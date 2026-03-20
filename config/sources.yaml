@@ -1,0 +1,39 @@
+# Data source symbols and canonical event definitions
+
+markets:
+  yahoo:
+    symbols:
+      gold: ["GC=F", "GLD"]
+      silver: ["SI=F", "SLV"]
+      bitcoin: ["BTC-USD", "BTC=F"]
+
+prediction_markets:
+  polymarket:
+    gamma_base: "https://gamma-api.polymarket.com"
+    clob_base: "https://clob.polymarket.com"
+    # Tags or keywords we care about for canonical events
+    topic_keywords:
+      - bitcoin
+      - gold
+      - silver
+      - btc
+      - crypto
+
+# Optional: override Deribit API base (default: https://www.deribit.com/api/v2)
+# deribit_base: "https://test.deribit.com/api/v2"
+
+# Canonical event templates (threshold + resolution date)
+# We'll match Polymarket markets to these by keyword + expiry
+canonical_events:
+  gold_above_X:
+    description: "Gold (spot/futures) above $X by date Y"
+    asset: gold
+    market_symbols: ["GC=F", "GLD"]
+  silver_above_X:
+    description: "Silver above $X by date Y"
+    asset: silver
+    market_symbols: ["SI=F", "SLV"]
+  bitcoin_above_X:
+    description: "Bitcoin above $X by date Y"
+    asset: bitcoin
+    market_symbols: ["BTC-USD"]
