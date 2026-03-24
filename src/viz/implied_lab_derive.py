@@ -174,33 +174,39 @@ def _derive_user_belief_outputs(
     else:
         delta = center - market_peak
         if abs(delta) < max(1.0, 0.002 * market_peak):
-            tilt = "about **aligned** with the market peak"
+            tilt_line = "Tilt: Aligned — belief peak near the market peak"
         elif delta > 0:
-            tilt = f"**more bullish** than the {ref_kind} peak (~${delta:,.0f} above the market peak at ${market_peak:,.0f})"
+            tilt_line = (
+                f"Tilt: Bullish — your peak ~${delta:,.0f} above the "
+                f"{ref_kind} peak near ${market_peak:,.0f}"
+            )
         else:
-            tilt = f"**more bearish** than the {ref_kind} peak (~${-delta:,.0f} below the market peak at ${market_peak:,.0f})"
+            tilt_line = (
+                f"Tilt: Bearish — your peak ~${-delta:,.0f} below the "
+                f"{ref_kind} peak near ${market_peak:,.0f}"
+            )
 
         if sigma_user < sigma_mkt * 0.92:
-            spread_txt = "**narrower** uncertainty than ATM-implied log volatility at this horizon"
+            width_line = "Width vs ATM-implied at this horizon: Narrower"
         elif sigma_user > sigma_mkt * 1.08:
-            spread_txt = "**wider** uncertainty than ATM-implied log volatility at this horizon"
+            width_line = "Width vs ATM-implied at this horizon: Wider"
         else:
-            spread_txt = "**similar** width to ATM-implied log volatility at this horizon"
+            width_line = "Width vs ATM-implied at this horizon: Similar"
+
+        lines = [
+            f"Peaks: You ${center:,.0f} · Market ${market_peak:,.0f} ({ref_kind})",
+            tilt_line,
+            width_line,
+        ]
 
         disc = [abs(u_norm[i] - r_norm[i]) for i in range(len(prices))]
         if disc:
             i0 = max(range(len(disc)), key=lambda i: disc[i])
-            disagree_txt = f"Largest shape gap is near **${prices[i0]:,.0f}** (comparing area-normalized densities)."
-        else:
-            disagree_txt = ""
+            lines.append(
+                f"Largest gap (normalized densities): near ${prices[i0]:,.0f}"
+            )
 
-        parts = [
-            f"**Belief vs {ref_kind}:** your curve peaks at **${center:,.0f}**; the reference peaks near **${market_peak:,.0f}** — you are {tilt}.",
-            f"You are {spread_txt}.",
-        ]
-        if disagree_txt:
-            parts.append(disagree_txt)
-        text = " ".join(parts)
+        text = "\n\n".join(lines)
 
     return {
         "chart_helpers_extra": {"user_belief_pct": user_belief_pct},
