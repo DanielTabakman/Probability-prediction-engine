@@ -1150,9 +1150,16 @@ if show_bitcoin_view:
                     if user_belief_for_state.get("enabled") and _dg:
                         _fwd_cap += f" · Belief disagreement: **{_dg}**"
                     right_forward_slot.caption(_fwd_cap)
-                    belief_txt = (outputs.get("belief_summary") or {}).get("text") or ""
-                    if belief_txt:
-                        right_belief_slot.markdown(belief_txt)
+                    _bs = outputs.get("belief_summary") or {}
+                    belief_txt = _bs.get("text") or ""
+                    belief_hints = _bs.get("hints_markdown") or ""
+                    if belief_txt or belief_hints:
+                        _belief_block = belief_txt
+                        if belief_hints:
+                            _belief_block += (
+                                ("\n\n" if belief_txt else "") + belief_hints
+                            )
+                        right_belief_slot.markdown(_belief_block)
 
                     # Quick summary and payout stats under sliders
                     if selected_strategy and selected_strategy.get("k1") is not None:

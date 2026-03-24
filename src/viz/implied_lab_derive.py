@@ -12,6 +12,7 @@ from src.engine.strategy_scanner import (
     payoff_target_to_strikes_with_work,
     strategy_payoff_at_prices,
 )
+from src.viz.belief_disagreement_hints import belief_disagreement_hints_payload
 
 
 def _compute_cost_usd(
@@ -137,7 +138,10 @@ def _derive_user_belief_outputs(
     empty_chart = {"user_belief_pct": []}
     ub = state.get("user_belief") or {}
     if not isinstance(ub, dict) or not bool(ub.get("enabled", False)):
-        return {"chart_helpers_extra": empty_chart, "belief_summary": {"text": ""}}
+        return {
+            "chart_helpers_extra": empty_chart,
+            "belief_summary": {"text": "", "hints_markdown": ""},
+        }
 
     prices: list[float] = market_data["dist"]["prices"]
     vol = float(market_data.get("vol") or 0.6)
@@ -151,7 +155,10 @@ def _derive_user_belief_outputs(
     if center <= 0:
         return {
             "chart_helpers_extra": empty_chart,
-            "belief_summary": {"text": "Set a positive belief center (peak price) to compare to the market."},
+            "belief_summary": {
+                "text": "Set a positive belief center (peak price) to compare to the market.",
+                "hints_markdown": "",
+            },
         }
 
     lognormal_raw = [float(x) for x in (market_data["dist"].get("pdf_raw") or [])]
@@ -178,7 +185,10 @@ def _derive_user_belief_outputs(
     if r_area <= 0:
         return {
             "chart_helpers_extra": {"user_belief_pct": user_belief_pct},
-            "belief_summary": {"text": "Market reference density is unavailable for comparison on this grid."},
+            "belief_summary": {
+                "text": "Market reference density is unavailable for comparison on this grid.",
+                "hints_markdown": "",
+            },
         }
 
     disc = [abs(u_norm[i] - r_norm[i]) for i in range(len(prices))]
@@ -197,7 +207,7 @@ def _derive_user_belief_outputs(
     if market_peak is None:
         return {
             "chart_helpers_extra": chart_helpers_extra,
-            "belief_summary": {"text": ""},
+            "belief_summary": {"text": "", "hints_markdown": ""},
         }
 
     delta = center - market_peak
@@ -232,9 +242,19 @@ def _derive_user_belief_outputs(
 
     text = "\n\n".join(lines)
 
+    hints_pl = belief_disagreement_hints_payload(
+        center_usd=center,
+        market_peak=market_peak,
+        sigma_user=sigma_user,
+        sigma_mkt=sigma_mkt,
+        shape_gap_strength=shape_gap_strength,
+    )
+    chart_helpers_extra["belief_disagreement_category"] = hints_pl["category_id"]
+    chart_helpers_extra["belief_strategy_family_hints"] = hints_pl["markdown"]
+
     return {
         "chart_helpers_extra": chart_helpers_extra,
-        "belief_summary": {"text": text},
+        "belief_summary": {"text": text, "hints_markdown": hints_pl["markdown"]},
     }
 
 
