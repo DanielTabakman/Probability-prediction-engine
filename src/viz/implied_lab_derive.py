@@ -112,6 +112,19 @@ def _argmax_peak_price(prices: list[float], f: list[float]) -> float | None:
     return float(prices[best_i])
 
 
+def _belief_shape_gap_strength_from_l1(l1_abs_density: float) -> str:
+    """
+    Compact UI label from ∫|f_user − f_ref| dx using the same normalized densities
+    as the belief summary. Both integrate to 1 on the grid, so the integral lies in [0, 2].
+    Thresholds are heuristic (legibility only).
+    """
+    if l1_abs_density < 0.28:
+        return "Low"
+    if l1_abs_density < 0.52:
+        return "Moderate"
+    return "High"
+
+
 def _derive_user_belief_outputs(
     state: dict[str, Any],
     market_data: dict[str, Any],
@@ -168,48 +181,59 @@ def _derive_user_belief_outputs(
             "belief_summary": {"text": "Market reference density is unavailable for comparison on this grid."},
         }
 
+    disc = [abs(u_norm[i] - r_norm[i]) for i in range(len(prices))]
+    i0 = max(range(len(disc)), key=lambda i: disc[i]) if disc else 0
+    largest_gap_price = float(prices[i0]) if prices else None
+    l1_shape_gap = _integrate_density_trapezoid(prices, disc)
+    shape_gap_strength = _belief_shape_gap_strength_from_l1(l1_shape_gap)
+
+    chart_helpers_extra: dict[str, Any] = {
+        "user_belief_pct": user_belief_pct,
+        "belief_largest_gap_price": largest_gap_price,
+        "belief_disagreement_strength": shape_gap_strength,
+    }
+
     market_peak = _argmax_peak_price(prices, ref_raw)
     if market_peak is None:
-        text = ""
+        return {
+            "chart_helpers_extra": chart_helpers_extra,
+            "belief_summary": {"text": ""},
+        }
+
+    delta = center - market_peak
+    if abs(delta) < max(1.0, 0.002 * market_peak):
+        tilt_line = "Tilt: Aligned — belief peak near the market peak"
+    elif delta > 0:
+        tilt_line = (
+            f"Tilt: Bullish — your peak ~${delta:,.0f} above the "
+            f"{ref_kind} peak near ${market_peak:,.0f}"
+        )
     else:
-        delta = center - market_peak
-        if abs(delta) < max(1.0, 0.002 * market_peak):
-            tilt_line = "Tilt: Aligned — belief peak near the market peak"
-        elif delta > 0:
-            tilt_line = (
-                f"Tilt: Bullish — your peak ~${delta:,.0f} above the "
-                f"{ref_kind} peak near ${market_peak:,.0f}"
-            )
-        else:
-            tilt_line = (
-                f"Tilt: Bearish — your peak ~${-delta:,.0f} below the "
-                f"{ref_kind} peak near ${market_peak:,.0f}"
-            )
+        tilt_line = (
+            f"Tilt: Bearish — your peak ~${-delta:,.0f} below the "
+            f"{ref_kind} peak near ${market_peak:,.0f}"
+        )
 
-        if sigma_user < sigma_mkt * 0.92:
-            width_line = "Width vs ATM-implied at this horizon: Narrower"
-        elif sigma_user > sigma_mkt * 1.08:
-            width_line = "Width vs ATM-implied at this horizon: Wider"
-        else:
-            width_line = "Width vs ATM-implied at this horizon: Similar"
+    if sigma_user < sigma_mkt * 0.92:
+        width_line = "Width vs ATM-implied at this horizon: Narrower"
+    elif sigma_user > sigma_mkt * 1.08:
+        width_line = "Width vs ATM-implied at this horizon: Wider"
+    else:
+        width_line = "Width vs ATM-implied at this horizon: Similar"
 
-        lines = [
-            f"Peaks: You ${center:,.0f} · Market ${market_peak:,.0f} ({ref_kind})",
-            tilt_line,
-            width_line,
-        ]
+    lines = [
+        f"Peaks: You ${center:,.0f} · Market ${market_peak:,.0f} ({ref_kind})",
+        tilt_line,
+        width_line,
+    ]
 
-        disc = [abs(u_norm[i] - r_norm[i]) for i in range(len(prices))]
-        if disc:
-            i0 = max(range(len(disc)), key=lambda i: disc[i])
-            lines.append(
-                f"Largest gap (normalized densities): near ${prices[i0]:,.0f}"
-            )
+    if disc:
+        lines.append(f"Largest gap (normalized densities): near ${prices[i0]:,.0f}")
 
-        text = "\n\n".join(lines)
+    text = "\n\n".join(lines)
 
     return {
-        "chart_helpers_extra": {"user_belief_pct": user_belief_pct},
+        "chart_helpers_extra": chart_helpers_extra,
         "belief_summary": {"text": text},
     }
 

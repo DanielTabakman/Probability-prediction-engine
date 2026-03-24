@@ -1110,6 +1110,24 @@ if show_bitcoin_view:
                             showgrid=False,
                         )
                     fig_dist.update_layout(**layout_kw)
+                    _ch = outputs.get("chart_helpers") or {}
+                    _gap_x = _ch.get("belief_largest_gap_price")
+                    if (
+                        user_belief_for_state.get("enabled")
+                        and _gap_x is not None
+                        and isinstance(_gap_x, (int, float))
+                    ):
+                        fig_dist.add_shape(
+                            type="line",
+                            xref="x",
+                            yref="paper",
+                            x0=float(_gap_x),
+                            x1=float(_gap_x),
+                            y0=0,
+                            y1=1,
+                            line=dict(color="rgba(110, 110, 110, 0.5)", width=1, dash="dash"),
+                            layer="below",
+                        )
                     # Cumulative % labels below x-axis (y in paper coords, 0–1)
                     for price, cdf_pct in data["cumulative_at"]:
                         fig_dist.add_annotation(
@@ -1125,7 +1143,13 @@ if show_bitcoin_view:
                         right_anomaly_slot.warning(
                             "Anomalous: market-implied distribution differs from lognormal (use multi-leg strategies to reshape)."
                         )
-                    right_forward_slot.caption(f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr")
+                    _fwd_cap = (
+                        f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
+                    )
+                    _dg = _ch.get("belief_disagreement_strength")
+                    if user_belief_for_state.get("enabled") and _dg:
+                        _fwd_cap += f" · Belief disagreement: **{_dg}**"
+                    right_forward_slot.caption(_fwd_cap)
                     belief_txt = (outputs.get("belief_summary") or {}).get("text") or ""
                     if belief_txt:
                         right_belief_slot.markdown(belief_txt)
