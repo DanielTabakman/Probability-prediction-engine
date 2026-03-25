@@ -30,10 +30,13 @@ from src.data.fetch_deribit import (
     fetch_deribit_btc_tight_bull_spreads,
     fetch_deribit_spreads_around_predictions,
     fetch_deribit_btc_option_expiries,
+    fetch_deribit_btc_options_instruments,
     fetch_deribit_forward_and_iv_for_expiry,
     fetch_deribit_btc_option_marks_by_expiry,
     fetch_deribit_btc_option_marks_by_expiry_full,
+    fetch_deribit_btc_option_book_marks,
     fetch_deribit_btc_index,
+    last_deribit_instruments_diagnostic,
 )
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
@@ -51,11 +54,87 @@ from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 import yaml
 
+
+def _render_implied_lab_verification(v: dict) -> None:
+    """Structured display for outputs['verification'] (no markdown contract)."""
+    if not v:
+        st.caption("Verification payload not available for this run.")
+        return
+    st.caption(v.get("snapshot_note") or "")
+    st.caption(v.get("cache_note") or "")
+    st.write("**As-of (UTC)** — run snapshot / valuation time:", v.get("as_of_utc", "—"))
+    st.write("**Data sources:**", ", ".join(str(x) for x in (v.get("data_sources") or [])))
+
+    dens = v.get("density") or {}
+    ref = dens.get("reference_risk_neutral") or {}
+    st.markdown("##### Risk-neutral distribution (reference, purple)")
+    st.caption(ref.get("method", ""))
+    c1, c2 = st.columns(2)
+    with c1:
+        st.write("Forward (USD):", f"{ref.get('forward_usd', 0):,.2f}")
+        st.write("ATM IV (annual):", f"{ref.get('atm_iv_annual', 0):.4f}")
+        st.write("T (years):", f"{ref.get('T_years', 0):.4f}")
+    with c2:
+        st.write("Grid min (USD):", f"{ref.get('grid_price_min_usd', 0):,.2f}")
+        st.write("Grid max (USD):", f"{ref.get('grid_price_max_usd', 0):,.2f}")
+        st.write("Grid points:", ref.get("grid_points"))
+
+    mi = dens.get("market_implied") or {}
+    st.markdown("##### Market-implied pricing distribution (orange)")
+    st.caption(mi.get("method_when_computed") or "")
+    st.write("**Call marks count:**", mi.get("call_marks_count"))
+    st.write("**Breeden–Litzenberger:**", mi.get("breeden_litzenberger"))
+    if mi.get("skip_reason"):
+        st.caption(mi["skip_reason"])
+
+    belief = v.get("belief")
+    if belief:
+        st.markdown("##### User belief overlay (teal)")
+        if belief.get("invalid"):
+            st.warning(belief.get("invalid_reason") or "Invalid belief parameters.")
+        st.write("Center / mode (USD):", f"{belief.get('center_mode_usd', 0):,.2f}")
+        st.write("σ of ln price:", f"{belief.get('sigma_ln_of_price', 0):.4f}")
+        st.write("σ at horizon (ATM-implied, same scale):", f"{belief.get('sigma_mkt_at_horizon', 0):.4f}")
+        st.caption(belief.get("note") or "")
+
+    ss = v.get("strategy_summary") or {}
+    st.markdown("##### Net cost, breakevens, max gain / loss")
+    if ss.get("error"):
+        st.error(str(ss["error"]))
+    vals = ss.get("values") or {}
+    notes = ss.get("calculation_notes") or {}
+    if not ss.get("applicable"):
+        st.caption(
+            "No strategy P&L on the chart for this run (invalid targets, missing strikes, or empty overlay)."
+        )
+    else:
+        st.write("**Strategy name:**", vals.get("name"))
+        st.write("**Qty:**", vals.get("qty"))
+        st.write(
+            "**Net cost (USD):**",
+            f"{vals.get('net_cost_usd', 0):,.2f}",
+            f"({vals.get('debit_credit')})",
+        )
+        st.write("**Max gain (USD):**", f"{vals.get('max_gain_usd', 0):,.2f}")
+        st.write("**Max loss (USD):**", f"{vals.get('max_loss_usd', 0):,.2f}")
+        be = vals.get("breakevens_usd") or []
+        st.write(
+            "**Breakevens (USD):**",
+            ", ".join(f"{x:,.2f}" for x in be) if be else "—",
+        )
+    with st.expander("Calculation notes", expanded=False):
+        st.write("**Net cost / credit:**", notes.get("net_cost", ""))
+        st.write("**Max gain / max loss:**", notes.get("max_gain_loss", ""))
+        st.write("**Breakevens:**", notes.get("breakevens", ""))
+
+
 st.set_page_config(page_title="Probability Engine", layout="wide")
 st.title("Probability Prediction Engine")
 
 # Cached fetches (2 min TTL) — avoids re-fetch on every sidebar change
 CACHE_TTL = 120
+# Shorter TTL for option expiries so a transient empty result is not stuck as long.
+CACHE_TTL_OPTION_EXPIRIES = 30
 
 @st.cache_data(ttl=CACHE_TTL)
 def _cached_yahoo(symbols, period):
@@ -74,16 +153,36 @@ def _cached_deribit_index():
     return fetch_deribit_btc_index()
 
 @st.cache_data(ttl=CACHE_TTL)
+def _cached_option_instruments():
+    """Single get_instruments(option) payload; reused for spreads + options chart."""
+    return fetch_deribit_btc_options_instruments(expired=False)
+
+@st.cache_data(ttl=CACHE_TTL)
+def _cached_option_book_marks():
+    """Single get_book_summary_by_currency(BTC, option); reused for spread marks (no per-ticker storm)."""
+    return fetch_deribit_btc_option_book_marks()
+
+@st.cache_data(ttl=CACHE_TTL)
 def _cached_bull_spreads(spot_price, spread_width, max_expiries):
-    return fetch_deribit_btc_tight_bull_spreads(spot_price=spot_price, spread_width=spread_width, max_expiries=max_expiries)
+    inst = _cached_option_instruments()
+    marks = _cached_option_book_marks()
+    return fetch_deribit_btc_tight_bull_spreads(
+        spot_price=spot_price,
+        spread_width=spread_width,
+        max_expiries=max_expiries,
+        instruments=inst,
+        option_book_marks=marks,
+    )
 
 @st.cache_data(ttl=CACHE_TTL)
 def _cached_options_for_chart():
-    return fetch_deribit_btc_options_for_chart()
+    inst = _cached_option_instruments()
+    return fetch_deribit_btc_options_for_chart(instruments=inst)
 
-@st.cache_data(ttl=CACHE_TTL)
+@st.cache_data(ttl=CACHE_TTL_OPTION_EXPIRIES)
 def _cached_option_expiries(max_expiries):
-    return fetch_deribit_btc_option_expiries(max_expiries=max_expiries)
+    rows = fetch_deribit_btc_option_expiries(max_expiries=max_expiries)
+    return rows, last_deribit_instruments_diagnostic()
 
 @st.cache_data(ttl=CACHE_TTL)
 def _cached_forward_iv(expiry_ts, spot):
@@ -121,7 +220,7 @@ show_markets = st.sidebar.checkbox("Market prices (Yahoo)", value=True)
 show_polymarket = st.sidebar.checkbox("Prediction markets (Polymarket)", value=True)
 chart_days = st.sidebar.slider("Chart history (days)", 5, 90, 30)
 
-# Chart toggles (always available; heavy pieces still gated by buttons)
+# Chart toggles (always available; optional Deribit overlays gated until Refresh priced inputs)
 is_full = True
 st.sidebar.caption("Chart detail")
 show_forward_curve = st.sidebar.checkbox("Show futures forward curve", value=True, help="Deribit futures at expiry dates.")
@@ -131,6 +230,19 @@ show_options_on_chart = st.sidebar.checkbox("Show options on main chart", value=
 options_in_separate_chart = st.sidebar.checkbox("Options in separate chart below", value=True, help="Dedicated options chart.")
 option_types_on_chart = st.sidebar.multiselect("Option types", ["call", "put"], default=["call", "put"], key="option_types")
 min_prob_label_pct = st.sidebar.slider("Show probability labels above (%)", 0, 50, 5, help="Hide small labels.")
+
+if show_bitcoin_view:
+    st.sidebar.markdown("---")
+    st.sidebar.caption("Implied lab — priced inputs")
+    if st.sidebar.button("Refresh priced inputs (Deribit)", key="btn_refresh_priced"):
+        st.cache_data.clear()
+        st.session_state["load_deribit"] = True
+        st.rerun()
+    st.sidebar.caption("Reloads exchange quotes and chart overlays. Does not reset your belief sliders.")
+    if not st.session_state.get("load_deribit", False):
+        st.sidebar.caption(
+            "Deribit forward curve and spread overlays on the main chart load after the first refresh above."
+        )
 
 # ---------- Bitcoin section: light load first, heavy data on demand ----------
 if show_bitcoin_view:
@@ -189,13 +301,9 @@ if show_bitcoin_view:
         except Exception:
             pass
 
-    # Deribit data only when user clicks "Load Deribit data" (Full view)
-    load_deribit = st.session_state.get("load_deribit", False)
-    if is_full and st.sidebar.button("Load Deribit data (spreads, options)", key="btn_deribit"):
-        load_deribit = True
-        st.session_state["load_deribit"] = True
-    if is_full and load_deribit:
-        st.session_state["load_deribit"] = True
+    # Optional Deribit extras (forward curve, bull spreads, prediction overlays, reference tables).
+    # Not auto-loaded: implied-lab fetches its own expiries/marks via _cached_* when that section runs.
+    load_deribit = bool(st.session_state.get("load_deribit", False))
 
     forward_curve = []
     bull_spreads = []
@@ -203,7 +311,14 @@ if show_bitcoin_view:
     if is_full and load_deribit and current_btc is not None:
         with st.spinner("Loading Deribit (forward curve, spreads, options)…"):
             try:
-                forward_curve = _cached_forward_curve(10) or []
+                with ThreadPoolExecutor(max_workers=3) as ex:
+                    f_fwd = ex.submit(_cached_forward_curve, 10)
+                    f_inst = ex.submit(_cached_option_instruments)
+                    f_marks = ex.submit(_cached_option_book_marks)
+                    wait([f_fwd, f_inst, f_marks])
+                    forward_curve = f_fwd.result() or []
+                    _ = f_inst.result()
+                    _ = f_marks.result()
             except Exception:
                 pass
             try:
@@ -215,7 +330,11 @@ if show_bitcoin_view:
                     eligible = [q for q in btc_questions if (q.get("strike") or 0) >= 10000]
                     eligible.sort(key=lambda q: q.get("strike") or 0, reverse=True)
                     prediction_spreads = fetch_deribit_spreads_around_predictions(
-                        btc_questions=eligible or btc_questions, current_spot=current_btc, max_questions=8
+                        btc_questions=eligible or btc_questions,
+                        current_spot=current_btc,
+                        max_questions=8,
+                        instruments=_cached_option_instruments(),
+                        option_book_marks=_cached_option_book_marks(),
                     ) or []
                 except Exception:
                     pass
@@ -546,18 +665,14 @@ if show_bitcoin_view:
             st.caption("No prediction-aligned spreads (need Polymarket questions + Deribit options at matching strikes/expiries).")
 
     if is_full and not load_deribit:
-        st.info("To see Deribit spreads, forward curve, and options on the chart, click **Load Deribit data (spreads, options)** in the sidebar.")
+        st.caption(
+            "Optional: use **Refresh priced inputs (Deribit)** in the sidebar to load the forward curve, "
+            "spread overlays on the chart, and Deribit reference tables."
+        )
 
-    # 4d) Implied probability distribution — on demand (Full view only)
-    run_implied = st.session_state.get("run_implied", False)
-    if is_full and st.sidebar.button("Run implied distribution & strategies", key="btn_implied"):
-        st.session_state["run_implied"] = True
-        run_implied = True
+    # 4d) Implied probability distribution — Full view: mounted automatically (own Deribit fetches inside)
+    run_implied = bool(is_full)
     if is_full:
-        run_implied = st.session_state.get("run_implied", False)
-    if is_full and load_deribit and not run_implied:
-        st.info("Click **Run implied distribution & strategies** in the sidebar to see the probability distribution chart and strategy scanner.")
-    if is_full and run_implied:
         st.subheader("Implied probability distribution")
         with st.expander("How to read this chart"):
             st.markdown("""
@@ -571,7 +686,7 @@ if show_bitcoin_view:
     if is_full and run_implied and current_btc is not None:
         try:
             with st.spinner("Loading expiries and option marks…"):
-                expiries = _cached_option_expiries(10)
+                expiries, expiry_fetch_diag = _cached_option_expiries(10)
             if expiries:
                 expiry_options = [e["expiry_date_str"] for e in expiries]
                 selected_expiry_str = st.selectbox(
@@ -593,6 +708,7 @@ if show_bitcoin_view:
                         right_anomaly_slot = st.empty()
                         right_forward_slot = st.empty()
                         right_belief_slot = st.empty()
+                        right_verification_slot = st.empty()
                     with col_controls:
                         # Only fetch data for the selected expiry to keep this step fast.
                         fwd_iv = _cached_forward_iv(selected["expiry_ts"], current_btc)
@@ -600,7 +716,9 @@ if show_bitcoin_view:
                         vol = (fwd_iv.get("atm_iv") or 0.6) if fwd_iv else 0.6
                         if vol <= 0:
                             vol = 0.6
-                        now_ts = pd.Timestamp.now(tz="UTC").timestamp() * 1000
+                        run_ts_utc = pd.Timestamp.now(tz="UTC")
+                        now_ts = run_ts_utc.timestamp() * 1000
+                        as_of_utc = run_ts_utc.isoformat()
                         T_years = max(0.0, (selected["expiry_ts"] - now_ts) / 1000 / (365.25 * 24 * 3600))
                         # Avoid degenerate near-zero T: use at least ~1 week so the bell is visible
                         T_years = max(T_years, 0.02)
@@ -640,6 +758,11 @@ if show_bitcoin_view:
                             "avail_strikes": avail_strikes,
                             "call_by_k": call_by_k,
                             "put_by_k": put_by_k,
+                            "data_sources": [
+                                "Deribit (BTC index, forward, ATM IV, option marks)",
+                            ],
+                            "as_of_utc": as_of_utc,
+                            "quote_cache_ttl_s": CACHE_TTL,
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
@@ -1161,6 +1284,10 @@ if show_bitcoin_view:
                             )
                         right_belief_slot.markdown(_belief_block)
 
+                    with right_verification_slot:
+                        with st.expander("Verification", expanded=False):
+                            _render_implied_lab_verification(outputs.get("verification") or {})
+
                     # Quick summary and payout stats under sliders
                     if selected_strategy and selected_strategy.get("k1") is not None:
                         name = selected_strategy.get("name", "Universal 4-leg")
@@ -1285,9 +1412,15 @@ if show_bitcoin_view:
                         if avail_strikes:
                             st.caption("Set strikes in the **left column** (open **Adjust strategy shape**) to see payoff and name above.")
                         else:
-                            st.caption("No strikes available for this expiry; load Deribit data and choose an expiry with options.")
+                            st.caption("No strikes available for this expiry; use **Refresh priced inputs (Deribit)** or pick another expiry.")
             else:
                 st.caption("No Deribit option expiries. Check API.")
+                with st.expander("Debug (expiries fetch)", expanded=False):
+                    st.code(
+                        expiry_fetch_diag
+                        or "No failure detail stored. If this persists, use the app menu → Clear cache, then Rerun.",
+                        language="text",
+                    )
         except Exception as e:
             st.caption(f"Implied distribution unavailable: {e}")
             with st.expander("Debug (last error)", expanded=False):
