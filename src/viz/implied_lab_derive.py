@@ -13,6 +13,34 @@ from src.engine.strategy_scanner import (
     strategy_payoff_at_prices,
 )
 from src.viz.belief_disagreement_hints import belief_disagreement_hints_payload
+from src.viz.implied_lab_provenance import build_verification_payload
+
+
+def _belief_verification_block(
+    *,
+    enabled: bool,
+    center_usd: float,
+    sigma_ln: float,
+    sigma_mkt: float,
+    invalid: bool = False,
+    invalid_reason: str | None = None,
+) -> dict[str, Any] | None:
+    if not enabled:
+        return None
+    out: dict[str, Any] = {
+        "enabled": True,
+        "center_mode_usd": float(center_usd),
+        "sigma_ln_of_price": float(sigma_ln),
+        "sigma_mkt_at_horizon": float(sigma_mkt),
+        "note": (
+            "Subjective lognormal-style overlay for comparison; not the risk-neutral distribution."
+        ),
+    }
+    if invalid:
+        out["invalid"] = True
+        if invalid_reason:
+            out["invalid_reason"] = invalid_reason
+    return out
 
 
 def _compute_cost_usd(
@@ -141,6 +169,7 @@ def _derive_user_belief_outputs(
         return {
             "chart_helpers_extra": empty_chart,
             "belief_summary": {"text": "", "hints_markdown": ""},
+            "belief_verification": None,
         }
 
     prices: list[float] = market_data["dist"]["prices"]
@@ -159,6 +188,14 @@ def _derive_user_belief_outputs(
                 "text": "Set a positive belief center (peak price) to compare to the market.",
                 "hints_markdown": "",
             },
+            "belief_verification": _belief_verification_block(
+                enabled=True,
+                center_usd=center,
+                sigma_ln=sigma_user,
+                sigma_mkt=sigma_mkt,
+                invalid=True,
+                invalid_reason="Belief peak (mode) must be positive.",
+            ),
         }
 
     lognormal_raw = [float(x) for x in (market_data["dist"].get("pdf_raw") or [])]
@@ -189,6 +226,12 @@ def _derive_user_belief_outputs(
                 "text": "Market reference density is unavailable for comparison on this grid.",
                 "hints_markdown": "",
             },
+            "belief_verification": _belief_verification_block(
+                enabled=True,
+                center_usd=center,
+                sigma_ln=sigma_user,
+                sigma_mkt=sigma_mkt,
+            ),
         }
 
     disc = [abs(u_norm[i] - r_norm[i]) for i in range(len(prices))]
@@ -208,6 +251,12 @@ def _derive_user_belief_outputs(
         return {
             "chart_helpers_extra": chart_helpers_extra,
             "belief_summary": {"text": "", "hints_markdown": ""},
+            "belief_verification": _belief_verification_block(
+                enabled=True,
+                center_usd=center,
+                sigma_ln=sigma_user,
+                sigma_mkt=sigma_mkt,
+            ),
         }
 
     delta = center - market_peak
@@ -255,6 +304,12 @@ def _derive_user_belief_outputs(
     return {
         "chart_helpers_extra": chart_helpers_extra,
         "belief_summary": {"text": text, "hints_markdown": hints_pl["markdown"]},
+        "belief_verification": _belief_verification_block(
+            enabled=True,
+            center_usd=center,
+            sigma_ln=sigma_user,
+            sigma_mkt=sigma_mkt,
+        ),
     }
 
 
@@ -440,18 +495,30 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 market_pct = [(d / max_mkt * 25.0) if max_mkt > 0 else 0.0 for d in market_pdf_raw]
                 anomalous = is_anomalous(prices, market_data["dist"]["pdf_raw"], market_pdf_raw, threshold=0.015)
             belief_pack = _derive_user_belief_outputs(state, market_data, market_pdf_raw)
+            summary_fail = {
+                "name": "—",
+                "cost_usd": 0.0,
+                "debit_credit": "—",
+                "max_gain": 0.0,
+                "max_loss": 0.0,
+                "breakevens": [],
+                "error": work.get("error") if isinstance(work, dict) else "Invalid targets.",
+            }
+            overlay_fail = {"prices": prices, "payoff_usd": []}
+            verification_fail = build_verification_payload(
+                market_data=market_data,
+                summary=summary_fail,
+                strategy=None,
+                overlay=overlay_fail,
+                market_pdf_raw=market_pdf_raw,
+                call_marks=call_marks,
+                belief_verification=belief_pack.get("belief_verification"),
+                solve_error=summary_fail.get("error"),
+            )
             return {
                 "strategy": None,
-                "overlay": {"prices": prices, "payoff_usd": []},
-                "summary": {
-                    "name": "—",
-                    "cost_usd": 0.0,
-                    "debit_credit": "—",
-                    "max_gain": 0.0,
-                    "max_loss": 0.0,
-                    "breakevens": [],
-                    "error": work.get("error") if isinstance(work, dict) else "Invalid targets.",
-                },
+                "overlay": overlay_fail,
+                "summary": summary_fail,
                 "chart_helpers": {
                     "market_pdf_raw": market_pdf_raw,
                     "market_pct": market_pct,
@@ -460,6 +527,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 },
                 "belief_summary": belief_pack["belief_summary"],
                 "solve_work": solve_work,
+                "verification": verification_fail,
             }
         k1, k2, k3, k4 = res
     else:
@@ -550,9 +618,21 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         "breakevens": breakevens,
     }
 
+    overlay_ok = {"prices": prices, "payoff_usd": payoff_usd}
+    verification_ok = build_verification_payload(
+        market_data=market_data,
+        summary=summary,
+        strategy=strategy,
+        overlay=overlay_ok,
+        market_pdf_raw=market_pdf_raw,
+        call_marks=call_marks,
+        belief_verification=belief_pack.get("belief_verification"),
+        solve_error=None,
+    )
+
     return {
         "strategy": strategy,
-        "overlay": {"prices": prices, "payoff_usd": payoff_usd},
+        "overlay": overlay_ok,
         "summary": summary,
         "chart_helpers": {
             "market_pdf_raw": market_pdf_raw,
@@ -562,5 +642,6 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         },
         "belief_summary": belief_pack["belief_summary"],
         "solve_work": solve_work,
+        "verification": verification_ok,
     }
 
