@@ -14,6 +14,60 @@ from src.viz.disagreement_thresholds import (
     L1_SHAPE_GAP_MODERATE_BELOW,
 )
 
+# Display-only: trust strip pointer (Sprint 006). Kept static so we do not imply extra provenance.
+TRUST_STRIP_VERIFICATION_POINTER = (
+    "Full traces and numeric inputs: expand **Verification** below."
+)
+
+TRUST_STRIP_FALLBACK_LINE = (
+    "Provenance summary unavailable for this run. "
+    "Expand **Verification** below for traces and inputs when available."
+)
+
+
+def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
+    """
+    Compact read-only lines for the always-visible trust strip (verification_summary + optional belief note).
+    Does not invent as-of, sources, or overlay text when absent — uses honest placeholders.
+    """
+    if not verification or not isinstance(verification, dict):
+        return [TRUST_STRIP_FALLBACK_LINE]
+    vs = verification.get("verification_summary")
+    if not isinstance(vs, dict) or not vs:
+        return [TRUST_STRIP_FALLBACK_LINE]
+
+    lines: list[str] = []
+    as_of = vs.get("as_of_utc")
+    if isinstance(as_of, str) and as_of.strip():
+        lines.append(f"**As of (UTC):** {as_of.strip()}")
+    else:
+        lines.append("**As of (UTC):** not reported for this run.")
+
+    ds = vs.get("data_sources")
+    if isinstance(ds, list) and len(ds) > 0:
+        lines.append("**Sources:** " + ", ".join(str(x) for x in ds))
+    else:
+        lines.append("**Sources:** not listed for this run.")
+
+    ob = vs.get("overlay_basis")
+    if isinstance(ob, str) and ob.strip():
+        lines.append(f"**Overlay basis:** {ob.strip()}")
+    else:
+        lines.append("**Overlay basis:** not reported for this run.")
+
+    sfs = vs.get("strategy_families_scope")
+    if isinstance(sfs, str) and sfs.strip():
+        lines.append(sfs.strip())
+
+    belief = verification.get("belief")
+    if isinstance(belief, dict) and belief.get("enabled") and not belief.get("invalid"):
+        note = belief.get("note")
+        if isinstance(note, str) and note.strip():
+            lines.append(f"**Belief (teal):** {note.strip()}")
+
+    lines.append(TRUST_STRIP_VERIFICATION_POINTER)
+    return lines
+
 
 def _overlay_basis_one_line(lab_mode: str | None) -> str:
     """Same semantics as verification_summary.overlay_basis; compact for the glance card."""

@@ -50,6 +50,7 @@ from src.engine.strategy_scanner import (
 from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
+from src.viz.implied_lab_provenance import build_trust_strip_lines
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -107,6 +108,14 @@ def _render_belief_vs_market_glance(v: dict) -> None:
             f"{g.get('formula_caption', '')}"
         )
         st.caption(f"{g.get('overlay_basis_line', '')}")
+
+
+def _render_trust_strip(verification: dict) -> None:
+    """Always-visible provenance strip from verification_summary (Sprint 006)."""
+    lines = build_trust_strip_lines(verification if isinstance(verification, dict) else None)
+    with st.container(border=True):
+        st.markdown("##### Trust / provenance")
+        st.caption("\n\n".join(lines))
 
 
 def _render_implied_lab_verification(v: dict) -> None:
@@ -474,6 +483,7 @@ if show_bitcoin_view:
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
+                        right_trust_slot = st.empty()
                         right_review_slot = st.empty()
                         right_glance_slot = st.empty()
                         right_anomaly_slot = st.empty()
@@ -1055,6 +1065,8 @@ if show_bitcoin_view:
                     # Summary card (Sprint 001): single-source-of-truth from derived outputs.
                     with right_summary_slot.container():
                         _render_implied_lab_summary_card(outputs)
+                    with right_trust_slot.container():
+                        _render_trust_strip(outputs.get("verification") or {})
                     with right_review_slot.container():
                         _render_decision_ready_review(outputs.get("verification") or {})
                     with right_glance_slot.container():

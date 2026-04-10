@@ -10,19 +10,20 @@ Declare **exactly one** transaction type per session (**BUILD**, **CLOSEOUT**, *
 
 ## Current priority
 
-Select the next bounded Sprint 1 frontier from `docs/SOP/CURRENT_FRONTIER.md` after Sprint 005 closure.
+Select the next bounded Sprint 1 frontier from `docs/SOP/CURRENT_FRONTIER.md` after Sprint 006 closure.
 
 ## Active sprint
 
-**None.** Sprint 005 closed (Transaction 16, 2026-04-10).
+**None.** Sprint 006 closed (Transaction 22, 2026-04-10).
 
 ## Current status
 
-The repo can run unit tests, the primary UI smoke script, and the actual Streamlit app locally. **Sprint 005 is formally closed** (Transaction 16, 2026-04-10): `python -m pytest -q` **PASS** (28 tests); `python scripts/run_implied_lab_ui_smoke.py` **PASS** — manifest `artifacts/ui_smoke/20260410_153957/ui_smoke_manifest.json`. Gated smoke **C_directional_peak_disagreement** **FAIL** on this closeout rerun — manifest `artifacts/ui_smoke/20260410_154209/ui_smoke_manifest.json` (mixed disagreement vs harness’s directional expectation; **live-data-sensitive** / **scenario-sensitive**). **Sprint 004** remains closed with prior **C** green evidence (`artifacts/ui_smoke/20260410_150352/`). UI smokes remain **live-data-sensitive** / **environment-sensitive** if Deribit/Yahoo are down or local processes collide.
+The repo can run unit tests, the primary UI smoke script, and the actual Streamlit app locally. **Sprint 006 is formally closed** (Transaction 22, 2026-04-10): `python -m pytest -q` **PASS** (**35** tests); `python scripts/run_implied_lab_ui_smoke.py` **PASS** — manifest `artifacts/ui_smoke/20260410_171958/ui_smoke_manifest.json`. **Smoke C** not rerun for Sprint 006 (presentation-only; per OPERATING_RULES validation tiers). **Trust strip visibility:** compact **Trust / provenance** sits under **Summary** above **Decision-ready review**; primary smoke **A** still scrolls into expanded **Verification** before screenshot — use a local scroll or ad-hoc capture to pixel-check the strip (see `docs/IMPLIED_LAB_SMOKE.md` note). Prior **Sprint 005** closeout notes (smoke C fail on that window) remain historical in `CURRENT_FRONTIER.md`. UI smokes remain **live-data-sensitive** / **environment-sensitive** if Deribit/Yahoo are down or local processes collide.
 
 ## Completed recently
 
-- **closed:** **Sprint 005 — Decision-ready trade review** (`decision_ready_review.py`, right-column block between Summary and glance, `tests/test_decision_ready_review.py`). **Closeout (Transaction 16):** pytest **PASS**; smoke A **PASS** (manifest above); smoke C **FAIL** on rerun (see Current status); live inspection via smoke A screenshot — review block + non-advisory + fit caption adjacent to glance.
+- **closed:** **Sprint 006 — Trust / provenance strip** (`build_trust_strip_lines`, `app.py` `right_trust_slot`, `tests/test_trust_strip.py`). **Closeout (Transaction 22):** pytest **PASS**; smoke A **PASS** (manifest above).
+- **closed:** **Sprint 005 — Decision-ready trade review** (`decision_ready_review.py`, right-column block between Summary and glance, `tests/test_decision_ready_review.py`). **Closeout (Transaction 16):** pytest **PASS**; smoke A **PASS** (`artifacts/ui_smoke/20260410_153957/ui_smoke_manifest.json`); smoke C **FAIL** on that rerun — see `CURRENT_FRONTIER.md`.
 - **closed:** **Sprint 004 — Main disagreement digest & fit-family linkage** (`build_disagreement_scan_payload`, glance UI reorder, audit expander, tests). **Closeout (Transaction 13):** `python -m pytest -q` **PASS** (21 tests). `python scripts/run_implied_lab_ui_smoke.py` **PASS** — manifest `artifacts/ui_smoke/20260410_145441/ui_smoke_manifest.json`. `python scripts/implied_lab_ui_smoke_harness.py --scenario C_directional_peak_disagreement --port <ephemeral>` **PASS** — manifest `artifacts/ui_smoke/20260410_150352/ui_smoke_manifest.json`. (One earlier headless **C** attempt in the same session hung until stale Python processes were cleared; second run **PASS** — classify hang as **environment-sensitive**, not product regression.)
 - completed: **Sprint 003 — Belief uncertainty capture (±% move (1σ) input mode + σ_ln mapping + tests)**
 - verified: `python -m pytest -q` is green; prior green evidence exists for UI smoke A and C (may flap when data unavailable).
@@ -55,7 +56,7 @@ The repo can run unit tests, the primary UI smoke script, and the actual Streaml
 
 2. **Primary automated UI smoke**  
    `python scripts/run_implied_lab_ui_smoke.py`  
-   Last known result: passed (2026-04-10 — `artifacts/ui_smoke/20260410_153957/`)
+   Last known result: passed (2026-04-10 — `artifacts/ui_smoke/20260410_171958/`)
 
 3. **Local app launch**  
    `python -m streamlit run src/viz/app.py --server.headless true --server.port 8515`  
@@ -79,4 +80,4 @@ Pre–Sprint 006: accepted Sprint 002–005 work, full `tests/`, `scripts/run_im
 
 ## Last updated
 
-2026-04-10 by agent (Transaction 18 — RECOVERY baseline hygiene pre–Sprint 006; Transaction 17 — SOP validation tiers, closeout budget, preflight hygiene, smoke C scope; Transaction 16 — Sprint 005 closed; pytest + smoke A green; smoke C fail scenario/live-data on that window)
+2026-04-10 by agent (Transaction 22 — Sprint 006 closed; pytest 35 passed + smoke A green; Transaction 18 — RECOVERY baseline; Transaction 17 — validation tiers; Transaction 16 — Sprint 005 closed)

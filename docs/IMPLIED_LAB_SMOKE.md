@@ -20,6 +20,8 @@ If anything fails, use **Debug (last error)** (collapsed expander under the fail
 
 | 2 | **Summary visible** — Right-column summary card (strategy name, debit/credit, cost, max gain/loss, breakevens) | |
 
+| 2a | **Trust / provenance (Sprint 006)** — Immediately under Summary: as-of (UTC), sources, overlay basis, illustrative-scope line from `verification_summary`, pointer to **Verification**; no need to expand **Verification** to see this strip | |
+
 | 3 | **Exact strikes** — Mode = Exact strikes; adjust K1–K4; green payoff updates | |
 
 | 4 | **Target payoff** — Mode = Target payoff; payoff sliders update solved shape / summary | |
@@ -81,6 +83,8 @@ Use a different `--port` if `8610` is busy.
 
 ### What success means today
 For **A**, the harness checks page load plus disagreement/family/trade text and Verification (including disagreement classification). For **C** (when you run it), the same base checks apply plus **Directional** in the disagreement line and the manifest’s C-specific booleans. Exit code `0` means the checks required for the scenarios **in that run** passed (see `pass_criteria` in the manifest).
+
+**Sprint 006 note (trust strip vs screenshot):** Scenario **A** expands **Verification** and scrolls to disagreement classification before the `full_page=False` capture, so the default **A** PNG may **not** show the compact **Trust / provenance** block under **Summary**. Use checklist row **2a** (scroll up in the right column) or an ad-hoc screenshot when you need pixel evidence of the strip.
 
 **Scenario sensitivity (Sprint 005 closeout, 2026-04-10):** **C** can **fail** when live marks + default belief inputs yield **mixed** or **width_vol** disagreement (e.g. `width_band=wider`) even though the page loads and disagreement UI is coherent. Classify as **live-data-sensitive** / **scenario-sensitive** — not automatically a regression in the **Decision-ready review** block or digest copy. Prior green **C** artifacts (e.g. `artifacts/ui_smoke/20260410_150352/`) remain valid historical evidence.
 

@@ -5,14 +5,15 @@ Project: Probability Prediction Engine
 Phase: Sprint 1 / one-screen BTC implied lab
 Date: 2026-04-10
 Steward: ChatGPT frontier steward window
-Status: Active (post–Sprint 005 closeout)
+Status: Active (post–Sprint 006 closeout)
 
 ## Executive state
 - [V/I] Product: BTC-first belief-vs-market trade construction workbench; not a trading bot and not a general AI analyst.
 - [V/I] Current phase target: one-screen implied lab with semantic honesty, clear disagreement interpretation, and trustworthy interaction flow.
-- [V/R] Most recently implemented sprint work: **Sprint 005 — Decision-ready trade review** (`decision_ready_review.py` + app slot between Summary and glance + tests).
-- [V/R] Most recently closed sprint (process): **Sprint 005** (Transaction 16, 2026-04-10 — pytest + smoke **A** green; smoke **C** **FAIL** on closeout rerun — **live-data/scenario-sensitive** mixed vs directional; live inspection via smoke **A** screenshot).
-- [V/R] Prior closed sprint: **Sprint 004** (Transaction 13 — pytest + smoke A/C green; Yahoo MultiIndex fix in `src/data/fetch_yahoo.py`).
+- [V/R] Most recently implemented sprint work: **Sprint 006 — Trust / provenance strip** (`build_trust_strip_lines` + `right_trust_slot` under Summary + `tests/test_trust_strip.py`).
+- [V/R] Most recently closed sprint (process): **Sprint 006** (Transaction 22, 2026-04-10 — pytest **35** + smoke **A** green; smoke **C** not required; **A** harness screenshot not framed on trust strip — see truth table).
+- [V/R] Prior closed sprint: **Sprint 005** (Transaction 16 — decision-ready review; smoke **C** fail on that window **live-data/scenario-sensitive**).
+- [V/R] Prior: **Sprint 004** (Transaction 13 — pytest + smoke A/C green; Yahoo MultiIndex fix in `src/data/fetch_yahoo.py`).
 - [V/R] Earlier closed: **Sprint 003 — Belief uncertainty capture** (see truth table for caveats).
 - [V] Active sprint status: **none**.
 - [V/I] Single best next move: select next bounded frontier from `docs/SOP/CURRENT_FRONTIER.md` (Sprint 1 polish / optional ops runbook).
@@ -116,6 +117,12 @@ Status: Active (post–Sprint 005 closeout)
   - Smoke A: `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — **live-data-sensitive** + **environment-sensitive**; manifest `artifacts/ui_smoke/20260410_153957/ui_smoke_manifest.json`; screenshot shows **Decision-ready review** + **Belief vs market — at a glance** with non-advisory copy.
   - Smoke C: `python scripts/implied_lab_ui_smoke_harness.py --scenario C_directional_peak_disagreement --port 53912` → **FAIL** — **live-data-sensitive** / **scenario-sensitive**; manifest `artifacts/ui_smoke/20260410_154209/ui_smoke_manifest.json` (`directional_category_verified` false; notes: mixed disagreement, `width_band=wider`; some harness booleans false on that run). **Not** treated as Sprint 005 product regression.
   - Sprint 005 close decision: **CLOSED**
+- [V] Validation evidence captured (2026-04-10, Transaction 22 — Sprint 006 closure):
+  - Tests: `python -m pytest -q` → **PASS** (**35** tests) — **deterministic**.
+  - Smoke A: `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — **live-data-sensitive** + **environment-sensitive**; manifest `artifacts/ui_smoke/20260410_171958/ui_smoke_manifest.json`.
+  - Smoke C: **not run** for Sprint 006 (presentation/provenance-only; per validation tiers).
+  - **Trust strip visibility:** **Code + layout verified** — `src/viz/app.py` renders **Trust / provenance** in `right_trust_slot` between Summary and **Decision-ready review** without opening **Verification**. Official **A** scenario still expands **Verification** and scrolls to `disagreement classification` before `full_page=False` screenshot — artifact is **not** a dedicated framing of the strip; **manual scroll under Summary** or ad-hoc capture recommended for pixel proof.
+  - Sprint 006 close decision: **CLOSED**
 
 ### Reported but not independently re-checked
 - [R] Line-by-line audit of every local uncommitted change vs a single pushed commit (working tree is not clean on last agent pass).
@@ -163,8 +170,10 @@ Status: Active (post–Sprint 005 closeout)
 
 9. [V] **Transaction 17 — SELECTION (docs):** Patched SOP with **validation tiers**, **closeout runtime budget / stop rule**, **preflight hygiene before smoke**, and explicit rule that **smoke C is not a universal closeout tax**. No code; no tests/smoke run in this transaction.
 
+10. [V] **Transaction 22 — Sprint 006 CLOSEOUT:** Declared **Sprint 006 formally closed**: pytest green (35 tests); smoke **A** green (`artifacts/ui_smoke/20260410_171958/`); **C** not required; documented **A** screenshot framing caveat for **Trust / provenance**. Updated `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/HANDOFF.md`, `docs/IMPLIED_LAB_SMOKE.md`, this handoff. **No code edits** in CLOSEOUT.
+
 ## Active frontier
-Name: None active (Sprint 005 complete; choose next bounded frontier)
+Name: None active (Sprint 006 complete; choose next bounded frontier)
 
 User problem:
 - [I] The product likely now has its main skeleton, but the next best improvement depends on whether the top-level screen already tells the story quickly and cleanly after the reported glance-card sprint
