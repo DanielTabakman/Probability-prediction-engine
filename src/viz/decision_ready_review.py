@@ -104,16 +104,18 @@ def build_decision_ready_review_payload(
 
     if has_glance:
         linkage_line = (
-            "**How this ties together:** the **Trade ticket** (below) lists the legs for this structure. "
-            "The **Belief vs market — at a glance** card under this block carries the **interpretive "
-            "disagreement** and **illustrative fit classes** for the same exploration — your strikes "
-            "instantiate **one** concrete payoff, not a ranked choice."
+            "**How this ties together:** **Belief vs market — at a glance** is directly under this block, "
+            "then **Trade ticket (copy/paste)** (one expander) for the copy-ready leg list — same numbers as "
+            "**Summary**. That glance card carries the **interpretive disagreement** and **illustrative fit "
+            "classes** for the same exploration; your strikes instantiate **one** concrete payoff, not a "
+            "ranked choice."
         )
     else:
         linkage_line = (
             "**Belief overlay off or not linked here:** there is no **interpretive disagreement** digest "
-            "in this run. The **green line**, **Summary**, and **Trade ticket** still describe the strikes "
-            "and P&L you are inspecting."
+            "in this run. The **green line** and **Summary** still describe the structure; open "
+            "**Trade ticket (copy/paste)** just under the glance card (or directly under this review if the "
+            "glance card is empty) for the copy-paste leg block — same numbers as **Summary**."
         )
 
     vs_sum = verification.get("verification_summary")
@@ -124,7 +126,8 @@ def build_decision_ready_review_payload(
             bullets.append(f"- **Strike construction:** {ob.strip()}")
     bullets.append(
         "- **Same numbers as Summary / ticket:** max gain, max loss, breakevens, and legs stay "
-        "single-source from the engine — open **Trade ticket** for the copy-paste leg block."
+        "single-source from the engine — open **Trade ticket (copy/paste)** below the glance card "
+        "(one expander) for the leg list."
     )
 
     fit_caption = "**Fit is not recommendation.** Illustrative structure only — same stance as the glance card."

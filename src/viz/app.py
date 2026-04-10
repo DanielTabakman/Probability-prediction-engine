@@ -253,6 +253,142 @@ def _render_decision_ready_review(verification: dict) -> None:
         st.caption(payload.get("fit_caption") or "")
 
 
+def _implied_lab_trade_ticket_code_text(
+    *,
+    selected_expiry_str: str,
+    qty: int,
+    forward: float,
+    selected_strategy: dict,
+    put_by_k: dict,
+    call_by_k: dict,
+    summary: dict,
+) -> tuple[str, tuple[float, float, float, float], tuple[str, str, str, str]]:
+    """
+    FS-007: deterministic copy-paste ticket body plus per-leg premia (for Show calculations).
+
+    Returns (ticket_text, (prem_k1..4), (side_put1, side_put2, side_call3, side_call4)).
+    """
+    cost = float(summary.get("cost_usd") or 0.0)
+    max_gain = float(summary.get("max_gain") or 0.0)
+    max_loss = float(summary.get("max_loss") or 0.0)
+    breakevens = summary.get("breakevens") or []
+
+    side_put1 = "Long" if selected_strategy.get("long_k1", False) else "Short"
+    side_put2 = "Long" if selected_strategy.get("long_k2", True) else "Short"
+    side_call3 = "Long" if selected_strategy.get("long_k3", True) else "Short"
+    side_call4 = "Long" if selected_strategy.get("long_k4", False) else "Short"
+    k1 = selected_strategy.get("k1")
+    k2 = selected_strategy.get("k2")
+    k3 = selected_strategy.get("k3")
+    k4 = selected_strategy.get("k4")
+    prem_k1 = put_by_k.get(k1, 0.0) * forward if k1 is not None else 0.0
+    prem_k2 = put_by_k.get(k2, 0.0) * forward if k2 is not None else 0.0
+    prem_k3 = call_by_k.get(k3, 0.0) * forward if k3 is not None else 0.0
+    prem_k4 = call_by_k.get(k4, 0.0) * forward if k4 is not None else 0.0
+
+    ticket_text = (
+        f"Expiry: {selected_expiry_str}\n"
+        f"Size: {qty}x\n"
+        f"{side_put1} {qty} PUT @ {k1:,.0f}  (≈ {prem_k1:,.0f} USD per 1x)\n"
+        f"{side_put2} {qty} PUT @ {k2:,.0f}  (≈ {prem_k2:,.0f} USD per 1x)\n"
+        f"{side_call3} {qty} CALL @ {k3:,.0f} (≈ {prem_k3:,.0f} USD per 1x)\n"
+        f"{side_call4} {qty} CALL @ {k4:,.0f} (≈ {prem_k4:,.0f} USD per 1x)\n"
+        f"Net premium: {cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'})\n"
+        f"Max gain (approx): {max_gain:,.0f} USD\n"
+        f"Max loss (approx): {max_loss:,.0f} USD\n"
+        + (
+            f"Breakevens: {', '.join(f'{be:,.0f}' for be in breakevens[:3])} USD\n"
+            if breakevens
+            else ""
+        )
+    )
+    return ticket_text, (prem_k1, prem_k2, prem_k3, prem_k4), (side_put1, side_put2, side_call3, side_call4)
+
+
+def _render_implied_lab_trade_ticket_panel(
+    *,
+    selected_expiry_str: str,
+    qty: int,
+    forward: float,
+    selected_strategy: dict,
+    put_by_k: dict,
+    call_by_k: dict,
+    summary: dict,
+) -> None:
+    """
+    FS-007: copy-ready trade ticket one expander deep (same code path as pre-slice Strategy details).
+
+    Illustrative / export-style only — not a recommendation.
+    """
+    if not selected_strategy or selected_strategy.get("k1") is None:
+        return
+    ticket_text, (prem_k1, prem_k2, prem_k3, prem_k4), (side_put1, side_put2, side_call3, side_call4) = (
+        _implied_lab_trade_ticket_code_text(
+            selected_expiry_str=selected_expiry_str,
+            qty=qty,
+            forward=forward,
+            selected_strategy=selected_strategy,
+            put_by_k=put_by_k,
+            call_by_k=call_by_k,
+            summary=summary,
+        )
+    )
+    cost = float(summary.get("cost_usd") or 0.0)
+    max_gain = float(summary.get("max_gain") or 0.0)
+    max_loss = float(summary.get("max_loss") or 0.0)
+    breakevens = summary.get("breakevens") or []
+
+    st.caption("Illustrative copy-ready leg summary — not a recommendation.")
+    with st.expander("Trade ticket (copy/paste)", expanded=False):
+        st.code(ticket_text, language="text")
+        with st.expander("**Show calculations**", expanded=False):
+            u1 = 1 if selected_strategy.get("use_k1", True) else 0
+            u2 = 1 if selected_strategy.get("use_k2", True) else 0
+            u3 = 1 if selected_strategy.get("use_k3", True) else 0
+            u4 = 1 if selected_strategy.get("use_k4", True) else 0
+            sign1 = (1 if selected_strategy.get("long_k1", False) else -1) * u1
+            sign2 = (1 if selected_strategy.get("long_k2", True) else -1) * u2
+            sign3 = (1 if selected_strategy.get("long_k3", True) else -1) * u3
+            sign4 = (1 if selected_strategy.get("long_k4", False) else -1) * u4
+            c1 = sign1 * prem_k1
+            c2 = sign2 * prem_k2
+            c3 = sign3 * prem_k3
+            c4 = sign4 * prem_k4
+            st.markdown("**1. Net cost (premium)**")
+            st.markdown("Per leg we use mark × forward (USD). Long = you pay (+), short = you receive (−).")
+            st.latex(r"\text{Cost} = \sum_{\text{legs}} (\pm \text{premium})")
+            lines = []
+            if u1:
+                lines.append(f"K1 put ({side_put1}): {sign1:+.0f} × {prem_k1:,.0f} = {c1:+,.0f} USD")
+            if u2:
+                lines.append(f"K2 put ({side_put2}): {sign2:+.0f} × {prem_k2:,.0f} = {c2:+,.0f} USD")
+            if u3:
+                lines.append(f"K3 call ({side_call3}): {sign3:+.0f} × {prem_k3:,.0f} = {c3:+,.0f} USD")
+            if u4:
+                lines.append(f"K4 call ({side_call4}): {sign4:+.0f} × {prem_k4:,.0f} = {c4:+,.0f} USD")
+            st.code("\n".join(lines), language="text")
+            sum_txt = " + ".join(f"{x:+,.0f}" for x in [c1, c2, c3, c4])
+            st.markdown(
+                f"**Net cost = " + sum_txt + f" = {cost:,.0f} USD** ({'debit' if cost >= 0 else 'credit'})"
+            )
+            st.markdown("**2. Max gain / max loss**")
+            st.markdown(
+                "We evaluate the 4-leg payoff at each price on the chart (same formula as the green line). "
+                "Max gain = highest point, max loss = lowest point."
+            )
+            st.markdown(f"- **Max gain** = max(payoff curve) ≈ **{max_gain:,.0f} USD**")
+            st.markdown(f"- **Max loss** = min(payoff curve) ≈ **{max_loss:,.0f} USD**")
+            st.markdown("**3. Breakevens**")
+            if breakevens:
+                st.markdown(
+                    "Prices where the payoff curve crosses zero (we find sign changes between adjacent "
+                    "grid points and interpolate)."
+                )
+                st.markdown("**Breakevens:** " + ", ".join(f"{be:,.0f} USD" for be in breakevens[:3]))
+            else:
+                st.markdown("Payoff curve does not cross zero in the chart range (always profit or always loss).")
+
+
 def _render_implied_lab_summary_card(outputs: dict) -> None:
     """
     Compact trade summary for the implied lab.
@@ -486,6 +622,7 @@ if show_bitcoin_view:
                         right_trust_slot = st.empty()
                         right_review_slot = st.empty()
                         right_glance_slot = st.empty()
+                        right_ticket_slot = st.empty()
                         right_anomaly_slot = st.empty()
                         right_forward_slot = st.empty()
                         right_belief_slot = st.empty()
@@ -1071,6 +1208,17 @@ if show_bitcoin_view:
                         _render_decision_ready_review(outputs.get("verification") or {})
                     with right_glance_slot.container():
                         _render_belief_vs_market_glance(outputs.get("verification") or {})
+                    with right_ticket_slot.container():
+                        if selected_strategy and selected_strategy.get("k1") is not None:
+                            _render_implied_lab_trade_ticket_panel(
+                                selected_expiry_str=selected_expiry_str,
+                                qty=int(qty),
+                                forward=forward,
+                                selected_strategy=selected_strategy,
+                                put_by_k=put_by_k,
+                                call_by_k=call_by_k,
+                                summary=outputs.get("summary") or {},
+                            )
                     if anomalous:
                         right_anomaly_slot.warning(
                             "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
@@ -1121,74 +1269,10 @@ if show_bitcoin_view:
                                 use_container_width=True,
                                 hide_index=True,
                             )
-                            # Export-style trade ticket summary
-                            side_put1 = "Long" if selected_strategy.get("long_k1", False) else "Short"
-                            side_put2 = "Long" if selected_strategy.get("long_k2", True) else "Short"
-                            side_call3 = "Long" if selected_strategy.get("long_k3", True) else "Short"
-                            side_call4 = "Long" if selected_strategy.get("long_k4", False) else "Short"
-                            k1 = selected_strategy.get("k1")
-                            k2 = selected_strategy.get("k2")
-                            k3 = selected_strategy.get("k3")
-                            k4 = selected_strategy.get("k4")
-                            # Per-leg mark in USD (per 1x)
-                            prem_k1 = put_by_k.get(k1, 0.0) * forward if k1 is not None else 0.0
-                            prem_k2 = put_by_k.get(k2, 0.0) * forward if k2 is not None else 0.0
-                            prem_k3 = call_by_k.get(k3, 0.0) * forward if k3 is not None else 0.0
-                            prem_k4 = call_by_k.get(k4, 0.0) * forward if k4 is not None else 0.0
-                            with st.expander("Trade ticket (copy/paste)", expanded=False):
-                                st.code(
-                                    f"Expiry: {selected_expiry_str}\n"
-                                    f"Size: {qty}x\n"
-                                    f"{side_put1} {qty} PUT @ {k1:,.0f}  (≈ {prem_k1:,.0f} USD per 1x)\n"
-                                    f"{side_put2} {qty} PUT @ {k2:,.0f}  (≈ {prem_k2:,.0f} USD per 1x)\n"
-                                    f"{side_call3} {qty} CALL @ {k3:,.0f} (≈ {prem_k3:,.0f} USD per 1x)\n"
-                                    f"{side_call4} {qty} CALL @ {k4:,.0f} (≈ {prem_k4:,.0f} USD per 1x)\n"
-                                    f"Net premium: {cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'})\n"
-                                    f"Max gain (approx): {max_gain:,.0f} USD\n"
-                                    f"Max loss (approx): {max_loss:,.0f} USD\n"
-                                    + (f"Breakevens: {', '.join(f'{be:,.0f}' for be in breakevens[:3])} USD\n" if breakevens else ""),
-                                    language="text",
-                                )
-
-                                # Calculation breakdown: advanced math behind a second expander by default.
-                                with st.expander("**Show calculations**", expanded=False):
-                                    u1 = 1 if selected_strategy.get("use_k1", True) else 0
-                                    u2 = 1 if selected_strategy.get("use_k2", True) else 0
-                                    u3 = 1 if selected_strategy.get("use_k3", True) else 0
-                                    u4 = 1 if selected_strategy.get("use_k4", True) else 0
-                                    sign1 = (1 if selected_strategy.get("long_k1", False) else -1) * u1
-                                    sign2 = (1 if selected_strategy.get("long_k2", True) else -1) * u2
-                                    sign3 = (1 if selected_strategy.get("long_k3", True) else -1) * u3
-                                    sign4 = (1 if selected_strategy.get("long_k4", False) else -1) * u4
-                                    c1 = sign1 * prem_k1
-                                    c2 = sign2 * prem_k2
-                                    c3 = sign3 * prem_k3
-                                    c4 = sign4 * prem_k4
-                                    st.markdown("**1. Net cost (premium)**")
-                                    st.markdown("Per leg we use mark × forward (USD). Long = you pay (+), short = you receive (−).")
-                                    st.latex(r"\text{Cost} = \sum_{\text{legs}} (\pm \text{premium})")
-                                    lines = []
-                                    if u1:
-                                        lines.append(f"K1 put ({side_put1}): {sign1:+.0f} × {prem_k1:,.0f} = {c1:+,.0f} USD")
-                                    if u2:
-                                        lines.append(f"K2 put ({side_put2}): {sign2:+.0f} × {prem_k2:,.0f} = {c2:+,.0f} USD")
-                                    if u3:
-                                        lines.append(f"K3 call ({side_call3}): {sign3:+.0f} × {prem_k3:,.0f} = {c3:+,.0f} USD")
-                                    if u4:
-                                        lines.append(f"K4 call ({side_call4}): {sign4:+.0f} × {prem_k4:,.0f} = {c4:+,.0f} USD")
-                                    st.code("\n".join(lines), language="text")
-                                    sum_txt = " + ".join(f"{x:+,.0f}" for x in [c1, c2, c3, c4])
-                                    st.markdown(f"**Net cost = " + sum_txt + f" = {cost:,.0f} USD** ({'debit' if cost >= 0 else 'credit'})")
-                                    st.markdown("**2. Max gain / max loss**")
-                                    st.markdown("We evaluate the 4-leg payoff at each price on the chart (same formula as the green line). Max gain = highest point, max loss = lowest point.")
-                                    st.markdown(f"- **Max gain** = max(payoff curve) ≈ **{max_gain:,.0f} USD**")
-                                    st.markdown(f"- **Max loss** = min(payoff curve) ≈ **{max_loss:,.0f} USD**")
-                                    st.markdown("**3. Breakevens**")
-                                    if breakevens:
-                                        st.markdown("Prices where the payoff curve crosses zero (we find sign changes between adjacent grid points and interpolate).")
-                                        st.markdown(f"**Breakevens:** " + ", ".join(f"{be:,.0f} USD" for be in breakevens[:3]))
-                                    else:
-                                        st.markdown("Payoff curve does not cross zero in the chart range (always profit or always loss).")
+                            st.caption(
+                                "**Trade ticket (copy/paste)** is **above** (under the glance card) — same leg list "
+                                "and optional **Show calculations** — illustrative only, not a recommendation."
+                            )
             else:
                 st.caption("No Deribit option expiries. Check API.")
                 with st.expander("Debug (expiries fetch)", expanded=False):

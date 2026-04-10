@@ -70,7 +70,8 @@ class TestDecisionReadyReviewPayload(unittest.TestCase):
         self.assertIn("Iron condor", p["structure_line"])
         self.assertIn("Range-bound", p["payoff_line"])
         self.assertIn("Belief vs market", p["linkage_line"])
-        self.assertIn("Trade ticket", p["linkage_line"])
+        self.assertIn("Trade ticket (copy/paste)", p["linkage_line"])
+        self.assertIn("directly under this block", p["linkage_line"])
         self.assertEqual(len(p["bullets"]), 2)
         self.assertIn("Strike construction", p["bullets"][0])
         self.assertIn("Fit is not recommendation", p["fit_caption"])
@@ -80,6 +81,7 @@ class TestDecisionReadyReviewPayload(unittest.TestCase):
         p = build_decision_ready_review_payload(self._minimal_applicable_verification())
         assert p is not None
         self.assertIn("Belief overlay off", p["linkage_line"])
+        self.assertIn("Trade ticket (copy/paste)", p["linkage_line"])
         assert_no_advisory_language(_join_payload_text(p))
 
     def test_payoff_debit_credit_clauses(self) -> None:

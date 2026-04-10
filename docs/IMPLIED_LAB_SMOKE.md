@@ -22,6 +22,8 @@ If anything fails, use **Debug (last error)** (collapsed expander under the fail
 
 | 2a | **Trust / provenance (Sprint 006)** — Immediately under Summary: as-of (UTC), sources, overlay basis, illustrative-scope line from `verification_summary`, pointer to **Verification**; no need to expand **Verification** to see this strip | |
 
+| 2b | **Trade ticket path (Sprint 007)** — After **Belief vs market — at a glance**, **Trade ticket (copy/paste)** is a single top-level expander (not nested under **Strategy details**); **Decision-ready review** text names glance then ticket; caption stays non-advisory | |
+
 | 3 | **Exact strikes** — Mode = Exact strikes; adjust K1–K4; green payoff updates | |
 
 | 4 | **Target payoff** — Mode = Target payoff; payoff sliders update solved shape / summary | |
@@ -42,7 +44,7 @@ If anything fails, use **Debug (last error)** (collapsed expander under the fail
 
 ## Automated local UI smoke harness (narrow coverage)
 
-**Validation classification (SOP):** `python -m pytest -q` is **deterministic** (local). This harness is **live-data-sensitive** (Deribit/Yahoo/spot paths) and **environment-sensitive** (Playwright, network, free ports). Label pass/fail accordingly so operational issues are not read as product regressions; see `docs/SOP/OPERATING_RULES.md` (Transaction discipline → RULE 4).
+**Validation classification (SOP):** `python -m pytest -q` is **deterministic** (local). This harness is **live-data-sensitive** (Deribit/Yahoo/spot paths) and **environment-sensitive** (Playwright, network, free ports). Label pass/fail accordingly so operational issues are not read as product regressions; see `docs/SOP/OPERATING_RULES.md` (Execution step discipline → RULE 4).
 
 This is a **narrow-coverage** headless smoke harness—not a full scenario matrix. **`A_width_target_payoff`** is the **default primary** automated path for sprint closeout (see `docs/SOP/OPERATING_RULES.md` → **Validation tiers**). **`C_directional_peak_disagreement`** is a **conditional** gate: **required** when work materially touches disagreement classification, width/peak scenario behavior, belief/disagreement derivation, or related harness logic; **supporting/optional** for presentation or review-only changes unless the sprint spec names **C**. It is **not** a universal closeout requirement for every sprint. Before any smoke run, use the short **preflight hygiene** checklist in **OPERATING_RULES.md** (clean instance, fresh port, avoid orphan processes and manual+smoke collisions). Run **C** explicitly and use the run’s manifest booleans; treat it as “green” only when those checks pass (see `pass_criteria`). Other harness scenarios (`B_peak_aligned`, `D_exact_strikes_mode`) are ad-hoc.
 
@@ -85,6 +87,8 @@ Use a different `--port` if `8610` is busy.
 For **A**, the harness checks page load plus disagreement/family/trade text and Verification (including disagreement classification). For **C** (when you run it), the same base checks apply plus **Directional** in the disagreement line and the manifest’s C-specific booleans. Exit code `0` means the checks required for the scenarios **in that run** passed (see `pass_criteria` in the manifest).
 
 **Sprint 006 note (trust strip vs screenshot):** Scenario **A** expands **Verification** and scrolls to disagreement classification before the `full_page=False` capture, so the default **A** PNG may **not** show the compact **Trust / provenance** block under **Summary**. Use checklist row **2a** (scroll up in the right column) or an ad-hoc screenshot when you need pixel evidence of the strip.
+
+**Sprint 007 note (glance + trade ticket vs screenshot):** The harness still sets `trade_ticket_found` when the label **Trade ticket (copy/paste)** is present in the DOM (may be below the viewport). The default **A** PNG often frames **Decision-ready review** (updated linkage: glance then ticket) but may **not** show the glance card or the ticket expander. Use checklist row **2b** (scroll the right column after review) or an ad-hoc screenshot for pixel evidence of the flatter path.
 
 **Scenario sensitivity (Sprint 005 closeout, 2026-04-10):** **C** can **fail** when live marks + default belief inputs yield **mixed** or **width_vol** disagreement (e.g. `width_band=wider`) even though the page loads and disagreement UI is coherent. Classify as **live-data-sensitive** / **scenario-sensitive** — not automatically a regression in the **Decision-ready review** block or digest copy. Prior green **C** artifacts (e.g. `artifacts/ui_smoke/20260410_150352/`) remain valid historical evidence.
 
