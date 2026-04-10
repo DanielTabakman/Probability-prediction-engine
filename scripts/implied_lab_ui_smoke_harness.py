@@ -1,9 +1,10 @@
 """
 Local UI smoke harness for `src/viz/app.py` (implied lab).
 
-MVP (single-scenario): the only validated end-to-end path is **A_width_target_payoff**
-(use `--scenario A_width_target_payoff`). Other scenario names in SCENARIOS exist for
-future expansion, not for the current official pass definition.
+Narrow automated coverage (not a full scenario matrix): **A_width_target_payoff** is the
+validated primary path. **C_directional_peak_disagreement** is a second gated scenario
+with explicit manifest checks when run; do not treat C as “validated” unless that run’s
+manifest booleans pass. Other scenario names in SCENARIOS remain ad-hoc / future work.
 
 Runs:
 1) Streamlit on a fixed local port
@@ -63,6 +64,7 @@ class ScenarioResult:
     family_block_found: bool = False
     trade_ticket_found: bool = False
     verification_found: bool = False
+    directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
 
@@ -165,6 +167,58 @@ def _ensure_playwright():
             "  python -m playwright install chromium\n\n"
             f"Original error: {e}"
         ) from e
+
+
+def _parse_sigma_mkt_at_horizon_from_caption(page) -> float | None:
+    """
+    Parse belief summary line:
+      σ_ln: user <...> · ATM-implied @ horizon <num> · width band vs market: ...
+    """
+    try:
+        loc = page.locator("text=/ATM-implied @ horizon [0-9.]+/").first
+        if loc.count() == 0:
+            return None
+        txt = loc.inner_text()
+        m = re.search(r"ATM-implied @ horizon\s+([0-9.]+)", txt)
+        if not m:
+            return None
+        return float(m.group(1))
+    except Exception:
+        return None
+
+
+def _parse_width_band_from_belief_summary(page) -> str | None:
+    """
+    Parse belief summary line:
+      σ_ln: user <...> · ATM-implied @ horizon <num> · width band vs market: <band>
+    Returns: "narrower" | "similar" | "wider" (or None if not found)
+    """
+    try:
+        loc = page.locator("text=/width band vs market:/").first
+        if loc.count() == 0:
+            return None
+        txt = loc.inner_text()
+        m = re.search(r"width band vs market:\s*(narrower|similar|wider)", txt, re.IGNORECASE)
+        if not m:
+            return None
+        return str(m.group(1)).lower()
+    except Exception:
+        return None
+
+
+def _parse_disagreement_type_line(page) -> str | None:
+    """
+    Extract the current disagreement type label from the belief hints markdown.
+    Example: "Disagreement type: Directional (bullish)"
+    """
+    try:
+        body = page.locator("body").inner_text()
+        m = re.search(r"Disagreement type:\s*([^\n\r]+)", body, re.IGNORECASE)
+        if not m:
+            return None
+        return m.group(0).strip()
+    except Exception:
+        return None
 
 
 def _parse_forward_usd_from_caption(page) -> float | None:
@@ -275,6 +329,61 @@ def _set_slider_by_label_regex(page, label_regex: str, value: float) -> None:
     )
 
 
+def _set_belief_uncertainty_aria_slider(page, value: float) -> None:
+    """
+    Streamlit renders belief width as a Base Web `div[role=slider]`, not `<input type=range>`.
+    Scope to the 'My belief vs market' expander so sidebar sliders are not touched.
+    """
+    details = page.locator("details").filter(
+        has=page.locator("summary", has_text="My belief vs market")
+    ).first
+    if details.count() == 0:
+        raise RuntimeError("Belief expander not found")
+
+    # Ensure the uncertainty mode is σ_ln so the harness is setting the right control.
+    try:
+        details.locator("text=σ_ln (advanced)").first.click(timeout=2000)
+        page.wait_for_timeout(250)
+    except Exception:
+        pass
+    # First try the Base Web slider role (older Streamlit).
+    slider = details.get_by_role("slider").first
+    if slider.count() > 0:
+        # Slider step in the app may be finer than 0.01; keep extra precision.
+        target = float(max(0.02, min(0.8, round(value, 3))))
+        slider.click()
+        for _ in range(400):
+            cur = float(slider.get_attribute("aria-valuenow") or "0.02")
+            if abs(cur - target) < 0.0025:
+                break
+            if cur < target - 0.002:
+                page.keyboard.press("ArrowRight")
+            else:
+                page.keyboard.press("ArrowLeft")
+            page.wait_for_timeout(25)
+        page.wait_for_timeout(400)
+        return
+
+    # Newer Streamlit: <input type="range"> inside expander.
+    rng = details.locator("input[type='range']").first
+    if rng.count() > 0:
+        v = float(max(0.02, min(0.8, value)))
+        rng.evaluate(
+            """
+            (el, v) => {
+              el.value = String(v);
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            """,
+            v,
+        )
+        page.wait_for_timeout(500)
+        return
+
+    raise RuntimeError("Belief uncertainty slider not found")
+
+
 def _set_mode(page, mode_text: str) -> None:
     # Streamlit radio is usually rendered as clickable elements by label text.
     loc = page.locator(f"text={mode_text}").first
@@ -288,40 +397,41 @@ def _expand_expander(page, expander_title: str) -> None:
     """
     Click a <details><summary>... expander if not already open.
     """
-    summary = page.locator("summary", has_text=expander_title).first
+    try:
+        page.wait_for_selector(f"text={expander_title}", timeout=90000, state="attached")
+    except Exception:
+        pass
+
+    summary = page.locator("details summary").filter(
+        has_text=re.compile(re.escape(expander_title), re.I)
+    ).first
     if summary.count() == 0:
-        # Fallback for Streamlit variants where expander headers aren't <summary>.
-        # 1) substring match
-        header = page.locator(f"xpath=//*[contains(normalize-space(.), '{expander_title}')][1]").first
-        # 2) regex match
-        if header.count() == 0:
-            header = page.locator(f"text=/{re.escape(expander_title)}/").first
-        # 3) first-word match
-        if header.count() == 0 and expander_title.strip():
-            first_word = expander_title.strip().split()[0]
-            header = page.locator(f"xpath=//*[contains(normalize-space(.), '{first_word}')][1]").first
-        # 4) keyword match (handles cases where the title is split across nodes)
-        if header.count() == 0:
-            header = page.locator(
-                "xpath=//*[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'belief') and contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'market')][1]"
-            ).first
-        if header.count() == 0:
-            # Give the network-bound UI a moment to mount the expander header.
+        summary = page.locator("summary").filter(
+            has_text=re.compile(re.escape(expander_title), re.I)
+        ).first
+
+    if summary.count() > 0:
+        details = summary.locator("xpath=ancestor::details[1]").first
+        if details.get_attribute("open") is None:
+            try:
+                summary.scroll_into_view_if_needed()
+            except Exception:
+                pass
+            summary.click()
             page.wait_for_timeout(800)
-            header = page.locator(
-                "xpath=//*[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'belief') and contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'market')][1]"
-            ).first
-        if header.count() == 0:
-            raise RuntimeError(f"Could not find expander header: {expander_title}")
+        return
+
+    header = page.get_by_role("button", name=re.compile(re.escape(expander_title), re.I)).first
+    if header.count() > 0:
+        try:
+            header.scroll_into_view_if_needed()
+        except Exception:
+            pass
         header.click(force=True)
         page.wait_for_timeout(800)
         return
 
-    details = summary.locator("xpath=ancestor::details[1]").first
-    open_attr = details.get_attribute("open")
-    if not open_attr:
-        summary.click()
-        page.wait_for_timeout(800)
+    raise RuntimeError(f"Could not find expander header: {expander_title}")
 
 
 def _collect_observations(page, result: ScenarioResult) -> None:
@@ -352,6 +462,23 @@ def _collect_verification_observation(page, result: ScenarioResult) -> None:
         result.verification_found = False
 
 
+def _collect_directional_category_verification(page, result: ScenarioResult) -> None:
+    """Scenario C: belief-vs-market category must be directional (peak off, width similar)."""
+    if result.scenario != "C_directional_peak_disagreement":
+        return
+    try:
+        line = _parse_disagreement_type_line(page) or ""
+        result.directional_category_verified = bool(re.search(r"Directional", line, re.IGNORECASE))
+        if not result.directional_category_verified:
+            wb = _parse_width_band_from_belief_summary(page)
+            if wb:
+                result.notes = (result.notes + " | " if result.notes else "") + f"width_band={wb}"
+            if line:
+                result.notes = (result.notes + " | " if result.notes else "") + f"disagreement_line={line}"
+    except Exception:
+        result.directional_category_verified = False
+
+
 def take_screenshot(page, scenario: str) -> str:
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     shot_path = RUN_DIR / f"{scenario}.png"
@@ -373,10 +500,8 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     try:
         # The implied lab content is network-bound on first load; don't assume
         # the belief expander is present immediately.
-        try:
-            page.wait_for_selector("text=Expiry", timeout=90000, state="visible")
-        except Exception:
-            pass
+        # Wait for the belief panel to mount; it appears only after expiry/marks load.
+        page.wait_for_selector("text=My belief vs market", timeout=180000, state="attached")
 
         # Expand the belief expander so the checkbox + sliders become available.
         _expand_expander(page, "My belief vs market")
@@ -394,6 +519,8 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         if scenario == "A_width_target_payoff":
             _set_mode(page, "Target payoff")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            # Belief uncertainty now defaults to ±% mode; switch to σ mode so this scenario can set σ_ln.
+            page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.70)
             _expand_expander(page, "Verification")
             # Scroll & wait for the classification block to be rendered.
@@ -410,18 +537,75 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         elif scenario == "B_peak_aligned":
             _set_mode(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
 
         elif scenario == "C_directional_peak_disagreement":
             _set_mode(page, "Exact strikes")
-            # Shift belief peak away from the displayed reference peak by enough margin
-            # to exceed the tolerance used by the app (approx >= a few hundred USD).
+            # Match user σ_ln to ATM-implied σ first so width band is "similar", then
+            # shift peak — yields directional (not mixed) disagreement vs market modal peak.
+            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            page.wait_for_timeout(1500)
+            page.locator("text=σ_ln (advanced)").first.click()
+            sig = _parse_sigma_mkt_at_horizon_from_caption(page)
+            if sig is None:
+                sig = 0.08
+            sig = float(max(0.02, min(0.8, sig)))
+
+            def _ensure_width_band_similar(target_sig: float) -> float:
+                """
+                Adjust the belief uncertainty slider until the UI reports width band = similar.
+                This removes flakiness from rounding (e.g. σ_mkt very small) while preserving semantics.
+                """
+                # Try near the target with fine steps (slider supports ~0.01).
+                candidates = []
+                base = round(float(target_sig), 3)
+                # Centered sweep: base, ±0.005, ±0.01, ...
+                for d in [
+                    0.0,
+                    -0.005, 0.005,
+                    -0.01, 0.01,
+                    -0.015, 0.015,
+                    -0.02, 0.02,
+                    -0.025, 0.025,
+                    -0.03, 0.03,
+                ]:
+                    v = float(max(0.02, min(0.8, base + d)))
+                    if v not in candidates:
+                        candidates.append(v)
+                chosen = candidates[0]
+                for v in candidates:
+                    _set_belief_uncertainty_aria_slider(page, v)
+                    page.wait_for_timeout(450)
+                    wb = _parse_width_band_from_belief_summary(page)
+                    chosen = v
+                    if wb == "similar":
+                        break
+                return chosen
+
+            chosen_sig = _ensure_width_band_similar(sig)
+            page.wait_for_timeout(500)
+
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
-            _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
+            page.wait_for_timeout(900)
+            # Peak change can rerun the script and reset the width slider; restore and re-ensure "similar".
+            chosen_sig = _ensure_width_band_similar(chosen_sig)
+            page.wait_for_timeout(600)
+            _expand_expander(page, "Verification")
+            try:
+                page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
+            except Exception:
+                pass
+            page.wait_for_selector(
+                "text=disagreement classification",
+                timeout=60000,
+                state="attached",
+            )
 
         elif scenario == "D_exact_strikes_mode":
             _set_mode(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
@@ -442,6 +626,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         _collect_verification_observation(page, r)
     except Exception:
         pass
+    try:
+        _collect_directional_category_verification(page, r)
+    except Exception:
+        pass
 
     return r
 
@@ -457,7 +645,9 @@ def main() -> int:
     global PORT, BASE_URL, APP_URL
 
     parser = argparse.ArgumentParser(
-        description="Implied lab local UI smoke harness (MVP: validated scenario A_width_target_payoff)."
+        description=(
+            "Implied lab local UI smoke harness (A validated; C gated when run — see manifest)."
+        ),
     )
     parser.add_argument("--port", type=int, default=PORT, help="Local port to bind Streamlit")
     parser.add_argument(
@@ -522,6 +712,7 @@ def main() -> int:
                     "family_block_found": r.family_block_found,
                     "trade_ticket_found": r.trade_ticket_found,
                     "verification_found": r.verification_found,
+                    "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
                 }
@@ -529,22 +720,29 @@ def main() -> int:
             ],
             "pass_criteria": {
                 "harness_scope": (
-                    "MVP single-scenario smoke harness; validated scenario: A_width_target_payoff."
+                    "Narrow smoke harness (not a full scenario matrix): A_width_target_payoff "
+                    "is validated. C_directional_peak_disagreement is a second gated scenario "
+                    "(explicit checks below when included). B/D remain ad-hoc."
                 ),
                 "recommended_command": (
                     "python scripts/implied_lab_ui_smoke_harness.py --port <PORT> --scenario A_width_target_payoff"
                 ),
                 "success_requires": (
                     "For each scenario in this run: page_loaded, disagreement_text_found, "
-                    "family_block_found, and trade_ticket_found must be true. If scenario "
-                    "A_width_target_payoff is included, verification_found must also be true."
+                    "family_block_found, and trade_ticket_found must be true. "
+                    "If A_width_target_payoff is included, verification_found must be true. "
+                    "If C_directional_peak_disagreement is included, verification_found and "
+                    "directional_category_verified must be true. "
+                    "If neither A nor C is in the run, the verification gate fails."
                 ),
                 "future_work": (
-                    "Expanding official pass coverage to additional scenarios (B/C/D) is not part of this MVP."
+                    "Expanding automated coverage beyond B/D ad-hoc scenarios and "
+                    "tightening multi-scenario runs is optional follow-up."
                 ),
                 "note": (
-                    "For the intended MVP exit 0, use --scenario A_width_target_payoff only; "
-                    "other invocations may not match exit 0 even when partial checks pass."
+                    "Official one-command wrapper (`scripts/run_implied_lab_ui_smoke.py`) runs "
+                    "A_width_target_payoff only. For C, use --scenario C_directional_peak_disagreement; "
+                    "a green run implies C’s manifest gates passed for that run."
                 ),
             },
         }
@@ -561,8 +759,19 @@ def main() -> int:
             r.disagreement_text_found and r.family_block_found and r.trade_ticket_found
             for r in results
         )
-        verification_ok = next((r for r in results if r.scenario == "A_width_target_payoff"), None)
-        verification_ok = bool(verification_ok and verification_ok.verification_found)
+        has_a = any(r.scenario == "A_width_target_payoff" for r in results)
+        has_c = any(r.scenario == "C_directional_peak_disagreement" for r in results)
+        verification_ok = True
+        if has_a:
+            ra = next(r for r in results if r.scenario == "A_width_target_payoff")
+            verification_ok = verification_ok and bool(ra.verification_found)
+        if has_c:
+            rc = next(r for r in results if r.scenario == "C_directional_peak_disagreement")
+            verification_ok = verification_ok and bool(
+                rc.verification_found and rc.directional_category_verified
+            )
+        if not has_a and not has_c:
+            verification_ok = False
 
         overall_pass = page_loaded_ok and main_ok and verification_ok
 

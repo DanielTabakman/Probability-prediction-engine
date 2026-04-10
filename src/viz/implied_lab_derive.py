@@ -12,7 +12,20 @@ from src.engine.strategy_scanner import (
     payoff_target_to_strikes_with_work,
     strategy_payoff_at_prices,
 )
-from src.viz.belief_disagreement_hints import belief_disagreement_hints_payload
+from src.viz.belief_disagreement_hints import (
+    MarketReferenceKind,
+    belief_disagreement_hints_payload,
+)
+from src.viz.belief_uncertainty import (
+    sigma_ln_to_move_pct_1sigma,
+)
+from src.viz.disagreement_thresholds import (
+    L1_SHAPE_GAP_LOW_BELOW,
+    L1_SHAPE_GAP_MODERATE_BELOW,
+    WIDTH_NARROWER_RATIO,
+    WIDTH_WIDER_RATIO,
+    peak_alignment_tolerance_usd,
+)
 from src.viz.implied_lab_provenance import build_verification_payload
 
 
@@ -147,9 +160,9 @@ def _belief_shape_gap_strength_from_l1(l1_abs_density: float) -> str:
     as the belief summary. Both integrate to 1 on the grid, so the integral lies in [0, 2].
     Thresholds are heuristic (legibility only).
     """
-    if l1_abs_density < 0.28:
+    if l1_abs_density < L1_SHAPE_GAP_LOW_BELOW:
         return "Low"
-    if l1_abs_density < 0.52:
+    if l1_abs_density < L1_SHAPE_GAP_MODERATE_BELOW:
         return "Moderate"
     return "High"
 
@@ -260,50 +273,59 @@ def _derive_user_belief_outputs(
         }
 
     delta = center - market_peak
-    if abs(delta) < max(1.0, 0.002 * market_peak):
-        tilt_line = "Tilt: Aligned — belief peak near the market peak"
-    elif delta > 0:
-        tilt_line = (
-            f"Tilt: Bullish — your peak ~${delta:,.0f} above the "
-            f"{ref_kind} peak near ${market_peak:,.0f}"
-        )
+    tol = peak_alignment_tolerance_usd(market_peak)
+    if sigma_user < sigma_mkt * WIDTH_NARROWER_RATIO:
+        wb = "narrower"
+    elif sigma_user > sigma_mkt * WIDTH_WIDER_RATIO:
+        wb = "wider"
     else:
-        tilt_line = (
-            f"Tilt: Bearish — your peak ~${-delta:,.0f} below the "
-            f"{ref_kind} peak near ${market_peak:,.0f}"
-        )
-
-    if sigma_user < sigma_mkt * 0.92:
-        width_line = "Width vs ATM-implied at this horizon: Narrower"
-    elif sigma_user > sigma_mkt * 1.08:
-        width_line = "Width vs ATM-implied at this horizon: Wider"
-    else:
-        width_line = "Width vs ATM-implied at this horizon: Similar"
+        wb = "similar"
 
     lines = [
-        f"Peaks: You ${center:,.0f} · Market ${market_peak:,.0f} ({ref_kind})",
-        tilt_line,
-        width_line,
+        (
+            f"Peaks: you ${center:,.0f} · market modal ${market_peak:,.0f} · "
+            f"Δ ${delta:+,.0f} USD (ref: {ref_kind}; align tol ±${tol:,.0f})"
+        ),
+        (
+            f"σ_ln: user {sigma_user:.4f} · ATM-implied @ horizon {sigma_mkt:.4f} · "
+            f"width band vs market: {wb}"
+        ),
+        (
+            f"1σ move (intuitive): you ≈±{sigma_ln_to_move_pct_1sigma(sigma_user):.1f}% · "
+            f"market ≈±{sigma_ln_to_move_pct_1sigma(sigma_mkt):.1f}% (same σ_ln basis)"
+        ),
     ]
 
     if disc:
-        lines.append(f"Largest gap (normalized densities): near ${prices[i0]:,.0f}")
+        lines.append(
+            f"Largest PDF gap (normalized): ≈${prices[i0]:,.0f} · "
+            f"shape gap (L₁ label): {shape_gap_strength}"
+        )
 
     text = "\n\n".join(lines)
 
+    mref: MarketReferenceKind = (
+        "market-implied" if ref_kind == "market-implied" else "lognormal baseline"
+    )
     hints_pl = belief_disagreement_hints_payload(
         center_usd=center,
         market_peak=market_peak,
         sigma_user=sigma_user,
         sigma_mkt=sigma_mkt,
         shape_gap_strength=shape_gap_strength,
+        market_reference_kind=mref,
     )
     chart_helpers_extra["belief_disagreement_category"] = hints_pl["category_id"]
+    chart_helpers_extra["belief_disagreement"] = hints_pl["belief_disagreement"]
     chart_helpers_extra["belief_strategy_family_hints"] = hints_pl["markdown"]
 
     return {
         "chart_helpers_extra": chart_helpers_extra,
-        "belief_summary": {"text": text, "hints_markdown": hints_pl["markdown"]},
+        "belief_summary": {
+            "text": text,
+            "hints_markdown": hints_pl["markdown"],
+            "belief_disagreement": hints_pl["belief_disagreement"],
+        },
         "belief_verification": _belief_verification_block(
             enabled=True,
             center_usd=center,
@@ -505,6 +527,15 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 "error": work.get("error") if isinstance(work, dict) else "Invalid targets.",
             }
             overlay_fail = {"prices": prices, "payoff_usd": []}
+            _bs_fail = belief_pack.get("belief_summary")
+            _bd_fail = (
+                _bs_fail.get("belief_disagreement")
+                if isinstance(_bs_fail, dict)
+                else None
+            )
+            _gap_fail = (belief_pack.get("chart_helpers_extra") or {}).get(
+                "belief_largest_gap_price"
+            )
             verification_fail = build_verification_payload(
                 market_data=market_data,
                 summary=summary_fail,
@@ -513,7 +544,12 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 market_pdf_raw=market_pdf_raw,
                 call_marks=call_marks,
                 belief_verification=belief_pack.get("belief_verification"),
+                belief_disagreement=_bd_fail if isinstance(_bd_fail, dict) else None,
                 solve_error=summary_fail.get("error"),
+                lab_mode=state.get("mode"),
+                belief_largest_gap_price_usd=float(_gap_fail)
+                if _gap_fail is not None
+                else None,
             )
             return {
                 "strategy": None,
@@ -619,6 +655,13 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
     }
 
     overlay_ok = {"prices": prices, "payoff_usd": payoff_usd}
+    _bs_ok = belief_pack.get("belief_summary")
+    _bd_ok = (
+        _bs_ok.get("belief_disagreement")
+        if isinstance(_bs_ok, dict)
+        else None
+    )
+    _gap_ok = (belief_pack.get("chart_helpers_extra") or {}).get("belief_largest_gap_price")
     verification_ok = build_verification_payload(
         market_data=market_data,
         summary=summary,
@@ -627,7 +670,10 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         market_pdf_raw=market_pdf_raw,
         call_marks=call_marks,
         belief_verification=belief_pack.get("belief_verification"),
+        belief_disagreement=_bd_ok if isinstance(_bd_ok, dict) else None,
         solve_error=None,
+        lab_mode=state.get("mode"),
+        belief_largest_gap_price_usd=float(_gap_ok) if _gap_ok is not None else None,
     )
 
     return {

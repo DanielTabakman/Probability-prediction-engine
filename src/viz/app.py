@@ -40,92 +40,248 @@ from src.data.fetch_deribit import (
 )
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
-    market_implied_density_breeden_litzenberger,
-    is_anomalous,
 )
 from src.engine.strategy_scanner import (
     build_universal_strategy,
     name_universal_strategy,
     payoff_target_to_strikes,
     payoff_target_to_strikes_with_work,
-    strategy_payoff_at_prices,
 )
 from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
+from src.viz.decision_ready_review import build_decision_ready_review_payload
+from src.viz.belief_uncertainty import (
+    move_pct_1sigma_to_sigma_ln,
+    sigma_ln_to_move_pct_1sigma,
+)
 import yaml
 
 
+def _render_belief_vs_market_glance(v: dict) -> None:
+    """Compact BTC belief vs market card — values trace to verification payload / classification_trace."""
+    g = v.get("belief_vs_market_glance") if isinstance(v, dict) else None
+    if not isinstance(g, dict):
+        return
+    st.markdown("##### Belief vs market — at a glance")
+    digest = g.get("digest_lines")
+    if isinstance(digest, list) and digest:
+        st.markdown("###### Main disagreement (scan)")
+        st.markdown("\n".join(f"- {line}" for line in digest if str(line).strip()))
+    intro = g.get("fit_bridge_intro")
+    bullets = g.get("fit_bridge_bullets")
+    if isinstance(intro, str) and intro.strip():
+        st.markdown("###### Why these fit classes appear")
+        st.markdown(intro)
+        if isinstance(bullets, list) and bullets:
+            st.markdown("\n".join(str(b) for b in bullets))
+    st.caption(
+        f"**{g.get('fit_note', 'Fit is not recommendation.')}** "
+        f"{g.get('illustrative_scope_note', '')}"
+    )
+    st.markdown("###### Supporting numbers")
+    a, b = st.columns(2)
+    with a:
+        st.markdown(
+            f"- **Market forward:** ${g['forward_usd']:,.0f}\n"
+            f"- **Market modal (reference peak):** ${g['market_modal_usd']:,.0f}\n"
+            f"- **Your belief peak (mode):** ${g['belief_peak_usd']:,.0f}"
+        )
+    with b:
+        gap_part = (
+            f"{g['largest_gap_display']} (grid sample)"
+            if g.get("largest_gap_price_usd") is not None
+            else "— (see Verification if belief curve unavailable)"
+        )
+        st.markdown(
+            f"- **Width vs market (technical):** {g['width_relation_label']}\n"
+            f"- **Main mismatch (largest |ΔPDF| on grid):** {gap_part} · "
+            f"L₁ label: **{g['shape_gap_strength']}**\n"
+            f"- **Market reference for peak:** {g['market_reference_kind']}"
+        )
+    with st.expander("Audit trail: classification wording, trace & formulas", expanded=False):
+        if g.get("disagreement_type_line"):
+            st.markdown(str(g["disagreement_type_line"]))
+        st.caption(
+            f"As-of (UTC): {g.get('as_of_utc', '—')} · "
+            f"Trace: `{g.get('classification_trace_path', '')}` · "
+            f"{g.get('formula_caption', '')}"
+        )
+        st.caption(f"{g.get('overlay_basis_line', '')}")
+
+
 def _render_implied_lab_verification(v: dict) -> None:
-    """Structured display for outputs['verification'] (no markdown contract)."""
+    """Structured display for outputs['verification'] (contract-driven summary + demoted detail)."""
     if not v:
         st.caption("Verification payload not available for this run.")
         return
-    st.caption(v.get("snapshot_note") or "")
-    st.caption(v.get("cache_note") or "")
-    st.write("**As-of (UTC)** — run snapshot / valuation time:", v.get("as_of_utc", "—"))
-    st.write("**Data sources:**", ", ".join(str(x) for x in (v.get("data_sources") or [])))
+
+    vs = v.get("verification_summary")
+    if isinstance(vs, dict) and vs:
+        st.markdown("##### Verification summary")
+        a, b = st.columns(2)
+        with a:
+            st.write("**Contract schema version:**", vs.get("contract_schema_version", "—"))
+            st.write("**As-of (UTC):**", vs.get("as_of_utc", "—"))
+            st.write("**Data sources:**", ", ".join(str(x) for x in (vs.get("data_sources") or [])))
+            st.write("**Trace reference:**", vs.get("classification_trace_reference", "—"))
+        with b:
+            lm = vs.get("lab_mode")
+            st.write(
+                "**Overlay input mode:**",
+                "Target payoff → strikes on grid" if lm == "target_payoff" else (
+                    "Exact strikes (K1–K4)" if lm == "exact_strikes" else str(lm or "—")
+                ),
+            )
+            st.write("**Disagreement category:**", vs.get("disagreement_category_id", "—"))
+            if vs.get("disagreement_type_line"):
+                st.markdown(vs.get("disagreement_type_line"))
+            st.caption(vs.get("classification_dimensions", ""))
+        st.caption(vs.get("overlay_basis", ""))
+        st.caption(vs.get("strategy_families_scope", ""))
+        dp = vs.get("derivation_paths") or {}
+        if dp:
+            st.markdown("**Formula / derivation paths**")
+            for _k, line in dp.items():
+                st.caption(f"• {line}")
+
+    with st.expander("As-of, cache policy & snapshot notes", expanded=False):
+        st.caption(v.get("snapshot_note") or "")
+        st.caption(v.get("cache_note") or "")
+        st.write("**Quote cache TTL (s):**", v.get("quote_cache_ttl_s", "—"))
 
     dens = v.get("density") or {}
     ref = dens.get("reference_risk_neutral") or {}
-    st.markdown("##### Risk-neutral distribution (reference, purple)")
-    st.caption(ref.get("method", ""))
-    c1, c2 = st.columns(2)
-    with c1:
-        st.write("Forward (USD):", f"{ref.get('forward_usd', 0):,.2f}")
-        st.write("ATM IV (annual):", f"{ref.get('atm_iv_annual', 0):.4f}")
-        st.write("T (years):", f"{ref.get('T_years', 0):.4f}")
-    with c2:
-        st.write("Grid min (USD):", f"{ref.get('grid_price_min_usd', 0):,.2f}")
-        st.write("Grid max (USD):", f"{ref.get('grid_price_max_usd', 0):,.2f}")
-        st.write("Grid points:", ref.get("grid_points"))
-
     mi = dens.get("market_implied") or {}
-    st.markdown("##### Market-implied pricing distribution (orange)")
-    st.caption(mi.get("method_when_computed") or "")
-    st.write("**Call marks count:**", mi.get("call_marks_count"))
-    st.write("**Breeden–Litzenberger:**", mi.get("breeden_litzenberger"))
-    if mi.get("skip_reason"):
-        st.caption(mi["skip_reason"])
-
     belief = v.get("belief")
-    if belief:
-        st.markdown("##### User belief overlay (teal)")
-        if belief.get("invalid"):
-            st.warning(belief.get("invalid_reason") or "Invalid belief parameters.")
-        st.write("Center / mode (USD):", f"{belief.get('center_mode_usd', 0):,.2f}")
-        st.write("σ of ln price:", f"{belief.get('sigma_ln_of_price', 0):.4f}")
-        st.write("σ at horizon (ATM-implied, same scale):", f"{belief.get('sigma_mkt_at_horizon', 0):.4f}")
-        st.caption(belief.get("note") or "")
+    with st.expander("Distribution & belief inputs (numeric)", expanded=False):
+        st.markdown("##### Risk-neutral distribution (reference, purple)")
+        st.caption(ref.get("method", ""))
+        c1, c2 = st.columns(2)
+        with c1:
+            st.write("Forward (USD):", f"{ref.get('forward_usd', 0):,.2f}")
+            st.write("ATM IV (annual):", f"{ref.get('atm_iv_annual', 0):.4f}")
+            st.write("T (years):", f"{ref.get('T_years', 0):.4f}")
+        with c2:
+            st.write("Grid min (USD):", f"{ref.get('grid_price_min_usd', 0):,.2f}")
+            st.write("Grid max (USD):", f"{ref.get('grid_price_max_usd', 0):,.2f}")
+            st.write("Grid points:", ref.get("grid_points"))
+
+        st.markdown("##### Market-implied pricing distribution (orange)")
+        st.caption(mi.get("method_when_computed") or "")
+        st.write("**Call marks count:**", mi.get("call_marks_count"))
+        st.write("**Breeden–Litzenberger:**", mi.get("breeden_litzenberger"))
+        if mi.get("skip_reason"):
+            st.caption(mi["skip_reason"])
+
+        if belief:
+            st.markdown("##### User belief overlay (teal)")
+            if belief.get("invalid"):
+                st.warning(belief.get("invalid_reason") or "Invalid belief parameters.")
+            st.write("Center / mode (USD):", f"{belief.get('center_mode_usd', 0):,.2f}")
+            st.write("σ of ln price:", f"{belief.get('sigma_ln_of_price', 0):.4f}")
+            st.write("σ at horizon (ATM-implied, same scale):", f"{belief.get('sigma_mkt_at_horizon', 0):.4f}")
+            st.caption(belief.get("note") or "")
+
+    bdv = v.get("belief_disagreement_verification")
+    if bdv and isinstance(bdv, dict):
+        with st.expander("Full disagreement classification (trace)", expanded=False):
+            st.markdown(bdv.get("human_readable") or "")
+        with st.expander("Raw classification trace (debug)", expanded=False):
+            st.json(bdv.get("raw") or {})
+
+    bd_contract = v.get("belief_disagreement")
+    if bd_contract:
+        with st.expander("Belief vs market — disagreement contract (structured)", expanded=False):
+            st.caption(
+                "Fit classes and illustrative patterns for exploration only — not financial advice "
+                "and not optimized strikes from your belief."
+            )
+            st.json(bd_contract)
 
     ss = v.get("strategy_summary") or {}
-    st.markdown("##### Net cost, breakevens, max gain / loss")
-    if ss.get("error"):
-        st.error(str(ss["error"]))
+    with st.expander("Strategy overlay P&L (net cost, breakevens, max gain / loss)", expanded=False):
+        if ss.get("error"):
+            st.error(str(ss["error"]))
+        vals = ss.get("values") or {}
+        notes = ss.get("calculation_notes") or {}
+        if not ss.get("applicable"):
+            st.caption(
+                "No strategy P&L on the chart for this run (invalid targets, missing strikes, or empty overlay)."
+            )
+        else:
+            st.write("**Strategy name:**", vals.get("name"))
+            st.write("**Qty:**", vals.get("qty"))
+            st.write(
+                "**Net cost (USD):**",
+                f"{vals.get('net_cost_usd', 0):,.2f}",
+                f"({vals.get('debit_credit')})",
+            )
+            st.write("**Max gain (USD):**", f"{vals.get('max_gain_usd', 0):,.2f}")
+            st.write("**Max loss (USD):**", f"{vals.get('max_loss_usd', 0):,.2f}")
+            be = vals.get("breakevens_usd") or []
+            st.write(
+                "**Breakevens (USD):**",
+                ", ".join(f"{x:,.2f}" for x in be) if be else "—",
+            )
+        with st.expander("Calculation notes", expanded=False):
+            st.write("**Net cost / credit:**", notes.get("net_cost", ""))
+            st.write("**Max gain / max loss:**", notes.get("max_gain_loss", ""))
+            st.write("**Breakevens:**", notes.get("breakevens", ""))
+
+
+def _render_decision_ready_review(verification: dict) -> None:
+    """Sprint 005: plain-language structure + payoff read + disagreement/ticket linkage."""
+    payload = build_decision_ready_review_payload(verification)
+    if not payload:
+        return
+    with st.container(border=True):
+        st.markdown("##### Decision-ready review")
+        st.markdown(payload["structure_line"])
+        st.markdown(payload["payoff_line"])
+        st.markdown(payload["linkage_line"])
+        for line in payload.get("bullets") or []:
+            st.markdown(line)
+        st.caption(payload.get("fit_caption") or "")
+
+
+def _render_implied_lab_summary_card(outputs: dict) -> None:
+    """
+    Compact trade summary for the implied lab.
+    Single-source-of-truth: uses derived `outputs` (esp. verification.strategy_summary).
+    """
+    v = outputs.get("verification") if isinstance(outputs, dict) else {}
+    ss = (v.get("strategy_summary") or {}) if isinstance(v, dict) else {}
     vals = ss.get("values") or {}
-    notes = ss.get("calculation_notes") or {}
-    if not ss.get("applicable"):
-        st.caption(
-            "No strategy P&L on the chart for this run (invalid targets, missing strikes, or empty overlay)."
-        )
-    else:
-        st.write("**Strategy name:**", vals.get("name"))
-        st.write("**Qty:**", vals.get("qty"))
-        st.write(
-            "**Net cost (USD):**",
-            f"{vals.get('net_cost_usd', 0):,.2f}",
-            f"({vals.get('debit_credit')})",
-        )
-        st.write("**Max gain (USD):**", f"{vals.get('max_gain_usd', 0):,.2f}")
-        st.write("**Max loss (USD):**", f"{vals.get('max_loss_usd', 0):,.2f}")
-        be = vals.get("breakevens_usd") or []
-        st.write(
-            "**Breakevens (USD):**",
-            ", ".join(f"{x:,.2f}" for x in be) if be else "—",
-        )
-    with st.expander("Calculation notes", expanded=False):
-        st.write("**Net cost / credit:**", notes.get("net_cost", ""))
-        st.write("**Max gain / max loss:**", notes.get("max_gain_loss", ""))
-        st.write("**Breakevens:**", notes.get("breakevens", ""))
+
+    name = vals.get("name") or "—"
+    net_cost = vals.get("net_cost_usd")
+    debit_credit = vals.get("debit_credit") or "—"
+    max_gain = vals.get("max_gain_usd")
+    max_loss = vals.get("max_loss_usd")
+    breakevens = vals.get("breakevens_usd") or []
+
+    dc_label = str(debit_credit).title() if str(debit_credit) in ("debit", "credit") else "—"
+    cost_label = f"{float(net_cost):,.0f} USD" if isinstance(net_cost, (int, float)) else "—"
+    max_gain_label = f"{float(max_gain):,.0f} USD" if isinstance(max_gain, (int, float)) else "—"
+    max_loss_label = f"{float(max_loss):,.0f} USD" if isinstance(max_loss, (int, float)) else "—"
+    be_preview = (
+        ", ".join(f"{float(be):,.0f}" for be in breakevens[:3]) + ("…" if len(breakevens) > 3 else "")
+        if breakevens
+        else "—"
+    )
+
+    with st.container(border=True):
+        st.markdown("##### Summary")
+        st.markdown(f"**{name}**")
+        a, b, c = st.columns(3)
+        with a:
+            st.metric(f"{dc_label}", cost_label)
+        with b:
+            st.metric("Max gain", max_gain_label)
+        with c:
+            st.metric("Max loss", max_loss_label)
+        st.caption(f"**Breakevens (USD):** {be_preview}")
+        st.caption("**Fit quality:** — (not available in the current contract)")
 
 
 st.set_page_config(page_title="Probability Engine", layout="wide")
@@ -246,48 +402,25 @@ if show_bitcoin_view:
 
 # ---------- Bitcoin section: light load first, heavy data on demand ----------
 if show_bitcoin_view:
-    st.header("Bitcoin: price, prediction questions & implied value")
+    st.header("Bitcoin implied lab — market-implied view as the anchor")
+    st.caption(
+        "Start with the **market-implied view** for the selected horizon (expiry). "
+        "Then optionally add **your belief** and review the **disagreement**. "
+        "This is an exploration workbench — not a recommendation engine."
+    )
 
-    # 1) Light load: Yahoo + Polymarket in parallel (no Deribit)
-    btc_prices = None
-    events = []
-    with ThreadPoolExecutor(max_workers=2) as ex:
-        f_yahoo = ex.submit(_cached_yahoo, btc_symbols, f"{chart_days}d")
-        f_pm = ex.submit(_cached_polymarket, True, False, 150)
-        wait([f_yahoo, f_pm])
+    # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
+    current_btc = None
+    if is_full:
         try:
-            btc_prices = f_yahoo.result()
+            # Bounded wait: Deribit index can hang; fall through to Yahoo so the lab can mount.
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                fut = ex.submit(_cached_deribit_index)
+                done, _ = wait([fut], timeout=3.0)
+                if done:
+                    current_btc = fut.result()
         except Exception:
-            pass
-        try:
-            events = f_pm.result() or []
-        except Exception as e:
-            st.warning(
-                f"Polymarket API unavailable ({type(e).__name__}). "
-                "Bitcoin chart and other data still work; only Polymarket prediction data is missing."
-            )
-    if btc_prices is not None and not btc_prices.empty:
-        btc_spot = btc_prices[btc_prices["symbol"] == "BTC-USD"]
-        btc_fut = btc_prices[btc_prices["symbol"] == "BTC=F"]
-    else:
-        btc_spot = pd.DataFrame()
-        btc_fut = pd.DataFrame()
-
-    keywords = (config.get("prediction_markets") or {}).get("polymarket", {}).get("topic_keywords") or ["bitcoin", "btc"]
-    all_probs = markets_to_probabilities(events, topic_keywords=keywords)
-    btc_questions = btc_price_questions_from_polymarket(all_probs) if all_probs else []
-
-    current_btc = float(btc_spot["close"].iloc[-1]) if len(btc_spot) else None
-    if current_btc is None and len(btc_fut):
-        try:
-            current_btc = float(btc_fut.sort_values("timestamp")["close"].iloc[-1])
-        except Exception:
-            pass
-    if current_btc is None and is_full:
-        try:
-            current_btc = _cached_deribit_index()
-        except Exception:
-            pass
+            current_btc = None
     if current_btc is None:
         try:
             fallback_df = _cached_yahoo({"bitcoin": ["BTC-USD"]}, "5d")
@@ -299,385 +432,21 @@ if show_bitcoin_view:
                             current_btc = float(spot_rows.sort_values("timestamp")[col].iloc[-1])
                             break
         except Exception:
-            pass
+            current_btc = None
 
     # Optional Deribit extras (forward curve, bull spreads, prediction overlays, reference tables).
     # Not auto-loaded: implied-lab fetches its own expiries/marks via _cached_* when that section runs.
     load_deribit = bool(st.session_state.get("load_deribit", False))
 
-    forward_curve = []
-    bull_spreads = []
-    prediction_spreads = []
-    if is_full and load_deribit and current_btc is not None:
-        with st.spinner("Loading Deribit (forward curve, spreads, options)…"):
-            try:
-                with ThreadPoolExecutor(max_workers=3) as ex:
-                    f_fwd = ex.submit(_cached_forward_curve, 10)
-                    f_inst = ex.submit(_cached_option_instruments)
-                    f_marks = ex.submit(_cached_option_book_marks)
-                    wait([f_fwd, f_inst, f_marks])
-                    forward_curve = f_fwd.result() or []
-                    _ = f_inst.result()
-                    _ = f_marks.result()
-            except Exception:
-                pass
-            try:
-                bull_spreads = _cached_bull_spreads(current_btc, 5000.0, 5) or []
-            except Exception:
-                pass
-            if btc_questions:
-                try:
-                    eligible = [q for q in btc_questions if (q.get("strike") or 0) >= 10000]
-                    eligible.sort(key=lambda q: q.get("strike") or 0, reverse=True)
-                    prediction_spreads = fetch_deribit_spreads_around_predictions(
-                        btc_questions=eligible or btc_questions,
-                        current_spot=current_btc,
-                        max_questions=8,
-                        instruments=_cached_option_instruments(),
-                        option_book_marks=_cached_option_book_marks(),
-                    ) or []
-                except Exception:
-                    pass
-
-    # Toggles: which "will it hit" questions to show on chart
-    question_labels = []
-    for q in btc_questions:
-        s, r = q.get("strike"), q.get("resolution_date")
-        if s is not None and r:
-            question_labels.append(f"${s:,.0f} by {r}")
-    question_labels = list(dict.fromkeys(question_labels))  # preserve order, no dupes
-    # Default: fewer questions so chart isn’t crowded (e.g. first 4–5 unique strikes)
-    _default = question_labels if len(question_labels) <= 5 else question_labels[:5]
-    selected_questions = st.sidebar.multiselect(
-        "Price-target questions on chart",
-        question_labels,
-        default=_default,
-        key="chart_questions",
-    )
-    # Filter to selected: keep q if its label is in selected_questions
-    def _q_label(q):
-        s, r = q.get("strike"), q.get("resolution_date")
-        return f"${s:,.0f} by {r}" if (s is not None and r) else None
-    btc_questions_filtered = [q for q in btc_questions if _q_label(q) in selected_questions]
-
-    # 3) Plotly chart: price + overlay of questions + optional options
-    fig = go.Figure()
-    if not btc_spot.empty:
-        btc_spot = btc_spot.sort_values("timestamp")
-        fig.add_trace(
-            go.Scatter(
-                x=btc_spot["timestamp"],
-                y=btc_spot["close"],
-                name="BTC spot",
-                line=dict(color="rgb(247, 147, 26)", width=2),
-            )
-        )
-    # Forward curve and spreads only when Deribit loaded (Full view)
-    if is_full and load_deribit and show_forward_curve and forward_curve and current_btc is not None:
-        today = pd.Timestamp.now(tz="UTC").normalize()
-        x_fwd = [today] + [f["expiry_date"] for f in forward_curve]
-        y_fwd = [current_btc] + [f["mark_price"] for f in forward_curve]
-        fig.add_trace(
-            go.Scatter(
-                x=x_fwd,
-                y=y_fwd,
-                mode="lines+markers",
-                name="Futures (forward curve)",
-                line=dict(color="rgb(80, 160, 255)", width=2, dash="dot"),
-                marker=dict(size=8, symbol="diamond", line=dict(width=1)),
-                hovertemplate="%{x|%Y-%m-%d}<br>%{y:,.0f} USD<extra></extra>",
-            )
-        )
-    elif not btc_fut.empty:
-        # Fallback: single CME futures series if Deribit forward curve unavailable
-        btc_fut = btc_fut.sort_values("timestamp")
-        fig.add_trace(
-            go.Scatter(
-                x=btc_fut["timestamp"],
-                y=btc_fut["close"],
-                name="BTC futures (CME)",
-                line=dict(color="rgb(100, 180, 255)", width=1.5),
-            )
-        )
-
-    # Options on main chart (Full + Deribit loaded)
-    chart_options = []
-    if is_full and load_deribit and show_options_on_chart and option_types_on_chart and not options_in_separate_chart:
-        try:
-            all_opts = _cached_options_for_chart()
-            chart_options = [o for o in all_opts if o.get("option_type") in option_types_on_chart]
-            # Sample: one point per (expiry, strike_rounded_to_5k) to reduce clutter
-            if len(chart_options) > 200:
-                by_bucket = {}
-                for o in chart_options:
-                    exp = o["expiry_date"]
-                    strike_bucket = round(o["strike"] / 5000) * 5000
-                    key = (exp, strike_bucket, o.get("option_type"))
-                    if key not in by_bucket:
-                        by_bucket[key] = o
-                chart_options = list(by_bucket.values())
-        except Exception:
-            chart_options = []
-    y_vals = []
-    if not btc_spot.empty:
-        y_vals.extend(btc_spot["close"].dropna().tolist())
-    if not btc_fut.empty:
-        y_vals.extend(btc_fut["close"].dropna().tolist())
-    if forward_curve:
-        y_vals.extend([f["mark_price"] for f in forward_curve])
-    if current_btc is not None:
-        y_vals.append(current_btc)
-    strikes = [q.get("strike") for q in btc_questions_filtered if q.get("strike") is not None]
-    strikes = strikes + [o["strike"] for o in chart_options]  # only when options on main chart
-    if bull_spreads:
-        for s in bull_spreads:
-            strikes.extend([s["K_low"], s["K_high"]])
-    if prediction_spreads:
-        for s in prediction_spreads:
-            strikes.extend([s["K_low"], s["K_high"]])
-    y_max = max(y_vals + strikes) if (y_vals or strikes) else (current_btc or 70000)
-    y_min = min(y_vals) if y_vals else (current_btc or 60000) * 0.85
-    if strikes:
-        y_min = min(y_min, min(strikes) * 0.95)
-    y_span = max(y_max - y_min, 1000)
-
-    # Horizontal lines at each strike (e.g. 150k) and probability label on that line at resolution date (filtered)
-    seen_strikes = set()
-    for q in btc_questions_filtered:
-        res = q.get("resolution_date")
-        strike = q.get("strike")
-        prob = q.get("yes_probability")
-        if not res or strike is None or prob is None:
-            continue
-        try:
-            res_ts = pd.Timestamp(res)
-        except Exception:
-            continue
-        # One horizontal line per unique strike
-        if strike not in seen_strikes:
-            seen_strikes.add(strike)
-            fig.add_hline(
-                y=strike,
-                line_dash="dash",
-                line_color="rgba(100, 100, 100, 0.8)",
-                annotation_text=f"${strike:,.0f}",
-                annotation_position="left",
-                annotation_font_size=11,
-            )
-        # Probability label only if above threshold (reduces 0% / 1% clutter)
-        pct = (prob or 0) * 100
-        if pct >= min_prob_label_pct:
-            fig.add_annotation(
-                x=res_ts,
-                y=strike,
-                text=f"{pct:.0f}% Yes",
-                showarrow=False,
-                font=dict(size=11, color="darkblue"),
-                xanchor="left",
-                xshift=5,
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="gray",
-                borderwidth=1,
-            )
-        # Light vertical guide at resolution date (subtle)
-        fig.add_vline(x=res_ts, line_dash="dot", line_color="lightgray", opacity=0.35)
-
-    # Prediction-aligned spread overlay (Full + Deribit loaded)
-    if is_full and load_deribit and show_prediction_spreads and prediction_spreads:
-        for s in prediction_spreads:
-            try:
-                res_ts = pd.Timestamp(s["resolution_date"][:10])
-            except Exception:
-                continue
-            k_lo, k_hi = s["K_low"], s["K_high"]
-            rr = s.get("rr_ratio") or 0
-            pm_pct = s.get("polymarket_yes_pct") or 0
-            opt_pct = s.get("approx_implied_prob_pct")
-            lbl = f"{k_lo/1000:.0f}k/{k_hi/1000:.0f}k R:R 1:{rr:.1f}"
-            if opt_pct is not None:
-                lbl += f" | opt~{opt_pct:.0f}%"
-            fig.add_shape(
-                type="line",
-                x0=res_ts, x1=res_ts, y0=k_lo, y1=k_hi,
-                line=dict(color="rgba(50, 100, 200, 0.75)", width=4, dash="solid"),
-            )
-            fig.add_annotation(
-                x=res_ts, y=(k_lo + k_hi) / 2,
-                text=lbl,
-                showarrow=False, font=dict(size=9), xanchor="left", xshift=6,
-                bgcolor="rgba(200,220,255,0.9)", bordercolor="blue", borderwidth=1,
-            )
-
-    # Bull spread overlay (Full + Deribit loaded)
-    if is_full and load_deribit and show_bull_spreads and bull_spreads:
-        for s in bull_spreads:
-            exp = s["expiry_date"]
-            k_lo, k_hi = s["K_low"], s["K_high"]
-            rr = s.get("rr_ratio") or 0
-            fig.add_shape(
-                type="line",
-                x0=exp, x1=exp, y0=k_lo, y1=k_hi,
-                line=dict(color="rgba(0, 150, 80, 0.7)", width=4, dash="solid"),
-            )
-            fig.add_annotation(
-                x=exp, y=(k_lo + k_hi) / 2,
-                text=f"{k_lo/1000:.0f}k/{k_hi/1000:.0f}k R:R 1:{rr:.1f}",
-                showarrow=False, font=dict(size=9), xanchor="left", xshift=6,
-                bgcolor="rgba(200,255,200,0.9)", bordercolor="green", borderwidth=1,
-            )
-
-    # Options overlay on main chart: only if enabled and not using separate chart; sampled & subtle
-    if show_options_on_chart and chart_options and not options_in_separate_chart:
-        for opt_type in option_types_on_chart:
-            subset = [o for o in chart_options if o.get("option_type") == opt_type]
-            if not subset:
-                continue
-            x = [o["expiry_date"] for o in subset]
-            y = [o["strike"] for o in subset]
-            color = "rgba(0, 160, 90, 0.45)" if opt_type == "call" else "rgba(200, 70, 70, 0.45)"
-            fig.add_trace(
-                go.Scatter(
-                    x=x,
-                    y=y,
-                    mode="markers",
-                    name=f"Options ({opt_type}s)",
-                    marker=dict(size=4, color=color, symbol="diamond-open" if opt_type == "put" else "circle-open", line=dict(width=0.5)),
-                    hovertemplate="%{x|%Y-%m-%d}<br>Strike: %{y:,.0f}<extra></extra>",
-                )
-            )
-
-    fig.update_layout(
-        title="BTC price — dashed lines = price targets; labels = probability (filtered by slider)",
-        xaxis_title="Date",
-        yaxis_title="Price (USD)",
-        yaxis=dict(range=[y_min, y_max + y_span * 0.05]),
-        hovermode="x unified",
-        height=480,
-        margin=dict(b=60),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-    # Separate options chart (Full + Deribit loaded)
-    if is_full and load_deribit and options_in_separate_chart and option_types_on_chart:
-        with st.expander("Separate options chart (optional)", expanded=False):
-            try:
-                opts_for_fig = _cached_options_for_chart()
-                opts_for_fig = [o for o in opts_for_fig if o.get("option_type") in option_types_on_chart]
-                if len(opts_for_fig) > 400:
-                    by_bucket = {}
-                    for o in opts_for_fig:
-                        key = (o["expiry_date"], round(o["strike"] / 2000) * 2000, o.get("option_type"))
-                        if key not in by_bucket:
-                            by_bucket[key] = o
-                    opts_for_fig = list(by_bucket.values())
-                if opts_for_fig:
-                    fig_opts = go.Figure()
-                    for opt_type in option_types_on_chart:
-                        subset = [o for o in opts_for_fig if o.get("option_type") == opt_type]
-                        if not subset:
-                            continue
-                        fig_opts.add_trace(
-                            go.Scatter(
-                                x=[o["expiry_date"] for o in subset],
-                                y=[o["strike"] for o in subset],
-                                mode="markers",
-                                name=f"{opt_type}s",
-                                marker=dict(size=5, color="green" if opt_type == "call" else "red", symbol="circle-open" if opt_type == "call" else "diamond-open"),
-                                hovertemplate="%{x|%Y-%m-%d}<br>Strike: %{y:,.0f}<extra></extra>",
-                            )
-                        )
-                    fig_opts.update_layout(
-                        title="Deribit BTC options — expiry date vs strike",
-                        xaxis_title="Expiry",
-                        yaxis_title="Strike (USD)",
-                        height=320,
-                        margin=dict(b=50),
-                        showlegend=True,
-                        legend=dict(orientation="h"),
-                    )
-                    st.plotly_chart(fig_opts, use_container_width=True)
-            except Exception:
-                pass
-
-    with st.expander("Supporting derived tables (optional)", expanded=False):
-        # 4) Implied value table + risk/reward for questions
-        st.subheader("Implied value: Bitcoin price-target questions (with risk/reward)")
-        if btc_questions and current_btc is not None:
-            rows = []
-            for q in btc_questions:
-                strike = q.get("strike") or 0
-                prob = q.get("yes_probability") or 0
-                # Risk/reward: bet 1 unit on Yes at price p. If Yes get 1/p, profit (1/p - 1). If No lose 1. So risk=1, reward=(1/p)-1, R:R = (1/p - 1) : 1
-                reward_if_yes = (1.0 / prob - 1.0) if prob > 0 else 0
-                rr_ratio = reward_if_yes  # per 1 unit risk
-                rows.append({
-                    "Question": (q.get("market_question") or "")[:50] + ("..." if len((q.get("market_question") or "")) > 50 else ""),
-                    "Strike ($)": f"{strike:,.0f}",
-                    "Yes %": f"{prob*100:.1f}",
-                    "Resolution": q.get("resolution_date") or "",
-                    "Risk (1 unit)": "1",
-                    "Reward if Yes": f"{reward_if_yes:.2f}",
-                    "R:R": f"1:{rr_ratio:.2f}",
-                    "Spread vs spot": f"{strike - current_btc:,.0f}",
-                })
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-        else:
-            st.caption("No Bitcoin price-target questions parsed from Polymarket, or no spot price.")
-
-        # 4b) Tight bull spreads table — only when Deribit loaded
-        if is_full and load_deribit:
-            st.subheader("Tight bull spreads (Deribit) — risk/reward")
-        if is_full and load_deribit and bull_spreads:
-            spread_rows = []
-            for s in bull_spreads:
-                spread_rows.append({
-                    "Expiry": s["expiry_date"].strftime("%Y-%m-%d") if hasattr(s["expiry_date"], "strftime") else str(s["expiry_date"])[:10],
-                    "K_low": f"{s['K_low']:,.0f}",
-                    "K_high": f"{s['K_high']:,.0f}",
-                    "Cost (USD)": f"{s['cost_usd']:,.0f}",
-                    "Max loss": f"{s['max_loss']:,.0f}",
-                    "Max gain": f"{s['max_gain']:,.0f}",
-                    "R:R": f"1:{s['rr_ratio']:.2f}",
-                })
-            st.dataframe(pd.DataFrame(spread_rows), use_container_width=True, hide_index=True)
-        elif is_full and load_deribit:
-            st.caption("No tight bull spreads (Deribit calls). Check spot price and API.")
-
-        # 4c) Spreads around predictions — only when Deribit loaded
-        if is_full and load_deribit:
-            st.subheader("Spreads around predictions — Polymarket vs options")
-        if is_full and load_deribit and prediction_spreads:
-            pred_rows = []
-            for s in prediction_spreads:
-                pred_rows.append({
-                    "Target": f"${s['target']:,.0f}",
-                    "Resolution": s["resolution_date"][:10],
-                    "Polymarket Yes %": f"{s.get('polymarket_yes_pct', 0):.1f}",
-                    "Spread": f"{s['K_low']/1000:.0f}k/{s['K_high']/1000:.0f}k",
-                    "Cost (USD)": f"{s['cost_usd']:,.0f}",
-                    "R:R": f"1:{s['rr_ratio']:.2f}",
-                    "Opt ~implied %": f"{s.get('approx_implied_prob_pct') or 0:.1f}" if s.get("approx_implied_prob_pct") is not None else "—",
-                })
-            st.dataframe(pd.DataFrame(pred_rows), use_container_width=True, hide_index=True)
-            st.caption("Opt ~implied % = approximate from spread cost (simplified). Compare to Polymarket Yes %.")
-        elif is_full and load_deribit:
-            st.caption("No prediction-aligned spreads (need Polymarket questions + Deribit options at matching strikes/expiries).")
-
-    if is_full and not load_deribit:
-        st.caption(
-            "Optional: use **Refresh priced inputs (Deribit)** in the sidebar to load the forward curve, "
-            "spread overlays on the chart, and Deribit reference tables."
-        )
-
+    # Market-implied distribution is the top-of-screen anchor (H1-01).
     # 4d) Implied probability distribution — Full view: mounted automatically (own Deribit fetches inside)
     run_implied = bool(is_full)
     if is_full:
-        st.subheader("Implied probability distribution")
-        with st.expander("How to read this chart"):
+        st.subheader("Market-implied distribution (anchor)")
+        with st.expander("How to read this chart", expanded=False):
             st.markdown("""
-        - **Purple (filled):** Lognormal distribution from the **forward price** and **ATM implied volatility** — the standard model for “where price might be” at expiry.
-        - **Orange (dashed):** **Market-implied** distribution from option prices (Breeden–Litzenberger). When it diverges from the purple curve, the chart is marked **Anomalous**.
+        - **Purple (filled):** Risk-neutral lognormal reference from the **forward price** and **ATM implied volatility**.
+        - **Orange (dashed):** **Market-implied pricing distribution** from listed option marks (Breeden–Litzenberger). This is a **priced / risk-neutral** distribution (not a “true expectations” claim and not a recommendation).
         - **Green line (if selected):** **Strategy P&amp;L** at expiry (right axis). At each price level, this is your net profit or loss if you hold that strategy. Negative = loss (e.g. premium paid), positive = profit.
         - **Strikes** for the strategy scanner are chosen from available Deribit options: ATM = strike nearest the forward; spreads use the nearest strikes around the forward so the payoff is relevant to current pricing.
             """)
@@ -702,9 +471,11 @@ if show_bitcoin_view:
                     # Create right-panel slots early so the "live result" area
                     # doesn't get pushed down by the (potentially large) left-column controls.
                     with col_chart:
-                        right_summary_slot = st.empty()
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
                         right_chart_slot = st.empty()
+                        right_summary_slot = st.empty()
+                        right_review_slot = st.empty()
+                        right_glance_slot = st.empty()
                         right_anomaly_slot = st.empty()
                         right_forward_slot = st.empty()
                         right_belief_slot = st.empty()
@@ -783,19 +554,63 @@ if show_bitcoin_view:
                                 key=f"belief_center_{belief_exp}",
                                 format="%.0f",
                             )
-                            st.slider(
-                                "Uncertainty (σ of ln price at expiry)",
-                                0.02,
-                                0.8,
-                                0.2,
-                                0.01,
-                                key=f"belief_width_{belief_exp}",
-                                help="Larger σ = fatter tails / wider distribution. Compared to ATM-implied σ≈√T × IV.",
+
+                            # Market horizon uncertainty on the same basis (σ_ln)
+                            sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+                            mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+
+                            st.markdown("**Uncertainty input mode**")
+                            unc_mode_key = f"belief_unc_mode_{belief_exp}"
+                            unc_mode = st.radio(
+                                "Uncertainty input mode",
+                                ["±% move (1σ)", "σ_ln (advanced)"],
+                                key=unc_mode_key,
+                                horizontal=True,
+                                label_visibility="collapsed",
                             )
+
+                            if unc_mode == "±% move (1σ)":
+                                pct_key = f"belief_move_pct_{belief_exp}"
+                                # Initialize from existing sigma value if present to avoid jumpiness.
+                                if pct_key not in st.session_state:
+                                    existing_sigma = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+                                    st.session_state[pct_key] = float(sigma_ln_to_move_pct_1sigma(existing_sigma))
+
+                                st.slider(
+                                    "Uncertainty (±% move, 1σ at expiry)",
+                                    1.0,
+                                    200.0,
+                                    float(st.session_state.get(pct_key, 22.0)),
+                                    0.5,
+                                    key=pct_key,
+                                    help="Human-scaled: a ±1σ move corresponds to multiplying price by exp(±σ_ln).",
+                                )
+                                sigma_ln = move_pct_1sigma_to_sigma_ln(float(st.session_state.get(pct_key, 0.0)))
+                                st.caption(
+                                    f"Derived σ_ln: **{sigma_ln:.4f}** · "
+                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%** 1σ)"
+                                )
+                            else:
+                                sigma_key = f"belief_width_{belief_exp}"
+                                st.slider(
+                                    "Uncertainty (σ of ln price at expiry)",
+                                    0.02,
+                                    0.8,
+                                    0.2,
+                                    0.005,
+                                    key=sigma_key,
+                                    help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+                                )
+                                sigma_ln = float(st.session_state.get(sigma_key, 0.2))
+                                st.caption(
+                                    f"≈±**{sigma_ln_to_move_pct_1sigma(sigma_ln):.1f}%** 1σ move · "
+                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%**)"
+                                )
                         user_belief_for_state = {
                             "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
                             "center_usd": float(st.session_state.get(f"belief_center_{belief_exp}", forward)),
-                            "width": float(st.session_state.get(f"belief_width_{belief_exp}", 0.2)),
+                            # Internal model stays in σ_ln; percent mode is just input/display convenience.
+                            "width": float(sigma_ln),
                         }
                         # Defaults when no strikes (chart + belief still run)
                         qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
@@ -970,7 +785,7 @@ if show_bitcoin_view:
                                     }
 
                             # --- Adjust strategy shape (editable truth only in exact_strikes mode) ---
-                            with st.expander("Adjust strategy shape", expanded=True):
+                            with st.expander("Adjust strategy shape", expanded=False):
                                 st.caption(
                                     "Editable in current mode" if mode_norm == "exact_strikes"
                                     else "Derived / locked in current mode"
@@ -1134,34 +949,9 @@ if show_bitcoin_view:
                             outputs = derive_lab_outputs(state_min, market_data)
                             selected_strategy = base_strategy
                     # Everything below (distribution chart, summary, scanner) goes in the chart column
-                    if not avail_strikes:
-                        right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
-
-                    # Compact "at a glance" trade summary (Sprint 1B)
-                    be_preview = ", ".join(f"{be:,.0f}" for be in breakevens[:3]) if breakevens else "—"
-                    cost_label = f"{cost_usd:,.0f} USD" if isinstance(cost_usd, (int, float)) else "—"
-                    dc_label = debit_credit.title() if debit_credit in ("debit", "credit") else "—"
-                    right_summary_slot.info(
-                        f"**{strategy_name}**\n\n"
-                        f"- **{dc_label}**: {cost_label}\n"
-                        f"- **Max gain**: {float(max_gain):,.0f} USD\n"
-                        f"- **Max loss**: {float(max_loss):,.0f} USD\n"
-                        f"- **Breakevens**: {be_preview} USD"
-                    )
-
                     call_marks = marks_full.get("calls") or []
-                    market_pdf_raw = []
-                    anomalous = False
-                    if len(call_marks) >= 3:
-                        strikes = [m["strike"] for m in call_marks]
-                        call_usd = [m["mark_btc"] * forward for m in call_marks]
-                        market_pdf_raw = market_implied_density_breeden_litzenberger(
-                            strikes, call_usd, data["prices"]
-                        )
-                        if market_pdf_raw:
-                            anomalous = is_anomalous(
-                                data["prices"], data["pdf_raw"], market_pdf_raw, threshold=0.015
-                            )
+                    ch = outputs.get("chart_helpers") or {}
+                    anomalous = bool(ch.get("anomalous", False))
                     fig_dist = go.Figure()
                     fig_dist.add_trace(
                         go.Scatter(
@@ -1173,19 +963,18 @@ if show_bitcoin_view:
                             fill="tozeroy",
                         )
                     )
-                    if market_pdf_raw:
-                        max_mkt = max(market_pdf_raw) if market_pdf_raw else 1.0
-                        market_pct = [(d / max_mkt * 25.0) if max_mkt > 0 else 0.0 for d in market_pdf_raw]
+                    market_pct = ch.get("market_pct") or []
+                    if market_pct and len(market_pct) == len(data["prices"]):
                         fig_dist.add_trace(
                             go.Scatter(
                                 x=data["prices"],
                                 y=market_pct,
                                 mode="lines",
-                                name="Market-implied (options)",
+                                name="Market-implied pricing distribution (options)",
                                 line=dict(color="rgba(255, 140, 0, 0.9)", width=2, dash="dash"),
                             )
                         )
-                    user_belief_pct = (outputs.get("chart_helpers") or {}).get("user_belief_pct") or []
+                    user_belief_pct = ch.get("user_belief_pct") or []
                     if (
                         user_belief_pct
                         and len(user_belief_pct) == len(data["prices"])
@@ -1202,9 +991,8 @@ if show_bitcoin_view:
                     title = f"BTC — Underlying price on {selected_expiry_str}"
                     if anomalous:
                         title += " — Anomalous"
-                    payoff_usd = []
-                    if selected_strategy and selected_strategy.get("k1") is not None:
-                        payoff_usd = [qty * p for p in strategy_payoff_at_prices(selected_strategy, data["prices"])]
+                    payoff_usd = (outputs.get("overlay") or {}).get("payoff_usd") or []
+                    if selected_strategy and selected_strategy.get("k1") is not None and payoff_usd:
                         fig_dist.add_trace(
                             go.Scatter(
                                 x=data["prices"],
@@ -1233,8 +1021,7 @@ if show_bitcoin_view:
                             showgrid=False,
                         )
                     fig_dist.update_layout(**layout_kw)
-                    _ch = outputs.get("chart_helpers") or {}
-                    _gap_x = _ch.get("belief_largest_gap_price")
+                    _gap_x = ch.get("belief_largest_gap_price")
                     if (
                         user_belief_for_state.get("enabled")
                         and _gap_x is not None
@@ -1262,14 +1049,24 @@ if show_bitcoin_view:
                             font=dict(size=9),
                         )
                     right_chart_slot.plotly_chart(fig_dist, use_container_width=True)
+
+                    if not avail_strikes:
+                        right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
+                    # Summary card (Sprint 001): single-source-of-truth from derived outputs.
+                    with right_summary_slot.container():
+                        _render_implied_lab_summary_card(outputs)
+                    with right_review_slot.container():
+                        _render_decision_ready_review(outputs.get("verification") or {})
+                    with right_glance_slot.container():
+                        _render_belief_vs_market_glance(outputs.get("verification") or {})
                     if anomalous:
                         right_anomaly_slot.warning(
-                            "Anomalous: market-implied distribution differs from lognormal (use multi-leg strategies to reshape)."
+                            "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
                         )
                     _fwd_cap = (
                         f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
                     )
-                    _dg = _ch.get("belief_disagreement_strength")
+                    _dg = ch.get("belief_disagreement_strength")
                     if user_belief_for_state.get("enabled") and _dg:
                         _fwd_cap += f" · Belief disagreement: **{_dg}**"
                     right_forward_slot.caption(_fwd_cap)
@@ -1288,131 +1085,98 @@ if show_bitcoin_view:
                         with st.expander("Verification", expanded=False):
                             _render_implied_lab_verification(outputs.get("verification") or {})
 
-                    # Quick summary and payout stats under sliders
-                    if selected_strategy and selected_strategy.get("k1") is not None:
-                        name = selected_strategy.get("name", "Universal 4-leg")
-                        cost = selected_strategy.get("cost_usd", 0.0)
-                        wings = []
-                        if selected_strategy.get("use_k1", True):
-                            wings.append("left")
-                        if selected_strategy.get("use_k4", True):
-                            wings.append("right")
-                        wings_txt = "both wings" if len(wings) == 2 else (wings[0] + " wing" if wings else "no wings")
-                        # Derive simple stats from payoff curve (per total qty)
-                        max_gain = max(payoff_usd) if payoff_usd else 0.0
-                        max_loss = min(payoff_usd) if payoff_usd else 0.0
-                        # breakevens = price levels where sign changes
-                        breakevens = []
-                        if payoff_usd:
-                            for i in range(1, len(payoff_usd)):
-                                if payoff_usd[i - 1] == 0:
-                                    breakevens.append(data["prices"][i - 1])
-                                elif payoff_usd[i] == 0:
-                                    breakevens.append(data["prices"][i])
-                                elif payoff_usd[i - 1] * payoff_usd[i] < 0:
-                                    # linear interpolation between grid points
-                                    x0, x1 = data["prices"][i - 1], data["prices"][i]
-                                    y0, y1 = payoff_usd[i - 1], payoff_usd[i]
-                                    if y1 != y0:
-                                        x_be = x0 + (0 - y0) * (x1 - x0) / (y1 - y0)
-                                        breakevens.append(x_be)
-                        if breakevens:
-                            be_txt = " · Breakeven" + ("s " if len(breakevens) > 1 else " ") + ", ".join(f"{be:,.0f}" for be in breakevens[:3])
+                    # Strategy details are useful, but not part of the top-of-screen story.
+                    with st.expander("Strategy details (optional)", expanded=False):
+                        if not (selected_strategy and selected_strategy.get("k1") is not None):
+                            if avail_strikes:
+                                st.caption("Set strikes in the **left column** (open **Adjust strategy shape**) to see payoff and name above.")
+                            else:
+                                st.caption("No strikes available for this expiry; use **Refresh priced inputs (Deribit)** or pick another expiry.")
                         else:
-                            be_txt = ""
-                        st.caption(
-                            f"**Current shape:** {name} · Cost ≈ "
-                            f"{cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'}) · {wings_txt} active."
-                            f" · Max gain ≈ {max_gain:,.0f} · Max loss ≈ {max_loss:,.0f}{be_txt}."
-                        )
+                            summary = outputs.get("summary") or {}
+                            name = str(summary.get("name") or selected_strategy.get("name") or "Universal 4-leg")
+                            cost = float(summary.get("cost_usd") or 0.0)
+                            max_gain = float(summary.get("max_gain") or 0.0)
+                            max_loss = float(summary.get("max_loss") or 0.0)
+                            breakevens = summary.get("breakevens") or []
 
-                    # Strategy analysis: single universal 4-leg — show named strategy and summary table
-                    st.subheader("Strategy analysis")
-                    if selected_strategy and selected_strategy.get("k1") is not None:
-                        name = selected_strategy.get("name", "Universal 4-leg")
-                        cost = selected_strategy.get("cost_usd", 0)
-                        st.dataframe(
-                            pd.DataFrame([{
-                                "Strategy": name,
-                                "Cost (USD)": f"{cost:,.0f}" if cost >= 0 else f"-{abs(cost):,.0f}",
-                                "Legs": selected_strategy.get("legs_desc", ""),
-                            }]),
-                            use_container_width=True,
-                            hide_index=True,
-                        )
-                        # Export-style trade ticket summary
-                        side_put1 = "Long" if selected_strategy.get("long_k1", False) else "Short"
-                        side_put2 = "Long" if selected_strategy.get("long_k2", True) else "Short"
-                        side_call3 = "Long" if selected_strategy.get("long_k3", True) else "Short"
-                        side_call4 = "Long" if selected_strategy.get("long_k4", False) else "Short"
-                        k1 = selected_strategy.get("k1")
-                        k2 = selected_strategy.get("k2")
-                        k3 = selected_strategy.get("k3")
-                        k4 = selected_strategy.get("k4")
-                        # Per-leg mark in USD (per 1x)
-                        prem_k1 = put_by_k.get(k1, 0.0) * forward if k1 is not None else 0.0
-                        prem_k2 = put_by_k.get(k2, 0.0) * forward if k2 is not None else 0.0
-                        prem_k3 = call_by_k.get(k3, 0.0) * forward if k3 is not None else 0.0
-                        prem_k4 = call_by_k.get(k4, 0.0) * forward if k4 is not None else 0.0
-                        with st.expander("Trade ticket (copy/paste)", expanded=False):
-                            st.code(
-                                f"Expiry: {selected_expiry_str}\n"
-                                f"Size: {qty}x\n"
-                                f"{side_put1} {qty} PUT @ {k1:,.0f}  (≈ {prem_k1:,.0f} USD per 1x)\n"
-                                f"{side_put2} {qty} PUT @ {k2:,.0f}  (≈ {prem_k2:,.0f} USD per 1x)\n"
-                                f"{side_call3} {qty} CALL @ {k3:,.0f} (≈ {prem_k3:,.0f} USD per 1x)\n"
-                                f"{side_call4} {qty} CALL @ {k4:,.0f} (≈ {prem_k4:,.0f} USD per 1x)\n"
-                                f"Net premium: {cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'})\n"
-                                f"Max gain (approx): {max_gain:,.0f} USD\n"
-                                f"Max loss (approx): {max_loss:,.0f} USD\n"
-                                + (f"Breakevens: {', '.join(f'{be:,.0f}' for be in breakevens[:3])} USD\n" if breakevens else ""),
-                                language="text",
+                            st.dataframe(
+                                pd.DataFrame([{
+                                    "Strategy": name,
+                                    "Cost (USD)": f"{cost:,.0f}" if cost >= 0 else f"-{abs(cost):,.0f}",
+                                    "Legs": selected_strategy.get("legs_desc", ""),
+                                }]),
+                                use_container_width=True,
+                                hide_index=True,
                             )
+                            # Export-style trade ticket summary
+                            side_put1 = "Long" if selected_strategy.get("long_k1", False) else "Short"
+                            side_put2 = "Long" if selected_strategy.get("long_k2", True) else "Short"
+                            side_call3 = "Long" if selected_strategy.get("long_k3", True) else "Short"
+                            side_call4 = "Long" if selected_strategy.get("long_k4", False) else "Short"
+                            k1 = selected_strategy.get("k1")
+                            k2 = selected_strategy.get("k2")
+                            k3 = selected_strategy.get("k3")
+                            k4 = selected_strategy.get("k4")
+                            # Per-leg mark in USD (per 1x)
+                            prem_k1 = put_by_k.get(k1, 0.0) * forward if k1 is not None else 0.0
+                            prem_k2 = put_by_k.get(k2, 0.0) * forward if k2 is not None else 0.0
+                            prem_k3 = call_by_k.get(k3, 0.0) * forward if k3 is not None else 0.0
+                            prem_k4 = call_by_k.get(k4, 0.0) * forward if k4 is not None else 0.0
+                            with st.expander("Trade ticket (copy/paste)", expanded=False):
+                                st.code(
+                                    f"Expiry: {selected_expiry_str}\n"
+                                    f"Size: {qty}x\n"
+                                    f"{side_put1} {qty} PUT @ {k1:,.0f}  (≈ {prem_k1:,.0f} USD per 1x)\n"
+                                    f"{side_put2} {qty} PUT @ {k2:,.0f}  (≈ {prem_k2:,.0f} USD per 1x)\n"
+                                    f"{side_call3} {qty} CALL @ {k3:,.0f} (≈ {prem_k3:,.0f} USD per 1x)\n"
+                                    f"{side_call4} {qty} CALL @ {k4:,.0f} (≈ {prem_k4:,.0f} USD per 1x)\n"
+                                    f"Net premium: {cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'})\n"
+                                    f"Max gain (approx): {max_gain:,.0f} USD\n"
+                                    f"Max loss (approx): {max_loss:,.0f} USD\n"
+                                    + (f"Breakevens: {', '.join(f'{be:,.0f}' for be in breakevens[:3])} USD\n" if breakevens else ""),
+                                    language="text",
+                                )
 
-                            # Calculation breakdown: show how we get cost, max gain/loss, breakevens
-                            with st.expander("**Show calculations**", expanded=False):
-                                u1 = 1 if selected_strategy.get("use_k1", True) else 0
-                                u2 = 1 if selected_strategy.get("use_k2", True) else 0
-                                u3 = 1 if selected_strategy.get("use_k3", True) else 0
-                                u4 = 1 if selected_strategy.get("use_k4", True) else 0
-                                sign1 = (1 if selected_strategy.get("long_k1", False) else -1) * u1
-                                sign2 = (1 if selected_strategy.get("long_k2", True) else -1) * u2
-                                sign3 = (1 if selected_strategy.get("long_k3", True) else -1) * u3
-                                sign4 = (1 if selected_strategy.get("long_k4", False) else -1) * u4
-                                c1 = sign1 * prem_k1
-                                c2 = sign2 * prem_k2
-                                c3 = sign3 * prem_k3
-                                c4 = sign4 * prem_k4
-                                st.markdown("**1. Net cost (premium)**")
-                                st.markdown("Per leg we use mark × forward (USD). Long = you pay (+), short = you receive (−).")
-                                st.latex(r"\text{Cost} = \sum_{\text{legs}} (\pm \text{premium})")
-                                lines = []
-                                if u1:
-                                    lines.append(f"K1 put ({side_put1}): {sign1:+.0f} × {prem_k1:,.0f} = {c1:+,.0f} USD")
-                                if u2:
-                                    lines.append(f"K2 put ({side_put2}): {sign2:+.0f} × {prem_k2:,.0f} = {c2:+,.0f} USD")
-                                if u3:
-                                    lines.append(f"K3 call ({side_call3}): {sign3:+.0f} × {prem_k3:,.0f} = {c3:+,.0f} USD")
-                                if u4:
-                                    lines.append(f"K4 call ({side_call4}): {sign4:+.0f} × {prem_k4:,.0f} = {c4:+,.0f} USD")
-                                st.code("\n".join(lines), language="text")
-                                sum_txt = " + ".join(f"{x:+,.0f}" for x in [c1, c2, c3, c4])
-                                st.markdown(f"**Net cost = " + sum_txt + f" = {cost:,.0f} USD** ({'debit' if cost >= 0 else 'credit'})")
-                                st.markdown("**2. Max gain / max loss**")
-                                st.markdown("We evaluate the 4-leg payoff at each price on the chart (same formula as the green line). Max gain = highest point, max loss = lowest point.")
-                                st.markdown(f"- **Max gain** = max(payoff curve) ≈ **{max_gain:,.0f} USD**")
-                                st.markdown(f"- **Max loss** = min(payoff curve) ≈ **{max_loss:,.0f} USD**")
-                                st.markdown("**3. Breakevens**")
-                                if breakevens:
-                                    st.markdown("Prices where the payoff curve crosses zero (we find sign changes between adjacent grid points and interpolate).")
-                                    st.markdown(f"**Breakevens:** " + ", ".join(f"{be:,.0f} USD" for be in breakevens[:3]))
-                                else:
-                                    st.markdown("Payoff curve does not cross zero in the chart range (always profit or always loss).")
-                    else:
-                        if avail_strikes:
-                            st.caption("Set strikes in the **left column** (open **Adjust strategy shape**) to see payoff and name above.")
-                        else:
-                            st.caption("No strikes available for this expiry; use **Refresh priced inputs (Deribit)** or pick another expiry.")
+                                # Calculation breakdown: advanced math behind a second expander by default.
+                                with st.expander("**Show calculations**", expanded=False):
+                                    u1 = 1 if selected_strategy.get("use_k1", True) else 0
+                                    u2 = 1 if selected_strategy.get("use_k2", True) else 0
+                                    u3 = 1 if selected_strategy.get("use_k3", True) else 0
+                                    u4 = 1 if selected_strategy.get("use_k4", True) else 0
+                                    sign1 = (1 if selected_strategy.get("long_k1", False) else -1) * u1
+                                    sign2 = (1 if selected_strategy.get("long_k2", True) else -1) * u2
+                                    sign3 = (1 if selected_strategy.get("long_k3", True) else -1) * u3
+                                    sign4 = (1 if selected_strategy.get("long_k4", False) else -1) * u4
+                                    c1 = sign1 * prem_k1
+                                    c2 = sign2 * prem_k2
+                                    c3 = sign3 * prem_k3
+                                    c4 = sign4 * prem_k4
+                                    st.markdown("**1. Net cost (premium)**")
+                                    st.markdown("Per leg we use mark × forward (USD). Long = you pay (+), short = you receive (−).")
+                                    st.latex(r"\text{Cost} = \sum_{\text{legs}} (\pm \text{premium})")
+                                    lines = []
+                                    if u1:
+                                        lines.append(f"K1 put ({side_put1}): {sign1:+.0f} × {prem_k1:,.0f} = {c1:+,.0f} USD")
+                                    if u2:
+                                        lines.append(f"K2 put ({side_put2}): {sign2:+.0f} × {prem_k2:,.0f} = {c2:+,.0f} USD")
+                                    if u3:
+                                        lines.append(f"K3 call ({side_call3}): {sign3:+.0f} × {prem_k3:,.0f} = {c3:+,.0f} USD")
+                                    if u4:
+                                        lines.append(f"K4 call ({side_call4}): {sign4:+.0f} × {prem_k4:,.0f} = {c4:+,.0f} USD")
+                                    st.code("\n".join(lines), language="text")
+                                    sum_txt = " + ".join(f"{x:+,.0f}" for x in [c1, c2, c3, c4])
+                                    st.markdown(f"**Net cost = " + sum_txt + f" = {cost:,.0f} USD** ({'debit' if cost >= 0 else 'credit'})")
+                                    st.markdown("**2. Max gain / max loss**")
+                                    st.markdown("We evaluate the 4-leg payoff at each price on the chart (same formula as the green line). Max gain = highest point, max loss = lowest point.")
+                                    st.markdown(f"- **Max gain** = max(payoff curve) ≈ **{max_gain:,.0f} USD**")
+                                    st.markdown(f"- **Max loss** = min(payoff curve) ≈ **{max_loss:,.0f} USD**")
+                                    st.markdown("**3. Breakevens**")
+                                    if breakevens:
+                                        st.markdown("Prices where the payoff curve crosses zero (we find sign changes between adjacent grid points and interpolate).")
+                                        st.markdown(f"**Breakevens:** " + ", ".join(f"{be:,.0f} USD" for be in breakevens[:3]))
+                                    else:
+                                        st.markdown("Payoff curve does not cross zero in the chart range (always profit or always loss).")
             else:
                 st.caption("No Deribit option expiries. Check API.")
                 with st.expander("Debug (expiries fetch)", expanded=False):
@@ -1430,55 +1194,397 @@ if show_bitcoin_view:
     elif is_full and run_implied and current_btc is None:
         st.caption("Need BTC spot price for implied distribution.")
 
-    # 5) BTC options & futures summary — only when Deribit loaded
-    if is_full and load_deribit:
-        with st.expander("BTC options & futures (reference)", expanded=False):
-            st.subheader("BTC options & futures")
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.markdown("**Futures**")
-                if forward_curve:
-                    st.metric("Forward curve (Deribit)", f"{len(forward_curve)} expiries", None)
-                    st.caption("Chart: spot → today, then points at each expiry (see into the future).")
-                elif not btc_fut.empty:
-                    last = btc_fut.sort_values("timestamp").iloc[-1]
-                    st.metric("BTC=F (CME) last", f"${last['close']:,.2f}", None)
-                else:
-                    st.caption("Futures: enable Deribit forward curve or Yahoo BTC=F.")
-            with col2:
-                st.markdown("**Options (Yahoo)**")
-                opt_sum = _cached_btc_options_summary()
-                if opt_sum.get("available"):
-                    st.metric("Nearest expiry", opt_sum.get("nearest_expiry", "—"), None)
-                    st.caption(f"Calls: {opt_sum.get('calls_count', 0)}, Puts: {opt_sum.get('puts_count', 0)}")
-                else:
-                    st.caption("Options for BTC-USD often unavailable from Yahoo. Use Deribit below.")
-            with col3:
-                st.markdown("**Options (Deribit)**")
-                deribit = _cached_deribit_summary(12)
-                if deribit.get("available"):
-                    st.metric("BTC options", f"{deribit.get('total_count', 0)} total", None)
-                    st.caption(f"Calls: {deribit.get('calls_count', 0)}, Puts: {deribit.get('puts_count', 0)}")
-                    if deribit.get("expiries"):
-                        st.caption("Expiries: " + ", ".join(deribit["expiries"][:5]) + ("…" if len(deribit["expiries"]) > 5 else ""))
-                else:
-                    st.caption("Deribit API unavailable. Check network.")
+    st.divider()
 
-            if deribit.get("sample"):
-                with st.expander("Deribit BTC options sample (nearest expiry, mark price)"):
-                    sample_df = pd.DataFrame(deribit["sample"])
-                    if not sample_df.empty:
-                        sample_df = sample_df.rename(columns={"instrument": "Instrument", "strike": "Strike", "type": "Type", "mark_price": "Mark ($)"})
-                        def _fmt_mark(v):
-                            if v is None or (isinstance(v, float) and pd.isna(v)):
-                                return "—"
-                            try:
-                                return f"{float(v):,.2f}"
-                            except (TypeError, ValueError):
-                                return "—"
-                        sample_df["Mark ($)"] = sample_df["Mark ($)"].apply(_fmt_mark)
-                        sample_df["Strike"] = sample_df["Strike"].apply(lambda x: f"{x:,.0f}" if x is not None and pd.notna(x) else "—")
-                        st.dataframe(sample_df[["Instrument", "Strike", "Type", "Mark ($)"]], use_container_width=True, hide_index=True)
+    # Demoted context (price/prediction framing should not dominate first screen).
+    with st.expander("Market context (price chart + prediction questions) — reference only", expanded=False):
+        # 1) Light load: Yahoo + Polymarket in parallel (no Deribit)
+        btc_prices = None
+        events = []
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            f_yahoo = ex.submit(_cached_yahoo, btc_symbols, f"{chart_days}d")
+            f_pm = ex.submit(_cached_polymarket, True, False, 150)
+            wait([f_yahoo, f_pm])
+            try:
+                btc_prices = f_yahoo.result()
+            except Exception:
+                pass
+            try:
+                events = f_pm.result() or []
+            except Exception as e:
+                st.warning(
+                    f"Polymarket API unavailable ({type(e).__name__}). "
+                    "Bitcoin chart and other data still work; only Polymarket prediction data is missing."
+                )
+        if btc_prices is not None and not btc_prices.empty:
+            btc_spot = btc_prices[btc_prices["symbol"] == "BTC-USD"]
+            btc_fut = btc_prices[btc_prices["symbol"] == "BTC=F"]
+        else:
+            btc_spot = pd.DataFrame()
+            btc_fut = pd.DataFrame()
+
+        keywords = (config.get("prediction_markets") or {}).get("polymarket", {}).get("topic_keywords") or ["bitcoin", "btc"]
+        all_probs = markets_to_probabilities(events, topic_keywords=keywords)
+        btc_questions = btc_price_questions_from_polymarket(all_probs) if all_probs else []
+
+        # Deribit context overlays (only when user refreshes priced inputs).
+        forward_curve = []
+        bull_spreads = []
+        prediction_spreads = []
+        if is_full and load_deribit and current_btc is not None:
+            with st.spinner("Loading Deribit (forward curve, spreads, options)…"):
+                try:
+                    with ThreadPoolExecutor(max_workers=3) as ex:
+                        f_fwd = ex.submit(_cached_forward_curve, 10)
+                        f_inst = ex.submit(_cached_option_instruments)
+                        f_marks = ex.submit(_cached_option_book_marks)
+                        wait([f_fwd, f_inst, f_marks])
+                        forward_curve = f_fwd.result() or []
+                        _ = f_inst.result()
+                        _ = f_marks.result()
+                except Exception:
+                    pass
+                try:
+                    bull_spreads = _cached_bull_spreads(current_btc, 5000.0, 5) or []
+                except Exception:
+                    pass
+                if btc_questions:
+                    try:
+                        eligible = [q for q in btc_questions if (q.get("strike") or 0) >= 10000]
+                        eligible.sort(key=lambda q: q.get("strike") or 0, reverse=True)
+                        prediction_spreads = fetch_deribit_spreads_around_predictions(
+                            btc_questions=eligible or btc_questions,
+                            current_spot=current_btc,
+                            max_questions=8,
+                            instruments=_cached_option_instruments(),
+                            option_book_marks=_cached_option_book_marks(),
+                        ) or []
+                    except Exception:
+                        pass
+
+        # Toggles: which "will it hit" questions to show on chart (local to this expander)
+        question_labels = []
+        for q in btc_questions:
+            s, r = q.get("strike"), q.get("resolution_date")
+            if s is not None and r:
+                question_labels.append(f"${s:,.0f} by {r}")
+        question_labels = list(dict.fromkeys(question_labels))  # preserve order, no dupes
+        _default = question_labels if len(question_labels) <= 5 else question_labels[:5]
+        selected_questions = st.multiselect(
+            "Price-target questions on chart",
+            question_labels,
+            default=_default,
+            key="chart_questions",
+            help="Optional overlay for context; this is not the implied-lab anchor.",
+        )
+
+        def _q_label(q):
+            s, r = q.get("strike"), q.get("resolution_date")
+            return f"${s:,.0f} by {r}" if (s is not None and r) else None
+
+        btc_questions_filtered = [q for q in btc_questions if _q_label(q) in selected_questions]
+
+        # 3) Plotly chart: price + overlay of questions + optional options
+        fig = go.Figure()
+        if not btc_spot.empty:
+            btc_spot = btc_spot.sort_values("timestamp")
+            fig.add_trace(
+                go.Scatter(
+                    x=btc_spot["timestamp"],
+                    y=btc_spot["close"],
+                    name="BTC spot",
+                    line=dict(color="rgb(247, 147, 26)", width=2),
+                )
+            )
+        # Forward curve and spreads only when Deribit loaded (Full view)
+        if is_full and load_deribit and show_forward_curve and forward_curve and current_btc is not None:
+            today = pd.Timestamp.now(tz="UTC").normalize()
+            x_fwd = [today] + [f["expiry_date"] for f in forward_curve]
+            y_fwd = [current_btc] + [f["mark_price"] for f in forward_curve]
+            fig.add_trace(
+                go.Scatter(
+                    x=x_fwd,
+                    y=y_fwd,
+                    mode="lines+markers",
+                    name="Futures (forward curve)",
+                    line=dict(color="rgb(80, 160, 255)", width=2, dash="dot"),
+                    marker=dict(size=8, symbol="diamond", line=dict(width=1)),
+                    hovertemplate="%{x|%Y-%m-%d}<br>%{y:,.0f} USD<extra></extra>",
+                )
+            )
+        elif not btc_fut.empty:
+            # Fallback: single CME futures series if Deribit forward curve unavailable
+            btc_fut = btc_fut.sort_values("timestamp")
+            fig.add_trace(
+                go.Scatter(
+                    x=btc_fut["timestamp"],
+                    y=btc_fut["close"],
+                    name="BTC futures (CME)",
+                    line=dict(color="rgb(100, 180, 255)", width=1.5),
+                )
+            )
+
+        # Options on main chart (Full + Deribit loaded)
+        chart_options = []
+        if is_full and load_deribit and show_options_on_chart and option_types_on_chart and not options_in_separate_chart:
+            try:
+                all_opts = _cached_options_for_chart()
+                chart_options = [o for o in all_opts if o.get("option_type") in option_types_on_chart]
+                if len(chart_options) > 200:
+                    by_bucket = {}
+                    for o in chart_options:
+                        exp = o["expiry_date"]
+                        strike_bucket = round(o["strike"] / 5000) * 5000
+                        key = (exp, strike_bucket, o.get("option_type"))
+                        if key not in by_bucket:
+                            by_bucket[key] = o
+                    chart_options = list(by_bucket.values())
+            except Exception:
+                chart_options = []
+
+        y_vals = []
+        if not btc_spot.empty:
+            y_vals.extend(btc_spot["close"].dropna().tolist())
+        if not btc_fut.empty:
+            y_vals.extend(btc_fut["close"].dropna().tolist())
+        if forward_curve:
+            y_vals.extend([f["mark_price"] for f in forward_curve])
+        if current_btc is not None:
+            y_vals.append(current_btc)
+        strikes = [q.get("strike") for q in btc_questions_filtered if q.get("strike") is not None]
+        strikes = strikes + [o["strike"] for o in chart_options]
+        if bull_spreads:
+            for s in bull_spreads:
+                strikes.extend([s["K_low"], s["K_high"]])
+        if prediction_spreads:
+            for s in prediction_spreads:
+                strikes.extend([s["K_low"], s["K_high"]])
+        y_max = max(y_vals + strikes) if (y_vals or strikes) else (current_btc or 70000)
+        y_min = min(y_vals) if y_vals else (current_btc or 60000) * 0.85
+        if strikes:
+            y_min = min(y_min, min(strikes) * 0.95)
+        y_span = max(y_max - y_min, 1000)
+
+        # Horizontal lines at each strike and probability labels at resolution dates.
+        seen_strikes = set()
+        for q in btc_questions_filtered:
+            res = q.get("resolution_date")
+            strike = q.get("strike")
+            prob = q.get("yes_probability")
+            if not res or strike is None or prob is None:
+                continue
+            try:
+                res_ts = pd.Timestamp(res)
+            except Exception:
+                continue
+            if strike not in seen_strikes:
+                seen_strikes.add(strike)
+                fig.add_hline(
+                    y=strike,
+                    line_dash="dash",
+                    line_color="rgba(100, 100, 100, 0.8)",
+                    annotation_text=f"${strike:,.0f}",
+                    annotation_position="left",
+                    annotation_font_size=11,
+                )
+            pct = (prob or 0) * 100
+            if pct >= min_prob_label_pct:
+                fig.add_annotation(
+                    x=res_ts,
+                    y=strike,
+                    text=f"{pct:.0f}% Yes",
+                    showarrow=False,
+                    font=dict(size=11, color="darkblue"),
+                    xanchor="left",
+                    xshift=5,
+                    bgcolor="rgba(255,255,255,0.9)",
+                    bordercolor="gray",
+                    borderwidth=1,
+                )
+            fig.add_vline(x=res_ts, line_dash="dot", line_color="lightgray", opacity=0.35)
+
+        # Prediction-aligned spread overlay (Full + Deribit loaded)
+        if is_full and load_deribit and show_prediction_spreads and prediction_spreads:
+            for s in prediction_spreads:
+                try:
+                    res_ts = pd.Timestamp(s["resolution_date"][:10])
+                except Exception:
+                    continue
+                k_lo, k_hi = s["K_low"], s["K_high"]
+                rr = s.get("rr_ratio") or 0
+                opt_pct = s.get("approx_implied_prob_pct")
+                lbl = f"{k_lo/1000:.0f}k/{k_hi/1000:.0f}k R:R 1:{rr:.1f}"
+                if opt_pct is not None:
+                    lbl += f" | opt~{opt_pct:.0f}%"
+                fig.add_shape(
+                    type="line",
+                    x0=res_ts, x1=res_ts, y0=k_lo, y1=k_hi,
+                    line=dict(color="rgba(50, 100, 200, 0.75)", width=4, dash="solid"),
+                )
+                fig.add_annotation(
+                    x=res_ts, y=(k_lo + k_hi) / 2,
+                    text=lbl,
+                    showarrow=False, font=dict(size=9), xanchor="left", xshift=6,
+                    bgcolor="rgba(200,220,255,0.9)", bordercolor="blue", borderwidth=1,
+                )
+
+        # Bull spread overlay (Full + Deribit loaded)
+        if is_full and load_deribit and show_bull_spreads and bull_spreads:
+            for s in bull_spreads:
+                exp = s["expiry_date"]
+                k_lo, k_hi = s["K_low"], s["K_high"]
+                rr = s.get("rr_ratio") or 0
+                fig.add_shape(
+                    type="line",
+                    x0=exp, x1=exp, y0=k_lo, y1=k_hi,
+                    line=dict(color="rgba(0, 150, 80, 0.7)", width=4, dash="solid"),
+                )
+                fig.add_annotation(
+                    x=exp, y=(k_lo + k_hi) / 2,
+                    text=f"{k_lo/1000:.0f}k/{k_hi/1000:.0f}k R:R 1:{rr:.1f}",
+                    showarrow=False, font=dict(size=9), xanchor="left", xshift=6,
+                    bgcolor="rgba(200,255,200,0.9)", bordercolor="green", borderwidth=1,
+                )
+
+        # Options overlay on main chart (sampled & subtle)
+        if show_options_on_chart and chart_options and not options_in_separate_chart:
+            for opt_type in option_types_on_chart:
+                subset = [o for o in chart_options if o.get("option_type") == opt_type]
+                if not subset:
+                    continue
+                x = [o["expiry_date"] for o in subset]
+                y = [o["strike"] for o in subset]
+                color = "rgba(0, 160, 90, 0.45)" if opt_type == "call" else "rgba(200, 70, 70, 0.45)"
+                fig.add_trace(
+                    go.Scatter(
+                        x=x,
+                        y=y,
+                        mode="markers",
+                        name=f"Options ({opt_type}s)",
+                        marker=dict(size=4, color=color, symbol="diamond-open" if opt_type == "put" else "circle-open", line=dict(width=0.5)),
+                        hovertemplate="%{x|%Y-%m-%d}<br>Strike: %{y:,.0f}<extra></extra>",
+                    )
+                )
+
+        fig.update_layout(
+            title="BTC price — dashed lines = price targets; labels = probability (filtered by slider)",
+            xaxis_title="Date",
+            yaxis_title="Price (USD)",
+            yaxis=dict(range=[y_min, y_max + y_span * 0.05]),
+            hovermode="x unified",
+            height=480,
+            margin=dict(b=60),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Separate options chart (Full + Deribit loaded)
+        if is_full and load_deribit and options_in_separate_chart and option_types_on_chart:
+            with st.expander("Separate options chart (optional)", expanded=False):
+                try:
+                    opts_for_fig = _cached_options_for_chart()
+                    opts_for_fig = [o for o in opts_for_fig if o.get("option_type") in option_types_on_chart]
+                    if len(opts_for_fig) > 400:
+                        by_bucket = {}
+                        for o in opts_for_fig:
+                            key = (o["expiry_date"], round(o["strike"] / 2000) * 2000, o.get("option_type"))
+                            if key not in by_bucket:
+                                by_bucket[key] = o
+                        opts_for_fig = list(by_bucket.values())
+                    if opts_for_fig:
+                        fig_opts = go.Figure()
+                        for opt_type in option_types_on_chart:
+                            subset = [o for o in opts_for_fig if o.get("option_type") == opt_type]
+                            if not subset:
+                                continue
+                            fig_opts.add_trace(
+                                go.Scatter(
+                                    x=[o["expiry_date"] for o in subset],
+                                    y=[o["strike"] for o in subset],
+                                    mode="markers",
+                                    name=f"{opt_type}s",
+                                    marker=dict(size=5, color="green" if opt_type == "call" else "red", symbol="circle-open" if opt_type == "call" else "diamond-open"),
+                                    hovertemplate="%{x|%Y-%m-%d}<br>Strike: %{y:,.0f}<extra></extra>",
+                                )
+                            )
+                        fig_opts.update_layout(
+                            title="Deribit BTC options — expiry date vs strike",
+                            xaxis_title="Expiry",
+                            yaxis_title="Strike (USD)",
+                            height=320,
+                            margin=dict(b=50),
+                            showlegend=True,
+                            legend=dict(orientation="h"),
+                        )
+                        st.plotly_chart(fig_opts, use_container_width=True)
+                except Exception:
+                    pass
+
+        with st.expander("Supporting derived tables (optional)", expanded=False):
+            st.subheader("Implied value: Bitcoin price-target questions (with risk/reward)")
+            if btc_questions and current_btc is not None:
+                rows = []
+                for q in btc_questions:
+                    strike = q.get("strike") or 0
+                    prob = q.get("yes_probability") or 0
+                    reward_if_yes = (1.0 / prob - 1.0) if prob > 0 else 0
+                    rr_ratio = reward_if_yes
+                    rows.append({
+                        "Question": (q.get("market_question") or "")[:50] + ("..." if len((q.get("market_question") or "")) > 50 else ""),
+                        "Strike ($)": f"{strike:,.0f}",
+                        "Yes %": f"{prob*100:.1f}",
+                        "Resolution": q.get("resolution_date") or "",
+                        "Risk (1 unit)": "1",
+                        "Reward if Yes": f"{reward_if_yes:.2f}",
+                        "R:R": f"1:{rr_ratio:.2f}",
+                        "Spread vs spot": f"{strike - current_btc:,.0f}",
+                    })
+                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            else:
+                st.caption("No Bitcoin price-target questions parsed from Polymarket, or no spot price.")
+
+            if is_full and load_deribit:
+                st.subheader("Tight bull spreads (Deribit) — risk/reward")
+            if is_full and load_deribit and bull_spreads:
+                spread_rows = []
+                for s in bull_spreads:
+                    spread_rows.append({
+                        "Expiry": s["expiry_date"].strftime("%Y-%m-%d") if hasattr(s["expiry_date"], "strftime") else str(s["expiry_date"])[:10],
+                        "K_low": f"{s['K_low']:,.0f}",
+                        "K_high": f"{s['K_high']:,.0f}",
+                        "Cost (USD)": f"{s['cost_usd']:,.0f}",
+                        "Max loss": f"{s['max_loss']:,.0f}",
+                        "Max gain": f"{s['max_gain']:,.0f}",
+                        "R:R": f"1:{s['rr_ratio']:.2f}",
+                    })
+                st.dataframe(pd.DataFrame(spread_rows), use_container_width=True, hide_index=True)
+            elif is_full and load_deribit:
+                st.caption("No tight bull spreads (Deribit calls). Check spot price and API.")
+
+            if is_full and load_deribit:
+                st.subheader("Spreads around predictions — Polymarket vs options")
+            if is_full and load_deribit and prediction_spreads:
+                pred_rows = []
+                for s in prediction_spreads:
+                    pred_rows.append({
+                        "Target": f"${s['target']:,.0f}",
+                        "Resolution": s["resolution_date"][:10],
+                        "Polymarket Yes %": f"{s.get('polymarket_yes_pct', 0):.1f}",
+                        "Spread": f"{s['K_low']/1000:.0f}k/{s['K_high']/1000:.0f}k",
+                        "Cost (USD)": f"{s['cost_usd']:,.0f}",
+                        "R:R": f"1:{s['rr_ratio']:.2f}",
+                        "Opt ~implied %": f"{s.get('approx_implied_prob_pct') or 0:.1f}" if s.get("approx_implied_prob_pct") is not None else "—",
+                    })
+                st.dataframe(pd.DataFrame(pred_rows), use_container_width=True, hide_index=True)
+                st.caption("Opt ~implied % = approximate from spread cost (simplified). Compare to Polymarket Yes %.")
+            elif is_full and load_deribit:
+                st.caption("No prediction-aligned spreads (need Polymarket questions + Deribit options at matching strikes/expiries).")
+
+        if is_full and not load_deribit:
+            st.caption(
+                "Optional: use **Refresh priced inputs (Deribit)** in the sidebar to load the forward curve, "
+                "spread overlays on the chart, and Deribit reference tables."
+            )
 
     st.divider()
 

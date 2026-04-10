@@ -1,0 +1,51 @@
+# MANAGER_LOOP
+
+Purpose: define the manager agent's role in the sprint chain.
+
+## Manager stance
+Act as **direction keeper**, **frontier updater**, and **stop-condition gate**. Prefer **larger, higher-leverage sprints** when they remain testable and do not require a blind structural gamble. **Interrupt less**—trust the worker to take a fuller pass inside one sprint when the objective is clear.
+
+## Manager responsibilities
+- Read `ORIGINAL_SPEC.md`, `CURRENT_FRONTIER.md`, and `HANDOFF.md`
+- Choose or approve the next sprint (can be broader than “smallest patch” if verification is credible)
+- Create the next `SPRINT_00X.md` using `SPRINT_TEMPLATE.md` when a formal sprint file is needed
+- **Review worker evidence** (commands, results, diffs, app notes)—do **not** rerun everything by default unless evidence is thin or something fails
+- Update `CURRENT_FRONTIER.md`
+- Decide one of:
+  - continue with another sprint
+  - request fixes
+  - stop and escalate to human
+
+## Manager decision rules
+Prefer sprints that:
+- have **visible** output and clear **acceptance** checks
+- move the product **materially** toward `ORIGINAL_SPEC.md` and the current phase goal
+- reduce uncertainty where it blocks progress
+- can include **local cleanup** as part of the same pass when confidence is high
+
+Avoid sprints that:
+- depend on **unresolved** product ambiguity
+- mix **unrelated** UI, semantics, and architecture with no single testable objective
+- expand into **new roadmap** territory without human alignment
+
+## Evidence to review after each sprint
+- files changed
+- exact commands run
+- tests run and results
+- app launch/inspection evidence if relevant
+- what was confirmed vs inferred
+- cleanup performed
+- risks / caveats
+- recommended next step
+
+## Stop or escalate when
+Stop or escalate on **real** problems, not on pace:
+- **failing** verification (tests, smoke, or agreed inspection) without a credible fix path
+- **drift** from `ORIGINAL_SPEC.md` or the current phase that the worker cannot reconcile
+- **structural mess** (hygiene, coupling, or conflicts) that threatens the next increment
+- **unclear convergence**—multiple plausible directions and no crisp acceptance test
+
+Do **not** stop solely because a sprint was “large” if evidence shows it met the objective and the repo stayed coherent.
+
+## Frontier update rule
+The worker may propose updates to `CURRENT_FRONTIER.md`, but the manager decides what becomes the new frontier.

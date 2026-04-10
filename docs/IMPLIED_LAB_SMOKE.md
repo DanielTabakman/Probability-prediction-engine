@@ -38,31 +38,61 @@ If anything fails, use **Debug (last error)** (collapsed expander under the fail
 
 **Note:** This checklist does not change product behavior; it is for manual regression testing after edits to `app.py` / `implied_lab_*`.
 
-## Automated local UI smoke harness (MVP)
+## Automated local UI smoke harness (narrow coverage)
 
-This is a **single-scenario MVP** headless smoke harness. The only scenario validated end-to-end for the current pass definition is **`A_width_target_payoff`**. Running other scenario names is reserved for **future work** (not part of the official MVP pass).
+**Validation classification (SOP):** `python -m pytest -q` is **deterministic** (local). This harness is **live-data-sensitive** (Deribit/Yahoo/spot paths) and **environment-sensitive** (Playwright, network, free ports). Label pass/fail accordingly so operational issues are not read as product regressions; see `docs/SOP/OPERATING_RULES.md` (Transaction discipline → RULE 4).
+
+This is a **narrow-coverage** headless smoke harness—not a full scenario matrix. **`A_width_target_payoff`** is the **default primary** automated path for sprint closeout (see `docs/SOP/OPERATING_RULES.md` → **Validation tiers**). **`C_directional_peak_disagreement`** is a **conditional** gate: **required** when work materially touches disagreement classification, width/peak scenario behavior, belief/disagreement derivation, or related harness logic; **supporting/optional** for presentation or review-only changes unless the sprint spec names **C**. It is **not** a universal closeout requirement for every sprint. Before any smoke run, use the short **preflight hygiene** checklist in **OPERATING_RULES.md** (clean instance, fresh port, avoid orphan processes and manual+smoke collisions). Run **C** explicitly and use the run’s manifest booleans; treat it as “green” only when those checks pass (see `pass_criteria`). Other harness scenarios (`B_peak_aligned`, `D_exact_strikes_mode`) are ad-hoc.
 
 ### Required dependencies
 - Python deps: `pip install -r requirements.txt` (includes `playwright`)
 - Playwright browser:
   - `python -m playwright install chromium`
+- Unit tests (local): `pytest` must be installed for `python -m pytest -q`
+  - Install: `python -m pip install pytest`
 - Network: Yahoo and (for the implied lab) Deribit option marks/expiries must be reachable for a realistic run.
+  - **Operational caveat (live-data flakiness):** if spot/quotes are unavailable, the app may display **"Need BTC spot price for implied distribution"** and the belief/disagreement UI may not mount; treat this as **environment/data availability**, not automatically a product regression.
 
-### Command (supported MVP run)
-From the project folder, using the project venv:
+### Command (supported runs)
+
+**One command from repo root** (recommended): picks a free local port automatically and runs the official **`A_width_target_payoff`** path only. The wrapper does not add scenarios or change what that command’s “green” means. Validating **`C_directional_peak_disagreement`** requires invoking the harness with `--scenario C_directional_peak_disagreement` (see below).
+
+`python scripts/run_implied_lab_ui_smoke.py`
+
+Using the project venv’s interpreter is fine, for example:
+
+`".venv\Scripts\python.exe" scripts\run_implied_lab_ui_smoke.py`
+
+**Explicit harness** (choose a free `--port` yourself):
+
+`A_width_target_payoff`:
 
 `".venv\Scripts\python.exe" scripts\implied_lab_ui_smoke_harness.py --port 8610 --scenario A_width_target_payoff`
 
-Use a free `--port` if `8610` is busy.
+`C_directional_peak_disagreement`:
+
+`".venv\Scripts\python.exe" scripts\implied_lab_ui_smoke_harness.py --port 8610 --scenario C_directional_peak_disagreement`
+
+Use a different `--port` if `8610` is busy.
 
 ### Artifacts
 - Screenshots + JSON manifest: `artifacts/ui_smoke/<run_id>/`
 - Manifest file: `artifacts/ui_smoke/<run_id>/ui_smoke_manifest.json`
 
-### What success means today (MVP)
-For **`A_width_target_payoff`** only, the harness checks that the page loaded and that DOM checks find: disagreement text, strategy-family block, trade ticket, and Verification content (including disagreement classification). Exit code `0` means those checks passed for the scenarios in that run (see `pass_criteria` in the manifest).
+### What success means today
+For **A**, the harness checks page load plus disagreement/family/trade text and Verification (including disagreement classification). For **C** (when you run it), the same base checks apply plus **Directional** in the disagreement line and the manifest’s C-specific booleans. Exit code `0` means the checks required for the scenarios **in that run** passed (see `pass_criteria` in the manifest).
+
+**Scenario sensitivity (Sprint 005 closeout, 2026-04-10):** **C** can **fail** when live marks + default belief inputs yield **mixed** or **width_vol** disagreement (e.g. `width_band=wider`) even though the page loads and disagreement UI is coherent. Classify as **live-data-sensitive** / **scenario-sensitive** — not automatically a regression in the **Decision-ready review** block or digest copy. Prior green **C** artifacts (e.g. `artifacts/ui_smoke/20260410_150352/`) remain valid historical evidence.
+
+### Evidence snapshot (post–Sprint 002 closeout; 2026-04-09)
+- Tests: `python -m pytest -q` → **PASS**
+- Smoke A: `python scripts/run_implied_lab_ui_smoke.py` → **PASS**
+  - Example artifacts: `artifacts/ui_smoke/20260409_120856/` (manifest + `A_width_target_payoff.png`)
+- Smoke C: `python scripts/implied_lab_ui_smoke_harness.py --scenario C_directional_peak_disagreement --port 8512` → **PASS**
+  - Example artifacts: `artifacts/ui_smoke/20260409_122715/` (manifest + `C_directional_peak_disagreement.png`)
+  - Note: Earlier closeout reruns failed when the belief σ slider could not be set finely enough to keep width-band “similar”; harness now steers σ with finer precision and records disagreement diagnostics when failing.
 
 ### Future work
-- Expanding automated coverage to additional scenarios (e.g. B/C/D) and tightening manifest wording for multi-scenario runs is **not** part of this MVP harness yet.
+- Broadening to a full scenario matrix or promoting B/D to first-class gates is optional follow-up.
 
 
