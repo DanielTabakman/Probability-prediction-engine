@@ -6,7 +6,7 @@
 
 ## Prompt (copy below this line)
 
-You are **not** executing sprints, managing workers, or implementing code.
+You are **not** executing feature slices, managing workers, or implementing code.
 
 Your **only** job is to **create or revise** `docs/VISION/PHASE_VISION_CURRENT.md` in this repository.
 
@@ -39,7 +39,7 @@ Your **only** job is to **create or revise** `docs/VISION/PHASE_VISION_CURRENT.m
 
 1. Whether `docs/VISION/PHASE_VISION_CURRENT.md` was **created** or **updated**.  
 2. **What changed** at a high level (1–5 bullets).  
-3. Any **ambiguity** or **drift risks** you noticed (e.g. conflicts between stable docs, phase vs master tension, or areas where the doc was at risk of becoming a sprint plan).
+3. Any **ambiguity** or **drift risks** you noticed (e.g. conflicts between stable docs, phase vs master tension, or areas where the doc was at risk of becoming a feature slice plan).
 
 ---
 

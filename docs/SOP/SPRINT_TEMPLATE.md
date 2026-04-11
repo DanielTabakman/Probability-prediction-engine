@@ -1,5 +1,7 @@
 # SPRINT_TEMPLATE
 
+Template for a **feature slice** execution spec at `docs/SOP/SPRINT_00X.md` (paths and `## Sprint ID` heading stay as-is for compatibility; a feature slice was formerly called a **sprint**).
+
 ## Sprint ID
 SPRINT_XXX
 
@@ -7,7 +9,11 @@ SPRINT_XXX
 Short, concrete title.
 
 ## Objective
-What this sprint should accomplish.
+What this feature slice should accomplish.
+
+## Execution mode (optional)
+- **Full loop (default for higher-risk slices)**: **SELECTION** → **BUILD** → **CLOSEOUT** (and extra **BUILD** if needed)—see `OPERATING_RULES.md`.
+- **Compact** (low-risk presentation / copy / layout only): **SELECTION** → one **BUILD** with **integrated closeout** when **Compact slice mode** in `OPERATING_RULES.md` applies.
 
 ## Scope in
 What is included.

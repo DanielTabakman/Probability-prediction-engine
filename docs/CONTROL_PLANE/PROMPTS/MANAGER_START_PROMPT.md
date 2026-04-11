@@ -2,10 +2,10 @@
 
 ## Prompt (copy below this line)
 
-You are the **manager** for this repository. This is a **single transaction**: initialize (or confirm) the next sprint cycle and produce a worker-ready handoff.
+You are the **manager** for this repository. This is a **single execution step**: initialize (or confirm) the next feature slice cycle and produce a worker-ready handoff.
 
 ### Hard boundaries (must follow)
-- You are **not executing** the sprint in this transaction (no implementation, no tests, no app runs, no refactors).
+- You are **not executing** the feature slice in this execution step (no implementation, no tests, no app runs, no refactors).
 - You are **not supervising the worker here** (no live back-and-forth, no review-in-the-same-context).
 - You are **not** updating `CURRENT_FRONTIER.md` / `HANDOFF.md` “as if work were complete.”
 - You must **not** chain into manager-review mode or worker mode after producing the required output.
@@ -23,42 +23,42 @@ Read these in priority order:
 6. `docs/SOP/HANDOFF.md`
 7. `docs/SOP/MANAGER_LOOP.md` and `docs/SOP/WORKER_LOOP.md`
 8. `docs/SOP/SPRINT_TEMPLATE.md`
-9. If you will create/revise a sprint doc: `docs/CONTROL_PLANE/PROMPTS/SPRINT_AUTHORING_STANDARD.md`
+9. If you will create/revise a feature slice spec: `docs/CONTROL_PLANE/PROMPTS/SPRINT_AUTHORING_STANDARD.md`
 
-### Determine whether a sprint is already active
-Treat a sprint as active if **either** is true:
-- `docs/SOP/HANDOFF.md` has a real **Active sprint** ID/title filled in (not a placeholder), or
+### Determine whether a feature slice is already active
+Treat a feature slice as active if **either** is true:
+- `docs/SOP/HANDOFF.md` has a real **Active feature slice** ID/title filled in (not a placeholder), or
 - there is an existing `docs/SOP/SPRINT_00X.md` (excluding `SPRINT_TEMPLATE.md`) that is clearly the current execution contract.
 
-### If a sprint IS active
-- Do **not** create a new sprint.
-- Choose that sprint as the sprint choice for this transaction.
+### If a feature slice IS active
+- Do **not** create a new feature slice spec.
+- Choose that feature slice as the choice for this execution step.
 - Decide whether delegation to a worker is recommended (usually yes if acceptance + test plan are credible).
 
-### If NO sprint is active
-- Choose the best next sprint from `docs/SOP/CURRENT_FRONTIER.md` that most directly advances the current phase.
+### If NO feature slice is active
+- Choose the best next feature slice from `docs/SOP/CURRENT_FRONTIER.md` that most directly advances the current phase.
 - Create the next `docs/SOP/SPRINT_00X.md` using `docs/SOP/SPRINT_TEMPLATE.md` and the authoring rules in `docs/CONTROL_PLANE/PROMPTS/SPRINT_AUTHORING_STANDARD.md`.
-- Keep the sprint **meaningful, bounded, and testable**, and aligned to semantic/vision constraints (do not invent new product scope).
+- Keep the feature slice **meaningful, bounded, and testable**, and aligned to semantic / product vision constraints (do not invent new product scope).
 
 ### Worker-ready handoff requirements
 Prepare an **exact copy/paste handoff block** for the worker that includes:
-- The active sprint path (`docs/SOP/SPRINT_00X.md`)
-- The required reads for the worker (Operating rules, sprint, handoff, worker loop)
-- The verification commands the sprint expects (exact commands; include app launch/inspection when relevant)
-- A reminder that the worker must execute **exactly one sprint** and then stop with a closeout report
+- The active feature slice path (`docs/SOP/SPRINT_00X.md`)
+- The required reads for the worker (Operating rules, feature slice spec, handoff, worker loop)
+- The verification commands the feature slice expects (exact commands; include app launch/inspection when relevant)
+- A reminder that the worker must execute **exactly one feature slice** and then stop with a closeout report
 
 ---
 
 ## Required output (STOP after this)
 
-1) **Sprint active?**
+1) **Feature slice active?**
 - `YES` / `NO`
-- Evidence (1–3 bullets): what you checked (HANDOFF Active sprint, existing sprint doc path, etc.)
+- Evidence (1–3 bullets): what you checked (HANDOFF Active feature slice, existing `SPRINT_00X.md` path, etc.)
 
-2) **Sprint choice**
-- Sprint ID/title and path (e.g. `SPRINT_001 — <title>` at `docs/SOP/SPRINT_001.md`)
+2) **Feature slice choice**
+- Feature slice ID/title and path (e.g. `SPRINT_001 — <title>` at `docs/SOP/SPRINT_001.md`)
 
-3) **Why this sprint now**
+3) **Why this feature slice now**
 - 2–6 bullets tied to `CURRENT_FRONTIER.md` and `PHASE_VISION_CURRENT.md` (and any hard constraints like `SEMANTIC_CONTRACTS.md` if relevant)
 
 4) **Delegation recommended?**
@@ -70,17 +70,17 @@ Paste exactly the block below, filled in:
 
 ```text
 [WORKER_HANDOFF]
-Active sprint: <SPRINT_ID — Title> (<path>)
+Active feature slice: <SPRINT_ID — Title> (<path>)
 
 Non-negotiable reads (in order):
 1) docs/SOP/OPERATING_RULES.md
-2) <active sprint path>
+2) <active feature slice path>
 3) docs/SOP/HANDOFF.md
 4) docs/SOP/WORKER_LOOP.md
 
 Execution constraints:
-- Execute exactly ONE sprint. Do not start or choose the next sprint.
-- Follow the sprint’s scope/acceptance/test plan.
+- Execute exactly ONE feature slice. Do not start or choose the next feature slice.
+- Follow the feature slice’s scope/acceptance/test plan.
 - Do not commit/push/branch unless explicitly instructed.
 
 Verification (run and report exact results):
@@ -97,4 +97,3 @@ Closeout required:
 **STOP immediately after producing the five items above.**
 
 ## Prompt (copy above this line)
-

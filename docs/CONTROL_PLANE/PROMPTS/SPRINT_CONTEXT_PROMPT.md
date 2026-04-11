@@ -1,14 +1,14 @@
 # SPRINT_CONTEXT_PROMPT
 
-**Reusable instruction block** — paste into a future GPT (or similar) context window when you want **only** a `docs/SOP/SPRINT_00X.md` sprint doc created or revised. Control plane artifact; not the sprint itself.
+**Reusable instruction block** — paste into a future GPT (or similar) context window when you want **only** a `docs/SOP/SPRINT_00X.md` feature slice spec created or revised. Control plane artifact; not the feature slice itself.
 
 ---
 
 ## Prompt (copy below this line)
 
-You are **not** executing sprints, managing workers, or implementing code.
+You are **not** executing feature slices, managing workers, or implementing code.
 
-Your **only** job is to **create or revise exactly one sprint doc** under `docs/SOP/` (a `SPRINT_00X.md`) for this repository.
+Your **only** job is to **create or revise exactly one feature slice spec** under `docs/SOP/` (a `SPRINT_00X.md`) for this repository.
 
 **Do this in order:**
 
@@ -19,12 +19,12 @@ Your **only** job is to **create or revise exactly one sprint doc** under `docs/
    - `docs/SOP/ORIGINAL_SPEC.md` (cycle anchor)  
    - `docs/SOP/HANDOFF.md` (current reality + verification commands)  
    - `docs/SOP/OPERATING_RULES.md`, `docs/SOP/MANAGER_LOOP.md`, `docs/SOP/WORKER_LOOP.md` (posture, boundaries, evidence)  
-   - `docs/SOP/SPRINT_TEMPLATE.md` (required sprint structure)  
+   - `docs/SOP/SPRINT_TEMPLATE.md` (required feature slice structure)  
    Also consult `docs/SEMANTIC_CONTRACTS.md` and phase-relevant specs (e.g. `docs/SPRINT_1_SPEC.md`) when they constrain wording, acceptance, or “avoid for now.”  
 3. Choose one of:
-   - **Create** the next sprint doc `docs/SOP/SPRINT_00X.md` if none exists/active, or
-   - **Revise** the currently active sprint doc if it exists but is underspecified (weak acceptance, weak tests, unclear scope).
-4. Keep the sprint **meaningful, bounded, and testable**:
+   - **Create** the next feature slice spec `docs/SOP/SPRINT_00X.md` if none exists/active, or
+   - **Revise** the currently active feature slice spec if it exists but is underspecified (weak acceptance, weak tests, unclear scope).
+4. Keep the feature slice **meaningful, bounded, and testable**:
    - not tiny for the sake of caution
    - not a vague wishlist
    - not an implementation diary
@@ -36,12 +36,11 @@ Your **only** job is to **create or revise exactly one sprint doc** under `docs/
 
 **When done, report:**
 
-1. Whether you **created** or **updated** a sprint doc, and which path.  
-2. The sprint **objective** (1–2 sentences).  
-3. **Why this sprint now** (tie to current frontier/phase; 1–4 bullets).  
+1. Whether you **created** or **updated** a feature slice spec, and which path.  
+2. The feature slice **objective** (1–2 sentences).  
+3. **Why this feature slice now** (tie to current frontier/phase; 1–4 bullets).  
 4. Main **risks / ambiguity** (1–6 bullets) that the manager should watch for.
 
 ---
 
 ## Prompt (copy above this line)
-

@@ -1,6 +1,6 @@
 # VISION_MASTER
 
-Stable **long-horizon product vision** for the Probability Prediction Engine. This is **intent**, not implementation. For the current build cycle’s focus, pair with `PHASE_VISION_CURRENT.md`.
+Stable **product vision** (long-range intent) for the Probability Prediction Engine. This is **intent**, not implementation. For the current build cycle’s focus, pair with `PHASE_VISION_CURRENT.md`.
 
 ## Product promise
 
@@ -28,7 +28,7 @@ Help people **see** how **market data** and **prediction markets** relate on com
 
 - **Recommendation theater** — no “recommended trade” voice unless an explicit advisory layer is built and scoped.
 - **Scope smuggling** — no framing implied distributions as pure belief, or illustrative patterns as live optimized tickets.
-- **Vision as backlog** — this file does not replace phase specs, sprints, or `docs/SOP/ORIGINAL_SPEC.md` for cycle execution.
+- **Product vision as backlog** — this file does not replace phase specs, feature slices, or `docs/SOP/ORIGINAL_SPEC.md` for cycle execution.
 
 ## Design / interpretation principles
 

@@ -1,13 +1,13 @@
 # VISION_TEMPLATE
 
-Reusable skeleton for **phase** or **initiative** vision docs. Copy to e.g. `docs/VISION/PHASE_VISION_<NAME>.md` and fill. Remove unused optional blocks.
+Reusable skeleton for **phase** or **initiative** **product vision** docs. Copy to e.g. `docs/VISION/PHASE_VISION_<NAME>.md` and fill. Remove unused optional blocks.
 
 ---
 
 ## Title
 `<Short name — e.g. Phase 2: Opportunity surfacing>`
 
-## Horizon
+## Phase (planning scope; formerly horizon)
 - [ ] **Phase vision** (cycle-scoped)  
 - [ ] **Initiative vision** (cross-cutting slice)
 
@@ -52,7 +52,7 @@ Use when layout or density matters. **Pair every asset with text** (what changed
 **Storage convention:** put images under `docs/VISION/assets/` (create folder if needed). Name files `YYYY-MM-DD_<short-slug>.png` or similar. In this doc, **only** link paths and describe intent—do not embed secrets or PII.
 
 ## Links
-- Long horizon: `VISION_MASTER.md`  
+- Long-range product vision: `VISION_MASTER.md`  
 - Contracts: `docs/SEMANTIC_CONTRACTS.md` (if applicable)  
 - Cycle spec: `docs/SOP/ORIGINAL_SPEC.md` (if applicable)  
 

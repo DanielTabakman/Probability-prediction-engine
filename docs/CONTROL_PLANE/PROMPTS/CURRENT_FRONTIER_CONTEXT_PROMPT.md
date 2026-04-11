@@ -6,7 +6,7 @@
 
 ## Prompt (copy below this line)
 
-You are **not** executing sprints, managing workers, or implementing code.
+You are **not** executing feature slices, managing workers, or implementing code.
 
 Your **only** job is to **create or revise** `docs/SOP/CURRENT_FRONTIER.md` in this repository.
 
@@ -19,17 +19,17 @@ Your **only** job is to **create or revise** `docs/SOP/CURRENT_FRONTIER.md` in t
    - `docs/SOP/ORIGINAL_SPEC.md` (cycle anchor)  
    - `docs/SOP/HANDOFF.md` (what actually happened; verification evidence)  
    - `docs/SOP/MANAGER_LOOP.md` + `docs/SOP/WORKER_LOOP.md` + `docs/SOP/OPERATING_RULES.md` (execution posture, stop/escalate)  
-   - `docs/SOP/SPRINT_TEMPLATE.md` (how to shape a sprint)  
-   Also consult `docs/SEMANTIC_CONTRACTS.md` and phase-relevant specs (e.g. `docs/SPRINT_1_SPEC.md`) if they constrain sprint choices.  
-3. Synthesize the **current phase** and a **tight shortlist** of “Next best sprint candidates” that are **larger, testable** options with clear objectives and credible verification—avoid micro-patches and avoid blind big-bang rewrites.  
+   - `docs/SOP/SPRINT_TEMPLATE.md` (how to shape a feature slice spec)  
+   Also consult `docs/SEMANTIC_CONTRACTS.md` and phase-relevant specs (e.g. `docs/SPRINT_1_SPEC.md`) if they constrain feature slice choices.  
+3. Synthesize the **current phase** and a **tight shortlist** of “Next best feature slice candidates” that are **larger, testable** options with clear objectives and credible verification—avoid micro-patches and avoid blind big-bang rewrites.  
 4. Keep the frontier **tight and action-driving**. Avoid generic filler. If you cannot justify a candidate with phase intent + credible verification, omit it.  
 5. Use the **exact required H2 section order** from the authoring standard:  
    - `## Current phase`  
    - `## Top goal`  
    - `## Success condition for this phase`  
-   - `## Current sprint`  
+   - `## Current feature slice`  
    - `## Completed recently`  
-   - `## Next best sprint candidates`  
+   - `## Next best feature slice candidates`  
    - `## Avoid for now`  
    - `## Known risks / uncertainty`  
    - `## Stop / escalate conditions`  
@@ -41,9 +41,8 @@ Your **only** job is to **create or revise** `docs/SOP/CURRENT_FRONTIER.md` in t
 
 1. Whether `docs/SOP/CURRENT_FRONTIER.md` was **created** or **updated**.  
 2. **What changed** at a high level (1–5 bullets).  
-3. Any **ambiguity** or **drift risks** you noticed (e.g. conflicts between phase vision and frontier, missing evidence in handoff, candidates that felt under-verified).
+3. Any **ambiguity** or **drift risks** you noticed (e.g. conflicts between phase product vision and frontier, missing evidence in handoff, candidates that felt under-verified).
 
 ---
 
 ## Prompt (copy above this line)
-

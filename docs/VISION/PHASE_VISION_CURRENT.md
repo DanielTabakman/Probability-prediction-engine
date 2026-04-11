@@ -1,11 +1,11 @@
 # PHASE_VISION_CURRENT
 
-**Current-cycle vision** for the active product phase. Update when the phase changes. Long-horizon intent lives in `VISION_MASTER.md`.
+**Current-cycle product vision** for the active product phase. Update when the phase changes. Long-range intent lives in `VISION_MASTER.md`.
 
 ## Current phase
 
-**Sprint 1 — One-screen implied lab (manual exploration)**  
-(Aligned with `docs/SOP/CURRENT_FRONTIER.md` and `docs/SPRINT_1_SPEC.md`.)
+**Phase: One-screen implied lab (manual exploration)**  
+(Aligned with `docs/SOP/CURRENT_FRONTIER.md` and `docs/SPRINT_1_SPEC.md`; delivered through numbered **feature slices**, formerly “Sprint NNN”.)
 
 ## What this phase is trying to achieve
 
@@ -38,7 +38,7 @@ Advanced math and calculations stay **behind expanders** by default. Mode switch
 ## What to defer for now
 
 - New **AI** features, **prediction-market** integration work, **framework migration**, and **major new strategy logic** except what is **necessary** for layout/state clarity (`docs/SPRINT_1_SPEC.md` non-goals).  
-- Cross-cutting **engine/DB** rewrites unless a dedicated phase/sprint targets them with tests.
+- Cross-cutting **engine/DB** rewrites unless a dedicated phase / feature slice targets them with tests.
 
 ## Current drift risks
 
