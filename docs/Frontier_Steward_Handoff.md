@@ -1,23 +1,27 @@
 Update rule: overwrite current-state sections; append decision-log items; preserve [V]/[R]/[I]/[OOS] honesty.
 
+Canonical steward workflow protocol: `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` (read before trusting this narrative alone).
+
 # Frontier Steward Handoff
 Project: Probability Prediction Engine
 Phase: One-screen BTC implied lab (current phase; `docs/SPRINT_1_SPEC.md` anchor)
-Date: 2026-04-10
+Date: 2026-04-11
 Steward: ChatGPT frontier steward window
-Status: Active (post–feature slice 007 closeout)
+Status: Active (post–feature slice 009 closeout)
 
 ## Executive state
 - [V/I] Product: BTC-first belief-vs-market trade construction workbench; not a trading bot and not a general AI analyst.
 - [V/I] Current phase target: one-screen implied lab with semantic honesty, clear disagreement interpretation, and trustworthy interaction flow.
-- [V/R] Most recently implemented feature slice work: **Feature slice 007 — Flatter trade ticket path** (`right_ticket_slot`, `_render_implied_lab_trade_ticket_panel`, `decision_ready_review` linkage copy + `tests/test_implied_lab_trade_ticket.py`).
-- [V/R] Most recently closed feature slice (process): **Feature slice 007** (Execution step 27, 2026-04-10 — pytest **36** + smoke **A** green; `trade_ticket_found` **true**; smoke **C** not required; **A** PNG may not frame glance + ticket expander — see truth table).
-- [V/R] Prior closed feature slice: **Feature slice 006** (Execution step 22 — trust strip; **A** screenshot caveat for trust strip).
+- [V/R] Most recently implemented feature slice work: **Feature slice 008 — Glance-first orientation polish** (`src/viz/app.py` presentation/layout/copy/hierarchy only; BUILD then CLOSEOUT 2026-04-11).
+- [V/R] Most recently closed feature slice (process): **Feature slice 009** (CLOSEOUT 2026-04-11 — docs-only **Implied lab operator runbook**: `docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`; updates to `HANDOFF.md`, `CURRENT_FRONTIER.md`; cross-links from `IMPLIED_LAB_SMOKE.md` and this handoff; validation = doc consistency only).
+- [V/R] Prior closed feature slice (process): **Feature slice 008** (CLOSEOUT 2026-04-11 — pytest **36** + smoke **A** green; manifest `artifacts/ui_smoke/20260411_131344/ui_smoke_manifest.json`; smoke **C** not required; BUILD caveats: false expander-string match fixed before acceptance; one timeout before passing run — see truth table + `IMPLIED_LAB_SMOKE.md`).
+- [V/R] Prior closed feature slice: **Feature slice 007** (2026-04-10 — trade ticket path; **A** PNG may not frame glance + ticket expander).
+- [V/R] Prior: **Feature slice 006** (Execution step 22 — trust strip; **A** screenshot caveat for trust strip).
 - [V/R] Prior: **Feature slice 005** (Execution step 16 — decision-ready review; smoke **C** fail on that window **live-data/scenario-sensitive**).
 - [V/R] Prior: **Feature slice 004** (Execution step 13 — pytest + smoke A/C green; Yahoo MultiIndex fix in `src/data/fetch_yahoo.py`).
 - [V/R] Earlier closed: **Feature slice 003 — Belief uncertainty capture** (see truth table for caveats).
 - [V] Active feature slice status: **none**.
-- [V/I] Single best next move: select next bounded frontier from `docs/SOP/CURRENT_FRONTIER.md` (one-screen lab phase polish / optional ops runbook) after feature slice 007 closure.
+- [V/I] Single best next move: **SELECTION** — select next bounded frontier from `docs/SOP/CURRENT_FRONTIER.md` after feature slice **009** closure (no slice pre-chosen in this handoff). **Operator procedure** for implied lab validation/closeout: `docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`.
 
 ## Product identity and boundaries
 - [V/I] Core loop: market-implied distribution -> user belief -> disagreement -> strategy families that fit this disagreement -> verification
@@ -130,6 +134,12 @@ Status: Active (post–feature slice 007 closeout)
   - Smoke C: **not run** for Feature slice 007 (layout/copy + ticket placement only; per validation tiers).
   - **Review-to-ticket path:** **Code order** — glance slot then `right_ticket_slot` with top-level **Trade ticket (copy/paste)**; **Strategy details** no longer nests the ticket. **Decision-ready review** payload names **Belief vs market — at a glance** then ticket. **Screenshot:** smoke **A** `full_page=False` capture shows **Decision-ready review** linkage (non-advisory) in sample artifact; glance/ticket expander may require scroll — see `docs/IMPLIED_LAB_SMOKE.md` Sprint 007 note.
   - Feature slice 007 close decision: **CLOSED**
+- [V] Validation evidence captured (2026-04-11 — Feature slice 008 closure):
+  - Tests: `python -m pytest -q` → **PASS** (**36** tests) — **deterministic**.
+  - Smoke A: `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — **live-data-sensitive** + **environment-sensitive**; manifest `artifacts/ui_smoke/20260411_131344/ui_smoke_manifest.json`; screenshot `artifacts/ui_smoke/20260411_131344/A_width_target_payoff.png` (`trade_ticket_found` **true**).
+  - Smoke C: **not run** for Feature slice 008 (presentation-only; per validation tiers).
+  - **Honest BUILD caveats:** UI copy briefly duplicated the exact **My belief vs market** expander label and caused a false harness match — corrected before acceptance; one smoke run **timed out** (likely network/Deribit) before the accepted green run.
+  - Feature slice 008 close decision: **CLOSED** (docs-only CLOSEOUT; no code edits in this step).
 
 ### Reported but not independently re-checked
 - [R] Line-by-line audit of every local uncommitted change vs a single pushed commit (working tree is not clean on last agent pass).
@@ -181,8 +191,10 @@ Status: Active (post–feature slice 007 closeout)
 
 11. [V] **Execution step 27 — Feature slice 007 CLOSEOUT:** Declared **Feature slice 007 formally closed**: pytest green (36 tests); smoke **A** green (`artifacts/ui_smoke/20260410_180727/`, `trade_ticket_found` true); **C** not required; documented **A** screenshot / viewport caveat for glance + **Trade ticket** stack. Updated `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/HANDOFF.md`, `docs/IMPLIED_LAB_SMOKE.md`, this handoff. **No code edits** in CLOSEOUT.
 
+12. [V] **Feature slice 008 CLOSEOUT (2026-04-11):** Declared **Feature slice 008 (Glance-first orientation polish) formally closed** on accepted BUILD evidence: pytest **36** passed; smoke **A** green (`artifacts/ui_smoke/20260411_131344/`); **C** not required; recorded BUILD caveats (false expander-string match fixed before acceptance; one timeout before passing run). Updated `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/HANDOFF.md`, `docs/IMPLIED_LAB_SMOKE.md`, this handoff. **No code edits** in CLOSEOUT.
+
 ## Active frontier
-Name: None active (feature slice 007 complete; choose next bounded frontier)
+Name: None active (feature slice 008 complete; **SELECTION** — choose next bounded frontier)
 
 User problem:
 - [I] The product likely now has its main skeleton, but the next best improvement depends on whether the top-level screen already tells the story quickly and cleanly after the reported glance-card feature slice
@@ -209,10 +221,10 @@ Non-goals:
 - [I] Recommendation: do only if current state handling is materially impeding the next product move
 
 ### 2. Top-of-screen orientation polish (bounded)
-- [I] User benefit: even clearer first-screen answers (asset, horizon/expiry, “market-implied anchor”, and “where to state my view next”)
+- [V] **Feature slice 008** delivered a **glance-first orientation** pass (captions, grouping, chart-adjacent context) in `src/viz/app.py`; further polish only if review shows remaining gaps—do not re-open 008 as active work without a new slice charter.
+- [I] User benefit (if a follow-on slice): incremental layout/copy tightening without semantics change
 - [I] Implementation risk: low
 - [I] Drift risk: low
-- [I] Recommendation: strong candidate after feature slice 004 closure if first-screen orientation still feels soft
 
 ## Operational model
 - [V/R] Workflow model: frontier-driven, fast but testable

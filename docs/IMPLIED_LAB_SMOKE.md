@@ -1,6 +1,6 @@
 # Implied lab — manual smoke checklist (Stabilization S0)
 
-
+**Operator runbook (preflight, Tier 1 vs smoke C, artifacts, closeout, escalation):** `docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`.
 
 Run the app in **Full** view with **Bitcoin view** enabled. The implied distribution and strategy section loads on its own (Deribit expiries/marks for the lab are fetched when that section runs). **Optional** chart overlays (forward curve, spread overlays, reference tables) appear after **Refresh priced inputs (Deribit)** in the sidebar.
 
@@ -89,6 +89,8 @@ For **A**, the harness checks page load plus disagreement/family/trade text and 
 **Sprint 006 note (trust strip vs screenshot):** Scenario **A** expands **Verification** and scrolls to disagreement classification before the `full_page=False` capture, so the default **A** PNG may **not** show the compact **Trust / provenance** block under **Summary**. Use checklist row **2a** (scroll up in the right column) or an ad-hoc screenshot when you need pixel evidence of the strip.
 
 **Sprint 007 note (glance + trade ticket vs screenshot):** The harness still sets `trade_ticket_found` when the label **Trade ticket (copy/paste)** is present in the DOM (may be below the viewport). The default **A** PNG often frames **Decision-ready review** (updated linkage: glance then ticket) but may **not** show the glance card or the ticket expander. Use checklist row **2b** (scroll the right column after review) or an ad-hoc screenshot for pixel evidence of the flatter path.
+
+**Feature slice 008 closeout (2026-04-11, presentation-only):** **Smoke C** not required. Accepted evidence: `python -m pytest -q` → **36** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_131344/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260411_131344/A_width_target_payoff.png`. **Harness stability note:** the primary scenario waits on the exact string **My belief vs market** (the left-column expander label). UI copy that repeats that exact phrase *before* the expander mounts can cause a **false early match** or confusing runs—keep orientation text distinct from the expander title, or scope waits in future harness work. **Operational note:** a **timeout** on a given run is consistent with **network / Deribit** flakiness; classify as **environment-sensitive** and retry with preflight hygiene (`docs/SOP/OPERATING_RULES.md`).
 
 **Scenario sensitivity (Sprint 005 closeout, 2026-04-10):** **C** can **fail** when live marks + default belief inputs yield **mixed** or **width_vol** disagreement (e.g. `width_band=wider`) even though the page loads and disagreement UI is coherent. Classify as **live-data-sensitive** / **scenario-sensitive** — not automatically a regression in the **Decision-ready review** block or digest copy. Prior green **C** artifacts (e.g. `artifacts/ui_smoke/20260410_150352/`) remain valid historical evidence.
 

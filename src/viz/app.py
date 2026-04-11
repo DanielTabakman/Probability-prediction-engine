@@ -63,51 +63,54 @@ def _render_belief_vs_market_glance(v: dict) -> None:
     g = v.get("belief_vs_market_glance") if isinstance(v, dict) else None
     if not isinstance(g, dict):
         return
-    st.markdown("##### Belief vs market — at a glance")
-    digest = g.get("digest_lines")
-    if isinstance(digest, list) and digest:
-        st.markdown("###### Main disagreement (scan)")
-        st.markdown("\n".join(f"- {line}" for line in digest if str(line).strip()))
-    intro = g.get("fit_bridge_intro")
-    bullets = g.get("fit_bridge_bullets")
-    if isinstance(intro, str) and intro.strip():
-        st.markdown("###### Why these fit classes appear")
-        st.markdown(intro)
-        if isinstance(bullets, list) and bullets:
-            st.markdown("\n".join(str(b) for b in bullets))
-    st.caption(
-        f"**{g.get('fit_note', 'Fit is not recommendation.')}** "
-        f"{g.get('illustrative_scope_note', '')}"
-    )
-    st.markdown("###### Supporting numbers")
-    a, b = st.columns(2)
-    with a:
-        st.markdown(
-            f"- **Market forward:** ${g['forward_usd']:,.0f}\n"
-            f"- **Market modal (reference peak):** ${g['market_modal_usd']:,.0f}\n"
-            f"- **Your belief peak (mode):** ${g['belief_peak_usd']:,.0f}"
-        )
-    with b:
-        gap_part = (
-            f"{g['largest_gap_display']} (grid sample)"
-            if g.get("largest_gap_price_usd") is not None
-            else "— (see Verification if belief curve unavailable)"
-        )
-        st.markdown(
-            f"- **Width vs market (technical):** {g['width_relation_label']}\n"
-            f"- **Main mismatch (largest |ΔPDF| on grid):** {gap_part} · "
-            f"L₁ label: **{g['shape_gap_strength']}**\n"
-            f"- **Market reference for peak:** {g['market_reference_kind']}"
-        )
-    with st.expander("Audit trail: classification wording, trace & formulas", expanded=False):
-        if g.get("disagreement_type_line"):
-            st.markdown(str(g["disagreement_type_line"]))
+    with st.container(border=True):
+        st.markdown("##### Belief vs market — at a glance")
+        st.caption("Disagreement digest vs **market-implied pricing distribution** (same run as the chart).")
+        digest = g.get("digest_lines")
+        if isinstance(digest, list) and digest:
+            st.markdown("###### Main disagreement (scan)")
+            st.markdown("\n".join(f"- {line}" for line in digest if str(line).strip()))
+        intro = g.get("fit_bridge_intro")
+        bullets = g.get("fit_bridge_bullets")
+        if isinstance(intro, str) and intro.strip():
+            st.markdown("###### Why these fit classes appear")
+            st.markdown(intro)
+            if isinstance(bullets, list) and bullets:
+                st.markdown("\n".join(str(b) for b in bullets))
         st.caption(
-            f"As-of (UTC): {g.get('as_of_utc', '—')} · "
-            f"Trace: `{g.get('classification_trace_path', '')}` · "
-            f"{g.get('formula_caption', '')}"
+            f"**{g.get('fit_note', 'Fit is not recommendation.')}** "
+            f"{g.get('illustrative_scope_note', '')}"
         )
-        st.caption(f"{g.get('overlay_basis_line', '')}")
+        st.divider()
+        st.markdown("###### Reference numbers (grid)")
+        a, b = st.columns(2)
+        with a:
+            st.markdown(
+                f"- **Market forward:** ${g['forward_usd']:,.0f}\n"
+                f"- **Market modal (reference peak):** ${g['market_modal_usd']:,.0f}\n"
+                f"- **Your belief peak (mode):** ${g['belief_peak_usd']:,.0f}"
+            )
+        with b:
+            gap_part = (
+                f"{g['largest_gap_display']} (grid sample)"
+                if g.get("largest_gap_price_usd") is not None
+                else "— (see Verification if belief curve unavailable)"
+            )
+            st.markdown(
+                f"- **Width vs market (technical):** {g['width_relation_label']}\n"
+                f"- **Main mismatch (largest |ΔPDF| on grid):** {gap_part} · "
+                f"L₁ label: **{g['shape_gap_strength']}**\n"
+                f"- **Market reference for peak:** {g['market_reference_kind']}"
+            )
+        with st.expander("Audit trail: classification wording, trace & formulas", expanded=False):
+            if g.get("disagreement_type_line"):
+                st.markdown(str(g["disagreement_type_line"]))
+            st.caption(
+                f"As-of (UTC): {g.get('as_of_utc', '—')} · "
+                f"Trace: `{g.get('classification_trace_path', '')}` · "
+                f"{g.get('formula_caption', '')}"
+            )
+            st.caption(f"{g.get('overlay_basis_line', '')}")
 
 
 def _render_trust_strip(verification: dict) -> None:
@@ -245,6 +248,7 @@ def _render_decision_ready_review(verification: dict) -> None:
         return
     with st.container(border=True):
         st.markdown("##### Decision-ready review")
+        st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
         st.markdown(payload["structure_line"])
         st.markdown(payload["payoff_line"])
         st.markdown(payload["linkage_line"])
@@ -338,7 +342,7 @@ def _render_implied_lab_trade_ticket_panel(
     max_loss = float(summary.get("max_loss") or 0.0)
     breakevens = summary.get("breakevens") or []
 
-    st.caption("Illustrative copy-ready leg summary — not a recommendation.")
+    st.caption("Illustrative leg list — not a recommendation.")
     with st.expander("Trade ticket (copy/paste)", expanded=False):
         st.code(ticket_text, language="text")
         with st.expander("**Show calculations**", expanded=False):
@@ -417,6 +421,9 @@ def _render_implied_lab_summary_card(outputs: dict) -> None:
 
     with st.container(border=True):
         st.markdown("##### Summary")
+        st.caption(
+            "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
+        )
         st.markdown(f"**{name}**")
         a, b, c = st.columns(3)
         with a:
@@ -549,9 +556,9 @@ if show_bitcoin_view:
 if show_bitcoin_view:
     st.header("Bitcoin implied lab — market-implied view as the anchor")
     st.caption(
-        "Start with the **market-implied view** for the selected horizon (expiry). "
-        "Then optionally add **your belief** and review the **disagreement**. "
-        "This is an exploration workbench — not a recommendation engine."
+        "**Glance path:** **Market-implied** chart (right) · **User belief** (left column) · "
+        "**Disagreement digest** (*Belief vs market — at a glance*) · **Review → trade ticket** (under **Summary**). "
+        "Exploration workbench — not a recommendation engine."
     )
 
     # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
@@ -595,7 +602,6 @@ if show_bitcoin_view:
         - **Green line (if selected):** **Strategy P&amp;L** at expiry (right axis). At each price level, this is your net profit or loss if you hold that strategy. Negative = loss (e.g. premium paid), positive = profit.
         - **Strikes** for the strategy scanner are chosen from available Deribit options: ATM = strike nearest the forward; spreads use the nearest strikes around the forward so the payoff is relevant to current pricing.
             """)
-        st.caption("Risk-neutral distribution for BTC at expiry (lognormal from Deribit forward + ATM IV).")
 
     if is_full and run_implied and current_btc is not None:
         try:
@@ -617,6 +623,11 @@ if show_bitcoin_view:
                     # doesn't get pushed down by the (potentially large) left-column controls.
                     with col_chart:
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
+                        st.caption(
+                            "**Right column (read top → bottom):** chart → **Summary** → **Trust / provenance** → "
+                            "**Decision-ready review** → **Belief vs market — at a glance** → **Trade ticket**. "
+                            "**Left column:** expiry, **User belief** controls, strategy mode and shape."
+                        )
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
@@ -684,6 +695,7 @@ if show_bitcoin_view:
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
+                        st.markdown("###### User belief (optional overlay)")
                         with st.expander("My belief vs market", expanded=False):
                             st.caption(
                                 "Optional: compare a simple lognormal **belief** (peak = price you set) to the displayed market curve."
@@ -776,6 +788,7 @@ if show_bitcoin_view:
                             step = max(1000, (hi - lo) // 50)
                             atm = min(avail_strikes, key=lambda k: abs(k - forward))
 
+                            st.markdown("###### Strategy & payoff")
                             # Mode ownership (Sprint 1A): exact strikes vs target payoff
                             mode_key = f"implied_lab_mode_{selected_expiry_str}"
                             # Important: do not pass a computed `index` derived from session_state.
@@ -1195,7 +1208,36 @@ if show_bitcoin_view:
                             yref="paper",
                             font=dict(size=9),
                         )
-                    right_chart_slot.plotly_chart(fig_dist, use_container_width=True)
+                    _fwd_cap = (
+                        f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
+                    )
+                    _dg = ch.get("belief_disagreement_strength")
+                    if user_belief_for_state.get("enabled") and _dg:
+                        _fwd_cap += f" · Belief disagreement: **{_dg}**"
+                    _bs = outputs.get("belief_summary") or {}
+                    belief_txt = _bs.get("text") or ""
+                    belief_hints = _bs.get("hints_markdown") or ""
+                    _belief_block = ""
+                    if belief_txt or belief_hints:
+                        _belief_block = belief_txt
+                        if belief_hints:
+                            _belief_block += (
+                                ("\n\n" if belief_txt else "") + belief_hints
+                            )
+
+                    with right_chart_slot.container():
+                        st.markdown("##### Market-implied view (chart)")
+                        st.caption(
+                            "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
+                            "(Breeden–Litzenberger from marks) · Green: **strategy P&L** at expiry when legs are set."
+                        )
+                        st.plotly_chart(fig_dist, use_container_width=True)
+
+                    right_forward_slot.caption(_fwd_cap)
+                    if _belief_block:
+                        with right_belief_slot.container():
+                            st.markdown("###### Belief overlay (this run)")
+                            st.markdown(_belief_block)
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
@@ -1223,23 +1265,6 @@ if show_bitcoin_view:
                         right_anomaly_slot.warning(
                             "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
                         )
-                    _fwd_cap = (
-                        f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
-                    )
-                    _dg = ch.get("belief_disagreement_strength")
-                    if user_belief_for_state.get("enabled") and _dg:
-                        _fwd_cap += f" · Belief disagreement: **{_dg}**"
-                    right_forward_slot.caption(_fwd_cap)
-                    _bs = outputs.get("belief_summary") or {}
-                    belief_txt = _bs.get("text") or ""
-                    belief_hints = _bs.get("hints_markdown") or ""
-                    if belief_txt or belief_hints:
-                        _belief_block = belief_txt
-                        if belief_hints:
-                            _belief_block += (
-                                ("\n\n" if belief_txt else "") + belief_hints
-                            )
-                        right_belief_slot.markdown(_belief_block)
 
                     with right_verification_slot:
                         with st.expander("Verification", expanded=False):
