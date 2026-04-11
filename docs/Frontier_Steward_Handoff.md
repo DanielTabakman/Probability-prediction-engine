@@ -1,6 +1,6 @@
 Update rule: overwrite current-state sections; append decision-log items; preserve [V]/[R]/[I]/[OOS] honesty.
 
-Canonical steward workflow protocol: `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` (read before trusting this narrative alone).
+Canonical steward workflow protocol: `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` (read before trusting this narrative alone). **Validation runtime** (pytest/smoke wall-clock in the repo) and **Cursor turnaround** (steward packet → usable return) are optional, distinct health signals—neither is a mandatory gate.
 
 # Frontier Steward Handoff
 Project: Probability Prediction Engine

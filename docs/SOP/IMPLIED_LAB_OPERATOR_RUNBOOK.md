@@ -71,6 +71,12 @@ Use a free port; avoid collision with manual Streamlit (`docs/IMPLIED_LAB_SMOKE.
 
 If smoke is slow, hangs, or stays inconclusive: **stop after one or two** attempts, **classify** (environment-sensitive / live-data-sensitive / scenario-sensitive), and document—do not infinite-retry (`OPERATING_RULES.md` → **Closeout runtime budget**).
 
+### Runtime tracking (health signal)
+
+When practical, record **actual wall-clock** for **`python -m pytest -q`** and **smoke A** (`python scripts/run_implied_lab_ui_smoke.py`). Compare to **recent normal** when you know it; if materially slower, classify conservatively (**WATCH** / **ESCALATE** per `FRONTIER_STEWARD_PROTOCOL.md` → **Runtime health indicators**). **Repeated** slowdown matters more than a single slow run. Note whether the pattern looks like **live data / network / Deribit sensitivity**, **local tooling timeout or capture issue**, or **possible product regression**. **Do not fail a slice on runtime alone** unless the slowdown is **severe**, **repeated**, or **coupled with errors or flakes**.
+
+**Recent observed example (not a guaranteed benchmark):** on **2026-04-11** (checkpoint recovery), `python -m pytest -q` **passed** in **~94.88s**—one data point only; the repo does not define a formal pytest baseline here.
+
 ### Artifact location
 
 Each run writes under:
@@ -167,4 +173,4 @@ Stop and return **BUILD only** (or escalate to steward) when:
 
 ## Last updated
 
-2026-04-11 — Feature slice **009** (Implied lab operator runbook); docs-only.
+2026-04-11 — Feature slice **009** (Implied lab operator runbook); docs-only. Same day: runtime tracking (health signal) + recent pytest example in §4.

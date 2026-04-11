@@ -2,7 +2,7 @@
 
 Purpose: minimum context needed for the next work session.
 
-**Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md).
+**Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
 
 **Implied lab — validate, smoke, artifacts, closeout:** [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md).
 
@@ -11,6 +11,8 @@ Purpose: minimum context needed for the next work session.
 Declare **exactly one** execution step type per session (**BUILD**, **CLOSEOUT**, **RECOVERY**, **SELECTION**) and stay inside its allowed scope. Full anti-thrash rules—CLOSEOUT vs BUILD boundary, feature slice close criteria, validation labels (deterministic / environment-sensitive / live-data-sensitive), and stop-after-two for non-BUILD—live in [OPERATING_RULES.md](OPERATING_RULES.md) under **Execution step discipline**.
 
 **Closeout validation (summary):** [OPERATING_RULES.md](OPERATING_RULES.md) now defines **validation tiers** (universal vs conditional), a **closeout runtime budget** (do not let one unstable validation step dominate; stop after one or two inconclusive long runs and classify), **preflight hygiene** before smoke (clean instance, fresh port, avoid manual+smoke collision), and that **smoke C is not a universal tax**—required for classification/scenario-touched feature slices, otherwise supporting unless the spec says otherwise. Declare conditional runs in the feature slice spec / execution step when relevant.
+
+**Runtime health (optional):** stewards may record expected vs actual **validation runtime** (pytest / smoke inside the repo) with labels **NORMAL** / **SLOW_BUT_ACCEPTABLE** / **WATCH** / **ESCALATE** ([FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md)); that is separate from **Cursor turnaround** (same doc). Operators see §4 in [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md). Signals for drift and slowness trends—not default pass/fail gates.
 
 ## Current priority
 
@@ -91,4 +93,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Earlier: feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
