@@ -51,6 +51,7 @@ from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
+from src.viz.implied_lab_trade_ticket import implied_lab_trade_ticket_code_text as _implied_lab_trade_ticket_code_text
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -58,25 +59,189 @@ from src.viz.belief_uncertainty import (
 import yaml
 
 
+def _ensure_first_touch_belief_defaults(
+    belief_exp: str,
+    *,
+    forward: float,
+    mkt_move_pct: float,
+) -> None:
+    """Populate missing belief widget keys once so the lab opens in a credible starter state."""
+    en_k = f"belief_en_{belief_exp}"
+    if en_k not in st.session_state:
+        st.session_state[en_k] = True
+    c_k = f"belief_center_{belief_exp}"
+    if c_k not in st.session_state:
+        st.session_state[c_k] = float(forward)
+    pct_k = f"belief_move_pct_{belief_exp}"
+    if pct_k not in st.session_state:
+        st.session_state[pct_k] = float(max(1.0, min(200.0, mkt_move_pct)))
+    unc_k = f"belief_unc_mode_{belief_exp}"
+    if unc_k not in st.session_state:
+        st.session_state[unc_k] = "±% move (1σ)"
+
+
+def _apply_belief_quick_preset(
+    preset: str,
+    belief_exp: str,
+    *,
+    forward: float,
+    mkt_move_pct: float,
+    price_max: float,
+) -> None:
+    """Write session keys consumed by belief widgets; rerun picks up new values."""
+    st.session_state[f"belief_en_{belief_exp}"] = True
+    unc = str(st.session_state.get(f"belief_unc_mode_{belief_exp}", "±% move (1σ)"))
+    pct_floor, pct_cap = 1.0, 200.0
+    mkt_sigma = move_pct_1sigma_to_sigma_ln(float(mkt_move_pct))
+
+    msgs = {
+        "bullish": "Quick control: **Bullish** — raised your belief peak vs the forward (teal curve shifts right).",
+        "bearish": "Quick control: **Bearish** — lowered your belief peak vs the forward (teal curve shifts left).",
+        "narrower": "Quick control: **Narrower** — your ±1σ band is tighter than the ATM-implied horizon band (teal is more peaked).",
+        "wider": "Quick control: **Wider** — your ±1σ band is looser than the ATM-implied horizon band (teal is flatter).",
+    }
+    st.session_state[f"belief_last_touch_{belief_exp}"] = msgs.get(
+        preset,
+        f"Quick control: **{preset}** — updated belief inputs.",
+    )
+
+    if preset == "bullish":
+        st.session_state[f"belief_center_{belief_exp}"] = float(
+            min(price_max, max(1000.0, forward * 1.08))
+        )
+    elif preset == "bearish":
+        st.session_state[f"belief_center_{belief_exp}"] = float(
+            min(price_max, max(1000.0, forward * 0.92))
+        )
+
+    if unc == "±% move (1σ)":
+        if preset == "narrower":
+            st.session_state[f"belief_move_pct_{belief_exp}"] = float(
+                max(pct_floor, min(pct_cap, mkt_move_pct * 0.58))
+            )
+        elif preset == "wider":
+            st.session_state[f"belief_move_pct_{belief_exp}"] = float(
+                max(pct_floor, min(pct_cap, mkt_move_pct * 1.42))
+            )
+    else:
+        wk = f"belief_width_{belief_exp}"
+        if preset == "narrower":
+            st.session_state[wk] = float(max(0.02, min(0.8, mkt_sigma * 0.58)))
+        elif preset == "wider":
+            st.session_state[wk] = float(max(0.02, min(0.8, mkt_sigma * 1.42)))
+
+
+def _plain_english_disagreement_interp(belief_summary: dict | None) -> str:
+    """Single contract-aligned sentence from structured disagreement (summary_lines index 2)."""
+    if not isinstance(belief_summary, dict):
+        return ""
+    bd = belief_summary.get("belief_disagreement")
+    if not isinstance(bd, dict):
+        return ""
+    sl = bd.get("summary_lines") or []
+    if len(sl) >= 3:
+        t = str(sl[2]).strip()
+        if t:
+            return t
+    return ""
+
+
+def _render_first_touch_what_changed(
+    belief_summary: dict | None,
+    belief_exp: str,
+    *,
+    belief_enabled: bool,
+    orange_available: bool,
+) -> None:
+    """Stable interpretation hook: market view → optional user view → next step (no advice)."""
+    with st.container(border=True):
+        st.markdown("###### What this run is saying")
+
+        if orange_available:
+            st.caption(
+                "Anchor: **market-implied pricing distribution (risk-neutral)** (orange) against the **reference** curve (purple)."
+            )
+        else:
+            st.caption(
+                "Anchor: **reference distribution** (purple). **Market-implied (orange)** is unavailable on this run."
+            )
+
+        last = st.session_state.get(f"belief_last_touch_{belief_exp}")
+        if isinstance(last, str) and last.strip():
+            st.markdown(last.strip())
+
+        if not belief_enabled:
+            st.caption(
+                "**Optional user view:** turn on **Show my belief curve** below to state your view (teal), then this block reports the **difference: your view vs market view**."
+            )
+            st.caption(
+                "**Next step:** use **Strategy & payoff** (left) to explore a downstream **expression** (green P&L). The green line is **not** the disagreement."
+            )
+            return
+
+        bd = (
+            belief_summary.get("belief_disagreement")
+            if isinstance(belief_summary, dict)
+            else None
+        )
+        if isinstance(bd, dict):
+            sl = bd.get("summary_lines") or []
+            if sl and str(sl[0]).strip():
+                st.markdown(str(sl[0]).strip())
+
+        interp = _plain_english_disagreement_interp(belief_summary)
+        if interp:
+            st.markdown(interp)
+        else:
+            st.caption(
+                "Adjust belief peak or uncertainty, or open **Belief vs market — reference & fit bridge** "
+                "(under **Summary**) for the readable scan and illustrative fit notes."
+            )
+
+        st.caption(
+            "**Difference meaning:** the disagreement above is **your view (teal)** vs the **market view** "
+            f"({('orange market-implied pricing distribution' if orange_available else 'purple reference distribution')})."
+        )
+        st.caption(
+            "**Next step:** **Strategy & payoff** (left) turns the view difference into **one** downstream market expression (green P&L). "
+            "It’s an expression layer, **not** the disagreement layer."
+        )
+        st.caption(
+            "Exploration / comparison only — not a recommendation, forecast, or trade advice."
+        )
+
+
 def _render_belief_vs_market_glance(v: dict) -> None:
-    """Compact BTC belief vs market card — values trace to verification payload / classification_trace."""
+    """Reference numbers + illustrative fit bridge — primary wording lives under the chart (Slice 002)."""
     g = v.get("belief_vs_market_glance") if isinstance(v, dict) else None
     if not isinstance(g, dict):
         return
     with st.container(border=True):
-        st.markdown("##### Belief vs market — at a glance")
-        st.caption("Disagreement digest vs **market-implied pricing distribution** (same run as the chart).")
+        st.markdown("##### Belief vs market — reference & fit bridge")
+        st.caption(
+            "After **What this run is saying** (above the chart): **illustrative strategy families** give "
+            "**vocabulary** for how your view differs from the market curve — then use **Strategy & payoff** "
+            "(left) to instantiate **one** payoff and watch the **green** line, **Summary**, and **Trade ticket** "
+            "stay aligned. Same disagreement contract as the readable scan."
+        )
         digest = g.get("digest_lines")
         if isinstance(digest, list) and digest:
-            st.markdown("###### Main disagreement (scan)")
-            st.markdown("\n".join(f"- {line}" for line in digest if str(line).strip()))
+            with st.expander("Readable scan: peak · width · headline (same disagreement contract)", expanded=False):
+                st.markdown("\n".join(f"- {line}" for line in digest if str(line).strip()))
         intro = g.get("fit_bridge_intro")
         bullets = g.get("fit_bridge_bullets")
         if isinstance(intro, str) and intro.strip():
-            st.markdown("###### Why these fit classes appear")
+            sf_head = str(g.get("strategy_families_heading") or "").strip()
+            st.markdown(
+                f"###### {sf_head}" if sf_head else "###### Illustrative strategy families (exploration hooks)"
+            )
             st.markdown(intro)
             if isinstance(bullets, list) and bullets:
                 st.markdown("\n".join(str(b) for b in bullets))
+            st.caption(
+                "**→ Payoff sandbox:** families above are **hooks**, not assignments — dial **Strategy & payoff** "
+                "(left: mode, K1–K4, size) and the **green** line, **Summary**, and **Trade ticket** update together."
+            )
         st.caption(
             f"**{g.get('fit_note', 'Fit is not recommendation.')}** "
             f"{g.get('illustrative_scope_note', '')}"
@@ -119,6 +284,55 @@ def _render_trust_strip(verification: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Trust / provenance")
         st.caption("\n\n".join(lines))
+
+
+def _render_market_data_legibility(leg: dict | None) -> None:
+    """Feature slice 010: fetch-path / freshness legibility above the anchor chart."""
+    if not isinstance(leg, dict):
+        return
+    summary = leg.get("summary_line")
+    detail = leg.get("detail_markdown") or ""
+    expanded = bool(leg.get("expander_expanded"))
+    if isinstance(summary, str) and summary.strip():
+        st.caption(summary.strip())
+    title = "Market data status (this run)"
+    with st.expander(title, expanded=expanded):
+        if detail.strip():
+            st.markdown(detail)
+        else:
+            st.caption("No extra fetch-path detail for this payload (non-interactive or minimal run).")
+
+
+def _render_market_snapshot_one_liner(verification: dict | None) -> None:
+    """
+    H1-01 (Slice B): single-line market snapshot above the anchor chart.
+
+    Budget: one compact line. Detail stays behind expanders (market data status / verification).
+    """
+    if not isinstance(verification, dict):
+        return
+    vs = verification.get("verification_summary")
+    if not isinstance(vs, dict) or not vs:
+        return
+
+    as_of = str(vs.get("as_of_utc") or "").strip() or "not reported"
+    sources = vs.get("data_sources") if isinstance(vs.get("data_sources"), list) else []
+    src_txt = ", ".join(str(x) for x in sources[:2]).strip()
+    if len(sources) > 2:
+        src_txt = (src_txt + f", +{len(sources) - 2} more").strip(", ")
+    if not src_txt:
+        src_txt = "not listed"
+
+    orange_flag = verification.get("market_implied_orange_available")
+    if isinstance(orange_flag, bool):
+        orange = "available" if orange_flag else "unavailable"
+    else:
+        orange = "unknown"
+
+    st.caption(
+        f"**Market snapshot (UTC):** {as_of} · **Sources:** {src_txt} · "
+        f"**Market-implied (orange):** {orange}."
+    )
 
 
 def _render_implied_lab_verification(v: dict) -> None:
@@ -248,65 +462,16 @@ def _render_decision_ready_review(verification: dict) -> None:
         return
     with st.container(border=True):
         st.markdown("##### Decision-ready review")
-        st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
+        st.caption(
+            "Connects **Summary**, **illustrative strategy families** (reference & fit bridge), and "
+            "**Trade ticket** — descriptive only."
+        )
         st.markdown(payload["structure_line"])
         st.markdown(payload["payoff_line"])
         st.markdown(payload["linkage_line"])
         for line in payload.get("bullets") or []:
             st.markdown(line)
         st.caption(payload.get("fit_caption") or "")
-
-
-def _implied_lab_trade_ticket_code_text(
-    *,
-    selected_expiry_str: str,
-    qty: int,
-    forward: float,
-    selected_strategy: dict,
-    put_by_k: dict,
-    call_by_k: dict,
-    summary: dict,
-) -> tuple[str, tuple[float, float, float, float], tuple[str, str, str, str]]:
-    """
-    FS-007: deterministic copy-paste ticket body plus per-leg premia (for Show calculations).
-
-    Returns (ticket_text, (prem_k1..4), (side_put1, side_put2, side_call3, side_call4)).
-    """
-    cost = float(summary.get("cost_usd") or 0.0)
-    max_gain = float(summary.get("max_gain") or 0.0)
-    max_loss = float(summary.get("max_loss") or 0.0)
-    breakevens = summary.get("breakevens") or []
-
-    side_put1 = "Long" if selected_strategy.get("long_k1", False) else "Short"
-    side_put2 = "Long" if selected_strategy.get("long_k2", True) else "Short"
-    side_call3 = "Long" if selected_strategy.get("long_k3", True) else "Short"
-    side_call4 = "Long" if selected_strategy.get("long_k4", False) else "Short"
-    k1 = selected_strategy.get("k1")
-    k2 = selected_strategy.get("k2")
-    k3 = selected_strategy.get("k3")
-    k4 = selected_strategy.get("k4")
-    prem_k1 = put_by_k.get(k1, 0.0) * forward if k1 is not None else 0.0
-    prem_k2 = put_by_k.get(k2, 0.0) * forward if k2 is not None else 0.0
-    prem_k3 = call_by_k.get(k3, 0.0) * forward if k3 is not None else 0.0
-    prem_k4 = call_by_k.get(k4, 0.0) * forward if k4 is not None else 0.0
-
-    ticket_text = (
-        f"Expiry: {selected_expiry_str}\n"
-        f"Size: {qty}x\n"
-        f"{side_put1} {qty} PUT @ {k1:,.0f}  (≈ {prem_k1:,.0f} USD per 1x)\n"
-        f"{side_put2} {qty} PUT @ {k2:,.0f}  (≈ {prem_k2:,.0f} USD per 1x)\n"
-        f"{side_call3} {qty} CALL @ {k3:,.0f} (≈ {prem_k3:,.0f} USD per 1x)\n"
-        f"{side_call4} {qty} CALL @ {k4:,.0f} (≈ {prem_k4:,.0f} USD per 1x)\n"
-        f"Net premium: {cost:,.0f} USD ({'debit' if cost >= 0 else 'credit'})\n"
-        f"Max gain (approx): {max_gain:,.0f} USD\n"
-        f"Max loss (approx): {max_loss:,.0f} USD\n"
-        + (
-            f"Breakevens: {', '.join(f'{be:,.0f}' for be in breakevens[:3])} USD\n"
-            if breakevens
-            else ""
-        )
-    )
-    return ticket_text, (prem_k1, prem_k2, prem_k3, prem_k4), (side_put1, side_put2, side_call3, side_call4)
 
 
 def _render_implied_lab_trade_ticket_panel(
@@ -342,7 +507,10 @@ def _render_implied_lab_trade_ticket_panel(
     max_loss = float(summary.get("max_loss") or 0.0)
     breakevens = summary.get("breakevens") or []
 
-    st.caption("Illustrative leg list — not a recommendation.")
+    st.caption(
+        "Copy-paste leg list for the **same** structure as **Summary** / **green** line — illustrative only, "
+        "not a recommendation."
+    )
     with st.expander("Trade ticket (copy/paste)", expanded=False):
         st.code(ticket_text, language="text")
         with st.expander("**Show calculations**", expanded=False):
@@ -422,7 +590,11 @@ def _render_implied_lab_summary_card(outputs: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Summary")
         st.caption(
-            "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
+            "Payoff snapshot for the **green** line — same strikes and premiums as **Trade ticket (copy/paste)**."
+        )
+        st.caption(
+            "**Strategy families** in **Belief vs market — reference & fit bridge** describe **shape classes** for "
+            "the scan; this card is the **active** structure you set under **Strategy & payoff** (left)."
         )
         st.markdown(f"**{name}**")
         a, b, c = st.columns(3)
@@ -556,12 +728,12 @@ if show_bitcoin_view:
 if show_bitcoin_view:
     st.header("Bitcoin implied lab — market-implied view as the anchor")
     st.caption(
-        "**Glance path:** **Market-implied** chart (right) · **User belief** (left column) · "
-        "**Disagreement digest** (*Belief vs market — at a glance*) · **Review → trade ticket** (under **Summary**). "
-        "Exploration workbench — not a recommendation engine."
+        "**Anchor:** **Market-implied pricing distribution (risk-neutral)** (right) → **What this run is saying** → "
+        "**Your belief vs market** (optional) → **Strategy & payoff** (green, left) → **Review** (Summary → ticket)."
     )
 
     # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
+    spot_reference_source = "unknown"
     current_btc = None
     if is_full:
         try:
@@ -571,6 +743,8 @@ if show_bitcoin_view:
                 done, _ = wait([fut], timeout=3.0)
                 if done:
                     current_btc = fut.result()
+                    if current_btc is not None:
+                        spot_reference_source = "deribit_btc_index"
         except Exception:
             current_btc = None
     if current_btc is None:
@@ -582,6 +756,7 @@ if show_bitcoin_view:
                     for col in ("close", "Close"):
                         if col in spot_rows.columns:
                             current_btc = float(spot_rows.sort_values("timestamp")[col].iloc[-1])
+                            spot_reference_source = "yahoo_btc_usd_last_close"
                             break
         except Exception:
             current_btc = None
@@ -590,15 +765,15 @@ if show_bitcoin_view:
     # Not auto-loaded: implied-lab fetches its own expiries/marks via _cached_* when that section runs.
     load_deribit = bool(st.session_state.get("load_deribit", False))
 
-    # Market-implied distribution is the top-of-screen anchor (H1-01).
-    # 4d) Implied probability distribution — Full view: mounted automatically (own Deribit fetches inside)
+    # Market-implied pricing distribution is the top-of-screen anchor (H1-01).
+    # 4d) Distribution — Full view: mounted automatically (own Deribit fetches inside)
     run_implied = bool(is_full)
     if is_full:
-        st.subheader("Market-implied distribution (anchor)")
+        st.subheader("Distribution at expiry (anchor)")
         with st.expander("How to read this chart", expanded=False):
             st.markdown("""
-        - **Purple (filled):** Risk-neutral lognormal reference from the **forward price** and **ATM implied volatility**.
-        - **Orange (dashed):** **Market-implied pricing distribution** from listed option marks (Breeden–Litzenberger). This is a **priced / risk-neutral** distribution (not a “true expectations” claim and not a recommendation).
+        - **Purple (filled):** Reference distribution (risk-neutral) from **forward** and **ATM implied volatility**.
+        - **Orange (dashed):** **Market-implied pricing distribution (risk-neutral)** from listed option marks (Breeden–Litzenberger). This is pricing-implied, **not** a forecast or expectation claim.
         - **Green line (if selected):** **Strategy P&amp;L** at expiry (right axis). At each price level, this is your net profit or loss if you hold that strategy. Negative = loss (e.g. premium paid), positive = profit.
         - **Strikes** for the strategy scanner are chosen from available Deribit options: ATM = strike nearest the forward; spreads use the nearest strikes around the forward so the payoff is relevant to current pricing.
             """)
@@ -619,15 +794,18 @@ if show_bitcoin_view:
                 if selected:
                     # Lay out controls and chart side-by-side to reduce scrolling.
                     col_controls, col_chart = st.columns([1, 2])
-                    # Create right-panel slots early so the "live result" area
+                    # Create right-panel slots early so the primary chart column
                     # doesn't get pushed down by the (potentially large) left-column controls.
                     with col_chart:
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
-                        st.caption(
-                            "**Right column (read top → bottom):** chart → **Summary** → **Trust / provenance** → "
-                            "**Decision-ready review** → **Belief vs market — at a glance** → **Trade ticket**. "
-                            "**Left column:** expiry, **User belief** controls, strategy mode and shape."
-                        )
+                        with st.expander("Screen map (optional)", expanded=False):
+                            st.caption(
+                                "**This column:** market-data status → main chart → **What this run is saying** → "
+                                "**Summary** (active payoff snapshot) → **Trust / provenance** → **Decision-ready review** "
+                                "→ **Belief vs market — reference & fit bridge** (families + grid) → **Trade ticket**. "
+                                "**Left column:** expiry → **Your belief vs market** → **Strategy & payoff** "
+                                "(green line inputs)."
+                            )
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
@@ -645,6 +823,11 @@ if show_bitcoin_view:
                         vol = (fwd_iv.get("atm_iv") or 0.6) if fwd_iv else 0.6
                         if vol <= 0:
                             vol = 0.6
+                        live_data_provenance = {
+                            "spot_reference": spot_reference_source,
+                            "deribit_atm_ticker_ok": bool(fwd_iv),
+                            "atm_iv_from_deribit": bool(fwd_iv and fwd_iv.get("atm_iv") is not None),
+                        }
                         run_ts_utc = pd.Timestamp.now(tz="UTC")
                         now_ts = run_ts_utc.timestamp() * 1000
                         as_of_utc = run_ts_utc.isoformat()
@@ -665,6 +848,21 @@ if show_bitcoin_view:
                         marks_full = _cached_marks_full(selected["expiry_ts"])
                         call_marks = marks_full.get("calls") or []
                         put_marks = marks_full.get("puts") or []
+                        # QA-only: force orange-unavailable screenshots without changing defaults.
+                        # Activated only via query param `qa_orange_unavailable=1`.
+                        try:
+                            qp = getattr(st, "query_params", {}) or {}
+                            qa_force_orange_off = str(qp.get("qa_orange_unavailable", "0")).strip().lower() in (
+                                "1",
+                                "true",
+                                "yes",
+                            )
+                        except Exception:
+                            qa_force_orange_off = False
+                        if qa_force_orange_off:
+                            call_marks = []
+                            put_marks = []
+                            marks_full = {"calls": [], "puts": []}
                         base_strategy = build_universal_strategy(forward, call_marks, put_marks)
                         # Restore last exact-strike shape for this expiry if present
                         shape_key = f"u4_shape_{selected_expiry_str}"
@@ -692,11 +890,73 @@ if show_bitcoin_view:
                             ],
                             "as_of_utc": as_of_utc,
                             "quote_cache_ttl_s": CACHE_TTL,
+                            "live_data_provenance": live_data_provenance,
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
-                        st.markdown("###### User belief (optional overlay)")
-                        with st.expander("My belief vs market", expanded=False):
+                        sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+                        mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+                        _ensure_first_touch_belief_defaults(
+                            belief_exp, forward=float(forward), mkt_move_pct=float(mkt_move_pct)
+                        )
+                        st.markdown("###### Your belief vs market")
+                        st.caption(
+                            "Nudge the teal curve against the orange market-implied curve — a small sandbox, not a recommendation."
+                        )
+                        st.markdown("**Quick try** (presets)")
+                        pq1, pq2 = st.columns(2)
+                        with pq1:
+                            if st.button(
+                                "Bullish",
+                                key=f"preset_bull_{belief_exp}",
+                                help="Raise belief peak vs forward (~+8%).",
+                            ):
+                                _apply_belief_quick_preset(
+                                    "bullish",
+                                    belief_exp,
+                                    forward=float(forward),
+                                    mkt_move_pct=float(mkt_move_pct),
+                                    price_max=float(price_max),
+                                )
+                            if st.button(
+                                "Narrower",
+                                key=f"preset_narrow_{belief_exp}",
+                                help="Tighter ±1σ vs ATM-implied horizon (same input mode).",
+                            ):
+                                _apply_belief_quick_preset(
+                                    "narrower",
+                                    belief_exp,
+                                    forward=float(forward),
+                                    mkt_move_pct=float(mkt_move_pct),
+                                    price_max=float(price_max),
+                                )
+                        with pq2:
+                            if st.button(
+                                "Bearish",
+                                key=f"preset_bear_{belief_exp}",
+                                help="Lower belief peak vs forward (~−8%).",
+                            ):
+                                _apply_belief_quick_preset(
+                                    "bearish",
+                                    belief_exp,
+                                    forward=float(forward),
+                                    mkt_move_pct=float(mkt_move_pct),
+                                    price_max=float(price_max),
+                                )
+                            if st.button(
+                                "Wider",
+                                key=f"preset_wide_{belief_exp}",
+                                help="Wider ±1σ vs ATM-implied horizon (same input mode).",
+                            ):
+                                _apply_belief_quick_preset(
+                                    "wider",
+                                    belief_exp,
+                                    forward=float(forward),
+                                    mkt_move_pct=float(mkt_move_pct),
+                                    price_max=float(price_max),
+                                )
+                        sigma_ln = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+                        with st.expander("My belief vs market (fine-tune)", expanded=False):
                             st.caption(
                                 "Optional: compare a simple lognormal **belief** (peak = price you set) to the displayed market curve."
                             )
@@ -713,10 +973,6 @@ if show_bitcoin_view:
                                 key=f"belief_center_{belief_exp}",
                                 format="%.0f",
                             )
-
-                            # Market horizon uncertainty on the same basis (σ_ln)
-                            sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
-                            mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
 
                             st.markdown("**Uncertainty input mode**")
                             unc_mode_key = f"belief_unc_mode_{belief_exp}"
@@ -788,7 +1044,13 @@ if show_bitcoin_view:
                             step = max(1000, (hi - lo) // 50)
                             atm = min(avail_strikes, key=lambda k: abs(k - forward))
 
-                            st.markdown("###### Strategy & payoff")
+                            st.markdown("###### Strategy & payoff — reward surface")
+                            st.caption(
+                                "**Where the readout becomes a curve:** strikes, mode, and size set the **green** "
+                                "expiry P&L, **Summary**, and **Trade ticket**. **Illustrative strategy families** "
+                                "(right column, under **Summary**) suggest **shape classes** for this disagreement — "
+                                "**not** optimized strikes; you explore here."
+                            )
                             # Mode ownership (Sprint 1A): exact strikes vs target payoff
                             mode_key = f"implied_lab_mode_{selected_expiry_str}"
                             # Important: do not pass a computed `index` derived from session_state.
@@ -1118,7 +1380,7 @@ if show_bitcoin_view:
                             x=data["prices"],
                             y=data["pdf_pct"],
                             mode="lines",
-                            name="Lognormal (forward + IV)",
+                            name="Reference distribution (risk-neutral)",
                             line=dict(color="rgba(138, 43, 226, 0.9)", width=2),
                             fill="tozeroy",
                         )
@@ -1130,7 +1392,7 @@ if show_bitcoin_view:
                                 x=data["prices"],
                                 y=market_pct,
                                 mode="lines",
-                                name="Market-implied pricing distribution (options)",
+                                name="Market-implied pricing distribution (risk-neutral)",
                                 line=dict(color="rgba(255, 140, 0, 0.9)", width=2, dash="dash"),
                             )
                         )
@@ -1148,7 +1410,13 @@ if show_bitcoin_view:
                                 line=dict(color="rgba(0, 160, 160, 0.95)", width=2, dash="dot"),
                             )
                         )
-                    title = f"BTC — Underlying price on {selected_expiry_str}"
+                    # Canonical truth: verification owns orange availability.
+                    orange_ok = bool((outputs.get("verification") or {}).get("market_implied_orange_available"))
+                    title = (
+                        f"BTC at expiry — market-implied pricing distribution (risk-neutral) ({selected_expiry_str})"
+                        if orange_ok
+                        else f"BTC at expiry — reference distribution (market-implied unavailable) ({selected_expiry_str})"
+                    )
                     if anomalous:
                         title += " — Anomalous"
                     payoff_usd = (outputs.get("overlay") or {}).get("payoff_usd") or []
@@ -1164,12 +1432,14 @@ if show_bitcoin_view:
                             )
                         )
                     layout_kw = {
-                        "title": title,
+                        "title": dict(text=title, font=dict(size=16)),
                         "xaxis_title": "Underlying price (USD)",
                         "yaxis_title": "Probability (scaled)",
-                        "height": 340,
-                        "margin": dict(b=40),
+                        # Bounded first-screen compaction (H1-01 polish): keep the anchor chart above the fold.
+                        "height": 360,
+                        "margin": dict(b=48, t=48),
                         "showlegend": True,
+                        "legend": dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
                         "xaxis": dict(tickformat=",d", gridcolor="rgba(128,128,128,0.2)"),
                         "yaxis": dict(ticksuffix="%", range=[0, 30], gridcolor="rgba(128,128,128,0.2)"),
                     }
@@ -1211,33 +1481,56 @@ if show_bitcoin_view:
                     _fwd_cap = (
                         f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
                     )
-                    _dg = ch.get("belief_disagreement_strength")
-                    if user_belief_for_state.get("enabled") and _dg:
-                        _fwd_cap += f" · Belief disagreement: **{_dg}**"
                     _bs = outputs.get("belief_summary") or {}
                     belief_txt = _bs.get("text") or ""
                     belief_hints = _bs.get("hints_markdown") or ""
-                    _belief_block = ""
-                    if belief_txt or belief_hints:
-                        _belief_block = belief_txt
-                        if belief_hints:
-                            _belief_block += (
-                                ("\n\n" if belief_txt else "") + belief_hints
-                            )
 
                     with right_chart_slot.container():
-                        st.markdown("##### Market-implied view (chart)")
-                        st.caption(
-                            "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
-                            "(Breeden–Litzenberger from marks) · Green: **strategy P&L** at expiry when legs are set."
-                        )
+                        if orange_ok:
+                            st.markdown("### Market-implied pricing distribution (risk-neutral)")
+                        else:
+                            st.markdown("### Reference distribution (market-implied unavailable)")
+                        _render_market_snapshot_one_liner(outputs.get("verification") or {})
+                        # Chart canvas first: preserve first-screen anchor semantics.
                         st.plotly_chart(fig_dist, use_container_width=True)
+                        # Interpretation + status are still first-screen, but demoted below the canvas to avoid pushing it under the fold.
+                        if orange_ok:
+                            st.caption(
+                                "Purple: **reference distribution (risk-neutral)** · "
+                                "Orange: **market-implied pricing distribution (risk-neutral)** · "
+                                "Teal: **your belief** (optional) · Green: **strategy P&L** (downstream expression)."
+                            )
+                        else:
+                            st.caption(
+                                "Purple: **reference distribution (risk-neutral)** · "
+                                "Teal: **your belief** (optional) · Green: **strategy P&L** (downstream expression)."
+                            )
+                        _render_market_data_legibility(
+                            (outputs.get("verification") or {}).get("market_data_legibility")
+                        )
+                        _render_first_touch_what_changed(
+                            outputs.get("belief_summary") if isinstance(outputs.get("belief_summary"), dict) else None,
+                            belief_exp,
+                            belief_enabled=bool(user_belief_for_state.get("enabled")),
+                            orange_available=bool(orange_ok),
+                        )
 
                     right_forward_slot.caption(_fwd_cap)
-                    if _belief_block:
+                    if belief_txt or belief_hints:
                         with right_belief_slot.container():
-                            st.markdown("###### Belief overlay (this run)")
-                            st.markdown(_belief_block)
+                            st.markdown("###### Belief overlay — numbers (this run)")
+                            st.caption(
+                                "Peaks and σ lines for the teal curve. Plain-English disagreement: "
+                                "**What this run is saying** above the chart."
+                            )
+                            if belief_txt:
+                                st.markdown(belief_txt)
+                            if belief_hints:
+                                with st.expander(
+                                    "Illustrative strategy families — full contract markdown",
+                                    expanded=False,
+                                ):
+                                    st.markdown(belief_hints)
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
@@ -1266,7 +1559,7 @@ if show_bitcoin_view:
                             "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
                         )
 
-                    with right_verification_slot:
+                    with right_verification_slot.container():
                         with st.expander("Verification", expanded=False):
                             _render_implied_lab_verification(outputs.get("verification") or {})
 
@@ -1295,8 +1588,8 @@ if show_bitcoin_view:
                                 hide_index=True,
                             )
                             st.caption(
-                                "**Trade ticket (copy/paste)** is **above** (under the glance card) — same leg list "
-                                "and optional **Show calculations** — illustrative only, not a recommendation."
+                                "**Trade ticket (copy/paste)** sits with **Summary** and the **green** line — same "
+                                "legs and optional **Show calculations** — illustrative only, not a recommendation."
                             )
             else:
                 st.caption("No Deribit option expiries. Check API.")

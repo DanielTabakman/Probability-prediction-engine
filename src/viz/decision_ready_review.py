@@ -104,18 +104,19 @@ def build_decision_ready_review_payload(
 
     if has_glance:
         linkage_line = (
-            "**How this ties together:** **Belief vs market — at a glance** is directly under this block, "
-            "then **Trade ticket (copy/paste)** (one expander) for the copy-ready leg list — same numbers as "
-            "**Summary**. That glance card carries the **interpretive disagreement** and **illustrative fit "
-            "classes** for the same exploration; your strikes instantiate **one** concrete payoff, not a "
-            "ranked choice."
+            "**How this ties together:** the **primary plain-English readout** is beside the chart "
+            "(**What this run is saying**). **Belief vs market — reference & fit bridge** is directly under this block "
+            "for **illustrative strategy families** (shape vocabulary tied to the disagreement scan), the number grid, "
+            "then **Trade ticket (copy/paste)** (one expander) — same numbers as **Summary**. "
+            "**Strategy & payoff** (left) is where you choose strikes/mode/size; families do **not** auto-link. "
+            "Your strikes instantiate **one** concrete payoff, not a ranked choice."
         )
     else:
         linkage_line = (
             "**Belief overlay off or not linked here:** there is no **interpretive disagreement** digest "
             "in this run. The **green line** and **Summary** still describe the structure; open "
-            "**Trade ticket (copy/paste)** just under the glance card (or directly under this review if the "
-            "glance card is empty) for the copy-paste leg block — same numbers as **Summary**."
+            "**Trade ticket (copy/paste)** under the reference card (or directly under this review if that "
+            "card is empty) for the copy-paste leg block — same numbers as **Summary**."
         )
 
     vs_sum = verification.get("verification_summary")
@@ -126,11 +127,13 @@ def build_decision_ready_review_payload(
             bullets.append(f"- **Strike construction:** {ob.strip()}")
     bullets.append(
         "- **Same numbers as Summary / ticket:** max gain, max loss, breakevens, and legs stay "
-        "single-source from the engine — open **Trade ticket (copy/paste)** below the glance card "
-        "(one expander) for the leg list."
+        "single-source from the engine — open **Trade ticket (copy/paste)** below the reference & fit bridge "
+        "card (one expander) for the leg list."
     )
 
-    fit_caption = "**Fit is not recommendation.** Illustrative structure only — same stance as the glance card."
+    fit_caption = (
+        "**Fit is not recommendation.** Illustrative structure only — same stance as the reference & fit bridge card."
+    )
     if has_glance and isinstance(glance, dict):
         fn = glance.get("fit_note")
         if isinstance(fn, str) and fn.strip():
