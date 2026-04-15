@@ -53,6 +53,27 @@ Minimum acceptable practice:
 - Create a short-lived branch for the pass, do the work, then merge via normal review flow.
 - If you must inspect `main`, do read-only inspection; do not edit.
 
+## Agent continuity (hard)
+
+When **live repo state exists**, the same agent must continue the pass. Live repo state includes:
+
+- stash entries
+- staged/uncommitted changes
+- partial recovery
+- branch/worktree divergence that has not been explicitly parked/handed off
+- any incomplete execution state
+
+A new agent is allowed only when the pass is fully closed and repo state is legible/parked (clean working tree, and any remaining state explicitly isolated and named).
+
+**Required execution output block:**
+
+```text
+AGENT CONTINUITY
+- Safe to switch agents? YES/NO
+- Exact reason:
+- If YES: exact handoff payload required:
+```
+
 ## BUILD preflight gate (required)
 
 BUILD is **blocked** unless a preflight report is produced and says **BUILD allowed: YES**.
@@ -220,3 +241,11 @@ Preferred format:
 - This doc governs steward workflow unless superseded by a newer accepted protocol doc.
 - **Mandatory handoff reporting split:** always report **Doc-state safety** (canonical docs aligned) separately from **Repo-state safety** (branch/divergence/cleanliness; reproducible checkout).
 - **Canonical naming:** treat **H1 / H1-01 / H1-02** as **non-canonical legacy shorthand** unless explicitly reintroduced by accepted repo docs. Prefer **Phase / Sprint / Slice / Execution step** identifiers in all control-plane updates.
+- Mandatory continuity reporting: include the **AGENT CONTINUITY** block in every execution-step return and handoff.
+
+## Current recovery reality (minimal note)
+
+- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `7cc2e28`
+- **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
+- **Slice 005 SELECTION** may proceed conceptually from canonical docs.
+- **BUILD remains blocked** pending later triage of the parked deferred state.
