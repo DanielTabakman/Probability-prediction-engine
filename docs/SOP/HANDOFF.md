@@ -2,7 +2,42 @@
 
 Purpose: minimum context needed for the next work session.
 
+## HANDOFF GATE (fill this block; no interpretation)
+
+Copy/paste and fill every field. Do not infer from memory; verify in repo/docs.
+
+```text
+HANDOFF GATE — v2.1 (DOCS-ONLY control-plane)
+
+A) DOC-STATE SAFETY (alignment)
+- Source-of-truth precedence: pushed repo+accepted docs > CURRENT_FRONTIER > HANDOFF > OPERATING_RULES
+- Active phase:
+- Active sprint:
+- Closed slices:
+- Next pending execution step:
+- Reporting posture: SLIM MODE / REPO-SENSOR execution-only
+- Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
+- Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
+- Canonical truth rule: steering truth lives in canonical docs; repo-state gate is separate
+
+B) REPO-STATE SAFETY (reproducibility)
+- Branch:
+- Ahead/behind vs origin:
+- Working tree: CLEAN / DIRTY
+- Dirty-state classification: M-only / U-only / M+U / Index-or-merge
+- Changed files by plane (CONTROL / PRODUCT / EVIDENCE):
+- Untracked canonical docs present? YES/NO (canonical = docs/SOP/**):
+- Mixed-plane dirty state? YES/NO:
+- BUILD allowed right now? YES/NO:
+- Operationally handoff-safe? YES/NO
+- If NO: exact reason (one sentence):
+```
+
 **Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
+
+**Repo navigation (agent map):** [CODEBASE_MAP.md](CODEBASE_MAP.md) (what lives where, hot files, validation paths, helper placement hygiene).
+
+**Workflow Metrics V1 (lightweight, cross-session):** see [WORKFLOW_METRICS_V1.md](WORKFLOW_METRICS_V1.md). Session logging uses chat commands `start session`, `break start`, `break end`, `session stop`. The assistant/steward should generate structured rows/events for the sheet at session and slice milestones. This is a lightweight convention, not a pass/fail gate.
 
 **Implied lab — validate, smoke, artifacts, closeout:** [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md).
 
@@ -10,37 +45,45 @@ Purpose: minimum context needed for the next work session.
 
 Declare **exactly one** execution step type per session (**BUILD**, **CLOSEOUT**, **RECOVERY**, **SELECTION**) and stay inside its allowed scope. Full anti-thrash rules—CLOSEOUT vs BUILD boundary, feature slice close criteria, validation labels (deterministic / environment-sensitive / live-data-sensitive), and stop-after-two for non-BUILD—live in [OPERATING_RULES.md](OPERATING_RULES.md) under **Execution step discipline**.
 
+**Coupled slice batching (optional):** tightly coupled slices may be batched into one **BUILD** only under the **Coupled slice batching** protocol in [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Batched work still requires clear **per-sub-slice** reporting at review/closeout (accepted/deferred/reopened); batching is never the default.
+
 **Closeout validation (summary):** [OPERATING_RULES.md](OPERATING_RULES.md) now defines **validation tiers** (universal vs conditional), a **closeout runtime budget** (do not let one unstable validation step dominate; stop after one or two inconclusive long runs and classify), **preflight hygiene** before smoke (clean instance, fresh port, avoid manual+smoke collision), and that **smoke C is not a universal tax**—required for classification/scenario-touched feature slices, otherwise supporting unless the spec says otherwise. Declare conditional runs in the feature slice spec / execution step when relevant.
 
 **Runtime health (optional):** stewards may record expected vs actual **validation runtime** (pytest / smoke inside the repo) with labels **NORMAL** / **SLOW_BUT_ACCEPTABLE** / **WATCH** / **ESCALATE** ([FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md)); that is separate from **Cursor turnaround** (same doc). Operators see §4 in [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md). Signals for drift and slowness trends—not default pass/fail gates.
 
+## Control-plane safety: doc-state vs repo-state (report separately)
+
+This repo can appear “aligned” in docs while still being **operationally unsafe to hand off** (dirty tree, untracked files, unknown divergence vs origin). Therefore, **handoff must report two independent states**:
+
+- **Doc-state safety (alignment)**: are canonical docs mutually consistent about phase/sprint/closed slices/next step?
+- **Repo-state safety (reproducibility)**: can a new steward pull/checkout and reproduce the declared state without ambiguity?
+
+**Canonical truth note:** `docs/SOP/CURRENT_FRONTIER.md` **outranks** this `HANDOFF.md` if they temporarily drift; treat drift as a control-plane bug and reconcile in the next docs-only pass.
+
 ## Current priority
 
-**SELECTION** — pick the next bounded feature slice from `docs/SOP/CURRENT_FRONTIER.md` (one-screen implied lab phase). **No active slice** after feature slice **009** closure.
+**SELECTION** — choose exactly one next bounded Sprint 001 slice (Phase 2) from `docs/SOP/CURRENT_FRONTIER.md`.
+
+**Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
+
+## Hard rule reminders (state-transition safety)
+
+- **No execution work directly on `main`**: all execution passes must use a short-lived branch or a worktree.
+- **Single-plane passes**: each pass declares exactly one plane (CONTROL-PLANE / PRODUCT-PLANE / EVIDENCE-PLANE / RECOVERY).
+- **BUILD requires preflight**: if preflight says BUILD allowed: NO, BUILD is blocked even if steering is clear.
+- **No untracked canonical docs across accepted baselines**: `docs/SOP/**` must not linger untracked at a baseline that is treated as “accepted”.
 
 ## Active feature slice
 
-**None.** Feature slice **009** (Implied lab operator runbook) closed (CLOSEOUT, 2026-04-11, docs-only). Prior: feature slice **008** closed (2026-04-11); feature slice **007** closed (2026-04-10).
+**None.**
 
 ## Current status
 
-The repo can run unit tests, the primary UI smoke script, and the actual Streamlit app locally. **Feature slice 009** added the canonical implied lab operator runbook: [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md) (preflight, Tier 1 vs smoke **C**, artifacts, caveats, closeout checklist). **Validation for 009:** documentation review only—no code changes.
-
-**Feature slice 008 (Glance-first orientation polish) remains closed** (2026-04-11): `python -m pytest -q` **PASS** (**36** tests); `python scripts/run_implied_lab_ui_smoke.py` **PASS** — manifest `artifacts/ui_smoke/20260411_131344/ui_smoke_manifest.json`; screenshot `artifacts/ui_smoke/20260411_131344/A_width_target_payoff.png` (`trade_ticket_found` **true**). **Smoke C** not required (presentation-only slice). **BUILD caveats (recorded in `CURRENT_FRONTIER.md`):** false expander-label match fixed before acceptance; one smoke run timed out (likely network/Deribit) before the passing run.
-
-**Feature slice 007** remains closed: flatter **Trade ticket** path after glance; **Decision-ready review** linkage; default smoke **A** `full_page=False` may still omit glance/ticket in the PNG — scroll or ad-hoc capture (`docs/IMPLIED_LAB_SMOKE.md`). **Trust strip** and feature slice **005** smoke **C** caveats unchanged in `CURRENT_FRONTIER.md`. UI smokes remain **live-data-sensitive** / **environment-sensitive** when Deribit/Yahoo fail or processes collide.
+The repo can run unit tests, the primary UI smoke script, and the Streamlit app locally. Control-plane Phase 2 docs exist (`PHASE_2_CHARTER.md`, `SPRINT_001_PHASE_2.md`), but Sprint 001 execution status must not be asserted from docs alone when repo-state is not reproducible.
 
 ## Completed recently
 
-- **closed:** **Feature slice 009 — Implied lab operator runbook** (`docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`; HANDOFF + CURRENT_FRONTIER updates; cross-links). **Closeout (2026-04-11):** docs-only consistency review.
-- **closed:** **Feature slice 008 — Glance-first orientation polish** (`src/viz/app.py` only; layout/copy/hierarchy). **Closeout (2026-04-11):** pytest **36** passed; smoke A **PASS** (`artifacts/ui_smoke/20260411_131344/`).
-- **closed:** **Feature slice 007 — Flatter trade ticket path** (`app.py` `right_ticket_slot`, `_implied_lab_trade_ticket_code_text`, `_render_implied_lab_trade_ticket_panel`; `decision_ready_review.py` linkage copy; `tests/test_implied_lab_trade_ticket.py` + updated `tests/test_decision_ready_review.py`). **Closeout (Execution step 27):** pytest **PASS**; smoke A **PASS** (`artifacts/ui_smoke/20260410_180727/ui_smoke_manifest.json`).
-- **closed:** **Feature slice 006 — Trust / provenance strip** (`build_trust_strip_lines`, `app.py` `right_trust_slot`, `tests/test_trust_strip.py`). **Closeout (Execution step 22):** pytest **PASS**; smoke A **PASS** (`artifacts/ui_smoke/20260410_171958/ui_smoke_manifest.json`).
-- **closed:** **Feature slice 005 — Decision-ready trade review** (`decision_ready_review.py`, right-column block between Summary and glance, `tests/test_decision_ready_review.py`). **Closeout (Execution step 16):** pytest **PASS**; smoke A **PASS** (`artifacts/ui_smoke/20260410_153957/ui_smoke_manifest.json`); smoke C **FAIL** on that rerun — see `CURRENT_FRONTIER.md`.
-- **closed:** **Feature slice 004 — Main disagreement digest & fit-family linkage** (`build_disagreement_scan_payload`, glance UI reorder, audit expander, tests). **Closeout (Execution step 13):** `python -m pytest -q` **PASS** (21 tests). `python scripts/run_implied_lab_ui_smoke.py` **PASS** — manifest `artifacts/ui_smoke/20260410_145441/ui_smoke_manifest.json`. `python scripts/implied_lab_ui_smoke_harness.py --scenario C_directional_peak_disagreement --port <ephemeral>` **PASS** — manifest `artifacts/ui_smoke/20260410_150352/ui_smoke_manifest.json`. (One earlier headless **C** attempt in the same session hung until stale Python processes were cleared; second run **PASS** — classify hang as **environment-sensitive**, not product regression.)
-- completed: **Feature slice 003 — Belief uncertainty capture (±% move (1σ) input mode + σ_ln mapping + tests)**
-- verified: `python -m pytest -q` is green; prior green evidence exists for UI smoke A and C (may flap when data unavailable).
-- cleanup done:
+See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative list. This handoff intentionally stays minimal and non-duplicative to reduce drift.
 
 ## Remaining
 
@@ -85,7 +128,34 @@ The repo can run unit tests, the primary UI smoke script, and the actual Streaml
 
 ## Recommended next step
 
-**SELECTION** — choose exactly one next bounded feature slice from `docs/SOP/CURRENT_FRONTIER.md` under the current one-screen implied lab phase (no slice is pre-selected here).
+**SELECTION** — choose exactly one next bounded Sprint 001 slice from `docs/SOP/CURRENT_FRONTIER.md` (Phase 2). **Conceptual selection is allowed** even while BUILD is gated; **execution remains blocked** until repo-state is reproducible.
+
+## Handoff checklist (must be filled each handoff)
+
+### A) Doc-state safety / alignment (canonical docs only)
+
+- **Active phase**:
+- **Active sprint**:
+- **Closed slices (Sprint 001)**:
+- **Next pending execution step**:
+- **Reporting posture**: **SLIM MODE** and (if applicable) **REPO-SENSOR execution-only** (no extra analysis)
+- **Canonical truth rule**: confirm `CURRENT_FRONTIER` outranks `HANDOFF` if drift is detected (until reconciled)
+- **Non-canonical naming note**: confirm any **H1 / H1-01 / H1-02** shorthand is treated as **non-canonical legacy** unless explicitly reintroduced by accepted docs (prefer Phase/Sprint/Slice identifiers)
+
+### B) Repo-state safety / reproducibility (operational)
+
+- **Branch**:
+- **Ahead/behind vs `origin/<branch>`**:
+- **Working tree**: **CLEAN** / **DIRTY**
+- **Dirty-state classification** (choose one):
+  - **M-only** (modified tracked files only)
+  - **U-only** (untracked files only)
+  - **M+U** (both modified + untracked)
+  - **Index/merge** (staged changes, conflicts, or in-progress operations)
+- **Operationally handoff-safe?** **YES/NO**
+  - **YES** requires: pushed/known branch, divergence known, and a clean or intentionally-classified state that a new steward can reproduce without guessing
+  - **NO** requires: state is dirty/unknown enough that a new steward could misread “what is real” vs “local leftovers”
+- **If NO**: one-sentence reason (e.g., “docs aligned but `main` dirty with untracked artifacts; not reproducible from origin”)
 
 ## Baseline checkpoint (Execution step 18, 2026-04-10, RECOVERY)
 

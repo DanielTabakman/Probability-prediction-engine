@@ -5,6 +5,7 @@
 - **Frontier Steward** is the context window responsible for project continuity, bounded slice selection, workflow integrity, and strategic guidance.
 - **Repo/docs truth overrides chat memory.**
 - **Handoffs are summaries, not ground truth.**
+- **Handoff safety has two independent axes:** **doc-state alignment** and **repo-state reproducibility**. Report them separately at handoff.
 
 ## Source-of-truth order
 
@@ -26,6 +27,50 @@ Exactly **one** execution step type per pass:
 - **BUILD**
 - **CLOSEOUT**
 - **RECOVERY**
+
+## Plane discipline (single-plane per execution pass)
+
+Each execution pass must declare **exactly one plane** and stay inside it. This prevents mixed acceptance and recurring cleanup.
+
+Plane labels:
+
+- **CONTROL-PLANE** — `docs/SOP/` frontier/handoff/protocol/operating rules
+- **PRODUCT-PLANE** — user-facing behavior (`src/`, app behavior)
+- **EVIDENCE-PLANE** — tests/harness/validation tooling (`tests/`, `scripts/`, validation docs when strictly operational)
+- **RECOVERY** — state repair only (see `docs/SOP/RECOVERY_PROTOCOL.md`)
+
+**Rule:** If the working tree is dirty in more than one plane, the pass is blocked unless the declared plane is **RECOVERY** and the work is bounded to state separation/repair.
+
+## Hard git rule: no execution work directly on `main`
+
+Cursor must not perform execution work directly on `main`. Every execution pass runs in isolation:
+
+- Use a **short-lived branch** (preferred) or a **worktree**.
+- Keep it operational and simple; do not introduce a new framework.
+
+Minimum acceptable practice:
+
+- Create a short-lived branch for the pass, do the work, then merge via normal review flow.
+- If you must inspect `main`, do read-only inspection; do not edit.
+
+## BUILD preflight gate (required)
+
+BUILD is **blocked** unless a preflight report is produced and says **BUILD allowed: YES**.
+
+Preflight must report repo facts (machine-derived where possible) and only then steward interpretation.
+
+**Preflight required fields:**
+
+- branch
+- ahead/behind vs `origin/<branch>`
+- working tree clean/dirty
+- changed files by plane (CONTROL/PRODUCT/EVIDENCE)
+- untracked canonical docs: yes/no (canonical docs = `docs/SOP/**`)
+- mixed-plane dirty state: yes/no
+- BUILD allowed: yes/no
+- exact blocker if no (one line, unambiguous)
+
+**Canonical fact rule:** repo facts should be produced by commands (e.g., git status/diff); steward explains meaning, but should not hand-author “facts” when machine output exists.
 
 ## Steward operating rules
 
@@ -53,6 +98,30 @@ Use separate steps when:
 - Slice touches engine behavior, state shape, classification, thresholds, derivation, fetches, validation harness semantics, or broader architecture.
 - Validation may require iteration or interpretation.
 - Closure status depends on judgment after seeing results.
+
+### Coupled slice batching (BUILD-only)
+
+Multiple slices may be **batched into one BUILD** only when **all** are true:
+
+- They serve **one immediate user outcome**.
+- They touch **mostly the same file cluster / UI region**.
+- They share the **same validation path** (same “what we run” to assess).
+- **Semantic ambiguity is low** (reviewers can tell what changed and why).
+- Each sub-slice can still be described cleanly in review/closeout (no blur).
+
+Batching is **not allowed** when any are true:
+
+- One sub-slice could plausibly **pass** while another plausibly **fails**.
+- **Semantic layers differ materially** (e.g., UI polish vs derivation vs harness semantics).
+- **Validation requirements differ materially**.
+- A likely **reopen** of one part would muddy ownership/clarity of the others.
+- Control-plane reporting would stop being crisp (unclear “what happened” per sub-slice).
+
+Closeout rule for batched work:
+
+- Closeout must record a **batched set title** and the **sub-slices included**.
+- It must state what **each sub-slice accomplished**.
+- It must label each sub-slice as **accepted** / **deferred** / **reopened**.
 
 ## Closeout minimums
 
@@ -149,3 +218,5 @@ Preferred format:
 
 - Next steward should read **this doc** before trusting prior chat narrative.
 - This doc governs steward workflow unless superseded by a newer accepted protocol doc.
+- **Mandatory handoff reporting split:** always report **Doc-state safety** (canonical docs aligned) separately from **Repo-state safety** (branch/divergence/cleanliness; reproducible checkout).
+- **Canonical naming:** treat **H1 / H1-01 / H1-02** as **non-canonical legacy shorthand** unless explicitly reintroduced by accepted repo docs. Prefer **Phase / Sprint / Slice / Execution step** identifiers in all control-plane updates.

@@ -9,11 +9,43 @@ Purpose: lightweight rules for how work gets done in this repo.
 4. Validate with **automated tests**, **app launch/inspection** when UI changes, and **targeted cleanup**—that stack is the safety system, not hesitation.
 5. End with a short factual closeout report.
 
+## Default response conventions (agent/steward)
+- Default to **SLIM MODE** unless **AUDIT MODE** is explicitly requested.
+- Each execution-step return should include a short **REPO-SENSOR REPORT** (what changed in the working tree: modified/untracked files).
+
 ## Execution step discipline (anti-thrash rules)
 
 *An **execution step** is one bounded operational pass; we formerly called this a **transaction**.*
 
 Every work pass is an **execution step** and must declare **exactly one** execution step type up front. Agents must obey the allowed-scope boundary of the declared type.
+
+## Plane discipline (hard rule)
+
+Each execution pass must be **single-plane**. Declare exactly one plane up front and do not mix planes inside the same execution pass.
+
+Plane labels:
+
+- **CONTROL-PLANE**: `docs/SOP/` frontier/handoff/protocol/operating rules
+- **PRODUCT-PLANE**: user-facing behavior (`src/`, app behavior)
+- **EVIDENCE-PLANE**: tests/harness/validation tooling (`tests/`, `scripts/`, validation tooling)
+- **RECOVERY**: state repair only (see `docs/SOP/RECOVERY_PROTOCOL.md`)
+
+**Mixed-plane guardrail:** if the working tree is dirty across multiple planes, BUILD is blocked. Only a **RECOVERY** pass may touch multiple planes, and only to **separate/undo** mixed state (not to advance product work).
+
+## Hard git rule: no execution work directly on `main`
+
+Cursor must not do execution work directly on `main`. Each execution pass must use:
+
+- a short-lived **branch**, or
+- a **worktree**.
+
+This is an operational safety rule to prevent “dirty main” cleanup cycles.
+
+## Agent continuity rule (hard)
+
+When **live repo state exists** (branch/worktree divergence, stash entries, staged/uncommitted changes, partial recovery, or any incomplete execution state), the same agent must continue the pass.
+
+A new agent is allowed only after the pass is fully closed and repo state is legible/parked (clean working tree, and any remaining state explicitly isolated and named).
 
 ### RULE 1 — Execution step types are mandatory
 Choose exactly one:
@@ -140,6 +172,23 @@ Short operational checklist **before** smoke or live closeout (reduces stale-pro
 - Avoid **simultaneous** manual Streamlit run and automated smoke against the same port when you can separate them in time or by port.
 
 Keep this lightweight—checklist, not a new procedure tree.
+
+## BUILD preflight gate (hard requirement)
+
+Before any **BUILD** execution pass, produce a preflight report. **BUILD is blocked** unless the report says **BUILD allowed: YES**.
+
+Preflight must include (machine-derived where possible):
+
+- branch
+- ahead/behind vs `origin/<branch>`
+- clean/dirty
+- changed files by plane (CONTROL/PRODUCT/EVIDENCE)
+- untracked canonical docs: yes/no (canonical docs = `docs/SOP/**`)
+- mixed-plane dirty state: yes/no
+- BUILD allowed: yes/no
+- exact blocker if no (one line)
+
+Steward/agent may interpret meaning after listing facts, but should not hand-author repo facts that can be generated.
 
 ## Default posture
 - Prefer **substantive feature slices** that are still testable over the smallest possible diff for its own sake.
