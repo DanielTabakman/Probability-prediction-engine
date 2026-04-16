@@ -130,6 +130,8 @@ Multiple slices may be **batched into one BUILD** only when **all** are true:
 - **Semantic ambiguity is low** (reviewers can tell what changed and why).
 - Each sub-slice can still be described cleanly in review/closeout (no blur).
 
+**Phase 2 (UX-loop) note:** Adjacent loop slices (e.g., **starter/presets** + **plain-English “what changed?”** readout) may be batched **only** when they remain **PRODUCT-PLANE**, share **Tier 1** validation, and the “what changed” language is explicitly checked against `docs/SEMANTIC_CONTRACTS.md` (no new semantic claims).
+
 Batching is **not allowed** when any are true:
 
 - One sub-slice could plausibly **pass** while another plausibly **fails**.
