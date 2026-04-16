@@ -51,6 +51,7 @@ from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
+from src.viz.implied_lab_presets import PRESETS, compute_preset_shape
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -789,8 +790,59 @@ if show_bitcoin_view:
                             atm = min(avail_strikes, key=lambda k: abs(k - forward))
 
                             st.markdown("###### Strategy & payoff")
+                            st.caption("Quick start: pick a preset to visibly change the green payoff line (main object).")
                             # Mode ownership (Sprint 1A): exact strikes vs target payoff
                             mode_key = f"implied_lab_mode_{selected_expiry_str}"
+
+                            # Sprint 001 Slice 005 — one obvious first move (presets)
+                            def _apply_preset(preset_id: str) -> None:
+                                shape = compute_preset_shape(
+                                    preset_id=preset_id,
+                                    forward=float(forward),
+                                    avail_strikes=[float(x) for x in avail_strikes],
+                                )
+                                # Presets are "first move" affordances: switch to an immediately inspectable state.
+                                st.session_state[mode_key] = "Exact strikes"
+                                st.session_state[shape_key] = {
+                                    **(
+                                        st.session_state.get(shape_key, {})
+                                        if isinstance(st.session_state.get(shape_key, {}), dict)
+                                        else {}
+                                    ),
+                                    "k1": float(shape["k1"]),
+                                    "k2": float(shape["k2"]),
+                                    "k3": float(shape["k3"]),
+                                    "k4": float(shape["k4"]),
+                                    "reverse": bool(shape["reverse"]),
+                                    "use_k1": bool(shape["use_k1"]),
+                                    "use_k2": bool(shape["use_k2"]),
+                                    "use_k3": bool(shape["use_k3"]),
+                                    "use_k4": bool(shape["use_k4"]),
+                                    "qty": int(shape.get("qty", 1)),
+                                }
+
+                                # Keep widget keys coherent (so the left-column controls match the derived payoff immediately).
+                                strike_key = selected_expiry_str
+                                st.session_state[f"u4_k1_{strike_key}"] = int(float(shape["k1"]))
+                                st.session_state[f"u4_k2_{strike_key}"] = int(float(shape["k2"]))
+                                st.session_state[f"u4_k3_{strike_key}"] = int(float(shape["k3"]))
+                                st.session_state[f"u4_k4_{strike_key}"] = int(float(shape["k4"]))
+                                st.session_state["u4_use_k1"] = bool(shape["use_k1"])
+                                st.session_state["u4_use_k2"] = bool(shape["use_k2"])
+                                st.session_state["u4_use_k3"] = bool(shape["use_k3"])
+                                st.session_state["u4_use_k4"] = bool(shape["use_k4"])
+                                st.session_state["u4_reverse"] = bool(shape["reverse"])
+                                st.rerun()
+
+                            preset_cols = st.columns(3)
+                            for i, pid in enumerate(list(PRESETS.keys())[:3]):
+                                with preset_cols[i]:
+                                    if st.button(
+                                        PRESETS[pid].label,
+                                        use_container_width=True,
+                                        key=f"btn_implied_preset_{selected_expiry_str}_{pid}",
+                                    ):
+                                        _apply_preset(pid)
                             # Important: do not pass a computed `index` derived from session_state.
                             # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
                             mode = st.radio(
