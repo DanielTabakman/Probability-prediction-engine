@@ -14,13 +14,13 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 **Steering continuity (doc-state, canonical):**
 - **Phase 2 is active.**
 - **Sprint 001 is active.**
-- **Slices 001–004 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
+- **Slices 001–006 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
 - **Slice 005 (CLOSED):** **Sprint 001 — Slice 005 — Starter state + one obvious first move (presets)**.
-- **Slice 006 (SELECTED, conceptual):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout**.
+- **Slice 006 (CLOSED):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout** (preset-driven readout shipped on baseline).
 
 **Repo-state gate (operational, separate from steering):**
 
-- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `8113703`
+- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
@@ -39,17 +39,18 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**Sprint 001 — Slice 006 (SELECTED, conceptual):** **Last-action meaning: plain-English “what changed?” readout**.  
-**Next move:** **BUILD (allowed)** from the clean baseline (use a fresh BUILD branch/worktree; do not use parked branches).
+**None.** **Sprint 001 — Slice 006** is **closed** on the accepted baseline (plain-English preset “what changed?” readout shipped).  
+**Next move:** **SELECTION** — next Sprint 001 increment (per `SPRINT_001_PHASE_2.md` / Phase 2 charter), then **BUILD** on a fresh branch/worktree when selected; do not use parked branches.
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
+- **Sprint 001 — Slice 006 (CLOSED, product):** plain-English preset “what changed?” readout — shipped on accepted baseline (`519d6d7` and later).
 - **Feature slice 011 (docs-only): Phase 1 exit criteria and demo acceptance** — `docs/SOP/PHASE_1_EXIT_CRITERIA.md`; control-plane alignment. **Closeout evidence:** documentation review only (no product code changes claimed in this slice closeout record).
 - **Feature slice 009 (closed): Implied lab operator runbook** — `docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`; HANDOFF/CURRENT_FRONTIER cross-links; `docs/IMPLIED_LAB_SMOKE.md`, `docs/Frontier_Steward_Handoff.md`. **Closeout:** docs-only; pytest/smoke not required for that slice.
 - **Feature slice 008 (local / unaccepted notes): Glance-first orientation polish** — historical implementation notes only; **do not treat as accepted closure** unless repo-state is reconciled and committed.
 - **Feature slice 007 (local / unaccepted notes): Trade ticket path + linkage copy** — historical implementation notes only; **do not treat as accepted closure** unless repo-state is reconciled and committed.
-- **Feature slice 006 (local / unaccepted notes): Trust / provenance strip** — historical implementation notes only; **do not treat as accepted closure** unless repo-state is reconciled and committed.
+- **Legacy Phase 1 increment (older “Sprint/Feature 006” id — trust / provenance strip):** **CLOSED** — distinct from **Sprint 001 — Slice 006** (Phase 2 last-action readout).
 - **Feature slice 005 (local / unaccepted notes): Decision-ready trade review** — historical implementation notes only; **do not treat as accepted closure** unless repo-state is reconciled and committed.
 - **Feature slice 004 (closed): Scannable main-disagreement digest** — `build_disagreement_scan_payload()` → `digest_lines`, `fit_bridge_intro`, `fit_bridge_bullets` on `belief_vs_market_glance`; glance UI shows digest/bridge first, audit trail collapsed; tests extended. **Closeout validation:** `python -m pytest -q` **PASS** (21 tests); `python scripts/run_implied_lab_ui_smoke.py` **PASS**; `python scripts/implied_lab_ui_smoke_harness.py --scenario C_directional_peak_disagreement --port <ephemeral>` **PASS** (see manifests `artifacts/ui_smoke/20260410_145441/`, `artifacts/ui_smoke/20260410_150352/`).
 - **Feature slice 003: Belief uncertainty capture** — added an intuitive **±% move (1σ)** uncertainty input mode (with explicit σ_ln mapping and market-horizon comparison) while preserving the existing internal lognormal belief overlay model; added focused unit tests.
@@ -83,4 +84,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-13 by agent (**DOCS-ONLY control-plane** — Phase 2 charter + Sprint 001 spec + workflow metrics added; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-16 by agent (**DOCS-ONLY control-plane** — steering ledger aligned to baseline reality: Sprint 001 Slice 006 **closed** shipped; baseline gate points to branch tip). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
