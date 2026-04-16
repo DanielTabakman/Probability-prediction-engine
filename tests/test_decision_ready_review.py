@@ -70,6 +70,7 @@ class TestDecisionReadyReviewPayload(unittest.TestCase):
         self.assertIn("Iron condor", p["structure_line"])
         self.assertIn("Range-bound", p["payoff_line"])
         self.assertIn("Belief vs market", p["linkage_line"])
+        self.assertIn("What this run is saying", p["linkage_line"])
         self.assertIn("Trade ticket (copy/paste)", p["linkage_line"])
         self.assertIn("directly under this block", p["linkage_line"])
         self.assertEqual(len(p["bullets"]), 2)

@@ -503,6 +503,14 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         call_usd = [float(m.get("mark_btc") or 0.0) * forward for m in call_marks]
         market_pdf_raw = market_implied_density_breeden_litzenberger(strikes, call_usd, prices)
 
+    # Canonical truth for whether the orange curve is actually usable on this run.
+    # This must stay aligned between verification payload, market snapshot, and chart headings.
+    orange_available = bool(
+        market_pdf_raw
+        and len(market_pdf_raw) == len(prices)
+        and max(market_pdf_raw) > 1e-20
+    )
+
     # Determine strikes based on mode ownership.
     solve_work: dict[str, Any] | None = None
     if state["mode"] == "target_payoff":
@@ -550,6 +558,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 belief_largest_gap_price_usd=float(_gap_fail)
                 if _gap_fail is not None
                 else None,
+                market_implied_orange_available=bool(orange_available),
             )
             return {
                 "strategy": None,
@@ -558,6 +567,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 "chart_helpers": {
                     "market_pdf_raw": market_pdf_raw,
                     "market_pct": market_pct,
+                    "orange_available": bool(orange_available),
                     "anomalous": anomalous,
                     **belief_pack["chart_helpers_extra"],
                 },
@@ -638,7 +648,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
 
     market_pct: list[float] = []
     anomalous = False
-    if market_pdf_raw:
+    if orange_available:
         max_mkt = max(market_pdf_raw) if market_pdf_raw else 1.0
         market_pct = [(d / max_mkt * 25.0) if max_mkt > 0 else 0.0 for d in market_pdf_raw]
         anomalous = is_anomalous(prices, market_data["dist"]["pdf_raw"], market_pdf_raw, threshold=0.015)
@@ -674,6 +684,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         solve_error=None,
         lab_mode=state.get("mode"),
         belief_largest_gap_price_usd=float(_gap_ok) if _gap_ok is not None else None,
+        market_implied_orange_available=bool(orange_available),
     )
 
     return {
@@ -683,6 +694,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         "chart_helpers": {
             "market_pdf_raw": market_pdf_raw,
             "market_pct": market_pct,
+            "orange_available": bool(orange_available),
             "anomalous": anomalous,
             **belief_pack["chart_helpers_extra"],
         },

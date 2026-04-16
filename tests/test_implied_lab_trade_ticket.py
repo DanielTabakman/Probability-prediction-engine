@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.viz.app import _implied_lab_trade_ticket_code_text
+from src.viz.implied_lab_trade_ticket import implied_lab_trade_ticket_code_text
 
 
 class TestImpliedLabTradeTicketCodeText(unittest.TestCase):
@@ -33,7 +33,7 @@ class TestImpliedLabTradeTicketCodeText(unittest.TestCase):
             "max_loss": 200.0,
             "breakevens": [44_000.0, 56_000.0],
         }
-        text, prems, sides = _implied_lab_trade_ticket_code_text(
+        text, prems, sides = implied_lab_trade_ticket_code_text(
             selected_expiry_str="2026-06-26",
             qty=2,
             forward=50_000.0,

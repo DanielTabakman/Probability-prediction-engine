@@ -65,6 +65,12 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
         if isinstance(note, str) and note.strip():
             lines.append(f"**Belief (teal):** {note.strip()}")
 
+    mdl = verification.get("market_data_legibility")
+    if isinstance(mdl, dict):
+        suf = mdl.get("trust_strip_suffix")
+        if isinstance(suf, str) and suf.strip():
+            lines.append(suf.strip())
+
     lines.append(TRUST_STRIP_VERIFICATION_POINTER)
     return lines
 
@@ -216,6 +222,132 @@ def _verification_summary_block(
     }
 
 
+def build_market_data_legibility_payload(
+    market_data: dict[str, Any],
+    *,
+    call_n: int,
+    put_n: int,
+) -> dict[str, Any]:
+    """
+    Bounded, honest UI copy for live-data / fetch-path state (Feature slice 010).
+
+    When ``live_data_provenance`` is absent (e.g. unit tests with minimal market_data),
+    returns a neutral pointer without inventing fetch outcomes.
+    """
+    prov = market_data.get("live_data_provenance")
+    if not isinstance(prov, dict):
+        return {
+            "summary_line": (
+                "Market snapshot: **Trust / provenance** below lists as-of and sources; "
+                "fetch-path detail is attached only in the full Streamlit run."
+            ),
+            "expander_expanded": False,
+            "detail_markdown": "",
+            "trust_strip_suffix": None,
+        }
+
+    spot = str(prov.get("spot_reference") or "unknown")
+    ticker_ok = bool(prov.get("deribit_atm_ticker_ok"))
+    iv_ok = bool(prov.get("atm_iv_from_deribit"))
+
+    bullets: list[str] = []
+    degraded = False
+    partial_orange = call_n < 3
+
+    if spot == "deribit_btc_index":
+        bullets.append(
+            "- **Spot reference:** Deribit **BTC index** (used for pricing hooks in this run)."
+        )
+    elif spot == "yahoo_btc_usd_last_close":
+        bullets.append(
+            "- **Spot reference:** **Yahoo BTC-USD** last close in the cached window — "
+            "the Deribit index did not return within the short timeout. "
+            "Deribit forward/marks may still load, but the anchor spot is **not** the index."
+        )
+        degraded = True
+    else:
+        bullets.append("- **Spot reference:** not classified for this run.")
+        degraded = True
+
+    if ticker_ok:
+        bullets.append(
+            "- **Forward:** Deribit **ATM option ticker** for this expiry (forward/index fields from ticker)."
+        )
+    else:
+        bullets.append(
+            "- **Forward / ATM IV:** **Fallback** — no usable Deribit ATM ticker for this expiry. "
+            "Forward is set to the **spot reference** above; ATM IV uses the app **default** (60% annualized) "
+            "for the purple **reference** lognormal only."
+        )
+        degraded = True
+
+    if ticker_ok and not iv_ok:
+        bullets.append(
+            "- **ATM IV:** Ticker returned **no mark IV** — purple reference uses the app **default** annualized vol."
+        )
+        degraded = True
+
+    if partial_orange:
+        bullets.append(
+            f"- **Orange curve (Breeden–Litzenberger):** **Not computed** — need ≥3 call marks; "
+            f"this expiry has **{call_n}**. Purple still shows; the options-implied priced distribution is **partially unavailable**."
+        )
+    else:
+        bullets.append(
+            f"- **Option marks (this expiry):** **{call_n}** calls, **{put_n}** puts — orange curve is **eligible** "
+            "(still subject to numeric stability and cache timing)."
+        )
+
+    ttl = market_data.get("quote_cache_ttl_s")
+    if ttl is None:
+        bullets.append(
+            "- **Timing / cache:** As-of is the **run snapshot** (UTC); quote cache TTL is not set on this run."
+        )
+    else:
+        try:
+            ti = int(ttl)
+        except (TypeError, ValueError):
+            ti = None
+        if ti is not None:
+            bullets.append(
+                f"- **Timing / cache:** As-of is the **run snapshot** (UTC). Deribit REST responses may be **cached up to {ti}s** — "
+                "not tick-by-tick."
+            )
+        else:
+            bullets.append(
+                "- **Timing / cache:** As-of is the **run snapshot** (UTC); cache behavior see **Verification** notes."
+            )
+
+    if degraded or partial_orange:
+        summary = (
+            "**Market data — degraded or partial** — "
+            "do not read the chart as fully current exchange truth."
+        )
+    else:
+        summary = (
+            "**Market data — nominal path** — "
+            "primary Deribit inputs resolved; quotes may still be **cached** (see below)."
+        )
+
+    trust_suffix: str | None = None
+    if degraded:
+        trust_suffix = (
+            "**Market inputs:** degraded path (non-index spot and/or Deribit ticker fallback) — "
+            "see **Market data status** above."
+        )
+    elif partial_orange:
+        trust_suffix = (
+            "**Market-implied curve:** partial — orange Breeden–Litzenberger skipped (fewer than 3 call marks)."
+        )
+
+    return {
+        "summary_line": summary,
+        "expander_expanded": bool(degraded or partial_orange),
+        "detail_markdown": "\n".join(bullets),
+        "trust_strip_suffix": trust_suffix,
+    }
+
+
 def build_belief_disagreement_verification_trace(
     belief_disagreement: dict[str, Any] | None,
 ) -> dict[str, Any] | None:
@@ -295,6 +427,7 @@ def build_verification_payload(
     solve_error: str | None = None,
     lab_mode: str | None = None,
     belief_largest_gap_price_usd: float | None = None,
+    market_implied_orange_available: bool | None = None,
 ) -> dict[str, Any]:
     """
     Normalize verification fields for the current derive_lab_outputs run.
@@ -319,13 +452,23 @@ def build_verification_payload(
 
     call_n = len(call_marks)
     breeden_gate = call_n >= 3
-    breeden_status = "computed" if breeden_gate else "skipped"
+    orange_available = (
+        bool(market_implied_orange_available)
+        if market_implied_orange_available is not None
+        else bool(breeden_gate)
+    )
+    breeden_status = "computed" if orange_available else "skipped"
     skip_reason: str | None = None
-    if not breeden_gate:
-        skip_reason = (
-            "Fewer than 3 call option marks at this expiry — Breeden–Litzenberger "
-            "is not run (same gate as the chart engine)."
-        )
+    if not orange_available:
+        if not breeden_gate:
+            skip_reason = (
+                "Fewer than 3 call option marks at this expiry — Breeden–Litzenberger "
+                "is not run (same gate as the chart engine)."
+            )
+        else:
+            skip_reason = (
+                "Market-implied distribution not available on this run (computed curve missing or degenerate)."
+            )
 
     summary_err = summary.get("error")
     err = solve_error or (summary_err if isinstance(summary_err, str) else None)
@@ -357,10 +500,18 @@ def build_verification_payload(
         lab_mode=lab_mode,
     )
 
+    put_n = len(market_data.get("put_marks") or [])
+    market_data_legibility = build_market_data_legibility_payload(
+        market_data,
+        call_n=call_n,
+        put_n=put_n,
+    )
+
     return {
         "data_sources": data_sources,
         "as_of_utc": as_of_utc,
         "lab_mode": lab_mode,
+        "market_implied_orange_available": bool(orange_available),
         "verification_summary": verification_summary,
         "belief_vs_market_glance": belief_vs_market_glance,
         "snapshot_note": (
@@ -408,6 +559,7 @@ def build_verification_payload(
         "belief_disagreement_verification": build_belief_disagreement_verification_trace(
             belief_disagreement
         ),
+        "market_data_legibility": market_data_legibility,
         "strategy_summary": {
             "applicable": applicable,
             "error": err,
