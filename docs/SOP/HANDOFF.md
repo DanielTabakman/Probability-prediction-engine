@@ -67,7 +67,9 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
-**SELECTION (complete):** **Sprint 001 — Slice 005 selected (conceptual)** = **Starter state + one obvious first move (presets)**.
+**SELECTION (complete):**
+- **Sprint 001 — Slice 005 CLOSED** = **Starter state + one obvious first move (presets)**.
+- **Sprint 001 — Slice 006 SELECTED (conceptual)** = **Last-action meaning: plain-English “what changed?” readout**.
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -86,7 +88,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 **Post-recovery reality (minimal, operational):**
 
-- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `9f5175f`
+- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `8113703`
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
 - **Slice 005 SELECTION** is complete (selected concept recorded in `docs/SOP/CURRENT_FRONTIER.md`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
@@ -138,7 +140,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**BUILD** — **Sprint 001 — Slice 005** from the clean baseline (use a fresh BUILD branch/worktree; do not use parked branches).
+**BUILD** — **Sprint 001 — Slice 006** from the clean baseline (use a fresh BUILD branch/worktree; do not use parked branches).
 
 ## Handoff checklist (must be filled each handoff)
 
