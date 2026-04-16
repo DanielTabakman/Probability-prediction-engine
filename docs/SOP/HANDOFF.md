@@ -99,7 +99,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task:
+- next task: **SELECTION complete → proceed to BUILD**: **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “What changed?” readout beyond presets to cover mode switch, leg toggles, strike edits, polarity/qty).
 - deferred:
 - optional:
 

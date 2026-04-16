@@ -40,7 +40,7 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 
 ## Current feature slice
 **None.** **Sprint 001 — Slice 006** is **closed** on the accepted baseline (plain-English preset “what changed?” readout shipped).  
-**Next move:** **SELECTION** — next Sprint 001 increment (per `SPRINT_001_PHASE_2.md` / Phase 2 charter), then **BUILD** on a fresh branch/worktree when selected; do not use parked branches.
+**Next move (SELECTED):** **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the plain-English “what changed?” readout so it updates for the main user edits beyond presets: mode switch, leg toggles, strike edits, polarity/qty). Then **BUILD** on a fresh branch/worktree; do not use parked branches.
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
