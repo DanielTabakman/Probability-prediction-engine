@@ -67,10 +67,11 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
-**SELECTION / execution posture (Sprint 001):**
+**Execution posture (Sprint 001):**
 - **Sprint 001 — Slice 005 CLOSED** = **Starter state + one obvious first move (presets)**.
 - **Sprint 001 — Slice 006 CLOSED** = **Last-action meaning: plain-English “what changed?” readout** (preset-driven readout on accepted baseline).
 - **Sprint 001 — Slice 007 CLOSED** = **Last-action meaning for non-preset interactions** (extend “what changed?” beyond presets; shipped on accepted baseline).
+- **Sprint 001 — Slice 008 SELECTED (next BUILD)** = **Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3.
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -100,7 +101,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — choose the next Sprint 001 slice after Slice 007 closeout (then proceed to **BUILD** on a fresh branch/worktree; do not use parked branches).
+- next task: **BUILD** — **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** (selected 2026-04-16; fresh branch/worktree from clean baseline; do not use parked branches).
 - deferred:
 - optional:
 
@@ -141,7 +142,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — next **Sprint 001** slice after **Slice 007** closeout (then **BUILD** on a fresh branch/worktree; do not use parked branches).
+**BUILD** — **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** (bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3; trust/provenance posture unchanged).
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -183,4 +184,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-16 by agent (**DOCS-ONLY** — ledger aligned: Sprint 001 Slice 007 **closed** shipped; baseline gate uses branch tip; recommended next step **SELECTION**). Prior: 2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-16 by agent (**DOCS-ONLY** — SELECTION: next BUILD target **Sprint 001 — Slice 008**; ledger aligned; baseline gate uses branch tip). Prior same day: Slice 007 **closed** shipped; recommended next step was **SELECTION**. Prior: 2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: legacy Phase 1 feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.

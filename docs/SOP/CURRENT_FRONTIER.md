@@ -18,6 +18,7 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 - **Slice 005 (CLOSED):** **Sprint 001 — Slice 005 — Starter state + one obvious first move (presets)**.
 - **Slice 006 (CLOSED):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout** (preset-driven readout shipped on baseline).
 - **Slice 007 (CLOSED):** **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “what changed?” readout beyond presets; shipped on accepted baseline).
+- **Slice 008 (SELECTED, not started):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — next BUILD target after SELECTION (2026-04-16); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3 (collapse/move/reweight visual weight; **trust/provenance** remains visible).
 
 **Repo-state gate (operational, separate from steering):**
 
@@ -40,14 +41,14 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**None.** **Sprint 001 — Slice 007** is **closed** on the accepted baseline (extend the plain-English “what changed?” readout beyond presets; shipped).  
-**Next move (SELECTED):** **SELECTION** — choose the next Sprint 001 slice after Slice 007 closeout (then **BUILD** on a fresh branch/worktree; do not use parked branches).
+**None** (no BUILD in flight). **Sprint 001 — Slice 007** is **closed** on the accepted baseline (extend the plain-English “what changed?” readout beyond presets; shipped).  
+**Next BUILD target (SELECTED):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — execute next as **BUILD** on a fresh branch/worktree from the clean baseline (do not use parked branches).
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
 - **Sprint 001 — Slice 006 (CLOSED, product):** plain-English preset “what changed?” readout — shipped on accepted baseline (`519d6d7` and later).
-- **Sprint 001 — Slice 007 (CLOSED, product):** last-action meaning for **non-preset** interactions — shipped on accepted baseline (current branch head `ac30604`).
+- **Sprint 001 — Slice 007 (CLOSED, product):** last-action meaning for **non-preset** interactions — shipped on accepted baseline (precedes current baseline tip).
 - **Feature slice 011 (docs-only): Phase 1 exit criteria and demo acceptance** — `docs/SOP/PHASE_1_EXIT_CRITERIA.md`; control-plane alignment. **Closeout evidence:** documentation review only (no product code changes claimed in this slice closeout record).
 - **Feature slice 009 (closed): Implied lab operator runbook** — `docs/SOP/IMPLIED_LAB_OPERATOR_RUNBOOK.md`; HANDOFF/CURRENT_FRONTIER cross-links; `docs/IMPLIED_LAB_SMOKE.md`, `docs/Frontier_Steward_Handoff.md`. **Closeout:** docs-only; pytest/smoke not required for that slice.
 - **Feature slice 008 (local / unaccepted notes): Glance-first orientation polish** — historical implementation notes only; **do not treat as accepted closure** unless repo-state is reconciled and committed.
@@ -85,4 +86,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-16 by agent (**DOCS-ONLY control-plane** — steering ledger aligned to baseline reality: Sprint 001 Slice 007 **closed** shipped; baseline gate points to branch tip). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-16 by agent (**DOCS-ONLY control-plane** — SELECTION: **Sprint 001 — Slice 008** recorded as next BUILD target; Slice 007 closeout remains canonical). Prior same day: steering ledger aligned to baseline reality; baseline gate points to branch tip. Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
