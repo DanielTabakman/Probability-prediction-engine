@@ -31,11 +31,6 @@ B) REPO-STATE SAFETY (reproducibility)
 - BUILD allowed right now? YES/NO:
 - Operationally handoff-safe? YES/NO
 - If NO: exact reason (one sentence):
-
-C) AGENT CONTINUITY (required)
-- Safe to switch agents? YES/NO
-- Exact reason:
-- If YES: exact handoff payload required:
 ```
 
 **Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
@@ -67,7 +62,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
-**SELECTION** — conceptual Slice 005 selection may proceed from `docs/SOP/CURRENT_FRONTIER.md`.
+**SELECTION** — choose exactly one next bounded Sprint 001 slice (Phase 2) from `docs/SOP/CURRENT_FRONTIER.md`.
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -84,12 +79,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current status
 
-**Post-recovery reality (minimal, operational):**
-
-- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `7cc2e28`
-- **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **Slice 005 SELECTION** may proceed conceptually from canonical docs.
-- **BUILD remains blocked** pending later triage of the parked deferred state.
+The repo can run unit tests, the primary UI smoke script, and the Streamlit app locally. Control-plane Phase 2 docs exist (`PHASE_2_CHARTER.md`, `SPRINT_001_PHASE_2.md`), but Sprint 001 execution status must not be asserted from docs alone when repo-state is not reproducible.
 
 ## Completed recently
 
@@ -138,7 +128,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — choose exactly one Slice 005 option conceptually from `docs/SOP/CURRENT_FRONTIER.md`. **Execution remains blocked** until repo-state is reproducible, and the parked deferred state is triaged.
+**SELECTION** — choose exactly one next bounded Sprint 001 slice from `docs/SOP/CURRENT_FRONTIER.md` (Phase 2). **Conceptual selection is allowed** even while BUILD is gated; **execution remains blocked** until repo-state is reproducible.
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -166,13 +156,6 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
   - **YES** requires: pushed/known branch, divergence known, and a clean or intentionally-classified state that a new steward can reproduce without guessing
   - **NO** requires: state is dirty/unknown enough that a new steward could misread “what is real” vs “local leftovers”
 - **If NO**: one-sentence reason (e.g., “docs aligned but `main` dirty with untracked artifacts; not reproducible from origin”)
-
-### C) Agent continuity (required)
-
-- **Safe to switch agents?** **YES/NO**
-  - **NO** whenever live repo state still exists: stash entries; staged/uncommitted changes; partial recovery; branch/worktree divergence not explicitly parked/handed off; any incomplete execution state.
-- **Exact reason:**
-- **If YES: exact handoff payload required:** (minimum: branch/worktree + commit SHA, plus any named parked state and how to reproduce it)
 
 ## Baseline checkpoint (Execution step 18, 2026-04-10, RECOVERY)
 

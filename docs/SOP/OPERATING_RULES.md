@@ -41,31 +41,6 @@ Cursor must not do execution work directly on `main`. Each execution pass must u
 
 This is an operational safety rule to prevent “dirty main” cleanup cycles.
 
-## Agent continuity rule (hard)
-
-When **live repo state exists**, the same agent must continue the pass. Live repo state includes:
-
-- stash entries
-- staged/uncommitted changes
-- partial recovery
-- branch/worktree divergence that has not been explicitly parked/handed off
-- any incomplete execution state
-
-A new agent is allowed only after the pass is fully closed and repo state is legible/parked (clean working tree, and any remaining state explicitly isolated and named).
-
-Do not switch agents just because the next action is docs-only, closeout, or “easy to explain.”
-
-## Required execution output: Agent continuity
-
-Include this block in every execution-step return (including docs-only passes):
-
-```text
-AGENT CONTINUITY
-- Safe to switch agents? YES/NO
-- Exact reason:
-- If YES: exact handoff payload required:
-```
-
 ### RULE 1 — Execution step types are mandatory
 Choose exactly one:
 - **BUILD**: Code changes allowed. Goal: implement a bounded feature slice / user story.
@@ -258,4 +233,3 @@ End each work pass with:
 - risks / caveats
 - needs human attention
 - recommended next step
-- agent continuity block (required; use exact template above)
