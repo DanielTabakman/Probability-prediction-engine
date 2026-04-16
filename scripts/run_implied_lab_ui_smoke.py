@@ -65,12 +65,16 @@ def main() -> int:
     manifest_path = run_dir / "ui_smoke_manifest.json" if run_dir else None
 
     screenshot_path: str | None = None
+    lab_mounted: bool | None = None
+    lab_mount_blocker: str = ""
     if manifest_path is not None and manifest_path.is_file():
         try:
             data = json.loads(manifest_path.read_text(encoding="utf-8"))
             for row in data.get("scenarios", []):
                 if row.get("scenario") == OFFICIAL_SCENARIO:
                     screenshot_path = row.get("screenshot_path") or None
+                    lab_mounted = row.get("lab_mounted")
+                    lab_mount_blocker = str(row.get("lab_mount_blocker") or "")
                     break
         except Exception:
             screenshot_path = None
@@ -78,6 +82,10 @@ def main() -> int:
     print(f"Exit code: {code}")
     print(f"Manifest path: {manifest_path if manifest_path and manifest_path.is_file() else '(unknown)'}")
     print(f"Screenshot path: {screenshot_path if screenshot_path else '(unknown)'}")
+    if lab_mounted is not None:
+        print(f"Implied lab mounted: {lab_mounted}")
+    if lab_mount_blocker:
+        print(f"Lab mount blocker (infra/data classification): {lab_mount_blocker}")
     return code
 
 

@@ -60,6 +60,11 @@ SCENARIOS = [
 class ScenarioResult:
     scenario: str
     page_loaded: bool = False
+    # True once the implied-lab belief UI anchor is present (same gate as prior harness).
+    lab_mounted: bool = False
+    # When lab_mounted is false: btc_spot_prerequisite, option_expiries_unavailable,
+    # implied_distribution_exception, btc_spot_or_quote_feed_failure (log-inferred), timeout_lab_mount.
+    lab_mount_blocker: str = ""
     disagreement_text_found: bool = False
     family_block_found: bool = False
     trade_ticket_found: bool = False
@@ -244,35 +249,110 @@ def _wait_for_visible_text(page, text: str, timeout_s: float = 45.0) -> None:
     page.wait_for_selector(f"text={text}", timeout=int(timeout_s * 1000), state="visible")
 
 
+def _classify_from_streamlit_log_tail(log_path: Path) -> str | None:
+    """
+    Infer data/feed failures that prevent the implied lab from mounting, using the Streamlit
+    process log. Conservative: only returns a code when multiple corroborating signals appear.
+    """
+    try:
+        raw = log_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    tail = raw[-48000:]
+    low = tail.lower()
+    if "deribit ticker failed" not in low and "deribit.com" not in low:
+        return None
+    if "failed download" not in low and "failed downloads" not in low:
+        return None
+    if "btc-usd" not in low:
+        return None
+    return "btc_spot_or_quote_feed_failure"
+
+
+def _wait_for_implied_lab_mount(
+    page,
+    *,
+    log_path: Path,
+    timeout_s: float = 180.0,
+    log_inference_after_s: float = 25.0,
+) -> tuple[bool, str]:
+    """
+    Wait for the belief-panel anchor, or classify a pre-mount / data-gated failure early.
+
+    Returns (mounted_ok, lab_mount_blocker). When mounted_ok is True, lab_mount_blocker is "".
+    """
+    deadline = time.time() + timeout_s
+    start = time.time()
+    poll_s = 1.25
+    while time.time() < deadline:
+        try:
+            body = page.locator("body").inner_text(timeout=2500)
+        except Exception:
+            body = ""
+
+        if "Need BTC spot price for implied distribution." in body:
+            return False, "btc_spot_prerequisite"
+        if "No Deribit option expiries" in body:
+            return False, "option_expiries_unavailable"
+        if "Implied distribution unavailable:" in body:
+            return False, "implied_distribution_exception"
+
+        try:
+            loc = page.locator("text=My belief vs market").first
+            if loc.count() > 0:
+                return True, ""
+        except Exception:
+            pass
+
+        # Implied lab still fetching; avoid treating parallel Yahoo/Deribit log lines as mount failure.
+        if "Loading expiries and option marks" in body:
+            time.sleep(poll_s)
+            continue
+
+        elapsed = time.time() - start
+        if elapsed >= log_inference_after_s and log_path.is_file():
+            inferred = _classify_from_streamlit_log_tail(log_path)
+            if inferred:
+                return False, inferred
+
+        time.sleep(poll_s)
+
+    return False, "timeout_lab_mount"
+
+
+def _belief_curve_checkbox_checked(page) -> bool:
+    """Read Streamlit checkbox state inside the belief expander (avoids false toggles when overlay copy is off-screen)."""
+    try:
+        details = page.locator("details").filter(
+            has=page.locator("summary", has_text=re.compile(r"My belief vs market", re.I))
+        ).first
+        if details.count() == 0:
+            return False
+        inp = details.locator("input[type='checkbox']").first
+        if inp.count() == 0:
+            return False
+        return bool(inp.is_checked())
+    except Exception:
+        return False
+
+
 def _set_belief_enabled(page, enabled: bool) -> None:
     """
     Toggle belief overlay checkbox.
 
-    Streamlit's checkbox labeling isn't always exposed to Playwright's
-    get_by_label(), so we use a text-based approach and validate via the
-    presence of the belief disagreement text block.
+    Prefer checkbox DOM state over disagreement text visibility: first-touch UX
+    may show disagreement lines in a different slot than older layouts, and
+    off-screen markdown must not cause a spurious extra click (which would
+    toggle belief off when it was already on).
     """
-
-    def _disagreement_visible() -> bool:
-        try:
-            loc = page.locator("text=Disagreement type:").first
-            return loc.count() > 0 and loc.is_visible()
-        except Exception:
-            return False
-
-    currently_enabled = _disagreement_visible()
-    if enabled and currently_enabled:
-        return
-    if (not enabled) and (not currently_enabled):
+    if _belief_curve_checkbox_checked(page) == enabled:
         return
 
-    # Click the checkbox label text; this should toggle the underlying input.
     cb_label = page.locator("text=Show my belief curve").first
     if cb_label.count() == 0:
         raise RuntimeError("Could not find belief curve checkbox label text.")
     cb_label.click()
 
-    # Wait briefly for the belief block to update.
     page.wait_for_timeout(1200)
 
 
@@ -497,11 +577,20 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         r.page_loaded = False
         return r
 
+    log_path = RUN_DIR / "streamlit.log"
     try:
         # The implied lab content is network-bound on first load; don't assume
         # the belief expander is present immediately.
-        # Wait for the belief panel to mount; it appears only after expiry/marks load.
-        page.wait_for_selector("text=My belief vs market", timeout=180000, state="attached")
+        mounted, blocker = _wait_for_implied_lab_mount(page, log_path=log_path, timeout_s=180.0)
+        r.lab_mounted = mounted
+        r.lab_mount_blocker = blocker or ""
+        if not mounted:
+            r.notes = (
+                f"implied_lab_not_mounted:{blocker}"
+                + (f" | {r.notes}" if r.notes else "")
+            ).strip()
+            r.screenshot_path = take_screenshot(page, scenario)
+            return r
 
         # Expand the belief expander so the checkbox + sliders become available.
         _expand_expander(page, "My belief vs market")
@@ -708,6 +797,8 @@ def main() -> int:
                 {
                     "scenario": r.scenario,
                     "page_loaded": r.page_loaded,
+                    "lab_mounted": r.lab_mounted,
+                    "lab_mount_blocker": r.lab_mount_blocker,
                     "disagreement_text_found": r.disagreement_text_found,
                     "family_block_found": r.family_block_found,
                     "trade_ticket_found": r.trade_ticket_found,
@@ -776,6 +867,7 @@ def main() -> int:
         overall_pass = page_loaded_ok and main_ok and verification_ok
 
         summary_path = RUN_DIR / "ui_smoke_summary.txt"
+        blockers = ",".join(sorted({r.lab_mount_blocker for r in results if r.lab_mount_blocker}))
         summary_path.write_text(
             (
                 f"RUN_ID={RUN_ID}\n"
@@ -784,6 +876,7 @@ def main() -> int:
                 f"page_loaded_ok={page_loaded_ok}\n"
                 f"main_texts_ok={main_ok}\n"
                 f"verification_ok={verification_ok}\n"
+                f"lab_mount_blockers={blockers or '(none)'}\n"
             ),
             encoding="utf-8",
         )
