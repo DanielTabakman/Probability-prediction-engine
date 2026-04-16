@@ -52,6 +52,7 @@ from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
 from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
+from src.viz.implied_lab_last_action import last_action_meaning
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -808,6 +809,8 @@ if show_bitcoin_view:
                                     preset_what_changed(preset_id=preset_id, shape=shape)
                                     + " Mode set to **Exact strikes**."
                                 )
+                                # Slice 007: avoid immediately overwriting preset meaning via change detection on rerun.
+                                st.session_state[f"implied_lab_last_change_suppress_{selected_expiry_str}"] = True
                                 st.session_state[shape_key] = {
                                     **(
                                         st.session_state.get(shape_key, {})
@@ -852,7 +855,7 @@ if show_bitcoin_view:
                             last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
                             with st.container(border=True):
                                 st.markdown("###### What changed?")
-                                st.caption("Sprint 001 — Slice 006 (Phase 2)")
+                                st.caption("Sprint 001 — Slice 007 (Phase 2)")
                                 last_msg = st.session_state.get(last_change_key)
                                 if isinstance(last_msg, str) and last_msg.strip():
                                     st.markdown(last_msg)
@@ -867,6 +870,7 @@ if show_bitcoin_view:
                                 horizontal=True,
                             )
                             mode_norm = "exact_strikes" if mode == "Exact strikes" else "target_payoff"
+                            prev_mode_key = f"{mode_key}__prev"
 
                             # Defaults for strike truth (from persisted exact-strike state)
                             k1d = shape_state.get("k1") or min(avail_strikes)
@@ -897,6 +901,20 @@ if show_bitcoin_view:
                             use_k4 = bool(shape_state.get("use_k4", True))
                             reverse = bool(shape_state.get("reverse", False))
                             qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
+
+                            # Slice 007: "last action" meaning beyond presets (mode switch + exact-strikes controls).
+                            suppress_key = f"implied_lab_last_change_suppress_{selected_expiry_str}"
+                            if st.session_state.get(suppress_key, False):
+                                st.session_state[suppress_key] = False
+                                st.session_state[prev_mode_key] = mode
+                            else:
+                                prev_mode = st.session_state.get(prev_mode_key)
+                                if isinstance(prev_mode, str) and prev_mode and prev_mode != mode:
+                                    st.session_state[last_change_key] = last_action_meaning(
+                                        action_id="mode_switch",
+                                        mode_label=mode,
+                                    )
+                                st.session_state[prev_mode_key] = mode
 
                             # --- Payoff → strikes (editable truth only in target_payoff mode) ---
                             with st.expander("Payoff → strikes", expanded=False):
@@ -1110,6 +1128,44 @@ if show_bitcoin_view:
                                     key="u4_reverse",
                                     disabled=(mode_norm != "exact_strikes"),
                                 )
+                                # Slice 007: update "What changed?" for main non-preset interactions (Exact strikes mode).
+                                if mode_norm == "exact_strikes" and not st.session_state.get(suppress_key, False):
+                                    prev_qty = int(shape_state.get("qty", 1) or 1)
+                                    prev_reverse = bool(shape_state.get("reverse", False))
+                                    prev_use = {
+                                        "K1": bool(shape_state.get("use_k1", True)),
+                                        "K2": bool(shape_state.get("use_k2", True)),
+                                        "K3": bool(shape_state.get("use_k3", True)),
+                                        "K4": bool(shape_state.get("use_k4", True)),
+                                    }
+                                    prev_strikes = {
+                                        "k1": float(shape_state.get("k1", k1_sel)),
+                                        "k2": float(shape_state.get("k2", k2_sel)),
+                                        "k3": float(shape_state.get("k3", k3_sel)),
+                                        "k4": float(shape_state.get("k4", k4_sel)),
+                                    }
+
+                                    msg: str | None = None
+                                    if int(qty) != int(prev_qty):
+                                        msg = last_action_meaning(action_id="quantity", qty=int(qty))
+                                    elif bool(reverse) != bool(prev_reverse):
+                                        msg = last_action_meaning(action_id="polarity_reverse", reverse=bool(reverse))
+                                    else:
+                                        curr_use = {"K1": use_k1, "K2": use_k2, "K3": use_k3, "K4": use_k4}
+                                        for leg_id, enabled in curr_use.items():
+                                            if bool(enabled) != bool(prev_use.get(leg_id, enabled)):
+                                                msg = last_action_meaning(
+                                                    action_id="leg_toggle",
+                                                    leg=leg_id,
+                                                    leg_enabled=bool(enabled),
+                                                )
+                                                break
+                                    if msg is None:
+                                        curr_strikes = {"k1": float(k1_sel), "k2": float(k2_sel), "k3": float(k3_sel), "k4": float(k4_sel)}
+                                        if any(abs(float(curr_strikes[k]) - float(prev_strikes.get(k, curr_strikes[k]))) > 1e-9 for k in ("k1", "k2", "k3", "k4")):
+                                            msg = last_action_meaning(action_id="strike_edit", strikes=curr_strikes)
+                                    if msg:
+                                        st.session_state[last_change_key] = msg
                                 # Persist exact-strike truth only in exact-strikes mode
                                 if mode_norm == "exact_strikes":
                                     st.session_state[shape_key] = {
