@@ -70,6 +70,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 **SELECTION / execution posture (Sprint 001):**
 - **Sprint 001 — Slice 005 CLOSED** = **Starter state + one obvious first move (presets)**.
 - **Sprint 001 — Slice 006 CLOSED** = **Last-action meaning: plain-English “what changed?” readout** (preset-driven readout on accepted baseline).
+- **Sprint 001 — Slice 007 CLOSED** = **Last-action meaning for non-preset interactions** (extend “what changed?” beyond presets; shipped on accepted baseline).
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -90,7 +91,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **Sprint 001 — Slices 005–006** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
+- **Sprint 001 — Slices 005–007** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently
@@ -99,7 +100,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION complete → proceed to BUILD**: **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “What changed?” readout beyond presets to cover mode switch, leg toggles, strike edits, polarity/qty).
+- next task: **SELECTION** — choose the next Sprint 001 slice after Slice 007 closeout (then proceed to **BUILD** on a fresh branch/worktree; do not use parked branches).
 - deferred:
 - optional:
 
@@ -140,7 +141,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — next **Sprint 001** slice after **Slice 006** closeout (then **BUILD** on a fresh branch/worktree; do not use parked branches).
+**SELECTION** — next **Sprint 001** slice after **Slice 007** closeout (then **BUILD** on a fresh branch/worktree; do not use parked branches).
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -182,4 +183,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-16 by agent (**DOCS-ONLY** — ledger aligned: Sprint 001 Slice 006 **closed** shipped; baseline gate uses branch tip; recommended next step **SELECTION**). Prior: 2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-16 by agent (**DOCS-ONLY** — ledger aligned: Sprint 001 Slice 007 **closed** shipped; baseline gate uses branch tip; recommended next step **SELECTION**). Prior: 2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
