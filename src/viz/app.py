@@ -51,7 +51,7 @@ from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
-from src.viz.implied_lab_presets import PRESETS, compute_preset_shape
+from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -803,6 +803,11 @@ if show_bitcoin_view:
                                 )
                                 # Presets are "first move" affordances: switch to an immediately inspectable state.
                                 st.session_state[mode_key] = "Exact strikes"
+                                last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
+                                st.session_state[last_change_key] = (
+                                    preset_what_changed(preset_id=preset_id, shape=shape)
+                                    + " Mode set to **Exact strikes**."
+                                )
                                 st.session_state[shape_key] = {
                                     **(
                                         st.session_state.get(shape_key, {})
@@ -843,6 +848,16 @@ if show_bitcoin_view:
                                         key=f"btn_implied_preset_{selected_expiry_str}_{pid}",
                                     ):
                                         _apply_preset(pid)
+
+                            last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
+                            with st.container(border=True):
+                                st.markdown("###### What changed?")
+                                st.caption("Sprint 001 — Slice 006 (Phase 2)")
+                                last_msg = st.session_state.get(last_change_key)
+                                if isinstance(last_msg, str) and last_msg.strip():
+                                    st.markdown(last_msg)
+                                else:
+                                    st.caption("Pick a preset above to see a plain-English summary of what changed.")
                             # Important: do not pass a computed `index` derived from session_state.
                             # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
                             mode = st.radio(

@@ -114,3 +114,40 @@ def compute_preset_shape(
 def preset_label(preset_id: PresetId) -> str:
     return PRESETS[preset_id].label
 
+
+def preset_what_changed(*, preset_id: PresetId, shape: dict[str, Any]) -> str:
+    """
+    Pure mapping: explain the effect of applying a preset in plain English.
+
+    Sprint 001 — Slice 006 (Phase 2): "Last action" meaning readout.
+    """
+    label = preset_label(preset_id)
+    enabled: list[str] = []
+    disabled: list[str] = []
+    for leg in ("k1", "k2", "k3", "k4"):
+        flag = bool(shape.get(f"use_{leg}", True))
+        (enabled if flag else disabled).append(leg.upper())
+
+    def _fmt_usd(x: Any) -> str:
+        try:
+            v = float(x)
+        except Exception:
+            return "—"
+        if abs(v) >= 1000:
+            return f"${v:,.0f}"
+        return f"${v:.2f}"
+
+    ks = {k: _fmt_usd(shape.get(k)) for k in ("k1", "k2", "k3", "k4")}
+    reverse = bool(shape.get("reverse", False))
+    polarity = "reversed (long/short flipped)" if reverse else "normal"
+    qty = shape.get("qty", 1)
+
+    parts: list[str] = [
+        f"Applied preset: **{label}**.",
+        f"Enabled legs: {', '.join(enabled) if enabled else '—'}.",
+        f"Disabled legs: {', '.join(disabled) if disabled else '—'}.",
+        f"Strikes set to K1 {ks['k1']} · K2 {ks['k2']} · K3 {ks['k3']} · K4 {ks['k4']}.",
+        f"Polarity: {polarity}.",
+        f"Quantity: {qty}.",
+    ]
+    return " ".join(parts)

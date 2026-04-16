@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.viz.implied_lab_presets import PRESETS, compute_preset_shape
+from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
 
 
 class TestImpliedLabPresets(unittest.TestCase):
@@ -62,6 +62,21 @@ class TestImpliedLabPresets(unittest.TestCase):
         self.assertTrue(shape["use_k3"])
         self.assertTrue(shape["use_k4"])
         self.assertTrue(shape["reverse"])
+
+    def test_preset_what_changed_mentions_enabled_disabled_and_strikes__sprint_001_slice_006_phase_2(self) -> None:
+        shape = compute_preset_shape(
+            preset_id="bull_call_spread",
+            forward=50_000.0,
+            avail_strikes=[40_000.0, 45_000.0, 50_000.0, 55_000.0, 60_000.0],
+        )
+        msg = preset_what_changed(preset_id="bull_call_spread", shape=shape)
+        self.assertIn("Applied preset", msg)
+        self.assertIn("Enabled legs", msg)
+        self.assertIn("Disabled legs", msg)
+        self.assertIn("Strikes set to", msg)
+        self.assertIn("Bull call spread", msg)
+        self.assertIn("K1", msg)
+        self.assertIn("K4", msg)
 
 
 if __name__ == "__main__":
