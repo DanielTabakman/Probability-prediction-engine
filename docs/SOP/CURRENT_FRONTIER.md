@@ -15,13 +15,13 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 - **Phase 2 is active.**
 - **Sprint 001 is active.**
 - **Slices 001–004 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
-- **Next step:** **SELECTION** for **Slice 005** (**conceptual only**) may proceed from canonical docs.
+- **Slice 005 (SELECTED, conceptual):** **Sprint 001 — Slice 005 — Starter state + one obvious first move (presets)**.
 
 **Repo-state gate (operational, separate from steering):**
 
-- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `7cc2e28`
+- **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `9f5175f`
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **BUILD remains blocked** pending later triage of the parked deferred state.
+- **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 This does **not** erase or downgrade the steering state above; it only blocks execution.
 
@@ -38,7 +38,8 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**None.** **Next move:** **SELECTION** to choose exactly one Slice 005 option (Phase 2) **conceptually**. Do **not** start BUILD until the repo-state gate above is cleared.
+**Sprint 001 — Slice 005 (SELECTED, conceptual):** **Starter state + one obvious first move (presets)**.  
+**Next move:** **BUILD (allowed)** from the clean baseline (use a fresh BUILD branch/worktree; do not use parked branches).
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
