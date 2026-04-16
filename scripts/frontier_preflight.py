@@ -50,6 +50,18 @@ def _classify_path(rel: str) -> str:
     return "SUSPICIOUS / UNKNOWN"
 
 
+def _all_under_src_or_tests(rel_paths: list[str]) -> bool:
+    """True iff every path is confined to product tree or companion unit-test tree."""
+    for rel in rel_paths:
+        p = rel.replace("\\", "/").lstrip("./")
+        if p == "src" or p.startswith("src/"):
+            continue
+        if p == "tests" or p.startswith("tests/"):
+            continue
+        return False
+    return bool(rel_paths)
+
+
 def _parse_branch_line(line: str) -> tuple[str, str | None, int | None, int | None]:
     """
     Parse `git status --porcelain=v1 -b` first line.
@@ -169,7 +181,9 @@ def main() -> int:
     classifications = {p: _classify_path(p) for p in dirty_paths}
     planes_hit = {classifications[p] for p in dirty_paths}
     core_planes = sorted(p for p in planes_hit if p in KNOWN_PLANES)
-    mixed_plane = len(set(core_planes)) > 1
+    planes_mixed = len(set(core_planes)) > 1
+    # Companion tests under tests/ are EVIDENCE in classification but not ambiguous with src/.
+    mixed_plane = planes_mixed and not _all_under_src_or_tests(dirty_paths)
     unknown_hits = [p for p, c in classifications.items() if c not in KNOWN_PLANES]
 
     untracked_names, u_code = _run_git(
