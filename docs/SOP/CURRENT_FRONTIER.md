@@ -26,6 +26,7 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
+- **Reproducibility caveat:** an accepted baseline may exist **locally** without the same branch name on `origin`; rely on **commit SHA** + canonical docs rather than assuming the branch name exists remotely.
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 This does **not** erase or downgrade the steering state above; it only blocks execution.
@@ -44,10 +45,9 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 
 ## Current feature slice
 **Sprint 001 — Slice 010** — **closed/shipped** on the accepted baseline.  
-**Next pending execution step:** **SELECTION** — choose the next slice to build (do not re-open Slice 010).
-
-**Proposed next slice (for the next BUILD, B1 trial):**
-- **Sprint 001 — Slice 011 (PENDING):** **Guided “Try next” follow-on moves** (repeat-play affordances) — **layout/copy/affordance-only**, reuse existing semantically-valid moves/presets; **no semantic-contract changes**; keep trust/provenance visible.
+**Next selected slice:** **Sprint 001 — Slice 011 (PENDING)** — **Guided “Try next” follow-on moves** (repeat-play affordances).  
+**Canonical slice spec:** `docs/SOP/SPRINT_001_SLICE_011.md`  
+**Next pending execution step:** **BUILD** (transactional; single-slice) — execute Slice 011 without reopening Slice 010.
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
@@ -94,4 +94,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-17 by agent (**DOCS-ONLY control-plane** — align steering: **Sprint 001 — Slice 010 shipped/closed on accepted baseline**; next step **SELECTION**). Prior: 2026-04-16 by agent (DOCS-ONLY — Slice 009 shipped/closed; next step SELECTION; and Slice 008 close alignment). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-17 by agent (**DOCS-ONLY control-plane** — align steering: **Sprint 001 — Slice 010 shipped/closed on accepted baseline**; select Slice 011 spec; next step **BUILD**). Prior: 2026-04-16 by agent (DOCS-ONLY — Slice 009 shipped/closed; next step SELECTION; and Slice 008 close alignment). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
