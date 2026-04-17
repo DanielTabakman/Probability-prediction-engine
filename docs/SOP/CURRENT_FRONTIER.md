@@ -46,6 +46,9 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Sprint 001 — Slice 010** — **closed/shipped** on the accepted baseline.  
 **Next pending execution step:** **SELECTION** — choose the next slice to build (do not re-open Slice 010).
 
+**Proposed next slice (for the next BUILD, B1 trial):**
+- **Sprint 001 — Slice 011 (PENDING):** **Guided “Try next” follow-on moves** (repeat-play affordances) — **layout/copy/affordance-only**, reuse existing semantically-valid moves/presets; **no semantic-contract changes**; keep trust/provenance visible.
+
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
