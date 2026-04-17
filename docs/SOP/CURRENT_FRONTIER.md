@@ -14,11 +14,11 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 **Steering continuity (doc-state, canonical):**
 - **Phase 2 is active.**
 - **Sprint 001 is active.**
-- **Slices 001–007 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
+- **Slices 001–008 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
 - **Slice 005 (CLOSED):** **Sprint 001 — Slice 005 — Starter state + one obvious first move (presets)**.
 - **Slice 006 (CLOSED):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout** (preset-driven readout shipped on baseline).
 - **Slice 007 (CLOSED):** **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “what changed?” readout beyond presets; shipped on accepted baseline).
-- **Slice 008 (SELECTED, not started):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — next BUILD target after SELECTION (2026-04-16); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3 (collapse/move/reweight visual weight; **trust/provenance** remains visible).
+- **Slice 008 (CLOSED):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — shipped on accepted baseline (`99a54f2` and later; includes smoke-harness companion); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3 (**trust/provenance** remains visible).
 
 **Repo-state gate (operational, separate from steering):**
 
@@ -41,12 +41,13 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**None** (no BUILD in flight). **Sprint 001 — Slice 007** is **closed** on the accepted baseline (extend the plain-English “what changed?” readout beyond presets; shipped).  
-**Next BUILD target (SELECTED):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — execute next as **BUILD** on a fresh branch/worktree from the clean baseline (do not use parked branches).
+**None** (no BUILD in flight). **Sprint 001 — Slice 008** is **closed** on the accepted baseline (progressive disclosure / instrument hierarchy; product + required smoke-harness companion shipped).  
+**Next pending execution step:** **SELECTION** — choose the next Sprint 001 Phase 2 BUILD target per `docs/SOP/PHASE_2_CHARTER.md` and `docs/SOP/SPRINT_001_PHASE_2.md` (no BUILD target is recorded in steering docs until after SELECTION).
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
+- **Sprint 001 — Slice 008 (CLOSED, product + smoke harness):** progressive disclosure & advanced de-emphasis (instrument hierarchy) — shipped on accepted baseline (`99a54f2` and later; baseline tip includes transactional starter `scripts/frontier_start_pass.py`).
 - **Sprint 001 — Slice 006 (CLOSED, product):** plain-English preset “what changed?” readout — shipped on accepted baseline (`519d6d7` and later).
 - **Sprint 001 — Slice 007 (CLOSED, product):** last-action meaning for **non-preset** interactions — shipped on accepted baseline (precedes current baseline tip).
 - **Feature slice 011 (docs-only): Phase 1 exit criteria and demo acceptance** — `docs/SOP/PHASE_1_EXIT_CRITERIA.md`; control-plane alignment. **Closeout evidence:** documentation review only (no product code changes claimed in this slice closeout record).
@@ -86,4 +87,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-16 by agent (**DOCS-ONLY control-plane** — SELECTION: **Sprint 001 — Slice 008** recorded as next BUILD target; Slice 007 closeout remains canonical). Prior same day: steering ledger aligned to baseline reality; baseline gate points to branch tip. Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-16 by agent (**DOCS-ONLY control-plane** — CLOSEOUT alignment: **Sprint 001 — Slice 008** recorded as **closed/shipped** on accepted baseline; next step is **SELECTION** only). Prior same day: SELECTION recorded Slice 008 as next BUILD target (superseded by shipped baseline). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
