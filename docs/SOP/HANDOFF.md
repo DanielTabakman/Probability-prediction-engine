@@ -84,7 +84,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**Sprint 001 — Slice 009** (selected for next **BUILD**; not yet shipped — see `docs/SOP/CURRENT_FRONTIER.md`).
+**Sprint 001 — Slice 009** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).
 
 ## Current status
 
@@ -92,7 +92,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **Sprint 001 — Slices 005–008** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
+- **Sprint 001 — Slices 005–009** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently
@@ -101,7 +101,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **BUILD** — **Sprint 001 — Slice 009** (selected; see `docs/SOP/CURRENT_FRONTIER.md`; fresh short-lived branch/worktree from `recovery/frontier-steward-v2_1-baseline`; preflight before start; do not use parked branches).
+- next task: **SELECTION** — choose the next slice to build (do not re-open Slice 009; see `docs/SOP/CURRENT_FRONTIER.md`).
 - deferred:
 - optional:
 
@@ -142,7 +142,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**BUILD** — **Sprint 001 — Slice 009** (per `docs/SOP/CURRENT_FRONTIER.md`; `docs/SOP/PHASE_2_CHARTER.md` + `docs/SOP/SPRINT_001_PHASE_2.md`). Run `python scripts/frontier_preflight.py` immediately before BUILD start; preflight on baseline tip was **BUILD allowed** as of SELECTION.
+**SELECTION** — choose the next slice to build (per `docs/SOP/CURRENT_FRONTIER.md`; `docs/SOP/PHASE_2_CHARTER.md` + `docs/SOP/SPRINT_001_PHASE_2.md`).
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -184,4 +184,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-16 by agent (**DOCS-ONLY** — **SELECTION** complete: next BUILD **Sprint 001 — Slice 009**; Slice 008 remains closed/shipped). Prior same day: steering aligned Slice 008 close; recommended step was SELECTION. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-16 by agent (**DOCS-ONLY** — align steering: **Sprint 001 — Slice 009 shipped/closed on accepted baseline**; next step **SELECTION**). Prior same day: steering aligned Slice 008 close; recommended step was SELECTION. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
