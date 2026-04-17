@@ -8,6 +8,12 @@ LastActionId = Literal[
     "polarity_reverse",
     "leg_toggle",
     "strike_edit",
+    # Sprint 001 — Slice 010 (Phase 2): belief + target-payoff interactions
+    "belief_toggle",
+    "belief_center",
+    "belief_width",
+    "net_pnl_mode_toggle",
+    "target_payoff_edit",
 ]
 
 
@@ -35,6 +41,12 @@ def last_action_meaning(
     leg: str | None = None,
     leg_enabled: bool | None = None,
     strikes: dict[str, float] | None = None,
+    belief_enabled: bool | None = None,
+    belief_center_usd: float | None = None,
+    belief_width_sigma_ln: float | None = None,
+    net_pnl_mode: bool | None = None,
+    target_id: str | None = None,
+    target_value: float | None = None,
 ) -> str:
     """
     Sprint 001 — Slice 007 (Phase 2): "Last action" meaning for non-preset interactions.
@@ -71,6 +83,44 @@ def last_action_meaning(
         k3 = _fmt_usd(s.get("k3"))
         k4 = _fmt_usd(s.get("k4"))
         return f"Strikes updated: K1 {k1} · K2 {k2} · K3 {k3} · K4 {k4}."
+
+    if action_id == "belief_toggle":
+        if belief_enabled is None:
+            return "Belief curve display updated (shown/hidden)."
+        return (
+            "Belief curve shown (overlay enabled)."
+            if bool(belief_enabled)
+            else "Belief curve hidden (overlay disabled)."
+        )
+
+    if action_id == "belief_center":
+        return f"Belief peak updated: **{_fmt_usd(belief_center_usd)}**."
+
+    if action_id == "belief_width":
+        try:
+            v = float(belief_width_sigma_ln) if belief_width_sigma_ln is not None else None
+        except Exception:
+            v = None
+        if v is None:
+            return "Belief uncertainty updated."
+        return f"Belief uncertainty updated: σ_ln = **{v:.4f}**."
+
+    if action_id == "net_pnl_mode_toggle":
+        if net_pnl_mode is None:
+            return "Net P&L mode updated (cost-aware on/off)."
+        return (
+            "Net P&L mode enabled (cost-aware targets)."
+            if bool(net_pnl_mode)
+            else "Net P&L mode disabled (intrinsic shape targets)."
+        )
+
+    if action_id == "target_payoff_edit":
+        tid = (target_id or "").strip() or "target"
+        tv = target_value
+        if tv is None:
+            return f"Target-payoff input updated: **{tid}**."
+        # All current targets are in USD terms.
+        return f"Target-payoff input updated: **{tid}** = **{_fmt_usd(tv)}**."
 
     # Defensive fallback (should be unreachable due to Literal typing).
     return "Updated strategy settings."

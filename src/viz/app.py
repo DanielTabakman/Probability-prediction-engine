@@ -773,6 +773,45 @@ if show_bitcoin_view:
                             # Internal model stays in σ_ln; percent mode is just input/display convenience.
                             "width": float(sigma_ln),
                         }
+                        # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to belief interactions.
+                        # Keep it local to this screen + expiry; descriptive only.
+                        last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
+                        suppress_key = f"implied_lab_last_change_suppress_{selected_expiry_str}"
+                        belief_prev_key = f"implied_lab_belief_prev_{selected_expiry_str}"
+                        prev_belief = (
+                            st.session_state.get(belief_prev_key)
+                            if isinstance(st.session_state.get(belief_prev_key), dict)
+                            else None
+                        )
+                        if prev_belief is None:
+                            st.session_state[belief_prev_key] = dict(user_belief_for_state)
+                        else:
+                            if not st.session_state.get(suppress_key, False):
+                                prev_en = bool(prev_belief.get("enabled", False))
+                                prev_center = float(prev_belief.get("center_usd") or 0.0)
+                                prev_width = float(prev_belief.get("width") or 0.0)
+                                curr_en = bool(user_belief_for_state["enabled"])
+                                curr_center = float(user_belief_for_state["center_usd"])
+                                curr_width = float(user_belief_for_state["width"])
+                                msg = None
+                                if curr_en != prev_en:
+                                    msg = last_action_meaning(
+                                        action_id="belief_toggle",
+                                        belief_enabled=curr_en,
+                                    )
+                                elif abs(curr_center - prev_center) > 1e-9:
+                                    msg = last_action_meaning(
+                                        action_id="belief_center",
+                                        belief_center_usd=curr_center,
+                                    )
+                                elif abs(curr_width - prev_width) > 1e-9:
+                                    msg = last_action_meaning(
+                                        action_id="belief_width",
+                                        belief_width_sigma_ln=curr_width,
+                                    )
+                                if msg:
+                                    st.session_state[last_change_key] = msg
+                            st.session_state[belief_prev_key] = dict(user_belief_for_state)
                         # Defaults when no strikes (chart + belief still run)
                         qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
                         selected_strategy = base_strategy
@@ -859,7 +898,7 @@ if show_bitcoin_view:
                             last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
                             with st.container(border=True):
                                 st.markdown("###### What changed?")
-                                st.caption("Sprint 001 — Slice 009 (Phase 2) · repeat-play clarity (follow-on loop)")
+                                st.caption("Sprint 001 — Slice 010 (Phase 2) · belief + target-payoff interactions")
                                 st.caption(
                                     "This updates after each meaningful change you make (preset, mode, strikes, legs, quantity). "
                                     "Descriptive only — not a recommendation."
@@ -1041,6 +1080,57 @@ if show_bitcoin_view:
 
                                 # Persist payoff target truth only in target-payoff mode
                                 if mode_norm == "target_payoff":
+                                    # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to target-payoff interactions.
+                                    payoff_prev_key = f"implied_lab_payoff_prev_{selected_expiry_str}"
+                                    prev_payoff = (
+                                        st.session_state.get(payoff_prev_key)
+                                        if isinstance(st.session_state.get(payoff_prev_key), dict)
+                                        else None
+                                    )
+                                    curr_payoff = {
+                                        "net_pnl_mode": bool(net_pnl_mode),
+                                        "body_left": float(body_left),
+                                        "body_right": float(body_right),
+                                        "left_wing": float(left_wing_usd),
+                                        "right_wing": float(right_wing_usd),
+                                    }
+                                    if prev_payoff is None:
+                                        st.session_state[payoff_prev_key] = dict(curr_payoff)
+                                    else:
+                                        if not st.session_state.get(suppress_key, False):
+                                            msg = None
+                                            if bool(curr_payoff["net_pnl_mode"]) != bool(prev_payoff.get("net_pnl_mode", curr_payoff["net_pnl_mode"])):
+                                                msg = last_action_meaning(
+                                                    action_id="net_pnl_mode_toggle",
+                                                    net_pnl_mode=bool(curr_payoff["net_pnl_mode"]),
+                                                )
+                                            elif abs(float(curr_payoff["body_left"]) - float(prev_payoff.get("body_left", curr_payoff["body_left"]))) > 1e-9:
+                                                msg = last_action_meaning(
+                                                    action_id="target_payoff_edit",
+                                                    target_id="Body left",
+                                                    target_value=float(curr_payoff["body_left"]),
+                                                )
+                                            elif abs(float(curr_payoff["body_right"]) - float(prev_payoff.get("body_right", curr_payoff["body_right"]))) > 1e-9:
+                                                msg = last_action_meaning(
+                                                    action_id="target_payoff_edit",
+                                                    target_id="Body right",
+                                                    target_value=float(curr_payoff["body_right"]),
+                                                )
+                                            elif abs(float(curr_payoff["left_wing"]) - float(prev_payoff.get("left_wing", curr_payoff["left_wing"]))) > 1e-9:
+                                                msg = last_action_meaning(
+                                                    action_id="target_payoff_edit",
+                                                    target_id="Left wing",
+                                                    target_value=float(curr_payoff["left_wing"]),
+                                                )
+                                            elif abs(float(curr_payoff["right_wing"]) - float(prev_payoff.get("right_wing", curr_payoff["right_wing"]))) > 1e-9:
+                                                msg = last_action_meaning(
+                                                    action_id="target_payoff_edit",
+                                                    target_id="Right wing",
+                                                    target_value=float(curr_payoff["right_wing"]),
+                                                )
+                                            if msg:
+                                                st.session_state[last_change_key] = msg
+                                        st.session_state[payoff_prev_key] = dict(curr_payoff)
                                     st.session_state[payoff_targets_key] = {
                                         "body_left": float(body_left),
                                         "body_right": float(body_right),
