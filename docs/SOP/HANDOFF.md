@@ -72,6 +72,8 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Sprint 001 — Slice 006 CLOSED** = **Last-action meaning: plain-English “what changed?” readout** (preset-driven readout on accepted baseline).
 - **Sprint 001 — Slice 007 CLOSED** = **Last-action meaning for non-preset interactions** (extend “what changed?” beyond presets; shipped on accepted baseline).
 - **Sprint 001 — Slice 008 CLOSED** = **Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — shipped on accepted baseline (`99a54f2` and later); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3.
+- **Sprint 001 — Slice 009 CLOSED** = repeat-play / follow-on interaction quality within the Phase 2 primary loop — shipped/closed on accepted baseline.
+- **Sprint 001 — Slice 010 CLOSED** = extend “What changed” to belief + target-payoff — shipped/closed on accepted baseline.
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -84,7 +86,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**Sprint 001 — Slice 009** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).
+**Sprint 001 — Slice 010** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).
 
 ## Current status
 
@@ -92,7 +94,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **Sprint 001 — Slices 005–009** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
+- **Sprint 001 — Slices 005–010** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently
@@ -101,7 +103,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — choose the next slice to build (do not re-open Slice 009; see `docs/SOP/CURRENT_FRONTIER.md`).
+- next task: **SELECTION** — choose the next slice to build (do not re-open Slice 010; see `docs/SOP/CURRENT_FRONTIER.md`).
 - deferred:
 - optional:
 
