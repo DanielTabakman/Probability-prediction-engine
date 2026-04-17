@@ -86,7 +86,8 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**Sprint 001 — Slice 010** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).
+**Sprint 001 — Slice 010** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).  
+**Next selected slice:** **Sprint 001 — Slice 011 (PENDING)** — canonical spec: `docs/SOP/SPRINT_001_SLICE_011.md`
 
 ## Current status
 
@@ -103,7 +104,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — choose the next slice to build (do not re-open Slice 010; see `docs/SOP/CURRENT_FRONTIER.md`).
+- next task: **BUILD** — transactional single-slice build for **Sprint 001 — Slice 011** (do not re-open Slice 010; see `docs/SOP/CURRENT_FRONTIER.md`).
 - deferred:
 - optional:
 
@@ -144,7 +145,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — choose the next slice to build (per `docs/SOP/CURRENT_FRONTIER.md`; `docs/SOP/PHASE_2_CHARTER.md` + `docs/SOP/SPRINT_001_PHASE_2.md`).
+**BUILD** — transactional single-slice build for **Sprint 001 — Slice 011** (spec: `docs/SOP/SPRINT_001_SLICE_011.md`; ledger: `docs/SOP/CURRENT_FRONTIER.md`).
 
 ## Handoff checklist (must be filled each handoff)
 
