@@ -76,11 +76,15 @@ CLOSEOUT for this sprint should be concise and evidence-backed:
 - **Regression / smoke evidence** (pytest; primary implied-lab smoke; any extra scenarios the sprint spec required).
 - **Tradeoffs / rough edges** (honest list: what a follow-on sprint might pick up).
 
+## Control-plane supplement: Sprint 001 wrap posture
+
+**2026-04-17 (Frontier Steward 2.2 — Phase 2 demo coherence SELECTION, CONTROL-PLANE only):** As recorded in `docs/SOP/CURRENT_FRONTIER.md`, the **primary target loop** (§2) is **treated as satisfied** on the accepted baseline with **Slices 005–011** closed; **Sprint 001** is in **wrap posture** (**outcome B** — no default **Slice 012**). Further UX work should enter **Sprint 002** (or later) via explicit **SELECTION**, not as implicit continuation of Sprint 001, unless a steward re-opens scope with new acceptance bullets.
+
 ---
 
 ## Last updated
 
-2026-04-13 — **SELECTION** pass: sprint spec narrowed and canonized. **No BUILD** executed in this pass.
+2026-04-17 — **CONTROL-PLANE** pass: **Sprint 001 wrap posture** canonized (see § “Control-plane supplement”); authoritative ledger `docs/SOP/CURRENT_FRONTIER.md`. **No product BUILD** in this pass. Prior: 2026-04-13 — **SELECTION** pass: sprint spec narrowed and canonized. **No BUILD** executed in that pass.
 
 # Sprint 001 — Phase 2 — First desirability / playability pass
 
