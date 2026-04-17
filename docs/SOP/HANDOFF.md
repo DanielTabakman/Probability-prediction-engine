@@ -84,7 +84,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**None.**
+**Sprint 001 — Slice 009** (selected for next **BUILD**; not yet shipped — see `docs/SOP/CURRENT_FRONTIER.md`).
 
 ## Current status
 
@@ -101,7 +101,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — choose the next Sprint 001 Phase 2 BUILD target per charter/sprint spec (no BUILD target recorded in steering docs until after SELECTION; fresh branch/worktree from clean baseline when BUILD resumes; do not use parked branches).
+- next task: **BUILD** — **Sprint 001 — Slice 009** (selected; see `docs/SOP/CURRENT_FRONTIER.md`; fresh short-lived branch/worktree from `recovery/frontier-steward-v2_1-baseline`; preflight before start; do not use parked branches).
 - deferred:
 - optional:
 
@@ -142,7 +142,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — pick the next Sprint 001 Phase 2 slice to execute (per `docs/SOP/PHASE_2_CHARTER.md` and `docs/SOP/SPRINT_001_PHASE_2.md`). **BUILD** resumes only after a target is selected and preflight allows it.
+**BUILD** — **Sprint 001 — Slice 009** (per `docs/SOP/CURRENT_FRONTIER.md`; `docs/SOP/PHASE_2_CHARTER.md` + `docs/SOP/SPRINT_001_PHASE_2.md`). Run `python scripts/frontier_preflight.py` immediately before BUILD start; preflight on baseline tip was **BUILD allowed** as of SELECTION.
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -184,4 +184,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-16 by agent (**DOCS-ONLY** — steering aligned: **Sprint 001 — Slice 008** **closed/shipped** on accepted baseline; recommended next step **SELECTION**). Prior same day: SELECTION recorded Slice 008 as next BUILD target (superseded by shipped baseline). Prior: 2026-04-11 by agent (CLOSEOUT — feature slice 009 closed; operator runbook + discoverability; recommended next step SELECTION). Same day: runtime health indicators (steward protocol + runbook + this handoff). Earlier: legacy Phase 1 feature slice 008 closeout (pytest 36 + smoke A `20260411_131344`); 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-16 by agent (**DOCS-ONLY** — **SELECTION** complete: next BUILD **Sprint 001 — Slice 009**; Slice 008 remains closed/shipped). Prior same day: steering aligned Slice 008 close; recommended step was SELECTION. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.

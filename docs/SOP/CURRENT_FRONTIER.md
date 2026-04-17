@@ -19,6 +19,7 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 - **Slice 006 (CLOSED):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout** (preset-driven readout shipped on baseline).
 - **Slice 007 (CLOSED):** **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “what changed?” readout beyond presets; shipped on accepted baseline).
 - **Slice 008 (CLOSED):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — shipped on accepted baseline (`99a54f2` and later; includes smoke-harness companion); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3 (**trust/provenance** remains visible).
+- **Slice 009 (SELECTED — next BUILD target, not closed):** **Sprint 001 — Slice 009** — **not** the same identifier as legacy Phase 1 **Feature slice 009** (operator runbook, closed). Scope intent: bounded **repeat-play / follow-on interaction** quality within the Phase 2 primary loop (`docs/SOP/PHASE_2_CHARTER.md` §9 behavioral witness: clarity after a **second and third** meaningful interaction), **layout/copy/affordance-only** unless an approved contract note exists; no architecture program.
 
 **Repo-state gate (operational, separate from steering):**
 
@@ -41,8 +42,8 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**None** (no BUILD in flight). **Sprint 001 — Slice 008** is **closed** on the accepted baseline (progressive disclosure / instrument hierarchy; product + required smoke-harness companion shipped).  
-**Next pending execution step:** **SELECTION** — choose the next Sprint 001 Phase 2 BUILD target per `docs/SOP/PHASE_2_CHARTER.md` and `docs/SOP/SPRINT_001_PHASE_2.md` (no BUILD target is recorded in steering docs until after SELECTION).
+**Sprint 001 — Slice 009** — **selected** as the next **BUILD** target (SELECTION complete on baseline `2fa9db4`; preflight **BUILD allowed**). **Sprint 001 — Slice 008** remains **closed** on the accepted baseline.  
+**Next pending execution step:** **BUILD** — execute **Sprint 001 — Slice 009** from `recovery/frontier-steward-v2_1-baseline` (fresh short-lived BUILD branch/worktree; `python scripts/frontier_preflight.py` before start; single-plane **PRODUCT-PLANE** unless explicitly re-declared).
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
@@ -87,4 +88,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-16 by agent (**DOCS-ONLY control-plane** — CLOSEOUT alignment: **Sprint 001 — Slice 008** recorded as **closed/shipped** on accepted baseline; next step is **SELECTION** only). Prior same day: SELECTION recorded Slice 008 as next BUILD target (superseded by shipped baseline). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-16 by agent (**DOCS-ONLY control-plane** — **SELECTION**: next BUILD target **Sprint 001 — Slice 009** recorded; disambiguated from legacy **Feature slice 009**). Prior same day: CLOSEOUT alignment Slice 008 closed/shipped; next step was SELECTION only. Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
