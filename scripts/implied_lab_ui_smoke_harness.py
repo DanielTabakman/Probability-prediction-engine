@@ -385,6 +385,8 @@ def _set_belief_uncertainty_aria_slider(page, value: float) -> None:
 
 
 def _set_mode(page, mode_text: str) -> None:
+    # Sprint 001 — Slice 008 (Phase 2): mode radio lives inside a collapsed expander.
+    _expand_expander(page, "Mode & solver (Exact strikes vs Target payoff)")
     # Streamlit radio is usually rendered as clickable elements by label text.
     loc = page.locator(f"text={mode_text}").first
     if loc.count() == 0:

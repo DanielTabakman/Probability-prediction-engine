@@ -625,16 +625,16 @@ if show_bitcoin_view:
                     # doesn't get pushed down by the (potentially large) left-column controls.
                     with col_chart:
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
-                        st.caption(
-                            "**Right column (read top → bottom):** chart → **Summary** → **Trust / provenance** → "
-                            "**Decision-ready review** → **Belief vs market — at a glance** → **Trade ticket**. "
-                            "**Left column:** expiry, **User belief** controls, strategy mode and shape."
-                        )
+                        with st.expander("Screen map (optional)", expanded=False):
+                            st.caption(
+                                "**Right column:** chart → **Summary** → **Trust / provenance** → optional **Belief overlay** "
+                                "narrative → **Review & disagreement digest** → **Trade ticket**. "
+                                "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
+                            )
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
                         right_review_slot = st.empty()
-                        right_glance_slot = st.empty()
                         right_ticket_slot = st.empty()
                         right_anomaly_slot = st.empty()
                         right_forward_slot = st.empty()
@@ -697,7 +697,7 @@ if show_bitcoin_view:
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
-                        st.markdown("###### User belief (optional overlay)")
+                        st.caption("Optional belief overlay — compare a simple curve to the market-implied view (right).")
                         with st.expander("My belief vs market", expanded=False):
                             st.caption(
                                 "Optional: compare a simple lognormal **belief** (peak = price you set) to the displayed market curve."
@@ -790,8 +790,12 @@ if show_bitcoin_view:
                             step = max(1000, (hi - lo) // 50)
                             atm = min(avail_strikes, key=lambda k: abs(k - forward))
 
-                            st.markdown("###### Strategy & payoff")
-                            st.caption("Quick start: pick a preset to visibly change the green payoff line (main object).")
+                            st.caption("Sprint 001 — Slice 008 (Phase 2)")
+                            st.markdown("**Shape & payoff**")
+                            st.caption(
+                                "Quick start: pick a preset to visibly change the green payoff line (main object). "
+                                "Open **Mode & solver** when you need Target payoff vs Exact strikes."
+                            )
                             # Mode ownership (Sprint 1A): exact strikes vs target payoff
                             mode_key = f"implied_lab_mode_{selected_expiry_str}"
 
@@ -855,7 +859,7 @@ if show_bitcoin_view:
                             last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
                             with st.container(border=True):
                                 st.markdown("###### What changed?")
-                                st.caption("Sprint 001 — Slice 007 (Phase 2)")
+                                st.caption("Sprint 001 — Slices 007–008 (Phase 2)")
                                 last_msg = st.session_state.get(last_change_key)
                                 if isinstance(last_msg, str) and last_msg.strip():
                                     st.markdown(last_msg)
@@ -863,12 +867,13 @@ if show_bitcoin_view:
                                     st.caption("Pick a preset above to see a plain-English summary of what changed.")
                             # Important: do not pass a computed `index` derived from session_state.
                             # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
-                            mode = st.radio(
-                                "Mode",
-                                ["Exact strikes", "Target payoff"],
-                                key=mode_key,
-                                horizontal=True,
-                            )
+                            with st.expander("Mode & solver (Exact strikes vs Target payoff)", expanded=False):
+                                mode = st.radio(
+                                    "Mode",
+                                    ["Exact strikes", "Target payoff"],
+                                    key=mode_key,
+                                    horizontal=True,
+                                )
                             mode_norm = "exact_strikes" if mode == "Exact strikes" else "target_payoff"
                             prev_mode_key = f"{mode_key}__prev"
 
@@ -1357,10 +1362,6 @@ if show_bitcoin_view:
                         st.plotly_chart(fig_dist, use_container_width=True)
 
                     right_forward_slot.caption(_fwd_cap)
-                    if _belief_block:
-                        with right_belief_slot.container():
-                            st.markdown("###### Belief overlay (this run)")
-                            st.markdown(_belief_block)
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
@@ -1369,10 +1370,14 @@ if show_bitcoin_view:
                         _render_implied_lab_summary_card(outputs)
                     with right_trust_slot.container():
                         _render_trust_strip(outputs.get("verification") or {})
+                    with right_belief_slot.container():
+                        if _belief_block:
+                            with st.expander("Belief overlay (this run)", expanded=False):
+                                st.markdown(_belief_block)
                     with right_review_slot.container():
-                        _render_decision_ready_review(outputs.get("verification") or {})
-                    with right_glance_slot.container():
-                        _render_belief_vs_market_glance(outputs.get("verification") or {})
+                        with st.expander("Review & disagreement digest", expanded=False):
+                            _render_decision_ready_review(outputs.get("verification") or {})
+                            _render_belief_vs_market_glance(outputs.get("verification") or {})
                     with right_ticket_slot.container():
                         if selected_strategy and selected_strategy.get("k1") is not None:
                             _render_implied_lab_trade_ticket_panel(
@@ -1418,8 +1423,8 @@ if show_bitcoin_view:
                                 hide_index=True,
                             )
                             st.caption(
-                                "**Trade ticket (copy/paste)** is **above** (under the glance card) — same leg list "
-                                "and optional **Show calculations** — illustrative only, not a recommendation."
+                                "**Trade ticket (copy/paste)** is **above** (under **Review & disagreement digest**) — "
+                                "same leg list and optional **Show calculations** — illustrative only, not a recommendation."
                             )
             else:
                 st.caption("No Deribit option expiries. Check API.")
