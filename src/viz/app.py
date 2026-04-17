@@ -848,6 +848,7 @@ if show_bitcoin_view:
                                 # Presets are "first move" affordances: switch to an immediately inspectable state.
                                 st.session_state[mode_key] = "Exact strikes"
                                 last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
+                                st.session_state[f"implied_lab_last_preset_{selected_expiry_str}"] = preset_id
                                 st.session_state[last_change_key] = (
                                     preset_what_changed(preset_id=preset_id, shape=shape)
                                     + " Mode set to **Exact strikes**."
@@ -907,12 +908,71 @@ if show_bitcoin_view:
                                 if isinstance(last_msg, str) and last_msg.strip():
                                     st.markdown(last_msg)
                                     st.write("")
-                                    st.markdown("**Try another interaction (examples):**")
-                                    st.markdown(
-                                        "- Pick a *different preset* (top row) to compare payoff shapes.\n"
-                                        "- Open **Mode & solver** to switch **Exact strikes** ↔ **Target payoff**.\n"
-                                        "- Open **Adjust strategy shape** and toggle a leg (K1–K4) or flip polarity."
-                                    )
+                                    st.markdown("**Try next (one click):**")
+
+                                    try_cols = st.columns(3)
+
+                                    last_preset = st.session_state.get(f"implied_lab_last_preset_{selected_expiry_str}")
+                                    preset_ids = list(PRESETS.keys())
+                                    if len(preset_ids) >= 2:
+                                        if isinstance(last_preset, str) and last_preset in preset_ids:
+                                            idx = preset_ids.index(last_preset)
+                                            next_pid = preset_ids[(idx + 1) % len(preset_ids)]
+                                        else:
+                                            next_pid = preset_ids[1]
+                                        with try_cols[0]:
+                                            if st.button(
+                                                f"Compare preset: {PRESETS[next_pid].label}",
+                                                use_container_width=True,
+                                                key=f"btn_try_next_preset_{selected_expiry_str}_{next_pid}",
+                                            ):
+                                                _apply_preset(next_pid)
+
+                                    current_mode_label = st.session_state.get(mode_key, "Exact strikes")
+                                    next_mode = "Target payoff" if current_mode_label == "Exact strikes" else "Exact strikes"
+                                    with try_cols[1]:
+                                        if st.button(
+                                            f"Mode: {next_mode}",
+                                            use_container_width=True,
+                                            key=f"btn_try_next_mode_{selected_expiry_str}_{next_mode}",
+                                        ):
+                                            st.session_state[mode_key] = next_mode
+                                            st.session_state[last_change_key] = last_action_meaning(
+                                                action_id="mode_switch",
+                                                mode_label=next_mode,
+                                            )
+                                            st.rerun()
+
+                                    with try_cols[2]:
+                                        if current_mode_label == "Exact strikes":
+                                            if st.button(
+                                                "Polarity: flip long/short",
+                                                use_container_width=True,
+                                                key=f"btn_try_next_polarity_{selected_expiry_str}",
+                                            ):
+                                                new_reverse = not bool(st.session_state.get("u4_reverse", False))
+                                                st.session_state["u4_reverse"] = new_reverse
+                                                st.session_state[last_change_key] = last_action_meaning(
+                                                    action_id="polarity_reverse",
+                                                    reverse=bool(new_reverse),
+                                                )
+                                                st.rerun()
+                                        else:
+                                            payoff_key = selected_expiry_str
+                                            net_key = f"netpnl_mode_{payoff_key}"
+                                            net_label = "Net P&L mode: on" if bool(st.session_state.get(net_key, True)) else "Net P&L mode: off"
+                                            if st.button(
+                                                net_label,
+                                                use_container_width=True,
+                                                key=f"btn_try_next_netpnl_{selected_expiry_str}",
+                                            ):
+                                                new_net = not bool(st.session_state.get(net_key, True))
+                                                st.session_state[net_key] = new_net
+                                                st.session_state[last_change_key] = last_action_meaning(
+                                                    action_id="net_pnl_mode_toggle",
+                                                    net_pnl_mode=bool(new_net),
+                                                )
+                                                st.rerun()
                                 else:
                                     st.caption(
                                         "Pick a preset above to see a plain-English summary of what changed. "
