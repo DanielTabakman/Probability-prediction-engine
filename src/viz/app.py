@@ -859,12 +859,26 @@ if show_bitcoin_view:
                             last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
                             with st.container(border=True):
                                 st.markdown("###### What changed?")
-                                st.caption("Sprint 001 — Slices 007–008 (Phase 2)")
+                                st.caption("Sprint 001 — Slice 009 (Phase 2) · repeat-play clarity (follow-on loop)")
+                                st.caption(
+                                    "This updates after each meaningful change you make (preset, mode, strikes, legs, quantity). "
+                                    "Descriptive only — not a recommendation."
+                                )
                                 last_msg = st.session_state.get(last_change_key)
                                 if isinstance(last_msg, str) and last_msg.strip():
                                     st.markdown(last_msg)
+                                    st.write("")
+                                    st.markdown("**Try another interaction (examples):**")
+                                    st.markdown(
+                                        "- Pick a *different preset* (top row) to compare payoff shapes.\n"
+                                        "- Open **Mode & solver** to switch **Exact strikes** ↔ **Target payoff**.\n"
+                                        "- Open **Adjust strategy shape** and toggle a leg (K1–K4) or flip polarity."
+                                    )
                                 else:
-                                    st.caption("Pick a preset above to see a plain-English summary of what changed.")
+                                    st.caption(
+                                        "Pick a preset above to see a plain-English summary of what changed. "
+                                        "Then try a second and third interaction — this panel will keep updating."
+                                    )
                             # Important: do not pass a computed `index` derived from session_state.
                             # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
                             with st.expander("Mode & solver (Exact strikes vs Target payoff)", expanded=False):
