@@ -14,13 +14,14 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 **Steering continuity (doc-state, canonical):**
 - **Phase 2 is active.**
 - **Sprint 001 is active.**
-- **Slices 001–010 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
+- **Slices 001–011 are closed** (canonical ledger posture for Sprint 001 unless explicitly superseded by newer accepted docs).
 - **Slice 005 (CLOSED):** **Sprint 001 — Slice 005 — Starter state + one obvious first move (presets)**.
 - **Slice 006 (CLOSED):** **Sprint 001 — Slice 006 — Last-action meaning: plain-English “what changed?” readout** (preset-driven readout shipped on baseline).
 - **Slice 007 (CLOSED):** **Sprint 001 — Slice 007 — Last-action meaning for non-preset interactions** (extend the “what changed?” readout beyond presets; shipped on accepted baseline).
 - **Slice 008 (CLOSED):** **Sprint 001 — Slice 008 — Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — shipped on accepted baseline (`99a54f2` and later; includes smoke-harness companion); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3 (**trust/provenance** remains visible).
 - **Slice 009 (CLOSED):** **Sprint 001 — Slice 009** — **not** the same identifier as legacy Phase 1 **Feature slice 009** (operator runbook, closed). Scope intent: bounded **repeat-play / follow-on interaction** quality within the Phase 2 primary loop (`docs/SOP/PHASE_2_CHARTER.md` §9 behavioral witness: clarity after a **second and third** meaningful interaction), **layout/copy/affordance-only** unless an approved contract note exists; no architecture program. **Shipped on accepted baseline.**
 - **Slice 010 (CLOSED):** **Sprint 001 — Slice 010 (Phase 2)** — extend “What changed” to belief + target-payoff. **Shipped on accepted baseline.**
+- **Slice 011 (CLOSED):** **Sprint 001 — Slice 011 (Phase 2)** — guided **“Try next”** follow-on affordances (one-click buttons on existing preset/meaning paths; **layout/copy/affordance-only** relative to semantic contracts). **Shipped on accepted baseline** (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`).
 
 **Repo-state gate (operational, separate from steering):**
 
@@ -43,15 +44,15 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**Sprint 001 — Slice 010** — **closed/shipped** on the accepted baseline.  
-**Next pending execution step:** **SELECTION** — choose the next slice to build (do not re-open Slice 010).
+**Sprint 001 — Slice 011** — **closed/shipped** on the accepted baseline (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`; product: `src/viz/app.py`).  
+**Next pending execution step:** **SELECTION** — complete the **Sprint 001 / Phase 2 demo coherence brief** (CONTROL-PLANE, docs-only; see **Selected next steering move** below) **before** opening a **BUILD** for **Slice 012**. Do not re-open **Slices 005–011**.
 
-**Proposed next slice (for the next BUILD, B1 trial):**
-- **Sprint 001 — Slice 011 (PENDING):** **Guided “Try next” follow-on moves** (repeat-play affordances) — **layout/copy/affordance-only**, reuse existing semantically-valid moves/presets; **no semantic-contract changes**; keep trust/provenance visible.
+**Selected next steering move (Bellman / MDP posture — 2026-04-17):** **B) Short concrete Phase 2 experience-tightening pass (CONTROL-PLANE only).** Deliver, in canonical docs, a **bounded observable checklist** mapped to `docs/SOP/PHASE_2_CHARTER.md` §9 (behavioral witness) and `docs/SOP/SPRINT_001_PHASE_2.md` §5 (acceptance bullets) — **plus exactly one** of: (**i**) a **Slice 012** BUILD brief (one short scope paragraph + explicit acceptance bullets; **layout/copy/affordance-only** unless a separately approved contract note exists), or (**ii**) a steward-facing statement that the **Sprint 001 primary loop** is **complete** and the honest next step is **wrap / Sprint 002 SELECTION** (no automatic extra UX slice). **No product BUILD** until (**i**) or (**ii**) is written; this pass is intentionally **evidence-first** (fuzzy → legible; speculative → evidenced) so the next BUILD branch has a **gated** scope.
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
+- **Sprint 001 — Slice 011 (CLOSED, product):** guided **“Try next”** one-click affordances under **“What changed?”** (existing presets/meaning readout) — shipped on accepted baseline (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`).
 - **Sprint 001 — Slice 008 (CLOSED, product + smoke harness):** progressive disclosure & advanced de-emphasis (instrument hierarchy) — shipped on accepted baseline (`99a54f2` and later; baseline tip includes transactional starter `scripts/frontier_start_pass.py`).
 - **Sprint 001 — Slice 009 (CLOSED):** repeat-play / follow-on interaction quality within the Phase 2 primary loop — shipped/closed on accepted baseline.
 - **Sprint 001 — Slice 010 (CLOSED):** extend “What changed” to belief + target-payoff — shipped/closed on accepted baseline.
@@ -94,4 +95,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-17 by agent (**DOCS-ONLY control-plane** — align steering: **Sprint 001 — Slice 010 shipped/closed on accepted baseline**; next step **SELECTION**). Prior: 2026-04-16 by agent (DOCS-ONLY — Slice 009 shipped/closed; next step SELECTION; and Slice 008 close alignment). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).
+2026-04-17 by agent (**DOCS-ONLY control-plane — Frontier Steward 2.2**): **Sprint 001 — Slice 011 shipped/closed** on accepted baseline (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`); ledger **001–011** closed; next step **SELECTION** with **selected move B** (bounded demo coherence brief before **Slice 012** BUILD or sprint wrap). Prior same day: Slice 010 close alignment. Prior: 2026-04-16 by agent (DOCS-ONLY — Slice 009 shipped/closed; next step SELECTION; and Slice 008 close alignment). Prior: 2026-04-13 by agent (Phase 2 charter + Sprint 001 spec + workflow metrics; `CURRENT_FRONTIER` / `HANDOFF` aligned). Prior: 2026-04-11 by agent (CLOSEOUT — Phase 1 declared complete after phase-exit confirmation vs `PHASE_1_EXIT_CRITERIA.md`; pytest **41** + smoke **A** `artifacts/ui_smoke/20260411_163249/`).

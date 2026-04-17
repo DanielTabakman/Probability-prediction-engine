@@ -74,6 +74,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Sprint 001 — Slice 008 CLOSED** = **Progressive disclosure & advanced de-emphasis (instrument hierarchy)** — shipped on accepted baseline (`99a54f2` and later); bounded per `docs/SOP/SPRINT_001_PHASE_2.md` §3.
 - **Sprint 001 — Slice 009 CLOSED** = repeat-play / follow-on interaction quality within the Phase 2 primary loop — shipped/closed on accepted baseline.
 - **Sprint 001 — Slice 010 CLOSED** = extend “What changed” to belief + target-payoff — shipped/closed on accepted baseline.
+- **Sprint 001 — Slice 011 CLOSED** = guided **“Try next”** one-click affordances (repeat-play; reuses existing presets/meaning readout) — shipped/closed on accepted baseline (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`).
 
 **Repo-state gate (operational; does not erase steering):** selection may be done **conceptually**, but **no BUILD** may start until the repo is **reproducible/handoff-safe** (cleanly separated deltas; no mixed dirty tree). Do **not** start BUILD from a mixed dirty tree.
 
@@ -86,7 +87,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**Sprint 001 — Slice 010** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`).
+**Sprint 001 — Slice 011** (**closed/shipped** — see `docs/SOP/CURRENT_FRONTIER.md`). **No open BUILD slice** until **SELECTION** completes the **demo coherence brief** (same file).
 
 ## Current status
 
@@ -94,7 +95,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` (use branch **tip**; verify with `git rev-parse HEAD`)
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
-- **Sprint 001 — Slices 005–010** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
+- **Sprint 001 — Slices 005–011** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules). The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently
@@ -103,7 +104,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — choose the next slice to build (do not re-open Slice 010; see `docs/SOP/CURRENT_FRONTIER.md`).
+- next task: **SELECTION** — CONTROL-PLANE **demo coherence brief** (observable checklist vs charter §9 + sprint §5) **and** either a **Slice 012** BUILD brief or an explicit **Sprint 001 loop complete / wrap** posture — see `docs/SOP/CURRENT_FRONTIER.md` (**Selected next steering move**). **No product BUILD** until that lands.
 - deferred:
 - optional:
 
@@ -144,7 +145,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — choose the next slice to build (per `docs/SOP/CURRENT_FRONTIER.md`; `docs/SOP/PHASE_2_CHARTER.md` + `docs/SOP/SPRINT_001_PHASE_2.md`).
+**SELECTION** — execute the **bounded demo coherence brief** (docs-only) described in `docs/SOP/CURRENT_FRONTIER.md`, then either charter **Slice 012** for BUILD or declare **Sprint 001** primary-loop completion (`docs/SOP/PHASE_2_CHARTER.md`, `docs/SOP/SPRINT_001_PHASE_2.md`).
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -186,4 +187,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-16 by agent (**DOCS-ONLY** — align steering: **Sprint 001 — Slice 009 shipped/closed on accepted baseline**; next step **SELECTION**). Prior same day: steering aligned Slice 008 close; recommended step was SELECTION. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-17 by agent (**DOCS-ONLY control-plane — Frontier Steward 2.2**): **Sprint 001 — Slice 011 shipped/closed** (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`); **SELECTION** next with **demo coherence brief** before **Slice 012** BUILD (see `CURRENT_FRONTIER.md`). Prior: 2026-04-16 by agent (**DOCS-ONLY** — Slice 009 shipped/closed; next step SELECTION). Prior same day: Slice 008 close. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
