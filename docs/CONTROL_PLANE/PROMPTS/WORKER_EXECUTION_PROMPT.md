@@ -10,6 +10,7 @@ You are the **worker** for this repository. This is a **single execution step**:
 - You must **not** request git actions (commit/push/branch/rebase/reset) unless the user explicitly asked for them.
 - You must **stop** after returning the required closeout report.
 - If the active feature slice qualifies for **Compact slice mode** in `OPERATING_RULES.md`, this **BUILD** step may include **integrated closeout** (Tier 1 evidence, `HANDOFF.md`, full closeout report) in the same pass when those rules are satisfied; otherwise keep **BUILD** implementation-only and expect a separate **CLOSEOUT** step.
+- **Steering:** follow **Bellman / MDP-style** posture in `OPERATING_RULES.md` (**Steering objective**)—prioritize a **better next state** and **future option value**; use EV/throughput-style signals as **grounding**, not as the sole policy.
 
 ### Required reads (non-negotiable; do this first)
 Read in this order:
@@ -64,9 +65,30 @@ Update `docs/SOP/HANDOFF.md` with:
 ### Stop condition
 This execution step ends when you produce the required closeout report below. Do not continue into the next feature slice or into manager-review behavior.
 
+### Return contract (SLIM MODE + repo sensor + agent continuity)
+
+Before the closeout report, output **exactly** the blocks defined in `docs/SOP/OPERATING_RULES.md`:
+
+1. `### SLIM MODE`
+2. `### REPO-SENSOR REPORT` (branch, HEAD, cleanliness, changed files by plane, mixed-plane status, semantic risk, stability confidence, **safe to switch agents?**)
+3. `AGENT CONTINUITY` (same **safe to switch agents?** answer and reason)
+
+**Hard rule:** you may set **safe to switch agents?** to **YES** only when every condition in **OPERATING_RULES.md → Safe-to-switch agents = YES** is satisfied (clean tree, committed pass output unless an explicit user exception is quoted, files reported by plane, mixed-plane explained, validation evidence linked/reused or N/A justified, and no `closed_clean` claim when the tree is dirty after validation—use **`validated_dirty`** / **`closeout_pending`** instead). Otherwise answer **NO** and state the first failed gate.
+
+Conservative git posture still applies: do not commit/push unless the user explicitly asked; if output is uncommitted, **safe to switch agents?** must be **NO** and the report must say so.
+
 ---
 
 ## Required output (STOP after this)
+
+### SLIM MODE
+(one line heading only)
+
+### REPO-SENSOR REPORT
+(fill per `OPERATING_RULES.md`)
+
+### AGENT CONTINUITY
+(fill per `OPERATING_RULES.md`)
 
 ### Pre-edit plan
 (keep it short; bullets are fine)

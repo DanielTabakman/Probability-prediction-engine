@@ -2,6 +2,14 @@
 
 Purpose: lightweight rules for how work gets done in this repo.
 
+## Steering objective (Bellman / MDP posture)
+
+**Frontier Steward 2.2+:** prefer actions that **improve the next repo/workflow state** and **preserve or increase future option value** (Bellman-style: value of where you land after the step), not **maximizing a single-step EV proxy alone**.
+
+- **EV / throughput** (e.g. weighted slices per hour, quick local wins) stays a **grounding term** and useful **local reward signal**—**not** the sole policy for what to do next.
+- Favor honest **state shifts** when they are high-leverage: **dirty→clean**, **fuzzy→legible**, **selected→closed_clean**, **speculative→evidenced**, **brittle→gated**, **ungrounded→grounded**.
+- **Metrics / dashboards** (`WORKFLOW_METRICS_V1.md`) should be read for **transitions and posture**, not only isolated point-in-time throughput.
+
 ## Default workflow
 1. Read the active feature slice doc (`docs/SOP/SPRINT_00X.md`), `HANDOFF.md`, and directly relevant code/docs.
 2. Write a short pre-edit plan (still required; keep it proportional to scope).
@@ -12,6 +20,43 @@ Purpose: lightweight rules for how work gets done in this repo.
 ## Default response conventions (agent/steward)
 - Default to **SLIM MODE** unless **AUDIT MODE** is explicitly requested.
 - Each execution-step return should include a short **REPO-SENSOR REPORT** (what changed in the working tree: modified/untracked files).
+
+### SLIM MODE header (required shape)
+
+Start the return with:
+
+```text
+### SLIM MODE
+```
+
+Then the **REPO-SENSOR REPORT** block (below). Keep prose after that proportional to the execution step.
+
+### REPO-SENSOR REPORT (required fields)
+
+```text
+### REPO-SENSOR REPORT
+- branch:
+- HEAD: (`git rev-parse HEAD`)
+- cleanliness: CLEAN / DIRTY (from `git status`)
+- changed files by plane: CONTROL: … / PRODUCT: … / EVIDENCE: … (or “none”)
+- mixed-plane status: YES / NO — if YES, one-line explanation and whether RECOVERY is required
+- semantic risk noticed: (short; or “none noted”)
+- stability confidence: LOW / MEDIUM / HIGH (judgment; say why in one phrase)
+- safe to switch agents? YES / NO
+```
+
+### Safe-to-switch agents = YES (hard gate)
+
+You may answer **safe to switch agents? YES** only when **all** are true:
+
+1. **Working tree clean** at report time (`git status` shows nothing to commit).
+2. **This pass’s material output is committed** (or the user explicitly authorized uncommitted work and that exception is stated verbatim in the report). If work is uncommitted, the answer is **NO**.
+3. **Changed files are listed** and classified by **plane** (CONTROL / PRODUCT / EVIDENCE), matching the declared execution-step plane unless the step type is **RECOVERY** (see `FRONTIER_STEWARD_PROTOCOL.md`).
+4. **Mixed-plane status** is stated; if dirty across planes, **YES** is forbidden unless this was a bounded **RECOVERY** pass that **separated** state (explain how).
+5. **Validation evidence** is linked (e.g. manifest path, log excerpt) **or** explicitly **reused** with a pointer to the prior accepted artifact **or** a one-line cite to the rule that makes validation N/A for this step type (e.g. docs-only **SELECTION** with no product claim).
+6. **Pass state honesty:** if product-side validation **passed** but the tree is still **dirty**, you must **not** label the pass `closed_clean`; use **`validated_dirty`** or **`closeout_pending`** (and **safe to switch agents? NO** until clean).
+
+If any item fails: **safe to switch agents? NO** and name the first failed item in **Exact reason** (see **Agent continuity** block below).
 
 ## Execution step discipline (anti-thrash rules)
 
@@ -57,7 +102,7 @@ Do not switch agents just because the next action is docs-only, closeout, or “
 
 ## Required execution output: Agent continuity
 
-Include this block in every execution-step return (including docs-only passes):
+Include this block in every execution-step return (including docs-only passes). **YES** is allowed only under **Safe-to-switch agents = YES** above.
 
 ```text
 AGENT CONTINUITY

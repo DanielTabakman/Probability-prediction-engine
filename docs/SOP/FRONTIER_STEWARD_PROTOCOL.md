@@ -7,6 +7,10 @@
 - **Handoffs are summaries, not ground truth.**
 - **Handoff safety has two independent axes:** **doc-state alignment** and **repo-state reproducibility**. Report them separately at handoff.
 
+## Steering posture (Bellman / MDP)
+
+Stewarding **prioritizes the post-step state and future option value** over chasing the single-step “highest EV” move. Use **EV / throughput** as **grounding** only. Prefer passes that produce durable **state shifts** (e.g. toward clean, legible, evidenced, gated). Canonical wording: `docs/SOP/OPERATING_RULES.md` → **Steering objective (Bellman / MDP posture)**.
+
 ## Source-of-truth order
 
 1. Pushed repo + current accepted docs
@@ -73,6 +77,8 @@ AGENT CONTINUITY
 - Exact reason:
 - If YES: exact handoff payload required:
 ```
+
+**YES gate (non-negotiable):** **Safe to switch agents? YES** only when all conditions in `docs/SOP/OPERATING_RULES.md` (**SLIM MODE** / **REPO-SENSOR REPORT** / **Safe-to-switch agents = YES**) are met—including committed pass output (unless the user’s explicit exception is quoted), validation evidence linked or honestly reused/N/A, mixed-plane status explained, and **no `closed_clean` pass labeling** when validation succeeded but the working tree remains dirty (use **`validated_dirty`** or **`closeout_pending`** instead; agent continuity stays **NO** until clean).
 
 ## BUILD preflight gate (required)
 
