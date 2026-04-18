@@ -103,7 +103,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Parked deferred mixed state (explicitly unaccepted):** `parked/deferred-mixed-stash0` @ `3983870`
 - **Sprint 001 — Slices 005–011** are **closed** on the accepted baseline (see `docs/SOP/CURRENT_FRONTIER.md`); **Sprint 001 primary loop** is **wrapped** (**outcome B**, 2026-04-17).
 - **Sprint002-Slice001** is **closed/shipped** (product **`ff40b48`**).
-- **Sprint002-Slice002** is **closed/shipped** (product **`bd12b7c`**; baseline **tip** verifies with `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline`).
+- **Sprint002-Slice002** is **closed/shipped** (product **`bd12b7c`**; baseline **tip** includes control-plane CLOSEOUT — verify `git rev-parse HEAD`; verify product with `git merge-base --is-ancestor bd12b7cc09bee0399a755e5dd322f4e63a04fe0a HEAD`).
 - **BUILD may proceed** from the clean baseline **without using parked branches** (use a fresh BUILD branch/worktree; obey preflight + single-plane rules) **after** **SELECTION** names the next slice. The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently

@@ -47,7 +47,7 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**None (BUILD-selected).** **Sprint002-Slice001** and **Sprint002-Slice002** are **closed/shipped** on the accepted baseline (**tip** includes product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`** after promotion; verify with `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline`). Spec anchors: **`docs/SOP/SPRINT_002_PHASE_2.md` §7–§8**.
+**None (BUILD-selected).** **Sprint002-Slice001** and **Sprint002-Slice002** are **closed/shipped** on the accepted baseline. **Verify repo tip:** `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline` (post–Slice002 CLOSEOUT docs). **Verify Slice002 product on that tip:** `git merge-base --is-ancestor bd12b7cc09bee0399a755e5dd322f4e63a04fe0a HEAD`. Spec anchors: **`docs/SOP/SPRINT_002_PHASE_2.md` §7–§8**.
 
 **Sprint 001 — Slice 011** — **closed/shipped** (demo coherence **outcome B**, 2026-04-17); no **Slice 012**.
 
