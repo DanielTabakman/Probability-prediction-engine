@@ -56,11 +56,10 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **No slice in-flight under BUILD** (post–**Sprint002-Slice002** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
+- **Sprint002-Slice003** — **selected/chartered** (**CONTROL-PLANE SELECTION**, 2026-04-18); **BUILD** is the next execution step; full definition **§9**. **Latest shipped:** **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
 
-### B. Likely next (after Slice002 CLOSEOUT unless steward re-orders)
+### B. Likely next (after Slice003 unless steward re-orders)
 
-- **Sprint002-Slice003** — **Shape-reading consistency pass** (align labels, captions, and “What changed?” vocabulary with the shape-focus model—**copy/layout only**).
 - **§6.C** batch candidates — only with explicit later **SELECTION** (not bundled by default).
 
 ### C. Batch candidates (pick up only with explicit SELECTION; not default bundled)
@@ -171,10 +170,58 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### 8.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice002** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**. **Product delta:** `src/viz/app.py` only (session bookmark + **Return to last chart view**). **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_163043/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_163043/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary (map **§6.B** = candidates only, not implicit charter).
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice002** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**. **Product delta:** `src/viz/app.py` only (session bookmark + **Return to last chart view**). **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_163043/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_163043/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Superseded (steering):** **SELECTION** named **Sprint002-Slice003** (**§9**); **next** = **BUILD** (see **`docs/SOP/CURRENT_FRONTIER.md`**).
+
+---
+
+## 9. Sprint002-Slice003 (selected / chartered — awaiting BUILD)
+
+### 9.1 Identifier
+
+**Sprint002-Slice003**
+
+### 9.2 Title
+
+**Vocabulary consistency / local region meaning alignment**
+
+### 9.3 User problem
+
+“I can **find** a band on the chart (Slice001) and **come back** to it (Slice002), but the **words** on the screen don’t always **name the same region the same way**—shape-focus strip, chart-adjacent captions, glance lines, and **‘What changed?’** can feel like **different dialects**. I want a **single, visual-language-consistent read** so I can **think about the market through the tool’s shape language** without guessing which label is ‘the real one.’”
+
+### 9.4 Exact UI target (product surface)
+
+**Bounded to:** the **primary implied-distribution chart** (Plotly main figure) **and** the **Sprint002-Slice001** **shape-focus strip** (prompts / AOI copy), **plus** **chart-adjacent** and **glance-adjacent** strings that **refer to the same x-window / local-region concepts** (e.g. narrowed band, last chart view, where-to-look cues), **and** the **last-action / “What changed?”** readout **only where** it touches **chart-window / shape-focus / AOI vocabulary**—so one interaction does not produce **contradictory region naming** across those surfaces.
+
+**Primary files expected (BUILD planning only):** `src/viz/app.py` (and only closely related viz helpers if unavoidable); **no** `docs/SEMANTIC_CONTRACTS.md` edits.
+
+### 9.5 Non-goals (slice)
+
+- **No** recommendation logic, ranked plays, or “best” framing.
+- **No** new overlay series, payoff modes, or **preset** explosion.
+- **No** major semantic **contract** rewrite or quantitative **new claims**—if copy would require them, **stop** and split a **SELECTION** enabling slice or defer.
+- **No** **§6.C** program in this slice (sliders, keyboard x-range affordances, broad glance/memory systems, cross-session persistence).
+- **No** advisory tone; **no** changes to disagreement / belief **math**—**interpretation and naming only** where strings are adjusted.
+
+### 9.6 Acceptance criteria (slice)
+
+1. **Vocabulary alignment:** terms for the **user’s local chart region** / **shape-focus object** read **consistently** across the **shape-focus strip**, **chart-adjacent** copy tied to x-window behavior, and **last-action / “What changed?”** strings **on paths already covered**, where those strings describe the **same** region/window concept (same idea → same **family** of labels; no accidental synonym sprawl).
+2. **Contract-true:** adjusted wording stays aligned with **`docs/SEMANTIC_CONTRACTS.md`** and existing numeric semantics (**descriptive**, not new quantitative assertions).
+3. **Non-advisory:** copy remains **orientation / description** (“shows,” “highlights,” “returns to”)—not **prescription** (“you should,” “favor,” “best”).
+4. **Trust spine intact:** provenance, verification entry, degraded honesty, and **exploration vs recommendation** boundary remain **as visible and true** as on the Slice002-closeout baseline.
+5. **`python -m pytest -q`** and **`python scripts/run_implied_lab_ui_smoke.py`** → **PASS** on the BUILD branch.
+
+### 9.7 Validation posture (slice)
+
+- **Required:** `python -m pytest -q`; `python scripts/run_implied_lab_ui_smoke.py`.
+- **Conditional:** if glance / classification / disagreement **wiring or strings** beyond **pure** chart-chrome relabel are touched, add the **smallest** harness scenario per **`IMPLIED_LAB_OPERATOR_RUNBOOK.md`** / **`OPERATING_RULES.md`** for touched paths.
+- **Witness (human/steward):** narrow chart → use shape-focus cue → trigger a covered **“What changed?”** path → confirm **one coherent local-region story** in plain English across strip + chart + readout (optional screenshot on **CLOSEOUT**).
+
+### 9.8 Control-plane supplement: execution status
+
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE SELECTION):** **Sprint002-Slice003** is **selected/chartered**; **BUILD** is next. **Not** shipped until product work + **CLOSEOUT** land on an accepted baseline. Authoritative execution ledger: **`docs/SOP/CURRENT_FRONTIER.md`**.
 
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice002** **closed/shipped** (`bd12b7c`); **next** = **SELECTION**. Prior same day: **BUILD** + promotion Slice002; **SELECTION** charter **§8**; **CLOSEOUT** Slice001.
+2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): **Sprint002-Slice003** **chartered** (**§9**); **next** = **BUILD**. Prior same day: **CLOSEOUT** Slice002 (`bd12b7c`); **BUILD** + promotion Slice002; **CLOSEOUT** Slice001.
