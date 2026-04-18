@@ -56,12 +56,13 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **No slice in-flight under BUILD** (post–**Sprint002-Slice001** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice001** — shape focus & area-of-interest prompts (baseline **`ff40b48`**).
+- **Sprint002-Slice002 — SELECTED** (2026-04-18 **SELECTION**; **BUILD** is next — see **§8**). **No slice in-flight under BUILD** until a BUILD pass opens a short-lived branch.
+- **Latest shipped:** **Sprint002-Slice001** — shape focus & area-of-interest prompts (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**; baseline tip includes control-plane **`1894c18363459db4c73f170348e8c48116a1ce31`**).
 
-### B. Likely next
+### B. Likely next (after Slice002 CLOSEOUT unless steward re-orders)
 
-- **Sprint002-Slice002** — **Focus persistence / “return to my region”** (remember last user-named or last-interacted band within session; minimal state; no centralization program).
 - **Sprint002-Slice003** — **Shape-reading consistency pass** (align labels, captions, and “What changed?” vocabulary with the shape-focus model—**copy/layout only**).
+- **§6.C** batch candidates — only with explicit later **SELECTION** (not bundled by default).
 
 ### C. Batch candidates (pick up only with explicit SELECTION; not default bundled)
 
@@ -121,10 +122,60 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### 7.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice001** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**. **Product delta:** `src/viz/app.py` only. **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary (see **§6.B** for default *candidates*, not an implicit charter).
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice001** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**. **Product delta:** `src/viz/app.py` only. **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Subsequent execution step (steering):** **SELECTION** then **BUILD** for **Sprint002-Slice002** (**§8**) — **SELECTION** completed 2026-04-18 same day.
+
+---
+
+## 8. Sprint002-Slice002 (selected — BUILD next)
+
+### 8.1 Identifier
+
+**Sprint002-Slice002**
+
+### 8.2 Title
+
+**Focus persistence / “return to my region” (session-scoped)**
+
+### 8.3 User problem
+
+“After I **narrow** the chart to the band I care about (or follow Slice001’s **where-to-look** cue), a **reset**, **other control**, or **natural exploration** **throws away** that framing. I want a **bounded way back** to **my last meaningful chart window** **without** hunting the same controls again or **losing** trust/provenance context.”
+
+### 8.4 Exact UI target (product surface)
+
+**Bounded to:** the **primary implied-distribution chart** (Plotly main figure) **and** the **same chart-adjacent / shape-focus surface** established in **Sprint002-Slice001** (compact shape-focus strip + x-axis window behavior **already shipped** — extend **only** with **session-local** persistence and **one** explicit **return/restore** affordance **or** one **equivalent** minimal pattern (e.g. single **“Return to last chart view”** control placed in the existing strip / chart chrome; **no** new secondary panels).
+
+**State rule:** **`st.session_state` (Streamlit) only** — remember the **last user-established meaningful x-range** (or equivalent **single** bounded window token the BUILD agent derives from existing Slice001 mechanics); **no** cross-session storage, **no** DB, **no** state-centralization program beyond what Slice001 already uses.
+
+**Primary files expected (BUILD planning only):** `src/viz/app.py` (and only closely related viz helpers if unavoidable); **no** `docs/SEMANTIC_CONTRACTS.md` edits.
+
+### 8.5 Non-goals (slice)
+
+- **No** new overlay series, payoff modes, or **preset** explosion.
+- **No** cross-browser / cross-tab persistence; **no** URL deep-link state program.
+- **No** vocabulary-wide relabel of **“What changed?”** or glance digest (**defer** to **Sprint002-Slice003**).
+- **No** advisory framing; **no** semantic changes to disagreement / belief math.
+- **No** chart **x-range affordance** sprawl beyond **§6.C** (sliders, keyboard program, etc.) — this slice is **return-to-view**, not **more controls**.
+
+### 8.6 Acceptance criteria (slice)
+
+1. After the user establishes a **non-default** chart x-window (via existing Slice001 mechanics), **later** in the **same session** they can **restore that window** using the **new explicit affordance** (or the single equivalent pattern named in CLOSEOUT) **without** manual re-entry of identical bounds.
+2. The affordance is **visible but non-dominant**; it does **not** hide provenance, verification entry, or the **main chart**.
+3. **“What changed?”** / last-action readouts **remain contract-true** on paths they already cover; **no contradictions** introduced by persistence copy.
+4. Copy remains **descriptive** (orientation), not **prescriptive** (advice).
+5. **`python -m pytest -q`** and **`python scripts/run_implied_lab_ui_smoke.py`** → **PASS** on the BUILD branch.
+
+### 8.7 Validation posture (slice)
+
+- **Required:** `python -m pytest -q`; `python scripts/run_implied_lab_ui_smoke.py`.
+- **Conditional:** if glance / classification / disagreement strings are touched beyond unavoidable labels, add the **smallest** harness scenario per runbook for touched paths.
+- **Witness (human/steward):** narrow chart → change something that alters view → **return** → confirm same band; optional screenshot pair on CLOSEOUT.
+
+### 8.8 Control-plane supplement: execution status
+
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE SELECTION):** **Sprint002-Slice002** is **SELECTED**; **next execution step** = **BUILD**. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Not shipped** until product **CLOSEOUT** records acceptance.
 
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice001** **closed/shipped** (`ff40b48`); **next** = **SELECTION** (see `CURRENT_FRONTIER.md`). Prior same day: **SELECTION** naming Slice001 + **BUILD** + baseline promotion (product commits, not repeated here).
+2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): pinned **Sprint002-Slice002** (**§8**); **next** = **BUILD**. Prior same day: **CLOSEOUT** **Sprint002-Slice001** (`ff40b48` product; `1894c18` baseline tip). Prior same day: **SELECTION** + **BUILD** + promotion for Slice001.
