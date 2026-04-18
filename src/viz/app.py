@@ -115,6 +115,58 @@ def _render_belief_vs_market_glance(v: dict) -> None:
             st.caption(f"{g.get('overlay_basis_line', '')}")
 
 
+def _shape_focus_x_range(
+    choice: str,
+    price_min: float,
+    price_max: float,
+    forward: float,
+) -> tuple[float, float]:
+    """Sprint002-Slice001: map UI labels to chart x-axis window (descriptive navigation only)."""
+    lo, hi = float(price_min), float(price_max)
+    fw = float(forward)
+    if hi <= lo:
+        return lo, hi
+    if choice == "Lower prices":
+        upper = min(hi, fw * 1.1)
+        return lo, max(lo + 1.0, upper)
+    if choice == "Near forward":
+        a = max(lo, fw * 0.82)
+        b = min(hi, fw * 1.18)
+        if b <= a + 1.0:
+            return lo, hi
+        return a, b
+    if choice == "Higher prices":
+        lower = max(lo, fw * 0.9)
+        return lower, hi
+    # "Full range" and any unknown value
+    return lo, hi
+
+
+def _shape_focus_post_interaction_hint(verification: dict | None, forward: float) -> str:
+    """Short descriptive copy; uses existing glance fields only (no new metrics)."""
+    v = verification if isinstance(verification, dict) else {}
+    g = v.get("belief_vs_market_glance")
+    base = (
+        "**Where to look:** the horizontal axis is **underlying price (USD)**. "
+        "**Purple (filled)** is the reference distribution; **orange (dashed)** is the market-implied curve from marks."
+    )
+    if isinstance(g, dict) and g.get("largest_gap_price_usd") is not None:
+        gap_txt = str(g.get("largest_gap_display") or "").strip() or (
+            f"${float(g['largest_gap_price_usd']):,.0f}"
+        )
+        return (
+            base + " "
+            f"When the optional belief overlay is on, **Belief vs market — at a glance** reports where "
+            f"the sample grid shows the largest **|ΔPDF|** around **{gap_txt}** on that same axis "
+            f"(a mismatch descriptor, not a recommendation)."
+        )
+    return (
+        base + " "
+        "When the optional belief overlay is on, open **Review & disagreement digest** below for "
+        "**Belief vs market — at a glance** on the same run as this chart."
+    )
+
+
 def _render_trust_strip(verification: dict) -> None:
     """Always-visible provenance strip from verification_summary (Sprint 006)."""
     lines = build_trust_strip_lines(verification if isinstance(verification, dict) else None)
@@ -630,6 +682,22 @@ if show_bitcoin_view:
                                 "**Right column:** chart → **Summary** → **Trust / provenance** → optional **Belief overlay** "
                                 "narrative → **Review & disagreement digest** → **Trade ticket**. "
                                 "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
+                            )
+                        # Sprint002-Slice001: x-axis window control (declared before chart body uses the same key).
+                        _zkey_shape = f"implied_lab_shape_zoom_{selected_expiry_str}"
+                        if _zkey_shape not in st.session_state:
+                            st.session_state[_zkey_shape] = "Full range"
+                        with st.container(border=True):
+                            st.caption(
+                                "**Shape focus (Sprint 002 — Slice 001)** — sets the chart’s **underlying price** window for readability; "
+                                "it does not change the priced inputs."
+                            )
+                            st.radio(
+                                "X-axis window",
+                                ("Full range", "Lower prices", "Near forward", "Higher prices"),
+                                horizontal=True,
+                                key=_zkey_shape,
+                                help="Descriptive navigation on the same distribution; not advice about trades.",
                             )
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
@@ -1473,6 +1541,12 @@ if show_bitcoin_view:
                             showgrid=False,
                         )
                     fig_dist.update_layout(**layout_kw)
+                    _zkey_shape = f"implied_lab_shape_zoom_{selected_expiry_str}"
+                    _zoom_choice = str(st.session_state.get(_zkey_shape, "Full range"))
+                    _xr0, _xr1 = _shape_focus_x_range(
+                        _zoom_choice, float(price_min), float(price_max), float(forward)
+                    )
+                    fig_dist.update_xaxes(range=[_xr0, _xr1])
                     _gap_x = ch.get("belief_largest_gap_price")
                     if (
                         user_belief_for_state.get("enabled")
@@ -1519,6 +1593,20 @@ if show_bitcoin_view:
 
                     with right_chart_slot.container():
                         st.markdown("##### Market-implied view (chart)")
+                        with st.container(border=True):
+                            st.caption(
+                                "**Belief vs market — at a glance** (digest + reference numbers) lives in **Review & disagreement digest** "
+                                "below this column — same run as the chart."
+                            )
+                            _lc_key_sf = f"implied_lab_last_change_{selected_expiry_str}"
+                            _last_sf = st.session_state.get(_lc_key_sf)
+                            if isinstance(_last_sf, str) and _last_sf.strip():
+                                st.markdown(_shape_focus_post_interaction_hint(outputs.get("verification"), float(forward)))
+                            else:
+                                st.caption(
+                                    "After a preset, belief control, or strategy control on the left, this box adds a short "
+                                    "**where-to-look** note on the price axis (descriptive, not advisory)."
+                                )
                         st.caption(
                             "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
                             "(Breeden–Litzenberger from marks) · Green: **strategy P&L** at expiry when legs are set."
