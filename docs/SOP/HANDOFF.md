@@ -11,31 +11,31 @@ HANDOFF GATE — v2.1 (DOCS-ONLY control-plane)
 
 A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > CURRENT_FRONTIER > HANDOFF > OPERATING_RULES
-- Active phase:
-- Active sprint:
-- Closed slices:
-- Next pending execution step:
+- Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
+- Active sprint: Sprint 002 (`docs/SOP/SPRINT_002_PHASE_2.md`)
+- Closed slices: Sprint 001 — Slices 005–011 (wrap posture / outcome B); no active Sprint 001 slice
+- Next pending execution step: BUILD — Sprint002-Slice001 (`SPRINT_002_PHASE_2.md` §7)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
 - Canonical truth rule: steering truth lives in canonical docs; repo-state gate is separate
 
 B) REPO-STATE SAFETY (reproducibility)
-- Branch:
-- Ahead/behind vs origin:
-- Working tree: CLEAN / DIRTY
-- Dirty-state classification: M-only / U-only / M+U / Index-or-merge
-- Changed files by plane (CONTROL / PRODUCT / EVIDENCE):
-- Untracked canonical docs present? YES/NO (canonical = docs/SOP/**):
-- Mixed-plane dirty state? YES/NO:
-- BUILD allowed right now? YES/NO:
-- Operationally handoff-safe? YES/NO
+- Branch: verify at session start (`git rev-parse --abbrev-ref HEAD`; expected baseline `recovery/frontier-steward-v2_1-baseline` unless steward moved it)
+- Ahead/behind vs origin: verify at session start (`git rev-list --left-right --count origin/<branch>...HEAD`)
+- Working tree: verify at session start (CLEAN required before BUILD)
+- Dirty-state classification: M-only / U-only / M+U / Index-or-merge (record actual)
+- Changed files by plane (CONTROL / PRODUCT / EVIDENCE): record actual next pass
+- Untracked canonical docs present? YES/NO (canonical = docs/SOP/**): verify; must be NO before accepted baseline
+- Mixed-plane dirty state? YES/NO: verify
+- BUILD allowed right now? YES/NO: YES only if preflight + clean tree + CONTROL/PRODUCT plane discipline satisfied
+- Operationally handoff-safe? YES/NO: verify
 - If NO: exact reason (one sentence):
 
 C) AGENT CONTINUITY (required)
-- Safe to switch agents? YES/NO
+- Safe to switch agents? YES/NO: verify after repo-state
 - Exact reason:
-- If YES: exact handoff payload required:
+- If YES: exact handoff payload required: branch + HEAD SHA + read `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_002_PHASE_2.md` §7
 ```
 
 **Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
@@ -67,7 +67,10 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
-**Execution posture (Sprint 001 — WRAP):**
+**Execution posture (Sprint 002 — BUILD pending):**
+- **Sprint002-Slice001** — **selected** — shape focus + area-of-interest scaffolding on **chart + Belief vs market glance** band (`docs/SOP/SPRINT_002_PHASE_2.md` §7). **Next execution step:** **BUILD** (then CLOSEOUT).
+
+**Execution posture (Sprint 001 — WRAP / archive):**
 - **Sprint 001 — Slice 005 CLOSED** = **Starter state + one obvious first move (presets)**.
 - **Sprint 001 — Slice 006 CLOSED** = **Last-action meaning: plain-English “what changed?” readout** (preset-driven readout on accepted baseline).
 - **Sprint 001 — Slice 007 CLOSED** = **Last-action meaning for non-preset interactions** (extend “what changed?” beyond presets; shipped on accepted baseline).
@@ -88,7 +91,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**None (Sprint 001 wrapped).** **Sprint 001 — Slice 011** is **closed/shipped** (see `docs/SOP/CURRENT_FRONTIER.md`). **Next:** **SELECTION** for **Sprint 002** (Phase 2) or steward phase transition — **not** a standing **Slice 012** under Sprint 001.
+**Sprint002-Slice001** — **selected; BUILD not started** (see `docs/SOP/SPRINT_002_PHASE_2.md` §7 and `docs/SOP/CURRENT_FRONTIER.md`). **Sprint 001** remains **wrapped** (**Slices 005–011** closed; no **Slice 012**).
 
 ## Current status
 
@@ -105,9 +108,9 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — name **Sprint 002** (Phase 2) scope **or** an explicit steward phase transition; see `docs/SOP/CURRENT_FRONTIER.md` (demo coherence pass **complete**, **outcome B**). **No product BUILD** until that **SELECTION** lands.
-- deferred:
-- optional:
+- next task: **BUILD** — **Sprint002-Slice001** per `docs/SOP/SPRINT_002_PHASE_2.md` §7 (then **CLOSEOUT** with evidence). Obey preflight, single-plane rules, and short-lived BUILD branch/worktree.
+- deferred: Sprint 002 follow-on slices per sprint map (`SPRINT_002_PHASE_2.md` §6) — execute only per post-closeout **SELECTION** if scope drifts from map.
+- optional: steward demo script (docs-only) if validation thrash warrants it — not selected by default.
 
 ## Risks / watchouts
 
@@ -146,16 +149,16 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — **Sprint 002** under `docs/SOP/PHASE_2_CHARTER.md` (new bounded scope + acceptance) **or** steward-approved phase re-charter. **Sprint 001** is **wrapped** per `docs/SOP/CURRENT_FRONTIER.md` (2026-04-17).
+**BUILD** — **Sprint002-Slice001** (`docs/SOP/SPRINT_002_PHASE_2.md` §7). **Sprint 001** remains **wrapped** (`docs/SOP/CURRENT_FRONTIER.md`, 2026-04-17 **outcome B**).
 
 ## Handoff checklist (must be filled each handoff)
 
 ### A) Doc-state safety / alignment (canonical docs only)
 
-- **Active phase**:
-- **Active sprint**:
-- **Closed slices (Sprint 001)**:
-- **Next pending execution step**:
+- **Active phase**: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
+- **Active sprint**: Sprint 002 (`docs/SOP/SPRINT_002_PHASE_2.md`)
+- **Closed slices (Sprint 001)**: 005–011 (wrap **outcome B**; no Slice 012)
+- **Next pending execution step**: **BUILD** — **Sprint002-Slice001**
 - **Reporting posture**: **SLIM MODE** and (if applicable) **REPO-SENSOR execution-only** (no extra analysis)
 - **Canonical truth rule**: confirm `CURRENT_FRONTIER` outranks `HANDOFF` if drift is detected (until reconciled)
 - **Non-canonical naming note**: confirm any **H1 / H1-01 / H1-02** shorthand is treated as **non-canonical legacy** unless explicitly reintroduced by accepted docs (prefer Phase/Sprint/Slice identifiers)
@@ -188,4 +191,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-17 by agent (**DOCS-ONLY control-plane — Frontier Steward 2.2**, Phase 2 demo coherence pass): **Sprint 001 wrapped** (**outcome B**); verified baseline **tip** per `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline`; **next SELECTION** = **Sprint 002** or phase transition (see `CURRENT_FRONTIER.md`). Prior same day: Slice 011 shipped/closed (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea` in ancestry). Prior: 2026-04-16 by agent (**DOCS-ONLY** — Slice 009 shipped/closed; next step SELECTION). Prior same day: Slice 008 close. Prior: 2026-04-11 by agent (CLOSEOUT — legacy **feature slice 009** operator runbook; not Sprint 001 Slice 009). Earlier: legacy Phase 1 feature slice 008 closeout; 2026-04-10 — feature slice 007/006/005 closeouts; Execution step 18 RECOVERY baseline; Execution step 17 validation tiers.
+2026-04-18 by agent (**CONTROL-PLANE SELECTION — Frontier Steward 2.2**): **Sprint 002** + map + **Sprint002-Slice001** recorded in `docs/SOP/SPRINT_002_PHASE_2.md`; **next** = **BUILD** that slice. **No product BUILD** in this pass. Prior: 2026-04-17 (**Sprint 001 wrap**, **outcome B**). Prior: 2026-04-16 (Slice 009). Prior: 2026-04-11 (feature slice 009 runbook CLOSEOUT).
