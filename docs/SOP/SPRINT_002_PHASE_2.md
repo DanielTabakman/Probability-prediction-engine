@@ -56,8 +56,7 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **Sprint002-Slice002 — SELECTED** (2026-04-18 **SELECTION**; **BUILD** is next — see **§8**). **No slice in-flight under BUILD** until a BUILD pass opens a short-lived branch.
-- **Latest shipped:** **Sprint002-Slice001** — shape focus & area-of-interest prompts (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**; baseline tip includes control-plane **`1894c18363459db4c73f170348e8c48116a1ce31`**).
+- **No slice in-flight under BUILD** (post–**Sprint002-Slice002** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
 
 ### B. Likely next (after Slice002 CLOSEOUT unless steward re-orders)
 
@@ -122,11 +121,11 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### 7.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice001** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**. **Product delta:** `src/viz/app.py` only. **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Subsequent execution step (steering):** **SELECTION** then **BUILD** for **Sprint002-Slice002** (**§8**) — **SELECTION** completed 2026-04-18 same day.
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice001** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**. **Product delta:** `src/viz/app.py` only. **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Sprint002-Slice002** history: **§8**.
 
 ---
 
-## 8. Sprint002-Slice002 (selected — BUILD next)
+## 8. Sprint002-Slice002 (closed / shipped)
 
 ### 8.1 Identifier
 
@@ -170,12 +169,12 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 - **Conditional:** if glance / classification / disagreement strings are touched beyond unavoidable labels, add the **smallest** harness scenario per runbook for touched paths.
 - **Witness (human/steward):** narrow chart → change something that alters view → **return** → confirm same band; optional screenshot pair on CLOSEOUT.
 
-### 8.8 Control-plane supplement: execution status
+### 8.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE SELECTION):** **Sprint002-Slice002** is **SELECTED**; **next execution step** = **BUILD**. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Not shipped** until product **CLOSEOUT** records acceptance.
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice002** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**. **Product delta:** `src/viz/app.py` only (session bookmark + **Return to last chart view**). **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_163043/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_163043/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary (map **§6.B** = candidates only, not implicit charter).
 
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): pinned **Sprint002-Slice002** (**§8**); **next** = **BUILD**. Prior same day: **CLOSEOUT** **Sprint002-Slice001** (`ff40b48` product; `1894c18` baseline tip). Prior same day: **SELECTION** + **BUILD** + promotion for Slice001.
+2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice002** **closed/shipped** (`bd12b7c`); **next** = **SELECTION**. Prior same day: **BUILD** + promotion Slice002; **SELECTION** charter **§8**; **CLOSEOUT** Slice001.
