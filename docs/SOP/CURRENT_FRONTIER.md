@@ -103,4 +103,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-18 by agent (**CONTROL-PLANE CLOSEOUT — Frontier Steward 2.2**): **Sprint002-Slice002** **closed/shipped**; product **`bd12b7c`**; control-plane commits through **`e804c45a0ed1286ba870ee50eb27f4779856ad8d`** (verify `git rev-parse HEAD`); evidence **`artifacts/ui_smoke/20260418_163043/`**; **next** = **SELECTION**. **No product code** in this pass.
+2026-04-18 by agent (**CONTROL-PLANE CLOSEOUT — Frontier Steward 2.2**): **Sprint002-Slice002** **closed/shipped**; product **`bd12b7c`** on `recovery/frontier-steward-v2_1-baseline` (verify `git merge-base --is-ancestor bd12b7cc09bee0399a755e5dd322f4e63a04fe0a HEAD`); **ledger tip** verify `git rev-parse HEAD`; evidence **`artifacts/ui_smoke/20260418_163043/`**; **next** = **SELECTION**. **No product code** in this pass.
