@@ -10,7 +10,7 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 
 **Active phase (chartered):** **Phase 2 — Desirability / Playability / UX** — `docs/SOP/PHASE_2_CHARTER.md`.  
 **Sprint 001 — Phase 2 (wrapped / archive):** `docs/SOP/SPRINT_001_PHASE_2.md` — **primary loop complete** (2026-04-17, **outcome B**); **no active Sprint 001 BUILD slice**.  
-**Sprint 002 — Phase 2 (active):** `docs/SOP/SPRINT_002_PHASE_2.md` — **SELECTION complete** (2026-04-18); **lightweight sprint map** recorded in that doc (**§6**). **Current selected slice:** **Sprint002-Slice001** (pending **BUILD**).  
+**Sprint 002 — Phase 2 (active):** `docs/SOP/SPRINT_002_PHASE_2.md` — **SELECTION complete** (2026-04-18); **lightweight sprint map** in **§6**. **Sprint002-Slice001 — CLOSED / shipped** (2026-04-18 **CLOSEOUT**; product **ff40b48** on `recovery/frontier-steward-v2_1-baseline`). **No slice in-flight** under **BUILD** until the next **SELECTION** names a boundary.  
 
 **Steering continuity (doc-state, canonical):**
 - **Phase 2 is active.**
@@ -23,6 +23,7 @@ Purpose: live steering document for the current phase. Updateable; should reflec
 - **Slice 009 (CLOSED):** **Sprint 001 — Slice 009** — **not** the same identifier as legacy Phase 1 **Feature slice 009** (operator runbook, closed). Scope intent: bounded **repeat-play / follow-on interaction** quality within the Phase 2 primary loop (`docs/SOP/PHASE_2_CHARTER.md` §9 behavioral witness: clarity after a **second and third** meaningful interaction), **layout/copy/affordance-only** unless an approved contract note exists; no architecture program. **Shipped on accepted baseline.**
 - **Slice 010 (CLOSED):** **Sprint 001 — Slice 010 (Phase 2)** — extend “What changed” to belief + target-payoff. **Shipped on accepted baseline.**
 - **Slice 011 (CLOSED):** **Sprint 001 — Slice 011 (Phase 2)** — guided **“Try next”** follow-on affordances (one-click buttons on existing preset/meaning paths; **layout/copy/affordance-only** relative to semantic contracts). **Shipped on accepted baseline** (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`).
+- **Sprint002-Slice001 (CLOSED, product):** **Shape focus prompts + AOI scaffolding** — chart x-axis window control + post-interaction **where-to-look** copy (existing glance fields only); **`src/viz/app.py`**. **Shipped on accepted baseline** (`ff40b48deb7acf4b2d897a09287e69ed7148abd9`). **Closeout validation:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`; screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`.
 
 **Repo-state gate (operational, separate from steering):**
 
@@ -45,17 +46,18 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 **Formal phase-exit rubric:** `docs/SOP/PHASE_1_EXIT_CRITERIA.md` (feature slice **011**). **Phase-exit confirmation** (same doc, section 5 + section 3 assessment): `python -m pytest -q` → **41** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — manifest `artifacts/ui_smoke/20260411_163249/ui_smoke_manifest.json` (page load, disagreement, strategy family block, trade ticket, **Verification** expander found).
 
 ## Current feature slice
-**Sprint002-Slice001** — **selected; BUILD not started** (spec: `docs/SOP/SPRINT_002_PHASE_2.md` §7). **Title:** Shape focus prompts + AOI scaffolding on the main surface. **UI target:** primary implied-distribution chart + adjacent **Belief vs market glance** band + at most one compact shape-focus strip (see sprint doc). **Operational baseline:** continue to use `recovery/frontier-steward-v2_1-baseline` branch tip unless steward directs otherwise; verify with `git rev-parse HEAD`.
+**None (BUILD-selected).** **Sprint002-Slice001** is **closed/shipped** on the accepted baseline (**HEAD** includes **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**; verify with `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline`). Spec / scope: `docs/SOP/SPRINT_002_PHASE_2.md` §7.
 
-**Sprint 001 — Slice 011** — **closed/shipped** on the accepted baseline (product lineage includes `29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`; demo-coherence review anchor **HEAD:** `c51a4b4985f586b64264d63715af61e17f66358d`). **Demo coherence SELECTION (2026-04-17 — COMPLETE):** **Outcome B** — Sprint 001 wrap; no **Slice 012**.
+**Sprint 001 — Slice 011** — **closed/shipped** (demo coherence **outcome B**, 2026-04-17); no **Slice 012**.
 
-**Next pending execution step:** **BUILD** — **Sprint002-Slice001** per `docs/SOP/SPRINT_002_PHASE_2.md` §7 (preflight + single-plane rules; fresh BUILD branch/worktree). **Prerequisite:** lightweight sprint map — **satisfied** by `SPRINT_002_PHASE_2.md` §6.
+**Next pending execution step:** **SELECTION** — name the **next bounded Sprint 002 slice** (per sprint map **§6.B** the default *candidate* is **Sprint002-Slice002**, but **SELECTION** is still the explicit state transition—do not treat the map as an auto-BUILD charter) **or** steward adjustment / phase transition. **CLOSEOUT** for **Sprint002-Slice001** is **complete** in control-plane truth with this ledger update (**not** a BUILD pass).
 
-**Selected next steering move (2026-04-18 SELECTION):** Execute **Sprint002-Slice001**, then **CLOSEOUT** with evidence; follow-on slices **Sprint002-Slice002** / **Slice003** per sprint map (**likely next**) require their own explicit selection only if scope diverges from the map.
+**Selected next steering move (Bellman / MDP posture):** With **Sprint002-Slice001** shipped, the highest-value *documented* successor in the sprint map is **Sprint002-Slice002** (focus persistence / “return to my region”); realize it only after **SELECTION** pins acceptance and any batching rules. Alternative: steward re-prioritizes within Phase 2 without widening scope silently.
 
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
+- **Sprint002-Slice001 (CLOSED, product):** shape focus + AOI scaffolding — **`ff40b48`**; pytest **51** passed; primary smoke **PASS** (`artifacts/ui_smoke/20260418_160804/`).
 - **Sprint 001 — Slice 011 (CLOSED, product):** guided **“Try next”** one-click affordances under **“What changed?”** (existing presets/meaning readout) — shipped on accepted baseline (`29df0069cbbd14fdb96a8bfdda9c4b46329d7cea`).
 - **Sprint 001 — Slice 008 (CLOSED, product + smoke harness):** progressive disclosure & advanced de-emphasis (instrument hierarchy) — shipped on accepted baseline (`99a54f2` and later; baseline tip includes transactional starter `scripts/frontier_start_pass.py`).
 - **Sprint 001 — Slice 009 (CLOSED):** repeat-play / follow-on interaction quality within the Phase 2 primary loop — shipped/closed on accepted baseline.
@@ -99,4 +101,4 @@ Use the **Phase 1–oriented** list below **only** when `docs/SOP/PHASE_1_EXIT_C
 - **Stop / escalate** if repo hygiene degrades (conflicting patterns, duplicate sources of truth) in a way that blocks the next increment.
 
 ## Last updated
-2026-04-18 by agent (**CONTROL-PLANE SELECTION — Frontier Steward 2.2**): **Sprint 002** canon + map in `docs/SOP/SPRINT_002_PHASE_2.md`; **Sprint002-Slice001** selected; **next** = **BUILD** for that slice (sprint map prerequisite satisfied). **No product BUILD** in this pass. Prior: 2026-04-17 (**DOCS-ONLY** demo coherence / Sprint 001 wrap **outcome B**). Prior: 2026-04-16 (Slice 009 shipped/closed). Prior: 2026-04-13 (Phase 2 charter + Sprint 001 spec). Prior: 2026-04-11 (Phase 1 CLOSEOUT).
+2026-04-18 by agent (**CONTROL-PLANE CLOSEOUT — Frontier Steward 2.2**): **Sprint002-Slice001** **closed/shipped** on baseline **`ff40b48`**; evidence recorded above; **next** = **SELECTION** for next Sprint 002 slice boundary (map **§6.B** is candidate list, not auto-charter). **No product code** in this pass. Prior same day: **SELECTION** + **BUILD** + promotion for Slice001. Prior: 2026-04-17 (Sprint 001 wrap **outcome B**).

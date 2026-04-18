@@ -56,7 +56,7 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **Sprint002-Slice001** — **Shape focus & area-of-interest prompts** (chart + belief-vs-market glance band; descriptive copy + bounded affordances; interpretability without new engine semantics).
+- **No slice in-flight under BUILD** (post–**Sprint002-Slice001** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice001** — shape focus & area-of-interest prompts (baseline **`ff40b48`**).
 
 ### B. Likely next
 
@@ -78,7 +78,7 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ---
 
-## 7. Sprint002-Slice001 (selected)
+## 7. Sprint002-Slice001 (closed / shipped)
 
 ### 7.1 Identifier
 
@@ -119,8 +119,12 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 - **Conditional:** if glance/classification strings or disagreement digest wiring is touched, add the smallest relevant **harness** scenario per runbook for touched paths.
 - **Closeout:** before/after screenshot of chart+glance band optional; must list **files changed** and any **deferred** map items explicitly.
 
+### 7.8 Control-plane supplement: execution / CLOSEOUT status
+
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice001** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**. **Product delta:** `src/viz/app.py` only. **Evidence:** `python -m pytest -q` → **51** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_160804/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_160804/A_width_target_payoff.png`. Authoritative ledger: `docs/SOP/CURRENT_FRONTIER.md`. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary (see **§6.B** for default *candidates*, not an implicit charter).
+
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): Sprint 002 canon + map + **Sprint002-Slice001** selected; next execution step **BUILD** (see `docs/SOP/CURRENT_FRONTIER.md`). **No product BUILD** in this pass.
+2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice001** **closed/shipped** (`ff40b48`); **next** = **SELECTION** (see `CURRENT_FRONTIER.md`). Prior same day: **SELECTION** naming Slice001 + **BUILD** + baseline promotion (product commits, not repeated here).
