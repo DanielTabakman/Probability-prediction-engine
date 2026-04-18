@@ -684,7 +684,9 @@ if show_bitcoin_view:
                                 "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
                             )
                         # Sprint002-Slice001: x-axis window control (declared before chart body uses the same key).
+                        # Sprint002-Slice002: remember last non–full-range window for in-session restore (same keys per expiry).
                         _zkey_shape = f"implied_lab_shape_zoom_{selected_expiry_str}"
+                        _bookmark_shape = f"implied_lab_shape_zoom_bookmark_{selected_expiry_str}"
                         if _zkey_shape not in st.session_state:
                             st.session_state[_zkey_shape] = "Full range"
                         with st.container(border=True):
@@ -699,6 +701,25 @@ if show_bitcoin_view:
                                 key=_zkey_shape,
                                 help="Descriptive navigation on the same distribution; not advice about trades.",
                             )
+                            _zoom_now = str(st.session_state.get(_zkey_shape, "Full range"))
+                            if _zoom_now != "Full range":
+                                st.session_state[_bookmark_shape] = _zoom_now
+                            _zoom_saved = st.session_state.get(_bookmark_shape)
+                            if (
+                                isinstance(_zoom_saved, str)
+                                and _zoom_saved != "Full range"
+                                and _zoom_now != _zoom_saved
+                            ):
+                                st.caption(
+                                    "Shows the same curves with the chart’s prior **underlying-price** window for this session."
+                                )
+                                if st.button(
+                                    "Return to last chart view",
+                                    key=f"implied_lab_shape_zoom_restore_{selected_expiry_str}",
+                                    help="Restores the last non–full-range x-axis window you used this session (same inputs).",
+                                ):
+                                    st.session_state[_zkey_shape] = _zoom_saved
+                                    st.rerun()
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
