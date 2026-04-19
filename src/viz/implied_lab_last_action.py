@@ -14,6 +14,8 @@ LastActionId = Literal[
     "belief_width",
     "net_pnl_mode_toggle",
     "target_payoff_edit",
+    # Sprint002-Slice003: chart underlying-price window (shape language)
+    "shape_window",
 ]
 
 
@@ -47,6 +49,7 @@ def last_action_meaning(
     net_pnl_mode: bool | None = None,
     target_id: str | None = None,
     target_value: float | None = None,
+    shape_window_label: str | None = None,
 ) -> str:
     """
     Sprint 001 — Slice 007 (Phase 2): "Last action" meaning for non-preset interactions.
@@ -121,6 +124,13 @@ def last_action_meaning(
             return f"Target-payoff input updated: **{tid}**."
         # All current targets are in USD terms.
         return f"Target-payoff input updated: **{tid}** = **{_fmt_usd(tv)}**."
+
+    if action_id == "shape_window":
+        label = (shape_window_label or "—").strip() or "—"
+        return (
+            f"Chart **shape window** set to **{label}** on the **underlying price (USD)** axis "
+            "(how much of the distribution you see; **same priced inputs**)."
+        )
 
     # Defensive fallback (should be unreachable due to Literal typing).
     return "Updated strategy settings."

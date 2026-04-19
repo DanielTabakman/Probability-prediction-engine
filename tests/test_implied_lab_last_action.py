@@ -67,6 +67,12 @@ class TestImpliedLabLastAction(unittest.TestCase):
         self.assertIn("enabled", last_action_meaning(action_id="net_pnl_mode_toggle", net_pnl_mode=True))
         self.assertIn("disabled", last_action_meaning(action_id="net_pnl_mode_toggle", net_pnl_mode=False))
 
+    def test_shape_window(self) -> None:
+        msg = last_action_meaning(action_id="shape_window", shape_window_label="Near forward")
+        self.assertIn("shape window", msg.lower())
+        self.assertIn("Near forward", msg)
+        self.assertIn("underlying price", msg.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

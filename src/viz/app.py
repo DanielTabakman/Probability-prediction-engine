@@ -67,7 +67,10 @@ def _render_belief_vs_market_glance(v: dict) -> None:
         return
     with st.container(border=True):
         st.markdown("##### Belief vs market — at a glance")
-        st.caption("Disagreement digest vs **market-implied pricing distribution** (same run as the chart).")
+        st.caption(
+            "Digest vs **market-implied pricing distribution** on the **same underlying-price axis** as the chart "
+            "(your **shape window** control above), same run."
+        )
         digest = g.get("digest_lines")
         if isinstance(digest, list) and digest:
             st.markdown("###### Main disagreement (scan)")
@@ -147,7 +150,8 @@ def _shape_focus_post_interaction_hint(verification: dict | None, forward: float
     v = verification if isinstance(verification, dict) else {}
     g = v.get("belief_vs_market_glance")
     base = (
-        "**Where to look:** the horizontal axis is **underlying price (USD)**. "
+        "**Where to look:** the horizontal axis is **underlying price (USD)** — the same **shape window** "
+        "you chose above. "
         "**Purple (filled)** is the reference distribution; **orange (dashed)** is the market-implied curve from marks."
     )
     if isinstance(g, dict) and g.get("largest_gap_price_usd") is not None:
@@ -157,13 +161,13 @@ def _shape_focus_post_interaction_hint(verification: dict | None, forward: float
         return (
             base + " "
             f"When the optional belief overlay is on, **Belief vs market — at a glance** reports where "
-            f"the sample grid shows the largest **|ΔPDF|** around **{gap_txt}** on that same axis "
+            f"the sample grid shows the largest **|ΔPDF|** around **{gap_txt}** on that **same underlying-price axis** "
             f"(a mismatch descriptor, not a recommendation)."
         )
     return (
         base + " "
         "When the optional belief overlay is on, open **Review & disagreement digest** below for "
-        "**Belief vs market — at a glance** on the same run as this chart."
+        "**Belief vs market — at a glance** on the **same underlying-price axis** as this chart."
     )
 
 
@@ -691,11 +695,11 @@ if show_bitcoin_view:
                             st.session_state[_zkey_shape] = "Full range"
                         with st.container(border=True):
                             st.caption(
-                                "**Shape focus (Sprint 002 — Slice 001)** — sets the chart’s **underlying price** window for readability; "
-                                "it does not change the priced inputs."
+                                "**Shape focus** — pick the chart’s **shape window**: how much of the **underlying price (USD)** "
+                                "axis you see; **same priced inputs**."
                             )
                             st.radio(
-                                "X-axis window",
+                                "Shape window",
                                 ("Full range", "Lower prices", "Near forward", "Higher prices"),
                                 horizontal=True,
                                 key=_zkey_shape,
@@ -711,15 +715,25 @@ if show_bitcoin_view:
                                 and _zoom_now != _zoom_saved
                             ):
                                 st.caption(
-                                    "Shows the same curves with the chart’s prior **underlying-price** window for this session."
+                                    "Same curves with your previous **shape window** on this expiry’s underlying-price axis."
                                 )
                                 if st.button(
-                                    "Return to last chart view",
+                                    "Return to last shape window",
                                     key=f"implied_lab_shape_zoom_restore_{selected_expiry_str}",
-                                    help="Restores the last non–full-range x-axis window you used this session (same inputs).",
+                                    help="Restores your last non–full-range **shape window** from this session (same inputs).",
                                 ):
                                     st.session_state[_zkey_shape] = _zoom_saved
                                     st.rerun()
+                            _prev_shape_zoom_key = f"implied_lab_shape_zoom_prev_{selected_expiry_str}"
+                            if _prev_shape_zoom_key not in st.session_state:
+                                st.session_state[_prev_shape_zoom_key] = _zoom_now
+                            elif str(st.session_state.get(_prev_shape_zoom_key)) != _zoom_now:
+                                _lck = f"implied_lab_last_change_{selected_expiry_str}"
+                                st.session_state[_lck] = last_action_meaning(
+                                    action_id="shape_window",
+                                    shape_window_label=_zoom_now,
+                                )
+                                st.session_state[_prev_shape_zoom_key] = _zoom_now
                         right_chart_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
@@ -990,8 +1004,8 @@ if show_bitcoin_view:
                                 st.markdown("###### What changed?")
                                 st.caption("Sprint 001 — Slice 010 (Phase 2) · belief + target-payoff interactions")
                                 st.caption(
-                                    "This updates after each meaningful change you make (preset, mode, strikes, legs, quantity). "
-                                    "Descriptive only — not a recommendation."
+                                    "This updates after each meaningful change you make (preset, mode, strikes, legs, quantity, "
+                                    "**shape window**). Descriptive only — not a recommendation."
                                 )
                                 last_msg = st.session_state.get(last_change_key)
                                 if isinstance(last_msg, str) and last_msg.strip():
@@ -1064,7 +1078,7 @@ if show_bitcoin_view:
                                                 st.rerun()
                                 else:
                                     st.caption(
-                                        "Pick a preset above to see a plain-English summary of what changed. "
+                                        "Pick a preset above **or change the chart shape window** to see a plain-English summary. "
                                         "Then try a second and third interaction — this panel will keep updating."
                                     )
                             # Important: do not pass a computed `index` derived from session_state.
@@ -1625,8 +1639,9 @@ if show_bitcoin_view:
                                 st.markdown(_shape_focus_post_interaction_hint(outputs.get("verification"), float(forward)))
                             else:
                                 st.caption(
-                                    "After a preset, belief control, or strategy control on the left, this box adds a short "
-                                    "**where-to-look** note on the price axis (descriptive, not advisory)."
+                                    "After a preset, belief control, or strategy control on the left, this adds a short "
+                                    "**where-to-look** cue on the **same underlying-price axis** as your **shape window** "
+                                    "(descriptive, not advisory)."
                                 )
                         st.caption(
                             "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
