@@ -12,10 +12,10 @@ HANDOFF GATE — v2.1 (DOCS-ONLY control-plane)
 A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > CURRENT_FRONTIER > HANDOFF > OPERATING_RULES
 - Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
-- Active sprint: Sprint 002 — **ready to wrap / primary loop complete** (`docs/SOP/SPRINT_002_PHASE_2.md` §11)
+- Active phase sprint (BUILD): **none** — **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Phase 2** still **active** (`docs/SOP/PHASE_2_CHARTER.md`)
 - Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**)
 - Current selected slice: **none** — no slice in-flight under **BUILD**
-- Next pending execution step: **Sprint 002 wrap closeout** / **next sprint or phase decision** (steward; **`docs/SOP/CURRENT_FRONTIER.md`** — **SELECTION outcome A**, 2026-04-18)
+- Next pending execution step: **SELECTION** — **(A)** **Sprint 003** within Phase 2 **or** **(B)** **phase transition / new charter** (`docs/SOP/CURRENT_FRONTIER.md`)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
@@ -36,7 +36,7 @@ B) REPO-STATE SAFETY (reproducibility)
 C) AGENT CONTINUITY (required)
 - Safe to switch agents? YES/NO: verify after repo-state
 - Exact reason:
-- If YES: exact handoff payload required: branch + HEAD SHA + read `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_002_PHASE_2.md` §6 (map) / §7–§10 (Sprint002 Slices 001–004 **closed**) / **§11** (wrap posture — **SELECTION outcome A**)
+- If YES: exact handoff payload required: branch + HEAD SHA + read `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_002_PHASE_2.md` §6 (map) / §7–§10 (Slices **001–004** **closed**) / **§11–§12** (**Sprint 002 wrapped**)
 ```
 
 **Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
@@ -68,12 +68,13 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
-**Execution posture (Sprint 002 — post–SELECTION outcome A, ready to wrap):**
+**Execution posture (Sprint 002 — WRAPPED, 2026-04-18):**
 - **Sprint002-Slice001** — **CLOSED / shipped** (product **`ff40b48`**); evidence: `CURRENT_FRONTIER.md` **Steering continuity** + **Completed recently**.
 - **Sprint002-Slice002** — **CLOSED / shipped** (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); evidence: `CURRENT_FRONTIER.md` **Completed recently**; smoke `artifacts/ui_smoke/20260418_163043/`.
 - **Sprint002-Slice003** — **CLOSED / shipped** (product **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**); evidence: `CURRENT_FRONTIER.md` **Steering continuity** + **Completed recently**; smoke `artifacts/ui_smoke/20260418_220503/`.
 - **Sprint002-Slice004** — **CLOSED / shipped** (product **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**): **local region story / chart-adjacent meaning cue**; evidence: `CURRENT_FRONTIER.md` **Steering continuity** + **Completed recently**; smoke `artifacts/ui_smoke/20260418_222621/`.
-- **Next execution step:** **Sprint 002 wrap closeout** / **next sprint or phase decision** — **SELECTION** concluded **outcome A** (2026-04-18); **§6.C** remains **deferred map only**.
+- **Sprint 002 status:** **Wrapped / primary loop complete** — coherence **SELECTION outcome A** + **WRAP CLOSEOUT**; **§6.C** remains **deferred map only** (not selected).
+- **Next execution step:** **SELECTION** — **Sprint 003 (Phase 2)** **or** **phase transition / new charter**.
 
 **Execution posture (Sprint 001 — WRAP / archive):**
 - **Sprint 001 — Slice 005 CLOSED** = **Starter state + one obvious first move (presets)**.
@@ -96,7 +97,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**None (BUILD-selected).** **Sprint002-Slice001–004** are **closed/shipped** (see `docs/SOP/CURRENT_FRONTIER.md`). **Sprint 001** remains **wrapped** (**Slices 005–011** closed; no **Slice 012**).
+**None (BUILD-selected).** **Sprint002-Slice001–004** are **closed/shipped**; **Sprint 002** is **wrapped** (see `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/SPRINT_002_PHASE_2.md` **§12**). **Sprint 001** remains **wrapped** (**Slices 005–011** closed; no **Slice 012**).
 
 ## Current status
 
@@ -109,7 +110,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Sprint002-Slice002** is **closed/shipped** (product **`bd12b7c`**; verify `git merge-base --is-ancestor bd12b7cc09bee0399a755e5dd322f4e63a04fe0a HEAD`).
 - **Sprint002-Slice003** is **closed/shipped** (product **`6e5f563`**; verify `git merge-base --is-ancestor 6e5f5635acb9371af17ce7d8621f70ceb0072215 HEAD`).
 - **Sprint002-Slice004** is **closed/shipped** (product **`6be6d7c`**; verify `git merge-base --is-ancestor 6be6d7c5401c489bb702fb1ea40b4bee93ad8907 HEAD`).
-- **BUILD** (product) is **not** the default **next** step for **Sprint 002** (**SELECTION outcome A** — **ready to wrap**). **BUILD may proceed** from the clean baseline **without using parked branches** (fresh BUILD branch/worktree; preflight + single-plane rules) **only after** steward **wrap closeout** / **next sprint or phase decision** yields an explicit **chartered** slice boundary. The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
+- **Sprint 002** is **wrapped** — **no** Sprint 002 BUILD pending. **BUILD may proceed** from the clean baseline **without using parked branches** (fresh BUILD branch/worktree; preflight + single-plane rules) **only after** the next **SELECTION** charters **Sprint 003** (or successor) / slice boundary **or** a **re-chartered** execution boundary following a **phase** decision. The parked deferred state remains **explicitly unaccepted** and does not gate baseline-based BUILD.
 
 ## Completed recently
 
@@ -117,8 +118,8 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **Sprint 002 wrap closeout** / **next sprint or phase decision** (steward; **`docs/SOP/CURRENT_FRONTIER.md`**).
-- deferred: **§6.C** batch candidates — **not** chartered by Sprint 002 **SELECTION outcome A**; revive only via a **new** sprint/phase **SELECTION** if justified.
+- next task: **SELECTION** — **Sprint 003** within Phase 2 **or** **phase transition / new charter** (`docs/SOP/CURRENT_FRONTIER.md`).
+- deferred: **§6.C** batch candidates (and similar optional notes) — **not** selected by Sprint 002 wrap; revive only via explicit **future SELECTION**.
 - optional: steward demo script (docs-only) if validation thrash warrants it — not selected by default.
 
 ## Risks / watchouts
@@ -158,17 +159,17 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**Sprint 002 wrap closeout** / **next sprint or phase decision** — **SELECTION** concluded **outcome A** (2026-04-18): **primary loop complete**; optional **demo witness** vs **`docs/SOP/SPRINT_002_PHASE_2.md` §3** + **`docs/SOP/PHASE_2_CHARTER.md` §9** may inform **wrap** but does **not** imply another Sprint 002 BUILD slice. **Sprint002-Slice001–004** are **closed**; **Sprint 001** remains **wrapped** (`docs/SOP/CURRENT_FRONTIER.md`).
+**SELECTION** — see **`docs/SOP/CURRENT_FRONTIER.md`** (**Steward recommendation**): default posture is **Sprint 003 within Phase 2** unless the steward is explicitly choosing **phase transition / new charter**. **Sprint 002** is **wrapped**; **no** BUILD until **SELECTION** names a boundary.
 
 ## Handoff checklist (must be filled each handoff)
 
 ### A) Doc-state safety / alignment (canonical docs only)
 
 - **Active phase**: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
-- **Active sprint**: Sprint 002 — **ready to wrap** (`docs/SOP/SPRINT_002_PHASE_2.md` §11)
+- **Active sprint (BUILD)**: **none** — **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Phase 2 active**
 - **Closed slices (Sprint 001)**: 005–011 (wrap **outcome B**; no Slice 012). **Sprint002-Slice001** — **closed/shipped** (product **`ff40b48`**). **Sprint002-Slice002** — **closed/shipped** (product **`bd12b7c`**). **Sprint002-Slice003** — **closed/shipped** (product **`6e5f563`**). **Sprint002-Slice004** — **closed/shipped** (product **`6be6d7c`**)
 - **Current selected slice (Sprint 002)**: **none**
-- **Next pending execution step**: **Sprint 002 wrap closeout** / **next sprint or phase decision**
+- **Next pending execution step**: **SELECTION** — **Sprint 003 (Phase 2)** **or** **phase transition / new charter**
 - **Reporting posture**: **SLIM MODE** and (if applicable) **REPO-SENSOR execution-only** (no extra analysis)
 - **Canonical truth rule**: confirm `CURRENT_FRONTIER` outranks `HANDOFF` if drift is detected (until reconciled)
 - **Non-canonical naming note**: confirm any **H1 / H1-01 / H1-02** shorthand is treated as **non-canonical legacy** unless explicitly reintroduced by accepted docs (prefer Phase/Sprint/Slice identifiers)
@@ -201,4 +202,4 @@ Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `
 
 ## Last updated
 
-2026-04-18 by agent (**CONTROL-PLANE SELECTION — Frontier Steward 2.2**): **Sprint 002** **ready to wrap** (**outcome A**); **next** = **Sprint 002 wrap closeout** / **next sprint or phase decision**. **No product code** in this pass. Prior same day: **CLOSEOUT** Slice004 (`6be6d7c`); baseline tip **`53882962d618b4022826ff04e9771a03cacf8f72`**.
+2026-04-18 by agent (**CONTROL-PLANE WRAP CLOSEOUT — Frontier Steward 2.2**): **Sprint 002** **wrapped**; **next** = **SELECTION** (Sprint 003 vs phase). **No product code** in this pass. Prior: **SELECTION** outcome A; Slice004 **`6be6d7c`**.
