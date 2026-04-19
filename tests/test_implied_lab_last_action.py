@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.viz.implied_lab_last_action import last_action_meaning
+from src.viz.implied_lab_last_action import last_action_meaning, shape_window_local_region_story
 
 
 class TestImpliedLabLastAction(unittest.TestCase):
@@ -72,6 +72,51 @@ class TestImpliedLabLastAction(unittest.TestCase):
         self.assertIn("shape window", msg.lower())
         self.assertIn("Near forward", msg)
         self.assertIn("underlying price", msg.lower())
+
+    def test_local_region_story_full_range_no_strip(self) -> None:
+        md, strip = shape_window_local_region_story(
+            zoom_choice="Full range",
+            xr0=40_000.0,
+            xr1=120_000.0,
+            forward=95_000.0,
+            belief_overlay_enabled=False,
+            verification=None,
+        )
+        self.assertIn("no narrowed band", md.lower())
+        self.assertIn("full", md.lower())
+        self.assertEqual(strip, "")
+
+    def test_local_region_story_near_forward_mentions_band(self) -> None:
+        md, strip = shape_window_local_region_story(
+            zoom_choice="Near forward",
+            xr0=80_000.0,
+            xr1=110_000.0,
+            forward=95_000.0,
+            belief_overlay_enabled=False,
+            verification=None,
+        )
+        self.assertIn("Near forward", md)
+        self.assertIn("80", md.replace(",", ""))
+        self.assertIn("same priced inputs", md.lower())
+        self.assertTrue(len(strip) > 10)
+
+    def test_local_region_story_gap_inside_window(self) -> None:
+        ver = {
+            "belief_vs_market_glance": {
+                "largest_gap_price_usd": 90_000.0,
+                "largest_gap_display": "$90,000",
+            }
+        }
+        md, _ = shape_window_local_region_story(
+            zoom_choice="Near forward",
+            xr0=80_000.0,
+            xr1=110_000.0,
+            forward=95_000.0,
+            belief_overlay_enabled=True,
+            verification=ver,
+        )
+        self.assertIn("inside this shape window", md.lower())
+        self.assertIn("ΔPDF", md)
 
 
 if __name__ == "__main__":

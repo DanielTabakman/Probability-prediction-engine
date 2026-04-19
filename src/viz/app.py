@@ -52,7 +52,7 @@ from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
 from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
-from src.viz.implied_lab_last_action import last_action_meaning
+from src.viz.implied_lab_last_action import last_action_meaning, shape_window_local_region_story
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -735,6 +735,7 @@ if show_bitcoin_view:
                                 )
                                 st.session_state[_prev_shape_zoom_key] = _zoom_now
                         right_chart_slot = st.empty()
+                        strip_local_story_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_trust_slot = st.empty()
                         right_review_slot = st.empty()
@@ -1581,6 +1582,19 @@ if show_bitcoin_view:
                     _xr0, _xr1 = _shape_focus_x_range(
                         _zoom_choice, float(price_min), float(price_max), float(forward)
                     )
+                    _story_md, _story_strip = shape_window_local_region_story(
+                        zoom_choice=_zoom_choice,
+                        xr0=float(_xr0),
+                        xr1=float(_xr1),
+                        forward=float(forward),
+                        belief_overlay_enabled=bool(user_belief_for_state.get("enabled")),
+                        verification=outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None,
+                    )
+                    if _story_strip:
+                        with strip_local_story_slot.container():
+                            st.caption(_story_strip)
+                    else:
+                        strip_local_story_slot.empty()
                     fig_dist.update_xaxes(range=[_xr0, _xr1])
                     _gap_x = ch.get("belief_largest_gap_price")
                     if (
@@ -1643,6 +1657,13 @@ if show_bitcoin_view:
                                     "**where-to-look** cue on the **same underlying-price axis** as your **shape window** "
                                     "(descriptive, not advisory)."
                                 )
+                        st.markdown("###### Local region (descriptive)")
+                        if _zoom_choice == "Full range":
+                            st.caption(
+                                _story_md.replace("**", "").replace("  ", " ").strip()
+                            )
+                        else:
+                            st.markdown(_story_md)
                         st.caption(
                             "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
                             "(Breeden–Litzenberger from marks) · Green: **strategy P&L** at expiry when legs are set."
