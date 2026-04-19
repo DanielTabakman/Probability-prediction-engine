@@ -2,7 +2,7 @@
 
 **What this file is:** the **Sprint 002 spec** (scope + acceptance + slice map) for Phase 2.
 
-**Execution status (ledger lives elsewhere):** closed slices, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`). **Sprint002-Slice004** is **closed/shipped** — **§10** (product **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**); **next** = **SELECTION**.
+**Execution status (ledger lives elsewhere):** closed slices, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`). **Sprint002-Slice004** is **closed/shipped** — **§10** (product **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**). **Sprint 002 — SELECTION (2026-04-18, Frontier Steward 2.2):** **outcome A** — **ready to wrap / primary loop complete** (**§11**); **next** = **Sprint 002 wrap closeout** / **next sprint or phase decision** (steward).
 
 **Parent charter:** `docs/SOP/PHASE_2_CHARTER.md`  
 **Prior sprint (wrapped, do not reopen by default):** `docs/SOP/SPRINT_001_PHASE_2.md`  
@@ -56,11 +56,11 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **No slice in-flight under BUILD** (post–**Sprint002-Slice004** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice004** — **local region story / chart-adjacent meaning cue** (product **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**); **Sprint002-Slice003** — vocabulary / **shape window** alignment (product **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**); **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
+- **No slice in-flight under BUILD** (post–**Sprint002-Slice004** **CLOSEOUT**, 2026-04-18). **Sprint 002 SELECTION — outcome A:** **no further Sprint 002 BUILD slice**; sprint is **ready to wrap** (**§11**). **Latest shipped:** **Sprint002-Slice004** — **local region story / chart-adjacent meaning cue** (product **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**); **Sprint002-Slice003** — vocabulary / **shape window** alignment (product **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**); **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
 
 ### B. Deferred batch (after Slice004 CLOSEOUT unless steward re-orders)
 
-- **§6.C** batch candidates — only with explicit **SELECTION** (not bundled by default). **Steward-facing posture (non-charter):** consider a **short Sprint 002 coherence / demo witness** vs **§3** + **`docs/SOP/PHASE_2_CHARTER.md` §9** before defaulting to a new **§6.C**-class slice (see **`docs/SOP/CURRENT_FRONTIER.md`**).
+- **§6.C** batch candidates — **not** chartered for Sprint 002 by **SELECTION outcome A** (2026-04-18); remain **deferred map only** unless a **future** sprint/phase **SELECTION** revives them with explicit justification. **Coherence / demo witness** vs **§3** + **`docs/SOP/PHASE_2_CHARTER.md` §9** may inform **wrap closeout** but does **not** imply another Sprint 002 BUILD slice.
 
 ### C. Batch candidates (pick up only with explicit SELECTION; not default bundled)
 
@@ -268,10 +268,20 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### 10.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice004** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**. **Product delta:** `src/viz/app.py`, `src/viz/implied_lab_last_action.py`, `tests/test_implied_lab_last_action.py`. **Evidence:** `python -m pytest -q` → **55** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_222621/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_222621/A_width_target_payoff.png`. Authoritative ledger: **`docs/SOP/CURRENT_FRONTIER.md`**. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary **or** steward wrap / phase decision (map **§6.B–§6.C** = candidates only, not implicit charter).
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice004** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`6be6d7c5401c489bb702fb1ea40b4bee93ad8907`**. **Product delta:** `src/viz/app.py`, `src/viz/implied_lab_last_action.py`, `tests/test_implied_lab_last_action.py`. **Evidence:** `python -m pytest -q` → **55** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_222621/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_222621/A_width_target_payoff.png`. Authoritative ledger: **`docs/SOP/CURRENT_FRONTIER.md`**. **Next execution step (steering):** **Sprint 002 wrap closeout** / **next sprint or phase decision** (see **`docs/SOP/CURRENT_FRONTIER.md`**).
+
+---
+
+## 11. Sprint 002 wrap posture (SELECTION — outcome A, 2026-04-18)
+
+**Control-plane SELECTION (Frontier Steward 2.2):** **Outcome A** — **Sprint 002 is ready to wrap**; **primary interaction spine for this sprint is complete** on the shipped sequence **Sprint002-Slice001 → Slice004** (**find a region → return → consistent naming → compact local-region story**).
+
+**Reasoning (summary):** Sprint **§3** acceptance is **substantially met** by the integrated spine plus Phase 2 / Sprint 001 trust and meaning infrastructure already on baseline. Remaining **§6.C** items (**x-range affordance sprawl**, **deeper glance↔last-interaction ties**, optional docs-only demo pack) are **explicitly optional** in this sprint map and would mostly add **controls, copy surface, or narration** without a **new fuzzy→legible category**—i.e. **polish drift / low-value expansion** relative to the closed narrative, not a **deterministic blocker**.
+
+**Next pending execution step:** **Sprint 002 wrap closeout** / **next sprint or phase decision** (steward). **No** chartered **Sprint002-Slice005** under this pass.
 
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice004** **closed/shipped** (`6be6d7c`); **next** = **SELECTION**. Prior same day: **BUILD** + promotion Slice004; **SELECTION** Slice004; **CLOSEOUT** Slice003 (`6e5f563`); **CLOSEOUT** Slice002 (`bd12b7c`); **CLOSEOUT** Slice001.
+2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): **Sprint 002** **ready to wrap** (**outcome A**); **next** = **wrap closeout** / **next sprint or phase decision**. Prior same day: **CLOSEOUT** Slice004 (`6be6d7c`); **SELECTION** Slice004 boundary; **CLOSEOUT** Slice003 (`6e5f563`); **CLOSEOUT** Slice002 (`bd12b7c`); **CLOSEOUT** Slice001.
