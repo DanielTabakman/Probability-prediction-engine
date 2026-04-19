@@ -2,7 +2,7 @@
 
 **What this file is:** the **Sprint 002 spec** (scope + acceptance + slice map) for Phase 2.
 
-**Execution status (ledger lives elsewhere):** closed slices, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`).
+**Execution status (ledger lives elsewhere):** closed slices, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`). **Sprint002-Slice004** is **selected** pending **BUILD** — **§10**.
 
 **Parent charter:** `docs/SOP/PHASE_2_CHARTER.md`  
 **Prior sprint (wrapped, do not reopen by default):** `docs/SOP/SPRINT_001_PHASE_2.md`  
@@ -56,11 +56,12 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### A. Selected now
 
-- **No slice in-flight under BUILD** (post–**Sprint002-Slice003** **CLOSEOUT**, 2026-04-18). **Latest shipped:** **Sprint002-Slice003** — vocabulary / **shape window** alignment (product **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**); **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
+- **BUILD boundary (SELECTION complete, 2026-04-18):** **Sprint002-Slice004** — **local region story / chart-adjacent meaning cue** — chartered in **§10**; **no product BUILD branch** in-flight until the next **BUILD** session obeys preflight + short-lived branch rules.
+- **Latest shipped:** **Sprint002-Slice003** — vocabulary / **shape window** alignment (product **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**); **Sprint002-Slice002** — focus persistence / return to last chart view (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); **Sprint002-Slice001** — shape focus & AOI scaffolding (product **`ff40b48deb7acf4b2d897a09287e69ed7148abd9`**).
 
-### B. Likely next (after Slice003 CLOSEOUT unless steward re-orders)
+### B. Deferred batch (after Slice004 unless steward re-orders)
 
-- **§6.C** batch candidates — only with explicit later **SELECTION** (not bundled by default).
+- **§6.C** batch candidates — only with explicit later **SELECTION** after Slice004 **CLOSEOUT** (not bundled by default).
 
 ### C. Batch candidates (pick up only with explicit SELECTION; not default bundled)
 
@@ -218,10 +219,60 @@ After BUILD + agreed validation for the sprint (may span multiple slices; each s
 
 ### 9.8 Control-plane supplement: execution / CLOSEOUT status
 
-**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice003** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**. **Product delta:** `src/viz/app.py`, `src/viz/implied_lab_last_action.py`, `tests/test_implied_lab_last_action.py`. **Evidence:** `python -m pytest -q` → **52** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_220503/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_220503/A_width_target_payoff.png`. Authoritative ledger: **`docs/SOP/CURRENT_FRONTIER.md`**. **Next execution step (steering):** **SELECTION** for the next Sprint 002 slice boundary (map **§6.B–§6.C** = candidates only, not implicit charter).
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE CLOSEOUT):** **Sprint002-Slice003** is **closed/shipped** on accepted baseline **`recovery/frontier-steward-v2_1-baseline`** at product commit **`6e5f5635acb9371af17ce7d8621f70ceb0072215`**. **Product delta:** `src/viz/app.py`, `src/viz/implied_lab_last_action.py`, `tests/test_implied_lab_last_action.py`. **Evidence:** `python -m pytest -q` → **52** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** — `artifacts/ui_smoke/20260418_220503/ui_smoke_manifest.json`, screenshot `artifacts/ui_smoke/20260418_220503/A_width_target_payoff.png`. Authoritative ledger: **`docs/SOP/CURRENT_FRONTIER.md`**. **Superseded (steering):** **Sprint002-Slice004** **selected** — **§10**; **next** = **BUILD**.
+
+---
+
+## 10. Sprint002-Slice004 (selected — pending BUILD)
+
+### 10.1 Identifier
+
+**Sprint002-Slice004**
+
+### 10.2 Title
+
+**Local region story / chart-adjacent meaning cue**
+
+### 10.3 User problem
+
+“I can **find** a region (Slice001), **return** to it (Slice002), and **read one vocabulary** for it across surfaces (Slice003)—but when I **glance** at the chart and its neighbors, I still lack **one compact, coherent, non-advisory sentence** for **what is going on in that region right now** (what the shape is **showing** there), so the band feels **labeled** but not yet **situated** in my head.”
+
+### 10.4 Exact UI target (product surface)
+
+**Bounded to:** the **primary implied-distribution chart** (Plotly main figure) **and** the **Sprint002-Slice001** **shape-focus strip**, **plus** **chart-adjacent** and **glance-adjacent** surfaces already tied to **local chart window / shape window** meaning (captions, compact hints, lead lines)—deliver **one** **short** (roughly **one to three sentences** or **one** tight bullet block), **always visible or clearly glance-adjacent** when a **non–full-range** window is active, and **explicitly neutral / de-emphasized** when the view is **full range** (no fake specificity).
+
+**Composition rule:** **reuse** existing payload fields, glance strings, last-action tokens, and shape-window state **already on the baseline** after Slice003—**no new quantitative metrics** or engine outputs **if** the story can be assembled from those fields; if a BUILD agent discovers a **hard dependency** on a **new** computed field, **stop** and return to **SELECTION** / steward for an enabling slice (do not silently widen).
+
+**Primary files expected (BUILD planning only):** `src/viz/app.py` and closely related viz/last-action helpers **if unavoidable** (e.g. `src/viz/implied_lab_last_action.py`); **no** `docs/SEMANTIC_CONTRACTS.md` edits.
+
+### 10.5 Non-goals (slice)
+
+- **No** recommendation logic, ranked plays, “best,” or “you should.”
+- **No** major **semantic contract** rewrite or **new** disagreement/belief **math** claims.
+- **No** new overlay series, payoff modes, or **preset** explosion.
+- **No** **§6.C** program: sliders / keyboard x-range sprawl, **broad** glance↔memory↔comparison subsystem, cross-session persistence, or URL deep-link state.
+- **No** ornamental copy walls; keep the read **skimmable** and **testable**.
+
+### 10.6 Acceptance criteria (slice)
+
+1. When the user has a **meaningful local chart window** (non-default x-window consistent with Slice001–002 behavior), the UI presents **one coherent descriptive “local region story”** tying **what the window is showing** to **existing** shape/glance vocabulary—**without** contradicting **“What changed?”** on covered paths.
+2. When the view is **full range** (or no local window applies), the UI **does not invent** a false local story—**neutral / omitted / clearly global** posture only.
+3. Copy stays **descriptive and contract-aligned** (orientation: “shows,” “highlights,” “in this window”)—**not advisory**.
+4. **Trust spine intact:** provenance, verification entry, degraded honesty, and **exploration vs recommendation** boundary remain **as visible and true** as on the Slice003-closeout baseline.
+5. **`python -m pytest -q`** and **`python scripts/run_implied_lab_ui_smoke.py`** → **PASS** on the BUILD branch.
+
+### 10.7 Validation posture (slice)
+
+- **Required:** `python -m pytest -q`; `python scripts/run_implied_lab_ui_smoke.py`.
+- **Conditional:** if glance / classification / disagreement **wiring** beyond string assembly is touched, add the **smallest** harness scenario per **`IMPLIED_LAB_OPERATOR_RUNBOOK.md`** / **`OPERATING_RULES.md`** for touched paths.
+- **Witness (human/steward):** narrow chart → read the **local region story** in one glance → trigger a covered **“What changed?”** path → confirm **no contradiction** and **non-advisory** tone (optional screenshot on **CLOSEOUT**).
+
+### 10.8 Control-plane supplement: execution status
+
+**2026-04-18 (Frontier Steward 2.2 — CONTROL-PLANE SELECTION):** **Sprint002-Slice004** is **selected**; **next execution step** = **BUILD** per **§10**. **No product SHA** until **CLOSEOUT** records shipping commit on accepted baseline. Authoritative ledger: **`docs/SOP/CURRENT_FRONTIER.md`**.
 
 ---
 
 ## Last updated
 
-2026-04-18 — **CONTROL-PLANE CLOSEOUT** (Frontier Steward 2.2): **Sprint002-Slice003** **closed/shipped** (`6e5f563`); **next** = **SELECTION**. Prior same day: **BUILD** + promotion Slice003; **SELECTION** Slice003; **CLOSEOUT** Slice002 (`bd12b7c`); **CLOSEOUT** Slice001.
+2026-04-18 — **CONTROL-PLANE SELECTION** (Frontier Steward 2.2): **Sprint002-Slice004** **selected** (**§10**); **next** = **BUILD**. Prior same day: **CLOSEOUT** Slice003 (`6e5f563`); **BUILD** + promotion Slice003; **SELECTION** Slice003; **CLOSEOUT** Slice002 (`bd12b7c`); **CLOSEOUT** Slice001.
