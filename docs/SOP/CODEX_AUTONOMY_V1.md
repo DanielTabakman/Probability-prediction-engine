@@ -211,6 +211,177 @@ These may be reconsidered in a future `CODEX_AUTONOMY_V2.md` once v1 has observa
 - The steward may pre-authorize v1 for an entire sprint by naming it in the sprint spec (e.g., `SPRINT_003_PHASE_2.md` §execution model).
 - Absence of declaration → worker runs under the default `WORKER_EXECUTION_PROMPT.md` single-step rules (unchanged).
 
-## 14. Last updated
+## 14. Relay result contract (machine-readable)
 
-2026-04-20 — introduced before **Sprint 003 SELECTION** as a control-plane process pass. No product code changed by this introduction.
+Purpose: give a relay (process supervising a Codex autonomy run) a **single, machine-readable payload** it can parse **without rereading** §§1–13 to decide whether the run may continue, must stop, may retry, or is hard-blocked.
+
+The relay result is emitted **once per run**, **after** the worker's §10 textual outputs are produced, and **in addition** to them — never in place of them. The §10 blocks remain the human-readable record; this section is the structured form a relay reads.
+
+File location: emitted to stdout by the worker **and** written to a run-scoped path the worker names in §10.3 (`artifacts/ui_smoke/<timestamp>/relay_result.json` is a reasonable default; the slice spec may name another path).
+
+### 14.1 Field definitions
+
+All fields are required unless marked optional. Enum values are case-sensitive. Unknown values are a **schema violation** and must cause the relay to treat the run as `BLOCKED` (see §15).
+
+```json
+{
+  "protocol": "CODEX_AUTONOMY_V1",
+  "schema_version": "1",
+  "slice_id": "<SprintNNN-SliceNNN verbatim from sprint spec>",
+  "run_id": "<timestamp or uuid; must match the run's artifact folder>",
+
+  "declared_plane": "PRODUCT-PLANE | EVIDENCE-PLANE",
+  "build_branch": "<branch name created for this run>",
+  "baseline_branch": "<accepted baseline named by CURRENT_FRONTIER.md>",
+  "baseline_tip_before": "<SHA at run start>",
+  "baseline_tip_after":  "<SHA at run end; equal to baseline_tip_before if no promotion>",
+  "product_commit_sha":  "<SHA of the product commit, or null if none>",
+
+  "preflight": {
+    "build_allowed": true,
+    "tree_clean": true,
+    "untracked_canonical_docs": false,
+    "mixed_plane_dirty": false,
+    "blocker": null
+  },
+
+  "retry_count": 0,
+  "retry_budget_max": 2,
+  "retry_budget_exhausted": false,
+
+  "tests": {
+    "pytest_status": "PASS | FAIL | INCONCLUSIVE | NOT_RUN",
+    "pytest_count": 55,
+    "ui_smoke_primary_status": "PASS | FAIL | INCONCLUSIVE | NOT_RUN",
+    "ui_smoke_conditional_status": "PASS | FAIL | INCONCLUSIVE | NOT_RUN | NOT_REQUIRED",
+    "ui_inspection_evidence_present": true,
+    "validation_classification": "deterministic | environment-sensitive | live-data-sensitive | mixed"
+  },
+
+  "tree_cleanliness": {
+    "build_branch_clean": true,
+    "mixed_plane_residue": false,
+    "untracked_canonical_docs": false
+  },
+
+  "promotion": {
+    "attempted": true,
+    "performed": true,
+    "method": "fast-forward | merge | null",
+    "ancestor_check_pass": true
+  },
+
+  "stop_condition": null,
+
+  "ready_for_control_closeout": true,
+  "safe_to_continue": true,
+
+  "artifacts": {
+    "ui_smoke_manifest":   "<path or null>",
+    "ui_smoke_screenshot": "<path or null>",
+    "run_log":             "<path or null>"
+  },
+
+  "notes": "<short, factual; no marketing language; ≤ 280 chars>"
+}
+```
+
+### 14.2 Enum: `stop_condition`
+
+Exactly one of the following, or `null` if no §8 condition fired:
+
+- `null`
+- `"PREFLIGHT_FAIL"` — §8.1
+- `"MAX_RETRIES_EXCEEDED"` — §8.2
+- `"SCOPE_AMBIGUITY"` — §8.3
+- `"UNEXPECTED_CONTRACT_CHANGE"` — §8.4
+- `"MIXED_PLANE_CONTAMINATION"` — §8.5
+- `"UNCLEAR_TEST_RESULTS"` — §8.6
+- `"SELECTION_BOUNDARY_REACHED"` — §8.7
+- `"REPO_STATE_DRIFT"` — §8.8
+- `"CONTROL_PLANE_CLOSEOUT_NEEDED"` — §8.9
+
+### 14.3 Invariants the relay may rely on
+
+These are hard worker obligations; violating them is itself a relay-visible defect:
+
+- `protocol` is always the literal string `"CODEX_AUTONOMY_V1"`.
+- `schema_version` is `"1"` for this doc.
+- `retry_count` is an integer in `[0, retry_budget_max]`; never exceeds `retry_budget_max` (= 2 per §7).
+- `retry_budget_exhausted == true` **iff** `retry_count == retry_budget_max` **and** validation is still not green.
+- `promotion.performed == true` requires **all** §9 gates green **and** `tree_cleanliness.build_branch_clean == true` **and** `tree_cleanliness.mixed_plane_residue == false` **and** `tree_cleanliness.untracked_canonical_docs == false`.
+- `ready_for_control_closeout == true` requires `promotion.performed == true` **and** `stop_condition == null`.
+- `safe_to_continue == true` requires `stop_condition == null` **and** `tree_cleanliness.mixed_plane_residue == false` **and** `tree_cleanliness.untracked_canonical_docs == false`.
+- `declared_plane` must match the plane actually touched; any cross-plane edit forces `stop_condition = "MIXED_PLANE_CONTAMINATION"` and `safe_to_continue = false`.
+
+If any invariant is violated, the worker must set `stop_condition` to the corresponding §8 value and `safe_to_continue = false`, **not** silently repair the payload.
+
+## 15. Relay decision policy
+
+The relay consumes §14.1 and emits **exactly one** decision, in this precedence order. The first matching rule wins; later rules are not evaluated.
+
+### 15.1 Decisions (enum)
+
+- `CONTINUE` — slice is cleanly closed through PROMOTION; relay hands the §10.6 HANDBACK payload to the steward for **CONTROL-CLOSEOUT**. The relay **does not** run CONTROL-CLOSEOUT itself and **does not** start the next SELECTION.
+- `RETRY_ALLOWED` — an in-slice corrective repair iteration is permitted under §7.
+- `STOP_FOR_REVIEW` — run is paused for steward judgment; not a hard block, but the relay must not auto-advance.
+- `BLOCKED` — hard stop; no retry, no continue. Steward intervention required before any further action on this slice.
+
+### 15.2 Decision rules (evaluate top-down; first match wins)
+
+1. **Schema / invariant violation** (any field missing, unknown enum value, invariant in §14.3 violated, or `protocol != "CODEX_AUTONOMY_V1"`)  
+   → `BLOCKED`.
+
+2. **Hard §8 conditions**  
+   If `stop_condition` ∈ {`PREFLIGHT_FAIL`, `MIXED_PLANE_CONTAMINATION`, `UNEXPECTED_CONTRACT_CHANGE`, `REPO_STATE_DRIFT`, `SELECTION_BOUNDARY_REACHED`, `CONTROL_PLANE_CLOSEOUT_NEEDED`}  
+   → `BLOCKED`.
+
+3. **Retry budget exhausted**  
+   If `stop_condition == "MAX_RETRIES_EXCEEDED"` **or** `retry_budget_exhausted == true`  
+   → `STOP_FOR_REVIEW`.
+
+4. **Judgment-required stop**  
+   If `stop_condition` ∈ {`SCOPE_AMBIGUITY`, `UNCLEAR_TEST_RESULTS`}  
+   → `STOP_FOR_REVIEW`.
+
+5. **In-slice repair eligible**  
+   If `stop_condition == null` **and** any of `tests.pytest_status`, `tests.ui_smoke_primary_status`, `tests.ui_smoke_conditional_status` is `FAIL` **and** `retry_count < retry_budget_max` **and** `tree_cleanliness.mixed_plane_residue == false` **and** `tests.validation_classification == "deterministic"`  
+   → `RETRY_ALLOWED`.
+
+6. **Inconclusive / non-deterministic validation without hard stop**  
+   If `stop_condition == null` **and** any of the three test statuses is `INCONCLUSIVE`, or `tests.validation_classification` ∈ {`environment-sensitive`, `live-data-sensitive`, `mixed`} with a non-PASS test status  
+   → `STOP_FOR_REVIEW`.  
+   *(This aligns with OPERATING_RULES.md RULE 4 and the closeout runtime budget — the relay never spends more retries on non-deterministic failures.)*
+
+7. **Clean closure**  
+   If `stop_condition == null` **and** `promotion.performed == true` **and** `ready_for_control_closeout == true` **and** `safe_to_continue == true` **and** `tests.pytest_status == "PASS"` **and** `tests.ui_smoke_primary_status == "PASS"` **and** `tests.ui_smoke_conditional_status` ∈ {`PASS`, `NOT_REQUIRED`} **and** `tests.ui_inspection_evidence_present == true` **and** `tree_cleanliness.build_branch_clean == true`  
+   → `CONTINUE`.
+
+8. **Default / unclassified**  
+   Anything that reaches this rule → `STOP_FOR_REVIEW`.  
+   *(Safe default: the relay must not guess; the steward decides.)*
+
+### 15.3 What the relay must never do
+
+- Auto-run **CONTROL-CLOSEOUT**. `CONTINUE` means *hand back to steward for CONTROL-CLOSEOUT*, not *perform it*.
+- Auto-start the next **SELECTION**. V1 never crosses the selection boundary (§2, §8.7).
+- Extend `retry_budget_max` beyond 2, or grant retries after `stop_condition != null`.
+- Reinterpret a `BLOCKED` decision as `STOP_FOR_REVIEW` to keep the run alive.
+- Edit canonical steering docs (`docs/SOP/**`) or the slice spec to make a failing payload pass.
+- Promote, rebase, force-push, or amend on behalf of the worker.
+- Downgrade `schema_version` or translate between schema versions silently.
+
+### 15.4 What the relay may do
+
+- Record the decision, the input payload, and a one-line reason keyed to the triggering rule (e.g., `"rule 2: stop_condition=MIXED_PLANE_CONTAMINATION"`).
+- On `RETRY_ALLOWED`, re-invoke the worker **once** for the same slice with `retry_count += 1` and the same slice spec; it must **not** expand scope, change plane, or edit the slice spec.
+- On `CONTINUE`, surface the §10.6 HANDBACK payload (slice id, product commit SHA, baseline branch, artifact paths) to the steward and stop.
+- On `STOP_FOR_REVIEW` or `BLOCKED`, surface the §10.6 HANDBACK payload and the fired §8 condition (if any) and stop.
+
+### 15.5 Authority boundary reminder
+
+The relay's authority is **strictly a subset** of Codex Autonomy v1's authority boundary (§2): `PREFLIGHT → BUILD → bounded REPAIR → BUILD-CLOSEOUT → PROMOTION` for **one** already-selected slice. A relay running outside that boundary is itself a §8.5 / §8.9 violation and must stop.
+
+## 16. Last updated
+
+2026-04-20 — §§14–15 added: machine-readable relay result schema and relay decision policy for Codex Autonomy v1. Control-plane / process-only pass; no product code changed, no orchestrator code changed, no sprint chartered. Prior: 2026-04-20 introduction of this protocol before **Sprint 003 SELECTION**.
