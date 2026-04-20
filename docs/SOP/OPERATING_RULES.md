@@ -105,6 +105,10 @@ Purpose: prevent live-data/environment failures from being confused with product
 ### RULE 5 — Stop-after-two rule for non-BUILD execution steps
 If an agent makes two consecutive nontrivial corrective edits inside a CLOSEOUT, RECOVERY, or SELECTION execution step, it must stop and return a wrap-up/reassessment instead of continuing to iterate.
 
+## Codex Autonomy v1 (optional, opt-in)
+
+For runs that opt into `docs/SOP/CODEX_AUTONOMY_V1.md`, a single Codex run may execute **PREFLIGHT -> BUILD -> bounded repair loop -> BUILD-CLOSEOUT -> PROMOTION** for **one already-selected slice**, and then stop. Codex Autonomy v1 **excludes** `SELECTION` and `CONTROL-CLOSEOUT`; those remain steward-driven. All rules in this file (plane discipline, preflight gate, validation tiers, RULE 5, closeout runtime budget) still apply and are **narrowed**, never loosened, by that protocol. Activation requires an explicit `PROTOCOL: CODEX_AUTONOMY_V1` declaration at the start of the run or pre-authorization in the sprint spec.
+
 ## Compact slice mode (low-risk feature slices)
 
 **Use for** low-risk feature slices that mainly touch:

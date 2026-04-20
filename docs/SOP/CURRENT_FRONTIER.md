@@ -62,6 +62,8 @@ A new user can in ~**15 seconds** answer: what the **market-implied** view shows
 
 **Steward-facing next posture:** **Sprint 002** is **wrapped**; execute **SELECTION** for **Sprint 003** or **phase** next — **not** implicit **§6.C** BUILD.
 
+**Autonomy posture (Sprint 003 onward, optional):** `docs/SOP/CODEX_AUTONOMY_V1.md` is available as an **opt-in** protocol for Codex BUILD runs once a slice is selected. Authority boundary: **PREFLIGHT -> BUILD -> bounded repair -> BUILD-CLOSEOUT -> PROMOTION** for **one** slice only. **SELECTION** and **CONTROL-CLOSEOUT** remain steward-driven. Not a default; activated only by explicit declaration or sprint-spec pre-authorization.
+
 **Ledger hygiene note (important):** The “Completed recently” list below contains **historical notes** that may include **local / unaccepted** product/harness/test deltas. **Do not treat those as canonized closures** unless they are backed by an accepted repo-state (commit/push) and reconciled against the repo-state gate. The canonical steering ledger for Phase 2/Sprint 001 is stated above under **Steering continuity (doc-state, canonical)**.
 
 ## Completed recently
