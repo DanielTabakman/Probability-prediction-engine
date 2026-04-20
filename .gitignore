@@ -39,3 +39,7 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local relay/planner scaffolding (pre-Codex-Autonomy-v1 prototype).
+# Not canonical; see docs/SOP/CODEX_AUTONOMY_V1.md §§14-15 for the real contract.
+/orchestrator/
