@@ -64,12 +64,11 @@ All inputs are passed at invocation; the runtime does not read hidden config fil
 Per invocation:
 
 - **Stdout**: a terse human-readable log of what was staged, validated, decided, and exited with. Never a substitute for artifact files.
-- **Exit code**: deterministic mapping to §15 decisions and schema failures. Proposed:
-  - `0` — `CONTINUE`
-  - `10` — `RETRY` (runtime signals the operator to re-invoke for the same slice)
-  - `20` — `STOP_CLEAN` (handoff to steward CONTROL-CLOSEOUT)
-  - `30` — `STOP_HARD` (steward diagnosis required)
-  - `40` — `BLOCKED` (schema/invariant violation; always human-visible)
+- **Exit code**: deterministic mapping to the canonical `CODEX_AUTONOMY_V1` §15.1 decision enum (`CONTINUE` / `RETRY_ALLOWED` / `STOP_FOR_REVIEW` / `BLOCKED`) plus invocation-level outcomes:
+  - `0` — `CONTINUE` (§15.1 rule 7; handoff to steward CONTROL-CLOSEOUT)
+  - `10` — `RETRY_ALLOWED` (§15.1 rule 5; runtime signals the operator to re-invoke for the same slice within the §7 retry budget)
+  - `20` — `STOP_FOR_REVIEW` (§15.1 rules 3, 4, 6, 8; run is paused for steward judgment; not a hard block, but the relay must not auto-advance)
+  - `40` — `BLOCKED` (§15.1 rules 1–2; schema/invariant violation or hard §8 stop condition; always human-visible)
   - `2` — invocation-level refusal (bad inputs, unknown job, preflight drift before any job ran)
   - `1` — unexpected internal error (bug in runtime; never a normal state)
 - **Durable artifacts** (all under `artifacts_root`, all gitignored):
@@ -94,7 +93,7 @@ Run states (values of `run_state.json.status`):
 - `staged_for_worker` — runtime has written `task_envelope.json` for `run_selected_slice_v1` and is waiting for the worker to produce `relay_result.json`.
 - `validating` — runtime is checking the returned payload against §14.1 and §14.3.
 - `deciding` — runtime is applying §15.1 precedence to the validated payload.
-- `decided_continue` / `decided_retry` / `decided_stop_clean` / `decided_stop_hard` / `decided_blocked` — terminal states for this run; runtime exits with the matching exit code and clears `current_job.json`.
+- `decided_continue` / `decided_retry_allowed` / `decided_stop_for_review` / `decided_blocked` — terminal states for this run, one per canonical §15.1 decision; runtime exits with the matching exit code (§5) and clears `current_job.json`.
 - `aborted` — operator-invoked `abort`; terminal; no further automation.
 
 Rules:
@@ -135,7 +134,7 @@ The runtime halts (non-zero exit, no further automation, terminal `run_state.sta
 
 - **Input refusal** (§4): unknown job name, missing required input, `baseline_branch` mismatch with `CURRENT_FRONTIER.md`, `repo_root` not a git repo. Exit `2`.
 - **Preflight drift** before staging `run_selected_slice_v1`:
-  - tracked tree not clean → force `stop_condition = REPO_STATE_DRIFT`, exit `30`.
+  - tracked tree not clean → record `stop_condition = REPO_STATE_DRIFT`, map to `STOP_FOR_REVIEW`, exit `20`.
   - untracked canonical docs (any file under `docs/SOP/**` or `docs/CONTROL_PLANE/**` untracked) → same.
   - `build_branch` already exists locally or on remote → refusal, exit `2`.
 - **Registry integrity failure**: `JOB_REGISTRY_V1.md` is missing, or the registry as read on disk is older than the runtime's pinned reference SHA for it (implementation detail deferred; the **requirement** is that an unexpected registry edit halts the runtime). Exit `40`.
@@ -173,7 +172,7 @@ The runtime does not touch, and never automates, any of:
 - Amendment of `CODEX_AUTONOMY_V1.md` §§1–15 (protocol itself).
 - Amendment of `JOB_REGISTRY_V1.md` (adding / removing / renaming jobs; changing any job's authority boundary, inputs, outputs, or stop conditions).
 - Amendment of this doc.
-- Disposition of any `STOP_CLEAN`, `STOP_HARD`, or `BLOCKED` run — the runtime produces the terminal artifact and exits; the steward diagnoses and decides.
+- Disposition of any `STOP_FOR_REVIEW` or `BLOCKED` run — the runtime produces the terminal artifact and exits; the steward diagnoses and decides. `CONTINUE` is likewise handed back to the steward for CONTROL-CLOSEOUT (§11), never auto-closed by the runtime.
 - Any change to `.gitignore` or the `orchestrator/` disposition.
 - Phase transitions, charter decisions, or product-facing policy.
 
@@ -215,3 +214,5 @@ Not in v0. Do **not** rely on any of these; revisiting them requires a new bound
 ## 14. Last updated
 
 2026-04-20 — Initial definition of Relay Runtime v0 as a minimum local file-backed staged runtime consuming Job Registry v1 (commit `67f38ad`) and `CODEX_AUTONOMY_V1` §§14–15 (commit `57de839`). Control-plane / process-only pass; pre-implementation spec; no code, no orchestrator edits, no sprint chartered. Deliberately local, single-run, non-LLM, non-selector.
+
+2026-04-20 — Reconciliation pass (post-implementation `bc1b9ac`). Aligned §§5–6 decision enum, terminal-state names, and exit-code mapping with the canonical 4-decision enum from `CODEX_AUTONOMY_V1.md` §15.1 (`CONTINUE` / `RETRY_ALLOWED` / `STOP_FOR_REVIEW` / `BLOCKED`). Removed the non-canonical `STOP_CLEAN` / `STOP_HARD` split and the unused exit `30`. Updated §8 preflight-drift mapping to `STOP_FOR_REVIEW` (exit `20`) to match the implementation, and §10 steward-only list accordingly. No new constraints, no scope widening; control-plane / semantic-consistency only.
