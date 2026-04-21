@@ -1079,6 +1079,36 @@ def _looks_like_artifact(path: str) -> bool:
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(\d+(?:\.\d+)*)?[\.\)]?\s*(.*)$", re.UNICODE)
 _LINK_PATH_RE = re.compile(r"`([A-Za-z0-9_./\\-]+\.(?:md|py|json|txt))`")
 
+# Intentional SOP template placeholders. These literal strings appear inside
+# canonical docs (e.g. `docs/SOP/SPRINT_TEMPLATE.md`, `docs/SOP/OPERATING_RULES.md`,
+# `docs/SOP/CODEX_AUTONOMY_V1.md`, `docs/SOP/JOB_REGISTRY_V1.md`) to describe
+# the *shape* of a sprint-spec path, using the template variable tokens `00X`
+# (slot for a sprint number) and `_Y` (slot for a phase number). They never
+# name a real doc on disk and must not be reported as unresolved references.
+#
+# Rule scope is deliberately narrow: an explicit, exhaustive allow-list of
+# literal placeholder paths -- not a pattern over arbitrary `SPRINT_*.md`
+# references. Adding a new placeholder token requires a steward-accepted
+# amendment to this list.
+_SOP_SPRINT_TEMPLATE_PLACEHOLDERS = frozenset(
+    {
+        "docs/SOP/SPRINT_00X.md",
+        "docs/SOP/SPRINT_00X_PHASE_Y.md",
+    }
+)
+
+
+def _is_sop_template_placeholder(norm_path: str) -> bool:
+    """Return True iff `norm_path` is an intentional SOP template placeholder.
+
+    `norm_path` must already be forward-slash normalized. The check is a pure
+    literal membership test against `_SOP_SPRINT_TEMPLATE_PLACEHOLDERS`; it
+    does not match real sprint specs like `docs/SOP/SPRINT_003_PHASE_2.md`
+    (those use digit+digit where the template uses the `00X` / `_Y` tokens)
+    and it does not match arbitrary `docs/SOP/SPRINT_*.md` references.
+    """
+    return norm_path in _SOP_SPRINT_TEMPLATE_PLACEHOLDERS
+
 
 def dispatch_control_plane_consistency_check(runtime: Runtime) -> Tuple[int, str]:
     repo = runtime.repo_root
@@ -1135,6 +1165,10 @@ def dispatch_control_plane_consistency_check(runtime: Runtime) -> Tuple[int, str
                 continue
             # Only check .md references into docs/** that look canonical.
             if not norm.startswith("docs/"):
+                continue
+            if _is_sop_template_placeholder(norm):
+                # Intentional SOP template placeholder (e.g. SPRINT_00X.md,
+                # SPRINT_00X_PHASE_Y.md). Not a real missing reference.
                 continue
             if not (repo / norm).is_file():
                 findings.append(

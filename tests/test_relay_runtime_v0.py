@@ -613,6 +613,150 @@ class TestStateMachine(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
+# control_plane_consistency_check -- SOP template placeholder suppression
+# (Sprint003-Slice001)
+#
+# Narrow rule: references to `docs/SOP/SPRINT_00X.md` and
+# `docs/SOP/SPRINT_00X_PHASE_Y.md` are intentional SOP template placeholders
+# and must not produce unresolved-reference warnings. Any other missing
+# canonical-doc reference must still produce a `warn` finding.
+# ---------------------------------------------------------------------------
+
+
+class TestSopTemplatePlaceholderSuppression(unittest.TestCase):
+    """Covers Sprint003-Slice001 narrow-rule suppression in step 3 of
+    `dispatch_control_plane_consistency_check`.
+
+    Each test builds a minimal sandbox repo containing only the canonical
+    docs listed in `relay.CANONICAL_DOC_PATHS`, where one doc embeds the
+    backtick-quoted reference under test. The other canonical docs are
+    written as empty stubs so that step 1 (doc presence) passes and steps
+    2 and 4 do not emit noise.
+    """
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self._tmp.name).resolve()
+        sop_dir = self.repo / "docs" / "SOP"
+        sop_dir.mkdir(parents=True, exist_ok=True)
+        for canonical in relay.CANONICAL_DOC_PATHS:
+            (self.repo / canonical).parent.mkdir(parents=True, exist_ok=True)
+            (self.repo / canonical).write_text(
+                self._baseline_canonical_body(canonical), encoding="utf-8"
+            )
+        self.runtime = relay.Runtime(self.repo)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    @staticmethod
+    def _baseline_canonical_body(path: str) -> str:
+        # For CODEX_AUTONOMY_V1.md step 4 requires every section 14.2 enum
+        # value to appear textually; stub that content in so the test does
+        # not spuriously produce `error` findings.
+        if path.endswith("CODEX_AUTONOMY_V1.md"):
+            enum_dump = "\n".join(sorted(relay.ALL_STOP_CONDITIONS))
+            return f"# CODEX_AUTONOMY_V1 stub\n\n{enum_dump}\n"
+        return f"# {Path(path).name} stub\n"
+
+    def _run_check(self) -> list[dict]:
+        self.runtime.artifacts_root.mkdir(parents=True, exist_ok=True)
+        relay.dispatch_control_plane_consistency_check(self.runtime)
+        health_dir = self.repo / "artifacts" / "health"
+        reports = sorted(health_dir.glob("*/control_plane_consistency_report.json"))
+        self.assertTrue(reports, "consistency report was not written")
+        return json.loads(reports[-1].read_text(encoding="utf-8"))["findings"]
+
+    def _inject_references(self, doc_rel: str, refs: list[str]) -> None:
+        p = self.repo / doc_rel
+        body = p.read_text(encoding="utf-8")
+        body += "\n\n" + "\n".join(f"See `{ref}` for details." for ref in refs) + "\n"
+        p.write_text(body, encoding="utf-8")
+
+    # -- Positive (suppression) cases ---------------------------------------
+
+    def test_sprint_00x_placeholder_is_suppressed(self) -> None:
+        self._inject_references(
+            "docs/SOP/OPERATING_RULES.md",
+            ["docs/SOP/SPRINT_00X.md"],
+        )
+        findings = self._run_check()
+        self.assertFalse(
+            any(
+                f["severity"] == "warn"
+                and "SPRINT_00X.md" in f.get("locator", "")
+                and "does not resolve" in f.get("message", "")
+                for f in findings
+            ),
+            f"placeholder 'SPRINT_00X.md' should be suppressed; got findings: {findings}",
+        )
+
+    def test_sprint_00x_phase_y_placeholder_is_suppressed(self) -> None:
+        self._inject_references(
+            "docs/SOP/CODEX_AUTONOMY_V1.md",
+            ["docs/SOP/SPRINT_00X_PHASE_Y.md"],
+        )
+        findings = self._run_check()
+        self.assertFalse(
+            any(
+                f["severity"] == "warn"
+                and "SPRINT_00X_PHASE_Y.md" in f.get("locator", "")
+                and "does not resolve" in f.get("message", "")
+                for f in findings
+            ),
+            f"placeholder 'SPRINT_00X_PHASE_Y.md' should be suppressed; got findings: {findings}",
+        )
+
+    def test_is_sop_template_placeholder_literal_membership(self) -> None:
+        # Pure literal allow-list: only the two canonical placeholder paths
+        # match; real sprint specs and lookalike strings do not.
+        self.assertTrue(relay._is_sop_template_placeholder("docs/SOP/SPRINT_00X.md"))
+        self.assertTrue(relay._is_sop_template_placeholder("docs/SOP/SPRINT_00X_PHASE_Y.md"))
+        # A real sprint spec is not a placeholder.
+        self.assertFalse(relay._is_sop_template_placeholder("docs/SOP/SPRINT_003_PHASE_2.md"))
+        # Arbitrary lookalikes are not a placeholder.
+        self.assertFalse(relay._is_sop_template_placeholder("docs/SOP/SPRINT_ABC.md"))
+        self.assertFalse(relay._is_sop_template_placeholder("docs/SOP/SPRINT_00X_PHASE_2.md"))
+
+    # -- Negative (still-flagged) cases -------------------------------------
+
+    def test_genuinely_missing_doc_still_flags_warn(self) -> None:
+        self._inject_references(
+            "docs/SOP/OPERATING_RULES.md",
+            ["docs/SOP/DEFINITELY_NOT_A_REAL_DOC.md"],
+        )
+        findings = self._run_check()
+        self.assertTrue(
+            any(
+                f["severity"] == "warn"
+                and "DEFINITELY_NOT_A_REAL_DOC.md" in f.get("locator", "")
+                and "does not resolve" in f.get("message", "")
+                for f in findings
+            ),
+            f"genuinely missing reference should still warn; got findings: {findings}",
+        )
+
+    def test_numbered_sprint_ref_still_flags_if_missing(self) -> None:
+        # A real-shaped sprint spec that does not exist on disk must still
+        # warn -- the suppression must not extend to the general SPRINT_*
+        # family.
+        self._inject_references(
+            "docs/SOP/JOB_REGISTRY_V1.md",
+            ["docs/SOP/SPRINT_042_PHASE_7.md"],
+        )
+        findings = self._run_check()
+        self.assertTrue(
+            any(
+                f["severity"] == "warn"
+                and "SPRINT_042_PHASE_7.md" in f.get("locator", "")
+                and "does not resolve" in f.get("message", "")
+                for f in findings
+            ),
+            f"real-shaped but missing sprint spec should still warn; got findings: {findings}",
+        )
+
+
+# ---------------------------------------------------------------------------
 # CLI smoke (light: --help and status on a sandbox repo)
 # ---------------------------------------------------------------------------
 
