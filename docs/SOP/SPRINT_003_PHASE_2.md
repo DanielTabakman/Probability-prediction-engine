@@ -68,7 +68,7 @@ A Sprint 003 slice is acceptable only if **all** hold:
 
 ### A. Selected now
 
-- **Sprint003-Slice001** — `control_plane_consistency_check` placeholder-literal suppression. **Evidence-plane only.** **First real relay-assisted slice.**
+- **none** — **Sprint003-Slice001** **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; accepted baseline tip **`e044f0fe16097da32ef7e472084e266fc5405740`**; see §9 slice ledger). No further Sprint 003 slice has been SELECTED; §6.B candidates remain **deferred** pending fresh pilot evidence.
 
 ### B. Deferred candidates (do not promote without explicit SELECTION)
 
@@ -86,7 +86,7 @@ A Sprint 003 slice is acceptable only if **all** hold:
 
 ---
 
-## 7. Sprint003-Slice001 — `control_plane_consistency_check` placeholder-literal suppression (**SELECTED**)
+## 7. Sprint003-Slice001 — `control_plane_consistency_check` placeholder-literal suppression (**CLOSED / shipped, 2026-04-21**)
 
 **Identifier:** `Sprint003-Slice001`
 **Title:** `control_plane_consistency_check` placeholder-literal suppression
@@ -170,10 +170,26 @@ Treating them as unresolved references creates **signal-diluting noise** in a to
 
 ## 9. Slice ledger (Sprint 003)
 
-- **Sprint003-Slice001** — **SELECTED** (2026-04-20). Status: pre-BUILD. No product SHA yet.
+- **Sprint003-Slice001** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; **first real relay-assisted slice**).
+  - **Selected:** 2026-04-20.
+  - **BUILD executed:** 2026-04-21 via `run_selected_slice_v1` (Job Registry v1 §3.1) on `build_branch = build/sprint003-slice001-placeholder-suppression`, `baseline_branch = recovery/frontier-steward-v2_1-baseline`, `declared_plane = EVIDENCE-PLANE`, `retry_budget_max = 2` (retry count used: 0). Dispatch: staged / manual-resume per `RELAY_RUNTIME_V0` §7.2.
+  - **Baseline tip before promotion:** `63fee9510670873d4c2a5b6d82025de617b55a73`.
+  - **Accepted baseline tip after promotion (product-of-record):** **`e044f0fe16097da32ef7e472084e266fc5405740`** (fast-forward; `ancestor_check_pass: true`). Verify with `git rev-parse HEAD` on `recovery/frontier-steward-v2_1-baseline` and `git merge-base --is-ancestor e044f0fe16097da32ef7e472084e266fc5405740 HEAD`.
+  - **Diff scope (evidence-plane only):** `scripts/relay_runtime_v0.py` (`dispatch_control_plane_consistency_check` step 3 — explicit `_SOP_SPRINT_TEMPLATE_PLACEHOLDERS` literal allow-list), `tests/test_relay_runtime_v0.py` (positive-suppression + negative-still-flagged unit tests). Zero writes under `docs/SOP/**`, `docs/CONTROL_PLANE/**`, `src/**`, or `orchestrator/` — satisfies §3 acceptance rules 1, 3, 4 and §7.4 bullets.
+  - **Evidence pointers (relay-assisted BUILD):**
+    - **Pytest (universal tier):** `python -m pytest -q` → **117** passed; no regressions vs pre-BUILD (`tests.pytest_status == "PASS"`, `validation_classification == "deterministic"`). Satisfies §7.4 "zero regressions".
+    - **Post-build functional witness (§7.5 functional witness):** `artifacts/health/20260421_164325/control_plane_consistency_report.json` — `passed: true`, `findings: []`; the three cited `SPRINT_00X` / `SPRINT_00X_PHASE_Y` template placeholder warnings are absent. Satisfies §7.4 bullets 1, 2.
+    - **Relay result payload (`CODEX_AUTONOMY_V1` §14.1):** `artifacts/relay/runs/20260421_163438/relay_result.json` — `declared_plane == "EVIDENCE-PLANE"` (satisfies §3 rule 1 / §14.3 `declared_plane_matches_actual`), `preflight.build_allowed == true`, `tree_cleanliness.build_branch_clean == true`, `tree_cleanliness.mixed_plane_residue == false`, `stop_condition == null`, `ready_for_control_closeout == true`, `safe_to_continue == true`, `promotion.performed == true`, `promotion.method == "fast-forward"`, `product_commit_sha == "e044f0fe16097da32ef7e472084e266fc5405740"`. Negative witness coverage (§5 / §7.4 bullets 3, 4) lives in `tests/test_relay_runtime_v0.py` and is counted in the 117-test run.
+    - **§15 relay-gate decision:** `artifacts/relay/runs/20260421_163438/decision.json` → **`CONTINUE`** (`rule_matched == "15.2 rule 7"` — *clean closure; hand back to steward for CONTROL-CLOSEOUT*), `schema_violations == []`, `invariant_violations == []`.
+    - **Task envelope / run log:** `artifacts/relay/runs/20260421_163438/task_envelope.json`, `artifacts/relay/runs/20260421_163438/events.log`.
+  - **Acceptance (§7.4 checklist status):** all bullets satisfied — narrow/explicit suppression (literal allow-list, not a regex sweep), genuinely-missing-doc case still flagged (negative unit test), `declared_plane == EVIDENCE-PLANE`, §14.3 invariant holds, `stop_condition == null`, `ready_for_control_closeout == true`, §15 decision `CONTINUE`.
+  - **Sprint-level acceptance (§3):** all seven rules satisfied (evidence-plane target; pilot-grounded in the first read-only relay pilot's `control_plane_consistency_report.json`; no `docs/SOP/**`, `docs/CONTROL_PLANE/**`, `orchestrator/`, or `src/viz/**` writes; zero pytest regressions; narrow explicit rule; single-run under `run_selected_slice_v1` → `relay_gate_decision`).
+  - **Status:** CLOSED / shipped. No reopen. Further Sprint 003 slices must re-enter via explicit SELECTION grounded in a real relay/health artifact per §3 rule 2 and §6.B.
 
 (Further slices, when chartered, append to this section on CONTROL-CLOSEOUT.)
 
 ## 10. Last updated
+
+2026-04-21 — **Sprint003-Slice001 CONTROL-CLOSEOUT** (steward-only, control-plane only). Slice CLOSED / shipped as the **first real relay-assisted slice** executed end-to-end under `run_selected_slice_v1` + §15 `relay_gate_decision`. Accepted baseline tip after promotion: **`e044f0fe16097da32ef7e472084e266fc5405740`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint003-slice001-placeholder-suppression`; pre-promotion tip `63fee9510670873d4c2a5b6d82025de617b55a73`). Evidence recorded in §9: pytest **117** passed; post-build functional witness `artifacts/health/20260421_164325/control_plane_consistency_report.json` (`passed: true`, `findings: []`); relay result `artifacts/relay/runs/20260421_163438/relay_result.json` (`stop_condition == null`, `ready_for_control_closeout == true`); §15 decision `artifacts/relay/runs/20260421_163438/decision.json` → **`CONTINUE`** (`rule_matched == "15.2 rule 7"`). BUILD diff was evidence-plane only (`scripts/relay_runtime_v0.py`, `tests/test_relay_runtime_v0.py`). No protocol / registry / runtime-spec amendments. **Next pending execution step (canonical in `docs/SOP/CURRENT_FRONTIER.md` / `docs/SOP/HANDOFF.md`):** **SELECTION / timing-audit decision gate** — steward decides between (a) a next Sprint 003 §6.B hardening slice only if fresh pilot evidence supports it, or (b) a phase / new-sprint re-charter. **BUILD does not start in this pass.**
 
 2026-04-20 — Sprint 003 chartered as **pilot-driven evidence-plane hardening (relay-assisted)**. **Sprint003-Slice001 SELECTED** as the **first real relay-assisted slice** following successful Relay Runtime V0 local pilots (read-only, staged/manual-resume, forensic-replay). Control-plane / SELECTION-only pass; no product code, no orchestrator edits, no protocol or registry amendments. Next pending execution step: **BUILD via relay-assisted execution** (`run_selected_slice_v1`, `Sprint003-Slice001`).
