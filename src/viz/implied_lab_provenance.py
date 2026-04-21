@@ -69,6 +69,81 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
     return lines
 
 
+def build_width_vol_candidate_strip_payload(
+    verification: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """
+    Sprint 004 — compact, hypothesis-oriented strip fields for **width_vol** only.
+
+    Gated on verification_summary.disagreement_category_id (same truth as the Verification row).
+    """
+    if not verification or not isinstance(verification, dict):
+        return None
+    vs = verification.get("verification_summary")
+    if not isinstance(vs, dict) or not vs:
+        return None
+    if vs.get("disagreement_category_id") != "width_vol":
+        return None
+    bd = verification.get("belief_disagreement")
+    if not isinstance(bd, dict) or not bd:
+        return None
+
+    trace = bd.get("classification_trace")
+    trace_d = trace if isinstance(trace, dict) else {}
+    sl = bd.get("summary_lines") or []
+    anomaly_md = str(sl[0]).strip() if sl else "**Disagreement type:** Width / volatility disagreement"
+    why_body = str(sl[2]).strip() if len(sl) > 2 else (
+        "Peak aligned with the market reference while σ_user differs from ATM-implied σ at this horizon."
+    )
+    why_md = f"**Why flagged:** {why_body}"
+
+    shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
+    confidence_md = (
+        f"**Confidence (exploratory):** L₁ PDF shape-gap label **{shape_gap}** — descriptive tension on the grid, "
+        "not a calibrated probability of being correct."
+    )
+
+    mi = (verification.get("density") or {}).get("market_implied") or {}
+    if mi.get("breeden_litzenberger") == "skipped":
+        sr = mi.get("skip_reason")
+        trust_md = "**Trust / artifact note:** " + (
+            str(sr).strip()
+            if isinstance(sr, str) and sr.strip()
+            else "Market-implied curve not computed (marks gate); orange path may be absent."
+        )
+    else:
+        trust_md = (
+            "**Trust / artifact note:** Priced marks snapshot + Breeden–Litzenberger — sparse strikes and quote age "
+            "can distort tails; align with **Trust / provenance** and expand **Verification** for inputs."
+        )
+
+    fams = bd.get("strategy_families") or []
+    labels: list[str] = []
+    for fam in fams[:3]:
+        if isinstance(fam, dict):
+            lab = str(fam.get("label") or "").strip()
+            if lab:
+                labels.append(lab)
+    expr_md = "**Expression families (fit-scope only):** " + (
+        " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
+    )
+
+    falsification_md = (
+        "**Falsification (when this hypothesis stops fitting the labels):** Peak alignment breaks, "
+        "the width band re-enters **similar** vs ATM-implied σ, or refreshed marks/forward re-classify the run "
+        "under the same thresholds — see **Verification** trace."
+    )
+
+    return {
+        "anomaly_md": anomaly_md,
+        "why_md": why_md,
+        "confidence_md": confidence_md,
+        "trust_artifact_md": trust_md,
+        "expression_families_md": expr_md,
+        "falsification_md": falsification_md,
+    }
+
+
 def _overlay_basis_one_line(lab_mode: str | None) -> str:
     """Same semantics as verification_summary.overlay_basis; compact for the glance card."""
     if lab_mode == "target_payoff":

@@ -50,7 +50,10 @@ from src.engine.strategy_scanner import (
 from src.viz.implied_lab_state import build_implied_lab_state
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
-from src.viz.implied_lab_provenance import build_trust_strip_lines
+from src.viz.implied_lab_provenance import (
+    build_trust_strip_lines,
+    build_width_vol_candidate_strip_payload,
+)
 from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
 from src.viz.implied_lab_last_action import last_action_meaning, shape_window_local_region_story
 from src.viz.belief_uncertainty import (
@@ -177,6 +180,19 @@ def _render_trust_strip(verification: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Trust / provenance")
         st.caption("\n\n".join(lines))
+
+
+def _render_width_vol_candidate_strip_payload(payload: dict) -> None:
+    """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""
+    with st.container(border=True):
+        st.markdown("##### Candidate to inspect (width-shaped, v0)")
+        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.markdown(payload["anomaly_md"])
+        st.markdown(payload["why_md"])
+        st.markdown(payload["confidence_md"])
+        st.markdown(payload["trust_artifact_md"])
+        st.markdown(payload["expression_families_md"])
+        st.markdown(payload["falsification_md"])
 
 
 def _render_implied_lab_verification(v: dict) -> None:
@@ -737,6 +753,7 @@ if show_bitcoin_view:
                         right_chart_slot = st.empty()
                         strip_local_story_slot = st.empty()
                         right_summary_slot = st.empty()
+                        right_width_candidate_slot = st.empty()
                         right_trust_slot = st.empty()
                         right_review_slot = st.empty()
                         right_ticket_slot = st.empty()
@@ -1677,6 +1694,13 @@ if show_bitcoin_view:
                     # Summary card (Sprint 001): single-source-of-truth from derived outputs.
                     with right_summary_slot.container():
                         _render_implied_lab_summary_card(outputs)
+                    _v_pay = outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None
+                    _wv_strip = build_width_vol_candidate_strip_payload(_v_pay)
+                    if _wv_strip:
+                        with right_width_candidate_slot.container():
+                            _render_width_vol_candidate_strip_payload(_wv_strip)
+                    else:
+                        right_width_candidate_slot.empty()
                     with right_trust_slot.container():
                         _render_trust_strip(outputs.get("verification") or {})
                     with right_belief_slot.container():
