@@ -74,7 +74,7 @@ Every job in this doc uses the same fields, in this order:
 - **inputs**:
   - `relay_result_path` — path to a single `relay_result.json` conforming to §14.1.
   - `policy_version` — must equal the `schema_version` of the payload (currently `"1"`). Mismatch is a schema violation.
-- **authority boundary**: **read-only** with respect to code, docs, and git. The only thing this job may mutate is its own decision log artifact. It may **name** a follow-up job (e.g., request a retry of `run_selected_slice_v1`) but **must not** dispatch it; dispatch is the relay runtime's responsibility (not defined in this doc).
+- **authority boundary**: **read-only** with respect to code, docs, and git. The only thing this job may mutate is its own decision log artifact. It may **name** a follow-up job (e.g., `run_selected_slice_v1` when the §15.1 outcome is `RETRY_ALLOWED`) but **must not** dispatch it; dispatch is the relay runtime's responsibility (see `RELAY_RUNTIME_V0.md`).
 - **stop conditions**:
   - Payload is unparseable JSON → `BLOCKED`.
   - Payload violates §14.1 schema (missing required field, unknown enum value, invariant violation per §14.3) → `BLOCKED`.
@@ -84,7 +84,7 @@ Every job in this doc uses the same fields, in this order:
   - A decision record written to `artifacts/relay/<run_id>/decision.json`:
     ```json
     {
-      "decision": "CONTINUE | RETRY | STOP_CLEAN | STOP_HARD | BLOCKED",
+      "decision": "CONTINUE | RETRY_ALLOWED | STOP_FOR_REVIEW | BLOCKED",
       "rule_matched": "§15.x",
       "reason": "short factual string",
       "follow_up_job": "run_selected_slice_v1 | null",
@@ -96,8 +96,8 @@ Every job in this doc uses the same fields, in this order:
   - Writes one JSON file under `artifacts/relay/` (already `.gitignore`-covered).
   - Does **not** modify the input payload. Does **not** touch any repo file outside `artifacts/relay/`.
 - **human signoff required?**: **conditional** —
-  - `no` for `CONTINUE` and `RETRY` (within the autonomy authority boundary).
-  - `yes` for `STOP_CLEAN` (requires CONTROL-CLOSEOUT), `STOP_HARD` (requires steward diagnosis), and `BLOCKED` (schema-level defect — always human-visible).
+  - `no` for `CONTINUE` and `RETRY_ALLOWED` (decision record is valid; next step is steward handoff for CONTROL-CLOSEOUT on `CONTINUE`, or operator re-invocation per §15.4 on `RETRY_ALLOWED` — neither is auto-dispatch by this job).
+  - `yes` for `STOP_FOR_REVIEW` (steward judgment before further autonomous work) and `BLOCKED` (schema/invariant defect or hard §8 mapping — always human-visible).
 
 ### 3.3 `codebase_health_report`
 
@@ -154,7 +154,7 @@ The registry does not define dispatch, but it does name the **legal composition*
 
 - `run_selected_slice_v1` → emits §14.1 payload → `relay_gate_decision` consumes it → emits decision.
 - Before a steward-authored SELECTION, `codebase_health_report` and `control_plane_consistency_check` may run in any order; both are read-only and independent.
-- After a `STOP_CLEAN` or any non-null `stop_condition`, the next step is **steward CONTROL-CLOSEOUT**, not another automated job. Chaining more jobs across an unfinished CONTROL-CLOSEOUT is a schema violation.
+- **What happens next** (canonical §15.1 + `RELAY_RUNTIME_V0`): On `CONTINUE`, the relay/runtime **stops** after recording the decision and surfacing the §10.6 HANDBACK; the next **human** step is **steward CONTROL-CLOSEOUT** (`CODEX_AUTONOMY_V1` §15.3 — no auto-closeout, no auto-SELECTION). On `RETRY_ALLOWED`, **at most one** additional in-slice worker invocation is permitted per §15.4 / §7 (same slice spec, `retry_count += 1`); no scope/plane change, no other job chaining. On `STOP_FOR_REVIEW` or `BLOCKED`, automation halts for **steward disposition**; a non-null `stop_condition` is mapped by §15.2 (often `STOP_FOR_REVIEW` or `BLOCKED`, not `CONTINUE`) and must **never** be silently upgraded to `CONTINUE`. Automated chaining that treats canonical steering truth as closed before steward CONTROL-CLOSEOUT on a `CONTINUE` path is forbidden (`RELAY_RUNTIME_V0` §§9–10).
 - `BLOCKED` always halts the chain; no automated follow-up is authorized.
 
 ## 5. Versioning and change control
@@ -164,5 +164,7 @@ The registry does not define dispatch, but it does name the **legal composition*
 - Removing or renaming a job is a **breaking change**.
 
 ## 6. Last updated
+
+2026-04-21 — Control-plane vocabulary reconcile: `relay_gate_decision` §15.1 decision enum and closeout-chaining notes aligned with `CODEX_AUTONOMY_V1.md` §15.1 and `RELAY_RUNTIME_V0.md` (`CONTINUE` / `RETRY_ALLOWED` / `STOP_FOR_REVIEW` / `BLOCKED`; removed stale `RETRY` / `STOP_CLEAN` / `STOP_HARD` wording). No protocol intent change; no BUILD.
 
 2026-04-20 — Initial definition of Job Registry v1 with four starter jobs: `run_selected_slice_v1`, `relay_gate_decision`, `codebase_health_report`, `control_plane_consistency_check`. Control-plane / process-only pass; no product code, no orchestrator edits, no sprint chartered. Depends on: `docs/SOP/CODEX_AUTONOMY_V1.md` (v1, committed `57de839`).
