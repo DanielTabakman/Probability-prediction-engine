@@ -12,10 +12,10 @@ HANDOFF GATE — v2.1 (DOCS-ONLY control-plane)
 A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > CURRENT_FRONTIER > HANDOFF > OPERATING_RULES
 - Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
-- Active phase sprint (BUILD): **none** — **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Phase 2** still **active** (`docs/SOP/PHASE_2_CHARTER.md`)
-- Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**)
-- Current selected slice: **none** — no slice in-flight under **BUILD**
-- Next pending execution step: **SELECTION** — **(A)** **Sprint 003** within Phase 2 **or** **(B)** **phase transition / new charter** (`docs/SOP/CURRENT_FRONTIER.md`)
+- Active phase sprint (BUILD): **Sprint 003 — Phase 2 (chartered narrow, 2026-04-20)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`). **Not** a Phase 2 product UX sprint.
+- Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12)
+- Current selected slice: **Sprint003-Slice001** — `control_plane_consistency_check` placeholder-literal suppression (**first real relay-assisted slice**; `docs/SOP/SPRINT_003_PHASE_2.md` §7); declared plane **EVIDENCE-PLANE**; pre-BUILD
+- Next pending execution step: **BUILD via relay-assisted execution** — operator invokes `run_selected_slice_v1` (`docs/SOP/JOB_REGISTRY_V1.md` §3.1) with `slice_id = "Sprint003-Slice001"`, `sprint_spec_path = "docs/SOP/SPRINT_003_PHASE_2.md"`, `declared_plane = "EVIDENCE-PLANE"`, `baseline_branch = "recovery/frontier-steward-v2_1-baseline"`, fresh `build_branch`, `retry_budget_max = 2`; dispatch model = staged / manual-resume (`docs/SOP/RELAY_RUNTIME_V0.md` §7.2)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
@@ -36,7 +36,7 @@ B) REPO-STATE SAFETY (reproducibility)
 C) AGENT CONTINUITY (required)
 - Safe to switch agents? YES/NO: verify after repo-state
 - Exact reason:
-- If YES: exact handoff payload required: branch + HEAD SHA + read `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_002_PHASE_2.md` §6 (map) / §7–§10 (Slices **001–004** **closed**) / **§11–§12** (**Sprint 002 wrapped**)
+- If YES: exact handoff payload required: branch + HEAD SHA + read `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_003_PHASE_2.md` §§1–8 (Sprint 003 charter + **Sprint003-Slice001** definition; **first real relay-assisted slice**) + `docs/SOP/RELAY_RUNTIME_V0.md` §§3–8 (runtime contract + staged dispatch) + `docs/SOP/JOB_REGISTRY_V1.md` §3.1 (`run_selected_slice_v1` contract). Prior sprint ledger: `docs/SOP/SPRINT_002_PHASE_2.md` **§11–§12** (Sprint 002 wrapped).
 ```
 
 **Steward workflow (role, source-of-truth order, compact vs non-compact closeout, window ledger):** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). Optional **workflow health** there may include roundtrips, raw copy-pastes, and **Cursor turnaround** (packet → usable return)—still not a pass/fail gate.
@@ -70,6 +70,11 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Current priority
 
+**Execution posture (Sprint 003 — CHARTERED narrow, 2026-04-20):**
+- **Sprint 003 (Phase 2) — Pilot-driven evidence-plane hardening (relay-assisted):** `docs/SOP/SPRINT_003_PHASE_2.md`. Deliberately narrow; **not** a Phase 2 product UX sprint; does not advance Phase 2 product acceptance; does not reopen Sprint 001 / Sprint 002.
+- **Sprint003-Slice001 — SELECTED (2026-04-20, first real relay-assisted slice):** **`control_plane_consistency_check` placeholder-literal suppression** (`docs/SOP/SPRINT_003_PHASE_2.md` §7). Declared plane: **EVIDENCE-PLANE**. Pilot-grounded in `artifacts/health/<timestamp>/control_plane_consistency_report.json` — three benign warnings for SOP template placeholders (`SPRINT_00X.md`, `SPRINT_00X_PHASE_Y.md`) in `docs/SOP/OPERATING_RULES.md`, `docs/SOP/CODEX_AUTONOMY_V1.md`, `docs/SOP/JOB_REGISTRY_V1.md`. Fix lives in the **checker** (`scripts/relay_runtime_v0.py` + `tests/test_relay_runtime_v0.py`), not in those docs.
+- **Next execution step:** **BUILD via relay-assisted execution** — `run_selected_slice_v1` with the inputs recorded in HANDOFF GATE §A above; staged / manual-resume dispatch (`docs/SOP/RELAY_RUNTIME_V0.md` §7.2); §14.1 payload + §15 decision per `CODEX_AUTONOMY_V1`; CONTROL-CLOSEOUT remains **steward-only**.
+
 **Execution posture (Sprint 002 — WRAPPED, 2026-04-18):**
 - **Sprint002-Slice001** — **CLOSED / shipped** (product **`ff40b48`**); evidence: `CURRENT_FRONTIER.md` **Steering continuity** + **Completed recently**.
 - **Sprint002-Slice002** — **CLOSED / shipped** (product **`bd12b7cc09bee0399a755e5dd322f4e63a04fe0a`**); evidence: `CURRENT_FRONTIER.md` **Completed recently**; smoke `artifacts/ui_smoke/20260418_163043/`.
@@ -99,7 +104,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**None (BUILD-selected).** **Sprint002-Slice001–004** are **closed/shipped**; **Sprint 002** is **wrapped** (see `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/SPRINT_002_PHASE_2.md` **§12**). **Sprint 001** remains **wrapped** (**Slices 005–011** closed; no **Slice 012**).
+**Sprint003-Slice001 — SELECTED (2026-04-20).** Title: **`control_plane_consistency_check` placeholder-literal suppression**. Declared plane: **EVIDENCE-PLANE**. Spec anchor: `docs/SOP/SPRINT_003_PHASE_2.md` §7. **First real relay-assisted slice** following successful Relay Runtime V0 local pilots (read-only, staged/manual-resume, forensic-replay). **Pre-BUILD.** No product SHA yet. **Sprint 002** remains **wrapped** (see `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/SPRINT_002_PHASE_2.md` **§12**); **Sprint 001** remains **wrapped** (**Slices 005–011** closed; no **Slice 012**).
 
 ## Current status
 
@@ -120,8 +125,10 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **SELECTION** — **Sprint 003** within Phase 2 **or** **phase transition / new charter** (`docs/SOP/CURRENT_FRONTIER.md`).
-- deferred: **§6.C** batch candidates (and similar optional notes) — **not** selected by Sprint 002 wrap; revive only via explicit **future SELECTION**.
+- next task: **BUILD via relay-assisted execution** — `run_selected_slice_v1` for **Sprint003-Slice001** per HANDOFF GATE §A and `docs/SOP/SPRINT_003_PHASE_2.md` §8.
+- deferred: **Sprint003-Slice002/Slice003 candidates** (`docs/SOP/SPRINT_003_PHASE_2.md` §6.B) — not selected; pilot evidence required for any future SELECTION under Sprint 003.
+- deferred: **Sprint 002 §6.C** batch candidates — remain **deferred map only**.
+- deferred: a separate Phase 2 **product UX** sprint (Sprint 004 or re-charter) — **not** chartered now; Sprint 003 is narrow infrastructure hardening, not product.
 - optional: steward demo script (docs-only) if validation thrash warrants it — not selected by default.
 
 ## Risks / watchouts
@@ -161,17 +168,17 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**SELECTION** — see **`docs/SOP/CURRENT_FRONTIER.md`** (**Steward recommendation**): default posture is **Sprint 003 within Phase 2** unless the steward is explicitly choosing **phase transition / new charter**. **Sprint 002** is **wrapped**; **no** BUILD until **SELECTION** names a boundary.
+**BUILD via relay-assisted execution** — `run_selected_slice_v1` for **Sprint003-Slice001** (**first real relay-assisted slice**). Inputs and dispatch model are recorded in HANDOFF GATE §A above and in `docs/SOP/SPRINT_003_PHASE_2.md` §8. CONTROL-CLOSEOUT remains **steward-only** per `CODEX_AUTONOMY_V1.md` §§2, 10 and `RELAY_RUNTIME_V0.md` §10. No product code touched in this slice.
 
 ## Handoff checklist (must be filled each handoff)
 
 ### A) Doc-state safety / alignment (canonical docs only)
 
 - **Active phase**: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
-- **Active sprint (BUILD)**: **none** — **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Phase 2 active**
-- **Closed slices (Sprint 001)**: 005–011 (wrap **outcome B**; no Slice 012). **Sprint002-Slice001** — **closed/shipped** (product **`ff40b48`**). **Sprint002-Slice002** — **closed/shipped** (product **`bd12b7c`**). **Sprint002-Slice003** — **closed/shipped** (product **`6e5f563`**). **Sprint002-Slice004** — **closed/shipped** (product **`6be6d7c`**)
-- **Current selected slice (Sprint 002)**: **none**
-- **Next pending execution step**: **SELECTION** — **Sprint 003 (Phase 2)** **or** **phase transition / new charter**
+- **Active sprint (BUILD)**: **Sprint 003 — Phase 2 (chartered narrow)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`). Not a Phase 2 product UX sprint.
+- **Closed slices (Sprint 001)**: 005–011 (wrap **outcome B**; no Slice 012). **Sprint002-Slice001** — **closed/shipped** (product **`ff40b48`**). **Sprint002-Slice002** — **closed/shipped** (product **`bd12b7c`**). **Sprint002-Slice003** — **closed/shipped** (product **`6e5f563`**). **Sprint002-Slice004** — **closed/shipped** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12).
+- **Current selected slice (Sprint 003)**: **Sprint003-Slice001** — `control_plane_consistency_check` placeholder-literal suppression (**first real relay-assisted slice**); declared plane **EVIDENCE-PLANE**; pre-BUILD.
+- **Next pending execution step**: **BUILD via relay-assisted execution** — `run_selected_slice_v1` per HANDOFF GATE §A (inputs) and `docs/SOP/SPRINT_003_PHASE_2.md` §8 (execution posture).
 - **Reporting posture**: **SLIM MODE** and (if applicable) **REPO-SENSOR execution-only** (no extra analysis)
 - **Canonical truth rule**: confirm `CURRENT_FRONTIER` outranks `HANDOFF` if drift is detected (until reconciled)
 - **Non-canonical naming note**: confirm any **H1 / H1-01 / H1-02** shorthand is treated as **non-canonical legacy** unless explicitly reintroduced by accepted docs (prefer Phase/Sprint/Slice identifiers)
@@ -203,5 +210,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `scripts/run_implied_lab_ui_smoke.py`, and `docs/SOP/` (including Execution step 17 validation-tier / closeout rules in `OPERATING_RULES.md`) are present on disk but **mostly not committed**; `main` is **ahead of `origin/main` by 1** (local commit: implied-lab smoke harness + doc/requirements). **Modified** tracked files carry large deltas on top of that commit. **`python -m pytest -q`:** 28 passed on this tree (2026-04-10). Smallest honest next step before feature slice 006: one scoped checkpoint (commit + push) after deciding whether `artifacts/` (and similar) should be ignored or archived—not broad cleanup.
 
 ## Last updated
+
+2026-04-20 by agent (**CONTROL-PLANE SELECTION — Frontier Steward 2.2**): **Sprint 003 chartered** narrow (`docs/SOP/SPRINT_003_PHASE_2.md`, **Pilot-driven evidence-plane hardening (relay-assisted)**); **Sprint003-Slice001 SELECTED** as **first real relay-assisted slice** (`control_plane_consistency_check` placeholder-literal suppression). **Next** = **BUILD via relay-assisted execution** (`run_selected_slice_v1`, declared plane **EVIDENCE-PLANE**). **No product code** in this pass; no protocol / registry / runtime-spec amendments. Prior: Relay Runtime V0 local pilots complete (read-only, staged, forensic-replay); baseline tip includes **`894ca60`** (relay-runtime decision-enum reconciliation).
 
 2026-04-18 by agent (**CONTROL-PLANE WRAP CLOSEOUT — Frontier Steward 2.2**): **Sprint 002** **wrapped**; **next** = **SELECTION** (Sprint 003 vs phase). **No product code** in this pass. Prior: **SELECTION** outcome A; Slice004 **`6be6d7c`**.
