@@ -2,7 +2,7 @@
 
 **What this file is:** the **Sprint 004 spec** (scope boundary + slice map + acceptance framing) for a **Phase 2 product** increment: a **BTC-first mispricing discovery wedge** carried as **small, testable slices**. This sprint is **not** Sprint 003; it does **not** subsume or rewrite **`docs/SOP/SPRINT_003_PHASE_2.md`** (Sprint 003 remains **evidence-plane only** — relay tooling / tests — per that sprint’s charter).
 
-**Execution status (ledger lives elsewhere):** the **current selected slice**, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`).
+**Execution status (ledger lives elsewhere):** the **current selected slice**, BUILD/CLOSEOUT state, and the **next pending execution step** are authoritative in `docs/SOP/CURRENT_FRONTIER.md` (and summarized in `docs/SOP/HANDOFF.md`). **`Sprint004-Slice001` is CLOSED / shipped** (2026-04-21); product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`** on `recovery/frontier-steward-v2_1-baseline`.
 
 **Authority model (unchanged):** **SELECTION** and **CONTROL-CLOSEOUT** are **steward-driven**. After a slice is chartered and **PREFLIGHT** authorizes work, a **relay-assisted BUILD** (when used) operates only inside **bounded BUILD loops** per `docs/SOP/CODEX_AUTONOMY_V1.md` + `docs/SOP/RELAY_RUNTIME_V0.md` + `docs/SOP/JOB_REGISTRY_V1.md` — the relay **helps execution**; it does **not** replace steward **selection** or **closeout**. This sprint spec was opened on a **CONTROL-PLANE-only** pass — **no BUILD** on that pass.
 
@@ -54,7 +54,7 @@ A Sprint 004 slice is acceptable only if **all** hold at closeout:
 
 ### A. Selected now
 
-- **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)** — **SELECTED** (control-plane canonization; **this pass did not run BUILD**). **Next pending execution step:** **PREFLIGHT** for this slice (steward/operator gate per `CODEX_AUTONOMY_V1` §5 + `RELAY_RUNTIME_V0` §8 when relay is used). Exact file targets, declared plane, and relay envelope (if any) are fixed **at PREFLIGHT / BUILD packet**, not retroactively by this sprint-opening pass.
+- **None** — steward **SELECTION** required for the next Sprint 004 slice under §6 (**§6.B–§6.C** remain deferred until explicitly chosen). **`Sprint004-Slice001` — Width-disagreement candidate strip (v0) — CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**); product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**.
 
 ### B. Likely next (not selected; require explicit SELECTION)
 
@@ -81,9 +81,9 @@ Items listed in **§4** remain **out of scope** until a future steward **re-char
 
 Users can see **belief vs market** tension, but the lab does not yet give a **single, bounded “candidate strip”** that names **width/disagreement-shaped** tension as a **hypothesis to inspect** — not a recommendation — aligned with existing glance / digest semantics.
 
-### 7.2 Exact target (to be pinned at PREFLIGHT)
+### 7.2 Exact target (pinned at BUILD / closeout)
 
-**Preflight must name:** primary UI region (e.g. glance / chart-adjacent band), **exact files**, copy limits, and **verification commands**. Until then, this section is **intent-only** — **no BUILD** was executed in the sprint-opening pass.
+**Primary UI region:** implied-lab **right column**, dedicated `right_width_candidate_slot` — **between** **Summary** card and **Trust / provenance** strip (`src/viz/app.py`). **PRODUCT-PLANE files:** `src/viz/app.py`, `src/viz/implied_lab_provenance.py`, `tests/test_width_vol_candidate_strip.py`. **Verification commands:** `python -m pytest -q`; `python scripts/run_implied_lab_ui_smoke.py`.
 
 ### 7.3 Non-goals (slice-level; v0)
 
@@ -91,11 +91,11 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 - No **strike optimizer** or **auto-trade** copy.
 - No **semantic contract** edits unless separately approved.
 
-### 7.4 Acceptance bullets (slice-level; to be finalized at PREFLIGHT)
+### 7.4 Acceptance bullets (slice-level; Slice001 closeout)
 
-- [ ] A **compact candidate strip** (or equivalent bounded UI) makes **width/disagreement-shaped** tension **legible** as a **candidate** (wording non-advisory; contract-aligned).
-- [ ] **pytest** + **primary UI smoke** **PASS** on the BUILD branch after changes touching product surfaces.
-- [ ] No regression to **trust / provenance / verification** discoverability.
+- [x] A **compact candidate strip** makes **width_vol** tension **legible** as a **candidate** (wording non-advisory; contract-aligned).
+- [x] **pytest** + **primary UI smoke** **PASS** on the BUILD branch after changes touching product surfaces (`artifacts/ui_smoke/20260421_195139/`).
+- [x] No regression to **trust / provenance / verification** discoverability.
 
 ### 7.5 Validation posture (slice-level)
 
@@ -107,7 +107,7 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 
 ## 8. Slice ledger (Sprint 004)
 
-- **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)** — **SELECTED** (2026-04-21 control-plane sprint open; **no BUILD** on that pass). **Next:** **PREFLIGHT** → (authorized) **BUILD** → **BUILD-CLOSEOUT** → **CONTROL-CLOSEOUT**.
+- **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)** — **CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**). Product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice001-width-candidate-strip-v0`; pre-promotion tip **`478d2cf5ecb5eaa82e02e9cca022e3968e6a58e4`**). **Closeout validation:** `python -m pytest -q` → **120** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS**; **manual one-screen checklist** → **PASS**.
 
 ---
 
@@ -120,5 +120,7 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 ---
 
 ## 10. Last updated
+
+2026-04-21 — **CONTROL-CLOSEOUT (Steward Model 2.3):** **`Sprint004-Slice001` — CLOSED / shipped**; baseline tip **`b13cb30b67457cb673514ebf8ae8183f88967f06`**; **next pending execution step:** **SELECTION** for the next Sprint 004 slice. **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
 
 2026-04-21 — **CONTROL-PLANE sprint open (Steward Model 2.3):** chartered **Sprint 004 — Phase 2 Product: Candidate Edge v1**; **SELECTED** **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)**; **next pending execution step:** **PREFLIGHT** for Slice001. **No BUILD** on this pass. **Sprint 003** remains **evidence-plane only** (`docs/SOP/SPRINT_003_PHASE_2.md`); Sprint 004 does not modify Sprint 003 scope.
