@@ -245,6 +245,21 @@ Preferred format:
 - **Canonical naming:** treat **H1 / H1-01 / H1-02** as **non-canonical legacy shorthand** unless explicitly reintroduced by accepted repo docs. Prefer **Phase / Sprint / Slice / Execution step** identifiers in all control-plane updates.
 - Mandatory continuity reporting: include the **AGENT CONTINUITY** block in every execution-step return and handoff.
 
+## SOP reads: LOAD-ALWAYS vs LOAD-ON-DEMAND (advisory)
+
+Advisory companion to `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` (context-budget bands). Not a gate. Overridable with a recorded reason.
+
+**LOAD-ALWAYS (every BUILD-class pass):**
+- `docs/SOP/CURRENT_FRONTIER.md` (canonical next step; outranks HANDOFF on drift)
+- `docs/SOP/HANDOFF.md` (minimum session context)
+- the **active sprint spec** only (e.g. `docs/SOP/SPRINT_003_PHASE_2.md`)
+
+**LOAD-ON-DEMAND (only when the pass actually touches them):**
+- `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`, `docs/SOP/OPERATING_RULES.md` — read on scope/gate questions
+- `docs/SOP/CODEX_AUTONOMY_V1.md`, `docs/SOP/JOB_REGISTRY_V1.md`, `docs/SOP/RELAY_RUNTIME_V0.md` — read only for relay-assisted BUILD
+- `docs/SOP/WORKFLOW_METRICS_V1.md`, `docs/SEMANTIC_CONTRACTS.md`, older sprint specs — read on explicit reference
+- `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` — read when a pass classifies as WATCH/ESCALATE
+
 ## Current recovery reality (minimal note)
 
 - **Clean control-plane baseline:** `recovery/frontier-steward-v2_1-baseline` @ `7cc2e28`
