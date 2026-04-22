@@ -12,6 +12,8 @@ Runs:
 3) Drives the UI in a headless browser
 4) Captures a screenshot per scenario executed in this run
 5) Writes a per-run JSON manifest with verification booleans + screenshot paths
+   (scenario A adds `slice003_witness` + `workflow_hardening_slice003_closeout` + optional
+   `A_width_target_payoff_slice003_witness.png`)
 
 Artifacts:
   artifacts/ui_smoke/<run_id>/
@@ -47,6 +49,11 @@ PORT = int(os.environ.get("UI_SMOKE_PORT", str(DEFAULT_PORT)))
 BASE_URL = f"http://127.0.0.1:{PORT}"
 APP_URL = f"{BASE_URL}/"
 
+# Sprint004-Slice003 (WH-Slice003): bounded witness of the width_vol candidate strip + session history UI.
+SLICE003_CANDIDATE_HEADING = "Candidate to inspect (width-shaped, v0)"
+SLICE003_HISTORY_SUMMARY = "History (this session)"
+SLICE003_STRIP_WAIT_S = 55.0
+
 
 SCENARIOS = [
     "A_width_target_payoff",
@@ -67,6 +74,13 @@ class ScenarioResult:
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
+    # WH-Slice003 witness (scenario A only; see slice003_witness in manifest).
+    slice003_classification: str = "NOT_APPLICABLE"
+    slice003_candidate_strip_found: bool = False
+    slice003_history_expander_found: bool = False
+    slice003_clear_history_control_found: bool = False
+    slice003_witness_screenshot_path: str = ""
+    slice003_witness_notes: str = ""
 
 
 def _port_is_listening(port: int) -> bool:
@@ -481,6 +495,107 @@ def _collect_directional_category_verification(page, result: ScenarioResult) -> 
         result.directional_category_verified = False
 
 
+def _collect_slice003_witness(page, result: ScenarioResult) -> None:
+    """
+    Narrow, selector-based witness for Sprint004-Slice003 UI (candidate strip + session history).
+
+    Does not widen into a screenshot framework: one optional element screenshot when the
+    candidate heading is attached. Classifications are machine-stable for manifest closeout.
+    """
+    if result.scenario != "A_width_target_payoff":
+        result.slice003_classification = "NOT_APPLICABLE"
+        return
+
+    if not result.page_loaded:
+        result.slice003_classification = "DEGRADED_PAGE_NOT_LOADED"
+        result.slice003_witness_notes = "App shell did not reach a loaded state."
+        return
+
+    if result.notes:
+        result.slice003_classification = "DEGRADED_SCENARIO_INCOMPLETE"
+        result.slice003_witness_notes = result.notes[:800]
+        return
+
+    if not result.verification_found:
+        result.slice003_classification = "DEGRADED_VERIFICATION_UI_NOT_REACHED"
+        result.slice003_witness_notes = (
+            "Primary scenario controls ran, but disagreement classification UI was not observed."
+        )
+        return
+
+    heading = page.get_by_text(
+        re.compile(r"Candidate\s+to\s+inspect\s*\(width-shaped,\s*v0\)", re.I)
+    ).first
+    try:
+        heading.wait_for(state="attached", timeout=int(SLICE003_STRIP_WAIT_S * 1000))
+    except Exception as e:  # noqa: BLE001
+        result.slice003_classification = "DEGRADED_STRIP_NOT_SHOWN"
+        result.slice003_witness_notes = (
+            "Live verification did not surface the width_vol candidate strip within the bounded wait "
+            f"({SLICE003_STRIP_WAIT_S:.0f}s). Same gate as app `disagreement_category_id == width_vol`. "
+            f"Last error: {type(e).__name__}: {e}"
+        )
+        return
+
+    result.slice003_candidate_strip_found = True
+    try:
+        heading.scroll_into_view_if_needed()
+    except Exception:
+        pass
+    page.wait_for_timeout(350)
+
+    try:
+        witness_path = RUN_DIR / f"{result.scenario}_slice003_witness.png"
+        RUN_DIR.mkdir(parents=True, exist_ok=True)
+        heading.screenshot(path=str(witness_path))
+        result.slice003_witness_screenshot_path = str(witness_path)
+    except Exception as ex:  # noqa: BLE001
+        result.slice003_witness_notes = f"heading_screenshot_skipped: {type(ex).__name__}: {ex}"
+
+    hist_summary = page.locator("summary").filter(
+        has_text=re.compile(re.escape(SLICE003_HISTORY_SUMMARY), re.I)
+    ).first
+    if hist_summary.count() == 0:
+        result.slice003_classification = "PARTIAL_DOM"
+        result.slice003_witness_notes = (
+            (result.slice003_witness_notes + " | " if result.slice003_witness_notes else "")
+            + "Candidate strip visible but History (this session) expander not found."
+        )
+        return
+
+    result.slice003_history_expander_found = True
+    try:
+        if hist_summary.count() > 0:
+            details = hist_summary.locator("xpath=ancestor::details[1]").first
+            if details.count() > 0 and details.get_attribute("open") is None:
+                hist_summary.click()
+                page.wait_for_timeout(450)
+    except Exception:
+        pass
+
+    clear_btn = page.get_by_role("button", name=re.compile(r"Clear\s+history", re.I)).first
+    try:
+        clear_btn.wait_for(state="visible", timeout=8000)
+        result.slice003_clear_history_control_found = True
+    except Exception:
+        try:
+            fallback = page.locator("button", has_text=re.compile(r"Clear\s+history", re.I)).first
+            if fallback.count() > 0 and fallback.is_visible():
+                result.slice003_clear_history_control_found = True
+        except Exception:
+            result.slice003_clear_history_control_found = False
+
+    if not result.slice003_clear_history_control_found:
+        result.slice003_classification = "PARTIAL_DOM"
+        result.slice003_witness_notes = (
+            (result.slice003_witness_notes + " | " if result.slice003_witness_notes else "")
+            + "Clear history control not visible after opening History expander."
+        )
+        return
+
+    result.slice003_classification = "WITNESS_OK"
+
+
 def take_screenshot(page, scenario: str) -> str:
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     shot_path = RUN_DIR / f"{scenario}.png"
@@ -497,6 +612,11 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         r.page_loaded = True
     except Exception:
         r.page_loaded = False
+        if scenario == "A_width_target_payoff":
+            r.slice003_classification = "DEGRADED_PAGE_NOT_LOADED"
+            r.slice003_witness_notes = (
+                "Shell/title visibility wait failed before implied lab content could be driven."
+            )
         return r
 
     try:
@@ -633,6 +753,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     except Exception:
         pass
 
+    try:
+        _collect_slice003_witness(page, r)
+    except Exception as e:  # noqa: BLE001
+        if r.scenario == "A_width_target_payoff":
+            r.slice003_classification = "DEGRADED_SCENARIO_INCOMPLETE"
+            r.slice003_witness_notes = f"slice003_witness_exception: {type(e).__name__}: {e}"
+
     return r
 
 
@@ -700,12 +827,56 @@ def main() -> int:
 
             browser.close()
 
+        def _slice003_witness_row(r: ScenarioResult) -> dict[str, Any]:
+            return {
+                "classification": r.slice003_classification,
+                "candidate_strip_heading_found": r.slice003_candidate_strip_found,
+                "history_expander_found": r.slice003_history_expander_found,
+                "clear_history_control_found": r.slice003_clear_history_control_found,
+                "witness_screenshot_path": r.slice003_witness_screenshot_path,
+                "notes": r.slice003_witness_notes,
+            }
+
+        def _slice003_closeout_block(rows: list[ScenarioResult]) -> dict[str, Any]:
+            ra = next((x for x in rows if x.scenario == "A_width_target_payoff"), None)
+            if ra is None:
+                return {
+                    "schema_version": 1,
+                    "primary_scenario_ran": False,
+                    "evidence_plane_complete": False,
+                    "workflow_hardening_slice003_signal": "NOT_APPLICABLE",
+                    "detail": "A_width_target_payoff not in this run.",
+                }
+            cls = ra.slice003_classification
+            bounded_live_miss = cls == "DEGRADED_STRIP_NOT_SHOWN"
+            evidence_plane_complete = cls in ("WITNESS_OK", "DEGRADED_STRIP_NOT_SHOWN")
+            return {
+                "schema_version": 1,
+                "primary_scenario_ran": True,
+                "evidence_plane_complete": bool(evidence_plane_complete),
+                "bounded_live_data_miss": bool(bounded_live_miss),
+                "workflow_hardening_slice003_signal": (
+                    "WITNESS_OK"
+                    if cls == "WITNESS_OK"
+                    else (
+                        "BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP"
+                        if bounded_live_miss
+                        else "NEEDS_FIX_OR_RETRY"
+                    )
+                ),
+                "classification": cls,
+                "detail": ra.slice003_witness_notes or "",
+            }
+
+        wh_slice003_closeout = _slice003_closeout_block(results)
+
         # Write manifest.
         manifest = {
             "app_url": APP_URL,
             "port": PORT,
             "run_id": RUN_ID,
             "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+            "workflow_hardening_slice003_closeout": wh_slice003_closeout,
             "scenarios": [
                 {
                     "scenario": r.scenario,
@@ -717,6 +888,7 @@ def main() -> int:
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
+                    "slice003_witness": _slice003_witness_row(r),
                 }
                 for r in results
             ],
@@ -745,6 +917,12 @@ def main() -> int:
                     "Official one-command wrapper (`scripts/run_implied_lab_ui_smoke.py`) runs "
                     "A_width_target_payoff only. For C, use --scenario C_directional_peak_disagreement; "
                     "a green run implies C’s manifest gates passed for that run."
+                ),
+                "workflow_hardening_slice003": (
+                    "Scenario A collects `slice003_witness` (candidate strip heading, History expander, "
+                    "Clear history) plus `workflow_hardening_slice003_closeout`. "
+                    "`evidence_plane_complete` is true for WITNESS_OK or DEGRADED_STRIP_NOT_SHOWN "
+                    "(bounded live-data miss: verification UI reached but width_vol strip never appeared)."
                 ),
             },
         }
@@ -778,6 +956,14 @@ def main() -> int:
         overall_pass = page_loaded_ok and main_ok and verification_ok
 
         summary_path = RUN_DIR / "ui_smoke_summary.txt"
+        _a = next((x for x in results if x.scenario == "A_width_target_payoff"), None)
+        _slice003_line = ""
+        if _a is not None:
+            _slice003_line = (
+                f"slice003_classification={_a.slice003_classification}\n"
+                f"slice003_evidence_plane_complete="
+                f"{str(wh_slice003_closeout['evidence_plane_complete']).lower()}\n"
+            )
         summary_path.write_text(
             (
                 f"RUN_ID={RUN_ID}\n"
@@ -786,6 +972,7 @@ def main() -> int:
                 f"page_loaded_ok={page_loaded_ok}\n"
                 f"main_texts_ok={main_ok}\n"
                 f"verification_ok={verification_ok}\n"
+                f"{_slice003_line}"
             ),
             encoding="utf-8",
         )

@@ -8,7 +8,8 @@ Delegates to scripts/implied_lab_ui_smoke_harness.py with:
   --scenario A_width_target_payoff
   --port <ephemeral free port>
 
-Does not change harness behavior, pass/fail semantics for this command, or artifact layout.
+Pass/fail for this command remains the harness exit code; the wrapper additionally prints
+Slice003 witness fields from the manifest for closeout triage.
 """
 
 from __future__ import annotations
@@ -65,19 +66,33 @@ def main() -> int:
     manifest_path = run_dir / "ui_smoke_manifest.json" if run_dir else None
 
     screenshot_path: str | None = None
+    slice003_summary = "(n/a)"
+    witness_shot: str | None = None
     if manifest_path is not None and manifest_path.is_file():
         try:
             data = json.loads(manifest_path.read_text(encoding="utf-8"))
+            close = data.get("workflow_hardening_slice003_closeout") or {}
             for row in data.get("scenarios", []):
-                if row.get("scenario") == OFFICIAL_SCENARIO:
-                    screenshot_path = row.get("screenshot_path") or None
-                    break
+                if row.get("scenario") != OFFICIAL_SCENARIO:
+                    continue
+                screenshot_path = row.get("screenshot_path") or None
+                w = row.get("slice003_witness") or {}
+                witness_shot = w.get("witness_screenshot_path") or None
+                slice003_summary = (
+                    f"classification={w.get('classification')} "
+                    f"signal={close.get('workflow_hardening_slice003_signal')} "
+                    f"evidence_plane_complete={close.get('evidence_plane_complete')}"
+                )
+                break
         except Exception:
             screenshot_path = None
+            slice003_summary = "(manifest parse error)"
 
     print(f"Exit code: {code}")
     print(f"Manifest path: {manifest_path if manifest_path and manifest_path.is_file() else '(unknown)'}")
     print(f"Screenshot path: {screenshot_path if screenshot_path else '(unknown)'}")
+    print(f"Slice003 witness summary: {slice003_summary}")
+    print(f"Slice003 witness screenshot: {witness_shot if witness_shot else '(none)'}")
     return code
 
 
