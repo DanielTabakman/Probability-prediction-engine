@@ -121,6 +121,6 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 
 ## 10. Last updated
 
-2026-04-21 — **CONTROL-CLOSEOUT (Steward Model 2.3):** **`Sprint004-Slice001` — CLOSED / shipped**; accepted baseline tip **`ba1b9f8fb17dd81b2a81f39bfe2caab24544eb24`** (BUILD product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **next pending execution step:** **SELECTION** for the next Sprint 004 slice. **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
+2026-04-21 — **CONTROL-CLOSEOUT (Steward Model 2.3):** **`Sprint004-Slice001` — CLOSED / shipped**; accepted baseline tip **`f8830613f813c18fadca0570bb0c2a2a2b2ddae5`** (BUILD product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **next pending execution step:** **SELECTION** for the next Sprint 004 slice. **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
 
 2026-04-21 — **CONTROL-PLANE sprint open (Steward Model 2.3):** chartered **Sprint 004 — Phase 2 Product: Candidate Edge v1**; **SELECTED** **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)**; **next pending execution step:** **PREFLIGHT** for Slice001. **No BUILD** on this pass. **Sprint 003** remains **evidence-plane only** (`docs/SOP/SPRINT_003_PHASE_2.md`); Sprint 004 does not modify Sprint 003 scope.
