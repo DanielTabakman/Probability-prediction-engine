@@ -63,7 +63,7 @@ This is a **narrow-coverage** headless smoke harness—not a full scenario matri
 
 `python scripts/run_implied_lab_ui_smoke.py`
 
-**Workflow-Hardening-Slice003 (evidence plane):** the harness manifest includes `slice003_witness` on each scenario row and top-level `workflow_hardening_slice003_closeout` (`evidence_plane_complete`, `workflow_hardening_slice003_signal`, `bounded_live_data_miss`). A healthy width_vol strip run also drops `A_width_target_payoff_slice003_witness.png` beside the main scenario screenshot.
+**Workflow-Hardening-Slice003 (evidence plane):** the harness manifest includes `slice003_witness` on each scenario row and top-level `workflow_hardening_slice003_closeout` (schema v2: `evidence_plane_complete`, `bounded_failure_bucket`, `workflow_hardening_slice003_signal`, `bounded_live_data_miss`, `bounded_app_or_data_unavailable`, `region_witness_artifact_ok`, `used_union_viewport_clip`). A healthy run writes `A_width_target_payoff_slice003_witness.png` as a **bounded viewport clip** over the strip container + History + Clear history when possible (union clip metadata in `slice003_witness.region_witness_clip_px`).
 
 Using the project venv’s interpreter is fine, for example:
 

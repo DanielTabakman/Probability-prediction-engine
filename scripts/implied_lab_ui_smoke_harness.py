@@ -80,6 +80,10 @@ class ScenarioResult:
     slice003_history_expander_found: bool = False
     slice003_clear_history_control_found: bool = False
     slice003_witness_screenshot_path: str = ""
+    slice003_region_witness_saved: bool = False
+    slice003_used_union_clip: bool = False
+    slice003_region_witness_clip_px: dict[str, float] | None = None
+    slice003_region_dom_anchor: str = ""
     slice003_witness_notes: str = ""
 
 
@@ -495,12 +499,61 @@ def _collect_directional_category_verification(page, result: ScenarioResult) -> 
         result.directional_category_verified = False
 
 
+def _slice003_strip_root_locator(page, heading: Any) -> tuple[Any, str]:
+    """
+    Prefer Streamlit bordered vertical wrapper that contains the strip + hypothesis caption
+    (colocated in `right_width_candidate_slot` in app.py).
+    """
+    try:
+        bordered = page.locator('[data-testid="stVerticalBlockBorderWrapper"]').filter(
+            has_text=re.compile(r"Candidate to inspect", re.I)
+        )
+        if bordered.count() > 0:
+            return bordered.first, "stVerticalBlockBorderWrapper"
+    except Exception:
+        pass
+    return heading, "candidate_heading"
+
+
+def _slice003_union_clip(page, *locs: Any) -> dict[str, float] | None:
+    """Union locator bounding boxes in viewport CSS pixels for a single bounded screenshot."""
+    boxes: list[dict[str, float]] = []
+    vp = page.viewport_size or {"width": 1400, "height": 950}
+    vw, vh = float(vp["width"]), float(vp["height"])
+    for loc in locs:
+        if loc is None:
+            continue
+        try:
+            if getattr(loc, "count", lambda: 0)() == 0:
+                continue
+            handle = loc.element_handle()
+            if handle is None:
+                continue
+            bb = handle.bounding_box()
+            if bb and float(bb["width"]) > 1 and float(bb["height"]) > 1:
+                boxes.append(bb)
+        except Exception:
+            continue
+    if not boxes:
+        return None
+    x0 = min(float(b["x"]) for b in boxes)
+    y0 = min(float(b["y"]) for b in boxes)
+    x1 = max(float(b["x"]) + float(b["width"]) for b in boxes)
+    y1 = max(float(b["y"]) + float(b["height"]) for b in boxes)
+    pad = 8.0
+    x0, y0 = max(0.0, x0 - pad), max(0.0, y0 - pad)
+    x1, y1 = min(vw, x1 + pad), min(vh, y1 + pad)
+    w, h = max(1.0, x1 - x0), max(1.0, y1 - y0)
+    return {"x": x0, "y": y0, "width": w, "height": h}
+
+
 def _collect_slice003_witness(page, result: ScenarioResult) -> None:
     """
     Narrow, selector-based witness for Sprint004-Slice003 UI (candidate strip + session history).
 
-    Does not widen into a screenshot framework: one optional element screenshot when the
-    candidate heading is attached. Classifications are machine-stable for manifest closeout.
+    One bounded viewport clip screenshot covering strip root + History expander + Clear history
+    once all three are reachable (scroll-to-region, no full-page framework).
+    Classifications are machine-stable for manifest closeout.
     """
     if result.scenario != "A_width_target_payoff":
         result.slice003_classification = "NOT_APPLICABLE"
@@ -538,19 +591,17 @@ def _collect_slice003_witness(page, result: ScenarioResult) -> None:
         return
 
     result.slice003_candidate_strip_found = True
+    strip_root, anchor = _slice003_strip_root_locator(page, heading)
+    result.slice003_region_dom_anchor = anchor
+    try:
+        strip_root.scroll_into_view_if_needed()
+    except Exception:
+        pass
     try:
         heading.scroll_into_view_if_needed()
     except Exception:
         pass
     page.wait_for_timeout(350)
-
-    try:
-        witness_path = RUN_DIR / f"{result.scenario}_slice003_witness.png"
-        RUN_DIR.mkdir(parents=True, exist_ok=True)
-        heading.screenshot(path=str(witness_path))
-        result.slice003_witness_screenshot_path = str(witness_path)
-    except Exception as ex:  # noqa: BLE001
-        result.slice003_witness_notes = f"heading_screenshot_skipped: {type(ex).__name__}: {ex}"
 
     hist_summary = page.locator("summary").filter(
         has_text=re.compile(re.escape(SLICE003_HISTORY_SUMMARY), re.I)
@@ -558,22 +609,22 @@ def _collect_slice003_witness(page, result: ScenarioResult) -> None:
     if hist_summary.count() == 0:
         result.slice003_classification = "PARTIAL_DOM"
         result.slice003_witness_notes = (
-            (result.slice003_witness_notes + " | " if result.slice003_witness_notes else "")
-            + "Candidate strip visible but History (this session) expander not found."
+            "Candidate strip visible but History (this session) expander not found "
+            "(session history renders only after at least one width_vol appearance event)."
         )
         return
 
     result.slice003_history_expander_found = True
+    details_el = hist_summary.locator("xpath=ancestor::details[1]").first
     try:
-        if hist_summary.count() > 0:
-            details = hist_summary.locator("xpath=ancestor::details[1]").first
-            if details.count() > 0 and details.get_attribute("open") is None:
-                hist_summary.click()
-                page.wait_for_timeout(450)
+        if details_el.count() > 0 and details_el.get_attribute("open") is None:
+            hist_summary.click()
+            page.wait_for_timeout(450)
     except Exception:
         pass
 
     clear_btn = page.get_by_role("button", name=re.compile(r"Clear\s+history", re.I)).first
+    result.slice003_clear_history_control_found = False
     try:
         clear_btn.wait_for(state="visible", timeout=8000)
         result.slice003_clear_history_control_found = True
@@ -582,15 +633,54 @@ def _collect_slice003_witness(page, result: ScenarioResult) -> None:
             fallback = page.locator("button", has_text=re.compile(r"Clear\s+history", re.I)).first
             if fallback.count() > 0 and fallback.is_visible():
                 result.slice003_clear_history_control_found = True
+                clear_btn = fallback
         except Exception:
             result.slice003_clear_history_control_found = False
 
     if not result.slice003_clear_history_control_found:
         result.slice003_classification = "PARTIAL_DOM"
         result.slice003_witness_notes = (
-            (result.slice003_witness_notes + " | " if result.slice003_witness_notes else "")
-            + "Clear history control not visible after opening History expander."
+            "Clear history control not visible after opening History expander."
         )
+        return
+
+    for loc in (strip_root, details_el, clear_btn):
+        try:
+            if loc is not None and getattr(loc, "count", lambda: 0)() > 0:
+                loc.scroll_into_view_if_needed()
+        except Exception:
+            pass
+    page.wait_for_timeout(300)
+
+    witness_path = RUN_DIR / f"{result.scenario}_slice003_witness.png"
+    RUN_DIR.mkdir(parents=True, exist_ok=True)
+    clip = _slice003_union_clip(page, strip_root, details_el, clear_btn)
+    result.slice003_region_witness_clip_px = clip
+    try:
+        if clip:
+            page.screenshot(path=str(witness_path), clip=clip)
+            if witness_path.is_file() and witness_path.stat().st_size > 80:
+                result.slice003_witness_screenshot_path = str(witness_path)
+                result.slice003_region_witness_saved = True
+                result.slice003_used_union_clip = True
+        if not result.slice003_region_witness_saved:
+            heading.screenshot(path=str(witness_path))
+            if witness_path.is_file() and witness_path.stat().st_size > 80:
+                result.slice003_witness_screenshot_path = str(witness_path)
+                result.slice003_region_witness_saved = True
+                result.slice003_used_union_clip = False
+                result.slice003_witness_notes = (
+                    "region_union_clip_unavailable_or_empty; saved heading-only fallback witness."
+                )
+    except Exception as ex:  # noqa: BLE001
+        result.slice003_witness_notes = f"slice003_screenshot_failed: {type(ex).__name__}: {ex}"
+
+    if not result.slice003_region_witness_saved:
+        result.slice003_classification = "PARTIAL_DOM"
+        if not result.slice003_witness_notes:
+            result.slice003_witness_notes = (
+                "Strip/history/clear were located in DOM but bounded screenshot did not persist."
+            )
         return
 
     result.slice003_classification = "WITNESS_OK"
@@ -834,6 +924,10 @@ def main() -> int:
                 "history_expander_found": r.slice003_history_expander_found,
                 "clear_history_control_found": r.slice003_clear_history_control_found,
                 "witness_screenshot_path": r.slice003_witness_screenshot_path,
+                "region_witness_saved": r.slice003_region_witness_saved,
+                "used_union_viewport_clip": r.slice003_used_union_clip,
+                "region_dom_anchor": r.slice003_region_dom_anchor,
+                "region_witness_clip_px": r.slice003_region_witness_clip_px,
                 "notes": r.slice003_witness_notes,
             }
 
@@ -841,30 +935,56 @@ def main() -> int:
             ra = next((x for x in rows if x.scenario == "A_width_target_payoff"), None)
             if ra is None:
                 return {
-                    "schema_version": 1,
+                    "schema_version": 2,
                     "primary_scenario_ran": False,
                     "evidence_plane_complete": False,
+                    "bounded_failure_bucket": "NOT_APPLICABLE",
+                    "bounded_live_data_miss": False,
+                    "bounded_app_or_data_unavailable": False,
+                    "region_witness_artifact_ok": False,
+                    "used_union_viewport_clip": False,
                     "workflow_hardening_slice003_signal": "NOT_APPLICABLE",
                     "detail": "A_width_target_payoff not in this run.",
                 }
             cls = ra.slice003_classification
             bounded_live_miss = cls == "DEGRADED_STRIP_NOT_SHOWN"
-            evidence_plane_complete = cls in ("WITNESS_OK", "DEGRADED_STRIP_NOT_SHOWN")
+            bounded_app_unreachable = cls in (
+                "DEGRADED_PAGE_NOT_LOADED",
+                "DEGRADED_SCENARIO_INCOMPLETE",
+            )
+            bounded_failure_bucket = {
+                "WITNESS_OK": "OK",
+                "DEGRADED_STRIP_NOT_SHOWN": "LIVE_DATA_NO_WIDTH_VOL_STRIP",
+                "DEGRADED_PAGE_NOT_LOADED": "APP_OR_DATA_NOT_WITNESSABLE",
+                "DEGRADED_SCENARIO_INCOMPLETE": "APP_OR_DATA_NOT_WITNESSABLE",
+                "DEGRADED_VERIFICATION_UI_NOT_REACHED": "VERIFICATION_UI_NOT_REACHED",
+                "PARTIAL_DOM": "SLICE003_DOM_INCOMPLETE",
+                "NOT_APPLICABLE": "NOT_APPLICABLE",
+            }.get(cls, "NEEDS_FIX_OR_RETRY")
+            evidence_plane_complete = bounded_failure_bucket != "NEEDS_FIX_OR_RETRY"
+            if cls == "WITNESS_OK":
+                wf_signal = "WITNESS_OK"
+            elif bounded_live_miss:
+                wf_signal = "BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP"
+            elif bounded_app_unreachable:
+                wf_signal = "BOUNDED_APP_OR_DATA_UNAVAILABLE"
+            elif cls == "DEGRADED_VERIFICATION_UI_NOT_REACHED":
+                wf_signal = "BOUNDED_VERIFICATION_UI_NOT_REACHED"
+            elif cls == "PARTIAL_DOM":
+                wf_signal = "BOUNDED_SLICE003_DOM_INCOMPLETE"
+            else:
+                wf_signal = "NEEDS_FIX_OR_RETRY"
             return {
-                "schema_version": 1,
+                "schema_version": 2,
                 "primary_scenario_ran": True,
                 "evidence_plane_complete": bool(evidence_plane_complete),
+                "bounded_failure_bucket": bounded_failure_bucket,
                 "bounded_live_data_miss": bool(bounded_live_miss),
-                "workflow_hardening_slice003_signal": (
-                    "WITNESS_OK"
-                    if cls == "WITNESS_OK"
-                    else (
-                        "BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP"
-                        if bounded_live_miss
-                        else "NEEDS_FIX_OR_RETRY"
-                    )
-                ),
+                "bounded_app_or_data_unavailable": bool(bounded_app_unreachable),
                 "classification": cls,
+                "region_witness_artifact_ok": bool(ra.slice003_region_witness_saved),
+                "used_union_viewport_clip": bool(ra.slice003_used_union_clip),
+                "workflow_hardening_slice003_signal": wf_signal,
                 "detail": ra.slice003_witness_notes or "",
             }
 
@@ -919,10 +1039,13 @@ def main() -> int:
                     "a green run implies C’s manifest gates passed for that run."
                 ),
                 "workflow_hardening_slice003": (
-                    "Scenario A collects `slice003_witness` (candidate strip heading, History expander, "
-                    "Clear history) plus `workflow_hardening_slice003_closeout`. "
-                    "`evidence_plane_complete` is true for WITNESS_OK or DEGRADED_STRIP_NOT_SHOWN "
-                    "(bounded live-data miss: verification UI reached but width_vol strip never appeared)."
+                    "Scenario A collects `slice003_witness` (strip DOM, History expander, Clear history, "
+                    "optional union viewport clip + `A_width_target_payoff_slice003_witness.png`) plus "
+                    "`workflow_hardening_slice003_closeout` (schema v2: `bounded_failure_bucket`, "
+                    "`region_witness_artifact_ok`, `used_union_viewport_clip`). "
+                    "`evidence_plane_complete` is true when `bounded_failure_bucket` != NEEDS_FIX_OR_RETRY "
+                    "(bounded terminals include WITNESS_OK, live strip miss, app/data unreachable, "
+                    "verification-not-reached, partial DOM)."
                 ),
             },
         }

@@ -81,7 +81,10 @@ def main() -> int:
                 slice003_summary = (
                     f"classification={w.get('classification')} "
                     f"signal={close.get('workflow_hardening_slice003_signal')} "
-                    f"evidence_plane_complete={close.get('evidence_plane_complete')}"
+                    f"evidence_plane_complete={close.get('evidence_plane_complete')} "
+                    f"bucket={close.get('bounded_failure_bucket')} "
+                    f"region_artifact_ok={close.get('region_witness_artifact_ok')} "
+                    f"union_clip={close.get('used_union_viewport_clip')}"
                 )
                 break
         except Exception:
