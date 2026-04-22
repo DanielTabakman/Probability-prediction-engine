@@ -158,6 +158,14 @@ A closeout is only complete when it records:
 - Honest caveats
 - No active slice / next step, if that is the truthful state
 
+### UI closeout declaration (minimum)
+
+When a closeout covers a user-visible UI slice, it must also declare:
+
+- **Gate type used:** **hard visual** vs **semantic/copy-only**
+- **Bounded capture artifact or witness used:** path(s) to the bounded capture artifact(s) (when used) or an explicit unchanged-layout witness statement
+- **Tooling prohibition:** no ad hoc helper scripts / improvised closeout tooling were used (unless separately selected/authorized)
+
 ### Runtime health indicators (validation / closeout)
 
 This is **validation runtime inside the repo**—wall-clock for commands such as pytest and smoke—not **Cursor turnaround** in the steward loop (see **Cursor turnaround health** below).

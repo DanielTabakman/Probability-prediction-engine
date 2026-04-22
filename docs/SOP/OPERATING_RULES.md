@@ -174,6 +174,18 @@ Required **only when the feature slice materially touches** the corresponding la
 ### Smoke C is not a universal tax
 **Smoke C is not** an automatic universal required closeout gate for every feature slice. It is a **conditional** gate for **classification-sensitive** work and otherwise a **supporting signal**, unless the feature slice spec explicitly requires it.
 
+## UI closeout gate assignment (hardening)
+
+When a slice touches user-visible UI, assign **exactly one** closeout gate type and close under that gate.
+
+- **Hard visual closeout (required)** when the slice changes **layout/structure**, **interaction/flow**, **component presence/visibility**, or any other user-visible UI boundary where “copy-only” would be ambiguous. Evidence must include a **hard visual witness** of the **actual changed UI region** (live/manual inspection or screenshot review) plus the normal Tier 1 stack.
+
+- **Semantic/copy-only closeout (allowed)** only when the slice changes **copy/labels/text** (or similarly non-structural semantics) **without changing layout boundaries** of the relevant UI region. Closeout may use **smoke + unchanged layout boundary witness** (a screenshot/inspection confirming the relevant layout boundary is unchanged) plus the normal Tier 1 stack. Do not “upgrade” this gate to cover structural changes.
+
+- **Sanctioned bounded capture (allowed)** as evidence: capture only the **minimum bounded UI region** needed to witness the closeout gate (e.g., one screenshot of the affected card/slot). Prefer stable, repo-local artifact paths already used by the workflow (e.g., `artifacts/ui_smoke/<run>/...`). Do not introduce new capture tooling.
+
+- **Forbidden:** ad hoc helper scripts, improvised closeout tooling, or one-off automation to “speed closeout” (unless a separate slice explicitly selects/authorizes new tooling).
+
 ## Closeout runtime budget / stop rule
 
 Non-deterministic steps (live smoke, headless browser, data-dependent scenarios) must not **dominate** the whole closeout.
