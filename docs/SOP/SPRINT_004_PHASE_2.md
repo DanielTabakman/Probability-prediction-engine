@@ -54,13 +54,10 @@ A Sprint 004 slice is acceptable only if **all** hold at closeout:
 
 ### A. Selected now
 
-- **None** — steward **SELECTION** required for the next Sprint 004 slice under §6 (**§6.B–§6.C** remain deferred until explicitly chosen). **`Sprint004-Slice001` — Width-disagreement candidate strip (v0) — CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**); product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**.
+- **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **SELECTED** (2026-04-22, Steward Model 2.3). **Next pending execution step:** **PREFLIGHT** (BUILD not authorized until PREFLIGHT passes).
+- **`Sprint004-Slice001` — Width-disagreement candidate strip (v0) — CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**); product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**.
 
-### B. Likely next (not selected; require explicit SELECTION)
-
-- **Trust / confidence / falsification layer** — make “candidate” status **honest** (limits, disconfirming views, what would change the label) without becoming advisory.
-
-### C. Likely after that (not selected)
+### B. Likely after that (not selected)
 
 - **Candidate event logging / history** — lightweight, inspectable record of **candidate appearances** (still non-advisory; no auto-trade).
 
