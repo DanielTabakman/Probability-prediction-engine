@@ -53,9 +53,11 @@ class TestWidthVolCandidateStrip(unittest.TestCase):
         self.assertIn("width", out["anomaly_md"].lower())
         self.assertIn("why flagged", out["why_md"].lower())
         self.assertIn("moderate", out["confidence_md"].lower())
+        self.assertIn("not a probability", out["confidence_md"].lower())
         self.assertIn("trust", out["trust_artifact_md"].lower())
         self.assertIn("expression families", out["expression_families_md"].lower())
         self.assertIn("falsification", out["falsification_md"].lower())
+        self.assertIn("classification_trace", out["falsification_md"].lower())
 
     def test_skipped_breeden_trust_line(self) -> None:
         pl = belief_disagreement_hints_payload(

@@ -54,7 +54,7 @@ A Sprint 004 slice is acceptable only if **all** hold at closeout:
 
 ### A. Selected now
 
-- **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **SELECTED** (2026-04-22, Steward Model 2.3). **Next pending execution step:** **PREFLIGHT** (BUILD not authorized until PREFLIGHT passes).
+- **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **CLOSED / shipped** (2026-04-22, Steward Model 2.3).
 - **`Sprint004-Slice001` — Width-disagreement candidate strip (v0) — CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**); product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**.
 
 ### B. Likely after that (not selected)
@@ -105,6 +105,7 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 ## 8. Slice ledger (Sprint 004)
 
 - **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)** — **CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**). Product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice001-width-candidate-strip-v0`; pre-promotion tip **`478d2cf5ecb5eaa82e02e9cca022e3968e6a58e4`**). **Closeout validation:** `python -m pytest -q` → **120** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS**; **manual one-screen checklist** → **PASS**.
+- **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **CLOSED / shipped** (2026-04-22 **BUILD-CLOSEOUT / CONTROL-CLOSEOUT**). Product-of-record: **TBD (this closeout commit)** on `build/sprint004-slice002-widthstrip-refine` pending promotion. **Change boundary:** copy/semantic refinement only in the existing **width_vol** candidate strip payload (no layout-slot move; no new gating dimensions). **Closeout validation:** `python -m pytest -q` → **PASS**; `python scripts/run_implied_lab_ui_smoke.py` → **PASS**.
 
 ---
 

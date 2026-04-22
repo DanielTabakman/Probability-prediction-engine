@@ -99,22 +99,32 @@ def build_width_vol_candidate_strip_payload(
 
     shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
     confidence_md = (
-        f"**Confidence (exploratory):** L₁ PDF shape-gap label **{shape_gap}** — descriptive tension on the grid, "
-        "not a calibrated probability of being correct."
+        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
+        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not used "
+        "to choose the **width_vol** category (that comes from peak alignment × width band in the trace)."
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
     if mi.get("breeden_litzenberger") == "skipped":
         sr = mi.get("skip_reason")
-        trust_md = "**Trust / artifact note:** " + (
-            str(sr).strip()
-            if isinstance(sr, str) and sr.strip()
-            else "Market-implied curve not computed (marks gate); orange path may be absent."
+        trust_md = (
+            "**Trust / artifact note:** Market-implied density (orange) was **skipped** by the same marks gate "
+            "as the chart engine. "
+            + (
+                str(sr).strip()
+                if isinstance(sr, str) and sr.strip()
+                else "Market-implied curve not computed (marks gate); the orange curve may be absent."
+            )
+            + " Cross-check **Verification** → Distribution for call-mark count and skip reason."
         )
     else:
+        call_n = mi.get("call_marks_count")
+        call_n_txt = f"{int(call_n)}" if isinstance(call_n, int) else "the reported"
         trust_md = (
-            "**Trust / artifact note:** Priced marks snapshot + Breeden–Litzenberger — sparse strikes and quote age "
-            "can distort tails; align with **Trust / provenance** and expand **Verification** for inputs."
+            "**Trust / artifact note:** Uses the current marks snapshot + Breeden–Litzenberger market-implied density "
+            f"(orange; computed from {call_n_txt} call marks when available). "
+            "Sparse strikes / wide bid–ask / stale quotes can shift the inferred peak and apparent width. "
+            "Cross-check **Trust / provenance** and expand **Verification** for call-mark count, cache notes, and trace paths."
         )
 
     fams = bd.get("strategy_families") or []
@@ -129,9 +139,10 @@ def build_width_vol_candidate_strip_payload(
     )
 
     falsification_md = (
-        "**Falsification (when this hypothesis stops fitting the labels):** Peak alignment breaks, "
-        "the width band re-enters **similar** vs ATM-implied σ, or refreshed marks/forward re-classify the run "
-        "under the same thresholds — see **Verification** trace."
+        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
+        "if the trace no longer shows **peak_aligned**, or the trace width band becomes **similar**, the category "
+        "should move out of **width_vol** under the *same* rules. Audit via **Verification** → "
+        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
     )
 
     return {
