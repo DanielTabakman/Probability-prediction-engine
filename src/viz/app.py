@@ -195,6 +195,99 @@ def _render_width_vol_candidate_strip_payload(payload: dict) -> None:
         st.markdown(payload["falsification_md"])
 
 
+def _width_vol_history_entry(*, verification: dict, selected_expiry_str: str) -> dict:
+    """
+    Sprint004-Slice003 (v0): session-local, width_vol-only appearance history.
+    Stores only already-derived, descriptive fields; no persistence.
+    """
+    v = verification if isinstance(verification, dict) else {}
+    vs = v.get("verification_summary") if isinstance(v.get("verification_summary"), dict) else {}
+    g = v.get("belief_vs_market_glance") if isinstance(v.get("belief_vs_market_glance"), dict) else {}
+    return {
+        "as_of_utc": vs.get("as_of_utc"),
+        "expiry": selected_expiry_str,
+        "disagreement_category_id": vs.get("disagreement_category_id"),
+        "classification_dimensions": vs.get("classification_dimensions"),
+        "width_band": g.get("width_band"),
+        "shape_gap_strength": g.get("shape_gap_strength"),
+        "market_reference_kind": g.get("market_reference_kind"),
+        "overlay_basis": vs.get("overlay_basis"),
+        "data_sources": vs.get("data_sources"),
+    }
+
+
+def _width_vol_history_fingerprint(entry: dict) -> str:
+    """
+    Session-local de-dupe token so a single width_vol strip doesn't spam history on reruns.
+    Intentionally small: stable across reruns of the same run snapshot.
+    """
+    parts = (
+        str(entry.get("as_of_utc") or ""),
+        str(entry.get("expiry") or ""),
+        str(entry.get("classification_dimensions") or ""),
+        str(entry.get("overlay_basis") or ""),
+    )
+    return "|".join(parts)
+
+
+def _maybe_append_width_vol_history(*, verification: dict, selected_expiry_str: str) -> None:
+    """Append a single entry when the width_vol candidate strip appears (session-local only)."""
+    hist_key = "implied_lab_width_vol_history_v0"
+    last_fp_key = "implied_lab_width_vol_history_last_fp_v0"
+    cap = 20
+
+    if hist_key not in st.session_state:
+        st.session_state[hist_key] = []
+    hist = st.session_state.get(hist_key)
+    if not isinstance(hist, list):
+        hist = []
+        st.session_state[hist_key] = hist
+
+    entry = _width_vol_history_entry(
+        verification=verification if isinstance(verification, dict) else {},
+        selected_expiry_str=str(selected_expiry_str),
+    )
+    fp = _width_vol_history_fingerprint(entry)
+    if fp and fp == str(st.session_state.get(last_fp_key) or ""):
+        return
+
+    hist.append(entry)
+    if len(hist) > cap:
+        st.session_state[hist_key] = hist[-cap:]
+        hist = st.session_state[hist_key]
+    st.session_state[last_fp_key] = fp
+
+
+def _render_width_vol_history_panel(*, selected_expiry_str: str) -> None:
+    """Compact session-local history display colocated with the width_vol strip."""
+    hist_key = "implied_lab_width_vol_history_v0"
+    last_fp_key = "implied_lab_width_vol_history_last_fp_v0"
+    hist = st.session_state.get(hist_key)
+    if not isinstance(hist, list) or not hist:
+        return
+
+    with st.expander("History (this session)", expanded=False):
+        a, b = st.columns([1, 1])
+        with a:
+            st.caption(f"{len(hist)} event(s) · session-local only · width_vol only")
+        with b:
+            if st.button("Clear history", key=f"clear_wv_history_{selected_expiry_str}"):
+                st.session_state[hist_key] = []
+                st.session_state[last_fp_key] = ""
+                st.rerun()
+
+        # Newest first; single-line entries to avoid UI bloat.
+        for e in reversed(hist[-20:]):
+            if not isinstance(e, dict):
+                continue
+            as_of = str(e.get("as_of_utc") or "—")
+            exp = str(e.get("expiry") or "—")
+            wb = str(e.get("width_band") or "—")
+            sg = str(e.get("shape_gap_strength") or "—")
+            mr = str(e.get("market_reference_kind") or "—")
+            st.caption(f"• as-of {as_of} · expiry {exp} · width {wb} · gap {sg} · ref {mr}")
+
+
 def _render_implied_lab_verification(v: dict) -> None:
     """Structured display for outputs['verification'] (contract-driven summary + demoted detail)."""
     if not v:
@@ -1698,7 +1791,12 @@ if show_bitcoin_view:
                     _wv_strip = build_width_vol_candidate_strip_payload(_v_pay)
                     if _wv_strip:
                         with right_width_candidate_slot.container():
+                            _maybe_append_width_vol_history(
+                                verification=_v_pay or {},
+                                selected_expiry_str=selected_expiry_str,
+                            )
                             _render_width_vol_candidate_strip_payload(_wv_strip)
+                            _render_width_vol_history_panel(selected_expiry_str=selected_expiry_str)
                     else:
                         right_width_candidate_slot.empty()
                     with right_trust_slot.container():
