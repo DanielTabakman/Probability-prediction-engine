@@ -52,15 +52,22 @@ A Sprint 004 slice is acceptable only if **all** hold at closeout:
 
 ## 6. Sprint 004 map (lightweight)
 
-### A. Selected now
+### A. Selected now (next execution boundary)
 
-- **`Sprint004-Slice003` — Candidate event logging / history foundation (v0)** — **SELECTED** (Steward Model 2.3). **Boundary (narrow):** session-local history only (no persistence), no telemetry/analytics, no cross-category logging, no generalized event framework.
+- **`Workflow-Hardening-Slice-003` — sanctioned target-region witness for Slice003 closeout** — **SELECTED** (Steward Model 2.3). **Framing:** closeout-enabling **control-plane / harness** hardening for **`Sprint004-Slice003`** — **not** a generic harness rewrite. **Narrow scope:** extend the **existing sanctioned** implied-lab UI smoke / witness path **only as needed** to cover the **changed UI region**; **no** broad screenshot framework; **no** product-plane changes inside WH-003; **no** generic offline capture system unless later forced by evidence.
+
+### B. Checkpointed / not closed (Sprint004 product slice — pending sanctioned witness)
+
+- **`Sprint004-Slice003` — Candidate event logging / history foundation (v0)** — **CHECKPOINTED / NOT CLOSED**. **Safe tip:** **`dc98a541dfa77d28e3fffae1e4520b41ffae8a1d`** on **`exec/sprint004-slice003-history-v0`** (verify with `git rev-parse exec/sprint004-slice003-history-v0`). **Product intent (unchanged):** session-local history only (no persistence), no telemetry/analytics, no cross-category logging, no generalized event framework. **Closeout blocker (repo truth):** not missing product logic — the **sanctioned witness path is insufficient** for the **changed UI region** until WH-003 lands.
+
+### C. Closed / shipped (this sprint)
+
 - **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **CLOSED / shipped** (2026-04-22, Steward Model 2.3).
 - **`Sprint004-Slice001` — Width-disagreement candidate strip (v0) — CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**); product **`b13cb30b67457cb673514ebf8ae8183f88967f06`**.
 
-### B. Pending / not selected (keep empty unless steward names a next slice)
+### D. Pending / not selected (keep empty unless steward names a next slice)
 
-### D. Deferred / parked (explicitly not Sprint 004 v0)
+### E. Deferred / parked (explicitly not Sprint 004 v0)
 
 Items listed in **§4** remain **out of scope** until a future steward **re-charters** or opens a new sprint boundary.
 
@@ -105,6 +112,7 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 
 - **`Sprint004-Slice001` — Width-disagreement candidate strip (v0)** — **CLOSED / shipped** (2026-04-21 **BUILD + CONTROL-CLOSEOUT**). Product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice001-width-candidate-strip-v0`; pre-promotion tip **`478d2cf5ecb5eaa82e02e9cca022e3968e6a58e4`**). **Closeout validation:** `python -m pytest -q` → **120** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS**; **manual one-screen checklist** → **PASS**.
 - **`Sprint004-Slice002` — Width-strip trust / confidence / falsification refinement (v0)** — **CLOSED / shipped** (2026-04-22 **BUILD-CLOSEOUT / CONTROL-CLOSEOUT**). Product-of-record **`069d76f`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice002-widthstrip-refine`; pre-promotion baseline tip **`bec9024`**). **Change boundary:** copy/semantic refinement only in the existing **width_vol** candidate strip payload (no layout-slot move; no new gating dimensions). **Closeout validation:** `python -m pytest -q` → **PASS**; `python scripts/run_implied_lab_ui_smoke.py` → **PASS**.
+- **`Sprint004-Slice003` — Candidate event logging / history foundation (v0)** — **CHECKPOINTED / NOT CLOSED** (2026-04-22, Steward Model 2.3). **Checkpoint tip:** **`dc98a541dfa77d28e3fffae1e4520b41ffae8a1d`** on **`exec/sprint004-slice003-history-v0`**. **Closeout:** **blocked** pending **`Workflow-Hardening-Slice-003`** (sanctioned target-region witness). **Accepted clean baseline tip at this canonization (verify):** **`8c66bdd8edf5a28b89df6db9a6bdd60ad267d625`** on **`recovery/frontier-steward-v2_1-baseline`** (`git rev-parse recovery/frontier-steward-v2_1-baseline`).
 
 ---
 
@@ -118,7 +126,7 @@ Users can see **belief vs market** tension, but the lab does not yet give a **si
 
 ## 10. Last updated
 
-2026-04-22 — **CONTROL-PLANE SELECTION (Steward Model 2.3):** **`Sprint004-Slice003` — Candidate event logging / history foundation (v0) — SELECTED**. **Next pending execution step:** **PREFLIGHT** for Slice003. **Boundary (narrow):** session-local history only (no persistence), no telemetry/analytics, no cross-category logging, no generalized event framework. **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
+2026-04-22 — **CONTROL-PLANE SELECTION (Steward Model 2.3):** **`Workflow-Hardening-Slice-003` — sanctioned target-region witness for Slice003 closeout — SELECTED**. **`Sprint004-Slice003` remains CHECKPOINTED / NOT CLOSED** at **`dc98a541dfa77d28e3fffae1e4520b41ffae8a1d`** on **`exec/sprint004-slice003-history-v0`**. **Closeout blocker:** sanctioned witness path **insufficient** for the **changed UI region** (WH-003 is closeout-enabling hardening, not an unrelated harness program). **Next pending execution step:** **PREFLIGHT** for **WH-003**. **Accepted clean baseline tip (verify):** **`8c66bdd8edf5a28b89df6db9a6bdd60ad267d625`** on **`recovery/frontier-steward-v2_1-baseline`**. **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
 
 2026-04-21 — **CONTROL-CLOSEOUT (Steward Model 2.3):** **`Sprint004-Slice001` — CLOSED / shipped**; accepted baseline on `recovery/frontier-steward-v2_1-baseline` includes BUILD product **`b13cb30b67457cb673514ebf8ae8183f88967f06`** plus CONTROL-CLOSEOUT doc commits (verify `git merge-base --is-ancestor b13cb30b67457cb673514ebf8ae8183f88967f06 HEAD`). **Sprint 003** remains **evidence-plane only**; Sprint 004 does not modify Sprint 003 scope.
 
