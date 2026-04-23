@@ -16,19 +16,11 @@ import copy
 import json
 import os
 import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-SCRIPTS = ROOT / "scripts"
-if str(SCRIPTS) not in sys.path:
-    sys.path.insert(0, str(SCRIPTS))
-
-import relay_runtime_v0 as relay  # type: ignore  # noqa: E402
+from scripts import relay_runtime_v0 as relay  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
