@@ -12,21 +12,21 @@ from src.engine.strategy_scanner import (
     payoff_target_to_strikes_with_work,
     strategy_payoff_at_prices,
 )
-from src.viz.belief_disagreement_hints import (
+from src.engine.belief_disagreement_hints import (
     MarketReferenceKind,
     belief_disagreement_hints_payload,
 )
-from src.viz.belief_uncertainty import (
+from src.engine.belief_uncertainty import (
     sigma_ln_to_move_pct_1sigma,
 )
-from src.viz.disagreement_thresholds import (
+from src.engine.disagreement_thresholds import (
     L1_SHAPE_GAP_LOW_BELOW,
     L1_SHAPE_GAP_MODERATE_BELOW,
     WIDTH_NARROWER_RATIO,
     WIDTH_WIDER_RATIO,
     peak_alignment_tolerance_usd,
 )
-from src.viz.implied_lab_provenance import build_verification_payload
+from src.engine.implied_lab_provenance import build_verification_payload
 
 
 def _belief_verification_block(
