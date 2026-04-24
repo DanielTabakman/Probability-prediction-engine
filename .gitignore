@@ -22,6 +22,11 @@ __pycache__/
 *.py[cod]
 *.pyo
 .pytest_cache/
+.hypothesis/
+.coverage
+.coverage.*
+.tox/
+.ruff_cache/
 .mypy_cache/
 *.egg-info/
 dist/
@@ -43,3 +48,6 @@ Thumbs.db
 # Local relay/planner scaffolding (pre-Codex-Autonomy-v1 prototype).
 # Not canonical; see docs/SOP/CODEX_AUTONOMY_V1.md §§14-15 for the real contract.
 /orchestrator/
+
+# Git worktrees (local dev only)
+/_worktrees/
