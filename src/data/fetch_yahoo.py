@@ -1,10 +1,14 @@
 """
 Fetch gold, silver, and Bitcoin prices from Yahoo Finance.
 """
+
 from __future__ import annotations
 
+import logging
 import pandas as pd
 import yfinance as yf
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_SYMBOLS = {
     "gold": ["GC=F", "GLD"],
@@ -46,7 +50,9 @@ def fetch_yahoo_prices(
     # when group_by="ticker"; extract the ticker level so Open/Close renames apply.
     if len(all_tickers) == 1:
         t = all_tickers[0]
-        if isinstance(data.columns, pd.MultiIndex) and t in data.columns.get_level_values(0):
+        if isinstance(
+            data.columns, pd.MultiIndex
+        ) and t in data.columns.get_level_values(0):
             df = data[t].copy()
         else:
             df = data.copy()
@@ -54,7 +60,13 @@ def fetch_yahoo_prices(
         df.columns = [c if c != "Date" else "date" for c in df.columns]
         df["symbol"] = t
         df["asset"] = asset_map[t]
-        renames = {"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
+        renames = {
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Close": "close",
+            "Volume": "volume",
+        }
         df = df.rename(columns={k: v for k, v in renames.items() if k in df.columns})
         out.append(df)
     else:
@@ -67,10 +79,22 @@ def fetch_yahoo_prices(
                 block.columns = [c if c != "Date" else "date" for c in block.columns]
                 block["symbol"] = ticker
                 block["asset"] = asset_map[ticker]
-                renames = {"Open": "open", "High": "high", "Low": "low", "Close": "close", "Volume": "volume"}
-                block = block.rename(columns={k: v for k, v in renames.items() if k in block.columns})
+                renames = {
+                    "Open": "open",
+                    "High": "high",
+                    "Low": "low",
+                    "Close": "close",
+                    "Volume": "volume",
+                }
+                block = block.rename(
+                    columns={k: v for k, v in renames.items() if k in block.columns}
+                )
                 out.append(block)
             except Exception:
+                # Keep going, but don't silently swallow: it makes debugging data gaps painful.
+                logger.warning(
+                    "Yahoo fetch: failed to parse ticker %s", ticker, exc_info=True
+                )
                 continue
 
     if not out:

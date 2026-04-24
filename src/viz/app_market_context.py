@@ -14,9 +14,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from src.data.fetch_polymarket import markets_to_probabilities
-from src.data.parse_btc_markets import btc_price_questions_from_polymarket
-from src.data.fetch_deribit import fetch_deribit_spreads_around_predictions
+from src.probability_engine.services.market_context import (
+    get_deribit_spreads_around_predictions,
+    polymarket_events_to_probabilities,
+    polymarket_probs_to_btc_price_questions,
+)
 
 
 def _q_label(q: dict) -> str | None:
@@ -85,8 +87,8 @@ def render_market_context_expander(
             .get("topic_keywords")
             or ["bitcoin", "btc"]
         )
-        all_probs = markets_to_probabilities(events, topic_keywords=keywords)
-        btc_questions = btc_price_questions_from_polymarket(all_probs) if all_probs else []
+        all_probs = polymarket_events_to_probabilities(events, topic_keywords=keywords)
+        btc_questions = polymarket_probs_to_btc_price_questions(all_probs)
 
         # Deribit context overlays (only when user refreshes priced inputs).
         forward_curve: list[dict[str, Any]] = []
@@ -113,7 +115,7 @@ def render_market_context_expander(
                     try:
                         eligible = [q for q in btc_questions if (q.get("strike") or 0) >= 10000]
                         eligible.sort(key=lambda q: q.get("strike") or 0, reverse=True)
-                        prediction_spreads = fetch_deribit_spreads_around_predictions(
+                        prediction_spreads = get_deribit_spreads_around_predictions(
                             btc_questions=eligible or btc_questions,
                             current_spot=current_btc,
                             max_questions=8,

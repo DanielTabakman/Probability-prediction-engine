@@ -5,7 +5,6 @@ Bitcoin view: price chart with Polymarket questions overlaid, implied value, opt
 from __future__ import annotations
 
 import traceback
-from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 
 # Project root
@@ -13,28 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
-from src.data import fetch_yahoo_prices, fetch_polymarket_markets
-from src.data.fetch_polymarket import markets_to_probabilities
-from src.data.parse_btc_markets import btc_price_questions_from_polymarket
-from src.data.fetch_btc_options import fetch_btc_options_summary
-from src.data.fetch_deribit import (
-    fetch_deribit_btc_options_summary,
-    fetch_deribit_btc_options_for_chart,
-    fetch_deribit_btc_futures_forward_curve,
-    fetch_deribit_btc_tight_bull_spreads,
-    fetch_deribit_spreads_around_predictions,
-    fetch_deribit_btc_option_expiries,
-    fetch_deribit_btc_options_instruments,
-    fetch_deribit_forward_and_iv_for_expiry,
-    fetch_deribit_btc_option_marks_by_expiry,
-    fetch_deribit_btc_option_marks_by_expiry_full,
-    fetch_deribit_btc_option_book_marks,
-    fetch_deribit_btc_index,
-    last_deribit_instruments_diagnostic,
-)
 from src.viz.app_cache import (
     CACHE_TTL,
     CACHE_TTL_OPTION_EXPIRIES,
@@ -55,21 +33,26 @@ from src.viz.app_cache import (
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
 )
+from src.probability_engine.services.implied_lab_fetch import fetch_implied_lab_bundle
+from src.probability_engine.services.implied_lab_chart import (
+    build_implied_lab_distribution_chart_bundle,
+)
+from src.probability_engine.services.spot_price import resolve_btc_spot_usd
+from src.probability_engine.services.strikes import snap_and_order_u4_strikes
 from src.engine.strategy_scanner import (
     build_universal_strategy,
     name_universal_strategy,
     payoff_target_to_strikes,
     payoff_target_to_strikes_with_work,
 )
-from src.viz.implied_lab_state import build_implied_lab_state
-from src.viz.implied_lab_derive import derive_lab_outputs
+from src.probability_engine.services.implied_lab_run import run_implied_lab
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import (
     build_trust_strip_lines,
     build_width_vol_candidate_strip_payload,
 )
 from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
-from src.viz.implied_lab_last_action import last_action_meaning, shape_window_local_region_story
+from src.viz.implied_lab_last_action import last_action_meaning
 from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
@@ -87,7 +70,6 @@ from src.viz.app_panels import (
     render_width_vol_candidate_strip_payload as _render_width_vol_candidate_strip_payload,
     render_width_vol_history_panel as _render_width_vol_history_panel,
     shape_focus_post_interaction_hint as _shape_focus_post_interaction_hint,
-    shape_focus_x_range as _shape_focus_x_range,
 )
 from src.viz.app_market_context import render_market_context_expander
 from src.viz.app_market_reference import render_market_reference_sections
@@ -137,29 +119,11 @@ if show_bitcoin_view:
     )
 
     # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
-    current_btc = None
-    if is_full:
-        try:
-            # Bounded wait: Deribit index can hang; fall through to Yahoo so the lab can mount.
-            with ThreadPoolExecutor(max_workers=1) as ex:
-                fut = ex.submit(_cached_deribit_index)
-                done, _ = wait([fut], timeout=3.0)
-                if done:
-                    current_btc = fut.result()
-        except Exception:
-            current_btc = None
-    if current_btc is None:
-        try:
-            fallback_df = _cached_yahoo({"bitcoin": ["BTC-USD"]}, "5d")
-            if fallback_df is not None and not fallback_df.empty:
-                spot_rows = fallback_df[fallback_df["symbol"] == "BTC-USD"]
-                if len(spot_rows):
-                    for col in ("close", "Close"):
-                        if col in spot_rows.columns:
-                            current_btc = float(spot_rows.sort_values("timestamp")[col].iloc[-1])
-                            break
-        except Exception:
-            current_btc = None
+    current_btc = resolve_btc_spot_usd(
+        get_deribit_index_usd=_cached_deribit_index,
+        get_yahoo_prices_df=lambda: _cached_yahoo({"bitcoin": ["BTC-USD"]}, "5d"),
+        deribit_timeout_s=3.0,
+    )
 
     # Optional Deribit extras (forward curve, bull spreads, prediction overlays, reference tables).
     # Not auto-loaded: implied-lab fetches its own expiries/marks via _cached_* when that section runs.
@@ -181,7 +145,16 @@ if show_bitcoin_view:
     if is_full and run_implied and current_btc is not None:
         try:
             with st.spinner("Loading expiries and option marks…"):
-                expiries, expiry_fetch_diag = _cached_option_expiries(10)
+                bundle0 = fetch_implied_lab_bundle(
+                    spot_usd=float(current_btc),
+                    max_expiries=10,
+                    selected_expiry_str=None,
+                    cached_option_expiries=_cached_option_expiries,
+                    cached_forward_iv=_cached_forward_iv,
+                    cached_marks_full=_cached_marks_full,
+                    quote_cache_ttl_s=CACHE_TTL,
+                )
+                expiries, expiry_fetch_diag = bundle0.expiries, bundle0.expiry_fetch_diag
             if expiries:
                 expiry_options = [e["expiry_date_str"] for e in expiries]
                 selected_expiry_str = st.selectbox(
@@ -264,59 +237,32 @@ if show_bitcoin_view:
                         right_verification_slot = st.empty()
                     with col_controls:
                         # Only fetch data for the selected expiry to keep this step fast.
-                        fwd_iv = _cached_forward_iv(selected["expiry_ts"], current_btc)
-                        forward = (fwd_iv.get("forward") or current_btc) if fwd_iv else current_btc
-                        vol = (fwd_iv.get("atm_iv") or 0.6) if fwd_iv else 0.6
-                        if vol <= 0:
-                            vol = 0.6
-                        run_ts_utc = pd.Timestamp.now(tz="UTC")
-                        now_ts = run_ts_utc.timestamp() * 1000
-                        as_of_utc = run_ts_utc.isoformat()
-                        T_years = max(0.0, (selected["expiry_ts"] - now_ts) / 1000 / (365.25 * 24 * 3600))
-                        # Avoid degenerate near-zero T: use at least ~1 week so the bell is visible
-                        T_years = max(T_years, 0.02)
-                        price_min = max(1000, forward * 0.4)
-                        price_max = forward * 2.2
-                        data = build_distribution_chart_data(
-                            forward=forward,
-                            vol_annual=vol,
-                            T_years=T_years,
-                            price_min=price_min,
-                            price_max=price_max,
-                            num_points=100,
+                        bundle = fetch_implied_lab_bundle(
+                            spot_usd=float(current_btc),
+                            max_expiries=10,
+                            selected_expiry_str=selected_expiry_str,
+                            cached_option_expiries=_cached_option_expiries,
+                            cached_forward_iv=_cached_forward_iv,
+                            cached_marks_full=_cached_marks_full,
+                            quote_cache_ttl_s=CACHE_TTL,
                         )
-                        # One book summary for both chart and strategy scanner
-                        marks_full = _cached_marks_full(selected["expiry_ts"])
-                        call_marks = marks_full.get("calls") or []
-                        put_marks = marks_full.get("puts") or []
+                        market_data = bundle.market_data_for_selected_expiry or {}
+                        forward = float(market_data["forward"])
+                        vol = float(market_data["vol"])
+                        T_years = float(market_data["T_years"])
+                        price_min = float(market_data["price_min"])
+                        price_max = float(market_data["price_max"])
+                        data = market_data["dist"]
+                        marks_full = market_data["marks_full"]
+                        call_marks = market_data["call_marks"]
+                        put_marks = market_data["put_marks"]
+                        avail_strikes = market_data["avail_strikes"]
+                        call_by_k = market_data["call_by_k"]
+                        put_by_k = market_data["put_by_k"]
                         base_strategy = build_universal_strategy(forward, call_marks, put_marks)
                         # Restore last exact-strike shape for this expiry if present
                         shape_key = f"u4_shape_{selected_expiry_str}"
                         shape_state = st.session_state.get(shape_key, {})
-                        avail_strikes = sorted(set(m["strike"] for m in call_marks + put_marks))
-                        call_by_k = {m["strike"]: float(m.get("mark_btc") or 0) for m in call_marks}
-                        put_by_k = {m["strike"]: float(m.get("mark_btc") or 0) for m in put_marks}
-
-                        # Separate user state vs market_data (Sprint 1A contract)
-                        market_data = {
-                            "forward": forward,
-                            "vol": vol,
-                            "T_years": T_years,
-                            "price_min": price_min,
-                            "price_max": price_max,
-                            "dist": data,
-                            "marks_full": marks_full,
-                            "call_marks": call_marks,
-                            "put_marks": put_marks,
-                            "avail_strikes": avail_strikes,
-                            "call_by_k": call_by_k,
-                            "put_by_k": put_by_k,
-                            "data_sources": [
-                                "Deribit (BTC index, forward, ATM IV, option marks)",
-                            ],
-                            "as_of_utc": as_of_utc,
-                            "quote_cache_ttl_s": CACHE_TTL,
-                        }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
                         st.caption("Optional belief overlay — compare a simple curve to the market-implied view (right).")
@@ -613,16 +559,17 @@ if show_bitcoin_view:
                             prev_mode_key = f"{mode_key}__prev"
 
                             # Defaults for strike truth (from persisted exact-strike state)
-                            k1d = shape_state.get("k1") or min(avail_strikes)
-                            k2d = shape_state.get("k2") or atm
-                            k3d = shape_state.get("k3") or atm
-                            k4d = shape_state.get("k4") or max(avail_strikes)
-                            k1d = min(avail_strikes, key=lambda k: abs(k - k1d))
-                            k2d = min(avail_strikes, key=lambda k: abs(k - k2d))
-                            k3d = min(avail_strikes, key=lambda k: abs(k - k3d))
-                            k4d = min(avail_strikes, key=lambda k: abs(k - k4d))
-                            if not (k1d <= k2d <= k3d <= k4d):
-                                k2d, k3d, k4d = max(k2d, k1d), max(k3d, k2d), max(k4d, k3d)
+                            k1d_raw = shape_state.get("k1") or min(avail_strikes)
+                            k2d_raw = shape_state.get("k2") or atm
+                            k3d_raw = shape_state.get("k3") or atm
+                            k4d_raw = shape_state.get("k4") or max(avail_strikes)
+                            k1d, k2d, k3d, k4d = snap_and_order_u4_strikes(
+                                k1d_raw,
+                                k2d_raw,
+                                k3d_raw,
+                                k4d_raw,
+                                avail_strikes=avail_strikes,
+                            )
 
                             # Persisted payoff targets (truth only in target_payoff mode)
                             payoff_targets_key = f"u4_payoff_targets_{selected_expiry_str}"
@@ -888,17 +835,13 @@ if show_bitcoin_view:
                                     )
 
                                 # Snap to nearest available strikes
-                                k1_sel = min(avail_strikes, key=lambda k: abs(k - int(k1_input)))
-                                k2_sel = min(avail_strikes, key=lambda k: abs(k - int(k2_input)))
-                                k3_sel = min(avail_strikes, key=lambda k: abs(k - int(k3_input)))
-                                k4_sel = min(avail_strikes, key=lambda k: abs(k - int(k4_input)))
-                                if k4_sel < k3_sel:
-                                    k4_sel = k3_sel
-                                # Enforce ordering again after any numeric overrides
-                                if not (k1_sel <= k2_sel <= k3_sel <= k4_sel):
-                                    k2_sel = max(k2_sel, k1_sel)
-                                    k3_sel = max(k3_sel, k2_sel)
-                                    k4_sel = max(k4_sel, k3_sel)
+                                k1_sel, k2_sel, k3_sel, k4_sel = snap_and_order_u4_strikes(
+                                    int(k1_input),
+                                    int(k2_input),
+                                    int(k3_input),
+                                    int(k4_input),
+                                    avail_strikes=avail_strikes,
+                                )
                                 # Per-leg include toggles and polarity
                                 st.caption("**Polarity & legs:** Long = pay premium, short = receive. Base: short K1, long K2, long K3, short K4.")
                                 leg_cols = st.columns(4)
@@ -981,18 +924,18 @@ if show_bitcoin_view:
                                 "left_wing": float(st.session_state.get(key_left_wing, payoff_targets["left_wing"])),
                                 "right_wing": float(st.session_state.get(key_right_wing, payoff_targets["right_wing"])),
                             }
-                            state = build_implied_lab_state(
+                            outputs = run_implied_lab(
                                 expiry_str=selected_expiry_str,
                                 mode=mode_norm,
                                 qty=int(qty),
                                 strikes_exact=strikes_exact,
                                 payoff_targets=payoff_targets,
                                 legs_enabled={"use_k1": use_k1, "use_k2": use_k2, "use_k3": use_k3, "use_k4": use_k4},
-                                reverse=reverse,
+                                reverse=bool(reverse),
                                 net_pnl_mode=bool(net_pnl_mode),
                                 user_belief=user_belief_for_state,
+                                market_data=market_data,
                             )
-                            outputs = derive_lab_outputs(state, market_data)
                             selected_strategy = outputs.get("strategy") or base_strategy
                             payoff_usd = outputs.get("overlay", {}).get("payoff_usd", []) or []
                             breakevens = outputs.get("summary", {}).get("breakevens", []) or []
@@ -1004,7 +947,7 @@ if show_bitcoin_view:
                             solve_work = outputs.get("solve_work")
                         else:
                             ph = float(forward)
-                            state_min = build_implied_lab_state(
+                            outputs = run_implied_lab(
                                 expiry_str=selected_expiry_str,
                                 mode="exact_strikes",
                                 qty=1,
@@ -1019,144 +962,31 @@ if show_bitcoin_view:
                                 reverse=False,
                                 net_pnl_mode=False,
                                 user_belief=user_belief_for_state,
+                                market_data=market_data,
                             )
-                            outputs = derive_lab_outputs(state_min, market_data)
                             selected_strategy = base_strategy
                     # Everything below (distribution chart, summary, scanner) goes in the chart column
                     call_marks = marks_full.get("calls") or []
                     ch = outputs.get("chart_helpers") or {}
-                    anomalous = bool(ch.get("anomalous", False))
-                    fig_dist = go.Figure()
-                    fig_dist.add_trace(
-                        go.Scatter(
-                            x=data["prices"],
-                            y=data["pdf_pct"],
-                            mode="lines",
-                            name="Lognormal (forward + IV)",
-                            line=dict(color="rgba(138, 43, 226, 0.9)", width=2),
-                            fill="tozeroy",
-                        )
-                    )
-                    market_pct = ch.get("market_pct") or []
-                    if market_pct and len(market_pct) == len(data["prices"]):
-                        fig_dist.add_trace(
-                            go.Scatter(
-                                x=data["prices"],
-                                y=market_pct,
-                                mode="lines",
-                                name="Market-implied pricing distribution (options)",
-                                line=dict(color="rgba(255, 140, 0, 0.9)", width=2, dash="dash"),
-                            )
-                        )
-                    user_belief_pct = ch.get("user_belief_pct") or []
-                    if (
-                        user_belief_pct
-                        and len(user_belief_pct) == len(data["prices"])
-                    ):
-                        fig_dist.add_trace(
-                            go.Scatter(
-                                x=data["prices"],
-                                y=user_belief_pct,
-                                mode="lines",
-                                name="My belief",
-                                line=dict(color="rgba(0, 160, 160, 0.95)", width=2, dash="dot"),
-                            )
-                        )
-                    title = f"BTC — Underlying price on {selected_expiry_str}"
-                    if anomalous:
-                        title += " — Anomalous"
-                    payoff_usd = (outputs.get("overlay") or {}).get("payoff_usd") or []
-                    if selected_strategy and selected_strategy.get("k1") is not None and payoff_usd:
-                        fig_dist.add_trace(
-                            go.Scatter(
-                                x=data["prices"],
-                                y=payoff_usd,
-                                mode="lines",
-                                name=f"Payoff: {selected_strategy.get('name', 'Universal 4-leg')}",
-                                line=dict(color="rgba(34, 139, 34, 0.9)", width=2),
-                                yaxis="y2",
-                            )
-                        )
-                    layout_kw = {
-                        "title": title,
-                        "xaxis_title": "Underlying price (USD)",
-                        "yaxis_title": "Probability (scaled)",
-                        "height": 340,
-                        "margin": dict(b=40),
-                        "showlegend": True,
-                        "xaxis": dict(tickformat=",d", gridcolor="rgba(128,128,128,0.2)"),
-                        "yaxis": dict(ticksuffix="%", range=[0, 30], gridcolor="rgba(128,128,128,0.2)"),
-                    }
-                    if selected_strategy and selected_strategy.get("k1") is not None:
-                        layout_kw["yaxis2"] = dict(
-                            title="Strategy P&L (USD)",
-                            overlaying="y",
-                            side="right",
-                            showgrid=False,
-                        )
-                    fig_dist.update_layout(**layout_kw)
                     _zkey_shape = f"implied_lab_shape_zoom_{selected_expiry_str}"
                     _zoom_choice = str(st.session_state.get(_zkey_shape, "Full range"))
-                    _xr0, _xr1 = _shape_focus_x_range(
-                        _zoom_choice, float(price_min), float(price_max), float(forward)
-                    )
-                    _story_md, _story_strip = shape_window_local_region_story(
-                        zoom_choice=_zoom_choice,
-                        xr0=float(_xr0),
-                        xr1=float(_xr1),
+                    chart_bundle = build_implied_lab_distribution_chart_bundle(
+                        selected_expiry_str=selected_expiry_str,
+                        dist_data=data,
+                        outputs=outputs,
                         forward=float(forward),
-                        belief_overlay_enabled=bool(user_belief_for_state.get("enabled")),
-                        verification=outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None,
+                        vol=float(vol),
+                        T_years=float(T_years),
+                        price_min=float(price_min),
+                        price_max=float(price_max),
+                        zoom_choice=_zoom_choice,
+                        user_belief_for_state=user_belief_for_state,
                     )
-                    if _story_strip:
+                    if chart_bundle.local_story_strip:
                         with strip_local_story_slot.container():
-                            st.caption(_story_strip)
+                            st.caption(chart_bundle.local_story_strip)
                     else:
                         strip_local_story_slot.empty()
-                    fig_dist.update_xaxes(range=[_xr0, _xr1])
-                    _gap_x = ch.get("belief_largest_gap_price")
-                    if (
-                        user_belief_for_state.get("enabled")
-                        and _gap_x is not None
-                        and isinstance(_gap_x, (int, float))
-                    ):
-                        fig_dist.add_shape(
-                            type="line",
-                            xref="x",
-                            yref="paper",
-                            x0=float(_gap_x),
-                            x1=float(_gap_x),
-                            y0=0,
-                            y1=1,
-                            line=dict(color="rgba(110, 110, 110, 0.5)", width=1, dash="dash"),
-                            layer="below",
-                        )
-                    # Cumulative % labels below x-axis (y in paper coords, 0–1)
-                    for price, cdf_pct in data["cumulative_at"]:
-                        fig_dist.add_annotation(
-                            x=price,
-                            y=-0.06,
-                            text=f"{cdf_pct:.1f}%",
-                            showarrow=False,
-                            yref="paper",
-                            font=dict(size=9),
-                        )
-                    _fwd_cap = (
-                        f"Forward ${forward:,.0f} · ATM IV {vol*100:.1f}% · T = {T_years:.2f} yr"
-                    )
-                    _dg = ch.get("belief_disagreement_strength")
-                    if user_belief_for_state.get("enabled") and _dg:
-                        _fwd_cap += f" · Belief disagreement: **{_dg}**"
-                    _bs = outputs.get("belief_summary") or {}
-                    belief_txt = _bs.get("text") or ""
-                    belief_hints = _bs.get("hints_markdown") or ""
-                    _belief_block = ""
-                    if belief_txt or belief_hints:
-                        _belief_block = belief_txt
-                        if belief_hints:
-                            _belief_block += (
-                                ("\n\n" if belief_txt else "") + belief_hints
-                            )
 
                     with right_chart_slot.container():
                         st.markdown("##### Market-implied view (chart)")
@@ -1178,17 +1008,17 @@ if show_bitcoin_view:
                         st.markdown("###### Local region (descriptive)")
                         if _zoom_choice == "Full range":
                             st.caption(
-                                _story_md.replace("**", "").replace("  ", " ").strip()
+                                chart_bundle.local_story_md.replace("**", "").replace("  ", " ").strip()
                             )
                         else:
-                            st.markdown(_story_md)
+                            st.markdown(chart_bundle.local_story_md)
                         st.caption(
                             "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
                             "(Breeden–Litzenberger from marks) · Green: **strategy P&L** at expiry when legs are set."
                         )
-                        st.plotly_chart(fig_dist, use_container_width=True)
+                        st.plotly_chart(chart_bundle.fig, use_container_width=True)
 
-                    right_forward_slot.caption(_fwd_cap)
+                    right_forward_slot.caption(chart_bundle.forward_caption)
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
@@ -1210,9 +1040,9 @@ if show_bitcoin_view:
                     with right_trust_slot.container():
                         _render_trust_strip(outputs.get("verification") or {})
                     with right_belief_slot.container():
-                        if _belief_block:
+                        if chart_bundle.belief_block_markdown:
                             with st.expander("Belief overlay (this run)", expanded=False):
-                                st.markdown(_belief_block)
+                                st.markdown(chart_bundle.belief_block_markdown)
                     with right_review_slot.container():
                         with st.expander("Review & disagreement digest", expanded=False):
                             _render_decision_ready_review(outputs.get("verification") or {})
@@ -1228,7 +1058,7 @@ if show_bitcoin_view:
                                 call_by_k=call_by_k,
                                 summary=outputs.get("summary") or {},
                             )
-                    if anomalous:
+                    if chart_bundle.anomalous:
                         right_anomaly_slot.warning(
                             "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
                         )

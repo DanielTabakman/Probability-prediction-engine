@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.probability_engine.services.implied_lab_chart_window import shape_focus_x_range
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
 
@@ -73,33 +74,6 @@ def render_belief_vs_market_glance(v: dict) -> None:
                 f"{g.get('formula_caption', '')}"
             )
             st.caption(f"{g.get('overlay_basis_line', '')}")
-
-
-def shape_focus_x_range(
-    choice: str,
-    price_min: float,
-    price_max: float,
-    forward: float,
-) -> tuple[float, float]:
-    """Sprint002-Slice001: map UI labels to chart x-axis window (descriptive navigation only)."""
-    lo, hi = float(price_min), float(price_max)
-    fw = float(forward)
-    if hi <= lo:
-        return lo, hi
-    if choice == "Lower prices":
-        upper = min(hi, fw * 1.1)
-        return lo, max(lo + 1.0, upper)
-    if choice == "Near forward":
-        a = max(lo, fw * 0.82)
-        b = min(hi, fw * 1.18)
-        if b <= a + 1.0:
-            return lo, hi
-        return a, b
-    if choice == "Higher prices":
-        lower = max(lo, fw * 0.9)
-        return lower, hi
-    # "Full range" and any unknown value
-    return lo, hi
 
 
 def shape_focus_post_interaction_hint(verification: dict | None, forward: float) -> str:

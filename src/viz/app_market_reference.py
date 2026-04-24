@@ -13,7 +13,7 @@ from typing import Any, Callable
 import pandas as pd
 import streamlit as st
 
-from src.data.fetch_polymarket import markets_to_probabilities
+from src.probability_engine.services.market_context import polymarket_events_to_probabilities
 
 
 def render_market_reference_sections(
@@ -61,7 +61,7 @@ def render_market_reference_sections(
                     f"Polymarket API unavailable ({type(e).__name__}). "
                     "The rest of the app works; only prediction market data is missing. Try again later or check your network."
                 )
-            probs = markets_to_probabilities(events, topic_keywords=keywords) if events else []
+            probs = polymarket_events_to_probabilities(events, topic_keywords=keywords)
             if probs:
                 pm_df = pd.DataFrame(probs)
                 st.dataframe(

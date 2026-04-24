@@ -9,20 +9,22 @@ from __future__ import annotations
 
 import streamlit as st
 
-from src.data import fetch_polymarket_markets, fetch_yahoo_prices
-from src.data.fetch_btc_options import fetch_btc_options_summary
-from src.data.fetch_deribit import (
-    fetch_deribit_btc_futures_forward_curve,
-    fetch_deribit_btc_index,
-    fetch_deribit_btc_option_book_marks,
-    fetch_deribit_btc_option_expiries,
-    fetch_deribit_btc_option_marks_by_expiry_full,
-    fetch_deribit_btc_options_instruments,
-    fetch_deribit_btc_options_for_chart,
-    fetch_deribit_btc_options_summary,
-    fetch_deribit_btc_tight_bull_spreads,
-    fetch_deribit_forward_and_iv_for_expiry,
-    last_deribit_instruments_diagnostic,
+from src.probability_engine.services.btc_options_data import get_btc_options_summary
+from src.probability_engine.services.deribit_data import (
+    get_deribit_btc_futures_forward_curve,
+    get_deribit_btc_index,
+    get_deribit_btc_option_book_marks,
+    get_deribit_btc_option_expiries,
+    get_deribit_btc_option_marks_by_expiry_full,
+    get_deribit_btc_options_for_chart,
+    get_deribit_btc_options_instruments,
+    get_deribit_btc_options_summary,
+    get_deribit_btc_tight_bull_spreads,
+    get_deribit_forward_and_iv_for_expiry,
+)
+from src.probability_engine.services.market_data import (
+    get_polymarket_markets,
+    get_yahoo_prices,
 )
 
 # Cached fetches (2 min TTL) — avoids re-fetch on every sidebar change
@@ -33,41 +35,41 @@ CACHE_TTL_OPTION_EXPIRIES = 30
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_yahoo(symbols, period):
-    return fetch_yahoo_prices(symbols=symbols, period=period)
+    return get_yahoo_prices(symbols=symbols, period=period)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_polymarket(active, closed, limit):
-    return fetch_polymarket_markets(active=active, closed=closed, limit=limit)
+    return get_polymarket_markets(active=active, closed=closed, limit=limit)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_forward_curve(max_contracts):
-    return fetch_deribit_btc_futures_forward_curve(max_contracts=max_contracts)
+    return get_deribit_btc_futures_forward_curve(max_contracts=max_contracts)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_deribit_index():
-    return fetch_deribit_btc_index()
+    return get_deribit_btc_index()
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_option_instruments():
     """Single get_instruments(option) payload; reused for spreads + options chart."""
-    return fetch_deribit_btc_options_instruments(expired=False)
+    return get_deribit_btc_options_instruments(expired=False)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_option_book_marks():
     """Single get_book_summary_by_currency(BTC, option); reused for spread marks (no per-ticker storm)."""
-    return fetch_deribit_btc_option_book_marks()
+    return get_deribit_btc_option_book_marks(snapshot=True)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_bull_spreads(spot_price, spread_width, max_expiries):
     inst = cached_option_instruments()
     marks = cached_option_book_marks()
-    return fetch_deribit_btc_tight_bull_spreads(
+    return get_deribit_btc_tight_bull_spreads(
         spot_price=spot_price,
         spread_width=spread_width,
         max_expiries=max_expiries,
@@ -79,31 +81,29 @@ def cached_bull_spreads(spot_price, spread_width, max_expiries):
 @st.cache_data(ttl=CACHE_TTL)
 def cached_options_for_chart():
     inst = cached_option_instruments()
-    return fetch_deribit_btc_options_for_chart(instruments=inst)
+    return get_deribit_btc_options_for_chart(instruments=inst)
 
 
 @st.cache_data(ttl=CACHE_TTL_OPTION_EXPIRIES)
 def cached_option_expiries(max_expiries):
-    rows = fetch_deribit_btc_option_expiries(max_expiries=max_expiries)
-    return rows, last_deribit_instruments_diagnostic()
+    return get_deribit_btc_option_expiries(max_expiries=max_expiries)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_forward_iv(expiry_ts, spot):
-    return fetch_deribit_forward_and_iv_for_expiry(expiry_ts, spot)
+    return get_deribit_forward_and_iv_for_expiry(expiry_ts=expiry_ts, spot=spot)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_marks_full(expiry_ts):
-    return fetch_deribit_btc_option_marks_by_expiry_full(expiry_ts)
+    return get_deribit_btc_option_marks_by_expiry_full(expiry_ts=expiry_ts)
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_btc_options_summary():
-    return fetch_btc_options_summary()
+    return get_btc_options_summary()
 
 
 @st.cache_data(ttl=CACHE_TTL)
 def cached_deribit_summary(max_tickers):
-    return fetch_deribit_btc_options_summary(max_tickers=max_tickers)
-
+    return get_deribit_btc_options_summary(max_tickers=max_tickers)
