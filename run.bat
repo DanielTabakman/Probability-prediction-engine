@@ -1,4 +1,5 @@
 @echo off
+REM Official entrypoint (Option A for now): src/viz/app.py
 REM Run from the folder that contains run.bat (double-click or from cmd).
 setlocal
 cd /d "%~dp0"

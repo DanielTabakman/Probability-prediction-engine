@@ -19,6 +19,21 @@ pip install -r requirements.txt
 streamlit run src/viz/app.py
 ```
 
+### Dependency management note
+
+This repo currently keeps dependencies in **both** `requirements.txt` (used by `run.bat` and CI) and `pyproject.toml` (packaging metadata). For day-to-day dev, treat `requirements.txt` as the source of truth.
+
+### Recovery
+
+If your environment gets into a bad state (venv conflicts, Streamlit cache weirdness, DB/schema drift), see `docs/RECOVERY.md`.
+
+### Contributing (minimal)
+
+- Run tests: `python -m pip install pytest` then `python -m pytest`
+- Keep changes small and avoid introducing a new formatting/lint toolchain unless we explicitly decide to.
+
+Note: `src/viz/app.py` is the official entrypoint for now; the planned migration target is `src/probability_engine/app/app.py`.
+
 Optional: copy `.env.example` to `.env` and set any API keys (none required for initial sources).
 
 **If `pip install` says "file in use" or "access denied"**: another program (IDE, another terminal, Python process) is using the package files. Close other Python/terminal windows and try again, or use a new venv in a new folder.
