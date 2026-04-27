@@ -66,6 +66,7 @@ from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import (
     build_trust_strip_lines,
+    build_directional_candidate_strip_payload,
     build_width_vol_candidate_strip_payload,
 )
 from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
@@ -80,6 +81,7 @@ from src.viz.app_panels import (
     maybe_append_width_vol_history as _maybe_append_width_vol_history,
     render_belief_vs_market_glance as _render_belief_vs_market_glance,
     render_decision_ready_review as _render_decision_ready_review,
+    render_directional_candidate_strip_payload as _render_directional_candidate_strip_payload,
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
@@ -255,6 +257,7 @@ if show_bitcoin_view:
                         strip_local_story_slot = st.empty()
                         right_summary_slot = st.empty()
                         right_width_candidate_slot = st.empty()
+                        right_directional_candidate_slot = st.empty()
                         right_trust_slot = st.empty()
                         right_review_slot = st.empty()
                         right_ticket_slot = st.empty()
@@ -1207,6 +1210,12 @@ if show_bitcoin_view:
                             _render_width_vol_history_panel(selected_expiry_str=selected_expiry_str)
                     else:
                         right_width_candidate_slot.empty()
+                    _dir_strip = build_directional_candidate_strip_payload(_v_pay)
+                    if _dir_strip:
+                        with right_directional_candidate_slot.container():
+                            _render_directional_candidate_strip_payload(_dir_strip)
+                    else:
+                        right_directional_candidate_slot.empty()
                     with right_trust_slot.container():
                         _render_trust_strip(outputs.get("verification") or {})
                     with right_belief_slot.container():
