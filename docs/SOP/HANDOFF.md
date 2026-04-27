@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
 - Active phase sprint (BUILD): **Sprint 004 — Phase 2 Product (chartered, 2026-04-21)** — **Candidate Edge v1** — BTC-first mispricing discovery wedge (`docs/SOP/SPRINT_004_PHASE_2.md`) — **active Phase 2 product execution boundary**. **Parallel:** **Sprint 003 — Phase 2 (chartered narrow, 2026-04-20)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`) — **evidence-plane only**; **not** a product UX sprint; scope **unchanged** by Sprint 004. **Interleaved CONTROL-PLANE interlude `Workflow-Hardening-Slice-001` — CLOSED / shipped 2026-04-21** (advisory, non-gating).
 - Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Sprint003-Slice001** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; **first real relay-assisted slice**; Slice001 product-of-record **`e044f0fe16097da32ef7e472084e266fc5405740`**); **`Workflow-Hardening-Slice-001`** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; CONTROL-PLANE interlude; accepted baseline tip after promotion **`e876bfe455ba5d51057a177088e362e9aa8ce384`**); **Sprint004-Slice001** — **CLOSED / shipped** (2026-04-21 BUILD + CONTROL-CLOSEOUT; product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **`Workflow-Hardening-Slice-002` — CLOSED / shipped** (CONTROL-PLANE interlude; UI closeout gate assignment + sanctioned bounded capture); **`Workflow-Hardening-Slice-003` — CLOSED / shipped** (2026-04-22 CONTROL-PLANE PROMOTION; accepted baseline tip **`7ae6470a9c202998470ce093909613881b31286d`**; fast-forward from `build/wh-slice003-sanctioned-witness-v0`); **Sprint004-Slice002** — **CLOSED / shipped** (2026-04-22 BUILD + CONTROL-CLOSEOUT; product-of-record **`069d76f`**); **Sprint004-Slice003** — **CLOSED / shipped** (2026-04-27 CONTROL-CLOSEOUT under tiered-delegation soft-launch; product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**)
-- Current execution focus: **`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** (selected under tiered-delegation soft-launch; M3 BUILD agent spawn pending)
+- Current execution focus: **`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** — **BUILD-CLOSEOUT complete on `build/sprint004-slice004-directional-strip-v0` @ `7f8ec19e191a5152301a580ec953f453c0330949`**; awaiting steward CONTROL-CLOSEOUT
 - **`Sprint004-Slice003`** is **CLOSED / shipped** on baseline @ **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; stale `exec/sprint004-slice003-history-v0` deleted at promotion (sibling tip `dc98a541...` superseded; no unique product work lost)
-- Next pending execution step: **BUILD — `Sprint004-Slice004`** on a fresh build branch off baseline tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**
+- Next pending execution step: **CONTROL-CLOSEOUT — `Sprint004-Slice004`** — steward verifies rubric on `build/sprint004-slice004-directional-strip-v0` @ `7f8ec19e191a5152301a580ec953f453c0330949`; promote via fast-forward to `recovery/frontier-steward-v2_1-baseline`
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
@@ -106,10 +106,13 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Single-plane passes**: each pass declares exactly one plane (CONTROL-PLANE / PRODUCT-PLANE / EVIDENCE-PLANE / RECOVERY).
 - **BUILD requires preflight**: if preflight says BUILD allowed: NO, BUILD is blocked even if steering is clear.
 - **No untracked canonical docs across accepted baselines**: `docs/SOP/**` must not linger untracked at a baseline that is treated as “accepted”.
+- **Authority pointer (live):** during the 2026-04-27 tiered-delegation soft-launch trial, live authority is canonical at `docs/SOP/CURRENT_FRONTIER.md` “Authority (tiered-delegation soft-launch — 2026-04-27 onward)”. Older steward-only language in `CODEX_AUTONOMY_V1.md` and `FRONTIER_STEWARD_PROTOCOL.md` is superseded for the trial.
 
 ## Active feature slice
 
-**`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** — **SELECTED** under tiered-delegation soft-launch (Tier 2 SELECTION; steward veto window observed). M3 BUILD agent spawn pending; spec being folded with D3–D6 decisions (heading wording = "location-shaped"; history panel = width-only with explicit caption; schema versioning = single `MANIFEST_SCHEMA_VERSION` source of truth, bump 2→3 if shipping new field; harness wrapper prints both witnesses).
+**`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** — **BUILD-CLOSEOUT complete on `build/sprint004-slice004-directional-strip-v0` @ `7f8ec19e191a5152301a580ec953f453c0330949`; awaiting CONTROL-CLOSEOUT.** Evidence: pytest **127** passed; UI smoke **PASS** (`schema_version: 3`; `width_vol: BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP; directional: WITNESS_OK`; `evidence_plane_complete: true`; `artifacts/ui_smoke/20260427_191122/`). Decisions D3–D6 implemented: heading = "Location-shaped tension — hypothesis to inspect"; D4 history caption added; `MANIFEST_SCHEMA_VERSION` bumped 2→3; harness wrapper prints both witnesses.
+
+**Next pending execution step:** steward **CONTROL-CLOSEOUT** — verify rubric on `build/sprint004-slice004-directional-strip-v0` → promote to `recovery/frontier-steward-v2_1-baseline` via fast-forward; update Slice004 from BUILD-CLOSEOUT to CLOSED in canonical docs.
 
 **Just shipped (do not reopen):** **`Sprint004-Slice003` — Candidate event logging / history foundation (v0)** — **CLOSED / shipped** (2026-04-27 **CONTROL-CLOSEOUT under tiered-delegation soft-launch**). Product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice003-closeout-v1`; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**). **Stale exec branch** `exec/sprint004-slice003-history-v0` (sibling tip `dc98a541...`) deleted at promotion — no unique product work lost. **Closeout validation re-verified:** `python -m pytest -q` → **121** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** (signal `BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP`; `artifacts/ui_smoke/20260427_180931/ui_smoke_manifest.json`; `schema_version: 2`). **Schema-drift fold-in shipped on baseline:** `MANIFEST_SCHEMA_VERSION` constant in `scripts/implied_lab_ui_smoke_harness.py`; canonical `docs/SOP/MANIFEST_SCHEMA.md`; assertion test `tests/test_manifest_schema_drift.py`; advisory `docs/SOP/CODE_DOCS_DRIFT_POLICY_V1.md`.
 
@@ -119,7 +122,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 **Sprint 003 posture (unchanged):** **Evidence-plane only**; Sprint003-Slice001 **CLOSED / shipped**; §6.B candidates **deferred** per `SPRINT_003_PHASE_2.md` §3 rule 2. **Sprint 002** **wrapped**; **Sprint 001** **wrapped**.
 
-Next = **BUILD — `Sprint004-Slice004`** (directional-disagreement candidate strip + payload/harness refactor) on a fresh build branch off the post-Slice003 baseline tip `a98377a066db99f1e893c2ef86d1ba71f6a5c53d`.
+Next = **CONTROL-CLOSEOUT — `Sprint004-Slice004`** (steward-owned; promote `build/sprint004-slice004-directional-strip-v0` → `recovery/frontier-steward-v2_1-baseline`).
 
 ## Current status
 
@@ -142,7 +145,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **steward CONTROL-CLOSEOUT** — promote `build/sprint004-slice003-closeout-v1` → `recovery/frontier-steward-v2_1-baseline`; update Slice003 from CHECKPOINTED to CLOSED in canonical docs; verify `python -m pytest -q` → **121** passed on promoted baseline.
+- next task: **steward CONTROL-CLOSEOUT** — verify rubric on `build/sprint004-slice004-directional-strip-v0` @ `7f8ec19e191a5152301a580ec953f453c0330949`; promote to `recovery/frontier-steward-v2_1-baseline` via fast-forward; update Slice004 from BUILD-CLOSEOUT to CLOSED in canonical docs; verify `python -m pytest -q` → **127** passed and `schema_version: 3` on promoted baseline.
 - deferred: **Sprint003-Slice002/Slice003 candidates** (`docs/SOP/SPRINT_003_PHASE_2.md` §6.B) — not selected; fresh pilot evidence required for any future SELECTION under Sprint 003.
 - deferred: **Sprint 002 §6.C** batch candidates — remain **deferred map only**.
 - deferred: next Sprint 004 follow-on slice — pending explicit steward selection.
@@ -185,7 +188,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**PREFLIGHT** then **honest `Sprint004-Slice003` closeout** (WH-003 **shipped**; upgraded sanctioned harness on baseline).
+**CONTROL-CLOSEOUT — `Sprint004-Slice004`** — promote `build/sprint004-slice004-directional-strip-v0` → `recovery/frontier-steward-v2_1-baseline`; update canonical docs; verify `schema_version: 3` and pytest **127** passed on promoted baseline.
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -228,6 +231,8 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 Pre–feature slice 006: accepted feature slice 002–005 work, full `tests/`, `scripts/run_implied_lab_ui_smoke.py`, and `docs/SOP/` (including Execution step 17 validation-tier / closeout rules in `OPERATING_RULES.md`) are present on disk but **mostly not committed**; `main` is **ahead of `origin/main` by 1** (local commit: implied-lab smoke harness + doc/requirements). **Modified** tracked files carry large deltas on top of that commit. **`python -m pytest -q`:** 28 passed on this tree (2026-04-10). Smallest honest next step before feature slice 006: one scoped checkpoint (commit + push) after deciding whether `artifacts/` (and similar) should be ignored or archived—not broad cleanup.
 
 ## Last updated
+
+2026-04-27 by build agent (**BUILD-CLOSEOUT — `Sprint004-Slice004` — directional candidate strip + payload/harness refactor v0**): **`Sprint004-Slice004` BUILD-CLOSEOUT complete** on `build/sprint004-slice004-directional-strip-v0` @ `7f8ec19e191a5152301a580ec953f453c0330949`. Evidence: `python -m pytest -q` → **127 passed**; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** (`schema_version: 3`; `evidence_plane_complete: true`; `directional_signal: WITNESS_OK`; `artifacts/ui_smoke/20260427_191122/`). `tests/test_manifest_schema_drift.py` **PASS**. **Next** = steward **CONTROL-CLOSEOUT** (promote build branch → baseline; update Slice004 CLOSED in canonical docs). Doc updates: `CURRENT_FRONTIER.md`, `HANDOFF.md`, `SPRINT_004_PHASE_2.md`, `MANIFEST_SCHEMA.md`.
 
 2026-04-22 by agent (**CONTROL-PLANE PROMOTION / CLOSEOUT — Steward Model 2.3**): **`Workflow-Hardening-Slice-003` — CLOSED / shipped** — fast-forward `build/wh-slice003-sanctioned-witness-v0` to `recovery/frontier-steward-v2_1-baseline`; tip **`7ae6470a9c202998470ce093909613881b31286d`**. **`Sprint004-Slice003` CHECKPOINTED / NOT CLOSED** @ **`dc98a541dfa77d28e3fffae1e4520b41ffae8a1d`** — **honest closeout still pending**. **Next** = **PREFLIGHT** then **Slice003 closeout attempt** (upgraded sanctioned harness). **Accepted baseline gate:** `git merge-base --is-ancestor 7ae6470a9c202998470ce093909613881b31286d HEAD`. Doc updates: `SPRINT_004_PHASE_2.md`, `CURRENT_FRONTIER.md`, `HANDOFF.md`. **No** Slice003 rerun in this pass.
 
