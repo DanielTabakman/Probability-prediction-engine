@@ -40,6 +40,8 @@ Rationale:
 
 This boundary is the **recommended default** for v1.
 
+> **Trial in effect (2026-04-27 onward — tiered-delegation soft-launch).** The steward has temporarily delegated Tier-2 **SELECTION** and Tier-2/3 **CONTROL-CLOSEOUT** to the parent agent under explicit guardrails (rubric verification, semantic-contract gates, phase-boundary strategic touchpoint, escalation triggers on rubric failure / semantic drift / charter ambiguity / scope expansion). The live authority state is canonical at `docs/SOP/CURRENT_FRONTIER.md` — "Authority (tiered-delegation soft-launch — 2026-04-27 onward)". This document's older steward-only language is superseded for the duration of the trial. Formal canonization (or rollback) follows `WH-Slice-005` after Slice004 closes.
+
 ## 3. Scope (single-slice only)
 
 - One Codex autonomy run = **exactly one already-selected slice**.

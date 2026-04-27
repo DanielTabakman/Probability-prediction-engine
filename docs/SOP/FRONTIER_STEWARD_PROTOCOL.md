@@ -102,6 +102,8 @@ Preflight must report repo facts (machine-derived where possible) and only then 
 - Do not silently morph **CLOSEOUT** into **BUILD**.
 - Do not silently morph **BUILD** into refactor work.
 
+> **Trial in effect (2026-04-27 onward).** Tiered-delegation soft-launch is active; live authority state in `docs/SOP/CURRENT_FRONTIER.md`. See `CODEX_AUTONOMY_V1.md` "Trial in effect" callout for scope and escalation triggers.
+
 ### Compact-slice rule
 
 Compact **BUILD + CLOSEOUT** in one pass is allowed only when **all** are true:
