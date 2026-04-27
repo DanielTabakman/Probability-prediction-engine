@@ -54,10 +54,15 @@ SLICE003_CANDIDATE_HEADING = "Candidate to inspect (width-shaped, v0)"
 SLICE003_HISTORY_SUMMARY = "History (this session)"
 SLICE003_STRIP_WAIT_S = 55.0
 
+# Sprint004-Slice004: bounded witness for directional/mixed candidate strip.
+# Scenario A produces width_vol conditions; directional strip is not expected there.
+SLICE004_DIRECTIONAL_HEADING = "Location-shaped tension"
+SLICE004_DIRECTIONAL_WAIT_S = 10.0
+
 # Manifest schema version — single source of truth.
 # Increment this constant when the closeout block structure changes.
 # docs/SOP/MANIFEST_SCHEMA.md must match; tests/test_manifest_schema_drift.py enforces alignment.
-MANIFEST_SCHEMA_VERSION = 2
+MANIFEST_SCHEMA_VERSION = 3
 MANIFEST_SCHEMA_DOCS_REFERENCE = "docs/SOP/MANIFEST_SCHEMA.md"
 
 
@@ -87,6 +92,10 @@ class ScenarioResult:
     slice003_clear_history_control_found: bool = False
     slice003_witness_screenshot_path: str = ""
     slice003_witness_notes: str = ""
+    # Sprint004-Slice004 directional witness (scenario A only; not expected in width_vol conditions).
+    slice004_directional_classification: str = "NOT_APPLICABLE"
+    slice004_directional_strip_found: bool = False
+    slice004_directional_notes: str = ""
 
 
 def _port_is_listening(port: int) -> bool:
@@ -602,6 +611,52 @@ def _collect_slice003_witness(page, result: ScenarioResult) -> None:
     result.slice003_classification = "WITNESS_OK"
 
 
+def _collect_slice004_directional_witness(page, result: ScenarioResult) -> None:
+    """
+    Sprint004-Slice004: bounded witness for directional/mixed candidate strip.
+
+    Scenario A always produces width_vol disagreement category (sigma_ln = 0.70 >> market).
+    The directional strip is not expected to appear; classification is
+    BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP (sanctioned degraded path).
+    """
+    if result.scenario != "A_width_target_payoff":
+        result.slice004_directional_classification = "NOT_APPLICABLE"
+        return
+
+    if not result.page_loaded:
+        result.slice004_directional_classification = "DEGRADED_PAGE_NOT_LOADED"
+        result.slice004_directional_notes = "App shell did not reach a loaded state."
+        return
+
+    heading = page.get_by_text(
+        re.compile(r"Location-shaped\s+tension", re.I)
+    ).first
+    try:
+        heading.wait_for(state="attached", timeout=int(SLICE004_DIRECTIONAL_WAIT_S * 1000))
+        result.slice004_directional_strip_found = True
+        result.slice004_directional_classification = "WITNESS_OK"
+    except Exception:
+        result.slice004_directional_classification = "BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP"
+        result.slice004_directional_notes = (
+            f"Directional strip not surfaced in scenario A (expected: scenario A uses "
+            f"width_vol conditions — sigma_ln=0.70 >> market; directional strip requires "
+            f"directional/mixed category which is not produced by this scenario)."
+        )
+
+
+def _signal_for_category(classification: str, category: str) -> str:
+    """Map classification string to the canonical signal name for a given category."""
+    if classification == "WITNESS_OK":
+        return "WITNESS_OK"
+    if classification == "NOT_APPLICABLE":
+        return "NOT_APPLICABLE"
+    if category == "width_vol" and classification == "DEGRADED_STRIP_NOT_SHOWN":
+        return "BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP"
+    if category == "directional" and classification == "BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP":
+        return "BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP"
+    return "NEEDS_FIX_OR_RETRY"
+
+
 def take_screenshot(page, scenario: str) -> str:
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     shot_path = RUN_DIR / f"{scenario}.png"
@@ -766,6 +821,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             r.slice003_classification = "DEGRADED_SCENARIO_INCOMPLETE"
             r.slice003_witness_notes = f"slice003_witness_exception: {type(e).__name__}: {e}"
 
+    try:
+        _collect_slice004_directional_witness(page, r)
+    except Exception as e:  # noqa: BLE001
+        if r.scenario == "A_width_target_payoff":
+            r.slice004_directional_classification = "DEGRADED_SCENARIO_INCOMPLETE"
+            r.slice004_directional_notes = f"slice004_directional_witness_exception: {type(e).__name__}: {e}"
+
     return r
 
 
@@ -843,38 +905,44 @@ def main() -> int:
                 "notes": r.slice003_witness_notes,
             }
 
-        def _slice003_closeout_block(rows: list[ScenarioResult]) -> dict[str, Any]:
+        def _slice004_directional_witness_row(r: ScenarioResult) -> dict[str, Any]:
+            return {
+                "classification": r.slice004_directional_classification,
+                "candidate_strip_heading_found": r.slice004_directional_strip_found,
+                "notes": r.slice004_directional_notes,
+            }
+
+        def _closeout_block(rows: list[ScenarioResult]) -> dict[str, Any]:
             ra = next((x for x in rows if x.scenario == "A_width_target_payoff"), None)
             if ra is None:
                 return {
                     "schema_version": MANIFEST_SCHEMA_VERSION,
                     "primary_scenario_ran": False,
                     "evidence_plane_complete": False,
-                    "workflow_hardening_slice003_signal": "NOT_APPLICABLE",
+                    "width_vol_signal": "NOT_APPLICABLE",
+                    "directional_signal": "NOT_APPLICABLE",
                     "detail": "A_width_target_payoff not in this run.",
                 }
-            cls = ra.slice003_classification
-            bounded_live_miss = cls == "DEGRADED_STRIP_NOT_SHOWN"
-            evidence_plane_complete = cls in ("WITNESS_OK", "DEGRADED_STRIP_NOT_SHOWN")
+            wv_cls = ra.slice003_classification
+            dir_cls = ra.slice004_directional_classification
+            wv_signal = _signal_for_category(wv_cls, "width_vol")
+            dir_signal = _signal_for_category(dir_cls, "directional")
+            wv_acceptable = wv_cls in ("WITNESS_OK", "DEGRADED_STRIP_NOT_SHOWN")
+            dir_acceptable = dir_cls in ("WITNESS_OK", "BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP")
+            evidence_plane_complete = wv_acceptable and dir_acceptable
+            bounded_live_miss = wv_cls == "DEGRADED_STRIP_NOT_SHOWN"
             return {
                 "schema_version": MANIFEST_SCHEMA_VERSION,
                 "primary_scenario_ran": True,
                 "evidence_plane_complete": bool(evidence_plane_complete),
                 "bounded_live_data_miss": bool(bounded_live_miss),
-                "workflow_hardening_slice003_signal": (
-                    "WITNESS_OK"
-                    if cls == "WITNESS_OK"
-                    else (
-                        "BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP"
-                        if bounded_live_miss
-                        else "NEEDS_FIX_OR_RETRY"
-                    )
-                ),
-                "classification": cls,
+                "width_vol_signal": wv_signal,
+                "directional_signal": dir_signal,
+                "classification": wv_cls,
                 "detail": ra.slice003_witness_notes or "",
             }
 
-        wh_slice003_closeout = _slice003_closeout_block(results)
+        wh_slice003_closeout = _closeout_block(results)
 
         # Write manifest.
         manifest = {
@@ -895,6 +963,7 @@ def main() -> int:
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
                     "slice003_witness": _slice003_witness_row(r),
+                    "slice004_directional_witness": _slice004_directional_witness_row(r),
                 }
                 for r in results
             ],
@@ -925,10 +994,14 @@ def main() -> int:
                     "a green run implies C’s manifest gates passed for that run."
                 ),
                 "workflow_hardening_slice003": (
-                    "Scenario A collects `slice003_witness` (candidate strip heading, History expander, "
-                    "Clear history) plus `workflow_hardening_slice003_closeout`. "
-                    "`evidence_plane_complete` is true for WITNESS_OK or DEGRADED_STRIP_NOT_SHOWN "
-                    "(bounded live-data miss: verification UI reached but width_vol strip never appeared)."
+                    "Scenario A collects `slice003_witness` (width_vol: candidate strip heading, History expander, "
+                    "Clear history) and `slice004_directional_witness` (directional strip heading) plus "
+                    "`workflow_hardening_slice003_closeout`. "
+                    "`evidence_plane_complete` is true when both witnesses are in an acceptable state: "
+                    "width_vol in (WITNESS_OK, DEGRADED_STRIP_NOT_SHOWN) AND directional in "
+                    "(WITNESS_OK, BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP). "
+                    "Scenario A produces width_vol conditions; directional strip is expected to be "
+                    "BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP (sanctioned bounded degraded path)."
                 ),
             },
         }
@@ -963,12 +1036,15 @@ def main() -> int:
 
         summary_path = RUN_DIR / "ui_smoke_summary.txt"
         _a = next((x for x in results if x.scenario == "A_width_target_payoff"), None)
-        _slice003_line = ""
+        _witness_lines = ""
         if _a is not None:
-            _slice003_line = (
+            _witness_lines = (
                 f"slice003_classification={_a.slice003_classification}\n"
-                f"slice003_evidence_plane_complete="
+                f"slice004_directional_classification={_a.slice004_directional_classification}\n"
+                f"evidence_plane_complete="
                 f"{str(wh_slice003_closeout['evidence_plane_complete']).lower()}\n"
+                f"width_vol_signal={wh_slice003_closeout.get('width_vol_signal', '')}\n"
+                f"directional_signal={wh_slice003_closeout.get('directional_signal', '')}\n"
             )
         summary_path.write_text(
             (
@@ -978,7 +1054,7 @@ def main() -> int:
                 f"page_loaded_ok={page_loaded_ok}\n"
                 f"main_texts_ok={main_ok}\n"
                 f"verification_ok={verification_ok}\n"
-                f"{_slice003_line}"
+                f"{_witness_lines}"
             ),
             encoding="utf-8",
         )

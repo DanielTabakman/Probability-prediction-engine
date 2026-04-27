@@ -67,6 +67,7 @@ def main() -> int:
 
     screenshot_path: str | None = None
     slice003_summary = "(n/a)"
+    slice004_summary = "(n/a)"
     witness_shot: str | None = None
     if manifest_path is not None and manifest_path.is_file():
         try:
@@ -80,18 +81,25 @@ def main() -> int:
                 witness_shot = w.get("witness_screenshot_path") or None
                 slice003_summary = (
                     f"classification={w.get('classification')} "
-                    f"signal={close.get('workflow_hardening_slice003_signal')} "
+                    f"signal={close.get('width_vol_signal')} "
                     f"evidence_plane_complete={close.get('evidence_plane_complete')}"
+                )
+                wd = row.get("slice004_directional_witness") or {}
+                slice004_summary = (
+                    f"classification={wd.get('classification')} "
+                    f"signal={close.get('directional_signal')}"
                 )
                 break
         except Exception:
             screenshot_path = None
             slice003_summary = "(manifest parse error)"
+            slice004_summary = "(manifest parse error)"
 
     print(f"Exit code: {code}")
     print(f"Manifest path: {manifest_path if manifest_path and manifest_path.is_file() else '(unknown)'}")
     print(f"Screenshot path: {screenshot_path if screenshot_path else '(unknown)'}")
     print(f"Slice003 witness summary: {slice003_summary}")
+    print(f"Slice004 directional witness summary: {slice004_summary}")
     print(f"Slice003 witness screenshot: {witness_shot if witness_shot else '(none)'}")
     return code
 

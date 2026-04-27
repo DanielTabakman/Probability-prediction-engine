@@ -69,6 +69,43 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
     return lines
 
 
+def _build_trust_artifact_md(market_implied: dict[str, Any]) -> str:
+    """Shared helper: trust/artifact note for candidate strip payloads."""
+    if market_implied.get("breeden_litzenberger") == "skipped":
+        sr = market_implied.get("skip_reason")
+        return (
+            "**Trust / artifact note:** Market-implied density (orange) was **skipped** by the same marks gate "
+            "as the chart engine. "
+            + (
+                str(sr).strip()
+                if isinstance(sr, str) and sr.strip()
+                else "Market-implied curve not computed (marks gate); the orange curve may be absent."
+            )
+            + " Cross-check **Verification** → Distribution for call-mark count and skip reason."
+        )
+    call_n = market_implied.get("call_marks_count")
+    call_n_txt = f"{int(call_n)}" if isinstance(call_n, int) else "the reported"
+    return (
+        "**Trust / artifact note:** Uses the current marks snapshot + Breeden–Litzenberger market-implied density "
+        f"(orange; computed from {call_n_txt} call marks when available). "
+        "Sparse strikes / wide bid–ask / stale quotes can shift the inferred peak and apparent width. "
+        "Cross-check **Trust / provenance** and expand **Verification** for call-mark count, cache notes, and trace paths."
+    )
+
+
+def _build_expression_families_md(strategy_families: list[Any]) -> str:
+    """Shared helper: expression families line for candidate strip payloads."""
+    labels: list[str] = []
+    for fam in strategy_families[:3]:
+        if isinstance(fam, dict):
+            lab = str(fam.get("label") or "").strip()
+            if lab:
+                labels.append(lab)
+    return "**Expression families (fit-scope only):** " + (
+        " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
+    )
+
+
 def build_width_vol_candidate_strip_payload(
     verification: dict[str, Any] | None,
 ) -> dict[str, Any] | None:
@@ -105,43 +142,81 @@ def build_width_vol_candidate_strip_payload(
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
-    if mi.get("breeden_litzenberger") == "skipped":
-        sr = mi.get("skip_reason")
-        trust_md = (
-            "**Trust / artifact note:** Market-implied density (orange) was **skipped** by the same marks gate "
-            "as the chart engine. "
-            + (
-                str(sr).strip()
-                if isinstance(sr, str) and sr.strip()
-                else "Market-implied curve not computed (marks gate); the orange curve may be absent."
-            )
-            + " Cross-check **Verification** → Distribution for call-mark count and skip reason."
-        )
-    else:
-        call_n = mi.get("call_marks_count")
-        call_n_txt = f"{int(call_n)}" if isinstance(call_n, int) else "the reported"
-        trust_md = (
-            "**Trust / artifact note:** Uses the current marks snapshot + Breeden–Litzenberger market-implied density "
-            f"(orange; computed from {call_n_txt} call marks when available). "
-            "Sparse strikes / wide bid–ask / stale quotes can shift the inferred peak and apparent width. "
-            "Cross-check **Trust / provenance** and expand **Verification** for call-mark count, cache notes, and trace paths."
-        )
+    trust_md = _build_trust_artifact_md(mi)
 
     fams = bd.get("strategy_families") or []
-    labels: list[str] = []
-    for fam in fams[:3]:
-        if isinstance(fam, dict):
-            lab = str(fam.get("label") or "").strip()
-            if lab:
-                labels.append(lab)
-    expr_md = "**Expression families (fit-scope only):** " + (
-        " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
-    )
+    expr_md = _build_expression_families_md(fams)
 
     falsification_md = (
         "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
         "if the trace no longer shows **peak_aligned**, or the trace width band becomes **similar**, the category "
         "should move out of **width_vol** under the *same* rules. Audit via **Verification** → "
+        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
+    )
+
+    return {
+        "anomaly_md": anomaly_md,
+        "why_md": why_md,
+        "confidence_md": confidence_md,
+        "trust_artifact_md": trust_md,
+        "expression_families_md": expr_md,
+        "falsification_md": falsification_md,
+    }
+
+
+def build_directional_candidate_strip_payload(
+    verification: dict[str, Any] | None,
+) -> dict[str, Any] | None:
+    """
+    Sprint 004 — compact, hypothesis-oriented strip fields for **directional** and **mixed**.
+
+    Gated on verification_summary.disagreement_category_id in ("directional", "mixed").
+    Mixed shares the location-shaped peak disagreement component.
+
+    Design note: separate builder from build_width_vol_candidate_strip_payload (symmetric
+    functions sharing _build_trust_artifact_md / _build_expression_families_md helpers)
+    rather than a single dispatch function — each category has distinct gate logic and copy;
+    the shared helpers eliminate the only true code duplication.
+    """
+    if not verification or not isinstance(verification, dict):
+        return None
+    vs = verification.get("verification_summary")
+    if not isinstance(vs, dict) or not vs:
+        return None
+    if vs.get("disagreement_category_id") not in ("directional", "mixed"):
+        return None
+    bd = verification.get("belief_disagreement")
+    if not isinstance(bd, dict) or not bd:
+        return None
+
+    trace = bd.get("classification_trace")
+    trace_d = trace if isinstance(trace, dict) else {}
+    sl = bd.get("summary_lines") or []
+    anomaly_md = str(sl[0]).strip() if sl else "**Disagreement type:** Location-shaped tension — hypothesis to inspect"
+    why_body = str(sl[2]).strip() if len(sl) > 2 else (
+        "Peak does not align with the market reference modal while σ_user is within "
+        "the width band at this horizon."
+    )
+    why_md = f"**Why flagged:** {why_body}"
+
+    shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
+    confidence_md = (
+        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
+        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not the "
+        "primary signal for the **directional** / **mixed** category (that comes from peak alignment × width band "
+        "in the trace). Audit: `belief_disagreement.classification_trace.delta_peak_usd` vs `peak_tolerance_usd`."
+    )
+
+    mi = (verification.get("density") or {}).get("market_implied") or {}
+    trust_md = _build_trust_artifact_md(mi)
+
+    fams = bd.get("strategy_families") or []
+    expr_md = _build_expression_families_md(fams)
+
+    falsification_md = (
+        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
+        "if the trace shows **peak_aligned = True**, the category moves out of **directional** / **mixed** "
+        "under the *same* rules. Audit via **Verification** → "
         "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
     )
 

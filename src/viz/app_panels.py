@@ -149,6 +149,19 @@ def render_width_vol_candidate_strip_payload(payload: dict) -> None:
         st.markdown(payload["falsification_md"])
 
 
+def render_directional_candidate_strip_payload(payload: dict) -> None:
+    """Sprint 004 — directional/mixed hypothesis strip (location-shaped tension)."""
+    with st.container(border=True):
+        st.markdown("##### Location-shaped tension — hypothesis to inspect")
+        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.markdown(payload["anomaly_md"])
+        st.markdown(payload["why_md"])
+        st.markdown(payload["confidence_md"])
+        st.markdown(payload["trust_artifact_md"])
+        st.markdown(payload["expression_families_md"])
+        st.markdown(payload["falsification_md"])
+
+
 def _width_vol_history_entry(*, verification: dict, selected_expiry_str: str) -> dict:
     """
     Sprint004-Slice003 (v0): session-local, width_vol-only appearance history.
@@ -229,6 +242,8 @@ def render_width_vol_history_panel(*, selected_expiry_str: str) -> None:
                 st.session_state[hist_key] = []
                 st.session_state[last_fp_key] = ""
                 st.rerun()
+
+        st.caption("*History scope: width-only (v0). Directional-history slated for a future slice.*")
 
         # Newest first; single-line entries to avoid UI bloat.
         for e in reversed(hist[-20:]):
