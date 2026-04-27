@@ -106,6 +106,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Single-plane passes**: each pass declares exactly one plane (CONTROL-PLANE / PRODUCT-PLANE / EVIDENCE-PLANE / RECOVERY).
 - **BUILD requires preflight**: if preflight says BUILD allowed: NO, BUILD is blocked even if steering is clear.
 - **No untracked canonical docs across accepted baselines**: `docs/SOP/**` must not linger untracked at a baseline that is treated as “accepted”.
+- **Authority pointer (live):** during the 2026-04-27 tiered-delegation soft-launch trial, live authority is canonical at `docs/SOP/CURRENT_FRONTIER.md` “Authority (tiered-delegation soft-launch — 2026-04-27 onward)”. Older steward-only language in `CODEX_AUTONOMY_V1.md` and `FRONTIER_STEWARD_PROTOCOL.md` is superseded for the trial.
 
 ## Active feature slice
 
