@@ -54,6 +54,12 @@ SLICE003_CANDIDATE_HEADING = "Candidate to inspect (width-shaped, v0)"
 SLICE003_HISTORY_SUMMARY = "History (this session)"
 SLICE003_STRIP_WAIT_S = 55.0
 
+# Manifest schema version — single source of truth.
+# Increment this constant when the closeout block structure changes.
+# docs/SOP/MANIFEST_SCHEMA.md must match; tests/test_manifest_schema_drift.py enforces alignment.
+MANIFEST_SCHEMA_VERSION = 2
+MANIFEST_SCHEMA_DOCS_REFERENCE = "docs/SOP/MANIFEST_SCHEMA.md"
+
 
 SCENARIOS = [
     "A_width_target_payoff",
@@ -841,7 +847,7 @@ def main() -> int:
             ra = next((x for x in rows if x.scenario == "A_width_target_payoff"), None)
             if ra is None:
                 return {
-                    "schema_version": 1,
+                    "schema_version": MANIFEST_SCHEMA_VERSION,
                     "primary_scenario_ran": False,
                     "evidence_plane_complete": False,
                     "workflow_hardening_slice003_signal": "NOT_APPLICABLE",
@@ -851,7 +857,7 @@ def main() -> int:
             bounded_live_miss = cls == "DEGRADED_STRIP_NOT_SHOWN"
             evidence_plane_complete = cls in ("WITNESS_OK", "DEGRADED_STRIP_NOT_SHOWN")
             return {
-                "schema_version": 1,
+                "schema_version": MANIFEST_SCHEMA_VERSION,
                 "primary_scenario_ran": True,
                 "evidence_plane_complete": bool(evidence_plane_complete),
                 "bounded_live_data_miss": bool(bounded_live_miss),
