@@ -109,13 +109,30 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 ## Active feature slice
 
-**`Workflow-Hardening-Slice-003` — CLOSED / shipped** on baseline (tip **`7ae6470a9c202998470ce093909613881b31286d`**). **`Sprint004-Slice003` — CHECKPOINTED / NOT CLOSED** — baseline product-of-record for closeout **`124a38f4b68a7a6a0ac88a14148cfd715aa93a1a`** (ancestor of baseline `HEAD`; common parent with the sibling `dc98a541...` branch tip). **Honest visual closeout** next. Next pending step: **PREFLIGHT** then **CLOSEOUT** for **Slice003** (upgraded sanctioned harness).
+**`Sprint004-Slice003` — BUILD-CLOSEOUT complete** on `build/sprint004-slice003-closeout-v1` @ code commit `27d60fd161e12e142284022dbb957d7ccd472657` (branch tip after ledger commit available via `git rev-parse build/sprint004-slice003-closeout-v1`). **AWAITING steward CONTROL-CLOSEOUT for promotion.** Evidence: pytest **121** passed; UI smoke **PASS** (`BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP`; `artifacts/ui_smoke/20260427_180931/ui_smoke_manifest.json`); `schema_version: 2` confirmed.
+
+**How to verify:**
+1. `git checkout build/sprint004-slice003-closeout-v1`
+2. `python -m pytest -q` → expect **121** passed (includes `tests/test_manifest_schema_drift.py`)
+3. `python scripts/run_implied_lab_ui_smoke.py` → expect **PASS**; check `schema_version` in manifest = **2**
+4. `git diff recovery/frontier-steward-v2_1-baseline build/sprint004-slice003-closeout-v1 --stat` → expect changes only in `scripts/implied_lab_ui_smoke_harness.py`, `tests/test_manifest_schema_drift.py`, `docs/SOP/MANIFEST_SCHEMA.md`, `docs/SOP/CODE_DOCS_DRIFT_POLICY_V1.md`, `docs/SOP/CURRENT_FRONTIER.md`, `docs/SOP/HANDOFF.md`, `docs/SOP/SPRINT_004_PHASE_2.md`
+
+**Files changed on build branch:**
+- `scripts/implied_lab_ui_smoke_harness.py` — added `MANIFEST_SCHEMA_VERSION = 2` + `MANIFEST_SCHEMA_DOCS_REFERENCE` constants; replaced both `"schema_version": 1` literals with `MANIFEST_SCHEMA_VERSION`
+- `tests/test_manifest_schema_drift.py` — new: drift detection test (imports constant; regex-parses doc; asserts equality)
+- `docs/SOP/MANIFEST_SCHEMA.md` — new: canonical schema doc (v2; closeout block + witness row; version history)
+- `docs/SOP/CODE_DOCS_DRIFT_POLICY_V1.md` — new: advisory drift policy SOP
+- `docs/SOP/CURRENT_FRONTIER.md` — ledger entry appended (BUILD-CLOSEOUT)
+- `docs/SOP/HANDOFF.md` — this update
+- `docs/SOP/SPRINT_004_PHASE_2.md` — Slice003 §6.A/§6.B rows updated to BUILD-CLOSEOUT state
+
+**Steward CONTROL-CLOSEOUT required** to promote `build/sprint004-slice003-closeout-v1` to `recovery/frontier-steward-v2_1-baseline`. Do NOT change Slice003 from CHECKPOINTED to CLOSED without steward CONTROL-CLOSEOUT.
 
 **Prior closeout (context — not reopened):** **`Workflow-Hardening-Slice-001`** **CLOSED / shipped** (2026-04-21). Evidence: **Completed recently** in `docs/SOP/CURRENT_FRONTIER.md` + `docs/SOP/SPRINT_003_PHASE_2.md` §9.
 
 **Sprint 003 posture (unchanged):** **Evidence-plane only**; Sprint003-Slice001 **CLOSED / shipped**; §6.B candidates **deferred** per `SPRINT_003_PHASE_2.md` §3 rule 2. **Sprint 002** **wrapped**; **Sprint 001** **wrapped**.
 
-Next = **PREFLIGHT** then **Slice003 closeout attempt** (sanctioned harness; WH-003 **shipped**).
+Next = steward **CONTROL-CLOSEOUT** for **Slice003** (promote `build/sprint004-slice003-closeout-v1` → `recovery/frontier-steward-v2_1-baseline`).
 
 ## Current status
 
@@ -138,7 +155,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **PREFLIGHT** then **honest `Sprint004-Slice003` closeout attempt** (upgraded sanctioned harness; `docs/SOP/SPRINT_004_PHASE_2.md` §6; `docs/SOP/CURRENT_FRONTIER.md`).
+- next task: **steward CONTROL-CLOSEOUT** — promote `build/sprint004-slice003-closeout-v1` → `recovery/frontier-steward-v2_1-baseline`; update Slice003 from CHECKPOINTED to CLOSED in canonical docs; verify `python -m pytest -q` → **121** passed on promoted baseline.
 - deferred: **Sprint003-Slice002/Slice003 candidates** (`docs/SOP/SPRINT_003_PHASE_2.md` §6.B) — not selected; fresh pilot evidence required for any future SELECTION under Sprint 003.
 - deferred: **Sprint 002 §6.C** batch candidates — remain **deferred map only**.
 - deferred: next Sprint 004 follow-on slice — pending explicit steward selection.
