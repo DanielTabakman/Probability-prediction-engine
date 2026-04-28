@@ -570,6 +570,10 @@ def _build_parser() -> argparse.ArgumentParser:
     pp.add_argument("--sus-minutes", type=int, default=15)
     pp.add_argument("--hard-minutes", type=int, default=30)
 
+    st = sub.add_parser("self-test", help="Run a fast relay/orchestrator self-test without LLM worker.")
+    st.add_argument("--baseline-branch", default="main")
+    st.add_argument("--declared-plane", default="PRODUCT-PLANE", choices=["PRODUCT-PLANE", "EVIDENCE-PLANE"])
+
     return p
 
 
@@ -601,6 +605,75 @@ def main(argv: Optional[list[str]] = None) -> int:
         if result["status"] == "BLOCKED":
             return 40
         return 2
+
+    if args.cmd == "self-test":
+        # Stage a minimal run in an isolated worktree and write a synthetic relay_result.json,
+        # ensuring the relay decision engine works end-to-end without depending on agent tooling.
+        baseline_local = orch.ensure_local_baseline(str(args.baseline_branch))
+        build_branch = orch.ensure_unique_branch("build/orchestrator/selftest")
+        wt = orch.ensure_worktree(baseline_local=baseline_local, build_branch=build_branch)
+        # Minimal spec: reuse README as a placeholder document to satisfy "path exists".
+        # (The relay only checks existence; workers interpret the contents.)
+        placeholder_spec = "README.md"
+        run = SliceRun(
+            slice_id="Orchestrator-SelfTest",
+            sprint_spec_path=placeholder_spec,
+            declared_plane=str(args.declared_plane),
+            baseline_branch=baseline_local,
+            build_branch=build_branch,
+            retry_budget_max=2,
+        )
+        job = orch.relay_stage(run, repo_root=wt)
+        run_id = job["run_id"]
+        expected_rel = job["expected_relay_result_path"]
+        expected_path = (wt / expected_rel).resolve()
+        expected_path.parent.mkdir(parents=True, exist_ok=True)
+
+        payload = {
+            "protocol": "CODEX_AUTONOMY_V1",
+            "schema_version": "1",
+            "slice_id": run.slice_id,
+            "run_id": run_id,
+            "declared_plane": run.declared_plane,
+            "build_branch": run.build_branch,
+            "baseline_branch": run.baseline_branch,
+            "baseline_tip_before": "UNKNOWN",
+            "baseline_tip_after": "UNKNOWN",
+            "product_commit_sha": None,
+            "preflight": {
+                "build_allowed": True,
+                "tree_clean": True,
+                "untracked_canonical_docs": False,
+                "mixed_plane_dirty": False,
+                "blocker": None,
+            },
+            "retry_count": 0,
+            "retry_budget_max": 2,
+            "retry_budget_exhausted": False,
+            "tests": {
+                "pytest_status": "NOT_RUN",
+                "pytest_count": 0,
+                "ui_smoke_primary_status": "NOT_RUN",
+                "ui_smoke_conditional_status": "NOT_REQUIRED",
+                "ui_inspection_evidence_present": False,
+                "validation_classification": "deterministic",
+            },
+            "tree_cleanliness": {
+                "build_branch_clean": True,
+                "mixed_plane_residue": False,
+                "untracked_canonical_docs": False,
+            },
+            "promotion": {"attempted": False, "performed": False, "method": None, "ancestor_check_pass": False},
+            "stop_condition": "SCOPE_AMBIGUITY",
+            "ready_for_control_closeout": False,
+            "safe_to_continue": False,
+            "artifacts": {"ui_smoke_manifest": None, "ui_smoke_screenshot": None, "run_log": None},
+            "notes": "self-test synthetic payload",
+        }
+        expected_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+        code, text = orch.relay_resume(repo_root=wt)
+        print(text)
+        return code
 
     if args.cmd == "run-phase":
         budgets = TimeBudget(sus_seconds=int(args.sus_minutes) * 60, hard_seconds=int(args.hard_minutes) * 60)
