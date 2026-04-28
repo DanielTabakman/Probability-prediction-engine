@@ -110,7 +110,11 @@ class Orchestrator:
         _write_json(self.state_path, state)
 
     def relay_stage(self, run: SliceRun) -> dict[str, Any]:
-        # If the relay is sitting in a terminal state from a prior run, reset it.
+        # Ensure relay is idle. If a previous run is staged/in-flight, abort+reset.
+        run_state_path = self.repo_root / "artifacts" / "relay" / "state" / "run_state.json"
+        run_state = _read_json(run_state_path, default={})
+        if isinstance(run_state, dict) and run_state.get("status") not in (None, "idle"):
+            _run([sys.executable, "scripts/relay_runtime_v0.py", "abort"], cwd=self.repo_root)
         _run([sys.executable, "scripts/relay_runtime_v0.py", "reset"], cwd=self.repo_root)
 
         cmd = [
