@@ -378,6 +378,73 @@ class Orchestrator:
             self.save_state({"status": "unexpected_relay_exit", "exit": code, "text": text})
             return {"status": "STOP_FOR_REVIEW", "reason": f"unexpected relay exit {code}", "detail": text}
 
+    def run_phase(
+        self,
+        plan_path: str,
+        budgets: TimeBudget,
+        worker_mode: str,
+    ) -> dict[str, Any]:
+        """Run a phase plan (sequential slices) until stop or completion.
+
+        Plan file format (JSON):
+          {
+            "phase_id": "phase_20260428_demo",
+            "baseline_branch": "main" | "origin/main",
+            "declared_plane": "PRODUCT-PLANE" | "EVIDENCE-PLANE",
+            "slices": [
+              {
+                "slice_id": "...",
+                "sprint_spec_path": "artifacts/phase_runs/.../slices/slice_001.md",
+                "build_branch": "build/auto/...",
+                "retry_budget_max": 2
+              }
+            ]
+          }
+        """
+        abs_path = (self.repo_root / plan_path).resolve()
+        plan = _read_json(abs_path)
+        if not isinstance(plan, dict):
+            raise RuntimeError(f"phase plan is not valid JSON: {plan_path}")
+        phase_id = str(plan.get("phase_id") or abs_path.stem)
+        baseline = str(plan.get("baseline_branch") or "main")
+        plane = str(plan.get("declared_plane") or "PRODUCT-PLANE")
+        slices = plan.get("slices")
+        if plane not in ("PRODUCT-PLANE", "EVIDENCE-PLANE"):
+            raise RuntimeError(f"plan declared_plane invalid: {plane!r}")
+        if not isinstance(slices, list) or not slices:
+            raise RuntimeError("plan.slices must be a non-empty list")
+
+        results: list[dict[str, Any]] = []
+        for idx, s in enumerate(slices, start=1):
+            if not isinstance(s, dict):
+                raise RuntimeError(f"plan.slices[{idx}] must be an object")
+            run = SliceRun(
+                slice_id=str(s.get("slice_id") or f"slice_{idx:03d}"),
+                sprint_spec_path=str(s.get("sprint_spec_path") or ""),
+                declared_plane=plane,
+                baseline_branch=baseline,
+                build_branch=str(s.get("build_branch") or ""),
+                retry_budget_max=int(s.get("retry_budget_max") or 2),
+            )
+            if not run.sprint_spec_path or not run.build_branch:
+                raise RuntimeError(f"slice {run.slice_id!r} missing sprint_spec_path/build_branch")
+
+            self.save_state(
+                {
+                    "status": "phase_running",
+                    "phase_id": phase_id,
+                    "slice_index": idx,
+                    "slice_total": len(slices),
+                    "active_slice_id": run.slice_id,
+                }
+            )
+            r = self.run_slice(run=run, budgets=budgets, worker_mode=worker_mode)
+            results.append(r)
+            if r.get("status") != "CONTINUE":
+                return {"phase_id": phase_id, "status": "STOPPED", "results": results}
+
+        return {"phase_id": phase_id, "status": "COMPLETE", "results": results}
+
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Phase Orchestrator v0 (relay-gated).")
@@ -393,6 +460,12 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--sus-minutes", type=int, default=15)
     sp.add_argument("--hard-minutes", type=int, default=30)
     sp.add_argument("--retry-budget-max", type=int, default=2)
+
+    pp = sub.add_parser("run-phase", help="Run a phase plan (sequential slices) until stop.")
+    pp.add_argument("--plan-path", required=True, help="Path to phase plan JSON (usually under artifacts/).")
+    pp.add_argument("--worker-mode", default="cursor-agent", choices=["cursor-agent"])
+    pp.add_argument("--sus-minutes", type=int, default=15)
+    pp.add_argument("--hard-minutes", type=int, default=30)
 
     return p
 
@@ -425,6 +498,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         if result["status"] == "BLOCKED":
             return 40
         return 2
+
+    if args.cmd == "run-phase":
+        budgets = TimeBudget(sus_seconds=int(args.sus_minutes) * 60, hard_seconds=int(args.hard_minutes) * 60)
+        result = orch.run_phase(plan_path=args.plan_path, budgets=budgets, worker_mode=args.worker_mode)
+        print(json.dumps(result, indent=2))
+        if result["status"] == "COMPLETE":
+            return 0
+        return 20
 
     return 2
 
