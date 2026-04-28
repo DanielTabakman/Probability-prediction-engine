@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
 - Active phase sprint (BUILD): **Sprint 004 — Phase 2 Product (chartered, 2026-04-21)** — **Candidate Edge v1** — BTC-first mispricing discovery wedge (`docs/SOP/SPRINT_004_PHASE_2.md`) — **active Phase 2 product execution boundary**. **Parallel:** **Sprint 003 — Phase 2 (chartered narrow, 2026-04-20)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`) — **evidence-plane only**; **not** a product UX sprint; scope **unchanged** by Sprint 004. **Interleaved CONTROL-PLANE interlude `Workflow-Hardening-Slice-001` — CLOSED / shipped 2026-04-21** (advisory, non-gating).
 - Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Sprint003-Slice001** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; **first real relay-assisted slice**; Slice001 product-of-record **`e044f0fe16097da32ef7e472084e266fc5405740`**); **`Workflow-Hardening-Slice-001`** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; CONTROL-PLANE interlude; accepted baseline tip after promotion **`e876bfe455ba5d51057a177088e362e9aa8ce384`**); **Sprint004-Slice001** — **CLOSED / shipped** (2026-04-21 BUILD + CONTROL-CLOSEOUT; product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **`Workflow-Hardening-Slice-002` — CLOSED / shipped** (CONTROL-PLANE interlude; UI closeout gate assignment + sanctioned bounded capture); **`Workflow-Hardening-Slice-003` — CLOSED / shipped** (2026-04-22 CONTROL-PLANE PROMOTION; accepted baseline tip **`7ae6470a9c202998470ce093909613881b31286d`**; fast-forward from `build/wh-slice003-sanctioned-witness-v0`); **Sprint004-Slice002** — **CLOSED / shipped** (2026-04-22 BUILD + CONTROL-CLOSEOUT; product-of-record **`069d76f`**); **Sprint004-Slice003** — **CLOSED / shipped** (2026-04-27 CONTROL-CLOSEOUT under tiered-delegation soft-launch; product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**)
-- Current execution focus: **`WH-Slice-005` — protocol trial lifecycle docs (BUILD)** (protocol trial lifecycle + ledger docs)
+- Current execution focus: **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`)
 - **`Sprint004-Slice003`** is **CLOSED / shipped** on baseline @ **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; stale `exec/sprint004-slice003-history-v0` deleted at promotion (sibling tip `dc98a541...` superseded; no unique product work lost)
-- Next pending execution step: **BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs)
+- Next pending execution step: **SELECTION — next Sprint 004 product slice** (or open a new sprint boundary if needed)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
@@ -78,7 +78,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 - **Sprint003-Slice001 — CLOSED / shipped (2026-04-21 CONTROL-CLOSEOUT; first real relay-assisted slice):** **`control_plane_consistency_check` placeholder-literal suppression** (`docs/SOP/SPRINT_003_PHASE_2.md` §7). Declared plane: **EVIDENCE-PLANE**. Slice001 product-of-record: **`e044f0fe16097da32ef7e472084e266fc5405740`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint003-slice001-placeholder-suppression`). Evidence: pytest **117** passed; post-build consistency report `artifacts/health/20260421_164325/control_plane_consistency_report.json` → `passed: true`, `findings: []`; relay result `artifacts/relay/runs/20260421_163438/relay_result.json` (`stop_condition == null`, `ready_for_control_closeout == true`, `safe_to_continue == true`, `promotion.method == "fast-forward"`); §15 decision `artifacts/relay/runs/20260421_163438/decision.json` → **`CONTINUE`** (`rule_matched == "15.2 rule 7"`). BUILD diff was evidence-plane only (`scripts/relay_runtime_v0.py`, `tests/test_relay_runtime_v0.py`) — zero writes under `docs/SOP/**`, `docs/CONTROL_PLANE/**`, `src/viz/**`, or `orchestrator/`.
 - **Interleaved CONTROL-PLANE interlude `Workflow-Hardening-Slice-001` — CLOSED / shipped (2026-04-21 CONTROL-CLOSEOUT; advisory, non-gating):** **Timing/context audit canonization + Cursor context-budget advisory + threshold bands.** Spec: `docs/SOP/CURRENT_FRONTIER.md` "Current feature slice". Cross-ref: `docs/SOP/SPRINT_003_PHASE_2.md` §6.A note + §9 ledger (CLOSED). Three CONTROL-PLANE outputs shipped: new `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` (canonical audit + NORMAL / WATCH / ESCALATE bands + advisory actions + explicit advisory-not-gating clause); new `.cursor/rules/context-budget.mdc` (advisory, on-demand load; not a gate); +15-line LOAD-ALWAYS / LOAD-ON-DEMAND subsection in `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` (inside the ≤~20-line budget from the slice spec). Accepted baseline tip after promotion: **`e876bfe455ba5d51057a177088e362e9aa8ce384`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/workflow-hardening-slice-001`; pre-promotion tip `e044f0fe16097da32ef7e472084e266fc5405740`). **Not routed through the relay runtime** (CONTROL-PLANE BUILD; no `run_selected_slice_v1` invocation). Evidence: pytest **117** passed (no regressions; slice touches no runtime code); post-build functional witness `artifacts/health/20260421_175320/control_plane_consistency_report.json` → `passed: true`, `findings: []` (forward-reference warnings for the canonical audit doc cleared). Zero writes under `src/**`, `scripts/**`, `tests/**`, `orchestrator/`, or to `CODEX_AUTONOMY_V1.md` / `JOB_REGISTRY_V1.md` / `RELAY_RUNTIME_V0.md`.
 - **No further Sprint 003 evidence-plane slice selected.** §6.B candidates (Sprint003-Slice002 / Sprint003-Slice003) remain **deferred**, gated on fresh pilot evidence per `SPRINT_003_PHASE_2.md` §3 rule 2.
-- **Next execution step:** **BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs).
+- **Next execution step:** **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`).
 
 **Execution posture (Sprint 002 — WRAPPED, 2026-04-18):**
 - **Sprint002-Slice001** — **CLOSED / shipped** (product **`ff40b48`**); evidence: `CURRENT_FRONTIER.md` **Steering continuity** + **Completed recently**.
@@ -113,7 +113,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 **`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** [combined with **WH-Slice-004** + **worktree-rule canonization**] — **CLOSED / shipped** (2026-04-28 CONTROL-CLOSEOUT; promoted baseline tip **`31ff3df2f5ed9adb30a54e4ff7f58b2052f60332`**). Evidence on promoted baseline: pytest **127 passed**; UI smoke **PASS** (`schema_version: 3`; `evidence_plane_complete: true`).
 
-**Next pending execution step:** **BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs).
+**Next pending execution step:** **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`).
 
 **Just shipped (do not reopen):** **`Sprint004-Slice003` — Candidate event logging / history foundation (v0)** — **CLOSED / shipped** (2026-04-27 **CONTROL-CLOSEOUT under tiered-delegation soft-launch**). Product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`** on `recovery/frontier-steward-v2_1-baseline` (fast-forward from `build/sprint004-slice003-closeout-v1`; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**). **Stale exec branch** `exec/sprint004-slice003-history-v0` (sibling tip `dc98a541...`) deleted at promotion — no unique product work lost. **Closeout validation re-verified:** `python -m pytest -q` → **121** passed; `python scripts/run_implied_lab_ui_smoke.py` → **PASS** (signal `BOUNDED_LIVE_DATA_NO_WIDTH_VOL_STRIP`; `artifacts/ui_smoke/20260427_180931/ui_smoke_manifest.json`; `schema_version: 2`). **Schema-drift fold-in shipped on baseline:** `MANIFEST_SCHEMA_VERSION` constant in `scripts/implied_lab_ui_smoke_harness.py`; canonical `docs/SOP/MANIFEST_SCHEMA.md`; assertion test `tests/test_manifest_schema_drift.py`; advisory `docs/SOP/CODE_DOCS_DRIFT_POLICY_V1.md`.
 
@@ -123,7 +123,7 @@ This repo can appear “aligned” in docs while still being **operationally uns
 
 **Sprint 003 posture (unchanged):** **Evidence-plane only**; Sprint003-Slice001 **CLOSED / shipped**; §6.B candidates **deferred** per `SPRINT_003_PHASE_2.md` §3 rule 2. **Sprint 002** **wrapped**; **Sprint 001** **wrapped**.
 
-Next = **BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs).
+Next = **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`).
 
 ## Current status
 
@@ -146,7 +146,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Remaining
 
-- next task: **BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs).
+- next task: **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`).
 - deferred: **Sprint003-Slice002/Slice003 candidates** (`docs/SOP/SPRINT_003_PHASE_2.md` §6.B) — not selected; fresh pilot evidence required for any future SELECTION under Sprint 003.
 - deferred: **Sprint 002 §6.C** batch candidates — remain **deferred map only**.
 - deferred: next Sprint 004 follow-on slice — pending explicit steward selection.
@@ -189,7 +189,7 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 
 ## Recommended next step
 
-**BUILD — `WH-Slice-005`** (protocol trial lifecycle + ledger docs).
+**SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`).
 
 ## Handoff checklist (must be filled each handoff)
 
@@ -198,8 +198,8 @@ See `docs/SOP/CURRENT_FRONTIER.md` **Completed recently** for the authoritative 
 - **Active phase**: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
 - **Active sprint (product boundary)**: **Sprint 004 — Phase 2 Product — Candidate Edge v1** (`docs/SOP/SPRINT_004_PHASE_2.md`). **Parallel (evidence-plane only):** **Sprint 003 — Phase 2 (chartered narrow)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`) — scope **unchanged**. **Interleaved CONTROL-PLANE interlude (2026-04-21): `Workflow-Hardening-Slice-001` — CLOSED / shipped** (advisory, non-gating).
 - **Closed slices (Sprint 001)**: 005–011 (wrap **outcome B**; no Slice 012). **Sprint002-Slice001** — **closed/shipped** (product **`ff40b48`**). **Sprint002-Slice002** — **closed/shipped** (product **`bd12b7c`**). **Sprint002-Slice003** — **closed/shipped** (product **`6e5f563`**). **Sprint002-Slice004** — **closed/shipped** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12). **Sprint003-Slice001** — **closed/shipped** (Slice001 product-of-record **`e044f0fe16097da32ef7e472084e266fc5405740`**; first real relay-assisted slice). **`Workflow-Hardening-Slice-001`** — **closed/shipped** (accepted baseline tip **`e876bfe455ba5d51057a177088e362e9aa8ce384`**; CONTROL-PLANE interlude).
-- **Current execution focus**: **`WH-Slice-005` — protocol trial lifecycle docs (BUILD)**
-- **Next pending execution step**: **BUILD — `WH-Slice-005`**
+- **Current execution focus**: **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`)
+- **Next pending execution step**: **SELECTION — next Sprint 004 product slice**
 - **Reporting posture**: **SLIM MODE** and (if applicable) **REPO-SENSOR execution-only** (no extra analysis)
 - **Canonical truth rule**: confirm `CURRENT_FRONTIER` outranks `HANDOFF` if drift is detected (until reconciled)
 - **Non-canonical naming note**: confirm any **H1 / H1-01 / H1-02** shorthand is treated as **non-canonical legacy** unless explicitly reintroduced by accepted docs (prefer Phase/Sprint/Slice identifiers)
