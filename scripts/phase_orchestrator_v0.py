@@ -30,6 +30,7 @@ import shutil
 import subprocess
 import sys
 import time
+import secrets
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -200,6 +201,17 @@ class Orchestrator:
             raise RuntimeError(f"git worktree add failed: {err or out}".strip())
         return wt
 
+    def ensure_unique_branch(self, desired: str) -> str:
+        """If a branch already exists locally, append a short random suffix."""
+        desired = desired.strip()
+        if not desired:
+            raise RuntimeError("build_branch must be non-empty")
+        code, _, _ = _run(["git", "rev-parse", "--verify", "--quiet", f"refs/heads/{desired}"], cwd=self.repo_root)
+        if code != 0:
+            return desired
+        suffix = secrets.token_hex(2)
+        return f"{desired}-{suffix}"
+
     def spawn_worker_cursor_agent(self, prompt: str, cwd: Path) -> subprocess.Popen:
         """Best-effort worker launcher.
 
@@ -277,7 +289,7 @@ class Orchestrator:
             sprint_spec_path=run.sprint_spec_path,
             declared_plane=run.declared_plane,
             baseline_branch=baseline_local,
-            build_branch=run.build_branch,
+            build_branch=self.ensure_unique_branch(run.build_branch),
             retry_budget_max=run.retry_budget_max,
         )
 
