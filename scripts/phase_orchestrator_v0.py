@@ -111,16 +111,17 @@ class Orchestrator:
         _write_json(self.state_path, state)
 
     def relay_stage(self, run: SliceRun, repo_root: Path) -> dict[str, Any]:
+        relay_path = (self.repo_root / "scripts" / "relay_runtime_v0.py").resolve()
         # Ensure relay is idle. If a previous run is staged/in-flight, abort+reset.
         run_state_path = repo_root / "artifacts" / "relay" / "state" / "run_state.json"
         run_state = _read_json(run_state_path, default={})
         if isinstance(run_state, dict) and run_state.get("status") not in (None, "idle"):
-            _run([sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "abort"], cwd=repo_root)
-        _run([sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "reset"], cwd=repo_root)
+            _run([sys.executable, str(relay_path), "--repo-root", str(repo_root), "abort"], cwd=self.repo_root)
+        _run([sys.executable, str(relay_path), "--repo-root", str(repo_root), "reset"], cwd=self.repo_root)
 
         cmd = [
             sys.executable,
-            "scripts/relay_runtime_v0.py",
+            str(relay_path),
             "--repo-root",
             str(repo_root),
             "stage",
@@ -138,7 +139,7 @@ class Orchestrator:
             "--retry-budget-max",
             str(run.retry_budget_max),
         ]
-        code, out, err = _run(cmd, cwd=repo_root)
+        code, out, err = _run(cmd, cwd=self.repo_root)
         if code != 0:
             raise RuntimeError(f"relay stage failed (exit={code}): {err or out}".strip())
 
@@ -148,8 +149,9 @@ class Orchestrator:
         return current_job
 
     def relay_resume(self, repo_root: Path) -> tuple[int, str]:
-        cmd = [sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "resume"]
-        code, out, err = _run(cmd, cwd=repo_root)
+        relay_path = (self.repo_root / "scripts" / "relay_runtime_v0.py").resolve()
+        cmd = [sys.executable, str(relay_path), "--repo-root", str(repo_root), "resume"]
+        code, out, err = _run(cmd, cwd=self.repo_root)
         text = (out or "") + (err or "")
         return int(code), text.strip()
 
