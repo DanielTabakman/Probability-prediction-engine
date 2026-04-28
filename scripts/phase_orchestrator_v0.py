@@ -26,6 +26,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -174,14 +175,28 @@ class Orchestrator:
         NOTE: Cursor Windows `cursor agent` currently appears interactive; flags like -p are not exposed.
         We still launch it and feed the prompt on stdin. If Cursor ignores stdin, the run will time out.
         """
-        proc = subprocess.Popen(
-            ["cursor", "agent"],
-            cwd=str(cwd),
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-        )
+        exe = shutil.which("cursor") or shutil.which("cursor.cmd") or "cursor"
+        # On Windows, `cursor` is often a .cmd shim; that requires `shell=True`.
+        if str(exe).lower().endswith(".cmd"):
+            cmd: Any = f"\"{exe}\" agent"
+            proc = subprocess.Popen(
+                cmd,
+                cwd=str(cwd),
+                shell=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+        else:
+            proc = subprocess.Popen(
+                [exe, "agent"],
+                cwd=str(cwd),
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
         try:
             if proc.stdin:
                 proc.stdin.write(prompt + "\n")
