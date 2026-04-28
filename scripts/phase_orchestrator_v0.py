@@ -209,6 +209,33 @@ class Orchestrator:
             pass
         return proc
 
+    def spawn_worker_agent_cli(self, prompt: str, cwd: Path) -> subprocess.Popen:
+        """Spawn the dedicated Cursor CLI (`agent`) in non-interactive mode.
+
+        Requires prior `agent login` (or CURSOR_API_KEY / CURSOR_AUTH_TOKEN).
+        """
+        exe = shutil.which("agent") or "agent"
+        # `--trust` prevents workspace trust prompts in headless mode.
+        # `--force` allows tool execution without interactive approvals.
+        cmd = [
+            exe,
+            "--print",
+            "--output-format",
+            "text",
+            "--trust",
+            "--force",
+            "--workspace",
+            str(cwd),
+            prompt,
+        ]
+        return subprocess.Popen(
+            cmd,
+            cwd=str(cwd),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+
     def run_slice(
         self,
         run: SliceRun,
@@ -266,6 +293,8 @@ class Orchestrator:
 
             if worker_mode == "cursor-agent":
                 proc = self.spawn_worker_cursor_agent(prompt=prompt, cwd=self.repo_root)
+            elif worker_mode == "agent-cli":
+                proc = self.spawn_worker_agent_cli(prompt=prompt, cwd=self.repo_root)
             else:
                 raise RuntimeError(f"unknown worker_mode {worker_mode!r}")
 
@@ -456,14 +485,14 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--declared-plane", required=True, choices=["PRODUCT-PLANE", "EVIDENCE-PLANE"])
     sp.add_argument("--baseline-branch", required=True, help="Local branch or origin/<branch>.")
     sp.add_argument("--build-branch", required=True)
-    sp.add_argument("--worker-mode", default="cursor-agent", choices=["cursor-agent"])
+    sp.add_argument("--worker-mode", default="agent-cli", choices=["agent-cli", "cursor-agent"])
     sp.add_argument("--sus-minutes", type=int, default=15)
     sp.add_argument("--hard-minutes", type=int, default=30)
     sp.add_argument("--retry-budget-max", type=int, default=2)
 
     pp = sub.add_parser("run-phase", help="Run a phase plan (sequential slices) until stop.")
     pp.add_argument("--plan-path", required=True, help="Path to phase plan JSON (usually under artifacts/).")
-    pp.add_argument("--worker-mode", default="cursor-agent", choices=["cursor-agent"])
+    pp.add_argument("--worker-mode", default="agent-cli", choices=["agent-cli", "cursor-agent"])
     pp.add_argument("--sus-minutes", type=int, default=15)
     pp.add_argument("--hard-minutes", type=int, default=30)
 
