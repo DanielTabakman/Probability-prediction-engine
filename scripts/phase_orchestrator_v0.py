@@ -101,6 +101,7 @@ class Orchestrator:
         self.repo_root = repo_root
         self.artifacts_root = repo_root / "artifacts" / "orchestrator"
         self.state_path = self.artifacts_root / "state.json"
+        self.worktrees_root = repo_root / "_worktrees" / "orchestrator"
 
     def load_state(self) -> dict[str, Any]:
         return _read_json(self.state_path, default={"status": "idle", "updated_at": None})
@@ -109,17 +110,19 @@ class Orchestrator:
         state["updated_at"] = _iso_now()
         _write_json(self.state_path, state)
 
-    def relay_stage(self, run: SliceRun) -> dict[str, Any]:
+    def relay_stage(self, run: SliceRun, repo_root: Path) -> dict[str, Any]:
         # Ensure relay is idle. If a previous run is staged/in-flight, abort+reset.
-        run_state_path = self.repo_root / "artifacts" / "relay" / "state" / "run_state.json"
+        run_state_path = repo_root / "artifacts" / "relay" / "state" / "run_state.json"
         run_state = _read_json(run_state_path, default={})
         if isinstance(run_state, dict) and run_state.get("status") not in (None, "idle"):
-            _run([sys.executable, "scripts/relay_runtime_v0.py", "abort"], cwd=self.repo_root)
-        _run([sys.executable, "scripts/relay_runtime_v0.py", "reset"], cwd=self.repo_root)
+            _run([sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "abort"], cwd=repo_root)
+        _run([sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "reset"], cwd=repo_root)
 
         cmd = [
             sys.executable,
             "scripts/relay_runtime_v0.py",
+            "--repo-root",
+            str(repo_root),
             "stage",
             "run_selected_slice_v1",
             "--slice-id",
@@ -135,18 +138,18 @@ class Orchestrator:
             "--retry-budget-max",
             str(run.retry_budget_max),
         ]
-        code, out, err = _run(cmd, cwd=self.repo_root)
+        code, out, err = _run(cmd, cwd=repo_root)
         if code != 0:
             raise RuntimeError(f"relay stage failed (exit={code}): {err or out}".strip())
 
-        current_job = _read_json(self.repo_root / "artifacts" / "relay" / "state" / "current_job.json")
+        current_job = _read_json(repo_root / "artifacts" / "relay" / "state" / "current_job.json")
         if not isinstance(current_job, dict) or not current_job.get("run_id"):
             raise RuntimeError("relay staged, but current_job.json missing or malformed")
         return current_job
 
-    def relay_resume(self) -> tuple[int, str]:
-        cmd = [sys.executable, "scripts/relay_runtime_v0.py", "resume"]
-        code, out, err = _run(cmd, cwd=self.repo_root)
+    def relay_resume(self, repo_root: Path) -> tuple[int, str]:
+        cmd = [sys.executable, "scripts/relay_runtime_v0.py", "--repo-root", str(repo_root), "resume"]
+        code, out, err = _run(cmd, cwd=repo_root)
         text = (out or "") + (err or "")
         return int(code), text.strip()
 
@@ -172,6 +175,28 @@ class Orchestrator:
         if code2 != 0:
             raise RuntimeError(f"could not create local baseline {local!r}: {err2}".strip())
         return local
+
+    def _worktree_path(self, build_branch: str) -> Path:
+        leaf = build_branch.split("/")[-1]
+        return (self.worktrees_root / leaf).resolve()
+
+    def ensure_worktree(self, baseline_local: str, build_branch: str) -> Path:
+        """Create (or reuse) a git worktree for the slice run.
+
+        This prevents worker runs from switching the operator's current checkout/branch.
+        """
+        wt = self._worktree_path(build_branch)
+        wt.parent.mkdir(parents=True, exist_ok=True)
+
+        if wt.exists():
+            return wt
+
+        # Create a new worktree with its own branch.
+        cmd = ["git", "worktree", "add", "-b", build_branch, str(wt), baseline_local]
+        code, out, err = _run(cmd, cwd=self.repo_root)
+        if code != 0:
+            raise RuntimeError(f"git worktree add failed: {err or out}".strip())
+        return wt
 
     def spawn_worker_cursor_agent(self, prompt: str, cwd: Path) -> subprocess.Popen:
         """Best-effort worker launcher.
@@ -255,10 +280,14 @@ class Orchestrator:
         )
 
         self.save_state({"status": "staging", "slice_id": run2.slice_id, "build_branch": run2.build_branch})
-        job = self.relay_stage(run2)
+
+        # Run the slice in an isolated worktree so worker tooling can't flip the operator checkout.
+        wt = self.ensure_worktree(baseline_local=baseline_local, build_branch=run2.build_branch)
+
+        job = self.relay_stage(run2, repo_root=wt)
         run_id = job["run_id"]
         expected_rel = job["expected_relay_result_path"]
-        expected_path = (self.repo_root / expected_rel).resolve()
+        expected_path = (wt / expected_rel).resolve()
 
         self.save_state(
             {
@@ -294,9 +323,9 @@ class Orchestrator:
             )
 
             if worker_mode == "cursor-agent":
-                proc = self.spawn_worker_cursor_agent(prompt=prompt, cwd=self.repo_root)
+                proc = self.spawn_worker_cursor_agent(prompt=prompt, cwd=wt)
             elif worker_mode == "agent-cli":
-                proc = self.spawn_worker_agent_cli(prompt=prompt, cwd=self.repo_root)
+                proc = self.spawn_worker_agent_cli(prompt=prompt, cwd=wt)
             else:
                 raise RuntimeError(f"unknown worker_mode {worker_mode!r}")
 
@@ -384,7 +413,7 @@ class Orchestrator:
 
             # Relay result exists: call resume (may be RETRY_ALLOWED and keep non-terminal).
             self.save_state({"status": "resuming", "run_id": run_id, "slice_id": run2.slice_id, "attempt": attempt})
-            code, text = self.relay_resume()
+            code, text = self.relay_resume(repo_root=wt)
 
             # Exit codes per relay: 0 CONTINUE, 10 RETRY_ALLOWED, 20 STOP_FOR_REVIEW, 40 BLOCKED.
             if code == 0:
