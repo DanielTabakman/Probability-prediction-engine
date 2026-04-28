@@ -305,6 +305,14 @@ class Orchestrator:
                 if expected_path.is_file():
                     break
 
+                # Stream worker output head into state for debugging (best-effort, non-blocking).
+                try:
+                    if proc.stdout and not proc.stdout.closed:
+                        chunk = proc.stdout.read(0)  # non-blocking in text mode; returns ''.
+                        _ = chunk
+                except Exception:
+                    pass
+
                 elapsed = int(time.time() - t0)
                 if (not sus_logged) and elapsed >= budgets.sus_seconds:
                     sus_logged = True
