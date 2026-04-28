@@ -53,6 +53,14 @@ Minimum acceptable practice:
 - Create a short-lived branch for the pass, do the work, then merge via normal review flow.
 - If you must inspect `main`, do read-only inspection; do not edit.
 
+## Concurrent-agent dispatch — worktree rule (operational; non-gating)
+
+Git's working tree is single-threaded per checkout: `HEAD`, the index, and untracked-file state are shared by every process operating in that directory. When a parent agent dispatches multiple BUILD or CONTROL-PLANE agents concurrently into the **same** working tree, their `git checkout`, `git commit`, and file-edit operations interleave and collide — commits land on each other's branches, untracked files appear in the wrong context, and recovery requires manual cherry-pick reconciliation.
+
+**Rule:** when dispatching multiple concurrent agents that touch git, give each agent its own working directory via `git worktree add <path> <branch>`. Sequential dispatch (one agent at a time in the main tree) is the safe fallback.
+
+Cross-reference: incident on 2026-04-27 — `Sprint004-Slice004` + `WH-Slice-004` + `WH-Slice-005` collision; recovered via cherry-pick on `build/sprint004-slice004-and-wh004-combined-recovery-v1`.
+
 ## Agent continuity (hard)
 
 When **live repo state exists**, the same agent must continue the pass. Live repo state includes:
