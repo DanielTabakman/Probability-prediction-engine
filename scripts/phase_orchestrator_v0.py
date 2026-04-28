@@ -1,0 +1,415 @@
+"""Phase Orchestrator v0 - spawn worker agents, enforce time budgets, gate via relay.
+
+This is intentionally small and mechanical:
+- The relay (`scripts/relay_runtime_v0.py`) is the hard gate (preflight, schema, decision policy).
+- This orchestrator spawns Cursor CLI workers and loops `resume` until terminal.
+- Time budgets:
+  - 15 minutes: "sus" threshold (surface for investigation)
+  - 30 minutes: hard cap (terminate worker, stop)
+
+The orchestrator is designed to be resumable via its own state file under artifacts/.
+
+Usage (single slice):
+  python scripts/phase_orchestrator_v0.py run-slice ^
+    --slice-id Sprint004-SliceXXX ^
+    --sprint-spec-path artifacts/phase_runs/demo/slices/slice_001.md ^
+    --declared-plane PRODUCT-PLANE ^
+    --baseline-branch main ^
+    --build-branch build/auto/sprint004-slicexxx ^
+    --worker-mode cursor-agent
+
+Phase mode is a thin loop over a generated plan file (see `init-phase`).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Optional
+
+
+REPO_ROOT_SENTINEL = "pyproject.toml"
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _repo_root(start: Path) -> Optional[Path]:
+    cur = start.resolve()
+    for _ in range(12):
+        if (cur / ".git").exists() and (cur / REPO_ROOT_SENTINEL).exists():
+            return cur
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    return None
+
+
+def _run(cmd: list[str], cwd: Path, timeout_s: Optional[int] = None) -> tuple[int, str, str]:
+    proc = subprocess.run(
+        cmd,
+        cwd=cwd,
+        text=True,
+        capture_output=True,
+        timeout=timeout_s,
+        check=False,
+    )
+    return int(proc.returncode), (proc.stdout or ""), (proc.stderr or "")
+
+
+def _read_json(path: Path, default: Any = None) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except FileNotFoundError:
+        return default
+    except json.JSONDecodeError:
+        return default
+
+
+def _write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=False), encoding="utf-8")
+
+
+@dataclass(frozen=True)
+class SliceRun:
+    slice_id: str
+    sprint_spec_path: str
+    declared_plane: str
+    baseline_branch: str
+    build_branch: str
+    retry_budget_max: int = 2
+
+
+@dataclass(frozen=True)
+class TimeBudget:
+    sus_seconds: int = 15 * 60
+    hard_seconds: int = 30 * 60
+
+
+class Orchestrator:
+    def __init__(self, repo_root: Path) -> None:
+        self.repo_root = repo_root
+        self.artifacts_root = repo_root / "artifacts" / "orchestrator"
+        self.state_path = self.artifacts_root / "state.json"
+
+    def load_state(self) -> dict[str, Any]:
+        return _read_json(self.state_path, default={"status": "idle", "updated_at": None})
+
+    def save_state(self, state: dict[str, Any]) -> None:
+        state["updated_at"] = _iso_now()
+        _write_json(self.state_path, state)
+
+    def relay_stage(self, run: SliceRun) -> dict[str, Any]:
+        # If the relay is sitting in a terminal state from a prior run, reset it.
+        _run([sys.executable, "scripts/relay_runtime_v0.py", "reset"], cwd=self.repo_root)
+
+        cmd = [
+            sys.executable,
+            "scripts/relay_runtime_v0.py",
+            "stage",
+            "run_selected_slice_v1",
+            "--slice-id",
+            run.slice_id,
+            "--sprint-spec-path",
+            run.sprint_spec_path,
+            "--declared-plane",
+            run.declared_plane,
+            "--baseline-branch",
+            run.baseline_branch,
+            "--build-branch",
+            run.build_branch,
+            "--retry-budget-max",
+            str(run.retry_budget_max),
+        ]
+        code, out, err = _run(cmd, cwd=self.repo_root)
+        if code != 0:
+            raise RuntimeError(f"relay stage failed (exit={code}): {err or out}".strip())
+
+        current_job = _read_json(self.repo_root / "artifacts" / "relay" / "state" / "current_job.json")
+        if not isinstance(current_job, dict) or not current_job.get("run_id"):
+            raise RuntimeError("relay staged, but current_job.json missing or malformed")
+        return current_job
+
+    def relay_resume(self) -> tuple[int, str]:
+        cmd = [sys.executable, "scripts/relay_runtime_v0.py", "resume"]
+        code, out, err = _run(cmd, cwd=self.repo_root)
+        text = (out or "") + (err or "")
+        return int(code), text.strip()
+
+    def ensure_local_baseline(self, baseline: str) -> str:
+        """Relay requires baseline_branch to exist as a local head.
+
+        If given an origin/* ref, ensure a local branch exists and return the local name.
+        """
+        b = baseline.strip()
+        if b.startswith("origin/"):
+            local = b.split("/", 1)[1]
+        else:
+            local = b
+
+        # Does local branch exist?
+        code, _, _ = _run(["git", "rev-parse", "--verify", "--quiet", f"refs/heads/{local}"], cwd=self.repo_root)
+        if code == 0:
+            return local
+
+        # Try to fetch and create a tracking branch.
+        _run(["git", "fetch", "origin", local], cwd=self.repo_root)
+        code2, _, err2 = _run(["git", "branch", "--track", local, f"origin/{local}"], cwd=self.repo_root)
+        if code2 != 0:
+            raise RuntimeError(f"could not create local baseline {local!r}: {err2}".strip())
+        return local
+
+    def spawn_worker_cursor_agent(self, prompt: str, cwd: Path) -> subprocess.Popen:
+        """Best-effort worker launcher.
+
+        NOTE: Cursor Windows `cursor agent` currently appears interactive; flags like -p are not exposed.
+        We still launch it and feed the prompt on stdin. If Cursor ignores stdin, the run will time out.
+        """
+        proc = subprocess.Popen(
+            ["cursor", "agent"],
+            cwd=str(cwd),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        try:
+            if proc.stdin:
+                proc.stdin.write(prompt + "\n")
+                proc.stdin.flush()
+        except OSError:
+            pass
+        return proc
+
+    def run_slice(
+        self,
+        run: SliceRun,
+        budgets: TimeBudget,
+        worker_mode: str,
+    ) -> dict[str, Any]:
+        baseline_local = self.ensure_local_baseline(run.baseline_branch)
+        run2 = SliceRun(
+            slice_id=run.slice_id,
+            sprint_spec_path=run.sprint_spec_path,
+            declared_plane=run.declared_plane,
+            baseline_branch=baseline_local,
+            build_branch=run.build_branch,
+            retry_budget_max=run.retry_budget_max,
+        )
+
+        self.save_state({"status": "staging", "slice_id": run2.slice_id, "build_branch": run2.build_branch})
+        job = self.relay_stage(run2)
+        run_id = job["run_id"]
+        expected_rel = job["expected_relay_result_path"]
+        expected_path = (self.repo_root / expected_rel).resolve()
+
+        self.save_state(
+            {
+                "status": "staged",
+                "run_id": run_id,
+                "slice_id": run2.slice_id,
+                "expected_relay_result_path": expected_rel,
+                "build_branch": run2.build_branch,
+                "attempt": 0,
+            }
+        )
+
+        prompt = (
+            "You are a worker agent executing exactly one slice under CODEX_AUTONOMY_V1 relay.\n\n"
+            f"Task envelope path: artifacts/relay/runs/{run_id}/task_envelope.json\n"
+            f"Expected relay result path (MUST write): {expected_rel}\n\n"
+            "Read the task envelope JSON and the referenced sprint spec, execute the slice, and write relay_result.json.\n"
+            "Then STOP.\n"
+        )
+
+        attempt = 0
+        while True:
+            attempt += 1
+            self.save_state(
+                {
+                    "status": "worker_running",
+                    "run_id": run_id,
+                    "slice_id": run2.slice_id,
+                    "attempt": attempt,
+                    "expected_relay_result_path": expected_rel,
+                    "started_at": _iso_now(),
+                }
+            )
+
+            if worker_mode == "cursor-agent":
+                proc = self.spawn_worker_cursor_agent(prompt=prompt, cwd=self.repo_root)
+            else:
+                raise RuntimeError(f"unknown worker_mode {worker_mode!r}")
+
+            # Wait for relay_result.json to appear, bounded by time budgets.
+            t0 = time.time()
+            sus_logged = False
+            while True:
+                if expected_path.is_file():
+                    break
+
+                elapsed = int(time.time() - t0)
+                if (not sus_logged) and elapsed >= budgets.sus_seconds:
+                    sus_logged = True
+                    self.save_state(
+                        {
+                            "status": "worker_sus_timeout",
+                            "run_id": run_id,
+                            "slice_id": run2.slice_id,
+                            "attempt": attempt,
+                            "elapsed_seconds": elapsed,
+                            "expected_relay_result_path": expected_rel,
+                            "note": "no relay_result.json yet; investigate",
+                        }
+                    )
+
+                if elapsed >= budgets.hard_seconds:
+                    try:
+                        proc.terminate()
+                    except OSError:
+                        pass
+                    self.save_state(
+                        {
+                            "status": "worker_hard_timeout",
+                            "run_id": run_id,
+                            "slice_id": run2.slice_id,
+                            "attempt": attempt,
+                            "elapsed_seconds": elapsed,
+                            "expected_relay_result_path": expected_rel,
+                        }
+                    )
+                    return {
+                        "status": "STOP_FOR_REVIEW",
+                        "reason": "worker hard timeout",
+                        "run_id": run_id,
+                        "slice_id": run2.slice_id,
+                        "attempt": attempt,
+                        "expected_relay_result_path": expected_rel,
+                    }
+
+                # If the worker exits early, stop waiting and surface output.
+                if proc.poll() is not None and not expected_path.is_file():
+                    out = ""
+                    try:
+                        if proc.stdout:
+                            out = proc.stdout.read()[:4000]
+                    except OSError:
+                        pass
+                    self.save_state(
+                        {
+                            "status": "worker_exited_no_result",
+                            "run_id": run_id,
+                            "slice_id": run2.slice_id,
+                            "attempt": attempt,
+                            "output_head": out,
+                        }
+                    )
+                    return {
+                        "status": "STOP_FOR_REVIEW",
+                        "reason": "worker exited without relay_result.json",
+                        "run_id": run_id,
+                        "slice_id": run2.slice_id,
+                        "attempt": attempt,
+                        "output_head": out,
+                    }
+
+                time.sleep(2)
+
+            # Relay result exists: call resume (may be RETRY_ALLOWED and keep non-terminal).
+            self.save_state({"status": "resuming", "run_id": run_id, "slice_id": run2.slice_id, "attempt": attempt})
+            code, text = self.relay_resume()
+
+            # Exit codes per relay: 0 CONTINUE, 10 RETRY_ALLOWED, 20 STOP_FOR_REVIEW, 40 BLOCKED.
+            if code == 0:
+                self.save_state({"status": "done_continue", "run_id": run_id, "slice_id": run2.slice_id})
+                return {"status": "CONTINUE", "run_id": run_id, "slice_id": run2.slice_id, "detail": text}
+            if code == 10:
+                # Auto-retry up to 2 total worker attempts (user request).
+                if attempt >= 2:
+                    self.save_state({"status": "stop_for_review_max_attempts", "run_id": run_id, "slice_id": run2.slice_id})
+                    return {
+                        "status": "STOP_FOR_REVIEW",
+                        "reason": "max orchestrator attempts reached after RETRY_ALLOWED",
+                        "run_id": run_id,
+                        "slice_id": run2.slice_id,
+                        "detail": text,
+                    }
+                # Remove the relay_result.json so the next attempt must produce a fresh one.
+                try:
+                    expected_path.unlink()
+                except OSError:
+                    pass
+                continue
+            if code == 20:
+                self.save_state({"status": "stop_for_review", "run_id": run_id, "slice_id": run2.slice_id})
+                return {"status": "STOP_FOR_REVIEW", "run_id": run_id, "slice_id": run2.slice_id, "detail": text}
+            if code == 40:
+                self.save_state({"status": "blocked", "run_id": run_id, "slice_id": run2.slice_id})
+                return {"status": "BLOCKED", "run_id": run_id, "slice_id": run2.slice_id, "detail": text}
+
+            self.save_state({"status": "unexpected_relay_exit", "exit": code, "text": text})
+            return {"status": "STOP_FOR_REVIEW", "reason": f"unexpected relay exit {code}", "detail": text}
+
+
+def _build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="Phase Orchestrator v0 (relay-gated).")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    sp = sub.add_parser("run-slice", help="Stage + run one slice through the relay.")
+    sp.add_argument("--slice-id", required=True)
+    sp.add_argument("--sprint-spec-path", required=True)
+    sp.add_argument("--declared-plane", required=True, choices=["PRODUCT-PLANE", "EVIDENCE-PLANE"])
+    sp.add_argument("--baseline-branch", required=True, help="Local branch or origin/<branch>.")
+    sp.add_argument("--build-branch", required=True)
+    sp.add_argument("--worker-mode", default="cursor-agent", choices=["cursor-agent"])
+    sp.add_argument("--sus-minutes", type=int, default=15)
+    sp.add_argument("--hard-minutes", type=int, default=30)
+    sp.add_argument("--retry-budget-max", type=int, default=2)
+
+    return p
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    args = _build_parser().parse_args(argv)
+    repo = _repo_root(Path.cwd()) or _repo_root(Path(__file__).resolve().parent.parent)
+    if repo is None:
+        print("ERROR: could not locate repo root.", file=sys.stderr)
+        return 2
+    orch = Orchestrator(repo)
+
+    if args.cmd == "run-slice":
+        run = SliceRun(
+            slice_id=args.slice_id,
+            sprint_spec_path=args.sprint_spec_path,
+            declared_plane=args.declared_plane,
+            baseline_branch=args.baseline_branch,
+            build_branch=args.build_branch,
+            retry_budget_max=int(args.retry_budget_max),
+        )
+        budgets = TimeBudget(sus_seconds=int(args.sus_minutes) * 60, hard_seconds=int(args.hard_minutes) * 60)
+        result = orch.run_slice(run=run, budgets=budgets, worker_mode=args.worker_mode)
+        print(json.dumps(result, indent=2))
+        # Map to relay-like exits for easy scripting.
+        if result["status"] == "CONTINUE":
+            return 0
+        if result["status"] == "STOP_FOR_REVIEW":
+            return 20
+        if result["status"] == "BLOCKED":
+            return 40
+        return 2
+
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

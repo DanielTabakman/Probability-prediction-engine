@@ -99,12 +99,15 @@ STATE_IDLE = "idle"
 STATE_STAGED_FOR_WORKER = "staged_for_worker"
 STATE_VALIDATING = "validating"
 STATE_DECIDING = "deciding"
+STATE_RETRY_WAITING = "retry_waiting"
 STATE_DECIDED_CONTINUE = "decided_continue"
 STATE_DECIDED_RETRY_ALLOWED = "decided_retry_allowed"
 STATE_DECIDED_STOP_FOR_REVIEW = "decided_stop_for_review"
 STATE_DECIDED_BLOCKED = "decided_blocked"
 STATE_ABORTED = "aborted"
-NON_TERMINAL_STATES = frozenset({STATE_IDLE, STATE_STAGED_FOR_WORKER, STATE_VALIDATING, STATE_DECIDING})
+NON_TERMINAL_STATES = frozenset(
+    {STATE_IDLE, STATE_STAGED_FOR_WORKER, STATE_VALIDATING, STATE_DECIDING, STATE_RETRY_WAITING}
+)
 TERMINAL_STATES = frozenset(
     {
         STATE_DECIDED_CONTINUE,
@@ -836,6 +839,7 @@ def dispatch_stage_slice(
             "slice_id": slice_id,
             "build_branch": build_branch,
             "baseline_branch": baseline_branch,
+            "attempt": 0,
         }
     )
     runtime.log_event(run_id, f"staged {slice_id} for worker on {build_branch}")
@@ -855,7 +859,7 @@ def dispatch_resume(runtime: Runtime) -> Tuple[int, str]:
     """Consume the staged slice's relay_result.json and apply section 15."""
 
     state = runtime.load_run_state()
-    if state["status"] != STATE_STAGED_FOR_WORKER:
+    if state["status"] not in (STATE_STAGED_FOR_WORKER, STATE_RETRY_WAITING):
         return (
             EXIT_REFUSAL,
             f"refusal: no slice staged (current status={state['status']})",
@@ -869,13 +873,17 @@ def dispatch_resume(runtime: Runtime) -> Tuple[int, str]:
             f"refusal: relay_result.json not found at {result_path}; worker has not finished",
         )
 
+    # Attempt counter (for durable attempt artifacts).
+    attempt = int(state.get("attempt") or 0) + 1
+
     # Transition to validating.
     state["status"] = STATE_VALIDATING
     runtime.save_run_state(state)
     runtime.log_event(run_id, "state=validating; loading relay_result.json")
 
     try:
-        payload = json.loads(result_path.read_text(encoding="utf-8-sig"))
+        raw_text = result_path.read_text(encoding="utf-8-sig")
+        payload = json.loads(raw_text)
     except json.JSONDecodeError as exc:
         # Malformed JSON -> BLOCKED.
         decision_record = {
@@ -890,6 +898,10 @@ def dispatch_resume(runtime: Runtime) -> Tuple[int, str]:
         _finalize_decision(runtime, state, decision_record)
         return DECISION_TO_EXIT[DECISION_BLOCKED], _format_decision(decision_record)
 
+    # Preserve the raw payload for this attempt (even if a later retry overwrites relay_result.json).
+    attempt_path = runtime.run_dir(run_id) / f"relay_result_attempt_{attempt}.json"
+    attempt_path.write_text(raw_text, encoding="utf-8")
+
     # Transition to deciding.
     state["status"] = STATE_DECIDING
     runtime.save_run_state(state)
@@ -898,6 +910,25 @@ def dispatch_resume(runtime: Runtime) -> Tuple[int, str]:
     dec = decide(payload)
     dec["generated_at"] = _iso_now()
     dec["run_id"] = run_id
+
+    # Persist attempt decision record.
+    _write_json(runtime.run_dir(run_id) / f"decision_attempt_{attempt}.json", dec)
+    _write_json(runtime.last_decision_path, dec)
+
+    if dec["decision"] == DECISION_RETRY_ALLOWED:
+        # Keep run non-terminal; allow an external orchestrator to re-run the worker.
+        state["status"] = STATE_RETRY_WAITING
+        state["attempt"] = attempt
+        state["last_decision"] = dec["decision"]
+        state["last_rule_matched"] = dec["rule_matched"]
+        runtime.save_run_state(state)
+        runtime.log_event(run_id, f"decision=RETRY_ALLOWED via {dec['rule_matched']}; awaiting worker retry")
+        msg = _format_decision(dec) + (
+            "\n\nretry: allowed. Re-run the worker for the same slice, then overwrite relay_result.json and run:\n"
+            "  python scripts/relay_runtime_v0.py resume"
+        )
+        return DECISION_TO_EXIT[dec["decision"]], msg
+
     _finalize_decision(runtime, state, dec)
     return DECISION_TO_EXIT[dec["decision"]], _format_decision(dec)
 
@@ -982,6 +1013,12 @@ def dispatch_reset(runtime: Runtime) -> Tuple[int, str]:
         )
     # Terminal -> idle.
     runtime.save_run_state({"status": STATE_IDLE, "run_id": None, "job": None})
+    # Best-effort: clear staged job pointer.
+    try:
+        if runtime.current_job_path.exists():
+            runtime.current_job_path.unlink()
+    except OSError:
+        pass
     return EXIT_CONTINUE, "reset to idle"
 
 
