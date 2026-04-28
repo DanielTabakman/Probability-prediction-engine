@@ -194,8 +194,10 @@ class Orchestrator:
         if wt.exists():
             return wt
 
-        # Create a new worktree with its own branch.
-        cmd = ["git", "worktree", "add", "-b", build_branch, str(wt), baseline_local]
+        # Create a new worktree checked out at the baseline branch.
+        # Do NOT create the build branch here: relay preflight requires that the build branch
+        # does not exist yet (the worker will create it).
+        cmd = ["git", "worktree", "add", str(wt), baseline_local]
         code, out, err = _run(cmd, cwd=self.repo_root)
         if code != 0:
             raise RuntimeError(f"git worktree add failed: {err or out}".strip())
