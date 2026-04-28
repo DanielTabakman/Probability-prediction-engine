@@ -286,6 +286,25 @@ class Orchestrator:
         # Run the slice in an isolated worktree so worker tooling can't flip the operator checkout.
         wt = self.ensure_worktree(baseline_local=baseline_local, build_branch=run2.build_branch)
 
+        # Ensure the sprint spec exists inside the worktree. If it only exists in the anchor,
+        # copy it into the worktree under artifacts so staging can reference it.
+        spec_in_wt = (wt / run2.sprint_spec_path).resolve()
+        if not spec_in_wt.is_file():
+            spec_in_anchor = (self.repo_root / run2.sprint_spec_path).resolve()
+            if spec_in_anchor.is_file():
+                imported_rel = Path("artifacts") / "orchestrator" / "imported_specs" / Path(run2.sprint_spec_path).name
+                imported_abs = (wt / imported_rel).resolve()
+                imported_abs.parent.mkdir(parents=True, exist_ok=True)
+                imported_abs.write_text(spec_in_anchor.read_text(encoding="utf-8-sig"), encoding="utf-8")
+                run2 = SliceRun(
+                    slice_id=run2.slice_id,
+                    sprint_spec_path=str(imported_rel).replace("\\", "/"),
+                    declared_plane=run2.declared_plane,
+                    baseline_branch=run2.baseline_branch,
+                    build_branch=run2.build_branch,
+                    retry_budget_max=run2.retry_budget_max,
+                )
+
         job = self.relay_stage(run2, repo_root=wt)
         run_id = job["run_id"]
         expected_rel = job["expected_relay_result_path"]
