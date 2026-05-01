@@ -30,6 +30,7 @@ build/
 # IDE / OS
 .idea/
 .vscode/
+!.vscode/tasks.json
 *.swp
 .DS_Store
 Thumbs.db
@@ -39,6 +40,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local recovery stash (kept out of canonical history)
+_recovery_stash/
 
 # Local relay/planner scaffolding (pre-Codex-Autonomy-v1 prototype).
 # Not canonical; see docs/SOP/CODEX_AUTONOMY_V1.md §§14-15 for the real contract.

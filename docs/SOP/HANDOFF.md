@@ -7,12 +7,13 @@ Purpose: minimum context needed for the next work session.
 Copy/paste and fill every field. Do not infer from memory; verify in repo/docs.
 
 ```text
-HANDOFF GATE — v2.1 (DOCS-ONLY control-plane)
+HANDOFF GATE — v3.0 (MVP1 control-plane)
 
 A) DOC-STATE SAFETY (alignment)
-- Source-of-truth precedence: pushed repo+accepted docs > CURRENT_FRONTIER > HANDOFF > OPERATING_RULES
-- Active phase: Phase 2 — Desirability / Playability / UX (`docs/SOP/PHASE_2_CHARTER.md`)
-- Active phase sprint (BUILD): **Sprint 004 — Phase 2 Product (chartered, 2026-04-21)** — **Candidate Edge v1** — BTC-first mispricing discovery wedge (`docs/SOP/SPRINT_004_PHASE_2.md`) — **active Phase 2 product execution boundary**. **Parallel:** **Sprint 003 — Phase 2 (chartered narrow, 2026-04-20)** — **Pilot-driven evidence-plane hardening (relay-assisted)** (`docs/SOP/SPRINT_003_PHASE_2.md`) — **evidence-plane only**; **not** a product UX sprint; scope **unchanged** by Sprint 004. **Interleaved CONTROL-PLANE interlude `Workflow-Hardening-Slice-001` — CLOSED / shipped 2026-04-21** (advisory, non-gating).
+- Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
+- Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
+- Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
+- Active MVP1 focus: finish Phase 1 (market + benchmark substrate) then proceed Phase 2 → Phase 3 in dependency order
 - Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Sprint003-Slice001** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; **first real relay-assisted slice**; Slice001 product-of-record **`e044f0fe16097da32ef7e472084e266fc5405740`**); **`Workflow-Hardening-Slice-001`** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; CONTROL-PLANE interlude; accepted baseline tip after promotion **`e876bfe455ba5d51057a177088e362e9aa8ce384`**); **Sprint004-Slice001** — **CLOSED / shipped** (2026-04-21 BUILD + CONTROL-CLOSEOUT; product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **`Workflow-Hardening-Slice-002` — CLOSED / shipped** (CONTROL-PLANE interlude; UI closeout gate assignment + sanctioned bounded capture); **`Workflow-Hardening-Slice-003` — CLOSED / shipped** (2026-04-22 CONTROL-PLANE PROMOTION; accepted baseline tip **`7ae6470a9c202998470ce093909613881b31286d`**; fast-forward from `build/wh-slice003-sanctioned-witness-v0`); **Sprint004-Slice002** — **CLOSED / shipped** (2026-04-22 BUILD + CONTROL-CLOSEOUT; product-of-record **`069d76f`**); **Sprint004-Slice003** — **CLOSED / shipped** (2026-04-27 CONTROL-CLOSEOUT under tiered-delegation soft-launch; product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**)
 - Current execution focus: **SELECTION — next Sprint 004 product slice** (post `Sprint004-Slice004`)
 - **`Sprint004-Slice003`** is **CLOSED / shipped** on baseline @ **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; stale `exec/sprint004-slice003-history-v0` deleted at promotion (sibling tip `dc98a541...` superseded; no unique product work lost)
