@@ -136,6 +136,61 @@ def render_trust_strip(verification: dict) -> None:
         st.caption("\n\n".join(lines))
 
 
+def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
+    """MVP1 Phase 1 — benchmark ID/version + widths at horizon + explicit trust/degraded state."""
+    v = verification if isinstance(verification, dict) else {}
+    block = v.get("mvp1_benchmark_substrate")
+    if not isinstance(block, dict):
+        return
+
+    def _fmt_sigma(x: object) -> str:
+        if isinstance(x, (int, float)):
+            xf = float(x)
+            if xf == xf:  # NaN check
+                return f"{xf:.4f}"
+        return "—"
+
+    bid = str(block.get("benchmark_id") or "—")
+    bver = str(block.get("benchmark_version") or "—")
+    T = block.get("horizon_years")
+    t_txt = f"{float(T):.4f}" if isinstance(T, (int, float)) else "—"
+    sm = _fmt_sigma(block.get("sigma_market_atm_ln"))
+    sb = _fmt_sigma(block.get("sigma_benchmark_ln"))
+    emp = block.get("empirical_market_implied_sigma_ln")
+    emp_st = str(block.get("empirical_status") or "")
+    trust = str(block.get("trust_state") or "").lower()
+    note = str(block.get("trust_state_note") or "").strip()
+
+    with st.container(border=True):
+        st.markdown("##### MVP1 benchmark substrate (Phase 1)")
+        st.caption(
+            "Explicit **benchmark identity** and **widths** on the same horizon **T** as the purple/orange curves "
+            "(selected expiry)."
+        )
+        st.markdown(f"**Benchmark:** `{bid}` **v{bver}**")
+        st.markdown(
+            f"**Horizon (yr):** {t_txt} · **Market width (ATM σ·√T):** `{sm}` · **Benchmark width (σ·√T):** `{sb}`"
+        )
+        bdef = block.get("benchmark_definition")
+        if isinstance(bdef, str) and bdef.strip():
+            st.caption(bdef.strip())
+
+        if emp_st == "computed" and isinstance(emp, (int, float)) and float(emp) == float(emp):
+            st.markdown(
+                "**Market-implied width (Breeden–Litzenberger σ on grid):** "
+                f"`{_fmt_sigma(emp)}`"
+            )
+        else:
+            reason = block.get("empirical_skip_reason")
+            rtxt = str(reason).strip() if isinstance(reason, str) else "Not computed for this run."
+            st.warning(f"**Empirical market-implied σ on grid:** unavailable — {rtxt}")
+
+        if trust == "degraded":
+            st.warning(f"**Trust state:** DEGRADED — {note}" if note else "**Trust state:** DEGRADED.")
+        elif note:
+            st.caption(f"**Trust state:** OK — {note}")
+
+
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""
     with st.container(border=True):

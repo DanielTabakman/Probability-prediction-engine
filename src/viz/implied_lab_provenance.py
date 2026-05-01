@@ -13,6 +13,7 @@ from src.viz.disagreement_thresholds import (
     L1_SHAPE_GAP_LOW_BELOW,
     L1_SHAPE_GAP_MODERATE_BELOW,
 )
+from src.viz.mvp1_benchmark_substrate import build_mvp1_benchmark_substrate
 
 # Display-only: trust strip pointer (Sprint 006). Kept static so we do not imply extra provenance.
 TRUST_STRIP_VERIFICATION_POINTER = (
@@ -54,6 +55,19 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
         lines.append(f"**Overlay basis:** {ob.strip()}")
     else:
         lines.append("**Overlay basis:** not reported for this run.")
+
+    mvp1 = verification.get("mvp1_benchmark_substrate")
+    if isinstance(mvp1, dict):
+        mid = str(mvp1.get("benchmark_id") or "").strip()
+        if mid:
+            mver = str(mvp1.get("benchmark_version") or "").strip()
+            ver_part = f" v{mver}" if mver else ""
+            lines.append(f"**MVP1 benchmark:** `{mid}`{ver_part}")
+            ts = str(mvp1.get("trust_state") or "").lower()
+            if ts == "degraded":
+                lines.append("**Trust state:** DEGRADED (see **MVP1 benchmark substrate** panel).")
+            elif ts == "ok":
+                lines.append("**Trust state:** OK for this horizon (see substrate panel for width detail).")
 
     sfs = vs.get("strategy_families_scope")
     if isinstance(sfs, str) and sfs.strip():
@@ -518,6 +532,12 @@ def build_verification_payload(
         lab_mode=lab_mode,
     )
 
+    mvp1_block = build_mvp1_benchmark_substrate(
+        market_data=market_data,
+        market_pdf_raw=market_pdf_raw,
+        call_marks=call_marks,
+    )
+
     return {
         "data_sources": data_sources,
         "as_of_utc": as_of_utc,
@@ -569,6 +589,7 @@ def build_verification_payload(
         "belief_disagreement_verification": build_belief_disagreement_verification_trace(
             belief_disagreement
         ),
+        "mvp1_benchmark_substrate": mvp1_block,
         "strategy_summary": {
             "applicable": applicable,
             "error": err,

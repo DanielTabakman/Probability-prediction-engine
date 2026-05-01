@@ -85,6 +85,7 @@ from src.viz.app_panels import (
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
+    render_mvp1_benchmark_substrate_panel as _render_mvp1_benchmark_substrate_panel,
     render_trust_strip as _render_trust_strip,
     render_width_vol_candidate_strip_payload as _render_width_vol_candidate_strip_payload,
     render_width_vol_history_panel as _render_width_vol_history_panel,
@@ -263,6 +264,7 @@ if show_bitcoin_view:
                         right_ticket_slot = st.empty()
                         right_anomaly_slot = st.empty()
                         right_forward_slot = st.empty()
+                        right_mvp1_substrate_slot = st.empty()
                         right_belief_slot = st.empty()
                         right_verification_slot = st.empty()
                     with col_controls:
@@ -1192,6 +1194,8 @@ if show_bitcoin_view:
                         st.plotly_chart(fig_dist, use_container_width=True)
 
                     right_forward_slot.caption(_fwd_cap)
+                    with right_mvp1_substrate_slot.container():
+                        _render_mvp1_benchmark_substrate_panel(outputs.get("verification") or {})
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
