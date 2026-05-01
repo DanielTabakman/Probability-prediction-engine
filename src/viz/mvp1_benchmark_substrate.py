@@ -1,11 +1,15 @@
 """
-MVP1 Phase 1–2 — market + benchmark substrate + ATM width-gap engine v1.
+MVP1 Phase 1–3 — market + benchmark substrate, ATM width-gap engine v1, and decision surface v0.
 
 Numerics stay free of Streamlit. Breeden–Litzenberger gate matches implied_lab_derive /
 build_verification_payload (len(call_marks) >= 3).
 
 Phase 2 adds G_abs / G_rel, materiality (v0 proxy floors), trust gate usable/degraded/invalid,
 and the required deterministic label set (see MVP1_PHASE1_3_SPRINT MVP1-Phase2-Slice001).
+
+Phase 3 adds primary_output_state (candidate / watch_only / no_trade), explanation, confidence tier,
+expression-family mapping, falsification, review horizon, and no-trade reasoning per
+PPE_MASTER_MVP1 §14 output-state precedence (see MVP1-Phase3-Slice001).
 """
 
 from __future__ import annotations
@@ -19,6 +23,183 @@ MVP1_BENCHMARK_VERSION = "1.0.0"
 
 # Phase 2 width-gap classifier (slice-owned; bump when labeling rules change).
 MVP1_WIDTH_GAP_CLASSIFIER_VERSION = "1.0.0"
+
+# Phase 3 decision surface (slice-owned; bump when precedence / copy rules change).
+MVP1_PHASE3_DECISION_VERSION = "1.0.0"
+# Materiality is satisfied at M_ratio >= 1.0; treat 1.0 ≤ ratio < this cap as "marginal" → watch_only.
+_MVP1_PHASE3_MARGINAL_MATERIALITY_RATIO_CAP = 1.18
+
+
+def _phase3_decision_surface(*, substrate_block: dict[str, Any]) -> dict[str, Any]:
+    """
+    MVP1 Phase 3 primary state + operator-facing explanation (verification payload only).
+
+    Precedence matches PPE_MASTER_MVP1 §14 / sprint MVP1-Phase3-Slice001 (invalid → low-trust →
+    mixed → immaterial → marginal → candidate).
+    """
+    tg = str(substrate_block.get("trust_gate_state") or "")
+    wlab = str(substrate_block.get("width_gap_label") or "")
+    m_ratio = substrate_block.get("materiality_ratio")
+    mat_sat = bool(substrate_block.get("materiality_satisfied"))
+    clf_note = str(substrate_block.get("classification_note") or "").strip()
+    T = substrate_block.get("horizon_years")
+    try:
+        T_f = float(T) if T is not None else float("nan")
+    except (TypeError, ValueError):
+        T_f = float("nan")
+    T_ok = T_f == T_f and T_f > 0.0
+
+    review_horizon = {
+        "schema": "mvp1_review_horizon_v0",
+        "horizon_years": T_f if T_ok else None,
+        "label": (
+            f"Selected pricing horizon T = {T_f:.4g} yr (active expiry in this run)"
+            if T_ok
+            else "Horizon unavailable — treat review timing as unset for this evaluation."
+        ),
+    }
+
+    def _base(
+        *,
+        primary_output_state: str,
+        precedence_step: int,
+        explanation: str,
+        confidence_tier: str,
+        expression_family: str,
+        falsification_condition: str,
+        no_trade_reason: str | None,
+    ) -> dict[str, Any]:
+        return {
+            "decision_schema_version": MVP1_PHASE3_DECISION_VERSION,
+            "precedence_step": precedence_step,
+            "primary_output_state": primary_output_state,
+            "explanation": explanation,
+            "confidence_tier": confidence_tier,
+            "expression_family": expression_family,
+            "falsification_condition": falsification_condition,
+            "review_horizon": review_horizon,
+            "no_trade_reason": no_trade_reason,
+        }
+
+    if tg == "invalid":
+        return _base(
+            primary_output_state="no_trade",
+            precedence_step=1,
+            explanation=(
+                "Benchmark or market-implied width path is invalid on this horizon (inputs or grid are not "
+                "usable for an ATM width read)."
+            ),
+            confidence_tier="low",
+            expression_family="none",
+            falsification_condition=(
+                "A rerun with valid forward/vol/horizon and a priced grid that clears MVP1 trust gates "
+                "would be required before any trade-consideration state."
+            ),
+            no_trade_reason="invalid_market_or_benchmark_path",
+        )
+
+    if tg == "degraded" or wlab == "insufficient_trust":
+        return _base(
+            primary_output_state="no_trade",
+            precedence_step=2,
+            explanation=(
+                "Trust is too low to treat the ATM width gap as decision-grade "
+                + (f"({clf_note})" if clf_note else "(insufficient trust).")
+            ),
+            confidence_tier="low",
+            expression_family="none",
+            falsification_condition=(
+                "Breeden–Litzenberger coverage on sufficient strikes plus a stable empirical σ on the grid "
+                "would raise trust toward usable and could reopen evaluation."
+            ),
+            no_trade_reason="low_trust",
+        )
+
+    if wlab == "mixed_unclear":
+        return _base(
+            primary_output_state="watch_only",
+            precedence_step=3,
+            explanation=(
+                "Materiality clears the v0 floor, but the ATM gap sits inside an ambiguity band — "
+                "treat as watch, not a clean promotion to candidate."
+            ),
+            confidence_tier="medium",
+            expression_family="atm_width_disagreement_ambiguous",
+            falsification_condition=(
+                "A rerun where the empirical width clearly separates from benchmark W_b outside the tie band "
+                "would promote this to candidate or a clear no-trade."
+            ),
+            no_trade_reason=None,
+        )
+
+    if wlab == "insufficient_materiality":
+        return _base(
+            primary_output_state="no_trade",
+            precedence_step=4,
+            explanation=(
+                "After trust gates, the absolute gap does not clear the labeled v0 materiality floor "
+                "(M_ratio < 1)."
+            ),
+            confidence_tier="low",
+            expression_family="none",
+            falsification_condition=(
+                "Larger |W_m − W_b| versus the same v0 floor (or a future calibrated floor) could change "
+                "materiality."
+            ),
+            no_trade_reason="insufficient_materiality",
+        )
+
+    if wlab in ("market_too_wide", "market_too_narrow"):
+        mr = float(m_ratio) if isinstance(m_ratio, (int, float)) and m_ratio == m_ratio else 0.0
+        direction = "wide" if wlab == "market_too_wide" else "cheap"
+        family = (
+            "atm_implied_width_rich_vs_lognormal_benchmark"
+            if wlab == "market_too_wide"
+            else "atm_implied_width_cheap_vs_lognormal_benchmark"
+        )
+        if mat_sat and mr < _MVP1_PHASE3_MARGINAL_MATERIALITY_RATIO_CAP:
+            return _base(
+                primary_output_state="watch_only",
+                precedence_step=5,
+                explanation=(
+                    f"Disagreement is directional (market-implied ATM width looks {direction} versus the "
+                    "lognormal benchmark) but only marginally past the v0 materiality floor — watch, not "
+                    "a full candidate promotion."
+                ),
+                confidence_tier="medium",
+                expression_family=family,
+                falsification_condition=(
+                    "M_ratio rising meaningfully above the marginal band, or refreshed marks that collapse "
+                    "the gap while trust remains usable, would clarify candidate vs no-trade."
+                ),
+                no_trade_reason=None,
+            )
+        if mat_sat:
+            return _base(
+                primary_output_state="candidate",
+                precedence_step=6,
+                explanation=(
+                    f"High-trust, material ATM width read: market-implied width is {direction} versus the "
+                    "lognormal benchmark on this horizon under MVP1 v0 gates."
+                ),
+                confidence_tier="high",
+                expression_family=family,
+                falsification_condition=(
+                    "Refreshed quotes or Breeden density that eliminates the gap (or flips sign) while trust "
+                    "stays usable would weaken this thesis."
+                ),
+                no_trade_reason=None,
+            )
+
+    return _base(
+        primary_output_state="no_trade",
+        precedence_step=1,
+        explanation="Width-gap state could not be mapped to a Phase 3 decision — treat as no-trade.",
+        confidence_tier="low",
+        expression_family="none",
+        falsification_condition="Rerun with complete inputs and review the MVP1 verification block.",
+        no_trade_reason="unclassified_width_gap_state",
+    )
 
 def _mvp1_materiality_floor_v0(*, trust_gate: str) -> dict[str, Any]:
     """Provisional floors per PPE_MASTER_MVP1 (explicitly labeled, not earned-from-data)."""
@@ -289,7 +470,7 @@ def build_mvp1_benchmark_substrate(
         breeden_gate=breeden_gate,
     )
 
-    return {
+    substrate_body: dict[str, Any] = {
         "benchmark_id": MVP1_BENCHMARK_ID,
         "benchmark_version": MVP1_BENCHMARK_VERSION,
         "horizon_years": float(T_years),
@@ -310,3 +491,5 @@ def build_mvp1_benchmark_substrate(
         "trust_state_note": trust_note,
         **wg_block,
     }
+    substrate_body["phase3_decision_surface"] = _phase3_decision_surface(substrate_block=substrate_body)
+    return substrate_body

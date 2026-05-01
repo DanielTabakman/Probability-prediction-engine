@@ -237,6 +237,38 @@ def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
         if isinstance(pn, str) and pn.strip():
             st.caption(str(pn).strip())
 
+        # --- Phase 3 decision surface ---
+        p3 = block.get("phase3_decision_surface")
+        if isinstance(p3, dict):
+            st.divider()
+            st.markdown("##### MVP1 decision surface (Phase 3, v0)")
+            st.caption(
+                "Single primary state with explanation — **not** a trade recommendation; "
+                "precedence follows PPE_MASTER_MVP1 §14."
+            )
+            pos = str(p3.get("primary_output_state") or "—")
+            st.markdown(f"**Primary output state:** `{pos}`")
+            ct = str(p3.get("confidence_tier") or "—")
+            fam = str(p3.get("expression_family") or "—")
+            step = p3.get("precedence_step")
+            step_txt = str(int(step)) if isinstance(step, int) else "—"
+            st.markdown(f"**Confidence tier:** `{ct}` · **Expression family:** `{fam}` · **Precedence step:** {step_txt}")
+            expl = p3.get("explanation")
+            if isinstance(expl, str) and expl.strip():
+                st.info(expl.strip())
+            ntr = p3.get("no_trade_reason")
+            if isinstance(ntr, str) and ntr.strip():
+                st.warning(f"**No-trade reason:** `{ntr.strip()}`")
+            rh = p3.get("review_horizon")
+            if isinstance(rh, dict):
+                rh_lbl = rh.get("label")
+                if isinstance(rh_lbl, str) and rh_lbl.strip():
+                    st.caption(f"**Review horizon:** {rh_lbl.strip()}")
+            fal = p3.get("falsification_condition")
+            if isinstance(fal, str) and fal.strip():
+                st.markdown("**Falsification (what would weaken this evaluation):**")
+                st.caption(fal.strip())
+
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""

@@ -9,6 +9,7 @@ from src.viz.implied_lab_provenance import build_trust_strip_lines, build_verifi
 from src.viz.mvp1_benchmark_substrate import (
     MVP1_BENCHMARK_ID,
     MVP1_BENCHMARK_VERSION,
+    MVP1_PHASE3_DECISION_VERSION,
     MVP1_WIDTH_GAP_CLASSIFIER_VERSION,
     build_mvp1_benchmark_substrate,
 )
@@ -37,6 +38,11 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         self.assertEqual(b["trust_gate_state"], "degraded")
         self.assertEqual(b["width_gap_label"], "insufficient_trust")
         self.assertIsNone(b["G_abs"])
+        p3 = b.get("phase3_decision_surface")
+        self.assertIsInstance(p3, dict)
+        assert isinstance(p3, dict)
+        self.assertEqual(p3.get("primary_output_state"), "no_trade")
+        self.assertEqual(p3.get("precedence_step"), 2)
 
     def test_vol_zero_phase2_invalid_trust_gate(self) -> None:
         md = {
@@ -50,6 +56,11 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         b = build_mvp1_benchmark_substrate(market_data=md, market_pdf_raw=raw, call_marks=marks)
         self.assertEqual(b["trust_gate_state"], "invalid")
         self.assertEqual(b["width_gap_label"], "insufficient_trust")
+        p3 = b.get("phase3_decision_surface")
+        self.assertIsInstance(p3, dict)
+        assert isinstance(p3, dict)
+        self.assertEqual(p3.get("primary_output_state"), "no_trade")
+        self.assertEqual(p3.get("precedence_step"), 1)
 
     def test_computed_empirical_is_ok(self) -> None:
         prices = [80_000.0 + i * 500.0 for i in range(40)]
@@ -92,6 +103,23 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         self.assertIsInstance(mat, dict)
         assert isinstance(mat, dict)
         self.assertEqual(mat.get("proxy_schema"), "mvp1_materiality_floor_v0_proxy")
+        p3 = b.get("phase3_decision_surface")
+        self.assertIsInstance(p3, dict)
+        assert isinstance(p3, dict)
+        self.assertEqual(p3.get("decision_schema_version"), MVP1_PHASE3_DECISION_VERSION)
+        pos = str(p3.get("primary_output_state") or "")
+        self.assertIn(pos, ("candidate", "watch_only", "no_trade"))
+        if pos == "candidate":
+            self.assertEqual(p3.get("confidence_tier"), "high")
+            self.assertIsNone(p3.get("no_trade_reason"))
+        elif pos == "watch_only":
+            self.assertEqual(p3.get("confidence_tier"), "medium")
+        else:
+            self.assertEqual(p3.get("confidence_tier"), "low")
+            self.assertIsInstance(p3.get("no_trade_reason"), str)
+        rh = p3.get("review_horizon")
+        self.assertIsInstance(rh, dict)
+        self.assertEqual(rh.get("schema"), "mvp1_review_horizon_v0")
 
     def test_trust_strip_includes_mvp1_when_verification_has_summary(self) -> None:
         md = {
@@ -116,6 +144,9 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         self.assertIn(MVP1_BENCHMARK_ID, joined)
         self.assertIn(MVP1_BENCHMARK_VERSION, joined)
         self.assertIsInstance(v.get("mvp1_benchmark_substrate"), dict)
+        self.assertIsInstance(v.get("primary_output_state"), str)
+        self.assertIn(v["primary_output_state"], ("candidate", "watch_only", "no_trade"))
+        self.assertIn("MVP1 primary output", joined)
 
 
 if __name__ == "__main__":

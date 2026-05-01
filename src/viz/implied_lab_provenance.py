@@ -69,6 +69,10 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
             elif ts == "ok":
                 lines.append("**Trust state:** OK for this horizon (see substrate panel for width detail).")
 
+    pos = verification.get("primary_output_state")
+    if isinstance(pos, str) and pos.strip():
+        lines.append(f"**MVP1 primary output:** `{pos.strip()}`")
+
     sfs = vs.get("strategy_families_scope")
     if isinstance(sfs, str) and sfs.strip():
         lines.append(sfs.strip())
@@ -537,6 +541,12 @@ def build_verification_payload(
         market_pdf_raw=market_pdf_raw,
         call_marks=call_marks,
     )
+    phase3 = mvp1_block.get("phase3_decision_surface")
+    primary_output_state: str | None = None
+    if isinstance(phase3, dict):
+        raw_pos = phase3.get("primary_output_state")
+        if isinstance(raw_pos, str) and raw_pos.strip():
+            primary_output_state = raw_pos.strip()
 
     return {
         "data_sources": data_sources,
@@ -590,6 +600,7 @@ def build_verification_payload(
             belief_disagreement
         ),
         "mvp1_benchmark_substrate": mvp1_block,
+        "primary_output_state": primary_output_state,
         "strategy_summary": {
             "applicable": applicable,
             "error": err,
