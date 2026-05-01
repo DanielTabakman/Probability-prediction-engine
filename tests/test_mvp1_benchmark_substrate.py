@@ -9,6 +9,7 @@ from src.viz.implied_lab_provenance import build_trust_strip_lines, build_verifi
 from src.viz.mvp1_benchmark_substrate import (
     MVP1_BENCHMARK_ID,
     MVP1_BENCHMARK_VERSION,
+    MVP1_WIDTH_GAP_CLASSIFIER_VERSION,
     build_mvp1_benchmark_substrate,
 )
 
@@ -33,6 +34,22 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         self.assertEqual(b["empirical_status"], "skipped")
         self.assertEqual(b["trust_state"], "degraded")
         self.assertIsNone(b["empirical_market_implied_sigma_ln"])
+        self.assertEqual(b["trust_gate_state"], "degraded")
+        self.assertEqual(b["width_gap_label"], "insufficient_trust")
+        self.assertIsNone(b["G_abs"])
+
+    def test_vol_zero_phase2_invalid_trust_gate(self) -> None:
+        md = {
+            "forward": 100_000.0,
+            "vol": 0.0,
+            "T_years": 0.25,
+            "dist": {"prices": [90_000.0, 100_000.0, 110_000.0]},
+        }
+        marks = [{"strike": float(x), "mark_btc": 0.01} for x in (98_000.0, 100_000.0, 102_000.0)]
+        raw = [0.02, 0.05, 0.02]
+        b = build_mvp1_benchmark_substrate(market_data=md, market_pdf_raw=raw, call_marks=marks)
+        self.assertEqual(b["trust_gate_state"], "invalid")
+        self.assertEqual(b["width_gap_label"], "insufficient_trust")
 
     def test_computed_empirical_is_ok(self) -> None:
         prices = [80_000.0 + i * 500.0 for i in range(40)]
@@ -55,6 +72,26 @@ class TestMvp1BenchmarkSubstrate(unittest.TestCase):
         self.assertEqual(b["trust_state"], "ok")
         self.assertIsInstance(b["empirical_market_implied_sigma_ln"], float)
         self.assertGreater(float(b["empirical_market_implied_sigma_ln"]), 0.0)
+        self.assertEqual(b["trust_gate_state"], "usable")
+        self.assertEqual(str(b["classifier_version"]), MVP1_WIDTH_GAP_CLASSIFIER_VERSION)
+        self.assertIsNotNone(b.get("W_m"))
+        self.assertIsNotNone(b.get("W_b"))
+        self.assertIsNotNone(b.get("G_abs"))
+        self.assertIsNotNone(b.get("G_rel"))
+        self.assertIn(
+            str(b["width_gap_label"]),
+            (
+                "market_too_wide",
+                "market_too_narrow",
+                "mixed_unclear",
+                "insufficient_materiality",
+                "insufficient_trust",
+            ),
+        )
+        mat = b.get("materiality")
+        self.assertIsInstance(mat, dict)
+        assert isinstance(mat, dict)
+        self.assertEqual(mat.get("proxy_schema"), "mvp1_materiality_floor_v0_proxy")
 
     def test_trust_strip_includes_mvp1_when_verification_has_summary(self) -> None:
         md = {

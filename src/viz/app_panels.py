@@ -137,7 +137,7 @@ def render_trust_strip(verification: dict) -> None:
 
 
 def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
-    """MVP1 Phase 1 — benchmark ID/version + widths at horizon + explicit trust/degraded state."""
+    """MVP1 Phase 1–2 — substrate + ATM width-gap engine v1 (benchmarked disagreement)."""
     v = verification if isinstance(verification, dict) else {}
     block = v.get("mvp1_benchmark_substrate")
     if not isinstance(block, dict):
@@ -150,6 +150,13 @@ def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
                 return f"{xf:.4f}"
         return "—"
 
+    def _fmt_gap(x: object) -> str:
+        if isinstance(x, (int, float)):
+            xf = float(x)
+            if xf == xf:
+                return f"{xf:.6f}"
+        return "—"
+
     bid = str(block.get("benchmark_id") or "—")
     bver = str(block.get("benchmark_version") or "—")
     T = block.get("horizon_years")
@@ -160,6 +167,8 @@ def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
     emp_st = str(block.get("empirical_status") or "")
     trust = str(block.get("trust_state") or "").lower()
     note = str(block.get("trust_state_note") or "").strip()
+    clf_v = str(block.get("classifier_version") or "").strip()
+    wlab = str(block.get("width_gap_label") or "—")
 
     with st.container(border=True):
         st.markdown("##### MVP1 benchmark substrate (Phase 1)")
@@ -189,6 +198,44 @@ def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
             st.warning(f"**Trust state:** DEGRADED — {note}" if note else "**Trust state:** DEGRADED.")
         elif note:
             st.caption(f"**Trust state:** OK — {note}")
+
+        # --- Phase 2 width-gap ---
+        st.divider()
+        st.markdown("##### MVP1 ATM width-gap (Phase 2, v1)")
+        st.caption(
+            "**W_m** = empirical market-implied σ on grid when trust is **usable**; **W_b** = lognormal ATM benchmark "
+            "σ on **T**. **G_abs** / **G_rel** materiality uses labeled v0 proxy floors (verification payload)."
+        )
+        tg = str(block.get("trust_gate_state") or "—")
+        st.markdown(f"**Trust gate (usable/degraded/invalid):** `{tg}`")
+        st.markdown(f"**Width-gap label:** `{wlab}`" + (f" · classifier `{clf_v}`" if clf_v else ""))
+
+        wm = block.get("W_m")
+        if wm is None:
+            st.caption("**W_m:** — · **W_b:** " + _fmt_sigma(block.get("W_b")) + " · **G_abs / G_rel:** —")
+        else:
+            st.markdown(
+                f"**W_m:** `{_fmt_sigma(wm)}` · **W_b:** `{_fmt_sigma(block.get('W_b'))}` · "
+                f"**G_abs:** `{_fmt_gap(block.get('G_abs'))}` · **G_rel:** `{_fmt_gap(block.get('G_rel'))}`"
+            )
+        mrat = block.get("materiality_ratio")
+        mf = None
+        mat = block.get("materiality")
+        if isinstance(mat, dict):
+            mf = mat.get("M_floor_sigma_ln")
+        mfloor_txt = _fmt_gap(mf) if mf is not None else "—"
+        mr_txt = _fmt_gap(mrat) if isinstance(mrat, (int, float)) else "—"
+        st.caption(f"**M_floor (σ_ln, v0 proxy):** {mfloor_txt} · **M_ratio:** {mr_txt}")
+
+        cn = block.get("classification_note")
+        if isinstance(cn, str) and cn.strip():
+            st.info(cn.strip())
+
+        pn = None
+        if isinstance(mat, dict):
+            pn = mat.get("proxy_note")
+        if isinstance(pn, str) and pn.strip():
+            st.caption(str(pn).strip())
 
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
