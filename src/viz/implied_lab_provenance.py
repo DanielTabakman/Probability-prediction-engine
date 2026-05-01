@@ -14,6 +14,7 @@ from src.viz.disagreement_thresholds import (
     L1_SHAPE_GAP_MODERATE_BELOW,
 )
 from src.viz.mvp1_benchmark_substrate import build_mvp1_benchmark_substrate
+from src.viz.mvp1_phase3_decision_surface import build_mvp1_phase3_decision_surface
 
 # Display-only: trust strip pointer (Sprint 006). Kept static so we do not imply extra provenance.
 TRUST_STRIP_VERIFICATION_POINTER = (
@@ -538,6 +539,11 @@ def build_verification_payload(
         call_marks=call_marks,
     )
 
+    phase3 = build_mvp1_phase3_decision_surface(
+        mvp1_benchmark_substrate=mvp1_block,
+        belief_disagreement=belief_disagreement if isinstance(belief_disagreement, dict) else None,
+    )
+
     return {
         "data_sources": data_sources,
         "as_of_utc": as_of_utc,
@@ -590,6 +596,7 @@ def build_verification_payload(
             belief_disagreement
         ),
         "mvp1_benchmark_substrate": mvp1_block,
+        "mvp1_phase3_decision_surface": phase3,
         "strategy_summary": {
             "applicable": applicable,
             "error": err,

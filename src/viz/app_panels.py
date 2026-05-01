@@ -237,6 +237,49 @@ def render_mvp1_benchmark_substrate_panel(verification: dict) -> None:
         if isinstance(pn, str) and pn.strip():
             st.caption(str(pn).strip())
 
+        ds = v.get("mvp1_phase3_decision_surface")
+        if isinstance(ds, dict):
+            st.divider()
+            st.markdown("##### MVP1 decision surface (Phase 3)")
+            st.caption(
+                "Exactly one primary output state — **candidate** / **watch_only** / **no_trade** — with plain "
+                "language, confidence tier, falsification, and review horizon (payload-driven)."
+            )
+            pos = str(ds.get("primary_output_state") or "—")
+            st.markdown(f"**Primary output state:** `{pos}`")
+            step = ds.get("decision_precedence_step")
+            if isinstance(step, int):
+                st.caption(f"Precedence step (1–6): **{step}**")
+            elif step is None:
+                st.caption("Precedence step: **unspecified** (residual substrate combination).")
+            ct = str(ds.get("confidence_tier") or "—")
+            st.markdown(f"**Confidence tier:** `{ct}`")
+            expl = ds.get("explanation_plain")
+            if isinstance(expl, str) and expl.strip():
+                st.markdown(expl.strip())
+            fals = ds.get("falsification_plain")
+            if isinstance(fals, str) and fals.strip():
+                st.markdown(f"**Falsification:** {fals.strip()}")
+            rh = ds.get("review_horizon")
+            if isinstance(rh, dict):
+                assign = rh.get("assignment_note")
+                hy = rh.get("horizon_years")
+                hy_txt = f"{float(hy):g}" if isinstance(hy, (int, float)) else "—"
+                st.markdown(f"**Review horizon (yr):** `{hy_txt}`")
+                if isinstance(assign, str) and assign.strip():
+                    st.caption(assign.strip())
+            efm = ds.get("expression_family_mapping")
+            if isinstance(efm, dict):
+                fams = efm.get("families") or []
+                if isinstance(fams, list) and fams:
+                    st.markdown("**Expression families (fit-scope):** " + " · ".join(str(x) for x in fams[:6]))
+                mn = efm.get("mapping_note")
+                if isinstance(mn, str) and mn.strip():
+                    st.caption(mn.strip())
+            ntr = ds.get("no_trade_reasoning")
+            if isinstance(ntr, str) and ntr.strip():
+                st.warning(f"**No-trade reasoning:** {ntr.strip()}")
+
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""
