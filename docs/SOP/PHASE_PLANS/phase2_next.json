@@ -1,0 +1,15 @@
+{
+  "name": "Phase2_next (seed from CURRENT_FRONTIER)",
+  "slices": [
+    {
+      "sliceId": "Sprint004-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_004_PHASE_2.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "buildBranch": "build/auto/Sprint004-Slice004-phase2_next",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 2
+    }
+  ]
+}
+

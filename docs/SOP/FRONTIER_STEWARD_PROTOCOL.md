@@ -53,6 +53,10 @@ Minimum acceptable practice:
 - Create a short-lived branch for the pass, do the work, then merge via normal review flow.
 - If you must inspect `main`, do read-only inspection; do not edit.
 
+## Commit policy (default)
+
+See `docs/SOP/COMMIT_POLICY_V1.md` for the default “when to commit” protocol. Purpose: reduce repeated ambiguity and keep continuity durable.
+
 ## Concurrent-agent dispatch — worktree rule (operational; non-gating)
 
 Git's working tree is single-threaded per checkout: `HEAD`, the index, and untracked-file state are shared by every process operating in that directory. When a parent agent dispatches multiple BUILD or CONTROL-PLANE agents concurrently into the **same** working tree, their `git checkout`, `git commit`, and file-edit operations interleave and collide — commits land on each other's branches, untracked files appear in the wrong context, and recovery requires manual cherry-pick reconciliation.
