@@ -5,6 +5,15 @@ imported_utc: "2026-04-30"
 control_rule: "For MVP1 implementation, MVP1-specific sections override broad canon if they appear to conflict."
 ---
 
+---
+addendum:
+  source: "Applied from `d:/Users/User/Downloads/PPE Master — Vision, Canon, Build Order, and Current Audit (1).md`"
+  applied_utc: "2026-05-04"
+  changes:
+    - "Adds explicit Conversation-mode rule + Discussion-mode default."
+    - "Adds roadmap vocabulary translation layer (Strategic/Roadmap/Build/Sync layers) under section 1A."
+---
+
 PPE Master — Operating Architecture, Canon, MVP1, and Current Audit
 
 AI-first navigation layer  
@@ -64,9 +73,76 @@ The code should flow downward from the controlling contract.
 Corrections should flow upward from evidence.  
 Neither direction should bypass the document.
 
+Conversation-mode rule  
+This document is used for both vision steering and implementation steering.  
+When the user asks to discuss vision, naming, strategy, product architecture, conceptual direction, or the relationship between the North Star and MVP, respond conversationally and strategically.  
+Do not provide Cursor prompts, agent prompts, repo implementation instructions, or copy-paste execution blocks unless the user explicitly asks for one using phrases such as: for Cursor, agent prompt, implementation prompt, turn this into a slice, or make this actionable for the repo.  
+If an implementation step seems relevant during a strategy conversation, mention it briefly as an option, but do not generate a copy-paste block by default.
+
+Discussion-mode default  
+For vision conversations, treat the goal as conceptual clarity, altitude separation, decision quality, and roadmap coherence.  
+For implementation conversations, treat the goal as bounded execution, repo truth, validation, and closeout evidence.  
+Do not silently switch from discussion mode to implementation mode.
+
 Purpose  
 This is the single master document for PPE.  
 Its job is to keep the project coherent while it is still being built, reduce term drift, preserve the project’s logic, identify the current bottleneck, and make future build choices easier.
+
+\============================================================  
+1A. VALIDATION PHASE, PRODUCT SURFACES, AND PRODUCTION SPINE  
+\============================================================
+
+Purpose of this section  
+This section exists because PPE needs near-term validation without collapsing the long-term vision into premature claims.  
+The operator needs real contact with reality soon: people who understand and might pay, a narrow strategy protocol that can be tracked, and a coherent production chain that explains why each next addition belongs.
+
+Accepted roadmap vocabulary  
+This section defines the current working vocabulary for vision-aware roadmap planning.  
+These terms are intended to reduce altitude collapse and help translate between strategy, validation, and build execution.
+
+Strategic layer  
+End-State Vision: the long-term commercial destination of PPE.  
+Product Surface: a sellable or user-facing manifestation of PPE.  
+Core Engine: the shared underlying machinery that supports product surfaces and future capabilities.  
+Wedge: a narrow proof-of-system domain used to make progress without broadening too quickly.  
+Protocol: a repeatable research or strategy rule, usually of the form when X is observed, do Y, then review Z.
+
+Roadmap layer  
+Roadmap Chapter: a major product maturity movement or development chapter.  
+Reality Check: a real-world validation test showing whether PPE matters in contact with customers, markets, operators, or strategy evidence.  
+Strategic Lever: a high-leverage product or system addition chosen because it advances the vision and improves one or more validation lanes.
+
+Build layer  
+Epic: a large coherent build package that can be decomposed by Cursor or an implementation agent.  
+Slice: the smallest meaningful product change that can be validated and closed.  
+Task: a concrete implementation step inside a slice.
+
+Sync layer  
+Frontier Sync: the ritual for keeping the vision frontier and build frontier aligned.  
+Steering Delta: the vision-to-build update.  
+Build Delta: the build-to-vision update.
+
+Canonical hierarchy interpretation  
+The normal top-down flow is:  
+End-State Vision → Product Surface / Core Engine → Roadmap Chapter → Reality Check / Strategic Lever → Epic → Slice → Task
+
+The normal bottom-up flow is:  
+Task → Slice → Epic → Build Delta → Frontier Sync → roadmap adjustment → master-doc update if needed
+
+Translation-layer rule  
+The roadmap layer translates top-down vision into bottom-up build reality.  
+It should decide which Reality Checks and Strategic Levers matter next before Cursor decomposes work into epics, slices, and tasks.
+
+Two-pull roadmap rule  
+PPE should be roadmaped through two intentional pulls:  
+1. Vision pull: the North Star, Anomaly Desk, Belief-to-Trade Engine, and PPE Core should keep pulling the project upward toward the larger commercial and strategic possibility.  
+2. Validation pull: near-term milestones should deliberately create reality contact through demos, users, payment, paper-tracked protocols, reviewed cases, and clearer operator confidence.
+
+Canonical interpretation  
+The larger vision should pull the roadmap upward.  
+The current validation need should pull the roadmap toward useful near-term proof.  
+Neither pull should erase the other.  
+A good roadmap item advances the vision while creating validation, as long as it does not create major detour cost or weaken the core loop.
 
 This is not a marketing document.  
 This is not a hype deck.  

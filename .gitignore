@@ -31,6 +31,7 @@ build/
 .idea/
 .vscode/
 !.vscode/tasks.json
+.cursor/plans/
 *.swp
 .DS_Store
 Thumbs.db

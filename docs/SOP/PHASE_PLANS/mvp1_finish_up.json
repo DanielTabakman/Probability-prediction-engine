@@ -1,0 +1,15 @@
+{
+  "name": "MVP1 finish-up (remaining runnable slices) — steward-run",
+  "slices": [
+    {
+      "sliceId": "MVP1-UIExclusions-Slice001",
+      "sprintSpecPath": "docs/SOP/MVP1_PHASE1_3_SPRINT.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "buildBranch": "build/auto/MVP1-UIExclusions-Slice001-phase_plan",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 2
+    }
+  ]
+}
+

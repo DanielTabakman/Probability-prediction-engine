@@ -7,12 +7,13 @@ This doc defines **what the steward autopilot may do**, **what it must never do*
 ### Source-of-truth order (unchanged)
 
 1. Pushed repo + accepted docs
-2. `docs/SOP/CURRENT_FRONTIER.md`
-3. `docs/SOP/HANDOFF.md`
-4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
-5. Phase/sprint docs
-6. This doc (durable autopilot policy)
-7. Older chat only when the above are silent
+2. `docs/VISION/PPE_MASTER_MVP1.md` (controlling canon)
+3. `docs/SOP/MVP1_FRONTIER.md` (live steering truth)
+4. `docs/SOP/HANDOFF.md`
+5. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
+6. Phase/sprint docs
+7. This doc (durable autopilot policy)
+8. Older chat only when the above are silent
 
 ### Components
 
@@ -55,7 +56,7 @@ Autopilot must stop and require human disposition when any are true:
 - Relay decision is `STOP_FOR_REVIEW` or `BLOCKED`.
 - Worker reports: scope ambiguity, contract drift, mixed-plane contamination, unclear validation classification, repo-state drift.
 - A slice is already closed/accepted but the plan still includes it (plan drift).
-- A slice is at **CONTROL-CLOSEOUT boundary** per `CURRENT_FRONTIER.md` (e.g., “awaiting steward CONTROL-CLOSEOUT” / “BUILD-CLOSEOUT complete”). Autopilot must stop rather than re-run execution.
+- A slice is at **CONTROL-CLOSEOUT boundary** per `docs/SOP/MVP1_FRONTIER.md` (e.g., “awaiting steward CONTROL-CLOSEOUT” / “BUILD-CLOSEOUT complete”). Autopilot must stop rather than re-run execution.
 - The plan references missing files (sprint spec path missing) or a slice ID not found in the sprint spec.
 - Next step would require CONTROL-PLANE edits but the run is not explicitly authorized as CONTROL-PLANE.
 

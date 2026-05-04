@@ -4,7 +4,7 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 ### Roles
 
-- **Steward / human**: SELECTION and CONTROL-CLOSEOUT authority (unless a currently active trial explicitly says otherwise; see `CURRENT_FRONTIER.md`).
+- **Steward / human**: SELECTION and CONTROL-CLOSEOUT authority (see `docs/SOP/MVP1_FRONTIER.md`).
 - **Relay** (`scripts/relay_runtime_v0.py`): hard gate — stages jobs, validates §14 payload, emits §15 decision.
 - **Orchestrator** (`ppe-orchestrator-acp`, sibling repo): driver — creates worktrees, runs ACP workers, watches time, retries when relay allows.
 - **Worker** (`agent acp` session): does the slice work and writes `relay_result.json`.
@@ -39,14 +39,22 @@ From repo root:
   - `artifacts/relay/runs/<run_id>/decision.json`
 - **Orchestrator state**:
   - `artifacts/orchestrator/acp_state.json` (progress + results; written early so crashes still leave breadcrumbs)
+- **Last run report (wrapper completion)**:
+  - `artifacts/orchestrator/LAST_RUN_REPORT.json` + `artifacts/orchestrator/LAST_RUN_REPORT.md` (written by `run_slice.cmd` / `run_phase.cmd` / `run_phase_raw.cmd` on exit)
+  - `artifacts/orchestrator/ACTIVE_RUN.json` (present only while a wrapper-launched slice/phase is in-flight)
+  - Optional: set `PPE_NOTIFY=0` to disable Windows toast/beeps from `scripts/notify_run_finished.ps1`
 - **UI smoke** (when applicable):
   - `artifacts/ui_smoke/<timestamp>/...`
 
 ### Feedback loop (what gets updated after a run)
 
-- If relay returns **CONTINUE**: steward performs CONTROL-CLOSEOUT and updates canonical steering docs (typically `CURRENT_FRONTIER.md`).
+- If relay returns **CONTINUE**: steward performs CONTROL-CLOSEOUT and updates canonical steering docs (typically `docs/SOP/MVP1_FRONTIER.md`).
 - If relay returns **RETRY_ALLOWED**: orchestrator re-runs the worker (max 2 attempts total).
 - If relay returns **STOP_FOR_REVIEW** or **BLOCKED**: stop; steward decides whether to open RECOVERY, adjust slice scope, or defer.
+
+### Promotion caveat (common STOP_FOR_REVIEW procedural case)
+
+Relay may return **STOP_FOR_REVIEW** (even when BUILD + tests + artifacts are green) when **promotion cannot be performed** from the worker worktree. This happens when the baseline branch is checked out elsewhere (git refuses fast-forward/branch moves across worktrees).\n+\n+Steward action:\n+- perform promotion from the checkout that currently owns the baseline branch, and\n+- record the closeout in `docs/SOP/MVP1_FRONTIER.md` with pointers to the relay run artifacts.
 
 ### Audits (lightweight, repeatable)
 
