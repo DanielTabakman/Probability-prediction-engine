@@ -4,12 +4,19 @@ Bitcoin view: price chart with Polymarket questions overlaid, implied value, opt
 """
 from __future__ import annotations
 
+import os
 import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 
 # Project root
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def _post_mvp1_lab_ui_enabled() -> bool:
+    """When false (default), MVP1 excludes post-MVP strike/payoff/ticket execution surfaces from the lab UI."""
+    v = str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip().lower()
+    return v in ("1", "true", "yes", "on")
 
 import streamlit as st
 import pandas as pd
@@ -135,8 +142,13 @@ if show_bitcoin_view:
     st.header("Bitcoin implied lab — market-implied view as the anchor")
     st.caption(
         "**Glance path:** **Market-implied** chart (right) · **User belief** (left column) · "
-        "**Disagreement digest** (*Belief vs market — at a glance*) · **Review → trade ticket** (under **Summary**). "
-        "Exploration workbench — not a recommendation engine."
+        "**Disagreement digest** (*Belief vs market — at a glance*)"
+        + (
+            " · **Review → trade ticket** (under **Summary**). "
+            if _post_mvp1_lab_ui_enabled()
+            else ". "
+        )
+        + "Exploration workbench — not a recommendation engine."
     )
 
     # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
@@ -202,11 +214,18 @@ if show_bitcoin_view:
                     with col_chart:
                         # Dedicated slots: reusing one st.empty() for plot + text replaces the chart (Streamlit replaces slot content).
                         with st.expander("Screen map (optional)", expanded=False):
-                            st.caption(
-                                "**Right column:** chart → **Summary** → **Trust / provenance** → optional **Belief overlay** "
-                                "narrative → **Review & disagreement digest** → **Trade ticket**. "
-                                "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
-                            )
+                            if _post_mvp1_lab_ui_enabled():
+                                st.caption(
+                                    "**Right column:** chart → **Summary** → **Trust / provenance** → optional **Belief overlay** "
+                                    "narrative → **Review & disagreement digest** → **Trade ticket**. "
+                                    "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
+                                )
+                            else:
+                                st.caption(
+                                    "**Right column:** chart → **Summary** → **MVP1 benchmark substrate** → **Trust / provenance** → "
+                                    "optional **Belief overlay** narrative → **Review & disagreement digest**. "
+                                    "**Left column:** expiry → **Shape & payoff** (presets + **What changed?**) → optional belief controls."
+                                )
                         # Sprint002-Slice001: x-axis window control (declared before chart body uses the same key).
                         # Sprint002-Slice002: remember last non–full-range window for in-session restore (same keys per expiry).
                         _zkey_shape = f"implied_lab_shape_zoom_{selected_expiry_str}"
@@ -455,13 +474,21 @@ if show_bitcoin_view:
                             lo, hi = int(min(avail_strikes)), int(max(avail_strikes))
                             step = max(1000, (hi - lo) // 50)
                             atm = min(avail_strikes, key=lambda k: abs(k - forward))
+                            show_advanced_lab_ui = _post_mvp1_lab_ui_enabled()
 
                             st.caption("Sprint 001 — Slice 008 (Phase 2)")
                             st.markdown("**Shape & payoff**")
-                            st.caption(
-                                "Quick start: pick a preset to visibly change the green payoff line (main object). "
-                                "Open **Mode & solver** when you need Target payoff vs Exact strikes."
-                            )
+                            if show_advanced_lab_ui:
+                                st.caption(
+                                    "Quick start: pick a preset to visibly change the green payoff line (main object). "
+                                    "Open **Mode & solver** when you need Target payoff vs Exact strikes."
+                                )
+                            else:
+                                st.caption(
+                                    "Quick start: pick a preset to visibly change the green payoff line (main object). "
+                                    "MVP1 scope: strike-level editing, target-payoff solving, and trade-ticket export are hidden "
+                                    "(set env **PPE_POST_MVP1_LAB_UI=1** to show legacy execution-surfaces)."
+                                )
                             # Mode ownership (Sprint 1A): exact strikes vs target payoff
                             mode_key = f"implied_lab_mode_{selected_expiry_str}"
 
@@ -537,7 +564,7 @@ if show_bitcoin_view:
                                     st.write("")
                                     st.markdown("**Try next (one click):**")
 
-                                    try_cols = st.columns(3)
+                                    try_cols = st.columns(3 if show_advanced_lab_ui else 1)
 
                                     last_preset = st.session_state.get(f"implied_lab_last_preset_{selected_expiry_str}")
                                     preset_ids = list(PRESETS.keys())
@@ -555,437 +582,499 @@ if show_bitcoin_view:
                                             ):
                                                 _apply_preset(next_pid)
 
-                                    current_mode_label = st.session_state.get(mode_key, "Exact strikes")
-                                    next_mode = "Target payoff" if current_mode_label == "Exact strikes" else "Exact strikes"
-                                    with try_cols[1]:
-                                        if st.button(
-                                            f"Mode: {next_mode}",
-                                            use_container_width=True,
-                                            key=f"btn_try_next_mode_{selected_expiry_str}_{next_mode}",
-                                        ):
-                                            st.session_state[mode_key] = next_mode
-                                            st.session_state[last_change_key] = last_action_meaning(
-                                                action_id="mode_switch",
-                                                mode_label=next_mode,
-                                            )
-                                            st.rerun()
+                                    if show_advanced_lab_ui:
+                                        current_mode_label = st.session_state.get(mode_key, "Exact strikes")
+                                        next_mode = "Target payoff" if current_mode_label == "Exact strikes" else "Exact strikes"
+                                        with try_cols[1]:
+                                            if st.button(
+                                                f"Mode: {next_mode}",
+                                                use_container_width=True,
+                                                key=f"btn_try_next_mode_{selected_expiry_str}_{next_mode}",
+                                            ):
+                                                st.session_state[mode_key] = next_mode
+                                                st.session_state[last_change_key] = last_action_meaning(
+                                                    action_id="mode_switch",
+                                                    mode_label=next_mode,
+                                                )
+                                                st.rerun()
 
-                                    with try_cols[2]:
-                                        if current_mode_label == "Exact strikes":
-                                            if st.button(
-                                                "Polarity: flip long/short",
-                                                use_container_width=True,
-                                                key=f"btn_try_next_polarity_{selected_expiry_str}",
-                                            ):
-                                                new_reverse = not bool(st.session_state.get("u4_reverse", False))
-                                                st.session_state["u4_reverse"] = new_reverse
-                                                st.session_state[last_change_key] = last_action_meaning(
-                                                    action_id="polarity_reverse",
-                                                    reverse=bool(new_reverse),
-                                                )
-                                                st.rerun()
-                                        else:
-                                            payoff_key = selected_expiry_str
-                                            net_key = f"netpnl_mode_{payoff_key}"
-                                            net_label = "Net P&L mode: on" if bool(st.session_state.get(net_key, True)) else "Net P&L mode: off"
-                                            if st.button(
-                                                net_label,
-                                                use_container_width=True,
-                                                key=f"btn_try_next_netpnl_{selected_expiry_str}",
-                                            ):
-                                                new_net = not bool(st.session_state.get(net_key, True))
-                                                st.session_state[net_key] = new_net
-                                                st.session_state[last_change_key] = last_action_meaning(
-                                                    action_id="net_pnl_mode_toggle",
-                                                    net_pnl_mode=bool(new_net),
-                                                )
-                                                st.rerun()
+                                        with try_cols[2]:
+                                            if current_mode_label == "Exact strikes":
+                                                if st.button(
+                                                    "Polarity: flip long/short",
+                                                    use_container_width=True,
+                                                    key=f"btn_try_next_polarity_{selected_expiry_str}",
+                                                ):
+                                                    new_reverse = not bool(st.session_state.get("u4_reverse", False))
+                                                    st.session_state["u4_reverse"] = new_reverse
+                                                    st.session_state[last_change_key] = last_action_meaning(
+                                                        action_id="polarity_reverse",
+                                                        reverse=bool(new_reverse),
+                                                    )
+                                                    st.rerun()
+                                            else:
+                                                payoff_key = selected_expiry_str
+                                                net_key = f"netpnl_mode_{payoff_key}"
+                                                net_label = "Net P&L mode: on" if bool(st.session_state.get(net_key, True)) else "Net P&L mode: off"
+                                                if st.button(
+                                                    net_label,
+                                                    use_container_width=True,
+                                                    key=f"btn_try_next_netpnl_{selected_expiry_str}",
+                                                ):
+                                                    new_net = not bool(st.session_state.get(net_key, True))
+                                                    st.session_state[net_key] = new_net
+                                                    st.session_state[last_change_key] = last_action_meaning(
+                                                        action_id="net_pnl_mode_toggle",
+                                                        net_pnl_mode=bool(new_net),
+                                                    )
+                                                    st.rerun()
                                 else:
                                     st.caption(
                                         "Pick a preset above **or change the chart shape window** to see a plain-English summary. "
                                         "Then try a second and third interaction — this panel will keep updating."
                                     )
-                            # Important: do not pass a computed `index` derived from session_state.
-                            # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
-                            with st.expander("Mode & solver (Exact strikes vs Target payoff)", expanded=False):
-                                mode = st.radio(
-                                    "Mode",
-                                    ["Exact strikes", "Target payoff"],
-                                    key=mode_key,
-                                    horizontal=True,
+                            if not show_advanced_lab_ui:
+                                mode_norm = "exact_strikes"
+                                st.session_state[mode_key] = "Exact strikes"
+                                k1d = shape_state.get("k1") or min(avail_strikes)
+                                k2d = shape_state.get("k2") or atm
+                                k3d = shape_state.get("k3") or atm
+                                k4d = shape_state.get("k4") or max(avail_strikes)
+                                k1d = min(avail_strikes, key=lambda k: abs(k - k1d))
+                                k2d = min(avail_strikes, key=lambda k: abs(k - k2d))
+                                k3d = min(avail_strikes, key=lambda k: abs(k - k3d))
+                                k4d = min(avail_strikes, key=lambda k: abs(k - k4d))
+                                if not (k1d <= k2d <= k3d <= k4d):
+                                    k2d, k3d, k4d = max(k2d, k1d), max(k3d, k2d), max(k4d, k3d)
+                                payoff_targets_key = f"u4_payoff_targets_{selected_expiry_str}"
+                                payoff_defaults = (
+                                    st.session_state.get(payoff_targets_key, {})
+                                    if isinstance(st.session_state.get(payoff_targets_key, {}), dict)
+                                    else {}
                                 )
-                            mode_norm = "exact_strikes" if mode == "Exact strikes" else "target_payoff"
-                            prev_mode_key = f"{mode_key}__prev"
-
-                            # Defaults for strike truth (from persisted exact-strike state)
-                            k1d = shape_state.get("k1") or min(avail_strikes)
-                            k2d = shape_state.get("k2") or atm
-                            k3d = shape_state.get("k3") or atm
-                            k4d = shape_state.get("k4") or max(avail_strikes)
-                            k1d = min(avail_strikes, key=lambda k: abs(k - k1d))
-                            k2d = min(avail_strikes, key=lambda k: abs(k - k2d))
-                            k3d = min(avail_strikes, key=lambda k: abs(k - k3d))
-                            k4d = min(avail_strikes, key=lambda k: abs(k - k4d))
-                            if not (k1d <= k2d <= k3d <= k4d):
-                                k2d, k3d, k4d = max(k2d, k1d), max(k3d, k2d), max(k4d, k3d)
-
-                            # Persisted payoff targets (truth only in target_payoff mode)
-                            payoff_targets_key = f"u4_payoff_targets_{selected_expiry_str}"
-                            payoff_defaults = st.session_state.get(payoff_targets_key, {}) if isinstance(st.session_state.get(payoff_targets_key, {}), dict) else {}
-                            payoff_targets = {
-                                "body_left": float(payoff_defaults.get("body_left", k2d)),
-                                "body_right": float(payoff_defaults.get("body_right", k3d)),
-                                "left_wing": float(payoff_defaults.get("left_wing", max(0.0, k2d - k1d))),
-                                "right_wing": float(payoff_defaults.get("right_wing", max(0.0, k4d - k3d))),
-                            }
-
-                            # Shared leg toggles + polarity (persisted in exact-shape state)
-                            use_k1 = bool(shape_state.get("use_k1", True))
-                            use_k2 = bool(shape_state.get("use_k2", True))
-                            use_k3 = bool(shape_state.get("use_k3", True))
-                            use_k4 = bool(shape_state.get("use_k4", True))
-                            reverse = bool(shape_state.get("reverse", False))
-                            qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
-
-                            # Slice 007: "last action" meaning beyond presets (mode switch + exact-strikes controls).
-                            suppress_key = f"implied_lab_last_change_suppress_{selected_expiry_str}"
-                            if st.session_state.get(suppress_key, False):
-                                st.session_state[suppress_key] = False
-                                st.session_state[prev_mode_key] = mode
-                            else:
-                                prev_mode = st.session_state.get(prev_mode_key)
-                                if isinstance(prev_mode, str) and prev_mode and prev_mode != mode:
-                                    st.session_state[last_change_key] = last_action_meaning(
-                                        action_id="mode_switch",
-                                        mode_label=mode,
-                                    )
-                                st.session_state[prev_mode_key] = mode
-
-                            # --- Payoff → strikes (editable truth only in target_payoff mode) ---
-                            with st.expander("Payoff → strikes", expanded=False):
-                                st.caption("Use this to *calculate* which strikes (K1–K4) produce the payoff/P&L shape you want. **Chain:** Payoff → strikes → chart.")
-                                st.caption(
-                                    "Editable in current mode" if mode_norm == "target_payoff"
-                                    else "Derived / locked in current mode"
-                                )
-                                payoff_key = selected_expiry_str  # per-expiry widget keys to prevent drift
-                                payoff_work_key = f"payoff_work_{payoff_key}"
-                                net_pnl_mode = st.checkbox(
-                                    "Net P&L mode (cost-aware)",
-                                    value=bool(st.session_state.get(f"netpnl_mode_{payoff_key}", True)),
-                                    key=f"netpnl_mode_{payoff_key}",
-                                    disabled=(mode_norm != "target_payoff"),
-                                )
-
-                                max_wing = int(max(0, hi - lo))
-                                wing_abs = int(min(2_000_000, max(1_000, int(abs(payoff_targets["left_wing"])), int(abs(payoff_targets["right_wing"]))) * 2))
-
-                                # Avoid Streamlit "default + session_state set" warnings:
-                                # only provide defaults when a widget key isn't already in session_state.
-                                key_body_left = f"payoff_body_left_{payoff_key}"
-                                key_body_right = f"payoff_body_right_{payoff_key}"
-                                key_left_wing = f"payoff_left_wing_{payoff_key}"
-                                key_right_wing = f"payoff_right_wing_{payoff_key}"
-
-                                st.markdown("**Inputs (payoff → strikes)**")
-                                st.markdown(
-                                    "- **BodyLeft / BodyRight**: " + (
-                                        "net breakeven prices (where green line crosses 0)." if net_pnl_mode else "where the *flat middle* starts/ends."
-                                    ) + "\n" +
-                                    "- **LeftWingUSD / RightWingUSD**: " + (
-                                        "net profit plateaus in the wings (green line height, after premium)." if net_pnl_mode else
-                                        "the **width** of each wing (in USD). Bigger width pushes K1 further left and K4 further right."
-                                    )
-                                )
-
-                                # Slider UI (same feel as strike dials)
-                                bl_col, br_col = st.columns(2)
-                                with bl_col:
-                                    body_left = st.slider(
-                                        "Body left (price $)",
-                                        lo,
-                                        hi,
-                                        value=int(payoff_targets["body_left"]),
-                                        step=step,
-                                        key=key_body_left,
-                                        disabled=(mode_norm != "target_payoff"),
-                                    )
-                                with br_col:
-                                    body_right = st.slider(
-                                        "Body right (price $)",
-                                        lo,
-                                        hi,
-                                        value=int(payoff_targets["body_right"]),
-                                        step=step,
-                                        key=key_body_right,
-                                        disabled=(mode_norm != "target_payoff"),
-                                    )
-
-                                lw_col, rw_col = st.columns(2)
-                                with lw_col:
-                                    if net_pnl_mode:
-                                        left_wing_usd = st.slider(
-                                            "Left wing net profit (USD)",
-                                            -wing_abs,
-                                            wing_abs,
-                                            value=int(payoff_targets["left_wing"]),
-                                            step=step,
-                                            key=key_left_wing,
-                                            disabled=(mode_norm != "target_payoff"),
-                                        )
-                                    else:
-                                        left_wing_usd = st.slider(
-                                            "Left wing width (USD)",
-                                            0,
-                                            max_wing,
-                                            value=int(max(0.0, payoff_targets["left_wing"])),
-                                            step=step,
-                                            key=key_left_wing,
-                                            disabled=(mode_norm != "target_payoff"),
-                                        )
-                                with rw_col:
-                                    if net_pnl_mode:
-                                        right_wing_usd = st.slider(
-                                            "Right wing net profit (USD)",
-                                            -wing_abs,
-                                            wing_abs,
-                                            value=int(payoff_targets["right_wing"]),
-                                            step=step,
-                                            key=key_right_wing,
-                                            disabled=(mode_norm != "target_payoff"),
-                                        )
-                                    else:
-                                        right_wing_usd = st.slider(
-                                            "Right wing width (USD)",
-                                            0,
-                                            max_wing,
-                                            value=int(max(0.0, payoff_targets["right_wing"])),
-                                            step=step,
-                                            key=key_right_wing,
-                                            disabled=(mode_norm != "target_payoff"),
-                                        )
-
-                                # Persist payoff target truth only in target-payoff mode
-                                if mode_norm == "target_payoff":
-                                    # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to target-payoff interactions.
-                                    payoff_prev_key = f"implied_lab_payoff_prev_{selected_expiry_str}"
-                                    prev_payoff = (
-                                        st.session_state.get(payoff_prev_key)
-                                        if isinstance(st.session_state.get(payoff_prev_key), dict)
-                                        else None
-                                    )
-                                    curr_payoff = {
-                                        "net_pnl_mode": bool(net_pnl_mode),
-                                        "body_left": float(body_left),
-                                        "body_right": float(body_right),
-                                        "left_wing": float(left_wing_usd),
-                                        "right_wing": float(right_wing_usd),
-                                    }
-                                    if prev_payoff is None:
-                                        st.session_state[payoff_prev_key] = dict(curr_payoff)
-                                    else:
-                                        if not st.session_state.get(suppress_key, False):
-                                            msg = None
-                                            if bool(curr_payoff["net_pnl_mode"]) != bool(prev_payoff.get("net_pnl_mode", curr_payoff["net_pnl_mode"])):
-                                                msg = last_action_meaning(
-                                                    action_id="net_pnl_mode_toggle",
-                                                    net_pnl_mode=bool(curr_payoff["net_pnl_mode"]),
-                                                )
-                                            elif abs(float(curr_payoff["body_left"]) - float(prev_payoff.get("body_left", curr_payoff["body_left"]))) > 1e-9:
-                                                msg = last_action_meaning(
-                                                    action_id="target_payoff_edit",
-                                                    target_id="Body left",
-                                                    target_value=float(curr_payoff["body_left"]),
-                                                )
-                                            elif abs(float(curr_payoff["body_right"]) - float(prev_payoff.get("body_right", curr_payoff["body_right"]))) > 1e-9:
-                                                msg = last_action_meaning(
-                                                    action_id="target_payoff_edit",
-                                                    target_id="Body right",
-                                                    target_value=float(curr_payoff["body_right"]),
-                                                )
-                                            elif abs(float(curr_payoff["left_wing"]) - float(prev_payoff.get("left_wing", curr_payoff["left_wing"]))) > 1e-9:
-                                                msg = last_action_meaning(
-                                                    action_id="target_payoff_edit",
-                                                    target_id="Left wing",
-                                                    target_value=float(curr_payoff["left_wing"]),
-                                                )
-                                            elif abs(float(curr_payoff["right_wing"]) - float(prev_payoff.get("right_wing", curr_payoff["right_wing"]))) > 1e-9:
-                                                msg = last_action_meaning(
-                                                    action_id="target_payoff_edit",
-                                                    target_id="Right wing",
-                                                    target_value=float(curr_payoff["right_wing"]),
-                                                )
-                                            if msg:
-                                                st.session_state[last_change_key] = msg
-                                        st.session_state[payoff_prev_key] = dict(curr_payoff)
-                                    st.session_state[payoff_targets_key] = {
-                                        "body_left": float(body_left),
-                                        "body_right": float(body_right),
-                                        "left_wing": float(left_wing_usd),
-                                        "right_wing": float(right_wing_usd),
-                                    }
-
-                            # --- Adjust strategy shape (editable truth only in exact_strikes mode) ---
-                            with st.expander("Adjust strategy shape", expanded=False):
-                                st.caption(
-                                    "Editable in current mode" if mode_norm == "exact_strikes"
-                                    else "Derived / locked in current mode"
-                                )
-                                qty = st.slider(
-                                    "Contracts (scale height)",
-                                    1,
-                                    10,
-                                    int(qty),
-                                    help="Multiply payoff by number of contracts.",
-                                    disabled=(mode_norm != "exact_strikes"),
-                                )
-                                k1, k2, k3, k4 = k1d, k2d, k3d, k4d
-                                st.caption("**Bodies on top, wings below.** Use +/- inputs for exact levels (snaps to strikes). Checkboxes turn legs on/off.")
-                                strike_key = selected_expiry_str  # per-expiry widget keys prevent cross-expiry drift
-                                # Bodies row (K2, K3) — +/- number inputs
-                                b_left, b_right = st.columns(2)
-                                with b_left:
-                                    k2_key = f"u4_k2_{strike_key}"
-                                    k2_input = st.number_input(
-                                        "K2 — left body $",
-                                        min_value=lo,
-                                        max_value=hi,
-                                        value=int(k2),
-                                        step=step,
-                                        key=k2_key,
-                                        disabled=(mode_norm != "exact_strikes"),
-                                    )
-                                with b_right:
-                                    k3_key = f"u4_k3_{strike_key}"
-                                    k3_input = st.number_input(
-                                        "K3 — right body $",
-                                        min_value=lo,
-                                        max_value=hi,
-                                        value=int(k3),
-                                        step=step,
-                                        key=k3_key,
-                                        disabled=(mode_norm != "exact_strikes"),
-                                    )
-
-                                # Wings row (K1, K4) — +/- number inputs
-                                w_left, w_right = st.columns(2)
-                                with w_left:
-                                    k1_key = f"u4_k1_{strike_key}"
-                                    k1_input = st.number_input(
-                                        "K1 — left wing $",
-                                        min_value=lo,
-                                        max_value=hi,
-                                        value=int(k1),
-                                        step=step,
-                                        key=k1_key,
-                                        disabled=(mode_norm != "exact_strikes"),
-                                    )
-                                with w_right:
-                                    k4_key = f"u4_k4_{strike_key}"
-                                    k4_input = st.number_input(
-                                        "K4 — right wing $",
-                                        min_value=lo,
-                                        max_value=hi,
-                                        value=int(k4),
-                                        step=step,
-                                        key=k4_key,
-                                        disabled=(mode_norm != "exact_strikes"),
-                                    )
-
-                                # Snap to nearest available strikes
-                                k1_sel = min(avail_strikes, key=lambda k: abs(k - int(k1_input)))
-                                k2_sel = min(avail_strikes, key=lambda k: abs(k - int(k2_input)))
-                                k3_sel = min(avail_strikes, key=lambda k: abs(k - int(k3_input)))
-                                k4_sel = min(avail_strikes, key=lambda k: abs(k - int(k4_input)))
+                                payoff_targets = {
+                                    "body_left": float(payoff_defaults.get("body_left", k2d)),
+                                    "body_right": float(payoff_defaults.get("body_right", k3d)),
+                                    "left_wing": float(payoff_defaults.get("left_wing", max(0.0, k2d - k1d))),
+                                    "right_wing": float(payoff_defaults.get("right_wing", max(0.0, k4d - k3d))),
+                                }
+                                use_k1 = bool(shape_state.get("use_k1", True))
+                                use_k2 = bool(shape_state.get("use_k2", True))
+                                use_k3 = bool(shape_state.get("use_k3", True))
+                                use_k4 = bool(shape_state.get("use_k4", True))
+                                reverse = bool(shape_state.get("reverse", False))
+                                qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
+                                net_pnl_mode = bool(st.session_state.get(f"netpnl_mode_{selected_expiry_str}", True))
+                                k1_sel = min(avail_strikes, key=lambda k: abs(k - float(shape_state.get("k1", k1d))))
+                                k2_sel = min(avail_strikes, key=lambda k: abs(k - float(shape_state.get("k2", k2d))))
+                                k3_sel = min(avail_strikes, key=lambda k: abs(k - float(shape_state.get("k3", k3d))))
+                                k4_sel = min(avail_strikes, key=lambda k: abs(k - float(shape_state.get("k4", k4d))))
                                 if k4_sel < k3_sel:
                                     k4_sel = k3_sel
-                                # Enforce ordering again after any numeric overrides
                                 if not (k1_sel <= k2_sel <= k3_sel <= k4_sel):
                                     k2_sel = max(k2_sel, k1_sel)
                                     k3_sel = max(k3_sel, k2_sel)
                                     k4_sel = max(k4_sel, k3_sel)
-                                # Per-leg include toggles and polarity
-                                st.caption("**Polarity & legs:** Long = pay premium, short = receive. Base: short K1, long K2, long K3, short K4.")
-                                leg_cols = st.columns(4)
-                                with leg_cols[0]:
-                                    use_k1 = st.checkbox("Use K1", value=use_k1, key="u4_use_k1", disabled=(mode_norm != "exact_strikes"))
-                                with leg_cols[1]:
-                                    use_k2 = st.checkbox("Use K2", value=use_k2, key="u4_use_k2", disabled=(mode_norm != "exact_strikes"))
-                                with leg_cols[2]:
-                                    use_k3 = st.checkbox("Use K3", value=use_k3, key="u4_use_k3", disabled=(mode_norm != "exact_strikes"))
-                                with leg_cols[3]:
-                                    use_k4 = st.checkbox("Use K4", value=use_k4, key="u4_use_k4", disabled=(mode_norm != "exact_strikes"))
-
-                                st.write("")
-                                # Reverse polarity toggle
-                                reverse = st.checkbox(
-                                    "Reverse the polarity (flip long/short)",
-                                    value=bool(reverse),
-                                    key="u4_reverse",
-                                    disabled=(mode_norm != "exact_strikes"),
-                                )
-                                # Slice 007: update "What changed?" for main non-preset interactions (Exact strikes mode).
-                                if mode_norm == "exact_strikes" and not st.session_state.get(suppress_key, False):
-                                    prev_qty = int(shape_state.get("qty", 1) or 1)
-                                    prev_reverse = bool(shape_state.get("reverse", False))
-                                    prev_use = {
-                                        "K1": bool(shape_state.get("use_k1", True)),
-                                        "K2": bool(shape_state.get("use_k2", True)),
-                                        "K3": bool(shape_state.get("use_k3", True)),
-                                        "K4": bool(shape_state.get("use_k4", True)),
-                                    }
-                                    prev_strikes = {
-                                        "k1": float(shape_state.get("k1", k1_sel)),
-                                        "k2": float(shape_state.get("k2", k2_sel)),
-                                        "k3": float(shape_state.get("k3", k3_sel)),
-                                        "k4": float(shape_state.get("k4", k4_sel)),
-                                    }
-
-                                    msg: str | None = None
-                                    if int(qty) != int(prev_qty):
-                                        msg = last_action_meaning(action_id="quantity", qty=int(qty))
-                                    elif bool(reverse) != bool(prev_reverse):
-                                        msg = last_action_meaning(action_id="polarity_reverse", reverse=bool(reverse))
-                                    else:
-                                        curr_use = {"K1": use_k1, "K2": use_k2, "K3": use_k3, "K4": use_k4}
-                                        for leg_id, enabled in curr_use.items():
-                                            if bool(enabled) != bool(prev_use.get(leg_id, enabled)):
-                                                msg = last_action_meaning(
-                                                    action_id="leg_toggle",
-                                                    leg=leg_id,
-                                                    leg_enabled=bool(enabled),
-                                                )
-                                                break
-                                    if msg is None:
-                                        curr_strikes = {"k1": float(k1_sel), "k2": float(k2_sel), "k3": float(k3_sel), "k4": float(k4_sel)}
-                                        if any(abs(float(curr_strikes[k]) - float(prev_strikes.get(k, curr_strikes[k]))) > 1e-9 for k in ("k1", "k2", "k3", "k4")):
-                                            msg = last_action_meaning(action_id="strike_edit", strikes=curr_strikes)
-                                    if msg:
-                                        st.session_state[last_change_key] = msg
-                                # Persist exact-strike truth only in exact-strikes mode
-                                if mode_norm == "exact_strikes":
-                                    st.session_state[shape_key] = {
-                                        **st.session_state.get(shape_key, {}),
-                                        "k1": k1_sel,
-                                        "k2": k2_sel,
-                                        "k3": k3_sel,
-                                        "k4": k4_sel,
-                                        "reverse": reverse,
-                                        "use_k1": use_k1,
-                                        "use_k2": use_k2,
-                                        "use_k3": use_k3,
-                                        "use_k4": use_k4,
-                                        "qty": int(qty),
-                                    }
-
+                                st.session_state[shape_key] = {
+                                    **(
+                                        st.session_state.get(shape_key, {})
+                                        if isinstance(st.session_state.get(shape_key, {}), dict)
+                                        else {}
+                                    ),
+                                    "k1": k1_sel,
+                                    "k2": k2_sel,
+                                    "k3": k3_sel,
+                                    "k4": k4_sel,
+                                    "reverse": reverse,
+                                    "use_k1": use_k1,
+                                    "use_k2": use_k2,
+                                    "use_k3": use_k3,
+                                    "use_k4": use_k4,
+                                    "qty": int(qty),
+                                }
+                            elif show_advanced_lab_ui:
+                                # Important: do not pass a computed `index` derived from session_state.
+                                # Streamlit can treat the widget as "already initialized" and keep it effectively locked.
+                                with st.expander("Mode & solver (Exact strikes vs Target payoff)", expanded=False):
+                                    mode = st.radio(
+                                        "Mode",
+                                        ["Exact strikes", "Target payoff"],
+                                        key=mode_key,
+                                        horizontal=True,
+                                    )
+                                mode_norm = "exact_strikes" if mode == "Exact strikes" else "target_payoff"
+                                prev_mode_key = f"{mode_key}__prev"
+    
+                                # Defaults for strike truth (from persisted exact-strike state)
+                                k1d = shape_state.get("k1") or min(avail_strikes)
+                                k2d = shape_state.get("k2") or atm
+                                k3d = shape_state.get("k3") or atm
+                                k4d = shape_state.get("k4") or max(avail_strikes)
+                                k1d = min(avail_strikes, key=lambda k: abs(k - k1d))
+                                k2d = min(avail_strikes, key=lambda k: abs(k - k2d))
+                                k3d = min(avail_strikes, key=lambda k: abs(k - k3d))
+                                k4d = min(avail_strikes, key=lambda k: abs(k - k4d))
+                                if not (k1d <= k2d <= k3d <= k4d):
+                                    k2d, k3d, k4d = max(k2d, k1d), max(k3d, k2d), max(k4d, k3d)
+    
+                                # Persisted payoff targets (truth only in target_payoff mode)
+                                payoff_targets_key = f"u4_payoff_targets_{selected_expiry_str}"
+                                payoff_defaults = st.session_state.get(payoff_targets_key, {}) if isinstance(st.session_state.get(payoff_targets_key, {}), dict) else {}
+                                payoff_targets = {
+                                    "body_left": float(payoff_defaults.get("body_left", k2d)),
+                                    "body_right": float(payoff_defaults.get("body_right", k3d)),
+                                    "left_wing": float(payoff_defaults.get("left_wing", max(0.0, k2d - k1d))),
+                                    "right_wing": float(payoff_defaults.get("right_wing", max(0.0, k4d - k3d))),
+                                }
+    
+                                # Shared leg toggles + polarity (persisted in exact-shape state)
+                                use_k1 = bool(shape_state.get("use_k1", True))
+                                use_k2 = bool(shape_state.get("use_k2", True))
+                                use_k3 = bool(shape_state.get("use_k3", True))
+                                use_k4 = bool(shape_state.get("use_k4", True))
+                                reverse = bool(shape_state.get("reverse", False))
+                                qty = int(shape_state.get("qty", 1)) if str(shape_state.get("qty", "")).isdigit() else int(shape_state.get("qty", 1) or 1)
+    
+                                # Slice 007: "last action" meaning beyond presets (mode switch + exact-strikes controls).
+                                suppress_key = f"implied_lab_last_change_suppress_{selected_expiry_str}"
+                                if st.session_state.get(suppress_key, False):
+                                    st.session_state[suppress_key] = False
+                                    st.session_state[prev_mode_key] = mode
+                                else:
+                                    prev_mode = st.session_state.get(prev_mode_key)
+                                    if isinstance(prev_mode, str) and prev_mode and prev_mode != mode:
+                                        st.session_state[last_change_key] = last_action_meaning(
+                                            action_id="mode_switch",
+                                            mode_label=mode,
+                                        )
+                                    st.session_state[prev_mode_key] = mode
+    
+                                # --- Payoff → strikes (editable truth only in target_payoff mode) ---
+                                with st.expander("Payoff → strikes", expanded=False):
+                                    st.caption("Use this to *calculate* which strikes (K1–K4) produce the payoff/P&L shape you want. **Chain:** Payoff → strikes → chart.")
+                                    st.caption(
+                                        "Editable in current mode" if mode_norm == "target_payoff"
+                                        else "Derived / locked in current mode"
+                                    )
+                                    payoff_key = selected_expiry_str  # per-expiry widget keys to prevent drift
+                                    payoff_work_key = f"payoff_work_{payoff_key}"
+                                    net_pnl_mode = st.checkbox(
+                                        "Net P&L mode (cost-aware)",
+                                        value=bool(st.session_state.get(f"netpnl_mode_{payoff_key}", True)),
+                                        key=f"netpnl_mode_{payoff_key}",
+                                        disabled=(mode_norm != "target_payoff"),
+                                    )
+    
+                                    max_wing = int(max(0, hi - lo))
+                                    wing_abs = int(min(2_000_000, max(1_000, int(abs(payoff_targets["left_wing"])), int(abs(payoff_targets["right_wing"]))) * 2))
+    
+                                    # Avoid Streamlit "default + session_state set" warnings:
+                                    # only provide defaults when a widget key isn't already in session_state.
+                                    key_body_left = f"payoff_body_left_{payoff_key}"
+                                    key_body_right = f"payoff_body_right_{payoff_key}"
+                                    key_left_wing = f"payoff_left_wing_{payoff_key}"
+                                    key_right_wing = f"payoff_right_wing_{payoff_key}"
+    
+                                    st.markdown("**Inputs (payoff → strikes)**")
+                                    st.markdown(
+                                        "- **BodyLeft / BodyRight**: " + (
+                                            "net breakeven prices (where green line crosses 0)." if net_pnl_mode else "where the *flat middle* starts/ends."
+                                        ) + "\n" +
+                                        "- **LeftWingUSD / RightWingUSD**: " + (
+                                            "net profit plateaus in the wings (green line height, after premium)." if net_pnl_mode else
+                                            "the **width** of each wing (in USD). Bigger width pushes K1 further left and K4 further right."
+                                        )
+                                    )
+    
+                                    # Slider UI (same feel as strike dials)
+                                    bl_col, br_col = st.columns(2)
+                                    with bl_col:
+                                        body_left = st.slider(
+                                            "Body left (price $)",
+                                            lo,
+                                            hi,
+                                            value=int(payoff_targets["body_left"]),
+                                            step=step,
+                                            key=key_body_left,
+                                            disabled=(mode_norm != "target_payoff"),
+                                        )
+                                    with br_col:
+                                        body_right = st.slider(
+                                            "Body right (price $)",
+                                            lo,
+                                            hi,
+                                            value=int(payoff_targets["body_right"]),
+                                            step=step,
+                                            key=key_body_right,
+                                            disabled=(mode_norm != "target_payoff"),
+                                        )
+    
+                                    lw_col, rw_col = st.columns(2)
+                                    with lw_col:
+                                        if net_pnl_mode:
+                                            left_wing_usd = st.slider(
+                                                "Left wing net profit (USD)",
+                                                -wing_abs,
+                                                wing_abs,
+                                                value=int(payoff_targets["left_wing"]),
+                                                step=step,
+                                                key=key_left_wing,
+                                                disabled=(mode_norm != "target_payoff"),
+                                            )
+                                        else:
+                                            left_wing_usd = st.slider(
+                                                "Left wing width (USD)",
+                                                0,
+                                                max_wing,
+                                                value=int(max(0.0, payoff_targets["left_wing"])),
+                                                step=step,
+                                                key=key_left_wing,
+                                                disabled=(mode_norm != "target_payoff"),
+                                            )
+                                    with rw_col:
+                                        if net_pnl_mode:
+                                            right_wing_usd = st.slider(
+                                                "Right wing net profit (USD)",
+                                                -wing_abs,
+                                                wing_abs,
+                                                value=int(payoff_targets["right_wing"]),
+                                                step=step,
+                                                key=key_right_wing,
+                                                disabled=(mode_norm != "target_payoff"),
+                                            )
+                                        else:
+                                            right_wing_usd = st.slider(
+                                                "Right wing width (USD)",
+                                                0,
+                                                max_wing,
+                                                value=int(max(0.0, payoff_targets["right_wing"])),
+                                                step=step,
+                                                key=key_right_wing,
+                                                disabled=(mode_norm != "target_payoff"),
+                                            )
+    
+                                    # Persist payoff target truth only in target-payoff mode
+                                    if mode_norm == "target_payoff":
+                                        # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to target-payoff interactions.
+                                        payoff_prev_key = f"implied_lab_payoff_prev_{selected_expiry_str}"
+                                        prev_payoff = (
+                                            st.session_state.get(payoff_prev_key)
+                                            if isinstance(st.session_state.get(payoff_prev_key), dict)
+                                            else None
+                                        )
+                                        curr_payoff = {
+                                            "net_pnl_mode": bool(net_pnl_mode),
+                                            "body_left": float(body_left),
+                                            "body_right": float(body_right),
+                                            "left_wing": float(left_wing_usd),
+                                            "right_wing": float(right_wing_usd),
+                                        }
+                                        if prev_payoff is None:
+                                            st.session_state[payoff_prev_key] = dict(curr_payoff)
+                                        else:
+                                            if not st.session_state.get(suppress_key, False):
+                                                msg = None
+                                                if bool(curr_payoff["net_pnl_mode"]) != bool(prev_payoff.get("net_pnl_mode", curr_payoff["net_pnl_mode"])):
+                                                    msg = last_action_meaning(
+                                                        action_id="net_pnl_mode_toggle",
+                                                        net_pnl_mode=bool(curr_payoff["net_pnl_mode"]),
+                                                    )
+                                                elif abs(float(curr_payoff["body_left"]) - float(prev_payoff.get("body_left", curr_payoff["body_left"]))) > 1e-9:
+                                                    msg = last_action_meaning(
+                                                        action_id="target_payoff_edit",
+                                                        target_id="Body left",
+                                                        target_value=float(curr_payoff["body_left"]),
+                                                    )
+                                                elif abs(float(curr_payoff["body_right"]) - float(prev_payoff.get("body_right", curr_payoff["body_right"]))) > 1e-9:
+                                                    msg = last_action_meaning(
+                                                        action_id="target_payoff_edit",
+                                                        target_id="Body right",
+                                                        target_value=float(curr_payoff["body_right"]),
+                                                    )
+                                                elif abs(float(curr_payoff["left_wing"]) - float(prev_payoff.get("left_wing", curr_payoff["left_wing"]))) > 1e-9:
+                                                    msg = last_action_meaning(
+                                                        action_id="target_payoff_edit",
+                                                        target_id="Left wing",
+                                                        target_value=float(curr_payoff["left_wing"]),
+                                                    )
+                                                elif abs(float(curr_payoff["right_wing"]) - float(prev_payoff.get("right_wing", curr_payoff["right_wing"]))) > 1e-9:
+                                                    msg = last_action_meaning(
+                                                        action_id="target_payoff_edit",
+                                                        target_id="Right wing",
+                                                        target_value=float(curr_payoff["right_wing"]),
+                                                    )
+                                                if msg:
+                                                    st.session_state[last_change_key] = msg
+                                            st.session_state[payoff_prev_key] = dict(curr_payoff)
+                                        st.session_state[payoff_targets_key] = {
+                                            "body_left": float(body_left),
+                                            "body_right": float(body_right),
+                                            "left_wing": float(left_wing_usd),
+                                            "right_wing": float(right_wing_usd),
+                                        }
+    
+                                # --- Adjust strategy shape (editable truth only in exact_strikes mode) ---
+                                with st.expander("Adjust strategy shape", expanded=False):
+                                    st.caption(
+                                        "Editable in current mode" if mode_norm == "exact_strikes"
+                                        else "Derived / locked in current mode"
+                                    )
+                                    qty = st.slider(
+                                        "Contracts (scale height)",
+                                        1,
+                                        10,
+                                        int(qty),
+                                        help="Multiply payoff by number of contracts.",
+                                        disabled=(mode_norm != "exact_strikes"),
+                                    )
+                                    k1, k2, k3, k4 = k1d, k2d, k3d, k4d
+                                    st.caption("**Bodies on top, wings below.** Use +/- inputs for exact levels (snaps to strikes). Checkboxes turn legs on/off.")
+                                    strike_key = selected_expiry_str  # per-expiry widget keys prevent cross-expiry drift
+                                    # Bodies row (K2, K3) — +/- number inputs
+                                    b_left, b_right = st.columns(2)
+                                    with b_left:
+                                        k2_key = f"u4_k2_{strike_key}"
+                                        k2_input = st.number_input(
+                                            "K2 — left body $",
+                                            min_value=lo,
+                                            max_value=hi,
+                                            value=int(k2),
+                                            step=step,
+                                            key=k2_key,
+                                            disabled=(mode_norm != "exact_strikes"),
+                                        )
+                                    with b_right:
+                                        k3_key = f"u4_k3_{strike_key}"
+                                        k3_input = st.number_input(
+                                            "K3 — right body $",
+                                            min_value=lo,
+                                            max_value=hi,
+                                            value=int(k3),
+                                            step=step,
+                                            key=k3_key,
+                                            disabled=(mode_norm != "exact_strikes"),
+                                        )
+    
+                                    # Wings row (K1, K4) — +/- number inputs
+                                    w_left, w_right = st.columns(2)
+                                    with w_left:
+                                        k1_key = f"u4_k1_{strike_key}"
+                                        k1_input = st.number_input(
+                                            "K1 — left wing $",
+                                            min_value=lo,
+                                            max_value=hi,
+                                            value=int(k1),
+                                            step=step,
+                                            key=k1_key,
+                                            disabled=(mode_norm != "exact_strikes"),
+                                        )
+                                    with w_right:
+                                        k4_key = f"u4_k4_{strike_key}"
+                                        k4_input = st.number_input(
+                                            "K4 — right wing $",
+                                            min_value=lo,
+                                            max_value=hi,
+                                            value=int(k4),
+                                            step=step,
+                                            key=k4_key,
+                                            disabled=(mode_norm != "exact_strikes"),
+                                        )
+    
+                                    # Snap to nearest available strikes
+                                    k1_sel = min(avail_strikes, key=lambda k: abs(k - int(k1_input)))
+                                    k2_sel = min(avail_strikes, key=lambda k: abs(k - int(k2_input)))
+                                    k3_sel = min(avail_strikes, key=lambda k: abs(k - int(k3_input)))
+                                    k4_sel = min(avail_strikes, key=lambda k: abs(k - int(k4_input)))
+                                    if k4_sel < k3_sel:
+                                        k4_sel = k3_sel
+                                    # Enforce ordering again after any numeric overrides
+                                    if not (k1_sel <= k2_sel <= k3_sel <= k4_sel):
+                                        k2_sel = max(k2_sel, k1_sel)
+                                        k3_sel = max(k3_sel, k2_sel)
+                                        k4_sel = max(k4_sel, k3_sel)
+                                    # Per-leg include toggles and polarity
+                                    st.caption("**Polarity & legs:** Long = pay premium, short = receive. Base: short K1, long K2, long K3, short K4.")
+                                    leg_cols = st.columns(4)
+                                    with leg_cols[0]:
+                                        use_k1 = st.checkbox("Use K1", value=use_k1, key="u4_use_k1", disabled=(mode_norm != "exact_strikes"))
+                                    with leg_cols[1]:
+                                        use_k2 = st.checkbox("Use K2", value=use_k2, key="u4_use_k2", disabled=(mode_norm != "exact_strikes"))
+                                    with leg_cols[2]:
+                                        use_k3 = st.checkbox("Use K3", value=use_k3, key="u4_use_k3", disabled=(mode_norm != "exact_strikes"))
+                                    with leg_cols[3]:
+                                        use_k4 = st.checkbox("Use K4", value=use_k4, key="u4_use_k4", disabled=(mode_norm != "exact_strikes"))
+    
+                                    st.write("")
+                                    # Reverse polarity toggle
+                                    reverse = st.checkbox(
+                                        "Reverse the polarity (flip long/short)",
+                                        value=bool(reverse),
+                                        key="u4_reverse",
+                                        disabled=(mode_norm != "exact_strikes"),
+                                    )
+                                    # Slice 007: update "What changed?" for main non-preset interactions (Exact strikes mode).
+                                    if mode_norm == "exact_strikes" and not st.session_state.get(suppress_key, False):
+                                        prev_qty = int(shape_state.get("qty", 1) or 1)
+                                        prev_reverse = bool(shape_state.get("reverse", False))
+                                        prev_use = {
+                                            "K1": bool(shape_state.get("use_k1", True)),
+                                            "K2": bool(shape_state.get("use_k2", True)),
+                                            "K3": bool(shape_state.get("use_k3", True)),
+                                            "K4": bool(shape_state.get("use_k4", True)),
+                                        }
+                                        prev_strikes = {
+                                            "k1": float(shape_state.get("k1", k1_sel)),
+                                            "k2": float(shape_state.get("k2", k2_sel)),
+                                            "k3": float(shape_state.get("k3", k3_sel)),
+                                            "k4": float(shape_state.get("k4", k4_sel)),
+                                        }
+    
+                                        msg: str | None = None
+                                        if int(qty) != int(prev_qty):
+                                            msg = last_action_meaning(action_id="quantity", qty=int(qty))
+                                        elif bool(reverse) != bool(prev_reverse):
+                                            msg = last_action_meaning(action_id="polarity_reverse", reverse=bool(reverse))
+                                        else:
+                                            curr_use = {"K1": use_k1, "K2": use_k2, "K3": use_k3, "K4": use_k4}
+                                            for leg_id, enabled in curr_use.items():
+                                                if bool(enabled) != bool(prev_use.get(leg_id, enabled)):
+                                                    msg = last_action_meaning(
+                                                        action_id="leg_toggle",
+                                                        leg=leg_id,
+                                                        leg_enabled=bool(enabled),
+                                                    )
+                                                    break
+                                        if msg is None:
+                                            curr_strikes = {"k1": float(k1_sel), "k2": float(k2_sel), "k3": float(k3_sel), "k4": float(k4_sel)}
+                                            if any(abs(float(curr_strikes[k]) - float(prev_strikes.get(k, curr_strikes[k]))) > 1e-9 for k in ("k1", "k2", "k3", "k4")):
+                                                msg = last_action_meaning(action_id="strike_edit", strikes=curr_strikes)
+                                        if msg:
+                                            st.session_state[last_change_key] = msg
+                                    # Persist exact-strike truth only in exact-strikes mode
+                                    if mode_norm == "exact_strikes":
+                                        st.session_state[shape_key] = {
+                                            **st.session_state.get(shape_key, {}),
+                                            "k1": k1_sel,
+                                            "k2": k2_sel,
+                                            "k3": k3_sel,
+                                            "k4": k4_sel,
+                                            "reverse": reverse,
+                                            "use_k1": use_k1,
+                                            "use_k2": use_k2,
+                                            "use_k3": use_k3,
+                                            "use_k4": use_k4,
+                                            "qty": int(qty),
+                                        }
+    
                             # Centralized state (user truth only) + pure derived outputs (Sprint 1A)
                             strikes_exact = {"k1": float(k1_sel), "k2": float(k2_sel), "k3": float(k3_sel), "k4": float(k4_sel)}
-                            payoff_targets = {
-                                "body_left": float(st.session_state.get(key_body_left, payoff_targets["body_left"])),
-                                "body_right": float(st.session_state.get(key_body_right, payoff_targets["body_right"])),
-                                "left_wing": float(st.session_state.get(key_left_wing, payoff_targets["left_wing"])),
-                                "right_wing": float(st.session_state.get(key_right_wing, payoff_targets["right_wing"])),
-                            }
+                            if show_advanced_lab_ui:
+                                payoff_targets = {
+                                    "body_left": float(st.session_state.get(key_body_left, payoff_targets["body_left"])),
+                                    "body_right": float(st.session_state.get(key_body_right, payoff_targets["body_right"])),
+                                    "left_wing": float(st.session_state.get(key_left_wing, payoff_targets["left_wing"])),
+                                    "right_wing": float(st.session_state.get(key_right_wing, payoff_targets["right_wing"])),
+                                }
                             state = build_implied_lab_state(
                                 expiry_str=selected_expiry_str,
                                 mode=mode_norm,
@@ -1228,10 +1317,13 @@ if show_bitcoin_view:
                                 st.markdown(_belief_block)
                     with right_review_slot.container():
                         with st.expander("Review & disagreement digest", expanded=False):
-                            _render_decision_ready_review(outputs.get("verification") or {})
+                            _render_decision_ready_review(
+                                outputs.get("verification") or {},
+                                mvp1_exclude_execution_ui=not _post_mvp1_lab_ui_enabled(),
+                            )
                             _render_belief_vs_market_glance(outputs.get("verification") or {})
-                    with right_ticket_slot.container():
-                        if selected_strategy and selected_strategy.get("k1") is not None:
+                    if _post_mvp1_lab_ui_enabled() and selected_strategy and selected_strategy.get("k1") is not None:
+                        with right_ticket_slot.container():
                             _render_implied_lab_trade_ticket_panel(
                                 selected_expiry_str=selected_expiry_str,
                                 qty=int(qty),
@@ -1241,6 +1333,8 @@ if show_bitcoin_view:
                                 call_by_k=call_by_k,
                                 summary=outputs.get("summary") or {},
                             )
+                    else:
+                        right_ticket_slot.empty()
                     if anomalous:
                         right_anomaly_slot.warning(
                             "Anomalous: market-implied pricing distribution differs from the lognormal reference (see Verification)."
@@ -1254,7 +1348,15 @@ if show_bitcoin_view:
                     with st.expander("Strategy details (optional)", expanded=False):
                         if not (selected_strategy and selected_strategy.get("k1") is not None):
                             if avail_strikes:
-                                st.caption("Set strikes in the **left column** (open **Adjust strategy shape**) to see payoff and name above.")
+                                if _post_mvp1_lab_ui_enabled():
+                                    st.caption(
+                                        "Set strikes in the **left column** (open **Adjust strategy shape**) to see payoff and name above."
+                                    )
+                                else:
+                                    st.caption(
+                                        "Pick a **preset** in **Shape & payoff** (left) to load an illustrative structure — "
+                                        "MVP1 hides manual strike editing."
+                                    )
                             else:
                                 st.caption("No strikes available for this expiry; use **Refresh priced inputs (Deribit)** or pick another expiry.")
                         else:
@@ -1274,10 +1376,15 @@ if show_bitcoin_view:
                                 use_container_width=True,
                                 hide_index=True,
                             )
-                            st.caption(
-                                "**Trade ticket (copy/paste)** is **above** (under **Review & disagreement digest**) — "
-                                "same leg list and optional **Show calculations** — illustrative only, not a recommendation."
-                            )
+                            if _post_mvp1_lab_ui_enabled():
+                                st.caption(
+                                    "**Trade ticket (copy/paste)** is **above** (under **Review & disagreement digest**) — "
+                                    "same leg list and optional **Show calculations** — illustrative only, not a recommendation."
+                                )
+                            else:
+                                st.caption(
+                                    "**MVP1 scope:** copy/paste trade ticket and execution-ready leg export are hidden."
+                                )
             else:
                 st.caption("No Deribit option expiries. Check API.")
                 with st.expander("Debug (expiries fetch)", expanded=False):

@@ -74,6 +74,12 @@ SCENARIOS = [
 ]
 
 
+def mvp1_execution_surfaces_hidden_by_default() -> bool:
+    """True unless env enables post-MVP1 lab surfaces (`PPE_POST_MVP1_LAB_UI`)."""
+    v = str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip().lower()
+    return v not in ("1", "true", "yes", "on")
+
+
 @dataclass
 class ScenarioResult:
     scenario: str
@@ -424,6 +430,12 @@ def _set_mode(page, mode_text: str) -> None:
     loc.click()
 
 
+def _set_mode_when_advanced_lab_ui_enabled(page, mode_text: str) -> None:
+    if mvp1_execution_surfaces_hidden_by_default():
+        return
+    _set_mode(page, mode_text)
+
+
 def _expand_expander(page, expander_title: str) -> None:
     """
     Click a <details><summary>... expander if not already open.
@@ -462,6 +474,16 @@ def _expand_expander(page, expander_title: str) -> None:
         page.wait_for_timeout(800)
         return
 
+    loose_btn = page.locator("button").filter(has_text=re.compile(re.escape(expander_title), re.I)).first
+    if loose_btn.count() > 0:
+        try:
+            loose_btn.scroll_into_view_if_needed()
+        except Exception:
+            pass
+        loose_btn.click(force=True)
+        page.wait_for_timeout(800)
+        return
+
     raise RuntimeError(f"Could not find expander header: {expander_title}")
 
 
@@ -478,7 +500,12 @@ def _collect_observations(page, result: ScenarioResult) -> None:
     # doesn't get misclassified as "not found".
     result.disagreement_text_found = _text_present("Disagreement type:")
     result.family_block_found = _text_present("Strategy families that fit this disagreement")
-    result.trade_ticket_found = _text_present("Trade ticket (copy/paste)")
+    ticket_visible = _text_present("Trade ticket (copy/paste)")
+    if mvp1_execution_surfaces_hidden_by_default():
+        # Field name kept for manifest compatibility: "found" means gate satisfied (no ticket UI).
+        result.trade_ticket_found = not ticket_visible
+    else:
+        result.trade_ticket_found = ticket_visible
 
 
 def _collect_verification_observation(page, result: ScenarioResult) -> None:
@@ -700,11 +727,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
 
         # Set scenario-specific widgets.
         if scenario == "A_width_target_payoff":
-            _set_mode(page, "Target payoff")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Target payoff")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             # Belief uncertainty now defaults to ±% mode; switch to σ mode so this scenario can set σ_ln.
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.70)
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(800)
             _expand_expander(page, "Verification")
             # Scroll & wait for the classification block to be rendered.
             try:
@@ -718,13 +747,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             )
 
         elif scenario == "B_peak_aligned":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
 
         elif scenario == "C_directional_peak_disagreement":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             # Match user σ_ln to ATM-implied σ first so width band is "similar", then
             # shift peak — yields directional (not mixed) disagreement vs market modal peak.
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
@@ -774,6 +803,8 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             # Peak change can rerun the script and reset the width slider; restore and re-ensure "similar".
             chosen_sig = _ensure_width_band_similar(chosen_sig)
             page.wait_for_timeout(600)
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(800)
             _expand_expander(page, "Verification")
             try:
                 page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
@@ -786,7 +817,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             )
 
         elif scenario == "D_exact_strikes_mode":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
@@ -950,6 +981,7 @@ def main() -> int:
             "port": PORT,
             "run_id": RUN_ID,
             "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+            "mvp1_execution_surfaces_hidden_default": mvp1_execution_surfaces_hidden_by_default(),
             "workflow_hardening_slice003_closeout": wh_slice003_closeout,
             "scenarios": [
                 {
@@ -978,7 +1010,8 @@ def main() -> int:
                 ),
                 "success_requires": (
                     "For each scenario in this run: page_loaded, disagreement_text_found, "
-                    "family_block_found, and trade_ticket_found must be true. "
+                    "family_block_found must be true, and trade_ticket_found must be true "
+                    "(when MVP1 hides trade-ticket UI by default, this field means the ticket UI stayed absent). "
                     "If A_width_target_payoff is included, verification_found must be true. "
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "

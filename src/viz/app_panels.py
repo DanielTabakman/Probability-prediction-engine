@@ -11,10 +11,17 @@ so extraction remains behavior-neutral.
 
 from __future__ import annotations
 
+import os
+
 import streamlit as st
 
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
+
+
+def _mvp1_hide_execution_surfaces() -> bool:
+    v = str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip().lower()
+    return v not in ("1", "true", "yes", "on")
 
 
 def render_belief_vs_market_glance(v: dict) -> None:
@@ -511,14 +518,24 @@ def render_implied_lab_verification(v: dict) -> None:
             st.write("**Breakevens:**", notes.get("breakevens", ""))
 
 
-def render_decision_ready_review(verification: dict) -> None:
+def render_decision_ready_review(
+    verification: dict, *, mvp1_exclude_execution_ui: bool = False
+) -> None:
     """Sprint 005: plain-language structure + payoff read + disagreement/ticket linkage."""
-    payload = build_decision_ready_review_payload(verification)
+    payload = build_decision_ready_review_payload(
+        verification, mvp1_exclude_execution_ui=mvp1_exclude_execution_ui
+    )
     if not payload:
         return
     with st.container(border=True):
         st.markdown("##### Decision-ready review")
-        st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
+        if mvp1_exclude_execution_ui:
+            st.caption(
+                "Connects **Summary** to the glance digest below — descriptive only "
+                "(MVP1 hides copy/paste trade-ticket export)."
+            )
+        else:
+            st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
         st.markdown(payload["structure_line"])
         st.markdown(payload["payoff_line"])
         st.markdown(payload["linkage_line"])
@@ -700,9 +717,14 @@ def render_implied_lab_summary_card(outputs: dict) -> None:
 
     with st.container(border=True):
         st.markdown("##### Summary")
-        st.caption(
-            "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
-        )
+        if _mvp1_hide_execution_surfaces():
+            st.caption(
+                "Payoff snapshot for the green line — strikes and premiums match **Verification** / strategy overlay."
+            )
+        else:
+            st.caption(
+                "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
+            )
         st.markdown(f"**{name}**")
         a, b, c = st.columns(3)
         with a:
