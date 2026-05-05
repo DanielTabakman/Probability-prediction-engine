@@ -1,6 +1,6 @@
 # MANIFEST_SCHEMA
 
-**Canonical schema version: v3**
+**Canonical schema version: v4**
 
 Source of truth for the integer constant: `MANIFEST_SCHEMA_VERSION` in
 `scripts/implied_lab_ui_smoke_harness.py`. The drift-detection test
@@ -15,7 +15,7 @@ Emitted in every manifest at the top level, keyed
 
 | Field | Type | Meaning |
 |---|---|---|
-| `schema_version` | int | Schema version of this block (currently `3`). |
+| `schema_version` | int | Schema version of this block (currently `4`). |
 | `primary_scenario_ran` | bool | Whether `A_width_target_payoff` was included in the run. |
 | `evidence_plane_complete` | bool | True when **both** width_vol and directional witnesses are in acceptable states: width_vol in (`WITNESS_OK`, `DEGRADED_STRIP_NOT_SHOWN`) AND directional in (`WITNESS_OK`, `BOUNDED_LIVE_DATA_NO_DIRECTIONAL_STRIP`). |
 | `bounded_live_data_miss` | bool | True when width_vol classification is `DEGRADED_STRIP_NOT_SHOWN`. Present only when `primary_scenario_ran` is true. |
@@ -72,6 +72,7 @@ Emitted inside each scenario's entry in the `scenarios` list (Sprint004-Slice004
 | v1 | 2026-04-22 | Initial schema; shipped with `Workflow-Hardening-Slice-003`. Literal `1` embedded in harness. |
 | v2 | 2026-04-27 | Same structure and semantics as v1. Terminology aligned with `CURRENT_FRONTIER.md` "manifest/schema v2" language. Integer literal replaced by `MANIFEST_SCHEMA_VERSION` constant in harness. This is a documentation-version reconciliation, not a structural change. |
 | v3 | 2026-04-27 | Sprint004-Slice004: added `slice004_directional_witness` row per scenario; added `width_vol_signal` and `directional_signal` fields to closeout block; `evidence_plane_complete` now requires both witnesses to be in acceptable states. `workflow_hardening_slice003_signal` field removed (superseded by `width_vol_signal`). |
+| v4 | 2026-05-04 | MVP1 dual-smoke: new scenario `MVP1_compact_verification`; harness pass criteria treat `trade_ticket_found` as required-false for that scenario only; `verification_ok` may be satisfied by MVP1 scenario without A/C. |
 
 v2 → v3 is a **structural bump**: the closeout block gains two new fields (`width_vol_signal`,
 `directional_signal`) and the per-scenario entries gain a new witness row

@@ -538,7 +538,9 @@ def render_implied_lab_trade_ticket_panel(
                 st.markdown("Payoff curve does not cross zero in the chart range (always profit or always loss).")
 
 
-def render_implied_lab_summary_card(outputs: dict) -> None:
+def render_implied_lab_summary_card(
+    outputs: dict, *, mvp1_lab_surfaces_hidden: bool = False
+) -> None:
     """
     Compact trade summary for the implied lab.
     Single-source-of-truth: uses derived `outputs` (esp. verification.strategy_summary).
@@ -567,7 +569,9 @@ def render_implied_lab_summary_card(outputs: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Summary")
         st.caption(
-            "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
+            "Reference strategy economics from the same engine as the hidden post-MVP UI (not a trade ticket)."
+            if mvp1_lab_surfaces_hidden
+            else "Payoff snapshot for the green line — same strikes and premiums as **Trade ticket (copy/paste)**."
         )
         st.markdown(f"**{name}**")
         a, b, c = st.columns(3)

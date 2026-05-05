@@ -62,7 +62,7 @@ SLICE004_DIRECTIONAL_WAIT_S = 10.0
 # Manifest schema version — single source of truth.
 # Increment this constant when the closeout block structure changes.
 # docs/SOP/MANIFEST_SCHEMA.md must match; tests/test_manifest_schema_drift.py enforces alignment.
-MANIFEST_SCHEMA_VERSION = 3
+MANIFEST_SCHEMA_VERSION = 4
 MANIFEST_SCHEMA_DOCS_REFERENCE = "docs/SOP/MANIFEST_SCHEMA.md"
 
 
@@ -71,7 +71,45 @@ SCENARIOS = [
     "B_peak_aligned",
     "C_directional_peak_disagreement",
     "D_exact_strikes_mode",
+    "MVP1_compact_verification",
 ]
+
+
+def _ensure_width_band_similar(page, target_sig: float) -> float:
+    """
+    Adjust belief uncertainty (σ_ln) until width band vs market reads "similar".
+    Shared by C_directional_peak_disagreement and MVP1_compact_verification.
+    """
+    sig = float(max(0.02, min(0.8, round(float(target_sig), 3))))
+    candidates: list[float] = []
+    base = round(float(sig), 3)
+    for d in (
+        0.0,
+        -0.005,
+        0.005,
+        -0.01,
+        0.01,
+        -0.015,
+        0.015,
+        -0.02,
+        0.02,
+        -0.025,
+        0.025,
+        -0.03,
+        0.03,
+    ):
+        v = float(max(0.02, min(0.8, base + d)))
+        if v not in candidates:
+            candidates.append(v)
+    chosen = candidates[0]
+    for v in candidates:
+        _set_belief_uncertainty_aria_slider(page, v)
+        page.wait_for_timeout(450)
+        wb = _parse_width_band_from_belief_summary(page)
+        chosen = v
+        if wb == "similar":
+            break
+    return chosen
 
 
 @dataclass
@@ -735,44 +773,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
                 sig = 0.08
             sig = float(max(0.02, min(0.8, sig)))
 
-            def _ensure_width_band_similar(target_sig: float) -> float:
-                """
-                Adjust the belief uncertainty slider until the UI reports width band = similar.
-                This removes flakiness from rounding (e.g. σ_mkt very small) while preserving semantics.
-                """
-                # Try near the target with fine steps (slider supports ~0.01).
-                candidates = []
-                base = round(float(target_sig), 3)
-                # Centered sweep: base, ±0.005, ±0.01, ...
-                for d in [
-                    0.0,
-                    -0.005, 0.005,
-                    -0.01, 0.01,
-                    -0.015, 0.015,
-                    -0.02, 0.02,
-                    -0.025, 0.025,
-                    -0.03, 0.03,
-                ]:
-                    v = float(max(0.02, min(0.8, base + d)))
-                    if v not in candidates:
-                        candidates.append(v)
-                chosen = candidates[0]
-                for v in candidates:
-                    _set_belief_uncertainty_aria_slider(page, v)
-                    page.wait_for_timeout(450)
-                    wb = _parse_width_band_from_belief_summary(page)
-                    chosen = v
-                    if wb == "similar":
-                        break
-                return chosen
-
-            chosen_sig = _ensure_width_band_similar(sig)
+            chosen_sig = _ensure_width_band_similar(page, sig)
             page.wait_for_timeout(500)
 
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
             page.wait_for_timeout(900)
             # Peak change can rerun the script and reset the width slider; restore and re-ensure "similar".
-            chosen_sig = _ensure_width_band_similar(chosen_sig)
+            chosen_sig = _ensure_width_band_similar(page, chosen_sig)
             page.wait_for_timeout(600)
             _expand_expander(page, "Verification")
             try:
@@ -790,6 +797,32 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
+
+        elif scenario == "MVP1_compact_verification":
+            # Default MVP1 UI: no Mode & solver / strike ladder — belief-only path (same math as C).
+            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            page.wait_for_timeout(1500)
+            page.locator("text=σ_ln (advanced)").first.click()
+            sig = _parse_sigma_mkt_at_horizon_from_caption(page)
+            if sig is None:
+                sig = 0.08
+            sig = float(max(0.02, min(0.8, sig)))
+            chosen_sig = _ensure_width_band_similar(page, sig)
+            page.wait_for_timeout(500)
+            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
+            page.wait_for_timeout(900)
+            chosen_sig = _ensure_width_band_similar(page, chosen_sig)
+            page.wait_for_timeout(600)
+            _expand_expander(page, "Verification")
+            try:
+                page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
+            except Exception:
+                pass
+            page.wait_for_selector(
+                "text=disagreement classification",
+                timeout=60000,
+                state="attached",
+            )
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
 
@@ -977,12 +1010,13 @@ def main() -> int:
                     "python scripts/implied_lab_ui_smoke_harness.py --port <PORT> --scenario A_width_target_payoff"
                 ),
                 "success_requires": (
-                    "For each scenario in this run: page_loaded, disagreement_text_found, "
-                    "family_block_found, and trade_ticket_found must be true. "
+                    "For each scenario: page_loaded, disagreement_text_found, family_block_found. "
+                    "trade_ticket_found must be true for A/B/C/D; for MVP1_compact_verification it must be false. "
                     "If A_width_target_payoff is included, verification_found must be true. "
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
-                    "If neither A nor C is in the run, the verification gate fails."
+                    "If MVP1_compact_verification is included, verification_found must be true. "
+                    "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
                     "Expanding automated coverage beyond B/D ad-hoc scenarios and "
@@ -1014,12 +1048,18 @@ def main() -> int:
             return all(bool(x) for x in cond)
 
         page_loaded_ok = _all(r.page_loaded for r in results)
-        main_ok = _all(
-            r.disagreement_text_found and r.family_block_found and r.trade_ticket_found
-            for r in results
-        )
+
+        def _row_main_ok(r: ScenarioResult) -> bool:
+            base = bool(r.disagreement_text_found and r.family_block_found)
+            if r.scenario == "MVP1_compact_verification":
+                # Post-MVP trade ticket must be absent in default MVP1 chrome.
+                return base and (not r.trade_ticket_found)
+            return base and bool(r.trade_ticket_found)
+
+        main_ok = _all(_row_main_ok(r) for r in results)
         has_a = any(r.scenario == "A_width_target_payoff" for r in results)
         has_c = any(r.scenario == "C_directional_peak_disagreement" for r in results)
+        has_mvp1 = any(r.scenario == "MVP1_compact_verification" for r in results)
         verification_ok = True
         if has_a:
             ra = next(r for r in results if r.scenario == "A_width_target_payoff")
@@ -1029,7 +1069,10 @@ def main() -> int:
             verification_ok = verification_ok and bool(
                 rc.verification_found and rc.directional_category_verified
             )
-        if not has_a and not has_c:
+        if has_mvp1:
+            rm = next(r for r in results if r.scenario == "MVP1_compact_verification")
+            verification_ok = verification_ok and bool(rm.verification_found)
+        if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 
         overall_pass = page_loaded_ok and main_ok and verification_ok
