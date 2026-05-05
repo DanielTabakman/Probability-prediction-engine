@@ -1,0 +1,55 @@
+# Auto-commit and auto-push policy
+
+## When to auto-commit
+
+- All todos / requested work for the current task or plan are complete.
+- Relevant **targeted tests** for the changed code have passed.
+- Before committing, the agent must always:
+  - Show `git status`, `git diff`, `git log -1 --oneline`.
+  - Propose **one commit by default** for the task; split into multiple commits only when changes are clearly separate (e.g. docs vs code vs tests).
+
+## What not to commit (safety exclusions)
+
+- Never auto-commit secrets:
+  - `.env`, `*.env*`, credentials, keys, tokens, or similar sensitive material.
+- Never auto-commit obvious generated noise unless explicitly requested:
+  - `artifacts/`, `.pytest_cache/`, `__pycache__/`, `*.sqlite*`, `*.db`, log files, or other large/generated outputs.
+- Do not change git config.
+- Do not use `git commit --amend` unless the user explicitly requests it.
+
+## Auto-push behavior (branch-aware)
+
+### Non-main branches
+
+- After auto-commit on any branch **other than** `main` / `master`, the agent should **auto-push** to the branch’s existing upstream.
+- If the current branch has no upstream yet, the first push should be `git push -u origin HEAD` (or equivalent for the default remote).
+- Preconditions for auto-push on non-main branches:
+  - Targeted tests for the work have passed.
+  - The working tree is clean except for the intended changes (no untracked / unstaged surprises that are part of the task).
+  - No force push is required; only fast-forward pushes are allowed.
+
+### `main` / `master` branches
+
+- On `main` / `master`, the agent may auto-push **only after the full test suite passes**, e.g. `python -m pytest -q`.
+- The same safety checks apply:
+  - No secrets / artifacts staged in the commit.
+  - No force push, no history rewrite.
+  - Working tree clean apart from the committed changes.
+
+## When not to auto-push
+
+The agent must NOT auto-push, and instead report status to the user, when:
+
+- A push would require `--force`, rewriting history, or resolving conflicts the agent cannot safely handle.
+- The remote rejects the push (e.g. branch protection, required checks); the agent should surface the error but not retry with riskier options.
+- Tests (targeted or full) fail or are incomplete for the work being committed.
+
+## Test alignment
+
+- **Targeted tests default**:
+  - For each task, the agent should identify and run the most relevant test modules (for example, `tests/test_*.py` files that import or mention the edited code).
+  - If no obvious tests exist, the agent should run a minimal, safe smoke (e.g. importing the module or running a narrow subset of pytest) and fall back to `python -m pytest -q` only when necessary.
+- **Full tests gate for main**:
+  - When on `main` / `master`, the agent must run `python -m pytest -q` and see it pass before auto-pushing.
+  - If full tests fail, the agent must not create new commits or pushes until the failures are addressed.
+
