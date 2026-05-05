@@ -29,6 +29,18 @@ def render_market_reference_sections(
         with st.expander("Market prices (reference)", expanded=False):
             st.subheader("Market prices (Gold, Silver, Bitcoin)")
             symbols = (config.get("markets") or {}).get("yahoo", {}).get("symbols")
+            load_key = "ref_load_yahoo"
+            if load_key not in st.session_state:
+                st.session_state[load_key] = False
+            c1, c2 = st.columns((1, 3))
+            with c1:
+                if st.button("Load market prices", key="btn_ref_load_yahoo"):
+                    st.session_state[load_key] = True
+            with c2:
+                st.caption("Deferred by default for faster first render; uses Streamlit cache when loaded.")
+            if not st.session_state.get(load_key, False):
+                st.info("Click **Load market prices** to fetch Yahoo data.")
+                st.stop()
             df = cached_yahoo(symbols, "5d")
             if df is not None and not df.empty:
                 latest = df.sort_values("timestamp").groupby("symbol").last().reset_index()
@@ -53,6 +65,18 @@ def render_market_reference_sections(
             )
             events: list[dict[str, Any]] = []
             polymarket_failed = False
+            load_key = "ref_load_polymarket"
+            if load_key not in st.session_state:
+                st.session_state[load_key] = False
+            c1, c2 = st.columns((1, 3))
+            with c1:
+                if st.button("Load Polymarket", key="btn_ref_load_polymarket"):
+                    st.session_state[load_key] = True
+            with c2:
+                st.caption("Deferred by default for faster first render; uses Streamlit cache when loaded.")
+            if not st.session_state.get(load_key, False):
+                st.info("Click **Load Polymarket** to fetch prediction market data.")
+                st.stop()
             try:
                 events = cached_polymarket(True, False, 100)
             except Exception as e:

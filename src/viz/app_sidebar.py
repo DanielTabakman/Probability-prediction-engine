@@ -76,6 +76,16 @@ def build_sidebar_state(*, show_bitcoin_default: bool = True) -> dict[str, Any]:
             st.sidebar.caption(
                 "Deribit forward curve and spread overlays on the main chart load after the first refresh above."
             )
+        st.sidebar.markdown("---")
+        st.sidebar.caption("Implied lab — compute policy")
+        implied_auto_compute = st.sidebar.checkbox(
+            "Auto-compute on every change (slower)",
+            value=False,
+            help="When off (recommended), heavy implied-lab outputs recompute only when you press Compute.",
+            key="implied_lab_auto_compute",
+        )
+    else:
+        implied_auto_compute = bool(st.session_state.get("implied_lab_auto_compute", False))
 
     return {
         "show_bitcoin_view": show_bitcoin_view,
@@ -89,5 +99,6 @@ def build_sidebar_state(*, show_bitcoin_default: bool = True) -> dict[str, Any]:
         "options_in_separate_chart": options_in_separate_chart,
         "option_types_on_chart": option_types_on_chart,
         "min_prob_label_pct": min_prob_label_pct,
+        "implied_lab_auto_compute": bool(implied_auto_compute),
     }
 

@@ -102,11 +102,21 @@ from src.viz.mvp1_lab_ui import ensure_mvp1_lab_default_shape, post_mvp1_lab_ui_
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz import frozen_evaluation_store as _fz_store
 from src.viz.reviewed_class_summary import build_class_summary
+from src.viz.perf import PerfLog, timed
+from src.viz.tutorial import render_tutorial_section
 import yaml
 
 
 st.set_page_config(page_title="Probability Engine", layout="wide")
 st.title("Probability Prediction Engine")
+
+_perf = PerfLog()
+with st.expander("Tutorial / Getting started", expanded=False):
+    render_tutorial_section()
+
+with st.expander("Debug: performance", expanded=False):
+    st.caption("Wall-clock timings for the current rerun (ms).")
+    st.json({"total_ms": round(_perf.total_ms(), 1), **{k: round(v, 1) for k, v in _perf.timings_ms.items()}})
 
 config_path = ROOT / "config" / "sources.yaml"
 if config_path.exists():
@@ -134,6 +144,7 @@ show_options_on_chart = bool(sidebar["show_options_on_chart"])
 options_in_separate_chart = bool(sidebar["options_in_separate_chart"])
 option_types_on_chart = list(sidebar["option_types_on_chart"])
 min_prob_label_pct = int(sidebar["min_prob_label_pct"])
+implied_lab_auto_compute = bool(sidebar.get("implied_lab_auto_compute", False))
 
 # Chart toggles (always available; optional Deribit overlays gated until Refresh priced inputs)
 is_full = True
@@ -569,7 +580,18 @@ if show_bitcoin_view:
                                     net_pnl_mode=bool(net_pnl_mode),
                                     user_belief=user_belief_for_state,
                                 )
-                                outputs = derive_lab_outputs(state, market_data)
+
+                                compute_key = f"implied_lab_outputs_{selected_expiry_str}"
+                                should_compute = bool(implied_lab_auto_compute) or bool(
+                                    st.session_state.pop("implied_lab_force_compute", False)
+                                )
+                                if st.button("Compute implied-lab outputs", key=f"btn_implied_compute_{selected_expiry_str}"):
+                                    should_compute = True
+                                outputs = st.session_state.get(compute_key) if not should_compute else None
+                                if should_compute or outputs is None:
+                                    with timed(_perf, "implied_lab.derive"):
+                                        outputs = derive_lab_outputs(state, market_data)
+                                    st.session_state[compute_key] = outputs
                                 selected_strategy = outputs.get("strategy") or base_strategy
                                 payoff_usd = outputs.get("overlay", {}).get("payoff_usd", []) or []
                                 breakevens = outputs.get("summary", {}).get("breakevens", []) or []
@@ -636,6 +658,7 @@ if show_bitcoin_view:
                                     st.session_state["u4_use_k3"] = bool(shape["use_k3"])
                                     st.session_state["u4_use_k4"] = bool(shape["use_k4"])
                                     st.session_state["u4_reverse"] = bool(shape["reverse"])
+                                    st.session_state["implied_lab_force_compute"] = True
                                     st.rerun()
 
                                 preset_cols = st.columns(3)
@@ -1120,7 +1143,20 @@ if show_bitcoin_view:
                                     net_pnl_mode=bool(net_pnl_mode),
                                     user_belief=user_belief_for_state,
                                 )
-                                outputs = derive_lab_outputs(state, market_data)
+                                compute_key = f"implied_lab_outputs_{selected_expiry_str}"
+                                should_compute = bool(implied_lab_auto_compute) or bool(
+                                    st.session_state.pop("implied_lab_force_compute", False)
+                                )
+                                if st.button(
+                                    "Compute implied-lab outputs",
+                                    key=f"btn_implied_compute2_{selected_expiry_str}",
+                                ):
+                                    should_compute = True
+                                outputs = st.session_state.get(compute_key) if not should_compute else None
+                                if should_compute or outputs is None:
+                                    with timed(_perf, "implied_lab.derive"):
+                                        outputs = derive_lab_outputs(state, market_data)
+                                    st.session_state[compute_key] = outputs
                                 selected_strategy = outputs.get("strategy") or base_strategy
                                 payoff_usd = outputs.get("overlay", {}).get("payoff_usd", []) or []
                                 breakevens = outputs.get("summary", {}).get("breakevens", []) or []
@@ -1591,6 +1627,17 @@ if show_bitcoin_view:
                                     use_container_width=True,
                                     hide_index=True,
                                 )
+                                try:
+                                    _csv2 = _df.drop(columns=["_snapshot_id_full"]).to_csv(index=False).encode("utf-8")
+                                    st.download_button(
+                                        "Download reviewed table (CSV)",
+                                        data=_csv2,
+                                        file_name="ppe_reviewed_table_filtered.csv",
+                                        mime="text/csv",
+                                        key=f"ppe_phase6_table_csv_{selected_expiry_str}",
+                                    )
+                                except Exception:
+                                    pass
                                 for _ri, _row in enumerate(_rows[:20]):
                                     if st.button(
                                         f"Open {_row['snapshot_id']}",
