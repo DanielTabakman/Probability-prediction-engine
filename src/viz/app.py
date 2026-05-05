@@ -104,6 +104,7 @@ from src.viz import frozen_evaluation_store as _fz_store
 from src.viz.reviewed_class_summary import build_class_summary
 from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_tutorial_section
+from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
 import yaml
 
 
@@ -117,6 +118,8 @@ with st.expander("Tutorial / Getting started", expanded=False):
 with st.expander("Debug: performance", expanded=False):
     st.caption("Wall-clock timings for the current rerun (ms).")
     st.json({"total_ms": round(_perf.total_ms(), 1), **{k: round(v, 1) for k, v in _perf.timings_ms.items()}})
+    st.caption("Prefetch status (best-effort).")
+    st.json(prefetch_status())
 
 config_path = ROOT / "config" / "sources.yaml"
 if config_path.exists():
@@ -193,6 +196,39 @@ if show_bitcoin_view:
     # Optional Deribit extras (forward curve, bull spreads, prediction overlays, reference tables).
     # Not auto-loaded: implied-lab fetches its own expiries/marks via _cached_* when that section runs.
     load_deribit = bool(st.session_state.get("load_deribit", False))
+
+    # Background cache warming (best-effort): likely timeframe windows + key Deribit endpoints.
+    # This improves perceived speed on the next rerun (e.g., switching chart_days).
+    try:
+        for _d in (5, 30, 90):
+            maybe_submit_prefetch(
+                key=f"yahoo_btc_{_d}d",
+                label=f"yahoo BTC {_d}d",
+                fn=lambda d=_d: _cached_yahoo({"bitcoin": ["BTC-USD", "BTC=F"]}, f"{int(d)}d"),
+            )
+        maybe_submit_prefetch(
+            key="polymarket_ref",
+            label="polymarket (active)",
+            fn=lambda: _cached_polymarket(True, False, 150),
+        )
+        if load_deribit:
+            maybe_submit_prefetch(
+                key="deribit_option_instruments",
+                label="deribit option instruments",
+                fn=lambda: _cached_option_instruments(),
+            )
+            maybe_submit_prefetch(
+                key="deribit_option_book_marks",
+                label="deribit option book marks",
+                fn=lambda: _cached_option_book_marks(),
+            )
+            maybe_submit_prefetch(
+                key="deribit_option_expiries",
+                label="deribit option expiries",
+                fn=lambda: _cached_option_expiries(10),
+            )
+    except Exception:
+        pass
 
     # Market-implied distribution is the top-of-screen anchor (H1-01).
     # 4d) Implied probability distribution — Full view: mounted automatically (own Deribit fetches inside)

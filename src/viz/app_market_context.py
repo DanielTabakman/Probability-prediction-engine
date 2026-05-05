@@ -24,6 +24,12 @@ def _q_label(q: dict) -> str | None:
     return f"${s:,.0f} by {r}" if (s is not None and r) else None
 
 
+@st.cache_data(ttl=120)
+def _cached_questions_from_events(events: list[dict[str, Any]], keywords: list[str]) -> list[dict[str, Any]]:
+    all_probs = markets_to_probabilities(events, topic_keywords=keywords)
+    return btc_price_questions_from_polymarket(all_probs) if all_probs else []
+
+
 def render_market_context_expander(
     *,
     config: dict[str, Any],
@@ -85,8 +91,7 @@ def render_market_context_expander(
             .get("topic_keywords")
             or ["bitcoin", "btc"]
         )
-        all_probs = markets_to_probabilities(events, topic_keywords=keywords)
-        btc_questions = btc_price_questions_from_polymarket(all_probs) if all_probs else []
+        btc_questions = _cached_questions_from_events(events, keywords) if events else []
 
         # Deribit context overlays (only when user refreshes priced inputs).
         forward_curve: list[dict[str, Any]] = []
