@@ -1,0 +1,10 @@
+marketstructureos.com {
+  encode gzip
+  reverse_proxy app_demo:8501
+}
+
+app.marketstructureos.com {
+  encode gzip
+  reverse_proxy app_full:8501
+}
+

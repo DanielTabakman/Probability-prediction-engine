@@ -4,6 +4,7 @@ Bitcoin view: price chart with Polymarket questions overlaid, implied value, opt
 """
 from __future__ import annotations
 
+import os
 import sys
 import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -110,6 +111,15 @@ import yaml
 
 st.set_page_config(page_title="Probability Engine", layout="wide")
 st.title("Probability Prediction Engine")
+
+def _env_flag(name: str, default: bool) -> bool:
+    raw = (os.environ.get(name) or "").strip().lower()
+    if raw == "":
+        return default
+    return raw in ("1", "true", "yes", "y", "on")
+
+
+_snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
 
 _perf = PerfLog()
 with st.expander("Tutorial / Getting started", expanded=False):
@@ -1466,221 +1476,293 @@ if show_bitcoin_view:
                     if "ppe_frozen_view_id" not in st.session_state:
                         st.session_state["ppe_frozen_view_id"] = None
                     with st.expander("Freeze & history (this device, SQLite)", expanded=False):
-                        st.caption(
-                            "Explicit **freeze** writes the current **verification** witness to a local database "
-                            f"(default `{_fz_store.default_db_path()}`; override with env **PPE_SNAPSHOT_DB_PATH**)."
-                        )
-                        _fz_note = st.text_input(
-                            "Optional note (stored with snapshot)",
-                            key=f"ppe_freeze_note_{selected_expiry_str}",
-                        )
-                        if st.button("Freeze this evaluation", key=f"ppe_freeze_btn_{selected_expiry_str}"):
-                            _fv = outputs.get("verification")
-                            if isinstance(_fv, dict) and _fv:
-                                _rec = build_frozen_evaluation_record(
-                                    verification=_fv,
-                                    expiry_str=selected_expiry_str,
-                                    operator_note=_fz_note or None,
-                                )
-                                _conn = _fz_store.open_store()
-                                try:
-                                    _rid = _fz_store.insert_record(_conn, _rec)
-                                    st.success(f"Saved frozen snapshot `{_rid}`")
-                                finally:
-                                    _conn.close()
-                            else:
-                                st.warning("No verification payload to freeze for this run.")
-                        _conn2 = _fz_store.open_store()
-                        try:
-                            _fz_rows = _fz_store.list_recent(_conn2, limit=40)
-                        finally:
-                            _conn2.close()
-                        if _fz_rows:
-                            _labels = [f"{r['summary_line']}  (id {r['id'][:8]}…)" for r in _fz_rows]
-                            _ix = st.selectbox(
-                                "Pick a frozen record",
-                                range(len(_fz_rows)),
-                                format_func=lambda i: _labels[i],
-                                key=f"ppe_freeze_pick_{selected_expiry_str}",
+                        if not _snapshots_enabled:
+                            st.info(
+                                "Snapshots are disabled on this host. "
+                                "Use the private app hostname to freeze/reopen/review."
                             )
-                            c1, c2 = st.columns(2)
-                            with c1:
-                                if st.button("Reopen read-only view", key=f"ppe_freeze_reopen_{selected_expiry_str}"):
-                                    st.session_state["ppe_frozen_view_id"] = _fz_rows[int(_ix)]["id"]
-                                    st.rerun()
-                            with c2:
-                                if st.button("Clear read-only view", key=f"ppe_freeze_clear_{selected_expiry_str}"):
-                                    st.session_state["ppe_frozen_view_id"] = None
-                                    st.rerun()
                         else:
-                            st.caption("No frozen records on this device yet.")
-                    with st.expander("Pending snapshot reviews", expanded=False):
-                        _conn_pd = _fz_store.open_store()
-                        try:
-                            _pend_all = _fz_store.list_snapshots_pending_review(_conn_pd, limit=200)
-                        finally:
-                            _conn_pd.close()
-                        _expiries = sorted({str(r.get("expiry") or "").strip() for r in _pend_all if str(r.get("expiry") or "").strip()})
-                        _exp_choice = st.selectbox(
-                            "Filter by expiry (pending only)",
-                            options=["(all)"] + _expiries,
-                            index=0,
-                            key=f"ppe_pending_expiry_filter_{selected_expiry_str}",
-                        )
-                        _pend = _pend_all
-                        if _exp_choice != "(all)":
-                            _pend = [r for r in _pend_all if str(r.get("expiry") or "").strip() == _exp_choice]
-                        if not _pend:
-                            st.caption("No snapshots pending review.")
-                        else:
-                            for _pi, _pr in enumerate(_pend):
-                                _pc1, _pc2 = st.columns((4, 1))
-                                with _pc1:
-                                    st.caption(f"{_pr['summary_line']}  (`{_pr['id'][:8]}…`)")
-                                with _pc2:
-                                    if st.button("Open", key=f"ppe_pend_open_{_pr['id']}_{_pi}"):
-                                        st.session_state["ppe_frozen_view_id"] = _pr["id"]
-                                        st.rerun()
-                    with st.expander("Class summary — reviewed snapshots (Phase 6)", expanded=False):
-                        st.caption(
-                            "Rollup over snapshots with a **saved** review status other than **pending**. "
-                            "Counts use disagreement category (direction proxy), shape-gap label, Breeden gate, "
-                            "benchmark method, and classifier version from each frozen record."
-                        )
-                        _status_opts = ["supportive", "contradictory", "contaminated", "not_judgeable"]
-                        _sel_statuses = st.multiselect(
-                            "Filter by review status",
-                            options=_status_opts,
-                            default=_status_opts,
-                            key=f"ppe_phase6_status_filter_{selected_expiry_str}",
-                        )
-                        _use_date = st.checkbox(
-                            "Filter by reviewed date (local)",
-                            value=False,
-                            key=f"ppe_phase6_date_enable_{selected_expiry_str}",
-                        )
-                        _dr = None
-                        if _use_date:
-                            _dr = st.date_input(
-                                "Reviewed date range",
-                                key=f"ppe_phase6_date_filter_{selected_expiry_str}",
+                            st.caption(
+                                "Explicit **freeze** writes the current **verification** witness to a local database "
+                                f"(default `{_fz_store.default_db_path()}`; override with env **PPE_SNAPSHOT_DB_PATH**)."
                             )
-                        _after_utc = None
-                        _before_utc = None
-                        try:
-                            if isinstance(_dr, (tuple, list)) and len(_dr) == 2 and _dr[0] and _dr[1]:
-                                _after_utc = f"{_dr[0].isoformat()}T00:00:00Z"
-                                _before_utc = f"{_dr[1].isoformat()}T23:59:59Z"
-                        except Exception:
-                            _after_utc, _before_utc = None, None
-                        _conn_cls = _fz_store.open_store()
-                        try:
-                            _completed_all = _fz_store.list_completed_review_snapshots(
-                                _conn_cls,
-                                limit=500,
-                                review_statuses=list(_sel_statuses) if _sel_statuses else [],
-                                reviewed_after_utc=_after_utc,
-                                reviewed_before_utc=_before_utc,
+                            _fz_note = st.text_input(
+                                "Optional note (stored with snapshot)",
+                                key=f"ppe_freeze_note_{selected_expiry_str}",
                             )
-                        finally:
-                            _conn_cls.close()
-                        _expiries2 = sorted(
-                            {
-                                str(r.get("expiry") or "").strip()
-                                for r in _completed_all
-                                if str(r.get("expiry") or "").strip()
-                            }
-                        )
-                        _exp_choice2 = st.selectbox(
-                            "Filter by expiry (reviewed only)",
-                            options=["(all)"] + _expiries2,
-                            index=0,
-                            key=f"ppe_phase6_expiry_filter_{selected_expiry_str}",
-                        )
-                        _completed = _completed_all
-                        if _exp_choice2 != "(all)":
-                            _completed = [
-                                r
-                                for r in _completed_all
-                                if str(r.get("expiry") or "").strip() == _exp_choice2
-                            ]
-                        _rollup = build_class_summary(_completed)
-                        st.markdown(f"**{_rollup['operator_summary_line']}**")
-                        st.metric("Reviewed snapshots (non-pending)", int(_rollup["n_reviewed"]))
-                        if _rollup["n_reviewed"]:
-                            import json as _json
-
-                            _rollup_json = _json.dumps(_rollup, indent=2, ensure_ascii=False).encode("utf-8")
-                            st.download_button(
-                                "Download rollup (JSON)",
-                                data=_rollup_json,
-                                file_name="ppe_phase6_rollup.json",
-                                mime="application/json",
-                                key=f"ppe_rollup_dl_json_{selected_expiry_str}",
-                            )
-                            _ca, _cb = st.columns(2)
-                            with _ca:
-                                st.subheader("Review outcomes")
-                                st.json(_rollup["by_review_status"])
-                                st.subheader("Disagreement category")
-                                st.json(_rollup["by_disagreement_category"])
-                                st.subheader("Shape gap strength")
-                                st.json(_rollup["by_shape_gap_strength"])
-                            with _cb:
-                                st.subheader("Breeden gate (trust proxy)")
-                                st.json(_rollup["by_trust_breeden"])
-                                st.subheader("Benchmark method")
-                                st.json(_rollup["by_benchmark_method"])
-                                st.subheader("Classifier version")
-                                st.json(_rollup["by_classifier_version"])
-
-                            st.subheader("Reviewed snapshots (filtered)")
-                            _rows = []
-                            for r in _completed[:50]:
-                                rec = r.get("record") if isinstance(r.get("record"), dict) else {}
-                                vdoc = rec.get("verification") if isinstance(rec.get("verification"), dict) else {}
-                                vs = (
-                                    vdoc.get("verification_summary")
-                                    if isinstance(vdoc.get("verification_summary"), dict)
-                                    else {}
-                                )
-                                _rows.append(
-                                    {
-                                        "snapshot_id": str(r.get("snapshot_id") or "")[:8] + "…",
-                                        "reviewed_at_utc": (r.get("review") or {}).get("reviewed_at_utc"),
-                                        "expiry": r.get("expiry"),
-                                        "review_status": (r.get("review") or {}).get("review_status"),
-                                        "disagreement_category_id": (vs or {}).get("disagreement_category_id"),
-                                        "classifier_version": rec.get("classifier_version"),
-                                        "outcome_notes": ((r.get("review") or {}).get("outcome_notes") or "")[:120],
-                                        "_snapshot_id_full": r.get("snapshot_id"),
-                                    }
-                                )
-                            if _rows:
-                                _df = pd.DataFrame(_rows)
-                                st.dataframe(
-                                    _df.drop(columns=["_snapshot_id_full"]),
-                                    use_container_width=True,
-                                    hide_index=True,
-                                )
-                                try:
-                                    _csv2 = _df.drop(columns=["_snapshot_id_full"]).to_csv(index=False).encode("utf-8")
-                                    st.download_button(
-                                        "Download reviewed table (CSV)",
-                                        data=_csv2,
-                                        file_name="ppe_reviewed_table_filtered.csv",
-                                        mime="text/csv",
-                                        key=f"ppe_phase6_table_csv_{selected_expiry_str}",
+                            if st.button("Freeze this evaluation", key=f"ppe_freeze_btn_{selected_expiry_str}"):
+                                _fv = outputs.get("verification")
+                                if isinstance(_fv, dict) and _fv:
+                                    _rec = build_frozen_evaluation_record(
+                                        verification=_fv,
+                                        expiry_str=selected_expiry_str,
+                                        operator_note=_fz_note or None,
                                     )
-                                except Exception:
-                                    pass
-                                for _ri, _row in enumerate(_rows[:20]):
+                                    _conn = _fz_store.open_store()
+                                    try:
+                                        _rid = _fz_store.insert_record(_conn, _rec)
+                                        st.success(f"Saved frozen snapshot `{_rid}`")
+                                    finally:
+                                        _conn.close()
+                                else:
+                                    st.warning("No verification payload to freeze for this run.")
+                            _conn2 = _fz_store.open_store()
+                            try:
+                                _fz_rows = _fz_store.list_recent(_conn2, limit=40)
+                            finally:
+                                _conn2.close()
+                            if _fz_rows:
+                                _labels = [f"{r['summary_line']}  (id {r['id'][:8]}…)" for r in _fz_rows]
+                                _ix = st.selectbox(
+                                    "Pick a frozen record",
+                                    range(len(_fz_rows)),
+                                    format_func=lambda i: _labels[i],
+                                    key=f"ppe_freeze_pick_{selected_expiry_str}",
+                                )
+                                c1, c2 = st.columns(2)
+                                with c1:
                                     if st.button(
-                                        f"Open {_row['snapshot_id']}",
-                                        key=f"ppe_phase6_open_{_row['_snapshot_id_full']}_{_ri}",
+                                        "Reopen read-only view",
+                                        key=f"ppe_freeze_reopen_{selected_expiry_str}",
                                     ):
-                                        st.session_state["ppe_frozen_view_id"] = _row["_snapshot_id_full"]
+                                        st.session_state["ppe_frozen_view_id"] = _fz_rows[int(_ix)]["id"]
                                         st.rerun()
+                                with c2:
+                                    if st.button(
+                                        "Clear read-only view",
+                                        key=f"ppe_freeze_clear_{selected_expiry_str}",
+                                    ):
+                                        st.session_state["ppe_frozen_view_id"] = None
+                                        st.rerun()
+                            else:
+                                st.caption("No frozen records on this device yet.")
+                    if _snapshots_enabled:
+                        with st.expander("Pending snapshot reviews", expanded=False):
+                            _conn_pd = _fz_store.open_store()
+                            try:
+                                _pend_all = _fz_store.list_snapshots_pending_review(_conn_pd, limit=200)
+                            finally:
+                                _conn_pd.close()
+                            _expiries = sorted(
+                                {
+                                    str(r.get("expiry") or "").strip()
+                                    for r in _pend_all
+                                    if str(r.get("expiry") or "").strip()
+                                }
+                            )
+                            _exp_choice = st.selectbox(
+                                "Filter by expiry (pending only)",
+                                options=["(all)"] + _expiries,
+                                index=0,
+                                key=f"ppe_pending_expiry_filter_{selected_expiry_str}",
+                            )
+                            _pend = _pend_all
+                            if _exp_choice != "(all)":
+                                _pend = [
+                                    r
+                                    for r in _pend_all
+                                    if str(r.get("expiry") or "").strip() == _exp_choice
+                                ]
+                            if not _pend:
+                                st.caption("No snapshots pending review.")
+                            else:
+                                for _pi, _pr in enumerate(_pend):
+                                    _pc1, _pc2 = st.columns((4, 1))
+                                    with _pc1:
+                                        st.caption(
+                                            f"{_pr['summary_line']}  (`{_pr['id'][:8]}…`)"
+                                        )
+                                    with _pc2:
+                                        if st.button(
+                                            "Open", key=f"ppe_pend_open_{_pr['id']}_{_pi}"
+                                        ):
+                                            st.session_state["ppe_frozen_view_id"] = _pr["id"]
+                                            st.rerun()
+
+                        with st.expander(
+                            "Class summary — reviewed snapshots (Phase 6)", expanded=False
+                        ):
+                            st.caption(
+                                "Rollup over snapshots with a **saved** review status other than **pending**. "
+                                "Counts use disagreement category (direction proxy), shape-gap label, Breeden gate, "
+                                "benchmark method, and classifier version from each frozen record."
+                            )
+                            _status_opts = [
+                                "supportive",
+                                "contradictory",
+                                "contaminated",
+                                "not_judgeable",
+                            ]
+                            _sel_statuses = st.multiselect(
+                                "Filter by review status",
+                                options=_status_opts,
+                                default=_status_opts,
+                                key=f"ppe_phase6_status_filter_{selected_expiry_str}",
+                            )
+                            _use_date = st.checkbox(
+                                "Filter by reviewed date (local)",
+                                value=False,
+                                key=f"ppe_phase6_date_enable_{selected_expiry_str}",
+                            )
+                            _dr = None
+                            if _use_date:
+                                _dr = st.date_input(
+                                    "Reviewed date range",
+                                    key=f"ppe_phase6_date_filter_{selected_expiry_str}",
+                                )
+                            _after_utc = None
+                            _before_utc = None
+                            try:
+                                if (
+                                    isinstance(_dr, (tuple, list))
+                                    and len(_dr) == 2
+                                    and _dr[0]
+                                    and _dr[1]
+                                ):
+                                    _after_utc = f"{_dr[0].isoformat()}T00:00:00Z"
+                                    _before_utc = f"{_dr[1].isoformat()}T23:59:59Z"
+                            except Exception:
+                                _after_utc, _before_utc = None, None
+                            _conn_cls = _fz_store.open_store()
+                            try:
+                                _completed_all = _fz_store.list_completed_review_snapshots(
+                                    _conn_cls,
+                                    limit=500,
+                                    review_statuses=list(_sel_statuses)
+                                    if _sel_statuses
+                                    else [],
+                                    reviewed_after_utc=_after_utc,
+                                    reviewed_before_utc=_before_utc,
+                                )
+                            finally:
+                                _conn_cls.close()
+                            _expiries2 = sorted(
+                                {
+                                    str(r.get("expiry") or "").strip()
+                                    for r in _completed_all
+                                    if str(r.get("expiry") or "").strip()
+                                }
+                            )
+                            _exp_choice2 = st.selectbox(
+                                "Filter by expiry (reviewed only)",
+                                options=["(all)"] + _expiries2,
+                                index=0,
+                                key=f"ppe_phase6_expiry_filter_{selected_expiry_str}",
+                            )
+                            _completed = _completed_all
+                            if _exp_choice2 != "(all)":
+                                _completed = [
+                                    r
+                                    for r in _completed_all
+                                    if str(r.get("expiry") or "").strip() == _exp_choice2
+                                ]
+                            _rollup = build_class_summary(_completed)
+                            st.markdown(f"**{_rollup['operator_summary_line']}**")
+                            st.metric(
+                                "Reviewed snapshots (non-pending)",
+                                int(_rollup["n_reviewed"]),
+                            )
+                            if _rollup["n_reviewed"]:
+                                import json as _json
+
+                                _rollup_json = _json.dumps(
+                                    _rollup, indent=2, ensure_ascii=False
+                                ).encode("utf-8")
+                                st.download_button(
+                                    "Download rollup (JSON)",
+                                    data=_rollup_json,
+                                    file_name="ppe_phase6_rollup.json",
+                                    mime="application/json",
+                                    key=f"ppe_rollup_dl_json_{selected_expiry_str}",
+                                )
+                                _ca, _cb = st.columns(2)
+                                with _ca:
+                                    st.subheader("Review outcomes")
+                                    st.json(_rollup["by_review_status"])
+                                    st.subheader("Disagreement category")
+                                    st.json(_rollup["by_disagreement_category"])
+                                    st.subheader("Shape gap strength")
+                                    st.json(_rollup["by_shape_gap_strength"])
+                                with _cb:
+                                    st.subheader("Breeden gate (trust proxy)")
+                                    st.json(_rollup["by_trust_breeden"])
+                                    st.subheader("Benchmark method")
+                                    st.json(_rollup["by_benchmark_method"])
+                                    st.subheader("Classifier version")
+                                    st.json(_rollup["by_classifier_version"])
+
+                                st.subheader("Reviewed snapshots (filtered)")
+                                _rows = []
+                                for r in _completed[:50]:
+                                    rec = (
+                                        r.get("record")
+                                        if isinstance(r.get("record"), dict)
+                                        else {}
+                                    )
+                                    vdoc = (
+                                        rec.get("verification")
+                                        if isinstance(rec.get("verification"), dict)
+                                        else {}
+                                    )
+                                    vs = (
+                                        vdoc.get("verification_summary")
+                                        if isinstance(
+                                            vdoc.get("verification_summary"), dict
+                                        )
+                                        else {}
+                                    )
+                                    _rows.append(
+                                        {
+                                            "snapshot_id": str(
+                                                r.get("snapshot_id") or ""
+                                            )[:8]
+                                            + "…",
+                                            "reviewed_at_utc": (r.get("review") or {}).get(
+                                                "reviewed_at_utc"
+                                            ),
+                                            "expiry": r.get("expiry"),
+                                            "review_status": (r.get("review") or {}).get(
+                                                "review_status"
+                                            ),
+                                            "disagreement_category_id": (vs or {}).get(
+                                                "disagreement_category_id"
+                                            ),
+                                            "classifier_version": rec.get("classifier_version"),
+                                            "outcome_notes": (
+                                                (r.get("review") or {}).get("outcome_notes") or ""
+                                            )[:120],
+                                            "_snapshot_id_full": r.get("snapshot_id"),
+                                        }
+                                    )
+                                if _rows:
+                                    _df = pd.DataFrame(_rows)
+                                    st.dataframe(
+                                        _df.drop(columns=["_snapshot_id_full"]),
+                                        use_container_width=True,
+                                        hide_index=True,
+                                    )
+                                    try:
+                                        _csv2 = _df.drop(
+                                            columns=["_snapshot_id_full"]
+                                        ).to_csv(index=False).encode("utf-8")
+                                        st.download_button(
+                                            "Download reviewed table (CSV)",
+                                            data=_csv2,
+                                            file_name="ppe_reviewed_table_filtered.csv",
+                                            mime="text/csv",
+                                            key=f"ppe_phase6_table_csv_{selected_expiry_str}",
+                                        )
+                                    except Exception:
+                                        pass
+                                    for _ri, _row in enumerate(_rows[:20]):
+                                        if st.button(
+                                            f"Open {_row['snapshot_id']}",
+                                            key=f"ppe_phase6_open_{_row['_snapshot_id_full']}_{_ri}",
+                                        ):
+                                            st.session_state["ppe_frozen_view_id"] = _row[
+                                                "_snapshot_id_full"
+                                            ]
+                                            st.rerun()
 
                             try:
                                 _flat = [
@@ -1704,7 +1786,7 @@ if show_bitcoin_view:
                             except Exception as _e:
                                 st.caption(f"CSV export unavailable: {type(_e).__name__}")
                     _fvid = st.session_state.get("ppe_frozen_view_id")
-                    if _fvid:
+                    if _fvid and _snapshots_enabled:
                         _conn3 = _fz_store.open_store()
                         try:
                             _frozen = _fz_store.get_by_id(_conn3, str(_fvid))
@@ -1769,6 +1851,8 @@ if show_bitcoin_view:
                         else:
                             st.warning("Frozen record not found (id may have been deleted).")
                             st.session_state["ppe_frozen_view_id"] = None
+                    elif _fvid and not _snapshots_enabled:
+                        st.session_state["ppe_frozen_view_id"] = None
 
                     # Strategy details are useful, but not part of the top-of-screen story.
                     with st.expander("Strategy details (optional)", expanded=False):

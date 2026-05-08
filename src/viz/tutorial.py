@@ -16,6 +16,10 @@ def render_tutorial_section() -> None:
 This is a **local-first** Streamlit workbench for comparing **market data** and **prediction markets**, and for running the **Bitcoin implied lab (MVP1)** workflow:
 freeze → reopen → review → class summary.
 
+### Demo vs full app
+- Some deployments run a **public demo** where **snapshots/reviews are disabled**.
+- The private/full deployment enables snapshots (SQLite) so you can freeze → reopen → review and build consistency over time.
+
 ### Quick start
 - Run: `streamlit run src/viz/app.py`
 - Use the sidebar **Refresh priced inputs (Deribit)** when you want fresh quotes.

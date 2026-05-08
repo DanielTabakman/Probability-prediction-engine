@@ -1,0 +1,47 @@
+services:
+  app_demo:
+    build: .
+    container_name: ppe_app_demo
+    environment:
+      - PORT=8501
+      - PPE_ENABLE_SNAPSHOTS=0
+    restart: unless-stopped
+    networks:
+      - web
+
+  app_full:
+    build: .
+    container_name: ppe_app_full
+    environment:
+      - PORT=8501
+      - PPE_ENABLE_SNAPSHOTS=1
+      - PPE_SNAPSHOT_DB_PATH=/data/ppe_frozen_evaluations.sqlite3
+    volumes:
+      - ppe_snapshots:/data
+    restart: unless-stopped
+    networks:
+      - web
+
+  caddy:
+    image: caddy:2
+    container_name: ppe_caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    networks:
+      - web
+
+volumes:
+  ppe_snapshots:
+    name: ppe_snapshots
+  caddy_data:
+  caddy_config:
+
+networks:
+  web:
+    driver: bridge
