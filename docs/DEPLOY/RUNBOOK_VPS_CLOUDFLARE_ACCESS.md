@@ -60,11 +60,28 @@ In Cloudflare DNS for `marketstructureos.com`:
 - **A** record: `@` → your VPS IPv4 (**Proxied**)
 - **A** record: `app` → your VPS IPv4 (**Proxied**)
 
-### 5) Cloudflare TLS mode
+### 5) Cloudflare TLS mode (pick one)
 
-In Cloudflare → SSL/TLS:
+The Caddy config in this repo uses **`auto_https off`** and serves **HTTP on port 80** at the origin (simple + reliable before DNS). Cloudflare must match that until you add TLS on the origin.
 
-- Set mode to **Full (strict)**
+**Phase A — go live quickly (recommended first)**
+
+In Cloudflare → **SSL/TLS** → **Overview**:
+
+- Set mode to **Flexible**  
+  - Visitors → Cloudflare: **HTTPS**  
+  - Cloudflare → your VPS: **HTTP (port 80)**  
+  - Fine for an early launch; encryption is still HTTPS in the browser.
+
+**Phase B — stricter origin encryption (later)**
+
+When you want **Full (strict)** (Cloudflare → origin must be **HTTPS** with a trusted cert):
+
+1. Cloudflare → **SSL/TLS** → **Origin Server** → **Create certificate** (15-year origin cert). Include hostnames such as `marketstructureos.com` and `*.marketstructureos.com` (or at least `app.marketstructureos.com`).
+2. Save the PEM bundle and private key on the VPS (example paths): `/opt/marketstructureos/certs/cloudflare-origin.pem` and `cloudflare-origin-key.pem`.
+3. Extend **Caddy** to terminate TLS on **:443** using those files (`tls /path/to.pem /path/to.key`), keep the same `reverse_proxy` routes, then set Cloudflare to **Full (strict)**.
+
+Until Phase B is done, **do not** use **Full (strict)** with an HTTP-only origin or the edge will fail to connect.
 
 ### 6) Bring up the stack (first boot)
 
