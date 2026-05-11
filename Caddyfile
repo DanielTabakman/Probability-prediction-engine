@@ -1,10 +1,24 @@
+# Global: do not redirect every HTTP request to HTTPS automatically.
+# Without this, Caddy issues 308 to https://… before Let's Encrypt can
+# validate your domain (and https://<raw-ip> never gets a valid cert).
+# After Cloudflare DNS + TLS are working, you can remove this line if you
+# want origin HTTP→HTTPS redirects (Cloudflare can still enforce HTTPS).
+{
+	auto_https disable_redirects
+}
+
 marketstructureos.com {
-  encode gzip
-  reverse_proxy app_demo:8501
+	encode gzip
+	reverse_proxy app_demo:8501
 }
 
 app.marketstructureos.com {
-  encode gzip
-  reverse_proxy app_full:8501
+	encode gzip
+	reverse_proxy app_full:8501
 }
 
+# Raw IP or unknown Host on port 80 → demo (until DNS points hostnames here)
+:80 {
+	encode gzip
+	reverse_proxy app_demo:8501
+}
