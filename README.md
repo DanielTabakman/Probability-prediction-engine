@@ -93,6 +93,10 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 - `src/viz/` — Streamlit dashboards
 - `docs/` — plan and design notes
 
+### VPS / public demo (operators)
+
+Production layout (demo apex + private app, Caddy, Cloudflare Access, R2 backups) is documented in **[docs/DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md](docs/DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md)**. The runbook includes **Streamlit + `X-Forwarded-Proto`** (so lazy-loaded `/static/js/` chunks stay on **HTTPS** behind Cloudflare Flexible) and post-deploy smoke checks.
+
 ## Roadmap
 
 1. **Phase 1**: Ingest markets + prediction markets → canonical events → probability layer

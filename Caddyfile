@@ -2,17 +2,39 @@
 # Cloudflare "Full (strict)" needs a TLS cert on the origin later — use a
 # Cloudflare Origin Certificate + tls /path/to/cert.pem /path/to/key.pem
 # in a second server block, or switch auto_https back on after DNS works.
+#
+# Streamlit builds absolute URLs for lazy-loaded /static/js chunks. Behind
+# Cloudflare Flexible, the hop to this origin is HTTP, so we must forward the
+# visitor's scheme (X-Forwarded-Proto) or chunks load as http:// and break HTTPS.
 {
 	auto_https off
 }
 
 :80 {
 	encode gzip
+
+	# Two inputs: client-reported proto (from Cloudflare) + CF-Ray (present when proxied).
+	map {http.request.header.X-Forwarded-Proto} {http.request.header.CF-Ray} {forwarded_proto} {
+		https * https
+		HTTPS * https
+		http * http
+		HTTP * http
+		"" "" {http.request.scheme}
+		"" * https
+		* * {http.request.scheme}
+	}
+
 	@app host app.marketstructureos.com
 	handle @app {
-		reverse_proxy app_full:8501
+		reverse_proxy app_full:8501 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
 	}
 	handle {
-		reverse_proxy app_demo:8501
+		reverse_proxy app_demo:8501 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
 	}
 }

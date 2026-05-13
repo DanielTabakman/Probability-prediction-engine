@@ -5,6 +5,7 @@ services:
     environment:
       - PORT=8501
       - PPE_ENABLE_SNAPSHOTS=0
+      - PPE_PRIVATE_APP_URL=https://app.marketstructureos.com
     restart: unless-stopped
     networks:
       - web

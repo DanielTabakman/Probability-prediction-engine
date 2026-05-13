@@ -106,6 +106,7 @@ from src.viz.reviewed_class_summary import build_class_summary
 from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
+from src.viz.signup_cta import private_app_cta_url
 import yaml
 
 
@@ -120,6 +121,25 @@ def _env_flag(name: str, default: bool) -> bool:
 
 
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
+
+_cta_private_url = private_app_cta_url(
+    snapshots_enabled=_snapshots_enabled,
+    private_app_url=os.environ.get("PPE_PRIVATE_APP_URL"),
+)
+if _cta_private_url:
+    st.info(
+        "You’re on the **public demo**: snapshots and saved review history are turned off here. "
+        "Sign in on the private app to **freeze, reopen, and review** over time."
+    )
+    if hasattr(st, "link_button"):
+        st.link_button(
+            "Sign in to save work & build consistency",
+            _cta_private_url,
+        )
+    else:
+        st.markdown(
+            f"[Sign in to save work & build consistency]({_cta_private_url})"
+        )
 
 _perf = PerfLog()
 with st.expander("Tutorial / Getting started", expanded=False):

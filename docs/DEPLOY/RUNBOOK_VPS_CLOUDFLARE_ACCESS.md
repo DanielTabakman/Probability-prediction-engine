@@ -22,6 +22,28 @@ On the VPS:
 - Firewall: allow **22**, **80**, **443**
 - Enable unattended upgrades
 
+#### Hetzner Cloud firewall (recommended)
+
+If the VPS is on Hetzner Cloud, attach a **Cloud Firewall** to the server instead of relying only on OS-level rules:
+
+- **Inbound allow:** TCP **22** (SSH; restrict source to your home/office IP if practical), TCP **80**, TCP **443**
+- **Inbound default:** deny all other ports
+- Attach the firewall to the server in the Hetzner console
+
+This reduces exposure if a future service is accidentally bound to a public interface.
+
+#### Optional scheduled reboot
+
+Some teams schedule a low-traffic **weekly reboot** after kernel updates or to clear rare memory leaks. Expect roughly **1–2 minutes** of downtime while the machine and Docker stack come back.
+
+Example (Sundays 04:30 UTC; adjust the window to your traffic):
+
+```cron
+30 4 * * 0 /sbin/shutdown -r now
+```
+
+Run the cron entry as **root** (or use `sudo crontab -e` for root’s crontab). If you prefer not to automate reboots, reboot **manually** after major kernel upgrades instead.
+
 ### 2) Install Docker
 
 Install Docker Engine + Compose plugin (Ubuntu).
@@ -98,6 +120,17 @@ Expected:
 - `marketstructureos.com` proxies to the demo container.
 - `app.marketstructureos.com` proxies to the full container (Access will be added next).
 
+#### Streamlit and HTTPS (Caddy forwarded headers)
+
+With **Cloudflare Flexible**, browsers use **HTTPS** while Cloudflare talks **HTTP** to your origin. Streamlit must still see the **original visitor scheme**; otherwise it emits **`http://…/static/js/…`** URLs for lazy-loaded widgets and the browser blocks them (**mixed content**), with console errors like `Failed to fetch dynamically imported module`.
+
+The repo [`Caddyfile`](../../Caddyfile) fixes this by:
+
+- Computing **`X-Forwarded-Proto`** from the incoming **`X-Forwarded-Proto`** header when set, else **`https`** when **`CF-Ray`** is present (traffic came through Cloudflare), else the request’s own scheme (useful for raw HTTP tests).
+- Sending **`X-Forwarded-Host`** from the incoming **`Host`**.
+
+If chunk URLs are still **`http://`** after a deploy: confirm Cloudflare is **proxied** (orange cloud), reload Caddy (`docker compose restart caddy`), and check `docker compose logs caddy` for config errors.
+
 ### 7) Cloudflare Access (Google login) for `app.marketstructureos.com`
 
 #### 7.1) Add Google as an identity provider
@@ -144,6 +177,7 @@ The full app is configured by `docker-compose.yml` to:
 The demo app sets:
 
 - `PPE_ENABLE_SNAPSHOTS=0`
+- Optional: `PPE_PRIVATE_APP_URL` (HTTPS URL of the full app) so the public demo shows a **“Sign in to save work”** banner linking users to persistent snapshots on the private hostname.
 
 ### 9) Backups to Cloudflare R2 (restic)
 
@@ -206,6 +240,8 @@ Add:
 15 3 * * * cd /opt/marketstructureos && ENV_FILE=/opt/marketstructureos/ops/restic/env.local APP_ROOT=/opt/marketstructureos ./ops/restic/backup.sh >> /var/log/marketstructureos-backup.log 2>&1
 ```
 
+**Restore drill:** At least **monthly**, practice a restore on a staging path using [section 11](#11-restore-drill-when-needed) so you are not learning `restic` under incident pressure. The scripts live under `ops/restic/` (`backup.sh`, `restore.sh`).
+
 ### 10) Deploy updates
 
 On the VPS:
@@ -215,6 +251,14 @@ cd /opt/marketstructureos
 git pull
 docker compose up -d --build
 ```
+
+Smoke checks after a deploy:
+
+- **`https://marketstructureos.com`**: public demo loads; if `PPE_PRIVATE_APP_URL` is set on `app_demo`, you should see the **sign in to save work** banner and link to the private app.
+- **Streamlit assets (both hostnames):** in browser DevTools → Network, requests under **`/static/js/`** must use **`https://`** (not `http://`). The console should not show `Failed to fetch dynamically imported module` for those paths.
+- **`https://app.marketstructureos.com`**: Cloudflare Access login still works; after sign-in, the full app loads with snapshots enabled.
+
+After changing only [`Caddyfile`](../../Caddyfile), `git pull` and `docker compose restart caddy` (or `docker compose up -d`) is enough; a full image rebuild is optional unless app code changed.
 
 ### 11) Restore drill (when needed)
 
@@ -242,6 +286,6 @@ Then follow the printed instructions to copy restored data into the `ppe_snapsho
   - `docker compose logs -n 200 app_full`
 - If Access blocks you unexpectedly:
   - Zero Trust → Access → Logs
+- If Streamlit loads but **widgets fail** with **`http://…/static/js/`** in the console, re-check [Streamlit and HTTPS (Caddy forwarded headers)](#streamlit-and-https-caddy-forwarded-headers) and Caddy’s `header_up` / `map` block in [`Caddyfile`](../../Caddyfile).
 - If Streamlit is slow:
   - Use the app’s **Debug: performance** expander and verify Deribit/Yahoo calls.
-
