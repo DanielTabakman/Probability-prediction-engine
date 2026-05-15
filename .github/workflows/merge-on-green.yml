@@ -1,0 +1,97 @@
+# Free private repos: merges PRs when CI passed AND label `automerge` is present.
+# Triggers after workflow "CI" OR "Label PR automerge" so ordering (label vs CI) never races.
+# See docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md § "Merge on green (Actions workaround)".
+name: Merge on green
+
+on:
+  workflow_run:
+    workflows: [CI, Label PR automerge]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  merge-labeled:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            if (run.event !== 'pull_request') {
+              core.info(`Skip: workflow_run.event is ${run.event}`);
+              return;
+            }
+
+            async function ciPassedOnSha(sha) {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner,
+                repo,
+                workflow_id: 'ci.yml',
+                head_sha: sha,
+                event: 'pull_request',
+                per_page: 5,
+              });
+              const runs = data.workflow_runs || [];
+              if (!runs.length) return false;
+              return runs[0].conclusion === 'success';
+            }
+
+            const defaultBranch = context.payload.repository.default_branch || 'main';
+            let prRefs = run.pull_requests || [];
+            if (!prRefs.length && run.head_branch && run.head_branch !== defaultBranch) {
+              const { data: items } = await github.rest.pulls.list({
+                owner,
+                repo,
+                state: 'open',
+                head: `${owner}:${run.head_branch}`,
+                base: defaultBranch,
+              });
+              prRefs = items.map((p) => ({ number: p.number }));
+              core.info(`workflow_run.pull_requests empty; resolved ${prRefs.length} PR(s) via head ${run.head_branch}`);
+            }
+
+            for (const { number } of prRefs) {
+              const { data: pr } = await github.rest.pulls.get({
+                owner,
+                repo,
+                pull_number: number,
+              });
+              if (pr.draft) {
+                core.info(`PR #${number} is draft; skip`);
+                continue;
+              }
+              const hasLabel = pr.labels.some((l) => l.name === 'automerge');
+              if (!hasLabel) {
+                core.info(`PR #${number} has no label automerge; skip`);
+                continue;
+              }
+              if (pr.merged) {
+                core.info(`PR #${number} already merged`);
+                continue;
+              }
+              if (pr.mergeable === false) {
+                core.warning(`PR #${number} has conflicts (mergeable=false); skip`);
+                continue;
+              }
+              const sha = pr.head.sha;
+              if (!(await ciPassedOnSha(sha))) {
+                core.info(`PR #${number}: latest CI on ${sha.slice(0, 7)} not success yet; skip`);
+                continue;
+              }
+              await github.rest.pulls.merge({
+                owner,
+                repo,
+                pull_number: number,
+                merge_method: 'squash',
+              });
+              core.notice(`Merged PR #${number} (squash) after green CI + automerge label`);
+            }
