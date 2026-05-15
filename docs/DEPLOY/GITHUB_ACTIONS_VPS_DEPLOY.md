@@ -32,6 +32,17 @@ In GitHub: **Settings → Secrets and variables → Actions → New repository s
 
 Do **not** commit keys or paste them into the repo.
 
+### Set secrets from your machine (GitHub CLI)
+
+If [GitHub CLI](https://cli.github.com/) is installed and you are logged in (`gh auth login`), you can push the three secrets without pasting them into the browser:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/set_github_deploy_secrets.ps1 `
+  -VpsHost "YOUR.VPS.HOSTNAME" `
+  -VpsUser "YOUR_SSH_USER" `
+  -PrivateKeyPath "C:\path\to\deploy_key.pem"
+```
+
 ## VPS prerequisites
 
 1. **Directory:** `/opt/marketstructureos` exists and is a **git clone** of this repository (or a fork you intend to deploy), with `origin` set so **`git pull`** works **non-interactively** (e.g. deploy key read access to GitHub, or HTTPS credential helper). A failing `git pull` fails the workflow.
