@@ -43,6 +43,8 @@ powershell -ExecutionPolicy Bypass -File scripts/set_github_deploy_secrets.ps1 `
   -PrivateKeyPath "C:\path\to\deploy_key.pem"
 ```
 
+**First-time bootstrap (deploy key + secrets + trigger deploy):** see [scripts/setup_vps_deploy_once.ps1](../../scripts/setup_vps_deploy_once.ps1) — run without flags to generate a key and print VPS steps, then `-SecretsOnly` with host/user after the key is on the server.
+
 ## VPS prerequisites
 
 1. **Directory:** `/opt/marketstructureos` exists and is a **git clone** of this repository (or a fork you intend to deploy), with `origin` set so **`git pull`** works **non-interactively** (e.g. deploy key read access to GitHub, or HTTPS credential helper). A failing `git pull` fails the workflow.
