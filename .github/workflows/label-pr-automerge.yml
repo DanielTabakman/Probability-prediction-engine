@@ -1,0 +1,56 @@
+# Applies label `automerge` so merge-on-green.yml can merge after CI — no manual label click.
+# Same-repo heads only; skips drafts until ready_for_review.
+name: Label PR automerge
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  add-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pr = context.payload.pull_request;
+
+            if (pr.draft) {
+              core.info('Draft PR; skip automerge label until ready_for_review');
+              return;
+            }
+            const headFull = pr.head.repo.full_name;
+            if (headFull !== `${owner}/${repo}`) {
+              core.info(`Fork or foreign head (${headFull}); skip automerge label`);
+              return;
+            }
+
+            try {
+              await github.rest.issues.getLabel({ owner, repo, name: 'automerge' });
+            } catch (e) {
+              if (e.status !== 404) throw e;
+              await github.rest.issues.createLabel({
+                owner,
+                repo,
+                name: 'automerge',
+                color: '0E8A16',
+                description: 'Merge on green: squash-merge when CI passes',
+              });
+              core.info('Created label automerge');
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pr.number,
+              labels: ['automerge'],
+            });
+            core.notice(`Added automerge to PR #${pr.number}`);
