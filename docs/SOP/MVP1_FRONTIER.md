@@ -3,7 +3,7 @@
 Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Control rule (hard)
-- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md`
+- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (full doc re-imported 2026-05-18; §12 audit + §15A repo-truth)
 - **This file** is the only live frontier/steering truth.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
@@ -24,8 +24,9 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
   - **Evidence pointers**:
     - logbook: `artifacts/logbook/ppe_events.jsonl` (`MVP1-Phase2-Slice001`)
     - sprint spec: `docs/SOP/MVP1_PHASE1_3_SPRINT.md`
-- **Phase 3 — Candidate/watch/no-trade decision surface**: **substantially present**
-  - **Present**: single `primary_output_state` with explanation/confidence/horizon fields and first-class no-trade reasoning (v0).
+- **Phase 3 — Candidate/watch/no-trade decision surface**: **partial (v0 digest; §15 gaps)**
+  - **Present**: operator digest (Belief vs market, verification, candidate strips), disagreement categories, no-trade reasoning in copy.
+  - **Gap vs §15**: `primary_output_state` (`candidate` / `watch_only` / `no_trade`) not yet on verification payload — see `PPE_MASTER_MVP1.md` §15A.
   - **Evidence pointers**:
     - logbook: `artifacts/logbook/ppe_events.jsonl` (`MVP1-Phase3-Slice001`, final exit_code=0)
     - sprint spec: `docs/SOP/MVP1_PHASE1_3_SPRINT.md`

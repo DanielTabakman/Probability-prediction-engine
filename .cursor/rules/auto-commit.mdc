@@ -31,6 +31,7 @@
 ### `main` / `master` branches
 
 - On `main` / `master`, the agent may auto-push **only after the full test suite passes**, e.g. `python -m pytest -q`.
+- If the repository uses **PR-only** delivery to `main` (branch protection; see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Instead push a **feature branch** and open a PR to `main` with **auto-merge** (or report that the user/orchestrator should), so GitHub enforces **`CI / pytest`** before merge.
 - The same safety checks apply:
   - No secrets / artifacts staged in the commit.
   - No force push, no history rewrite.

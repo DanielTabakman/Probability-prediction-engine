@@ -4,7 +4,7 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 ### Roles
 
-- **Steward / human**: SELECTION and CONTROL-CLOSEOUT authority (see `docs/SOP/MVP1_FRONTIER.md`).
+- **Steward / human**: SELECTION and CONTROL-CLOSEOUT authority (see `docs/SOP/MVP1_FRONTIER.md`). For **routine ship to production**, the steward is **not** in the GitHub merge path when checks are green: see [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md) (design, troubleshoot, supervise—no standing approval gate).
 - **Relay** (`scripts/relay_runtime_v0.py`): hard gate — stages jobs, validates §14 payload, emits §15 decision.
 - **Orchestrator** (`ppe-orchestrator-acp`, sibling repo): driver — creates worktrees, runs ACP workers, watches time, retries when relay allows.
 - **Worker** (`agent acp` session): does the slice work and writes `relay_result.json`.
@@ -54,7 +54,22 @@ From repo root:
 
 ### Promotion caveat (common STOP_FOR_REVIEW procedural case)
 
-Relay may return **STOP_FOR_REVIEW** (even when BUILD + tests + artifacts are green) when **promotion cannot be performed** from the worker worktree. This happens when the baseline branch is checked out elsewhere (git refuses fast-forward/branch moves across worktrees).\n+\n+Steward action:\n+- perform promotion from the checkout that currently owns the baseline branch, and\n+- record the closeout in `docs/SOP/MVP1_FRONTIER.md` with pointers to the relay run artifacts.
+Relay may return **STOP_FOR_REVIEW** (even when BUILD + tests + artifacts are green) when **promotion cannot be performed** from the worker worktree. This happens when the baseline branch is checked out elsewhere (git refuses fast-forward/branch moves across worktrees).
+
+Steward action:
+
+- Perform promotion from the checkout that currently owns the baseline branch, and
+- Record the closeout in `docs/SOP/MVP1_FRONTIER.md` with pointers to the relay run artifacts.
+
+### Shipping (GitHub)
+
+After relay **CONTINUE** and successful **promotion** to a branch that can merge to **`main`**, the default path to production is:
+
+1. Open (or update) a **pull request** to **`main`**.
+2. Enable **auto-merge** so GitHub merges when **`CI / pytest`** and any other required checks pass ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). If that control is greyed out (private + Free), **Label PR automerge** applies **`automerge`** automatically; **Merge on green** merges after CI passes.
+3. **Deploy VPS** runs on the resulting push to **`main`** ([GITHUB_ACTIONS_VPS_DEPLOY.md](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md)).
+
+Orchestrator or agents with suitable credentials can enable auto-merge via the GitHub API so the steward does not click **Merge** for routine slices.
 
 ### Audits (lightweight, repeatable)
 
@@ -74,3 +89,7 @@ Use these as quick “are we drifting?” checks:
 - Worktree pruning (safe default): `powershell -File scripts/cleanup_orchestrator_worktrees.ps1 -Keep 3` (dry run) or add `-Force` to delete.
 - Relay/artifact folders are intentionally persistent for audit/replay; prune only when you have a clear retention policy.
 
+### Related
+
+- [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md) — PR auto-merge, branch protection, **`CI / pytest`**.  
+- [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) — `main` + VPS + deploy Action.

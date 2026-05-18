@@ -1,5 +1,7 @@
 # Probability Prediction Engine
 
+The Streamlit dashboard uses the shorter in-app and browser-tab title **Probability Engine**.
+
 Cross-reference **market data** (stocks, crypto, futures) and **prediction markets** to find arbitrage, near-arbitrage, and high-probability opportunities. Later: derived (non-obvious) questions and AI-assisted trading, with visualization throughout.
 
 ## Stack
@@ -48,7 +50,7 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 ### Operator / steward backlog (rituals)
 
 - Re-run **`python scripts/run_mvp1_dual_implied_lab_smoke.py`** after major implied-lab or harness changes (Playwright required).
-- Run **`python -m pytest -q`** (full suite) before merge when you touched shared modules.
+- Run **`python -m pytest -q`** (full suite) before merge when you touched shared modules. On GitHub, **`CI / pytest`** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) is the required gate for **auto-merge** to `main`—see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md).
 - Use **relay / logbook** closeout when your SOP requires it for a slice (`run_slice.cmd`, `scripts/log_event.py`, `artifacts/logbook/`).
 
 ### Agent commit / push behavior (automation)
@@ -94,6 +96,12 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 - `docs/` — plan and design notes
 
 ### VPS / public demo (operators)
+
+**Default release protocol:** **[docs/SOP/PRODUCTION_DEPLOY_PROTOCOL.md](docs/SOP/PRODUCTION_DEPLOY_PROTOCOL.md)** (branch `main`, bootstrap, Actions vs manual).
+
+**Every UI release (local → git → VPS):** follow **[docs/SOP/DEMO_UI_RELEASE_CHECKLIST.md](docs/SOP/DEMO_UI_RELEASE_CHECKLIST.md)**.
+
+**Auto-deploy on `main`:** after you configure secrets, **[docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md](docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md)** describes the GitHub Action that SSHs to the VPS and runs `git pull` + `docker compose up -d --build`.
 
 Production layout (demo apex + private app, Caddy, Cloudflare Access, R2 backups) is documented in **[docs/DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md](docs/DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md)**. The runbook includes **Streamlit + `X-Forwarded-Proto`** (so lazy-loaded `/static/js/` chunks stay on **HTTPS** behind Cloudflare Flexible) and post-deploy smoke checks.
 

@@ -244,6 +244,8 @@ Add:
 
 ### 10) Deploy updates
 
+For a **short end-to-end order** (local smoke → tests → git → these commands → browser checks), use **[DEMO_UI_RELEASE_CHECKLIST.md](../SOP/DEMO_UI_RELEASE_CHECKLIST.md)**. Optional **GitHub Actions** auto-deploy on `main` is documented in **[GITHUB_ACTIONS_VPS_DEPLOY.md](GITHUB_ACTIONS_VPS_DEPLOY.md)**.
+
 On the VPS:
 
 ```bash
@@ -254,7 +256,7 @@ docker compose up -d --build
 
 Smoke checks after a deploy:
 
-- **`https://marketstructureos.com`**: public demo loads; if `PPE_PRIVATE_APP_URL` is set on `app_demo`, you should see the **sign in to save work** banner and link to the private app.
+- **`https://marketstructureos.com`**: public demo loads; if `PPE_PRIVATE_APP_URL` is set on `app_demo`, you should see the **Get full access** (or equivalent) banner and link to the private app.
 - **Streamlit assets (both hostnames):** in browser DevTools → Network, requests under **`/static/js/`** must use **`https://`** (not `http://`). The console should not show `Failed to fetch dynamically imported module` for those paths.
 - **`https://app.marketstructureos.com`**: Cloudflare Access login still works; after sign-in, the full app loads with snapshots enabled.
 

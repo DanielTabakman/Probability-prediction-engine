@@ -17,6 +17,7 @@ import streamlit as st
 from src.data.fetch_polymarket import markets_to_probabilities
 from src.data.parse_btc_markets import btc_price_questions_from_polymarket
 from src.data.fetch_deribit import fetch_deribit_spreads_around_predictions
+from src.viz.plotly_theme import apply_chart_theme
 
 
 def _q_label(q: dict) -> str | None:
@@ -357,6 +358,7 @@ def render_market_context_expander(
             margin=dict(b=60),
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         )
+        apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True)
 
         # Separate options chart (Full + Deribit loaded)
@@ -409,6 +411,7 @@ def render_market_context_expander(
                             showlegend=True,
                             legend=dict(orientation="h"),
                         )
+                        apply_chart_theme(fig_opts)
                         st.plotly_chart(fig_opts, use_container_width=True)
                 except Exception:
                     pass

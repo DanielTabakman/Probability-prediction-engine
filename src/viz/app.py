@@ -107,11 +107,9 @@ from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
 from src.viz.signup_cta import private_app_cta_url
+from src.viz.plotly_theme import apply_chart_theme
 import yaml
 
-
-st.set_page_config(page_title="Probability Engine", layout="wide")
-st.title("Probability Prediction Engine")
 
 def _env_flag(name: str, default: bool) -> bool:
     raw = (os.environ.get(name) or "").strip().lower()
@@ -120,36 +118,64 @@ def _env_flag(name: str, default: bool) -> bool:
     return raw in ("1", "true", "yes", "y", "on")
 
 
+PAGE_TITLE = "Probability Engine"
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
-
+_show_debug_ui = _env_flag("PPE_SHOW_DEBUG_UI", False)
 _cta_private_url = private_app_cta_url(
     snapshots_enabled=_snapshots_enabled,
     private_app_url=os.environ.get("PPE_PRIVATE_APP_URL"),
 )
+
+st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
+
+_APP_TAGLINE = (
+    "Market-implied distributions and prediction markets — exploration, not advice."
+)
 if _cta_private_url:
+    hero_left, hero_right = st.columns([3, 1])
+    with hero_left:
+        st.title(PAGE_TITLE)
+        st.caption(_APP_TAGLINE)
+    with hero_right:
+        if hasattr(st, "link_button"):
+            st.link_button(
+                "Get full access",
+                _cta_private_url,
+                use_container_width=True,
+            )
+        else:
+            st.markdown(f"[Get full access]({_cta_private_url})")
+        st.caption("Sign in on the full app to save snapshots and reviews.")
     st.info(
-        "You’re on the **public demo**: snapshots and saved review history are turned off here. "
-        "Sign in on the private app to **freeze, reopen, and review** over time."
+        "**Public demo:** no saved snapshot history here. "
+        "**Get full access** opens the full app with saves and reviews."
     )
-    if hasattr(st, "link_button"):
-        st.link_button(
-            "Sign in to save work & build consistency",
-            _cta_private_url,
-        )
-    else:
-        st.markdown(
-            f"[Sign in to save work & build consistency]({_cta_private_url})"
-        )
+else:
+    st.title(PAGE_TITLE)
+    st.caption(_APP_TAGLINE)
 
 _perf = PerfLog()
-with st.expander("Tutorial / Getting started", expanded=False):
-    render_tutorial_section()
+# First Streamlit run in this session: open intro expander once; later reruns stay collapsed by default.
+_tutorial_expanded = "ppe_tutorial_intro_done" not in st.session_state
+with st.expander("How to use this demo (~2 min)", expanded=_tutorial_expanded):
+    render_tutorial_section(
+        show_dev_sections=_show_debug_ui,
+        show_demo_cta=bool(_cta_private_url),
+    )
+if "ppe_tutorial_intro_done" not in st.session_state:
+    st.session_state["ppe_tutorial_intro_done"] = True
 
-with st.expander("Debug: performance", expanded=False):
-    st.caption("Wall-clock timings for the current rerun (ms).")
-    st.json({"total_ms": round(_perf.total_ms(), 1), **{k: round(v, 1) for k, v in _perf.timings_ms.items()}})
-    st.caption("Prefetch status (best-effort).")
-    st.json(prefetch_status())
+if _show_debug_ui:
+    with st.expander("Debug: performance", expanded=False):
+        st.caption("Wall-clock timings for the current rerun (ms).")
+        st.json(
+            {
+                "total_ms": round(_perf.total_ms(), 1),
+                **{k: round(v, 1) for k, v in _perf.timings_ms.items()},
+            }
+        )
+        st.caption("Prefetch status (best-effort).")
+        st.json(prefetch_status())
 
 config_path = ROOT / "config" / "sources.yaml"
 if config_path.exists():
@@ -186,17 +212,22 @@ is_full = True
 if show_bitcoin_view:
     post_mvp_implied_lab_ui = post_mvp1_lab_ui_enabled()
     st.header("Bitcoin implied lab — market-implied view as the anchor")
-    _glance_suffix = (
-        "**Review → trade ticket** (under **Summary**). "
-        if post_mvp_implied_lab_ui
-        else "**Review** digest only (MVP1: strike/payoff/ticket UI hidden — set **PPE_POST_MVP1_LAB_UI=1** for full lab). "
-    )
     st.caption(
-        "**Glance path:** **Market-implied** chart (right) · **User belief** (left column) · "
-        "**Disagreement digest** (*Belief vs market — at a glance*) · "
-        + _glance_suffix
-        + "Exploration workbench — not a recommendation engine."
+        "**Read in order:** market-implied chart → your **belief** (left) → **Belief vs market** for the disagreement "
+        "story. Exploration only — not advice."
     )
+    if _show_debug_ui:
+        _glance_suffix = (
+            "**Review → trade ticket** (under **Summary**). "
+            if post_mvp_implied_lab_ui
+            else "**Review** digest only (MVP1: strike/payoff/ticket UI hidden — set **PPE_POST_MVP1_LAB_UI=1** for full lab). "
+        )
+        st.caption(
+            "Dev — **Glance path:** **Market-implied** (right) · **User belief** (left) · "
+            "**Disagreement digest** (*Belief vs market — at a glance*) · "
+            + _glance_suffix
+            + "Exploration workbench — not a recommendation engine."
+        )
 
     # Top-of-screen anchor: get a spot reference quickly (implied-lab needs this).
     current_btc = None
@@ -1430,6 +1461,7 @@ if show_bitcoin_view:
                                 else "."
                             )
                         )
+                        apply_chart_theme(fig_dist)
                         st.plotly_chart(fig_dist, use_container_width=True)
 
                     right_forward_slot.caption(_fwd_cap)
@@ -1866,8 +1898,9 @@ if show_bitcoin_view:
                                         _cs.close()
                                     st.toast("Review saved.")
                                     st.rerun()
-                                with st.expander("Debug: full frozen JSON", expanded=False):
-                                    st.json(_frozen)
+                                if _show_debug_ui:
+                                    with st.expander("Debug: full frozen JSON", expanded=False):
+                                        st.json(_frozen)
                         else:
                             st.warning("Frozen record not found (id may have been deleted).")
                             st.session_state["ppe_frozen_view_id"] = None
@@ -1915,18 +1948,20 @@ if show_bitcoin_view:
                             )
             else:
                 st.caption("No Deribit option expiries. Check API.")
-                with st.expander("Debug (expiries fetch)", expanded=False):
-                    st.code(
-                        expiry_fetch_diag
-                        or "No failure detail stored. If this persists, use the app menu → Clear cache, then Rerun.",
-                        language="text",
-                    )
+                if _show_debug_ui:
+                    with st.expander("Debug (expiries fetch)", expanded=False):
+                        st.code(
+                            expiry_fetch_diag
+                            or "No failure detail stored. If this persists, use the app menu → Clear cache, then Rerun.",
+                            language="text",
+                        )
         except Exception as e:
             st.caption(f"Implied distribution unavailable: {e}")
-            with st.expander("Debug (last error)", expanded=False):
-                st.markdown(f"**Exception type:** `{type(e).__name__}`")
-                st.markdown(f"**Message:** `{e!s}`")
-                st.code(traceback.format_exc(), language="text")
+            if _show_debug_ui:
+                with st.expander("Debug (last error)", expanded=False):
+                    st.markdown(f"**Exception type:** `{type(e).__name__}`")
+                    st.markdown(f"**Message:** `{e!s}`")
+                    st.code(traceback.format_exc(), language="text")
     elif is_full and run_implied and current_btc is None:
         st.caption("Need BTC spot price for implied distribution.")
 
