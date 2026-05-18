@@ -5,7 +5,7 @@ Single place for **how production is supposed to run**: what branch, what server
 ## A) Canonical rules
 
 - **Production source of truth:** branch **`main`** on GitHub for this repository.
-- **VPS working copy:** `/opt/marketstructureos` should have **`HEAD` on `main`**. Before you trust a deploy, run `git status` and confirm `On branch main`. Deploying from a long-lived feature branch (for example a typo branch like `notifivations`) makes the live site drift from what you merge elsewhere and **does not** match the default GitHub Action (which runs on **`main`** pushes).
+- **VPS working copy:** `/opt/marketstructureos` should have **`HEAD` on `main`**. Before you trust a deploy, run `git status` and confirm `On branch main`. Deploying from a long-lived feature branch (for example `notifications` for local integration work) makes the live site drift from what you merge elsewhere and **does not** match the default GitHub Action (which runs on **`main`** pushes).
 - **What runs in Docker:** the commit checked out in that directory after `git pull` on **`main`**, then `docker compose up -d --build` (see [Dockerfile](../../Dockerfile) `COPY . /app`).
 
 ```mermaid
