@@ -42,26 +42,28 @@ Reconcile **Phase 2 desirability / playability** product work onto **`main`** un
 
 ---
 
-### MVP1-Phase2-Reconcile-Slice002 — baseline reconcile (CONTROL) — **OPEN**
+### MVP1-Phase2-Reconcile-Slice002 — baseline reconcile (CONTROL) — **CLOSED**
 
 **Goal:** Steward-reviewed diff: `main` vs `recovery/frontier-steward-v2_1-baseline` for Sprint 004-class viz/product paths.
 
-**Deliverables:** reconcile notes in [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) (file list + port/defer decision per path).
+**Deliverables:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
 
-**Acceptance:** steward signs first PRODUCT slice target (likely `Sprint004-Slice004` class directional strip — see historical [`SPRINT_004_PHASE_2.md`](SPRINT_004_PHASE_2.md)).
-
----
-
-### MVP1-Phase2-Product-Slice003 — first PRODUCT port (PRODUCT) — **OPEN**
-
-**Goal:** First steward-selected PRODUCT slice from reconcile plan (not started until Slice002 **CLOSED**).
-
-**Acceptance:** pytest + dual smoke green; frontier updated.
+**Closed** 2026-05-19 — directional strip **already_on_main**; narrow Product-Slice003 scope approved.
 
 ---
 
-### MVP1-Phase2-Closeout-Slice004 — chapter checkpoint (CONTROL) — **OPEN**
+### MVP1-Phase2-Product-Slice003 — MVP1 UI exclusions alignment (PRODUCT) — **CLOSED**
 
-**Goal:** Document first PRODUCT slice closeout or defer with honest evidence.
+**Goal:** Port reconcile-approved copy/harness alignment (not blind recovery merge).
 
-**Acceptance:** evidence doc + HANDOFF next step.
+**Shipped:** `belief_disagreement_hints` strike-policy runtime; `decision_ready_review` + `app_panels` + `app.py` MVP1 copy; harness `_set_mode_when_advanced_lab_ui_enabled`; test `test_mvp1_excludes_trade_ticket_language`.
+
+**Acceptance:** pytest green; dual smoke witness logged. **Closed** 2026-05-19.
+
+---
+
+### MVP1-Phase2-Closeout-Slice004 — chapter checkpoint (CONTROL) — **CLOSED**
+
+**Goal:** Document first PRODUCT slice closeout with honest evidence.
+
+**Closed** 2026-05-19 — Product-Slice003 complete; Phase 2 chapter remains **OPEN** for further PRODUCT slices per reconcile report (directional strip already on `main`).

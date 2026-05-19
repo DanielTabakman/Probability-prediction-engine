@@ -75,6 +75,8 @@ def _payoff_shape_plain(name: str, debit_credit: str | None) -> str:
 
 def build_decision_ready_review_payload(
     verification: dict[str, Any] | None,
+    *,
+    mvp1_exclude_execution_ui: bool = False,
 ) -> dict[str, Any] | None:
     """
     Build markdown-safe lines for the right-column review block.
@@ -103,20 +105,34 @@ def build_decision_ready_review_payload(
     has_glance = isinstance(glance, dict) and bool(glance)
 
     if has_glance:
-        linkage_line = (
-            "**How this ties together:** **Belief vs market — at a glance** is directly under this block, "
-            "then **Trade ticket (copy/paste)** (one expander) for the copy-ready leg list — same numbers as "
-            "**Summary**. That glance card carries the **interpretive disagreement** and **illustrative fit "
-            "classes** for the same exploration; your strikes instantiate **one** concrete payoff, not a "
-            "ranked choice."
-        )
+        if mvp1_exclude_execution_ui:
+            linkage_line = (
+                "**How this ties together:** **Belief vs market — at a glance** is directly under this block. "
+                "That glance card carries the **interpretive disagreement** and **illustrative fit classes** "
+                "for the same exploration. (**MVP1 scope:** no trade-ticket export — use **Summary** for numbers.)"
+            )
+        else:
+            linkage_line = (
+                "**How this ties together:** **Belief vs market — at a glance** is directly under this block, "
+                "then **Trade ticket (copy/paste)** (one expander) for the copy-ready leg list — same numbers as "
+                "**Summary**. That glance card carries the **interpretive disagreement** and **illustrative fit "
+                "classes** for the same exploration; your strikes instantiate **one** concrete payoff, not a "
+                "ranked choice."
+            )
     else:
-        linkage_line = (
-            "**Belief overlay off or not linked here:** there is no **interpretive disagreement** digest "
-            "in this run. The **green line** and **Summary** still describe the structure; open "
-            "**Trade ticket (copy/paste)** just under the glance card (or directly under this review if the "
-            "glance card is empty) for the copy-paste leg block — same numbers as **Summary**."
-        )
+        if mvp1_exclude_execution_ui:
+            linkage_line = (
+                "**Belief overlay off or not linked here:** there is no **interpretive disagreement** digest "
+                "in this run. The **green line** and **Summary** still describe the structure "
+                "(**MVP1 scope:** trade-ticket export is hidden)."
+            )
+        else:
+            linkage_line = (
+                "**Belief overlay off or not linked here:** there is no **interpretive disagreement** digest "
+                "in this run. The **green line** and **Summary** still describe the structure; open "
+                "**Trade ticket (copy/paste)** just under the glance card (or directly under this review if the "
+                "glance card is empty) for the copy-paste leg block — same numbers as **Summary**."
+            )
 
     vs_sum = verification.get("verification_summary")
     bullets: list[str] = []
@@ -124,11 +140,16 @@ def build_decision_ready_review_payload(
         ob = vs_sum.get("overlay_basis")
         if isinstance(ob, str) and ob.strip():
             bullets.append(f"- **Strike construction:** {ob.strip()}")
-    bullets.append(
-        "- **Same numbers as Summary / ticket:** max gain, max loss, breakevens, and legs stay "
-        "single-source from the engine — open **Trade ticket (copy/paste)** below the glance card "
-        "(one expander) for the leg list."
-    )
+    if mvp1_exclude_execution_ui:
+        bullets.append(
+            "- **Same numbers as Summary:** max gain, max loss, breakevens, and legs stay single-source from the engine."
+        )
+    else:
+        bullets.append(
+            "- **Same numbers as Summary / ticket:** max gain, max loss, breakevens, and legs stay "
+            "single-source from the engine — open **Trade ticket (copy/paste)** below the glance card "
+            "(one expander) for the leg list."
+        )
 
     fit_caption = "**Fit is not recommendation.** Illustrative structure only — same stance as the glance card."
     if has_glance and isinstance(glance, dict):

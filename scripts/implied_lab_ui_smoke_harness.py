@@ -84,6 +84,12 @@ SCENARIO_TIMEOUT_S_BY_SCENARIO: dict[str, float] = {
 DEFAULT_SCENARIO_TIMEOUT_S = 20.0 * 60.0
 
 
+def mvp1_execution_surfaces_hidden_by_default() -> bool:
+    """True unless env enables post-MVP1 lab surfaces (`PPE_POST_MVP1_LAB_UI`)."""
+    v = str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip().lower()
+    return v not in ("1", "true", "yes", "on")
+
+
 def default_scenario_timeout_s(scenario: str) -> float:
     return float(SCENARIO_TIMEOUT_S_BY_SCENARIO.get(scenario, DEFAULT_SCENARIO_TIMEOUT_S))
 
@@ -475,6 +481,12 @@ def _set_mode(page, mode_text: str) -> None:
     loc.click()
 
 
+def _set_mode_when_advanced_lab_ui_enabled(page, mode_text: str) -> None:
+    if mvp1_execution_surfaces_hidden_by_default():
+        return
+    _set_mode(page, mode_text)
+
+
 def _expand_expander(page, expander_title: str) -> None:
     """
     Click a <details><summary>... expander if not already open.
@@ -510,6 +522,16 @@ def _expand_expander(page, expander_title: str) -> None:
         except Exception:
             pass
         header.click(force=True)
+        page.wait_for_timeout(800)
+        return
+
+    loose_btn = page.locator("button").filter(has_text=re.compile(re.escape(expander_title), re.I)).first
+    if loose_btn.count() > 0:
+        try:
+            loose_btn.scroll_into_view_if_needed()
+        except Exception:
+            pass
+        loose_btn.click(force=True)
         page.wait_for_timeout(800)
         return
 
@@ -784,7 +806,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
 
         # Set scenario-specific widgets.
         if scenario == "A_width_target_payoff":
-            _set_mode(page, "Target payoff")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Target payoff")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             # Belief uncertainty now defaults to ±% mode; switch to σ mode so this scenario can set σ_ln.
             page.locator("text=σ_ln (advanced)").first.click()
@@ -796,13 +818,13 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
                 pass
 
         elif scenario == "B_peak_aligned":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
 
         elif scenario == "C_directional_peak_disagreement":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             # Match user σ_ln to ATM-implied σ first so width band is "similar", then
             # shift peak — yields directional (not mixed) disagreement vs market modal peak.
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
@@ -828,7 +850,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
                 pass
 
         elif scenario == "D_exact_strikes_mode":
-            _set_mode(page, "Exact strikes")
+            _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)

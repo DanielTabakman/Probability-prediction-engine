@@ -1551,8 +1551,10 @@ if show_bitcoin_view:
                                 st.markdown(_belief_block)
                     with right_review_slot.container():
                         with st.expander("Review & disagreement digest", expanded=False):
-                            if post_mvp_implied_lab_ui:
-                                _render_decision_ready_review(outputs.get("verification") or {})
+                            _render_decision_ready_review(
+                                outputs.get("verification") or {},
+                                mvp1_exclude_execution_ui=not post_mvp_implied_lab_ui,
+                            )
                             _render_belief_vs_market_glance(outputs.get("verification") or {})
                     if post_mvp_implied_lab_ui:
                         with right_ticket_slot.container():

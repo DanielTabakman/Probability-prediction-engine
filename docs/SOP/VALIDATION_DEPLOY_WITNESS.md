@@ -11,7 +11,7 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
 | **HTTPS static assets** | PASS |
 | **Demo operator script** | PASS |
-| **Research offer CTA on demo** | **pending steward `.env`** — compose on `main` wires `${PPE_RESEARCH_OFFER_URL:-}`; agent fetch did not surface **Research beta (v0)** (expected until VPS repo-root `.env` sets URL) |
+| **Research offer CTA on demo** | **pending steward `.env`** — compose on `main`; set **PASS** after VPS `.env` + browser confirms **Research beta (v0)** |
 
 **Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 

@@ -415,14 +415,24 @@ def render_implied_lab_verification(v: dict) -> None:
             st.write("**Breakevens:**", notes.get("breakevens", ""))
 
 
-def render_decision_ready_review(verification: dict) -> None:
+def render_decision_ready_review(
+    verification: dict, *, mvp1_exclude_execution_ui: bool = False
+) -> None:
     """Sprint 005: plain-language structure + payoff read + disagreement/ticket linkage."""
-    payload = build_decision_ready_review_payload(verification)
+    payload = build_decision_ready_review_payload(
+        verification, mvp1_exclude_execution_ui=mvp1_exclude_execution_ui
+    )
     if not payload:
         return
     with st.container(border=True):
         st.markdown("##### Decision-ready review")
-        st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
+        if mvp1_exclude_execution_ui:
+            st.caption(
+                "Connects **Summary** to the glance digest below — descriptive only "
+                "(MVP1 hides copy/paste trade-ticket export)."
+            )
+        else:
+            st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
         st.markdown(payload["structure_line"])
         st.markdown(payload["payoff_line"])
         st.markdown(payload["linkage_line"])

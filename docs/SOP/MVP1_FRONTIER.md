@@ -10,7 +10,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 ### Current execution focus (MVP1 framing)
 - **Active BUILD chapter:** **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · [`PHASE_PLANS/mvp1_phase2_on_main_relay.json`](PHASE_PLANS/mvp1_phase2_on_main_relay.json).
 - **SELECTION:** [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md) — Phase 2 chartered; Control-Slice001 **CLOSED**.
-- **Next slice:** `MVP1-Phase2-Reconcile-Slice002` — baseline vs `recovery/frontier-steward-v2_1-baseline`.
+- **Next slice:** `MVP1-Phase2-Closeout-Slice004` checkpoint (Product-Slice003 **CLOSED** 2026-05-19).
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA PASS; paid-interest call (**N** until live conversation).
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
@@ -19,9 +19,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-Phase2-Control-Slice001` — charter + SELECTION record | CONTROL |
-| **OPEN** | `MVP1-Phase2-Reconcile-Slice002` — `main` vs recovery baseline diff | CONTROL |
-| **OPEN** | `MVP1-Phase2-Product-Slice003` — first PRODUCT port (after reconcile) | PRODUCT |
-| **OPEN** | `MVP1-Phase2-Closeout-Slice004` — checkpoint closeout | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` — [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions alignment (copy + harness) | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint after Product-Slice003 | CONTROL |
 
 **Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
