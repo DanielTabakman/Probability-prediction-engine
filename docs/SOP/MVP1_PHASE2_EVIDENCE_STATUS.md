@@ -1,6 +1,6 @@
 # Phase 2 on `main` — evidence status
 
-**Chapter:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · **Baseline:** `main` @ `01c89cf`+ · **One-pager:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
+**Chapter:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · **Baseline:** `main` @ `0b09b97`+ · **One-pager:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
 
 **Reconcile report:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md)
 

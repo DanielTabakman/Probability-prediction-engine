@@ -19,7 +19,7 @@
 | Push `main` → GitHub Actions **Deploy VPS** | done | auto `git pull` + `docker compose up -d --build` on push |
 | VPS repo-root `.env` with offer URL | **steward follow-up** | Deploy-Slice003 closed (agent lane); CTA needs `.env` for browser PASS |
 | Production browser: **Research beta (v0)** CTA | **steward follow-up** | After `.env` set; re-run `docker compose up -d` |
-| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `01c89cf`+; CTA row pending steward `.env` |
+| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `0b09b97`; CTA row pending steward `.env` |
 | Live paid-interest conversation | **steward** | **N** — honest; outreach script below |
 | **Ops completion (agent lane)** | done | |
 | **SELECTION** | done | MVP1 Reliability chartered |
