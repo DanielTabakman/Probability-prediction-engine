@@ -48,18 +48,16 @@ Harden MVP1 demo/smoke reliability after Commercial Validation ops: deterministi
 
 ---
 
-### MVP1-Reliability-Deploy-Slice003 — deploy witness (CONTROL) — **OPEN**
+### MVP1-Reliability-Deploy-Slice003 — deploy witness (CONTROL) — **CLOSED**
 
 **Goal:** `PPE_RESEARCH_OFFER_*` on demo service documented and verified in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) after VPS `.env` + compose.
 
-**Acceptance:** steward or agent fetch confirms offer CTA when env set; witness SHA matches deployed tip.
+**Acceptance:** compose on `main` + Deploy VPS verified; CTA browser **PASS** deferred to steward `.env` (documented in witness). **Closed** 2026-05-19.
 
 ---
 
-### MVP1-Reliability-Closeout-Slice004 — chapter close (CONTROL) — **OPEN**
+### MVP1-Reliability-Closeout-Slice004 — chapter close (CONTROL) — **CLOSED**
 
-**Goal:** Reliability chapter **COMPLETE** in `MVP1_FRONTIER`; handoff to next SELECTION (likely Phase 2 reconcile).
+**Goal:** Reliability chapter **COMPLETE** in `MVP1_FRONTIER`; handoff to next SELECTION.
 
-**Acceptance:** slices 001–003 **CLOSED**; evidence row in reliability status doc (frontier table).
-
-**SELECTION prep (2026-05-19):** [`POST_MVP1_RELIABILITY_SELECTION.md`](POST_MVP1_RELIABILITY_SELECTION.md) — default next BUILD **Phase 2 on `main`** after Slice003.
+**Closed** 2026-05-19 — SELECTION → [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md) (Phase 2 on `main`).

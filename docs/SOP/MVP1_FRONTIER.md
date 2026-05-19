@@ -8,21 +8,33 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Ops pass:** **DONE** 2026-05-19 — compose `PPE_RESEARCH_OFFER_*` on `app_demo`; dual smoke green. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
-- **SELECTION:** **COMPLETE** — [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md).
-- **Active BUILD chapter:** **MVP1 Reliability** (Smoke-Slice002 **CLOSED**) — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) · evidence [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
-- **Steward:** Deploy-Slice003 (VPS `.env` + CTA) + paid-interest call.
-- **After Reliability closeout:** SELECTION prep [`POST_MVP1_RELIABILITY_SELECTION.md`](POST_MVP1_RELIABILITY_SELECTION.md) → default **Phase 2 on `main`**.
+- **Active BUILD chapter:** **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · [`PHASE_PLANS/mvp1_phase2_on_main_relay.json`](PHASE_PLANS/mvp1_phase2_on_main_relay.json).
+- **SELECTION:** [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md) — Phase 2 chartered; Control-Slice001 **CLOSED**.
+- **Next slice:** `MVP1-Phase2-Reconcile-Slice002` — baseline vs `recovery/frontier-steward-v2_1-baseline`.
+- **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA PASS; paid-interest call (**N** until live conversation).
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
-### MVP1 Reliability — relay queue (baseline **`main`**) — **OPEN**
+### Phase 2 on `main` — relay queue (baseline **`main`**) — **OPEN**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **CLOSED** | `MVP1-Reliability-Control-Slice001` — charter + SELECTION record | CONTROL |
-| **CLOSED** | `MVP1-Reliability-Smoke-Slice002` — harness timeouts + dual smoke `20260519_133606` / `134906` | PRODUCT |
-| **OPEN** | `MVP1-Reliability-Deploy-Slice003` — steward VPS `.env` + offer CTA verify | CONTROL |
-| **OPEN** | `MVP1-Reliability-Closeout-Slice004` — chapter close after Slice003 | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Control-Slice001` — charter + SELECTION record | CONTROL |
+| **OPEN** | `MVP1-Phase2-Reconcile-Slice002` — `main` vs recovery baseline diff | CONTROL |
+| **OPEN** | `MVP1-Phase2-Product-Slice003` — first PRODUCT port (after reconcile) | PRODUCT |
+| **OPEN** | `MVP1-Phase2-Closeout-Slice004` — checkpoint closeout | CONTROL |
+
+**Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
+
+### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-Reliability-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-Reliability-Smoke-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-Reliability-Deploy-Slice003` | CONTROL |
+| **CLOSED** | `MVP1-Reliability-Closeout-Slice004` | CONTROL |
+
+**Evidence:** [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md)
 
 ### Archived roadmap chapters (baseline **`main`**)
 
@@ -30,6 +42,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 |---------|--------|----------|
 | Validation Chapter | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
+| MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
 
 ### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 

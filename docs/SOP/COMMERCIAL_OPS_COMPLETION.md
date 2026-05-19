@@ -17,9 +17,9 @@
 | Fresh `run_mvp1_dual_implied_lab_smoke.py` | done | Post–Reliability Slice002: `20260519_133606` + `134906`; prior `131035` + `131251` |
 | `docker-compose.yml` `PPE_RESEARCH_OFFER_*` on `app_demo` | done | `${PPE_RESEARCH_OFFER_URL:-}` / `LABEL` wired; [`.env.example`](../../.env.example) |
 | Push `main` → GitHub Actions **Deploy VPS** | done | auto `git pull` + `docker compose up -d --build` on push |
-| VPS repo-root `.env` with offer URL | **steward** | Required for CTA text on demo; compose passes empty if unset |
-| Production browser: **Research beta (v0)** CTA | **steward** | After `.env` set; re-run `docker compose up -d` |
-| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Agent fetch + deploy trigger; CTA row pending steward `.env` |
+| VPS repo-root `.env` with offer URL | **steward follow-up** | Deploy-Slice003 closed (agent lane); CTA needs `.env` for browser PASS |
+| Production browser: **Research beta (v0)** CTA | **steward follow-up** | After `.env` set; re-run `docker compose up -d` |
+| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `559f908`; CTA row pending steward `.env` |
 | Live paid-interest conversation | **steward** | **N** — honest; outreach script below |
 | **Ops completion (agent lane)** | done | |
 | **SELECTION** | done | MVP1 Reliability chartered |
@@ -82,5 +82,5 @@ docker compose up -d --build
 
 ## Next
 
-**BUILD:** [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) — Deploy-Slice003 (steward) then Closeout-Slice004. **SELECTION prep:** [`POST_MVP1_RELIABILITY_SELECTION.md`](POST_MVP1_RELIABILITY_SELECTION.md).
+**BUILD:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) — Reconcile-Slice002. **SELECTION:** [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md). Reliability chapter **COMPLETE**.
 

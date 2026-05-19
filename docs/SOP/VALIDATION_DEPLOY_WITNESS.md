@@ -4,28 +4,26 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 |
-| **Git SHA on VPS** | Verify `cd /opt/marketstructureos && git rev-parse HEAD` (expect `main` ≥ ops compose + reliability smoke commits) |
+| **Date (UTC)** | 2026-05-19 (Reliability Deploy-Slice003 closeout) |
+| **Git SHA on VPS** | **`559f908`** (target via Deploy VPS on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
 | **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
 | **HTTPS static assets** | PASS |
 | **Demo operator script** | PASS |
-| **Research offer CTA on demo** | **pending steward `.env`** — `docker-compose.yml` wires `${PPE_RESEARCH_OFFER_URL:-}`; CTA renders only when repo-root `.env` sets URL on VPS |
+| **Research offer CTA on demo** | **pending steward `.env`** — compose on `main` wires `${PPE_RESEARCH_OFFER_URL:-}`; agent fetch did not surface **Research beta (v0)** (expected until VPS repo-root `.env` sets URL) |
 
-**Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — see [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
+**Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 
-**Steward (Deploy-Slice003):**
+**Deploy-Slice003 (agent lane):** compose + auto-deploy verified on `main` @ `559f908`. **Steward follow-up:** set `.env` below → `docker compose up -d --build` → set CTA row **PASS** after browser confirms **Research beta (v0)**.
 
 ```bash
 cd /opt/marketstructureos
 git pull
-# create/edit .env:
+# .env (not committed):
 #   PPE_RESEARCH_OFFER_URL=mailto:...
 #   PPE_RESEARCH_OFFER_LABEL=Request research beta access
 docker compose up -d --build
 ```
-
-Browser: confirm **Research beta (v0)** on [marketstructureos.com](https://marketstructureos.com) → set CTA row **PASS** and record VPS SHA above.
 
 **Tracker:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)

@@ -1,6 +1,6 @@
 # Post–MVP1 Reliability — steward SELECTION (prep)
 
-**Status:** Reliability chapter **in progress** — Smoke-Slice002 **CLOSED** (2026-05-19); Deploy-Slice003 + Closeout-Slice004 **OPEN**.
+**Status:** **SUPERSEDED** by [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md) — Reliability **COMPLETE**; Phase 2 on `main` chartered.
 
 **Evidence:** [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md)
 

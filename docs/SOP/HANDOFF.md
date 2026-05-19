@@ -13,11 +13,11 @@ A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
-- Active MVP1 focus: **MVP1 Reliability** — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md); SELECTION [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md)
-- Closed chapters: Validation + Commercial Validation — **COMPLETE** 2026-05-19
-- Ops agent lane: **DONE** — compose offer env; smoke `20260519_131035` / `131251`; pytest **153**; [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
-- Steward parallel: VPS `.env` `PPE_RESEARCH_OFFER_*` + live paid-interest call
-- Next pending execution step: **`MVP1-Reliability-Deploy-Slice003`** (steward VPS `.env` + CTA); Smoke-Slice002 **CLOSED** 2026-05-19
+- Active MVP1 focus: **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md)
+- Closed chapters: Validation, Commercial Validation, MVP1 Reliability — **COMPLETE** 2026-05-19
+- SELECTION: [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md)
+- Next pending execution step: **`MVP1-Phase2-Reconcile-Slice002`** (baseline diff vs recovery branch)
+- Steward parallel: VPS `.env` CTA PASS; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 - Legacy `CURRENT_FRONTIER.md` is **historical only**
@@ -27,35 +27,36 @@ B) REPO-STATE SAFETY (reproducibility)
 - Ahead/behind vs origin: verify
 - Working tree: verify CLEAN before BUILD
 - Untracked canonical docs: verify NO
-- BUILD allowed: YES — MVP1 Reliability relay after CONTROL-Slice001 accept
+- BUILD allowed: YES — after Reconcile-Slice002 steward sign-off for Product-Slice003
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: verify after repo-state
-- If YES: branch + HEAD SHA + `MVP1_FRONTIER.md` + `COMMERCIAL_OPS_COMPLETION.md`
+- If YES: branch + HEAD SHA + `MVP1_FRONTIER.md` + `MVP1_PHASE2_EVIDENCE_STATUS.md`
 ```
 
-**Steward workflow:** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). **Ops tracker:** [COMMERCIAL_OPS_COMPLETION.md](COMMERCIAL_OPS_COMPLETION.md). **Implied lab:** [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md).
+**Steward workflow:** [FRONTIER_STEWARD_PROTOCOL.md](FRONTIER_STEWARD_PROTOCOL.md). **Phase 2 evidence:** [MVP1_PHASE2_EVIDENCE_STATUS.md](MVP1_PHASE2_EVIDENCE_STATUS.md). **Implied lab:** [IMPLIED_LAB_OPERATOR_RUNBOOK.md](IMPLIED_LAB_OPERATOR_RUNBOOK.md).
 
 ## Current priority
 
-**MVP1 Reliability** — Smoke-Slice002 **closed** (dual smoke `20260519_133606` / `134906`). **Next:** steward Deploy-Slice003 (VPS `.env` + CTA). Evidence: [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
+**Phase 2 on `main`** — Reconcile-Slice002: diff `main` vs `recovery/frontier-steward-v2_1-baseline` before first PRODUCT port. Reliability chapter **closed**; dual smoke `20260519_133606` / `134906`.
 
 ## Hard rule reminders
 
-- Dual smoke: `PYTHONUNBUFFERED=1 python scripts/run_mvp1_dual_implied_lab_smoke.py` (~15–20 min)
+- Dual smoke: `PYTHONUNBUFFERED=1 python scripts/run_mvp1_dual_implied_lab_smoke.py` (~15–25 min)
 - Classify live-data smoke failures per implied-lab runbook §6
 
 ## Most relevant checks
 
 1. `python -m pytest -q`
-2. `python scripts/run_mvp1_dual_implied_lab_smoke.py`
+2. `python scripts/run_mvp1_dual_implied_lab_smoke.py` (after PRODUCT slices)
 3. Production §5 in [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md)
 
 ## Recommended next step
 
-1. Steward: VPS + demo env in [COMMERCIAL_OPS_COMPLETION.md](COMMERCIAL_OPS_COMPLETION.md).  
-2. **SELECTION:** [POST_COMMERCIAL_OPS_SELECTION.md](POST_COMMERCIAL_OPS_SELECTION.md).
+1. **Agent/steward:** complete Reconcile-Slice002 in [MVP1_PHASE2_EVIDENCE_STATUS.md](MVP1_PHASE2_EVIDENCE_STATUS.md).  
+2. **Steward:** VPS `.env` + CTA — [VALIDATION_DEPLOY_WITNESS.md](VALIDATION_DEPLOY_WITNESS.md).  
+3. **Steward:** paid-interest call — [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md).
 
 ## Last updated
 
-2026-05-19 — ops agent lane complete; dual smoke green; SELECTION prep posted.
+2026-05-19 — integrated finish-line: Reliability **COMPLETE**; Phase 2 chartered on `main`.

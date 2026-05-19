@@ -1,0 +1,43 @@
+{
+  "name": "MVP1_phase2_on_main (post-reliability SELECTION)",
+  "baselineBranch": "main",
+  "reconcileReferenceBranch": "recovery/frontier-steward-v2_1-baseline",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_ON_MAIN.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md",
+  "parentCharter": "docs/SOP/PHASE_2_CHARTER.md",
+  "historicalReference": {
+    "sprint004Spec": "docs/SOP/SPRINT_004_PHASE_2.md",
+    "phase2NextPlan": "docs/SOP/PHASE_PLANS/phase2_next.json",
+    "note": "HISTORICAL — re-validate on main before PRODUCT BUILD"
+  },
+  "slices": [
+    {
+      "sliceId": "MVP1-Phase2-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Phase2-Reconcile-Slice002",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Phase2-Product-Slice003",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Phase2-Closeout-Slice004",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}
