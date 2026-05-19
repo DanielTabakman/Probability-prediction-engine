@@ -40,11 +40,11 @@ Harden MVP1 demo/smoke reliability after Commercial Validation ops: deterministi
 
 ---
 
-### MVP1-Reliability-Smoke-Slice002 — harness discipline (PRODUCT) — **OPEN**
+### MVP1-Reliability-Smoke-Slice002 — harness discipline (PRODUCT) — **CLOSED**
 
 **Goal:** Reduce smoke kill/hang class: scenario progress logging, documented per-scenario timeouts, runbook alignment.
 
-**Acceptance:** dual smoke exit **0** on `main`; witness run IDs logged.
+**Acceptance:** dual smoke exit **0** on `main`; witness run IDs logged. **Closed** 2026-05-19 — runs `20260519_133606` + `134906`; see [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 
 ---
 
@@ -61,3 +61,5 @@ Harden MVP1 demo/smoke reliability after Commercial Validation ops: deterministi
 **Goal:** Reliability chapter **COMPLETE** in `MVP1_FRONTIER`; handoff to next SELECTION (likely Phase 2 reconcile).
 
 **Acceptance:** slices 001–003 **CLOSED**; evidence row in reliability status doc (frontier table).
+
+**SELECTION prep (2026-05-19):** [`POST_MVP1_RELIABILITY_SELECTION.md`](POST_MVP1_RELIABILITY_SELECTION.md) — default next BUILD **Phase 2 on `main`** after Slice003.

@@ -10,8 +10,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 ### Current execution focus (MVP1 framing)
 - **Ops pass:** **DONE** 2026-05-19 — compose `PPE_RESEARCH_OFFER_*` on `app_demo`; dual smoke green. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
 - **SELECTION:** **COMPLETE** — [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md).
-- **Active BUILD chapter:** **MVP1 Reliability** — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) · [`PHASE_PLANS/mvp1_reliability_relay.json`](PHASE_PLANS/mvp1_reliability_relay.json).
-- **Steward parallel:** VPS `.env` for offer URL + live paid-interest call (does not block CONTROL-Slice001).
+- **Active BUILD chapter:** **MVP1 Reliability** (Smoke-Slice002 **CLOSED**) — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) · evidence [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
+- **Steward:** Deploy-Slice003 (VPS `.env` + CTA) + paid-interest call.
+- **After Reliability closeout:** SELECTION prep [`POST_MVP1_RELIABILITY_SELECTION.md`](POST_MVP1_RELIABILITY_SELECTION.md) → default **Phase 2 on `main`**.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
 ### MVP1 Reliability — relay queue (baseline **`main`**) — **OPEN**
@@ -19,9 +20,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-Reliability-Control-Slice001` — charter + SELECTION record | CONTROL |
-| **OPEN** | `MVP1-Reliability-Smoke-Slice002` — harness timeout / progress witness | PRODUCT |
-| **OPEN** | `MVP1-Reliability-Deploy-Slice003` — deploy witness + offer CTA verify | CONTROL |
-| **OPEN** | `MVP1-Reliability-Closeout-Slice004` — chapter close | CONTROL |
+| **CLOSED** | `MVP1-Reliability-Smoke-Slice002` — harness timeouts + dual smoke `20260519_133606` / `134906` | PRODUCT |
+| **OPEN** | `MVP1-Reliability-Deploy-Slice003` — steward VPS `.env` + offer CTA verify | CONTROL |
+| **OPEN** | `MVP1-Reliability-Closeout-Slice004` — chapter close after Slice003 | CONTROL |
 
 ### Archived roadmap chapters (baseline **`main`**)
 

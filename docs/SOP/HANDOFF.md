@@ -17,7 +17,7 @@ A) DOC-STATE SAFETY (alignment)
 - Closed chapters: Validation + Commercial Validation — **COMPLETE** 2026-05-19
 - Ops agent lane: **DONE** — compose offer env; smoke `20260519_131035` / `131251`; pytest **153**; [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
 - Steward parallel: VPS `.env` `PPE_RESEARCH_OFFER_*` + live paid-interest call
-- Next pending execution step: **`MVP1-Reliability-Smoke-Slice002`** (CONTROL-Slice001 closed 2026-05-19)
+- Next pending execution step: **`MVP1-Reliability-Deploy-Slice003`** (steward VPS `.env` + CTA); Smoke-Slice002 **CLOSED** 2026-05-19
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 - Legacy `CURRENT_FRONTIER.md` is **historical only**
@@ -38,7 +38,7 @@ C) AGENT CONTINUITY (required)
 
 ## Current priority
 
-**MVP1 Reliability** — first relay slice CONTROL accept. Ops **closed**; steward VPS/outreach in parallel. Validation + Commercial Validation chapters **closed** on `main`.
+**MVP1 Reliability** — Smoke-Slice002 **closed** (dual smoke `20260519_133606` / `134906`). **Next:** steward Deploy-Slice003 (VPS `.env` + CTA). Evidence: [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 
 ## Hard rule reminders
 

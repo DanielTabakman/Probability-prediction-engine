@@ -74,6 +74,19 @@ SCENARIOS = [
     "MVP1_compact_verification",
 ]
 
+# Per-scenario wall-clock budgets (seconds) for one scenario drive after Streamlit is ready.
+# Dual-smoke passes these via --scenario-timeout-s; parent may also enforce subprocess timeout.
+SCENARIO_TIMEOUT_S_BY_SCENARIO: dict[str, float] = {
+    "MVP1_compact_verification": 15.0 * 60.0,
+    "A_width_target_payoff": 25.0 * 60.0,
+    "C_directional_peak_disagreement": 25.0 * 60.0,
+}
+DEFAULT_SCENARIO_TIMEOUT_S = 20.0 * 60.0
+
+
+def default_scenario_timeout_s(scenario: str) -> float:
+    return float(SCENARIO_TIMEOUT_S_BY_SCENARIO.get(scenario, DEFAULT_SCENARIO_TIMEOUT_S))
+
 
 def _ensure_width_band_similar(page, target_sig: float) -> float:
     """
@@ -924,6 +937,14 @@ def main() -> int:
         default=300.0,
         help="Streamlit readiness timeout seconds.",
     )
+    parser.add_argument(
+        "--scenario-timeout-s",
+        type=float,
+        default=0.0,
+        help=(
+            "Wall-clock budget for each scenario after Streamlit is ready (0 = use per-scenario default)."
+        ),
+    )
     args = parser.parse_args()
 
     # Update globals in case caller overrides port.
@@ -957,14 +978,34 @@ def main() -> int:
                 scenarios_to_run = [args.scenario]
 
             for scenario in scenarios_to_run:
-                _log(f"[ui_smoke] scenario={scenario}")
+                budget_s = (
+                    float(args.scenario_timeout_s)
+                    if float(args.scenario_timeout_s) > 0
+                    else default_scenario_timeout_s(scenario)
+                )
+                _log(f"[ui_smoke] scenario={scenario} budget_s={budget_s:.0f}")
                 # For each scenario, reload the page to avoid cross-scenario widget state drift.
                 page.goto(APP_URL, wait_until="domcontentloaded")
                 page.wait_for_timeout(1500)
-                results.append(run_one_scenario(page, scenario))
+                t0 = time.monotonic()
+                result = run_one_scenario(page, scenario)
+                elapsed_s = time.monotonic() - t0
+                if elapsed_s > budget_s:
+                    result.notes = (
+                        f"SCENARIO_TIMEOUT: elapsed {elapsed_s:.1f}s > budget {budget_s:.0f}s; "
+                        f"{result.notes}".strip()
+                    ).strip("; ")
+                    result.page_loaded = False
+                    result.verification_found = False
+                    _log(
+                        f"[ui_smoke] scenario={scenario} TIMEOUT "
+                        f"elapsed_s={elapsed_s:.1f} budget_s={budget_s:.0f}"
+                    )
+                results.append(result)
                 _log(
                     f"[ui_smoke] scenario={scenario} done "
-                    f"page_loaded={results[-1].page_loaded} verification={results[-1].verification_found}"
+                    f"elapsed_s={elapsed_s:.1f} "
+                    f"page_loaded={result.page_loaded} verification={result.verification_found}"
                 )
 
             browser.close()
@@ -1019,11 +1060,21 @@ def main() -> int:
         wh_slice003_closeout = _closeout_block(results)
 
         # Write manifest.
+        scenario_timeout_manifest: dict[str, float] = {}
+        for sc in scenarios_to_run:
+            scenario_timeout_manifest[sc] = (
+                float(args.scenario_timeout_s)
+                if float(args.scenario_timeout_s) > 0
+                else default_scenario_timeout_s(sc)
+            )
+
         manifest = {
             "app_url": APP_URL,
             "port": PORT,
             "run_id": RUN_ID,
             "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+            "scenario_timeout_s_by_scenario": scenario_timeout_manifest,
+            "streamlit_ready_timeout_s": float(args.timeout_s),
             "workflow_hardening_slice003_closeout": wh_slice003_closeout,
             "scenarios": [
                 {
