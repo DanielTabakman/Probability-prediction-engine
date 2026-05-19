@@ -13,10 +13,11 @@ A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
-- Active MVP1 focus: **Commercial ops completion** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
+- Active MVP1 focus: **Post-ops SELECTION** — [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md)
 - Closed chapters: Validation + Commercial Validation — **COMPLETE** 2026-05-19
-- Current execution focus: VPS + demo env + dual smoke + paid-interest outreach (no BUILD)
-- Next pending execution step: complete ops checklist → **SELECTION** for next BUILD chapter
+- Ops agent lane: **DONE** — smoke `20260519_131035` / `131251`; pytest **153**; see [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
+- Current execution focus: steward VPS + `PPE_RESEARCH_OFFER_*` + live paid-interest call
+- Next pending execution step: **SELECTION** for next BUILD chapter (after steward outreach optional)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 - Legacy `CURRENT_FRONTIER.md` is **historical only**
@@ -52,8 +53,9 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-Complete [COMMERCIAL_OPS_COMPLETION.md](COMMERCIAL_OPS_COMPLETION.md), then **SELECTION** for next BUILD chapter.
+1. Steward: VPS + demo env in [COMMERCIAL_OPS_COMPLETION.md](COMMERCIAL_OPS_COMPLETION.md).  
+2. **SELECTION:** [POST_COMMERCIAL_OPS_SELECTION.md](POST_COMMERCIAL_OPS_SELECTION.md).
 
 ## Last updated
 
-2026-05-19 — cleanup: ops completion focus; archived Commercial Validation in frontier.
+2026-05-19 — ops agent lane complete; dual smoke green; SELECTION prep posted.

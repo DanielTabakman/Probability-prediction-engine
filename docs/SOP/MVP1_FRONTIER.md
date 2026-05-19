@@ -8,8 +8,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Interim ops pass:** **Commercial ops completion** — VPS align @ `main`, demo env (`PPE_RESEARCH_OFFER_*`), fresh dual smoke, live paid-interest outreach. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
-- **No BUILD** until ops checklist done and steward **SELECTION** picks next roadmap chapter.
+- **Ops pass (agent lane):** **DONE** 2026-05-19 — dual smoke green; docs aligned. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md). **Steward:** VPS env + live paid-interest call.
+- **Next:** **SELECTION** for next BUILD chapter — [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md).
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
 ### Archived roadmap chapters (baseline **`main`**)
