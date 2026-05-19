@@ -10,12 +10,15 @@
 ## Source-of-truth order
 
 1. Pushed repo + current accepted docs
-2. `docs/SOP/CURRENT_FRONTIER.md`
-3. `docs/SOP/HANDOFF.md`
-4. `docs/SOP/OPERATING_RULES.md`
-5. `docs/SPRINT_1_SPEC.md`
-6. `docs/SEMANTIC_CONTRACTS.md`
-7. Older handoff/chat only when docs are silent
+2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon)
+3. `docs/SOP/MVP1_FRONTIER.md` (live steering / slice queue)
+4. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter summary)
+5. `docs/SOP/HANDOFF.md`
+6. `docs/SOP/OPERATING_RULES.md`
+7. `docs/SEMANTIC_CONTRACTS.md`
+8. Older handoff/chat only when docs are silent
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is historical only (Phase 2 ledger); do not use for MVP1 steering.
 
 ## Execution-step model
 
@@ -114,7 +117,7 @@ Preflight must report repo facts (machine-derived where possible) and only then 
 - Do not silently morph **CLOSEOUT** into **BUILD**.
 - Do not silently morph **BUILD** into refactor work.
 
-> **Trial in effect (2026-04-27 onward).** Tiered-delegation soft-launch is active; live authority state in `docs/SOP/CURRENT_FRONTIER.md`. See `CODEX_AUTONOMY_V1.md` "Trial in effect" callout for scope and escalation triggers.
+> **Trial in effect (2026-04-27 onward).** Tiered-delegation soft-launch is active; live authority state in `docs/SOP/MVP1_FRONTIER.md` and `docs/SOP/PPE_INTEGRATED_STATUS.md`. See `CODEX_AUTONOMY_V1.md` "Trial in effect" callout.
 
 ### Compact-slice rule
 
@@ -124,7 +127,7 @@ Compact **BUILD + CLOSEOUT** in one pass is allowed only when **all** are true:
 - Mostly layout/copy/presentation/non-semantic linkage.
 - No classification/threshold/derivation/fetch/state/harness semantics changes.
 - Tier 1 validation is sufficient.
-- `CURRENT_FRONTIER` and `HANDOFF` can be updated honestly in the same pass.
+- `MVP1_FRONTIER` and `HANDOFF` can be updated honestly in the same pass.
 
 ### Non-compact rule
 
@@ -272,7 +275,7 @@ Preferred format:
 Advisory companion to `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` (context-budget bands). Not a gate. Overridable with a recorded reason.
 
 **LOAD-ALWAYS (every BUILD-class pass):**
-- `docs/SOP/CURRENT_FRONTIER.md` (canonical next step; outranks HANDOFF on drift)
+- `docs/SOP/MVP1_FRONTIER.md` (canonical next step; outranks HANDOFF on drift)
 - `docs/SOP/HANDOFF.md` (minimum session context)
 - the **active sprint spec** only (e.g. `docs/SOP/SPRINT_003_PHASE_2.md`)
 

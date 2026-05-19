@@ -6,13 +6,17 @@ Status: **v0 — pre-implementation spec, local-only.** Introduced after Job Reg
 
 Precedence (on any conflict, canonical docs win in this order):
 
-1. `docs/SOP/CURRENT_FRONTIER.md`
-2. `docs/SOP/HANDOFF.md`
-3. `docs/SOP/OPERATING_RULES.md`
-4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
-5. `docs/SOP/CODEX_AUTONOMY_V1.md`
-6. `docs/SOP/JOB_REGISTRY_V1.md`
-7. This doc (`RELAY_RUNTIME_V0.md`)
+1. `docs/VISION/PPE_MASTER_MVP1.md`
+2. `docs/SOP/MVP1_FRONTIER.md`
+3. `docs/SOP/PPE_INTEGRATED_STATUS.md`
+4. `docs/SOP/HANDOFF.md`
+5. `docs/SOP/OPERATING_RULES.md`
+6. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
+7. `docs/SOP/CODEX_AUTONOMY_V1.md`
+8. `docs/SOP/JOB_REGISTRY_V1.md`
+9. This doc (`RELAY_RUNTIME_V0.md`)
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is not required for relay preflight (historical Phase 2 ledger).
 
 ## 1. Purpose
 
@@ -50,7 +54,7 @@ Inputs at invocation time:
 - **Subcommand**: the job name (from §3) plus optional subcommand verbs `stage`, `resume`, `status`, `abort`. Exact CLI shape is deferred to implementation but the logical verbs are fixed here.
 - **Job inputs**: exactly the `inputs` fields defined for the named job in `JOB_REGISTRY_V1.md` §3.x. Missing or invalid → refusal, no side effects.
 - **Runtime config** (required, small):
-  - `baseline_branch` — must match `CURRENT_FRONTIER.md` repo-state gate at invocation time.
+  - `baseline_branch` — must match `MVP1_FRONTIER.md` / `HANDOFF.md` repo-state gate at invocation time.
   - `repo_root` — absolute path to the working tree; must be a clean git repo at invocation (see §8).
   - `artifacts_root` — defaults to `<repo_root>/artifacts/relay`. Must be gitignored.
   - `job_registry_path` — defaults to `docs/SOP/JOB_REGISTRY_V1.md`.
