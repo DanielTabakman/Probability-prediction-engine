@@ -4,8 +4,8 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 (Phase 2 integrated closeout + witness refresh) |
-| **Git SHA on VPS** | **`566f4f0`** (target via Deploy VPS on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
+| **Date (UTC)** | 2026-05-19 (operator hardening witness refresh) |
+| **Git SHA on VPS** | **`7961c33`**+ (target via Deploy VPS on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
 | **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
@@ -13,7 +13,9 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | **Demo operator script** | PASS |
 | **Research offer CTA on demo** | **pending steward `.env`** — compose on `main`; set **PASS** after VPS `.env` + browser confirms **Research beta (v0)** |
 
-**Phase 2 (local):** dual smoke green `20260519_144000` + `20260519_144350` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
+**Phase 2 (local):** dual smoke green `20260519_155858` + `20260519_160103` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
+
+**Operator hardening:** see [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) after Smoke-Slice002 witness.
 
 **Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 

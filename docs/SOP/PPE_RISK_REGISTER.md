@@ -1,6 +1,6 @@
 # PPE risk register
 
-**As-of:** 2026-05-19 · **Baseline:** `main` @ `6ba9ec1`+ (product tip `01c89cf`) · **Audit:** Phase 1 worry pass before Slice005 BUILD
+**As-of:** 2026-05-19 · **Baseline:** `main` @ `7961c33`+ · **Audit:** post–Phase 2 closeout; operator hardening chapter open
 
 Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **accepted** / **steward**
 
@@ -14,7 +14,7 @@ Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **
 | Medium | 3 | 2 | 1 |
 | Low | 4 | 1 | 3 |
 
-**Slice005:** **not blocked** — no open high risks.
+**Operator hardening:** **not blocked** — no open high risks. Trust-strip smoke gate added in harness (Slice002).
 
 ---
 

@@ -21,11 +21,11 @@ flowchart LR
     ENV[VPS .env CTA pending]
     PI[Paid interest N]
   end
-  subgraph next [Next BUILD]
-    SEL[Steward SELECTION TBD]
+  subgraph closed2 [Also closed]
+    OH[MVP1 operator hardening COMPLETE]
   end
-  closed --> steward
-  steward -.-> SEL
+  closed --> closed2
+  closed2 --> steward
 ```
 
 ---
@@ -38,10 +38,17 @@ flowchart LR
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
 | Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
+| MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
 
-**Chapter close SELECTION (prep):** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
+**Chapter close SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md) · **Next chapter SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md`](POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md)
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
+
+---
+
+## MVP1 operator hardening — final relay (archived)
+
+All slices **CLOSED** 2026-05-19. **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md)
 
 ---
 
@@ -65,8 +72,8 @@ flowchart LR
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **161** passed (Slice006 trust strip) |
-| Dual smoke (post–Slice006) | **PASS** | `20260519_155858` + `20260519_160103` |
+| `python -m pytest -q` | **PASS** | **161** passed (operator hardening Slice002) |
+| Dual smoke (post–operator Slice002) | **PASS** | `20260519_164110` + `20260519_164330` |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
@@ -111,4 +118,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — candidates in [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

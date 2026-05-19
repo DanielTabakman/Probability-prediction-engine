@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — Phase 2 on `main` **COMPLETE** 2026-05-19
-- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`
-- Next pending execution step: **steward SELECTION** — `docs/SOP/POST_PHASE2_CHAPTER_SELECTION.md`
+- Active MVP1 focus: **none** — operator hardening **COMPLETE** 2026-05-19
+- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, MVP1 operator hardening
+- Next pending execution step: **steward SELECTION** — `docs/SOP/POST_MVP1_OPERATOR_HARDENING_SELECTION.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -33,7 +33,7 @@ C) AGENT CONTINUITY (required)
 
 ## Current priority
 
-**Phase 2 on `main` COMPLETE** (Slices001–007). Await steward **SELECTION** for next BUILD chapter. Canon: [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md).
+**Operator hardening COMPLETE** — trust-strip smoke gate green. Await steward **SELECTION**. Canon: [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md).
 
 ## Hard rule reminders
 
@@ -43,9 +43,9 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-1. **Steward:** pick next BUILD chapter per [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md); VPS CTA + paid-interest ([`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md), [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)).
-2. **Agent:** await SELECTION; do not blind-merge recovery ([`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md)).
+1. **Steward:** SELECTION + VPS CTA + paid-interest ([`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md), [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md)).
+2. **Agent:** await SELECTION; no recovery blind-merge.
 
 ## Last updated
 
-2026-05-19 — Phase 2 chapter COMPLETE (Slice006 trust strip + Slice007 closeout).
+2026-05-19 — Operator hardening chapter COMPLETE (`trust_strip_mvp1_found` smoke gate).

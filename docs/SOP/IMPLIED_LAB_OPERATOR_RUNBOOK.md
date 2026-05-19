@@ -97,6 +97,7 @@ Typical files: `ui_smoke_manifest.json`, scenario PNG (e.g. `A_width_target_payo
 
 - Identifies **scenario(s)**, **timestamps**, **recommended commands**, and **pass criteria** for that run.
 - Contains **booleans** and diagnostics (e.g. disagreement-related fields for **C**). Use these to justify **pass** vs **fail** and to explain **scenario-sensitive** outcomes (see `IMPLIED_LAB_SMOKE.md` and historical closeouts in `CURRENT_FRONTIER.md`).
+- For **`MVP1_compact_verification`**, manifest includes **`trust_strip_mvp1_found`** — true when the always-visible **Trust / provenance** strip shows **MVP1 data quality** / **MVP1 primary output** (Phase 2 Slice006 disclosure). Failure here is usually a product regression in [`build_trust_strip_lines`](../../src/viz/implied_lab_provenance.py), not a screenshot crop issue.
 
 ### PNG evidence
 

@@ -9,8 +9,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)).
-- **Last closed chapter:** **Phase 2 on `main`** — **COMPLETE** 2026-05-19.
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md))
+- **Last closed chapter:** **MVP1 operator hardening** — **COMPLETE** 2026-05-19 (also: Phase 2 on `main`)
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
@@ -27,6 +27,17 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-Phase2-Chapter-Closeout-Slice007` — chapter close | CONTROL |
 
 **Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
+
+### MVP1 operator hardening — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-OperatorHardening-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-OperatorHardening-Smoke-Slice002` — trust-strip MVP1 smoke witness | PRODUCT |
+| **CLOSED** | `MVP1-OperatorHardening-Witness-Slice003` — deploy witness refresh | CONTROL |
+| **CLOSED** | `MVP1-OperatorHardening-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 
@@ -47,6 +58,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
 | Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
+| MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
 
 ### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 

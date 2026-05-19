@@ -139,6 +139,7 @@ class ScenarioResult:
     family_block_found: bool = False
     trade_ticket_found: bool = False
     verification_found: bool = False
+    trust_strip_mvp1_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
@@ -599,6 +600,21 @@ def _collect_verification_observation(page, result: ScenarioResult) -> None:
         result.verification_found = False
 
 
+def _collect_trust_strip_mvp1_observation(page, result: ScenarioResult) -> None:
+    """MVP1 compact: always-visible trust strip must surface Slice006 MVP1 decision lines."""
+    if result.scenario != "MVP1_compact_verification":
+        return
+    try:
+        for marker in ("MVP1 data quality", "MVP1 primary output"):
+            loc = page.locator(f"text={marker}").first
+            if loc.count() > 0:
+                result.trust_strip_mvp1_found = True
+                return
+        result.trust_strip_mvp1_found = False
+    except Exception:
+        result.trust_strip_mvp1_found = False
+
+
 def _collect_directional_category_verification(page, result: ScenarioResult) -> None:
     """Scenario C: belief-vs-market category must be directional (peak off, width similar)."""
     if result.scenario != "C_directional_peak_disagreement":
@@ -904,6 +920,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     except Exception:
         pass
     try:
+        _collect_trust_strip_mvp1_observation(page, r)
+    except Exception:
+        pass
+    try:
         _collect_directional_category_verification(page, r)
     except Exception:
         pass
@@ -1027,7 +1047,8 @@ def main() -> int:
                 _log(
                     f"[ui_smoke] scenario={scenario} done "
                     f"elapsed_s={elapsed_s:.1f} "
-                    f"page_loaded={result.page_loaded} verification={result.verification_found}"
+                    f"page_loaded={result.page_loaded} verification={result.verification_found} "
+                    f"trust_strip_mvp1={result.trust_strip_mvp1_found}"
                 )
 
             browser.close()
@@ -1106,6 +1127,7 @@ def main() -> int:
                     "family_block_found": r.family_block_found,
                     "trade_ticket_found": r.trade_ticket_found,
                     "verification_found": r.verification_found,
+                    "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
@@ -1129,7 +1151,8 @@ def main() -> int:
                     "If A_width_target_payoff is included, verification_found must be true. "
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
-                    "If MVP1_compact_verification is included, verification_found must be true. "
+                    "If MVP1_compact_verification is included, verification_found and "
+                    "trust_strip_mvp1_found must be true. "
                     "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
@@ -1190,6 +1213,7 @@ def main() -> int:
         if has_mvp1:
             rm = next(r for r in results if r.scenario == "MVP1_compact_verification")
             verification_ok = verification_ok and bool(rm.verification_found)
+            verification_ok = verification_ok and bool(rm.trust_strip_mvp1_found)
         if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 
