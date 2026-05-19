@@ -2032,10 +2032,10 @@ Maps §15 product contract to what exists in `src/` today. **Target spec remains
 | Benchmark + classifier version on freeze | **shipped (v0)** | `benchmark_witness`, `classifier_version` in frozen JSON |
 | Per-snapshot review + finite statuses | **shipped (v0)** | `pending`, `supportive`, `contradictory`, `contaminated`, `not_judgeable` |
 | Class-level summary | **shipped (v0)** | `reviewed_class_summary.py`; continue/refine/suppress-style hint |
-| `primary_output_state` (candidate / watch_only / no_trade) | **not shipped** | UI uses `disagreement_category_id` + digest copy |
-| Data-quality enum (usable / degraded / invalid) | **partial** | Trust via Breeden skip, belief invalid, degraded copy — not §14 enum on payload |
-| Materiality floors (M_floor, M_ratio) | **not shipped** | Canon in §6; thresholds live in disagreement helpers only |
-| Full §15 frozen top-level fields | **partial** | Full `verification` blob stored; not all §15 fields denormalized |
+| `primary_output_state` (candidate / watch_only / no_trade) | **shipped (v0)** | `mvp1_decision` + `verification_summary` via `src/viz/mvp1_decision_surface.py` |
+| Data-quality enum (usable / degraded / invalid) | **shipped (v0)** | On `mvp1_decision.data_quality` |
+| Materiality floors (M_floor, M_ratio) | **shipped (v0 proxies)** | `materiality` block; provisional constants labeled |
+| Full §15 frozen top-level fields | **partial** | Key witness denormalized on freeze record; full blob still stored |
 | MVP1 compact UI (hide strikes/ticket) | **shipped** | `PPE_POST_MVP1_LAB_UI` |
 | Demo vs full app CTA | **shipped** | `PPE_ENABLE_SNAPSHOTS`, `PPE_PRIVATE_APP_URL` |
 

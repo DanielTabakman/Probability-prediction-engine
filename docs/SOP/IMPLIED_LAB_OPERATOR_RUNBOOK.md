@@ -6,6 +6,8 @@ This runbook is the **canonical procedure** for running, validating, interpretin
 
 **Audience:** execution agents, frontier stewards, and human operators touching this phase.
 
+**MVP1 closed-loop ritual (freeze → review → class summary):** [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md).
+
 **Boundary:** implied lab **operations and evidence** only. It does **not** replace general repo governance, git policy, or phase-wide strategy documents—those live in the SOP docs listed under [Related docs](#9-related-docs).
 
 ---

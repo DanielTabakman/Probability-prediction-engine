@@ -7,7 +7,7 @@ from typing import Sequence
 
 import streamlit as st
 
-from src.viz.implied_lab_presets import PRESETS, compute_preset_shape
+from src.viz.implied_lab_presets import PRESETS, compute_preset_shape, preset_what_changed
 
 
 def post_mvp1_lab_ui_enabled() -> bool:
@@ -66,3 +66,50 @@ def ensure_mvp1_lab_default_shape(
             "qty": int(shape.get("qty", 1)),
         }
         st.session_state[f"implied_lab_last_preset_{expiry_str}"] = pid
+
+
+def apply_implied_lab_preset_to_session(
+    *,
+    preset_id: str,
+    shape_key: str,
+    mode_key: str,
+    expiry_str: str,
+    forward: float,
+    avail_strikes: Sequence[float],
+    strike_widget_key: str,
+) -> str:
+    """Apply a preset shape to session state; returns 'what changed' message for UI."""
+    shape = compute_preset_shape(
+        preset_id=preset_id,
+        forward=float(forward),
+        avail_strikes=[float(x) for x in avail_strikes],
+    )
+    st.session_state[mode_key] = "Exact strikes"
+    last_change_key = f"implied_lab_last_change_{expiry_str}"
+    msg = preset_what_changed(preset_id=preset_id, shape=shape) + " Mode set to **Exact strikes**."
+    st.session_state[f"implied_lab_last_preset_{expiry_str}"] = preset_id
+    st.session_state[last_change_key] = msg
+    st.session_state[f"implied_lab_last_change_suppress_{expiry_str}"] = True
+    st.session_state[shape_key] = {
+        "k1": float(shape["k1"]),
+        "k2": float(shape["k2"]),
+        "k3": float(shape["k3"]),
+        "k4": float(shape["k4"]),
+        "reverse": bool(shape["reverse"]),
+        "use_k1": bool(shape["use_k1"]),
+        "use_k2": bool(shape["use_k2"]),
+        "use_k3": bool(shape["use_k3"]),
+        "use_k4": bool(shape["use_k4"]),
+        "qty": int(shape.get("qty", 1)),
+    }
+    st.session_state[f"u4_k1_{strike_widget_key}"] = int(float(shape["k1"]))
+    st.session_state[f"u4_k2_{strike_widget_key}"] = int(float(shape["k2"]))
+    st.session_state[f"u4_k3_{strike_widget_key}"] = int(float(shape["k3"]))
+    st.session_state[f"u4_k4_{strike_widget_key}"] = int(float(shape["k4"]))
+    st.session_state["u4_use_k1"] = bool(shape["use_k1"])
+    st.session_state["u4_use_k2"] = bool(shape["use_k2"])
+    st.session_state["u4_use_k3"] = bool(shape["use_k3"])
+    st.session_state["u4_use_k4"] = bool(shape["use_k4"])
+    st.session_state["u4_reverse"] = bool(shape["reverse"])
+    st.session_state["implied_lab_force_compute"] = True
+    return msg

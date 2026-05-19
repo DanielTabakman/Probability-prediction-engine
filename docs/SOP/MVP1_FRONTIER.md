@@ -8,8 +8,16 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Current focus**: MVP1 **Phases 4–6 v0** are present in `src/`: snapshot + memory, per-snapshot review, and **read-only class rollups** over non-pending reviews. Continue validation and operator workflow; **Phase 6** remains research-surface only (no capital / no automated class verdicts).
+- **Active chapter:** **Validation Chapter** — demoable research cockpit + evidence-generating loop (`docs/VISION/PPE_MASTER_MVP1.md` §1A).
+- **Current focus**: MVP1 **Phases 1–6 v0** in `src/`; close §15 gaps (`primary_output_state`, `data_quality`, materiality witness); validate freeze → review → class summary; ship demo UX.
 - **Non-goal**: Phase 5–6 do **not** add execution, tickets, or automated live trading; class summary is counts + a one-line operator hint, not a model.
+
+### Validation Chapter — next slices (balanced order)
+1. **Steering + deploy** — `HANDOFF` / this file aligned; [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) on VPS after `main` deploy.
+2. **Loop validation** — [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); `pytest` + `scripts/run_mvp1_dual_implied_lab_smoke.py`.
+3. **§15 contract** — `src/viz/mvp1_decision_surface.py` on verification payload; frozen-record witness fields.
+4. **Demo UX** — [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md); compact presets; chart theme cohesion.
+5. **Evidence clock** — [MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md); targets in [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md).
 
 ### MVP1 Phase placement (repo-truth)
 This placement is repo-grounded; it is allowed to contradict legacy “phase complete” language.
@@ -24,9 +32,9 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
   - **Evidence pointers**:
     - logbook: `artifacts/logbook/ppe_events.jsonl` (`MVP1-Phase2-Slice001`)
     - sprint spec: `docs/SOP/MVP1_PHASE1_3_SPRINT.md`
-- **Phase 3 — Candidate/watch/no-trade decision surface**: **partial (v0 digest; §15 gaps)**
-  - **Present**: operator digest (Belief vs market, verification, candidate strips), disagreement categories, no-trade reasoning in copy.
-  - **Gap vs §15**: `primary_output_state` (`candidate` / `watch_only` / `no_trade`) not yet on verification payload — see `PPE_MASTER_MVP1.md` §15A.
+- **Phase 3 — Candidate/watch/no-trade decision surface**: **substantially present (v0; provisional materiality)**
+  - **Present**: `mvp1_decision` on verification payload (`primary_output_state`, `data_quality`, `materiality`, classification); UI in verification panel.
+  - **Note**: materiality floors use v0 provisional proxies — see `mvp1_decision_surface.MATERIALITY_RULE_VERSION`.
   - **Evidence pointers**:
     - logbook: `artifacts/logbook/ppe_events.jsonl` (`MVP1-Phase3-Slice001`, final exit_code=0)
     - sprint spec: `docs/SOP/MVP1_PHASE1_3_SPRINT.md`

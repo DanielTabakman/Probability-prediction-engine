@@ -10,9 +10,21 @@ from src.viz.frozen_evaluation_record import build_frozen_evaluation_record, sum
 class TestFrozenEvaluationRecord(unittest.TestCase):
     def test_classifier_and_benchmark(self) -> None:
         v = {
+            "mvp1_decision": {
+                "data_quality": "usable",
+                "primary_output_state": "watch_only",
+                "classification_label": "aligned",
+                "materiality": {
+                    "materiality_rule_version": "mvp1_v0_provisional",
+                    "market_width_1sigma_move_pct": 12.0,
+                    "benchmark_width_1sigma_move_pct": 11.5,
+                    "m_ratio": 1.1,
+                },
+            },
             "verification_summary": {
                 "as_of_utc": "2026-01-02T00:00:00Z",
                 "disagreement_category_id": "aligned",
+                "primary_output_state": "watch_only",
             },
             "density": {
                 "reference_risk_neutral": {
@@ -33,5 +45,8 @@ class TestFrozenEvaluationRecord(unittest.TestCase):
         self.assertEqual(r["classifier_version"], "bd-schema-x")
         self.assertEqual(r["benchmark_witness"]["forward_usd"], 90_000.0)
         self.assertEqual(r["operator_note"], "hi")
+        self.assertEqual(r["data_quality"], "usable")
+        self.assertEqual(r["primary_output_state"], "watch_only")
+        self.assertEqual(r["materiality_m_ratio"], 1.1)
         sl = summary_line_for_record(r)
         self.assertIn("aligned", sl)

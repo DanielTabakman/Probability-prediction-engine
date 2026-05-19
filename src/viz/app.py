@@ -99,7 +99,11 @@ from src.viz.app_panels import (
 )
 from src.viz.app_market_context import render_market_context_expander
 from src.viz.app_market_reference import render_market_reference_sections
-from src.viz.mvp1_lab_ui import ensure_mvp1_lab_default_shape, post_mvp1_lab_ui_enabled
+from src.viz.mvp1_lab_ui import (
+    apply_implied_lab_preset_to_session,
+    ensure_mvp1_lab_default_shape,
+    post_mvp1_lab_ui_enabled,
+)
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz import frozen_evaluation_store as _fz_store
 from src.viz.reviewed_class_summary import build_class_summary
@@ -610,6 +614,32 @@ if show_bitcoin_view:
                                         "Set environment variable **PPE_POST_MVP1_LAB_UI=1** (e.g. in `.env` or the shell "
                                         "that launches Streamlit) to restore the full post-MVP workbench."
                                     )
+                                    st.caption(
+                                        "**Quick start:** pick a preset to change the green payoff line on the chart."
+                                    )
+                                    _preset_cols = st.columns(3)
+                                    for _i, _pid in enumerate(list(PRESETS.keys())[:3]):
+                                        with _preset_cols[_i]:
+                                            if st.button(
+                                                PRESETS[_pid].label,
+                                                use_container_width=True,
+                                                key=f"btn_mvp1_preset_{selected_expiry_str}_{_pid}",
+                                            ):
+                                                apply_implied_lab_preset_to_session(
+                                                    preset_id=_pid,
+                                                    shape_key=shape_key,
+                                                    mode_key=mode_key,
+                                                    expiry_str=selected_expiry_str,
+                                                    forward=float(forward),
+                                                    avail_strikes=avail_strikes,
+                                                    strike_widget_key=selected_expiry_str,
+                                                )
+                                                st.rerun()
+                                    _lc = st.session_state.get(
+                                        f"implied_lab_last_change_{selected_expiry_str}"
+                                    )
+                                    if isinstance(_lc, str) and _lc.strip():
+                                        st.caption(_lc)
                                 last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
                                 _shape_m = (
                                     st.session_state.get(shape_key)

@@ -42,6 +42,8 @@ def build_frozen_evaluation_record(
     ).strip() or "unknown"
 
     vs = v.get("verification_summary") if isinstance(v.get("verification_summary"), dict) else {}
+    mvp1 = v.get("mvp1_decision") if isinstance(v.get("mvp1_decision"), dict) else {}
+    mat = mvp1.get("materiality") if isinstance(mvp1.get("materiality"), dict) else {}
     return {
         "snapshot_id": str(uuid.uuid4()),
         "created_at_utc": _utc_now_iso(),
@@ -50,6 +52,13 @@ def build_frozen_evaluation_record(
         "operator_note": (operator_note or "").strip() or None,
         "classifier_version": classifier_version,
         "benchmark_witness": benchmark_witness,
+        "data_quality": mvp1.get("data_quality") or vs.get("data_quality"),
+        "primary_output_state": mvp1.get("primary_output_state") or vs.get("primary_output_state"),
+        "classification_label": mvp1.get("classification_label") or vs.get("classification_label"),
+        "materiality_rule_version": mat.get("materiality_rule_version"),
+        "market_width_1sigma_move_pct": mat.get("market_width_1sigma_move_pct"),
+        "benchmark_width_1sigma_move_pct": mat.get("benchmark_width_1sigma_move_pct"),
+        "materiality_m_ratio": mat.get("m_ratio"),
         "verification": v,
     }
 

@@ -6,6 +6,8 @@ Use this for **Streamlit UI / copy / theme** changes that should appear on **`ma
 
 **GitHub Actions:** If [GitHub Actions VPS deploy](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md) is enabled and repository secrets are set, **merges to `main` redeploy the VPS automatically**. Prefer **PR auto-merge** when checks pass so you are not the merge bottleneck ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). You can still run **§4** manually for hotfixes or when debugging the server.
 
+**Validation Chapter:** After merging to `main`, confirm deploy then run [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) against production hostnames.
+
 **Important:** Without that workflow (or if secrets are missing), pushing to GitHub does **not** update the live site until you run **§4** on the VPS. Cursor **autocommit** (see [README](../../README.md) and [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)) only updates git, not Docker on the server.
 
 ## 1) Local smoke

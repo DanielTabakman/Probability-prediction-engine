@@ -263,6 +263,26 @@ def render_implied_lab_verification(v: dict) -> None:
         st.caption("Verification payload not available for this run.")
         return
 
+    mvp1 = v.get("mvp1_decision")
+    if isinstance(mvp1, dict) and mvp1.get("primary_output_state"):
+        state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
+        st.markdown(f"##### MVP1 output: **{state}**")
+        st.caption(mvp1.get("primary_output_reason") or "")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
+        with c2:
+            st.write("**Classification:**", mvp1.get("classification_label", "—"))
+        with c3:
+            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+        mat = mvp1.get("materiality")
+        if isinstance(mat, dict):
+            st.caption(
+                f"Width gap: market {mat.get('market_width_1sigma_move_pct', '—')}% vs "
+                f"benchmark {mat.get('benchmark_width_1sigma_move_pct', '—')}% · "
+                f"M_ratio={mat.get('m_ratio', '—')} ({mat.get('materiality_rule_version', '')})"
+            )
+
     vs = v.get("verification_summary")
     if isinstance(vs, dict) and vs:
         st.markdown("##### Verification summary")

@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.viz.belief_disagreement_hints import build_disagreement_scan_payload
+from src.viz.mvp1_decision_surface import build_mvp1_decision_surface
 from src.viz.disagreement_thresholds import (
     L1_SHAPE_GAP_LOW_BELOW,
     L1_SHAPE_GAP_MODERATE_BELOW,
@@ -509,6 +510,19 @@ def build_verification_payload(
         lab_mode=lab_mode,
     )
 
+    mvp1_decision = build_mvp1_decision_surface(
+        market_data=market_data,
+        belief_disagreement=belief_disagreement if isinstance(belief_disagreement, dict) else None,
+        belief_verification=belief_verification if isinstance(belief_verification, dict) else None,
+        breeden_status=breeden_status,
+    )
+    verification_summary["data_quality"] = mvp1_decision["data_quality"]
+    verification_summary["classification_label"] = mvp1_decision["classification_label"]
+    verification_summary["primary_output_state"] = mvp1_decision["primary_output_state"]
+    verification_summary["primary_output_reason"] = mvp1_decision["primary_output_reason"]
+    verification_summary["expression_family"] = mvp1_decision["expression_family"]
+    verification_summary["materiality"] = mvp1_decision["materiality"]
+
     belief_vs_market_glance = _belief_vs_market_glance_block(
         belief_disagreement=belief_disagreement,
         belief_verification=belief_verification,
@@ -523,6 +537,7 @@ def build_verification_payload(
         "as_of_utc": as_of_utc,
         "lab_mode": lab_mode,
         "verification_summary": verification_summary,
+        "mvp1_decision": mvp1_decision,
         "belief_vs_market_glance": belief_vs_market_glance,
         "snapshot_note": (
             "As-of is the run snapshot / valuation time used for this calculation "

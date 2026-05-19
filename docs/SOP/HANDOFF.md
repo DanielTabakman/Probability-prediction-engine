@@ -13,18 +13,17 @@ A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
-- Active MVP1 focus: Phases 1–6 v0 present in `src/` per `docs/SOP/MVP1_FRONTIER.md` — validate closed loop (freeze → review → class summary), close §15 contract gaps, demo UX; not greenfield Phase 4 build
+- Active MVP1 focus: **Validation Chapter** — validate closed loop, §15 contract gaps (`primary_output_state`, materiality witness), demo UX on `main`; see `docs/SOP/MVP1_FRONTIER.md`
 - Closed slices: Sprint 001 — Slices 005–011 (wrap **outcome B**); **Sprint002-Slice001** (product **`ff40b48`**); **Sprint002-Slice002** (product **`bd12b7c`**); **Sprint002-Slice003** (product **`6e5f563`**); **Sprint002-Slice004** (product **`6be6d7c`**); **Sprint 002 wrapped** (`docs/SOP/SPRINT_002_PHASE_2.md` §12); **Sprint003-Slice001** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; **first real relay-assisted slice**; Slice001 product-of-record **`e044f0fe16097da32ef7e472084e266fc5405740`**); **`Workflow-Hardening-Slice-001`** — **CLOSED / shipped** (2026-04-21 CONTROL-CLOSEOUT; CONTROL-PLANE interlude; accepted baseline tip after promotion **`e876bfe455ba5d51057a177088e362e9aa8ce384`**); **Sprint004-Slice001** — **CLOSED / shipped** (2026-04-21 BUILD + CONTROL-CLOSEOUT; product-of-record **`b13cb30b67457cb673514ebf8ae8183f88967f06`**); **`Workflow-Hardening-Slice-002` — CLOSED / shipped** (CONTROL-PLANE interlude; UI closeout gate assignment + sanctioned bounded capture); **`Workflow-Hardening-Slice-003` — CLOSED / shipped** (2026-04-22 CONTROL-PLANE PROMOTION; accepted baseline tip **`7ae6470a9c202998470ce093909613881b31286d`**; fast-forward from `build/wh-slice003-sanctioned-witness-v0`); **Sprint004-Slice002** — **CLOSED / shipped** (2026-04-22 BUILD + CONTROL-CLOSEOUT; product-of-record **`069d76f`**); **Sprint004-Slice003** — **CLOSED / shipped** (2026-04-27 CONTROL-CLOSEOUT under tiered-delegation soft-launch; product-of-record / FF tip **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; pre-promotion baseline tip **`fd981dde81fb5135652acfd4d7a4a0ba7841f4b6`**)
-- Current execution focus: **`Sprint004-Slice004` — Directional-disagreement candidate strip + payload/harness refactor (v0)** [combined with WH-Slice-004 + worktree-rule] — **BUILD-CLOSEOUT complete on combined recovery branch `build/sprint004-slice004-and-wh004-combined-recovery-v1` @ `c4f9f09e1af742455f526d53df9c0f2af594a336`**; awaiting steward CONTROL-CLOSEOUT
-- **`Sprint004-Slice003`** is **CLOSED / shipped** on baseline @ **`a98377a066db99f1e893c2ef86d1ba71f6a5c53d`**; stale `exec/sprint004-slice003-history-v0` deleted at promotion (sibling tip `dc98a541...` superseded; no unique product work lost)
-- Next pending execution step: **CONTROL-CLOSEOUT — `Sprint004-Slice004` + `WH-Slice-004` combined recovery** — steward verifies rubric on `build/sprint004-slice004-and-wh004-combined-recovery-v1` @ `c4f9f09e1af742455f526d53df9c0f2af594a336`; promote via fast-forward to `recovery/frontier-steward-v2_1-baseline`
+- Current execution focus: **Validation Chapter** (balanced) — Waves 0–5 per master §1A; product on **`main`**
+- Next pending execution step: Run [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); post-deploy [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) on VPS; accumulate evidence per [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: CURRENT_FRONTIER outranks HANDOFF if they drift (until reconciled)
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
 - Canonical truth rule: steering truth lives in canonical docs; repo-state gate is separate
 
 B) REPO-STATE SAFETY (reproducibility)
-- Branch: verify at session start (`git rev-parse --abbrev-ref HEAD`; expected baseline `recovery/frontier-steward-v2_1-baseline` unless steward moved it)
+- Branch: verify at session start (`git rev-parse --abbrev-ref HEAD`; expected **`main`** for Validation Chapter product work unless steward moved it)
 - Ahead/behind vs origin: verify at session start (`git rev-list --left-right --count origin/<branch>...HEAD`)
 - Working tree: verify at session start (CLEAN required before BUILD)
 - Dirty-state classification: M-only / U-only / M+U / Index-or-merge (record actual)
