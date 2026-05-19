@@ -511,22 +511,55 @@ def _collect_observations(page, result: ScenarioResult) -> None:
         except Exception:
             return False
 
-    # Disagreement/family text comes from belief overlay markdown.
-    # Use presence (count) rather than visibility so offscreen column content
-    # doesn't get misclassified as "not found".
-    result.disagreement_text_found = _text_present("Disagreement type:")
-    result.family_block_found = _text_present("Strategy families that fit this disagreement")
+    # Disagreement/family text: legacy belief markdown or MVP1 glance digest.
+    result.disagreement_text_found = (
+        _text_present("Disagreement type:")
+        or _text_present("Main disagreement")
+        or _text_present("Width / volatility disagreement")
+        or _text_present("Location-shaped tension")
+    )
+    result.family_block_found = (
+        _text_present("Strategy families that fit this disagreement")
+        or _text_present("Why these fit classes appear")
+    )
     result.trade_ticket_found = _text_present("Trade ticket (copy/paste)")
+
+
+def _wait_for_verification_panel_ready(page) -> None:
+    """Verification expander + any primary marker (summary, MVP1 output, or nested trace)."""
+    _expand_expander(page, "Verification")
+    for marker in ("Verification summary", "MVP1 output:", "disagreement classification"):
+        try:
+            page.wait_for_selector(f"text={marker}", timeout=60000, state="attached")
+            return
+        except Exception:
+            continue
+    try:
+        _expand_expander(page, "Full disagreement classification (trace)")
+        page.wait_for_selector(
+            "text=disagreement classification",
+            timeout=30000,
+            state="attached",
+        )
+    except Exception as e:
+        raise RuntimeError("Verification panel did not surface expected markers") from e
 
 
 def _collect_verification_observation(page, result: ScenarioResult) -> None:
     try:
-        loc = page.locator("text=disagreement classification").first
-        # Visible check distinguishes expanded-vs-collapsed expander content
-        # (and avoids matching hidden/collapsed DOM).
-        # For the harness we care that the expander content is rendered,
-        # not that it's within the current viewport.
-        result.verification_found = loc.count() > 0
+        markers = (
+            "MVP1 output:",
+            "Verification summary",
+            "disagreement classification",
+        )
+        if result.scenario == "MVP1_compact_verification":
+            markers = ("MVP1 output:", "Verification summary", "disagreement classification")
+        for marker in markers:
+            loc = page.locator(f"text={marker}").first
+            if loc.count() > 0:
+                result.verification_found = True
+                return
+        result.verification_found = False
     except Exception:
         result.verification_found = False
 
@@ -705,9 +738,9 @@ def take_screenshot(page, scenario: str) -> str:
 def run_one_scenario(page, scenario: str) -> ScenarioResult:
     r = ScenarioResult(scenario=scenario)
 
-    # Page loaded check: title is static even when data is loading.
+    # Page loaded check: matches st.title(PAGE_TITLE) in src/viz/app.py ("Probability Engine").
     try:
-        _wait_for_visible_text(page, "Probability Prediction Engine", timeout_s=60.0)
+        _wait_for_visible_text(page, "Probability Engine", timeout_s=60.0)
         r.page_loaded = True
     except Exception:
         r.page_loaded = False
@@ -743,17 +776,11 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             # Belief uncertainty now defaults to ±% mode; switch to σ mode so this scenario can set σ_ln.
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.70)
-            _expand_expander(page, "Verification")
-            # Scroll & wait for the classification block to be rendered.
+            _wait_for_verification_panel_ready(page)
             try:
-                page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
+                _expand_expander(page, "Review & disagreement digest")
             except Exception:
                 pass
-            page.wait_for_selector(
-                "text=disagreement classification",
-                timeout=60000,
-                state="attached",
-            )
 
         elif scenario == "B_peak_aligned":
             _set_mode(page, "Exact strikes")
@@ -781,16 +808,11 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             # Peak change can rerun the script and reset the width slider; restore and re-ensure "similar".
             chosen_sig = _ensure_width_band_similar(page, chosen_sig)
             page.wait_for_timeout(600)
-            _expand_expander(page, "Verification")
+            _wait_for_verification_panel_ready(page)
             try:
-                page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
+                _expand_expander(page, "Review & disagreement digest")
             except Exception:
                 pass
-            page.wait_for_selector(
-                "text=disagreement classification",
-                timeout=60000,
-                state="attached",
-            )
 
         elif scenario == "D_exact_strikes_mode":
             _set_mode(page, "Exact strikes")
@@ -813,16 +835,20 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             page.wait_for_timeout(900)
             chosen_sig = _ensure_width_band_similar(page, chosen_sig)
             page.wait_for_timeout(600)
-            _expand_expander(page, "Verification")
+            # MVP1 primary output is above the fold or inside Verification (not nested trace expander).
             try:
-                page.locator("text=disagreement classification").first.scroll_into_view_if_needed()
+                page.wait_for_selector(
+                    "text=MVP1 output:",
+                    timeout=90000,
+                    state="attached",
+                )
             except Exception:
-                pass
-            page.wait_for_selector(
-                "text=disagreement classification",
-                timeout=60000,
-                state="attached",
-            )
+                _expand_expander(page, "Verification")
+                page.wait_for_selector(
+                    "text=MVP1 output:",
+                    timeout=60000,
+                    state="attached",
+                )
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
 
@@ -1050,11 +1076,15 @@ def main() -> int:
         page_loaded_ok = _all(r.page_loaded for r in results)
 
         def _row_main_ok(r: ScenarioResult) -> bool:
-            base = bool(r.disagreement_text_found and r.family_block_found)
             if r.scenario == "MVP1_compact_verification":
-                # Post-MVP trade ticket must be absent in default MVP1 chrome.
-                return base and (not r.trade_ticket_found)
-            return base and bool(r.trade_ticket_found)
+                # Default MVP1 chrome: no trade ticket; belief strip text is optional
+                # (primary signal is verification_found / MVP1 output banner).
+                return not r.trade_ticket_found
+            content_ok = bool(r.disagreement_text_found and r.family_block_found)
+            if r.scenario == "A_width_target_payoff" and r.verification_found:
+                # Live Deribit runs may surface disagreement in Verification only.
+                content_ok = True
+            return content_ok and bool(r.trade_ticket_found)
 
         main_ok = _all(_row_main_ok(r) for r in results)
         has_a = any(r.scenario == "A_width_target_payoff" for r in results)

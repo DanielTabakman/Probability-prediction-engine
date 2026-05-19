@@ -257,6 +257,24 @@ def render_width_vol_history_panel(*, selected_expiry_str: str) -> None:
             st.caption(f"• as-of {as_of} · expiry {exp} · width {wb} · gap {sg} · ref {mr}")
 
 
+def render_mvp1_primary_output_compact(v: dict) -> None:
+    """Above-fold MVP1 decision digest (chart → this → review/freeze)."""
+    mvp1 = v.get("mvp1_decision") if isinstance(v, dict) else None
+    if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
+        return
+    state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
+    with st.container(border=True):
+        st.markdown(f"##### MVP1 output: **{state}**")
+        st.caption(mvp1.get("primary_output_reason") or "")
+        c1, c2, c3 = st.columns(3)
+        with c1:
+            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
+        with c2:
+            st.write("**Classification:**", mvp1.get("classification_label", "—"))
+        with c3:
+            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+
+
 def render_implied_lab_verification(v: dict) -> None:
     """Structured display for outputs['verification'] (contract-driven summary + demoted detail)."""
     if not v:

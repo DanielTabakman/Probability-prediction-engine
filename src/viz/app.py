@@ -89,6 +89,7 @@ from src.viz.app_panels import (
     render_decision_ready_review as _render_decision_ready_review,
     render_directional_candidate_strip_payload as _render_directional_candidate_strip_payload,
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
+    render_mvp1_primary_output_compact as _render_mvp1_primary_output_compact,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
     render_trust_strip as _render_trust_strip,
@@ -1498,6 +1499,12 @@ if show_bitcoin_view:
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
+                    # MVP1 compact: primary decision digest immediately under the chart.
+                    if not post_mvp_implied_lab_ui:
+                        _v_mvp1 = outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None
+                        if _v_mvp1:
+                            with right_summary_slot.container():
+                                _render_mvp1_primary_output_compact(_v_mvp1)
                     # Summary card (Sprint 001): single-source-of-truth from derived outputs.
                     with right_summary_slot.container():
                         _render_implied_lab_summary_card(
