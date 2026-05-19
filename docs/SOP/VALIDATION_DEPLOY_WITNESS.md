@@ -5,7 +5,7 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | Field | Value |
 |-------|--------|
 | **Date (UTC)** | 2026-05-19 |
-| **Git SHA on VPS** | `c5b9191` (origin/main at witness time; re-verify after Validation Chapter merge) |
+| **Git SHA on VPS** | `f71566a` (local `main` after Validation Chapter merge; verify on VPS after `git pull`) |
 | **Deploy path** | GitHub Actions on push to `main` / manual §4 |
 | **marketstructureos.com** | PASS — Streamlit demo loads (HTTP 200; title **Streamlit** / Probability Engine surface) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access login gate present (**App full (snapshots)**); full app behind auth as designed |
