@@ -67,3 +67,13 @@ Reconcile **Phase 2 desirability / playability** product work onto **`main`** un
 **Goal:** Document first PRODUCT slice closeout with honest evidence.
 
 **Closed** 2026-05-19 — Product-Slice003 complete; Phase 2 chapter remains **OPEN** for further PRODUCT slices per reconcile report (directional strip already on `main`).
+
+---
+
+### MVP1-Phase2-Product-Slice005 — decision surface parity audit (PRODUCT) — **CHARTERED**
+
+**Goal:** Bounded audit of [`mvp1_decision_surface.py`](../../src/viz/mvp1_decision_surface.py) vs verification/MVP1 panel surfacing on `main`; document gaps; small test/copy fixes only.
+
+**Spec:** [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md) · **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md).
+
+**Defer (binding):** `mvp1_benchmark_substrate.py`, blind `app.py` merge, provenance substrate wiring — per [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md).

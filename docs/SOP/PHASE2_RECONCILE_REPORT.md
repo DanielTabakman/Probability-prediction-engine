@@ -43,5 +43,5 @@
 
 ## Next after Slice003
 
-- Re-run dual smoke; log run IDs in [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
-- `MVP1-Phase2-Closeout-Slice004` checkpoint or next PRODUCT slice from [`SPRINT_004_PHASE_2.md`](SPRINT_004_PHASE_2.md) if steward expands scope
+- **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
+- **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md) → **`MVP1-Phase2-Product-Slice005`**

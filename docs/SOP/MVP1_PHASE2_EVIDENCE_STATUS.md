@@ -1,6 +1,6 @@
 # Phase 2 on `main` — evidence status
 
-**Chapter:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · **Baseline:** `main` @ `03a6835`+
+**Chapter:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · **Baseline:** `main` @ `01c89cf`+ · **One-pager:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
 
 **Reconcile report:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md)
 
@@ -47,3 +47,10 @@ Full matrix: [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md). Directi
 
 - VPS CTA: [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) — pending `.env`
 - Paid interest: [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) — **N** until live call
+
+---
+
+## Next BUILD
+
+- **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
+- **Slice005:** [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md) — decision surface / panel parity audit

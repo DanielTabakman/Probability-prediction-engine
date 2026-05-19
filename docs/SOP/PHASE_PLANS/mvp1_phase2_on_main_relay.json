@@ -38,6 +38,15 @@
       "susMinutes": 15,
       "hardMinutes": 30,
       "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Phase2-Product-Slice005",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2,
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_SLICE005.md",
+      "selectionRecord": "docs/SOP/POST_PHASE2_PRODUCT_SLICE003_SELECTION.md"
     }
   ]
 }

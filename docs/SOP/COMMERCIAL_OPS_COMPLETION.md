@@ -14,12 +14,12 @@
 |------|--------|-------|
 | `git pull` on `main`; clean tree | done | pytest **153 passed** |
 | `python -m pytest -q` green | done | 2026-05-19 |
-| Fresh `run_mvp1_dual_implied_lab_smoke.py` | done | Post–Reliability Slice002: `20260519_133606` + `134906`; prior `131035` + `131251` |
+| Fresh `run_mvp1_dual_implied_lab_smoke.py` | done | Post–Phase2 Slice003: `20260519_144000` + `144350`; Reliability: `133606` + `134906` |
 | `docker-compose.yml` `PPE_RESEARCH_OFFER_*` on `app_demo` | done | `${PPE_RESEARCH_OFFER_URL:-}` / `LABEL` wired; [`.env.example`](../../.env.example) |
 | Push `main` → GitHub Actions **Deploy VPS** | done | auto `git pull` + `docker compose up -d --build` on push |
 | VPS repo-root `.env` with offer URL | **steward follow-up** | Deploy-Slice003 closed (agent lane); CTA needs `.env` for browser PASS |
 | Production browser: **Research beta (v0)** CTA | **steward follow-up** | After `.env` set; re-run `docker compose up -d` |
-| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `559f908`; CTA row pending steward `.env` |
+| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `01c89cf`+; CTA row pending steward `.env` |
 | Live paid-interest conversation | **steward** | **N** — honest; outreach script below |
 | **Ops completion (agent lane)** | done | |
 | **SELECTION** | done | MVP1 Reliability chartered |
@@ -73,6 +73,8 @@ docker compose up -d --build
 
 | Run ID | Exit | Classification | Notes |
 |--------|------|----------------|-------|
+| 20260519_144000 | 0 | deterministic | MVP1_compact (Phase2 Product-Slice003) |
+| 20260519_144350 | 0 | deterministic | A_width_target_payoff (Phase2 Product-Slice003) |
 | 20260519_133606 | 0 | deterministic | MVP1_compact (Reliability Slice002) |
 | 20260519_134906 | 0 | deterministic | A_width_target_payoff (Reliability Slice002) |
 | 20260519_131035 | 0 | deterministic | MVP1_compact (pre-Slice002) |
@@ -82,5 +84,5 @@ docker compose up -d --build
 
 ## Next
 
-**BUILD:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) — Reconcile-Slice002. **SELECTION:** [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md). Reliability chapter **COMPLETE**.
+**Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md). **BUILD:** `MVP1-Phase2-Product-Slice005` — [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md). **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md).
 
