@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-19 · **Baseline `main`:** `0b09b97` ([`origin/main`](https://github.com/DanielTabakman/Probability-prediction-engine))  
+**As-of:** 2026-05-19 · **Baseline `main`:** `f828fb3` ([`origin/main`](https://github.com/DanielTabakman/Probability-prediction-engine))  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, active Phase 2 relay state, engineering gates, steward parallel work, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -68,7 +68,7 @@ flowchart LR
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **157** passed @ `0b09b97` baseline (2026-05-19) |
+| `python -m pytest -q` | **PASS** | **157** passed @ `f828fb3` baseline (2026-05-19) |
 | Dual smoke (post–Slice003) | **PASS** | `20260519_144000` + `20260519_144350` |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
@@ -89,7 +89,7 @@ cd /opt/marketstructureos
 git pull
 # .env (not committed): PPE_RESEARCH_OFFER_URL=mailto:...  PPE_RESEARCH_OFFER_LABEL=Request research beta access
 docker compose up -d --build
-git rev-parse HEAD   # expect main @ 0b09b97+ after agent push
+git rev-parse HEAD   # expect main @ f828fb3+ after agent push
 ```
 
 **Do not** mark paid-interest **Y** without a live call.

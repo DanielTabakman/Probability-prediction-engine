@@ -25,7 +25,7 @@ A) DOC-STATE SAFETY (alignment)
 
 B) REPO-STATE SAFETY (reproducibility)
 - Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main`)
-- Baseline SHA: `0b09b97`+ (verify `git rev-parse origin/main`)
+- Baseline SHA: `f828fb3`+ (verify `git rev-parse origin/main`)
 - BUILD allowed: YES — bounded PRODUCT per Slice005 spec + reconcile defer list
 
 C) AGENT CONTINUITY (required)
