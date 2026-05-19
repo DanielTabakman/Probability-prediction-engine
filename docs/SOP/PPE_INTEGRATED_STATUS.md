@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-19 · **Baseline `main`:** `566f4f0` ([`origin/main`](https://github.com/DanielTabakman/Probability-prediction-engine))  
+**As-of:** 2026-05-19 · **Baseline `main`:** `707610c` ([`origin/main`](https://github.com/DanielTabakman/Probability-prediction-engine))  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, active Phase 2 relay state, engineering gates, steward parallel work, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.

@@ -25,7 +25,7 @@ A) DOC-STATE SAFETY (alignment)
 
 B) REPO-STATE SAFETY (reproducibility)
 - Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main`)
-- Baseline SHA: `566f4f0`+ (verify `git rev-parse origin/main`)
+- Baseline SHA: `707610c` (verify `git rev-parse origin/main`)
 - BUILD allowed: YES — after steward SELECTION; honor reconcile defer list
 
 C) AGENT CONTINUITY (required)
