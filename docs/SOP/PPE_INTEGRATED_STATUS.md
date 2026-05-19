@@ -72,7 +72,7 @@ All slices **CLOSED** 2026-05-19. **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDE
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **161** passed (operator hardening Slice002) |
+| `python -m pytest -q` | **PASS** | **165** passed (health-check cleanup 2026-05-19) |
 | Dual smoke (post–operator Slice002) | **PASS** | `20260519_164110` + `20260519_164330` |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)

@@ -5,17 +5,11 @@ Bitcoin view: price chart with Polymarket questions overlaid, implied value, opt
 from __future__ import annotations
 
 import os
-import sys
 import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 
-# Project root
-ROOT = Path(__file__).resolve().parents[2]
-
-# Allow `streamlit run src/viz/app.py` from any cwd.
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from src.viz.app_env import APP_ROOT as ROOT, env_flag as _env_flag
 
 import streamlit as st
 import pandas as pd
@@ -114,14 +108,6 @@ from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
 from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 from src.viz.plotly_theme import apply_chart_theme
 import yaml
-
-
-def _env_flag(name: str, default: bool) -> bool:
-    raw = (os.environ.get(name) or "").strip().lower()
-    if raw == "":
-        return default
-    return raw in ("1", "true", "yes", "y", "on")
-
 
 PAGE_TITLE = "Probability Engine"
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)

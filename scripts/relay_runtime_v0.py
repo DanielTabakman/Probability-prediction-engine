@@ -38,6 +38,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple
 
+from scripts.relay.canonical_docs import CANONICAL_DOC_PATHS
+
 # ---------------------------------------------------------------------------
 # Canonical constants. Changing these without a steward-accepted amendment
 # to the upstream doc is a schema violation.
@@ -133,17 +135,6 @@ VALIDATION_CLASSIFICATIONS = frozenset(
     {"deterministic", "environment-sensitive", "live-data-sensitive", "mixed"}
 )
 PROMOTION_METHODS = frozenset({"fast-forward", "merge"})  # plus None handled separately
-
-# Canonical doc precedence (RELAY_RUNTIME_V0 section 0).
-CANONICAL_DOC_PATHS = (
-    "docs/SOP/CURRENT_FRONTIER.md",
-    "docs/SOP/HANDOFF.md",
-    "docs/SOP/OPERATING_RULES.md",
-    "docs/SOP/FRONTIER_STEWARD_PROTOCOL.md",
-    "docs/SOP/CODEX_AUTONOMY_V1.md",
-    "docs/SOP/JOB_REGISTRY_V1.md",
-    "docs/SOP/RELAY_RUNTIME_V0.md",
-)
 
 
 # ---------------------------------------------------------------------------

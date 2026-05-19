@@ -12,6 +12,15 @@ Cross-reference **market data** (stocks, crypto, futures) and **prediction marke
 
 See [docs/PLAN.md](docs/PLAN.md) for full stack, data sources, and event definitions.
 
+### Documentation and control plane (MVP1)
+
+| Doc | Purpose |
+|-----|---------|
+| [docs/README.md](docs/README.md) | Documentation index |
+| [docs/SOP/PPE_INTEGRATED_STATUS.md](docs/SOP/PPE_INTEGRATED_STATUS.md) | One-pager: chapter status, gates, deferred BUILD list |
+| [docs/SOP/MVP1_FRONTIER.md](docs/SOP/MVP1_FRONTIER.md) | Live steering / slice queue |
+| [docs/SOP/HANDOFF.md](docs/SOP/HANDOFF.md) | Session handoff gate |
+
 ## Quick start
 
 ```bash
@@ -43,22 +52,33 @@ This runs `MVP1_compact_verification` without `PPE_POST_MVP1_LAB_UI`, then `A_wi
 
 Running `implied_lab_ui_smoke_harness.py` **without** `--scenario` exercises every entry in its `SCENARIOS` list in one Streamlit session; with default MVP1 UI, scenarios that open **Mode & solver** will fail—prefer `--scenario` or the dual runner above.
 
+### Commit and merge test gates
+
+Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md).
+
+| When | Command |
+|------|---------|
+| **Every pushable commit** (code or mixed) | `python -m ruff check src tests scripts` then `python -m pytest -q` |
+| **Docs-only** (`docs/` only) | pytest not required |
+| **PR touching implied lab** (`src/viz/**`, smoke scripts) | also `python scripts/run_mvp1_dual_implied_lab_smoke.py` before merge (not every commit) |
+| **Merge to `main`** | GitHub **`CI / pytest`** (same as local: ruff + full pytest) |
+
 ### Testing policy (imports)
 
 Unit tests should import **pure modules** under `src/` (for example `src.viz.app_panels`, `src.viz.frozen_evaluation_record`) and avoid importing `src.viz.app` unless the test is an explicit Streamlit integration test (that module runs `st.set_page_config` at import time and is slow). Periodically search `tests/` for `from src.viz.app import` / `import src.viz.app` to prevent regressions.
 
 ### Operator / steward backlog (rituals)
 
-- Re-run **`python scripts/run_mvp1_dual_implied_lab_smoke.py`** after major implied-lab or harness changes (Playwright required).
-- Run **`python -m pytest -q`** (full suite) before merge when you touched shared modules. On GitHub, **`CI / pytest`** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) is the required gate for **auto-merge** to `main`—see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md).
-- Use **relay / logbook** closeout when your SOP requires it for a slice (`run_slice.cmd`, `scripts/log_event.py`, `artifacts/logbook/`).
+- **Dual smoke** before merging implied-lab PRs (see table above); Playwright required.
+- **Relay / logbook** closeout when your SOP requires it (`run_slice.cmd`, `scripts/log_event.py`, `artifacts/logbook/`).
+- **Auto-merge to `main`:** [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md).
 
 ### Agent commit / push behavior (automation)
 
-- Auto-commit when the active plan's todos are complete and **targeted tests** for the touched code pass (always showing `git status` / `git diff` / `git log -1` first).
-- Auto-push on **feature branches** to their tracked remote after targeted tests pass (no force-push, no history rewrite).
-- Auto-push on **`main`** / `master` only after **full pytest** (`python -m pytest -q`) passes.
-- Never auto-commit secrets or obvious artifacts by default (`.env`, `artifacts/`, caches, local DB files); never force-push.
+- Auto-commit when todos are complete and **ruff + full pytest** pass (or docs-only exception); show `git status` / `git diff` / `git log -1` first.
+- Auto-push after the same gate on feature branches (no force-push).
+- On **`main`**, prefer PR + **`CI / pytest`** rather than direct push when branch protection applies.
+- Never auto-commit secrets or artifacts (`.env`, `artifacts/`, caches, local DB files).
 
 **If `pip install` says "file in use" or "access denied"**: another program (IDE, another terminal, Python process) is using the package files. Close other Python/terminal windows and try again, or use a new venv in a new folder.
 

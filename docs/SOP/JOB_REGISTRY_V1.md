@@ -6,12 +6,16 @@ Status: **v1 — starter registry, four jobs.** Introduced **after** `CODEX_AUTO
 
 Precedence (on any conflict, canonical docs win in this order):
 
-1. `docs/SOP/CURRENT_FRONTIER.md`
-2. `docs/SOP/HANDOFF.md`
-3. `docs/SOP/OPERATING_RULES.md`
-4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
-5. `docs/SOP/CODEX_AUTONOMY_V1.md`
-6. This doc (`JOB_REGISTRY_V1.md`)
+1. `docs/VISION/PPE_MASTER_MVP1.md` (product canon)
+2. `docs/SOP/MVP1_FRONTIER.md` (live steering / slice queue)
+3. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter one-pager)
+4. `docs/SOP/HANDOFF.md`
+5. `docs/SOP/OPERATING_RULES.md`
+6. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
+7. `docs/SOP/CODEX_AUTONOMY_V1.md`
+8. This doc (`JOB_REGISTRY_V1.md`)
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is **not controlling** for MVP1; historical Phase 2 ledger only.
 
 ## 1. Non-goals (explicit boundaries for v1)
 

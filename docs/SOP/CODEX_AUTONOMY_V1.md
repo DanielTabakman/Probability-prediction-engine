@@ -6,11 +6,15 @@ Status: **v1 — introduced before Sprint 003 BUILD.** Applies to workers runnin
 
 This doc **does not supersede** existing control-plane rules. It **narrows** them for a specific autonomy mode. On any conflict, canonical docs win in this order:
 
-1. `docs/SOP/CURRENT_FRONTIER.md`
-2. `docs/SOP/HANDOFF.md`
-3. `docs/SOP/OPERATING_RULES.md`
-4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
-5. This doc (`CODEX_AUTONOMY_V1.md`)
+1. `docs/VISION/PPE_MASTER_MVP1.md`
+2. `docs/SOP/MVP1_FRONTIER.md`
+3. `docs/SOP/PPE_INTEGRATED_STATUS.md`
+4. `docs/SOP/HANDOFF.md`
+5. `docs/SOP/OPERATING_RULES.md`
+6. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
+7. This doc (`CODEX_AUTONOMY_V1.md`)
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is not controlling for MVP1; use `MVP1_FRONTIER.md` for live steering.
 
 ## 1. Canonical slice loop (unchanged)
 
@@ -35,12 +39,12 @@ PREFLIGHT  ->  BUILD  ->  bounded REPAIR loop  ->  BUILD-CLOSEOUT  ->  PROMOTION
 Rationale:
 
 - **SELECTION** is the highest-judgment step (phase/sprint framing, scope framing, deferral calls). Auto-selecting compounds risk.
-- **CONTROL-CLOSEOUT** writes canonical steering truth (`CURRENT_FRONTIER.md`, `HANDOFF.md`). Errors there corrupt continuity for every future steward/agent.
+- **CONTROL-CLOSEOUT** writes canonical steering truth (`MVP1_FRONTIER.md`, `HANDOFF.md`, and related SOP). Errors there corrupt continuity for every future steward/agent.
 - **PREFLIGHT -> PROMOTION** is the range where decisions are mostly **verifiable from repo facts and slice spec**. Autonomy there gives the largest throughput win at the smallest correctness cost.
 
 This boundary is the **recommended default** for v1.
 
-> **Trial in effect (2026-04-27 onward — tiered-delegation soft-launch).** The steward has temporarily delegated Tier-2 **SELECTION** and Tier-2/3 **CONTROL-CLOSEOUT** to the parent agent under explicit guardrails (rubric verification, semantic-contract gates, phase-boundary strategic touchpoint, escalation triggers on rubric failure / semantic drift / charter ambiguity / scope expansion). The live authority state is canonical at `docs/SOP/CURRENT_FRONTIER.md` — "Authority (tiered-delegation soft-launch — 2026-04-27 onward)". This document's older steward-only language is superseded for the duration of the trial. Formal canonization (or rollback) follows `WH-Slice-005` after Slice004 closes.
+> **Trial in effect (2026-04-27 onward — tiered-delegation soft-launch).** The steward has temporarily delegated Tier-2 **SELECTION** and Tier-2/3 **CONTROL-CLOSEOUT** to the parent agent under explicit guardrails. The live authority state is canonical at `docs/SOP/MVP1_FRONTIER.md` and `docs/SOP/PPE_INTEGRATED_STATUS.md`. Legacy `CURRENT_FRONTIER.md` entries are historical only.
 
 ## 3. Scope (single-slice only)
 
