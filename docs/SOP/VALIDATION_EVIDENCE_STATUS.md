@@ -27,6 +27,6 @@ Parallel to relay BUILD slices. Update after each ritual session.
 | Gate | Status |
 |------|--------|
 | `python -m pytest -q` on `main` | green — **149 passed** (2026-05-19, `notifications` + unmerged product) |
-| `python scripts/run_mvp1_dual_implied_lab_smoke.py` | green — local artifacts `artifacts/ui_smoke/20260519_*`; re-run after merge |
+| `python scripts/run_mvp1_dual_implied_lab_smoke.py` | green — `artifacts/ui_smoke/20260519_032728/` (compact), `20260519_034108/` (full lab); dual run exit 0 (2026-05-19) |
 
 **Chapter closeout** (`Validation-Chapter-Closeout-Slice004`): **gates met** for engineering + evidence clock; **paid interest** and **NVIDIA/LEAPS** reality checks remain **deferred** to post-chapter commercial track (documented in [POST_VALIDATION_CHAPTER_SELECTION.md](POST_VALIDATION_CHAPTER_SELECTION.md)).

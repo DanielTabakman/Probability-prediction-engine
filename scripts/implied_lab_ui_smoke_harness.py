@@ -890,8 +890,14 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     return r
 
 
+def _log(msg: str) -> None:
+    print(msg, flush=True)
+
+
 def main() -> int:
+    _log(f"[ui_smoke] run_id={RUN_ID} starting")
     _ensure_playwright()
+    _log("[ui_smoke] playwright ok")
 
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     results: list[ScenarioResult] = []
@@ -927,13 +933,17 @@ def main() -> int:
 
     proc: subprocess.Popen[str] | None = None
     try:
+        _log(f"[ui_smoke] starting streamlit on port {PORT}")
         proc = start_streamlit()
         wait_for_streamlit_ready(timeout_s=args.timeout_s)
+        _log(f"[ui_smoke] streamlit ready ({APP_URL})")
 
         from playwright.sync_api import sync_playwright
 
+        _log("[ui_smoke] launching chromium")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
+            _log("[ui_smoke] chromium launched")
             context = browser.new_context(viewport={"width": 1400, "height": 950})
             page = context.new_page()
 
@@ -947,10 +957,15 @@ def main() -> int:
                 scenarios_to_run = [args.scenario]
 
             for scenario in scenarios_to_run:
+                _log(f"[ui_smoke] scenario={scenario}")
                 # For each scenario, reload the page to avoid cross-scenario widget state drift.
                 page.goto(APP_URL, wait_until="domcontentloaded")
                 page.wait_for_timeout(1500)
                 results.append(run_one_scenario(page, scenario))
+                _log(
+                    f"[ui_smoke] scenario={scenario} done "
+                    f"page_loaded={results[-1].page_loaded} verification={results[-1].verification_found}"
+                )
 
             browser.close()
 
@@ -1132,8 +1147,8 @@ def main() -> int:
             encoding="utf-8",
         )
 
-        print(f"UI smoke manifest: {manifest_path}")
-        print(f"Overall pass: {overall_pass}")
+        _log(f"UI smoke manifest: {manifest_path}")
+        _log(f"Overall pass: {overall_pass}")
         return 0 if overall_pass else 1
     finally:
         if proc is not None:
