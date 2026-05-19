@@ -111,7 +111,7 @@ from src.viz.reviewed_class_summary import build_class_summary
 from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
-from src.viz.signup_cta import private_app_cta_url
+from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 from src.viz.plotly_theme import apply_chart_theme
 import yaml
 
@@ -129,6 +129,11 @@ _show_debug_ui = _env_flag("PPE_SHOW_DEBUG_UI", False)
 _cta_private_url = private_app_cta_url(
     snapshots_enabled=_snapshots_enabled,
     private_app_url=os.environ.get("PPE_PRIVATE_APP_URL"),
+)
+_research_offer = research_offer_cta(
+    snapshots_enabled=_snapshots_enabled,
+    offer_url=os.environ.get("PPE_RESEARCH_OFFER_URL"),
+    offer_label=os.environ.get("PPE_RESEARCH_OFFER_LABEL"),
 )
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
@@ -155,6 +160,16 @@ if _cta_private_url:
         "**Public demo:** no saved snapshot history here. "
         "**Get full access** opens the full app with saves and reviews."
     )
+    if _research_offer:
+        _offer_url, _offer_label = _research_offer
+        st.markdown(
+            "**Research beta (v0):** BTC options market-structure readouts and anomaly inspection — "
+            "decision support only, not investment advice or guaranteed returns."
+        )
+        if hasattr(st, "link_button"):
+            st.link_button(_offer_label, _offer_url, use_container_width=False)
+        else:
+            st.markdown(f"[{_offer_label}]({_offer_url})")
 else:
     st.title(PAGE_TITLE)
     st.caption(_APP_TAGLINE)

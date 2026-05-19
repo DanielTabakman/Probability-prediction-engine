@@ -35,6 +35,17 @@ streamlit run src/viz/app.py
 
 You should see **Get full access** and the short demo banner.
 
+Optional research-offer CTA (Commercial Validation v0):
+
+```bash
+$env:PPE_ENABLE_SNAPSHOTS="0"
+$env:PPE_PRIVATE_APP_URL="https://app.marketstructureos.com"
+$env:PPE_RESEARCH_OFFER_URL="mailto:research@example.com?subject=PPE%20beta"
+streamlit run src/viz/app.py
+```
+
+You should see the **Research beta (v0)** line and the offer button (honest copy; no guaranteed returns).
+
 ## 2) Tests
 
 Per [README](../../README.md) testing policy:
