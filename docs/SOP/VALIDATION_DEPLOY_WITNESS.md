@@ -5,7 +5,7 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | Field | Value |
 |-------|--------|
 | **Date (UTC)** | 2026-05-19 (pre–ops re-verify); update after VPS pull |
-| **Git SHA on VPS** | `132ac4f` — **re-verify** on VPS after `git pull` (Commercial Validation + smoke logging) |
+| **Git SHA on VPS** | `983e7f5` — **re-verify** on VPS after `git pull` (ops cleanup + smoke witness) |
 | **Deploy path** | GitHub Actions on push to `main` / manual §4 |
 | **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19); re-check after deploy |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
