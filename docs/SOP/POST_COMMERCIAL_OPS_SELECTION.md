@@ -1,18 +1,16 @@
 # Post–commercial ops — steward SELECTION (prep)
 
-**Status:** Ops agent lane **complete** (2026-05-19). Steward VPS + paid-interest outreach remain. **No BUILD** until SELECTION confirms next chapter.
+**Status:** **SELECTION COMPLETE** (2026-05-19). Outcome: [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md). Next BUILD: **MVP1 Reliability** — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md).
+
+Ops agent lane **complete**. Steward VPS `.env` + paid-interest call remain **parallel** (non-blocking for CONTROL-Slice001).
 
 ---
 
-## Recommended next BUILD chapter (steward decision)
+## Selected chapter (record)
 
-| Rank | Candidate | Rationale |
-|------|-----------|-----------|
-| 1 | **MVP1 reliability** | If smoke regresses after deploy or §15 gaps block demos |
-| 2 | **Phase 2 on `main`** | If desirability/playability is the product bottleneck; requires baseline reconcile from `recovery/frontier-steward-v2_1-baseline` |
-| 3 | **Sprint 003 evidence-plane** | Only with fresh pilot evidence |
-
-**Default if ops stay green and outreach gets Y:** Phase 2 reconcile or narrow MVP1 hardening — steward call.
+| Chapter | Sprint | Phase plan |
+|---------|--------|------------|
+| **MVP1 Reliability** | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) | [`PHASE_PLANS/mvp1_reliability_relay.json`](PHASE_PLANS/mvp1_reliability_relay.json) |
 
 ---
 
@@ -21,11 +19,17 @@
 - Billing / Phase 3–class commercial wrapper
 - Multi-asset / NVIDIA automation BUILD
 - Execution engine
+- **Phase 2 on `main`** — after reliability chapter + baseline reconcile
+
+---
+
+## Steward parallel
+
+1. VPS `.env` + verify **Research beta (v0)** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
+2. Live paid-interest conversation → [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md)
 
 ---
 
 ## Next execution step
 
-1. Steward: VPS steps in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
-2. Steward: one paid-interest conversation → update reality checks
-3. **SELECTION** session: pick chapter → draft sprint spec + phase plan → CONTROL-Slice001
+**`MVP1-Reliability-Control-Slice001`** — accept sprint spec, sync `MVP1_FRONTIER` / `HANDOFF`, then relay PRODUCT slices.

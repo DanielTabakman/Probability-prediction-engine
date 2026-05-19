@@ -13,11 +13,11 @@ A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
-- Active MVP1 focus: **Post-ops SELECTION** — [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md)
+- Active MVP1 focus: **MVP1 Reliability** — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md); SELECTION [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md)
 - Closed chapters: Validation + Commercial Validation — **COMPLETE** 2026-05-19
-- Ops agent lane: **DONE** — smoke `20260519_131035` / `131251`; pytest **153**; see [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
-- Current execution focus: steward VPS + `PPE_RESEARCH_OFFER_*` + live paid-interest call
-- Next pending execution step: **SELECTION** for next BUILD chapter (after steward outreach optional)
+- Ops agent lane: **DONE** — compose offer env; smoke `20260519_131035` / `131251`; pytest **153**; [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
+- Steward parallel: VPS `.env` `PPE_RESEARCH_OFFER_*` + live paid-interest call
+- Next pending execution step: **`MVP1-Reliability-Smoke-Slice002`** (CONTROL-Slice001 closed 2026-05-19)
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 - Legacy `CURRENT_FRONTIER.md` is **historical only**
@@ -27,7 +27,7 @@ B) REPO-STATE SAFETY (reproducibility)
 - Ahead/behind vs origin: verify
 - Working tree: verify CLEAN before BUILD
 - Untracked canonical docs: verify NO
-- BUILD allowed: NO during ops pass (CONTROL/operator only)
+- BUILD allowed: YES — MVP1 Reliability relay after CONTROL-Slice001 accept
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: verify after repo-state
@@ -38,7 +38,7 @@ C) AGENT CONTINUITY (required)
 
 ## Current priority
 
-**Ops completion** — deploy, smoke evidence, live paid-interest. Chapters Validation + Commercial Validation are **closed** on `main`.
+**MVP1 Reliability** — first relay slice CONTROL accept. Ops **closed**; steward VPS/outreach in parallel. Validation + Commercial Validation chapters **closed** on `main`.
 
 ## Hard rule reminders
 

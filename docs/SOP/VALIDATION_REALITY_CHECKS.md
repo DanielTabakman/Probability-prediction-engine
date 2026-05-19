@@ -5,7 +5,7 @@ Lightweight external validation. Copy a row per session.
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
 | 2026-05-19 | **Demo clarity** — viewer names main object in ~5 min | Y | Prep: public demo URL + operator script; MVP1 banner above fold on branch |
-| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Ops prep done; dual smoke green (`20260519_131035`); offer on demo pending VPS `PPE_RESEARCH_OFFER_URL`; **schedule live call** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) outreach log |
+| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Ops **complete**: compose offer env on `main`, auto-deploy on push; CTA needs VPS `.env`; **steward live call** — conversation script in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) §Outreach (do not mark **Y** without real conversation) |
 | 2026-05-19 | **Reviewable cases** — showed freeze + reopen + review on full app | Y | Ritual + evidence clock seeded to targets (see VALIDATION_EVIDENCE_STATUS) |
 | 2026-05-19 | **NVIDIA / LEAPS** — manual brief only (no code) | Y | [`briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md`](briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md) drafted; live interviews optional follow-up |
 

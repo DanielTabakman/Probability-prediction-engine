@@ -8,9 +8,20 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Ops pass (agent lane):** **DONE** 2026-05-19 — dual smoke green; docs aligned. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md). **Steward:** VPS env + live paid-interest call.
-- **Next:** **SELECTION** for next BUILD chapter — [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md).
+- **Ops pass:** **DONE** 2026-05-19 — compose `PPE_RESEARCH_OFFER_*` on `app_demo`; dual smoke green. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
+- **SELECTION:** **COMPLETE** — [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md).
+- **Active BUILD chapter:** **MVP1 Reliability** — [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) · [`PHASE_PLANS/mvp1_reliability_relay.json`](PHASE_PLANS/mvp1_reliability_relay.json).
+- **Steward parallel:** VPS `.env` for offer URL + live paid-interest call (does not block CONTROL-Slice001).
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
+
+### MVP1 Reliability — relay queue (baseline **`main`**) — **OPEN**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-Reliability-Control-Slice001` — charter + SELECTION record | CONTROL |
+| **OPEN** | `MVP1-Reliability-Smoke-Slice002` — harness timeout / progress witness | PRODUCT |
+| **OPEN** | `MVP1-Reliability-Deploy-Slice003` — deploy witness + offer CTA verify | CONTROL |
+| **OPEN** | `MVP1-Reliability-Closeout-Slice004` — chapter close | CONTROL |
 
 ### Archived roadmap chapters (baseline **`main`**)
 

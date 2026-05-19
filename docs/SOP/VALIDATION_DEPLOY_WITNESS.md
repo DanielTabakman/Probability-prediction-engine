@@ -4,13 +4,15 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 (pre–ops re-verify); update after VPS pull |
-| **Git SHA on VPS** | `983e7f5` — **re-verify** on VPS after `git pull` (ops cleanup + smoke witness) |
-| **Deploy path** | GitHub Actions on push to `main` / manual §4 |
-| **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19); re-check after deploy |
+| **Date (UTC)** | 2026-05-19 |
+| **Git SHA on VPS** | Expect tip after **Deploy VPS** on `main` push (compose `PPE_RESEARCH_OFFER_*`); verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
+| **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` + manual SSH per runbook §4 |
+| **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19 post-push) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
 | **HTTPS static assets** | PASS — no mixed-content on demo fetch |
-| **Demo operator script** | PASS — prep; re-run after offer CTA env on demo service |
-| **Research offer CTA on demo** | pending — requires `PPE_RESEARCH_OFFER_URL` on demo container |
+| **Demo operator script** | PASS — prep |
+| **Research offer CTA on demo** | **pending steward `.env`** — compose wires `${PPE_RESEARCH_OFFER_URL:-}`; CTA appears only when repo-root `.env` sets URL on VPS |
 
-**Post–Commercial Validation:** Re-run checklist §5 after VPS aligns to `132ac4f`+ and demo env sets `PPE_RESEARCH_OFFER_URL`. Log result in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
+**Agent lane (2026-05-19):** `docker-compose.yml` offer env merged to `main`; auto-deploy runs `git pull` + `docker compose up -d --build`. **Steward:** set `.env` on VPS, confirm **Research beta (v0)** in browser, update SHA in this table.
+
+**Post–Commercial Validation:** See [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).

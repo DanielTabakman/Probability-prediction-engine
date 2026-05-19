@@ -1,0 +1,36 @@
+{
+  "name": "MVP1_reliability (post-commercial-ops SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_RELIABILITY.md",
+  "selectionRecord": "docs/SOP/POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-Reliability-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 10,
+      "hardMinutes": 20,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Reliability-Smoke-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 25,
+      "hardMinutes": 45,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Reliability-Deploy-Slice003",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Reliability-Closeout-Slice004",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 10,
+      "hardMinutes": 20,
+      "maxAttempts": 1
+    }
+  ]
+}

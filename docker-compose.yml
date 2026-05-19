@@ -6,6 +6,8 @@ services:
       - PORT=8501
       - PPE_ENABLE_SNAPSHOTS=0
       - PPE_PRIVATE_APP_URL=https://app.marketstructureos.com
+      - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
+      - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
     restart: unless-stopped
     networks:
       - web
