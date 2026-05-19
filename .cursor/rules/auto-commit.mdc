@@ -25,6 +25,7 @@
 
 - After auto-commit on any branch **other than** `main` / `master`, the agent should **auto-push** to the branch’s existing upstream.
 - If the current branch has no upstream yet, the first push should be `git push -u origin HEAD` (or equivalent for the default remote).
+- **After push**, if there is no open PR to `main` for this branch, **open one** (`gh pr create --base main --head <branch>`). GitHub will add the `automerge` label ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when **`CI / pytest`** passes, [`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges to `main` and **Deploy VPS** can run. Do not stop at “pushed feature branch” when the intent is to ship.
 - Preconditions for auto-push on non-main branches:
   - Pushable commit gate passed (ruff + full pytest, or docs-only exception).
   - The working tree is clean except for the intended changes.
