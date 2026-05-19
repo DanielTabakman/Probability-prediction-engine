@@ -9,13 +9,12 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · [`PHASE_PLANS/mvp1_phase2_on_main_relay.json`](PHASE_PLANS/mvp1_phase2_on_main_relay.json).
-- **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md) — Slice005 chartered.
-- **Next slice:** steward **SELECTION** for post–Slice005 BUILD (no new slice chartered on frontier).
-- **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA PASS; paid-interest call (**N** until live conversation).
-- **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)).
+- **Last closed chapter:** **Phase 2 on `main`** — **COMPLETE** 2026-05-19.
+- **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
+- **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
-### Phase 2 on `main` — relay queue (baseline **`main`**) — **OPEN**
+### Phase 2 on `main` — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
@@ -24,8 +23,10 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions alignment (copy + harness) | PRODUCT |
 | **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint after Product-Slice003 | CONTROL |
 | **CLOSED** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice006` — trust strip MVP1 disclosure | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Chapter-Closeout-Slice007` — chapter close | CONTROL |
 
-**Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
+**Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 
@@ -45,6 +46,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | Validation Chapter | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
+| Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 
 ### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 

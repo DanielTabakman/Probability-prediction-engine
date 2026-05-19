@@ -10,8 +10,8 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **159** passed (2026-05-19, Product-Slice005) |
-| Dual smoke | **PASS** | `20260519_150936` + `20260519_151210` (post–Slice005 viz) |
+| `python -m pytest -q` | **PASS** | **161** passed (2026-05-19, Product-Slice006) |
+| Dual smoke | **PASS** | `20260519_155858` + `20260519_160103` (post–Slice006 viz) |
 
 ---
 
@@ -24,6 +24,35 @@
 | Product-Slice003 | **CLOSED** 2026-05-19 — MVP1 UI exclusions alignment |
 | Closeout-Slice004 | **CLOSED** 2026-05-19 — checkpoint |
 | Product-Slice005 | **CLOSED** 2026-05-19 — decision surface / panel parity |
+| Product-Slice006 | **CLOSED** 2026-05-19 — trust strip MVP1 disclosure |
+| Chapter-Closeout-Slice007 | **CLOSED** 2026-05-19 — Phase 2 chapter **COMPLETE** |
+
+**Chapter status:** **COMPLETE** 2026-05-19 — [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
+
+---
+
+## Product-Slice006 — trust strip MVP1 disclosure
+
+**Module:** [`src/viz/implied_lab_provenance.py`](../../src/viz/implied_lab_provenance.py) — `build_trust_strip_lines` reads `verification["mvp1_decision"]` for `data_quality`, `primary_output_state`, optional `primary_output_reason` (non-advisory).
+
+| Area | Status | Notes |
+|------|--------|-------|
+| Trust strip MVP1 lines | **shipped** | No `mvp1_benchmark_substrate` import |
+| `mvp1_benchmark_substrate` | **defer** | Recovery-only per reconcile |
+| Blind `app.py` merge | **defer** | — |
+
+**Tests added:** [`tests/test_mvp1_trust_strip.py`](../../tests/test_mvp1_trust_strip.py)
+
+---
+
+## Product-Slice006 smoke witness
+
+| Run ID | Scenario | Exit | elapsed_s |
+|--------|----------|------|-----------|
+| 20260519_155858 | MVP1_compact_verification | 0 | 125.5 |
+| 20260519_160103 | A_width_target_payoff | 0 | 102.0 |
+
+**Dual smoke total:** ~228.6s.
 
 ---
 

@@ -66,6 +66,20 @@ def build_trust_strip_lines(verification: dict[str, Any] | None) -> list[str]:
         if isinstance(note, str) and note.strip():
             lines.append(f"**Belief (teal):** {note.strip()}")
 
+    mvp1 = verification.get("mvp1_decision")
+    if isinstance(mvp1, dict):
+        dq = mvp1.get("data_quality")
+        if isinstance(dq, str) and dq.strip():
+            lines.append(f"**MVP1 data quality:** `{dq.strip()}`")
+        pos = mvp1.get("primary_output_state")
+        if isinstance(pos, str) and pos.strip():
+            label = pos.strip().replace("_", " ")
+            reason = mvp1.get("primary_output_reason")
+            if isinstance(reason, str) and reason.strip():
+                lines.append(f"**MVP1 primary output:** {label} — {reason.strip()}")
+            else:
+                lines.append(f"**MVP1 primary output:** {label}")
+
     lines.append(TRUST_STRIP_VERIFICATION_POINTER)
     return lines
 

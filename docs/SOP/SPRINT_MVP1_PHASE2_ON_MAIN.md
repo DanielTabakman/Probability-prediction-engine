@@ -70,10 +70,32 @@ Reconcile **Phase 2 desirability / playability** product work onto **`main`** un
 
 ---
 
-### MVP1-Phase2-Product-Slice005 — decision surface parity audit (PRODUCT) — **CHARTERED**
+### MVP1-Phase2-Product-Slice005 — decision surface parity audit (PRODUCT) — **CLOSED**
 
-**Goal:** Bounded audit of [`mvp1_decision_surface.py`](../../src/viz/mvp1_decision_surface.py) vs verification/MVP1 panel surfacing on `main`; document gaps; small test/copy fixes only.
+**Goal:** Bounded audit of [`mvp1_decision_surface.py`](../../src/viz/mvp1_decision_surface.py) vs verification/MVP1 panel surfacing on `main`.
 
-**Spec:** [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md) · **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md).
+**Closed** 2026-05-19 — [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md).
 
-**Defer (binding):** `mvp1_benchmark_substrate.py`, blind `app.py` merge, provenance substrate wiring — per [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md).
+---
+
+### MVP1-Phase2-Product-Slice006 — trust strip MVP1 disclosure (PRODUCT) — **CLOSED**
+
+**Goal:** Surface MVP1 trust fields on the always-visible trust strip from `verification["mvp1_decision"]`.
+
+**Closed** 2026-05-19 — [`SPRINT_MVP1_PHASE2_SLICE006.md`](SPRINT_MVP1_PHASE2_SLICE006.md).
+
+---
+
+### MVP1-Phase2-Chapter-Closeout-Slice007 — chapter complete (CONTROL) — **CLOSED**
+
+**Goal:** Mark Phase 2 on `main` **COMPLETE**; [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md) for next BUILD prep.
+
+**Closed** 2026-05-19.
+
+---
+
+## Sprint status
+
+**Phase 2 on `main`:** **COMPLETE** 2026-05-19.
+
+**Defer (binding):** `mvp1_benchmark_substrate.py`, blind `app.py` merge — per [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md).

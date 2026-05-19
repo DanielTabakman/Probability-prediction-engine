@@ -1,13 +1,13 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-19 · **Baseline `main`:** `707610c` ([`origin/main`](https://github.com/DanielTabakman/Probability-prediction-engine))  
+**As-of:** 2026-05-19 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
-This file merges archived chapters, active Phase 2 relay state, engineering gates, steward parallel work, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
+This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
 
 ---
 
-## Flow (closed → active → steward → next BUILD)
+## Flow (archived → steward → next BUILD)
 
 ```mermaid
 flowchart LR
@@ -15,21 +15,17 @@ flowchart LR
     V[Validation COMPLETE]
     C[Commercial Validation COMPLETE]
     R[MVP1 Reliability COMPLETE]
-  end
-  subgraph active [Active on main]
-    P2[Phase 2 OPEN]
-    S003[Product-Slice003 CLOSED]
-    S004[Closeout-Slice004 CLOSED]
-    S005[Product-Slice005 CLOSED]
+    P2[Phase 2 on main COMPLETE]
   end
   subgraph steward [Steward parallel]
-    ENV[VPS .env CTA]
+    ENV[VPS .env CTA pending]
     PI[Paid interest N]
   end
-  closed --> P2
-  P2 --> S003 --> S004 --> S005
-  S004 -.-> steward
-  steward -.-> S005
+  subgraph next [Next BUILD]
+    SEL[Steward SELECTION TBD]
+  end
+  closed --> steward
+  steward -.-> SEL
 ```
 
 ---
@@ -41,26 +37,27 @@ flowchart LR
 | Validation | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
+| Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 
-**Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — agent lane done; CTA + paid-interest remain steward.
+**Chapter close SELECTION (prep):** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
+
+**Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 
 ---
 
-## Active — Phase 2 on `main`
-
-**Sprint:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · **Plan:** [`PHASE_PLANS/mvp1_phase2_on_main_relay.json`](PHASE_PLANS/mvp1_phase2_on_main_relay.json) · **SELECTION (chapter):** [`POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md`](POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md) · **SELECTION (post–Slice003):** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
+## Phase 2 on `main` — final relay (archived)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-Phase2-Control-Slice001` | CONTROL |
 | **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` | CONTROL |
-| **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions (copy + harness) | PRODUCT |
-| **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint | CONTROL |
-| **CLOSED** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice003` | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Closeout-Slice004` | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Product-Slice005` | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice006` — trust strip MVP1 disclosure | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Chapter-Closeout-Slice007` | CONTROL |
 
-**Reconcile:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) — Sprint004 directional strip **already_on_main**; no blind recovery merge.
-
-**Next slice spec:** [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md)
+**Reconcile:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) — directional strip **already_on_main**; no blind recovery merge.
 
 ---
 
@@ -68,8 +65,8 @@ flowchart LR
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **159** passed (Slice005 panel parity) |
-| Dual smoke (post–Slice003) | **PASS** | `20260519_144000` + `20260519_144350` |
+| `python -m pytest -q` | **PASS** | **161** passed (Slice006 trust strip) |
+| Dual smoke (post–Slice006) | **PASS** | `20260519_155858` + `20260519_160103` |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
@@ -79,20 +76,10 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status | Action |
 |------|--------|--------|
-| VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) after browser confirms CTA |
-| Paid-interest live call | **N** (honest) | Use script in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) §Outreach; log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) only after browser confirms CTA |
+| Paid-interest live call | **N** (honest) | Log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 
-**VPS steps (summary):**
-
-```bash
-cd /opt/marketstructureos
-git pull
-# .env (not committed): PPE_RESEARCH_OFFER_URL=mailto:...  PPE_RESEARCH_OFFER_LABEL=Request research beta access
-docker compose up -d --build
-git rev-parse HEAD   # expect main @ 566f4f0+ after agent push
-```
-
-**Do not** mark paid-interest **Y** without a live call.
+**Do not** mark CTA **PASS** or paid-interest **Y** without steward verification.
 
 ---
 
@@ -103,6 +90,7 @@ git rev-parse HEAD   # expect main @ 566f4f0+ after agent push
 | **This one-pager** | [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) |
 | Live frontier / slice queue | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
 | Session handoff gate | [`HANDOFF.md`](HANDOFF.md) |
+| Post–Phase 2 SELECTION | [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md) |
 | Reconcile port/defer matrix | [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) |
 | Phase 2 evidence clock | [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
@@ -115,13 +103,12 @@ git rev-parse HEAD   # expect main @ 566f4f0+ after agent push
 
 | Path / topic | Decision |
 |--------------|----------|
-| [`src/viz/mvp1_benchmark_substrate.py`](../../src/viz/mvp1_benchmark_substrate.py) | **defer** — recovery-only; `main` uses [`mvp1_decision_surface.py`](../../src/viz/mvp1_decision_surface.py) |
+| [`src/viz/mvp1_benchmark_substrate.py`](../../src/viz/mvp1_benchmark_substrate.py) | **defer** — recovery-only |
 | Blind [`src/viz/app.py`](../../src/viz/app.py) merge | **defer** |
-| [`implied_lab_provenance.py`](../../src/viz/implied_lab_provenance.py) substrate wiring | **defer** until parity audit completes |
 | [`tests/test_mvp1_benchmark_substrate.py`](../../tests/test_mvp1_benchmark_substrate.py) | **defer** |
 
 ---
 
 ## Next BUILD (agent lane)
 
-**Slice005 CLOSED** 2026-05-19 — see parity table in [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md). **Next:** steward **SELECTION** for post–Slice005 work. **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — candidates in [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

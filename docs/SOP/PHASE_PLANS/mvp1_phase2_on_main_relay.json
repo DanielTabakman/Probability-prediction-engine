@@ -47,6 +47,22 @@
       "maxAttempts": 2,
       "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_SLICE005.md",
       "selectionRecord": "docs/SOP/POST_PHASE2_PRODUCT_SLICE003_SELECTION.md"
+    },
+    {
+      "sliceId": "MVP1-Phase2-Product-Slice006",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 2,
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_SLICE006.md",
+      "selectionRecord": "docs/SOP/POST_PHASE2_SLICE005_SELECTION_OUTCOME.md"
+    },
+    {
+      "sliceId": "MVP1-Phase2-Chapter-Closeout-Slice007",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
     }
   ]
 }
