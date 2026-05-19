@@ -28,13 +28,15 @@ Do this **before** smoke or live closeout validation (aligns with `docs/SOP/OPER
 - **Branch / working tree:** confirm `git status` and branch match what the execution packet claims; do not assume chat or stale handoff narrative matches the repo.
 - **Source-of-truth order:** read current accepted docs in this order when resolving conflicts (per steward practice):
   1. Pushed repo + current accepted docs  
-  2. `docs/SOP/CURRENT_FRONTIER.md`  
-  3. `docs/SOP/HANDOFF.md`  
-  4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`  
-  5. `docs/SOP/OPERATING_RULES.md`  
-  6. `docs/SPRINT_1_SPEC.md`  
-  7. `docs/SEMANTIC_CONTRACTS.md`  
-  8. Older handoff/chat only when docs are silent  
+  2. `docs/VISION/PPE_MASTER_MVP1.md` (master canon)  
+  3. `docs/SOP/MVP1_FRONTIER.md` (live MVP1 steering)  
+  4. `docs/SOP/HANDOFF.md`  
+  5. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`  
+  6. `docs/SOP/OPERATING_RULES.md`  
+  7. `docs/SPRINT_1_SPEC.md` / active sprint spec named in `MVP1_FRONTIER.md`  
+  8. `docs/SEMANTIC_CONTRACTS.md`  
+  9. `docs/SOP/CURRENT_FRONTIER.md` — **historical only** for MVP1 execution  
+  10. Older handoff/chat only when docs are silent  
 
 - **Stale narrative:** if handoff text disagrees with repo files or frontier docs, **trust the repo/docs** and record the correction in closeout.
 - **Git posture:** stay **conservative**—do not commit, push, or branch unless explicitly requested (`OPERATING_RULES.md` → **Git**).

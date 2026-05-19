@@ -8,11 +8,18 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Active chapter:** **Commercial Validation** — paid-beta / research-offer surface + live Reality Checks (`docs/VISION/PPE_MASTER_MVP1.md` § accepted order 4–5).
-- **Current focus**: honest offer copy on public demo (`PPE_RESEARCH_OFFER_*`); operator playbook; paid-interest + optional NVIDIA brief logs.
-- **Non-goal**: billing automation, execution engine, multi-asset BUILD.
+- **Interim ops pass:** **Commercial ops completion** — VPS align @ `main`, demo env (`PPE_RESEARCH_OFFER_*`), fresh dual smoke, live paid-interest outreach. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
+- **No BUILD** until ops checklist done and steward **SELECTION** picks next roadmap chapter.
+- **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
-### Commercial Validation — relay queue (baseline **`main`**)
+### Archived roadmap chapters (baseline **`main`**)
+
+| Chapter | Status | Evidence |
+|---------|--------|----------|
+| Validation Chapter | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
+| Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
+
+### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 
 **Sprint spec:** [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md) · **Phase plan:** [`PHASE_PLANS/post_validation_commercial_validation.json`](PHASE_PLANS/post_validation_commercial_validation.json)
 
@@ -23,14 +30,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `Commercial-Validation-Reality-Slice003` — operator playbook + reality log | CONTROL |
 | **CLOSED** | `Commercial-Validation-Nvidia-Brief-Slice004` — manual brief | CONTROL |
 
-**Commercial Validation status:** **COMPLETE** (2026-05-19). Evidence: [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md). **Next:** steward **SELECTION** for following roadmap chapter (no default BUILD).
-
-**Operator:** [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) · Reality checks [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
-
-**Run one slice:** `run_slice.cmd <sliceId>` · **Run phase:** `run_phase.cmd docs/SOP/PHASE_PLANS/post_validation_commercial_validation.json`
+**Commercial Validation status:** **COMPLETE** (2026-05-19). **Ops follow-up:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md). **After ops:** steward **SELECTION** for next BUILD chapter.
 
 ### Validation Chapter — relay queue (baseline **`main`**) — **COMPLETE**
-
 
 **Sprint spec:** [`docs/SOP/SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md) · **Phase plan:** [`docs/SOP/PHASE_PLANS/validation_chapter_relay.json`](PHASE_PLANS/validation_chapter_relay.json)
 

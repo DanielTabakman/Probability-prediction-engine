@@ -1,17 +1,16 @@
-# Validation Chapter — deploy witness (steward fill)
+# Validation / production deploy witness (steward fill)
 
 Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5.
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 |
-| **Git SHA on VPS** | `f6490a7` (Commercial Validation closeout; verify on VPS after `git pull`) |
+| **Date (UTC)** | 2026-05-19 (pre–ops re-verify); update after VPS pull |
+| **Git SHA on VPS** | `132ac4f` — **re-verify** on VPS after `git pull` (Commercial Validation + smoke logging) |
 | **Deploy path** | GitHub Actions on push to `main` / manual §4 |
-| **marketstructureos.com** | PASS — Streamlit demo loads (HTTP 200; title **Streamlit** / Probability Engine surface) |
-| **app.marketstructureos.com** | PASS — Cloudflare Access login gate present (**App full (snapshots)**); full app behind auth as designed |
-| **HTTPS static assets** | PASS — no mixed-content failures observed on demo hostname fetch |
-| **Demo operator script** | PASS — prep session; scripted walkthrough per [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) on public demo URL |
+| **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19); re-check after deploy |
+| **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
+| **HTTPS static assets** | PASS — no mixed-content on demo fetch |
+| **Demo operator script** | PASS — prep; re-run after offer CTA env on demo service |
+| **Research offer CTA on demo** | pending — requires `PPE_RESEARCH_OFFER_URL` on demo container |
 
-**Notes:** Full-app post-login smoke requires steward credentials; public demo validated without snapshot DB. Re-run §5 after merging Validation Chapter product commits to `main` and VPS `git pull`.
-
-**Steward:** closeout **Validation-Chapter-Deploy-Slice003** — summary copied to [MVP1_FRONTIER.md](MVP1_FRONTIER.md).
+**Post–Commercial Validation:** Re-run checklist §5 after VPS aligns to `132ac4f`+ and demo env sets `PPE_RESEARCH_OFFER_URL`. Log result in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
