@@ -12,12 +12,24 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - **Current focus**: MVP1 **Phases 1–6 v0** in `src/`; close §15 gaps (`primary_output_state`, `data_quality`, materiality witness); validate freeze → review → class summary; ship demo UX.
 - **Non-goal**: Phase 5–6 do **not** add execution, tickets, or automated live trading; class summary is counts + a one-line operator hint, not a model.
 
-### Validation Chapter — next slices (balanced order)
-1. **Steering + deploy** — `HANDOFF` / this file aligned; [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) on VPS after `main` deploy.
-2. **Loop validation** — [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); `pytest` + `scripts/run_mvp1_dual_implied_lab_smoke.py`.
-3. **§15 contract** — `src/viz/mvp1_decision_surface.py` on verification payload; frozen-record witness fields.
-4. **Demo UX** — [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md); compact presets; chart theme cohesion.
-5. **Evidence clock** — [MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md); targets in [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md).
+### Validation Chapter — relay queue (baseline **`main`**)
+
+**Sprint spec:** [`docs/SOP/SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md) · **Phase plan:** [`docs/SOP/PHASE_PLANS/validation_chapter_relay.json`](PHASE_PLANS/validation_chapter_relay.json)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `Validation-Chapter-Control-Slice001` — relay baseline `main`, sprint spec, frontier sync | CONTROL |
+| **SHIPPED (pre-relay)** | Bulk BUILD **`9cc536b`** — §15 contract, demo UX, operator ritual docs | ad-hoc |
+| **CLOSED** | `Validation-Chapter-Smoke-Slice001` — dual smoke green (harness title + MVP1 gates) | PRODUCT |
+| **CLOSED** | `Validation-Chapter-UX-Slice002` — MVP1 primary output banner above fold | PRODUCT |
+| **CLOSED** | `Validation-Chapter-Deploy-Slice003` — [VALIDATION_DEPLOY_WITNESS.md](VALIDATION_DEPLOY_WITNESS.md) (2026-05-19) | CONTROL |
+| **CLOSED** | `Validation-Chapter-Closeout-Slice004` — chapter complete; evidence per [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md) | CONTROL |
+
+**Validation Chapter status:** **COMPLETE** (2026-05-19). **Next roadmap chapter (SELECTION only):** [POST_VALIDATION_CHAPTER_SELECTION.md](POST_VALIDATION_CHAPTER_SELECTION.md) — **Commercial Validation** (paid-beta / research-offer surface); **no BUILD** until charter approved.
+
+**Operator (not relay):** [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); evidence clock [MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md) + tracker [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md); reality checks [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md).
+
+**Run one slice:** `run_slice.cmd <sliceId>` · **Run phase:** `run_phase.cmd docs/SOP/PHASE_PLANS/validation_chapter_relay.json`
 
 ### MVP1 Phase placement (repo-truth)
 This placement is repo-grounded; it is allowed to contradict legacy “phase complete” language.

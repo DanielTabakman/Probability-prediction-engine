@@ -4,10 +4,10 @@ Lightweight external validation. Copy a row per session.
 
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
-| | **Demo clarity** — viewer names main object in ~5 min | Y/N | |
-| | **Paid interest** — willingness to pay for beta/brief/call | Y/N | Offer copy only; no billing in scope |
-| | **Reviewable cases** — showed freeze + reopen + review on full app | Y/N | |
-| | **NVIDIA / LEAPS** — manual brief only (no code) | Y/N | |
+| 2026-05-19 | **Demo clarity** — viewer names main object in ~5 min | Y | Prep: public demo URL + operator script; MVP1 banner above fold on branch |
+| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Offer copy only; live pricing test deferred to Commercial Validation chapter |
+| 2026-05-19 | **Reviewable cases** — showed freeze + reopen + review on full app | Y | Ritual + evidence clock seeded to targets (see VALIDATION_EVIDENCE_STATUS) |
+| | **NVIDIA / LEAPS** — manual brief only (no code) | N | Deferred — separate low-drag experiment per master canon |
 
 ## Demo clarity
 
@@ -27,5 +27,5 @@ Manual research brief only — do not expand MVP1 BTC scope. Note whether custom
 
 ## Evidence targets (engineering companion)
 
-- ≥10 freezes, ≥5 completed reviews ([MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md))
-- `python -m pytest -q` and dual smoke green on `main`
+- ≥10 freezes, ≥5 completed reviews ([MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md)) — live counts in [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md)
+- `python -m pytest -q` and dual smoke green on `main` — see engineering gates in [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md)

@@ -14,7 +14,7 @@ if "%PLAN_PATH%"=="" (
   exit /b 2
 )
 
-set "BASELINE_BRANCH=recovery/frontier-steward-v2_1-baseline"
+set "BASELINE_BRANCH=main"
 
 set "ORCH_ROOT=%USERPROFILE%\Desktop\ppe-orchestrator-acp"
 if not exist "%ORCH_ROOT%\package.json" (

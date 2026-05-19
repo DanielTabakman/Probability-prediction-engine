@@ -1,5 +1,6 @@
 {
   "name": "Phase2_next (seed from CURRENT_FRONTIER)",
+  "historicalNote": "HISTORICAL — Sprint004 on recovery baseline. Do not run without steward re-validation. See POST_VALIDATION_CHAPTER_SELECTION.md.",
   "slices": [
     {
       "sliceId": "Sprint004-Slice004",

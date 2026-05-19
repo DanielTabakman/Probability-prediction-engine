@@ -15,12 +15,12 @@ if "%SLICE_ID%"=="" (
 )
 
 set "SPRINT_SPEC=%~2"
-if "%SPRINT_SPEC%"=="" set "SPRINT_SPEC=docs/SOP/SPRINT_004_PHASE_2.md"
+if "%SPRINT_SPEC%"=="" set "SPRINT_SPEC=docs/SOP/SPRINT_VALIDATION_CHAPTER.md"
 
 set "DECLARED_PLANE=%~3"
 if "%DECLARED_PLANE%"=="" set "DECLARED_PLANE=PRODUCT-PLANE"
 
-set "BASELINE_BRANCH=recovery/frontier-steward-v2_1-baseline"
+set "BASELINE_BRANCH=main"
 
 for /f "tokens=1-4 delims=/.- " %%a in ("%date%") do set "YYYYMMDD=%%d%%b%%c"
 for /f "tokens=1-3 delims=:." %%a in ("%time%") do set "HHMMSS=%%a%%b%%c"

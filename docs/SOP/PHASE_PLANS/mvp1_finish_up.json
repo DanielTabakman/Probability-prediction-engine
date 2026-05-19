@@ -1,5 +1,6 @@
 {
   "name": "MVP1 finish-up (remaining runnable slices) — steward-run",
+  "historicalNote": "HISTORICAL — UIExclusions slice likely shipped. Prefer MVP1_FRONTIER gap roadmap.",
   "slices": [
     {
       "sliceId": "MVP1-UIExclusions-Slice001",

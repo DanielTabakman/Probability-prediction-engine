@@ -1,0 +1,15 @@
+{
+  "name": "Commercial Validation — draft queue (do not run until steward approves charter)",
+  "baselineNote": "main",
+  "historicalNote": "DRAFT — SELECTION 2026-05-19. Approve SPRINT_POST_VALIDATION_COMMERCIAL.md before run_phase.cmd.",
+  "slices": [
+    {
+      "sliceId": "Commercial-Validation-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_POST_VALIDATION_COMMERCIAL.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 10,
+      "hardMinutes": 20,
+      "maxAttempts": 2
+    }
+  ]
+}

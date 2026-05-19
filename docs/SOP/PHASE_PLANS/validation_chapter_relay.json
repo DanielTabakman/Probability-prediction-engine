@@ -1,0 +1,30 @@
+{
+  "name": "Validation Chapter — relay queue",
+  "baselineNote": "main",
+  "slices": [
+    {
+      "sliceId": "Validation-Chapter-Smoke-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "Validation-Chapter-UX-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "Validation-Chapter-Deploy-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 10,
+      "hardMinutes": 20,
+      "maxAttempts": 2
+    }
+  ]
+}
