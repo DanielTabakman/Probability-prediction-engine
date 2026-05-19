@@ -13,10 +13,11 @@ A) DOC-STATE SAFETY (alignment)
 - Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
-- Active MVP1 focus: **Commercial Validation** (SELECTION) — [`POST_VALIDATION_CHAPTER_SELECTION.md`](POST_VALIDATION_CHAPTER_SELECTION.md); draft [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md)
-- Closed slices (Validation Chapter): Control / Smoke / UX / Deploy / Closeout — **COMPLETE** 2026-05-19 — see `SPRINT_VALIDATION_CHAPTER.md`
-- Current execution focus: steward **approve** Commercial Validation charter; then CONTROL-Slice001 only
-- Next pending execution step: approve draft sprint spec → `run_slice.cmd Commercial-Validation-Control-Slice001` (CONTROL-PLANE)
+- Active MVP1 focus: **Commercial Validation** — [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md) ACCEPTED
+- Closed slices (Validation Chapter): Control / Smoke / UX / Deploy / Closeout — **COMPLETE** 2026-05-19
+- Closed slices (Commercial Validation): Control / Offer / Reality / Nvidia — **COMPLETE** 2026-05-19
+- Current execution focus: **SELECTION** — next roadmap chapter (no BUILD until chartered)
+- Next pending execution step: live paid-interest outreach per [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md); re-run dual smoke after deploy
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift; legacy `CURRENT_FRONTIER.md` is **historical only**
 - Naming rule: H1/H1-01/H1-02 is non-canonical unless explicitly reintroduced; use Phase/Sprint/Slice
@@ -48,7 +49,7 @@ Report **doc-state** (canonical alignment) and **repo-state** (reproducibility) 
 
 **Validation Chapter:** **COMPLETE** (2026-05-19) — [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md).
 
-**Next chapter (SELECTION, no BUILD until approved):** **Commercial Validation** — [`POST_VALIDATION_CHAPTER_SELECTION.md`](POST_VALIDATION_CHAPTER_SELECTION.md).
+**Commercial Validation:** **COMPLETE** (2026-05-19). **Next:** steward SELECTION for following chapter — see [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md).
 
 **Legacy Sprint 004 / `recovery/frontier-steward-v2_1-baseline`:** historical Phase 2 track only; do **not** use for MVP1 Validation execution unless explicitly re-chartered. See [`CURRENT_FRONTIER.md`](CURRENT_FRONTIER.md) supersession note.
 
@@ -68,9 +69,8 @@ Validation Chapter product slices (smoke + UX) and control infra — ledger in `
 
 ## Remaining
 
-- Steward approve [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md) and run CONTROL-Slice001
-- Live **paid-interest** reality check (deferred from Validation closeout)
-- Re-run deploy witness SHA after Validation product merge to `main`
+- See **`MVP1_FRONTIER.md`** Commercial Validation relay queue
+- Live **paid-interest** customer signal when outreach runs ([`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md))
 
 ## Risks / watchouts
 
@@ -86,8 +86,8 @@ Validation Chapter product slices (smoke + UX) and control infra — ledger in `
 
 ## Recommended next step
 
-**SELECTION / CONTROL** — approve **`SPRINT_POST_VALIDATION_COMMERCIAL.md`**, then **`Commercial-Validation-Control-Slice001`** on `main`. See **`POST_VALIDATION_CHAPTER_SELECTION.md`**.
+**SELECTION** — pick next roadmap chapter; run live paid-interest conversation when ready ([`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md)).
 
 ## Last updated
 
-2026-05-19 — Validation Chapter closed; Commercial Validation selected (draft charter).
+2026-05-19 — Commercial Validation chapter closed on `main` (offer surface + operator docs).

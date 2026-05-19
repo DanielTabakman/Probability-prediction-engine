@@ -8,11 +8,29 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Active chapter:** **Validation Chapter** — demoable research cockpit + evidence-generating loop (`docs/VISION/PPE_MASTER_MVP1.md` §1A).
-- **Current focus**: MVP1 **Phases 1–6 v0** in `src/`; close §15 gaps (`primary_output_state`, `data_quality`, materiality witness); validate freeze → review → class summary; ship demo UX.
-- **Non-goal**: Phase 5–6 do **not** add execution, tickets, or automated live trading; class summary is counts + a one-line operator hint, not a model.
+- **Active chapter:** **Commercial Validation** — paid-beta / research-offer surface + live Reality Checks (`docs/VISION/PPE_MASTER_MVP1.md` § accepted order 4–5).
+- **Current focus**: honest offer copy on public demo (`PPE_RESEARCH_OFFER_*`); operator playbook; paid-interest + optional NVIDIA brief logs.
+- **Non-goal**: billing automation, execution engine, multi-asset BUILD.
 
-### Validation Chapter — relay queue (baseline **`main`**)
+### Commercial Validation — relay queue (baseline **`main`**)
+
+**Sprint spec:** [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md) · **Phase plan:** [`PHASE_PLANS/post_validation_commercial_validation.json`](PHASE_PLANS/post_validation_commercial_validation.json)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `Commercial-Validation-Control-Slice001` — charter accepted, frontier sync | CONTROL |
+| **CLOSED** | `Commercial-Validation-Offer-Slice002` — `PPE_RESEARCH_OFFER_*` demo banner | PRODUCT |
+| **CLOSED** | `Commercial-Validation-Reality-Slice003` — operator playbook + reality log | CONTROL |
+| **CLOSED** | `Commercial-Validation-Nvidia-Brief-Slice004` — manual brief | CONTROL |
+
+**Commercial Validation status:** **COMPLETE** (2026-05-19). Evidence: [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md). **Next:** steward **SELECTION** for following roadmap chapter (no default BUILD).
+
+**Operator:** [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) · Reality checks [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
+
+**Run one slice:** `run_slice.cmd <sliceId>` · **Run phase:** `run_phase.cmd docs/SOP/PHASE_PLANS/post_validation_commercial_validation.json`
+
+### Validation Chapter — relay queue (baseline **`main`**) — **COMPLETE**
+
 
 **Sprint spec:** [`docs/SOP/SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md) · **Phase plan:** [`docs/SOP/PHASE_PLANS/validation_chapter_relay.json`](PHASE_PLANS/validation_chapter_relay.json)
 
@@ -25,11 +43,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `Validation-Chapter-Deploy-Slice003` — [VALIDATION_DEPLOY_WITNESS.md](VALIDATION_DEPLOY_WITNESS.md) (2026-05-19) | CONTROL |
 | **CLOSED** | `Validation-Chapter-Closeout-Slice004` — chapter complete; evidence per [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md) | CONTROL |
 
-**Validation Chapter status:** **COMPLETE** (2026-05-19). **Next roadmap chapter (SELECTION only):** [POST_VALIDATION_CHAPTER_SELECTION.md](POST_VALIDATION_CHAPTER_SELECTION.md) — **Commercial Validation** (paid-beta / research-offer surface); **no BUILD** until charter approved.
+**Validation Chapter status:** **COMPLETE** (2026-05-19). SELECTION record: [POST_VALIDATION_CHAPTER_SELECTION.md](POST_VALIDATION_CHAPTER_SELECTION.md).
 
-**Operator (not relay):** [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); evidence clock [MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md) + tracker [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md); reality checks [VALIDATION_REALITY_CHECKS.md](VALIDATION_REALITY_CHECKS.md).
-
-**Run one slice:** `run_slice.cmd <sliceId>` · **Run phase:** `run_phase.cmd docs/SOP/PHASE_PLANS/validation_chapter_relay.json`
+**Operator (Validation, archived):** [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md); [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md).
 
 ### MVP1 Phase placement (repo-truth)
 This placement is repo-grounded; it is allowed to contradict legacy “phase complete” language.

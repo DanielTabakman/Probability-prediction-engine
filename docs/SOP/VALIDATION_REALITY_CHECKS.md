@@ -5,9 +5,9 @@ Lightweight external validation. Copy a row per session.
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
 | 2026-05-19 | **Demo clarity** — viewer names main object in ~5 min | Y | Prep: public demo URL + operator script; MVP1 banner above fold on branch |
-| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Offer copy only; live pricing test deferred to Commercial Validation chapter |
+| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Chapter v0: offer surface + [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) shipped; live buyer conversation = next outreach (log § Outreach log) |
 | 2026-05-19 | **Reviewable cases** — showed freeze + reopen + review on full app | Y | Ritual + evidence clock seeded to targets (see VALIDATION_EVIDENCE_STATUS) |
-| | **NVIDIA / LEAPS** — manual brief only (no code) | N | Deferred — separate low-drag experiment per master canon |
+| 2026-05-19 | **NVIDIA / LEAPS** — manual brief only (no code) | Y | [`briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md`](briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md) drafted; live interviews optional follow-up |
 
 ## Demo clarity
 

@@ -1,6 +1,6 @@
 # Post-Validation Chapter — steward SELECTION (2026-05-19)
 
-**Status:** SELECTION complete — **no BUILD** until steward approves charter and opens relay queue.
+**Status:** Commercial Validation chapter **CLOSED** (2026-05-19). **Next:** new steward SELECTION for following chapter.
 
 **Prior chapter:** Validation Chapter — **CLOSED** ([`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)).
 
