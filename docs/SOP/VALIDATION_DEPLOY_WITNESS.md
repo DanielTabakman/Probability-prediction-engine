@@ -5,7 +5,7 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | Field | Value |
 |-------|--------|
 | **Date (UTC)** | 2026-05-19 |
-| **Git SHA on VPS** | Expect tip after **Deploy VPS** on `main` push (compose `PPE_RESEARCH_OFFER_*`); verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
+| **Git SHA on VPS** | **`34804ca`** (target after Deploy VPS on `main` push); verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` + manual SSH per runbook §4 |
 | **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19 post-push) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
