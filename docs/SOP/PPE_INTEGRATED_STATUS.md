@@ -20,7 +20,7 @@ flowchart LR
     P2[Phase 2 OPEN]
     S003[Product-Slice003 CLOSED]
     S004[Closeout-Slice004 CLOSED]
-    S005[Product-Slice005 NEXT]
+    S005[Product-Slice005 CLOSED]
   end
   subgraph steward [Steward parallel]
     ENV[VPS .env CTA]
@@ -56,7 +56,7 @@ flowchart LR
 | **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` | CONTROL |
 | **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions (copy + harness) | PRODUCT |
 | **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint | CONTROL |
-| **NEXT** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
 
 **Reconcile:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) — Sprint004 directional strip **already_on_main**; no blind recovery merge.
 
@@ -68,7 +68,7 @@ flowchart LR
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **157** passed (product @ `01c89cf`; docs @ `566f4f0`) |
+| `python -m pytest -q` | **PASS** | **159** passed (Slice005 panel parity) |
 | Dual smoke (post–Slice003) | **PASS** | `20260519_144000` + `20260519_144350` |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
@@ -106,6 +106,7 @@ git rev-parse HEAD   # expect main @ 566f4f0+ after agent push
 | Reconcile port/defer matrix | [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) |
 | Phase 2 evidence clock | [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
+| Risk register | [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md) |
 | Commercial ops + smoke history | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 
 ---
@@ -123,4 +124,4 @@ git rev-parse HEAD   # expect main @ 566f4f0+ after agent push
 
 ## Next BUILD (agent lane)
 
-**Chartered:** `MVP1-Phase2-Product-Slice005` — bounded parity audit of MVP1 decision surface vs verification panel copy/labels on `main` (see [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md)). **Not** a full substrate module port.
+**Slice005 CLOSED** 2026-05-19 — see parity table in [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md). **Next:** steward **SELECTION** for post–Slice005 work. **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

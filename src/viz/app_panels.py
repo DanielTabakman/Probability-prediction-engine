@@ -17,6 +17,41 @@ from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import build_trust_strip_lines
 
 
+def format_mvp1_materiality_caption(mvp1: dict) -> str | None:
+    """Single-line width-gap witness from `mvp1_decision.materiality` (parity across panels)."""
+    mat = mvp1.get("materiality") if isinstance(mvp1, dict) else None
+    if not isinstance(mat, dict):
+        return None
+    return (
+        f"Width gap: market {mat.get('market_width_1sigma_move_pct', '—')}% vs "
+        f"benchmark {mat.get('benchmark_width_1sigma_move_pct', '—')}% · "
+        f"M_ratio={mat.get('m_ratio', '—')} ({mat.get('materiality_rule_version', '')})"
+    )
+
+
+def _render_mvp1_decision_digest(mvp1: dict, *, bordered: bool) -> None:
+    """Shared MVP1 decision fields from verification `mvp1_decision` payload."""
+    state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
+    if bordered:
+        with st.container(border=True):
+            st.markdown(f"##### MVP1 output: **{state}**")
+            st.caption(mvp1.get("primary_output_reason") or "")
+            c1, c2, c3 = st.columns(3)
+    else:
+        st.markdown(f"##### MVP1 output: **{state}**")
+        st.caption(mvp1.get("primary_output_reason") or "")
+        c1, c2, c3 = st.columns(3)
+    with c1:
+        st.write("**Data quality:**", mvp1.get("data_quality", "—"))
+    with c2:
+        st.write("**Classification:**", mvp1.get("classification_label", "—"))
+    with c3:
+        st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+    mat_cap = format_mvp1_materiality_caption(mvp1)
+    if mat_cap:
+        st.caption(mat_cap)
+
+
 def render_belief_vs_market_glance(v: dict) -> None:
     """Compact BTC belief vs market card — values trace to verification payload / classification_trace."""
     g = v.get("belief_vs_market_glance") if isinstance(v, dict) else None
@@ -262,17 +297,7 @@ def render_mvp1_primary_output_compact(v: dict) -> None:
     mvp1 = v.get("mvp1_decision") if isinstance(v, dict) else None
     if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
         return
-    state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
-    with st.container(border=True):
-        st.markdown(f"##### MVP1 output: **{state}**")
-        st.caption(mvp1.get("primary_output_reason") or "")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
-        with c2:
-            st.write("**Classification:**", mvp1.get("classification_label", "—"))
-        with c3:
-            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+    _render_mvp1_decision_digest(mvp1, bordered=True)
 
 
 def render_implied_lab_verification(v: dict) -> None:
@@ -283,23 +308,7 @@ def render_implied_lab_verification(v: dict) -> None:
 
     mvp1 = v.get("mvp1_decision")
     if isinstance(mvp1, dict) and mvp1.get("primary_output_state"):
-        state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
-        st.markdown(f"##### MVP1 output: **{state}**")
-        st.caption(mvp1.get("primary_output_reason") or "")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
-        with c2:
-            st.write("**Classification:**", mvp1.get("classification_label", "—"))
-        with c3:
-            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
-        mat = mvp1.get("materiality")
-        if isinstance(mat, dict):
-            st.caption(
-                f"Width gap: market {mat.get('market_width_1sigma_move_pct', '—')}% vs "
-                f"benchmark {mat.get('benchmark_width_1sigma_move_pct', '—')}% · "
-                f"M_ratio={mat.get('m_ratio', '—')} ({mat.get('materiality_rule_version', '')})"
-            )
+        _render_mvp1_decision_digest(mvp1, bordered=False)
 
     vs = v.get("verification_summary")
     if isinstance(vs, dict) and vs:

@@ -11,7 +11,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
 - **Active BUILD chapter:** **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) · [`PHASE_PLANS/mvp1_phase2_on_main_relay.json`](PHASE_PLANS/mvp1_phase2_on_main_relay.json).
 - **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md) — Slice005 chartered.
-- **Next slice:** `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit — [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md).
+- **Next slice:** steward **SELECTION** for post–Slice005 BUILD (no new slice chartered on frontier).
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA PASS; paid-interest call (**N** until live conversation).
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
 
@@ -23,7 +23,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` — [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) | CONTROL |
 | **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions alignment (copy + harness) | PRODUCT |
 | **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint after Product-Slice003 | CONTROL |
-| **NEXT** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
 
 **Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
 

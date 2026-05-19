@@ -10,8 +10,8 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **157** passed (2026-05-19, Product-Slice003) |
-| Dual smoke | **PASS** | `20260519_144000` + `20260519_144350` (post–Slice003) |
+| `python -m pytest -q` | **PASS** | **159** passed (2026-05-19, Product-Slice005) |
+| Dual smoke | **PASS** | `20260519_150936` + `20260519_151210` (post–Slice005 viz) |
 
 ---
 
@@ -23,6 +23,26 @@
 | Reconcile-Slice002 | **CLOSED** 2026-05-19 |
 | Product-Slice003 | **CLOSED** 2026-05-19 — MVP1 UI exclusions alignment |
 | Closeout-Slice004 | **CLOSED** 2026-05-19 — checkpoint |
+| Product-Slice005 | **CLOSED** 2026-05-19 — decision surface / panel parity |
+
+---
+
+## Product-Slice005 — decision surface parity audit
+
+**Module:** [`src/viz/mvp1_decision_surface.py`](../../src/viz/mvp1_decision_surface.py) · **Panels:** [`src/viz/app_panels.py`](../../src/viz/app_panels.py) · **Payload:** [`src/viz/implied_lab_provenance.py`](../../src/viz/implied_lab_provenance.py) (`mvp1_decision` + mirrored `verification_summary` fields)
+
+| Area | Status | Notes |
+|------|--------|-------|
+| `primary_output_state` / reason | **matched** | Compact + verification via `_render_mvp1_decision_digest` |
+| `data_quality`, `classification_label`, `expression_family` | **matched** | Same three-column layout |
+| `materiality` (M_ratio caption) | **fixed** | Was verification-only; compact now uses `format_mvp1_materiality_caption` |
+| `verification_summary` mirror fields | **matched** | Set from `build_mvp1_decision_surface` in provenance (no drift) |
+| `mvp1_benchmark_substrate` | **defer** | Recovery-only per reconcile |
+| Blind `app.py` merge | **defer** | — |
+
+**Tests added:** [`tests/test_mvp1_panel_parity.py`](../../tests/test_mvp1_panel_parity.py)
+
+**Risk register:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md)
 
 ---
 
@@ -34,6 +54,17 @@
 | 20260519_144350 | A_width_target_payoff | 0 | 99.6 |
 
 **Dual smoke total:** ~346.3s.
+
+---
+
+## Product-Slice005 smoke witness
+
+| Run ID | Scenario | Exit | elapsed_s |
+|--------|----------|------|-----------|
+| 20260519_150936 | MVP1_compact_verification | 0 | 141.2 |
+| 20260519_151210 | A_width_target_payoff | 0 | 89.8 |
+
+**Dual smoke total:** ~253.4s.
 
 ---
 
@@ -52,5 +83,5 @@ Full matrix: [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md). Directi
 
 ## Next BUILD
 
-- **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
-- **Slice005:** [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md) — decision surface / panel parity audit
+- **SELECTION:** steward pick for next Phase 2 slice or chapter closeout (Slice005 **CLOSED**).
+- **Risk register:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md)

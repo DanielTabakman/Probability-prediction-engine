@@ -16,26 +16,26 @@ A) DOC-STATE SAFETY (alignment)
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
 - Active MVP1 focus: **Phase 2 on `main`** — [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md)
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability — **COMPLETE** 2026-05-19
-- Phase 2 progress: Slices001–004 **CLOSED**; Sprint004 strip **already_on_main**
-- Next pending execution step: `MVP1-Phase2-Product-Slice005` — [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md)
+- Phase 2 progress: Slices001–005 **CLOSED**; Sprint004 strip **already_on_main**
+- Next pending execution step: steward **SELECTION** for post–Slice005 BUILD
 - SELECTION: [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)
-- Steward parallel: VPS `.env` CTA PASS; paid-interest **N** until live call
+- Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 
 B) REPO-STATE SAFETY (reproducibility)
 - Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main`)
 - Baseline SHA: `566f4f0`+ (verify `git rev-parse origin/main`)
-- BUILD allowed: YES — bounded PRODUCT per Slice005 spec + reconcile defer list
+- BUILD allowed: YES — after steward SELECTION; honor reconcile defer list
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `PHASE2_RECONCILE_REPORT.md` + `MVP1_PHASE2_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `PPE_RISK_REGISTER.md` + `MVP1_PHASE2_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**Phase 2 on `main`** — Product-Slice003 **shipped** (copy/harness only; directional strip already on `main`). **Next:** Product-Slice005 parity audit. Canon: [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md).
+**Phase 2 on `main`** — Product-Slice005 **CLOSED** (decision surface / panel parity). **Next:** steward SELECTION. Canon: [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) · risks: [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
 
 ## Hard rule reminders
 
@@ -45,9 +45,9 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-1. **BUILD:** `MVP1-Phase2-Product-Slice005` per [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md).
-2. **Steward:** VPS CTA + paid-interest ([`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md), [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)).
+1. **Steward:** SELECTION for next BUILD slice; VPS CTA + paid-interest ([`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md), [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)).
+2. **Agent:** await SELECTION; do not blind-merge recovery ([`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md)).
 
 ## Last updated
 
-2026-05-19 — integrated status + Slice005 SELECTION chartered.
+2026-05-19 — Slice005 CLOSED; risk register added.
