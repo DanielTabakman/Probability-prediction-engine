@@ -2038,3 +2038,4 @@ render_market_reference_sections(
 )
 
 st.sidebar.caption("Phase 1: data ingest. Next: canonical events → probabilities → opportunities.")
+# Orch-Smoke relay slice marker — pipeline validation only; no semantic/UI change.
