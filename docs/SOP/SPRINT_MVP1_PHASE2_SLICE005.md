@@ -3,7 +3,7 @@
 **Parent sprint:** [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md)  
 **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md)  
 **Reconcile matrix:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md)  
-**Baseline:** **`main`** @ `f828fb3`+
+**Baseline:** **`main`** @ `566f4f0`+
 
 **Status:** **CHARTERED** (stub) — not started until BUILD agent accepts slice.
 
