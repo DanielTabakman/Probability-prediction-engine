@@ -1,6 +1,6 @@
 # MVP1 onboarding / How it works — evidence status
 
-**Chapter:** [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) · **SELECTION:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md)
+**Chapter:** [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) · **SELECTION:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · **Next SELECTION prep:** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
 
 ---
 
@@ -29,6 +29,14 @@
 
 ---
 
+## Chapter close (witness)
+
+**`MVP1-OnboardingHowItWorks-Closeout-Slice004`** — **CLOSED** 2026-05-20.
+
+- Steering + handoff + integrated status + continuity brief + SELECTION outcome tail synced; steward prep [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md) created.
+
+---
+
 ## Chapter status
 
-**IN PROGRESS** — Product-Slice002 + Smoke-Slice003 **CLOSED** 2026-05-20. **Next:** `MVP1-OnboardingHowItWorks-Closeout-Slice004` (chapter close / steward).
+**COMPLETE** 2026-05-20.
