@@ -14,7 +14,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.viz.decision_ready_review import build_decision_ready_review_payload
-from src.viz.implied_lab_provenance import build_trust_strip_lines
+from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
 
 
 def format_mvp1_materiality_caption(mvp1: dict) -> str | None:
@@ -29,27 +29,41 @@ def format_mvp1_materiality_caption(mvp1: dict) -> str | None:
     )
 
 
-def _render_mvp1_decision_digest(mvp1: dict, *, bordered: bool) -> None:
+def _primary_output_state_label(mvp1: dict) -> str:
+    return str(mvp1.get("primary_output_state", "")).replace("_", " ")
+
+
+def _render_mvp1_decision_digest(mvp1: dict, *, bordered: bool, friends_first: bool = False) -> None:
     """Shared MVP1 decision fields from verification `mvp1_decision` payload."""
-    state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
+    state = _primary_output_state_label(mvp1)
+    title = f"**{state}**" if friends_first else f"##### MVP1 output: **{state}**"
+    reason = mvp1.get("primary_output_reason") or ""
+
+    def _body() -> None:
+        if friends_first:
+            st.markdown(title)
+            if reason:
+                st.caption(reason)
+        else:
+            st.markdown(title)
+            st.caption(reason)
+        c1, c2, c3 = st.columns(3)
+        dq_label = "MVP1 data quality" if friends_first else "Data quality"
+        with c1:
+            st.write(f"**{dq_label}:**", mvp1.get("data_quality", "—"))
+        with c2:
+            st.write("**Classification:**", mvp1.get("classification_label", "—"))
+        with c3:
+            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+        mat_cap = format_mvp1_materiality_caption(mvp1)
+        if mat_cap:
+            st.caption(mat_cap)
+
     if bordered:
         with st.container(border=True):
-            st.markdown(f"##### MVP1 output: **{state}**")
-            st.caption(mvp1.get("primary_output_reason") or "")
-            c1, c2, c3 = st.columns(3)
+            _body()
     else:
-        st.markdown(f"##### MVP1 output: **{state}**")
-        st.caption(mvp1.get("primary_output_reason") or "")
-        c1, c2, c3 = st.columns(3)
-    with c1:
-        st.write("**Data quality:**", mvp1.get("data_quality", "—"))
-    with c2:
-        st.write("**Classification:**", mvp1.get("classification_label", "—"))
-    with c3:
-        st.write("**Expression family:**", mvp1.get("expression_family", "—"))
-    mat_cap = format_mvp1_materiality_caption(mvp1)
-    if mat_cap:
-        st.caption(mat_cap)
+        _body()
 
 
 def render_belief_vs_market_glance(v: dict) -> None:
@@ -169,6 +183,47 @@ def render_trust_strip(verification: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Trust / provenance")
         st.caption("\n\n".join(lines))
+
+
+def trust_strip_at_a_glance_lines(verification: dict | None, *, max_lines: int = 4) -> list[str]:
+    """Compact trust lines for above-fold MVP1 (no duplicate primary-output lines)."""
+    lines = build_trust_strip_lines(verification if isinstance(verification, dict) else None)
+    compact: list[str] = []
+    for line in lines:
+        if "MVP1 primary output" in line:
+            continue
+        if "expand **Verification**" in line:
+            continue
+        compact.append(line)
+        if len(compact) >= max_lines:
+            break
+    return compact if compact else [TRUST_STRIP_FALLBACK_LINE]
+
+
+def render_trust_strip_at_a_glance(verification: dict) -> None:
+    """Compact trust lines for above-fold MVP1 (no duplicate primary-output lines)."""
+    compact = trust_strip_at_a_glance_lines(verification)
+    st.markdown("##### Trust / provenance")
+    st.markdown("\n\n".join(compact))
+
+
+def render_mvp1_friends_first_above_fold(verification: dict) -> None:
+    """
+    Above-fold MVP1 block: what this run is saying + compact decision + trust (before chart).
+  """
+    if not isinstance(verification, dict):
+        return
+    mvp1 = verification.get("mvp1_decision")
+    if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
+        return
+    with st.container(border=True):
+        st.markdown("##### What this run is saying")
+        st.caption(
+            "Plain-English read from this marks snapshot — research insight, not trade advice."
+        )
+        _render_mvp1_decision_digest(mvp1, bordered=False, friends_first=True)
+        st.divider()
+        render_trust_strip_at_a_glance(verification)
 
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
@@ -293,11 +348,11 @@ def render_width_vol_history_panel(*, selected_expiry_str: str) -> None:
 
 
 def render_mvp1_primary_output_compact(v: dict) -> None:
-    """Above-fold MVP1 decision digest (chart → this → review/freeze)."""
+    """Legacy compact digest below chart (post-MVP1 lab only). MVP1 mode uses friends-first above-fold."""
     mvp1 = v.get("mvp1_decision") if isinstance(v, dict) else None
     if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
         return
-    _render_mvp1_decision_digest(mvp1, bordered=True)
+    _render_mvp1_decision_digest(mvp1, bordered=True, friends_first=False)
 
 
 def render_implied_lab_verification(v: dict) -> None:

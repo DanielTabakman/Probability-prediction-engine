@@ -3,14 +3,14 @@
 Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Control rule (hard)
-- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (full doc re-imported 2026-05-18; §12 audit + §15A repo-truth)
+- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (§15B–15F vision import 2026-05-20; §15A repo-truth)
 - **This file** is the only live frontier/steering truth.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md))
-- **Last closed chapter:** **MVP1 smoke regression** — **COMPLETE** 2026-05-19
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_FRIENDS_FIRST_SELECTION.md`](POST_MVP1_FRIENDS_FIRST_SELECTION.md))
+- **Last closed chapter:** **MVP1 friends-first screen** — **COMPLETE** 2026-05-20
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
@@ -60,7 +60,18 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-SmokeRegression-Witness-Slice003` — dual smoke green | CONTROL |
 | **CLOSED** | `MVP1-SmokeRegression-Closeout-Slice004` — chapter close | CONTROL |
 
-**Evidence:** [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)
+**Evidence:** [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md)
+
+### MVP1 friends-first screen — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-FriendsFirst-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-FriendsFirst-Product-Slice002` — above-fold headline + trust-at-a-glance | PRODUCT |
+| **CLOSED** | `MVP1-FriendsFirst-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **CLOSED** | `MVP1-FriendsFirst-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_FRIENDS_FIRST_SELECTION.md`](POST_MVP1_FRIENDS_FIRST_SELECTION.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 

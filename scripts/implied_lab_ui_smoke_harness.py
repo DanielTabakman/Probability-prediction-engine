@@ -594,6 +594,7 @@ def _scroll_main_content(page) -> None:
 
 def _mvp1_compact_marker_visible(page) -> bool:
     for marker in (
+        "What this run is saying",
         "MVP1 output:",
         "MVP1 primary output",
         "MVP1 data quality",
@@ -663,7 +664,13 @@ def _collect_verification_observation(page, result: ScenarioResult) -> None:
             "disagreement classification",
         )
         if result.scenario == "MVP1_compact_verification":
-            markers = ("MVP1 output:", "Verification summary", "disagreement classification")
+            markers = (
+                "What this run is saying",
+                "MVP1 data quality",
+                "MVP1 output:",
+                "Verification summary",
+                "disagreement classification",
+            )
         for marker in markers:
             loc = page.locator(f"text={marker}").first
             if loc.count() > 0:
