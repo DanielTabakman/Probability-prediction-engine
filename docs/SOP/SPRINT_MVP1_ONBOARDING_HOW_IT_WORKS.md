@@ -45,12 +45,12 @@ Ship a bounded **“How it works”** education surface in the MVP1 implied lab 
 
 **Closed** 2026-05-20 — dual smoke `20260520_042057` + `20260520_042128` (~127s).
 
-### MVP1-OnboardingHowItWorks-Closeout-Slice004 — chapter close (CONTROL) — **OPEN**
+### MVP1-OnboardingHowItWorks-Closeout-Slice004 — chapter close (CONTROL) — **CLOSED**
 
-Chapter close: integrated status + handoff + SELECTION prep for the following chapter (steward).
+**Closed** 2026-05-20 — [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), [`HANDOFF.md`](HANDOFF.md), [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md), [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md), [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md); SELECTION prep [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md).
 
 ---
 
 ## Sprint status
 
-**IN PROGRESS** — SELECTION 2026-05-20; **Control-Slice001** closed 2026-05-20; **Product-Slice002** + **Smoke-Slice003** closed 2026-05-20.
+**COMPLETE** 2026-05-20.

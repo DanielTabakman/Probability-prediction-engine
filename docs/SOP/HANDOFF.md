@@ -14,26 +14,26 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **MVP1 onboarding / How it works (v0)** — **IN PROGRESS**; Product-Slice002 + Smoke-Slice003 **CLOSED** 2026-05-20; belief-input UX **COMPLETE** 2026-05-20
-- Closed chapters: … friends-first screen, belief-input UX (see `MVP1_FRONTIER.md`)
-- Next pending execution step: **`MVP1-OnboardingHowItWorks-Closeout-Slice004`** (CONTROL) — chapter close; see `docs/SOP/SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md` + `docs/SOP/MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`
-- Steward parallel: VPS `.env` CTA **pending**; verify VPS after **merge** of onboarding Product+Smoke slice; paid-interest **N**
+- Active MVP1 focus: **none** — onboarding / How it works **COMPLETE** 2026-05-20
+- Closed chapters: … friends-first screen, belief-input UX, onboarding / How it works (see `MVP1_FRONTIER.md`)
+- Next pending execution step: **none** — steward **deferred next SELECTION** (prep only: `docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`)
+- Steward parallel: VPS `.env` CTA **pending**; verify VPS after pull of closeout merge; paid-interest **N**
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 
 B) REPO-STATE SAFETY (reproducibility)
 - Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main` after pull)
-- Baseline SHA: verify `git rev-parse origin/main` after merge of onboarding Product+Smoke slice
-- BUILD allowed: chartered chapter active; honor reconcile defer list
+- Baseline SHA: verify `git rev-parse origin/main` after merge of onboarding closeout slice
+- BUILD allowed: only after steward SELECTION; honor reconcile defer list
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md` + `MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md` + `MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**`origin/main`** (after merge) — MVP1 **onboarding / How it works**: **Product-Slice002** + **Smoke-Slice003** closed 2026-05-20. **Next:** `MVP1-OnboardingHowItWorks-Closeout-Slice004`.
+**`origin/main`** (after merge) — MVP1 **onboarding / How it works** chapter **COMPLETE** 2026-05-20. **Next:** steward **SELECTION** — prep [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md).
 
 ## Hard rule reminders
 
@@ -50,4 +50,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-05-20 — **Product-Slice002** + **Smoke-Slice003** closed (How it works expander + dual smoke); **next** Closeout-Slice004; handoff synced.
+2026-05-20 — `MVP1-OnboardingHowItWorks-Closeout-Slice004` closed; onboarding chapter **COMPLETE**; SELECTION prep doc added; handoff synced.
