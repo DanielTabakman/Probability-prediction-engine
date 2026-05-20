@@ -20,6 +20,9 @@ if "%SPRINT_SPEC%"=="" set "SPRINT_SPEC=docs/SOP/SPRINT_VALIDATION_CHAPTER.md"
 set "DECLARED_PLANE=%~3"
 if "%DECLARED_PLANE%"=="" set "DECLARED_PLANE=PRODUCT-PLANE"
 
+set "PHASE_PLAN=%~4"
+if "%PHASE_PLAN%"=="" set "PHASE_PLAN=%PPE_PHASE_PLAN%"
+
 set "BASELINE_BRANCH=main"
 
 for /f "tokens=1-4 delims=/.- " %%a in ("%date%") do set "YYYYMMDD=%%d%%b%%c"
@@ -72,6 +75,11 @@ popd >nul
 python "%REPO_ROOT%\scripts\log_event.py" --event-type "run_slice.end" --summary "End slice %SLICE_ID% exit_code=%EXIT_CODE%" --actor "wrapper" --ref "kind=cmd,path=run_slice.cmd" >nul 2>nul
 
 python "%REPO_ROOT%\scripts\write_last_run_report.py" --repo-root "%REPO_ROOT%" --kind slice --exit-code %EXIT_CODE% --slice-id "%SLICE_ID%" --baseline-branch "%BASELINE_BRANCH%" --build-branch "%BUILD_BRANCH%" --sprint-spec "%SPRINT_SPEC%" --declared-plane "%DECLARED_PLANE%" >nul 2>nul
+
+if not "%PHASE_PLAN%"=="" (
+  python "%REPO_ROOT%\scripts\post_relay_continue.py" --repo-root "%REPO_ROOT%" --phase-plan "%PHASE_PLAN%" --orchestrator-exit-code %EXIT_CODE%
+  if errorlevel 1 exit /b 1
+)
 powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO_ROOT%\scripts\notify_run_finished.ps1" -RepoRoot "%REPO_ROOT%" >nul 2>nul
 
 REM Clear active-run marker on completion.

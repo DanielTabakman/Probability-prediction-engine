@@ -4,8 +4,8 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 (operator hardening witness refresh) |
-| **Git SHA on VPS** | **`7961c33`**+ (target via Deploy VPS on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` |
+| **Date (UTC)** | 2026-05-20 (friends-first merge + manual Deploy VPS dispatch) |
+| **Git SHA on VPS** | **`542cd4c`**+ (PR #9 on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` after [Deploy VPS](https://github.com/DanielTabakman/Probability-prediction-engine/actions/workflows/deploy-vps.yml) run **26146010358**+ |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
 | **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |

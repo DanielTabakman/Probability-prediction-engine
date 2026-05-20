@@ -107,6 +107,10 @@ def _ensure_belief_uncertainty_sigma_mode(page) -> None:
     ).first
     if details.count() == 0:
         raise RuntimeError("Belief expander not found for σ_ln mode")
+    try:
+        _expand_expander(page, "Advanced uncertainty")
+    except Exception:
+        pass
     label = details.locator("label").filter(
         has_text=re.compile(r"σ_ln\s*\(advanced\)", re.I)
     ).first

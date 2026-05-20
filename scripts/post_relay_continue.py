@@ -1,0 +1,121 @@
+"""After orchestrator slice/phase exit 0: chain apply_control_closeout_v1 on CONTINUE."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
+
+
+def _find_newest_relay_run(repo_root: Path) -> Path | None:
+    candidates: list[Path] = []
+    relay_runs = repo_root / "artifacts" / "relay" / "runs"
+    if relay_runs.is_dir():
+        candidates.extend(relay_runs.glob("*/relay_result.json"))
+    wt = repo_root / "_worktrees" / "acp_orchestrator"
+    if wt.is_dir():
+        candidates.extend(wt.glob("*/artifacts/relay/runs/*/relay_result.json"))
+    existing = [p.parent for p in candidates if p.is_file()]
+    if not existing:
+        return None
+    return max(existing, key=lambda p: p.stat().st_mtime)
+
+
+def _load_decision(run_dir: Path) -> dict | None:
+    p = run_dir / "decision.json"
+    if not p.is_file():
+        return None
+    return json.loads(p.read_text(encoding="utf-8-sig"))
+
+
+def _load_relay_result(run_dir: Path) -> dict | None:
+    p = run_dir / "relay_result.json"
+    if not p.is_file():
+        return None
+    return json.loads(p.read_text(encoding="utf-8-sig"))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Post-CONTINUE closeout hook")
+    parser.add_argument("--repo-root", type=Path, default=Path.cwd())
+    parser.add_argument("--phase-plan", type=Path, required=True)
+    parser.add_argument("--relay-run-dir", type=Path, default=None)
+    parser.add_argument("--orchestrator-exit-code", type=int, default=0)
+    parser.add_argument("--commit", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args(argv)
+
+    if args.orchestrator_exit_code != 0:
+        print(f"post_relay_continue: skip (orchestrator exit {args.orchestrator_exit_code})")
+        return 0
+
+    repo = args.repo_root.resolve()
+    run_dir = args.relay_run_dir
+    if run_dir is None:
+        run_dir = _find_newest_relay_run(repo)
+    if run_dir is None:
+        print("post_relay_continue: no relay run found; skip")
+        return 0
+
+    decision = _load_decision(run_dir)
+    relay = _load_relay_result(run_dir)
+    if decision is None and relay is None:
+        print(f"post_relay_continue: no artifacts in {run_dir}; skip")
+        return 0
+
+    dec_val = (decision or {}).get("decision")
+    if dec_val != "CONTINUE":
+        print(f"post_relay_continue: decision={dec_val!r}; skip closeout")
+        return 0
+
+    slice_id = (relay or {}).get("slice_id")
+    if not slice_id:
+        print("post_relay_continue: missing slice_id; skip")
+        return 0
+
+    plan = load_phase_plan(args.phase_plan.resolve())
+    if find_closeout_for_slice(plan, slice_id) is None:
+        print(f"post_relay_continue: slice {slice_id} has no closeout block; skip")
+        return 0
+
+    if args.dry_run:
+        print(f"post_relay_continue: would run closeout for {slice_id}")
+        return 0
+
+    import os
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(repo)
+    cmd = [
+        sys.executable,
+        str(repo / "scripts" / "relay_runtime_v0.py"),
+        "--repo-root",
+        str(repo),
+        "stage",
+        "apply_control_closeout_v1",
+        "--phase-plan",
+        str(args.phase_plan.resolve()),
+        "--relay-run-dir",
+        str(run_dir.resolve()),
+        "--slice-id",
+        slice_id,
+    ]
+    proc = subprocess.run(cmd, cwd=repo, env=env)
+    if proc.returncode != 0:
+        return proc.returncode
+
+    if args.commit:
+        subprocess.run(["git", "add", "-A", "docs/SOP"], cwd=repo, check=False)
+        msg = f"control-closeout: {slice_id}"
+        subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=False)
+
+    print(f"post_relay_continue: closeout OK for {slice_id}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

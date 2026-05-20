@@ -1,6 +1,6 @@
 # Post–MVP1 friends-first screen — steward SELECTION (prep)
 
-**Status:** Friends-first chapter **COMPLETE** (verify closeout date in [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md)). **Agent BUILD:** **stopped here** — no next chapter chartered. **Steward:** pick next BUILD from deferred table below when ready.
+**Status:** Friends-first **COMPLETE**. Successor: belief-input UX **IN PROGRESS** ([`POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md`](POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md)).
 
 **Closed record:** [`SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md`](SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md) · [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md)
 

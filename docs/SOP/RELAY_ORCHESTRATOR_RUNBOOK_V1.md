@@ -4,7 +4,7 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 ### Roles
 
-- **Steward / human**: SELECTION and CONTROL-CLOSEOUT authority (see `docs/SOP/MVP1_FRONTIER.md`). For **routine ship to production**, the steward is **not** in the GitHub merge path when checks are green: see [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md) (design, troubleshoot, supervise—no standing approval gate).
+- **Steward / human**: SELECTION authority and disposition of `STOP_FOR_REVIEW` / `BLOCKED`. **CONTROL-CLOSEOUT** is automated via relay job `apply_control_closeout_v1` (`RELAY_RUNTIME_V1.md`). For **routine ship to production**, the steward is **not** in the GitHub merge path when checks are green: see [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md).
 - **Relay** (`scripts/relay_runtime_v0.py`): hard gate — stages jobs, validates §14 payload, emits §15 decision.
 - **Orchestrator** (`ppe-orchestrator-acp`, sibling repo): driver — creates worktrees, runs ACP workers, watches time, retries when relay allows.
 - **Worker** (`agent acp` session): does the slice work and writes `relay_result.json`.
@@ -29,6 +29,9 @@ From repo root:
 2. Run:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
+4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically.
+
+Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 
 ### Artifacts (where to look)
 
@@ -45,10 +48,13 @@ From repo root:
   - Optional: set `PPE_NOTIFY=0` to disable Windows toast/beeps from `scripts/notify_run_finished.ps1`
 - **UI smoke** (when applicable):
   - `artifacts/ui_smoke/<timestamp>/...`
+- **Agent continuity** (after closeout job):
+  - `docs/SOP/AGENT_CONTINUITY_BRIEF.md`
+  - `artifacts/control_plane/continuity_brief.json`
 
 ### Feedback loop (what gets updated after a run)
 
-- If relay returns **CONTINUE**: steward performs CONTROL-CLOSEOUT and updates canonical steering docs (typically `docs/SOP/MVP1_FRONTIER.md`).
+- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`).
 - If relay returns **RETRY_ALLOWED**: orchestrator re-runs the worker (max 2 attempts total).
 - If relay returns **STOP_FOR_REVIEW** or **BLOCKED**: stop; steward decides whether to open RECOVERY, adjust slice scope, or defer.
 
@@ -58,8 +64,7 @@ Relay may return **STOP_FOR_REVIEW** (even when BUILD + tests + artifacts are gr
 
 Steward action:
 
-- Perform promotion from the checkout that currently owns the baseline branch, and
-- Record the closeout in `docs/SOP/MVP1_FRONTIER.md` with pointers to the relay run artifacts.
+- Perform promotion from the checkout that currently owns the baseline branch, then re-run closeout with `--force` if needed.
 
 ### Shipping (GitHub)
 

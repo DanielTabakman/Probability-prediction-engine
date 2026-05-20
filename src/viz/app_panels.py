@@ -13,8 +13,102 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.viz.belief_uncertainty import (
+    move_pct_1sigma_to_sigma_ln,
+    sigma_ln_to_move_pct_1sigma,
+)
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
+
+
+def compute_mvp1_belief_overlay_state(
+    *,
+    belief_exp: str,
+    forward: float,
+    price_max: float,
+    vol: float,
+    T_years: float,
+) -> dict:
+    """
+    MVP1-friendly belief controls (§15B slice 3): human labels, ±% default, σ_ln nested.
+    Returns user_belief dict for `build_implied_lab_state` (width is σ_ln internally).
+    """
+    st.caption(
+        "Optional: add **your** view on where price might land — compare to the market curve (right)."
+    )
+    with st.expander("My belief vs market", expanded=False):
+        st.caption(
+            "Turn on a simple belief curve. This is not a forecast or trade recommendation."
+        )
+        st.checkbox(
+            "Show my belief curve",
+            key=f"belief_en_{belief_exp}",
+        )
+        st.number_input(
+            "Where you think price lands (USD peak)",
+            min_value=1000.0,
+            max_value=float(max(price_max, 1_000_000)),
+            value=float(forward),
+            step=1000.0,
+            key=f"belief_center_{belief_exp}",
+            format="%.0f",
+            help="Your best single price level for this expiry (mode of your belief curve).",
+        )
+
+        sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+        mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+        unc_mode_key = f"belief_unc_mode_{belief_exp}"
+        pct_key = f"belief_move_pct_{belief_exp}"
+        if pct_key not in st.session_state:
+            existing_sigma = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+            st.session_state[pct_key] = float(sigma_ln_to_move_pct_1sigma(existing_sigma))
+
+        st.markdown("**How unsure are you?**")
+        st.slider(
+            "Typical move by expiry (±% about 2/3 of the time, 1σ)",
+            1.0,
+            200.0,
+            float(st.session_state.get(pct_key, 22.0)),
+            0.5,
+            key=pct_key,
+            help="How far price might move up or down by expiry (one standard deviation).",
+        )
+
+        with st.expander("Advanced uncertainty (technical)", expanded=False):
+            st.radio(
+                "Uncertainty input mode",
+                ["±% move (1σ)", "σ_ln (advanced)"],
+                key=unc_mode_key,
+                horizontal=True,
+                label_visibility="collapsed",
+            )
+            sigma_key = f"belief_width_{belief_exp}"
+            st.slider(
+                "Uncertainty (σ of ln price at expiry)",
+                0.02,
+                0.8,
+                0.2,
+                0.005,
+                key=sigma_key,
+                help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+            )
+
+        unc_mode = str(st.session_state.get(unc_mode_key, "±% move (1σ)"))
+        if unc_mode == "σ_ln (advanced)":
+            sigma_ln = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+        else:
+            sigma_ln = move_pct_1sigma_to_sigma_ln(float(st.session_state.get(pct_key, 22.0)))
+
+        st.caption(
+            f"Active uncertainty σ_ln ≈ **{sigma_ln:.4f}** · "
+            f"Market horizon σ_ln ≈ **{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%** 1σ)"
+        )
+
+    return {
+        "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
+        "center_usd": float(st.session_state.get(f"belief_center_{belief_exp}", forward)),
+        "width": float(sigma_ln),
+    }
 
 
 def format_mvp1_materiality_caption(mvp1: dict) -> str | None:

@@ -84,7 +84,12 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
         )
 
     if safe_to_continue is True and ready_for_control_closeout is True:
-        return False, "continue", "No human gate implied by relay payload: proceed to next queued slice/plan or closeout docs if needed."
+        return (
+            False,
+            "continue",
+            "Relay CONTINUE: post_relay_continue runs apply_control_closeout_v1 when phase plan has closeout; "
+            "see docs/SOP/AGENT_CONTINUITY_BRIEF.md.",
+        )
 
     return True, "review", "Relay payload is ambiguous; read LAST_RUN_REPORT.json and relay_result.json for details."
 

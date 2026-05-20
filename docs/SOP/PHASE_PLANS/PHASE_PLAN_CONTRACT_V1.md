@@ -20,24 +20,47 @@ Top-level object:
 ```json
 {
   "name": "string",
-  "baselineBranch": "string (optional; wrapper defaults to CURRENT_FRONTIER baseline)",
+  "baselineBranch": "string (optional; wrapper defaults to main)",
+  "sprintSpecPath": "string (optional; repo-relative; plan-level default)",
+  "selectionRecord": "string (optional; SELECTION outcome doc)",
   "slices": [
     {
       "sliceId": "string (required)",
-      "sprintSpecPath": "string (required; repo-relative path to the sprint spec naming the slice)",
-      "declaredPlane": "PRODUCT-PLANE | EVIDENCE-PLANE (required)",
-      "buildBranch": "string (required; must be unique per run or per invocation)",
+      "declaredPlane": "CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE (required)",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "closeout": { }
     }
   ]
 }
 ```
+
+### `closeout` object (required on chapter **Closeout** slice only)
+
+Required on the final slice whose `sliceId` ends with `Closeout-Slice` (or contains `-Closeout-`). `post_relay_continue.py` refuses phase completion without it on that slice.
+
+| Field | Type | Required |
+|-------|------|----------|
+| `chapterId` | string | yes |
+| `chapterTitle` | string | yes |
+| `chapterStatus` | string | yes (`COMPLETE`) |
+| `closedDate` | string | yes (`YYYY-MM-DD`) |
+| `evidenceDoc` | string | yes (repo-relative) |
+| `sprintSpec` | string | yes |
+| `nextSelectionDoc` | string | yes |
+| `selectionOutcomeDoc` | string | no |
+| `carryDocs` | string[] | no |
+| `dualSmokeRunIds` | string[] | no |
+| `pytestCount` | int | no |
+| `closedChaptersLine` | string | no (HANDOFF gate bullet; auto-built if omitted) |
+
+Example: see `mvp1_friends_first_screen_relay.json`.
 
 Notes:
 
 - `susMinutes` and `hardMinutes` implement the **15/30 rule** (SUS at 15m; cancel at 30m).
 - `maxAttempts` is the orchestrator max total attempts. Relay may also impose retry-budget invariants.
 - Phase runner semantics are **stop-on-first-non-CONTINUE**.
+- After slice `CONTINUE`, **`apply_control_closeout_v1`** runs automatically when `closeout` is present (`RELAY_RUNTIME_V1.md`).
 
