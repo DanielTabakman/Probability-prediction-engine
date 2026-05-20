@@ -232,7 +232,9 @@ Steward/agent may interpret meaning after listing facts, but should not hand-aut
 - Be honest about **verified vs inferred** (Confirmed / High-confidence inference / Speculation).
 
 ## Git
-**Stay conservative:** do not commit, push, or create branches unless explicitly requested. Local edits are fine.
+**Authorized BUILD closeout:** follow [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc) and [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)—commit and push to feature branches when the pushable gate passes and the task is complete; do not ask “may I commit?” each time.
+
+**Otherwise stay conservative:** do not commit, push, or create branches for unclear scope, recovery without charter, or direct `main` push when PR-only delivery applies. Local edits are fine.
 
 ## Pre-edit plan
 Before editing, briefly state:
