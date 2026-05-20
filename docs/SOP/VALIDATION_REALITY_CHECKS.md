@@ -25,6 +25,16 @@ On full app: run [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md) once live in
 
 Manual research brief only — do not expand MVP1 BTC scope. Note whether customer values thesis-to-options translation.
 
+## §15F friends-first spot-check (optional)
+
+After friends-first / belief-input UX on demo: 5–10 min with 1–2 smart non-experts. Copy a row when done.
+
+| Date | Tester profile | Understood “what this run is saying” without Verification? | Trust strip noticed? | Would open again? | Notes |
+|------|----------------|--------------------------------------------------------------|----------------------|---------------------|-------|
+| _fill_ | _e.g. quant-curious friend_ | Y/N | Y/N | Y/N | |
+
+Use [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) timing; rubric detail in [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) §15F.
+
 ## Evidence targets (engineering companion)
 
 - ≥10 freezes, ≥5 completed reviews ([MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md)) — live counts in [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md)
