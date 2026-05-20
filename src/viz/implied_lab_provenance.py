@@ -116,8 +116,30 @@ def _build_expression_families_md(strategy_families: list[Any]) -> str:
             lab = str(fam.get("label") or "").strip()
             if lab:
                 labels.append(lab)
-    return "**Expression families (fit-scope only):** " + (
-        " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
+    # Wording aligned with docs/SEMANTIC_CONTRACTS.md — strategy family = fit class, not a ticket.
+    return "**Strategy families to explore (fit class, not a ticket):** " + (
+        " · ".join(labels)
+        if labels
+        else "Illustrative pattern rows live under **Review & disagreement digest**."
+    )
+
+
+def _build_mvp1_snapshot_context_md(verification: dict[str, Any]) -> str:
+    """Optional one-liner: tie strip to MVP1 decision surface on the same snapshot (descriptive only)."""
+    mvp1 = verification.get("mvp1_decision")
+    if not isinstance(mvp1, dict):
+        return ""
+    pos = mvp1.get("primary_output_state")
+    if not isinstance(pos, str) or not pos.strip():
+        return ""
+    label = pos.strip().replace("_", " ")
+    dq = mvp1.get("data_quality")
+    dq_part = ""
+    if isinstance(dq, str) and dq.strip():
+        dq_part = f" · data quality `{dq.strip()}`"
+    return (
+        f"**MVP1 snapshot (descriptive):** {label}{dq_part}. "
+        "Same classification source as **Verification** — not execution advice."
     )
 
 
@@ -147,13 +169,13 @@ def build_width_vol_candidate_strip_payload(
     why_body = str(sl[2]).strip() if len(sl) > 2 else (
         "Peak aligned with the market reference while σ_user differs from ATM-implied σ at this horizon."
     )
-    why_md = f"**Why flagged:** {why_body}"
+    why_md = f"**Disagreement read:** {why_body}"
 
     shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
     confidence_md = (
-        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
-        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not used "
-        "to choose the **width_vol** category (that comes from peak alignment × width band in the trace)."
+        f"**Shape on the sampled grid:** label **{shape_gap}** (L₁-style distance band on the chart prices). "
+        "This is a *visual summary* — **not** a win probability, edge estimate, or calibrated interval. "
+        "The **width_vol** label itself still comes **only** from peak alignment × width band in the classification trace."
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
@@ -163,11 +185,13 @@ def build_width_vol_candidate_strip_payload(
     expr_md = _build_expression_families_md(fams)
 
     falsification_md = (
-        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
-        "if the trace no longer shows **peak_aligned**, or the trace width band becomes **similar**, the category "
-        "should move out of **width_vol** under the *same* rules. Audit via **Verification** → "
-        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
+        "**Falsification — what would change this read:**\n"
+        "- **Weaker or gone:** On a rerun with refreshed marks/forward, if the trace no longer shows **peak_aligned**, "
+        "or the width band becomes **similar**, the category should move out of **width_vol** under the *same* rules.\n"
+        "- **Audit:** **Verification** → `belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
     )
+
+    mvp1_snap = _build_mvp1_snapshot_context_md(verification)
 
     return {
         "anomaly_md": anomaly_md,
@@ -176,6 +200,7 @@ def build_width_vol_candidate_strip_payload(
         "trust_artifact_md": trust_md,
         "expression_families_md": expr_md,
         "falsification_md": falsification_md,
+        "mvp1_snapshot_md": mvp1_snap,
     }
 
 
@@ -212,14 +237,14 @@ def build_directional_candidate_strip_payload(
         "Peak does not align with the market reference modal while σ_user is within "
         "the width band at this horizon."
     )
-    why_md = f"**Why flagged:** {why_body}"
+    why_md = f"**Disagreement read:** {why_body}"
 
     shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
     confidence_md = (
-        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
-        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not the "
-        "primary signal for the **directional** / **mixed** category (that comes from peak alignment × width band "
-        "in the trace). Audit: `belief_disagreement.classification_trace.delta_peak_usd` vs `peak_tolerance_usd`."
+        f"**Shape on the sampled grid:** label **{shape_gap}** (L₁-style distance band on the chart prices). "
+        "This is a *visual summary* — **not** a win probability, edge estimate, or calibrated interval. "
+        "The **directional** / **mixed** label comes from peak alignment × width band in the trace; for peak tension "
+        "see `classification_trace.delta_peak_usd` vs `peak_tolerance_usd` in **Verification**."
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
@@ -229,11 +254,14 @@ def build_directional_candidate_strip_payload(
     expr_md = _build_expression_families_md(fams)
 
     falsification_md = (
-        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
-        "if the trace shows **peak_aligned = True**, the category moves out of **directional** / **mixed** "
-        "under the *same* rules. Audit via **Verification** → "
-        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
+        "**Falsification — what would change this read:**\n"
+        "- **Weaker or gone:** On a rerun with refreshed marks/forward, if the trace shows **peak_aligned = True**, "
+        "the category moves out of **directional** / **mixed** under the *same* rules.\n"
+        "- **Audit:** **Verification** → `belief_disagreement.classification_trace` "
+        "(peak_aligned, width_band, category_id; compare `delta_peak_usd` to `peak_tolerance_usd`)."
     )
+
+    mvp1_snap = _build_mvp1_snapshot_context_md(verification)
 
     return {
         "anomaly_md": anomaly_md,
@@ -242,6 +270,7 @@ def build_directional_candidate_strip_payload(
         "trust_artifact_md": trust_md,
         "expression_families_md": expr_md,
         "falsification_md": falsification_md,
+        "mvp1_snapshot_md": mvp1_snap,
     }
 
 

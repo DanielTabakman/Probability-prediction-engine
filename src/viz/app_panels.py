@@ -323,8 +323,14 @@ def render_mvp1_friends_first_above_fold(verification: dict) -> None:
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""
     with st.container(border=True):
-        st.markdown("##### Candidate to inspect (width-shaped, v0)")
-        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.markdown("##### Candidate to inspect — width / volatility disagreement")
+        st.caption(
+            "Hypothesis for **fit exploration** only — not ranked, not sized, not execution advice. "
+            "Category matches **Verification** on this snapshot."
+        )
+        mvp1_line = str(payload.get("mvp1_snapshot_md") or "").strip()
+        if mvp1_line:
+            st.markdown(mvp1_line)
         st.markdown(payload["anomaly_md"])
         st.markdown(payload["why_md"])
         st.markdown(payload["confidence_md"])
@@ -336,8 +342,14 @@ def render_width_vol_candidate_strip_payload(payload: dict) -> None:
 def render_directional_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — directional/mixed hypothesis strip (location-shaped tension)."""
     with st.container(border=True):
-        st.markdown("##### Location-shaped tension — hypothesis to inspect")
-        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.markdown("##### Candidate to inspect — location vs market reference")
+        st.caption(
+            "Hypothesis for **fit exploration** only — not ranked, not sized, not execution advice. "
+            "Category matches **Verification** on this snapshot."
+        )
+        mvp1_line = str(payload.get("mvp1_snapshot_md") or "").strip()
+        if mvp1_line:
+            st.markdown(mvp1_line)
         st.markdown(payload["anomaly_md"])
         st.markdown(payload["why_md"])
         st.markdown(payload["confidence_md"])
