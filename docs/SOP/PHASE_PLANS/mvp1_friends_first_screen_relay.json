@@ -30,7 +30,20 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_friends_first_screen",
+        "chapterTitle": "MVP1 friends-first screen",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-20",
+        "evidenceDoc": "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION.md",
+        "carryDocs": ["docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md"],
+        "dualSmokeRunIds": ["20260520_022938", "20260520_023132"],
+        "pytestCount": 170
+      }
     }
   ]
 }

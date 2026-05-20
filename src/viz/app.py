@@ -85,6 +85,7 @@ from src.viz.app_sidebar import build_sidebar_state
 from src.viz.app_panels import (
     implied_lab_trade_ticket_code_text as _implied_lab_trade_ticket_code_text,
     maybe_append_width_vol_history as _maybe_append_width_vol_history,
+    compute_mvp1_belief_overlay_state as _compute_mvp1_belief_overlay_state,
     render_belief_vs_market_glance as _render_belief_vs_market_glance,
     render_decision_ready_review as _render_decision_ready_review,
     render_directional_candidate_strip_payload as _render_directional_candidate_strip_payload,
@@ -470,82 +471,96 @@ if show_bitcoin_view:
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
-                        st.caption("Optional belief overlay — compare a simple curve to the market-implied view (right).")
-                        with st.expander("My belief vs market", expanded=False):
+                        if post_mvp_implied_lab_ui:
                             st.caption(
-                                "Optional: compare a simple lognormal **belief** (peak = price you set) to the displayed market curve."
+                                "Optional belief overlay — compare a simple curve to the market-implied view (right)."
                             )
-                            st.checkbox(
-                                "Show my belief curve",
-                                key=f"belief_en_{belief_exp}",
-                            )
-                            st.number_input(
-                                "Belief peak — mode (USD)",
-                                min_value=1000.0,
-                                max_value=float(max(price_max, 1_000_000)),
-                                value=float(forward),
-                                step=1000.0,
-                                key=f"belief_center_{belief_exp}",
-                                format="%.0f",
-                            )
-
-                            # Market horizon uncertainty on the same basis (σ_ln)
-                            sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
-                            mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
-
-                            st.markdown("**Uncertainty input mode**")
-                            unc_mode_key = f"belief_unc_mode_{belief_exp}"
-                            unc_mode = st.radio(
-                                "Uncertainty input mode",
-                                ["±% move (1σ)", "σ_ln (advanced)"],
-                                key=unc_mode_key,
-                                horizontal=True,
-                                label_visibility="collapsed",
-                            )
-
-                            if unc_mode == "±% move (1σ)":
-                                pct_key = f"belief_move_pct_{belief_exp}"
-                                # Initialize from existing sigma value if present to avoid jumpiness.
-                                if pct_key not in st.session_state:
-                                    existing_sigma = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
-                                    st.session_state[pct_key] = float(sigma_ln_to_move_pct_1sigma(existing_sigma))
-
-                                st.slider(
-                                    "Uncertainty (±% move, 1σ at expiry)",
-                                    1.0,
-                                    200.0,
-                                    float(st.session_state.get(pct_key, 22.0)),
-                                    0.5,
-                                    key=pct_key,
-                                    help="Human-scaled: a ±1σ move corresponds to multiplying price by exp(±σ_ln).",
-                                )
-                                sigma_ln = move_pct_1sigma_to_sigma_ln(float(st.session_state.get(pct_key, 0.0)))
+                            with st.expander("My belief vs market", expanded=False):
                                 st.caption(
-                                    f"Derived σ_ln: **{sigma_ln:.4f}** · "
-                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%** 1σ)"
+                                    "Optional: compare a simple lognormal **belief** (peak = price you set) "
+                                    "to the displayed market curve."
                                 )
-                            else:
-                                sigma_key = f"belief_width_{belief_exp}"
-                                st.slider(
-                                    "Uncertainty (σ of ln price at expiry)",
-                                    0.02,
-                                    0.8,
-                                    0.2,
-                                    0.005,
-                                    key=sigma_key,
-                                    help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+                                st.checkbox(
+                                    "Show my belief curve",
+                                    key=f"belief_en_{belief_exp}",
                                 )
-                                sigma_ln = float(st.session_state.get(sigma_key, 0.2))
-                                st.caption(
-                                    f"≈±**{sigma_ln_to_move_pct_1sigma(sigma_ln):.1f}%** 1σ move · "
-                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%**)"
+                                st.number_input(
+                                    "Belief peak — mode (USD)",
+                                    min_value=1000.0,
+                                    max_value=float(max(price_max, 1_000_000)),
+                                    value=float(forward),
+                                    step=1000.0,
+                                    key=f"belief_center_{belief_exp}",
+                                    format="%.0f",
                                 )
-                        user_belief_for_state = {
-                            "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
-                            "center_usd": float(st.session_state.get(f"belief_center_{belief_exp}", forward)),
-                            # Internal model stays in σ_ln; percent mode is just input/display convenience.
-                            "width": float(sigma_ln),
-                        }
+                                sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+                                mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+                                unc_mode_key = f"belief_unc_mode_{belief_exp}"
+                                unc_mode = st.radio(
+                                    "Uncertainty input mode",
+                                    ["±% move (1σ)", "σ_ln (advanced)"],
+                                    key=unc_mode_key,
+                                    horizontal=True,
+                                    label_visibility="collapsed",
+                                )
+                                if unc_mode == "±% move (1σ)":
+                                    pct_key = f"belief_move_pct_{belief_exp}"
+                                    if pct_key not in st.session_state:
+                                        existing_sigma = float(
+                                            st.session_state.get(f"belief_width_{belief_exp}", 0.2)
+                                        )
+                                        st.session_state[pct_key] = float(
+                                            sigma_ln_to_move_pct_1sigma(existing_sigma)
+                                        )
+                                    st.slider(
+                                        "Uncertainty (±% move, 1σ at expiry)",
+                                        1.0,
+                                        200.0,
+                                        float(st.session_state.get(pct_key, 22.0)),
+                                        0.5,
+                                        key=pct_key,
+                                        help="Human-scaled: a ±1σ move corresponds to multiplying price by exp(±σ_ln).",
+                                    )
+                                    sigma_ln = move_pct_1sigma_to_sigma_ln(
+                                        float(st.session_state.get(pct_key, 0.0))
+                                    )
+                                    st.caption(
+                                        f"Derived σ_ln: **{sigma_ln:.4f}** · "
+                                        f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** "
+                                        f"(≈±**{mkt_move_pct:.1f}%** 1σ)"
+                                    )
+                                else:
+                                    sigma_key = f"belief_width_{belief_exp}"
+                                    st.slider(
+                                        "Uncertainty (σ of ln price at expiry)",
+                                        0.02,
+                                        0.8,
+                                        0.2,
+                                        0.005,
+                                        key=sigma_key,
+                                        help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+                                    )
+                                    sigma_ln = float(st.session_state.get(sigma_key, 0.2))
+                                    st.caption(
+                                        f"≈±**{sigma_ln_to_move_pct_1sigma(sigma_ln):.1f}%** 1σ move · "
+                                        f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** "
+                                        f"(≈±**{mkt_move_pct:.1f}%**)"
+                                    )
+                            user_belief_for_state = {
+                                "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
+                                "center_usd": float(
+                                    st.session_state.get(f"belief_center_{belief_exp}", forward)
+                                ),
+                                "width": float(sigma_ln),
+                            }
+                        else:
+                            user_belief_for_state = _compute_mvp1_belief_overlay_state(
+                                belief_exp=belief_exp,
+                                forward=float(forward),
+                                price_max=float(price_max),
+                                vol=float(vol),
+                                T_years=float(T_years),
+                            )
                         # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to belief interactions.
                         # Keep it local to this screen + expiry; descriptive only.
                         last_change_key = f"implied_lab_last_change_{selected_expiry_str}"

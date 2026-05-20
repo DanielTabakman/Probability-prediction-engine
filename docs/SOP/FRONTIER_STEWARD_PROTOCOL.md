@@ -112,7 +112,7 @@ Preflight must report repo facts (machine-derived where possible) and only then 
 
 - **SELECTION** is always separate.
 - **BUILD** may be combined with **CLOSEOUT** only for compact slices that truly earn it (see below).
-- A slice is **not closed** until control-plane docs are updated honestly.
+- A chapter closeout slice is **not closed** until `apply_control_closeout_v1` **PASS** (steering alignment + consistency) and changes are committed.
 - If validation is ambiguous, docs are contradictory, or scope drifts, fall back to separate **BUILD** then steward review.
 - Do not silently morph **CLOSEOUT** into **BUILD**.
 - Do not silently morph **BUILD** into refactor work.
@@ -127,7 +127,7 @@ Compact **BUILD + CLOSEOUT** in one pass is allowed only when **all** are true:
 - Mostly layout/copy/presentation/non-semantic linkage.
 - No classification/threshold/derivation/fetch/state/harness semantics changes.
 - Tier 1 validation is sufficient.
-- `MVP1_FRONTIER` and `HANDOFF` can be updated honestly in the same pass.
+- `MVP1_FRONTIER` and `HANDOFF` are updated by the closeout job (not manual steward edits by default).
 
 ### Non-compact rule
 

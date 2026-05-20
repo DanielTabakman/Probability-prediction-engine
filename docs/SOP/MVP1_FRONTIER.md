@@ -9,10 +9,11 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_FRIENDS_FIRST_SELECTION.md`](POST_MVP1_FRIENDS_FIRST_SELECTION.md))
-- **Last closed chapter:** **MVP1 friends-first screen** — **COMPLETE** 2026-05-20
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_BELIEF_INPUT_SELECTION.md`](POST_MVP1_BELIEF_INPUT_SELECTION.md))
+- **Last closed chapter:** **MVP1 belief-input UX** — **COMPLETE** 2026-05-20
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
+
 
 ### Phase 2 on `main` — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
 
@@ -71,7 +72,18 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-FriendsFirst-Smoke-Slice003` — dual smoke witness | CONTROL |
 | **CLOSED** | `MVP1-FriendsFirst-Closeout-Slice004` — chapter close | CONTROL |
 
-**Evidence:** [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_FRIENDS_FIRST_SELECTION.md`](POST_MVP1_FRIENDS_FIRST_SELECTION.md)
+**Evidence:** [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md`](POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md)
+
+### MVP1 belief-input UX — relay queue — **COMPLETE** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-BeliefInput-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-BeliefInput-Product-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-BeliefInput-Smoke-Slice003` | CONTROL |
+| **CLOSED** | `MVP1-BeliefInput-Closeout-Slice004` | CONTROL |
+
+**Evidence:** [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_BELIEF_INPUT_SELECTION.md`](POST_MVP1_BELIEF_INPUT_SELECTION.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 

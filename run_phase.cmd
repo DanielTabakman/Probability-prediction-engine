@@ -52,6 +52,9 @@ popd >nul
 python "%REPO_ROOT%\scripts\log_event.py" --event-type "run_phase.end" --summary "End phase plan %PLAN_PATH% exit_code=%EXIT_CODE%" --actor "wrapper" --ref "kind=cmd,path=run_phase.cmd" >nul 2>nul
 
 python "%REPO_ROOT%\scripts\write_last_run_report.py" --repo-root "%REPO_ROOT%" --kind phase --exit-code %EXIT_CODE% --plan-path "%PLAN_PATH%" --baseline-branch "%BASELINE_BRANCH%" >nul 2>nul
+
+python "%REPO_ROOT%\scripts\post_relay_continue.py" --repo-root "%REPO_ROOT%" --phase-plan "%PLAN_PATH%" --orchestrator-exit-code %EXIT_CODE%
+if errorlevel 1 exit /b 1
 powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO_ROOT%\scripts\notify_run_finished.ps1" -RepoRoot "%REPO_ROOT%" >nul 2>nul
 
 python -c "import pathlib; pathlib.Path(r'%ACTIVE_RUN%').unlink(missing_ok=True)" >nul 2>nul

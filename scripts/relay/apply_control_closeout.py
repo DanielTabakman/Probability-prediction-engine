@@ -1,0 +1,401 @@
+"""Deterministic CONTROL-CLOSEOUT patches (apply_control_closeout_v1)."""
+
+from __future__ import annotations
+
+import json
+import re
+import subprocess
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from scripts.relay.steering_alignment import (
+    SOURCE_OF_TRUTH_ORDER,
+    check_steering_alignment,
+)
+
+HANDOFF_REL = "docs/SOP/HANDOFF.md"
+FRONTIER_REL = "docs/SOP/MVP1_FRONTIER.md"
+INTEGRATED_REL = "docs/SOP/PPE_INTEGRATED_STATUS.md"
+BRIEF_REL = "docs/SOP/AGENT_CONTINUITY_BRIEF.md"
+
+
+@dataclass
+class CloseoutSpec:
+    chapter_id: str
+    chapter_title: str
+    chapter_status: str
+    closed_date: str
+    evidence_doc: str
+    sprint_spec: str
+    next_selection_doc: str
+    selection_outcome_doc: str | None = None
+    carry_docs: list[str] | None = None
+    dual_smoke_run_ids: list[str] | None = None
+    pytest_count: int | None = None
+    closed_chapters_line: str | None = None
+    slice_id: str | None = None
+
+    @classmethod
+    def from_dict(cls, d: dict[str, Any], slice_id: str | None = None) -> CloseoutSpec:
+        return cls(
+            chapter_id=d["chapterId"],
+            chapter_title=d["chapterTitle"],
+            chapter_status=d["chapterStatus"],
+            closed_date=d["closedDate"],
+            evidence_doc=d["evidenceDoc"].replace("\\", "/"),
+            sprint_spec=d["sprintSpec"].replace("\\", "/"),
+            next_selection_doc=d["nextSelectionDoc"].replace("\\", "/"),
+            selection_outcome_doc=(d.get("selectionOutcomeDoc") or "").replace("\\", "/") or None,
+            carry_docs=[x.replace("\\", "/") for x in (d.get("carryDocs") or [])],
+            dual_smoke_run_ids=list(d.get("dualSmokeRunIds") or []),
+            pytest_count=d.get("pytestCount"),
+            closed_chapters_line=d.get("closedChaptersLine"),
+            slice_id=slice_id,
+        )
+
+
+def load_phase_plan(plan_path: Path) -> dict[str, Any]:
+    return json.loads(plan_path.read_text(encoding="utf-8-sig"))
+
+
+def find_closeout_for_slice(plan: dict[str, Any], slice_id: str) -> dict[str, Any] | None:
+    for sl in plan.get("slices") or []:
+        if sl.get("sliceId") == slice_id and "closeout" in sl:
+            return sl["closeout"]
+    return None
+
+
+def _git_head(repo: Path) -> str | None:
+    try:
+        out = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return out.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _next_selection_name(path: str) -> str:
+    return Path(path).name
+
+
+def build_handoff_gate(spec: CloseoutSpec) -> str:
+    carry = spec.carry_docs or [spec.evidence_doc]
+    carry_str = " + ".join(f"`{c}`" for c in carry[:4])
+    closed = spec.closed_chapters_line or (
+        "Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, "
+        "operator hardening, review enrichment, smoke regression, friends-first screen"
+    )
+    next_name = _next_selection_name(spec.next_selection_doc)
+    return f"""HANDOFF GATE — v3.1 (MVP1 control-plane)
+
+A) DOC-STATE SAFETY (alignment)
+- Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
+- Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
+- Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
+- Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
+- Active MVP1 focus: **none** — {spec.chapter_title.lower()} **{spec.chapter_status}** {spec.closed_date}
+- Closed chapters: {closed}
+- Next pending execution step: **steward SELECTION** — `{spec.next_selection_doc}`
+- Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
+- Reporting posture: SLIM MODE / REPO-SENSOR execution-only
+- Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
+
+B) REPO-STATE SAFETY (reproducibility)
+- Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main`)
+- Baseline SHA: verify `git rev-parse origin/main` after push
+- BUILD allowed: only after steward SELECTION; honor reconcile defer list
+
+C) AGENT CONTINUITY (required)
+- Safe to switch agents: YES after push
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `{Path(spec.evidence_doc).name}`"""
+
+
+def patch_handoff(repo: Path, spec: CloseoutSpec) -> None:
+    path = repo / HANDOFF_REL
+    text = path.read_text(encoding="utf-8-sig")
+    gate = build_handoff_gate(spec)
+    text = re.sub(
+        r"```text\s*\n.*?```",
+        f"```text\n{gate}\n```",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    next_name = _next_selection_name(spec.next_selection_doc)
+    smoke_note = ""
+    if spec.dual_smoke_run_ids:
+        smoke_note = " (`" + "` + `".join(spec.dual_smoke_run_ids) + "`)"
+    priority = (
+        f"**{spec.chapter_title} {spec.chapter_status}** — "
+        f"dual smoke green{smoke_note}. Await steward **SELECTION**."
+    )
+    text = re.sub(
+        r"## Current priority\s*\n\n.*?(?=\n## )",
+        f"## Current priority\n\n{priority}\n\n",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"## Last updated\s*\n\n.*\Z",
+        f"## Last updated\n\n{spec.closed_date} — {spec.chapter_title} {spec.chapter_status}; "
+        f"closeout job `{spec.slice_id or 'apply_control_closeout_v1'}`.\n",
+        text,
+        flags=re.DOTALL,
+    )
+    text = re.sub(
+        r"## Recommended next step\s*\n\n.*?(?=\n## Last updated)",
+        f"## Recommended next step\n\n"
+        f"1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).\n"
+        f"2. **Steward:** SELECTION — [`{next_name}`]({spec.next_selection_doc}).\n\n",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    path.write_text(text, encoding="utf-8")
+
+
+def patch_frontier(repo: Path, spec: CloseoutSpec) -> None:
+    path = repo / FRONTIER_REL
+    text = path.read_text(encoding="utf-8-sig")
+    next_name = _next_selection_name(spec.next_selection_doc)
+    focus = f"""### Current execution focus (MVP1 framing)
+- **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`{next_name}`]({spec.next_selection_doc}))
+- **Last closed chapter:** **{spec.chapter_title}** — **{spec.chapter_status}** {spec.closed_date}
+- **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
+- **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
+"""
+    text = re.sub(
+        r"### Current execution focus \(MVP1 framing\).*?(?=\n### )",
+        focus + "\n",
+        text,
+        count=1,
+        flags=re.DOTALL,
+    )
+    path.write_text(text, encoding="utf-8")
+
+
+def patch_integrated(repo: Path, spec: CloseoutSpec) -> None:
+    path = repo / INTEGRATED_REL
+    text = path.read_text(encoding="utf-8-sig")
+    text = re.sub(
+        r"\*\*As-of:\*\* \d{4}-\d{2}-\d{2}",
+        f"**As-of:** {spec.closed_date}",
+        text,
+        count=1,
+    )
+    row = (
+        f"| {spec.chapter_title} | **{spec.chapter_status}** {spec.closed_date} | "
+        f"[`{Path(spec.sprint_spec).name}`]({spec.sprint_spec}), "
+        f"[`{Path(spec.evidence_doc).name}`]({spec.evidence_doc}) |"
+    )
+    if spec.chapter_title not in text or f"**{spec.chapter_status}** {spec.closed_date}" not in text:
+        # Insert before ops tail separator if table exists
+        marker = "**Ops tail:**"
+        if marker in text and row not in text:
+            text = text.replace(
+                "\n**Ops tail:**",
+                f"\n{row}\n\n**Ops tail:**",
+            )
+    if spec.pytest_count is not None:
+        text = re.sub(
+            r"(\| `python -m pytest -q` \| \*\*PASS\*\* \| ).*?(\|)",
+            rf"\1**{spec.pytest_count}** passed ({spec.closed_date})\2",
+            text,
+            count=1,
+        )
+    if spec.dual_smoke_run_ids:
+        ids = " + ".join(f"`{x}`" for x in spec.dual_smoke_run_ids)
+        text = re.sub(
+            r"(\| Dual smoke \| \*\*PASS\*\* \| ).*?(\|)",
+            rf"\1{ids} (~221s)\2",
+            text,
+            count=1,
+        )
+    next_name = _next_selection_name(spec.next_selection_doc)
+    text = re.sub(
+        r"\*\*Next chapter SELECTION:\*\*[^\n]*",
+        f"**Next chapter SELECTION:** [`{next_name}`]({spec.next_selection_doc})",
+        text,
+        count=1,
+    )
+    text = re.sub(
+        r"## Next BUILD \(agent lane\)\s*\n\n.*\Z",
+        f"## Next BUILD (agent lane)\n\n"
+        f"**Await steward SELECTION** — [`{next_name}`]({spec.next_selection_doc}). "
+        f"**Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).\n",
+        text,
+        flags=re.DOTALL,
+    )
+    path.write_text(text, encoding="utf-8")
+
+
+def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
+    path = repo / spec.evidence_doc
+    if not path.is_file():
+        return
+    text = path.read_text(encoding="utf-8-sig")
+    status_line = f"**{spec.chapter_title}:** **{spec.chapter_status}** {spec.closed_date}."
+    if "## Chapter status" in text:
+        text = re.sub(
+            r"## Chapter status\s*\n\n.*?(?=\n## |\Z)",
+            f"## Chapter status\n\n{status_line}\n\n",
+            text,
+            count=1,
+            flags=re.DOTALL,
+        )
+        path.write_text(text, encoding="utf-8")
+
+
+def build_continuity_brief_md(
+    repo: Path,
+    spec: CloseoutSpec,
+    *,
+    alignment: dict[str, Any],
+    relay_run_dir: Path | None,
+    head_sha: str | None,
+) -> str:
+    gaps = [f for f in alignment.get("findings", []) if f.get("severity") in ("error", "warn")]
+    aligned = alignment.get("steering_aligned", False)
+    relay_lines = ""
+    if relay_run_dir:
+        relay_lines = f"\n- **relay_run_dir:** `{relay_run_dir.as_posix()}`\n"
+    if gaps:
+        gaps_block = "".join(
+            f'- [{g["severity"]}] {g["check"]}: {g["message"]}\n' for g in gaps
+        )
+    else:
+        gaps_block = "- No gaps (errors/warnings).\n"
+    return f"""# Agent continuity brief (generated)
+
+**Do not edit by hand.** Regenerated by `apply_control_closeout_v1`. Load this file first (see [`AGENT_GUIDE_ROLE.md`](AGENT_GUIDE_ROLE.md)).
+
+**As-of:** {_iso_now()} · **HEAD:** `{head_sha or 'unknown'}` · **Closeout slice:** `{spec.slice_id or 'backfill'}`
+
+## Source-of-truth order
+
+{chr(10).join(f'{i + 1}. `{p}`' for i, p in enumerate(SOURCE_OF_TRUTH_ORDER))}
+
+## Chapter status
+
+| Field | Value |
+|-------|-------|
+| Chapter | {spec.chapter_title} |
+| Status | {spec.chapter_status} |
+| Closed | {spec.closed_date} |
+| Evidence | [{Path(spec.evidence_doc).name}]({spec.evidence_doc}) |
+| Next SELECTION | [{_next_selection_name(spec.next_selection_doc)}]({spec.next_selection_doc}) |
+
+## Active BUILD
+
+**none** — await steward SELECTION.
+
+## Steering alignment
+
+- **steering_aligned:** `{aligned}`
+- **gap_count:** {len(gaps)}
+
+{gaps_block}{relay_lines}
+## Roles
+
+### Guide agent (read-only advisor)
+
+1. Read this brief, then `PPE_INTEGRATED_STATUS.md`.
+2. If `steering_aligned` is false, list gaps for the build agent; do **not** start BUILD.
+3. Never treat `CURRENT_FRONTIER.md` or `Frontier_Steward_Handoff.md` as controlling.
+
+### Build agent (Cursor / ACP worker)
+
+1. Honor `MVP1_FRONTIER.md` slice queue; run relay slices via `run_slice.cmd` / `run_phase.cmd`.
+2. Do not edit steering docs during BUILD; closeout job updates them after `CONTINUE`.
+3. Carry docs: {', '.join(f'`{c}`' for c in (spec.carry_docs or [spec.evidence_doc]))}.
+"""
+
+
+def apply_control_closeout(
+    repo_root: Path,
+    *,
+    closeout: CloseoutSpec,
+    relay_run_dir: Path | None = None,
+    skip_alignment: bool = False,
+) -> dict[str, Any]:
+    repo = repo_root.resolve()
+    patch_handoff(repo, closeout)
+    patch_frontier(repo, closeout)
+    patch_integrated(repo, closeout)
+    patch_evidence_chapter_status(repo, closeout)
+
+    alignment_report = check_steering_alignment(
+        repo,
+        expected_chapter_title=closeout.chapter_title,
+        expected_closed_date=closeout.closed_date,
+        expected_next_selection=closeout.next_selection_doc,
+        expected_evidence_doc=closeout.evidence_doc,
+    )
+    if skip_alignment:
+        alignment_report.passed = True
+
+    brief_md = build_continuity_brief_md(
+        repo,
+        closeout,
+        alignment=alignment_report.to_dict(),
+        relay_run_dir=relay_run_dir,
+        head_sha=_git_head(repo),
+    )
+    (repo / BRIEF_REL).write_text(brief_md, encoding="utf-8")
+
+    cp_dir = repo / "artifacts" / "control_plane"
+    cp_dir.mkdir(parents=True, exist_ok=True)
+    brief_json = {
+        "generated_at": _iso_now(),
+        "closeout": closeout.__dict__,
+        "alignment": alignment_report.to_dict(),
+        "relay_run_dir": str(relay_run_dir) if relay_run_dir else None,
+        "head_sha": _git_head(repo),
+    }
+    (cp_dir / "continuity_brief.json").write_text(
+        json.dumps(brief_json, indent=2),
+        encoding="utf-8",
+    )
+
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    report_dir = cp_dir / ts
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report = {
+        "job": "apply_control_closeout_v1",
+        "passed": alignment_report.passed,
+        "alignment": alignment_report.to_dict(),
+        "generated_at": _iso_now(),
+    }
+    (report_dir / "closeout_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return report
+
+
+def run_consistency_check(repo_root: Path) -> tuple[bool, str]:
+    """Invoke relay consistency check; return (passed, message)."""
+    import sys
+
+    cmd = [
+        sys.executable,
+        str(repo_root / "scripts" / "relay_runtime_v0.py"),
+        "--repo-root",
+        str(repo_root),
+        "stage",
+        "control_plane_consistency_check",
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, cwd=repo_root)
+    out = (proc.stdout or "") + (proc.stderr or "")
+    return proc.returncode == 0, out

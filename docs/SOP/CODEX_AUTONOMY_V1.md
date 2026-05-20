@@ -238,7 +238,7 @@ All fields are required unless marked optional. Enum values are case-sensitive. 
 
   "declared_plane": "PRODUCT-PLANE | EVIDENCE-PLANE",
   "build_branch": "<branch name created for this run>",
-  "baseline_branch": "<accepted baseline named by CURRENT_FRONTIER.md>",
+  "baseline_branch": "<accepted baseline named by MVP1_FRONTIER.md / HANDOFF.md>",
   "baseline_tip_before": "<SHA at run start>",
   "baseline_tip_after":  "<SHA at run end; equal to baseline_tip_before if no promotion>",
   "product_commit_sha":  "<SHA of the product commit, or null if none>",
@@ -367,10 +367,20 @@ The relay consumes §14.1 and emits **exactly one** decision, in this precedence
    Anything that reaches this rule → `STOP_FOR_REVIEW`.  
    *(Safe default: the relay must not guess; the steward decides.)*
 
-### 15.3 What the relay must never do
+### 15.3 What the relay must never do (slice gate job)
 
-- Auto-run **CONTROL-CLOSEOUT**. `CONTINUE` means *hand back to steward for CONTROL-CLOSEOUT*, not *perform it*.
+- The **slice gate** (`relay_gate_decision` / v0 resume path) must not edit canonical steering docs inline.
 - Auto-start the next **SELECTION**. V1 never crosses the selection boundary (§2, §8.7).
+
+### 15.3a Closeout job (`apply_control_closeout_v1`, `RELAY_RUNTIME_V1`)
+
+- **Separate job** from §15.3 slice gate. Invoked by `scripts/post_relay_continue.py` after `CONTINUE` when phase-plan `closeout` is present.
+- Deterministic template patches only; no LLM. See `JOB_REGISTRY_V1.md` §3.5.
+- Workers still **stop before** closeout; `ready_for_control_closeout == true` means the **closeout job may run**, not that the worker edits `HANDOFF.md`.
+
+### 15.3b What the slice gate must never do (legacy list)
+
+- (Removed) forbid auto-closeout on the gate path — closeout is allowed on the **dedicated** job only.
 - Extend `retry_budget_max` beyond 2, or grant retries after `stop_condition != null`.
 - Reinterpret a `BLOCKED` decision as `STOP_FOR_REVIEW` to keep the run alive.
 - Edit canonical steering docs (`docs/SOP/**`) or the slice spec to make a failing payload pass.
@@ -381,7 +391,7 @@ The relay consumes §14.1 and emits **exactly one** decision, in this precedence
 
 - Record the decision, the input payload, and a one-line reason keyed to the triggering rule (e.g., `"rule 2: stop_condition=MIXED_PLANE_CONTAMINATION"`).
 - On `RETRY_ALLOWED`, re-invoke the worker **once** for the same slice with `retry_count += 1` and the same slice spec; it must **not** expand scope, change plane, or edit the slice spec.
-- On `CONTINUE`, surface the §10.6 HANDBACK payload (slice id, product commit SHA, baseline branch, artifact paths) to the steward and stop.
+- On `CONTINUE`, surface the §10.6 HANDBACK payload and stop; wrappers chain `apply_control_closeout_v1` when configured.
 - On `STOP_FOR_REVIEW` or `BLOCKED`, surface the §10.6 HANDBACK payload and the fired §8 condition (if any) and stop.
 
 ### 15.5 Authority boundary reminder
