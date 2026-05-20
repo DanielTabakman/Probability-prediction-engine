@@ -41,4 +41,6 @@ VPS CTA + §15F spot-check remain steward-owned ([`VALIDATION_DEPLOY_WITNESS.md`
 
 **Update:** `MVP1-OnboardingHowItWorks-Control-Slice001` **CLOSED** 2026-05-20 (charter witness on `main` @ `2c0393e`+).
 
-Run **`MVP1-OnboardingHowItWorks-Product-Slice002`** (PRODUCT) per [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) after PREFLIGHT.
+**Update:** `MVP1-OnboardingHowItWorks-Product-Slice002` + **`MVP1-OnboardingHowItWorks-Smoke-Slice003`** **CLOSED** 2026-05-20 — dual smoke `20260520_042057` + `20260520_042128`.
+
+Run **`MVP1-OnboardingHowItWorks-Closeout-Slice004`** (CONTROL) per [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) when steward-ready.

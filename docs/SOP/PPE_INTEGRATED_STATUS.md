@@ -119,8 +119,8 @@ All slices **CLOSED** 2026-05-19.
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **178** passed on `main` @ `aff44c5` (belief-input PR #10, 2026-05-20) |
-| Dual smoke | **PASS** | `20260520_024407` + `024438` (~136s) — [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md); next chapter gates **pending** — [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) |
+| `python -m pytest -q` | **PASS** | **178** passed (2026-05-20) — verify on `origin/main` after pull |
+| Dual smoke | **PASS** | Onboarding chapter: `20260520_042057` + `20260520_042128` (~127s) — [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md); prior belief-input: `20260520_024407` + `024438` — [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
@@ -165,4 +165,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**MVP1 onboarding / How it works** — **IN PROGRESS** — Control-Slice001 **CLOSED** 2026-05-20 — [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · sprint [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) · **Next slice:** `MVP1-OnboardingHowItWorks-Product-Slice002`. **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**MVP1 onboarding / How it works** — **IN PROGRESS** — Product-Slice002 + Smoke-Slice003 **CLOSED** 2026-05-20 — [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · sprint [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) · **Next slice:** `MVP1-OnboardingHowItWorks-Closeout-Slice004`. **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

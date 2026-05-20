@@ -111,7 +111,7 @@ from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz import frozen_evaluation_store as _fz_store
 from src.viz.reviewed_class_summary import build_class_summary, serialize_rollup_csv
 from src.viz.perf import PerfLog, timed
-from src.viz.tutorial import render_tutorial_section
+from src.viz.tutorial import render_how_it_works_expander, render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
 from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 from src.viz.plotly_theme import apply_chart_theme
@@ -230,6 +230,7 @@ if show_bitcoin_view:
         "**Read in order:** market-implied chart → your **belief** (left) → **Belief vs market** for the disagreement "
         "story. Exploration only — not advice."
     )
+    render_how_it_works_expander(expanded=False)
     if _show_debug_ui:
         _glance_suffix = (
             "**Review → trade ticket** (under **Summary**). "

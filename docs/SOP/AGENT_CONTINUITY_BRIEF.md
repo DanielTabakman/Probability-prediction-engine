@@ -4,7 +4,7 @@
 
 **Steward note:** Refreshed for **Control-Slice001** close (2026-05-20); next successful `apply_control_closeout_v1` run will overwrite per automation rules.
 
-**As-of:** 2026-05-20T18:00:00Z · **HEAD:** `2c0393e` · **Closeout slice:** `MVP1-OnboardingHowItWorks-Control-Slice001`
+**As-of:** 2026-05-20T22:00:00Z · **HEAD:** verify after merge · **Closeout slice:** `MVP1-OnboardingHowItWorks-Smoke-Slice003`
 
 ## Source-of-truth order
 
@@ -26,7 +26,7 @@
 
 ## Active BUILD
 
-**Next:** run **`MVP1-OnboardingHowItWorks-Product-Slice002`** after PREFLIGHT (see [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) and [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md)).
+**Next:** chapter close — **`MVP1-OnboardingHowItWorks-Closeout-Slice004`** (see [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) and [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md)).
 
 ## Steering alignment
 
