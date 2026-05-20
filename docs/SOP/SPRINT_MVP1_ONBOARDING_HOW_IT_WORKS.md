@@ -33,9 +33,9 @@ Ship a bounded **“How it works”** education surface in the MVP1 implied lab 
 
 ## Slice map
 
-### MVP1-OnboardingHowItWorks-Control-Slice001 — charter (CONTROL) — **OPEN**
+### MVP1-OnboardingHowItWorks-Control-Slice001 — charter (CONTROL) — **CLOSED**
 
-Charter relay: align sprint links, frontier table, evidence stub; no product code unless slice spec explicitly expands (default: docs-only charter).
+**Closed** 2026-05-20 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json`](PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json), [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), and [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) aligned; baseline `main` @ `2c0393e`+.
 
 ### MVP1-OnboardingHowItWorks-Product-Slice002 — How it works UX (PRODUCT) — **OPEN**
 
@@ -53,4 +53,4 @@ Chapter close: integrated status + handoff + SELECTION prep for the following ch
 
 ## Sprint status
 
-**CHARTERED** — SELECTION complete 2026-05-20.
+**IN PROGRESS** — SELECTION 2026-05-20; **Control-Slice001** closed 2026-05-20.
