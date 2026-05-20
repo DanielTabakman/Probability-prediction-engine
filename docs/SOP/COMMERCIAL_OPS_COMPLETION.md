@@ -1,5 +1,7 @@
 # Commercial ops completion — checklist
 
+**Post-merge:** PR #10 merged `aff44c5` 2026-05-20; **Deploy VPS** [26146497234](https://github.com/DanielTabakman/Probability-prediction-engine/actions/runs/26146497234) success — steward still sets VPS `.env` for CTA **PASS**.
+
 **Purpose:** Close operational gaps after Commercial Validation code/docs on `main` (no new product BUILD).
 
 **Status:** **Agent lane COMPLETE** (2026-05-19). **SELECTION COMPLETE** → MVP1 Reliability — [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md).
@@ -73,6 +75,8 @@ docker compose up -d --build
 
 | Run ID | Exit | Classification | Notes |
 |--------|------|----------------|-------|
+| 20260520_024407 | 0 | deterministic | MVP1_compact (belief-input PR #10 closeout) |
+| 20260520_024438 | 0 | deterministic | A_width_target_payoff (belief-input PR #10 closeout) |
 | 20260519_144000 | 0 | deterministic | MVP1_compact (Phase2 Product-Slice003) |
 | 20260519_144350 | 0 | deterministic | A_width_target_payoff (Phase2 Product-Slice003) |
 | 20260519_133606 | 0 | deterministic | MVP1_compact (Reliability Slice002) |

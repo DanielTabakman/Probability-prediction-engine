@@ -1,6 +1,12 @@
 # Paste into Cursor Settings → User Rules
 
-Copy the block below into your global Cursor user rules so it does not override this repo’s auto-commit policy.
+Copy the block under **“Git commits (Probability Prediction Engine)”** below into Cursor:
+
+1. Open **Cursor Settings** (gear) → **Cursor Settings** (or **General**).
+2. Open **Rules** (or **Rules for AI**).
+3. Under **User rules** (global), paste the block — or add a **project** rule pointing at this file if your Cursor version supports `@file` includes.
+
+This stops global “commit only when asked” from blocking this repo’s standing authorization in [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc).
 
 ---
 
