@@ -9,7 +9,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — steward **deferred next SELECTION** (prep only: [`POST_MVP1_BELIEF_INPUT_SELECTION.md`](POST_MVP1_BELIEF_INPUT_SELECTION.md))
+- **Active BUILD chapter:** **MVP1 onboarding / How it works (v0)** — **next:** `MVP1-OnboardingHowItWorks-Control-Slice001` after PREFLIGHT ([`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) · [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md))
 - **Last closed chapter:** **MVP1 belief-input UX** — **COMPLETE** 2026-05-20
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
@@ -83,7 +83,18 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-BeliefInput-Smoke-Slice003` | CONTROL |
 | **CLOSED** | `MVP1-BeliefInput-Closeout-Slice004` | CONTROL |
 
-**Evidence:** [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_BELIEF_INPUT_SELECTION.md`](POST_MVP1_BELIEF_INPUT_SELECTION.md)
+**Evidence:** [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) · **SELECTION outcome:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md)
+
+### MVP1 onboarding / How it works — relay queue — **CHARTERED** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **OPEN** | `MVP1-OnboardingHowItWorks-Control-Slice001` — charter | CONTROL |
+| **OPEN** | `MVP1-OnboardingHowItWorks-Product-Slice002` — How it works UX | PRODUCT |
+| **OPEN** | `MVP1-OnboardingHowItWorks-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **OPEN** | `MVP1-OnboardingHowItWorks-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 
