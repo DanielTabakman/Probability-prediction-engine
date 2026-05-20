@@ -37,13 +37,13 @@ Ship a bounded **“How it works”** education surface in the MVP1 implied lab 
 
 **Closed** 2026-05-20 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json`](PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json), [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), and [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) aligned; baseline `main` @ `2c0393e`+.
 
-### MVP1-OnboardingHowItWorks-Product-Slice002 — How it works UX (PRODUCT) — **OPEN**
+### MVP1-OnboardingHowItWorks-Product-Slice002 — How it works UX (PRODUCT) — **CLOSED**
 
-Bounded onboarding / explainer UI (e.g. expander, tutorial section, or dedicated panel) using plain language; may reuse or extend `src/viz/tutorial.py` (`render_tutorial_section`).
+**Closed** 2026-05-20 — `render_how_it_works_expander()` in [`src/viz/tutorial.py`](../../src/viz/tutorial.py); wired under **Bitcoin implied lab** header in [`src/viz/app.py`](../../src/viz/app.py).
 
-### MVP1-OnboardingHowItWorks-Smoke-Slice003 — dual smoke (CONTROL) — **OPEN**
+### MVP1-OnboardingHowItWorks-Smoke-Slice003 — dual smoke (CONTROL) — **CLOSED**
 
-Dual smoke witness with run IDs in evidence status.
+**Closed** 2026-05-20 — dual smoke `20260520_042057` + `20260520_042128` (~127s).
 
 ### MVP1-OnboardingHowItWorks-Closeout-Slice004 — chapter close (CONTROL) — **OPEN**
 
@@ -53,4 +53,4 @@ Chapter close: integrated status + handoff + SELECTION prep for the following ch
 
 ## Sprint status
 
-**IN PROGRESS** — SELECTION 2026-05-20; **Control-Slice001** closed 2026-05-20.
+**IN PROGRESS** — SELECTION 2026-05-20; **Control-Slice001** closed 2026-05-20; **Product-Slice002** + **Smoke-Slice003** closed 2026-05-20.

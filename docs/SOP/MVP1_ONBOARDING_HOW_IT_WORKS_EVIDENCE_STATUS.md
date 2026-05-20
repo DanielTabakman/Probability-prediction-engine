@@ -8,14 +8,15 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **pending** | Record SHA + pass count when PRODUCT slice completes |
-| Dual smoke | **pending** | Record run IDs when Smoke slice completes |
+| `python -m pytest -q` | **PASS** | **178** passed (2026-05-20) |
+| Dual smoke | **PASS** | `20260520_042057` + `20260520_042128` (~127s) |
 
 ---
 
 ## Product delta
 
-- *To be filled during BUILD — How it works / onboarding surfaces only.*
+- **`render_how_it_works_expander()`** — [`src/viz/tutorial.py`](../../src/viz/tutorial.py): collapsed-by-default **How this lab works (~90 sec)** expander (§15B slice 5 copy: market-implied, belief overlay, disagreement, strategy families as *fit*, no-advice boundary).
+- **`src/viz/app.py`** — expander mounted under **Bitcoin implied lab** header (after read-order caption).
 
 ---
 
@@ -30,4 +31,4 @@
 
 ## Chapter status
 
-**IN PROGRESS** — SELECTION 2026-05-20; Control-Slice001 **CLOSED** 2026-05-20. **Next:** `MVP1-OnboardingHowItWorks-Product-Slice002`.
+**IN PROGRESS** — Product-Slice002 + Smoke-Slice003 **CLOSED** 2026-05-20. **Next:** `MVP1-OnboardingHowItWorks-Closeout-Slice004` (chapter close / steward).
