@@ -39,4 +39,6 @@ VPS CTA + §15F spot-check remain steward-owned ([`VALIDATION_DEPLOY_WITNESS.md`
 
 ## Next execution step
 
-PREFLIGHT, then run **`MVP1-OnboardingHowItWorks-Control-Slice001`** per relay runbook.
+**Update:** `MVP1-OnboardingHowItWorks-Control-Slice001` **CLOSED** 2026-05-20 (charter witness on `main` @ `2c0393e`+).
+
+Run **`MVP1-OnboardingHowItWorks-Product-Slice002`** (PRODUCT) per [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) after PREFLIGHT.
