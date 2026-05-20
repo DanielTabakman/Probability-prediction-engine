@@ -9,8 +9,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md))
-- **Last closed chapter:** **MVP1 operator hardening** — **COMPLETE** 2026-05-19 (also: Phase 2 on `main`)
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md))
+- **Last closed chapter:** **MVP1 smoke regression** — **COMPLETE** 2026-05-19
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
@@ -37,7 +37,30 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-OperatorHardening-Witness-Slice003` — deploy witness refresh | CONTROL |
 | **CLOSED** | `MVP1-OperatorHardening-Closeout-Slice004` — chapter close | CONTROL |
 
-**Evidence:** [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md)
+**Evidence:** [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md)
+
+### MVP1 memory & review enrichment — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-ReviewEnrichment-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice002` — pending sort, paper tag, expiry filter | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice003` — class summary SQL expiry filter | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice004` — rollup CSV export | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Closeout-Slice005` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
+
+### MVP1 smoke regression — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-SmokeRegression-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Harness-Slice002` — MVP1_compact budget + marker waits | PRODUCT |
+| **CLOSED** | `MVP1-SmokeRegression-Witness-Slice003` — dual smoke green | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) · **Next SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 
@@ -59,6 +82,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
 | Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 | MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
+| MVP1 memory & review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md), [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) |
+| MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md), [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) |
 
 ### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 
@@ -128,11 +153,13 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
 - Regression: dual smoke [`scripts/run_mvp1_dual_implied_lab_smoke.py`](scripts/run_mvp1_dual_implied_lab_smoke.py) after major implied-lab changes; full `pytest` before merge when touching shared modules ([`README.md`](../../README.md) steward backlog).
 - Manual: freeze → review (non-pending) → open **Class summary — reviewed snapshots** and confirm counts move off zero.
 
-#### Phase 5 optional follow-ons (deferred)
-- Spec stub **`MVP1-Phase5-Slice002`** in [`docs/SOP/MVP1_PHASE1_3_SPRINT.md`](docs/SOP/MVP1_PHASE1_3_SPRINT.md): horizon filtering UX, structured paper field, optional SQLite FK — implement only if prioritized.
+#### Phase 5 optional follow-ons
+- **DONE (chapter):** pending expiry filter + sort; optional **paper tag** on reviews ([`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md)).
+- **Still deferred:** SQLite FK / `PRAGMA foreign_keys`, full horizon UX per **`MVP1-Phase5-Slice002`** stub in [`MVP1_PHASE1_3_SPRINT.md`](MVP1_PHASE1_3_SPRINT.md).
 
-#### Phase 6 next (beyond v0)
-- Richer filters (date range, expiry), export CSV/JSON of rollups, stronger trust metrics when verification payload gains explicit trust enums — track as future slices; canon still excludes execution and automated deployment.
+#### Phase 6 beyond v0
+- **DONE (chapter):** store-backed expiry + reviewed-date filters; rollup JSON/CSV + reviewed table CSV export.
+- **Still deferred:** stronger trust metrics when verification payload gains explicit trust enums; canon still excludes execution and automated deployment.
 
 ### Logging policy (low-maintenance)
 - Local-first append-only logbook: `artifacts/logbook/ppe_events.jsonl` (gitignored).

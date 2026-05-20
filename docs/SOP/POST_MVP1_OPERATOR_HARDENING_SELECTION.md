@@ -1,6 +1,6 @@
 # Post–MVP1 operator hardening — steward SELECTION (prep)
 
-**Status:** Operator hardening chapter **COMPLETE** (2026-05-19). **Next:** steward **SELECTION** for next BUILD chapter.
+**Status:** Operator hardening chapter **COMPLETE** (2026-05-19). **Superseded by:** review enrichment SELECTION outcome [`POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md) → chapter [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md) **COMPLETE**.
 
 **Closed record:** [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md) · [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md)
 

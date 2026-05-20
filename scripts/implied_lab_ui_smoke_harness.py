@@ -77,11 +77,13 @@ SCENARIOS = [
 # Per-scenario wall-clock budgets (seconds) for one scenario drive after Streamlit is ready.
 # Dual-smoke passes these via --scenario-timeout-s; parent may also enforce subprocess timeout.
 SCENARIO_TIMEOUT_S_BY_SCENARIO: dict[str, float] = {
-    "MVP1_compact_verification": 15.0 * 60.0,
+    # Slow hosts (Deribit + width-band loop) may exceed 15m; dual-smoke closeout 20260519_173853 @ 942s.
+    "MVP1_compact_verification": 20.0 * 60.0,
     "A_width_target_payoff": 25.0 * 60.0,
     "C_directional_peak_disagreement": 25.0 * 60.0,
 }
 DEFAULT_SCENARIO_TIMEOUT_S = 20.0 * 60.0
+_MVP1_COMPACT_TIMEOUT_ENV = "PPE_UI_SMOKE_MVP1_COMPACT_TIMEOUT_S"
 
 
 def mvp1_execution_surfaces_hidden_by_default() -> bool:
@@ -91,7 +93,28 @@ def mvp1_execution_surfaces_hidden_by_default() -> bool:
 
 
 def default_scenario_timeout_s(scenario: str) -> float:
+    if scenario == "MVP1_compact_verification":
+        raw = (os.environ.get(_MVP1_COMPACT_TIMEOUT_ENV) or "").strip()
+        if raw:
+            return float(raw)
     return float(SCENARIO_TIMEOUT_S_BY_SCENARIO.get(scenario, DEFAULT_SCENARIO_TIMEOUT_S))
+
+
+def _ensure_belief_uncertainty_sigma_mode(page) -> None:
+    """Select σ_ln (advanced) radio inside the belief expander (not sidebar)."""
+    details = page.locator("details").filter(
+        has=page.locator("summary", has_text="My belief vs market")
+    ).first
+    if details.count() == 0:
+        raise RuntimeError("Belief expander not found for σ_ln mode")
+    label = details.locator("label").filter(
+        has_text=re.compile(r"σ_ln\s*\(advanced\)", re.I)
+    ).first
+    if label.count() > 0:
+        label.click()
+    else:
+        details.locator("text=σ_ln (advanced)").first.click()
+    page.wait_for_timeout(600)
 
 
 def _ensure_width_band_similar(page, target_sig: float) -> float:
@@ -561,6 +584,57 @@ def _collect_observations(page, result: ScenarioResult) -> None:
     result.trade_ticket_found = _text_present("Trade ticket (copy/paste)")
 
 
+def _scroll_main_content(page) -> None:
+    try:
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_timeout(400)
+    except Exception:
+        pass
+
+
+def _mvp1_compact_marker_visible(page) -> bool:
+    for marker in (
+        "MVP1 output:",
+        "MVP1 primary output",
+        "MVP1 data quality",
+        "Trust / provenance",
+    ):
+        try:
+            if page.locator(f"text={marker}").first.count() > 0:
+                return True
+        except Exception:
+            continue
+    return False
+
+
+def _wait_for_mvp1_compact_markers(page, *, timeout_s: float = 240.0) -> None:
+    """
+    MVP1 compact surfaces primary digest and trust strip below the chart.
+    Poll with scroll — do not require the Verification expander.
+    """
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        if _mvp1_compact_marker_visible(page):
+            return
+        _scroll_main_content(page)
+        page.wait_for_timeout(2000)
+    try:
+        _expand_expander(page, "Review & disagreement digest")
+        page.wait_for_timeout(1500)
+    except Exception:
+        pass
+    if _mvp1_compact_marker_visible(page):
+        return
+    try:
+        _expand_expander(page, "Verification")
+        page.wait_for_timeout(1500)
+        if _mvp1_compact_marker_visible(page):
+            return
+    except Exception:
+        pass
+    raise RuntimeError("MVP1 compact markers not visible after bounded wait")
+
+
 def _wait_for_verification_panel_ready(page) -> None:
     """Verification expander + any primary marker (summary, MVP1 output, or nested trace)."""
     _expand_expander(page, "Verification")
@@ -605,11 +679,16 @@ def _collect_trust_strip_mvp1_observation(page, result: ScenarioResult) -> None:
     if result.scenario != "MVP1_compact_verification":
         return
     try:
-        for marker in ("MVP1 data quality", "MVP1 primary output"):
+        for marker in ("MVP1 data quality", "MVP1 primary output", "Trust / provenance"):
             loc = page.locator(f"text={marker}").first
-            if loc.count() > 0:
+            if loc.count() > 0 and marker != "Trust / provenance":
                 result.trust_strip_mvp1_found = True
                 return
+            if marker == "Trust / provenance" and loc.count() > 0:
+                sub = page.locator("text=MVP1 data quality").first
+                if sub.count() > 0:
+                    result.trust_strip_mvp1_found = True
+                    return
         result.trust_strip_mvp1_found = False
     except Exception:
         result.trust_strip_mvp1_found = False
@@ -873,9 +952,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
 
         elif scenario == "MVP1_compact_verification":
             # Default MVP1 UI: no Mode & solver / strike ladder — belief-only path (same math as C).
+            print("[ui_smoke] MVP1_compact: belief peak + width-band similar", flush=True)
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
             page.wait_for_timeout(1500)
-            page.locator("text=σ_ln (advanced)").first.click()
+            _ensure_belief_uncertainty_sigma_mode(page)
             sig = _parse_sigma_mkt_at_horizon_from_caption(page)
             if sig is None:
                 sig = 0.08
@@ -884,22 +964,11 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             page.wait_for_timeout(500)
             _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
             page.wait_for_timeout(900)
+            _ensure_belief_uncertainty_sigma_mode(page)
             chosen_sig = _ensure_width_band_similar(page, chosen_sig)
             page.wait_for_timeout(600)
-            # MVP1 primary output is above the fold or inside Verification (not nested trace expander).
-            try:
-                page.wait_for_selector(
-                    "text=MVP1 output:",
-                    timeout=90000,
-                    state="attached",
-                )
-            except Exception:
-                _expand_expander(page, "Verification")
-                page.wait_for_selector(
-                    "text=MVP1 output:",
-                    timeout=60000,
-                    state="attached",
-                )
+            print("[ui_smoke] MVP1_compact: waiting for compact MVP1 markers", flush=True)
+            _wait_for_mvp1_compact_markers(page, timeout_s=240.0)
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
 

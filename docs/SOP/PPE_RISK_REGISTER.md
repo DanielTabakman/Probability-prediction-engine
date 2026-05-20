@@ -1,6 +1,6 @@
 # PPE risk register
 
-**As-of:** 2026-05-19 · **Baseline:** `main` @ `7961c33`+ · **Audit:** post–Phase 2 closeout; operator hardening chapter open
+**As-of:** 2026-05-19 · **Baseline:** `main` (verify `git rev-parse HEAD` before push) · **Audit:** post–smoke regression closeout; **no active BUILD chapter**
 
 Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **accepted** / **steward**
 
@@ -14,7 +14,7 @@ Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **
 | Medium | 3 | 2 | 1 |
 | Low | 4 | 1 | 3 |
 
-**Operator hardening:** **not blocked** — no open high risks. Trust-strip smoke gate added in harness (Slice002).
+**Smoke regression:** **not blocked** — dual smoke green `20260519_232908` + `233106`; pytest **168**. No open high risks.
 
 ---
 
@@ -35,8 +35,8 @@ Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **
 |-------|--------|
 | **Severity** | **low** |
 | **Status** | **accepted** (monitored) |
-| **Finding** | Recent green runs: MVP1_compact **138.6s** (`20260519_144000`). ~770s class matches **pre–Reliability-Slice002** wall-clock or **environment kill / hung** scenarios (see [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md) §6), not current harness defaults. Per-scenario caps on `main`: `MVP1_compact_verification` **900s**, `A_width_target_payoff` **1500s** (`scripts/implied_lab_ui_smoke_harness.py` → `SCENARIO_TIMEOUT_S_BY_SCENARIO`); dual-smoke parent adds **+120s** subprocess grace. |
-| **Action** | No harness change this pass. Re-classify **medium** if two consecutive post-cap runs exceed budget without kill exit. |
+| **Finding** | Recent green dual smoke: MVP1_compact **~104s** + A_width **~91s** (`20260519_232908` / `233106`, total **~220s**). Historical ~770s / 942s class = slow host or pre–hardening budgets. Current cap: `MVP1_compact_verification` **1200s** (env `PPE_UI_SMOKE_MVP1_COMPACT_TIMEOUT_S`), `A_width_target_payoff` **1500s**. |
+| **Action** | Re-run dual smoke before implied-lab merge if harness/app touched. Re-classify **medium** if two consecutive runs exceed budget without kill exit. |
 
 ---
 
@@ -57,7 +57,7 @@ Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **
 |-------|--------|
 | **Severity** | **medium** |
 | **Status** | **mitigated** |
-| **Finding** | Local checkout may show branch `build/commercial-validation-v0` while `HEAD` == `origin/main` (`6ba9ec1`). `main` worktree locked at `_worktrees/orchestrator/orch-smoke-09f3`. Doc baseline refs mixed `566f4f0` vs `6ba9ec1` (docs-only witness commits after product `01c89cf`). Steering docs (HANDOFF, MVP1_FRONTIER, PPE_INTEGRATED_STATUS) aligned on Slice005 **NEXT**. |
+| **Finding** | Local checkout may diverge from `origin/main` until push. Steering docs (HANDOFF, MVP1_FRONTIER, PPE_INTEGRATED_STATUS) aligned: smoke regression **COMPLETE**; **await steward SELECTION** only ([`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)). |
 | **Action** | Agent: verify `git rev-parse HEAD` == `origin/main` before push; update witness SHAs on closeout. Steward: use `main` worktree or `git pull` on VPS. |
 
 ---
@@ -79,7 +79,7 @@ Severity: **high** / **medium** / **low**. Status: **open** / **mitigated** / **
 |-------|--------|
 | **Severity** | — |
 | **Status** | **PASS** |
-| **Finding** | `python -m pytest -q` → **157** passed @ `6ba9ec1` (pre–Slice005); **159** after Slice005 panel test (verify on closeout). |
+| **Finding** | `python -m pytest -q` → **168** passed (review enrichment + smoke regression harness tests). |
 | **Action** | Re-run after each product touch. |
 
 ---

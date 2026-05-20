@@ -7,6 +7,8 @@ No execution or automated trading semantics.
 
 from __future__ import annotations
 
+import csv
+import io
 from collections import Counter
 from typing import Any
 
@@ -104,3 +106,31 @@ def build_class_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "by_classifier_version": dict(by_class),
         "operator_summary_line": operator_guidance_line(by_status),
     }
+
+
+_ROLLUP_COUNT_KEYS: tuple[str, ...] = (
+    "by_review_status",
+    "by_disagreement_category",
+    "by_shape_gap_strength",
+    "by_trust_breeden",
+    "by_benchmark_method",
+    "by_classifier_version",
+)
+
+
+def serialize_rollup_csv(rollup: dict[str, Any]) -> str:
+    """Flat CSV for Phase 6 rollup download (metric, bucket, count)."""
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["metric", "bucket", "count"])
+    writer.writerow(["n_reviewed", "", rollup.get("n_reviewed", 0)])
+    for metric in _ROLLUP_COUNT_KEYS:
+        counts = rollup.get(metric)
+        if not isinstance(counts, dict):
+            continue
+        for bucket, count in sorted(counts.items(), key=lambda kv: str(kv[0])):
+            writer.writerow([metric, bucket, count])
+    writer.writerow(
+        ["operator_summary_line", "", rollup.get("operator_summary_line", "")]
+    )
+    return buf.getvalue()
