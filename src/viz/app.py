@@ -5,9 +5,15 @@ Bitcoin view: price chart with Polymarket questions overlaid, implied value, opt
 from __future__ import annotations
 
 import os
+import sys
 import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
+
+# Streamlit puts `src/viz` on sys.path; `src.*` imports need the repo root.
+_app_root = Path(__file__).resolve().parents[2]
+if str(_app_root) not in sys.path:
+    sys.path.insert(0, str(_app_root))
 
 from src.viz.app_env import APP_ROOT as ROOT, env_flag as _env_flag
 
