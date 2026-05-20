@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-19 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-05-20 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -27,7 +27,11 @@ flowchart LR
     SR[MVP1 smoke regression COMPLETE]
   end
   closed --> closed2
-  closed2 --> steward
+  subgraph closed3 [Also closed]
+    FF[MVP1 friends-first COMPLETE]
+  end
+  closed2 --> closed3
+  closed3 --> steward
 ```
 
 ---
@@ -43,6 +47,7 @@ flowchart LR
 | MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
 | MVP1 memory & review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md), [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) |
 | MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md), [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) |
+| MVP1 friends-first screen | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md`](SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md), [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) |
 
 **Chapter close SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md) · **Next chapter SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)
 
@@ -105,8 +110,8 @@ All slices **CLOSED** 2026-05-19.
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **168** passed (smoke regression 2026-05-19) |
-| Dual smoke | **PASS** | `20260519_232908` + `20260519_233106` (~220s) |
+| `python -m pytest -q` | **PASS** | **170** passed (friends-first 2026-05-20) |
+| Dual smoke | **PASS** | `20260520_022938` + `20260520_023132` (~221s) |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
@@ -151,4 +156,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_MVP1_FRIENDS_FIRST_SELECTION.md`](POST_MVP1_FRIENDS_FIRST_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

@@ -1,0 +1,36 @@
+{
+  "name": "MVP1_friends_first_screen (post-smoke-regression SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-FriendsFirst-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-FriendsFirst-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-FriendsFirst-Smoke-Slice003",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-FriendsFirst-Closeout-Slice004",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

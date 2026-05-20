@@ -5,6 +5,7 @@ imported_utc: "2026-05-18"
 control_rule: "For MVP1 implementation, MVP1-specific sections override broad canon if they appear to conflict."
 addendum:
   - "2026-05-04: Conversation-mode + roadmap vocabulary (from Audit (1).md)"
+  - "2026-05-20: Vision import §1A Phase2 pointer + §15B–15F from Audit (4); repo-truth unchanged"
   - "2026-05-18: Full re-import; §1A order, §12 audit, §1A deployment surfaces, §15A repo-truth (from MVP1_FRONTIER + src/)"
 live_steering: "docs/SOP/MVP1_FRONTIER.md overrides stale phase-order language in §12 when they differ."
 ---
@@ -321,6 +322,57 @@ Deployment surfaces (operator env; see `README.md`, `.env.example`, `docs/SOP/DE
 \- **MVP1 compact lab** (default): strike/payoff/ticket chrome hidden unless `PPE_POST_MVP1_LAB_UI=1`.  
 \- **Debug UI**: `PPE_SHOW_DEBUG_UI=1` exposes performance/debug expanders (default off).  
 \- In-app / tab title: **Probability Engine** (`src/viz/app.py`).
+
+
+Phase 2 UI/UX steering update (2026-05-18)  
+Phase 2 desirability / playability is now an active parallel steering track for the validation chapter.  
+Its job is to make PPE legible, trustworthy, fun, and desirable to use before broader commercial wrapper or paywall work.
+
+Product frame:  
+PPE should be experienced as a belief-to-market translation machine.  
+It helps the user move from market-implied structure and personal belief to structured disagreement, candidate expression family, falsification condition, and decision-ready review.  
+It must not present itself as a trade recommender or proven-alpha system.
+
+Core UI/UX principles:  
+1\. One-screen first, depth second.  
+2\. Trust / provenance is a compact first-class UI object, not debug-only material.  
+3\. Strategy output is fit, not recommendation.  
+4\. Belief inputs should feel human, not like raw model parameters.  
+5\. Advanced and debug details should use progressive disclosure.  
+6\. The first meaningful screen should show market read, user belief, disagreement, candidate to inspect, and trust state.  
+7\. The aesthetic should feel like a serious game / lab / cockpit, not a generic dashboard.
+
+Current release path:  
+1\. Friends-first private release: test whether smart non-expert users can understand and enjoy the core loop.  
+2\. Trader-tester release: test whether traders see process value, decision clarity, and repeat-use potential.  
+3\. Paid beta later: add paywall/commercial wrapper only after the core loop feels valuable and credible.
+
+Recommended product surfaces:  
+\- public landing page  
+\- authenticated home  
+\- BTC implied lab  
+\- How it works  
+\- Feedback  
+\- Account
+
+BTC implied lab hierarchy:  
+1\. What this run is saying  
+2\. Main chart  
+3\. Belief controls  
+4\. Disagreement card  
+5\. Candidate to inspect  
+6\. Decision-ready review  
+7\. Verification / provenance expander
+
+Anti-goals for this UI/UX track:  
+\- Do not make scanner, saved theses, or paywall Phase 2 requirements.  
+\- Do not use recommended trade or signal language.  
+\- Do not hide trust/provenance in debug-only surfaces.  
+\- Do not overload the first screen with raw technical detail.  
+\- Do not propose a full frontend rewrite unless repo constraints make it necessary.  
+\- Do not widen MVP1 scope while making the product more usable.
+
+Full steering: §15B–15F below. Execution charter: [`docs/SOP/PHASE_2_CHARTER.md`](../SOP/PHASE_2_CHARTER.md).
 
 Current validation-phase goal  
 The next chapter should be understood as a validation phase:  
@@ -1411,7 +1463,7 @@ A reviewed success means the thesis, the expression, and the protocol were clear
 \============================================================
 
 Repo-truth anchor  
-Live MVP1 steering: `docs/SOP/MVP1_FRONTIER.md`. This section summarizes placement as of **2026-05**; if this audit and the frontier diverge, **update this section explicitly** (approved update rule) rather than letting code or chat drift silently.
+Live MVP1 steering and next BUILD: `docs/SOP/MVP1_FRONTIER.md` (outranks this audit when they differ). This section summarizes placement as of **2026-05**; if this audit and the frontier diverge, **update this section explicitly** (approved update rule) rather than letting code or chat drift silently.
 
 Current known state summary  
 PPE is strongest in market legibility and bounded product reasoning. **MVP1 Phases 1–6 exist at v0 in `src/`** (substrate → width disagreement → digest surfaces → freeze → review → class summary). The project is past “dashboard only,” but **not** an evidence-backed edge engine: review density and calibration on the evidence clock remain early.
@@ -1422,7 +1474,7 @@ MVP1 phase placement (engineering clock)
 |-------|----------------|---------------|
 | 1 — Market + benchmark substrate | substantially present | implied lab verification, benchmark witness on freeze |
 | 2 — ATM width-disagreement engine | substantially present | classification via belief-disagreement contract; trust via Breeden gate / degraded paths |
-| 3 — Candidate / watch / no-trade surface | **partial** vs §15 | digest + categories (`width_vol`, `directional`, `mixed`); **`primary_output_state` not yet on verification payload** |
+| 3 — Candidate / watch / no-trade surface | substantially present (v0) | `mvp1_decision` / `primary_output_state` on verification payload (see §15A); provisional materiality proxies |
 | 4 — Snapshot + memory | substantially present (v0) | `frozen_evaluation_store.py`, **Freeze & history** in UI |
 | 5 — Review engine | substantially present (v0) | `snapshot_reviews`, finite statuses, review form on reopen |
 | 6 — Class summaries | substantially present (v0) | `reviewed_class_summary.py`, **Class summary — reviewed snapshots** |
@@ -1493,7 +1545,7 @@ The main bottleneck is not vision, dashboard legibility, or wedge selection.
 The real bottleneck is: **closing the gap between §15 product contract and shipped behavior**, then **running the closed loop in production** (freeze → review → class summary) so the **evidence clock** can move.
 
 Current bottleneck cluster  
-\- §15 contract gaps (`primary_output_state`, explicit materiality versioning, fuller frozen-field witness)  
+\- remaining §15 partials (explicit materiality versioning witness, fuller frozen-field denormalization)  
 \- trust / materiality / confidence sharpening in operator-facing copy  
 \- demo UX + deployment clarity (public demo vs full app)  
 \- review density and calibration (evidence clock), not greenfield memory
@@ -2041,6 +2093,663 @@ Maps §15 product contract to what exists in `src/` today. **Target spec remains
 
 Canonical rule  
 “Substantially present” in `MVP1_FRONTIER.md` means **v0 landed**, not **§15 complete**.
+
+\============================================================  
+15B. PHASE 2 UI/UX STEERING (CURRENT)  
+\============================================================
+
+Purpose  
+This section preserves the current Phase 2 UI/UX steering so it survives chat-window drift.
+
+Status  
+Phase 2 UI/UX is a parallel desirability / playability track inside the validation chapter.  
+It does not replace MVP1.  
+It does not widen the BTC-first ATM-width closed-loop scope.  
+It should make the existing research cockpit easier to understand, trust, enjoy, demo, and test with friends and traders.
+
+Primary UX product frame  
+PPE is a belief-to-market translation machine.  
+It starts from market-implied structure, lets the user make belief explicit, identifies structured disagreement, maps that disagreement to cautious expression families, and produces decision-ready review material.
+
+Primary output promise  
+PPE produces trusted, decision-ready insight.  
+It does not currently produce guaranteed edge, autonomous trade recommendations, or optimized tickets.
+
+Core UI/UX principles  
+1. One-screen first, depth second.  
+2. Trust / provenance is a compact first-class UI object.  
+3. Strategy-family output is fit, not recommendation.  
+4. Belief inputs should feel human, not like raw model parameters.  
+5. Advanced math, raw provenance, and debug detail should be progressively disclosed.  
+6. The first meaningful screen should show market read, user belief, disagreement, candidate to inspect, and trust state.  
+7. The aesthetic should feel like a serious game / lab / cockpit, not a generic dashboard.
+
+Current release path  
+1. Friends-first private release: verify that smart early users understand the product and want to play with it.  
+2. Trader-tester release: verify that traders see workflow value and repeat-use potential.  
+3. Paid beta later: add commercial wrapper/paywall only after the core loop is valuable and credible.
+
+Recommended product structure  
+- public landing page  
+- authenticated home  
+- BTC implied lab  
+- How it works  
+- Feedback  
+- Account
+
+BTC implied lab screen hierarchy  
+1. What this run is saying  
+2. Main chart  
+3. Belief controls  
+4. Disagreement card  
+5. Candidate to inspect  
+6. Decision-ready review  
+7. Verification / provenance expander
+
+UX anti-goals  
+- Do not make scanner, saved theses, or paywall Phase 2 requirements.  
+- Do not use recommended trade, best trade, guaranteed edge, or signal language.  
+- Do not hide trust/provenance in debug-only surfaces.  
+- Do not overload the first screen with raw technical detail.  
+- Do not propose a full frontend rewrite unless repo constraints make it necessary.  
+- Do not let desirability/playability work weaken MVP1 evidence discipline.
+
+Suggested first UI/UX implementation slices  
+1. Product shell clarity: public landing, authenticated home, minimal nav, feedback path.  
+2. First meaningful screen polish: better headline, What this run is saying, compact trust strip, chart visible early.  
+3. Belief input UX: simple belief mode, advanced controls behind disclosure, human labels and defaults.  
+4. Disagreement/candidate strip polish: better candidate labels, confidence/trust language, falsification condition, fit-not-recommendation copy.  
+5. Onboarding / How it works: explain market-implied distribution, belief overlay, disagreement, strategy families, and no-advice boundary.  
+6. Feedback and beta instrumentation: collect confusion, usefulness, repeat-use intent, and trader-specific objections.
+
+Canonical interpretation  
+Phase 2 UI/UX should make the current system more legible, trusted, and desirable without pretending the evidence clock has moved farther than it has.
+
+\============================================================    
+\============================================================  
+15C. UI/UX PLANNING CLARIFICATION — THREE-FRAME NUCLEUS  
+\============================================================
+
+Purpose  
+This section records the current UI/UX planning decision so future chats and implementation agents do not overbuild from the Figma/FigJam artifacts.
+
+Current design artifact status  
+The FigJam/Figma AI outputs are useful as a planning scaffold: they capture hierarchy, journey, screen states, components, slices, and copy rules. They should **not** be treated as polished visual design or as a direct implementation spec.
+
+Do not keep asking AI design tools for giant UX boards or flowcharts. The important planning work is now smaller and more concrete.
+
+What is necessary before Cursor implementation  
+Only four things are required before a bounded frontend slice:  
+1. Name hierarchy decided.  
+2. Default BTC Lab screen layout decided.  
+3. Main states decided: default, belief adjusted/candidate, watch-only/no-trade.  
+4. Acceptance criteria decided.
+
+Product hierarchy to preserve  
+- Market Structure OS \= the broader platform / guide to market structure.  
+- Probability Engine \= the first tool inside Market Structure OS.  
+- BTC Implied Lab \= the first module / asset-specific workspace inside Probability Engine.  
+- PPE \= internal project shorthand; avoid making first-time users decode it.
+
+Screen naming rule  
+Use one primary name per screen and at most one secondary context label.  
+Do not show Market Structure OS, Probability Engine, PPE, PPE Lab, Probability Prediction Engine, Research Cockpit, and BTC Implied Lab all together in first-session UI.
+
+What is for the operator vs steward vs Cursor  
+For the operator / founder:  
+- judge whether the product feels right  
+- judge whether names are confusing  
+- judge whether the first action is obvious  
+- judge whether the screen feels trustworthy  
+- judge whether the app avoids trade-signal language
+
+For the steward / planning layer:  
+- maintain UX principles  
+- maintain state map  
+- maintain naming hierarchy  
+- maintain anti-goals  
+- convert the design into implementation slices
+
+For Cursor / implementation:  
+- receive a bounded build target  
+- follow current repo truth  
+- implement specific screen/component changes  
+- preserve copy rules and anti-goals  
+- validate with tests/smoke/manual inspection
+
+UX / functionality dual-track rule  
+Every important UI frame must track two separate things:
+
+1. User experience  
+What the user feels, understands, trusts, and becomes ready to do.  
+This answers:  
+- What state is the user in before this screen?  
+- What state should they be in after this screen?  
+- Do they feel oriented, confused, curious, confident, restrained, or ready to inspect?  
+- Do they understand what the system is saying and what it is not saying?
+
+2. User functionality  
+What the user can actually do and what the system can actually respond with.  
+This answers:  
+- What controls/actions are available?  
+- What outputs update?  
+- What system state changes?  
+- What component behavior is required?  
+- What is the pass/fail product behavior?
+
+Canonical distinction  
+Do not collapse “user feels” into “user can do,” and do not let functionality substitute for experience.  
+PPE needs both: a clear human cognitive/emotional transition and concrete implementable product behavior.
+
+Required UI frame template  
+For each important screen or state, use:
+
+SCREEN / FRAME NAME  
+Purpose: why this screen exists.  
+Experience goal: what the user should feel, understand, or trust.  
+Functionality goal: what the user can actually do.  
+User sees: visible UI elements.  
+User can do: available actions.  
+System responds: frontend/backend state changes.  
+Trust cue: how the system prevents false confidence.  
+Acceptance criteria: how we know the screen works.
+
+Three nucleus frames through the dual-track lens
+
+Frame 1 — Default market read  
+Experience job: move the user from curious / uncertain to oriented / ready to interact.  
+Functionality job: show market read, trust status, chart, belief controls, and inactive default downstream cards.
+
+Frame 2 — Candidate found  
+Experience job: move the user from experimenting to insight: “the system translated my belief into structured disagreement.”  
+Functionality job: update chart with belief overlay, classify disagreement, show candidate-to-inspect, expression family, confidence/trust language, and falsification condition.
+
+Frame 3 — Watch-only / no-trade  
+Experience job: move the user from expecting action to calibrated restraint: “the system is protecting me from overconfidence.”  
+Functionality job: suppress candidate promotion, show watch-only/no-trade, explain the blocker, expose provenance, and allow rerun/freeze/feedback.
+
+Implementation implication  
+Cursor should not receive only feelings and should not receive only components.  
+A good implementation slice should include both the experience goal and the functionality goal.
+
+The three-frame UI nucleus  
+Before implementation, reduce the UI/UX plan to three concrete BTC Implied Lab frames:
+
+Frame 1 — Default market read  
+User sees:  
+- top nav / breadcrumb  
+- BTC Implied Lab page title  
+- “What this run is saying” insight card  
+- compact trust strip  
+- belief controls  
+- main distribution chart  
+- default disagreement/candidate/review placeholders
+
+User should understand within 15 seconds:  
+- main market read  
+- data trustworthiness  
+- they can adjust belief  
+- the app compares belief vs market-implied structure
+
+Frame 2 — Candidate found  
+User has adjusted belief.  
+System shows:  
+- active belief overlay  
+- disagreement card  
+- candidate to inspect card  
+- expression family  
+- confidence / trust language  
+- falsification condition  
+- decision-ready review preview
+
+Boundary:  
+Candidate is “fit, not recommendation.” Do not use recommended trade, buy/sell signal, guaranteed edge, or proven alpha language.
+
+Frame 3 — Watch-only / no-trade  
+Trust or materiality is insufficient.  
+System shows:  
+- watch-only or no-trade as a valid output  
+- calm explanation of why no candidate was promoted  
+- provenance/trust cue  
+- no promoted candidate card
+
+Boundary:  
+No-trade must feel like honest product behavior, not a broken state.
+
+Minimal default BTC Lab layout  
+The load-bearing default screen is:  
+- top nav  
+- breadcrumb  
+- page title  
+- large InsightCard: “What this run is saying”  
+- compact TrustStrip  
+- two-column main layout: BeliefControlPanel left, DistributionChartShell right  
+- below: DisagreementCard, CandidateToInspectCard, DecisionReadyReview preview
+
+Implementation posture  
+Do not hand the full Figma/FigJam board to Cursor as the build spec.  
+Use it as background context only.  
+Cursor should receive a bounded slice derived from the three-frame nucleus, likely starting with:  
+“First meaningful BTC Lab screen” or “BTC Lab three-state UX nucleus.”
+
+Canonical summary  
+The UI/UX plan is now mature enough to stop expanding the planning board.  
+The next planning task is to define three concrete BTC Lab screen states and acceptance criteria.  
+The next implementation task, once authorized, should be a bounded first-screen slice rather than a broad redesign.
+
+\============================================================  
+15D. CURSOR PLANNING INTERFACE \+ SIMPLE TOOL ACCESS PRINCIPLE  
+\============================================================
+
+Purpose  
+This section defines how implementation agents should use the master document and records the current product-design priority: simple surface, easy access to tools.
+
+Operating model  
+The PPE Master doc is strategic/product steering, not a literal implementation packet.  
+Repo docs and code remain implementation truth.  
+Cursor should reconcile both before planning or building.
+
+Cursor should:  
+1. Read the current PPE Master doc as strategic steering.  
+2. Inspect repo truth and local planning/frontier docs.  
+3. Report conflicts between master-doc steering and repo reality.  
+4. Update local implementation/frontier docs as needed.  
+5. Propose small implementation slices from the current priorities.  
+6. Build one bounded slice at a time after plan approval.  
+7. Preserve MVP1 constraints and evidence discipline.
+
+Cursor should not:  
+- treat Figma/FigJam flowcharts as literal build specs  
+- widen scope into scanner, saved theses, paywall, or broad redesign unless explicitly authorized  
+- replace repo truth with chat memory  
+- introduce recommendation/signal language  
+- bury trust/provenance while simplifying UI
+
+Current Phase 2 UI/UX priority stack  
+1. Preserve MVP1 truth and the existing freeze/review/class-summary loop.  
+2. Make the BTC Implied Lab first screen understandable within \~15 seconds.  
+3. Make belief-to-disagreement translation obvious.  
+4. Make watch-only/no-trade feel like honest valid product states.  
+5. Keep trust/provenance visible but compact.  
+6. Preserve fit-not-recommendation language.  
+7. Simplify the visible interface while keeping necessary tools easy to reach.
+
+Simple surface, easy tool access principle  
+The desired design is not “minimal because capabilities are removed.”  
+The desired design is “simple first layer, powerful second layer.”
+
+The user should see a calm, readable cockpit first:  
+- what this run is saying  
+- trust/provenance state  
+- main chart  
+- belief controls  
+- disagreement/candidate/no-trade state  
+- next action
+
+The user should also have easy access to tools when needed:  
+- How it works  
+- provenance/details  
+- advanced belief controls  
+- decision-ready review  
+- freeze/review history when enabled  
+- feedback  
+- account/access  
+- future modules when they are real
+
+Design interpretation  
+This is not an oxymoron. It is progressive disclosure.  
+PPE should avoid a cluttered first screen while keeping important tools one click away.  
+The first layer should answer “what is happening and what do I do next?”  
+The second layer should answer “how do I inspect, verify, tune, freeze, review, or learn more?”
+
+Primary navigation principle  
+Do not expose every future concept as a top-level nav item.  
+Prefer a small persistent nav plus contextual tools:  
+- Lab  
+- How it works  
+- Feedback  
+- Account
+
+Within the lab, use contextual actions:  
+- Open provenance  
+- Advanced controls  
+- Decision-ready review  
+- Freeze evaluation  
+- Give feedback
+
+Tool access rule  
+A tool should be visible when it is needed for the current decision, and discoverable otherwise.  
+Avoid both extremes:  
+- clutter: every tool visible all the time  
+- hiding: important trust or action tools buried too deeply
+
+Current design target  
+A simple cockpit with accessible drawers/panels:  
+- top layer: insight, trust, chart, belief input, state output  
+- second layer: provenance, advanced controls, review, freeze, feedback  
+- later layer: saved history, scanner, paywall, broader modules
+
+Next planning task  
+Create a concise “Simple Cockpit Layout Spec” for the BTC Implied Lab three-frame nucleus:  
+1. Default market read  
+2. Candidate found  
+3. Watch-only / no-trade
+
+That spec should define:  
+- what stays visible on the first layer  
+- what goes behind disclosure  
+- which tools are one-click contextual actions  
+- what is deferred to later phases
+
+Canonical summary  
+Phase 2 UI/UX is now mapped enough at the strategic level.  
+The next work is not more giant storyboarding.  
+The next work is organizing the simple cockpit layout and tool-access model, then letting Cursor reconcile repo truth and propose implementation slices.
+
+\============================================================  
+15E. SIMPLE COCKPIT LAYOUT SPEC — BTC IMPLIED LAB  
+\============================================================
+
+Purpose  
+This section defines the current UI/UX layout priority for BTC Implied Lab: a simple first layer with easy access to all tools the user may need.
+
+Core principle  
+The product should feel simple without becoming shallow.  
+PPE should not remove important capabilities to create minimalism.  
+It should organize capabilities into layers:  
+- Layer 1: always visible orientation and action surface  
+- Layer 2: one-click contextual tools  
+- Layer 3: later/separate surfaces
+
+This is progressive disclosure, not hiding.
+
+Design target  
+A calm research cockpit where the user can quickly answer:  
+1. What is the market saying?  
+2. Can I trust this run?  
+3. What do I believe?  
+4. Where do I differ from the market?  
+5. What state is the system in: default, candidate, watch-only, or no-trade?  
+6. What should I inspect or do next?
+
+Layer 1 — Always visible first-layer cockpit  
+This layer should be visible without hunting or opening drawers.  
+It answers “what is happening and what do I do next?”
+
+Required first-layer elements:  
+- product context: Market Structure OS / Probability Engine / BTC Implied Lab  
+- page title: BTC Implied Lab  
+- InsightCard: “What this run is saying”  
+- compact TrustStrip: source, timestamp, data status, curve status, benchmark status, no-advice boundary  
+- main DistributionChartShell  
+- basic BeliefControlPanel  
+- current output state: default, candidate, watch-only, or no-trade  
+- primary next action: adjust belief, inspect candidate, open review, or inspect blocker
+
+Layer 1 should not include:  
+- raw debug dumps  
+- dense provenance tables  
+- every advanced model parameter  
+- future modules that are not usable yet  
+- paywall/commercial clutter  
+- scanner/saved-theses expansion  
+- recommendation/signal language
+
+Layer 2 — One-click contextual tools  
+These tools should be easy to access from the current screen, but should not dominate the first layer.  
+They answer “how do I inspect, verify, tune, freeze, review, or learn more?”
+
+One-click tools:  
+- Advanced controls  
+- Open provenance/details  
+- Decision-ready review  
+- Freeze evaluation  
+- Give feedback  
+- How it works  
+- Explain this state / Why this candidate? / Why no-trade?
+
+Layer 2 rule  
+If a tool affects user trust or the next decision, it should be no more than one click away.  
+If a tool is only for debugging or expert inspection, it can be behind disclosure but must be findable.
+
+Layer 3 — Later or separate surfaces  
+These are real future capabilities, but should not clutter the current BTC Lab first screen.
+
+Later/separate surfaces:  
+- Saved theses  
+- Full review board  
+- Scanner / anomaly desk  
+- Multi-asset expansion  
+- Paywall / pricing / account tiers  
+- Portfolio logic  
+- Exact strike optimization as a primary user flow  
+- Autonomous execution
+
+Navigation model  
+Use minimal persistent navigation:  
+- Lab  
+- How it works  
+- Feedback  
+- Account
+
+Use contextual lab actions instead of bloated global nav:  
+- Open provenance  
+- Advanced controls  
+- Decision-ready review  
+- Freeze evaluation  
+- Give feedback
+
+Tool placement guidance  
+Always visible:  
+- insight  
+- trust state  
+- chart  
+- basic belief controls  
+- output state  
+- primary next action
+
+One click away:  
+- provenance/details  
+- advanced controls  
+- full decision-ready review  
+- freeze  
+- feedback  
+- explanation/help
+
+Deferred:  
+- scanner  
+- saved theses as primary nav  
+- paywall  
+- broad asset expansion  
+- portfolio or execution workflows
+
+Three-frame application
+
+Frame 1 — Default market read  
+Layer 1 visible:  
+- What this run is saying  
+- TrustStrip  
+- Chart  
+- Basic belief controls  
+- inactive/default disagreement/candidate/review cards  
+Primary next action:  
+- adjust belief  
+Layer 2 tools:  
+- provenance/details  
+- advanced controls  
+- how it works
+
+Frame 2 — Candidate found  
+Layer 1 visible:  
+- updated insight  
+- belief overlay  
+- disagreement card  
+- candidate to inspect  
+- fit-not-recommendation boundary  
+- falsification condition  
+Primary next action:  
+- inspect candidate or open decision-ready review  
+Layer 2 tools:  
+- provenance/details  
+- freeze evaluation  
+- feedback  
+- advanced controls
+
+Frame 3 — Watch-only / no-trade  
+Layer 1 visible:  
+- watch-only/no-trade state  
+- clear blocker reason  
+- TrustStrip  
+- no promoted candidate  
+- next action: inspect blocker, adjust inputs, or open provenance  
+Primary next action:  
+- inspect why not promoted or adjust belief/horizon  
+Layer 2 tools:  
+- provenance/details  
+- freeze/watch  
+- feedback
+
+UX/functionality interpretation  
+Simple design does not mean fewer functions.  
+It means the first layer is for orientation and next action, while the second layer gives fast access to tools when the user needs them.
+
+The cockpit should reduce cognitive load without reducing user agency.
+
+Cursor interpretation  
+Cursor should use this section as design steering, not as a literal component implementation order.  
+Cursor should inspect repo truth, update local plans, and propose the smallest implementation slice that advances this cockpit model.
+
+Canonical summary  
+The current UI/UX goal is a simple BTC Lab cockpit with accessible tools:  
+- visible insight/trust/chart/belief/output state  
+- one-click advanced/provenance/review/freeze/feedback tools  
+- future capabilities deferred until they are real and useful
+
+\============================================================  
+15F. FIRST TESTER SCRIPT \+ UI REVIEW RUBRIC  
+\============================================================
+
+Purpose  
+This section defines a lightweight human-read validation process for the BTC Implied Lab cockpit. It is meant for friends-first and trader-tester releases, before heavy commercialization or broad feature expansion.
+
+Why this matters  
+The UI/UX plan is strategically mapped enough. Further abstract planning risks becoming over-planning. The next product-risk question is whether real users can understand the cockpit without extensive founder explanation.
+
+Tester posture  
+Do not pitch while testing. Watch what the user understands unaided.  
+Ask neutral questions. Avoid explaining until after the first pass.  
+The goal is to detect confusion, false confidence, missing trust cues, and unclear next actions.
+
+Test target  
+The first tester session should focus on the BTC Implied Lab three-frame nucleus:  
+1. Default market read  
+2. Candidate found  
+3. Watch-only / no-trade
+
+Core tester questions  
+1. What do you think this app does?  
+2. What do you think this screen is showing?  
+3. What is the market saying here?  
+4. Can you tell whether the data is trustworthy?  
+5. What do you think you can adjust?  
+6. What do you expect will happen if you adjust your belief?  
+7. Where do you think your belief differs from the market?  
+8. Does “candidate to inspect” feel like a recommendation, a suggestion, or something else?  
+9. What would you click next?  
+10. What is confusing?  
+11. What would make this feel more trustworthy?  
+12. Would you want to use this again? Why or why not?
+
+Default market read checks  
+Ask:  
+- What is this screen showing?  
+- What can you adjust?  
+- Can you tell if the data is usable, degraded, or invalid?  
+- Why do you think there is no candidate yet?  
+Pass signal:  
+User can describe the market read, identify trust status, and name the next action without founder explanation.
+
+Candidate found checks  
+Ask:  
+- Where do you disagree with the market?  
+- Why was this candidate shown?  
+- What does expression family mean to you?  
+- Does this feel like a trade recommendation?  
+- What would falsify this idea?  
+Pass signal:  
+User understands candidate as a fit-to-thesis object, not as a buy/sell signal.
+
+Watch-only / no-trade checks  
+Ask:  
+- Why was no candidate shown?  
+- Does this feel honest or broken?  
+- Is the blocker data trust, weak materiality, or unclear disagreement?  
+- What would you do next?  
+Pass signal:  
+User experiences no-trade/watch-only as calibrated restraint rather than product failure.
+
+UI review rubric  
+Use this rubric after each demo or build pass.
+
+Clarity  
+- Can a user understand the screen in roughly 15 seconds?  
+- Is “What this run is saying” visible and useful?  
+- Does the user know what to do next?
+
+Trust  
+- Are source, timestamp, data status, curve status, and benchmark status visible?  
+- Is provenance/details accessible without clutter?  
+- Does the UI distinguish market data from user belief?
+
+Action  
+- Are basic belief controls obvious?  
+- Does the chart respond clearly to belief changes?  
+- Is the primary next action obvious in each state?
+
+Translation  
+- Does the UI make belief-to-disagreement translation clear?  
+- Does the candidate explain why it was flagged?  
+- Is falsification visible?
+
+Restraint  
+- Does candidate language preserve fit-not-recommendation?  
+- Does no-trade/watch-only feel like a valid output?  
+- Does the UI avoid buy/sell/signal/guaranteed-edge language?
+
+Layout  
+- Is the first layer simple?  
+- Is the chart prominent but not overwhelming?  
+- Are tools easy to reach without cluttering the first layer?
+
+Tester result categories  
+After a tester session, classify feedback as:  
+- naming confusion  
+- market-read confusion  
+- trust/provenance confusion  
+- belief-control confusion  
+- candidate/recommendation confusion  
+- no-trade/watch-only confusion  
+- layout/visual hierarchy confusion  
+- value/desirability signal  
+- feature request / later-scope item
+
+Do not treat every feature request as a build instruction.  
+Feature requests should be sorted into now / later / no.
+
+Minimum friends-first validation target  
+Before trader-tester release, aim for several friends-first sessions where users can:  
+- explain what Market Structure OS / Probability Engine / BTC Implied Lab are at a basic level  
+- understand the default market read  
+- understand that belief inputs are their own view, not market data  
+- understand candidate-to-inspect as non-recommendation  
+- understand watch-only/no-trade as valid output  
+- identify at least one useful next action
+
+Operator timed demo (walkthrough script): [`docs/SOP/DEMO_OPERATOR_SCRIPT.md`](../SOP/DEMO_OPERATOR_SCRIPT.md). This section is the friends-first comprehension rubric.
+
+Canonical summary  
+The next product-risk test is human comprehension, not more abstract planning.  
+Use this script and rubric to test whether the simple cockpit actually works for first-time users.
 
 \============================================================  
 16\. FINAL SUMMARY  

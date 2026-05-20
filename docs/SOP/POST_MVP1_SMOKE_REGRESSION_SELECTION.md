@@ -1,6 +1,6 @@
 # Post–MVP1 smoke regression — steward SELECTION (prep)
 
-**Status:** Smoke regression chapter **COMPLETE** (2026-05-19). **Agent BUILD:** **stopped here** — no next chapter chartered or implemented. **Steward:** pick next BUILD from deferred table below when ready.
+**Status:** Smoke regression chapter **COMPLETE** (2026-05-19). **Successor chapter:** MVP1 friends-first screen — **IN PROGRESS** ([`POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md)).
 
 **Closed record:** [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md) · [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md)
 
