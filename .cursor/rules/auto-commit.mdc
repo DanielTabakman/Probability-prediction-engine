@@ -32,7 +32,7 @@ alwaysApply: true
 
 - After auto-commit on any branch **other than** `main` / `master`, the agent should **auto-push** to the branch’s existing upstream.
 - If the current branch has no upstream yet, the first push should be `git push -u origin HEAD` (or equivalent for the default remote).
-- **After push**, if there is no open PR to `main` for this branch, **open one** (`gh pr create --base main --head <branch>`). GitHub will add the `automerge` label ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when **`CI / pytest`** passes, [`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges to `main` and **Deploy VPS** can run. Do not stop at “pushed feature branch” when the intent is to ship.
+- **After push**, if there is no open PR to `main` for this branch, **open one** (`gh pr create --base main --head <branch>`). GitHub will add the `automerge` label ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when the **CI** workflow ([`ci.yml`](../../.github/workflows/ci.yml)) completes **`success`**—i.e. both **`CI / pytest`** and **`CI / docker_entrypoint`** pass—[`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges to `main` and **Deploy VPS** can run. Do not stop at “pushed feature branch” when the intent is to ship.
 - Preconditions for auto-push on non-main branches:
   - Pushable commit gate passed (ruff + full pytest, or docs-only exception).
   - The working tree is clean except for the intended changes.
@@ -41,7 +41,7 @@ alwaysApply: true
 ### `main` / `master` branches
 
 - Same gate as any pushable commit: `python -m ruff check src tests scripts` and `python -m pytest -q`.
-- If the repository uses **PR-only** delivery to `main` (see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Push a **feature branch** and open a PR so GitHub runs **`CI / pytest`** before merge.
+- If the repository uses **PR-only** delivery to `main` (see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Push a **feature branch** and open a PR so GitHub runs the full **CI** workflow (pytest + docker_entrypoint) before merge.
 - No secrets / artifacts in the commit; no force push or history rewrite.
 
 ## When not to auto-push
@@ -81,4 +81,4 @@ Do not block commit on dual smoke (environment-sensitive).
 
 ### Merge to `main`
 
-GitHub **`CI / pytest`** = ruff + full pytest. Local gate should match before push.
+GitHub **CI** = **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker + Streamlit smoke). Local gate should match pytest + ruff before push; docker smoke runs on GitHub unless you replicate it locally.

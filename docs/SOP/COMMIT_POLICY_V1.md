@@ -19,7 +19,7 @@ python -m ruff check src tests scripts
 python -m pytest -q
 ```
 
-This matches the **`CI / pytest`** workflow (ruff + full pytest). Do not use “targeted pytest only” for commits intended to be shared.
+This matches the **`CI / pytest`** job (ruff + full pytest). The full **CI** workflow on GitHub also runs **`CI / docker_entrypoint`**; both must pass before merge when using merge-on-green or required checks. Do not use “targeted pytest only” for commits intended to be shared.
 
 ### Docs-only exception
 
@@ -38,7 +38,7 @@ When a PR or slice changes `src/viz/**` or `scripts/*smoke*` / `implied_lab_ui_s
 
 ### Merge to `main`
 
-- GitHub required check: **`CI / pytest`** (ruff + full pytest).
+- GitHub **CI** workflow (`.github/workflows/ci.yml`): jobs **`CI / pytest`** (ruff + full pytest) and **`CI / docker_entrypoint`** (Docker build + Streamlit entry smoke). Branch protection may list both; **Merge on green** merges only when the **entire** workflow run is `success`, which requires **both** jobs to pass.
 - Prefer PR + auto-merge per `GITHUB_ZERO_TOUCH_MERGE.md`; do not push directly to `main` when branch protection applies.
 
 ## Authorization

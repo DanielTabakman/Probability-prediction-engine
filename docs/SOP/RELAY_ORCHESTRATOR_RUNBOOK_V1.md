@@ -71,7 +71,7 @@ Steward action:
 After relay **CONTINUE** and successful **promotion** to a branch that can merge to **`main`**, the default path to production is:
 
 1. Open (or update) a **pull request** to **`main`**.
-2. Enable **auto-merge** so GitHub merges when **`CI / pytest`** and any other required checks pass ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). If that control is greyed out (private + Free), **Label PR automerge** applies **`automerge`** automatically; **Merge on green** merges after CI passes.
+2. Enable **auto-merge** so GitHub merges when required checks pass, including the full **CI** workflow (**`CI / pytest`** + **`CI / docker_entrypoint`**) ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). If that control is greyed out (private + Free), **Label PR automerge** applies **`automerge`** automatically; **Merge on green** merges only when the **entire** `ci.yml` run is `success` (both jobs must pass).
 3. **Deploy VPS** runs on the resulting push to **`main`** ([GITHUB_ACTIONS_VPS_DEPLOY.md](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md)).
 
 Orchestrator or agents with suitable credentials can enable auto-merge via the GitHub API so the steward does not click **Merge** for routine slices.
@@ -96,5 +96,5 @@ Use these as quick “are we drifting?” checks:
 
 ### Related
 
-- [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md) — PR auto-merge, branch protection, **`CI / pytest`**.  
+- [GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md) — PR auto-merge, branch protection, **`CI / pytest`** and **`CI / docker_entrypoint`**.  
 - [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) — `main` + VPS + deploy Action.

@@ -61,7 +61,7 @@ Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md).
 | **Every pushable commit** (code or mixed) | `python -m ruff check src tests scripts` then `python -m pytest -q` |
 | **Docs-only** (`docs/` only) | pytest not required |
 | **PR touching implied lab** (`src/viz/**`, smoke scripts) | also `python scripts/run_mvp1_dual_implied_lab_smoke.py` before merge (not every commit) |
-| **Merge to `main`** | GitHub **`CI / pytest`** (same as local: ruff + full pytest) |
+| **Merge to `main`** | GitHub **CI** workflow green: **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker image + Streamlit entry smoke). [Merge on green](.github/workflows/merge-on-green.yml) merges only when the **whole** `ci.yml` run succeeds, so both jobs must pass. |
 
 ### Testing policy (imports)
 
@@ -78,7 +78,7 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 - **Always-on rule:** [`.cursor/rules/auto-commit.mdc`](.cursor/rules/auto-commit.mdc). Paste global snippet from [`.cursor/USER_RULES_GIT_SNIPPET.md`](.cursor/USER_RULES_GIT_SNIPPET.md) if Cursor user rules still say “commit only when asked.”
 - Auto-commit when todos are complete and **ruff + full pytest** pass (or docs-only exception); show `git status` / `git diff` / `git log -1` first.
 - Auto-push after the same gate on feature branches (no force-push).
-- On **`main`**, prefer PR + **`CI / pytest`** rather than direct push when branch protection applies.
+- On **`main`**, prefer PR + full **CI** workflow green (pytest + docker_entrypoint) rather than direct push when branch protection applies.
 - Never auto-commit secrets or artifacts (`.env`, `artifacts/`, caches, local DB files).
 
 **If `pip install` says "file in use" or "access denied"**: another program (IDE, another terminal, Python process) is using the package files. Close other Python/terminal windows and try again, or use a new venv in a new folder.
