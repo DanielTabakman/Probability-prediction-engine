@@ -63,7 +63,12 @@ When a PR or slice changes `src/viz/**` or `scripts/*smoke*` / `implied_lab_ui_s
 
 ## Relationship to other SOPs
 
+- **Cursor agent (always-on):** [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc) — implements this policy in the IDE (commit, feature-branch push, open PR to `main`).
 - Branch/worktree isolation: `FRONTIER_STEWARD_PROTOCOL.md`
 - Execution steps + planes: `OPERATING_RULES.md`
 - Relay gates: `CODEX_AUTONOMY_V1.md`, `RELAY_RUNTIME_V0.md`
 - Auto-merge / CI: `GITHUB_ZERO_TOUCH_MERGE.md`
+
+## Cursor user rules (global)
+
+Paste the snippet in [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into **Cursor Settings → Rules** so global “commit only when asked” does not block this repo’s standing authorization.

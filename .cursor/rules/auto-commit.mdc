@@ -1,4 +1,11 @@
+---
+description: Auto-commit and push after authorized tasks when COMMIT_POLICY gates pass. Supersedes generic "ask before commit" for this repo.
+alwaysApply: true
+---
+
 # Auto-commit and auto-push policy
+
+**Precedence:** In this repository, this rule overrides `OPERATING_RULES.md` § Git and any generic user instruction to "ask before commit" when the current task or plan is **authorized and complete**.
 
 ## When to auto-commit
 
