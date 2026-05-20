@@ -89,6 +89,7 @@ from src.viz.app_panels import (
     render_decision_ready_review as _render_decision_ready_review,
     render_directional_candidate_strip_payload as _render_directional_candidate_strip_payload,
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
+    render_mvp1_friends_first_above_fold as _render_mvp1_friends_first_above_fold,
     render_mvp1_primary_output_compact as _render_mvp1_primary_output_compact,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
@@ -399,6 +400,7 @@ if show_bitcoin_view:
                                     shape_window_label=_zoom_now,
                                 )
                                 st.session_state[_prev_shape_zoom_key] = _zoom_now
+                        right_above_fold_slot = st.empty()
                         right_chart_slot = st.empty()
                         strip_local_story_slot = st.empty()
                         right_summary_slot = st.empty()
@@ -1466,6 +1468,18 @@ if show_bitcoin_view:
                                 ("\n\n" if belief_txt else "") + belief_hints
                             )
 
+                    if not post_mvp_implied_lab_ui:
+                        _v_above = (
+                            outputs.get("verification")
+                            if isinstance(outputs.get("verification"), dict)
+                            else None
+                        )
+                        if _v_above:
+                            with right_above_fold_slot.container():
+                                _render_mvp1_friends_first_above_fold(_v_above)
+                    else:
+                        right_above_fold_slot.empty()
+
                     with right_chart_slot.container():
                         st.markdown("##### Market-implied view (chart)")
                         with st.container(border=True):
@@ -1506,12 +1520,6 @@ if show_bitcoin_view:
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
-                    # MVP1 compact: primary decision digest immediately under the chart.
-                    if not post_mvp_implied_lab_ui:
-                        _v_mvp1 = outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None
-                        if _v_mvp1:
-                            with right_summary_slot.container():
-                                _render_mvp1_primary_output_compact(_v_mvp1)
                     # Summary card (Sprint 001): single-source-of-truth from derived outputs.
                     with right_summary_slot.container():
                         _render_implied_lab_summary_card(
@@ -1535,8 +1543,11 @@ if show_bitcoin_view:
                             _render_directional_candidate_strip_payload(_dir_strip)
                     else:
                         right_directional_candidate_slot.empty()
-                    with right_trust_slot.container():
-                        _render_trust_strip(outputs.get("verification") or {})
+                    if post_mvp_implied_lab_ui:
+                        with right_trust_slot.container():
+                            _render_trust_strip(outputs.get("verification") or {})
+                    else:
+                        right_trust_slot.empty()
                     with right_belief_slot.container():
                         if _belief_block:
                             with st.expander("Belief overlay (this run)", expanded=False):
