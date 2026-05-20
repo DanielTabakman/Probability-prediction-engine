@@ -17,6 +17,7 @@ from src.viz.reviewed_class_summary import (
     build_class_summary,
     extract_summary_dimensions,
     operator_guidance_line,
+    serialize_rollup_csv,
 )
 from collections import Counter
 
@@ -46,6 +47,15 @@ class TestReviewedClassSummary(unittest.TestCase):
         c = Counter({"supportive": 2, "contradictory": 2})
         g = operator_guidance_line(c)
         self.assertTrue(g)
+
+    def test_serialize_rollup_csv(self) -> None:
+        rollup = build_class_summary([])
+        rollup["n_reviewed"] = 1
+        rollup["by_review_status"] = {"supportive": 1}
+        csv_text = serialize_rollup_csv(rollup)
+        self.assertIn("metric,bucket,count", csv_text.splitlines()[0])
+        self.assertIn("by_review_status,supportive,1", csv_text)
+        self.assertIn("operator_summary_line", csv_text)
 
     def test_sqlite_list_completed_and_rollup(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -96,5 +106,12 @@ class TestReviewedClassSummary(unittest.TestCase):
                 self.assertEqual(len(rows4), 1)
                 rows5 = list_completed_review_snapshots(conn, limit=50, expiry="6MAY26")
                 self.assertEqual(len(rows5), 0)
+                rows6 = list_completed_review_snapshots(
+                    conn,
+                    limit=50,
+                    reviewed_after_utc="2020-01-01T00:00:00Z",
+                    reviewed_before_utc="2099-12-31T23:59:59Z",
+                )
+                self.assertEqual(len(rows6), 1)
             finally:
                 conn.close()

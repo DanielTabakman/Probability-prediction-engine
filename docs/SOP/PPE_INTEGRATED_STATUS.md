@@ -23,6 +23,8 @@ flowchart LR
   end
   subgraph closed2 [Also closed]
     OH[MVP1 operator hardening COMPLETE]
+    RE[MVP1 review enrichment COMPLETE]
+    SR[MVP1 smoke regression COMPLETE]
   end
   closed --> closed2
   closed2 --> steward
@@ -39,16 +41,47 @@ flowchart LR
 | MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
 | Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
 | MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
+| MVP1 memory & review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md), [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) |
+| MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md), [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) |
 
-**Chapter close SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md) · **Next chapter SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md`](POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md)
+**Chapter close SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md) · **Next chapter SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 
 ---
 
+## MVP1 smoke regression — final relay (archived)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-SmokeRegression-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Harness-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-SmokeRegression-Witness-Slice003` | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Closeout-Slice004` | CONTROL |
+
+**Dual smoke:** `20260519_232908` + `233106` — **PASS** (~220s total).
+
+**Next SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md)
+
+---
+
+## MVP1 review enrichment — final relay (archived)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-ReviewEnrichment-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice003` | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice004` | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Closeout-Slice005` | CONTROL |
+
+**Next SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION.md)
+
+---
+
 ## MVP1 operator hardening — final relay (archived)
 
-All slices **CLOSED** 2026-05-19. **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md)
+All slices **CLOSED** 2026-05-19.
 
 ---
 
@@ -72,8 +105,8 @@ All slices **CLOSED** 2026-05-19. **Next SELECTION:** [`POST_MVP1_OPERATOR_HARDE
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **165** passed (health-check cleanup 2026-05-19) |
-| Dual smoke (post–operator Slice002) | **PASS** | `20260519_164110` + `20260519_164330` |
+| `python -m pytest -q` | **PASS** | **168** passed (smoke regression 2026-05-19) |
+| Dual smoke | **PASS** | `20260519_232908` + `20260519_233106` (~220s) |
 
 Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
@@ -118,4 +151,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_MVP1_OPERATOR_HARDENING_SELECTION.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_MVP1_SMOKE_REGRESSION_SELECTION.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

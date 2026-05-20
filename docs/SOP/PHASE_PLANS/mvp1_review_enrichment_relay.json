@@ -1,0 +1,43 @@
+{
+  "name": "MVP1_review_enrichment (post-operator-hardening SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_REVIEW_ENRICHMENT.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-ReviewEnrichment-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-ReviewEnrichment-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-ReviewEnrichment-Product-Slice003",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-ReviewEnrichment-Product-Slice004",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-ReviewEnrichment-Closeout-Slice005",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 1
+    }
+  ]
+}

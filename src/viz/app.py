@@ -101,7 +101,7 @@ from src.viz.mvp1_lab_ui import (
 )
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz import frozen_evaluation_store as _fz_store
-from src.viz.reviewed_class_summary import build_class_summary
+from src.viz.reviewed_class_summary import build_class_summary, serialize_rollup_csv
 from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
@@ -1632,29 +1632,39 @@ if show_bitcoin_view:
                         with st.expander("Pending snapshot reviews", expanded=False):
                             _conn_pd = _fz_store.open_store()
                             try:
-                                _pend_all = _fz_store.list_snapshots_pending_review(_conn_pd, limit=200)
+                                _expiries = _fz_store.list_distinct_frozen_expiries(_conn_pd)
                             finally:
                                 _conn_pd.close()
-                            _expiries = sorted(
-                                {
-                                    str(r.get("expiry") or "").strip()
-                                    for r in _pend_all
-                                    if str(r.get("expiry") or "").strip()
-                                }
-                            )
                             _exp_choice = st.selectbox(
                                 "Filter by expiry (pending only)",
                                 options=["(all)"] + _expiries,
                                 index=0,
                                 key=f"ppe_pending_expiry_filter_{selected_expiry_str}",
                             )
-                            _pend = _pend_all
-                            if _exp_choice != "(all)":
-                                _pend = [
-                                    r
-                                    for r in _pend_all
-                                    if str(r.get("expiry") or "").strip() == _exp_choice
-                                ]
+                            _pend_sort = st.selectbox(
+                                "Sort pending",
+                                options=list(_fz_store.PENDING_SORT_OPTIONS),
+                                format_func=lambda s: {
+                                    _fz_store.PENDING_SORT_NEWEST: "Newest frozen first",
+                                    _fz_store.PENDING_SORT_EXPIRY: "Expiry (A→Z)",
+                                    _fz_store.PENDING_SORT_HORIZON: "Review horizon ref",
+                                }.get(s, s),
+                                index=0,
+                                key=f"ppe_pending_sort_{selected_expiry_str}",
+                            )
+                            _pend_exp = (
+                                None if _exp_choice == "(all)" else str(_exp_choice).strip()
+                            )
+                            _conn_pd2 = _fz_store.open_store()
+                            try:
+                                _pend = _fz_store.list_snapshots_pending_review(
+                                    _conn_pd2,
+                                    limit=200,
+                                    expiry=_pend_exp,
+                                    sort=_pend_sort,
+                                )
+                            finally:
+                                _conn_pd2.close()
                             if not _pend:
                                 st.caption("No snapshots pending review.")
                             else:
@@ -1715,39 +1725,36 @@ if show_bitcoin_view:
                                     _before_utc = f"{_dr[1].isoformat()}T23:59:59Z"
                             except Exception:
                                 _after_utc, _before_utc = None, None
-                            _conn_cls = _fz_store.open_store()
+                            _conn_ex = _fz_store.open_store()
                             try:
-                                _completed_all = _fz_store.list_completed_review_snapshots(
-                                    _conn_cls,
-                                    limit=500,
-                                    review_statuses=list(_sel_statuses)
-                                    if _sel_statuses
-                                    else [],
-                                    reviewed_after_utc=_after_utc,
-                                    reviewed_before_utc=_before_utc,
-                                )
+                                _expiries2 = _fz_store.list_distinct_frozen_expiries(_conn_ex)
                             finally:
-                                _conn_cls.close()
-                            _expiries2 = sorted(
-                                {
-                                    str(r.get("expiry") or "").strip()
-                                    for r in _completed_all
-                                    if str(r.get("expiry") or "").strip()
-                                }
-                            )
+                                _conn_ex.close()
                             _exp_choice2 = st.selectbox(
                                 "Filter by expiry (reviewed only)",
                                 options=["(all)"] + _expiries2,
                                 index=0,
                                 key=f"ppe_phase6_expiry_filter_{selected_expiry_str}",
                             )
-                            _completed = _completed_all
-                            if _exp_choice2 != "(all)":
-                                _completed = [
-                                    r
-                                    for r in _completed_all
-                                    if str(r.get("expiry") or "").strip() == _exp_choice2
-                                ]
+                            _cls_exp = (
+                                None
+                                if _exp_choice2 == "(all)"
+                                else str(_exp_choice2).strip()
+                            )
+                            _conn_cls = _fz_store.open_store()
+                            try:
+                                _completed = _fz_store.list_completed_review_snapshots(
+                                    _conn_cls,
+                                    limit=500,
+                                    review_statuses=list(_sel_statuses)
+                                    if _sel_statuses
+                                    else [],
+                                    expiry=_cls_exp,
+                                    reviewed_after_utc=_after_utc,
+                                    reviewed_before_utc=_before_utc,
+                                )
+                            finally:
+                                _conn_cls.close()
                             _rollup = build_class_summary(_completed)
                             st.markdown(f"**{_rollup['operator_summary_line']}**")
                             st.metric(
@@ -1766,6 +1773,14 @@ if show_bitcoin_view:
                                     file_name="ppe_phase6_rollup.json",
                                     mime="application/json",
                                     key=f"ppe_rollup_dl_json_{selected_expiry_str}",
+                                )
+                                _rollup_csv = serialize_rollup_csv(_rollup).encode("utf-8")
+                                st.download_button(
+                                    "Download rollup (CSV)",
+                                    data=_rollup_csv,
+                                    file_name="ppe_phase6_rollup.csv",
+                                    mime="text/csv",
+                                    key=f"ppe_rollup_dl_csv_{selected_expiry_str}",
                                 )
                                 _ca, _cb = st.columns(2)
                                 with _ca:
@@ -1863,6 +1878,7 @@ if show_bitcoin_view:
                                         "review_status": (r.get("review") or {}).get("review_status"),
                                         "reviewed_at_utc": (r.get("review") or {}).get("reviewed_at_utc"),
                                         "review_horizon_ref": (r.get("review") or {}).get("review_horizon_ref"),
+                                        "paper_tag": (r.get("review") or {}).get("paper_tag"),
                                         "outcome_notes": (r.get("review") or {}).get("outcome_notes"),
                                     }
                                     for r in _completed
@@ -1923,6 +1939,21 @@ if show_bitcoin_view:
                                     value=_default_notes,
                                     key=f"ppe_rev_notes_{_fvid}",
                                 )
+                                _default_paper = (
+                                    (_rev_existing.get("paper_tag") or "")
+                                    if _rev_existing
+                                    else ""
+                                )
+                                _paper_val = st.text_input(
+                                    "Paper tag (optional, ≤120 chars)",
+                                    value=_default_paper,
+                                    max_chars=120,
+                                    key=f"ppe_rev_paper_{_fvid}",
+                                )
+                                if _rev_existing and _rev_existing.get("review_horizon_ref"):
+                                    st.caption(
+                                        f"Review horizon ref: `{_rev_existing['review_horizon_ref']}`"
+                                    )
                                 if st.button("Save review", key=f"ppe_rev_save_{_fvid}"):
                                     _href = _fz_store.review_horizon_ref_from_frozen(_frozen)
                                     _cs = _fz_store.open_store()
@@ -1933,6 +1964,7 @@ if show_bitcoin_view:
                                             review_status=_sel_status,
                                             outcome_notes=_notes_val or None,
                                             review_horizon_ref=_href or None,
+                                            paper_tag=_paper_val or None,
                                         )
                                     finally:
                                         _cs.close()
