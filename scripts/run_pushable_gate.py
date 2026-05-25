@@ -25,6 +25,7 @@ SCRIPT_EXTRA_TESTS: dict[str, tuple[str, ...]] = {
         "tests/test_msos_snapshot.py",
         "tests/test_sync_msos_repo_truth.py",
     ),
+    "scripts/google_docs_refresh.py": ("tests/test_google_docs_refresh.py",),
 }
 
 RUFF_CMD = [sys.executable, "-m", "ruff", "check", "src", "tests", "scripts"]

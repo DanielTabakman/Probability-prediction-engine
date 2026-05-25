@@ -10,8 +10,9 @@ alwaysApply: true
 **Agents (steward BUILD):**
 
 1. At **SELECTION**, update [`docs/SOP/ACTIVE_PHASE_MANIFEST.json`](docs/SOP/ACTIVE_PHASE_MANIFEST.json): `phasePlanPath`, `sprintSpecPath`, `status: READY` ([`ACTIVE_PHASE_MANIFEST.md`](docs/SOP/ACTIVE_PHASE_MANIFEST.md)).
-2. Tell the operator: run `run_ppe.cmd` (do not ask them to hand-edit HANDOFF/FRONTIER or paste orchestrator logs).
-3. After phase exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; use a **new** Cursor thread with [`AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
+2. **Refresh Google Docs** before a new cycle: optional `refresh_google_docs.cmd`; `run_ppe.cmd` also runs **cycle-start** refresh automatically ([`GOOGLE_DOCS_REFRESH_V1.md`](docs/SOP/GOOGLE_DOCS_REFRESH_V1.md)).
+3. Tell the operator: run `run_ppe.cmd` (do not ask them to hand-edit HANDOFF/FRONTIER or paste orchestrator logs).
+4. After phase exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **cycle-end** refresh runs after closeout; review `artifacts/control_plane/google_docs_refresh_report.md` if needed; use a **new** Cursor thread with [`AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
 
 **No active chapter:** manifest `COMPLETE` + empty `phasePlanPath` is normal — do SELECTION before `run_ppe.cmd`.
 

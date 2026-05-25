@@ -185,12 +185,29 @@ Every job in this doc uses the same fields, in this order:
 - **side effects**: Google Docs API `batchUpdate` on MSOS document only.
 - **human signoff required?**: **no** when chained after closeout; OAuth and doc markers are one-time operator setup.
 
+### 3.7 `google_docs_refresh_v1`
+
+- **name**: `google_docs_refresh_v1`
+- **purpose**: **GOOGLE_DOCS_REFRESH** — align control-plane docs at cycle boundaries: repo truth check, naming drift scan, lightweight validation, Live Mirror regeneration, structured report for founder/ChatGPT.
+- **inputs**:
+  - `repo_root`
+  - `trigger` — `cycle-start` \| `cycle-end` \| `manual`
+  - `dry_run` — MSOS snapshot only (no Google push)
+  - `skip_msos_push`, `skip_validation`, `skip_witness_http` — optional
+- **authority boundary**: **never writes PPE Master.** Invokes `sync_msos_repo_truth_v1` for Live Mirror only. Writes `artifacts/control_plane/google_docs_refresh_report.*` (gitignored).
+- **stop conditions**: MSOS markers missing with credentials → exit `2` on **cycle-end** chain; otherwise best-effort skip exit `0`.
+- **outputs**: `google_docs_refresh_report.json`, `google_docs_refresh_report.md`; updates `msos_sync_report.json` when MSOS push runs.
+- **side effects**: Google Docs MSOS block when push succeeds.
+- **human signoff required?**: **no** when chained; manual run is operator habit (“refresh Google Docs”).
+- **canonical SOP**: [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md)
+
 ## 4. Interactions (for future relay runtime reference)
 
 The registry does not define dispatch, but it does name the **legal composition** a v0 relay may rely on:
 
 - `run_selected_slice_v1` → emits §14.1 payload → `relay_gate_decision` consumes it → emits decision.
-- On chapter `CONTINUE` with phase-plan `closeout`: `apply_control_closeout_v1` → `sync_msos_repo_truth_v1` (best-effort; MSOS skip does not block closeout).
+- On chapter `CONTINUE` with phase-plan `closeout`: `apply_control_closeout_v1` → `google_docs_refresh_v1` (`cycle-end`, includes `sync_msos_repo_truth_v1`).
+- Before `run_ppe.cmd` phase execution: `google_docs_refresh_v1` (`cycle-start`, best-effort WARN only).
 - Before a steward-authored SELECTION, `codebase_health_report` and `control_plane_consistency_check` may run in any order; both are read-only and independent.
 - **What happens next** (canonical §15.1 + `RELAY_RUNTIME_V0`): On `CONTINUE`, the relay/runtime **stops** after recording the decision and surfacing the §10.6 HANDBACK; the next **human** step is **steward CONTROL-CLOSEOUT** (`CODEX_AUTONOMY_V1` §15.3 — no auto-closeout, no auto-SELECTION). On `RETRY_ALLOWED`, **at most one** additional in-slice worker invocation is permitted per §15.4 / §7 (same slice spec, `retry_count += 1`); no scope/plane change, no other job chaining. On `STOP_FOR_REVIEW` or `BLOCKED`, automation halts for **steward disposition**; a non-null `stop_condition` is mapped by §15.2 (often `STOP_FOR_REVIEW` or `BLOCKED`, not `CONTINUE`) and must **never** be silently upgraded to `CONTINUE`. Automated chaining that treats canonical steering truth as closed before steward CONTROL-CLOSEOUT on a `CONTINUE` path is forbidden (`RELAY_RUNTIME_V0` §§9–10).
 - `BLOCKED` always halts the chain; no automated follow-up is authorized.
@@ -203,6 +220,7 @@ The registry does not define dispatch, but it does name the **legal composition*
 
 ## 6. Last updated
 
+2026-05-25 — Added §3.7 `google_docs_refresh_v1` (cycle-start/cycle-end hooks + manual `refresh_google_docs.cmd`).  
 2026-05-25 — Added §3.5 `apply_control_closeout_v1` and §3.6 `sync_msos_repo_truth_v1` (Google MSOS mirror). Control-plane only.
 
 2026-04-21 — Control-plane vocabulary reconcile: `relay_gate_decision` §15.1 decision enum and closeout-chaining notes aligned with `CODEX_AUTONOMY_V1.md` §15.1 and `RELAY_RUNTIME_V0.md` (`CONTINUE` / `RETRY_ALLOWED` / `STOP_FOR_REVIEW` / `BLOCKED`; removed stale `RETRY` / `STOP_CLEAN` / `STOP_HARD` wording). No protocol intent change; no BUILD.

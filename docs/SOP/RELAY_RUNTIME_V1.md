@@ -12,7 +12,8 @@ Precedence: same stack as v0, with this doc after `RELAY_RUNTIME_V0.md` for clos
 - **Allow-listed writes** under `docs/SOP/` only, driven by phase-plan `closeout` metadata — no LLM prose generation.
 - **Mandatory chaining:** after slice run `CONTINUE` with `ready_for_control_closeout == true`, wrappers **must** run closeout (via [`scripts/post_relay_continue.py`](../../scripts/post_relay_continue.py)) before the next slice in a phase plan.
 - **Outputs:** patched steering docs + [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) + `artifacts/control_plane/continuity_brief.json` (gitignored).
-- **Sixth job (best-effort):** `sync_msos_repo_truth_v1` (§3.6) — **PPE / MSOS Repo Truth — Live Mirror** Google Doc only; chained by [`post_relay_continue.py`](../../scripts/post_relay_continue.py) after successful closeout. Skip (missing OAuth/markers/deps) does **not** fail closeout; marker missing with credentials → non-zero for operator visibility.
+- **Sixth job (cycle-end):** `google_docs_refresh_v1` (§3.7) — chained by [`post_relay_continue.py`](../../scripts/post_relay_continue.py) after successful closeout; includes `sync_msos_repo_truth_v1` (§3.6). See [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md).
+- **Cycle-start (best-effort):** `google_docs_refresh_v1` from [`ppe_run.py`](../../scripts/ppe_run.py) when `run_ppe.cmd` starts a phase; WARN only on failure.
 
 ## 2. Relationship to v0
 

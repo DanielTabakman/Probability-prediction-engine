@@ -27,7 +27,9 @@ Machine-readable pointer for **`run_ppe.cmd`** (unified full-phase run). Steward
 
 1. Charter chapter → phase plan JSON exists
 2. Update this manifest (`READY`)
-3. Run `run_ppe.cmd` from repo root (or `run_ppe.cmd --dry-run` first)
-4. After exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with `AGENT_CONTINUITY_BRIEF.md` only
+3. **Refresh Google Docs** (optional explicit pass): `refresh_google_docs.cmd` — or rely on **cycle-start** refresh when `run_ppe.cmd` starts
+4. Run `run_ppe.cmd` from repo root (or `run_ppe.cmd --dry-run` first)
+5. After exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with `AGENT_CONTINUITY_BRIEF.md` only
+6. After chapter closeout: **cycle-end** refresh runs automatically via `post_relay_continue`; review `artifacts/control_plane/google_docs_refresh_report.md`
 
 See [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md) and [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).

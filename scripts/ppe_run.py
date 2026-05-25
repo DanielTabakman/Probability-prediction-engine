@@ -62,6 +62,28 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     except Exception as e:
         print(f"WARN: could not set manifest RUNNING: {e}")
 
+    refresh = repo / "scripts" / "google_docs_refresh.py"
+    if refresh.is_file():
+        refresh_env = env.copy()
+        refresh_env["PYTHONPATH"] = str(repo)
+        refresh_proc = subprocess.run(
+            [
+                sys.executable,
+                str(refresh),
+                "--repo-root",
+                str(repo),
+                "--trigger",
+                "cycle-start",
+            ],
+            cwd=repo,
+            env=refresh_env,
+        )
+        if refresh_proc.returncode != 0:
+            print(
+                f"WARN: google_docs_refresh (cycle-start) exit {refresh_proc.returncode}; "
+                "continuing phase run"
+            )
+
     log = repo / "scripts" / "log_event.py"
     if log.is_file():
         subprocess.run(

@@ -117,6 +117,22 @@ def main(argv: list[str] | None = None) -> int:
     if maybe_mark_manifest_complete(repo, args.phase_plan.resolve(), slice_id):
         print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
 
+    refresh_cmd = [
+        sys.executable,
+        str(repo / "scripts" / "google_docs_refresh.py"),
+        "--repo-root",
+        str(repo),
+        "--trigger",
+        "cycle-end",
+    ]
+    refresh_proc = subprocess.run(refresh_cmd, cwd=repo, env=env)
+    if refresh_proc.returncode != 0:
+        print(
+            f"post_relay_continue: google_docs_refresh exit {refresh_proc.returncode} "
+            "(closeout OK; fix MSOS markers/OAuth if needed)"
+        )
+        return refresh_proc.returncode
+
     print(f"post_relay_continue: closeout OK for {slice_id}")
     return 0
 

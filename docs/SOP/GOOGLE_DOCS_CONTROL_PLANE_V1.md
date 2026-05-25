@@ -105,14 +105,26 @@ Automation replaces everything **between** the markers (markers are found by tex
 
 Env: `MSOS_REPO_TRUTH_DOC_ID` in `.env.mcp` (see [`MCP_GOOGLE_DOCS_SETUP.md`](MCP_GOOGLE_DOCS_SETUP.md)).
 
-## When MSOS sync runs
+## When GOOGLE_DOCS_REFRESH runs (cycle hooks)
 
-After relay `CONTINUE` when phase-plan `closeout` runs successfully:
+Canonical command: **refresh Google Docs**. Full protocol: [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md).
 
-1. `apply_control_closeout_v1` patches repo steering docs
-2. `sync_msos_repo_truth_v1` runs via [`scripts/post_relay_continue.py`](../../scripts/post_relay_continue.py)
+| Trigger | When | Entry |
+|---------|------|--------|
+| **cycle-end** | After successful chapter closeout | [`post_relay_continue.py`](../../scripts/post_relay_continue.py) → `google_docs_refresh_v1` (`--trigger cycle-end`) |
+| **cycle-start** | When `run_ppe.cmd` starts a phase (`manifest` → `RUNNING`) | [`ppe_run.py`](../../scripts/ppe_run.py) → `google_docs_refresh_v1` (`--trigger cycle-start`, best-effort WARN only) |
+| **manual** | Operator or agent anytime | [`refresh_google_docs.cmd`](../../refresh_google_docs.cmd) |
 
-MSOS sync is **best-effort**: missing OAuth or markers logs a skip and does **not** fail closeout. Marker missing with credentials configured exits non-zero for operator visibility.
+Each refresh run:
+
+1. Inspects repo git state and naming drift
+2. Runs lightweight control-plane validation
+3. Calls `sync_msos_repo_truth_v1` (Live Mirror push unless `--dry-run`)
+4. Writes `artifacts/control_plane/google_docs_refresh_report.{json,md}`
+
+**cycle-end** runs **after** `apply_control_closeout_v1` so steering docs and `continuity_brief.json` match the closed chapter before the mirror is regenerated.
+
+MSOS push inside refresh is **best-effort** on **cycle-start** (phase still runs on WARN). On **cycle-end**, missing markers with credentials configured can exit non-zero for operator visibility (closeout patches already landed).
 
 Manual run:
 
@@ -153,9 +165,10 @@ If §15A in `PPE_MASTER_MVP1.md` and the generated MSOS §15A table disagree, `s
 | Job | Registry | Writes Google? |
 |-----|----------|----------------|
 | `apply_control_closeout_v1` | §3.5 | No |
-| `sync_msos_repo_truth_v1` | §3.6 | MSOS only |
+| `sync_msos_repo_truth_v1` | §3.6 | MSOS only (also invoked by refresh) |
+| `google_docs_refresh_v1` | §3.7 | MSOS via sync; reports only otherwise |
 
-See [`JOB_REGISTRY_V1.md`](JOB_REGISTRY_V1.md), [`RELAY_RUNTIME_V1.md`](RELAY_RUNTIME_V1.md).
+See [`JOB_REGISTRY_V1.md`](JOB_REGISTRY_V1.md), [`RELAY_RUNTIME_V1.md`](RELAY_RUNTIME_V1.md), [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md).
 
 ## Related
 
@@ -166,4 +179,5 @@ See [`JOB_REGISTRY_V1.md`](JOB_REGISTRY_V1.md), [`RELAY_RUNTIME_V1.md`](RELAY_RU
 ## Last updated
 
 2026-05-25 — Initial Google Docs control plane v1 (MSOS sync + steward SOP).  
-2026-05-25 — Renamed Google Doc display title to **PPE / MSOS Repo Truth — Live Mirror** (env `MSOS_REPO_TRUTH_DOC_ID` unchanged).
+2026-05-25 — Renamed Google Doc display title to **PPE / MSOS Repo Truth — Live Mirror** (env `MSOS_REPO_TRUTH_DOC_ID` unchanged).  
+2026-05-25 — Cycle hooks: `google_docs_refresh_v1` at phase start (`ppe_run`) and after closeout (`post_relay_continue`).

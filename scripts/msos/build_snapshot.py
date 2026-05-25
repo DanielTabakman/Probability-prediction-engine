@@ -238,7 +238,8 @@ def build_repo_path_index() -> str:
 
 **Automation**
 - `scripts/sync_msos_repo_truth.py` — regenerates this doc block
-- `scripts/post_relay_continue.py` — closeout + MSOS chain"""
+- `scripts/google_docs_refresh.py` — GOOGLE_DOCS_REFRESH (cycle-start / cycle-end / manual)
+- `scripts/post_relay_continue.py` — closeout + cycle-end refresh chain"""
 
 
 def load_continuity_json(repo: Path) -> dict[str, Any] | None:

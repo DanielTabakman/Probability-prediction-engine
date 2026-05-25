@@ -7,7 +7,9 @@ addendum:
   - "2026-05-04: Conversation-mode + roadmap vocabulary (from Audit (1).md)"
   - "2026-05-20: Vision import §1A Phase2 pointer + §15B–15F from Audit (4); repo-truth unchanged"
   - "2026-05-18: Full re-import; §1A order, §12 audit, §1A deployment surfaces, §15A repo-truth (from MVP1_FRONTIER + src/)"
+  - "2026-05-25: GOOGLE_DOCS_REFRESH cycle hooks — repo SOP docs/SOP/GOOGLE_DOCS_REFRESH_V1.md; refresh at SELECTION and chapter closeout"
 live_steering: "docs/SOP/MVP1_FRONTIER.md overrides stale phase-order language in §12 when they differ."
+google_docs_refresh: "docs/SOP/GOOGLE_DOCS_REFRESH_V1.md"
 ---
 
 PPE Master — Operating Architecture, Canon, MVP1, and Current Audit
@@ -2781,4 +2783,24 @@ Make candidate outputs honest.
 Remember them.  
 Review them.  
 Then earn stronger claims.
+
+\============================================================  
+15G. GOOGLE DOCS REFRESH (CONTROL PLANE)  
+\============================================================
+
+Canonical human command: **refresh Google Docs**.
+
+Run **GOOGLE_DOCS_REFRESH** when a cycle ends (chapter closeout), when a new cycle starts (steward SELECTION before `run_ppe.cmd`), or whenever repo/deploy/naming may have drifted.
+
+**Repo SOP (authoritative for automation):** `docs/SOP/GOOGLE_DOCS_REFRESH_V1.md`  
+**Operator command:** `refresh_google_docs.cmd` from repo root.
+
+**Automation (Cursor / relay):**
+
+- **cycle-end:** after `apply_control_closeout_v1` via `post_relay_continue.py`
+- **cycle-start:** when `run_ppe.cmd` sets manifest `RUNNING` via `ppe_run.py` (best-effort WARN on failure)
+
+**Hard rules:** Cursor never writes PPE Master (Google). Live Mirror updates only via `sync_msos_repo_truth_v1` inside refresh. Pushed repo wins disputes.
+
+This section is maintenance and synchronization, not a product BUILD unless explicitly chartered.
 
