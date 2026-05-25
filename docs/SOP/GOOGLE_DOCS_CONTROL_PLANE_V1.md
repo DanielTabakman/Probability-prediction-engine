@@ -8,7 +8,7 @@ Status: **v1** — MSOS auto-sync after control closeout; PPE Master is steward/
 
 | Role | Responsibility |
 |------|----------------|
-| **Cursor / relay** | Read PPE Master (optional MCP); **write MSOS Repo Truth only** via `sync_msos_repo_truth_v1` |
+| **Cursor / relay** | Read PPE Master (optional MCP); **write PPE / MSOS Repo Truth — Live Mirror** only via `sync_msos_repo_truth_v1` |
 | **ChatGPT / founder** | Update **PPE Master** from repo facts + product judgment; **never write MSOS** |
 | **Operators** | OAuth once, doc markers once, optional Master import into repo |
 
@@ -17,7 +17,7 @@ Status: **v1** — MSOS auto-sync after control closeout; PPE Master is steward/
 ```text
 Repo (code + MVP1_FRONTIER + closeout)  = ground truth for "what exists"
         |
-        +-- Cursor --> MSOS Repo Truth (Google)   [auto block replace]
+        +-- Cursor --> PPE / MSOS Repo Truth — Live Mirror (Google)   [auto block replace]
         |
         +-- You + ChatGPT --> PPE Master (Google)  [manual / periodic]
 ```
@@ -38,7 +38,7 @@ flowchart TB
   end
 
   subgraph google [Google Docs]
-    MSOS[MSOS Repo Truth]
+    MSOS[PPE / MSOS Repo Truth — Live Mirror]
     Master[PPE Master]
   end
 
@@ -59,7 +59,7 @@ flowchart TB
 
 ## Hard rules
 
-| Actor | PPE Master (Google) | MSOS Repo Truth (Google) | Repo `docs/` |
+| Actor | PPE Master (Google) | PPE / MSOS Repo Truth — Live Mirror (Google) | Repo `docs/` |
 |--------|---------------------|---------------------------|--------------|
 | Cursor / relay | **Never write** | **Replace auto block only** | Closeout writes `docs/SOP/*` via `apply_control_closeout_v1` |
 | ChatGPT / you | **Write** (product/canon from repo) | **Do not write** | Import Master → `docs/VISION/PPE_MASTER_MVP1.md` when canon changes |
@@ -75,7 +75,7 @@ Precedence (unchanged): pushed repo + accepted docs → `PPE_MASTER_MVP1` → `M
 2. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) (live slice queue)
 3. PPE Master — Google MCP **read-only** or [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) for scope questions only
 
-Do **not** use MSOS Google Doc as authority over repo; MSOS is a human-facing mirror.
+Do **not** use the **PPE / MSOS Repo Truth — Live Mirror** Google Doc as authority over repo; it is a human-facing mirror only.
 
 ### ChatGPT Master refresh
 
@@ -89,9 +89,9 @@ Use repo sources:
 
 MSOS is optional context for humans; **repo files are authoritative** for as-built facts.
 
-## MSOS Google Doc — one-time setup
+## PPE / MSOS Repo Truth — Live Mirror (Google Doc) — one-time setup
 
-In [MSOS Repo Truth](https://docs.google.com/document/d/1BlGsdaKgBCPHwHqMR52io0-IDKLrSWvqhMXdrDxap1w/edit), add plain-text markers (visible in the doc):
+In [PPE / MSOS Repo Truth — Live Mirror](https://docs.google.com/document/d/1BlGsdaKgBCPHwHqMR52io0-IDKLrSWvqhMXdrDxap1w/edit), add plain-text markers (visible in the doc):
 
 ```text
 MSOS_REPO_TRUTH_AUTO_START
@@ -131,9 +131,10 @@ Artifacts (gitignored):
 1. Complete MCP auth per [`MCP_GOOGLE_DOCS_SETUP.md`](MCP_GOOGLE_DOCS_SETUP.md).
 2. Fill `.env.mcp` with `MSOS_REPO_TRUTH_DOC_ID` (and `PPE_MASTER_DOC_ID` for agent reads).
 3. Install sync deps (local only): `pip install -e ".[google-docs-sync]"`
-4. Add markers to the MSOS Google Doc (see above).
+4. Add markers to the live-mirror Google Doc (see above).
 5. Dry-run: `python scripts/sync_msos_repo_truth.py --repo-root . --dry-run`
-6. Live push: `python scripts/sync_msos_repo_truth.py --repo-root .` — confirm `msos_sync_report.json` has `"passed": true` and `"skipped": false`.
+6. Live push (first time or after API enable): `powershell -ExecutionPolicy Bypass -File scripts/ensure_google_docs_api_and_sync_msos.ps1` — opens Google Cloud **Enable Docs API** if needed, then pushes automatically.
+7. Later pushes: `python scripts/sync_msos_repo_truth.py --repo-root .` (also runs after each relay closeout).
 
 ## When ChatGPT updates PPE Master
 
@@ -164,4 +165,5 @@ See [`JOB_REGISTRY_V1.md`](JOB_REGISTRY_V1.md), [`RELAY_RUNTIME_V1.md`](RELAY_RU
 
 ## Last updated
 
-2026-05-25 — Initial Google Docs control plane v1 (MSOS sync + steward SOP).
+2026-05-25 — Initial Google Docs control plane v1 (MSOS sync + steward SOP).  
+2026-05-25 — Renamed Google Doc display title to **PPE / MSOS Repo Truth — Live Mirror** (env `MSOS_REPO_TRUTH_DOC_ID` unchanged).

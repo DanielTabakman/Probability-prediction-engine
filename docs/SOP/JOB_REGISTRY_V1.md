@@ -171,7 +171,7 @@ Every job in this doc uses the same fields, in this order:
 ### 3.6 `sync_msos_repo_truth_v1`
 
 - **name**: `sync_msos_repo_truth_v1`
-- **purpose**: regenerate **MSOS Repo Truth** Google Doc auto-block from repo steering truth after closeout (mirror for humans/ChatGPT context; not controlling canon).
+- **purpose**: regenerate **PPE / MSOS Repo Truth — Live Mirror** Google Doc auto-block from repo steering truth after closeout (mirror for humans/ChatGPT context; not controlling canon).
 - **inputs**:
   - `repo_root`
   - `.env.mcp` — `MSOS_REPO_TRUTH_DOC_ID`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`

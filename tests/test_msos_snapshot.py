@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from scripts.msos.build_snapshot import (
+    MSOS_DOC_DISPLAY_NAME,
     build_snapshot_markdown,
+    compose_google_doc_markdown,
     extract_execution_focus,
     extract_section15a_table,
     write_snapshot_artifact,
@@ -50,7 +52,7 @@ def test_extract_section15a_table():
 
 def test_build_snapshot_against_real_repo():
     md, meta = build_snapshot_markdown(REPO)
-    assert "# MSOS Repo Truth" in md
+    assert f"# {MSOS_DOC_DISPLAY_NAME}" in md
     assert "§0 — INDEX" in md
     assert "WHAT_THIS_DOCUMENT_IS" in md
     assert "CHATGPT_DOC_MAP" in md
@@ -76,3 +78,9 @@ def test_write_snapshot_artifact(tmp_path):
     out = write_snapshot_artifact(tmp_path, md, meta)
     assert out.is_file()
     assert (tmp_path / "artifacts" / "control_plane" / "msos_snapshot_meta.json").is_file()
+
+
+def test_compose_google_doc_markdown_uses_display_name():
+    wrapped = compose_google_doc_markdown(f"# {MSOS_DOC_DISPLAY_NAME} (auto-generated)\n\nbody")
+    assert wrapped.startswith(f"# {MSOS_DOC_DISPLAY_NAME}\n")
+    assert "MSOS_REPO_TRUTH_AUTO_START" in wrapped

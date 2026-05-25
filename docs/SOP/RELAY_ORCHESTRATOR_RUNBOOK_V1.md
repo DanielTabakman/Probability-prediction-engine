@@ -41,7 +41,7 @@ From repo root:
 2. Run:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
-4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then MSOS Google Doc sync (best-effort).
+4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then **PPE / MSOS Repo Truth — Live Mirror** sync (best-effort).
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 
@@ -63,14 +63,14 @@ Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set 
 - **Agent continuity** (after closeout job):
   - `docs/SOP/AGENT_CONTINUITY_BRIEF.md`
   - `artifacts/control_plane/continuity_brief.json`
-- **MSOS mirror** (after closeout, best-effort):
+- **PPE / MSOS live mirror** (after closeout, best-effort):
   - `artifacts/msos_repo_truth_snapshot.md`
   - `artifacts/control_plane/msos_sync_report.json`
-  - Google Doc **MSOS Repo Truth** (marker block only) — see [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md)
+  - Google Doc **PPE / MSOS Repo Truth — Live Mirror** (marker block only) — see [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md)
 
 ### Feedback loop (what gets updated after a run)
 
-- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`), then `sync_msos_repo_truth_v1` (MSOS Google Doc only; skip does not fail closeout).
+- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`), then `sync_msos_repo_truth_v1` (**PPE / MSOS Repo Truth — Live Mirror** only; skip does not fail closeout).
 - If relay returns **RETRY_ALLOWED**: orchestrator re-runs the worker (max 2 attempts total).
 - If relay returns **STOP_FOR_REVIEW** or **BLOCKED**: stop; steward decides whether to open RECOVERY, adjust slice scope, or defer.
 

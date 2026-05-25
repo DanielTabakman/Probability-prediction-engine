@@ -28,7 +28,7 @@ https://docs.google.com/document/d/DOCUMENT_ID_HERE/edit
 Copy `DOCUMENT_ID_HERE`. You will paste it into `.env.mcp`:
 
 - `PPE_MASTER_DOC_ID` — vision / canon (PPE Master)
-- `MSOS_REPO_TRUTH_DOC_ID` — as-built repo truth ([MSOS Repo Truth](https://docs.google.com/document/d/1BlGsdaKgBCPHwHqMR52io0-IDKLrSWvqhMXdrDxap1w/edit))
+- `MSOS_REPO_TRUTH_DOC_ID` — as-built repo truth ([PPE / MSOS Repo Truth — Live Mirror](https://docs.google.com/document/d/1BlGsdaKgBCPHwHqMR52io0-IDKLrSWvqhMXdrDxap1w/edit))
 
 ---
 

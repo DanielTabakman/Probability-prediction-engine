@@ -36,8 +36,8 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 
 ## Relay closeout (automatic)
 
-After slice `CONTINUE`, [`scripts/post_relay_continue.py`](../../scripts/post_relay_continue.py) runs [`apply_control_closeout_v1`](../../scripts/relay_runtime_v0.py), then best-effort [`sync_msos_repo_truth_v1`](../../scripts/sync_msos_repo_truth.py) (MSOS Google Doc only). No manual HANDOFF edits required.
+After slice `CONTINUE`, [`scripts/post_relay_continue.py`](../../scripts/post_relay_continue.py) runs [`apply_control_closeout_v1`](../../scripts/relay_runtime_v0.py), then best-effort [`sync_msos_repo_truth_v1`](../../scripts/sync_msos_repo_truth.py) (**PPE / MSOS Repo Truth — Live Mirror** Google Doc only). No manual HANDOFF edits required.
 
-**Google Docs:** never write PPE Master via MCP; MSOS is updated by `sync_msos_repo_truth_v1` only. See [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md).
+**Google Docs:** never write PPE Master via MCP; **PPE / MSOS Repo Truth — Live Mirror** is updated by `sync_msos_repo_truth_v1` only. See [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md).
 
 Spec: [`RELAY_RUNTIME_V1.md`](RELAY_RUNTIME_V1.md), [`JOB_REGISTRY_V1.md`](JOB_REGISTRY_V1.md) §§3.5–3.6.

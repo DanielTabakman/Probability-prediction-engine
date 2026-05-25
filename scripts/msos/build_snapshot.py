@@ -1,4 +1,4 @@
-"""Build deterministic MSOS Repo Truth markdown from repo steering docs."""
+"""Build deterministic PPE / MSOS Repo Truth — Live Mirror markdown from repo steering docs."""
 
 from __future__ import annotations
 
@@ -19,6 +19,9 @@ CONTINUITY_JSON_REL = "artifacts/control_plane/continuity_brief.json"
 
 MARKER_START = "MSOS_REPO_TRUTH_AUTO_START"
 MARKER_END = "MSOS_REPO_TRUTH_AUTO_END"
+
+# Google Doc title (operator-facing); env/job ids stay MSOS_REPO_TRUTH_*.
+MSOS_DOC_DISPLAY_NAME = "PPE / MSOS Repo Truth — Live Mirror"
 
 # Stable section IDs for index (ChatGPT: search "§N" or heading text).
 SECTION_INDEX: list[tuple[str, str, str]] = [
@@ -326,7 +329,7 @@ def build_snapshot_markdown(
     if dual_ids:
         health_extra.append(f"- **dual smoke (closeout):** {', '.join(dual_ids)}")
 
-    md = f"""# MSOS Repo Truth — live mirror (auto-generated)
+    md = f"""# {MSOS_DOC_DISPLAY_NAME} (auto-generated)
 
 **Document version:** v1 iteration · **Sync:** `sync_msos_repo_truth_v1` · **Regenerated:** {generated_at}
 
@@ -340,7 +343,7 @@ def build_snapshot_markdown(
 
 ## §1 — WHAT_THIS_DOCUMENT_IS
 
-**MSOS Repo Truth** is the **as-built, repo-grounded status document** for the Probability Prediction Engine (PPE) / Market Structure OS program. It answers: *what exists in the repository today*, *what chapter just closed*, *what is blocked*, and *where to look next*.
+**{MSOS_DOC_DISPLAY_NAME}** is the **as-built, repo-grounded status document** for the Probability Prediction Engine (PPE) / Market Structure OS program. It answers: *what exists in the repository today*, *what chapter just closed*, *what is blocked*, and *where to look next*.
 
 **This document is NOT:**
 - Product canon (use **PPE Master** Google Doc or `docs/VISION/PPE_MASTER_MVP1.md`)
@@ -364,7 +367,7 @@ def build_snapshot_markdown(
 
 ## §2 — ROLES_CHATGPT_CURSOR_REPO
 
-| Actor | PPE Master (Google) | MSOS Repo Truth (this doc) | Repo `docs/` |
+| Actor | PPE Master (Google) | {MSOS_DOC_DISPLAY_NAME} (this doc) | Repo `docs/` |
 |--------|---------------------|----------------------------|--------------|
 | **Cursor** | Read only | Write auto block only | Closeout patches `docs/SOP/*` |
 | **ChatGPT / founder** | Write (canon, audit, strategy) | Do not edit | Import Master → `PPE_MASTER_MVP1.md` when needed |
@@ -498,7 +501,7 @@ def write_snapshot_artifact(repo_root: Path, markdown: str, meta: SnapshotMeta) 
 def compose_google_doc_markdown(snapshot_md: str) -> str:
     """Wrap snapshot with stable doc shell + sync markers for Google Docs."""
     body = snapshot_md.strip()
-    return f"""# MSOS Repo Truth
+    return f"""# {MSOS_DOC_DISPLAY_NAME}
 
 **As-built mirror** of the Probability Prediction Engine repository — for **ChatGPT** and operators.
 

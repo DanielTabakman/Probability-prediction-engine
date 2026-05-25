@@ -6,10 +6,17 @@ import argparse
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
-from scripts.msos.build_snapshot import MARKER_END, MARKER_START, build_and_write
+from scripts.msos.build_snapshot import (
+    MARKER_END,
+    MARKER_START,
+    build_and_write,
+    MSOS_DOC_DISPLAY_NAME,
+    compose_google_doc_markdown,
+)
 
 ENV_MCP = ".env.mcp"
 TOKEN_REL = ".config/google-docs-mcp/token.json"
@@ -68,8 +75,15 @@ def _load_google_credentials(client_id: str, client_secret: str, token_file: Pat
             client_secret=client_secret,
             scopes=scopes,
         )
-        creds.refresh(Request())
-        return creds
+        last_err: Exception | None = None
+        for attempt in range(5):
+            try:
+                creds.refresh(Request())
+                return creds
+            except Exception as exc:
+                last_err = exc
+                time.sleep(min(2**attempt, 30))
+        raise RuntimeError(f"OAuth token refresh failed after retries: {last_err}") from last_err
 
     raw.setdefault("client_id", client_id)
     raw.setdefault("client_secret", client_secret)
@@ -170,9 +184,12 @@ def push_markdown_to_doc(
     bootstrapped = False
 
     if indices is None:
-        # First run: append marker block at document end (no manual marker paste).
+        # First run: append at document end (payload may already include markers).
         end_idx = _document_end_index(doc)
-        block = f"\n\n{MARKER_START}\n{insert_text}{MARKER_END}\n"
+        if MARKER_START in markdown and MARKER_END in markdown:
+            block = "\n\n" + markdown.strip() + "\n"
+        else:
+            block = f"\n\n{MARKER_START}\n{insert_text}{MARKER_END}\n"
         requests.append({"insertText": {"location": {"index": end_idx}, "text": block}})
         bootstrapped = True
         start_idx, end_idx = end_idx, end_idx
@@ -224,6 +241,9 @@ def run_sync(
             closeout = None
 
     md, meta, snap_path = build_and_write(repo, closeout=closeout)
+    google_md = compose_google_doc_markdown(md)
+    payload_path = repo / "artifacts" / "msos_google_doc_payload.md"
+    payload_path.write_text(google_md, encoding="utf-8")
 
     base_report: dict[str, Any] = {
         "job": "sync_msos_repo_truth_v1",
@@ -256,7 +276,7 @@ def run_sync(
     try:
         push_result = push_markdown_to_doc(
             document_id=doc_id,
-            markdown=md,
+            markdown=google_md,
             client_id=client_id,
             client_secret=client_secret,
             token_file=token_file,
@@ -287,7 +307,9 @@ def run_sync(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Sync MSOS Repo Truth Google Doc from repo")
+    parser = argparse.ArgumentParser(
+        description=f"Sync {MSOS_DOC_DISPLAY_NAME} Google Doc from repo"
+    )
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     parser.add_argument("--dry-run", action="store_true", help="Build snapshot only; no Google API")
     parser.add_argument("--force", action="store_true", help="Non-zero exit on push failure")

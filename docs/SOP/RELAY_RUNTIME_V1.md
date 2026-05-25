@@ -12,7 +12,7 @@ Precedence: same stack as v0, with this doc after `RELAY_RUNTIME_V0.md` for clos
 - **Allow-listed writes** under `docs/SOP/` only, driven by phase-plan `closeout` metadata — no LLM prose generation.
 - **Mandatory chaining:** after slice run `CONTINUE` with `ready_for_control_closeout == true`, wrappers **must** run closeout (via [`scripts/post_relay_continue.py`](../../scripts/post_relay_continue.py)) before the next slice in a phase plan.
 - **Outputs:** patched steering docs + [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) + `artifacts/control_plane/continuity_brief.json` (gitignored).
-- **Sixth job (best-effort):** `sync_msos_repo_truth_v1` (§3.6) — MSOS Google Doc only; chained by [`post_relay_continue.py`](../../scripts/post_relay_continue.py) after successful closeout. Skip (missing OAuth/markers/deps) does **not** fail closeout; marker missing with credentials → non-zero for operator visibility.
+- **Sixth job (best-effort):** `sync_msos_repo_truth_v1` (§3.6) — **PPE / MSOS Repo Truth — Live Mirror** Google Doc only; chained by [`post_relay_continue.py`](../../scripts/post_relay_continue.py) after successful closeout. Skip (missing OAuth/markers/deps) does **not** fail closeout; marker missing with credentials → non-zero for operator visibility.
 
 ## 2. Relationship to v0
 
@@ -38,6 +38,6 @@ Precedence: same stack as v0, with this doc after `RELAY_RUNTIME_V0.md` for clos
 
 ## 5. Last updated
 
-2026-05-25 — Document `sync_msos_repo_truth_v1` post-closeout chaining (MSOS Google Doc mirror).
+2026-05-25 — Document `sync_msos_repo_truth_v1` post-closeout chaining (PPE / MSOS live mirror Google Doc).
 
 2026-05-20 — Initial v1 closeout automation spec (companion to `apply_control_closeout_v1` implementation).
