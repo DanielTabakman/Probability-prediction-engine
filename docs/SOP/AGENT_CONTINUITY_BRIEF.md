@@ -45,6 +45,12 @@
 
 ### Build agent (Cursor / ACP worker)
 
-1. Honor `MVP1_FRONTIER.md` slice queue; run relay slices via `run_slice.cmd` / `run_phase.cmd`.
+1. Honor `MVP1_FRONTIER.md` slice queue; run relay slices via `run_ppe.cmd` / `run_phase.cmd` / `run_slice.cmd`.
 2. Do not edit steering docs during BUILD; closeout job updates them after `CONTINUE`.
 3. Carry docs: [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md), [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md).
+
+## Cursor context
+
+- **Relay workers:** fresh ACP session per slice — not this chat history.
+- **After closeout:** new Cursor thread; load only this brief (+ SELECTION doc). [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+- **BUILD packets:** [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).

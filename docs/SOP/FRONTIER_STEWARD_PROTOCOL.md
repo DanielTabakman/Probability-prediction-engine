@@ -80,6 +80,8 @@ When **live repo state exists**, the same agent must continue the pass. Live rep
 
 A new agent is allowed only when the pass is fully closed and repo state is legible/parked (clean working tree, and any remaining state explicitly isolated and named).
 
+**Repo continuity ≠ one Cursor thread forever:** the rule above governs **git/repo state** during an open pass. After **CLOSEOUT**, between relay slices in a phase, or when starting a new chapter, prefer a **new Cursor thread** even when `Safe to switch agents? YES`. See **Cursor context discipline** below and [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+
 **Required execution output block:**
 
 ```text
@@ -230,6 +232,23 @@ When useful, note:
 - Avoid refactor gravity during user-facing legibility phases.
 - Prefer smallest meaningful slice that improves phase success.
 - Do not let “helpful expansion” hijack the frontier.
+
+## Cursor context discipline (advisory)
+
+Thread map:
+
+| Thread | Role | When to start fresh |
+|--------|------|---------------------|
+| **Steward** | SELECTION, manifest, VPS/CTA parallel, read `LAST_RUN_REPORT.md` | New chapter; after phase exit; when chat is noisy |
+| **BUILD (manual Cursor)** | Rare — prefer relay/ACP | One sub-sprint or slice; not full phase + PR in same thread |
+| **Recovery** | RECOVERY execution step only | After RECOVERY CLOSEOUT |
+
+Rules:
+
+- **Relay/orchestrator** (`run_ppe.cmd`, `run_phase.cmd`, `run_slice.cmd`): each slice gets a fresh ACP worker; do not paste orchestrator logs into steward chat.
+- **Unified run:** steward sets [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json), runs `run_ppe.cmd`, then opens a **new** thread with only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
+- **Packets:** [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — link paths; no HANDOFF gate inline, no full diffs/logs.
+- **Context bands:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4 (Cursor UI heuristics).
 
 ## Window ledger
 

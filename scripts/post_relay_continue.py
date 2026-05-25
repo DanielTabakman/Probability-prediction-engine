@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.ppe_manifest import maybe_mark_manifest_complete
 from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
 
 
@@ -112,6 +113,9 @@ def main(argv: list[str] | None = None) -> int:
         subprocess.run(["git", "add", "-A", "docs/SOP"], cwd=repo, check=False)
         msg = f"control-closeout: {slice_id}"
         subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=False)
+
+    if maybe_mark_manifest_complete(repo, args.phase_plan.resolve(), slice_id):
+        print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     return 0

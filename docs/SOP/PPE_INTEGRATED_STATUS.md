@@ -127,10 +127,13 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status | Action |
 |------|--------|--------|
+| **Next relay chapter** | **await SELECTION** | Set [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) → `READY`; run **`run_ppe.cmd`** ([`ACTIVE_PHASE_MANIFEST.md`](ACTIVE_PHASE_MANIFEST.md)) |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) only after browser confirms CTA |
 | Paid-interest live call | **N** (honest) | Log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 
 **Do not** mark CTA **PASS** or paid-interest **Y** without steward verification.
+
+**After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only ([`CONTEXT_RULES.md`](../CONTEXT_RULES.md)).
 
 ---
 

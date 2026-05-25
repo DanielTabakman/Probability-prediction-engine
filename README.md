@@ -69,8 +69,10 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 
 ### Operator / steward backlog (rituals)
 
+- **Day-to-day BUILD (full phase):** set [`docs/SOP/ACTIVE_PHASE_MANIFEST.json`](docs/SOP/ACTIVE_PHASE_MANIFEST.json) at SELECTION, then **`run_ppe.cmd`** from repo root ([`docs/SOP/ACTIVE_PHASE_MANIFEST.md`](docs/SOP/ACTIVE_PHASE_MANIFEST.md), [`docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md)).
+- **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; open a **new** Cursor thread with [`docs/SOP/AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
 - **Dual smoke** before merging implied-lab PRs (see table above); Playwright required.
-- **Relay / logbook** closeout when your SOP requires it (`run_slice.cmd`, `scripts/log_event.py`, `artifacts/logbook/`).
+- **Relay / logbook** closeout when your SOP requires it (`run_slice.cmd`, `run_phase.cmd`, `scripts/log_event.py`, `artifacts/logbook/`).
 - **Auto-merge to `main`:** [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md).
 
 ### Agent commit / push behavior (automation)
