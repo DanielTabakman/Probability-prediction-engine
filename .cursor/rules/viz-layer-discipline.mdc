@@ -1,0 +1,33 @@
+---
+description: Viz layer discipline — where agents put Streamlit and domain code (thin shell, touch sets).
+globs:
+  - src/viz/**
+  - docs/SOP/**
+  - docs/agents/**
+---
+
+# Viz layer discipline
+
+Canonical reference: [docs/SOP/VIZ_LAYER_DISCIPLINE_V1.md](docs/SOP/VIZ_LAYER_DISCIPLINE_V1.md).
+
+## Default behavior (positive)
+
+1. **Lowest layer first** — L3 domain + tests, then L2 panels, then L1 page (`app_bitcoin_implied_lab.py`), not `app.py`.
+2. **Declare TOUCH_SET** in BUILD packets; stay inside prefixes; respect FORBIDDEN_TOUCH (usually `src/viz/app.py`).
+3. **One agent per file** for parallel slices; use `scripts/check_touch_set.py` when reviewing parallel branches.
+4. **REFACTOR slices** may move code across layers with zero user-visible change + pytest + smoke.
+
+## Layer quick reference
+
+| Layer | Paths |
+|-------|--------|
+| L0 Shell | `app.py`, `app_shell.py` |
+| L1 Page | `app_bitcoin_implied_lab.py`, future `app_*_page.py` |
+| L2 Panels | `app_panels.py`, `app_sidebar.py`, `app_market_context.py` |
+| L3 Domain | `implied_lab_*`, `belief_*`, `engine/*` |
+| L4 Data | `src/data/*` |
+
+## Gates
+
+- PRODUCT diffs under `src/viz/` run `scripts/check_viz_layer_budget.py` via `run_pushable_gate.py`.
+- Do not import `src.viz.app` in unit tests (entry import test only).

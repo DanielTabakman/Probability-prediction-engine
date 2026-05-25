@@ -27,6 +27,9 @@ Top-level object:
     {
       "sliceId": "string (required)",
       "declaredPlane": "CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE (required)",
+      "touchSet": ["optional repo-relative path prefixes allowed in this slice"],
+      "forbiddenTouch": ["optional prefixes that must not change"],
+      "dependsOnSliceId": "optional sliceId that must merge first",
       "susMinutes": 15,
       "hardMinutes": 30,
       "maxAttempts": 2,
@@ -63,4 +66,5 @@ Notes:
 - `maxAttempts` is the orchestrator max total attempts. Relay may also impose retry-budget invariants.
 - Phase runner semantics are **stop-on-first-non-CONTINUE**.
 - After slice `CONTINUE`, **`apply_control_closeout_v1`** runs automatically when `closeout` is present (`RELAY_RUNTIME_V1.md`).
+- **`touchSet` / `forbiddenTouch`:** optional parallel-agent ownership; see [`VIZ_LAYER_DISCIPLINE_V1.md`](../VIZ_LAYER_DISCIPLINE_V1.md). Verify with `python scripts/check_touch_set.py` when running disjoint BUILD branches.
 

@@ -14,6 +14,19 @@ CONTINUITY_BRIEF: docs/SOP/AGENT_CONTINUITY_BRIEF.md
 BASELINE_BRANCH: main
 BUILD_BRANCH: build/auto/<sliceId>-<timestamp>  (orchestrator assigns)
 CLOSEOUT: auto-commit per COMMIT_POLICY_V1 when python scripts/run_pushable_gate.py passes
+LAYER: <L0 | L1 | L2 | L3 | L4>   # see VIZ_LAYER_DISCIPLINE_V1.md
+PRIMARY_MODULE: <repo-relative path>
+TOUCH_SET: <comma-separated path prefixes; all changed files must match>
+FORBIDDEN_TOUCH: <prefixes that must not change; default src/viz/app.py unless L0 shell/extract slice>
+```
+
+Example (L2 panel slice — parallel-safe):
+
+```text
+LAYER: L2
+PRIMARY_MODULE: src/viz/app_panels.py
+TOUCH_SET: src/viz/implied_lab_provenance.py, src/viz/app_panels.py, tests/test_trust_strip.py
+FORBIDDEN_TOUCH: src/viz/app.py, src/viz/app_bitcoin_implied_lab.py
 ```
 
 ## AGENT CONTINUITY (required in return)
@@ -45,3 +58,4 @@ AGENT CONTINUITY
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) — SLIM MODE default
 - [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) — advisory context bands
 - [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md) — Cursor context discipline
+- [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md) — thin shell, touch sets, parallel BUILD

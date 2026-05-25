@@ -9,6 +9,10 @@ Purpose: lightweight rules for how work gets done in this repo.
 4. Validate with **automated tests**, **app launch/inspection** when UI changes, and **targeted cleanup**—that stack is the safety system, not hesitation.
 5. End with a short factual closeout report.
 
+## Viz layer discipline (PRODUCT agents)
+
+Before editing Streamlit layout, read [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md). Default: L3 domain + tests, then L2 panels, then L1 page (`app_bitcoin_implied_lab.py`), not `app.py`. BUILD packets declare `TOUCH_SET` / `FORBIDDEN_TOUCH`.
+
 ## Platform evolution (agents)
 
 Before proposing or implementing Supabase, Postgres migration, FastAPI split, or a non-Streamlit customer UI, read [`PLATFORM_EVOLUTION_V1.md`](PLATFORM_EVOLUTION_V1.md). If no steward trigger (T1–T6) is documented, **ask the steward** which trigger applies; do not charter platform BUILD work from inference alone.

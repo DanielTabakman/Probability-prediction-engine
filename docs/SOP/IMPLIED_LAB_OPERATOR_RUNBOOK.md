@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-This runbook is the **canonical procedure** for running, validating, interpreting smoke outcomes, and closing out work on the **one-screen BTC implied lab** Streamlit workflow (`src/viz/app.py` and related viz modules).
+This runbook is the **canonical procedure** for running, validating, interpreting smoke outcomes, and closing out work on the **one-screen BTC implied lab** Streamlit workflow. Entry: `streamlit run src/viz/app.py` (thin shell). Layout: [`src/viz/app_bitcoin_implied_lab.py`](../../src/viz/app_bitcoin_implied_lab.py) and related viz modules. Layer rules: [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md).
 
 **Audience:** execution agents, frontier stewards, and human operators touching this phase.
 

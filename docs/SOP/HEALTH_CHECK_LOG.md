@@ -2,6 +2,24 @@
 
 Repeatable one-screen entries from the codebase health check procedure. Newest first.
 
+**Template fields (viz layer):** `app_py_lines`, `app_bitcoin_implied_lab_lines`, `touch_set_violations` (see [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md)).
+
+---
+
+## 2026-05-25 — viz layer discipline + page extraction
+
+```text
+Date: 2026-05-25
+viz_layer_discipline: shipped (SOP + cursor rule + check_viz_layer_budget + check_touch_set)
+app_py_lines: 86 (shell max 300)
+app_bitcoin_implied_lab_lines: 1999
+touch_set_violations: 0
+pytest: PASS (212)
+pushable_gate: PASS (tier product + viz budget + ruff + full pytest)
+dual_smoke: run before merge — python scripts/run_mvp1_dual_implied_lab_smoke.py
+top_risks: UI smokes not in CI (unchanged)
+```
+
 ---
 
 ## 2026-05-19 — post-plan implementation pass

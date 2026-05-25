@@ -28,6 +28,7 @@ SCRIPT_EXTRA_TESTS: dict[str, tuple[str, ...]] = {
 }
 
 RUFF_CMD = [sys.executable, "-m", "ruff", "check", "src", "tests", "scripts"]
+VIZ_BUDGET_CMD = [sys.executable, str(REPO_ROOT / "scripts" / "check_viz_layer_budget.py")]
 
 
 class GateTier(IntEnum):
@@ -146,10 +147,17 @@ def git_changed_paths() -> tuple[str, ...]:
     return tuple(lines)
 
 
+def _touches_src_viz(changed: tuple[str, ...]) -> bool:
+    return any(_normalize_path(p).startswith("src/viz/") for p in changed)
+
+
 def plan_commands(plan: GatePlan) -> list[list[str]]:
     if plan.tier == GateTier.DOCS_ONLY:
         return []
-    cmds = [RUFF_CMD]
+    cmds: list[list[str]] = []
+    if plan.tier == GateTier.PRODUCT and _touches_src_viz(plan.changed_paths):
+        cmds.append(VIZ_BUDGET_CMD)
+    cmds.append(RUFF_CMD)
     if plan.uses_full_pytest:
         cmds.append([sys.executable, "-m", "pytest", "-q"])
     else:

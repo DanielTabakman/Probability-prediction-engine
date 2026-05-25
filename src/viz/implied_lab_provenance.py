@@ -1,7 +1,7 @@
 """
 Structured verification payload for the BTC implied options lab (Sprint: provenance first slice).
 
-Builds a single dict consumed by app.py; no Streamlit dependency here.
+Builds a single dict consumed by the implied lab page; no Streamlit dependency here.
 """
 
 from __future__ import annotations

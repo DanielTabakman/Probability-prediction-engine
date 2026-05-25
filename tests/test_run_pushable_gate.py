@@ -62,3 +62,11 @@ def test_plan_commands_product_includes_ruff_and_pytest():
     assert len(cmds) == 2
     assert "ruff" in " ".join(cmds[0])
     assert cmds[1] == [gate.sys.executable, "-m", "pytest", "-q"]
+
+
+def test_plan_commands_product_viz_includes_budget_check():
+    plan = gate.classify_paths(("src/viz/app_panels.py",))
+    cmds = gate.plan_commands(plan)
+    assert len(cmds) == 3
+    assert "check_viz_layer_budget" in cmds[0][1]
+    assert "ruff" in " ".join(cmds[1])

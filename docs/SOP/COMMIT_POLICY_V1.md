@@ -24,6 +24,8 @@ python scripts/run_pushable_gate.py --dry-run
 
 Implementation: [`scripts/run_pushable_gate.py`](../../scripts/run_pushable_gate.py). Operator setup: [`AGENT_GIT_SETUP.md`](AGENT_GIT_SETUP.md).
 
+PRODUCT diffs under `src/viz/` also run [`scripts/check_viz_layer_budget.py`](../../scripts/check_viz_layer_budget.py) (see [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md)).
+
 ### Tier table (local)
 
 | Tier | Condition | Local gate |

@@ -114,7 +114,7 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 - `src/data/` — fetchers (Yahoo, Polymarket)
 - `src/models/` — DB schema, canonical event types
 - `src/engine/` — probability layer, opportunity detection
-- `src/viz/` — Streamlit dashboards
+- `src/viz/` — Streamlit dashboards (`app.py` shell, `app_bitcoin_implied_lab.py` page, panels/domain modules — see [`docs/SOP/VIZ_LAYER_DISCIPLINE_V1.md`](docs/SOP/VIZ_LAYER_DISCIPLINE_V1.md))
 - `docs/` — plan and design notes
 
 ### VPS / public demo (operators)

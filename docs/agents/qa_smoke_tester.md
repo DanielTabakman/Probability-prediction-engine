@@ -14,7 +14,7 @@ Manually verify the implied lab after changes using `docs/IMPLIED_LAB_SMOKE.md` 
 
 - Changing product code during QA (file issues for `app_engineer` instead).
 - Treating “no error visible” as pass if chart/summary is wrong or empty.
-- Approving a sprint without core checks from the smoke doc when `app.py` / `implied_lab_*` changed.
+- Approving a sprint without core checks from the smoke doc when `app_bitcoin_implied_lab.py` / `app_panels.py` / `implied_lab_*` changed.
 
 ## Checklist
 

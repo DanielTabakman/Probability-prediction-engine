@@ -153,12 +153,21 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ---
 
+## Viz layer discipline (architecture)
+
+| Item | Status |
+|------|--------|
+| SOP + gates + touch-set tooling | **shipped** — [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md), `scripts/check_viz_layer_budget.py`, `scripts/check_touch_set.py` |
+| Thin shell + page extract | **shipped** — [`app.py`](../../src/viz/app.py) (L0), [`app_bitcoin_implied_lab.py`](../../src/viz/app_bitcoin_implied_lab.py) (L1), [`app_shell.py`](../../src/viz/app_shell.py) |
+
+---
+
 ## Deferred (reconcile — do not BUILD without SELECTION)
 
 | Path / topic | Decision |
 |--------------|----------|
 | [`src/viz/mvp1_benchmark_substrate.py`](../../src/viz/mvp1_benchmark_substrate.py) | **defer** — recovery-only |
-| Blind [`src/viz/app.py`](../../src/viz/app.py) merge | **defer** |
+| Blind merge of monolithic `app.py` history | **defer** — shell is split; use touch sets per `VIZ_LAYER_DISCIPLINE_V1` |
 | [`tests/test_mvp1_benchmark_substrate.py`](../../tests/test_mvp1_benchmark_substrate.py) | **defer** |
 
 ---

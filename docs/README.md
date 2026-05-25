@@ -12,6 +12,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
 | **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) · setup [`SOP/AGENT_GIT_SETUP.md`](SOP/AGENT_GIT_SETUP.md) |
+| **Viz layer discipline (agents)** | [`SOP/VIZ_LAYER_DISCIPLINE_V1.md`](SOP/VIZ_LAYER_DISCIPLINE_V1.md) — thin shell, touch sets, parallel BUILD |
 | **Platform evolution (layered stack)** | [`SOP/PLATFORM_EVOLUTION_V1.md`](SOP/PLATFORM_EVOLUTION_V1.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
 | **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — PPE / MSOS live mirror sync; Master read-only for Cursor |
