@@ -15,7 +15,8 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Viz layer discipline (agents)** | [`SOP/VIZ_LAYER_DISCIPLINE_V1.md`](SOP/VIZ_LAYER_DISCIPLINE_V1.md) — thin shell, touch sets, parallel BUILD |
 | **Platform evolution (layered stack)** | [`SOP/PLATFORM_EVOLUTION_V1.md`](SOP/PLATFORM_EVOLUTION_V1.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
-| **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — PPE / MSOS live mirror sync; Master read-only for Cursor |
+| **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — roles; Master read-only for Cursor |
+| **Google Docs refresh (cycles)** | [`SOP/GOOGLE_DOCS_REFRESH_V1.md`](SOP/GOOGLE_DOCS_REFRESH_V1.md) — `refresh_google_docs.cmd` at SELECTION / closeout |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
 

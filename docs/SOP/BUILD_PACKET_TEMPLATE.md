@@ -51,6 +51,12 @@ AGENT CONTINUITY
 - Prefer a **dedicated BUILD Cursor thread** per slice or sub-sprint; steward SELECTION/planning stays in a **different** thread.
 - After chapter CLOSEOUT: open a **new** Cursor thread; load only `AGENT_CONTINUITY_BRIEF.md` (+ linked SELECTION doc if needed). See [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
 
+## Cycle boundaries
+
+- **Before phase run (SELECTION):** steward runs `run_ppe.cmd` → automatic **cycle-start** refresh; optional explicit `refresh_google_docs.cmd`.
+- **After chapter closeout slice:** automatic **cycle-end** refresh (Live Mirror + `artifacts/control_plane/google_docs_refresh_report.md`).
+- Human command: **refresh Google Docs** — see [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md).
+
 ## References
 
 - [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md) — tiered pushable gate
@@ -59,3 +65,4 @@ AGENT CONTINUITY
 - [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) — advisory context bands
 - [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md) — Cursor context discipline
 - [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md) — thin shell, touch sets, parallel BUILD
+- [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md) — control-plane doc refresh at cycle start/end

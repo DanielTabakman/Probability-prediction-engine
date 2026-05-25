@@ -41,7 +41,7 @@ From repo root:
 2. Run:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
-4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then **PPE / MSOS Repo Truth — Live Mirror** sync (best-effort).
+4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then **GOOGLE_DOCS_REFRESH** (`cycle-end`: Live Mirror + report; best-effort).
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 
@@ -70,7 +70,8 @@ Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set 
 
 ### Feedback loop (what gets updated after a run)
 
-- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`), then `sync_msos_repo_truth_v1` (**PPE / MSOS Repo Truth — Live Mirror** only; skip does not fail closeout).
+- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`), then `google_docs_refresh_v1` (`cycle-end`: includes Live Mirror sync + `google_docs_refresh_report.md`).
+- Before a phase run: `run_ppe.cmd` → `ppe_run.py` runs `google_docs_refresh_v1` (`cycle-start`, WARN-only on failure).
 - If relay returns **RETRY_ALLOWED**: orchestrator re-runs the worker (max 2 attempts total).
 - If relay returns **STOP_FOR_REVIEW** or **BLOCKED**: stop; steward decides whether to open RECOVERY, adjust slice scope, or defer.
 

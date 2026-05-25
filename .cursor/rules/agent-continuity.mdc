@@ -20,7 +20,8 @@ After relay `CONTINUE` on a closeout slice, steering docs are updated by `script
 
 - Read [`docs/SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](docs/SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) for roles.
 - **Never write** PPE Master (`PPE_MASTER_DOC_ID`) via google-docs MCP.
-- **PPE / MSOS Repo Truth — Live Mirror** is updated only by `scripts/sync_msos_repo_truth.py` / `sync_msos_repo_truth_v1` (chained after closeout).
+- **GOOGLE_DOCS_REFRESH** at cycle boundaries: `refresh_google_docs.cmd` or *refresh Google Docs*; automatic **cycle-end** after closeout (`post_relay_continue`) and **cycle-start** when `run_ppe.cmd` runs. See [`docs/SOP/GOOGLE_DOCS_REFRESH_V1.md`](docs/SOP/GOOGLE_DOCS_REFRESH_V1.md).
+- **PPE / MSOS Repo Truth — Live Mirror** is updated only via `google_docs_refresh_v1` / `sync_msos_repo_truth_v1` (never PPE Master writes).
 
 ## Cursor context (keep Conversation small)
 
