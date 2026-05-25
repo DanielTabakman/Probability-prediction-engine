@@ -25,6 +25,8 @@ Skip otherwise. This rule is not required for CLOSEOUT-only, SELECTION-only, or 
 
 Full heuristics (canonical-doc reads, handoff-packet length, expected roundtrips, slice scope size, governance : diff ratio) and per-band advisory actions live in `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` §§3–4.
 
+**Cursor UI:** same thread across 2+ relay slices or mixed SELECTION+BUILD+PR → WATCH; full phase + planning + `gh` in one thread → ESCALATE. Prefer new thread + `AGENT_CONTINUITY_BRIEF.md` only (`docs/CONTEXT_RULES.md`, audit §3.4).
+
 ## What this rule is NOT
 
 - Not a pass/fail gate on BUILD.

@@ -43,10 +43,9 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-1. **One-time Cursor:** paste [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into **Cursor Settings → Rules → User rules** (see snippet file for exact navigation).
-2. **Steward:** VPS `.env` CTA + browser verify → [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md); confirm site matches **`origin/main`** after merge.
+1. **Next BUILD chapter (agents):** SELECTION → set [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) to `READY` → operator runs **`run_ppe.cmd`** only ([`ACTIVE_PHASE_MANIFEST.md`](ACTIVE_PHASE_MANIFEST.md)).
+2. **Steward parallel (human/VPS):** `.env` CTA + browser verify → [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md); paid-interest per [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
 3. **Optional:** §15F friends-first spot-check — template in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
-4. **Local:** if you had WIP, `git stash list` — e.g. `stash@{0}: local wip unrelated` — apply when ready.
 
 ## Last updated
 

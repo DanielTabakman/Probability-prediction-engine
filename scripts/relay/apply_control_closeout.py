@@ -318,9 +318,16 @@ def build_continuity_brief_md(
 
 ### Build agent (Cursor / ACP worker)
 
-1. Honor `MVP1_FRONTIER.md` slice queue; run relay slices via `run_slice.cmd` / `run_phase.cmd`.
+1. Honor `MVP1_FRONTIER.md` slice queue; run relay slices via `run_slice.cmd` / `run_phase.cmd` / `run_ppe.cmd`.
 2. Do not edit steering docs during BUILD; closeout job updates them after `CONTINUE`.
 3. Carry docs: {', '.join(f'`{c}`' for c in (spec.carry_docs or [spec.evidence_doc]))}.
+
+## Cursor context
+
+- **Relay workers:** each slice uses a fresh ACP session in an isolated worktree — not this Cursor chat history.
+- **Steward vs BUILD:** keep SELECTION/planning in a steward thread; implementation via relay/orchestrator, not one mega-thread.
+- **After this closeout:** open a **new** Cursor thread; load only this brief (+ next SELECTION doc). Full rules: [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+- **BUILD packets:** use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — paths only, no inlined HANDOFF gate or logs.
 """
 
 

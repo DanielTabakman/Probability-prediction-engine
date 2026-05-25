@@ -9,13 +9,25 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 - **Orchestrator** (`ppe-orchestrator-acp`, sibling repo): driver — creates worktrees, runs ACP workers, watches time, retries when relay allows.
 - **Worker** (`agent acp` session): does the slice work and writes `relay_result.json`.
 
-### One-slice default workflow (day-to-day)
+### Unified run (recommended — full phase)
+
+1. **SELECTION:** steward charters chapter → phase plan under `docs/SOP/PHASE_PLANS/`.
+2. Set [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) (`phasePlanPath`, `sprintSpecPath`, `status: READY`) — see [`ACTIVE_PHASE_MANIFEST.md`](ACTIVE_PHASE_MANIFEST.md).
+3. Preflight (optional): `run_ppe.cmd --dry-run`
+4. From repo root: **`run_ppe.cmd`** (runs full phase via `run_phase.cmd` + preflight + manifest `RUNNING`).
+5. **After exit:** read `artifacts/orchestrator/LAST_RUN_REPORT.md` (includes **Cursor context ritual**); open a **new** Cursor thread with `AGENT_CONTINUITY_BRIEF.md` only — do not paste orchestrator logs into chat. See [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+
+Escape hatches: `run_ppe.cmd --plan <path>`, `run_ppe.cmd --slice <sliceId>`, `run_ppe.cmd --status`.
+
+**Cursor discipline during phase:** steward SELECTION thread ≠ relay BUILD workers (fresh ACP per slice). Do not run a full phase + PR + planning in one IDE chat ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4).
+
+### One-slice workflow
 
 From repo root:
 
 1. Ensure the work is referenced in the live frontier `docs/SOP/MVP1_FRONTIER.md` (MVP1 language).
 2. Run:
-   - `run_slice.cmd <sliceId>`
+   - `run_slice.cmd <sliceId>` or `run_ppe.cmd --slice <sliceId>` (requires manifest / `--plan`)
 3. Orchestrator will:
    - create a per-slice worktree
    - call relay `stage run_selected_slice_v1`
@@ -29,7 +41,7 @@ From repo root:
 2. Run:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
-4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically.
+4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then MSOS Google Doc sync (best-effort).
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 
@@ -43,7 +55,7 @@ Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set 
 - **Orchestrator state**:
   - `artifacts/orchestrator/acp_state.json` (progress + results; written early so crashes still leave breadcrumbs)
 - **Last run report (wrapper completion)**:
-  - `artifacts/orchestrator/LAST_RUN_REPORT.json` + `artifacts/orchestrator/LAST_RUN_REPORT.md` (written by `run_slice.cmd` / `run_phase.cmd` / `run_phase_raw.cmd` on exit)
+  - `artifacts/orchestrator/LAST_RUN_REPORT.json` + `artifacts/orchestrator/LAST_RUN_REPORT.md` (written by `run_slice.cmd` / `run_phase.cmd` / `run_ppe.cmd` on exit; includes context ritual when manifest present)
   - `artifacts/orchestrator/ACTIVE_RUN.json` (present only while a wrapper-launched slice/phase is in-flight)
   - Optional: set `PPE_NOTIFY=0` to disable Windows toast/beeps from `scripts/notify_run_finished.ps1`
 - **UI smoke** (when applicable):
@@ -51,10 +63,14 @@ Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set 
 - **Agent continuity** (after closeout job):
   - `docs/SOP/AGENT_CONTINUITY_BRIEF.md`
   - `artifacts/control_plane/continuity_brief.json`
+- **MSOS mirror** (after closeout, best-effort):
+  - `artifacts/msos_repo_truth_snapshot.md`
+  - `artifacts/control_plane/msos_sync_report.json`
+  - Google Doc **MSOS Repo Truth** (marker block only) — see [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md)
 
 ### Feedback loop (what gets updated after a run)
 
-- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`).
+- If relay returns **CONTINUE** and the slice has phase-plan `closeout`: `post_relay_continue.py` runs `apply_control_closeout_v1` (updates `MVP1_FRONTIER.md`, `HANDOFF.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`), then `sync_msos_repo_truth_v1` (MSOS Google Doc only; skip does not fail closeout).
 - If relay returns **RETRY_ALLOWED**: orchestrator re-runs the worker (max 2 attempts total).
 - If relay returns **STOP_FOR_REVIEW** or **BLOCKED**: stop; steward decides whether to open RECOVERY, adjust slice scope, or defer.
 

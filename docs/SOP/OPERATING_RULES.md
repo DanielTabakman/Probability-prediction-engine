@@ -11,6 +11,7 @@ Purpose: lightweight rules for how work gets done in this repo.
 
 ## Default response conventions (agent/steward)
 - Default to **SLIM MODE** unless **AUDIT MODE** is explicitly requested.
+- Steward → BUILD handoffs use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) (paths only; no inlined specs/logs).
 - Each execution-step return should include a short **REPO-SENSOR REPORT** (what changed in the working tree: modified/untracked files).
 
 ## Execution step discipline (anti-thrash rules)

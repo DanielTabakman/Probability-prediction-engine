@@ -12,7 +12,10 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
 | **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) |
+| **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
+| **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
+| **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
 
 **Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, **`MVP1_FRONTIER.md` wins.**
 
@@ -48,3 +51,14 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 ## Context rules
 
 - [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor thread vs stay in-session
+- [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only)
+
+## Unified run
+
+From repo root after steward sets the manifest to `READY`:
+
+```bash
+run_ppe.cmd --dry-run   # optional preflight
+run_ppe.cmd             # full relay phase
+run_ppe.cmd --status    # ACTIVE_RUN + last report summary
+```

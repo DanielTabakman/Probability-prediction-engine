@@ -15,3 +15,16 @@ Before BUILD or when answering "what's next / what's missing":
 3. Do not treat `CURRENT_FRONTIER.md` as live steering; use `MVP1_FRONTIER.md`.
 
 After relay `CONTINUE` on a closeout slice, steering docs are updated by `scripts/post_relay_continue.py` — do not hand-edit HANDOFF/FRONTIER/INTEGRATED unless recovery.
+
+## Google Docs (hard)
+
+- Read [`docs/SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](docs/SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) for roles.
+- **Never write** PPE Master (`PPE_MASTER_DOC_ID`) via google-docs MCP.
+- MSOS Repo Truth is updated only by `scripts/sync_msos_repo_truth.py` / `sync_msos_repo_truth_v1` (chained after closeout).
+
+## Cursor context (keep Conversation small)
+
+- Read `docs/CONTEXT_RULES.md` before long BUILD threads.
+- **Relay BUILD** = fresh ACP worker per slice; **Cursor steward chat ≠ BUILD chat**.
+- After chapter closeout: prefer a **new** Agent thread with only `AGENT_CONTINUITY_BRIEF.md`.
+- Steward packets: `docs/SOP/BUILD_PACKET_TEMPLATE.md` (paths only; no pasted logs/specs).

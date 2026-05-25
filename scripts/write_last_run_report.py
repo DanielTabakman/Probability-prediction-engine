@@ -94,6 +94,55 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
     return True, "review", "Relay payload is ambiguous; read LAST_RUN_REPORT.json and relay_result.json for details."
 
 
+def _context_band_hint(repo_root: Path, sprint_spec_rel: str | None) -> str | None:
+    if not sprint_spec_rel:
+        return None
+    p = repo_root / sprint_spec_rel.replace("\\", "/")
+    if not p.is_file():
+        return None
+    line_count = len(p.read_text(encoding="utf-8", errors="replace").splitlines())
+    if line_count > 400:
+        return "ESCALATE (sprint spec line count > 400 — prefer links over inline paste)"
+    if line_count > 200:
+        return "WATCH (sprint spec line count > 200)"
+    return "NORMAL"
+
+
+def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
+    return {
+        "open_new_cursor_thread": True,
+        "load_only": ["docs/SOP/AGENT_CONTINUITY_BRIEF.md"],
+        "rules_doc": "docs/CONTEXT_RULES.md",
+        "build_packet_template": "docs/SOP/BUILD_PACKET_TEMPLATE.md",
+        "do_not_paste": [
+            "orchestrator stdout",
+            "full pytest log",
+            "full git diff",
+            "HANDOFF gate inline",
+        ],
+        "summary": (
+            "After this run: open a new Cursor thread; @ AGENT_CONTINUITY_BRIEF.md only; "
+            "read LAST_RUN_REPORT for steward actions. See docs/CONTEXT_RULES.md."
+        ),
+    }
+
+
+def _enrich_from_manifest(repo_root: Path, report: dict[str, Any]) -> None:
+    manifest_path = repo_root / "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
+    if not manifest_path.is_file():
+        return
+    try:
+        manifest = _read_json(manifest_path)
+    except Exception:
+        return
+    report["manifest_path"] = "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
+    report["manifest_status"] = manifest.get("status")
+    sprint = str(manifest.get("sprintSpecPath") or report.get("sprint_spec") or "").strip()
+    if sprint:
+        report["context_band_hint"] = _context_band_hint(repo_root, sprint)
+    report["context_ritual"] = _build_context_ritual(repo_root)
+
+
 def _render_md(report: dict[str, Any]) -> str:
     lines: list[str] = []
     lines.append(f"# PPE last run report ({report.get('ts_utc')})")
@@ -116,6 +165,23 @@ def _render_md(report: dict[str, Any]) -> str:
     lines.append(f"- **worktree_path**: `{report.get('worktree_path')}`")
     lines.append(f"- **relay_result_path**: `{report.get('relay_result_path')}`")
     lines.append(f"- **steward_summary_path**: `{report.get('steward_summary_path')}`")
+    if report.get("manifest_path"):
+        lines.append(f"- **manifest_path**: `{report.get('manifest_path')}`")
+        lines.append(f"- **manifest_status**: `{report.get('manifest_status')}`")
+    if report.get("context_band_hint"):
+        lines.append(f"- **context_band_hint**: `{report.get('context_band_hint')}`")
+    ritual = report.get("context_ritual")
+    if isinstance(ritual, dict):
+        lines.append("")
+        lines.append("## Cursor context ritual")
+        lines.append("")
+        lines.append(str(ritual.get("summary") or "").strip())
+        lines.append("")
+        lines.append(f"- Rules: `{ritual.get('rules_doc')}`")
+        lines.append(f"- BUILD packets: `{ritual.get('build_packet_template')}`")
+        load_only = ritual.get("load_only") or []
+        if load_only:
+            lines.append(f"- Load only: `{load_only[0]}`")
     lines.append("")
     return "\n".join(lines) + "\n"
 
@@ -168,6 +234,7 @@ def main() -> int:
         "awaiting_user": awaiting_user,
         "next_action": next_action,
     }
+    _enrich_from_manifest(repo_root, report)
 
     (out_dir / "LAST_RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     (out_dir / "LAST_RUN_REPORT.md").write_text(_render_md(report), encoding="utf-8")
