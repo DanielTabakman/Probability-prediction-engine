@@ -43,6 +43,30 @@ Never auto-commit: `.env`, credentials, `artifacts/`, caches, local DB files (se
 - **Local:** tiered gate (docs-only / targeted pytest / full pytest) via `run_pushable_gate.py`.
 - **PR merge:** GitHub **CI** still runs full ruff + pytest + docker entrypoint — unchanged.
 
+## 5. When network works (e.g. home Wi‑Fi)
+
+Library Wi‑Fi often blocks Git HTTPS (port 443) even when the browser can open GitHub.
+
+**Check what still needs pushing:**
+
+```powershell
+cd "d:\Users\User\Desktop\Probability prediction engine"
+git fetch origin
+git status
+git branch -vv
+```
+
+**If `build/msos-live-mirror-title` is up to date with `origin/...`:** tiered gate commit `2776dbb` is already on the remote for that branch — open or refresh the PR to `main` if needed.
+
+**If `build/ppe-unified-run-v1` shows `ahead` of origin** (optional cleanup branch from an earlier session):
+
+```powershell
+git checkout build/ppe-unified-run-v1
+git push origin HEAD
+```
+
+**After any push:** tell the agent “home — push done” or paste `git status` so it can help with PR / merge-on-green.
+
 ## References
 
 - [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)
