@@ -1,0 +1,24 @@
+---
+description: Layered platform evolution — read before Supabase/UI migration; ask steward for trigger T1–T6
+alwaysApply: false
+globs:
+  - docs/**/*
+  - src/viz/**/*
+---
+
+# Platform evolution (layered stack)
+
+**Canonical reference:** `docs/SOP/PLATFORM_EVOLUTION_V1.md`.
+
+## When this applies
+
+- User or BUILD packet mentions Supabase, Postgres migration, React/Next, FastAPI, replacing Streamlit, framework migration, multi-tenant, or SaaS auth.
+- Editing `src/viz/` with intent to change deploy surfaces, auth, or persistence backend.
+
+## Agent rules
+
+1. Read `PLATFORM_EVOLUTION_V1.md` before proposing or implementing platform swaps.
+2. If no steward trigger **T1–T6** is documented, **STOP** and ask the steward which trigger applies.
+3. Prefer smallest layer first: **API → DB → auth → UI** — no big-bang rewrites.
+4. Do not widen MVP1 scope via platform work unless `MVP1_FRONTIER` or an explicit steward packet charters it.
+5. Hybrid is allowed: Streamlit can remain on demo/internal while a new UI ships on `app.` when triggered.

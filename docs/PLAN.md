@@ -9,6 +9,10 @@
 | Viz         | Streamlit      | Fast dashboards in Python; iterate quickly and learn from the data. |
 | Deps        | pandas, yfinance, requests, PyYAML | Minimal set to fetch, normalize, and store. |
 
+### Platform evolution (steering)
+
+Stack choices above are the **MVP1 baseline**. Growth is **by layer** (API, DB, auth, UI), not a single swap. Triggers and agent STOP rules: [`docs/SOP/PLATFORM_EVOLUTION_V1.md`](SOP/PLATFORM_EVOLUTION_V1.md).
+
 No API keys required for the initial data sources below (except optional CoinGecko for higher rate limits).
 
 ---

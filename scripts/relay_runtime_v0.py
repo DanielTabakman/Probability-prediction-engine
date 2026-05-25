@@ -95,8 +95,16 @@ JOB_GATE_DECISION = "relay_gate_decision"
 JOB_HEALTH = "codebase_health_report"
 JOB_CONSISTENCY = "control_plane_consistency_check"
 JOB_CLOSEOUT = "apply_control_closeout_v1"
+JOB_MSOS_SYNC = "sync_msos_repo_truth_v1"
 SUPPORTED_JOBS = frozenset(
-    {JOB_RUN_SLICE, JOB_GATE_DECISION, JOB_HEALTH, JOB_CONSISTENCY, JOB_CLOSEOUT}
+    {
+        JOB_RUN_SLICE,
+        JOB_GATE_DECISION,
+        JOB_HEALTH,
+        JOB_CONSISTENCY,
+        JOB_CLOSEOUT,
+        JOB_MSOS_SYNC,
+    }
 )
 
 # State machine.
@@ -1198,6 +1206,22 @@ def dispatch_apply_control_closeout_v1(
     )
 
 
+def dispatch_sync_msos_repo_truth_v1(
+    runtime: Runtime,
+    *,
+    dry_run: bool = False,
+    force: bool = False,
+) -> Tuple[int, str]:
+    from scripts.sync_msos_repo_truth import run_sync
+
+    code = run_sync(runtime.repo_root, dry_run=dry_run, force=force)
+    if code == 0:
+        return EXIT_CONTINUE, "sync_msos_repo_truth_v1: ok or skipped"
+    if code == 2:
+        return EXIT_BLOCKED, "sync_msos_repo_truth_v1: markers missing in MSOS doc"
+    return EXIT_INTERNAL_ERROR, f"sync_msos_repo_truth_v1: exit {code}"
+
+
 def dispatch_control_plane_consistency_check(runtime: Runtime) -> Tuple[int, str]:
     repo = runtime.repo_root
     findings: list[dict] = []
@@ -1379,6 +1403,8 @@ def _build_parser() -> argparse.ArgumentParser:
                           help="For apply_control_closeout_v1: phase plan JSON path")
     sp_stage.add_argument("--force", action="store_true",
                           help="For apply_control_closeout_v1: skip ready_for_control_closeout check")
+    sp_stage.add_argument("--dry-run", action="store_true",
+                          help="For sync_msos_repo_truth_v1: snapshot only, no Google API")
 
     return p
 
@@ -1457,6 +1483,12 @@ def _dispatch_stage(runtime: Runtime, args: argparse.Namespace) -> Tuple[int, st
             relay_run_dir=args.relay_run_dir.resolve() if args.relay_run_dir else None,
             phase_plan_path=args.phase_plan,
             slice_id=args.slice_id,
+            force=bool(args.force),
+        )
+    if job == JOB_MSOS_SYNC:
+        return dispatch_sync_msos_repo_truth_v1(
+            runtime,
+            dry_run=bool(args.dry_run),
             force=bool(args.force),
         )
     return EXIT_REFUSAL, f"refusal: unknown job {job!r}"

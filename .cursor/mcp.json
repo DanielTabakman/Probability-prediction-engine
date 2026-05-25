@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "google-docs": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/google_docs_mcp_launcher.ps1"
+      ]
+    }
+  }
+}

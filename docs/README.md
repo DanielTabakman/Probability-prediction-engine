@@ -12,6 +12,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
 | **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) |
+| **Platform evolution (layered stack)** | [`SOP/PLATFORM_EVOLUTION_V1.md`](SOP/PLATFORM_EVOLUTION_V1.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
 | **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |

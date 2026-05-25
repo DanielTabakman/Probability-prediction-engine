@@ -152,11 +152,45 @@ Every job in this doc uses the same fields, in this order:
 - **side effects**: writes exactly one JSON artifact under `artifacts/health/` (already `.gitignore`-covered). Writes nothing else.
 - **human signoff required?**: **no** for a report with zero findings. **Advisory** for any finding — the steward decides in a separate control-plane pass whether to act. This job never edits control-plane docs.
 
+### 3.5 `apply_control_closeout_v1`
+
+- **name**: `apply_control_closeout_v1`
+- **purpose**: after slice `CONTINUE`, patch allow-listed repo steering docs from phase-plan `closeout` metadata (deterministic templates; no LLM).
+- **inputs**:
+  - `repo_root`
+  - `phase_plan` — JSON with per-slice `closeout` block
+  - `slice_id` — closeout slice id
+  - `relay_run_dir` — optional; supplies `relay_result.json` for `ready_for_control_closeout` gate
+  - `force` — optional; skip `ready_for_control_closeout` check (backfill)
+- **authority boundary**: writes only under `docs/SOP/` paths defined in [`RELAY_RUNTIME_V1.md`](RELAY_RUNTIME_V1.md); runs `steering_alignment` + `control_plane_consistency_check` after patch. **No Google Docs writes.**
+- **stop conditions**: missing `closeout` block; steering alignment errors; consistency check errors.
+- **outputs**: patched `HANDOFF.md`, `MVP1_FRONTIER.md`, `PPE_INTEGRATED_STATUS.md`, `AGENT_CONTINUITY_BRIEF.md`; `artifacts/control_plane/continuity_brief.json`; `closeout_report.json`.
+- **side effects**: git-tracked `docs/SOP/**` edits (commit by wrapper/orchestrator policy).
+- **human signoff required?**: **no** when chained from `post_relay_continue.py` on automated `CONTINUE`.
+
+### 3.6 `sync_msos_repo_truth_v1`
+
+- **name**: `sync_msos_repo_truth_v1`
+- **purpose**: regenerate **MSOS Repo Truth** Google Doc auto-block from repo steering truth after closeout (mirror for humans/ChatGPT context; not controlling canon).
+- **inputs**:
+  - `repo_root`
+  - `.env.mcp` — `MSOS_REPO_TRUTH_DOC_ID`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+  - OAuth token at `~/.config/google-docs-mcp/token.json`
+  - MSOS doc markers: `MSOS_REPO_TRUTH_AUTO_START` / `MSOS_REPO_TRUTH_AUTO_END`
+  - `dry_run` — build `artifacts/msos_repo_truth_snapshot.md` only
+  - `force` — non-zero exit on push failure (default: push failure does not fail closeout wrapper)
+- **authority boundary**: **writes Google MSOS doc only** (marker block). **Never writes PPE Master.** Read-only use of `docs/VISION/PPE_MASTER_MVP1.md` for §15A excerpt. See [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md).
+- **stop conditions**: markers missing in doc → exit `2` (operator setup). Missing env/token → **skip** exit `0`. Missing optional Python deps → skip exit `0`.
+- **outputs**: `artifacts/msos_repo_truth_snapshot.md`, `artifacts/control_plane/msos_sync_report.json`.
+- **side effects**: Google Docs API `batchUpdate` on MSOS document only.
+- **human signoff required?**: **no** when chained after closeout; OAuth and doc markers are one-time operator setup.
+
 ## 4. Interactions (for future relay runtime reference)
 
 The registry does not define dispatch, but it does name the **legal composition** a v0 relay may rely on:
 
 - `run_selected_slice_v1` → emits §14.1 payload → `relay_gate_decision` consumes it → emits decision.
+- On chapter `CONTINUE` with phase-plan `closeout`: `apply_control_closeout_v1` → `sync_msos_repo_truth_v1` (best-effort; MSOS skip does not block closeout).
 - Before a steward-authored SELECTION, `codebase_health_report` and `control_plane_consistency_check` may run in any order; both are read-only and independent.
 - **What happens next** (canonical §15.1 + `RELAY_RUNTIME_V0`): On `CONTINUE`, the relay/runtime **stops** after recording the decision and surfacing the §10.6 HANDBACK; the next **human** step is **steward CONTROL-CLOSEOUT** (`CODEX_AUTONOMY_V1` §15.3 — no auto-closeout, no auto-SELECTION). On `RETRY_ALLOWED`, **at most one** additional in-slice worker invocation is permitted per §15.4 / §7 (same slice spec, `retry_count += 1`); no scope/plane change, no other job chaining. On `STOP_FOR_REVIEW` or `BLOCKED`, automation halts for **steward disposition**; a non-null `stop_condition` is mapped by §15.2 (often `STOP_FOR_REVIEW` or `BLOCKED`, not `CONTINUE`) and must **never** be silently upgraded to `CONTINUE`. Automated chaining that treats canonical steering truth as closed before steward CONTROL-CLOSEOUT on a `CONTINUE` path is forbidden (`RELAY_RUNTIME_V0` §§9–10).
 - `BLOCKED` always halts the chain; no automated follow-up is authorized.
@@ -168,6 +202,8 @@ The registry does not define dispatch, but it does name the **legal composition*
 - Removing or renaming a job is a **breaking change**.
 
 ## 6. Last updated
+
+2026-05-25 — Added §3.5 `apply_control_closeout_v1` and §3.6 `sync_msos_repo_truth_v1` (Google MSOS mirror). Control-plane only.
 
 2026-04-21 — Control-plane vocabulary reconcile: `relay_gate_decision` §15.1 decision enum and closeout-chaining notes aligned with `CODEX_AUTONOMY_V1.md` §15.1 and `RELAY_RUNTIME_V0.md` (`CONTINUE` / `RETRY_ALLOWED` / `STOP_FOR_REVIEW` / `BLOCKED`; removed stale `RETRY` / `STOP_CLEAN` / `STOP_HARD` wording). No protocol intent change; no BUILD.
 

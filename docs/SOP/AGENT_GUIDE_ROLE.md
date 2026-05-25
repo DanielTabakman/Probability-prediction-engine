@@ -9,6 +9,7 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 3. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) — only if brief reports `steering_aligned: true`
 4. [`VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — product canon when scope questions arise
 5. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
+6. [`PLATFORM_EVOLUTION_V1.md`](PLATFORM_EVOLUTION_V1.md) — when scope questions mention Supabase, Postgres, React/Next, or replacing Streamlit
 
 ## Do not use as controlling
 
@@ -20,6 +21,7 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 
 - Output a numbered checklist for the **build agent** (file paths + fix).
 - Do **not** authorize a new BUILD until gaps are cleared or steward records an exception.
+- Platform swaps (Streamlit / Supabase / React): cite `PLATFORM_EVOLUTION_V1.md`; escalate triggers T1–T6 to steward before BUILD.
 
 ## When `gaps` is empty
 

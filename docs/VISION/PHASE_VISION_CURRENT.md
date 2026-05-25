@@ -37,7 +37,8 @@ Advanced math and calculations stay **behind expanders** by default. Mode switch
 
 ## What to defer for now
 
-- New **AI** features, **prediction-market** integration work, **framework migration**, and **major new strategy logic** except what is **necessary** for layout/state clarity (`docs/SPRINT_1_SPEC.md` non-goals).  
+- **Framework / platform migration** — deferred while validation and demo UX are the bottleneck. When persistence, auth, or cockpit UX block growth, follow [`docs/SOP/PLATFORM_EVOLUTION_V1.md`](../SOP/PLATFORM_EVOLUTION_V1.md) (steward triggers T1–T6); do not migrate by default.
+- New **AI** features, **prediction-market** integration work, and **major new strategy logic** except what is **necessary** for layout/state clarity (`docs/SPRINT_1_SPEC.md` non-goals).  
 - Cross-cutting **engine/DB** rewrites unless a dedicated phase / feature slice targets them with tests.
 
 ## Current drift risks
