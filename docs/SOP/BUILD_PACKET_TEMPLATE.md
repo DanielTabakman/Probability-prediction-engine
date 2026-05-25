@@ -13,6 +13,7 @@ SPRINT_SPEC: docs/SOP/SPRINT_<chapter>.md
 CONTINUITY_BRIEF: docs/SOP/AGENT_CONTINUITY_BRIEF.md
 BASELINE_BRANCH: main
 BUILD_BRANCH: build/auto/<sliceId>-<timestamp>  (orchestrator assigns)
+CLOSEOUT: auto-commit per COMMIT_POLICY_V1 when python scripts/run_pushable_gate.py passes
 ```
 
 ## AGENT CONTINUITY (required in return)
@@ -39,6 +40,8 @@ AGENT CONTINUITY
 
 ## References
 
+- [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md) — tiered pushable gate
+- [`AGENT_GIT_SETUP.md`](AGENT_GIT_SETUP.md) — Cursor user-rules + auto-commit setup
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) — SLIM MODE default
 - [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) — advisory context bands
 - [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md) — Cursor context discipline
