@@ -140,7 +140,10 @@ def render_width_vol_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — width_vol-only hypothesis strip (does not use right_anomaly_slot)."""
     with st.container(border=True):
         st.markdown("##### Candidate to inspect (width-shaped, v0)")
-        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.caption(
+            "Hypothesis-oriented readout for **width / volatility tension** — inspect the shape, "
+            "then cross-check **Verification**. **Fit exploration only** — not a trade recommendation."
+        )
         st.markdown(payload["anomaly_md"])
         st.markdown(payload["why_md"])
         st.markdown(payload["confidence_md"])
@@ -153,7 +156,10 @@ def render_directional_candidate_strip_payload(payload: dict) -> None:
     """Sprint 004 — directional/mixed hypothesis strip (location-shaped tension)."""
     with st.container(border=True):
         st.markdown("##### Location-shaped tension — hypothesis to inspect")
-        st.caption("Hypothesis-oriented readout — **fit exploration**, not a trade recommendation.")
+        st.caption(
+            "Hypothesis-oriented readout for **peak-location tension** vs the market reference modal. "
+            "**Fit exploration only** — not a trade recommendation."
+        )
         st.markdown(payload["anomaly_md"])
         st.markdown(payload["why_md"])
         st.markdown(payload["confidence_md"])

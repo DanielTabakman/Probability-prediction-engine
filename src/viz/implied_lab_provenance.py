@@ -102,8 +102,10 @@ def _build_expression_families_md(strategy_families: list[Any]) -> str:
             lab = str(fam.get("label") or "").strip()
             if lab:
                 labels.append(lab)
-    return "**Expression families (fit-scope only):** " + (
-        " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
+    names = " · ".join(labels) if labels else "Illustrative_pattern rows live under **Review & disagreement digest**."
+    return (
+        "**Expression families (fit-scope only):** "
+        f"{names} — **fit classes for exploration**, not ranked recommendations."
     )
 
 
@@ -133,13 +135,14 @@ def build_width_vol_candidate_strip_payload(
     why_body = str(sl[2]).strip() if len(sl) > 2 else (
         "Peak aligned with the market reference while σ_user differs from ATM-implied σ at this horizon."
     )
-    why_md = f"**Why flagged:** {why_body}"
+    why_md = f"**Why surfaced as a hypothesis:** {why_body}"
 
     shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
     confidence_md = (
-        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
-        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not used "
-        "to choose the **width_vol** category (that comes from peak alignment × width band in the trace)."
+        f"**Shape descriptor (exploratory, not a probability):** Label **{shape_gap}** "
+        "(L₁ distance band on the sampled grid). "
+        "This describes *visual/shape difference* only — **not calibrated confidence**, and **not** the rule that "
+        "assigns **width_vol** (that comes from peak alignment × width band in the trace)."
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
@@ -149,10 +152,11 @@ def build_width_vol_candidate_strip_payload(
     expr_md = _build_expression_families_md(fams)
 
     falsification_md = (
-        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
-        "if the trace no longer shows **peak_aligned**, or the trace width band becomes **similar**, the category "
-        "should move out of **width_vol** under the *same* rules. Audit via **Verification** → "
-        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
+        "**Falsification (what would weaken or remove this hypothesis):** After a rerun with refreshed "
+        "marks/forward, this hypothesis **weakens** if the trace no longer shows **peak_aligned**, or if the "
+        "width band becomes **similar** — the category should move out of **width_vol** under the *same* rules. "
+        "Audit via **Verification** → `belief_disagreement.classification_trace` "
+        "(peak_aligned, width_band, category_id)."
     )
 
     return {
@@ -198,14 +202,15 @@ def build_directional_candidate_strip_payload(
         "Peak does not align with the market reference modal while σ_user is within "
         "the width band at this horizon."
     )
-    why_md = f"**Why flagged:** {why_body}"
+    why_md = f"**Why surfaced as a hypothesis:** {why_body}"
 
     shape_gap = bd.get("shape_gap_strength") or trace_d.get("shape_gap_strength") or "—"
     confidence_md = (
-        f"**Confidence (exploratory):** Shape-gap label **{shape_gap}** (L₁ distance label on the sampled grid). "
-        "This is a *descriptor* of visual/shape difference — **not a probability**, not calibrated, and not the "
-        "primary signal for the **directional** / **mixed** category (that comes from peak alignment × width band "
-        "in the trace). Audit: `belief_disagreement.classification_trace.delta_peak_usd` vs `peak_tolerance_usd`."
+        f"**Shape descriptor (exploratory, not a probability):** Label **{shape_gap}** "
+        "(L₁ distance band on the sampled grid). "
+        "This describes *visual/shape difference* only — **not calibrated confidence**, and **not** the rule that "
+        "assigns **directional** / **mixed** (that comes from peak alignment × width band in the trace). "
+        "Audit: `belief_disagreement.classification_trace.delta_peak_usd` vs `peak_tolerance_usd`."
     )
 
     mi = (verification.get("density") or {}).get("market_implied") or {}
@@ -215,10 +220,11 @@ def build_directional_candidate_strip_payload(
     expr_md = _build_expression_families_md(fams)
 
     falsification_md = (
-        "**Falsification (what would weaken or remove this candidate):** On a rerun with refreshed marks/forward, "
-        "if the trace shows **peak_aligned = True**, the category moves out of **directional** / **mixed** "
-        "under the *same* rules. Audit via **Verification** → "
-        "`belief_disagreement.classification_trace` (peak_aligned, width_band, category_id)."
+        "**Falsification (what would weaken or remove this hypothesis):** After a rerun with refreshed "
+        "marks/forward, this hypothesis **weakens** if the trace shows **peak_aligned = True** — the category "
+        "moves out of **directional** / **mixed** under the *same* rules. "
+        "Audit via **Verification** → `belief_disagreement.classification_trace` "
+        "(peak_aligned, width_band, category_id)."
     )
 
     return {
