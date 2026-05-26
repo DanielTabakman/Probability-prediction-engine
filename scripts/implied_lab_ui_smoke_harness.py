@@ -85,6 +85,15 @@ SCENARIO_TIMEOUT_S_BY_SCENARIO: dict[str, float] = {
 DEFAULT_SCENARIO_TIMEOUT_S = 20.0 * 60.0
 _MVP1_COMPACT_TIMEOUT_ENV = "PPE_UI_SMOKE_MVP1_COMPACT_TIMEOUT_S"
 
+# Belief peak number_input label drifted in MVP1 compact UI (app_panels.py).
+BELIEF_PEAK_LABEL_REGEX = (
+    r"(Belief peak.*mode|Where you think price lands \(USD peak\))"
+)
+_BELIEF_PEAK_FALLBACK_TEXTS = (
+    "Where you think price lands",
+    "Belief peak",
+)
+
 
 def mvp1_execution_surfaces_hidden_by_default() -> bool:
     """True unless env enables post-MVP1 lab surfaces (`PPE_POST_MVP1_LAB_UI`)."""
@@ -390,6 +399,15 @@ def _set_belief_enabled(page, enabled: bool) -> None:
     page.wait_for_timeout(1200)
 
 
+def _is_belief_peak_label(label_regex: str) -> bool:
+    lowered = label_regex.lower()
+    return (
+        "belief peak" in lowered
+        or "where you think price lands" in lowered
+        or lowered.strip() == BELIEF_PEAK_LABEL_REGEX.lower()
+    )
+
+
 def _set_number_input_by_label_regex(page, label_regex: str, value: float) -> None:
     """
     Set a Streamlit number input by its visible label.
@@ -398,15 +416,43 @@ def _set_number_input_by_label_regex(page, label_regex: str, value: float) -> No
 
     inp = page.get_by_label(_re.compile(label_regex, _re.IGNORECASE)).first
     if inp.count() == 0:
-        # Fallback: look for a label substring and then the first adjacent number input.
-        fallback_sub = "Belief peak" if "Belief peak" in label_regex else "Belief peak"
-        inp = page.locator(
-            f"xpath=//*[contains(normalize-space(.), '{fallback_sub}')]/following::input[@type='number'][1]"
-        ).first
+        # Fallback: Streamlit labels are sometimes not bound to <input> for get_by_label.
+        # Try several text-adjacent strategies (robust to unicode dashes and label splitting).
+
+        # 0) Special-case: belief peak is the first number input inside the belief expander.
+        # This avoids brittle label binding changes in Streamlit.
+        if _is_belief_peak_label(label_regex):
+            try:
+                belief_details = page.locator("details").filter(
+                    has_text=_re.compile(r"My belief vs market", _re.IGNORECASE)
+                ).first
+                candidate = belief_details.locator("input[type='number']").first
+                if candidate.count() > 0:
+                    inp = candidate
+            except Exception:
+                pass
+
+        # 1) Simple "contains text" then nearest following number input.
         if inp.count() == 0:
-            raise RuntimeError(
-                f"Could not find numeric input (fallback) for label regex: {label_regex}"
-            )
+            for fallback_sub in _BELIEF_PEAK_FALLBACK_TEXTS:
+                candidate = page.locator(
+                    "xpath=//*[contains(normalize-space(.), "
+                    f"'{fallback_sub}')]/following::input[@type='number'][1]"
+                ).first
+                if candidate.count() > 0:
+                    inp = candidate
+                    break
+
+        # 2) Case-insensitive split-text match: contains 'belief' and 'peak' anywhere in the node text.
+        if inp.count() == 0 and _is_belief_peak_label(label_regex):
+            inp = page.locator(
+                "xpath=//*[contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'belief') "
+                "and contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'peak')]"
+                "/following::input[@type='number'][1]"
+            ).first
+
+        if inp.count() == 0:
+            raise RuntimeError(f"Could not find numeric input for label regex: {label_regex}")
 
     # Streamlit may be locked by focus; fill + enter is the most reliable.
     inp.click()
@@ -913,7 +959,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         # Set scenario-specific widgets.
         if scenario == "A_width_target_payoff":
             _set_mode_when_advanced_lab_ui_enabled(page, "Target payoff")
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward)
             # Belief uncertainty now defaults to ±% mode; switch to σ mode so this scenario can set σ_ln.
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.70)
@@ -925,7 +971,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
 
         elif scenario == "B_peak_aligned":
             _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
 
@@ -933,7 +979,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
             # Match user σ_ln to ATM-implied σ first so width band is "similar", then
             # shift peak — yields directional (not mixed) disagreement vs market modal peak.
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward)
             page.wait_for_timeout(1500)
             page.locator("text=σ_ln (advanced)").first.click()
             sig = _parse_sigma_mkt_at_horizon_from_caption(page)
@@ -944,7 +990,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             chosen_sig = _ensure_width_band_similar(page, sig)
             page.wait_for_timeout(500)
 
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward * 1.07)
             page.wait_for_timeout(900)
             # Peak change can rerun the script and reset the width slider; restore and re-ensure "similar".
             chosen_sig = _ensure_width_band_similar(page, chosen_sig)
@@ -957,14 +1003,14 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
 
         elif scenario == "D_exact_strikes_mode":
             _set_mode_when_advanced_lab_ui_enabled(page, "Exact strikes")
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward)
             page.locator("text=σ_ln (advanced)").first.click()
             _set_slider_by_label_regex(page, r"Uncertainty", 0.20)
 
         elif scenario == "MVP1_compact_verification":
             # Default MVP1 UI: no Mode & solver / strike ladder — belief-only path (same math as C).
             print("[ui_smoke] MVP1_compact: belief peak + width-band similar", flush=True)
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward)
             page.wait_for_timeout(1500)
             _ensure_belief_uncertainty_sigma_mode(page)
             sig = _parse_sigma_mkt_at_horizon_from_caption(page)
@@ -973,7 +1019,7 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             sig = float(max(0.02, min(0.8, sig)))
             chosen_sig = _ensure_width_band_similar(page, sig)
             page.wait_for_timeout(500)
-            _set_number_input_by_label_regex(page, r"Belief peak.*mode", forward * 1.07)
+            _set_number_input_by_label_regex(page, BELIEF_PEAK_LABEL_REGEX, forward * 1.07)
             page.wait_for_timeout(900)
             _ensure_belief_uncertainty_sigma_mode(page)
             chosen_sig = _ensure_width_band_similar(page, chosen_sig)
