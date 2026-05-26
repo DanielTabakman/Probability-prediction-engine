@@ -184,8 +184,8 @@ def classify_disagreement(
 
 
 SEMANTIC_NOTE = (
-    "Strategy families above are **fit classes** for exploration (education / "
-    "decision-support), not recommendations."
+    "Strategy families above are **fit classes** to inspect against this disagreement shape — "
+    "exploration / decision-support only, **not recommendations or trade signals**."
 )
 
 
@@ -647,7 +647,7 @@ def build_belief_disagreement_contract(
     if category_id == "directional":
         b = bool(bullish)
         tilt = "bullish" if b else "bearish"
-        title = f"**Disagreement type:** Directional ({tilt})"
+        title = f"**Hypothesis to inspect:** Directional peak shift ({tilt})"
         if b:
             interp = (
                 "You place more probability mass higher than the market-implied modal price, "
@@ -664,14 +664,14 @@ def build_belief_disagreement_contract(
 
     elif category_id == "width_vol":
         if width_band == "wider":
-            title = "**Disagreement type:** Width / volatility disagreement (wider than market)"
+            title = "**Hypothesis to inspect:** Width / volatility (wider than market reference)"
             interp = (
                 "Your modal view aligns with the market, but you expect more tail risk than "
                 "the market-implied distribution at this horizon."
             )
             families = _families_width_wider()
         else:
-            title = "**Disagreement type:** Width / volatility disagreement (narrower than market)"
+            title = "**Hypothesis to inspect:** Width / volatility (narrower than market reference)"
             interp = (
                 "Your modal view aligns with the market, but you see less dispersion than "
                 "the market-implied distribution at this horizon."
@@ -683,7 +683,7 @@ def build_belief_disagreement_contract(
         b = bool(bullish)
         tilt = "bullish" if b else "bearish"
         wlab = "wider" if width_band == "wider" else "narrower"
-        title = f"**Disagreement type:** Mixed ({tilt} peak, {wlab} than market)"
+        title = f"**Hypothesis to inspect:** Mixed peak + width ({tilt} peak, {wlab} than market)"
         interp = (
             "You disagree with the market on **both** where probability peaks and how wide "
             "the distribution is at this horizon."
@@ -914,7 +914,7 @@ def _digest_main_line(
     """Single headline for disagreement category — interpretive, matches contract meanings."""
     cat = str(category_id or "—")
     wb = str(width_band or "")
-    prefix = "**Main disagreement (interpretive):** "
+    prefix = "**Hypothesis (interpretive):** "
     if cat == "aligned":
         return (
             prefix
@@ -981,8 +981,8 @@ def build_disagreement_scan_payload(
 
     fit_bridge_intro = (
         "The **strategy family** rows in the belief section below are **illustrative fit classes** "
-        "for this **disagreement shape**. They are **not** recommendations, **not** ranked, and "
-        "strikes are **not** optimized from your belief curve."
+        "for this **hypothesis shape**. They are **not** recommendations, **not** ranked, and "
+        "**not** trade signals — inspect whether the pattern fits your view."
     )
     fit_bridge_bullets: list[str] = []
     for fam in families:
