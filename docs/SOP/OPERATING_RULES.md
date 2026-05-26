@@ -13,6 +13,8 @@ Purpose: lightweight rules for how work gets done in this repo.
 
 Before editing Streamlit layout, read [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md). Default: L3 domain + tests, then L2 panels, then L1 page (`app_bitcoin_implied_lab.py`), not `app.py`. BUILD packets declare `TOUCH_SET` / `FORBIDDEN_TOUCH`.
 
+**PRODUCT BUILD guardrail:** do not commit a PRODUCT slice without an active touch-set artifact (`artifacts/control_plane/active_slice_touch_set.json` from `run_slice.cmd`) or a passing pushable gate touch-set check (`PPE_SLICE_TOUCH_SET` env for tests only). Phase plans require non-empty `touchSet` on every PRODUCT-PLANE slice.
+
 ## Platform evolution (agents)
 
 Before proposing or implementing Supabase, Postgres migration, FastAPI split, or a non-Streamlit customer UI, read [`PLATFORM_EVOLUTION_V1.md`](PLATFORM_EVOLUTION_V1.md). If no steward trigger (T1–T6) is documented, **ask the steward** which trigger applies; do not charter platform BUILD work from inference alone.

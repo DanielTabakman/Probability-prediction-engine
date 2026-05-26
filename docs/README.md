@@ -65,3 +65,5 @@ run_ppe.cmd --dry-run   # optional preflight
 run_ppe.cmd             # full relay phase
 run_ppe.cmd --status    # ACTIVE_RUN + last report summary
 ```
+
+**CI on PRs:** `CI / pytest`, `CI / docker_entrypoint`, `CI / ui_smoke_compact` (MVP1 compact UI smoke). Local dual smoke before merge: `python scripts/run_mvp1_dual_implied_lab_smoke.py`.

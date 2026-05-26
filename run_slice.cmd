@@ -7,6 +7,7 @@ REM   run_slice.cmd <sliceId> [sprintSpecPath] [declaredPlane]
 
 set "REPO_ROOT=%~dp0"
 set "REPO_ROOT=%REPO_ROOT:~0,-1%"
+set "PYTHONPATH=%REPO_ROOT%"
 
 set "SLICE_ID=%~1"
 if "%SLICE_ID%"=="" (
@@ -51,6 +52,11 @@ REM Prefer portable Node 20 used elsewhere if present.
 set "NODE20=%USERPROFILE%\Desktop\ppe-orchestrator-sdk\node\node-v20.18.2-win-x64"
 if exist "%NODE20%\npm.cmd" (
   set "PATH=%NODE20%;%PATH%"
+)
+
+if not "%PHASE_PLAN%"=="" (
+  python "%REPO_ROOT%\scripts\relay\write_slice_touch_set.py" --repo-root "%REPO_ROOT%" --phase-plan "%PHASE_PLAN%" --slice-id "%SLICE_ID%" --declared-plane "%DECLARED_PLANE%"
+  if errorlevel 1 exit /b 1
 )
 
 pushd "%ORCH_ROOT%" >nul

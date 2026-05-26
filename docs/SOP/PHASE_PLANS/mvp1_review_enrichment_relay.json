@@ -16,21 +16,45 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 60,
       "hardMinutes": 120,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-ReviewEnrichment-Product-Slice003",
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 45,
       "hardMinutes": 90,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-ReviewEnrichment-Product-Slice004",
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 30,
       "hardMinutes": 60,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-ReviewEnrichment-Closeout-Slice005",

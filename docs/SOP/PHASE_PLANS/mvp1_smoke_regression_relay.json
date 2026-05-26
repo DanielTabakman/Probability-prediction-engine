@@ -16,7 +16,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 60,
       "hardMinutes": 180,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-SmokeRegression-Witness-Slice003",

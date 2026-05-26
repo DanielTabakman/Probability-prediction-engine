@@ -67,6 +67,14 @@ def test_plan_commands_product_includes_ruff_and_pytest():
 def test_plan_commands_product_viz_includes_budget_check():
     plan = gate.classify_paths(("src/viz/app_panels.py",))
     cmds = gate.plan_commands(plan)
-    assert len(cmds) == 3
-    assert "check_viz_layer_budget" in cmds[0][1]
-    assert "ruff" in " ".join(cmds[1])
+    assert len(cmds) >= 2
+    joined = " ".join(" ".join(c) for c in cmds)
+    assert "check_viz_layer_budget" in joined
+    assert "ruff" in joined
+
+
+def test_plan_commands_includes_touch_set_with_env(monkeypatch):
+    monkeypatch.setenv("PPE_SLICE_TOUCH_SET", "src/viz/app_panels.py,tests/")
+    plan = gate.classify_paths(("src/viz/app_panels.py",))
+    cmds = gate.plan_commands(plan)
+    assert any("check_touch_set" in " ".join(c) for c in cmds)

@@ -60,7 +60,7 @@ Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md). 
 |------|---------|
 | **Every pushable commit (local)** | `python scripts/run_pushable_gate.py` (tier 0 docs-only / tier 1 targeted pytest / tier 2 full pytest) |
 | **PR touching implied lab** (`src/viz/**`, smoke scripts) | also `python scripts/run_mvp1_dual_implied_lab_smoke.py` before merge (not every commit) |
-| **Merge to `main`** | GitHub **CI** workflow green: **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker image + Streamlit entry smoke). [Merge on green](.github/workflows/merge-on-green.yml) merges only when the **whole** `ci.yml` run succeeds, so both jobs must pass. |
+| **Merge to `main`** | GitHub **CI** green: **`CI / pytest`**, **`CI / docker_entrypoint`**, **`CI / ui_smoke_compact`** (MVP1 compact UI smoke). [Merge on green](.github/workflows/merge-on-green.yml) requires the full workflow `success`. |
 
 ### Testing policy (imports)
 

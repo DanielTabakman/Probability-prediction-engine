@@ -1,6 +1,6 @@
 {
   "name": "Phase2_next (seed from CURRENT_FRONTIER)",
-  "historicalNote": "HISTORICAL — Sprint004 on recovery baseline. Do not run without steward re-validation. See POST_VALIDATION_CHAPTER_SELECTION.md.",
+  "historicalNote": "HISTORICAL \u2014 Sprint004 on recovery baseline. Do not run without steward re-validation. See POST_VALIDATION_CHAPTER_SELECTION.md.",
   "slices": [
     {
       "sliceId": "Sprint004-Slice004",
@@ -9,8 +9,15 @@
       "buildBranch": "build/auto/Sprint004-Slice004-phase2_next",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     }
   ]
 }
-

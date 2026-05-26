@@ -1,5 +1,5 @@
 {
-  "name": "Commercial Validation — relay queue",
+  "name": "Commercial Validation \u2014 relay queue",
   "baselineNote": "main",
   "slices": [
     {
@@ -16,7 +16,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "Commercial-Validation-Reality-Slice003",

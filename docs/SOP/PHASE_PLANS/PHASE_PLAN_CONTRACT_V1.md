@@ -27,8 +27,8 @@ Top-level object:
     {
       "sliceId": "string (required)",
       "declaredPlane": "CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE (required)",
-      "touchSet": ["optional repo-relative path prefixes allowed in this slice"],
-      "forbiddenTouch": ["optional prefixes that must not change"],
+      "touchSet": ["required for PRODUCT-PLANE: non-empty path prefixes"],
+      "forbiddenTouch": ["optional; default src/viz/app.py for PRODUCT if omitted at write time"],
       "dependsOnSliceId": "optional sliceId that must merge first",
       "susMinutes": 15,
       "hardMinutes": 30,

@@ -1,6 +1,6 @@
 {
-  "name": "MVP1 finish-up (remaining runnable slices) — steward-run",
-  "historicalNote": "HISTORICAL — UIExclusions slice likely shipped. Prefer MVP1_FRONTIER gap roadmap.",
+  "name": "MVP1 finish-up (remaining runnable slices) \u2014 steward-run",
+  "historicalNote": "HISTORICAL \u2014 UIExclusions slice likely shipped. Prefer MVP1_FRONTIER gap roadmap.",
   "slices": [
     {
       "sliceId": "MVP1-UIExclusions-Slice001",
@@ -9,8 +9,15 @@
       "buildBranch": "build/auto/MVP1-UIExclusions-Slice001-phase_plan",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     }
   ]
 }
-

@@ -20,6 +20,8 @@ TOUCH_SET: <comma-separated path prefixes; all changed files must match>
 FORBIDDEN_TOUCH: <prefixes that must not change; default src/viz/app.py unless L0 shell/extract slice>
 ```
 
+**PRODUCT slices:** `TOUCH_SET` / `FORBIDDEN_TOUCH` must match the phase plan JSON (`touchSet` / `forbiddenTouch`). `run_slice.cmd` writes `artifacts/control_plane/active_slice_touch_set.json` automatically when a phase plan is set.
+
 Example (L2 panel slice — parallel-safe):
 
 ```text

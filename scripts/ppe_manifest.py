@@ -47,6 +47,18 @@ def validate_phase_plan(plan: dict[str, Any]) -> list[str]:
             continue
         if not sl.get("sliceId"):
             errors.append(f"slice[{i}]: missing sliceId")
+        plane = str(sl.get("declaredPlane") or "").strip()
+        if plane == "PRODUCT-PLANE":
+            touch = sl.get("touchSet")
+            if not isinstance(touch, list) or not touch:
+                errors.append(
+                    f"slice[{i}] ({sl.get('sliceId')}): PRODUCT-PLANE requires non-empty touchSet"
+                )
+            elif not all(isinstance(t, str) and t.strip() for t in touch):
+                errors.append(f"slice[{i}]: touchSet entries must be non-empty strings")
+        if plane == "PRODUCT-PLANE" and not sl.get("forbiddenTouch"):
+            # Advisory only — write_slice_touch_set defaults forbiddenTouch for PRODUCT.
+            pass
         if "closeout" in sl:
             has_closeout = True
     if not has_closeout:

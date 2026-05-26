@@ -28,7 +28,8 @@ From repo root:
 1. Ensure the work is referenced in the live frontier `docs/SOP/MVP1_FRONTIER.md` (MVP1 language).
 2. Run:
    - `run_slice.cmd <sliceId>` or `run_ppe.cmd --slice <sliceId>` (requires manifest / `--plan`)
-3. Orchestrator will:
+3. When `PHASE_PLAN` is set, `run_slice.cmd` writes **`artifacts/control_plane/active_slice_touch_set.json`** via `scripts/relay/write_slice_touch_set.py` (PRODUCT slices must have `touchSet` in the plan JSON).
+4. Orchestrator will:
    - create a per-slice worktree
    - call relay `stage run_selected_slice_v1`
    - run ACP worker in that worktree
@@ -41,7 +42,7 @@ From repo root:
 2. Run:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
-4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, then **GOOGLE_DOCS_REFRESH** (`cycle-end`: Live Mirror + report; best-effort).
+4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` it runs **`verify_slice_touch_set`** before CONTROL closeout, then steering docs update when the slice has a `closeout` block, then **GOOGLE_DOCS_REFRESH** (`cycle-end`: Live Mirror + report; best-effort).
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 

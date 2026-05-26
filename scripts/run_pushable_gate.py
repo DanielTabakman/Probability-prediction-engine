@@ -10,6 +10,8 @@ from enum import IntEnum
 from pathlib import Path, PurePosixPath
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 # Non-obvious script → extra test files (unioned with tests/test_<stem>.py when present).
 SCRIPT_EXTRA_TESTS: dict[str, tuple[str, ...]] = {
@@ -26,10 +28,14 @@ SCRIPT_EXTRA_TESTS: dict[str, tuple[str, ...]] = {
         "tests/test_sync_msos_repo_truth.py",
     ),
     "scripts/google_docs_refresh.py": ("tests/test_google_docs_refresh.py",),
+    "scripts/relay/write_slice_touch_set.py": ("tests/test_slice_touch_set_artifact.py",),
+    "scripts/relay/verify_slice_touch_set.py": ("tests/test_slice_touch_set_artifact.py",),
+    "scripts/ppe_manifest.py": ("tests/test_ppe_manifest_touch_set.py",),
 }
 
 RUFF_CMD = [sys.executable, "-m", "ruff", "check", "src", "tests", "scripts"]
 VIZ_BUDGET_CMD = [sys.executable, str(REPO_ROOT / "scripts" / "check_viz_layer_budget.py")]
+CHECK_TOUCH_SET_SCRIPT = REPO_ROOT / "scripts" / "check_touch_set.py"
 
 
 class GateTier(IntEnum):
@@ -152,10 +158,49 @@ def _touches_src_viz(changed: tuple[str, ...]) -> bool:
     return any(_normalize_path(p).startswith("src/viz/") for p in changed)
 
 
+def _requires_touch_set_gate(changed: tuple[str, ...]) -> bool:
+    if not changed:
+        return False
+    return not all(_normalize_path(p).startswith("docs/") for p in changed)
+
+
+def _touch_set_gate_cmd(changed: tuple[str, ...]) -> list[str] | None:
+    if not _requires_touch_set_gate(changed):
+        return None
+
+    from scripts.relay.slice_touch_set import load_active_slice_touch_set, touch_set_from_env
+
+    env = touch_set_from_env()
+    if env is not None:
+        allowed, forbidden = env
+    else:
+        artifact = load_active_slice_touch_set(REPO_ROOT)
+        if artifact is None:
+            return None
+        allowed = tuple(str(p) for p in (artifact.get("touchSet") or []) if str(p).strip())
+        forbidden = tuple(str(p) for p in (artifact.get("forbiddenTouch") or []) if str(p).strip())
+
+    if not allowed:
+        return None
+
+    cmd = [sys.executable, str(CHECK_TOUCH_SET_SCRIPT)]
+    for prefix in allowed:
+        cmd.extend(["--allowed-prefixes", prefix])
+    for prefix in forbidden:
+        cmd.extend(["--forbidden-prefixes", prefix])
+    if changed:
+        cmd.append("--paths")
+        cmd.extend(changed)
+    return cmd
+
+
 def plan_commands(plan: GatePlan) -> list[list[str]]:
     if plan.tier == GateTier.DOCS_ONLY:
         return []
     cmds: list[list[str]] = []
+    touch_cmd = _touch_set_gate_cmd(plan.changed_paths)
+    if touch_cmd is not None:
+        cmds.append(touch_cmd)
     if plan.tier == GateTier.PRODUCT and _touches_src_viz(plan.changed_paths):
         cmds.append(VIZ_BUDGET_CMD)
     cmds.append(RUFF_CMD)

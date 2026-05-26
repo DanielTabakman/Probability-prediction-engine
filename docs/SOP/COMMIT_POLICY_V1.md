@@ -24,7 +24,9 @@ python scripts/run_pushable_gate.py --dry-run
 
 Implementation: [`scripts/run_pushable_gate.py`](../../scripts/run_pushable_gate.py). Operator setup: [`AGENT_GIT_SETUP.md`](AGENT_GIT_SETUP.md).
 
-PRODUCT diffs under `src/viz/` also run [`scripts/check_viz_layer_budget.py`](../../scripts/check_viz_layer_budget.py) (see [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md)).
+PRODUCT diffs under `src/viz/` also run [`scripts/check_viz_layer_budget.py`](../../scripts/check_viz_layer_budget.py).
+
+When `artifacts/control_plane/active_slice_touch_set.json` exists (written by `run_slice.cmd` / relay) or env `PPE_SLICE_TOUCH_SET` is set, the gate also runs [`scripts/check_touch_set.py`](../../scripts/check_touch_set.py). See [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md).
 
 ### Tier table (local)
 
@@ -38,17 +40,17 @@ PRODUCT diffs under `src/viz/` also run [`scripts/check_viz_layer_budget.py`](..
 
 **PR / merge to `main`:** GitHub **CI** still runs **full** ruff + pytest + docker entrypoint (`.github/workflows/ci.yml`). The tiered gate is a **local speed** optimization, not a weaker merge bar.
 
-### Implied-lab UI (before merge, not every commit)
+### Implied-lab UI smoke
 
-When a PR or slice changes `src/viz/**` or `scripts/*smoke*` / `implied_lab_ui_smoke_harness.py`:
-
-- Run **`python scripts/run_mvp1_dual_implied_lab_smoke.py`** once before opening or merging the PR.
-- Record pass/fail and manifest run IDs in PR text or slice evidence.
-- **Not** a commit gate (live-data flaky); **not** in CI yet.
+| When | Command |
+|------|---------|
+| **GitHub CI** (every PR / push to `main`) | Job **`ui_smoke_compact`** — `python scripts/run_mvp1_compact_ui_smoke_ci.py` (`MVP1_compact_verification`) |
+| **Before merge** (steward / implied-lab chapters) | `python scripts/run_mvp1_dual_implied_lab_smoke.py` — record manifest run IDs in PR or evidence |
+| **Every commit** | Not required (live-data flaky) |
 
 ### Merge to `main`
 
-- GitHub **CI** workflow (`.github/workflows/ci.yml`): jobs **`CI / pytest`** (ruff + full pytest) and **`CI / docker_entrypoint`** (Docker build + Streamlit entry smoke). Branch protection may list both; **Merge on green** merges only when the **entire** workflow run is `success`, which requires **both** jobs to pass.
+- GitHub **CI** (`.github/workflows/ci.yml`): **`CI / pytest`**, **`CI / docker_entrypoint`**, **`CI / ui_smoke_compact`**. **Merge on green** requires the workflow run **`success`** (all jobs).
 - Prefer PR + auto-merge per `GITHUB_ZERO_TOUCH_MERGE.md`; do not push directly to `main` when branch protection applies.
 
 ## Authorization

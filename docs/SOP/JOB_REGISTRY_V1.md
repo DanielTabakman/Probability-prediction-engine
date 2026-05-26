@@ -201,6 +201,18 @@ Every job in this doc uses the same fields, in this order:
 - **human signoff required?**: **no** when chained; manual run is operator habit (“refresh Google Docs”).
 - **canonical SOP**: [`GOOGLE_DOCS_REFRESH_V1.md`](GOOGLE_DOCS_REFRESH_V1.md)
 
+### 3.8 `verify_slice_touch_set_v1` (repo hook)
+
+- **name**: `verify_slice_touch_set_v1`
+- **purpose**: after a PRODUCT slice BUILD, verify `git diff` against `artifacts/control_plane/active_slice_touch_set.json` before CONTROL closeout.
+- **inputs**: active touch-set artifact; `baselineBranch` from artifact or relay result.
+- **authority boundary**: read-only git comparison; no doc or `src/` writes.
+- **stop conditions**: any path outside `touchSet` or matching `forbiddenTouch` → exit `1` (blocks `post_relay_continue` closeout).
+- **outputs**: stdout OK / stderr violations.
+- **side effects**: none.
+- **human signoff required?**: **no** when artifact matches plan; steward fixes plan or slice on failure.
+- **implementation**: [`scripts/relay/verify_slice_touch_set.py`](../../scripts/relay/verify_slice_touch_set.py); paired with [`write_slice_touch_set.py`](../../scripts/relay/write_slice_touch_set.py).
+
 ## 4. Interactions (for future relay runtime reference)
 
 The registry does not define dispatch, but it does name the **legal composition** a v0 relay may rely on:

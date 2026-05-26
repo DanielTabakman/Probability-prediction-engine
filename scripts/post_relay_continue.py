@@ -83,6 +83,24 @@ def main(argv: list[str] | None = None) -> int:
         print(f"post_relay_continue: slice {slice_id} has no closeout block; skip")
         return 0
 
+    verify_script = repo / "scripts" / "relay" / "verify_slice_touch_set.py"
+    if verify_script.is_file():
+        baseline = (relay or {}).get("baseline_branch") or "main"
+        verify_proc = subprocess.run(
+            [
+                sys.executable,
+                str(verify_script),
+                "--repo-root",
+                str(repo),
+                "--baseline-branch",
+                str(baseline),
+            ],
+            cwd=repo,
+        )
+        if verify_proc.returncode != 0:
+            print("post_relay_continue: touch-set verification failed; skip closeout", file=sys.stderr)
+            return verify_proc.returncode
+
     if args.dry_run:
         print(f"post_relay_continue: would run closeout for {slice_id}")
         return 0

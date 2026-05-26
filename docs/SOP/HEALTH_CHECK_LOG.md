@@ -16,8 +16,10 @@ app_bitcoin_implied_lab_lines: 1999
 touch_set_violations: 0
 pytest: PASS (212)
 pushable_gate: PASS (tier product + viz budget + ruff + full pytest)
-dual_smoke: run before merge — python scripts/run_mvp1_dual_implied_lab_smoke.py
-top_risks: UI smokes not in CI (unchanged)
+dual_smoke: local before merge — python scripts/run_mvp1_dual_implied_lab_smoke.py
+ci_ui_smoke_compact: GitHub job ui_smoke_compact (MVP1_compact_verification)
+touch_set_automation: write_slice_touch_set + verify_slice_touch_set + pushable gate
+top_risks: (none viz-layer blockers)
 ```
 
 ---

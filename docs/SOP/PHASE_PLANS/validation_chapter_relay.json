@@ -1,5 +1,5 @@
 {
-  "name": "Validation Chapter — relay queue",
+  "name": "Validation Chapter \u2014 relay queue",
   "baselineNote": "main",
   "slices": [
     {
@@ -8,7 +8,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "Validation-Chapter-UX-Slice002",
@@ -16,7 +24,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "Validation-Chapter-Deploy-Slice003",

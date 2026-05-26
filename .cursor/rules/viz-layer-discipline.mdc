@@ -27,7 +27,10 @@ Canonical reference: [docs/SOP/VIZ_LAYER_DISCIPLINE_V1.md](docs/SOP/VIZ_LAYER_DI
 | L3 Domain | `implied_lab_*`, `belief_*`, `engine/*` |
 | L4 Data | `src/data/*` |
 
-## Gates
+## Gates (automatic)
 
-- PRODUCT diffs under `src/viz/` run `scripts/check_viz_layer_budget.py` via `run_pushable_gate.py`.
-- Do not import `src.viz.app` in unit tests (entry import test only).
+- `run_slice.cmd` + phase plan → `write_slice_touch_set.py` → `artifacts/control_plane/active_slice_touch_set.json`
+- `run_pushable_gate.py` → `check_touch_set.py` when artifact or `PPE_SLICE_TOUCH_SET` env set; `check_viz_layer_budget.py` when `src/viz/` changes
+- `post_relay_continue` → `verify_slice_touch_set.py` before closeout
+- CI job `ui_smoke_compact` on every PR; run `run_mvp1_dual_implied_lab_smoke.py` before merge for implied-lab chapters
+- Do not import `src.viz.app` in unit tests (entry import test only)

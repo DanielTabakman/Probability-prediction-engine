@@ -8,7 +8,7 @@
   "historicalReference": {
     "sprint004Spec": "docs/SOP/SPRINT_004_PHASE_2.md",
     "phase2NextPlan": "docs/SOP/PHASE_PLANS/phase2_next.json",
-    "note": "HISTORICAL — re-validate on main before PRODUCT BUILD"
+    "note": "HISTORICAL \u2014 re-validate on main before PRODUCT BUILD"
   },
   "slices": [
     {
@@ -30,7 +30,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 30,
       "hardMinutes": 60,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-Phase2-Closeout-Slice004",
@@ -46,7 +54,15 @@
       "hardMinutes": 90,
       "maxAttempts": 2,
       "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_SLICE005.md",
-      "selectionRecord": "docs/SOP/POST_PHASE2_PRODUCT_SLICE003_SELECTION.md"
+      "selectionRecord": "docs/SOP/POST_PHASE2_PRODUCT_SLICE003_SELECTION.md",
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-Phase2-Product-Slice006",
@@ -55,7 +71,15 @@
       "hardMinutes": 60,
       "maxAttempts": 2,
       "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE2_SLICE006.md",
-      "selectionRecord": "docs/SOP/POST_PHASE2_SLICE005_SELECTION_OUTCOME.md"
+      "selectionRecord": "docs/SOP/POST_PHASE2_SLICE005_SELECTION_OUTCOME.md",
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-Phase2-Chapter-Closeout-Slice007",

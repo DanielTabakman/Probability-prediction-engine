@@ -5,7 +5,7 @@
 
 ## Philosophy
 
-**Thin shell, fat modules, lowest layer first.** The Streamlit entry (`app.py`) routes screens only. Each major screen lives in a **page module**. Panels render regions; domain modules build payloads and math; data modules fetch. Every BUILD slice declares a **touch set** so parallel agents do not collide on the same files.
+**Thin shell, fat modules, lowest layer first.** The Streamlit entry (`app.py`) routes screens only. Each major screen lives in a **page module**. Panels render regions; domain modules build payloads and math; data modules fetch. Every BUILD slice declares a **touch set** in the phase plan so parallel agents do not collide on the same files.
 
 ## Layer model
 
@@ -28,69 +28,72 @@
 
 ## BUILD packet fields (required for PRODUCT slices)
 
-```text
-LAYER: <L0 | L1 | L2 | L3 | L4>   # primary layer of this slice
-PRIMARY_MODULE: <repo-relative path>   # main file steward expects diffs in
-TOUCH_SET: <comma-separated path prefixes; all changed files must match one>
-FORBIDDEN_TOUCH: <prefixes that must not appear in the diff; default includes src/viz/app.py unless L0 Extract/Shell slice>
-```
-
-Example (panel-only slice):
+Must match the active phase plan slice JSON (`touchSet` / `forbiddenTouch`).
 
 ```text
-LAYER: L2
-PRIMARY_MODULE: src/viz/app_panels.py
-TOUCH_SET: src/viz/implied_lab_provenance.py, src/viz/app_panels.py, tests/test_trust_strip.py
-FORBIDDEN_TOUCH: src/viz/app.py, src/viz/app_bitcoin_implied_lab.py
+LAYER: <L0 | L1 | L2 | L3 | L4>
+PRIMARY_MODULE: <repo-relative path>
+TOUCH_SET: <comma-separated path prefixes>
+FORBIDDEN_TOUCH: <prefixes; default src/viz/app.py for PRODUCT unless L0 shell slice>
 ```
+
+## Phase plan JSON (required for PRODUCT slices)
+
+Each `PRODUCT-PLANE` slice in `docs/SOP/PHASE_PLANS/*.json` must include:
+
+```json
+"touchSet": ["src/viz/app_panels.py", "tests/"],
+"forbiddenTouch": ["src/viz/app.py", "src/viz/app_bitcoin_implied_lab.py"]
+```
+
+Validated by [`scripts/ppe_manifest.py`](../../scripts/ppe_manifest.py) when the manifest references the plan.
+
+## Automatic enforcement (relay + gate + CI)
+
+| When | What runs |
+|------|-----------|
+| **`run_slice.cmd` with phase plan** | [`scripts/relay/write_slice_touch_set.py`](../../scripts/relay/write_slice_touch_set.py) → `artifacts/control_plane/active_slice_touch_set.json` (gitignored) |
+| **`python scripts/run_pushable_gate.py`** | If artifact exists (or env `PPE_SLICE_TOUCH_SET` / `PPE_SLICE_FORBIDDEN_TOUCH`) → [`check_touch_set.py`](../../scripts/check_touch_set.py); if `src/viz/` changed → [`check_viz_layer_budget.py`](../../scripts/check_viz_layer_budget.py) |
+| **`post_relay_continue` on CONTINUE** | [`verify_slice_touch_set.py`](../../scripts/relay/verify_slice_touch_set.py) vs `baselineBranch` before CONTROL closeout |
+| **GitHub CI** | Job **`ui_smoke_compact`**: [`run_mvp1_compact_ui_smoke_ci.py`](../../scripts/run_mvp1_compact_ui_smoke_ci.py) (`MVP1_compact_verification`) |
+| **Health report** | `codebase_health_report` includes `viz_layer.app_py_lines`, `app_bitcoin_implied_lab_lines`, `budget_ok` |
+
+**Local / steward before merge (stricter than CI):** `python scripts/run_mvp1_dual_implied_lab_smoke.py` when implied-lab behavior changes.
 
 ## Parallel multi-agent rules
 
-- **One active slice per file** — if two slices need the same file, serialize in the phase plan or run an **Extract/REFACTOR** slice first.
-- **Disjoint `TOUCH_SET`** — parallel BUILD branches only when changed paths do not overlap.
-- **`dependsOnSliceId`** — when slice B wires UI that calls APIs added in slice A, A merges first (see [`PHASE_PLAN_CONTRACT_V1.md`](PHASE_PLANS/PHASE_PLAN_CONTRACT_V1.md)).
-- **Roles (Streamlit stack):** data agent → L4; engine/domain → L3; panels → L2; page wiring → L1 (at most one agent on `app_bitcoin_implied_lab.py`); shell → L0 (rare).
+- **One active slice per file** — serialize or REFACTOR first when two slices need the same file.
+- **Disjoint `touchSet`** in phase plan — parallel BUILD branches only when paths do not overlap.
+- **`dependsOnSliceId`** — merge order when APIs must land first ([`PHASE_PLAN_CONTRACT_V1.md`](PHASE_PLANS/PHASE_PLAN_CONTRACT_V1.md)).
 
 ## REFACTOR slices
 
-Charter explicitly as **REFACTOR** (PRODUCT or EVIDENCE plane):
+Zero user-visible change; preserve widget keys; evidence: pytest + one smoke scenario ([`IMPLIED_LAB_SMOKE.md`](../IMPLIED_LAB_SMOKE.md)).
 
-- **Zero** user-visible behavior change.
-- Move code across layers; preserve Streamlit widget keys and session-state names.
-- Evidence: `python -m pytest -q` + at least one implied-lab smoke scenario (see [`IMPLIED_LAB_SMOKE.md`](../IMPLIED_LAB_SMOKE.md)).
+## Line budgets (`check_viz_layer_budget.py`)
 
-## Line budgets (enforced by `scripts/check_viz_layer_budget.py`)
+| Symbol | Value | Rule |
+|--------|-------|------|
+| `APP_PY_SHELL_MAX_LINES` | 300 | `app.py` shell max (auto when page module exists) |
+| `APP_PY_BASELINE_LINES` | 2109 | legacy baseline if page module absent |
 
-Constants live in `scripts/check_viz_layer_budget.py`:
+Prefer new logic in L2/L3 — not unbounded growth of `app_bitcoin_implied_lab.py`.
 
-| Symbol | Meaning |
-|--------|---------|
-| `APP_PY_SHELL_MAX_LINES` | After page extraction: max lines in `app.py` (shell) |
-| `APP_PY_BASELINE_LINES` | Before extraction: max lines; **no net increase** vs baseline |
-
-| Phase | `app.py` rule | Page module |
-|-------|----------------|-------------|
-| **Before PR2 extract** | Line count ≤ `APP_PY_BASELINE_LINES` (frozen baseline) | N/A |
-| **After PR2 extract** | Line count ≤ `APP_PY_SHELL_MAX_LINES` | `app_bitcoin_implied_lab.py` may be large; prefer L2/L3 for new logic |
-
-Doc/code alignment: cite symbol names in this doc; tests assert script constants match (pattern (b) in [`CODE_DOCS_DRIFT_POLICY_V1.md`](CODE_DOCS_DRIFT_POLICY_V1.md)).
-
-## Touch-set checker (optional per slice)
+## Manual override (tests / debugging)
 
 ```bash
-python scripts/check_touch_set.py --allowed-prefixes src/viz/app_panels.py --allowed-prefixes tests/ --paths $(git diff --name-only HEAD)
+export PPE_SLICE_TOUCH_SET=src/viz/app_panels.py,tests/
+export PPE_SLICE_FORBIDDEN_TOUCH=src/viz/app.py
+python scripts/run_pushable_gate.py
 ```
-
-Not run on every commit by default; steward uses for parallel slice review.
 
 ## Steward rhythm
 
-- **Chapter closeout:** record `app_py_lines`, `app_bitcoin_implied_lab_lines`, `touch_set_violations` in [`HEALTH_CHECK_LOG.md`](HEALTH_CHECK_LOG.md).
-- **Before SELECTION:** if `app.py` is at baseline budget, charter an **Extract** slice before feature slices that would grow the shell.
-- **Pushable gate:** PRODUCT diffs under `src/viz/` run `check_viz_layer_budget.py` (see [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)).
+- Chapter closeout: record viz fields in [`HEALTH_CHECK_LOG.md`](HEALTH_CHECK_LOG.md).
+- SELECTION: every new PRODUCT slice gets concrete `touchSet` prefixes (not "`app.py` only").
 
 ## References
 
-- [`ARCHITECT_NOTES.md`](../ARCHITECT_NOTES.md) — product order and acceptance mindset
-- [`README.md`](../../README.md) — do not import `src.viz.app` in unit tests
-- [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md) — operator procedures
+- [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md) — gates and CI
+- [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md) — slice hooks
+- [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md) — smoke matrix

@@ -50,6 +50,16 @@ Operational detail for smoke commands and artifacts is also in `docs/IMPLIED_LAB
 
 Authoritative definitions: `docs/SOP/OPERATING_RULES.md` → **Validation tiers (closeout)**, **Closeout runtime budget / stop rule**, **RULE 4** (classification labels).
 
+### CI vs local smoke (merge bar)
+
+| Context | Command / job | Scope |
+|---------|---------------|--------|
+| **GitHub CI** (every PR) | Job **`CI / ui_smoke_compact`** — `python scripts/run_mvp1_compact_ui_smoke_ci.py` | **`MVP1_compact_verification`** only (~1–2 min) |
+| **Before merge** (steward / implied-lab chapters) | `python scripts/run_mvp1_dual_implied_lab_smoke.py` | Full dual pass (A + compact + C when applicable); stricter than CI |
+| **Tier 1 closeout** (typical slice) | `python scripts/run_implied_lab_ui_smoke.py` | Scenario **A** only |
+
+CI compact smoke catches regressions on every PR; local dual smoke remains the steward merge ritual for implied-lab work. See [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md).
+
 ### Tier 1 — default baseline (normal low-risk slices)
 
 For closing a typical feature slice that touches the implied lab:

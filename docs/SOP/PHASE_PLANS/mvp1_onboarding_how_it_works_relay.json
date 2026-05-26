@@ -16,7 +16,15 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 90,
       "hardMinutes": 240,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
     },
     {
       "sliceId": "MVP1-OnboardingHowItWorks-Smoke-Slice003",

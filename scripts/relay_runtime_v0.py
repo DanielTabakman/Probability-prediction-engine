@@ -1072,6 +1072,22 @@ def dispatch_codebase_health_report(runtime: Runtime, baseline_branch: Optional[
             _, ci_code = _run_git(repo, ["check-ignore", "-q", "orchestrator/relay.py"])
             orchestrator_status["gitignored"] = ci_code == 0
 
+    viz_layer: dict[str, object] = {}
+    try:
+        from scripts import check_viz_layer_budget as budget
+
+        app_lines = budget._line_count(budget.APP_PY)
+        page_lines = budget._line_count(budget.BTC_PAGE)
+        ok_budget, budget_msgs = budget.check_budget(shell_mode=None)
+        viz_layer = {
+            "app_py_lines": app_lines,
+            "app_bitcoin_implied_lab_lines": page_lines,
+            "budget_ok": ok_budget,
+            "budget_messages": budget_msgs,
+        }
+    except Exception as exc:
+        viz_layer = {"error": str(exc)}
+
     report = {
         "protocol": PROTOCOL,
         "job": JOB_HEALTH,
@@ -1079,6 +1095,7 @@ def dispatch_codebase_health_report(runtime: Runtime, baseline_branch: Optional[
         "branch": branch or None,
         "head_sha": head or None,
         "head_sha_short": head_short or None,
+        "viz_layer": viz_layer,
         "tree_cleanliness": {
             "tracked_modified": tracked_modified,
             "staged": staged,
@@ -1107,6 +1124,12 @@ def dispatch_codebase_health_report(runtime: Runtime, baseline_branch: Optional[
         f"tracked={orchestrator_status['tracked_file_count']}, "
         f"gitignored={orchestrator_status['gitignored']}",
     ]
+    if viz_layer and "app_py_lines" in viz_layer:
+        lines.append(
+            f"  viz_layer:       app.py={viz_layer.get('app_py_lines')} lines, "
+            f"page={viz_layer.get('app_bitcoin_implied_lab_lines')} lines, "
+            f"budget_ok={viz_layer.get('budget_ok')}"
+        )
     return EXIT_CONTINUE, "\n".join(lines)
 
 

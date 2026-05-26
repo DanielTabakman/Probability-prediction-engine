@@ -157,8 +157,9 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status |
 |------|--------|
-| SOP + gates + touch-set tooling | **shipped** — [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md), `scripts/check_viz_layer_budget.py`, `scripts/check_touch_set.py` |
+| SOP + gates + touch-set tooling | **shipped** — [`VIZ_LAYER_DISCIPLINE_V1.md`](VIZ_LAYER_DISCIPLINE_V1.md), `check_viz_layer_budget.py`, `check_touch_set.py` |
 | Thin shell + page extract | **shipped** — [`app.py`](../../src/viz/app.py) (L0), [`app_bitcoin_implied_lab.py`](../../src/viz/app_bitcoin_implied_lab.py) (L1), [`app_shell.py`](../../src/viz/app_shell.py) |
+| **Automation** | **shipped** — `write_slice_touch_set` / `verify_slice_touch_set` in relay; gate + phase-plan validation; CI **`ui_smoke_compact`** |
 
 ---
 
