@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from scripts.ui_smoke_diagnose import diagnose_stop_for_review, format_diagnosis
+
 
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -127,6 +129,45 @@ def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
     }
 
 
+def _enrich_from_steward_summary(repo_root: Path, report: dict[str, Any]) -> None:
+    path = repo_root / "artifacts" / "orchestrator" / "steward_phase_summary.json"
+    if not path.is_file():
+        return
+    try:
+        summary = _read_json(path)
+    except Exception:
+        return
+    stopped = summary.get("stopped") if isinstance(summary.get("stopped"), dict) else {}
+    slice_id = stopped.get("sliceId")
+    results = summary.get("results") if isinstance(summary.get("results"), list) else []
+    last = results[-1] if results else {}
+    run = last.get("run") if isinstance(last.get("run"), dict) else {}
+    detail = str(run.get("detail") or "")
+    if detail:
+        report["orchestrator_detail"] = detail.replace("\r\n", "\n").strip()
+    if slice_id:
+        report["stopped_slice_id"] = slice_id
+    status = str(run.get("status") or "")
+    if status == "STOP_FOR_REVIEW" and "rule 6" in detail.lower():
+        report["status_bucket"] = "stop_for_review_smoke_env"
+        report["next_action"] = (
+            "UI smoke failed with environment-sensitive classification (relay rule 6). "
+            "Read smoke diagnosis below; fix harness/wrapper scenario alignment or retry on a stable network."
+        )
+
+
+def _enrich_smoke_diagnosis(repo_root: Path, report: dict[str, Any]) -> None:
+    relay = report.get("relay_result") if isinstance(report.get("relay_result"), dict) else None
+    exit_code = int(report.get("wrapper_exit_code") or 0)
+    diagnosis = diagnose_stop_for_review(repo_root=repo_root, exit_code=exit_code, relay=relay)
+    if diagnosis is None:
+        return
+    report["smoke_diagnosis"] = diagnosis.as_dict()
+    if report.get("awaiting_user"):
+        report["next_action"] = diagnosis.suggested_fix
+    report["status_bucket"] = report.get("status_bucket") or "stop_for_review_smoke_env"
+
+
 def _enrich_from_manifest(repo_root: Path, report: dict[str, Any]) -> None:
     manifest_path = repo_root / "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
     if not manifest_path.is_file():
@@ -170,6 +211,19 @@ def _render_md(report: dict[str, Any]) -> str:
         lines.append(f"- **manifest_status**: `{report.get('manifest_status')}`")
     if report.get("context_band_hint"):
         lines.append(f"- **context_band_hint**: `{report.get('context_band_hint')}`")
+    if report.get("orchestrator_detail"):
+        lines.append(f"- **orchestrator_detail**: `{report.get('orchestrator_detail')}`")
+    smoke = report.get("smoke_diagnosis")
+    if isinstance(smoke, dict) and smoke.get("summary"):
+        lines.append("")
+        lines.append("## Smoke diagnosis")
+        lines.append("")
+        lines.append(f"- **category**: `{smoke.get('category')}`")
+        lines.append(f"- **summary**: {smoke.get('summary')}")
+        lines.append(f"- **likely_cause**: {smoke.get('likely_cause')}")
+        lines.append(f"- **suggested_fix**: {smoke.get('suggested_fix')}")
+        if smoke.get("auto_retry_command"):
+            lines.append(f"- **retry**: `{smoke.get('auto_retry_command')}`")
     ritual = report.get("context_ritual")
     if isinstance(ritual, dict):
         lines.append("")
@@ -235,6 +289,8 @@ def main() -> int:
         "next_action": next_action,
     }
     _enrich_from_manifest(repo_root, report)
+    _enrich_from_steward_summary(repo_root, report)
+    _enrich_smoke_diagnosis(repo_root, report)
 
     (out_dir / "LAST_RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     (out_dir / "LAST_RUN_REPORT.md").write_text(_render_md(report), encoding="utf-8")
