@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — onboarding / How it works **COMPLETE** 2026-05-20
+- Active MVP1 focus: **MVP1 disagreement / candidate strip polish (v0)** — **IN PROGRESS**; Control-Slice001 **CLOSED** 2026-05-26; onboarding / How it works **COMPLETE** 2026-05-20
 - Closed chapters: … friends-first screen, belief-input UX, onboarding / How it works (see `MVP1_FRONTIER.md`)
-- Next pending execution step: **none** — steward **deferred next SELECTION** (prep only: `docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`)
+- Next pending execution step: **`MVP1-DisagreementStrip-Product-Slice002`** (PRODUCT) — see `docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md` + `docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`
 - Steward parallel: VPS `.env` CTA **pending**; verify VPS after pull of closeout merge; paid-interest **N**
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md` + `MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md` + `MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**`origin/main`** (after merge) — MVP1 **onboarding / How it works** chapter **COMPLETE** 2026-05-20. **Next:** steward **SELECTION** — prep [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md).
+**`origin/main`** (after merge) — MVP1 **disagreement / candidate strip polish**: **Control-Slice001** closed 2026-05-26. **Next:** `MVP1-DisagreementStrip-Product-Slice002` (strip polish).
 
 ## Hard rule reminders
 
@@ -49,4 +49,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-05-20 — `MVP1-OnboardingHowItWorks-Closeout-Slice004` closed; onboarding chapter **COMPLETE**; SELECTION prep doc added; handoff synced.
+2026-05-26 — `MVP1-DisagreementStrip-Control-Slice001` closed (charter witness); **next** Product-Slice002; handoff synced.
