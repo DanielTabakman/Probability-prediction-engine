@@ -31,6 +31,14 @@ SCRIPT_EXTRA_TESTS: dict[str, tuple[str, ...]] = {
     "scripts/relay/write_slice_touch_set.py": ("tests/test_slice_touch_set_artifact.py",),
     "scripts/relay/verify_slice_touch_set.py": ("tests/test_slice_touch_set_artifact.py",),
     "scripts/ppe_manifest.py": ("tests/test_ppe_manifest_touch_set.py",),
+    "scripts/queue_cycle.py": (
+        "tests/test_queue_cycle_contract.py",
+        "tests/test_queue_cycle_stops_on_blocked.py",
+    ),
+    "scripts/run_queue_cycle.py": (
+        "tests/test_queue_cycle_contract.py",
+        "tests/test_queue_cycle_stops_on_blocked.py",
+    ),
 }
 
 RUFF_CMD = [sys.executable, "-m", "ruff", "check", "src", "tests", "scripts"]

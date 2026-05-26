@@ -1,6 +1,6 @@
 # Active phase manifest
 
-Machine-readable pointer for **`run_ppe.cmd`** (unified full-phase run). Steward updates at **SELECTION**; automation may set **`RUNNING`** / **`COMPLETE`**.
+Machine-readable pointer for **`run_ppe.cmd`** (unified full-phase run). Steward updates at **SELECTION**; [`run_queue_cycle.cmd`](../../run_queue_cycle.cmd) may set **`READY`** from [`SLICE_QUEUE_V1.json`](SLICE_QUEUE_V1.json); `run_ppe.cmd` sets **`RUNNING`**; closeout sets **`COMPLETE`**.
 
 ## File
 
@@ -18,7 +18,7 @@ Machine-readable pointer for **`run_ppe.cmd`** (unified full-phase run). Steward
 
 ## Status transitions
 
-- **SELECTION:** steward sets `phasePlanPath`, `sprintSpecPath`, `status: READY`
+- **SELECTION:** steward sets `phasePlanPath`, `sprintSpecPath`, `status: READY` — or `run_queue_cycle.cmd` sets them from the chapter queue
 - **`run_ppe.cmd` start:** sets `RUNNING`
 - **Closeout slice CONTINUE:** `post_relay_continue` sets `COMPLETE` when the closeout slice in the plan finishes
 - **Failed/stopped phase:** steward resets to `READY` or updates plan path

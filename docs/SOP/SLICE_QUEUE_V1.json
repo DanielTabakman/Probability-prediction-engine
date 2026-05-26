@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "defaultBaselineBranch": "main",
+  "defaultSprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+  "items": [
+    {
+      "queueId": "Q-EXAMPLE-0001",
+      "chapterId": "example_chapter_template",
+      "chapterTitle": "EXAMPLE — copy this item, set status PENDING, replace slices before run",
+      "phasePlanName": "example_chapter_relay",
+      "baselineBranch": "main",
+      "sprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+      "selectionRecord": "docs/SOP/POST_VALIDATION_CHAPTER_SELECTION.md",
+      "status": "DONE",
+      "createdAt": "2026-05-26T00:00:00Z",
+      "updatedAt": "2026-05-26T00:00:00Z",
+      "notes": "Template only. Duplicate and set status PENDING to enqueue a real chapter.",
+      "slices": [
+        {
+          "sliceId": "Example-Control-Slice001",
+          "declaredPlane": "CONTROL-PLANE",
+          "susMinutes": 15,
+          "hardMinutes": 30,
+          "maxAttempts": 1
+        },
+        {
+          "sliceId": "Example-Product-Slice002",
+          "declaredPlane": "PRODUCT-PLANE",
+          "susMinutes": 15,
+          "hardMinutes": 30,
+          "maxAttempts": 2,
+          "touchSet": ["src/viz/", "tests/"],
+          "forbiddenTouch": ["src/viz/app.py"]
+        },
+        {
+          "sliceId": "Example-Closeout-Slice003",
+          "declaredPlane": "CONTROL-PLANE",
+          "susMinutes": 15,
+          "hardMinutes": 30,
+          "maxAttempts": 1,
+          "closeout": {
+            "chapterId": "example_chapter_template",
+            "chapterTitle": "Example chapter",
+            "chapterStatus": "COMPLETE",
+            "closedDate": "2026-05-26",
+            "evidenceDoc": "docs/SOP/VALIDATION_EVIDENCE_STATUS.md",
+            "sprintSpec": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
+            "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md"
+          }
+        }
+      ]
+    }
+  ]
+}

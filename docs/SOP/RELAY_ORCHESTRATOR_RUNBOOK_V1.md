@@ -19,6 +19,29 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 Escape hatches: `run_ppe.cmd --plan <path>`, `run_ppe.cmd --slice <sliceId>`, `run_ppe.cmd --status`.
 
+### Chapter queue cycle (mechanical SELECTION)
+
+For unattended chapter runs, maintain [`SLICE_QUEUE_V1.json`](SLICE_QUEUE_V1.json) (chapter-level items with full `slices[]` including closeout).
+
+From repo root:
+
+```bash
+run_queue_cycle.cmd --dry-run
+run_queue_cycle.cmd --max-chapters 1
+run_queue_cycle.cmd --max-chapters 3 --continuous
+```
+
+The runner:
+
+1. Pops the first `PENDING` chapter.
+2. Writes `docs/SOP/PHASE_PLANS/auto_queue_<queueId>_<ts>.json` and sets [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) to `READY`.
+3. Runs `run_ppe.cmd --plan <generated-plan>`.
+4. Marks the queue item `DONE` or `BLOCKED` from `LAST_RUN_REPORT.json` + manifest status.
+
+**Hard stops:** `STOP_FOR_REVIEW`, `BLOCKED`, non-zero wrapper exit, or `ACTIVE_RUN.json` already present — the cycle exits; steward fixes the queue item or frontier, then re-runs.
+
+Queue-driven selection is **mechanical**, not judgment-free: it does not replace steward chartering of what enters the queue.
+
 **Cursor discipline during phase:** steward SELECTION thread ≠ relay BUILD workers (fresh ACP per slice). Do not run a full phase + PR + planning in one IDE chat ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4).
 
 ### One-slice workflow
