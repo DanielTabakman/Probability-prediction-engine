@@ -318,6 +318,16 @@ def render_mvp1_friends_first_above_fold(verification: dict) -> None:
         _render_mvp1_decision_digest(mvp1, bordered=False, friends_first=True)
         st.divider()
         render_trust_strip_at_a_glance(verification)
+        with st.expander("Verification", expanded=False):
+            vs = verification.get("verification_summary")
+            if isinstance(vs, dict) and vs:
+                st.markdown("##### Verification summary")
+                st.write("**Disagreement category:**", vs.get("disagreement_category_id", "—"))
+                if vs.get("disagreement_type_line"):
+                    st.markdown(vs.get("disagreement_type_line"))
+                st.caption(vs.get("classification_dimensions", ""))
+            else:
+                st.caption("Verification payload not available for this run.")
 
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
