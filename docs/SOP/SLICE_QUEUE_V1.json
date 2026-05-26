@@ -4,6 +4,63 @@
   "defaultSprintSpecPath": "docs/SOP/SPRINT_VALIDATION_CHAPTER.md",
   "items": [
     {
+      "queueId": "Q-INFRA-0001",
+      "chapterId": "queue_infra_smoke",
+      "chapterTitle": "Queue infra smoke (chapter-level cycle)",
+      "phasePlanName": "queue_infra_smoke_relay",
+      "baselineBranch": "build/msos-live-mirror-title",
+      "sprintSpecPath": "docs/SOP/SPRINT_QUEUE_INFRA_SMOKE.md",
+      "selectionRecord": "docs/SOP/QUEUE_INFRA_SMOKE_SELECTION.md",
+      "status": "PENDING",
+      "createdAt": "2026-05-26T12:00:00Z",
+      "updatedAt": "2026-05-26T12:00:00Z",
+      "notes": "First real queue cycle; baseline is current feature branch (viz + queue runner).",
+      "slices": [
+        {
+          "sliceId": "QueueInfra-Charter-Slice001",
+          "declaredPlane": "CONTROL-PLANE",
+          "susMinutes": 15,
+          "hardMinutes": 30,
+          "maxAttempts": 1
+        },
+        {
+          "sliceId": "QueueInfra-Witness-Slice002",
+          "declaredPlane": "EVIDENCE-PLANE",
+          "susMinutes": 20,
+          "hardMinutes": 45,
+          "maxAttempts": 2,
+          "touchSet": [
+            "tests/test_queue_cycle_contract.py",
+            "tests/test_queue_cycle_stops_on_blocked.py",
+            "scripts/queue_cycle.py",
+            "scripts/run_queue_cycle.py"
+          ]
+        },
+        {
+          "sliceId": "QueueInfra-Closeout-Slice003",
+          "declaredPlane": "CONTROL-PLANE",
+          "susMinutes": 15,
+          "hardMinutes": 30,
+          "maxAttempts": 1,
+          "closeout": {
+            "chapterId": "queue_infra_smoke",
+            "chapterTitle": "Queue infra smoke",
+            "chapterStatus": "COMPLETE",
+            "closedDate": "2026-05-26",
+            "evidenceDoc": "docs/SOP/QUEUE_INFRA_SMOKE_EVIDENCE_STATUS.md",
+            "sprintSpec": "docs/SOP/SPRINT_QUEUE_INFRA_SMOKE.md",
+            "selectionOutcomeDoc": "docs/SOP/QUEUE_INFRA_SMOKE_SELECTION.md",
+            "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+            "carryDocs": [
+              "docs/SOP/SLICE_QUEUE_V1.json",
+              "docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md"
+            ],
+            "pytestCount": 8
+          }
+        }
+      ]
+    },
+    {
       "queueId": "Q-EXAMPLE-0001",
       "chapterId": "example_chapter_template",
       "chapterTitle": "EXAMPLE — copy this item, set status PENDING, replace slices before run",
