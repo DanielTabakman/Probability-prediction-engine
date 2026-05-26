@@ -19,6 +19,12 @@ Do NOT create a new context for every tiny action.
 - doing acceptance fixes for that sprint
 - constraints and goal are unchanged
 
+## Relay / run_ppe.cmd
+
+- **`run_ppe.cmd`** runs a full phase via orchestrator; each **slice** gets a **fresh ACP worker** (not your Cursor chat history).
+- **Steward thread:** SELECTION, manifest, read `LAST_RUN_REPORT.md` — keep separate from BUILD.
+- **After phase exit:** new Cursor thread; load only `docs/SOP/AGENT_CONTINUITY_BRIEF.md`.
+
 ## Good thread unit
 One thread per sprint or sub-sprint.
 

@@ -73,7 +73,21 @@ def init_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS ix_snapshot_reviews_status ON snapshot_reviews(review_status)"
     )
+    try:
+        conn.execute("ALTER TABLE snapshot_reviews ADD COLUMN paper_tag TEXT")
+    except sqlite3.OperationalError:
+        pass
     conn.commit()
+
+
+PENDING_SORT_NEWEST = "newest"
+PENDING_SORT_EXPIRY = "expiry"
+PENDING_SORT_HORIZON = "horizon"
+PENDING_SORT_OPTIONS: tuple[str, ...] = (
+    PENDING_SORT_NEWEST,
+    PENDING_SORT_EXPIRY,
+    PENDING_SORT_HORIZON,
+)
 
 
 def review_horizon_ref_from_frozen(record: dict[str, Any]) -> str:
@@ -95,6 +109,7 @@ def upsert_review(
     review_status: str,
     outcome_notes: str | None,
     review_horizon_ref: str | None = None,
+    paper_tag: str | None = None,
 ) -> None:
     init_schema(conn)
     if review_status not in REVIEW_STATUSES:
@@ -102,25 +117,30 @@ def upsert_review(
     sid = str(snapshot_id)
     notes = (outcome_notes or "").strip() or None
     href = (review_horizon_ref or "").strip() or None
+    tag = (paper_tag or "").strip() or None
+    if tag and len(tag) > 120:
+        tag = tag[:120]
     now = _utc_iso()
     row = conn.execute("SELECT id FROM snapshot_reviews WHERE snapshot_id = ?", (sid,)).fetchone()
     if row:
         conn.execute(
             """
             UPDATE snapshot_reviews
-            SET review_status = ?, outcome_notes = ?, reviewed_at_utc = ?, review_horizon_ref = ?
+            SET review_status = ?, outcome_notes = ?, reviewed_at_utc = ?,
+                review_horizon_ref = ?, paper_tag = ?
             WHERE snapshot_id = ?
             """,
-            (review_status, notes, now, href, sid),
+            (review_status, notes, now, href, tag, sid),
         )
     else:
         conn.execute(
             """
             INSERT INTO snapshot_reviews
-            (id, snapshot_id, review_status, outcome_notes, reviewed_at_utc, review_horizon_ref)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (id, snapshot_id, review_status, outcome_notes, reviewed_at_utc,
+             review_horizon_ref, paper_tag)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (str(uuid.uuid4()), sid, review_status, notes, now, href),
+            (str(uuid.uuid4()), sid, review_status, notes, now, href, tag),
         )
     conn.commit()
 
@@ -129,7 +149,8 @@ def get_review_for_snapshot(conn: sqlite3.Connection, snapshot_id: str) -> dict[
     init_schema(conn)
     cur = conn.execute(
         """
-        SELECT id, snapshot_id, review_status, outcome_notes, reviewed_at_utc, review_horizon_ref
+        SELECT id, snapshot_id, review_status, outcome_notes, reviewed_at_utc,
+               review_horizon_ref, paper_tag
         FROM snapshot_reviews WHERE snapshot_id = ?
         """,
         (str(snapshot_id),),
@@ -138,8 +159,21 @@ def get_review_for_snapshot(conn: sqlite3.Connection, snapshot_id: str) -> dict[
     return dict(row) if row else None
 
 
+def _pending_order_clause(sort: str) -> str:
+    s = (sort or PENDING_SORT_NEWEST).strip().lower()
+    if s == PENDING_SORT_EXPIRY:
+        return "fe.expiry ASC, fe.created_at DESC"
+    if s == PENDING_SORT_HORIZON:
+        return "COALESCE(sr.review_horizon_ref, fe.expiry) ASC, fe.created_at DESC"
+    return "fe.created_at DESC"
+
+
 def list_snapshots_pending_review(
-    conn: sqlite3.Connection, *, limit: int = 20, expiry: str | None = None
+    conn: sqlite3.Connection,
+    *,
+    limit: int = 20,
+    expiry: str | None = None,
+    sort: str = PENDING_SORT_NEWEST,
 ) -> list[dict[str, Any]]:
     """Frozen rows with no review row or review_status = pending."""
     init_schema(conn)
@@ -149,18 +183,35 @@ def list_snapshots_pending_review(
     if exp:
         where = f"({where}) AND fe.expiry = ?"
         params.append(exp)
+    order = _pending_order_clause(sort)
     cur = conn.execute(
         f"""
-        SELECT fe.id, fe.created_at, fe.expiry, fe.summary_line
+        SELECT fe.id, fe.created_at, fe.expiry, fe.summary_line,
+               sr.review_horizon_ref
         FROM frozen_evaluations fe
         LEFT JOIN snapshot_reviews sr ON sr.snapshot_id = fe.id
         WHERE {where}
-        ORDER BY fe.created_at DESC
+        ORDER BY {order}
         LIMIT ?
         """,
         (*params, int(limit)),
     )
     return [dict(r) for r in cur.fetchall()]
+
+
+def list_distinct_frozen_expiries(conn: sqlite3.Connection, *, limit: int = 200) -> list[str]:
+    """Distinct expiry labels from frozen_evaluations (for filter dropdowns)."""
+    init_schema(conn)
+    cur = conn.execute(
+        """
+        SELECT DISTINCT expiry FROM frozen_evaluations
+        WHERE TRIM(expiry) != ''
+        ORDER BY expiry ASC
+        LIMIT ?
+        """,
+        (int(limit),),
+    )
+    return [str(r[0]) for r in cur.fetchall()]
 
 
 def list_completed_review_snapshots(
@@ -201,7 +252,7 @@ def list_completed_review_snapshots(
         f"""
         SELECT fe.id AS snapshot_id, fe.created_at, fe.expiry, fe.summary_line, fe.record_json,
                sr.id AS review_row_id, sr.review_status, sr.outcome_notes,
-               sr.reviewed_at_utc, sr.review_horizon_ref
+               sr.reviewed_at_utc, sr.review_horizon_ref, sr.paper_tag
         FROM frozen_evaluations fe
         INNER JOIN snapshot_reviews sr ON sr.snapshot_id = fe.id
         WHERE {where}
@@ -227,6 +278,7 @@ def list_completed_review_snapshots(
                     "outcome_notes": r["outcome_notes"],
                     "reviewed_at_utc": r["reviewed_at_utc"],
                     "review_horizon_ref": r["review_horizon_ref"],
+                    "paper_tag": r.get("paper_tag"),
                 },
             }
         )

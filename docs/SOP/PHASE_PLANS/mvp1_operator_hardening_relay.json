@@ -1,0 +1,36 @@
+{
+  "name": "MVP1_operator_hardening (post-Phase2 SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_OPERATOR_HARDENING.md",
+  "selectionRecord": "docs/SOP/POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-OperatorHardening-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-OperatorHardening-Smoke-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-OperatorHardening-Witness-Slice003",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-OperatorHardening-Closeout-Slice004",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

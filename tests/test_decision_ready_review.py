@@ -71,6 +71,18 @@ class TestDecisionReadyReviewPayload(unittest.TestCase):
         self.assertIn("Fit is not recommendation", p["fit_caption"])
         assert_no_advisory_language(_join_payload_text(p))
 
+    def test_mvp1_excludes_trade_ticket_language(self) -> None:
+        glance = {"fit_note": "Fit is not recommendation."}
+        p = build_decision_ready_review_payload(
+            self._minimal_applicable_verification(glance=glance),
+            mvp1_exclude_execution_ui=True,
+        )
+        assert p is not None
+        self.assertNotIn("Trade ticket (copy/paste)", p["linkage_line"])
+        self.assertIn("MVP1", p["linkage_line"])
+        self.assertNotIn("Trade ticket (copy/paste)", p["bullets"][-1])
+        assert_no_advisory_language(_join_payload_text(p))
+
     def test_missing_belief_context_branch(self) -> None:
         p = build_decision_ready_review_payload(self._minimal_applicable_verification())
         assert p is not None

@@ -27,3 +27,18 @@ jobs:
             cd /opt/marketstructureos
             git pull
             docker compose up -d --build
+
+      - name: Demo site health (no import traceback)
+        if: success()
+        run: |
+          set -euo pipefail
+          body=$(curl -fsS --max-time 60 https://marketstructureos.com/ || true)
+          if echo "$body" | grep -q 'ModuleNotFoundError'; then
+            echo 'Demo site HTML contains ModuleNotFoundError'
+            exit 1
+          fi
+          if echo "$body" | grep -q 'Traceback (most recent call last)'; then
+            echo 'Demo site HTML contains a Python traceback'
+            exit 1
+          fi
+          echo 'Demo site health check passed (no import traceback in HTML)'

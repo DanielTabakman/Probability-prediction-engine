@@ -95,6 +95,26 @@ A pass is classified by the **worst** band any single heuristic triggers (i.e. i
 4. **Switch to CONTROL-PLANE interlude first.** If the overhead is driven by doc drift / missing advisory infrastructure, run a short CONTROL-PLANE slice (this doc is an example) to compress the overhead before the main BUILD.
 5. **Stop and re-SELECT.** If none of the above apply, stop at SELECTION and re-scope; do **not** push through a BUILD in ESCALATE without an explicit steward decision recorded in `CURRENT_FRONTIER.md`.
 
+### 3.4 Cursor UI (Conversation bucket — advisory)
+
+These heuristics apply to the **Cursor chat thread** (the IDE “Conversation” portion of the context window), not relay worker sessions (ACP gets a fresh session per slice).
+
+**WATCH (any one triggers):**
+
+- The same Cursor thread spans **2+ relay slices** or mixes **SELECTION + BUILD + PR** work.
+- Steward pasted full pytest output, full `git diff`, or inlined sprint spec / HANDOFF gate into chat.
+
+**ESCALATE (any one triggers):**
+
+- One thread used for a **full phase run** plus ad-hoc planning plus manual `gh` / merge fixes.
+- Context UI shows Conversation dominating the window (e.g. governance chat history dwarfs repo files).
+
+**Advisory actions:**
+
+- **New Cursor thread** after CLOSEOUT or between chapters; load only `docs/SOP/AGENT_CONTINUITY_BRIEF.md` (+ SELECTION path). See `docs/CONTEXT_RULES.md`.
+- **BUILD packets:** `docs/SOP/BUILD_PACKET_TEMPLATE.md` — paths only.
+- **Unified run:** `run_ppe.cmd` for phase execution; do not paste orchestrator logs into steward chat; read `artifacts/orchestrator/LAST_RUN_REPORT.md` after exit.
+
 ---
 
 ## 4. Heuristic reference (what to count, roughly)
@@ -108,6 +128,7 @@ These are **rough** counts, not machine-measured thresholds. The steward is the 
 | Expected roundtrips | BUILD + planned repairs | ≤ 2 | 3 | ≥ 4 |
 | Slice scope size | Planned size label from `WORKFLOW_METRICS_V1.md` | S | M | L or multi-plane |
 | Governance : diff ratio | Feel: spec + evidence payload vs expected diff | balanced | spec dwarfs diff | spec + ledger dwarf everything |
+| Cursor thread scope (`§3.4`) | One IDE chat: slices/steps mixed | one slice or step type | 2+ slices or SELECTION+BUILD+PR | full phase + planning + gh in one thread |
 
 A heuristic is **advisory**: if it triggers WATCH but the steward has specific reason the pass is still NORMAL (e.g. the handoff payload is long but mostly a single linked spec), the steward records the reason and proceeds.
 

@@ -3,14 +3,120 @@
 Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Control rule (hard)
-- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (full doc re-imported 2026-05-18; §12 audit + §15A repo-truth)
+- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (§15B–15F vision import 2026-05-20; §15A repo-truth)
 - **This file** is the only live frontier/steering truth.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
 
 ### Current execution focus (MVP1 framing)
-- **Ops pass (agent lane):** **DONE** 2026-05-19 — dual smoke green; docs aligned. Tracker: [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md). **Steward:** VPS env + live paid-interest call.
-- **Next:** **SELECTION** for next BUILD chapter — [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md).
-- **Non-goal**: billing automation, execution engine, multi-asset BUILD in this pass.
+- **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
+- **Active BUILD chapter:** **MVP1 disagreement / candidate strip polish (v0)** — **next:** `MVP1-DisagreementStrip-Product-Slice002` ([`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md) · [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md))
+- **Last closed chapter:** **MVP1 onboarding / How it works** — **COMPLETE** 2026-05-20
+- **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
+- **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
+
+
+### Phase 2 on `main` — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-Phase2-Control-Slice001` — charter + SELECTION record | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` — [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Product-Slice003` — MVP1 UI exclusions alignment (copy + harness) | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Closeout-Slice004` — checkpoint after Product-Slice003 | CONTROL |
+| **CLOSED** | `MVP1-Phase2-Product-Slice005` — decision surface / panel parity audit | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Product-Slice006` — trust strip MVP1 disclosure | PRODUCT |
+| **CLOSED** | `MVP1-Phase2-Chapter-Closeout-Slice007` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md)
+
+### MVP1 operator hardening — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-OperatorHardening-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-OperatorHardening-Smoke-Slice002` — trust-strip MVP1 smoke witness | PRODUCT |
+| **CLOSED** | `MVP1-OperatorHardening-Witness-Slice003` — deploy witness refresh | CONTROL |
+| **CLOSED** | `MVP1-OperatorHardening-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md`](POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md)
+
+### MVP1 memory & review enrichment — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-ReviewEnrichment-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice002` — pending sort, paper tag, expiry filter | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice003` — class summary SQL expiry filter | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice004` — rollup CSV export | PRODUCT |
+| **CLOSED** | `MVP1-ReviewEnrichment-Closeout-Slice005` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
+
+### MVP1 smoke regression — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-SmokeRegression-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Harness-Slice002` — MVP1_compact budget + marker waits | PRODUCT |
+| **CLOSED** | `MVP1-SmokeRegression-Witness-Slice003` — dual smoke green | CONTROL |
+| **CLOSED** | `MVP1-SmokeRegression-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md)
+
+### MVP1 friends-first screen — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-FriendsFirst-Control-Slice001` — charter + SELECTION | CONTROL |
+| **CLOSED** | `MVP1-FriendsFirst-Product-Slice002` — above-fold headline + trust-at-a-glance | PRODUCT |
+| **CLOSED** | `MVP1-FriendsFirst-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **CLOSED** | `MVP1-FriendsFirst-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) · **Chapter SELECTION:** [`POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md`](POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md)
+
+### MVP1 belief-input UX — relay queue — **COMPLETE** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-BeliefInput-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-BeliefInput-Product-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-BeliefInput-Smoke-Slice003` | CONTROL |
+| **CLOSED** | `MVP1-BeliefInput-Closeout-Slice004` | CONTROL |
+
+**Evidence:** [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) · **SELECTION outcome:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md)
+
+### MVP1 onboarding / How it works — relay queue — **COMPLETE** (2026-05-20)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-OnboardingHowItWorks-Control-Slice001` — charter | CONTROL |
+| **CLOSED** | `MVP1-OnboardingHowItWorks-Product-Slice002` — How it works UX | PRODUCT |
+| **CLOSED** | `MVP1-OnboardingHowItWorks-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **CLOSED** | `MVP1-OnboardingHowItWorks-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) · **SELECTION (charter):** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · **Next SELECTION prep:** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
+
+### MVP1 disagreement / candidate strip polish — relay queue — **IN PROGRESS** (2026-05-26)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-DisagreementStrip-Control-Slice001` — charter | CONTROL |
+| **OPEN** | `MVP1-DisagreementStrip-Product-Slice002` — strip polish | PRODUCT |
+| **OPEN** | `MVP1-DisagreementStrip-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **OPEN** | `MVP1-DisagreementStrip-Closeout-Slice004` — chapter close | CONTROL |
+
+**Evidence:** [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md)
+
+### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-Reliability-Control-Slice001` | CONTROL |
+| **CLOSED** | `MVP1-Reliability-Smoke-Slice002` | PRODUCT |
+| **CLOSED** | `MVP1-Reliability-Deploy-Slice003` | CONTROL |
+| **CLOSED** | `MVP1-Reliability-Closeout-Slice004` | CONTROL |
+
+**Evidence:** [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md)
 
 ### Archived roadmap chapters (baseline **`main`**)
 
@@ -18,6 +124,11 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 |---------|--------|----------|
 | Validation Chapter | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
 | Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
+| MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
+| Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
+| MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
+| MVP1 memory & review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md), [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) |
+| MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md), [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) |
 
 ### Commercial Validation — relay queue (baseline **`main`**) — **COMPLETE**
 
@@ -87,11 +198,13 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
 - Regression: dual smoke [`scripts/run_mvp1_dual_implied_lab_smoke.py`](scripts/run_mvp1_dual_implied_lab_smoke.py) after major implied-lab changes; full `pytest` before merge when touching shared modules ([`README.md`](../../README.md) steward backlog).
 - Manual: freeze → review (non-pending) → open **Class summary — reviewed snapshots** and confirm counts move off zero.
 
-#### Phase 5 optional follow-ons (deferred)
-- Spec stub **`MVP1-Phase5-Slice002`** in [`docs/SOP/MVP1_PHASE1_3_SPRINT.md`](docs/SOP/MVP1_PHASE1_3_SPRINT.md): horizon filtering UX, structured paper field, optional SQLite FK — implement only if prioritized.
+#### Phase 5 optional follow-ons
+- **DONE (chapter):** pending expiry filter + sort; optional **paper tag** on reviews ([`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md)).
+- **Still deferred:** SQLite FK / `PRAGMA foreign_keys`, full horizon UX per **`MVP1-Phase5-Slice002`** stub in [`MVP1_PHASE1_3_SPRINT.md`](MVP1_PHASE1_3_SPRINT.md).
 
-#### Phase 6 next (beyond v0)
-- Richer filters (date range, expiry), export CSV/JSON of rollups, stronger trust metrics when verification payload gains explicit trust enums — track as future slices; canon still excludes execution and automated deployment.
+#### Phase 6 beyond v0
+- **DONE (chapter):** store-backed expiry + reviewed-date filters; rollup JSON/CSV + reviewed table CSV export.
+- **Still deferred:** stronger trust metrics when verification payload gains explicit trust enums; canon still excludes execution and automated deployment.
 
 ### Logging policy (low-maintenance)
 - Local-first append-only logbook: `artifacts/logbook/ppe_events.jsonl` (gitignored).

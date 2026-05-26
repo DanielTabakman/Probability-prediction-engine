@@ -11,7 +11,7 @@ docker compose up -d --build
 ## Related
 
 - **[PRODUCTION_DEPLOY_PROTOCOL.md](../SOP/PRODUCTION_DEPLOY_PROTOCOL.md)** — canonical rule: production tracks **`main`** on the VPS; when to rely on this Action vs manual SSH.
-- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when **`CI / pytest`** passes; branch protection so merges to **`main`** always ran CI first. After that merge, **this** workflow is what updates the site (no separate human deploy step).
+- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when the **CI** workflow is green (**`CI / pytest`** + **`CI / docker_entrypoint`**); branch protection (when available) can require both. **Merge on green** merges only when the whole `ci.yml` run succeeds, so both jobs must pass. After that merge, **this** workflow is what updates the site (no separate human deploy step).
 
 ## When it runs
 

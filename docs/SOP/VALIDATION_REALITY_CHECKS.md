@@ -5,7 +5,7 @@ Lightweight external validation. Copy a row per session.
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
 | 2026-05-19 | **Demo clarity** — viewer names main object in ~5 min | Y | Prep: public demo URL + operator script; MVP1 banner above fold on branch |
-| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Ops prep done; dual smoke green (`20260519_131035`); offer on demo pending VPS `PPE_RESEARCH_OFFER_URL`; **schedule live call** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) outreach log |
+| 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Phase2 Product-Slice003 shipped; VPS CTA still pending `.env`; **steward live call required** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) §Outreach (**do not mark Y** without real conversation) |
 | 2026-05-19 | **Reviewable cases** — showed freeze + reopen + review on full app | Y | Ritual + evidence clock seeded to targets (see VALIDATION_EVIDENCE_STATUS) |
 | 2026-05-19 | **NVIDIA / LEAPS** — manual brief only (no code) | Y | [`briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md`](briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md) drafted; live interviews optional follow-up |
 
@@ -24,6 +24,16 @@ On full app: run [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md) once live in
 ## NVIDIA / LEAPS
 
 Manual research brief only — do not expand MVP1 BTC scope. Note whether customer values thesis-to-options translation.
+
+## §15F friends-first spot-check (optional)
+
+After friends-first / belief-input UX on demo: 5–10 min with 1–2 smart non-experts. Copy a row when done.
+
+| Date | Tester profile | Understood “what this run is saying” without Verification? | Trust strip noticed? | Would open again? | Notes |
+|------|----------------|--------------------------------------------------------------|----------------------|---------------------|-------|
+| _fill_ | _e.g. quant-curious friend_ | Y/N | Y/N | Y/N | |
+
+Use [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) timing; rubric detail in [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) §15F.
 
 ## Evidence targets (engineering companion)
 

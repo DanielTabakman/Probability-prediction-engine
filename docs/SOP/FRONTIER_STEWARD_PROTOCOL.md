@@ -10,12 +10,15 @@
 ## Source-of-truth order
 
 1. Pushed repo + current accepted docs
-2. `docs/SOP/CURRENT_FRONTIER.md`
-3. `docs/SOP/HANDOFF.md`
-4. `docs/SOP/OPERATING_RULES.md`
-5. `docs/SPRINT_1_SPEC.md`
-6. `docs/SEMANTIC_CONTRACTS.md`
-7. Older handoff/chat only when docs are silent
+2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon)
+3. `docs/SOP/MVP1_FRONTIER.md` (live steering / slice queue)
+4. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter summary)
+5. `docs/SOP/HANDOFF.md`
+6. `docs/SOP/OPERATING_RULES.md`
+7. `docs/SEMANTIC_CONTRACTS.md`
+8. Older handoff/chat only when docs are silent
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is historical only (Phase 2 ledger); do not use for MVP1 steering.
 
 ## Execution-step model
 
@@ -77,6 +80,8 @@ When **live repo state exists**, the same agent must continue the pass. Live rep
 
 A new agent is allowed only when the pass is fully closed and repo state is legible/parked (clean working tree, and any remaining state explicitly isolated and named).
 
+**Repo continuity ≠ one Cursor thread forever:** the rule above governs **git/repo state** during an open pass. After **CLOSEOUT**, between relay slices in a phase, or when starting a new chapter, prefer a **new Cursor thread** even when `Safe to switch agents? YES`. See **Cursor context discipline** below and [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+
 **Required execution output block:**
 
 ```text
@@ -109,12 +114,12 @@ Preflight must report repo facts (machine-derived where possible) and only then 
 
 - **SELECTION** is always separate.
 - **BUILD** may be combined with **CLOSEOUT** only for compact slices that truly earn it (see below).
-- A slice is **not closed** until control-plane docs are updated honestly.
+- A chapter closeout slice is **not closed** until `apply_control_closeout_v1` **PASS** (steering alignment + consistency) and changes are committed.
 - If validation is ambiguous, docs are contradictory, or scope drifts, fall back to separate **BUILD** then steward review.
 - Do not silently morph **CLOSEOUT** into **BUILD**.
 - Do not silently morph **BUILD** into refactor work.
 
-> **Trial in effect (2026-04-27 onward).** Tiered-delegation soft-launch is active; live authority state in `docs/SOP/CURRENT_FRONTIER.md`. See `CODEX_AUTONOMY_V1.md` "Trial in effect" callout for scope and escalation triggers.
+> **Trial in effect (2026-04-27 onward).** Tiered-delegation soft-launch is active; live authority state in `docs/SOP/MVP1_FRONTIER.md` and `docs/SOP/PPE_INTEGRATED_STATUS.md`. See `CODEX_AUTONOMY_V1.md` "Trial in effect" callout.
 
 ### Compact-slice rule
 
@@ -124,7 +129,7 @@ Compact **BUILD + CLOSEOUT** in one pass is allowed only when **all** are true:
 - Mostly layout/copy/presentation/non-semantic linkage.
 - No classification/threshold/derivation/fetch/state/harness semantics changes.
 - Tier 1 validation is sufficient.
-- `CURRENT_FRONTIER` and `HANDOFF` can be updated honestly in the same pass.
+- `MVP1_FRONTIER` and `HANDOFF` are updated by the closeout job (not manual steward edits by default).
 
 ### Non-compact rule
 
@@ -228,6 +233,23 @@ When useful, note:
 - Prefer smallest meaningful slice that improves phase success.
 - Do not let “helpful expansion” hijack the frontier.
 
+## Cursor context discipline (advisory)
+
+Thread map:
+
+| Thread | Role | When to start fresh |
+|--------|------|---------------------|
+| **Steward** | SELECTION, manifest, VPS/CTA parallel, read `LAST_RUN_REPORT.md` | New chapter; after phase exit; when chat is noisy |
+| **BUILD (manual Cursor)** | Rare — prefer relay/ACP | One sub-sprint or slice; not full phase + PR in same thread |
+| **Recovery** | RECOVERY execution step only | After RECOVERY CLOSEOUT |
+
+Rules:
+
+- **Relay/orchestrator** (`run_ppe.cmd`, `run_phase.cmd`, `run_slice.cmd`): each slice gets a fresh ACP worker; do not paste orchestrator logs into steward chat.
+- **Unified run:** steward sets [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json), runs `run_ppe.cmd`, then opens a **new** thread with only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
+- **Packets:** [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — link paths; no HANDOFF gate inline, no full diffs/logs.
+- **Context bands:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4 (Cursor UI heuristics).
+
 ## Window ledger
 
 Definitions:
@@ -272,7 +294,7 @@ Preferred format:
 Advisory companion to `docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md` (context-budget bands). Not a gate. Overridable with a recorded reason.
 
 **LOAD-ALWAYS (every BUILD-class pass):**
-- `docs/SOP/CURRENT_FRONTIER.md` (canonical next step; outranks HANDOFF on drift)
+- `docs/SOP/MVP1_FRONTIER.md` (canonical next step; outranks HANDOFF on drift)
 - `docs/SOP/HANDOFF.md` (minimum session context)
 - the **active sprint spec** only (e.g. `docs/SOP/SPRINT_003_PHASE_2.md`)
 

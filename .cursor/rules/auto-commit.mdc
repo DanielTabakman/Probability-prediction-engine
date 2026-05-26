@@ -1,9 +1,18 @@
+---
+description: Auto-commit and push after authorized tasks when COMMIT_POLICY gates pass. Supersedes generic "ask before commit" for this repo.
+alwaysApply: true
+---
+
 # Auto-commit and auto-push policy
+
+**Precedence:** In this repository, this rule overrides `OPERATING_RULES.md` § Git and any generic user instruction to "ask before commit" when the current task or plan is **authorized and complete**.
 
 ## When to auto-commit
 
+**Standing authorization:** commit and push to feature branches when the task is done and the gate passes—do not ask “may I commit?” each time (see `COMMIT_POLICY_V1.md`).
+
 - All todos / requested work for the current task or plan are complete.
-- Relevant **targeted tests** for the changed code have passed.
+- **Pushable commit gate** has passed (see Test alignment below).
 - Before committing, the agent must always:
   - Show `git status`, `git diff`, `git log -1 --oneline`.
   - Propose **one commit by default** for the task; split into multiple commits only when changes are clearly separate (e.g. docs vs code vs tests).
@@ -23,34 +32,53 @@
 
 - After auto-commit on any branch **other than** `main` / `master`, the agent should **auto-push** to the branch’s existing upstream.
 - If the current branch has no upstream yet, the first push should be `git push -u origin HEAD` (or equivalent for the default remote).
+- **After push**, if there is no open PR to `main` for this branch, **open one** (`gh pr create --base main --head <branch>`). GitHub will add the `automerge` label ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when the **CI** workflow ([`ci.yml`](../../.github/workflows/ci.yml)) completes **`success`**—i.e. both **`CI / pytest`** and **`CI / docker_entrypoint`** pass—[`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges to `main` and **Deploy VPS** can run. Do not stop at “pushed feature branch” when the intent is to ship.
 - Preconditions for auto-push on non-main branches:
-  - Targeted tests for the work have passed.
-  - The working tree is clean except for the intended changes (no untracked / unstaged surprises that are part of the task).
-  - No force push is required; only fast-forward pushes are allowed.
+  - Pushable commit gate passed (ruff + full pytest, or docs-only exception).
+  - The working tree is clean except for the intended changes.
+  - No force push; fast-forward only.
 
 ### `main` / `master` branches
 
-- On `main` / `master`, the agent may auto-push **only after the full test suite passes**, e.g. `python -m pytest -q`.
-- If the repository uses **PR-only** delivery to `main` (branch protection; see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Instead push a **feature branch** and open a PR to `main` with **auto-merge** (or report that the user/orchestrator should), so GitHub enforces **`CI / pytest`** before merge.
-- The same safety checks apply:
-  - No secrets / artifacts staged in the commit.
-  - No force push, no history rewrite.
-  - Working tree clean apart from the committed changes.
+- Same gate as any pushable commit: `python -m ruff check src tests scripts` and `python -m pytest -q`.
+- If the repository uses **PR-only** delivery to `main` (see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Push a **feature branch** and open a PR so GitHub runs the full **CI** workflow (pytest + docker_entrypoint) before merge.
+- No secrets / artifacts in the commit; no force push or history rewrite.
 
 ## When not to auto-push
 
-The agent must NOT auto-push, and instead report status to the user, when:
+The agent must NOT auto-push when:
 
-- A push would require `--force`, rewriting history, or resolving conflicts the agent cannot safely handle.
-- The remote rejects the push (e.g. branch protection, required checks); the agent should surface the error but not retry with riskier options.
-- Tests (targeted or full) fail or are incomplete for the work being committed.
+- Push would require `--force`, history rewrite, or unsafe conflict resolution.
+- Remote rejects the push (branch protection, required checks) — surface the error; do not retry with riskier options.
+- Ruff or full pytest failed, or the gate was not run for non-docs-only code changes.
 
-## Test alignment
+## Test alignment (canonical)
 
-- **Targeted tests default**:
-  - For each task, the agent should identify and run the most relevant test modules (for example, `tests/test_*.py` files that import or mention the edited code).
-  - If no obvious tests exist, the agent should run a minimal, safe smoke (e.g. importing the module or running a narrow subset of pytest) and fall back to `python -m pytest -q` only when necessary.
-- **Full tests gate for main**:
-  - When on `main` / `master`, the agent must run `python -m pytest -q` and see it pass before auto-pushing.
-  - If full tests fail, the agent must not create new commits or pushes until the failures are addressed.
+Authoritative detail: [docs/SOP/COMMIT_POLICY_V1.md](../../docs/SOP/COMMIT_POLICY_V1.md).
 
+### Pushable commit (default)
+
+```bash
+python -m ruff check src tests scripts
+python -m pytest -q
+```
+
+Run both before every commit that will be pushed. Do **not** substitute “targeted pytest only.”
+
+### Docs-only exception
+
+If the change set is **only** under `docs/`, pytest is not required; ruff is optional unless `scripts/` or `src/` changed.
+
+### Implied-lab UI (PR / merge, not commit)
+
+If the task touched `src/viz/**` or UI smoke scripts, remind the user (or run when asked) before PR merge:
+
+```bash
+python scripts/run_mvp1_dual_implied_lab_smoke.py
+```
+
+Do not block commit on dual smoke (environment-sensitive).
+
+### Merge to `main`
+
+GitHub **CI** = **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker + Streamlit smoke). Local gate should match pytest + ruff before push; docker smoke runs on GitHub unless you replicate it locally.

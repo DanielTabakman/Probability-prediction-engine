@@ -55,7 +55,7 @@ From the repo root, after [GitHub CLI](https://cli.github.com/) is installed and
 powershell -ExecutionPolicy Bypass -File scripts/enable_github_zero_touch.ps1
 ```
 
-This enables **Allow auto-merge** and creates or updates a ruleset named **`PPE zero-touch main`** for `refs/heads/main` (PR required with **0** approvals, required check **`CI / pytest`**, no force-push). Re-run the script anytime to refresh that ruleset.
+This enables **Allow auto-merge** and creates or updates a ruleset named **`PPE zero-touch main`** for `refs/heads/main` (PR required with **0** approvals, required checks **`CI / pytest`** and **`CI / docker_entrypoint`**, no force-push). Re-run the script anytime to refresh that ruleset.
 
 ### Repository
 
@@ -70,7 +70,7 @@ Recommended for the stated policy:
 | Rule | Recommendation |
 |------|----------------|
 | Require a pull request before merging | **On** (so every production change has a PR trail; direct pushes to `main` bypass checks). |
-| Require status checks to pass before merging | **On** — require **`CI / pytest`** (workflow **CI**, job **pytest**). |
+| Require status checks to pass before merging | **On** — require **`CI / pytest`** and **`CI / docker_entrypoint`** (workflow **CI**, jobs **pytest** and **docker_entrypoint**). |
 | Require branches to be up to date before merging | **On** if you want a strict linear gate; pairs well with **merge queue** (optional). |
 | Require approvals | **Off** for “no human in merge path when green” (steward verifies on the site when they choose, not as a merge blocker). |
 | Allow administrators to bypass | **Off** if you want the same rules for everyone including admins. |
@@ -91,7 +91,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 
 1. Work lands on a **feature branch** (worker/orchestrator or human).
 2. Open a PR to **`main`**; enable **auto-merge**.
-3. **`CI / pytest`** runs; when green, GitHub merges without further human action.
+3. **`CI / pytest`** and **`CI / docker_entrypoint`** run; when green, GitHub merges without further human action.
 4. **Deploy VPS** runs on the push to **`main`**; post-deploy smoke when you want assurance ([DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5).
 
 **Path B — private Free (greyed-out auto-merge):**
@@ -104,7 +104,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 | Symptom | What to check |
 |--------|----------------|
 | Auto-merge not available | Repo setting **Allow auto-merge**; branch protection may require incompatible rules. **Private Free:** use label **`automerge`** + workflow **Merge on green** ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). |
-| PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and the required check name matches **`CI / pytest`**. |
+| PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. |
 | Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**. **Private Free:** confirm **Merge on green** ran (Actions tab) and **Workflow permissions** allow read/write. |
 | Merged but site old | [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D; confirm **Deploy VPS** run for that commit. |
 
@@ -112,4 +112,5 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 
 - [RELAY_ORCHESTRATOR_RUNBOOK_V1.md](RELAY_ORCHESTRATOR_RUNBOOK_V1.md) — slice/phase artifacts; **Shipping (GitHub)** subsection.  
 - [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) — VPS and `main` as source of truth.  
-- [README](../../README.md) — local testing policy; CI mirrors **`python -m pytest -q`** for the gate.
+- [README](../../README.md) — commit/merge test gates; CI runs **ruff + full pytest** (`CI / pytest`) and **Docker entrypoint smoke** (`CI / docker_entrypoint`).
+- [COMMIT_POLICY_V1.md](COMMIT_POLICY_V1.md) — canonical local gate before pushable commits.

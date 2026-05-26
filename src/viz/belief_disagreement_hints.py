@@ -8,6 +8,7 @@ example structure per family. Markdown is derived from the contract only.
 
 from __future__ import annotations
 
+import os
 from typing import Any, Literal, TypedDict
 
 from src.viz.disagreement_thresholds import (
@@ -45,6 +46,18 @@ STRIKE_POLICY_ILLUSTRATIVE = (
     "Illustrative only: strikes are not optimized from your belief curve. "
     "Use Exact strikes or Target payoff below with listed option marks."
 )
+
+
+def strike_policy_illustrative_for_runtime() -> str:
+    """MVP1 default UI omits Exact-strikes / Target-payoff tooling; keep copy aligned."""
+    base = "Illustrative only: strikes are not optimized from your belief curve."
+    v = str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip().lower()
+    if v in ("1", "true", "yes", "on"):
+        return STRIKE_POLICY_ILLUSTRATIVE
+    return base
+
+
+_DEFAULT_STRIKE_POLICY = object()
 
 CONTRACT_SCHEMA_VERSION = "1"
 StructureKind = Literal["illustrative_pattern"]
@@ -108,9 +121,11 @@ def _example(
     label: str,
     construction_note: str,
     why_it_fits: str,
-    strike_policy: str = STRIKE_POLICY_ILLUSTRATIVE,
+    strike_policy: Any = _DEFAULT_STRIKE_POLICY,
     leg_pattern: list[list[str]] | None = None,
 ) -> ExampleStructureDict:
+    if strike_policy is _DEFAULT_STRIKE_POLICY:
+        strike_policy = strike_policy_illustrative_for_runtime()
     ex: ExampleStructureDict = {
         "structure_id": structure_id,
         "structure_kind": "illustrative_pattern",
@@ -742,7 +757,7 @@ def markdown_from_disagreement_contract(contract: BeliefDisagreementContract) ->
         lines.append(
             "- **Illustrative only:** "
             f"**{ex['label']}** — {ex['construction_note']} "
-            f"(*Strike policy:* {ex.get('strike_policy', STRIKE_POLICY_ILLUSTRATIVE)})"
+            f"(*Strike policy:* {ex.get('strike_policy', strike_policy_illustrative_for_runtime())})"
         )
         lines.append("")
     lines.append("---")

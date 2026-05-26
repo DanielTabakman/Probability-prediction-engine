@@ -13,8 +13,151 @@ from __future__ import annotations
 
 import streamlit as st
 
+from src.viz.belief_uncertainty import (
+    move_pct_1sigma_to_sigma_ln,
+    sigma_ln_to_move_pct_1sigma,
+)
 from src.viz.decision_ready_review import build_decision_ready_review_payload
-from src.viz.implied_lab_provenance import build_trust_strip_lines
+from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
+
+
+def compute_mvp1_belief_overlay_state(
+    *,
+    belief_exp: str,
+    forward: float,
+    price_max: float,
+    vol: float,
+    T_years: float,
+) -> dict:
+    """
+    MVP1-friendly belief controls (§15B slice 3): human labels, ±% default, σ_ln nested.
+    Returns user_belief dict for `build_implied_lab_state` (width is σ_ln internally).
+    """
+    st.caption(
+        "Optional: add **your** view on where price might land — compare to the market curve (right)."
+    )
+    with st.expander("My belief vs market", expanded=False):
+        st.caption(
+            "Turn on a simple belief curve. This is not a forecast or trade recommendation."
+        )
+        st.checkbox(
+            "Show my belief curve",
+            key=f"belief_en_{belief_exp}",
+        )
+        st.number_input(
+            "Where you think price lands (USD peak)",
+            min_value=1000.0,
+            max_value=float(max(price_max, 1_000_000)),
+            value=float(forward),
+            step=1000.0,
+            key=f"belief_center_{belief_exp}",
+            format="%.0f",
+            help="Your best single price level for this expiry (mode of your belief curve).",
+        )
+
+        sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+        mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+        unc_mode_key = f"belief_unc_mode_{belief_exp}"
+        pct_key = f"belief_move_pct_{belief_exp}"
+        if pct_key not in st.session_state:
+            existing_sigma = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+            st.session_state[pct_key] = float(sigma_ln_to_move_pct_1sigma(existing_sigma))
+
+        st.markdown("**How unsure are you?**")
+        st.slider(
+            "Typical move by expiry (±% about 2/3 of the time, 1σ)",
+            1.0,
+            200.0,
+            float(st.session_state.get(pct_key, 22.0)),
+            0.5,
+            key=pct_key,
+            help="How far price might move up or down by expiry (one standard deviation).",
+        )
+
+        with st.expander("Advanced uncertainty (technical)", expanded=False):
+            st.radio(
+                "Uncertainty input mode",
+                ["±% move (1σ)", "σ_ln (advanced)"],
+                key=unc_mode_key,
+                horizontal=True,
+                label_visibility="collapsed",
+            )
+            sigma_key = f"belief_width_{belief_exp}"
+            st.slider(
+                "Uncertainty (σ of ln price at expiry)",
+                0.02,
+                0.8,
+                0.2,
+                0.005,
+                key=sigma_key,
+                help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+            )
+
+        unc_mode = str(st.session_state.get(unc_mode_key, "±% move (1σ)"))
+        if unc_mode == "σ_ln (advanced)":
+            sigma_ln = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
+        else:
+            sigma_ln = move_pct_1sigma_to_sigma_ln(float(st.session_state.get(pct_key, 22.0)))
+
+        st.caption(
+            f"Active uncertainty σ_ln ≈ **{sigma_ln:.4f}** · "
+            f"Market horizon σ_ln ≈ **{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%** 1σ)"
+        )
+
+    return {
+        "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
+        "center_usd": float(st.session_state.get(f"belief_center_{belief_exp}", forward)),
+        "width": float(sigma_ln),
+    }
+
+
+def format_mvp1_materiality_caption(mvp1: dict) -> str | None:
+    """Single-line width-gap witness from `mvp1_decision.materiality` (parity across panels)."""
+    mat = mvp1.get("materiality") if isinstance(mvp1, dict) else None
+    if not isinstance(mat, dict):
+        return None
+    return (
+        f"Width gap: market {mat.get('market_width_1sigma_move_pct', '—')}% vs "
+        f"benchmark {mat.get('benchmark_width_1sigma_move_pct', '—')}% · "
+        f"M_ratio={mat.get('m_ratio', '—')} ({mat.get('materiality_rule_version', '')})"
+    )
+
+
+def _primary_output_state_label(mvp1: dict) -> str:
+    return str(mvp1.get("primary_output_state", "")).replace("_", " ")
+
+
+def _render_mvp1_decision_digest(mvp1: dict, *, bordered: bool, friends_first: bool = False) -> None:
+    """Shared MVP1 decision fields from verification `mvp1_decision` payload."""
+    state = _primary_output_state_label(mvp1)
+    title = f"**{state}**" if friends_first else f"##### MVP1 output: **{state}**"
+    reason = mvp1.get("primary_output_reason") or ""
+
+    def _body() -> None:
+        if friends_first:
+            st.markdown(title)
+            if reason:
+                st.caption(reason)
+        else:
+            st.markdown(title)
+            st.caption(reason)
+        c1, c2, c3 = st.columns(3)
+        dq_label = "MVP1 data quality" if friends_first else "Data quality"
+        with c1:
+            st.write(f"**{dq_label}:**", mvp1.get("data_quality", "—"))
+        with c2:
+            st.write("**Classification:**", mvp1.get("classification_label", "—"))
+        with c3:
+            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+        mat_cap = format_mvp1_materiality_caption(mvp1)
+        if mat_cap:
+            st.caption(mat_cap)
+
+    if bordered:
+        with st.container(border=True):
+            _body()
+    else:
+        _body()
 
 
 def render_belief_vs_market_glance(v: dict) -> None:
@@ -134,6 +277,47 @@ def render_trust_strip(verification: dict) -> None:
     with st.container(border=True):
         st.markdown("##### Trust / provenance")
         st.caption("\n\n".join(lines))
+
+
+def trust_strip_at_a_glance_lines(verification: dict | None, *, max_lines: int = 4) -> list[str]:
+    """Compact trust lines for above-fold MVP1 (no duplicate primary-output lines)."""
+    lines = build_trust_strip_lines(verification if isinstance(verification, dict) else None)
+    compact: list[str] = []
+    for line in lines:
+        if "MVP1 primary output" in line:
+            continue
+        if "expand **Verification**" in line:
+            continue
+        compact.append(line)
+        if len(compact) >= max_lines:
+            break
+    return compact if compact else [TRUST_STRIP_FALLBACK_LINE]
+
+
+def render_trust_strip_at_a_glance(verification: dict) -> None:
+    """Compact trust lines for above-fold MVP1 (no duplicate primary-output lines)."""
+    compact = trust_strip_at_a_glance_lines(verification)
+    st.markdown("##### Trust / provenance")
+    st.markdown("\n\n".join(compact))
+
+
+def render_mvp1_friends_first_above_fold(verification: dict) -> None:
+    """
+    Above-fold MVP1 block: what this run is saying + compact decision + trust (before chart).
+  """
+    if not isinstance(verification, dict):
+        return
+    mvp1 = verification.get("mvp1_decision")
+    if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
+        return
+    with st.container(border=True):
+        st.markdown("##### What this run is saying")
+        st.caption(
+            "Plain-English read from this marks snapshot — research insight, not trade advice."
+        )
+        _render_mvp1_decision_digest(mvp1, bordered=False, friends_first=True)
+        st.divider()
+        render_trust_strip_at_a_glance(verification)
 
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
@@ -264,21 +448,11 @@ def render_width_vol_history_panel(*, selected_expiry_str: str) -> None:
 
 
 def render_mvp1_primary_output_compact(v: dict) -> None:
-    """Above-fold MVP1 decision digest (chart → this → review/freeze)."""
+    """Legacy compact digest below chart (post-MVP1 lab only). MVP1 mode uses friends-first above-fold."""
     mvp1 = v.get("mvp1_decision") if isinstance(v, dict) else None
     if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
         return
-    state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
-    with st.container(border=True):
-        st.markdown(f"##### MVP1 output: **{state}**")
-        st.caption(mvp1.get("primary_output_reason") or "")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
-        with c2:
-            st.write("**Classification:**", mvp1.get("classification_label", "—"))
-        with c3:
-            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
+    _render_mvp1_decision_digest(mvp1, bordered=True, friends_first=False)
 
 
 def render_implied_lab_verification(v: dict) -> None:
@@ -289,23 +463,7 @@ def render_implied_lab_verification(v: dict) -> None:
 
     mvp1 = v.get("mvp1_decision")
     if isinstance(mvp1, dict) and mvp1.get("primary_output_state"):
-        state = str(mvp1.get("primary_output_state", "")).replace("_", " ")
-        st.markdown(f"##### MVP1 output: **{state}**")
-        st.caption(mvp1.get("primary_output_reason") or "")
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            st.write("**Data quality:**", mvp1.get("data_quality", "—"))
-        with c2:
-            st.write("**Classification:**", mvp1.get("classification_label", "—"))
-        with c3:
-            st.write("**Expression family:**", mvp1.get("expression_family", "—"))
-        mat = mvp1.get("materiality")
-        if isinstance(mat, dict):
-            st.caption(
-                f"Width gap: market {mat.get('market_width_1sigma_move_pct', '—')}% vs "
-                f"benchmark {mat.get('benchmark_width_1sigma_move_pct', '—')}% · "
-                f"M_ratio={mat.get('m_ratio', '—')} ({mat.get('materiality_rule_version', '')})"
-            )
+        _render_mvp1_decision_digest(mvp1, bordered=False)
 
     vs = v.get("verification_summary")
     if isinstance(vs, dict) and vs:
@@ -421,14 +579,24 @@ def render_implied_lab_verification(v: dict) -> None:
             st.write("**Breakevens:**", notes.get("breakevens", ""))
 
 
-def render_decision_ready_review(verification: dict) -> None:
+def render_decision_ready_review(
+    verification: dict, *, mvp1_exclude_execution_ui: bool = False
+) -> None:
     """Sprint 005: plain-language structure + payoff read + disagreement/ticket linkage."""
-    payload = build_decision_ready_review_payload(verification)
+    payload = build_decision_ready_review_payload(
+        verification, mvp1_exclude_execution_ui=mvp1_exclude_execution_ui
+    )
     if not payload:
         return
     with st.container(border=True):
         st.markdown("##### Decision-ready review")
-        st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
+        if mvp1_exclude_execution_ui:
+            st.caption(
+                "Connects **Summary** to the glance digest below — descriptive only "
+                "(MVP1 hides copy/paste trade-ticket export)."
+            )
+        else:
+            st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
         st.markdown(payload["structure_line"])
         st.markdown(payload["payoff_line"])
         st.markdown(payload["linkage_line"])

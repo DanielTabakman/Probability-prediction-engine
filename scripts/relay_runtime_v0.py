@@ -38,6 +38,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Optional, Tuple
 
+from scripts.relay.canonical_docs import CANONICAL_DOC_PATHS
+
 # ---------------------------------------------------------------------------
 # Canonical constants. Changing these without a steward-accepted amendment
 # to the upstream doc is a schema violation.
@@ -92,7 +94,10 @@ JOB_RUN_SLICE = "run_selected_slice_v1"
 JOB_GATE_DECISION = "relay_gate_decision"
 JOB_HEALTH = "codebase_health_report"
 JOB_CONSISTENCY = "control_plane_consistency_check"
-SUPPORTED_JOBS = frozenset({JOB_RUN_SLICE, JOB_GATE_DECISION, JOB_HEALTH, JOB_CONSISTENCY})
+JOB_CLOSEOUT = "apply_control_closeout_v1"
+SUPPORTED_JOBS = frozenset(
+    {JOB_RUN_SLICE, JOB_GATE_DECISION, JOB_HEALTH, JOB_CONSISTENCY, JOB_CLOSEOUT}
+)
 
 # State machine.
 STATE_IDLE = "idle"
@@ -133,17 +138,6 @@ VALIDATION_CLASSIFICATIONS = frozenset(
     {"deterministic", "environment-sensitive", "live-data-sensitive", "mixed"}
 )
 PROMOTION_METHODS = frozenset({"fast-forward", "merge"})  # plus None handled separately
-
-# Canonical doc precedence (RELAY_RUNTIME_V0 section 0).
-CANONICAL_DOC_PATHS = (
-    "docs/SOP/CURRENT_FRONTIER.md",
-    "docs/SOP/HANDOFF.md",
-    "docs/SOP/OPERATING_RULES.md",
-    "docs/SOP/FRONTIER_STEWARD_PROTOCOL.md",
-    "docs/SOP/CODEX_AUTONOMY_V1.md",
-    "docs/SOP/JOB_REGISTRY_V1.md",
-    "docs/SOP/RELAY_RUNTIME_V0.md",
-)
 
 
 # ---------------------------------------------------------------------------
@@ -1147,6 +1141,63 @@ def _is_sop_template_placeholder(norm_path: str) -> bool:
     return norm_path in _SOP_SPRINT_TEMPLATE_PLACEHOLDERS
 
 
+def dispatch_apply_control_closeout_v1(
+    runtime: Runtime,
+    *,
+    relay_run_dir: Path | None,
+    phase_plan_path: Path,
+    slice_id: str | None,
+    force: bool = False,
+) -> Tuple[int, str]:
+    from scripts.relay.apply_control_closeout import (
+        CloseoutSpec,
+        apply_control_closeout,
+        find_closeout_for_slice,
+        load_phase_plan,
+        run_consistency_check,
+    )
+
+    repo = runtime.repo_root
+    plan = load_phase_plan(phase_plan_path.resolve())
+    sid = slice_id
+    relay_payload: dict | None = None
+    if relay_run_dir is not None:
+        rr_path = relay_run_dir / "relay_result.json"
+        if not rr_path.is_file():
+            return EXIT_REFUSAL, f"refusal: missing {rr_path}"
+        relay_payload = json.loads(rr_path.read_text(encoding="utf-8-sig"))
+        sid = sid or relay_payload.get("slice_id")
+        if not force and not relay_payload.get("ready_for_control_closeout"):
+            return (
+                EXIT_BLOCKED,
+                "blocked: ready_for_control_closeout is not true (use --force for backfill)",
+            )
+    if not sid:
+        return EXIT_REFUSAL, "refusal: slice_id required (--slice-id or relay_result.json)"
+    closeout_raw = find_closeout_for_slice(plan, sid)
+    if closeout_raw is None:
+        return EXIT_REFUSAL, f"refusal: no closeout block for slice {sid!r} in plan"
+    spec = CloseoutSpec.from_dict(closeout_raw, slice_id=sid)
+    report = apply_control_closeout(
+        repo,
+        closeout=spec,
+        relay_run_dir=relay_run_dir,
+    )
+    if not report.get("passed"):
+        return EXIT_BLOCKED, f"blocked: steering alignment failed\n{json.dumps(report, indent=2)}"
+    ok, cons_out = run_consistency_check(repo)
+    if not ok:
+        return EXIT_BLOCKED, f"blocked: control_plane_consistency_check failed\n{cons_out}"
+    brief = repo / "docs" / "SOP" / "AGENT_CONTINUITY_BRIEF.md"
+    return (
+        EXIT_CONTINUE,
+        f"apply_control_closeout_v1  slice={sid}\n"
+        f"  brief: {brief.relative_to(repo)}\n"
+        f"  alignment: passed\n"
+        f"  consistency: passed",
+    )
+
+
 def dispatch_control_plane_consistency_check(runtime: Runtime) -> Tuple[int, str]:
     repo = runtime.repo_root
     findings: list[dict] = []
@@ -1322,6 +1373,12 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     sp_stage.add_argument("--relay-result-path", type=Path, default=None,
                           help="For relay_gate_decision forensic replay only.")
+    sp_stage.add_argument("--relay-run-dir", type=Path, default=None,
+                          help="For apply_control_closeout_v1: run directory with relay_result.json")
+    sp_stage.add_argument("--phase-plan", type=Path, default=None,
+                          help="For apply_control_closeout_v1: phase plan JSON path")
+    sp_stage.add_argument("--force", action="store_true",
+                          help="For apply_control_closeout_v1: skip ready_for_control_closeout check")
 
     return p
 
@@ -1392,6 +1449,16 @@ def _dispatch_stage(runtime: Runtime, args: argparse.Namespace) -> Tuple[int, st
                 "refusal: relay_gate_decision forensic replay requires --relay-result-path",
             )
         return dispatch_gate_decision_forensic(runtime, args.relay_result_path.resolve())
+    if job == JOB_CLOSEOUT:
+        if args.phase_plan is None:
+            return EXIT_REFUSAL, "refusal: apply_control_closeout_v1 requires --phase-plan"
+        return dispatch_apply_control_closeout_v1(
+            runtime,
+            relay_run_dir=args.relay_run_dir.resolve() if args.relay_run_dir else None,
+            phase_plan_path=args.phase_plan,
+            slice_id=args.slice_id,
+            force=bool(args.force),
+        )
     return EXIT_REFUSAL, f"refusal: unknown job {job!r}"
 
 

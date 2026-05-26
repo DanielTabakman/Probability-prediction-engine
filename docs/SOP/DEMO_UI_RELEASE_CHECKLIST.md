@@ -54,10 +54,17 @@ Per [README](../../README.md) testing policy:
 python -m pytest -q
 ```
 
+This includes [`tests/test_app_entrypoint_import.py`](../../tests/test_app_entrypoint_import.py), which loads `src/viz/app.py` with a **Streamlit-like** `sys.path` (repo root omitted). That catches `ModuleNotFoundError: No module named 'src'` regressions that ordinary unit tests miss.
+
+**Before merging to `main`**, confirm GitHub **CI** is green for both:
+
+- **`CI / pytest`**
+- **`CI / docker_entrypoint`** (builds the production Docker image and verifies Streamlit can start)
+
 For a narrow UI-only pass, at minimum:
 
 ```bash
-python -m pytest tests/test_signup_cta.py -q
+python -m pytest tests/test_signup_cta.py tests/test_app_entrypoint_import.py -q
 ```
 
 ## 3) Git: review, commit, push

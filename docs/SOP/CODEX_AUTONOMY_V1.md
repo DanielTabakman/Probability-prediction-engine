@@ -6,11 +6,15 @@ Status: **v1 — introduced before Sprint 003 BUILD.** Applies to workers runnin
 
 This doc **does not supersede** existing control-plane rules. It **narrows** them for a specific autonomy mode. On any conflict, canonical docs win in this order:
 
-1. `docs/SOP/CURRENT_FRONTIER.md`
-2. `docs/SOP/HANDOFF.md`
-3. `docs/SOP/OPERATING_RULES.md`
-4. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
-5. This doc (`CODEX_AUTONOMY_V1.md`)
+1. `docs/VISION/PPE_MASTER_MVP1.md`
+2. `docs/SOP/MVP1_FRONTIER.md`
+3. `docs/SOP/PPE_INTEGRATED_STATUS.md`
+4. `docs/SOP/HANDOFF.md`
+5. `docs/SOP/OPERATING_RULES.md`
+6. `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md`
+7. This doc (`CODEX_AUTONOMY_V1.md`)
+
+**Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is not controlling for MVP1; use `MVP1_FRONTIER.md` for live steering.
 
 ## 1. Canonical slice loop (unchanged)
 
@@ -35,12 +39,12 @@ PREFLIGHT  ->  BUILD  ->  bounded REPAIR loop  ->  BUILD-CLOSEOUT  ->  PROMOTION
 Rationale:
 
 - **SELECTION** is the highest-judgment step (phase/sprint framing, scope framing, deferral calls). Auto-selecting compounds risk.
-- **CONTROL-CLOSEOUT** writes canonical steering truth (`CURRENT_FRONTIER.md`, `HANDOFF.md`). Errors there corrupt continuity for every future steward/agent.
+- **CONTROL-CLOSEOUT** writes canonical steering truth (`MVP1_FRONTIER.md`, `HANDOFF.md`, and related SOP). Errors there corrupt continuity for every future steward/agent.
 - **PREFLIGHT -> PROMOTION** is the range where decisions are mostly **verifiable from repo facts and slice spec**. Autonomy there gives the largest throughput win at the smallest correctness cost.
 
 This boundary is the **recommended default** for v1.
 
-> **Trial in effect (2026-04-27 onward — tiered-delegation soft-launch).** The steward has temporarily delegated Tier-2 **SELECTION** and Tier-2/3 **CONTROL-CLOSEOUT** to the parent agent under explicit guardrails (rubric verification, semantic-contract gates, phase-boundary strategic touchpoint, escalation triggers on rubric failure / semantic drift / charter ambiguity / scope expansion). The live authority state is canonical at `docs/SOP/CURRENT_FRONTIER.md` — "Authority (tiered-delegation soft-launch — 2026-04-27 onward)". This document's older steward-only language is superseded for the duration of the trial. Formal canonization (or rollback) follows `WH-Slice-005` after Slice004 closes.
+> **Trial in effect (2026-04-27 onward — tiered-delegation soft-launch).** The steward has temporarily delegated Tier-2 **SELECTION** and Tier-2/3 **CONTROL-CLOSEOUT** to the parent agent under explicit guardrails. The live authority state is canonical at `docs/SOP/MVP1_FRONTIER.md` and `docs/SOP/PPE_INTEGRATED_STATUS.md`. Legacy `CURRENT_FRONTIER.md` entries are historical only.
 
 ## 3. Scope (single-slice only)
 
@@ -234,7 +238,7 @@ All fields are required unless marked optional. Enum values are case-sensitive. 
 
   "declared_plane": "PRODUCT-PLANE | EVIDENCE-PLANE",
   "build_branch": "<branch name created for this run>",
-  "baseline_branch": "<accepted baseline named by CURRENT_FRONTIER.md>",
+  "baseline_branch": "<accepted baseline named by MVP1_FRONTIER.md / HANDOFF.md>",
   "baseline_tip_before": "<SHA at run start>",
   "baseline_tip_after":  "<SHA at run end; equal to baseline_tip_before if no promotion>",
   "product_commit_sha":  "<SHA of the product commit, or null if none>",
@@ -363,10 +367,20 @@ The relay consumes §14.1 and emits **exactly one** decision, in this precedence
    Anything that reaches this rule → `STOP_FOR_REVIEW`.  
    *(Safe default: the relay must not guess; the steward decides.)*
 
-### 15.3 What the relay must never do
+### 15.3 What the relay must never do (slice gate job)
 
-- Auto-run **CONTROL-CLOSEOUT**. `CONTINUE` means *hand back to steward for CONTROL-CLOSEOUT*, not *perform it*.
+- The **slice gate** (`relay_gate_decision` / v0 resume path) must not edit canonical steering docs inline.
 - Auto-start the next **SELECTION**. V1 never crosses the selection boundary (§2, §8.7).
+
+### 15.3a Closeout job (`apply_control_closeout_v1`, `RELAY_RUNTIME_V1`)
+
+- **Separate job** from §15.3 slice gate. Invoked by `scripts/post_relay_continue.py` after `CONTINUE` when phase-plan `closeout` is present.
+- Deterministic template patches only; no LLM. See `JOB_REGISTRY_V1.md` §3.5.
+- Workers still **stop before** closeout; `ready_for_control_closeout == true` means the **closeout job may run**, not that the worker edits `HANDOFF.md`.
+
+### 15.3b What the slice gate must never do (legacy list)
+
+- (Removed) forbid auto-closeout on the gate path — closeout is allowed on the **dedicated** job only.
 - Extend `retry_budget_max` beyond 2, or grant retries after `stop_condition != null`.
 - Reinterpret a `BLOCKED` decision as `STOP_FOR_REVIEW` to keep the run alive.
 - Edit canonical steering docs (`docs/SOP/**`) or the slice spec to make a failing payload pass.
@@ -377,7 +391,7 @@ The relay consumes §14.1 and emits **exactly one** decision, in this precedence
 
 - Record the decision, the input payload, and a one-line reason keyed to the triggering rule (e.g., `"rule 2: stop_condition=MIXED_PLANE_CONTAMINATION"`).
 - On `RETRY_ALLOWED`, re-invoke the worker **once** for the same slice with `retry_count += 1` and the same slice spec; it must **not** expand scope, change plane, or edit the slice spec.
-- On `CONTINUE`, surface the §10.6 HANDBACK payload (slice id, product commit SHA, baseline branch, artifact paths) to the steward and stop.
+- On `CONTINUE`, surface the §10.6 HANDBACK payload and stop; wrappers chain `apply_control_closeout_v1` when configured.
 - On `STOP_FOR_REVIEW` or `BLOCKED`, surface the §10.6 HANDBACK payload and the fired §8 condition (if any) and stop.
 
 ### 15.5 Authority boundary reminder

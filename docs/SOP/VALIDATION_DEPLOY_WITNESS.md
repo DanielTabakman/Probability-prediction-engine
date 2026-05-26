@@ -4,13 +4,30 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-19 (pre–ops re-verify); update after VPS pull |
-| **Git SHA on VPS** | `983e7f5` — **re-verify** on VPS after `git pull` (ops cleanup + smoke witness) |
-| **Deploy path** | GitHub Actions on push to `main` / manual §4 |
-| **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-19); re-check after deploy |
+| **Date (UTC)** | 2026-05-20 (PR #10 belief-input + relay bundle merged; Deploy VPS re-run) |
+| **Git SHA on VPS** | **`aff44c5`**+ (squash merge #10 on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` after [Deploy VPS run 26146497234](https://github.com/DanielTabakman/Probability-prediction-engine/actions/runs/26146497234) **success** |
+| **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
+| **marketstructureos.com** | PASS — demo loads (agent fetch 2026-05-20; page title Streamlit) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
-| **HTTPS static assets** | PASS — no mixed-content on demo fetch |
-| **Demo operator script** | PASS — prep; re-run after offer CTA env on demo service |
-| **Research offer CTA on demo** | pending — requires `PPE_RESEARCH_OFFER_URL` on demo container |
+| **HTTPS static assets** | PASS |
+| **Demo operator script** | PASS |
+| **Research offer CTA on demo** | **pending steward `.env`** — compose on `main`; set **PASS** after VPS `.env` + browser confirms **Research beta (v0)** |
 
-**Post–Commercial Validation:** Re-run checklist §5 after VPS aligns to `132ac4f`+ and demo env sets `PPE_RESEARCH_OFFER_URL`. Log result in [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md).
+**Phase 2 (local):** dual smoke green `20260519_155858` + `20260519_160103` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
+
+**Operator hardening:** see [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) after Smoke-Slice002 witness.
+
+**Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
+
+**Steward follow-up:** set `.env` below → `docker compose up -d --build` → set CTA row **PASS** after browser confirms **Research beta (v0)**.
+
+```bash
+cd /opt/marketstructureos
+git pull
+# .env (not committed):
+#   PPE_RESEARCH_OFFER_URL=mailto:...
+#   PPE_RESEARCH_OFFER_LABEL=Request research beta access
+docker compose up -d --build
+```
+
+**Tracker:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) · **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)

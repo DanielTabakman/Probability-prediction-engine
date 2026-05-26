@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from scripts.ui_smoke_diagnose import diagnose_stop_for_review, format_diagnosis
+
 
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -84,9 +86,102 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
         )
 
     if safe_to_continue is True and ready_for_control_closeout is True:
-        return False, "continue", "No human gate implied by relay payload: proceed to next queued slice/plan or closeout docs if needed."
+        return (
+            False,
+            "continue",
+            "Relay CONTINUE: post_relay_continue runs apply_control_closeout_v1 when phase plan has closeout; "
+            "see docs/SOP/AGENT_CONTINUITY_BRIEF.md.",
+        )
 
     return True, "review", "Relay payload is ambiguous; read LAST_RUN_REPORT.json and relay_result.json for details."
+
+
+def _context_band_hint(repo_root: Path, sprint_spec_rel: str | None) -> str | None:
+    if not sprint_spec_rel:
+        return None
+    p = repo_root / sprint_spec_rel.replace("\\", "/")
+    if not p.is_file():
+        return None
+    line_count = len(p.read_text(encoding="utf-8", errors="replace").splitlines())
+    if line_count > 400:
+        return "ESCALATE (sprint spec line count > 400 — prefer links over inline paste)"
+    if line_count > 200:
+        return "WATCH (sprint spec line count > 200)"
+    return "NORMAL"
+
+
+def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
+    return {
+        "open_new_cursor_thread": True,
+        "load_only": ["docs/SOP/AGENT_CONTINUITY_BRIEF.md"],
+        "rules_doc": "docs/CONTEXT_RULES.md",
+        "build_packet_template": "docs/SOP/BUILD_PACKET_TEMPLATE.md",
+        "do_not_paste": [
+            "orchestrator stdout",
+            "full pytest log",
+            "full git diff",
+            "HANDOFF gate inline",
+        ],
+        "summary": (
+            "After this run: open a new Cursor thread; @ AGENT_CONTINUITY_BRIEF.md only; "
+            "read LAST_RUN_REPORT for steward actions. See docs/CONTEXT_RULES.md."
+        ),
+    }
+
+
+def _enrich_from_steward_summary(repo_root: Path, report: dict[str, Any]) -> None:
+    path = repo_root / "artifacts" / "orchestrator" / "steward_phase_summary.json"
+    if not path.is_file():
+        return
+    try:
+        summary = _read_json(path)
+    except Exception:
+        return
+    stopped = summary.get("stopped") if isinstance(summary.get("stopped"), dict) else {}
+    slice_id = stopped.get("sliceId")
+    results = summary.get("results") if isinstance(summary.get("results"), list) else []
+    last = results[-1] if results else {}
+    run = last.get("run") if isinstance(last.get("run"), dict) else {}
+    detail = str(run.get("detail") or "")
+    if detail:
+        report["orchestrator_detail"] = detail.replace("\r\n", "\n").strip()
+    if slice_id:
+        report["stopped_slice_id"] = slice_id
+    status = str(run.get("status") or "")
+    if status == "STOP_FOR_REVIEW" and "rule 6" in detail.lower():
+        report["status_bucket"] = "stop_for_review_smoke_env"
+        report["next_action"] = (
+            "UI smoke failed with environment-sensitive classification (relay rule 6). "
+            "Read smoke diagnosis below; fix harness/wrapper scenario alignment or retry on a stable network."
+        )
+
+
+def _enrich_smoke_diagnosis(repo_root: Path, report: dict[str, Any]) -> None:
+    relay = report.get("relay_result") if isinstance(report.get("relay_result"), dict) else None
+    exit_code = int(report.get("wrapper_exit_code") or 0)
+    diagnosis = diagnose_stop_for_review(repo_root=repo_root, exit_code=exit_code, relay=relay)
+    if diagnosis is None:
+        return
+    report["smoke_diagnosis"] = diagnosis.as_dict()
+    if report.get("awaiting_user"):
+        report["next_action"] = diagnosis.suggested_fix
+    report["status_bucket"] = report.get("status_bucket") or "stop_for_review_smoke_env"
+
+
+def _enrich_from_manifest(repo_root: Path, report: dict[str, Any]) -> None:
+    manifest_path = repo_root / "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
+    if not manifest_path.is_file():
+        return
+    try:
+        manifest = _read_json(manifest_path)
+    except Exception:
+        return
+    report["manifest_path"] = "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
+    report["manifest_status"] = manifest.get("status")
+    sprint = str(manifest.get("sprintSpecPath") or report.get("sprint_spec") or "").strip()
+    if sprint:
+        report["context_band_hint"] = _context_band_hint(repo_root, sprint)
+    report["context_ritual"] = _build_context_ritual(repo_root)
 
 
 def _render_md(report: dict[str, Any]) -> str:
@@ -111,6 +206,36 @@ def _render_md(report: dict[str, Any]) -> str:
     lines.append(f"- **worktree_path**: `{report.get('worktree_path')}`")
     lines.append(f"- **relay_result_path**: `{report.get('relay_result_path')}`")
     lines.append(f"- **steward_summary_path**: `{report.get('steward_summary_path')}`")
+    if report.get("manifest_path"):
+        lines.append(f"- **manifest_path**: `{report.get('manifest_path')}`")
+        lines.append(f"- **manifest_status**: `{report.get('manifest_status')}`")
+    if report.get("context_band_hint"):
+        lines.append(f"- **context_band_hint**: `{report.get('context_band_hint')}`")
+    if report.get("orchestrator_detail"):
+        lines.append(f"- **orchestrator_detail**: `{report.get('orchestrator_detail')}`")
+    smoke = report.get("smoke_diagnosis")
+    if isinstance(smoke, dict) and smoke.get("summary"):
+        lines.append("")
+        lines.append("## Smoke diagnosis")
+        lines.append("")
+        lines.append(f"- **category**: `{smoke.get('category')}`")
+        lines.append(f"- **summary**: {smoke.get('summary')}")
+        lines.append(f"- **likely_cause**: {smoke.get('likely_cause')}")
+        lines.append(f"- **suggested_fix**: {smoke.get('suggested_fix')}")
+        if smoke.get("auto_retry_command"):
+            lines.append(f"- **retry**: `{smoke.get('auto_retry_command')}`")
+    ritual = report.get("context_ritual")
+    if isinstance(ritual, dict):
+        lines.append("")
+        lines.append("## Cursor context ritual")
+        lines.append("")
+        lines.append(str(ritual.get("summary") or "").strip())
+        lines.append("")
+        lines.append(f"- Rules: `{ritual.get('rules_doc')}`")
+        lines.append(f"- BUILD packets: `{ritual.get('build_packet_template')}`")
+        load_only = ritual.get("load_only") or []
+        if load_only:
+            lines.append(f"- Load only: `{load_only[0]}`")
     lines.append("")
     return "\n".join(lines) + "\n"
 
@@ -163,6 +288,9 @@ def main() -> int:
         "awaiting_user": awaiting_user,
         "next_action": next_action,
     }
+    _enrich_from_manifest(repo_root, report)
+    _enrich_from_steward_summary(repo_root, report)
+    _enrich_smoke_diagnosis(repo_root, report)
 
     (out_dir / "LAST_RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     (out_dir / "LAST_RUN_REPORT.md").write_text(_render_md(report), encoding="utf-8")

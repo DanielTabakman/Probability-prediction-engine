@@ -1,0 +1,18 @@
+---
+description: Unified relay phase run (run_ppe.cmd) and context discipline. Load for BUILD/steering or when the user wants work executed without manual SOP steps.
+alwaysApply: true
+---
+
+# PPE unified run (operator + agents)
+
+**Operator (human):** after agents complete SELECTION, run **`run_ppe.cmd`** from repo root only. Optional: `run_ppe.cmd --dry-run`, `run_ppe.cmd --status`.
+
+**Agents (steward BUILD):**
+
+1. At **SELECTION**, update [`docs/SOP/ACTIVE_PHASE_MANIFEST.json`](docs/SOP/ACTIVE_PHASE_MANIFEST.json): `phasePlanPath`, `sprintSpecPath`, `status: READY` ([`ACTIVE_PHASE_MANIFEST.md`](docs/SOP/ACTIVE_PHASE_MANIFEST.md)).
+2. Tell the operator: run `run_ppe.cmd` (do not ask them to hand-edit HANDOFF/FRONTIER or paste orchestrator logs).
+3. After phase exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; use a **new** Cursor thread with [`AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
+
+**No active chapter:** manifest `COMPLETE` + empty `phasePlanPath` is normal — do SELECTION before `run_ppe.cmd`.
+
+Canonical runbook: [`docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).

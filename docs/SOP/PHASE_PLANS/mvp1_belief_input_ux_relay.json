@@ -1,0 +1,36 @@
+{
+  "name": "MVP1_belief_input_ux (post-friends-first SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-BeliefInput-Control-Slice001",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-BeliefInput-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-BeliefInput-Smoke-Slice003",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-BeliefInput-Closeout-Slice004",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

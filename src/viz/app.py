@@ -10,12 +10,12 @@ import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
 from pathlib import Path
 
-# Project root
-ROOT = Path(__file__).resolve().parents[2]
+# Streamlit puts `src/viz` on sys.path; `src.*` imports need the repo root.
+_app_root = Path(__file__).resolve().parents[2]
+if str(_app_root) not in sys.path:
+    sys.path.insert(0, str(_app_root))
 
-# Allow `streamlit run src/viz/app.py` from any cwd.
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from src.viz.app_env import APP_ROOT as ROOT, env_flag as _env_flag
 
 import streamlit as st
 import pandas as pd
@@ -85,10 +85,12 @@ from src.viz.app_sidebar import build_sidebar_state
 from src.viz.app_panels import (
     implied_lab_trade_ticket_code_text as _implied_lab_trade_ticket_code_text,
     maybe_append_width_vol_history as _maybe_append_width_vol_history,
+    compute_mvp1_belief_overlay_state as _compute_mvp1_belief_overlay_state,
     render_belief_vs_market_glance as _render_belief_vs_market_glance,
     render_decision_ready_review as _render_decision_ready_review,
     render_directional_candidate_strip_payload as _render_directional_candidate_strip_payload,
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
+    render_mvp1_friends_first_above_fold as _render_mvp1_friends_first_above_fold,
     render_mvp1_primary_output_compact as _render_mvp1_primary_output_compact,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
@@ -107,21 +109,13 @@ from src.viz.mvp1_lab_ui import (
 )
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
 from src.viz import frozen_evaluation_store as _fz_store
-from src.viz.reviewed_class_summary import build_class_summary
+from src.viz.reviewed_class_summary import build_class_summary, serialize_rollup_csv
 from src.viz.perf import PerfLog, timed
-from src.viz.tutorial import render_tutorial_section
+from src.viz.tutorial import render_how_it_works_expander, render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
 from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 from src.viz.plotly_theme import apply_chart_theme
 import yaml
-
-
-def _env_flag(name: str, default: bool) -> bool:
-    raw = (os.environ.get(name) or "").strip().lower()
-    if raw == "":
-        return default
-    return raw in ("1", "true", "yes", "y", "on")
-
 
 PAGE_TITLE = "Probability Engine"
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
@@ -236,6 +230,7 @@ if show_bitcoin_view:
         "**Read in order:** market-implied chart → your **belief** (left) → **Belief vs market** for the disagreement "
         "story. Exploration only — not advice."
     )
+    render_how_it_works_expander(expanded=False)
     if _show_debug_ui:
         _glance_suffix = (
             "**Review → trade ticket** (under **Summary**). "
@@ -407,6 +402,7 @@ if show_bitcoin_view:
                                     shape_window_label=_zoom_now,
                                 )
                                 st.session_state[_prev_shape_zoom_key] = _zoom_now
+                        right_above_fold_slot = st.empty()
                         right_chart_slot = st.empty()
                         strip_local_story_slot = st.empty()
                         right_summary_slot = st.empty()
@@ -476,82 +472,96 @@ if show_bitcoin_view:
                         }
                         # Sprint 2A: user belief overlay (orthogonal to strike / payoff mode)
                         belief_exp = selected_expiry_str
-                        st.caption("Optional belief overlay — compare a simple curve to the market-implied view (right).")
-                        with st.expander("My belief vs market", expanded=False):
+                        if post_mvp_implied_lab_ui:
                             st.caption(
-                                "Optional: compare a simple lognormal **belief** (peak = price you set) to the displayed market curve."
+                                "Optional belief overlay — compare a simple curve to the market-implied view (right)."
                             )
-                            st.checkbox(
-                                "Show my belief curve",
-                                key=f"belief_en_{belief_exp}",
-                            )
-                            st.number_input(
-                                "Belief peak — mode (USD)",
-                                min_value=1000.0,
-                                max_value=float(max(price_max, 1_000_000)),
-                                value=float(forward),
-                                step=1000.0,
-                                key=f"belief_center_{belief_exp}",
-                                format="%.0f",
-                            )
-
-                            # Market horizon uncertainty on the same basis (σ_ln)
-                            sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
-                            mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
-
-                            st.markdown("**Uncertainty input mode**")
-                            unc_mode_key = f"belief_unc_mode_{belief_exp}"
-                            unc_mode = st.radio(
-                                "Uncertainty input mode",
-                                ["±% move (1σ)", "σ_ln (advanced)"],
-                                key=unc_mode_key,
-                                horizontal=True,
-                                label_visibility="collapsed",
-                            )
-
-                            if unc_mode == "±% move (1σ)":
-                                pct_key = f"belief_move_pct_{belief_exp}"
-                                # Initialize from existing sigma value if present to avoid jumpiness.
-                                if pct_key not in st.session_state:
-                                    existing_sigma = float(st.session_state.get(f"belief_width_{belief_exp}", 0.2))
-                                    st.session_state[pct_key] = float(sigma_ln_to_move_pct_1sigma(existing_sigma))
-
-                                st.slider(
-                                    "Uncertainty (±% move, 1σ at expiry)",
-                                    1.0,
-                                    200.0,
-                                    float(st.session_state.get(pct_key, 22.0)),
-                                    0.5,
-                                    key=pct_key,
-                                    help="Human-scaled: a ±1σ move corresponds to multiplying price by exp(±σ_ln).",
-                                )
-                                sigma_ln = move_pct_1sigma_to_sigma_ln(float(st.session_state.get(pct_key, 0.0)))
+                            with st.expander("My belief vs market", expanded=False):
                                 st.caption(
-                                    f"Derived σ_ln: **{sigma_ln:.4f}** · "
-                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%** 1σ)"
+                                    "Optional: compare a simple lognormal **belief** (peak = price you set) "
+                                    "to the displayed market curve."
                                 )
-                            else:
-                                sigma_key = f"belief_width_{belief_exp}"
-                                st.slider(
-                                    "Uncertainty (σ of ln price at expiry)",
-                                    0.02,
-                                    0.8,
-                                    0.2,
-                                    0.005,
-                                    key=sigma_key,
-                                    help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+                                st.checkbox(
+                                    "Show my belief curve",
+                                    key=f"belief_en_{belief_exp}",
                                 )
-                                sigma_ln = float(st.session_state.get(sigma_key, 0.2))
-                                st.caption(
-                                    f"≈±**{sigma_ln_to_move_pct_1sigma(sigma_ln):.1f}%** 1σ move · "
-                                    f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** (≈±**{mkt_move_pct:.1f}%**)"
+                                st.number_input(
+                                    "Belief peak — mode (USD)",
+                                    min_value=1000.0,
+                                    max_value=float(max(price_max, 1_000_000)),
+                                    value=float(forward),
+                                    step=1000.0,
+                                    key=f"belief_center_{belief_exp}",
+                                    format="%.0f",
                                 )
-                        user_belief_for_state = {
-                            "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
-                            "center_usd": float(st.session_state.get(f"belief_center_{belief_exp}", forward)),
-                            # Internal model stays in σ_ln; percent mode is just input/display convenience.
-                            "width": float(sigma_ln),
-                        }
+                                sigma_mkt_horizon = float(vol) * (float(T_years) ** 0.5)
+                                mkt_move_pct = sigma_ln_to_move_pct_1sigma(sigma_mkt_horizon)
+                                unc_mode_key = f"belief_unc_mode_{belief_exp}"
+                                unc_mode = st.radio(
+                                    "Uncertainty input mode",
+                                    ["±% move (1σ)", "σ_ln (advanced)"],
+                                    key=unc_mode_key,
+                                    horizontal=True,
+                                    label_visibility="collapsed",
+                                )
+                                if unc_mode == "±% move (1σ)":
+                                    pct_key = f"belief_move_pct_{belief_exp}"
+                                    if pct_key not in st.session_state:
+                                        existing_sigma = float(
+                                            st.session_state.get(f"belief_width_{belief_exp}", 0.2)
+                                        )
+                                        st.session_state[pct_key] = float(
+                                            sigma_ln_to_move_pct_1sigma(existing_sigma)
+                                        )
+                                    st.slider(
+                                        "Uncertainty (±% move, 1σ at expiry)",
+                                        1.0,
+                                        200.0,
+                                        float(st.session_state.get(pct_key, 22.0)),
+                                        0.5,
+                                        key=pct_key,
+                                        help="Human-scaled: a ±1σ move corresponds to multiplying price by exp(±σ_ln).",
+                                    )
+                                    sigma_ln = move_pct_1sigma_to_sigma_ln(
+                                        float(st.session_state.get(pct_key, 0.0))
+                                    )
+                                    st.caption(
+                                        f"Derived σ_ln: **{sigma_ln:.4f}** · "
+                                        f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** "
+                                        f"(≈±**{mkt_move_pct:.1f}%** 1σ)"
+                                    )
+                                else:
+                                    sigma_key = f"belief_width_{belief_exp}"
+                                    st.slider(
+                                        "Uncertainty (σ of ln price at expiry)",
+                                        0.02,
+                                        0.8,
+                                        0.2,
+                                        0.005,
+                                        key=sigma_key,
+                                        help="Advanced: σ of ln(price) at expiry. Compared to market σ≈IV×√T.",
+                                    )
+                                    sigma_ln = float(st.session_state.get(sigma_key, 0.2))
+                                    st.caption(
+                                        f"≈±**{sigma_ln_to_move_pct_1sigma(sigma_ln):.1f}%** 1σ move · "
+                                        f"Market horizon: σ_ln≈**{sigma_mkt_horizon:.4f}** "
+                                        f"(≈±**{mkt_move_pct:.1f}%**)"
+                                    )
+                            user_belief_for_state = {
+                                "enabled": bool(st.session_state.get(f"belief_en_{belief_exp}", False)),
+                                "center_usd": float(
+                                    st.session_state.get(f"belief_center_{belief_exp}", forward)
+                                ),
+                                "width": float(sigma_ln),
+                            }
+                        else:
+                            user_belief_for_state = _compute_mvp1_belief_overlay_state(
+                                belief_exp=belief_exp,
+                                forward=float(forward),
+                                price_max=float(price_max),
+                                vol=float(vol),
+                                T_years=float(T_years),
+                            )
                         # Sprint 001 — Slice 010 (Phase 2): extend "What changed?" to belief interactions.
                         # Keep it local to this screen + expiry; descriptive only.
                         last_change_key = f"implied_lab_last_change_{selected_expiry_str}"
@@ -1474,6 +1484,18 @@ if show_bitcoin_view:
                                 ("\n\n" if belief_txt else "") + belief_hints
                             )
 
+                    if not post_mvp_implied_lab_ui:
+                        _v_above = (
+                            outputs.get("verification")
+                            if isinstance(outputs.get("verification"), dict)
+                            else None
+                        )
+                        if _v_above:
+                            with right_above_fold_slot.container():
+                                _render_mvp1_friends_first_above_fold(_v_above)
+                    else:
+                        right_above_fold_slot.empty()
+
                     with right_chart_slot.container():
                         st.markdown("##### Market-implied view (chart)")
                         with st.container(border=True):
@@ -1514,12 +1536,6 @@ if show_bitcoin_view:
 
                     if not avail_strikes:
                         right_summary_slot.info("No option strikes for this expiry — the strategy overlay is unavailable.")
-                    # MVP1 compact: primary decision digest immediately under the chart.
-                    if not post_mvp_implied_lab_ui:
-                        _v_mvp1 = outputs.get("verification") if isinstance(outputs.get("verification"), dict) else None
-                        if _v_mvp1:
-                            with right_summary_slot.container():
-                                _render_mvp1_primary_output_compact(_v_mvp1)
                     # Summary card (Sprint 001): single-source-of-truth from derived outputs.
                     with right_summary_slot.container():
                         _render_implied_lab_summary_card(
@@ -1543,16 +1559,21 @@ if show_bitcoin_view:
                             _render_directional_candidate_strip_payload(_dir_strip)
                     else:
                         right_directional_candidate_slot.empty()
-                    with right_trust_slot.container():
-                        _render_trust_strip(outputs.get("verification") or {})
+                    if post_mvp_implied_lab_ui:
+                        with right_trust_slot.container():
+                            _render_trust_strip(outputs.get("verification") or {})
+                    else:
+                        right_trust_slot.empty()
                     with right_belief_slot.container():
                         if _belief_block:
                             with st.expander("Belief overlay (this run)", expanded=False):
                                 st.markdown(_belief_block)
                     with right_review_slot.container():
                         with st.expander("Review & disagreement digest", expanded=False):
-                            if post_mvp_implied_lab_ui:
-                                _render_decision_ready_review(outputs.get("verification") or {})
+                            _render_decision_ready_review(
+                                outputs.get("verification") or {},
+                                mvp1_exclude_execution_ui=not post_mvp_implied_lab_ui,
+                            )
                             _render_belief_vs_market_glance(outputs.get("verification") or {})
                     if post_mvp_implied_lab_ui:
                         with right_ticket_slot.container():
@@ -1644,29 +1665,39 @@ if show_bitcoin_view:
                         with st.expander("Pending snapshot reviews", expanded=False):
                             _conn_pd = _fz_store.open_store()
                             try:
-                                _pend_all = _fz_store.list_snapshots_pending_review(_conn_pd, limit=200)
+                                _expiries = _fz_store.list_distinct_frozen_expiries(_conn_pd)
                             finally:
                                 _conn_pd.close()
-                            _expiries = sorted(
-                                {
-                                    str(r.get("expiry") or "").strip()
-                                    for r in _pend_all
-                                    if str(r.get("expiry") or "").strip()
-                                }
-                            )
                             _exp_choice = st.selectbox(
                                 "Filter by expiry (pending only)",
                                 options=["(all)"] + _expiries,
                                 index=0,
                                 key=f"ppe_pending_expiry_filter_{selected_expiry_str}",
                             )
-                            _pend = _pend_all
-                            if _exp_choice != "(all)":
-                                _pend = [
-                                    r
-                                    for r in _pend_all
-                                    if str(r.get("expiry") or "").strip() == _exp_choice
-                                ]
+                            _pend_sort = st.selectbox(
+                                "Sort pending",
+                                options=list(_fz_store.PENDING_SORT_OPTIONS),
+                                format_func=lambda s: {
+                                    _fz_store.PENDING_SORT_NEWEST: "Newest frozen first",
+                                    _fz_store.PENDING_SORT_EXPIRY: "Expiry (A→Z)",
+                                    _fz_store.PENDING_SORT_HORIZON: "Review horizon ref",
+                                }.get(s, s),
+                                index=0,
+                                key=f"ppe_pending_sort_{selected_expiry_str}",
+                            )
+                            _pend_exp = (
+                                None if _exp_choice == "(all)" else str(_exp_choice).strip()
+                            )
+                            _conn_pd2 = _fz_store.open_store()
+                            try:
+                                _pend = _fz_store.list_snapshots_pending_review(
+                                    _conn_pd2,
+                                    limit=200,
+                                    expiry=_pend_exp,
+                                    sort=_pend_sort,
+                                )
+                            finally:
+                                _conn_pd2.close()
                             if not _pend:
                                 st.caption("No snapshots pending review.")
                             else:
@@ -1727,39 +1758,36 @@ if show_bitcoin_view:
                                     _before_utc = f"{_dr[1].isoformat()}T23:59:59Z"
                             except Exception:
                                 _after_utc, _before_utc = None, None
-                            _conn_cls = _fz_store.open_store()
+                            _conn_ex = _fz_store.open_store()
                             try:
-                                _completed_all = _fz_store.list_completed_review_snapshots(
-                                    _conn_cls,
-                                    limit=500,
-                                    review_statuses=list(_sel_statuses)
-                                    if _sel_statuses
-                                    else [],
-                                    reviewed_after_utc=_after_utc,
-                                    reviewed_before_utc=_before_utc,
-                                )
+                                _expiries2 = _fz_store.list_distinct_frozen_expiries(_conn_ex)
                             finally:
-                                _conn_cls.close()
-                            _expiries2 = sorted(
-                                {
-                                    str(r.get("expiry") or "").strip()
-                                    for r in _completed_all
-                                    if str(r.get("expiry") or "").strip()
-                                }
-                            )
+                                _conn_ex.close()
                             _exp_choice2 = st.selectbox(
                                 "Filter by expiry (reviewed only)",
                                 options=["(all)"] + _expiries2,
                                 index=0,
                                 key=f"ppe_phase6_expiry_filter_{selected_expiry_str}",
                             )
-                            _completed = _completed_all
-                            if _exp_choice2 != "(all)":
-                                _completed = [
-                                    r
-                                    for r in _completed_all
-                                    if str(r.get("expiry") or "").strip() == _exp_choice2
-                                ]
+                            _cls_exp = (
+                                None
+                                if _exp_choice2 == "(all)"
+                                else str(_exp_choice2).strip()
+                            )
+                            _conn_cls = _fz_store.open_store()
+                            try:
+                                _completed = _fz_store.list_completed_review_snapshots(
+                                    _conn_cls,
+                                    limit=500,
+                                    review_statuses=list(_sel_statuses)
+                                    if _sel_statuses
+                                    else [],
+                                    expiry=_cls_exp,
+                                    reviewed_after_utc=_after_utc,
+                                    reviewed_before_utc=_before_utc,
+                                )
+                            finally:
+                                _conn_cls.close()
                             _rollup = build_class_summary(_completed)
                             st.markdown(f"**{_rollup['operator_summary_line']}**")
                             st.metric(
@@ -1778,6 +1806,14 @@ if show_bitcoin_view:
                                     file_name="ppe_phase6_rollup.json",
                                     mime="application/json",
                                     key=f"ppe_rollup_dl_json_{selected_expiry_str}",
+                                )
+                                _rollup_csv = serialize_rollup_csv(_rollup).encode("utf-8")
+                                st.download_button(
+                                    "Download rollup (CSV)",
+                                    data=_rollup_csv,
+                                    file_name="ppe_phase6_rollup.csv",
+                                    mime="text/csv",
+                                    key=f"ppe_rollup_dl_csv_{selected_expiry_str}",
                                 )
                                 _ca, _cb = st.columns(2)
                                 with _ca:
@@ -1875,6 +1911,7 @@ if show_bitcoin_view:
                                         "review_status": (r.get("review") or {}).get("review_status"),
                                         "reviewed_at_utc": (r.get("review") or {}).get("reviewed_at_utc"),
                                         "review_horizon_ref": (r.get("review") or {}).get("review_horizon_ref"),
+                                        "paper_tag": (r.get("review") or {}).get("paper_tag"),
                                         "outcome_notes": (r.get("review") or {}).get("outcome_notes"),
                                     }
                                     for r in _completed
@@ -1935,6 +1972,21 @@ if show_bitcoin_view:
                                     value=_default_notes,
                                     key=f"ppe_rev_notes_{_fvid}",
                                 )
+                                _default_paper = (
+                                    (_rev_existing.get("paper_tag") or "")
+                                    if _rev_existing
+                                    else ""
+                                )
+                                _paper_val = st.text_input(
+                                    "Paper tag (optional, ≤120 chars)",
+                                    value=_default_paper,
+                                    max_chars=120,
+                                    key=f"ppe_rev_paper_{_fvid}",
+                                )
+                                if _rev_existing and _rev_existing.get("review_horizon_ref"):
+                                    st.caption(
+                                        f"Review horizon ref: `{_rev_existing['review_horizon_ref']}`"
+                                    )
                                 if st.button("Save review", key=f"ppe_rev_save_{_fvid}"):
                                     _href = _fz_store.review_horizon_ref_from_frozen(_frozen)
                                     _cs = _fz_store.open_store()
@@ -1945,6 +1997,7 @@ if show_bitcoin_view:
                                             review_status=_sel_status,
                                             outcome_notes=_notes_val or None,
                                             review_horizon_ref=_href or None,
+                                            paper_tag=_paper_val or None,
                                         )
                                     finally:
                                         _cs.close()

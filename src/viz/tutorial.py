@@ -62,3 +62,28 @@ On this deployment you can **freeze** a lab state, **reopen** it later, add **re
     if st.button("Got it — collapse this intro", key="ppe_tutorial_got_it"):
         st.session_state["ppe_tutorial_intro_done"] = True
         st.rerun()
+
+
+def render_how_it_works_expander(*, expanded: bool = False) -> None:
+    """MVP1 §15B slice 5: plain-language map of the implied lab (copy only; no math)."""
+    with st.expander("How this lab works (~90 sec)", expanded=expanded):
+        st.markdown(
+            """
+**Market-implied distribution**  
+The main chart is built from **live option prices** (Deribit) for a chosen **expiry**. It answers:
+“Given today’s quotes, what **probability shape** over BTC levels is roughly priced in?” It is a **market readout**, not a forecast of what *will* happen.
+
+**Belief overlay**  
+In **MVP1 compact** mode you can still set a **simple belief curve** (plain-language controls on the left). That overlay is **your** stated view — optional, and always shown **against** the market-implied curve, not instead of it.
+
+**Disagreement**  
+When belief is on, **Belief vs market — at a glance** summarizes **where** your curve and the market-implied curve differ in plain language. It is **diagnostic** (where views diverge), not a buy/sell signal.
+
+**Strategy families (fit, not recommendation)**  
+Deeper panels may show **strategy shapes** that **fit** the disagreement story. Language stays **non-prescriptive**: families are **illustrative structure**, not ranked “best trades” or guaranteed edge.
+
+**Boundary — not advice**  
+This app is a **research cockpit** for exploration and learning. Nothing here is personalized investment, tax, or legal advice; there are **no** promises of returns. Prefer **Freeze & history** (when enabled) to capture what you reviewed, not as a trade log.
+"""
+        )
+        st.caption("Exploration only — not trading advice.")

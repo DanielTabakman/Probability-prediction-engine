@@ -59,7 +59,7 @@ This is a **narrow-coverage** headless smoke harness—not a full scenario matri
 
 ### Command (supported runs)
 
-**One command from repo root** (recommended): picks a free local port automatically and runs the official **`A_width_target_payoff`** path only. The wrapper does not add scenarios or change what that command’s “green” means. Validating **`C_directional_peak_disagreement`** requires invoking the harness with `--scenario C_directional_peak_disagreement` (see below).
+**One command from repo root** (recommended): picks a free local port and runs **`A_width_target_payoff`**. On default MVP1 chrome the harness **skips Mode & solver** (hidden unless `PPE_POST_MVP1_LAB_UI=1`). For explicit compact-only validation use `--scenario MVP1_compact_verification` or `scripts/run_mvp1_dual_implied_lab_smoke.py`.
 
 `python scripts/run_implied_lab_ui_smoke.py`
 

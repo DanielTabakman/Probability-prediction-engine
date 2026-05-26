@@ -97,6 +97,7 @@ Typical files: `ui_smoke_manifest.json`, scenario PNG (e.g. `A_width_target_payo
 
 - Identifies **scenario(s)**, **timestamps**, **recommended commands**, and **pass criteria** for that run.
 - Contains **booleans** and diagnostics (e.g. disagreement-related fields for **C**). Use these to justify **pass** vs **fail** and to explain **scenario-sensitive** outcomes (see `IMPLIED_LAB_SMOKE.md` and historical closeouts in `CURRENT_FRONTIER.md`).
+- For **`MVP1_compact_verification`**, manifest includes **`trust_strip_mvp1_found`** — true when the always-visible **Trust / provenance** strip shows **MVP1 data quality** / **MVP1 primary output** (Phase 2 Slice006 disclosure). Failure here is usually a product regression in [`build_trust_strip_lines`](../../src/viz/implied_lab_provenance.py), not a screenshot crop issue.
 
 ### PNG evidence
 
@@ -126,6 +127,7 @@ State **UNKNOWN** when the evidence does not support a stronger label.
 | UI copy duplicates harness wait string (**My belief vs market**) before expander mounts | **Harness / timing fragility** (not necessarily user-visible bug) | Documented in `IMPLIED_LAB_SMOKE.md` (feature slice **008**). Fix copy or future harness scope—**out of scope** for this runbook to change code. |
 | Stale Python/Streamlit/browser processes; port in use | **Environment-sensitive** | Clear stuck processes; fresh port; avoid manual+smoke on same port (`OPERATING_RULES.md` → preflight). |
 | Playwright/Chromium missing or broken | **Environment-sensitive** | Install per `IMPLIED_LAB_SMOKE.md` (**Required dependencies**). |
+| Process **killed** or **hung** mid-scenario (`exit_code=4294967295` on Windows, subprocess exit **124**, or harness log has no `scenario=… done` line) | **Environment-sensitive** / operator timeout | Not automatically a product regression if a rerun passes. Prefer `PYTHONUNBUFFERED=1 python scripts/run_mvp1_dual_implied_lab_smoke.py` (~20–30 min wall clock on slow hosts). Per-scenario budgets: `MVP1_compact_verification` **1200s** default; override with env **`PPE_UI_SMOKE_MVP1_COMPACT_TIMEOUT_S`**. See `scripts/implied_lab_ui_smoke_harness.py` → `SCENARIO_TIMEOUT_S_BY_SCENARIO`. |
 
 **True product regression** is more plausible when: deterministic **pytest** fails, **A** fails with data available and clean preflight, or UI **semantics** break acceptance tied to `docs/SEMANTIC_CONTRACTS.md`—still verify before asserting.
 
@@ -143,7 +145,7 @@ Aligned with `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` → **Closeout minimums** a
 - [ ] **Caveats** (honest; include UNKNOWN where needed).
 - [ ] **Next truthful state:** active slice (or none) and **next step** (**SELECTION** / **BUILD** / **RECOVERY** / **CLOSEOUT**).
 
-Update **`docs/SOP/CURRENT_FRONTIER.md`** and **`docs/SOP/HANDOFF.md`** when a feature slice is formally closed.
+Update **`docs/SOP/MVP1_FRONTIER.md`** and **`docs/SOP/HANDOFF.md`** when a feature slice is formally closed.
 
 **Docs-only slices:** if no product code changed, closeout may rely on **file/consistency review** only—state that explicitly (no fabricated pytest/smoke runs).
 
@@ -165,7 +167,8 @@ Stop and return **BUILD only** (or escalate to steward) when:
 
 | Document | Role |
 |----------|------|
-| `docs/SOP/CURRENT_FRONTIER.md` | Live phase, active slice, recent closeouts, risks |
+| `docs/SOP/MVP1_FRONTIER.md` | Live steering, active slice, recent closeouts |
+| `docs/SOP/PPE_INTEGRATED_STATUS.md` | Cross-chapter status and gates |
 | `docs/SOP/HANDOFF.md` | Session minimum, checks list, next step |
 | `docs/SOP/FRONTIER_STEWARD_PROTOCOL.md` | Steward model, compact vs full closeout, closeout minimums |
 | `docs/SOP/OPERATING_RULES.md` | Execution steps, validation tiers, preflight, git posture, closeout budget |

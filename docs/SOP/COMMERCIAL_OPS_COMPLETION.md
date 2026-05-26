@@ -1,8 +1,12 @@
 # Commercial ops completion — checklist
 
+**Post-merge:** PR #10 merged `aff44c5` 2026-05-20; **Deploy VPS** [26146497234](https://github.com/DanielTabakman/Probability-prediction-engine/actions/runs/26146497234) success — steward still sets VPS `.env` for CTA **PASS**.
+
 **Purpose:** Close operational gaps after Commercial Validation code/docs on `main` (no new product BUILD).
 
-**Baseline:** `main` @ **`132ac4f`** (or merge commit with ops cleanup — verify `git rev-parse HEAD`).
+**Status:** **Agent lane COMPLETE** (2026-05-19). **SELECTION COMPLETE** → MVP1 Reliability — [`POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md`](POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md).
+
+**Baseline:** `main` after ops compose commit (verify with `git rev-parse HEAD` on VPS after deploy).
 
 ---
 
@@ -10,29 +14,43 @@
 
 | Step | Status | Notes |
 |------|--------|-------|
-| `git pull` on `main`; clean tree | done | pytest **153 passed** on branch with ops docs |
+| `git pull` on `main`; clean tree | done | pytest **153 passed** |
 | `python -m pytest -q` green | done | 2026-05-19 |
-| Fresh `run_mvp1_dual_implied_lab_smoke.py` | done | `20260519_131035` + `131251`; exit **0**; deterministic |
-| VPS `git pull` + `docker compose up -d --build` | **steward** | `/opt/marketstructureos` — agent cannot SSH |
-| VPS SHA matches `main` tip | **steward** | Expect `132ac4f`+ after pull |
-| Demo env: `PPE_RESEARCH_OFFER_*` on demo service | **steward** | See env block below |
-| Production browser: demo + offer CTA | partial | `marketstructureos.com` loads (2026-05-19 fetch); offer CTA needs env on VPS |
-| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Re-verify row after VPS pull |
-| Live paid-interest conversation | **steward** | Log in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md); next outreach scheduled below |
-| **Ops completion (agent lane)** | done | Engineering + docs; VPS/outreach = steward |
+| Fresh `run_mvp1_dual_implied_lab_smoke.py` | done | Post–Phase2 Slice003: `20260519_144000` + `144350`; Reliability: `133606` + `134906` |
+| `docker-compose.yml` `PPE_RESEARCH_OFFER_*` on `app_demo` | done | `${PPE_RESEARCH_OFFER_URL:-}` / `LABEL` wired; [`.env.example`](../../.env.example) |
+| Push `main` → GitHub Actions **Deploy VPS** | done | auto `git pull` + `docker compose up -d --build` on push |
+| VPS repo-root `.env` with offer URL | **steward follow-up** | Deploy-Slice003 closed (agent lane); CTA needs `.env` for browser PASS |
+| Production browser: **Research beta (v0)** CTA | **steward follow-up** | After `.env` set; re-run `docker compose up -d` |
+| Update [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) | done | Target SHA `566f4f0`; CTA row pending steward `.env` |
+| Live paid-interest conversation | **steward** | **N** — honest; outreach script below |
+| **Ops completion (agent lane)** | done | |
+| **SELECTION** | done | MVP1 Reliability chartered |
 
 ---
 
 ## Demo service env (VPS)
 
+**1. Repo-root `.env` on VPS** (not committed):
+
 ```bash
-PPE_ENABLE_SNAPSHOTS=0
-PPE_PRIVATE_APP_URL=https://app.marketstructureos.com
 PPE_RESEARCH_OFFER_URL=mailto:YOUR_EMAIL?subject=PPE%20research%20beta
-# optional: PPE_RESEARCH_OFFER_LABEL=Request research beta access
+PPE_RESEARCH_OFFER_LABEL=Request research beta access
 ```
 
-Set in demo container compose/env, then `docker compose up -d --build`.
+**2. `docker-compose.yml`** — `app_demo.environment` includes:
+
+```yaml
+      - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
+      - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+```
+
+Then:
+
+```bash
+cd /opt/marketstructureos
+git pull
+docker compose up -d --build
+```
 
 ---
 
@@ -40,9 +58,16 @@ Set in demo container compose/env, then `docker compose up -d --build`.
 
 | Date | Contact | Offer | Y/N | Notes |
 |------|---------|-------|-----|-------|
-| 2026-05-19 | — | research beta | N | Ops prep complete; **schedule first live call** per [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) |
+| 2026-05-19 | — | research beta | N | Ops + compose complete; **steward:** one live call using script below |
 
-**Next outreach target:** steward calendar — one conversation required for paid-interest **Y**.
+### Steward conversation script (paid-interest)
+
+1. Open demo: `https://marketstructureos.com` — walk **MVP1 output** + disagreement readout (~5 min).
+2. Offer (pick one): research beta access (`PPE_RESEARCH_OFFER_URL` CTA), weekly BTC brief, or paid discovery call.
+3. Ask: willingness to pay for beta/brief/call this quarter; capture objection themes.
+4. Log **Y/N** + one-line notes in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) and update the outreach table above.
+
+**Do not log Y without a real conversation.**
 
 ---
 
@@ -50,11 +75,18 @@ Set in demo container compose/env, then `docker compose up -d --build`.
 
 | Run ID | Exit | Classification | Notes |
 |--------|------|----------------|-------|
-| 20260519_131035 | 0 | deterministic | MVP1_compact_verification |
-| 20260519_131251 | 0 | deterministic | A_width_target_payoff |
+| 20260520_024407 | 0 | deterministic | MVP1_compact (belief-input PR #10 closeout) |
+| 20260520_024438 | 0 | deterministic | A_width_target_payoff (belief-input PR #10 closeout) |
+| 20260519_144000 | 0 | deterministic | MVP1_compact (Phase2 Product-Slice003) |
+| 20260519_144350 | 0 | deterministic | A_width_target_payoff (Phase2 Product-Slice003) |
+| 20260519_133606 | 0 | deterministic | MVP1_compact (Reliability Slice002) |
+| 20260519_134906 | 0 | deterministic | A_width_target_payoff (Reliability Slice002) |
+| 20260519_131035 | 0 | deterministic | MVP1_compact (pre-Slice002) |
+| 20260519_131251 | 0 | deterministic | A_width (pre-Slice002) |
 
 ---
 
-## Next after steward VPS + outreach
+## Next
 
-**SELECTION** for next BUILD chapter — see [`POST_COMMERCIAL_OPS_SELECTION.md`](POST_COMMERCIAL_OPS_SELECTION.md).
+**Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md). **BUILD:** `MVP1-Phase2-Product-Slice005` — [`SPRINT_MVP1_PHASE2_SLICE005.md`](SPRINT_MVP1_PHASE2_SLICE005.md). **SELECTION:** [`POST_PHASE2_PRODUCT_SLICE003_SELECTION.md`](POST_PHASE2_PRODUCT_SLICE003_SELECTION.md).
+
