@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-20 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-05-26 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -53,7 +53,19 @@ flowchart LR
 | MVP1 belief-input UX | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_BELIEF_INPUT_UX.md`](SPRINT_MVP1_BELIEF_INPUT_UX.md), [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) |
 | MVP1 onboarding / How it works | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md), [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) |
 
-**Post–belief-input SELECTION outcome:** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · **Prep record (closed):** [`POST_MVP1_BELIEF_INPUT_SELECTION.md`](POST_MVP1_BELIEF_INPUT_SELECTION.md) · **Next SELECTION prep (onboarding chapter):** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
+**Post–onboarding SELECTION outcome:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md) · **Prior SELECTION prep (closed):** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
+
+---
+
+## Active BUILD chapter — disagreement / candidate strip polish
+
+| Field | Value |
+|-------|--------|
+| **Chapter** | MVP1 disagreement / candidate strip polish (v0) |
+| **Status** | **IN PROGRESS** (Control-Slice001 **CLOSED** 2026-05-26) |
+| **Sprint** | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md) |
+| **Evidence** | [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
+| **Next slice** | `MVP1-DisagreementStrip-Product-Slice002` (PRODUCT) |
 
 **Chapter-close SELECTION trail (historical):** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
 
@@ -127,7 +139,7 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Next relay chapter** | **await SELECTION** | Set [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) → `READY`; run **`run_ppe.cmd`** ([`ACTIVE_PHASE_MANIFEST.md`](ACTIVE_PHASE_MANIFEST.md)) |
+| **Active relay chapter** | **IN PROGRESS** | Disagreement strip polish — next Product-Slice002; operator **`run_ppe.cmd`** when manifest `READY` |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) only after browser confirms CTA |
 | Paid-interest live call | **N** (honest) | Log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 
@@ -165,4 +177,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**Steward deferred next SELECTION** — prep only: [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**`MVP1-DisagreementStrip-Product-Slice002`** — strip polish (PRODUCT); charter closed on Control-Slice001. **SELECTION record:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
