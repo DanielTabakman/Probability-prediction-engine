@@ -1,0 +1,65 @@
+{
+  "name": "MVP1_disagreement_candidate_strip_polish (post-onboarding SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DisagreementStrip-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DisagreementStrip-Control-Slice001-disagreement_strip",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DisagreementStrip-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DisagreementStrip-Product-Slice002-disagreement_strip",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DisagreementStrip-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DisagreementStrip-Smoke-Slice003-disagreement_strip",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DisagreementStrip-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DisagreementStrip-Closeout-Slice004-disagreement_strip",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_disagreement_candidate_strip_polish",
+        "chapterTitle": "MVP1 disagreement / candidate strip polish",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-26",
+        "evidenceDoc": "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

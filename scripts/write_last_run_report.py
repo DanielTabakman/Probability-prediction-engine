@@ -127,6 +127,55 @@ def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
     }
 
 
+def _enrich_from_steward_summary(repo_root: Path, report: dict[str, Any]) -> None:
+    summary_path = repo_root / "artifacts" / "orchestrator" / "steward_phase_summary.json"
+    if not summary_path.is_file():
+        return
+    try:
+        summary = _read_json(summary_path)
+    except Exception:
+        return
+    if not isinstance(summary, dict):
+        return
+
+    stopped = summary.get("stopped")
+    if isinstance(stopped, dict):
+        slice_id = str(stopped.get("sliceId") or "").strip()
+        if slice_id and not report.get("slice_id"):
+            report["slice_id"] = slice_id
+
+    results = summary.get("results")
+    if isinstance(results, list) and results:
+        last = results[-1]
+        if isinstance(last, dict):
+            run = last.get("run")
+            if isinstance(run, dict):
+                detail = str(run.get("detail") or "").strip()
+                wt = str(run.get("worktreePath") or "").strip()
+                if detail:
+                    report["orchestrator_detail"] = detail
+                    if report.get("awaiting_user") and report.get("wrapper_exit_code") != 0:
+                        lowered = detail.lower()
+                        if "unavailable" in lowered or "acp worker failed" in lowered:
+                            report["next_action"] = (
+                                "Cursor Agent API failed ([unavailable] or ACP error). "
+                                "Run agent health check (docs/SOP/PPE_AGENT_AND_NETWORK_TROUBLESHOOTING.md) "
+                                "before retrying run_ppe.cmd. "
+                                f"Detail: {detail[:300]}"
+                            )
+                        elif "timeout waiting for relay_result" in lowered:
+                            report["next_action"] = (
+                                "Worker did not write relay_result.json in time (often Agent/network). "
+                                f"Detail: {detail[:300]}"
+                            )
+                if wt:
+                    report["worktree_path"] = wt
+                    wt_path = Path(wt)
+                    relay_in_wt = _find_newest_relay_result(repo_root, wt_path)
+                    if relay_in_wt:
+                        report["relay_result_path"] = str(relay_in_wt)
+
+
 def _enrich_from_manifest(repo_root: Path, report: dict[str, Any]) -> None:
     manifest_path = repo_root / "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
     if not manifest_path.is_file():
@@ -164,6 +213,8 @@ def _render_md(report: dict[str, Any]) -> str:
     lines.append("")
     lines.append(f"- **worktree_path**: `{report.get('worktree_path')}`")
     lines.append(f"- **relay_result_path**: `{report.get('relay_result_path')}`")
+    if report.get("orchestrator_detail"):
+        lines.append(f"- **orchestrator_detail**: `{report.get('orchestrator_detail')}`")
     lines.append(f"- **steward_summary_path**: `{report.get('steward_summary_path')}`")
     if report.get("manifest_path"):
         lines.append(f"- **manifest_path**: `{report.get('manifest_path')}`")
@@ -234,6 +285,7 @@ def main() -> int:
         "awaiting_user": awaiting_user,
         "next_action": next_action,
     }
+    _enrich_from_steward_summary(repo_root, report)
     _enrich_from_manifest(repo_root, report)
 
     (out_dir / "LAST_RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")

@@ -27,7 +27,10 @@ set "ACTIVE_RUN=%REPO_ROOT%\\artifacts\\orchestrator\\ACTIVE_RUN.json"
 if not exist "%REPO_ROOT%\\artifacts\\orchestrator" (
   mkdir "%REPO_ROOT%\\artifacts\\orchestrator" >nul 2>nul
 )
-python -c "import json,datetime,pathlib; p=r'%ACTIVE_RUN%'; d={'kind':'phase','plan_path':r'%PLAN_PATH%','baseline_branch':r'%BASELINE_BRANCH%','ts_utc':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z'}; pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True); pathlib.Path(p).write_text(json.dumps(d,indent=2), encoding='utf-8')" >nul 2>nul
+python -c "import json,datetime,pathlib,os; p=r'%ACTIVE_RUN%'; d={'kind':'phase','plan_path':r'%PLAN_PATH%','baseline_branch':r'%BASELINE_BRANCH%','wrapper_pid':os.getppid(),'ts_utc':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z'}; pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True); pathlib.Path(p).write_text(json.dumps(d,indent=2), encoding='utf-8')" >nul 2>nul
+
+REM Stall watchdog: SUS toast (~15m) + hard kill (~30m+grace). Disable: set PPE_WATCH=0
+python "%REPO_ROOT%\scripts\spawn_active_run_watch.py" "%REPO_ROOT%" "%PLAN_PATH%" >nul 2>nul
 
 set "NODE20=%USERPROFILE%\Desktop\ppe-orchestrator-sdk\node\node-v20.18.2-win-x64"
 if exist "%NODE20%\npm.cmd" (

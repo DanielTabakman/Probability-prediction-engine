@@ -44,12 +44,24 @@ alwaysApply: true
 - If the repository uses **PR-only** delivery to `main` (see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Push a **feature branch** and open a PR so GitHub runs the full **CI** workflow (pytest + docker_entrypoint) before merge.
 - No secrets / artifacts in the commit; no force push or history rewrite.
 
+## Local git-only mode (`PPE_LOCAL_GIT_ONLY=1`)
+
+When the environment variable **`PPE_LOCAL_GIT_ONLY=1`** is set (restricted network / cannot reach GitHub):
+
+- **Do commit** after `run_pushable_gate.py` passes and the task is complete.
+- **Do not** `git push`, open PRs, or treat push failure as a task failure.
+- Tell the operator: push and PR from home/unrestricted Wi‑Fi using `python scripts/ppe_git_network.py --repo-root .` or `git push -u origin HEAD`.
+- Relay workers: local **promotion** (fast-forward/merge to baseline) still counts; remote push is deferred.
+
+See `docs/SOP/AGENT_GIT_SETUP.md` § Local git-only mode.
+
 ## When not to auto-push
 
 The agent must NOT auto-push when:
 
+- **`PPE_LOCAL_GIT_ONLY=1`** is set (commit only; push later).
 - Push would require `--force`, history rewrite, or unsafe conflict resolution.
-- Remote rejects the push (branch protection, required checks) — surface the error; do not retry with riskier options.
+- Remote rejects the push (branch protection, required checks) — surface the error; do not retry with riskier options (unless `PPE_LOCAL_GIT_ONLY=1`, then note deferred push and continue).
 - Pushable gate failed, or was not run for non-docs-only code changes.
 
 ## Test alignment (canonical)

@@ -102,6 +102,16 @@ Codex gets a **bounded repair loop** inside BUILD:
 
 The repair budget aligns with the existing `OPERATING_RULES.md` **RULE 5 (Stop-after-two)** spirit but applied to in-slice BUILD iterations.
 
+## 2.1 Local git-only mode (`PPE_LOCAL_GIT_ONLY`)
+
+When the task envelope has `"git_network_mode": "local_only"` or the operator set `PPE_LOCAL_GIT_ONLY=1`:
+
+- Perform **local** commits and **local** promotion per §9 (fast-forward/merge to baseline).
+- **Do not** require `git push` or a GitHub PR for this run.
+- **Do not** stop solely because `git push` failed or the network cannot reach GitHub.
+- In `relay_result`, `promotion.performed` may be `true` when local promotion succeeded; `stop_condition` must be `null` if all §9 gates are green.
+- In **HANDBACK**, state that remote push is **deferred** and list branch names + SHAs for the operator to push later.
+
 ## 8. Stop / escalation conditions (hard)
 
 Codex must stop immediately and hand back to the steward on any of:

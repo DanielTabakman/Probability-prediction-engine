@@ -41,7 +41,10 @@ REM Local-first logbook (append-only; gitignored).
 python "%REPO_ROOT%\scripts\log_event.py" --event-type "run_slice.start" --summary "Start slice %SLICE_ID% (plane=%DECLARED_PLANE%, spec=%SPRINT_SPEC%)" --actor "wrapper" --ref "kind=cmd,path=run_slice.cmd" --ref "kind=doc,path=docs/SOP/MVP1_FRONTIER.md" >nul 2>nul
 
 REM Write an explicit active-run marker so the steward can tell if anything is in-flight.
-python -c "import json,datetime,pathlib; p=r'%ACTIVE_RUN%'; d={'kind':'slice','slice_id':r'%SLICE_ID%','declared_plane':r'%DECLARED_PLANE%','sprint_spec':r'%SPRINT_SPEC%','baseline_branch':r'%BASELINE_BRANCH%','build_branch':r'%BUILD_BRANCH%','ts_utc':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z'}; pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True); pathlib.Path(p).write_text(json.dumps(d,indent=2), encoding='utf-8')" >nul 2>nul
+python -c "import json,datetime,pathlib,os; p=r'%ACTIVE_RUN%'; d={'kind':'slice','slice_id':r'%SLICE_ID%','declared_plane':r'%DECLARED_PLANE%','sprint_spec':r'%SPRINT_SPEC%','baseline_branch':r'%BASELINE_BRANCH%','build_branch':r'%BUILD_BRANCH%','wrapper_pid':os.getppid(),'ts_utc':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z'}; pathlib.Path(p).parent.mkdir(parents=True, exist_ok=True); pathlib.Path(p).write_text(json.dumps(d,indent=2), encoding='utf-8')" >nul 2>nul
+
+REM Stall watchdog (slice-level). Disable: set PPE_WATCH=0
+python "%REPO_ROOT%\scripts\spawn_active_run_watch.py" "%REPO_ROOT%" "%PHASE_PLAN%" >nul 2>nul
 
 set "ORCH_ROOT=%USERPROFILE%\Desktop\ppe-orchestrator-acp"
 if not exist "%ORCH_ROOT%\package.json" (

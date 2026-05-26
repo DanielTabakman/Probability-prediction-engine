@@ -58,6 +58,22 @@ def run_preflight(
     active_run = repo / "artifacts" / "orchestrator" / "ACTIVE_RUN.json"
     if active_run.is_file():
         warnings.append(f"ACTIVE_RUN present: {active_run.as_posix()} (stale or in-flight)")
+        try:
+            active_data = json.loads(active_run.read_text(encoding="utf-8"))
+            wp = int(active_data.get("wrapper_pid") or 0)
+        except (json.JSONDecodeError, TypeError, ValueError):
+            wp = 0
+        if wp > 0:
+            alive = subprocess.run(
+                ["tasklist", "/FI", f"PID eq {wp}"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if str(wp) not in (alive.stdout or ""):
+                warnings.append(
+                    f"ACTIVE_RUN wrapper_pid {wp} is not running (stale lock — delete ACTIVE_RUN.json)"
+                )
 
     orch = _orchestrator_root(repo) if check_orchestrator else None
     if check_orchestrator:

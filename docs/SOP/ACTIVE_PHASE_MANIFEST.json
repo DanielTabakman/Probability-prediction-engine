@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "",
-  "selectionRecord": "docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "Await steward SELECTION: set phasePlanPath, sprintSpecPath, and status READY before run_ppe.cmd"
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md",
+  "status": "READY",
+  "notes": "SELECTION 2026-05-26: disagreement/candidate strip polish (\u00a715B slice 4); run_ppe.cmd from repo root."
 }

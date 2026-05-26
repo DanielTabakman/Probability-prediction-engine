@@ -8,6 +8,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.ppe_agent_healthcheck import run_agent_healthcheck
+from scripts.ppe_git_network import local_git_only_enabled
 from scripts.ppe_manifest import load_manifest, set_manifest_status
 from scripts.ppe_preflight import run_preflight
 from scripts.resolve_active_phase import main as resolve_main
@@ -42,7 +44,23 @@ def cmd_dry_run(repo: Path) -> int:
         print(f"WARN: {w}")
     for e in pf.get("errors") or []:
         print(f"ERROR: {e}", file=sys.stderr)
+    if os.environ.get("PPE_SKIP_AGENT_CHECK", "").strip().lower() not in ("1", "true", "yes"):
+        print("ppe_run: would run ppe_agent_healthcheck")
+    if local_git_only_enabled():
+        print("ppe_run: PPE_LOCAL_GIT_ONLY=1 (local commit/promotion; no git push)")
     return 0 if pf["ok"] else 1 if rc == 0 else rc
+
+
+def _agent_health_gate(repo: Path) -> int:
+    if os.environ.get("PPE_SKIP_AGENT_CHECK", "").strip().lower() in ("1", "true", "yes"):
+        print("WARN: PPE_SKIP_AGENT_CHECK set — skipping Cursor Agent health gate")
+        return 0
+    hc = run_agent_healthcheck(repo)
+    for w in hc.get("warnings") or []:
+        print(f"WARN: {w}")
+    for e in hc.get("errors") or []:
+        print(f"ERROR: {e}", file=sys.stderr)
+    return 0 if hc["ok"] else 1
 
 
 def cmd_run_phase(repo: Path, plan_path: str) -> int:
@@ -56,6 +74,16 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
         return 1
     for w in pf.get("warnings") or []:
         print(f"WARN: {w}")
+
+    agent_rc = _agent_health_gate(repo)
+    if agent_rc != 0:
+        return agent_rc
+
+    if local_git_only_enabled():
+        print(
+            "WARN: PPE_LOCAL_GIT_ONLY=1 — commits/promotion are local only; "
+            "git push and PR are deferred until an unrestricted network."
+        )
 
     try:
         set_manifest_status(repo, "RUNNING")

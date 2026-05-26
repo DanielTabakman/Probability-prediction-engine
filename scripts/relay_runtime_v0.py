@@ -815,6 +815,15 @@ def dispatch_stage_slice(
     run_id = _now_stamp()
     runtime.run_dir(run_id).mkdir(parents=True, exist_ok=True)
 
+    git_mode = "normal"
+    try:
+        from scripts.ppe_git_network import git_network_mode
+
+        git_mode = git_network_mode()
+    except ImportError:
+        if os.environ.get("PPE_LOCAL_GIT_ONLY", "").strip().lower() in ("1", "true", "yes", "on"):
+            git_mode = "local_only"
+
     task_envelope = {
         "protocol": PROTOCOL,
         "schema_version": SCHEMA_VERSION,
@@ -826,6 +835,7 @@ def dispatch_stage_slice(
         "baseline_branch": baseline_branch,
         "build_branch": build_branch,
         "retry_budget_max": retry_budget_max,
+        "git_network_mode": git_mode,
         "expected_relay_result_path": str(
             (runtime.run_dir(run_id) / "relay_result.json").relative_to(runtime.repo_root)
         ).replace("\\", "/"),

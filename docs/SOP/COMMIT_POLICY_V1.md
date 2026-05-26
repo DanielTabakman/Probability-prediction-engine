@@ -57,6 +57,8 @@ When `artifacts/control_plane/active_slice_touch_set.json` exists (written by `r
 
 **Standing authorization (2026-05-19, tiered gate 2026-05-25):** The steward approved this policy. Agents and automation **may commit and push to feature branches** when `python scripts/run_pushable_gate.py` succeeds and the requested task is complete—**without asking “may I commit?” each time.** Still require explicit instruction for ambiguous scope, recovery, or `main` when PR-only delivery applies.
 
+**Restricted network (`PPE_LOCAL_GIT_ONLY=1`):** commit and local promotion are allowed; **push and PR are deferred** until an unrestricted network. See [`AGENT_GIT_SETUP.md`](AGENT_GIT_SETUP.md) §6 and [`scripts/ppe_git_network.py`](../../scripts/ppe_git_network.py).
+
 1. **Do not commit** without steward/user instruction when scope is unclear or the change is not part of an authorized task.
    - Exception: toolchain (e.g. pre-commit) modifies files required to proceed — include in the next authorized commit.
 2. If a tool requires a clean tree on the same checkout (relay stage), use an isolated **worktree** or park state on a branch + commit once authorized.

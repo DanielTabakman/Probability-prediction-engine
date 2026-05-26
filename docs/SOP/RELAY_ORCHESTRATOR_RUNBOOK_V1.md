@@ -81,7 +81,14 @@ Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set 
 - **Last run report (wrapper completion)**:
   - `artifacts/orchestrator/LAST_RUN_REPORT.json` + `artifacts/orchestrator/LAST_RUN_REPORT.md` (written by `run_slice.cmd` / `run_phase.cmd` / `run_ppe.cmd` on exit; includes context ritual when manifest present)
   - `artifacts/orchestrator/ACTIVE_RUN.json` (present only while a wrapper-launched slice/phase is in-flight)
-  - Optional: set `PPE_NOTIFY=0` to disable Windows toast/beeps from `scripts/notify_run_finished.ps1`
+  - Optional: set `PPE_NOTIFY=0` to disable Windows toast/beeps from `scripts/notify_run_finished.ps1` and `scripts/notify_run_error.ps1`
+  - **Agent health gate:** `scripts/ppe_agent_healthcheck.py` (automatic in `run_ppe.cmd`; bypass `PPE_SKIP_AGENT_CHECK=1`) — see [PPE_AGENT_AND_NETWORK_TROUBLESHOOTING.md](PPE_AGENT_AND_NETWORK_TROUBLESHOOTING.md)
+  - **Early failure:** orchestrator writes `artifacts/orchestrator/run_alert.json` + toast via `notify_run_error.ps1` (watchdog polls as backup)
+  - **Stall watchdog** (default on): `scripts/watch_active_run.py` spawned by `run_phase.cmd` / `run_slice.cmd`
+    - **~15m (SUS):** Windows toast via `scripts/notify_run_stalled.ps1` (once per slice)
+    - **~30m + 90s (hard):** toast + kill stuck wrapper + manifest `READY` + `artifacts/orchestrator/STALL_REPORT.json`
+    - Disable: `set PPE_WATCH=0` before `run_ppe.cmd`
+    - Override limits: `PPE_SUS_MINUTES` / `PPE_HARD_MINUTES`
 - **UI smoke** (when applicable):
   - `artifacts/ui_smoke/<timestamp>/...`
 - **Agent continuity** (after closeout job):

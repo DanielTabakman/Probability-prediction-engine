@@ -28,7 +28,7 @@ When it exits 0, automatically:
 
 1. Run `git status`, `git diff`, and `git log -1 --oneline` (summarize for the user).
 2. **Commit** on the current branch with a policy-style message (slice/chapter + plane + intent).
-3. On a **feature branch**: **push** (`git push -u origin HEAD` if no upstream), then **open a PR to `main`** if none exists (see `docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md`).
+3. On a **feature branch**: **push** (`git push -u origin HEAD` if no upstream), then **open a PR to `main`** if none exists (see `docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md`) — **unless** `PPE_LOCAL_GIT_ONLY=1` (commit only; push later from home — see `docs/SOP/AGENT_GIT_SETUP.md` §6).
 
 Gate tiers (local only; PR CI still runs full pytest):
 

@@ -67,6 +67,47 @@ git push origin HEAD
 
 **After any push:** tell the agent “home — push done” or paste `git status` so it can help with PR / merge-on-green.
 
+## 6. Local git-only mode (restricted network / cannot push)
+
+When this machine **cannot** `git push` to GitHub (library Wi‑Fi, firewall, TLS revocation errors), use **local-only** mode so relay slices still run:
+
+```powershell
+set PPE_LOCAL_GIT_ONLY=1
+run_ppe.cmd
+```
+
+Or for one session in PowerShell:
+
+```powershell
+$env:PPE_LOCAL_GIT_ONLY = "1"
+.\run_ppe.cmd
+```
+
+**What changes:**
+
+| Step | Normal | `PPE_LOCAL_GIT_ONLY=1` |
+|------|--------|-------------------------|
+| BUILD + commit on slice branch | Yes | Yes |
+| Local promotion (merge/ff to baseline) | Yes | Yes |
+| `git push` / open PR | Yes | **Skipped** (deferred) |
+| Relay CONTINUE (tests green) | Yes | Yes (if local promotion ok) |
+
+Task envelopes include `"git_network_mode": "local_only"`. ACP workers are instructed not to treat push failure as a stop.
+
+**When you reach home / unrestricted network**, push deferred branches:
+
+```powershell
+cd "d:\Users\User\Desktop\Probability prediction engine"
+git branch -vv
+python scripts/ppe_git_network.py --repo-root .
+# or per branch:
+git push -u origin HEAD
+```
+
+Unset for normal shipping: `set PPE_LOCAL_GIT_ONLY=` then `run_ppe.cmd`.
+
+**IP allowlist:** GitHub does not offer per-IP allowlists for `git push` over HTTPS. Options are: fix outbound HTTPS to `github.com:443`, use home network, GitHub Codespaces/another machine for push, or stay in local-only mode until you can push elsewhere.
+
 ## References
 
 - [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)
