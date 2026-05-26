@@ -421,6 +421,15 @@ def run_google_docs_refresh(
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows consoles often default to cp1252, which cannot print some unicode
+    # characters used in reports (e.g., em-dash, arrows). Make printing best-effort
+    # instead of crashing the whole refresh.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    except Exception:
+        pass
+
     parser = argparse.ArgumentParser(
         description="GOOGLE_DOCS_REFRESH — control-plane Google Docs maintenance"
     )
