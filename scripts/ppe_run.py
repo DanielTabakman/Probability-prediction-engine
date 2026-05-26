@@ -111,6 +111,16 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
                 set_manifest_status(repo, "READY")
         except Exception:
             pass
+        try:
+            from scripts.ui_smoke_diagnose import diagnose_stop_for_review, format_diagnosis
+
+            diagnosis = diagnose_stop_for_review(repo_root=repo, exit_code=exit_code, relay=None)
+            if diagnosis:
+                print("")
+                print("ppe_run: smoke auto-diagnosis")
+                print(format_diagnosis(diagnosis))
+        except Exception as e:
+            print(f"WARN: smoke auto-diagnosis skipped: {e}")
 
     report_path = repo / "artifacts" / "orchestrator" / "LAST_RUN_REPORT.md"
     print("")

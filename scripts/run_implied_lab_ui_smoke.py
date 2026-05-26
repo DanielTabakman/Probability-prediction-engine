@@ -1,11 +1,12 @@
 """
-One-command wrapper for the primary implied-lab UI smoke path (A_width_target_payoff).
+One-command wrapper for the primary implied-lab UI smoke path.
 
-The harness also supports a second gated scenario (C_directional_peak_disagreement);
-invoke implied_lab_ui_smoke_harness.py with --scenario for that path.
+Auto-selects scenario from UI mode:
+  - Default MVP1 and full lab: A_width_target_payoff (harness skips hidden controls)
+  - Dual-smoke / explicit compact path: MVP1_compact_verification via harness --scenario
 
 Delegates to scripts/implied_lab_ui_smoke_harness.py with:
-  --scenario A_width_target_payoff
+  --scenario <primary>
   --port <ephemeral free port>
 
 Pass/fail for this command remains the harness exit code; the wrapper additionally prints
@@ -22,8 +23,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "scripts" / "implied_lab_ui_smoke_harness.py"
-OFFICIAL_SCENARIO = "A_width_target_payoff"
 SMOKE_ROOT = ROOT / "artifacts" / "ui_smoke"
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.implied_lab_ui_smoke_harness import (  # noqa: E402
+    primary_smoke_scenario,
+    ui_smoke_env_summary,
+)
+from scripts.ui_smoke_diagnose import (  # noqa: E402
+    diagnose_manifest,
+    format_diagnosis,
+)
 
 
 def _pick_free_port() -> int:
@@ -43,6 +55,14 @@ def main() -> int:
         print(f"Missing harness script: {HARNESS}", file=sys.stderr)
         return 2
 
+    scenario = primary_smoke_scenario()
+    env_summary = ui_smoke_env_summary()
+    print(
+        f"Primary smoke scenario: {scenario} "
+        f"(PPE_POST_MVP1_LAB_UI={env_summary['ppe_post_mvp1_lab_ui'] or '(unset)'})",
+        flush=True,
+    )
+
     port = _pick_free_port()
     cmd = [
         sys.executable,
@@ -50,7 +70,7 @@ def main() -> int:
         "--port",
         str(port),
         "--scenario",
-        OFFICIAL_SCENARIO,
+        scenario,
     ]
 
     delegated = subprocess.list2cmdline(cmd)
@@ -74,7 +94,7 @@ def main() -> int:
             data = json.loads(manifest_path.read_text(encoding="utf-8"))
             close = data.get("workflow_hardening_slice003_closeout") or {}
             for row in data.get("scenarios", []):
-                if row.get("scenario") != OFFICIAL_SCENARIO:
+                if row.get("scenario") != scenario:
                     continue
                 screenshot_path = row.get("screenshot_path") or None
                 w = row.get("slice003_witness") or {}
@@ -90,6 +110,10 @@ def main() -> int:
                     f"signal={close.get('directional_signal')}"
                 )
                 break
+            if code != 0:
+                diagnosis = diagnose_manifest(data)
+                if diagnosis:
+                    print(format_diagnosis(diagnosis), flush=True)
         except Exception:
             screenshot_path = None
             slice003_summary = "(manifest parse error)"

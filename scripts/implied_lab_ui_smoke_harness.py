@@ -101,6 +101,29 @@ def mvp1_execution_surfaces_hidden_by_default() -> bool:
     return v not in ("1", "true", "yes", "on")
 
 
+PRIMARY_SMOKE_SCENARIO_FULL_LAB = "A_width_target_payoff"
+PRIMARY_SMOKE_SCENARIO_COMPACT = "MVP1_compact_verification"
+
+
+def primary_smoke_scenario() -> str:
+    """
+    Official one-command wrapper scenario.
+
+    Always ``A_width_target_payoff``; the harness skips Mode & solver controls when
+    default MVP1 chrome is active (``PPE_POST_MVP1_LAB_UI`` unset).
+    """
+    return PRIMARY_SMOKE_SCENARIO_FULL_LAB
+
+
+def ui_smoke_env_summary() -> dict[str, str]:
+    """Snapshot env knobs for manifest/debug output."""
+    return {
+        "ppe_post_mvp1_lab_ui": str(os.environ.get("PPE_POST_MVP1_LAB_UI", "")).strip(),
+        "mvp1_surfaces_hidden": str(mvp1_execution_surfaces_hidden_by_default()).lower(),
+        "primary_scenario": primary_smoke_scenario(),
+    }
+
+
 def default_scenario_timeout_s(scenario: str) -> float:
     if scenario == "MVP1_compact_verification":
         raw = (os.environ.get(_MVP1_COMPACT_TIMEOUT_ENV) or "").strip()
@@ -581,6 +604,8 @@ def _set_belief_uncertainty_aria_slider(page, value: float) -> None:
 
 def _set_mode(page, mode_text: str) -> None:
     # Sprint 001 — Slice 008 (Phase 2): mode radio lives inside a collapsed expander.
+    if mvp1_execution_surfaces_hidden_by_default():
+        return
     _expand_expander(page, "Mode & solver (Exact strikes vs Target payoff)")
     # Streamlit radio is usually rendered as clickable elements by label text.
     loc = page.locator(f"text={mode_text}").first
@@ -1276,6 +1301,7 @@ def main() -> int:
             "port": PORT,
             "run_id": RUN_ID,
             "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+            "ui_smoke_env": ui_smoke_env_summary(),
             "scenario_timeout_s_by_scenario": scenario_timeout_manifest,
             "streamlit_ready_timeout_s": float(args.timeout_s),
             "workflow_hardening_slice003_closeout": wh_slice003_closeout,
@@ -1321,7 +1347,8 @@ def main() -> int:
                 ),
                 "note": (
                     "Official one-command wrapper (`scripts/run_implied_lab_ui_smoke.py`) runs "
-                    "A_width_target_payoff only. For C, use --scenario C_directional_peak_disagreement; "
+                    "A_width_target_payoff; harness skips Mode & solver on default MVP1 UI. "
+                    "For C, use --scenario C_directional_peak_disagreement; "
                     "a green run implies C’s manifest gates passed for that run."
                 ),
                 "workflow_hardening_slice003": (
