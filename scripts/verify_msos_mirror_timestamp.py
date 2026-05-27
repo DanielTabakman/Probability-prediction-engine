@@ -112,6 +112,9 @@ def main() -> int:
 
     print(f"mirror_doc_id: {file_id}")
     print(f"generated_line: {generated_line}")
+    if generated_line == "NOT_FOUND":
+        print("ERROR: mirror export did not contain a Generated (UTC) line")
+        return 2
     return 0
 
 
