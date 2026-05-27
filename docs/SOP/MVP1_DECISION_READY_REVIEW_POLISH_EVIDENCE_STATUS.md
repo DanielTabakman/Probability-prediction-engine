@@ -12,8 +12,8 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-DecisionReview-Control-Slice001 | **OPEN** | charter |
-| MVP1-DecisionReview-Product-Slice002 | **OPEN** | PRODUCT |
+| MVP1-DecisionReview-Control-Slice001 | **CLOSED** 2026-05-27 | charter witness on steward branch; relay `8efa01e` (promotion pending) |
+| MVP1-DecisionReview-Product-Slice002 | **CLOSED** 2026-05-27 | product **`61c2571`** — hypothesis copy + MVP1 linkage polish |
 | MVP1-DecisionReview-Smoke-Slice003 | **OPEN** | dual smoke |
 | MVP1-DecisionReview-Closeout-Slice004 | **OPEN** | chapter close |
 
