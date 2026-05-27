@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_manifest import load_manifest, set_manifest_status
 from scripts.ppe_preflight import run_preflight
 from scripts.resolve_active_phase import main as resolve_main
@@ -17,7 +18,25 @@ def _repo_root(explicit: Path | None) -> Path:
     return (explicit or Path.cwd()).resolve()
 
 
+def _windows_cmdline(argv: list[str]) -> str:
+    """Build a cmd.exe command line (list2cmdline over-escapes for cmd /c on some paths)."""
+    parts: list[str] = []
+    for arg in argv:
+        if arg == "":
+            parts.append('""')
+        elif any(c in arg for c in " \t"):
+            parts.append(f'"{arg}"')
+        else:
+            parts.append(arg)
+    return " ".join(parts)
+
+
 def _run_cmd(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> int:
+    # Windows: avoid cmd /c argv splitting on repo paths with spaces (use shell=True).
+    if sys.platform == "win32" and len(cmd) >= 3 and cmd[0].lower() == "cmd" and cmd[1].lower() == "/c":
+        line = _windows_cmdline(cmd[2:])
+        print(f"ppe_run: {line}")
+        return subprocess.run(line, shell=True, cwd=cwd, env=env).returncode
     print(f"ppe_run: {' '.join(cmd)}")
     return subprocess.run(cmd, cwd=cwd, env=env).returncode
 
@@ -132,6 +151,41 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     return exit_code
 
 
+def cmd_continuous(repo: Path, *, max_chapters: int = 5) -> int:
+    """Run phases back-to-back until queue empty, failure, or max_chapters."""
+    for chapter in range(1, max_chapters + 1):
+        print(f"ppe_run: continuous chapter {chapter}/{max_chapters}")
+        sel_rc = run_auto_select(repo, apply=True, select_only=False, mark_done=False, force=False)
+        if sel_rc != 0:
+            print(f"ppe_run: continuous stop (auto-select exit {sel_rc})")
+            return sel_rc
+
+        try:
+            manifest = load_manifest(repo)
+        except Exception as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            return 1
+
+        plan_path = str(manifest.get("phasePlanPath") or "").strip()
+        status = str(manifest.get("status") or "").strip().upper()
+        if status != "READY" or not plan_path:
+            print("ppe_run: continuous idle (no READY manifest / empty plan)")
+            return 0
+
+        exit_code = cmd_run_phase(repo, plan_path)
+        if exit_code != 0:
+            print(f"ppe_run: continuous stop (phase exit {exit_code})")
+            return exit_code
+
+        manifest = load_manifest(repo)
+        if str(manifest.get("status") or "").strip().upper() != "COMPLETE":
+            print("ppe_run: continuous stop (phase ended without COMPLETE manifest)")
+            return exit_code
+
+    print(f"ppe_run: continuous stop (reached max chapters {max_chapters})")
+    return 0
+
+
 def cmd_run_slice(repo: Path, slice_id: str, plan_path: str) -> int:
     env = os.environ.copy()
     env["PPE_PHASE_PLAN"] = plan_path
@@ -155,6 +209,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slice", type=str, default=None, help="Run single slice (escape hatch)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--status", action="store_true")
+    ap.add_argument(
+        "--continuous",
+        action="store_true",
+        help="After each chapter COMPLETE, auto-select and run next READY queue item (max 5).",
+    )
+    ap.add_argument(
+        "--continuous-max",
+        type=int,
+        default=5,
+        help="Max chapters per --continuous invocation (default 5).",
+    )
     args = ap.parse_args(argv)
 
     repo = _repo_root(args.repo_root)
@@ -163,6 +228,11 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_status(repo)
     if args.dry_run:
         return cmd_dry_run(repo)
+    if args.continuous:
+        if args.slice:
+            print("ERROR: --continuous cannot be used with --slice", file=sys.stderr)
+            return 2
+        return cmd_continuous(repo, max_chapters=max(1, args.continuous_max))
 
     plan_path = args.plan
     if not plan_path:

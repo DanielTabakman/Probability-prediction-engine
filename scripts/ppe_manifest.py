@@ -126,6 +126,16 @@ def set_manifest_status(repo_root: Path, status: str) -> None:
     save_manifest(repo_root, manifest)
 
 
+def clear_manifest_plan_path(repo_root: Path, *, note: str = "") -> None:
+    """Clear phasePlanPath while keeping status (typically COMPLETE)."""
+    manifest = load_manifest(repo_root)
+    manifest["phasePlanPath"] = ""
+    if note:
+        prev = str(manifest.get("notes") or "").strip()
+        manifest["notes"] = f"{prev} {note}".strip() if prev else note
+    save_manifest(repo_root, manifest)
+
+
 def maybe_mark_manifest_complete(
     repo_root: Path,
     phase_plan_path: Path,

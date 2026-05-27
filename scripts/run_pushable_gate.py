@@ -1,7 +1,14 @@
 """Tiered pushable gate for PPE commits.
 
-This script is the canonical local gate runner referenced by workspace policy.
-It chooses a gate tier based on git changes vs a base ref (default: origin/main).
+Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md). Classifies the
+diff vs a base ref (default: origin/main) and runs:
+
+- **Tier 0** — docs-only under ``docs/``: no ruff/pytest (exit 0).
+- **Tier 1** — control plane (``scripts/``, ``tests/``, config, ``.cursor/``; no ``src/``):
+  ``ruff check scripts tests`` + full ``pytest -q``.
+- **Tier 2** — product (any ``src/`` touch): ``ruff check src tests scripts`` + full ``pytest -q``.
+
+Use ``--tier N`` to force a tier for local debugging.
 """
 
 from __future__ import annotations
