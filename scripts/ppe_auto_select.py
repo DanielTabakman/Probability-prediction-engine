@@ -73,6 +73,32 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
     return None, "no READY items in queue"
 
 
+def mark_queue_item_done(repo_root: Path, *, plan_path: str) -> tuple[bool, str]:
+    """Mark the first matching queue item as DONE."""
+    queue_path = (repo_root / QUEUE_REL).resolve()
+    queue = _load_queue(repo_root)
+    items = queue.get("items") or []
+    if not isinstance(items, list):
+        raise ValueError("queue: items must be an array")
+
+    norm = plan_path.replace("\\", "/").strip()
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        item_plan = str(item.get("planPath") or "").replace("\\", "/").strip()
+        if item_plan != norm:
+            continue
+        item["status"] = "DONE"
+        prev = str(item.get("doneReason") or "").strip()
+        if not prev:
+            item["doneReason"] = "marked DONE by ppe_auto_select.py"
+        queue["items"][i] = item
+        queue_path.write_text(json.dumps(queue, indent=2) + "\n", encoding="utf-8")
+        return True, f"queue item {i} marked DONE"
+
+    return False, "no matching planPath in queue"
+
+
 def _print_result(*, selected: bool, plan_path: str | None, reason: str) -> None:
     obj = {"selected": selected, "plan_path": plan_path, "reason": reason}
     print(json.dumps(obj, indent=2))
@@ -82,6 +108,16 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="PPE bounded selection automation")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--apply", action="store_true", help="Write ACTIVE_PHASE_MANIFEST.json")
+    ap.add_argument(
+        "--select-only",
+        action="store_true",
+        help="Print what would be selected, but never write the manifest.",
+    )
+    ap.add_argument(
+        "--mark-done",
+        action="store_true",
+        help="Mark the currently selected phasePlanPath as DONE in PHASE_QUEUE.json (requires --apply).",
+    )
     ap.add_argument(
         "--force",
         action="store_true",
@@ -100,6 +136,21 @@ def main(argv: list[str] | None = None) -> int:
     status = str(manifest.get("status") or "").strip().upper()
     current_plan = str(manifest.get("phasePlanPath") or "").strip()
 
+    if args.apply and args.select_only:
+        print("ERROR: --apply and --select-only are mutually exclusive", file=sys.stderr)
+        return 2
+
+    if args.mark_done:
+        if not args.apply:
+            print("ERROR: --mark-done requires --apply", file=sys.stderr)
+            return 2
+        if not current_plan:
+            _print_result(selected=False, plan_path=None, reason="no phasePlanPath to mark DONE")
+            return 1
+        ok, reason = mark_queue_item_done(repo, plan_path=current_plan)
+        _print_result(selected=ok, plan_path=current_plan, reason=reason)
+        return 0 if ok else 1
+
     if status in {"READY", "RUNNING"}:
         _print_result(selected=False, plan_path=current_plan or None, reason=f"manifest is {status}")
         return 0
@@ -117,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
         _print_result(selected=False, plan_path=None, reason=reason)
         return 1
 
-    if args.apply:
+    if args.apply and not args.select_only:
         # Keep existing selectionRecord/sprintSpecPath unless queue/plan provides better info later.
         # For now we set minimal required fields for run_ppe.cmd.
         plan = load_phase_plan(repo, plan_path)
