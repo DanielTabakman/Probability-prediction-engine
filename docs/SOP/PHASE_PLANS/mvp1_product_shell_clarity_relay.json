@@ -1,0 +1,65 @@
+{
+  "name": "MVP1_product_shell_clarity (post-decision-review SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-ProductShell-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+      "buildBranch": "build/auto/MVP1-ProductShell-Control-Slice001-product_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-ProductShell-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+      "buildBranch": "build/auto/MVP1-ProductShell-Product-Slice002-product_shell",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-ProductShell-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+      "buildBranch": "build/auto/MVP1-ProductShell-Product-Slice003-product_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-ProductShell-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+      "buildBranch": "build/auto/MVP1-ProductShell-Closeout-Slice004-product_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_product_shell_clarity",
+        "chapterTitle": "MVP1 product shell clarity",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-27",
+        "evidenceDoc": "docs/SOP/MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

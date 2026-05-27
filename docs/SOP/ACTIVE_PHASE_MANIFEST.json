@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_product_shell_clarity_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md",
   "status": "READY",
-  "notes": "Steward SELECTION 2026-05-27 \u2014 decision-ready review polish (post Sprint 003)."
+  "notes": "Auto SELECTION 2026-05-27 — MVP1 product shell clarity (§15B slice 1); highest-priority deferred BUILD."
 }
