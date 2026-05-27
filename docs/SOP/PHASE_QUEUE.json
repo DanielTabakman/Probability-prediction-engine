@@ -22,9 +22,15 @@
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json",
+      "status": "READY",
+      "reason": "MVP1 decision-ready review polish — post Sprint 003 SELECTION 2026-05-27.",
+      "selectionPrep": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md"
+    },
+    {
       "planPath": "",
       "status": "PENDING",
-      "reason": "Placeholder — steward SELECTION: set planPath + READY when next chapter is chartered.",
+      "reason": "Placeholder — steward SELECTION after decision-ready review chapter closes.",
       "selectionPrep": "docs/SOP/POST_MVP1_SPRINT003_SELECTION.md"
     }
   ]

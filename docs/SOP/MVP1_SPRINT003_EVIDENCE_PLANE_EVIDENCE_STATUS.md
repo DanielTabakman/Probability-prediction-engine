@@ -24,7 +24,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| `python -m pytest -q` | **PASS** | **215** passed (unified auto-run control-plane) |
+| `python -m pytest -q` | **PASS** | **218** collected (charter witness refresh 2026-05-27) |
 | `python scripts/run_pushable_gate.py` | **PASS** | tier **1** (control-plane) |
 | Primary UI smoke | **PASS** | `20260527_175706` |
 

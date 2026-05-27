@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
-  "status": "COMPLETE",
-  "notes": "Sprint 003 evidence-plane COMPLETE 2026-05-27. Await steward SELECTION — see POST_MVP1_SPRINT003_SELECTION.md."
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md",
+  "status": "READY",
+  "notes": "Steward SELECTION 2026-05-27 — decision-ready review polish (post Sprint 003)."
 }

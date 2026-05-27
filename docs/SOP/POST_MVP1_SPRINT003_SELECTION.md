@@ -1,6 +1,6 @@
 # Post–MVP1 Sprint 003 evidence-plane — steward SELECTION (prep)
 
-**Status:** Sprint 003 evidence-plane chapter **COMPLETE** (2026-05-27) — see [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md).
+**Status:** **Historical** — Sprint 003 **COMPLETE**; next chapter chartered — [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md).
 
 ## Deferred BUILD candidates
 

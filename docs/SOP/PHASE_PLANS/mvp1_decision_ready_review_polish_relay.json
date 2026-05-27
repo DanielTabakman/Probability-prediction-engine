@@ -1,0 +1,65 @@
+{
+  "name": "MVP1_decision_ready_review_polish (post-Sprint003 SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DecisionReview-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DecisionReview-Control-Slice001-decision_review",
+      "declaredPlane": "CONTROL",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DecisionReview-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DecisionReview-Product-Slice002-decision_review",
+      "declaredPlane": "PRODUCT",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DecisionReview-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DecisionReview-Smoke-Slice003-decision_review",
+      "declaredPlane": "CONTROL",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DecisionReview-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+      "buildBranch": "build/auto/MVP1-DecisionReview-Closeout-Slice004-decision_review",
+      "declaredPlane": "CONTROL",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_decision_ready_review_polish",
+        "chapterTitle": "MVP1 decision-ready review polish",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-27",
+        "evidenceDoc": "docs/SOP/MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_SPRINT003_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
