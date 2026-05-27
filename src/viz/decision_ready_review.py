@@ -96,8 +96,9 @@ def build_decision_ready_review_payload(
         dc_str = str(dc_raw)
 
     structure_line = (
-        f"You are inspecting **{name}** — an **illustrative** multi-leg BTC structure on the chart "
-        f"(green **expiry P&L** line). It is **not** a recommendation and **not** an optimized pick."
+        f"You are inspecting **{name}** as a **hypothesis to inspect** — an **illustrative** "
+        f"multi-leg BTC structure on the chart (green **expiry P&L** line). It is **not** a "
+        f"recommendation, **not** ranked, and **not** an optimized pick."
     )
     payoff_line = _payoff_shape_plain(name, dc_str)
 
@@ -108,8 +109,8 @@ def build_decision_ready_review_payload(
         if mvp1_exclude_execution_ui:
             linkage_line = (
                 "**How this ties together:** **Belief vs market — at a glance** is directly under this block. "
-                "That glance card carries the **interpretive disagreement** and **illustrative fit classes** "
-                "for the same exploration. (**MVP1 scope:** no trade-ticket export — use **Summary** for numbers.)"
+                "That digest links the **disagreement read** and any **candidate hypotheses** surfaced above "
+                "to this concrete payoff shape. (**MVP1 scope:** no trade-ticket export — use **Summary** for numbers.)"
             )
         else:
             linkage_line = (
@@ -151,7 +152,10 @@ def build_decision_ready_review_payload(
             "(one expander) for the leg list."
         )
 
-    fit_caption = "**Fit is not recommendation.** Illustrative structure only — same stance as the glance card."
+    fit_caption = (
+        "**Fit is not recommendation.** Treat this structure as one illustrative payoff to stress-test — "
+        "same stance as the glance card and candidate strips."
+    )
     if has_glance and isinstance(glance, dict):
         fn = glance.get("fit_note")
         if isinstance(fn, str) and fn.strip():

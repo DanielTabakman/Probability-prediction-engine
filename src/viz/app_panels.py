@@ -604,8 +604,8 @@ def render_decision_ready_review(
         st.markdown("##### Decision-ready review")
         if mvp1_exclude_execution_ui:
             st.caption(
-                "Connects **Summary** to the glance digest below — descriptive only "
-                "(MVP1 hides copy/paste trade-ticket export)."
+                "Hypothesis framing for the active structure — connects **Summary** to the glance digest "
+                "below. Descriptive only (MVP1 hides trade-ticket export)."
             )
         else:
             st.caption("Connects **Summary** to the glance digest and **Trade ticket** next — descriptive only.")
