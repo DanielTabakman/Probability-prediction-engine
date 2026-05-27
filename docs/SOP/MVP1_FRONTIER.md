@@ -113,7 +113,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 |--------|--------|-------|
 | **CLOSED** | `MVP1-DecisionReview-Control-Slice001` — charter | EVIDENCE-PLANE |
 | **CLOSED** | `MVP1-DecisionReview-Product-Slice002` — review polish | PRODUCT |
-| **OPEN** | `MVP1-DecisionReview-Smoke-Slice003` — dual smoke witness | EVIDENCE-PLANE |
+| **CLOSED** | `MVP1-DecisionReview-Smoke-Slice003` — dual smoke witness | EVIDENCE-PLANE |
 | **OPEN** | `MVP1-DecisionReview-Closeout-Slice004` — chapter close | EVIDENCE-PLANE |
 
 **Evidence:** [`MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md`](MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md)
