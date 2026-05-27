@@ -42,7 +42,7 @@ From repo root:
    - `run_phase.cmd docs/SOP/PHASE_PLANS/phase2_next.json`
 3. Phase runner stops on first non-CONTINUE.
 4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, **`PHASE_QUEUE` item marked DONE**, manifest `phasePlanPath` cleared, then MSOS Google Doc sync (best-effort).
-5. **Continuous auto-cycle (optional):** `run_ppe.cmd --continuous` runs phases until the queue has no `READY` items, a non-zero exit, or five chapters (configurable via `ppe_run.py --continuous-max`).
+5. **Auto-resume + auto-chain (default):** `run_ppe.cmd` auto-resumes slices left incomplete in `artifacts/orchestrator/steward_phase_summary.json` after a partial phase stop, then auto-selects and runs the next `READY` queue chapter after closeout. Use `run_ppe.cmd --continuous` for up to five chapters; `run_ppe.cmd --no-auto-chain` to disable next-chapter chaining.
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 

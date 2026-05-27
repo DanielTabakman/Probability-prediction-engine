@@ -2,11 +2,13 @@
 setlocal enabledelayedexpansion
 
 REM Unified PPE entry: full relay phase from ACTIVE_PHASE_MANIFEST.json (default).
+REM Default: auto-resume partial phases + auto-chain next READY queue chapter after closeout.
 REM Usage:
 REM   run_ppe.cmd
+REM   run_ppe.cmd --continuous
+REM   run_ppe.cmd --no-auto-chain
 REM   run_ppe.cmd --dry-run
 REM   run_ppe.cmd --status
-REM   run_ppe.cmd --continuous
 REM   run_ppe.cmd --plan docs/SOP/PHASE_PLANS/<plan>.json
 REM   run_ppe.cmd --slice <sliceId>
 
@@ -14,16 +16,10 @@ set "REPO_ROOT=%~dp0"
 set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
 set "PYTHONPATH=%REPO_ROOT%"
-set "CONTINUOUS=0"
 set "SELECT_ONLY=0"
 
 :strip_flags
 if "%~1"=="" goto strip_done
-if /i "%~1"=="--continuous" (
-  set "CONTINUOUS=1"
-  shift
-  goto strip_flags
-)
 if /i "%~1"=="--select-only" (
   set "SELECT_ONLY=1"
   shift
@@ -45,10 +41,6 @@ del "%SEL_OUT%" >nul 2>nul
 if "%SELECT_ONLY%"=="1" exit /b %SEL_RC%
 if not "%SEL_RC%"=="0" exit /b %SEL_RC%
 
-if "%CONTINUOUS%"=="1" (
-  python "%REPO_ROOT%\scripts\ppe_run.py" --repo-root "%REPO_ROOT%" --continuous %*
-  exit /b %ERRORLEVEL%
-)
-
+REM ppe_run: --auto-chain default on; --continuous = multi-chapter; pass through other flags.
 python "%REPO_ROOT%\scripts\ppe_run.py" --repo-root "%REPO_ROOT%" %*
 exit /b %ERRORLEVEL%

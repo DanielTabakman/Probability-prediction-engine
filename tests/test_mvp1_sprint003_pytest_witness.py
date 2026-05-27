@@ -9,7 +9,7 @@ REPO = Path(__file__).resolve().parents[1]
 EVIDENCE_STATUS = REPO / "docs" / "SOP" / "MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md"
 
 # Recorded at Witness-Slice003 closeout on steward branch (197 baseline + 3 witness tests).
-WITNESS_PYTEST_COUNT = 200
+WITNESS_PYTEST_COUNT = 203
 
 
 def test_ruff_check_scripts_tests_passes() -> None:

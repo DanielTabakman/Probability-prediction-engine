@@ -5,13 +5,13 @@ alwaysApply: true
 
 # PPE unified run (operator + agents)
 
-**Operator (human):** after agents complete SELECTION, run **`run_ppe.cmd`** from repo root only. Optional: `run_ppe.cmd --dry-run`, `run_ppe.cmd --status`, `run_ppe.cmd --continuous` (back-to-back chapters while `PHASE_QUEUE.json` has `READY` items).
+**Operator (human):** run **`run_ppe.cmd`** from repo root. Default behavior: **auto-resume** remaining slices after a partial phase stop (e.g. `BLOCKED` / exit 40), then **auto-chain** to the next `READY` queue chapter after closeout. Optional: `run_ppe.cmd --continuous` (up to 5 chapters), `run_ppe.cmd --no-auto-chain`, `run_ppe.cmd --dry-run`, `run_ppe.cmd --status`.
 
 **Agents (steward BUILD):**
 
 1. At **SELECTION**, update [`docs/SOP/ACTIVE_PHASE_MANIFEST.json`](docs/SOP/ACTIVE_PHASE_MANIFEST.json): `phasePlanPath`, `sprintSpecPath`, `status: READY` — or add the chapter to [`PHASE_QUEUE.json`](docs/SOP/PHASE_QUEUE.json) as `READY` and let `run_ppe.cmd` auto-select.
 2. Tell the operator: run `run_ppe.cmd` (do not ask them to hand-edit HANDOFF/FRONTIER or paste orchestrator logs).
-3. **Do not stop after chapter closeout** when the user asked for an auto cycle: run `python scripts/ppe_auto_select.py --repo-root . --apply` (or `run_ppe.cmd`) so the next `READY` queue item starts; use `--continuous` only when multiple chartered chapters are queued.
+3. **Do not stop after chapter closeout** when the user asked for an auto cycle: `run_ppe.cmd` auto-chains by default; agents only intervene when the queue has no `READY` chapter (steward SELECTION + phase plan).
 4. After phase exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; use a **new** Cursor thread with [`AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
 
 **No active chapter:** manifest `COMPLETE` + empty `phasePlanPath` is normal — add next chapter to `PHASE_QUEUE` as `READY` (with phase plan JSON) before `run_ppe.cmd`.
