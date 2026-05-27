@@ -219,6 +219,7 @@ class ScenarioResult:
     trade_ticket_found: bool = False
     verification_found: bool = False
     trust_strip_mvp1_found: bool = False
+    feedback_panel_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
@@ -703,12 +704,12 @@ def _scroll_main_content(page) -> None:
 
 
 def _mvp1_compact_marker_visible(page) -> bool:
+    """Friends-first digest markers only — avoid false positives from collapsed Screen map caption."""
     for marker in (
         "What this run is saying",
-        "MVP1 output:",
-        "MVP1 primary output",
+        "Give feedback",
         "MVP1 data quality",
-        "Trust / provenance",
+        "MVP1 primary output",
     ):
         try:
             if page.locator(f"text={marker}").first.count() > 0:
@@ -716,6 +717,15 @@ def _mvp1_compact_marker_visible(page) -> bool:
         except Exception:
             continue
     return False
+
+
+def _scroll_to_mvp1_friends_first_block(page) -> None:
+    """Scroll until friends-first digest or feedback expander is attached."""
+    for _ in range(8):
+        if _mvp1_compact_marker_visible(page):
+            return
+        _scroll_main_content(page)
+        page.wait_for_timeout(1500)
 
 
 def _wait_for_mvp1_compact_markers(page, *, timeout_s: float = 240.0) -> None:
@@ -768,6 +778,8 @@ def _wait_for_verification_panel_ready(page) -> None:
 
 def _collect_verification_observation(page, result: ScenarioResult) -> None:
     try:
+        if result.scenario == "MVP1_compact_verification":
+            _scroll_to_mvp1_friends_first_block(page)
         markers = (
             "MVP1 output:",
             "Verification summary",
@@ -809,6 +821,24 @@ def _collect_trust_strip_mvp1_observation(page, result: ScenarioResult) -> None:
         result.trust_strip_mvp1_found = False
     except Exception:
         result.trust_strip_mvp1_found = False
+
+
+def _collect_feedback_panel_observation(page, result: ScenarioResult) -> None:
+    """MVP1 compact: friends-first feedback expander must be reachable (§15F rubric)."""
+    if result.scenario != "MVP1_compact_verification":
+        return
+    try:
+        _scroll_to_mvp1_friends_first_block(page)
+        for _ in range(4):
+            loc = page.locator("text=Give feedback").first
+            if loc.count() > 0:
+                result.feedback_panel_found = True
+                return
+            _scroll_main_content(page)
+            page.wait_for_timeout(800)
+        result.feedback_panel_found = False
+    except Exception:
+        result.feedback_panel_found = False
 
 
 def _collect_directional_category_verification(page, result: ScenarioResult) -> None:
@@ -1085,6 +1115,8 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
             page.wait_for_timeout(600)
             print("[ui_smoke] MVP1_compact: waiting for compact MVP1 markers", flush=True)
             _wait_for_mvp1_compact_markers(page, timeout_s=240.0)
+            _scroll_to_mvp1_friends_first_block(page)
+            page.wait_for_timeout(3000)
         else:
             raise ValueError(f"Unknown scenario: {scenario}")
 
@@ -1106,6 +1138,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
         pass
     try:
         _collect_trust_strip_mvp1_observation(page, r)
+    except Exception:
+        pass
+    try:
+        _collect_feedback_panel_observation(page, r)
     except Exception:
         pass
     try:
@@ -1233,7 +1269,8 @@ def main() -> int:
                     f"[ui_smoke] scenario={scenario} done "
                     f"elapsed_s={elapsed_s:.1f} "
                     f"page_loaded={result.page_loaded} verification={result.verification_found} "
-                    f"trust_strip_mvp1={result.trust_strip_mvp1_found}"
+                    f"trust_strip_mvp1={result.trust_strip_mvp1_found} "
+                    f"feedback_panel={result.feedback_panel_found}"
                 )
 
             browser.close()
@@ -1314,6 +1351,7 @@ def main() -> int:
                     "trade_ticket_found": r.trade_ticket_found,
                     "verification_found": r.verification_found,
                     "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
+                    "feedback_panel_found": r.feedback_panel_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
@@ -1337,8 +1375,8 @@ def main() -> int:
                     "If A_width_target_payoff is included, verification_found must be true. "
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
-                    "If MVP1_compact_verification is included, verification_found and "
-                    "trust_strip_mvp1_found must be true. "
+                    "If MVP1_compact_verification is included, verification_found, "
+                    "trust_strip_mvp1_found, and feedback_panel_found must be true. "
                     "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
@@ -1402,6 +1440,7 @@ def main() -> int:
             rm = next(r for r in results if r.scenario == "MVP1_compact_verification")
             verification_ok = verification_ok and bool(rm.verification_found)
             verification_ok = verification_ok and bool(rm.trust_strip_mvp1_found)
+            verification_ok = verification_ok and bool(rm.feedback_panel_found)
         if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 
