@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "google-docs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@a-bonus/google-docs-mcp"
+      ],
+      "envFile": "${workspaceFolder}/.env.mcp"
+    }
+  }
+}
+
