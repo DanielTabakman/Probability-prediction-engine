@@ -2,6 +2,6 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
   "selectionRecord": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
-  "status": "RUNNING",
-  "notes": "SELECTION 2026-05-27: MVP1 feedback + beta instrumentation (\u00a715B slice 6) after disagreement strip polish closeout."
+  "status": "READY",
+  "notes": "Product-Slice002 promoted to main @ 0a7db79 after REPO_STATE_DRIFT BLOCKED; resume from Smoke-Slice003 via run_ppe.cmd."
 }
