@@ -107,14 +107,14 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 **Evidence:** [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md)
 
-### MVP1 decision-ready review polish — relay queue — **IN PROGRESS** (2026-05-27)
+### MVP1 decision-ready review polish — relay queue — **COMPLETE** (2026-05-27)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-DecisionReview-Control-Slice001` — charter | EVIDENCE-PLANE |
 | **CLOSED** | `MVP1-DecisionReview-Product-Slice002` — review polish | PRODUCT |
 | **CLOSED** | `MVP1-DecisionReview-Smoke-Slice003` — dual smoke witness | EVIDENCE-PLANE |
-| **OPEN** | `MVP1-DecisionReview-Closeout-Slice004` — chapter close | EVIDENCE-PLANE |
+| **CLOSED** | `MVP1-DecisionReview-Closeout-Slice004` — chapter close | EVIDENCE-PLANE |
 
 **Evidence:** [`MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md`](MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md)
 

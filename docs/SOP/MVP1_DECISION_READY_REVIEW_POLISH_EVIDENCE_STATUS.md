@@ -15,7 +15,7 @@
 | MVP1-DecisionReview-Control-Slice001 | **CLOSED** 2026-05-27 | charter witness on steward branch; relay `8efa01e` (promotion pending) |
 | MVP1-DecisionReview-Product-Slice002 | **CLOSED** 2026-05-27 | product **`61c2571`** — hypothesis copy + MVP1 linkage polish |
 | MVP1-DecisionReview-Smoke-Slice003 | **CLOSED** 2026-05-27 | dual smoke `20260527_190000` + `20260527_191207` (exit 0, ~925s) |
-| MVP1-DecisionReview-Closeout-Slice004 | **OPEN** | chapter close |
+| MVP1-DecisionReview-Closeout-Slice004 | **CLOSED** 2026-05-27 | chapter **COMPLETE**; closeout `034a70e` |
 
 ---
 
@@ -30,10 +30,15 @@
 
 ## Product delta
 
-_(record shipped commits and copy changes on Product-Slice002 close)_
+- **`decision_ready_review.py`** — hypothesis-to-inspect structure line; MVP1 linkage to disagreement + candidate hypotheses; strengthened fit caption.
+- **`app_panels.py`** — friends-first decision-review caption polish.
+- **`implied_lab_ui_smoke_harness.py`** — optional `decision_review_mvp1_found` witness on MVP1_compact.
+- **Tests** — `test_decision_ready_review.py` (MVP1 hypothesis framing); `test_mvp1_decision_review_charter_witness.py`.
+
+**Shipped on steward branch:** `61c2571` (product) + closeout `034a70e`.
 
 ---
 
 ## Sprint status
 
-**IN PROGRESS** — relay BUILD active.
+**COMPLETE** 2026-05-27 — all relay slices closed; dual smoke green.
