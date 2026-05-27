@@ -10,6 +10,7 @@ Operational CLIs and automation. Run from repo root: `python scripts/<name>.py`.
 | **Relay** | `relay_runtime_v0.py`, [`relay/canonical_docs.py`](relay/canonical_docs.py) | Codex autonomy runtime; canonical paths in `relay/` |
 | **Orchestration** | `phase_orchestrator_v0.py`, `frontier_preflight.py`, `frontier_start_pass.py` | Phase plans + preflight |
 | **Evidence / logbook** | `log_event.py`, `write_last_run_report.py`, `count_validation_evidence.py`, `seed_validation_evidence_clock.py` | `artifacts/logbook/`, validation clocks |
+| **MSOS mirror** | `sync_msos_repo_truth.py` | Generates `artifacts/msos_repo_truth_snapshot.md` + sync report for updating Google Docs mirror |
 | **Deploy (PowerShell)** | `*.ps1` | VPS, GitHub secrets, notifications |
 
 See [`docs/SOP/JOB_REGISTRY_V1.md`](../docs/SOP/JOB_REGISTRY_V1.md) for relay job names.
