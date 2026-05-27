@@ -1,7 +1,7 @@
 # MVP1 disagreement / candidate strip polish — evidence status
 
 **Chapter:** MVP1 disagreement / candidate strip polish (v0)  
-**Status:** **COMPLETE** 2026-05-27  
+**Status:** **COMPLETE** 2026-05-26  
 **SELECTION:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json`](PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json)

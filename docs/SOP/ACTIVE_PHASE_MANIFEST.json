@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "",
-  "selectionRecord": "docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "Await steward SELECTION: set phasePlanPath, sprintSpecPath, and status READY before run_ppe.cmd"
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
+  "status": "RUNNING",
+  "notes": "SELECTION 2026-05-27: MVP1 feedback + beta instrumentation (\u00a715B slice 6) after disagreement strip polish closeout."
 }
