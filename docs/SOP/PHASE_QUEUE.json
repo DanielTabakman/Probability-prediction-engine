@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Explicit steward queue for SELECTION automation. Order matters; first READY item is selected when manifest is COMPLETE with no active plan.",
+  "notes": "Explicit steward queue for SELECTION automation. Order matters; first READY item is selected when manifest is COMPLETE with no active plan. post_relay_continue marks the closed chapter DONE and clears phasePlanPath.",
   "items": [
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
@@ -10,8 +10,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
+      "status": "DONE",
+      "reason": "MVP1 §15B slice 6 — feedback + beta instrumentation.",
+      "doneReason": "chapter COMPLETE 2026-05-27; post_relay_closeout"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
       "status": "READY",
-      "reason": "MVP1 §15B slice 6 — feedback + beta instrumentation after disagreement strip polish."
+      "reason": "MVP1 Sprint 003 evidence-plane — post-feedback SELECTION 2026-05-27.",
+      "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md"
     }
   ]
 }
