@@ -57,19 +57,25 @@ flowchart LR
 
 ---
 
-## Active BUILD chapter — disagreement / candidate strip polish
+## Active BUILD chapter — product shell clarity
 
 | Field | Value |
 |-------|--------|
-| **Chapter** | MVP1 disagreement / candidate strip polish (v0) |
-| **Status** | **IN PROGRESS** (Control-Slice001 **CLOSED** 2026-05-26) |
-| **Sprint** | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md) |
-| **Evidence** | [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
-| **Next slice** | `MVP1-DisagreementStrip-Product-Slice002` (PRODUCT) |
+| **Chapter** | MVP1 product shell clarity (v0) |
+| **Status** | **IN PROGRESS** (Control-Slice001 **CLOSED** 2026-05-27) |
+| **Sprint** | [`SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md`](SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md) |
+| **Evidence** | [`MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md`](MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md) |
+| **Next slice** | `MVP1-ProductShell-Product-Slice002` (PRODUCT) |
 
-**Chapter-close SELECTION trail (historical):** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
+**SELECTION:** [`POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md`](POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md)
 
-| MVP1 disagreement / candidate strip polish | **COMPLETE** 2026-05-26 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md), [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
+---
+
+## Archived — decision-ready review polish
+
+| MVP1 decision-ready review polish | **COMPLETE** 2026-05-27 | [`SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md`](SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md), [`MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md`](MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md) |
+
+| MVP1 disagreement / candidate strip polish | **COMPLETE** 2026-05-27 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md), [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 
@@ -141,7 +147,7 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **IN PROGRESS** | Disagreement strip polish — next Product-Slice002; operator **`run_ppe.cmd`** when manifest `READY` |
+| **Active relay chapter** | **IN PROGRESS** | Product shell clarity — next Product-Slice002; operator **`run_ppe.cmd`** when manifest `READY` |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) only after browser confirms CTA |
 | Paid-interest live call | **N** (honest) | Log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 

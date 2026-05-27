@@ -24,7 +24,7 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| `python -m pytest -q` | **PASS** | **213** collected (decision-review closeout re-verify 2026-05-27) |
+| `python -m pytest -q` | **PASS** | **217** collected (product-shell charter re-verify 2026-05-27) |
 | `python scripts/run_pushable_gate.py` | **PASS** | tier **1** (control-plane) |
 | Primary UI smoke | **PASS** | `20260527_175706` |
 
