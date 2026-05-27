@@ -30,37 +30,112 @@ This SOP defines:
 
 ## Refresh protocol (GOOGLE_DOCS_REFRESH)
 
-When the steward says **“refresh Google Docs”**, Cursor should do **maintenance + synchronization**, not a product BUILD.
+GOOGLE_DOCS_REFRESH keeps the Google Docs control plane aligned with **repo truth**, **deployment truth** (when applicable), and **current Cursor execution state**.
 
-### Required actions
+This is a control-plane maintenance action. Treat it like “re-generate and publish the latest truth,” not “start a build.”
 
-1. **Repo state**
-   - Branch
-   - HEAD
-   - Working tree status (clean/dirty)
-2. **Generate a mirror snapshot** from repo truth (local artifact)
+### Purpose
+
+GOOGLE_DOCS_REFRESH keeps the Google Docs control plane aligned with repo truth, deployment truth, and current Cursor execution state.
+
+### Triggers
+
+- **Manual**: founder says “refresh Google Docs”.
+- **Daily scheduled refresh** (GitHub Actions).
+- **After closeout** (best-effort mirror refresh chained from closeout).
+- **After deployment changes** (domain / hosting / pipeline changes; redeploys; env changes).
+- **After naming / control-plane changes** (doc ids, marker names, SOP names, control-plane file paths).
+- **After queue / selection changes** (new SELECTION outcome; phase manifest updates; continuity brief updates).
+
+### Inputs (evidence sources)
+
+- **Active PPE Master / Copy** (Google Doc; steward-owned canon).
+- **PPE / MSOS Repo Truth — Live Mirror** (Google Doc; automation-owned mirror).
+- **Repo docs** (especially `docs/SOP/*` and `docs/VISION/*`).
+- **Current repo state**: branch / HEAD / working tree, plus relevant diffs since last refresh.
+- **Validation evidence**: test/smoke/deploy artifacts and/or linked run reports when applicable.
+
+### Required outputs
+
+At the end of refresh, the following must be captured (in the mirror and in the refresh report):
+
+- **Regenerated Live Mirror** (marker block updated from repo truth).
+- **Current timestamp** (UTC) on the mirror.
+- **Branch / HEAD / working tree** status.
+- **Selected or active chapter** (best-effort from continuity + manifest).
+- **Latest delta** since previous refresh (best-effort; at minimum “repo changed / did not change”).
+- **Fresh vs historical validation evidence** (explicitly label what was run now vs older evidence).
+- **Website / deployment witness** (when applicable; include what you observed and when).
+- **Known blockers / drift** (including naming/control-plane drift).
+- **Recommended next move** (e.g., “run SELECTION,” “run gate,” “steward decision needed,” “deploy witness pending”).
+- **Whether Master needs update** (yes/no/unknown; never silently write Master).
+
+### Success criteria (must all hold)
+
+- **Google Doc visibly updates** (mirror marker block changes are observable).
+- **Regenerated timestamp is current** (UTC now, not stale).
+- **HEAD matches current repo state** (mirror HEAD == local `git rev-parse HEAD`).
+- **Stale naming check completed** (doc ids / markers / file paths referenced here are still correct).
+- **Refresh report emitted** (see Report format below).
+- **No product behavior changed** unless explicitly authorized (refresh is sync/maintenance only).
+
+### Failure criteria (any of these is a failure)
+
+- **Live Mirror not updated** (marker block unchanged when it should be updated).
+- **Timestamp stale**.
+- **HEAD missing or mismatched**.
+- **Sync script errors** (`sync_msos_repo_truth.py` or `google_docs_sync.py` failures).
+- **Google Docs write failure** (MCP/API write fails or marker block not found).
+- **Unclear active chapter / selection state** (cannot infer and did not report uncertainty).
+
+### Escalation (hard rule)
+
+If repo truth and PPE Master canon disagree, **do not silently resolve**.
+
+- Report the mismatch.
+- Ask founder / ChatGPT steward to decide: update Master, update repo, or defer with an explicit reason.
+
+### Boundaries (hard rule)
+
+Refresh is **maintenance/synchronization**, not a product build.
+
+- Do **not** change UI, trading logic, roadmap, pricing, or product behavior unless explicitly selected as a BUILD chapter.
+- Allowed changes during refresh: reporting accuracy, mirror generation, naming drift fixes within control-plane docs/scripts, and clarifying SOP text.
+
+### Canonical procedure (local Cursor run)
+
+1. **Capture repo state** (for the report)
+   - Branch / HEAD / working tree status.
+2. **Regenerate the Live Mirror snapshot artifacts** (repo truth → local artifacts)
    - Run `python scripts/sync_msos_repo_truth.py`
-   - This produces:
+   - Outputs:
      - `artifacts/msos_repo_truth_snapshot.md`
      - `artifacts/control_plane/msos_sync_report.json`
-3. **Write the mirror (Google Doc)**
-   - Replace only the marker block in **PPE / MSOS Repo Truth — Live Mirror** with the generated snapshot.
-   - Use google-docs MCP write tools (`replaceRangeWithMarkdown` or equivalent).
+3. **Update the Live Mirror Google Doc marker block**
+   - Preferred: run `python scripts/google_docs_sync.py --sync-repo-to-mirror --write-report`
+     - This uses Google APIs directly (CI-friendly) and replaces the marker block range.
+   - Alternative: use google-docs MCP to replace only the marker block
+     - Never write outside `MSOS_REPO_TRUTH_AUTO_START` / `MSOS_REPO_TRUTH_AUTO_END`.
 4. **Do not write PPE Master**
-   - If mismatch/drift is found, **report it** and request a steward decision (update Master vs update repo vs defer).
-5. **Produce a REFRESH REPORT**
-   - Branch / HEAD:
-   - Working tree:
-   - Freshness verdict:
-   - Snapshot generated: path + timestamp:
-   - Mirror updated (Google Doc): yes/no:
-   - Drift found:
-   - Recommended next move:
-   - Confidence:
+   - If drift is found, report it and escalate to steward decision.
+5. **Confirm the Drive doc shows the new regenerated timestamp**
+   - Verify the mirror doc text contains the current “Generated (UTC)” timestamp from the latest run.
 
-### Boundary rule
+### Report format (required)
 
-Refresh is control-plane maintenance only. It may fix small inconsistencies in reporting, naming, or mirror generation. It must not introduce new product behavior, UI changes, trading logic, or commercial claims unless separately selected as a BUILD slice.
+Return a **GOOGLE_DOCS_REFRESH REPORT**:
+
+- **Branch / HEAD**
+- **Working tree**
+- **Freshness verdict**
+- **What changed since last refresh**
+- **Validation run** (fresh vs historical)
+- **Website / deployment witness** (if applicable)
+- **Live Mirror regenerated**: yes/no + timestamp
+- **Naming/control-plane drift found**
+- **Master update needed**: yes/no/unknown
+- **Recommended next move**
+- **Confidence**
 
 ## Automation path (closeout)
 
