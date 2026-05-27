@@ -1,7 +1,7 @@
 # MVP1 decision-ready review polish — evidence status
 
 **Chapter:** MVP1 decision-ready review polish (v0)  
-**Status:** **IN PROGRESS**  
+**Status:** **COMPLETE** 2026-05-27  
 **SELECTION:** [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md`](SPRINT_MVP1_DECISION_READY_REVIEW_POLISH.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json`](PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json)
