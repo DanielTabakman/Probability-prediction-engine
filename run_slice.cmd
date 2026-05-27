@@ -46,6 +46,9 @@ set "ORCH_ROOT=%USERPROFILE%\Desktop\ppe-orchestrator-acp"
 if not exist "%ORCH_ROOT%\package.json" (
   set "ORCH_ROOT=%REPO_ROOT%\..\ppe-orchestrator-acp"
 )
+if not exist "%ORCH_ROOT%\package.json" (
+  set "ORCH_ROOT=%REPO_ROOT%\..\..\..\ppe-orchestrator-acp"
+)
 
 REM Prefer portable Node 20 used elsewhere if present.
 set "NODE20=%USERPROFILE%\Desktop\ppe-orchestrator-sdk\node\node-v20.18.2-win-x64"
