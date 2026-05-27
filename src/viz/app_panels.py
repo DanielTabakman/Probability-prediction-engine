@@ -19,6 +19,7 @@ from src.viz.belief_uncertainty import (
 )
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
+from src.viz.mvp1_feedback_ui import render_mvp1_feedback_panel
 
 
 def compute_mvp1_belief_overlay_state(
@@ -328,6 +329,7 @@ def render_mvp1_friends_first_above_fold(verification: dict) -> None:
                 st.caption(vs.get("classification_dimensions", ""))
             else:
                 st.caption("Verification payload not available for this run.")
+        render_mvp1_feedback_panel(verification=verification)
 
 
 def render_width_vol_candidate_strip_payload(payload: dict) -> None:
