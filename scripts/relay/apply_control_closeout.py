@@ -248,6 +248,18 @@ def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
         return
     text = path.read_text(encoding="utf-8-sig")
     status_line = f"**{spec.chapter_title}:** **{spec.chapter_status}** {spec.closed_date}."
+    changed = False
+    # Canonical evidence docs use a top-level **Status:** line (not ## Chapter status).
+    new_text, n = re.subn(
+        r"(^\*\*Status:\*\*\s+)\*\*[^*\n]+\*\*(?:\s+\d{4}-\d{2}-\d{2})?",
+        rf"\1**{spec.chapter_status}** {spec.closed_date}",
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if n:
+        text = new_text
+        changed = True
     if "## Chapter status" in text:
         text = re.sub(
             r"## Chapter status\s*\n\n.*?(?=\n## |\Z)",
@@ -256,6 +268,8 @@ def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
             count=1,
             flags=re.DOTALL,
         )
+        changed = True
+    if changed:
         path.write_text(text, encoding="utf-8")
 
 

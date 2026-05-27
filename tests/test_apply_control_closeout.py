@@ -111,6 +111,35 @@ def test_relay_closeout_job_refusal_without_closeout_block(tmp_path: Path) -> No
     assert code == relay.EXIT_REFUSAL
 
 
+def test_patch_evidence_status_header(tmp_path: Path) -> None:
+    """Evidence docs use **Status:** at top, not ## Chapter status."""
+    sop = tmp_path / "docs" / "SOP"
+    sop.mkdir(parents=True)
+    evidence = sop / "TEST_EVIDENCE.md"
+    evidence.write_text(
+        "# Test chapter — evidence status\n\n"
+        "**Chapter:** Test chapter (v0)  \n"
+        "**Status:** **ACTIVE**  \n"
+        "**SELECTION:** [`SEL.md`](SEL.md)\n",
+        encoding="utf-8",
+    )
+    spec = CloseoutSpec(
+        chapter_id="test",
+        chapter_title="Test chapter",
+        chapter_status="COMPLETE",
+        closed_date="2026-05-27",
+        evidence_doc="docs/SOP/TEST_EVIDENCE.md",
+        sprint_spec="docs/SOP/SPRINT_TEST.md",
+        next_selection_doc="docs/SOP/POST_TEST_SELECTION.md",
+    )
+    from scripts.relay.apply_control_closeout import patch_evidence_chapter_status
+
+    patch_evidence_chapter_status(tmp_path, spec)
+    text = evidence.read_text(encoding="utf-8")
+    assert "**Status:** **COMPLETE** 2026-05-27" in text
+    assert "ACTIVE" not in text
+
+
 def test_find_closeout_in_plan(tmp_path: Path) -> None:
     from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
 
