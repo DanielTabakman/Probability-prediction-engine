@@ -21,5 +21,6 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| `python -m pytest -q` | **PENDING** | |
-| `python scripts/run_pushable_gate.py` | **PENDING** | |
+| `python -m ruff check scripts tests` | **PASS** | **209** tests baseline; Witness-Slice003 @ `3d4b311`+ |
+| `python -m pytest -q` | **PASS** | **209** passed — Witness-Slice003 witness |
+| `python scripts/run_pushable_gate.py` | **PENDING** | tier 1/2 witness deferred to Closeout-Slice004 |
