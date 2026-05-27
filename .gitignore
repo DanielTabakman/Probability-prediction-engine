@@ -5,6 +5,7 @@ env/
 
 # Environment and secrets
 .env
+.env.mcp
 *.env.local
 ops/restic/env.local
 
