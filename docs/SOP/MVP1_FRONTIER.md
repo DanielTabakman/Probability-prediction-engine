@@ -9,7 +9,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_FEEDBACK_BETA_SELECTION.md`](docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION.md))
+- **Active BUILD chapter:** **MVP1 decision-ready review polish** — **IN PROGRESS** ([`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md))
 - **Last closed chapter:** **MVP1 Sprint 003 evidence-plane** — **COMPLETE** 2026-05-27
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
@@ -96,16 +96,27 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 **Evidence:** [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) · **SELECTION (charter):** [`POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md`](POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md) · **Next SELECTION prep:** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
 
-### MVP1 disagreement / candidate strip polish — relay queue — **IN PROGRESS** (2026-05-26)
+### MVP1 disagreement / candidate strip polish — relay queue — **COMPLETE** (2026-05-27)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-DisagreementStrip-Control-Slice001` — charter | CONTROL |
-| **OPEN** | `MVP1-DisagreementStrip-Product-Slice002` — strip polish | PRODUCT |
-| **OPEN** | `MVP1-DisagreementStrip-Smoke-Slice003` — dual smoke witness | CONTROL |
-| **OPEN** | `MVP1-DisagreementStrip-Closeout-Slice004` — chapter close | CONTROL |
+| **CLOSED** | `MVP1-DisagreementStrip-Product-Slice002` — strip polish | PRODUCT |
+| **CLOSED** | `MVP1-DisagreementStrip-Smoke-Slice003` — dual smoke witness | CONTROL |
+| **CLOSED** | `MVP1-DisagreementStrip-Closeout-Slice004` — chapter close | CONTROL |
 
 **Evidence:** [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md)
+
+### MVP1 decision-ready review polish — relay queue — **IN PROGRESS** (2026-05-27)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MVP1-DecisionReview-Control-Slice001` — charter | EVIDENCE-PLANE |
+| **CLOSED** | `MVP1-DecisionReview-Product-Slice002` — review polish | PRODUCT |
+| **OPEN** | `MVP1-DecisionReview-Smoke-Slice003` — dual smoke witness | EVIDENCE-PLANE |
+| **OPEN** | `MVP1-DecisionReview-Closeout-Slice004` — chapter close | EVIDENCE-PLANE |
+
+**Evidence:** [`MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md`](MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 
