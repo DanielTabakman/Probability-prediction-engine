@@ -294,6 +294,14 @@ def main() -> int:
 
     (out_dir / "LAST_RUN_REPORT.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     (out_dir / "LAST_RUN_REPORT.md").write_text(_render_md(report), encoding="utf-8")
+
+    # Best-effort progress note (never fail the wrapper on note generation).
+    try:
+        from scripts.write_dev_note_v1 import main as write_dev_note_main
+
+        write_dev_note_main(["--repo-root", str(repo_root)])
+    except Exception:
+        pass
     return 0
 
 
