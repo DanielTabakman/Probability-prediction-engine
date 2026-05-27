@@ -8,3 +8,6 @@ requests>=2.31.0
 streamlit>=1.33.0
 plotly>=5.18.0
 playwright
+google-api-python-client>=2.120.0
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0

@@ -71,3 +71,30 @@ After relay **CONTINUE** with a phase-plan `closeout`, repo closeout runs:
 
 See `docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md` for the closeout chain and expected artifacts.
 
+## Automatic sync (GitHub Actions)
+
+If you want this to run automatically (not just in Cursor), use the workflow:
+
+- `.github/workflows/google-docs-sync.yml`
+
+### Required GitHub secrets
+
+- `PPE_MASTER_DOC_ID`
+- `PPE_MSOS_MIRROR_DOC_ID`
+- `GOOGLE_OAUTH_CLIENT_ID`
+- `GOOGLE_OAUTH_CLIENT_SECRET`
+- `GOOGLE_OAUTH_REFRESH_TOKEN`
+
+### What it does
+
+1. Generates a fresh local mirror snapshot:
+   - `python scripts/sync_msos_repo_truth.py`
+2. Syncs PPE Master → repo and repo → mirror:
+   - `python scripts/google_docs_sync.py --sync-master-to-repo --sync-repo-to-mirror`
+3. Commits any resulting repo changes.
+
+### Safety / role split
+
+- PPE Master remains **written by the steward**; automation only **reads** it.
+- The MSOS mirror is updated from repo truth, using marker boundaries.
+
