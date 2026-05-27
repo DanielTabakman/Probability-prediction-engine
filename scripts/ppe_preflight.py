@@ -17,11 +17,22 @@ from scripts.ppe_manifest import (
 
 
 def _orchestrator_root(repo_root: Path) -> Path | None:
+    # Windows note: some setups have Desktop on a different drive than USERPROFILE
+    # (e.g., repo at D:\Users\User\Desktop\...). Prefer detecting Desktop from repo_root
+    # parents when possible, so worktrees under the repo still resolve correctly.
+    repo_desktop = next(
+        (p for p in repo_root.resolve().parents if p.name.lower() == "desktop"),
+        None,
+    )
+
     candidates = [
+        (repo_desktop / "ppe-orchestrator-acp") if repo_desktop else None,
         Path.home() / "Desktop" / "ppe-orchestrator-acp",
         repo_root.parent / "ppe-orchestrator-acp",
     ]
     for c in candidates:
+        if c is None:
+            continue
         if (c / "package.json").is_file():
             return c
     return None

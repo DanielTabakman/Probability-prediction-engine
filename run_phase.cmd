@@ -20,6 +20,9 @@ set "ORCH_ROOT=%USERPROFILE%\Desktop\ppe-orchestrator-acp"
 if not exist "%ORCH_ROOT%\package.json" (
   set "ORCH_ROOT=%REPO_ROOT%\..\ppe-orchestrator-acp"
 )
+if not exist "%ORCH_ROOT%\package.json" (
+  set "ORCH_ROOT=%REPO_ROOT%\..\..\..\ppe-orchestrator-acp"
+)
 
 python "%REPO_ROOT%\scripts\log_event.py" --event-type "run_phase.start" --summary "Start phase plan %PLAN_PATH% (steward)" --actor "wrapper" --ref "kind=cmd,path=run_phase.cmd" --ref "kind=doc,path=%PLAN_PATH%" >nul 2>nul
 
