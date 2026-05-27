@@ -29,6 +29,7 @@ import argparse
 import json
 import os
 import re
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -39,7 +40,12 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from scripts.msos.repo_truth_snapshot import build_repo_truth_snapshot
+# Ensure `import scripts.*` works when invoked as `python scripts/google_docs_sync.py`.
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from scripts.msos.repo_truth_snapshot import build_repo_truth_snapshot  # noqa: E402
 
 
 def _utc_now_iso() -> str:
@@ -51,6 +57,51 @@ def _required_env(name: str) -> str:
     if not v:
         raise SystemExit(f"ERROR: missing required env var {name}")
     return v
+
+
+def _load_env_file_if_present(env_path: Path) -> None:
+    """
+    Best-effort local convenience for Cursor runs.
+
+    - Loads KEY=VALUE lines from an env file (e.g. repo-root `.env.mcp`) into `os.environ`
+      *only if* the key is not already set.
+    - Ignores blank lines and `#` comments.
+    - Does not print values.
+    """
+    try:
+        text = env_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return
+
+    for raw in text.splitlines():
+        s = raw.strip()
+        if not s or s.startswith("#") or "=" not in s:
+            continue
+        k, v = s.split("=", 1)
+        k = k.strip()
+        v = v.strip()
+        if not k or k in os.environ:
+            continue
+        if len(v) >= 2 and v[0] == v[-1] == '"':
+            v = v[1:-1]
+        os.environ[k] = v
+
+
+def _mcp_refresh_token() -> str | None:
+    """
+    Best-effort: reuse the local google-docs-mcp token store if present.
+
+    Path matches `docs/SOP/MCP_GOOGLE_DOCS_SETUP.md` and `scripts/set_google_docs_secrets_once.ps1`.
+    """
+    token_path = Path.home() / ".config" / "google-docs-mcp" / "token.json"
+    try:
+        obj = json.loads(token_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except Exception:
+        return None
+    v = str(obj.get("refresh_token") or "").strip()
+    return v or None
 
 
 # Must match @a-bonus/google-docs-mcp auth scopes (token was granted with these).
@@ -227,6 +278,31 @@ def main(argv: list[str] | None = None) -> int:
 
     repo = args.repo_root.resolve()
     os.environ.setdefault("PYTHONPATH", str(repo))
+    _load_env_file_if_present(repo / ".env.mcp")
+
+    # Back-compat: some local env files use older mirror key names.
+    if not (os.environ.get("PPE_MSOS_MIRROR_DOC_ID") or "").strip():
+        legacy = (os.environ.get("MSOS_REPO_TRUTH_DOC_ID") or "").strip()
+        if legacy:
+            os.environ["PPE_MSOS_MIRROR_DOC_ID"] = legacy
+
+    # Back-compat: OAuth env names (match scripts/set_google_docs_secrets_once.ps1 behavior).
+    if not (os.environ.get("GOOGLE_OAUTH_CLIENT_ID") or "").strip():
+        v = (os.environ.get("GOOGLE_CLIENT_ID") or "").strip()
+        if v:
+            os.environ["GOOGLE_OAUTH_CLIENT_ID"] = v
+    if not (os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET") or "").strip():
+        v = (os.environ.get("GOOGLE_CLIENT_SECRET") or "").strip()
+        if v:
+            os.environ["GOOGLE_OAUTH_CLIENT_SECRET"] = v
+    if not (os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN") or "").strip():
+        v = (os.environ.get("GOOGLE_REFRESH_TOKEN") or "").strip()
+        if v:
+            os.environ["GOOGLE_OAUTH_REFRESH_TOKEN"] = v
+    if not (os.environ.get("GOOGLE_OAUTH_REFRESH_TOKEN") or "").strip():
+        v = _mcp_refresh_token()
+        if v:
+            os.environ["GOOGLE_OAUTH_REFRESH_TOKEN"] = v
 
     master_id = os.environ.get("PPE_MASTER_DOC_ID") or ""
     mirror_id = os.environ.get("PPE_MSOS_MIRROR_DOC_ID") or ""
