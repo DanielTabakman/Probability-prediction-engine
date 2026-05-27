@@ -11,14 +11,21 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
       "status": "DONE",
-      "reason": "MVP1 §15B slice 6 — feedback + beta instrumentation.",
+      "reason": "MVP1 \u00a715B slice 6 \u2014 feedback + beta instrumentation.",
       "doneReason": "chapter COMPLETE 2026-05-27; post_relay_closeout"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
-      "status": "READY",
-      "reason": "MVP1 Sprint 003 evidence-plane — post-feedback SELECTION 2026-05-27.",
-      "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md"
+      "status": "DONE",
+      "reason": "MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27.",
+      "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "",
+      "status": "PENDING",
+      "reason": "Placeholder — steward SELECTION: set planPath + READY when next chapter is chartered.",
+      "selectionPrep": "docs/SOP/POST_MVP1_SPRINT003_SELECTION.md"
     }
   ]
 }

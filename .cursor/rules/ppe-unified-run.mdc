@@ -18,4 +18,4 @@ alwaysApply: true
 
 **Closeout automation:** `post_relay_continue` marks the closed plan **DONE** in the queue and clears `phasePlanPath`; agents must not leave feedback (or any closed chapter) as `READY` in the queue.
 
-Canonical runbook: [`docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).
+Canonical runbook: [`docs/SOP/PPE_UNIFIED_AUTO_RUN_V1.md`](docs/SOP/PPE_UNIFIED_AUTO_RUN_V1.md) · [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).

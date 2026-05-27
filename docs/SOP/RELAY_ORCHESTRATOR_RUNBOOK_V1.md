@@ -11,11 +11,12 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 ### Unified run (recommended — full phase)
 
-1. **SELECTION:** steward charters chapter → phase plan under `docs/SOP/PHASE_PLANS/`.
-2. Set [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json) (`phasePlanPath`, `sprintSpecPath`, `status: READY`) — see [`ACTIVE_PHASE_MANIFEST.md`](ACTIVE_PHASE_MANIFEST.md).
-3. Preflight (optional): `run_ppe.cmd --dry-run`
-4. From repo root: **`run_ppe.cmd`** (runs full phase via `run_phase.cmd` + preflight + manifest `RUNNING`).
-5. **After exit:** read `artifacts/orchestrator/LAST_RUN_REPORT.md` (includes **Cursor context ritual**); open a **new** Cursor thread with `AGENT_CONTINUITY_BRIEF.md` only — do not paste orchestrator logs into chat. See [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
+**Canonical checklist:** [`PPE_UNIFIED_AUTO_RUN_V1.md`](PPE_UNIFIED_AUTO_RUN_V1.md).
+
+1. **SELECTION:** steward charters chapter → phase plan under `docs/SOP/PHASE_PLANS/` → queue item **`READY`** (or manifest `READY`).
+2. Preflight (optional): `run_ppe.cmd --dry-run`
+3. From repo root: **`run_ppe.cmd`** (auto-select, phase run, auto-resume, auto-chain, Google Docs on idle).
+4. **After exit:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new** Cursor thread with `AGENT_CONTINUITY_BRIEF.md` only — see [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
 
 Escape hatches: `run_ppe.cmd --plan <path>`, `run_ppe.cmd --slice <sliceId>`, `run_ppe.cmd --status`.
 

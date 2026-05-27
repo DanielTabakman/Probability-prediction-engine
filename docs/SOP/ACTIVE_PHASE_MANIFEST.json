@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md",
   "selectionRecord": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27."
+  "status": "COMPLETE",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27. Chapter closeout MVP1-Sprint003-Closeout-Slice004; queue item marked DONE."
 }
