@@ -60,13 +60,25 @@ pushd "%ORCH_ROOT%" >nul
 REM ACP permissions are handled programmatically by the orchestrator; this avoids relying on Cursor popups.
 REM Modes: allow-once (default) or allow-always (reduces repeated permission prompts).
 set "ACP_PERMISSION_MODE=allow-always"
+
+set "SUS_MIN=15"
+set "HARD_MIN=30"
+set "MAX_ATT=2"
+if not "%PHASE_PLAN%"=="" (
+  for /f "tokens=1-3" %%a in ('python "%REPO_ROOT%\scripts\resolve_slice_orchestrator_args.py" --repo-root "%REPO_ROOT%" --slice-id "%SLICE_ID%" --phase-plan "%PHASE_PLAN%"') do (
+    set "SUS_MIN=%%a"
+    set "HARD_MIN=%%b"
+    set "MAX_ATT=%%c"
+  )
+)
+
 REM Prefer npm if available; otherwise run tsx directly (node_modules is already present).
 where npm >nul 2>nul
 if "%ERRORLEVEL%"=="0" (
-  call npm run dev -- run-slice "%REPO_ROOT%" "%SLICE_ID%" "%SPRINT_SPEC%" "%BASELINE_BRANCH%" "%BUILD_BRANCH%" 15 30 2
+  call npm run dev -- run-slice "%REPO_ROOT%" "%SLICE_ID%" "%SPRINT_SPEC%" "%BASELINE_BRANCH%" "%BUILD_BRANCH%" %SUS_MIN% %HARD_MIN% %MAX_ATT%
 ) else (
   if exist "%ORCH_ROOT%\\node_modules\\.bin\\tsx.cmd" (
-    call "%ORCH_ROOT%\\node_modules\\.bin\\tsx.cmd" src\\cli.ts run-slice "%REPO_ROOT%" "%SLICE_ID%" "%SPRINT_SPEC%" "%BASELINE_BRANCH%" "%BUILD_BRANCH%" 15 30 2
+    call "%ORCH_ROOT%\\node_modules\\.bin\\tsx.cmd" src\\cli.ts run-slice "%REPO_ROOT%" "%SLICE_ID%" "%SPRINT_SPEC%" "%BASELINE_BRANCH%" "%BUILD_BRANCH%" %SUS_MIN% %HARD_MIN% %MAX_ATT%
   ) else (
     echo ERROR: npm not found and tsx.cmd missing under "%ORCH_ROOT%\\node_modules\\.bin"
     exit /b 2

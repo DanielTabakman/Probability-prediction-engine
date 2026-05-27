@@ -673,10 +673,16 @@ def _expand_expander(page, expander_title: str) -> None:
 
 
 def _collect_observations(page, result: ScenarioResult) -> None:
+    def _is_visible(loc) -> bool:
+        try:
+            return loc.count() > 0 and bool(loc.is_visible())
+        except Exception:
+            return False
+
     def _text_present(substr: str) -> bool:
         try:
             loc = page.locator(f"text={substr}").first
-            return loc.count() > 0
+            return _is_visible(loc)
         except Exception:
             return False
 
@@ -711,7 +717,8 @@ def _mvp1_compact_marker_visible(page) -> bool:
         "Trust / provenance",
     ):
         try:
-            if page.locator(f"text={marker}").first.count() > 0:
+            loc = page.locator(f"text={marker}").first
+            if loc.count() > 0 and loc.is_visible():
                 return True
         except Exception:
             continue
@@ -783,7 +790,7 @@ def _collect_verification_observation(page, result: ScenarioResult) -> None:
             )
         for marker in markers:
             loc = page.locator(f"text={marker}").first
-            if loc.count() > 0:
+            if loc.count() > 0 and loc.is_visible():
                 result.verification_found = True
                 return
         result.verification_found = False
@@ -798,12 +805,12 @@ def _collect_trust_strip_mvp1_observation(page, result: ScenarioResult) -> None:
     try:
         for marker in ("MVP1 data quality", "MVP1 primary output", "Trust / provenance"):
             loc = page.locator(f"text={marker}").first
-            if loc.count() > 0 and marker != "Trust / provenance":
+            if loc.count() > 0 and loc.is_visible() and marker != "Trust / provenance":
                 result.trust_strip_mvp1_found = True
                 return
-            if marker == "Trust / provenance" and loc.count() > 0:
+            if marker == "Trust / provenance" and loc.count() > 0 and loc.is_visible():
                 sub = page.locator("text=MVP1 data quality").first
-                if sub.count() > 0:
+                if sub.count() > 0 and sub.is_visible():
                     result.trust_strip_mvp1_found = True
                     return
         result.trust_strip_mvp1_found = False

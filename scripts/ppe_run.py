@@ -17,7 +17,25 @@ def _repo_root(explicit: Path | None) -> Path:
     return (explicit or Path.cwd()).resolve()
 
 
+def _windows_cmdline(argv: list[str]) -> str:
+    """Build a cmd.exe command line (list2cmdline over-escapes for cmd /c on some paths)."""
+    parts: list[str] = []
+    for arg in argv:
+        if arg == "":
+            parts.append('""')
+        elif any(c in arg for c in " \t"):
+            parts.append(f'"{arg}"')
+        else:
+            parts.append(arg)
+    return " ".join(parts)
+
+
 def _run_cmd(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> int:
+    # Windows: avoid cmd /c argv splitting on repo paths with spaces (use shell=True).
+    if sys.platform == "win32" and len(cmd) >= 3 and cmd[0].lower() == "cmd" and cmd[1].lower() == "/c":
+        line = _windows_cmdline(cmd[2:])
+        print(f"ppe_run: {line}")
+        return subprocess.run(line, shell=True, cwd=cwd, env=env).returncode
     print(f"ppe_run: {' '.join(cmd)}")
     return subprocess.run(cmd, cwd=cwd, env=env).returncode
 
