@@ -55,7 +55,7 @@
         "evidenceDoc": "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md",
         "sprintSpec": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md",
         "selectionOutcomeDoc": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md",
-        "nextSelectionDoc": "docs/SOP/POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION.md",
         "carryDocs": [
           "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md"
         ]

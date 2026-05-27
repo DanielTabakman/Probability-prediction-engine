@@ -1,0 +1,65 @@
+{
+  "name": "MVP1_feedback_beta_instrumentation (post-disagreement SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-FeedbackBeta-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+      "buildBranch": "build/auto/MVP1-FeedbackBeta-Control-Slice001-feedback_beta",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-FeedbackBeta-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+      "buildBranch": "build/auto/MVP1-FeedbackBeta-Product-Slice002-feedback_beta",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app.py",
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-FeedbackBeta-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+      "buildBranch": "build/auto/MVP1-FeedbackBeta-Smoke-Slice003-feedback_beta",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-FeedbackBeta-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+      "buildBranch": "build/auto/MVP1-FeedbackBeta-Closeout-Slice004-feedback_beta",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_feedback_beta_instrumentation",
+        "chapterTitle": "MVP1 feedback + beta instrumentation",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-27",
+        "evidenceDoc": "docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

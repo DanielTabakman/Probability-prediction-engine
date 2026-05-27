@@ -4,9 +4,14 @@
   "items": [
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
+      "status": "DONE",
+      "reason": "Chapter COMPLETE 2026-05-27; closeout applied.",
+      "doneReason": "marked DONE by steward SELECTION 2026-05-27"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
       "status": "READY",
-      "reason": "MVP1 frontier: disagreement/candidate strip polish is IN PROGRESS; advance when steward wants automation to continue."
+      "reason": "MVP1 §15B slice 6 — feedback + beta instrumentation after disagreement strip polish."
     }
   ]
 }
-
