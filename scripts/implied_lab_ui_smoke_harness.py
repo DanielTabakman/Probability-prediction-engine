@@ -220,6 +220,7 @@ class ScenarioResult:
     verification_found: bool = False
     trust_strip_mvp1_found: bool = False
     feedback_panel_found: bool = False
+    decision_review_mvp1_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
@@ -674,10 +675,16 @@ def _expand_expander(page, expander_title: str) -> None:
 
 
 def _collect_observations(page, result: ScenarioResult) -> None:
+    def _is_visible(loc) -> bool:
+        try:
+            return loc.count() > 0 and bool(loc.is_visible())
+        except Exception:
+            return False
+
     def _text_present(substr: str) -> bool:
         try:
             loc = page.locator(f"text={substr}").first
-            return loc.count() > 0
+            return _is_visible(loc)
         except Exception:
             return False
 
@@ -712,7 +719,8 @@ def _mvp1_compact_marker_visible(page) -> bool:
         "MVP1 primary output",
     ):
         try:
-            if page.locator(f"text={marker}").first.count() > 0:
+            loc = page.locator(f"text={marker}").first
+            if loc.count() > 0 and loc.is_visible():
                 return True
         except Exception:
             continue
@@ -795,7 +803,7 @@ def _collect_verification_observation(page, result: ScenarioResult) -> None:
             )
         for marker in markers:
             loc = page.locator(f"text={marker}").first
-            if loc.count() > 0:
+            if loc.count() > 0 and loc.is_visible():
                 result.verification_found = True
                 return
         result.verification_found = False
@@ -810,12 +818,12 @@ def _collect_trust_strip_mvp1_observation(page, result: ScenarioResult) -> None:
     try:
         for marker in ("MVP1 data quality", "MVP1 primary output", "Trust / provenance"):
             loc = page.locator(f"text={marker}").first
-            if loc.count() > 0 and marker != "Trust / provenance":
+            if loc.count() > 0 and loc.is_visible() and marker != "Trust / provenance":
                 result.trust_strip_mvp1_found = True
                 return
-            if marker == "Trust / provenance" and loc.count() > 0:
+            if marker == "Trust / provenance" and loc.count() > 0 and loc.is_visible():
                 sub = page.locator("text=MVP1 data quality").first
-                if sub.count() > 0:
+                if sub.count() > 0 and sub.is_visible():
                     result.trust_strip_mvp1_found = True
                     return
         result.trust_strip_mvp1_found = False
@@ -839,6 +847,23 @@ def _collect_feedback_panel_observation(page, result: ScenarioResult) -> None:
         result.feedback_panel_found = False
     except Exception:
         result.feedback_panel_found = False
+
+
+def _collect_decision_review_mvp1_observation(page, result: ScenarioResult) -> None:
+    """MVP1 compact: decision-ready review polish markers (when strategy overlay applies)."""
+    if result.scenario != "MVP1_compact_verification":
+        return
+    try:
+        _expand_expander(page, "Review & disagreement digest")
+        page.wait_for_timeout(1000)
+        for marker in ("Decision-ready review", "hypothesis to inspect"):
+            loc = page.locator(f"text={marker}").first
+            if loc.count() > 0 and loc.is_visible():
+                result.decision_review_mvp1_found = True
+                return
+        result.decision_review_mvp1_found = False
+    except Exception:
+        result.decision_review_mvp1_found = False
 
 
 def _collect_directional_category_verification(page, result: ScenarioResult) -> None:
@@ -1145,6 +1170,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     except Exception:
         pass
     try:
+        _collect_decision_review_mvp1_observation(page, r)
+    except Exception:
+        pass
+    try:
         _collect_directional_category_verification(page, r)
     except Exception:
         pass
@@ -1270,7 +1299,8 @@ def main() -> int:
                     f"elapsed_s={elapsed_s:.1f} "
                     f"page_loaded={result.page_loaded} verification={result.verification_found} "
                     f"trust_strip_mvp1={result.trust_strip_mvp1_found} "
-                    f"feedback_panel={result.feedback_panel_found}"
+                    f"feedback_panel={result.feedback_panel_found} "
+                    f"decision_review_mvp1={result.decision_review_mvp1_found}"
                 )
 
             browser.close()
@@ -1352,6 +1382,7 @@ def main() -> int:
                     "verification_found": r.verification_found,
                     "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
                     "feedback_panel_found": r.feedback_panel_found,
+                    "decision_review_mvp1_found": r.decision_review_mvp1_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,

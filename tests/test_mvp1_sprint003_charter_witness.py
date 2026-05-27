@@ -1,11 +1,11 @@
-"""Charter witness for MVP1-Sprint003-Control-Slice001 (EVIDENCE-PLANE)."""
+"""Charter witness for MVP1-Sprint003 (EVIDENCE-PLANE chapter)."""
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from scripts.ppe_manifest import load_manifest, resolve_summary, validate_phase_plan
+from scripts.ppe_manifest import validate_phase_plan
 
 REPO = Path(__file__).resolve().parents[1]
 SOP = REPO / "docs" / "SOP"
@@ -15,10 +15,18 @@ SPRINT_SPEC = SOP / "SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
 SELECTION_OUTCOME = SOP / "POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md"
 EVIDENCE_STATUS = SOP / "MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md"
 PHASE_QUEUE = SOP / "PHASE_QUEUE.json"
+NEXT_SELECTION = SOP / "POST_MVP1_SPRINT003_SELECTION.md"
 
 
 def test_charter_artifacts_exist() -> None:
-    for path in (SPRINT_SPEC, Path(REPO / PLAN_REL), SELECTION_OUTCOME, EVIDENCE_STATUS, PHASE_QUEUE):
+    for path in (
+        SPRINT_SPEC,
+        Path(REPO / PLAN_REL),
+        SELECTION_OUTCOME,
+        EVIDENCE_STATUS,
+        PHASE_QUEUE,
+        NEXT_SELECTION,
+    ):
         assert path.is_file(), f"missing charter artifact: {path.relative_to(REPO)}"
 
 
@@ -32,26 +40,15 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
     assert plan["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
 
 
-def test_active_manifest_points_at_sprint003_chapter() -> None:
-    manifest = load_manifest(REPO)
-    assert manifest["phasePlanPath"] == PLAN_REL
-    assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
-    assert manifest["status"] == "RUNNING"
-    summary = resolve_summary(REPO)
-    assert summary["errors"] == []
-    assert summary["first_slice_id"] == "MVP1-Sprint003-Control-Slice001"
-
-
-def test_phase_queue_has_sprint003_ready() -> None:
+def test_phase_queue_sprint003_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
-    sprint003 = next(
-        item for item in queue["items"] if item["planPath"] == PLAN_REL
-    )
-    assert sprint003["status"] == "READY"
+    sprint003 = next(item for item in queue["items"] if item["planPath"] == PLAN_REL)
+    assert sprint003["status"] == "DONE"
     assert "selectionPrep" in sprint003
 
 
-def test_evidence_status_stub_records_control_slice_closed() -> None:
+def test_evidence_status_records_chapter_complete() -> None:
     text = EVIDENCE_STATUS.read_text(encoding="utf-8")
     assert "MVP1-Sprint003-Control-Slice001" in text
-    assert "**CLOSED**" in text
+    assert "**COMPLETE**" in text
+    assert "POST_MVP1_SPRINT003_SELECTION" in text
