@@ -5,7 +5,7 @@ alwaysApply: true
 
 # PPE unified run (operator + agents)
 
-**Operator (human):** run **`run_ppe.cmd`** from repo root. Default behavior: **auto-resume** remaining slices after a partial phase stop (e.g. `BLOCKED` / exit 40), then **auto-chain** to the next `READY` queue chapter after closeout. Optional: `run_ppe.cmd --continuous` (up to 5 chapters), `run_ppe.cmd --no-auto-chain`, `run_ppe.cmd --dry-run`, `run_ppe.cmd --status`.
+**Operator (human):** run **`run_ppe.cmd`** from repo root. Default: **auto-resume**, **auto-chain** next `READY` chapter, then **Google Docs MSOS mirror refresh** when the queue runs out (needs `.env.mcp` or OAuth env for mirror push). Optional: `--continuous`, `--no-auto-chain`, `PPE_GOOGLE_DOCS_ON_IDLE=0`, `--dry-run`, `--status`.
 
 **Agents (steward BUILD):**
 

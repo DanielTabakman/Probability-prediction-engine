@@ -10,6 +10,7 @@ from pathlib import Path
 
 from scripts.ppe_auto_chain import chapter_is_complete, resume_incomplete_phase
 from scripts.ppe_auto_select import run_auto_select
+from scripts.ppe_google_docs_refresh import refresh_google_docs_on_queue_idle
 from scripts.ppe_manifest import load_manifest, load_phase_plan, set_manifest_status
 from scripts.ppe_preflight import run_preflight
 from scripts.resolve_active_phase import main as resolve_main
@@ -181,6 +182,14 @@ def cmd_run_phase(repo: Path, plan_path: str, *, auto_resume: bool) -> int:
     return exit_code
 
 
+def _on_queue_idle(repo: Path, *, reason: str) -> None:
+    """Best-effort MSOS Google Doc refresh when no READY queue chapter remains."""
+    try:
+        refresh_google_docs_on_queue_idle(repo, reason=reason)
+    except Exception as e:
+        print(f"ppe_run: WARN google docs idle refresh skipped: {e}")
+
+
 def _try_select_next_chapter(repo: Path) -> tuple[bool, str]:
     """Auto-select after COMPLETE. Returns (selected, plan_path)."""
     sel_rc = run_auto_select(repo, apply=True, select_only=False, mark_done=False, force=False)
@@ -208,6 +217,7 @@ def cmd_auto_chain_loop(
             selected, plan_path = _try_select_next_chapter(repo)
             if not selected:
                 print("ppe_run: auto-chain idle (no READY queue chapter)")
+                _on_queue_idle(repo, reason="auto-chain: no READY queue chapter")
                 return 0
             print(f"ppe_run: auto-chain chapter {chapter}/{max_chapters} -> {plan_path}")
 
@@ -225,6 +235,7 @@ def cmd_auto_chain_loop(
             break
 
     print(f"ppe_run: auto-chain finished ({max_chapters} chapter slot(s))")
+    _on_queue_idle(repo, reason="auto-chain: finished chapter slots")
     return 0
 
 
@@ -236,6 +247,7 @@ def cmd_run_slice(repo: Path, slice_id: str, plan_path: str, *, auto_chain: bool
         return exit_code
     selected, next_plan = _try_select_next_chapter(repo)
     if not selected:
+        _on_queue_idle(repo, reason="slice closeout: no next READY chapter")
         return exit_code
     print(f"ppe_run: slice closeout complete; auto-chain -> {next_plan}")
     return cmd_run_phase(repo, next_plan, auto_resume=auto_resume)
@@ -340,6 +352,7 @@ def main(argv: list[str] | None = None) -> int:
 
     selected, next_plan = _try_select_next_chapter(repo)
     if not selected:
+        _on_queue_idle(repo, reason="chapter complete: no next READY chapter")
         return exit_code
     print(f"ppe_run: chapter complete; auto-chain -> {next_plan}")
     return cmd_run_phase(repo, next_plan, auto_resume=auto_resume)

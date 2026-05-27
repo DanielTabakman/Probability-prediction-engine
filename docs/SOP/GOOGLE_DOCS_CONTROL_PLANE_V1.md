@@ -42,7 +42,8 @@ GOOGLE_DOCS_REFRESH keeps the Google Docs control plane aligned with repo truth,
 
 - **Manual**: founder says “refresh Google Docs”.
 - **Daily scheduled refresh** (GitHub Actions).
-- **After closeout** (best-effort mirror refresh chained from closeout).
+- **After closeout** (repo steering docs via `apply_control_closeout_v1`).
+- **When BUILD queue is idle** (default): `run_ppe.cmd` regenerates `artifacts/msos_repo_truth_snapshot.md` and best-effort pushes the MSOS mirror marker block when OAuth is configured (`PPE_GOOGLE_DOCS_ON_IDLE=0` to disable).
 - **After deployment changes** (domain / hosting / pipeline changes; redeploys; env changes).
 - **After naming / control-plane changes** (doc ids, marker names, SOP names, control-plane file paths).
 - **After queue / selection changes** (new SELECTION outcome; phase manifest updates; continuity brief updates).

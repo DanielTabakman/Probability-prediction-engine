@@ -43,6 +43,7 @@ From repo root:
 3. Phase runner stops on first non-CONTINUE.
 4. Wrapper runs `scripts/post_relay_continue.py` after each slice exit `0`; on `CONTINUE` + plan `closeout`, steering docs update automatically, **`PHASE_QUEUE` item marked DONE**, manifest `phasePlanPath` cleared, then MSOS Google Doc sync (best-effort).
 5. **Auto-resume + auto-chain (default):** `run_ppe.cmd` auto-resumes slices left incomplete in `artifacts/orchestrator/steward_phase_summary.json` after a partial phase stop, then auto-selects and runs the next `READY` queue chapter after closeout. Use `run_ppe.cmd --continuous` for up to five chapters; `run_ppe.cmd --no-auto-chain` to disable next-chapter chaining.
+6. **Google Docs on queue idle (default):** when auto-chain has no next `READY` chapter, `run_ppe.cmd` runs `sync_msos_repo_truth.py` and (if OAuth + `PPE_MSOS_MIRROR_DOC_ID` are configured, e.g. via `.env.mcp`) pushes the MSOS mirror marker block via `google_docs_sync.py`. Disable with `PPE_GOOGLE_DOCS_ON_IDLE=0`. Report: `artifacts/control_plane/google_docs_idle_refresh.json`.
 
 Optional: `run_slice.cmd <sliceId> [sprintSpec] [plane] [phasePlanPath]` or set `PPE_PHASE_PLAN` for the same post-closeout hook.
 

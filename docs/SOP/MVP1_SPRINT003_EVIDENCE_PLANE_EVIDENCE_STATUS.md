@@ -22,5 +22,5 @@
 | Gate | Status | Evidence |
 |------|--------|----------|
 | `python -m ruff check scripts tests` | **PASS** | Witness-Slice003 @ steward branch |
-| `python -m pytest -q` | **PASS** | **203** collected / passed — Witness-Slice003 witness |
+| `python -m pytest -q` | **PASS** | **206** collected / passed — Witness-Slice003 witness |
 | `python scripts/run_pushable_gate.py` | **PENDING** | tier 1/2 witness deferred to Closeout-Slice004 |
