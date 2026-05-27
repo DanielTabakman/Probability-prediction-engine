@@ -69,6 +69,18 @@ def run_preflight(
             warnings.append(f"orchestrator: {orch.as_posix()}")
 
     try:
+        branch = subprocess.run(
+            ["git", "branch", "--show-current"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        if branch and branch != "main":
+            warnings.append(
+                f"checkout is {branch!r}, not main; post-phase closeout patches docs/SOP here — "
+                "prefer main for run_ppe.cmd"
+            )
         out = subprocess.run(
             ["git", "status", "--porcelain"],
             cwd=repo,
