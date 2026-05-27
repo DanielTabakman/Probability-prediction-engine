@@ -27,3 +27,25 @@ In Cursor, a working setup should allow the agent to:
 
 Policy and refresh workflow: see [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md).
 
+## One-time GitHub secrets (automatic)
+
+If Google Docs MCP already works in Cursor, your refresh token is stored locally at:
+
+- `%USERPROFILE%\.config\google-docs-mcp\token.json`
+
+From repo root, run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/set_google_docs_secrets_once.ps1
+```
+
+This reads `.env.mcp` + the MCP token file and sets GitHub secrets (no manual copy/paste).
+
+If MCP is not authorized yet, run once (browser opens):
+
+```bash
+npx -y @a-bonus/google-docs-mcp auth
+```
+
+Then re-run the PowerShell script above.
+

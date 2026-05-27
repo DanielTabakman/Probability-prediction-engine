@@ -53,6 +53,17 @@ def _required_env(name: str) -> str:
     return v
 
 
+# Must match @a-bonus/google-docs-mcp auth scopes (token was granted with these).
+_MCP_GOOGLE_SCOPES = [
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/calendar.events",
+]
+
+
 def _oauth_creds() -> Credentials:
     client_id = _required_env("GOOGLE_OAUTH_CLIENT_ID")
     client_secret = _required_env("GOOGLE_OAUTH_CLIENT_SECRET")
@@ -65,10 +76,7 @@ def _oauth_creds() -> Credentials:
         token_uri=token_uri,
         client_id=client_id,
         client_secret=client_secret,
-        scopes=[
-            "https://www.googleapis.com/auth/documents",
-            "https://www.googleapis.com/auth/drive.readonly",
-        ],
+        scopes=_MCP_GOOGLE_SCOPES,
     )
     creds.refresh(Request())
     return creds
