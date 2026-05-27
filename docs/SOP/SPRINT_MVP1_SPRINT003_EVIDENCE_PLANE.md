@@ -35,14 +35,22 @@ Bounded **evidence-plane / control-plane** hardening on `main`: tiered pushable 
 
 **Closed** 2026-05-27 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json`](PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json), [`PHASE_QUEUE.json`](PHASE_QUEUE.json), and [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md) aligned; baseline `main` @ `897e16c`+.
 
-### MVP1-Sprint003-Evidence-Slice002 — gate + auto-select (EVIDENCE-PLANE) — **OPEN**
+### MVP1-Sprint003-Evidence-Slice002 — gate + auto-select (EVIDENCE-PLANE) — **CLOSED**
+
+**Closed** 2026-05-27 — tiered pushable gate + queue auto-select; product **`3d4b311`**.
 
 Touch: `scripts/`, `tests/`, `.cursor/rules/` (control plane). No `src/**`.
 
-### MVP1-Sprint003-Witness-Slice003 — pytest witness (EVIDENCE-PLANE) — **OPEN**
+### MVP1-Sprint003-Witness-Slice003 — pytest witness (EVIDENCE-PLANE) — **CLOSED**
 
-Full pytest + ruff; record counts in evidence status.
+**Closed** 2026-05-27 — pytest + ruff witness; **206** passed at closeout re-verify.
 
-### MVP1-Sprint003-Closeout-Slice004 — chapter closeout (EVIDENCE-PLANE) — **OPEN**
+### MVP1-Sprint003-Closeout-Slice004 — chapter closeout (EVIDENCE-PLANE) — **CLOSED**
 
-Evidence witness + steering alignment per phase plan `closeout` block.
+**Closed** 2026-05-27 — evidence witness in [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md); steward CONTROL-CLOSEOUT pending (frontier, handoff, integrated status, continuity brief, SELECTION prep).
+
+---
+
+## Sprint status
+
+**COMPLETE** 2026-05-27 — relay BUILD slices closed; steward CONTROL-CLOSEOUT pending.
