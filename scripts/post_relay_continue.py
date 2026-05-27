@@ -8,7 +8,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from scripts.ppe_manifest import maybe_mark_manifest_complete
+from scripts.ppe_manifest import (
+    clear_manifest_plan_path,
+    load_manifest,
+    maybe_mark_manifest_complete,
+)
+from scripts.ppe_queue import mark_queue_item_done
 from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
 
 
@@ -116,6 +121,22 @@ def main(argv: list[str] | None = None) -> int:
 
     if maybe_mark_manifest_complete(repo, args.phase_plan.resolve(), slice_id):
         print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
+        try:
+            plan_rel = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")
+        except ValueError:
+            plan_rel = ""
+        try:
+            rel_manifest_plan = str(load_manifest(repo).get("phasePlanPath") or "").replace("\\", "/")
+        except Exception:
+            rel_manifest_plan = plan_rel
+        queue_plan = rel_manifest_plan or plan_rel
+        ok, qreason = mark_queue_item_done(repo, plan_path=queue_plan)
+        print(f"post_relay_continue: queue mark-done {ok!r} ({qreason})")
+        clear_manifest_plan_path(
+            repo,
+            note=f"Chapter closeout {slice_id}; queue item marked DONE.",
+        )
+        print("post_relay_continue: cleared manifest phasePlanPath")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     return 0

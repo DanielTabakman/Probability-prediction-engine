@@ -6,6 +6,7 @@ REM Usage:
 REM   run_ppe.cmd
 REM   run_ppe.cmd --dry-run
 REM   run_ppe.cmd --status
+REM   run_ppe.cmd --continuous
 REM   run_ppe.cmd --plan docs/SOP/PHASE_PLANS/<plan>.json
 REM   run_ppe.cmd --slice <sliceId>
 
@@ -13,13 +14,25 @@ set "REPO_ROOT=%~dp0"
 set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
 set "PYTHONPATH=%REPO_ROOT%"
-REM Optional SELECTION automation: if no plan is selected, pick from docs/SOP/PHASE_QUEUE.json.
-REM This is safe: it will not override READY/RUNNING manifests.
-REM If selection fails, print the selector output so the operator can see why.
+set "CONTINUOUS=0"
 set "SELECT_ONLY=0"
-if /i "%~1"=="--select-only" set "SELECT_ONLY=1"
-if /i "%~1"=="--select-only" shift
 
+:strip_flags
+if "%~1"=="" goto strip_done
+if /i "%~1"=="--continuous" (
+  set "CONTINUOUS=1"
+  shift
+  goto strip_flags
+)
+if /i "%~1"=="--select-only" (
+  set "SELECT_ONLY=1"
+  shift
+  goto strip_flags
+)
+goto strip_done
+
+:strip_done
+REM SELECTION: finalize COMPLETE+stale plan, mark queue DONE, select next READY item.
 set "SEL_OUT=%TEMP%\ppe_auto_select_%RANDOM%.json"
 if "%SELECT_ONLY%"=="1" (
   python "%REPO_ROOT%\scripts\ppe_auto_select.py" --repo-root "%REPO_ROOT%" --select-only > "%SEL_OUT%" 2>&1
@@ -27,12 +40,15 @@ if "%SELECT_ONLY%"=="1" (
   python "%REPO_ROOT%\scripts\ppe_auto_select.py" --repo-root "%REPO_ROOT%" --apply > "%SEL_OUT%" 2>&1
 )
 set "SEL_RC=%ERRORLEVEL%"
-if not "%SEL_RC%"=="0" (
-  type "%SEL_OUT%"
-)
+type "%SEL_OUT%"
 del "%SEL_OUT%" >nul 2>nul
 if "%SELECT_ONLY%"=="1" exit /b %SEL_RC%
+if not "%SEL_RC%"=="0" exit /b %SEL_RC%
+
+if "%CONTINUOUS%"=="1" (
+  python "%REPO_ROOT%\scripts\ppe_run.py" --repo-root "%REPO_ROOT%" --continuous %*
+  exit /b %ERRORLEVEL%
+)
 
 python "%REPO_ROOT%\scripts\ppe_run.py" --repo-root "%REPO_ROOT%" %*
-set "EXIT_CODE=%ERRORLEVEL%"
-exit /b %EXIT_CODE%
+exit /b %ERRORLEVEL%

@@ -14,7 +14,9 @@ Before BUILD or when answering "what's next / what's missing":
 2. Follow `docs/SOP/AGENT_GUIDE_ROLE.md` for guide vs build agent boundaries.
 3. Do not treat `CURRENT_FRONTIER.md` as live steering; use `MVP1_FRONTIER.md`.
 
-After relay `CONTINUE` on a closeout slice, steering docs are updated by `scripts/post_relay_continue.py` — do not hand-edit HANDOFF/FRONTIER/INTEGRATED unless recovery.
+After relay `CONTINUE` on a closeout slice, steering docs are updated by `scripts/post_relay_continue.py` (also marks `PHASE_QUEUE` DONE and clears manifest `phasePlanPath`) — do not hand-edit HANDOFF/FRONTIER/INTEGRATED unless recovery.
+
+When the user wants the **auto cycle to continue**, do not stop at closeout: run `run_ppe.cmd` or `ppe_auto_select.py --apply` if the queue has a next `READY` chapter; use `run_ppe.cmd --continuous` only when multiple `READY` items exist.
 
 ## Google Docs (hard)
 
