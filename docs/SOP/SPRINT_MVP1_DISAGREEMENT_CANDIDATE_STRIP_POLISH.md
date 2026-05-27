@@ -37,21 +37,23 @@ Polish **disagreement** and **candidate strip** copy so width/directional candid
 
 **Closed** 2026-05-26 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json`](PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json), [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), and [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) aligned; baseline `main` @ `ef7a0f8`+.
 
-### MVP1-DisagreementStrip-Product-Slice002 — strip polish (PRODUCT)
+### MVP1-DisagreementStrip-Product-Slice002 — strip polish (PRODUCT) — **CLOSED**
+
+**Closed** 2026-05-26 — product **`630e93a`** (PR **#23**); hypothesis copy polish without classification/math changes.
 
 **Touch:** `src/viz/` (belief/disagreement hints, candidate strip panels, provenance copy), `tests/`.  
 **Forbidden:** `src/viz/app.py`, `src/viz/app_bitcoin_implied_lab.py` unless steward packet widens TOUCH_SET.
 
-### MVP1-DisagreementStrip-Smoke-Slice003 — dual smoke (CONTROL)
+### MVP1-DisagreementStrip-Smoke-Slice003 — dual smoke (CONTROL) — **CLOSED**
 
-Record dual smoke run IDs in evidence status.
+**Closed** 2026-05-27 — dual smoke witness recorded (PR **#24**).
 
-### MVP1-DisagreementStrip-Closeout-Slice004 — chapter close (CONTROL)
+### MVP1-DisagreementStrip-Closeout-Slice004 — chapter close (CONTROL) — **CLOSED**
 
-Update frontier, handoff, integrated status, continuity brief; SELECTION prep for next chapter.
+**Closed** 2026-05-27 — evidence witness in [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md); steward CONTROL-CLOSEOUT pending (frontier, handoff, integrated status, continuity brief, SELECTION prep).
 
 ---
 
 ## Sprint status
 
-**ACTIVE** — relay phase started 2026-05-26.
+**COMPLETE** 2026-05-27 — relay BUILD slices closed; steward CONTROL-CLOSEOUT pending.
