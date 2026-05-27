@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
-  "status": "COMPLETE",
-  "notes": "MVP1 feedback + beta instrumentation COMPLETE 2026-05-27. Await steward SELECTION (see POST_MVP1_FEEDBACK_BETA_SELECTION.md)."
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27."
 }

@@ -16,9 +16,9 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
-      "status": "PENDING",
-      "reason": "Sprint 003 evidence-plane — charter exists (SPRINT_003_PHASE_2.md); steward sets READY after phase plan JSON is authored.",
-      "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION.md"
+      "status": "READY",
+      "reason": "MVP1 Sprint 003 evidence-plane — post-feedback SELECTION 2026-05-27.",
+      "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md"
     }
   ]
 }
