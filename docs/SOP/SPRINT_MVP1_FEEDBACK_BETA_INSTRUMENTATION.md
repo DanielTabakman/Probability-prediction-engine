@@ -33,31 +33,27 @@ Ship a bounded **feedback** path in the MVP1 implied lab so early testers can su
 
 ## Slice map
 
-### MVP1-FeedbackBeta-Control-Slice001 — charter (CONTROL) — **OPEN**
+### MVP1-FeedbackBeta-Control-Slice001 — charter (CONTROL) — **CLOSED**
 
-Charter witness: sprint spec, phase plan, frontier queue, evidence doc stub.
+**Closed** 2026-05-27 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json`](PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json), [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md), and [`MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md`](MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md) aligned; baseline `main` @ `9a4a04c`+.
 
-### MVP1-FeedbackBeta-Product-Slice002 — feedback capture (PRODUCT) — **OPEN**
+### MVP1-FeedbackBeta-Product-Slice002 — feedback capture (PRODUCT) — **CLOSED**
+
+**Closed** 2026-05-27 — product **`0937cef`**; Give feedback expander + local SQLite persistence (§15F rubric).
 
 **Touch:** `src/viz/` (feedback UI + local persistence), `tests/`.  
 **Forbidden:** `src/viz/app.py`, `src/viz/app_bitcoin_implied_lab.py` unless steward packet widens TOUCH_SET.
 
-**Minimum product delta:**
+### MVP1-FeedbackBeta-Smoke-Slice003 — dual smoke (CONTROL) — **CLOSED**
 
-- Discoverable **Give feedback** entry (expander or sidebar) in MVP1 friends-first context.
-- Fields: confusion category (master §15F list), usefulness (Likert), repeat-use intent (Likert), optional objections text.
-- Persist submissions locally (SQLite table or existing store pattern); no PII beyond session-local optional note.
+**Closed** 2026-05-27 — harness `feedback_panel_found` witness; product **`b48b087`**.
 
-### MVP1-FeedbackBeta-Smoke-Slice003 — dual smoke (CONTROL) — **OPEN**
+### MVP1-FeedbackBeta-Closeout-Slice004 — chapter close (CONTROL) — **CLOSED**
 
-Dual smoke witness with feedback surface reachable in MVP1_compact scenario.
-
-### MVP1-FeedbackBeta-Closeout-Slice004 — chapter close (CONTROL) — **OPEN**
-
-Evidence witness + CONTROL-CLOSEOUT steering sync.
+**Closed** 2026-05-27 — evidence witness in [`MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md`](MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md); steward CONTROL-CLOSEOUT pending (frontier, handoff, integrated status, continuity brief, SELECTION prep).
 
 ---
 
 ## Sprint status
 
-**IN PROGRESS** — awaiting relay phase via **`run_ppe.cmd`**.
+**COMPLETE** 2026-05-27 — relay BUILD slices closed; steward CONTROL-CLOSEOUT pending.
