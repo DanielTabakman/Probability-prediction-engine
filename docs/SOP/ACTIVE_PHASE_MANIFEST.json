@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md",
   "selectionRecord": "docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md",
-  "status": "READY",
-  "notes": "Product-Slice002 promoted to main @ 0a7db79 after REPO_STATE_DRIFT BLOCKED; resume from Smoke-Slice003 via run_ppe.cmd."
+  "status": "COMPLETE",
+  "notes": "MVP1 feedback + beta instrumentation COMPLETE 2026-05-27. Await steward SELECTION (see POST_MVP1_FEEDBACK_BETA_SELECTION.md)."
 }

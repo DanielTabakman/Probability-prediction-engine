@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-26 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-05-27 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -70,6 +70,8 @@ flowchart LR
 **Chapter-close SELECTION trail (historical):** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
 
 | MVP1 disagreement / candidate strip polish | **COMPLETE** 2026-05-26 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md), [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
+
+| MVP1 feedback + beta instrumentation | **COMPLETE** 2026-05-27 | [`SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md`](docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md), [`MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md`](docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 

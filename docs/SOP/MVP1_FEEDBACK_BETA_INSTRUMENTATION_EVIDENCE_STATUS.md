@@ -1,7 +1,7 @@
 # MVP1 feedback + beta instrumentation — evidence status
 
 **Chapter:** MVP1 feedback + beta instrumentation (v0)  
-**Status:** **IN PROGRESS**  
+**Status:** **COMPLETE** 2026-05-27  
 **SELECTION:** [`POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md`](POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md`](SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json`](PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json)

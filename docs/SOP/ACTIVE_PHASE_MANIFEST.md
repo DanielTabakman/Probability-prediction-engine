@@ -18,9 +18,10 @@ Machine-readable pointer for **`run_ppe.cmd`** (unified full-phase run). Steward
 
 ## Status transitions
 
-- **SELECTION:** steward sets `phasePlanPath`, `sprintSpecPath`, `status: READY`
+- **SELECTION:** steward sets `phasePlanPath`, `sprintSpecPath`, `status: READY` (or `run_ppe.cmd` auto-select from `PHASE_QUEUE.json`)
 - **`run_ppe.cmd` start:** sets `RUNNING`
-- **Closeout slice CONTINUE:** `post_relay_continue` sets `COMPLETE` when the closeout slice in the plan finishes
+- **Closeout slice CONTINUE:** `post_relay_continue` sets `COMPLETE`, marks the chapter **DONE** in `PHASE_QUEUE.json`, and **clears** `phasePlanPath`
+- **Next chapter:** `run_ppe.cmd` / `ppe_auto_select.py` picks the first queue item with `status: READY` (or use `run_ppe.cmd --continuous` for back-to-back chapters)
 - **Failed/stopped phase:** steward resets to `READY` or updates plan path
 
 ## Steward checklist (SELECTION)
