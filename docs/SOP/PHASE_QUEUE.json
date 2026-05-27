@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "notes": "Explicit steward queue for SELECTION automation. Order matters; first READY item is selected when manifest is COMPLETE with no active plan.",
+  "items": [
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
+      "status": "READY",
+      "reason": "MVP1 frontier: disagreement/candidate strip polish is IN PROGRESS; advance when steward wants automation to continue."
+    }
+  ]
+}
+

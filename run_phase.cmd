@@ -35,6 +35,9 @@ if exist "%NODE20%\npm.cmd" (
 )
 
 pushd "%ORCH_ROOT%" >nul
+REM ACP permissions are handled programmatically by the orchestrator; this avoids relying on Cursor popups.
+REM Modes: allow-once (default) or allow-always (reduces repeated permission prompts).
+set "ACP_PERMISSION_MODE=allow-always"
 where npm >nul 2>nul
 if "%ERRORLEVEL%"=="0" (
   call npm run dev -- run-phase-steward "%REPO_ROOT%" "%PLAN_PATH%" "%BASELINE_BRANCH%"
