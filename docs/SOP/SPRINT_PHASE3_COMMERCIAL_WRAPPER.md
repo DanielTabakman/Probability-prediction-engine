@@ -28,3 +28,23 @@ Add a **bounded commercial wrapper** around the existing MVP1 demo experience: c
 - Multi-asset expansion
 - Recovery merges
 
+---
+
+## Slice map
+
+### Phase3-CommercialWrapper-Control-Slice001 — charter (EVIDENCE-PLANE)
+
+Charter witness: sprint spec, phase plan, evidence stub, and queue/manifest/frontier alignment; baseline `main`.
+
+### Phase3-CommercialWrapper-Product-Slice002 — commercial wrapper polish (PRODUCT-PLANE)
+
+Bounded copy/CTA wrapper work (no billing automation).
+
+### Phase3-CommercialWrapper-Smoke-Slice003 — dual smoke witness (EVIDENCE-PLANE)
+
+Dual smoke witness run IDs recorded in evidence doc.
+
+### Phase3-CommercialWrapper-Closeout-Slice004 — chapter close (EVIDENCE-PLANE)
+
+Evidence witness + steward control-closeout (updates `MVP1_FRONTIER`, `HANDOFF`, `PPE_INTEGRATED_STATUS`, continuity brief).
+
