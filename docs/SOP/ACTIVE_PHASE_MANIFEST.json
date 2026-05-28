@@ -1,7 +1,7 @@
 {
   "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md",
-  "selectionRecord": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+  "selectionRecord": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
   "status": "COMPLETE",
-  "notes": "MVP1-PostPhase3-Control-Slice001 charter witness 2026-05-28. Post-Phase3 closeout manual after ACP plan limit"
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Deploy witness refresh \u2014 evidence-only relay on main Chapter closeout MVP1-DeployWitness-Closeout-Slice003; queue item marked DONE."
 }

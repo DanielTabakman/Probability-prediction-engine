@@ -183,10 +183,22 @@ class Orchestrator:
         leaf = build_branch.split("/")[-1]
         return (self.worktrees_root / leaf).resolve()
 
+    def _baseline_tip_sha(self, baseline_local: str) -> str:
+        """Resolve baseline to a commit SHA (prefer origin/<branch>)."""
+        for ref in (f"origin/{baseline_local}", baseline_local):
+            code, out, err = _run(["git", "rev-parse", "--verify", ref], cwd=self.repo_root)
+            if code == 0:
+                return out.strip()
+        raise RuntimeError(
+            f"could not resolve baseline {baseline_local!r}: {err or out}".strip()
+        )
+
     def ensure_worktree(self, baseline_local: str, build_branch: str) -> Path:
         """Create (or reuse) a git worktree for the slice run.
 
         This prevents worker runs from switching the operator's current checkout/branch.
+        When ``baseline_local`` is already checked out in another worktree (common for
+        ``main``), fall back to a detached worktree at the baseline tip.
         """
         wt = self._worktree_path(build_branch)
         wt.parent.mkdir(parents=True, exist_ok=True)
@@ -199,6 +211,11 @@ class Orchestrator:
         # does not exist yet (the worker will create it).
         cmd = ["git", "worktree", "add", str(wt), baseline_local]
         code, out, err = _run(cmd, cwd=self.repo_root)
+        combined = f"{out or ''}\n{err or ''}".lower()
+        if code != 0 and "already used" in combined:
+            sha = self._baseline_tip_sha(baseline_local)
+            cmd = ["git", "worktree", "add", "--detach", str(wt), sha]
+            code, out, err = _run(cmd, cwd=self.repo_root)
         if code != 0:
             raise RuntimeError(f"git worktree add failed: {err or out}".strip())
         return wt

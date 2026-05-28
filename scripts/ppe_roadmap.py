@@ -260,7 +260,11 @@ def maybe_advance_roadmap_and_select(
         if sync:
             out["synced"] = len(sync)
 
-    adv = advance_after_chapter_closeout(repo, closed_plan_path, apply=apply)
+    adv = advance_after_chapter_closeout(
+        repo,
+        closed_plan_path=closed_plan_path,
+        apply=apply,
+    )
     out["advance"] = adv
 
     boot = bootstrap_next_ready(repo, apply=apply)
@@ -281,6 +285,14 @@ def prepare_selection_idle(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     if apply:
         sync = sync_roadmap_to_queue(repo, apply=True)
         out["synced"] = len(sync)
+    try:
+        from scripts.ppe_steward_cursor import maybe_run_steward_cursor
+
+        steward = maybe_run_steward_cursor(repo, apply=apply)
+        if not steward.get("skipped"):
+            out["steward"] = steward
+    except Exception as exc:
+        out["steward_error"] = str(exc)
     boot = bootstrap_next_ready(repo, apply=apply)
     out["bootstrap"] = boot
     return out

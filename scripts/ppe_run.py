@@ -80,6 +80,12 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
 
     try:
         set_manifest_status(repo, "RUNNING")
+        manifest = load_manifest(repo)
+        wm = str(manifest.get("workerMode") or "").strip().lower()
+        if wm and not env.get("PPE_WORKER_MODE"):
+            env["PPE_WORKER_MODE"] = wm
+            if wm == "deterministic":
+                env.setdefault("PPE_SKIP_ACP", "1")
     except Exception as e:
         print(f"WARN: could not set manifest RUNNING: {e}")
 
