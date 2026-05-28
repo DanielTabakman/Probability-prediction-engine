@@ -43,14 +43,14 @@ Touch: `scripts/`, `tests/`, `.cursor/rules/` (control plane). No `src/**`.
 
 ### MVP1-Sprint003-Witness-Slice003 — pytest witness (EVIDENCE-PLANE) — **CLOSED**
 
-**Closed** 2026-05-27 — pytest + ruff witness; **206** passed at closeout re-verify.
+**Closed** 2026-05-28 — pytest + ruff witness (PR **#54**).
 
 ### MVP1-Sprint003-Closeout-Slice004 — chapter closeout (EVIDENCE-PLANE) — **CLOSED**
 
-**Closed** 2026-05-27 — evidence witness in [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md); steward CONTROL-CLOSEOUT pending (frontier, handoff, integrated status, continuity brief, SELECTION prep).
+**Closed** 2026-05-28 — evidence witness in [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md); steward CONTROL-CLOSEOUT pending (frontier, handoff, integrated status, continuity brief, SELECTION prep).
 
 ---
 
 ## Sprint status
 
-**COMPLETE** 2026-05-27 — relay BUILD slices closed; steward CONTROL-CLOSEOUT pending.
+**COMPLETE** 2026-05-28 — relay BUILD slices closed; steward CONTROL-CLOSEOUT pending.
