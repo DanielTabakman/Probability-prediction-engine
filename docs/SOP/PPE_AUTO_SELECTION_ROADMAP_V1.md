@@ -12,11 +12,13 @@ Ordered chapter list in [`PHASE_SELECTION_ROADMAP.json`](PHASE_SELECTION_ROADMAP
 
 ```text
 run_ppe.cmd
-  → ppe_auto_select (prepare_selection_idle: sync roadmap → queue, bootstrap first pending → READY)
+  → ppe_auto_select (prepare_selection_idle: sync roadmap → queue, optional Cursor steward hook, bootstrap first pending → READY)
   → relay phase
   → post_relay_continue (chapter closeout)
   → maybe_advance_roadmap_and_select (closed → done, next pending → READY, auto-select)
 ```
+
+**Cursor steward hook** (optional): when idle and no valid `pending` row, [`ppe_steward_cursor.py`](../../scripts/ppe_steward_cursor.py) may charter the next chapter (`PPE_AUTO_STEWARD=1`). See [`PPE_STEWARD_CURSOR_V1.md`](PPE_STEWARD_CURSOR_V1.md).
 
 ## Roadmap item fields
 

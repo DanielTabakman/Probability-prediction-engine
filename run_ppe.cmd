@@ -33,7 +33,7 @@ if /i "%~1"=="--select-only" (
 goto strip_done
 
 :strip_done
-REM SELECTION: roadmap bootstrap (if idle), finalize COMPLETE+stale plan, select next READY.
+REM SELECTION: roadmap sync, optional Cursor steward hook (PPE_AUTO_STEWARD=1), bootstrap, select READY.
 set "SEL_OUT=%TEMP%\ppe_auto_select_%RANDOM%.json"
 if "%SELECT_ONLY%"=="1" (
   python "%REPO_ROOT%\scripts\ppe_auto_select.py" --repo-root "%REPO_ROOT%" --select-only > "%SEL_OUT%" 2>&1
