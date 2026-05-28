@@ -26,9 +26,9 @@ After Phase 3 commercial wrapper and Sprint 003 evidence-plane closeout: align s
 
 ## Slice map
 
-### MVP1-PostPhase3-Control-Slice001 — charter (CONTROL)
+### MVP1-PostPhase3-Control-Slice001 — charter (EVIDENCE-PLANE) — **CLOSED**
 
-**Goal:** Accept sprint spec, phase plan, queue health witness, SELECTION record.
+**Closed** 2026-05-28 — charter witness: sprint spec, [`PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json`](PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json), [`PHASE_QUEUE.json`](PHASE_QUEUE.json), queue health audit, and [`MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md`](MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md) aligned; baseline `main` @ `db7ca53`+.
 
 ### MVP1-PostPhase3-Smoke-Slice002 — dual smoke (EVIDENCE)
 

@@ -12,7 +12,7 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-PostPhase3-Control-Slice001 | **OPEN** | charter witness |
+| MVP1-PostPhase3-Control-Slice001 | **CLOSED** 2026-05-28 | charter witness; baseline `main` @ `db7ca53`+ |
 | MVP1-PostPhase3-Smoke-Slice002 | **OPEN** | dual smoke witness |
 | MVP1-PostPhase3-Closeout-Slice003 | **OPEN** | chapter close |
 

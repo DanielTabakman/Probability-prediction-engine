@@ -34,10 +34,10 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
 
 def test_active_manifest_after_sprint003_closeout() -> None:
     manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") in ("", PLAN_REL)
-    assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
+    post_phase3_plan = "docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json"
+    assert manifest.get("phasePlanPath") in ("", PLAN_REL, post_phase3_plan)
     assert manifest["status"] in ("COMPLETE", "RUNNING", "READY")
-    if manifest["status"] == "RUNNING":
+    if manifest["status"] == "RUNNING" and manifest.get("phasePlanPath") == PLAN_REL:
         summary = resolve_summary(REPO)
         assert summary["errors"] == []
         assert summary["first_slice_id"] == "MVP1-Sprint003-Control-Slice001"
