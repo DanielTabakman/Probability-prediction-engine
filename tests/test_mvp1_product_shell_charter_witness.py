@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.ppe_manifest import load_manifest, validate_phase_plan
+from scripts.ppe_manifest import validate_phase_plan
 
 REPO = Path(__file__).resolve().parents[1]
 SOP = REPO / "docs" / "SOP"
@@ -38,9 +38,9 @@ def test_phase_plan_valid_and_first_slice_is_evidence_charter() -> None:
 
 
 def test_active_manifest_chapter_complete() -> None:
-    manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") == ""
-    assert manifest["status"] == "COMPLETE"
+    text = EVIDENCE_STATUS.read_text(encoding="utf-8")
+    assert "**COMPLETE**" in text
+    assert "MVP1-ProductShell-Closeout-Slice004" in text
 
 
 def test_phase_queue_product_shell_done() -> None:

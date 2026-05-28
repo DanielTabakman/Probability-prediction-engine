@@ -1,0 +1,66 @@
+{
+  "name": "Phase3_commercial_wrapper (post-MVP1 product shell)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "Phase3-CommercialWrapper-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+      "buildBranch": "build/auto/Phase3-CommercialWrapper-Control-Slice001-commercial_wrapper",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "Phase3-CommercialWrapper-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+      "buildBranch": "build/auto/Phase3-CommercialWrapper-Product-Slice002-commercial_wrapper",
+      "declaredPlane": "PRODUCT-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/",
+        "docs/"
+      ],
+      "forbiddenTouch": [
+        "src/viz/app_bitcoin_implied_lab.py"
+      ]
+    },
+    {
+      "sliceId": "Phase3-CommercialWrapper-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+      "buildBranch": "build/auto/Phase3-CommercialWrapper-Smoke-Slice003-commercial_wrapper",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "Phase3-CommercialWrapper-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+      "buildBranch": "build/auto/Phase3-CommercialWrapper-Closeout-Slice004-commercial_wrapper",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "phase3_commercial_wrapper",
+        "chapterTitle": "Phase 3 commercial wrapper",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-28",
+        "evidenceDoc": "docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
+

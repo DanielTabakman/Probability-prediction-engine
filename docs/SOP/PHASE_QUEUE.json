@@ -11,34 +11,47 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
       "status": "DONE",
-      "reason": "MVP1 §15B slice 6 — feedback + beta instrumentation.",
+      "reason": "MVP1 \u00a715B slice 6 \u2014 feedback + beta instrumentation.",
       "doneReason": "chapter COMPLETE 2026-05-27; post_relay_closeout"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
       "status": "DONE",
-      "reason": "MVP1 Sprint 003 evidence-plane — post-feedback SELECTION 2026-05-27.",
+      "reason": "MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27.",
       "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_decision_ready_review_polish_relay.json",
       "status": "DONE",
-      "reason": "MVP1 decision-ready review polish — post Sprint 003 SELECTION 2026-05-27.",
+      "reason": "MVP1 decision-ready review polish \u2014 post Sprint 003 SELECTION 2026-05-27.",
       "selectionPrep": "docs/SOP/POST_MVP1_SPRINT003_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_product_shell_clarity_relay.json",
-      "status": "READY",
-      "reason": "MVP1 product shell clarity — auto SELECTION 2026-05-27 (§15B slice 1).",
-      "selectionPrep": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md"
+      "status": "DONE",
+      "reason": "MVP1 product shell clarity \u2014 auto SELECTION 2026-05-27 (\u00a715B slice 1).",
+      "selectionPrep": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "",
       "status": "PENDING",
-      "reason": "Placeholder — steward SELECTION after product-shell chapter closes.",
+      "reason": "Placeholder \u2014 steward SELECTION after product-shell chapter closes.",
       "selectionPrep": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json",
+      "status": "READY",
+      "reason": "Phase 3 commercial wrapper \u2014 auto SELECTION 2026-05-28.",
+      "selectionPrep": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md"
+    },
+    {
+      "planPath": "",
+      "status": "PENDING",
+      "reason": "Placeholder \u2014 steward SELECTION after Phase 3 commercial wrapper closes.",
+      "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION.md"
     }
   ]
 }

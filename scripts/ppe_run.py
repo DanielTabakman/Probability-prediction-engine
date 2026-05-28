@@ -13,6 +13,7 @@ from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_google_docs_refresh import refresh_google_docs_on_queue_idle
 from scripts.ppe_manifest import load_manifest, load_phase_plan, set_manifest_status
 from scripts.ppe_preflight import run_preflight
+from scripts.ppe_troubleshooter import maybe_recover_stop_for_review
 from scripts.resolve_active_phase import main as resolve_main
 
 
@@ -137,6 +138,20 @@ def cmd_run_phase(repo: Path, plan_path: str, *, auto_resume: bool) -> int:
         if recovered and resume_code == 0:
             print("ppe_run: auto-resume recovered phase")
             exit_code = 0
+
+    # Troubleshooter: auto-recover common STOP_FOR_REVIEW cases (promotion locks, closeout not applied).
+    if auto_resume and exit_code == 20:
+        try:
+            recovered = maybe_recover_stop_for_review(
+                repo=repo,
+                plan_path=plan_path,
+                run_slice=lambda sid: _run_slice_impl(repo, sid, plan_path),
+            )
+            if recovered:
+                print("ppe_run: troubleshooter recovered STOP_FOR_REVIEW")
+                exit_code = 0
+        except Exception as e:
+            print(f"WARN: troubleshooter failed: {e}")
 
     if log.is_file():
         subprocess.run(
