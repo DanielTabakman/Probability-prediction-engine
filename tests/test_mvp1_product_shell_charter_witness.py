@@ -37,14 +37,13 @@ def test_phase_plan_valid_and_first_slice_is_evidence_charter() -> None:
     assert plan["baselineBranch"] == "main"
 
 
-def test_active_manifest_ready_for_relay() -> None:
+def test_active_manifest_chapter_complete() -> None:
     manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") == PLAN_REL
-    assert manifest["status"] in ("READY", "RUNNING")
-    assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md"
+    assert manifest.get("phasePlanPath") == ""
+    assert manifest["status"] == "COMPLETE"
 
 
-def test_phase_queue_product_shell_ready() -> None:
+def test_phase_queue_product_shell_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == PLAN_REL)
-    assert row["status"] == "READY"
+    assert row["status"] == "DONE"
