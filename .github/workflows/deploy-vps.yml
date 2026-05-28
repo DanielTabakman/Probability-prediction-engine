@@ -32,7 +32,13 @@ jobs:
         if: success()
         run: |
           set -euo pipefail
-          body=$(curl -fsS --max-time 60 https://marketstructureos.com/ || true)
+          code=$(curl -sS -o /tmp/msos_body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/ || true)
+          if [ "$code" != "200" ]; then
+            echo "Demo site health check failed (HTTP $code)"
+            head -n 50 /tmp/msos_body.html || true
+            exit 1
+          fi
+          body=$(cat /tmp/msos_body.html)
           if echo "$body" | grep -q 'ModuleNotFoundError'; then
             echo 'Demo site HTML contains ModuleNotFoundError'
             exit 1

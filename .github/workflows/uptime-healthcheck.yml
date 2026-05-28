@@ -1,0 +1,35 @@
+name: Uptime healthcheck
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Demo homepage must return 200
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/ || true)
+          if [ "$code" != "200" ]; then
+            echo "Healthcheck failed: HTTP $code"
+            head -n 80 /tmp/body.html || true
+            exit 1
+          fi
+
+      - name: Demo homepage must not show traceback
+        run: |
+          set -euo pipefail
+          body=$(curl -fsS --max-time 60 https://marketstructureos.com/)
+          if echo "$body" | grep -q 'ModuleNotFoundError'; then
+            echo 'Demo site HTML contains ModuleNotFoundError'
+            exit 1
+          fi
+          if echo "$body" | grep -q 'Traceback (most recent call last)'; then
+            echo 'Demo site HTML contains a Python traceback'
+            exit 1
+          fi
+          echo "OK"
+
