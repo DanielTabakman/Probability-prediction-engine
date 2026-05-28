@@ -25,8 +25,8 @@
 | Gate | Status | Notes |
 |------|--------|-------|
 | `python -m pytest -q` | **PASS** | **228** passed (2026-05-28 closeout re-verify) |
-| Dual smoke | **PASS** | `20260527_232844` (MVP1_compact) + `20260527_234308` (A_width); exit 0 (~915s closeout re-verify) |
-| Primary UI smoke | **PASS** | `20260527_232631` (A_width); exit 0 (~117s closeout re-verify) |
+| Dual smoke | **PASS** | `20260528_011401` (MVP1_compact) + `20260528_012742` (A_width); exit 0 (~1019s closeout re-verify) |
+| Primary UI smoke | **PASS** | `20260528_011046` (A_width); exit 0 (~152s closeout re-verify) |
 
 ---
 
@@ -46,8 +46,8 @@
 
 | Run ID | Scenario | Exit | Notes |
 |--------|----------|------|-------|
-| 20260527_232844 | MVP1_compact_verification | 0 | verification true; product_shell_context=true (~710s) closeout re-verify |
-| 20260527_234308 | A_width_target_payoff | 0 | verification true; evidence_plane_complete=true (~182s) closeout re-verify (A_width retry after flaky dual pass) |
+| 20260528_011401 | MVP1_compact_verification | 0 | verification true; product_shell_context=true (~825s) closeout re-verify |
+| 20260528_012742 | A_width_target_payoff | 0 | verification true; evidence_plane_complete=true (~194s) closeout re-verify |
 
 ## Pytest
 
