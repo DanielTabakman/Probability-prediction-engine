@@ -1,0 +1,71 @@
+name: VPS recover
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Recovery action to run on VPS"
+        type: choice
+        required: true
+        options:
+          - restart_stack
+          - restart_caddy
+          - restart_apps
+          - show_status
+          - show_logs
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH recover
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          command_timeout: 20m
+          script: |
+            set -euo pipefail
+            cd /opt/marketstructureos
+            echo "== git =="
+            git status -sb || true
+            git log -1 --oneline || true
+            echo "== docker ps =="
+            docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' || true
+
+            case "${{ inputs.action }}" in
+              show_status)
+                docker compose ps || true
+                ;;
+              show_logs)
+                docker compose logs --tail 200 caddy app_demo app_full || true
+                ;;
+              restart_caddy)
+                docker compose restart caddy
+                ;;
+              restart_apps)
+                docker compose restart app_demo app_full
+                ;;
+              restart_stack)
+                docker compose up -d --build
+                ;;
+              *)
+                echo "Unknown action"
+                exit 2
+                ;;
+            esac
+
+      - name: Post-recover healthcheck
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/ || true)
+          if [ "$code" != "200" ]; then
+            echo "Still unhealthy: HTTP $code"
+            head -n 80 /tmp/body.html || true
+            exit 1
+          fi
+          echo "OK (HTTP 200)"
+
