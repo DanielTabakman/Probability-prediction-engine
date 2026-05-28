@@ -35,30 +35,24 @@ jobs:
             git log -1 --oneline || true
             echo "== docker ps =="
             docker ps || true
-
-            case "${{ inputs.action }}" in
-              show_status)
-                docker compose ps || true
-                ;;
-              show_logs)
-                docker compose logs --tail 200 caddy app_demo app_full || true
-                ;;
-              restart_caddy)
-                docker compose restart caddy
-                ;;
-              restart_apps)
-                docker compose restart app_demo app_full
-                ;;
-              restart_stack)
-                docker compose up -d --build
-                ;;
-              *)
-                echo "Unknown action"
-                exit 2
-                ;;
-            esac
+            ACTION="${{ inputs.action }}"
+            if [ "$ACTION" = "show_status" ]; then
+              docker compose ps || true
+            elif [ "$ACTION" = "show_logs" ]; then
+              docker compose logs --tail 200 caddy app_demo app_full || true
+            elif [ "$ACTION" = "restart_caddy" ]; then
+              docker compose restart caddy
+            elif [ "$ACTION" = "restart_apps" ]; then
+              docker compose restart app_demo app_full
+            elif [ "$ACTION" = "restart_stack" ]; then
+              docker compose up -d --build
+            else
+              echo "Unknown action: $ACTION"
+              exit 2
+            fi
 
       - name: Post-recover healthcheck
+        if: inputs.action != 'show_status' && inputs.action != 'show_logs'
         run: |
           set -euo pipefail
           code=$(curl -sS -o /tmp/body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/ || true)
@@ -68,4 +62,3 @@ jobs:
             exit 1
           fi
           echo "OK (HTTP 200)"
-
