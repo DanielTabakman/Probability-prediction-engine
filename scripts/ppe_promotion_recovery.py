@@ -144,6 +144,14 @@ def _run_control_closeout(repo: Path, phase_plan: Path, slice_id: str, relay_run
         print(f"ppe_promotion_recovery: queue mark-done {ok!r} ({reason})")
         clear_manifest_plan_path(repo, note=f"Chapter closeout {slice_id} via promotion recovery.")
     print(f"ppe_promotion_recovery: control-closeout OK for {slice_id}")
+    try:
+        from scripts.ppe_google_docs_refresh import run_google_docs_refresh
+
+        gdocs_rc = run_google_docs_refresh(repo, write_report=True)
+        if gdocs_rc != 0:
+            print(f"ppe_promotion_recovery: google docs refresh failed ({gdocs_rc})")
+    except Exception as exc:
+        print(f"ppe_promotion_recovery: google docs refresh skipped: {exc}")
     return 0
 
 

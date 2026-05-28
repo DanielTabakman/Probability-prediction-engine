@@ -139,6 +139,14 @@ def main(argv: list[str] | None = None) -> int:
         print("post_relay_continue: cleared manifest phasePlanPath")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
+    try:
+        from scripts.ppe_google_docs_refresh import run_google_docs_refresh
+
+        gdocs_rc = run_google_docs_refresh(repo, write_report=True)
+        if gdocs_rc != 0:
+            print(f"post_relay_continue: google docs refresh failed ({gdocs_rc}); continuing")
+    except Exception as exc:
+        print(f"post_relay_continue: google docs refresh skipped: {exc}")
     return 0
 
 

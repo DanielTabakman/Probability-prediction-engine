@@ -20,6 +20,19 @@
       "reason": "MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27.",
       "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json",
+      "status": "DONE",
+      "reason": "Phase 3 commercial wrapper v0 \u2014 COMPLETE 2026-05-28.",
+      "selectionPrep": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
+      "doneReason": "shipped via PR #42/#56; chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
+      "status": "READY",
+      "reason": "MVP1 disagreement / candidate strip polish \u2014 next BUILD per MVP1_FRONTIER.",
+      "selectionPrep": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md"
     }
   ]
 }
