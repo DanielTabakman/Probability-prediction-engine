@@ -41,16 +41,19 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
 
 def test_active_manifest_after_post_phase3_closeout() -> None:
     manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") in ("", PLAN_REL)
+    phase5 = "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json"
+    assert manifest.get("phasePlanPath") in ("", PLAN_REL, phase5)
     assert manifest["status"] in ("COMPLETE", "READY", "RUNNING")
     sprint = manifest.get("sprintSpecPath") or ""
     assert sprint in (
         "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md",
         "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+        "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
     )
     assert manifest.get("selectionRecord") in (
         "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
         "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+        "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
     )
 
 

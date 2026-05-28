@@ -9,7 +9,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md))
+- **Active BUILD chapter:** **MVP1 Phase 5 review persistence hardening** — queued on roadmap ([`POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md`](POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md))
 - **Last closed chapter:** **MVP1 deploy witness refresh** — **COMPLETE** 2026-05-28
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
