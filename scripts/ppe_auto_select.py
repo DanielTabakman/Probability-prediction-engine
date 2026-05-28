@@ -23,7 +23,7 @@ from scripts.ppe_manifest import (
     save_manifest,
     validate_phase_plan,
 )
-from scripts.ppe_queue import QUEUE_REL, load_queue, mark_queue_item_done
+from scripts.ppe_queue import QUEUE_REL, find_queue_item_index, load_queue, mark_queue_item_done
 from scripts.ppe_queue_health import repair_queue
 
 
@@ -189,6 +189,14 @@ def run_auto_select(
         manifest["selectionRecord"] = str(plan.get("selectionRecord") or manifest.get("selectionRecord") or "").strip()
         manifest["status"] = "READY"
         manifest["notes"] = f"auto-selected from {QUEUE_REL}: {reason}"
+        queue = load_queue(repo)
+        idx = find_queue_item_index(queue, plan_path)
+        if idx is not None:
+            item = (queue.get("items") or [])[idx]
+            if isinstance(item, dict):
+                wm = str(item.get("workerMode") or "").strip()
+                if wm:
+                    manifest["workerMode"] = wm
         save_manifest(repo, manifest)
 
     _print_result(selected=True, plan_path=plan_path, reason=reason)

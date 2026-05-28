@@ -5,42 +5,43 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
       "status": "DONE",
-      "reason": "Chapter COMPLETE 2026-05-27; closeout applied.",
+      "reason": "Chapter COMPLETE 2026-05-27",
       "doneReason": "marked DONE by steward SELECTION 2026-05-27"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json",
       "status": "DONE",
-      "reason": "MVP1 \u00a715B slice 6 \u2014 feedback + beta instrumentation.",
+      "reason": "MVP1 feedback-beta instrumentation COMPLETE",
       "doneReason": "chapter COMPLETE 2026-05-27; post_relay_closeout"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json",
       "status": "DONE",
-      "reason": "MVP1 Sprint 003 evidence-plane \u2014 post-feedback SELECTION 2026-05-27.",
+      "reason": "Sprint 003 evidence-plane COMPLETE",
       "selectionPrep": "docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json",
       "status": "DONE",
-      "reason": "Phase 3 commercial wrapper v0 \u2014 COMPLETE 2026-05-28.",
+      "reason": "Phase 3 commercial wrapper COMPLETE",
       "selectionPrep": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
       "doneReason": "shipped via PR #42/#56; chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json",
       "status": "DONE",
-      "reason": "Post-Phase3 steering + smoke witness refresh \u2014 SELECTION 2026-05-28.",
+      "reason": "Post-Phase3 steering + smoke COMPLETE 2026-05-28",
       "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json",
-      "status": "PLANNED",
-      "reason": "Deploy witness refresh — auto-SELECTION roadmap (pending until bootstrap).",
+      "status": "DONE",
+      "reason": "Deploy witness refresh \u2014 evidence-only relay on main",
       "selectionPrep": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
-      "workerMode": "deterministic"
+      "workerMode": "deterministic",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     }
   ]
 }

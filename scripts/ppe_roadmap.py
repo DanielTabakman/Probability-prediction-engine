@@ -260,7 +260,11 @@ def maybe_advance_roadmap_and_select(
         if sync:
             out["synced"] = len(sync)
 
-    adv = advance_after_chapter_closeout(repo, closed_plan_path, apply=apply)
+    adv = advance_after_chapter_closeout(
+        repo,
+        closed_plan_path=closed_plan_path,
+        apply=apply,
+    )
     out["advance"] = adv
 
     boot = bootstrap_next_ready(repo, apply=apply)

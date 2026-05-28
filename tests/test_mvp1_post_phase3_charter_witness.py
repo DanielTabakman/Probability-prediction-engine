@@ -43,8 +43,15 @@ def test_active_manifest_after_post_phase3_closeout() -> None:
     manifest = load_manifest(REPO)
     assert manifest.get("phasePlanPath") in ("", PLAN_REL)
     assert manifest["status"] in ("COMPLETE", "READY", "RUNNING")
-    assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md"
-    assert manifest["selectionRecord"] == "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md"
+    sprint = manifest.get("sprintSpecPath") or ""
+    assert sprint in (
+        "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md",
+        "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+    )
+    assert manifest.get("selectionRecord") in (
+        "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
+        "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+    )
 
 
 def test_phase_queue_post_phase3_done_or_ready() -> None:

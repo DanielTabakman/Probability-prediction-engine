@@ -1,7 +1,7 @@
 # MVP1 deploy witness refresh — evidence status
 
 **Chapter:** `mvp1_deploy_witness_refresh`  
-**Status:** **IN_PROGRESS** (awaiting relay slices)  
+**Status:** **COMPLETE** 2026-05-28 (deterministic relay closeout)  
 **Phase plan:** [`PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json`](PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json)  
 **Sprint:** [`SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md`](SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md)
 
@@ -11,9 +11,9 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-DeployWitness-Control-Slice001 | OPEN | Charter + roadmap/queue alignment |
-| MVP1-DeployWitness-Smoke-Slice002 | OPEN | `pytest -q` witness |
-| MVP1-DeployWitness-Closeout-Slice003 | OPEN | Control closeout |
+| MVP1-DeployWitness-Control-Slice001 | **CLOSED** | Deterministic charter (exit 20 → next slice) |
+| MVP1-DeployWitness-Smoke-Slice002 | **CLOSED** | Pytest witness (`PPE_SKIP_DUAL_SMOKE=1`) |
+| MVP1-DeployWitness-Closeout-Slice003 | **CLOSED** | Control closeout; manifest COMPLETE |
 
 ---
 
@@ -25,4 +25,4 @@ Primary doc: [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md)
 
 ## Pytest witness
 
-_(filled by Smoke slice)_
+**237 passed** (deterministic smoke slice, 2026-05-28).

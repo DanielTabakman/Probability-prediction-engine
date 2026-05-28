@@ -22,7 +22,7 @@ def _run_slice_cmd(
     plan_path: str,
     build_branch: str,
     slice_obj: dict | None,
-) -> int:
+) -> tuple[int, Path | None]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(repo)
     env["PPE_PHASE_PLAN"] = plan_path
@@ -78,19 +78,20 @@ def _run_slice_cmd(
         r = orch.run_slice(run=run, budgets=TimeBudget(), worker_mode="agent-cli")
         st = r.get("status")
         if st == "CONTINUE":
-            return 0
+            return 0, None
         if st == "STOP_FOR_REVIEW":
-            return 20
+            return 20, None
         if st == "BLOCKED":
-            return 40
-        return 2
+            return 40, None
+        return 2, None
 
     slice_cmd = repo / "run_slice.cmd"
-    return subprocess.run(
+    rc = subprocess.run(
         ["cmd", "/c", str(slice_cmd), slice_id, sprint_spec, plane, plan_path],
         cwd=repo,
         env=env,
     ).returncode
+    return rc, None
 
 
 def run_phase(repo_root: Path, plan_path: str) -> int:
@@ -116,7 +117,7 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
         plane = resolve_declared_plane(sl, "EVIDENCE-PLANE")
         build_branch = str(sl.get("buildBranch") or f"build/auto/{slice_id}-local")
         print(f"ppe_relay_phase: slice {slice_id} worker={resolve_worker_mode(slice_id=slice_id, slice_obj=sl)}")
-        exit_code = _run_slice_cmd(
+        exit_code, relay_run_dir = _run_slice_cmd(
             repo,
             slice_id=slice_id,
             sprint_spec=sprint,
@@ -125,20 +126,19 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
             build_branch=build_branch,
             slice_obj=sl,
         )
-        subprocess.run(
-            [
-                sys.executable,
-                str(repo / "scripts" / "post_relay_continue.py"),
-                "--repo-root",
-                str(repo),
-                "--phase-plan",
-                plan_path,
-                "--orchestrator-exit-code",
-                str(exit_code),
-            ],
-            cwd=repo,
-            check=False,
-        )
+        post_cmd = [
+            sys.executable,
+            str(repo / "scripts" / "post_relay_continue.py"),
+            "--repo-root",
+            str(repo),
+            "--phase-plan",
+            plan_path,
+            "--orchestrator-exit-code",
+            str(exit_code),
+        ]
+        if relay_run_dir is not None:
+            post_cmd.extend(["--relay-run-dir", str(relay_run_dir)])
+        subprocess.run(post_cmd, cwd=repo, check=False)
         if exit_code != 0:
             rc = try_recover(
                 repo,
