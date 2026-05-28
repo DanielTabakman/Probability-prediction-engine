@@ -22,7 +22,9 @@ def test_evidence_status_chapter_complete() -> None:
     ):
         assert slice_id in text
         assert "**CLOSED**" in text
-    assert "227" in text
-    assert "20260527_230359" in text
-    assert "20260527_231725" in text
-    assert "b4b195b" in text
+    assert "214" in text
+    assert "20260528_092349" in text
+    assert "20260528_092617" in text
+    assert "20260528_093947" in text
+    assert "49e856e" in text
+    assert "daecb6c" in text

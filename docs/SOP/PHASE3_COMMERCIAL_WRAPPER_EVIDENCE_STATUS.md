@@ -14,8 +14,8 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | Phase3-CommercialWrapper-Control-Slice001 | **CLOSED** 2026-05-28 | charter witness; baseline `main` @ `4dbc147`+ |
-| Phase3-CommercialWrapper-Product-Slice002 | **CLOSED** 2026-05-28 | product **`b4b195b`** — commercial wrapper v0 (CTA/offer copy, operator checklist, signal guard) |
-| Phase3-CommercialWrapper-Smoke-Slice003 | **CLOSED** 2026-05-28 | dual smoke witness; run IDs below |
+| Phase3-CommercialWrapper-Product-Slice002 | **CLOSED** 2026-05-28 | product **`49e856e`** — commercial wrapper v0 (CTA/offer copy, operator checklist, signal guard) |
+| Phase3-CommercialWrapper-Smoke-Slice003 | **CLOSED** 2026-05-28 | harness `commercial_wrapper_found` witness; product **`daecb6c`** |
 | Phase3-CommercialWrapper-Closeout-Slice004 | **CLOSED** 2026-05-28 | evidence witness; chapter **COMPLETE** |
 
 ---
@@ -24,8 +24,9 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **227** passed (2026-05-28 closeout re-verify) |
-| Dual smoke | **PASS** | `20260527_230359` (MVP1_compact) + `20260527_231725` (A_width); exit 0 (~1003s closeout re-verify) |
+| `python -m pytest -q` | **PASS** | **214** passed (2026-05-28 closeout re-verify) |
+| Dual smoke | **PASS** | `20260528_092617` (MVP1_compact) + `20260528_093947` (A_width); exit 0 (~1037s closeout re-verify) |
+| Primary UI smoke | **PASS** | `20260528_092349` (A_width); exit 0 (~114s closeout re-verify) |
 
 ---
 
@@ -34,9 +35,10 @@
 - **`commercial_wrapper.py`** — centralized demo CTA/offer copy, operator checklist markdown, signal-language guard via `validate_all_wrapper_copy()`.
 - **`app.py`** — hero tagline, public demo banner, research-offer strip, operator checklist expander wiring.
 - **`app_panels.py`** — commercial boundary caption on BTC implied lab path.
-- **Tests** — `test_commercial_wrapper.py` (copy + signal guard); `test_phase3_commercial_wrapper_charter_witness.py` (charter gate).
+- **`implied_lab_ui_smoke_harness.py`** — `commercial_wrapper_found` witness in MVP1_compact scenario.
+- **Tests** — `test_commercial_wrapper.py` (copy + signal guard); `test_commercial_wrapper_smoke_witness.py` (harness gate); `test_phase3_commercial_wrapper_charter_witness.py` (charter gate); `test_phase3_commercial_wrapper_closeout_witness.py` (chapter closeout gate).
 
-**Shipped product commit:** `b4b195b` on `main` (Slice002).
+**Shipped product commit:** `49e856e` on `main` (Slice002 integrate); smoke harness **`daecb6c`** (Slice003).
 
 ---
 
@@ -44,12 +46,12 @@
 
 | Run ID | Scenario | Exit | Notes |
 |--------|----------|------|-------|
-| 20260527_230359 | MVP1_compact_verification | 0 | verification true; product_shell_context=true (~804s) closeout re-verify |
-| 20260527_231725 | A_width_target_payoff | 0 | verification true; evidence_plane_complete=true (~198s) closeout re-verify |
+| 20260528_092617 | MVP1_compact_verification | 0 | verification true; commercial_wrapper=true (~810s) closeout re-verify |
+| 20260528_093947 | A_width_target_payoff | 0 | verification true; evidence_plane_complete=true (~224s) closeout re-verify |
 
 ## Pytest
 
-- Count at closeout re-verify: **227** passed (2026-05-28)
+- Count at closeout re-verify: **214** passed (2026-05-28)
 
 ---
 
