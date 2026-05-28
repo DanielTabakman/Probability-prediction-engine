@@ -220,6 +220,7 @@ class ScenarioResult:
     verification_found: bool = False
     trust_strip_mvp1_found: bool = False
     feedback_panel_found: bool = False
+    product_shell_context_found: bool = False
     decision_review_mvp1_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
@@ -713,6 +714,7 @@ def _scroll_main_content(page) -> None:
 def _mvp1_compact_marker_visible(page) -> bool:
     """Friends-first digest markers only — avoid false positives from collapsed Screen map caption."""
     for marker in (
+        "Where you are",
         "What this run is saying",
         "Give feedback",
         "MVP1 data quality",
@@ -847,6 +849,23 @@ def _collect_feedback_panel_observation(page, result: ScenarioResult) -> None:
         result.feedback_panel_found = False
     except Exception:
         result.feedback_panel_found = False
+
+
+def _collect_product_shell_context_observation(page, result: ScenarioResult) -> None:
+    """MVP1 compact: product-shell context strip (name hierarchy + where-you-are)."""
+    if result.scenario != "MVP1_compact_verification":
+        return
+    try:
+        _scroll_to_mvp1_friends_first_block(page)
+        required = ("Where you are", "Probability Engine", "BTC Implied Lab")
+        for marker in required:
+            loc = page.locator(f"text={marker}").first
+            if loc.count() == 0 or not loc.is_visible():
+                result.product_shell_context_found = False
+                return
+        result.product_shell_context_found = True
+    except Exception:
+        result.product_shell_context_found = False
 
 
 def _collect_decision_review_mvp1_observation(page, result: ScenarioResult) -> None:
@@ -1170,6 +1189,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     except Exception:
         pass
     try:
+        _collect_product_shell_context_observation(page, r)
+    except Exception:
+        pass
+    try:
         _collect_decision_review_mvp1_observation(page, r)
     except Exception:
         pass
@@ -1300,6 +1323,7 @@ def main() -> int:
                     f"page_loaded={result.page_loaded} verification={result.verification_found} "
                     f"trust_strip_mvp1={result.trust_strip_mvp1_found} "
                     f"feedback_panel={result.feedback_panel_found} "
+                    f"product_shell_context={result.product_shell_context_found} "
                     f"decision_review_mvp1={result.decision_review_mvp1_found}"
                 )
 
@@ -1382,6 +1406,7 @@ def main() -> int:
                     "verification_found": r.verification_found,
                     "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
                     "feedback_panel_found": r.feedback_panel_found,
+                    "product_shell_context_found": r.product_shell_context_found,
                     "decision_review_mvp1_found": r.decision_review_mvp1_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
@@ -1407,7 +1432,8 @@ def main() -> int:
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
                     "If MVP1_compact_verification is included, verification_found, "
-                    "trust_strip_mvp1_found, and feedback_panel_found must be true. "
+                    "trust_strip_mvp1_found, feedback_panel_found, and "
+                    "product_shell_context_found must be true. "
                     "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
@@ -1472,6 +1498,7 @@ def main() -> int:
             verification_ok = verification_ok and bool(rm.verification_found)
             verification_ok = verification_ok and bool(rm.trust_strip_mvp1_found)
             verification_ok = verification_ok and bool(rm.feedback_panel_found)
+            verification_ok = verification_ok and bool(rm.product_shell_context_found)
         if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 
