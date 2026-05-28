@@ -1,7 +1,7 @@
 # MVP1 Sprint 003 evidence-plane — evidence status
 
 **Chapter:** MVP1 Sprint 003 evidence-plane (relay-assisted hardening)  
-**Status:** **COMPLETE** 2026-05-28  
+**Status:** **COMPLETE** 2026-05-27  
 **SELECTION:** [`POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md`](POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md`](SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json`](PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json)
