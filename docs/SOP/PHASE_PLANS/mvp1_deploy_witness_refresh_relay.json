@@ -1,0 +1,49 @@
+{
+  "name": "MVP1_deploy_witness_refresh (auto-SELECTION roadmap)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+  "selectionRecord": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DeployWitness-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+      "buildBranch": "build/auto/MVP1-DeployWitness-Control-Slice001-deploy_witness",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DeployWitness-Smoke-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+      "buildBranch": "build/auto/MVP1-DeployWitness-Smoke-Slice002-deploy_witness",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DeployWitness-Closeout-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+      "buildBranch": "build/auto/MVP1-DeployWitness-Closeout-Slice003-deploy_witness",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_deploy_witness_refresh",
+        "chapterTitle": "MVP1 deploy witness refresh",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-28",
+        "evidenceDoc": "docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
+        "selectionOutcomeDoc": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md",
+          "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
+        ]
+      }
+    }
+  ]
+}

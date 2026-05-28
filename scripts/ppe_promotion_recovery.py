@@ -144,6 +144,17 @@ def _run_control_closeout(repo: Path, phase_plan: Path, slice_id: str, relay_run
         ok, reason = mark_queue_item_done(repo, plan_path=rel_plan)
         print(f"ppe_promotion_recovery: queue mark-done {ok!r} ({reason})")
         clear_manifest_plan_path(repo, note=f"Chapter closeout {slice_id} via promotion recovery.")
+        try:
+            from scripts.ppe_roadmap import maybe_advance_roadmap_and_select
+
+            road = maybe_advance_roadmap_and_select(
+                repo,
+                closed_plan_path=rel_plan,
+                apply=True,
+            )
+            print(f"ppe_promotion_recovery: roadmap advance {road}")
+        except Exception as exc:
+            print(f"ppe_promotion_recovery: roadmap advance skipped: {exc}")
     print(f"ppe_promotion_recovery: control-closeout OK for {slice_id}")
     try:
         from scripts.ppe_google_docs_refresh import run_google_docs_refresh

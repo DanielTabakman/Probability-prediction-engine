@@ -113,6 +113,16 @@ def run_auto_select(
                 f"ppe_auto_select: queue health warnings: {len(remaining)} issue(s) remain",
                 file=sys.stderr,
             )
+        try:
+            from scripts.ppe_roadmap import prepare_selection_idle
+
+            prep = prepare_selection_idle(repo, apply=True)
+            if not prep.get("skipped"):
+                print(f"ppe_auto_select: roadmap prepare {json.dumps(prep)}")
+        except FileNotFoundError:
+            pass
+        except Exception as exc:
+            print(f"ppe_auto_select: roadmap prepare warning: {exc}", file=sys.stderr)
 
     try:
         manifest = load_manifest(repo)

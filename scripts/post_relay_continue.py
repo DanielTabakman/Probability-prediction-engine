@@ -143,6 +143,17 @@ def main(argv: list[str] | None = None) -> int:
             print(f"post_relay_continue: queue auto-repair {len(fixes)} fix(es)")
         if remaining:
             print(f"post_relay_continue: queue health {len(remaining)} issue(s): {remaining}")
+        try:
+            from scripts.ppe_roadmap import maybe_advance_roadmap_and_select
+
+            road = maybe_advance_roadmap_and_select(
+                repo,
+                closed_plan_path=queue_plan,
+                apply=True,
+            )
+            print(f"post_relay_continue: roadmap advance {json.dumps(road)}")
+        except Exception as exc:
+            print(f"post_relay_continue: roadmap advance skipped: {exc}")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     try:
