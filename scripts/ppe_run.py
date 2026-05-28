@@ -13,7 +13,10 @@ from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_google_docs_refresh import refresh_google_docs_on_queue_idle
 from scripts.ppe_manifest import load_manifest, load_phase_plan, set_manifest_status
 from scripts.ppe_preflight import run_preflight
-from scripts.ppe_troubleshooter import maybe_recover_stop_for_review
+from scripts.ppe_troubleshooter import (
+    maybe_open_promotion_pr_for_blocked,
+    maybe_recover_stop_for_review,
+)
 from scripts.resolve_active_phase import main as resolve_main
 
 
@@ -152,6 +155,15 @@ def cmd_run_phase(repo: Path, plan_path: str, *, auto_resume: bool) -> int:
                 exit_code = 0
         except Exception as e:
             print(f"WARN: troubleshooter failed: {e}")
+
+    # If relay BLOCKED due to promotion drift, try opening a PR automatically.
+    if auto_resume and exit_code == 40:
+        try:
+            url = maybe_open_promotion_pr_for_blocked(repo=repo)
+            if url:
+                print(f"ppe_run: opened promotion PR: {url}")
+        except Exception as e:
+            print(f"WARN: promotion PR open failed: {e}")
 
     if log.is_file():
         subprocess.run(

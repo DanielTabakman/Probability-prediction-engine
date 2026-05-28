@@ -7,6 +7,7 @@ promotion locks or closeout not being applied, *when it is safe*.
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Callable
 
@@ -84,4 +85,67 @@ def maybe_recover_stop_for_review(
         return rc == 0
 
     return False
+
+
+def maybe_open_promotion_pr_for_blocked(*, repo: Path) -> str | None:
+    """
+    If the last relay run BLOCKED due to repo-state drift / promotion issues,
+    try to open a PR for the build branch to `main`.
+
+    Returns PR URL if created or already exists; otherwise None.
+    """
+    latest = _find_latest_relay_result(repo)
+    if latest is None:
+        return None
+    data = json.loads(latest.read_text(encoding="utf-8-sig"))
+    if not isinstance(data, dict):
+        return None
+
+    # Only act when relay itself indicates continuation is safe.
+    if not bool(data.get("safe_to_continue", False)):
+        return None
+
+    build_branch = str(data.get("build_branch") or "").strip()
+    if not build_branch:
+        return None
+
+    promotion = data.get("promotion") if isinstance(data.get("promotion"), dict) else {}
+    if bool(promotion.get("performed", False)):
+        return None
+
+    # Best-effort: if gh is unavailable or auth fails, just return None.
+    try:
+        pr_list = subprocess.run(
+            ["gh", "pr", "list", "--head", build_branch, "--json", "url,state", "--jq", ".[0].url"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        existing = (pr_list.stdout or "").strip()
+        if existing:
+            return existing
+        pr_create = subprocess.run(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--base",
+                "main",
+                "--head",
+                build_branch,
+                "--title",
+                f"Promote {build_branch}",
+                "--body",
+                "Automated PR opened due to relay BLOCKED promotion.",
+            ],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        url = (pr_create.stdout or "").strip()
+        return url or None
+    except Exception:
+        return None
 
