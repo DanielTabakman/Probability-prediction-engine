@@ -20,6 +20,11 @@ from src.viz.belief_uncertainty import (
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
 from src.viz.mvp1_feedback_ui import render_mvp1_feedback_panel
+from src.viz.mvp1_product_shell import (
+    feedback_path_hint,
+    product_hierarchy_line,
+    workspace_context_caption,
+)
 
 
 def compute_mvp1_belief_overlay_state(
@@ -302,15 +307,25 @@ def render_trust_strip_at_a_glance(verification: dict) -> None:
     st.markdown("\n\n".join(compact))
 
 
+def render_mvp1_product_shell_context() -> None:
+    """Compact product shell: where the user is + feedback path (friends-first MVP1)."""
+    with st.container(border=True):
+        st.markdown("##### Where you are")
+        st.markdown(product_hierarchy_line())
+        st.caption(workspace_context_caption())
+        st.caption(feedback_path_hint())
+
+
 def render_mvp1_friends_first_above_fold(verification: dict) -> None:
     """
     Above-fold MVP1 block: what this run is saying + compact decision + trust (before chart).
-  """
+    """
     if not isinstance(verification, dict):
         return
     mvp1 = verification.get("mvp1_decision")
     if not isinstance(mvp1, dict) or not mvp1.get("primary_output_state"):
         return
+    render_mvp1_product_shell_context()
     with st.container(border=True):
         st.markdown("##### What this run is saying")
         st.caption(
