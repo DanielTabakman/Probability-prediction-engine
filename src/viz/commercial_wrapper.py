@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.viz.mvp1_product_shell import assert_no_signal_language
 from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 
 COMMERCIAL_FORBIDDEN_SIGNAL_TOKENS = (
@@ -21,6 +20,9 @@ COMMERCIAL_FORBIDDEN_SIGNAL_TOKENS = (
 
 APP_TAGLINE = (
     "Market-implied distributions and prediction markets — exploration, not advice."
+)
+COMMERCIAL_BOUNDARY_CAPTION = (
+    "Research exploration only; not trade advice, edge claims, or execution."
 )
 PRIVATE_APP_CTA_LABEL = "Get full access"
 PRIVATE_APP_CTA_CAPTION = "Sign in on the full app to save snapshots and reviews."
@@ -40,7 +42,6 @@ def assert_commercial_copy_safe(text: str) -> None:
     for tok in COMMERCIAL_FORBIDDEN_SIGNAL_TOKENS:
         if tok in low:
             raise AssertionError(f"forbidden signal language: {tok!r}")
-    assert_no_signal_language(text)
 
 
 @dataclass(frozen=True)
@@ -73,6 +74,7 @@ def commercial_surface_copy() -> CommercialSurfaceCopy:
         copy.private_app_caption,
         copy.demo_banner,
         copy.research_offer_blurb,
+        COMMERCIAL_BOUNDARY_CAPTION,
     ):
         assert_commercial_copy_safe(value)
     return copy

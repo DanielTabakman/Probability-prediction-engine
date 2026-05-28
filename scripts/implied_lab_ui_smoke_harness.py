@@ -220,6 +220,7 @@ class ScenarioResult:
     verification_found: bool = False
     trust_strip_mvp1_found: bool = False
     feedback_panel_found: bool = False
+    commercial_wrapper_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
@@ -848,6 +849,25 @@ def _collect_feedback_panel_observation(page, result: ScenarioResult) -> None:
         result.feedback_panel_found = False
 
 
+def _collect_commercial_wrapper_observation(page, result: ScenarioResult) -> None:
+    """MVP1 compact: Phase 3 commercial wrapper hero tagline + boundary caption."""
+    if result.scenario != "MVP1_compact_verification":
+        return
+    try:
+        hero = page.locator("text=exploration, not advice").first
+        if hero.count() == 0 or not hero.is_visible():
+            result.commercial_wrapper_found = False
+            return
+        _scroll_to_mvp1_friends_first_block(page)
+        boundary = page.locator("text=Research exploration only").first
+        if boundary.count() == 0 or not boundary.is_visible():
+            result.commercial_wrapper_found = False
+            return
+        result.commercial_wrapper_found = True
+    except Exception:
+        result.commercial_wrapper_found = False
+
+
 def _collect_directional_category_verification(page, result: ScenarioResult) -> None:
     """Scenario C: belief-vs-market category must be directional (peak off, width similar)."""
     if result.scenario != "C_directional_peak_disagreement":
@@ -1152,6 +1172,10 @@ def run_one_scenario(page, scenario: str) -> ScenarioResult:
     except Exception:
         pass
     try:
+        _collect_commercial_wrapper_observation(page, r)
+    except Exception:
+        pass
+    try:
         _collect_directional_category_verification(page, r)
     except Exception:
         pass
@@ -1277,7 +1301,8 @@ def main() -> int:
                     f"elapsed_s={elapsed_s:.1f} "
                     f"page_loaded={result.page_loaded} verification={result.verification_found} "
                     f"trust_strip_mvp1={result.trust_strip_mvp1_found} "
-                    f"feedback_panel={result.feedback_panel_found}"
+                    f"feedback_panel={result.feedback_panel_found} "
+                    f"commercial_wrapper={result.commercial_wrapper_found}"
                 )
 
             browser.close()
@@ -1359,6 +1384,7 @@ def main() -> int:
                     "verification_found": r.verification_found,
                     "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
                     "feedback_panel_found": r.feedback_panel_found,
+                    "commercial_wrapper_found": r.commercial_wrapper_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
@@ -1383,7 +1409,7 @@ def main() -> int:
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
                     "If MVP1_compact_verification is included, verification_found, "
-                    "trust_strip_mvp1_found, and feedback_panel_found must be true. "
+                    "trust_strip_mvp1_found, feedback_panel_found, and commercial_wrapper_found must be true. "
                     "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
@@ -1448,6 +1474,7 @@ def main() -> int:
             verification_ok = verification_ok and bool(rm.verification_found)
             verification_ok = verification_ok and bool(rm.trust_strip_mvp1_found)
             verification_ok = verification_ok and bool(rm.feedback_panel_found)
+            verification_ok = verification_ok and bool(rm.commercial_wrapper_found)
         if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 

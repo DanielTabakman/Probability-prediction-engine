@@ -17,6 +17,7 @@ from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
 )
+from src.viz.commercial_wrapper import COMMERCIAL_BOUNDARY_CAPTION
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
 from src.viz.mvp1_feedback_ui import render_mvp1_feedback_panel
@@ -316,6 +317,7 @@ def render_mvp1_friends_first_above_fold(verification: dict) -> None:
         st.caption(
             "Plain-English read from this marks snapshot — research insight, not trade advice."
         )
+        st.caption(COMMERCIAL_BOUNDARY_CAPTION)
         _render_mvp1_decision_digest(mvp1, bordered=False, friends_first=True)
         st.divider()
         render_trust_strip_at_a_glance(verification)

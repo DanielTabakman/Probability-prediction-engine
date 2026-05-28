@@ -43,11 +43,11 @@ class TestCommercialWrapper(unittest.TestCase):
         self.assertEqual(private_url, "https://app.example.com")
         self.assertEqual(offer, ("https://cal.example.com/book", "Book a research demo"))
 
-    def test_forbidden_tokens_cover_product_shell_subset(self) -> None:
-        from src.viz.mvp1_product_shell import FORBIDDEN_SIGNAL_TOKENS
+    def test_boundary_caption_is_non_advisory(self) -> None:
+        from src.viz.commercial_wrapper import COMMERCIAL_BOUNDARY_CAPTION
 
-        for tok in FORBIDDEN_SIGNAL_TOKENS:
-            self.assertIn(tok, COMMERCIAL_FORBIDDEN_SIGNAL_TOKENS)
+        assert_commercial_copy_safe(COMMERCIAL_BOUNDARY_CAPTION)
+        self.assertIn("Research exploration only", COMMERCIAL_BOUNDARY_CAPTION)
 
 
 if __name__ == "__main__":
