@@ -170,7 +170,7 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     return exit_code
 
 
-def cmd_continuous(repo: Path, *, max_chapters: int = 5) -> int:
+def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
     """Run phases back-to-back until queue empty, failure, or max_chapters."""
     for chapter in range(1, max_chapters + 1):
         print(f"ppe_run: continuous chapter {chapter}/{max_chapters}")
@@ -193,6 +193,13 @@ def cmd_continuous(repo: Path, *, max_chapters: int = 5) -> int:
 
         exit_code = cmd_run_phase(repo, plan_path)
         if exit_code != 0:
+            try:
+                manifest = load_manifest(repo)
+                if str(manifest.get("status") or "").strip().upper() == "COMPLETE":
+                    print("ppe_run: continuous continue (phase exit non-zero but manifest COMPLETE)")
+                    continue
+            except Exception:
+                pass
             print(f"ppe_run: continuous stop (phase exit {exit_code})")
             return exit_code
 
@@ -236,8 +243,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--continuous-max",
         type=int,
-        default=5,
-        help="Max chapters per --continuous invocation (default 5).",
+        default=20,
+        help="Max chapters per --continuous invocation (default 20).",
     )
     args = ap.parse_args(argv)
 

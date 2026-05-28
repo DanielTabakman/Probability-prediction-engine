@@ -3,5 +3,5 @@
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
   "selectionRecord": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
   "status": "COMPLETE",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Deploy witness refresh \u2014 evidence-only relay on main Chapter closeout MVP1-DeployWitness-Closeout-Slice003; queue item marked DONE."
+  "notes": "Idle after deploy witness closeout; Phase 5 review hardening queued on roadmap."
 }

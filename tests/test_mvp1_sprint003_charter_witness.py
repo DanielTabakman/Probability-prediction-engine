@@ -35,7 +35,8 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
 def test_active_manifest_after_sprint003_closeout() -> None:
     manifest = load_manifest(REPO)
     post_phase3_plan = "docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json"
-    assert manifest.get("phasePlanPath") in ("", PLAN_REL, post_phase3_plan)
+    phase5_plan = "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json"
+    assert manifest.get("phasePlanPath") in ("", PLAN_REL, post_phase3_plan, phase5_plan)
     assert manifest["status"] in ("COMPLETE", "RUNNING", "READY")
     if manifest["status"] == "RUNNING" and manifest.get("phasePlanPath") == PLAN_REL:
         summary = resolve_summary(REPO)

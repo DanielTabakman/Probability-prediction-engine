@@ -42,6 +42,12 @@
       "selectionPrep": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json",
+      "status": "PLANNED",
+      "reason": "Phase 5 review SQLite FK hardening \u2014 MVP1-Phase5-Slice002 canon",
+      "selectionPrep": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md"
     }
   ]
 }

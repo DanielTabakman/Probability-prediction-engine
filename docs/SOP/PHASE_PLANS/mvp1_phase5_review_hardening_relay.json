@@ -1,0 +1,63 @@
+{
+  "name": "MVP1_phase5_review_hardening (post-deploy witness SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+  "selectionRecord": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-Phase5Review-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+      "buildBranch": "build/auto/MVP1-Phase5Review-Control-Slice001-phase5_review",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Phase5Review-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+      "buildBranch": "build/auto/MVP1-Phase5Review-Product-Slice002-phase5_review",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/frozen_evaluation_store.py",
+        "tests/test_frozen_review_store.py",
+        "tests/test_frozen_evaluation_store.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-Phase5Review-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+      "buildBranch": "build/auto/MVP1-Phase5Review-Smoke-Slice003-phase5_review",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Phase5Review-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+      "buildBranch": "build/auto/MVP1-Phase5Review-Closeout-Slice004-phase5_review",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_phase5_review_hardening",
+        "chapterTitle": "MVP1 Phase 5 review persistence hardening",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-28",
+        "evidenceDoc": "docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
