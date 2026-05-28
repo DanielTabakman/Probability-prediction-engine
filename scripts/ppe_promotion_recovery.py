@@ -11,6 +11,7 @@ from pathlib import Path
 
 from scripts.ppe_manifest import clear_manifest_plan_path, load_manifest, maybe_mark_manifest_complete
 from scripts.ppe_queue import mark_queue_item_done
+from scripts.ppe_queue_health import repair_queue
 from scripts.post_relay_continue import _find_newest_relay_run, _load_decision, _load_relay_result
 from scripts.relay.apply_control_closeout import (
     CloseoutSpec,
@@ -179,6 +180,12 @@ def try_recover(
     if exit_code not in (20, 40):
         print(f"ppe_promotion_recovery: exit {exit_code} not recoverable here")
         return 0
+
+    fixes, remaining = repair_queue(repo, apply=True)
+    if fixes:
+        print(f"ppe_promotion_recovery: queue auto-repair {len(fixes)} fix(es)")
+    if remaining:
+        print(f"ppe_promotion_recovery: queue health {len(remaining)} issue(s) remain")
 
     run_dir = _find_newest_relay_run(repo)
     relay = _load_relay_result(run_dir) if run_dir else None

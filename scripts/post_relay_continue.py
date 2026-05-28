@@ -14,6 +14,7 @@ from scripts.ppe_manifest import (
     maybe_mark_manifest_complete,
 )
 from scripts.ppe_queue import mark_queue_item_done
+from scripts.ppe_queue_health import repair_queue
 from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
 
 
@@ -137,6 +138,11 @@ def main(argv: list[str] | None = None) -> int:
             note=f"Chapter closeout {slice_id}; queue item marked DONE.",
         )
         print("post_relay_continue: cleared manifest phasePlanPath")
+        fixes, remaining = repair_queue(repo, apply=True)
+        if fixes:
+            print(f"post_relay_continue: queue auto-repair {len(fixes)} fix(es)")
+        if remaining:
+            print(f"post_relay_continue: queue health {len(remaining)} issue(s): {remaining}")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     try:

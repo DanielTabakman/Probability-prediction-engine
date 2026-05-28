@@ -24,6 +24,7 @@ from scripts.ppe_manifest import (
     validate_phase_plan,
 )
 from scripts.ppe_queue import QUEUE_REL, load_queue, mark_queue_item_done
+from scripts.ppe_queue_health import repair_queue
 
 
 def _plan_exists_and_valid(repo_root: Path, plan_path: str) -> list[str]:
@@ -102,6 +103,16 @@ def run_auto_select(
 ) -> int:
     """Core selection logic; returns process exit code."""
     repo = repo_root.resolve()
+
+    if apply and not select_only:
+        fixes, remaining = repair_queue(repo, apply=True)
+        if fixes:
+            print(f"ppe_auto_select: queue auto-repair applied {len(fixes)} fix(es)")
+        if remaining:
+            print(
+                f"ppe_auto_select: queue health warnings: {len(remaining)} issue(s) remain",
+                file=sys.stderr,
+            )
 
     try:
         manifest = load_manifest(repo)

@@ -39,18 +39,27 @@ def mark_queue_item_done(
         raise ValueError("queue: items must be an array")
 
     norm = plan_path.replace("\\", "/").strip()
+    marked: list[int] = []
     for i, item in enumerate(items):
         if not isinstance(item, dict):
             continue
         item_plan = str(item.get("planPath") or "").replace("\\", "/").strip()
         if item_plan != norm:
             continue
+        if str(item.get("status") or "").upper() == "DONE":
+            marked.append(i)
+            continue
         item["status"] = "DONE"
         prev = str(item.get("doneReason") or "").strip()
         if not prev:
             item["doneReason"] = done_reason
         queue["items"][i] = item
+        marked.append(i)
+
+    if marked:
         save_queue(repo_root, queue)
-        return True, f"queue item {i} marked DONE"
+        if len(marked) == 1:
+            return True, f"queue item {marked[0]} marked DONE"
+        return True, f"queue items {marked} marked DONE ({len(marked)} duplicates)"
 
     return False, "no matching planPath in queue"
