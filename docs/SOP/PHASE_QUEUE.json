@@ -34,6 +34,13 @@
       "reason": "Post-Phase3 steering + smoke witness refresh \u2014 SELECTION 2026-05-28.",
       "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json",
+      "status": "PLANNED",
+      "reason": "Deploy witness refresh — auto-SELECTION roadmap (pending until bootstrap).",
+      "selectionPrep": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+      "workerMode": "deterministic"
     }
   ]
 }

@@ -63,3 +63,46 @@ def mark_queue_item_done(
         return True, f"queue items {marked} marked DONE ({len(marked)} duplicates)"
 
     return False, "no matching planPath in queue"
+
+
+def find_queue_item_index(queue: dict[str, Any], plan_path: str) -> int | None:
+    norm = plan_path.replace("\\", "/").strip()
+    for i, item in enumerate(queue.get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("planPath") or "").replace("\\", "/").strip() == norm:
+            return i
+    return None
+
+
+def upsert_queue_item(
+    repo_root: Path,
+    *,
+    plan_path: str,
+    status: str,
+    **fields: Any,
+) -> tuple[bool, str]:
+    """Insert or update a queue row by planPath."""
+    queue = load_queue(repo_root)
+    items = queue.get("items") or []
+    if not isinstance(items, list):
+        raise ValueError("queue: items must be an array")
+
+    norm = plan_path.replace("\\", "/").strip()
+    idx = find_queue_item_index(queue, norm)
+    row: dict[str, Any] = {"planPath": norm, "status": status.upper()}
+    for key, val in fields.items():
+        if val is not None and val != "":
+            row[key] = val
+
+    if idx is None:
+        items.append(row)
+        save_queue(repo_root, queue)
+        return True, f"queue item {len(items) - 1} created ({status})"
+
+    prev = items[idx]
+    prev.update(row)
+    items[idx] = prev
+    queue["items"] = items
+    save_queue(repo_root, queue)
+    return True, f"queue item {idx} updated ({status})"
