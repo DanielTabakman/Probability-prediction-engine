@@ -39,11 +39,14 @@ class CloseoutSpec:
 
     @classmethod
     def from_dict(cls, d: dict[str, Any], slice_id: str | None = None) -> CloseoutSpec:
+        closed = str(d.get("closedDate") or "").strip()
+        if not closed:
+            closed = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         return cls(
             chapter_id=d["chapterId"],
             chapter_title=d["chapterTitle"],
             chapter_status=d["chapterStatus"],
-            closed_date=d["closedDate"],
+            closed_date=closed,
             evidence_doc=d["evidenceDoc"].replace("\\", "/"),
             sprint_spec=d["sprintSpec"].replace("\\", "/"),
             next_selection_doc=d["nextSelectionDoc"].replace("\\", "/"),

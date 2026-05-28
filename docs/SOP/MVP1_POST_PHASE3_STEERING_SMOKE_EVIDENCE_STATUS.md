@@ -1,7 +1,7 @@
 # MVP1 post-Phase3 steering + smoke witness — evidence status
 
 **Chapter:** MVP1 post-Phase3 steering + smoke witness refresh (v0)  
-**Status:** **IN PROGRESS**  
+**Status:** **COMPLETE** 2026-05-28  
 **SELECTION:** [`POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md`](POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md`](SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json`](PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json)
@@ -14,7 +14,7 @@
 |-------|--------|-------|
 | MVP1-PostPhase3-Control-Slice001 | **CLOSED** 2026-05-28 | charter witness; baseline `main` @ `35a0528`+ |
 | MVP1-PostPhase3-Smoke-Slice002 | **CLOSED** 2026-05-28 | dual smoke witness; relay build `05db71d` |
-| MVP1-PostPhase3-Closeout-Slice003 | **OPEN** | chapter close |
+| MVP1-PostPhase3-Closeout-Slice003 | **CLOSED** 2026-05-28 | control closeout (manual; ACP plan limit) |
 
 ---
 

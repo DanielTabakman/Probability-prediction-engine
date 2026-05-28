@@ -30,9 +30,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json",
-      "status": "READY",
-      "reason": "Post-Phase3 steering + smoke witness refresh — SELECTION 2026-05-28.",
-      "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md"
+      "status": "DONE",
+      "reason": "Post-Phase3 steering + smoke witness refresh \u2014 SELECTION 2026-05-28.",
+      "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     }
   ]
 }

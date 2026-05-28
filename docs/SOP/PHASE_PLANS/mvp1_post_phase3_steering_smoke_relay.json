@@ -34,6 +34,7 @@
         "chapterId": "mvp1_post_phase3_steering_smoke",
         "chapterTitle": "MVP1 post-Phase3 steering + smoke witness refresh",
         "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-28",
         "evidenceDoc": "docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md",
         "sprintSpec": "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md",
         "selectionOutcomeDoc": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md",
