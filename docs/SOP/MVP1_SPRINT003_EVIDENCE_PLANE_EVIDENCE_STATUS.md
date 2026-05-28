@@ -1,7 +1,7 @@
 # MVP1 Sprint 003 evidence-plane — evidence status
 
 **Chapter:** MVP1 Sprint 003 evidence-plane (relay-assisted hardening)  
-**Status:** **COMPLETE** 2026-05-27  
+**Status:** **COMPLETE** 2026-05-28  
 **SELECTION:** [`POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md`](POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md)  
 **Sprint spec:** [`SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md`](SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md)  
 **Phase plan:** [`PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json`](PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json)  
@@ -16,7 +16,7 @@
 | MVP1-Sprint003-Control-Slice001 | **CLOSED** 2026-05-27 | charter witness; baseline `main` @ `897e16c`+ |
 | MVP1-Sprint003-Evidence-Slice002 | **CLOSED** 2026-05-27 | tiered pushable gate + queue auto-select; product **`3d4b311`** |
 | MVP1-Sprint003-Witness-Slice003 | **CLOSED** 2026-05-27 | pytest + ruff witness |
-| MVP1-Sprint003-Closeout-Slice004 | **CLOSED** 2026-05-27 | evidence witness; chapter **COMPLETE**; `main` @ **`a2138e2`** |
+| MVP1-Sprint003-Closeout-Slice004 | **CLOSED** 2026-05-28 | evidence witness; chapter **COMPLETE** |
 
 ---
 
@@ -24,9 +24,9 @@
 
 | Gate | Status | Evidence |
 |------|--------|----------|
-| `python -m pytest -q` | **PASS** | **217** collected (product-shell charter re-verify 2026-05-27) |
-| `python scripts/run_pushable_gate.py` | **PASS** | tier **1** (control-plane) |
-| Primary UI smoke | **PASS** | `20260527_175706` |
+| `python -m pytest -q` | **PASS** | **229** passed (2026-05-28 closeout re-verify) |
+| `python scripts/run_pushable_gate.py` | **PASS** | tier **1** (docs + tests witness) |
+| Primary UI smoke | **PASS** | `20260528_111917` (A_width_target_payoff); exit 0 (~113s) |
 
 ---
 
@@ -37,3 +37,18 @@
 - **`tests/test_run_pushable_gate.py`**, **`tests/test_ppe_auto_select.py`**, **`tests/test_ppe_auto_chain.py`**, **`tests/test_ppe_google_docs_refresh.py`**.
 
 **Process doc:** [`PPE_UNIFIED_AUTO_RUN_V1.md`](PPE_UNIFIED_AUTO_RUN_V1.md).
+
+---
+
+## Pytest
+
+- Count at closeout re-verify: **229** passed (2026-05-28)
+
+---
+
+## Chapter close (witness)
+
+**`MVP1-Sprint003-Closeout-Slice004`** — **CLOSED** 2026-05-28.
+
+- All relay slices **CLOSED**; engineering gates **PASS**; evidence-plane delta recorded above.
+- Steward **CONTROL-CLOSEOUT** pending: sync `MVP1_FRONTIER`, `HANDOFF`, `PPE_INTEGRATED_STATUS`, continuity brief, and next-chapter **SELECTION** prep per sprint spec.
