@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — mvp1 sprint 003 evidence-plane **COMPLETE** 2026-05-27
+- Active MVP1 focus: **none** — mvp1 post-phase3 steering + smoke witness refresh **COMPLETE** 2026-05-28
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MVP1 Sprint 003 evidence-plane COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MVP1 post-Phase3 steering + smoke witness refresh COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -50,4 +50,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-05-27 — MVP1 Sprint 003 evidence-plane COMPLETE; closeout job `MVP1-Sprint003-Closeout-Slice004`.
+2026-05-28 — MVP1 post-Phase3 steering + smoke witness refresh COMPLETE; closeout job `MVP1-PostPhase3-Closeout-Slice003`.

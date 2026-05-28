@@ -9,8 +9,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MVP1 post-Phase3 steering + smoke witness refresh (v0)** — **IN PROGRESS** ([`POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md`](POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md))
-- **Last closed chapter:** **Phase 3 commercial wrapper (v0)** — **COMPLETE** 2026-05-28
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_MVP1_FEEDBACK_BETA_SELECTION.md`](docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION.md))
+- **Last closed chapter:** **MVP1 post-Phase3 steering + smoke witness refresh** — **COMPLETE** 2026-05-28
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
