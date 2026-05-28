@@ -113,6 +113,14 @@ from src.viz.reviewed_class_summary import build_class_summary, serialize_rollup
 from src.viz.perf import PerfLog, timed
 from src.viz.tutorial import render_how_it_works_expander, render_tutorial_section
 from src.viz.prefetch import maybe_submit_prefetch, prefetch_status
+from src.viz.commercial_wrapper import (
+    DEMO_HERO_TAGLINE,
+    PRIVATE_APP_CTA_CAPTION,
+    PRIVATE_APP_CTA_LABEL,
+    PUBLIC_DEMO_BANNER,
+    operator_checklist_markdown,
+    research_offer_markdown,
+)
 from src.viz.signup_cta import private_app_cta_url, research_offer_cta
 from src.viz.plotly_theme import apply_chart_theme
 import yaml
@@ -132,41 +140,36 @@ _research_offer = research_offer_cta(
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
 
-_APP_TAGLINE = (
-    "Market-implied distributions and prediction markets — exploration, not advice."
-)
 if _cta_private_url:
     hero_left, hero_right = st.columns([3, 1])
     with hero_left:
         st.title(PAGE_TITLE)
-        st.caption(_APP_TAGLINE)
+        st.caption(DEMO_HERO_TAGLINE)
     with hero_right:
         if hasattr(st, "link_button"):
             st.link_button(
-                "Get full access",
+                PRIVATE_APP_CTA_LABEL,
                 _cta_private_url,
                 use_container_width=True,
             )
         else:
-            st.markdown(f"[Get full access]({_cta_private_url})")
-        st.caption("Sign in on the full app to save snapshots and reviews.")
-    st.info(
-        "**Public demo:** no saved snapshot history here. "
-        "**Get full access** opens the full app with saves and reviews."
-    )
+            st.markdown(f"[{PRIVATE_APP_CTA_LABEL}]({_cta_private_url})")
+        st.caption(PRIVATE_APP_CTA_CAPTION)
+    st.info(PUBLIC_DEMO_BANNER)
     if _research_offer:
         _offer_url, _offer_label = _research_offer
-        st.markdown(
-            "**Research beta (v0):** BTC options market-structure readouts and anomaly inspection — "
-            "decision support only, not investment advice or guaranteed returns."
-        )
+        st.markdown(research_offer_markdown())
         if hasattr(st, "link_button"):
             st.link_button(_offer_label, _offer_url, use_container_width=False)
         else:
             st.markdown(f"[{_offer_label}]({_offer_url})")
 else:
     st.title(PAGE_TITLE)
-    st.caption(_APP_TAGLINE)
+    st.caption(DEMO_HERO_TAGLINE)
+
+if not _snapshots_enabled:
+    with st.expander("Operator checklist (v0)", expanded=False):
+        st.markdown(operator_checklist_markdown())
 
 _perf = PerfLog()
 # First Streamlit run in this session: open intro expander once; later reruns stay collapsed by default.

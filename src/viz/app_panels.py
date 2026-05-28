@@ -20,6 +20,7 @@ from src.viz.belief_uncertainty import (
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
 from src.viz.mvp1_feedback_ui import render_mvp1_feedback_panel
+from src.viz.commercial_wrapper import COMMERCIAL_BOUNDARY_CAPTION
 from src.viz.mvp1_product_shell import (
     feedback_path_hint,
     product_hierarchy_line,
@@ -313,6 +314,7 @@ def render_mvp1_product_shell_context() -> None:
         st.markdown("##### Where you are")
         st.markdown(product_hierarchy_line())
         st.caption(workspace_context_caption())
+        st.caption(COMMERCIAL_BOUNDARY_CAPTION)
         st.caption(feedback_path_hint())
 
 
