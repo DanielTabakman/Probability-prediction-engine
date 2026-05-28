@@ -14,8 +14,8 @@
 |-------|--------|-------|
 | MVP1-ProductShell-Control-Slice001 | **CLOSED** 2026-05-27 | charter + auto SELECTION on steward branch |
 | MVP1-ProductShell-Product-Slice002 | **CLOSED** 2026-05-27 | product shell strip + compact sidebar (pre-relay) |
-| MVP1-ProductShell-Smoke-Slice003 | **OPEN** | dual smoke |
-| MVP1-ProductShell-Closeout-Slice004 | **OPEN** | chapter close |
+| MVP1-ProductShell-Smoke-Slice003 | **CLOSED** 2026-05-28 | dual smoke `20260527_202825` + `20260527_204052` (PR [#39](https://github.com/DanielTabakman/Probability-prediction-engine/pull/39)) |
+| MVP1-ProductShell-Closeout-Slice004 | **OPEN** | chapter close (blocked on `main` merge / closeout slice) |
 
 ---
 
@@ -24,7 +24,7 @@
 | Gate | Status | Notes |
 |------|--------|-------|
 | `python -m pytest -q` | **PASS** | **226** passed (2026-05-27) |
-| Dual smoke | **PENDING** | record run IDs at Smoke-Slice003 |
+| Dual smoke | **PASS** | `20260527_202825` (MVP1_compact, product_shell=true) + `20260527_204052` (A_width) |
 
 ---
 
