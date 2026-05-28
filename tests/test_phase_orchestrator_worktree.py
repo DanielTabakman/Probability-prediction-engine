@@ -10,22 +10,33 @@ from pathlib import Path
 from scripts.phase_orchestrator_v0 import Orchestrator
 
 
+def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
+    return subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.email=test@example.com",
+            "-c",
+            "user.name=Test User",
+            *args,
+        ],
+        cwd=cwd,
+        capture_output=True,
+        check=True,
+    )
+
+
 class TestPhaseOrchestratorWorktree(unittest.TestCase):
     def test_detach_when_branch_already_used(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)
-            subprocess.run(["git", "init", "-b", "main"], cwd=repo, check=True, capture_output=True)
+            _git(repo, "init", "-b", "main")
             (repo / "pyproject.toml").write_text("[project]\nname='t'\n", encoding="utf-8")
-            subprocess.run(["git", "add", "pyproject.toml"], cwd=repo, check=True, capture_output=True)
-            subprocess.run(
-                ["git", "commit", "-m", "init"],
-                cwd=repo,
-                check=True,
-                capture_output=True,
-            )
-            subprocess.run(["git", "checkout", "-b", "dev"], cwd=repo, check=True, capture_output=True)
+            _git(repo, "add", "pyproject.toml")
+            _git(repo, "commit", "-m", "init")
+            _git(repo, "checkout", "-b", "dev")
             holder = repo / "holder"
-            subprocess.run(["git", "worktree", "add", str(holder), "main"], cwd=repo, check=True, capture_output=True)
+            _git(repo, "worktree", "add", str(holder), "main")
 
             orch = Orchestrator(repo)
             wt = orch.ensure_worktree(baseline_local="main", build_branch="build/auto/test-slice")
