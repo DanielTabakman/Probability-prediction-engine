@@ -14,6 +14,7 @@ from scripts.ppe_manifest import (
     resolve_summary,
     validate_manifest,
 )
+from scripts.ppe_queue_health import repair_queue
 
 
 def _orchestrator_root(repo_root: Path) -> Path | None:
@@ -104,6 +105,15 @@ def run_preflight(
             warnings.append("main checkout has uncommitted changes (worktrees do BUILD)")
     except (subprocess.CalledProcessError, FileNotFoundError):
         warnings.append("git status unavailable")
+
+    try:
+        fixes, remaining = repair_queue(repo, apply=True)
+        for fix in fixes:
+            warnings.append(f"queue auto-repair: {fix.get('action')} index={fix.get('index')} plan={fix.get('planPath')}")
+        for issue in remaining:
+            errors.append(f"PHASE_QUEUE: {issue.get('code')} plan={issue.get('planPath', '')} index={issue.get('index', '')}")
+    except FileNotFoundError:
+        errors.append("Missing docs/SOP/PHASE_QUEUE.json")
 
     ok = len(errors) == 0
     return {

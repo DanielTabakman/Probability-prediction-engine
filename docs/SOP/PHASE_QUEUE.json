@@ -27,6 +27,12 @@
       "reason": "Phase 3 commercial wrapper v0 \u2014 COMPLETE 2026-05-28.",
       "selectionPrep": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
       "doneReason": "shipped via PR #42/#56; chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json",
+      "status": "READY",
+      "reason": "Post-Phase3 steering + smoke witness refresh — SELECTION 2026-05-28.",
+      "selectionPrep": "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md"
     }
   ]
 }
