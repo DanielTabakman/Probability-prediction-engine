@@ -27,12 +27,6 @@
       "reason": "Phase 3 commercial wrapper v0 \u2014 COMPLETE 2026-05-28.",
       "selectionPrep": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
       "doneReason": "shipped via PR #42/#56; chapter COMPLETE"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json",
-      "status": "READY",
-      "reason": "MVP1 disagreement / candidate strip polish \u2014 next BUILD per MVP1_FRONTIER.",
-      "selectionPrep": "docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md"
     }
   ]
 }
