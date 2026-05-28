@@ -14,6 +14,7 @@ set "REPO_ROOT=%~dp0"
 set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
 set "PYTHONPATH=%REPO_ROOT%"
+if not defined PPE_WORKER_MODE if "%PPE_SKIP_ACP%"=="1" set "PPE_WORKER_MODE=deterministic"
 set "CONTINUOUS=0"
 set "SELECT_ONLY=0"
 

@@ -68,6 +68,8 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     env = os.environ.copy()
     env["PPE_PHASE_PLAN"] = plan_path
     env["PYTHONPATH"] = str(repo)
+    if not env.get("PPE_WORKER_MODE") and env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes"):
+        env["PPE_WORKER_MODE"] = "deterministic"
     pf = run_preflight(repo)
     if not pf["ok"]:
         for e in pf["errors"]:
@@ -100,12 +102,23 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
             check=False,
         )
 
-    phase_cmd = repo / "run_phase.cmd"
-    if not phase_cmd.is_file():
-        print("ERROR: run_phase.cmd not found", file=sys.stderr)
-        return 2
-
-    exit_code = _run_cmd(["cmd", "/c", str(phase_cmd), plan_path], cwd=repo, env=env)
+    worker_mode = (env.get("PPE_WORKER_MODE") or "").strip().lower()
+    if worker_mode in ("deterministic", "local") or env.get("PPE_SKIP_ACP", "").lower() in (
+        "1",
+        "true",
+        "yes",
+    ):
+        exit_code = subprocess.run(
+            [sys.executable, str(repo / "scripts" / "ppe_relay_phase.py"), "--repo-root", str(repo), "--plan", plan_path],
+            cwd=repo,
+            env=env,
+        ).returncode
+    else:
+        phase_cmd = repo / "run_phase.cmd"
+        if not phase_cmd.is_file():
+            print("ERROR: run_phase.cmd not found", file=sys.stderr)
+            return 2
+        exit_code = _run_cmd(["cmd", "/c", str(phase_cmd), plan_path], cwd=repo, env=env)
 
     if log.is_file():
         subprocess.run(

@@ -16,6 +16,10 @@ if "%PLAN_PATH%"=="" (
 
 set "BASELINE_BRANCH=main"
 
+if /i "%PPE_WORKER_MODE%"=="deterministic" goto local_phase
+if "%PPE_SKIP_ACP%"=="1" goto local_phase
+if /i "%PPE_USE_LOCAL_PHASE%"=="1" goto local_phase
+
 set "ORCH_ROOT=%USERPROFILE%\Desktop\ppe-orchestrator-acp"
 if not exist "%ORCH_ROOT%\package.json" (
   set "ORCH_ROOT=%REPO_ROOT%\..\ppe-orchestrator-acp"
@@ -65,5 +69,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO_ROOT%\scripts\notify_
 
 python -c "import pathlib; pathlib.Path(r'%ACTIVE_RUN%').unlink(missing_ok=True)" >nul 2>nul
 
+exit /b %EXIT_CODE%
+
+:local_phase
+set "PYTHONPATH=%REPO_ROOT%"
+python "%REPO_ROOT%\scripts\ppe_relay_phase.py" --repo-root "%REPO_ROOT%" --plan "%PLAN_PATH%"
+set "EXIT_CODE=%ERRORLEVEL%"
+python "%REPO_ROOT%\scripts\log_event.py" --event-type "run_phase.end" --summary "End phase plan %PLAN_PATH% exit_code=%EXIT_CODE% (local)" --actor "wrapper" --ref "kind=cmd,path=run_phase.cmd" >nul 2>nul
+python "%REPO_ROOT%\scripts\write_last_run_report.py" --repo-root "%REPO_ROOT%" --kind phase --exit-code %EXIT_CODE% --plan-path "%PLAN_PATH%" --baseline-branch "%BASELINE_BRANCH%" >nul 2>nul
+powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO_ROOT%\scripts\notify_run_finished.ps1" -RepoRoot "%REPO_ROOT%" >nul 2>nul
+python -c "import pathlib; pathlib.Path(r'%ACTIVE_RUN%').unlink(missing_ok=True)" >nul 2>nul
 exit /b %EXIT_CODE%
 

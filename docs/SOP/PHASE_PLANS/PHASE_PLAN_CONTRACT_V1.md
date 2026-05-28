@@ -27,6 +27,7 @@ Top-level object:
     {
       "sliceId": "string (required)",
       "declaredPlane": "CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE (required)",
+      "workerMode": "acp | deterministic | local-agent (optional)",
       "susMinutes": 15,
       "hardMinutes": 30,
       "maxAttempts": 2,

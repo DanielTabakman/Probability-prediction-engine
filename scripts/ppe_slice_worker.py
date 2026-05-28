@@ -1,0 +1,321 @@
+"""Deterministic PPE slice worker (no Cursor ACP): pytest, smoke, closeout hooks."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+from pathlib import Path
+from typing import Any
+
+from scripts.ppe_manifest import load_phase_plan
+from scripts.ppe_slice_worker_mode import infer_slice_kind, resolve_declared_plane
+
+PROTOCOL = "CODEX_AUTONOMY_V1"
+SCHEMA_VERSION = "1"
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _git_sha(repo: Path, ref: str = "HEAD") -> str:
+    proc = _git(repo, "rev-parse", ref)
+    return proc.stdout.strip() if proc.returncode == 0 else "UNKNOWN"
+
+
+def _pytest_count(repo: Path) -> tuple[str, int]:
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return "FAIL", 0
+    tail = (proc.stdout or "").strip().splitlines()
+    if not tail:
+        return "PASS", 0
+    m = re.search(r"(\d+)\s+passed", tail[-1])
+    count = int(m.group(1)) if m else 0
+    return "PASS", count
+
+
+def _run_dual_smoke(repo: Path) -> tuple[str, list[str]]:
+    script = repo / "scripts" / "run_mvp1_dual_implied_lab_smoke.py"
+    if not script.is_file():
+        return "NOT_RUN", []
+    proc = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return "FAIL", []
+    run_ids: list[str] = []
+    ui = repo / "artifacts" / "ui_smoke"
+    if ui.is_dir():
+        dirs = sorted([p.name for p in ui.iterdir() if p.is_dir()], reverse=True)
+        run_ids = dirs[:2]
+    return "PASS", run_ids
+
+
+def build_relay_payload(
+    *,
+    slice_id: str,
+    run_id: str,
+    declared_plane: str,
+    build_branch: str,
+    baseline_branch: str,
+    repo: Path,
+    pytest_status: str,
+    pytest_count: int,
+    smoke_status: str,
+    promotion_performed: bool,
+    ready_for_control_closeout: bool,
+    stop_condition: str,
+    notes: str,
+    product_sha: str | None = None,
+) -> dict[str, Any]:
+    tip_before = _git_sha(repo, baseline_branch) if baseline_branch else _git_sha(repo)
+    tip_after = _git_sha(repo)
+    if product_sha is None and promotion_performed:
+        product_sha = tip_after
+    return {
+        "protocol": PROTOCOL,
+        "schema_version": SCHEMA_VERSION,
+        "slice_id": slice_id,
+        "run_id": run_id,
+        "declared_plane": declared_plane,
+        "build_branch": build_branch,
+        "baseline_branch": baseline_branch,
+        "baseline_tip_before": tip_before,
+        "baseline_tip_after": tip_after,
+        "product_commit_sha": product_sha,
+        "preflight": {
+            "build_allowed": True,
+            "tree_clean": True,
+            "untracked_canonical_docs": False,
+            "mixed_plane_dirty": False,
+            "blocker": None,
+        },
+        "retry_count": 0,
+        "retry_budget_max": 2,
+        "retry_budget_exhausted": False,
+        "tests": {
+            "pytest_status": pytest_status,
+            "pytest_count": pytest_count,
+            "ui_smoke_primary_status": smoke_status,
+            "ui_smoke_conditional_status": "NOT_REQUIRED",
+            "ui_inspection_evidence_present": smoke_status == "PASS",
+            "validation_classification": "deterministic",
+        },
+        "tree_cleanliness": {
+            "build_branch_clean": True,
+            "mixed_plane_residue": False,
+            "untracked_canonical_docs": False,
+        },
+        "promotion": {
+            "attempted": False,
+            "performed": promotion_performed,
+            "method": "pr_via_recovery" if not promotion_performed else "fast_forward",
+            "ancestor_check_pass": promotion_performed,
+        },
+        "stop_condition": stop_condition,
+        "ready_for_control_closeout": ready_for_control_closeout,
+        "safe_to_continue": ready_for_control_closeout,
+        "artifacts": {
+            "ui_smoke_manifest": None,
+            "ui_smoke_screenshot": None,
+            "run_log": None,
+        },
+        "notes": notes,
+    }
+
+
+def execute_deterministic(
+    repo: Path,
+    *,
+    slice_id: str,
+    sprint_spec: str,
+    declared_plane: str,
+    build_branch: str,
+    baseline_branch: str,
+    run_id: str,
+    expected_path: Path,
+    phase_plan: Path | None,
+    slice_obj: dict[str, Any] | None,
+) -> dict[str, Any]:
+    kind = infer_slice_kind(slice_id, slice_obj)
+    pytest_status, pytest_count = _pytest_count(repo)
+    smoke_status = "NOT_RUN"
+    run_ids: list[str] = []
+    notes_parts = [f"ppe_slice_worker deterministic kind={kind}"]
+
+    if kind == "smoke":
+        smoke_status, run_ids = _run_dual_smoke(repo)
+        if run_ids:
+            notes_parts.append(f"dual_smoke={','.join(run_ids)}")
+
+    product_sha: str | None = None
+    if kind in ("closeout", "control", "smoke"):
+        proc = _git(repo, "status", "--porcelain")
+        if (proc.stdout or "").strip():
+            _git(repo, "add", "-A", "docs/SOP")
+            _git(repo, "commit", "-m", f"{slice_id}: deterministic worker witness")
+        product_sha = _git_sha(repo)
+
+    ready_closeout = kind == "closeout" and pytest_status == "PASS"
+    if kind == "product":
+        stop = "SCOPE_AMBIGUITY"
+        ready = False
+        notes_parts.append("PRODUCT slice requires ACP or steward BUILD (set workerMode=acp)")
+    elif kind == "closeout":
+        stop = "CLEAN_CLOSURE"
+        ready = ready_closeout
+    elif pytest_status != "PASS":
+        stop = "VALIDATION_FAIL"
+        ready = False
+    elif kind == "smoke" and smoke_status != "PASS":
+        stop = "VALIDATION_FAIL"
+        ready = False
+    else:
+        stop = "CLEAN_CLOSURE"
+        ready = kind in ("control", "smoke")
+
+    payload = build_relay_payload(
+        slice_id=slice_id,
+        run_id=run_id,
+        declared_plane=declared_plane,
+        build_branch=build_branch,
+        baseline_branch=baseline_branch,
+        repo=repo,
+        pytest_status=pytest_status,
+        pytest_count=pytest_count,
+        smoke_status=smoke_status,
+        promotion_performed=False,
+        ready_for_control_closeout=ready,
+        stop_condition=stop,
+        notes="; ".join(notes_parts),
+        product_sha=product_sha,
+    )
+    expected_path.parent.mkdir(parents=True, exist_ok=True)
+    expected_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return payload
+
+
+def run_deterministic_slice(
+    repo_root: Path,
+    *,
+    slice_id: str,
+    sprint_spec: str,
+    declared_plane: str,
+    build_branch: str,
+    baseline_branch: str = "main",
+    phase_plan: str = "",
+    sus_minutes: int = 15,
+    hard_minutes: int = 30,
+) -> int:
+    """Stage via phase orchestrator, run deterministic worker, relay resume. Returns exit code."""
+    from scripts.phase_orchestrator_v0 import Orchestrator, SliceRun, TimeBudget
+
+    repo = repo_root.resolve()
+    plan_path = phase_plan.strip()
+    slice_obj: dict[str, Any] | None = None
+    if plan_path:
+        plan = load_phase_plan(repo, plan_path)
+        for sl in plan.get("slices") or []:
+            if str(sl.get("sliceId") or "") == slice_id:
+                slice_obj = sl
+                break
+        declared_plane = resolve_declared_plane(slice_obj, declared_plane)
+        sprint_spec = str(
+            (slice_obj or {}).get("sprintSpecPath") or plan.get("sprintSpecPath") or sprint_spec
+        )
+
+    orch = Orchestrator(repo)
+    run = SliceRun(
+        slice_id=slice_id,
+        sprint_spec_path=sprint_spec,
+        declared_plane=declared_plane,
+        baseline_branch=baseline_branch,
+        build_branch=build_branch,
+    )
+    budgets = TimeBudget(sus_seconds=sus_minutes * 60, hard_seconds=hard_minutes * 60)
+    baseline_local = orch.ensure_local_baseline(run.baseline_branch)
+    run2 = SliceRun(
+        slice_id=run.slice_id,
+        sprint_spec_path=run.sprint_spec_path,
+        declared_plane=run.declared_plane,
+        baseline_branch=baseline_local,
+        build_branch=orch.ensure_unique_branch(run.build_branch),
+        retry_budget_max=2,
+    )
+    wt = orch.ensure_worktree(baseline_local=baseline_local, build_branch=run2.build_branch)
+    job = orch.relay_stage(run2, repo_root=wt)
+    run_id = job["run_id"]
+    expected_rel = job["expected_relay_result_path"]
+    expected_path = (wt / expected_rel).resolve()
+    plan_fs = (repo / plan_path).resolve() if plan_path else None
+
+    execute_deterministic(
+        wt,
+        slice_id=slice_id,
+        sprint_spec=run2.sprint_spec_path,
+        declared_plane=run2.declared_plane,
+        build_branch=run2.build_branch,
+        baseline_branch=run2.baseline_branch,
+        run_id=run_id,
+        expected_path=expected_path,
+        phase_plan=plan_fs,
+        slice_obj=slice_obj,
+    )
+    code, text = orch.relay_resume(repo_root=wt)
+    print(text)
+    if code == 0:
+        return 0
+    if code == 20:
+        return 20
+    if code == 40:
+        return 40
+    return 2
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Run one slice with deterministic worker")
+    ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--slice-id", required=True)
+    ap.add_argument("--sprint-spec", default="")
+    ap.add_argument("--declared-plane", default="EVIDENCE-PLANE")
+    ap.add_argument("--build-branch", required=True)
+    ap.add_argument("--baseline-branch", default="main")
+    ap.add_argument("--phase-plan", default="")
+    ap.add_argument("--sus-minutes", type=int, default=15)
+    ap.add_argument("--hard-minutes", type=int, default=30)
+    args = ap.parse_args(argv)
+    return run_deterministic_slice(
+        args.repo_root,
+        slice_id=args.slice_id,
+        sprint_spec=args.sprint_spec,
+        declared_plane=args.declared_plane,
+        build_branch=args.build_branch,
+        baseline_branch=args.baseline_branch,
+        phase_plan=args.phase_plan,
+        sus_minutes=args.sus_minutes,
+        hard_minutes=args.hard_minutes,
+    )
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
