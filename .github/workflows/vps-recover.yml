@@ -34,7 +34,7 @@ jobs:
             git status -sb || true
             git log -1 --oneline || true
             echo "== docker ps =="
-            docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' || true
+            docker ps || true
 
             case "${{ inputs.action }}" in
               show_status)
