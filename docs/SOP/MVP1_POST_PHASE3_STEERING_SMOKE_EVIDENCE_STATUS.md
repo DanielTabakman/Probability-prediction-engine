@@ -12,8 +12,8 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-PostPhase3-Control-Slice001 | **CLOSED** 2026-05-28 | charter witness; baseline `main` @ `db7ca53`+ |
-| MVP1-PostPhase3-Smoke-Slice002 | **OPEN** | dual smoke witness |
+| MVP1-PostPhase3-Control-Slice001 | **CLOSED** 2026-05-28 | charter witness; baseline `main` @ `35a0528`+ |
+| MVP1-PostPhase3-Smoke-Slice002 | **CLOSED** 2026-05-28 | dual smoke witness; relay build `05db71d` |
 | MVP1-PostPhase3-Closeout-Slice003 | **OPEN** | chapter close |
 
 ---
@@ -22,5 +22,18 @@
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | pending | verify at smoke slice |
-| Dual smoke | pending | `scripts/run_mvp1_dual_implied_lab_smoke.py` |
+| `python -m pytest -q` | **PASS** | **227** passed (2026-05-28, Smoke-Slice002) |
+| Dual smoke | **PASS** | `scripts/run_mvp1_dual_implied_lab_smoke.py` exit **0** |
+
+---
+
+## Smoke-Slice002 witness (dual implied-lab)
+
+| Run ID | Scenario | Exit | verification | Notes |
+|--------|----------|------|--------------|-------|
+| 20260528_123049 | MVP1_compact_verification | 0 | true | ~765s |
+| 20260528_124335 | A_width_target_payoff | 0 | true | ~193s |
+
+**Dual smoke total:** ~959s (one transient A_width flake on first full run; clean re-run succeeded).
+
+**Manifests:** `artifacts/ui_smoke/20260528_123049/`, `artifacts/ui_smoke/20260528_124335/` (local; not committed)
