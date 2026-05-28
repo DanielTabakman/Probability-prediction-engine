@@ -9,8 +9,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MVP1 product shell clarity** — **IN PROGRESS** ([`POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md`](POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md))
-- **Last closed chapter:** **MVP1 decision-ready review polish** — **COMPLETE** 2026-05-27
+- **Active BUILD chapter:** **Phase 3 commercial wrapper (v0)** — **IN PROGRESS** ([`POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md`](POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md))
+- **Last closed chapter:** **MVP1 product shell clarity** — **COMPLETE** 2026-05-27
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
@@ -140,16 +140,27 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 **Evidence:** [`MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md`](MVP1_DECISION_READY_REVIEW_POLISH_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_SPRINT003_SELECTION_OUTCOME.md`](POST_MVP1_SPRINT003_SELECTION_OUTCOME.md)
 
-### MVP1 product shell clarity — relay queue — **IN PROGRESS** (2026-05-27)
+### MVP1 product shell clarity — relay queue — **COMPLETE** (2026-05-27)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MVP1-ProductShell-Control-Slice001` — charter | EVIDENCE |
-| **OPEN** | `MVP1-ProductShell-Product-Slice002` — shell polish | PRODUCT |
-| **OPEN** | `MVP1-ProductShell-Smoke-Slice003` — dual smoke witness | EVIDENCE |
-| **OPEN** | `MVP1-ProductShell-Closeout-Slice004` — chapter close | EVIDENCE |
+| **CLOSED** | `MVP1-ProductShell-Product-Slice002` — shell polish | PRODUCT |
+| **CLOSED** | `MVP1-ProductShell-Smoke-Slice003` — dual smoke witness | EVIDENCE |
+| **CLOSED** | `MVP1-ProductShell-Closeout-Slice004` — chapter close | EVIDENCE |
 
 **Evidence:** [`MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md`](MVP1_PRODUCT_SHELL_CLARITY_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md`](POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md)
+
+### Phase 3 commercial wrapper (v0) — relay queue — **IN PROGRESS** (2026-05-28)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `Phase3-CommercialWrapper-Control-Slice001` — charter | EVIDENCE |
+| **OPEN** | `Phase3-CommercialWrapper-Product-Slice002` — commercial wrapper v0 | PRODUCT |
+| **OPEN** | `Phase3-CommercialWrapper-Smoke-Slice003` — dual smoke witness | EVIDENCE |
+| **OPEN** | `Phase3-CommercialWrapper-Closeout-Slice004` — chapter close | EVIDENCE |
+
+**Evidence:** [`PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md`](PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md`](POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md)
 
 ### MVP1 Reliability — relay queue — **COMPLETE** (2026-05-19)
 

@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_product_shell_clarity_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_DECISION_REVIEW_SELECTION_OUTCOME.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md",
   "status": "RUNNING",
-  "notes": "MVP1 product shell clarity — Control-Slice001 charter witness 2026-05-27."
+  "notes": "Phase3-CommercialWrapper-Control-Slice001 charter witness 2026-05-28."
 }

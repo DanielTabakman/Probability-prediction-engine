@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.ppe_manifest import load_manifest, validate_phase_plan
+from scripts.ppe_manifest import validate_phase_plan
 
 REPO = Path(__file__).resolve().parents[1]
 SOP = REPO / "docs" / "SOP"
@@ -40,15 +40,8 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
     assert plan["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md"
 
 
-def test_active_manifest_ready_for_relay() -> None:
-    manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") == PLAN_REL
-    assert manifest["status"] in ("READY", "RUNNING")
-    assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_PRODUCT_SHELL_CLARITY.md"
-
-
-def test_phase_queue_product_shell_ready() -> None:
+def test_phase_queue_product_shell_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == PLAN_REL)
-    assert row["status"] == "READY"
+    assert row["status"] == "DONE"
     assert "selectionPrep" in row
