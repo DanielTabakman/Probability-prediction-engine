@@ -94,6 +94,10 @@ python "%REPO_ROOT%\scripts\write_last_run_report.py" --repo-root "%REPO_ROOT%" 
 if not "%PHASE_PLAN%"=="" (
   python "%REPO_ROOT%\scripts\post_relay_continue.py" --repo-root "%REPO_ROOT%" --phase-plan "%PHASE_PLAN%" --orchestrator-exit-code %EXIT_CODE%
   if errorlevel 1 exit /b 1
+  if not "%EXIT_CODE%"=="0" (
+    python "%REPO_ROOT%\scripts\ppe_promotion_recovery.py" --repo-root "%REPO_ROOT%" --phase-plan "%PHASE_PLAN%" --slice-id "%SLICE_ID%" --build-branch "%BUILD_BRANCH%" --orchestrator-exit-code %EXIT_CODE% --run-next-slice
+    if errorlevel 1 exit /b 1
+  )
 )
 powershell -NoProfile -ExecutionPolicy Bypass -File "%REPO_ROOT%\scripts\notify_run_finished.ps1" -RepoRoot "%REPO_ROOT%" >nul 2>nul
 

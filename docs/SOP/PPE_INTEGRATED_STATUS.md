@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-28 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-05-27 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -72,6 +72,8 @@ flowchart LR
 | MVP1 disagreement / candidate strip polish | **COMPLETE** 2026-05-26 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md), [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
 
 | Phase 3 commercial wrapper | **COMPLETE** 2026-05-28 | [`SPRINT_PHASE3_COMMERCIAL_WRAPPER.md`](docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md), [`PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md`](docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md) |
+
+| MVP1 Sprint 003 evidence-plane | **COMPLETE** 2026-05-27 | [`SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md`](docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md), [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 
@@ -181,4 +183,4 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION.md`](docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_MVP1_FEEDBACK_BETA_SELECTION.md`](docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
