@@ -357,7 +357,23 @@ class Orchestrator:
                 }
             )
 
-            if worker_mode == "cursor-agent":
+            if worker_mode == "deterministic":
+                from scripts.ppe_slice_worker import execute_deterministic
+
+                execute_deterministic(
+                    wt,
+                    slice_id=run2.slice_id,
+                    sprint_spec=run2.sprint_spec_path,
+                    declared_plane=run2.declared_plane,
+                    build_branch=run2.build_branch,
+                    baseline_branch=run2.baseline_branch,
+                    run_id=run_id,
+                    expected_path=expected_path,
+                    phase_plan=None,
+                    slice_obj=None,
+                )
+                proc = None
+            elif worker_mode == "cursor-agent":
                 proc = self.spawn_worker_cursor_agent(prompt=prompt, cwd=wt)
             elif worker_mode == "agent-cli":
                 proc = self.spawn_worker_agent_cli(prompt=prompt, cwd=wt)
@@ -371,9 +387,12 @@ class Orchestrator:
                 if expected_path.is_file():
                     break
 
+                if worker_mode == "deterministic":
+                    break
+
                 # Stream worker output head into state for debugging (best-effort, non-blocking).
                 try:
-                    if proc.stdout and not proc.stdout.closed:
+                    if proc is not None and proc.stdout and not proc.stdout.closed:
                         chunk = proc.stdout.read(0)  # non-blocking in text mode; returns ''.
                         _ = chunk
                 except Exception:
@@ -394,9 +413,19 @@ class Orchestrator:
                         }
                     )
 
+                if worker_mode == "deterministic" and not expected_path.is_file():
+                    return {
+                        "status": "STOP_FOR_REVIEW",
+                        "reason": "deterministic worker did not write relay_result.json",
+                        "run_id": run_id,
+                        "slice_id": run2.slice_id,
+                        "attempt": attempt,
+                    }
+
                 if elapsed >= budgets.hard_seconds:
                     try:
-                        proc.terminate()
+                        if proc is not None:
+                            proc.terminate()
                     except OSError:
                         pass
                     self.save_state(
@@ -419,7 +448,7 @@ class Orchestrator:
                     }
 
                 # If the worker exits early, stop waiting and surface output.
-                if proc.poll() is not None and not expected_path.is_file():
+                if proc is not None and proc.poll() is not None and not expected_path.is_file():
                     out = ""
                     try:
                         if proc.stdout:
@@ -559,14 +588,22 @@ def _build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--declared-plane", required=True, choices=["PRODUCT-PLANE", "EVIDENCE-PLANE"])
     sp.add_argument("--baseline-branch", required=True, help="Local branch or origin/<branch>.")
     sp.add_argument("--build-branch", required=True)
-    sp.add_argument("--worker-mode", default="agent-cli", choices=["agent-cli", "cursor-agent"])
+    sp.add_argument(
+        "--worker-mode",
+        default="agent-cli",
+        choices=["agent-cli", "cursor-agent", "deterministic"],
+    )
     sp.add_argument("--sus-minutes", type=int, default=15)
     sp.add_argument("--hard-minutes", type=int, default=30)
     sp.add_argument("--retry-budget-max", type=int, default=2)
 
     pp = sub.add_parser("run-phase", help="Run a phase plan (sequential slices) until stop.")
     pp.add_argument("--plan-path", required=True, help="Path to phase plan JSON (usually under artifacts/).")
-    pp.add_argument("--worker-mode", default="agent-cli", choices=["agent-cli", "cursor-agent"])
+    pp.add_argument(
+        "--worker-mode",
+        default="agent-cli",
+        choices=["agent-cli", "cursor-agent", "deterministic"],
+    )
     pp.add_argument("--sus-minutes", type=int, default=15)
     pp.add_argument("--hard-minutes", type=int, default=30)
 

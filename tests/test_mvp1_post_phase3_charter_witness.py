@@ -39,19 +39,20 @@ def test_phase_plan_valid_and_first_slice_is_control_charter() -> None:
     assert plan["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md"
 
 
-def test_active_manifest_ready_for_relay() -> None:
+def test_active_manifest_after_post_phase3_closeout() -> None:
     manifest = load_manifest(REPO)
-    assert manifest.get("phasePlanPath") == PLAN_REL
-    assert manifest["status"] in ("READY", "RUNNING")
+    assert manifest.get("phasePlanPath") in ("", PLAN_REL)
+    assert manifest["status"] in ("COMPLETE", "READY", "RUNNING")
     assert manifest["sprintSpecPath"] == "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md"
     assert manifest["selectionRecord"] == "docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md"
 
 
-def test_phase_queue_post_phase3_ready() -> None:
+def test_phase_queue_post_phase3_done_or_ready() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == PLAN_REL)
-    assert row["status"] == "READY"
-    assert "selectionPrep" in row
+    assert row["status"] in ("READY", "DONE")
+    if row["status"] == "READY":
+        assert "selectionPrep" in row
 
 
 def test_queue_health_no_issues_on_live_queue() -> None:
@@ -59,8 +60,9 @@ def test_queue_health_no_issues_on_live_queue() -> None:
     assert issues == [], f"queue health issues: {issues}"
 
 
-def test_evidence_status_control_slice_closed() -> None:
+def test_evidence_status_chapter_complete() -> None:
     text = EVIDENCE_STATUS.read_text(encoding="utf-8")
     assert "MVP1-PostPhase3-Control-Slice001" in text
     assert "**CLOSED**" in text
+    assert "**COMPLETE**" in text
     assert "POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION" in text
