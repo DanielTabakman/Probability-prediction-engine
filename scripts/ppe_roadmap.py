@@ -286,6 +286,16 @@ def prepare_selection_idle(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         sync = sync_roadmap_to_queue(repo, apply=True)
         out["synced"] = len(sync)
     try:
+        from scripts.ppe_propagate_queue import maybe_propagate_queue
+
+        prop = maybe_propagate_queue(repo, apply=apply)
+        if prop.get("propagated") or prop.get("backlog_sync"):
+            out["propagate"] = prop
+    except FileNotFoundError:
+        pass
+    except Exception as exc:
+        out["propagate_error"] = str(exc)
+    try:
         from scripts.ppe_steward_cursor import maybe_run_steward_cursor
 
         steward = maybe_run_steward_cursor(repo, apply=apply)
