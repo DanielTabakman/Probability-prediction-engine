@@ -45,9 +45,18 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "Phase 5 review SQLite FK hardening \u2014 MVP1-Phase5-Slice002 canon",
-      "selectionPrep": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md"
+      "selectionPrep": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json",
+      "status": "DONE",
+      "reason": "Post-chapter steering alignment witness (deterministic evidence relay)",
+      "selectionPrep": "docs/SOP/MVP1_FRONTIER.md",
+      "workerMode": "deterministic",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     }
   ]
 }

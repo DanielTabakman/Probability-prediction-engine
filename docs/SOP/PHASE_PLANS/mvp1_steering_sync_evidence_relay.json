@@ -1,0 +1,48 @@
+{
+  "name": "MVP1 steering sync evidence",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
+  "selectionRecord": "docs/SOP/MVP1_FRONTIER.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-Mvp1SteeringSyncEvidence-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
+      "buildBranch": "build/auto/MVP1-Mvp1SteeringSyncEvidence-Control-Slice001-mvp1_steering_sy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Mvp1SteeringSyncEvidence-Smoke-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
+      "buildBranch": "build/auto/MVP1-Mvp1SteeringSyncEvidence-Smoke-Slice002-mvp1_steering_sy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Mvp1SteeringSyncEvidence-Closeout-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
+      "buildBranch": "build/auto/MVP1-Mvp1SteeringSyncEvidence-Closeout-Slice003-mvp1_steering_sy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_steering_sync_evidence",
+        "chapterTitle": "MVP1 steering sync evidence",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-28",
+        "evidenceDoc": "docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
+        "selectionOutcomeDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

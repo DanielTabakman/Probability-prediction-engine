@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — mvp1 deploy witness refresh **COMPLETE** 2026-05-28
+- Active MVP1 focus: **none** — mvp1 steering sync evidence **COMPLETE** 2026-05-28
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/MVP1_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MVP1 deploy witness refresh COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MVP1 steering sync evidence COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -50,4 +50,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-05-28 — MVP1 deploy witness refresh COMPLETE; closeout job `MVP1-DeployWitness-Closeout-Slice003`.
+2026-05-28 — MVP1 steering sync evidence COMPLETE; closeout job `MVP1-Mvp1SteeringSyncEvidence-Closeout-Slice003`.

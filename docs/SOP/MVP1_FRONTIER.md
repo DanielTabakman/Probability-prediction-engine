@@ -9,8 +9,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MVP1 Phase 5 review persistence hardening** — queued on roadmap ([`POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md`](POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md))
-- **Last closed chapter:** **MVP1 deploy witness refresh** — **COMPLETE** 2026-05-28
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md))
+- **Last closed chapter:** **MVP1 steering sync evidence** — **COMPLETE** 2026-05-28
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
@@ -210,7 +210,8 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
 
 #### Phase 5 optional follow-ons
 - **DONE (chapter):** pending expiry filter + sort; optional **paper tag** on reviews ([`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md)).
-- **Still deferred:** SQLite FK / `PRAGMA foreign_keys`, full horizon UX per **`MVP1-Phase5-Slice002`** stub in [`MVP1_PHASE1_3_SPRINT.md`](MVP1_PHASE1_3_SPRINT.md).
+- **DONE (chapter):** SQLite FK / `PRAGMA foreign_keys` hardening — [`MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md`](MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md) (`MVP1-Phase5-Slice002`).
+- **Still deferred:** full horizon UX per **`MVP1-Phase5-Slice002`** stub in [`MVP1_PHASE1_3_SPRINT.md`](MVP1_PHASE1_3_SPRINT.md).
 
 #### Phase 6 beyond v0
 - **DONE (chapter):** store-backed expiry + reviewed-date filters; rollup JSON/CSV + reviewed table CSV export.

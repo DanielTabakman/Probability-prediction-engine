@@ -1,7 +1,7 @@
 {
   "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md",
-  "selectionRecord": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
   "status": "COMPLETE",
-  "notes": "Idle after deploy witness closeout; Phase 5 review hardening queued on roadmap."
+  "notes": "Idle after Phase 5 review hardening + steering sync evidence closeout."
 }
