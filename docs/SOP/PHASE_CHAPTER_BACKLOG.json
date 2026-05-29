@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "notes": "Ordered chapter backlog for deterministic queue propagation (PPE_QUEUE_PROPAGATION_V1). First status=queued row with a valid planPath (or scaffold=true) is appended to PHASE_SELECTION_ROADMAP as pending when idle. blocked rows need steward direction before auto-charter.",
+  "items": [
+    {
+      "chapterId": "mvp1_phase5_review_hardening",
+      "status": "done",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json",
+      "canonRef": "docs/SOP/MVP1_PHASE1_3_SPRINT.md \u2014 MVP1-Phase5-Slice002",
+      "selectionRecord": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
+      "reason": "Phase 5 SQLite FK / PRAGMA hardening (product local-agent slice)"
+    },
+    {
+      "chapterId": "mvp1_phase6_trust_metrics_v1",
+      "status": "blocked",
+      "blockReason": "Verification payload lacks explicit trust enums; see MVP1_FRONTIER Phase 6 beyond v0",
+      "canonRef": "docs/SOP/MVP1_FRONTIER.md \u2014 Phase 6 beyond v0",
+      "reason": "Stronger trust metrics in class summary \u2014 needs charter when payload ready"
+    },
+    {
+      "chapterId": "mvp1_steering_sync_evidence",
+      "status": "done",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json",
+      "scaffold": true,
+      "chapterTitle": "MVP1 steering sync evidence",
+      "workerMode": "deterministic",
+      "selectionRecord": "docs/SOP/MVP1_FRONTIER.md",
+      "reason": "Post-chapter steering alignment witness (deterministic evidence relay)",
+      "canonRef": "docs/SOP/PPE_INTEGRATED_STATUS.md \u2014 after each product closeout"
+    }
+  ]
+}

@@ -36,7 +36,55 @@ def _connect(path: Path) -> sqlite3.Connection:
     path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys=ON")
     return conn
+
+
+def _snapshot_reviews_has_fk(conn: sqlite3.Connection) -> bool:
+    rows = conn.execute("PRAGMA foreign_key_list(snapshot_reviews)").fetchall()
+    return len(rows) > 0
+
+
+def _migrate_snapshot_reviews_fk(conn: sqlite3.Connection) -> None:
+    """Recreate snapshot_reviews with FK to frozen_evaluations; drop orphan review rows."""
+    if _snapshot_reviews_has_fk(conn):
+        return
+    exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='snapshot_reviews'"
+    ).fetchone()
+    if not exists:
+        return
+    conn.execute(
+        """
+        CREATE TABLE snapshot_reviews__fk_migrated (
+            id TEXT PRIMARY KEY NOT NULL,
+            snapshot_id TEXT NOT NULL UNIQUE
+                REFERENCES frozen_evaluations(id) ON DELETE CASCADE,
+            review_status TEXT NOT NULL,
+            outcome_notes TEXT,
+            reviewed_at_utc TEXT NOT NULL,
+            review_horizon_ref TEXT,
+            paper_tag TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
+        INSERT INTO snapshot_reviews__fk_migrated
+        (id, snapshot_id, review_status, outcome_notes, reviewed_at_utc,
+         review_horizon_ref, paper_tag)
+        SELECT sr.id, sr.snapshot_id, sr.review_status, sr.outcome_notes,
+               sr.reviewed_at_utc, sr.review_horizon_ref, sr.paper_tag
+        FROM snapshot_reviews sr
+        INNER JOIN frozen_evaluations fe ON fe.id = sr.snapshot_id
+        """
+    )
+    conn.execute("DROP TABLE snapshot_reviews")
+    conn.execute("ALTER TABLE snapshot_reviews__fk_migrated RENAME TO snapshot_reviews")
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS ix_snapshot_reviews_status ON snapshot_reviews(review_status)"
+    )
+    conn.commit()
 
 
 def _utc_iso() -> str:
@@ -58,25 +106,33 @@ def init_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS ix_frozen_eval_created ON frozen_evaluations(created_at DESC)"
     )
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS snapshot_reviews (
-            id TEXT PRIMARY KEY NOT NULL,
-            snapshot_id TEXT NOT NULL UNIQUE,
-            review_status TEXT NOT NULL,
-            outcome_notes TEXT,
-            reviewed_at_utc TEXT NOT NULL,
-            review_horizon_ref TEXT
+    reviews_exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name='snapshot_reviews'"
+    ).fetchone()
+    if not reviews_exists:
+        conn.execute(
+            """
+            CREATE TABLE snapshot_reviews (
+                id TEXT PRIMARY KEY NOT NULL,
+                snapshot_id TEXT NOT NULL UNIQUE
+                    REFERENCES frozen_evaluations(id) ON DELETE CASCADE,
+                review_status TEXT NOT NULL,
+                outcome_notes TEXT,
+                reviewed_at_utc TEXT NOT NULL,
+                review_horizon_ref TEXT,
+                paper_tag TEXT
+            )
+            """
         )
-        """
-    )
-    conn.execute(
-        "CREATE INDEX IF NOT EXISTS ix_snapshot_reviews_status ON snapshot_reviews(review_status)"
-    )
-    try:
-        conn.execute("ALTER TABLE snapshot_reviews ADD COLUMN paper_tag TEXT")
-    except sqlite3.OperationalError:
-        pass
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS ix_snapshot_reviews_status ON snapshot_reviews(review_status)"
+        )
+    else:
+        try:
+            conn.execute("ALTER TABLE snapshot_reviews ADD COLUMN paper_tag TEXT")
+        except sqlite3.OperationalError:
+            pass
+        _migrate_snapshot_reviews_fk(conn)
     conn.commit()
 
 
