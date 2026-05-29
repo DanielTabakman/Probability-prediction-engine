@@ -2,7 +2,7 @@
   "version": 1,
   "profile": "local",
   "enabled": true,
-  "notes": "Default = local (no credits). Use run_ppe_acp.cmd or PPE_OPERATOR_PROFILE=acp when you have agent quota. See docs/SOP/PPE_CONTINUOUS_OPERATOR.md.",
+  "notes": "Default = local (no credits). Product slices: run_product_slice.cmd. ACP profile: run_ppe_acp.cmd; stewardCharter only when skipAcp=false. See PPE_TOKEN_ECONOMY_V1.md.",
   "propagateBacklog": true,
   "stewardCharter": false,
   "workerMode": "deterministic",

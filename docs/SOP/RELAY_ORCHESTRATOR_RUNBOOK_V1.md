@@ -19,6 +19,8 @@ Purpose: a short “how we run work now” doc so the process lives in-repo, not
 
 Escape hatches: `run_ppe.cmd --plan <path>`, `run_ppe.cmd --slice <sliceId>`, `run_ppe.cmd --status`.
 
+**Product slice (explicit agent spend):** when auto-operator uses `PPE_SKIP_ACP=1`, product BUILD is not run in continuous mode. Use `run_product_slice.cmd <sliceId> [phasePlanPath]` — see [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md).
+
 **Cursor discipline during phase:** steward SELECTION thread ≠ relay BUILD workers (fresh ACP per slice). Do not run a full phase + PR + planning in one IDE chat ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4).
 
 ### One-slice workflow

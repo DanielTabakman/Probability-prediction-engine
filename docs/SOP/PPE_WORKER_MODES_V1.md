@@ -42,8 +42,13 @@ Uses `scripts/ppe_relay_phase.py` instead of npm steward. Each slice: determinis
 
 Deterministic mode **does not** implement product code changes. **Product** slices get `STOP_FOR_REVIEW` with a note to use ACP or steward BUILD in Cursor, then **promotion recovery** can still merge if you committed on the build branch manually.
 
+### Product slice (explicit spend)
+
+Use [`run_product_slice.cmd`](../../run_product_slice.cmd) for **one** product slice with `agent-cli` without re-enabling ACP for the whole phase. See [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md).
+
 ## Related
 
+- [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md)
 - [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md)
 - [`scripts/ppe_promotion_recovery.py`](../../scripts/ppe_promotion_recovery.py)
 - [`scripts/ppe_queue_health.py`](../../scripts/ppe_queue_health.py)

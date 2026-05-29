@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
@@ -211,6 +212,8 @@ def _render_md(report: dict[str, Any]) -> str:
         lines.append(f"- **manifest_status**: `{report.get('manifest_status')}`")
     if report.get("context_band_hint"):
         lines.append(f"- **context_band_hint**: `{report.get('context_band_hint')}`")
+    if report.get("token_economy_hint"):
+        lines.append(f"- **token_economy**: {report.get('token_economy_hint')}")
     if report.get("orchestrator_detail"):
         lines.append(f"- **orchestrator_detail**: `{report.get('orchestrator_detail')}`")
     smoke = report.get("smoke_diagnosis")
@@ -288,6 +291,14 @@ def main() -> int:
         "awaiting_user": awaiting_user,
         "next_action": next_action,
     }
+    run_kind = (os.environ.get("PPE_RUN_KIND") or "").strip()
+    if run_kind == "product_slice":
+        report["run_kind"] = run_kind
+        report["token_economy_hint"] = (
+            "Product slice run (agent-cli) — expect Cursor billing; "
+            "keep steward chat thin (LAST_RUN_REPORT + AGENT_CONTINUITY_BRIEF only)."
+        )
+
     _enrich_from_manifest(repo_root, report)
     _enrich_from_steward_summary(repo_root, report)
     _enrich_smoke_diagnosis(repo_root, report)

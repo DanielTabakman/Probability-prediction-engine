@@ -16,7 +16,7 @@ Set `PPE_OPERATOR_PROFILE=local` or `=acp` (wrappers above do this). Default [`P
 ### No credits (local)
 
 - **Relay:** deterministic (`PPE_SKIP_ACP=1`) — control, smoke, closeout slices only.
-- **Product slices:** continuous run **stops** on PRODUCT (guard) — implement in **Cursor IDE chat**, commit on the build branch, then `run_ppe_local.cmd` again for smoke/closeout.
+- **Product slices:** continuous run **stops** on PRODUCT (guard) — run [`run_product_slice.cmd`](../../run_product_slice.cmd) once (agent-cli), or BUILD in Cursor IDE, then `run_ppe_local.cmd` for smoke/closeout. See [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md).
 - **No** npm steward / ACP / Cursor SDK charter.
 
 ### Have credits (acp)
@@ -58,7 +58,7 @@ Controlled by [`PPE_AUTO_OPERATOR.json`](PPE_AUTO_OPERATOR.json):
 |------|---------|--------|
 | `enabled` | `true` | Master switch for `run_ppe_auto.cmd` |
 | `propagateBacklog` | `true` | `queued` backlog → roadmap `pending` → queue `PLANNED` → bootstrap `READY` |
-| `stewardCharter` | `true` | When idle and backlog empty, Cursor SDK steward adds next **deterministic** chapter |
+| `stewardCharter` | `true` | When idle and backlog empty, Cursor SDK steward charters next chapter — **only if `skipAcp` is false** (ACP profile); ignored on local profile |
 | `workerMode` | `deterministic` | Relay worker mode |
 | `skipAcp` | `true` | Sets `PPE_SKIP_ACP=1` (local deterministic relay; avoids cloud ACP quota) |
 | `continuousMax` | `20` | Max chapters per `--continuous` pass |
@@ -126,6 +126,7 @@ Set `"enabled": false` in `PPE_AUTO_OPERATOR.json`, or use plain `run_ppe.cmd` w
 
 ## Related
 
+- [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md)
 - [`PPE_AUTO_SELECTION_ROADMAP_V1.md`](PPE_AUTO_SELECTION_ROADMAP_V1.md)
 - [`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)
 - [`PPE_STEWARD_CURSOR_V1.md`](PPE_STEWARD_CURSOR_V1.md)

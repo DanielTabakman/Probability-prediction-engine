@@ -62,3 +62,5 @@ run_ppe.cmd --dry-run   # optional preflight
 run_ppe.cmd             # full relay phase
 run_ppe.cmd --status    # ACTIVE_RUN + last report summary
 ```
+
+**Token economy:** auto chapters via [`run_ppe_auto.cmd`](../run_ppe_auto.cmd) (deterministic, low Cursor spend); one product slice via [`run_product_slice.cmd`](../run_product_slice.cmd) — [`SOP/PPE_TOKEN_ECONOMY_V1.md`](SOP/PPE_TOKEN_ECONOMY_V1.md).
