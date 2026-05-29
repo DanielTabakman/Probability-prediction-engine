@@ -23,7 +23,11 @@ BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 VALID_BACKLOG_STATUSES = frozenset({"queued", "chartered", "done", "blocked", "skipped"})
 
 
-def backlog_enabled() -> bool:
+def backlog_enabled(repo_root: Path | None = None) -> bool:
+    if repo_root is not None:
+        from scripts.ppe_operator_config import propagate_backlog_enabled
+
+        return propagate_backlog_enabled(repo_root.resolve())
     env = os.environ.get("PPE_AUTO_PROPAGATE_QUEUE", "").strip().lower()
     if env in ("0", "false", "no", "off"):
         return False
@@ -110,7 +114,7 @@ def _plan_on_roadmap(roadmap: dict[str, Any], plan_path: str) -> bool:
 def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     """Append first queued backlog row to roadmap as pending (with optional scaffold)."""
     repo = repo_root.resolve()
-    if not backlog_enabled():
+    if not backlog_enabled(repo):
         return {"propagated": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
     if not backlog_path(repo).is_file():
         return {"propagated": False, "reason": "no backlog file"}

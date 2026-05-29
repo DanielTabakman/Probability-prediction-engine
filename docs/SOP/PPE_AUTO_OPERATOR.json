@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "enabled": true,
+  "notes": "Repo-local auto-operator. When enabled, run_ppe_auto.cmd sets env and enables backlog propagation + steward charter when the queue is idle.",
+  "propagateBacklog": true,
+  "stewardCharter": true,
+  "workerMode": "deterministic",
+  "skipAcp": true,
+  "continuousMax": 20,
+  "loopWhenIdle": true,
+  "idleSleepSeconds": 120
+}

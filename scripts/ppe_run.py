@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
-from scripts.ppe_auto_select import run_auto_select
-from scripts.ppe_manifest import load_manifest, set_manifest_status
+from scripts.ppe_auto_select import choose_next_plan, run_auto_select
+from scripts.ppe_manifest import load_manifest, load_phase_plan, save_manifest, set_manifest_status
 from scripts.ppe_preflight import run_preflight
 from scripts.resolve_active_phase import main as resolve_main
 
@@ -170,6 +171,26 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     return exit_code
 
 
+def _idle_hydrate_and_select(repo: Path) -> bool:
+    """Re-run backlog propagate + steward + bootstrap; select READY if one appears."""
+    from scripts.ppe_roadmap import prepare_selection_idle
+
+    prep = prepare_selection_idle(repo, apply=True)
+    print(f"ppe_run: idle hydrate {json.dumps(prep)}")
+    plan_path, reason = choose_next_plan(repo)
+    if not plan_path:
+        return False
+    plan = load_phase_plan(repo, plan_path)
+    manifest = load_manifest(repo)
+    manifest["phasePlanPath"] = plan_path
+    manifest["sprintSpecPath"] = str(plan.get("sprintSpecPath") or manifest.get("sprintSpecPath") or "").strip()
+    manifest["selectionRecord"] = str(plan.get("selectionRecord") or manifest.get("selectionRecord") or "").strip()
+    manifest["status"] = "READY"
+    manifest["notes"] = f"idle hydrate selected: {reason}"
+    save_manifest(repo, manifest)
+    return True
+
+
 def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
     """Run phases back-to-back until queue empty, failure, or max_chapters."""
     for chapter in range(1, max_chapters + 1):
@@ -188,8 +209,13 @@ def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
         plan_path = str(manifest.get("phasePlanPath") or "").strip()
         status = str(manifest.get("status") or "").strip().upper()
         if status != "READY" or not plan_path:
-            print("ppe_run: continuous idle (no READY manifest / empty plan)")
-            return 0
+            if _idle_hydrate_and_select(repo):
+                manifest = load_manifest(repo)
+                plan_path = str(manifest.get("phasePlanPath") or "").strip()
+                status = str(manifest.get("status") or "").strip().upper()
+            if status != "READY" or not plan_path:
+                print("ppe_run: continuous idle (no READY manifest / empty plan)")
+                return 0
 
         exit_code = cmd_run_phase(repo, plan_path)
         if exit_code != 0:
