@@ -33,7 +33,7 @@ run_ppe.cmd
       → bootstrap pending → READY
 ```
 
-Enable/disable: `PPE_AUTO_PROPAGATE_QUEUE=1` (default **on** when backlog file exists).
+Enable/disable: `PPE_AUTO_PROPAGATE_QUEUE=1` (default **on**), or `"propagateBacklog": true` in [`PPE_AUTO_OPERATOR.json`](PPE_AUTO_OPERATOR.json) via **`run_ppe_auto.cmd`**.
 
 ## CLI
 

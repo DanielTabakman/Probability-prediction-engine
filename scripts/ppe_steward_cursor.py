@@ -45,7 +45,11 @@ FORBIDDEN_WRITE_PREFIXES = (
 )
 
 
-def steward_enabled() -> bool:
+def steward_enabled(repo_root: Path | None = None) -> bool:
+    if repo_root is not None:
+        from scripts.ppe_operator_config import steward_charter_enabled
+
+        return steward_charter_enabled(repo_root.resolve())
     env = os.environ.get("PPE_AUTO_STEWARD", "").strip().lower()
     if env in ("0", "false", "no", "off"):
         return False
@@ -70,7 +74,7 @@ def _manifest_idle(repo: Path) -> tuple[bool, str]:
 def needs_steward_charter(repo_root: Path) -> tuple[bool, str]:
     """True when auto-run should try to charter the next chapter."""
     repo = repo_root.resolve()
-    if not steward_enabled():
+    if not steward_enabled(repo):
         return False, "PPE_AUTO_STEWARD disabled"
     if not roadmap_enabled(repo):
         return False, "roadmap disabled or missing"

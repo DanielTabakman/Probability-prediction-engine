@@ -21,6 +21,10 @@ You do not run the steward by hand unless debugging.
 
 ## Enable
 
+**Recommended:** [`PPE_AUTO_OPERATOR.json`](PPE_AUTO_OPERATOR.json) with `"stewardCharter": true` and **`run_ppe_auto.cmd`** (see [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)).
+
+Manual env:
+
 ```bat
 pip install cursor-sdk
 set CURSOR_API_KEY=your_key
@@ -32,7 +36,7 @@ run_ppe.cmd --continuous
 
 | Variable | Default | Meaning |
 |----------|---------|---------|
-| `PPE_AUTO_STEWARD` | `0` (off) | `1` runs steward when idle |
+| `PPE_AUTO_STEWARD` | off unless `PPE_AUTO_OPERATOR.json` has `stewardCharter: true` | `1` runs steward when idle |
 | `CURSOR_API_KEY` | — | Required for SDK (local runtime still uses API) |
 | `PPE_STEWARD_MODEL` | `composer-2.5` | Model id |
 | `PPE_STEWARD_ALLOW_PRODUCT` | off | Allow `workerMode` other than `deterministic` |
