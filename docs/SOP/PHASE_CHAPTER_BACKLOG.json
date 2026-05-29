@@ -12,10 +12,11 @@
     },
     {
       "chapterId": "mvp1_phase6_trust_metrics_v1",
-      "status": "blocked",
-      "blockReason": "Verification payload lacks explicit trust enums; see MVP1_FRONTIER Phase 6 beyond v0",
-      "canonRef": "docs/SOP/MVP1_FRONTIER.md \u2014 Phase 6 beyond v0",
-      "reason": "Stronger trust metrics in class summary \u2014 needs charter when payload ready"
+      "status": "queued",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase6_trust_metrics_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
+      "canonRef": "docs/SOP/MVP1_PHASE1_3_SPRINT.md \u2014 Phase 6 beyond v0",
+      "reason": "Trust enum rollups (data_quality, primary_output_state) in class summary \u2014 chartered 2026-05-29"
     },
     {
       "chapterId": "mvp1_steering_sync_evidence",

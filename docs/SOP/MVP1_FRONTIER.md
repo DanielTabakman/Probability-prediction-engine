@@ -215,7 +215,8 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
 
 #### Phase 6 beyond v0
 - **DONE (chapter):** store-backed expiry + reviewed-date filters; rollup JSON/CSV + reviewed table CSV export.
-- **Still deferred:** stronger trust metrics when verification payload gains explicit trust enums; canon still excludes execution and automated deployment.
+- **READY (chartered):** trust enum rollups (`data_quality`, `primary_output_state`) — [`POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md`](POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md), [`SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md`](SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md).
+- **Still deferred:** richer multi-field trust witness beyond enum rollups; canon still excludes execution and automated deployment.
 
 ### Logging policy (low-maintenance)
 - Local-first append-only logbook: `artifacts/logbook/ppe_events.jsonl` (gitignored).

@@ -1,0 +1,64 @@
+{
+  "name": "MVP1_phase6_trust_metrics_v1 (post-Phase5 SELECTION)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+  "selectionRecord": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-Phase6Trust-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+      "buildBranch": "build/auto/MVP1-Phase6Trust-Control-Slice001-phase6_trust",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-Phase6Trust-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+      "buildBranch": "build/auto/MVP1-Phase6Trust-Product-Slice002-phase6_trust",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/reviewed_class_summary.py",
+        "src/viz/frozen_evaluation_record.py",
+        "src/viz/app.py",
+        "tests/test_reviewed_class_summary.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-Phase6Trust-Smoke-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+      "buildBranch": "build/auto/MVP1-Phase6Trust-Smoke-Slice003-phase6_trust",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-Phase6Trust-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+      "buildBranch": "build/auto/MVP1-Phase6Trust-Closeout-Slice004-phase6_trust",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_phase6_trust_metrics_v1",
+        "chapterTitle": "MVP1 Phase 6 trust metrics v1",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-05-29",
+        "evidenceDoc": "docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

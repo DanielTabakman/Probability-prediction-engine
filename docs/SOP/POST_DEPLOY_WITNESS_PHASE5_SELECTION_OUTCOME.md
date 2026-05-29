@@ -22,7 +22,7 @@
 
 | Candidate | Source |
 |-----------|--------|
-| Phase 6 trust metrics v1 | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) — when verification payload has explicit trust enums |
+| ~~Phase 6 trust metrics v1~~ | **Chartered** — [`POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md`](POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md) |
 | Steward VPS CTA | Commercial ops (not agent BUILD) |
 
 ## Relay
