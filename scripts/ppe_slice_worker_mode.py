@@ -42,10 +42,6 @@ def resolve_worker_mode(
     slice_obj: dict[str, Any] | None = None,
 ) -> str:
     """Return acp | deterministic | local-agent."""
-    env = _env_mode()
-    if env:
-        return env
-
     if slice_obj:
         plan_mode = str(slice_obj.get("workerMode") or slice_obj.get("worker") or "").strip().lower()
         if plan_mode in ("deterministic", "local"):
@@ -54,6 +50,10 @@ def resolve_worker_mode(
             return "acp"
         if plan_mode in ("local-agent", "agent-cli", "agent"):
             return "local-agent"
+
+    env = _env_mode()
+    if env:
+        return env
 
     kind = infer_slice_kind(slice_id, slice_obj)
     if kind in ("closeout", "smoke", "control"):

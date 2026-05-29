@@ -8,5 +8,16 @@
   "skipAcp": true,
   "continuousMax": 20,
   "loopWhenIdle": true,
-  "idleSleepSeconds": 120
+  "idleSleepSeconds": 120,
+  "guards": {
+    "enabled": true,
+    "stopOnContextEscalate": true,
+    "stopOnContextWatch": false,
+    "maxPhaseSlices": 6,
+    "blockProductUnderGlobalDeterministic": true,
+    "requireTouchSetOnProductSlices": true,
+    "skipChapterIfEvidenceComplete": true,
+    "maxConsecutivePhaseFailures": 2,
+    "runQueueHealthBeforeChapter": true
+  }
 }

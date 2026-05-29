@@ -35,6 +35,25 @@ Controlled by [`PPE_AUTO_OPERATOR.json`](PPE_AUTO_OPERATOR.json):
 | `loopWhenIdle` | `true` | Use `run_ppe_auto_loop.cmd` for outer retry |
 | `idleSleepSeconds` | `120` | Sleep between loop passes |
 
+### Operator guards (`guards` object)
+
+When `enabled` is true and the operator is on, `--continuous` runs pre-flight checks before each chapter. A guard stop exits **7** and writes [`artifacts/orchestrator/OPERATOR_GUARD_REPORT.md`](../../artifacts/orchestrator/OPERATOR_GUARD_REPORT.md). `run_ppe_auto_loop.cmd` does **not** sleep and retry on exit 7.
+
+| Guard | Default | Effect |
+|-------|---------|--------|
+| `stopOnContextEscalate` | `true` | Stop if any sprint spec in the plan is **>400 lines** (ESCALATE band) |
+| `stopOnContextWatch` | `false` | Stop if sprint spec **>200 lines** (WATCH band) |
+| `maxPhaseSlices` | `6` | Stop if the phase plan has too many slices |
+| `blockProductUnderGlobalDeterministic` | `true` | Stop if a **PRODUCT** slice would run as deterministic (SCOPE_AMBIGUITY) |
+| `requireTouchSetOnProductSlices` | `true` | PRODUCT slices must declare a non-empty `touchSet` |
+| `skipChapterIfEvidenceComplete` | `true` | Skip relay when closeout evidence already says **COMPLETE** |
+| `maxConsecutivePhaseFailures` | `2` | Stop after N failed chapters in one `--continuous` pass |
+| `runQueueHealthBeforeChapter` | `true` | Auto-repair duplicate READY / stale READY rows |
+
+**Product chapters under auto-operator:** set `workerMode: local-agent` on the product slice (Phase 6 plan does). Slice-level `local-agent` overrides global `PPE_WORKER_MODE=deterministic` so evidence slices stay local while product runs via agent CLI / Cursor BUILD.
+
+Disable all guards: `"guards": { "enabled": false }` or `PPE_OPERATOR_GUARDS=0`.
+
 Environment variables **override** the JSON file (`PPE_AUTO_STEWARD=0` disables steward even if JSON says on).
 
 ## Flow

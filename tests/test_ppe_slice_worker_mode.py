@@ -35,6 +35,16 @@ class TestPpeSliceWorkerMode(unittest.TestCase):
                 "deterministic",
             )
 
+    def test_local_agent_overrides_global_deterministic(self) -> None:
+        with patch.dict(os.environ, {"PPE_WORKER_MODE": "deterministic"}, clear=False):
+            self.assertEqual(
+                resolve_worker_mode(
+                    slice_id="MVP1-Foo-Product-Slice002",
+                    slice_obj={"workerMode": "local-agent"},
+                ),
+                "local-agent",
+            )
+
     def test_auto_deterministic_control(self) -> None:
         with patch.dict(os.environ, {}, clear=False):
             os.environ.pop("PPE_WORKER_MODE", None)

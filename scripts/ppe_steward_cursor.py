@@ -216,6 +216,14 @@ def validate_proposal(repo_root: Path, proposal: dict[str, Any]) -> list[str]:
         errors.append(f"invalid workerMode: {wm}")
     if wm != "deterministic" and not os.environ.get("PPE_STEWARD_ALLOW_PRODUCT"):
         errors.append("only workerMode deterministic allowed without PPE_STEWARD_ALLOW_PRODUCT=1")
+    if plan:
+        plan_file = repo_root / plan
+        if plan_file.is_file():
+            from scripts.ppe_operator_guards import assess_phase_plan
+
+            verdict = assess_phase_plan(repo_root, plan)
+            if not verdict.ok:
+                errors.append(f"operator guard ({verdict.code}): {verdict.message}")
     return errors
 
 

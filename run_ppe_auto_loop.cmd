@@ -14,6 +14,10 @@ for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scr
 echo [run_ppe_auto_loop] starting pass at %DATE% %TIME%
 call "%~dp0run_ppe_auto.cmd"
 set "RC=%ERRORLEVEL%"
+if "%RC%"=="7" (
+  echo [run_ppe_auto_loop] operator guard stop — review artifacts/orchestrator/OPERATOR_GUARD_REPORT.md
+  exit /b 7
+)
 if not "%RC%"=="0" exit /b %RC%
 echo [run_ppe_auto_loop] idle sleep %SLEEP%s — Ctrl+C to stop
 timeout /t %SLEEP% /nobreak >nul

@@ -193,6 +193,19 @@ def _idle_hydrate_and_select(repo: Path) -> bool:
 
 def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
     """Run phases back-to-back until queue empty, failure, or max_chapters."""
+    from scripts.ppe_operator_guards import (
+        OPERATOR_GUARD_EXIT,
+        assess_before_continuous_chapter,
+        guards_enabled,
+        load_guards,
+        write_guard_report,
+    )
+
+    use_guards = guards_enabled(repo)
+    guard_cfg = load_guards(repo) if use_guards else {}
+    consecutive_failures = 0
+    max_failures = int(guard_cfg.get("maxConsecutivePhaseFailures") or 2)
+
     for chapter in range(1, max_chapters + 1):
         print(f"ppe_run: continuous chapter {chapter}/{max_chapters}")
         sel_rc = run_auto_select(repo, apply=True, select_only=False, mark_done=False, force=False)
@@ -217,18 +230,59 @@ def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
                 print("ppe_run: continuous idle (no READY manifest / empty plan)")
                 return 0
 
+        if use_guards:
+            if guard_cfg.get("runQueueHealthBeforeChapter"):
+                from scripts.ppe_queue_health import repair_queue
+
+                fixes, remaining = repair_queue(repo, apply=True)
+                if fixes:
+                    print(f"ppe_run: queue health repairs {json.dumps(fixes)}")
+                if remaining:
+                    print(f"ppe_run: queue health issues (unrepaired) {json.dumps(remaining)}")
+
+            verdict = assess_before_continuous_chapter(repo, plan_path)
+            if verdict.skip_chapter:
+                print(f"ppe_run: guard skip — {verdict.message}")
+                from scripts.ppe_queue_health import repair_queue
+
+                repair_queue(repo, apply=True)
+                continue
+            if not verdict.ok and verdict.stop:
+                report = write_guard_report(repo, verdict)
+                print(f"ppe_run: operator guard stop ({verdict.code}): {verdict.message}")
+                print(f"ppe_run: guard report={report}")
+                return OPERATOR_GUARD_EXIT
+
         exit_code = cmd_run_phase(repo, plan_path)
         if exit_code != 0:
             try:
                 manifest = load_manifest(repo)
                 if str(manifest.get("status") or "").strip().upper() == "COMPLETE":
                     print("ppe_run: continuous continue (phase exit non-zero but manifest COMPLETE)")
+                    consecutive_failures = 0
                     continue
             except Exception:
                 pass
+            consecutive_failures += 1
+            if use_guards and consecutive_failures >= max_failures:
+                from scripts.ppe_operator_guards import GuardVerdict, write_guard_report
+
+                fail_verdict = GuardVerdict(
+                    False,
+                    True,
+                    False,
+                    "CONSECUTIVE_PHASE_FAILURES",
+                    f"{consecutive_failures} consecutive phase failures (max {max_failures})",
+                    {"lastExitCode": exit_code, "planPath": plan_path},
+                )
+                report = write_guard_report(repo, fail_verdict)
+                print(f"ppe_run: operator guard stop ({fail_verdict.code})")
+                print(f"ppe_run: guard report={report}")
+                return OPERATOR_GUARD_EXIT
             print(f"ppe_run: continuous stop (phase exit {exit_code})")
             return exit_code
 
+        consecutive_failures = 0
         manifest = load_manifest(repo)
         if str(manifest.get("status") or "").strip().upper() != "COMPLETE":
             print("ppe_run: continuous stop (phase ended without COMPLETE manifest)")
