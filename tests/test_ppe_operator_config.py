@@ -11,6 +11,8 @@ from pathlib import Path
 from scripts.ppe_operator_config import (
     apply_operator_env,
     operator_enabled,
+    operator_env_cmd_lines,
+    planned_operator_env,
     steward_charter_enabled,
 )
 from scripts.ppe_steward_cursor import needs_steward_charter
@@ -29,6 +31,7 @@ class TestPpeOperatorConfig(unittest.TestCase):
                     "enabled": True,
                     "propagateBacklog": True,
                     "stewardCharter": True,
+                    "skipAcp": False,
                 }
             ),
             encoding="utf-8",
@@ -64,3 +67,18 @@ class TestPpeOperatorConfig(unittest.TestCase):
         self.assertTrue(out.get("applied"))
         self.assertEqual(os.environ.get("PPE_AUTO_STEWARD"), "1")
         self.assertEqual(os.environ.get("PPE_AUTO_PROPAGATE_QUEUE"), "1")
+
+    def test_skip_acp_disables_steward_charter_from_config(self) -> None:
+        cfg_path = self.repo / "docs" / "SOP" / "PPE_AUTO_OPERATOR.json"
+        cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+        cfg["skipAcp"] = True
+        cfg["stewardCharter"] = True
+        cfg_path.write_text(json.dumps(cfg), encoding="utf-8")
+        os.environ.pop("PPE_AUTO_STEWARD", None)
+        self.assertFalse(steward_charter_enabled(self.repo))
+        planned = planned_operator_env(self.repo)
+        self.assertNotIn("PPE_AUTO_STEWARD", planned)
+        self.assertEqual(planned.get("PPE_SKIP_ACP"), "1")
+        lines = operator_env_cmd_lines(self.repo)
+        self.assertTrue(any("PPE_SKIP_ACP" in ln for ln in lines))
+        self.assertFalse(any("PPE_AUTO_STEWARD" in ln for ln in lines))

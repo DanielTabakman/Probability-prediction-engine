@@ -60,19 +60,20 @@ class TestPpeOperatorGuards(unittest.TestCase):
         self.assertFalse(v.ok)
         self.assertEqual(v.code, "PRODUCT_BLOCKED")
 
-    def test_product_allowed_with_local_agent_override(self) -> None:
+    def test_global_deterministic_overrides_plan_local_agent(self) -> None:
         os.environ["PPE_WORKER_MODE"] = "deterministic"
         plan = json.loads((self.repo / self.plan_path).read_text(encoding="utf-8"))
         plan["slices"][0]["workerMode"] = "local-agent"
         (self.repo / self.plan_path).write_text(json.dumps(plan), encoding="utf-8")
         v = assess_phase_plan(self.repo, self.plan_path)
-        self.assertTrue(v.ok)
+        self.assertFalse(v.ok)
+        self.assertEqual(v.code, "PRODUCT_BLOCKED")
         self.assertEqual(
             resolve_worker_mode(
                 slice_id="MVP1-Test-Product-Slice002",
                 slice_obj={"workerMode": "local-agent"},
             ),
-            "local-agent",
+            "deterministic",
         )
 
     def test_product_requires_touch_set(self) -> None:

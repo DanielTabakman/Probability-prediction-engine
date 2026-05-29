@@ -14,6 +14,10 @@ set "REPO_ROOT=%~dp0"
 set "REPO_ROOT=%REPO_ROOT:~0,-1%"
 
 set "PYTHONPATH=%REPO_ROOT%"
+if not defined PPE_OPERATOR_ENV_APPLIED (
+  for /f "usebackq delims=" %%a in (`python "%REPO_ROOT%\scripts\ppe_operator_env.py" --repo-root "%REPO_ROOT%" --emit-cmd`) do %%a
+  set "PPE_OPERATOR_ENV_APPLIED=1"
+)
 if not defined PPE_WORKER_MODE if "%PPE_SKIP_ACP%"=="1" set "PPE_WORKER_MODE=deterministic"
 set "CONTINUOUS=0"
 set "SELECT_ONLY=0"

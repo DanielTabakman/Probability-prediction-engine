@@ -8,6 +8,7 @@ REM Optional: CURSOR_API_KEY when stewardCharter is true (Cursor SDK local runti
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
+for /f "usebackq delims=" %%a in (`python "%CD%\scripts\ppe_operator_env.py" --emit-cmd`) do %%a
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
 

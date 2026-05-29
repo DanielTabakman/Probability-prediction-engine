@@ -33,9 +33,12 @@ def steward_charter_enabled(repo_root: Path) -> bool:
     if env in ("1", "true", "yes", "on"):
         return True
     cfg = load_operator_config(repo_root)
-    if operator_enabled(repo_root) and cfg.get("stewardCharter") is True:
-        return True
-    return False
+    if not operator_enabled(repo_root):
+        return False
+    # Local/deterministic operator: skipAcp means no Cursor SDK steward charter.
+    if cfg.get("skipAcp", True) is not False:
+        return False
+    return cfg.get("stewardCharter") is True
 
 
 def propagate_backlog_enabled(repo_root: Path) -> bool:
@@ -73,6 +76,30 @@ def continuous_max(repo_root: Path) -> int:
         return 20
 
 
+def planned_operator_env(repo_root: Path) -> dict[str, str]:
+    """Env assignments from operator config (empty when disabled)."""
+    cfg = load_operator_config(repo_root)
+    if not cfg.get("enabled"):
+        return {}
+    out: dict[str, str] = {"PPE_AUTO_ROADMAP": "1"}
+    if cfg.get("propagateBacklog", True) is not False:
+        out["PPE_AUTO_PROPAGATE_QUEUE"] = "1"
+    skip_acp = cfg.get("skipAcp", True) is not False
+    if cfg.get("stewardCharter") is True and not skip_acp:
+        out["PPE_AUTO_STEWARD"] = "1"
+    wm = str(cfg.get("workerMode") or "deterministic").strip()
+    if wm:
+        out["PPE_WORKER_MODE"] = wm
+    if skip_acp:
+        out["PPE_SKIP_ACP"] = "1"
+    return out
+
+
+def operator_env_cmd_lines(repo_root: Path) -> list[str]:
+    """Lines for cmd.exe: SET \"KEY=value\" (for for /f in .cmd wrappers)."""
+    return [f'SET "{k}={v}"' for k, v in planned_operator_env(repo_root).items()]
+
+
 def apply_operator_env(repo_root: Path) -> dict[str, Any]:
     """Set process env from operator config (does not override explicit env)."""
     cfg = load_operator_config(repo_root)
@@ -83,14 +110,6 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
         if key not in os.environ or not str(os.environ.get(key) or "").strip():
             os.environ[key] = value
 
-    _set("PPE_AUTO_ROADMAP", "1")
-    if cfg.get("propagateBacklog", True) is not False:
-        _set("PPE_AUTO_PROPAGATE_QUEUE", "1")
-    if cfg.get("stewardCharter") is True:
-        _set("PPE_AUTO_STEWARD", "1")
-    wm = str(cfg.get("workerMode") or "deterministic").strip()
-    if wm:
-        _set("PPE_WORKER_MODE", wm)
-    if cfg.get("skipAcp", True) is not False:
-        _set("PPE_SKIP_ACP", "1")
+    for key, value in planned_operator_env(repo_root).items():
+        _set(key, value)
     return {"applied": True, "config": cfg}
