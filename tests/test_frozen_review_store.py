@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -130,5 +131,114 @@ class TestFrozenReviewStore(unittest.TestCase):
                 )
                 self.assertEqual(len(by_exp), 2)
                 self.assertEqual([r["expiry"] for r in by_exp], ["5MAY26", "6MAY26"])
+            finally:
+                conn.close()
+
+    def test_foreign_keys_enabled_and_enforced(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "fk.sqlite"
+            conn = open_store(p)
+            try:
+                fk_on = conn.execute("PRAGMA foreign_keys").fetchone()
+                self.assertIsNotNone(fk_on)
+                self.assertEqual(int(fk_on[0]), 1)
+
+                fk_list = conn.execute("PRAGMA foreign_key_list(snapshot_reviews)").fetchall()
+                self.assertGreaterEqual(len(fk_list), 1)
+                self.assertEqual(fk_list[0]["table"], "frozen_evaluations")
+
+                with self.assertRaises(sqlite3.IntegrityError):
+                    upsert_review(
+                        conn,
+                        snapshot_id="00000000-0000-0000-0000-000000000000",
+                        review_status="pending",
+                        outcome_notes=None,
+                    )
+            finally:
+                conn.close()
+
+    def test_delete_snapshot_cascades_review(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "cascade.sqlite"
+            conn = open_store(p)
+            try:
+                v = {
+                    "verification_summary": {
+                        "as_of_utc": "2026-05-04T12:00:00Z",
+                        "disagreement_category_id": "width_vol",
+                    },
+                    "density": {
+                        "reference_risk_neutral": {
+                            "method": "test",
+                            "forward_usd": 100_000.0,
+                            "atm_iv_annual": 0.5,
+                            "T_years": 0.1,
+                            "grid_price_min_usd": 10_000.0,
+                            "grid_price_max_usd": 200_000.0,
+                            "grid_points": 10,
+                        }
+                    },
+                    "belief_disagreement": {},
+                }
+                rec = build_frozen_evaluation_record(verification=v, expiry_str="5MAY26")
+                rid = insert_record(conn, rec)
+                upsert_review(conn, snapshot_id=rid, review_status="supportive", outcome_notes="x")
+                self.assertIsNotNone(get_review_for_snapshot(conn, rid))
+
+                conn.execute("DELETE FROM frozen_evaluations WHERE id = ?", (rid,))
+                conn.commit()
+                self.assertIsNone(get_review_for_snapshot(conn, rid))
+            finally:
+                conn.close()
+
+    def test_legacy_migration_drops_orphan_reviews(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "legacy.sqlite"
+            raw = sqlite3.connect(str(p))
+            try:
+                raw.execute("PRAGMA foreign_keys=ON")
+                raw.execute(
+                    """
+                    CREATE TABLE frozen_evaluations (
+                        id TEXT PRIMARY KEY,
+                        created_at TEXT NOT NULL,
+                        expiry TEXT NOT NULL,
+                        summary_line TEXT NOT NULL,
+                        record_json TEXT NOT NULL
+                    )
+                    """
+                )
+                raw.execute(
+                    """
+                    CREATE TABLE snapshot_reviews (
+                        id TEXT PRIMARY KEY NOT NULL,
+                        snapshot_id TEXT NOT NULL UNIQUE,
+                        review_status TEXT NOT NULL,
+                        outcome_notes TEXT,
+                        reviewed_at_utc TEXT NOT NULL,
+                        review_horizon_ref TEXT,
+                        paper_tag TEXT
+                    )
+                    """
+                )
+                raw.execute(
+                    """
+                    INSERT INTO snapshot_reviews
+                    (id, snapshot_id, review_status, outcome_notes, reviewed_at_utc,
+                     review_horizon_ref, paper_tag)
+                    VALUES ('orphan-review', 'missing-snapshot', 'pending', NULL,
+                            '2026-05-01T00:00:00Z', NULL, NULL)
+                    """
+                )
+                raw.commit()
+            finally:
+                raw.close()
+
+            conn = open_store(p)
+            try:
+                rows = conn.execute("SELECT snapshot_id FROM snapshot_reviews").fetchall()
+                self.assertEqual(len(rows), 0)
+                fk_list = conn.execute("PRAGMA foreign_key_list(snapshot_reviews)").fetchall()
+                self.assertGreaterEqual(len(fk_list), 1)
             finally:
                 conn.close()
