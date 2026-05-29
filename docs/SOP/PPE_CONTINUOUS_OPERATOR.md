@@ -2,17 +2,47 @@
 
 Hands-off chapter runner: drain **`PHASE_QUEUE`**, pull **`queued`** rows from **`PHASE_CHAPTER_BACKLOG.json`**, and optionally **charter** new evidence chapters when idle.
 
+## Two processes (credits vs no credits)
+
+Use **one profile at a time** — do not run local and ACP auto-loops together.
+
+| When | Entry (single chapter) | Entry (continuous) | Config |
+|------|------------------------|--------------------|--------|
+| **No agent credits** | `run_ppe_local.cmd` | `run_ppe_auto_local_loop.cmd` | [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) |
+| **Have agent credits** | `run_ppe_acp.cmd` | `run_ppe_auto_acp_loop.cmd` | [`PPE_AUTO_OPERATOR.acp.json`](PPE_AUTO_OPERATOR.acp.json) |
+
+Set `PPE_OPERATOR_PROFILE=local` or `=acp` (wrappers above do this). Default [`PPE_AUTO_OPERATOR.json`](PPE_AUTO_OPERATOR.json) matches **local**.
+
+### No credits (local)
+
+- **Relay:** deterministic (`PPE_SKIP_ACP=1`) — control, smoke, closeout slices only.
+- **Product slices:** continuous run **stops** on PRODUCT (guard) — implement in **Cursor IDE chat**, commit on the build branch, then `run_ppe_local.cmd` again for smoke/closeout.
+- **No** npm steward / ACP / Cursor SDK charter.
+
+### Have credits (acp)
+
+- **Relay:** `ppe-orchestrator-acp` npm steward + ACP workers per slice.
+- **Steward charter** when queue idle (`stewardCharter: true`).
+- Requires `CURSOR_API_KEY` and sibling `ppe-orchestrator-acp` repo.
+
 ## Quick start (repo root)
 
-```bat
-run_ppe_auto.cmd
-```
-
-**Keep running** (sleep and retry when the queue empties):
+**Default (local / no credits):**
 
 ```bat
-run_ppe_auto_loop.cmd
+run_ppe_auto_local.cmd
+run_ppe_auto_local_loop.cmd
 ```
+
+**With credits:**
+
+```bat
+set CURSOR_API_KEY=your_key
+run_ppe_auto_acp.cmd
+run_ppe_auto_acp_loop.cmd
+```
+
+Legacy names (`run_ppe_auto.cmd`) use whatever is in `PPE_AUTO_OPERATOR.json` (local by default).
 
 Monitor (optional second terminal):
 
@@ -50,7 +80,7 @@ When `enabled` is true and the operator is on, `--continuous` runs pre-flight ch
 | `maxConsecutivePhaseFailures` | `2` | Stop after N failed chapters in one `--continuous` pass |
 | `runQueueHealthBeforeChapter` | `true` | Auto-repair duplicate READY / stale READY rows |
 
-**Product chapters under auto-operator:** set `workerMode: local-agent` on the product slice (Phase 6 plan does). Slice-level `local-agent` overrides global `PPE_WORKER_MODE=deterministic` so evidence slices stay local while product runs via agent CLI / Cursor BUILD.
+**Product chapters under local profile:** continuous stops on PRODUCT (guard). Build product code in Cursor IDE, then re-run `run_ppe_local.cmd` for remaining slices. Under **acp** profile, product slices use ACP / plan `workerMode`.
 
 Disable all guards: `"guards": { "enabled": false }` or `PPE_OPERATOR_GUARDS=0`.
 

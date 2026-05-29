@@ -8,10 +8,36 @@ from pathlib import Path
 from typing import Any
 
 OPERATOR_REL = "docs/SOP/PPE_AUTO_OPERATOR.json"
+OPERATOR_PROFILES: dict[str, str] = {
+    "local": "docs/SOP/PPE_AUTO_OPERATOR.local.json",
+    "acp": "docs/SOP/PPE_AUTO_OPERATOR.acp.json",
+}
 
 
 def operator_config_path(repo_root: Path) -> Path:
+    explicit = os.environ.get("PPE_OPERATOR_CONFIG", "").strip()
+    if explicit:
+        p = Path(explicit)
+        return (repo_root / p if not p.is_absolute() else p).resolve()
+    profile = os.environ.get("PPE_OPERATOR_PROFILE", "").strip().lower()
+    rel = OPERATOR_PROFILES.get(profile)
+    if rel:
+        return (repo_root / rel).resolve()
     return (repo_root / OPERATOR_REL).resolve()
+
+
+def active_operator_profile(repo_root: Path) -> str:
+    cfg = load_operator_config(repo_root)
+    if isinstance(cfg.get("profile"), str) and cfg["profile"].strip():
+        return cfg["profile"].strip()
+    profile = os.environ.get("PPE_OPERATOR_PROFILE", "").strip().lower()
+    if profile:
+        return profile
+    p = operator_config_path(repo_root)
+    for name, rel in OPERATOR_PROFILES.items():
+        if p.resolve() == (repo_root / rel).resolve():
+            return name
+    return "default"
 
 
 def load_operator_config(repo_root: Path) -> dict[str, Any]:

@@ -7,9 +7,10 @@ import sys
 from pathlib import Path
 
 from scripts.ppe_operator_config import (
-    OPERATOR_REL,
+    active_operator_profile,
     apply_operator_env,
     continuous_max,
+    operator_config_path,
     operator_env_cmd_lines,
 )
 
@@ -37,7 +38,11 @@ def main(argv: list[str] | None = None) -> int:
 
     out = apply_operator_env(repo)
     if out.get("applied"):
-        print(f"ppe_operator_env: enabled ({OPERATOR_REL})")
+        try:
+            rel = operator_config_path(repo).relative_to(repo)
+        except ValueError:
+            rel = operator_config_path(repo)
+        print(f"ppe_operator_env: profile={active_operator_profile(repo)} ({rel})")
     else:
         print("ppe_operator_env: no config or disabled (set env manually if needed)")
     return 0

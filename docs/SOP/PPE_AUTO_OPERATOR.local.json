@@ -2,7 +2,7 @@
   "version": 1,
   "profile": "local",
   "enabled": true,
-  "notes": "Default = local (no credits). Use run_ppe_acp.cmd or PPE_OPERATOR_PROFILE=acp when you have agent quota. See docs/SOP/PPE_CONTINUOUS_OPERATOR.md.",
+  "notes": "No agent credits: deterministic relay for control/smoke/closeout; PRODUCT slices are built manually in Cursor IDE chat, then re-run relay.",
   "propagateBacklog": true,
   "stewardCharter": false,
   "workerMode": "deterministic",

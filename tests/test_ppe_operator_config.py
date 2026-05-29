@@ -10,6 +10,7 @@ from pathlib import Path
 
 from scripts.ppe_operator_config import (
     apply_operator_env,
+    load_operator_config,
     operator_enabled,
     operator_env_cmd_lines,
     planned_operator_env,
@@ -82,3 +83,50 @@ class TestPpeOperatorConfig(unittest.TestCase):
         lines = operator_env_cmd_lines(self.repo)
         self.assertTrue(any("PPE_SKIP_ACP" in ln for ln in lines))
         self.assertFalse(any("PPE_AUTO_STEWARD" in ln for ln in lines))
+
+    def test_operator_profile_local(self) -> None:
+        from scripts.ppe_operator_config import active_operator_profile, operator_config_path
+
+        local = self.repo / "docs" / "SOP" / "PPE_AUTO_OPERATOR.local.json"
+        local.write_text(
+            json.dumps({"version": 1, "profile": "local", "enabled": True, "skipAcp": True, "workerMode": "deterministic"}),
+            encoding="utf-8",
+        )
+        os.environ["PPE_OPERATOR_PROFILE"] = "local"
+        self.assertEqual(
+            operator_config_path(self.repo).name,
+            "PPE_AUTO_OPERATOR.local.json",
+        )
+        local_cfg = load_operator_config(self.repo)
+        self.assertTrue(local_cfg.get("skipAcp"))
+        self.assertEqual(active_operator_profile(self.repo), "local")
+        os.environ.pop("PPE_OPERATOR_PROFILE", None)
+
+    def test_operator_profile_acp(self) -> None:
+        from scripts.ppe_operator_config import operator_config_path, planned_operator_env
+
+        acp = self.repo / "docs" / "SOP" / "PPE_AUTO_OPERATOR.acp.json"
+        acp.write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "profile": "acp",
+                    "enabled": True,
+                    "skipAcp": False,
+                    "workerMode": "acp",
+                    "stewardCharter": True,
+                    "propagateBacklog": True,
+                }
+            ),
+            encoding="utf-8",
+        )
+        os.environ["PPE_OPERATOR_PROFILE"] = "acp"
+        self.assertEqual(
+            operator_config_path(self.repo).name,
+            "PPE_AUTO_OPERATOR.acp.json",
+        )
+        planned = planned_operator_env(self.repo)
+        self.assertNotIn("PPE_SKIP_ACP", planned)
+        self.assertEqual(planned.get("PPE_WORKER_MODE"), "acp")
+        self.assertEqual(planned.get("PPE_AUTO_STEWARD"), "1")
+        os.environ.pop("PPE_OPERATOR_PROFILE", None)
