@@ -57,6 +57,13 @@
       "selectionPrep": "docs/SOP/MVP1_FRONTIER.md",
       "workerMode": "deterministic",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase6_trust_metrics_v1_relay.json",
+      "status": "DONE",
+      "reason": "Trust enum rollups (data_quality, primary_output_state) in class summary \u2014 COMPLETE 2026-06-01",
+      "selectionPrep": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     }
   ]
 }

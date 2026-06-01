@@ -12,7 +12,7 @@
     },
     {
       "chapterId": "mvp1_phase6_trust_metrics_v1",
-      "status": "queued",
+      "status": "done",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase6_trust_metrics_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
       "canonRef": "docs/SOP/MVP1_PHASE1_3_SPRINT.md \u2014 Phase 6 beyond v0",

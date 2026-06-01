@@ -46,6 +46,12 @@
       "reason": "Post-chapter steering alignment witness (deterministic evidence relay)",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/MVP1_FRONTIER.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase6_trust_metrics_v1_relay.json",
+      "status": "done",
+      "reason": "Trust enum rollups COMPLETE 2026-06-01 (PR #73)",
+      "selectionPrep": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md"
     }
   ]
 }
