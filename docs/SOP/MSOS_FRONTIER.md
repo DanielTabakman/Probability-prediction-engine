@@ -12,10 +12,10 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P1 stack routing ADR** — **READY** (auto-selected after P0 closeout)
-- **SELECTION:** [`POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md`](POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md)
-- **Sprint:** [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md)
-- **Evidence:** [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md)
+- **Active BUILD chapter:** **MSOS P1 stack routing ADR** — ADR committed; relay witness/closeout via `run_ppe_local.cmd`
+- **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) — phased Next.js shell + Streamlit PPE (proxy at P4)
+- **Sprint:** [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md)
+- **Phase plan:** [`PHASE_PLANS/msos_p1_stack_routing_relay.json`](PHASE_PLANS/msos_p1_stack_routing_relay.json)
 
 ### MSOS Website Program — relay queue
 
@@ -29,25 +29,25 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Evidence:** [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md)
 
-### MSOS P1 stack routing — relay queue — **READY**
+### MSOS P1 stack routing — relay queue — **IN PROGRESS**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **OPEN** | `MSOS-P1-Control-Slice001` — charter | EVIDENCE |
-| **OPEN** | `MSOS-P1-Product-Slice002` — stack/routing ADR | CONTROL |
+| **DONE (IDE)** | `MSOS-P1-Product-Slice002` — stack/routing ADR | CONTROL |
 | **OPEN** | `MSOS-P1-Witness-Slice003` — witness | EVIDENCE |
 | **OPEN** | `MSOS-P1-Closeout-Slice004` — chapter close | EVIDENCE |
 
-**Phase plan:** [`PHASE_PLANS/msos_p1_stack_routing_relay.json`](PHASE_PLANS/msos_p1_stack_routing_relay.json)
+**Deliverable:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
 
 ### Waterfall backlog (P1–P8)
 
 | Priority | chapterId | Backlog status | Blocker |
 |----------|-----------|----------------|---------|
-| P1 | `msos_p1_stack_routing` | **queued** | — |
-| P2 | `msos_p2_homepage` | **blocked** | Storyboard v0.6 not in-repo; P1 ADR pending |
-| P3 | `msos_p3_command_center` | **blocked** | After P1 + P2 |
-| P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE adapter TBD |
+| P1 | `msos_p1_stack_routing` | **chartered** | Relay closeout pending |
+| P2 | `msos_p2_homepage` | **blocked** | Storyboard v0.6 not in-repo |
+| P3 | `msos_p3_command_center` | **blocked** | After P2 |
+| P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE via Caddy proxy (ADR) |
 | P5 | `msos_p5_thesis_confirm` | **blocked** | After P4 |
 | P6 | `msos_p6_expression_sim` | **blocked** | After P5 |
 | P7 | `msos_p7_monitoring` | **blocked** | After P6 |
