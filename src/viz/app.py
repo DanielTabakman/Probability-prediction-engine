@@ -1813,7 +1813,11 @@ if show_bitcoin_view:
                                     st.subheader("Shape gap strength")
                                     st.json(_rollup["by_shape_gap_strength"])
                                 with _cb:
-                                    st.subheader("Breeden gate (trust proxy)")
+                                    st.subheader("Data quality (MVP1)")
+                                    st.json(_rollup.get("by_data_quality", {}))
+                                    st.subheader("Primary output state (MVP1)")
+                                    st.json(_rollup.get("by_primary_output_state", {}))
+                                    st.subheader("Breeden gate (legacy trust proxy)")
                                     st.json(_rollup["by_trust_breeden"])
                                     st.subheader("Benchmark method")
                                     st.json(_rollup["by_benchmark_method"])
