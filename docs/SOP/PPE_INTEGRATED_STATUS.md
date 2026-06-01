@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-28 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-05-29 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
@@ -82,6 +82,8 @@ flowchart LR
 | MVP1 Phase 5 review persistence hardening | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md`](docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md), [`MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md`](docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md) |
 
 | MVP1 steering sync evidence | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md`](docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md), [`MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md`](docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md) |
+
+| MVP1 Phase 6 trust metrics v1 | **COMPLETE** 2026-05-29 | [`SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md`](docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md), [`MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md`](docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
 
