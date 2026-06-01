@@ -1,0 +1,49 @@
+{
+  "name": "MSOS_website_program_p0 (queue install)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P0-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
+      "buildBranch": "build/auto/MSOS-P0-Control-Slice001-msos_p0",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P0-Witness-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
+      "buildBranch": "build/auto/MSOS-P0-Witness-Slice002-msos_p0",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P0-Closeout-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
+      "buildBranch": "build/auto/MSOS-P0-Closeout-Slice003-msos_p0",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_website_program_p0",
+        "chapterTitle": "MSOS Website Program P0",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-06-01",
+        "evidenceDoc": "docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md",
+          "docs/SOP/MSOS_WEBSITE_PROGRAM.md"
+        ]
+      }
+    }
+  ]
+}

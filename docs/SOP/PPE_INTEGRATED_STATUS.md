@@ -1,9 +1,23 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-29 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
-**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
+**As-of:** 2026-06-01 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)
 
-This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
+This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
+
+---
+
+## Active BUILD — MSOS Website Program P0
+
+| Field | Value |
+|-------|--------|
+| **Chapter** | MSOS Website Program P0 — queue installation |
+| **Status** | **READY** (charter) |
+| **Sprint** | [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md) |
+| **Evidence** | [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md) |
+| **Canon** | [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) |
+
+**MVP1 relay:** idle (Phase 6 trust metrics **COMPLETE** 2026-06-01). Operator: `run_ppe.cmd` after manifest **READY**.
 
 ---
 

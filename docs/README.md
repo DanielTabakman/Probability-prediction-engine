@@ -7,7 +7,8 @@ Start here when navigating the Probability Prediction Engine repo.
 | Role | Path |
 |------|------|
 | **Integrated one-pager** | [`SOP/PPE_INTEGRATED_STATUS.md`](SOP/PPE_INTEGRATED_STATUS.md) |
-| **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) |
+| **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) (MVP1 engine) · [`SOP/MSOS_FRONTIER.md`](SOP/MSOS_FRONTIER.md) (MSOS website) |
+| **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
 | **Session handoff gate** | [`SOP/HANDOFF.md`](SOP/HANDOFF.md) |
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
@@ -17,7 +18,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
 
-**Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, **`MVP1_FRONTIER.md` wins.**
+**Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for its track.
 
 **Legacy (do not use for steering):** [`SOP/CURRENT_FRONTIER.md`](SOP/CURRENT_FRONTIER.md) and [`CURRENT_FRONTIER.md`](CURRENT_FRONTIER.md) are historical Phase 2 ledgers only.
 

@@ -10,13 +10,17 @@
 ## Source-of-truth order
 
 1. Pushed repo + current accepted docs
-2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon)
-3. `docs/SOP/MVP1_FRONTIER.md` (live steering / slice queue)
+2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon + MSOS waterfall queue)
+3. **Dual-track live steering:**
+   - `docs/SOP/MVP1_FRONTIER.md` — MVP1 engine relay (Streamlit implied lab, freeze/review)
+   - `docs/SOP/MSOS_FRONTIER.md` — MSOS website/platform BUILD queue
 4. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter summary)
 5. `docs/SOP/HANDOFF.md`
 6. `docs/SOP/OPERATING_RULES.md`
 7. `docs/SEMANTIC_CONTRACTS.md`
 8. Older handoff/chat only when docs are silent
+
+**MSOS non-widening rule:** MSOS UI work must not silently alter PPE math contracts or resolved MVP1 evidence. See [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md).
 
 **Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is historical only (Phase 2 ledger); do not use for MVP1 steering.
 
