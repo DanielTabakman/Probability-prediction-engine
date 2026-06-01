@@ -64,6 +64,6 @@ run_ppe.cmd             # full relay phase
 run_ppe.cmd --status    # ACTIVE_RUN + last report summary
 ```
 
-**No API credits (IDE-native):** [`SOP/PPE_IDE_NATIVE_OPERATOR_V1.md`](SOP/PPE_IDE_NATIVE_OPERATOR_V1.md) — `run_ppe_auto_local_loop.cmd` for evidence/closeout; IDE BUILD for product; `run_ppe_local.cmd` to finish a chapter.
+**No API credits (IDE-native):** [`SOP/PPE_IDE_NATIVE_OPERATOR_V1.md`](SOP/PPE_IDE_NATIVE_OPERATOR_V1.md) · [checklist](SOP/PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md) — `run_ppe_auto_local_loop.cmd`; IDE BUILD → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd`.
 
 **With API credits:** `run_ppe_auto_acp_loop.cmd` — see [`SOP/PPE_CONTINUOUS_OPERATOR.md`](SOP/PPE_CONTINUOUS_OPERATOR.md).

@@ -3,6 +3,7 @@ setlocal enabledelayedexpansion
 
 REM Repeat run_ppe_auto until you stop it (Ctrl+C). Sleep between passes when idle.
 REM idleSleepSeconds from docs/SOP/PPE_AUTO_OPERATOR.json (default 120).
+REM Exit 7: guard stop (PRODUCT_BLOCKED, CONTEXT_ESCALATE, TOO_MANY_SLICES, etc.) — no sleep/retry.
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"

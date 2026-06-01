@@ -82,7 +82,8 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
             True,
             "product_ide_build_required",
             "Product slice under deterministic relay: BUILD in Cursor IDE using docs/SOP/BUILD_PACKET_TEMPLATE.md "
-            f"(sprint spec + AGENT_CONTINUITY_BRIEF).{branch_note} Then run `run_ppe_local.cmd` from repo root.",
+            f"(sprint spec + AGENT_CONTINUITY_BRIEF).{branch_note} "
+            "Then `mark_ide_product_ready.cmd <sliceId>` and `run_ppe_local.cmd` from repo root.",
         )
 
     decision = str(relay.get("stop_condition") or "").strip()

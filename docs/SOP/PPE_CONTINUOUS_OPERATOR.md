@@ -71,11 +71,15 @@ Environment variables **override** JSON (`PPE_AUTO_STEWARD=0`, `PPE_OPERATOR_GUA
 
 ### Operator guards (`guards` object)
 
-When enabled, `--continuous` may exit **7** and write [`artifacts/orchestrator/OPERATOR_GUARD_REPORT.md`](../../artifacts/orchestrator/OPERATOR_GUARD_REPORT.md). `run_ppe_auto_loop.cmd` does **not** sleep and retry on exit 7.
+When enabled, `--continuous` may exit **7** and write [`artifacts/orchestrator/OPERATOR_GUARD_REPORT.md`](../../artifacts/orchestrator/OPERATOR_GUARD_REPORT.md). `run_ppe_auto_loop.cmd` does **not** sleep and retry on exit 7. Exit **8** skips a chapter (evidence already COMPLETE) and continues.
 
 | Guard | Local default | Effect |
 |-------|---------------|--------|
-| `blockProductUnderGlobalDeterministic` | `true` | Stop before phase if product slice would run under `PPE_SKIP_ACP=1` |
+| `blockProductUnderGlobalDeterministic` | `true` | Stop if product slice(s) and no valid IDE product-ready marker |
+| `stopOnContextEscalate` | `true` | Stop if any sprint spec in plan is **>400 lines** |
+| `stopOnContextWatch` | `false` | Stop if sprint spec **>200 lines** when enabled |
+| `maxPhaseSlices` | `6` | Stop if phase plan has too many slices |
+| `skipChapterIfEvidenceComplete` | `true` | Skip relay when closeout evidence doc already **COMPLETE** |
 
 ## Flow
 
