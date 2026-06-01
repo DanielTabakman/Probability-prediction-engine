@@ -17,6 +17,8 @@ from src.viz.reviewed_class_summary import (
     build_class_summary,
     extract_summary_dimensions,
     operator_guidance_line,
+    resolve_data_quality_bucket,
+    resolve_primary_output_state_bucket,
     serialize_rollup_csv,
 )
 from collections import Counter
@@ -42,6 +44,55 @@ class TestReviewedClassSummary(unittest.TestCase):
         self.assertEqual(d["disagreement_category_id"], "width_vol")
         self.assertEqual(d["shape_gap_strength"], "Low")
         self.assertEqual(d["trust_breeden"], "computed")
+        self.assertEqual(d["data_quality"], "unknown")
+        self.assertEqual(d["primary_output_state"], "unknown")
+
+    def test_resolve_data_quality_explicit_and_legacy(self) -> None:
+        rec_explicit = {"data_quality": "usable"}
+        self.assertEqual(resolve_data_quality_bucket(rec_explicit), "usable")
+        rec_legacy = {
+            "verification": {
+                "density": {"market_implied": {"breeden_litzenberger": "computed"}},
+            }
+        }
+        self.assertEqual(resolve_data_quality_bucket(rec_legacy), "unknown")
+        rec_degraded = {
+            "verification": {
+                "density": {"market_implied": {"breeden_litzenberger": "failed"}},
+            }
+        }
+        self.assertEqual(resolve_data_quality_bucket(rec_degraded), "degraded")
+
+    def test_resolve_primary_output_state_explicit(self) -> None:
+        rec = {"primary_output_state": "watch_only"}
+        self.assertEqual(resolve_primary_output_state_bucket(rec), "watch_only")
+        self.assertEqual(resolve_primary_output_state_bucket({}), "unknown")
+
+    def test_rollup_includes_trust_enums(self) -> None:
+        rows = [
+            {
+                "record": {
+                    "data_quality": "usable",
+                    "primary_output_state": "candidate",
+                },
+                "review": {"review_status": "supportive"},
+            },
+            {
+                "record": {
+                    "data_quality": "degraded",
+                    "primary_output_state": "no_trade",
+                },
+                "review": {"review_status": "contradictory"},
+            },
+        ]
+        s = build_class_summary(rows)
+        self.assertEqual(s["by_data_quality"]["usable"], 1)
+        self.assertEqual(s["by_data_quality"]["degraded"], 1)
+        self.assertEqual(s["by_primary_output_state"]["candidate"], 1)
+        self.assertEqual(s["by_primary_output_state"]["no_trade"], 1)
+        csv_text = serialize_rollup_csv(s)
+        self.assertIn("by_data_quality,usable,1", csv_text)
+        self.assertIn("by_primary_output_state,candidate,1", csv_text)
 
     def test_guidance_mixed(self) -> None:
         c = Counter({"supportive": 2, "contradictory": 2})

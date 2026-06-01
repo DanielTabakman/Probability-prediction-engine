@@ -12,6 +12,45 @@ import io
 from collections import Counter
 from typing import Any
 
+_DATA_QUALITY_VALUES = frozenset({"usable", "degraded", "invalid"})
+_PRIMARY_OUTPUT_VALUES = frozenset({"candidate", "watch_only", "no_trade"})
+
+
+def _verification_summary(record: dict[str, Any]) -> dict[str, Any]:
+    v = record.get("verification") if isinstance(record.get("verification"), dict) else {}
+    vs = v.get("verification_summary")
+    return vs if isinstance(vs, dict) else {}
+
+
+def resolve_data_quality_bucket(record: dict[str, Any]) -> str:
+    """MVP1 data_quality for rollups: record → verification_summary → legacy Breeden proxy."""
+    top = record.get("data_quality")
+    if top in _DATA_QUALITY_VALUES:
+        return str(top)
+    vs = _verification_summary(record)
+    vs_dq = vs.get("data_quality")
+    if vs_dq in _DATA_QUALITY_VALUES:
+        return str(vs_dq)
+    v = record.get("verification") if isinstance(record.get("verification"), dict) else {}
+    dens = v.get("density") if isinstance(v.get("density"), dict) else {}
+    mi = dens.get("market_implied") if isinstance(dens.get("market_implied"), dict) else {}
+    breeden = mi.get("breeden_litzenberger")
+    if str(breeden or "") == "computed":
+        return "unknown"
+    return "degraded"
+
+
+def resolve_primary_output_state_bucket(record: dict[str, Any]) -> str:
+    """MVP1 primary_output_state for rollups; no Breeden inference when absent."""
+    top = record.get("primary_output_state")
+    if top in _PRIMARY_OUTPUT_VALUES:
+        return str(top)
+    vs = _verification_summary(record)
+    vs_pos = vs.get("primary_output_state")
+    if vs_pos in _PRIMARY_OUTPUT_VALUES:
+        return str(vs_pos)
+    return "unknown"
+
 
 def extract_summary_dimensions(record: dict[str, Any]) -> dict[str, str]:
     """
@@ -40,6 +79,8 @@ def extract_summary_dimensions(record: dict[str, Any]) -> dict[str, str]:
         "disagreement_category_id": str(cat or "unknown"),
         "shape_gap_strength": str(shape_gap),
         "trust_breeden": str(trust or "unknown"),
+        "data_quality": resolve_data_quality_bucket(record),
+        "primary_output_state": resolve_primary_output_state_bucket(record),
         "benchmark_method": str(benchmark_method),
         "classifier_version": str(classifier),
     }
@@ -79,6 +120,8 @@ def build_class_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     by_cat: Counter[str] = Counter()
     by_gap: Counter[str] = Counter()
     by_trust: Counter[str] = Counter()
+    by_dq: Counter[str] = Counter()
+    by_pos: Counter[str] = Counter()
     by_bench: Counter[str] = Counter()
     by_class: Counter[str] = Counter()
 
@@ -93,6 +136,8 @@ def build_class_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         by_cat[d["disagreement_category_id"]] += 1
         by_gap[d["shape_gap_strength"]] += 1
         by_trust[d["trust_breeden"]] += 1
+        by_dq[d["data_quality"]] += 1
+        by_pos[d["primary_output_state"]] += 1
         by_bench[d["benchmark_method"]] += 1
         by_class[d["classifier_version"]] += 1
 
@@ -101,6 +146,8 @@ def build_class_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "by_review_status": dict(by_status),
         "by_disagreement_category": dict(by_cat),
         "by_shape_gap_strength": dict(by_gap),
+        "by_data_quality": dict(by_dq),
+        "by_primary_output_state": dict(by_pos),
         "by_trust_breeden": dict(by_trust),
         "by_benchmark_method": dict(by_bench),
         "by_classifier_version": dict(by_class),
@@ -112,6 +159,8 @@ _ROLLUP_COUNT_KEYS: tuple[str, ...] = (
     "by_review_status",
     "by_disagreement_category",
     "by_shape_gap_strength",
+    "by_data_quality",
+    "by_primary_output_state",
     "by_trust_breeden",
     "by_benchmark_method",
     "by_classifier_version",

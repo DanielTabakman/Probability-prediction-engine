@@ -7,7 +7,7 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-Phase6Trust-Control-Slice001 | OPEN | Charter |
-| MVP1-Phase6Trust-Product-Slice002 | OPEN | Trust enum rollups + Phase 6 UI |
+| MVP1-Phase6Trust-Control-Slice001 | CLOSED | Charter witness (run_slice exit 0, 2026-06-01) |
+| MVP1-Phase6Trust-Product-Slice002 | IN_PROGRESS | Trust enum rollups + Phase 6 UI |
 | MVP1-Phase6Trust-Smoke-Slice003 | OPEN | pytest witness |
 | MVP1-Phase6Trust-Closeout-Slice004 | OPEN | Closeout |
