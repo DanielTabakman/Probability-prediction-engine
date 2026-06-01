@@ -6,6 +6,7 @@
   "slices": [
     {
       "sliceId": "MSOS-P1-Control-Slice001",
+      "layerPreset": "CONTROL",
       "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
       "buildBranch": "build/auto/MSOS-P1-Control-Slice001-msos_p1",
       "declaredPlane": "EVIDENCE-PLANE",
@@ -15,6 +16,7 @@
     },
     {
       "sliceId": "MSOS-P1-Product-Slice002",
+      "layerPreset": "DOCS_CANON",
       "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
       "buildBranch": "build/auto/MSOS-P1-Product-Slice002-msos_p1",
       "declaredPlane": "CONTROL-PLANE",
@@ -29,6 +31,7 @@
     },
     {
       "sliceId": "MSOS-P1-Witness-Slice003",
+      "layerPreset": "CONTROL",
       "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
       "buildBranch": "build/auto/MSOS-P1-Witness-Slice003-msos_p1",
       "declaredPlane": "EVIDENCE-PLANE",
@@ -38,6 +41,7 @@
     },
     {
       "sliceId": "MSOS-P1-Closeout-Slice004",
+      "layerPreset": "CONTROL",
       "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
       "buildBranch": "build/auto/MSOS-P1-Closeout-Slice004-msos_p1",
       "declaredPlane": "EVIDENCE-PLANE",

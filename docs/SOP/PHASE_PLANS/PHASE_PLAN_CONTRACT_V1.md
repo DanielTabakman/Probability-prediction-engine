@@ -27,6 +27,11 @@ Top-level object:
     {
       "sliceId": "string (required)",
       "declaredPlane": "CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE (required)",
+      "layerPreset": "MSOS_UI | PPE_UI | PPE_CORE | CONTROL | ... (optional; see ../REPO_LAYER_PATH_PREFIXES.json)",
+      "layer": "msos-shell | ppe-ui | ppe-core | dev-factory | platform | product-canon (optional)",
+      "allowedPaths": ["repo-relative prefixes (optional override)"],
+      "forbiddenPaths": ["repo-relative prefixes (optional override)"],
+      "touchSet": ["explicit file paths allowed for this slice (optional)"],
       "workerMode": "acp | deterministic | local-agent (optional)",
       "susMinutes": 15,
       "hardMinutes": 30,

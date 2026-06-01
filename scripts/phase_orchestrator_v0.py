@@ -89,6 +89,7 @@ class SliceRun:
     baseline_branch: str
     build_branch: str
     retry_budget_max: int = 2
+    repo_layer: dict[str, Any] | None = None
 
 
 @dataclass(frozen=True)
@@ -140,6 +141,8 @@ class Orchestrator:
             "--retry-budget-max",
             str(run.retry_budget_max),
         ]
+        if run.repo_layer:
+            cmd.extend(["--repo-layer-json", json.dumps(run.repo_layer)])
         code, out, err = _run(cmd, cwd=self.repo_root)
         if code != 0:
             raise RuntimeError(f"relay stage failed (exit={code}): {err or out}".strip())
@@ -301,8 +304,25 @@ class Orchestrator:
         run: SliceRun,
         budgets: TimeBudget,
         worker_mode: str,
+        *,
+        slice_obj: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         baseline_local = self.ensure_local_baseline(run.baseline_branch)
+        repo_layer = run.repo_layer
+        if repo_layer is None:
+            try:
+                from scripts.repo_layer_paths import resolve_slice_layer_scope
+
+                scope = resolve_slice_layer_scope(
+                    self.repo_root,
+                    slice_obj=slice_obj,
+                    slice_id=run.slice_id,
+                    declared_plane=run.declared_plane,
+                )
+                repo_layer = scope.to_envelope_dict()
+            except (FileNotFoundError, KeyError):
+                repo_layer = None
+
         run2 = SliceRun(
             slice_id=run.slice_id,
             sprint_spec_path=run.sprint_spec_path,
@@ -310,6 +330,7 @@ class Orchestrator:
             baseline_branch=baseline_local,
             build_branch=self.ensure_unique_branch(run.build_branch),
             retry_budget_max=run.retry_budget_max,
+            repo_layer=repo_layer,
         )
 
         self.save_state({"status": "staging", "slice_id": run2.slice_id, "build_branch": run2.build_branch})
@@ -334,6 +355,7 @@ class Orchestrator:
                     baseline_branch=run2.baseline_branch,
                     build_branch=run2.build_branch,
                     retry_budget_max=run2.retry_budget_max,
+                    repo_layer=run2.repo_layer,
                 )
 
         job = self.relay_stage(run2, repo_root=wt)
@@ -352,11 +374,26 @@ class Orchestrator:
             }
         )
 
+        layer_lines = ""
+        if run2.repo_layer:
+            preset = run2.repo_layer.get("layer_preset") or run2.repo_layer.get("layer")
+            allowed = run2.repo_layer.get("allowed_paths") or []
+            forbidden = run2.repo_layer.get("forbidden_paths") or []
+            layer_lines = (
+                f"\nRepo layer (hard boundary): preset={preset!r}\n"
+                f"ALLOWED_PATHS: {', '.join(allowed[:12])}"
+                f"{'...' if len(allowed) > 12 else ''}\n"
+                f"FORBIDDEN_PATHS: {', '.join(forbidden[:12])}"
+                f"{'...' if len(forbidden) > 12 else ''}\n"
+                "Do not edit paths outside ALLOWED_PATHS. See docs/SOP/REPO_LAYER_MAP_V1.md.\n"
+            )
+
         prompt = (
             "You are a worker agent executing exactly one slice under CODEX_AUTONOMY_V1 relay.\n\n"
             f"Task envelope path: artifacts/relay/runs/{run_id}/task_envelope.json\n"
             f"Expected relay result path (MUST write): {expected_rel}\n\n"
             "Read the task envelope JSON and the referenced sprint spec, execute the slice, and write relay_result.json.\n"
+            f"{layer_lines}"
             "Then STOP.\n"
         )
 

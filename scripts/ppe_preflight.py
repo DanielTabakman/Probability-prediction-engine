@@ -115,6 +115,28 @@ def run_preflight(
     except FileNotFoundError:
         errors.append("Missing docs/SOP/PHASE_QUEUE.json")
 
+    layer_warnings: list[str] = []
+    layer_errors: list[str] = []
+    manifest_status = str(manifest.get("status") or "") if manifest else ""
+    if manifest_status in ("RUNNING", "READY") or active_run.is_file():
+        try:
+            from scripts.repo_layer_paths import audit_git_dirty, scope_for_active_manifest
+
+            scope = scope_for_active_manifest(repo)
+            if scope is not None:
+                dirty_v = audit_git_dirty(repo, scope)
+                if dirty_v:
+                    layer_errors.extend(dirty_v)
+                else:
+                    layer_warnings.append(
+                        f"repo layer scope: preset={scope.layer_preset!r} (dirty paths OK)"
+                    )
+        except FileNotFoundError:
+            pass
+
+    errors.extend(layer_errors)
+    warnings.extend(layer_warnings)
+
     ok = len(errors) == 0
     return {
         "ok": ok,

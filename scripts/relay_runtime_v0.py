@@ -755,6 +755,7 @@ def dispatch_stage_slice(
     baseline_branch: str,
     build_branch: str,
     retry_budget_max: int = RETRY_BUDGET_MAX_CANONICAL,
+    repo_layer: dict[str, Any] | None = None,
 ) -> Tuple[int, str]:
     """Stage a run_selected_slice_v1 task for an external worker."""
 
@@ -823,6 +824,8 @@ def dispatch_stage_slice(
         ).replace("\\", "/"),
         "staged_at": _iso_now(),
     }
+    if repo_layer:
+        task_envelope["repo_layer"] = repo_layer
     _write_json(runtime.run_dir(run_id) / "task_envelope.json", task_envelope)
     _write_json(runtime.current_job_path, task_envelope)
     runtime.save_run_state(
@@ -901,6 +904,20 @@ def dispatch_resume(runtime: Runtime) -> Tuple[int, str]:
     runtime.save_run_state(state)
     runtime.log_event(run_id, "state=deciding; applying section 15")
 
+    layer_violations = _audit_relay_result_layer(runtime, run_id, payload)
+    if layer_violations:
+        dec = {
+            "decision": DECISION_STOP_FOR_REVIEW,
+            "rule_matched": "15.x repo_layer_audit",
+            "reason": "build diff touches paths outside staged repo_layer scope",
+            "schema_violations": [],
+            "invariant_violations": layer_violations,
+            "generated_at": _iso_now(),
+            "run_id": run_id,
+        }
+        _finalize_decision(runtime, state, dec)
+        return DECISION_TO_EXIT[DECISION_STOP_FOR_REVIEW], _format_decision(dec)
+
     dec = decide(payload)
     dec["generated_at"] = _iso_now()
     dec["run_id"] = run_id
@@ -939,6 +956,36 @@ def _finalize_decision(runtime: Runtime, state: dict, dec: dict) -> None:
         run_id,
         f"decision={dec['decision']} via {dec['rule_matched']}; state={state['status']}",
     )
+
+
+def _audit_relay_result_layer(runtime: Runtime, run_id: str, payload: dict) -> list[str]:
+    """If task envelope has repo_layer, audit build_branch diff vs baseline."""
+    job_path = runtime.run_dir(run_id) / "task_envelope.json"
+    if not job_path.is_file():
+        job_path = runtime.current_job_path
+    envelope = _read_json(job_path, default={})
+    if not isinstance(envelope, dict):
+        return []
+    raw_layer = envelope.get("repo_layer")
+    if not raw_layer:
+        return []
+
+    try:
+        from scripts.repo_layer_paths import LayerScope, audit_git_diff
+    except ImportError:
+        return []
+
+    scope = LayerScope.from_envelope(raw_layer)
+    if scope is None:
+        return ["repo_layer envelope block malformed"]
+
+    baseline = str(payload.get("baseline_branch") or envelope.get("baseline_branch") or "main")
+    build_branch = str(payload.get("build_branch") or envelope.get("build_branch") or "")
+    if not build_branch:
+        return []
+
+    merge_base = f"{baseline}...{build_branch}"
+    return audit_git_diff(runtime.repo_root, scope, base_ref=merge_base, head_ref=build_branch)
 
 
 def _format_decision(dec: dict) -> str:
@@ -1371,6 +1418,11 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         default=RETRY_BUDGET_MAX_CANONICAL,
     )
+    sp_stage.add_argument(
+        "--repo-layer-json",
+        default=None,
+        help="JSON object: repo_layer block (layer_preset, allowed_paths, forbidden_paths)",
+    )
     sp_stage.add_argument("--relay-result-path", type=Path, default=None,
                           help="For relay_gate_decision forensic replay only.")
     sp_stage.add_argument("--relay-run-dir", type=Path, default=None,
@@ -1429,6 +1481,12 @@ def _dispatch_stage(runtime: Runtime, args: argparse.Namespace) -> Tuple[int, st
                 missing.append(f"--{key.replace('_','-')}")
         if missing:
             return EXIT_REFUSAL, f"refusal: missing required args for run_selected_slice_v1: {', '.join(missing)}"
+        repo_layer = None
+        if getattr(args, "repo_layer_json", None):
+            try:
+                repo_layer = json.loads(args.repo_layer_json)
+            except json.JSONDecodeError as exc:
+                return EXIT_REFUSAL, f"refusal: --repo-layer-json invalid: {exc}"
         return dispatch_stage_slice(
             runtime=runtime,
             slice_id=args.slice_id,
@@ -1437,6 +1495,7 @@ def _dispatch_stage(runtime: Runtime, args: argparse.Namespace) -> Tuple[int, st
             baseline_branch=args.baseline_branch,
             build_branch=args.build_branch,
             retry_budget_max=args.retry_budget_max,
+            repo_layer=repo_layer,
         )
     if job == JOB_HEALTH:
         return dispatch_codebase_health_report(runtime, baseline_branch=args.baseline_branch)

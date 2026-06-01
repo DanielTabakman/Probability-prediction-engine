@@ -14,6 +14,7 @@ Use ``--tier N`` to force a tier for local debugging.
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -128,6 +129,36 @@ def main(argv: list[str] | None = None) -> int:
     print(f"pushable gate: tier={plan.tier} ({plan.reason})")
     if files:
         print(f"changed_files={len(files)}")
+
+    if files and plan.tier >= 1 and os.environ.get("PPE_LAYER_AUDIT", "1") != "0":
+        try:
+            from scripts.repo_layer_paths import audit_paths, load_presets, scope_from_preset
+
+            # Best-effort: infer preset from diff shape when no manifest scope.
+            if any(f.startswith("src/") for f in files):
+                preset_name = "PPE_UI" if any(f.startswith("src/viz/") for f in files) else "PPE_CORE"
+            elif any(f.startswith("apps/") for f in files):
+                preset_name = "MSOS_UI"
+            elif all(f.startswith("docs/") for f in files):
+                preset_name = "DOCS_ONLY" if all(f.startswith("docs/SOP/") for f in files) else "DOCS_CANON"
+            else:
+                preset_name = "CONTROL"
+            scope = scope_from_preset(load_presets(repo), preset_name)
+            violations = audit_paths(files, scope)
+            if violations:
+                print("ERROR: repo layer audit failed for changed files:", file=sys.stderr)
+                for v in violations[:10]:
+                    print(f"  {v}", file=sys.stderr)
+                if len(violations) > 10:
+                    print(f"  ... {len(violations) - 10} more", file=sys.stderr)
+                print(
+                    "Set PPE_LAYER_AUDIT=0 to skip (not recommended). "
+                    "Use one LAYER_PRESET per commit — see docs/SOP/PARALLEL_AGENT_CHECKLIST_V1.md",
+                    file=sys.stderr,
+                )
+                return 1
+        except FileNotFoundError:
+            pass
 
     for cmd in plan.commands:
         rc = _run(cmd, cwd=repo)
