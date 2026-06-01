@@ -194,6 +194,16 @@ Canonical gates: [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md) · `python scripts
 
 Cursor: [`.cursor/rules/repo-layers.mdc`](../../.cursor/rules/repo-layers.mdc) (always on for implementation paths).
 
+## Automation integration
+
+| System | Behavior |
+|--------|----------|
+| **Relay** (`relay_runtime_v0.py`) | `task_envelope.json` includes `repo_layer`; `resume` audits build-branch diff → `STOP_FOR_REVIEW` on violation |
+| **Orchestrator** (`phase_orchestrator_v0.py`) | Resolves `layerPreset` from phase plan; passes `--repo-layer-json` to relay; worker prompt lists allowed paths |
+| **Preflight** (`ppe_preflight.py`) | When manifest `RUNNING`/`READY` or `ACTIVE_RUN`, audits dirty paths vs active slice scope |
+| **Pushable gate** (`run_pushable_gate.py`) | Tier 1/2: infers preset from changed files (disable with `PPE_LAYER_AUDIT=0`) |
+| **CLI** | `python scripts/ppe_layer_audit.py` — see [`PARALLEL_AGENT_CHECKLIST_V1.md`](PARALLEL_AGENT_CHECKLIST_V1.md) |
+
 ---
 
 ## Related documents

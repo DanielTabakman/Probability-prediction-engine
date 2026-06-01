@@ -8,7 +8,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 
 # Recorded at Witness-Slice003 BUILD (main + 2 witness tests in this module).
-WITNESS_PYTEST_COUNT = 276
+WITNESS_PYTEST_COUNT = 279
 
 
 def test_ruff_check_scripts_tests_passes() -> None:

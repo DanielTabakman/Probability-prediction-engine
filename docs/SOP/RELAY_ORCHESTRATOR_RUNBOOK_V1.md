@@ -30,10 +30,12 @@ From repo root:
    - `run_slice.cmd <sliceId>` or `run_ppe.cmd --slice <sliceId>` (requires manifest / `--plan`)
 3. Orchestrator will:
    - create a per-slice worktree
-   - call relay `stage run_selected_slice_v1`
+   - call relay `stage run_selected_slice_v1` (task envelope includes `repo_layer` from phase plan `layerPreset`)
    - run ACP worker in that worktree
    - wait for `artifacts/relay/runs/<run_id>/relay_result.json`
-   - call relay `resume`
+   - call relay `resume` (layer path audit vs envelope before CONTINUE)
+
+**Repo layers:** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · parallel agents [`PARALLEL_AGENT_CHECKLIST_V1.md`](PARALLEL_AGENT_CHECKLIST_V1.md) · audit `python scripts/ppe_layer_audit.py --help`
 
 ### Phase workflow (sequential)
 

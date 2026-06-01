@@ -15,7 +15,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
 | **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
-| **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) |
+| **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) · [`SOP/PARALLEL_AGENT_CHECKLIST_V1.md`](SOP/PARALLEL_AGENT_CHECKLIST_V1.md) |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
 

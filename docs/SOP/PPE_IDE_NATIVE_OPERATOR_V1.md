@@ -23,11 +23,12 @@ Monitor (optional):
 When the loop stops for a **product** slice:
 
 1. Read `artifacts/orchestrator/LAST_RUN_REPORT.md` or `OPERATOR_GUARD_REPORT.md`.
-2. **IDE BUILD** — new Cursor Agent thread; load `docs/SOP/AGENT_CONTINUITY_BRIEF.md` + sprint spec; use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).
-3. Commit on the phase plan `buildBranch`.
-4. **`mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`**
-5. **`run_ppe_local.cmd`** — finish smoke/closeout for that chapter.
-6. Loop continues on the next pass (marker cleared after successful `run_ppe_local`).
+2. **IDE BUILD** — new Cursor Agent thread; load `docs/SOP/AGENT_CONTINUITY_BRIEF.md` + sprint spec; use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) (`LAYER` / `LAYER_PRESET` from phase plan or [`PARALLEL_AGENT_CHECKLIST_V1.md`](PARALLEL_AGENT_CHECKLIST_V1.md)).
+3. `python scripts/ppe_layer_audit.py --repo-root . --dirty --manifest` (or `--layer-preset PPE_UI`) before commit.
+4. Commit on the phase plan `buildBranch`.
+5. **`mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`**
+6. **`run_ppe_local.cmd`** — finish smoke/closeout for that chapter.
+7. Loop continues on the next pass (marker cleared after successful `run_ppe_local`).
 
 ---
 

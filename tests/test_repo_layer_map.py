@@ -5,6 +5,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from scripts.repo_layer_paths import (
+    audit_paths,
+    infer_layer_preset,
+    resolve_slice_layer_scope,
+    scope_from_preset,
+    load_presets,
+)
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PRESETS_PATH = REPO_ROOT / "docs" / "SOP" / "REPO_LAYER_PATH_PREFIXES.json"
 CANON_DOC = REPO_ROOT / "docs" / "SOP" / "REPO_LAYER_MAP_V1.md"
@@ -69,3 +77,26 @@ def test_repo_layer_primary_paths_exist_or_reserved() -> None:
                 assert path.is_dir(), f"reserved dir missing: {rel}"
                 continue
             assert path.exists(), f"missing primary path for layer: {rel}"
+
+
+def test_ppe_ui_preset_allows_viz_blocks_engine() -> None:
+    presets = load_presets(REPO_ROOT)
+    scope = scope_from_preset(presets, "PPE_UI")
+    assert not audit_paths(["src/viz/app_panels.py"], scope)
+    assert audit_paths(["src/engine/implied_distribution.py"], scope)
+
+
+def test_infer_msos_control_slice() -> None:
+    assert infer_layer_preset("MSOS-P1-Control-Slice001", "EVIDENCE-PLANE") == "CONTROL"
+
+
+def test_resolve_slice_layer_preset_from_plan_field() -> None:
+    scope = resolve_slice_layer_scope(
+        REPO_ROOT,
+        slice_obj={"layerPreset": "DOCS_CANON", "touchSet": ["docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"]},
+        slice_id="MSOS-P1-Product-Slice002",
+        declared_plane="CONTROL-PLANE",
+    )
+    assert scope.layer_preset == "DOCS_CANON"
+    assert not audit_paths(["docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"], scope)
+    assert audit_paths(["src/viz/app.py"], scope)

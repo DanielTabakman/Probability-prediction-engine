@@ -68,14 +68,23 @@ def _run_slice_cmd(
         from scripts.phase_orchestrator_v0 import Orchestrator, SliceRun, TimeBudget
 
         orch = Orchestrator(repo)
+        from scripts.repo_layer_paths import resolve_slice_layer_scope
+
+        scope = resolve_slice_layer_scope(
+            repo,
+            slice_obj=slice_obj,
+            slice_id=slice_id,
+            declared_plane=plane,
+        )
         run = SliceRun(
             slice_id=slice_id,
             sprint_spec_path=sprint_spec,
             declared_plane=plane,
             baseline_branch="main",
             build_branch=build_branch,
+            repo_layer=scope.to_envelope_dict(),
         )
-        r = orch.run_slice(run=run, budgets=TimeBudget(), worker_mode="agent-cli")
+        r = orch.run_slice(run=run, budgets=TimeBudget(), worker_mode="agent-cli", slice_obj=slice_obj)
         st = r.get("status")
         if st == "CONTINUE":
             return 0, None
