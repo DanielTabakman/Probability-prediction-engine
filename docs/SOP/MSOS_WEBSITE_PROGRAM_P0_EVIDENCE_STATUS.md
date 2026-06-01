@@ -1,7 +1,7 @@
 # MSOS Website Program P0 — evidence status
 
 **Chapter:** MSOS Website Program P0 — queue installation  
-**Status:** **IN PROGRESS**  
+**Status:** **COMPLETE** 2026-06-01  
 **SELECTION:** [`POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md`](POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md)  
 **Sprint:** [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md)
 
@@ -9,12 +9,12 @@
 
 | Artifact | Status |
 |----------|--------|
-| PPE Master sync (waterfall in repo) | pending witness |
-| [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | created |
-| [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | created |
-| [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) | created |
-| Queue/backlog wiring | pending witness |
-| Charter witness test | pending |
+| PPE Master sync (waterfall in repo) | **PASS** |
+| [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | **PASS** |
+| [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | **PASS** |
+| [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) | **PASS** |
+| Queue/backlog wiring | **PASS** |
+| Charter witness test | **PASS** (`tests/test_msos_p0_charter_witness.py`) |
 
 ## Gate
 

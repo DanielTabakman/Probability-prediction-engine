@@ -67,14 +67,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "MSOS Website Program P0 \u2014 queue install",
       "selectionPrep": "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
-      "workerMode": "deterministic"
+      "workerMode": "deterministic",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "Stack / routing ADR without rewriting PPE",
       "selectionPrep": "docs/SOP/MSOS_FRONTIER.md"
     }

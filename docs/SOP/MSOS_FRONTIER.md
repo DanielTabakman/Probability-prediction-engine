@@ -12,20 +12,33 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS Website Program P0** — queue install (charter in progress)
+- **Active BUILD chapter:** **MSOS P1 stack routing ADR** — **READY** (auto-selected after P0 closeout)
 - **SELECTION:** [`POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md`](POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md)
 - **Sprint:** [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md)
 - **Evidence:** [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md)
 
 ### MSOS Website Program — relay queue
 
+### MSOS Website Program P0 — relay queue — **COMPLETE** (2026-06-01)
+
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **OPEN** | `MSOS-P0-Control-Slice001` — charter + queue install | EVIDENCE |
-| **OPEN** | `MSOS-P0-Witness-Slice002` — charter witness + queue health | EVIDENCE |
-| **OPEN** | `MSOS-P0-Closeout-Slice003` — chapter close | EVIDENCE |
+| **CLOSED** | `MSOS-P0-Control-Slice001` — charter + queue install | EVIDENCE |
+| **CLOSED** | `MSOS-P0-Witness-Slice002` — charter witness + queue health | EVIDENCE |
+| **CLOSED** | `MSOS-P0-Closeout-Slice003` — chapter close | EVIDENCE |
 
-**Phase plan:** [`PHASE_PLANS/msos_website_program_p0_relay.json`](PHASE_PLANS/msos_website_program_p0_relay.json)
+**Evidence:** [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md)
+
+### MSOS P1 stack routing — relay queue — **READY**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **OPEN** | `MSOS-P1-Control-Slice001` — charter | EVIDENCE |
+| **OPEN** | `MSOS-P1-Product-Slice002` — stack/routing ADR | CONTROL |
+| **OPEN** | `MSOS-P1-Witness-Slice003` — witness | EVIDENCE |
+| **OPEN** | `MSOS-P1-Closeout-Slice004` — chapter close | EVIDENCE |
+
+**Phase plan:** [`PHASE_PLANS/msos_p1_stack_routing_relay.json`](PHASE_PLANS/msos_p1_stack_routing_relay.json)
 
 ### Waterfall backlog (P1–P8)
 
