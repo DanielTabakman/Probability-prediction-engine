@@ -33,6 +33,24 @@ Plane labels:
 
 **Mixed-plane guardrail:** if the working tree is dirty across multiple planes, BUILD is blocked. Only a **RECOVERY** pass may touch multiple planes, and only to **separate/undo** mixed state (not to advance product work).
 
+## Repo layer discipline (hard rule)
+
+Each BUILD pass must stay inside **one repo layer** (where code lives). Layer is orthogonal to plane.
+
+| Layer | Primary paths |
+|-------|----------------|
+| `msos-shell` | `apps/msos-web/` |
+| `ppe-ui` | `src/viz/` |
+| `ppe-core` | `src/engine/`, `src/data/`, `src/models/` |
+| `dev-factory` | `scripts/`, `docs/SOP/` (process) |
+| `platform` | `docker-compose.yml`, `Caddyfile`, `.github/`, `docs/DEPLOY/` |
+| `product-canon` | `docs/VISION/` |
+
+- **Canon:** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · presets [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.json)
+- **BUILD packets** must include `LAYER`, `LAYER_PRESET`, `ALLOWED_PATHS`, `FORBIDDEN_PATHS` ([`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md))
+- **No PPE math in TypeScript**; **no `src/viz` imports from `src/engine`**
+- If work needs a forbidden prefix, stop and split slices — do not absorb another layer in the same pass
+
 ## Hard git rule: no execution work directly on `main`
 
 Cursor must not do execution work directly on `main`. Each execution pass must use:

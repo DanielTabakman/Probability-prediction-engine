@@ -15,6 +15,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
 | **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
+| **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
 
@@ -52,7 +53,8 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 ## Context rules
 
 - [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor thread vs stay in-session
-- [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only)
+- [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only; includes layer presets)
+- [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) — MSOS / PPE / factory folder boundaries
 
 ## Unified run
 

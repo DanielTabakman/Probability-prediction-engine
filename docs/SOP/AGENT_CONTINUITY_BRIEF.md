@@ -54,4 +54,4 @@
 - **Relay workers:** each slice uses a fresh ACP session in an isolated worktree — not this Cursor chat history.
 - **Steward vs BUILD:** keep SELECTION/planning in a steward thread; implementation via relay/orchestrator, not one mega-thread.
 - **After this closeout:** open a **new** Cursor thread; load only this brief (+ next SELECTION doc). Full rules: [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
-- **BUILD packets:** use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — paths only, no inlined HANDOFF gate or logs.
+- **BUILD packets:** use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — paths only; include `LAYER` / `LAYER_PRESET` per [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md).

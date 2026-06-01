@@ -71,13 +71,17 @@ We’ll store:
 ## Repo layout (high level)
 
 ```
-config/          # symbols, event definitions, source URLs
+apps/msos-web/    # MSOS Next.js shell (layer A; see docs/SOP/REPO_LAYER_MAP_V1.md)
+config/           # symbols, event definitions, source URLs
 src/
-  data/           # fetchers (yfinance, Polymarket Gamma/CLOB)
-  models/         # DB schema, canonical event types
-  engine/         # probability layer, arb/opportunity detection
-  viz/            # Streamlit app
-docs/             # this plan, later design notes
+  data/           # fetchers (layer C — ppe-core)
+  models/         # DB schema, canonical event types (layer C)
+  engine/         # probability layer (layer C)
+  viz/            # Streamlit implied lab (layer B — ppe-ui)
+scripts/          # relay, queue, operator (layer D — dev-factory)
+docs/             # SOP, vision, deploy runbooks
 ```
+
+Layer map: [`docs/SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md)
 
 Next: implement fetchers, normalize to canonical events, then wire engine + Streamlit.

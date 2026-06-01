@@ -15,9 +15,10 @@ You are the **worker** for this repository. This is a **single execution step**:
 Read in this order:
 1. `docs/CONTROL_PLANE/PROMPTS/PROMPT_TRANSACTION_RULES.md`
 2. `docs/SOP/OPERATING_RULES.md`
-3. The active feature slice doc: `docs/SOP/SPRINT_00X.md` (as specified by the manager handoff or `docs/SOP/HANDOFF.md`)
-4. `docs/SOP/HANDOFF.md`
-5. `docs/SOP/WORKER_LOOP.md`
+3. `docs/SOP/REPO_LAYER_MAP_V1.md` — and obey BUILD packet `LAYER` / `ALLOWED_PATHS` / `FORBIDDEN_PATHS`
+4. The active feature slice doc: `docs/SOP/SPRINT_00X.md` (as specified by the manager handoff or `docs/SOP/HANDOFF.md`)
+5. `docs/SOP/HANDOFF.md`
+6. `docs/SOP/WORKER_LOOP.md`
 
 Then read only what the feature slice requires (examples):
 - `docs/VISION/PHASE_VISION_CURRENT.md` (especially for layout/UX work)
@@ -29,9 +30,10 @@ If feature slice instructions conflict with higher-priority intent/constraints (
 
 ### Pre-edit plan (required, short)
 Before editing any files, produce a short plan:
+- **Layer** (`msos-shell` | `ppe-ui` | `ppe-core` | `dev-factory` | `platform` | `product-canon`) and allowed path prefixes
 - Understanding of objective + scope boundaries (what is in / out)
 - Files to inspect
-- Files expected to change
+- Files expected to change (must stay under allowed prefixes)
 - Smallest viable implementation path (you may take a fuller pass if still one feature slice objective)
 - Verification plan with **exact commands**
 - App launch/inspection plan when user-visible behavior changes
