@@ -7,19 +7,18 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 ---
 
-## Active BUILD — MSOS P1 stack routing
+## Active BUILD — none (await SELECTION)
 
 | Field | Value |
 |-------|--------|
-| **Chapter** | MSOS P1 stack / routing ADR |
-| **Status** | **IN PROGRESS** — ADR committed; relay witness/closeout pending |
+| **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
 | **ADR** | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
-| **Sprint** | [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md) |
-| **Next** | `run_ppe_local.cmd` after `mark_ide_product_ready.cmd MSOS-P1-Product-Slice002` |
+| **Evidence** | [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
+| **Next (blocked)** | MSOS P2 homepage — storyboard v0.6 not in-repo |
 
-**Decision (P1):** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
+**P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle (no active engine chapter). **MSOS P2:** **blocked** until storyboard v0.6 in-repo ([`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)).
+**MVP1 relay:** idle. **Operator:** drop storyboard, then SELECTION for P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 
@@ -74,6 +73,7 @@ flowchart LR
 | Phase 3 commercial wrapper | **COMPLETE** 2026-05-28 | [`SPRINT_PHASE3_COMMERCIAL_WRAPPER.md`](SPRINT_PHASE3_COMMERCIAL_WRAPPER.md) |
 | MVP1 Phase 6 trust metrics v1 | **COMPLETE** 2026-06-01 | [`SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md`](SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md) |
 | MSOS Website Program P0 | **COMPLETE** 2026-06-01 | [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md), [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md) |
+| MSOS P1 stack routing ADR | **COMPLETE** 2026-06-01 | [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md), [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
@@ -92,7 +92,7 @@ flowchart LR
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **MSOS P1** | `mark_ide_product_ready` → `run_ppe_local.cmd` |
+| **Active relay chapter** | **none** | MSOS P1 **COMPLETE**; manifest `COMPLETE` |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Storyboard v0.6** | **not in-repo** | Blocks MSOS P2 — operator drops files per [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) |
@@ -125,5 +125,4 @@ flowchart LR
 
 ## Next BUILD (agent lane)
 
-1. Finish **MSOS P1** relay closeout (witness + closeout slices).
-2. **MSOS P2** when storyboard gate **OPEN** — see [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

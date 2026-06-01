@@ -67,7 +67,7 @@ def test_phase_queue_msos_p0_ready_or_done() -> None:
 def test_backlog_p1_queued_p2_blocked() -> None:
     backlog = json.loads(BACKLOG.read_text(encoding="utf-8"))
     by_id = {item["chapterId"]: item for item in backlog["items"]}
-    assert by_id["msos_p1_stack_routing"]["status"] in ("queued", "chartered")
+    assert by_id["msos_p1_stack_routing"]["status"] in ("queued", "chartered", "done")
     assert by_id["msos_p2_homepage"]["status"] == "blocked"
     assert by_id["msos_p8_tester_release"]["status"] == "blocked"
 

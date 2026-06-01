@@ -10,29 +10,31 @@ Copy/paste and fill every field. Do not infer from memory; verify in repo/docs.
 HANDOFF GATE — v3.1 (MVP1 control-plane)
 
 A) DOC-STATE SAFETY (alignment)
-- Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER / MSOS_FRONTIER > HANDOFF > OPERATING_RULES
+- Source-of-truth precedence: pushed repo+accepted docs > PPE_MASTER_MVP1 > MVP1_FRONTIER > HANDOFF > OPERATING_RULES
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
-- Live frontier (MSOS): `docs/SOP/MSOS_FRONTIER.md`
-- Live frontier (MVP1 engine): `docs/SOP/MVP1_FRONTIER.md` — idle
+- Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MSOS focus: **MSOS P1 stack routing** — ADR at `docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md`; relay closeout pending
-- Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call; storyboard v0.6 **not in-repo** (blocks P2)
+- Active MVP1 focus: **none** — msos p1 stack routing adr **COMPLETE** 2026-06-01
+- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
+- Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
-- Drift rule: **`MSOS_FRONTIER.md`** outranks HANDOFF for MSOS queue
+- Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
 
 B) REPO-STATE SAFETY (reproducibility)
-- Branch: verify (`git rev-parse --abbrev-ref HEAD`)
+- Branch: verify (`git rev-parse --abbrev-ref HEAD`; expect `main`)
 - Baseline SHA: verify `git rev-parse origin/main` after push
-- BUILD allowed: MSOS P1 relay after IDE product marker + `run_ppe_local.cmd`
+- BUILD allowed: only after steward SELECTION; honor reconcile defer list
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `MSOS_P1_STACK_ROUTING_ADR.md` + `MSOS_FRONTIER.md` + `PPE_INTEGRATED_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS P1** — stack/routing ADR committed. Operator: **`mark_ide_product_ready.cmd MSOS-P1-Product-Slice002`** then **`run_ppe_local.cmd`**.
+**MSOS P1 stack routing ADR COMPLETE** — dual smoke green. Await steward **SELECTION**.
+
 
 ## Hard rule reminders
 
@@ -43,10 +45,10 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-1. **Relay:** `mark_ide_product_ready.cmd MSOS-P1-Product-Slice002` → `run_ppe_local.cmd`
-2. **Operator:** drop storyboard v0.6 into `docs/VISION/MSOS/storyboard-v0.6/` when ready for P2
-3. **Steward:** VPS CTA `.env` per [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)
+1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
+2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
+
 
 ## Last updated
 
-2026-06-01 — MSOS P1 ADR accepted; relay closeout pending.
+2026-06-01 — MSOS P1 stack routing ADR COMPLETE; closeout job `MSOS-P1-Closeout-Slice004`.

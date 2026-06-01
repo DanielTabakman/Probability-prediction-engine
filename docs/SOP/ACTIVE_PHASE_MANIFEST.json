@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
   "selectionRecord": "docs/SOP/MSOS_FRONTIER.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Stack / routing ADR without rewriting PPE",
+  "status": "COMPLETE",
+  "notes": "MSOS P1 stack routing COMPLETE 2026-06-01 Chapter closeout MSOS-P1-Closeout-Slice004; queue item marked DONE.",
   "workerMode": "deterministic"
 }

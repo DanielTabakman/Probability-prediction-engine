@@ -12,10 +12,10 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P1 stack routing ADR** — ADR committed; relay witness/closeout via `run_ppe_local.cmd`
-- **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) — phased Next.js shell + Streamlit PPE (proxy at P4)
-- **Sprint:** [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md)
-- **Phase plan:** [`PHASE_PLANS/msos_p1_stack_routing_relay.json`](PHASE_PLANS/msos_p1_stack_routing_relay.json)
+- **Active BUILD chapter:** **none** — MSOS P1 stack routing **COMPLETE** 2026-06-01
+- **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
+- **Evidence:** [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md)
+- **Next:** **MSOS P2 homepage** — **blocked** until storyboard v0.6 in-repo ([`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md))
 
 ### MSOS Website Program — relay queue
 
@@ -29,14 +29,14 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Evidence:** [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md)
 
-### MSOS P1 stack routing — relay queue — **IN PROGRESS**
+### MSOS P1 stack routing — relay queue — **COMPLETE** (2026-06-01)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **OPEN** | `MSOS-P1-Control-Slice001` — charter | EVIDENCE |
-| **DONE (IDE)** | `MSOS-P1-Product-Slice002` — stack/routing ADR | CONTROL |
-| **OPEN** | `MSOS-P1-Witness-Slice003` — witness | EVIDENCE |
-| **OPEN** | `MSOS-P1-Closeout-Slice004` — chapter close | EVIDENCE |
+| **CLOSED** | `MSOS-P1-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P1-Product-Slice002` — stack/routing ADR | CONTROL |
+| **CLOSED** | `MSOS-P1-Witness-Slice003` — witness | EVIDENCE |
+| **CLOSED** | `MSOS-P1-Closeout-Slice004` — chapter close | EVIDENCE |
 
 **Deliverable:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
 
@@ -44,7 +44,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 | Priority | chapterId | Backlog status | Blocker |
 |----------|-----------|----------------|---------|
-| P1 | `msos_p1_stack_routing` | **chartered** | Relay closeout pending |
+| P1 | `msos_p1_stack_routing` | **done** | — |
 | P2 | `msos_p2_homepage` | **blocked** | Storyboard v0.6 not in-repo |
 | P3 | `msos_p3_command_center` | **blocked** | After P2 |
 | P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE via Caddy proxy (ADR) |

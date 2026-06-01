@@ -75,9 +75,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Stack / routing ADR without rewriting PPE",
-      "selectionPrep": "docs/SOP/MSOS_FRONTIER.md"
+      "selectionPrep": "docs/SOP/MSOS_FRONTIER.md",
+      "doneReason": "MSOS P1 chapter COMPLETE 2026-06-01"
     }
   ]
 }
