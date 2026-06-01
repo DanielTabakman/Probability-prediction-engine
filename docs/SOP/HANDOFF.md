@@ -14,9 +14,10 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos p1 stack routing adr **COMPLETE** 2026-06-01
+- Active MVP1 focus: **none** — mvp1 phase 6 trust metrics v1 **COMPLETE** 2026-06-01
+- MSOS track: **MSOS P1 stack routing ADR COMPLETE** 2026-06-01; P2 blocked until storyboard v0.6 in-repo
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md` (P2 blocked)
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,13 +29,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P1_STACK_ROUTING_ADR.md` + `MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS P1 stack routing ADR COMPLETE** — dual smoke green. Await steward **SELECTION**.
-
+**MSOS P1 stack routing ADR COMPLETE** — MVP1 Phase 6 trust metrics v1 COMPLETE. Await steward **SELECTION** for MSOS P2 (blocked until storyboard).
 
 ## Hard rule reminders
 
@@ -46,9 +46,8 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
-
+2. **Steward:** import storyboard v0.6, then SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
 
 ## Last updated
 
-2026-06-01 — MSOS P1 stack routing ADR COMPLETE; closeout job `MSOS-P1-Closeout-Slice004`.
+2026-06-01 — MSOS P1 stack routing ADR COMPLETE; closeout job `MSOS-P1-Closeout-Slice004`. MVP1 Phase 6 trust metrics v1 COMPLETE (PR #73).

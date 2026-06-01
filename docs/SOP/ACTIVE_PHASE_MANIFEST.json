@@ -1,8 +1,7 @@
 {
   "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
-  "selectionRecord": "docs/SOP/MSOS_FRONTIER.md",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
   "status": "COMPLETE",
-  "notes": "MSOS P1 stack routing COMPLETE 2026-06-01 Chapter closeout MSOS-P1-Closeout-Slice004; queue item marked DONE.",
-  "workerMode": "deterministic"
+  "notes": "MSOS P1 stack routing COMPLETE 2026-06-01 (chapter closeout MSOS-P1-Closeout-Slice004). MVP1 Phase 6 trust metrics v1 COMPLETE 2026-06-01 (PR #73)."
 }

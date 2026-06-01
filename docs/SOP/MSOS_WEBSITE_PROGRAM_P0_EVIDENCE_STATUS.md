@@ -21,6 +21,10 @@
 - Tier 1 control-plane: `pytest tests/test_msos_p0_charter_witness.py`
 - No dual smoke (no `src/viz/` changes)
 
+## Closeout method
+
+P0 marked **DONE** via `apply_control_closeout` + `mark_queue_item_done` after orchestrator worktree failure (orphan worktree missing `SPRINT_MSOS_WEBSITE_PROGRAM_P0.md` on disk). Relay Control/Witness/Closeout slices were not re-run.
+
 ## Next SELECTION after closeout
 
 P1 stack/routing — [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md)
