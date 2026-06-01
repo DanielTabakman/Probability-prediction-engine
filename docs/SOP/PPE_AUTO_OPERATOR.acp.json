@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "profile": "acp",
+  "enabled": true,
+  "notes": "ACP relay + steward charter when idle. Requires CURSOR_API_KEY and ppe-orchestrator-acp sibling repo.",
+  "propagateBacklog": true,
+  "stewardCharter": true,
+  "workerMode": "acp",
+  "skipAcp": false,
+  "continuousMax": 20,
+  "loopWhenIdle": true,
+  "idleSleepSeconds": 120,
+  "guards": {
+    "enabled": true,
+    "blockProductUnderGlobalDeterministic": false
+  }
+}

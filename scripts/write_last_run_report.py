@@ -68,6 +68,23 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
     if not relay:
         return True, "unknown", "Relay result not found on disk yet (or path scan failed). Check newest worktree under _worktrees/acp_orchestrator and artifacts/relay/runs/."
 
+    stop_raw = relay.get("stop_condition")
+    stop_code = ""
+    if isinstance(stop_raw, dict):
+        stop_code = str(stop_raw.get("code") or stop_raw.get("id") or "")
+    else:
+        stop_code = str(stop_raw or "").strip()
+    slice_id = str(relay.get("slice_id") or "").upper()
+    if stop_code == "SCOPE_AMBIGUITY" and "PRODUCT" in slice_id:
+        build_branch = str(relay.get("build_branch") or relay.get("buildBranch") or "")
+        branch_note = f" Commit on `{build_branch}`." if build_branch else ""
+        return (
+            True,
+            "product_ide_build_required",
+            "Product slice under deterministic relay: BUILD in Cursor IDE using docs/SOP/BUILD_PACKET_TEMPLATE.md "
+            f"(sprint spec + AGENT_CONTINUITY_BRIEF).{branch_note} Then run `run_ppe_local.cmd` from repo root.",
+        )
+
     decision = str(relay.get("stop_condition") or "").strip()
     # relay_result uses nested decision sometimes? Usually top-level has safe_to_continue etc.
     safe_to_continue = relay.get("safe_to_continue")
