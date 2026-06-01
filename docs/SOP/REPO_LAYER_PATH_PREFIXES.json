@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "canonical_doc": "docs/SOP/REPO_LAYER_MAP_V1.md",
+  "layers": {
+    "msos-shell": {
+      "label": "A — MSOS platform shell",
+      "description": "Customer-facing Next.js shell, Command Center chrome, Strategy Lab entry (no PPE math).",
+      "primary_paths": ["apps/msos-web/"],
+      "related_paths": [
+        "docs/SOP/MSOS_",
+        "docs/SOP/SPRINT_MSOS_",
+        "docs/VISION/MSOS/"
+      ]
+    },
+    "ppe-ui": {
+      "label": "B — PPE Streamlit UI",
+      "description": "Implied lab, panels, MVP1 decision surface presentation.",
+      "primary_paths": ["src/viz/"],
+      "related_paths": [
+        "tests/test_mvp1_",
+        "tests/test_implied_lab_",
+        "tests/test_app_",
+        "tests/test_frozen_",
+        "tests/test_belief_",
+        "tests/test_commercial_wrapper",
+        "tests/test_decision_ready",
+        "tests/test_reviewed_class",
+        "tests/test_signup_cta",
+        "tests/test_trust_strip",
+        "tests/test_width_vol",
+        "tests/test_directional_candidate",
+        "scripts/run_mvp1_dual_implied_lab_smoke.py",
+        "scripts/implied_lab_ui_smoke_harness.py",
+        "scripts/run_implied_lab_ui_smoke.py",
+        "scripts/ui_smoke_diagnose.py",
+        "docs/IMPLIED_LAB_SMOKE.md"
+      ]
+    },
+    "ppe-core": {
+      "label": "C — PPE engine",
+      "description": "Math, fetchers, schemas; no Streamlit imports.",
+      "primary_paths": ["src/engine/", "src/data/", "src/models/"],
+      "related_paths": ["config/"]
+    },
+    "dev-factory": {
+      "label": "D — Dev factory",
+      "description": "Relay, queue, steward automation, process SOP.",
+      "primary_paths": ["scripts/"],
+      "related_paths": [
+        "docs/SOP/",
+        "tests/test_ppe_",
+        "tests/test_relay_",
+        "tests/test_phase_",
+        "tests/test_apply_control",
+        "tests/test_run_pushable_gate",
+        "tests/test_resolve_active",
+        "tests/test_write_last_run",
+        "tests/test_steering_",
+        "tests/test_manifest_",
+        "tests/test_canonical_docs",
+        "tests/test_msos_p0",
+        "tests/test_mvp1_sprint003",
+        "tests/test_mvp1_post_phase3",
+        "tests/test_phase3_commercial",
+        "tests/test_commercial_wrapper_smoke",
+        "tests/test_ui_smoke_scenario",
+        ".cursor/rules/",
+        "run_ppe.cmd",
+        "run_slice.cmd",
+        "run_phase.cmd"
+      ]
+    },
+    "platform": {
+      "label": "E — Shared platform",
+      "description": "Deploy, routing, CI infrastructure.",
+      "primary_paths": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "Dockerfile",
+        ".dockerignore",
+        ".github/"
+      ],
+      "related_paths": ["docs/DEPLOY/"]
+    },
+    "product-canon": {
+      "label": "F — Product canon",
+      "description": "Vision docs, storyboard assets, PPE Master imports.",
+      "primary_paths": ["docs/VISION/"],
+      "related_paths": [
+        "docs/PRODUCT_THESIS.md",
+        "docs/PLAN.md",
+        "docs/SEMANTIC_CONTRACTS.md",
+        "docs/ARCHITECT_NOTES.md"
+      ]
+    }
+  },
+  "import_rules": [
+    {
+      "from": "apps/msos-web",
+      "to": "src",
+      "allowed": false,
+      "note": "Use HTTP, Caddy proxy, or iframe per MSOS P1 ADR — not Python imports."
+    },
+    {
+      "from": "src/viz",
+      "to": "src/engine|src/data|src/models",
+      "allowed": true
+    },
+    {
+      "from": "src/engine",
+      "to": "src/viz",
+      "allowed": false
+    },
+    {
+      "from": "src/data",
+      "to": "src/viz",
+      "allowed": false
+    },
+    {
+      "from": "msos-typescript",
+      "to": "ppe-math",
+      "allowed": false,
+      "note": "Display PPE outputs only; C remains authoritative."
+    }
+  ],
+  "presets": {
+    "MSOS_UI": {
+      "layer": "msos-shell",
+      "typical_plane": "PRODUCT-PLANE",
+      "allowed_paths": [
+        "apps/msos-web/",
+        "docs/VISION/MSOS/",
+        "docs/SOP/MSOS_",
+        "docs/SOP/SPRINT_MSOS_"
+      ],
+      "forbidden_paths": [
+        "src/engine/",
+        "src/data/",
+        "src/models/",
+        "src/viz/"
+      ]
+    },
+    "PPE_UI": {
+      "layer": "ppe-ui",
+      "typical_plane": "PRODUCT-PLANE",
+      "allowed_paths": [
+        "src/viz/",
+        "tests/test_mvp1_",
+        "tests/test_implied_lab_",
+        "tests/test_app_",
+        "tests/test_frozen_",
+        "tests/test_belief_",
+        "tests/test_commercial_wrapper.py",
+        "tests/test_decision_ready_review.py",
+        "tests/test_reviewed_class_summary.py",
+        "tests/test_signup_cta.py",
+        "tests/test_trust_strip.py",
+        "tests/test_width_vol_candidate_strip.py",
+        "tests/test_directional_candidate_strip.py",
+        "scripts/run_mvp1_dual_implied_lab_smoke.py",
+        "scripts/implied_lab_ui_smoke_harness.py",
+        "scripts/run_implied_lab_ui_smoke.py",
+        "scripts/ui_smoke_diagnose.py",
+        "docs/IMPLIED_LAB_SMOKE.md"
+      ],
+      "forbidden_paths": [
+        "apps/msos-web/",
+        "src/engine/",
+        "src/data/",
+        "src/models/"
+      ],
+      "notes": "If engine semantics must change, split a PPE_CORE slice — do not widen silently."
+    },
+    "PPE_CORE": {
+      "layer": "ppe-core",
+      "typical_plane": "PRODUCT-PLANE",
+      "allowed_paths": [
+        "src/engine/",
+        "src/data/",
+        "src/models/",
+        "config/",
+        "tests/test_"
+      ],
+      "forbidden_paths": [
+        "apps/msos-web/",
+        "src/viz/"
+      ],
+      "notes": "If UI must change for a core slice, open a separate PPE_UI pass or steward exception."
+    },
+    "CONTROL": {
+      "layer": "dev-factory",
+      "typical_plane": "CONTROL-PLANE",
+      "allowed_paths": [
+        "scripts/",
+        "docs/SOP/",
+        "tests/test_ppe_",
+        "tests/test_relay_",
+        "tests/test_phase_",
+        "tests/test_apply_control",
+        "tests/test_run_pushable_gate",
+        "tests/test_resolve_active",
+        "tests/test_write_last_run",
+        "tests/test_steering_",
+        "tests/test_manifest_",
+        "tests/test_canonical_docs",
+        ".cursor/rules/"
+      ],
+      "forbidden_paths": [
+        "src/",
+        "apps/msos-web/"
+      ]
+    },
+    "PLATFORM": {
+      "layer": "platform",
+      "typical_plane": "EVIDENCE-PLANE",
+      "allowed_paths": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "Dockerfile",
+        ".dockerignore",
+        ".github/",
+        "docs/DEPLOY/"
+      ],
+      "forbidden_paths": [
+        "src/engine/",
+        "src/data/",
+        "src/models/",
+        "apps/msos-web/"
+      ],
+      "notes": "MSOS P2+ may allow apps/msos-web/ + platform in one steward-authorized PLATFORM+MSOS slice."
+    },
+    "DOCS_CANON": {
+      "layer": "product-canon",
+      "typical_plane": "CONTROL-PLANE",
+      "allowed_paths": [
+        "docs/VISION/",
+        "docs/PRODUCT_THESIS.md",
+        "docs/PLAN.md",
+        "docs/SEMANTIC_CONTRACTS.md",
+        "docs/ARCHITECT_NOTES.md"
+      ],
+      "forbidden_paths": ["src/", "apps/msos-web/", "scripts/"]
+    },
+    "DOCS_ONLY": {
+      "layer": null,
+      "typical_plane": "CONTROL-PLANE",
+      "allowed_paths": ["docs/"],
+      "forbidden_paths": ["src/", "apps/", "scripts/", "tests/"]
+    },
+    "MSOS_PROXY": {
+      "layer": "msos-shell",
+      "typical_plane": "PRODUCT-PLANE",
+      "allowed_paths": [
+        "apps/msos-web/",
+        "Caddyfile",
+        "docker-compose.yml",
+        "src/viz/",
+        "docs/DEPLOY/",
+        "docs/SOP/MSOS_"
+      ],
+      "forbidden_paths": [
+        "src/engine/",
+        "src/data/",
+        "src/models/"
+      ],
+      "notes": "P4 Strategy Lab entry only; steward-authorized; proxy before iframe."
+    }
+  }
+}

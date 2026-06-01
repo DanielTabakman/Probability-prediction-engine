@@ -38,7 +38,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json",
       "status": "DONE",
-      "reason": "Deploy witness refresh \u2014 evidence-only relay on main",
+      "reason": "Deploy witness refresh — evidence-only relay on main",
       "selectionPrep": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
@@ -46,7 +46,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json",
       "status": "DONE",
-      "reason": "Phase 5 review SQLite FK hardening \u2014 MVP1-Phase5-Slice002 canon",
+      "reason": "Phase 5 review SQLite FK hardening — MVP1-Phase5-Slice002 canon",
       "selectionPrep": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
@@ -61,9 +61,24 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase6_trust_metrics_v1_relay.json",
       "status": "DONE",
-      "reason": "Trust enum rollups (data_quality, primary_output_state) in class summary \u2014 COMPLETE 2026-06-01",
+      "reason": "Trust enum rollups (data_quality, primary_output_state) in class summary — COMPLETE 2026-06-01",
       "selectionPrep": "docs/SOP/POST_PHASE5_PHASE6_TRUST_METRICS_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json",
+      "status": "DONE",
+      "reason": "MSOS Website Program P0 — queue install",
+      "selectionPrep": "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
+      "workerMode": "deterministic",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json",
+      "status": "DONE",
+      "reason": "Stack / routing ADR without rewriting PPE",
+      "selectionPrep": "docs/SOP/MSOS_FRONTIER.md",
+      "doneReason": "MSOS P1 chapter COMPLETE 2026-06-01"
     }
   ]
 }

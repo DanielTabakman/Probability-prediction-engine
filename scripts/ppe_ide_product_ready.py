@@ -1,0 +1,251 @@
+"""Mark IDE product BUILD complete so local continuous guards allow the phase to run."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+from scripts.ppe_manifest import load_manifest, load_phase_plan
+from scripts.ppe_slice_worker_mode import infer_slice_kind
+
+MARKER_REL = "artifacts/orchestrator/IDE_PRODUCT_READY.json"
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def marker_path(repo: Path) -> Path:
+    return (repo / MARKER_REL).resolve()
+
+
+def load_marker(repo: Path) -> dict[str, Any] | None:
+    p = marker_path(repo)
+    if not p.is_file():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _branch_has_commits(repo: Path, *, build_branch: str, baseline: str = "main") -> bool:
+    if not build_branch.strip():
+        return False
+    for ref_pair in (f"origin/{baseline}..{build_branch}", f"{baseline}..{build_branch}"):
+        proc = _git(repo, "rev-list", "--count", ref_pair)
+        if proc.returncode == 0:
+            try:
+                if int((proc.stdout or "0").strip() or "0") > 0:
+                    return True
+            except ValueError:
+                pass
+    return False
+
+
+def _resolve_slice_and_branch(
+    repo: Path,
+    *,
+    slice_id: str,
+    plan_path: str,
+    build_branch: str | None,
+) -> tuple[str, str, str]:
+    plan = load_phase_plan(repo, plan_path)
+    sl_obj: dict[str, Any] | None = None
+    for sl in plan.get("slices") or []:
+        if isinstance(sl, dict) and str(sl.get("sliceId") or "") == slice_id:
+            sl_obj = sl
+            break
+    if infer_slice_kind(slice_id, sl_obj) != "product":
+        raise ValueError(f"{slice_id} is not a product slice")
+    branch = (build_branch or "").strip()
+    if not branch and sl_obj:
+        branch = str(sl_obj.get("buildBranch") or "").strip()
+    if not branch:
+        branch = f"build/auto/{slice_id}-local"
+    baseline = "main"
+    if sl_obj:
+        baseline = str(sl_obj.get("baselineBranch") or plan.get("baselineBranch") or "main").strip() or "main"
+    return slice_id, branch, baseline
+
+
+def write_marker(
+    repo: Path,
+    *,
+    phase_plan_path: str,
+    slice_id: str,
+    build_branch: str,
+    commit_sha: str,
+) -> Path:
+    p = marker_path(repo)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    norm_plan = phase_plan_path.replace("\\", "/").strip()
+    payload = {
+        "phasePlanPath": norm_plan,
+        "sliceId": slice_id,
+        "buildBranch": build_branch,
+        "commitSha": commit_sha,
+        "markedAt": _utc_now(),
+    }
+    p.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return p
+
+
+def mark_product_ready(
+    repo: Path,
+    *,
+    slice_id: str,
+    plan_path: str,
+    build_branch: str | None = None,
+) -> tuple[int, str]:
+    repo = repo.resolve()
+    norm_plan = plan_path.replace("\\", "/").strip()
+    try:
+        slice_id, branch, baseline = _resolve_slice_and_branch(
+            repo, slice_id=slice_id, plan_path=norm_plan, build_branch=build_branch
+        )
+    except ValueError as e:
+        return 2, str(e)
+
+    if not _branch_has_commits(repo, build_branch=branch, baseline=baseline):
+        return 2, f"build branch {branch!r} has no commits ahead of {baseline}; commit IDE BUILD first"
+
+    head = _git(repo, "rev-parse", branch)
+    sha = (head.stdout or "").strip() if head.returncode == 0 else ""
+    out = write_marker(
+        repo,
+        phase_plan_path=norm_plan,
+        slice_id=slice_id,
+        build_branch=branch,
+        commit_sha=sha,
+    )
+    return 0, str(out)
+
+
+def marker_covers_product_slices(
+    repo: Path,
+    *,
+    plan_path: str,
+    product_slice_ids: list[str],
+) -> bool:
+    """True when marker matches plan and all listed product slices (same sliceId in marker)."""
+    if not product_slice_ids:
+        return True
+    data = load_marker(repo)
+    if not data:
+        return False
+    norm_plan = plan_path.replace("\\", "/").strip()
+    if str(data.get("phasePlanPath") or "").replace("\\", "/").strip() != norm_plan:
+        return False
+    marked_slice = str(data.get("sliceId") or "").strip()
+    if marked_slice not in product_slice_ids:
+        return False
+    branch = str(data.get("buildBranch") or "").strip()
+    if not branch:
+        return False
+    return _branch_has_commits(repo, build_branch=branch)
+
+
+def check_marker(repo: Path) -> int:
+    repo = repo.resolve()
+    data = load_marker(repo)
+    if not data:
+        print("ppe_ide_product_ready: no marker")
+        return 1
+    try:
+        manifest = load_manifest(repo)
+    except FileNotFoundError:
+        print("ppe_ide_product_ready: marker present but no manifest")
+        return 1
+    plan_path = str(manifest.get("phasePlanPath") or data.get("phasePlanPath") or "").strip()
+    if not plan_path:
+        print(f"ppe_ide_product_ready: marker {json.dumps(data, indent=2)}")
+        return 0
+    product_ids = []
+    plan = load_phase_plan(repo, plan_path)
+    for sl in plan.get("slices") or []:
+        if isinstance(sl, dict):
+            sid = str(sl.get("sliceId") or "").strip()
+            if sid and infer_slice_kind(sid, sl) == "product":
+                product_ids.append(sid)
+    if marker_covers_product_slices(repo, plan_path=plan_path, product_slice_ids=product_ids):
+        print(f"ppe_ide_product_ready: OK for {plan_path}")
+        return 0
+    print("ppe_ide_product_ready: marker stale or branch has no commits")
+    return 1
+
+
+def clear_marker(repo: Path) -> bool:
+    p = marker_path(repo)
+    if p.is_file():
+        p.unlink()
+        print(f"ppe_ide_product_ready: cleared {MARKER_REL}")
+        return True
+    return False
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="IDE product-ready marker for local operator")
+    ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--mark", action="store_true")
+    ap.add_argument("--check", action="store_true")
+    ap.add_argument("--clear", action="store_true")
+    ap.add_argument("--slice-id", type=str, default="")
+    ap.add_argument("--plan", type=str, default="")
+    ap.add_argument("--build-branch", type=str, default="")
+    args = ap.parse_args(argv)
+    repo = args.repo_root.resolve()
+
+    if args.clear:
+        clear_marker(repo)
+        return 0
+    if args.check:
+        return check_marker(repo)
+    if args.mark:
+        plan = args.plan.strip()
+        if not plan:
+            try:
+                manifest = load_manifest(repo)
+                plan = str(manifest.get("phasePlanPath") or "").strip()
+            except FileNotFoundError:
+                plan = ""
+        if not plan:
+            print("ERROR: --plan or manifest phasePlanPath required", file=sys.stderr)
+            return 2
+        if not args.slice_id.strip():
+            print("ERROR: --slice-id required for --mark", file=sys.stderr)
+            return 2
+        rc, msg = mark_product_ready(
+            repo,
+            slice_id=args.slice_id.strip(),
+            plan_path=plan,
+            build_branch=args.build_branch.strip() or None,
+        )
+        if rc != 0:
+            print(f"ERROR: {msg}", file=sys.stderr)
+            return rc
+        print(f"ppe_ide_product_ready: {msg}")
+        return 0
+
+    ap.print_help()
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -10,13 +10,18 @@
 ## Source-of-truth order
 
 1. Pushed repo + current accepted docs
-2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon)
-3. `docs/SOP/MVP1_FRONTIER.md` (live steering / slice queue)
+2. `docs/VISION/PPE_MASTER_MVP1.md` (MVP1 product canon + MSOS waterfall queue)
+   - After steward edits **PPE Master** in Google Docs: `python scripts/google_docs_sync.py --sync-master-to-repo` before repo canon / SELECTION (`ppe_google_docs_refresh.py` does not import Master → repo).
+3. **Dual-track live steering:**
+   - `docs/SOP/MVP1_FRONTIER.md` — MVP1 engine relay (Streamlit implied lab, freeze/review)
+   - `docs/SOP/MSOS_FRONTIER.md` — MSOS website/platform BUILD queue
 4. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter summary)
 5. `docs/SOP/HANDOFF.md`
 6. `docs/SOP/OPERATING_RULES.md`
 7. `docs/SEMANTIC_CONTRACTS.md`
 8. Older handoff/chat only when docs are silent
+
+**MSOS non-widening rule:** MSOS UI work must not silently alter PPE math contracts or resolved MVP1 evidence. See [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md).
 
 **Legacy:** `docs/SOP/CURRENT_FRONTIER.md` is historical only (Phase 2 ledger); do not use for MVP1 steering.
 
@@ -247,7 +252,7 @@ Rules:
 
 - **Relay/orchestrator** (`run_ppe.cmd`, `run_phase.cmd`, `run_slice.cmd`): each slice gets a fresh ACP worker; do not paste orchestrator logs into steward chat.
 - **Unified run:** steward sets [`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json), runs `run_ppe.cmd`, then opens a **new** thread with only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-- **Packets:** [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — link paths; no HANDOFF gate inline, no full diffs/logs.
+- **Packets:** [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) — link paths; include `LAYER` / `LAYER_PRESET` / `ALLOWED_PATHS` per [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md); no HANDOFF gate inline, no full diffs/logs.
 - **Context bands:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) §3.4 (Cursor UI heuristics).
 
 ## Window ledger

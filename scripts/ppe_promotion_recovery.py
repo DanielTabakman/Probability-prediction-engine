@@ -13,6 +13,7 @@ from scripts.ppe_manifest import clear_manifest_plan_path, load_manifest, maybe_
 from scripts.ppe_queue import mark_queue_item_done
 from scripts.ppe_queue_health import repair_queue
 from scripts.post_relay_continue import _find_newest_relay_run, _load_decision, _load_relay_result
+from scripts.ppe_slice_worker_mode import infer_slice_kind
 from scripts.relay.apply_control_closeout import (
     CloseoutSpec,
     apply_control_closeout,
@@ -167,6 +168,66 @@ def _run_control_closeout(repo: Path, phase_plan: Path, slice_id: str, relay_run
     return 0
 
 
+def _slice_obj(plan: dict, slice_id: str) -> dict | None:
+    for sl in plan.get("slices") or []:
+        if isinstance(sl, dict) and str(sl.get("sliceId") or "") == slice_id:
+            return sl
+    return None
+
+
+def _build_branch_has_product_commits(
+    repo: Path,
+    *,
+    build_branch: str,
+    baseline_branch: str = "main",
+) -> bool:
+    if not build_branch.strip():
+        return False
+    proc = _run(
+        ["git", "rev-list", "--count", f"origin/{baseline_branch}..{build_branch}"],
+        cwd=repo,
+        check=False,
+    )
+    if proc.returncode != 0:
+        proc = _run(
+            ["git", "rev-list", "--count", f"{baseline_branch}..{build_branch}"],
+            cwd=repo,
+            check=False,
+        )
+    if proc.returncode != 0:
+        return False
+    try:
+        return int((proc.stdout or "0").strip() or "0") > 0
+    except ValueError:
+        return False
+
+
+def _should_block_product_auto_resume(
+    repo: Path,
+    *,
+    plan: dict,
+    slice_id: str,
+    stop: str,
+    promoted: bool,
+    build_branch: str,
+    baseline_branch: str = "main",
+) -> bool:
+    if stop != "SCOPE_AMBIGUITY":
+        return False
+    sl = _slice_obj(plan, slice_id)
+    if infer_slice_kind(slice_id, sl) != "product":
+        return False
+    if promoted:
+        return False
+    if _build_branch_has_product_commits(repo, build_branch=build_branch, baseline_branch=baseline_branch):
+        return False
+    print(
+        "ppe_promotion_recovery: product slice SCOPE_AMBIGUITY without promotion or "
+        "build-branch commits — do not auto-resume; use IDE BUILD then run_ppe_local.cmd"
+    )
+    return True
+
+
 def _next_slice_id(plan: dict, current: str) -> str | None:
     slices = plan.get("slices") or []
     ids = [str(s.get("sliceId") or "") for s in slices]
@@ -248,6 +309,17 @@ def try_recover(
         return 0
 
     if exit_code == 20 and dec_val in ("STOP_FOR_REVIEW", "CONTINUE", None):
+        baseline = str((relay or {}).get("baseline_branch") or "main")
+        if _should_block_product_auto_resume(
+            repo,
+            plan=plan,
+            slice_id=slice_id,
+            stop=stop,
+            promoted=promoted,
+            build_branch=branch,
+            baseline_branch=baseline,
+        ):
+            return 0
         nxt = _next_slice_id(plan, slice_id)
         if nxt:
             print(f"ppe_promotion_recovery: suggest next slice {nxt} (exit 20 steward review)")

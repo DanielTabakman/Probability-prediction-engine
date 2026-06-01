@@ -3,14 +3,21 @@
 Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Control rule (hard)
-- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (§15B–15F vision import 2026-05-20; §15A repo-truth)
-- **This file** is the only live frontier/steering truth.
+- **Controlling canon**: `docs/VISION/PPE_MASTER_MVP1.md` (§15B–15F vision import 2026-05-20; §15A repo-truth; MSOS waterfall queue 2026-05-31)
+- **This file** is the live frontier for **MVP1 engine relay** (Streamlit implied lab, freeze/review loop).
+- **MSOS website/platform BUILD** uses [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) — parallel track; does not widen MVP1 scope.
 - Legacy steering documents (e.g. legacy `CURRENT_FRONTIER`, sprint specs, legacy phase language) are **historical only** and must not be used as controlling truth.
+
+### Parallel track — MSOS Website Program
+- **Active platform/UI steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)
+- **Canon:** [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) + PPE Master waterfall (top section)
+- **Non-widening rule:** MSOS UI wraps PPE truth; MVP1 math/evidence contracts unchanged unless dedicated SELECTION says otherwise.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md))
-- **Last closed chapter:** **MVP1 Phase 6 trust metrics v1** — **COMPLETE** 2026-05-29
+- **Active BUILD chapter (MVP1):** **none** — await steward **SELECTION**
+- **Last closed chapter (MVP1):** **MVP1 Phase 6 trust metrics v1** — **COMPLETE** 2026-06-01
+- **MSOS parallel track:** P1 stack routing **COMPLETE** 2026-06-01 — see [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md); P2 blocked until storyboard v0.6 in-repo
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 

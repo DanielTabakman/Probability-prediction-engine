@@ -2,11 +2,19 @@
 
 Use this template when sending a relay BUILD packet to Cursor or documenting a slice handoff. **Paths only** — do not inline sprint specs, HANDOFF gate blocks, or ledger history.
 
+**Layer map (required for all BUILD packets):** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · presets [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.json)
+
 ## Required fields
 
 ```text
 EXECUTION STEP: BUILD
 PLANE: <CONTROL-PLANE | PRODUCT-PLANE | EVIDENCE-PLANE>
+LAYER: <msos-shell | ppe-ui | ppe-core | dev-factory | platform | product-canon>
+LAYER_PRESET: <MSOS_UI | PPE_UI | PPE_CORE | CONTROL | PLATFORM | DOCS_CANON | DOCS_ONLY | MSOS_PROXY>
+ALLOWED_PATHS:
+  - <prefix/from/preset/or/sprint>
+FORBIDDEN_PATHS:
+  - <prefix/from/preset/or/sprint>
 SLICE_ID: <sliceId from phase plan>
 PHASE_PLAN: docs/SOP/PHASE_PLANS/<plan>.json
 SPRINT_SPEC: docs/SOP/SPRINT_<chapter>.md
@@ -14,6 +22,21 @@ CONTINUITY_BRIEF: docs/SOP/AGENT_CONTINUITY_BRIEF.md
 BASELINE_BRANCH: main
 BUILD_BRANCH: build/auto/<sliceId>-<timestamp>  (orchestrator assigns)
 ```
+
+`LAYER` must match the preset’s `layer` in `REPO_LAYER_PATH_PREFIXES.json`. Copy `ALLOWED_PATHS` / `FORBIDDEN_PATHS` from the preset unless the sprint narrows them further. **Do not widen** forbidden paths without steward exception in the sprint or SELECTION doc.
+
+### Preset quick reference
+
+| LAYER_PRESET | LAYER | Typical PLANE |
+|--------------|-------|---------------|
+| `MSOS_UI` | `msos-shell` | `PRODUCT-PLANE` |
+| `PPE_UI` | `ppe-ui` | `PRODUCT-PLANE` |
+| `PPE_CORE` | `ppe-core` | `PRODUCT-PLANE` |
+| `CONTROL` | `dev-factory` | `CONTROL-PLANE` or `EVIDENCE-PLANE` |
+| `PLATFORM` | `platform` | `EVIDENCE-PLANE` |
+| `DOCS_CANON` | `product-canon` | `CONTROL-PLANE` |
+| `DOCS_ONLY` | (docs only) | `CONTROL-PLANE` |
+| `MSOS_PROXY` | `msos-shell` | `PRODUCT-PLANE` (P4; steward only) |
 
 ## AGENT CONTINUITY (required in return)
 
@@ -39,6 +62,7 @@ AGENT CONTINUITY
 
 ## References
 
+- [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) — folder ownership, import rules, parallel development
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) — SLIM MODE default
 - [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) — advisory context bands
 - [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md) — Cursor context discipline

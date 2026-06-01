@@ -1,9 +1,24 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-05-29 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
-**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **Live steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md)
+**As-of:** 2026-06-01 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)
 
-This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for slice queue; this file wins for cross-chapter summary.
+This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
+
+---
+
+## Active BUILD — none (await SELECTION)
+
+| Field | Value |
+|-------|--------|
+| **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
+| **ADR** | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
+| **Evidence** | [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
+| **Next (blocked)** | MSOS P2 homepage — storyboard v0.6 not in-repo |
+
+**P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
+
+**MVP1 relay:** idle. **Operator:** drop storyboard, then SELECTION for P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 
@@ -31,112 +46,36 @@ flowchart LR
     FF[MVP1 friends-first COMPLETE]
     BI[MVP1 belief-input COMPLETE]
     ON[MVP1 onboarding COMPLETE]
+    P0[MSOS P0 COMPLETE]
   end
   closed2 --> closed3
   closed3 --> steward
+  steward --> P1[MSOS P1 ADR in progress]
 ```
 
 ---
 
-## Archived chapters
+## Archived chapters (summary)
 
 | Chapter | Status | Sprint / evidence |
 |---------|--------|-------------------|
-| Validation | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md), [`VALIDATION_EVIDENCE_STATUS.md`](VALIDATION_EVIDENCE_STATUS.md) |
-| Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md), [`COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md`](COMMERCIAL_VALIDATION_EVIDENCE_STATUS.md) |
-| MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md), [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md) |
-| Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md), [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
-| MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md), [`MVP1_OPERATOR_EVIDENCE_STATUS.md`](MVP1_OPERATOR_EVIDENCE_STATUS.md) |
-| MVP1 memory & review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md), [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) |
-| MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md), [`MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md`](MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md) |
-| MVP1 friends-first screen | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md`](SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md), [`MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md`](MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md) |
-| MVP1 belief-input UX | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_BELIEF_INPUT_UX.md`](SPRINT_MVP1_BELIEF_INPUT_UX.md), [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) |
-| MVP1 onboarding / How it works | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md), [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md) |
+| Validation | **COMPLETE** 2026-05-19 | [`SPRINT_VALIDATION_CHAPTER.md`](SPRINT_VALIDATION_CHAPTER.md) |
+| Commercial Validation | **COMPLETE** 2026-05-19 | [`SPRINT_POST_VALIDATION_COMMERCIAL.md`](SPRINT_POST_VALIDATION_COMMERCIAL.md) |
+| MVP1 Reliability | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) |
+| Phase 2 on `main` | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_PHASE2_ON_MAIN.md`](SPRINT_MVP1_PHASE2_ON_MAIN.md) |
+| MVP1 operator hardening | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_OPERATOR_HARDENING.md`](SPRINT_MVP1_OPERATOR_HARDENING.md) |
+| MVP1 review enrichment | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_REVIEW_ENRICHMENT.md`](SPRINT_MVP1_REVIEW_ENRICHMENT.md) |
+| MVP1 smoke regression | **COMPLETE** 2026-05-19 | [`SPRINT_MVP1_SMOKE_REGRESSION.md`](SPRINT_MVP1_SMOKE_REGRESSION.md) |
+| MVP1 friends-first screen | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md`](SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md) |
+| MVP1 belief-input UX | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_BELIEF_INPUT_UX.md`](SPRINT_MVP1_BELIEF_INPUT_UX.md) |
+| MVP1 onboarding / How it works | **COMPLETE** 2026-05-20 | [`SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md`](SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md) |
+| MVP1 disagreement strip polish | **COMPLETE** 2026-05-26 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md) |
+| Phase 3 commercial wrapper | **COMPLETE** 2026-05-28 | [`SPRINT_PHASE3_COMMERCIAL_WRAPPER.md`](SPRINT_PHASE3_COMMERCIAL_WRAPPER.md) |
+| MVP1 Phase 6 trust metrics v1 | **COMPLETE** 2026-06-01 | [`SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md`](SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md) |
+| MSOS Website Program P0 | **COMPLETE** 2026-06-01 | [`SPRINT_MSOS_WEBSITE_PROGRAM_P0.md`](SPRINT_MSOS_WEBSITE_PROGRAM_P0.md), [`MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md`](MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md) |
+| MSOS P1 stack routing ADR | **COMPLETE** 2026-06-01 | [`SPRINT_MSOS_P1_STACK_ROUTING.md`](SPRINT_MSOS_P1_STACK_ROUTING.md), [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
 
-**Post–onboarding SELECTION outcome:** [`POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md`](POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md) · **Prior SELECTION prep (closed):** [`POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md`](POST_MVP1_ONBOARDING_HOW_IT_WORKS_SELECTION.md)
-
----
-
-## Active BUILD chapter — disagreement / candidate strip polish
-
-| Field | Value |
-|-------|--------|
-| **Chapter** | MVP1 disagreement / candidate strip polish (v0) |
-| **Status** | **IN PROGRESS** (Control-Slice001 **CLOSED** 2026-05-26) |
-| **Sprint** | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md) |
-| **Evidence** | [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
-| **Next slice** | `MVP1-DisagreementStrip-Product-Slice002` (PRODUCT) |
-
-**Chapter-close SELECTION trail (historical):** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
-
-| MVP1 disagreement / candidate strip polish | **COMPLETE** 2026-05-26 | [`SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md`](docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md), [`MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md) |
-
-| Phase 3 commercial wrapper | **COMPLETE** 2026-05-28 | [`SPRINT_PHASE3_COMMERCIAL_WRAPPER.md`](docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md), [`PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md`](docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md) |
-
-| MVP1 Sprint 003 evidence-plane | **COMPLETE** 2026-05-27 | [`SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md`](docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md), [`MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md`](docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md) |
-
-| MVP1 post-Phase3 steering + smoke witness refresh | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md`](docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md), [`MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md`](docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md) |
-
-| MVP1 deploy witness refresh | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md`](docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md), [`MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md) |
-
-| MVP1 Phase 5 review persistence hardening | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md`](docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md), [`MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md`](docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md) |
-
-| MVP1 steering sync evidence | **COMPLETE** 2026-05-28 | [`SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md`](docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md), [`MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md`](docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md) |
-
-| MVP1 Phase 6 trust metrics v1 | **COMPLETE** 2026-05-29 | [`SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md`](docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md), [`MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md`](docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md) |
-
-**Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — CTA + paid-interest remain steward.
-
----
-
-## MVP1 smoke regression — final relay (archived)
-
-| Status | Slice | Plane |
-|--------|--------|-------|
-| **CLOSED** | `MVP1-SmokeRegression-Control-Slice001` | CONTROL |
-| **CLOSED** | `MVP1-SmokeRegression-Harness-Slice002` | PRODUCT |
-| **CLOSED** | `MVP1-SmokeRegression-Witness-Slice003` | CONTROL |
-| **CLOSED** | `MVP1-SmokeRegression-Closeout-Slice004` | CONTROL |
-
-**Dual smoke:** `20260519_232908` + `233106` — **PASS** (~220s total).
-
-**SELECTION:** [`POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md`](POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md) (friends-first chartered)
-
----
-
-## MVP1 review enrichment — final relay (archived)
-
-| Status | Slice | Plane |
-|--------|--------|-------|
-| **CLOSED** | `MVP1-ReviewEnrichment-Control-Slice001` | CONTROL |
-| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice002` | PRODUCT |
-| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice003` | PRODUCT |
-| **CLOSED** | `MVP1-ReviewEnrichment-Product-Slice004` | PRODUCT |
-| **CLOSED** | `MVP1-ReviewEnrichment-Closeout-Slice005` | CONTROL |
-
-**Next SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION.md)
-
----
-
-## MVP1 operator hardening — final relay (archived)
-
-All slices **CLOSED** 2026-05-19.
-
----
-
-## Phase 2 on `main` — final relay (archived)
-
-| Status | Slice | Plane |
-|--------|--------|-------|
-| **CLOSED** | `MVP1-Phase2-Control-Slice001` | CONTROL |
-| **CLOSED** | `MVP1-Phase2-Reconcile-Slice002` | CONTROL |
-| **CLOSED** | `MVP1-Phase2-Product-Slice003` | PRODUCT |
-| **CLOSED** | `MVP1-Phase2-Closeout-Slice004` | CONTROL |
-| **CLOSED** | `MVP1-Phase2-Product-Slice005` | PRODUCT |
-| **CLOSED** | `MVP1-Phase2-Product-Slice006` — trust strip MVP1 disclosure | PRODUCT |
-| **CLOSED** | `MVP1-Phase2-Chapter-Closeout-Slice007` | CONTROL |
-
-**Reconcile:** [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) — directional strip **already_on_main**; no blind recovery merge.
+**Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
 
@@ -144,10 +83,8 @@ All slices **CLOSED** 2026-05-19.
 
 | Gate | Status | Notes |
 |------|--------|-------|
-| `python -m pytest -q` | **PASS** | **247** passed (2026-05-28)|
-| Dual smoke | **PASS** | Onboarding chapter: `20260520_042057` + `20260520_042128` (~127s) — [`MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md`](MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md); prior belief-input: `20260520_024407` + `024438` — [`MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md`](MVP1_BELIEF_INPUT_EVIDENCE_STATUS.md) |
-
-Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
+| `python -m pytest -q` | verify on branch | Run before P1 closeout push |
+| Dual smoke | last PASS on MVP1 chapters | MSOS P1 is docs-only |
 
 ---
 
@@ -155,13 +92,12 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **IN PROGRESS** | Disagreement strip polish — next Product-Slice002; operator **`run_ppe.cmd`** when manifest `READY` |
-| VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | Set `PPE_RESEARCH_OFFER_URL` / `PPE_RESEARCH_OFFER_LABEL` on VPS; `docker compose up -d --build`; mark **PASS** in [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) only after browser confirms CTA |
-| Paid-interest live call | **N** (honest) | Log **Y/N** only after real conversation in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| **Active relay chapter** | **none** | MSOS P1 **COMPLETE**; manifest `COMPLETE` |
+| VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
+| Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| **Storyboard v0.6** | **not in-repo** | Blocks MSOS P2 — operator drops files per [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) |
 
-**Do not** mark CTA **PASS** or paid-interest **Y** without steward verification.
-
-**After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only ([`CONTEXT_RULES.md`](../CONTEXT_RULES.md)).
+**After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
 
 ---
 
@@ -170,14 +106,11 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 | Role | Path |
 |------|------|
 | **This one-pager** | [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) |
-| Live frontier / slice queue | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
-| Session handoff gate | [`HANDOFF.md`](HANDOFF.md) |
-| Post–Phase 2 SELECTION | [`POST_PHASE2_CHAPTER_SELECTION.md`](POST_PHASE2_CHAPTER_SELECTION.md) |
-| Reconcile port/defer matrix | [`PHASE2_RECONCILE_REPORT.md`](PHASE2_RECONCILE_REPORT.md) |
-| Phase 2 evidence clock | [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md) |
+| MVP1 frontier | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
+| MSOS frontier | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
+| MSOS P1 ADR | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
+| Session handoff | [`HANDOFF.md`](HANDOFF.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
-| Risk register | [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md) |
-| Commercial ops + smoke history | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 
 ---
 
@@ -187,10 +120,9 @@ Detail: [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md)
 |--------------|----------|
 | [`src/viz/mvp1_benchmark_substrate.py`](../../src/viz/mvp1_benchmark_substrate.py) | **defer** — recovery-only |
 | Blind [`src/viz/app.py`](../../src/viz/app.py) merge | **defer** |
-| [`tests/test_mvp1_benchmark_substrate.py`](../../tests/test_mvp1_benchmark_substrate.py) | **defer** |
 
 ---
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

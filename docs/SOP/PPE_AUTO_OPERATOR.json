@@ -1,12 +1,21 @@
 {
   "version": 1,
+  "profile": "local",
   "enabled": true,
-  "notes": "Repo-local auto-operator. When enabled, run_ppe_auto.cmd sets env and enables backlog propagation + steward charter when the queue is idle.",
+  "notes": "Default matches local (no API). Use run_ppe_auto_local_loop.cmd or set PPE_OPERATOR_PROFILE=acp for full ACP.",
   "propagateBacklog": true,
-  "stewardCharter": true,
+  "stewardCharter": false,
   "workerMode": "deterministic",
   "skipAcp": true,
   "continuousMax": 20,
   "loopWhenIdle": true,
-  "idleSleepSeconds": 120
+  "idleSleepSeconds": 120,
+  "guards": {
+    "enabled": true,
+    "blockProductUnderGlobalDeterministic": true,
+    "stopOnContextEscalate": true,
+    "stopOnContextWatch": false,
+    "maxPhaseSlices": 6,
+    "skipChapterIfEvidenceComplete": true
+  }
 }

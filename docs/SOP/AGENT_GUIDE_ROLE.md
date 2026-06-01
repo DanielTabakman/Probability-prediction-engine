@@ -5,10 +5,11 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 ## Load order
 
 1. [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) — **generated**; gaps and current chapter
-2. [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) — cross-chapter summary
-3. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) — only if brief reports `steering_aligned: true`
-4. [`VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — product canon when scope questions arise
-5. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
+2. [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) — layer boundaries; match BUILD packet `LAYER_PRESET`
+3. [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) — cross-chapter summary
+4. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) — only if brief reports `steering_aligned: true` for that track
+5. [`VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — product canon when scope questions arise
+6. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
 
 ## Do not use as controlling
 

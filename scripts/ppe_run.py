@@ -217,6 +217,22 @@ def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
                 print("ppe_run: continuous idle (no READY manifest / empty plan)")
                 return 0
 
+        try:
+            from scripts.ppe_operator_config import operator_enabled
+            from scripts.ppe_operator_guards import run_continuous_guards
+
+            if operator_enabled(repo):
+                from scripts.ppe_operator_guards import GUARD_SKIP_CHAPTER
+
+                guard_rc = run_continuous_guards(repo, plan_path)
+                if guard_rc == GUARD_SKIP_CHAPTER:
+                    print("ppe_run: continuous skip chapter (guard)")
+                    continue
+                if guard_rc != 0:
+                    return guard_rc
+        except Exception as exc:
+            print(f"WARN: continuous guards skipped: {exc}")
+
         exit_code = cmd_run_phase(repo, plan_path)
         if exit_code != 0:
             try:

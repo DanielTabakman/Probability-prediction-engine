@@ -1,0 +1,61 @@
+{
+  "name": "MSOS_p1_stack_routing (ADR)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+  "selectionRecord": "docs/SOP/MSOS_FRONTIER.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P1-Control-Slice001",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+      "buildBranch": "build/auto/MSOS-P1-Control-Slice001-msos_p1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P1-Product-Slice002",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+      "buildBranch": "build/auto/MSOS-P1-Product-Slice002-msos_p1",
+      "declaredPlane": "CONTROL-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
+        "docs/SOP/MSOS_FRONTIER.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-P1-Witness-Slice003",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+      "buildBranch": "build/auto/MSOS-P1-Witness-Slice003-msos_p1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P1-Closeout-Slice004",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+      "buildBranch": "build/auto/MSOS-P1-Closeout-Slice004-msos_p1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p1_stack_routing",
+        "chapterTitle": "MSOS P1 stack routing ADR",
+        "chapterStatus": "COMPLETE",
+        "closedDate": "2026-06-01",
+        "evidenceDoc": "docs/SOP/MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
+        ]
+      }
+    }
+  ]
+}

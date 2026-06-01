@@ -118,7 +118,11 @@ Refresh is **maintenance/synchronization**, not a product build.
      - Never write outside `MSOS_REPO_TRUTH_AUTO_START` / `MSOS_REPO_TRUTH_AUTO_END`.
 4. **Do not write PPE Master**
    - If drift is found, report it and escalate to steward decision.
-5. **Confirm the Drive doc shows the new regenerated timestamp**
+5. **Import PPE Master into repo when steward edits canon** (separate step — not part of mirror refresh)
+   - Run `python scripts/google_docs_sync.py --sync-master-to-repo`
+   - Updates `docs/VISION/PPE_MASTER_MVP1.md` from the Google Doc.
+   - **`ppe_google_docs_refresh.py` and closeout mirror refresh do not run this step.** Agents that grep repo canon need master-to-repo after steward edits.
+6. **Confirm the Drive doc shows the new regenerated timestamp**
    - Verify the mirror doc text contains the current “Generated (UTC)” timestamp from the latest run.
 
 ### Report format (required)
