@@ -7,18 +7,18 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 ---
 
-## Active BUILD — none (await SELECTION)
+## Active BUILD — MSOS P2 homepage (manifest READY)
 
 | Field | Value |
 |-------|--------|
+| **Chapter** | `msos_p2_homepage` — [`msos_p2_homepage_relay.json`](PHASE_PLANS/msos_p2_homepage_relay.json) |
+| **Sprint** | [`SPRINT_MSOS_P2_HOMEPAGE.md`](SPRINT_MSOS_P2_HOMEPAGE.md) |
+| **Evidence** | [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md) |
 | **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
-| **ADR** | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
-| **Evidence** | [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
-| **Next (READY)** | MSOS P2 homepage — relay plan READY; run `run_ppe.cmd` for SELECTION |
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle. **Operator:** `run_ppe.cmd` to SELECTION MSOS P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**MVP1 relay:** idle. **Operator:** `run_ppe.cmd` (or `run_ppe_local.cmd`) to execute P2 slices — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 
