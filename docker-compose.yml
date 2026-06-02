@@ -1,4 +1,15 @@
 services:
+  msos_web:
+    build:
+      context: ./apps/msos-web
+      dockerfile: Dockerfile
+    container_name: msos_web
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - web
+
   app_demo:
     build: .
     container_name: ppe_app_demo

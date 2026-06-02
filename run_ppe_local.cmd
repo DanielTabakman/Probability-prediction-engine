@@ -6,6 +6,8 @@ REM Optional: mark_ide_product_ready.cmd <sliceId> [phasePlanPath] before this r
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 set "PPE_OPERATOR_PROFILE=local"
+set "PPE_SKIP_ACP=1"
+set "PPE_WORKER_MODE=deterministic"
 
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1

@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — MSOS P1 stack routing **COMPLETE** 2026-06-01
+- **Active BUILD chapter:** **MSOS P2 homepage** — Product-Slice002 **shipped** (Next.js); relay finishing via `run_ppe_local.cmd`
 - **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
 - **Evidence:** [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md)
 - **Next:** **MSOS P2 homepage** — **queued** + relay **READY** in [`PHASE_QUEUE.json`](PHASE_QUEUE.json) — run `run_ppe.cmd` for SELECTION ([`POST_MSOS_P2_HOMEPAGE_SELECTION.md`](POST_MSOS_P2_HOMEPAGE_SELECTION.md))
