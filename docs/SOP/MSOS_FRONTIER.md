@@ -15,7 +15,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Active BUILD chapter:** **none** — MSOS P1 stack routing **COMPLETE** 2026-06-01
 - **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
 - **Evidence:** [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md)
-- **Next:** **MSOS P2 homepage** — **blocked** until storyboard v0.6 in-repo ([`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md))
+- **Next:** **MSOS P2 homepage** — **queued** (storyboard v0.6 in-repo 2026-06-02; gate **OPEN** — [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md); await SELECTION + relay plan)
 
 ### MSOS Website Program — relay queue
 
@@ -45,7 +45,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | Priority | chapterId | Backlog status | Blocker |
 |----------|-----------|----------------|---------|
 | P1 | `msos_p1_stack_routing` | **done** | — |
-| P2 | `msos_p2_homepage` | **blocked** | Storyboard v0.6 not in-repo |
+| P2 | `msos_p2_homepage` | **queued** | Storyboard v0.6 in-repo; await SELECTION + plan |
 | P3 | `msos_p3_command_center` | **blocked** | After P2 |
 | P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE via Caddy proxy (ADR) |
 | P5 | `msos_p5_thesis_confirm` | **blocked** | After P4 |

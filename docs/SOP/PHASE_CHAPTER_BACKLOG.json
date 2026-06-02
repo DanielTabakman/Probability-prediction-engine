@@ -48,9 +48,9 @@
     },
     {
       "chapterId": "msos_p2_homepage",
-      "status": "blocked",
+      "status": "queued",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P2",
-      "reason": "Design system + public homepage \u2014 blocked: storyboard v0.6 not in-repo"
+      "reason": "Design system + public homepage \u2014 storyboard v0.6 in-repo; await relay plan for SELECTION"
     },
     {
       "chapterId": "msos_p3_command_center",
