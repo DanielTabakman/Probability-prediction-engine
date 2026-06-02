@@ -45,7 +45,16 @@ def test_active_manifest_after_post_phase3_closeout() -> None:
     steering = "docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json"
     msos_p0_plan = "docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json"
     msos_p1_plan = "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json"
-    assert manifest.get("phasePlanPath") in ("", PLAN_REL, phase5, steering, msos_p0_plan, msos_p1_plan)
+    msos_p2_plan = "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json"
+    assert manifest.get("phasePlanPath") in (
+        "",
+        PLAN_REL,
+        phase5,
+        steering,
+        msos_p0_plan,
+        msos_p1_plan,
+        msos_p2_plan,
+    )
     assert manifest["status"] in ("COMPLETE", "READY", "RUNNING")
     sprint = manifest.get("sprintSpecPath") or ""
     assert sprint in (
@@ -56,6 +65,7 @@ def test_active_manifest_after_post_phase3_closeout() -> None:
         "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md",
         "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md",
         "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md",
+        "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
     )
     selection = manifest.get("selectionRecord") or ""
     assert selection in (
@@ -64,9 +74,10 @@ def test_active_manifest_after_post_phase3_closeout() -> None:
         "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
         "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
         "docs/SOP/MVP1_FRONTIER.md",
-        "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-    )
+            "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
+            "docs/SOP/MSOS_FRONTIER.md",
+            "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
+        )
 
 
 def test_phase_queue_post_phase3_done_or_ready() -> None:

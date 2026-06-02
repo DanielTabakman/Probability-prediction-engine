@@ -100,7 +100,7 @@ def test_backlog_p1_done_p2_queued_with_plan() -> None:
     by_id = {item["chapterId"]: item for item in backlog["items"]}
     assert by_id["msos_p1_stack_routing"]["status"] in ("queued", "chartered", "done")
     p2 = by_id["msos_p2_homepage"]
-    assert p2["status"] == "queued"
+    assert p2["status"] in ("queued", "chartered")
     assert p2["planPath"] == P2_PLAN_REL
     assert by_id["msos_p8_tester_release"]["status"] == "blocked"
 
