@@ -82,11 +82,12 @@ def test_phase_queue_msos_p0_ready_or_done() -> None:
         assert "selectionPrep" in row
 
 
-def test_phase_queue_msos_p2_ready() -> None:
+def test_phase_queue_msos_p2_ready_or_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == P2_PLAN_REL)
-    assert row["status"] == "READY"
-    assert row["selectionPrep"] == "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md"
+    assert row["status"] in ("READY", "DONE")
+    if row["status"] == "READY":
+        assert row["selectionPrep"] == "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md"
 
 
 def test_storyboard_gate_open() -> None:
@@ -100,7 +101,7 @@ def test_backlog_p1_done_p2_queued_with_plan() -> None:
     by_id = {item["chapterId"]: item for item in backlog["items"]}
     assert by_id["msos_p1_stack_routing"]["status"] in ("queued", "chartered", "done")
     p2 = by_id["msos_p2_homepage"]
-    assert p2["status"] in ("queued", "chartered")
+    assert p2["status"] in ("queued", "chartered", "done")
     assert p2["planPath"] == P2_PLAN_REL
     assert by_id["msos_p8_tester_release"]["status"] == "blocked"
 

@@ -82,9 +82,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Design system + public homepage \u2014 storyboard gate OPEN; relay plan ready for SELECTION",
-      "selectionPrep": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
+      "doneReason": "MSOS P2 closeout manual finish"
     }
   ]
 }

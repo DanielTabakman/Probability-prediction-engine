@@ -12,12 +12,22 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P2 homepage** — Product-Slice002 **shipped** (Next.js); relay **RUNNING** ([`ACTIVE_PHASE_MANIFEST.json`](ACTIVE_PHASE_MANIFEST.json))
-- **ADR:** [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
-- **Evidence:** [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md)
-- **Next:** **MSOS P2 homepage** — **queued** + relay **READY** in [`PHASE_QUEUE.json`](PHASE_QUEUE.json) — run `run_ppe.cmd` for SELECTION ([`POST_MSOS_P2_HOMEPAGE_SELECTION.md`](POST_MSOS_P2_HOMEPAGE_SELECTION.md))
+- **Active BUILD chapter:** **none** — await steward **SELECTION** (P3 Command Center **blocked** until chartered)
+- **Last closed:** **MSOS P2 design system + public homepage** — **COMPLETE** 2026-06-02
+- **Evidence:** [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md)
+- **Deliverable:** [`apps/msos-web/`](../../apps/msos-web/) Next.js public homepage
 
-### MSOS Website Program — relay queue
+### MSOS P2 homepage — relay queue — **COMPLETE** (2026-06-02)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P2-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P2-Product-Slice002` — Next.js homepage | PRODUCT |
+| **CLOSED** | `MSOS-P2-Platform-Slice003` — Docker/Caddy wiring | EVIDENCE |
+| **CLOSED** | `MSOS-P2-Witness-Slice004` — witness | EVIDENCE |
+| **CLOSED** | `MSOS-P2-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Evidence:** [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md)
 
 ### MSOS Website Program P0 — relay queue — **COMPLETE** (2026-06-01)
 
@@ -45,8 +55,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | Priority | chapterId | Backlog status | Blocker |
 |----------|-----------|----------------|---------|
 | P1 | `msos_p1_stack_routing` | **done** | — |
-| P2 | `msos_p2_homepage` | **queued** | Relay plan ready; PHASE_QUEUE **READY** — `run_ppe.cmd` |
-| P3 | `msos_p3_command_center` | **blocked** | After P2 |
+| P2 | `msos_p2_homepage` | **done** | — |
+| P3 | `msos_p3_command_center` | **blocked** | After P2 — next SELECTION candidate |
 | P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE via Caddy proxy (ADR) |
 | P5 | `msos_p5_thesis_confirm` | **blocked** | After P4 |
 | P6 | `msos_p6_expression_sim` | **blocked** | After P5 |
