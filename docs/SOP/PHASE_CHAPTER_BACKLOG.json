@@ -48,9 +48,11 @@
     },
     {
       "chapterId": "msos_p2_homepage",
-      "status": "blocked",
+      "status": "queued",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P2",
-      "reason": "Design system + public homepage \u2014 blocked: storyboard v0.6 not in-repo"
+      "reason": "Design system + public homepage \u2014 storyboard gate OPEN; relay plan ready for SELECTION"
     },
     {
       "chapterId": "msos_p3_command_center",

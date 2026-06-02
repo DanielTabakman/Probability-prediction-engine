@@ -43,7 +43,7 @@ Approved direction: **Market Structure OS Website Storyboard v0.6**. P0 and P1 d
 
 ### P2 — Design system + public MSOS homepage
 
-**Reference:** Storyboard homepage. **Blocked** until storyboard in-repo + P1 ADR.  
+**Reference:** Storyboard homepage ([`storyboard-v0.6/`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md)). **Ready for SELECTION** (gate OPEN, relay plan installed 2026-06-02).  
 **Outcome:** Investor/customer-facing public entry (Read → State → Fit → Learn; honest BTC/PPE preview).
 
 ### P3 — Authenticated shell + Command Center

@@ -1,0 +1,79 @@
+{
+  "name": "MSOS_p2_homepage (design system + public homepage)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P2-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+      "buildBranch": "build/auto/MSOS-P2-Control-Slice001-msos_p2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P2-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+      "buildBranch": "build/auto/MSOS-P2-Product-Slice002-msos_p2",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/",
+        "docs/SOP/MSOS_FRONTIER.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-P2-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+      "buildBranch": "build/auto/MSOS-P2-Platform-Slice003-msos_p2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "docs/DEPLOY/"
+      ]
+    },
+    {
+      "sliceId": "MSOS-P2-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+      "buildBranch": "build/auto/MSOS-P2-Witness-Slice004-msos_p2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P2-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+      "buildBranch": "build/auto/MSOS-P2-Closeout-Slice005-msos_p2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p2_homepage",
+        "chapterTitle": "MSOS P2 design system + public homepage",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
+        ]
+      }
+    }
+  ]
+}

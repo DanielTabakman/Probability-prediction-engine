@@ -71,9 +71,9 @@ P2 (design system + public homepage) may be SELECTION'd only when **all** are tr
 1. This ADR merged on `main`.
 2. **Market Structure OS Website Storyboard v0.6** assets in-repo under [`docs/VISION/MSOS/storyboard-v0.6/`](../VISION/MSOS_STORYBOARD_GATE.md).
 3. [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) updated to **OPEN** with file manifest.
-4. [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) row `msos_p2_homepage` moved from `blocked` → `queued` at steward SELECTION.
+4. [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) row `msos_p2_homepage` moved from `blocked` → `queued` with relay plan.
 
-P2 remains **blocked** until storyboard gate is satisfied (operator action).
+**Status (2026-06-02):** Criteria 2–4 satisfied; P2 **READY** for relay SELECTION ([`POST_MSOS_P2_HOMEPAGE_SELECTION.md`](POST_MSOS_P2_HOMEPAGE_SELECTION.md)).
 
 ---
 

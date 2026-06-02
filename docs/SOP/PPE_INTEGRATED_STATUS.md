@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-01 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-02 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -14,11 +14,11 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
 | **ADR** | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | **Evidence** | [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
-| **Next (blocked)** | MSOS P2 homepage — storyboard v0.6 not in-repo |
+| **Next (READY)** | MSOS P2 homepage — relay plan READY; run `run_ppe.cmd` for SELECTION |
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle. **Operator:** drop storyboard, then SELECTION for P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**MVP1 relay:** idle. **Operator:** `run_ppe.cmd` to SELECTION MSOS P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 
@@ -95,7 +95,7 @@ flowchart LR
 | **Active relay chapter** | **none** | MSOS P1 **COMPLETE**; manifest `COMPLETE` |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
-| **Storyboard v0.6** | **not in-repo** | Blocks MSOS P2 — operator drops files per [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) |
+| **Storyboard v0.6** | **in-repo** | [`storyboard-v0.6/MANIFEST.md`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md); gate OPEN — MSOS P2 queued |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
 
