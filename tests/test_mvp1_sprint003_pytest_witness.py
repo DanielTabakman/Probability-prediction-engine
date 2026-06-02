@@ -7,7 +7,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Recorded at Witness-Slice003 BUILD (main + 2 witness tests in this module).
+# Recorded at Witness-Slice003 BUILD (main + MSOS P2 charter witness tests).
 WITNESS_PYTEST_COUNT = 282
 
 
