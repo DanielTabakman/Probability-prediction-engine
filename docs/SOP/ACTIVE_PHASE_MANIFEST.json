@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
   "selectionRecord": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Design system + public homepage \u2014 storyboard gate OPEN; relay plan ready for SELECTION"
+  "status": "COMPLETE",
+  "notes": "MSOS P2 Product-Slice002 IDE BUILD complete; finishing relay via run_ppe_local MSOS P2 homepage chapter COMPLETE 2026-06-02"
 }

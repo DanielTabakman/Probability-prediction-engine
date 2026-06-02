@@ -36,7 +36,7 @@
 			}
 		}
 		handle {
-			reverse_proxy app_demo:8501 {
+			reverse_proxy msos_web:3000 {
 				header_up X-Forwarded-Proto {forwarded_proto}
 				header_up X-Forwarded-Host {http.request.host}
 			}
@@ -60,7 +60,7 @@
 			}
 		}
 		handle {
-			reverse_proxy app_demo:8501 {
+			reverse_proxy msos_web:3000 {
 				header_up X-Forwarded-Proto {forwarded_proto}
 				header_up X-Forwarded-Host {http.request.host}
 			}
