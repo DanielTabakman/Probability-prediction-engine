@@ -34,7 +34,7 @@ Before **P2 — Design system + public MSOS homepage** or any user-facing visual
 
 1. ~~Operator drops storyboard files under `docs/VISION/MSOS/storyboard-v0.6/`.~~ **Done**
 2. ~~Update this file: set gate **OPEN**, list files, date.~~ **Done**
-3. **Next:** Steward SELECTION — `msos_p2_homepage` is `queued` in [`PHASE_CHAPTER_BACKLOG.json`](../SOP/PHASE_CHAPTER_BACKLOG.json); add relay plan / scaffold before `run_ppe.cmd` auto-select.
+3. **Next:** Operator **`run_ppe.cmd`** (or steward SELECTION) — [`msos_p2_homepage_relay.json`](../SOP/PHASE_PLANS/msos_p2_homepage_relay.json) is **READY** in [`PHASE_QUEUE.json`](../SOP/PHASE_QUEUE.json).
 
 ## Screenshot witness (ongoing)
 

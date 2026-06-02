@@ -14,11 +14,11 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
 | **ADR** | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | **Evidence** | [`MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md`](MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md) |
-| **Next (queued)** | MSOS P2 homepage — storyboard v0.6 in-repo ([`storyboard-v0.6/`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md)); gate OPEN; await SELECTION |
+| **Next (READY)** | MSOS P2 homepage — relay plan READY; run `run_ppe.cmd` for SELECTION |
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle. **Operator:** SELECTION for MSOS P2 when ready (`run_ppe.cmd` after relay plan) — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**MVP1 relay:** idle. **Operator:** `run_ppe.cmd` to SELECTION MSOS P2 — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 

@@ -79,6 +79,12 @@
       "reason": "Stack / routing ADR without rewriting PPE",
       "selectionPrep": "docs/SOP/MSOS_FRONTIER.md",
       "doneReason": "MSOS P1 chapter COMPLETE 2026-06-01"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json",
+      "status": "READY",
+      "reason": "Design system + public homepage \u2014 storyboard gate OPEN",
+      "selectionPrep": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md"
     }
   ]
 }
