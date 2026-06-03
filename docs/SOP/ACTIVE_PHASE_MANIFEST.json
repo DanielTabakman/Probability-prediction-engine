@@ -1,7 +1,7 @@
-{
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "MSOS P2 Product-Slice002 IDE BUILD complete; finishing relay via run_ppe_local MSOS P2 homepage chapter COMPLETE 2026-06-02"
-}
+{
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
+  "status": "READY",
+  "notes": "Steward SELECTION 2026-06-03: MSOS P3 Command Center after P2 COMPLETE"
+}

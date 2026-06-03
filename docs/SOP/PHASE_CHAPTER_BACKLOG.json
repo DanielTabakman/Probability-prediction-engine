@@ -56,9 +56,11 @@
     },
     {
       "chapterId": "msos_p3_command_center",
-      "status": "blocked",
+      "status": "queued",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P3",
-      "reason": "Authenticated shell + Command Center \u2014 blocked: after P1 + P2"
+      "reason": "Authenticated shell + Command Center \u2014 SELECTION 2026-06-03 after P2 COMPLETE"
     },
     {
       "chapterId": "msos_p4_strategy_lab",
