@@ -89,4 +89,6 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 |----------|-----------|---------------------------|
 | P0 | `msos_website_program_p0` | `PHASE_PLANS/msos_website_program_p0_relay.json` |
 | P1 | `msos_p1_stack_routing` | `PHASE_PLANS/msos_p1_stack_routing_relay.json` |
-| P2–P8 | `msos_p2_homepage` … `msos_p8_tester_release` | Chartered at SELECTION; **blocked** in backlog until unblocked |
+| P2 | `msos_p2_homepage` | `PHASE_PLANS/msos_p2_homepage_relay.json` |
+| P3 | `msos_p3_command_center` | `PHASE_PLANS/msos_p3_command_center_relay.json` |
+| P4–P8 | `msos_p4_strategy_lab` … `msos_p8_tester_release` | Chartered at SELECTION; **blocked** in backlog until unblocked |
