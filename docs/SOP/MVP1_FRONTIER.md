@@ -211,7 +211,7 @@ This placement is repo-grounded; it is allowed to contradict legacy “phase com
   - Non-pending review rollups + operator hint line: [`src/viz/reviewed_class_summary.py`](src/viz/reviewed_class_summary.py), [`src/viz/app.py`](src/viz/app.py).
 
 #### Next validation (product surface)
-- Regression: dual smoke [`scripts/run_mvp1_dual_implied_lab_smoke.py`](scripts/run_mvp1_dual_implied_lab_smoke.py) after major implied-lab changes; full `pytest` before merge when touching shared modules ([`README.md`](../../README.md) steward backlog).
+- Regression tiers: [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md) — default **`python scripts/run_implied_lab_ui_smoke.py`** (scenario A) for viz slices; **dual smoke** [`scripts/run_mvp1_dual_implied_lab_smoke.py`](scripts/run_mvp1_dual_implied_lab_smoke.py) only for harness-wide / dual-chrome changes; WIP **`python scripts/run_pushable_gate.py`**, pre-push **`--pre-push`** (full pytest).
 - Manual: freeze → review (non-pending) → open **Class summary — reviewed snapshots** and confirm counts move off zero.
 
 #### Phase 5 optional follow-ons

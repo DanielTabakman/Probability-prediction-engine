@@ -33,8 +33,7 @@
 
 - **`run_pushable_gate.py`** — tier 0/1/2 classification for local pushable gate.
 - **`ppe_queue.py`**, **`ppe_run.py`**, **`ppe_auto_select.py`**, **`post_relay_continue.py`** — queue `DONE` + manifest finalize; continuous `run_ppe.cmd`.
-- **`tests/test_run_pushable_gate.py`**, **`tests/test_ppe_auto_select.py`**, **`tests/test_mvp1_sprint003_pytest_witness.py`** — tier, auto-select, and pytest witness coverage.
-- **`tests/test_mvp1_sprint003_closeout_witness.py`** — closeout witness tests.
+- **`tests/test_run_pushable_gate.py`**, **`tests/test_ppe_auto_select.py`**, **`tests/test_program_charter_invariants.py`** — tier, auto-select, and consolidated charter witness coverage.
 
 **Shipped evidence commits:** `bfddedf` (Control), **`3d4b311`** (Evidence-Slice002), witness + closeout via PRs **#54** / closeout merge.
 

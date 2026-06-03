@@ -84,10 +84,15 @@ flowchart LR
 
 ## Engineering gates
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| `python -m pytest -q` | verify on branch | Run before P1 closeout push |
-| Dual smoke | last PASS on MVP1 chapters | MSOS P1 is docs-only |
+See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
+
+| Gate | When | Notes |
+|------|------|-------|
+| `python scripts/run_pushable_gate.py` | WIP commit | Scoped or fast pytest |
+| `python scripts/run_pushable_gate.py --pre-push` | Before push | Full pytest (matches CI) |
+| `python scripts/run_implied_lab_ui_smoke.py` | Viz PR merge | Scenario A default |
+| Dual smoke | Harness-wide viz only | Optional; not every PR |
+| CI `pytest` + `docker_entrypoint` | Merge to `main` | Required checks |
 
 ---
 
