@@ -48,7 +48,9 @@ python scripts/ppe_propagate_queue.py --repo-root . --apply
 2. Set `planPath` to an existing phase plan **or** `scaffold: true` + `chapterTitle` / `workerMode`.
 3. Run `run_ppe.cmd --continuous` — propagation runs automatically when idle.
 
-Mark **`blocked`** when canon is not ready (example: Phase 6 trust metrics).
+Mark **`blocked`** when the chapter must not start yet (e.g. waits on prior MSOS phase). Rows with **`planPath`** are **auto-promoted to `queued`** when every earlier backlog row is `done` or `skipped` — triggered from `post_relay_continue` after chapter closeout and from `maybe_propagate_queue` when idle.
+
+Mark **`blocked`** without `planPath` when canon is not ready (steward must add a relay plan before promotion can run).
 
 ## Related
 

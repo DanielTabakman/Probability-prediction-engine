@@ -47,7 +47,7 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Operator:** finish P3 slices — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md); then `run_ppe.cmd --continuous` for P4 propagation.
+2. **Operator:** `run_ppe_auto_local_loop.cmd` — control slices automatic; on PRODUCT_BLOCKED → IDE BUILD → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd`. P4–P8 auto-queue after each closeout.
 3. **Commercial (parallel):** [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) on live demo/app — not blocked on MSOS P8.
 
 

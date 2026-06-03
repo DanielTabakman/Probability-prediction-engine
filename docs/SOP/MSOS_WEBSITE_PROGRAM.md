@@ -92,5 +92,10 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | P1 | `msos_p1_stack_routing` | `PHASE_PLANS/msos_p1_stack_routing_relay.json` |
 | P2 | `msos_p2_homepage` | `PHASE_PLANS/msos_p2_homepage_relay.json` |
 | P3 | `msos_p3_command_center` | `PHASE_PLANS/msos_p3_command_center_relay.json` |
-| P4 | `msos_p4_strategy_lab` | `PHASE_PLANS/msos_p4_strategy_lab_relay.json` (pre-chartered; **blocked** until P3 done) |
-| P5–P8 | `msos_p5_thesis_confirm` … `msos_p8_tester_release` | Charter at SELECTION; **blocked** in backlog |
+| P4 | `msos_p4_strategy_lab` | `PHASE_PLANS/msos_p4_strategy_lab_relay.json` |
+| P5 | `msos_p5_thesis_confirm` | `PHASE_PLANS/msos_p5_thesis_confirm_relay.json` |
+| P6 | `msos_p6_expression_sim` | `PHASE_PLANS/msos_p6_expression_sim_relay.json` |
+| P7 | `msos_p7_monitoring` | `PHASE_PLANS/msos_p7_monitoring_relay.json` |
+| P8 | `msos_p8_tester_release` | `PHASE_PLANS/msos_p8_tester_release_relay.json` |
+
+Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

@@ -12,9 +12,9 @@
 
 | # | Change | Owner | Status |
 |---|--------|-------|--------|
-| 1.1 | Run **`run_ppe.cmd --continuous`** (or `run_ppe_auto_local.cmd`) after each MSOS chapter closeout so the next `queued` row propagates without idle days | Operator | **Do** |
-| 1.2 | **Pre-charter P4–P8** before each prior chapter closes: add relay + sprint + SELECTION + evidence per chapter | Steward | **P4 done** 2026-06-03; **P5–P8 Todo** |
-| 1.3 | For each pre-chartered chapter: add `SPRINT_MSOS_P4_*.md`, `POST_MSOS_P4_*_SELECTION.md`, `MSOS_P4_*_EVIDENCE_STATUS.md`, and set backlog `planPath` + `status: queued` when predecessor is **done** (per [`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)) | Steward | **Todo** |
+| 1.1 | Use **`run_ppe_auto_local_loop.cmd`** (continuous local profile) — promotes next `blocked`→`queued` after closeout | Operator | **Wired** (`promote_first_blocked_with_plan`) |
+| 1.2 | **Pre-charter P4–P8** relay + sprint + SELECTION + evidence | Steward | **Done** 2026-06-03 |
+| 1.3 | Backlog `planPath` on P4–P8; status stays **blocked** until prior chapter **done** — promotion is automatic | Repo | **Done** |
 | 1.4 | Keep **`PHASE_CHAPTER_BACKLOG.json`** in sync when flipping `blocked` → `queued` → `done` (do not hand-edit manifest `phasePlanPath` after closeout — use `post_relay_continue`) | Agents | **Ongoing** |
 | 1.5 | Optional steward **SELECTION record**: approve a **vertical demo** chapter (see §6) if investor walkthrough must land before P5 persistence | Steward | **Decision pending** |
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Ordered chapter backlog for deterministic queue propagation (PPE_QUEUE_PROPAGATION_V1). First status=queued row with a valid planPath (or scaffold=true) is appended to PHASE_SELECTION_ROADMAP as pending when idle. blocked rows need steward direction before auto-charter.",
+  "notes": "Ordered chapter backlog (PPE_QUEUE_PROPAGATION_V1). First status=queued row with valid planPath propagates when idle. blocked rows with planPath auto-promote to queued after prior chapters are done (post_relay_continue + maybe_propagate_queue).",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -73,26 +73,34 @@
     {
       "chapterId": "msos_p5_thesis_confirm",
       "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P5",
-      "reason": "Thesis confirmation + durable state \u2014 blocked: after P4"
+      "reason": "Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE"
     },
     {
       "chapterId": "msos_p6_expression_sim",
       "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P6",
-      "reason": "Expression planning + simulation only \u2014 blocked: after P5"
+      "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE"
     },
     {
       "chapterId": "msos_p7_monitoring",
       "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P7",
-      "reason": "Monitoring, history, calibration loop \u2014 blocked: after P6"
+      "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE"
     },
     {
       "chapterId": "msos_p8_tester_release",
       "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P8",
-      "reason": "Tester release + evidence-based next selection \u2014 blocked: after P7"
+      "reason": "Tester release + evidence-based next selection \u2014 pre-chartered; blocked until P7 COMPLETE"
     }
   ]
 }

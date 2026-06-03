@@ -1,0 +1,63 @@
+{
+  "name": "MSOS_p8_tester_release (tester release + next selection)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P8-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+      "buildBranch": "build/auto/MSOS-P8-Control-Slice001-msos_p8",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P8-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+      "buildBranch": "build/auto/MSOS-P8-Product-Slice002-msos_p8",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": ["apps/msos-web/", "docs/SOP/MSOS_FRONTIER.md"]
+    },
+    {
+      "sliceId": "MSOS-P8-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+      "buildBranch": "build/auto/MSOS-P8-Witness-Slice004-msos_p8",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": ["docs/SOP/VALIDATION_REALITY_CHECKS.md"]
+    },
+    {
+      "sliceId": "MSOS-P8-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+      "buildBranch": "build/auto/MSOS-P8-Closeout-Slice005-msos_p8",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p8_tester_release",
+        "chapterTitle": "MSOS P8 tester release + evidence-based next selection",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/VALIDATION_REALITY_CHECKS.md",
+          "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md"
+        ]
+      }
+    }
+  ]
+}

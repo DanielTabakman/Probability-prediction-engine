@@ -73,11 +73,11 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P1 | `msos_p1_stack_routing` | **done** | — |
 | P2 | `msos_p2_homepage` | **done** | — |
 | P3 | `msos_p3_command_center` | **queued / READY** | SELECTION 2026-06-03 — relay running |
-| P4 | `msos_p4_strategy_lab` | **blocked** (plan pre-chartered) | After P3; [`msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json) |
-| P5 | `msos_p5_thesis_confirm` | **blocked** | After P4 |
-| P6 | `msos_p6_expression_sim` | **blocked** | After P5 |
-| P7 | `msos_p7_monitoring` | **blocked** | After P6 |
-| P8 | `msos_p8_tester_release` | **blocked** | After P7 |
+| P4 | `msos_p4_strategy_lab` | **blocked** (pre-chartered) | Auto-**queued** after P3 closeout |
+| P5 | `msos_p5_thesis_confirm` | **blocked** (pre-chartered) | After P4 |
+| P6 | `msos_p6_expression_sim` | **blocked** (pre-chartered) | After P5 |
+| P7 | `msos_p7_monitoring` | **blocked** (pre-chartered) | After P6 |
+| P8 | `msos_p8_tester_release` | **blocked** (pre-chartered) | After P7 |
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
 

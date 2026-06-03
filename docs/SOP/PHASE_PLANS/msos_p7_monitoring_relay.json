@@ -1,0 +1,59 @@
+{
+  "name": "MSOS_p7_monitoring (monitoring, history, calibration loop)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P7-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+      "buildBranch": "build/auto/MSOS-P7-Control-Slice001-msos_p7",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P7-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+      "buildBranch": "build/auto/MSOS-P7-Product-Slice002-msos_p7",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 180,
+      "hardMinutes": 480,
+      "maxAttempts": 2,
+      "touchSet": ["apps/msos-web/", "docs/SOP/MSOS_FRONTIER.md"]
+    },
+    {
+      "sliceId": "MSOS-P7-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+      "buildBranch": "build/auto/MSOS-P7-Witness-Slice004-msos_p7",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P7-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+      "buildBranch": "build/auto/MSOS-P7-Closeout-Slice005-msos_p7",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p7_monitoring",
+        "chapterTitle": "MSOS P7 monitoring, history, calibration loop",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_P7_MONITORING_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": ["docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"]
+      }
+    }
+  ]
+}

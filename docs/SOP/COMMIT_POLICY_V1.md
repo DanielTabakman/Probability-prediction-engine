@@ -8,17 +8,27 @@ Purpose: remove “should we commit?” and “which tests?” ambiguity for hum
 - **Single-plane per execution step** still applies (see `OPERATING_RULES.md`).
 - Prefer **small, reviewable commits** over one huge dump.
 
-## Test gates (canonical — 2026-05-19)
+## Test gates (canonical — 2026-06-03)
 
-### Every pushable commit (code or mixed docs+code)
+See **[`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md)** for fast vs full vs smoke tiers.
 
-Run from repo root before `git commit` / `git push`:
+### WIP commit (code or mixed docs+code)
+
+Run from repo root before `git commit`:
 
 ```bash
 python scripts/run_pushable_gate.py
 ```
 
-Before **`git push`**, you may use **`python scripts/run_pushable_gate.py --pre-push`** to tier-check only commits ahead of the branch upstream. The default runner also unions **`upstream..HEAD`** when the branch is ahead of remote (fixes “tier 0 / no changes” after merging `main` when diff vs `origin/main` is empty).
+Runs ruff + **fast pytest** (`-m "not witness and not slow"`). Changed-file tiering unchanged (docs-only = tier 0).
+
+### Before `git push` (required)
+
+```bash
+python scripts/run_pushable_gate.py --pre-push
+```
+
+Runs ruff + **full pytest** on commits ahead of upstream — matches **`CI / pytest`**. The default runner also unions **`upstream..HEAD`** when classifying branch diffs (fixes tier 0 after merging `main` when diff vs `origin/main` is empty).
 
 Equivalent full product check:
 
@@ -27,7 +37,7 @@ python -m ruff check src tests scripts
 python -m pytest -q
 ```
 
-This matches the **`CI / pytest`** job (ruff + full pytest). The full **CI** workflow on GitHub also runs **`CI / docker_entrypoint`**; both must pass before merge when using merge-on-green or required checks. Do not use “targeted pytest only” for commits intended to be shared.
+The full **CI** workflow on GitHub also runs **`CI / docker_entrypoint`**; both must pass before merge when using merge-on-green or required checks.
 
 After **`git merge origin/main`** / rebase on a feature branch: gate, then **push** without asking — see [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc).
 
@@ -42,7 +52,8 @@ When the diff touches **only** paths under `docs/` (and no `src/`, `tests/`, `sc
 
 When a PR or slice changes `src/viz/**` or `scripts/*smoke*` / `implied_lab_ui_smoke_harness.py`:
 
-- Run **`python scripts/run_mvp1_dual_implied_lab_smoke.py`** once before opening or merging the PR.
+- Default: **`python scripts/run_implied_lab_ui_smoke.py`** (scenario A only).
+- Dual pass (**`python scripts/run_mvp1_dual_implied_lab_smoke.py`**) only when harness-wide or dual MVP1/full-lab chrome changed — see [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 - Record pass/fail and manifest run IDs in PR text or slice evidence.
 - **Not** a commit gate (live-data flaky); **not** in CI yet.
 
@@ -77,6 +88,7 @@ When a PR or slice changes `src/viz/**` or `scripts/*smoke*` / `implied_lab_ui_s
 - Branch/worktree isolation: `FRONTIER_STEWARD_PROTOCOL.md`
 - Execution steps + planes: `OPERATING_RULES.md`
 - Relay gates: `CODEX_AUTONOMY_V1.md`, `RELAY_RUNTIME_V0.md`
+- Test tiers (fast / full / smoke): `TESTING_TIERS_V1.md`
 - Auto-merge / CI: `GITHUB_ZERO_TOUCH_MERGE.md`
 
 ## Cursor user rules (global)

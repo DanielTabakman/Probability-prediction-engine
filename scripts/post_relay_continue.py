@@ -144,6 +144,20 @@ def main(argv: list[str] | None = None) -> int:
         if remaining:
             print(f"post_relay_continue: queue health {len(remaining)} issue(s): {remaining}")
         try:
+            from scripts.ppe_propagate_queue import (
+                maybe_propagate_queue,
+                promote_first_blocked_with_plan,
+                sync_backlog_from_roadmap,
+            )
+
+            sync_backlog_from_roadmap(repo, apply=True)
+            prom = promote_first_blocked_with_plan(repo, apply=True)
+            print(f"post_relay_continue: backlog promote {json.dumps(prom)}")
+            prop = maybe_propagate_queue(repo, apply=True)
+            print(f"post_relay_continue: backlog propagate {json.dumps(prop)}")
+        except Exception as exc:
+            print(f"post_relay_continue: backlog promote/propagate skipped: {exc}")
+        try:
             from scripts.ppe_roadmap import maybe_advance_roadmap_and_select
 
             road = maybe_advance_roadmap_and_select(
