@@ -21,6 +21,7 @@ def _operator_json(**guards: object) -> str:
         {
             "enabled": True,
             "guards": {"enabled": True, **guards},
+            "workflowEfficiency": {"enabled": True, "trackMetrics": True, "autoGenerateIdeStarter": True},
         }
     )
 
@@ -37,11 +38,35 @@ class TestPpeOperatorGuards(unittest.TestCase):
             _operator_json(blockProductUnderGlobalDeterministic=True),
             encoding="utf-8",
         )
+        (sop / "REPO_LAYER_PATH_PREFIXES.json").write_text(
+            json.dumps(
+                {
+                    "presets": {
+                        "MSOS_UI": {
+                            "layer": "msos-shell",
+                            "allowed_paths": ["apps/msos-web/"],
+                            "forbidden_paths": ["src/"],
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        (sop / "AGENT_CONTINUITY_BRIEF.md").write_text("# brief\n", encoding="utf-8")
+        (sop / "SPRINT_TEST.md").write_text(
+            "## intent\n\n## Slice map\n\n| Ch-Product-Slice002 | PRODUCT | MSOS_UI | x |\n",
+            encoding="utf-8",
+        )
         plan = {
             "sprintSpecPath": "docs/SOP/SPRINT_TEST.md",
             "slices": [
                 {"sliceId": "Ch-Control-Slice001"},
-                {"sliceId": "Ch-Product-Slice002"},
+                {
+                    "sliceId": "Ch-Product-Slice002",
+                    "declaredPlane": "PRODUCT-PLANE",
+                    "layerPreset": "MSOS_UI",
+                    "buildBranch": "build/auto/Ch-Product-Slice002",
+                },
                 {"sliceId": "Ch-Closeout-Slice003", "closeout": True},
             ],
         }
@@ -58,8 +83,9 @@ class TestPpeOperatorGuards(unittest.TestCase):
         self.assertEqual(rc, GUARD_EXIT)
         report = self.repo / "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md"
         self.assertTrue(report.is_file())
-        self.assertIn("PRODUCT_BLOCKED", report.read_text(encoding="utf-8"))
-        self.assertIn("IDE_BUILD_STARTER", report.read_text(encoding="utf-8"))
+        text = report.read_text(encoding="utf-8")
+        self.assertIn("PRODUCT_BLOCKED", text)
+        self.assertIn("IDE_BUILD_STARTER", text)
 
     @patch("scripts.ppe_ide_product_ready.marker_covers_product_slices", return_value=True)
     def test_product_plan_ok_with_marker(self, *_m: object) -> None:

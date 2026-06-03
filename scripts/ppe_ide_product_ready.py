@@ -241,6 +241,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"ERROR: {msg}", file=sys.stderr)
             return rc
         print(f"ppe_ide_product_ready: {msg}")
+        try:
+            from scripts.ppe_workflow_loop_hooks import on_product_marked
+
+            on_product_marked(repo, slice_id=args.slice_id.strip(), plan_path=plan)
+        except Exception as exc:
+            print(f"WARN: workflow loop hooks skipped: {exc}")
         return 0
 
     ap.print_help()

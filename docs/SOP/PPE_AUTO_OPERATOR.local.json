@@ -17,5 +17,12 @@
     "stopOnContextWatch": false,
     "maxPhaseSlices": 6,
     "skipChapterIfEvidenceComplete": true
+  },
+  "workflowEfficiency": {
+    "enabled": true,
+    "trackMetrics": true,
+    "autoGenerateIdeStarter": true,
+    "autoPreflight": false,
+    "printSummaryOnChapterComplete": false
   }
 }

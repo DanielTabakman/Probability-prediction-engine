@@ -168,6 +168,17 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     if report_path.is_file():
         ritual = "Open a NEW Cursor thread; load only docs/SOP/AGENT_CONTINUITY_BRIEF.md"
         print(f"ppe_run: {ritual}")
+
+    if exit_code == 0:
+        try:
+            manifest = load_manifest(repo)
+            if str(manifest.get("status") or "").strip().upper() == "COMPLETE":
+                from scripts.ppe_workflow_loop_hooks import on_chapter_complete
+
+                on_chapter_complete(repo, plan_path=plan_path)
+        except Exception as exc:
+            print(f"WARN: workflow loop hooks skipped: {exc}")
+
     return exit_code
 
 
@@ -249,6 +260,13 @@ def cmd_continuous(repo: Path, *, max_chapters: int = 20) -> int:
         if str(manifest.get("status") or "").strip().upper() != "COMPLETE":
             print("ppe_run: continuous stop (phase ended without COMPLETE manifest)")
             return exit_code
+
+        try:
+            from scripts.ppe_workflow_loop_hooks import on_chapter_complete
+
+            on_chapter_complete(repo, plan_path=plan_path)
+        except Exception as exc:
+            print(f"WARN: workflow loop hooks skipped: {exc}")
 
     print(f"ppe_run: continuous stop (reached max chapters {max_chapters})")
     return 0

@@ -22,14 +22,14 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## When the loop stops (product)
 
-- [ ] Read `artifacts/orchestrator/OPERATOR_GUARD_REPORT.md` or `LAST_RUN_REPORT.md`.
-- [ ] `generate_ide_build_starter.cmd <sliceId> <phasePlanPath>`
+- [ ] Read `artifacts/orchestrator/OPERATOR_GUARD_REPORT.md` — **IDE BUILD starter is auto-generated** (see Resume section).
 - [ ] **New** Cursor Agent thread — `@` `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md` only.
 - [ ] Implement product slice; **commit** on plan `buildBranch`.
-- [ ] `mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`
-- [ ] `run_ppe_local.cmd`
-- [ ] Optional: `workflow_metrics.cmd slice close --slice-id <sliceId> --size M --roundtrips N`
+- [ ] `mark_ide_product_ready.cmd <sliceId> [phasePlanPath]` — auto-logs product slice metrics.
+- [ ] `run_ppe_local.cmd` — chapter close auto-logged on success.
 - [ ] Loop continues on next pass (or restart loop).
+
+Optional review: `workflow_metrics.cmd summary --days 7`
 
 ---
 

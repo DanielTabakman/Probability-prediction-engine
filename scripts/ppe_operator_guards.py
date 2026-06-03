@@ -70,6 +70,7 @@ def write_guard_report(
     detail: str,
     plan_path: str,
     resume: str | None = None,
+    extra_resume: str | None = None,
 ) -> Path:
     out = repo / GUARD_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -78,6 +79,8 @@ def write_guard_report(
         "commit on `buildBranch`, run `mark_ide_product_ready.cmd`, then `run_ppe_local.cmd`.\n"
         "2. **Otherwise:** fix the issue, then `run_ppe.cmd` or `run_ppe_auto_local.cmd`."
     )
+    if extra_resume:
+        resume_block = f"{resume_block.rstrip()}\n\n{extra_resume.strip()}"
     body = f"""# Operator guard stop
 
 **As-of:** {_utc_now()}
@@ -96,8 +99,37 @@ def write_guard_report(
     return out
 
 
-def _guard_stop(repo: Path, *, reason: str, detail: str, plan_path: str, resume: str | None = None) -> int:
-    report = write_guard_report(repo, reason=reason, detail=detail, plan_path=plan_path, resume=resume)
+def _guard_stop(
+    repo: Path,
+    *,
+    reason: str,
+    detail: str,
+    plan_path: str,
+    resume: str | None = None,
+    slice_id: str | None = None,
+) -> int:
+    extra_resume = ""
+    try:
+        from scripts.ppe_workflow_loop_hooks import on_guard_stop
+
+        extra_resume = on_guard_stop(
+            repo,
+            reason=reason,
+            plan_path=plan_path,
+            detail=detail,
+            slice_id=slice_id,
+        )
+    except Exception as exc:
+        print(f"WARN: workflow loop hooks skipped: {exc}")
+
+    report = write_guard_report(
+        repo,
+        reason=reason,
+        detail=detail,
+        plan_path=plan_path,
+        resume=resume,
+        extra_resume=extra_resume or None,
+    )
     print(f"ppe_operator_guards: stop ({GUARD_EXIT}) — {detail}")
     print(f"ppe_operator_guards: report={report}")
     return GUARD_EXIT
@@ -202,4 +234,11 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
         "IDE BUILD, commit, then `mark_ide_product_ready.cmd <sliceId>`, then `run_ppe_local.cmd`."
     )
     resume = format_ide_build_resume(primary_slice, norm_plan)
-    return _guard_stop(repo, reason="PRODUCT_BLOCKED", detail=detail, plan_path=norm_plan, resume=resume)
+    return _guard_stop(
+        repo,
+        reason="PRODUCT_BLOCKED",
+        detail=detail,
+        plan_path=norm_plan,
+        resume=resume,
+        slice_id=primary_slice,
+    )

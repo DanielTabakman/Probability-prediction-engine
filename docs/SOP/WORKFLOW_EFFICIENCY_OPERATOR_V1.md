@@ -24,24 +24,26 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 ---
 
-## Product guard stop
+## Daily (local profile)
 
-When `PRODUCT_BLOCKED` or loop exit 7:
+1. `run_ppe_auto_local_loop.cmd` — **auto-starts** a metrics session and logs loop events.
+2. Metrics data: `artifacts/workflow_metrics/` (gitignored).
+
+---
+
+## Product guard stop (automatic)
+
+When the loop hits `PRODUCT_BLOCKED` (exit 7):
+
+1. **IDE BUILD starter is auto-generated** under `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md`.
+2. Guard event logged to `artifacts/workflow_metrics/events.jsonl`.
+3. Open **new** Cursor Agent thread → `@` the starter file.
+4. After BUILD → `mark_ide_product_ready.cmd` (logs product slice close) → `run_ppe_local.cmd`.
+
+Manual regen if needed:
 
 ```bat
 generate_ide_build_starter.cmd <sliceId> <phasePlanPath>
-```
-
-1. Open **new** Cursor Agent thread.
-2. `@` `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md` only.
-3. Implement → commit on plan `buildBranch`.
-4. `mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`
-5. `run_ppe_local.cmd`
-
-Optional before BUILD:
-
-```bat
-python scripts/ppe_context_preflight.py --phase-plan <phasePlanPath> --slice-id <sliceId>
 ```
 
 ---

@@ -8,6 +8,8 @@ REM Exit 7: guard stop (PRODUCT_BLOCKED, CONTEXT_ESCALATE, TOO_MANY_SLICES, etc.
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
+python "%CD%\scripts\ppe_workflow_loop_hooks.py" --repo-root "%CD%" --loop-start
+
 set "SLEEP=120"
 for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scripts.ppe_operator_config import idle_sleep_seconds; print(idle_sleep_seconds(Path('.')))"`) do set "SLEEP=%%s"
 

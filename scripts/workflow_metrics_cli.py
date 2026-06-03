@@ -13,6 +13,7 @@ from typing import Any
 METRICS_DIR = "artifacts/workflow_metrics"
 SESSIONS_FILE = "sessions.jsonl"
 SLICES_FILE = "slices.jsonl"
+EVENTS_FILE = "events.jsonl"
 
 SIZE_WEIGHTS = {"S": 1, "M": 2, "L": 3, "XL": 5}
 
@@ -69,6 +70,49 @@ def cmd_session_start(repo: Path, *, notes: str = "") -> int:
     _append_jsonl(_metrics_dir(repo) / SESSIONS_FILE, row)
     print(f"workflow_metrics: session_start id={session_id}")
     return 0
+
+
+def open_session(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    return _open_session(rows)
+
+
+def ensure_session_started(repo: Path, *, notes: str = "") -> str | None:
+    """Start a metrics session when none is open; return session_id."""
+    path = _metrics_dir(repo) / SESSIONS_FILE
+    existing = _open_session(_read_jsonl(path))
+    if existing:
+        sid = str(existing.get("session_id") or "")
+        return sid or None
+    cmd_session_start(repo, notes=notes or "auto loop")
+    started = _open_session(_read_jsonl(path))
+    if started:
+        return str(started.get("session_id") or "") or None
+    return None
+
+
+def log_event(
+    repo: Path,
+    event_type: str,
+    *,
+    session_id: str | None = None,
+    slice_id: str | None = None,
+    note: str = "",
+    value_1: str | None = None,
+    value_2: str | None = None,
+) -> None:
+    if not session_id:
+        session_id = ensure_session_started(repo, notes="auto loop")
+    row = {
+        "event_id": str(uuid.uuid4()),
+        "timestamp": _utc_now(),
+        "event_type": event_type,
+        "session_id": session_id,
+        "slice_id": slice_id,
+        "value_1": value_1,
+        "value_2": value_2,
+        "note": note,
+    }
+    _append_jsonl(_metrics_dir(repo) / EVENTS_FILE, row)
 
 
 def _open_session(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
