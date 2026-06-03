@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
-from scripts.run_pushable_gate import GatePlan, _classify
+from scripts.run_pushable_gate import GatePlan, _classify, _union_paths, resolve_changed_files
 
 
 class TestRunPushableGateTiers(unittest.TestCase):
@@ -28,6 +29,27 @@ class TestRunPushableGateTiers(unittest.TestCase):
         plan = _classify([])
         self.assertEqual(plan.tier, 0)
         self.assertIsInstance(plan, GatePlan)
+
+    def test_union_paths_dedupes_and_preserves_order(self) -> None:
+        merged = _union_paths(
+            ["docs/SOP/HANDOFF.md"],
+            ["docs/SOP/HANDOFF.md", "src/viz/app.py"],
+        )
+        self.assertEqual(merged, ["docs/SOP/HANDOFF.md", "src/viz/app.py"])
+
+    def test_classify_union_with_src_is_tier2(self) -> None:
+        """Simulates main...HEAD empty but upstream..HEAD touches src/."""
+        plan = _classify(_union_paths([], ["apps/msos-web/page.tsx", "src/foo.py"]))
+        self.assertEqual(plan.tier, 2)
+
+
+class TestResolveChangedFiles(unittest.TestCase):
+    def test_pre_push_requires_upstream(self) -> None:
+        from unittest.mock import patch
+
+        with patch("scripts.run_pushable_gate._upstream_ref", return_value=None):
+            with self.assertRaises(ValueError):
+                resolve_changed_files(Path("."), pre_push=True)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,10 @@
-# Paste into Cursor Settings → User Rules
+# Git rules for Cursor agents
 
-Copy the block under **“Git commits (Probability Prediction Engine)”** below into Cursor:
+**Installed in repo:** [`.cursor/rules/ppe-git-commits.mdc`](rules/ppe-git-commits.mdc) (`alwaysApply: true`).
 
-1. Open **Cursor Settings** (gear) → **Cursor Settings** (or **General**).
-2. Open **Rules** (or **Rules for AI**).
-3. Under **User rules** (global), paste the block — or add a **project** rule pointing at this file if your Cursor version supports `@file` includes.
+**Optional global copy:** `%USERPROFILE%\.cursor\rules\ppe-probability-engine-git.mdc` (user-level rule file).
 
-This stops global “commit only when asked” from blocking this repo’s standing authorization in [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc).
+To paste into **Cursor Settings → User Rules** manually, use the block below. This stops global “commit only when asked” from blocking [`.cursor/rules/auto-commit.mdc`](rules/auto-commit.mdc).
 
 ---
 
@@ -14,11 +12,13 @@ This stops global “commit only when asked” from blocking this repo’s stand
 
 For the **Probability Prediction Engine** workspace, follow `.cursor/rules/auto-commit.mdc` and `docs/SOP/COMMIT_POLICY_V1.md`. Do **not** ask “may I commit?” when authorized work is complete.
 
-After the **pushable gate** passes (`python -m ruff check src tests scripts` and `python -m pytest -q`, or docs-only exception per `COMMIT_POLICY_V1.md`), automatically:
+After **`python scripts/run_pushable_gate.py`** passes (or docs-only exception per `COMMIT_POLICY_V1.md`), automatically:
 
 1. Run `git status`, `git diff`, and `git log -1 --oneline` (summarize for the user).
 2. **Commit** on the current branch with a policy-style message (slice/chapter + plane + intent).
 3. On a **feature branch**: **push** (`git push -u origin HEAD` if no upstream), then **open a PR to `main`** if none exists (see `docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md`).
+
+After **merge/rebase `origin/main`** on a feature branch: run the gate, then **push** — do not stop at “merge succeeded” or wait for the user to ask.
 
 **Never** commit: `.env`, credentials, `artifacts/`, caches, local DBs, or other generated noise listed in `auto-commit.mdc`. **Never** force-push or `git commit --amend` unless the user explicitly asks. On **`main`**, use PR-only delivery when branch protection applies.
 
