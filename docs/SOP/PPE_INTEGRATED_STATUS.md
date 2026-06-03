@@ -1,24 +1,25 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-02 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
-**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)
+**As-of:** 2026-06-03 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
 
 ---
 
-## Active BUILD — MSOS P2 homepage (manifest READY)
+## Active BUILD — MSOS P3 Command Center (manifest RUNNING)
 
 | Field | Value |
 |-------|--------|
-| **Chapter** | `msos_p2_homepage` — [`msos_p2_homepage_relay.json`](PHASE_PLANS/msos_p2_homepage_relay.json) |
-| **Sprint** | [`SPRINT_MSOS_P2_HOMEPAGE.md`](SPRINT_MSOS_P2_HOMEPAGE.md) |
-| **Evidence** | [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md) |
-| **Last closed** | MSOS P1 stack / routing ADR — **COMPLETE** 2026-06-01 |
+| **Chapter** | `msos_p3_command_center` — [`msos_p3_command_center_relay.json`](PHASE_PLANS/msos_p3_command_center_relay.json) |
+| **Sprint** | [`SPRINT_MSOS_P3_COMMAND_CENTER.md`](SPRINT_MSOS_P3_COMMAND_CENTER.md) |
+| **Evidence** | [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md) |
+| **Last closed** | MSOS P2 homepage — **COMPLETE** 2026-06-03 |
+| **Next queued (pre-chartered)** | P4 [`msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json) — **blocked** until P3 closeout |
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle. **Operator:** `run_ppe.cmd` (or `run_ppe_local.cmd`) to execute P2 slices — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**MVP1 relay:** idle. **Operator:** `run_ppe_local.cmd` / `run_ppe.cmd` — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md). **Commercial outreach** parallel per acceleration checklist (not gated on P8).
 
 ---
 
@@ -94,10 +95,10 @@ flowchart LR
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **none** | MSOS P1 **COMPLETE**; manifest `COMPLETE` |
+| **Active relay chapter** | **MSOS P3** | manifest `RUNNING`; P4 plan pre-chartered |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
-| **Storyboard v0.6** | **in-repo** | [`storyboard-v0.6/MANIFEST.md`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md); gate OPEN — MSOS P2 queued |
+| **Storyboard v0.6** | **in-repo** | gate OPEN — MSOS P3 BUILD; P4 relay pre-chartered |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
 
@@ -110,6 +111,7 @@ flowchart LR
 | **This one-pager** | [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) |
 | MVP1 frontier | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
 | MSOS frontier | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
+| MSOS acceleration | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) |
 | MSOS P1 ADR | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | Session handoff | [`HANDOFF.md`](HANDOFF.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
@@ -127,4 +129,4 @@ flowchart LR
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Execute MSOS P3** — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md). After closeout: propagate P4 (`run_ppe.cmd --continuous`). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

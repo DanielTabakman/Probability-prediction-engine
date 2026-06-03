@@ -56,7 +56,7 @@
     },
     {
       "chapterId": "msos_p3_command_center",
-      "status": "queued",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P3",
@@ -65,8 +65,10 @@
     {
       "chapterId": "msos_p4_strategy_lab",
       "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P4",
-      "reason": "Strategy Lab / PPE integration \u2014 blocked: after P3; PPE adapter boundary TBD"
+      "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE"
     },
     {
       "chapterId": "msos_p5_thesis_confirm",

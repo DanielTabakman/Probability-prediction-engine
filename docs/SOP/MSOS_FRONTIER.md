@@ -5,6 +5,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Control rule (hard)
 
 - **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) (waterfall queue, top section) + [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md)
+- **Acceleration playbook:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
 - **This file** is the only live frontier for MSOS website/platform BUILD.
 - **MVP1 engine relay** (Streamlit implied lab, freeze/review loop): [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) — idle unless a new MVP1 chapter is SELECTION'd.
 - **On conflict (MSOS UI vs PPE math):** non-widening rule wins; MVP1 contracts unchanged.
@@ -72,7 +73,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P1 | `msos_p1_stack_routing` | **done** | — |
 | P2 | `msos_p2_homepage` | **done** | — |
 | P3 | `msos_p3_command_center` | **queued / READY** | SELECTION 2026-06-03 — relay running |
-| P4 | `msos_p4_strategy_lab` | **blocked** | After P3; PPE via Caddy proxy (ADR) |
+| P4 | `msos_p4_strategy_lab` | **blocked** (plan pre-chartered) | After P3; [`msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json) |
 | P5 | `msos_p5_thesis_confirm` | **blocked** | After P4 |
 | P6 | `msos_p6_expression_sim` | **blocked** | After P5 |
 | P7 | `msos_p7_monitoring` | **blocked** | After P6 |

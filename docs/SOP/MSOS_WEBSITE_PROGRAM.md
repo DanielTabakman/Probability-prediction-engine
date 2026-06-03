@@ -2,6 +2,7 @@
 
 **Canon source:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) (top section, imported 2026-06-01)  
 **Live steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)  
+**Acceleration checklist:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)  
 **Storyboard gate (P2+):** [`docs/VISION/MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)
 
 Portable agent canon for the MSOS customer-facing website/platform program. PPE engine math and MVP1 evidence contracts remain unchanged unless a dedicated SELECTION chapter says otherwise.
@@ -91,4 +92,5 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | P1 | `msos_p1_stack_routing` | `PHASE_PLANS/msos_p1_stack_routing_relay.json` |
 | P2 | `msos_p2_homepage` | `PHASE_PLANS/msos_p2_homepage_relay.json` |
 | P3 | `msos_p3_command_center` | `PHASE_PLANS/msos_p3_command_center_relay.json` |
-| P4–P8 | `msos_p4_strategy_lab` … `msos_p8_tester_release` | Chartered at SELECTION; **blocked** in backlog until unblocked |
+| P4 | `msos_p4_strategy_lab` | `PHASE_PLANS/msos_p4_strategy_lab_relay.json` (pre-chartered; **blocked** until P3 done) |
+| P5–P8 | `msos_p5_thesis_confirm` … `msos_p8_tester_release` | Charter at SELECTION; **blocked** in backlog |

@@ -1,7 +1,7 @@
-{
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
-  "status": "READY",
-  "notes": "Steward SELECTION 2026-06-03: MSOS P3 Command Center after P2 COMPLETE"
-}
+{
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
+  "status": "RUNNING",
+  "notes": "Steward SELECTION 2026-06-03: MSOS P3 Command Center after P2 COMPLETE"
+}
