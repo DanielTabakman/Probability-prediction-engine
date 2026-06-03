@@ -1,12 +1,10 @@
-# Paste into Cursor Settings → User Rules
+# Git rules for Cursor agents
 
-Copy the block under **“Git commits (Probability Prediction Engine)”** below into Cursor:
+**Installed in repo:** [`.cursor/rules/ppe-git-commits.mdc`](rules/ppe-git-commits.mdc) (`alwaysApply: true`).
 
-1. Open **Cursor Settings** (gear) → **Cursor Settings** (or **General**).
-2. Open **Rules** (or **Rules for AI**).
-3. Under **User rules** (global), paste the block — or add a **project** rule pointing at this file if your Cursor version supports `@file` includes.
+**Optional global copy:** `%USERPROFILE%\.cursor\rules\ppe-probability-engine-git.mdc` (user-level rule file).
 
-This stops global “commit only when asked” from blocking this repo’s standing authorization in [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc).
+To paste into **Cursor Settings → User Rules** manually, use the block below. This stops global “commit only when asked” from blocking [`.cursor/rules/auto-commit.mdc`](rules/auto-commit.mdc).
 
 ---
 
