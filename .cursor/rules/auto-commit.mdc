@@ -72,7 +72,7 @@ Authoritative detail: [docs/SOP/COMMIT_POLICY_V1.md](../../docs/SOP/COMMIT_POLIC
 python scripts/run_pushable_gate.py
 ```
 
-Runs ruff + fast pytest (`-m "not witness and not slow"`).
+Runs ruff + scoped pytest (when diff maps) or fast markers (`-m "not witness and not slow"`). Parallel via `-n auto` unless `PPE_PYTEST_PARALLEL=0`.
 
 ### Before push (full gate — required)
 
