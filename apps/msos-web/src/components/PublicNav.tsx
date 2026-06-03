@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function PublicNav() {
   return (
     <nav className="public-nav">
@@ -15,7 +17,9 @@ export function PublicNav() {
         <span>Vision</span>
         <div className="nav-actions">
           <span className="btn slim dark">Sign in</span>
-          <span className="btn slim primary">Enter Command Center</span>
+          <Link className="btn slim primary" href="/command-center">
+            Enter Command Center
+          </Link>
         </div>
       </div>
     </nav>
