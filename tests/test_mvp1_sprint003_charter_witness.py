@@ -40,6 +40,7 @@ def test_active_manifest_after_sprint003_closeout() -> None:
     msos_p0_plan = "docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json"
     msos_p1_plan = "docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json"
     msos_p2_plan = "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json"
+    msos_p3_plan = "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json"
     assert manifest.get("phasePlanPath") in (
         "",
         PLAN_REL,
@@ -49,6 +50,7 @@ def test_active_manifest_after_sprint003_closeout() -> None:
         msos_p0_plan,
         msos_p1_plan,
         msos_p2_plan,
+        msos_p3_plan,
     )
     assert manifest["status"] in ("COMPLETE", "RUNNING", "READY")
     if manifest["status"] == "RUNNING" and manifest.get("phasePlanPath") == PLAN_REL:
