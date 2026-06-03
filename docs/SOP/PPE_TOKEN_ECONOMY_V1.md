@@ -27,11 +27,19 @@ Do **not** disable `skipAcp` on the local profile to “fix” product slices �
 
 ## Product lane (explicit)
 
+Generate starter before IDE BUILD (local profile):
+
+```bat
+generate_ide_build_starter.cmd <sliceId> <phasePlanPath>
+```
+
 After IDE BUILD and commit:
 
 ```bat
 run_ppe_local.cmd
 ```
+
+Optional metrics (~30s): [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
 
 Optional one-shot API product slice (when credits exist): `run_product_slice.cmd <sliceId>` — see runbook if present in repo.
 
@@ -49,3 +57,4 @@ Optional one-shot API product slice (when credits exist): `run_product_slice.cmd
 
 - [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)
+- [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)

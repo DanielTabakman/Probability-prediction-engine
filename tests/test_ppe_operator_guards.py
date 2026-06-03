@@ -59,6 +59,7 @@ class TestPpeOperatorGuards(unittest.TestCase):
         report = self.repo / "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md"
         self.assertTrue(report.is_file())
         self.assertIn("PRODUCT_BLOCKED", report.read_text(encoding="utf-8"))
+        self.assertIn("IDE_BUILD_STARTER", report.read_text(encoding="utf-8"))
 
     @patch("scripts.ppe_ide_product_ready.marker_covers_product_slices", return_value=True)
     def test_product_plan_ok_with_marker(self, *_m: object) -> None:
