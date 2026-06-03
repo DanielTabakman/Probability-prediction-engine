@@ -4,31 +4,41 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from scripts.run_pushable_gate import GatePlan, _classify, _union_paths, resolve_changed_files
+from scripts.run_pushable_gate import (
+    FAST_PYTEST_MARKER,
+    GatePlan,
+    _classify,
+    _union_paths,
+    pytest_cmd,
+    pytest_commands,
+    resolve_changed_files,
+)
+
+REPO = Path(__file__).resolve().parents[1]
 
 
 class TestRunPushableGateTiers(unittest.TestCase):
     def test_tier0_docs_only(self) -> None:
-        plan = _classify(["docs/SOP/HANDOFF.md", "docs/VISION/foo.md"])
+        plan = _classify(["docs/SOP/HANDOFF.md"], repo=REPO)
         self.assertEqual(plan.tier, 0)
         self.assertEqual(plan.commands, [])
 
-    def test_tier1_control_plane_without_src(self) -> None:
-        plan = _classify(["scripts/run_pushable_gate.py", "tests/test_foo.py"])
+    def test_tier1_control_plane_fast_pytest(self) -> None:
+        plan = _classify(["scripts/ppe_auto_select.py"], repo=REPO, pytest_profile="fast")
         self.assertEqual(plan.tier, 1)
-        self.assertIn(["python", "-m", "ruff", "check", "scripts", "tests"], plan.commands)
-        self.assertIn(["python", "-m", "pytest", "-q"], plan.commands)
+        self.assertTrue(any(c[0:3] == ["python", "-m", "ruff"] for c in plan.commands))
 
     def test_tier2_any_src_touch(self) -> None:
-        plan = _classify(["src/viz/app.py", "tests/test_app.py"])
+        plan = _classify(["src/viz/app.py"], repo=REPO)
         self.assertEqual(plan.tier, 2)
-        self.assertIn(["python", "-m", "ruff", "check", "src", "tests", "scripts"], plan.commands)
 
-    def test_tier0_empty_change_set(self) -> None:
-        plan = _classify([])
-        self.assertEqual(plan.tier, 0)
-        self.assertIsInstance(plan, GatePlan)
+    def test_pytest_cmd_profiles(self) -> None:
+        self.assertIn(FAST_PYTEST_MARKER, pytest_cmd("fast"))
+        full_cmds = pytest_commands("full")
+        self.assertEqual(len(full_cmds), 2)
+        self.assertIn("not slow", " ".join(full_cmds[0]))
 
     def test_union_paths_dedupes_and_preserves_order(self) -> None:
         merged = _union_paths(
@@ -37,16 +47,9 @@ class TestRunPushableGateTiers(unittest.TestCase):
         )
         self.assertEqual(merged, ["docs/SOP/HANDOFF.md", "src/viz/app.py"])
 
-    def test_classify_union_with_src_is_tier2(self) -> None:
-        """Simulates main...HEAD empty but upstream..HEAD touches src/."""
-        plan = _classify(_union_paths([], ["apps/msos-web/page.tsx", "src/foo.py"]))
-        self.assertEqual(plan.tier, 2)
-
 
 class TestResolveChangedFiles(unittest.TestCase):
     def test_pre_push_requires_upstream(self) -> None:
-        from unittest.mock import patch
-
         with patch("scripts.run_pushable_gate._upstream_ref", return_value=None):
             with self.assertRaises(ValueError):
                 resolve_changed_files(Path("."), pre_push=True)

@@ -1,19 +1,6 @@
 """Tiered pushable gate for PPE commits.
 
-Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md). Classifies changed
-paths and runs:
-
-- **Tier 0** — docs-only under ``docs/``: no ruff/pytest (exit 0).
-- **Tier 1** — control plane (``scripts/``, ``tests/``, config, ``.cursor/``; no ``src/``):
-  ``ruff check scripts tests`` + full ``pytest -q``.
-- **Tier 2** — product (any ``src/`` touch): ``ruff check src tests scripts`` + full ``pytest -q``.
-
-By default, changed files are the union of ``{base_ref}...HEAD`` (branch vs main) and
-``{upstream}..HEAD`` when the branch is ahead of its upstream — so a merge that
-aligns with ``main`` but is not yet pushed still runs the correct tier.
-
-Use ``--pre-push`` to classify only ``upstream..HEAD`` (commits not on the remote branch).
-Use ``--tier N`` to force a tier for local debugging.
+Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md, docs/SOP/TESTING_TIERS_V1.md).
 """
 
 from __future__ import annotations
@@ -25,12 +12,48 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+PytestProfile = str  # "fast" | "full" | "scoped"
+
+FAST_PYTEST_MARKER = "not witness and not slow"
+
 
 @dataclass(frozen=True)
 class GatePlan:
     tier: int
     reason: str
     commands: list[list[str]]
+
+
+def _parallel_enabled() -> bool:
+    return os.environ.get("PPE_PYTEST_PARALLEL", "1").strip().lower() not in ("0", "false", "no")
+
+
+def _parallel_args() -> list[str]:
+    return ["-n", "auto"] if _parallel_enabled() else []
+
+
+def pytest_commands(
+    profile: PytestProfile,
+    *,
+    scoped_tests: list[str] | None = None,
+) -> list[list[str]]:
+    """Return one or more pytest command lines for the given profile."""
+    if profile == "full":
+        parallel = _parallel_args()
+        return [
+            ["python", "-m", "pytest", "-q", *parallel, "-m", "not slow"],
+            ["python", "-m", "pytest", "-q", "-m", "slow"],
+        ]
+
+    cmd = ["python", "-m", "pytest", "-q", *_parallel_args(), "-m", FAST_PYTEST_MARKER]
+    if profile == "scoped" and scoped_tests:
+        cmd.extend(scoped_tests)
+    return [cmd]
+
+
+def pytest_cmd(profile: PytestProfile, *, scoped_tests: list[str] | None = None) -> list[str]:
+    """First pytest command (backward compat for unit tests)."""
+    return pytest_commands(profile, scoped_tests=scoped_tests)[0]
 
 
 def _run(cmd: list[str], *, cwd: Path) -> int:
@@ -128,7 +151,38 @@ def resolve_changed_files(
     return _union_paths(*groups), " + ".join(labels)
 
 
-def _classify(files: list[str]) -> GatePlan:
+def _ruff_for_tier(tier: int) -> list[str]:
+    if tier == 1:
+        return [["python", "-m", "ruff", "check", "scripts", "tests"]]
+    return [["python", "-m", "ruff", "check", "src", "tests", "scripts"]]
+
+
+def _resolve_pytest_profile(
+    *,
+    pytest_profile: PytestProfile,
+    files: list[str],
+    repo: Path,
+    force_scoped: bool,
+) -> tuple[PytestProfile, list[str] | None, str]:
+    if pytest_profile == "full":
+        return "full", None, "full"
+
+    from scripts.gate_pytest_scope import resolve_scoped_tests
+
+    scoped = resolve_scoped_tests(files, repo)
+    if scoped and (force_scoped or pytest_profile == "fast"):
+        return "scoped", scoped, f"scoped ({len(scoped)} files)"
+
+    return "fast", None, "fast (markers)"
+
+
+def _classify(
+    files: list[str],
+    *,
+    repo: Path,
+    pytest_profile: PytestProfile = "fast",
+    force_scoped: bool = False,
+) -> GatePlan:
     if not files:
         return GatePlan(tier=0, reason="no changes", commands=[])
 
@@ -138,31 +192,39 @@ def _classify(files: list[str]) -> GatePlan:
     def all_under(prefix: str) -> bool:
         return all(f.replace("\\", "/").startswith(prefix) for f in files)
 
-    # Tier 0 — docs only
     if all_under("docs/"):
         return GatePlan(tier=0, reason="docs-only changes", commands=[])
 
-    # Tier 2 — product (any src/)
-    if under("src/"):
-        return GatePlan(
-            tier=2,
-            reason="src/ touched (product tier)",
-            commands=[
-                ["python", "-m", "ruff", "check", "src", "tests", "scripts"],
-                ["python", "-m", "pytest", "-q"],
-            ],
-        )
+    tier = 2 if under("src/") else 1
+    reason = "src/ touched (product tier)" if tier == 2 else "no src/ touched (control-plane tier)"
 
-    # Tier 1 — control plane (scripts/, tests/, config, .cursor, etc.)
-    # Conservative default: run full pytest to avoid missing coverage.
-    return GatePlan(
-        tier=1,
-        reason="no src/ touched (control-plane tier)",
-        commands=[
-            ["python", "-m", "ruff", "check", "scripts", "tests"],
-            ["python", "-m", "pytest", "-q"],
-        ],
+    profile, scoped_tests, profile_label = _resolve_pytest_profile(
+        pytest_profile=pytest_profile,
+        files=files,
+        repo=repo,
+        force_scoped=force_scoped,
     )
+    commands = _ruff_for_tier(tier) + pytest_commands(profile, scoped_tests=scoped_tests)
+    return GatePlan(tier=tier, reason=f"{reason}; pytest={profile_label}", commands=commands)
+
+
+def _tier_commands(
+    tier: int,
+    *,
+    repo: Path,
+    pytest_profile: PytestProfile,
+    files: list[str],
+    force_scoped: bool,
+) -> list[list[str]]:
+    if tier == 0:
+        return []
+    profile, scoped_tests, _ = _resolve_pytest_profile(
+        pytest_profile=pytest_profile,
+        files=files,
+        repo=repo,
+        force_scoped=force_scoped,
+    )
+    return _ruff_for_tier(tier) + pytest_commands(profile, scoped_tests=scoped_tests)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -172,7 +234,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--pre-push",
         action="store_true",
-        help="Classify only commits ahead of upstream (two-dot upstream..HEAD)",
+        help="Classify upstream..HEAD only and run full pytest (required before git push)",
+    )
+    ap.add_argument(
+        "--full",
+        action="store_true",
+        help="Run full pytest suite (same as CI pytest job)",
+    )
+    ap.add_argument(
+        "--scoped",
+        action="store_true",
+        help="Force path-scoped pytest when mapping exists (default auto on fast WIP)",
     )
     ap.add_argument(
         "--no-auto-upstream",
@@ -189,6 +261,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+
+    pytest_profile: PytestProfile = "full" if args.pre_push or args.full else "fast"
+
     try:
         files, source = resolve_changed_files(
             repo,
@@ -203,31 +280,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {e}", file=sys.stderr)
         return 2
 
-    plan = _classify(files)
+    plan = _classify(
+        files,
+        repo=repo,
+        pytest_profile=pytest_profile,
+        force_scoped=args.scoped,
+    )
     if args.tier is not None:
-        forced = args.tier
-        if forced == 0:
-            plan = GatePlan(tier=0, reason="forced tier 0", commands=[])
-        elif forced == 1:
-            plan = GatePlan(
-                tier=1,
-                reason="forced tier 1",
-                commands=[
-                    ["python", "-m", "ruff", "check", "scripts", "tests"],
-                    ["python", "-m", "pytest", "-q"],
-                ],
-            )
-        else:
-            plan = GatePlan(
-                tier=2,
-                reason="forced tier 2",
-                commands=[
-                    ["python", "-m", "ruff", "check", "src", "tests", "scripts"],
-                    ["python", "-m", "pytest", "-q"],
-                ],
-            )
+        plan = GatePlan(
+            tier=args.tier,
+            reason=f"forced tier {args.tier}",
+            commands=_tier_commands(
+                args.tier,
+                repo=repo,
+                pytest_profile=pytest_profile,
+                files=files,
+                force_scoped=args.scoped,
+            ),
+        )
 
     print(f"pushable gate: tier={plan.tier} ({plan.reason})")
+    print(f"pytest profile: {pytest_profile}")
     print(f"sources: {source}")
     if files:
         print(f"changed_files={len(files)}")
@@ -236,7 +309,6 @@ def main(argv: list[str] | None = None) -> int:
         try:
             from scripts.repo_layer_paths import audit_paths, load_presets, scope_from_preset
 
-            # Best-effort: infer preset from diff shape when no manifest scope.
             if any(f.startswith("src/") for f in files):
                 preset_name = "PPE_UI" if any(f.startswith("src/viz/") for f in files) else "PPE_CORE"
             elif any(f.startswith("apps/") for f in files):

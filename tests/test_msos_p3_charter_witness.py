@@ -49,10 +49,10 @@ def test_backlog_p3_queued_with_plan() -> None:
     assert p3["planPath"] == P3_PLAN_REL
 
 
-def test_manifest_ready_for_p3() -> None:
+def test_manifest_points_at_p3() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["status"] == "READY"
     assert manifest["phasePlanPath"] == P3_PLAN_REL
+    assert manifest["status"] in ("READY", "RUNNING")
 
 
 def test_queue_health_no_issues_on_live_queue() -> None:

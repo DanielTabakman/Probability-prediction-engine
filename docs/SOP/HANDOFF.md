@@ -14,9 +14,10 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos p2 design system + public homepage **COMPLETE** 2026-06-02
-- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
+- Active MSOS focus: **P3 Command Center** — manifest **RUNNING** (SELECTION 2026-06-03); P2 homepage **COMPLETE**
+- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen, MSOS P0–P2
+- Next pending execution step: **execute P3 relay** — `docs/SOP/MSOS_FRONTIER.md`; P4 pre-chartered after closeout
+- Acceleration playbook: `docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,27 +29,29 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MSOS_FRONTIER.md` + `MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS P2 design system + public homepage COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS P3 Command Center** — relay **RUNNING** (P2 homepage **COMPLETE**). See [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) and [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md).
 
 
 ## Hard rule reminders
 
-- Dual smoke: `PYTHONUNBUFFERED=1 python scripts/run_mvp1_dual_implied_lab_smoke.py`
+- UI smoke tiers ([`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md)): default **`python scripts/run_implied_lab_ui_smoke.py`** (scenario A); dual smoke only when harness-wide or slice `smokeMode: dual`
+- Push gate: WIP **`python scripts/run_pushable_gate.py`**; before push **`python scripts/run_pushable_gate.py --pre-push`**
 - Do not blind-merge `recovery/frontier-steward-v2_1-baseline`
 - Do not port `mvp1_benchmark_substrate.py` without steward SELECTION
-- MSOS P2 UI blocked until [`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md) satisfied
+- MSOS P2+ requires storyboard gate **OPEN** ([`MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)) — satisfied
 
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
+2. **Operator:** `run_ppe_auto_local_loop.cmd` — control slices automatic; on PRODUCT_BLOCKED → IDE BUILD → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd`. P4–P8 auto-queue after each closeout.
+3. **Commercial (parallel):** [`COMMERCIAL_VALIDATION_OPERATOR.md`](COMMERCIAL_VALIDATION_OPERATOR.md) on live demo/app — not blocked on MSOS P8.
 
 
 ## Last updated
 
-2026-06-02 — MSOS P2 design system + public homepage COMPLETE; closeout job `MSOS-P2-Closeout-Slice005`.
+2026-06-03 — MSOS P3 SELECTION; P4 relay pre-chartered; acceleration checklist added.

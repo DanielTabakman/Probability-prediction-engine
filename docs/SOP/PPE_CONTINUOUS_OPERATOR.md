@@ -108,7 +108,7 @@ See [`PPE_STEWARD_CURSOR_V1.md`](PPE_STEWARD_CURSOR_V1.md).
 
 1. **`queued` in backlog** — preferred.
 2. **`pending` on roadmap** — manual or steward output (acp).
-3. **`blocked` in backlog** — never auto-propagates.
+3. **`blocked` in backlog** — does not propagate until promoted. Rows with **`planPath`** auto-promote to **`queued`** when all prior backlog rows are `done`/`skipped` (after closeout or on idle `maybe_propagate_queue`).
 
 ## Disable
 

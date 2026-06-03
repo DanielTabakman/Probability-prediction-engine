@@ -1,0 +1,80 @@
+{
+  "name": "MSOS_p4_strategy_lab (Strategy Lab / PPE integration)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P4-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+      "buildBranch": "build/auto/MSOS-P4-Control-Slice001-msos_p4",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P4-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+      "buildBranch": "build/auto/MSOS-P4-Product-Slice002-msos_p4",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 150,
+      "hardMinutes": 420,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/",
+        "docs/SOP/MSOS_FRONTIER.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-P4-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+      "buildBranch": "build/auto/MSOS-P4-Platform-Slice003-msos_p4",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "docs/DEPLOY/"
+      ]
+    },
+    {
+      "sliceId": "MSOS-P4-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+      "buildBranch": "build/auto/MSOS-P4-Witness-Slice004-msos_p4",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P4-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+      "buildBranch": "build/auto/MSOS-P4-Closeout-Slice005-msos_p4",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p4_strategy_lab",
+        "chapterTitle": "MSOS P4 Strategy Lab / PPE integration",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
+          "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
+        ]
+      }
+    }
+  ]
+}

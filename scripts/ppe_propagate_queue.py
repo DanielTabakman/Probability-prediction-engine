@@ -103,6 +103,76 @@ def _first_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
     return None
 
 
+_TERMINAL_BACKLOG = frozenset({"done", "skipped"})
+
+
+def _prior_backlog_items_terminal(items: list[Any], index: int) -> bool:
+    """True when every backlog row before index is done or skipped."""
+    for prior in items[:index]:
+        if not isinstance(prior, dict):
+            continue
+        prev = str(prior.get("status") or "").strip().lower()
+        if prev not in _TERMINAL_BACKLOG:
+            return False
+    return True
+
+
+def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    """Promote the first blocked backlog row with a valid planPath when all prior rows are done/skipped."""
+    repo = repo_root.resolve()
+    if not backlog_enabled(repo):
+        return {"promoted": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
+    if not backlog_path(repo).is_file():
+        return {"promoted": False, "reason": "no backlog file"}
+
+    backlog = load_backlog(repo)
+    items = backlog.get("items") or []
+    if not isinstance(items, list):
+        return {"promoted": False, "reason": "invalid backlog items"}
+
+    if _first_queued_item(backlog) is not None:
+        return {"promoted": False, "reason": "queued backlog item already exists"}
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "").strip().lower() != "blocked":
+            continue
+        plan_path = norm_plan(str(item.get("planPath") or ""))
+        if not plan_path:
+            continue
+        if not _prior_backlog_items_terminal(items, index):
+            return {
+                "promoted": False,
+                "reason": "prior backlog chapters not terminal",
+                "chapterId": item.get("chapterId"),
+            }
+        ok, err = _plan_valid(repo, plan_path)
+        if not ok:
+            return {
+                "promoted": False,
+                "reason": f"plan invalid: {err}",
+                "planPath": plan_path,
+                "chapterId": item.get("chapterId"),
+            }
+        if not apply:
+            return {
+                "promoted": True,
+                "dry_run": True,
+                "planPath": plan_path,
+                "chapterId": item.get("chapterId"),
+            }
+        item["status"] = "queued"
+        save_backlog(repo, backlog)
+        return {
+            "promoted": True,
+            "planPath": plan_path,
+            "chapterId": item.get("chapterId"),
+        }
+
+    return {"promoted": False, "reason": "no blocked backlog item with planPath"}
+
+
 def _plan_on_roadmap(roadmap: dict[str, Any], plan_path: str) -> bool:
     norm = norm_plan(plan_path)
     return any(
@@ -125,7 +195,16 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     backlog = load_backlog(repo)
     item = _first_queued_item(backlog)
     if item is None:
-        return {"propagated": False, "reason": "no queued backlog item"}
+        promoted = promote_first_blocked_with_plan(repo, apply=apply)
+        if promoted.get("promoted"):
+            sync_backlog_from_roadmap(repo, apply=apply)
+            backlog = load_backlog(repo)
+            item = _first_queued_item(backlog)
+        if item is None:
+            out: dict[str, Any] = {"propagated": False, "reason": "no queued backlog item"}
+            if promoted.get("promoted") or promoted.get("reason"):
+                out["promote"] = promoted
+            return out
 
     plan_path = norm_plan(str(item.get("planPath") or ""))
     if not plan_path:

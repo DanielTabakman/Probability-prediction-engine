@@ -13,7 +13,9 @@ from scripts.ppe_roadmap import load_roadmap
 from scripts.ppe_propagate_queue import (
     load_backlog,
     maybe_propagate_queue,
+    promote_first_blocked_with_plan,
     propagate_from_backlog,
+    save_backlog,
     sync_backlog_from_roadmap,
 )
 
@@ -94,6 +96,63 @@ class TestPpePropagateQueue(unittest.TestCase):
     def test_maybe_propagate_idle(self) -> None:
         out = maybe_propagate_queue(self.repo, apply=True)
         self.assertTrue(out.get("propagated"))
+
+    def test_promote_blocked_when_prior_done(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        blocked_plan = {
+            "name": "blocked_chapter",
+            "sprintSpecPath": "docs/SOP/SPRINT_BLOCKED.md",
+            "selectionRecord": "docs/SOP/SEL_BLOCKED.md",
+            "slices": [{"sliceId": "B-Closeout", "closeout": {"chapterId": "b"}}],
+        }
+        (plans / "blocked_relay.json").write_text(json.dumps(blocked_plan), encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SPRINT_BLOCKED.md").write_text("# b\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_BLOCKED.md").write_text("# s\n", encoding="utf-8")
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {
+                "chapterId": "done_chapter",
+                "status": "done",
+                "planPath": "docs/SOP/PHASE_PLANS/next_relay.json",
+            },
+            {
+                "chapterId": "blocked_chapter",
+                "status": "blocked",
+                "planPath": "docs/SOP/PHASE_PLANS/blocked_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        out = promote_first_blocked_with_plan(self.repo, apply=True)
+        self.assertTrue(out.get("promoted"))
+        backlog = load_backlog(self.repo)
+        self.assertEqual(backlog["items"][1]["status"], "queued")
+
+    def test_promote_skips_when_prior_not_done(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        (plans / "blocked_relay.json").write_text(
+            json.dumps(
+                {
+                    "name": "b",
+                    "sprintSpecPath": "docs/SOP/SPRINT_BLOCKED.md",
+                    "selectionRecord": "docs/SOP/SEL_BLOCKED.md",
+                    "slices": [{"sliceId": "B-Closeout", "closeout": {"chapterId": "b"}}],
+                }
+            ),
+            encoding="utf-8",
+        )
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {"chapterId": "active", "status": "chartered", "planPath": "docs/SOP/PHASE_PLANS/next_relay.json"},
+            {
+                "chapterId": "blocked_chapter",
+                "status": "blocked",
+                "planPath": "docs/SOP/PHASE_PLANS/blocked_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        out = promote_first_blocked_with_plan(self.repo, apply=True)
+        self.assertFalse(out.get("promoted"))
+        self.assertIn("prior", str(out.get("reason", "")).lower())
 
 
 if __name__ == "__main__":

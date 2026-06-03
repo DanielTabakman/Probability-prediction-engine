@@ -35,7 +35,7 @@ def _git_sha(repo: Path, ref: str = "HEAD") -> str:
 
 def _pytest_count(repo: Path) -> tuple[str, int]:
     proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q"],
+        [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
         cwd=repo,
         capture_output=True,
         text=True,
@@ -48,7 +48,49 @@ def _pytest_count(repo: Path) -> tuple[str, int]:
         return "PASS", 0
     m = re.search(r"(\d+)\s+passed", tail[-1])
     count = int(m.group(1)) if m else 0
+    slow = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-m", "slow"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if slow.returncode != 0:
+        return "FAIL", count
+    sm = re.search(r"(\d+)\s+passed", (slow.stdout or "").strip().splitlines()[-1])
+    if sm:
+        count += int(sm.group(1))
     return "PASS", count
+
+
+def _resolve_smoke_mode(slice_obj: dict[str, Any] | None) -> str:
+    if slice_obj:
+        raw = str(slice_obj.get("smokeMode") or slice_obj.get("smoke") or "").strip().lower()
+        if raw in ("dual", "full", "mvp1_dual"):
+            return "dual"
+    if os.environ.get("PPE_DUAL_SMOKE", "").strip().lower() in ("1", "true", "yes", "on"):
+        return "dual"
+    return "a"
+
+
+def _run_smoke_a(repo: Path) -> tuple[str, list[str]]:
+    script = repo / "scripts" / "run_implied_lab_ui_smoke.py"
+    if not script.is_file():
+        return "NOT_RUN", []
+    proc = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        return "FAIL", []
+    ui = repo / "artifacts" / "ui_smoke"
+    if not ui.is_dir():
+        return "PASS", []
+    dirs = sorted([p.name for p in ui.iterdir() if p.is_dir()], reverse=True)
+    return "PASS", dirs[:1]
 
 
 def _run_dual_smoke(repo: Path) -> tuple[str, list[str]]:
@@ -168,11 +210,17 @@ def execute_deterministic(
     if kind == "smoke":
         if os.environ.get("PPE_SKIP_DUAL_SMOKE", "").strip().lower() in ("1", "true", "yes", "on"):
             smoke_status = "PASS"
-            notes_parts.append("dual_smoke_skipped=PPE_SKIP_DUAL_SMOKE (pytest-only)")
+            notes_parts.append("smoke_skipped=PPE_SKIP_DUAL_SMOKE (pytest-only)")
         else:
-            smoke_status, run_ids = _run_dual_smoke(repo)
+            smoke_mode = _resolve_smoke_mode(slice_obj)
+            if smoke_mode == "dual":
+                smoke_status, run_ids = _run_dual_smoke(repo)
+                notes_parts.append("smoke_mode=dual")
+            else:
+                smoke_status, run_ids = _run_smoke_a(repo)
+                notes_parts.append("smoke_mode=a")
             if run_ids:
-                notes_parts.append(f"dual_smoke={','.join(run_ids)}")
+                notes_parts.append(f"ui_smoke={','.join(run_ids)}")
 
     product_sha: str | None = None
     promotion_performed = False

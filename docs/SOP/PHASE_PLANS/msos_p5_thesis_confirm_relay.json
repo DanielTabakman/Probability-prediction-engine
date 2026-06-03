@@ -1,0 +1,59 @@
+{
+  "name": "MSOS_p5_thesis_confirm (thesis confirmation + durable state)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-P5-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+      "buildBranch": "build/auto/MSOS-P5-Control-Slice001-msos_p5",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-P5-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+      "buildBranch": "build/auto/MSOS-P5-Product-Slice002-msos_p5",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 150,
+      "hardMinutes": 420,
+      "maxAttempts": 2,
+      "touchSet": ["apps/msos-web/", "docs/SOP/MSOS_FRONTIER.md"]
+    },
+    {
+      "sliceId": "MSOS-P5-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+      "buildBranch": "build/auto/MSOS-P5-Witness-Slice004-msos_p5",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-P5-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+      "buildBranch": "build/auto/MSOS-P5-Closeout-Slice005-msos_p5",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_p5_thesis_confirm",
+        "chapterTitle": "MSOS P5 thesis confirmation + durable state",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_P5_THESIS_CONFIRM_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": ["docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"]
+      }
+    }
+  ]
+}
