@@ -16,7 +16,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from scripts.ui_smoke_diagnose import diagnose_stop_for_review, format_diagnosis
+from scripts.ppe_context_bands import classify_line_count, file_line_count, format_band_hint
+from scripts.ppe_ide_build_starter import format_ide_build_resume
+from scripts.ui_smoke_diagnose import diagnose_stop_for_review
 
 
 def _utc_now_iso() -> str:
@@ -76,13 +78,21 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
         stop_code = str(stop_raw or "").strip()
     slice_id = str(relay.get("slice_id") or "").upper()
     if stop_code == "SCOPE_AMBIGUITY" and "PRODUCT" in slice_id:
+        relay_slice_id = str(relay.get("slice_id") or relay.get("sliceId") or "").strip()
+        plan_path = str(relay.get("plan_path") or relay.get("phasePlanPath") or "").strip()
+        if relay_slice_id and plan_path:
+            return (
+                True,
+                "product_ide_build_required",
+                format_ide_build_resume(relay_slice_id, plan_path),
+            )
         build_branch = str(relay.get("build_branch") or relay.get("buildBranch") or "")
         branch_note = f" Commit on `{build_branch}`." if build_branch else ""
         return (
             True,
             "product_ide_build_required",
-            "Product slice under deterministic relay: BUILD in Cursor IDE using docs/SOP/BUILD_PACKET_TEMPLATE.md "
-            f"(sprint spec + AGENT_CONTINUITY_BRIEF).{branch_note} "
+            "Product slice under deterministic relay: run `generate_ide_build_starter.cmd <sliceId> <phasePlan>`, "
+            f"then new Cursor thread.{branch_note} "
             "Then `mark_ide_product_ready.cmd <sliceId>` and `run_ppe_local.cmd` from repo root.",
         )
 
@@ -117,15 +127,11 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
 def _context_band_hint(repo_root: Path, sprint_spec_rel: str | None) -> str | None:
     if not sprint_spec_rel:
         return None
-    p = repo_root / sprint_spec_rel.replace("\\", "/")
-    if not p.is_file():
+    line_count = file_line_count(repo_root, sprint_spec_rel)
+    if line_count is None:
         return None
-    line_count = len(p.read_text(encoding="utf-8", errors="replace").splitlines())
-    if line_count > 400:
-        return "ESCALATE (sprint spec line count > 400 — prefer links over inline paste)"
-    if line_count > 200:
-        return "WATCH (sprint spec line count > 200)"
-    return "NORMAL"
+    band = classify_line_count(line_count)
+    return format_band_hint(band, subject="sprint spec")
 
 
 def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
