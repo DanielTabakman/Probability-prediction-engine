@@ -6,71 +6,68 @@ Purpose: keep **real** validation (unit tests, docker entry, Playwright smoke + 
 
 | Speed | When | Command | What runs |
 |-------|------|---------|-----------|
-| **Fast** | WIP commits, control-plane tweaks | `python scripts/run_pushable_gate.py` | ruff + `pytest -m "not witness and not slow"` |
-| **Full** | Before push / PR merge path | `python scripts/run_pushable_gate.py --pre-push` | ruff + full `pytest -q` (matches CI) |
+| **Scoped** | WIP commit with mappable diff | `python scripts/run_pushable_gate.py` | ruff + targeted test files + core safety net |
+| **Fast** | WIP when scope unmapped | same | ruff + `pytest -m "not witness and not slow"` |
+| **Full** | Before push / PR merge path | `python scripts/run_pushable_gate.py --pre-push` | ruff + full pytest (parallel + slow serial) |
 | **Heavy** | Viz slice closeout only | smoke scripts (below) | Playwright + Streamlit + live data + PNGs |
 
-**CI** (`.github/workflows/ci.yml`) always runs **full pytest** + **docker_entrypoint**. Local fast gate does not replace CI.
+**CI** (`.github/workflows/ci.yml`) runs **full pytest** (parallel + slow serial) + **docker_entrypoint**. PRs labeled **`viz-change`** also run **CI / ui_smoke** (scenario A).
 
 ## Pytest markers
 
-Auto-applied in `tests/conftest.py` (no per-test boilerplate required):
+Auto-applied in `tests/conftest.py`:
 
 | Marker | Files / tests | Why excluded from fast gate |
 |--------|---------------|----------------------------|
-| `witness` | `*witness*`, `*charter*`, `test_msos_web_homepage` | Chapter closeout evidence; file-exists / queue JSON checks |
-| `slow` | `test_phase_orchestrator_worktree`, `test_app_entrypoint_import` | Git subprocess / isolated import subprocess |
+| `witness` | `*witness*`, `*charter*`, `test_msos_web_homepage`, `test_program_charter_invariants` | Chapter closeout evidence |
+| `slow` | `test_phase_orchestrator_worktree`, `test_app_entrypoint_import` | Git subprocess / isolated import |
 
-Run subsets manually:
+Manual subsets:
 
 ```bash
-# Fast (default local gate)
-python -m pytest -q -m "not witness and not slow"
-
-# Full (pre-push / debug parity with CI)
-python -m pytest -q
-
-# Witness only (after charter/queue doc changes)
-python -m pytest -q -m witness
+python -m pytest -q -m "not witness and not slow"    # fast
+python -m pytest -q -n auto -m "not slow"            # parallel (then slow serial)
+python -m pytest -q -m witness                         # witness only
 ```
+
+Set `PPE_PYTEST_PARALLEL=0` to disable `-n auto` locally.
+
+## Path-scoped pytest
+
+`scripts/gate_pytest_scope.py` maps changed paths → test files. Used automatically on **fast** WIP gate when mapping succeeds.
+
+Examples:
+
+- `scripts/ppe_*.py` → `tests/test_ppe_*.py`
+- `src/viz/**` → viz/UI test glob set
+- `docs/SOP/PHASE_QUEUE.json` → falls back to marker-fast (queue witnesses)
+
+Force scoped: `python scripts/run_pushable_gate.py --scoped`
 
 ## Pushable gate
 
-`scripts/run_pushable_gate.py`:
-
-- **Default** — tier 0/1/2 with **fast pytest** (excludes `witness` + `slow`).
-- **`--pre-push`** — same tier rules, **full pytest** on commits ahead of upstream. **Required before `git push`.**
-- **`--full`** — force full pytest without pre-push scope (local debug).
-
-Tier 0 (docs-only under `docs/`) unchanged: no ruff/pytest.
+- **Default** — tier 0/1/2; **scoped** when mappable else **fast** pytest.
+- **`--pre-push`** — **full** pytest on commits ahead of upstream. **Required before `git push`.**
+- **`--full`** — force full pytest without pre-push scope.
 
 ## UI smoke (heavy — not in pytest)
 
-Playwright smoke stays **outside** default pytest (live Deribit/Yahoo; flaky in CI).
-
 | Change | Run |
 |--------|-----|
-| Most viz slices | `python scripts/run_implied_lab_ui_smoke.py` (scenario **A** only) |
-| Disagreement classification / harness semantics | Add scenario **C** when slice spec requires it (`OPERATING_RULES.md` Tier 2) |
-| Harness-wide or dual MVP1/full-lab chrome | `python scripts/run_mvp1_dual_implied_lab_smoke.py` |
+| Most viz slices | `python scripts/run_implied_lab_ui_smoke.py` (scenario **A**) |
+| Harness-wide / dual chrome | `python scripts/run_mvp1_dual_implied_lab_smoke.py` or slice `smokeMode: dual` |
 | Control-plane / relay only | **No smoke** |
 
-Record `artifacts/ui_smoke/<run_id>/` manifest + PNG in PR or closeout evidence.
+Deterministic worker (`ppe_slice_worker.py`): smoke slices default to **A**; set `smokeMode: dual` on slice or `PPE_DUAL_SMOKE=1` for dual.
 
-**Stop rule:** after 1–2 inconclusive smoke attempts, classify and report — do not infinite-retry (`OPERATING_RULES.md` → Closeout runtime budget).
+Label PR **`viz-change`** to run CI Playwright smoke (scenario A).
 
-## Agent / relay testing
+## Witness consolidation
 
-- **In pytest:** `test_relay_runtime_v0.py`, steward/queue tests — fast, deterministic.
-- **Not in pytest:** spinning up Cursor/ACP workers — use relay artifacts + slice closeout witnesses.
-
-## What we removed (fat)
-
-- `test_mvp1_sprint003_pytest_witness.py` — nested ruff + pinned pytest count (brittle; duplicated gate + CI).
-- Full pytest on every intermediate commit — replaced by fast marker subset; full runs at pre-push + CI.
+Closed chapter witnesses live in **`tests/test_program_charter_invariants.py`**. Active chapter witnesses remain separate (`test_msos_p3_charter_witness.py`, etc.).
 
 ## Related docs
 
-- Commit gates: [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)
-- Closeout tiers: [`OPERATING_RULES.md`](OPERATING_RULES.md) → Validation tiers
-- Implied lab smoke: [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md)
+- [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)
+- [`OPERATING_RULES.md`](OPERATING_RULES.md) → Validation tiers
+- [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md)

@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-_WITNESS_STEMS = frozenset({"test_msos_web_homepage"})
+_WITNESS_STEMS = frozenset({"test_msos_web_homepage", "test_program_charter_invariants"})
 _SLOW_STEMS = frozenset(
     {
         "test_phase_orchestrator_worktree",

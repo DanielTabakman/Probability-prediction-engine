@@ -42,26 +42,33 @@ Optional: copy `.env.example` to `.env` and set any API keys (none required for 
 
 **Freeze & history:** In the Streamlit app, open Bitcoin implied lab → expand **Freeze & history (this device, SQLite)** under the chart column to save or reopen read-only snapshots.
 
-**Dual UI smoke (MVP1 default + full lab):** from the repo root, with Playwright installed for the harness:
+**Dual UI smoke (harness-wide / dual chrome only):** from the repo root, with Playwright installed:
 
 ```bash
 python scripts/run_mvp1_dual_implied_lab_smoke.py
 ```
 
-This runs `MVP1_compact_verification` without `PPE_POST_MVP1_LAB_UI`, then `A_width_target_payoff` with `PPE_POST_MVP1_LAB_UI=1`. Manifests are written under `artifacts/ui_smoke/<run_id>/`.
+**Default viz validation (most PRs):** scenario A only:
+
+```bash
+python scripts/run_implied_lab_ui_smoke.py
+```
+
+Dual smoke runs `MVP1_compact_verification` without `PPE_POST_MVP1_LAB_UI`, then `A_width_target_payoff` with `PPE_POST_MVP1_LAB_UI=1`. See [`docs/SOP/TESTING_TIERS_V1.md`](docs/SOP/TESTING_TIERS_V1.md).
 
 Running `implied_lab_ui_smoke_harness.py` **without** `--scenario` exercises every entry in its `SCENARIOS` list in one Streamlit session; with default MVP1 UI, scenarios that open **Mode & solver** will fail—prefer `--scenario` or the dual runner above.
 
 ### Commit and merge test gates
 
-Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md).
+Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md) and [docs/SOP/TESTING_TIERS_V1.md](docs/SOP/TESTING_TIERS_V1.md).
 
 | When | Command |
 |------|---------|
-| **Every pushable commit** (code or mixed) | `python -m ruff check src tests scripts` then `python -m pytest -q` |
+| **WIP commit** (code or mixed) | `python scripts/run_pushable_gate.py` (fast / scoped pytest) |
+| **Before push** | `python scripts/run_pushable_gate.py --pre-push` (full pytest; matches CI) |
 | **Docs-only** (`docs/` only) | pytest not required |
-| **PR touching implied lab** (`src/viz/**`, smoke scripts) | also `python scripts/run_mvp1_dual_implied_lab_smoke.py` before merge (not every commit) |
-| **Merge to `main`** | GitHub **CI** workflow green: **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker image + Streamlit entry smoke). [Merge on green](.github/workflows/merge-on-green.yml) merges only when the **whole** `ci.yml` run succeeds, so both jobs must pass. |
+| **PR touching implied lab** (`src/viz/**`, smoke scripts) | `python scripts/run_implied_lab_ui_smoke.py` before merge; dual smoke only when harness-wide |
+| **Merge to `main`** | GitHub **CI** green: **`CI / pytest`** + **`CI / docker_entrypoint`**. Optional: label PR `viz-change` for CI Playwright smoke. |
 
 ### Testing policy (imports)
 
