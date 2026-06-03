@@ -6,6 +6,8 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
+from scripts.ppe_context_bands import ESCALATE_LINE_THRESHOLD, WATCH_LINE_THRESHOLD, classify_line_count
+from scripts.ppe_ide_build_starter import format_ide_build_resume
 from scripts.ppe_manifest import load_phase_plan
 from scripts.ppe_operator_config import _guards_config, guards_enabled, load_operator_config
 from scripts.ppe_queue import mark_queue_item_done
@@ -153,8 +155,12 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
             n = _sprint_spec_line_count(repo, spec_rel)
             if n is None:
                 continue
-            if g.get("stopOnContextEscalate", True) is not False and n > 400:
-                detail = f"Sprint spec {spec_rel} has {n} lines (>400 ESCALATE). Shrink or split before unattended run."
+            band = classify_line_count(n)
+            if g.get("stopOnContextEscalate", True) is not False and band == "ESCALATE":
+                detail = (
+                    f"Sprint spec {spec_rel} has {n} lines "
+                    f"(>{ESCALATE_LINE_THRESHOLD} ESCALATE). Shrink or split before unattended run."
+                )
                 return _guard_stop(
                     repo,
                     reason="CONTEXT_ESCALATE",
@@ -162,8 +168,10 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
                     plan_path=norm_plan,
                     resume="Shrink sprint spec or split chapter, then re-run.",
                 )
-            if watch_on and n > 200:
-                detail = f"Sprint spec {spec_rel} has {n} lines (>200 WATCH)."
+            if watch_on and band == "WATCH":
+                detail = (
+                    f"Sprint spec {spec_rel} has {n} lines (>{WATCH_LINE_THRESHOLD} WATCH)."
+                )
                 return _guard_stop(
                     repo,
                     reason="CONTEXT_WATCH",
@@ -187,9 +195,11 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
         print(f"ppe_operator_guards: IDE product marker OK for {norm_plan}")
         return 0
 
+    primary_slice = product_slices[0]
     ids = ", ".join(product_slices)
     detail = (
         f"Phase plan contains product slice(s) [{ids}] but PPE_SKIP_ACP=1 and no valid IDE_PRODUCT_READY marker. "
         "IDE BUILD, commit, then `mark_ide_product_ready.cmd <sliceId>`, then `run_ppe_local.cmd`."
     )
-    return _guard_stop(repo, reason="PRODUCT_BLOCKED", detail=detail, plan_path=norm_plan)
+    resume = format_ide_build_resume(primary_slice, norm_plan)
+    return _guard_stop(repo, reason="PRODUCT_BLOCKED", detail=detail, plan_path=norm_plan, resume=resume)

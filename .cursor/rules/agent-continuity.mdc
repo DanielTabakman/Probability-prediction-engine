@@ -30,4 +30,5 @@ When the user wants the **auto cycle to continue**, do not stop at closeout: run
 - Read `docs/CONTEXT_RULES.md` before long BUILD threads.
 - **Relay BUILD** = fresh ACP worker per slice; **Cursor steward chat ≠ BUILD chat**.
 - After chapter closeout: prefer a **new** Agent thread with only `AGENT_CONTINUITY_BRIEF.md`.
+- **IDE BUILD:** prefer `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` when present (`generate_ide_build_starter.cmd`).
 - Steward packets: `docs/SOP/BUILD_PACKET_TEMPLATE.md` (paths only; no pasted logs/specs).
