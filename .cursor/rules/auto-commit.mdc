@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Auto-commit and auto-push policy
 
-**Precedence:** In this repository, this rule overrides `OPERATING_RULES.md` § Git and any generic user instruction to "ask before commit" when the current task or plan is **authorized and complete**.
+**Precedence:** In this repository, this rule overrides `OPERATING_RULES.md` § Git and any generic Cursor user instruction to "ask before commit" or "push only when asked" when the current task or plan is **authorized and complete**. Paste [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into global user rules if agents still hesitate.
 
 ## When to auto-commit
 
@@ -38,6 +38,16 @@ alwaysApply: true
   - The working tree is clean except for the intended changes.
   - No force push; fast-forward only.
 
+### After merge or rebase of `origin/main`
+
+When `git merge origin/main` or `git rebase origin/main` completes on a **non-main** branch (clean tree, no conflict markers):
+
+1. Run **`python scripts/run_pushable_gate.py`** — it auto-includes commits **ahead of upstream** (not only diff vs `main`). Use **`--pre-push`** when you only want the unpushed commit range.
+2. **`git push`** (or `git push -u origin HEAD` if no upstream). Do **not** stop at "merge succeeded" or ask "want me to push?"
+3. If no open PR to `main` for this branch, **open one** per non-main rules above.
+
+This applies even when the user only asked to "sync main" — syncing is complete only after gate + push (unless push is blocked: force-push, remote rejection, or gate failure).
+
 ### `main` / `master` branches
 
 - Same gate as any pushable commit: `python -m ruff check src tests scripts` and `python -m pytest -q`.
@@ -59,11 +69,17 @@ Authoritative detail: [docs/SOP/COMMIT_POLICY_V1.md](../../docs/SOP/COMMIT_POLIC
 ### Pushable commit (default)
 
 ```bash
+python scripts/run_pushable_gate.py
+```
+
+Tiered runner (see `COMMIT_POLICY_V1.md`). Before **push**, prefer **`--pre-push`** when validating only unpushed commits. Equivalent full product tier:
+
+```bash
 python -m ruff check src tests scripts
 python -m pytest -q
 ```
 
-Run both before every commit that will be pushed. Do **not** substitute “targeted pytest only.”
+Run before every commit that will be pushed. Do **not** substitute “targeted pytest only.”
 
 ### Docs-only exception
 

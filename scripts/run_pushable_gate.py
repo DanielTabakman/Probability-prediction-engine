@@ -1,13 +1,18 @@
 """Tiered pushable gate for PPE commits.
 
-Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md). Classifies the
-diff vs a base ref (default: origin/main) and runs:
+Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md). Classifies changed
+paths and runs:
 
 - **Tier 0** — docs-only under ``docs/``: no ruff/pytest (exit 0).
 - **Tier 1** — control plane (``scripts/``, ``tests/``, config, ``.cursor/``; no ``src/``):
   ``ruff check scripts tests`` + full ``pytest -q``.
 - **Tier 2** — product (any ``src/`` touch): ``ruff check src tests scripts`` + full ``pytest -q``.
 
+By default, changed files are the union of ``{base_ref}...HEAD`` (branch vs main) and
+``{upstream}..HEAD`` when the branch is ahead of its upstream — so a merge that
+aligns with ``main`` but is not yet pushed still runs the correct tier.
+
+Use ``--pre-push`` to classify only ``upstream..HEAD`` (commits not on the remote branch).
 Use ``--tier N`` to force a tier for local debugging.
 """
 
@@ -33,16 +38,94 @@ def _run(cmd: list[str], *, cwd: Path) -> int:
     return subprocess.run(cmd, cwd=cwd).returncode
 
 
-def _changed_files(repo: Path, base_ref: str) -> list[str]:
-    # Use ... to compare against merge base (branch-friendly).
+def _git_lines(repo: Path, *args: str) -> list[str]:
     out = subprocess.run(
-        ["git", "diff", "--name-only", f"{base_ref}...HEAD"],
+        ["git", *args],
         cwd=repo,
         check=True,
         capture_output=True,
         text=True,
     )
     return [line.strip() for line in out.stdout.splitlines() if line.strip()]
+
+
+def _changed_files_three_dot(repo: Path, base_ref: str) -> list[str]:
+    return _git_lines(repo, "diff", "--name-only", f"{base_ref}...HEAD")
+
+
+def _changed_files_two_dot(repo: Path, base_ref: str, head: str = "HEAD") -> list[str]:
+    return _git_lines(repo, "diff", "--name-only", f"{base_ref}..{head}")
+
+
+def _union_paths(*groups: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for group in groups:
+        for path in group:
+            norm = path.replace("\\", "/")
+            if norm not in seen:
+                seen.add(norm)
+                out.append(norm)
+    return out
+
+
+def _upstream_ref(repo: Path) -> str | None:
+    proc = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        return None
+    ref = proc.stdout.strip()
+    return ref or None
+
+
+def _commits_ahead(repo: Path, ref: str) -> int:
+    proc = subprocess.run(
+        ["git", "rev-list", "--count", f"{ref}..HEAD"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return int(proc.stdout.strip() or "0")
+
+
+def resolve_changed_files(
+    repo: Path,
+    *,
+    base_ref: str = "origin/main",
+    pre_push: bool = False,
+    auto_upstream: bool = True,
+) -> tuple[list[str], str]:
+    """Return (paths, human-readable source label) for tier classification."""
+    upstream = _upstream_ref(repo)
+
+    if pre_push:
+        if not upstream:
+            raise ValueError("no upstream configured; set upstream with git push -u")
+        ahead = _commits_ahead(repo, upstream)
+        if ahead == 0:
+            return [], f"pre-push ({upstream}: nothing ahead)"
+        files = _changed_files_two_dot(repo, upstream, "HEAD")
+        return files, f"pre-push ({upstream}..HEAD, {ahead} commit(s))"
+
+    groups: list[list[str]] = []
+    labels: list[str] = []
+
+    main_files = _changed_files_three_dot(repo, base_ref)
+    groups.append(main_files)
+    labels.append(f"{base_ref}...HEAD")
+
+    if auto_upstream and upstream:
+        ahead = _commits_ahead(repo, upstream)
+        if ahead > 0:
+            groups.append(_changed_files_two_dot(repo, upstream, "HEAD"))
+            labels.append(f"{upstream}..HEAD ({ahead} ahead)")
+
+    return _union_paths(*groups), " + ".join(labels)
 
 
 def _classify(files: list[str]) -> GatePlan:
@@ -85,7 +168,17 @@ def _classify(files: list[str]) -> GatePlan:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Run PPE pushable gate (tiered).")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
-    ap.add_argument("--base-ref", default="origin/main", help="Base ref to diff against")
+    ap.add_argument("--base-ref", default="origin/main", help="Base ref for branch vs main (three-dot)")
+    ap.add_argument(
+        "--pre-push",
+        action="store_true",
+        help="Classify only commits ahead of upstream (two-dot upstream..HEAD)",
+    )
+    ap.add_argument(
+        "--no-auto-upstream",
+        action="store_true",
+        help="Do not union upstream..HEAD with base-ref...HEAD (default unions when ahead)",
+    )
     ap.add_argument(
         "--tier",
         type=int,
@@ -97,9 +190,17 @@ def main(argv: list[str] | None = None) -> int:
 
     repo = args.repo_root.resolve()
     try:
-        files = _changed_files(repo, args.base_ref)
+        files, source = resolve_changed_files(
+            repo,
+            base_ref=args.base_ref,
+            pre_push=args.pre_push,
+            auto_upstream=not args.no_auto_upstream,
+        )
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: failed to compute changed files vs {args.base_ref}: {e}", file=sys.stderr)
+        print(f"ERROR: failed to compute changed files: {e}", file=sys.stderr)
+        return 2
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
         return 2
 
     plan = _classify(files)
@@ -127,6 +228,7 @@ def main(argv: list[str] | None = None) -> int:
             )
 
     print(f"pushable gate: tier={plan.tier} ({plan.reason})")
+    print(f"sources: {source}")
     if files:
         print(f"changed_files={len(files)}")
 
@@ -169,4 +271,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -15,11 +15,21 @@ Purpose: remove “should we commit?” and “which tests?” ambiguity for hum
 Run from repo root before `git commit` / `git push`:
 
 ```bash
+python scripts/run_pushable_gate.py
+```
+
+Before **`git push`**, you may use **`python scripts/run_pushable_gate.py --pre-push`** to tier-check only commits ahead of the branch upstream. The default runner also unions **`upstream..HEAD`** when the branch is ahead of remote (fixes “tier 0 / no changes” after merging `main` when diff vs `origin/main` is empty).
+
+Equivalent full product check:
+
+```bash
 python -m ruff check src tests scripts
 python -m pytest -q
 ```
 
 This matches the **`CI / pytest`** job (ruff + full pytest). The full **CI** workflow on GitHub also runs **`CI / docker_entrypoint`**; both must pass before merge when using merge-on-green or required checks. Do not use “targeted pytest only” for commits intended to be shared.
+
+After **`git merge origin/main`** / rebase on a feature branch: gate, then **push** without asking — see [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc).
 
 ### Docs-only exception
 
