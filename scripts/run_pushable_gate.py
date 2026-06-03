@@ -1,18 +1,22 @@
 """Tiered pushable gate for PPE commits.
 
-Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md). Classifies changed
-paths and runs:
+Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md, docs/SOP/TESTING_TIERS_V1.md).
+Classifies changed paths and runs:
 
 - **Tier 0** — docs-only under ``docs/``: no ruff/pytest (exit 0).
 - **Tier 1** — control plane (``scripts/``, ``tests/``, config, ``.cursor/``; no ``src/``):
-  ``ruff check scripts tests`` + full ``pytest -q``.
-- **Tier 2** — product (any ``src/`` touch): ``ruff check src tests scripts`` + full ``pytest -q``.
+  ``ruff check scripts tests`` + pytest (fast or full profile).
+- **Tier 2** — product (any ``src/`` touch): ``ruff check src tests scripts`` + pytest.
+
+**Pytest profiles** (see TESTING_TIERS_V1.md):
+
+- **fast** (default) — ``pytest -m "not witness and not slow"`` for WIP commits.
+- **full** — ``pytest -q`` entire suite; use ``--pre-push`` or ``--full`` before push.
 
 By default, changed files are the union of ``{base_ref}...HEAD`` (branch vs main) and
-``{upstream}..HEAD`` when the branch is ahead of its upstream — so a merge that
-aligns with ``main`` but is not yet pushed still runs the correct tier.
+``{upstream}..HEAD`` when the branch is ahead of its upstream.
 
-Use ``--pre-push`` to classify only ``upstream..HEAD`` (commits not on the remote branch).
+Use ``--pre-push`` to classify only ``upstream..HEAD`` and run **full** pytest.
 Use ``--tier N`` to force a tier for local debugging.
 """
 
@@ -25,12 +29,22 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+PytestProfile = str  # "fast" | "full"
+
+FAST_PYTEST_MARKER = "not witness and not slow"
+
 
 @dataclass(frozen=True)
 class GatePlan:
     tier: int
     reason: str
     commands: list[list[str]]
+
+
+def pytest_cmd(profile: PytestProfile) -> list[str]:
+    if profile == "full":
+        return ["python", "-m", "pytest", "-q"]
+    return ["python", "-m", "pytest", "-q", "-m", FAST_PYTEST_MARKER]
 
 
 def _run(cmd: list[str], *, cwd: Path) -> int:
@@ -128,7 +142,7 @@ def resolve_changed_files(
     return _union_paths(*groups), " + ".join(labels)
 
 
-def _classify(files: list[str]) -> GatePlan:
+def _classify(files: list[str], *, pytest_profile: PytestProfile = "fast") -> GatePlan:
     if not files:
         return GatePlan(tier=0, reason="no changes", commands=[])
 
@@ -137,6 +151,8 @@ def _classify(files: list[str]) -> GatePlan:
 
     def all_under(prefix: str) -> bool:
         return all(f.replace("\\", "/").startswith(prefix) for f in files)
+
+    ptest = pytest_cmd(pytest_profile)
 
     # Tier 0 — docs only
     if all_under("docs/"):
@@ -149,20 +165,34 @@ def _classify(files: list[str]) -> GatePlan:
             reason="src/ touched (product tier)",
             commands=[
                 ["python", "-m", "ruff", "check", "src", "tests", "scripts"],
-                ["python", "-m", "pytest", "-q"],
+                ptest,
             ],
         )
 
     # Tier 1 — control plane (scripts/, tests/, config, .cursor, etc.)
-    # Conservative default: run full pytest to avoid missing coverage.
     return GatePlan(
         tier=1,
         reason="no src/ touched (control-plane tier)",
         commands=[
             ["python", "-m", "ruff", "check", "scripts", "tests"],
-            ["python", "-m", "pytest", "-q"],
+            ptest,
         ],
     )
+
+
+def _tier_commands(tier: int, *, pytest_profile: PytestProfile) -> list[list[str]]:
+    ptest = pytest_cmd(pytest_profile)
+    if tier == 0:
+        return []
+    if tier == 1:
+        return [
+            ["python", "-m", "ruff", "check", "scripts", "tests"],
+            ptest,
+        ]
+    return [
+        ["python", "-m", "ruff", "check", "src", "tests", "scripts"],
+        ptest,
+    ]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -172,7 +202,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--pre-push",
         action="store_true",
-        help="Classify only commits ahead of upstream (two-dot upstream..HEAD)",
+        help="Classify upstream..HEAD only and run full pytest (required before git push)",
+    )
+    ap.add_argument(
+        "--full",
+        action="store_true",
+        help="Run full pytest suite (same as CI pytest job)",
     )
     ap.add_argument(
         "--no-auto-upstream",
@@ -187,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
         help="Force tier (0 docs-only, 1 control-plane, 2 product)",
     )
     args = ap.parse_args(argv)
+
+    pytest_profile: PytestProfile = "full" if args.pre_push or args.full else "fast"
 
     repo = args.repo_root.resolve()
     try:
@@ -203,31 +240,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ERROR: {e}", file=sys.stderr)
         return 2
 
-    plan = _classify(files)
+    plan = _classify(files, pytest_profile=pytest_profile)
     if args.tier is not None:
-        forced = args.tier
-        if forced == 0:
-            plan = GatePlan(tier=0, reason="forced tier 0", commands=[])
-        elif forced == 1:
-            plan = GatePlan(
-                tier=1,
-                reason="forced tier 1",
-                commands=[
-                    ["python", "-m", "ruff", "check", "scripts", "tests"],
-                    ["python", "-m", "pytest", "-q"],
-                ],
-            )
-        else:
-            plan = GatePlan(
-                tier=2,
-                reason="forced tier 2",
-                commands=[
-                    ["python", "-m", "ruff", "check", "src", "tests", "scripts"],
-                    ["python", "-m", "pytest", "-q"],
-                ],
-            )
+        plan = GatePlan(
+            tier=args.tier,
+            reason=f"forced tier {args.tier}",
+            commands=_tier_commands(args.tier, pytest_profile=pytest_profile),
+        )
 
     print(f"pushable gate: tier={plan.tier} ({plan.reason})")
+    print(f"pytest profile: {pytest_profile}")
     print(f"sources: {source}")
     if files:
         print(f"changed_files={len(files)}")

@@ -4,8 +4,16 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from scripts.run_pushable_gate import GatePlan, _classify, _union_paths, resolve_changed_files
+from scripts.run_pushable_gate import (
+    FAST_PYTEST_MARKER,
+    GatePlan,
+    _classify,
+    _union_paths,
+    pytest_cmd,
+    resolve_changed_files,
+)
 
 
 class TestRunPushableGateTiers(unittest.TestCase):
@@ -14,10 +22,14 @@ class TestRunPushableGateTiers(unittest.TestCase):
         self.assertEqual(plan.tier, 0)
         self.assertEqual(plan.commands, [])
 
-    def test_tier1_control_plane_without_src(self) -> None:
+    def test_tier1_control_plane_fast_pytest(self) -> None:
         plan = _classify(["scripts/run_pushable_gate.py", "tests/test_foo.py"])
         self.assertEqual(plan.tier, 1)
         self.assertIn(["python", "-m", "ruff", "check", "scripts", "tests"], plan.commands)
+        self.assertIn(["python", "-m", "pytest", "-q", "-m", FAST_PYTEST_MARKER], plan.commands)
+
+    def test_tier1_control_plane_full_pytest(self) -> None:
+        plan = _classify(["scripts/run_pushable_gate.py"], pytest_profile="full")
         self.assertIn(["python", "-m", "pytest", "-q"], plan.commands)
 
     def test_tier2_any_src_touch(self) -> None:
@@ -42,11 +54,16 @@ class TestRunPushableGateTiers(unittest.TestCase):
         plan = _classify(_union_paths([], ["apps/msos-web/page.tsx", "src/foo.py"]))
         self.assertEqual(plan.tier, 2)
 
+    def test_pytest_cmd_profiles(self) -> None:
+        self.assertEqual(pytest_cmd("full"), ["python", "-m", "pytest", "-q"])
+        self.assertEqual(
+            pytest_cmd("fast"),
+            ["python", "-m", "pytest", "-q", "-m", FAST_PYTEST_MARKER],
+        )
+
 
 class TestResolveChangedFiles(unittest.TestCase):
     def test_pre_push_requires_upstream(self) -> None:
-        from unittest.mock import patch
-
         with patch("scripts.run_pushable_gate._upstream_ref", return_value=None):
             with self.assertRaises(ValueError):
                 resolve_changed_files(Path("."), pre_push=True)
