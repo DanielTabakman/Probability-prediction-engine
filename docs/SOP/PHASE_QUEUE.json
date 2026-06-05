@@ -89,9 +89,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Authenticated shell + Command Center \u2014 SELECTION 2026-06-03 after P2 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
+      "status": "READY",
+      "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md"
     }
   ]
 }

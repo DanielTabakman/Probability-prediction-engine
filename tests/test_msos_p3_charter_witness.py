@@ -34,25 +34,24 @@ def test_p3_phase_plan_valid() -> None:
     assert closeout.get("chapterId") == "msos_p3_command_center"
 
 
-def test_phase_queue_msos_p3_ready() -> None:
+def test_phase_queue_msos_p3_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == P3_PLAN_REL)
-    assert row["status"] == "READY"
+    assert row["status"] == "DONE"
     assert row["selectionPrep"] == "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md"
 
 
-def test_backlog_p3_queued_with_plan() -> None:
+def test_backlog_p3_done_with_plan() -> None:
     backlog = json.loads(BACKLOG.read_text(encoding="utf-8"))
     by_id = {item["chapterId"]: item for item in backlog["items"]}
     p3 = by_id["msos_p3_command_center"]
-    assert p3["status"] in ("queued", "chartered")
+    assert p3["status"] == "done"
     assert p3["planPath"] == P3_PLAN_REL
 
 
-def test_manifest_points_at_p3() -> None:
+def test_manifest_not_active_on_p3_after_complete() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["phasePlanPath"] == P3_PLAN_REL
-    assert manifest["status"] in ("READY", "RUNNING")
+    assert manifest["phasePlanPath"] != P3_PLAN_REL
 
 
 def test_queue_health_no_issues_on_live_queue() -> None:
