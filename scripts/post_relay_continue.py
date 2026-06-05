@@ -115,12 +115,26 @@ def main(argv: list[str] | None = None) -> int:
     if proc.returncode != 0:
         return proc.returncode
 
+    chapter_closed = maybe_mark_manifest_complete(repo, args.phase_plan.resolve(), slice_id)
+
+    if chapter_closed:
+        try:
+            from scripts.ppe_dev_changelog import append_chapter_closed_event
+
+            append_chapter_closed_event(
+                repo,
+                slice_id=slice_id,
+                phase_plan=args.phase_plan.resolve(),
+            )
+        except Exception as exc:
+            print(f"post_relay_continue: dev changelog event skipped: {exc}")
+
     if args.commit:
-        subprocess.run(["git", "add", "-A", "docs/SOP"], cwd=repo, check=False)
+        subprocess.run(["git", "add", "-A", "docs/SOP", "docs/RELEASES"], cwd=repo, check=False)
         msg = f"control-closeout: {slice_id}"
         subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=False)
 
-    if maybe_mark_manifest_complete(repo, args.phase_plan.resolve(), slice_id):
+    if chapter_closed:
         print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
         try:
             plan_rel = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")

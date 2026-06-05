@@ -1,0 +1,55 @@
+name: Dev changelog
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily 13:30 UTC (after google-docs-sync).
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "refresh | backfill"
+        required: true
+        default: "refresh"
+      backfill_days:
+        description: "Days for backfill mode"
+        required: false
+        default: "30"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Update dev changelog
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            DAY=$(date -u +%Y-%m-%d)
+            python scripts/ppe_dev_changelog.py --repo-root . refresh --day "$DAY"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.mode }}" = "backfill" ]; then
+            python scripts/ppe_dev_changelog.py --repo-root . backfill --days "${{ inputs.backfill_days }}"
+          else
+            python scripts/ppe_dev_changelog.py --repo-root . refresh
+          fi
+
+      - name: Commit updated changelog (if any)
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            git add docs/RELEASES/
+            git commit -m "Control-plane: dev changelog"
+            git push
+          else
+            echo "No changelog changes."
+          fi
