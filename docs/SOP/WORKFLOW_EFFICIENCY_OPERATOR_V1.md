@@ -88,7 +88,7 @@ From **PowerShell**, run `.cmd` files via **`cmd /c`** (PowerShell does not exec
 cmd /c weekly_digest.cmd notify
 ```
 
-Default popup is a **MessageBox** dialog (reliable on Windows 10). Optional corner toast: `set PPE_WEEKLY_DIGEST_POPUP=toast` or `both`. Disable all: `set PPE_NOTIFY=0`.
+Default popup is a **MessageBox** with **Yes/No to open** [`WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md) in your default editor. Optional corner toast: `set PPE_WEEKLY_DIGEST_POPUP=toast` or `both`. Skip open prompt: `set PPE_WEEKLY_DIGEST_AUTO_OPEN=0`. Disable all: `set PPE_NOTIFY=0`.
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 
