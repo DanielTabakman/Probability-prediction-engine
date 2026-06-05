@@ -49,6 +49,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "src/engine/",
         (
             "tests/test_belief_*.py",
+            "tests/test_implied_lab_legibility.py",
             "tests/test_mvp1_decision_surface.py",
             "tests/test_reviewed_class_summary.py",
         ),

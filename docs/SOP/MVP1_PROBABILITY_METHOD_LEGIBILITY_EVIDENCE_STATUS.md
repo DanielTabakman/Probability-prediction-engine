@@ -13,7 +13,7 @@
 | Polymarket table method labels | PASS | `app_market_context.py` |
 | Pointwise P(> strike) columns | PASS | `implied_distribution.py`, `prediction_spread_probs.py` |
 | `pytest -q` (fast tier) | PASS | 286 passed, 28 deselected; `test_implied_lab_legibility.py` |
-| Dual implied-lab smoke | DEFER | UI smoke environment-sensitive; run before merge if `viz-change` |
+| Dual implied-lab smoke | RUN | harness gates `legibility_labels_found` on MVP1_compact; record run id below |
 | Chapter closeout docs | PASS | frontier note, evidence, HANDOFF pointer |
 
 ## Smoke run IDs

@@ -221,6 +221,7 @@ class ScenarioResult:
     trust_strip_mvp1_found: bool = False
     feedback_panel_found: bool = False
     commercial_wrapper_found: bool = False
+    legibility_labels_found: bool = False
     directional_category_verified: bool = False
     screenshot_path: str = ""
     notes: str = ""
@@ -700,6 +701,10 @@ def _collect_observations(page, result: ScenarioResult) -> None:
         or _text_present("Why these fit classes appear")
     )
     result.trade_ticket_found = _text_present("Trade ticket (copy/paste)")
+    result.legibility_labels_found = (
+        _text_present("Model bell (lognormal)")
+        or _text_present("Options chain (Breeden")
+    ) and _text_present("Density (display scale")
 
 
 def _scroll_main_content(page) -> None:
@@ -1385,6 +1390,7 @@ def main() -> int:
                     "trust_strip_mvp1_found": r.trust_strip_mvp1_found,
                     "feedback_panel_found": r.feedback_panel_found,
                     "commercial_wrapper_found": r.commercial_wrapper_found,
+                    "legibility_labels_found": r.legibility_labels_found,
                     "directional_category_verified": r.directional_category_verified,
                     "screenshot_path": r.screenshot_path,
                     "notes": r.notes,
@@ -1409,7 +1415,8 @@ def main() -> int:
                     "If C_directional_peak_disagreement is included, verification_found and "
                     "directional_category_verified must be true. "
                     "If MVP1_compact_verification is included, verification_found, "
-                    "trust_strip_mvp1_found, feedback_panel_found, and commercial_wrapper_found must be true. "
+                    "trust_strip_mvp1_found, feedback_panel_found, commercial_wrapper_found, and "
+                    "legibility_labels_found must be true. "
                     "If none of A, C, or MVP1_compact_verification is in the run, the verification gate fails."
                 ),
                 "future_work": (
@@ -1475,6 +1482,7 @@ def main() -> int:
             verification_ok = verification_ok and bool(rm.trust_strip_mvp1_found)
             verification_ok = verification_ok and bool(rm.feedback_panel_found)
             verification_ok = verification_ok and bool(rm.commercial_wrapper_found)
+            verification_ok = verification_ok and bool(rm.legibility_labels_found)
         if not has_a and not has_c and not has_mvp1:
             verification_ok = False
 
