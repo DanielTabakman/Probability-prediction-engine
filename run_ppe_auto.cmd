@@ -15,4 +15,6 @@ set "MAX_CH=20"
 for /f "usebackq delims=" %%m in (`python "%CD%\scripts\ppe_operator_env.py" --print-continuous-max`) do set "MAX_CH=%%m"
 
 call "%CD%\run_ppe.cmd" --continuous --continuous-max %MAX_CH% %*
-exit /b %ERRORLEVEL%
+set "RC=%ERRORLEVEL%"
+if not "%RC%"=="0" exit /b %RC%
+exit /b 0

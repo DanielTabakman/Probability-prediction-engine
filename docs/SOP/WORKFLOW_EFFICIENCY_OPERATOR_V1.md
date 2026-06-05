@@ -19,8 +19,9 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 ## Daily (local profile)
 
-1. `run_ppe_auto_local_loop.cmd`
-2. Optional: `workflow_metrics.cmd session start` at desk open
+1. `run_ppe_operator.cmd` — verdict + next commands (`artifacts/orchestrator/OPERATOR_STATUS.md`)
+2. Follow verdict: `run_ppe_auto_local_loop.cmd` **or** IDE BUILD path **or** `run_ppe_local.cmd`
+3. Optional: `workflow_metrics.cmd session start` at desk open
 
 ---
 
@@ -60,6 +61,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 
 | Command | Purpose |
 |---------|---------|
+| `run_ppe_operator.cmd` | Status verdict before auto-loop (`--brief`, `--notify`, `--json`) |
 | `generate_ide_build_starter.cmd` | One-file IDE BUILD bundle |
 | `generate_build_packet.cmd` | Slim paths-only BUILD packet |
 | `python scripts/ppe_context_preflight.py` | Advisory band check before BUILD |

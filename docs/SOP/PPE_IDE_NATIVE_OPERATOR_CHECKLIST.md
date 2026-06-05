@@ -14,7 +14,8 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Daily run
 
-- [ ] Terminal: `run_ppe_auto_local_loop.cmd` from repo root.
+- [ ] `run_ppe_operator.cmd` — read verdict (`artifacts/orchestrator/OPERATOR_STATUS.md`).
+- [ ] Terminal: `run_ppe_auto_local_loop.cmd` from repo root **only when verdict is RUN_AUTO**.
 - [ ] Optional second terminal: `.\scripts\watch_ppe_live.ps1`.
 - [ ] Queue fed: `queued` rows in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (local profile does **not** steward-charter when idle).
 
