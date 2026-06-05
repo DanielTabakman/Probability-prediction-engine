@@ -25,5 +25,5 @@ exit /b 0
 :notify
 python "%CD%\scripts\ppe_weekly_digest.py" --repo-root "%CD%" write-notify-payload
 if errorlevel 1 exit /b %ERRORLEVEL%
-powershell -NoProfile -ExecutionPolicy Bypass -File "%CD%\scripts\notify_weekly_digest.ps1" -RepoRoot "%CD%"
+powershell -NoProfile -STA -ExecutionPolicy Bypass -File "%CD%\scripts\notify_weekly_digest.ps1" -RepoRoot "%CD%"
 exit /b %ERRORLEVEL%

@@ -88,7 +88,7 @@ From **PowerShell**, run `.cmd` files via **`cmd /c`** (PowerShell does not exec
 cmd /c weekly_digest.cmd notify
 ```
 
-Requires PC on at run time. Toast reads `artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json`. Disable: `set PPE_NOTIFY=0`.
+Default popup is a **MessageBox** dialog (reliable on Windows 10). Optional corner toast: `set PPE_WEEKLY_DIGEST_POPUP=toast` or `both`. Disable all: `set PPE_NOTIFY=0`.
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 
