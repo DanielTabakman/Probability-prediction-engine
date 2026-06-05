@@ -61,6 +61,20 @@ from src.viz.app_cache import (
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
 )
+from src.viz.implied_lab_legibility import (
+    BELIEF_STRATEGY_HOW_CALCULATED_MARKDOWN,
+    CUMULATIVE_CAPTION,
+    FAMILY_VS_TICKET_CAPTION,
+    METHOD_GLOSSARY_MARKDOWN,
+    TRACE_MODEL_BELL,
+    TRACE_MODEL_BELL_HELP,
+    TRACE_OPTIONS_CHAIN,
+    TRACE_OPTIONS_CHAIN_HELP,
+    TRACE_STRATEGY_PAYOFF,
+    TRACE_USER_BELIEF,
+    TRACE_USER_BELIEF_HELP,
+    YAXIS_DENSITY_TITLE,
+)
 from src.engine.strategy_scanner import (
     build_universal_strategy,
     name_universal_strategy,
@@ -301,12 +315,11 @@ if show_bitcoin_view:
     if is_full:
         st.subheader("Market-implied distribution (anchor)")
         with st.expander("How to read this chart", expanded=False):
-            st.markdown("""
-        - **Purple (filled):** Risk-neutral lognormal reference from the **forward price** and **ATM implied volatility**.
-        - **Orange (dashed):** **Market-implied pricing distribution** from listed option marks (Breeden–Litzenberger). This is a **priced / risk-neutral** distribution (not a “true expectations” claim and not a recommendation).
-        - **Green line (if selected):** **Strategy P&amp;L** at expiry (right axis). At each price level, this is your net profit or loss if you hold that strategy. Negative = loss (e.g. premium paid), positive = profit.
-        - **Strikes** for the strategy scanner are chosen from available Deribit options: ATM = strike nearest the forward; spreads use the nearest strikes around the forward so the payoff is relevant to current pricing.
-            """)
+            st.markdown(METHOD_GLOSSARY_MARKDOWN)
+            st.caption(
+                "Green payoff line (when shown): net strategy P&L at expiry from exact strikes on this run — "
+                "not the same as illustrative strategy families in the belief panel."
+            )
 
     if is_full and run_implied and current_btc is not None:
         try:
@@ -1338,9 +1351,10 @@ if show_bitcoin_view:
                             x=data["prices"],
                             y=data["pdf_pct"],
                             mode="lines",
-                            name="Lognormal (forward + IV)",
+                            name=TRACE_MODEL_BELL,
                             line=dict(color="rgba(138, 43, 226, 0.9)", width=2),
                             fill="tozeroy",
+                            meta=TRACE_MODEL_BELL_HELP,
                         )
                     )
                     market_pct = ch.get("market_pct") or []
@@ -1350,8 +1364,9 @@ if show_bitcoin_view:
                                 x=data["prices"],
                                 y=market_pct,
                                 mode="lines",
-                                name="Market-implied pricing distribution (options)",
+                                name=TRACE_OPTIONS_CHAIN,
                                 line=dict(color="rgba(255, 140, 0, 0.9)", width=2, dash="dash"),
+                                meta=TRACE_OPTIONS_CHAIN_HELP,
                             )
                         )
                     user_belief_pct = ch.get("user_belief_pct") or []
@@ -1364,8 +1379,9 @@ if show_bitcoin_view:
                                 x=data["prices"],
                                 y=user_belief_pct,
                                 mode="lines",
-                                name="My belief",
+                                name=TRACE_USER_BELIEF,
                                 line=dict(color="rgba(0, 160, 160, 0.95)", width=2, dash="dot"),
+                                meta=TRACE_USER_BELIEF_HELP,
                             )
                         )
                     title = f"BTC — Underlying price on {selected_expiry_str}"
@@ -1383,7 +1399,7 @@ if show_bitcoin_view:
                                 x=data["prices"],
                                 y=payoff_usd,
                                 mode="lines",
-                                name=f"Payoff: {selected_strategy.get('name', 'Universal 4-leg')}",
+                                name=f"{TRACE_STRATEGY_PAYOFF}: {selected_strategy.get('name', 'Universal 4-leg')}",
                                 line=dict(color="rgba(34, 139, 34, 0.9)", width=2),
                                 yaxis="y2",
                             )
@@ -1391,7 +1407,7 @@ if show_bitcoin_view:
                     layout_kw = {
                         "title": title,
                         "xaxis_title": "Underlying price (USD)",
-                        "yaxis_title": "Probability (scaled)",
+                        "yaxis_title": YAXIS_DENSITY_TITLE,
                         "height": 340,
                         "margin": dict(b=40),
                         "showlegend": True,
@@ -1510,14 +1526,19 @@ if show_bitcoin_view:
                         else:
                             st.markdown(_story_md)
                         st.caption(
-                            "Purple: **risk-neutral distribution** reference · Orange: **market-implied pricing distribution** "
-                            "(Breeden–Litzenberger from marks)"
+                            f"**{TRACE_MODEL_BELL}** · **{TRACE_OPTIONS_CHAIN}**"
                             + (
-                                " · Green: **strategy P&L** at expiry when legs are set."
+                                f" · **{TRACE_USER_BELIEF}** (optional)"
+                                if user_belief_for_state.get("enabled")
+                                else ""
+                            )
+                            + (
+                                f" · **{TRACE_STRATEGY_PAYOFF}** when legs are set."
                                 if post_mvp_implied_lab_ui
                                 else "."
                             )
                         )
+                        st.caption(CUMULATIVE_CAPTION)
                         apply_chart_theme(fig_dist)
                         st.plotly_chart(fig_dist, use_container_width=True)
 
@@ -1557,6 +1578,9 @@ if show_bitcoin_view:
                         if _belief_block:
                             with st.expander("Belief overlay (this run)", expanded=False):
                                 st.markdown(_belief_block)
+                                st.caption(FAMILY_VS_TICKET_CAPTION)
+                            with st.expander("How strategy families are chosen", expanded=False):
+                                st.markdown(BELIEF_STRATEGY_HOW_CALCULATED_MARKDOWN)
                     with right_review_slot.container():
                         with st.expander("Review & disagreement digest", expanded=False):
                             _render_decision_ready_review(

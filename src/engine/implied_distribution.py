@@ -54,6 +54,53 @@ def lognormal_cdf(
     return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
 
+def probability_above_strike_lognormal(
+    forward: float,
+    vol_annual: float,
+    T_years: float,
+    strike: float,
+) -> float:
+    """Risk-neutral P(S_T > strike) under lognormal(forward, vol, T)."""
+    return max(0.0, min(1.0, 1.0 - lognormal_cdf(forward, vol_annual, T_years, strike)))
+
+
+def probability_above_strike_from_density(
+    prices: list[float],
+    pdf_raw: list[float],
+    strike: float,
+) -> float:
+    """P(S > strike) via trapezoid integral of density on the price grid."""
+    if len(prices) < 2 or len(pdf_raw) != len(prices):
+        return 0.0
+    area = 0.0
+    for i in range(len(prices) - 1):
+        dx = float(prices[i + 1]) - float(prices[i])
+        if dx <= 0:
+            continue
+        area += 0.5 * (float(pdf_raw[i]) + float(pdf_raw[i + 1])) * dx
+    if area <= 0:
+        return 0.0
+    above = 0.0
+    for i in range(len(prices) - 1):
+        p0 = float(prices[i])
+        p1 = float(prices[i + 1])
+        if p1 <= strike:
+            continue
+        f0 = float(pdf_raw[i]) / area
+        f1 = float(pdf_raw[i + 1]) / area
+        seg_lo = max(p0, strike)
+        seg_hi = p1
+        if seg_hi <= seg_lo:
+            continue
+        if seg_lo > p0 and p1 > p0:
+            t = (seg_lo - p0) / (p1 - p0)
+            f_lo = f0 + t * (f1 - f0)
+        else:
+            f_lo = f0
+        above += 0.5 * (f_lo + f1) * (seg_hi - seg_lo)
+    return max(0.0, min(1.0, above))
+
+
 def build_distribution_chart_data(
     forward: float,
     vol_annual: float,

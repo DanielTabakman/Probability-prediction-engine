@@ -68,6 +68,25 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd summary --days 7` | Throughput review |
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
+| `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
+| `weekly_digest.cmd notify` | Windows toast with latest **In short** (respects `PPE_NOTIFY=0`) |
+| `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
+
+**Monday popup (local):** Task Scheduler — use **cmd.exe** (paths with spaces break if you paste the `.cmd` directly):
+
+| Field | Value |
+|-------|--------|
+| Program | `cmd.exe` |
+| Arguments | `/c "D:\Users\User\Desktop\Probability prediction engine\weekly_digest_monday.cmd"` |
+| Start in | `D:\Users\User\Desktop\Probability prediction engine` |
+
+From **PowerShell**, run `.cmd` files via **`cmd /c`** (PowerShell does not execute `.cmd` with `&` alone):
+
+```bat
+cmd /c weekly_digest.cmd notify
+```
+
+Requires PC on at run time. Toast reads `artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json`. Disable: `set PPE_NOTIFY=0`.
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 

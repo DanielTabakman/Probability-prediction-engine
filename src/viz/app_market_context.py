@@ -17,7 +17,19 @@ import streamlit as st
 from src.data.fetch_polymarket import markets_to_probabilities
 from src.data.parse_btc_markets import btc_price_questions_from_polymarket
 from src.data.fetch_deribit import fetch_deribit_spreads_around_predictions
+from src.viz.app_cache import cached_forward_iv, cached_marks_full
+from src.viz.implied_lab_legibility import (
+    COL_LOGNORMAL_ABOVE,
+    COL_LOGNORMAL_ABOVE_HELP,
+    COL_OPTIONS_INTEGRATED_ABOVE,
+    COL_OPTIONS_INTEGRATED_ABOVE_HELP,
+    COL_PREDICTION_MARKET,
+    COL_PREDICTION_MARKET_HELP,
+    COL_SPREAD_PROXY,
+    COL_SPREAD_PROXY_HELP,
+)
 from src.viz.plotly_theme import apply_chart_theme
+from src.viz.prediction_spread_probs import enrich_prediction_spreads_pointwise
 
 
 def _q_label(q: dict) -> str | None:
@@ -126,6 +138,12 @@ def render_market_context_expander(
                             instruments=cached_option_instruments(),
                             option_book_marks=cached_option_book_marks(),
                         ) or []
+                        prediction_spreads = enrich_prediction_spreads_pointwise(
+                            prediction_spreads,
+                            current_spot=float(current_btc),
+                            forward_iv_fn=cached_forward_iv,
+                            marks_full_fn=cached_marks_full,
+                        )
                     except Exception:
                         pass
 
@@ -473,22 +491,28 @@ def render_market_context_expander(
             if is_full and load_deribit and prediction_spreads:
                 pred_rows: list[dict[str, Any]] = []
                 for s in prediction_spreads:
-                    pred_rows.append(
-                        {
-                            "Target": f"${s['target']:,.0f}",
-                            "Resolution": s["resolution_date"][:10],
-                            "Polymarket Yes %": f"{s.get('polymarket_yes_pct', 0):.1f}",
-                            "Spread": f"{s['K_low']/1000:.0f}k/{s['K_high']/1000:.0f}k",
-                            "Cost (USD)": f"{s['cost_usd']:,.0f}",
-                            "R:R": f"1:{s['rr_ratio']:.2f}",
-                            "Opt ~implied %": f"{s.get('approx_implied_prob_pct') or 0:.1f}"
-                            if s.get("approx_implied_prob_pct") is not None
-                            else "—",
-                        }
-                    )
+                    row: dict[str, Any] = {
+                        "Target": f"${s['target']:,.0f}",
+                        "Resolution": s["resolution_date"][:10],
+                        COL_PREDICTION_MARKET: f"{s.get('polymarket_yes_pct', 0):.1f}",
+                        "Spread": f"{s['K_low']/1000:.0f}k/{s['K_high']/1000:.0f}k",
+                        "Cost (USD)": f"{s['cost_usd']:,.0f}",
+                        "R:R": f"1:{s['rr_ratio']:.2f}",
+                        COL_SPREAD_PROXY: f"{s.get('approx_implied_prob_pct') or 0:.1f}"
+                        if s.get("approx_implied_prob_pct") is not None
+                        else "—",
+                    }
+                    if s.get("lognormal_p_above_pct") is not None:
+                        row[COL_LOGNORMAL_ABOVE] = f"{float(s['lognormal_p_above_pct']):.1f}"
+                    if s.get("options_chain_p_above_pct") is not None:
+                        row[COL_OPTIONS_INTEGRATED_ABOVE] = f"{float(s['options_chain_p_above_pct']):.1f}"
+                    pred_rows.append(row)
                 st.dataframe(pd.DataFrame(pred_rows), use_container_width=True, hide_index=True)
                 st.caption(
-                    "Opt ~implied % = approximate from spread cost (simplified). Compare to Polymarket Yes %."
+                    f"**{COL_PREDICTION_MARKET}:** {COL_PREDICTION_MARKET_HELP} "
+                    f"**{COL_SPREAD_PROXY}:** {COL_SPREAD_PROXY_HELP} "
+                    f"**{COL_LOGNORMAL_ABOVE}:** {COL_LOGNORMAL_ABOVE_HELP} "
+                    f"**{COL_OPTIONS_INTEGRATED_ABOVE}:** {COL_OPTIONS_INTEGRATED_ABOVE_HELP}"
                 )
             elif is_full and load_deribit:
                 st.caption(

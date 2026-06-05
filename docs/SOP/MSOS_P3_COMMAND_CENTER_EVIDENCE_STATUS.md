@@ -1,7 +1,7 @@
 # MSOS P3 Command Center — evidence status
 
 **Chapter:** `msos_p3_command_center`  
-**Status:** **READY** (awaiting relay)  
+**Status:** **COMPLETE** 2026-06-05 (awaiting relay)  
 **Sprint:** [`SPRINT_MSOS_P3_COMMAND_CENTER.md`](SPRINT_MSOS_P3_COMMAND_CENTER.md)
 
 ## Gate

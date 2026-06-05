@@ -96,7 +96,7 @@ def test_storyboard_gate_open() -> None:
     assert "storyboard-v0.6" in text
 
 
-def test_backlog_p1_done_p2_done_p3_queued_with_plan() -> None:
+def test_backlog_p1_done_p2_done_p3_done_p4_chartered() -> None:
     backlog = json.loads(BACKLOG.read_text(encoding="utf-8"))
     by_id = {item["chapterId"]: item for item in backlog["items"]}
     assert by_id["msos_p1_stack_routing"]["status"] in ("queued", "chartered", "done")
@@ -104,8 +104,11 @@ def test_backlog_p1_done_p2_done_p3_queued_with_plan() -> None:
     assert p2["status"] == "done"
     assert p2["planPath"] == P2_PLAN_REL
     p3 = by_id["msos_p3_command_center"]
-    assert p3["status"] in ("queued", "chartered")
+    assert p3["status"] == "done"
     assert p3["planPath"] == "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json"
+    p4 = by_id["msos_p4_strategy_lab"]
+    assert p4["status"] in ("queued", "chartered")
+    assert p4["planPath"] == "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json"
     assert by_id["msos_p8_tester_release"]["status"] == "blocked"
 
 

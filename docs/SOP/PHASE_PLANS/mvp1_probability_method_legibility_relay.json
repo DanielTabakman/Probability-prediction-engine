@@ -1,0 +1,104 @@
+{
+  "name": "MVP1_probability_method_legibility (chart + belief + Polymarket method labels)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/implied_lab_legibility.py",
+        "src/viz/app.py",
+        "src/viz/tutorial.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app.py",
+        "src/viz/app_panels.py",
+        "src/viz/implied_lab_provenance.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Product-Slice004",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app_market_context.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Product-Slice005",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/implied_distribution.py",
+        "src/viz/app_market_context.py",
+        "src/data/fetch_deribit.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Smoke-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-ProbMethodLegibility-Closeout-Slice007",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_probability_method_legibility",
+        "chapterTitle": "MVP1 probability method legibility",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_PROBABILITY_METHOD_LEGIBILITY_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SEMANTIC_CONTRACTS.md"
+        ]
+      }
+    }
+  ]
+}

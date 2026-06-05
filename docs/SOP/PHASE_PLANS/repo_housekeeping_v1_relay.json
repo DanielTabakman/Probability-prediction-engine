@@ -1,0 +1,56 @@
+{
+  "name": "Repo housekeeping v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+  "selectionRecord": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "RepoHousekeeping-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RepoHousekeeping-Evidence-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "RepoHousekeeping-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RepoHousekeeping-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "repo_housekeeping_v1",
+        "chapterTitle": "Repo housekeeping v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
