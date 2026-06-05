@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -14,6 +15,7 @@ from scripts.ppe_dev_changelog import CHAPTER_CLOSED_PREFIX, QUIET_STUB, load_ch
 
 DIGEST_REL = "docs/RELEASES/WEEKLY_DIGEST.md"
 STATE_REL = "docs/RELEASES/.weekly_digest_state.json"
+NOTIFY_REL = "artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json"
 MSOS_FRONTIER_REL = "docs/SOP/MSOS_FRONTIER.md"
 MVP1_FRONTIER_REL = "docs/SOP/MVP1_FRONTIER.md"
 
@@ -101,6 +103,62 @@ class WeekSection:
 
 def digest_path(repo: Path) -> Path:
     return repo / DIGEST_REL
+
+
+def notify_payload_path(repo: Path) -> Path:
+    return repo / NOTIFY_REL
+
+
+def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
+    """Return summary for the newest ## Week of section in WEEKLY_DIGEST.md."""
+    week_monday: str | None = None
+    in_short: str | None = None
+    merge_count = 0
+    in_first_week = False
+    for line in text.splitlines():
+        if line.startswith("## Week of "):
+            if week_monday is not None:
+                break
+            week_monday = line.split("## Week of ", 1)[1].split(" ", 1)[0].strip()
+            in_first_week = True
+            continue
+        if not in_first_week:
+            continue
+        stripped = line.strip()
+        if stripped.startswith("**In short:**"):
+            in_short = stripped.split("**In short:**", 1)[1].strip()
+        elif stripped.startswith("- ") and "merge(s) to `main`" in stripped:
+            m = re.search(r"(\d+)\s+merge\(s\)", stripped)
+            if m:
+                merge_count = int(m.group(1))
+    if week_monday and in_short:
+        return {
+            "week_monday": week_monday,
+            "in_short": in_short,
+            "merge_count": merge_count,
+            "digest_rel": DIGEST_REL,
+        }
+    return None
+
+
+def cmd_write_notify_payload(repo: Path) -> int:
+    repo = repo.resolve()
+    p = digest_path(repo)
+    if not p.is_file():
+        print("ppe_weekly_digest: notify payload skipped (no digest file)", file=sys.stderr)
+        return 1
+    summary = parse_latest_week_summary(p.read_text(encoding="utf-8"))
+    if not summary:
+        print("ppe_weekly_digest: notify payload skipped (no week section)", file=sys.stderr)
+        return 1
+    summary["generated_at_utc"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace(
+        "+00:00", "Z"
+    )
+    out = notify_payload_path(repo)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"ppe_weekly_digest: wrote {out}")
+    return 0
 
 
 def state_path(repo: Path) -> Path:
@@ -393,6 +451,8 @@ def main(argv: list[str] | None = None) -> int:
     p_back = sub.add_parser("backfill", help="Seed recent completed weeks")
     p_back.add_argument("--weeks", type=int, default=4)
 
+    sub.add_parser("write-notify-payload", help="Write JSON for Windows toast notifier")
+
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -403,6 +463,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_generate(repo, week_monday=week, force=args.force)
     if args.command == "backfill":
         return cmd_backfill(repo, weeks=args.weeks)
+    if args.command == "write-notify-payload":
+        return cmd_write_notify_payload(repo)
     return 2
 
 

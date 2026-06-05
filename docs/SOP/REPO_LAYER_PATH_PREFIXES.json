@@ -70,6 +70,8 @@
         "run_phase.cmd",
         "dev_changelog.cmd",
         "weekly_digest.cmd",
+        "weekly_digest_monday.cmd",
+        "scripts/notify_weekly_digest.ps1",
         "workflow_metrics.cmd",
         "docs/RELEASES/",
         "docs/README.md",
@@ -218,6 +220,8 @@
         "docs/README.md",
         "dev_changelog.cmd",
         "weekly_digest.cmd",
+        "weekly_digest_monday.cmd",
+        "scripts/notify_weekly_digest.ps1",
         "workflow_metrics.cmd",
         ".github/workflows/dev-changelog.yml",
         ".github/workflows/weekly-digest.yml"

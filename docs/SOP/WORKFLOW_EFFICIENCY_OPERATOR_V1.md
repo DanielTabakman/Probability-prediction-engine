@@ -69,6 +69,10 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
 | `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
+| `weekly_digest.cmd notify` | Windows toast with latest **In short** (respects `PPE_NOTIFY=0`) |
+| `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
+
+**Monday popup (local):** Task Scheduler → weekly → run `weekly_digest_monday.cmd` from repo root (e.g. Monday 09:00). Requires PC on at run time. Toast reads `artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json`.
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 
