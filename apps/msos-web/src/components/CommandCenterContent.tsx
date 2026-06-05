@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import {
   currentWork,
   headlines,
@@ -55,7 +57,9 @@ export function CommandCenterContent() {
                   <p>{tile.description}</p>
                 </div>
                 {tile.enabled ? (
-                  <span className="btn slim primary">{tile.cta}</span>
+                  <Link href="/strategy-lab" className="btn slim primary">
+                    {tile.cta}
+                  </Link>
                 ) : (
                   <span className="tag muted">{tile.tag}</span>
                 )}
