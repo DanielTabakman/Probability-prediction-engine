@@ -701,6 +701,11 @@ def _collect_observations(page, result: ScenarioResult) -> None:
         or _text_present("Why these fit classes appear")
     )
     result.trade_ticket_found = _text_present("Trade ticket (copy/paste)")
+    try:
+        page.evaluate("window.scrollTo(0, 0)")
+        page.wait_for_timeout(600)
+    except Exception:
+        pass
     result.legibility_labels_found = (
         _text_present("Model bell (lognormal)")
         or _text_present("Options chain (Breeden")
