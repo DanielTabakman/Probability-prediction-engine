@@ -13,23 +13,35 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P3 authenticated shell + Command Center** — **READY** (SELECTION 2026-06-03)
-- **Relay plan:** [`PHASE_PLANS/msos_p3_command_center_relay.json`](PHASE_PLANS/msos_p3_command_center_relay.json)
-- **Sprint:** [`SPRINT_MSOS_P3_COMMAND_CENTER.md`](SPRINT_MSOS_P3_COMMAND_CENTER.md)
-- **SELECTION:** [`POST_MSOS_P3_COMMAND_CENTER_SELECTION.md`](POST_MSOS_P3_COMMAND_CENTER_SELECTION.md)
-- **Last closed:** **MSOS P2 design system + public homepage** — **COMPLETE** 2026-06-03
-- **Evidence (P2):** [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md)
-- **Operator:** `run_ppe_local.cmd` — product slice via IDE BUILD + `mark_ide_product_ready.cmd MSOS-P3-Product-Slice002`
+- **Active BUILD chapter:** **MSOS P4 Strategy Lab / PPE integration** — **READY** (relay running)
+- **Relay plan:** [`PHASE_PLANS/msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json)
+- **Sprint:** [`SPRINT_MSOS_P4_STRATEGY_LAB.md`](SPRINT_MSOS_P4_STRATEGY_LAB.md)
+- **SELECTION:** [`POST_MSOS_P4_STRATEGY_LAB_SELECTION.md`](POST_MSOS_P4_STRATEGY_LAB_SELECTION.md)
+- **Last closed:** **MSOS P3 authenticated shell + Command Center** — product shell on `main`
+- **Evidence (P3):** [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md)
+- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P4-Product-Slice002` → `run_ppe_local.cmd`
 
-### MSOS P3 Command Center — relay queue — **READY** (2026-06-03)
+### MSOS P4 Strategy Lab — relay queue — **READY**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **NEXT** | `MSOS-P3-Control-Slice001` — charter | EVIDENCE |
-| **PENDING** | `MSOS-P3-Product-Slice002` — shell + Command Center | PRODUCT |
-| **PENDING** | `MSOS-P3-Platform-Slice003` — Access / routes | EVIDENCE |
-| **PENDING** | `MSOS-P3-Witness-Slice004` — witness | EVIDENCE |
-| **PENDING** | `MSOS-P3-Closeout-Slice005` — chapter close | EVIDENCE |
+| **CLOSED** | `MSOS-P4-Control-Slice001` — charter | EVIDENCE |
+| **IN PROGRESS** | `MSOS-P4-Product-Slice002` — Strategy Lab route + embed boundary | PRODUCT |
+| **PENDING** | `MSOS-P4-Platform-Slice003` — Caddy/compose proxy | EVIDENCE |
+| **PENDING** | `MSOS-P4-Witness-Slice004` — witness | EVIDENCE |
+| **PENDING** | `MSOS-P4-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `03_ppe_lab` · **Embed:** `NEXT_PUBLIC_PPE_EMBED_URL` (proxy wired in platform slice)
+
+### MSOS P3 Command Center — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P3-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P3-Product-Slice002` — shell + Command Center | PRODUCT |
+| **CLOSED** | `MSOS-P3-Platform-Slice003` — Access / routes | EVIDENCE |
+| **CLOSED** | `MSOS-P3-Witness-Slice004` — witness | EVIDENCE |
+| **CLOSED** | `MSOS-P3-Closeout-Slice005` — chapter close | EVIDENCE |
 
 **Evidence:** [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md)
 
@@ -72,8 +84,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 |----------|-----------|----------------|---------|
 | P1 | `msos_p1_stack_routing` | **done** | — |
 | P2 | `msos_p2_homepage` | **done** | — |
-| P3 | `msos_p3_command_center` | **queued / READY** | SELECTION 2026-06-03 — relay running |
-| P4 | `msos_p4_strategy_lab` | **blocked** (pre-chartered) | Auto-**queued** after P3 closeout |
+| P3 | `msos_p3_command_center` | **done** | — |
+| P4 | `msos_p4_strategy_lab` | **queued / READY** | Relay running — product slice IDE BUILD |
 | P5 | `msos_p5_thesis_confirm` | **blocked** (pre-chartered) | After P4 |
 | P6 | `msos_p6_expression_sim` | **blocked** (pre-chartered) | After P5 |
 | P7 | `msos_p7_monitoring` | **blocked** (pre-chartered) | After P6 |

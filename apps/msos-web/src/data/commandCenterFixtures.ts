@@ -15,8 +15,8 @@ export type MarketAsset = {
 };
 
 export const navItems: NavItem[] = [
-  { id: "command-center", label: "Command Center", href: "/command-center", active: true },
-  { id: "strategy-lab", label: "Strategy Lab", href: "#", disabled: true },
+  { id: "command-center", label: "Command Center", href: "/command-center" },
+  { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
   { id: "theses", label: "Theses", href: "#", disabled: true },
   { id: "expression", label: "Expression & Execution", href: "#", disabled: true },
   { id: "monitor", label: "Monitor", href: "#", disabled: true },
