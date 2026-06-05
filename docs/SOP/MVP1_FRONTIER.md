@@ -15,8 +15,9 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md))
-- **Next queued MVP1 chapter (blocked until MSOS P4 COMPLETE):** **probability method legibility** — [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md) · backlog `mvp1_probability_method_legibility` · **product legibility shipped** on branch (charter + UI labels + pointwise table)
+- **Active BUILD chapter:** **none** — parallel MSOS track active ([`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)); MVP1 relay awaits MSOS P4 COMPLETE
+- **Next queued MVP1 chapter (after MSOS P4):** **distribution export Phase 1** — [`SPRINT_MVP1_DISTRIBUTION_EXPORT.md`](SPRINT_MVP1_DISTRIBUTION_EXPORT.md) · backlog `mvp1_distribution_export` · BTC mean + quartiles CSV download (research partner)
+- **Then (blocked):** **probability method legibility** — [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md) · backlog `mvp1_probability_method_legibility`
 - **Last closed chapter:** **MSOS P3 authenticated shell + Command Center** — **COMPLETE** 2026-06-05
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
@@ -58,6 +59,20 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 | **CLOSED** | `MVP1-ReviewEnrichment-Closeout-Slice005` — chapter close | CONTROL |
 
 **Evidence:** [`MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md`](MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md) · **SELECTION:** [`POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md`](POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md)
+
+### MVP1 distribution export — relay queue (baseline **`main`**) — **CHARTERED** (2026-06-05)
+
+**Sprint spec:** [`SPRINT_MVP1_DISTRIBUTION_EXPORT.md`](SPRINT_MVP1_DISTRIBUTION_EXPORT.md) · **Phase plan:** [`PHASE_PLANS/mvp1_distribution_export_relay.json`](PHASE_PLANS/mvp1_distribution_export_relay.json) · **SELECTION:** [`POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md`](POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MVP1-DistExport-Control-Slice001` — charter + SELECTION | CONTROL |
+| **PENDING** | `MVP1-DistExport-Product-Slice002` — lognormal + BL quantile helpers | PRODUCT (`PPE_CORE`) |
+| **PENDING** | `MVP1-DistExport-Product-Slice003` — CSV serializer + download button | PRODUCT (`PPE_UI`) |
+| **PENDING** | `MVP1-DistExport-Smoke-Slice004` — pytest witness | CONTROL |
+| **PENDING** | `MVP1-DistExport-Closeout-Slice005` — chapter close | CONTROL |
+
+**Queue position:** `queued` in backlog — auto-select after **MSOS P4** COMPLETE. **Evidence:** [`MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md`](MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md).
 
 ### MVP1 smoke regression — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
 

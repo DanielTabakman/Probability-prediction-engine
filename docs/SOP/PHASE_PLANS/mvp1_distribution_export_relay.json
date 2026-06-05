@@ -1,0 +1,82 @@
+{
+  "name": "MVP1_distribution_export (BTC implied distribution CSV Phase 1)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DistExport-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "buildBranch": "build/auto/MVP1-DistExport-Control-Slice001-dist_export",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DistExport-Product-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "buildBranch": "build/auto/MVP1-DistExport-Product-Slice002-dist_export",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/implied_distribution.py",
+        "tests/test_implied_distribution.py",
+        "tests/test_distribution_export.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistExport-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "buildBranch": "build/auto/MVP1-DistExport-Product-Slice003-dist_export",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/distribution_export.py",
+        "src/viz/app.py",
+        "tests/test_distribution_export.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistExport-Smoke-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "buildBranch": "build/auto/MVP1-DistExport-Smoke-Slice004-dist_export",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DistExport-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "buildBranch": "build/auto/MVP1-DistExport-Closeout-Slice005-dist_export",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_distribution_export",
+        "chapterTitle": "MVP1 BTC distribution export (Phase 1)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
