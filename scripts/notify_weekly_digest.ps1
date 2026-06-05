@@ -66,12 +66,38 @@ function Show-ToastWin10 {
 function Open-DigestFile {
   param([string]$Path)
   if (-not (Test-Path -LiteralPath $Path)) { return $false }
-  try {
-    Start-Process -FilePath $Path
-    return $true
-  } catch {
-    return $false
+  $Path = (Resolve-Path -LiteralPath $Path).Path
+
+  # Cursor / VS Code CLIs (preferred for this repo).
+  foreach ($cmd in @("cursor", "code")) {
+    $exe = Get-Command $cmd -ErrorAction SilentlyContinue
+    if ($exe) {
+      try {
+        Start-Process -FilePath $exe.Source -ArgumentList @($Path)
+        return $true
+      } catch { }
+    }
   }
+
+  # Default file association (.md handler).
+  try {
+    Invoke-Item -LiteralPath $Path
+    return $true
+  } catch { }
+
+  # Classic Windows shell open (works when Invoke-Item fails).
+  try {
+    Start-Process -FilePath "cmd.exe" -ArgumentList @("/c", "start", '""', $Path) -WindowStyle Hidden
+    return $true
+  } catch { }
+
+  # Last resort: highlight file in Explorer.
+  try {
+    Start-Process -FilePath "explorer.exe" -ArgumentList @("/select,", $Path)
+    return $true
+  } catch { }
+
+  return $false
 }
 
 function Show-MessageBox {
@@ -110,7 +136,15 @@ if ($popupMode -eq "messagebox" -or $popupMode -eq "both") {
 }
 
 if ($openFile) {
-  Open-DigestFile -Path $digestPath | Out-Null
+  if (-not (Open-DigestFile -Path $digestPath)) {
+    Add-Type -AssemblyName System.Windows.Forms
+    [void][System.Windows.Forms.MessageBox]::Show(
+      "Could not open the digest automatically.`n`nOpen manually:`n$digestPath",
+      "PPE weekly digest",
+      [System.Windows.Forms.MessageBoxButtons]::OK,
+      [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+  }
 }
 
 if (-not $shown) {
