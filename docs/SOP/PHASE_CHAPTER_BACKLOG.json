@@ -71,6 +71,16 @@
       "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE"
     },
     {
+      "chapterId": "repo_housekeeping_v1",
+      "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
+      "workerMode": "deterministic",
+      "chapterTitle": "Repo housekeeping v1",
+      "selectionRecord": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
+      "canonRef": "docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md \u2014 Cleanup",
+      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope"
+    },
+    {
       "chapterId": "mvp1_probability_method_legibility",
       "status": "blocked",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json",
