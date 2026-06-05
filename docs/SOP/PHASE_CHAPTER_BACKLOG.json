@@ -71,14 +71,6 @@
       "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE"
     },
     {
-      "chapterId": "mvp1_distribution_export",
-      "status": "queued",
-      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_export_relay.json",
-      "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md",
-      "canonRef": "docs/SOP/MVP1_FRONTIER.md \u2014 distribution research export",
-      "reason": "BTC implied distribution mean + quartiles CSV download (Phase 1); research partner deliverable \u2014 queued after MSOS P4"
-    },
-    {
       "chapterId": "repo_housekeeping_v1",
       "status": "blocked",
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
