@@ -69,10 +69,12 @@
         "run_slice.cmd",
         "run_phase.cmd",
         "dev_changelog.cmd",
+        "weekly_digest.cmd",
         "workflow_metrics.cmd",
         "docs/RELEASES/",
         "docs/README.md",
-        ".github/workflows/dev-changelog.yml"
+        ".github/workflows/dev-changelog.yml",
+        ".github/workflows/weekly-digest.yml"
       ]
     },
     "platform": {
@@ -209,13 +211,16 @@
         "tests/test_manifest_",
         "tests/test_canonical_docs",
         "tests/test_ppe_dev_changelog.py",
+        "tests/test_ppe_weekly_digest.py",
         "tests/test_workflow_metrics_cli.py",
         ".cursor/rules/",
         "docs/RELEASES/",
         "docs/README.md",
         "dev_changelog.cmd",
+        "weekly_digest.cmd",
         "workflow_metrics.cmd",
-        ".github/workflows/dev-changelog.yml"
+        ".github/workflows/dev-changelog.yml",
+        ".github/workflows/weekly-digest.yml"
       ],
       "forbidden_paths": [
         "src/",

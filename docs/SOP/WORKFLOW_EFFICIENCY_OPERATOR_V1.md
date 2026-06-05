@@ -68,6 +68,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd summary --days 7` | Throughput review |
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
+| `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 

@@ -1,0 +1,50 @@
+name: Weekly digest
+
+on:
+  schedule:
+    # Monday 14:00 UTC — summary of prior Mon–Sun week.
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "generate | backfill"
+        required: true
+        default: "generate"
+      backfill_weeks:
+        description: "Weeks for backfill mode"
+        required: false
+        default: "4"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Update weekly digest
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.mode }}" = "backfill" ]; then
+            python scripts/ppe_weekly_digest.py --repo-root . backfill --weeks "${{ inputs.backfill_weeks }}"
+          else
+            python scripts/ppe_weekly_digest.py --repo-root . generate
+          fi
+
+      - name: Commit updated digest (if any)
+        run: |
+          git status --porcelain
+          if [ -n "$(git status --porcelain)" ]; then
+            git add docs/RELEASES/
+            git commit -m "Control-plane: weekly digest"
+            git push
+          else
+            echo "No digest changes."
+          fi

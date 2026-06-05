@@ -18,7 +18,8 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) · [`SOP/PARALLEL_AGENT_CHECKLIST_V1.md`](SOP/PARALLEL_AGENT_CHECKLIST_V1.md) |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **Active phase manifest** | [`SOP/ACTIVE_PHASE_MANIFEST.json`](SOP/ACTIVE_PHASE_MANIFEST.json) · [`SOP/ACTIVE_PHASE_MANIFEST.md`](SOP/ACTIVE_PHASE_MANIFEST.md) — input for **`run_ppe.cmd`** |
-| **Dev changelog (rolling)** | [`RELEASES/DEV_CHANGELOG.md`](RELEASES/DEV_CHANGELOG.md) — daily / merge release notes on `main` |
+| **Dev changelog (rolling)** | [`RELEASES/DEV_CHANGELOG.md`](RELEASES/DEV_CHANGELOG.md) — daily / merge receipt on `main` |
+| **Weekly digest (human)** | [`RELEASES/WEEKLY_DIGEST.md`](RELEASES/WEEKLY_DIGEST.md) — Monday summary of prior week |
 
 **Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for its track.
 
