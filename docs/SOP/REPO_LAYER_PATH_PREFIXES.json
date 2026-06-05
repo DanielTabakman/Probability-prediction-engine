@@ -67,7 +67,12 @@
         ".cursor/rules/",
         "run_ppe.cmd",
         "run_slice.cmd",
-        "run_phase.cmd"
+        "run_phase.cmd",
+        "dev_changelog.cmd",
+        "workflow_metrics.cmd",
+        "docs/RELEASES/",
+        "docs/README.md",
+        ".github/workflows/dev-changelog.yml"
       ]
     },
     "platform": {
@@ -203,7 +208,14 @@
         "tests/test_steering_",
         "tests/test_manifest_",
         "tests/test_canonical_docs",
-        ".cursor/rules/"
+        "tests/test_ppe_dev_changelog.py",
+        "tests/test_workflow_metrics_cli.py",
+        ".cursor/rules/",
+        "docs/RELEASES/",
+        "docs/README.md",
+        "dev_changelog.cmd",
+        "workflow_metrics.cmd",
+        ".github/workflows/dev-changelog.yml"
       ],
       "forbidden_paths": [
         "src/",
