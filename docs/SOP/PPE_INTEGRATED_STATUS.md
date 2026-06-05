@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-03 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-05 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -78,6 +78,8 @@ flowchart LR
 
 | MSOS P2 design system + public homepage | **COMPLETE** 2026-06-02 | [`SPRINT_MSOS_P2_HOMEPAGE.md`](docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md), [`MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md) |
 
+| MSOS P3 authenticated shell + Command Center | **COMPLETE** 2026-06-05 | [`SPRINT_MSOS_P3_COMMAND_CENTER.md`](docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md), [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -134,4 +136,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Execute MSOS P3** — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md). After closeout: propagate P4 (`run_ppe.cmd --continuous`). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
