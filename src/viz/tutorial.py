@@ -86,4 +86,8 @@ Deeper panels may show **strategy shapes** that **fit** the disagreement story. 
 This app is a **research cockpit** for exploration and learning. Nothing here is personalized investment, tax, or legal advice; there are **no** promises of returns. Prefer **Freeze & history** (when enabled) to capture what you reviewed, not as a trade log.
 """
         )
+        from src.viz.implied_lab_legibility import METHOD_GLOSSARY_MARKDOWN
+
+        with st.expander("What each probability number means", expanded=False):
+            st.markdown(METHOD_GLOSSARY_MARKDOWN)
         st.caption("Exploration only — not trading advice.")

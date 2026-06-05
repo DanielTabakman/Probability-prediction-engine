@@ -19,7 +19,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
 
-**MVP1 relay:** idle. **Operator:** `run_ppe_local.cmd` / `run_ppe.cmd` — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md). **Commercial outreach** parallel per acceleration checklist (not gated on P8).
+**MVP1 relay:** idle (P4 **READY** in queue). **Next MVP1 chapter (blocked until P4 COMPLETE):** probability method legibility — [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md) (UI labels + pointwise Polymarket comparison shipped on branch). **Operator:** `run_ppe_local.cmd` / `run_ppe.cmd` — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 
 ---
 

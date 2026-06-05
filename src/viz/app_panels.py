@@ -18,6 +18,7 @@ from src.viz.belief_uncertainty import (
     sigma_ln_to_move_pct_1sigma,
 )
 from src.viz.commercial_wrapper import COMMERCIAL_BOUNDARY_CAPTION
+from src.viz.implied_lab_legibility import FAMILY_VS_TICKET_CAPTION
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import TRUST_STRIP_FALLBACK_LINE, build_trust_strip_lines
 from src.viz.mvp1_feedback_ui import render_mvp1_feedback_panel
@@ -188,6 +189,12 @@ def render_belief_vs_market_glance(v: dict) -> None:
             f"**{g.get('fit_note', 'Fit is not recommendation.')}** "
             f"{g.get('illustrative_scope_note', '')}"
         )
+        st.caption(FAMILY_VS_TICKET_CAPTION)
+        _vsum = v.get("verification_summary") if isinstance(v.get("verification_summary"), dict) else {}
+        _paths = _vsum.get("derivation_paths") if isinstance(_vsum.get("derivation_paths"), dict) else {}
+        _dcap = _paths.get("disagreement_category")
+        if isinstance(_dcap, str) and _dcap.strip():
+            st.caption(f"**Category rule:** {_dcap}")
         st.divider()
         st.markdown("###### Reference numbers (grid)")
         a, b = st.columns(2)

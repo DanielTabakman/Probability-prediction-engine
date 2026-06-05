@@ -601,6 +601,7 @@ def fetch_deribit_spreads_around_predictions(
             "target": row["target"],
             "resolution_date": row["res_str"],
             "polymarket_yes_pct": (row["prob"] or 0) * 100,
+            "expiry_ts": exp_ts,
             "expiry_date": datetime.fromtimestamp(exp_ts / 1000, tz=timezone.utc),
             "K_low": k_low,
             "K_high": k_high,

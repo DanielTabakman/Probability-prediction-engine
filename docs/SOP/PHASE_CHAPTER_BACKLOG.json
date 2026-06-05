@@ -56,7 +56,7 @@
     },
     {
       "chapterId": "msos_p3_command_center",
-      "status": "chartered",
+      "status": "done",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P3",
@@ -64,11 +64,19 @@
     },
     {
       "chapterId": "msos_p4_strategy_lab",
-      "status": "blocked",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P4",
       "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE"
+    },
+    {
+      "chapterId": "mvp1_probability_method_legibility",
+      "status": "blocked",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md",
+      "canonRef": "docs/SEMANTIC_CONTRACTS.md",
+      "reason": "Chart + belief + Polymarket probability method labeling \u2014 next MVP1 priority after MSOS P4"
     },
     {
       "chapterId": "msos_p5_thesis_confirm",

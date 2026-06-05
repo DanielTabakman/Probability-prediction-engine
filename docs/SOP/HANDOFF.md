@@ -16,7 +16,7 @@ A) DOC-STATE SAFETY (alignment)
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
 - Active MVP1 focus: **none** — msos p3 authenticated shell + command center **COMPLETE** 2026-06-05
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
+- Next pending execution step: **MSOS P4 Strategy Lab** (`ACTIVE_PHASE_MANIFEST` / `PHASE_QUEUE`); then **MVP1 probability method legibility** auto-promotes from backlog
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -33,7 +33,7 @@ C) AGENT CONTINUITY (required)
 
 ## Current priority
 
-**MSOS P3 authenticated shell + Command Center COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS P4 Strategy Lab** is **READY** in queue (finish current cycle). **MVP1 probability method legibility** chartered **blocked** after P4 — labels/copy/pointwise comparison implemented on branch.
 
 
 ## Hard rule reminders
