@@ -1,0 +1,28 @@
+name: Codebase health
+
+on:
+  schedule:
+    # Monday 14:30 UTC — after weekly digest (14:00).
+    - cron: "30 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run codebase health gate
+        run: python scripts/run_codebase_health_gate.py --repo-root .
+
+      - name: Upload health artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codebase-health-${{ github.run_id }}
+          path: artifacts/health/
+          if-no-files-found: ignore
