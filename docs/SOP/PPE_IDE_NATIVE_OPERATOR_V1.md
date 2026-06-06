@@ -14,6 +14,8 @@ From repo root:
 run_ppe_auto_local_loop.cmd
 ```
 
+Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md` before the first pass.
+
 This is the **default driver** for MSOS P3→P8: control/witness/closeout slices run in the loop; each **product** slice still needs IDE BUILD + `mark_ide_product_ready.cmd` + `run_ppe_local.cmd`. After each chapter closeout, the next **blocked** MSOS row with `planPath` is promoted to **queued** automatically.
 
 Monitor (optional):
