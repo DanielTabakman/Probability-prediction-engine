@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -17,6 +18,14 @@ from scripts.ppe_slice_worker_mode import infer_slice_kind
 GUARD_REPORT_REL = "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md"
 GUARD_EXIT = 7
 GUARD_SKIP_CHAPTER = 8
+
+
+@dataclass
+class GuardResult:
+    exit_code: int = 0
+    reason: str = ""
+    detail: str = ""
+    plan_path: str = ""
 
 
 def _utc_now() -> str:
@@ -122,20 +131,23 @@ def _apply_skip_complete_chapter(repo: Path, plan_path: str) -> None:
         print(f"WARN: manifest update on guard skip: {exc}")
 
 
-def run_continuous_guards(repo: Path, plan_path: str) -> int:
-    """Return 0 run phase; GUARD_SKIP_CHAPTER (8) skip; GUARD_EXIT (7) stop."""
+def evaluate_continuous_guards(repo: Path, plan_path: str) -> GuardResult:
+    """Dry-run guards for operator status (no queue/manifest writes)."""
+    norm_plan = plan_path.replace("\\", "/").strip()
     if not guards_enabled(repo):
-        return 0
+        return GuardResult(exit_code=0, plan_path=norm_plan)
 
     cfg = load_operator_config(repo)
     g = _guards_config(cfg)
-    norm_plan = plan_path.replace("\\", "/").strip()
 
     if g.get("skipChapterIfEvidenceComplete", True) is not False:
         if chapter_marked_complete_in_repo(repo, norm_plan):
-            print(f"ppe_operator_guards: skip chapter (evidence COMPLETE) {norm_plan}")
-            _apply_skip_complete_chapter(repo, norm_plan)
-            return GUARD_SKIP_CHAPTER
+            return GuardResult(
+                exit_code=GUARD_SKIP_CHAPTER,
+                reason="SKIP_CHAPTER_EVIDENCE_COMPLETE",
+                detail=f"evidence COMPLETE for {norm_plan}",
+                plan_path=norm_plan,
+            )
 
     plan = load_phase_plan(repo, norm_plan)
     slices = plan.get("slices") or []
@@ -145,7 +157,12 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
             limit = int(max_slices)
             if limit > 0 and len(slices) > limit:
                 detail = f"Phase plan has {len(slices)} slices (max {limit}). Split the chapter or raise maxPhaseSlices."
-                return _guard_stop(repo, reason="TOO_MANY_SLICES", detail=detail, plan_path=norm_plan)
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
+                    reason="TOO_MANY_SLICES",
+                    detail=detail,
+                    plan_path=norm_plan,
+                )
         except (TypeError, ValueError):
             pass
 
@@ -161,45 +178,78 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
                     f"Sprint spec {spec_rel} has {n} lines "
                     f"(>{ESCALATE_LINE_THRESHOLD} ESCALATE). Shrink or split before unattended run."
                 )
-                return _guard_stop(
-                    repo,
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
                     reason="CONTEXT_ESCALATE",
                     detail=detail,
                     plan_path=norm_plan,
-                    resume="Shrink sprint spec or split chapter, then re-run.",
                 )
             if watch_on and band == "WATCH":
-                detail = (
-                    f"Sprint spec {spec_rel} has {n} lines (>{WATCH_LINE_THRESHOLD} WATCH)."
-                )
-                return _guard_stop(
-                    repo,
+                detail = f"Sprint spec {spec_rel} has {n} lines (>{WATCH_LINE_THRESHOLD} WATCH)."
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
                     reason="CONTEXT_WATCH",
                     detail=detail,
                     plan_path=norm_plan,
-                    resume="Review context band (WORKFLOW_CONTEXT_AUDIT_001.md) before continuous run.",
                 )
 
     if g.get("blockProductUnderGlobalDeterministic", True) is False:
-        return 0
+        return GuardResult(exit_code=0, plan_path=norm_plan)
     if not _skip_acp_active():
-        return 0
+        return GuardResult(exit_code=0, plan_path=norm_plan)
 
     product_slices = _plan_product_slice_ids(repo, norm_plan)
     if not product_slices:
-        return 0
+        return GuardResult(exit_code=0, plan_path=norm_plan)
 
     from scripts.ppe_ide_product_ready import marker_covers_product_slices
 
     if marker_covers_product_slices(repo, plan_path=norm_plan, product_slice_ids=product_slices):
-        print(f"ppe_operator_guards: IDE product marker OK for {norm_plan}")
-        return 0
+        return GuardResult(
+            exit_code=0,
+            reason="IDE_MARKER_OK",
+            detail="IDE product marker present",
+            plan_path=norm_plan,
+        )
 
-    primary_slice = product_slices[0]
     ids = ", ".join(product_slices)
     detail = (
         f"Phase plan contains product slice(s) [{ids}] but PPE_SKIP_ACP=1 and no valid IDE_PRODUCT_READY marker. "
         "IDE BUILD, commit, then `mark_ide_product_ready.cmd <sliceId>`, then `run_ppe_local.cmd`."
     )
-    resume = format_ide_build_resume(primary_slice, norm_plan)
-    return _guard_stop(repo, reason="PRODUCT_BLOCKED", detail=detail, plan_path=norm_plan, resume=resume)
+    return GuardResult(
+        exit_code=GUARD_EXIT,
+        reason="PRODUCT_BLOCKED",
+        detail=detail,
+        plan_path=norm_plan,
+    )
+
+
+def run_continuous_guards(repo: Path, plan_path: str) -> int:
+    """Return 0 run phase; GUARD_SKIP_CHAPTER (8) skip; GUARD_EXIT (7) stop."""
+    result = evaluate_continuous_guards(repo, plan_path)
+    norm_plan = plan_path.replace("\\", "/").strip()
+
+    if result.exit_code == GUARD_SKIP_CHAPTER:
+        print(f"ppe_operator_guards: skip chapter (evidence COMPLETE) {norm_plan}")
+        _apply_skip_complete_chapter(repo, norm_plan)
+        return GUARD_SKIP_CHAPTER
+
+    if result.exit_code == GUARD_EXIT:
+        resume = None
+        if result.reason == "PRODUCT_BLOCKED":
+            product_slices = _plan_product_slice_ids(repo, norm_plan)
+            if product_slices:
+                resume = format_ide_build_resume(product_slices[0], norm_plan)
+        return _guard_stop(
+            repo,
+            reason=result.reason,
+            detail=result.detail,
+            plan_path=norm_plan,
+            resume=resume,
+        )
+
+    if result.reason == "IDE_MARKER_OK":
+        print(f"ppe_operator_guards: IDE product marker OK for {norm_plan}")
+
+    return 0
