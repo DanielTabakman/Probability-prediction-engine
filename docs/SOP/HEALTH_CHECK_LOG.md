@@ -2,6 +2,20 @@
 
 Repeatable one-screen entries from the codebase health check procedure. Newest first.
 
+**Scheduled automation:** GitHub Actions workflow **Codebase health** (`.github/workflows/codebase-health.yml`) runs weekly on `main` via `python scripts/run_codebase_health_gate.py`. Failure history lives in Actions; use this log for manual steward passes only.
+
+---
+
+## 2026-06-06 — scheduled codebase health gate
+
+```text
+Date: 2026-06-06
+Automation: .github/workflows/codebase-health.yml (Mon 14:30 UTC)
+Local gate: python scripts/run_codebase_health_gate.py --repo-root .
+Checks: ppe_queue_health (audit), codebase_health_report, control_plane_consistency_check
+Fail policy: queue issues + consistency errors; warnings logged only
+```
+
 ---
 
 ## 2026-05-19 — post-plan implementation pass

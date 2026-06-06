@@ -95,6 +95,10 @@ from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
 )
+from src.viz.distribution_export import (
+    build_distribution_export_rows,
+    serialize_distribution_export_csv,
+)
 from src.viz.app_sidebar import build_sidebar_state
 from src.viz.app_panels import (
     implied_lab_trade_ticket_code_text as _implied_lab_trade_ticket_code_text,
@@ -326,6 +330,24 @@ if show_bitcoin_view:
             with st.spinner("Loading expiries and option marks…"):
                 expiries, expiry_fetch_diag = _cached_option_expiries(10)
             if expiries:
+                run_ts_export = pd.Timestamp.now(tz="UTC")
+                as_of_export = run_ts_export.isoformat()
+                now_ms_export = run_ts_export.timestamp() * 1000
+                export_rows = build_distribution_export_rows(
+                    as_of_utc=as_of_export,
+                    spot_usd=float(current_btc),
+                    expiries=expiries,
+                    forward_iv_fn=_cached_forward_iv,
+                    marks_full_fn=_cached_marks_full,
+                    now_ms=now_ms_export,
+                )
+                st.download_button(
+                    "Download distribution stats (CSV)",
+                    data=serialize_distribution_export_csv(export_rows).encode("utf-8"),
+                    file_name="ppe_btc_distribution_stats.csv",
+                    mime="text/csv",
+                    key="implied_dist_export_csv",
+                )
                 expiry_options = [e["expiry_date_str"] for e in expiries]
                 selected_expiry_str = st.selectbox(
                     "Expiry",

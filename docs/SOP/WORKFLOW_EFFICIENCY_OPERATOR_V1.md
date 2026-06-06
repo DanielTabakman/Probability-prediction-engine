@@ -19,7 +19,7 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 ## Daily (local profile)
 
-1. `run_ppe_auto_local_loop.cmd`
+1. `run_ppe_auto_local_loop.cmd` — startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`; read it if the loop stops at preflight (exit 7)
 2. Optional: `workflow_metrics.cmd session start` at desk open
 
 ---
@@ -60,6 +60,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 
 | Command | Purpose |
 |---------|---------|
+| `run_ppe_operator.cmd` | Status-only verdict (`--brief`, `--notify`, `--json`); auto-loop runs full preflight at startup |
 | `generate_ide_build_starter.cmd` | One-file IDE BUILD bundle |
 | `generate_build_packet.cmd` | Slim paths-only BUILD packet |
 | `python scripts/ppe_context_preflight.py` | Advisory band check before BUILD |

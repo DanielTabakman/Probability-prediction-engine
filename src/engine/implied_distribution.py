@@ -64,6 +64,147 @@ def probability_above_strike_lognormal(
     return max(0.0, min(1.0, 1.0 - lognormal_cdf(forward, vol_annual, T_years, strike)))
 
 
+def _standard_normal_ppf(p: float) -> float:
+    """Inverse standard normal CDF for p in (0, 1) via bisection."""
+    if p <= 0.0:
+        return float("-inf")
+    if p >= 1.0:
+        return float("inf")
+    lo, hi = -12.0, 12.0
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        cdf = 0.5 * (1.0 + math.erf(mid / math.sqrt(2.0)))
+        if cdf < p:
+            lo = mid
+        else:
+            hi = mid
+    return 0.5 * (lo + hi)
+
+
+def _lognormal_quantile(forward: float, vol_annual: float, T_years: float, p: float) -> float:
+    """Terminal price quantile under risk-neutral lognormal."""
+    if forward <= 0 or vol_annual <= 0 or T_years <= 0 or p <= 0.0:
+        return 0.0
+    if p >= 1.0:
+        return float("inf")
+    sigma = vol_annual * math.sqrt(T_years)
+    mu = math.log(forward) - 0.5 * sigma * sigma
+    z = _standard_normal_ppf(p)
+    return math.exp(mu + sigma * z)
+
+
+def lognormal_distribution_stats(
+    forward: float,
+    vol_annual: float,
+    T_years: float,
+) -> dict[str, float]:
+    """
+    Mean and quartiles for risk-neutral lognormal terminal distribution.
+    Mean equals forward; q50 is the median terminal price.
+    """
+    if forward <= 0 or vol_annual <= 0 or T_years <= 0:
+        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+    return {
+        "mean_usd": float(forward),
+        "q25_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.25),
+        "q50_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.50),
+        "q75_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.75),
+    }
+
+
+def _integrate_density_trapezoid(prices: list[float], values: list[float]) -> float:
+    if len(prices) < 2 or len(values) != len(prices):
+        return 0.0
+    total = 0.0
+    for i in range(len(prices) - 1):
+        dx = float(prices[i + 1]) - float(prices[i])
+        if dx <= 0:
+            continue
+        total += 0.5 * (float(values[i]) + float(values[i + 1])) * dx
+    return total
+
+
+def _normalize_density(prices: list[float], pdf_raw: list[float]) -> list[float]:
+    area = _integrate_density_trapezoid(prices, pdf_raw)
+    if area <= 0:
+        return [0.0] * len(pdf_raw)
+    return [float(x) / area for x in pdf_raw]
+
+
+def _density_cdf_at(prices: list[float], pdf_norm: list[float], strike: float) -> float:
+    """P(S <= strike) on the price grid."""
+    if len(prices) < 2 or len(pdf_norm) != len(prices):
+        return 0.0
+    if strike <= float(prices[0]):
+        return 0.0
+    if strike >= float(prices[-1]):
+        return 1.0
+    area = 0.0
+    for i in range(len(prices) - 1):
+        p0 = float(prices[i])
+        p1 = float(prices[i + 1])
+        if strike <= p0:
+            break
+        f0 = float(pdf_norm[i])
+        f1 = float(pdf_norm[i + 1])
+        if strike >= p1:
+            area += 0.5 * (f0 + f1) * (p1 - p0)
+            continue
+        if p1 > p0:
+            t = (strike - p0) / (p1 - p0)
+            f_at = f0 + t * (f1 - f0)
+            area += 0.5 * (f0 + f_at) * (strike - p0)
+        break
+    return max(0.0, min(1.0, area))
+
+
+def _density_quantile(prices: list[float], pdf_norm: list[float], p: float) -> float:
+    if not prices or p <= 0.0:
+        return float(prices[0]) if prices else 0.0
+    if p >= 1.0:
+        return float(prices[-1])
+    target = p
+    for i in range(len(prices) - 1):
+        p0 = float(prices[i])
+        p1 = float(prices[i + 1])
+        if p1 <= p0:
+            continue
+        cdf_lo = _density_cdf_at(prices, pdf_norm, p0)
+        cdf_hi = _density_cdf_at(prices, pdf_norm, p1)
+        if cdf_hi < target:
+            continue
+        if cdf_hi == cdf_lo:
+            return p1
+        t = (target - cdf_lo) / (cdf_hi - cdf_lo)
+        return p0 + t * (p1 - p0)
+    return float(prices[-1])
+
+
+def density_distribution_stats(
+    prices: list[float],
+    pdf_raw: list[float],
+) -> dict[str, float]:
+    """
+    Mean and quartiles from a density on a price grid (area-normalized internally).
+    Mean is integral x·f(x) dx.
+    """
+    if len(prices) < 2 or len(pdf_raw) != len(prices):
+        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+    pdf_norm = _normalize_density(prices, pdf_raw)
+    if max(pdf_norm) <= 0:
+        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+    mean = _integrate_density_trapezoid(
+        prices,
+        [float(prices[i]) * pdf_norm[i] for i in range(len(prices))],
+    )
+    return {
+        "mean_usd": float(mean),
+        "q25_usd": _density_quantile(prices, pdf_norm, 0.25),
+        "q50_usd": _density_quantile(prices, pdf_norm, 0.50),
+        "q75_usd": _density_quantile(prices, pdf_norm, 0.75),
+    }
+
+
 def probability_above_strike_from_density(
     prices: list[float],
     pdf_raw: list[float],

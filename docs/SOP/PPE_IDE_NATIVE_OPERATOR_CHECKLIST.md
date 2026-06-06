@@ -14,7 +14,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Daily run
 
-- [ ] Terminal: `run_ppe_auto_local_loop.cmd` from repo root.
+- [ ] Terminal: `run_ppe_auto_local_loop.cmd` from repo root (preflight writes `OPERATOR_STATUS.md` automatically).
 - [ ] Optional second terminal: `.\scripts\watch_ppe_live.ps1`.
 - [ ] Queue fed: `queued` rows in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (local profile does **not** steward-charter when idle).
 
