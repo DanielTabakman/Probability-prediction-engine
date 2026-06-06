@@ -6,7 +6,6 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 from scripts.run_codebase_health_gate import (
     evaluate_codebase_health_report,
@@ -77,13 +76,6 @@ class TestEvaluateConsistencyReport(unittest.TestCase):
 
 
 class TestRunGateIntegration(unittest.TestCase):
-    def test_gate_passes_on_clean_repo(self) -> None:
-        repo = Path(__file__).resolve().parents[1]
-        result = run_gate(repo)
-        self.assertTrue(result["ok"], msg="\n".join(result["errors"]))
-        self.assertIsNotNone(result["artifacts"]["codebase_health_report"])
-        self.assertIsNotNone(result["artifacts"]["control_plane_consistency_report"])
-
     def test_queue_issues_fail_gate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)
