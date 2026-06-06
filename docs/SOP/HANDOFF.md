@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos p3 authenticated shell + command center **COMPLETE** 2026-06-05
+- Active MVP1 focus: **none** — mvp1 btc distribution export (phase 1) **COMPLETE** 2026-06-06
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **MSOS P4 Strategy Lab** (`ACTIVE_PHASE_MANIFEST` / `PHASE_QUEUE`); then **MVP1 probability method legibility** auto-promotes from backlog
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MVP1_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS P4 Strategy Lab** is **READY** in queue (finish current cycle). **MVP1 probability method legibility** chartered **blocked** after P4 — labels/copy/pointwise comparison implemented on branch.
+**MVP1 BTC distribution export (Phase 1) COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -47,9 +47,9 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
+2. **Steward:** SELECTION — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md).
 
 
 ## Last updated
 
-2026-06-05 — MSOS P3 authenticated shell + Command Center COMPLETE; closeout job `MSOS-P3-Closeout-Slice005`.
+2026-06-06 — MVP1 BTC distribution export (Phase 1) COMPLETE; closeout job `MVP1-DistExport-Closeout-Slice005`.

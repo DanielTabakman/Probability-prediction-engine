@@ -13,6 +13,18 @@ Purpose: keep **real** validation (unit tests, docker entry, Playwright smoke + 
 
 **CI** (`.github/workflows/ci.yml`) runs **full pytest** (parallel + slow serial) + **docker_entrypoint**. PRs labeled **`viz-change`** also run **CI / ui_smoke** (scenario A).
 
+**Scheduled codebase health** (`.github/workflows/codebase-health.yml`) runs **Monday 14:30 UTC** on `main`:
+
+```bash
+python scripts/run_codebase_health_gate.py --repo-root .
+```
+
+Read-only: queue audit, `codebase_health_report`, `control_plane_consistency_check`. Fails on queue issues or consistency **errors** (warnings are logged only). Local dry-run before changing control-plane docs:
+
+```bash
+python scripts/run_codebase_health_gate.py --repo-root .
+```
+
 ## Pytest markers
 
 Auto-applied in `tests/conftest.py`:

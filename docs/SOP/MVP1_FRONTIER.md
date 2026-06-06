@@ -15,9 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md))
-- **Next queued MVP1 chapter (blocked until MSOS P4 COMPLETE):** **probability method legibility** — [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md) · backlog `mvp1_probability_method_legibility` · **product legibility shipped** on branch (charter + UI labels + pointwise table)
-- **Last closed chapter:** **MSOS P3 authenticated shell + Command Center** — **COMPLETE** 2026-06-05
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md))
+- **Last closed chapter:** **MVP1 BTC distribution export (Phase 1)** — **COMPLETE** 2026-06-06
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
