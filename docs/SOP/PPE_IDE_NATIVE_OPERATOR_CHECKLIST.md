@@ -9,6 +9,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 - [ ] Repo includes phase 1+2 operator files (`run_ppe_auto_local_loop.cmd`, `mark_ide_product_ready.cmd`).
 - [ ] On `main` (or merge PR with operator changes) before treating this as canonical.
 - [ ] `docs/SOP/PPE_AUTO_OPERATOR.json` shows `stewardCharter: false`, `skipAcp: true`.
+- [ ] **Desktop first-time:** Cursor Agent on desktop → [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) (loop host + ntfy + Tailscale).
 
 ---
 
