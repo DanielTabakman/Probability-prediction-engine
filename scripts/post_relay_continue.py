@@ -195,6 +195,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"post_relay_continue: google docs refresh failed ({gdocs_rc}); continuing")
     except Exception as exc:
         print(f"post_relay_continue: google docs refresh skipped: {exc}")
+    try:
+        from scripts.ppe_operator_git_sync import publish_ahead
+
+        pub = publish_ahead(repo)
+        print(f"post_relay_continue: git publish {json.dumps(pub)}")
+    except Exception as exc:
+        print(f"post_relay_continue: git publish skipped: {exc}")
     return 0
 
 

@@ -10,6 +10,13 @@
   "continuousMax": 20,
   "loopWhenIdle": true,
   "idleSleepSeconds": 120,
+  "gitSync": {
+    "enabled": true,
+    "pullEachPass": true,
+    "pullBranch": "main",
+    "pushAfterCommit": true,
+    "openPrOnPush": true
+  },
   "guards": {
     "enabled": true,
     "blockProductUnderGlobalDeterministic": true,

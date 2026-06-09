@@ -150,15 +150,38 @@ setup_desktop_operator.cmd
 
 The loop does **not** use Cursor. Once G is done, routine chapters need no Cursor permission prompts.
 
+### I — Remote Desktop (Cursor from phone)
+
+Run **once as Administrator** on the desktop:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\enable_rdp_tailscale.ps1
+```
+
+On phone: install **Microsoft Remote Desktop** → PC name `desktop-ge39o15`, user `USER`, Windows password.
+
+When ntfy fires for `IDE_BUILD` / `ERROR`: RDP → Cursor Agent on desktop (you do not code by hand).
+
+### J — Auto git sync (no manual pull from phone)
+
+Enabled in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (`gitSync`). Each loop pass pulls `main`; closeout pushes + opens PR automatically.
+
+Verify:
+
+```bat
+python scripts\ppe_operator_git_sync.py --pull
+```
+
 ---
 
 ## When loop stops (desktop / phone)
 
-| Verdict | Desktop / phone SSH | Laptop |
-|---------|---------------------|--------|
-| `IDE_BUILD` | Read `OPERATOR_GUARD_REPORT.md` | Agent BUILD → push → desktop `git pull` → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd` |
-| `RUN_LOCAL` | `run_ppe_local.cmd` | — |
-| Loop died | `start_ppe_desktop_operator.cmd` | — |
+| Verdict | Phone SSH (Termius) | Phone RDP + Cursor | Loop auto |
+|---------|---------------------|--------------------|-----------|
+| `IDE_BUILD` | Read `OPERATOR_GUARD_REPORT.md` | Agent BUILD on desktop | `git pull` each pass |
+| `RUN_LOCAL` | `run_ppe_local.cmd` | — | pull + publish |
+| `SUPPLY_LOW` | Nothing — idle | — | — |
+| Loop died | `start_ppe_desktop_operator.cmd` | — | — |
 
 Phone triage commands:
 
@@ -172,10 +195,11 @@ type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ## Git sync between laptop and desktop
 
 ```
-Laptop (BUILD, push) → GitHub → Desktop (git pull, run_ppe_local)
+Any machine (Cursor BUILD) → push → GitHub → desktop loop auto-pulls each pass
+Closeout on desktop → auto-push + PR (no manual phone git)
 ```
 
-Desktop does **not** replace laptop for product slices. Desktop runs unattended relay slices only.
+Desktop is the **primary** loop host and recommended Cursor Agent machine. Laptop remains optional.
 
 ---
 

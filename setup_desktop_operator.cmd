@@ -35,6 +35,10 @@ if errorlevel 1 (
 )
 
 echo.
+echo --- Git sync (loop) ---
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
+echo.
+
 echo --- Start stack ---
 echo   start_ppe_desktop_operator.cmd
 echo.

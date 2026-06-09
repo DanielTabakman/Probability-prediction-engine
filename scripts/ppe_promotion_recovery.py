@@ -165,6 +165,13 @@ def _run_control_closeout(repo: Path, phase_plan: Path, slice_id: str, relay_run
             print(f"ppe_promotion_recovery: google docs refresh failed ({gdocs_rc})")
     except Exception as exc:
         print(f"ppe_promotion_recovery: google docs refresh skipped: {exc}")
+    try:
+        from scripts.ppe_operator_git_sync import publish_ahead
+
+        pub = publish_ahead(repo)
+        print(f"ppe_promotion_recovery: git publish {json.dumps(pub)}")
+    except Exception as exc:
+        print(f"ppe_promotion_recovery: git publish skipped: {exc}")
     return 0
 
 

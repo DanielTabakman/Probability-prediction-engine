@@ -13,9 +13,12 @@ set "PPE_WORKER_MODE=deterministic"
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
 
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
+
 call "%CD%\run_ppe.cmd" %*
 set "RC=%ERRORLEVEL%"
 if "%RC%"=="0" (
   python "%CD%\scripts\ppe_ide_product_ready.py" --repo-root "%CD%" --clear >nul 2>&1
+  python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --publish
 )
 exit /b %RC%
