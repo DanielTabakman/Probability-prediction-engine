@@ -16,7 +16,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 ## Daily run
 
 - [ ] **Desktop (always-on):** `start_ppe_desktop_operator.cmd` — loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)).
-- [ ] Or manually: `run_ppe_auto_local_loop.cmd` + optional `watch_operator_mobile.cmd`.
+- [ ] Or manually: `run_ppe_auto_local_loop.cmd` from repo root (preflight writes `OPERATOR_STATUS.md` automatically) + optional `watch_operator_mobile.cmd`.
 - [ ] Optional second terminal: `.\scripts\watch_ppe_live.ps1`.
 - [ ] Queue fed: `queued` rows in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (local profile does **not** steward-charter when idle).
 
@@ -61,6 +61,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Related
 
+- [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
 - [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)
 - [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md)
