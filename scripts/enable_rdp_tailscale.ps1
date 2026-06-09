@@ -29,9 +29,9 @@ if (Test-Path -LiteralPath $tsExe) {
 Write-Host ""
 Write-Host "Remote Desktop is enabled."
 Write-Host "Connect from phone (Microsoft Remote Desktop app):"
-Write-Host "  PC name: desktop-ge39o15   (Tailscale hostname)"
+Write-Host "  PC name: desktop-ge39o15 (Tailscale hostname)"
 if ($tsIp) { Write-Host "  Tailscale IP (alt): $tsIp" }
-Write-Host "  User:    $env:USERNAME"
+Write-Host "  User: $env:USERNAME"
 Write-Host "  Password: your Windows login password"
 Write-Host ""
-Write-Host "Security: use Tailscale hostname only — do not port-forward 3389 on your router."
+Write-Host "Security: use Tailscale hostname only. Do not port-forward 3389 on your router."
