@@ -72,6 +72,9 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
 | `weekly_digest.cmd notify` | Windows toast with latest **In short** (respects `PPE_NOTIFY=0`) |
 | `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
+| `start_ppe_desktop_operator.cmd` | Desktop stack: auto-loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)) |
+| [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) | Paste prompt for new Cursor Agent chat on desktop |
+| `watch_operator_mobile.cmd` | ntfy push on verdict change or loop death (`PPE_NTFY_TOPIC`) |
 
 **Monday popup (local):** Task Scheduler — use **cmd.exe** (paths with spaces break if you paste the `.cmd` directly):
 
@@ -103,5 +106,6 @@ Data lives under `artifacts/workflow_metrics/` (gitignored).
 
 ## Related
 
+- [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
 - [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md)

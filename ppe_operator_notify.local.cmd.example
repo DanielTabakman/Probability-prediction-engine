@@ -1,0 +1,8 @@
+@echo off
+REM Copy to ppe_operator_notify.local.cmd (gitignored) and set your ntfy topic.
+REM Subscribe to the same topic in the ntfy app on your phone.
+
+set "PPE_NTFY_TOPIC=ppe-your-secret-topic-here"
+REM Optional private server or authenticated topic:
+REM set "PPE_NTFY_SERVER=https://ntfy.sh"
+REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
