@@ -1,7 +1,7 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
   "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Strategy Lab / PPE integration — pre-chartered; blocked until P3 COMPLETE"
+  "status": "COMPLETE",
+  "notes": "skipped by operator guard (evidence COMPLETE) Guard skip: evidence already COMPLETE."
 }

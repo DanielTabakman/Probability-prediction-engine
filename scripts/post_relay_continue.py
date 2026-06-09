@@ -26,6 +26,9 @@ def _find_newest_relay_run(repo_root: Path) -> Path | None:
     wt = repo_root / "_worktrees" / "acp_orchestrator"
     if wt.is_dir():
         candidates.extend(wt.glob("*/artifacts/relay/runs/*/relay_result.json"))
+    wt_local = repo_root / "_worktrees" / "orchestrator"
+    if wt_local.is_dir():
+        candidates.extend(wt_local.glob("*/artifacts/relay/runs/*/relay_result.json"))
     existing = [p.parent for p in candidates if p.is_file()]
     if not existing:
         return None

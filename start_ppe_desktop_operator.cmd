@@ -6,7 +6,7 @@ REM Run on the always-on PC. See docs/SOP/PPE_MOBILE_OPERATOR_V1.md
 
 cd /d "%~dp0"
 
-if exist "%CD%\ppe_operator_notify.local.cmd" call "%CD%\ppe_operator_notify.local.cmd"
+if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 
 start "PPE auto loop" cmd /k call "%~dp0run_ppe_auto_local_loop.cmd"
 timeout /t 3 /nobreak >nul

@@ -8,6 +8,7 @@ env/
 .env.mcp
 *.env.local
 ppe_operator_notify.local.cmd
+ppe_operator_git.local.cmd
 ops/restic/env.local
 
 # Data and DB (optional: remove if you want to track sample DB)
@@ -51,3 +52,4 @@ _recovery_stash/
 # Local relay/planner scaffolding (pre-Codex-Autonomy-v1 prototype).
 # Not canonical; see docs/SOP/CODEX_AUTONOMY_V1.md §§14-15 for the real contract.
 /orchestrator/
+_worktrees/

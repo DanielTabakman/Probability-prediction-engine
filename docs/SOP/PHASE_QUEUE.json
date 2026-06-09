@@ -96,9 +96,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     }
   ]
 }

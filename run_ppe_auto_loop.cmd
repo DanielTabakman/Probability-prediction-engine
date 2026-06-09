@@ -7,6 +7,7 @@ REM Exit 7: guard stop (PRODUCT_BLOCKED, CONTEXT_ESCALATE, TOO_MANY_SLICES, etc.
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
+if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 if not defined PPE_OPERATOR_PROFILE set "PPE_OPERATOR_PROFILE=local"
 
 python "%CD%\scripts\ppe_operator_env.py"

@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-06 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-09 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -82,6 +82,8 @@ flowchart LR
 
 | MVP1 BTC distribution export (Phase 1) | **COMPLETE** 2026-06-06 | [`SPRINT_MVP1_DISTRIBUTION_EXPORT.md`](docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md), [`MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md) |
 
+| MSOS P4 Strategy Lab / PPE integration | **COMPLETE** 2026-06-09 | [`SPRINT_MSOS_P4_STRATEGY_LAB.md`](docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md), [`MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -138,4 +140,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

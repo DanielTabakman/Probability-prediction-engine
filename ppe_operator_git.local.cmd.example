@@ -1,0 +1,11 @@
+@echo off
+REM Copy to ppe_operator_git.local.cmd (gitignored) for commits from the desktop loop host.
+REM Uses env vars so repo/global git config is optional.
+
+set "GIT_AUTHOR_NAME=Your Name"
+set "GIT_AUTHOR_EMAIL=you@example.com"
+set "GIT_COMMITTER_NAME=%GIT_AUTHOR_NAME%"
+set "GIT_COMMITTER_EMAIL=%GIT_AUTHOR_EMAIL%"
+
+REM Optional: gh CLI token for promotion-recovery PRs (or run `gh auth login` once).
+REM set "GH_TOKEN=ghp_..."
