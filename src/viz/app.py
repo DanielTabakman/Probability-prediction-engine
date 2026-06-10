@@ -73,6 +73,7 @@ from src.viz.implied_lab_legibility import (
     TRACE_STRATEGY_PAYOFF,
     TRACE_USER_BELIEF,
     TRACE_USER_BELIEF_HELP,
+    YAXIS_DENSITY_HELP,
     YAXIS_DENSITY_TITLE,
 )
 from src.engine.strategy_scanner import (
@@ -1561,6 +1562,7 @@ if show_bitcoin_view:
                             )
                         )
                         st.caption(CUMULATIVE_CAPTION)
+                        st.caption(YAXIS_DENSITY_HELP)
                         apply_chart_theme(fig_dist)
                         st.plotly_chart(fig_dist, use_container_width=True)
 
