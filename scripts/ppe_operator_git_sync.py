@@ -299,6 +299,25 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
     }
 
 
+def _runtime_sop_only_dirty(repo: Path) -> bool:
+    dirty = _dirty_paths(repo)
+    if not dirty:
+        return True
+    runtime_names = {
+        "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+        "docs/SOP/PHASE_QUEUE.json",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+        "docs/SOP/PHASE_SELECTION_ROADMAP.json",
+    }
+    for p in dirty:
+        if p.startswith("artifacts/"):
+            continue
+        if p in runtime_names or (p.startswith("docs/SOP/PHASE_") and p.endswith(".json")):
+            continue
+        return False
+    return True
+
+
 def maybe_auto_publish(repo: Path) -> dict[str, Any]:
     """Push + open PR when this branch has unpushed commits (loop/agent work)."""
     repo = repo.resolve()
@@ -307,13 +326,14 @@ def maybe_auto_publish(repo: Path) -> dict[str, Any]:
     current = _current_branch(repo)
     if not current or current == "main":
         return {"action": "auto_publish", "skipped": True, "reason": "not a feature branch"}
-    if _dirty_paths(repo):
+    dirty = _dirty_paths(repo)
+    if dirty and not _runtime_sop_only_dirty(repo):
         return {
             "action": "auto_publish",
             "skipped": True,
-            "reason": "dirty working tree — commit before auto-publish",
+            "reason": "dirty working tree — commit product/control changes before auto-publish",
             "branch": current,
-            "dirty": _dirty_paths(repo)[:5],
+            "dirty": dirty[:5],
         }
     ahead = _ahead_count(repo, branch=current)
     if ahead == 0:
