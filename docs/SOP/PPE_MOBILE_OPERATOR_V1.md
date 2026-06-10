@@ -159,6 +159,7 @@ start_ppe_desktop_operator.cmd
 | Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK - …**, low priority) |
 | Relay slice completes | **ntfy** (title: **PPE slice done: …**) |
 | Chapter closeout completes | **ntfy** (title: **PPE chapter done: …**, includes next chapter if known) |
+| Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
 
 Disable progress pings: `set PPE_NTFY_PROGRESS=0` in `ppe_operator_notify.local.cmd`.
 
@@ -195,6 +196,7 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_TOPIC` | Yes for mobile push | — |
 | `PPE_NTFY_SERVER` | No | `https://ntfy.sh` |
 | `PPE_NOTIFY` | No | enabled; `0` disables |
+| `PPE_WEEKLY_DIGEST_TOAST` | No | enabled; `0` skips Windows toast (phone push still uses ntfy) |
 | `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running |
 | `PPE_NTFY_STUCK_HOURS` | No | `4` — re-alert while verdict is FIX_PLAN / IDE_BUILD / ERROR |
 | `PPE_GIT_SYNC` | No | enabled |

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
@@ -109,34 +110,254 @@ def notify_payload_path(repo: Path) -> Path:
     return repo / NOTIFY_REL
 
 
+_MONTH_ABBR = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+_GITHUB_REMOTE_RE = re.compile(
+    r"^(?:https://github\.com/|git@github\.com:)([^/]+)/([^/.]+?)(?:\.git)?$"
+)
+
+
+def format_week_range(week_monday: str) -> str:
+    mon = date.fromisoformat(week_monday)
+    sun = mon + timedelta(days=6)
+    if mon.month == sun.month:
+        return f"{_MONTH_ABBR[mon.month - 1]} {mon.day}-{sun.day}"
+    return f"{_MONTH_ABBR[mon.month - 1]} {mon.day}-{_MONTH_ABBR[sun.month - 1]} {sun.day}"
+
+
+def _repo_is_public_on_github(repo: Path) -> bool:
+    try:
+        proc = subprocess.run(
+            ["gh", "repo", "view", "--json", "isPrivate"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=8,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    if proc.returncode != 0:
+        return False
+    try:
+        data = json.loads(proc.stdout or "{}")
+    except json.JSONDecodeError:
+        return False
+    return not bool(data.get("isPrivate"))
+
+
+def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
+    if not _repo_is_public_on_github(repo):
+        return None
+    try:
+        proc = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if proc.returncode != 0:
+        return None
+    match = _GITHUB_REMOTE_RE.match((proc.stdout or "").strip())
+    if not match:
+        return None
+    rel = DIGEST_REL.replace("\\", "/")
+    return f"https://github.com/{match.group(1)}/{match.group(2)}/blob/{branch}/{rel}"
+
+
+def _phone_product_line(raw: str) -> str:
+    text = raw.strip()
+    match = re.match(r"\*\*(.+?)\*\*:?\s*(.*)", text)
+    if not match:
+        return re.sub(r"`", "", text).strip()
+    label = match.group(1).strip().rstrip(":")
+    for prefix in (
+        "MSOS website — ",
+        "MSOS program — ",
+        "PPE implied lab (Streamlit): ",
+        "MVP1 engine / lab: ",
+        "MSOS design: ",
+    ):
+        if label.startswith(prefix):
+            label = label[len(prefix) :]
+            break
+    rest = re.sub(r"`", "", match.group(2)).strip().rstrip(".")
+    if rest:
+        short_rest = rest.split("—", 1)[0].strip()
+        if len(short_rest) > 72:
+            short_rest = short_rest[:69].rstrip() + "..."
+        return f"{label}: {short_rest}" if short_rest else label
+    return label
+
+
+def _user_facing_ship(raw: str) -> str:
+    lower = raw.lower()
+    if "homepage" in lower and "p2" in lower:
+        return "MSOS now has a public homepage you can share"
+    if "command center" in lower and "p3" in lower:
+        return "Signed-in Command Center shell is live (preview data)"
+    if "stack decision" in lower or (re.search(r"\bp1\b", lower) and "streamlit" in lower):
+        return "Website + PPE lab fit is documented and locked in"
+    if "storyboard" in lower:
+        return "UI storyboards landed for upcoming design chapters"
+    if "trust" in lower or "disagreement" in lower:
+        return "PPE lab trust and disagreement views got sharper"
+    if "onboarding" in lower:
+        return "PPE lab onboarding is clearer and easier to follow"
+    if "smoke witness" in lower:
+        return "PPE lab picked up stronger automated UI checks"
+    if CHAPTER_CLOSED_PREFIX in raw:
+        title = raw.split(CHAPTER_CLOSED_PREFIX, 1)[-1].split("(`", 1)[0].strip()
+        if title:
+            return f"Chapter wrapped: {title}"
+    return _phone_product_line(raw)
+
+
+def _phone_next_line(raw: str) -> str:
+    text = re.sub(r"\*\*", "", raw)
+    text = re.sub(r"`", "", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    return text.strip()
+
+
+def _user_facing_next(raw: str) -> str:
+    lower = raw.lower()
+    if "active build chapter" in lower:
+        match = re.search(r"MSOS P\d[^—\n*]*", raw, re.I)
+        if match:
+            label = re.sub(r"\*+", "", match.group(0)).strip()
+            return f"Building next: {label}"
+    if "next slice" in lower and "evidence" in lower:
+        return "Next up: Command Center evidence charter"
+    if "mvp1 track" in lower:
+        return "MVP1 lab still has active slices in flight"
+    return _phone_next_line(raw)
+
+
+def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
+    week = str(section["week_monday"])
+    merge_count = int(section.get("merge_count") or 0)
+    product_lines = [str(x) for x in (section.get("product_lines") or [])]
+    ops_summary = str(section.get("ops_summary") or "").strip()
+    whats_next = [str(x) for x in (section.get("whats_next_lines") or [])]
+    week_range = format_week_range(week)
+    product_count = len(product_lines)
+
+    if product_count >= 4:
+        opener = f"Strong week. {product_count} user-facing changes just landed."
+    elif product_count == 3:
+        opener = "Good momentum - three updates you'll actually notice."
+    elif product_count == 2:
+        opener = "Two solid wins shipped this week."
+    elif product_count == 1:
+        opener = "One meaningful update went live."
+    else:
+        opener = "Quiet product week - the build factory kept humming."
+
+    lines = [opener, "", "What's different for you"]
+    if product_lines:
+        shown: list[str] = []
+        for line in product_lines[:3]:
+            item = _user_facing_ship(line)
+            if item not in shown:
+                shown.append(item)
+        for item in shown:
+            lines.append(f"- {item}")
+        extra = product_count - len(shown)
+        if extra > 0:
+            lines.append(f"- +{extra} more ship(s) this week")
+    else:
+        lines.append("- No user-visible surface changes merged to main")
+    lines.append("")
+
+    if ops_summary:
+        ops = ops_summary.lstrip("- ").strip()
+        ops = re.sub(r"— omitted from product bullets above\.?", "", ops).strip()
+        match = re.search(r"(\d+)\s+control-plane", ops, re.I)
+        if match:
+            lines.extend(["Behind the curtain", f"{match.group(1)} planning and CI merges kept automation moving.", ""])
+        else:
+            lines.extend(["Behind the curtain", ops, ""])
+
+    if whats_next:
+        lines.append("On deck")
+        for raw in whats_next[:2]:
+            lines.append(f"- {_user_facing_next(raw)}")
+        lines.append("")
+
+    if section.get("click_url"):
+        lines.append(f"{merge_count} merges to main. Tap for the long read on GitHub.")
+    else:
+        lines.append(f"{merge_count} merges to main. You're caught up - details are above.")
+
+    body = "\n".join(lines).strip()
+    if len(body) > 3500:
+        body = body[:3497] + "..."
+    return {"phone_title": f"This week in PPE - {week_range}", "phone_body": body}
+
+
 def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
     """Return summary for the newest ## Week of section in WEEKLY_DIGEST.md."""
     week_monday: str | None = None
     in_short: str | None = None
     merge_count = 0
     in_first_week = False
+    current_section: str | None = None
+    product_lines: list[str] = []
+    ops_summary = ""
+    whats_next_lines: list[str] = []
+
     for line in text.splitlines():
         if line.startswith("## Week of "):
             if week_monday is not None:
                 break
             week_monday = line.split("## Week of ", 1)[1].split(" ", 1)[0].strip()
             in_first_week = True
+            current_section = None
             continue
         if not in_first_week:
             continue
+        if line.startswith("## "):
+            break
+        if line.startswith("### What shipped"):
+            current_section = "product"
+            continue
+        if line.startswith("### Behind the scenes"):
+            current_section = "ops"
+            continue
+        if line.startswith("### What's next"):
+            current_section = "next"
+            continue
+        if line.startswith("### "):
+            current_section = None
+            continue
+
         stripped = line.strip()
         if stripped.startswith("**In short:**"):
             in_short = stripped.split("**In short:**", 1)[1].strip()
+        elif current_section == "product" and stripped.startswith("- "):
+            product_lines.append(stripped[2:])
+        elif current_section == "ops" and stripped.startswith("- ") and not ops_summary:
+            ops_summary = stripped[2:]
+        elif current_section == "next" and stripped.startswith("- "):
+            whats_next_lines.append(stripped[2:])
         elif stripped.startswith("- ") and "merge(s) to `main`" in stripped:
-            m = re.search(r"(\d+)\s+merge\(s\)", stripped)
-            if m:
-                merge_count = int(m.group(1))
+            match = re.search(r"(\d+)\s+merge\(s\)", stripped)
+            if match:
+                merge_count = int(match.group(1))
+
     if week_monday and in_short:
         return {
             "week_monday": week_monday,
             "in_short": in_short,
             "merge_count": merge_count,
             "digest_rel": DIGEST_REL,
+            "product_lines": product_lines,
+            "ops_summary": ops_summary,
+            "whats_next_lines": whats_next_lines,
         }
     return None
 
@@ -154,6 +375,10 @@ def cmd_write_notify_payload(repo: Path) -> int:
     summary["generated_at_utc"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace(
         "+00:00", "Z"
     )
+    click_url = resolve_digest_click_url(repo)
+    if click_url:
+        summary["click_url"] = click_url
+    summary.update(build_phone_digest_notify(summary))
     out = notify_payload_path(repo)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

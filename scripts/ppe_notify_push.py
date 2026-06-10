@@ -88,6 +88,36 @@ def send_ntfy(
         return False
 
 
+def send_weekly_digest_from_payload(payload_path: Path) -> bool:
+    if not payload_path.is_file():
+        return False
+    try:
+        payload = json.loads(payload_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"ppe_notify_push: unreadable weekly digest payload {payload_path}: {exc}", file=sys.stderr)
+        return False
+    if not isinstance(payload, dict):
+        return False
+
+    week = str(payload.get("week_monday") or "").strip()
+    in_short = str(payload.get("in_short") or "").strip()
+    phone_title = str(payload.get("phone_title") or "").strip()
+    phone_body = str(payload.get("phone_body") or "").strip()
+    click_url = str(payload.get("click_url") or "").strip() or None
+    if not week or (not phone_body and not in_short):
+        return False
+
+    title = phone_title or f"PPE weekly digest (week of {week})"
+    body = phone_body or in_short
+    return send_ntfy(
+        title,
+        body,
+        tags=["ppe", "weekly", "digest"],
+        priority="default",
+        click_url=click_url,
+    )
+
+
 def send_from_payload(payload_path: Path) -> bool:
     if not payload_path.is_file():
         return False
@@ -129,6 +159,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Send PPE operator alerts to ntfy (mobile push)")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--payload", type=Path, help="JSON payload (e.g. OPERATOR_STATUS_NOTIFY.json)")
+    ap.add_argument("--weekly-digest", action="store_true", help="Send WEEKLY_DIGEST_NOTIFY.json to ntfy")
     ap.add_argument("--title", help="Direct title (with --body)")
     ap.add_argument("--body", help="Direct body (with --title)")
     ap.add_argument("--verdict", help="Verdict tag for priority when using --title/--body")
@@ -139,6 +170,11 @@ def main(argv: list[str] | None = None) -> int:
         ok = notify_enabled() and ntfy_configured()
         print(f"ppe_notify_push: configured={ok} topic={ntfy_topic() or '(unset)'}")
         return 0 if ok else 1
+
+    if args.weekly_digest:
+        payload = args.payload or (args.repo_root / "artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json")
+        sent = send_weekly_digest_from_payload(payload.resolve())
+        return 0 if sent or not ntfy_configured() else 1
 
     if args.payload:
         sent = send_from_payload(args.payload.resolve())

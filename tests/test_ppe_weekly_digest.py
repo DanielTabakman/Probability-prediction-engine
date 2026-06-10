@@ -9,11 +9,13 @@ from pathlib import Path
 
 from scripts.ppe_dev_changelog import save_changelog, ParsedChangelog
 from scripts.ppe_weekly_digest import (
+    build_phone_digest_notify,
     build_week_section,
     classify_bullet,
     cmd_backfill,
     cmd_generate,
     cmd_write_notify_payload,
+    format_week_range,
     humanize_product_bullet,
     last_completed_week_monday,
     load_state,
@@ -106,6 +108,15 @@ class TestPpeWeeklyDigest(unittest.TestCase):
                 "",
                 "**In short:** This week: homepage shipped.",
                 "",
+                "### What shipped (product)",
+                "- **MSOS website — homepage (P2):** Public marketing homepage landed on `main`.",
+                "",
+                "### Behind the scenes",
+                "- 2 control-plane / planning merge(s) — omitted from product bullets above.",
+                "",
+                "### What's next",
+                "- **Next slice:** EVIDENCE (`MSOS-P3-Control-Slice001` — charter)",
+                "",
                 "### Receipt",
                 "- 3 merge(s) to `main` — detail in [DEV_CHANGELOG.md](DEV_CHANGELOG.md).",
                 "",
@@ -119,6 +130,26 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         assert summary["week_monday"] == "2026-06-01"
         assert "homepage" in summary["in_short"]
         assert summary["merge_count"] == 3
+        assert len(summary["product_lines"]) == 1
+
+    def test_build_phone_digest_notify(self) -> None:
+        phone = build_phone_digest_notify(
+            {
+                "week_monday": "2026-06-01",
+                "merge_count": 3,
+                "product_lines": [
+                    "- **MSOS website — homepage (P2):** Public marketing homepage landed on `main`."
+                ],
+                "ops_summary": "2 control-plane / planning merge(s)",
+                "whats_next_lines": ["**Next slice:** EVIDENCE (`MSOS-P3-Control-Slice001` — charter)"],
+            }
+        )
+        assert "This week in PPE" in phone["phone_title"]
+        assert "What's different for you" in phone["phone_body"]
+        assert "public homepage" in phone["phone_body"]
+
+    def test_format_week_range(self) -> None:
+        self.assertEqual(format_week_range("2026-06-01"), "Jun 1-7")
 
     def test_write_notify_payload(self) -> None:
         self._seed_changelog()
@@ -126,7 +157,10 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         self.assertEqual(cmd_write_notify_payload(self.repo), 0)
         payload = notify_payload_path(self.repo)
         self.assertTrue(payload.is_file())
-        assert "in_short" in payload.read_text(encoding="utf-8")
+        raw = payload.read_text(encoding="utf-8")
+        assert "in_short" in raw
+        assert "phone_title" in raw
+        assert "phone_body" in raw
 
     def test_generate_and_backfill_idempotent(self) -> None:
         self._seed_changelog()
