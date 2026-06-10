@@ -49,6 +49,7 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
     if not isinstance(items, list):
         raise ValueError("queue: items must be an array")
 
+    skipped: list[str] = []
     for i, item in enumerate(items):
         if not isinstance(item, dict):
             continue
@@ -61,9 +62,20 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         errors = _plan_exists_and_valid(repo_root, plan_path)
         if errors:
             return None, f"queue item {i} invalid: " + "; ".join(errors)
+        try:
+            from scripts.ppe_operator_guards import GUARD_EXIT, evaluate_selection_guards
+
+            guard = evaluate_selection_guards(repo_root, plan_path)
+        except FileNotFoundError:
+            guard = None
+        if guard is not None and guard.exit_code == GUARD_EXIT:
+            skipped.append(f"{plan_path}: {guard.detail}")
+            continue
         reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
         return plan_path, reason
 
+    if skipped:
+        return None, "no selectable READY item; skipped: " + "; ".join(skipped)
     return None, "no READY items in queue"
 
 

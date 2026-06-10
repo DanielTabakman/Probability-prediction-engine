@@ -11,6 +11,10 @@ from scripts.ppe_context_bands import ESCALATE_LINE_THRESHOLD, WATCH_LINE_THRESH
 from scripts.ppe_ide_build_starter import format_ide_build_resume
 from scripts.ppe_manifest import load_phase_plan
 from scripts.ppe_operator_config import _guards_config, guards_enabled, load_operator_config
+from scripts.ppe_phase_plan_window import (
+    effective_slice_count_for_guard,
+    phase_slice_batching_enabled,
+)
 from scripts.ppe_queue import mark_queue_item_done
 from scripts.ppe_queue_health import chapter_marked_complete_in_repo
 from scripts.ppe_slice_worker_mode import infer_slice_kind
@@ -131,6 +135,64 @@ def _apply_skip_complete_chapter(repo: Path, plan_path: str) -> None:
         print(f"WARN: manifest update on guard skip: {exc}")
 
 
+def evaluate_selection_guards(repo: Path, plan_path: str) -> GuardResult | None:
+    """Pre-SELECTION checks: block auto-select when plan config violates guard limits."""
+    norm_plan = plan_path.replace("\\", "/").strip()
+    if not guards_enabled(repo):
+        return None
+
+    cfg = load_operator_config(repo)
+    g = _guards_config(cfg)
+
+    plan = load_phase_plan(repo, norm_plan)
+    slices = plan.get("slices") or []
+    max_slices = g.get("maxPhaseSlices")
+    if max_slices is not None and not phase_slice_batching_enabled(repo):
+        try:
+            limit = int(max_slices)
+            if limit > 0 and len(slices) > limit:
+                detail = (
+                    f"Phase plan has {len(slices)} slices (max {limit}). "
+                    "Split the chapter or raise maxPhaseSlices before SELECTION."
+                )
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
+                    reason="TOO_MANY_SLICES",
+                    detail=detail,
+                    plan_path=norm_plan,
+                )
+        except (TypeError, ValueError):
+            pass
+
+    if g.get("stopOnContextEscalate", True) is not False or g.get("stopOnContextWatch") is True:
+        watch_on = g.get("stopOnContextWatch") is True
+        for spec_rel in _plan_sprint_spec_paths(repo, norm_plan):
+            n = _sprint_spec_line_count(repo, spec_rel)
+            if n is None:
+                continue
+            band = classify_line_count(n)
+            if g.get("stopOnContextEscalate", True) is not False and band == "ESCALATE":
+                detail = (
+                    f"Sprint spec {spec_rel} has {n} lines "
+                    f"(>{ESCALATE_LINE_THRESHOLD} ESCALATE). Shrink or split before SELECTION."
+                )
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
+                    reason="CONTEXT_ESCALATE",
+                    detail=detail,
+                    plan_path=norm_plan,
+                )
+            if watch_on and band == "WATCH":
+                detail = f"Sprint spec {spec_rel} has {n} lines (>{WATCH_LINE_THRESHOLD} WATCH)."
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
+                    reason="CONTEXT_WATCH",
+                    detail=detail,
+                    plan_path=norm_plan,
+                )
+    return None
+
+
 def evaluate_continuous_guards(repo: Path, plan_path: str) -> GuardResult:
     """Dry-run guards for operator status (no queue/manifest writes)."""
     norm_plan = plan_path.replace("\\", "/").strip()
@@ -150,13 +212,30 @@ def evaluate_continuous_guards(repo: Path, plan_path: str) -> GuardResult:
             )
 
     plan = load_phase_plan(repo, norm_plan)
-    slices = plan.get("slices") or []
     max_slices = g.get("maxPhaseSlices")
-    if max_slices is not None:
+    if max_slices is not None and not phase_slice_batching_enabled(repo):
+        slices = plan.get("slices") or []
         try:
             limit = int(max_slices)
             if limit > 0 and len(slices) > limit:
                 detail = f"Phase plan has {len(slices)} slices (max {limit}). Split the chapter or raise maxPhaseSlices."
+                return GuardResult(
+                    exit_code=GUARD_EXIT,
+                    reason="TOO_MANY_SLICES",
+                    detail=detail,
+                    plan_path=norm_plan,
+                )
+        except (TypeError, ValueError):
+            pass
+    elif max_slices is not None and phase_slice_batching_enabled(repo):
+        try:
+            limit = int(max_slices)
+            effective = effective_slice_count_for_guard(repo, norm_plan)
+            if limit > 0 and effective > limit:
+                detail = (
+                    f"Active slice batch has {effective} slices (max {limit}). "
+                    "This should not happen — check phase slice progress state."
+                )
                 return GuardResult(
                     exit_code=GUARD_EXIT,
                     reason="TOO_MANY_SLICES",

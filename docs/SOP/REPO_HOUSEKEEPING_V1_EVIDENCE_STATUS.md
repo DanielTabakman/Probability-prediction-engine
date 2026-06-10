@@ -1,7 +1,7 @@
 # Repo housekeeping v1 — evidence status
 
 **Chapter:** `repo_housekeeping_v1`  
-**Status:** **PENDING** (relay plan pre-chartered; SELECTION after MSOS P4 **COMPLETE**)  
+**Status:** **COMPLETE** 2026-06-10 (relay plan pre-chartered; SELECTION after MSOS P4 **COMPLETE**)  
 **Sprint:** [`SPRINT_REPO_HOUSEKEEPING_V1.md`](SPRINT_REPO_HOUSEKEEPING_V1.md)
 
 ## Gate

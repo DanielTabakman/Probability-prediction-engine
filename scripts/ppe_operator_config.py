@@ -101,6 +101,21 @@ def idle_sleep_seconds(repo_root: Path) -> int:
         return 120
 
 
+def guard_stop_sleep_seconds(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(60, int(cfg.get("guardStopSleepSeconds", 300)))
+    except (TypeError, ValueError):
+        return 300
+
+
+def keep_loop_alive_on_guard_stop(repo_root: Path) -> bool:
+    cfg = load_operator_config(repo_root)
+    if cfg.get("keepLoopAliveOnGuardStop") is False:
+        return False
+    return bool(cfg.get("keepLoopAliveOnGuardStop", True))
+
+
 def continuous_max(repo_root: Path) -> int:
     cfg = load_operator_config(repo_root)
     try:

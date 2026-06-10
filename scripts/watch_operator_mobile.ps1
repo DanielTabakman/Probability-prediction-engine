@@ -19,7 +19,13 @@ if (-not (Test-Path -LiteralPath $localEnv)) {
   $localEnv = Join-Path $RepoRoot "ppe_operator_notify.local.cmd"
 }
 if (Test-Path -LiteralPath $localEnv) {
-  cmd /c "`"$localEnv`""
+  # cmd /c alone does not export set vars into this PowerShell session.
+  $envLines = cmd /c "`"$localEnv`" && set PPE"
+  foreach ($line in $envLines) {
+    if ($line -match '^(PPE[^=]+)=(.*)$') {
+      Set-Item -Path "env:$($matches[1])" -Value $matches[2]
+    }
+  }
 }
 
 $py = Join-Path $RepoRoot "scripts\ppe_watch_operator_mobile.py"

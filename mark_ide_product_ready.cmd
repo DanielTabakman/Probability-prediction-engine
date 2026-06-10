@@ -14,7 +14,9 @@ if "%~1"=="" (
 
 if "%~2"=="" (
   python "%CD%\scripts\ppe_ide_product_ready.py" --repo-root "%CD%" --mark --slice-id "%~1"
-) else (
+) else if "%~3"=="" (
   python "%CD%\scripts\ppe_ide_product_ready.py" --repo-root "%CD%" --mark --slice-id "%~1" --plan "%~2"
+) else (
+  python "%CD%\scripts\ppe_ide_product_ready.py" --repo-root "%CD%" --mark --slice-id "%~1" --plan "%~2" --build-branch "%~3"
 )
 exit /b %ERRORLEVEL%

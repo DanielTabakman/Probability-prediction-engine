@@ -60,6 +60,15 @@ def push_enabled(repo: Path) -> bool:
     return _git_sync_cfg(repo).get("pushAfterCommit", True) is not False
 
 
+def publish_each_pass_enabled(repo: Path) -> bool:
+    if not push_enabled(repo):
+        return False
+    g = _git_sync_cfg(repo)
+    if g.get("publishEachPass") is False:
+        return False
+    return bool(g.get("publishEachPass", True))
+
+
 def _current_branch(repo: Path) -> str:
     proc = _git(repo, "branch", "--show-current")
     return (proc.stdout or "").strip() if proc.returncode == 0 else ""
@@ -290,11 +299,73 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
     }
 
 
+def _runtime_sop_only_dirty(repo: Path) -> bool:
+    dirty = _dirty_paths(repo)
+    if not dirty:
+        return True
+    runtime_names = {
+        "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+        "docs/SOP/PHASE_QUEUE.json",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+        "docs/SOP/PHASE_SELECTION_ROADMAP.json",
+    }
+    for p in dirty:
+        if p.startswith("artifacts/"):
+            continue
+        if p in runtime_names or (p.startswith("docs/SOP/PHASE_") and p.endswith(".json")):
+            continue
+        return False
+    return True
+
+
+def maybe_auto_publish(repo: Path) -> dict[str, Any]:
+    """Push + open PR when this branch has unpushed commits (loop/agent work)."""
+    repo = repo.resolve()
+    if not publish_each_pass_enabled(repo):
+        return {"action": "auto_publish", "skipped": True, "reason": "disabled"}
+    current = _current_branch(repo)
+    if not current or current == "main":
+        return {"action": "auto_publish", "skipped": True, "reason": "not a feature branch"}
+    dirty = _dirty_paths(repo)
+    if dirty and not _runtime_sop_only_dirty(repo):
+        return {
+            "action": "auto_publish",
+            "skipped": True,
+            "reason": "dirty working tree — commit product/control changes before auto-publish",
+            "branch": current,
+            "dirty": dirty[:5],
+        }
+    ahead = _ahead_count(repo, branch=current)
+    if ahead == 0:
+        pr_url = None
+        if _git_sync_cfg(repo).get("openPrOnPush", True) is not False and _gh_available():
+            pr_url = _open_pr(
+                repo,
+                head=current,
+                title=f"ops: {current}",
+                body="Auto-published by desktop loop host (ppe_operator_git_sync).",
+            )
+        if pr_url:
+            return {
+                "action": "auto_publish",
+                "ok": True,
+                "skipped": False,
+                "reason": "PR ensured (branch already pushed)",
+                "branch": current,
+                "pr_url": pr_url,
+            }
+        return {"action": "auto_publish", "skipped": True, "reason": "nothing ahead", "branch": current}
+    pub = publish_ahead(repo)
+    pub["action"] = "auto_publish"
+    return pub
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Desktop operator git sync")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--pull", action="store_true")
     ap.add_argument("--publish", action="store_true")
+    ap.add_argument("--auto-publish", action="store_true", help="Push+PR when branch has unpushed commits")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
@@ -304,8 +375,10 @@ def main(argv: list[str] | None = None) -> int:
         results.append(pull_main(repo))
     if args.publish:
         results.append(publish_ahead(repo))
+    if args.auto_publish:
+        results.append(maybe_auto_publish(repo))
     if not results:
-        ap.error("specify --pull and/or --publish")
+        ap.error("specify --pull, --publish, and/or --auto-publish")
         return 2
 
     if args.json:

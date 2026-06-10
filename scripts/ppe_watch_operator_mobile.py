@@ -16,6 +16,7 @@ from scripts.ppe_operator_status import (
     VERDICT_ERROR,
     VERDICT_FIX_PLAN,
     VERDICT_IDE_BUILD,
+    VERDICT_RUN_AUTO,
     VERDICT_RUN_LOCAL,
     VERDICT_STALE_STATE,
     VERDICT_SUPPLY_LOW,
@@ -31,6 +32,23 @@ ATTENTION_VERDICTS = frozenset(
         VERDICT_FIX_PLAN,
         VERDICT_STALE_STATE,
         VERDICT_ERROR,
+        VERDICT_RUN_LOCAL,
+        VERDICT_SUPPLY_LOW,
+    }
+)
+
+STUCK_VERDICTS = frozenset(
+    {
+        VERDICT_IDE_BUILD,
+        VERDICT_FIX_PLAN,
+        VERDICT_STALE_STATE,
+        VERDICT_ERROR,
+    }
+)
+
+HEALTHY_VERDICTS = frozenset(
+    {
+        VERDICT_RUN_AUTO,
         VERDICT_RUN_LOCAL,
         VERDICT_SUPPLY_LOW,
     }
@@ -59,6 +77,27 @@ def _heartbeat_hours() -> float:
         return max(1.0, float(raw))
     except ValueError:
         return 6.0
+
+
+def _stuck_alert_hours() -> float:
+    raw = os.environ.get("PPE_NTFY_STUCK_HOURS", "4").strip()
+    try:
+        return max(1.0, float(raw))
+    except ValueError:
+        return 4.0
+
+
+def _stuck_alert_due(prior: dict[str, Any], verdict: str) -> bool:
+    if verdict not in STUCK_VERDICTS:
+        return False
+    prior_verdict = str(prior.get("last_verdict") or "")
+    if verdict != prior_verdict:
+        return False
+    last = _parse_utc(str(prior.get("last_stuck_alert_at") or ""))
+    if last is None:
+        return True
+    elapsed_h = (datetime.now(timezone.utc) - last).total_seconds() / 3600.0
+    return elapsed_h >= _stuck_alert_hours()
 
 
 def _heartbeat_due(prior: dict[str, Any]) -> bool:
@@ -143,6 +182,22 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     if verdict in ATTENTION_VERDICTS and verdict != prior_verdict:
         alerts.append((f"PPE operator: {verdict}", str(status.get("blocker") or verdict)))
 
+    if prior_verdict in STUCK_VERDICTS and verdict in HEALTHY_VERDICTS:
+        alerts.append(
+            (
+                f"PPE unblocked: {verdict}",
+                str(status.get("blocker") or "Operator guard cleared — loop can continue."),
+            )
+        )
+
+    if _stuck_alert_due(prior, verdict):
+        alerts.append(
+            (
+                f"PPE still stuck: {verdict}",
+                str(status.get("blocker") or verdict),
+            )
+        )
+
     if prior_loop and not loop_running:
         alerts.append(
             (
@@ -164,10 +219,13 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
             heartbeat_sent = True
 
     sent = 0
+    stuck_alert_sent = False
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
             if send_ntfy(title, body, tags=["ppe", "watch"], priority="high"):
                 sent += 1
+                if title.startswith("PPE still stuck:"):
+                    stuck_alert_sent = True
 
     new_state = {
         "as_of": _utc_now(),
@@ -176,6 +234,9 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "alerts_sent": sent,
         "last_alert_titles": [title for title, _ in alerts],
         "last_heartbeat_at": _utc_now() if heartbeat_sent else prior.get("last_heartbeat_at"),
+        "last_stuck_alert_at": _utc_now()
+        if stuck_alert_sent or (verdict in STUCK_VERDICTS and verdict != prior_verdict and sent)
+        else prior.get("last_stuck_alert_at"),
     }
     save_state(repo, new_state)
 

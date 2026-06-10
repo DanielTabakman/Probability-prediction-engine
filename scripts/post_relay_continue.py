@@ -138,6 +138,12 @@ def main(argv: list[str] | None = None) -> int:
         subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=False)
 
     if chapter_closed:
+        try:
+            from scripts.ppe_phase_plan_window import clear_progress
+
+            clear_progress(repo, str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/"))
+        except Exception:
+            pass
         print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
         try:
             plan_rel = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")

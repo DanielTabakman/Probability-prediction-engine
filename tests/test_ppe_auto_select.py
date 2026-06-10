@@ -105,6 +105,45 @@ class TestPpeAutoSelect(unittest.TestCase):
         manifest = load_manifest(self.repo)
         self.assertEqual(manifest.get("phasePlanPath"), "")
 
+    def test_skips_ready_plan_over_max_slices(self) -> None:
+        (self.repo / "docs" / "SOP" / "PPE_AUTO_OPERATOR.json").write_text(
+            json.dumps({"enabled": True, "guards": {"enabled": True, "maxPhaseSlices": 1, "phaseSliceBatching": False}}),
+            encoding="utf-8",
+        )
+        plan_c = {
+            "name": "chapter_c",
+            "sprintSpecPath": "docs/SOP/SPRINT_C.md",
+            "selectionRecord": "docs/SOP/SEL_C.md",
+            "slices": [
+                {"sliceId": "C-Control-Slice001"},
+                {"sliceId": "C-Closeout-Slice002", "closeout": {"chapterId": "c"}},
+            ],
+        }
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        (plans / "chapter_c.json").write_text(json.dumps(plan_c), encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SPRINT_C.md").write_text("# C\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_C.md").write_text("# C\n", encoding="utf-8")
+        queue = load_queue(self.repo)
+        queue["items"][1]["status"] = "DONE"
+        queue["items"].append(
+            {
+                "planPath": "docs/SOP/PHASE_PLANS/chapter_c.json",
+                "status": "READY",
+                "reason": "too many slices",
+            }
+        )
+        from scripts.ppe_queue import save_queue
+
+        save_queue(self.repo, queue)
+        save_manifest(
+            self.repo,
+            {"phasePlanPath": "", "status": "COMPLETE", "notes": ""},
+        )
+        rc = run_auto_select(self.repo, apply=True, select_only=False, mark_done=False, force=False)
+        self.assertEqual(rc, 0)
+        manifest = load_manifest(self.repo)
+        self.assertEqual(manifest.get("phasePlanPath"), "")
+
 
 if __name__ == "__main__":
     unittest.main()
