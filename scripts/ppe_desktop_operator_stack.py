@@ -14,9 +14,14 @@ WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
 
 
 def _powershell_process_match(pattern: str) -> bool:
+    # Exclude our own probe command line (pattern appears in -match and would false-positive).
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.CommandLine -match '{pattern}' }}; "
+        "Where-Object { "
+        "$_.CommandLine -and "
+        f"$_.CommandLine -match '{pattern}' -and "
+        "$_.CommandLine -notmatch 'Get-CimInstance Win32_Process' "
+        "}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:

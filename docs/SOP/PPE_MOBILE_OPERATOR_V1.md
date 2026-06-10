@@ -178,6 +178,27 @@ install_ppe_desktop_operator_task.cmd
 
 Runs `run_ppe_desktop_operator.cmd` at user logon (git pull, queue propagate, start stack if missing).
 
+### Watchdog every 15 minutes (recommended with daily use)
+
+If you use **Cursor, browser, or RDP** on the desktop, background cmd windows still run — but closing a window stops the loop. Register a **hidden** watchdog that re-starts loop + watch without stealing focus:
+
+```bat
+install_ppe_desktop_operator_watchdog_task.cmd
+```
+
+| Task | When | What |
+|------|------|------|
+| **PPE Desktop Operator** | Logon | Full bootstrap (pull, propagate, start stack) |
+| **PPE Desktop Operator Watchdog** | Every 15 min (hidden) | Pull + ensure loop/watch still running |
+
+Loop windows start **minimized** (`start /min`) so they stay out of the way. You do not need to keep cmd windows on top.
+
+Remove watchdog:
+
+```bat
+install_ppe_desktop_operator_watchdog_task.cmd -Unregister
+```
+
 Manual Task Scheduler fields:
 
 | Field | Value |
