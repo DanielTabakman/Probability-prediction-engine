@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from scripts.ppe_progress_notify import notify_chapter_complete, notify_slice_complete
+from scripts.ppe_progress_notify import (
+    notify_chapter_complete,
+    notify_fix_resolved,
+    notify_fix_working,
+    notify_slice_complete,
+)
 
 
 def test_notify_slice_complete(monkeypatch):
@@ -36,4 +41,28 @@ def test_progress_disabled(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_PROGRESS", "0")
     with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
         assert notify_slice_complete("X") is False
+        assert notify_fix_working("ERROR") is False
     send.assert_not_called()
+
+
+def test_notify_fix_working(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
+        ok = notify_fix_working("IDE_BUILD: PRODUCT_BLOCKED", detail="Slice007")
+    assert ok is True
+    assert "fixing" in send.call_args[0][0].lower()
+
+
+def test_notify_fix_resolved(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
+        ok = notify_fix_resolved(
+            "gate failure",
+            summary="Ruff fixed; pytest green.",
+            verdict="RUN_LOCAL",
+        )
+    assert ok is True
+    assert "fixed" in send.call_args[0][0].lower()
+    assert "RUN_LOCAL" in send.call_args[0][1]

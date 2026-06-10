@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_NTFY_SERVER = "https://ntfy.sh"
+OUTBOUND_TAG = "from-desktop"
 PRIORITY_BY_VERDICT = {
     "ERROR": "urgent",
     "IDE_BUILD": "high",
@@ -68,9 +69,12 @@ def send_ntfy(
         return False
 
     url = f"{ntfy_server()}/{topic}"
+    outbound_tags = list(tags or [])
+    if OUTBOUND_TAG not in outbound_tags:
+        outbound_tags.insert(0, OUTBOUND_TAG)
     headers = {"Title": _header_value(title), "Priority": priority}
-    if tags:
-        headers["Tags"] = _header_value(",".join(tags[:5]))
+    if outbound_tags:
+        headers["Tags"] = _header_value(",".join(outbound_tags[:5]))
     if click_url:
         headers["Click"] = _header_value(click_url)
 
