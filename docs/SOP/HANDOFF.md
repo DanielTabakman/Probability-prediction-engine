@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — mvp1 btc distribution export (phase 1) **COMPLETE** 2026-06-06
+- Active MVP1 focus: **none** — msos p4 strategy lab / ppe integration **COMPLETE** 2026-06-09
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/MVP1_FRONTIER.md`
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MVP1 BTC distribution export (Phase 1) COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS P4 Strategy Lab / PPE integration COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -47,9 +47,9 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md).
+2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
 
 
 ## Last updated
 
-2026-06-06 — MVP1 BTC distribution export (Phase 1) COMPLETE; closeout job `MVP1-DistExport-Closeout-Slice005`.
+2026-06-09 — MSOS P4 Strategy Lab / PPE integration COMPLETE; closeout job `MSOS-P4-Closeout-Slice005`.

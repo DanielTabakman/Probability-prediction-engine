@@ -7,6 +7,7 @@ REM Exit 7: guard stop (PRODUCT_BLOCKED, CONTEXT_ESCALATE, TOO_MANY_SLICES, etc.
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
+if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 if not defined PPE_OPERATOR_PROFILE set "PPE_OPERATOR_PROFILE=local"
 
 python "%CD%\scripts\ppe_operator_env.py"
@@ -25,8 +26,12 @@ if "%PREFLIGHT_RC%"=="7" (
 )
 if not "%PREFLIGHT_RC%"=="0" exit /b %PREFLIGHT_RC%
 
+echo [run_ppe_auto_loop] git sync pull
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
+
 :loop
 echo [run_ppe_auto_loop] starting pass at %DATE% %TIME%
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --brief --no-write
 set "STATUS_RC=%ERRORLEVEL%"
 if "%STATUS_RC%"=="7" (

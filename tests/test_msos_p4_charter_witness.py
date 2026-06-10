@@ -1,4 +1,4 @@
-"""Charter witness for MSOS P4 Strategy Lab (SELECTION after P3 COMPLETE)."""
+"""Charter / closeout witness for MSOS P4 Strategy Lab."""
 
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ P4_EVIDENCE = SOP / "MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md"
 PHASE_QUEUE = SOP / "PHASE_QUEUE.json"
 BACKLOG = SOP / "PHASE_CHAPTER_BACKLOG.json"
 MANIFEST = SOP / "ACTIVE_PHASE_MANIFEST.json"
+HOUSEKEEPING_PLAN = "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json"
 
 
 def test_p4_charter_artifacts_exist() -> None:
@@ -34,25 +35,38 @@ def test_p4_phase_plan_valid() -> None:
     assert closeout.get("chapterId") == "msos_p4_strategy_lab"
 
 
-def test_phase_queue_msos_p4_ready() -> None:
+def test_phase_queue_msos_p4_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == P4_PLAN_REL)
-    assert row["status"] == "READY"
-    assert row["selectionPrep"] == "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md"
+    assert row["status"] == "DONE"
 
 
-def test_backlog_p4_chartered_with_plan() -> None:
+def test_backlog_p4_done() -> None:
     backlog = json.loads(BACKLOG.read_text(encoding="utf-8"))
     by_id = {item["chapterId"]: item for item in backlog["items"]}
     p4 = by_id["msos_p4_strategy_lab"]
-    assert p4["status"] in ("queued", "chartered")
+    assert p4["status"] == "done"
     assert p4["planPath"] == P4_PLAN_REL
 
 
-def test_manifest_points_at_p4() -> None:
+def test_manifest_ready_for_next_chapter() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["phasePlanPath"] == P4_PLAN_REL
-    assert manifest["status"] in ("READY", "RUNNING")
+    assert manifest["status"] in ("READY", "RUNNING", "COMPLETE")
+    if manifest["status"] == "COMPLETE":
+        assert manifest.get("phasePlanPath") in ("", None)
+    if manifest["status"] == "READY":
+        assert manifest.get("phasePlanPath") == HOUSEKEEPING_PLAN
+
+
+def test_next_chapter_ready_or_queued() -> None:
+    queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
+    backlog = json.loads(BACKLOG.read_text(encoding="utf-8"))
+    hk_queue = next((i for i in queue["items"] if i.get("planPath") == HOUSEKEEPING_PLAN), None)
+    hk_backlog = next(i for i in backlog["items"] if i.get("chapterId") == "repo_housekeeping_v1")
+    if hk_queue is not None:
+        assert hk_queue["status"] in ("READY", "PLANNED", "RUNNING", "DONE")
+    else:
+        assert hk_backlog["status"] in ("queued", "chartered", "blocked", "done")
 
 
 def test_queue_health_no_issues_on_live_queue() -> None:

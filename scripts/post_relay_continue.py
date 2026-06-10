@@ -26,6 +26,9 @@ def _find_newest_relay_run(repo_root: Path) -> Path | None:
     wt = repo_root / "_worktrees" / "acp_orchestrator"
     if wt.is_dir():
         candidates.extend(wt.glob("*/artifacts/relay/runs/*/relay_result.json"))
+    wt_local = repo_root / "_worktrees" / "orchestrator"
+    if wt_local.is_dir():
+        candidates.extend(wt_local.glob("*/artifacts/relay/runs/*/relay_result.json"))
     existing = [p.parent for p in candidates if p.is_file()]
     if not existing:
         return None
@@ -161,10 +164,11 @@ def main(argv: list[str] | None = None) -> int:
             from scripts.ppe_propagate_queue import (
                 maybe_propagate_queue,
                 promote_first_blocked_with_plan,
-                sync_backlog_from_roadmap,
+                reconcile_closed_chapters,
             )
 
-            sync_backlog_from_roadmap(repo, apply=True)
+            recon = reconcile_closed_chapters(repo, apply=True)
+            print(f"post_relay_continue: backlog reconcile {json.dumps(recon)}")
             prom = promote_first_blocked_with_plan(repo, apply=True)
             print(f"post_relay_continue: backlog promote {json.dumps(prom)}")
             prop = maybe_propagate_queue(repo, apply=True)
@@ -192,6 +196,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"post_relay_continue: google docs refresh failed ({gdocs_rc}); continuing")
     except Exception as exc:
         print(f"post_relay_continue: google docs refresh skipped: {exc}")
+    try:
+        from scripts.ppe_operator_git_sync import publish_ahead
+
+        pub = publish_ahead(repo)
+        print(f"post_relay_continue: git publish {json.dumps(pub)}")
+    except Exception as exc:
+        print(f"post_relay_continue: git publish skipped: {exc}")
     return 0
 
 

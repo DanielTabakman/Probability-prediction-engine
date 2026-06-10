@@ -14,7 +14,10 @@ if (-not $RepoRoot) {
 }
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 
-$localEnv = Join-Path $RepoRoot "ppe_operator_notify.local.cmd"
+$localEnv = Join-Path $RepoRoot "ppe_operator_local.cmd"
+if (-not (Test-Path -LiteralPath $localEnv)) {
+  $localEnv = Join-Path $RepoRoot "ppe_operator_notify.local.cmd"
+}
 if (Test-Path -LiteralPath $localEnv) {
   cmd /c "`"$localEnv`""
 }
@@ -27,9 +30,9 @@ if ($Once) {
   $pyArgs += @("--interval", "$IntervalSeconds")
 }
 
-Write-Host "PPE mobile watch — repo: $RepoRoot"
+Write-Host "PPE mobile watch - repo: $RepoRoot"
 if (-not $Once) {
-  Write-Host "Interval: ${IntervalSeconds}s | Ctrl+C to stop"
+  Write-Host "Interval: $IntervalSeconds s (Ctrl+C to stop)"
 }
 
 & python $py @pyArgs

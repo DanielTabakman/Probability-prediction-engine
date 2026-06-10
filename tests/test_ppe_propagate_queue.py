@@ -72,6 +72,32 @@ class TestPpePropagateQueue(unittest.TestCase):
         backlog = load_backlog(self.repo)
         self.assertEqual(backlog["items"][0]["status"], "chartered")
 
+    def test_sync_backlog_done_from_queue(self) -> None:
+        from scripts.ppe_queue import save_queue
+
+        save_queue(
+            self.repo,
+            {
+                "version": 1,
+                "items": [
+                    {
+                        "planPath": "docs/SOP/PHASE_PLANS/next_relay.json",
+                        "status": "DONE",
+                        "reason": "closed",
+                    }
+                ],
+            },
+        )
+        backlog = load_backlog(self.repo)
+        backlog["items"][0]["status"] = "chartered"
+        save_backlog(self.repo, backlog)
+        from scripts.ppe_propagate_queue import sync_backlog_from_queue
+
+        changes = sync_backlog_from_queue(self.repo, apply=True)
+        self.assertTrue(changes)
+        backlog = load_backlog(self.repo)
+        self.assertEqual(backlog["items"][0]["status"], "done")
+
     def test_sync_backlog_done_from_roadmap(self) -> None:
         roadmap = load_roadmap(self.repo)
         roadmap["items"] = [

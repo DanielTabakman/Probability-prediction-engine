@@ -165,6 +165,13 @@ def _run_control_closeout(repo: Path, phase_plan: Path, slice_id: str, relay_run
             print(f"ppe_promotion_recovery: google docs refresh failed ({gdocs_rc})")
     except Exception as exc:
         print(f"ppe_promotion_recovery: google docs refresh skipped: {exc}")
+    try:
+        from scripts.ppe_operator_git_sync import publish_ahead
+
+        pub = publish_ahead(repo)
+        print(f"ppe_promotion_recovery: git publish {json.dumps(pub)}")
+    except Exception as exc:
+        print(f"ppe_promotion_recovery: git publish skipped: {exc}")
     return 0
 
 
@@ -211,6 +218,7 @@ def _should_block_product_auto_resume(
     promoted: bool,
     build_branch: str,
     baseline_branch: str = "main",
+    plan_path: str = "",
 ) -> bool:
     if stop != "SCOPE_AMBIGUITY":
         return False
@@ -219,7 +227,16 @@ def _should_block_product_auto_resume(
         return False
     if promoted:
         return False
-    if _build_branch_has_product_commits(repo, build_branch=build_branch, baseline_branch=baseline_branch):
+    norm_plan = plan_path.replace("\\", "/").strip() or str(plan.get("phasePlanPath") or "").replace("\\", "/")
+    if norm_plan:
+        from scripts.ppe_ide_product_ready import marker_covers_product_slices
+
+        if marker_covers_product_slices(repo, plan_path=norm_plan, product_slice_ids=[slice_id]):
+            return False
+    plan_branch = str((sl or {}).get("buildBranch") or build_branch or "").strip()
+    if _build_branch_has_product_commits(
+        repo, build_branch=plan_branch or build_branch, baseline_branch=baseline_branch
+    ):
         return False
     print(
         "ppe_promotion_recovery: product slice SCOPE_AMBIGUITY without promotion or "
@@ -286,7 +303,13 @@ def try_recover(
             print(f"ppe_promotion_recovery: main at {head_proc.stdout.strip()[:8]}; closeout commit {sha[:8]} may need PR")
         return _run_control_closeout(repo, phase_plan, slice_id, run_dir)
 
-    if not promoted and stop in ("REPO_STATE_DRIFT", "BASELINE_LOCKED", ""):
+    sl_obj = _slice_obj(plan, slice_id)
+    sl_kind = infer_slice_kind(slice_id, sl_obj)
+    if (
+        not promoted
+        and sl_kind == "product"
+        and stop in ("REPO_STATE_DRIFT", "BASELINE_LOCKED")
+    ):
         product_sha = ""
         if relay:
             product_sha = str(relay.get("product_commit_sha") or "")
@@ -316,8 +339,11 @@ def try_recover(
             slice_id=slice_id,
             stop=stop,
             promoted=promoted,
-            build_branch=branch,
+            build_branch=build_branch,
             baseline_branch=baseline,
+            plan_path=str(phase_plan.relative_to(repo)).replace("\\", "/")
+            if phase_plan.is_relative_to(repo)
+            else str(phase_plan),
         ):
             return 0
         nxt = _next_slice_id(plan, slice_id)

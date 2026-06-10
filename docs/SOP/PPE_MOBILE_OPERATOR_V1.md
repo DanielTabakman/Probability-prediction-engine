@@ -2,19 +2,21 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** run the auto-loop on an always-on desktop; monitor and triage from phone.
 
-**New desktop?** Open Cursor on the desktop → new Agent chat → paste the prompt in [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md).
+**New desktop?** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
 
 Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
 
 ---
 
-## Roles
+## Roles (three devices)
 
-| Device | Job |
-|--------|-----|
-| **Desktop** (plugged in, never sleeps) | `run_ppe_auto_local_loop.cmd` + mobile watch |
-| **Phone** | ntfy alerts + SSH status checks |
-| **Laptop** | Cursor IDE BUILD when verdict is `IDE_BUILD` |
+| Device | Tools | Job |
+|--------|-------|-----|
+| **Desktop** (plugged in, never sleeps) | Loop + **Cursor** + RDP host | Loop host; primary Agent machine; optional direct work |
+| **Phone** | **ntfy** + **Termius** + **Microsoft Remote Desktop** | Alerts; quick SSH triage; full Cursor via RDP |
+| **Laptop** | Cursor + Termius (optional) | Alternate BUILD machine if desktop unavailable |
+
+**You do not code by hand.** When something needs judgment, open **Cursor Agent** on the desktop (locally or via phone RDP).
 
 ---
 
@@ -27,9 +29,9 @@ Windows → Power → **Never sleep** when plugged in (display may turn off).
 ### 2. ntfy (phone push)
 
 1. Install [ntfy app](https://ntfy.sh) on your phone.
-2. Subscribe to a **private topic** (long random string, e.g. `ppe-msos-abc123xyz`).
+2. Subscribe to a **private topic**.
 3. Copy `ppe_operator_notify.local.cmd.example` → `ppe_operator_notify.local.cmd`
-4. Set `PPE_NTFY_TOPIC` to that topic (file is gitignored).
+4. Set `PPE_NTFY_TOPIC` (gitignored).
 
 Verify:
 
@@ -38,56 +40,107 @@ python scripts\ppe_notify_push.py --check
 python scripts\ppe_notify_push.py --title "PPE test" --body "desktop ready"
 ```
 
-Disable all notifications: `set PPE_NOTIFY=0`.
-
 ### 3. Tailscale (private access)
 
-Install Tailscale on **desktop**, **laptop**, and **phone**. No public SSH ports on your router.
+Install Tailscale on **desktop**, **laptop**, and **phone**. No public ports on your router.
 
-### 4. OpenSSH on desktop
+### 4. OpenSSH on desktop (Termius triage)
 
-Windows Settings → Apps → Optional features → **OpenSSH Server**.
+Windows → Optional features → **OpenSSH Server**.
 
-Phone/laptop connect: `ssh youruser@<desktop-tailscale-name>`
+```text
+ssh USER@desktop-ge39o15
+```
+
+### 5. Remote Desktop on desktop (Cursor from phone)
+
+Run **once as Administrator** on the desktop:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\enable_rdp_tailscale.ps1
+```
+
+On your phone, install **Microsoft Remote Desktop** (not Termius):
+
+| Field | Value |
+|-------|-------|
+| PC name | `desktop-ge39o15` |
+| User | `USER` |
+| Password | Windows login password |
+
+Use Tailscale hostname only — do not expose port 3389 on your router.
+
+### 6. Git identity + GitHub CLI
+
+```bat
+copy ppe_operator_git.local.cmd.example ppe_operator_git.local.cmd
+gh auth login -h github.com -p https -w
+setup_desktop_operator.cmd
+```
+
+---
+
+## Auto git sync (loop host)
+
+Configured in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) → `gitSync`:
+
+| Setting | Default | Behavior |
+|---------|---------|----------|
+| `pullEachPass` | true | Each loop pass: `git fetch` + `git pull --ff-only origin main` |
+| `pushAfterCommit` | true | After closeout / `run_ppe_local` success: push + open PR |
+| `openPrOnPush` | true | `gh pr create` when publishing from `main` |
+
+Disable: `set PPE_GIT_SYNC=0` or `set PPE_GIT_SYNC_PULL=0`.
+
+**You do not manually `git pull` from the phone** — the loop pulls laptop/desktop pushes automatically.
 
 ---
 
 ## Daily start (desktop)
 
-One command opens two terminals (loop + watch):
+**One command** (git pull, propagate queue, ensure loop + watch, print verdict):
+
+```bat
+run_ppe_desktop_operator.cmd
+```
+
+Low-level (opens two cmd windows only — no queue/stack check):
 
 ```bat
 start_ppe_desktop_operator.cmd
 ```
 
-Or manually:
-
-```bat
-run_ppe_auto_local_loop.cmd
-watch_operator_mobile.cmd
-```
-
 ---
 
-## Phone triage
+## Phone workflow when ntfy fires
 
-When ntfy alerts fire, SSH to the desktop and run:
+### Quick triage (Termius)
 
 ```bat
+cd C:\Users\USER\Desktop\Probability-prediction-engine
 run_ppe_operator.cmd --brief
 type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
-type artifacts\orchestrator\LAST_RUN_REPORT.md
 ```
 
-| Verdict | Phone can | Needs laptop Cursor |
-|---------|-----------|---------------------|
-| `RUN_AUTO` | Watch — loop handles it | — |
-| `RUN_LOCAL` | `run_ppe_local.cmd` (if marker set) | — |
-| `IDE_BUILD` | Read reports | Agent BUILD + commit + `mark_ide_product_ready.cmd` |
-| `SUPPLY_LOW` | Wait (loop idles) | Add backlog rows when ready |
-| `STALE_STATE` / `ERROR` | Read reports; restart loop if crashed | Fix root cause |
+### Fix with Cursor Agent (Microsoft Remote Desktop)
 
-Restart stack from phone:
+1. Open **Microsoft Remote Desktop** → connect to `desktop-ge39o15`
+2. Open **Cursor** on the desktop
+3. New Agent thread → load `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` or `AGENT_CONTINUITY_BRIEF.md`
+4. Agent implements / fixes; commit happens on desktop
+5. Loop auto-pulls/pushes — or run `run_ppe_local.cmd` if verdict is `RUN_LOCAL`
+
+### Verdict matrix
+
+| Verdict | Phone (Termius) | Phone (RDP + Cursor) | Loop auto |
+|---------|-----------------|----------------------|-----------|
+| `SUPPLY_LOW` | Nothing — idle | — | — |
+| `RUN_AUTO` | Watch | — | Runs relay |
+| `RUN_LOCAL` | `run_ppe_local.cmd` | Agent if stuck | Pull + publish |
+| `IDE_BUILD` | Read reports | **Cursor Agent BUILD** | Pull after push |
+| `ERROR` / `STALE_STATE` | Read reports; restart stack | Agent fix | — |
+
+Restart stack from phone (Termius):
 
 ```bat
 start_ppe_desktop_operator.cmd
@@ -99,20 +152,34 @@ start_ppe_desktop_operator.cmd
 
 | Trigger | Channel |
 |---------|---------|
-| Loop guard stop (exit 7) | Windows toast + **ntfy** (`run_ppe_auto_loop.cmd` → `--notify`) |
-| Verdict change while watch runs | **ntfy** (`watch_operator_mobile.cmd`) |
-| Loop process died | **ntfy** (watch detects missing `run_ppe_auto_loop`) |
+| Loop guard stop (exit 7) | **ntfy** |
+| Verdict change while watch runs | **ntfy** |
+| Loop process died | **ntfy** (title: **PPE loop stopped**) |
+| Stack started (logon / `run_ppe_desktop_operator.cmd`) | **ntfy** (title: **PPE OK — …**) |
+| Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK — …**, low priority) |
 
-Watch state: `artifacts/control_plane/MOBILE_WATCH_STATE.json` (gitignored with `artifacts/`).
+**Phone check without SSH:** open the **ntfy** app → your topic. Recent **PPE OK** = running. **PPE loop stopped** = needs a reboot or desktop fix. **IDE_BUILD** / **ERROR** = needs you.
+
+Optional: set `PPE_NTFY_HEARTBEAT_HOURS=4` in `ppe_operator_notify.local.cmd` for more frequent OK pings.
 
 ---
 
-## Optional: Task Scheduler at logon
+## Task Scheduler at logon (recommended)
+
+Register once from repo root:
+
+```bat
+install_ppe_desktop_operator_task.cmd
+```
+
+Runs `run_ppe_desktop_operator.cmd` at user logon (git pull, queue propagate, start stack if missing).
+
+Manual Task Scheduler fields:
 
 | Field | Value |
 |-------|--------|
 | Program | `cmd.exe` |
-| Arguments | `/c "D:\path\to\Probability prediction engine\start_ppe_desktop_operator.cmd"` |
+| Arguments | `/c "…\run_ppe_desktop_operator.cmd"` |
 | Start in | repo root |
 
 ---
@@ -123,8 +190,10 @@ Watch state: `artifacts/control_plane/MOBILE_WATCH_STATE.json` (gitignored with 
 |----------|----------|---------|
 | `PPE_NTFY_TOPIC` | Yes for mobile push | — |
 | `PPE_NTFY_SERVER` | No | `https://ntfy.sh` |
-| `PPE_NTFY_TOKEN` | No | — (auth for private server) |
-| `PPE_NOTIFY` | No | enabled; set `0` to disable |
+| `PPE_NOTIFY` | No | enabled; `0` disables |
+| `PPE_GIT_SYNC` | No | enabled |
+| `PPE_GIT_SYNC_PULL` | No | enabled |
+| `PPE_GIT_SYNC_PUSH` | No | enabled |
 
 ---
 

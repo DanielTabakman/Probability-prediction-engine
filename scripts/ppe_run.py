@@ -71,7 +71,10 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     env["PYTHONPATH"] = str(repo)
     if not env.get("PPE_WORKER_MODE") and env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes"):
         env["PPE_WORKER_MODE"] = "deterministic"
-    pf = run_preflight(repo)
+    skip_orchestrator = env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes") or (
+        env.get("PPE_WORKER_MODE") or ""
+    ).strip().lower() in ("deterministic", "local")
+    pf = run_preflight(repo, check_orchestrator=not skip_orchestrator)
     if not pf["ok"]:
         for e in pf["errors"]:
             print(f"ERROR: {e}", file=sys.stderr)

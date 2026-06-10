@@ -31,6 +31,7 @@ Do NOT do product IDE BUILD on this machine unless I ask — laptop handles BUIL
 | Run commands in **this repo root** on the desktop | Product slice implementation unless operator asks |
 | Verify each step before the next | `run_ppe_auto_acp_loop.cmd` / API relay |
 | Create `ppe_operator_notify.local.cmd` from example (gitignored) | Commit secrets or `ppe_operator_notify.local.cmd` |
+| Create `ppe_operator_git.local.cmd` from example (gitignored) | Commit secrets or `ppe_operator_git.local.cmd` |
 | Use local profile only | Paste laptop chat history |
 
 **Three devices:** desktop = loop host · phone = ntfy + SSH triage · laptop = Cursor BUILD.
@@ -97,8 +98,10 @@ Agent: help troubleshoot only if operator is on this step.
 ### E — Start the stack
 
 ```bat
-start_ppe_desktop_operator.cmd
+run_ppe_desktop_operator.cmd
 ```
+
+Propagates the chapter queue, checks whether loop + watch are running, starts them if not, prints verdict.
 
 Two terminals should open: **PPE auto loop** and **PPE mobile watch**.
 
@@ -110,19 +113,81 @@ run_ppe_operator.cmd --brief
 
 Expected when healthy: `VERDICT=RUN_AUTO` or `VERDICT=SUPPLY_LOW` (idle queue).
 
-### F — Optional: auto-start at logon
+### F — Auto-start at logon
 
-Task Scheduler → At logon → `cmd.exe /c "…\start_ppe_desktop_operator.cmd"` with **Start in** = repo root.
+```bat
+install_ppe_desktop_operator_task.cmd
+```
+
+Registers Task Scheduler → at logon → `run_ppe_desktop_operator.cmd`.
+
+### G — Git commits + push from desktop
+
+Closeout slices commit `docs/SOP/` on this machine. Use gitignored env (no global git config required):
+
+```bat
+copy ppe_operator_git.local.cmd.example ppe_operator_git.local.cmd
+```
+
+Set `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` (match your GitHub noreply or primary email).
+
+For **push** and promotion-recovery PRs, log in once:
+
+```bat
+gh auth login -h github.com -p https -w
+```
+
+Opens a browser on the desktop — or copy the device code URL to your phone/laptop browser.
+
+Verify everything:
+
+```bat
+setup_desktop_operator.cmd
+```
+
+### H — Permissions: Cursor vs unattended loop
+
+| Context | Who approves | Phone can help? |
+|---------|--------------|-----------------|
+| **Unattended loop** (`run_ppe_auto_local_loop.cmd`) | Nobody — Python/cmd only | SSH triage only (`run_ppe_operator.cmd`, restart stack) |
+| **Cursor Agent on desktop** | You, in Cursor on the desktop | **No** — smart-mode blocks are IDE-only |
+| **Windows UAC** (OpenSSH install, etc.) | You, on the desktop (one-time) | No |
+| **`gh auth login`** | You, any browser (device code) | **Yes** — paste URL/code from SSH session |
+
+The loop does **not** use Cursor. Once G is done, routine chapters need no Cursor permission prompts.
+
+### I — Remote Desktop (Cursor from phone)
+
+Run **once as Administrator** on the desktop:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\enable_rdp_tailscale.ps1
+```
+
+On phone: install **Microsoft Remote Desktop** → PC name `desktop-ge39o15`, user `USER`, Windows password.
+
+When ntfy fires for `IDE_BUILD` / `ERROR`: RDP → Cursor Agent on desktop (you do not code by hand).
+
+### J — Auto git sync (no manual pull from phone)
+
+Enabled in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (`gitSync`). Each loop pass pulls `main`; closeout pushes + opens PR automatically.
+
+Verify:
+
+```bat
+python scripts\ppe_operator_git_sync.py --pull
+```
 
 ---
 
 ## When loop stops (desktop / phone)
 
-| Verdict | Desktop / phone SSH | Laptop |
-|---------|---------------------|--------|
-| `IDE_BUILD` | Read `OPERATOR_GUARD_REPORT.md` | Agent BUILD → push → desktop `git pull` → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd` |
-| `RUN_LOCAL` | `run_ppe_local.cmd` | — |
-| Loop died | `start_ppe_desktop_operator.cmd` | — |
+| Verdict | Phone SSH (Termius) | Phone RDP + Cursor | Loop auto |
+|---------|---------------------|--------------------|-----------|
+| `IDE_BUILD` | Read `OPERATOR_GUARD_REPORT.md` | Agent BUILD on desktop | `git pull` each pass |
+| `RUN_LOCAL` | `run_ppe_local.cmd` | — | pull + publish |
+| `SUPPLY_LOW` | Nothing — idle | — | — |
+| Loop died | `start_ppe_desktop_operator.cmd` | — | — |
 
 Phone triage commands:
 
@@ -136,10 +201,11 @@ type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ## Git sync between laptop and desktop
 
 ```
-Laptop (BUILD, push) → GitHub → Desktop (git pull, run_ppe_local)
+Any machine (Cursor BUILD) → push → GitHub → desktop loop auto-pulls each pass
+Closeout on desktop → auto-push + PR (no manual phone git)
 ```
 
-Desktop does **not** replace laptop for product slices. Desktop runs unattended relay slices only.
+Desktop is the **primary** loop host and recommended Cursor Agent machine. Laptop remains optional.
 
 ---
 

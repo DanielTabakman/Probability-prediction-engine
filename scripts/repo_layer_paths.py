@@ -226,7 +226,7 @@ def git_dirty_paths(repo_root: Path) -> list[str]:
         if len(line) < 4:
             continue
         path = _norm(line[3:].strip())
-        if path:
+        if path and not path.startswith("_worktrees/"):
             paths.append(path)
     return paths
 

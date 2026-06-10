@@ -18,9 +18,10 @@ def test_watch_once_alerts_on_verdict_change(tmp_path, monkeypatch):
 
     with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", side_effect=status_sequence):
         with patch("scripts.ppe_watch_operator_mobile.is_loop_running", return_value=True):
-            with patch("scripts.ppe_watch_operator_mobile.send_ntfy", return_value=True) as send:
-                first = watch_once(tmp_path, write_report=False)
-                second = watch_once(tmp_path, write_report=False)
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_watch_operator_mobile.send_ntfy", return_value=True) as send:
+                    first = watch_once(tmp_path, write_report=False)
+                    second = watch_once(tmp_path, write_report=False)
 
     assert first["alerts"] == []
     assert second["alerts_sent"] == 1

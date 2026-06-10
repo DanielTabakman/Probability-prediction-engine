@@ -11,7 +11,7 @@ REM Requires PPE_NTFY_TOPIC — see docs/SOP/PPE_MOBILE_OPERATOR_V1.md
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
-if exist "%CD%\ppe_operator_notify.local.cmd" call "%CD%\ppe_operator_notify.local.cmd"
+if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 
 if /i "%~1"=="--once" (
   powershell -NoProfile -ExecutionPolicy Bypass -File "%CD%\scripts\watch_operator_mobile.ps1" -RepoRoot "%CD%" -Once
