@@ -103,10 +103,11 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
-      "workerMode": "deterministic"
+      "workerMode": "deterministic",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     }
   ]
 }
