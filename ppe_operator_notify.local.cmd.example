@@ -8,3 +8,6 @@ REM set "PPE_WEEKLY_DIGEST_TOAST=0"
 REM Optional private server or authenticated topic:
 REM set "PPE_NTFY_SERVER=https://ntfy.sh"
 REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
+REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | help
+REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
+REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"

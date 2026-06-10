@@ -11,6 +11,7 @@ from typing import Any
 
 LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
+NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
 def _powershell_process_match(pattern: str) -> bool:
@@ -42,12 +43,23 @@ def is_watch_running() -> bool:
     return _powershell_process_match(WATCH_CMD_PATTERN)
 
 
+def is_ntfy_listen_running() -> bool:
+    """True when the remote ntfy command listener is still alive."""
+    from scripts.ppe_ntfy_commands import commands_enabled
+
+    if not commands_enabled():
+        return False
+    return _powershell_process_match(NTFY_CMD_PATTERN)
+
+
 def stack_status() -> dict[str, bool]:
     loop = is_loop_running()
     watch = is_watch_running()
+    ntfy_listen = is_ntfy_listen_running()
     return {
         "loop_running": loop,
         "watch_running": watch,
+        "ntfy_listen_running": ntfy_listen,
         "stack_running": loop and watch,
     }
 
@@ -85,13 +97,33 @@ def start_loop_only(repo: Path) -> None:
     _start_cmd_window(repo, "run_ppe_auto_local_loop.cmd", "PPE auto loop")
 
 
+def start_ntfy_listen_only(repo: Path) -> None:
+    _start_cmd_window(repo, "watch_ntfy_commands.cmd", "PPE ntfy commands")
+
+
+def restart_stack(repo: Path) -> dict[str, Any]:
+    from scripts.ppe_ntfy_commands import stop_stack_processes
+
+    killed = stop_stack_processes()
+    import time
+
+    time.sleep(2)
+    return {**ensure_stack(repo, start=True), "killed": killed, "restarted": True}
+
+
 def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
     """Ensure auto-loop + mobile watch are running; start missing pieces when allowed."""
     before = stack_status()
     started: list[str] = []
+    from scripts.ppe_ntfy_commands import commands_enabled
 
     if before["stack_running"]:
-        return {**before, "started": started, "action": "none"}
+        after = before
+        if commands_enabled() and start and not after.get("ntfy_listen_running"):
+            start_ntfy_listen_only(repo)
+            started.append("ntfy_listen")
+            after = stack_status()
+        return {**after, "started": started, "action": ",".join(started) or "none"}
 
     if not start:
         return {**before, "started": started, "action": "not_started"}
@@ -107,7 +139,13 @@ def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
             start_full_stack(repo)
             started.append("stack")
 
-    return {**stack_status(), "started": started, "action": ",".join(started) or "none"}
+    after = stack_status()
+    if commands_enabled() and start and not after.get("ntfy_listen_running"):
+        start_ntfy_listen_only(repo)
+        started.append("ntfy_listen")
+        after = stack_status()
+
+    return {**after, "started": started, "action": ",".join(started) or "none"}
 
 
 def collect_status(repo: Path, *, apply_propagate: bool = True, ensure: bool = False) -> dict[str, Any]:

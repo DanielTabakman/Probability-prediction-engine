@@ -137,7 +137,7 @@ type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 | `SUPPLY_LOW` | Nothing — idle | — | — |
 | `RUN_AUTO` | Watch | — | Runs relay |
 | `RUN_LOCAL` | `run_ppe_local.cmd` | Agent if stuck | Pull + publish |
-| `IDE_BUILD` | Read reports | **Cursor Agent BUILD** | Pull after push |
+| `IDE_BUILD` | Send **`build`** on ntfy | **Cursor Agent BUILD** (or **`build`** from phone) | Pull after push |
 | `ERROR` / `STALE_STATE` | Read reports; restart stack | Agent fix | — |
 
 Restart stack from phone (Termius):
@@ -145,6 +145,41 @@ Restart stack from phone (Termius):
 ```bat
 start_ppe_desktop_operator.cmd
 ```
+
+### Remote commands (ntfy app — no SSH)
+
+When `watch_ntfy_commands.cmd` is running (started automatically by `start_ppe_desktop_operator.cmd`), publish a message **to your ntfy topic** from the phone app:
+
+| Message | What happens |
+|---------|----------------|
+| **`build`** | **Primary workflow.** When verdict is `IDE_BUILD`, starts Cursor Agent on the queued product slice (gate → commit → mark ready → `run_ppe_local`). When verdict is `RUN_LOCAL`, runs `run_ppe_local.cmd` on the desktop. |
+| `build <note>` | Same as `build`, with extra context in the agent prompt |
+| `restart` | Stops loop + watch, restarts the stack |
+| `fix` | Starts Cursor Agent to investigate the current blocker (use when stuck, not for normal slice work) |
+| `fix <note>` | Same as `fix`, with extra context |
+| `status` | Desktop replies on ntfy with loop/watch state + operator brief |
+| `help` | Lists commands |
+
+**Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`build`**. No SSH, no RDP, no opening Cursor manually.
+
+Optional shared secret (set `PPE_NTFY_CMD_SECRET` in `ppe_operator_notify.local.cmd`):
+
+```text
+my-secret build
+my-secret fix can you fix it if so please do
+```
+
+The `build` / `fix` commands use the `agent` CLI when installed, otherwise `cursor-sdk` with `CURSOR_API_KEY`. One-time desktop setup:
+
+```bat
+setup_cursor_agent.cmd
+agent login
+verify_cursor_agent.cmd
+```
+
+Progress logs: `artifacts/orchestrator/REMOTE_BUILD_AGENT.log` (build) or `REMOTE_FIX_AGENT.log` (fix). You get ntfy pings when build/fix starts and finishes.
+
+Disable remote commands: `set PPE_NTFY_CMD_ENABLED=0` in `ppe_operator_notify.local.cmd`.
 
 ---
 
@@ -198,6 +233,8 @@ Manual Task Scheduler fields:
 |----------|----------|---------|
 | `PPE_NTFY_TOPIC` | Yes for mobile push | — |
 | `PPE_NTFY_SERVER` | No | `https://ntfy.sh` |
+| `PPE_NTFY_CMD_ENABLED` | No | enabled; `0` disables phone commands |
+| `PPE_NTFY_CMD_SECRET` | No | optional shared secret prefix for commands |
 | `PPE_NOTIFY` | No | enabled; `0` disables |
 | `PPE_WEEKLY_DIGEST_TOAST` | No | enabled; `0` skips Windows toast (phone push still uses ntfy) |
 | `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running |
