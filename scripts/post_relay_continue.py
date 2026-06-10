@@ -164,10 +164,11 @@ def main(argv: list[str] | None = None) -> int:
             from scripts.ppe_propagate_queue import (
                 maybe_propagate_queue,
                 promote_first_blocked_with_plan,
-                sync_backlog_from_roadmap,
+                reconcile_closed_chapters,
             )
 
-            sync_backlog_from_roadmap(repo, apply=True)
+            recon = reconcile_closed_chapters(repo, apply=True)
+            print(f"post_relay_continue: backlog reconcile {json.dumps(recon)}")
             prom = promote_first_blocked_with_plan(repo, apply=True)
             print(f"post_relay_continue: backlog promote {json.dumps(prom)}")
             prop = maybe_propagate_queue(repo, apply=True)

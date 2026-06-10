@@ -1,7 +1,8 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "skipped by operator guard (evidence COMPLETE) Guard skip: evidence already COMPLETE."
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
+  "selectionRecord": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
+  "workerMode": "deterministic"
 }

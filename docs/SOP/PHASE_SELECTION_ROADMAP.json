@@ -80,9 +80,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
+      "status": "ready",
+      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
+      "workerMode": "deterministic",
+      "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md"
     }
   ]
 }

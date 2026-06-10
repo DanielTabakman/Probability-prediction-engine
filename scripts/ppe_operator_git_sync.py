@@ -95,11 +95,57 @@ def _dirty_paths(repo: Path) -> list[str]:
     return paths
 
 
+def ensure_main_on_loop_host(repo: Path) -> dict[str, Any]:
+    """When loop host is on a clean ops/* branch, checkout main so pullEachPass works."""
+    repo = repo.resolve()
+    cfg = _git_sync_cfg(repo)
+    if cfg.get("checkoutMainWhenOpsBranch", True) is False:
+        return {"action": "checkout", "skipped": True, "reason": "disabled"}
+    target = (str(cfg.get("pullBranch") or "main")).strip() or "main"
+    current = _current_branch(repo)
+    if not current or current == target:
+        return {"action": "checkout", "skipped": True, "reason": "already on pull branch"}
+    if not current.startswith("ops/"):
+        return {"action": "checkout", "skipped": True, "reason": f"branch {current!r} not ops/*"}
+    if _dirty_paths(repo):
+        return {"action": "checkout", "skipped": True, "reason": "dirty working tree", "branch": current}
+    fetch = _git(repo, "fetch", "origin")
+    if fetch.returncode != 0:
+        return {
+            "action": "checkout",
+            "ok": False,
+            "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+        }
+    co = _git(repo, "checkout", target)
+    if co.returncode != 0:
+        return {
+            "action": "checkout",
+            "ok": False,
+            "branch": current,
+            "error": (co.stderr or co.stdout or "git checkout failed").strip(),
+        }
+    pull = _git(repo, "pull", "--ff-only", "origin", target)
+    ok = pull.returncode == 0
+    return {
+        "action": "checkout",
+        "checked_out": True,
+        "ok": ok,
+        "from": current,
+        "branch": target,
+        "stdout": (pull.stdout or co.stdout or "").strip(),
+        "error": None if ok else (pull.stderr or pull.stdout or "git pull failed").strip(),
+    }
+
+
 def pull_main(repo: Path, *, branch: str | None = None) -> dict[str, Any]:
     """Fetch and fast-forward pull when on the configured branch and tree allows it."""
     repo = repo.resolve()
     if not pull_enabled(repo):
         return {"action": "pull", "skipped": True, "reason": "disabled"}
+
+    ensure = ensure_main_on_loop_host(repo)
+    if ensure.get("checked_out"):
+        return ensure
 
     target = (branch or str(_git_sync_cfg(repo).get("pullBranch") or "main")).strip() or "main"
     current = _current_branch(repo)

@@ -64,7 +64,7 @@
     },
     {
       "chapterId": "msos_p4_strategy_lab",
-      "status": "chartered",
+      "status": "done",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P4",
@@ -72,7 +72,7 @@
     },
     {
       "chapterId": "repo_housekeeping_v1",
-      "status": "blocked",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "workerMode": "deterministic",
       "chapterTitle": "Repo housekeeping v1",

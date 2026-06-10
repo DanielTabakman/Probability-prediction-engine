@@ -94,6 +94,86 @@ def sync_backlog_from_roadmap(repo_root: Path, *, apply: bool) -> list[dict[str,
     return changes
 
 
+def _queue_done_plans(repo_root: Path) -> set[str]:
+    from scripts.ppe_queue import load_queue
+
+    queue = load_queue(repo_root)
+    done: set[str] = set()
+    for item in queue.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "").strip().upper() != "DONE":
+            continue
+        plan = norm_plan(str(item.get("planPath") or ""))
+        if plan:
+            done.add(plan)
+    return done
+
+
+def sync_backlog_from_queue(repo_root: Path, *, apply: bool) -> list[dict[str, Any]]:
+    """Mark backlog rows done when PHASE_QUEUE shows DONE (closeout drift repair)."""
+    repo = repo_root.resolve()
+    if not backlog_path(repo).is_file():
+        return []
+    done_plans = _queue_done_plans(repo)
+    if not done_plans:
+        return []
+    backlog = load_backlog(repo)
+    changes: list[dict[str, Any]] = []
+    for item in backlog.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        plan = norm_plan(str(item.get("planPath") or ""))
+        if not plan or plan not in done_plans:
+            continue
+        prev = str(item.get("status") or "").strip().lower()
+        if prev != "done":
+            if apply:
+                item["status"] = "done"
+            changes.append({"chapterId": item.get("chapterId"), "status": "done", "planPath": plan, "source": "queue"})
+    if apply and changes:
+        save_backlog(repo, backlog)
+    return changes
+
+
+def sync_roadmap_from_queue(repo_root: Path, *, apply: bool) -> list[dict[str, Any]]:
+    """Mark roadmap rows done when PHASE_QUEUE shows DONE (closeout drift repair)."""
+    repo = repo_root.resolve()
+    if not roadmap_path(repo).is_file():
+        return []
+    done_plans = _queue_done_plans(repo)
+    if not done_plans:
+        return []
+    roadmap = load_roadmap(repo)
+    changes: list[dict[str, Any]] = []
+    for item in roadmap.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        plan = norm_plan(str(item.get("planPath") or ""))
+        if not plan or plan not in done_plans:
+            continue
+        prev = str(item.get("status") or "").strip().lower()
+        if prev != "done":
+            if apply:
+                item["status"] = "done"
+            changes.append({"planPath": plan, "status": "done", "source": "queue"})
+    if apply and changes:
+        save_roadmap(repo, roadmap)
+    return changes
+
+
+def reconcile_closed_chapters(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    """Repair backlog/roadmap drift when queue already marks chapters DONE."""
+    backlog_q = sync_backlog_from_queue(repo_root, apply=apply)
+    roadmap_q = sync_roadmap_from_queue(repo_root, apply=apply)
+    backlog_r = sync_backlog_from_roadmap(repo_root, apply=apply)
+    return {
+        "backlog_from_queue": backlog_q,
+        "roadmap_from_queue": roadmap_q,
+        "backlog_from_roadmap": backlog_r,
+    }
+
+
 def _first_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
     for item in backlog.get("items") or []:
         if not isinstance(item, dict):
@@ -291,6 +371,9 @@ def maybe_propagate_queue(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     from scripts.ppe_roadmap import _first_pending_with_valid_plan, load_roadmap
 
     out: dict[str, Any] = {"skipped": False}
+    recon = reconcile_closed_chapters(repo, apply=apply)
+    if any(recon.get(k) for k in recon):
+        out["reconcile"] = {k: v for k, v in recon.items() if v}
     synced = sync_backlog_from_roadmap(repo, apply=apply)
     if synced:
         out["backlog_sync"] = synced
