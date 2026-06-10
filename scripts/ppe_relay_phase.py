@@ -148,6 +148,21 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
         if relay_run_dir is not None:
             post_cmd.extend(["--relay-run-dir", str(relay_run_dir)])
         subprocess.run(post_cmd, cwd=repo, check=False)
+        if exit_code == 0:
+            is_closeout = isinstance(sl.get("closeout"), dict)
+            if not is_closeout:
+                try:
+                    from scripts.ppe_progress_notify import notify_slice_complete
+
+                    closeout = sl.get("closeout") or {}
+                    chapter_id = str(closeout.get("chapterId") or "").strip()
+                    notify_slice_complete(
+                        slice_id,
+                        plan_path=plan_path.replace("\\", "/"),
+                        chapter_id=chapter_id,
+                    )
+                except Exception as exc:
+                    print(f"ppe_relay_phase: progress notify skipped: {exc}")
         if exit_code != 0:
             rc = try_recover(
                 repo,

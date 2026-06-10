@@ -148,6 +148,9 @@ def main(argv: list[str] | None = None) -> int:
         except Exception:
             rel_manifest_plan = plan_rel
         queue_plan = rel_manifest_plan or plan_rel
+        prop: dict = {}
+        prom: dict = {}
+        road: dict = {}
         ok, qreason = mark_queue_item_done(repo, plan_path=queue_plan)
         print(f"post_relay_continue: queue mark-done {ok!r} ({qreason})")
         clear_manifest_plan_path(
@@ -175,6 +178,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"post_relay_continue: backlog propagate {json.dumps(prop)}")
         except Exception as exc:
             print(f"post_relay_continue: backlog promote/propagate skipped: {exc}")
+            prop = {}
+            prom = {}
         try:
             from scripts.ppe_roadmap import maybe_advance_roadmap_and_select
 
@@ -186,6 +191,28 @@ def main(argv: list[str] | None = None) -> int:
             print(f"post_relay_continue: roadmap advance {json.dumps(road)}")
         except Exception as exc:
             print(f"post_relay_continue: roadmap advance skipped: {exc}")
+            road = {}
+        try:
+            from scripts.ppe_progress_notify import notify_chapter_complete
+
+            closeout = find_closeout_for_slice(plan, slice_id) or {}
+            chapter_id = str(closeout.get("chapterId") or slice_id).strip()
+            next_chapter = ""
+            if isinstance(prop, dict):
+                next_chapter = str(prop.get("chapterId") or "").strip()
+            if not next_chapter and isinstance(prom, dict):
+                next_chapter = str(prom.get("chapterId") or "").strip()
+            adv = (road or {}).get("advance") or {}
+            if not next_chapter:
+                next_chapter = str(adv.get("nextPlan") or "").split("/")[-1].replace("_relay.json", "")
+            notify_chapter_complete(
+                chapter_id,
+                slice_id=slice_id,
+                plan_path=queue_plan,
+                next_chapter=next_chapter,
+            )
+        except Exception as exc:
+            print(f"post_relay_continue: progress notify skipped: {exc}")
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     try:
