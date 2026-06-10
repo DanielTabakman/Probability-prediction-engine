@@ -159,6 +159,9 @@ start_ppe_desktop_operator.cmd
 | Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK - …**, low priority) |
 | Relay slice completes | **ntfy** (title: **PPE slice done: …**) |
 | Chapter closeout completes | **ntfy** (title: **PPE chapter done: …**, includes next chapter if known) |
+| Cursor Agent starts fixing a block | **ntfy** (title: **PPE fixing: …**) — agent runs `ppe_notify_fix.py --working` |
+| Cursor Agent finishes a fix | **ntfy** (title: **PPE fixed (VERDICT): …** or **PPE fix done: …**) — agent runs `ppe_notify_fix.py --resolved` |
+| Stuck verdict clears (watch poll) | **ntfy** (title: **PPE fixed: RUN_AUTO** / **RUN_LOCAL** — includes prior blocker) |
 | Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
 
 Disable progress pings: `set PPE_NTFY_PROGRESS=0` in `ppe_operator_notify.local.cmd`.

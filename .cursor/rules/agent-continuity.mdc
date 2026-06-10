@@ -32,3 +32,12 @@ When the user wants the **auto cycle to continue**, do not stop at closeout: run
 - After chapter closeout: prefer a **new** Agent thread with only `AGENT_CONTINUITY_BRIEF.md`.
 - **IDE BUILD:** prefer `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` when present (`generate_ide_build_starter.cmd`).
 - Steward packets: `docs/SOP/BUILD_PACKET_TEMPLATE.md` (paths only; no pasted logs/specs).
+
+## Operator fix notifications (phone)
+
+When the user asks you to **fix** a blocked operator state (`ERROR`, `IDE_BUILD`, `FIX_PLAN`, `STALE_STATE`, or a stuck relay/gate failure):
+
+1. **Start** (first tool pass): `python scripts/ppe_notify_fix.py --working --issue "<verdict>: <blocker>" [--detail "..."] [--plan "<plan path>"]`
+2. **Finish** (before your final reply): `python scripts/ppe_notify_fix.py --resolved --issue "<same label>" --summary "<what you changed or why still blocked>" [--verdict RUN_LOCAL|RUN_AUTO|...] [--plan "<plan path>"]`
+
+Skip silently if ntfy is not configured. The mobile watch also pings **PPE fixed: …** when the loop clears a stuck verdict on its own.

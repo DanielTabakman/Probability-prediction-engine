@@ -182,13 +182,20 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     if verdict in ATTENTION_VERDICTS and verdict != prior_verdict:
         alerts.append((f"PPE operator: {verdict}", str(status.get("blocker") or verdict)))
 
+    prior_blocker = str(prior.get("last_blocker") or "").strip()
+    current_blocker = str(status.get("blocker") or "").strip()
+    plan = str(status.get("phase_plan_path") or "").strip()
+
     if prior_verdict in STUCK_VERDICTS and verdict in HEALTHY_VERDICTS:
-        alerts.append(
-            (
-                f"PPE unblocked: {verdict}",
-                str(status.get("blocker") or "Operator guard cleared — loop can continue."),
-            )
-        )
+        body_parts = ["Operator guard cleared — loop can continue."]
+        if prior_blocker:
+            body_parts.insert(0, f"Was: {prior_verdict} — {prior_blocker}.")
+        elif prior_verdict:
+            body_parts.insert(0, f"Was: {prior_verdict}.")
+        body_parts.append(f"Now: {verdict}.")
+        if plan:
+            body_parts.append(f"Plan: {plan}")
+        alerts.append((f"PPE fixed: {verdict}", " ".join(body_parts)))
 
     if _stuck_alert_due(prior, verdict):
         alerts.append(
@@ -230,6 +237,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     new_state = {
         "as_of": _utc_now(),
         "last_verdict": verdict,
+        "last_blocker": current_blocker or None,
         "loop_running": loop_running,
         "alerts_sent": sent,
         "last_alert_titles": [title for title, _ in alerts],
