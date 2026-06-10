@@ -62,3 +62,31 @@ def test_priority_for_verdict():
     assert push._priority_for_verdict("IDE_BUILD") == "high"
     assert push._priority_for_verdict("ERROR") == "urgent"
     assert push._priority_for_verdict("SUPPLY_LOW") == "low"
+
+
+def test_send_weekly_digest_from_payload(tmp_path: Path):
+    payload = tmp_path / "WEEKLY_DIGEST_NOTIFY.json"
+    payload.write_text(
+        json.dumps(
+            {
+                "week_monday": "2026-06-01",
+                "phone_title": "This week in PPE - Jun 1-7",
+                "phone_body": "What's different for you\n- MSOS now has a public homepage you can share",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    response = MagicMock()
+    response.status = 200
+    response.__enter__ = MagicMock(return_value=response)
+    response.__exit__ = MagicMock(return_value=False)
+
+    with patch.dict("os.environ", {"PPE_NTFY_TOPIC": "t", "PPE_NOTIFY": "1"}, clear=False):
+        with patch("urllib.request.urlopen", return_value=response) as urlopen:
+            assert push.send_weekly_digest_from_payload(payload) is True
+
+    request = urlopen.call_args[0][0]
+    assert request.headers["Title"] == "This week in PPE - Jun 1-7"
+    assert "public homepage" in request.data.decode("utf-8")

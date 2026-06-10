@@ -11,6 +11,7 @@ REM   weekly_digest_monday.cmd   (generate + notify — for Task Scheduler)
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
+if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 
 if /i "%~1"=="notify" goto notify
 
@@ -25,5 +26,9 @@ exit /b 0
 :notify
 python "%CD%\scripts\ppe_weekly_digest.py" --repo-root "%CD%" write-notify-payload
 if errorlevel 1 exit /b %ERRORLEVEL%
+python "%CD%\scripts\ppe_notify_push.py" --repo-root "%CD%" --weekly-digest
+if errorlevel 1 exit /b %ERRORLEVEL%
+if /i "%PPE_WEEKLY_DIGEST_TOAST%"=="0" exit /b 0
+if /i "%PPE_WEEKLY_DIGEST_TOAST%"=="false" exit /b 0
 powershell -NoProfile -ExecutionPolicy Bypass -File "%CD%\scripts\notify_weekly_digest.ps1" -RepoRoot "%CD%"
 exit /b %ERRORLEVEL%
