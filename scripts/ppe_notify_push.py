@@ -40,6 +40,12 @@ def ntfy_configured() -> bool:
     return bool(ntfy_topic())
 
 
+def _header_value(value: str) -> str:
+    """ntfy headers must be latin-1; keep phone alerts ASCII-safe."""
+    text = (value or "").replace("\u2014", "-").replace("\u2013", "-")
+    return text.encode("ascii", "replace").decode("ascii")[:250]
+
+
 def _priority_for_verdict(verdict: str | None) -> str:
     if not verdict:
         return "default"
@@ -62,11 +68,11 @@ def send_ntfy(
         return False
 
     url = f"{ntfy_server()}/{topic}"
-    headers = {"Title": title[:250], "Priority": priority}
+    headers = {"Title": _header_value(title), "Priority": priority}
     if tags:
-        headers["Tags"] = ",".join(tags[:5])
+        headers["Tags"] = _header_value(",".join(tags[:5]))
     if click_url:
-        headers["Click"] = click_url
+        headers["Click"] = _header_value(click_url)
 
     token = os.environ.get("PPE_NTFY_TOKEN", "").strip()
     if token:

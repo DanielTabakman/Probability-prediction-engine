@@ -170,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
             if stack.get("stack_running") or stack.get("loop_running"):
                 push_stack_status_notify(
                     repo,
-                    verdict=verdict,
+                    verdict=verdict.replace("VERDICT=", "") if verdict.startswith("VERDICT=") else verdict,
                     loop_running=bool(stack.get("loop_running")),
                     watch_running=bool(stack.get("watch_running")),
                     reason="startup",

@@ -87,7 +87,7 @@ def push_stack_status_notify(
         priority = "high"
         tags = ["ppe", "down"]
     else:
-        title = f"PPE OK — {verdict or 'RUNNING'}"
+        title = f"PPE OK - {verdict or 'RUNNING'}"
         parts = ["Loop running."]
         if watch_running:
             parts.append("Watch running.")
