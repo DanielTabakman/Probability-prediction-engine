@@ -39,6 +39,36 @@ def test_watch_module_imports_verdict_run_auto():
     assert "RUN_AUTO" in HEALTHY_VERDICTS
 
 
+def test_watch_once_auto_build_on_ide_build(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_AUTO_REMOTE_BUILD", "1")
+
+    status = {
+        "verdict": "IDE_BUILD",
+        "blocker": "PRODUCT_BLOCKED [MVP1-Slice002]",
+        "guard": {"detail": "product [MVP1-Slice002, MVP1-Slice003]"},
+        "phase_plan_path": "docs/SOP/PHASE_PLANS/foo.json",
+        "commands": [],
+    }
+
+    with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_watch_operator_mobile.is_loop_running", return_value=True):
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_watch_operator_mobile._maybe_auto_remote_build") as auto_build:
+                    auto_build.return_value = {
+                        "started": True,
+                        "slice_id": "MVP1-Slice002",
+                        "action": "build",
+                    }
+                    with patch("scripts.ppe_watch_operator_mobile.send_ntfy", return_value=True) as send:
+                        result = watch_once(tmp_path, write_report=False)
+
+    assert result["auto_build"]["started"] is True
+    auto_build.assert_called_once()
+    assert "auto-build started" in send.call_args[0][0].lower()
+
+
 def test_watch_once_alerts_when_stuck_clears(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")

@@ -162,6 +162,8 @@ When `watch_ntfy_commands.cmd` is running (started automatically by `start_ppe_d
 
 **Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`build`**. No SSH, no RDP, no opening Cursor manually.
 
+**Fully automatic (default):** when `autoRemoteBuild` is true in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (or `PPE_AUTO_REMOTE_BUILD=1`), the **loop** and **mobile watch** start the desktop **agent CLI** on `IDE_BUILD` without a phone tap. Phone `build` remains a manual override. Disable: `set PPE_AUTO_REMOTE_BUILD=0`.
+
 Optional shared secret (set `PPE_NTFY_CMD_SECRET` in `ppe_operator_notify.local.cmd`):
 
 ```text
