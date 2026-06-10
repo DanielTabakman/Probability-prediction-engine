@@ -116,6 +116,15 @@ def ensure_main_on_loop_host(repo: Path) -> dict[str, Any]:
             "ok": False,
             "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
         }
+    runner = "run_ppe_desktop_operator.cmd"
+    probe = _git(repo, "show", f"origin/{target}:{runner}")
+    if probe.returncode != 0:
+        return {
+            "action": "checkout",
+            "skipped": True,
+            "reason": f"origin/{target} missing {runner} (stay on ops branch until merge)",
+            "branch": current,
+        }
     co = _git(repo, "checkout", target)
     if co.returncode != 0:
         return {

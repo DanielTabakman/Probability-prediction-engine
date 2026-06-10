@@ -9,7 +9,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
-$runner = Join-Path $RepoRoot "run_ppe_desktop_operator.cmd"
+$runner = Join-Path $RepoRoot "run_ppe_desktop_operator_logon.cmd"
+if (-not (Test-Path -LiteralPath $runner)) {
+  $runner = Join-Path $RepoRoot "run_ppe_desktop_operator.cmd"
+}
 
 if (-not (Test-Path -LiteralPath $runner)) {
     throw "Missing runner: $runner"
