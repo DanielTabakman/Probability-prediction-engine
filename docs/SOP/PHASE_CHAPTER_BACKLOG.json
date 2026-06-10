@@ -89,6 +89,33 @@
       "reason": "Chart + belief + Polymarket probability method labeling \u2014 next MVP1 priority after MSOS P4"
     },
     {
+      "chapterId": "mvp1_distribution_stats_legibility",
+      "status": "blocked",
+      "priority": "high",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility"
+    },
+    {
+      "chapterId": "msos_strategy_lab_distribution_demo",
+      "status": "blocked",
+      "priority": "medium",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P4 follow-on",
+      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website"
+    },
+    {
+      "chapterId": "mvp1_distribution_quant_research_v2",
+      "status": "blocked",
+      "priority": "low",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md",
+      "canonRef": "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md \u2014 Phase 2+",
+      "reason": "[LOW] Tail quantiles, strike-level P(>K), derived export columns, daily snapshot collector MVP"
+    },
+    {
       "chapterId": "msos_p5_thesis_confirm",
       "status": "blocked",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
