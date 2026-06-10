@@ -1,0 +1,97 @@
+{
+  "name": "MVP1_distribution_quant_research_v2 (tail quantiles, P(>K), daily collector MVP)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DistQuantV2-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Control-Slice001-dist_quant_v2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DistQuantV2-Product-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Product-Slice002-dist_quant_v2",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/implied_distribution.py",
+        "tests/test_implied_distribution.py",
+        "tests/test_distribution_quant_research_v2.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistQuantV2-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Product-Slice003-dist_quant_v2",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/distribution_export.py",
+        "src/viz/distribution_summary_panel.py",
+        "tests/test_distribution_quant_research_v2.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistQuantV2-Product-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Product-Slice004-dist_quant_v2",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/collect_distribution_stats_snapshot.py",
+        "docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistQuantV2-Smoke-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Smoke-Slice005-dist_quant_v2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DistQuantV2-Closeout-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+      "buildBranch": "build/auto/MVP1-DistQuantV2-Closeout-Slice006-dist_quant_v2",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_distribution_quant_research_v2",
+        "chapterTitle": "MVP1 distribution quant research v2",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

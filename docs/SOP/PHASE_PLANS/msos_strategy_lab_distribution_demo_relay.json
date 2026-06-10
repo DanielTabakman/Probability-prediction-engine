@@ -1,0 +1,80 @@
+{
+  "name": "MSOS_strategy_lab_distribution_demo (Strategy Lab research demo surface)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-DistDemo-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+      "buildBranch": "build/auto/MSOS-DistDemo-Control-Slice001-dist_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-DistDemo-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+      "buildBranch": "build/auto/MSOS-DistDemo-Product-Slice002-dist_demo",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/components/PpeEmbedBoundary.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-DistDemo-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+      "buildBranch": "build/auto/MSOS-DistDemo-Platform-Slice003-dist_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "docs/DEPLOY/"
+      ]
+    },
+    {
+      "sliceId": "MSOS-DistDemo-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+      "buildBranch": "build/auto/MSOS-DistDemo-Witness-Slice004-dist_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MSOS-DistDemo-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+      "buildBranch": "build/auto/MSOS-DistDemo-Closeout-Slice005-dist_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_strategy_lab_distribution_demo",
+        "chapterTitle": "MSOS Strategy Lab distribution demo",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
+        ]
+      }
+    }
+  ]
+}

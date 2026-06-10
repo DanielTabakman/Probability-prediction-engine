@@ -1,0 +1,80 @@
+{
+  "name": "MVP1_distribution_stats_legibility (labeled on-screen BTC distribution summary)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DistStatsLeg-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+      "buildBranch": "build/auto/MVP1-DistStatsLeg-Control-Slice001-dist_stats_leg",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DistStatsLeg-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+      "buildBranch": "build/auto/MVP1-DistStatsLeg-Product-Slice002-dist_stats_leg",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/implied_lab_legibility.py",
+        "src/viz/distribution_summary_panel.py",
+        "src/viz/app.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistStatsLeg-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+      "buildBranch": "build/auto/MVP1-DistStatsLeg-Product-Slice003-dist_stats_leg",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "tests/test_distribution_summary_legibility.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistStatsLeg-Smoke-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+      "buildBranch": "build/auto/MVP1-DistStatsLeg-Smoke-Slice004-dist_stats_leg",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-DistStatsLeg-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+      "buildBranch": "build/auto/MVP1-DistStatsLeg-Closeout-Slice005-dist_stats_leg",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_distribution_stats_legibility",
+        "chapterTitle": "MVP1 distribution stats legibility",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
