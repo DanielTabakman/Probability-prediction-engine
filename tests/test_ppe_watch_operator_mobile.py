@@ -31,3 +31,9 @@ def test_watch_once_alerts_on_verdict_change(tmp_path, monkeypatch):
 
 def test_attention_verdicts_include_run_local():
     assert "RUN_LOCAL" in ATTENTION_VERDICTS
+
+
+def test_watch_module_imports_verdict_run_auto():
+    from scripts.ppe_watch_operator_mobile import HEALTHY_VERDICTS
+
+    assert "RUN_AUTO" in HEALTHY_VERDICTS

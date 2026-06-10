@@ -16,6 +16,7 @@ from scripts.ppe_operator_status import (
     VERDICT_ERROR,
     VERDICT_FIX_PLAN,
     VERDICT_IDE_BUILD,
+    VERDICT_RUN_AUTO,
     VERDICT_RUN_LOCAL,
     VERDICT_STALE_STATE,
     VERDICT_SUPPLY_LOW,
