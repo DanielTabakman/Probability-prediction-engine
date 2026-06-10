@@ -156,7 +156,11 @@ start_ppe_desktop_operator.cmd
 | Verdict change while watch runs | **ntfy** |
 | Loop process died | **ntfy** (title: **PPE loop stopped**) |
 | Stack started (logon / `run_ppe_desktop_operator.cmd`) | **ntfy** (title: **PPE OK — …**) |
-| Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK — …**, low priority) |
+| Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK - …**, low priority) |
+| Relay slice completes | **ntfy** (title: **PPE slice done: …**) |
+| Chapter closeout completes | **ntfy** (title: **PPE chapter done: …**, includes next chapter if known) |
+
+Disable progress pings: `set PPE_NTFY_PROGRESS=0` in `ppe_operator_notify.local.cmd`.
 
 **Phone check without SSH:** open the **ntfy** app → your topic. Recent **PPE OK** = running. **PPE loop stopped** = needs a reboot or desktop fix. **IDE_BUILD** / **ERROR** = needs you.
 
