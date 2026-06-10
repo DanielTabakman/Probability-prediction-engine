@@ -337,6 +337,23 @@ def maybe_auto_publish(repo: Path) -> dict[str, Any]:
         }
     ahead = _ahead_count(repo, branch=current)
     if ahead == 0:
+        pr_url = None
+        if _git_sync_cfg(repo).get("openPrOnPush", True) is not False and _gh_available():
+            pr_url = _open_pr(
+                repo,
+                head=current,
+                title=f"ops: {current}",
+                body="Auto-published by desktop loop host (ppe_operator_git_sync).",
+            )
+        if pr_url:
+            return {
+                "action": "auto_publish",
+                "ok": True,
+                "skipped": False,
+                "reason": "PR ensured (branch already pushed)",
+                "branch": current,
+                "pr_url": pr_url,
+            }
         return {"action": "auto_publish", "skipped": True, "reason": "nothing ahead", "branch": current}
     pub = publish_ahead(repo)
     pub["action"] = "auto_publish"
