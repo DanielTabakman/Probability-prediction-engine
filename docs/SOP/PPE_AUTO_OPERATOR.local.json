@@ -10,9 +10,10 @@
   "continuousMax": 20,
   "loopWhenIdle": true,
   "idleSleepSeconds": 120,
-  "gitSync": {
+    "gitSync": {
     "enabled": true,
     "pullEachPass": true,
+    "publishEachPass": true,
     "pullBranch": "main",
     "checkoutMainWhenOpsBranch": true,
     "pushAfterCommit": true,

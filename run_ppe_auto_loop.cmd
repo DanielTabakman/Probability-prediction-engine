@@ -24,10 +24,12 @@ if not "%PREFLIGHT_RC%"=="0" exit /b %PREFLIGHT_RC%
 
 echo [run_ppe_auto_loop] git sync pull
 python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --auto-publish
 
 :loop
 echo [run_ppe_auto_loop] starting pass at %DATE% %TIME%
 python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
+python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --auto-publish
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --brief --no-write
 set "STATUS_RC=%ERRORLEVEL%"
 if "%STATUS_RC%"=="7" goto handle_guard_stop

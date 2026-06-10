@@ -45,6 +45,14 @@ STUCK_VERDICTS = frozenset(
     }
 )
 
+HEALTHY_VERDICTS = frozenset(
+    {
+        VERDICT_RUN_AUTO,
+        VERDICT_RUN_LOCAL,
+        VERDICT_SUPPLY_LOW,
+    }
+)
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -172,6 +180,14 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
 
     if verdict in ATTENTION_VERDICTS and verdict != prior_verdict:
         alerts.append((f"PPE operator: {verdict}", str(status.get("blocker") or verdict)))
+
+    if prior_verdict in STUCK_VERDICTS and verdict in HEALTHY_VERDICTS:
+        alerts.append(
+            (
+                f"PPE unblocked: {verdict}",
+                str(status.get("blocker") or "Operator guard cleared — loop can continue."),
+            )
+        )
 
     if _stuck_alert_due(prior, verdict):
         alerts.append(

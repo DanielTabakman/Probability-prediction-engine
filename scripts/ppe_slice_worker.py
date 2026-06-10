@@ -200,6 +200,7 @@ def execute_deterministic(
     expected_path: Path,
     phase_plan: Path | None,
     slice_obj: dict[str, Any] | None,
+    marker_repo: Path | None = None,
 ) -> dict[str, Any]:
     kind = infer_slice_kind(slice_id, slice_obj)
     pytest_status, pytest_count = _pytest_count(repo)
@@ -237,9 +238,15 @@ def execute_deterministic(
     if kind == "product":
         from scripts.ppe_ide_product_ready import marker_covers_product_slices
 
-        norm_plan = str(phase_plan or "").replace("\\", "/").strip()
+        marker_root = (marker_repo or repo).resolve()
+        norm_plan = ""
+        if phase_plan is not None:
+            try:
+                norm_plan = str(phase_plan.relative_to(marker_root)).replace("\\", "/")
+            except ValueError:
+                norm_plan = str(phase_plan).replace("\\", "/")
         if norm_plan and marker_covers_product_slices(
-            repo, plan_path=norm_plan, product_slice_ids=[slice_id]
+            marker_root, plan_path=norm_plan, product_slice_ids=[slice_id]
         ):
             stop = None
             safe = pytest_status == "PASS"
@@ -376,6 +383,7 @@ def run_deterministic_slice(
         expected_path=expected_path,
         phase_plan=plan_fs,
         slice_obj=slice_obj,
+        marker_repo=repo,
     )
     code, text = orch.relay_resume(repo_root=wt)
     print(text)
