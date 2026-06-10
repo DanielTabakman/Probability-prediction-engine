@@ -20,6 +20,7 @@ PHASE_QUEUE = SOP / "PHASE_QUEUE.json"
 BACKLOG = SOP / "PHASE_CHAPTER_BACKLOG.json"
 MANIFEST = SOP / "ACTIVE_PHASE_MANIFEST.json"
 HOUSEKEEPING_PLAN = "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json"
+MVP1_LEGIBILITY_PLAN = "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json"
 
 
 def test_p4_charter_artifacts_exist() -> None:
@@ -55,7 +56,7 @@ def test_manifest_ready_for_next_chapter() -> None:
     if manifest["status"] == "COMPLETE":
         assert manifest.get("phasePlanPath") in ("", None)
     if manifest["status"] == "READY":
-        assert manifest.get("phasePlanPath") == HOUSEKEEPING_PLAN
+        assert manifest.get("phasePlanPath") in (HOUSEKEEPING_PLAN, MVP1_LEGIBILITY_PLAN)
 
 
 def test_next_chapter_ready_or_queued() -> None:
