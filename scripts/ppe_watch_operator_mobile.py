@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -38,6 +39,64 @@ ATTENTION_VERDICTS = frozenset(
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _parse_utc(value: str) -> datetime | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def _heartbeat_hours() -> float:
+    raw = os.environ.get("PPE_NTFY_HEARTBEAT_HOURS", "6").strip()
+    try:
+        return max(1.0, float(raw))
+    except ValueError:
+        return 6.0
+
+
+def _heartbeat_due(prior: dict[str, Any]) -> bool:
+    last = _parse_utc(str(prior.get("last_heartbeat_at") or ""))
+    if last is None:
+        return True
+    elapsed_h = (datetime.now(timezone.utc) - last).total_seconds() / 3600.0
+    return elapsed_h >= _heartbeat_hours()
+
+
+def push_stack_status_notify(
+    repo: Path,
+    *,
+    verdict: str,
+    loop_running: bool,
+    watch_running: bool,
+    reason: str = "status",
+    plan: str = "",
+) -> bool:
+    """Low-friction phone ping: stack health without SSH."""
+    if not notify_enabled() or not ntfy_configured():
+        return False
+    if not loop_running:
+        title = "PPE stack down"
+        body = "Loop is not running on the desktop. Reboot or run run_ppe_desktop_operator.cmd at the PC."
+        priority = "high"
+        tags = ["ppe", "down"]
+    else:
+        title = f"PPE OK — {verdict or 'RUNNING'}"
+        parts = ["Loop running."]
+        if watch_running:
+            parts.append("Watch running.")
+        if plan:
+            parts.append(f"Plan: {plan}")
+        body = " ".join(parts)
+        priority = "low"
+        tags = ["ppe", "ok", reason]
+    return send_ntfy(title, body, tags=tags, priority=priority)
 
 
 def state_path(repo: Path) -> Path:
@@ -92,6 +151,18 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
             )
         )
 
+    heartbeat_sent = False
+    if loop_running and _heartbeat_due(prior):
+        if push_stack_status_notify(
+            repo,
+            verdict=verdict,
+            loop_running=loop_running,
+            watch_running=True,
+            reason="heartbeat",
+            plan=str(status.get("phase_plan_path") or "").strip(),
+        ):
+            heartbeat_sent = True
+
     sent = 0
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
@@ -104,6 +175,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "loop_running": loop_running,
         "alerts_sent": sent,
         "last_alert_titles": [title for title, _ in alerts],
+        "last_heartbeat_at": _utc_now() if heartbeat_sent else prior.get("last_heartbeat_at"),
     }
     save_state(repo, new_state)
 
@@ -112,6 +184,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "loop_running": loop_running,
         "alerts": alerts,
         "alerts_sent": sent,
+        "heartbeat_sent": heartbeat_sent,
         "state_path": str(state_path(repo)),
     }
 

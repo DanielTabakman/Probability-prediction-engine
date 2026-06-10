@@ -157,6 +157,27 @@ def main(argv: list[str] | None = None) -> int:
         if result.get("operator_brief"):
             print(result["operator_brief"])
 
+    if args.ensure and not args.status:
+        try:
+            from scripts.ppe_watch_operator_mobile import push_stack_status_notify
+
+            stack = result["stack"]
+            brief = result.get("operator_brief") or ""
+            verdict = "RUNNING"
+            for part in brief.split():
+                if part.startswith("VERDICT="):
+                    verdict = part.split("=", 1)[1]
+            if stack.get("stack_running") or stack.get("loop_running"):
+                push_stack_status_notify(
+                    repo,
+                    verdict=verdict,
+                    loop_running=bool(stack.get("loop_running")),
+                    watch_running=bool(stack.get("watch_running")),
+                    reason="startup",
+                )
+        except Exception:
+            pass
+
     stack = result["stack"]
     if args.ensure and stack.get("action") not in (None, "none", "not_started"):
         return 0 if stack.get("loop_running") or stack.get("started") else 1
