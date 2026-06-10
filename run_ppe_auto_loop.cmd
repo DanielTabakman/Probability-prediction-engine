@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 
 REM Repeat run_ppe_auto until you stop it (Ctrl+C). Sleep between passes when idle.
 REM idleSleepSeconds from docs/SOP/PPE_AUTO_OPERATOR.json (default 120).
-REM Exit 7: guard stop (PRODUCT_BLOCKED, CONTEXT_ESCALATE, TOO_MANY_SLICES, etc.) — no sleep/retry.
+REM Exit 7: guard stop — notify, then sleep+retry when keepLoopAliveOnGuardStop is true.
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
@@ -19,11 +19,7 @@ for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scr
 echo [run_ppe_auto_loop] startup preflight
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%"
 set "PREFLIGHT_RC=%ERRORLEVEL%"
-if "%PREFLIGHT_RC%"=="7" (
-  python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --notify
-  echo [run_ppe_auto_loop] preflight stop — review artifacts/orchestrator/OPERATOR_STATUS.md
-  exit /b 7
-)
+if "%PREFLIGHT_RC%"=="7" goto handle_guard_stop
 if not "%PREFLIGHT_RC%"=="0" exit /b %PREFLIGHT_RC%
 
 echo [run_ppe_auto_loop] git sync pull
@@ -34,19 +30,22 @@ echo [run_ppe_auto_loop] starting pass at %DATE% %TIME%
 python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --brief --no-write
 set "STATUS_RC=%ERRORLEVEL%"
-if "%STATUS_RC%"=="7" (
-  python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --notify
-  echo [run_ppe_auto_loop] operator status stop — review artifacts/orchestrator/OPERATOR_STATUS.md
-  exit /b 7
-)
+if "%STATUS_RC%"=="7" goto handle_guard_stop
 call "%~dp0run_ppe_auto.cmd"
 set "RC=%ERRORLEVEL%"
-if "%RC%"=="7" (
-  python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --notify
-  echo [run_ppe_auto_loop] operator guard stop — review artifacts/orchestrator/OPERATOR_GUARD_REPORT.md
-  exit /b 7
-)
+if "%RC%"=="7" goto handle_guard_stop
 if not "%RC%"=="0" exit /b %RC%
 echo [run_ppe_auto_loop] idle sleep %SLEEP%s — Ctrl+C to stop
 timeout /t %SLEEP% /nobreak >nul
+goto loop
+
+:handle_guard_stop
+python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --notify
+for /f "usebackq delims=" %%g in (`python "%CD%\scripts\ppe_loop_guard_stop.py" --repo-root "%CD%"`) do set "GUARD_SLEEP=%%g"
+if "!GUARD_SLEEP!"=="-1" (
+  echo [run_ppe_auto_loop] guard stop — review artifacts/orchestrator/OPERATOR_STATUS.md
+  exit /b 7
+)
+echo [run_ppe_auto_loop] guard stop — sleeping !GUARD_SLEEP!s then retry (keepLoopAliveOnGuardStop)
+timeout /t !GUARD_SLEEP! /nobreak >nul
 goto loop

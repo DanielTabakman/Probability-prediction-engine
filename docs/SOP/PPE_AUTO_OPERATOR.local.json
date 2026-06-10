@@ -24,6 +24,9 @@
     "stopOnContextEscalate": true,
     "stopOnContextWatch": false,
     "maxPhaseSlices": 6,
+    "phaseSliceBatching": true,
     "skipChapterIfEvidenceComplete": true
-  }
+  },
+  "guardStopSleepSeconds": 300,
+  "keepLoopAliveOnGuardStop": true
 }

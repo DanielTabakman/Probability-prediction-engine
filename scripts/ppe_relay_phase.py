@@ -105,7 +105,26 @@ def _run_slice_cmd(
 
 def run_phase(repo_root: Path, plan_path: str) -> int:
     repo = repo_root.resolve()
-    plan = load_phase_plan(repo, plan_path)
+    norm_plan = plan_path.replace("\\", "/").strip()
+    from scripts.ppe_phase_plan_window import (
+        active_slice_window,
+        mark_slice_complete,
+        phase_slice_batching_enabled,
+        plan_slice_count,
+        windowed_phase_plan,
+    )
+
+    plan = windowed_phase_plan(repo, norm_plan) if phase_slice_batching_enabled(repo) else load_phase_plan(repo, plan_path)
+    batch_slices = plan.get("slices") or []
+    if phase_slice_batching_enabled(repo) and not batch_slices:
+        print("ppe_relay_phase: all slices complete for plan (batching)")
+        return 0
+    if phase_slice_batching_enabled(repo):
+        meta = plan.get("_sliceBatch") or {}
+        print(
+            f"ppe_relay_phase: slice batch {meta.get('batchSize')} of "
+            f"{meta.get('totalSlices')} (limit {meta.get('limit')}, done {meta.get('completedCount')})"
+        )
     sprint_default = str(plan.get("sprintSpecPath") or "")
     try:
         set_manifest_status(repo, "RUNNING")
@@ -116,7 +135,7 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
     except Exception as e:
         print(f"WARN: manifest RUNNING: {e}")
 
-    for sl in plan.get("slices") or []:
+    for sl in batch_slices:
         if not isinstance(sl, dict):
             continue
         slice_id = str(sl.get("sliceId") or "").strip()
@@ -149,6 +168,8 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
             post_cmd.extend(["--relay-run-dir", str(relay_run_dir)])
         subprocess.run(post_cmd, cwd=repo, check=False)
         if exit_code == 0:
+            if phase_slice_batching_enabled(repo):
+                mark_slice_complete(repo, norm_plan, slice_id)
             is_closeout = isinstance(sl.get("closeout"), dict)
             if not is_closeout:
                 try:
@@ -174,6 +195,20 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
             if rc == 100:
                 continue
             return exit_code
+
+    if phase_slice_batching_enabled(repo):
+        remaining = active_slice_window(repo, norm_plan)
+        if remaining:
+            try:
+                set_manifest_status(repo, "READY")
+                print(f"ppe_relay_phase: batch complete — {len(remaining)} slice(s) remain in next pass")
+            except Exception as e:
+                print(f"WARN: manifest READY after batch: {e}")
+        elif plan_slice_count(repo, norm_plan) > len(batch_slices):
+            try:
+                set_manifest_status(repo, "READY")
+            except Exception as e:
+                print(f"WARN: manifest READY after batch: {e}")
     return 0
 
 

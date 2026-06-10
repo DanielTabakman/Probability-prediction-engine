@@ -195,6 +195,8 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_TOPIC` | Yes for mobile push | — |
 | `PPE_NTFY_SERVER` | No | `https://ntfy.sh` |
 | `PPE_NOTIFY` | No | enabled; `0` disables |
+| `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running |
+| `PPE_NTFY_STUCK_HOURS` | No | `4` — re-alert while verdict is FIX_PLAN / IDE_BUILD / ERROR |
 | `PPE_GIT_SYNC` | No | enabled |
 | `PPE_GIT_SYNC_PULL` | No | enabled |
 | `PPE_GIT_SYNC_PUSH` | No | enabled |

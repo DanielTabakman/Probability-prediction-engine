@@ -46,7 +46,11 @@ def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
 
 
 def _branch_has_commits(repo: Path, *, build_branch: str, baseline: str = "main") -> bool:
-    if not build_branch.strip():
+    bb = (build_branch or "").strip()
+    bl = (baseline or "main").strip()
+    if bb == bl or bb == f"origin/{bl}":
+        return True
+    if not bb:
         return False
     for ref_pair in (f"origin/{baseline}..{build_branch}", f"{baseline}..{build_branch}"):
         proc = _git(repo, "rev-list", "--count", ref_pair)
@@ -96,9 +100,22 @@ def write_marker(
     p = marker_path(repo)
     p.parent.mkdir(parents=True, exist_ok=True)
     norm_plan = phase_plan_path.replace("\\", "/").strip()
+    prior = load_marker(repo) or {}
+    completed: list[str] = []
+    if str(prior.get("phasePlanPath") or "").replace("\\", "/").strip() == norm_plan:
+        for sid in prior.get("completedProductSlices") or []:
+            s = str(sid or "").strip()
+            if s and s not in completed:
+                completed.append(s)
+        legacy = str(prior.get("sliceId") or "").strip()
+        if legacy and legacy not in completed:
+            completed.append(legacy)
+    if slice_id not in completed:
+        completed.append(slice_id)
     payload = {
         "phasePlanPath": norm_plan,
         "sliceId": slice_id,
+        "completedProductSlices": completed,
         "buildBranch": build_branch,
         "commitSha": commit_sha,
         "markedAt": _utc_now(),
@@ -144,7 +161,7 @@ def marker_covers_product_slices(
     plan_path: str,
     product_slice_ids: list[str],
 ) -> bool:
-    """True when marker matches plan and all listed product slices (same sliceId in marker)."""
+    """True when marker matches plan and covers every listed product slice."""
     if not product_slice_ids:
         return True
     data = load_marker(repo)
@@ -153,13 +170,18 @@ def marker_covers_product_slices(
     norm_plan = plan_path.replace("\\", "/").strip()
     if str(data.get("phasePlanPath") or "").replace("\\", "/").strip() != norm_plan:
         return False
-    marked_slice = str(data.get("sliceId") or "").strip()
-    if marked_slice not in product_slice_ids:
-        return False
     branch = str(data.get("buildBranch") or "").strip()
-    if not branch:
+    if not branch or not _branch_has_commits(repo, build_branch=branch):
         return False
-    return _branch_has_commits(repo, build_branch=branch)
+    completed: set[str] = set()
+    for sid in data.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s:
+            completed.add(s)
+    legacy = str(data.get("sliceId") or "").strip()
+    if legacy:
+        completed.add(legacy)
+    return all(sid in completed for sid in product_slice_ids)
 
 
 def check_marker(repo: Path) -> int:

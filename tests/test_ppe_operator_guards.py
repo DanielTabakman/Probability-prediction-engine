@@ -107,6 +107,7 @@ class TestPpeOperatorGuards(unittest.TestCase):
             _operator_json(
                 blockProductUnderGlobalDeterministic=False,
                 maxPhaseSlices=2,
+                phaseSliceBatching=False,
             ),
             encoding="utf-8",
         )

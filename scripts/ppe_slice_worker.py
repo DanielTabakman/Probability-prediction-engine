@@ -235,8 +235,18 @@ def execute_deterministic(
     ready = False
     safe = False
     if kind == "product":
-        stop = "SCOPE_AMBIGUITY"
-        notes_parts.append("PRODUCT slice requires ACP or steward BUILD (set workerMode=acp)")
+        from scripts.ppe_ide_product_ready import marker_covers_product_slices
+
+        norm_plan = str(phase_plan or "").replace("\\", "/").strip()
+        if norm_plan and marker_covers_product_slices(
+            repo, plan_path=norm_plan, product_slice_ids=[slice_id]
+        ):
+            stop = None
+            safe = pytest_status == "PASS"
+            notes_parts.append("PRODUCT slice IDE marker OK — pytest verification")
+        else:
+            stop = "SCOPE_AMBIGUITY"
+            notes_parts.append("PRODUCT slice requires ACP or steward BUILD (set workerMode=acp)")
     elif pytest_status != "PASS":
         stop = "UNCLEAR_TEST_RESULTS"
     elif kind == "smoke" and smoke_status != "PASS":
