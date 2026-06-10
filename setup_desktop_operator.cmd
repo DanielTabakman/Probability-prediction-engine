@@ -40,7 +40,7 @@ python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
 echo.
 
 echo --- Start stack ---
-echo   start_ppe_desktop_operator.cmd
+echo   run_ppe_desktop_operator.cmd
 echo.
 echo --- Phone triage ---
 echo   ssh USER@desktop-ge39o15

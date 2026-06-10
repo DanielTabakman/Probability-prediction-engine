@@ -98,15 +98,16 @@ Disable: `set PPE_GIT_SYNC=0` or `set PPE_GIT_SYNC_PULL=0`.
 
 ## Daily start (desktop)
 
+**One command** (git pull, propagate queue, ensure loop + watch, print verdict):
+
 ```bat
-start_ppe_desktop_operator.cmd
+run_ppe_desktop_operator.cmd
 ```
 
-Or:
+Low-level (opens two cmd windows only — no queue/stack check):
 
 ```bat
-run_ppe_auto_local_loop.cmd
-watch_operator_mobile.cmd
+start_ppe_desktop_operator.cmd
 ```
 
 ---
@@ -157,12 +158,22 @@ start_ppe_desktop_operator.cmd
 
 ---
 
-## Optional: Task Scheduler at logon
+## Task Scheduler at logon (recommended)
+
+Register once from repo root:
+
+```bat
+install_ppe_desktop_operator_task.cmd
+```
+
+Runs `run_ppe_desktop_operator.cmd` at user logon (git pull, queue propagate, start stack if missing).
+
+Manual Task Scheduler fields:
 
 | Field | Value |
 |-------|--------|
 | Program | `cmd.exe` |
-| Arguments | `/c "…\start_ppe_desktop_operator.cmd"` |
+| Arguments | `/c "…\run_ppe_desktop_operator.cmd"` |
 | Start in | repo root |
 
 ---

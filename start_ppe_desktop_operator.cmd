@@ -2,7 +2,8 @@
 setlocal
 
 REM Desktop operator stack: auto-loop + mobile watch (two terminals).
-REM Run on the always-on PC. See docs/SOP/PPE_MOBILE_OPERATOR_V1.md
+REM Prefer run_ppe_desktop_operator.cmd (queue + stack check + this script).
+REM See docs/SOP/PPE_MOBILE_OPERATOR_V1.md
 
 cd /d "%~dp0"
 

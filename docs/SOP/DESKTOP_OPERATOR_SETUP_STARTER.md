@@ -98,8 +98,10 @@ Agent: help troubleshoot only if operator is on this step.
 ### E — Start the stack
 
 ```bat
-start_ppe_desktop_operator.cmd
+run_ppe_desktop_operator.cmd
 ```
+
+Propagates the chapter queue, checks whether loop + watch are running, starts them if not, prints verdict.
 
 Two terminals should open: **PPE auto loop** and **PPE mobile watch**.
 
@@ -111,9 +113,13 @@ run_ppe_operator.cmd --brief
 
 Expected when healthy: `VERDICT=RUN_AUTO` or `VERDICT=SUPPLY_LOW` (idle queue).
 
-### F — Optional: auto-start at logon
+### F — Auto-start at logon
 
-Task Scheduler → At logon → `cmd.exe /c "…\start_ppe_desktop_operator.cmd"` with **Start in** = repo root.
+```bat
+install_ppe_desktop_operator_task.cmd
+```
+
+Registers Task Scheduler → at logon → `run_ppe_desktop_operator.cmd`.
 
 ### G — Git commits + push from desktop
 

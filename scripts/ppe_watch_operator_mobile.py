@@ -62,23 +62,9 @@ def save_state(repo: Path, state: dict[str, Any]) -> None:
 
 
 def is_loop_running() -> bool:
-    """True when the Windows auto-loop cmd wrapper is still alive."""
-    ps = (
-        "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        "Where-Object { $_.CommandLine -match 'run_ppe_auto_local_loop|run_ppe_auto_loop\\.cmd' }; "
-        "if ($hits) { 'yes' } else { 'no' }"
-    )
-    try:
-        proc = subprocess.run(
-            ["powershell", "-NoProfile", "-Command", ps],
-            capture_output=True,
-            text=True,
-            timeout=30,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return False
-    return proc.stdout.strip().lower() == "yes"
+    from scripts.ppe_desktop_operator_stack import is_loop_running as _stack_loop_running
+
+    return _stack_loop_running()
 
 
 def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
