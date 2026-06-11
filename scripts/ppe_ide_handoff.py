@@ -13,6 +13,7 @@ from typing import Any
 
 from scripts.ppe_ide_build_starter import starter_path, write_starter
 from scripts.ppe_notify_push import OUTBOUND_TAG, ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_operator_hint import PPE_GO_HINT, append_ppe_go_hint
 
 HANDOFF_STATE_REL = "artifacts/orchestrator/IDE_HANDOFF_STATE.json"
 HANDOFF_NOW_REL = "artifacts/orchestrator/IDE_BUILD_NOW.md"
@@ -349,10 +350,10 @@ def write_handoff_now_doc(
             f"**Slice:** `{slice_id}`",
             f"**Reason:** {reason}",
             "",
-            "## Do this in a new Cursor Agent thread",
+            "## Do this",
             "",
-            f"1. `@` `{starter_rel}`",
-            "2. Paste the prompt below (or say: build this slice per the starter).",
+            f"1. Run **`ppe_go.cmd`** from repo root → new Agent → **Ctrl+V** → Enter",
+            f"2. Or manual: `@` `{starter_rel}` and paste the prompt below.",
             "",
             "```text",
             prompt,
@@ -424,10 +425,9 @@ def launch_ide_handoff(
 
     title = f"PPE IDE BUILD: {slice_id}"
     clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
-    body = (
-        f"{reason}\n"
-        f"Open Cursor → new Agent thread → @{starter_rel}\n"
-        f"Shortcut: {HANDOFF_NOW_REL}.{clip_note}"
+    body = append_ppe_go_hint(
+        f"{reason}\n{HANDOFF_NOW_REL}.{clip_note}",
+        "IDE_BUILD",
     )
     notified = False
     if notify_enabled() and ntfy_configured():
@@ -446,7 +446,7 @@ def launch_ide_handoff(
         "source": source,
         "reason": reason,
         "notified": notified,
-        "message": f"IDE handoff ready for {slice_id} — open Agent thread with @{starter_rel}",
+        "message": f"IDE handoff ready for {slice_id}. {PPE_GO_HINT}",
     }
 
 

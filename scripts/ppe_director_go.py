@@ -8,11 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from scripts.ppe_ide_handoff import _detached_open, copy_text_to_clipboard, resolve_cursor_executable
+from scripts.ppe_operator_hint import PPE_GO_HINT, PPE_GO_VERDICTS
 from scripts.ppe_operator_status import (
     STATUS_REPORT_REL,
-    VERDICT_IDE_BUILD,
     VERDICT_RUN_AUTO,
-    VERDICT_RUN_LOCAL,
     VERDICT_SUPPLY_LOW,
     collect_operator_status,
     write_status_report,
@@ -20,16 +19,7 @@ from scripts.ppe_operator_status import (
 
 DIRECTOR_PROMPT = "@ppe-director Director pass. Terminal loop running."
 
-# Verdicts where the operator should paste the director prompt in Agent.
-HANDOFF_VERDICTS = frozenset(
-    {
-        VERDICT_IDE_BUILD,
-        VERDICT_RUN_LOCAL,
-        "FIX_PLAN",
-        "STALE_STATE",
-        "ERROR",
-    }
-)
+HANDOFF_VERDICTS = PPE_GO_VERDICTS
 
 USER_LINES: dict[str, list[str]] = {
     VERDICT_RUN_AUTO: [
@@ -98,10 +88,9 @@ def format_user_banner(result: dict[str, Any]) -> str:
     if result.get("needs_handoff"):
         lines.extend(
             [
-                "  1. Cursor is opening",
-                "  2. New Agent chat  ->  Ctrl+V  ->  Enter",
+                f"  {PPE_GO_HINT}",
                 "",
-                "  (prompt copied to clipboard)",
+                "  (Cursor opening; prompt copied to clipboard)",
             ]
         )
     else:

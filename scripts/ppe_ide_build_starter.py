@@ -54,13 +54,15 @@ def format_build_closeout_section(*, slice_id: str, phase_plan: str) -> str:
 
 
 def format_ide_build_resume(slice_id: str, phase_plan: str) -> str:
+    from scripts.ppe_operator_hint import PPE_GO_HINT
+
     rel = starter_path(slice_id)
     return (
-        f"1. Generate starter: `python scripts/ppe_ide_build_starter.py --slice-id {slice_id} "
-        f'--phase-plan {phase_plan}`\n'
-        f"2. Open **new** Cursor Agent thread; `@` `{rel}` only.\n"
-        f"3. Commit on plan `buildBranch`, then `mark_ide_product_ready.cmd {slice_id}`, "
-        f"then `run_ppe_local.cmd`."
+        f"1. **You:** `{PPE_GO_HINT}`\n"
+        f"2. **Manual fallback:** `@` `{rel}` — then commit, `mark_ide_product_ready.cmd {slice_id}`, "
+        f"`run_ppe_local.cmd`.\n"
+        f"3. Starter: `python scripts/ppe_ide_build_starter.py --slice-id {slice_id} "
+        f'--phase-plan {phase_plan}`'
     )
 
 

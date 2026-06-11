@@ -117,8 +117,11 @@ def execute_fix(repo: Path, *, note: str = "") -> dict[str, Any]:
 
 def execute_help(repo: Path) -> dict[str, Any]:
     prefix = f"{command_secret()} " if command_secret() else ""
+    from scripts.ppe_operator_hint import PPE_GO_HINT
+
     body = (
         f"{prefix}build - IDE BUILD for queued slice\n"
+        f"Desktop: {PPE_GO_HINT}\n"
         f"{prefix}restart - restart stack\n"
         f"{prefix}fix - investigate blocker\n"
         f"{prefix}status - operator status\n"
