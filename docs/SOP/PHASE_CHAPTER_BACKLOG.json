@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Ordered chapter backlog (PPE_QUEUE_PROPAGATION_V1). First status=queued row with valid planPath propagates when idle. blocked rows with planPath auto-promote to queued after prior chapters are done (post_relay_continue + maybe_propagate_queue).",
+  "notes": "Ordered chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low (scheduling not yet wired — list order still wins until ppe_backlog_priority_scheduling_v1). blocked rows with planPath auto-promote to queued when prior rows are done/skipped.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -96,6 +96,14 @@
       "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
       "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility"
+    },
+    {
+      "chapterId": "ppe_backlog_priority_scheduling_v1",
+      "status": "blocked",
+      "priority": "high",
+      "workerMode": "deterministic",
+      "canonRef": "docs/SOP/PPE_QUEUE_PROPAGATION_V1.md",
+      "reason": "[HIGH] Backlog priority scheduling — propagate/select by high/medium/low (not array order); safe append-anywhere operator flow; tests + SOP operator doc"
     },
     {
       "chapterId": "msos_strategy_lab_distribution_demo",
