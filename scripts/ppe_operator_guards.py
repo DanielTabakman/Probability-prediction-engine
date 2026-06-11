@@ -144,6 +144,15 @@ def evaluate_selection_guards(repo: Path, plan_path: str) -> GuardResult | None:
     cfg = load_operator_config(repo)
     g = _guards_config(cfg)
 
+    if g.get("skipChapterIfEvidenceComplete", True) is not False:
+        if chapter_marked_complete_in_repo(repo, norm_plan):
+            return GuardResult(
+                exit_code=GUARD_SKIP_CHAPTER,
+                reason="SKIP_CHAPTER_EVIDENCE_COMPLETE",
+                detail=f"evidence COMPLETE for {norm_plan}",
+                plan_path=norm_plan,
+            )
+
     plan = load_phase_plan(repo, norm_plan)
     slices = plan.get("slices") or []
     max_slices = g.get("maxPhaseSlices")

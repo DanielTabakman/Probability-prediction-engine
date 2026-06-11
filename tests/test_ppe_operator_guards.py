@@ -12,6 +12,7 @@ from unittest.mock import patch
 from scripts.ppe_operator_guards import (
     GUARD_EXIT,
     GUARD_SKIP_CHAPTER,
+    evaluate_selection_guards,
     run_continuous_guards,
 )
 
@@ -114,6 +115,28 @@ class TestPpeOperatorGuards(unittest.TestCase):
         rc = run_continuous_guards(self.repo, "docs/SOP/PHASE_PLANS/test_relay.json")
         self.assertEqual(rc, GUARD_EXIT)
         self.assertIn("TOO_MANY_SLICES", (self.repo / "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md").read_text(encoding="utf-8"))
+
+    def test_selection_guard_skips_evidence_complete(self) -> None:
+        evidence = self.repo / "docs" / "SOP" / "CHAPTER_DONE_EVIDENCE.md"
+        evidence.write_text("# Evidence\n\n**Status:** **COMPLETE** 2026-06-05\n", encoding="utf-8")
+        plan = {
+            "sprintSpecPath": "docs/SOP/SPRINT_TEST.md",
+            "slices": [
+                {
+                    "sliceId": "Ch-Closeout-Slice003",
+                    "closeout": {"evidenceDoc": "docs/SOP/CHAPTER_DONE_EVIDENCE.md"},
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "done_relay.json").write_text(
+            json.dumps(plan),
+            encoding="utf-8",
+        )
+        guard = evaluate_selection_guards(self.repo, "docs/SOP/PHASE_PLANS/done_relay.json")
+        self.assertIsNotNone(guard)
+        assert guard is not None
+        self.assertEqual(guard.exit_code, GUARD_SKIP_CHAPTER)
+        self.assertEqual(guard.reason, "SKIP_CHAPTER_EVIDENCE_COMPLETE")
 
     @patch("scripts.ppe_operator_guards.chapter_marked_complete_in_repo", return_value=True)
     def test_skip_evidence_complete(self, *_m: object) -> None:

@@ -9,7 +9,13 @@ from pathlib import Path
 
 from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_queue import load_queue
-from scripts.ppe_queue_health import audit_queue, chapter_marked_complete_in_repo, repair_queue
+from scripts.ppe_queue_health import (
+    audit_backlog,
+    audit_queue,
+    chapter_marked_complete_in_repo,
+    repair_backlog,
+    repair_queue,
+)
 
 
 class TestPpeQueueHealth(unittest.TestCase):
@@ -84,6 +90,48 @@ class TestPpeQueueHealth(unittest.TestCase):
         queue = load_queue(self.repo)
         ready = [i for i in queue["items"] if i.get("status") == "READY"]
         self.assertEqual(ready, [])
+
+    def test_audit_backlog_detects_active_complete_chapter(self) -> None:
+        backlog = {
+            "version": 1,
+            "items": [
+                {
+                    "chapterId": "early_ship",
+                    "status": "blocked",
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(backlog, indent=2),
+            encoding="utf-8",
+        )
+        issues = audit_backlog(self.repo)
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0]["code"], "BACKLOG_ACTIVE_BUT_EVIDENCE_COMPLETE")
+
+    def test_repair_backlog_marks_done(self) -> None:
+        backlog = {
+            "version": 1,
+            "items": [
+                {
+                    "chapterId": "early_ship",
+                    "status": "blocked",
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(backlog, indent=2),
+            encoding="utf-8",
+        )
+        fixes, remaining = repair_backlog(self.repo, apply=True)
+        self.assertTrue(fixes)
+        self.assertEqual(remaining, [])
+        backlog_data = json.loads(
+            (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(backlog_data["items"][0]["status"], "done")
 
     def test_chapter_marked_complete_chapter_status_section(self) -> None:
         evidence = self.repo / "docs" / "SOP" / "CHAPTER_STATUS_EVIDENCE.md"

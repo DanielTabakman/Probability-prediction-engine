@@ -18,6 +18,7 @@ from scripts.ppe_roadmap import (
     sync_roadmap_to_queue,
 )
 from scripts.ppe_queue import upsert_queue_item
+from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_chapter_evidence_complete
 
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 VALID_BACKLOG_STATUSES = frozenset({"queued", "chartered", "done", "blocked", "skipped"})
@@ -213,6 +214,7 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
     if _first_queued_item(backlog) is not None:
         return {"promoted": False, "reason": "queued backlog item already exists"}
 
+    finalized_plans: list[str] = []
     for index, item in enumerate(items):
         if not isinstance(item, dict):
             continue
@@ -235,6 +237,21 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
                 "planPath": plan_path,
                 "chapterId": item.get("chapterId"),
             }
+        if chapter_marked_complete_in_repo(repo, plan_path):
+            if not apply:
+                return {
+                    "promoted": False,
+                    "finalized": True,
+                    "dry_run": True,
+                    "planPath": plan_path,
+                    "chapterId": item.get("chapterId"),
+                    "reason": "evidence COMPLETE — would mark backlog done",
+                }
+            item["status"] = "done"
+            save_backlog(repo, backlog)
+            finalize_chapter_evidence_complete(repo, plan_path, apply=True)
+            finalized_plans.append(plan_path)
+            continue
         if not apply:
             return {
                 "promoted": True,
@@ -250,6 +267,14 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             "chapterId": item.get("chapterId"),
         }
 
+    if finalized_plans:
+        return {
+            "promoted": False,
+            "finalized": True,
+            "planPath": finalized_plans[-1],
+            "finalizedPlans": finalized_plans,
+            "reason": "evidence COMPLETE — marked backlog done",
+        }
     return {"promoted": False, "reason": "no blocked backlog item with planPath"}
 
 
@@ -289,6 +314,25 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     plan_path = norm_plan(str(item.get("planPath") or ""))
     if not plan_path:
         return {"propagated": False, "reason": "queued item missing planPath"}
+
+    if chapter_marked_complete_in_repo(repo, plan_path):
+        if not apply:
+            return {
+                "propagated": False,
+                "finalized": True,
+                "dry_run": True,
+                "planPath": plan_path,
+                "reason": "evidence COMPLETE — would mark backlog done",
+            }
+        item["status"] = "done"
+        save_backlog(repo, backlog)
+        finalize_chapter_evidence_complete(repo, plan_path, apply=True)
+        return {
+            "propagated": False,
+            "finalized": True,
+            "planPath": plan_path,
+            "reason": "evidence COMPLETE — marked backlog done",
+        }
 
     if roadmap_path(repo).is_file():
         roadmap = load_roadmap(repo)

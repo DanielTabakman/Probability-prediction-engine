@@ -153,6 +153,45 @@ class TestPpePropagateQueue(unittest.TestCase):
         backlog = load_backlog(self.repo)
         self.assertEqual(backlog["items"][1]["status"], "queued")
 
+    def test_promote_blocked_finalizes_when_evidence_complete(self) -> None:
+        sop = self.repo / "docs" / "SOP"
+        plans = sop / "PHASE_PLANS"
+        evidence = sop / "BLOCKED_DONE_EVIDENCE.md"
+        evidence.write_text("# Evidence\n\n**Status:** **COMPLETE** 2026-06-05\n", encoding="utf-8")
+        blocked_plan = {
+            "name": "blocked_done",
+            "sprintSpecPath": "docs/SOP/SPRINT_BLOCKED_DONE.md",
+            "selectionRecord": "docs/SOP/SEL_BLOCKED_DONE.md",
+            "slices": [
+                {
+                    "sliceId": "BD-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/BLOCKED_DONE_EVIDENCE.md"},
+                }
+            ],
+        }
+        (plans / "blocked_done_relay.json").write_text(json.dumps(blocked_plan), encoding="utf-8")
+        (sop / "SPRINT_BLOCKED_DONE.md").write_text("# b\n", encoding="utf-8")
+        (sop / "SEL_BLOCKED_DONE.md").write_text("# s\n", encoding="utf-8")
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {
+                "chapterId": "done_chapter",
+                "status": "done",
+                "planPath": "docs/SOP/PHASE_PLANS/next_relay.json",
+            },
+            {
+                "chapterId": "blocked_done",
+                "status": "blocked",
+                "planPath": "docs/SOP/PHASE_PLANS/blocked_done_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        out = promote_first_blocked_with_plan(self.repo, apply=True)
+        self.assertFalse(out.get("promoted"))
+        self.assertTrue(out.get("finalized"))
+        backlog = load_backlog(self.repo)
+        self.assertEqual(backlog["items"][1]["status"], "done")
+
     def test_promote_skips_when_prior_not_done(self) -> None:
         plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
         (plans / "blocked_relay.json").write_text(
