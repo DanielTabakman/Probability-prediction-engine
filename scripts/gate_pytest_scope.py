@@ -71,7 +71,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "tests/test_frozen_*.py",
         ),
     ),
-    ("apps/msos-web/", ("tests/test_msos_web_homepage.py",)),
+    ("apps/msos-web/", ("tests/test_msos_web_homepage.py", "tests/test_msos_web_strategy_lab.py")),
     (
         ".github/workflows/",
         ("tests/test_run_pushable_gate.py", "tests/test_codebase_health_gate.py"),

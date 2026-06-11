@@ -16,6 +16,12 @@ if errorlevel 1 exit /b 1
 set "SLEEP=120"
 for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scripts.ppe_operator_config import idle_sleep_seconds; print(idle_sleep_seconds(Path('.')))"`) do set "SLEEP=%%s"
 
+python "%CD%\scripts\ppe_loop_singleton.py" --repo-root "%CD%"
+if errorlevel 1 (
+  echo [run_ppe_auto_loop] another loop instance is already running — exiting
+  exit /b 1
+)
+
 echo [run_ppe_auto_loop] startup hygiene (queue/backlog repair + health audit)
 python "%CD%\scripts\run_codebase_health_gate.py" --repo-root "%CD%" --skip-relay
 if errorlevel 1 (
@@ -46,7 +52,7 @@ set "RC=%ERRORLEVEL%"
 if "%RC%"=="7" goto handle_guard_stop
 if not "%RC%"=="0" exit /b %RC%
 echo [run_ppe_auto_loop] idle sleep %SLEEP%s — Ctrl+C to stop
-timeout /t %SLEEP% /nobreak >nul
+python "%CD%\scripts\ppe_loop_sleep.py" %SLEEP%
 goto loop
 
 :handle_guard_stop
@@ -57,5 +63,5 @@ if "!GUARD_SLEEP!"=="-1" (
   exit /b 7
 )
 echo [run_ppe_auto_loop] guard stop — sleeping !GUARD_SLEEP!s then retry (keepLoopAliveOnGuardStop)
-timeout /t !GUARD_SLEEP! /nobreak >nul
+python "%CD%\scripts\ppe_loop_sleep.py" !GUARD_SLEEP!
 goto loop
