@@ -57,7 +57,7 @@ Definitions: [`.cursor/agents/`](../.cursor/agents/).
 
 **After 3+ dispatches or a chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `@ppe-director` again.
 
-**Optional Automation (hands-off happy path):** Cursor Automation on `artifacts/orchestrator/IDE_BUILD_NOW.md` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `@ppe-director` for exceptions.
+**Optional Automation (hands-off happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `@ppe-director` for exceptions.
 
 ---
 
