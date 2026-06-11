@@ -184,6 +184,12 @@ def mark_product_ready(
         clear_cli_usage_exhausted(repo)
     except ImportError:
         pass
+    try:
+        from scripts.ppe_ide_build_automation_trigger import write_trigger_idle
+
+        write_trigger_idle(repo, completed_slice=slice_id)
+    except ImportError:
+        pass
     return 0, str(out)
 
 
