@@ -15,10 +15,20 @@ from scripts.ppe_progress_notify import (
 def test_notify_slice_complete(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_PROGRESS", "all")
     with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
         ok = notify_slice_complete("RepoHousekeeping-Control-Slice001", plan_path="docs/plan.json")
     assert ok is True
     assert "slice done" in send.call_args[0][0].lower()
+
+
+def test_slice_skipped_in_chapter_mode(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.delenv("PPE_NTFY_PROGRESS", raising=False)
+    with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
+        assert notify_slice_complete("Slice001") is False
+    send.assert_not_called()
 
 
 def test_notify_chapter_complete(monkeypatch):
@@ -48,6 +58,7 @@ def test_progress_disabled(monkeypatch):
 def test_notify_fix_working(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_PROGRESS", "all")
     with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
         ok = notify_fix_working("IDE_BUILD: PRODUCT_BLOCKED", detail="Slice007")
     assert ok is True
@@ -57,6 +68,7 @@ def test_notify_fix_working(monkeypatch):
 def test_notify_fix_resolved(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_PROGRESS", "all")
     with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
         ok = notify_fix_resolved(
             "gate failure",

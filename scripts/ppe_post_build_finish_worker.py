@@ -73,12 +73,7 @@ def main(argv: list[str] | None = None) -> int:
         save_state(repo, state)
         clear_build_lock(repo)
 
-        if ok:
-            _notify(
-                title=f"PPE finish OK: {slice_id}",
-                body=f"Marked ready and run_ppe_local succeeded ({sha[:8]}).",
-            )
-        else:
+        if not ok:
             _notify(
                 title=f"PPE finish failed: {slice_id}",
                 body=f"run_ppe_local exit {proc.returncode} — see {log_path.name}",

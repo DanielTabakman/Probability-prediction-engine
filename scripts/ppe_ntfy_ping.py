@@ -21,6 +21,7 @@ def main() -> int:
         f"Delivery test from desktop. Topic={topic}",
         tags=["ppe", "test"],
         priority="high",
+        bypass_throttle=True,
     )
     if ok:
         print(f"OK: sent to topic {topic}")

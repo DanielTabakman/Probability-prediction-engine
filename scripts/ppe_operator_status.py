@@ -350,18 +350,12 @@ def _maybe_auto_remote_build(repo: Path, status: dict[str, Any]) -> dict[str, An
 
 def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
     auto_build = _maybe_auto_remote_build(repo, status or {}) if status else None
-    payload = repo / NOTIFY_REL
-    if not payload.is_file():
-        return
     push = repo / "scripts" / "ppe_notify_push.py"
     if not push.is_file():
         return
-    subprocess.run(
-        [sys.executable, str(push), "--payload", str(payload)],
-        cwd=repo,
-        check=False,
-    )
     if auto_build and auto_build.get("started"):
+        if auto_build.get("notified"):
+            return
         mode = str(auto_build.get("mode") or auto_build.get("action") or "build")
         if mode == "ide_handoff":
             title = f"PPE IDE handoff: {auto_build.get('slice_id') or 'IDE_BUILD'}"
@@ -386,6 +380,15 @@ def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
             cwd=repo,
             check=False,
         )
+        return
+    payload = repo / NOTIFY_REL
+    if not payload.is_file():
+        return
+    subprocess.run(
+        [sys.executable, str(push), "--payload", str(payload)],
+        cwd=repo,
+        check=False,
+    )
 
 
 def _notify_windows(repo: Path, *, status: dict[str, Any]) -> None:

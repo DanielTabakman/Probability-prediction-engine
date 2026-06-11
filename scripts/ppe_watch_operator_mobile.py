@@ -73,19 +73,19 @@ def _parse_utc(value: str) -> datetime | None:
 
 
 def _heartbeat_hours() -> float:
-    raw = os.environ.get("PPE_NTFY_HEARTBEAT_HOURS", "6").strip()
+    raw = os.environ.get("PPE_NTFY_HEARTBEAT_HOURS", "24").strip()
     try:
-        return max(1.0, float(raw))
+        return max(0.0, float(raw))
     except ValueError:
-        return 6.0
+        return 24.0
 
 
 def _stuck_alert_hours() -> float:
-    raw = os.environ.get("PPE_NTFY_STUCK_HOURS", "4").strip()
+    raw = os.environ.get("PPE_NTFY_STUCK_HOURS", "8").strip()
     try:
         return max(1.0, float(raw))
     except ValueError:
-        return 4.0
+        return 8.0
 
 
 def _auto_build_retry_due(prior: dict[str, Any], verdict: str) -> bool:
@@ -316,7 +316,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         )
 
     heartbeat_sent = False
-    if loop_running and _heartbeat_due(prior):
+    if loop_running and _heartbeat_hours() > 0 and _heartbeat_due(prior):
         if push_stack_status_notify(
             repo,
             verdict=verdict,

@@ -3,12 +3,19 @@ REM Copy to ppe_operator_notify.local.cmd (gitignored) and set your ntfy topic.
 REM Subscribe to the same topic in the ntfy app on your phone.
 
 set "PPE_NTFY_TOPIC=ppe-your-secret-topic-here"
+REM Volume control (defaults: cap 40/day, chapter-only progress, heartbeat every 24h):
+REM set "PPE_NTFY_DAILY_CAP=40"
+REM set "PPE_NTFY_PROGRESS=chapter"
+REM set "PPE_NTFY_HEARTBEAT_HOURS=24"
+REM set "PPE_NTFY_HEARTBEAT_HOURS=0"
+REM set "PPE_NTFY_STUCK_HOURS=8"
 REM Weekly digest to phone (skip desktop toast):
 REM set "PPE_WEEKLY_DIGEST_TOAST=0"
 REM Optional private server or authenticated topic:
 REM set "PPE_NTFY_SERVER=https://ntfy.sh"
 REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
-REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | help
+REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | help
+REM Snooze examples from phone: snooze | snooze 6 | snooze 30m | snooze until 08:00 | snooze clear
 REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
 REM Near-zero API (recommended): copy ppe_operator_near_zero_api.local.cmd.example
