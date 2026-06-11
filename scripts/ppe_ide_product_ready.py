@@ -60,7 +60,30 @@ def _branch_has_commits(repo: Path, *, build_branch: str, baseline: str = "main"
                     return True
             except ValueError:
                 pass
+    for base_ref in (bl, f"origin/{bl}"):
+        anc = _git(repo, "merge-base", "--is-ancestor", bb, base_ref)
+        if anc.returncode == 0:
+            return True
     return False
+
+
+def _product_touchset_on_main(repo: Path, *, slice_id: str, plan_path: str) -> bool:
+    """True when slice touchSet paths exist on the current checkout (e.g. after squash merge to main)."""
+    try:
+        plan = load_phase_plan(repo, plan_path)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return False
+    touch: list[str] = []
+    for sl in plan.get("slices") or []:
+        if not isinstance(sl, dict) or str(sl.get("sliceId") or "") != slice_id:
+            continue
+        raw = sl.get("touchSet") or []
+        if isinstance(raw, list):
+            touch = [str(p).strip() for p in raw if str(p).strip()]
+        break
+    if not touch:
+        return False
+    return all((repo / p).is_file() for p in touch)
 
 
 def _resolve_slice_and_branch(
@@ -141,7 +164,10 @@ def mark_product_ready(
         return 2, str(e)
 
     if not _branch_has_commits(repo, build_branch=branch, baseline=baseline):
-        return 2, f"build branch {branch!r} has no commits ahead of {baseline}; commit IDE BUILD first"
+        if _product_touchset_on_main(repo, slice_id=slice_id, plan_path=norm_plan):
+            branch = baseline
+        else:
+            return 2, f"build branch {branch!r} has no commits ahead of {baseline}; commit IDE BUILD first"
 
     head = _git(repo, "rev-parse", branch)
     sha = (head.stdout or "").strip() if head.returncode == 0 else ""
