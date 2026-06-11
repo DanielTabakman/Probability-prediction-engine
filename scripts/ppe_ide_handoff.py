@@ -16,7 +16,11 @@ from scripts.ppe_notify_push import OUTBOUND_TAG, ntfy_configured, notify_enable
 
 HANDOFF_STATE_REL = "artifacts/orchestrator/IDE_HANDOFF_STATE.json"
 HANDOFF_NOW_REL = "artifacts/orchestrator/IDE_BUILD_NOW.md"
+HANDOFF_FIX_NOW_REL = "artifacts/orchestrator/IDE_FIX_NOW.md"
 BUILD_LOG_REL = "artifacts/orchestrator/REMOTE_BUILD_AGENT.log"
+FIX_LOG_REL = "artifacts/orchestrator/REMOTE_FIX_AGENT.log"
+CONTINUITY_BRIEF_REL = "docs/SOP/AGENT_CONTINUITY_BRIEF.md"
+REMOTE_AGENT_LOGS = (BUILD_LOG_REL, FIX_LOG_REL)
 USAGE_MARKERS = (
     "out of usage",
     "usage limit",
@@ -143,8 +147,8 @@ def skip_cli_when_usage_exhausted(repo: Path) -> bool:
     return True
 
 
-def _log_tail(repo: Path, *, max_bytes: int = 8000) -> str:
-    path = repo.resolve() / BUILD_LOG_REL
+def _log_tail(repo: Path, *, log_rel: str = BUILD_LOG_REL, max_bytes: int = 8000) -> str:
+    path = repo.resolve() / log_rel
     if not path.is_file():
         return ""
     try:
@@ -167,7 +171,7 @@ def cli_usage_exhausted(repo: Path) -> bool:
     state = load_handoff_state(repo)
     if state.get("cli_usage_exhausted"):
         return True
-    return text_indicates_usage_exhausted(_log_tail(repo))
+    return any(text_indicates_usage_exhausted(_log_tail(repo, log_rel=log_rel)) for log_rel in REMOTE_AGENT_LOGS)
 
 
 def mark_cli_usage_exhausted(repo: Path, *, detail: str = "") -> None:
@@ -190,19 +194,25 @@ def clear_cli_usage_exhausted(repo: Path) -> None:
     save_handoff_state(repo, state)
 
 
-def should_attempt_cli_build(repo: Path, *, force_handoff: bool = False) -> bool:
+def should_attempt_headless_cli(repo: Path, *, mode: str = "build", force_handoff: bool = False) -> bool:
+    """When True, try headless agent CLI before IDE handoff (build or fix)."""
     if force_handoff or prefer_ide_over_cli(repo):
         return False
     if skip_cli_when_usage_exhausted(repo) and cli_usage_exhausted(repo):
         return False
-    try:
-        from scripts.ppe_operator_config import auto_remote_build_enabled
+    if mode == "build":
+        try:
+            from scripts.ppe_operator_config import auto_remote_build_enabled
 
-        if not auto_remote_build_enabled(repo):
-            return False
-    except ImportError:
-        pass
+            if not auto_remote_build_enabled(repo):
+                return False
+        except ImportError:
+            pass
     return True
+
+
+def should_attempt_cli_build(repo: Path, *, force_handoff: bool = False) -> bool:
+    return should_attempt_headless_cli(repo, mode="build", force_handoff=force_handoff)
 
 
 def copy_text_to_clipboard(text: str) -> dict[str, Any]:
@@ -422,6 +432,19 @@ def launch_ide_handoff(
     )
     save_handoff_state(repo, state)
 
+    from scripts.ppe_ide_build_automation_trigger import notify_automation
+
+    automation = notify_automation(
+        repo,
+        handoff={
+            "slice_id": slice_id,
+            "plan_path": plan_path,
+            "starter": starter_rel,
+            "reason": reason,
+            "source": source,
+        },
+    )
+
     title = f"PPE IDE BUILD: {slice_id}"
     clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
     body = (
@@ -446,8 +469,153 @@ def launch_ide_handoff(
         "source": source,
         "reason": reason,
         "notified": notified,
+        "automation": automation,
         "message": f"IDE handoff ready for {slice_id} — open Agent thread with @{starter_rel}",
     }
+
+
+def fix_handoff_recently_done(repo: Path, verdict: str) -> bool:
+    state = load_handoff_state(repo)
+    if str(state.get("last_fix_handoff_verdict") or "") != verdict:
+        return False
+    at_raw = str(state.get("last_fix_handoff_at") or "").strip()
+    if not at_raw:
+        return False
+    try:
+        at = datetime.fromisoformat(at_raw.replace("Z", "+00:00"))
+        age = (datetime.now(timezone.utc) - at).total_seconds()
+        return age < _handoff_debounce_sec()
+    except ValueError:
+        return False
+
+
+def write_fix_handoff_now_doc(
+    repo: Path,
+    *,
+    verdict: str,
+    blocker: str,
+    reason: str,
+    prompt: str,
+) -> Path:
+    brief_rel = CONTINUITY_BRIEF_REL
+    body = "\n".join(
+        [
+            "# IDE FIX — action required",
+            "",
+            f"**Verdict:** `{verdict}`",
+            f"**Blocker:** {blocker or '—'}",
+            f"**Reason:** {reason}",
+            "",
+            "## Do this in a new Cursor Agent thread",
+            "",
+            f"1. `@` `{brief_rel}`",
+            "2. Paste the prompt below (or say: investigate and fix the blocker).",
+            "",
+            "```text",
+            prompt,
+            "```",
+            "",
+            f"Continuity brief: `{brief_rel}`",
+        ]
+    )
+    out = repo / HANDOFF_FIX_NOW_REL
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(body + "\n", encoding="utf-8")
+    return out
+
+
+def launch_ide_fix_handoff(
+    repo: Path,
+    *,
+    verdict: str,
+    blocker: str,
+    prompt: str,
+    source: str,
+    reason: str,
+    force: bool = False,
+) -> dict[str, Any]:
+    repo = repo.resolve()
+    if not ide_handoff_enabled(repo):
+        return {
+            "action": "ide_fix_handoff",
+            "started": False,
+            "reason": "IDE handoff disabled (PPE_IDE_HANDOFF=0)",
+            "verdict": verdict,
+        }
+
+    if not force and fix_handoff_recently_done(repo, verdict):
+        return {
+            "action": "ide_fix_handoff",
+            "started": False,
+            "reason": f"fix handoff already done recently for {verdict}",
+            "verdict": verdict,
+            "debounced": True,
+        }
+
+    brief_file = repo / CONTINUITY_BRIEF_REL.replace("/", os.sep)
+    now_doc = write_fix_handoff_now_doc(
+        repo,
+        verdict=verdict,
+        blocker=blocker,
+        reason=reason,
+        prompt=prompt,
+    )
+    clipboard = copy_text_to_clipboard(prompt)
+    cursor = open_cursor_for_handoff(repo, brief_file if brief_file.is_file() else now_doc)
+
+    state = load_handoff_state(repo)
+    state.update(
+        {
+            "last_fix_handoff_at": _utc_now(),
+            "last_fix_handoff_verdict": verdict,
+            "last_fix_handoff_source": source,
+            "last_fix_handoff_reason": reason,
+            "cursor_open": cursor.get("ok"),
+            "clipboard": clipboard.get("ok"),
+        }
+    )
+    save_handoff_state(repo, state)
+
+    title = f"PPE IDE FIX: {verdict}"
+    clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
+    body = (
+        f"{reason}\n"
+        f"{blocker or 'Investigate operator blocker.'}\n"
+        f"Open Cursor → new Agent thread → @{CONTINUITY_BRIEF_REL}\n"
+        f"Shortcut: {HANDOFF_FIX_NOW_REL}.{clip_note}"
+    )
+    notified = False
+    if notify_enabled() and ntfy_configured():
+        notified = send_ntfy(title, body, tags=["ppe", "ide", OUTBOUND_TAG], priority="high")
+
+    return {
+        "action": "ide_fix_handoff",
+        "mode": "ide_handoff",
+        "started": True,
+        "verdict": verdict,
+        "blocker": blocker,
+        "now_doc": str(now_doc.relative_to(repo)).replace("\\", "/"),
+        "cursor": cursor,
+        "clipboard": clipboard,
+        "source": source,
+        "reason": reason,
+        "notified": notified,
+        "message": f"IDE fix handoff ready for {verdict} — open Agent thread with @{CONTINUITY_BRIEF_REL}",
+    }
+
+
+def headless_cli_skip_reason(repo: Path, *, try_cli: bool, cli_out: dict[str, Any]) -> str:
+    if prefer_ide_over_cli(repo):
+        return "near-zero API profile — use Cursor IDE Agent"
+    if cli_usage_exhausted(repo):
+        return "agent CLI out of usage — use Cursor IDE Agent"
+    from scripts.ppe_remote_agent import agent_available
+
+    if not agent_available():
+        return "agent CLI not installed — use Cursor IDE Agent"
+    if not try_cli:
+        return "CLI skipped — use Cursor IDE Agent"
+    return str(cli_out.get("reason") or "CLI unavailable")
 
 
 def respond_to_ide_build(
@@ -458,59 +626,15 @@ def respond_to_ide_build(
     force_handoff: bool = False,
 ) -> dict[str, Any]:
     """Try headless CLI when allowed; otherwise surface IDE handoff."""
-    from scripts.ppe_remote_agent import agent_available
-    from scripts.ppe_remote_build_agent import launch_build, read_build_lock, resolve_build_target
+    from scripts.ppe_remote_agent_dispatch import respond_remote_agent
 
-    repo = repo.resolve()
-    target = resolve_build_target(repo)
-    if not target.get("ok"):
-        return {"action": "ide_build", "started": False, **target}
-    if target.get("mode") == "run_local":
-        return launch_build(repo, note=note, source=source)
-
-    slice_id = str(target["slice_id"])
-    plan_path = str(target["plan_path"])
-
-    if read_build_lock(repo):
-        return {
-            "action": "ide_build",
-            "started": False,
-            "reason": f"build already in flight for {slice_id}",
-            "slice_id": slice_id,
-        }
-
-    try_cli = (
-        should_attempt_cli_build(repo, force_handoff=force_handoff)
-        and agent_available()
-        and not force_handoff
-    )
-    cli_out: dict[str, Any] = {}
-    if try_cli:
-        cli_out = launch_build(repo, note=note, source=source)
-        if cli_out.get("started"):
-            return cli_out
-
-    if prefer_ide_over_cli(repo):
-        reason = "near-zero API profile — use Cursor IDE Agent"
-    elif cli_usage_exhausted(repo):
-        reason = "agent CLI out of usage — use Cursor IDE Agent"
-    elif not agent_available():
-        reason = "agent CLI not installed — use Cursor IDE Agent"
-    elif not try_cli:
-        reason = "CLI build skipped — use Cursor IDE Agent"
-    else:
-        reason = str(cli_out.get("reason") or "CLI build unavailable")
-
-    handoff = launch_ide_handoff(
+    return respond_remote_agent(
         repo,
-        slice_id=slice_id,
-        plan_path=plan_path,
+        mode="build",
         source=source,
-        reason=reason,
-        force=force_handoff,
+        note=note,
+        force_handoff=force_handoff,
     )
-    handoff["cli_attempted"] = try_cli
-    return handoff
 
 
 def maybe_handoff_after_cli_failure(repo: Path, job: dict[str, Any], result: dict[str, Any]) -> dict[str, Any] | None:
@@ -530,16 +654,36 @@ def maybe_handoff_after_cli_failure(repo: Path, job: dict[str, Any], result: dic
         mark_cli_usage_exhausted(repo, detail=stderr or detail[-300:])
 
     handoff_info = job.get("handoff") or {}
+    if not ide_handoff_enabled(repo):
+        return None
+
+    reason = "agent CLI out of usage" if cli_usage_exhausted(repo) else "agent CLI failed"
+
+    mode = str(handoff_info.get("mode") or "build").strip().lower()
+    if mode == "fix":
+        verdict = str(handoff_info.get("verdict") or "").strip()
+        if not verdict:
+            return None
+        from scripts.ppe_remote_fix_agent import build_fix_prompt
+
+        prompt = build_fix_prompt(
+            repo,
+            user_note=str(handoff_info.get("user_note") or ""),
+        )
+        return launch_ide_fix_handoff(
+            repo,
+            verdict=verdict,
+            blocker=str(handoff_info.get("blocker") or ""),
+            prompt=prompt,
+            source=str(handoff_info.get("source") or "cli-failure"),
+            reason=reason,
+            force=True,
+        )
+
     slice_id = str(handoff_info.get("slice_id") or "").strip()
     plan_path = str(handoff_info.get("plan_path") or "").strip()
     if not slice_id or not plan_path:
         return None
-    if not ide_handoff_enabled(repo):
-        return None
-
-    reason = "agent CLI build failed"
-    if cli_usage_exhausted(repo):
-        reason = "agent CLI out of usage"
     return launch_ide_handoff(
         repo,
         slice_id=slice_id,
