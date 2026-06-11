@@ -42,6 +42,31 @@ def test_strategy_lab_fixtures_honest_lens_labels() -> None:
     assert "BTC / Options" in fixtures
 
 
+def test_thesis_confirmation_route_and_narrative() -> None:
+    page = MSOS_WEB / "src" / "app" / "strategy-lab" / "confirm" / "page.tsx"
+    assert page.is_file()
+    text = page.read_text(encoding="utf-8")
+    assert "ThesisConfirmationPanel" in text
+    assert 'activeNavId="strategy-lab"' in text
+
+    fixtures = (MSOS_WEB / "src" / "data" / "thesisConfirmFixtures.ts").read_text(encoding="utf-8")
+    assert "Is this what you think is true?" in fixtures
+
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(encoding="utf-8")
+    assert "thesisConfirmHeadline" in panel
+    assert "Proceed to expression planning" in panel
+    assert "Preview persistence" in panel
+    assert "no live order transmitted" in panel
+
+    persistence = (MSOS_WEB / "src" / "lib" / "thesisPersistence.ts").read_text(encoding="utf-8")
+    assert "msos.thesis.preview.v1" in persistence
+    assert "exploring" in persistence
+    assert "confirmed" in persistence
+
+    lab = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    assert 'href="/strategy-lab/confirm"' in lab
+
+
 def test_nav_enables_strategy_lab() -> None:
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'id: "strategy-lab"' in nav

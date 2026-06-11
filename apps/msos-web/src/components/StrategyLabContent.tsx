@@ -17,7 +17,9 @@ export function StrategyLabContent() {
             Live via PPE when embed wired
           </span>
           <span className="btn slim">Share view</span>
-          <span className="btn slim primary">Save draft thesis</span>
+          <Link href="/strategy-lab/confirm" className="btn slim primary">
+            Save draft thesis
+          </Link>
           <span className="avatar" aria-hidden="true">
             DT
           </span>
@@ -112,7 +114,9 @@ export function StrategyLabContent() {
               <strong>Candidate: narrower-range disagreement</strong>
               <p>Potential expression families available after thesis confirmation.</p>
             </div>
-            <span className="btn slim primary">Confirm thesis →</span>
+            <Link href="/strategy-lab/confirm" className="btn slim primary">
+              Confirm thesis →
+            </Link>
           </div>
         </div>
       </section>
