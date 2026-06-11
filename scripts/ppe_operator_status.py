@@ -321,7 +321,32 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
     return out
 
 
-def _notify_mobile(repo: Path) -> None:
+def _maybe_auto_remote_build(repo: Path, status: dict[str, Any]) -> dict[str, Any] | None:
+    """Start agent CLI when loop hits IDE_BUILD guard stop (no phone tap required)."""
+    if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
+        return None
+    try:
+        from scripts.ppe_operator_config import auto_remote_build_enabled
+        from scripts.ppe_remote_agent import agent_available
+        from scripts.ppe_remote_build_agent import launch_build, read_build_lock, resolve_build_target
+    except ImportError:
+        return None
+    if not auto_remote_build_enabled(repo) or not agent_available():
+        return None
+    if read_build_lock(repo):
+        return None
+    target = resolve_build_target(repo)
+    if not target.get("ok") or target.get("mode") != "ide_build":
+        return None
+    return launch_build(
+        repo,
+        note="auto-triggered by operator loop on IDE_BUILD guard stop",
+        source="loop-guard",
+    )
+
+
+def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
+    auto_build = _maybe_auto_remote_build(repo, status or {}) if status else None
     payload = repo / NOTIFY_REL
     if not payload.is_file():
         return
@@ -333,9 +358,24 @@ def _notify_mobile(repo: Path) -> None:
         cwd=repo,
         check=False,
     )
+    if auto_build and auto_build.get("started"):
+        subprocess.run(
+            [
+                sys.executable,
+                str(push),
+                "--title",
+                f"PPE auto-build started: {auto_build.get('slice_id') or 'IDE_BUILD'}",
+                "--body",
+                str(auto_build.get("message") or "Agent CLI running on desktop."),
+                "--priority",
+                "high",
+            ],
+            cwd=repo,
+            check=False,
+        )
 
 
-def _notify_windows(repo: Path) -> None:
+def _notify_windows(repo: Path, *, status: dict[str, Any]) -> None:
     ps = repo / "scripts" / "notify_operator_status.ps1"
     if ps.is_file():
         subprocess.run(
@@ -352,7 +392,7 @@ def _notify_windows(repo: Path) -> None:
             cwd=repo,
             check=False,
         )
-    _notify_mobile(repo)
+    _notify_mobile(repo, status=status)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -387,7 +427,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.notify and status.get("verdict") in STOP_VERDICTS:
         _write_notify_payload(repo, status)
-        _notify_windows(repo)
+        _notify_windows(repo, status=status)
 
     return int(status.get("exit_code") or 0)
 

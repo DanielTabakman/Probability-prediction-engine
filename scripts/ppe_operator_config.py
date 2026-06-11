@@ -116,6 +116,17 @@ def keep_loop_alive_on_guard_stop(repo_root: Path) -> bool:
     return bool(cfg.get("keepLoopAliveOnGuardStop", True))
 
 
+def auto_remote_build_enabled(repo_root: Path) -> bool:
+    """When True, mobile watch auto-starts agent CLI on IDE_BUILD (no phone 'build' tap)."""
+    env = os.environ.get("PPE_AUTO_REMOTE_BUILD", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    cfg = load_operator_config(repo_root)
+    return cfg.get("autoRemoteBuild", True) is not False
+
+
 def continuous_max(repo_root: Path) -> int:
     cfg = load_operator_config(repo_root)
     try:
@@ -148,4 +159,6 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
     profile = (os.environ.get("PPE_OPERATOR_PROFILE") or cfg.get("profile") or "").strip()
     if profile:
         _set("PPE_OPERATOR_PROFILE", profile)
+    if auto_remote_build_enabled(repo_root):
+        _set("PPE_AUTO_REMOTE_BUILD", "1")
     return {"applied": True, "config": cfg, "config_path": str(operator_config_path(repo_root))}

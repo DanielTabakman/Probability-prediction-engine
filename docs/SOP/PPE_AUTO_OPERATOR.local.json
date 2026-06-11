@@ -29,5 +29,6 @@
     "skipChapterIfEvidenceComplete": true
   },
   "guardStopSleepSeconds": 300,
-  "keepLoopAliveOnGuardStop": true
+  "keepLoopAliveOnGuardStop": true,
+  "autoRemoteBuild": true
 }

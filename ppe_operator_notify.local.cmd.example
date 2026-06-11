@@ -11,3 +11,5 @@ REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
 REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | help
 REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
+REM Auto-start agent CLI on IDE_BUILD (default on): set "PPE_AUTO_REMOTE_BUILD=1"
+
