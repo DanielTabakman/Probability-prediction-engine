@@ -30,19 +30,23 @@ def test_resolve_build_ide_build(monkeypatch, tmp_path):
 
 def test_execute_build_launches_agent(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
-    with patch("scripts.ppe_remote_build_agent.resolve_build_target") as resolve:
-        resolve.return_value = {
+    monkeypatch.setenv("PPE_NOTIFY", "0")
+    monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "1")
+    with patch(
+        "scripts.ppe_remote_build_agent.resolve_build_target",
+        return_value={
             "ok": True,
             "mode": "ide_build",
             "slice_id": "MVP1-Slice002",
             "plan_path": "docs/SOP/PHASE_PLANS/foo.json",
-        }
-        with patch("scripts.ppe_remote_build_agent.write_starter"):
-            with patch("scripts.ppe_remote_build_agent.launch_agent_background") as launch:
-                launch.return_value = {"started": True, "message": "ok"}
+        },
+    ):
+        with patch("scripts.ppe_remote_build_agent.read_build_lock", return_value=None):
+            with patch("scripts.ppe_ide_build_starter.build_starter_md", return_value="# starter\n"):
                 from scripts.ppe_ntfy_commands import execute_build
 
                 result = execute_build(tmp_path)
     assert result["started"] is True
     assert result["slice_id"] == "MVP1-Slice002"
-    launch.assert_called_once()
+    assert result["mode"] == "ide_handoff"
