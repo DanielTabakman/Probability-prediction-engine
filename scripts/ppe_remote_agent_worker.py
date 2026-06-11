@@ -40,6 +40,10 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
         result=result,
         log_path=log_path,
     )
+    if not result.get("ok"):
+        from scripts.ppe_ide_handoff import maybe_handoff_after_cli_failure
+
+        maybe_handoff_after_cli_failure(repo, job, result)
     return result
 
 

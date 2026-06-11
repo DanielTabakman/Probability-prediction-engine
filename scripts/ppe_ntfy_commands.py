@@ -104,9 +104,9 @@ def execute_status(repo: Path) -> dict[str, Any]:
 
 
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
-    from scripts.ppe_remote_build_agent import launch_build
+    from scripts.ppe_ide_handoff import respond_to_ide_build
 
-    return launch_build(repo, note=note)
+    return respond_to_ide_build(repo, source="phone", note=note)
 
 
 def execute_fix(repo: Path, *, note: str = "") -> dict[str, Any]:

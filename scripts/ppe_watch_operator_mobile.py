@@ -114,15 +114,13 @@ def _maybe_auto_remote_build(
     *,
     retry: bool = False,
 ) -> dict[str, Any] | None:
+    from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
     from scripts.ppe_operator_config import auto_remote_build_enabled
-    from scripts.ppe_remote_agent import agent_available
-    from scripts.ppe_remote_build_agent import launch_build, read_build_lock, resolve_build_target
+    from scripts.ppe_remote_build_agent import read_build_lock, resolve_build_target
 
-    if not auto_remote_build_enabled(repo):
+    if not auto_remote_build_enabled(repo) and not ide_handoff_enabled(repo):
         return None
     if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
-        return None
-    if not agent_available():
         return None
 
     target = resolve_build_target(repo)
@@ -154,7 +152,12 @@ def _maybe_auto_remote_build(
     note = "auto-triggered by mobile watch on IDE_BUILD"
     if retry:
         note = "auto-retry by mobile watch (IDE_BUILD still stuck)"
-    return launch_build(repo, note=note, source="auto-watch")
+    return respond_to_ide_build(
+        repo,
+        source="auto-watch",
+        note=note,
+        force_handoff=retry and bool(prior.get("last_auto_build")),
+    )
 
 
 def _stuck_alert_due(prior: dict[str, Any], verdict: str) -> bool:
@@ -259,12 +262,20 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         blocker = str(status.get("blocker") or verdict)
         if auto_build and auto_build.get("started"):
             slice_id = str(auto_build.get("slice_id") or "")
-            alerts.append(
-                (
-                    f"PPE auto-build started: {slice_id or verdict}",
-                    f"{blocker}\nAgent CLI running on desktop — no phone action needed.",
+            if str(auto_build.get("mode") or auto_build.get("action")) == "ide_handoff":
+                alerts.append(
+                    (
+                        f"PPE IDE handoff: {slice_id or verdict}",
+                        f"{blocker}\nOpen Cursor → new Agent → @{auto_build.get('starter', 'IDE_BUILD_STARTER')}",
+                    )
                 )
-            )
+            else:
+                alerts.append(
+                    (
+                        f"PPE auto-build started: {slice_id or verdict}",
+                        f"{blocker}\nAgent CLI running on desktop — no phone action needed.",
+                    )
+                )
         else:
             alerts.append((f"PPE operator: {verdict}", blocker))
 
