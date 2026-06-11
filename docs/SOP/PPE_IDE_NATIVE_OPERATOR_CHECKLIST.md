@@ -15,8 +15,10 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Daily run
 
+- [ ] On **`main`** (or sync before loop): `git checkout main && git pull`.
+- [ ] **Preflight:** `python scripts/ppe_operator_status.py` — read `artifacts/orchestrator/OPERATOR_STATUS.md` before starting the loop.
 - [ ] **Desktop (always-on):** `start_ppe_desktop_operator.cmd` — loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)).
-- [ ] Or manually: `run_ppe_auto_local_loop.cmd` from repo root (preflight writes `OPERATOR_STATUS.md` automatically) + optional `watch_operator_mobile.cmd`.
+- [ ] Or manually: `run_ppe_auto_local_loop.cmd` from repo root (health gate + preflight write `OPERATOR_STATUS.md`) + optional `watch_operator_mobile.cmd`.
 - [ ] Optional second terminal: `.\scripts\watch_ppe_live.ps1`.
 - [ ] Queue fed: `queued` rows in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (local profile does **not** steward-charter when idle).
 
@@ -56,6 +58,14 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 - **Mixed chapters** with Product: use marker + `run_ppe_local` after IDE BUILD.
 - **Split plans** (control/smoke in one plan, product in another) if you want more unattended control work before IDE BUILD.
 - **Multitask:** parallel IDE agents are fine for BUILD; they do not replace `run_ppe_local` or the marker.
+
+---
+
+## Chapter hygiene (avoid false PRODUCT_BLOCKED)
+
+- [ ] When product + smoke are witness-complete on `main`, set evidence doc line 2–4 to **`**Status:** **COMPLETE** YYYY-MM-DD`** (required for skip guards).
+- [ ] Do **not** leave witness-complete chapters in backlog **`blocked`** — mark **`done`** or run closeout slice promptly.
+- [ ] Loop startup runs `run_codebase_health_gate.py --skip-relay`; manual check: same command from repo root.
 
 ---
 

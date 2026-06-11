@@ -19,8 +19,10 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 ## Daily (local profile)
 
-1. `run_ppe_auto_local_loop.cmd` — startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`; read it if the loop stops at preflight (exit 7)
-2. Optional: `workflow_metrics.cmd session start` at desk open
+1. `git checkout main && git pull` — relay closeout patches `docs/SOP` on `main`.
+2. `python scripts/ppe_operator_status.py` — preflight + verdict before looping.
+3. `run_ppe_auto_local_loop.cmd` — startup runs health gate (`--skip-relay`) then writes `OPERATOR_STATUS.md`; read it if the loop stops at preflight (exit 7).
+4. Optional: `workflow_metrics.cmd session start` at desk open
 
 ---
 

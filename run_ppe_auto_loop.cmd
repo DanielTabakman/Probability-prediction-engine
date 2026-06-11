@@ -16,6 +16,13 @@ if errorlevel 1 exit /b 1
 set "SLEEP=120"
 for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scripts.ppe_operator_config import idle_sleep_seconds; print(idle_sleep_seconds(Path('.')))"`) do set "SLEEP=%%s"
 
+echo [run_ppe_auto_loop] startup hygiene (queue/backlog repair + health audit)
+python "%CD%\scripts\run_codebase_health_gate.py" --repo-root "%CD%" --skip-relay
+if errorlevel 1 (
+  echo [run_ppe_auto_loop] health gate failed — fix queue/backlog drift before continuing
+  exit /b 1
+)
+
 echo [run_ppe_auto_loop] startup preflight
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%"
 set "PREFLIGHT_RC=%ERRORLEVEL%"

@@ -1,5 +1,7 @@
 # MVP1 probability method legibility — evidence status
 
+**Status:** **COMPLETE** 2026-06-05 — implementation on `main`; relay skipped (evidence witness)
+
 **Chapter:** `mvp1_probability_method_legibility`  
 **Sprint:** [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md)
 
@@ -23,4 +25,4 @@
 
 ## Chapter status
 
-**COMPLETE** (implementation); **relay SELECTION** awaits MSOS P4 closeout per backlog `blocked` → `queued` propagation.
+Chapter **COMPLETE** — product legibility shipped on `main`; formal relay closeout superseded by evidence witness above.

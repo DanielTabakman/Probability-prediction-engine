@@ -323,8 +323,8 @@ def scaffold_chapter_files(repo_root: Path, proposal: dict[str, Any]) -> list[st
     if not ev_fs.is_file():
         ev_fs.write_text(
             f"# {title} — evidence status\n\n"
-            f"**Chapter:** `{chapter_id}`  \n"
-            "**Status:** **IN_PROGRESS**\n",
+            f"**Status:** **IN_PROGRESS** — set to **COMPLETE** YYYY-MM-DD when product + smoke witness on `main`\n\n"
+            f"**Chapter:** `{chapter_id}`\n",
             encoding="utf-8",
         )
         written.append(evidence)
