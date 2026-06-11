@@ -8,37 +8,24 @@
 
 ---
 
-## Quick start
+## Quick start — two commands for you
 
-From repo root:
+| When | Command |
+|------|---------|
+| **Start once** (leave terminal open) | `run_ppe_auto_local_loop.cmd` |
+| **Phone buzzes** (`IDE_BUILD` / operator ping) | `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter |
 
-```bat
-run_ppe_auto_local_loop.cmd
-```
+`ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. The director spawns build/finish/triage workers — you do not run gate, mark-ready, or `run_ppe_local` by hand unless the agent asks.
 
-Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md` before the first pass.
+Monitor (optional): `.\scripts\watch_ppe_live.ps1`
 
-This is the **default driver** for MSOS P3→P8: control/witness/closeout slices run in the loop; each **product** slice still needs IDE BUILD + `mark_ide_product_ready.cmd` + `run_ppe_local.cmd`. After each chapter closeout, the next **blocked** MSOS row with `planPath` is promoted to **queued** automatically.
+---
 
-Monitor (optional):
+## What the loop does (background)
 
-```powershell
-.\scripts\watch_ppe_live.ps1
-```
+Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`. Control/witness/closeout slices run unattended; **product** slices stop until IDE BUILD completes. After closeout, the next blocked MSOS row with `planPath` promotes to **queued** automatically.
 
-When the loop stops for a **product** slice:
-
-1. Read `artifacts/orchestrator/LAST_RUN_REPORT.md` or `OPERATOR_GUARD_REPORT.md`.
-2. **IDE BUILD** — new Cursor Agent thread; load `docs/SOP/AGENT_CONTINUITY_BRIEF.md` + sprint spec; use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md) (`LAYER` / `LAYER_PRESET` from phase plan or [`PARALLEL_AGENT_CHECKLIST_V1.md`](PARALLEL_AGENT_CHECKLIST_V1.md)).
-3. `python scripts/ppe_layer_audit.py --repo-root . --dirty --manifest` (or `--layer-preset PPE_UI`) before commit.
-4. Commit on the phase plan `buildBranch`.
-5. **`mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`**
-6. **`run_ppe_local.cmd`** — finish smoke/closeout for that chapter.
-7. Loop continues on the next pass (marker cleared after successful `run_ppe_local`).
-
-### Director agents (optional — thinner IDE handoff)
-
-The terminal loop stays the infinite driver. Cursor agents only handle **interrupts** (`IDE_BUILD`, `RUN_LOCAL`, blockers).
+### Director agents (behind `ppe_go.cmd`)
 
 | Agent | Role |
 |-------|------|
@@ -47,17 +34,17 @@ The terminal loop stays the infinite driver. Cursor agents only handle **interru
 | `@ppe-finish-worker` | `RUN_LOCAL` only — `run_ppe_local.cmd` when marker present |
 | `@ppe-triage-worker` | `FIX_PLAN` / `STALE_STATE` / `ERROR` diagnosis |
 
-Definitions: [`.cursor/agents/`](../.cursor/agents/).
+Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/ppe_director_go.py`](../../scripts/ppe_director_go.py).
 
-**Invoke after ntfy `IDE_BUILD`:**
+**Manual fallback** (same as clipboard from `ppe_go.cmd`):
 
 ```text
-@ppe-director Director pass. Terminal loop running. Read OPERATOR_STATUS and act.
+@ppe-director Director pass. Terminal loop running.
 ```
 
-**After 3+ dispatches or a chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `@ppe-director` again.
+**After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `ppe_go.cmd` again.
 
-**Optional Automation (hands-off happy path):** Cursor Automation on `artifacts/orchestrator/IDE_BUILD_NOW.md` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `@ppe-director` for exceptions.
+**Optional Automation (zero-click happy path):** Cursor Automation on `artifacts/orchestrator/IDE_BUILD_NOW.md` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
 
 ---
 
@@ -104,7 +91,7 @@ Requires commits on the plan `buildBranch` ahead of baseline. Cleared automatica
 
 | Signal | You do |
 |--------|--------|
-| Guard exit **7** / `PRODUCT_BLOCKED` | `@ppe-director` or manual IDE BUILD → commit → **mark ready** → `run_ppe_local.cmd` |
+| Guard exit **7** / `PRODUCT_BLOCKED` | **`ppe_go.cmd`** → Ctrl+V in Agent |
 | `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | Fix plan/spec; see guard report |
 | `SCOPE_AMBIGUITY` on product slice | Same as product blocked |
 | Queue idle, no `READY` | Add `queued` row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |
