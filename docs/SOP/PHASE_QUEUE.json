@@ -118,9 +118,23 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
-      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
+      "status": "DONE",
+      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website",
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
+      "status": "READY",
+      "reason": "Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md"
     }
   ]
 }

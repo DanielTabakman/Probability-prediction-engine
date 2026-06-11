@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low — propagation picks highest eligible row when pipeline idle (see BACKLOG_OPERATOR.md). Append new rows anywhere; list order is tie-break only.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low \u2014 propagation picks highest eligible row when pipeline idle (see BACKLOG_OPERATOR.md). Append new rows anywhere; list order is tie-break only.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -90,7 +90,7 @@
     },
     {
       "chapterId": "mvp1_distribution_stats_legibility",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
@@ -103,11 +103,11 @@
       "priority": "high",
       "workerMode": "deterministic",
       "canonRef": "docs/SOP/BACKLOG_OPERATOR.md",
-      "reason": "[HIGH] Backlog priority scheduling — shipped in ppe_propagate_queue (high/medium/low + BACKLOG_OPERATOR.md)"
+      "reason": "[HIGH] Backlog priority scheduling \u2014 shipped in ppe_propagate_queue (high/medium/low + BACKLOG_OPERATOR.md)"
     },
     {
       "chapterId": "msos_strategy_lab_distribution_demo",
-      "status": "blocked",
+      "status": "done",
       "priority": "medium",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
@@ -125,7 +125,7 @@
     },
     {
       "chapterId": "msos_p5_thesis_confirm",
-      "status": "blocked",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P5",

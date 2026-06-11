@@ -1,6 +1,9 @@
 {
   "last_main_sha": "b32f95544e4638e84f6cc95b439c307b04065bfb",
-  "recorded_events": [],
+  "recorded_events": [
+    "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
+    "chapter_closed:MSOS-DistDemo-Closeout-Slice005"
+  ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",
     "c01a14d7d8ede15d0f784cfd97364ca3c661b384",
