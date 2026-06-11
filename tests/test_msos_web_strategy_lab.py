@@ -75,3 +75,46 @@ def test_nav_enables_strategy_lab() -> None:
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert 'href="/strategy-lab"' in cc
+
+
+def test_expression_planning_route_and_narrative() -> None:
+    page = MSOS_WEB / "src" / "app" / "strategy-lab" / "expression" / "page.tsx"
+    assert page.is_file()
+    text = page.read_text(encoding="utf-8")
+    assert "ExpressionPlanningPanel" in text
+    assert 'activeNavId="expression"' in text
+
+    fixtures = (MSOS_WEB / "src" / "data" / "expressionPlanningFixtures.ts").read_text(
+        encoding="utf-8"
+    )
+    assert "Defined-risk range structure" in fixtures
+    assert "Hyperliquid" in fixtures
+    assert "Pending" in fixtures
+    assert "Profit guarantee" in fixtures
+    assert '"None"' in fixtures
+
+    panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "Order not transmitted" in panel
+    assert "Simulate expression" in panel
+    assert "no live order transmitted" in panel
+    assert "Optimization basis" in panel
+    assert "Expression families" in panel
+
+    persistence = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
+    assert "msos.expression.preview.v1" in persistence
+    assert "simulated" in persistence
+
+    thesis_panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert 'href="/strategy-lab/expression"' in thesis_panel
+
+
+def test_nav_enables_expression_planning() -> None:
+    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+    assert 'id: "expression"' in nav
+    assert 'href: "/strategy-lab/expression"' in nav
+    expression_block = nav.split('id: "expression"')[1].split("monitor")[0]
+    assert "disabled: true" not in expression_block

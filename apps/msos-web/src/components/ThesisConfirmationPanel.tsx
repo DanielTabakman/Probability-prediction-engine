@@ -158,9 +158,9 @@ export function ThesisConfirmationPanel() {
               </button>
             </div>
             {isConfirmed ? (
-              <span className="btn slim primary proceed-cta" aria-disabled="true">
+              <Link href="/strategy-lab/expression" className="btn slim primary proceed-cta">
                 Proceed to expression planning
-              </span>
+              </Link>
             ) : (
               <span className="btn slim primary proceed-cta muted" title="Confirm thesis first">
                 Proceed to expression planning

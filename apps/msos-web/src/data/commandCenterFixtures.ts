@@ -18,7 +18,7 @@ export const navItems: NavItem[] = [
   { id: "command-center", label: "Command Center", href: "/command-center" },
   { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
   { id: "theses", label: "Theses", href: "#", disabled: true },
-  { id: "expression", label: "Expression & Execution", href: "#", disabled: true },
+  { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "#", disabled: true },
   { id: "history", label: "History", href: "#", disabled: true },
 ];
