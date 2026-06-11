@@ -9,7 +9,7 @@ from pathlib import Path
 
 from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_queue import load_queue
-from scripts.ppe_queue_health import audit_queue, repair_queue
+from scripts.ppe_queue_health import audit_queue, chapter_marked_complete_in_repo, repair_queue
 
 
 class TestPpeQueueHealth(unittest.TestCase):
@@ -84,6 +84,27 @@ class TestPpeQueueHealth(unittest.TestCase):
         queue = load_queue(self.repo)
         ready = [i for i in queue["items"] if i.get("status") == "READY"]
         self.assertEqual(ready, [])
+
+    def test_chapter_marked_complete_chapter_status_section(self) -> None:
+        evidence = self.repo / "docs" / "SOP" / "CHAPTER_STATUS_EVIDENCE.md"
+        evidence.write_text(
+            "# Evidence\n\n## Chapter status\n\n**COMPLETE** (implementation)\n",
+            encoding="utf-8",
+        )
+        plan = {
+            "name": "status_section",
+            "slices": [
+                {
+                    "sliceId": "Y-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/CHAPTER_STATUS_EVIDENCE.md"},
+                }
+            ],
+        }
+        plan_path = self.repo / "docs" / "SOP" / "PHASE_PLANS" / "status_section.json"
+        plan_path.write_text(json.dumps(plan), encoding="utf-8")
+        self.assertTrue(
+            chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/status_section.json")
+        )
 
 
 if __name__ == "__main__":

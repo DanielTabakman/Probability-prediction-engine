@@ -108,6 +108,19 @@
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json",
+      "status": "DONE",
+      "reason": "Chart + belief + Polymarket probability method labeling \u2014 next MVP1 priority after MSOS P4",
+      "selectionPrep": "docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md",
+      "doneReason": "operator guard: chapter evidence already COMPLETE in repo"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
+      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
     }
   ]
 }

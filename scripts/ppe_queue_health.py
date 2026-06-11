@@ -45,6 +45,8 @@ def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
         return True
     if re.search(r"chapter\s+\*\*COMPLETE\*\*", head, re.I):
         return True
+    if re.search(r"##\s*Chapter status\s*[\r\n]+\s*\*\*COMPLETE\*\*", head, re.I):
+        return True
     return False
 
 
