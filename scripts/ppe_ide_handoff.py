@@ -443,7 +443,9 @@ def launch_ide_handoff(
         f"Shortcut: {HANDOFF_NOW_REL}.{clip_note}"
     )
     notified = False
-    if notify_enabled() and ntfy_configured():
+    # Watch/loop paths already push IDE_BUILD alerts; phone build gets notify_command_result.
+    skip_push = source in ("auto-watch", "loop-guard")
+    if not skip_push and notify_enabled() and ntfy_configured():
         notified = send_ntfy(title, body, tags=["ppe", "ide", OUTBOUND_TAG], priority="high")
 
     return {

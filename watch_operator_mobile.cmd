@@ -18,7 +18,7 @@ if /i "%~1"=="--once" (
   exit /b %ERRORLEVEL%
 )
 
-set "INTERVAL=120"
+set "INTERVAL=300"
 if /i "%~1"=="--interval" set "INTERVAL=%~2"
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%CD%\scripts\watch_operator_mobile.ps1" -RepoRoot "%CD%" -IntervalSeconds %INTERVAL%

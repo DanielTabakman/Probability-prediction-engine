@@ -10,9 +10,17 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from scripts.ppe_notify_push import OUTBOUND_TAG, ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_notify_push import (
+    OUTBOUND_TAG,
+    apply_snooze_request,
+    format_snooze_until,
+    ntfy_configured,
+    notify_enabled,
+    parse_snooze_args,
+    send_ntfy,
+)
 
-KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help"})
+KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze"})
 
 
 @dataclass(frozen=True)
@@ -99,7 +107,7 @@ def execute_status(repo: Path) -> dict[str, Any]:
     brief = str(result.get("operator_brief") or "")
     stack = result.get("stack") or {}
     body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}"
-    sent = send_ntfy("PPE status", body, tags=["ppe", "cmd", OUTBOUND_TAG])
+    sent = send_ntfy("PPE status", body, tags=["ppe", "cmd", OUTBOUND_TAG], bypass_throttle=True)
     return {"action": "status", "body": body, "notified": sent}
 
 
@@ -115,6 +123,55 @@ def execute_fix(repo: Path, *, note: str = "") -> dict[str, Any]:
     return launch_fix_agent(repo, user_note=note)
 
 
+def execute_snooze(repo: Path, *, note: str = "") -> dict[str, Any]:
+    try:
+        request = parse_snooze_args(note)
+    except ValueError:
+        sent = send_ntfy(
+            "PPE snooze help",
+            "Use: snooze | snooze 6 | snooze 30m | snooze until 08:00 | snooze clear",
+            tags=["ppe", "cmd", OUTBOUND_TAG],
+            priority="low",
+            bypass_snooze=True,
+            bypass_throttle=True,
+        )
+        return {"action": "snooze", "mode": "help", "notified": sent}
+    if request.mode == "clear":
+        payload = apply_snooze_request(request, reason="phone-clear", repo=repo)
+        sent = send_ntfy(
+            "PPE ntfy awake",
+            "Phone pushes resumed.",
+            tags=["ppe", "cmd", OUTBOUND_TAG],
+            priority="low",
+            bypass_snooze=True,
+            bypass_throttle=True,
+        )
+        return {"action": "snooze", "mode": "clear", "notified": sent, "payload": payload}
+    payload = apply_snooze_request(request, reason="phone", repo=repo) or {}
+    until = str(payload.get("until") or "")
+    until_local = format_snooze_until(until)
+    if request.mode == "until":
+        detail = f"No phone pings until {until_local}."
+    else:
+        detail = f"No phone pings for {request.hours:g}h (until {until_local})."
+    sent = send_ntfy(
+        "PPE ntfy snoozed",
+        f"{detail} Send snooze clear to resume early.",
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_snooze=True,
+        bypass_throttle=True,
+    )
+    return {
+        "action": "snooze",
+        "mode": request.mode,
+        "hours": request.hours,
+        "until": until,
+        "until_local": until_local,
+        "notified": sent,
+    }
+
+
 def execute_help(repo: Path) -> dict[str, Any]:
     prefix = f"{command_secret()} " if command_secret() else ""
     body = (
@@ -122,6 +179,7 @@ def execute_help(repo: Path) -> dict[str, Any]:
         f"{prefix}restart - restart stack\n"
         f"{prefix}fix - investigate blocker\n"
         f"{prefix}status - operator status\n"
+        f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
         f"{prefix}help - this list"
     )
     sent = send_ntfy("PPE remote commands", body, tags=["ppe", "cmd", OUTBOUND_TAG], priority="low")
@@ -137,6 +195,8 @@ def execute_command(repo: Path, command: RemoteCommand) -> dict[str, Any]:
         return execute_status(repo)
     if command.name == "fix":
         return execute_fix(repo, note=command.args)
+    if command.name == "snooze":
+        return execute_snooze(repo, note=command.args)
     return execute_help(repo)
 
 
@@ -152,6 +212,8 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             tags=["ppe", "cmd", OUTBOUND_TAG],
         )
     if action in ("build", "fix"):
+        if result.get("notified"):
+            return True
         if result.get("started"):
             sid = result.get("slice_id") or ""
             return send_ntfy(
@@ -166,7 +228,7 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             tags=["ppe", "cmd", OUTBOUND_TAG],
             priority="high",
         )
-    if action == "status":
+    if action in ("status", "snooze"):
         return bool(result.get("notified"))
     return bool(result.get("notified"))
 
