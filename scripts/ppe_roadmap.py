@@ -129,7 +129,14 @@ def _set_roadmap_status(
     return False
 
 
-def _first_pending_with_valid_plan(repo_root: Path, roadmap: dict[str, Any]) -> dict[str, Any] | None:
+def _first_pending_with_valid_plan(
+    repo_root: Path,
+    roadmap: dict[str, Any],
+    *,
+    apply: bool = False,
+) -> dict[str, Any] | None:
+    from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_chapter_evidence_complete
+
     for item in roadmap.get("items") or []:
         if not isinstance(item, dict):
             continue
@@ -137,8 +144,14 @@ def _first_pending_with_valid_plan(repo_root: Path, roadmap: dict[str, Any]) -> 
             continue
         plan = norm_plan(str(item.get("planPath") or ""))
         ok, _ = _plan_valid(repo_root, plan)
-        if ok:
-            return item
+        if not ok:
+            continue
+        if chapter_marked_complete_in_repo(repo_root, plan):
+            if apply:
+                _set_roadmap_status(roadmap, plan, "done")
+                finalize_chapter_evidence_complete(repo_root, plan, apply=True)
+            continue
+        return item
     return None
 
 
@@ -169,7 +182,7 @@ def bootstrap_next_ready(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         return {"bootstrapped": False, "reason": "queue already has READY"}
 
     roadmap = load_roadmap(repo)
-    item = _first_pending_with_valid_plan(repo, roadmap)
+    item = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
     if item is None:
         return {"bootstrapped": False, "reason": "no valid pending roadmap item"}
 
@@ -212,7 +225,7 @@ def advance_after_chapter_closeout(
                 done_reason="marked DONE by ppe_roadmap (chapter closeout)",
             )
 
-    next_item = _first_pending_with_valid_plan(repo, roadmap)
+    next_item = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
     if next_item is None:
         if apply:
             save_roadmap(repo, roadmap)

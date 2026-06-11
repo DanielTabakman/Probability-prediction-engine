@@ -15,6 +15,11 @@ from scripts.ppe_queue import load_queue, save_queue
 Issue = dict[str, Any]
 Fix = dict[str, Any]
 
+BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+BACKLOG_ACTIVE_STATUSES = frozenset({"blocked", "chartered", "queued"})
+BACKLOG_TERMINAL_STATUSES = frozenset({"done", "skipped"})
+FINALIZE_DONE_REASON = "auto-repair: evidence doc shows chapter COMPLETE"
+
 
 def _norm_plan(path: str) -> str:
     return str(path or "").replace("\\", "/").strip()
@@ -48,6 +53,114 @@ def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
     if re.search(r"##\s*Chapter status\s*[\r\n]+\s*\*\*COMPLETE\*\*", head, re.I):
         return True
     return False
+
+
+def finalize_chapter_evidence_complete(
+    repo_root: Path,
+    plan_path: str,
+    *,
+    apply: bool,
+    done_reason: str = FINALIZE_DONE_REASON,
+) -> bool:
+    """Mark queue, roadmap, and backlog done when closeout evidence is COMPLETE."""
+    repo = repo_root.resolve()
+    norm = _norm_plan(plan_path)
+    if not norm or not chapter_marked_complete_in_repo(repo, norm):
+        return False
+    if not apply:
+        return True
+
+    from scripts.ppe_queue import mark_queue_item_done
+
+    mark_queue_item_done(repo, plan_path=norm, done_reason=done_reason)
+
+    try:
+        from scripts.ppe_roadmap import (
+            _set_roadmap_status,
+            load_roadmap,
+            roadmap_enabled,
+            roadmap_path,
+            save_roadmap,
+        )
+
+        if roadmap_enabled(repo) and roadmap_path(repo).is_file():
+            roadmap = load_roadmap(repo)
+            if _set_roadmap_status(roadmap, norm, "done"):
+                save_roadmap(repo, roadmap)
+    except FileNotFoundError:
+        pass
+
+    try:
+        from scripts.ppe_propagate_queue import backlog_path, load_backlog, save_backlog
+
+        if backlog_path(repo).is_file():
+            backlog = load_backlog(repo)
+            for item in backlog.get("items") or []:
+                if not isinstance(item, dict):
+                    continue
+                if _norm_plan(str(item.get("planPath") or "")) == norm:
+                    item["status"] = "done"
+            save_backlog(repo, backlog)
+    except FileNotFoundError:
+        pass
+
+    return True
+
+
+def audit_backlog(repo_root: Path) -> list[Issue]:
+    """Detect backlog rows still active while closeout evidence is COMPLETE."""
+    repo = repo_root.resolve()
+    try:
+        from scripts.ppe_propagate_queue import backlog_path, load_backlog
+    except ImportError:
+        return []
+
+    if not backlog_path(repo).is_file():
+        return []
+
+    backlog = load_backlog(repo)
+    issues: list[Issue] = []
+    for i, item in enumerate(backlog.get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        status = str(item.get("status") or "").strip().lower()
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        if not plan or status not in BACKLOG_ACTIVE_STATUSES:
+            continue
+        if chapter_marked_complete_in_repo(repo, plan):
+            issues.append(
+                {
+                    "code": "BACKLOG_ACTIVE_BUT_EVIDENCE_COMPLETE",
+                    "index": i,
+                    "planPath": plan,
+                    "status": status,
+                    "chapterId": item.get("chapterId"),
+                }
+            )
+    return issues
+
+
+def repair_backlog(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
+    """Mark active backlog rows done when evidence already shows COMPLETE."""
+    repo = repo_root.resolve()
+    fixes: list[Fix] = []
+    issues = audit_backlog(repo)
+    for issue in issues:
+        plan = str(issue.get("planPath") or "")
+        if not plan:
+            continue
+        if apply:
+            finalize_chapter_evidence_complete(repo, plan, apply=True)
+        fixes.append(
+            {
+                "action": "finalize_backlog_evidence_complete",
+                "planPath": plan,
+                "index": issue.get("index"),
+                "reason": FINALIZE_DONE_REASON,
+            }
+        )
+    remaining = audit_backlog(repo) if apply else issues
+    return fixes, remaining
 
 
 def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
@@ -206,12 +319,17 @@ def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue
 
 
 def run_queue_health(repo_root: Path, *, apply: bool) -> dict[str, Any]:
-    fixes, remaining = repair_queue(repo_root, apply=apply)
+    backlog_fixes, backlog_remaining = repair_backlog(repo_root, apply=apply)
+    queue_fixes, queue_remaining = repair_queue(repo_root, apply=apply)
+    fixes = backlog_fixes + queue_fixes
+    remaining = backlog_remaining + queue_remaining
     return {
         "apply": apply,
         "fixes": fixes,
         "fix_count": len(fixes),
         "remaining_issues": remaining,
+        "backlog_issues": backlog_remaining,
+        "queue_issues": queue_remaining,
         "ok": len(remaining) == 0,
     }
 

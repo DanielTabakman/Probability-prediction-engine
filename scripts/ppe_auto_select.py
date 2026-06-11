@@ -24,7 +24,7 @@ from scripts.ppe_manifest import (
     validate_phase_plan,
 )
 from scripts.ppe_queue import QUEUE_REL, find_queue_item_index, load_queue, mark_queue_item_done
-from scripts.ppe_queue_health import repair_queue
+from scripts.ppe_queue_health import chapter_marked_complete_in_repo, repair_backlog, repair_queue
 
 
 def _plan_exists_and_valid(repo_root: Path, plan_path: str) -> list[str]:
@@ -62,13 +62,20 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         errors = _plan_exists_and_valid(repo_root, plan_path)
         if errors:
             return None, f"queue item {i} invalid: " + "; ".join(errors)
+        if chapter_marked_complete_in_repo(repo_root, plan_path):
+            skipped.append(f"{plan_path}: evidence COMPLETE (skip SELECTION)")
+            continue
         try:
-            from scripts.ppe_operator_guards import GUARD_EXIT, evaluate_selection_guards
+            from scripts.ppe_operator_guards import (
+                GUARD_EXIT,
+                GUARD_SKIP_CHAPTER,
+                evaluate_selection_guards,
+            )
 
             guard = evaluate_selection_guards(repo_root, plan_path)
         except FileNotFoundError:
             guard = None
-        if guard is not None and guard.exit_code == GUARD_EXIT:
+        if guard is not None and guard.exit_code in (GUARD_EXIT, GUARD_SKIP_CHAPTER):
             skipped.append(f"{plan_path}: {guard.detail}")
             continue
         reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
@@ -117,7 +124,9 @@ def run_auto_select(
     repo = repo_root.resolve()
 
     if apply and not select_only:
+        backlog_fixes, _ = repair_backlog(repo, apply=True)
         fixes, remaining = repair_queue(repo, apply=True)
+        fixes = backlog_fixes + fixes
         if fixes:
             print(f"ppe_auto_select: queue auto-repair applied {len(fixes)} fix(es)")
         if remaining:

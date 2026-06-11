@@ -127,6 +127,40 @@ class TestPpeRoadmap(unittest.TestCase):
         b = next(i for i in queue["items"] if i["planPath"].endswith("B.json"))
         self.assertEqual(b["status"], "PLANNED")
 
+    def test_bootstrap_skips_evidence_complete_pending(self) -> None:
+        sop = self.repo / "docs" / "SOP"
+        evidence = sop / "EARLY_DONE_EVIDENCE.md"
+        evidence.write_text("# Evidence\n\n**Status:** **COMPLETE** 2026-06-05\n", encoding="utf-8")
+        plan = {
+            "name": "early_done",
+            "sprintSpecPath": "docs/SOP/SPRINT_EARLY.md",
+            "selectionRecord": "docs/SOP/SEL_EARLY.md",
+            "slices": [
+                {
+                    "sliceId": "Early-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/EARLY_DONE_EVIDENCE.md"},
+                }
+            ],
+        }
+        (sop / "PHASE_PLANS" / "EARLY.json").write_text(json.dumps(plan), encoding="utf-8")
+        (sop / "SPRINT_EARLY.md").write_text("# sprint\n", encoding="utf-8")
+        (sop / "SEL_EARLY.md").write_text("# sel\n", encoding="utf-8")
+
+        roadmap = load_roadmap(self.repo)
+        roadmap["items"] = [
+            {"planPath": "docs/SOP/PHASE_PLANS/A.json", "status": "done"},
+            {"planPath": "docs/SOP/PHASE_PLANS/EARLY.json", "status": "pending", "reason": "shipped early"},
+            {"planPath": "docs/SOP/PHASE_PLANS/B.json", "status": "pending", "reason": "real next"},
+        ]
+        save_roadmap(self.repo, roadmap)
+
+        out = bootstrap_next_ready(self.repo, apply=True)
+        self.assertTrue(out.get("bootstrapped"))
+        self.assertEqual(out.get("planPath"), "docs/SOP/PHASE_PLANS/B.json")
+        roadmap = load_roadmap(self.repo)
+        early = next(i for i in roadmap["items"] if i["planPath"].endswith("EARLY.json"))
+        self.assertEqual(early["status"], "done")
+
     def test_roadmap_disabled_by_env(self) -> None:
         os.environ["PPE_AUTO_ROADMAP"] = "0"
         save_manifest(

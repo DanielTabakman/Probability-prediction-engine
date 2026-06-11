@@ -76,6 +76,51 @@ class TestEvaluateConsistencyReport(unittest.TestCase):
 
 
 class TestRunGateIntegration(unittest.TestCase):
+    def test_backlog_evidence_complete_fails_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            sop = repo / "docs" / "SOP"
+            plans = sop / "PHASE_PLANS"
+            plans.mkdir(parents=True)
+            (sop / "PHASE_QUEUE.json").write_text(
+                json.dumps({"version": 1, "items": []}),
+                encoding="utf-8",
+            )
+            (sop / "CHAPTER_DONE_EVIDENCE.md").write_text(
+                "# Evidence\n\n**Status:** **COMPLETE** 2026-06-05\n",
+                encoding="utf-8",
+            )
+            plan = {
+                "name": "done",
+                "slices": [
+                    {
+                        "sliceId": "X-Closeout",
+                        "closeout": {"evidenceDoc": "docs/SOP/CHAPTER_DONE_EVIDENCE.md"},
+                    }
+                ],
+            }
+            (plans / "done.json").write_text(json.dumps(plan), encoding="utf-8")
+            (sop / "PHASE_CHAPTER_BACKLOG.json").write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "items": [
+                            {
+                                "chapterId": "done",
+                                "status": "blocked",
+                                "planPath": "docs/SOP/PHASE_PLANS/done.json",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            result = run_gate(repo, skip_relay=True)
+            self.assertFalse(result["ok"])
+            self.assertTrue(
+                any("BACKLOG_ACTIVE_BUT_EVIDENCE_COMPLETE" in err for err in result["errors"])
+            )
+
     def test_queue_issues_fail_gate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)
