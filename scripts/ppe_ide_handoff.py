@@ -422,6 +422,19 @@ def launch_ide_handoff(
     )
     save_handoff_state(repo, state)
 
+    from scripts.ppe_ide_build_automation_trigger import notify_automation
+
+    automation = notify_automation(
+        repo,
+        handoff={
+            "slice_id": slice_id,
+            "plan_path": plan_path,
+            "starter": starter_rel,
+            "reason": reason,
+            "source": source,
+        },
+    )
+
     title = f"PPE IDE BUILD: {slice_id}"
     clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
     body = (
@@ -446,6 +459,7 @@ def launch_ide_handoff(
         "source": source,
         "reason": reason,
         "notified": notified,
+        "automation": automation,
         "message": f"IDE handoff ready for {slice_id} — open Agent thread with @{starter_rel}",
     }
 

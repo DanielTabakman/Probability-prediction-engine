@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from unittest.mock import patch
 
+from scripts.ppe_ide_build_automation_trigger import TRIGGER_REL
 from scripts.ppe_ide_handoff import (
     BUILD_LOG_REL,
     cli_usage_exhausted,
@@ -52,6 +53,9 @@ def test_launch_ide_handoff_writes_starter(tmp_path, monkeypatch):
     assert result["started"] is True
     assert (tmp_path / "artifacts/orchestrator/IDE_BUILD_STARTER_MVP1-Slice002.md").is_file()
     assert (tmp_path / "artifacts/orchestrator/IDE_BUILD_NOW.md").is_file()
+    trigger = json.loads((tmp_path / TRIGGER_REL).read_text(encoding="utf-8"))
+    assert trigger["status"] == "pending"
+    assert trigger["sliceId"] == "MVP1-Slice002"
 
 
 def test_handoff_debounce(tmp_path, monkeypatch):

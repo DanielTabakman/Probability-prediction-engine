@@ -33,7 +33,7 @@
 5. **Open Cursor** on repo + starter file.
 6. **ntfy:** `PPE IDE BUILD: <sliceId>`.
 
-**Automation (recommended):** Cursor Automation on `IDE_BUILD_NOW.md` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
+**Automation (recommended):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` (not `.md`) — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
 
 **Manual:** new Agent thread → `@` starter → paste handoff prompt.
 

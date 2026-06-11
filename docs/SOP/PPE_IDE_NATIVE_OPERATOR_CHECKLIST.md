@@ -27,7 +27,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 ## When the loop stops (product)
 
 - [ ] Read `artifacts/orchestrator/IDE_BUILD_NOW.md` or `OPERATOR_GUARD_REPORT.md`.
-- [ ] **Automation:** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) on `IDE_BUILD_NOW.md`.
+- [ ] **Automation:** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) on `.cursor/IDE_BUILD_TRIGGER.json`.
 - [ ] **Manual:** `@` `IDE_BUILD_STARTER_<sliceId>.md` — starter includes **## When done**.
 - [ ] If agent committed but stalled: `finish_ide_build.cmd`
 - [ ] Optional: `workflow_metrics.cmd slice close --slice-id <sliceId> --size M --roundtrips N`
