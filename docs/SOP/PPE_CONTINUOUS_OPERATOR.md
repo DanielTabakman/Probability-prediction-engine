@@ -106,9 +106,9 @@ See [`PPE_STEWARD_CURSOR_V1.md`](PPE_STEWARD_CURSOR_V1.md).
 
 ## Adding work
 
-1. **`queued` in backlog** — preferred.
+1. **`blocked` in backlog** — preferred (set `priority`: high / medium / low). See [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md).
 2. **`pending` on roadmap** — manual or steward output (acp).
-3. **`blocked` in backlog** — does not propagate until promoted. Rows with **`planPath`** auto-promote to **`queued`** when all prior backlog rows are `done`/`skipped` (after closeout or on idle `maybe_propagate_queue`).
+3. Rows with **`planPath`** auto-promote to **`queued`** when the backlog pipeline is idle (after closeout or on idle `maybe_propagate_queue`). Highest priority wins.
 
 ## Disable
 
