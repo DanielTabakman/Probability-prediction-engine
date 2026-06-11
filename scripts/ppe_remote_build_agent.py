@@ -188,4 +188,12 @@ def launch_build(repo: Path, *, note: str = "", source: str = "phone") -> dict[s
     )
     if not out.get("started"):
         clear_build_lock(repo)
-    return {"action": "build", "mode": "ide_build", "slice_id": slice_id, "plan_path": plan_path, "starter": starter_rel, "source": source, **out}
+    return {
+        "action": "build",
+        "mode": "ide_build",
+        "slice_id": slice_id,
+        "plan_path": plan_path,
+        "starter": starter_rel,
+        "source": source,
+        **out,
+    }

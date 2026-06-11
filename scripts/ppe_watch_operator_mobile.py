@@ -253,6 +253,10 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     current_blocker = str(status.get("blocker") or "").strip()
     plan = str(status.get("phase_plan_path") or "").strip()
 
+    prior_blocker = str(prior.get("last_blocker") or "").strip()
+    current_blocker = str(status.get("blocker") or "").strip()
+    plan = str(status.get("phase_plan_path") or "").strip()
+
     if prior_verdict in STUCK_VERDICTS and verdict in HEALTHY_VERDICTS:
         body_parts = ["Operator guard cleared — loop can continue."]
         if prior_blocker:
