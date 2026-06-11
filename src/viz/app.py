@@ -99,6 +99,7 @@ from src.viz.distribution_export import (
     build_distribution_export_rows,
     serialize_distribution_export_csv,
 )
+from src.viz.distribution_summary_panel import render_distribution_summary_panel
 from src.viz.app_sidebar import build_sidebar_state
 from src.viz.app_panels import (
     implied_lab_trade_ticket_code_text as _implied_lab_trade_ticket_code_text,
@@ -341,6 +342,7 @@ if show_bitcoin_view:
                     marks_full_fn=_cached_marks_full,
                     now_ms=now_ms_export,
                 )
+                render_distribution_summary_panel(export_rows)
                 st.download_button(
                     "Download distribution stats (CSV)",
                     data=serialize_distribution_export_csv(export_rows).encode("utf-8"),
