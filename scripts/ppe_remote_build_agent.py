@@ -257,6 +257,7 @@ def launch_build(repo: Path, *, note: str = "", source: str = "phone") -> dict[s
         clear_build_lock=True,
         notify_ok_title=f"PPE build finished: {slice_id}",
         notify_fail_title=f"PPE build failed: {slice_id}",
+        handoff={"slice_id": slice_id, "plan_path": plan_path, "source": source},
     )
     if not out.get("started"):
         clear_build_lock(repo)

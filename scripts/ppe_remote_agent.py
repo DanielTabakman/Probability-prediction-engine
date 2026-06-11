@@ -134,6 +134,7 @@ def launch_agent_background(
     clear_build_lock: bool = False,
     notify_ok_title: str = "PPE agent finished",
     notify_fail_title: str = "PPE agent failed",
+    handoff: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Spawn a detached worker so short-lived callers (loop --notify) do not kill the agent."""
     if not agent_available():
@@ -155,6 +156,8 @@ def launch_agent_background(
         "notify_ok_title": notify_ok_title,
         "notify_fail_title": notify_fail_title,
     }
+    if handoff:
+        job["handoff"] = handoff
     job_path.write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8")
 
     try:
