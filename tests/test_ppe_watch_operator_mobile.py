@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from scripts.ppe_watch_operator_mobile import ATTENTION_VERDICTS, watch_once
+from scripts.ppe_watch_operator_mobile import ATTENTION_VERDICTS, _auto_build_retry_due, watch_once
 
 
 def test_watch_once_alerts_on_verdict_change(tmp_path, monkeypatch):
@@ -67,6 +67,15 @@ def test_watch_once_auto_build_on_ide_build(tmp_path, monkeypatch):
     assert result["auto_build"]["started"] is True
     auto_build.assert_called_once()
     assert "auto-build started" in send.call_args[0][0].lower()
+
+
+def test_auto_build_retry_when_never_started():
+    prior = {
+        "last_verdict": "IDE_BUILD",
+        "last_verdict_slice": "MVP1-Slice002",
+        "last_stuck_alert_at": None,
+    }
+    assert _auto_build_retry_due(prior, "IDE_BUILD") is True
 
 
 def test_watch_once_alerts_when_stuck_clears(tmp_path, monkeypatch):

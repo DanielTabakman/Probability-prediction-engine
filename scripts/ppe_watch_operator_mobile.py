@@ -93,7 +93,18 @@ def _auto_build_retry_due(prior: dict[str, Any], verdict: str) -> bool:
         return False
     if not _stuck_alert_due(prior, verdict):
         return False
-    return str(prior.get("last_auto_build_slice") or "") == str(prior.get("last_verdict_slice") or "")
+    verdict_slice = str(prior.get("last_verdict_slice") or "")
+    if not verdict_slice:
+        return False
+    auto_slice = str(prior.get("last_auto_build_slice") or "")
+    last_auto = prior.get("last_auto_build") or {}
+    if not auto_slice:
+        return True
+    if auto_slice != verdict_slice:
+        return False
+    if not last_auto.get("started"):
+        return True
+    return True
 
 
 def _maybe_auto_remote_build(
@@ -125,11 +136,19 @@ def _maybe_auto_remote_build(
     if read_build_lock(repo):
         return None
 
-    prior_slice = str(prior.get("last_auto_build_slice") or "")
+    prior_verdict_slice = str(prior.get("last_verdict_slice") or "")
+    last_auto = prior.get("last_auto_build") or {}
     if not retry:
-        if str(prior.get("last_verdict") or "") == VERDICT_IDE_BUILD and prior_slice == slice_id:
+        if (
+            str(prior.get("last_verdict") or "") == VERDICT_IDE_BUILD
+            and prior_verdict_slice == slice_id
+            and last_auto.get("started")
+            and str(last_auto.get("slice_id") or prior.get("last_auto_build_slice") or "") == slice_id
+        ):
             return None
-    elif prior_slice and prior_slice != slice_id:
+    elif not _auto_build_retry_due(prior, VERDICT_IDE_BUILD):
+        return None
+    elif prior_verdict_slice and prior_verdict_slice != slice_id:
         return None
 
     note = "auto-triggered by mobile watch on IDE_BUILD"

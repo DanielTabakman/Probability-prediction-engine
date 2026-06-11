@@ -132,12 +132,16 @@ def check_operator(repo: Path) -> bool:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Desktop operator bootstrap preflight")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--agent-only", action="store_true", help="Check agent CLI login only")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
     local = repo / "ppe_operator_local.cmd"
     if local.is_file():
         subprocess.run(["cmd", "/c", str(local)], cwd=repo, check=False)
+
+    if args.agent_only:
+        return 0 if check_agent_cli() else 1
 
     checks = [
         check_ntfy(),

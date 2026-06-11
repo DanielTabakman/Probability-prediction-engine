@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.ppe_operator_status import collect_operator_status
-from scripts.ppe_remote_agent import launch_agent_background, notify_agent_done
+from scripts.ppe_remote_agent import launch_agent_background
 
 
 def build_fix_prompt(repo: Path, *, user_note: str = "") -> str:
@@ -27,19 +27,12 @@ def launch_fix_agent(repo: Path, *, user_note: str = "") -> dict[str, Any]:
     repo = repo.resolve()
     prompt = build_fix_prompt(repo, user_note=user_note)
 
-    def _on_complete(result: dict[str, Any]) -> None:
-        notify_agent_done(
-            title_ok="PPE fix finished",
-            title_fail="PPE fix failed",
-            result=result,
-            log_path=repo / "artifacts/orchestrator/REMOTE_FIX_AGENT.log",
-        )
-
     out = launch_agent_background(
         repo,
         prompt=prompt,
         log_name="REMOTE_FIX_AGENT.log",
-        on_complete=_on_complete,
         started_message="Fix agent started on desktop.",
+        notify_ok_title="PPE fix finished",
+        notify_fail_title="PPE fix failed",
     )
     return {"action": "fix", **out}

@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
-import threading
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from scripts.ppe_notify_push import OUTBOUND_TAG, ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_remote_agent_spawn import spawn_python_worker
 
 
 def _utc_now() -> str:
@@ -129,27 +130,49 @@ def launch_agent_background(
     *,
     prompt: str,
     log_name: str,
-    on_complete: Callable[[dict[str, Any]], None] | None,
     started_message: str,
+    clear_build_lock: bool = False,
+    notify_ok_title: str = "PPE agent finished",
+    notify_fail_title: str = "PPE agent failed",
 ) -> dict[str, Any]:
+    """Spawn a detached worker so short-lived callers (loop --notify) do not kill the agent."""
     if not agent_available():
         return {"started": False, "reason": "Need agent CLI (setup_cursor_agent.cmd) or CURSOR_API_KEY"}
 
-    log_path = repo / "artifacts/orchestrator" / log_name
+    repo = repo.resolve()
+    log_path = repo / "artifacts" / "orchestrator" / log_name
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text(f"remote agent log start {_utc_now()}\n", encoding="utf-8")
 
-    def _worker() -> None:
-        result = run_agent(repo, prompt=prompt, log_path=log_path)
-        if on_complete:
-            on_complete(result)
-        else:
-            notify_agent_done(
-                title_ok="PPE agent finished",
-                title_fail="PPE agent failed",
-                result=result,
-                log_path=log_path,
-            )
+    job_dir = repo / "artifacts" / "orchestrator"
+    job_dir.mkdir(parents=True, exist_ok=True)
+    job_path = job_dir / f"REMOTE_AGENT_JOB_{os.getpid()}_{int(datetime.now(timezone.utc).timestamp())}.json"
+    job = {
+        "repo_root": str(repo),
+        "prompt": prompt,
+        "log_name": log_name,
+        "clear_build_lock": clear_build_lock,
+        "notify_ok_title": notify_ok_title,
+        "notify_fail_title": notify_fail_title,
+    }
+    job_path.write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8")
 
-    threading.Thread(target=_worker, name=f"ppe-remote-{log_name}", daemon=True).start()
-    return {"started": True, "message": started_message, "log": str(log_path)}
+    try:
+        proc = spawn_python_worker(
+            repo,
+            "scripts/ppe_remote_agent_worker.py",
+            "--job",
+            str(job_path),
+            "--delete-job",
+        )
+    except OSError as exc:
+        job_path.unlink(missing_ok=True)
+        return {"started": False, "reason": f"failed to spawn worker: {exc}"}
+
+    return {
+        "started": True,
+        "message": started_message,
+        "log": str(log_path),
+        "worker_pid": proc.pid,
+        "job_path": str(job_path),
+    }
