@@ -142,6 +142,8 @@ def send_from_payload(payload_path: Path) -> bool:
 
 
 def send_operator_status(status: dict[str, Any]) -> bool:
+    from scripts.ppe_operator_hint import append_ppe_go_hint
+
     verdict = str(status.get("verdict") or "UNKNOWN")
     title = f"PPE operator: {verdict}"
     lines = [f"VERDICT={verdict}"]
@@ -150,7 +152,7 @@ def send_operator_status(status: dict[str, Any]) -> bool:
     commands = status.get("commands") or []
     if commands:
         lines.append("Next: " + str(commands[0]))
-    body = "\n".join(lines)
+    body = append_ppe_go_hint("\n".join(lines), verdict)
     return send_ntfy(
         title,
         body,

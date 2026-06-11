@@ -88,12 +88,12 @@ def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tupl
             )
         build_branch = str(relay.get("build_branch") or relay.get("buildBranch") or "")
         branch_note = f" Commit on `{build_branch}`." if build_branch else ""
+        from scripts.ppe_operator_hint import PPE_GO_HINT
+
         return (
             True,
             "product_ide_build_required",
-            "Product slice under deterministic relay: run `generate_ide_build_starter.cmd <sliceId> <phasePlan>`, "
-            f"then new Cursor thread.{branch_note} "
-            "Then `mark_ide_product_ready.cmd <sliceId>` and `run_ppe_local.cmd` from repo root.",
+            f"Product slice under deterministic relay.{branch_note} {PPE_GO_HINT}",
         )
 
     decision = str(relay.get("stop_condition") or "").strip()

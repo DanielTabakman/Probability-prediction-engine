@@ -9,6 +9,7 @@ from pathlib import Path
 
 from scripts.ppe_context_bands import ESCALATE_LINE_THRESHOLD, WATCH_LINE_THRESHOLD, classify_line_count
 from scripts.ppe_ide_build_starter import format_ide_build_resume
+from scripts.ppe_operator_hint import PPE_GO_HINT
 from scripts.ppe_manifest import load_phase_plan
 from scripts.ppe_operator_config import _guards_config, guards_enabled, load_operator_config
 from scripts.ppe_phase_plan_window import (
@@ -87,9 +88,9 @@ def write_guard_report(
     out = repo / GUARD_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     resume_block = resume or (
-        "1. **Product slice:** BUILD in Cursor IDE (`docs/SOP/BUILD_PACKET_TEMPLATE.md`), "
-        "commit on `buildBranch`, run `mark_ide_product_ready.cmd`, then `run_ppe_local.cmd`.\n"
-        "2. **Otherwise:** fix the issue, then `run_ppe.cmd` or `run_ppe_auto_local.cmd`."
+        f"1. **You:** `{PPE_GO_HINT}`\n"
+        "2. **Director** handles BUILD, commit, mark ready, and `run_ppe_local`.\n"
+        "3. **Otherwise:** fix the issue, then `ppe_go.cmd` or `run_ppe_operator.cmd`."
     )
     body = f"""# Operator guard stop
 
@@ -303,7 +304,7 @@ def evaluate_continuous_guards(repo: Path, plan_path: str) -> GuardResult:
 
     detail = (
         f"Next product slice [{next_sid}] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). "
-        "IDE BUILD, commit, then `mark_ide_product_ready.cmd <sliceId>`, then `run_ppe_local.cmd`."
+        f"{PPE_GO_HINT}"
     )
     return GuardResult(
         exit_code=GUARD_EXIT,

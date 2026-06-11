@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_operator_hint import append_ppe_go_hint
 from scripts.ppe_operator_status import (
     VERDICT_ERROR,
     VERDICT_FIX_PLAN,
@@ -266,7 +267,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                 alerts.append(
                     (
                         f"PPE IDE handoff: {slice_id or verdict}",
-                        f"{blocker}\nOpen Cursor → new Agent → @{auto_build.get('starter', 'IDE_BUILD_STARTER')}",
+                        append_ppe_go_hint(blocker, VERDICT_IDE_BUILD),
                     )
                 )
             else:
@@ -277,7 +278,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                     )
                 )
         else:
-            alerts.append((f"PPE operator: {verdict}", blocker))
+            alerts.append((f"PPE operator: {verdict}", append_ppe_go_hint(blocker, verdict)))
 
     prior_blocker = str(prior.get("last_blocker") or "").strip()
     current_blocker = str(status.get("blocker") or "").strip()
