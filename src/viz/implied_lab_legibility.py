@@ -90,6 +90,49 @@ FORBIDDEN_PHRASES = (
     "recommended trade",
 )
 
+# Distribution summary table (on-screen stats; same fields as CSV export)
+DIST_SUMMARY_TITLE = "Distribution summary"
+DIST_SUMMARY_ANCHOR_ID = "distribution-summary"
+DIST_HOW_TO_READ_MARKDOWN = """
+**How to read this table**
+
+Each row is one **expiry** and one **method** for terminal BTC price statistics (same numbers as the CSV download).
+
+| Column | Meaning |
+|--------|---------|
+| **Risk-neutral mean** | Expected terminal price under that distribution |
+| **Median (50th %)** | Half of implied outcomes below this price |
+| **Lower / upper quartile** | 25th and 75th percentile of terminal price |
+| **Implied range width** | Upper quartile minus lower quartile — wider = more uncertainty |
+| **Method** | **Model bell (lognormal)** = forward + ATM vol baseline; **Options chain (B–L)** = shape from live call marks |
+
+**Status** — when the options chain cannot be used honestly, the row shows *Skipped* (not enough marks or degenerate fit). Lognormal baseline rows always show computed stats.
+"""
+
+DIST_COL_EXPIRY = "Expiry"
+DIST_COL_METHOD = "Method"
+DIST_COL_MEAN = "Risk-neutral mean"
+DIST_COL_Q25 = "Lower quartile"
+DIST_COL_Q50 = "Median terminal price (50th %)"
+DIST_COL_Q75 = "Upper quartile"
+DIST_COL_RANGE = "Implied range width"
+DIST_COL_STATUS = "Status"
+
+DIST_LABEL_MEAN_HELP = "Expected terminal price under this distribution"
+DIST_LABEL_Q50_HELP = "Half of implied outcomes below this price"
+DIST_LABEL_Q25_HELP = "25th percentile of terminal price"
+DIST_LABEL_Q75_HELP = "75th percentile of terminal price"
+DIST_LABEL_RANGE_HELP = "q75 − q25; wider = more uncertainty"
+
+DIST_METHOD_LOGNORMAL = "Model bell (lognormal)"
+DIST_METHOD_LOGNORMAL_HELP = "Forward + ATM vol baseline"
+DIST_METHOD_BL = "Options chain (B–L)"
+DIST_METHOD_BL_HELP = "Shape from live option marks"
+
+BL_STATUS_SKIPPED_INSUFFICIENT = "Skipped: not enough option marks"
+BL_STATUS_SKIPPED_DEGENERATE = "Skipped: could not fit chain density"
+BL_STATUS_COMPUTED = "From chain"
+
 
 def contains_forbidden_phrase(text: str) -> bool:
     low = (text or "").lower()
