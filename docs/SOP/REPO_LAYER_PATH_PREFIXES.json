@@ -167,6 +167,8 @@
       "typical_plane": "PRODUCT-PLANE",
       "allowed_paths": [
         "apps/msos-web/",
+        "tests/test_msos_web_homepage.py",
+        "tests/test_msos_web_strategy_lab.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_"
@@ -250,6 +252,8 @@
         "tests/test_ppe_ntfy_build.py",
         "tests/test_ppe_ntfy_commands.py",
         "tests/test_ppe_ntfy_listen.py",
+        "tests/test_ppe_guard_notify_dedup.py",
+        "tests/test_ppe_loop_singleton.py",
         "tests/test_ppe_remote_fix_agent.py",
         "tests/test_ppe_remote_agent_spawn.py",
         "tests/test_ppe_ide_handoff.py",
