@@ -225,6 +225,7 @@
       "layer": "dev-factory",
       "typical_plane": "CONTROL-PLANE",
       "allowed_paths": [
+        ".gitignore",
         "scripts/",
         "docs/SOP/",
         "tests/test_ppe_",
