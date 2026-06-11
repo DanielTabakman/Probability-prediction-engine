@@ -7,10 +7,26 @@ import os
 from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
 
 
+def progress_notify_mode() -> str:
+    """off | chapter (default) | all — controls relay/fix progress pings."""
+    raw = os.environ.get("PPE_NTFY_PROGRESS", "chapter").strip().lower()
+    if raw in ("0", "false", "no", "off"):
+        return "off"
+    if raw in ("1", "true", "yes", "on", "all", "full"):
+        return "all"
+    return "chapter"
+
+
 def progress_notify_enabled() -> bool:
-    if os.environ.get("PPE_NTFY_PROGRESS", "").strip().lower() in ("0", "false", "no", "off"):
-        return False
-    return notify_enabled() and ntfy_configured()
+    return progress_notify_mode() != "off" and notify_enabled() and ntfy_configured()
+
+
+def _slice_progress_enabled() -> bool:
+    return progress_notify_mode() == "all"
+
+
+def _fix_progress_enabled() -> bool:
+    return progress_notify_mode() == "all"
 
 
 def notify_slice_complete(
@@ -19,7 +35,7 @@ def notify_slice_complete(
     plan_path: str = "",
     chapter_id: str = "",
 ) -> bool:
-    if not progress_notify_enabled():
+    if not progress_notify_enabled() or not _slice_progress_enabled():
         return False
     title = f"PPE slice done: {slice_id}"
     parts = [f"Slice {slice_id} finished."]
@@ -42,7 +58,7 @@ def notify_fix_working(
     plan_path: str = "",
 ) -> bool:
     """Phone ping when an operator/agent starts fixing a blocked state."""
-    if not progress_notify_enabled():
+    if not progress_notify_enabled() or not _fix_progress_enabled():
         return False
     title = f"PPE fixing: {issue}"
     parts = [f"Working on: {issue}."]
@@ -66,7 +82,7 @@ def notify_fix_resolved(
     plan_path: str = "",
 ) -> bool:
     """Phone ping when a fix attempt finishes (success or still blocked)."""
-    if not progress_notify_enabled():
+    if not progress_notify_enabled() or not _fix_progress_enabled():
         return False
     if verdict:
         title = f"PPE fixed ({verdict}): {issue}"
