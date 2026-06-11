@@ -33,6 +33,45 @@ def _git_sha(repo: Path, ref: str = "HEAD") -> str:
     return proc.stdout.strip() if proc.returncode == 0 else "UNKNOWN"
 
 
+def _materialize_ide_product_in_worktree(
+    wt: Path,
+    marker_repo: Path,
+    *,
+    slice_id: str,
+    phase_plan: Path | None,
+) -> None:
+    """Check out IDE-built product commits in the slice worktree before pytest."""
+    if phase_plan is None:
+        return
+    try:
+        norm_plan = str(phase_plan.relative_to(marker_repo)).replace("\\", "/")
+    except ValueError:
+        norm_plan = str(phase_plan).replace("\\", "/")
+    from scripts.ppe_ide_product_ready import load_marker, marker_covers_product_slices
+
+    if not marker_covers_product_slices(
+        marker_repo, plan_path=norm_plan, product_slice_ids=[slice_id]
+    ):
+        return
+    marker = load_marker(marker_repo)
+    if not marker:
+        return
+    branch = str(marker.get("buildBranch") or "").strip()
+    sha = str(marker.get("commitSha") or "").strip()
+    if branch:
+        _git(marker_repo, "fetch", "origin", branch)
+        _git(wt, "fetch", "origin", branch)
+    for ref in (sha, f"origin/{branch}" if branch else "", branch):
+        ref = ref.strip()
+        if not ref:
+            continue
+        proc = _git(wt, "checkout", "--detach", ref)
+        if proc.returncode == 0:
+            print(f"ppe_slice_worker: worktree at IDE product {ref[:12]}")
+            return
+    print("ppe_slice_worker: warn — could not checkout IDE product ref in worktree")
+
+
 def _pytest_count(repo: Path) -> tuple[str, int]:
     proc = subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
@@ -203,6 +242,13 @@ def execute_deterministic(
     marker_repo: Path | None = None,
 ) -> dict[str, Any]:
     kind = infer_slice_kind(slice_id, slice_obj)
+    if kind == "product" and marker_repo is not None:
+        _materialize_ide_product_in_worktree(
+            repo,
+            marker_repo,
+            slice_id=slice_id,
+            phase_plan=phase_plan,
+        )
     pytest_status, pytest_count = _pytest_count(repo)
     smoke_status = "NOT_RUN"
     run_ids: list[str] = []
