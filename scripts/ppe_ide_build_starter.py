@@ -34,6 +34,25 @@ def starter_path(slice_id: str) -> str:
     return f"{STARTER_DIR}/IDE_BUILD_STARTER_{safe}.md"
 
 
+def format_build_closeout_section(*, slice_id: str, phase_plan: str) -> str:
+    """Closeout steps agents must run after implementing a product slice."""
+    norm_plan = phase_plan.replace("\\", "/").strip()
+    return "\n".join(
+        [
+            "## When done (required)",
+            "",
+            "Execute in order — do not skip:",
+            "",
+            "1. `python scripts/run_pushable_gate.py`",
+            "2. `git commit` on plan `buildBranch` (create branch if needed)",
+            f"3. `mark_ide_product_ready.cmd {slice_id} {norm_plan}`",
+            "4. `run_ppe_local.cmd`",
+            "",
+            "Execute autonomously; do not ask for confirmation.",
+        ]
+    )
+
+
 def format_ide_build_resume(slice_id: str, phase_plan: str) -> str:
     rel = starter_path(slice_id)
     return (
@@ -161,6 +180,8 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         "## Context ritual",
         "",
         _context_ritual_bullets(),
+        "",
+        format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),
         "",
     ]
 

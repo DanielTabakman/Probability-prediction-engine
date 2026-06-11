@@ -320,19 +320,15 @@ def open_cursor_for_handoff(repo: Path, starter_file: Path) -> dict[str, Any]:
 
 
 def build_handoff_prompt(*, slice_id: str, starter_rel: str, plan_path: str) -> str:
+    from scripts.ppe_ide_build_starter import format_build_closeout_section
+
     return "\n".join(
         [
             f"Build product slice **{slice_id}**.",
-            f"Load ONLY `@{starter_rel}`.",
+            f"Load ONLY `@{starter_rel}` (includes **## When done (required)**).",
             f"Phase plan: `{plan_path}`.",
             "",
-            "When done, in order:",
-            "1. python scripts/run_pushable_gate.py",
-            "2. git commit on plan buildBranch",
-            f"3. mark_ide_product_ready.cmd {slice_id} {plan_path}",
-            "4. run_ppe_local.cmd",
-            "",
-            "Execute autonomously; do not ask for confirmation.",
+            format_build_closeout_section(slice_id=slice_id, phase_plan=plan_path),
         ]
     )
 

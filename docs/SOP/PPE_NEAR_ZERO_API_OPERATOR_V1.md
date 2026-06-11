@@ -33,14 +33,18 @@
 5. **Open Cursor** on repo + starter file.
 6. **ntfy:** `PPE IDE BUILD: <sliceId>`.
 
-You: new Agent thread → `@` starter → paste (or type build).
+**Automation (recommended):** Cursor Automation on `IDE_BUILD_NOW.md` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
 
-Then:
+**Manual:** new Agent thread → `@` starter → paste handoff prompt.
+
+Closeout (in starter **## When done** or handoff clipboard):
 
 ```bat
 mark_ide_product_ready.cmd <sliceId> [phasePlan]
 run_ppe_local.cmd
 ```
+
+**Post-build watcher:** if the agent commits but skips closeout, `finish_ide_build.cmd` runs on loop/watch passes.
 
 ---
 
@@ -72,9 +76,9 @@ open_ide_handoff.cmd
 
 ---
 
-## Optional: Cursor Automations
+## Cursor Automations (recommended)
 
-Trigger an IDE Agent run when `IDE_BUILD_NOW.md` changes — uses IDE subscription, not headless CLI. See Cursor Automations in the IDE.
+Full setup: [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md). Prompt: [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md).
 
 ---
 
