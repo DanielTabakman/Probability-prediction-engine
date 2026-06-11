@@ -9,6 +9,7 @@ env/
 *.env.local
 ppe_operator_notify.local.cmd
 ppe_operator_git.local.cmd
+ppe_operator_near_zero_api.local.cmd
 ops/restic/env.local
 
 # Data and DB (optional: remove if you want to track sample DB)
