@@ -53,8 +53,15 @@ Optional one-shot API product slice (when credits exist): `run_product_slice.cmd
 
 ---
 
+## Near-zero API (recommended default)
+
+[`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md) — `autoRemoteBuild: false`, IDE handoff on exit 7, product in Cursor Agent.
+
+---
+
 ## Related
 
+- [`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)
 - [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)

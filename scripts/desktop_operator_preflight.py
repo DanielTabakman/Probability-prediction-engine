@@ -81,6 +81,21 @@ def check_tailscale() -> bool:
     return False
 
 
+def check_agent_cli() -> bool:
+    from scripts.ppe_remote_agent import resolve_agent_cli
+
+    exe = resolve_agent_cli()
+    if not exe:
+        _warn("agent CLI not installed (ntfy fix unavailable — run setup_cursor_agent.cmd)")
+        return True
+    proc = _run([exe, "status"], cwd=Path.cwd())
+    if proc.returncode == 0 and "Not logged in" not in (proc.stdout or ""):
+        _ok("agent CLI logged in")
+        return True
+    _warn("agent CLI not logged in (run: agent login)")
+    return True
+
+
 def check_sshd() -> bool:
     proc = _run(
         ["powershell", "-NoProfile", "-Command", "(Get-Service sshd).Status"],
@@ -117,6 +132,7 @@ def check_operator(repo: Path) -> bool:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Desktop operator bootstrap preflight")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--agent-only", action="store_true", help="Check agent CLI login only")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -124,8 +140,12 @@ def main(argv: list[str] | None = None) -> int:
     if local.is_file():
         subprocess.run(["cmd", "/c", str(local)], cwd=repo, check=False)
 
+    if args.agent_only:
+        return 0 if check_agent_cli() else 1
+
     checks = [
         check_ntfy(),
+        check_agent_cli(),
         check_git_identity(),
         check_gh(),
         check_tailscale(),

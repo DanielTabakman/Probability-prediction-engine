@@ -169,7 +169,13 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
             errors.append(f"guard evaluation failed: {exc}")
 
     stale = _stale_running(repo, manifest_status=manifest_status)
-    product_slice = _primary_product_slice(plan_path or "", guard)
+    product_slice: str | None = None
+    if plan_path and guard.reason == "PRODUCT_BLOCKED":
+        from scripts.ppe_ide_product_ready import next_pending_product_slice
+
+        product_slice = next_pending_product_slice(repo, plan_path=plan_path)
+    if not product_slice:
+        product_slice = _primary_product_slice(plan_path or "", guard)
 
     verdict = VERDICT_RUN_AUTO
     exit_code = 0
@@ -322,26 +328,23 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
 
 
 def _maybe_auto_remote_build(repo: Path, status: dict[str, Any]) -> dict[str, Any] | None:
-    """Start agent CLI when loop hits IDE_BUILD guard stop (no phone tap required)."""
+    """CLI build or IDE handoff when loop hits IDE_BUILD guard stop."""
     if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
         return None
     try:
+        from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
         from scripts.ppe_operator_config import auto_remote_build_enabled
-        from scripts.ppe_remote_agent import agent_available
-        from scripts.ppe_remote_build_agent import launch_build, read_build_lock, resolve_build_target
+        from scripts.ppe_remote_build_agent import read_build_lock
     except ImportError:
         return None
-    if not auto_remote_build_enabled(repo) or not agent_available():
+    if not auto_remote_build_enabled(repo) and not ide_handoff_enabled(repo):
         return None
     if read_build_lock(repo):
         return None
-    target = resolve_build_target(repo)
-    if not target.get("ok") or target.get("mode") != "ide_build":
-        return None
-    return launch_build(
+    return respond_to_ide_build(
         repo,
-        note="auto-triggered by operator loop on IDE_BUILD guard stop",
         source="loop-guard",
+        note="auto-triggered by operator loop on IDE_BUILD guard stop",
     )
 
 
@@ -359,14 +362,21 @@ def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
         check=False,
     )
     if auto_build and auto_build.get("started"):
+        mode = str(auto_build.get("mode") or auto_build.get("action") or "build")
+        if mode == "ide_handoff":
+            title = f"PPE IDE handoff: {auto_build.get('slice_id') or 'IDE_BUILD'}"
+            body = str(auto_build.get("message") or "Open Cursor Agent with IDE_BUILD_STARTER.")
+        else:
+            title = f"PPE auto-build started: {auto_build.get('slice_id') or 'IDE_BUILD'}"
+            body = str(auto_build.get("message") or "Agent CLI running on desktop.")
         subprocess.run(
             [
                 sys.executable,
                 str(push),
                 "--title",
-                f"PPE auto-build started: {auto_build.get('slice_id') or 'IDE_BUILD'}",
+                title,
                 "--body",
-                str(auto_build.get("message") or "Agent CLI running on desktop."),
+                body,
                 "--verdict",
                 VERDICT_IDE_BUILD,
             ],
