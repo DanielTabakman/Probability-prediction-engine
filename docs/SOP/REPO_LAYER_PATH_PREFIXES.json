@@ -167,7 +167,8 @@
       "typical_plane": "PRODUCT-PLANE",
       "allowed_paths": [
         "apps/msos-web/",
-        "tests/test_msos_web_",
+        "tests/test_msos_web_homepage.py",
+        "tests/test_msos_web_strategy_lab.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_"

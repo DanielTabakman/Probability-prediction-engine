@@ -150,7 +150,10 @@ def _path_matches_prefix(path: str, prefix: str) -> bool:
         return False
     if pref.endswith("/"):
         return p.startswith(pref) or p == pref.rstrip("/")
-    return p == pref or p.startswith(pref + "/")
+    if p == pref or p.startswith(pref + "/"):
+        return True
+    # Prefix entries like tests/test_msos_web_ match tests/test_msos_web_strategy_lab.py
+    return len(p) > len(pref) and p.startswith(pref)
 
 
 def path_allowed(path: str, scope: LayerScope) -> bool:
