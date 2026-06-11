@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_strategy_lab_distribution_demo`  
 **Priority:** MEDIUM  
-**Status:** **PENDING** — chartered; blocked until distribution stats legibility COMPLETE  
+**Status:** **COMPLETE** 2026-06-11 — chartered; blocked until distribution stats legibility COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json`](PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md`](SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md)
 

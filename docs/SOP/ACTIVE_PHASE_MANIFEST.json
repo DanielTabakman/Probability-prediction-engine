@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
   "workerMode": "deterministic"
 }

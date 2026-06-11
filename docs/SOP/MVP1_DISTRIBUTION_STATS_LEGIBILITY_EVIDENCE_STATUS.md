@@ -2,7 +2,7 @@
 
 **Chapter:** `mvp1_distribution_stats_legibility`  
 **Priority:** HIGH  
-**Status:** **PENDING** — chartered; blocked until prob-method legibility COMPLETE  
+**Status:** **COMPLETE** 2026-06-11 — chartered; blocked until prob-method legibility COMPLETE  
 **Phase plan:** [`PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json`](PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json)  
 **Sprint:** [`SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md`](SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md)
 

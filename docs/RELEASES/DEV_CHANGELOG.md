@@ -2,6 +2,11 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-11
+
+- **Chapter closed:** MSOS Strategy Lab distribution demo (`MSOS-DistDemo-Closeout-Slice005`)
+- **Chapter closed:** MVP1 distribution stats legibility (`MVP1-DistStatsLeg-Closeout-Slice005`)
+
 ## 2026-06-05
 
 - `b32f955` — ci: fix docker_entrypoint Streamlit health check hang (#88)
