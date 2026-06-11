@@ -36,6 +36,29 @@ When the loop stops for a **product** slice:
 6. **`run_ppe_local.cmd`** — finish smoke/closeout for that chapter.
 7. Loop continues on the next pass (marker cleared after successful `run_ppe_local`).
 
+### Director agents (optional — thinner IDE handoff)
+
+The terminal loop stays the infinite driver. Cursor agents only handle **interrupts** (`IDE_BUILD`, `RUN_LOCAL`, blockers).
+
+| Agent | Role |
+|-------|------|
+| `@ppe-director` | Read `OPERATOR_STATUS.md`; spawn workers; never run `run_ppe_auto_local_loop` |
+| `@ppe-build-worker` | One product slice from `IDE_BUILD_STARTER_*.md` → gate → commit → mark ready → `run_ppe_local` |
+| `@ppe-finish-worker` | `RUN_LOCAL` only — `run_ppe_local.cmd` when marker present |
+| `@ppe-triage-worker` | `FIX_PLAN` / `STALE_STATE` / `ERROR` diagnosis |
+
+Definitions: [`.cursor/agents/`](../.cursor/agents/).
+
+**Invoke after ntfy `IDE_BUILD`:**
+
+```text
+@ppe-director Director pass. Terminal loop running. Read OPERATOR_STATUS and act.
+```
+
+**After 3+ dispatches or a chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `@ppe-director` again.
+
+**Optional Automation (hands-off happy path):** Cursor Automation on `artifacts/orchestrator/IDE_BUILD_NOW.md` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `@ppe-director` for exceptions.
+
 ---
 
 ## Two profiles
@@ -81,7 +104,7 @@ Requires commits on the plan `buildBranch` ahead of baseline. Cleared automatica
 
 | Signal | You do |
 |--------|--------|
-| Guard exit **7** / `PRODUCT_BLOCKED` | IDE BUILD → commit → **mark ready** → `run_ppe_local.cmd` |
+| Guard exit **7** / `PRODUCT_BLOCKED` | `@ppe-director` or manual IDE BUILD → commit → **mark ready** → `run_ppe_local.cmd` |
 | `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | Fix plan/spec; see guard report |
 | `SCOPE_AMBIGUITY` on product slice | Same as product blocked |
 | Queue idle, no `READY` | Add `queued` row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |
@@ -109,3 +132,4 @@ Suggested pattern:
 - [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md)
 - [`PPE_WORKER_MODES_V1.md`](PPE_WORKER_MODES_V1.md)
 - [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md)
+- [`.cursor/agents/`](../.cursor/agents/) — `ppe-director`, `ppe-build-worker`, `ppe-finish-worker`, `ppe-triage-worker`
