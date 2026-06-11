@@ -132,9 +132,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
+      "status": "PLANNED",
+      "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md"
     }
   ]
 }

@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos strategy lab distribution demo **COMPLETE** 2026-06-11
+- Active MVP1 focus: **none** — msos p5 thesis confirmation + durable state **COMPLETE** 2026-06-11
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P5_THESIS_CONFIRM_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS Strategy Lab distribution demo COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS P5 thesis confirmation + durable state COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -52,4 +52,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-06-11 — MSOS Strategy Lab distribution demo COMPLETE; closeout job `MSOS-DistDemo-Closeout-Slice005`.
+2026-06-11 — MSOS P5 thesis confirmation + durable state COMPLETE; closeout job `MSOS-P5-Closeout-Slice005`.

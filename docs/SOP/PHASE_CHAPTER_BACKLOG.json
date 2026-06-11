@@ -125,7 +125,7 @@
     },
     {
       "chapterId": "msos_p5_thesis_confirm",
-      "status": "chartered",
+      "status": "done",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P5",
@@ -133,7 +133,7 @@
     },
     {
       "chapterId": "msos_p6_expression_sim",
-      "status": "blocked",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P6",
