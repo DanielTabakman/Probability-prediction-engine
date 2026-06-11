@@ -35,6 +35,7 @@
     "enabled": true,
     "openCursor": true,
     "skipCliWhenUsageExhausted": true,
-    "preferIdeOverCli": true
+    "preferIdeOverCli": true,
+    "postBuildWatcher": true
   }
 }

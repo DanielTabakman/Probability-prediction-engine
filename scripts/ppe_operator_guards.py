@@ -290,19 +290,19 @@ def evaluate_continuous_guards(repo: Path, plan_path: str) -> GuardResult:
     if not product_slices:
         return GuardResult(exit_code=0, plan_path=norm_plan)
 
-    from scripts.ppe_ide_product_ready import marker_covers_product_slices
+    from scripts.ppe_ide_product_ready import next_pending_product_slice
 
-    if marker_covers_product_slices(repo, plan_path=norm_plan, product_slice_ids=product_slices):
+    next_sid = next_pending_product_slice(repo, plan_path=norm_plan)
+    if next_sid is None:
         return GuardResult(
             exit_code=0,
             reason="IDE_MARKER_OK",
-            detail="IDE product marker present",
+            detail="All product slices marked in IDE_PRODUCT_READY",
             plan_path=norm_plan,
         )
 
-    ids = ", ".join(product_slices)
     detail = (
-        f"Phase plan contains product slice(s) [{ids}] but PPE_SKIP_ACP=1 and no valid IDE_PRODUCT_READY marker. "
+        f"Next product slice [{next_sid}] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). "
         "IDE BUILD, commit, then `mark_ide_product_ready.cmd <sliceId>`, then `run_ppe_local.cmd`."
     )
     return GuardResult(
@@ -326,9 +326,11 @@ def run_continuous_guards(repo: Path, plan_path: str) -> int:
     if result.exit_code == GUARD_EXIT:
         resume = None
         if result.reason == "PRODUCT_BLOCKED":
-            product_slices = _plan_product_slice_ids(repo, norm_plan)
-            if product_slices:
-                resume = format_ide_build_resume(product_slices[0], norm_plan)
+            from scripts.ppe_ide_product_ready import next_pending_product_slice
+
+            next_sid = next_pending_product_slice(repo, plan_path=norm_plan)
+            if next_sid:
+                resume = format_ide_build_resume(next_sid, norm_plan)
         return _guard_stop(
             repo,
             reason=result.reason,

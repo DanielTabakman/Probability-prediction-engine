@@ -361,6 +361,17 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         if auto_build.get("started") and auto_build.get("slice_id"):
             new_state["last_auto_build_slice"] = auto_build.get("slice_id")
             new_state["last_auto_build_at"] = _utc_now()
+
+    post_finish: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_post_build_watcher import try_finish_pending_ide_build
+
+        post_finish = try_finish_pending_ide_build(repo)
+        if post_finish and post_finish.get("started"):
+            new_state["last_post_build_finish"] = post_finish
+    except Exception as exc:
+        post_finish = {"action": "post_build_watcher", "error": str(exc)}
+
     save_state(repo, new_state)
 
     return {
@@ -370,6 +381,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "alerts_sent": sent,
         "heartbeat_sent": heartbeat_sent,
         "auto_build": auto_build,
+        "post_build_finish": post_finish,
         "state_path": str(state_path(repo)),
     }
 

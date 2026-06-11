@@ -58,11 +58,42 @@ class TestPpeOperatorGuards(unittest.TestCase):
         rc = run_continuous_guards(self.repo, "docs/SOP/PHASE_PLANS/test_relay.json")
         self.assertEqual(rc, GUARD_EXIT)
         report = self.repo / "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md"
+        text = report.read_text(encoding="utf-8")
         self.assertTrue(report.is_file())
-        self.assertIn("PRODUCT_BLOCKED", report.read_text(encoding="utf-8"))
-        self.assertIn("IDE_BUILD_STARTER", report.read_text(encoding="utf-8"))
+        self.assertIn("PRODUCT_BLOCKED", text)
+        self.assertIn("[Ch-Product-Slice002]", text)
+        self.assertIn("IDE_BUILD_STARTER", text)
 
-    @patch("scripts.ppe_ide_product_ready.marker_covers_product_slices", return_value=True)
+    def test_product_guard_shows_next_pending_only(self) -> None:
+        from scripts.ppe_ide_product_ready import write_marker
+
+        plan = {
+            "sprintSpecPath": "docs/SOP/SPRINT_TEST.md",
+            "slices": [
+                {"sliceId": "Ch-Control-Slice001"},
+                {"sliceId": "Ch-Product-Slice002"},
+                {"sliceId": "Ch-Product-Slice003"},
+                {"sliceId": "Ch-Closeout-Slice004", "closeout": True},
+            ],
+        }
+        plan_rel = "docs/SOP/PHASE_PLANS/multi.json"
+        path = self.repo / "docs" / "SOP" / "PHASE_PLANS" / "multi.json"
+        path.write_text(json.dumps(plan), encoding="utf-8")
+        write_marker(
+            self.repo,
+            phase_plan_path=plan_rel,
+            slice_id="Ch-Product-Slice002",
+            build_branch="main",
+            commit_sha="abc123",
+        )
+        rc = run_continuous_guards(self.repo, plan_rel)
+        self.assertEqual(rc, GUARD_EXIT)
+        detail = (self.repo / "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("[Ch-Product-Slice003]", detail)
+        bracket = detail.split("[", 1)[1].split("]", 1)[0]
+        self.assertNotIn("Ch-Product-Slice002", bracket)
+
+    @patch("scripts.ppe_ide_product_ready.next_pending_product_slice", return_value=None)
     def test_product_plan_ok_with_marker(self, *_m: object) -> None:
         rc = run_continuous_guards(self.repo, "docs/SOP/PHASE_PLANS/test_relay.json")
         self.assertEqual(rc, 0)
