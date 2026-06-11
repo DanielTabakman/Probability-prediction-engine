@@ -439,8 +439,15 @@ def main(argv: list[str] | None = None) -> int:
         print(_format_human(status), end="")
 
     if args.notify and status.get("verdict") in STOP_VERDICTS:
-        _write_notify_payload(repo, status)
-        _notify_windows(repo, status=status)
+        from scripts.ppe_guard_notify_dedup import record_guard_notify, should_skip_guard_notify
+
+        if should_skip_guard_notify(repo, status):
+            if not args.brief and not args.json:
+                print("ppe_operator_status: guard notify skipped (dedup cooldown)")
+        else:
+            _write_notify_payload(repo, status)
+            _notify_windows(repo, status=status)
+            record_guard_notify(repo, status)
 
     return int(status.get("exit_code") or 0)
 

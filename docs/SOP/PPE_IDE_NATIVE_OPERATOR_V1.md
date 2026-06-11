@@ -44,7 +44,7 @@ Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/
 
 **After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `ppe_go.cmd` again.
 
-**Optional Automation (zero-click happy path):** Cursor Automation on `artifacts/orchestrator/IDE_BUILD_NOW.md` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
+**Optional Automation (zero-click happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
 
 ---
 

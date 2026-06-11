@@ -22,7 +22,13 @@ MANIFEST = SOP / "ACTIVE_PHASE_MANIFEST.json"
 HOUSEKEEPING_PLAN = "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json"
 MVP1_LEGIBILITY_PLAN = "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json"
 MVP1_DIST_STATS_PLAN = "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json"
-ALLOWED_READY_PLANS = (HOUSEKEEPING_PLAN, MVP1_LEGIBILITY_PLAN, MVP1_DIST_STATS_PLAN)
+MSOS_DIST_DEMO_PLAN = "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json"
+ALLOWED_READY_PLANS = (
+    HOUSEKEEPING_PLAN,
+    MVP1_LEGIBILITY_PLAN,
+    MVP1_DIST_STATS_PLAN,
+    MSOS_DIST_DEMO_PLAN,
+)
 
 
 def test_p4_charter_artifacts_exist() -> None:

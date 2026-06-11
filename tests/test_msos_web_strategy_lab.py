@@ -19,8 +19,10 @@ def test_strategy_lab_route_and_shell() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab / PPE / Options Distribution Lens" in content
-    assert "Strategy Lab — PPE Tool" in content
+    assert "Strategy Lab / PPE / Distribution summary" in content
+    assert "Strategy Lab — research demo" in content
+    assert "Live via PPE when embed wired" in content
+    assert "Distribution summary (live PPE)" in content
     assert "PpeEmbedBoundary" in content
     assert "no live order transmitted" in content
 
@@ -28,6 +30,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in embed
     assert "iframe" in embed
     assert "degraded" in embed.lower() or "Embed pending" in embed
+    assert "distribution-summary" in embed
+    assert "Live via PPE" in embed
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:

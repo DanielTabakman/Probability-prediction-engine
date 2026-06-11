@@ -169,8 +169,8 @@ def run_auto_select(
         _print_result(selected=ok, plan_path=current_plan, reason=reason)
         return 0
 
-    if status in {"READY", "RUNNING"}:
-        _print_result(selected=False, plan_path=current_plan or None, reason=f"manifest is {status}")
+    if status in {"READY", "RUNNING"} and current_plan:
+        _print_result(selected=False, plan_path=current_plan, reason=f"manifest is {status}")
         return 0
 
     if status == "COMPLETE" and current_plan:

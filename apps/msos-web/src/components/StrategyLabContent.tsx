@@ -8,13 +8,13 @@ export function StrategyLabContent() {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab / PPE / Options Distribution Lens</div>
-          <h1 className="title">Strategy Lab — PPE Tool</h1>
+          <div className="crumb">Strategy Lab / PPE / Distribution summary</div>
+          <h1 className="title">Strategy Lab — research demo</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Preview data healthy
+            Live via PPE when embed wired
           </span>
           <span className="btn slim">Share view</span>
           <span className="btn slim primary">Save draft thesis</span>
@@ -41,14 +41,15 @@ export function StrategyLabContent() {
               I believe BTC will <span className="selectchip">remain within a narrower range</span> than the market
               prices over <span className="selectchip">30 days</span>.
             </div>
-            <p className="micro">Natural thesis builder first; PPE controls live in the embedded lab below.</p>
+            <p className="micro">Natural thesis builder first; authoritative stats live in the embedded PPE lab below.</p>
           </div>
 
           <div className="panel-head">
             <div>
-              <h2>Market-implied vs reference vs your belief</h2>
+              <h2>Distribution summary (live PPE)</h2>
               <div className="panel-sub">
-                Reference model: <span className="teal">Historical realised-vol benchmark</span> · alternatives in PPE
+                Research-demo path: embedded implied lab shows labeled mean and quartiles per expiry — math stays in
+                Python / Streamlit.
               </div>
             </div>
             <span className="tag">PPE</span>
@@ -116,7 +117,7 @@ export function StrategyLabContent() {
         </div>
       </section>
 
-      <p className="footer-note">Illustrative product storyboard — no live order transmitted</p>
+      <p className="footer-note">Research demo — fixture panels beside live PPE embed; no live order transmitted</p>
     </>
   );
 }

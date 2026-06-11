@@ -123,7 +123,7 @@ def execute_help(repo: Path) -> dict[str, Any]:
         f"{prefix}build - IDE BUILD for queued slice\n"
         f"Desktop: {PPE_GO_HINT}\n"
         f"{prefix}restart - restart stack\n"
-        f"{prefix}fix - investigate blocker\n"
+        f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
         f"{prefix}status - operator status\n"
         f"{prefix}help - this list"
     )
@@ -154,17 +154,21 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             f"killed={result.get('killed')} loop={stack.get('loop_running')}",
             tags=["ppe", "cmd", OUTBOUND_TAG],
         )
-    if action in ("build", "fix"):
+    if command.name in ("build", "fix"):
         if result.get("started"):
-            sid = result.get("slice_id") or ""
+            if result.get("notified"):
+                return True
+            label = result.get("slice_id") or result.get("verdict") or ""
             return send_ntfy(
-                f"PPE {action} started{(' ' + sid) if sid else ''}",
+                f"PPE {command.name} started{(' ' + label) if label else ''}",
                 str(result.get("message") or "started"),
                 tags=["ppe", "cmd", OUTBOUND_TAG],
                 priority="high",
             )
+        if result.get("debounced"):
+            return False
         return send_ntfy(
-            f"PPE {action} failed",
+            f"PPE {command.name} failed",
             str(result.get("reason") or "did not start"),
             tags=["ppe", "cmd", OUTBOUND_TAG],
             priority="high",

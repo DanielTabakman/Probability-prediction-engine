@@ -23,9 +23,20 @@ def build_fix_prompt(repo: Path, *, user_note: str = "") -> str:
     return "\n".join(parts)
 
 
-def launch_fix_agent(repo: Path, *, user_note: str = "") -> dict[str, Any]:
+def launch_fix_cli(
+    repo: Path,
+    *,
+    user_note: str = "",
+    source: str = "phone",
+    status: dict[str, Any] | None = None,
+    prompt: str | None = None,
+) -> dict[str, Any]:
+    """Start headless CLI fix worker only (no IDE handoff)."""
     repo = repo.resolve()
-    prompt = build_fix_prompt(repo, user_note=user_note)
+    if status is None:
+        status = collect_operator_status(repo)
+    if prompt is None:
+        prompt = build_fix_prompt(repo, user_note=user_note)
 
     out = launch_agent_background(
         repo,
@@ -34,5 +45,19 @@ def launch_fix_agent(repo: Path, *, user_note: str = "") -> dict[str, Any]:
         started_message="Fix agent started on desktop.",
         notify_ok_title="PPE fix finished",
         notify_fail_title="PPE fix failed",
+        handoff={
+            "mode": "fix",
+            "verdict": str(status.get("verdict") or "UNKNOWN"),
+            "blocker": str(status.get("blocker") or ""),
+            "source": source,
+            "user_note": user_note,
+        },
     )
     return {"action": "fix", **out}
+
+
+def launch_fix_agent(repo: Path, *, user_note: str = "") -> dict[str, Any]:
+    """Phone fix: CLI when allowed, otherwise IDE handoff."""
+    from scripts.ppe_remote_agent_dispatch import respond_remote_agent
+
+    return respond_remote_agent(repo, mode="fix", source="phone", note=user_note)

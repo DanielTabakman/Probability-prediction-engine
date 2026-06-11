@@ -85,6 +85,23 @@ class TestPpeAutoSelect(unittest.TestCase):
         queue = load_queue(self.repo)
         self.assertEqual(queue["items"][1]["status"], "DONE")
 
+    def test_ready_without_plan_selects_next(self) -> None:
+        save_manifest(
+            self.repo,
+            {
+                "phasePlanPath": "",
+                "status": "READY",
+                "notes": "cleared after closeout",
+            },
+        )
+        rc = run_auto_select(self.repo, apply=True, select_only=False, mark_done=False, force=False)
+        self.assertEqual(rc, 0)
+        manifest = load_manifest(self.repo)
+        self.assertEqual(
+            manifest["phasePlanPath"],
+            "docs/SOP/PHASE_PLANS/chapter_b.json",
+        )
+
     def test_idle_when_no_ready_items(self) -> None:
         save_manifest(
             self.repo,

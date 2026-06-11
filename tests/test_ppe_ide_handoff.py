@@ -5,15 +5,19 @@ from __future__ import annotations
 import json
 from unittest.mock import patch
 
+from scripts.ppe_ide_build_automation_trigger import TRIGGER_REL
 from scripts.ppe_ide_handoff import (
     BUILD_LOG_REL,
     cli_usage_exhausted,
     handoff_recently_done,
+    launch_ide_fix_handoff,
     launch_ide_handoff,
     mark_cli_usage_exhausted,
+    maybe_handoff_after_cli_failure,
     prefer_ide_over_cli,
     respond_to_ide_build,
     should_attempt_cli_build,
+    should_attempt_headless_cli,
     text_indicates_usage_exhausted,
 )
 from scripts.ppe_ide_product_ready import next_pending_product_slice, write_marker
@@ -52,6 +56,9 @@ def test_launch_ide_handoff_writes_starter(tmp_path, monkeypatch):
     assert result["started"] is True
     assert (tmp_path / "artifacts/orchestrator/IDE_BUILD_STARTER_MVP1-Slice002.md").is_file()
     assert (tmp_path / "artifacts/orchestrator/IDE_BUILD_NOW.md").is_file()
+    trigger = json.loads((tmp_path / TRIGGER_REL).read_text(encoding="utf-8"))
+    assert trigger["status"] == "pending"
+    assert trigger["sliceId"] == "MVP1-Slice002"
 
 
 def test_handoff_debounce(tmp_path, monkeypatch):
@@ -127,3 +134,46 @@ def test_respond_skips_cli_when_usage_exhausted(tmp_path, monkeypatch):
     assert result["mode"] == "ide_handoff"
     assert result["started"] is True
     assert result.get("cli_attempted") is False
+
+
+def test_should_attempt_headless_cli_fix_ignores_auto_remote_build(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_AUTO_REMOTE_BUILD", "0")
+    assert should_attempt_headless_cli(tmp_path, mode="fix") is True
+    assert should_attempt_cli_build(tmp_path) is False
+
+
+def test_launch_ide_fix_handoff_writes_now_doc(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NOTIFY", "0")
+    monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
+    result = launch_ide_fix_handoff(
+        tmp_path,
+        verdict="ERROR",
+        blocker="gate failed",
+        prompt="Investigate and fix.",
+        source="test",
+        reason="usage exhausted",
+        force=True,
+    )
+    assert result["started"] is True
+    assert (tmp_path / "artifacts/orchestrator/IDE_FIX_NOW.md").is_file()
+    assert "ERROR" in (tmp_path / "artifacts/orchestrator/IDE_FIX_NOW.md").read_text(encoding="utf-8")
+
+
+def test_worker_fix_failure_triggers_handoff(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NOTIFY", "0")
+    monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
+    job = {
+        "log_name": "REMOTE_FIX_AGENT.log",
+        "handoff": {
+            "mode": "fix",
+            "verdict": "ERROR",
+            "blocker": "smoke",
+            "source": "phone",
+            "user_note": "",
+        },
+    }
+    with patch("scripts.ppe_remote_fix_agent.collect_operator_status", return_value={"verdict": "ERROR", "blocker": "smoke", "commands": []}):
+        result = maybe_handoff_after_cli_failure(tmp_path, job, {"ok": False, "stderr_head": "failed"})
+    assert result is not None
+    assert result.get("verdict") == "ERROR"
+    assert (tmp_path / "artifacts/orchestrator/IDE_FIX_NOW.md").is_file()
