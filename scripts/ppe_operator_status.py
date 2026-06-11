@@ -169,7 +169,13 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
             errors.append(f"guard evaluation failed: {exc}")
 
     stale = _stale_running(repo, manifest_status=manifest_status)
-    product_slice = _primary_product_slice(plan_path or "", guard)
+    product_slice: str | None = None
+    if plan_path and guard.reason == "PRODUCT_BLOCKED":
+        from scripts.ppe_ide_product_ready import next_pending_product_slice
+
+        product_slice = next_pending_product_slice(repo, plan_path=plan_path)
+    if not product_slice:
+        product_slice = _primary_product_slice(plan_path or "", guard)
 
     verdict = VERDICT_RUN_AUTO
     exit_code = 0

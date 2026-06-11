@@ -161,4 +161,16 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
         _set("PPE_OPERATOR_PROFILE", profile)
     if auto_remote_build_enabled(repo_root):
         _set("PPE_AUTO_REMOTE_BUILD", "1")
+    else:
+        _set("PPE_AUTO_REMOTE_BUILD", "0")
+    handoff = cfg.get("ideHandoff")
+    if isinstance(handoff, dict) and handoff.get("enabled") is not False:
+        _set("PPE_IDE_HANDOFF", "1")
+        if handoff.get("preferIdeOverCli") is True or cfg.get("autoRemoteBuild") is False:
+            _set("PPE_PREFER_IDE_OVER_CLI", "1")
+            _set("PPE_FORCE_IDE_HANDOFF", "1")
+        if handoff.get("openCursor") is not False:
+            _set("PPE_IDE_HANDOFF_OPEN", "1")
+        if handoff.get("skipCliWhenUsageExhausted") is not False:
+            _set("PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED", "1")
     return {"applied": True, "config": cfg, "config_path": str(operator_config_path(repo_root))}

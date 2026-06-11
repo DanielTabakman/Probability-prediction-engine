@@ -91,6 +91,40 @@ def open_cursor_on_handoff(repo: Path) -> bool:
     return True
 
 
+def clipboard_on_handoff_enabled() -> bool:
+    env = os.environ.get("PPE_IDE_HANDOFF_CLIPBOARD", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    return True
+
+
+def prefer_ide_over_cli(repo: Path) -> bool:
+    """When True, never start headless agent CLI — use IDE handoff only."""
+    if os.environ.get("PPE_FORCE_CLI_BUILD", "").strip().lower() in ("1", "true", "yes", "on"):
+        return False
+    env = os.environ.get("PPE_PREFER_IDE_OVER_CLI", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    if os.environ.get("PPE_FORCE_IDE_HANDOFF", "").strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    try:
+        from scripts.ppe_operator_config import load_operator_config
+
+        cfg = load_operator_config(repo)
+        handoff = cfg.get("ideHandoff")
+        if isinstance(handoff, dict) and handoff.get("preferIdeOverCli") is True:
+            return True
+        if cfg.get("autoRemoteBuild") is False:
+            return True
+    except ImportError:
+        pass
+    return False
+
+
 def skip_cli_when_usage_exhausted(repo: Path) -> bool:
     env = os.environ.get("PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED", "").strip().lower()
     if env in ("0", "false", "no", "off"):
@@ -157,16 +191,54 @@ def clear_cli_usage_exhausted(repo: Path) -> None:
 
 
 def should_attempt_cli_build(repo: Path, *, force_handoff: bool = False) -> bool:
-    if force_handoff or os.environ.get("PPE_FORCE_IDE_HANDOFF", "").strip().lower() in (
-        "1",
-        "true",
-        "yes",
-        "on",
-    ):
+    if force_handoff or prefer_ide_over_cli(repo):
         return False
     if skip_cli_when_usage_exhausted(repo) and cli_usage_exhausted(repo):
         return False
+    try:
+        from scripts.ppe_operator_config import auto_remote_build_enabled
+
+        if not auto_remote_build_enabled(repo):
+            return False
+    except ImportError:
+        pass
     return True
+
+
+def copy_text_to_clipboard(text: str) -> dict[str, Any]:
+    if not clipboard_on_handoff_enabled():
+        return {"ok": False, "skipped": True, "reason": "clipboard disabled"}
+    try:
+        if sys.platform == "win32":
+            proc = subprocess.run(
+                ["powershell", "-NoProfile", "-Command", "$input | Set-Clipboard"],
+                input=text,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+            return {"ok": proc.returncode == 0, "platform": "windows"}
+        if sys.platform == "darwin":
+            proc = subprocess.run(
+                ["pbcopy"],
+                input=text,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            return {"ok": proc.returncode == 0, "platform": "darwin"}
+        proc = subprocess.run(
+            ["xclip", "-selection", "clipboard"],
+            input=text,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        return {"ok": proc.returncode == 0, "platform": "xclip"}
+    except (OSError, FileNotFoundError) as exc:
+        return {"ok": False, "error": str(exc)}
 
 
 def _handoff_debounce_sec() -> int:
@@ -329,6 +401,7 @@ def launch_ide_handoff(
     write_starter(repo, slice_id=slice_id, phase_plan=plan_path)
     starter_rel = starter_path(slice_id)
     starter_file = repo / starter_rel.replace("/", os.sep)
+    prompt = build_handoff_prompt(slice_id=slice_id, starter_rel=starter_rel, plan_path=plan_path)
     now_doc = write_handoff_now_doc(
         repo,
         slice_id=slice_id,
@@ -336,6 +409,7 @@ def launch_ide_handoff(
         plan_path=plan_path,
         reason=reason,
     )
+    clipboard = copy_text_to_clipboard(prompt)
     cursor = open_cursor_for_handoff(repo, starter_file)
 
     state = load_handoff_state(repo)
@@ -347,15 +421,17 @@ def launch_ide_handoff(
             "last_handoff_reason": reason,
             "last_starter": starter_rel,
             "cursor_open": cursor.get("ok"),
+            "clipboard": clipboard.get("ok"),
         }
     )
     save_handoff_state(repo, state)
 
     title = f"PPE IDE BUILD: {slice_id}"
+    clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
     body = (
-        f"Headless agent CLI unavailable ({reason}).\n"
+        f"{reason}\n"
         f"Open Cursor → new Agent thread → @{starter_rel}\n"
-        f"Shortcut: {HANDOFF_NOW_REL}"
+        f"Shortcut: {HANDOFF_NOW_REL}.{clip_note}"
     )
     notified = False
     if notify_enabled() and ntfy_configured():
@@ -370,6 +446,7 @@ def launch_ide_handoff(
         "starter": starter_rel,
         "now_doc": str(now_doc.relative_to(repo)).replace("\\", "/"),
         "cursor": cursor,
+        "clipboard": clipboard,
         "source": source,
         "reason": reason,
         "notified": notified,
@@ -411,20 +488,22 @@ def respond_to_ide_build(
         and agent_available()
         and not force_handoff
     )
+    cli_out: dict[str, Any] = {}
     if try_cli:
-        out = launch_build(repo, note=note, source=source)
-        if out.get("started"):
-            return out
-        reason = str(out.get("reason") or "CLI build did not start")
+        cli_out = launch_build(repo, note=note, source=source)
+        if cli_out.get("started"):
+            return cli_out
 
-    if cli_usage_exhausted(repo):
+    if prefer_ide_over_cli(repo):
+        reason = "near-zero API profile — use Cursor IDE Agent"
+    elif cli_usage_exhausted(repo):
         reason = "agent CLI out of usage — use Cursor IDE Agent"
     elif not agent_available():
         reason = "agent CLI not installed — use Cursor IDE Agent"
     elif not try_cli:
         reason = "CLI build skipped — use Cursor IDE Agent"
     else:
-        reason = str(out.get("reason") or "CLI build unavailable")
+        reason = str(cli_out.get("reason") or "CLI build unavailable")
 
     handoff = launch_ide_handoff(
         repo,

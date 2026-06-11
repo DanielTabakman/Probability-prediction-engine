@@ -152,6 +152,12 @@ def mark_product_ready(
         build_branch=branch,
         commit_sha=sha,
     )
+    try:
+        from scripts.ppe_ide_handoff import clear_cli_usage_exhausted
+
+        clear_cli_usage_exhausted(repo)
+    except ImportError:
+        pass
     return 0, str(out)
 
 
@@ -182,6 +188,39 @@ def marker_covers_product_slices(
     if legacy:
         completed.add(legacy)
     return all(sid in completed for sid in product_slice_ids)
+
+
+def completed_product_slice_ids(repo: Path, *, plan_path: str) -> set[str]:
+    """Product slices already marked ready for this phase plan."""
+    norm_plan = plan_path.replace("\\", "/").strip()
+    data = load_marker(repo)
+    if not data:
+        return set()
+    if str(data.get("phasePlanPath") or "").replace("\\", "/").strip() != norm_plan:
+        return set()
+    completed: set[str] = set()
+    for sid in data.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s:
+            completed.add(s)
+    legacy = str(data.get("sliceId") or "").strip()
+    if legacy:
+        completed.add(legacy)
+    return completed
+
+
+def next_pending_product_slice(repo: Path, *, plan_path: str) -> str | None:
+    """First plan-order product slice not yet in IDE_PRODUCT_READY marker."""
+    from scripts.ppe_operator_guards import _plan_product_slice_ids
+
+    product_ids = _plan_product_slice_ids(repo, plan_path)
+    if not product_ids:
+        return None
+    completed = completed_product_slice_ids(repo, plan_path=plan_path)
+    for sid in product_ids:
+        if sid not in completed:
+            return sid
+    return None
 
 
 def check_marker(repo: Path) -> int:
