@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Ordered chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low (scheduling not yet wired — list order still wins until ppe_backlog_priority_scheduling_v1). blocked rows with planPath auto-promote to queued when prior rows are done/skipped.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low — propagation picks highest eligible row when pipeline idle (see BACKLOG_OPERATOR.md). Append new rows anywhere; list order is tie-break only.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -99,11 +99,11 @@
     },
     {
       "chapterId": "ppe_backlog_priority_scheduling_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "workerMode": "deterministic",
-      "canonRef": "docs/SOP/PPE_QUEUE_PROPAGATION_V1.md",
-      "reason": "[HIGH] Backlog priority scheduling — propagate/select by high/medium/low (not array order); safe append-anywhere operator flow; tests + SOP operator doc"
+      "canonRef": "docs/SOP/BACKLOG_OPERATOR.md",
+      "reason": "[HIGH] Backlog priority scheduling — shipped in ppe_propagate_queue (high/medium/low + BACKLOG_OPERATOR.md)"
     },
     {
       "chapterId": "msos_strategy_lab_distribution_demo",

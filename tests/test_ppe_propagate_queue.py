@@ -13,6 +13,7 @@ from scripts.ppe_roadmap import load_roadmap
 from scripts.ppe_propagate_queue import (
     load_backlog,
     maybe_propagate_queue,
+    normalize_backlog_priority,
     promote_first_blocked_with_plan,
     propagate_from_backlog,
     save_backlog,
@@ -217,7 +218,93 @@ class TestPpePropagateQueue(unittest.TestCase):
         save_backlog(self.repo, backlog)
         out = promote_first_blocked_with_plan(self.repo, apply=True)
         self.assertFalse(out.get("promoted"))
-        self.assertIn("prior", str(out.get("reason", "")).lower())
+        self.assertIn("pipeline busy", str(out.get("reason", "")).lower())
+
+    def test_normalize_backlog_priority_defaults_medium(self) -> None:
+        self.assertEqual(normalize_backlog_priority({}), "medium")
+        self.assertEqual(normalize_backlog_priority({"priority": "HIGH"}), "high")
+        self.assertEqual(normalize_backlog_priority({"priority": "bogus"}), "medium")
+
+    def test_promote_blocked_prefers_high_over_low_list_order(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        for slug, sprint, sel in (
+            ("low_relay.json", "SPRINT_LOW.md", "SEL_LOW.md"),
+            ("high_relay.json", "SPRINT_HIGH.md", "SEL_HIGH.md"),
+        ):
+            plan = {
+                "name": slug,
+                "sprintSpecPath": f"docs/SOP/{sprint}",
+                "selectionRecord": f"docs/SOP/{sel}",
+                "slices": [{"sliceId": "Z-Closeout", "closeout": {"chapterId": slug}}],
+            }
+            (plans / slug).write_text(json.dumps(plan), encoding="utf-8")
+            (self.repo / "docs" / "SOP" / sprint).write_text("# s\n", encoding="utf-8")
+            (self.repo / "docs" / "SOP" / sel).write_text("# s\n", encoding="utf-8")
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {
+                "chapterId": "low_first",
+                "status": "blocked",
+                "priority": "low",
+                "planPath": "docs/SOP/PHASE_PLANS/low_relay.json",
+            },
+            {
+                "chapterId": "high_second",
+                "status": "blocked",
+                "priority": "high",
+                "planPath": "docs/SOP/PHASE_PLANS/high_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        out = promote_first_blocked_with_plan(self.repo, apply=True)
+        self.assertTrue(out.get("promoted"))
+        self.assertEqual(out.get("chapterId"), "high_second")
+        backlog = load_backlog(self.repo)
+        by_id = {row["chapterId"]: row["status"] for row in backlog["items"]}
+        self.assertEqual(by_id["high_second"], "queued")
+        self.assertEqual(by_id["low_first"], "blocked")
+
+    def test_propagate_queued_prefers_high_priority(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        med_plan = {
+            "name": "med",
+            "sprintSpecPath": "docs/SOP/SPRINT_MED.md",
+            "selectionRecord": "docs/SOP/SEL_MED.md",
+            "slices": [{"sliceId": "M-Closeout", "closeout": {"chapterId": "m"}}],
+        }
+        high_plan = {
+            "name": "high",
+            "sprintSpecPath": "docs/SOP/SPRINT_HIGHQ.md",
+            "selectionRecord": "docs/SOP/SEL_HIGHQ.md",
+            "slices": [{"sliceId": "H-Closeout", "closeout": {"chapterId": "h"}}],
+        }
+        (plans / "med_relay.json").write_text(json.dumps(med_plan), encoding="utf-8")
+        (plans / "high_relay.json").write_text(json.dumps(high_plan), encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SPRINT_MED.md").write_text("# m\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_MED.md").write_text("# m\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SPRINT_HIGHQ.md").write_text("# h\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_HIGHQ.md").write_text("# h\n", encoding="utf-8")
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {
+                "chapterId": "med_chapter",
+                "status": "queued",
+                "priority": "medium",
+                "planPath": "docs/SOP/PHASE_PLANS/med_relay.json",
+            },
+            {
+                "chapterId": "high_chapter",
+                "status": "queued",
+                "priority": "high",
+                "planPath": "docs/SOP/PHASE_PLANS/high_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        out = propagate_from_backlog(self.repo, apply=True)
+        self.assertTrue(out.get("propagated"))
+        self.assertEqual(out.get("chapterId"), "high_chapter")
+        roadmap = load_roadmap(self.repo)
+        self.assertEqual(roadmap["items"][-1]["planPath"], "docs/SOP/PHASE_PLANS/high_relay.json")
 
 
 if __name__ == "__main__":

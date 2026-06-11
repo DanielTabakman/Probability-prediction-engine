@@ -22,6 +22,9 @@ from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_c
 
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 VALID_BACKLOG_STATUSES = frozenset({"queued", "chartered", "done", "blocked", "skipped"})
+VALID_BACKLOG_PRIORITIES = frozenset({"high", "medium", "low"})
+PRIORITY_RANK = {"high": 0, "medium": 1, "low": 2}
+_DEFAULT_BACKLOG_PRIORITY = "medium"
 
 
 def backlog_enabled(repo_root: Path | None = None) -> bool:
@@ -175,31 +178,70 @@ def reconcile_closed_chapters(repo_root: Path, *, apply: bool) -> dict[str, Any]
     }
 
 
-def _first_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
-    for item in backlog.get("items") or []:
+def _backlog_items(backlog: dict[str, Any]) -> list[Any]:
+    items = backlog.get("items") or []
+    return items if isinstance(items, list) else []
+
+
+def _backlog_item_status(item: dict[str, Any]) -> str:
+    return str(item.get("status") or "").strip().lower()
+
+
+def normalize_backlog_priority(item: dict[str, Any]) -> str:
+    """Return high | medium | low; missing or invalid values default to medium."""
+    raw = str(item.get("priority") or _DEFAULT_BACKLOG_PRIORITY).strip().lower()
+    return raw if raw in VALID_BACKLOG_PRIORITIES else _DEFAULT_BACKLOG_PRIORITY
+
+
+def _priority_sort_key(index: int, item: dict[str, Any]) -> tuple[int, int]:
+    """Lower rank runs first; array index breaks ties (stable FIFO within tier)."""
+    return (PRIORITY_RANK[normalize_backlog_priority(item)], index)
+
+
+def _pipeline_busy(backlog: dict[str, Any]) -> bool:
+    """True when a chapter is already queued or chartered in the backlog pipeline."""
+    for item in _backlog_items(backlog):
         if not isinstance(item, dict):
             continue
-        if str(item.get("status") or "").strip().lower() == "queued":
-            return item
-    return None
+        if _backlog_item_status(item) in ("chartered", "queued"):
+            return True
+    return False
 
 
-_TERMINAL_BACKLOG = frozenset({"done", "skipped"})
-
-
-def _prior_backlog_items_terminal(items: list[Any], index: int) -> bool:
-    """True when every backlog row before index is done or skipped."""
-    for prior in items[:index]:
-        if not isinstance(prior, dict):
+def _best_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
+    """Highest-priority queued backlog row (high before medium before low)."""
+    candidates: list[tuple[int, dict[str, Any]]] = []
+    for index, item in enumerate(_backlog_items(backlog)):
+        if not isinstance(item, dict):
             continue
-        prev = str(prior.get("status") or "").strip().lower()
-        if prev not in _TERMINAL_BACKLOG:
-            return False
-    return True
+        if _backlog_item_status(item) == "queued":
+            candidates.append((index, item))
+    if not candidates:
+        return None
+    _index, item = min(candidates, key=lambda pair: _priority_sort_key(pair[0], pair[1]))
+    return item
+
+
+def _blocked_with_plan_sorted(
+    backlog: dict[str, Any],
+) -> list[tuple[int, dict[str, Any], str]]:
+    """Blocked rows with planPath, sorted by priority then list index."""
+    candidates: list[tuple[int, dict[str, Any], str]] = []
+    for index, item in enumerate(_backlog_items(backlog)):
+        if not isinstance(item, dict):
+            continue
+        if _backlog_item_status(item) != "blocked":
+            continue
+        plan_path = norm_plan(str(item.get("planPath") or ""))
+        if not plan_path:
+            continue
+        candidates.append((index, item, plan_path))
+    candidates.sort(key=lambda row: _priority_sort_key(row[0], row[1]))
+    return candidates
 
 
 def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str, Any]:
-    """Promote the first blocked backlog row with a valid planPath when all prior rows are done/skipped."""
+    """Promote highest-priority blocked row with valid planPath when pipeline is idle."""
     repo = repo_root.resolve()
     if not backlog_enabled(repo):
         return {"promoted": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
@@ -207,28 +249,17 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
         return {"promoted": False, "reason": "no backlog file"}
 
     backlog = load_backlog(repo)
-    items = backlog.get("items") or []
-    if not isinstance(items, list):
+    if not isinstance(backlog.get("items"), list):
         return {"promoted": False, "reason": "invalid backlog items"}
 
-    if _first_queued_item(backlog) is not None:
+    if _best_queued_item(backlog) is not None:
         return {"promoted": False, "reason": "queued backlog item already exists"}
 
+    if _pipeline_busy(backlog):
+        return {"promoted": False, "reason": "pipeline busy (chartered or queued chapter in backlog)"}
+
     finalized_plans: list[str] = []
-    for index, item in enumerate(items):
-        if not isinstance(item, dict):
-            continue
-        if str(item.get("status") or "").strip().lower() != "blocked":
-            continue
-        plan_path = norm_plan(str(item.get("planPath") or ""))
-        if not plan_path:
-            continue
-        if not _prior_backlog_items_terminal(items, index):
-            return {
-                "promoted": False,
-                "reason": "prior backlog chapters not terminal",
-                "chapterId": item.get("chapterId"),
-            }
+    for _index, item, plan_path in _blocked_with_plan_sorted(backlog):
         ok, err = _plan_valid(repo, plan_path)
         if not ok:
             return {
@@ -287,7 +318,7 @@ def _plan_on_roadmap(roadmap: dict[str, Any], plan_path: str) -> bool:
 
 
 def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
-    """Append first queued backlog row to roadmap as pending (with optional scaffold)."""
+    """Append highest-priority queued backlog row to roadmap as pending (with optional scaffold)."""
     repo = repo_root.resolve()
     if not backlog_enabled(repo):
         return {"propagated": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
@@ -298,13 +329,13 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
 
     sync_backlog_from_roadmap(repo, apply=apply)
     backlog = load_backlog(repo)
-    item = _first_queued_item(backlog)
+    item = _best_queued_item(backlog)
     if item is None:
         promoted = promote_first_blocked_with_plan(repo, apply=apply)
         if promoted.get("promoted"):
             sync_backlog_from_roadmap(repo, apply=apply)
             backlog = load_backlog(repo)
-            item = _first_queued_item(backlog)
+            item = _best_queued_item(backlog)
         if item is None:
             out: dict[str, Any] = {"propagated": False, "reason": "no queued backlog item"}
             if promoted.get("promoted") or promoted.get("reason"):
