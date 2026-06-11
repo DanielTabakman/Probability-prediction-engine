@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
   "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
   "workerMode": "deterministic"
 }
