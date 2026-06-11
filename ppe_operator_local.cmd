@@ -6,3 +6,4 @@ if exist "%LOCALAPPDATA%\cursor-agent" set "PATH=%LOCALAPPDATA%\cursor-agent;%PA
 if exist "%~dp0ppe_operator_cursor.local.cmd" call "%~dp0ppe_operator_cursor.local.cmd"
 if exist "%~dp0ppe_operator_notify.local.cmd" call "%~dp0ppe_operator_notify.local.cmd"
 if exist "%~dp0ppe_operator_git.local.cmd" call "%~dp0ppe_operator_git.local.cmd"
+if exist "%~dp0ppe_operator_near_zero_api.local.cmd" call "%~dp0ppe_operator_near_zero_api.local.cmd"

@@ -153,7 +153,13 @@ def resolve_build_target(repo: Path) -> dict[str, Any]:
     status = collect_operator_status(repo.resolve())
     verdict = str(status.get("verdict") or "")
     plan_path = str(status.get("phase_plan_path") or "").strip()
-    product_slice = _primary_product_slice(status)
+    product_slice: str | None = None
+    if plan_path:
+        from scripts.ppe_ide_product_ready import next_pending_product_slice
+
+        product_slice = next_pending_product_slice(repo.resolve(), plan_path=plan_path)
+    if not product_slice:
+        product_slice = _primary_product_slice(status)
 
     if verdict == VERDICT_IDE_BUILD:
         if not plan_path or not product_slice:

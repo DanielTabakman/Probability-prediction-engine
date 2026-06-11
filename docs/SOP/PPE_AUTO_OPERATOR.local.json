@@ -30,10 +30,11 @@
   },
   "guardStopSleepSeconds": 300,
   "keepLoopAliveOnGuardStop": true,
-  "autoRemoteBuild": true,
+  "autoRemoteBuild": false,
   "ideHandoff": {
     "enabled": true,
     "openCursor": true,
-    "skipCliWhenUsageExhausted": true
+    "skipCliWhenUsageExhausted": true,
+    "preferIdeOverCli": true
   }
 }

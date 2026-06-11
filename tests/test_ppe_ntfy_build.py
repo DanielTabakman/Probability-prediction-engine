@@ -21,7 +21,8 @@ def test_resolve_build_ide_build(monkeypatch, tmp_path):
         "blocker": "product blocked",
     }
     with patch("scripts.ppe_remote_build_agent.collect_operator_status", return_value=status):
-        target = resolve_build_target(tmp_path)
+        with patch("scripts.ppe_ide_product_ready.next_pending_product_slice", return_value=None):
+            target = resolve_build_target(tmp_path)
     assert target["ok"] is True
     assert target["mode"] == "ide_build"
     assert target["slice_id"] == "MVP1-Slice002"

@@ -11,10 +11,12 @@ from scripts.ppe_ide_handoff import (
     handoff_recently_done,
     launch_ide_handoff,
     mark_cli_usage_exhausted,
+    prefer_ide_over_cli,
     respond_to_ide_build,
     should_attempt_cli_build,
     text_indicates_usage_exhausted,
 )
+from scripts.ppe_ide_product_ready import next_pending_product_slice, write_marker
 
 
 def test_text_indicates_usage_exhausted():
@@ -68,9 +70,42 @@ def test_handoff_debounce(tmp_path, monkeypatch):
     assert handoff_recently_done(tmp_path, "MVP1-Slice002") is True
 
 
+def test_prefer_ide_over_cli_skips_cli(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "1")
+    assert prefer_ide_over_cli(tmp_path) is True
+    assert should_attempt_cli_build(tmp_path) is False
+
+
+def test_next_pending_product_slice_skips_marked(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    plan_path = "docs/SOP/PHASE_PLANS/foo.json"
+    plan_dir = tmp_path / "docs/SOP/PHASE_PLANS"
+    plan_dir.mkdir(parents=True)
+    (plan_dir / "foo.json").write_text(
+        json.dumps(
+            {
+                "slices": [
+                    {"sliceId": "MVP1-Product-Slice002", "declaredPlane": "PRODUCT-PLANE"},
+                    {"sliceId": "MVP1-Product-Slice003", "declaredPlane": "PRODUCT-PLANE"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    write_marker(
+        tmp_path,
+        phase_plan_path=plan_path,
+        slice_id="MVP1-Product-Slice002",
+        build_branch="build/auto/MVP1-Product-Slice002",
+        commit_sha="abc",
+    )
+    assert next_pending_product_slice(tmp_path, plan_path=plan_path) == "MVP1-Product-Slice003"
+
+
 def test_respond_skips_cli_when_usage_exhausted(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NOTIFY", "0")
     monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "1")
     mark_cli_usage_exhausted(tmp_path, detail="out of usage")
     status = {
         "verdict": "IDE_BUILD",

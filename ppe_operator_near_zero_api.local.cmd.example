@@ -1,0 +1,16 @@
+@echo off
+REM Copy to ppe_operator_near_zero_api.local.cmd (gitignored) for near-zero API economy.
+REM See docs/SOP/PPE_NEAR_ZERO_API_OPERATOR_V1.md
+
+set "PPE_AUTO_REMOTE_BUILD=0"
+set "PPE_FORCE_IDE_HANDOFF=1"
+set "PPE_PREFER_IDE_OVER_CLI=1"
+set "PPE_IDE_HANDOFF=1"
+set "PPE_IDE_HANDOFF_OPEN=1"
+set "PPE_IDE_HANDOFF_CLIPBOARD=1"
+set "PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED=1"
+
+REM Emergency only — one headless CLI build from phone:
+REM set "PPE_FORCE_CLI_BUILD=1"
+REM set "PPE_FORCE_IDE_HANDOFF=0"
+REM set "PPE_AUTO_REMOTE_BUILD=1"
