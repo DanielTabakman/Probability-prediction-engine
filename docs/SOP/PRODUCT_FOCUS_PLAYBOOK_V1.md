@@ -204,8 +204,29 @@ See [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).
 
 ---
 
+## Backlog and SELECTION (use this mythos)
+
+When filling [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) or steward **SELECTION**:
+
+1. **Read** [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) + this playbook **Priority stack** + **Drift guards**.
+2. **Tag** new backlog rows with playbook tier in `reason` or optional `focusPlaybookTier` (`P0`–`P4` / `defer`).
+3. **Mechanical** `high|medium|low` in JSON = propagate order only; **semantic** priority = playbook tier.
+4. **After P8 cohort:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) §6 **must** authorize the next chapter — not auto-widening.
+
+| Playbook tier | Backlog `priority` hint | Examples |
+|---------------|-------------------------|----------|
+| **P0** wedge proof | often `high` | VPS CTA, tester outreach, session logging |
+| **P1** chartered closeout | `high` / `medium` | Finish relay chapters already in waterfall |
+| **P2** lab legibility | `medium` | MVP1 comprehension / disagreement clarity |
+| **P3** distribution | `medium` | Dist demo, public URL, partner embed |
+| **P4** monetization signal | `medium` after validation | Manual paid pilot (no billing automation) |
+| **Defer** | `low` or `blocked` without plan | execution, multi-asset, AI, paywall scale |
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-06-12 | v1 — initial playbook from product/strategy working session |
+| 2026-06-12 | Backlog/SELECTION mythos wired — BACKLOG_OPERATOR, propagation, steward protocol |

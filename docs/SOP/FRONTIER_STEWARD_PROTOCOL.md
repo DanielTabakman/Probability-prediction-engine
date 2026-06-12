@@ -16,10 +16,11 @@
    - `docs/SOP/MVP1_FRONTIER.md` — MVP1 engine relay (Streamlit implied lab, freeze/review)
    - `docs/SOP/MSOS_FRONTIER.md` — MSOS website/platform BUILD queue
 4. `docs/SOP/PPE_INTEGRATED_STATUS.md` (cross-chapter summary)
-5. `docs/SOP/HANDOFF.md`
-6. `docs/SOP/OPERATING_RULES.md`
-7. `docs/SEMANTIC_CONTRACTS.md`
-8. Older handoff/chat only when docs are silent
+5. **`docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`** — wedge proof, priority stack, drift guards; **backlog/SELECTION mythos** (validation report §6 after P8 cohort)
+6. `docs/SOP/HANDOFF.md`
+7. `docs/SOP/OPERATING_RULES.md`
+8. `docs/SEMANTIC_CONTRACTS.md`
+9. Older handoff/chat only when docs are silent
 
 **MSOS non-widening rule:** MSOS UI work must not silently alter PPE math contracts or resolved MVP1 evidence. See [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md).
 

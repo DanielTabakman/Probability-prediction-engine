@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low \u2014 propagation picks highest eligible row when pipeline idle (see BACKLOG_OPERATOR.md). Append new rows anywhere; list order is tie-break only.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low — mechanical scheduling only; semantic priority rubric: docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md + docs/SOP/BACKLOG_OPERATOR.md. After P8 cohort: docs/SOP/MSOS_P8_VALIDATION_REPORT_V1.md §6 bosses next chapter. Append new rows anywhere; list order is tie-break only.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",

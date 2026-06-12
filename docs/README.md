@@ -23,7 +23,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Dev changelog (rolling)** | [`RELEASES/DEV_CHANGELOG.md`](RELEASES/DEV_CHANGELOG.md) — daily / merge release notes on `main` |
 | **Weekly digest (human)** | [`RELEASES/WEEKLY_DIGEST.md`](RELEASES/WEEKLY_DIGEST.md) — Monday summary of prior week |
 
-**Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for its track.
+**Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → **`PRODUCT_FOCUS_PLAYBOOK_V1`** (strategic scope / backlog mythos) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for BUILD order; playbook wins for scope expansion fights.
 
 **Legacy (do not use for steering):** [`SOP/CURRENT_FRONTIER.md`](SOP/CURRENT_FRONTIER.md) and [`CURRENT_FRONTIER.md`](CURRENT_FRONTIER.md) are historical Phase 2 ledgers only.
 

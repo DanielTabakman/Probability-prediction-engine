@@ -59,9 +59,12 @@ Operator cheat sheet: [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md).
 
 ## Adding chapters
 
-1. Append a row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) with `status: blocked` and `priority`.
-2. Set `planPath` when a phase plan exists **or** omit until chartered.
-3. Run `run_ppe.cmd --continuous` — propagation runs automatically when idle.
+1. Read [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — confirm tier (P0–P4) and drift guards.
+2. Append a row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) with `status: blocked` and `priority` per [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md).
+3. Set `planPath` when a phase plan exists **or** omit until chartered.
+4. Run `run_ppe.cmd --continuous` — propagation runs automatically when idle.
+
+After P8 tester cohort: **next chapter** must cite [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) §6 — do not auto-promote scope-expanding rows without it.
 
 Rows with **`planPath`** auto-promote `blocked` → `queued` when the pipeline is idle — from `post_relay_continue` after closeout and from `maybe_propagate_queue` when idle.
 
@@ -70,5 +73,7 @@ Mark **`blocked`** without `planPath` when canon is not ready (steward must add 
 ## Related
 
 - [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md)
+- [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
+- [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)
 - [`PPE_AUTO_SELECTION_ROADMAP_V1.md`](PPE_AUTO_SELECTION_ROADMAP_V1.md)
 - [`PPE_STEWARD_CURSOR_V1.md`](PPE_STEWARD_CURSOR_V1.md)
