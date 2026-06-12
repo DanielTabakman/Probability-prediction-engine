@@ -13,6 +13,7 @@ from typing import Any
 from scripts.ppe_notify_push import (
     OUTBOUND_TAG,
     apply_snooze_request,
+    format_quota_brief,
     format_snooze_until,
     ntfy_configured,
     notify_enabled,
@@ -106,7 +107,8 @@ def execute_status(repo: Path) -> dict[str, Any]:
     result = collect_status(repo.resolve(), apply_propagate=False, ensure=False)
     brief = str(result.get("operator_brief") or "")
     stack = result.get("stack") or {}
-    body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}"
+    quota = format_quota_brief(repo.resolve())
+    body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}\n\n{quota}"
     sent = send_ntfy("PPE status", body, tags=["ppe", "cmd", OUTBOUND_TAG], bypass_throttle=True)
     return {"action": "status", "body": body, "notified": sent}
 
@@ -174,10 +176,13 @@ def execute_snooze(repo: Path, *, note: str = "") -> dict[str, Any]:
 
 def execute_help(repo: Path) -> dict[str, Any]:
     prefix = f"{command_secret()} " if command_secret() else ""
+    from scripts.ppe_operator_hint import PPE_GO_HINT
+
     body = (
         f"{prefix}build - IDE BUILD for queued slice\n"
+        f"Desktop: {PPE_GO_HINT}\n"
         f"{prefix}restart - restart stack\n"
-        f"{prefix}fix - investigate blocker\n"
+        f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
         f"{prefix}status - operator status\n"
         f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
         f"{prefix}help - this list"
@@ -211,19 +216,21 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             f"killed={result.get('killed')} loop={stack.get('loop_running')}",
             tags=["ppe", "cmd", OUTBOUND_TAG],
         )
-    if action in ("build", "fix"):
+    if command.name in ("build", "fix"):
         if result.get("notified"):
             return True
         if result.get("started"):
-            sid = result.get("slice_id") or ""
+            label = result.get("slice_id") or result.get("verdict") or ""
             return send_ntfy(
-                f"PPE {action} started{(' ' + sid) if sid else ''}",
+                f"PPE {command.name} started{(' ' + label) if label else ''}",
                 str(result.get("message") or "started"),
                 tags=["ppe", "cmd", OUTBOUND_TAG],
                 priority="high",
             )
+        if result.get("debounced"):
+            return False
         return send_ntfy(
-            f"PPE {action} failed",
+            f"PPE {command.name} failed",
             str(result.get("reason") or "did not start"),
             tags=["ppe", "cmd", OUTBOUND_TAG],
             priority="high",

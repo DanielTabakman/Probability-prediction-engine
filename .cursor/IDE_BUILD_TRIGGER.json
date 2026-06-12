@@ -1,10 +1,6 @@
 {
   "version": 1,
-  "status": "pending",
-  "sliceId": "MSOS-DistDemo-Product-Slice002",
-  "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
-  "starter": "artifacts/orchestrator/IDE_BUILD_STARTER_MSOS-DistDemo-Product-Slice002.md",
-  "reason": "near-zero API profile \u2014 use Cursor IDE Agent",
-  "source": "loop-guard",
-  "handoffAt": "2026-06-11T05:15:31Z"
+  "status": "idle",
+  "clearedAt": "2026-06-11T19:15:58Z",
+  "lastCompletedSlice": "MSOS-DistDemo-Product-Slice002"
 }

@@ -9,6 +9,9 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Integrated one-pager** | [`SOP/PPE_INTEGRATED_STATUS.md`](SOP/PPE_INTEGRATED_STATUS.md) |
 | **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) (MVP1 engine) · [`SOP/MSOS_FRONTIER.md`](SOP/MSOS_FRONTIER.md) (MSOS website) |
 | **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
+| **Product focus / anti-drift** | [`SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof, priorities, validation gates |
+| **Operating calendar** | [`SOP/OPERATING_CALENDAR_V1.md`](SOP/OPERATING_CALENDAR_V1.md) — weekly / monthly / quarterly steward cadence |
+| **P8 validation report** | [`SOP/MSOS_P8_VALIDATION_REPORT_V1.md`](SOP/MSOS_P8_VALIDATION_REPORT_V1.md) — auto-select gate until **COMPLETE** |
 | **Session handoff gate** | [`SOP/HANDOFF.md`](SOP/HANDOFF.md) |
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |

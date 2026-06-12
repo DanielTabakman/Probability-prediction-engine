@@ -1,0 +1,28 @@
+---
+description: Product focus playbook — load on demand for SELECTION, backlog edits, and scope fights. Not for routine IDE BUILD slices (starters carry a 3-line excerpt).
+alwaysApply: false
+---
+
+# Product focus (on demand)
+
+**Canonical:** [`docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md)
+
+## When to load
+
+- Steward **SELECTION** or filling [`PHASE_CHAPTER_BACKLOG.json`](docs/SOP/PHASE_CHAPTER_BACKLOG.json)
+- Scope expansion fights (new asset, execution, platform surface)
+- Monthly playbook review ([`OPERATING_CALENDAR_V1.md`](docs/SOP/OPERATING_CALENDAR_V1.md))
+
+## When NOT to load
+
+- Routine **IDE BUILD** product slices — use the 3-line **Focus** block in `IDE_BUILD_STARTER_*.md` only
+- Deterministic relay / witness slices with no product scope change
+
+## Runtime (agents do not re-read full playbook)
+
+- Auto-select / propagate: blocked while [`MSOS_P8_VALIDATION_REPORT_V1.md`](docs/SOP/MSOS_P8_VALIDATION_REPORT_V1.md) is **DRAFT** unless backlog `urgent: true`
+- Disable gate: `PPE_FOCUS_GATE=0` (escape hatch)
+
+## Urgent IRL
+
+Add to backlog row: `"urgent": true`, `"urgentReason": "one line"`, `"focusPlaybookTier": "P0"`

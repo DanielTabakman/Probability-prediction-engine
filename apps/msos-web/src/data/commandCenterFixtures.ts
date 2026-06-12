@@ -18,10 +18,18 @@ export const navItems: NavItem[] = [
   { id: "command-center", label: "Command Center", href: "/command-center" },
   { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
   { id: "theses", label: "Theses", href: "#", disabled: true },
-  { id: "expression", label: "Expression & Execution", href: "#", disabled: true },
-  { id: "monitor", label: "Monitor", href: "#", disabled: true },
-  { id: "history", label: "History", href: "#", disabled: true },
+  { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
+  { id: "monitor", label: "Monitor", href: "/monitor" },
+  { id: "history", label: "History", href: "/history" },
+  { id: "learn", label: "Learn loop", href: "/learn" },
 ];
+
+export const calibrationStrip = {
+  title: "Calibration loop",
+  body: "Review observed vs saved vs simulated theses — executed count stays zero until live routing ships.",
+  cta: "Open monitor",
+  href: "/monitor",
+};
 
 export const connectedMarkets: MarketAsset[] = [
   { label: "BTC / Options", status: "LIVE", live: true },

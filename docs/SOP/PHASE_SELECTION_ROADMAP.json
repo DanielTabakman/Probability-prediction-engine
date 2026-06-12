@@ -99,9 +99,45 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
+      "status": "done",
+      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website",
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
+      "status": "done",
+      "reason": "Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
+      "status": "done",
+      "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+      "status": "done",
+      "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
+      "status": "done",
+      "reason": "Tester release + evidence-based next selection \u2014 pre-chartered; blocked until P7 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
+      "status": "ready",
+      "reason": "[LOW] Tail quantiles, strike-level P(>K), derived export columns, daily snapshot collector MVP",
+      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md"
     }
   ]
 }

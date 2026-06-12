@@ -1,7 +1,7 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-10 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
-**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
+**As-of:** 2026-06-12 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
 
@@ -86,6 +86,18 @@ flowchart LR
 
 | Repo housekeeping v1 | **COMPLETE** 2026-06-10 | [`SPRINT_REPO_HOUSEKEEPING_V1.md`](docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md), [`REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md`](docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md) |
 
+| MVP1 distribution stats legibility | **COMPLETE** 2026-06-11 | [`SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md`](docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md), [`MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md) |
+
+| MSOS Strategy Lab distribution demo | **COMPLETE** 2026-06-11 | [`SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md`](docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md), [`MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md`](docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md) |
+
+| MSOS P5 thesis confirmation + durable state | **COMPLETE** 2026-06-11 | [`SPRINT_MSOS_P5_THESIS_CONFIRM.md`](docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md), [`MSOS_P5_THESIS_CONFIRM_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P5_THESIS_CONFIRM_EVIDENCE_STATUS.md) |
+
+| MSOS P6 expression planning + simulation only | **COMPLETE** 2026-06-12 | [`SPRINT_MSOS_P6_EXPRESSION_SIM.md`](docs/SOP/SPRINT_MSOS_P6_EXPRESSION_SIM.md), [`MSOS_P6_EXPRESSION_SIM_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P6_EXPRESSION_SIM_EVIDENCE_STATUS.md) |
+
+| MSOS P7 monitoring, history, calibration loop | **COMPLETE** 2026-06-12 | [`SPRINT_MSOS_P7_MONITORING.md`](docs/SOP/SPRINT_MSOS_P7_MONITORING.md), [`MSOS_P7_MONITORING_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P7_MONITORING_EVIDENCE_STATUS.md) |
+
+| MSOS P8 tester release + evidence-based next selection | **COMPLETE** 2026-06-12 | [`SPRINT_MSOS_P8_TESTER_RELEASE.md`](docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md), [`MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md`](docs/SOP/MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -111,6 +123,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | **Active relay chapter** | **MSOS P3** | manifest `RUNNING`; P4 plan pre-chartered |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
 | **Storyboard v0.6** | **in-repo** | gate OPEN — MSOS P3 BUILD; P4 relay pre-chartered |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
@@ -125,6 +138,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | MVP1 frontier | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
 | MSOS frontier | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
 | MSOS acceleration | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) |
+| Product focus playbook | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) |
 | MSOS P1 ADR | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | Session handoff | [`HANDOFF.md`](HANDOFF.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
@@ -142,4 +156,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

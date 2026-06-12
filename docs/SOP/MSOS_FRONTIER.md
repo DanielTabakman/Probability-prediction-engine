@@ -13,25 +13,68 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P4 Strategy Lab / PPE integration** — **READY** (relay running)
-- **Relay plan:** [`PHASE_PLANS/msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json)
-- **Sprint:** [`SPRINT_MSOS_P4_STRATEGY_LAB.md`](SPRINT_MSOS_P4_STRATEGY_LAB.md)
-- **SELECTION:** [`POST_MSOS_P4_STRATEGY_LAB_SELECTION.md`](POST_MSOS_P4_STRATEGY_LAB_SELECTION.md)
-- **Last closed:** **MSOS P3 authenticated shell + Command Center** — product shell on `main`
-- **Evidence (P3):** [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md)
-- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P4-Product-Slice002` → `run_ppe_local.cmd`
+- **Active BUILD chapter:** **MSOS P8 tester release + evidence-based next selection** — **READY** (relay running)
+- **Relay plan:** [`PHASE_PLANS/msos_p8_tester_release_relay.json`](PHASE_PLANS/msos_p8_tester_release_relay.json)
+- **Sprint:** [`SPRINT_MSOS_P8_TESTER_RELEASE.md`](SPRINT_MSOS_P8_TESTER_RELEASE.md)
+- **SELECTION:** [`POST_MSOS_P8_TESTER_RELEASE_SELECTION.md`](POST_MSOS_P8_TESTER_RELEASE_SELECTION.md)
+- **Last closed:** **MSOS P7 monitoring, history, calibration loop** — on `main`
+- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P8-Product-Slice002` → `run_ppe_local.cmd`
 
-### MSOS P4 Strategy Lab — relay queue — **READY**
+### MSOS P8 tester release — relay queue — **READY**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-P8-Control-Slice001` — charter | EVIDENCE |
+| **IN PROGRESS** | `MSOS-P8-Product-Slice002` — conclusion / learn loop UI | PRODUCT |
+| **PENDING** | `MSOS-P8-Witness-Slice004` — witness + validation report stub | EVIDENCE |
+| **PENDING** | `MSOS-P8-Closeout-Slice005` — closeout + next-queue note | EVIDENCE |
+
+**Visual reference:** storyboard `09_conclusion` · **Route:** `/learn`
+
+### MSOS P7 monitoring — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P7-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P7-Product-Slice002` — monitor + history + updated Command Center | PRODUCT |
+| **CLOSED** | `MSOS-P7-Witness-Slice004` — pytest + visual witness | EVIDENCE |
+| **CLOSED** | `MSOS-P7-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `06_monitor` / `07_history` / `08_updated_command` · **Routes:** `/monitor`, `/history`
+
+### MSOS P6 expression planning — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P6-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P6-Product-Slice002` — expression planning + sim-only save | PRODUCT |
+| **CLOSED** | `MSOS-P6-Witness-Slice004` — pytest + visual witness | EVIDENCE |
+| **CLOSED** | `MSOS-P6-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `05_execution` · **Route:** `/strategy-lab/expression` · **Persistence:** `localStorage` preview (`msos.expression.preview.v1`)
+
+### MSOS P5 thesis confirmation — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P5-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P5-Product-Slice002` — confirmation UI + persistence boundary | PRODUCT |
+| **CLOSED** | `MSOS-P5-Witness-Slice004` — pytest + visual witness | EVIDENCE |
+| **CLOSED** | `MSOS-P5-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `04_confirmation` · **Route:** `/strategy-lab/confirm` · **Persistence:** `localStorage` preview (`msos.thesis.preview.v1`)
+
+### MSOS P4 Strategy Lab — relay queue — **COMPLETE**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **CLOSED** | `MSOS-P4-Control-Slice001` — charter | EVIDENCE |
-| **IN PROGRESS** | `MSOS-P4-Product-Slice002` — Strategy Lab route + embed boundary | PRODUCT |
-| **PENDING** | `MSOS-P4-Platform-Slice003` — Caddy/compose proxy | EVIDENCE |
-| **PENDING** | `MSOS-P4-Witness-Slice004` — witness | EVIDENCE |
-| **PENDING** | `MSOS-P4-Closeout-Slice005` — chapter close | EVIDENCE |
+| **CLOSED** | `MSOS-P4-Product-Slice002` — Strategy Lab route + embed boundary | PRODUCT |
+| **CLOSED** | `MSOS-P4-Platform-Slice003` — Caddy/compose proxy | EVIDENCE |
+| **CLOSED** | `MSOS-P4-Witness-Slice004` — witness | EVIDENCE |
+| **CLOSED** | `MSOS-P4-Closeout-Slice005` — chapter close | EVIDENCE |
 
-**Visual reference:** storyboard `03_ppe_lab` · **Embed:** `NEXT_PUBLIC_PPE_EMBED_URL` (proxy wired in platform slice)
+**Visual reference:** storyboard `03_ppe_lab` · **Embed:** `NEXT_PUBLIC_PPE_EMBED_URL`
 
 ### MSOS P3 Command Center — relay queue — **COMPLETE**
 
@@ -85,11 +128,11 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P1 | `msos_p1_stack_routing` | **done** | — |
 | P2 | `msos_p2_homepage` | **done** | — |
 | P3 | `msos_p3_command_center` | **done** | — |
-| P4 | `msos_p4_strategy_lab` | **queued / READY** | Relay running — product slice IDE BUILD |
-| P5 | `msos_p5_thesis_confirm` | **blocked** (pre-chartered) | After P4 |
-| P6 | `msos_p6_expression_sim` | **blocked** (pre-chartered) | After P5 |
-| P7 | `msos_p7_monitoring` | **blocked** (pre-chartered) | After P6 |
-| P8 | `msos_p8_tester_release` | **blocked** (pre-chartered) | After P7 |
+| P4 | `msos_p4_strategy_lab` | **done** | — |
+| P5 | `msos_p5_thesis_confirm` | **done** | — |
+| P6 | `msos_p6_expression_sim` | **done** | — |
+| P7 | `msos_p7_monitoring` | **done** | — |
+| P8 | `msos_p8_tester_release` | **queued / READY** | Relay running — product slice IDE BUILD |
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
 

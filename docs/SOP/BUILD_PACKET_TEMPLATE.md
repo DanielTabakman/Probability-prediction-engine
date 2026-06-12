@@ -47,6 +47,16 @@ AGENT CONTINUITY
 - If YES: exact handoff payload required:
 ```
 
+## Focus playbook (scope-expanding slices)
+
+When the slice adds product surface, assets, or commercial claims, cite [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md):
+
+```markdown
+## Focus playbook
+- Priority tier: P0 / P1 / P2 (from playbook priority stack)
+- Drift guards checked: yes / N/A — <exception note if steward approved>
+```
+
 ## Forbidden in packets
 
 - Full `HANDOFF.md` gate block pasted inline
@@ -66,3 +76,4 @@ AGENT CONTINUITY
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) — SLIM MODE default
 - [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) — advisory context bands
 - [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md) — Cursor context discipline
+- [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — strategic focus and anti-drift

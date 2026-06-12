@@ -50,6 +50,8 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
 
     def test_closeout_section_in_starter(self) -> None:
         md = build_starter_md(self.repo, slice_id="Ch-Product-Slice002", phase_plan=self.plan_rel)
+        self.assertIn("## Focus (3 lines", md)
+        self.assertIn("North star", md)
         self.assertIn("## When done (required)", md)
         self.assertIn("mark_ide_product_ready.cmd Ch-Product-Slice002", md)
         self.assertIn("run_ppe_local.cmd", md)

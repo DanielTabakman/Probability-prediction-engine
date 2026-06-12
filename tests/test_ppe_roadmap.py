@@ -78,6 +78,10 @@ class TestPpeRoadmap(unittest.TestCase):
             json.dumps({"phasePlanPath": "", "status": "COMPLETE", "notes": ""}, indent=2),
             encoding="utf-8",
         )
+        (sop / "MSOS_P8_VALIDATION_REPORT_V1.md").write_text(
+            "**Status:** **COMPLETE**\n",
+            encoding="utf-8",
+        )
         os.environ.pop("PPE_AUTO_ROADMAP", None)
 
     def tearDown(self) -> None:

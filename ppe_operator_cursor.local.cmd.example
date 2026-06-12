@@ -1,0 +1,6 @@
+@echo off
+REM Copy to ppe_operator_cursor.local.cmd (gitignored) for Cursor Automation webhook.
+REM See docs/SOP/CURSOR_IDE_BUILD_AUTOMATION_V1.md
+
+set "PPE_CURSOR_AUTOMATION_WEBHOOK_URL=https://api2.cursor.sh/automations/webhook/YOUR-ID-HERE"
+set "PPE_CURSOR_AUTOMATION_WEBHOOK_KEY=crsr_YOUR-KEY-HERE"

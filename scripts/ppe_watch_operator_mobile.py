@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_operator_hint import append_ppe_go_hint
 from scripts.ppe_operator_status import (
     VERDICT_ERROR,
     VERDICT_FIX_PLAN,
@@ -196,7 +197,7 @@ def push_stack_status_notify(
     if not loop_running:
         title = "PPE stack down"
         body = "Loop is not running on the desktop. Reboot or run run_ppe_desktop_operator.cmd at the PC."
-        priority = "high"
+        priority = "urgent"
         tags = ["ppe", "down"]
     else:
         title = f"PPE OK - {verdict or 'RUNNING'}"
@@ -266,7 +267,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                 alerts.append(
                     (
                         f"PPE IDE handoff: {slice_id or verdict}",
-                        f"{blocker}\nOpen Cursor → new Agent → @{auto_build.get('starter', 'IDE_BUILD_STARTER')}",
+                        append_ppe_go_hint(blocker, VERDICT_IDE_BUILD),
                     )
                 )
             else:
@@ -277,7 +278,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                     )
                 )
         else:
-            alerts.append((f"PPE operator: {verdict}", blocker))
+            alerts.append((f"PPE operator: {verdict}", append_ppe_go_hint(blocker, verdict)))
 
     prior_blocker = str(prior.get("last_blocker") or "").strip()
     current_blocker = str(status.get("blocker") or "").strip()
@@ -330,7 +331,8 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     stuck_alert_sent = False
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
-            if send_ntfy(title, body, tags=["ppe", "watch"], priority="high"):
+            priority = "urgent" if title == "PPE loop stopped" else "high"
+            if send_ntfy(title, body, tags=["ppe", "watch"], priority=priority):
                 sent += 1
                 if title.startswith("PPE still stuck:"):
                     stuck_alert_sent = True

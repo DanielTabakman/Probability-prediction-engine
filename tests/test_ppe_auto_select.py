@@ -59,6 +59,10 @@ class TestPpeAutoSelect(unittest.TestCase):
             "notes": "closed",
         }
         (sop / "ACTIVE_PHASE_MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        (sop / "MSOS_P8_VALIDATION_REPORT_V1.md").write_text(
+            "**Status:** **COMPLETE**\n",
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         self._tmp.cleanup()

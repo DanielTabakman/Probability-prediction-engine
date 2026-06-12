@@ -12,6 +12,7 @@ from typing import Any
 
 from scripts.ppe_auto_select import choose_next_plan
 from scripts.ppe_ide_build_starter import format_ide_build_resume, starter_path
+from scripts.ppe_operator_hint import PPE_GO_HINT, append_ppe_go_hint
 from scripts.ppe_manifest import load_manifest, resolve_summary
 from scripts.ppe_operator_guards import (
     GUARD_EXIT,
@@ -105,15 +106,12 @@ def _commands_for_verdict(
     plan_path: str | None,
     product_slice: str | None,
 ) -> list[str]:
-    if verdict == VERDICT_IDE_BUILD and plan_path and product_slice:
-        return [
-            f"generate_ide_build_starter.cmd {product_slice} {plan_path}",
-            f"New Cursor Agent thread -> @ {starter_path(product_slice)}",
-            f"mark_ide_product_ready.cmd {product_slice}",
-            "run_ppe_local.cmd",
-        ]
+    if verdict == VERDICT_IDE_BUILD:
+        return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_LOCAL:
-        return ["run_ppe_local.cmd"]
+        return [PPE_GO_HINT]
+    if verdict in ("FIX_PLAN", "STALE_STATE", "ERROR"):
+        return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_AUTO:
         return ["run_ppe_auto_local_loop.cmd"]
     if verdict == VERDICT_SUPPLY_LOW:
@@ -316,12 +314,14 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
     out = repo / NOTIFY_REL
     out.parent.mkdir(parents=True, exist_ok=True)
+    verdict = str(status.get("verdict") or "")
+    body = append_ppe_go_hint(str(status.get("blocker") or _format_brief(status)), verdict)
     payload = {
         "as_of": status.get("as_of"),
         "verdict": status.get("verdict"),
         "exit_code": status.get("exit_code"),
         "title": f"PPE operator: {status.get('verdict')}",
-        "body": status.get("blocker") or _format_brief(status),
+        "body": body,
     }
     out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return out
@@ -359,7 +359,10 @@ def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
         mode = str(auto_build.get("mode") or auto_build.get("action") or "build")
         if mode == "ide_handoff":
             title = f"PPE IDE handoff: {auto_build.get('slice_id') or 'IDE_BUILD'}"
-            body = str(auto_build.get("message") or "Open Cursor Agent with IDE_BUILD_STARTER.")
+            body = append_ppe_go_hint(
+                str(auto_build.get("message") or "IDE BUILD ready."),
+                VERDICT_IDE_BUILD,
+            )
         else:
             title = f"PPE auto-build started: {auto_build.get('slice_id') or 'IDE_BUILD'}"
             body = str(auto_build.get("message") or "Agent CLI running on desktop.")

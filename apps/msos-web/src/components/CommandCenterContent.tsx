@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import {
+  calibrationStrip,
   currentWork,
   headlines,
   kpis,
@@ -28,6 +29,24 @@ export function CommandCenterContent() {
           </span>
         </div>
       </header>
+
+      <section className="calibration-strip panel compact" aria-label="Calibration loop">
+        <div>
+          <h2>{calibrationStrip.title}</h2>
+          <p>{calibrationStrip.body}</p>
+        </div>
+        <div className="calibration-actions">
+          <Link href={calibrationStrip.href} className="btn slim primary">
+            {calibrationStrip.cta}
+          </Link>
+          <Link href="/history" className="btn slim">
+            History
+          </Link>
+          <Link href="/learn" className="btn slim">
+            Learn loop
+          </Link>
+        </div>
+      </section>
 
       <section className="kpi-row" aria-label="Key metrics">
         {kpis.map((kpi) => (

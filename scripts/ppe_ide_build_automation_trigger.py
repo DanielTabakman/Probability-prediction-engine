@@ -86,7 +86,14 @@ def post_automation_webhook(repo: Path, payload: dict[str, Any]) -> dict[str, An
         with urllib.request.urlopen(req, timeout=15) as resp:
             return {"ok": True, "status": resp.status}
     except urllib.error.HTTPError as exc:
-        return {"ok": False, "error": f"HTTP {exc.code}", "detail": exc.reason}
+        detail = exc.reason
+        try:
+            body = exc.read().decode("utf-8", errors="replace").strip()
+            if body:
+                detail = body[:500]
+        except OSError:
+            pass
+        return {"ok": False, "error": f"HTTP {exc.code}", "detail": detail}
     except OSError as exc:
         return {"ok": False, "error": str(exc)}
 
@@ -110,18 +117,36 @@ def notify_automation(repo: Path, *, handoff: dict[str, Any]) -> dict[str, Any]:
         reason=reason,
         source=source,
     )
+    starter_path = repo / starter.replace("/", os.sep)
+    starter_content = ""
+    if starter_path.is_file():
+        try:
+            starter_content = starter_path.read_text(encoding="utf-8")
+        except OSError:
+            pass
+
     webhook_payload = {
         "event": "ppe_ide_build_handoff",
         "sliceId": slice_id,
         "planPath": plan_path,
         "starter": starter,
+        "starterContent": starter_content,
         "reason": reason,
         "handoffAt": _utc_now(),
         "triggerFile": TRIGGER_REL,
     }
     webhook = post_automation_webhook(repo, webhook_payload)
-    return {
+    result: dict[str, Any] = {
         "ok": True,
         "trigger": str(trigger_file.relative_to(repo)).replace("\\", "/"),
         "webhook": webhook,
     }
+    if not webhook.get("ok") and not webhook.get("skipped"):
+        try:
+            from scripts.ppe_ide_build_automation_health import write_last_error
+
+            err_path = write_last_error(repo, context="handoff_webhook", failure=webhook)
+            result["last_error"] = str(err_path.relative_to(repo)).replace("\\", "/")
+        except ImportError:
+            pass
+    return result
