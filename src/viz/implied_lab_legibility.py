@@ -103,7 +103,8 @@ Each row is one **expiry** and one **method** for terminal BTC price statistics 
 | **Risk-neutral mean** | Expected terminal price under that distribution |
 | **Median (50th %)** | Half of implied outcomes below this price |
 | **Lower / upper quartile** | 25th and 75th percentile of terminal price |
-| **Implied range width** | Upper quartile minus lower quartile — wider = more uncertainty |
+| **Implied range width (IQR)** | Upper quartile minus lower quartile — wider = more uncertainty |
+| **BL − LN mean gap** | Options-chain mean minus lognormal baseline mean (chain rows only) |
 | **Method** | **Model bell (lognormal)** = forward + ATM vol baseline; **Options chain (B–L)** = shape from live call marks |
 
 **Status** — when the options chain cannot be used honestly, the row shows *Skipped* (not enough marks or degenerate fit). Lognormal baseline rows always show computed stats.
@@ -115,7 +116,8 @@ DIST_COL_MEAN = "Risk-neutral mean"
 DIST_COL_Q25 = "Lower quartile"
 DIST_COL_Q50 = "Median terminal price (50th %)"
 DIST_COL_Q75 = "Upper quartile"
-DIST_COL_RANGE = "Implied range width"
+DIST_COL_RANGE = "Implied range width (IQR)"
+DIST_COL_BL_LN_GAP = "BL − LN mean gap"
 DIST_COL_STATUS = "Status"
 
 DIST_LABEL_MEAN_HELP = "Expected terminal price under this distribution"
@@ -123,6 +125,7 @@ DIST_LABEL_Q50_HELP = "Half of implied outcomes below this price"
 DIST_LABEL_Q25_HELP = "25th percentile of terminal price"
 DIST_LABEL_Q75_HELP = "75th percentile of terminal price"
 DIST_LABEL_RANGE_HELP = "q75 − q25; wider = more uncertainty"
+DIST_LABEL_BL_LN_GAP_HELP = "Chain mean minus lognormal baseline mean for the same expiry"
 
 DIST_METHOD_LOGNORMAL = "Model bell (lognormal)"
 DIST_METHOD_LOGNORMAL_HELP = "Forward + ATM vol baseline"

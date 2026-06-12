@@ -20,9 +20,15 @@ CSV_COLUMNS = [
     "T_years",
     "distribution",
     "mean_usd",
+    "q05_usd",
+    "q10_usd",
     "q25_usd",
     "q50_usd",
     "q75_usd",
+    "q90_usd",
+    "q95_usd",
+    "iqr_usd",
+    "bl_ln_mean_gap_usd",
     "forward_usd",
     "atm_iv_annual",
     "spot_usd",
@@ -35,6 +41,30 @@ def _fmt_usd(value: float | None) -> str:
     if value is None:
         return ""
     return f"{float(value):.2f}"
+
+
+def _empty_bl_stats() -> dict[str, float]:
+    return {
+        "mean_usd": 0.0,
+        "q05_usd": 0.0,
+        "q10_usd": 0.0,
+        "q25_usd": 0.0,
+        "q50_usd": 0.0,
+        "q75_usd": 0.0,
+        "q90_usd": 0.0,
+        "q95_usd": 0.0,
+    }
+
+
+def _iqr_usd(stats: dict[str, float]) -> float | None:
+    q25 = stats.get("q25_usd")
+    q75 = stats.get("q75_usd")
+    if q25 is None or q75 is None:
+        return None
+    width = float(q75) - float(q25)
+    if width <= 0:
+        return None
+    return width
 
 
 def _stats_row(
@@ -50,7 +80,9 @@ def _stats_row(
     spot_usd: float,
     call_marks_count: str,
     bl_status: str,
+    bl_ln_mean_gap_usd: float | None = None,
 ) -> dict[str, str]:
+    iqr = _iqr_usd(stats)
     return {
         "as_of_utc": as_of_utc,
         "asset": asset,
@@ -58,9 +90,15 @@ def _stats_row(
         "T_years": f"{float(T_years):.6f}",
         "distribution": distribution,
         "mean_usd": _fmt_usd(stats.get("mean_usd")),
+        "q05_usd": _fmt_usd(stats.get("q05_usd")),
+        "q10_usd": _fmt_usd(stats.get("q10_usd")),
         "q25_usd": _fmt_usd(stats.get("q25_usd")),
         "q50_usd": _fmt_usd(stats.get("q50_usd")),
         "q75_usd": _fmt_usd(stats.get("q75_usd")),
+        "q90_usd": _fmt_usd(stats.get("q90_usd")),
+        "q95_usd": _fmt_usd(stats.get("q95_usd")),
+        "iqr_usd": _fmt_usd(iqr),
+        "bl_ln_mean_gap_usd": _fmt_usd(bl_ln_mean_gap_usd),
         "forward_usd": _fmt_usd(forward_usd),
         "atm_iv_annual": f"{float(atm_iv_annual):.6f}",
         "spot_usd": _fmt_usd(spot_usd),
@@ -131,7 +169,7 @@ def build_distribution_export_rows(
                     expiry_date=expiry_date,
                     T_years=T_years,
                     distribution="market_implied_bl",
-                    stats={"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0},
+                    stats=_empty_bl_stats(),
                     forward_usd=forward,
                     atm_iv_annual=vol,
                     spot_usd=spot_usd,
@@ -152,7 +190,7 @@ def build_distribution_export_rows(
                     expiry_date=expiry_date,
                     T_years=T_years,
                     distribution="market_implied_bl",
-                    stats={"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0},
+                    stats=_empty_bl_stats(),
                     forward_usd=forward,
                     atm_iv_annual=vol,
                     spot_usd=spot_usd,
@@ -176,6 +214,7 @@ def build_distribution_export_rows(
                 spot_usd=spot_usd,
                 call_marks_count=str(len(call_marks)),
                 bl_status="computed",
+                bl_ln_mean_gap_usd=float(bl_stats["mean_usd"]) - float(ln_stats["mean_usd"]),
             )
         )
     return rows
