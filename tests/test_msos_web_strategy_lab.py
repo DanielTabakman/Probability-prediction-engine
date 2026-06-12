@@ -118,3 +118,37 @@ def test_nav_enables_expression_planning() -> None:
     assert 'href: "/strategy-lab/expression"' in nav
     expression_block = nav.split('id: "expression"')[1].split("monitor")[0]
     assert "disabled: true" not in expression_block
+
+
+def test_monitoring_history_routes_and_panels() -> None:
+    monitor_page = MSOS_WEB / "src" / "app" / "monitor" / "page.tsx"
+    history_page = MSOS_WEB / "src" / "app" / "history" / "page.tsx"
+    assert monitor_page.is_file()
+    assert history_page.is_file()
+    assert "MonitorContent" in monitor_page.read_text(encoding="utf-8")
+    assert "HistoryContent" in history_page.read_text(encoding="utf-8")
+
+    monitor_fixtures = (MSOS_WEB / "src" / "data" / "monitoringFixtures.ts").read_text(encoding="utf-8")
+    assert "Thesis validity" in monitor_fixtures
+    assert "Expression risk" in monitor_fixtures
+    assert "Data & trust" in monitor_fixtures
+
+    monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+    assert "watchPanels" in monitor
+    assert "no live fills" in monitor
+
+    history_fixtures = (MSOS_WEB / "src" / "data" / "historyFixtures.ts").read_text(encoding="utf-8")
+    assert "observed" in history_fixtures
+    assert "simulated" in history_fixtures
+
+    history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
+    assert "historyEntries" in history
+    assert "Executed" in history
+
+    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+    assert 'href: "/monitor"' in nav
+    assert 'href: "/history"' in nav
+
+    cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
+    assert "calibrationStrip" in cc
+    assert 'href="/history"' in cc
