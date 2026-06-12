@@ -8,6 +8,7 @@ REM set "PPE_NTFY_DAILY_CAP=40"
 REM set "PPE_NTFY_PROGRESS=chapter"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=24"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=0"
+REM Phone status shows today's breakdown; cap ping includes what to cut.
 REM set "PPE_NTFY_STUCK_HOURS=8"
 REM Weekly digest to phone (skip desktop toast):
 REM set "PPE_WEEKLY_DIGEST_TOAST=0"

@@ -8,6 +8,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
@@ -16,10 +17,12 @@ from typing import Any, Literal
 DEFAULT_NTFY_SERVER = "https://ntfy.sh"
 SNOOZE_REL = "artifacts/control_plane/NTFY_SNOOZE.json"
 SEND_STATE_REL = "artifacts/control_plane/NTFY_SEND_STATE.json"
+QUOTA_STATUS_REL = "artifacts/control_plane/NTFY_QUOTA_STATUS.json"
 OUTBOUND_TAG = "from-desktop"
 DEFAULT_DAILY_CAP = 40
 DEFAULT_DEDUP_MINUTES = 45.0
 DEFAULT_MIN_INTERVAL_SEC = 120.0
+DEFAULT_WARN_PCT = 80
 SEND_WINDOW = timedelta(hours=24)
 PRIORITY_BY_VERDICT = {
     "ERROR": "urgent",
@@ -196,6 +199,15 @@ def ntfy_daily_cap() -> int:
         return DEFAULT_DAILY_CAP
 
 
+def ntfy_warn_threshold() -> int:
+    raw = os.environ.get("PPE_NTFY_WARN_PCT", str(DEFAULT_WARN_PCT)).strip()
+    try:
+        pct = max(50, min(100, int(raw)))
+    except ValueError:
+        pct = DEFAULT_WARN_PCT
+    return max(1, int(ntfy_daily_cap() * pct / 100))
+
+
 def ntfy_dedup_minutes() -> float:
     raw = os.environ.get("PPE_NTFY_DEDUP_MINUTES", str(DEFAULT_DEDUP_MINUTES)).strip()
     try:
@@ -214,6 +226,14 @@ def ntfy_min_interval_seconds() -> float:
 
 def send_state_path(repo: Path | None = None) -> Path:
     return (repo or repo_root()).resolve() / SEND_STATE_REL
+
+
+def quota_status_path(repo: Path | None = None) -> Path:
+    return (repo or repo_root()).resolve() / QUOTA_STATUS_REL
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _load_send_state(repo: Path | None = None) -> dict[str, Any]:
@@ -280,6 +300,192 @@ def _is_heartbeat_message(title: str, tags: list[str] | None) -> bool:
     return title.startswith("PPE OK") or {"ok", "heartbeat"}.intersection(tag_set)
 
 
+def categorize_send_title(title: str) -> str:
+    lower = (title or "").lower()
+    if "ntfy budget" in lower:
+        return "quota"
+    if lower.startswith("ppe ok"):
+        return "heartbeat"
+    if "slice done" in lower:
+        return "slice"
+    if "chapter done" in lower:
+        return "chapter"
+    if "ide build" in lower or "ide handoff" in lower or "auto-build" in lower:
+        return "ide_build"
+    if "loop stopped" in lower or "stack down" in lower:
+        return "critical"
+    if "still stuck" in lower:
+        return "stuck"
+    if "fixing" in lower or "fix done" in lower or lower.startswith("ppe fixed"):
+        return "fix"
+    if "build finished" in lower or "finish failed" in lower:
+        return "build"
+    if lower.startswith("ppe operator:"):
+        return "verdict"
+    if lower.startswith("ppe status"):
+        return "status"
+    return "other"
+
+
+def summarize_sends(sends: list[dict[str, Any]]) -> dict[str, int]:
+    counts: Counter[str] = Counter()
+    for item in sends:
+        title = str(item.get("title") or "")
+        cat = str(item.get("category") or categorize_send_title(title))
+        if cat != "quota":
+            counts[cat] += 1
+    return dict(counts.most_common())
+
+
+def suggest_volume_cuts(breakdown: dict[str, int]) -> list[str]:
+    cuts: list[str] = []
+    if breakdown.get("heartbeat", 0) >= 2:
+        cuts.append("PPE_NTFY_HEARTBEAT_HOURS=0 — disable OK heartbeats")
+    if breakdown.get("slice", 0) >= 3:
+        cuts.append("PPE_NTFY_PROGRESS=chapter — skip per-slice pings")
+    if breakdown.get("fix", 0) >= 2:
+        cuts.append("Skip notify_fix.cmd unless you need agent fix pings")
+    if breakdown.get("stuck", 0) >= 2:
+        cuts.append("PPE_NTFY_STUCK_HOURS=12 — fewer stuck reminders")
+    if breakdown.get("ide_build", 0) >= 8:
+        cuts.append("Fewer IDE_BUILD cycles or raise PPE_NTFY_DAILY_CAP")
+    if not cuts:
+        cuts.append("PPE_NTFY_PROGRESS=off — mute relay progress")
+        cuts.append("PPE_NTFY_HEARTBEAT_HOURS=0 — mute OK pings")
+    return cuts[:5]
+
+
+def build_quota_snapshot(
+    *,
+    sends: list[dict[str, Any]],
+    cap: int | None = None,
+    skipped_title: str = "",
+    skip_reason: str = "",
+) -> dict[str, Any]:
+    cap = cap if cap is not None else ntfy_daily_cap()
+    count = len(sends)
+    breakdown = summarize_sends(sends)
+    return {
+        "as_of": _utc_now(),
+        "count": count,
+        "cap": cap,
+        "remaining": max(0, cap - count),
+        "warn_threshold": ntfy_warn_threshold(),
+        "at_cap": count >= cap,
+        "skipped_last": skipped_title or None,
+        "skip_reason": skip_reason or None,
+        "breakdown": breakdown,
+        "suggested_cuts": suggest_volume_cuts(breakdown),
+    }
+
+
+def write_quota_status_file(snapshot: dict[str, Any], repo: Path | None = None) -> Path:
+    path = quota_status_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def format_quota_brief(repo: Path | None = None) -> str:
+    state = _load_send_state(repo)
+    sends = _prune_send_state(state)
+    snap = build_quota_snapshot(sends=sends)
+    write_quota_status_file(snap, repo)
+    lines = [f"ntfy today: {snap['count']}/{snap['cap']} ({snap['remaining']} left)"]
+    breakdown = snap.get("breakdown") or {}
+    if breakdown:
+        parts = [f"{k}={v}" for k, v in list(breakdown.items())[:6]]
+        lines.append("breakdown: " + ", ".join(parts))
+    if snap.get("at_cap"):
+        lines.append("AT CAP — routine pings are being skipped")
+    return "\n".join(lines)
+
+
+def _quota_notice_due(state: dict[str, Any], key: str) -> bool:
+    last = _parse_utc(str(state.get(key) or ""))
+    if last is None:
+        return True
+    if last.tzinfo is None:
+        last = last.replace(tzinfo=timezone.utc)
+    return (datetime.now(timezone.utc) - last).total_seconds() >= SEND_WINDOW.total_seconds()
+
+
+def _format_quota_notice_body(snap: dict[str, Any], *, kind: str, skipped_title: str = "") -> str:
+    lines = [f"Sent {snap['count']}/{snap['cap']} in the last 24h."]
+    if skipped_title:
+        lines.append(f"Just skipped: {skipped_title}")
+    breakdown = snap.get("breakdown") or {}
+    if breakdown:
+        lines.append("")
+        lines.append("Top senders:")
+        for cat, n in list(breakdown.items())[:6]:
+            lines.append(f"- {n}x {cat.replace('_', ' ')}")
+    cuts = snap.get("suggested_cuts") or []
+    if cuts:
+        lines.append("")
+        lines.append("To cut volume:")
+        for cut in cuts:
+            lines.append(f"- {cut}")
+    lines.append("")
+    lines.append(
+        "Urgent/loop-down still get through. Phone: status | snooze 8"
+        if kind == "exceeded"
+        else "Approaching cap. Phone: status for full breakdown."
+    )
+    return "\n".join(lines)
+
+
+def _post_ntfy_raw(title: str, body: str, *, tags: list[str] | None = None, priority: str = "default") -> bool:
+    if not notify_enabled() or not ntfy_topic():
+        return False
+    url = f"{ntfy_server()}/{ntfy_topic()}"
+    outbound_tags = list(tags or [])
+    if OUTBOUND_TAG not in outbound_tags:
+        outbound_tags.insert(0, OUTBOUND_TAG)
+    headers = {"Title": _header_value(title), "Priority": priority}
+    if outbound_tags:
+        headers["Tags"] = _header_value(",".join(outbound_tags[:5]))
+    token = os.environ.get("PPE_NTFY_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, data=body.encode("utf-8"), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            return 200 <= response.status < 300
+    except urllib.error.URLError as exc:
+        print(f"ppe_notify_push: ntfy failed: {exc}", file=sys.stderr)
+        return False
+
+
+def _maybe_notify_quota_warn(repo: Path | None, state: dict[str, Any], sends: list[dict[str, Any]]) -> None:
+    cap = ntfy_daily_cap()
+    if len(sends) < ntfy_warn_threshold() or len(sends) >= cap:
+        return
+    if not _quota_notice_due(state, "quota_warn_sent_at"):
+        return
+    snap = build_quota_snapshot(sends=sends, cap=cap)
+    write_quota_status_file(snap, repo)
+    title = f"PPE ntfy budget: {snap['count']}/{cap} today"
+    if _post_ntfy_raw(title, _format_quota_notice_body(snap, kind="warn"), tags=["ppe", "quota", "warn"], priority="high"):
+        state["quota_warn_sent_at"] = _utc_now()
+        _save_send_state(state, repo)
+
+
+def _maybe_notify_quota_exceeded(
+    repo: Path | None, state: dict[str, Any], sends: list[dict[str, Any]], *, skipped_title: str
+) -> None:
+    if not _quota_notice_due(state, "quota_cap_sent_at"):
+        return
+    cap = ntfy_daily_cap()
+    snap = build_quota_snapshot(sends=sends, cap=cap, skipped_title=skipped_title, skip_reason="daily cap")
+    write_quota_status_file(snap, repo)
+    title = f"PPE ntfy budget: {snap['count']}/{cap} — cap reached"
+    body = _format_quota_notice_body(snap, kind="exceeded", skipped_title=skipped_title)
+    if _post_ntfy_raw(title, body, tags=["ppe", "quota", "cap"], priority="urgent"):
+        state["quota_cap_sent_at"] = _utc_now()
+        _save_send_state(state, repo)
+
+
 def should_throttle_ntfy(
     title: str,
     *,
@@ -289,7 +495,7 @@ def should_throttle_ntfy(
     repo: Path | None = None,
 ) -> tuple[bool, str]:
     """Return (allow_send, skip_reason)."""
-    if bypass_throttle:
+    if bypass_throttle or priority == "urgent":
         return True, ""
 
     state = _load_send_state(repo)
@@ -310,20 +516,22 @@ def should_throttle_ntfy(
         if at >= dedup_cutoff:
             return False, f"dedup ({dedup_minutes:g}m window)"
 
-    if priority != "urgent":
-        cap = ntfy_daily_cap()
-        if len(sends) >= cap:
-            return False, f"daily cap ({cap})"
+    cap = ntfy_daily_cap()
+    if len(sends) >= cap:
+        snap = build_quota_snapshot(sends=sends, cap=cap, skipped_title=title, skip_reason="daily cap")
+        write_quota_status_file(snap, repo)
+        _maybe_notify_quota_exceeded(repo, state, sends, skipped_title=title)
+        return False, f"daily cap ({cap})"
 
-        min_gap = ntfy_min_interval_seconds()
-        if min_gap > 0 and sends:
-            last_at = _parse_utc(str(sends[-1].get("at") or ""))
-            if last_at is not None:
-                if last_at.tzinfo is None:
-                    last_at = last_at.replace(tzinfo=timezone.utc)
-                elapsed = (now - last_at).total_seconds()
-                if elapsed < min_gap:
-                    return False, f"min interval ({min_gap:g}s)"
+    min_gap = ntfy_min_interval_seconds()
+    if min_gap > 0 and sends:
+        last_at = _parse_utc(str(sends[-1].get("at") or ""))
+        if last_at is not None:
+            if last_at.tzinfo is None:
+                last_at = last_at.replace(tzinfo=timezone.utc)
+            elapsed = (now - last_at).total_seconds()
+            if elapsed < min_gap:
+                return False, f"min interval ({min_gap:g}s)"
 
     return True, ""
 
@@ -339,13 +547,17 @@ def record_ntfy_send(
     sends = _prune_send_state(state)
     sends.append(
         {
-            "at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "at": _utc_now(),
             "fp": _message_fingerprint(title, tags, priority),
             "title": title[:160],
             "priority": priority,
+            "category": categorize_send_title(title),
         }
     )
-    _save_send_state({"sends": sends}, repo)
+    state["sends"] = sends
+    write_quota_status_file(build_quota_snapshot(sends=sends), repo)
+    _maybe_notify_quota_warn(repo, state, sends)
+    _save_send_state(state, repo)
 
 
 def send_ntfy(
@@ -372,6 +584,7 @@ def send_ntfy(
         tags=tags,
         priority=priority,
         bypass_throttle=bypass_throttle,
+        repo=repo_root(),
     )
     if not allow:
         print(f"ppe_notify_push: skipped ({skip_reason}): {title[:80]}", file=sys.stderr)
@@ -397,7 +610,7 @@ def send_ntfy(
         with urllib.request.urlopen(request, timeout=15) as response:
             ok = 200 <= response.status < 300
             if ok:
-                record_ntfy_send(title, tags=outbound_tags, priority=priority)
+                record_ntfy_send(title, tags=outbound_tags, priority=priority, repo=repo_root())
             return ok
     except urllib.error.URLError as exc:
         print(f"ppe_notify_push: ntfy failed: {exc}", file=sys.stderr)
@@ -482,12 +695,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--body", help="Direct body (with --title)")
     ap.add_argument("--verdict", help="Verdict tag for priority when using --title/--body")
     ap.add_argument("--check", action="store_true", help="Print whether ntfy is configured and exit 0/1")
+    ap.add_argument("--quota", action="store_true", help="Print today's ntfy send budget and exit")
     args = ap.parse_args(argv)
 
     if args.check:
         ok = notify_enabled() and ntfy_configured()
         print(f"ppe_notify_push: configured={ok} topic={ntfy_topic() or '(unset)'}")
         return 0 if ok else 1
+
+    if args.quota:
+        print(format_quota_brief(args.repo_root.resolve()))
+        return 0
 
     if args.weekly_digest:
         payload = args.payload or (args.repo_root / "artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json")
@@ -508,7 +726,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0 if sent or not ntfy_configured() else 1
 
-    ap.error("provide --payload or --title")
+    ap.error("provide --payload, --title, or --quota")
     return 2
 
 

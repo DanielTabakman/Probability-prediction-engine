@@ -197,7 +197,7 @@ def push_stack_status_notify(
     if not loop_running:
         title = "PPE stack down"
         body = "Loop is not running on the desktop. Reboot or run run_ppe_desktop_operator.cmd at the PC."
-        priority = "high"
+        priority = "urgent"
         tags = ["ppe", "down"]
     else:
         title = f"PPE OK - {verdict or 'RUNNING'}"
@@ -331,7 +331,8 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     stuck_alert_sent = False
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
-            if send_ntfy(title, body, tags=["ppe", "watch"], priority="high"):
+            priority = "urgent" if title == "PPE loop stopped" else "high"
+            if send_ntfy(title, body, tags=["ppe", "watch"], priority=priority):
                 sent += 1
                 if title.startswith("PPE still stuck:"):
                     stuck_alert_sent = True

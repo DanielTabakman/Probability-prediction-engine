@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
   "workerMode": "deterministic"
 }

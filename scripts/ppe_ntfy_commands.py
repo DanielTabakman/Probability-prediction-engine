@@ -13,6 +13,7 @@ from typing import Any
 from scripts.ppe_notify_push import (
     OUTBOUND_TAG,
     apply_snooze_request,
+    format_quota_brief,
     format_snooze_until,
     ntfy_configured,
     notify_enabled,
@@ -106,7 +107,8 @@ def execute_status(repo: Path) -> dict[str, Any]:
     result = collect_status(repo.resolve(), apply_propagate=False, ensure=False)
     brief = str(result.get("operator_brief") or "")
     stack = result.get("stack") or {}
-    body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}"
+    quota = format_quota_brief(repo.resolve())
+    body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}\n\n{quota}"
     sent = send_ntfy("PPE status", body, tags=["ppe", "cmd", OUTBOUND_TAG], bypass_throttle=True)
     return {"action": "status", "body": body, "notified": sent}
 
