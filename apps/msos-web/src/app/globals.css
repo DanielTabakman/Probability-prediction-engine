@@ -1761,6 +1761,102 @@ button.btn:disabled {
   color: var(--muted);
 }
 
+/* P8 — conclusion / learn loop */
+.conclusion-hero {
+  margin-top: 8px;
+  padding: 22px 24px;
+}
+
+.conclusion-question {
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 840;
+  letter-spacing: -0.05em;
+  margin: 12px 0;
+}
+
+.conclusion-lead {
+  font-size: 15px;
+  color: #dbe8f4;
+  margin: 0 0 10px;
+}
+
+.learn-loop-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.learn-step {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #091522;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.learn-index {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--teal);
+  min-width: 18px;
+}
+
+.learn-step p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.conclusion-layout {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.metric-row {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metric-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.metric-fixture {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.metric-row p {
+  margin: 0;
+  font-size: 12px;
+  color: #bed0df;
+  line-height: 1.45;
+}
+
+.inline-code {
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+.aside-warning {
+  color: var(--amber);
+  margin-top: 12px;
+}
+
+.conclusion-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 @media (max-width: 1100px) {
   .monitor-layout {
     grid-template-columns: 1fr;
@@ -1774,10 +1870,22 @@ button.btn:disabled {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .learn-loop-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .conclusion-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
   .metrics {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .learn-loop-strip {
+    grid-template-columns: 1fr;
   }
 }

@@ -42,6 +42,9 @@ export function CommandCenterContent() {
           <Link href="/history" className="btn slim">
             History
           </Link>
+          <Link href="/learn" className="btn slim">
+            Learn loop
+          </Link>
         </div>
       </section>
 
