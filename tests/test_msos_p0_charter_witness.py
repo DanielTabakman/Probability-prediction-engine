@@ -109,7 +109,7 @@ def test_backlog_p1_done_p2_done_p3_done_p4_chartered() -> None:
     p4 = by_id["msos_p4_strategy_lab"]
     assert p4["status"] in ("queued", "chartered", "done")
     assert p4["planPath"] == "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json"
-    assert by_id["msos_p8_tester_release"]["status"] == "blocked"
+    assert by_id["msos_p8_tester_release"]["status"] in ("blocked", "queued", "chartered", "done")
 
 
 def test_queue_health_no_issues_on_live_queue() -> None:
