@@ -10,6 +10,7 @@ from src.viz.implied_lab_legibility import (
     BL_STATUS_COMPUTED,
     BL_STATUS_SKIPPED_DEGENERATE,
     BL_STATUS_SKIPPED_INSUFFICIENT,
+    DIST_COL_BL_LN_GAP,
     DIST_COL_EXPIRY,
     DIST_COL_MEAN,
     DIST_COL_METHOD,
@@ -51,6 +52,14 @@ def _range_width_usd(q25: str, q75: str) -> str:
     return f"${hi - lo:,.0f}"
 
 
+def _signed_gap_display(value: str) -> str:
+    parsed = _parse_usd(value)
+    if parsed is None:
+        return "—"
+    sign = "+" if parsed > 0 else ""
+    return f"{sign}${parsed:,.0f}"
+
+
 def distribution_method_label(distribution: str) -> str:
     if distribution == "market_implied_bl":
         return DIST_METHOD_BL
@@ -81,6 +90,8 @@ def build_distribution_summary_table_rows(
         distribution = str(row.get("distribution") or "")
         bl_status = str(row.get("bl_status") or "")
         skipped = distribution == "market_implied_bl" and bl_status.startswith("skipped")
+        iqr_value = str(row.get("iqr_usd") or "")
+        gap_value = str(row.get("bl_ln_mean_gap_usd") or "")
         display.append(
             {
                 DIST_COL_EXPIRY: str(row.get("expiry_date") or ""),
@@ -89,9 +100,15 @@ def build_distribution_summary_table_rows(
                 DIST_COL_Q25: "—" if skipped else _fmt_usd_display(str(row.get("q25_usd") or "")),
                 DIST_COL_Q50: "—" if skipped else _fmt_usd_display(str(row.get("q50_usd") or "")),
                 DIST_COL_Q75: "—" if skipped else _fmt_usd_display(str(row.get("q75_usd") or "")),
-                DIST_COL_RANGE: "—"
-                if skipped
-                else _range_width_usd(str(row.get("q25_usd") or ""), str(row.get("q75_usd") or "")),
+                DIST_COL_RANGE: "—" if skipped else _range_width_usd(
+                    str(row.get("q25_usd") or ""),
+                    str(row.get("q75_usd") or ""),
+                )
+                if not iqr_value
+                else _fmt_usd_display(iqr_value),
+                DIST_COL_BL_LN_GAP: "—"
+                if distribution != "market_implied_bl" or skipped
+                else _signed_gap_display(gap_value),
                 DIST_COL_STATUS: bl_status_display(bl_status, distribution=distribution),
             }
         )
