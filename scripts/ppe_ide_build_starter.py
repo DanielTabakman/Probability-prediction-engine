@@ -155,12 +155,27 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     )
     packet = build_packet_text(repo, slice_id=slice_id, phase_plan=norm_plan)
 
+    try:
+        from scripts.ppe_focus_gate import evaluate_focus_gate, format_ide_focus_block
+
+        focus = evaluate_focus_gate(repo, norm_plan)
+        focus_section = format_ide_focus_block(
+            tier=focus.tier,
+            urgent_bypass=focus.urgent_bypass,
+        )
+    except ImportError:
+        focus_section = ""
+
     starter_body_parts = [
         f"# IDE BUILD starter — `{slice_id}`",
         "",
         f"**As-of HEAD:** `{head}` · **Plane:** `{declared_plane}` · "
         f"**Layer preset:** `{scope.layer_preset}` · **Build branch:** `{build_branch}`",
         "",
+    ]
+    if focus_section:
+        starter_body_parts.extend([focus_section, ""])
+    starter_body_parts.extend([
         "## Continuity excerpt",
         "",
         _continuity_excerpt(repo),
@@ -185,7 +200,7 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         "",
         format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),
         "",
-    ]
+    ])
 
     full_md = "\n".join(starter_body_parts)
     starter_scored = score_text(full_md)

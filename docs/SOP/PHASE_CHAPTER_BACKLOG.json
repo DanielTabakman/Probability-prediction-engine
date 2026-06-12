@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high | medium | low \u2014 propagation picks highest eligible row when pipeline idle (see BACKLOG_OPERATOR.md). Append new rows anywhere; list order is tie-break only.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high|medium|low = mechanical order. focusPlaybookTier + PRODUCT_FOCUS_PLAYBOOK_V1 = semantic priority. urgent:true bypasses validation-report gate (ppe_focus_gate.py). See BACKLOG_OPERATOR.md.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
