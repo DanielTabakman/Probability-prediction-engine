@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P6_EXPRESSION_SIM.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "Expression planning + simulation only \u2014 closeout pass",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
   "workerMode": "deterministic"
 }

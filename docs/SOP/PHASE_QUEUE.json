@@ -146,7 +146,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md"
     }
