@@ -42,13 +42,19 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: |
           python scripts/sync_msos_repo_truth.py
-          python scripts/google_docs_sync.py \
-            $([ "${{ inputs.sync_master_to_repo }}" = "true" ] && echo "--sync-master-to-repo") \
-            $([ "${{ inputs.sync_repo_to_mirror }}" = "true" ] && echo "--sync-repo-to-mirror") \
-            --write-report
+          ARGS="--write-report"
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.sync_master_to_repo }}" = "true" ]; then
+            ARGS="$ARGS --sync-master-to-repo"
+          fi
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.sync_repo_to_mirror }}" = "true" ]; then
+            ARGS="$ARGS --sync-repo-to-mirror"
+          fi
+          python scripts/google_docs_sync.py $ARGS
 
       - name: Commit updated repo docs (if any)
         run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
           git status --porcelain
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
