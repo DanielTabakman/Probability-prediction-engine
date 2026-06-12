@@ -88,6 +88,8 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         self.assertTrue(section.product_lines)
         self.assertIn("homepage", section.in_short.lower())
         self.assertGreaterEqual(section.merge_count, 2)
+        self.assertTrue(section.backlog_runway_lines)
+        self.assertIn("Backlog runway", section.backlog_runway_lines[0])
 
     def test_week_dates_monday_to_sunday(self) -> None:
         mon = date(2026, 6, 1)
@@ -161,6 +163,25 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         assert "in_short" in raw
         assert "phone_title" in raw
         assert "phone_body" in raw
+        assert "backlog_runway" in raw
+        assert "Backlog check" in raw
+
+    def test_build_phone_digest_includes_backlog(self) -> None:
+        phone = build_phone_digest_notify(
+            {
+                "week_monday": "2026-06-01",
+                "merge_count": 1,
+                "product_lines": [],
+                "ops_summary": "",
+                "whats_next_lines": [],
+                "backlog_runway_phone": [
+                    "Backlog LOW: 1 chapter(s), ~1 est. days (want ≥2 chapters / ≥7 days).",
+                    "Next up: high: msos demo.",
+                ],
+            }
+        )
+        assert "Backlog check" in phone["phone_body"]
+        assert "Backlog LOW" in phone["phone_body"]
 
     def test_generate_and_backfill_idempotent(self) -> None:
         self._seed_changelog()

@@ -638,11 +638,13 @@ def send_weekly_digest_from_payload(payload_path: Path) -> bool:
 
     title = phone_title or f"PPE weekly digest (week of {week})"
     body = phone_body or in_short
+    runway = payload.get("backlog_runway") or {}
+    priority = "high" if isinstance(runway, dict) and runway.get("sufficient") is False else "default"
     return send_ntfy(
         title,
         body,
         tags=["ppe", "weekly", "digest"],
-        priority="default",
+        priority=priority,
         click_url=click_url,
     )
 

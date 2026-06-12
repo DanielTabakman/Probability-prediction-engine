@@ -71,8 +71,8 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd summary --days 7` | Throughput review |
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
-| `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
-| `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; optional Windows toast (`PPE_WEEKLY_DIGEST_TOAST=0` for phone only) |
+| `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) — includes **Backlog runway** (promotable chapters, priority, ~days ahead) |
+| `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; **high priority** when backlog runway is LOW |
 | `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
 | `install_weekly_digest_monday_task.cmd` | Register Monday 09:00 local Task Scheduler job (run once) |
 | `start_ppe_desktop_operator.cmd` | Desktop stack: auto-loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)) |

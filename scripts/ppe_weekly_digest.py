@@ -12,6 +12,11 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Literal
 
+from scripts.ppe_backlog_runway import (
+    analyze_backlog_runway,
+    build_backlog_runway_markdown,
+    build_backlog_runway_phone,
+)
 from scripts.ppe_dev_changelog import CHAPTER_CLOSED_PREFIX, QUIET_STUB, load_changelog
 
 DIGEST_REL = "docs/RELEASES/WEEKLY_DIGEST.md"
@@ -66,6 +71,7 @@ class WeekSection:
     product_lines: list[str]
     ops_summary: str
     whats_next_lines: list[str]
+    backlog_runway_lines: list[str]
     merge_count: int
     receipt_anchor: str
 
@@ -92,7 +98,8 @@ class WeekSection:
             lines.extend(self.whats_next_lines)
         else:
             lines.append("- See [`MSOS_FRONTIER.md`](../SOP/MSOS_FRONTIER.md) for live steering.")
-        lines.append("")
+        if self.backlog_runway_lines:
+            lines.extend(self.backlog_runway_lines)
         lines.append("### Receipt")
         lines.append(
             f"- {self.merge_count} merge(s) to `main` — "
@@ -288,6 +295,13 @@ def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
             lines.append(f"- {_user_facing_next(raw)}")
         lines.append("")
 
+    backlog_phone = section.get("backlog_runway_phone") or []
+    if backlog_phone:
+        lines.append("Backlog check")
+        for row in backlog_phone:
+            lines.append(f"- {row}")
+        lines.append("")
+
     if section.get("click_url"):
         lines.append(f"{merge_count} merges to main. Tap for the long read on GitHub.")
     else:
@@ -309,6 +323,8 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
     product_lines: list[str] = []
     ops_summary = ""
     whats_next_lines: list[str] = []
+    backlog_runway_lines: list[str] = []
+    in_backlog = False
 
     for line in text.splitlines():
         if line.startswith("## Week of "):
@@ -330,9 +346,15 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             continue
         if line.startswith("### What's next"):
             current_section = "next"
+            in_backlog = False
+            continue
+        if line.startswith("### Backlog runway"):
+            current_section = None
+            in_backlog = True
             continue
         if line.startswith("### "):
             current_section = None
+            in_backlog = False
             continue
 
         stripped = line.strip()
@@ -344,6 +366,8 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             ops_summary = stripped[2:]
         elif current_section == "next" and stripped.startswith("- "):
             whats_next_lines.append(stripped[2:])
+        elif in_backlog and stripped.startswith("- "):
+            backlog_runway_lines.append(stripped[2:])
         elif stripped.startswith("- ") and "merge(s) to `main`" in stripped:
             match = re.search(r"(\d+)\s+merge\(s\)", stripped)
             if match:
@@ -358,6 +382,7 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             "product_lines": product_lines,
             "ops_summary": ops_summary,
             "whats_next_lines": whats_next_lines,
+            "backlog_runway_lines": backlog_runway_lines,
         }
     return None
 
@@ -372,6 +397,9 @@ def cmd_write_notify_payload(repo: Path) -> int:
     if not summary:
         print("ppe_weekly_digest: notify payload skipped (no week section)", file=sys.stderr)
         return 1
+    runway = analyze_backlog_runway(repo)
+    summary["backlog_runway"] = runway.to_dict()
+    summary["backlog_runway_phone"] = build_backlog_runway_phone(runway)
     summary["generated_at_utc"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace(
         "+00:00", "Z"
     )
@@ -593,12 +621,14 @@ def build_week_section(repo: Path, week_monday: date) -> WeekSection:
             anchor = day
             break
 
+    runway = analyze_backlog_runway(repo)
     return WeekSection(
         week_monday=week_monday.isoformat(),
         in_short=build_in_short(product_human),
         product_lines=product_human,
         ops_summary=build_ops_summary(ops_count, total),
         whats_next_lines=extract_whats_next(repo),
+        backlog_runway_lines=build_backlog_runway_markdown(runway),
         merge_count=total,
         receipt_anchor=anchor,
     )
