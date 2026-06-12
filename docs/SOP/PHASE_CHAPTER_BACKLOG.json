@@ -141,7 +141,7 @@
     },
     {
       "chapterId": "msos_p7_monitoring",
-      "status": "chartered",
+      "status": "done",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P7",
@@ -149,7 +149,7 @@
     },
     {
       "chapterId": "msos_p8_tester_release",
-      "status": "blocked",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P8",
