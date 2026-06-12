@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md",
   "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Tail quantiles, strike-level P(>K), derived export columns, daily snapshot collector MVP",
   "workerMode": "deterministic"
 }
