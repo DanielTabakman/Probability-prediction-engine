@@ -56,12 +56,33 @@ Execute autonomously; do not ask for confirmation.
 
 ---
 
+## Health check (which part is broken)
+
+```bat
+check_ide_build_automation.cmd
+```
+
+Writes `artifacts/orchestrator/IDE_BUILD_AUTOMATION_HEALTH.md` with per-check codes.
+
+| Exit | Verdict | Meaning |
+|------|---------|---------|
+| 0 | `OK` | Wiring good; cloud BUILD should fire on handoff |
+| 2 | `QUOTA_BLOCKED` | Wiring good; Cursor quota exhausted — retry after billing cycle |
+| 1 | `BROKEN` | Fix blocker code in report (URL, key, handoff disabled, etc.) |
+
+Handoff webhook failures also write `artifacts/orchestrator/IDE_BUILD_AUTOMATION_LAST_ERROR.json` with `code` + `fix_hint`. Paste that code into a steward thread if stuck.
+
+**Will it work?** Yes, once quota returns: cloud agent implements + commits; local post-build watcher (or `finish_ide_build.cmd`) runs `mark_ide_product_ready` + `run_ppe_local`. Manual fallback: `@` starter in a new Agent thread.
+
+---
+
 ## Verify
 
-1. `run_ppe_operator.cmd --brief` → `IDE_BUILD` when a product slice is pending.
-2. `open_ide_handoff.cmd` or loop handoff → `.cursor/IDE_BUILD_TRIGGER.json` has `"status": "pending"`.
-3. Automation starts Agent within ~1 minute.
-4. After closeout: trigger returns to `"status": "idle"`; relay continues via `run_ppe_local`.
+1. `check_ide_build_automation.cmd` → `OK` or `QUOTA_BLOCKED` (not `BROKEN`).
+2. `run_ppe_operator.cmd --brief` → `IDE_BUILD` when a product slice is pending.
+3. `open_ide_handoff.cmd` or loop handoff → `.cursor/IDE_BUILD_TRIGGER.json` has `"status": "pending"`.
+4. Automation run appears in Cursor Automations history (when quota allows).
+5. After closeout: trigger returns to `"status": "idle"`; relay continues via `run_ppe_local`.
 
 ---
 

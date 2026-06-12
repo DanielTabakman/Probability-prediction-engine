@@ -448,8 +448,18 @@ def launch_ide_handoff(
 
     title = f"PPE IDE BUILD: {slice_id}"
     clip_note = " Prompt copied to clipboard." if clipboard.get("ok") else ""
+    auto_note = ""
+    wh = automation.get("webhook") if isinstance(automation, dict) else None
+    if isinstance(wh, dict) and not wh.get("ok") and not wh.get("skipped"):
+        try:
+            from scripts.ppe_ide_build_automation_health import classify_webhook_failure
+
+            code = classify_webhook_failure(wh)
+            auto_note = f"\nAutomation: {code} — run check_ide_build_automation.cmd"
+        except ImportError:
+            auto_note = "\nAutomation webhook failed — run check_ide_build_automation.cmd"
     body = append_ppe_go_hint(
-        f"{reason}\n{HANDOFF_NOW_REL}.{clip_note}",
+        f"{reason}\n{HANDOFF_NOW_REL}.{clip_note}{auto_note}",
         "IDE_BUILD",
     )
     notified = False
