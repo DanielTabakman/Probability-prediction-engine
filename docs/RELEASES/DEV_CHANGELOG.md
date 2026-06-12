@@ -2,13 +2,78 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-12
+
+- MVP1-DistQuantV2-Product-Slice004: daily distribution stats snapshot collector (#143) (`docs/SOP/`)
+- MVP1-DistQuantV2-Product-Slice003: extended CSV and summary panel quant columns (PRODUCT-PLANE) (#142) (`src/viz/`)
+- `8874f4e` — control-plane: fix scheduled Google Docs and dev-changelog CI sync (#141)
+- `467da50` — docs(control): laptop shutdown handoff checklist in desktop starter (#140) (`docs/SOP/`)
+- `61a4118` — fix(control-plane): throttle ntfy volume and auto-select empty plan (#124)
+- `d191d55` — control-plane: IDE BUILD health + product focus gate (#139) (`docs/SOP/`)
+- `9ea81c8` — control-plane: IDE BUILD automation health diagnostics (#138) (`scripts/`)
+- MVP1-DistQuantV2-Product-Slice002: tail quantiles and strike ladder (#137) (`src/engine/`)
+- MSOS-P8-Product-Slice002: conclusion learn loop UI (#135) (`docs/SOP/`)
+- MSOS-P7-Product-Slice002: monitor, history, and calibration Command Center (PRODUCT-PLANE) (#133) (`apps/msos-web/`)
+
 ## 2026-06-11
 
+- ops: loop publish build/auto/MSOS-P8-Product-Slice002-msos_p8 (#136) (`docs/SOP/`)
+- ops: loop publish build/auto/MSOS-P7-Product-Slice002-msos_p7 (#134) (`docs/SOP/`)
+- `0d5f46c` — fix(control-plane): ntfy quota visibility and urgent loop-down (#132) (`docs/SOP/`)
+- MSOS-P6-Product-Slice002: expression planning UI (PRODUCT-PLANE) (#130) (`apps/msos-web/`)
+- `929385d` — ops: loop publish control-plane/ntfy-quota-visibility (#131) (`scripts/`)
+- ops: loop publish build/auto/MSOS-P5-Product-Slice002-msos_p5 (#129) (`docs/SOP/`)
+- `4672f8c` — ops: ops/chapter-closeout-sync (#128)
+- `c95db81` — chore(control-plane): sync SOP after MVP1 and MSOS chapter closeouts (#127) (`docs/SOP/`)
+- `6522487` — control-plane: ppe_go.cmd operator handoff + alert hints (#120) (`scripts/`)
+- `6385151` — test(control-plane): allow MSOS dist demo plan in manifest witness (#126)
+- `afba296` — test(control-plane): allow MSOS dist demo plan in manifest witness (#125)
+- `0c3ac88` — fix(control-plane): auto-select when manifest READY with empty planPath (#123)
+- `8ffcff6` — fix(control-plane): auto-select when manifest READY with empty planPath (#122) (`scripts/`)
+- `a673f80` — control-plane: add CLI-to-IDE fallback for ntfy fix command (#117) (`scripts/`)
+- MSOS-DistDemo-Product-Slice002: Strategy Lab distribution demo embed (#121) (`apps/msos-web/`)
+- `3167da0` — control-plane: loop singleton guard + MSOS_UI test layer map (#119) (`scripts/`)
+- `f441914` — control-plane: IDE BUILD automation JSON trigger (not .md) (#118) (`docs/SOP/`)
+- `82f9113` — control-plane: add PPE director subagents for IDE_BUILD handoff (#116) (`docs/SOP/`)
+- `edaf09a` — control-plane: IDE BUILD automation loop and post-build watcher (#115)
+- `983169d` — control-plane: IDE BUILD automation loop and post-build watcher (#114) (`scripts/`)
+- `477980a` — control-plane: near-zero API IDE handoff + backlog priority (rebased) (#109) (`docs/SOP/`)
+- `9ed5abb` — control-plane: IDE marker accepts squash-merged product on main (#113) (`scripts/`)
+- `0f998cf` — control-plane: gitignore near-zero API + ntfy build test fix (#112)
+- `58b82aa` — product(ppe-ui): distribution summary panel Slice002 (#111) (`src/viz/`)
+- `a9acdc0` — control-plane: fix ntfy build test for IDE handoff path (#110)
+- `87d327b` — control-plane: evidence-complete skip gates + IDE handoff (rebased) (#108) (`scripts/`)
+- `fd84928` — control-plane: skip evidence-COMPLETE chapters at propagation and SELECTION (#105) (`scripts/`)
 - **Chapter closed:** MSOS Strategy Lab distribution demo (`MSOS-DistDemo-Closeout-Slice005`)
 - **Chapter closed:** MVP1 distribution stats legibility (`MVP1-DistStatsLeg-Closeout-Slice005`)
 
+## 2026-06-10
+
+- `97b7744` — control-plane: wire operator hygiene into preflight and loop startup (#107) (`docs/SOP/`)
+- `268c225` — control-plane: fix evidence COMPLETE detection and advance to dist-stats (#104) (`docs/SOP/`)
+- `ad5cec1` — control-plane: auto-start agent CLI on IDE_BUILD (#103) (`scripts/`)
+- `cb8a64a` — control-plane: fix-status phone ntfy for operator repairs (#102)
+- `a29b992` — control-plane: phone ntfy operator commands (build, fix, status) (#101) (`scripts/`)
+- `00662b9` — control-plane: weekly digest notify + research distribution queue charter (#100) (`docs/SOP/`)
+- `accf94f` — control-plane: weekly digest phone ntfy + Monday scheduler (#99) (`scripts/`)
+- `9d988b2` — ops: ops/slice-batching-legibility (#98) (`scripts/`)
+- `998a756` — feat: ntfy on slice and chapter completion for phone progress (CONTROL-PLANE) (#96) (`scripts/`)
+- `fd79dcf` — ops: desktop operator bootstrap + P4 closeout (#95) (`scripts/`)
+
+## 2026-06-09
+
+- `4402870` — control-plane: mobile operator ntfy watch for desktop loop (#94) (`scripts/`)
+
+## 2026-06-06
+
+- `23865d4` — MVP1: BTC distribution stats CSV export (Phase 1) (#93) (`docs/SOP/`)
+
 ## 2026-06-05
 
+- `ec445fe` — MVP1 probability method legibility + operator local-loop fixes (#90) (`docs/SOP/`)
+- MSOS-P4-Product-Slice002: Strategy Lab route + PPE embed boundary (PRODUCT-PLANE, msos-shell) (#92)
+- MSOS-P4-Product-Slice002: Strategy Lab route + PPE embed boundary (PRODUCT-PLANE, msos-shell) (#91) (`apps/msos-web/`)
+- `6b93d8f` — Control-plane: rolling dev changelog + CI docker_entrypoint fix (#89) (`docs/SOP/`)
 - `b32f955` — ci: fix docker_entrypoint Streamlit health check hang (#88)
 
 ## 2026-06-03
