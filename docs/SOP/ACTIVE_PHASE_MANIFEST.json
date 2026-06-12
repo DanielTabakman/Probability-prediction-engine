@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "MSOS P7 monitoring \u2014 IDE BUILD complete",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
+  "status": "READY",
+  "notes": "MSOS P8 tester release — IDE BUILD",
   "workerMode": "deterministic"
 }

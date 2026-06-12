@@ -46,6 +46,10 @@ Advanced math and calculations stay **behind expanders** by default. Mode switch
 - **State sprawl** — duplicated derivation paths that make the screen inconsistent or untestable.  
 - **External data fragility** — lab depends on live-ish inputs; failures should **read clearly**, not as generic breakage (`docs/SOP/CURRENT_FRONTIER.md` risks).
 
+## Strategic focus (12-month)
+
+Operational priorities, validation checkpoints, and drift guards live in [`docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](../SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md). This phase vision stays **UX/semantic**; the playbook stays **wedge proof + tester cohort + deferrals**.
+
 ## Last aligned with
 
 `docs/SOP/CURRENT_FRONTIER.md` (2026-04-01). Refresh this file when the frontier phase changes.

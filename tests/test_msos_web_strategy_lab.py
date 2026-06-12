@@ -152,3 +152,22 @@ def test_monitoring_history_routes_and_panels() -> None:
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "calibrationStrip" in cc
     assert 'href="/history"' in cc
+
+
+def test_conclusion_learn_loop_route() -> None:
+    page = MSOS_WEB / "src" / "app" / "learn" / "page.tsx"
+    assert page.is_file()
+    assert "ConclusionContent" in page.read_text(encoding="utf-8")
+    assert 'activeNavId="learn"' in page.read_text(encoding="utf-8")
+
+    fixtures = (MSOS_WEB / "src" / "data" / "conclusionFixtures.ts").read_text(encoding="utf-8")
+    assert "What did you learn from this run?" in fixtures
+    assert "VALIDATION_REALITY_CHECKS" in fixtures
+    assert "nextSelectionRecommendation" in fixtures
+
+    panel = (MSOS_WEB / "src" / "components" / "ConclusionContent.tsx").read_text(encoding="utf-8")
+    assert "testerMetricsTemplate" in panel
+    assert "Friends-first preview" in panel
+
+    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+    assert 'href: "/learn"' in nav

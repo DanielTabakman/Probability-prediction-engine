@@ -98,6 +98,7 @@ def test_manifest_points_at_known_active_or_closed_plan() -> None:
         "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
         "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
         "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+        "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
         "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
     }
     assert manifest.get("phasePlanPath") in allowed

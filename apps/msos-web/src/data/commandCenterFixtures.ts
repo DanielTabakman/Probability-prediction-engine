@@ -21,6 +21,7 @@ export const navItems: NavItem[] = [
   { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "/monitor" },
   { id: "history", label: "History", href: "/history" },
+  { id: "learn", label: "Learn loop", href: "/learn" },
 ];
 
 export const calibrationStrip = {
