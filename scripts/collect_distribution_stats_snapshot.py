@@ -88,11 +88,7 @@ def collect_distribution_stats_snapshot(
 
 
 def _default_spot() -> float | None:
-    index = fetch_deribit_btc_index() or {}
-    price = index.get("index_price") or index.get("price")
-    if price is None:
-        return None
-    return float(price)
+    return fetch_deribit_btc_index()
 
 
 def main(argv: list[str] | None = None) -> int:
