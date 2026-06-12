@@ -21,4 +21,3 @@ REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-se
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
 REM Near-zero API (recommended): copy ppe_operator_near_zero_api.local.cmd.example
 REM Legacy headless CLI auto-build: set "PPE_AUTO_REMOTE_BUILD=1"
-
