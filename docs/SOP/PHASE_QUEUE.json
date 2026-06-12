@@ -146,9 +146,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
+      "status": "PLANNED",
+      "reason": "Tester release + evidence-based next selection \u2014 pre-chartered; blocked until P7 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md"
     }
   ]
 }
