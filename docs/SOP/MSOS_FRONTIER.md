@@ -13,21 +13,32 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P6 expression planning + simulation only** — **READY** (relay running)
-- **Relay plan:** [`PHASE_PLANS/msos_p6_expression_sim_relay.json`](PHASE_PLANS/msos_p6_expression_sim_relay.json)
-- **Sprint:** [`SPRINT_MSOS_P6_EXPRESSION_SIM.md`](SPRINT_MSOS_P6_EXPRESSION_SIM.md)
-- **SELECTION:** [`POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md`](POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md)
-- **Last closed:** **MSOS P5 thesis confirmation + durable state** — on `main`
-- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P6-Product-Slice002` → `run_ppe_local.cmd`
+- **Active BUILD chapter:** **MSOS P7 monitoring, history, calibration loop** — **READY** (relay running)
+- **Relay plan:** [`PHASE_PLANS/msos_p7_monitoring_relay.json`](PHASE_PLANS/msos_p7_monitoring_relay.json)
+- **Sprint:** [`SPRINT_MSOS_P7_MONITORING.md`](SPRINT_MSOS_P7_MONITORING.md)
+- **SELECTION:** [`POST_MSOS_P7_MONITORING_SELECTION.md`](POST_MSOS_P7_MONITORING_SELECTION.md)
+- **Last closed:** **MSOS P6 expression planning + simulation only** — on `main`
+- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P7-Product-Slice002` → `run_ppe_local.cmd`
 
-### MSOS P6 expression planning — relay queue — **READY**
+### MSOS P7 monitoring — relay queue — **READY**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-P6-Control-Slice001` — charter | EVIDENCE |
-| **IN PROGRESS** | `MSOS-P6-Product-Slice002` — expression planning + sim-only save | PRODUCT |
-| **PENDING** | `MSOS-P6-Witness-Slice004` — pytest + visual witness | EVIDENCE |
-| **PENDING** | `MSOS-P6-Closeout-Slice005` — chapter close | EVIDENCE |
+| **PENDING** | `MSOS-P7-Control-Slice001` — charter | EVIDENCE |
+| **IN PROGRESS** | `MSOS-P7-Product-Slice002` — monitor + history + updated Command Center | PRODUCT |
+| **PENDING** | `MSOS-P7-Witness-Slice004` — pytest + visual witness | EVIDENCE |
+| **PENDING** | `MSOS-P7-Closeout-Slice005` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `06_monitor` / `07_history` / `08_updated_command` · **Routes:** `/monitor`, `/history`
+
+### MSOS P6 expression planning — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P6-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P6-Product-Slice002` — expression planning + sim-only save | PRODUCT |
+| **CLOSED** | `MSOS-P6-Witness-Slice004` — pytest + visual witness | EVIDENCE |
+| **CLOSED** | `MSOS-P6-Closeout-Slice005` — chapter close | EVIDENCE |
 
 **Visual reference:** storyboard `05_execution` · **Route:** `/strategy-lab/expression` · **Persistence:** `localStorage` preview (`msos.expression.preview.v1`)
 
@@ -108,8 +119,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P3 | `msos_p3_command_center` | **done** | — |
 | P4 | `msos_p4_strategy_lab` | **done** | — |
 | P5 | `msos_p5_thesis_confirm` | **queued / READY** | Relay running — product slice IDE BUILD |
-| P6 | `msos_p6_expression_sim` | **blocked** (pre-chartered) | After P5 |
-| P7 | `msos_p7_monitoring` | **blocked** (pre-chartered) | After P6 |
+| P6 | `msos_p6_expression_sim` | **done** | — |
+| P7 | `msos_p7_monitoring` | **queued / READY** | Relay running — product slice IDE BUILD |
 | P8 | `msos_p8_tester_release` | **blocked** (pre-chartered) | After P7 |
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
