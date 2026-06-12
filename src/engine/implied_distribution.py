@@ -93,22 +93,38 @@ def _lognormal_quantile(forward: float, vol_annual: float, T_years: float, p: fl
     return math.exp(mu + sigma * z)
 
 
+_QUANTILE_LEVELS: tuple[tuple[str, float], ...] = (
+    ("q05_usd", 0.05),
+    ("q10_usd", 0.10),
+    ("q25_usd", 0.25),
+    ("q50_usd", 0.50),
+    ("q75_usd", 0.75),
+    ("q90_usd", 0.90),
+    ("q95_usd", 0.95),
+)
+
+
+def _empty_distribution_stats() -> dict[str, float]:
+    return {"mean_usd": 0.0, **{key: 0.0 for key, _ in _QUANTILE_LEVELS}}
+
+
 def lognormal_distribution_stats(
     forward: float,
     vol_annual: float,
     T_years: float,
 ) -> dict[str, float]:
     """
-    Mean and quartiles for risk-neutral lognormal terminal distribution.
+    Mean and quantiles for risk-neutral lognormal terminal distribution.
     Mean equals forward; q50 is the median terminal price.
     """
     if forward <= 0 or vol_annual <= 0 or T_years <= 0:
-        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+        return _empty_distribution_stats()
     return {
         "mean_usd": float(forward),
-        "q25_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.25),
-        "q50_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.50),
-        "q75_usd": _lognormal_quantile(forward, vol_annual, T_years, 0.75),
+        **{
+            key: _lognormal_quantile(forward, vol_annual, T_years, p)
+            for key, p in _QUANTILE_LEVELS
+        },
     }
 
 
@@ -185,23 +201,24 @@ def density_distribution_stats(
     pdf_raw: list[float],
 ) -> dict[str, float]:
     """
-    Mean and quartiles from a density on a price grid (area-normalized internally).
+    Mean and quantiles from a density on a price grid (area-normalized internally).
     Mean is integral x·f(x) dx.
     """
     if len(prices) < 2 or len(pdf_raw) != len(prices):
-        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+        return _empty_distribution_stats()
     pdf_norm = _normalize_density(prices, pdf_raw)
     if max(pdf_norm) <= 0:
-        return {"mean_usd": 0.0, "q25_usd": 0.0, "q50_usd": 0.0, "q75_usd": 0.0}
+        return _empty_distribution_stats()
     mean = _integrate_density_trapezoid(
         prices,
         [float(prices[i]) * pdf_norm[i] for i in range(len(prices))],
     )
     return {
         "mean_usd": float(mean),
-        "q25_usd": _density_quantile(prices, pdf_norm, 0.25),
-        "q50_usd": _density_quantile(prices, pdf_norm, 0.50),
-        "q75_usd": _density_quantile(prices, pdf_norm, 0.75),
+        **{
+            key: _density_quantile(prices, pdf_norm, p)
+            for key, p in _QUANTILE_LEVELS
+        },
     }
 
 
@@ -240,6 +257,41 @@ def probability_above_strike_from_density(
             f_lo = f0
         above += 0.5 * (f_lo + f1) * (seg_hi - seg_lo)
     return max(0.0, min(1.0, above))
+
+
+def probability_above_strike_ladder_lognormal(
+    forward: float,
+    vol_annual: float,
+    T_years: float,
+    strikes_usd: list[float],
+) -> list[dict[str, float]]:
+    """P(S > K) for each strike under risk-neutral lognormal."""
+    return [
+        {
+            "strike_usd": float(strike),
+            "p_above": probability_above_strike_lognormal(
+                forward, vol_annual, T_years, float(strike)
+            ),
+        }
+        for strike in strikes_usd
+    ]
+
+
+def probability_above_strike_ladder_from_density(
+    prices: list[float],
+    pdf_raw: list[float],
+    strikes_usd: list[float],
+) -> list[dict[str, float]]:
+    """P(S > K) for each strike via trapezoid integral on the price grid."""
+    return [
+        {
+            "strike_usd": float(strike),
+            "p_above": probability_above_strike_from_density(
+                prices, pdf_raw, float(strike)
+            ),
+        }
+        for strike in strikes_usd
+    ]
 
 
 def build_distribution_chart_data(
