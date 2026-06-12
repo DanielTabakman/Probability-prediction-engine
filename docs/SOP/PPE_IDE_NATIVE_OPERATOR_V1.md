@@ -63,6 +63,18 @@ Set profile explicitly: `set PPE_OPERATOR_PROFILE=local` or `=acp`.
 
 ---
 
+## Distribution snapshot collector (MVP)
+
+Headless daily CSV capture (same schema as implied-lab download):
+
+```bat
+python scripts/collect_distribution_stats_snapshot.py
+```
+
+Writes under `artifacts/distribution_snapshots/YYYY-MM-DD/`. Schedule via Task Scheduler or cron on a machine with Deribit network access; not run by the relay loop.
+
+---
+
 ## IDE product-ready marker
 
 After IDE BUILD and commit, write `artifacts/orchestrator/IDE_PRODUCT_READY.json` so continuous guards allow the phase to run:
