@@ -2,6 +2,8 @@
 
 Lightweight external validation. Copy a row per session.
 
+**Strategic focus:** Log sessions against targets in [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) (return rate, paid interest, PMF survey). Use the playbook **session script** for guided tester runs.
+
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
 | 2026-05-19 | **Demo clarity** — viewer names main object in ~5 min | Y | Prep: public demo URL + operator script; MVP1 banner above fold on branch |
@@ -34,6 +36,16 @@ After friends-first / belief-input UX on demo: 5–10 min with 1–2 smart non-e
 | _fill_ | _e.g. quant-curious friend_ | Y/N | Y/N | Y/N | |
 
 Use [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) timing; rubric detail in [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) §15F.
+
+## MSOS P8 friends-first tester metrics (template)
+
+Log after guided MSOS web sessions (`/learn` learn loop). Do **not** auto-widen scope from fixture UI alone.
+
+| Date | Tester profile | Comprehension (~5 min) | Thesis confirm honest | Return to monitor/history | Paid interest (steward call) | Notes |
+|------|----------------|------------------------|----------------------|---------------------------|------------------------------|-------|
+| _fill_ | _e.g. research contact_ | Y/N | Y/N | Y/N | Y/N | Link session notes |
+
+**Next queue recommendation (P8 closeout):** friends-first validation before paywall or live execution SELECTION.
 
 ## Evidence targets (engineering companion)
 

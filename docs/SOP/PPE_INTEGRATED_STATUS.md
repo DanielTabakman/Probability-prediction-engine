@@ -1,7 +1,7 @@
 # PPE integrated status — canonical one-pager
 
 **As-of:** 2026-06-12 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
-**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)
+**Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
 
@@ -121,6 +121,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | **Active relay chapter** | **MSOS P3** | manifest `RUNNING`; P4 plan pre-chartered |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
 | **Storyboard v0.6** | **in-repo** | gate OPEN — MSOS P3 BUILD; P4 relay pre-chartered |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
@@ -135,6 +136,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | MVP1 frontier | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) |
 | MSOS frontier | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
 | MSOS acceleration | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) |
+| Product focus playbook | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) |
 | MSOS P1 ADR | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | Session handoff | [`HANDOFF.md`](HANDOFF.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |

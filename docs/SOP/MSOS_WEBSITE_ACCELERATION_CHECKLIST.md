@@ -2,6 +2,8 @@
 
 **Purpose:** Actionable changes agreed to compress calendar time toward storyboard v0.6 parity **without** widening PPE math, auth, or commercial honesty rules.
 
+**Strategic focus (priorities / anti-drift):** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — use before scope-expanding SELECTION; this checklist is tactical BUILD compression only.
+
 **Canon (unchanged):** [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) · [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) · [`docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md)
 
 **As-of:** 2026-06-03 — P2 **COMPLETE**; P3 **READY** ([`MSOS_FRONTIER.md`](MSOS_FRONTIER.md))
