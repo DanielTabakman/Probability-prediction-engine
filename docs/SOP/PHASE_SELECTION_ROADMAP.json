@@ -117,9 +117,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
-      "status": "pending",
+      "status": "done",
       "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+      "status": "pending",
+      "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md"
     }
   ]
 }

@@ -139,9 +139,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
+      "status": "PLANNED",
+      "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md"
     }
   ]
 }
