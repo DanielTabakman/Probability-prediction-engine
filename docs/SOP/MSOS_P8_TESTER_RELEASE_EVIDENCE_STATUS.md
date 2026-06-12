@@ -14,6 +14,10 @@
 
 **Next SELECTION (preview):** Hold friends-first tester scope; log comprehension / paid-interest in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) before paywall or live execution charter.
 
+**Validation report:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) — **DRAFT** (rollup + SELECTION decision when cohort complete).
+
 - [x] Learn loop narrative (`09_conclusion`)
 - [x] Tester metrics template surfaced in UI
+- [x] Validation report template (steward rollup doc)
+- [ ] Validation report **COMPLETE** (awaiting tester cohort)
 - [ ] vs `prototype/screens/09_conclusion.png` (PNG not in lean zip)

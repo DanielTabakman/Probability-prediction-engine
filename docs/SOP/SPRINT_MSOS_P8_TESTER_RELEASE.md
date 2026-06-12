@@ -18,7 +18,7 @@ Friends-first / tester release conventions: conclusion/learn loop UI (`09_conclu
 ## Acceptance
 
 1. Conclusion route aligned to `09_conclusion` (learn loop narrative).
-2. Validation evidence doc updated with tester metrics template (comprehension, thesis confirm, return monitoring, paid interest signals).
+2. Validation evidence doc updated with tester metrics template (comprehension, thesis confirm, return monitoring, paid interest signals) — session log: [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md); rollup: [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md).
 3. Next SELECTION recommendation recorded (not auto-widening scope).
 4. Screenshot witness vs `prototype/screens/09_conclusion.png`.
 

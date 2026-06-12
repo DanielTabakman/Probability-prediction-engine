@@ -39,13 +39,15 @@ Use [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) timing; rubric detail in 
 
 ## MSOS P8 friends-first tester metrics (template)
 
-Log after guided MSOS web sessions (`/learn` learn loop). Do **not** auto-widen scope from fixture UI alone.
+Log **per session** after guided MSOS web runs (`/learn` learn loop). Do **not** auto-widen scope from fixture UI alone.
 
 | Date | Tester profile | Comprehension (~5 min) | Thesis confirm honest | Return to monitor/history | Paid interest (steward call) | Notes |
 |------|----------------|------------------------|----------------------|---------------------------|------------------------------|-------|
 | _fill_ | _e.g. research contact_ | Y/N | Y/N | Y/N | Y/N | Link session notes |
 
-**Next queue recommendation (P8 closeout):** friends-first validation before paywall or live execution SELECTION.
+**Aggregate rollup + next SELECTION:** fill [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) when the cohort checkpoint is met (playbook: 10–30 testers).
+
+**Next queue recommendation (P8 closeout):** friends-first validation before paywall or live execution SELECTION — record final decision in the validation report §6.
 
 ## Evidence targets (engineering companion)
 

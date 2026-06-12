@@ -20,7 +20,7 @@ export const testerMetricsTemplate = [
   {
     metric: "Comprehension",
     prompt: "Could the tester name the main object in ~5 min?",
-    fixture: "Pending — log in VALIDATION_REALITY_CHECKS",
+    fixture: "Pending — log in VALIDATION_REALITY_CHECKS; rollup in MSOS_P8_VALIDATION_REPORT_V1",
   },
   {
     metric: "Thesis confirm",
@@ -42,6 +42,6 @@ export const testerMetricsTemplate = [
 export const nextSelectionRecommendation = {
   title: "Next SELECTION recommendation (preview)",
   recommendation:
-    "Hold MSOS scope at friends-first tester release. Run 2–3 guided sessions; log rows in VALIDATION_REALITY_CHECKS before chartering paywall or live execution.",
+    "Hold MSOS scope at friends-first tester release. Run guided sessions; log rows in VALIDATION_REALITY_CHECKS; complete MSOS_P8_VALIDATION_REPORT_V1 when the cohort checkpoint is met.",
   notNow: "No paywall or execution program expansion without new steward SELECTION.",
 };

@@ -23,7 +23,7 @@
 |----------|-----------------|
 | What slice runs next in relay? | Matching **FRONTIER** (MVP1 or MSOS) |
 | Should we add scope / new asset / execution? | **This playbook** + non-widening rule in PPE Master |
-| What do we build after P8? | **P8 validation report** (evidence-based SELECTION) |
+| What do we build after P8? | [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) (evidence-based SELECTION) |
 
 When this playbook and a FRONTIER disagree on **BUILD order**, FRONTIER wins for automation. When they disagree on **whether to widen scope**, this playbook wins until the P8 report updates priorities.
 
@@ -89,7 +89,7 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 
 ### Q3 — P8 tester release
 
-**Do:** Cohort **20–30** active BTC options traders. Ship P8 conclusion / learn loop. Write **validation report** (comprehension, confirm, return, paid interest). Unblock **VPS research beta URL**.
+**Do:** Cohort **20–30** active BTC options traders. Ship P8 conclusion / learn loop. Complete **[`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)** (comprehension, confirm, return, paid interest). Unblock **VPS research beta URL**.
 
 **Defer:** Paywall automation; live execution.
 
@@ -147,7 +147,7 @@ Stop and escalate if a BUILD packet would:
 | Thesis confirm | Track % reaching P5 confirm | Q2+ |
 | Paid interest | **≥5** would-pay signals | End Q3 |
 | PMF survey | **≥40%** “very disappointed if gone” | End Q3 |
-| P8 validation report | Written; next SELECTION recorded | P8 closeout |
+| P8 validation report | [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) COMPLETE; next SELECTION recorded | P8 closeout |
 
 ---
 
