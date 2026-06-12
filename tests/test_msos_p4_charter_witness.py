@@ -27,10 +27,14 @@ MSOS_P5_THESIS_PLAN = "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json"
 MSOS_P6_EXPRESSION_PLAN = "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json"
 MSOS_P7_MONITORING_PLAN = "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json"
 MSOS_P8_TESTER_PLAN = "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json"
+MVP1_DIST_QUANT_V2_PLAN = (
+    "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
+)
 ALLOWED_READY_PLANS = (
     HOUSEKEEPING_PLAN,
     MVP1_LEGIBILITY_PLAN,
     MVP1_DIST_STATS_PLAN,
+    MVP1_DIST_QUANT_V2_PLAN,
     MSOS_DIST_DEMO_PLAN,
     MSOS_P5_THESIS_PLAN,
     MSOS_P6_EXPRESSION_PLAN,
