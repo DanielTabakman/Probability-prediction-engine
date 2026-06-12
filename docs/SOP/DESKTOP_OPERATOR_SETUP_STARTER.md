@@ -8,6 +8,20 @@
 
 ---
 
+## Leaving the laptop (handoff checklist)
+
+Do this **once** on the laptop before you close Cursor there:
+
+1. **Nothing to save in chat** — instructions live in this repo on GitHub.
+2. **Working tree clean?** `git status` should show nothing to commit (or commit/push anything you still need).
+3. **On `main`:** `git checkout main` then `git pull` (or use branch `desktop-sync` tracking `origin/main`).
+4. **Ignore old stashes** — `git stash list` may show orchestrator WIP from past branches; **do not apply** on desktop (stale manifest/queue). Drop later with `git stash clear` if you want.
+5. **On desktop:** clone or `git pull`, open this folder in Cursor, paste the prompt below.
+
+GitHub `main` is the single source of truth — desktop and laptop are just clones.
+
+---
+
 ## What to paste in a new Cursor Agent chat (desktop)
 
 ```
