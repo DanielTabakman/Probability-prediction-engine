@@ -10,7 +10,8 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 4. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) — only if brief reports `steering_aligned: true` for that track
 5. [`VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — product canon when scope questions arise
 6. [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof, priorities, drift guards before widening scope
-7. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
+7. [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) — monthly/quarterly steward cadence (on demand)
+8. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
 
 ## Do not use as controlling
 

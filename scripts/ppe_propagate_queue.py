@@ -222,6 +222,18 @@ def _best_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
     return item
 
 
+def _focus_gate_blocks(repo: Path, plan_path: str) -> str | None:
+    try:
+        from scripts.ppe_focus_gate import evaluate_focus_gate
+
+        focus = evaluate_focus_gate(repo, plan_path)
+    except ImportError:
+        return None
+    if focus.allowed:
+        return None
+    return focus.reason
+
+
 def _blocked_with_plan_sorted(
     backlog: dict[str, Any],
 ) -> list[tuple[int, dict[str, Any], str]]:
@@ -259,7 +271,12 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
         return {"promoted": False, "reason": "pipeline busy (chartered or queued chapter in backlog)"}
 
     finalized_plans: list[str] = []
+    focus_blocked: list[str] = []
     for _index, item, plan_path in _blocked_with_plan_sorted(backlog):
+        fg = _focus_gate_blocks(repo, plan_path)
+        if fg:
+            focus_blocked.append(f"{plan_path}: {fg}")
+            continue
         ok, err = _plan_valid(repo, plan_path)
         if not ok:
             return {
@@ -306,6 +323,12 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             "finalizedPlans": finalized_plans,
             "reason": "evidence COMPLETE — marked backlog done",
         }
+    if focus_blocked:
+        return {
+            "promoted": False,
+            "reason": "focus gate blocked eligible backlog rows",
+            "focusGate": focus_blocked,
+        }
     return {"promoted": False, "reason": "no blocked backlog item with planPath"}
 
 
@@ -345,6 +368,15 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     plan_path = norm_plan(str(item.get("planPath") or ""))
     if not plan_path:
         return {"propagated": False, "reason": "queued item missing planPath"}
+
+    fg = _focus_gate_blocks(repo, plan_path)
+    if fg:
+        return {
+            "propagated": False,
+            "reason": f"focus gate: {fg}",
+            "planPath": plan_path,
+            "chapterId": item.get("chapterId"),
+        }
 
     if chapter_marked_complete_in_repo(repo, plan_path):
         if not apply:

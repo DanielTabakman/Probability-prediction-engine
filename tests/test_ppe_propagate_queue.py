@@ -59,6 +59,10 @@ class TestPpePropagateQueue(unittest.TestCase):
             encoding="utf-8",
         )
         save_manifest(self.repo, {"phasePlanPath": "", "status": "COMPLETE", "notes": ""})
+        (self.repo / "docs" / "SOP" / "MSOS_P8_VALIDATION_REPORT_V1.md").write_text(
+            "**Status:** **COMPLETE**\n",
+            encoding="utf-8",
+        )
         os.environ["PPE_AUTO_PROPAGATE_QUEUE"] = "1"
 
     def tearDown(self) -> None:

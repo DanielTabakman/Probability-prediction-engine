@@ -78,7 +78,18 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         if guard is not None and guard.exit_code in (GUARD_EXIT, GUARD_SKIP_CHAPTER):
             skipped.append(f"{plan_path}: {guard.detail}")
             continue
+        try:
+            from scripts.ppe_focus_gate import evaluate_focus_gate, focus_gate_skip_code
+
+            focus = evaluate_focus_gate(repo_root, plan_path)
+        except ImportError:
+            focus = None
+        if focus is not None and not focus.allowed:
+            skipped.append(f"{plan_path}: focus gate — {focus.reason}")
+            continue
         reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
+        if focus is not None and focus.urgent_bypass:
+            reason = f"{reason} (urgent bypass)"
         return plan_path, reason
 
     if skipped:

@@ -23,7 +23,7 @@
 |----------|-----------------|
 | What slice runs next in relay? | Matching **FRONTIER** (MVP1 or MSOS) |
 | Should we add scope / new asset / execution? | **This playbook** + non-widening rule in PPE Master |
-| What do we build after P8? | **P8 validation report** (evidence-based SELECTION) |
+| What do we build after P8? | [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) (evidence-based SELECTION) |
 
 When this playbook and a FRONTIER disagree on **BUILD order**, FRONTIER wins for automation. When they disagree on **whether to widen scope**, this playbook wins until the P8 report updates priorities.
 
@@ -204,8 +204,41 @@ See [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).
 
 ---
 
+## Runtime layer (automation — thin)
+
+Agents on **IDE BUILD** get a **3-line Focus block** in `IDE_BUILD_STARTER_*.md` only — not this full doc.
+
+| Mechanism | Behavior |
+|-----------|----------|
+| `ppe_focus_gate.py` | Blocks auto-select / propagate while validation report is **DRAFT** or **MISSING** |
+| `urgent: true` on backlog/queue row | Bypasses gate — requires `urgentReason` |
+| `PPE_FOCUS_GATE=0` | Disable gate (escape hatch) |
+| Active `RUNNING` manifest | Not cleared by gate — finish in-flight chapter first |
+
+Full playbook loads: **steward SELECTION**, backlog edits, monthly review ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)).
+
+---
+
+## Backlog and SELECTION (use this mythos)
+
+1. Read [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) + **Priority stack** + **Drift guards**.
+2. Tag rows with `focusPlaybookTier` and `[P0]`–`[P4]` in `reason`.
+3. After P8 cohort: complete validation report §6 before new **READY** queue rows (unless `urgent`).
+
+| Playbook tier | Backlog `priority` hint |
+|---------------|-------------------------|
+| **P0** wedge proof | often `high` |
+| **P1** chartered closeout | `high` / `medium` |
+| **P2** lab legibility | `medium` |
+| **P3** distribution | `medium` |
+| **P4** monetization | `medium` after validation |
+| **defer** | `low` or `blocked` without plan |
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-06-12 | v1 — initial playbook from product/strategy working session |
+| 2026-06-12 | Runtime gate + backlog mythos + operating calendar |
