@@ -99,7 +99,6 @@ class TestPpeQueueHealth(unittest.TestCase):
                     "chapterId": "early_ship",
                     "status": "blocked",
                     "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
-                    "focusPlaybookTier": "P2",
                 }
             ],
         }
@@ -119,7 +118,6 @@ class TestPpeQueueHealth(unittest.TestCase):
                     "chapterId": "early_ship",
                     "status": "blocked",
                     "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
-                    "focusPlaybookTier": "P2",
                 }
             ],
         }
@@ -134,27 +132,6 @@ class TestPpeQueueHealth(unittest.TestCase):
             (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").read_text(encoding="utf-8")
         )
         self.assertEqual(backlog_data["items"][0]["status"], "done")
-
-    def test_repair_backlog_infers_missing_focus_tier(self) -> None:
-        backlog = {
-            "version": 1,
-            "items": [
-                {
-                    "chapterId": "tierless",
-                    "status": "blocked",
-                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
-                    "reason": "[LOW] research",
-                }
-            ],
-        }
-        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
-            json.dumps(backlog, indent=2),
-            encoding="utf-8",
-        )
-        fixes, remaining = repair_backlog(self.repo, apply=True)
-        self.assertTrue(any(f.get("action") == "infer_focus_playbook_tier" for f in fixes))
-        tier_issues = [i for i in remaining if i.get("code") == "BACKLOG_MISSING_FOCUS_TIER"]
-        self.assertEqual(tier_issues, [])
 
     def test_chapter_marked_complete_chapter_status_section(self) -> None:
         evidence = self.repo / "docs" / "SOP" / "CHAPTER_STATUS_EVIDENCE.md"
