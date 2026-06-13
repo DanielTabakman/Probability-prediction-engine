@@ -10,7 +10,13 @@ import time
 from pathlib import Path
 from typing import Any, Iterator
 
-from scripts.ppe_notify_push import ntfy_configured, ntfy_server, ntfy_topic, notify_enabled
+from scripts.ppe_notify_push import (
+    bootstrap_operator_notify_env,
+    ntfy_configured,
+    ntfy_server,
+    ntfy_topic,
+    notify_enabled,
+)
 from scripts.ppe_ntfy_commands import (
     commands_enabled,
     execute_command,
@@ -151,35 +157,45 @@ def listen_once(repo: Path, *, notify: bool = True) -> dict[str, Any]:
     return {"handled": handled, "polled": len(messages), "state_path": str(state_path(repo))}
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Listen for remote ntfy operator commands")
-    ap.add_argument("--repo-root", type=Path, default=Path.cwd())
-    ap.add_argument("--once", action="store_true", help="Poll once and exit")
-    ap.add_argument("--no-notify", action="store_true", help="Do not send result ntfy replies")
-    args = ap.parse_args(argv)
+def cmd_poll_seconds() -> int:
+    raw = os.environ.get("PPE_NTFY_CMD_POLL_SEC", "30").strip()
+    try:
+        return max(10, int(raw))
+    except ValueError:
+        return 30
 
-    if not notify_enabled() or not ntfy_configured():
-        print("ppe_ntfy_listen: ntfy not configured (set PPE_NTFY_TOPIC)", file=sys.stderr)
-        return 1
-    if not commands_enabled():
-        print("ppe_ntfy_listen: remote commands disabled (PPE_NTFY_CMD_ENABLED=0)", file=sys.stderr)
-        return 1
 
-    repo = args.repo_root.resolve()
-    notify = not args.no_notify
+def sse_preferred() -> bool:
+    raw = os.environ.get("PPE_NTFY_CMD_SSE", "0").strip().lower()
+    return raw in ("1", "true", "yes", "on")
 
-    if args.once:
-        result = listen_once(repo, notify=notify)
-        print(json.dumps(result, indent=2))
-        return 0
 
+def poll_loop(repo: Path, *, notify: bool = True) -> None:
+    interval = cmd_poll_seconds()
+    print(
+        f"ppe_ntfy_listen: poll every {interval}s on topic={ntfy_topic()} — Ctrl+C to stop",
+        flush=True,
+    )
+    while True:
+        try:
+            result = listen_once(repo, notify=notify)
+            if result.get("handled"):
+                print(json.dumps(result["handled"][-1], indent=2), flush=True)
+        except KeyboardInterrupt:
+            print("ppe_ntfy_listen: stopped", flush=True)
+            return
+        except Exception as exc:
+            print(f"ppe_ntfy_listen: poll error: {exc}; retry in {interval}s", file=sys.stderr, flush=True)
+        time.sleep(interval)
+
+
+def sse_loop(repo: Path, *, notify: bool = True) -> None:
     state = load_state(repo)
     since = str(state.get("last_message_id") or "") or None
     print(
         f"ppe_ntfy_listen: SSE on topic={ntfy_topic()} since={since or 'all'} — Ctrl+C to stop",
         flush=True,
     )
-
     while True:
         try:
             for message in stream_messages(since=since):
@@ -192,15 +208,47 @@ def main(argv: list[str] | None = None) -> int:
                     state=state,
                     notify=notify,
                 )
+                save_state(repo, state)
                 if handled:
-                    save_state(repo, state)
                     print(json.dumps(handled[-1], indent=2), flush=True)
         except KeyboardInterrupt:
             print("ppe_ntfy_listen: stopped", flush=True)
-            return 0
+            return
         except Exception as exc:
             print(f"ppe_ntfy_listen: stream error: {exc}; retry in 10s", file=sys.stderr, flush=True)
             time.sleep(10)
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Listen for remote ntfy operator commands")
+    ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--once", action="store_true", help="Poll once and exit")
+    ap.add_argument("--no-notify", action="store_true", help="Do not send result ntfy replies")
+    ap.add_argument("--sse", action="store_true", help="Use SSE stream instead of poll loop")
+    args = ap.parse_args(argv)
+
+    if not notify_enabled() or not ntfy_configured():
+        print("ppe_ntfy_listen: ntfy not configured (set PPE_NTFY_TOPIC)", file=sys.stderr)
+        return 1
+    if not commands_enabled():
+        print("ppe_ntfy_listen: remote commands disabled (PPE_NTFY_CMD_ENABLED=0)", file=sys.stderr)
+        return 1
+
+    repo = args.repo_root.resolve()
+    bootstrap_operator_notify_env(repo)
+    notify = not args.no_notify
+
+    if args.once:
+        result = listen_once(repo, notify=notify)
+        print(json.dumps(result, indent=2))
+        return 0
+
+    if args.sse or sse_preferred():
+        sse_loop(repo, notify=notify)
+        return 0
+
+    poll_loop(repo, notify=notify)
+    return 0
 
 
 if __name__ == "__main__":

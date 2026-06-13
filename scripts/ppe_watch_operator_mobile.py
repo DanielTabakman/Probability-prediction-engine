@@ -11,8 +11,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
+from scripts.ppe_notify_push import (
+    is_ntfy_quiet_hours,
+    mark_quiet_stuck_sent,
+    ntfy_configured,
+    notify_enabled,
+    quiet_stuck_allowed,
+    reset_quiet_stuck_if_awake,
+    send_ntfy,
+)
 from scripts.ppe_operator_hint import append_ppe_go_hint
+from scripts.ppe_phone_status import format_phone_alert_body, verdict_headline
 from scripts.ppe_operator_status import (
     VERDICT_ERROR,
     VERDICT_FIX_PLAN,
@@ -240,7 +249,10 @@ def is_loop_running() -> bool:
 
 
 def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
+    from scripts.ppe_notify_push import bootstrap_operator_notify_env
+
     repo = repo.resolve()
+    bootstrap_operator_notify_env(repo)
     status = collect_operator_status(repo)
     if write_report:
         write_status_report(repo, status)
@@ -248,6 +260,8 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     verdict = str(status.get("verdict") or "")
     loop_running = is_loop_running()
     prior = load_state(repo)
+
+    reset_quiet_stuck_if_awake(repo)
 
     alerts: list[tuple[str, str]] = []
     prior_verdict = str(prior.get("last_verdict") or "")
@@ -284,26 +298,19 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     current_blocker = str(status.get("blocker") or "").strip()
     plan = str(status.get("phase_plan_path") or "").strip()
 
-    prior_blocker = str(prior.get("last_blocker") or "").strip()
-    current_blocker = str(status.get("blocker") or "").strip()
-    plan = str(status.get("phase_plan_path") or "").strip()
-
     if prior_verdict in STUCK_VERDICTS and verdict in HEALTHY_VERDICTS:
-        body_parts = ["Operator guard cleared — loop can continue."]
-        if prior_blocker:
-            body_parts.insert(0, f"Was: {prior_verdict} — {prior_blocker}.")
-        elif prior_verdict:
-            body_parts.insert(0, f"Was: {prior_verdict}.")
-        body_parts.append(f"Now: {verdict}.")
-        if plan:
-            body_parts.append(f"Plan: {plan}")
-        alerts.append((f"PPE fixed: {verdict}", " ".join(body_parts)))
-
-    if _stuck_alert_due(prior, verdict):
         alerts.append(
             (
-                f"PPE still stuck: {verdict}",
-                str(status.get("blocker") or verdict),
+                f"PPE: cleared - {verdict_headline(verdict)}",
+                format_phone_alert_body(status, kind="cleared", prior_verdict=prior_verdict),
+            )
+        )
+
+    if _stuck_alert_due(prior, verdict) and quiet_stuck_allowed(repo):
+        alerts.append(
+            (
+                f"PPE: still stuck - {verdict_headline(verdict)}",
+                format_phone_alert_body(status, kind="stuck"),
             )
         )
 
@@ -311,9 +318,17 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         alerts.append(
             (
                 "PPE loop stopped",
-                "run_ppe_auto_local_loop.cmd is not running on the desktop.",
+                format_phone_alert_body(status, kind="loop_down"),
             )
         )
+
+    morning_report: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_morning_report import maybe_send_morning_report
+
+        morning_report = maybe_send_morning_report(repo, status)
+    except Exception as exc:
+        morning_report = {"sent": False, "error": str(exc)}
 
     heartbeat_sent = False
     if loop_running and _heartbeat_hours() > 0 and _heartbeat_due(prior):
@@ -332,10 +347,13 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
             priority = "urgent" if title == "PPE loop stopped" else "high"
-            if send_ntfy(title, body, tags=["ppe", "watch"], priority=priority):
+            tags = ["ppe", "watch", "stuck"] if "still stuck" in title.lower() else ["ppe", "watch"]
+            if send_ntfy(title, body, tags=tags, priority=priority):
                 sent += 1
-                if title.startswith("PPE still stuck:"):
+                if "still stuck" in title.lower():
                     stuck_alert_sent = True
+                    if is_ntfy_quiet_hours():
+                        mark_quiet_stuck_sent(repo)
 
     guard = status.get("guard") or {}
     detail = str(guard.get("detail") or status.get("blocker") or "")
@@ -384,6 +402,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "heartbeat_sent": heartbeat_sent,
         "auto_build": auto_build,
         "post_build_finish": post_finish,
+        "morning_report": morning_report,
         "state_path": str(state_path(repo)),
     }
 

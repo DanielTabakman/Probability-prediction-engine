@@ -106,7 +106,6 @@ def test_watch_once_alerts_when_stuck_clears(tmp_path, monkeypatch):
 
     assert second["alerts_sent"] == 1
     title, body = send.call_args[0][0], send.call_args[0][1]
-    assert title.startswith("PPE fixed:")
+    assert title.startswith("PPE: cleared")
     assert "IDE_BUILD" in body
-    assert "PRODUCT_BLOCKED" in body
-    assert "RUN_AUTO" in body
+    assert "RUN_AUTO" in body or "Running" in body

@@ -10,8 +10,18 @@ REM Chapter closeout pings include "Check in:" hints; pipeline-idle ping when qu
 REM set "PPE_NTFY_CHECK_IN=1"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=24"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=0"
-REM Phone status shows today's breakdown; cap ping includes what to cut.
-REM set "PPE_NTFY_STUCK_HOURS=8"
+REM Stuck reminder while verdict unchanged (IDE_BUILD, ERROR, etc.). Default 8; 2 = every 2h.
+REM During quiet hours: one stuck ping per night, then silence until morning.
+REM set "PPE_NTFY_STUCK_HOURS=2"
+REM Quiet hours: mute routine auto-alerts (phone cmds + stuck + urgent still work).
+REM set "PPE_NTFY_QUIET_HOURS=1"
+REM set "PPE_NTFY_QUIET_START=01:00"
+REM set "PPE_NTFY_QUIET_END=08:00"
+REM 8am local digest (requires watch_operator_mobile running).
+REM set "PPE_NTFY_MORNING_REPORT=1"
+REM set "PPE_NTFY_MORNING_REPORT_AT=08:00"
+REM Phone command poll interval (default 30s; SSE optional via PPE_NTFY_CMD_SSE=1):
+REM set "PPE_NTFY_CMD_POLL_SEC=30"
 REM Weekly digest to phone (skip desktop toast):
 REM set "PPE_WEEKLY_DIGEST_TOAST=0"
 REM Optional private server or authenticated topic:
