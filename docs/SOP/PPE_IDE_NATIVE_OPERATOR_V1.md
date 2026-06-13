@@ -46,6 +46,8 @@ Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/
 
 **Optional Automation (zero-click happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
 
+**Autobuilder (pipeline SRE):** [`PPE_AUTOBUILDER_V1.md`](PPE_AUTOBUILDER_V1.md) · `ppe_autobuilder.cmd` · `@ppe-autobuilder-operator` — status, diagnose, and `advance` without product BUILD.
+
 ---
 
 ## Two profiles

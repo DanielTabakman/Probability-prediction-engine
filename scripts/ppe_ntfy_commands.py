@@ -109,6 +109,14 @@ def execute_status(repo: Path) -> dict[str, Any]:
     status = collect_operator_status(repo)
     stack = stack_status()
     body = format_phone_status(status, stack=stack, repo=repo)
+    try:
+        from scripts.ppe_autobuilder import collect_autobuilder_status, format_status_brief, write_status_artifact
+
+        ab = collect_autobuilder_status(repo)
+        write_status_artifact(repo, ab)
+        body = f"{body}\n\nAutobuilder: {format_status_brief(ab)}"
+    except Exception:
+        pass
     title = phone_status_title(status)
     sent = send_ntfy(
         title,
