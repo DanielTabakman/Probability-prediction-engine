@@ -139,6 +139,7 @@ P3 Command Center (READY)
 | 12.2 | Auto-select after `mvp1_distribution_quant_research_v2` closeout (MEDIUM beats LOW) | Loop | **Blocked** |
 | 12.3 | Close §2.1 deferred homepage pixel witness + P2–P8 unchecked evidence boxes | BUILD | **Todo** |
 | 12.4 | VPS deploy §2.2 folded into Platform slice 007 | Operator + BUILD | **Todo** |
+| 12.5 | Charter [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md) — post-parity VPS + CTA | Steward | **Done** |
 
 ---
 

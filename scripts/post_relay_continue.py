@@ -217,6 +217,20 @@ def main(argv: list[str] | None = None) -> int:
                 plan_path=queue_plan,
                 next_chapter=next_chapter,
             )
+            if not next_chapter:
+                from scripts.ppe_manifest import load_manifest
+                from scripts.ppe_progress_notify import notify_pipeline_idle
+                from scripts.ppe_queue import load_queue
+
+                manifest = load_manifest(repo)
+                plan_active = bool(str(manifest.get("phasePlanPath") or "").strip())
+                queue = load_queue(repo)
+                ready = any(
+                    isinstance(item, dict) and str(item.get("status") or "").upper() == "READY"
+                    for item in (queue.get("items") or [])
+                )
+                if not plan_active and not ready:
+                    notify_pipeline_idle(last_chapter=chapter_id)
         except Exception as exc:
             print(f"post_relay_continue: progress notify skipped: {exc}")
 

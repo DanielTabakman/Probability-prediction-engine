@@ -1,0 +1,86 @@
+{
+  "name": "MSOS_public_demo_launch_v1 (VPS live + research beta CTA)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-PublicLaunchV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+      "buildBranch": "build/auto/MSOS-PublicLaunchV1-Control-Slice001-public_launch",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-PublicLaunchV1-Platform-Slice002",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+      "buildBranch": "build/auto/MSOS-PublicLaunchV1-Platform-Slice002-public_launch",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "docs/DEPLOY/MSOS_WEB_V1.md",
+        "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-PublicLaunchV1-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+      "buildBranch": "build/auto/MSOS-PublicLaunchV1-Product-Slice003-public_launch",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/HeroSection.tsx",
+        "apps/msos-web/src/components/PublicNav.tsx",
+        "apps/msos-web/src/app/page.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-PublicLaunchV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+      "buildBranch": "build/auto/MSOS-PublicLaunchV1-Witness-Slice004-public_launch",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-PublicLaunchV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+      "buildBranch": "build/auto/MSOS-PublicLaunchV1-Closeout-Slice005-public_launch",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_public_demo_launch_v1",
+        "chapterTitle": "MSOS public demo launch v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
+          "docs/SOP/VALIDATION_REALITY_CHECKS.md"
+        ]
+      }
+    }
+  ]
+}

@@ -36,6 +36,18 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Visual reference:** storyboard `01_home` … `09_conclusion` · **Compare:** `prototype/html/*.html` side-by-side with `npm run dev`
 
+### MSOS public demo launch v1 — relay queue — **BLOCKED** (MEDIUM, after parity)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-PublicLaunchV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-PublicLaunchV1-Platform-Slice002` — VPS deploy + Caddy | EVIDENCE |
+| **PENDING** | `MSOS-PublicLaunchV1-Product-Slice003` — research beta CTA | PRODUCT |
+| **PENDING** | `MSOS-PublicLaunchV1-Witness-Slice004` — URL witness | EVIDENCE |
+| **PENDING** | `MSOS-PublicLaunchV1-Closeout-Slice005` — closeout + operator check-in | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md) · **Blocked until** visual parity COMPLETE
+
 ### MSOS P8 tester release — relay queue — **COMPLETE**
 
 | Status | Slice | Plane |

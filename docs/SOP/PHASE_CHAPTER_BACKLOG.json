@@ -164,6 +164,16 @@
       "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post-P8 visual parity",
       "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses"
+    },
+    {
+      "chapterId": "msos_public_demo_launch_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P3",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md \u2014 P3 distribution",
+      "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity"
     }
   ]
 }
