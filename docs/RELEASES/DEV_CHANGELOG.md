@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-13
 
+- `e24caef` — control-plane: cut GitHub Actions usage (#158) (`docs/SOP/`)
+- `8e79c82` — fix(platform): force-recreate caddy on VPS deploy (#155)
+- `88ea305` — control-plane: PPE autobuilder v1 (#153) (`scripts/`)
+- `f35db18` — feat(msos-shell): deploy operator session notebook on apex (#152) (`docs/SOP/`)
+- `1d1b3be` — Control-plane: dev changelog
 - `092d291` — control-plane: relay operator hardening for unattended loop (#150) (`scripts/`)
 - `29458ff` — control-plane: ntfy quiet hours, morning report, phone status (#148) (`scripts/`)
 - `3950670` — charter(control): public demo launch + operator check-in ntfy (#147) (`docs/SOP/`)
