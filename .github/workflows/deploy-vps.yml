@@ -56,3 +56,20 @@ jobs:
             exit 1
           fi
           echo 'Demo site health check passed (no import traceback in HTML)'
+
+      - name: Session notebook health
+        if: success()
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/session_body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/session.html || true)
+          if [ "$code" != "200" ]; then
+            echo "session.html health check failed (HTTP $code)"
+            exit 1
+          fi
+          body=$(cat /tmp/session_body.html)
+          if ! echo "$body" | grep -q 'Guided tester session'; then
+            echo 'session.html missing expected operator notebook title'
+            head -n 30 /tmp/session_body.html || true
+            exit 1
+          fi
+          echo 'session.html health check passed'
