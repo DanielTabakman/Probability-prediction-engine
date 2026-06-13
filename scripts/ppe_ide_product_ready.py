@@ -289,6 +289,14 @@ def clear_marker(repo: Path) -> bool:
     if p.is_file():
         p.unlink()
         print(f"ppe_ide_product_ready: cleared {MARKER_REL}")
+        try:
+            from scripts.ppe_ide_build_starter import prune_starters_for_completed_chapters
+
+            pruned = prune_starters_for_completed_chapters(repo)
+            if pruned:
+                print(f"ppe_ide_product_ready: pruned {len(pruned)} stale starter(s)")
+        except Exception:
+            pass
         return True
     return False
 
