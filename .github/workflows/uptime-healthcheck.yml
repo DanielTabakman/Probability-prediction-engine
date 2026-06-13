@@ -1,8 +1,9 @@
+# Site probe — was every 5 minutes (minute hog); now every 30 minutes. See docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md.
 name: Uptime healthcheck
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -32,4 +33,3 @@ jobs:
             exit 1
           fi
           echo "OK"
-

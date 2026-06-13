@@ -1,6 +1,6 @@
 # GitHub: zero-touch merge and ship
 
-Purpose: define how changes reach **production without a human merge or deploy step** when automated tests pass, and where the steward still belongs (outside the machine).
+Purpose: define how changes reach **`main` without a human merge click** when automated tests pass, and how production deploy fits in (manual step by design).
 
 ## Philosophy
 
@@ -9,6 +9,10 @@ Purpose: define how changes reach **production without a human merge or deploy s
 - **Ship on `main`.** After merge, [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) runs on pushes to **`main`**; the VPS reconciles with GitHub. See [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md).
 
 This doc is the **GitHub-side contract**. Relay/orchestrator promotion still produces a branch and PR (or equivalent); this layer completes the path to **`main`** and the live site.
+
+## Public repository
+
+This repo is **public** — standard Linux Actions runners are **free**. Uptime checks run every **30 minutes** (not every 5) to avoid unnecessary runner churn.
 
 ## GitHub Free and **private** repositories
 
@@ -28,7 +32,7 @@ Use this when **Allow auto-merge** is greyed out (typical for **private** repos 
 1. **One-time:** set **Settings → Actions → General → Workflow permissions** to **Read and write** (see below).  
 2. Merge these workflow files to **`main`** so they run on the default branch.  
 3. Open a **non-draft** PR to **`main`** from a branch in this repo — **`automerge`** is applied automatically; when **CI** is green, **Merge on green** squash-merges.  
-4. **Deploy VPS** still runs on push to **`main`**.
+4. **Deploy VPS** runs on push to **`main`**.
 
 **Draft PRs:** no **`automerge`** label while draft; when you mark **Ready for review**, the label workflow runs again and the usual CI → merge path applies.
 

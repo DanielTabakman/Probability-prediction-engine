@@ -6,12 +6,29 @@ This repository includes [`.github/workflows/deploy-vps.yml`](../../.github/work
 cd /opt/marketstructureos
 git pull
 docker compose up -d --build
+docker compose up -d --force-recreate caddy msos_web
 ```
+
+## Actions usage policy (2026-06)
+
+**Public repo:** standard Linux runners are **free** for public repositories.
+
+We only **throttle the hogs** — everything else stays automated:
+
+| Workflow | Trigger |
+|----------|---------|
+| **CI** | Pull requests + push to `main` |
+| **Deploy VPS** | Every push to `main` (+ manual **Run workflow**) |
+| **Uptime healthcheck** | **Every 30 minutes** (was every 5 — largest minute drain) |
+| **Google Docs sync** / **Dev changelog** | Daily schedule + `main` push (dev changelog) |
+| **Weekly digest** / **Codebase health** | Weekly schedule |
+
+Optional **VPS cron** for uptime if you want zero GitHub runner use for probes (see runbook).
 
 ## Related
 
 - **[PRODUCTION_DEPLOY_PROTOCOL.md](../SOP/PRODUCTION_DEPLOY_PROTOCOL.md)** — canonical rule: production tracks **`main`** on the VPS; when to rely on this Action vs manual SSH.
-- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when the **CI** workflow is green (**`CI / pytest`** + **`CI / docker_entrypoint`**); branch protection (when available) can require both. **Merge on green** merges only when the whole `ci.yml` run succeeds, so both jobs must pass. After that merge, **this** workflow is what updates the site (no separate human deploy step).
+- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when the **CI** workflow is green (**`CI / pytest`** + **`CI / docker_entrypoint`**). After merge, **Deploy VPS** runs on push to **`main`**.
 
 ## When it runs
 

@@ -47,7 +47,8 @@ Work through these once per VPS (or when keys/users change). Details and securit
 4. **If Actions is off or failing:** SSH to the VPS and run the manual block (same as [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §4), but **first** ensure you are on **`main`**:  
    `cd /opt/marketstructureos`  
    `git checkout main && git pull origin main`  
-   `docker compose up -d --build`
+   `docker compose up -d --build`  
+   `docker compose up -d --force-recreate caddy msos_web`
 5. **Post-deploy smoke:**  
    - **Automated:** [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) curls `https://marketstructureos.com/` and fails if the HTML contains `ModuleNotFoundError` or a Python traceback.  
    - **Steward (optional cadence):** confirm the demo loads as expected; DevTools → Network: `/static/js/` loads over **https**; `https://app.marketstructureos.com` — Cloudflare Access and full app after login (see runbook).
