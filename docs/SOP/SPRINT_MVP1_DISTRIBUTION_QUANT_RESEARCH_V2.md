@@ -10,7 +10,7 @@
 
 Quant depth for **backtest-oriented research**: tail quantiles, strike-level **P(S > K)**, derived export columns, and a **daily snapshot collector MVP**.
 
-**Priority:** LOW (after HIGH legibility + MEDIUM MSOS demo).
+**Priority:** LOW (after HIGH legibility + MEDIUM MSOS demo). **Quant program:** [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md) — cross-venue PM joint export is chapters 3–5, not this sprint.
 
 ---
 

@@ -30,11 +30,23 @@ MSOS_P8_TESTER_PLAN = "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json"
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
+MVP1_CROSS_VENUE_PROB_PLAN = (
+    "docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json"
+)
+MVP1_CROSS_VENUE_SCAN_PLAN = (
+    "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json"
+)
+MVP1_CROSS_VENUE_BT_PLAN = (
+    "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json"
+)
 ALLOWED_READY_PLANS = (
     HOUSEKEEPING_PLAN,
     MVP1_LEGIBILITY_PLAN,
     MVP1_DIST_STATS_PLAN,
     MVP1_DIST_QUANT_V2_PLAN,
+    MVP1_CROSS_VENUE_PROB_PLAN,
+    MVP1_CROSS_VENUE_SCAN_PLAN,
+    MVP1_CROSS_VENUE_BT_PLAN,
     MSOS_DIST_DEMO_PLAN,
     MSOS_P5_THESIS_PLAN,
     MSOS_P6_EXPRESSION_PLAN,

@@ -163,6 +163,24 @@
       "status": "READY",
       "reason": "[LOW] Tail quantiles, strike-level P(>K), derived export columns, daily snapshot collector MVP",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM \u00b7 slot 2] Polymarket vs options P(>K) CSV + daily snapshot",
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM \u00b7 slot 3] Ranked gap scan + latest.md report",
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[LOW] Resolution Brier + gap-bucket scoring",
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md"
     }
   ]
 }

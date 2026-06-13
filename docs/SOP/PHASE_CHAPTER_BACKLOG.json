@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high|medium|low = mechanical order. focusPlaybookTier + PRODUCT_FOCUS_PLAYBOOK_V1 = semantic priority. urgent:true bypasses validation-report gate (ppe_focus_gate.py). See BACKLOG_OPERATOR.md.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high|medium|low = mechanical order. Cross-venue quant sequence: MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md. focusPlaybookTier + PRODUCT_FOCUS_PLAYBOOK_V1 = semantic priority. urgent:true bypasses validation-report gate (ppe_focus_gate.py). See BACKLOG_OPERATOR.md.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -174,6 +174,38 @@
       "selectionRecord": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "canonRef": "docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md \u2014 P3 distribution",
       "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity"
+    },
+    {
+      "chapterId": "mvp1_cross_venue_prob_panel",
+      "status": "chartered",
+      "priority": "medium",
+      "mediumQueueSlot": 2,
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md",
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 3",
+      "reason": "[MEDIUM \u00b7 slot 2] Polymarket vs options P(>K) CSV + daily snapshot \u2014 merge PR #149"
+    },
+    {
+      "chapterId": "mvp1_cross_venue_scan_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "mediumQueueSlot": 3,
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 4",
+      "reason": "[MEDIUM \u00b7 slot 3] Ranked gap scan + latest.md report \u2014 no CSV by hand"
+    },
+    {
+      "chapterId": "mvp1_cross_venue_backtest_v1",
+      "status": "chartered",
+      "priority": "low",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 5",
+      "reason": "[LOW] Resolution Brier + gap-bucket scoring from snapshot history"
     }
   ]
 }

@@ -1,0 +1,96 @@
+{
+  "name": "MVP1_cross_venue_scan_v1 (ranked gap report — no CSV by hand)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-CrossVenueScan-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Control-Slice001-cross_venue_scan",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-CrossVenueScan-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Product-Slice002-cross_venue_scan",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/cross_venue_scan.py",
+        "tests/test_cross_venue_scan.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenueScan-Product-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Product-Slice003-cross_venue_scan",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/run_cross_venue_scan.py",
+        "docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenueScan-Product-Slice004",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Product-Slice004-cross_venue_scan",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app.py",
+        "tests/test_cross_venue_scan.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenueScan-Smoke-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Smoke-Slice005-cross_venue_scan",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-CrossVenueScan-Closeout-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+      "buildBranch": "build/auto/MVP1-CrossVenueScan-Closeout-Slice006-cross_venue_scan",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_cross_venue_scan_v1",
+        "chapterTitle": "MVP1 cross-venue scan v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md",
+          "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}
