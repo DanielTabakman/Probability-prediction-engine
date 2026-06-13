@@ -15,9 +15,11 @@ NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
 def _powershell_process_match(pattern: str) -> bool:
+    # Exclude our own detection subprocess (its -Command embeds the same regex).
+    exclude_self = "-and $_.CommandLine -notmatch 'Where-Object.*run_ppe_auto'"
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.CommandLine -match '{pattern}' }}; "
+        f"Where-Object {{ $_.CommandLine -match '{pattern}' {exclude_self} }}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:
