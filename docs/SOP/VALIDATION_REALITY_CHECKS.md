@@ -47,6 +47,8 @@ Log after guided MSOS web sessions (`/learn` learn loop). Do **not** auto-widen 
 
 **Next queue recommendation (P8 closeout):** friends-first validation before paywall or live execution SELECTION.
 
+**Validation rollup:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) — interim **COMPLETE** 2026-06-13 (0 guided sessions; PMF targets pending).
+
 ## Evidence targets (engineering companion)
 
 - ≥10 freezes, ≥5 completed reviews ([MVP1_WIDTH_PROTOCOL.md](MVP1_WIDTH_PROTOCOL.md)) — live counts in [VALIDATION_EVIDENCE_STATUS.md](VALIDATION_EVIDENCE_STATUS.md)

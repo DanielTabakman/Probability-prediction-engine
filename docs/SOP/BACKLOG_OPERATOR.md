@@ -43,6 +43,16 @@ When a relay plan already exists, add `planPath` and `selectionRecord` (copy a n
 | `focusPlaybookTier` | Semantic tier: `P0`–`P4` or `defer` (playbook stack) |
 | `urgent` | `true` = bypass validation-report gate (log reason) |
 | `urgentReason` | One line — shown in operator skip messages |
+| `focusPlaybookTier` | **Required** on chartered rows with `planPath` — gate uses tier + `priority` (P2 + `low` proceeds while report DRAFT) |
+
+## Focus gate (auto-select)
+
+While [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) is **DRAFT** or **MISSING**:
+
+- **medium/high** queue rows are blocked unless `urgent: true`
+- **P2 + priority `low`** research chapters may still auto-select (DistQuantV2-class work)
+
+Complete the validation report (interim **COMPLETE** is OK when P8 shipped but cohort pending) or set `urgent` for IRL overrides. Health gate fails if P8 evidence is **COMPLETE** but the report still blocks.
 
 ## Priority
 

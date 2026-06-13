@@ -210,9 +210,11 @@ Agents on **IDE BUILD** get a **3-line Focus block** in `IDE_BUILD_STARTER_*.md`
 
 | Mechanism | Behavior |
 |-----------|----------|
-| `ppe_focus_gate.py` | Blocks auto-select / propagate while validation report is **DRAFT** or **MISSING** |
+| `ppe_focus_gate.py` | Blocks auto-select / propagate while validation report is **DRAFT** or **MISSING** (medium/high chapters) |
+| **P2 + `priority: low`** | Research legibility chapters may auto-select while report is interim **COMPLETE** or cohort pending |
 | `urgent: true` on backlog/queue row | Bypasses gate — requires `urgentReason` |
 | `PPE_FOCUS_GATE=0` | Disable gate (escape hatch) |
+| `run_codebase_health_gate.py` | Fails when P8 evidence **COMPLETE** but validation report still **DRAFT** |
 | Active `RUNNING` manifest | Not cleared by gate — finish in-flight chapter first |
 
 Full playbook loads: **steward SELECTION**, backlog edits, monthly review ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)).
