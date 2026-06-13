@@ -184,6 +184,14 @@
       "selectionRecord": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md \u2014 Paperclip-inspired visibility",
       "reason": "[HIGH] Operator inbox, active-slice lock, queue preview, operator map \u2014 daily loop UX"
+    },
+    {
+      "chapterId": "ppe_operator_html_dashboard_eval",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "defer",
+      "canonRef": "docs/SOP/PPE_OPERATOR_IMPROVEMENTS_V1.md \u2014 item 6",
+      "reason": "[LOW] Optional HTML operator dashboard eval \u2014 only if MD inbox + BLOCKERS.md insufficient"
     }
   ]
 }

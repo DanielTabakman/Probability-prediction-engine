@@ -4,6 +4,9 @@
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
   "layerPreset": "CONTROL",
+  "preCompletedSliceIds": [
+    "PPE-OperatorVis-Control-Slice001"
+  ],
   "slices": [
     {
       "sliceId": "PPE-OperatorVis-Control-Slice001",
@@ -33,7 +36,15 @@
       "workerMode": "deterministic",
       "susMinutes": 20,
       "hardMinutes": 45,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "touchSet": [
+        "scripts/ppe_operator_blockers.py",
+        "scripts/ppe_active_ide_slice.py",
+        "scripts/ppe_auto_select.py",
+        "scripts/workflow_metrics_cli.py",
+        "tests/test_ppe_operator_blockers.py",
+        "tests/test_ppe_auto_select_priority.py"
+      ]
     },
     {
       "sliceId": "PPE-OperatorVis-Witness-Slice003",

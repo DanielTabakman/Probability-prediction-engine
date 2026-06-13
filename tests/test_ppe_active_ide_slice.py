@@ -35,6 +35,16 @@ class TestPpeActiveIdeSlice(unittest.TestCase):
             self.assertTrue(clear_active_slice(repo))
             self.assertFalse((repo / ACTIVE_SLICE_REL).is_file())
 
+    def test_is_active_slice_stale(self) -> None:
+        from datetime import datetime, timedelta, timezone
+
+        from scripts.ppe_active_ide_slice import is_active_slice_stale
+
+        old = (datetime.now(timezone.utc) - timedelta(hours=30)).isoformat().replace("+00:00", "Z")
+        self.assertTrue(is_active_slice_stale({"checkedOutAt": old}))
+        fresh = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        self.assertFalse(is_active_slice_stale({"checkedOutAt": fresh}))
+
     def test_write_starter_invokes_checkout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)

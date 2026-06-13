@@ -56,3 +56,36 @@ def clear_active_slice(repo: Path) -> bool:
         p.unlink()
         return True
     return False
+
+
+def active_slice_stale_hours() -> float:
+    import os
+
+    raw = os.environ.get("PPE_ACTIVE_SLICE_STALE_HOURS", "24").strip()
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        return 24.0
+
+
+def is_active_slice_stale(data: dict[str, Any] | None) -> bool:
+    if not data:
+        return False
+    hours = active_slice_stale_hours()
+    if hours <= 0:
+        return False
+    checked = str(data.get("checkedOutAt") or "").strip()
+    if not checked:
+        return False
+    try:
+        if checked.endswith("Z"):
+            checked = checked[:-1] + "+00:00"
+        from datetime import datetime, timezone
+
+        then = datetime.fromisoformat(checked)
+        if then.tzinfo is None:
+            then = then.replace(tzinfo=timezone.utc)
+        age_h = (datetime.now(timezone.utc) - then).total_seconds() / 3600.0
+        return age_h >= hours
+    except ValueError:
+        return False

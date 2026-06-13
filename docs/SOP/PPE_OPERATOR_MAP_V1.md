@@ -54,6 +54,7 @@ run_ppe_operator.cmd --brief
 | Artifact | Role |
 |----------|------|
 | `artifacts/orchestrator/OPERATOR_STATUS.md` | **Inbox** — owner, active slice, blocker, next command, queue preview |
+| `artifacts/orchestrator/BLOCKERS.md` | **Triage inbox** — one file for `@ppe-triage-worker` |
 | `artifacts/orchestrator/ACTIVE_IDE_SLICE.json` | Checkout lock while IDE BUILD in flight |
 | `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` | One-file BUILD bundle for product slices |
 | `artifacts/orchestrator/IDE_PRODUCT_READY.json` | Product slice committed; allows `run_ppe_local` |

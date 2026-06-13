@@ -64,6 +64,7 @@ def _build_inbox(
     active_slice: dict[str, Any] | None,
     commands: list[str],
     queue_preview: list[dict[str, Any]],
+    stale_active_slice: bool = False,
 ) -> dict[str, Any]:
     owner, agent = _inbox_owner(verdict)
     active_id = None
@@ -83,7 +84,31 @@ def _build_inbox(
         "blocker": blocker,
         "next_command": next_cmd,
         "queue_preview": queue_preview,
+        "stale_active_slice": stale_active_slice,
     }
+
+
+def format_inbox_notify_line(inbox: dict[str, Any]) -> str:
+    """One-line inbox summary for ntfy / Termius triage."""
+    parts: list[str] = []
+    owner = inbox.get("owner")
+    agent = inbox.get("agent")
+    if owner:
+        parts.append(f"owner={owner}")
+    if agent:
+        parts.append(str(agent))
+    active = inbox.get("active_slice_id")
+    if active:
+        parts.append(f"slice={active}")
+    if inbox.get("stale_active_slice"):
+        parts.append("stale_checkout")
+    nxt = inbox.get("next_command")
+    if nxt:
+        parts.append(f"next={nxt}")
+    elif inbox.get("blocker"):
+        blocker = str(inbox.get("blocker") or "")
+        parts.append(blocker[:80] + ("…" if len(blocker) > 80 else ""))
+    return " · ".join(parts) if parts else "see OPERATOR_STATUS.md"
 
 
 def _format_inbox_block(inbox: dict[str, Any]) -> str:
@@ -92,6 +117,8 @@ def _format_inbox_block(inbox: dict[str, Any]) -> str:
         "",
         f"- **Owner:** {inbox.get('owner')} ({inbox.get('agent')})",
     ]
+    if inbox.get("stale_active_slice"):
+        lines.append("- **Warning:** active IDE slice checkout is stale (>24h) — clear or finish BUILD")
     active = inbox.get("active_slice_id")
     if active:
         lines.append(f"- **Active slice:** `{active}`")
@@ -303,10 +330,12 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         pass
 
     active_slice: dict[str, Any] | None = None
+    stale_checkout = False
     try:
-        from scripts.ppe_active_ide_slice import load_active_slice
+        from scripts.ppe_active_ide_slice import is_active_slice_stale, load_active_slice
 
         active_slice = load_active_slice(repo)
+        stale_checkout = is_active_slice_stale(active_slice)
     except ImportError:
         pass
 
@@ -317,6 +346,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         active_slice=active_slice,
         commands=commands,
         queue_preview=queue_preview,
+        stale_active_slice=stale_checkout,
     )
 
     return {
@@ -416,6 +446,12 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 {_format_human(status)}
 """
     out.write_text(body, encoding="utf-8")
+    try:
+        from scripts.ppe_operator_blockers import write_blockers_report
+
+        write_blockers_report(repo, status)
+    except ImportError:
+        pass
     return out
 
 
@@ -423,7 +459,11 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
     out = repo / NOTIFY_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     verdict = str(status.get("verdict") or "")
-    body = append_ppe_go_hint(str(status.get("blocker") or _format_brief(status)), verdict)
+    inbox = status.get("inbox") or {}
+    inbox_line = format_inbox_notify_line(inbox) if inbox else ""
+    base = str(status.get("blocker") or _format_brief(status))
+    body_parts = [p for p in (inbox_line, base) if p]
+    body = append_ppe_go_hint("\n".join(body_parts), verdict)
     payload = {
         "as_of": status.get("as_of"),
         "verdict": status.get("verdict"),

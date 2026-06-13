@@ -9,6 +9,7 @@ from pathlib import Path
 
 from scripts.ppe_phase_plan_window import (
     active_slice_window,
+    completed_slice_ids,
     mark_slice_complete,
     select_slice_batch,
 )
@@ -49,6 +50,26 @@ class TestPpePhasePlanWindow(unittest.TestCase):
                 completed={"A", "B"},
             )
             self.assertEqual([s["sliceId"] for s in batch], ["C"])
+
+    def test_pre_completed_slice_ids_from_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            plans = repo / "docs" / "SOP" / "PHASE_PLANS"
+            plans.mkdir(parents=True)
+            plan_path = "docs/SOP/PHASE_PLANS/p.json"
+            plan = {
+                "name": "p",
+                "preCompletedSliceIds": ["PPE-OperatorVis-Control-Slice001"],
+                "slices": [
+                    _slice("PPE-OperatorVis-Control-Slice001"),
+                    _slice("PPE-OperatorVis-Control-Slice002"),
+                ],
+            }
+            (plans / "p.json").write_text(json.dumps(plan), encoding="utf-8")
+            done = completed_slice_ids(repo, plan_path)
+            self.assertIn("PPE-OperatorVis-Control-Slice001", done)
+            batch = select_slice_batch(plan["slices"], limit=6, completed=done)
+            self.assertEqual([s["sliceId"] for s in batch], ["PPE-OperatorVis-Control-Slice002"])
 
 
 def active_slice_window_from_batch(

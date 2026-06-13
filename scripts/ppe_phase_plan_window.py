@@ -68,14 +68,21 @@ def _is_closeout_slice(sl: dict[str, Any]) -> bool:
 
 def completed_slice_ids(repo: Path, plan_path: str) -> set[str]:
     norm = _norm_plan(plan_path)
-    data = load_progress(repo)
-    if _norm_plan(str(data.get("planPath") or "")) != norm:
-        return set()
     out: set[str] = set()
-    for sid in data.get("completedSliceIds") or []:
-        s = str(sid or "").strip()
-        if s:
-            out.add(s)
+    try:
+        plan = load_phase_plan(repo, plan_path)
+        for sid in plan.get("preCompletedSliceIds") or []:
+            s = str(sid or "").strip()
+            if s:
+                out.add(s)
+    except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        pass
+    data = load_progress(repo)
+    if _norm_plan(str(data.get("planPath") or "")) == norm:
+        for sid in data.get("completedSliceIds") or []:
+            s = str(sid or "").strip()
+            if s:
+                out.add(s)
     return out
 
 

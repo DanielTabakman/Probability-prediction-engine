@@ -11,10 +11,11 @@ You diagnose operator blockers. You do not BUILD product code.
 
 ## Load
 
-- `artifacts/orchestrator/OPERATOR_STATUS.md`
+- `artifacts/orchestrator/BLOCKERS.md` (**read first**)
+- `artifacts/orchestrator/OPERATOR_STATUS.md` (Inbox section)
 - `artifacts/orchestrator/OPERATOR_GUARD_REPORT.md` (if FIX_PLAN)
 - `artifacts/orchestrator/LAST_RUN_REPORT.md` (if STALE_STATE or relay failure)
-- `artifacts/relay/runs/<latest>/decision.json` (path from LAST_RUN_REPORT if available)
+- `artifacts/relay/runs/<latest>/decision.json` (path from BLOCKERS.md if available)
 
 ## Return
 

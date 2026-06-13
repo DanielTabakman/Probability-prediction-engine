@@ -42,6 +42,29 @@ def _plan_exists_and_valid(repo_root: Path, plan_path: str) -> list[str]:
     return errors
 
 
+def _backlog_priority_for_plan(repo_root: Path, plan_path: str) -> tuple[int, int]:
+    """Return (priority_rank, backlog_index) for READY sorting; unknown plans sort medium."""
+    from scripts.ppe_propagate_queue import (
+        PRIORITY_RANK,
+        backlog_path,
+        load_backlog,
+        normalize_backlog_priority,
+    )
+
+    norm = plan_path.replace("\\", "/").strip()
+    if not backlog_path(repo_root).is_file():
+        return PRIORITY_RANK["medium"], 9999
+    backlog = load_backlog(repo_root)
+    for index, item in enumerate(backlog.get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        item_plan = str(item.get("planPath") or "").replace("\\", "/").strip()
+        if item_plan != norm:
+            continue
+        return PRIORITY_RANK[normalize_backlog_priority(item)], index
+    return PRIORITY_RANK["medium"], 9999
+
+
 def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
     """Return (plan_path, reason). plan_path is None when nothing is selectable."""
     queue = load_queue(repo_root)
@@ -50,6 +73,7 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         raise ValueError("queue: items must be an array")
 
     skipped: list[str] = []
+    ready_candidates: list[tuple[int, int, int, str, str]] = []
     for i, item in enumerate(items):
         if not isinstance(item, dict):
             continue
@@ -59,6 +83,13 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         plan_path = str(item.get("planPath") or "").strip()
         if not plan_path:
             continue
+        prio, backlog_idx = _backlog_priority_for_plan(repo_root, plan_path)
+        reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
+        ready_candidates.append((prio, backlog_idx, i, plan_path, reason))
+
+    ready_candidates.sort(key=lambda row: (row[0], row[1], row[2]))
+
+    for _prio, _bidx, i, plan_path, reason in ready_candidates:
         errors = _plan_exists_and_valid(repo_root, plan_path)
         if errors:
             return None, f"queue item {i} invalid: " + "; ".join(errors)
@@ -79,7 +110,7 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
             skipped.append(f"{plan_path}: {guard.detail}")
             continue
         try:
-            from scripts.ppe_focus_gate import evaluate_focus_gate, focus_gate_skip_code
+            from scripts.ppe_focus_gate import evaluate_focus_gate
 
             focus = evaluate_focus_gate(repo_root, plan_path)
         except ImportError:
@@ -87,10 +118,10 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         if focus is not None and not focus.allowed:
             skipped.append(f"{plan_path}: focus gate — {focus.reason}")
             continue
-        reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
+        out_reason = reason
         if focus is not None and focus.urgent_bypass:
-            reason = f"{reason} (urgent bypass)"
-        return plan_path, reason
+            out_reason = f"{reason} (urgent bypass)"
+        return plan_path, out_reason
 
     if skipped:
         return None, "no selectable READY item; skipped: " + "; ".join(skipped)

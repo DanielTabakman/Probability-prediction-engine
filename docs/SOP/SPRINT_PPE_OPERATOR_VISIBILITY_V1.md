@@ -36,11 +36,11 @@ Improve daily operator UX: **inbox** in `OPERATOR_STATUS.md`, **active IDE slice
 **Closed** 2026-06-12 — inbox in `OPERATOR_STATUS.md`, checkout on starter write, docs in `PPE_OPERATOR_MAP_V1.md`.
 
 
-### PPE-OperatorVis-Control-Slice002 — blockers + cost tags (CONTROL)
+### PPE-OperatorVis-Control-Slice002 — blockers + cost tags (CONTROL) — **CLOSED**
 
-**Goal:** Auto `BLOCKERS.md`; workflow metrics lane/roundtrip fields.
+**Goal:** Auto `BLOCKERS.md`; workflow metrics lane/roundtrip fields; ntfy inbox line; priority auto-select; stale checkout guard.
 
-**Deferred** until Slice001 COMPLETE.
+**Closed** 2026-06-12 — see [`PPE_OPERATOR_IMPROVEMENTS_V1.md`](PPE_OPERATOR_IMPROVEMENTS_V1.md).
 
 ---
 

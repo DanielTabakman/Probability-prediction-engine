@@ -142,6 +142,8 @@ def cmd_slice_close(
     rework: int = 0,
     session_id: str | None = None,
     notes: str = "",
+    worker_lane: str | None = None,
+    api_calls: int | None = None,
 ) -> int:
     size_u = size.upper()
     if size_u not in SIZE_WEIGHTS:
@@ -164,6 +166,11 @@ def cmd_slice_close(
         "primary_session_id": session_id or None,
         "notes": notes,
     }
+    lane = (worker_lane or "").strip()
+    if lane:
+        row["worker_lane"] = lane
+    if api_calls is not None:
+        row["api_calls"] = api_calls
     _append_jsonl(_metrics_dir(repo) / SLICES_FILE, row)
     print(f"workflow_metrics: slice_close {slice_id} size={size_u} roundtrips={roundtrips}")
     return 0
@@ -240,6 +247,8 @@ def cmd_export_csv(repo: Path) -> int:
         "size_weight_actual",
         "roundtrips",
         "rework_count",
+        "worker_lane",
+        "api_calls",
         "primary_session_id",
         "notes",
     ]
@@ -277,6 +286,12 @@ def main(argv: list[str] | None = None) -> int:
     s_close.add_argument("--rework", type=int, default=0)
     s_close.add_argument("--session-id", default=None)
     s_close.add_argument("--notes", default="")
+    s_close.add_argument(
+        "--worker-lane",
+        default=None,
+        help="Cost lane tag: local | IDE | acp",
+    )
+    s_close.add_argument("--api-calls", type=int, default=None)
 
     p_sum = sub.add_parser("summary")
     p_sum.add_argument("--days", type=int, default=7)
@@ -304,6 +319,8 @@ def main(argv: list[str] | None = None) -> int:
             rework=args.rework,
             session_id=args.session_id,
             notes=args.notes,
+            worker_lane=args.worker_lane,
+            api_calls=args.api_calls,
         )
     if args.command == "summary":
         return cmd_summary(repo, days=args.days)
