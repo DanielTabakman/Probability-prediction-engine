@@ -21,7 +21,7 @@
 
 **Founder crib sheet (5 concepts, no equations):** [`FOUNDER_OPERATOR_CRIB_SHEET_V1.md`](FOUNDER_OPERATOR_CRIB_SHEET_V1.md)
 
-**Phone panic cue:** [`assets/operator_cue_card.html`](assets/operator_cue_card.html) or `https://marketstructureos.com/cue.html` — bookmark on your phone; not for testers.
+**Phone session notebook:** [`OPERATOR_SESSION_NOTEBOOK_V1.md`](OPERATOR_SESSION_NOTEBOOK_V1.md) · `https://marketstructureos.com/session.html` — step-by-step on your phone; updates via repo JSON.
 
 If you only read one section: **Phase 2 — weekly loop** below.
 

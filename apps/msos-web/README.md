@@ -30,7 +30,9 @@ python scripts/ppe_export_web_feedback.py --markdown
 
 ## Operator phone cue (founder only)
 
-Static page at `/cue.html` (source: [`docs/SOP/assets/operator_cue_card.html`](../../docs/SOP/assets/operator_cue_card.html)) — mobile panic cue for live demos. Not linked from site nav; `noindex`. Bookmark on your phone; do not share with testers.
+**Session notebook:** [`docs/SOP/OPERATOR_SESSION_NOTEBOOK_V1.md`](../../docs/SOP/OPERATOR_SESSION_NOTEBOOK_V1.md) — `/session.html` + `/session.json` (step-by-step, advances on phone). Edit [`docs/SOP/assets/operator_session_notebook.json`](../../docs/SOP/assets/operator_session_notebook.json) to update walkthrough.
+
+Legacy `/cue.html` redirects to session notebook. Not linked from site nav; `noindex`. Bookmark on your phone; do not share with testers.
 
 **Stack ADR:** [`docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md`](../../docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md)
 

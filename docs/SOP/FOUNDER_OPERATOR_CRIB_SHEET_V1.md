@@ -8,16 +8,18 @@
 
 ## Phone cue card (panic in the room)
 
-**Personal operator script** — not product tutorial (that stays on the demo site).
+**Session notebook (recommended):** step-by-step walkthrough that advances as you go — [`OPERATOR_SESSION_NOTEBOOK_V1.md`](OPERATOR_SESSION_NOTEBOOK_V1.md)
 
-| How | URL / path |
-|-----|------------|
-| **Live (after deploy)** | `https://marketstructureos.com/cue.html` — not linked from public nav; `noindex` |
-| **Repo / offline** | [`assets/operator_cue_card.html`](assets/operator_cue_card.html) — open in browser or **Add to Home Screen** |
+| How | URL |
+|-----|-----|
+| **Live** | `https://marketstructureos.com/session.html` |
+| **Offline** | [`assets/operator_session_notebook.html`](assets/operator_session_notebook.html) + `session.json` in same folder |
 
-**Setup once:** bookmark or home-screen icon on your phone. Glance under the table / in your pocket — traders see the demo screen, not your cue.
+Add to **Home Screen** on your phone. Glance under the table — traders see the demo, not your notebook.
 
-**Do not** pass this link to testers; it is for you only.
+**Static panic sheet (legacy):** [`assets/operator_cue_card.html`](assets/operator_cue_card.html) — redirects to session notebook when deployed.
+
+**Do not** share these links with testers.
 
 ---
 
