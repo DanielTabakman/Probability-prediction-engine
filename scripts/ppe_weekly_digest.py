@@ -379,6 +379,15 @@ def cmd_write_notify_payload(repo: Path) -> int:
     if click_url:
         summary["click_url"] = click_url
     summary.update(build_phone_digest_notify(summary))
+    try:
+        from scripts.ppe_steward_scoreboard import format_digest_commitment_lines
+
+        commitment = format_digest_commitment_lines(repo)
+        if commitment:
+            body = str(summary.get("phone_body") or "")
+            summary["phone_body"] = (body + "\n" + "\n".join(commitment)).strip()
+    except Exception as exc:
+        print(f"ppe_weekly_digest: steward commitments skipped: {exc}", file=sys.stderr)
     out = notify_payload_path(repo)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

@@ -3,6 +3,10 @@ REM Copy to ppe_operator_notify.local.cmd (gitignored) and set your ntfy topic.
 REM Subscribe to the same topic in the ntfy app on your phone.
 
 set "PPE_NTFY_TOPIC=ppe-your-secret-topic-here"
+REM Human commitments (Wed/Sun nudges) — separate subscription in ntfy app:
+set "PPE_NTFY_STEWARD_TOPIC=ppe-your-steward-topic-here"
+REM Steward channel daily cap (default 4):
+REM set "PPE_NTFY_STEWARD_DAILY_CAP=4"
 REM Volume control (defaults: cap 40/day, chapter-only progress, heartbeat every 24h):
 REM set "PPE_NTFY_DAILY_CAP=40"
 REM set "PPE_NTFY_PROGRESS=chapter"
