@@ -121,6 +121,31 @@ class TestRunGateIntegration(unittest.TestCase):
                 any("BACKLOG_ACTIVE_BUT_EVIDENCE_COMPLETE" in err for err in result["errors"])
             )
 
+    def test_p8_complete_with_draft_report_fails_gate(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            sop = repo / "docs" / "SOP"
+            sop.mkdir(parents=True)
+            (sop / "PHASE_QUEUE.json").write_text(
+                json.dumps({"version": 1, "items": []}),
+                encoding="utf-8",
+            )
+            (sop / "PHASE_CHAPTER_BACKLOG.json").write_text(
+                json.dumps({"version": 1, "items": []}),
+                encoding="utf-8",
+            )
+            (sop / "MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md").write_text(
+                "**Status:** **COMPLETE** 2026-06-12\n",
+                encoding="utf-8",
+            )
+            (sop / "MSOS_P8_VALIDATION_REPORT_V1.md").write_text(
+                "**Status:** **DRAFT**\n",
+                encoding="utf-8",
+            )
+            result = run_gate(repo, skip_relay=True)
+            self.assertFalse(result["ok"])
+            self.assertTrue(any("focus_gate" in err for err in result["errors"]))
+
     def test_queue_issues_fail_gate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)

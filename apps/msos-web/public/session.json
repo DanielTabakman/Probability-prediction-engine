@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "updated": "2026-06-13",
+  "version": 2,
+  "updated": "2026-06-14",
   "title": "Guided tester session",
   "subtitle": "Operator notebook — for you, not the demo audience",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
@@ -158,5 +158,20 @@
     "Guaranteed profit or proven edge",
     "Recommended trade from disagreement alone",
     "Improvised formulas or greek lectures"
-  ]
+  ],
+  "survey": {
+    "title": "Session feedback survey",
+    "subtitle": "Log validation metrics — saved to MSOS web feedback + copy row for reality checks.",
+    "confusionCategories": [
+      "naming confusion",
+      "market-read confusion",
+      "trust/provenance confusion",
+      "belief-control confusion",
+      "candidate/recommendation confusion",
+      "no-trade/watch-only confusion",
+      "layout/visual hierarchy confusion",
+      "value/desirability signal",
+      "feature request / later-scope item"
+    ]
+  }
 }

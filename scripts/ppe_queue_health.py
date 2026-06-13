@@ -137,16 +137,51 @@ def audit_backlog(repo_root: Path) -> list[Issue]:
                     "chapterId": item.get("chapterId"),
                 }
             )
+        if plan and not str(item.get("focusPlaybookTier") or "").strip():
+            issues.append(
+                {
+                    "code": "BACKLOG_MISSING_FOCUS_TIER",
+                    "index": i,
+                    "planPath": plan,
+                    "chapterId": item.get("chapterId"),
+                    "reason": item.get("reason"),
+                }
+            )
     return issues
 
 
 def repair_backlog(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
-    """Mark active backlog rows done when evidence already shows COMPLETE."""
+    """Mark active backlog rows done when evidence COMPLETE; infer missing focusPlaybookTier."""
     repo = repo_root.resolve()
     fixes: list[Fix] = []
     issues = audit_backlog(repo)
     for issue in issues:
+        code = str(issue.get("code") or "")
         plan = str(issue.get("planPath") or "")
+        if code == "BACKLOG_MISSING_FOCUS_TIER" and plan:
+            try:
+                from scripts.ppe_focus_gate import infer_focus_playbook_tier_from_reason
+                from scripts.ppe_propagate_queue import backlog_path, load_backlog, save_backlog
+
+                tier = infer_focus_playbook_tier_from_reason(str(issue.get("reason") or ""))
+                if apply and backlog_path(repo).is_file():
+                    backlog = load_backlog(repo)
+                    idx = int(issue.get("index") or -1)
+                    items = backlog.get("items") or []
+                    if 0 <= idx < len(items) and isinstance(items[idx], dict):
+                        items[idx]["focusPlaybookTier"] = tier
+                        save_backlog(repo, backlog)
+                fixes.append(
+                    {
+                        "action": "infer_focus_playbook_tier",
+                        "planPath": plan,
+                        "index": issue.get("index"),
+                        "tier": tier,
+                    }
+                )
+            except ImportError:
+                pass
+            continue
         if not plan:
             continue
         if apply:

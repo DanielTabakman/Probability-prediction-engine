@@ -25,9 +25,10 @@
 2. **Your notes** per step saved in phone `localStorage`.
 3. **Done → next** advances progress (stored on phone).
 4. **Panic** overlay anytime.
-5. **End:** copy-paste row for [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) § MSOS P8.
+5. **Survey** after the last step — validation metrics + MVP1 rubric; submits to `/api/feedback` (JSONL on server).
+6. **End:** copy-paste row for [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) § MSOS P8.
 
-Progress does **not** sync to the server in v1 — only your phone. Export via copy at end of session.
+Progress and survey drafts stay on the phone until submit. Successful submit also appends to `ppe_web_feedback.jsonl` on the VPS (`PPE_WEB_FEEDBACK_DIR`).
 
 ---
 

@@ -127,6 +127,12 @@ def run_gate(
 
     if not skip_queue:
         errors.extend(evaluate_queue(repo))
+        try:
+            from scripts.ppe_focus_gate import validation_report_gate_issues
+
+            errors.extend(validation_report_gate_issues(repo))
+        except ImportError:
+            pass
 
     if not skip_relay:
         for job, artifact_name in (

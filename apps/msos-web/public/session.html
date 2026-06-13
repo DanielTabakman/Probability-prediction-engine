@@ -153,6 +153,62 @@
         font-family: inherit;
         resize: vertical;
       }
+      select,
+      input[type="text"] {
+        width: 100%;
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--text);
+        padding: 10px;
+        font-size: 0.9rem;
+        font-family: inherit;
+      }
+      .field-label {
+        display: block;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .field-block {
+        margin-bottom: 12px;
+      }
+      .yn-row,
+      .likert-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .pill-btn {
+        flex: 1;
+        min-width: 64px;
+        border: 1px solid var(--line);
+        background: var(--panel2);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 10px 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .pill-btn.active {
+        background: var(--teal);
+        color: #041018;
+        border-color: var(--teal);
+      }
+      .status-ok {
+        color: var(--teal);
+        font-size: 0.85rem;
+        margin-top: 8px;
+      }
+      .status-warn {
+        color: var(--amber);
+        font-size: 0.85rem;
+        margin-top: 8px;
+      }
       .actions {
         display: flex;
         gap: 8px;
@@ -262,15 +318,34 @@
       function loadState() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return { index: 0, notes: {}, startedAt: null };
+          if (!raw) {
+            return {
+              index: 0,
+              notes: {},
+              startedAt: null,
+              survey: null,
+              surveySubmitted: false,
+              surveySaveStatus: null,
+            };
+          }
           const p = JSON.parse(raw);
           return {
             index: Number(p.index) || 0,
             notes: p.notes || {},
             startedAt: p.startedAt || null,
+            survey: p.survey || null,
+            surveySubmitted: Boolean(p.surveySubmitted),
+            surveySaveStatus: p.surveySaveStatus || null,
           };
         } catch {
-          return { index: 0, notes: {}, startedAt: null };
+          return {
+            index: 0,
+            notes: {},
+            startedAt: null,
+            survey: null,
+            surveySubmitted: false,
+            surveySaveStatus: null,
+          };
         }
       }
 
@@ -294,24 +369,63 @@
           .replace(/\n/g, "<br>");
       }
 
+      function ynFromNote(text) {
+        if (!text) return "";
+        const t = String(text).trim().toUpperCase();
+        if (t.startsWith("Y")) return "Y";
+        if (t.startsWith("N")) return "N";
+        return "";
+      }
+
+      function defaultSurvey() {
+        return {
+          testerProfile: state.notes.prep || "",
+          comprehension: ynFromNote(state.notes.comprehension),
+          thesisConfirm: "",
+          returnIntent: ynFromNote(state.notes.return),
+          paidInterest: "",
+          confusionCategory:
+            notebook?.survey?.confusionCategories?.[7] ||
+            "value/desirability signal",
+          usefulness: 3,
+          repeatUseIntent: 3,
+          objections: "",
+          sessionNotes: state.notes.log || "",
+        };
+      }
+
+      function ensureSurvey() {
+        if (!state.survey) {
+          state.survey = defaultSurvey();
+          saveState(state);
+        }
+      }
+
       function buildLogSnippet() {
         const today = new Date().toISOString().slice(0, 10);
-        const notes = state.notes;
-        const comp = notes.comprehension || "Y/N";
-        const ret = notes.return || "Y/N";
-        const profile = notes.prep || "vol trader";
-        const line = notes.log || "";
-        return (
-          `| ${today} | ${profile} | ${comp} | Y/N | ${ret} | N | ${line} |`
-        );
+        const s = state.survey || defaultSurvey();
+        const comp = s.comprehension || "Y/N";
+        const thesis = s.thesisConfirm || "Y/N";
+        const ret = s.returnIntent || "Y/N";
+        const paid = s.paidInterest || "N";
+        const profile = s.testerProfile || "vol trader";
+        const line = s.sessionNotes || s.objections || "";
+        return `| ${today} | ${profile} | ${comp} | ${thesis} | ${ret} | ${paid} | ${line} |`;
       }
 
       function renderDone() {
         const app = document.getElementById("app");
         const log = buildLogSnippet();
+        const saveMsg =
+          state.surveySaveStatus === "remote"
+            ? '<p class="status-ok">Feedback saved to MSOS web store.</p>'
+            : state.surveySaveStatus === "local"
+              ? '<p class="status-warn">Saved on phone only — server save failed. Copy the row below.</p>'
+              : "";
         app.innerHTML = `
           <div class="done-screen">
             <h2>Session complete</h2>
+            ${saveMsg}
             <p class="sub">Copy this row into VALIDATION_REALITY_CHECKS.md § MSOS P8</p>
             <div class="log-box" id="log-snippet">${log}</div>
             <button type="button" class="btn-next" style="width:100%" id="copy-log">Copy log row</button>
@@ -323,18 +437,193 @@
           document.getElementById("copy-log").textContent = "Copied!";
         };
         document.getElementById("restart").onclick = () => {
-          state = { index: 0, notes: {}, startedAt: null };
+          state = {
+            index: 0,
+            notes: {},
+            startedAt: null,
+            survey: null,
+            surveySubmitted: false,
+            surveySaveStatus: null,
+          };
           saveState(state);
           render();
         };
+      }
+
+      function renderSurvey() {
+        ensureSurvey();
+        const s = state.survey;
+        const survey = notebook.survey || {};
+        const categories = survey.confusionCategories || [];
+        const app = document.getElementById("app");
+
+        const catOptions = categories
+          .map(
+            (c) =>
+              `<option value="${c.replace(/"/g, "&quot;")}" ${
+                s.confusionCategory === c ? "selected" : ""
+              }>${c}</option>`
+          )
+          .join("");
+
+        function ynButtons(field, label) {
+          return `
+            <div class="field-block">
+              <span class="field-label">${label}</span>
+              <div class="yn-row" data-yn-field="${field}">
+                <button type="button" class="pill-btn ${s[field] === "Y" ? "active" : ""}" data-val="Y">Y</button>
+                <button type="button" class="pill-btn ${s[field] === "N" ? "active" : ""}" data-val="N">N</button>
+              </div>
+            </div>`;
+        }
+
+        function likertButtons(field, label) {
+          const buttons = [1, 2, 3, 4, 5]
+            .map(
+              (n) =>
+                `<button type="button" class="pill-btn ${s[field] === n ? "active" : ""}" data-likert-field="${field}" data-val="${n}">${n}</button>`
+            )
+            .join("");
+          return `
+            <div class="field-block">
+              <span class="field-label">${label}</span>
+              <div class="likert-row">${buttons}</div>
+              <p class="sub">1 = low · 5 = high</p>
+            </div>`;
+        }
+
+        app.innerHTML = `
+          <div class="top">
+            <div>
+              <h1>${survey.title || "Session feedback"}</h1>
+              <div class="sub">${survey.subtitle || ""}</div>
+            </div>
+            <button type="button" class="icon-btn" id="panic-btn">Panic</button>
+          </div>
+          <div class="progress">After session · validation survey</div>
+          <div class="field-block">
+            <label class="field-label" for="sf-profile">Tester profile</label>
+            <input type="text" id="sf-profile" value="${(s.testerProfile || "").replace(/"/g, "&quot;")}" placeholder="e.g. BTC vol trader, Deribit" />
+          </div>
+          ${ynButtons("comprehension", "Comprehension (~5 min)")}
+          ${ynButtons("thesisConfirm", "Thesis / market read honest")}
+          ${ynButtons("returnIntent", "Would open before next trade")}
+          ${ynButtons("paidInterest", "Paid interest (steward call)")}
+          <div class="field-block">
+            <label class="field-label" for="sf-category">Main confusion or signal</label>
+            <select id="sf-category">${catOptions}</select>
+          </div>
+          ${likertButtons("usefulness", "Usefulness for understanding the read")}
+          ${likertButtons("repeatUseIntent", "Would use again")}
+          <div class="field-block">
+            <label class="field-label" for="sf-objections">Objections / confusion detail</label>
+            <textarea id="sf-objections" placeholder="What felt wrong, missing, or hard to trust?">${(s.objections || "").replace(/</g, "&lt;")}</textarea>
+          </div>
+          <div class="field-block">
+            <label class="field-label" for="sf-notes">Session notes (reality-check row)</label>
+            <textarea id="sf-notes" placeholder="One-line surprise or confusion">${(s.sessionNotes || "").replace(/</g, "&lt;")}</textarea>
+          </div>
+          <button type="button" class="btn-next" style="width:100%" id="submit-survey">Submit feedback</button>
+          <button type="button" class="btn-reset" id="back-to-steps">Back to last step</button>
+        `;
+
+        document.getElementById("sf-profile").oninput = (e) => {
+          s.testerProfile = e.target.value;
+          saveState(state);
+        };
+        document.getElementById("sf-category").onchange = (e) => {
+          s.confusionCategory = e.target.value;
+          saveState(state);
+        };
+        document.getElementById("sf-objections").oninput = (e) => {
+          s.objections = e.target.value;
+          saveState(state);
+        };
+        document.getElementById("sf-notes").oninput = (e) => {
+          s.sessionNotes = e.target.value;
+          saveState(state);
+        };
+
+        document.querySelectorAll("[data-yn-field]").forEach((row) => {
+          const field = row.getAttribute("data-yn-field");
+          row.querySelectorAll(".pill-btn").forEach((btn) => {
+            btn.onclick = () => {
+              s[field] = btn.getAttribute("data-val");
+              saveState(state);
+              renderSurvey();
+            };
+          });
+        });
+
+        document.querySelectorAll("[data-likert-field]").forEach((btn) => {
+          btn.onclick = () => {
+            const field = btn.getAttribute("data-likert-field");
+            s[field] = Number(btn.getAttribute("data-val"));
+            saveState(state);
+            renderSurvey();
+          };
+        });
+
+        document.getElementById("submit-survey").onclick = async () => {
+          const btn = document.getElementById("submit-survey");
+          btn.disabled = true;
+          btn.textContent = "Saving…";
+          if (!s.comprehension || !s.returnIntent) {
+            btn.textContent = "Set comprehension + return (Y/N)";
+            btn.disabled = false;
+            return;
+          }
+          const row = buildLogSnippet();
+          const payload = {
+            source: "operator_session_notebook",
+            tester_profile: s.testerProfile,
+            comprehension: s.comprehension,
+            thesis_confirm: s.thesisConfirm || undefined,
+            return_intent: s.returnIntent,
+            paid_interest: s.paidInterest || undefined,
+            confusion_category: s.confusionCategory,
+            usefulness: s.usefulness,
+            repeat_use_intent: s.repeatUseIntent,
+            objections_text: s.objections,
+            session_note: s.sessionNotes,
+            reality_check_row: row,
+            session_started_at: state.startedAt,
+          };
+          let savedRemote = false;
+          try {
+            const res = await fetch("/api/feedback", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            savedRemote = res.ok;
+          } catch {
+            savedRemote = false;
+          }
+          state.surveySubmitted = true;
+          state.surveySaveStatus = savedRemote ? "remote" : "local";
+          saveState(state);
+          render();
+        };
+
+        document.getElementById("back-to-steps").onclick = () => {
+          state.index = notebook.steps.length - 1;
+          saveState(state);
+          render();
+        };
+        document.getElementById("panic-btn").onclick = showPanic;
       }
 
       function render() {
         if (!notebook) return;
         const steps = notebook.steps;
         const total = steps.length;
-        if (state.index >= total) {
+        if (state.surveySubmitted) {
           renderDone();
+          return;
+        }
+        if (state.index >= total) {
+          renderSurvey();
           return;
         }
         if (!state.startedAt) {
@@ -431,7 +720,14 @@
         };
         document.getElementById("reset-btn").onclick = () => {
           if (confirm("Clear progress and notes on this phone?")) {
-            state = { index: 0, notes: {}, startedAt: null };
+            state = {
+              index: 0,
+              notes: {},
+              startedAt: null,
+              survey: null,
+              surveySubmitted: false,
+              surveySaveStatus: null,
+            };
             saveState(state);
             render();
           }
