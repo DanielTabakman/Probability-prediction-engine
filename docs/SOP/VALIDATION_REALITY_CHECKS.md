@@ -2,7 +2,7 @@
 
 Lightweight external validation. Copy a row per session.
 
-**Strategic focus:** Log sessions against targets in [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) (return rate, paid interest, PMF survey). Use the playbook **session script** for guided tester runs.
+**Strategic focus:** Log sessions against targets in [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md). **Step-by-step:** [`STEWARD_VALIDATION_GUIDE_V1.md`](STEWARD_VALIDATION_GUIDE_V1.md). Use [`DEMO_OPERATOR_SCRIPT.md`](DEMO_OPERATOR_SCRIPT.md) for timed demo flow.
 
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|

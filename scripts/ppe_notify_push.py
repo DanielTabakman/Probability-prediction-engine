@@ -19,9 +19,11 @@ DEFAULT_NTFY_SERVER = "https://ntfy.sh"
 SNOOZE_REL = "artifacts/control_plane/NTFY_SNOOZE.json"
 QUIET_ALERT_REL = "artifacts/control_plane/NTFY_QUIET_ALERT_STATE.json"
 SEND_STATE_REL = "artifacts/control_plane/NTFY_SEND_STATE.json"
+STEWARD_SEND_STATE_REL = "artifacts/control_plane/STEWARD_NTFY_SEND_STATE.json"
 QUOTA_STATUS_REL = "artifacts/control_plane/NTFY_QUOTA_STATUS.json"
 OUTBOUND_TAG = "from-desktop"
 DEFAULT_DAILY_CAP = 40
+DEFAULT_STEWARD_DAILY_CAP = 4
 DEFAULT_DEDUP_MINUTES = 45.0
 DEFAULT_MIN_INTERVAL_SEC = 120.0
 DEFAULT_WARN_PCT = 80
@@ -54,6 +56,14 @@ def ntfy_configured() -> bool:
     return bool(ntfy_topic())
 
 
+def steward_ntfy_topic() -> str:
+    return os.environ.get("PPE_NTFY_STEWARD_TOPIC", "").strip()
+
+
+def steward_ntfy_configured() -> bool:
+    return bool(steward_ntfy_topic())
+
+
 def repo_root() -> Path:
     raw = os.environ.get("PPE_REPO_ROOT", "").strip()
     return Path(raw) if raw else Path.cwd()
@@ -61,8 +71,6 @@ def repo_root() -> Path:
 
 def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
     """Load PPE_* vars from local cmd wrappers when Python was not started via .cmd."""
-    if os.environ.get("PPE_NTFY_TOPIC", "").strip():
-        return
     root = (repo or repo_root()).resolve()
     for name in ("ppe_operator_local.cmd", "ppe_operator_notify.local.cmd"):
         path = root / name
@@ -83,7 +91,8 @@ def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
             if "=" not in line or not line.startswith("PPE"):
                 continue
             key, _, value = line.partition("=")
-            if key.strip() and key not in os.environ:
+            key = key.strip()
+            if key and key not in os.environ:
                 os.environ[key.strip()] = value
 
 
@@ -770,6 +779,101 @@ def send_ntfy(
         return False
 
 
+def steward_daily_cap() -> int:
+    raw = os.environ.get("PPE_NTFY_STEWARD_DAILY_CAP", str(DEFAULT_STEWARD_DAILY_CAP)).strip()
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return DEFAULT_STEWARD_DAILY_CAP
+
+
+def _steward_send_state_path(repo: Path | None = None) -> Path:
+    return (repo or repo_root()).resolve() / STEWARD_SEND_STATE_REL
+
+
+def _load_steward_send_state(repo: Path | None = None) -> dict[str, Any]:
+    path = _steward_send_state_path(repo)
+    if not path.is_file():
+        return {"sends": []}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"sends": []}
+    if not isinstance(data, dict):
+        return {"sends": []}
+    sends = data.get("sends")
+    if not isinstance(sends, list):
+        data["sends"] = []
+    return data
+
+
+def _save_steward_send_state(state: dict[str, Any], repo: Path | None = None) -> None:
+    path = _steward_send_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def _prune_steward_sends(sends: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    cutoff = datetime.now(timezone.utc) - SEND_WINDOW
+    kept: list[dict[str, Any]] = []
+    for item in sends:
+        at = _parse_utc(str(item.get("at") or ""))
+        if at is None:
+            continue
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        if at >= cutoff:
+            kept.append(item)
+    return kept
+
+
+def send_steward_ntfy(
+    title: str,
+    body: str,
+    *,
+    tags: list[str] | None = None,
+    priority: str = "default",
+    bypass_throttle: bool = False,
+    repo: Path | None = None,
+) -> bool:
+    """POST to PPE_NTFY_STEWARD_TOPIC — human commitments channel (no loop commands)."""
+    if not notify_enabled():
+        return False
+    topic = steward_ntfy_topic()
+    if not topic:
+        return False
+
+    repo = repo or repo_root()
+    state = _load_steward_send_state(repo)
+    sends = _prune_steward_sends(list(state.get("sends") or []))
+    cap = steward_daily_cap()
+    if not bypass_throttle and len(sends) >= cap:
+        print(f"ppe_notify_push: steward skipped (daily cap {cap}): {title[:80]}", file=sys.stderr)
+        return False
+
+    url = f"{ntfy_server()}/{topic}"
+    outbound_tags = list(tags or ["ppe", "steward"])
+    headers = {"Title": _header_value(title), "Priority": priority}
+    if outbound_tags:
+        headers["Tags"] = _header_value(",".join(outbound_tags[:5]))
+    token = os.environ.get("PPE_NTFY_TOKEN", "").strip()
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    request = urllib.request.Request(url, data=body.encode("utf-8"), headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            ok = 200 <= response.status < 300
+            if ok:
+                sends.append({"at": _utc_now(), "title": title[:160], "priority": priority})
+                state["sends"] = sends
+                _save_steward_send_state(state, repo)
+            return ok
+    except urllib.error.URLError as exc:
+        print(f"ppe_notify_push: steward ntfy failed: {exc}", file=sys.stderr)
+        return False
+
+
 def send_weekly_digest_from_payload(payload_path: Path) -> bool:
     if not payload_path.is_file():
         return False
@@ -848,13 +952,36 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--body", help="Direct body (with --title)")
     ap.add_argument("--verdict", help="Verdict tag for priority when using --title/--body")
     ap.add_argument("--check", action="store_true", help="Print whether ntfy is configured and exit 0/1")
+    ap.add_argument("--steward-check", action="store_true", help="Print steward topic config and exit 0/1")
+    ap.add_argument("--steward-test", action="store_true", help="Send test message to steward topic")
     ap.add_argument("--quota", action="store_true", help="Print today's ntfy send budget and exit")
     args = ap.parse_args(argv)
 
     if args.check:
         ok = notify_enabled() and ntfy_configured()
-        print(f"ppe_notify_push: configured={ok} topic={ntfy_topic() or '(unset)'}")
+        steward_ok = notify_enabled() and steward_ntfy_configured()
+        print(
+            f"ppe_notify_push: operator configured={ok} topic={ntfy_topic() or '(unset)'}; "
+            f"steward configured={steward_ok} topic={steward_ntfy_topic() or '(unset)'}"
+        )
         return 0 if ok else 1
+
+    if args.steward_check:
+        ok = notify_enabled() and steward_ntfy_configured()
+        print(f"ppe_notify_push: steward configured={ok} topic={steward_ntfy_topic() or '(unset)'}")
+        return 0 if ok else 1
+
+    if args.steward_test:
+        bootstrap_operator_notify_env(args.repo_root.resolve())
+        sent = send_steward_ntfy(
+            "PPE steward test",
+            "Steward topic works. Mon/Thu nudges land here — not build/fix commands.",
+            tags=["ppe", "steward", "test"],
+            priority="default",
+            bypass_throttle=True,
+            repo=args.repo_root.resolve(),
+        )
+        return 0 if sent or not steward_ntfy_configured() else 1
 
     if args.quota:
         print(format_quota_brief(args.repo_root.resolve()))
