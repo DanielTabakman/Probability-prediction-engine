@@ -166,11 +166,11 @@ def resolve_plan_phase(scoreboard: dict[str, Any]) -> str:
 
 def _phase_label(phase: str) -> str:
     return {
-        "start": "Phase 0–1 → first outreach (setup + solo rehearsal)",
-        "weekly_loop": "Phase 2 → weekly tester loop",
-        "weekly_and_draft": "Phase 2–3 → sessions + draft validation report",
-        "finish_report": "Phase 4 → complete validation report",
-        "complete": "Done → steward SELECTION from report",
+        "start": "Phase 0-1: first outreach (setup + solo rehearsal)",
+        "weekly_loop": "Phase 2: weekly tester loop",
+        "weekly_and_draft": "Phase 2-3: sessions + draft validation report",
+        "finish_report": "Phase 4: complete validation report",
+        "complete": "Done: steward SELECTION from report",
     }.get(phase, phase)
 
 
