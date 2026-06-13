@@ -1,0 +1,82 @@
+{
+  "name": "MVP1_guided_demo_path_v1 (screen-share demo mode + founder crib)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_GUIDED_DEMO_PATH_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-GuidedDemo-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+      "buildBranch": "build/auto/MVP1-GuidedDemo-Control-Slice001-guided_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-GuidedDemo-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+      "buildBranch": "build/auto/MVP1-GuidedDemo-Product-Slice002-guided_demo",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/",
+        ".env.example"
+      ]
+    },
+    {
+      "sliceId": "MVP1-GuidedDemo-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+      "buildBranch": "build/auto/MVP1-GuidedDemo-Product-Slice003-guided_demo",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/DEMO_OPERATOR_SCRIPT.md",
+        "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
+        "docs/SOP/FOUNDER_OPERATOR_CRIB_SHEET_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MVP1-GuidedDemo-Smoke-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+      "buildBranch": "build/auto/MVP1-GuidedDemo-Smoke-Slice004-guided_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 150,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-GuidedDemo-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+      "buildBranch": "build/auto/MVP1-GuidedDemo-Closeout-Slice005-guided_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_guided_demo_path_v1",
+        "chapterTitle": "MVP1 guided demo path v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_GUIDED_DEMO_PATH_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_GUIDED_DEMO_PATH_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_GUIDED_DEMO_PATH_V1_EVIDENCE_STATUS.md",
+          "docs/SOP/FOUNDER_OPERATOR_CRIB_SHEET_V1.md"
+        ]
+      }
+    }
+  ]
+}

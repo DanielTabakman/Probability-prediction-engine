@@ -13,6 +13,7 @@
 | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) / [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | Live BUILD queue |
 | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) | Session + paid-interest log |
 | [`STEWARD_VALIDATION_GUIDE_V1.md`](STEWARD_VALIDATION_GUIDE_V1.md) | **Human operator step-by-step** (why + how) |
+| [`FOUNDER_OPERATOR_CRIB_SHEET_V1.md`](FOUNDER_OPERATOR_CRIB_SHEET_V1.md) | **5-sentence demo script** (no math derivations) |
 | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) | Tactical BUILD compression |
 | [`VISION/PHASE_VISION_CURRENT.md`](../VISION/PHASE_VISION_CURRENT.md) | Phase UX / semantic deferrals |
 
@@ -237,9 +238,45 @@ Full playbook loads: **steward SELECTION**, backlog edits, monthly review ([`OPE
 
 ---
 
+## Founder-operator (human steward)
+
+**Crib sheet:** [`FOUNDER_OPERATOR_CRIB_SHEET_V1.md`](FOUNDER_OPERATOR_CRIB_SHEET_V1.md) — five concepts, 3-minute path, outreach text, math deflection lines.
+
+### Math bar
+
+Explain **meaning** from [`SEMANTIC_CONTRACTS.md`](../SEMANTIC_CONTRACTS.md), not derivations. On calls: point to Verification / trust strip for audit; do not improvise formulas.
+
+### What counts as a tester session
+
+| Counts toward 10 | Does not count |
+|------------------|----------------|
+| Guided screen share; options-aware profile logged in § MSOS P8 | Generic “crypto friend” saying “cool” |
+| Comprehension + return questions asked | Passive link shares with no guided walkthrough |
+
+Optional §15F spot-check rows are **learning only** — not cohort metrics.
+
+### Morning report precedence
+
+When `sessions_logged < 3` ([`ppe_steward_scoreboard.py`](../../scripts/ppe_steward_scoreboard.py)):
+
+1. **Outreach + one guided session** beats IDE BUILD / relay queue for that day.
+2. BUILD queue is secondary until at least **3** sessions are logged or steward documents honest skip.
+
+### Feedback → BUILD (not automatic)
+
+Recurring **confusion** tags from Streamlit feedback or [`ppe_export_web_feedback.py`](../../scripts/ppe_export_web_feedback.py) inform **P2 legibility** SELECTION — e.g. [`SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md`](SPRINT_MVP1_GUIDED_DEMO_PATH_V1.md). Charter a slice when:
+
+- Same theme appears **≥3** times from **traders**, **or**
+- Founder solo rehearsal fails per crib sheet **and** `sessions_logged < 3` (steward may set backlog `urgent: true`).
+
+Do not auto-charter from a single enthusiastic non-trader.
+
+---
+
 ## Changelog
 
 | Date | Change |
 |------|--------|
 | 2026-06-12 | v1 — initial playbook from product/strategy working session |
 | 2026-06-12 | Runtime gate + backlog mythos + operating calendar |
+| 2026-06-13 | Founder-operator addendum + guided demo path charter pointer |

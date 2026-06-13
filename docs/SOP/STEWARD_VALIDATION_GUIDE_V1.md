@@ -19,6 +19,8 @@
 **North star (say this in every session):**  
 *See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.*
 
+**Founder crib sheet (5 concepts, no equations):** [`FOUNDER_OPERATOR_CRIB_SHEET_V1.md`](FOUNDER_OPERATOR_CRIB_SHEET_V1.md)
+
 If you only read one section: **Phase 2 — weekly loop** below.
 
 ---
