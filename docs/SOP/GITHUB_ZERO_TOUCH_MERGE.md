@@ -6,13 +6,13 @@ Purpose: define how changes reach **`main` without a human merge click** when au
 
 - **Human in the loop for design and repair, not for routine merge.** The steward defines priorities, slice scope, and recovery when something is wrong—not a standing approval gate on every green PR.
 - **Merge when checks pass.** Use GitHub **auto-merge** on pull requests so the platform merges as soon as required status checks succeed (no manual “Merge” click for the common case).
-- **Ship after merge.** [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) is **manual** (`workflow_dispatch` or SSH) to limit Actions minutes — see [GITHUB_ACTIONS_VPS_DEPLOY.md](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md). **CI** runs on PRs only, not on every push to `main`.
+- **Ship on `main`.** After merge, [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) runs on pushes to **`main`**; the VPS reconciles with GitHub. See [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md).
 
-This doc is the **GitHub-side contract**. Relay/orchestrator promotion still produces a branch and PR (or equivalent); this layer completes the path to **`main`**. Deploy is a separate, intentional step.
+This doc is the **GitHub-side contract**. Relay/orchestrator promotion still produces a branch and PR (or equivalent); this layer completes the path to **`main`** and the live site.
 
-## Public repository (recommended)
+## Public repository
 
-**Public** repos get **free unlimited** GitHub Actions on standard Linux runners. That removes minute pressure while keeping CI on every PR. Source is visible — choose a **LICENSE** (see GitHub **Add file → Create license**). Monetization is the **hosted product**, not repo secrecy.
+This repo is **public** — standard Linux Actions runners are **free**. Uptime checks run every **30 minutes** (not every 5) to avoid unnecessary runner churn.
 
 ## GitHub Free and **private** repositories
 
@@ -32,7 +32,7 @@ Use this when **Allow auto-merge** is greyed out (typical for **private** repos 
 1. **One-time:** set **Settings → Actions → General → Workflow permissions** to **Read and write** (see below).  
 2. Merge these workflow files to **`main`** so they run on the default branch.  
 3. Open a **non-draft** PR to **`main`** from a branch in this repo — **`automerge`** is applied automatically; when **CI** is green, **Merge on green** squash-merges.  
-4. After merge: **Actions → Deploy VPS → Run workflow** (or SSH deploy per [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md)).
+4. **Deploy VPS** runs on push to **`main`**.
 
 **Draft PRs:** no **`automerge`** label while draft; when you mark **Ready for review**, the label workflow runs again and the usual CI → merge path applies.
 
@@ -96,12 +96,12 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 1. Work lands on a **feature branch** (worker/orchestrator or human).
 2. Open a PR to **`main`**; enable **auto-merge**.
 3. **`CI / pytest`** and **`CI / docker_entrypoint`** run; when green, GitHub merges without further human action.
-4. **Deploy:** **Actions → Deploy VPS → Run workflow** or SSH ([GITHUB_ACTIONS_VPS_DEPLOY.md](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md)).
+4. **Deploy VPS** runs on the push to **`main`**; post-deploy smoke when you want assurance ([DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5).
 
 **Path B — private Free (greyed-out auto-merge):**
 
 1. Open a PR to **`main`** from a branch in this repo (non-draft). **`automerge`** is added by **Label PR automerge**; **CI** runs; **Merge on green** merges after both are satisfied (no **Enable auto-merge** button).  
-2. **Deploy:** **Actions → Deploy VPS → Run workflow** or SSH; post-deploy smoke when you want ([DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5).
+2. **Deploy VPS** runs on the push to **`main`**; post-deploy smoke when you want ([DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5).
 
 ## Troubleshooting (steward)
 
@@ -110,7 +110,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 | Auto-merge not available | Repo setting **Allow auto-merge**; branch protection may require incompatible rules. **Private Free:** use label **`automerge`** + workflow **Merge on green** ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). |
 | PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. |
 | Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**. **Private Free:** confirm **Merge on green** ran (Actions tab) and **Workflow permissions** allow read/write. |
-| Merged but site old | Run **Deploy VPS** workflow or SSH deploy — merges do not auto-deploy ([PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D). |
+| Merged but site old | [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D; confirm **Deploy VPS** run for that commit. |
 
 ## Related
 

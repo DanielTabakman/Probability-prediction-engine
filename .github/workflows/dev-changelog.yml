@@ -1,6 +1,11 @@
 name: Dev changelog
 
 on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily 13:30 UTC (after google-docs-sync).
+    - cron: "30 13 * * *"
   workflow_dispatch:
     inputs:
       mode:
