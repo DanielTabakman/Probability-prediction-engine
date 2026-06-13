@@ -11,7 +11,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
 | **Product focus / anti-drift** | [`SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof, priorities, validation gates |
 | **Operating calendar** | [`SOP/OPERATING_CALENDAR_V1.md`](SOP/OPERATING_CALENDAR_V1.md) — weekly / monthly / quarterly steward cadence |
-| **Steward operator (you)** | [`SOP/STEWARD_OPERATOR_V1.md`](SOP/STEWARD_OPERATOR_V1.md) — tester sessions, Mon/Thu ntfy cues |
+| **Steward operator (you)** | [`SOP/STEWARD_OPERATOR_V1.md`](SOP/STEWARD_OPERATOR_V1.md) — ntfy setup · [`SOP/STEWARD_VALIDATION_GUIDE_V1.md`](SOP/STEWARD_VALIDATION_GUIDE_V1.md) — **step-by-step validation plan** |
 | **P8 validation report** | [`SOP/MSOS_P8_VALIDATION_REPORT_V1.md`](SOP/MSOS_P8_VALIDATION_REPORT_V1.md) — auto-select gate until **COMPLETE** |
 | **Session handoff gate** | [`SOP/HANDOFF.md`](SOP/HANDOFF.md) |
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |

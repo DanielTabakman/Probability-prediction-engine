@@ -160,7 +160,7 @@ def build_next_actions(
     if week_count == 0:
         actions.append(
             "Book 1 guided tester call this week (20–30 min). "
-            "Target: BTC options trader or quant-curious contact."
+            "See docs/SOP/STEWARD_VALIDATION_GUIDE_V1.md Phase 2 — Monday outreach."
         )
     elif week_count < 2 and remaining > 0:
         actions.append(
@@ -174,7 +174,7 @@ def build_next_actions(
         )
         actions.append(
             f"After session: add one row in {REALITY_CHECKS_REL} "
-            f"§ MSOS P8 (replace _fill_)."
+            f"§ MSOS P8 — see STEWARD_VALIDATION_GUIDE_V1.md Phase 2 Thursday log."
         )
     elif report_status != "COMPLETE":
         actions.append(
@@ -279,6 +279,7 @@ def build_nudge_message(scoreboard: dict[str, Any], slot: str) -> tuple[str, str
     lines.append("")
     lines.append(f"Receipt file: {REALITY_CHECKS_REL}")
     lines.append(f"Demo script: {DEMO_SCRIPT_REL}")
+    lines.append("Full guide: docs/SOP/STEWARD_VALIDATION_GUIDE_V1.md")
     return title, "\n".join(lines)
 
 

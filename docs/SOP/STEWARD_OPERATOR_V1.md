@@ -3,7 +3,8 @@
 **Plane:** CONTROL-PLANE · **Purpose:** cue **you** (not agents) on tester sessions, validation evidence, and VPS follow-ups.
 
 **Automation:** [`ppe_steward_scoreboard.py`](../../scripts/ppe_steward_scoreboard.py) · [`ppe_steward_nudge.py`](../../scripts/ppe_steward_nudge.py)  
-**Calendar:** [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) · **Playbook:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
+**Step-by-step guide (start here):** [`STEWARD_VALIDATION_GUIDE_V1.md`](STEWARD_VALIDATION_GUIDE_V1.md) — full plan, why, and how for each phase  
+**Calendar:** [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) · **Strategy:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 ---
 

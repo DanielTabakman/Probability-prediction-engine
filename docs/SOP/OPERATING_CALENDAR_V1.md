@@ -2,7 +2,7 @@
 
 **Purpose:** Light cadence for a real-company operating rhythm — without agent overload.
 
-**Human nudges:** [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) — Mon/Thu phone cues via `PPE_NTFY_STEWARD_TOPIC` (separate from loop alerts).
+**Human nudges:** [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) — Mon/Thu phone cues · **Full walkthrough:** [`STEWARD_VALIDATION_GUIDE_V1.md`](STEWARD_VALIDATION_GUIDE_V1.md)
 
 **Strategic canon:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) · **Validation rollup:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)
 

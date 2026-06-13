@@ -12,6 +12,7 @@
 | [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | MSOS waterfall P0–P8 |
 | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) / [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | Live BUILD queue |
 | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) | Session + paid-interest log |
+| [`STEWARD_VALIDATION_GUIDE_V1.md`](STEWARD_VALIDATION_GUIDE_V1.md) | **Human operator step-by-step** (why + how) |
 | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) | Tactical BUILD compression |
 | [`VISION/PHASE_VISION_CURRENT.md`](../VISION/PHASE_VISION_CURRENT.md) | Phase UX / semantic deferrals |
 
