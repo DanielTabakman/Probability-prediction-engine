@@ -68,7 +68,7 @@ jobs:
             exit 1
           fi
           body=$(cat /tmp/session_body.html)
-          if ! echo "$body" | grep -q 'Guided tester session'; then
+          if ! echo "$body" | grep -q 'Operator session notebook'; then
             echo 'session.html missing expected operator notebook title'
             head -n 30 /tmp/session_body.html || true
             exit 1
