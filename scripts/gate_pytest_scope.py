@@ -14,6 +14,7 @@ CORE_SCOPE_TESTS: tuple[str, ...] = (
 # Prefix -> test path globs (relative to repo root).
 _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("scripts/relay", ("tests/test_relay_runtime_v0.py",)),
+    ("scripts/ppe_auto_select.py", ("tests/test_ppe_auto_select.py",)),
     ("scripts/ppe_", ("tests/test_ppe_*.py",)),
     ("scripts/post_relay", ("tests/test_apply_control_closeout.py", "tests/test_write_last_run_report.py")),
     ("scripts/phase_orchestrator", ("tests/test_phase_orchestrator_worktree.py",)),
@@ -71,7 +72,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "tests/test_frozen_*.py",
         ),
     ),
-    ("apps/msos-web/", ("tests/test_msos_web_homepage.py", "tests/test_msos_web_strategy_lab.py")),
+    ("apps/msos-web/", ("tests/test_msos_web_homepage.py", "tests/test_msos_web_strategy_lab.py", "tests/test_msos_web_feedback.py")),
     (
         ".github/workflows/",
         ("tests/test_run_pushable_gate.py", "tests/test_codebase_health_gate.py"),
