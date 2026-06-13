@@ -24,7 +24,8 @@ Quant depth for **backtest-oriented research**: tail quantiles, strike-level **P
 
 ## Not now
 
-- Multi-asset, Polymarket joint export, MSOS REST API, full backfill automation
+- Multi-asset, MSOS REST API, full backfill automation
+- **Polymarket joint export** — moved to [`SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md`](SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md) (MEDIUM slot 2)
 
 ---
 

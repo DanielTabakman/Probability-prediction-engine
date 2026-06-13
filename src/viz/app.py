@@ -95,6 +95,10 @@ from src.viz.belief_uncertainty import (
     move_pct_1sigma_to_sigma_ln,
     sigma_ln_to_move_pct_1sigma,
 )
+from src.viz.cross_venue_export import (
+    build_cross_venue_panel_rows,
+    serialize_cross_venue_export_csv,
+)
 from src.viz.distribution_export import (
     build_distribution_export_rows,
     serialize_distribution_export_csv,
@@ -350,6 +354,48 @@ if show_bitcoin_view:
                     mime="text/csv",
                     key="implied_dist_export_csv",
                 )
+                if show_polymarket:
+                    try:
+                        pm_events = _cached_polymarket(True, False, 150)
+                        pm_probs = markets_to_probabilities(pm_events) if pm_events else []
+                        btc_pm_questions = (
+                            btc_price_questions_from_polymarket(pm_probs) if pm_probs else []
+                        )
+                        cross_venue_rows = build_cross_venue_panel_rows(
+                            as_of_utc=as_of_export,
+                            spot_usd=float(current_btc),
+                            btc_questions=btc_pm_questions,
+                            forward_iv_fn=_cached_forward_iv,
+                            marks_full_fn=_cached_marks_full,
+                            instruments_fn=_cached_option_instruments,
+                            option_book_marks_fn=_cached_option_book_marks,
+                        )
+                        if cross_venue_rows:
+                            st.download_button(
+                                "Download cross-venue prob panel (CSV)",
+                                data=serialize_cross_venue_export_csv(
+                                    cross_venue_rows
+                                ).encode("utf-8"),
+                                file_name="ppe_cross_venue_prob_panel.csv",
+                                mime="text/csv",
+                                key="implied_cross_venue_export_csv",
+                            )
+                            st.caption(
+                                "Polymarket Yes% vs options-implied P(BTC > K) at matched strikes. "
+                                "Sort by |gap_bl_minus_pm_pct| for arb candidates — not trade advice."
+                            )
+                        else:
+                            st.caption(
+                                "Cross-venue panel: no Polymarket questions aligned to Deribit strikes today."
+                            )
+                    except Exception:
+                        st.caption(
+                            "Cross-venue panel unavailable (Polymarket or Deribit fetch failed)."
+                        )
+                else:
+                    st.caption(
+                        "Enable **Prediction markets (Polymarket)** in the sidebar for cross-venue prob panel CSV."
+                    )
                 expiry_options = [e["expiry_date_str"] for e in expiries]
                 selected_expiry_str = st.selectbox(
                     "Expiry",

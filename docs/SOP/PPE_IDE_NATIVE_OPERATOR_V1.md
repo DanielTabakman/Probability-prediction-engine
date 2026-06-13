@@ -73,6 +73,16 @@ python scripts/collect_distribution_stats_snapshot.py
 
 Writes under `artifacts/distribution_snapshots/YYYY-MM-DD/`. Schedule via Task Scheduler or cron on a machine with Deribit network access; not run by the relay loop.
 
+## Cross-venue probability panel snapshot (MVP)
+
+Polymarket vs options-implied P(BTC > K) gap panel (same schema as implied-lab download):
+
+```bat
+python scripts/collect_cross_venue_snapshot.py
+```
+
+Writes under `artifacts/cross_venue_snapshots/YYYY-MM-DD/`. Requires Deribit + Polymarket network access.
+
 ---
 
 ## IDE product-ready marker
