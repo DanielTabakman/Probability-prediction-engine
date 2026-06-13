@@ -2,7 +2,7 @@
 
 **Chapter:** `mvp1_distribution_quant_research_v2`  
 **Priority:** LOW  
-**Status:** **PENDING** — chartered; blocked until MSOS distribution demo COMPLETE  
+**Status:** **COMPLETE** 2026-06-13 — chartered; blocked until MSOS distribution demo COMPLETE  
 **Phase plan:** [`PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json`](PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json)  
 **Sprint:** [`SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md`](SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md)
 
