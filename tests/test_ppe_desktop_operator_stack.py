@@ -4,7 +4,12 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from scripts.ppe_desktop_operator_stack import ensure_stack, stack_status
+from scripts.ppe_desktop_operator_stack import NTFY_LISTEN_PATTERN, ensure_stack, stack_status
+
+
+def test_ntfy_listen_pattern_requires_python_process():
+    assert "watch_ntfy_commands" not in NTFY_LISTEN_PATTERN
+    assert "ppe_ntfy_listen" in NTFY_LISTEN_PATTERN
 
 
 def test_stack_status_all_running():

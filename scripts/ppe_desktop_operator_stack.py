@@ -11,7 +11,7 @@ from typing import Any
 
 LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
-NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
+NTFY_LISTEN_PATTERN = r"ppe_ntfy_listen\.py"
 
 
 def _powershell_process_match(pattern: str) -> bool:
@@ -49,7 +49,7 @@ def is_ntfy_listen_running() -> bool:
 
     if not commands_enabled():
         return False
-    return _powershell_process_match(NTFY_CMD_PATTERN)
+    return _powershell_process_match(NTFY_LISTEN_PATTERN)
 
 
 def stack_status() -> dict[str, bool]:

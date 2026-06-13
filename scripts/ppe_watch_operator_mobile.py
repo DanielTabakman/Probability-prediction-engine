@@ -248,6 +248,34 @@ def is_loop_running() -> bool:
     return _stack_loop_running()
 
 
+def _ntfy_listen_restart_debounce_sec() -> int:
+    raw = os.environ.get("PPE_NTFY_LISTEN_RESTART_SEC", "60").strip()
+    try:
+        return max(30, int(raw))
+    except ValueError:
+        return 60
+
+
+def _maybe_ensure_ntfy_listener(repo: Path, prior: dict[str, Any]) -> dict[str, Any] | None:
+    """Start the phone-command listener when its Python process is missing."""
+    from scripts.ppe_ntfy_commands import commands_enabled
+    from scripts.ppe_desktop_operator_stack import is_ntfy_listen_running, start_ntfy_listen_only
+
+    if not commands_enabled() or is_ntfy_listen_running():
+        return None
+
+    last_attempt = _parse_utc(str(prior.get("last_ntfy_listen_restart_at") or ""))
+    if last_attempt is not None:
+        if last_attempt.tzinfo is None:
+            last_attempt = last_attempt.replace(tzinfo=timezone.utc)
+        elapsed = (datetime.now(timezone.utc) - last_attempt).total_seconds()
+        if elapsed < _ntfy_listen_restart_debounce_sec():
+            return None
+
+    start_ntfy_listen_only(repo)
+    return {"restarted": True, "at": _utc_now()}
+
+
 def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     from scripts.ppe_notify_push import bootstrap_operator_notify_env
 
@@ -260,6 +288,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     verdict = str(status.get("verdict") or "")
     loop_running = is_loop_running()
     prior = load_state(repo)
+    ntfy_listen_ensure = _maybe_ensure_ntfy_listener(repo, prior)
 
     reset_quiet_stuck_if_awake(repo)
 
@@ -376,6 +405,8 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         if stuck_alert_sent or (verdict in STUCK_VERDICTS and verdict != prior_verdict and sent)
         else prior.get("last_stuck_alert_at"),
     }
+    if ntfy_listen_ensure:
+        new_state["last_ntfy_listen_restart_at"] = ntfy_listen_ensure["at"]
     if auto_build:
         new_state["last_auto_build"] = auto_build
         if auto_build.get("started") and auto_build.get("slice_id"):
@@ -403,6 +434,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "auto_build": auto_build,
         "post_build_finish": post_finish,
         "morning_report": morning_report,
+        "ntfy_listen_ensure": ntfy_listen_ensure,
         "state_path": str(state_path(repo)),
     }
 

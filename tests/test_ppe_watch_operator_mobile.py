@@ -109,3 +109,18 @@ def test_watch_once_alerts_when_stuck_clears(tmp_path, monkeypatch):
     assert title.startswith("PPE: cleared")
     assert "IDE_BUILD" in body
     assert "RUN_AUTO" in body or "Running" in body
+
+
+def test_watch_once_restarts_dead_ntfy_listener(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
+    status = {"verdict": "RUN_AUTO", "blocker": None, "commands": []}
+
+    with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_watch_operator_mobile.is_loop_running", return_value=True):
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_desktop_operator_stack.is_ntfy_listen_running", return_value=False):
+                    with patch("scripts.ppe_desktop_operator_stack.start_ntfy_listen_only") as start:
+                        result = watch_once(tmp_path, write_report=False)
+
+    start.assert_called_once_with(tmp_path.resolve())
+    assert result["ntfy_listen_ensure"]["restarted"] is True
