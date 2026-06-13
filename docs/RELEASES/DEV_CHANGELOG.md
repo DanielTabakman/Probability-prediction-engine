@@ -2,8 +2,17 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-13
+
+- `092d291` — control-plane: relay operator hardening for unattended loop (#150) (`scripts/`)
+- `29458ff` — control-plane: ntfy quiet hours, morning report, phone status (#148) (`scripts/`)
+- `3950670` — charter(control): public demo launch + operator check-in ntfy (#147) (`docs/SOP/`)
+- `b2e9a2e` — charter(control): MSOS storyboard visual parity v1 at MEDIUM priority (#146) (`docs/SOP/`)
+
 ## 2026-06-12
 
+- `abeea4e` — fix(scripts): use float return from fetch_deribit_btc_index in snapshot collector (#145) (`scripts/`)
+- `dfdad29` — Control-plane: dev changelog
 - MVP1-DistQuantV2-Product-Slice004: daily distribution stats snapshot collector (#143) (`docs/SOP/`)
 - MVP1-DistQuantV2-Product-Slice003: extended CSV and summary panel quant columns (PRODUCT-PLANE) (#142) (`src/viz/`)
 - `8874f4e` — control-plane: fix scheduled Google Docs and dev-changelog CI sync (#141)
