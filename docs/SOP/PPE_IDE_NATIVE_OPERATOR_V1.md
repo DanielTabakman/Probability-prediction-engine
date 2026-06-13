@@ -77,6 +77,39 @@ Writes under `artifacts/distribution_snapshots/YYYY-MM-DD/`. Schedule via Task S
 
 ---
 
+## Cross-venue snapshot collector (MVP)
+
+Headless daily CSV capture (same schema as implied-lab **Download cross-venue prob panel (CSV)**):
+
+```bat
+python scripts/collect_cross_venue_snapshot.py
+```
+
+Writes under `artifacts/cross_venue_snapshots/YYYY-MM-DD/`. Requires Deribit + Polymarket network access; not run by the relay loop.
+
+---
+
+## IDE BUILD closeout (product slices)
+
+After implementing a product slice, run the full closeout — **do not stop at “code looks done”**:
+
+```bat
+ppe_ide_build_closeout.cmd <sliceId> <phasePlanPath>
+```
+
+That script runs gate → reminds you to commit on `buildBranch` → `mark_ide_product_ready.cmd` → `run_ppe_local.cmd` with **git sync disabled** on `build/auto/*` branches (avoids checkout to `main` mid-closeout).
+
+Manual equivalent:
+
+```bat
+mark_ide_product_ready.cmd MVP1-CrossVenue-Product-Slice003 docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json
+set PPE_GIT_SYNC_PULL=0
+set PPE_GIT_SYNC_PUSH=0
+run_ppe_local.cmd
+```
+
+---
+
 ## IDE product-ready marker
 
 After IDE BUILD and commit, write `artifacts/orchestrator/IDE_PRODUCT_READY.json` so continuous guards allow the phase to run:
