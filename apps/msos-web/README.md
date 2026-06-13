@@ -28,6 +28,10 @@ Export submissions:
 python scripts/ppe_export_web_feedback.py --markdown
 ```
 
+## Operator phone cue (founder only)
+
+Static page at `/cue.html` (source: [`docs/SOP/assets/operator_cue_card.html`](../../docs/SOP/assets/operator_cue_card.html)) — mobile panic cue for live demos. Not linked from site nav; `noindex`. Bookmark on your phone; do not share with testers.
+
 **Stack ADR:** [`docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md`](../../docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md)
 
 **Visual reference:** [`docs/VISION/MSOS/storyboard-v0.6/`](../../docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md) screen `01_home`.

@@ -6,6 +6,21 @@
 
 ---
 
+## Phone cue card (panic in the room)
+
+**Personal operator script** — not product tutorial (that stays on the demo site).
+
+| How | URL / path |
+|-----|------------|
+| **Live (after deploy)** | `https://marketstructureos.com/cue.html` — not linked from public nav; `noindex` |
+| **Repo / offline** | [`assets/operator_cue_card.html`](assets/operator_cue_card.html) — open in browser or **Add to Home Screen** |
+
+**Setup once:** bookmark or home-screen icon on your phone. Glance under the table / in your pocket — traders see the demo screen, not your cue.
+
+**Do not** pass this link to testers; it is for you only.
+
+---
+
 ## North star (say every session)
 
 > See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.

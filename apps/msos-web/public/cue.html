@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Demo cue" />
+    <meta name="theme-color" content="#05090f" />
+    <title>Operator cue — you only</title>
+    <style>
+      :root {
+        --bg: #05090f;
+        --panel: #0e1c2d;
+        --line: #1e3145;
+        --text: #edf5ff;
+        --muted: #8ea4bd;
+        --teal: #43e7d3;
+        --amber: #f2b657;
+        --red: #ff6478;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+        padding: 12px 14px 32px;
+        padding-bottom: max(32px, env(safe-area-inset-bottom));
+      }
+      h1 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0 0 4px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin-bottom: 14px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+      }
+      .card.panic {
+        border-color: var(--teal);
+        background: linear-gradient(145deg, #0a1a28, #0e2438);
+      }
+      .card h2 {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--teal);
+        margin: 0 0 10px;
+        font-weight: 700;
+      }
+      .card.panic h2 {
+        color: var(--amber);
+      }
+      .say {
+        font-size: 1.12rem;
+        font-weight: 600;
+        line-height: 1.35;
+      }
+      .say.big {
+        font-size: 1.28rem;
+      }
+      ol.steps {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+      ol.steps li {
+        margin-bottom: 10px;
+        font-size: 1rem;
+      }
+      ol.steps strong {
+        color: var(--teal);
+      }
+      ul.tight {
+        margin: 0;
+        padding-left: 1.2rem;
+      }
+      ul.tight li {
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+      }
+      .never {
+        color: var(--red);
+        font-size: 0.92rem;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      .foot {
+        text-align: center;
+        margin-top: 16px;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+      a {
+        color: var(--teal);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Demo cue card</h1>
+    <p class="sub">For you in the room — not the product tutorial.</p>
+
+    <section class="card panic" aria-label="Panic reset">
+      <h2>Panic reset</h2>
+      <ul class="tight">
+        <li><strong>Breathe.</strong> You are the guide, not the quant.</li>
+        <li><strong>Point at the screen.</strong> Let the chart talk first.</li>
+        <li><strong>You don’t derive the math.</strong> Verification is the audit trail.</li>
+      </ul>
+    </section>
+
+    <section class="card" aria-label="Opening line">
+      <h2>Say this first</h2>
+      <p class="say big">
+        “BTC options research cockpit — not advice. I’ll show what the market
+        prices in, where a view might differ, and how payoff fits. Five
+        minutes.”
+      </p>
+    </section>
+
+    <section class="card" aria-label="Mechanical steps">
+      <h2>Do this (mechanical)</h2>
+      <ol class="steps">
+        <li>
+          <strong>Sidebar</strong> → Bitcoin on →
+          <strong>Refresh priced inputs (Deribit)</strong> once.
+        </li>
+        <li>
+          Scroll to <strong>Bitcoin implied lab</strong> → pick an
+          <strong>Expiry</strong>.
+        </li>
+        <li>
+          Click <strong>one preset</strong> → open
+          <strong>Belief vs market</strong> → read one sentence aloud.
+        </li>
+      </ol>
+      <p class="muted">Skip Polymarket, forward curve, tickets unless they ask.</p>
+    </section>
+
+    <section class="card" aria-label="While showing chart">
+      <h2>While the chart is up</h2>
+      <p class="say">
+        “Purple and orange = what today’s option prices imply for this expiry.
+        Not a forecast — a market readout.”
+      </p>
+    </section>
+
+    <section class="card" aria-label="Math question">
+      <h2>If they ask how it’s calculated</h2>
+      <p class="say">
+        “Live Deribit chain turned into a density shape. Orange is from the
+        chain; purple is a simpler baseline. The trust strip and Verification
+        show provenance — I don’t derive it by hand on a call.”
+      </p>
+    </section>
+
+    <section class="card" aria-label="Flip to them">
+      <h2>Ask them (takes pressure off you)</h2>
+      <p class="say">
+        “What was the main thing on screen — in your words?”
+      </p>
+      <p class="muted" style="margin-top: 8px">
+        Then: “Would you open this before your next BTC options trade?”
+      </p>
+    </section>
+
+    <section class="card" aria-label="Never say">
+      <h2>Never say</h2>
+      <ul class="tight never">
+        <li>Guaranteed profit / proven edge</li>
+        <li>“Recommended trade” from disagreement alone</li>
+        <li>Improvised formulas or greek lectures</li>
+      </ul>
+    </section>
+
+    <section class="card" aria-label="After">
+      <h2>After they leave</h2>
+      <p class="muted">
+        Log one row in validation reality checks. Comprehension Y/N · Return Y/N
+        · one-line note.
+      </p>
+    </section>
+
+    <p class="foot">
+      Demo:
+      <a href="https://marketstructureos.com">marketstructureos.com</a>
+      · Add to Home Screen for offline cue
+    </p>
+  </body>
+</html>
