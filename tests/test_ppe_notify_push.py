@@ -145,3 +145,34 @@ def test_send_weekly_digest_from_payload(tmp_path: Path, monkeypatch):
     with patch.dict("os.environ", {"PPE_NTFY_TOPIC": "t", "PPE_NOTIFY": "1"}, clear=False):
         with patch("urllib.request.urlopen", return_value=response):
             assert push.send_weekly_digest_from_payload(payload) is True
+
+
+def test_quiet_hours_mute_routine(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_QUIET_HOURS", "1")
+    monkeypatch.setenv("PPE_NTFY_QUIET_START", "01:00")
+    monkeypatch.setenv("PPE_NTFY_QUIET_END", "08:00")
+    with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=True):
+        assert push.is_routine_notify_muted(title="PPE operator: IDE_BUILD") is True
+        assert push.is_routine_notify_muted(title="PPE: still stuck - foo") is False
+        assert push.is_routine_notify_muted(tags=["ppe", "cmd"]) is False
+
+
+def test_quiet_stuck_only_once_per_night(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_QUIET_HOURS", "1")
+    with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=True):
+        assert push.quiet_stuck_allowed(tmp_path) is True
+        push.mark_quiet_stuck_sent(tmp_path)
+        assert push.quiet_stuck_allowed(tmp_path) is False
+    with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=False):
+        push.reset_quiet_stuck_if_awake(tmp_path)
+        with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=True):
+            assert push.quiet_stuck_allowed(tmp_path) is True
+
+
+def test_stuck_reminder_not_muted_by_quiet_hours(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "t")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_REPO_ROOT", str(tmp_path))
+    monkeypatch.setenv("PPE_NTFY_MIN_INTERVAL_SEC", "0")
+    with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=True):
+        assert push.is_routine_notify_muted(title="PPE: still stuck - IDE BUILD") is False

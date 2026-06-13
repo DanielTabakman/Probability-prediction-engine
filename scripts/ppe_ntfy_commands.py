@@ -13,13 +13,13 @@ from typing import Any
 from scripts.ppe_notify_push import (
     OUTBOUND_TAG,
     apply_snooze_request,
-    format_quota_brief,
     format_snooze_until,
     ntfy_configured,
     notify_enabled,
     parse_snooze_args,
     send_ntfy,
 )
+from scripts.ppe_phone_status import format_phone_status, phone_status_title
 
 KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze"})
 
@@ -102,15 +102,21 @@ def execute_restart(repo: Path) -> dict[str, Any]:
 
 
 def execute_status(repo: Path) -> dict[str, Any]:
-    from scripts.ppe_desktop_operator_stack import collect_status
+    from scripts.ppe_desktop_operator_stack import stack_status
+    from scripts.ppe_operator_status import collect_operator_status
 
-    result = collect_status(repo.resolve(), apply_propagate=False, ensure=False)
-    brief = str(result.get("operator_brief") or "")
-    stack = result.get("stack") or {}
-    quota = format_quota_brief(repo.resolve())
-    body = f"loop={stack.get('loop_running')} watch={stack.get('watch_running')}\n{brief}\n\n{quota}"
-    sent = send_ntfy("PPE status", body, tags=["ppe", "cmd", OUTBOUND_TAG], bypass_throttle=True)
-    return {"action": "status", "body": body, "notified": sent}
+    repo = repo.resolve()
+    status = collect_operator_status(repo)
+    stack = stack_status()
+    body = format_phone_status(status, stack=stack, repo=repo)
+    title = phone_status_title(status)
+    sent = send_ntfy(
+        title,
+        body,
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        bypass_throttle=True,
+    )
+    return {"action": "status", "body": body, "notified": sent, "title": title}
 
 
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
@@ -179,15 +185,21 @@ def execute_help(repo: Path) -> dict[str, Any]:
     from scripts.ppe_operator_hint import PPE_GO_HINT
 
     body = (
-        f"{prefix}build - IDE BUILD for queued slice\n"
+        f"{prefix}build - start IDE BUILD when verdict is IDE_BUILD\n"
         f"Desktop: {PPE_GO_HINT}\n"
-        f"{prefix}restart - restart stack\n"
+        f"{prefix}restart - restart loop + watch on desktop\n"
         f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
-        f"{prefix}status - operator status\n"
+        f"{prefix}status - friendly operator snapshot\n"
         f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
         f"{prefix}help - this list"
     )
-    sent = send_ntfy("PPE remote commands", body, tags=["ppe", "cmd", OUTBOUND_TAG], priority="low")
+    sent = send_ntfy(
+        "PPE remote commands",
+        body,
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_throttle=True,
+    )
     return {"action": "help", "body": body, "notified": sent}
 
 
@@ -211,10 +223,13 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
     action = str(result.get("action") or command.name)
     if action == "restart":
         stack = result.get("stack") or {}
+        loop = "on" if stack.get("loop_running") else "off"
+        watch = "on" if stack.get("watch_running") else "off"
         return send_ntfy(
-            "PPE restarted",
-            f"killed={result.get('killed')} loop={stack.get('loop_running')}",
+            "PPE: restarted",
+            f"Desktop stack restarted ({result.get('killed', 0)} old process(es) stopped).\nLoop: {loop} · Watch: {watch}",
             tags=["ppe", "cmd", OUTBOUND_TAG],
+            bypass_throttle=True,
         )
     if command.name in ("build", "fix"):
         if result.get("notified"):
@@ -226,6 +241,7 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
                 str(result.get("message") or "started"),
                 tags=["ppe", "cmd", OUTBOUND_TAG],
                 priority="high",
+                bypass_throttle=True,
             )
         if result.get("debounced"):
             return False
@@ -234,6 +250,7 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             str(result.get("reason") or "did not start"),
             tags=["ppe", "cmd", OUTBOUND_TAG],
             priority="high",
+            bypass_throttle=True,
         )
     if action in ("status", "snooze"):
         return bool(result.get("notified"))

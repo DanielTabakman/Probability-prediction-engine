@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -16,6 +17,7 @@ from typing import Any, Literal
 
 DEFAULT_NTFY_SERVER = "https://ntfy.sh"
 SNOOZE_REL = "artifacts/control_plane/NTFY_SNOOZE.json"
+QUIET_ALERT_REL = "artifacts/control_plane/NTFY_QUIET_ALERT_STATE.json"
 SEND_STATE_REL = "artifacts/control_plane/NTFY_SEND_STATE.json"
 QUOTA_STATUS_REL = "artifacts/control_plane/NTFY_QUOTA_STATUS.json"
 OUTBOUND_TAG = "from-desktop"
@@ -55,6 +57,34 @@ def ntfy_configured() -> bool:
 def repo_root() -> Path:
     raw = os.environ.get("PPE_REPO_ROOT", "").strip()
     return Path(raw) if raw else Path.cwd()
+
+
+def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
+    """Load PPE_* vars from local cmd wrappers when Python was not started via .cmd."""
+    if os.environ.get("PPE_NTFY_TOPIC", "").strip():
+        return
+    root = (repo or repo_root()).resolve()
+    for name in ("ppe_operator_local.cmd", "ppe_operator_notify.local.cmd"):
+        path = root / name
+        if not path.is_file():
+            continue
+        try:
+            proc = subprocess.run(
+                ["cmd", "/c", f'call "{path}" && set PPE'],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                timeout=15,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            continue
+        for line in (proc.stdout or "").splitlines():
+            if "=" not in line or not line.startswith("PPE"):
+                continue
+            key, _, value = line.partition("=")
+            if key.strip() and key not in os.environ:
+                os.environ[key.strip()] = value
 
 
 def snooze_path(repo: Path | None = None) -> Path:
@@ -122,6 +152,124 @@ def clear_ntfy_snooze(repo: Path | None = None) -> bool:
     except OSError:
         return False
     return True
+
+
+def quiet_hours_enabled() -> bool:
+    raw = os.environ.get("PPE_NTFY_QUIET_HOURS", "0").strip().lower()
+    return raw not in ("0", "false", "no", "off")
+
+
+def _parse_quiet_clock(value: str, default: time) -> time:
+    parts = (value or "").strip().split(":")
+    if len(parts) != 2:
+        return default
+    try:
+        return time(int(parts[0]), int(parts[1]))
+    except ValueError:
+        return default
+
+
+def quiet_hours_window() -> tuple[time, time]:
+    start = _parse_quiet_clock(os.environ.get("PPE_NTFY_QUIET_START", "01:00"), time(1, 0))
+    end = _parse_quiet_clock(os.environ.get("PPE_NTFY_QUIET_END", "08:00"), time(8, 0))
+    return start, end
+
+
+def is_ntfy_quiet_hours(now: datetime | None = None) -> bool:
+    if not quiet_hours_enabled():
+        return False
+    now = now or datetime.now().astimezone()
+    start, end = quiet_hours_window()
+    current = now.time()
+    if start < end:
+        return start <= current < end
+    return current >= start or current < end
+
+
+def quiet_hours_until_local(now: datetime | None = None) -> str:
+    now = now or datetime.now().astimezone()
+    _, end = quiet_hours_window()
+    target = datetime.combine(now.date(), end, tzinfo=now.tzinfo)
+    if target <= now:
+        target += timedelta(days=1)
+    return target.strftime("%H:%M")
+
+
+def quiet_alert_state_path(repo: Path | None = None) -> Path:
+    return (repo or repo_root()).resolve() / QUIET_ALERT_REL
+
+
+def load_quiet_alert_state(repo: Path | None = None) -> dict[str, Any]:
+    path = quiet_alert_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_quiet_alert_state(repo: Path | None, state: dict[str, Any]) -> None:
+    path = quiet_alert_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def _local_today_iso() -> str:
+    return datetime.now().astimezone().date().isoformat()
+
+
+def reset_quiet_stuck_if_awake(repo: Path | None = None) -> None:
+    """Clear one-shot quiet-hours stuck flag after morning."""
+    if is_ntfy_quiet_hours():
+        return
+    state = load_quiet_alert_state(repo)
+    if state.get("quiet_stuck_sent_date"):
+        state = {k: v for k, v in state.items() if k != "quiet_stuck_sent_date"}
+        save_quiet_alert_state(repo, state)
+
+
+def quiet_stuck_allowed(repo: Path | None = None) -> bool:
+    """During quiet hours: at most one stuck reminder per night."""
+    reset_quiet_stuck_if_awake(repo)
+    if not is_ntfy_quiet_hours():
+        return True
+    state = load_quiet_alert_state(repo)
+    return str(state.get("quiet_stuck_sent_date") or "") != _local_today_iso()
+
+
+def mark_quiet_stuck_sent(repo: Path | None = None) -> None:
+    state = load_quiet_alert_state(repo)
+    state["quiet_stuck_sent_date"] = _local_today_iso()
+    save_quiet_alert_state(repo, state)
+
+
+def _is_stuck_reminder(title: str) -> bool:
+    return "still stuck" in (title or "").lower()
+
+
+def _is_phone_command_reply(tags: list[str] | None) -> bool:
+    return "cmd" in {str(t) for t in (tags or [])}
+
+
+def is_routine_notify_muted(
+    *,
+    title: str = "",
+    tags: list[str] | None = None,
+    priority: str = "default",
+) -> bool:
+    """Mute routine auto-alerts during quiet hours (not phone cmds / stuck / urgent)."""
+    if _is_phone_command_reply(tags):
+        return False
+    if _is_stuck_reminder(title):
+        return False
+    if priority == "urgent":
+        return False
+    tag_set = {str(t) for t in (tags or [])}
+    if "morning" in tag_set or "morning report" in (title or "").lower():
+        return False
+    return is_ntfy_quiet_hours()
 
 
 @dataclass(frozen=True)
@@ -324,6 +472,8 @@ def categorize_send_title(title: str) -> str:
         return "verdict"
     if lower.startswith("ppe status"):
         return "status"
+    if "morning report" in lower:
+        return "morning"
     return "other"
 
 
@@ -574,6 +724,9 @@ def send_ntfy(
     if not notify_enabled():
         return False
     if not bypass_snooze and is_ntfy_snoozed():
+        return False
+    if is_routine_notify_muted(title=title, tags=tags, priority=priority):
+        print(f"ppe_notify_push: skipped (quiet hours): {title[:80]}", file=sys.stderr)
         return False
     topic = ntfy_topic()
     if not topic:

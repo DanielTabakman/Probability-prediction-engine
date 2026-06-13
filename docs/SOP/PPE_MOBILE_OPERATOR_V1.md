@@ -241,8 +241,13 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_CMD_SECRET` | No | optional shared secret prefix for commands |
 | `PPE_NOTIFY` | No | enabled; `0` disables |
 | `PPE_WEEKLY_DIGEST_TOAST` | No | enabled; `0` skips Windows toast (phone push still uses ntfy) |
-| `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running |
-| `PPE_NTFY_STUCK_HOURS` | No | `4` — re-alert while verdict is FIX_PLAN / IDE_BUILD / ERROR |
+| `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running; `0` disables |
+| `PPE_NTFY_STUCK_HOURS` | No | `8` — re-alert while verdict is FIX_PLAN / IDE_BUILD / ERROR |
+| `PPE_NTFY_QUIET_HOURS` | No | `0`; `1` mutes routine alerts during quiet window |
+| `PPE_NTFY_QUIET_START` / `PPE_NTFY_QUIET_END` | No | `01:00` / `08:00` local — one stuck ping allowed per night |
+| `PPE_NTFY_MORNING_REPORT` | No | `1` — 8am digest when watch is running |
+| `PPE_NTFY_MORNING_REPORT_AT` | No | `08:00` local |
+| `PPE_NTFY_CMD_POLL_SEC` | No | `30` — phone command poll interval |
 | `PPE_GIT_SYNC` | No | enabled |
 | `PPE_GIT_SYNC_PULL` | No | enabled |
 | `PPE_GIT_SYNC_PUSH` | No | enabled |
