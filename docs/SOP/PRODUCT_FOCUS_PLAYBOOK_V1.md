@@ -212,7 +212,7 @@ Agents on **IDE BUILD** get a **3-line Focus block** in `IDE_BUILD_STARTER_*.md`
 
 | Mechanism | Behavior |
 |-----------|----------|
-| `ppe_focus_gate.py` | Blocks auto-select / propagate while validation report is **DRAFT** or **MISSING** |
+| `ppe_focus_gate.py` | Blocks auto-select / propagate for **P3/P4** while validation report is **DRAFT** or **MISSING**; **P0–P2** lab chapters continue |
 | `urgent: true` on backlog/queue row | Bypasses gate — requires `urgentReason` |
 | `PPE_FOCUS_GATE=0` | Disable gate (escape hatch) |
 | Active `RUNNING` manifest | Not cleared by gate — finish in-flight chapter first |
@@ -225,7 +225,7 @@ Full playbook loads: **steward SELECTION**, backlog edits, monthly review ([`OPE
 
 1. Read [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) + **Priority stack** + **Drift guards**.
 2. Tag rows with `focusPlaybookTier` and `[P0]`–`[P4]` in `reason`.
-3. After P8 cohort: complete validation report §6 before new **READY** queue rows (unless `urgent`).
+3. After P8 cohort: complete validation report §6 before new **P3/P4 READY** queue rows (unless `urgent`). P2 lab queue may continue while report is DRAFT.
 
 | Playbook tier | Backlog `priority` hint |
 |---------------|-------------------------|

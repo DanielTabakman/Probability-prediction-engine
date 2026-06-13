@@ -56,7 +56,27 @@ class TestPpeFocusGate(unittest.TestCase):
         self._write_complete_report()
         self.assertEqual(validation_report_status(self.repo), "COMPLETE")
 
-    def test_gate_blocks_without_urgent(self) -> None:
+    def test_gate_blocks_p3_without_urgent(self) -> None:
+        self._write_draft_report()
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "ch",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "P3",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        focus = evaluate_focus_gate(self.repo, self.plan_rel)
+        self.assertFalse(focus.allowed)
+        self.assertEqual(focus.tier, "P3")
+
+    def test_p2_lab_allowed_with_draft_report(self) -> None:
         self._write_draft_report()
         (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
             json.dumps(
@@ -73,8 +93,8 @@ class TestPpeFocusGate(unittest.TestCase):
             encoding="utf-8",
         )
         focus = evaluate_focus_gate(self.repo, self.plan_rel)
-        self.assertFalse(focus.allowed)
-        self.assertEqual(focus.tier, "P2")
+        self.assertTrue(focus.allowed)
+        self.assertFalse(focus.urgent_bypass)
 
     def test_urgent_bypass(self) -> None:
         self._write_draft_report()
@@ -87,7 +107,7 @@ class TestPpeFocusGate(unittest.TestCase):
                             "planPath": self.plan_rel,
                             "urgent": True,
                             "urgentReason": "IRL demo",
-                            "focusPlaybookTier": "P0",
+                            "focusPlaybookTier": "P3",
                         }
                     ]
                 }
@@ -98,14 +118,28 @@ class TestPpeFocusGate(unittest.TestCase):
         self.assertTrue(focus.allowed)
         self.assertTrue(focus.urgent_bypass)
 
-    def test_auto_select_skips_when_gate_blocks(self) -> None:
+    def test_auto_select_skips_p3_when_gate_blocks(self) -> None:
         self._write_draft_report()
         sop = self.repo / "docs" / "SOP"
+        (sop / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "ch",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "P3",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
         (sop / "PHASE_QUEUE.json").write_text(
             json.dumps(
                 {
                     "items": [
-                        {"planPath": self.plan_rel, "status": "READY", "reason": "[LOW] test"},
+                        {"planPath": self.plan_rel, "status": "READY", "reason": "[P3] test"},
                     ]
                 }
             ),
@@ -117,6 +151,40 @@ class TestPpeFocusGate(unittest.TestCase):
         from scripts.ppe_manifest import load_manifest
 
         self.assertEqual(load_manifest(self.repo).get("phasePlanPath"), "")
+
+    def test_auto_select_allows_p2_with_draft_report(self) -> None:
+        self._write_draft_report()
+        sop = self.repo / "docs" / "SOP"
+        (sop / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "ch",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "P2",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        (sop / "PHASE_QUEUE.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {"planPath": self.plan_rel, "status": "READY", "reason": "[P2] test"},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        save_manifest(self.repo, {"phasePlanPath": "", "status": "COMPLETE", "notes": ""})
+        rc = run_auto_select(self.repo, apply=True, select_only=False, mark_done=False, force=False)
+        self.assertEqual(rc, 0)
+        from scripts.ppe_manifest import load_manifest
+
+        self.assertEqual(load_manifest(self.repo)["phasePlanPath"], self.plan_rel)
 
     def test_auto_select_allows_when_report_complete(self) -> None:
         self._write_complete_report()
@@ -138,7 +206,7 @@ class TestPpeFocusGate(unittest.TestCase):
 
         self.assertEqual(load_manifest(self.repo)["phasePlanPath"], self.plan_rel)
 
-    def test_propagate_blocked_by_gate(self) -> None:
+    def test_propagate_blocked_by_gate_for_p3(self) -> None:
         self._write_draft_report()
         os.environ["PPE_AUTO_PROPAGATE_QUEUE"] = "1"
         sop = self.repo / "docs" / "SOP"
@@ -155,6 +223,7 @@ class TestPpeFocusGate(unittest.TestCase):
                             "chapterId": "ch",
                             "status": "queued",
                             "planPath": self.plan_rel,
+                            "focusPlaybookTier": "P3",
                         }
                     ]
                 }

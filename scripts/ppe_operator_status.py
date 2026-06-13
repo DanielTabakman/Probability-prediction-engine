@@ -212,6 +212,11 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         else:
             verdict = VERDICT_SUPPLY_LOW
             blocker = select_reason
+            if "focus gate" in (select_reason or "").lower():
+                blocker = (
+                    f"Queue blocked by focus gate — {select_reason}. "
+                    "P3/P4 need validation report COMPLETE; P0–P2 lab chapters should auto-select."
+                )
     elif manifest_status == "RUNNING":
         verdict = VERDICT_SUPPLY_LOW
         exit_code = 0

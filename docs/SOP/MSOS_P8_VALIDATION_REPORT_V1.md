@@ -13,7 +13,7 @@
 | When | This report |
 |------|-------------|
 | Per-session logging | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) § MSOS P8 friends-first tester metrics |
-| Auto-select / propagate gate | **DRAFT** blocks new chapters unless backlog `urgent: true` |
+| Auto-select / propagate gate | **DRAFT** blocks **P3/P4** chapters unless backlog `urgent: true`; **P0–P2** lab work continues |
 | Next BUILD chapter | Steward **SELECTION** must cite **§ Next SELECTION recommendation** below |
 
 ---

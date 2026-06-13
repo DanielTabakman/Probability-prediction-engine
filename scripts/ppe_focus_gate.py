@@ -28,6 +28,10 @@ TIER_DRIFT = {
     "defer": "Deferred — escalate if slice widens scope.",
 }
 
+# Only distribution/monetization tiers require P8 validation report COMPLETE.
+# P0–P2 lab and closeout chapters must not stall on a DRAFT rollup.
+VALIDATION_REPORT_TIERS = frozenset({"P3", "P4"})
+
 
 def focus_gate_enabled() -> bool:
     env = os.environ.get("PPE_FOCUS_GATE", "").strip().lower()
@@ -66,10 +70,20 @@ def validation_report_status(repo: Path) -> str:
     return "DRAFT"
 
 
-def validation_report_blocks_selection(repo: Path) -> bool:
+def validation_report_blocks_selection(repo: Path, *, tier: str | None = None) -> bool:
     if not focus_gate_enabled():
         return False
+    if tier is not None and not tier_requires_validation_report(tier):
+        return False
     return validation_report_status(repo) != "COMPLETE"
+
+
+def tier_requires_validation_report(tier: str) -> bool:
+    """True when playbook tier needs MSOS P8 validation report COMPLETE before auto-select."""
+    raw = (tier or "").strip().upper()
+    if raw == "DEFER":
+        return False
+    return raw in VALIDATION_REPORT_TIERS
 
 
 def _item_urgent(item: dict[str, Any]) -> bool:
@@ -148,7 +162,10 @@ def evaluate_focus_gate(repo: Path, plan_path: str) -> FocusGateResult:
     if not focus_gate_enabled():
         return FocusGateResult(allowed=True, tier=tier)
 
-    if not validation_report_blocks_selection(repo):
+    if not tier_requires_validation_report(tier):
+        return FocusGateResult(allowed=True, tier=tier)
+
+    if not validation_report_blocks_selection(repo, tier=tier):
         return FocusGateResult(allowed=True, tier=tier)
 
     if urgent:
@@ -164,8 +181,8 @@ def evaluate_focus_gate(repo: Path, plan_path: str) -> FocusGateResult:
     return FocusGateResult(
         allowed=False,
         reason=(
-            f"validation report {status} ({VALIDATION_REPORT_REL}); "
-            "steward SELECTION or set urgent:true on backlog row"
+            f"{tier} requires validation report {status} ({VALIDATION_REPORT_REL}); "
+            "complete § sign-off or set urgent:true on backlog row"
         ),
         tier=tier,
     )
