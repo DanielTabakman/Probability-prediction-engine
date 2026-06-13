@@ -6,6 +6,8 @@ set "PPE_NTFY_TOPIC=ppe-your-secret-topic-here"
 REM Volume control (defaults: cap 40/day, chapter-only progress, heartbeat every 24h):
 REM set "PPE_NTFY_DAILY_CAP=40"
 REM set "PPE_NTFY_PROGRESS=chapter"
+REM Chapter closeout pings include "Check in:" hints; pipeline-idle ping when queue empty:
+REM set "PPE_NTFY_CHECK_IN=1"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=24"
 REM set "PPE_NTFY_HEARTBEAT_HOURS=0"
 REM Phone status shows today's breakdown; cap ping includes what to cut.

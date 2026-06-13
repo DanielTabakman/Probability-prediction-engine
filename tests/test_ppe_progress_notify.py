@@ -45,6 +45,30 @@ def test_notify_chapter_complete(monkeypatch):
     assert "mvp1_probability" in send.call_args[0][1]
 
 
+def test_notify_chapter_complete_includes_check_in_hint(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
+        ok = notify_chapter_complete("msos_storyboard_visual_parity_v1")
+    assert ok is True
+    body = send.call_args[0][1]
+    assert "Check in:" in body
+    assert "storyboard" in body.lower()
+
+
+def test_notify_pipeline_idle(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_CHECK_IN", "1")
+    from scripts.ppe_progress_notify import notify_pipeline_idle
+
+    with patch("scripts.ppe_progress_notify.send_ntfy", return_value=True) as send:
+        ok = notify_pipeline_idle(last_chapter="msos_public_demo_launch_v1")
+    assert ok is True
+    assert "check in" in send.call_args[0][0].lower()
+    assert "idle" in send.call_args[0][1].lower()
+
+
 def test_progress_disabled(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")

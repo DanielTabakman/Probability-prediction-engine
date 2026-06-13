@@ -6,6 +6,30 @@ import os
 
 from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
 
+# Operator check-in hints after chapter closeout (phone ntfy body append / second ping).
+CHECK_IN_HINTS: dict[str, str] = {
+    "mvp1_distribution_quant_research_v2": (
+        "Dist-quant chapter done. Next: visual parity auto-starts if loop is running."
+    ),
+    "msos_storyboard_visual_parity_v1": (
+        "Open marketstructureos.com routes vs storyboard HTML. Reply status on phone if URLs look wrong."
+    ),
+    "msos_public_demo_launch_v1": (
+        "Public demo launch done. Check apex homepage + /command-center + research beta CTA. "
+        "Log one row in VALIDATION_REALITY_CHECKS if demo-ready."
+    ),
+}
+
+PIPELINE_IDLE_CHECK_IN = (
+    "All chartered chapters complete — queue idle. Check in: review site URLs, "
+    "then add next backlog row or run outreach."
+)
+
+
+def check_in_notify_enabled() -> bool:
+    raw = os.environ.get("PPE_NTFY_CHECK_IN", "1").strip().lower()
+    return raw not in ("0", "false", "no", "off")
+
 
 def progress_notify_mode() -> str:
     """off | chapter (default) | all — controls relay/fix progress pings."""
@@ -27,6 +51,45 @@ def _slice_progress_enabled() -> bool:
 
 def _fix_progress_enabled() -> bool:
     return progress_notify_mode() == "all"
+
+
+def check_in_hint_for_chapter(chapter_id: str) -> str:
+    key = str(chapter_id or "").strip().lower()
+    return CHECK_IN_HINTS.get(key, "")
+
+
+def notify_operator_check_in(
+    headline: str,
+    *,
+    detail: str = "",
+    chapter_id: str = "",
+) -> bool:
+    """Actionable phone ping when the loop thinks operator review is needed."""
+    if not progress_notify_enabled() or not check_in_notify_enabled():
+        return False
+    title = f"PPE check in: {headline}"
+    parts: list[str] = []
+    if detail:
+        parts.append(detail)
+    hint = check_in_hint_for_chapter(chapter_id) if chapter_id else ""
+    if hint and hint not in detail:
+        parts.append(hint)
+    if not parts:
+        parts.append("Review operator status and next backlog item.")
+    return send_ntfy(
+        title,
+        " ".join(parts),
+        tags=["ppe", "checkin", "operator"],
+        priority="high",
+    )
+
+
+def notify_pipeline_idle(*, last_chapter: str = "") -> bool:
+    """Ping when manifest is idle and no READY queue item remains."""
+    detail = PIPELINE_IDLE_CHECK_IN
+    if last_chapter:
+        detail = f"After {last_chapter}. {detail}"
+    return notify_operator_check_in("pipeline idle", detail=detail, chapter_id=last_chapter)
 
 
 def notify_slice_complete(
@@ -123,6 +186,9 @@ def notify_chapter_complete(
         parts.append(f"Next queued: {next_chapter}.")
     elif plan_path:
         parts.append("Queue propagating next chapter.")
+    hint = check_in_hint_for_chapter(chapter_id)
+    if hint:
+        parts.append(f"Check in: {hint}")
     return send_ntfy(
         title,
         " ".join(parts),
