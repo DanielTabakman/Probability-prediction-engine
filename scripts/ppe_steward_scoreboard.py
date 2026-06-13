@@ -378,17 +378,26 @@ def format_scoreboard_text(scoreboard: dict[str, Any]) -> str:
 
 
 def format_digest_commitment_lines(repo: Path) -> list[str]:
-    sb = build_scoreboard(repo)
-    lines = [
-        "",
-        "Your commitments",
-        f"- Tester sessions: {sb['sessions_logged']}/{sb['sessions_target']} "
-        f"({sb['sessions_this_week']} this week)",
-        f"- Validation report: {sb['validation_report_status']}",
-    ]
-    actions = sb.get("next_actions") or []
-    if actions:
-        lines.append(f"- Next: {actions[0]}")
+    """Business playbook block for weekly phone digest."""
+    try:
+        from scripts.ppe_operator_day_plan import business_playbook_lines
+    except ImportError:
+        sb = build_scoreboard(repo)
+        lines = [
+            "",
+            "Business playbook",
+            f"- Tester sessions: {sb['sessions_logged']}/{sb['sessions_target']} "
+            f"({sb['sessions_this_week']} this week)",
+            f"- Validation report: {sb['validation_report_status']}",
+        ]
+        actions = sb.get("next_actions") or []
+        if actions:
+            lines.append(f"- Next: {actions[0]}")
+        return lines
+
+    lines = ["", "Business playbook"]
+    for item in business_playbook_lines(repo):
+        lines.append(f"- {item}")
     return lines
 
 

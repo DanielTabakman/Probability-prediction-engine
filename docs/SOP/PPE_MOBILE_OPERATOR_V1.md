@@ -201,7 +201,13 @@ Disable remote commands: `set PPE_NTFY_CMD_ENABLED=0` in `ppe_operator_notify.lo
 | Cursor Agent starts fixing a block | **ntfy** (title: **PPE fixing: …**) — agent runs `ppe_notify_fix.py --working` |
 | Cursor Agent finishes a fix | **ntfy** (title: **PPE fixed (VERDICT): …** or **PPE fix done: …**) — agent runs `ppe_notify_fix.py --resolved` |
 | Stuck verdict clears (watch poll) | **ntfy** (title: **PPE fixed: RUN_AUTO** / **RUN_LOCAL** — includes prior blocker) |
+| Loop down >45m without maintenance (24/7 gap) | **ntfy** (title: **PPE: loop down … (24/7 gap)**) |
+| 8am morning digest (watch poll) | **ntfy** — dynamic title from today's plan; full copy in `docs/RELEASES/MORNING_REPORT_LATEST.md` |
 | Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
+
+**Morning report sections:** yesterday output · product git diff · runtime (uptime vs prior day, maintenance vs gap) · today's build plan · get-ahead blockers · business playbook (main topic). Steward Mon/Thu nudges use **`PPE_NTFY_STEWARD_TOPIC`** (separate subscription).
+
+**Maintenance:** intentional desktop downtime only — `maintenance on` from phone or `PPE_OPERATOR_MAINTENANCE=1`. Does **not** include quiet hours or IDE waits. After `restart`, if maintenance is still on you get a reminder to send `maintenance off`.
 
 Disable progress pings: `set PPE_NTFY_PROGRESS=0` in `ppe_operator_notify.local.cmd`.
 
@@ -247,6 +253,9 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_QUIET_START` / `PPE_NTFY_QUIET_END` | No | `01:00` / `08:00` local — one stuck ping allowed per night |
 | `PPE_NTFY_MORNING_REPORT` | No | `1` — 8am digest when watch is running |
 | `PPE_NTFY_MORNING_REPORT_AT` | No | `08:00` local |
+| `PPE_NTFY_GAP_ALERT` | No | `1` — ping when loop off without maintenance past threshold |
+| `PPE_NTFY_GAP_ALERT_MIN` | No | `45` — minutes before gap alert |
+| `PPE_OPERATOR_MAINTENANCE` | No | `1` on desktop marks intentional downtime |
 | `PPE_NTFY_CMD_POLL_SEC` | No | `30` — phone command poll interval |
 | `PPE_GIT_SYNC` | No | enabled |
 | `PPE_GIT_SYNC_PULL` | No | enabled |

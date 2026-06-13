@@ -123,6 +123,12 @@ def mark_slice_complete(repo: Path, plan_path: str, slice_id: str) -> None:
     data["completedSliceIds"] = done
     data["updatedAt"] = _utc_now()
     save_progress(repo, data)
+    try:
+        from scripts.ppe_operator_daily_metrics import record_slice_completed
+
+        record_slice_completed(repo, slice_id=sid, plan_path=norm)
+    except ImportError:
+        pass
 
 
 def clear_progress(repo: Path, plan_path: str) -> None:

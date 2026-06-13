@@ -52,6 +52,12 @@ def test_is_outbound_message_string_tags():
     assert is_outbound_message({"tags": "ppe,from-desktop,ok"})
 
 
+def test_parse_maintenance_command():
+    assert parse_command_text("maintenance on").name == "maintenance"
+    assert parse_command_text("maintenance off").args == "off"
+    assert parse_command_text("maintenance fixing viz").args == "fixing viz"
+
+
 def test_execute_restart_calls_stack(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
     with patch("scripts.ppe_ntfy_commands.stop_stack_processes", return_value=2):

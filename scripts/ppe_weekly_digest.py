@@ -145,7 +145,7 @@ def _repo_is_public_on_github(repo: Path) -> bool:
     return not bool(data.get("isPrivate"))
 
 
-def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
+def resolve_blob_click_url(repo: Path, rel: str, *, branch: str = "main") -> str | None:
     if not _repo_is_public_on_github(repo):
         return None
     try:
@@ -164,8 +164,12 @@ def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
     match = _GITHUB_REMOTE_RE.match((proc.stdout or "").strip())
     if not match:
         return None
-    rel = DIGEST_REL.replace("\\", "/")
-    return f"https://github.com/{match.group(1)}/{match.group(2)}/blob/{branch}/{rel}"
+    rel_norm = rel.replace("\\", "/")
+    return f"https://github.com/{match.group(1)}/{match.group(2)}/blob/{branch}/{rel_norm}"
+
+
+def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
+    return resolve_blob_click_url(repo, DIGEST_REL, branch=branch)
 
 
 def _phone_product_line(raw: str) -> str:
@@ -237,7 +241,7 @@ def _user_facing_next(raw: str) -> str:
     return _phone_next_line(raw)
 
 
-def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
+def build_phone_digest_notify(section: dict[str, Any], *, factory_lines: list[str] | None = None) -> dict[str, str]:
     week = str(section["week_monday"])
     merge_count = int(section.get("merge_count") or 0)
     product_lines = [str(x) for x in (section.get("product_lines") or [])]
@@ -286,6 +290,12 @@ def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
         lines.append("On deck")
         for raw in whats_next[:2]:
             lines.append(f"- {_user_facing_next(raw)}")
+        lines.append("")
+
+    if factory_lines:
+        lines.append("Build factory this week")
+        for item in factory_lines[:6]:
+            lines.append(f"- {item}")
         lines.append("")
 
     if section.get("click_url"):
@@ -378,7 +388,14 @@ def cmd_write_notify_payload(repo: Path) -> int:
     click_url = resolve_digest_click_url(repo)
     if click_url:
         summary["click_url"] = click_url
-    summary.update(build_phone_digest_notify(summary))
+    factory_lines: list[str] = []
+    try:
+        from scripts.ppe_operator_day_plan import build_week_factory_lines
+
+        factory_lines = build_week_factory_lines(repo)
+    except Exception as exc:
+        print(f"ppe_weekly_digest: build factory outlook skipped: {exc}", file=sys.stderr)
+    summary.update(build_phone_digest_notify(summary, factory_lines=factory_lines or None))
     try:
         from scripts.ppe_steward_scoreboard import format_digest_commitment_lines
 

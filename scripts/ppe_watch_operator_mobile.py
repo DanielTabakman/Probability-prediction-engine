@@ -394,6 +394,26 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
 
     save_state(repo, new_state)
 
+    try:
+        from scripts.ppe_operator_daily_metrics import record_watch_sample
+
+        record_watch_sample(repo, loop_running=loop_running, verdict=verdict)
+    except Exception:
+        pass
+
+    gap_alert: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_uptime_gap import maybe_send_gap_alert
+
+        gap_alert = maybe_send_gap_alert(
+            repo,
+            loop_running=loop_running,
+            verdict=verdict,
+            prior=prior,
+        )
+    except Exception as exc:
+        gap_alert = {"sent": False, "error": str(exc)}
+
     return {
         "verdict": verdict,
         "loop_running": loop_running,
@@ -403,6 +423,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "auto_build": auto_build,
         "post_build_finish": post_finish,
         "morning_report": morning_report,
+        "gap_alert": gap_alert,
         "state_path": str(state_path(repo)),
     }
 

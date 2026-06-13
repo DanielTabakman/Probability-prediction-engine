@@ -24,15 +24,21 @@ REM set "PPE_NTFY_QUIET_END=08:00"
 REM 8am local digest (requires watch_operator_mobile running).
 REM set "PPE_NTFY_MORNING_REPORT=1"
 REM set "PPE_NTFY_MORNING_REPORT_AT=08:00"
-REM Phone command poll interval (default 30s; SSE optional via PPE_NTFY_CMD_SSE=1):
-REM set "PPE_NTFY_CMD_POLL_SEC=30"
+REM Phone commands: SSE (instant) preferred; poll is fallback if stream drops.
+REM set "PPE_NTFY_CMD_SSE=1"
+REM set "PPE_NTFY_CMD_POLL_SEC=15"
 REM Weekly digest to phone (skip desktop toast):
 REM set "PPE_WEEKLY_DIGEST_TOAST=0"
 REM Optional private server or authenticated topic:
 REM set "PPE_NTFY_SERVER=https://ntfy.sh"
 REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
-REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | help
+REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | maintenance | help
 REM Snooze examples from phone: snooze | snooze 6 | snooze 30m | snooze until 08:00 | snooze clear
+REM Maintenance (intentional downtime for morning metrics): maintenance on | maintenance off
+REM Or on desktop while working: set "PPE_OPERATOR_MAINTENANCE=1"
+REM Gap alert when loop is off without maintenance (24/7 target):
+REM set "PPE_NTFY_GAP_ALERT=1"
+REM set "PPE_NTFY_GAP_ALERT_MIN=45"
 REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
 REM Near-zero API (recommended): copy ppe_operator_near_zero_api.local.cmd.example

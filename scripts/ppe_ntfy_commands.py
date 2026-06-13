@@ -21,7 +21,7 @@ from scripts.ppe_notify_push import (
 )
 from scripts.ppe_phone_status import format_phone_status, phone_status_title
 
-KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze"})
+KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze", "maintenance"})
 
 
 @dataclass(frozen=True)
@@ -106,6 +106,13 @@ def execute_status(repo: Path) -> dict[str, Any]:
     from scripts.ppe_operator_status import collect_operator_status
 
     repo = repo.resolve()
+    ack_sent = send_ntfy(
+        "PPE: checking...",
+        "Desktop received status — gathering operator snapshot.",
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_throttle=True,
+    )
     status = collect_operator_status(repo)
     stack = stack_status()
     body = format_phone_status(status, stack=stack, repo=repo)
@@ -116,7 +123,13 @@ def execute_status(repo: Path) -> dict[str, Any]:
         tags=["ppe", "cmd", OUTBOUND_TAG],
         bypass_throttle=True,
     )
-    return {"action": "status", "body": body, "notified": sent, "title": title}
+    return {
+        "action": "status",
+        "body": body,
+        "notified": sent,
+        "ack_notified": ack_sent,
+        "title": title,
+    }
 
 
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
@@ -180,6 +193,47 @@ def execute_snooze(repo: Path, *, note: str = "") -> dict[str, Any]:
     }
 
 
+def execute_maintenance(repo: Path, *, note: str = "") -> dict[str, Any]:
+    from scripts.ppe_desktop_operator_stack import stack_status
+    from scripts.ppe_operator_maintenance import set_maintenance
+
+    repo = repo.resolve()
+    args = (note or "").strip()
+    lower = args.lower()
+
+    if lower in ("off", "end", "clear", "done"):
+        set_maintenance(repo, False, set_by="phone")
+        stack = stack_status()
+        loop = "on" if stack.get("loop_running") else "off"
+        body = "Maintenance off. Loop should run 24/7 again."
+        if loop == "off":
+            body += " Loop is off now - send restart when ready."
+        sent = send_ntfy(
+            "PPE maintenance off",
+            body,
+            tags=["ppe", "cmd", OUTBOUND_TAG],
+            priority="low",
+            bypass_snooze=True,
+            bypass_throttle=True,
+        )
+        return {"action": "maintenance", "active": False, "notified": sent}
+
+    reason = args if args and lower not in ("on", "start") else "manual desktop work"
+    payload = set_maintenance(repo, True, reason=reason, set_by="phone")
+    sent = send_ntfy(
+        "PPE maintenance on",
+        (
+            f"{payload.get('reason')}. Loop downtime won't count against 24/7 uptime. "
+            "Send maintenance off when done, then restart if needed."
+        ),
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_snooze=True,
+        bypass_throttle=True,
+    )
+    return {"action": "maintenance", "active": True, "notified": sent, "payload": payload}
+
+
 def execute_help(repo: Path) -> dict[str, Any]:
     prefix = f"{command_secret()} " if command_secret() else ""
     from scripts.ppe_operator_hint import PPE_GO_HINT
@@ -191,6 +245,7 @@ def execute_help(repo: Path) -> dict[str, Any]:
         f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
         f"{prefix}status - friendly operator snapshot\n"
         f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
+        f"{prefix}maintenance [on|off|note] - mark intentional downtime (desktop work)\n"
         f"{prefix}help - this list"
     )
     sent = send_ntfy(
@@ -214,10 +269,12 @@ def execute_command(repo: Path, command: RemoteCommand) -> dict[str, Any]:
         return execute_fix(repo, note=command.args)
     if command.name == "snooze":
         return execute_snooze(repo, note=command.args)
+    if command.name == "maintenance":
+        return execute_maintenance(repo, note=command.args)
     return execute_help(repo)
 
 
-def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> bool:
+def notify_command_result(command: RemoteCommand, result: dict[str, Any], repo: Path | None = None) -> bool:
     if not notify_enabled() or not ntfy_configured():
         return False
     action = str(result.get("action") or command.name)
@@ -225,9 +282,23 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
         stack = result.get("stack") or {}
         loop = "on" if stack.get("loop_running") else "off"
         watch = "on" if stack.get("watch_running") else "off"
+        body = (
+            f"Desktop stack restarted ({result.get('killed', 0)} old process(es) stopped).\n"
+            f"Loop: {loop} · Watch: {watch}"
+        )
+        root = (repo or Path.cwd()).resolve()
+        try:
+            from scripts.ppe_operator_maintenance import is_maintenance_active
+
+            if is_maintenance_active(root):
+                body += (
+                    "\n\nMaintenance still ON — gap downtime won't count until you send maintenance off."
+                )
+        except ImportError:
+            pass
         return send_ntfy(
             "PPE: restarted",
-            f"Desktop stack restarted ({result.get('killed', 0)} old process(es) stopped).\nLoop: {loop} · Watch: {watch}",
+            body,
             tags=["ppe", "cmd", OUTBOUND_TAG],
             bypass_throttle=True,
         )
@@ -252,7 +323,7 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             priority="high",
             bypass_throttle=True,
         )
-    if action in ("status", "snooze"):
+    if action in ("status", "snooze", "maintenance"):
         return bool(result.get("notified"))
     return bool(result.get("notified"))
 
@@ -273,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     result = execute_command(args.repo_root.resolve(), cmd)
     if not args.no_notify:
-        notify_command_result(cmd, result)
+        notify_command_result(cmd, result, args.repo_root.resolve())
     print(json.dumps(result, indent=2) if args.json else result)
     return 0 if result.get("started", True) else 1
 

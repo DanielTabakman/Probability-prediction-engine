@@ -148,6 +148,20 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         assert "What's different for you" in phone["phone_body"]
         assert "public homepage" in phone["phone_body"]
 
+    def test_build_phone_digest_includes_factory_block(self) -> None:
+        phone = build_phone_digest_notify(
+            {
+                "week_monday": "2026-06-01",
+                "merge_count": 3,
+                "product_lines": [],
+                "ops_summary": "",
+                "whats_next_lines": [],
+            },
+            factory_lines=["Chapter: MVP1 track", "Will block: IDE BUILD for Slice004"],
+        )
+        assert "Build factory this week" in phone["phone_body"]
+        assert "Slice004" in phone["phone_body"]
+
     def test_format_week_range(self) -> None:
         self.assertEqual(format_week_range("2026-06-01"), "Jun 1-7")
 

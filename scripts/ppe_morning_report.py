@@ -1,38 +1,42 @@
-"""8am local digest of the last 24h of operator / ntfy activity."""
+"""8am local digest: yesterday metrics, today's plan, blockers, business playbook."""
 
 from __future__ import annotations
 
 import json
 import os
+import subprocess
+from collections import Counter
 from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from scripts.ppe_notify_push import (
     _load_send_state,
-    _parse_utc,
     _prune_send_state,
-    categorize_send_title,
     ntfy_configured,
     notify_enabled,
     send_ntfy,
-    summarize_sends,
 )
-from scripts.ppe_phone_status import verdict_headline
+from scripts.ppe_operator_daily_metrics import (
+    day_window_local,
+    format_duration,
+    format_pct,
+    get_day_metrics,
+    yesterday_local_date,
+)
+from scripts.ppe_operator_day_plan import (
+    build_morning_title,
+    build_plan_lines,
+    business_playbook_lines,
+    forecast_blockers,
+    operator_today_lines,
+)
+from scripts.ppe_phone_status import _clean_blocker, _extract_slice_id
 
 MORNING_STATE_REL = "artifacts/control_plane/MORNING_REPORT_STATE.json"
-_CATEGORY_LABELS = {
-    "ide_build": "IDE BUILD / handoff",
-    "verdict": "verdict changes",
-    "stuck": "stuck reminders",
-    "critical": "loop down",
-    "build": "build finish",
-    "chapter": "chapter done",
-    "slice": "slice done",
-    "fix": "fix attempts",
-    "status": "status checks",
-    "other": "other",
-}
+MORNING_ARTIFACT_REL = "artifacts/control_plane/MORNING_REPORT_LATEST.md"
+MORNING_DIGEST_REL = "docs/RELEASES/MORNING_REPORT_LATEST.md"
+MAX_BODY_CHARS = 3800
 
 
 def morning_report_enabled() -> bool:
@@ -95,57 +99,219 @@ def is_morning_report_window(now: datetime | None = None) -> bool:
     return start <= now < end
 
 
-def _format_local_time(at_raw: str) -> str:
-    at = _parse_utc(at_raw)
-    if at is None:
-        return at_raw
-    return at.astimezone().strftime("%m-%d %H:%M")
+def _product_changes(repo: Path, local_date: str) -> list[str]:
+    start, end = day_window_local(local_date)
+    since = start.isoformat()
+    until = end.isoformat()
+    paths = ("src/", "apps/msos-web/")
+    lines: list[str] = []
+
+    try:
+        stat_proc = subprocess.run(
+            [
+                "git",
+                "log",
+                f"--since={since}",
+                f"--until={until}",
+                "--numstat",
+                "--format=",
+                "--",
+                *paths,
+            ],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        stat_proc = None
+
+    added = deleted = 0
+    touched: set[str] = set()
+    if stat_proc and stat_proc.returncode == 0:
+        for row in (stat_proc.stdout or "").splitlines():
+            parts = row.split("\t")
+            if len(parts) != 3:
+                continue
+            try:
+                added += int(parts[0]) if parts[0] != "-" else 0
+                deleted += int(parts[1]) if parts[1] != "-" else 0
+            except ValueError:
+                continue
+            touched.add(parts[2].split("/")[1] if "/" in parts[2] else parts[2])
+
+    try:
+        subj_proc = subprocess.run(
+            [
+                "git",
+                "log",
+                f"--since={since}",
+                f"--until={until}",
+                "--format=%s",
+                "--no-merges",
+                "--",
+                *paths,
+            ],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        subj_proc = None
+
+    subjects = []
+    if subj_proc and subj_proc.returncode == 0:
+        subjects = [line.strip() for line in (subj_proc.stdout or "").splitlines() if line.strip()]
+
+    if not subjects and not touched:
+        return ["No product commits on src/ or apps/msos-web/."]
+
+    if touched:
+        areas = ", ".join(sorted(touched)[:5])
+        if len(touched) > 5:
+            areas += f" (+{len(touched) - 5} areas)"
+        stat = f"+{added}/-{deleted} lines" if added or deleted else "files touched"
+        lines.append(f"Product code: {stat} - {areas}")
+    for subject in subjects[:3]:
+        lines.append(f"  - {subject[:90]}")
+    if len(subjects) > 3:
+        lines.append(f"  - (+{len(subjects) - 3} more commits)")
+    return lines
+
+
+def _yesterday_output_lines(day_metrics: dict[str, Any]) -> list[str]:
+    slices = [row for row in (day_metrics.get("slicesCompleted") or []) if isinstance(row, dict)]
+    chapters = [row for row in (day_metrics.get("chaptersCompleted") or []) if isinstance(row, dict)]
+    lines: list[str] = []
+
+    if not slices and not chapters:
+        lines.append("No slices or chapters closed.")
+        return lines
+
+    if slices:
+        kinds = Counter(str(row.get("kind") or "other") for row in slices)
+        breakdown = ", ".join(f"{count} {kind}" for kind, count in sorted(kinds.items()))
+        lines.append(f"Slices closed: {len(slices)} ({breakdown})")
+        names = ", ".join(str(row.get("id") or "") for row in slices[:4] if row.get("id"))
+        if len(slices) > 4:
+            names += f" (+{len(slices) - 4} more)"
+        if names:
+            lines.append(f"  {names}")
+
+    if chapters:
+        lines.append(f"Chapters closed: {len(chapters)}")
+        names = ", ".join(str(row.get("id") or "") for row in chapters if row.get("id"))
+        if names:
+            lines.append(f"  {names}")
+
+    return lines
+
+
+def _runtime_lines(repo: Path, day_metrics: dict[str, Any], *, local_date: str, sends: list | None) -> list[str]:
+    from scripts.ppe_operator_daily_metrics import uptime_trend_line
+
+    running = int(day_metrics.get("runningSec") or 0)
+    down = int(day_metrics.get("downSec") or 0)
+    intentional = int(day_metrics.get("downIntentionalSec") or 0)
+    unexpected = int(day_metrics.get("downUnexpectedSec") or 0)
+    blocked = int(day_metrics.get("blockedSec") or 0)
+    total = running + down
+
+    if total <= 0:
+        return ["No uptime samples yet - keep watch_operator_mobile running for metrics."]
+
+    uptime_target = format_pct(running, total)
+    lines = [
+        f"Loop up: {format_duration(running)} ({uptime_target} uptime - target 24/7)",
+        f"Loop down: {format_duration(down)} ({format_pct(down, total)})",
+    ]
+    trend = uptime_trend_line(repo, local_date, sends=sends)
+    if trend:
+        lines.append(f"  {trend}")
+    if down:
+        lines.append(f"  maintenance: {format_duration(intentional)} (offline on purpose)")
+        lines.append(f"  gap: {format_duration(unexpected)} (should have been running)")
+    if blocked:
+        lines.append(f"Blocked while loop up: {format_duration(blocked)} (IDE_BUILD / fix / error)")
+    return lines
+
+
+def _trim_body(body: str, *, limit: int = MAX_BODY_CHARS) -> str:
+    if len(body) <= limit:
+        return body
+    return body[: limit - 3] + "..."
+
+
+def _morning_click_url(repo: Path) -> str | None:
+    try:
+        from scripts.ppe_weekly_digest import resolve_blob_click_url
+
+        return resolve_blob_click_url(repo, MORNING_DIGEST_REL)
+    except ImportError:
+        return None
+
+
+def write_morning_report_files(repo: Path, *, title: str, body: str) -> None:
+    repo = repo.resolve()
+    generated = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    md = f"# {title}\n\n_Generated {generated} UTC_\n\n{body}\n"
+    for rel in (MORNING_ARTIFACT_REL, MORNING_DIGEST_REL):
+        path = repo / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(md, encoding="utf-8")
 
 
 def build_morning_report(repo: Path, status: dict[str, Any]) -> tuple[str, str]:
+    repo = repo.resolve()
+    yday = yesterday_local_date()
     sends = _prune_send_state(_load_send_state(repo))
-    activity = [s for s in sends if "morning" not in str(s.get("title") or "").lower()]
-    breakdown = summarize_sends(activity)
+    day_metrics = get_day_metrics(repo, yday, sends=sends)
+    forecast = forecast_blockers(repo, status)
 
-    lines = ["Good morning. Here's the last 24 hours:", ""]
-    verdict = str(status.get("verdict") or "UNKNOWN")
-    lines.append(f"Now: {verdict_headline(verdict)}")
-    chapter = str(status.get("chapter_name") or "").strip()
-    if chapter:
-        lines.append(f"Chapter: {chapter}")
-    blocker = str(status.get("blocker") or "").strip()
-    if blocker and verdict not in ("RUN_AUTO", "RUN_LOCAL"):
-        lines.append(blocker[:200])
+    lines = [f"Good morning - metrics for {yday}.", "", "Yesterday's output:"]
+    for item in _yesterday_output_lines(day_metrics):
+        lines.append(f"- {item}")
 
-    lines.append("")
-    lines.append("Alerts sent:")
-    if not activity:
-        lines.append("- None (quiet day).")
-    else:
-        for cat, count in breakdown.items():
-            if cat == "quota":
-                continue
-            label = _CATEGORY_LABELS.get(cat, cat.replace("_", " "))
-            lines.append(f"- {count}x {label}")
-        lines.append("")
-        lines.append("Highlights:")
-        notable = [
-            s
-            for s in activity
-            if str(s.get("category") or categorize_send_title(str(s.get("title") or "")))
-            in ("ide_build", "verdict", "critical", "stuck", "chapter", "build", "fix")
-        ]
-        if not notable:
-            notable = activity[-5:]
-        for item in notable[-6:]:
-            title = str(item.get("title") or "").strip()
-            when = _format_local_time(str(item.get("at") or ""))
-            if title:
-                lines.append(f"- {when}: {title[:100]}")
+    lines.extend(["", "Product changes:"])
+    for item in _product_changes(repo, yday):
+        lines.append(f"- {item}")
 
-    lines.append("")
-    lines.append("Send status for the live picture.")
-    return "PPE morning report", "\n".join(lines)
+    lines.extend(["", "Runtime:"])
+    for item in _runtime_lines(repo, day_metrics, local_date=yday, sends=sends):
+        lines.append(f"- {item}")
+
+    lines.extend(["", "Today's build plan:"])
+    for item in build_plan_lines(repo, status):
+        lines.append(f"- {item}")
+
+    lines.extend(["", "Get ahead (keep loop up):"])
+    for item in forecast:
+        lines.append(f"- {item}")
+
+    op_lines = operator_today_lines(repo, status)
+    verdict = str(status.get("verdict") or "")
+    blocker = str(status.get("blocker") or "")
+    slice_id = _extract_slice_id(blocker)
+    detail = _clean_blocker(blocker, verdict=verdict, slice_id=slice_id)
+    if op_lines:
+        lines.append(f"- Right now: {op_lines[0]}")
+    if detail and verdict not in ("RUN_AUTO",):
+        lines.append(f"- {detail}")
+
+    lines.extend(["", "Business playbook:"])
+    for item in business_playbook_lines(repo):
+        lines.append(f"- {item}")
+
+    click = _morning_click_url(repo)
+    if click:
+        lines.extend(["", f"Full report: {click}"])
+
+    body = _trim_body("\n".join(lines))
+    title = build_morning_title(status, forecast)
+    return title, body
 
 
 def maybe_send_morning_report(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
@@ -161,6 +327,7 @@ def maybe_send_morning_report(repo: Path, status: dict[str, Any]) -> dict[str, A
         return {"sent": False, "reason": "already_sent_today"}
 
     title, body = build_morning_report(repo, status)
+    write_morning_report_files(repo, title=title, body=body)
     sent = send_ntfy(
         title,
         body,

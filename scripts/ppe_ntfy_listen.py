@@ -114,7 +114,7 @@ def handle_message(repo: Path, message: dict[str, Any], *, notify: bool = True) 
         return None
     result = execute_command(repo, command)
     if notify:
-        notify_command_result(command, result)
+        notify_command_result(command, result, repo)
     return {"command": command.name, "args": command.args, "result": result, "message_id": message.get("id")}
 
 

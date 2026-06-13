@@ -106,12 +106,21 @@ def notify_slice_complete(
         parts.append(f"Chapter: {chapter_id}.")
     if plan_path:
         parts.append(f"Plan: {plan_path}")
-    return send_ntfy(
+    sent = send_ntfy(
         title,
         " ".join(parts),
         tags=["ppe", "slice", "done"],
         priority="default",
     )
+    if sent:
+        try:
+            from scripts.ppe_notify_push import repo_root
+            from scripts.ppe_operator_daily_metrics import record_slice_completed
+
+            record_slice_completed(repo_root(), slice_id=slice_id, plan_path=plan_path)
+        except ImportError:
+            pass
+    return sent
 
 
 def notify_fix_working(
@@ -189,9 +198,18 @@ def notify_chapter_complete(
     hint = check_in_hint_for_chapter(chapter_id)
     if hint:
         parts.append(f"Check in: {hint}")
-    return send_ntfy(
+    sent = send_ntfy(
         title,
         " ".join(parts),
         tags=["ppe", "chapter", "done"],
         priority="high",
     )
+    if sent:
+        try:
+            from scripts.ppe_notify_push import repo_root
+            from scripts.ppe_operator_daily_metrics import record_chapter_completed
+
+            record_chapter_completed(repo_root(), chapter_id=chapter_id)
+        except ImportError:
+            pass
+    return sent
