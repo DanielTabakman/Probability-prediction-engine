@@ -21,6 +21,27 @@ def _norm_plan(path: str) -> str:
     return path.replace("\\", "/").strip()
 
 
+def _ide_marker_completed_slices(repo: Path, plan_path: str) -> set[str]:
+    """Product slices marked IDE-ready for this plan (skip re-run in relay batch)."""
+    norm = _norm_plan(plan_path)
+    try:
+        from scripts.ppe_ide_product_ready import load_marker
+    except ImportError:
+        return set()
+    marker = load_marker(repo)
+    if not marker:
+        return set()
+    marker_plan = _norm_plan(str(marker.get("phasePlanPath") or ""))
+    if marker_plan and marker_plan != norm:
+        return set()
+    out: set[str] = set()
+    for sid in marker.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s:
+            out.add(s)
+    return out
+
+
 def progress_path(repo: Path) -> Path:
     return (repo / PROGRESS_REL).resolve()
 
@@ -68,14 +89,22 @@ def _is_closeout_slice(sl: dict[str, Any]) -> bool:
 
 def completed_slice_ids(repo: Path, plan_path: str) -> set[str]:
     norm = _norm_plan(plan_path)
-    data = load_progress(repo)
-    if _norm_plan(str(data.get("planPath") or "")) != norm:
-        return set()
     out: set[str] = set()
-    for sid in data.get("completedSliceIds") or []:
-        s = str(sid or "").strip()
-        if s:
-            out.add(s)
+    try:
+        plan = load_phase_plan(repo, plan_path)
+        for sid in plan.get("preCompletedSliceIds") or []:
+            s = str(sid or "").strip()
+            if s:
+                out.add(s)
+    except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        pass
+    data = load_progress(repo)
+    if _norm_plan(str(data.get("planPath") or "")) == norm:
+        for sid in data.get("completedSliceIds") or []:
+            s = str(sid or "").strip()
+            if s:
+                out.add(s)
+    out.update(_ide_marker_completed_slices(repo, plan_path))
     return out
 
 

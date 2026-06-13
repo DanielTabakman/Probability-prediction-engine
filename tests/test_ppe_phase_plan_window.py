@@ -9,6 +9,7 @@ from pathlib import Path
 
 from scripts.ppe_phase_plan_window import (
     active_slice_window,
+    completed_slice_ids,
     mark_slice_complete,
     select_slice_batch,
 )
@@ -49,6 +50,34 @@ class TestPpePhasePlanWindow(unittest.TestCase):
                 completed={"A", "B"},
             )
             self.assertEqual([s["sliceId"] for s in batch], ["C"])
+
+    def test_pre_completed_and_ide_marker_slices_skipped(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            orch = repo / "artifacts" / "orchestrator"
+            plans = repo / "docs" / "SOP" / "PHASE_PLANS"
+            orch.mkdir(parents=True)
+            plans.mkdir(parents=True)
+            plan_path = "docs/SOP/PHASE_PLANS/p.json"
+            plan = {
+                "name": "p",
+                "preCompletedSliceIds": ["Done-A"],
+                "slices": [_slice("Done-A"), _slice("Done-B"), _slice("Next")],
+            }
+            (plans / "p.json").write_text(json.dumps(plan), encoding="utf-8")
+            (orch / "IDE_PRODUCT_READY.json").write_text(
+                json.dumps(
+                    {
+                        "phasePlanPath": plan_path,
+                        "completedProductSlices": ["Done-B"],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            done = completed_slice_ids(repo, plan_path)
+            self.assertEqual(done, {"Done-A", "Done-B"})
+            batch = select_slice_batch(plan["slices"], limit=6, completed=done)
+            self.assertEqual([s["sliceId"] for s in batch], ["Next"])
 
 
 def active_slice_window_from_batch(

@@ -38,6 +38,30 @@ def test_ensure_main_stays_on_ops_until_runner_on_origin(tmp_path: Path) -> None
     assert "missing run_ppe_desktop_operator.cmd" in out["reason"]
 
 
+def test_ensure_main_from_charter_when_clean(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("fetch", "origin"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("show", "origin/main:run_ppe_desktop_operator.cmd"):
+            return type("P", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+        if args[:2] == ("pull", "--ff-only"):
+            return type("P", (), {"returncode": 0, "stdout": "Already up to date.", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"checkoutMainWhenOpsBranch": True, "pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="charter/msos-launch"):
+            with patch("scripts.ppe_operator_git_sync._dirty_paths", return_value=[]):
+                with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                    out = ensure_main_on_loop_host(repo)
+    assert out.get("checked_out") is True
+    assert out.get("ok") is True
+    assert any(args[:2] == ["checkout", "main"] for args in calls)
+
+
 def test_publish_skips_when_nothing_ahead(tmp_path: Path) -> None:
     repo = tmp_path
     with patch("scripts.ppe_operator_git_sync.push_enabled", return_value=True):

@@ -15,6 +15,26 @@ def _norm(path: str) -> str:
     return path.replace("\\", "/").strip()
 
 
+# Orchestrator/automation paths — excluded from preflight layer dirty audit.
+PREFLIGHT_DIRTY_EXEMPT_PREFIXES: tuple[str, ...] = (
+    "artifacts/",
+    "_worktrees/",
+)
+PREFLIGHT_DIRTY_EXEMPT_EXACT: frozenset[str] = frozenset(
+    {
+        ".cursor/IDE_BUILD_TRIGGER.json",
+        ".cursor/IDE_BUILD_AUTOMATION_PROMPT.md",
+    }
+)
+
+
+def is_preflight_dirty_exempt(path: str) -> bool:
+    p = _norm(path)
+    if p in PREFLIGHT_DIRTY_EXEMPT_EXACT:
+        return True
+    return any(p.startswith(prefix) for prefix in PREFLIGHT_DIRTY_EXEMPT_PREFIXES)
+
+
 def presets_path(repo_root: Path) -> Path:
     return repo_root.resolve() / PRESETS_REL
 
@@ -246,6 +266,12 @@ def audit_git_diff(
 
 def audit_git_dirty(repo_root: Path, scope: LayerScope) -> list[str]:
     return audit_paths(git_dirty_paths(repo_root), scope)
+
+
+def audit_git_dirty_preflight(repo_root: Path, scope: LayerScope) -> list[str]:
+    """Dirty audit for run_ppe preflight — ignores orchestrator/automation noise."""
+    paths = [p for p in git_dirty_paths(repo_root) if not is_preflight_dirty_exempt(p)]
+    return audit_paths(paths, scope)
 
 
 def find_slice_in_plan(plan: dict[str, Any], slice_id: str) -> dict[str, Any] | None:
