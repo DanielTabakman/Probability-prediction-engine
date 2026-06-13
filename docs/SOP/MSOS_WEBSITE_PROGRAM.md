@@ -71,6 +71,13 @@ Distinct observed/saved/simulated/executed/reviewed states; no undefined thesis-
 
 Friends-first/trader-tester conventions; validation report drives next queue selection.
 
+### Post-P8 — Storyboard visual parity v1 (follow-on, chartered)
+
+**Outcome:** `apps/msos-web/` matches storyboard v0.6 **pictures** (layout, tokens, panel chrome), not narrative-only parity.  
+**Work:** Screen-by-screen witness vs `prototype/html/*.html`; VPS deploy; closes deferred pixel checks from P2–P8 evidence.  
+**Priority:** MEDIUM — runs after current LOW dist-quant chapter unless a higher tier is SELECTION'd.  
+**Charter:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md) · [`POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md`](POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md)
+
 ---
 
 ## Deferred until selected after validation
@@ -97,5 +104,6 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | P6 | `msos_p6_expression_sim` | `PHASE_PLANS/msos_p6_expression_sim_relay.json` |
 | P7 | `msos_p7_monitoring` | `PHASE_PLANS/msos_p7_monitoring_relay.json` |
 | P8 | `msos_p8_tester_release` | `PHASE_PLANS/msos_p8_tester_release_relay.json` |
+| Post-P8 | `msos_storyboard_visual_parity_v1` | `PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

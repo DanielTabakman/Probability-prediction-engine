@@ -13,21 +13,37 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **MSOS P8 tester release + evidence-based next selection** — **READY** (relay running)
-- **Relay plan:** [`PHASE_PLANS/msos_p8_tester_release_relay.json`](PHASE_PLANS/msos_p8_tester_release_relay.json)
-- **Sprint:** [`SPRINT_MSOS_P8_TESTER_RELEASE.md`](SPRINT_MSOS_P8_TESTER_RELEASE.md)
-- **SELECTION:** [`POST_MSOS_P8_TESTER_RELEASE_SELECTION.md`](POST_MSOS_P8_TESTER_RELEASE_SELECTION.md)
-- **Last closed:** **MSOS P7 monitoring, history, calibration loop** — on `main`
-- **Operator:** IDE BUILD + `mark_ide_product_ready.cmd MSOS-P8-Product-Slice002` → `run_ppe_local.cmd`
+- **Active BUILD chapter:** **none on MSOS track** — MVP1 dist-quant v2 finishing on parallel queue ([`MVP1_FRONTIER.md`](MVP1_FRONTIER.md))
+- **Next MSOS chapter (chartered, MEDIUM):** **Storyboard visual parity v1** — blocked until dist-quant closeout
+- **Relay plan:** [`PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json`](PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json)
+- **Sprint:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md)
+- **SELECTION:** [`POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md`](POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md)
+- **Last closed:** **MSOS P8 tester release** — 2026-06-12 on `main`
 
-### MSOS P8 tester release — relay queue — **READY**
+### MSOS storyboard visual parity v1 — relay queue — **BLOCKED** (MEDIUM)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-P8-Control-Slice001` — charter | EVIDENCE |
-| **IN PROGRESS** | `MSOS-P8-Product-Slice002` — conclusion / learn loop UI | PRODUCT |
-| **PENDING** | `MSOS-P8-Witness-Slice004` — witness + validation report stub | EVIDENCE |
-| **PENDING** | `MSOS-P8-Closeout-Slice005` — closeout + next-queue note | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
+
+**Visual reference:** storyboard `01_home` … `09_conclusion` · **Compare:** `prototype/html/*.html` side-by-side with `npm run dev`
+
+### MSOS P8 tester release — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-P8-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-P8-Product-Slice002` — conclusion / learn loop UI | PRODUCT |
+| **CLOSED** | `MSOS-P8-Witness-Slice004` — witness + validation report stub | EVIDENCE |
+| **CLOSED** | `MSOS-P8-Closeout-Slice005` — closeout + next-queue note | EVIDENCE |
 
 **Visual reference:** storyboard `09_conclusion` · **Route:** `/learn`
 

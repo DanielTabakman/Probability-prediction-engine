@@ -1,0 +1,162 @@
+{
+  "name": "MSOS_storyboard_visual_parity_v1 (storyboard v0.6 pixel/layout parity)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-VisParityV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Control-Slice001-vis_parity_v1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice002-vis_parity_v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/app/page.tsx",
+        "apps/msos-web/src/app/globals.css",
+        "apps/msos-web/src/components/PublicNav.tsx",
+        "apps/msos-web/src/components/HeroSection.tsx",
+        "apps/msos-web/src/components/ProductWindow.tsx",
+        "apps/msos-web/src/components/FeaturesRow.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice003-vis_parity_v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/AppShell.tsx",
+        "apps/msos-web/src/components/AppSidebar.tsx",
+        "apps/msos-web/src/components/CommandCenterContent.tsx",
+        "apps/msos-web/src/app/command-center/page.tsx",
+        "apps/msos-web/src/app/globals.css"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Product-Slice004",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice004-vis_parity_v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/components/PpeEmbedBoundary.tsx",
+        "apps/msos-web/src/app/strategy-lab/page.tsx",
+        "apps/msos-web/src/app/globals.css"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Product-Slice005",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice005-vis_parity_v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/ThesisConfirmationPanel.tsx",
+        "apps/msos-web/src/components/ExpressionPlanningPanel.tsx",
+        "apps/msos-web/src/app/strategy-lab/confirm/page.tsx",
+        "apps/msos-web/src/app/strategy-lab/expression/page.tsx",
+        "apps/msos-web/src/app/globals.css"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Product-Slice006",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice006-vis_parity_v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "apps/msos-web/src/components/HistoryContent.tsx",
+        "apps/msos-web/src/components/ConclusionContent.tsx",
+        "apps/msos-web/src/app/monitor/page.tsx",
+        "apps/msos-web/src/app/history/page.tsx",
+        "apps/msos-web/src/app/learn/page.tsx",
+        "apps/msos-web/src/app/globals.css"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Platform-Slice007",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Platform-Slice007-vis_parity_v1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "docs/DEPLOY/MSOS_WEB_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Witness-Slice008",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Witness-Slice008-vis_parity_v1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
+        "tests/test_msos_web_"
+      ]
+    },
+    {
+      "sliceId": "MSOS-VisParityV1-Closeout-Slice009",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+      "buildBranch": "build/auto/MSOS-VisParityV1-Closeout-Slice009-vis_parity_v1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_storyboard_visual_parity_v1",
+        "chapterTitle": "MSOS storyboard visual parity v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
+          "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
+        ]
+      }
+    }
+  ]
+}
