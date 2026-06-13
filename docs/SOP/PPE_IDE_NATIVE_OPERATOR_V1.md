@@ -121,6 +121,24 @@ mark_ide_product_ready.cmd MVP1-Phase6Trust-Product-Slice002 docs/SOP/PHASE_PLAN
 
 Requires commits on the plan `buildBranch` ahead of baseline. Cleared automatically when `run_ppe_local.cmd` exits 0.
 
+### Pushable gate (mixed-plane branches)
+
+On `build/auto/*` with multiple planes in branch history, scope the gate to the slice commit:
+
+```bat
+python scripts/run_pushable_gate.py --base-ref HEAD~1 --no-auto-upstream
+```
+
+Docs-only closeout: stage only `docs/SOP/*`, then `--base-ref HEAD --no-auto-upstream`.
+
+### Evidence doc stub (closeout hardening)
+
+Relay chapters with a closeout block get a **PENDING** evidence stub automatically when `ppe_auto_select.py --apply` selects the plan. Closeout flips it to COMPLETE. Do not delete the stub before closeout.
+
+### Control/smoke `STOP_FOR_REVIEW` in worktrees
+
+Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` in isolated worktrees — **normal**. Promotion recovery advances the phase; only product slices block on `IDE_PRODUCT_READY`.
+
 ---
 
 ## What runs unattended

@@ -354,8 +354,16 @@ def apply_control_closeout(
     closeout: CloseoutSpec,
     relay_run_dir: Path | None = None,
     skip_alignment: bool = False,
+    phase_plan_path: str | None = None,
 ) -> dict[str, Any]:
     repo = repo_root.resolve()
+    if phase_plan_path:
+        try:
+            from scripts.relay.ensure_evidence_doc_stub import ensure_evidence_doc_stub
+
+            ensure_evidence_doc_stub(repo, phase_plan_path)
+        except Exception:
+            pass
     patch_handoff(repo, closeout)
     patch_frontier(repo, closeout)
     patch_integrated(repo, closeout)
@@ -393,6 +401,17 @@ def apply_control_closeout(
         json.dumps(brief_json, indent=2),
         encoding="utf-8",
     )
+
+    if phase_plan_path:
+        try:
+            from scripts.ppe_ide_build_starter import prune_starters_for_plan
+
+            pruned = prune_starters_for_plan(repo, phase_plan_path)
+            if pruned:
+                report_dir_extra = cp_dir / "closeout_pruned_starters.txt"
+                report_dir_extra.write_text("\n".join(pruned) + "\n", encoding="utf-8")
+        except Exception:
+            pass
 
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
     report_dir = cp_dir / ts

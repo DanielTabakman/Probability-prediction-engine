@@ -235,6 +235,47 @@ def write_starter(repo: Path, *, slice_id: str, phase_plan: str) -> Path:
     return out
 
 
+def prune_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
+    """Remove IDE_BUILD_STARTER files for all slices in a phase plan (chapter closed)."""
+    norm_plan = phase_plan.replace("\\", "/").strip()
+    if not norm_plan:
+        return []
+    try:
+        plan = load_phase_plan(repo, norm_plan)
+    except (FileNotFoundError, OSError):
+        return []
+    removed: list[str] = []
+    for sl in plan.get("slices") or []:
+        if not isinstance(sl, dict):
+            continue
+        sid = str(sl.get("sliceId") or "").strip()
+        if not sid:
+            continue
+        path = repo / starter_path(sid)
+        if path.is_file():
+            path.unlink()
+            removed.append(sid)
+    return removed
+
+
+def prune_starters_for_completed_chapters(repo: Path) -> list[str]:
+    """Remove starters when closeout evidence docs show COMPLETE."""
+    from scripts.ppe_queue_health import chapter_marked_complete_in_repo
+
+    sop = repo / "docs" / "SOP" / "PHASE_PLANS"
+    if not sop.is_dir():
+        return []
+    removed: list[str] = []
+    for plan_file in sorted(sop.glob("*_relay.json")):
+        rel = str(plan_file.relative_to(repo)).replace("\\", "/")
+        if not chapter_marked_complete_in_repo(repo, rel):
+            continue
+        for sid in prune_starters_for_plan(repo, rel):
+            if sid not in removed:
+                removed.append(sid)
+    return removed
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Generate IDE BUILD starter markdown bundle.")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())

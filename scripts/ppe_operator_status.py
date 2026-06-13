@@ -411,7 +411,19 @@ def _notify_windows(repo: Path, *, status: dict[str, Any]) -> None:
     _notify_mobile(repo, status=status)
 
 
+def _configure_stdio_utf8() -> None:
+    """Avoid UnicodeEncodeError on Windows cp1252 consoles (e.g. arrows in PPE_GO_HINT)."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _configure_stdio_utf8()
     ap = argparse.ArgumentParser(description="PPE operator status and next-command verdict")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--json", action="store_true", help="Print JSON only")

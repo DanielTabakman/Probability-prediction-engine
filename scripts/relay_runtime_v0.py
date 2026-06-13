@@ -1229,6 +1229,7 @@ def dispatch_apply_control_closeout_v1(
         repo,
         closeout=spec,
         relay_run_dir=relay_run_dir,
+        phase_plan_path=str(phase_plan_path.resolve().relative_to(repo)).replace("\\", "/"),
     )
     if not report.get("passed"):
         return EXIT_BLOCKED, f"blocked: steering alignment failed\n{json.dumps(report, indent=2)}"

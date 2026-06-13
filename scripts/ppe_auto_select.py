@@ -230,6 +230,14 @@ def run_auto_select(
                 if wm:
                     manifest["workerMode"] = wm
         save_manifest(repo, manifest)
+        try:
+            from scripts.relay.ensure_evidence_doc_stub import ensure_evidence_doc_stub
+
+            stub = ensure_evidence_doc_stub(repo, plan_path)
+            if stub.get("created"):
+                print(f"ppe_auto_select: evidence stub {stub.get('path')}")
+        except Exception as exc:
+            print(f"ppe_auto_select: evidence stub skipped: {exc}")
 
     _print_result(selected=True, plan_path=plan_path, reason=reason)
     return 0
