@@ -128,9 +128,11 @@ def execute_status(repo: Path) -> dict[str, Any]:
 
 
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
-    from scripts.ppe_ide_handoff import respond_to_ide_build
+    from scripts.ppe_autobuilder_dispatch import dispatch_build
 
-    return respond_to_ide_build(repo, source="phone", note=note)
+    args = (note or "").strip().lower()
+    force = args in ("force", "retry") or args.startswith("force ")
+    return dispatch_build(repo, source="phone", note=note, force_handoff=force)
 
 
 def execute_fix(repo: Path, *, note: str = "") -> dict[str, Any]:

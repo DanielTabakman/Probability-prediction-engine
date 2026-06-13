@@ -329,23 +329,11 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
 
 def _maybe_auto_remote_build(repo: Path, status: dict[str, Any]) -> dict[str, Any] | None:
     """CLI build or IDE handoff when loop hits IDE_BUILD guard stop."""
-    if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
-        return None
     try:
-        from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
-        from scripts.ppe_operator_config import auto_remote_build_enabled
-        from scripts.ppe_remote_build_agent import read_build_lock
+        from scripts.ppe_autobuilder_dispatch import maybe_dispatch_loop
     except ImportError:
         return None
-    if not auto_remote_build_enabled(repo) and not ide_handoff_enabled(repo):
-        return None
-    if read_build_lock(repo):
-        return None
-    return respond_to_ide_build(
-        repo,
-        source="loop-guard",
-        note="auto-triggered by operator loop on IDE_BUILD guard stop",
-    )
+    return maybe_dispatch_loop(repo, status)
 
 
 def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:

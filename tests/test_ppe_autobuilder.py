@@ -7,7 +7,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_autobuilder import (
+    PHASE_STACK_DOWN,
     PHASE_AWAITING_BUILD,
+    PHASE_STUCK,
     PHASE_BUILD_IN_FLIGHT,
     PHASE_CLOSEOUT_PENDING,
     PHASE_FINISH_IN_FLIGHT,
@@ -164,6 +166,31 @@ def test_format_status_brief():
     )
     assert "PHASE=AWAITING_BUILD" in brief
     assert "MVP1-Slice003" in brief
+
+
+def test_apply_stuck_phase_after_threshold(tmp_path: Path):
+    from datetime import datetime, timedelta, timezone
+
+    from scripts.ppe_autobuilder import apply_stuck_phase, load_phase_state, save_phase_state
+
+    old = (datetime.now(timezone.utc) - timedelta(minutes=45)).isoformat().replace("+00:00", "Z")
+    save_phase_state(
+        tmp_path,
+        {
+            "phase": PHASE_AWAITING_BUILD,
+            "slice_id": "MVP1-Slice002",
+            "plan_path": "docs/plan.json",
+            "since": old,
+        },
+    )
+    phase, info = apply_stuck_phase(
+        tmp_path,
+        phase=PHASE_AWAITING_BUILD,
+        slice_id="MVP1-Slice002",
+        plan_path="docs/plan.json",
+    )
+    assert phase == PHASE_STUCK
+    assert info.get("stuck") is True
 
 
 def test_action_advance_ensure_on_stack_down(tmp_path: Path):

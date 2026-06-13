@@ -50,7 +50,9 @@ Plus dispatch paths:
 | `FINISH_IN_FLIGHT` | post_build worker running | wait |
 | `RUN_LOCAL_PENDING` | Marker present, relay pending | `run-local` |
 | `DEGRADED` | CLI quota / automation broken | `handoff` |
-| `FIX_PLAN` / `STALE_STATE` / `ERROR` | Plan or relay issue | triage worker |
+| `STUCK` | Same phase >30 min | `advance` or `@ppe-autobuilder-operator` |
+| `FIX_PLAN` / `ERROR` | Plan or relay issue | triage worker |
+| `STALE_STATE` | Manifest RUNNING without ACTIVE_RUN | `advance` (clears stale) |
 
 Canonical JSON: `artifacts/orchestrator/AUTOBUILDER_STATUS.json`
 

@@ -90,6 +90,8 @@ def format_user_banner(result: dict[str, Any]) -> str:
             [
                 f"  {PPE_GO_HINT}",
                 "",
+                "  Pipeline SRE: ppe_autobuilder.cmd status  |  @ppe-autobuilder-operator",
+                "",
                 "  (Cursor opening; prompt copied to clipboard)",
             ]
         )

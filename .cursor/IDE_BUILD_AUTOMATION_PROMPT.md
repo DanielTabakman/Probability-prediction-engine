@@ -20,3 +20,5 @@ Execute autonomously. Do not ask for confirmation. Do not paste orchestrator log
 If `run_ppe_local.cmd` fails, fix and retry once; then stop with a short failure summary.
 
 Human-readable handoff (optional): `artifacts/orchestrator/IDE_BUILD_NOW.md`.
+
+Pipeline health (optional): `artifacts/orchestrator/AUTOBUILDER_STATUS.json` — use `@ppe-autobuilder-operator` for stuck/closeout issues, not product rewrites.

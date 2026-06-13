@@ -23,6 +23,19 @@ PHASE_FIX_PLAN = "FIX_PLAN"
 PHASE_STALE_STATE = "STALE_STATE"
 PHASE_ERROR = "ERROR"
 PHASE_DEGRADED = "DEGRADED"
+PHASE_STUCK = "STUCK"
+
+PHASE_STATE_REL = "artifacts/orchestrator/AUTOBUILDER_PHASE_STATE.json"
+STUCK_PHASES = frozenset({
+    PHASE_AWAITING_BUILD,
+    PHASE_BUILD_IN_FLIGHT,
+    PHASE_CLOSEOUT_PENDING,
+    PHASE_DEGRADED,
+    PHASE_FINISH_IN_FLIGHT,
+    PHASE_STALE_STATE,
+    PHASE_RUN_LOCAL_PENDING,
+})
+DEFAULT_STUCK_MINUTES = 30
 
 ACTION_STATUS = "status"
 ACTION_DIAGNOSE = "diagnose"
@@ -45,6 +58,7 @@ PHASE_ACTIONS: dict[str, list[str]] = {
     PHASE_STALE_STATE: [ACTION_DIAGNOSE],
     PHASE_ERROR: [ACTION_DIAGNOSE, ACTION_ENSURE],
     PHASE_DEGRADED: [ACTION_HANDOFF, ACTION_DIAGNOSE, ACTION_ENSURE],
+    PHASE_STUCK: [ACTION_ADVANCE, ACTION_DIAGNOSE, ACTION_HANDOFF, ACTION_FINISH_PENDING],
 }
 
 PHASE_RECOMMENDED: dict[str, str] = {
@@ -59,6 +73,7 @@ PHASE_RECOMMENDED: dict[str, str] = {
     PHASE_STALE_STATE: ACTION_DIAGNOSE,
     PHASE_ERROR: ACTION_DIAGNOSE,
     PHASE_DEGRADED: ACTION_HANDOFF,
+    PHASE_STUCK: ACTION_ADVANCE,
 }
 
 
@@ -68,6 +83,98 @@ def _utc_now() -> str:
 
 def status_json_path(repo: Path) -> Path:
     return (repo / STATUS_JSON_REL).resolve()
+
+
+def phase_state_path(repo: Path) -> Path:
+    return (repo / PHASE_STATE_REL).resolve()
+
+
+def _stuck_minutes() -> int:
+    import os
+
+    try:
+        return max(5, int(os.environ.get("PPE_AUTOBUILDER_STUCK_MINUTES", str(DEFAULT_STUCK_MINUTES))))
+    except ValueError:
+        return DEFAULT_STUCK_MINUTES
+
+
+def _parse_utc(raw: str) -> datetime | None:
+    text = (raw or "").strip()
+    if not text:
+        return None
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def load_phase_state(repo: Path) -> dict[str, Any]:
+    path = phase_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_phase_state(repo: Path, state: dict[str, Any]) -> None:
+    path = phase_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state["updatedAt"] = _utc_now()
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def _stuck_key(phase: str, slice_id: str | None, plan_path: str | None) -> str:
+    return f"{phase}::{plan_path or ''}::{slice_id or ''}"
+
+
+def apply_stuck_phase(
+    repo: Path,
+    *,
+    phase: str,
+    slice_id: str | None,
+    plan_path: str | None,
+) -> tuple[str, dict[str, Any]]:
+    """Override phase to STUCK when unchanged longer than threshold."""
+    info: dict[str, Any] = {"stuck": False, "threshold_minutes": _stuck_minutes()}
+    if phase not in STUCK_PHASES:
+        save_phase_state(
+            repo,
+            {
+                "phase": phase,
+                "slice_id": slice_id,
+                "plan_path": plan_path,
+                "since": _utc_now(),
+            },
+        )
+        return phase, info
+
+    state = load_phase_state(repo)
+    key = _stuck_key(phase, slice_id, plan_path)
+    prior_key = _stuck_key(
+        str(state.get("phase") or ""),
+        str(state.get("slice_id") or "") or None,
+        str(state.get("plan_path") or "") or None,
+    )
+    now = datetime.now(timezone.utc)
+    since_raw = str(state.get("since") or "")
+    since = _parse_utc(since_raw)
+
+    if key != prior_key or since is None:
+        save_phase_state(repo, {"phase": phase, "slice_id": slice_id, "plan_path": plan_path, "since": _utc_now()})
+        info["since"] = _utc_now()
+        return phase, info
+
+    elapsed_min = (now - since).total_seconds() / 60.0
+    info["since"] = since_raw
+    info["elapsed_minutes"] = round(elapsed_min, 1)
+    if elapsed_min >= _stuck_minutes():
+        info["stuck"] = True
+        return PHASE_STUCK, info
+
+    return phase, info
 
 
 def _tail_log(repo: Path, rel: str, *, max_lines: int = 12) -> str:
@@ -300,6 +407,14 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
         dispatch_degraded=bool(dispatch.get("degraded")),
     )
     recommended = _recommended_action(phase, dispatch)
+    phase, stuck_info = apply_stuck_phase(
+        repo,
+        phase=phase,
+        slice_id=str(pending.get("slice_id") or "") or None,
+        plan_path=str(pending.get("plan_path") or "") or None,
+    )
+    if stuck_info.get("stuck"):
+        recommended = ACTION_ADVANCE
 
     try:
         from scripts.ppe_ide_handoff import load_handoff_state
@@ -351,6 +466,7 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
         "marker_present": marker_present,
         "automation": _automation_summary(repo),
         "dispatch": dispatch,
+        "stuck": stuck_info,
         "commands": {
             "status": "ppe_autobuilder.cmd status",
             "diagnose": "ppe_autobuilder.cmd diagnose",
@@ -446,6 +562,8 @@ def run_diagnose(repo: Path, *, ping_webhook: bool = False) -> dict[str, Any]:
         PHASE_RUN_LOCAL_PENDING: "Run relay: `ppe_autobuilder.cmd run-local`",
         PHASE_BUILD_IN_FLIGHT: "Wait for agent; check `REMOTE_BUILD_AGENT.log`",
         PHASE_DEGRADED: "Use IDE handoff: `ppe_autobuilder.cmd handoff`",
+        PHASE_STUCK: "Stuck too long — `ppe_autobuilder.cmd advance` or `@ppe-autobuilder-operator`",
+        PHASE_STALE_STATE: "Clear stale manifest: `ppe_autobuilder.cmd advance`",
     }
     lines.append(guidance.get(phase, "Run `ppe_autobuilder.cmd status`"))
 
@@ -486,9 +604,9 @@ def action_ensure(repo: Path) -> dict[str, Any]:
 
 
 def action_retry_build(repo: Path, *, note: str = "", force_handoff: bool = False) -> dict[str, Any]:
-    from scripts.ppe_ide_handoff import respond_to_ide_build
+    from scripts.ppe_autobuilder_dispatch import dispatch_build
 
-    result = respond_to_ide_build(
+    result = dispatch_build(
         repo.resolve(),
         source="autobuilder",
         note=note or "triggered by ppe_autobuilder retry-build",
@@ -503,10 +621,80 @@ def action_handoff(repo: Path) -> dict[str, Any]:
     return action_retry_build(repo, force_handoff=True)
 
 
-def action_finish_pending(repo: Path) -> dict[str, Any]:
+def action_clear_stale_manifest(repo: Path) -> dict[str, Any]:
+    """Reset manifest RUNNING -> READY when ACTIVE_RUN.json is missing."""
+    repo = repo.resolve()
+    try:
+        from scripts.ppe_manifest import load_manifest, set_manifest_status
+    except ImportError as exc:
+        return {"action": "clear_stale", "cleared": False, "reason": str(exc)}
+
+    manifest = load_manifest(repo)
+    status = str(manifest.get("status") or "").strip().upper()
+    if status != "RUNNING":
+        return {"action": "clear_stale", "cleared": False, "reason": f"manifest is {status or 'empty'}"}
+    active = repo / "artifacts" / "orchestrator" / "ACTIVE_RUN.json"
+    if active.is_file():
+        return {"action": "clear_stale", "cleared": False, "reason": "ACTIVE_RUN.json present"}
+    set_manifest_status(repo, "READY")
+    out = collect_autobuilder_status(repo)
+    write_status_artifact(repo, out)
+    return {"action": "clear_stale", "cleared": True, "phase": out.get("phase")}
+
+
+def action_force_closeout(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Mark product ready + run_ppe_local when watcher dedup skipped."""
+    import subprocess
+
+    repo = repo.resolve()
+    snap = status or collect_autobuilder_status(repo)
+    build = snap.get("build") or {}
+    closeout = snap.get("closeout") or {}
+    slice_id = str(build.get("slice_id") or closeout.get("slice_id") or "").strip()
+    plan_path = str(build.get("plan_path") or "").strip()
+    if not slice_id or not plan_path:
+        return {"action": "force_closeout", "started": False, "reason": "no slice/plan resolved"}
+
+    from scripts.ppe_ide_product_ready import mark_product_ready
+
+    rc, msg = mark_product_ready(repo, slice_id=slice_id, plan_path=plan_path)
+    if rc != 0:
+        return {"action": "force_closeout", "started": False, "reason": msg, "rc": rc}
+
+    proc = subprocess.run(
+        ["cmd", "/c", "run_ppe_local.cmd"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    out = collect_autobuilder_status(repo)
+    write_status_artifact(repo, out)
+    return {
+        "action": "force_closeout",
+        "started": True,
+        "slice_id": slice_id,
+        "mark": msg,
+        "run_ppe_local_exit": proc.returncode,
+        "phase": out.get("phase"),
+    }
+
+
+def action_finish_pending(repo: Path, *, force: bool = False) -> dict[str, Any]:
     from scripts.ppe_post_build_watcher import try_finish_pending_ide_build
 
     result = try_finish_pending_ide_build(repo.resolve())
+    if force or (
+        result.get("skipped")
+        and "already finished" in str(result.get("reason") or "")
+    ):
+        forced = action_force_closeout(repo)
+        if forced.get("started"):
+            forced["action"] = ACTION_FINISH_PENDING
+            forced["watcher"] = result
+            return forced
     status = collect_autobuilder_status(repo)
     write_status_artifact(repo, status)
     return {"action": ACTION_FINISH_PENDING, **result, "phase": status.get("phase")}
@@ -527,14 +715,33 @@ def action_advance(repo: Path) -> dict[str, Any]:
     phase = str(status.get("phase") or "")
     recommended = str(status.get("recommended_action") or ACTION_STATUS)
 
+    if phase == PHASE_STUCK:
+        state = load_phase_state(repo)
+        underlying = str(state.get("phase") or PHASE_AWAITING_BUILD)
+        if underlying == PHASE_STALE_STATE:
+            cleared = action_clear_stale_manifest(repo)
+            if cleared.get("cleared"):
+                return action_advance(repo)
+        if underlying == PHASE_CLOSEOUT_PENDING:
+            return action_finish_pending(repo, force=True)
+        if underlying in (PHASE_AWAITING_BUILD, PHASE_DEGRADED):
+            return action_handoff(repo)
+        return run_diagnose(repo)
+
+    if phase == PHASE_STALE_STATE:
+        cleared = action_clear_stale_manifest(repo)
+        if cleared.get("cleared"):
+            return action_advance(repo)
+        return run_diagnose(repo)
+
     if phase == PHASE_STACK_DOWN:
         return action_ensure(repo)
-    if phase == PHASE_AWAITING_BUILD:
+    if phase == PHASE_AWAITING_BUILD or phase == PHASE_DEGRADED:
         if status.get("dispatch", {}).get("prefer_ide") or status.get("dispatch", {}).get("degraded"):
             return action_handoff(repo)
         return action_retry_build(repo)
     if phase == PHASE_CLOSEOUT_PENDING:
-        return action_finish_pending(repo)
+        return action_finish_pending(repo, force=True)
     if phase == PHASE_RUN_LOCAL_PENDING:
         return action_run_local(repo)
     if recommended == ACTION_DIAGNOSE:

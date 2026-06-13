@@ -124,50 +124,11 @@ def _maybe_auto_remote_build(
     *,
     retry: bool = False,
 ) -> dict[str, Any] | None:
-    from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
-    from scripts.ppe_operator_config import auto_remote_build_enabled
-    from scripts.ppe_remote_build_agent import read_build_lock, resolve_build_target
-
-    if not auto_remote_build_enabled(repo) and not ide_handoff_enabled(repo):
+    try:
+        from scripts.ppe_autobuilder_dispatch import maybe_dispatch_watch
+    except ImportError:
         return None
-    if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
-        return None
-
-    target = resolve_build_target(repo)
-    if not target.get("ok") or target.get("mode") != "ide_build":
-        return None
-
-    slice_id = str(target.get("slice_id") or "")
-    if not slice_id:
-        return None
-
-    if read_build_lock(repo):
-        return None
-
-    prior_verdict_slice = str(prior.get("last_verdict_slice") or "")
-    last_auto = prior.get("last_auto_build") or {}
-    if not retry:
-        if (
-            str(prior.get("last_verdict") or "") == VERDICT_IDE_BUILD
-            and prior_verdict_slice == slice_id
-            and last_auto.get("started")
-            and str(last_auto.get("slice_id") or prior.get("last_auto_build_slice") or "") == slice_id
-        ):
-            return None
-    elif not _auto_build_retry_due(prior, VERDICT_IDE_BUILD):
-        return None
-    elif prior_verdict_slice and prior_verdict_slice != slice_id:
-        return None
-
-    note = "auto-triggered by mobile watch on IDE_BUILD"
-    if retry:
-        note = "auto-retry by mobile watch (IDE_BUILD still stuck)"
-    return respond_to_ide_build(
-        repo,
-        source="auto-watch",
-        note=note,
-        force_handoff=retry and bool(prior.get("last_auto_build")),
-    )
+    return maybe_dispatch_watch(repo, status, prior, retry=retry)
 
 
 def _stuck_alert_due(prior: dict[str, Any], verdict: str) -> bool:
