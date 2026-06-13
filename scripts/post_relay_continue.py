@@ -218,7 +218,6 @@ def main(argv: list[str] | None = None) -> int:
                 next_chapter=next_chapter,
             )
             if not next_chapter:
-                from scripts.ppe_manifest import load_manifest
                 from scripts.ppe_progress_notify import notify_pipeline_idle
                 from scripts.ppe_queue import load_queue
 
