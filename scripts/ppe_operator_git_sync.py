@@ -90,7 +90,7 @@ def _ahead_count(repo: Path, *, branch: str, remote: str = "origin") -> int:
     return 0
 
 
-def _dirty_paths(repo: Path) -> list[str]:
+def _dirty_paths(repo: Path, *, for_loop_host: bool = False) -> list[str]:
     proc = _git(repo, "status", "--porcelain")
     if proc.returncode != 0:
         return []
@@ -101,11 +101,33 @@ def _dirty_paths(repo: Path) -> list[str]:
         p = line[3:].strip().replace("\\", "/")
         if p and not p.startswith("_worktrees/"):
             paths.append(p)
+    if for_loop_host:
+        try:
+            from scripts.repo_layer_paths import is_preflight_dirty_exempt
+
+            paths = [p for p in paths if not is_preflight_dirty_exempt(p)]
+        except ImportError:
+            pass
     return paths
 
 
+_LOOP_HOST_TRANSIENT_PREFIXES: tuple[str, ...] = (
+    "ops/",
+    "build/auto/",
+    "control-plane/",
+    "charter/",
+    "fix/",
+)
+
+
+def _loop_host_transient_branch(current: str, target: str) -> bool:
+    if not current or current == target:
+        return False
+    return any(current.startswith(prefix) for prefix in _LOOP_HOST_TRANSIENT_PREFIXES)
+
+
 def ensure_main_on_loop_host(repo: Path) -> dict[str, Any]:
-    """When loop host is on a clean ops/* branch, checkout main so pullEachPass works."""
+    """When loop host is on a transient branch, checkout main so pullEachPass works."""
     repo = repo.resolve()
     cfg = _git_sync_cfg(repo)
     if cfg.get("checkoutMainWhenOpsBranch", True) is False:
@@ -114,10 +136,11 @@ def ensure_main_on_loop_host(repo: Path) -> dict[str, Any]:
     current = _current_branch(repo)
     if not current or current == target:
         return {"action": "checkout", "skipped": True, "reason": "already on pull branch"}
-    if not current.startswith("ops/"):
-        return {"action": "checkout", "skipped": True, "reason": f"branch {current!r} not ops/*"}
-    if _dirty_paths(repo):
-        return {"action": "checkout", "skipped": True, "reason": "dirty working tree", "branch": current}
+    if not _loop_host_transient_branch(current, target):
+        return {"action": "checkout", "skipped": True, "reason": f"branch {current!r} not loop-host transient"}
+    dirty = _dirty_paths(repo, for_loop_host=True)
+    if dirty:
+        return {"action": "checkout", "skipped": True, "reason": "dirty working tree", "branch": current, "dirty": dirty}
     fetch = _git(repo, "fetch", "origin")
     if fetch.returncode != 0:
         return {

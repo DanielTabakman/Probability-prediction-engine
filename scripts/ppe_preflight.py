@@ -17,6 +17,40 @@ from scripts.ppe_manifest import (
 from scripts.ppe_queue_health import run_queue_health
 
 
+def maybe_clear_stale_active_run(repo: Path, manifest: dict[str, object]) -> str | None:
+    """Remove stale ACTIVE_RUN when manifest is idle or slice already completed."""
+    active_path = repo / "artifacts" / "orchestrator" / "ACTIVE_RUN.json"
+    if not active_path.is_file():
+        return None
+
+    status = str(manifest.get("status") or "").upper()
+    plan_path = str(manifest.get("phasePlanPath") or "").strip()
+    reason = ""
+
+    if status in ("READY", "COMPLETE", ""):
+        reason = f"manifest status {status or 'empty'}"
+    elif plan_path:
+        try:
+            active = json.loads(active_path.read_text(encoding="utf-8-sig"))
+            sid = str(active.get("slice_id") or active.get("sliceId") or "").strip()
+            if sid:
+                from scripts.ppe_phase_plan_window import completed_slice_ids
+
+                if sid in completed_slice_ids(repo, plan_path):
+                    reason = f"slice {sid} already completed for plan"
+        except (json.JSONDecodeError, OSError, ValueError):
+            pass
+
+    if not reason:
+        return None
+
+    try:
+        active_path.unlink(missing_ok=True)
+    except OSError:
+        return None
+    return reason
+
+
 def _orchestrator_root(repo_root: Path) -> Path | None:
     # Windows note: some setups have Desktop on a different drive than USERPROFILE
     # (e.g., repo at D:\Users\User\Desktop\...). Prefer detecting Desktop from repo_root
@@ -68,6 +102,10 @@ def run_preflight(
             warnings.append("manifest status is RUNNING (prior run may have aborted)")
 
     active_run = repo / "artifacts" / "orchestrator" / "ACTIVE_RUN.json"
+    if manifest:
+        cleared = maybe_clear_stale_active_run(repo, manifest)
+        if cleared:
+            warnings.append(f"cleared stale ACTIVE_RUN ({cleared})")
     if active_run.is_file():
         warnings.append(f"ACTIVE_RUN present: {active_run.as_posix()} (stale or in-flight)")
 
@@ -126,11 +164,11 @@ def run_preflight(
     manifest_status = str(manifest.get("status") or "") if manifest else ""
     if manifest_status in ("RUNNING", "READY") or active_run.is_file():
         try:
-            from scripts.repo_layer_paths import audit_git_dirty, scope_for_active_manifest
+            from scripts.repo_layer_paths import audit_git_dirty_preflight, scope_for_active_manifest
 
             scope = scope_for_active_manifest(repo)
             if scope is not None:
-                dirty_v = audit_git_dirty(repo, scope)
+                dirty_v = audit_git_dirty_preflight(repo, scope)
                 if dirty_v:
                     layer_errors.extend(dirty_v)
                 else:
