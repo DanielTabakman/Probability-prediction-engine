@@ -2,9 +2,32 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from scripts.ppe_desktop_operator_stack import NTFY_LISTEN_PATTERN, ensure_stack, stack_status
+from scripts.ppe_desktop_operator_stack import (
+    NTFY_LISTEN_PATTERN,
+    LOOP_CMD_PATTERN,
+    _powershell_process_match,
+    ensure_stack,
+    stack_status,
+)
+
+
+def test_powershell_process_match_excludes_probe_command():
+    captured: list[str] = []
+
+    def _run(cmd, **kwargs):
+        captured.append(cmd[-1])
+        return MagicMock(stdout="no", returncode=0)
+
+    with patch("scripts.ppe_desktop_operator_stack.subprocess.run", side_effect=_run):
+        assert _powershell_process_match(LOOP_CMD_PATTERN) is False
+
+    assert captured
+    script = captured[-1]
+    assert "Get-CimInstance Win32_Process" in script
+    assert LOOP_CMD_PATTERN.split("|")[0] in script
+    assert "powershell.exe" in script
 
 
 def test_ntfy_listen_pattern_requires_python_process():

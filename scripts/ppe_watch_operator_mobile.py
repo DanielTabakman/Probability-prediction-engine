@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -256,6 +257,52 @@ def _ntfy_listen_restart_debounce_sec() -> int:
         return 60
 
 
+def _loop_restart_debounce_sec() -> int:
+    raw = os.environ.get("PPE_LOOP_RESTART_SEC", "120").strip()
+    try:
+        return max(60, int(raw))
+    except ValueError:
+        return 120
+
+
+def _loop_down_alert_hours() -> float:
+    raw = os.environ.get("PPE_NTFY_LOOP_DOWN_HOURS", "4").strip()
+    try:
+        return max(1.0, float(raw))
+    except ValueError:
+        return 4.0
+
+
+def _loop_down_alert_due(prior: dict[str, Any]) -> bool:
+    """Repeat loop-down ntfy when auto-restart did not stick."""
+    last = _parse_utc(str(prior.get("last_loop_down_alert_at") or ""))
+    if last is None:
+        return True
+    if last.tzinfo is None:
+        last = last.replace(tzinfo=timezone.utc)
+    elapsed_h = (datetime.now(timezone.utc) - last).total_seconds() / 3600.0
+    return elapsed_h >= _loop_down_alert_hours()
+
+
+def _maybe_ensure_auto_loop(repo: Path, prior: dict[str, Any], *, verdict: str) -> dict[str, Any] | None:
+    """Start the auto-loop when operator expects RUN_AUTO but the loop process is missing."""
+    from scripts.ppe_desktop_operator_stack import is_loop_running, start_loop_only
+
+    if verdict != VERDICT_RUN_AUTO or is_loop_running():
+        return None
+
+    last_attempt = _parse_utc(str(prior.get("last_loop_restart_at") or ""))
+    if last_attempt is not None:
+        if last_attempt.tzinfo is None:
+            last_attempt = last_attempt.replace(tzinfo=timezone.utc)
+        elapsed = (datetime.now(timezone.utc) - last_attempt).total_seconds()
+        if elapsed < _loop_restart_debounce_sec():
+            return None
+
+    start_loop_only(repo)
+    return {"restarted": True, "at": _utc_now()}
+
+
 def _maybe_ensure_ntfy_listener(repo: Path, prior: dict[str, Any]) -> dict[str, Any] | None:
     """Start the phone-command listener when its Python process is missing."""
     from scripts.ppe_ntfy_commands import commands_enabled
@@ -286,9 +333,12 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         write_status_report(repo, status)
 
     verdict = str(status.get("verdict") or "")
-    loop_running = is_loop_running()
     prior = load_state(repo)
     ntfy_listen_ensure = _maybe_ensure_ntfy_listener(repo, prior)
+    loop_ensure = _maybe_ensure_auto_loop(repo, prior, verdict=verdict)
+    if loop_ensure:
+        time.sleep(3)
+    loop_running = is_loop_running()
 
     reset_quiet_stuck_if_awake(repo)
 
@@ -350,6 +400,13 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                 format_phone_alert_body(status, kind="loop_down"),
             )
         )
+    elif not loop_running and verdict == VERDICT_RUN_AUTO and _loop_down_alert_due(prior):
+        alerts.append(
+            (
+                "PPE loop stopped",
+                format_phone_alert_body(status, kind="loop_down"),
+            )
+        )
 
     morning_report: dict[str, Any] | None = None
     try:
@@ -373,12 +430,15 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
 
     sent = 0
     stuck_alert_sent = False
+    loop_down_alert_sent = False
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
             priority = "urgent" if title == "PPE loop stopped" else "high"
             tags = ["ppe", "watch", "stuck"] if "still stuck" in title.lower() else ["ppe", "watch"]
             if send_ntfy(title, body, tags=tags, priority=priority):
                 sent += 1
+                if title == "PPE loop stopped":
+                    loop_down_alert_sent = True
                 if "still stuck" in title.lower():
                     stuck_alert_sent = True
                     if is_ntfy_quiet_hours():
@@ -404,6 +464,10 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "last_stuck_alert_at": _utc_now()
         if stuck_alert_sent or (verdict in STUCK_VERDICTS and verdict != prior_verdict and sent)
         else prior.get("last_stuck_alert_at"),
+        "last_loop_restart_at": loop_ensure["at"] if loop_ensure else prior.get("last_loop_restart_at"),
+        "last_loop_down_alert_at": _utc_now()
+        if loop_down_alert_sent
+        else prior.get("last_loop_down_alert_at"),
     }
     if ntfy_listen_ensure:
         new_state["last_ntfy_listen_restart_at"] = ntfy_listen_ensure["at"]
@@ -435,6 +499,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "post_build_finish": post_finish,
         "morning_report": morning_report,
         "ntfy_listen_ensure": ntfy_listen_ensure,
+        "loop_ensure": loop_ensure,
         "state_path": str(state_path(repo)),
     }
 

@@ -12,12 +12,16 @@ from typing import Any
 LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
 NTFY_LISTEN_PATTERN = r"ppe_ntfy_listen\.py"
+# Exclude the probe PowerShell process: its -Command embeds the search pattern and self-matches.
+_PROCESS_PROBE_EXCLUDE = (
+    "$_.Name -ne 'powershell.exe' -or $_.CommandLine -notmatch 'Get-CimInstance Win32_Process'"
+)
 
 
 def _powershell_process_match(pattern: str) -> bool:
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.CommandLine -match '{pattern}' }}; "
+        f"Where-Object {{ $_.CommandLine -match '{pattern}' -and ({_PROCESS_PROBE_EXCLUDE}) }}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:

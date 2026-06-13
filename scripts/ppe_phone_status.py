@@ -67,9 +67,11 @@ def verdict_headline(verdict: str) -> str:
     }.get(verdict, verdict.replace("_", " ").title())
 
 
-def phone_status_title(status: dict[str, Any]) -> str:
+def phone_status_title(status: dict[str, Any], *, stack: dict[str, Any] | None = None) -> str:
     verdict = str(status.get("verdict") or "UNKNOWN")
     if verdict in ("RUN_AUTO", "RUN_LOCAL"):
+        if stack is not None and not stack.get("loop_running"):
+            return "PPE: Loop stopped"
         return "PPE: All good"
     if verdict == "IDE_BUILD":
         slice_id = _extract_slice_id(str(status.get("blocker") or ""))
@@ -87,9 +89,16 @@ def _stack_line(stack: dict[str, Any] | None) -> str:
     return f"Desktop: loop {loop} · watch {watch} · phone cmds {listen}"
 
 
-def _next_step(status: dict[str, Any], *, slice_id: str | None) -> str:
+def _next_step(
+    status: dict[str, Any],
+    *,
+    slice_id: str | None,
+    stack: dict[str, Any] | None = None,
+) -> str:
     verdict = str(status.get("verdict") or "")
     if verdict in ("RUN_AUTO", "SUPPLY_LOW"):
+        if verdict == "RUN_AUTO" and stack is not None and not stack.get("loop_running"):
+            return "Auto-loop is off on the desktop — watch will restart it, or run run_ppe_auto_local_loop.cmd."
         return "Nothing needed on your phone - auto-loop is running."
     if verdict == "RUN_LOCAL":
         return "Run finish on the desktop (run_ppe_local.cmd), then loop continues."
@@ -146,7 +155,7 @@ def format_phone_status(
         lines.append(detail)
 
     lines.append("")
-    lines.append(_next_step(status, slice_id=slice_id))
+    lines.append(_next_step(status, slice_id=slice_id, stack=stack))
 
     if stack is not None:
         lines.append("")

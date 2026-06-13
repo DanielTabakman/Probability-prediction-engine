@@ -124,3 +124,36 @@ def test_watch_once_restarts_dead_ntfy_listener(tmp_path, monkeypatch):
 
     start.assert_called_once_with(tmp_path.resolve())
     assert result["ntfy_listen_ensure"]["restarted"] is True
+
+
+def test_watch_once_restarts_dead_auto_loop(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    status = {"verdict": "RUN_AUTO", "blocker": None, "commands": []}
+
+    with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_desktop_operator_stack.is_loop_running", side_effect=[False, True]):
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_watch_operator_mobile.time.sleep"):
+                    with patch("scripts.ppe_desktop_operator_stack.start_loop_only") as start:
+                        result = watch_once(tmp_path, write_report=False)
+
+    start.assert_called_once_with(tmp_path.resolve())
+    assert result["loop_ensure"]["restarted"] is True
+    assert result["alerts"] == []
+
+
+def test_watch_once_alerts_when_loop_down(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    status = {"verdict": "RUN_AUTO", "blocker": None, "commands": []}
+
+    with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_desktop_operator_stack.is_loop_running", return_value=False):
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_watch_operator_mobile.time.sleep"):
+                    with patch("scripts.ppe_desktop_operator_stack.start_loop_only"):
+                        with patch("scripts.ppe_watch_operator_mobile.send_ntfy", return_value=True) as send:
+                            result = watch_once(tmp_path, write_report=False)
+
+    assert result["alerts_sent"] == 1
+    assert send.call_args[0][0] == "PPE loop stopped"

@@ -83,7 +83,8 @@ def stop_stack_processes() -> int:
     ps = (
         "$k=0; Get-CimInstance Win32_Process -EA SilentlyContinue | "
         "Where-Object { $_.CommandLine -match 'run_ppe_auto_local_loop|watch_operator_mobile' "
-        "-and $_.CommandLine -notmatch 'ppe_ntfy_listen' } | "
+        "-and $_.CommandLine -notmatch 'ppe_ntfy_listen' "
+        "-and ($_.Name -ne 'powershell.exe' -or $_.CommandLine -notmatch 'Get-CimInstance Win32_Process') } | "
         "ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++ }; $k"
     )
     try:
@@ -109,7 +110,7 @@ def execute_status(repo: Path) -> dict[str, Any]:
     status = collect_operator_status(repo)
     stack = stack_status()
     body = format_phone_status(status, stack=stack, repo=repo)
-    title = phone_status_title(status)
+    title = phone_status_title(status, stack=stack)
     sent = send_ntfy(
         title,
         body,

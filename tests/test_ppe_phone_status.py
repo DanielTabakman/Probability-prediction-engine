@@ -7,6 +7,20 @@ from scripts.ppe_phone_status import format_phone_status, phone_status_title, ve
 
 def test_phone_status_title_healthy():
     assert phone_status_title({"verdict": "RUN_AUTO"}) == "PPE: All good"
+    assert (
+        phone_status_title({"verdict": "RUN_AUTO"}, stack={"loop_running": False, "watch_running": True})
+        == "PPE: Loop stopped"
+    )
+
+
+def test_format_phone_status_loop_off():
+    body = format_phone_status(
+        {"verdict": "RUN_AUTO", "chapter_name": "PPE operator visibility v1", "commands": []},
+        stack={"loop_running": False, "watch_running": True, "ntfy_listen_running": True},
+        repo=None,
+    )
+    assert "loop off" in body
+    assert "Auto-loop is off" in body
 
 
 def test_phone_status_title_ide_build():
