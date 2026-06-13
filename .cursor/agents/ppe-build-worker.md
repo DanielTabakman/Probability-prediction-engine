@@ -27,9 +27,14 @@ python scripts/run_pushable_gate.py
 ## Finish sequence (required, in order)
 
 1. Commit on build branch with policy-style message.
+2. `ppe_ide_build_closeout.cmd <sliceId> <phasePlanPath>` — gate + mark ready + `run_ppe_local` (git-sync safe).
+
+Manual fallback if closeout script unavailable:
+
+1. `python scripts/run_pushable_gate.py`
 2. `mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`
-3. `run_ppe_local.cmd`
-4. Re-read `artifacts/orchestrator/OPERATOR_STATUS.md`
+3. `set PPE_GIT_SYNC_PULL=0` and `set PPE_GIT_SYNC_PUSH=0` when on `build/auto/*`
+4. `run_ppe_local.cmd`
 
 If `run_ppe_local.cmd` fails, fix and retry once; then stop with a short failure summary.
 

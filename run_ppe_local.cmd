@@ -13,6 +13,15 @@ set "PPE_WORKER_MODE=deterministic"
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
 
+REM Stay on build/auto/* during IDE closeout — git sync checkout to main breaks phase plan paths.
+if not defined PPE_GIT_SYNC_PULL (
+  for /f "delims=" %%b in ('git branch --show-current 2^>nul') do set "PPE_LOCAL_BRANCH=%%b"
+  if /i "!PPE_LOCAL_BRANCH:~0,11!"=="build/auto/" (
+    set "PPE_GIT_SYNC_PULL=0"
+    set "PPE_GIT_SYNC_PUSH=0"
+  )
+)
+
 python "%CD%\scripts\ppe_operator_git_sync.py" --repo-root "%CD%" --pull
 
 call "%CD%\run_ppe.cmd" %*

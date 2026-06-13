@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos p8 tester release + evidence-based next selection **COMPLETE** 2026-06-12
+- Active MVP1 focus: **none** — mvp1 cross-venue probability panel **COMPLETE** 2026-06-13
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS P8 tester release + evidence-based next selection COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MVP1 cross-venue probability panel COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -47,9 +47,9 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
+2. **Steward:** SELECTION — [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md).
 
 
 ## Last updated
 
-2026-06-12 — MSOS P8 tester release + evidence-based next selection COMPLETE; closeout job `MSOS-P8-Closeout-Slice005`.
+2026-06-13 — MVP1 cross-venue probability panel COMPLETE; closeout job `MVP1-CrossVenue-Closeout-Slice006`.

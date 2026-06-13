@@ -1,0 +1,96 @@
+{
+  "name": "MVP1_cross_venue_prob_panel (Polymarket vs options P(>K) export)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-CrossVenue-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Control-Slice001-cross_venue",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-CrossVenue-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Product-Slice002-cross_venue",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/cross_venue_export.py",
+        "tests/test_cross_venue_export.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenue-Product-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Product-Slice003-cross_venue",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app.py",
+        "tests/test_cross_venue_export.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenue-Product-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Product-Slice004-cross_venue",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/collect_cross_venue_snapshot.py",
+        "docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MVP1-CrossVenue-Smoke-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Smoke-Slice005-cross_venue",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-CrossVenue-Closeout-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+      "buildBranch": "build/auto/MVP1-CrossVenue-Closeout-Slice006-cross_venue",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_cross_venue_prob_panel",
+        "chapterTitle": "MVP1 cross-venue probability panel",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md",
+          "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}
