@@ -12,7 +12,9 @@ from scripts.ppe_auto_select import run_auto_select
 from scripts.ppe_focus_gate import (
     evaluate_focus_gate,
     format_ide_focus_block,
+    infer_focus_playbook_tier_from_reason,
     validation_report_blocks_selection,
+    validation_report_gate_issues,
     validation_report_status,
 )
 from scripts.ppe_manifest import save_manifest
@@ -165,6 +167,45 @@ class TestPpeFocusGate(unittest.TestCase):
         out = propagate_from_backlog(self.repo, apply=True)
         self.assertFalse(out.get("propagated"))
         self.assertIn("focus gate", str(out.get("reason", "")))
+
+    def test_p2_low_priority_bypasses_draft_report(self) -> None:
+        self._write_draft_report()
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "ch",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "P2",
+                            "priority": "low",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        focus = evaluate_focus_gate(self.repo, self.plan_rel)
+        self.assertTrue(focus.allowed)
+        self.assertIn("P2 low-priority", focus.reason)
+
+    def test_infer_focus_playbook_tier_from_reason(self) -> None:
+        self.assertEqual(infer_focus_playbook_tier_from_reason("[LOW] quant"), "P2")
+        self.assertEqual(infer_focus_playbook_tier_from_reason("[P3] distro"), "P3")
+
+    def test_validation_report_gate_issues_when_p8_complete_but_report_draft(self) -> None:
+        self._write_draft_report()
+        p8 = self.repo / "docs" / "SOP" / "MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md"
+        p8.write_text("**Status:** **COMPLETE** 2026-06-12\n", encoding="utf-8")
+        issues = validation_report_gate_issues(self.repo)
+        self.assertEqual(len(issues), 1)
+        self.assertIn("focus_gate", issues[0])
+
+    def test_validation_report_gate_issues_clear_when_complete(self) -> None:
+        self._write_complete_report()
+        p8 = self.repo / "docs" / "SOP" / "MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md"
+        p8.write_text("**Status:** **COMPLETE** 2026-06-12\n", encoding="utf-8")
+        self.assertEqual(validation_report_gate_issues(self.repo), [])
 
     def test_format_ide_focus_block(self) -> None:
         text = format_ide_focus_block(tier="P2", urgent_bypass=False)

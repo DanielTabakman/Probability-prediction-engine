@@ -55,7 +55,8 @@
         "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
         "carryDocs": [
           "docs/SOP/VALIDATION_REALITY_CHECKS.md",
-          "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md"
+          "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
+          "docs/SOP/MSOS_P8_VALIDATION_REPORT_V1.md"
         ]
       }
     }

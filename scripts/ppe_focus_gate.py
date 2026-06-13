@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 VALIDATION_REPORT_REL = "docs/SOP/MSOS_P8_VALIDATION_REPORT_V1.md"
+P8_EVIDENCE_REL = "docs/SOP/MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md"
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 QUEUE_REL = "docs/SOP/PHASE_QUEUE.json"
 
@@ -81,15 +82,32 @@ def _item_urgent(item: dict[str, Any]) -> bool:
     return False
 
 
+def infer_focus_playbook_tier_from_reason(reason: str) -> str:
+    """Map backlog/queue reason tags to playbook tier when focusPlaybookTier omitted."""
+    text = str(reason or "")
+    m = re.search(r"\[(P0|P1|P2|P3|P4|defer|LOW|MEDIUM|HIGH)\]", text, re.IGNORECASE)
+    if not m:
+        return "P2"
+    tag = m.group(1).upper()
+    if tag in ("P0", "P1", "P2", "P3", "P4"):
+        return tag
+    if tag in ("LOW", "MEDIUM"):
+        return "P2"
+    if tag == "HIGH":
+        return "P1"
+    return "P2"
+
+
 def _tier_from_item(item: dict[str, Any]) -> str:
     tier = str(item.get("focusPlaybookTier") or "").strip()
     if tier:
         return tier
-    reason = str(item.get("reason") or "")
-    m = re.search(r"\[(P0|P1|P2|P3|P4|defer)\]", reason, re.IGNORECASE)
-    if m:
-        return m.group(1).upper() if m.group(1).lower() != "defer" else "defer"
-    return "P2"
+    return infer_focus_playbook_tier_from_reason(str(item.get("reason") or ""))
+
+
+def _priority_from_item(item: dict[str, Any]) -> str:
+    raw = str(item.get("priority") or "medium").strip().lower()
+    return raw if raw in ("high", "medium", "low") else "medium"
 
 
 def backlog_item_for_plan(repo: Path, plan_path: str) -> dict[str, Any] | None:
@@ -160,6 +178,17 @@ def evaluate_focus_gate(repo: Path, plan_path: str) -> FocusGateResult:
             tier=tier,
         )
 
+    priority = _priority_from_item(meta)
+    if tier == "P2" and priority == "low":
+        return FocusGateResult(
+            allowed=True,
+            reason=(
+                "P2 low-priority lab legibility — validation gate deferred "
+                "(see BACKLOG_OPERATOR.md priority=low)"
+            ),
+            tier=tier,
+        )
+
     status = validation_report_status(repo)
     return FocusGateResult(
         allowed=False,
@@ -190,3 +219,45 @@ def focus_gate_skip_code() -> int:
     from scripts.ppe_operator_guards import GUARD_SKIP_CHAPTER
 
     return GUARD_SKIP_CHAPTER
+
+
+def _p8_chapter_marked_complete(repo: Path) -> bool:
+    p = repo / P8_EVIDENCE_REL
+    if not p.is_file():
+        return False
+    head = p.read_text(encoding="utf-8", errors="replace")[:1200]
+    return bool(re.search(r"\*\*Status:\*\*\s*\*\*COMPLETE\*\*", head, re.IGNORECASE))
+
+
+def validation_report_gate_issues(repo: Path) -> list[str]:
+    """Hard health issues: P8 evidence COMPLETE but validation report still blocks selection."""
+    if not focus_gate_enabled():
+        return []
+    if not _p8_chapter_marked_complete(repo):
+        return []
+    status = validation_report_status(repo)
+    if status == "COMPLETE":
+        return []
+    return [
+        "focus_gate: P8 evidence COMPLETE but "
+        f"{VALIDATION_REPORT_REL} is {status} — complete §1–§5 and set **Status:** **COMPLETE** "
+        "(see MSOS_P8_VALIDATION_REPORT_V1.md)"
+    ]
+
+
+def focus_gate_status_summary(repo: Path, plan_path: str | None = None) -> dict[str, Any]:
+    """Machine-readable snapshot for operator status."""
+    report = validation_report_status(repo)
+    blocks = validation_report_blocks_selection(repo)
+    out: dict[str, Any] = {
+        "report_status": report,
+        "blocks_selection": blocks,
+        "enabled": focus_gate_enabled(),
+        "issues": validation_report_gate_issues(repo),
+    }
+    if plan_path:
+        result = evaluate_focus_gate(repo, plan_path)
+        out["next_plan"] = _norm_plan(plan_path)
+        out["next_allowed"] = result.allowed
+        out["next_reason"] = result.reason
+    return out
