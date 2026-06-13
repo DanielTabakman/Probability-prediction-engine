@@ -1,8 +1,8 @@
+# Manual uptime probe — scheduled runs were removed to cut Actions minutes (see docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md).
+# For continuous checks, use VPS cron + curl instead of GitHub-hosted runners.
 name: Uptime healthcheck
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -32,4 +32,3 @@ jobs:
             exit 1
           fi
           echo "OK"
-

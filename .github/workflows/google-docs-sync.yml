@@ -11,9 +11,6 @@ on:
         description: "Sync repo MSOS snapshot into MSOS mirror Google Doc marker block"
         required: true
         default: "true"
-  schedule:
-    # Daily 13:15 UTC (adjust as needed).
-    - cron: "15 13 * * *"
 
 permissions:
   contents: write

@@ -35,7 +35,7 @@ Work through these once per VPS (or when keys/users change). Details and securit
 3. **Git “dubious ownership”:** if you run `git` as a different user than the directory owner, either use the owning user for all `git`/`docker` work or add `git config --global --add safe.directory /opt/marketstructureos` for that user (prefer non-root owner + consistent user).
 4. **Non-interactive `git pull`:** add a **read-only deploy key** on the GitHub repo and the matching private key + `~/.ssh/config` block for `Host github.com` / `IdentityFile` on the VPS (so `git pull` never prompts).
 5. **Docker:** the deploy user can run `docker compose` in `/opt/marketstructureos` (typically **member of `docker` group**). If you require `sudo`, update the workflow script or manual commands accordingly.
-6. **GitHub Actions:** add repository secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`; merge [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) to **`main`**; confirm a green **Deploy VPS** run (push to `main` or **Run workflow**).
+6. **GitHub Actions:** add repository secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`; merge [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) to **`main`**; confirm a green **Deploy VPS** run (**Run workflow**).
 
 ## C) Standard release protocol (every change you ship)
 
@@ -43,11 +43,12 @@ Work through these once per VPS (or when keys/users change). Details and securit
 
 1. Implement on a **feature branch**; open a PR to **`main`** when ready; enable **auto-merge** on the PR.
 2. Wait for **`CI / pytest`** and **`CI / docker_entrypoint`** to pass; GitHub merges to **`main`** without a manual merge click when auto-merge is enabled.
-3. **Deploy:** pushes to **`main`** trigger [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) when secrets are set. Optionally confirm **Actions → Deploy VPS** for that commit, or use **Run workflow** to redeploy the same commit.
+3. **Deploy:** **Actions → Deploy VPS → Run workflow**, or SSH manual deploy (see [GITHUB_ACTIONS_VPS_DEPLOY.md](GITHUB_ACTIONS_VPS_DEPLOY.md)). Merges to `main` do **not** auto-deploy.
 4. **If Actions is off or failing:** SSH to the VPS and run the manual block (same as [DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §4), but **first** ensure you are on **`main`**:  
    `cd /opt/marketstructureos`  
    `git checkout main && git pull origin main`  
-   `docker compose up -d --build`
+   `docker compose up -d --build`  
+   `docker compose up -d --force-recreate caddy msos_web`
 5. **Post-deploy smoke:**  
    - **Automated:** [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) curls `https://marketstructureos.com/` and fails if the HTML contains `ModuleNotFoundError` or a Python traceback.  
    - **Steward (optional cadence):** confirm the demo loads as expected; DevTools → Network: `/static/js/` loads over **https**; `https://app.marketstructureos.com` — Cloudflare Access and full app after login (see runbook).

@@ -41,7 +41,7 @@ GOOGLE_DOCS_REFRESH keeps the Google Docs control plane aligned with repo truth,
 ### Triggers
 
 - **Manual**: founder says “refresh Google Docs”.
-- **Daily scheduled refresh** (GitHub Actions).
+- **Manual refresh** (GitHub Actions → **Google Docs sync**).
 - **After closeout** (best-effort mirror refresh chained from closeout).
 - **After deployment changes** (domain / hosting / pipeline changes; redeploys; env changes).
 - **After naming / control-plane changes** (doc ids, marker names, SOP names, control-plane file paths).

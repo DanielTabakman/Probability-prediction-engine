@@ -1,4 +1,4 @@
-# GitHub Actions: deploy to VPS on `main`
+# GitHub Actions: deploy to VPS (manual)
 
 This repository includes [`.github/workflows/deploy-vps.yml`](../../.github/workflows/deploy-vps.yml), which **SSHs into your VPS** and runs the same deploy commands as [RUNBOOK_VPS_CLOUDFLARE_ACCESS.md](RUNBOOK_VPS_CLOUDFLARE_ACCESS.md) section **10) Deploy updates**:
 
@@ -6,19 +6,43 @@ This repository includes [`.github/workflows/deploy-vps.yml`](../../.github/work
 cd /opt/marketstructureos
 git pull
 docker compose up -d --build
+docker compose up -d --force-recreate caddy msos_web
+```
+
+## Actions usage policy (2026-06)
+
+We **minimize** GitHub-hosted runner minutes:
+
+| Workflow | Trigger |
+|----------|---------|
+| **CI** | Pull requests to `main` only (not push to `main`) |
+| **Deploy VPS** | **Manual** (`workflow_dispatch`) — not on every merge |
+| **Uptime healthcheck** | **Manual** — use VPS cron for scheduled probes |
+| **Google Docs sync** / **Dev changelog** | **Manual** |
+| **Weekly digest** / **Codebase health** | Weekly schedule (low volume) |
+
+**Public repo:** standard Linux runners are free for public repositories. **Private** repos on GitHub Free still count against the monthly minute pool.
+
+**After merge to `main`:** run **Actions → Deploy VPS → Run workflow**, or SSH deploy (below). CI does not re-run on `main` pushes.
+
+**VPS cron uptime (optional, zero GitHub minutes):**
+
+```bash
+# /etc/cron.d/msos-health — example: every 30 minutes
+*/30 * * * * root curl -fsS --max-time 60 https://marketstructureos.com/ >/dev/null || logger -t msos-health 'homepage check failed'
 ```
 
 ## Related
 
 - **[PRODUCTION_DEPLOY_PROTOCOL.md](../SOP/PRODUCTION_DEPLOY_PROTOCOL.md)** — canonical rule: production tracks **`main`** on the VPS; when to rely on this Action vs manual SSH.
-- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when the **CI** workflow is green (**`CI / pytest`** + **`CI / docker_entrypoint`**); branch protection (when available) can require both. **Merge on green** merges only when the whole `ci.yml` run succeeds, so both jobs must pass. After that merge, **this** workflow is what updates the site (no separate human deploy step).
+- **[GITHUB_ZERO_TOUCH_MERGE.md](../SOP/GITHUB_ZERO_TOUCH_MERGE.md)** — PR **auto-merge** when the **CI** workflow is green (**`CI / pytest`** + **`CI / docker_entrypoint`**). After merge, **deploy manually** (this workflow or SSH).
 
 ## When it runs
 
-- **Every push to `main`** (including merges that land on `main`).
-- **Manual:** GitHub → **Actions** → **Deploy VPS** → **Run workflow** (`workflow_dispatch`).
+- **Manual only:** GitHub → **Actions** → **Deploy VPS** → **Run workflow** (`workflow_dispatch`).
+- **Not** on every push to `main` (saves Actions minutes; merge does not auto-ship).
 
-Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newer push starts).
+Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newer run starts).
 
 ## Required repository secrets
 
