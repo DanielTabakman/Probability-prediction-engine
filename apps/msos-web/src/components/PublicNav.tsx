@@ -16,6 +16,9 @@ export function PublicNav() {
         <span>Market surfaces</span>
         <span>Vision</span>
         <div className="nav-actions">
+          <Link className="btn slim dark" href="/feedback">
+            Feedback
+          </Link>
           <span className="btn slim dark">Sign in</span>
           <Link className="btn slim primary" href="/command-center">
             Enter Command Center

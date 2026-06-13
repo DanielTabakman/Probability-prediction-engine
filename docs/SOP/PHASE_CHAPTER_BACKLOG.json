@@ -253,6 +253,14 @@
       "focusPlaybookTier": "defer",
       "canonRef": "docs/SOP/MVP1_MARKET_REGISTRY_PROGRAM_V1.md \u2014 chapter 4",
       "reason": "[LOW] Yahoo equity provider (NVDA pilot) \u2014 disabled by default until commercial pull"
+    },
+    {
+      "chapterId": "msos_web_feedback_capture_v1",
+      "status": "done",
+      "priority": "medium",
+      "focusPlaybookTier": "P0",
+      "canonRef": "apps/msos-web/README.md \u2014 Web feedback",
+      "reason": "[MEDIUM] Public 3-question web feedback + operator inbox + JSONL export \u2014 shipped direct"
     }
   ]
 }

@@ -6,6 +6,10 @@ services:
     container_name: msos_web
     environment:
       - PORT=3000
+      - PPE_WEB_FEEDBACK_DIR=/data
+      - MSOS_OPERATOR_EMAIL=${MSOS_OPERATOR_EMAIL:-}
+    volumes:
+      - ppe_web_feedback:/data
     restart: unless-stopped
     networks:
       - web
@@ -53,6 +57,8 @@ services:
 volumes:
   ppe_snapshots:
     name: ppe_snapshots
+  ppe_web_feedback:
+    name: ppe_web_feedback
   caddy_data:
   caddy_config:
 

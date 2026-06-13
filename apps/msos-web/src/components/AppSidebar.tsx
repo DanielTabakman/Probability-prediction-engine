@@ -51,6 +51,9 @@ export function AppSidebar({ activeNavId = "command-center" }: AppSidebarProps) 
         <span>Trust state</span>
         <span className="teal">Good</span>
       </div>
+      <Link href="/feedback" className="side-feedback-link">
+        Give feedback
+      </Link>
     </aside>
   );
 }

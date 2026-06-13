@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { lensTiles, outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { FeedbackForm } from "@/components/FeedbackForm";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 
 export function StrategyLabContent() {
@@ -119,6 +120,19 @@ export function StrategyLabContent() {
             </Link>
           </div>
         </div>
+      </section>
+
+      <section className="panel feedback-lab-panel">
+        <div className="panel-head compact">
+          <div>
+            <h2>Quick feedback</h2>
+            <div className="panel-sub">Three questions — helps us prioritize the research beta.</div>
+          </div>
+          <Link href="/feedback" className="btn slim dark">
+            Full page
+          </Link>
+        </div>
+        <FeedbackForm pagePath="/strategy-lab" compact />
       </section>
 
       <p className="footer-note">Research demo — fixture panels beside live PPE embed; no live order transmitted</p>
