@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "updated": "2026-06-13",
+  "title": "Guided tester session",
+  "subtitle": "Operator notebook — for you, not the demo audience",
+  "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
+  "demoUrl": "https://marketstructureos.com",
+  "steps": [
+    {
+      "id": "prep",
+      "phase": "Before",
+      "title": "Open the demo",
+      "context": "You are running a **guided research walkthrough**, not a sales pitch. The product explains curves and disagreement; your job is to keep the room calm and collect honest reactions.",
+      "goal": "Confirm the demo loads on the big screen before traders arrive.",
+      "do": [
+        "Open the demo URL on the laptop (screen share ready).",
+        "Sidebar: Bitcoin view ON.",
+        "Optional: Refresh priced inputs (Deribit) once so you are not waiting live."
+      ],
+      "say": null,
+      "ask": null,
+      "skip": null
+    },
+    {
+      "id": "intro",
+      "phase": "Live",
+      "title": "Set expectations",
+      "context": "Traders fear hot tips and black boxes. Lead with **not advice** and **structure legibility**.",
+      "goal": "They know this is exploration + feedback, not a trade recommendation.",
+      "do": [
+        "Face the room, not the keyboard.",
+        "Keep the chart visible if already loaded."
+      ],
+      "say": "This is a BTC options research cockpit — not advice. I'll show what the market prices in for an expiry, where a view might differ, and how payoff fits. About five minutes, then I want your honest reaction.",
+      "ask": null,
+      "skip": "How to use this demo expander on the site — only if they seem lost before the lab."
+    },
+    {
+      "id": "sidebar",
+      "phase": "Live",
+      "title": "Load live quotes",
+      "context": "Deribit marks power the orange market-implied curve. Without refresh, the lab may look empty or stale.",
+      "goal": "Live data is on screen so the chart is trustworthy.",
+      "do": [
+        "Sidebar → Refresh priced inputs (Deribit) once.",
+        "Wait for completion (don't narrate errors — retry or use pre-refreshed session)."
+      ],
+      "say": "I'm pulling live BTC option quotes from Deribit for this run.",
+      "ask": null,
+      "skip": null
+    },
+    {
+      "id": "lab",
+      "phase": "Live",
+      "title": "Anchor on implied lab",
+      "context": "The **Bitcoin implied lab** is the wedge: one expiry, one chart, market-implied shape first.",
+      "goal": "They see the main object — the priced distribution — without scrolling confusion.",
+      "do": [
+        "Scroll to Bitcoin implied lab — market-implied view as the anchor.",
+        "Pick an Expiry that loaded cleanly."
+      ],
+      "say": "This chart is built from today's option prices. Purple and orange show what shape the market has priced in for this expiry — a readout, not a forecast of what will happen.",
+      "ask": null,
+      "skip": "Distribution stats table above — only if they ask for numbers."
+    },
+    {
+      "id": "belief",
+      "phase": "Live",
+      "title": "Overlay a belief",
+      "context": "Your belief is **optional** and always shown **against** the market curve, not replacing it.",
+      "goal": "They see that the tool separates market pricing from personal view.",
+      "do": [
+        "Click one belief preset (or adjust belief controls on the left).",
+        "Point at how the overlay changes on the chart."
+      ],
+      "say": "If I think differently — higher, wider, whatever — I state that here. It's my view on the same chart, not the market's.",
+      "ask": null,
+      "skip": "MVP1 output line (watch / candidate) — mention only if it reads clearly; no edge claims."
+    },
+    {
+      "id": "disagreement",
+      "phase": "Live",
+      "title": "Read disagreement",
+      "context": "Disagreement is **descriptive** — where views diverge — not a buy/sell signal.",
+      "goal": "They understand the second core insight after the chart.",
+      "do": [
+        "Open Belief vs market — at a glance (or Review disagreement digest).",
+        "Read one plain-language sentence aloud."
+      ],
+      "say": "This names where my view and the market's priced view differ — diagnostic, not a trade signal.",
+      "ask": null,
+      "skip": "Strategy families, trade ticket, Verification — unless they pull you there."
+    },
+    {
+      "id": "freeze",
+      "phase": "Live",
+      "title": "Freeze / full app (optional)",
+      "context": "On the **public demo**, freeze history may be limited. Full app = discipline: capture what you saw before outcomes.",
+      "goal": "They see there's a review loop, not just a one-off chart.",
+      "do": [
+        "If on demo: mention Get full access / research beta CTA.",
+        "If on full app: briefly show freeze under implied lab."
+      ],
+      "say": "The full app lets you freeze what the system showed so you can review later without hindsight bias. That's the discipline piece.",
+      "ask": null,
+      "skip": "Skip entirely if time is short or demo has no CTA configured."
+    },
+    {
+      "id": "comprehension",
+      "phase": "Ask",
+      "title": "Comprehension check",
+      "context": "This is your **validation signal** — pass if they name chart / implied / disagreement.",
+      "goal": "Learn if the UI communicated the main object (not whether they like you).",
+      "do": [
+        "Stop demoing. Look at them, not the screen."
+      ],
+      "say": null,
+      "ask": "What was the main thing on screen — in your words?",
+      "skip": null
+    },
+    {
+      "id": "return",
+      "phase": "Ask",
+      "title": "Return intent",
+      "context": "Stronger than compliments: would they **use** it before trading?",
+      "goal": "Honest pull signal for wedge proof.",
+      "do": [],
+      "say": null,
+      "ask": "Would you open this before your next BTC options trade?",
+      "skip": "Paid interest / pricing — session 4+ only, not first meetings."
+    },
+    {
+      "id": "log",
+      "phase": "After",
+      "title": "Log the session",
+      "context": "No row = session didn't count for validation. Two minutes now beats guilt later.",
+      "goal": "One row in reality checks so the scoreboard and morning report move.",
+      "do": [
+        "Note: profile, comprehension Y/N, return Y/N, one-line surprise or confusion.",
+        "Add row to VALIDATION_REALITY_CHECKS.md § MSOS P8 tester metrics."
+      ],
+      "say": "Thanks — this is exactly the feedback I needed.",
+      "ask": null,
+      "skip": null
+    }
+  ],
+  "panic": {
+    "title": "Panic reset",
+    "lines": [
+      "Breathe. You are the guide, not the quant.",
+      "Point at the screen. Let the chart talk.",
+      "You don't derive the math — Verification is the audit trail.",
+      "Ask them a question — takes pressure off you."
+    ],
+    "mathDeflect": "Live Deribit chain into a density shape. Orange from the chain, purple is a simpler baseline. Trust strip and Verification show provenance — I don't derive it by hand on a call."
+  },
+  "neverSay": [
+    "Guaranteed profit or proven edge",
+    "Recommended trade from disagreement alone",
+    "Improvised formulas or greek lectures"
+  ]
+}
