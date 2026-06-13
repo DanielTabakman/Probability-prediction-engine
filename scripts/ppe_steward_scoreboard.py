@@ -19,7 +19,7 @@ SESSION_TARGET = 10
 MSOS_P8_SECTION = "## MSOS P8 friends-first tester metrics"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-NudgeSlot = Literal["wednesday", "sunday", "auto"]
+NudgeSlot = Literal["monday", "thursday", "auto"]
 
 
 @dataclass(frozen=True)
@@ -236,15 +236,15 @@ def format_digest_commitment_lines(repo: Path) -> list[str]:
 
 def resolve_nudge_slot(slot: NudgeSlot, *, ref: date | None = None) -> str | None:
     ref = ref or date.today()
-    if slot == "wednesday":
-        return "wednesday"
-    if slot == "sunday":
-        return "sunday"
+    if slot == "monday":
+        return "monday"
+    if slot == "thursday":
+        return "thursday"
     weekday = ref.weekday()
-    if weekday == 2:
-        return "wednesday"
-    if weekday == 6:
-        return "sunday"
+    if weekday == 0:
+        return "monday"
+    if weekday == 3:
+        return "thursday"
     return None
 
 
@@ -255,17 +255,17 @@ def build_nudge_message(scoreboard: dict[str, Any], slot: str) -> tuple[str, str
     remaining = int(scoreboard["sessions_remaining"])
     actions = scoreboard.get("next_actions") or []
 
-    if slot == "wednesday":
+    if slot == "monday":
         title = f"PPE steward: plan outreach ({logged}/{target})"
         opener = (
-            "Mid-week check — book real-world validation time."
+            "Week start — book one real-world validation slot before Thursday."
             if week_count == 0
-            else f"You logged {week_count} session(s) this week — aim for 2."
+            else f"You logged {week_count} session(s) this week — aim for 2 total."
         )
     else:
         title = f"PPE steward: log or skip ({logged}/{target})"
         opener = (
-            "Weekend receipt — log a tester row or note why you skipped."
+            "Mid-week receipt — log a tester row or note why you skipped."
             if week_count == 0
             else f"This week: {week_count} session(s). Log notes while fresh."
         )

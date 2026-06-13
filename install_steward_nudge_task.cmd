@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-REM Register Task Scheduler: Wed + Sun steward nudges (human commitments).
+REM Register Task Scheduler: Mon + Thu steward nudges (human commitments).
 REM Run once from repo root. Requires PPE_NTFY_STEWARD_TOPIC in ppe_operator_notify.local.cmd
 
 cd /d "%~dp0"

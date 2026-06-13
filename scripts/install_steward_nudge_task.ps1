@@ -1,25 +1,30 @@
-# Register Task Scheduler: steward Wed/Sun nudges (separate ntfy topic).
+# Register Task Scheduler: steward Mon/Thu nudges (separate ntfy topic).
 
 param(
     [Parameter(Mandatory = $true)]
     [string]$RepoRoot,
-    [string]$WedTaskName = "PPE steward nudge (Wed)",
-    [string]$SunTaskName = "PPE steward nudge (Sun)",
-    [string]$WedRunTime = "18:00",
-    [string]$SunRunTime = "17:00",
+    [string]$MonTaskName = "PPE steward nudge (Mon)",
+    [string]$ThuTaskName = "PPE steward nudge (Thu)",
+    [string]$MonRunTime = "10:00",
+    [string]$ThuRunTime = "18:00",
     [switch]$Unregister
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
-$wedRunner = Join-Path $RepoRoot "steward_nudge_wednesday.cmd"
-$sunRunner = Join-Path $RepoRoot "steward_nudge_sunday.cmd"
+$monRunner = Join-Path $RepoRoot "steward_nudge_monday.cmd"
+$thuRunner = Join-Path $RepoRoot "steward_nudge_thursday.cmd"
 
-foreach ($path in @($wedRunner, $sunRunner)) {
+foreach ($path in @($monRunner, $thuRunner)) {
     if (-not (Test-Path -LiteralPath $path)) {
         throw "Missing runner: $path"
     }
 }
+
+$LegacyTaskNames = @(
+    "PPE steward nudge (Wed)",
+    "PPE steward nudge (Sun)"
+)
 
 function Register-StewardTask {
     param(
@@ -49,35 +54,42 @@ function Register-StewardTask {
 }
 
 if ($Unregister) {
-    Unregister-ScheduledTask -TaskName $WedTaskName -Confirm:$false -ErrorAction SilentlyContinue
-    Unregister-ScheduledTask -TaskName $SunTaskName -Confirm:$false -ErrorAction SilentlyContinue
-    Write-Host "Removed scheduled tasks: $WedTaskName, $SunTaskName"
+    Unregister-ScheduledTask -TaskName $MonTaskName -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName $ThuTaskName -Confirm:$false -ErrorAction SilentlyContinue
+    foreach ($legacy in $LegacyTaskNames) {
+        Unregister-ScheduledTask -TaskName $legacy -Confirm:$false -ErrorAction SilentlyContinue
+    }
+    Write-Host "Removed scheduled tasks: $MonTaskName, $ThuTaskName (+ legacy Wed/Sun if present)"
     exit 0
 }
 
+foreach ($legacy in $LegacyTaskNames) {
+    Unregister-ScheduledTask -TaskName $legacy -Confirm:$false -ErrorAction SilentlyContinue
+}
+
 Register-StewardTask `
-    -Name $WedTaskName `
-    -Runner $wedRunner `
-    -Day Wednesday `
-    -RunTime $WedRunTime `
+    -Name $MonTaskName `
+    -Runner $monRunner `
+    -Day Monday `
+    -RunTime $MonRunTime `
     -Description "PPE steward: book tester outreach. See docs/SOP/STEWARD_OPERATOR_V1.md"
 
 Register-StewardTask `
-    -Name $SunTaskName `
-    -Runner $sunRunner `
-    -Day Sunday `
-    -RunTime $SunRunTime `
+    -Name $ThuTaskName `
+    -Runner $thuRunner `
+    -Day Thursday `
+    -RunTime $ThuRunTime `
     -Description "PPE steward: log session or skip reason. See docs/SOP/STEWARD_OPERATOR_V1.md"
 
 Write-Host "Registered scheduled tasks:"
-Write-Host "  $WedTaskName — every Wednesday at $WedRunTime (local)"
-Write-Host "  $SunTaskName — every Sunday at $SunRunTime (local)"
+Write-Host "  $MonTaskName — every Monday at $MonRunTime (local)"
+Write-Host "  $ThuTaskName — every Thursday at $ThuRunTime (local)"
 Write-Host ""
 Write-Host "Prerequisite: PPE_NTFY_STEWARD_TOPIC in ppe_operator_notify.local.cmd"
 Write-Host ""
 Write-Host "Test now:"
-Write-Host "  cmd /c `"$wedRunner`""
-Write-Host "  python scripts\ppe_steward_nudge.py --dry-run --slot wednesday"
+Write-Host "  cmd /c `"$monRunner`""
+Write-Host "  python scripts\ppe_steward_nudge.py --dry-run --slot monday"
 Write-Host ""
 Write-Host "Scoreboard anytime:"
 Write-Host "  python scripts\ppe_steward_scoreboard.py"

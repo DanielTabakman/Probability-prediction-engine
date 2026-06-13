@@ -42,38 +42,38 @@ class TestPpeStewardNudge(unittest.TestCase):
         self._tmp.cleanup()
 
     def test_week_dedup(self) -> None:
-        mark_sent(self.repo, {}, "wednesday", ref=date(2026, 6, 10))
+        mark_sent(self.repo, {}, "monday", ref=date(2026, 6, 8))
         state = load_state(self.repo)
-        self.assertTrue(already_sent_this_week(state, "wednesday", ref=date(2026, 6, 11)))
-        self.assertFalse(already_sent_this_week(state, "wednesday", ref=date(2026, 6, 17)))
+        self.assertTrue(already_sent_this_week(state, "monday", ref=date(2026, 6, 9)))
+        self.assertFalse(already_sent_this_week(state, "monday", ref=date(2026, 6, 15)))
 
-    def test_dry_run_wednesday(self) -> None:
-        result = run_nudge(self.repo, slot="wednesday", dry_run=True, ref=date(2026, 6, 10))
+    def test_dry_run_monday(self) -> None:
+        result = run_nudge(self.repo, slot="monday", dry_run=True, ref=date(2026, 6, 8))
         self.assertTrue(result.get("dry_run"))
         self.assertIn("plan outreach", result.get("title", "").lower())
         self.assertIn("Do next:", result.get("body", ""))
 
-    def test_not_wed_or_sun_auto(self) -> None:
+    def test_not_mon_or_thu_auto(self) -> None:
         result = run_nudge(self.repo, slot="auto", dry_run=True, ref=date(2026, 6, 9))
-        self.assertEqual(result.get("reason"), "not_wed_or_sun")
+        self.assertEqual(result.get("reason"), "not_mon_or_thu")
 
     @patch.dict(os.environ, {"PPE_NTFY_STEWARD_TOPIC": "test-steward-topic"})
     @patch("scripts.ppe_steward_nudge.send_steward_ntfy", return_value=True)
     def test_send_when_configured(self, send_mock) -> None:
         result = run_nudge(
             self.repo,
-            slot="wednesday",
+            slot="monday",
             force=True,
-            ref=date(2026, 6, 10),
+            ref=date(2026, 6, 8),
         )
         self.assertTrue(result.get("sent"))
         send_mock.assert_called_once()
         state = load_state(self.repo)
-        self.assertEqual(state.get("last_wednesday_week"), week_key(date(2026, 6, 10)))
+        self.assertEqual(state.get("last_monday_week"), week_key(date(2026, 6, 8)))
 
     def test_steward_topic_unset(self) -> None:
         with patch("scripts.ppe_steward_nudge.steward_ntfy_configured", return_value=False):
-            result = run_nudge(self.repo, slot="wednesday", force=True, ref=date(2026, 6, 10))
+            result = run_nudge(self.repo, slot="monday", force=True, ref=date(2026, 6, 8))
         self.assertEqual(result.get("reason"), "steward_topic_unset")
 
 

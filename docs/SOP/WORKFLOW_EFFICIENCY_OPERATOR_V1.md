@@ -76,8 +76,8 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
 | `install_weekly_digest_monday_task.cmd` | Register Monday 09:00 local Task Scheduler job (run once) |
 | `python scripts/ppe_steward_scoreboard.py` | Human scoreboard: sessions N/10 + next actions |
-| `steward_nudge_wednesday.cmd` / `steward_nudge_sunday.cmd` | **Steward** ntfy (`PPE_NTFY_STEWARD_TOPIC`) — separate from loop alerts |
-| `install_steward_nudge_task.cmd` | Register Wed 18:00 + Sun 17:00 steward nudges (run once) — [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
+| `steward_nudge_monday.cmd` / `steward_nudge_thursday.cmd` | **Steward** ntfy (`PPE_NTFY_STEWARD_TOPIC`) — separate from loop alerts |
+| `install_steward_nudge_task.cmd` | Register Mon 10:00 + Thu 18:00 steward nudges (run once) — [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
 | `start_ppe_desktop_operator.cmd` | Desktop stack: auto-loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)) |
 | [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) | Paste prompt for new Cursor Agent chat on desktop |
 | `watch_operator_mobile.cmd` | ntfy push on verdict change or loop death (`PPE_NTFY_TOPIC`) |

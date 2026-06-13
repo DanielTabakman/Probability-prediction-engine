@@ -975,7 +975,7 @@ def main(argv: list[str] | None = None) -> int:
         bootstrap_operator_notify_env(args.repo_root.resolve())
         sent = send_steward_ntfy(
             "PPE steward test",
-            "Steward topic works. Wed/Sun nudges land here — not build/fix commands.",
+            "Steward topic works. Mon/Thu nudges land here — not build/fix commands.",
             tags=["ppe", "steward", "test"],
             priority="default",
             bypass_throttle=True,

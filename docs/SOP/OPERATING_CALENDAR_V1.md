@@ -2,7 +2,7 @@
 
 **Purpose:** Light cadence for a real-company operating rhythm — without agent overload.
 
-**Human nudges:** [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) — Wed/Sun phone cues via `PPE_NTFY_STEWARD_TOPIC` (separate from loop alerts).
+**Human nudges:** [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) — Mon/Thu phone cues via `PPE_NTFY_STEWARD_TOPIC` (separate from loop alerts).
 
 **Strategic canon:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) · **Validation rollup:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)
 
@@ -52,7 +52,7 @@ Update at quarterly review. **Done** = evidence in repo, not aspiration.
 |-----------|--------|--------|----------|
 | MSOS P0–P8 waterfall shipped | 2026-Q2 | **done** | MSOS evidence docs |
 | Product focus playbook + runtime gate | 2026-Q2 | **done** | `ppe_focus_gate.py`, this calendar |
-| Steward scoreboard + Wed/Sun nudges | 2026-Q2 | **done** | `ppe_steward_scoreboard.py`, `STEWARD_OPERATOR_V1.md` |
+| Steward scoreboard + Mon/Thu nudges | 2026-Q2 | **done** | `ppe_steward_scoreboard.py`, `STEWARD_OPERATOR_V1.md` |
 | P8 validation report **COMPLETE** | _date_ | **open** | `MSOS_P8_VALIDATION_REPORT_V1.md` |
 | 10 guided tester sessions logged | _date_ | **open** | `VALIDATION_REALITY_CHECKS.md` |
 | Paid-interest signal (≥1 honest Y) | _date_ | **open** | reality checks |
@@ -73,8 +73,8 @@ Update at quarterly review. **Done** = evidence in repo, not aspiration.
 
 | When | Mechanism | Doc |
 |------|-----------|-----|
-| Wed 18:00 local | `steward_nudge_wednesday.cmd` → `PPE_NTFY_STEWARD_TOPIC` | [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
-| Sun 17:00 local | `steward_nudge_sunday.cmd` | same |
+| Mon 10:00 local | `steward_nudge_monday.cmd` → `PPE_NTFY_STEWARD_TOPIC` | [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
+| Thu 18:00 local | `steward_nudge_thursday.cmd` | same |
 | Monday digest | Weekly phone ping includes commitment score | `weekly_digest_monday.cmd` |
 | Anytime | `python scripts/ppe_steward_scoreboard.py` | scoreboard CLI |
 
@@ -87,4 +87,4 @@ Install once: `install_steward_nudge_task.cmd`
 | Date | Change |
 |------|--------|
 | 2026-06-12 | v1 — weekly / monthly / quarterly cadence + milestone table |
-| 2026-06-12 | Steward Wed/Sun ntfy automation + STEWARD_OPERATOR_V1 |
+| 2026-06-12 | Steward Mon/Thu ntfy automation + STEWARD_OPERATOR_V1 |

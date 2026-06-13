@@ -92,8 +92,8 @@ class TestPpeStewardScoreboard(unittest.TestCase):
         self.assertIn("Do next:", text)
 
     def test_resolve_nudge_slot_auto(self) -> None:
-        self.assertEqual(resolve_nudge_slot("auto", ref=date(2026, 6, 10)), "wednesday")
-        self.assertEqual(resolve_nudge_slot("auto", ref=date(2026, 6, 14)), "sunday")
+        self.assertEqual(resolve_nudge_slot("auto", ref=date(2026, 6, 8)), "monday")
+        self.assertEqual(resolve_nudge_slot("auto", ref=date(2026, 6, 11)), "thursday")
         self.assertIsNone(resolve_nudge_slot("auto", ref=date(2026, 6, 9)))
 
     def test_sessions_this_week_monday_boundary(self) -> None:

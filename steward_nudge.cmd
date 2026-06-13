@@ -1,8 +1,8 @@
 @echo off
 setlocal
 
-REM Steward Wed/Sun nudge — human commitments (separate ntfy topic).
-REM Usage: steward_nudge.cmd [wednesday|sunday|auto]
+REM Steward Mon/Thu nudge — human commitments (separate ntfy topic).
+REM Usage: steward_nudge.cmd [monday|thursday|auto]
 
 cd /d "%~dp0"
 if exist "%~dp0ppe_operator_local.cmd" call "%~dp0ppe_operator_local.cmd"

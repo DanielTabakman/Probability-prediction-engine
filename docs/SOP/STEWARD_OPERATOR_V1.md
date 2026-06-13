@@ -12,9 +12,47 @@
 | Channel | Env var | Job | Commands? |
 |---------|---------|-----|-----------|
 | **Operator** | `PPE_NTFY_TOPIC` | Loop, IDE_BUILD, build/fix | Yes (`build`, `status`, …) |
-| **Steward** | `PPE_NTFY_STEWARD_TOPIC` | Wed/Sun “what to do next” | **No** — receive only |
+| **Steward** | `PPE_NTFY_STEWARD_TOPIC` | Mon/Thu “what to do next” | **No** — receive only |
 
 Same ntfy app → **two subscriptions**, two private topic names.
+
+---
+
+## What you need to succeed
+
+Minimum stack — if any is missing, nudges won’t convert to evidence:
+
+| # | Requirement | Why |
+|---|-------------|-----|
+| 1 | **`PPE_NTFY_STEWARD_TOPIC`** set + subscribed in ntfy app | Without this, zero cues |
+| 2 | **Desktop awake** at Mon 10:00 + Thu 18:00 local (or run scoreboard manually those days) | Task Scheduler only fires when PC is on |
+| 3 | **3 names** on a short outreach list (BTC options / quant-curious) | Mon nudge fails if you have to “find someone” first |
+| 4 | **Demo works once** — run [`DEMO_OPERATOR_SCRIPT.md`](DEMO_OPERATOR_SCRIPT.md) solo on `marketstructureos.com` | Broken URL wastes sessions |
+| 5 | **20–30 min calendar block** between Mon and Thu | One session per week minimum |
+| 6 | Know the **receipt file**: [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) § MSOS P8 | Thu nudge is useless if you don’t log the row |
+
+**Weekly success = two tiny actions:**
+
+- **Monday:** one outreach text + calendar hold (5 min)
+- **Thursday:** one table row OR one-line skip reason (5 min)
+
+Optional but high leverage: run `python scripts/ppe_steward_scoreboard.py` before Mon outreach.
+
+---
+
+## If you fail — most likely causes
+
+| Symptom | Most likely cause | Fix |
+|---------|-------------------|-----|
+| No phone ping Mon/Thu | Desktop off/asleep; steward topic unset | Never sleep when plugged in; `--steward-test` |
+| Ping arrives, score still 0/10 | Session happened but **no row logged** | Thu: paste row in VALIDATION_REALITY_CHECKS (5 min) |
+| Outreach never sent | Treated nudge as “think about validation” not “send one text” | Mon: literal SMS to one name — no prep |
+| Testers confused in session | Demo not rehearsed; wrong URL | Solo run DEMO_OPERATOR_SCRIPT once first |
+| “I’ll do it when product is ready” | Waiting on **agents** for **human** gate | Agents pause until **you** log 10 rows + COMPLETE report |
+| Muted / ignored steward topic | Alert fatigue from operator topic | Keep steward subscription **unmuted**; operator can snooze |
+| Perfectionism — no “good enough” testers | Friends-first cohort never starts | First 3 sessions can be smart non-experts; log honestly |
+
+**Honest skip beats silent drift:** `Skipped week of YYYY-MM-DD — reason` still counts as steward receipt.
 
 ---
 
@@ -42,13 +80,20 @@ python scripts\ppe_notify_push.py --steward-test
 install_steward_nudge_task.cmd
 ```
 
-Defaults: **Wed 18:00** (plan outreach) · **Sun 17:00** (log or skip).
+Defaults: **Mon 10:00** (plan outreach) · **Thu 18:00** (log or skip).  
+Re-run after changing days — removes legacy Wed/Sun tasks if present.
+
+Custom times:
+
+```powershell
+powershell -File scripts\install_steward_nudge_task.ps1 -RepoRoot . -MonRunTime 09:00 -ThuRunTime 17:30
+```
 
 ---
 
 ## What you do when a nudge fires
 
-### Wednesday — plan outreach
+### Monday — plan outreach
 
 1. Open scoreboard (optional):
 
@@ -56,11 +101,11 @@ Defaults: **Wed 18:00** (plan outreach) · **Sun 17:00** (log or skip).
 python scripts\ppe_steward_scoreboard.py
 ```
 
-2. **Pick one person** — active BTC options / quant-curious contact.
+2. **Pick one person** from your list.
 3. **Send a short text** — “20 min this week to walk through our BTC options research demo?”
 4. **Book a slot** — calendar hold counts; no repo row yet.
 
-### Sunday — log or skip
+### Thursday — log or skip
 
 **If you ran a session:**
 
@@ -75,7 +120,7 @@ python scripts\ppe_steward_scoreboard.py
 
 **If you skipped:**
 
-Add a short note in the same section or in Notes on the next row: `Skipped week of YYYY-MM-DD — reason`.
+Add a short note: `Skipped week of YYYY-MM-DD — reason`.
 
 ---
 
@@ -115,11 +160,11 @@ Until report is **COMPLETE**, agents stay on wedge proof unless backlog row has 
 
 ---
 
-## Manual test (before waiting for Wed/Sun)
+## Manual test (before waiting for Mon/Thu)
 
 ```bat
-python scripts\ppe_steward_nudge.py --dry-run --slot wednesday
-python scripts\ppe_steward_nudge.py --slot wednesday --force
+python scripts\ppe_steward_nudge.py --dry-run --slot monday
+python scripts\ppe_steward_nudge.py --slot monday --force
 ```
 
 `--force` bypasses once-per-week dedup (for testing only).
@@ -138,4 +183,5 @@ python scripts\ppe_steward_nudge.py --slot wednesday --force
 
 | Date | Change |
 |------|--------|
-| 2026-06-12 | v1 — steward topic, scoreboard, Wed/Sun nudges |
+| 2026-06-12 | v1 — steward topic, scoreboard, Mon/Thu nudges |
+| 2026-06-12 | Success prerequisites + failure modes; Wed/Sun → Mon/Thu |

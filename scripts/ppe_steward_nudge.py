@@ -1,4 +1,4 @@
-"""Wed/Sun steward nudges to PPE_NTFY_STEWARD_TOPIC (human commitments, not loop alerts)."""
+"""Mon/Thu steward nudges to PPE_NTFY_STEWARD_TOPIC (human commitments, not loop alerts)."""
 
 from __future__ import annotations
 
@@ -73,7 +73,7 @@ def run_nudge(
     bootstrap_operator_notify_env(repo)
     resolved = resolve_nudge_slot(slot, ref=ref)  # type: ignore[arg-type]
     if resolved is None:
-        return {"sent": False, "reason": "not_wed_or_sun", "slot_requested": slot}
+        return {"sent": False, "reason": "not_mon_or_thu", "slot_requested": slot}
 
     scoreboard = build_scoreboard(repo, ref=ref)
     title, body = build_nudge_message(scoreboard, resolved)
@@ -114,13 +114,13 @@ def run_nudge(
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Send steward Wed/Sun nudges (separate ntfy topic)")
+    ap = argparse.ArgumentParser(description="Send steward Mon/Thu nudges (separate ntfy topic)")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument(
         "--slot",
-        choices=("auto", "wednesday", "sunday"),
+        choices=("auto", "monday", "thursday"),
         default="auto",
-        help="auto = only send on Wed/Sun local day",
+        help="auto = only send on Mon/Thu local day",
     )
     ap.add_argument("--dry-run", action="store_true", help="Print payload without sending")
     ap.add_argument("--force", action="store_true", help="Send even if already sent this week")
@@ -134,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
 
     result = run_nudge(repo, slot=args.slot, dry_run=args.dry_run, force=args.force)
     print(json.dumps(result, indent=2))
-    if result.get("reason") == "not_wed_or_sun":
+    if result.get("reason") == "not_mon_or_thu":
         return 0
     if result.get("dry_run") or result.get("reason") == "already_sent_this_week":
         return 0
