@@ -134,8 +134,15 @@
       "selectionPrep": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md"
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_operator_visibility_v1_relay.json",
       "status": "ready",
+      "reason": "[HIGH] Operator inbox, active-slice lock, queue preview, operator map \u2014 daily loop UX",
+      "selectionPrep": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
+      "workerMode": "deterministic"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
+      "status": "pending",
       "reason": "[LOW] Tail quantiles, strike-level P(>K), derived export columns, daily snapshot collector MVP",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md"
     }

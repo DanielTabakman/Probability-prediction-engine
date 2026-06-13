@@ -37,4 +37,10 @@ Daily operator flow (phone ntfy → Termius/RDP → IDE BUILD) lacked a single *
 
 ## Operator
 
-After Slice001 lands: `python scripts/ppe_operator_status.py` — confirm inbox section. Loop: `run_ppe.cmd --plan docs/SOP/PHASE_PLANS/ppe_operator_visibility_v1_relay.json` when manifest is set **READY**.
+Wired for auto-loop (2026-06-12):
+
+- **Roadmap:** `ready` (before LOW `mvp1_distribution_quant_research_v2`)
+- **Queue:** first `READY` row
+- **Manifest:** `ACTIVE_PHASE_MANIFEST.json` → this plan, `status: READY`, `workerMode: deterministic`
+
+When the loop is running, `run_ppe.cmd` / `run_ppe_auto_local_loop.cmd` will drive slices 002–004 after Slice001 closeout. No manual `--plan` needed.
