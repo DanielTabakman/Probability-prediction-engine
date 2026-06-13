@@ -5,8 +5,8 @@ param(
     [string]$RepoRoot,
     [string]$MonTaskName = "PPE steward nudge (Mon)",
     [string]$ThuTaskName = "PPE steward nudge (Thu)",
-    [string]$MonRunTime = "10:00",
-    [string]$ThuRunTime = "18:00",
+    [string]$MonRunTime = "13:00",
+    [string]$ThuRunTime = "20:00",
     [switch]$Unregister
 )
 

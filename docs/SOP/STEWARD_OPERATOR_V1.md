@@ -25,7 +25,7 @@ Minimum stack — if any is missing, nudges won’t convert to evidence:
 | # | Requirement | Why |
 |---|-------------|-----|
 | 1 | **`PPE_NTFY_STEWARD_TOPIC`** set + subscribed in ntfy app | Without this, zero cues |
-| 2 | **Desktop awake** at Mon 10:00 + Thu 18:00 local (or run scoreboard manually those days) | Task Scheduler only fires when PC is on |
+| 2 | **Desktop awake** at Mon 13:00 + Thu 20:00 local (or run scoreboard manually those days) | Task Scheduler only fires when PC is on |
 | 3 | **3 names** on a short outreach list (BTC options / quant-curious) | Mon nudge fails if you have to “find someone” first |
 | 4 | **Demo works once** — run [`DEMO_OPERATOR_SCRIPT.md`](DEMO_OPERATOR_SCRIPT.md) solo on `marketstructureos.com` | Broken URL wastes sessions |
 | 5 | **20–30 min calendar block** between Mon and Thu | One session per week minimum |
@@ -80,7 +80,7 @@ python scripts\ppe_notify_push.py --steward-test
 install_steward_nudge_task.cmd
 ```
 
-Defaults: **Mon 10:00** (plan outreach) · **Thu 18:00** (log or skip).  
+Defaults: **Mon 13:00** (plan outreach) · **Thu 20:00** (log or skip).  
 Re-run after changing days — removes legacy Wed/Sun tasks if present.
 
 Custom times:

@@ -73,8 +73,8 @@ Update at quarterly review. **Done** = evidence in repo, not aspiration.
 
 | When | Mechanism | Doc |
 |------|-----------|-----|
-| Mon 10:00 local | `steward_nudge_monday.cmd` → `PPE_NTFY_STEWARD_TOPIC` | [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
-| Thu 18:00 local | `steward_nudge_thursday.cmd` | same |
+| Mon 13:00 local | `steward_nudge_monday.cmd` → `PPE_NTFY_STEWARD_TOPIC` | [`STEWARD_OPERATOR_V1.md`](STEWARD_OPERATOR_V1.md) |
+| Thu 20:00 local | `steward_nudge_thursday.cmd` | same |
 | Monday digest | Weekly phone ping includes commitment score | `weekly_digest_monday.cmd` |
 | Anytime | `python scripts/ppe_steward_scoreboard.py` | scoreboard CLI |
 
