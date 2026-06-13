@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high|medium|low = mechanical order. Cross-venue quant sequence: MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md. focusPlaybookTier + PRODUCT_FOCUS_PLAYBOOK_V1 = semantic priority. urgent:true bypasses validation-report gate (ppe_focus_gate.py). See BACKLOG_OPERATOR.md.",
+  "notes": "Chapter backlog (PPE_QUEUE_PROPAGATION_V1). priority: high|medium|low = mechanical order. Cross-venue quant: MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md (medium slots 2-3). Market registry: MVP1_MARKET_REGISTRY_PROGRAM_V1.md (medium slots 4-6, low slot 7). focusPlaybookTier + PRODUCT_FOCUS_PLAYBOOK_V1 = semantic priority. urgent:true bypasses validation-report gate (ppe_focus_gate.py). See BACKLOG_OPERATOR.md.",
   "items": [
     {
       "chapterId": "mvp1_phase5_review_hardening",
@@ -206,6 +206,41 @@
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 5",
       "reason": "[LOW] Resolution Brier + gap-bucket scoring from snapshot history"
+    },
+    {
+      "chapterId": "mvp1_market_registry_core_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "mediumQueueSlot": 4,
+      "focusPlaybookTier": "defer",
+      "canonRef": "docs/SOP/MVP1_MARKET_REGISTRY_PROGRAM_V1.md \u2014 chapter 1",
+      "reason": "[MEDIUM \u00b7 slot 4] Market registry + generic Deribit provider \u2014 config/markets.yaml; BTC default unchanged"
+    },
+    {
+      "chapterId": "mvp1_market_registry_lab_ui_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "mediumQueueSlot": 5,
+      "focusPlaybookTier": "defer",
+      "canonRef": "docs/SOP/MVP1_MARKET_REGISTRY_PROGRAM_V1.md \u2014 chapter 2",
+      "reason": "[MEDIUM \u00b7 slot 5] market_session + parameterized implied lab UI \u2014 BTC parity before new assets enabled"
+    },
+    {
+      "chapterId": "mvp1_market_registry_crypto_activate_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "mediumQueueSlot": 6,
+      "focusPlaybookTier": "defer",
+      "canonRef": "docs/SOP/MVP1_MARKET_REGISTRY_PROGRAM_V1.md \u2014 chapter 3",
+      "reason": "[MEDIUM \u00b7 slot 6] Enable ETH/SOL via config + smoke \u2014 Deribit CeFi; log session in reality checks"
+    },
+    {
+      "chapterId": "mvp1_market_registry_equity_provider_v1",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "defer",
+      "canonRef": "docs/SOP/MVP1_MARKET_REGISTRY_PROGRAM_V1.md \u2014 chapter 4",
+      "reason": "[LOW] Yahoo equity provider (NVDA pilot) \u2014 disabled by default until commercial pull"
     }
   ]
 }
