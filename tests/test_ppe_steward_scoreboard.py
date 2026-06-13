@@ -122,9 +122,10 @@ class TestPpeStewardScoreboard(unittest.TestCase):
 
     def test_walkthrough_covers_both_days(self) -> None:
         text = format_plan_walkthrough(build_scoreboard(self.repo))
-        self.assertIn("Phase 0-1", text)
+        self.assertIn("Monday 13:00", text)
         self.assertIn("Thursday 20:00", text)
         self.assertIn("Why this plan exists", text)
+        self.assertIn("Phase 0-1", text)
 
     def test_plan_phase_start_at_zero(self) -> None:
         sb = build_scoreboard(self.repo)
