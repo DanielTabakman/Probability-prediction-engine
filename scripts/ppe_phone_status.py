@@ -42,7 +42,7 @@ def _clean_blocker(blocker: str | None, *, verdict: str, slice_id: str | None) -
     if verdict == "IDE_BUILD" and slice_id:
         return f"Slice {slice_id} needs an IDE BUILD in Cursor."
     if "IDE product marker present" in text:
-        return "Slice is built - run local finish on the desktop."
+        return "Product slices built — relay (run_ppe_local) has not finished yet."
     if "manifest RUNNING" in text and "ACTIVE_RUN" in text:
         return "Manifest says running but no active run file - may need a reset."
     if "no READY queue item" in text.lower():
@@ -58,7 +58,7 @@ def _clean_blocker(blocker: str | None, *, verdict: str, slice_id: str | None) -
 def verdict_headline(verdict: str) -> str:
     return {
         "RUN_AUTO": "Running",
-        "RUN_LOCAL": "Running (finish step)",
+        "RUN_LOCAL": "Relay finish needed",
         "IDE_BUILD": "Needs you - IDE BUILD",
         "FIX_PLAN": "Needs fix - plan/spec",
         "STALE_STATE": "Stale state",
@@ -69,8 +69,10 @@ def verdict_headline(verdict: str) -> str:
 
 def phone_status_title(status: dict[str, Any]) -> str:
     verdict = str(status.get("verdict") or "UNKNOWN")
-    if verdict in ("RUN_AUTO", "RUN_LOCAL"):
+    if verdict == "RUN_AUTO":
         return "PPE: All good"
+    if verdict == "RUN_LOCAL":
+        return "PPE: relay not running"
     if verdict == "IDE_BUILD":
         slice_id = _extract_slice_id(str(status.get("blocker") or ""))
         if slice_id:
@@ -95,15 +97,17 @@ def _next_step(
 ) -> str:
     verdict = str(status.get("verdict") or "")
     loop_running = bool((stack or {}).get("loop_running"))
-    if verdict in ("RUN_AUTO", "SUPPLY_LOW"):
+    if verdict in ("RUN_AUTO",):
         return "Nothing needed on your phone - auto-loop is running."
     if verdict == "RUN_LOCAL":
         if loop_running:
             return (
-                "Loop is running and will finish this chapter on the desktop — "
-                "no phone action unless stuck for hours. Send build to nudge."
+                "Loop is up but relay is not running — auto-run_local should start run_ppe_local. "
+                "If stuck, send build from phone or run run_ppe_local.cmd on the desktop."
             )
         return "Loop is off — send restart from phone or run run_ppe_desktop_operator.cmd on the PC."
+    if verdict == "SUPPLY_LOW":
+        return "No queued chapter ready — add backlog or clear focus gate. Loop will idle-sleep briefly."
     hint = ppe_go_hint_for_verdict(verdict)
     if hint:
         return f"On desktop: {hint}"

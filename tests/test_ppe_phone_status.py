@@ -9,6 +9,10 @@ def test_phone_status_title_healthy():
     assert phone_status_title({"verdict": "RUN_AUTO"}) == "PPE: All good"
 
 
+def test_phone_status_title_run_local():
+    assert phone_status_title({"verdict": "RUN_LOCAL"}) == "PPE: relay not running"
+
+
 def test_phone_status_title_ide_build():
     title = phone_status_title(
         {
@@ -31,9 +35,9 @@ def test_format_phone_status_readable():
         stack={"loop_running": True, "watch_running": True, "ntfy_listen_running": True},
         repo=None,
     )
-    assert "Running (finish step)" in body
+    assert "Relay finish needed" in body
     assert "MVP1 distribution quant v2" in body
-    assert "Loop is running" in body
+    assert "auto-run_local" in body
     assert "loop on" in body
     assert "VERDICT=" not in body
 

@@ -34,9 +34,11 @@ def test_attention_verdicts_include_run_local():
 
 
 def test_watch_module_imports_verdict_run_auto():
-    from scripts.ppe_watch_operator_mobile import HEALTHY_VERDICTS
+    from scripts.ppe_watch_operator_mobile import HEALTHY_VERDICTS, STUCK_VERDICTS
 
     assert "RUN_AUTO" in HEALTHY_VERDICTS
+    assert "RUN_LOCAL" in STUCK_VERDICTS
+    assert "RUN_LOCAL" not in HEALTHY_VERDICTS
 
 
 def test_watch_once_auto_build_on_ide_build(tmp_path, monkeypatch):

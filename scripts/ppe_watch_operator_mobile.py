@@ -53,14 +53,14 @@ STUCK_VERDICTS = frozenset(
         VERDICT_FIX_PLAN,
         VERDICT_STALE_STATE,
         VERDICT_ERROR,
+        VERDICT_RUN_LOCAL,
+        VERDICT_SUPPLY_LOW,
     }
 )
 
 HEALTHY_VERDICTS = frozenset(
     {
         VERDICT_RUN_AUTO,
-        VERDICT_RUN_LOCAL,
-        VERDICT_SUPPLY_LOW,
     }
 )
 
@@ -215,9 +215,15 @@ def push_stack_status_notify(
             parts.append("Watch running.")
         if plan:
             parts.append(f"Plan: {plan}")
+        if verdict == VERDICT_RUN_LOCAL:
+            title = "PPE: relay finish pending"
+            parts = ["Loop up but relay not finished — auto-run_local should start run_ppe_local."]
+        elif verdict == VERDICT_SUPPLY_LOW:
+            title = "PPE: idle — no queued work"
+            parts = ["Loop running; queue empty or blocked by focus gate."]
         body = " ".join(parts)
-        priority = "low"
-        tags = ["ppe", "ok", reason]
+        priority = "default" if verdict == VERDICT_RUN_AUTO else "high"
+        tags = ["ppe", "ok" if verdict == VERDICT_RUN_AUTO else "watch", reason]
     return send_ntfy(title, body, tags=tags, priority=priority)
 
 
@@ -268,10 +274,19 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     prior_loop = bool(prior.get("loop_running"))
 
     auto_build: dict[str, Any] | None = None
+    auto_run_local: dict[str, Any] | None = None
     if verdict == VERDICT_IDE_BUILD and verdict != prior_verdict:
         auto_build = _maybe_auto_remote_build(repo, status, prior, retry=False)
     elif verdict == VERDICT_IDE_BUILD:
         auto_build = _maybe_auto_remote_build(repo, status, prior, retry=True)
+
+    if verdict == VERDICT_RUN_LOCAL:
+        try:
+            from scripts.ppe_auto_run_local import try_auto_run_local
+
+            auto_run_local = try_auto_run_local(repo)
+        except Exception as exc:
+            auto_run_local = {"started": False, "reason": str(exc)}
 
     if verdict in ATTENTION_VERDICTS and verdict != prior_verdict:
         blocker = str(status.get("blocker") or verdict)
@@ -291,6 +306,13 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                         f"{blocker}\nAgent CLI running on desktop — no phone action needed.",
                     )
                 )
+        elif verdict == VERDICT_RUN_LOCAL and auto_run_local and auto_run_local.get("started"):
+            alerts.append(
+                (
+                    "PPE auto-run_local started",
+                    f"{blocker}\nrun_ppe_local running on desktop — relay in progress.",
+                )
+            )
         else:
             alerts.append((f"PPE operator: {verdict}", append_ppe_go_hint(blocker, verdict)))
 
@@ -355,6 +377,34 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                     if is_ntfy_quiet_hours():
                         mark_quiet_stuck_sent(repo)
 
+    gap_alert: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_uptime_gap import maybe_send_gap_alert
+
+        gap_alert = maybe_send_gap_alert(
+            repo,
+            loop_running=loop_running,
+            verdict=verdict,
+            prior=prior,
+        )
+    except Exception as exc:
+        gap_alert = {"sent": False, "error": str(exc)}
+
+    idle_alert: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_idle_alert import maybe_send_idle_alert
+
+        idle_alert = maybe_send_idle_alert(
+            repo,
+            loop_running=loop_running,
+            verdict=verdict,
+            status=status,
+        )
+        if idle_alert.get("sent"):
+            sent += 1
+    except Exception as exc:
+        idle_alert = {"sent": False, "error": str(exc)}
+
     guard = status.get("guard") or {}
     detail = str(guard.get("detail") or status.get("blocker") or "")
     left, right = detail.find("["), detail.find("]")
@@ -401,19 +451,6 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     except Exception:
         pass
 
-    gap_alert: dict[str, Any] | None = None
-    try:
-        from scripts.ppe_operator_uptime_gap import maybe_send_gap_alert
-
-        gap_alert = maybe_send_gap_alert(
-            repo,
-            loop_running=loop_running,
-            verdict=verdict,
-            prior=prior,
-        )
-    except Exception as exc:
-        gap_alert = {"sent": False, "error": str(exc)}
-
     return {
         "verdict": verdict,
         "loop_running": loop_running,
@@ -424,6 +461,8 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "post_build_finish": post_finish,
         "morning_report": morning_report,
         "gap_alert": gap_alert,
+        "idle_alert": idle_alert,
+        "auto_run_local": auto_run_local,
         "state_path": str(state_path(repo)),
     }
 

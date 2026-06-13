@@ -39,7 +39,9 @@ VERDICT_SUPPLY_LOW = "SUPPLY_LOW"
 VERDICT_STALE_STATE = "STALE_STATE"
 VERDICT_ERROR = "ERROR"
 
-STOP_VERDICTS = frozenset({VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR})
+STOP_VERDICTS = frozenset(
+    {VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR, VERDICT_RUN_LOCAL}
+)
 
 
 def _utc_now() -> str:
@@ -109,7 +111,7 @@ def _commands_for_verdict(
     if verdict == VERDICT_IDE_BUILD:
         return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_LOCAL:
-        return [PPE_GO_HINT]
+        return ["run_ppe_local.cmd  (auto-run_local should spawn this if loop is up)"]
     if verdict in ("FIX_PLAN", "STALE_STATE", "ERROR"):
         return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_AUTO:

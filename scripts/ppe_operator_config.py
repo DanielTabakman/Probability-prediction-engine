@@ -93,20 +93,65 @@ def loop_when_idle(repo_root: Path) -> bool:
     return bool(cfg.get("loopWhenIdle", False))
 
 
+def min_loop_sleep_seconds(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(3, int(cfg.get("minLoopSleepSeconds", 5)))
+    except (TypeError, ValueError):
+        return 5
+
+
 def idle_sleep_seconds(repo_root: Path) -> int:
     cfg = load_operator_config(repo_root)
     try:
-        return max(30, int(cfg.get("idleSleepSeconds", 120)))
+        return max(min_loop_sleep_seconds(repo_root), int(cfg.get("idleSleepSeconds", 5)))
     except (TypeError, ValueError):
-        return 120
+        return 5
+
+
+def supply_low_sleep_seconds(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(min_loop_sleep_seconds(repo_root), int(cfg.get("supplyLowSleepSeconds", 60)))
+    except (TypeError, ValueError):
+        return 60
+
+
+def worker_poll_sleep_seconds(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(3, int(cfg.get("workerPollSleepSeconds", 10)))
+    except (TypeError, ValueError):
+        return 10
+
+
+def maintenance_loop_sleep_seconds(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(30, int(cfg.get("maintenanceLoopSleepSeconds", 300)))
+    except (TypeError, ValueError):
+        return 300
+
+
+def idle_alert_minutes_from_config(repo_root: Path) -> int:
+    cfg = load_operator_config(repo_root)
+    try:
+        return max(5, int(cfg.get("idleAlertMinutes", 20)))
+    except (TypeError, ValueError):
+        return 20
+
+
+def auto_run_local_enabled(repo_root: Path) -> bool:
+    cfg = load_operator_config(repo_root)
+    return cfg.get("autoRunLocal", True) is not False
 
 
 def guard_stop_sleep_seconds(repo_root: Path) -> int:
     cfg = load_operator_config(repo_root)
     try:
-        return max(60, int(cfg.get("guardStopSleepSeconds", 300)))
+        return max(min_loop_sleep_seconds(repo_root), int(cfg.get("guardStopSleepSeconds", 15)))
     except (TypeError, ValueError):
-        return 300
+        return 15
 
 
 def keep_loop_alive_on_guard_stop(repo_root: Path) -> bool:

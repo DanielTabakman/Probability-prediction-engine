@@ -2,15 +2,21 @@
   "version": 1,
   "profile": "local",
   "enabled": true,
-  "notes": "No API credits: deterministic relay; product BUILD in Cursor IDE, then run_ppe_local.cmd. See PPE_IDE_NATIVE_OPERATOR_V1.md.",
+  "notes": "No API credits: deterministic relay; product BUILD in Cursor IDE, then auto run_ppe_local. See PPE_IDE_NATIVE_OPERATOR_V1.md.",
   "propagateBacklog": true,
   "stewardCharter": false,
   "workerMode": "deterministic",
   "skipAcp": true,
   "continuousMax": 20,
   "loopWhenIdle": true,
-  "idleSleepSeconds": 120,
-    "gitSync": {
+  "minLoopSleepSeconds": 5,
+  "idleSleepSeconds": 5,
+  "supplyLowSleepSeconds": 60,
+  "workerPollSleepSeconds": 10,
+  "maintenanceLoopSleepSeconds": 300,
+  "idleAlertMinutes": 20,
+  "autoRunLocal": true,
+  "gitSync": {
     "enabled": true,
     "pullEachPass": true,
     "publishEachPass": true,
@@ -28,7 +34,7 @@
     "phaseSliceBatching": true,
     "skipChapterIfEvidenceComplete": true
   },
-  "guardStopSleepSeconds": 300,
+  "guardStopSleepSeconds": 15,
   "keepLoopAliveOnGuardStop": true,
   "autoRemoteBuild": false,
   "ideHandoff": {
