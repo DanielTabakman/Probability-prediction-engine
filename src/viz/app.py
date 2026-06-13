@@ -99,6 +99,11 @@ from src.viz.distribution_export import (
     build_distribution_export_rows,
     serialize_distribution_export_csv,
 )
+from src.viz.cross_venue_export import (
+    build_cross_venue_panel_rows,
+    serialize_cross_venue_export_csv,
+)
+from src.viz.app_market_context import _cached_questions_from_events
 from src.viz.distribution_summary_panel import render_distribution_summary_panel
 from src.viz.app_sidebar import build_sidebar_state
 from src.viz.app_panels import (
@@ -350,6 +355,42 @@ if show_bitcoin_view:
                     mime="text/csv",
                     key="implied_dist_export_csv",
                 )
+                if load_deribit:
+                    keywords = (
+                        (config.get("prediction_markets") or {})
+                        .get("polymarket", {})
+                        .get("topic_keywords")
+                        or ["bitcoin", "btc"]
+                    )
+                    try:
+                        pm_events = _cached_polymarket(True, False, 150) or []
+                        btc_questions = (
+                            _cached_questions_from_events(pm_events, keywords)
+                            if pm_events
+                            else []
+                        )
+                        if btc_questions:
+                            cv_rows = build_cross_venue_panel_rows(
+                                as_of_utc=as_of_export,
+                                spot_usd=float(current_btc),
+                                btc_questions=btc_questions,
+                                forward_iv_fn=_cached_forward_iv,
+                                marks_full_fn=_cached_marks_full,
+                                instruments_fn=_cached_option_instruments,
+                                option_book_marks_fn=_cached_option_book_marks,
+                            )
+                            if cv_rows:
+                                st.download_button(
+                                    "Download cross-venue prob panel (CSV)",
+                                    data=serialize_cross_venue_export_csv(cv_rows).encode(
+                                        "utf-8"
+                                    ),
+                                    file_name="ppe_cross_venue_prob_panel.csv",
+                                    mime="text/csv",
+                                    key="cross_venue_prob_panel_csv",
+                                )
+                    except Exception:
+                        pass
                 expiry_options = [e["expiry_date_str"] for e in expiries]
                 selected_expiry_str = st.selectbox(
                     "Expiry",

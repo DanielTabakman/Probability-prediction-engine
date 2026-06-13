@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 from src.viz.cross_venue_export import (
     CSV_COLUMNS,
     build_cross_venue_export_rows,
+    build_cross_venue_panel_rows,
     expiry_alignment_label,
     gap_pct,
     horizon_days_label,
@@ -69,6 +72,51 @@ def test_build_cross_venue_export_rows_gap_columns() -> None:
     assert rows[0]["gap_bl_minus_pm_pct"] == "5.50"
     assert rows[0]["gap_ln_minus_pm_pct"] == "2.50"
     assert rows[0]["match_status"] == "ok"
+
+
+def test_build_cross_venue_panel_rows_with_mocked_deribit(monkeypatch) -> None:
+    expiry = datetime(2026, 6, 27, tzinfo=UTC)
+
+    def _fake_spreads(**_kwargs):
+        return [
+            {
+                "question": "Will Bitcoin hit $150k by December 31, 2026?",
+                "target": 150_000.0,
+                "resolution_date": "2026-12-31",
+                "expiry_date": expiry,
+                "expiry_ts": 1_800_000_000_000,
+                "polymarket_yes_pct": 12.5,
+            }
+        ]
+
+    def _fake_enrich(spreads, **_kwargs):
+        return [
+            {
+                **spreads[0],
+                "lognormal_p_above_pct": 15.0,
+                "options_chain_p_above_pct": 18.0,
+            }
+        ]
+
+    monkeypatch.setattr(
+        "src.viz.cross_venue_export.fetch_deribit_spreads_around_predictions",
+        _fake_spreads,
+    )
+    monkeypatch.setattr(
+        "src.viz.cross_venue_export.enrich_prediction_spreads_pointwise",
+        _fake_enrich,
+    )
+
+    rows = build_cross_venue_panel_rows(
+        as_of_utc="2026-06-13T12:00:00+00:00",
+        spot_usd=100_000.0,
+        btc_questions=[{"strike": 150_000, "resolution_date": "2026-12-31"}],
+        forward_iv_fn=lambda _exp_ts, _spot: {"forward": 101_000.0, "atm_iv": 0.62},
+        marks_full_fn=lambda _exp_ts: {"calls": [{"strike": 150_000}] * 12},
+    )
+    assert len(rows) == 1
+    assert rows[0]["gap_bl_minus_pm_pct"] == "5.50"
+    assert rows[0]["call_marks_count"] == "12"
 
 
 def test_serialize_cross_venue_export_csv_header() -> None:
