@@ -135,7 +135,9 @@ def execute_status(repo: Path) -> dict[str, Any]:
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
     from scripts.ppe_ide_handoff import respond_to_ide_build
 
-    return respond_to_ide_build(repo, source="phone", note=note)
+    args = (note or "").strip().lower()
+    force = args in ("force", "retry") or args.startswith("force ")
+    return respond_to_ide_build(repo, source="phone", note=note, force_handoff=force)
 
 
 def execute_fix(repo: Path, *, note: str = "") -> dict[str, Any]:
@@ -239,7 +241,8 @@ def execute_help(repo: Path) -> dict[str, Any]:
     from scripts.ppe_operator_hint import PPE_GO_HINT
 
     body = (
-        f"{prefix}build - start IDE BUILD when verdict is IDE_BUILD\n"
+        f"{prefix}build - start headless CLI BUILD (or IDE handoff if CLI unavailable)\n"
+        f"{prefix}build force - repeat IDE handoff (clipboard + Cursor)\n"
         f"Desktop: {PPE_GO_HINT}\n"
         f"{prefix}restart - restart loop + watch on desktop\n"
         f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
@@ -315,7 +318,16 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any], repo: 
                 bypass_throttle=True,
             )
         if result.get("debounced"):
-            return False
+            return send_ntfy(
+                f"PPE {command.name}: already sent",
+                (
+                    f"{result.get('reason') or 'Debounced — handoff sent recently.'}\n"
+                    "Send **build force** to repeat IDE handoff, or **build** to retry headless CLI."
+                ),
+                tags=["ppe", "cmd", OUTBOUND_TAG],
+                priority="default",
+                bypass_throttle=True,
+            )
         return send_ntfy(
             f"PPE {command.name} failed",
             str(result.get("reason") or "did not start"),

@@ -201,14 +201,6 @@ def should_attempt_headless_cli(repo: Path, *, mode: str = "build", force_handof
         return False
     if skip_cli_when_usage_exhausted(repo) and cli_usage_exhausted(repo):
         return False
-    if mode == "build":
-        try:
-            from scripts.ppe_operator_config import auto_remote_build_enabled
-
-            if not auto_remote_build_enabled(repo):
-                return False
-        except ImportError:
-            pass
     return True
 
 

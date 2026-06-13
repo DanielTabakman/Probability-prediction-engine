@@ -60,10 +60,9 @@ def _respond_build(
     try_cli = (
         should_attempt_headless_cli(repo, mode="build", force_handoff=force_handoff)
         and agent_available()
-        and not force_handoff
     )
     cli_out: dict[str, Any] = {}
-    if try_cli:
+    if try_cli and not force_handoff:
         cli_out = launch_build(repo, note=note, source=source)
         if cli_out.get("started"):
             return cli_out
@@ -77,7 +76,12 @@ def _respond_build(
         reason=reason,
         force=force_handoff,
     )
-    handoff["cli_attempted"] = try_cli
+    handoff["cli_attempted"] = try_cli and not force_handoff
+    if handoff.get("debounced") and try_cli and agent_available() and not force_handoff:
+        cli_out = launch_build(repo, note=note, source=source)
+        if cli_out.get("started"):
+            cli_out["handoff_debounced"] = True
+            return cli_out
     return handoff
 
 
