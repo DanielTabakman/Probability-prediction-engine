@@ -3,20 +3,22 @@
 **Chapter:** `mvp1_bl_density_smoothing_v1`  
 **Priority:** **MEDIUM** (`mediumQueueSlot`: 1 · P2 demo wedge — not `high`)  
 **Sprint:** [`SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md`](SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md)  
-**Relay plan:** *(not yet — add `docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json` at charter)*
+**Relay plan:** [`PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json`](PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json)
 
 ## Status
 
-**NOT SELECTED** — `blocked` in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json). No `planPath` until steward charters relay.
+**CHARTERED** — inserted on roadmap + queue **immediately after** `mvp1_distribution_quant_research_v2` via `queueAfterPlanPath` + `ppe_queue_insert_after.py`.
 
 ## Intent
 
 Smoother **market-implied B–L** density (Method A in implied-distribution plan): IV- or spline-smoothed `C(K)` before `d²C/dK²`. Same orange legend; fewer jagged charts and skipped BL rows during research demos.
 
-## Steward note
+## Run order
 
-Mechanical backlog order still runs **MSOS slot-1** rows (`msos_storyboard_visual_parity_v1`, `msos_public_demo_launch_v1`) first when they promote. **SELECTION this chapter early** when implied-lab demo confidence beats website parity — justified as P2 legibility, not scope expansion.
+1. `mvp1_distribution_quant_research_v2` (current — READY)
+2. **`mvp1_bl_density_smoothing_v1`** (PLANNED — next after dist quant closeout)
+3. `mvp1_cross_venue_prob_panel` → scan → backtest
 
 ## First slice at SELECTION
 
-`MVP1-BLDensitySmooth-Control-Slice001` *(tentative — define in relay plan at charter)*
+`MVP1-BLDensitySmooth-Control-Slice001`

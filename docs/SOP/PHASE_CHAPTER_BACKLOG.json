@@ -177,13 +177,15 @@
     },
     {
       "chapterId": "mvp1_bl_density_smoothing_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "mediumQueueSlot": 1,
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+      "queueAfterPlanPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json",
       "canonRef": "docs/IMPLIED_DISTRIBUTION_AND_STRATEGIES_PLAN.md \u2014 Method A",
       "selectionRecord": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
-      "reason": "[MEDIUM \u00b7 slot 1 \u00b7 P2 demo] Smoother market-implied B\u2013L density (IV/smoothed C(K) before d\u00b2C/dK\u00b2) \u2014 same orange legend, fewer jagged/degenerate fits; demo confidence without new chart method"
+      "reason": "[MEDIUM \u00b7 slot 1 \u00b7 P2 demo] Smoother market-implied B\u2013L density (IV/smoothed C(K) before d\u00b2C/dK\u00b2) \u2014 same orange legend, fewer jagged/degenerate fits; runs after dist quant v2"
     },
     {
       "chapterId": "mvp1_cross_venue_prob_panel",

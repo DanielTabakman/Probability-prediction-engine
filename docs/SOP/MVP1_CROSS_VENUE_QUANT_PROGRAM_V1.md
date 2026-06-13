@@ -19,6 +19,7 @@ Not auto-trade. Not execution. Screening + evidence first.
 | # | Chapter | Priority | Blocked until | Delivers |
 |---|---------|----------|---------------|----------|
 | 0 | `mvp1_distribution_quant_research_v2` | LOW | — (may run first if READY) | Dist-stats tails, P(S>K) ladders, dist snapshot script |
+| 0b | **`mvp1_bl_density_smoothing_v1`** | MEDIUM · 1 · P2 | dist quant v2 COMPLETE | Smoother B–L orange curve (same legend) |
 | 1 | `msos_storyboard_visual_parity_v1` | MEDIUM · 1 | P8 COMPLETE | MSOS visual parity |
 | 2 | `msos_public_demo_launch_v1` | MEDIUM · 1 | storyboard COMPLETE | Public demo + research beta CTA |
 | 3 | **`mvp1_cross_venue_prob_panel`** | MEDIUM · 2 | public demo COMPLETE | CSV export + daily snapshot (**PR #149** implementation) |

@@ -65,4 +65,4 @@ Improve the **orange options-chain curve** on the implied lab: same legend (**Op
 
 ## Sprint status
 
-**NOT CHARTERED** — backlog row `mvp1_bl_density_smoothing_v1` (`blocked`, **medium**, slot 1 · P2 demo wedge).
+**CHARTERED** — `queueAfterPlanPath`: dist quant v2; **next READY** after current chapter closeout (`ppe_queue_insert_after.py`).

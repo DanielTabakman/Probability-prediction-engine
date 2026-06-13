@@ -74,10 +74,35 @@ Do not set `done` / `chartered` by hand.
 
 `blocked` without `planPath` is fine — it waits until someone charters a relay plan under `docs/SOP/PHASE_PLANS/`.
 
-## Do not edit
+## Relative RUN order (after a specific chapter)
 
-- `PHASE_QUEUE.json`
-- `PHASE_SELECTION_ROADMAP.json`
+**Backlog `priority`** picks the *next chapter to charter* when the pipeline is idle. It does **not** insert a chapter *between* two roadmap rows that are already `pending`.
+
+When a chartered chapter must run **immediately after** another (demo wedge, hotfix, steward bump — without raising `priority` to `high`):
+
+1. Add backlog row with `planPath`, `selectionRecord`, and **`queueAfterPlanPath`** (anchor chapter’s `planPath`).
+2. Run (from repo root):
+
+```bash
+python scripts/ppe_queue_insert_after.py \
+  --chapter-id my_chapter_id \
+  --after-plan docs/SOP/PHASE_PLANS/anchor_relay.json \
+  --apply
+```
+
+This inserts **`pending`** on [`PHASE_SELECTION_ROADMAP.json`](PHASE_SELECTION_ROADMAP.json) and **`PLANNED`** on [`PHASE_QUEUE.json`](PHASE_QUEUE.json) **right after** the anchor. `post_relay_continue` then promotes that row to **`READY`** when the anchor closes — no hand-editing manifest.
+
+Dry-run first (omit `--apply`). Telling an agent *“slot after X”* is enough if it runs this script; do not hand-reorder queue JSON unless recovering from drift.
+
+| Field | Meaning |
+|-------|---------|
+| `queueAfterPlanPath` | Anchor `planPath` — this chapter runs next after anchor closeout |
+| `mediumQueueSlot` | Documentation only — backlog tier label, not enforced by propagate |
+
+## Do not edit (by hand)
+
+- `PHASE_QUEUE.json` — use `ppe_queue_insert_after.py` for relative inserts; propagate/closeout owns status transitions
+- `PHASE_SELECTION_ROADMAP.json` — same; roadmap order = RUN order
 - `ACTIVE_PHASE_MANIFEST.json`
 
 ## Related

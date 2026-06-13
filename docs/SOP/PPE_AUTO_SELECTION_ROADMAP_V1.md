@@ -52,3 +52,5 @@ run_ppe.cmd --continuous
 ```
 
 Add new chapters by appending a **pending** row to the roadmap (and a valid phase plan) before the cycle idles.
+
+**Relative insert** (run after chapter X without changing priority tier): backlog `queueAfterPlanPath` + [`ppe_queue_insert_after.py`](../../scripts/ppe_queue_insert_after.py) — see [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md).

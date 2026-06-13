@@ -1,0 +1,80 @@
+{
+  "name": "MVP1_bl_density_smoothing_v1 (smoother market-implied B-L density)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-BLDensitySmooth-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+      "buildBranch": "build/auto/MVP1-BLDensitySmooth-Control-Slice001-bl_density_smooth",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-BLDensitySmooth-Product-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+      "buildBranch": "build/auto/MVP1-BLDensitySmooth-Product-Slice002-bl_density_smooth",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/implied_distribution.py",
+        "tests/test_implied_distribution.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-BLDensitySmooth-Product-Slice003",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+      "buildBranch": "build/auto/MVP1-BLDensitySmooth-Product-Slice003-bl_density_smooth",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/data/fetch_deribit.py",
+        "tests/test_bl_density_smoothing_v1.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-BLDensitySmooth-Smoke-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+      "buildBranch": "build/auto/MVP1-BLDensitySmooth-Smoke-Slice004-bl_density_smooth",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "MVP1-BLDensitySmooth-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+      "buildBranch": "build/auto/MVP1-BLDensitySmooth-Closeout-Slice005-bl_density_smooth",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_bl_density_smoothing_v1",
+        "chapterTitle": "MVP1 B-L density smoothing v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}
