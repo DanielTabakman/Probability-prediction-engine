@@ -6,7 +6,7 @@
 
 **Canon (unchanged):** [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) · [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) · [`docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md`](../VISION/MSOS/storyboard-v0.6/MANIFEST.md)
 
-**As-of:** 2026-06-03 — P2 **COMPLETE**; P3 **READY** ([`MSOS_FRONTIER.md`](MSOS_FRONTIER.md))
+**As-of:** 2026-06-12 — P2–P8 **COMPLETE**; visual parity v1 **chartered MEDIUM** ([`MSOS_FRONTIER.md`](MSOS_FRONTIER.md))
 
 ---
 
@@ -128,6 +128,17 @@ P3 Command Center (READY)
 ```
 
 **Target calendar (with §1–§9 applied):** ~6–12 weeks from P3 start to walkable storyboard journey; **~2–4 weeks** to public homepage + Command Center if P3 closes on schedule (P2 already shipped).
+
+---
+
+## 12. Storyboard visual parity v1 (chartered MEDIUM 2026-06-12)
+
+| # | Change | Owner | Status |
+|---|--------|-------|--------|
+| 12.1 | Charter [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md) — 9-screen layout parity vs `prototype/html/` | Steward | **Done** |
+| 12.2 | Auto-select after `mvp1_distribution_quant_research_v2` closeout (MEDIUM beats LOW) | Loop | **Blocked** |
+| 12.3 | Close §2.1 deferred homepage pixel witness + P2–P8 unchecked evidence boxes | BUILD | **Todo** |
+| 12.4 | VPS deploy §2.2 folded into Platform slice 007 | Operator + BUILD | **Todo** |
 
 ---
 

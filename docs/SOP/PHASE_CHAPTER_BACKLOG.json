@@ -154,6 +154,16 @@
       "selectionRecord": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P8",
       "reason": "Tester release + evidence-based next selection \u2014 pre-chartered; blocked until P7 COMPLETE"
+    },
+    {
+      "chapterId": "msos_storyboard_visual_parity_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post-P8 visual parity",
+      "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses"
     }
   ]
 }
