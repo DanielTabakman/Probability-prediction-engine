@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
 
 from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
 
@@ -18,6 +23,10 @@ CHECK_IN_HINTS: dict[str, str] = {
         "Public demo launch done. Check apex homepage + /command-center + research beta CTA. "
         "Log one row in VALIDATION_REALITY_CHECKS if demo-ready."
     ),
+    "mvp1_mobile_research_demo_v1": (
+        "Charter mobile demo relay if not done, then run ppe_queue_insert_after after public launch. "
+        "Test marketstructureos.com on your phone."
+    ),
 }
 
 PIPELINE_IDLE_CHECK_IN = (
@@ -25,10 +34,25 @@ PIPELINE_IDLE_CHECK_IN = (
     "then add next backlog row or run outreach."
 )
 
+QUEUE_SKIP_STATE_REL = "artifacts/control_plane/QUEUE_SKIP_NOTIFY_STATE.json"
+
 
 def check_in_notify_enabled() -> bool:
     raw = os.environ.get("PPE_NTFY_CHECK_IN", "1").strip().lower()
     return raw not in ("0", "false", "no", "off")
+
+
+def queue_skip_notify_enabled() -> bool:
+    raw = os.environ.get("PPE_NTFY_QUEUE_SKIP", "1").strip().lower()
+    return raw not in ("0", "false", "no", "off")
+
+
+def queue_skip_notify_hours() -> float:
+    raw = os.environ.get("PPE_NTFY_QUEUE_SKIP_HOURS", "6").strip()
+    try:
+        return max(0.0, float(raw))
+    except ValueError:
+        return 6.0
 
 
 def progress_notify_mode() -> str:
@@ -56,6 +80,61 @@ def _fix_progress_enabled() -> bool:
 def check_in_hint_for_chapter(chapter_id: str) -> str:
     key = str(chapter_id or "").strip().lower()
     return CHECK_IN_HINTS.get(key, "")
+
+
+def _queue_skip_state_path(repo: Path) -> Path:
+    return repo / QUEUE_SKIP_STATE_REL
+
+
+def _load_queue_skip_state(repo: Path) -> dict[str, Any]:
+    path = _queue_skip_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8-sig"))
+    except json.JSONDecodeError:
+        return {}
+
+
+def _save_queue_skip_state(repo: Path, state: dict[str, Any]) -> None:
+    path = _queue_skip_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def _parse_utc(value: str) -> datetime | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def _skip_notify_key(plan_path: str, reason: str, *, kind: str) -> str:
+    blob = f"{kind}|{plan_path}|{reason}".encode("utf-8")
+    return hashlib.sha256(blob).hexdigest()[:16]
+
+
+def _skip_notify_due(repo: Path, key: str) -> bool:
+    hours = queue_skip_notify_hours()
+    if hours <= 0:
+        return True
+    state = _load_queue_skip_state(repo)
+    last = _parse_utc(str(state.get(key) or ""))
+    if last is None:
+        return True
+    age_h = (datetime.now(timezone.utc) - last).total_seconds() / 3600.0
+    return age_h >= hours
+
+
+def _mark_skip_notified(repo: Path, key: str) -> None:
+    state = _load_queue_skip_state(repo)
+    state[key] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    _save_queue_skip_state(repo, state)
 
 
 def notify_operator_check_in(
@@ -90,6 +169,82 @@ def notify_pipeline_idle(*, last_chapter: str = "") -> bool:
     if last_chapter:
         detail = f"After {last_chapter}. {detail}"
     return notify_operator_check_in("pipeline idle", detail=detail, chapter_id=last_chapter)
+
+
+def notify_chapter_skipped(
+    repo: Path,
+    *,
+    skipped_chapter_id: str,
+    skipped_plan: str,
+    reason: str,
+    continued_with_chapter_id: str = "",
+    continued_with_plan: str = "",
+) -> bool:
+    """Phone ping when a blocked chapter was skipped and the loop continued elsewhere."""
+    if not progress_notify_enabled() or not queue_skip_notify_enabled():
+        return False
+
+    key = _skip_notify_key(skipped_plan, reason, kind="skip")
+    if not _skip_notify_due(repo, key):
+        return False
+
+    if continued_with_plan:
+        title = f"PPE skipped: {skipped_chapter_id}"
+        body = (
+            f"Blocked: {reason}. "
+            f"Continuing with {continued_with_chapter_id or continued_with_plan}."
+        )
+    else:
+        title = f"PPE queue blocked: {skipped_chapter_id}"
+        body = f"Could not select: {reason}. No other selectable chapter — check backlog or set urgent:true."
+
+    sent = send_ntfy(
+        title,
+        body,
+        tags=["ppe", "queue", "skip"],
+        priority="high",
+    )
+    if sent:
+        _mark_skip_notified(repo, key)
+    return sent
+
+
+def notify_queue_selection_skips(
+    repo: Path,
+    skipped: list[Any],
+    *,
+    selected_plan: str | None,
+    selected_chapter_id: str = "",
+) -> int:
+    """Notify for each newly skipped chapter (deduped). Returns count sent."""
+    if not skipped:
+        return 0
+    from scripts.ppe_queue_selection import chapter_id_for_plan
+
+    sent = 0
+    for row in skipped:
+        if hasattr(row, "plan_path"):
+            plan = str(row.plan_path)
+            cid = str(row.chapter_id)
+            reason = str(row.reason)
+        elif isinstance(row, dict):
+            plan = str(row.get("planPath") or "")
+            cid = str(row.get("chapterId") or "")
+            reason = str(row.get("reason") or "")
+        else:
+            continue
+        if not cid and plan:
+            cid = chapter_id_for_plan(repo, plan)
+        if notify_chapter_skipped(
+            repo,
+            skipped_chapter_id=cid,
+            skipped_plan=plan,
+            reason=reason,
+            continued_with_chapter_id=selected_chapter_id,
+            continued_with_plan=selected_plan or "",
+        ):
+            sent += 1
+    return sent
 
 
 def notify_slice_complete(

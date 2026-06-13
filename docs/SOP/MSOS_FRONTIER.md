@@ -48,6 +48,17 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Charter:** [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md) · **Blocked until** visual parity COMPLETE
 
+### MVP1 mobile research demo v1 — **BLOCKED** (P3, after public launch)
+
+| Field | Value |
+|-------|--------|
+| **chapterId** | `mvp1_mobile_research_demo_v1` |
+| **Backlog** | `blocked` — no relay plan yet |
+| **Runs after** | `msos_public_demo_launch_v1` closeout (`queueAfterPlanPath`) |
+| **SELECTION** | [`POST_MVP1_MOBILE_RESEARCH_DEMO_V1_SELECTION.md`](POST_MVP1_MOBILE_RESEARCH_DEMO_V1_SELECTION.md) |
+
+Phone-friendly Streamlit demo layout + 3-min script. Charter sprint/relay when public URL is live, then `ppe_queue_insert_after.py`.
+
 ### MSOS P8 tester release — relay queue — **COMPLETE**
 
 | Status | Slice | Plane |

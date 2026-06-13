@@ -279,12 +279,8 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             continue
         ok, err = _plan_valid(repo, plan_path)
         if not ok:
-            return {
-                "promoted": False,
-                "reason": f"plan invalid: {err}",
-                "planPath": plan_path,
-                "chapterId": item.get("chapterId"),
-            }
+            focus_blocked.append(f"{plan_path}: plan invalid: {err}")
+            continue
         if chapter_marked_complete_in_repo(repo, plan_path):
             if not apply:
                 return {
@@ -309,6 +305,8 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             }
         item["status"] = "queued"
         save_backlog(repo, backlog)
+        if apply and focus_blocked:
+            _notify_backlog_promote_skips(repo, focus_blocked, selected_plan=plan_path)
         return {
             "promoted": True,
             "planPath": plan_path,
@@ -324,12 +322,45 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             "reason": "evidence COMPLETE — marked backlog done",
         }
     if focus_blocked:
+        if apply:
+            _notify_backlog_promote_skips(repo, focus_blocked, selected_plan=None)
         return {
             "promoted": False,
             "reason": "focus gate blocked eligible backlog rows",
             "focusGate": focus_blocked,
         }
     return {"promoted": False, "reason": "no blocked backlog item with planPath"}
+
+
+def _notify_backlog_promote_skips(
+    repo: Path,
+    blocked_entries: list[str],
+    *,
+    selected_plan: str | None,
+) -> None:
+    try:
+        from scripts.ppe_progress_notify import notify_queue_selection_skips
+        from scripts.ppe_queue_selection import SkippedChapter, chapter_id_for_plan, norm_plan
+
+        skipped: list[SkippedChapter] = []
+        for entry in blocked_entries:
+            plan, _, reason = entry.partition(": ")
+            plan = norm_plan(plan)
+            if not plan:
+                continue
+            skipped.append(
+                SkippedChapter(plan, chapter_id_for_plan(repo, plan), [reason or entry])
+            )
+        if skipped:
+            selected_cid = chapter_id_for_plan(repo, selected_plan) if selected_plan else ""
+            notify_queue_selection_skips(
+                repo,
+                skipped,
+                selected_plan=selected_plan,
+                selected_chapter_id=selected_cid,
+            )
+    except ImportError:
+        pass
 
 
 def _plan_on_roadmap(roadmap: dict[str, Any], plan_path: str) -> bool:

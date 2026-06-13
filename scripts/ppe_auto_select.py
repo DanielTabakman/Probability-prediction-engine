@@ -44,57 +44,42 @@ def _plan_exists_and_valid(repo_root: Path, plan_path: str) -> list[str]:
 
 def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
     """Return (plan_path, reason). plan_path is None when nothing is selectable."""
+    result = choose_next_plan_result(repo_root)
+    return result.plan_path, result.reason
+
+
+def choose_next_plan_result(repo_root: Path):
+    from scripts.ppe_queue_selection import choose_next_selectable
+
     queue = load_queue(repo_root)
     items = queue.get("items") or []
     if not isinstance(items, list):
         raise ValueError("queue: items must be an array")
+    return choose_next_selectable(repo_root, items, status="READY")
 
-    skipped: list[str] = []
-    for i, item in enumerate(items):
-        if not isinstance(item, dict):
-            continue
-        status = str(item.get("status") or "").strip().upper()
-        if status != "READY":
-            continue
-        plan_path = str(item.get("planPath") or "").strip()
-        if not plan_path:
-            continue
-        errors = _plan_exists_and_valid(repo_root, plan_path)
-        if errors:
-            return None, f"queue item {i} invalid: " + "; ".join(errors)
-        if chapter_marked_complete_in_repo(repo_root, plan_path):
-            skipped.append(f"{plan_path}: evidence COMPLETE (skip SELECTION)")
-            continue
-        try:
-            from scripts.ppe_operator_guards import (
-                GUARD_EXIT,
-                GUARD_SKIP_CHAPTER,
-                evaluate_selection_guards,
-            )
 
-            guard = evaluate_selection_guards(repo_root, plan_path)
-        except FileNotFoundError:
-            guard = None
-        if guard is not None and guard.exit_code in (GUARD_EXIT, GUARD_SKIP_CHAPTER):
-            skipped.append(f"{plan_path}: {guard.detail}")
-            continue
-        try:
-            from scripts.ppe_focus_gate import evaluate_focus_gate, focus_gate_skip_code
+def maybe_notify_selection_skips(
+    repo_root: Path,
+    *,
+    skipped: list[Any],
+    selected_plan: str | None,
+    apply: bool,
+) -> None:
+    if not apply or not skipped:
+        return
+    try:
+        from scripts.ppe_progress_notify import notify_queue_selection_skips
+        from scripts.ppe_queue_selection import chapter_id_for_plan
 
-            focus = evaluate_focus_gate(repo_root, plan_path)
-        except ImportError:
-            focus = None
-        if focus is not None and not focus.allowed:
-            skipped.append(f"{plan_path}: focus gate — {focus.reason}")
-            continue
-        reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
-        if focus is not None and focus.urgent_bypass:
-            reason = f"{reason} (urgent bypass)"
-        return plan_path, reason
-
-    if skipped:
-        return None, "no selectable READY item; skipped: " + "; ".join(skipped)
-    return None, "no READY items in queue"
+        selected_cid = chapter_id_for_plan(repo_root, selected_plan) if selected_plan else ""
+        notify_queue_selection_skips(
+            repo_root,
+            skipped,
+            selected_plan=selected_plan,
+            selected_chapter_id=selected_cid,
+        )
+    except ImportError:
+        pass
 
 
 def finalize_complete_manifest_plan(repo_root: Path, *, apply: bool) -> tuple[bool, str]:
@@ -208,7 +193,16 @@ def run_auto_select(
         )
         return 1
 
-    plan_path, reason = choose_next_plan(repo)
+    plan_result = choose_next_plan_result(repo)
+    plan_path = plan_result.plan_path
+    reason = plan_result.reason
+    if apply and not select_only:
+        maybe_notify_selection_skips(
+            repo,
+            skipped=plan_result.skipped,
+            selected_plan=plan_path,
+            apply=True,
+        )
     if not plan_path:
         _print_result(selected=False, plan_path=None, reason=reason)
         return 0

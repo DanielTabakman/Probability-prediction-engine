@@ -204,6 +204,7 @@ Disable remote commands: `set PPE_NTFY_CMD_ENABLED=0` in `ppe_operator_notify.lo
 | Loop down >45m without maintenance (24/7 gap) | **ntfy** (title: **PPE: loop down … (24/7 gap)**) |
 | 8am morning digest (watch poll) | **ntfy** — dynamic title from today's plan; full copy in `docs/RELEASES/MORNING_REPORT_LATEST.md` |
 | Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
+| Queue chapter skipped (dependency / focus gate) | **ntfy** (title: **PPE skipped: …** or **PPE queue blocked: …**) — loop continues with next selectable chapter when possible |
 
 **Morning report sections:** yesterday output · product git diff · runtime (uptime vs prior day, maintenance vs gap) · today's build plan · get-ahead blockers · business playbook (main topic). Steward Mon/Thu nudges use **`PPE_NTFY_STEWARD_TOPIC`** (separate subscription).
 
@@ -255,6 +256,8 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_MORNING_REPORT_AT` | No | `08:00` local |
 | `PPE_NTFY_GAP_ALERT` | No | `1` — ping when loop off without maintenance past threshold |
 | `PPE_NTFY_GAP_ALERT_MIN` | No | `45` — minutes before gap alert |
+| `PPE_NTFY_QUEUE_SKIP` | No | `1` — ping when a queue chapter is skipped or all candidates blocked |
+| `PPE_NTFY_QUEUE_SKIP_HOURS` | No | `6` — dedupe interval for skip pings |
 | `PPE_OPERATOR_MAINTENANCE` | No | `1` on desktop marks intentional downtime |
 | `PPE_NTFY_CMD_POLL_SEC` | No | `30` — phone command poll interval |
 | `PPE_GIT_SYNC` | No | enabled |

@@ -68,6 +68,21 @@ Rows with **`planPath`** auto-promote `blocked` → `queued` when the pipeline i
 
 Mark **`blocked`** without `planPath` when canon is not ready (steward must add a relay plan before promotion can run).
 
+## Queue skip and continue
+
+When the next **READY** or **pending** chapter cannot run (missing plan, **`queueAfterPlanPath`** anchor incomplete, focus gate, selection guards), the loop **skips it and tries the next row** in queue/roadmap order — it does not stall the whole pipeline.
+
+Phone **ntfy** (when configured):
+
+| Title | Meaning |
+|-------|---------|
+| **PPE skipped: …** | A chapter was blocked; loop continued with the next selectable chapter |
+| **PPE queue blocked: …** | Every candidate was blocked — operator action needed |
+
+Deduped per chapter+reason (default **6h**). Disable: `PPE_NTFY_QUEUE_SKIP=0`. Interval: `PPE_NTFY_QUEUE_SKIP_HOURS=6`.
+
+Implementation: [`ppe_queue_selection.py`](../../scripts/ppe_queue_selection.py) · wired in `ppe_auto_select`, `ppe_roadmap`, `ppe_propagate_queue`.
+
 ## Related
 
 - [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md)

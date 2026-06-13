@@ -134,25 +134,65 @@ def _first_pending_with_valid_plan(
     roadmap: dict[str, Any],
     *,
     apply: bool = False,
-) -> dict[str, Any] | None:
+) -> tuple[dict[str, Any] | None, list[Any]]:
+    """Next pending roadmap row that passes selection checks; skip blocked rows."""
     from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_chapter_evidence_complete
+    from scripts.ppe_queue_selection import (
+        SkippedChapter,
+        chapter_id_for_plan,
+        selection_blockers,
+    )
 
+    skipped: list[SkippedChapter] = []
     for item in roadmap.get("items") or []:
         if not isinstance(item, dict):
             continue
         if str(item.get("status") or "").strip().lower() != "pending":
             continue
         plan = norm_plan(str(item.get("planPath") or ""))
-        ok, _ = _plan_valid(repo_root, plan)
+        ok, _err = _plan_valid(repo_root, plan)
         if not ok:
+            skipped.append(
+                SkippedChapter(plan, chapter_id_for_plan(repo_root, plan), [_err or "invalid plan"])
+            )
             continue
         if chapter_marked_complete_in_repo(repo_root, plan):
             if apply:
                 _set_roadmap_status(roadmap, plan, "done")
                 finalize_chapter_evidence_complete(repo_root, plan, apply=True)
             continue
-        return item
-    return None
+        blockers = selection_blockers(repo_root, plan)
+        if blockers:
+            skipped.append(
+                SkippedChapter(plan, chapter_id_for_plan(repo_root, plan), blockers)
+            )
+            continue
+        return item, skipped
+    return None, skipped
+
+
+def _notify_pending_skips(
+    repo: Path,
+    skipped: list[Any],
+    *,
+    selected_plan: str | None,
+    apply: bool,
+) -> None:
+    if not apply or not skipped:
+        return
+    try:
+        from scripts.ppe_progress_notify import notify_queue_selection_skips
+        from scripts.ppe_queue_selection import chapter_id_for_plan
+
+        selected_cid = chapter_id_for_plan(repo, selected_plan) if selected_plan else ""
+        notify_queue_selection_skips(
+            repo,
+            skipped,
+            selected_plan=selected_plan,
+            selected_chapter_id=selected_cid,
+        )
+    except ImportError:
+        pass
 
 
 def bootstrap_next_ready(repo_root: Path, *, apply: bool) -> dict[str, Any]:
@@ -182,8 +222,11 @@ def bootstrap_next_ready(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         return {"bootstrapped": False, "reason": "queue already has READY"}
 
     roadmap = load_roadmap(repo)
-    item = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
+    item, skipped = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
     if item is None:
+        if apply and skipped:
+            save_roadmap(repo, roadmap)
+            _notify_pending_skips(repo, skipped, selected_plan=None, apply=True)
         return {"bootstrapped": False, "reason": "no valid pending roadmap item"}
 
     plan = norm_plan(str(item["planPath"]))
@@ -198,6 +241,7 @@ def bootstrap_next_ready(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         status="READY",
         **_roadmap_item_fields(item),
     )
+    _notify_pending_skips(repo, skipped, selected_plan=plan, apply=True)
     return {"bootstrapped": True, "planPath": plan, "reason": "first pending -> READY"}
 
 
@@ -225,10 +269,12 @@ def advance_after_chapter_closeout(
                 done_reason="marked DONE by ppe_roadmap (chapter closeout)",
             )
 
-    next_item = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
+    next_item, skipped = _first_pending_with_valid_plan(repo, roadmap, apply=apply)
     if next_item is None:
         if apply:
             save_roadmap(repo, roadmap)
+            if skipped:
+                _notify_pending_skips(repo, skipped, selected_plan=None, apply=True)
         return {"advanced": False, "closedPlan": closed, "reason": "no pending roadmap item with valid plan"}
 
     next_plan = norm_plan(str(next_item["planPath"]))
@@ -248,6 +294,7 @@ def advance_after_chapter_closeout(
         status="READY",
         **_roadmap_item_fields(next_item),
     )
+    _notify_pending_skips(repo, skipped, selected_plan=next_plan, apply=apply)
     return {
         "advanced": True,
         "closedPlan": closed,
