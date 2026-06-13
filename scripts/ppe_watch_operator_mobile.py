@@ -392,6 +392,14 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     except Exception as exc:
         post_finish = {"action": "post_build_watcher", "error": str(exc)}
 
+    try:
+        from scripts.ppe_autobuilder import write_status_artifact, collect_autobuilder_status
+
+        autobuilder_path = write_status_artifact(repo, collect_autobuilder_status(repo))
+        new_state["autobuilder_status"] = str(autobuilder_path.relative_to(repo)).replace("\\", "/")
+    except Exception as exc:
+        new_state["autobuilder_error"] = str(exc)
+
     save_state(repo, new_state)
 
     return {

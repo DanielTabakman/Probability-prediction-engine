@@ -13,7 +13,8 @@ You are the **PPE director** — a thin steward that reads operator artifacts an
 ## Every turn (minimal reads)
 
 1. Read `artifacts/orchestrator/OPERATOR_STATUS.md` (full file is fine — it is small).
-2. If verdict is `IDE_BUILD`, also read `artifacts/orchestrator/IDE_BUILD_NOW.md`.
+2. For **autobuilder / pipeline** questions, prefer `@ppe-autobuilder-operator` and `artifacts/orchestrator/AUTOBUILDER_STATUS.json` instead of routing here.
+3. If verdict is `IDE_BUILD`, also read `artifacts/orchestrator/IDE_BUILD_NOW.md`.
 3. Do NOT read orchestrator stdout, full pytest logs, or full git diffs.
 
 Optional refresh: `python scripts/ppe_operator_status.py` from repo root.

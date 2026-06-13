@@ -31,5 +31,6 @@ if "%~1"=="" (
 set "RC=%ERRORLEVEL%"
 
 echo.
-echo Phone triage: run_ppe_operator.cmd --brief
+echo Autobuilder: ppe_autobuilder.cmd status  ^|  Agent: @ppe-autobuilder-operator
+python "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" status --write --brief
 exit /b %RC%

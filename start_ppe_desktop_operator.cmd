@@ -20,5 +20,6 @@ echo   1. PPE auto loop
 echo   2. PPE mobile watch
 echo   3. PPE ntfy commands (phone: build / restart / fix / status)
 echo.
+echo Autobuilder: ppe_autobuilder.cmd status  ^|  Agent: @ppe-autobuilder-operator
 echo Set PPE_NTFY_TOPIC before first run (see docs/SOP/PPE_MOBILE_OPERATOR_V1.md).
 exit /b 0

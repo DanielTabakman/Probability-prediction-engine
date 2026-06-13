@@ -168,6 +168,12 @@ def collect_status(repo: Path, *, apply_propagate: bool = True, ensure: bool = F
     )
     out["operator_brief"] = (proc.stdout or "").strip()
     out["operator_exit"] = proc.returncode
+    try:
+        from scripts.ppe_autobuilder import collect_autobuilder_status, write_status_artifact
+
+        write_status_artifact(repo, collect_autobuilder_status(repo))
+    except Exception:
+        pass
     return out
 
 
