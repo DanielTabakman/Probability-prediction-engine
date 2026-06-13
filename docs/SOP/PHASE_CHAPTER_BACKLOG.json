@@ -174,6 +174,16 @@
       "selectionRecord": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "canonRef": "docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md \u2014 P3 distribution",
       "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity"
+    },
+    {
+      "chapterId": "ppe_operator_visibility_v1",
+      "status": "chartered",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_operator_visibility_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md \u2014 Paperclip-inspired visibility",
+      "reason": "[HIGH] Operator inbox, active-slice lock, queue preview, operator map \u2014 daily loop UX"
     }
   ]
 }

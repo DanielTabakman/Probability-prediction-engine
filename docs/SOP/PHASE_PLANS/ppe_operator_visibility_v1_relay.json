@@ -1,0 +1,72 @@
+{
+  "name": "PPE operator visibility v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
+  "layerPreset": "CONTROL",
+  "slices": [
+    {
+      "sliceId": "PPE-OperatorVis-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "workerMode": "deterministic",
+      "susMinutes": 20,
+      "hardMinutes": 45,
+      "maxAttempts": 1,
+      "touchSet": [
+        "scripts/ppe_active_ide_slice.py",
+        "scripts/ppe_operator_status.py",
+        "scripts/ppe_ide_build_starter.py",
+        "scripts/ppe_ide_product_ready.py",
+        "scripts/ppe_queue.py",
+        "tests/test_ppe_active_ide_slice.py",
+        "tests/test_ppe_operator_status_inbox.py",
+        "docs/SOP/PPE_OPERATOR_MAP_V1.md"
+      ]
+    },
+    {
+      "sliceId": "PPE-OperatorVis-Control-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "workerMode": "deterministic",
+      "susMinutes": 20,
+      "hardMinutes": 45,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-OperatorVis-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "workerMode": "deterministic",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-OperatorVis-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "workerMode": "deterministic",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_operator_visibility_v1",
+        "chapterTitle": "PPE operator visibility v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_OPERATOR_VISIBILITY_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_OPERATOR_VISIBILITY_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_OPERATOR_VISIBILITY_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/PPE_OPERATOR_MAP_V1.md",
+          "docs/SOP/PPE_OPERATOR_VISIBILITY_V1_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

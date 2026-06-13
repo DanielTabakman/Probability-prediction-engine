@@ -60,6 +60,18 @@ Scheduling (`ppe_propagate_queue.py`): **high → medium → low**; ties break b
 
 One chapter runs at a time: while a row is `chartered` or `queued`, nothing else promotes.
 
+## Agent hiring (new subagents)
+
+Adding a Cursor subagent under `.cursor/agents/` is like **hiring** — it changes who does work in the operator org.
+
+| Do | Do not |
+|----|--------|
+| Add a backlog row or SELECTION note naming the role and why | Create agents mid-BUILD without steward visibility |
+| Update [`PPE_OPERATOR_MAP_V1.md`](PPE_OPERATOR_MAP_V1.md) verdict table if the role is operator-facing | Spawn parallel managers (one `@ppe-director` only) |
+| Keep **Reads / Writes / Never** on the agent file | Give agents open-ended repo access without layer preset |
+
+Operator-facing roles (`ppe-director`, `ppe-*-worker`) are **dev-factory** — charter via control-plane chapter when behavior changes materially.
+
 ## Status
 
 | Status | Use |

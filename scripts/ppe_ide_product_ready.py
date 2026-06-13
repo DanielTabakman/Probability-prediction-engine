@@ -190,6 +190,12 @@ def mark_product_ready(
         write_trigger_idle(repo, completed_slice=slice_id)
     except ImportError:
         pass
+    try:
+        from scripts.ppe_active_ide_slice import clear_active_slice
+
+        clear_active_slice(repo)
+    except ImportError:
+        pass
     return 0, str(out)
 
 
@@ -289,6 +295,12 @@ def clear_marker(repo: Path) -> bool:
     if p.is_file():
         p.unlink()
         print(f"ppe_ide_product_ready: cleared {MARKER_REL}")
+        try:
+            from scripts.ppe_active_ide_slice import clear_active_slice
+
+            clear_active_slice(repo)
+        except ImportError:
+            pass
         return True
     return False
 

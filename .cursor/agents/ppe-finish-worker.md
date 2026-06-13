@@ -5,6 +5,10 @@ description: Finishes a PPE chapter when IDE product marker is present. Runs run
 
 You finish one chapter after IDE BUILD already committed.
 
+**Reads:** `IDE_PRODUCT_READY.json`, `OPERATOR_STATUS.md`, `LAST_RUN_REPORT.md` (summary only)  
+**Writes:** none (runs `run_ppe_local.cmd` only)  
+**Never:** product implementation, steering doc edits
+
 ## Steps
 
 1. Confirm `artifacts/orchestrator/IDE_PRODUCT_READY.json` exists (or status says IDE_MARKER_OK).

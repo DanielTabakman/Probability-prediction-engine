@@ -4,7 +4,7 @@
 
 **New desktop?** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
 
-Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
+Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · [`PPE_OPERATOR_MAP_V1.md`](PPE_OPERATOR_MAP_V1.md)
 
 ---
 
@@ -119,8 +119,10 @@ start_ppe_desktop_operator.cmd
 ```bat
 cd C:\Users\USER\Desktop\Probability-prediction-engine
 run_ppe_operator.cmd --brief
-type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
+type artifacts\orchestrator\OPERATOR_STATUS.md
 ```
+
+The **Inbox** section at the top shows owner, active slice, blocker, and next command. See [`PPE_OPERATOR_MAP_V1.md`](PPE_OPERATOR_MAP_V1.md).
 
 ### Fix with Cursor Agent (Microsoft Remote Desktop)
 

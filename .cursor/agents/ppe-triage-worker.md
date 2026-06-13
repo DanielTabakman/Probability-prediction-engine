@@ -5,6 +5,10 @@ description: Diagnoses PPE operator blockers (FIX_PLAN, STALE_STATE, ERROR, STOP
 
 You diagnose operator blockers. You do not BUILD product code.
 
+**Reads:** `OPERATOR_STATUS.md` (Inbox), `OPERATOR_GUARD_REPORT.md`, `LAST_RUN_REPORT.md`, latest `decision.json`  
+**Writes:** diagnosis text only — no code unless RECOVERY chartered  
+**Never:** product slices, `run_ppe_auto_local_loop`, steering doc edits
+
 ## Load
 
 - `artifacts/orchestrator/OPERATOR_STATUS.md`

@@ -26,7 +26,7 @@ from scripts.ppe_propagate_queue import (
     load_backlog,
     promote_first_blocked_with_plan,
 )
-from scripts.ppe_queue import load_queue
+from scripts.ppe_queue import load_queue, list_ready_queue_items
 
 STATUS_REPORT_REL = "artifacts/orchestrator/OPERATOR_STATUS.md"
 NOTIFY_REL = "artifacts/control_plane/OPERATOR_STATUS_NOTIFY.json"
@@ -40,6 +40,84 @@ VERDICT_STALE_STATE = "STALE_STATE"
 VERDICT_ERROR = "ERROR"
 
 STOP_VERDICTS = frozenset({VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR})
+
+_INBOX_OWNER: dict[str, tuple[str, str]] = {
+    VERDICT_RUN_AUTO: ("loop", "unattended auto-loop"),
+    VERDICT_RUN_LOCAL: ("IDE", "@ppe-finish-worker"),
+    VERDICT_IDE_BUILD: ("IDE", "@ppe-build-worker"),
+    VERDICT_FIX_PLAN: ("triage", "@ppe-triage-worker"),
+    VERDICT_STALE_STATE: ("triage", "@ppe-triage-worker"),
+    VERDICT_ERROR: ("triage", "@ppe-triage-worker"),
+    VERDICT_SUPPLY_LOW: ("steward", "SELECTION / backlog"),
+}
+
+
+def _inbox_owner(verdict: str) -> tuple[str, str]:
+    return _INBOX_OWNER.get(verdict, ("operator", "run_ppe_operator.cmd"))
+
+
+def _build_inbox(
+    *,
+    verdict: str,
+    blocker: str | None,
+    product_slice: str | None,
+    active_slice: dict[str, Any] | None,
+    commands: list[str],
+    queue_preview: list[dict[str, Any]],
+) -> dict[str, Any]:
+    owner, agent = _inbox_owner(verdict)
+    active_id = None
+    starter_path_val = None
+    if isinstance(active_slice, dict):
+        active_id = str(active_slice.get("sliceId") or "").strip() or None
+        starter_path_val = str(active_slice.get("starterPath") or "").strip() or None
+    elif product_slice:
+        active_id = product_slice
+    next_cmd = commands[0] if commands else None
+    return {
+        "owner": owner,
+        "agent": agent,
+        "active_slice_id": active_id,
+        "pending_product_slice": product_slice,
+        "starter_path": starter_path_val,
+        "blocker": blocker,
+        "next_command": next_cmd,
+        "queue_preview": queue_preview,
+    }
+
+
+def _format_inbox_block(inbox: dict[str, Any]) -> str:
+    lines = [
+        "## Inbox",
+        "",
+        f"- **Owner:** {inbox.get('owner')} ({inbox.get('agent')})",
+    ]
+    active = inbox.get("active_slice_id")
+    if active:
+        lines.append(f"- **Active slice:** `{active}`")
+        starter = inbox.get("starter_path")
+        if starter:
+            lines.append(f"- **Starter:** `{starter}`")
+    pending = inbox.get("pending_product_slice")
+    if pending and pending != active:
+        lines.append(f"- **Pending product slice:** `{pending}`")
+    blocker = inbox.get("blocker")
+    if blocker:
+        lines.append(f"- **Blocker:** {blocker}")
+    next_cmd = inbox.get("next_command")
+    if next_cmd:
+        lines.append(f"- **Next:** `{next_cmd}`")
+    preview = inbox.get("queue_preview") or []
+    if preview:
+        lines.extend(["", "### Queue preview (READY)"])
+        for i, row in enumerate(preview, 1):
+            plan = row.get("planPath") or "?"
+            reason = row.get("reason")
+            suffix = f" — {reason}" if reason else ""
+            lines.append(f"{i}. `{plan}`{suffix}")
+    else:
+        lines.extend(["", "### Queue preview (READY)", "_none_"])
+    return "\n".join(lines) + "\n"
 
 
 def _utc_now() -> str:
@@ -218,6 +296,29 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
     avoid = _avoid_commands(verdict)
 
+    queue_preview: list[dict[str, Any]] = []
+    try:
+        queue_preview = list_ready_queue_items(repo, limit=3)
+    except FileNotFoundError:
+        pass
+
+    active_slice: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_active_ide_slice import load_active_slice
+
+        active_slice = load_active_slice(repo)
+    except ImportError:
+        pass
+
+    inbox = _build_inbox(
+        verdict=verdict,
+        blocker=blocker,
+        product_slice=product_slice,
+        active_slice=active_slice,
+        commands=commands,
+        queue_preview=queue_preview,
+    )
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
@@ -225,7 +326,9 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "chapter_name": summary.get("chapter_name"),
         "manifest_status": manifest_status,
         "phase_plan_path": plan_path,
+        "product_slice_id": product_slice,
         "blocker": blocker,
+        "inbox": inbox,
         "guard": {
             "exit_code": guard.exit_code,
             "reason": guard.reason,
@@ -241,10 +344,15 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 
 
 def _format_human(status: dict[str, Any]) -> str:
-    lines = [
+    inbox = status.get("inbox") or {}
+    lines: list[str] = []
+    if inbox:
+        lines.append(_format_inbox_block(inbox).rstrip())
+        lines.append("")
+    lines.extend([
         f"VERDICT: {status.get('verdict')}",
         "",
-    ]
+    ])
     if status.get("chapter_name"):
         lines.append(f"Chapter: {status['chapter_name']}")
     if status.get("manifest_status"):

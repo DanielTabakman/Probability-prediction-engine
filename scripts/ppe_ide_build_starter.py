@@ -229,9 +229,21 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
 
 def write_starter(repo: Path, *, slice_id: str, phase_plan: str) -> Path:
     md = build_starter_md(repo, slice_id=slice_id, phase_plan=phase_plan)
-    out = repo / starter_path(slice_id)
+    rel = starter_path(slice_id)
+    out = repo / rel
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(md, encoding="utf-8")
+    try:
+        from scripts.ppe_active_ide_slice import write_active_slice
+
+        write_active_slice(
+            repo,
+            slice_id=slice_id,
+            phase_plan_path=phase_plan,
+            starter_path=rel,
+        )
+    except ImportError:
+        pass
     return out
 
 

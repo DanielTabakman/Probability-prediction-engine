@@ -106,3 +106,28 @@ def upsert_queue_item(
     queue["items"] = items
     save_queue(repo_root, queue)
     return True, f"queue item {idx} updated ({status})"
+
+
+def list_ready_queue_items(repo_root: Path, *, limit: int = 3) -> list[dict[str, Any]]:
+    """First N READY queue rows in file order."""
+    queue = load_queue(repo_root)
+    ready: list[dict[str, Any]] = []
+    cap = max(1, limit)
+    for item in queue.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "").upper() != "READY":
+            continue
+        plan = str(item.get("planPath") or "").replace("\\", "/").strip()
+        if not plan:
+            continue
+        ready.append(
+            {
+                "planPath": plan,
+                "reason": str(item.get("reason") or "").strip() or None,
+                "workerMode": str(item.get("workerMode") or "").strip() or None,
+            }
+        )
+        if len(ready) >= cap:
+            break
+    return ready

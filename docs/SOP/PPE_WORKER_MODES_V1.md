@@ -45,5 +45,34 @@ Deterministic mode **does not** implement product code changes. **Product** slic
 ## Related
 
 - [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md)
+- [`PPE_OPERATOR_MAP_V1.md`](PPE_OPERATOR_MAP_V1.md) — verdict → mode decision tree
 - [`scripts/ppe_promotion_recovery.py`](../../scripts/ppe_promotion_recovery.py)
 - [`scripts/ppe_queue_health.py`](../../scripts/ppe_queue_health.py)
+
+---
+
+## Mode decision tree
+
+```
+Start: run_ppe_auto_local_loop.cmd (local profile)
+  │
+  ├─ Have API credits? → run_ppe_auto_acp_loop.cmd (acp mode)
+  │
+  └─ Loop hits product slice (exit 7 / IDE_BUILD)
+        │
+        ├─ autoRemoteBuild enabled? → CLI remote build adapter
+        │
+        └─ Default (near-zero API)
+              → generate_ide_build_starter.cmd
+              → ACTIVE_IDE_SLICE.json written
+              → ppe_go.cmd → @ppe-build-worker
+              → mark_ide_product_ready.cmd → run_ppe_local.cmd
+```
+
+| Slice kind in plan | Mode | Who implements |
+|--------------------|------|----------------|
+| Control / Witness / Closeout | deterministic | Loop + pytest/scripts |
+| Smoke / Evidence | deterministic or local-agent | Loop or ACP |
+| Product | **IDE** (local profile) or acp/local-agent | Cursor Agent or API worker |
+
+Per-slice override: `"workerMode": "deterministic"` in phase plan JSON.

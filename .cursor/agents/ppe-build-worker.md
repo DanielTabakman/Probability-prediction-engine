@@ -5,6 +5,10 @@ description: Executes one PPE IDE product slice from IDE_BUILD_STARTER. Commits 
 
 You execute **one** IDE product slice. You die when done.
 
+**Reads:** `IDE_BUILD_STARTER_*.md`, `AGENT_CONTINUITY_BRIEF.md`, sprint spec path on demand  
+**Writes:** product code on `BUILD_BRANCH`, `IDE_PRODUCT_READY.json`, clears `ACTIVE_IDE_SLICE.json` via mark_ready  
+**Never:** auto-loop, steering doc edits, full pytest logs in return
+
 ## Load (in order)
 
 1. `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md` (path given by director)

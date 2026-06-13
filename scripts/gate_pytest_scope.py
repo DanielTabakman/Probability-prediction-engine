@@ -88,7 +88,7 @@ _FALLBACK_PREFIXES: tuple[str, ...] = (
     "docs/SOP/PHASE_PLANS/",
 )
 
-_MAX_SCOPED_FILES = 45
+_MAX_SCOPED_FILES = 55
 
 
 def _glob_tests(repo: Path, pattern: str) -> list[str]:

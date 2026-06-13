@@ -2,6 +2,8 @@
 
 Use this template when sending a relay BUILD packet to Cursor or documenting a slice handoff. **Paths only** — do not inline sprint specs, HANDOFF gate blocks, or ledger history.
 
+**Target size:** ≤~80 lines prose in handoffs ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) NORMAL band). Link long specs; never paste orchestrator logs or full pytest output.
+
 **Layer map (required for all BUILD packets):** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · presets [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.json)
 
 ## Required fields
