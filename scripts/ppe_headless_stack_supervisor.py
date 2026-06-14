@@ -99,6 +99,13 @@ def _operator_env(repo: Path) -> dict[str, str]:
     return env
 
 
+def _worker_env(repo: Path, spec: WorkerSpec) -> dict[str, str]:
+    env = _operator_env(repo)
+    if spec.name == "loop":
+        env["PPE_HEADLESS_SUPERVISED_LOOP"] = "1"
+    return env
+
+
 @dataclass(frozen=True)
 class WorkerSpec:
     name: str
@@ -141,7 +148,17 @@ def worker_specs(repo: Path) -> list[WorkerSpec]:
     return [spec for spec in specs if spec.required]
 
 
-def worker_running(spec: WorkerSpec) -> bool:
+def worker_running(repo: Path, spec: WorkerSpec, state: dict[str, Any] | None = None) -> bool:
+    if state is not None:
+        workers = state.get("workers")
+        if isinstance(workers, dict):
+            pid = workers.get(spec.name)
+            if pid is not None:
+                try:
+                    if process_alive(int(pid)):
+                        return True
+                except (TypeError, ValueError):
+                    pass
     return _powershell_process_match(spec.pattern)
 
 
@@ -154,7 +171,7 @@ def spawn_worker(
     proc = spawn_detached_logged(
         spec.build_cmd(repo),
         cwd=repo.resolve(),
-        env=_operator_env(repo),
+        env=_worker_env(repo, spec),
         log_path=worker_log_path(repo, spec.name),
         log_handles=log_handles,
     )
@@ -192,7 +209,7 @@ def ensure_workers(
         if tracked is not None and process_alive(tracked):
             workers[spec.name] = tracked
             continue
-        if worker_running(spec):
+        if worker_running(repo, spec, state):
             continue
         pid = spawn_worker(repo, spec, log_handles=log_handles)
         workers[spec.name] = pid
@@ -219,6 +236,20 @@ def run_supervisor(repo: Path, *, poll_seconds: int = DEFAULT_POLL_SECONDS) -> i
             file=sys.stderr,
         )
         return 1
+
+    existing = load_state(repo)
+    other_pid = existing.get("supervisor_pid")
+    if other_pid is not None:
+        try:
+            other = int(other_pid)
+            if other != os.getpid() and process_alive(other):
+                print(
+                    f"ppe_headless_stack_supervisor: another supervisor pid={other} is active",
+                    file=sys.stderr,
+                )
+                return 1
+        except (TypeError, ValueError):
+            pass
 
     log_handles: list[TextIO | BinaryIO] = []
     state: dict[str, Any] = {

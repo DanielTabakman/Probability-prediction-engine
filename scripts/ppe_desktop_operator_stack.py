@@ -19,9 +19,12 @@ NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
 def _powershell_process_match(pattern: str) -> bool:
+    # Only match worker hosts (python/cmd). Excluding powershell.exe avoids false positives
+    # when this probe's own -Command string contains the same regex literal.
+    allowed = "@('python.exe','cmd.exe','pwsh.exe')"
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.CommandLine -match '{pattern}' }}; "
+        f"Where-Object {{ $_.Name -in {allowed} -and $_.CommandLine -match '{pattern}' }}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:

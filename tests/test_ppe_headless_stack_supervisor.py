@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -86,6 +87,21 @@ def test_start_full_stack_uses_headless(tmp_path):
         with patch("scripts.ppe_desktop_operator_stack._ensure_headless") as ensure:
             start_full_stack(tmp_path)
     ensure.assert_called_once_with(tmp_path)
+
+
+def test_powershell_process_match_excludes_probe_host():
+    from scripts.ppe_desktop_operator_stack import _powershell_process_match
+
+    captured: list[str] = []
+
+    def fake_run(cmd, **kwargs):
+        captured.append(cmd[-1])
+        return subprocess.CompletedProcess(cmd, 0, stdout="no\n", stderr="")
+
+    with patch("scripts.ppe_desktop_operator_stack.subprocess.run", side_effect=fake_run):
+        assert _powershell_process_match(r"run_ppe_auto_local_loop") is False
+    assert "python.exe" in captured[0]
+    assert "powershell.exe" not in captured[0]
 
 
 def test_load_state_missing_returns_empty(tmp_path):
