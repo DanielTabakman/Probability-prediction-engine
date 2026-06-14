@@ -1,3 +1,6 @@
+# Routing: apex (default) -> msos_web:3000 (Next.js MSOS); app.marketstructureos.com -> app_full:8501 (Streamlit).
+# Deploy notes: docs/DEPLOY/MSOS_WEB_V1.md
+#
 # Origin serves HTTP only for now (reliable for raw IP + pre-DNS testing).
 # Cloudflare "Full (strict)" needs a TLS cert on the origin later — use a
 # Cloudflare Origin Certificate + tls /path/to/cert.pem /path/to/key.pem
