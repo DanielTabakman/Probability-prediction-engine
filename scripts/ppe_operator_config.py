@@ -135,6 +135,21 @@ def continuous_max(repo_root: Path) -> int:
         return 20
 
 
+def headless_stack_mode(repo_root: Path) -> bool:
+    """When True, desktop stack uses one headless supervisor instead of cmd windows."""
+    env = os.environ.get("PPE_STACK_HEADLESS", "").strip().lower()
+    if env in ("1", "true", "yes", "on", "headless"):
+        return True
+    if env in ("0", "false", "no", "off", "windows"):
+        return False
+    cfg = load_operator_config(repo_root)
+    stack = cfg.get("desktopStack")
+    if not isinstance(stack, dict):
+        return False
+    mode = str(stack.get("mode") or "windows").strip().lower()
+    return mode == "headless"
+
+
 def apply_operator_env(repo_root: Path) -> dict[str, Any]:
     """Set process env from operator config (does not override explicit env)."""
     cfg = load_operator_config(repo_root)
