@@ -37,6 +37,22 @@ def test_write_trigger_idle(tmp_path):
     assert data["lastCompletedSlice"] == "MVP1-Slice002"
 
 
+def test_write_trigger_dispatched(tmp_path):
+    from scripts.ppe_ide_build_automation_trigger import write_trigger_dispatched
+
+    write_trigger_dispatched(
+        tmp_path,
+        slice_id="MVP1-Slice002",
+        plan_path="docs/SOP/PHASE_PLANS/foo.json",
+        starter_rel="artifacts/orchestrator/IDE_BUILD_STARTER_MVP1-Slice002.md",
+        handoff_at="2026-06-14T00:00:00Z",
+        worker_pid=99,
+    )
+    data = load_trigger(tmp_path)
+    assert data["status"] == "dispatched"
+    assert data["workerPid"] == 99
+
+
 def test_notify_automation_skips_webhook_without_url(tmp_path):
     result = notify_automation(
         tmp_path,

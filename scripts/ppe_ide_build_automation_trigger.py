@@ -72,6 +72,30 @@ def write_trigger_idle(repo: Path, *, completed_slice: str | None = None) -> Pat
     return write_trigger(repo, payload)
 
 
+def write_trigger_dispatched(
+    repo: Path,
+    *,
+    slice_id: str,
+    plan_path: str,
+    starter_rel: str,
+    handoff_at: str,
+    source: str = "local-watcher",
+    worker_pid: int | None = None,
+) -> Path:
+    payload: dict[str, Any] = {
+        "status": "dispatched",
+        "sliceId": slice_id,
+        "planPath": plan_path.replace("\\", "/"),
+        "starter": starter_rel.replace("\\", "/"),
+        "handoffAt": handoff_at,
+        "dispatchedAt": _utc_now(),
+        "dispatchedBy": source,
+    }
+    if worker_pid is not None:
+        payload["workerPid"] = worker_pid
+    return write_trigger(repo, payload)
+
+
 def post_automation_webhook(repo: Path, payload: dict[str, Any]) -> dict[str, Any]:
     url = os.environ.get("PPE_CURSOR_AUTOMATION_WEBHOOK_URL", "").strip()
     if not url:

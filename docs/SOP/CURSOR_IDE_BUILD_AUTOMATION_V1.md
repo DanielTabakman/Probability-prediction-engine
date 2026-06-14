@@ -1,12 +1,41 @@
 # Cursor IDE BUILD automation v1
 
-**Plane:** CONTROL-PLANE. **Purpose:** start IDE Agent on product slices when handoff fires — **IDE subscription**, not headless CLI.
+**Plane:** CONTROL-PLANE. **Purpose:** auto-start IDE BUILD on product slices when handoff fires.
 
 **Related:** [`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 
 ---
 
-## What this automates
+## Recommended: local trigger watcher (desktop)
+
+**Default on the always-on desktop.** No Cursor cloud Automations required.
+
+When handoff fires, [`ppe_ide_handoff.py`](../../scripts/ppe_ide_handoff.py) writes **`.cursor/IDE_BUILD_TRIGGER.json`** with `"status": "pending"`.  
+[`watch_ide_build_local.cmd`](../../watch_ide_build_local.cmd) polls that file and starts the **local agent CLI** against your repo.
+
+```text
+Loop exit 7 → handoff writes trigger (pending)
+            → watch_ide_build_local.cmd sees change (~5s)
+            → agent CLI implements starter + closeout
+            → post-build watcher or mark_ide_product_ready → run_ppe_local
+```
+
+| Item | Value |
+|------|-------|
+| **Watcher** | `watch_ide_build_local.cmd` (started by `start_ppe_desktop_operator.cmd`) |
+| **Config** | `ideHandoff.localTriggerWatcher: true` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) |
+| **Prerequisite** | `setup_cursor_agent.cmd` + `agent login` on the desktop |
+| **Disable** | `PPE_IDE_LOCAL_TRIGGER_WATCHER=0` or `localTriggerWatcher: false` |
+
+**Post-build:** [`ppe_post_build_watcher.py`](../../scripts/ppe_post_build_watcher.py) runs `mark_ide_product_ready` + `run_ppe_local` if the agent stops after commit.
+
+---
+
+## Legacy: Cursor cloud Automations (optional)
+
+Cloud Automations (webhook / GitHub-connected) hit **background composer quota** and do not watch the local workspace reliably. Prefer the **local watcher** above.
+
+### What handoff still writes
 
 When the loop hits `IDE_BUILD`, [`ppe_ide_handoff.py`](../../scripts/ppe_ide_handoff.py) writes:
 

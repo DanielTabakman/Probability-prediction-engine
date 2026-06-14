@@ -14,11 +14,14 @@ timeout /t 3 /nobreak >nul
 start "PPE mobile watch" cmd /k call "%~dp0watch_operator_mobile.cmd"
 timeout /t 2 /nobreak >nul
 start "PPE ntfy commands" cmd /k call "%~dp0watch_ntfy_commands.cmd"
+timeout /t 2 /nobreak >nul
+start "PPE IDE BUILD watcher" cmd /k call "%~dp0watch_ide_build_local.cmd"
 
 echo Started:
 echo   1. PPE auto loop
 echo   2. PPE mobile watch
 echo   3. PPE ntfy commands (phone: build / restart / fix / status)
+echo   4. PPE IDE BUILD watcher (.cursor\IDE_BUILD_TRIGGER.json -^> agent CLI)
 echo.
 echo Autobuilder: ppe_autobuilder.cmd status  ^|  Agent: @ppe-autobuilder-operator
 echo Set PPE_NTFY_TOPIC before first run (see docs/SOP/PPE_MOBILE_OPERATOR_V1.md).
