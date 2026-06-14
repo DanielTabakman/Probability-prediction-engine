@@ -89,6 +89,17 @@ def test_start_full_stack_uses_headless(tmp_path):
     ensure.assert_called_once_with(tmp_path)
 
 
+def test_ensure_stack_headless_routes_to_supervisor(tmp_path):
+    from scripts.ppe_desktop_operator_stack import ensure_stack
+
+    with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=True):
+        with patch("scripts.ppe_headless_stack_supervisor.ensure_headless_supervisor") as ensure:
+            ensure.return_value = {"stack_running": True, "action": "headless_supervisor"}
+            result = ensure_stack(tmp_path, start=True)
+    ensure.assert_called_once_with(tmp_path, detach=True, start=True)
+    assert result["action"] == "headless_supervisor"
+
+
 def test_powershell_process_match_excludes_probe_host():
     from scripts.ppe_desktop_operator_stack import _powershell_process_match
 

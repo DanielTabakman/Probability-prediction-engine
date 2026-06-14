@@ -47,6 +47,8 @@ State: `artifacts/orchestrator/HEADLESS_STACK_SUPERVISOR.json`
 
 Run headless stack on a **Hyper-V VM** (loop host). Your daily PC stays clean; restore VM snapshot if the stack misbehaves.
 
+On a daily-driver PC until the VM exists: keep `ideHandoff.openCursor: false` so handoff does not steal Cursor focus.
+
 See [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md).
 
 ---

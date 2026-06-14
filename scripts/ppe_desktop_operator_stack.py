@@ -11,7 +11,7 @@ from typing import Any
 
 from scripts.ppe_operator_config import headless_stack_mode
 
-LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
+LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd|ppe_headless_loop_worker\.py"
 HEADLESS_SUPERVISOR_PATTERN = r"ppe_headless_stack_supervisor\.py"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
 LOCAL_TRIGGER_WATCHER_PATTERN = r"ppe_ide_build_local_watcher\.py|watch_ide_build_local\.cmd"
@@ -176,6 +176,14 @@ def restart_stack(repo: Path) -> dict[str, Any]:
 def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
     """Ensure auto-loop + mobile watch are running; start missing pieces when allowed."""
     repo = repo.resolve()
+    if headless_stack_mode(repo):
+        if not start:
+            before = stack_status(repo)
+            return {**before, "started": [], "action": "not_started"}
+        from scripts.ppe_headless_stack_supervisor import ensure_headless_supervisor
+
+        return ensure_headless_supervisor(repo, detach=True, start=True)
+
     before = stack_status(repo)
     started: list[str] = []
     from scripts.ppe_ntfy_commands import commands_enabled

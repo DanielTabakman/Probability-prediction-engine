@@ -33,7 +33,7 @@
   "autoRemoteBuild": false,
   "ideHandoff": {
     "enabled": true,
-    "openCursor": true,
+    "openCursor": false,
     "skipCliWhenUsageExhausted": true,
     "preferIdeOverCli": true,
     "postBuildWatcher": true,

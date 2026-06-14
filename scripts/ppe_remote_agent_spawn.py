@@ -14,6 +14,15 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _win32_hidden_flags() -> int:
+    if sys.platform != "win32":
+        return 0
+    flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
+    if hasattr(subprocess, "CREATE_NO_WINDOW"):
+        flags |= subprocess.CREATE_NO_WINDOW  # type: ignore[attr-defined]
+    return flags
+
+
 def _detached_popen(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> subprocess.Popen[Any]:
     kwargs: dict[str, Any] = {
         "cwd": cwd,
@@ -24,7 +33,7 @@ def _detached_popen(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> subpro
         "close_fds": True,
     }
     if sys.platform == "win32":
-        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
+        kwargs["creationflags"] = _win32_hidden_flags()
     else:
         kwargs["start_new_session"] = True
     return subprocess.Popen(cmd, **kwargs)
@@ -64,7 +73,7 @@ def spawn_detached_logged(
         "close_fds": False,
     }
     if sys.platform == "win32":
-        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
+        kwargs["creationflags"] = _win32_hidden_flags()
     else:
         kwargs["start_new_session"] = True
     proc = subprocess.Popen(cmd, **kwargs)

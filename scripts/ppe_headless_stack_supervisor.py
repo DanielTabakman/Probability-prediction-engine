@@ -27,6 +27,7 @@ from scripts.ppe_operator_config import headless_stack_mode
 from scripts.ppe_remote_agent_spawn import process_alive, spawn_detached_logged
 
 STATE_REL = "artifacts/orchestrator/HEADLESS_STACK_SUPERVISOR.json"
+SPAWN_LOCK_REL = "artifacts/orchestrator/HEADLESS_STACK_SPAWN.lock"
 SUPERVISOR_LOG_REL = "artifacts/orchestrator/HEADLESS_STACK_SUPERVISOR.log"
 DEFAULT_POLL_SECONDS = 30
 DEFAULT_WATCH_INTERVAL = 300
@@ -70,6 +71,32 @@ def clear_state(repo: Path) -> None:
     path = state_path(repo)
     if path.is_file():
         path.unlink(missing_ok=True)
+    spawn_lock_path(repo).unlink(missing_ok=True)
+
+
+def spawn_lock_path(repo: Path) -> Path:
+    return (repo / SPAWN_LOCK_REL).resolve()
+
+
+def try_acquire_spawn_lock(repo: Path, *, timeout_sec: float = 30.0) -> bool:
+    path = spawn_lock_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    deadline = time.time() + timeout_sec
+    while time.time() < deadline:
+        try:
+            fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(fd, str(os.getpid()).encode("ascii", errors="replace"))
+            os.close(fd)
+            return True
+        except FileExistsError:
+            if not is_supervisor_running(repo):
+                path.unlink(missing_ok=True)
+            time.sleep(0.5)
+    return False
+
+
+def release_spawn_lock(repo: Path) -> None:
+    spawn_lock_path(repo).unlink(missing_ok=True)
 
 
 def append_supervisor_log(repo: Path, line: str) -> None:
@@ -116,7 +143,12 @@ class WorkerSpec:
         repo = repo.resolve()
         py = sys.executable
         if self.name == "loop":
-            return ["cmd", "/c", str(repo / "run_ppe_auto_local_loop.cmd")]
+            return [
+                py,
+                str(repo / "scripts" / "ppe_headless_loop_worker.py"),
+                "--repo-root",
+                str(repo),
+            ]
         if self.name == "watch":
             return [
                 py,
@@ -322,32 +354,45 @@ def ensure_headless_supervisor(
             "action": "none",
         }
 
-    if detach:
-        env = _operator_env(repo)
-        proc = spawn_detached_logged(
-            [
-                sys.executable,
-                str(repo / "scripts" / "ppe_headless_stack_supervisor.py"),
-                "--repo-root",
-                str(repo),
-            ],
-            cwd=repo,
-            env=env,
-            log_path=supervisor_log_path(repo),
-        )
-        time.sleep(2)
-        running = is_supervisor_running(repo)
+    if not try_acquire_spawn_lock(repo):
         status = stack_status(repo)
         return {
             **status,
             "headless": True,
-            "supervisor_running": running,
-            "supervisor_pid": proc.pid,
-            "started": ["headless_supervisor"] if running else [],
-            "action": "headless_supervisor" if running else "headless_supervisor_failed",
+            "supervisor_running": is_supervisor_running(repo),
+            "started": [],
+            "action": "spawn_locked",
         }
 
-    raise RuntimeError("foreground supervisor requires run_ppe_headless_stack.cmd")
+    try:
+        if detach:
+            env = _operator_env(repo)
+            proc = spawn_detached_logged(
+                [
+                    sys.executable,
+                    str(repo / "scripts" / "ppe_headless_stack_supervisor.py"),
+                    "--repo-root",
+                    str(repo),
+                ],
+                cwd=repo,
+                env=env,
+                log_path=supervisor_log_path(repo),
+            )
+            time.sleep(2)
+            running = is_supervisor_running(repo)
+            status = stack_status(repo)
+            return {
+                **status,
+                "headless": True,
+                "supervisor_running": running,
+                "supervisor_pid": proc.pid,
+                "started": ["headless_supervisor"] if running else [],
+                "action": "headless_supervisor" if running else "headless_supervisor_failed",
+            }
+
+        raise RuntimeError("foreground supervisor requires run_ppe_headless_stack.cmd")
+    finally:
+        release_spawn_lock(repo)
 
 
 def main(argv: list[str] | None = None) -> int:
