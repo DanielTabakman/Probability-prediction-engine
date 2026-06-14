@@ -154,6 +154,23 @@ def maybe_mark_manifest_complete(
                 m_plan = (repo_root / plan_rel).resolve()
                 if m_plan != phase_plan_path.resolve():
                     return False
+            try:
+                from scripts.ppe_phase_plan_window import non_closeout_slices_pending
+
+                plan_rel_for_pending = str(phase_plan_path.resolve().relative_to(repo_root)).replace(
+                    "\\", "/"
+                )
+                pending = non_closeout_slices_pending(repo_root, plan_rel_for_pending)
+            except ValueError:
+                pending = non_closeout_slices_pending(
+                    repo_root, str(phase_plan_path).replace("\\", "/")
+                )
+            if pending:
+                print(
+                    f"maybe_mark_manifest_complete: skip closeout {slice_id} — "
+                    f"non-closeout slices still pending: {pending}"
+                )
+                return False
             manifest["status"] = "COMPLETE"
             save_manifest(repo_root, manifest)
             return True
