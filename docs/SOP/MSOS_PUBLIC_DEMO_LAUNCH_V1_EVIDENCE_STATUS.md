@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_public_demo_launch_v1`  
 **Priority:** MEDIUM  
-**Status:** **PENDING** — chartered 2026-06-13; blocked until visual parity COMPLETE  
+**Status:** **COMPLETE** 2026-06-14 — chartered 2026-06-13; blocked until visual parity COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_public_demo_launch_v1_relay.json`](PHASE_PLANS/msos_public_demo_launch_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md)
 
