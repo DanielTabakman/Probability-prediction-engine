@@ -174,7 +174,7 @@
     },
     {
       "chapterId": "msos_storyboard_visual_parity_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
@@ -184,7 +184,7 @@
     },
     {
       "chapterId": "msos_public_demo_launch_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P3",
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
