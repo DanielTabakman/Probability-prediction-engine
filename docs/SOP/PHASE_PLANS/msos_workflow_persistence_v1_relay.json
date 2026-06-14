@@ -1,0 +1,88 @@
+{
+  "name": "MSOS_workflow_persistence_v1 (thesis/expression server store)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-WorkflowV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+      "buildBranch": "build/auto/MSOS-WorkflowV1-Control-Slice001-workflow",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-WorkflowV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+      "buildBranch": "build/auto/MSOS-WorkflowV1-Product-Slice002-workflow",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/thesisPersistence.ts",
+        "apps/msos-web/src/lib/expressionPersistence.ts",
+        "apps/msos-web/src/components/ThesisConfirmationPanel.tsx",
+        "apps/msos-web/src/components/ExpressionPlanningPanel.tsx",
+        "apps/msos-web/src/components/CommandCenterContent.tsx",
+        "apps/msos-web/src/app/api/theses/",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "tests/test_msos_web_workflow_persistence.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-WorkflowV1-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+      "buildBranch": "build/auto/MSOS-WorkflowV1-Platform-Slice003-workflow",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "docs/DEPLOY/MSOS_WEB_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-WorkflowV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+      "buildBranch": "build/auto/MSOS-WorkflowV1-Witness-Slice004-workflow",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-WorkflowV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+      "buildBranch": "build/auto/MSOS-WorkflowV1-Closeout-Slice005-workflow",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_workflow_persistence_v1",
+        "chapterTitle": "MSOS workflow persistence v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

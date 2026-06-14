@@ -141,9 +141,22 @@ P3 Command Center (READY)
 | 12.4 | VPS deploy §2.2 folded into Platform slice 007 | Operator + BUILD | **Todo** |
 | 12.5 | Charter [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md) — post-parity VPS + CTA | Steward | **Done** |
 
+## 13. Live product sequence (chartered HIGH 2026-06-14)
+
+Canonical plan: [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)
+
+| # | Phase | chapterId | Status |
+|---|-------|-----------|--------|
+| 13.1 | 1 Plumbing | `msos_production_wiring_v1` | **Chartered** |
+| 13.2 | 2 Snapshot bridge | `msos_user_state_v1` | **Chartered** — blocked until 13.1 |
+| 13.3 | 3 Workflow store | `msos_workflow_persistence_v1` | **Chartered** — blocked until 13.2 |
+| 13.4 | 4 Access identity | `msos_access_identity_v1` | Backlog stub |
+| 13.5 | 5 Monitor/History live | `msos_monitor_history_live_v1` | Backlog stub |
+
 ---
 
 ## Related
 
+- Live product sequence: [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)
 - Live queue: [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json)
 - Operator run: [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md)

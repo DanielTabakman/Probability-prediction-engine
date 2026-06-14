@@ -119,6 +119,7 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 | **P7** (monitoring) | Q2 return hook | Ship **minimum** that drives weekly return |
 | **P8** (tester release) | Q3 PMF gate | Validation report **bosses** next-year queue |
 | **MVP1** (when SELECTION'd) | Q1–Q2 | Only if improves 15-second comprehension or disagreement |
+| **Live product seq P1–P3** | Operator + tester path | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — wiring → snapshots → MSOS workflow store |
 
 ---
 

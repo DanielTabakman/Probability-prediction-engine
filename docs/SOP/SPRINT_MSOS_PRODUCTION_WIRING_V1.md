@@ -31,12 +31,20 @@ Operator goal: a visitor on `marketstructureos.com` can sign in to the real lab,
 3. **Strategy Lab** embed loads live Streamlit when `NEXT_PUBLIC_PPE_EMBED_URL` is set at `msos_web` build; degraded state when unset.
 4. **Platform:** `docker-compose.yml` passes embed + offer env to `msos_web`; Caddy documents embed/proxy path per ADR; [`docs/DEPLOY/MSOS_WEB_V1.md`](../DEPLOY/MSOS_WEB_V1.md) operator steps updated.
 5. **Shell navigation:** public nav + app sidebar dead spans replaced with real `Link`/`href` to chartered routes (Command Center, Strategy Lab, Monitor, History, Learn); disabled items stay honest.
-6. **Honest boundaries:** Command Center KPIs/theses remain fixture until [`msos_user_state_v1`](PHASE_CHAPTER_BACKLOG.json) — labels unchanged.
+6. **Honest boundaries:** Command Center KPIs/theses remain fixture **only until** [`msos_user_state_v1`](SPRINT_MSOS_USER_STATE_V1.md) (phase 2) — see [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md).
 7. Pytest witness for sign-in href, CTA when env set, embed boundary; evidence doc operator checklist.
+
+## Follow-on (chartered — do not implement in this chapter)
+
+| Phase | Chapter | Delivers |
+|-------|---------|----------|
+| 2 | [`msos_user_state_v1`](SPRINT_MSOS_USER_STATE_V1.md) | Command Center from PPE snapshots |
+| 3 | [`msos_workflow_persistence_v1`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) | MSOS thesis server store |
 
 ## Not now
 
-- Command Center / history fed from snapshot DB (follow-on `msos_user_state_v1`)
+- Command Center / history fed from snapshot DB (**phase 2**)
+- MSOS workflow server persistence (**phase 3**)
 - Custom auth server or in-app Google login
 - Port PPE math to TypeScript
 - Live execution, billing automation

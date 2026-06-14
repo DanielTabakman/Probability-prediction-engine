@@ -80,15 +80,26 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 
 ### Post-launch — Production wiring v1 (follow-on, chartered)
 
-**Outcome:** Apex MSOS shell **behaves** like a real product walkthrough — sign-in to `app.*`, live PPE embed, env-driven CTAs, wired navigation. Fixture KPIs remain honest until user-state chapter.  
+**Outcome:** Apex MSOS shell **behaves** like a real product walkthrough — sign-in to `app.*`, live PPE embed, env-driven CTAs, wired navigation. Command Center may still use fixtures until phase 2.  
 **Work:** Product slice (nav, sign-in, CTA) + platform slice (compose/Caddy/env) + operator witness.  
-**Priority:** HIGH — operator-visible gap after public demo launch.  
+**Priority:** HIGH — [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) **phase 1**.  
 **Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
 
-### Post-wiring — User state v1 (stub, not chartered)
+### Post-wiring — User state v1 / Command Center bridge (chartered)
 
-**Outcome:** Command Center / history surfaces read **real** saved theses from snapshot store — not fixture files.  
-**Status:** Backlog stub only; SELECTION after production wiring COMPLETE.
+**Outcome:** Command Center reads **real PPE snapshots** (read-only) with honest labeling — not fixture KPIs.  
+**Priority:** HIGH — sequence **phase 2**.  
+**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · [`POST_MSOS_USER_STATE_V1_SELECTION.md`](POST_MSOS_USER_STATE_V1_SELECTION.md)
+
+### Post-bridge — Workflow persistence v1 (chartered)
+
+**Outcome:** MSOS theses/expressions **server-side**; Command Center draft/confirmed from MSOS store; optional link to PPE snapshots.  
+**Priority:** HIGH — sequence **phase 3** (long-term workflow canon).  
+**Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · [`POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md`](POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md)
+
+### Later — Access identity + Monitor/History live (backlog stubs)
+
+**Phases 4–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md): Cloudflare Access on MSOS routes + per-user scoping; then Monitor/History from combined state. Charter at SELECTION after phase 3.
 
 ---
 
@@ -119,6 +130,10 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | Post-P8 | `msos_storyboard_visual_parity_v1` | `PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
 | Post-launch | `msos_public_demo_launch_v1` | `PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | Post-launch | `msos_production_wiring_v1` | `PHASE_PLANS/msos_production_wiring_v1_relay.json` |
-| Post-wiring | `msos_user_state_v1` | _(SELECTION pending)_ |
+| Live seq P2 | `msos_user_state_v1` | `PHASE_PLANS/msos_user_state_v1_relay.json` |
+| Live seq P3 | `msos_workflow_persistence_v1` | `PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
+| Live seq P4–5 | `msos_access_identity_v1`, `msos_monitor_history_live_v1` | _(SELECTION pending)_ |
+
+**Live product sequence (phases 1–5):** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

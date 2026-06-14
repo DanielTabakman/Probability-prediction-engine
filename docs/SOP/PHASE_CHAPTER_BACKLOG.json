@@ -194,7 +194,7 @@
     },
     {
       "chapterId": "msos_production_wiring_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P3",
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
@@ -205,10 +205,38 @@
     {
       "chapterId": "msos_user_state_v1",
       "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 2",
+      "reason": "[HIGH] Command Center bridge \u2014 read-only PPE snapshots; honest KPIs/current work \u2014 blocked until production wiring COMPLETE"
+    },
+    {
+      "chapterId": "msos_workflow_persistence_v1",
+      "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 3",
+      "reason": "[HIGH] MSOS thesis/expression server store; Command Center from MSOS records \u2014 blocked until user state bridge COMPLETE"
+    },
+    {
+      "chapterId": "msos_access_identity_v1",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P1",
-      "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post production wiring",
-      "reason": "[MEDIUM] Command Center KPIs/theses from real snapshot store \u2014 blocked until production wiring COMPLETE; charter at SELECTION"
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 4",
+      "reason": "[MEDIUM] Cloudflare Access on MSOS routes + per-user scoping \u2014 charter at SELECTION after workflow persistence"
+    },
+    {
+      "chapterId": "msos_monitor_history_live_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P1",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 5",
+      "reason": "[MEDIUM] Monitor/History from live MSOS + PPE review state \u2014 charter at SELECTION after access identity"
     }
   ]
 }

@@ -147,9 +147,21 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
-      "status": "queued",
-      "reason": "[HIGH] Sign-in, live PPE embed, research CTA, wired nav on apex MSOS shell",
+      "status": "chartered",
+      "reason": "[HIGH] Sign-in, live PPE embed, research CTA, wired nav — live product sequence phase 1",
       "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
+      "status": "blocked",
+      "reason": "[HIGH] Command Center bridge from PPE snapshots — phase 2",
+      "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
+      "status": "blocked",
+      "reason": "[HIGH] MSOS thesis/expression server store — phase 3",
+      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     }
   ]
 }

@@ -87,7 +87,8 @@
         "carryDocs": [
           "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
           "docs/SOP/VALIDATION_REALITY_CHECKS.md",
-          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
         ]
       }
     }

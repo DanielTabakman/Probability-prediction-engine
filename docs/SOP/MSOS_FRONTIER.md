@@ -19,9 +19,10 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Sprint:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md)
 - **SELECTION:** [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
 - **Last closed:** **MSOS public demo launch v1** — 2026-06-14 on `main`
-- **Follow-on (blocked):** `msos_user_state_v1` — real account KPIs/theses (not yet chartered)
+- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases 1→5 (wiring → snapshots → workflow → access → monitor/history)
+- **Follow-on (blocked):** `msos_user_state_v1` → `msos_workflow_persistence_v1` → access → monitor/history
 
-### MSOS production wiring v1 — relay queue — **QUEUED** (HIGH)
+### MSOS production wiring v1 — relay queue — **CHARTERED** (HIGH, phase 1)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
@@ -31,7 +32,31 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | **PENDING** | `MSOS-ProdWireV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
 | **PENDING** | `MSOS-ProdWireV1-Closeout-Slice005` — closeout + check-in | EVIDENCE |
 
-**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · **Precondition met:** public demo launch COMPLETE
+**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · **Precondition met:** public demo launch COMPLETE · **Next:** phase 2 user state bridge
+
+### MSOS user state v1 — relay queue — **BLOCKED** (HIGH, phase 2)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-UserStateV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Product-Slice002` — Command Center + snapshot read API | PRODUCT |
+| **PENDING** | `MSOS-UserStateV1-Platform-Slice003` — read-only snapshot volume | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Closeout-Slice005` — closeout | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · **Blocked until** production wiring COMPLETE
+
+### MSOS workflow persistence v1 — relay queue — **BLOCKED** (HIGH, phase 3)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-WorkflowV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Product-Slice002` — server thesis/expression store | PRODUCT |
+| **PENDING** | `MSOS-WorkflowV1-Platform-Slice003` — compose volume | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Witness-Slice004` — pytest + witness | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Closeout-Slice005` — closeout | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · **Blocked until** user state bridge COMPLETE
 
 ### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
 
