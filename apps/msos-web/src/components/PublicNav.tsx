@@ -1,6 +1,12 @@
 import Link from "next/link";
 
-export function PublicNav() {
+import type { ResearchOfferCta } from "@/lib/researchOfferCta";
+
+type PublicNavProps = {
+  researchOffer?: ResearchOfferCta | null;
+};
+
+export function PublicNav({ researchOffer = null }: PublicNavProps) {
   return (
     <nav className="public-nav">
       <div className="brand">
@@ -17,7 +23,15 @@ export function PublicNav() {
         <span>Vision</span>
         <div className="nav-actions">
           <span className="btn slim dark">Sign in</span>
-          <Link className="btn slim primary" href="/command-center">
+          {researchOffer ? (
+            <Link className="btn slim primary" href={researchOffer.url}>
+              {researchOffer.label}
+            </Link>
+          ) : null}
+          <Link
+            className={`btn slim ${researchOffer ? "dark" : "primary"}`}
+            href="/command-center"
+          >
             Enter Command Center
           </Link>
         </div>

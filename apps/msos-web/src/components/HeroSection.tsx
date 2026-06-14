@@ -1,4 +1,12 @@
-export function HeroSection() {
+import Link from "next/link";
+
+import type { ResearchOfferCta } from "@/lib/researchOfferCta";
+
+type HeroSectionProps = {
+  researchOffer?: ResearchOfferCta | null;
+};
+
+export function HeroSection({ researchOffer = null }: HeroSectionProps) {
   return (
     <section>
       <div className="eyebrow">A coherent interface for uncertainty</div>
@@ -13,7 +21,25 @@ export function HeroSection() {
           Explore the platform <span aria-hidden="true">→</span>
         </span>
         <span className="btn">Enter Command Center</span>
+        {researchOffer ? (
+          <Link className="btn" href={researchOffer.url}>
+            {researchOffer.label}
+          </Link>
+        ) : null}
       </div>
+      {researchOffer ? (
+        <p
+          style={{
+            marginTop: "22px",
+            fontSize: "15px",
+            color: "var(--muted)",
+            maxWidth: "710px",
+            lineHeight: 1.55,
+          }}
+        >
+          {researchOffer.blurb}
+        </p>
+      ) : null}
       <div className="chips">
         <span className="pill">
           <span className="dot" />

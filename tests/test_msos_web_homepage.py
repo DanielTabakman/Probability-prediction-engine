@@ -26,3 +26,21 @@ def test_msos_web_docker_and_compose_wiring() -> None:
     caddy = (REPO_ROOT / "Caddyfile").read_text(encoding="utf-8")
     assert "msos_web:" in compose
     assert "msos_web:3000" in caddy
+
+
+def test_msos_web_research_beta_cta_wiring() -> None:
+    """PublicLaunchV1 Product Slice003 — env-driven research beta CTA on homepage."""
+    lib = (MSOS_WEB / "src" / "lib" / "researchOfferCta.ts").read_text(encoding="utf-8")
+    page = (MSOS_WEB / "src" / "app" / "page.tsx").read_text(encoding="utf-8")
+    hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
+    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    readme = (MSOS_WEB / "README.md").read_text(encoding="utf-8")
+
+    assert "PPE_RESEARCH_OFFER_URL" in lib
+    assert "PPE_RESEARCH_OFFER_LABEL" in lib
+    assert "mailto:" in lib
+    assert "resolveResearchOfferCta" in page
+    assert "researchOffer" in hero
+    assert "researchOffer" in nav
+    assert "decision support only" in lib
+    assert "PPE_RESEARCH_OFFER_URL" in readme

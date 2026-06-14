@@ -13,6 +13,17 @@ npm run build
 npm run lint
 ```
 
+## Research beta CTA (homepage)
+
+Same env gates as Streamlit demo (`src/viz/signup_cta.py`):
+
+| Env | Purpose |
+|-----|---------|
+| `PPE_RESEARCH_OFFER_URL` | `https://` or `mailto:` link for the public research-beta button |
+| `PPE_RESEARCH_OFFER_LABEL` | Optional button label (default: `Request research beta access`) |
+
+When unset or invalid, homepage nav and hero omit the CTA (honest public shell only).
+
 ## Web feedback (research beta)
 
 Public form: `/feedback` and compact panel on `/strategy-lab`.
