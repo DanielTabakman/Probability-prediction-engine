@@ -11,6 +11,7 @@ from typing import Any
 
 LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
+LOCAL_TRIGGER_WATCHER_PATTERN = r"ppe_ide_build_local_watcher\.py|watch_ide_build_local\.cmd"
 NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
@@ -43,6 +44,20 @@ def is_watch_running() -> bool:
     return _powershell_process_match(WATCH_CMD_PATTERN)
 
 
+def is_local_trigger_watcher_running() -> bool:
+    """True when the local IDE_BUILD trigger watcher is still alive."""
+    return _powershell_process_match(LOCAL_TRIGGER_WATCHER_PATTERN)
+
+
+def local_trigger_watcher_desired(repo: Path) -> bool:
+    try:
+        from scripts.ppe_ide_build_local_watcher import local_trigger_watcher_enabled
+
+        return local_trigger_watcher_enabled(repo.resolve())
+    except ImportError:
+        return False
+
+
 def is_ntfy_listen_running() -> bool:
     """True when the remote ntfy command listener is still alive."""
     from scripts.ppe_ntfy_commands import commands_enabled
@@ -52,15 +67,20 @@ def is_ntfy_listen_running() -> bool:
     return _powershell_process_match(NTFY_CMD_PATTERN)
 
 
-def stack_status() -> dict[str, bool]:
+def stack_status(repo: Path | None = None) -> dict[str, bool]:
     loop = is_loop_running()
     watch = is_watch_running()
     ntfy_listen = is_ntfy_listen_running()
+    local_watcher = is_local_trigger_watcher_running()
+    watcher_desired = local_trigger_watcher_desired(repo) if repo is not None else False
+    stack_ok = loop and watch and (local_watcher or not watcher_desired)
     return {
         "loop_running": loop,
         "watch_running": watch,
         "ntfy_listen_running": ntfy_listen,
-        "stack_running": loop and watch,
+        "local_trigger_watcher_running": local_watcher,
+        "local_trigger_watcher_desired": watcher_desired,
+        "stack_running": stack_ok,
     }
 
 
@@ -101,6 +121,10 @@ def start_ntfy_listen_only(repo: Path) -> None:
     _start_cmd_window(repo, "watch_ntfy_commands.cmd", "PPE ntfy commands")
 
 
+def start_local_trigger_watcher_only(repo: Path) -> None:
+    _start_cmd_window(repo, "watch_ide_build_local.cmd", "PPE IDE BUILD watcher")
+
+
 def restart_stack(repo: Path) -> dict[str, Any]:
     from scripts.ppe_ntfy_commands import stop_stack_processes
 
@@ -113,16 +137,25 @@ def restart_stack(repo: Path) -> dict[str, Any]:
 
 def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
     """Ensure auto-loop + mobile watch are running; start missing pieces when allowed."""
-    before = stack_status()
+    repo = repo.resolve()
+    before = stack_status(repo)
     started: list[str] = []
     from scripts.ppe_ntfy_commands import commands_enabled
 
-    if before["stack_running"]:
-        after = before
+    def _ensure_extras(after: dict[str, bool]) -> dict[str, bool]:
+        nonlocal started
         if commands_enabled() and start and not after.get("ntfy_listen_running"):
             start_ntfy_listen_only(repo)
             started.append("ntfy_listen")
-            after = stack_status()
+            after = stack_status(repo)
+        if after.get("local_trigger_watcher_desired") and start and not after.get("local_trigger_watcher_running"):
+            start_local_trigger_watcher_only(repo)
+            started.append("local_trigger_watcher")
+            after = stack_status(repo)
+        return after
+
+    if before["stack_running"]:
+        after = _ensure_extras(before)
         return {**after, "started": started, "action": ",".join(started) or "none"}
 
     if not start:
@@ -139,12 +172,7 @@ def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
             start_full_stack(repo)
             started.append("stack")
 
-    after = stack_status()
-    if commands_enabled() and start and not after.get("ntfy_listen_running"):
-        start_ntfy_listen_only(repo)
-        started.append("ntfy_listen")
-        after = stack_status()
-
+    after = _ensure_extras(stack_status(repo))
     return {**after, "started": started, "action": ",".join(started) or "none"}
 
 

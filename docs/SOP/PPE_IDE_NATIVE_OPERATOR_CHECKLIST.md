@@ -28,7 +28,8 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 - [ ] Read `artifacts/orchestrator/IDE_BUILD_NOW.md` or `OPERATOR_GUARD_REPORT.md`.
 - [ ] **Autobuilder:** `ppe_autobuilder.cmd status` — agent `@ppe-autobuilder-operator` ([`PPE_AUTOBUILDER_V1.md`](PPE_AUTOBUILDER_V1.md))
-- [ ] **Automation:** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) on `.cursor/IDE_BUILD_TRIGGER.json`.
+- [ ] **Local trigger watcher:** `watch_ide_build_local.cmd` running (desktop stack item 4); `setup_cursor_agent.cmd` + `agent login`
+- [ ] **Automation (legacy):** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) cloud webhook — optional; prefer local watcher
 - [ ] **Manual:** `@` `IDE_BUILD_STARTER_<sliceId>.md` — starter includes **## When done**.
 - [ ] If agent committed but stalled: `finish_ide_build.cmd`
 - [ ] Optional: `workflow_metrics.cmd slice close --slice-id <sliceId> --size M --roundtrips N`

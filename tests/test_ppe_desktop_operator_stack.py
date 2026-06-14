@@ -11,7 +11,15 @@ def test_stack_status_all_running():
     with patch("scripts.ppe_desktop_operator_stack.is_loop_running", return_value=True):
         with patch("scripts.ppe_desktop_operator_stack.is_watch_running", return_value=True):
             with patch("scripts.ppe_desktop_operator_stack.is_ntfy_listen_running", return_value=False):
-                status = stack_status()
+                with patch(
+                    "scripts.ppe_desktop_operator_stack.is_local_trigger_watcher_running",
+                    return_value=True,
+                ):
+                    with patch(
+                        "scripts.ppe_desktop_operator_stack.local_trigger_watcher_desired",
+                        return_value=True,
+                    ):
+                        status = stack_status()
     assert status["stack_running"] is True
 
 
@@ -23,8 +31,20 @@ def test_ensure_stack_starts_full_when_idle(tmp_path):
                     with patch(
                         "scripts.ppe_desktop_operator_stack.stack_status",
                         side_effect=[
-                            {"loop_running": False, "watch_running": False, "stack_running": False},
-                            {"loop_running": True, "watch_running": True, "stack_running": True},
+                            {
+                                "loop_running": False,
+                                "watch_running": False,
+                                "local_trigger_watcher_running": False,
+                                "local_trigger_watcher_desired": False,
+                                "stack_running": False,
+                            },
+                            {
+                                "loop_running": True,
+                                "watch_running": True,
+                                "local_trigger_watcher_running": False,
+                                "local_trigger_watcher_desired": False,
+                                "stack_running": True,
+                            },
                         ],
                     ):
                         result = ensure_stack(tmp_path, start=True)
@@ -39,6 +59,8 @@ def test_ensure_stack_noop_when_running(tmp_path):
                 "loop_running": True,
                 "watch_running": True,
                 "ntfy_listen_running": False,
+                "local_trigger_watcher_running": True,
+                "local_trigger_watcher_desired": True,
                 "stack_running": True,
             }
             with patch("scripts.ppe_desktop_operator_stack.start_full_stack") as start:
@@ -57,12 +79,16 @@ def test_ensure_stack_starts_ntfy_when_loop_watch_up(tmp_path):
                         "loop_running": True,
                         "watch_running": True,
                         "ntfy_listen_running": False,
+                        "local_trigger_watcher_running": True,
+                        "local_trigger_watcher_desired": True,
                         "stack_running": True,
                     },
                     {
                         "loop_running": True,
                         "watch_running": True,
                         "ntfy_listen_running": True,
+                        "local_trigger_watcher_running": True,
+                        "local_trigger_watcher_desired": True,
                         "stack_running": True,
                     },
                 ],

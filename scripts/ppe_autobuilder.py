@@ -208,8 +208,12 @@ def derive_phase(
     verdict = str(operator_status.get("verdict") or "")
     loop_running = bool(stack.get("loop_running"))
     watch_running = bool(stack.get("watch_running"))
+    watcher_desired = bool(stack.get("local_trigger_watcher_desired"))
+    watcher_running = bool(stack.get("local_trigger_watcher_running"))
 
     if not loop_running or not watch_running:
+        return PHASE_STACK_DOWN
+    if watcher_desired and not watcher_running:
         return PHASE_STACK_DOWN
     if finish_worker.get("running"):
         return PHASE_FINISH_IN_FLIGHT
@@ -226,7 +230,7 @@ def derive_phase(
     if verdict == "RUN_LOCAL":
         return PHASE_RUN_LOCAL_PENDING
     if verdict == "IDE_BUILD":
-        if dispatch_degraded:
+        if dispatch_degraded and not (watcher_desired and watcher_running):
             return PHASE_DEGRADED
         return PHASE_AWAITING_BUILD
     if verdict in ("RUN_AUTO", "SUPPLY_LOW"):
@@ -280,7 +284,7 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
     from scripts.ppe_operator_status import collect_operator_status
 
     operator_status = collect_operator_status(repo)
-    stack = stack_status()
+    stack = stack_status(repo)
     build_lock = _build_lock_summary(repo)
     pending = _resolve_pending_slice(repo, operator_status)
     closeout = _closeout_pending(
