@@ -78,6 +78,18 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 **Priority:** MEDIUM — runs after current LOW dist-quant chapter unless a higher tier is SELECTION'd.  
 **Charter:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md) · [`POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md`](POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md)
 
+### Post-launch — Production wiring v1 (follow-on, chartered)
+
+**Outcome:** Apex MSOS shell **behaves** like a real product walkthrough — sign-in to `app.*`, live PPE embed, env-driven CTAs, wired navigation. Fixture KPIs remain honest until user-state chapter.  
+**Work:** Product slice (nav, sign-in, CTA) + platform slice (compose/Caddy/env) + operator witness.  
+**Priority:** HIGH — operator-visible gap after public demo launch.  
+**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
+
+### Post-wiring — User state v1 (stub, not chartered)
+
+**Outcome:** Command Center / history surfaces read **real** saved theses from snapshot store — not fixture files.  
+**Status:** Backlog stub only; SELECTION after production wiring COMPLETE.
+
 ---
 
 ## Deferred until selected after validation
@@ -105,5 +117,8 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | P7 | `msos_p7_monitoring` | `PHASE_PLANS/msos_p7_monitoring_relay.json` |
 | P8 | `msos_p8_tester_release` | `PHASE_PLANS/msos_p8_tester_release_relay.json` |
 | Post-P8 | `msos_storyboard_visual_parity_v1` | `PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
+| Post-launch | `msos_public_demo_launch_v1` | `PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
+| Post-launch | `msos_production_wiring_v1` | `PHASE_PLANS/msos_production_wiring_v1_relay.json` |
+| Post-wiring | `msos_user_state_v1` | _(SELECTION pending)_ |
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

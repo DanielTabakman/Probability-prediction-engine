@@ -184,13 +184,31 @@
     },
     {
       "chapterId": "msos_public_demo_launch_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P3",
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "canonRef": "docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md \u2014 P3 distribution",
       "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity"
+    },
+    {
+      "chapterId": "msos_production_wiring_v1",
+      "status": "queued",
+      "priority": "high",
+      "focusPlaybookTier": "P3",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "reason": "[HIGH] Sign-in, live PPE embed, research CTA, wired nav on apex MSOS shell \u2014 after public demo launch"
+    },
+    {
+      "chapterId": "msos_user_state_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P1",
+      "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post production wiring",
+      "reason": "[MEDIUM] Command Center KPIs/theses from real snapshot store \u2014 blocked until production wiring COMPLETE; charter at SELECTION"
     }
   ]
 }
