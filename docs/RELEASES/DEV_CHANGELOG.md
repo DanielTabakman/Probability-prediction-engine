@@ -2,8 +2,19 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-14
+
+- `b0070c6` — platform(MSOS-PublicLaunchV1): wire msos_web research-offer env for VPS deploy (#165) (`docs/SOP/`)
+- `cc26158` — control-plane: local IDE BUILD trigger watcher (CONTROL-PLANE) (#163) (`scripts/`)
+
 ## 2026-06-13
 
+- `2b378d3` — control-plane: dist quant v2 closeout + validation gate unblock (#161)
+- `31f2d5b` — feat(msos-shell): session notebook post-session survey (#162) (`docs/SOP/`)
+- `459e66c` — control-plane: operator hardening (evidence stubs, stack dedupe, queue sync) (#160) (`scripts/`)
+- `7a9ea61` — fix(platform): match session.html health check to page title (#159)
+- `547b674` — MVP1 cross-venue prob panel (slices 002-004 + closeout) (#157) (`docs/SOP/`)
+- `513ae72` — Control-plane: dev changelog
 - `e24caef` — control-plane: cut GitHub Actions usage (#158) (`docs/SOP/`)
 - `8e79c82` — fix(platform): force-recreate caddy on VPS deploy (#155)
 - `88ea305` — control-plane: PPE autobuilder v1 (#153) (`scripts/`)
