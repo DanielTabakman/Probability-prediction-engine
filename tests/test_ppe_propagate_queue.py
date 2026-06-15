@@ -310,6 +310,36 @@ class TestPpePropagateQueue(unittest.TestCase):
         roadmap = load_roadmap(self.repo)
         self.assertEqual(roadmap["items"][-1]["planPath"], "docs/SOP/PHASE_PLANS/high_relay.json")
 
+    def test_maybe_propagate_repairs_chartered_roadmap_row(self) -> None:
+        from scripts.ppe_roadmap import bootstrap_next_ready, save_roadmap
+        from scripts.ppe_queue import load_queue
+
+        roadmap = load_roadmap(self.repo)
+        roadmap["items"] = [
+            {
+                "planPath": "docs/SOP/PHASE_PLANS/next_relay.json",
+                "status": "chartered",
+                "reason": "live sequence hand-charter",
+            }
+        ]
+        save_roadmap(self.repo, roadmap)
+        backlog = load_backlog(self.repo)
+        backlog["items"][0]["status"] = "chartered"
+        save_backlog(self.repo, backlog)
+
+        out = maybe_propagate_queue(self.repo, apply=True)
+        self.assertTrue(out.get("roadmap_repair"))
+
+        roadmap = load_roadmap(self.repo)
+        self.assertEqual(roadmap["items"][0]["status"], "pending")
+
+        boot = bootstrap_next_ready(self.repo, apply=True)
+        self.assertTrue(boot.get("bootstrapped"))
+        queue = load_queue(self.repo)
+        ready = [i for i in queue["items"] if i.get("status") == "READY"]
+        self.assertEqual(len(ready), 1)
+        self.assertEqual(ready[0]["planPath"], "docs/SOP/PHASE_PLANS/next_relay.json")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -147,56 +147,56 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
-      "status": "chartered",
-      "reason": "[HIGH] Sign-in, live PPE embed, wired nav — live product sequence phase 1",
+      "status": "ready",
+      "reason": "[HIGH] Sign-in, live PPE embed, wired nav \u2014 live product sequence phase 1",
       "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] Command Center PPE snapshot bridge — phase 2",
+      "status": "skipped",
+      "reason": "[HIGH] Command Center PPE snapshot bridge \u2014 phase 2",
       "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] MSOS thesis/expression server store — phase 3",
+      "status": "skipped",
+      "reason": "[HIGH] MSOS thesis/expression server store \u2014 phase 3",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] PPE snapshot owner_email — phase 4a",
+      "status": "skipped",
+      "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",
       "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] Access on MSOS routes — phase 4b",
+      "status": "skipped",
+      "reason": "[HIGH] Access on MSOS routes \u2014 phase 4b",
       "selectionPrep": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] Live monitor/history — phase 5",
+      "status": "skipped",
+      "reason": "[HIGH] Live monitor/history \u2014 phase 5",
       "selectionPrep": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
-      "status": "blocked",
-      "reason": "[MEDIUM] E2E product witness — phase 6",
+      "status": "skipped",
+      "reason": "[MEDIUM] E2E product witness \u2014 phase 6",
       "selectionPrep": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
-      "status": "blocked",
-      "reason": "[HIGH] Free tier + manual paid — phase 7a",
+      "status": "skipped",
+      "reason": "[HIGH] Free tier + manual paid \u2014 phase 7a",
       "selectionPrep": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "blocked",
-      "reason": "[MEDIUM] Stripe billing — phase 7b BUILD deferred",
+      "status": "skipped",
+      "reason": "[MEDIUM] Stripe billing \u2014 phase 7b BUILD deferred",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     }
   ]

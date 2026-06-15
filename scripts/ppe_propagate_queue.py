@@ -10,6 +10,7 @@ from typing import Any
 from scripts.ppe_roadmap import (
     ROADMAP_REL,
     _plan_valid,
+    _set_roadmap_status,
     load_roadmap,
     norm_plan,
     roadmap_enabled,
@@ -18,7 +19,11 @@ from scripts.ppe_roadmap import (
     sync_roadmap_to_queue,
 )
 from scripts.ppe_queue import upsert_queue_item
-from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_chapter_evidence_complete
+from scripts.ppe_queue_health import (
+    ROADMAP_INVALID_TO_VALID,
+    chapter_marked_complete_in_repo,
+    finalize_chapter_evidence_complete,
+)
 
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 VALID_BACKLOG_STATUSES = frozenset({"queued", "chartered", "done", "blocked", "skipped"})
@@ -403,6 +408,27 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         roadmap = {"version": 1, "notes": "Auto from PHASE_CHAPTER_BACKLOG", "items": []}
 
     if _plan_on_roadmap(roadmap, plan_path):
+        rs = _roadmap_plan_statuses(roadmap).get(plan_path, "")
+        if apply and rs in ROADMAP_INVALID_TO_VALID and _backlog_item_status(item) in ("queued", "chartered"):
+            _set_roadmap_status(roadmap, plan_path, "pending")
+            save_roadmap(repo, roadmap)
+            item["status"] = "chartered"
+            save_backlog(repo, backlog)
+            sync_roadmap_to_queue(repo, apply=True)
+            upsert_queue_item(
+                repo,
+                plan_path=plan_path,
+                status="PLANNED",
+                reason=str(item.get("reason") or "backlog propagation"),
+                workerMode=str(item.get("workerMode") or "").strip() or None,
+                selectionPrep=str(item.get("selectionRecord") or item.get("selectionPrep") or "").strip() or None,
+            )
+            return {
+                "propagated": True,
+                "planPath": plan_path,
+                "chapterId": item.get("chapterId"),
+                "reason": "roadmap status normalized to pending",
+            }
         if apply:
             item["status"] = "chartered"
             save_backlog(repo, backlog)
@@ -478,6 +504,15 @@ def maybe_propagate_queue(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     from scripts.ppe_roadmap import _first_pending_with_valid_plan, load_roadmap
 
     out: dict[str, Any] = {"skipped": False}
+    if apply:
+        try:
+            from scripts.ppe_queue_health import repair_roadmap
+
+            roadmap_fixes, _ = repair_roadmap(repo, apply=True)
+            if roadmap_fixes:
+                out["roadmap_repair"] = roadmap_fixes
+        except Exception as exc:
+            out["roadmap_repair_error"] = str(exc)
     recon = reconcile_closed_chapters(repo, apply=apply)
     if any(recon.get(k) for k in recon):
         out["reconcile"] = {k: v for k, v in recon.items() if v}

@@ -24,7 +24,7 @@ from scripts.ppe_manifest import (
     validate_phase_plan,
 )
 from scripts.ppe_queue import QUEUE_REL, find_queue_item_index, load_queue, mark_queue_item_done
-from scripts.ppe_queue_health import chapter_marked_complete_in_repo, repair_backlog, repair_queue
+from scripts.ppe_queue_health import chapter_marked_complete_in_repo, repair_backlog, repair_queue, repair_roadmap
 
 
 def _plan_exists_and_valid(repo_root: Path, plan_path: str) -> list[str]:
@@ -135,9 +135,10 @@ def run_auto_select(
     repo = repo_root.resolve()
 
     if apply and not select_only:
+        roadmap_fixes, _ = repair_roadmap(repo, apply=True)
         backlog_fixes, _ = repair_backlog(repo, apply=True)
         fixes, remaining = repair_queue(repo, apply=True)
-        fixes = backlog_fixes + fixes
+        fixes = roadmap_fixes + backlog_fixes + fixes
         if fixes:
             print(f"ppe_auto_select: queue auto-repair applied {len(fixes)} fix(es)")
         if remaining:

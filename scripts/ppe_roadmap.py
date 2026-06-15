@@ -296,6 +296,16 @@ def prepare_selection_idle(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         return {"skipped": True}
     out: dict[str, Any] = {"skipped": False}
     if apply:
+        try:
+            from scripts.ppe_queue_health import repair_roadmap
+
+            roadmap_fixes, roadmap_remaining = repair_roadmap(repo, apply=True)
+            if roadmap_fixes:
+                out["roadmap_repair"] = roadmap_fixes
+            if roadmap_remaining:
+                out["roadmap_repair_issues"] = roadmap_remaining
+        except Exception as exc:
+            out["roadmap_repair_error"] = str(exc)
         sync = sync_roadmap_to_queue(repo, apply=True)
         out["synced"] = len(sync)
     try:

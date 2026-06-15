@@ -84,9 +84,10 @@ def upsert_queue_item(
 ) -> tuple[bool, str]:
     """Insert or update a queue row by planPath."""
     queue = load_queue(repo_root)
-    items = queue.get("items") or []
+    items = queue.get("items")
     if not isinstance(items, list):
-        raise ValueError("queue: items must be an array")
+        items = []
+        queue["items"] = items
 
     norm = plan_path.replace("\\", "/").strip()
     idx = find_queue_item_index(queue, norm)
@@ -97,6 +98,7 @@ def upsert_queue_item(
 
     if idx is None:
         items.append(row)
+        queue["items"] = items
         save_queue(repo_root, queue)
         return True, f"queue item {len(items) - 1} created ({status})"
 
