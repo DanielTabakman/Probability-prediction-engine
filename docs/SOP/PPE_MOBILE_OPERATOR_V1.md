@@ -87,10 +87,12 @@ Configured in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) →
 | Setting | Default | Behavior |
 |---------|---------|----------|
 | `pullEachPass` | true | Each loop pass: `git fetch` + `git pull --ff-only origin main` |
+| `publishEachPass` | true | Push unpushed commits on feature branches + open PR |
+| `mergeEachPass` | true | Label loop PRs `automerge` and squash-merge when CI is green |
 | `pushAfterCommit` | true | After closeout / `run_ppe_local` success: push + open PR |
 | `openPrOnPush` | true | `gh pr create` when publishing from `main` |
 
-Disable: `set PPE_GIT_SYNC=0` or `set PPE_GIT_SYNC_PULL=0`.
+Disable: `set PPE_GIT_SYNC=0`, `set PPE_GIT_SYNC_PULL=0`, or `set PPE_GIT_SYNC_MERGE=0`.
 
 **You do not manually `git pull` from the phone** — the loop pulls laptop/desktop pushes automatically.
 

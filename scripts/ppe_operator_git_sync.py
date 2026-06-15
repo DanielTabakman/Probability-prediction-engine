@@ -69,6 +69,17 @@ def publish_each_pass_enabled(repo: Path) -> bool:
     return bool(g.get("publishEachPass", True))
 
 
+def merge_each_pass_enabled(repo: Path) -> bool:
+    if not git_sync_enabled(repo):
+        return False
+    if _env_disabled("PPE_GIT_SYNC_MERGE"):
+        return False
+    g = _git_sync_cfg(repo)
+    if g.get("mergeEachPass") is False:
+        return False
+    return bool(g.get("mergeEachPass", True))
+
+
 def _current_branch(repo: Path) -> str:
     proc = _git(repo, "branch", "--show-current")
     return (proc.stdout or "").strip() if proc.returncode == 0 else ""
@@ -235,6 +246,154 @@ def _gh_available() -> bool:
         return False
 
 
+def _gh_json(repo: Path, args: list[str]) -> Any | None:
+    if not _gh_available():
+        return None
+    proc = subprocess.run(args, cwd=repo, capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        return None
+    try:
+        return json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def _pr_has_automerge(labels: list[Any]) -> bool:
+    return any(isinstance(label, dict) and label.get("name") == "automerge" for label in labels)
+
+
+def _default_merge_head_prefixes(cfg: dict[str, Any]) -> tuple[str, ...]:
+    raw = cfg.get("mergeHeadPrefixes")
+    if isinstance(raw, list) and raw:
+        return tuple(str(p) for p in raw if str(p).strip())
+    return _LOOP_HOST_TRANSIENT_PREFIXES + ("ops/",)
+
+
+def _head_eligible_for_automerge(head: str, cfg: dict[str, Any]) -> bool:
+    return any(head.startswith(prefix) for prefix in _default_merge_head_prefixes(cfg))
+
+
+def _merge_ready(pr: dict[str, Any]) -> bool:
+    mergeable = str(pr.get("mergeable") or "").upper()
+    state = str(pr.get("mergeStateStatus") or "").upper()
+    if mergeable == "CONFLICTING" or state == "DIRTY":
+        return False
+    if state == "CLEAN":
+        return True
+    return mergeable == "MERGEABLE" and state in ("", "UNKNOWN", "BEHIND")
+
+
+def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
+    """Ensure automerge label on loop PRs and squash-merge when GitHub reports merge-ready."""
+    repo = repo.resolve()
+    if not merge_each_pass_enabled(repo):
+        return {"action": "check_merge", "skipped": True, "reason": "disabled"}
+    if not _gh_available():
+        return {"action": "check_merge", "skipped": True, "reason": "gh not available"}
+
+    cfg = _git_sync_cfg(repo)
+    base = (str(cfg.get("pullBranch") or "main")).strip() or "main"
+    prs = _gh_json(
+        repo,
+        [
+            "gh",
+            "pr",
+            "list",
+            "--base",
+            base,
+            "--state",
+            "open",
+            "--limit",
+            "30",
+            "--json",
+            "number,headRefName,mergeable,mergeStateStatus,isDraft,labels,title,url",
+        ],
+    )
+    if prs is None:
+        return {"action": "check_merge", "ok": False, "error": "gh pr list failed"}
+    if not prs:
+        return {"action": "check_merge", "ok": True, "merged": [], "pending": [], "blocked": []}
+
+    merged: list[dict[str, Any]] = []
+    pending: list[dict[str, Any]] = []
+    blocked: list[dict[str, Any]] = []
+    add_label = cfg.get("mergeAddAutomergeLabel", True) is not False
+
+    for pr in prs:
+        if not isinstance(pr, dict):
+            continue
+        num = pr.get("number")
+        head = str(pr.get("headRefName") or "")
+        url = str(pr.get("url") or "")
+        if pr.get("isDraft"):
+            pending.append({"number": num, "head": head, "url": url, "reason": "draft"})
+            continue
+
+        labels = pr.get("labels") or []
+        has_label = _pr_has_automerge(labels if isinstance(labels, list) else [])
+        eligible = has_label or _head_eligible_for_automerge(head, cfg)
+        if not eligible:
+            continue
+
+        if not has_label and add_label and num is not None:
+            label_proc = subprocess.run(
+                ["gh", "pr", "edit", str(num), "--add-label", "automerge"],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if label_proc.returncode != 0:
+                pending.append(
+                    {
+                        "number": num,
+                        "head": head,
+                        "url": url,
+                        "reason": (label_proc.stderr or label_proc.stdout or "add-label failed").strip(),
+                    }
+                )
+                continue
+
+        if not _merge_ready(pr):
+            reason = str(pr.get("mergeStateStatus") or pr.get("mergeable") or "waiting on checks")
+            if str(pr.get("mergeable") or "").upper() == "CONFLICTING":
+                blocked.append({"number": num, "head": head, "url": url, "reason": "conflicts"})
+            else:
+                pending.append({"number": num, "head": head, "url": url, "reason": reason})
+            continue
+
+        merge_proc = subprocess.run(
+            ["gh", "pr", "merge", str(num), "--squash"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if merge_proc.returncode == 0:
+            merged.append({"number": num, "head": head, "url": url})
+            continue
+        pending.append(
+            {
+                "number": num,
+                "head": head,
+                "url": url,
+                "reason": (merge_proc.stderr or merge_proc.stdout or "merge failed").strip(),
+            }
+        )
+
+    result: dict[str, Any] = {
+        "action": "check_merge",
+        "ok": True,
+        "merged": merged,
+        "pending": pending,
+        "blocked": blocked,
+    }
+    if merged and pull_enabled(repo):
+        pull_after = pull_main(repo)
+        result["pull_after_merge"] = pull_after
+    return result
+
+
 def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str) -> str | None:
     if not _gh_available():
         print("ppe_operator_git_sync: gh not available; skip PR", file=sys.stderr)
@@ -389,6 +548,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--pull", action="store_true")
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--auto-publish", action="store_true", help="Push+PR when branch has unpushed commits")
+    ap.add_argument(
+        "--check-merge",
+        action="store_true",
+        help="Label loop PRs automerge and squash-merge when CI is green",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
@@ -400,8 +564,10 @@ def main(argv: list[str] | None = None) -> int:
         results.append(publish_ahead(repo))
     if args.auto_publish:
         results.append(maybe_auto_publish(repo))
+    if args.check_merge:
+        results.append(check_and_nudge_merges(repo))
     if not results:
-        ap.error("specify --pull, --publish, and/or --auto-publish")
+        ap.error("specify --pull, --publish, --auto-publish, and/or --check-merge")
         return 2
 
     if args.json:
