@@ -9,16 +9,22 @@ import sys
 from pathlib import Path
 from typing import Any
 
-LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd"
+from scripts.ppe_operator_config import headless_stack_mode
+
+LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd|ppe_headless_loop_worker\.py"
+HEADLESS_SUPERVISOR_PATTERN = r"ppe_headless_stack_supervisor\.py"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
 LOCAL_TRIGGER_WATCHER_PATTERN = r"ppe_ide_build_local_watcher\.py|watch_ide_build_local\.cmd"
 NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
 def _powershell_process_match(pattern: str) -> bool:
+    # Only match worker hosts (python/cmd). Excluding powershell.exe avoids false positives
+    # when this probe's own -Command string contains the same regex literal.
+    allowed = "@('python.exe','cmd.exe','pwsh.exe')"
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.CommandLine -match '{pattern}' }}; "
+        f"Where-Object {{ $_.Name -in {allowed} -and $_.CommandLine -match '{pattern}' }}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:
@@ -67,12 +73,17 @@ def is_ntfy_listen_running() -> bool:
     return _powershell_process_match(NTFY_CMD_PATTERN)
 
 
+def is_headless_supervisor_running() -> bool:
+    return _powershell_process_match(HEADLESS_SUPERVISOR_PATTERN)
+
+
 def stack_status(repo: Path | None = None) -> dict[str, bool]:
     loop = is_loop_running()
     watch = is_watch_running()
     ntfy_listen = is_ntfy_listen_running()
     local_watcher = is_local_trigger_watcher_running()
     watcher_desired = local_trigger_watcher_desired(repo) if repo is not None else False
+    headless = is_headless_supervisor_running()
     stack_ok = loop and watch and (local_watcher or not watcher_desired)
     return {
         "loop_running": loop,
@@ -80,6 +91,8 @@ def stack_status(repo: Path | None = None) -> dict[str, bool]:
         "ntfy_listen_running": ntfy_listen,
         "local_trigger_watcher_running": local_watcher,
         "local_trigger_watcher_desired": watcher_desired,
+        "headless_supervisor_running": headless,
+        "headless_mode": headless_stack_mode(repo) if repo is not None else False,
         "stack_running": stack_ok,
     }
 
@@ -105,23 +118,44 @@ def _start_cmd_window(repo: Path, script_name: str, title: str) -> None:
     )
 
 
+def _ensure_headless(repo: Path) -> dict[str, Any]:
+    from scripts.ppe_headless_stack_supervisor import ensure_headless_supervisor
+
+    return ensure_headless_supervisor(repo, detach=True, start=True)
+
+
 def start_full_stack(repo: Path) -> None:
+    if headless_stack_mode(repo):
+        _ensure_headless(repo)
+        return
     _start_cmd_window(repo, "start_ppe_desktop_operator.cmd", "PPE desktop operator")
 
 
 def start_watch_only(repo: Path) -> None:
+    if headless_stack_mode(repo):
+        _ensure_headless(repo)
+        return
     _start_cmd_window(repo, "watch_operator_mobile.cmd", "PPE mobile watch")
 
 
 def start_loop_only(repo: Path) -> None:
+    if headless_stack_mode(repo):
+        _ensure_headless(repo)
+        return
     _start_cmd_window(repo, "run_ppe_auto_local_loop.cmd", "PPE auto loop")
 
 
 def start_ntfy_listen_only(repo: Path) -> None:
+    if headless_stack_mode(repo):
+        _ensure_headless(repo)
+        return
     _start_cmd_window(repo, "watch_ntfy_commands.cmd", "PPE ntfy commands")
 
 
 def start_local_trigger_watcher_only(repo: Path) -> None:
+    if headless_stack_mode(repo):
+        _ensure_headless(repo)
+        return
     _start_cmd_window(repo, "watch_ide_build_local.cmd", "PPE IDE BUILD watcher")
 
 
@@ -129,6 +163,10 @@ def restart_stack(repo: Path) -> dict[str, Any]:
     from scripts.ppe_ntfy_commands import stop_stack_processes
 
     killed = stop_stack_processes()
+    if headless_stack_mode(repo):
+        from scripts.ppe_headless_stack_supervisor import clear_state
+
+        clear_state(repo)
     import time
 
     time.sleep(2)
@@ -138,6 +176,14 @@ def restart_stack(repo: Path) -> dict[str, Any]:
 def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
     """Ensure auto-loop + mobile watch are running; start missing pieces when allowed."""
     repo = repo.resolve()
+    if headless_stack_mode(repo):
+        if not start:
+            before = stack_status(repo)
+            return {**before, "started": [], "action": "not_started"}
+        from scripts.ppe_headless_stack_supervisor import ensure_headless_supervisor
+
+        return ensure_headless_supervisor(repo, detach=True, start=True)
+
     before = stack_status(repo)
     started: list[str] = []
     from scripts.ppe_ntfy_commands import commands_enabled

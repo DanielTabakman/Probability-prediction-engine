@@ -13,6 +13,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     _ = args.repo_root.resolve()
 
+    import os
+
+    if os.environ.get("PPE_HEADLESS_SUPERVISED_LOOP", "").strip() == "1":
+        return 0
+
     from scripts.ppe_desktop_operator_stack import is_loop_running
 
     if is_loop_running():

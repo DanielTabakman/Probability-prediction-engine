@@ -1,25 +1,24 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-13 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-14 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
 
 ---
 
-## Active BUILD — MSOS P3 Command Center (manifest RUNNING)
+## Active BUILD — MSOS live product sequence (phase 1 chartered)
 
 | Field | Value |
 |-------|--------|
-| **Chapter** | `msos_p3_command_center` — [`msos_p3_command_center_relay.json`](PHASE_PLANS/msos_p3_command_center_relay.json) |
-| **Sprint** | [`SPRINT_MSOS_P3_COMMAND_CENTER.md`](SPRINT_MSOS_P3_COMMAND_CENTER.md) |
-| **Evidence** | [`MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md`](MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md) |
-| **Last closed** | MSOS P2 homepage — **COMPLETE** 2026-06-03 |
-| **Next queued (pre-chartered)** | P4 [`msos_p4_strategy_lab_relay.json`](PHASE_PLANS/msos_p4_strategy_lab_relay.json) — **blocked** until P3 closeout |
+| **Sequence canon** | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) |
+| **Active chapter** | `msos_production_wiring_v1` — [`msos_production_wiring_v1_relay.json`](PHASE_PLANS/msos_production_wiring_v1_relay.json) |
+| **Next (blocked)** | Phase 2 `msos_user_state_v1` → phase 3 `msos_workflow_persistence_v1` |
+| **MSOS steering** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
 
-**P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js 15 + TypeScript) for MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; PPE entry via **Caddy reverse proxy** at P4.
+**P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
 
-**MVP1 relay:** idle (P4 **READY** in queue). **Next MVP1 chapter (blocked until P4 COMPLETE):** probability method legibility — [`SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md`](SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md) (UI labels + pointwise Polymarket comparison shipped on branch). **Operator:** `run_ppe_local.cmd` / `run_ppe.cmd` — [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+**MVP1 relay:** see [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md). **Operator:** `run_ppe_local.cmd` / `run_ppe.cmd`.
 
 ---
 
@@ -102,6 +101,10 @@ flowchart LR
 
 | MVP1 distribution quant research v2 | **COMPLETE** 2026-06-13 | [`SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md`](docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md), [`MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md`](docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md) |
 
+| MSOS public demo launch v1 | **COMPLETE** 2026-06-14 | [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md), [`MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md) |
+
+| MSOS live product sequence P1–7b | **CHARTERED** 2026-06-14 | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — full product + commercial path |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -124,11 +127,12 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **MSOS P3** | manifest `RUNNING`; P4 plan pre-chartered |
+| **Active relay chapter** | **MSOS production wiring v1** (phase 1) | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
-| **Storyboard v0.6** | **in-repo** | gate OPEN — MSOS P3 BUILD; P4 relay pre-chartered |
+| **Live product sequence** | P1–**7b** chartered | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · Stripe BUILD deferred |
+| **Commercial ADR** | PROPOSED | [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
 
@@ -160,4 +164,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

@@ -1,0 +1,88 @@
+{
+  "name": "MSOS_user_state_v1 (Command Center bridge — PPE snapshots)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-UserStateV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+      "buildBranch": "build/auto/MSOS-UserStateV1-Control-Slice001-user_state",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-UserStateV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+      "buildBranch": "build/auto/MSOS-UserStateV1-Product-Slice002-user_state",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/CommandCenterContent.tsx",
+        "apps/msos-web/src/app/command-center/page.tsx",
+        "apps/msos-web/src/app/api/command-center/summary/route.ts",
+        "apps/msos-web/src/lib/commandCenterSummary.ts",
+        "tests/test_msos_web_command_center.py",
+        "tests/test_msos_web_user_state.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UserStateV1-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+      "buildBranch": "build/auto/MSOS-UserStateV1-Platform-Slice003-user_state",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "docs/DEPLOY/MSOS_WEB_V1.md",
+        "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UserStateV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+      "buildBranch": "build/auto/MSOS-UserStateV1-Witness-Slice004-user_state",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_USER_STATE_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UserStateV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+      "buildBranch": "build/auto/MSOS-UserStateV1-Closeout-Slice005-user_state",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_user_state_v1",
+        "chapterTitle": "MSOS user state v1 — Command Center bridge",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_USER_STATE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
+          "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

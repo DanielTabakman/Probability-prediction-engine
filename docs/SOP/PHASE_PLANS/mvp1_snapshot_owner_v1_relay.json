@@ -1,0 +1,70 @@
+{
+  "name": "MVP1_snapshot_owner_v1 (owner_email on frozen evaluations)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-SnapshotOwner-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+      "buildBranch": "build/auto/MVP1-SnapshotOwner-Control-Slice001-snap_owner",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-SnapshotOwner-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+      "buildBranch": "build/auto/MVP1-SnapshotOwner-Product-Slice002-snap_owner",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/frozen_evaluation_store.py",
+        "src/viz/frozen_evaluation_record.py",
+        "src/viz/app.py",
+        "tests/test_frozen_evaluation_store.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-SnapshotOwner-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+      "buildBranch": "build/auto/MVP1-SnapshotOwner-Witness-Slice003-snap_owner",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MVP1-SnapshotOwner-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+      "buildBranch": "build/auto/MVP1-SnapshotOwner-Closeout-Slice004-snap_owner",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_snapshot_owner_v1",
+        "chapterTitle": "MVP1 snapshot owner v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

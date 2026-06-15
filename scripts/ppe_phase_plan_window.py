@@ -132,6 +132,23 @@ def clear_progress(repo: Path, plan_path: str) -> None:
         progress_path(repo).unlink(missing_ok=True)
 
 
+def non_closeout_slices_pending(repo: Path, plan_path: str) -> list[str]:
+    """Slice IDs in plan order that are not closeout and not yet completed."""
+    try:
+        plan = load_phase_plan(repo, plan_path)
+    except (FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        return []
+    completed = completed_slice_ids(repo, plan_path)
+    pending: list[str] = []
+    for sl in plan.get("slices") or []:
+        if not isinstance(sl, dict) or _is_closeout_slice(sl):
+            continue
+        sid = str(sl.get("sliceId") or "").strip()
+        if sid and sid not in completed:
+            pending.append(sid)
+    return pending
+
+
 def select_slice_batch(all_slices: list[dict[str, Any]], *, limit: int, completed: set[str]) -> list[dict[str, Any]]:
     """Return the next batch of slices (order preserved), deferring closeout if batch is full."""
     remaining: list[dict[str, Any]] = []

@@ -83,7 +83,8 @@ def stop_stack_processes() -> int:
     ps = (
         "$k=0; Get-CimInstance Win32_Process -EA SilentlyContinue | "
         "Where-Object { $_.CommandLine -match "
-        "'run_ppe_auto_local_loop|watch_operator_mobile|ppe_ntfy_listen|ppe_ide_build_local_watcher' } | "
+        "'run_ppe_auto_local_loop|watch_operator_mobile|ppe_ntfy_listen|ppe_ide_build_local_watcher|"
+        "ppe_headless_stack_supervisor|ppe_watch_operator_mobile|start_ppe_desktop_operator' } | "
         "ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++ }; $k"
     )
     try:

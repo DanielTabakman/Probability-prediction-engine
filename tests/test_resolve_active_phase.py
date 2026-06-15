@@ -15,6 +15,7 @@ from scripts.ppe_manifest import (
     validate_manifest,
     validate_phase_plan,
 )
+from scripts.ppe_phase_plan_window import mark_slice_complete
 
 
 def _write_plan(tmp_path: Path, name: str = "test_relay.json") -> Path:
@@ -89,6 +90,8 @@ def test_maybe_mark_manifest_complete(tmp_path: Path):
         encoding="utf-8",
     )
     plan_abs = tmp_path / plan_rel
+    assert not maybe_mark_manifest_complete(tmp_path, plan_abs, "Test-Closeout-002")
+    mark_slice_complete(tmp_path, plan_rel, "Test-Control-001")
     assert maybe_mark_manifest_complete(tmp_path, plan_abs, "Test-Closeout-002")
     assert load_manifest(tmp_path)["status"] == "COMPLETE"
     assert not maybe_mark_manifest_complete(tmp_path, plan_abs, "Test-Control-001")

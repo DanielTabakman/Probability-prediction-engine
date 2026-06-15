@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from scripts.ppe_ide_build_automation_trigger import load_trigger, write_trigger_dispatched
+from scripts.ppe_ide_build_automation_trigger import load_trigger, write_trigger_dispatched, write_trigger_idle
 from scripts.ppe_remote_agent import agent_available, launch_agent_background
 from scripts.ppe_remote_build_agent import (
     clear_build_lock,
@@ -133,6 +133,39 @@ def try_dispatch_from_trigger(repo: Path, trigger: dict[str, Any]) -> dict[str, 
             "skipped": True,
             "reason": "incomplete trigger (need sliceId, planPath, starter)",
         }
+
+    try:
+        from scripts.ppe_phase_plan_window import completed_slice_ids
+        from scripts.ppe_manifest import load_phase_plan
+        from scripts.ppe_ide_product_ready import _branch_has_commits
+
+        if slice_id in completed_slice_ids(repo, plan_path):
+            write_trigger_idle(repo, completed_slice=slice_id)
+            clear_build_lock(repo)
+            return {
+                "action": "local_trigger_watcher",
+                "skipped": True,
+                "reason": f"slice already completed: {slice_id}",
+                "slice_id": slice_id,
+            }
+        plan = load_phase_plan(repo, plan_path)
+        for sl in plan.get("slices") or []:
+            if not isinstance(sl, dict) or str(sl.get("sliceId") or "").strip() != slice_id:
+                continue
+            branch = str(sl.get("buildBranch") or "").strip()
+            baseline = str(plan.get("baselineBranch") or "main").strip() or "main"
+            if branch and _branch_has_commits(repo, build_branch=branch, baseline=baseline):
+                write_trigger_idle(repo, completed_slice=slice_id)
+                clear_build_lock(repo)
+                return {
+                    "action": "local_trigger_watcher",
+                    "skipped": True,
+                    "reason": f"build branch already has commits: {branch}",
+                    "slice_id": slice_id,
+                }
+            break
+    except (ImportError, FileNotFoundError, json.JSONDecodeError, OSError, ValueError):
+        pass
 
     dispatch_key = trigger_dispatch_key(trigger)
     state = load_state(repo)

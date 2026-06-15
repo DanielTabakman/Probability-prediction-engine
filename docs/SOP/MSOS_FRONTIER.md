@@ -13,40 +13,90 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none on MSOS track** — MVP1 dist-quant v2 finishing on parallel queue ([`MVP1_FRONTIER.md`](MVP1_FRONTIER.md))
-- **Next MSOS chapter (chartered, MEDIUM):** **Storyboard visual parity v1** — blocked until dist-quant closeout
-- **Relay plan:** [`PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json`](PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json)
-- **Sprint:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md)
-- **SELECTION:** [`POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md`](POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md)
-- **Last closed:** **MSOS P8 tester release** — 2026-06-12 on `main`
+- **Active BUILD chapter:** **none on MSOS track** — await relay / operator propagate
+- **Next MSOS chapter (chartered, HIGH):** **Production wiring v1** — sign-in, PPE embed, CTAs, wired nav
+- **Relay plan:** [`PHASE_PLANS/msos_production_wiring_v1_relay.json`](PHASE_PLANS/msos_production_wiring_v1_relay.json)
+- **Sprint:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md)
+- **SELECTION:** [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
+- **Last closed:** **MSOS public demo launch v1** — 2026-06-14 on `main`
+- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases **1→7b** (full product + commercial)
+- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
+- **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
 
-### MSOS storyboard visual parity v1 — relay queue — **BLOCKED** (MEDIUM)
+### Live product sequence — phases 4–7 (all chartered)
 
-| Status | Slice | Plane |
-|--------|--------|-------|
-| **PENDING** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
-| **PENDING** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
-| **PENDING** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
-| **PENDING** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
+| Phase | chapterId | Status |
+|-------|-----------|--------|
+| 4a | `mvp1_snapshot_owner_v1` | BLOCKED — PPE `owner_email` |
+| 4b | `msos_access_identity_v1` | BLOCKED — Access on MSOS routes |
+| 5 | `msos_monitor_history_live_v1` | BLOCKED — live monitor/history |
+| 6 | `msos_e2e_product_witness_v1` | BLOCKED — full journey witness |
+| 7a | `msos_entitlements_v1` | BLOCKED — **free tier** + manual paid |
+| 7b | `msos_billing_stripe_v1` | BLOCKED — **Stripe** (BUILD when operator ready) |
 
-**Visual reference:** storyboard `01_home` … `09_conclusion` · **Compare:** `prototype/html/*.html` side-by-side with `npm run dev`
-
-### MSOS public demo launch v1 — relay queue — **BLOCKED** (MEDIUM, after parity)
+### MSOS production wiring v1 — relay queue — **CHARTERED** (HIGH, phase 1)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-PublicLaunchV1-Control-Slice001` — charter | EVIDENCE |
-| **PENDING** | `MSOS-PublicLaunchV1-Platform-Slice002` — VPS deploy + Caddy | EVIDENCE |
-| **PENDING** | `MSOS-PublicLaunchV1-Product-Slice003` — research beta CTA | PRODUCT |
-| **PENDING** | `MSOS-PublicLaunchV1-Witness-Slice004` — URL witness | EVIDENCE |
-| **PENDING** | `MSOS-PublicLaunchV1-Closeout-Slice005` — closeout + operator check-in | EVIDENCE |
+| **PENDING** | `MSOS-ProdWireV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-ProdWireV1-Product-Slice002` — sign-in, CTA, nav/button wiring | PRODUCT |
+| **PENDING** | `MSOS-ProdWireV1-Platform-Slice003` — compose/Caddy/env + deploy docs | EVIDENCE |
+| **PENDING** | `MSOS-ProdWireV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
+| **PENDING** | `MSOS-ProdWireV1-Closeout-Slice005` — closeout + check-in | EVIDENCE |
 
-**Charter:** [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md) · **Blocked until** visual parity COMPLETE
+**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · **Precondition met:** public demo launch COMPLETE · **Next:** phase 2 user state bridge
+
+### MSOS user state v1 — relay queue — **BLOCKED** (HIGH, phase 2)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-UserStateV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Product-Slice002` — Command Center + snapshot read API | PRODUCT |
+| **PENDING** | `MSOS-UserStateV1-Platform-Slice003` — read-only snapshot volume | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
+| **PENDING** | `MSOS-UserStateV1-Closeout-Slice005` — closeout | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · **Blocked until** production wiring COMPLETE
+
+### MSOS workflow persistence v1 — relay queue — **BLOCKED** (HIGH, phase 3)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-WorkflowV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Product-Slice002` — server thesis/expression store | PRODUCT |
+| **PENDING** | `MSOS-WorkflowV1-Platform-Slice003` — compose volume | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Witness-Slice004` — pytest + witness | EVIDENCE |
+| **PENDING** | `MSOS-WorkflowV1-Closeout-Slice005` — closeout | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · **Blocked until** user state bridge COMPLETE
+
+### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
+| **CLOSED** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
+| **CLOSED** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
+| **CLOSED** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
+| **CLOSED** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
+| **CLOSED** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
+
+**Evidence:** [`MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md`](MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md)
+
+### MSOS public demo launch v1 — relay queue — **COMPLETE**
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **CLOSED** | `MSOS-PublicLaunchV1-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-PublicLaunchV1-Platform-Slice002` — VPS deploy + Caddy | EVIDENCE |
+| **CLOSED** | `MSOS-PublicLaunchV1-Product-Slice003` — research beta CTA | PRODUCT |
+| **CLOSED** | `MSOS-PublicLaunchV1-Witness-Slice004` — URL witness | EVIDENCE |
+| **CLOSED** | `MSOS-PublicLaunchV1-Closeout-Slice005` — closeout + operator check-in | EVIDENCE |
+
+**Evidence:** [`MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md`](MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md)
 
 ### MSOS P8 tester release — relay queue — **COMPLETE**
 

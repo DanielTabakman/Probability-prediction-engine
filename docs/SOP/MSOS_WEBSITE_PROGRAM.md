@@ -2,6 +2,7 @@
 
 **Canon source:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) (top section, imported 2026-06-01)  
 **Live steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)  
+**Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)  
 **Acceleration checklist:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)  
 **Storyboard gate (P2+):** [`docs/VISION/MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)
 
@@ -78,6 +79,42 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 **Priority:** MEDIUM — runs after current LOW dist-quant chapter unless a higher tier is SELECTION'd.  
 **Charter:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md) · [`POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md`](POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md)
 
+### Post-launch — Production wiring v1 (follow-on, chartered)
+
+**Outcome:** Apex MSOS shell **behaves** like a real product walkthrough — sign-in to `app.*`, live PPE embed, env-driven CTAs, wired navigation. Command Center may still use fixtures until phase 2.  
+**Work:** Product slice (nav, sign-in, CTA) + platform slice (compose/Caddy/env) + operator witness.  
+**Priority:** HIGH — [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) **phase 1**.  
+**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
+
+### Post-wiring — User state v1 / Command Center bridge (chartered)
+
+**Outcome:** Command Center reads **real PPE snapshots** (read-only) with honest labeling — not fixture KPIs.  
+**Priority:** HIGH — sequence **phase 2**.  
+**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · [`POST_MSOS_USER_STATE_V1_SELECTION.md`](POST_MSOS_USER_STATE_V1_SELECTION.md)
+
+### Post-bridge — Workflow persistence v1 (chartered)
+
+**Outcome:** MSOS theses/expressions **server-side**; Command Center draft/confirmed from MSOS store; optional link to PPE snapshots.  
+**Priority:** HIGH — sequence **phase 3** (long-term workflow canon).  
+**Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · [`POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md`](POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md)
+
+### Later — Access identity + Monitor/History live (chartered)
+
+Phases **4a–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md).
+
+### Later — E2E witness (chartered)
+
+Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md) — full production journey checklist.
+
+### Commercial — Entitlements + Stripe (chartered)
+
+| Phase | Chapter | When |
+|-------|---------|------|
+| **7a** | [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) | Free accounts; manual paid upgrade; ADR [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
+| **7b** | [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md) | Stripe Checkout — **chartered, BUILD deferred** until operator configures Stripe |
+
+**Intent:** Test willingness to pay via manual/invoice path first (7a); self-serve Stripe when ready (7b) without rework.
+
 ---
 
 ## Deferred until selected after validation
@@ -86,8 +123,9 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 - Hyperliquid integration beyond honest Pending representation
 - Prediction-market or perps lenses as live tools
 - Broad asset rollout
-- Paywall beyond low-cost validation needs
 - Claims of measured edge, profitability, formal TAM, or traction without evidence
+
+**Commercial note:** Paywall and Stripe are **not deferred indefinitely** — see live sequence phases **7a–7b**. Generic “paywall automation” in backlog is superseded by [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) + [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md).
 
 ---
 
@@ -105,5 +143,16 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | P7 | `msos_p7_monitoring` | `PHASE_PLANS/msos_p7_monitoring_relay.json` |
 | P8 | `msos_p8_tester_release` | `PHASE_PLANS/msos_p8_tester_release_relay.json` |
 | Post-P8 | `msos_storyboard_visual_parity_v1` | `PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
+| Post-launch | `msos_public_demo_launch_v1` | `PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
+| Post-launch | `msos_production_wiring_v1` | `PHASE_PLANS/msos_production_wiring_v1_relay.json` |
+| Live seq P3 | `msos_workflow_persistence_v1` | `PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
+| Live seq 4a | `mvp1_snapshot_owner_v1` | `PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
+| Live seq 4b | `msos_access_identity_v1` | `PHASE_PLANS/msos_access_identity_v1_relay.json` |
+| Live seq 5 | `msos_monitor_history_live_v1` | `PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
+| Live seq 6 | `msos_e2e_product_witness_v1` | `PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
+| Live seq 7a | `msos_entitlements_v1` | `PHASE_PLANS/msos_entitlements_v1_relay.json` |
+| Live seq 7b | `msos_billing_stripe_v1` | `PHASE_PLANS/msos_billing_stripe_v1_relay.json` |
+
+**Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

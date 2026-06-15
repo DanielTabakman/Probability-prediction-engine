@@ -1,0 +1,85 @@
+{
+  "name": "MSOS_access_identity_v1 (Cloudflare Access + scoped APIs)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-AccessIdV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+      "buildBranch": "build/auto/MSOS-AccessIdV1-Control-Slice001-access_id",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-AccessIdV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+      "buildBranch": "build/auto/MSOS-AccessIdV1-Product-Slice002-access_id",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/msosIdentity.ts",
+        "apps/msos-web/src/app/api/",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "tests/test_msos_web_access_identity.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-AccessIdV1-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+      "buildBranch": "build/auto/MSOS-AccessIdV1-Platform-Slice003-access_id",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "Caddyfile",
+        "docs/DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md",
+        "docs/DEPLOY/MSOS_WEB_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-AccessIdV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+      "buildBranch": "build/auto/MSOS-AccessIdV1-Witness-Slice004-access_id",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_ACCESS_IDENTITY_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-AccessIdV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+      "buildBranch": "build/auto/MSOS-AccessIdV1-Closeout-Slice005-access_id",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_access_identity_v1",
+        "chapterTitle": "MSOS access identity v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_ACCESS_IDENTITY_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

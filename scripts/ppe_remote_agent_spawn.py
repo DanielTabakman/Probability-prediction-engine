@@ -5,8 +5,22 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, BinaryIO, TextIO
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _win32_hidden_flags() -> int:
+    if sys.platform != "win32":
+        return 0
+    flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
+    if hasattr(subprocess, "CREATE_NO_WINDOW"):
+        flags |= subprocess.CREATE_NO_WINDOW  # type: ignore[attr-defined]
+    return flags
 
 
 def _detached_popen(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> subprocess.Popen[Any]:
@@ -19,7 +33,7 @@ def _detached_popen(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> subpro
         "close_fds": True,
     }
     if sys.platform == "win32":
-        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
+        kwargs["creationflags"] = _win32_hidden_flags()
     else:
         kwargs["start_new_session"] = True
     return subprocess.Popen(cmd, **kwargs)
@@ -32,6 +46,40 @@ def spawn_python_worker(repo: Path, script_rel: str, *args: str) -> subprocess.P
     env["PYTHONPATH"] = str(repo)
     cmd = [sys.executable, str(script), *args]
     return _detached_popen(cmd, cwd=repo, env=env)
+
+
+def spawn_detached_logged(
+    cmd: list[str],
+    *,
+    cwd: Path,
+    env: dict[str, str],
+    log_path: Path,
+    log_handles: list[TextIO | BinaryIO] | None = None,
+) -> subprocess.Popen[Any]:
+    """Start a detached child with stdout/stderr appended to log_path."""
+    log_path = log_path.resolve()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    log = log_path.open("a", encoding="utf-8")
+    log.write(f"\n--- spawn {_utc_now()} pid-pending cmd={' '.join(cmd)} ---\n")
+    log.flush()
+    if log_handles is not None:
+        log_handles.append(log)
+    kwargs: dict[str, Any] = {
+        "cwd": cwd,
+        "env": env,
+        "stdin": subprocess.DEVNULL,
+        "stdout": log,
+        "stderr": subprocess.STDOUT,
+        "close_fds": False,
+    }
+    if sys.platform == "win32":
+        kwargs["creationflags"] = _win32_hidden_flags()
+    else:
+        kwargs["start_new_session"] = True
+    proc = subprocess.Popen(cmd, **kwargs)
+    log.write(f"--- child pid={proc.pid} ---\n")
+    log.flush()
+    return proc
 
 
 def process_alive(pid: int) -> bool:

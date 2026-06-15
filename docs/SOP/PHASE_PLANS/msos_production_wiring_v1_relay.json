@@ -1,0 +1,96 @@
+{
+  "name": "MSOS_production_wiring_v1 (sign-in, embed, CTAs, wired nav)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-ProdWireV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "buildBranch": "build/auto/MSOS-ProdWireV1-Control-Slice001-prod_wire",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-ProdWireV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "buildBranch": "build/auto/MSOS-ProdWireV1-Product-Slice002-prod_wire",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/PublicNav.tsx",
+        "apps/msos-web/src/components/HeroSection.tsx",
+        "apps/msos-web/src/components/AppSidebar.tsx",
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/app/page.tsx",
+        "apps/msos-web/src/lib/researchOfferCta.ts",
+        "apps/msos-web/src/lib/msosPublicUrls.ts",
+        "tests/test_msos_web_homepage.py",
+        "tests/test_msos_web_production_wiring.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-ProdWireV1-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "buildBranch": "build/auto/MSOS-ProdWireV1-Platform-Slice003-prod_wire",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "apps/msos-web/Dockerfile",
+        ".env.example",
+        "docs/DEPLOY/MSOS_WEB_V1.md",
+        "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-ProdWireV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "buildBranch": "build/auto/MSOS-ProdWireV1-Witness-Slice004-prod_wire",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-ProdWireV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+      "buildBranch": "build/auto/MSOS-ProdWireV1-Closeout-Slice005-prod_wire",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_production_wiring_v1",
+        "chapterTitle": "MSOS production wiring v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
+          "docs/SOP/VALIDATION_REALITY_CHECKS.md",
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}
