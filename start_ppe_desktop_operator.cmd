@@ -8,7 +8,7 @@ REM See docs/SOP/PPE_HEADLESS_STACK_V1.md
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
-if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
+call "%~dp0call_ppe_operator_local.cmd"
 
 python -c "from pathlib import Path; from scripts.ppe_operator_config import headless_stack_mode; raise SystemExit(0 if headless_stack_mode(Path('.')) else 1)"
 if not errorlevel 1 (

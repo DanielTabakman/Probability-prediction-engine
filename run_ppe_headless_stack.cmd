@@ -12,11 +12,16 @@ cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 set "PPE_STACK_HEADLESS=1"
 
-if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
+call "%CD%\call_ppe_operator_local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
 
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
+
+if /i not "%~1"=="--stop" (
+  python "%CD%\scripts\ppe_loop_host_guard.py" --require
+  if errorlevel 1 exit /b %ERRORLEVEL%
+)
 
 if /i "%~1"=="--ensure" (
   python "%CD%\scripts\ppe_headless_stack_supervisor.py" --repo-root "%CD%" --ensure

@@ -1,0 +1,5 @@
+@echo off
+REM Daily-driver host ONLY — copy to ppe_operator_no_loop.local.cmd (gitignored).
+REM Blocks accidental loop/stack start on the real PC when the VM is the loop host.
+
+set "PPE_STACK_FORBIDDEN=1"

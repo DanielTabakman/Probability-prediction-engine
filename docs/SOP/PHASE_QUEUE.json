@@ -186,6 +186,12 @@
       "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity",
       "selectionPrep": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Sign-in, live PPE embed, wired nav \u2014 live product sequence phase 1",
+      "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md"
     }
   ]
 }

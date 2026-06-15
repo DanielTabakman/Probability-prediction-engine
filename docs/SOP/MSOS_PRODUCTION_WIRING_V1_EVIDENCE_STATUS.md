@@ -9,7 +9,7 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | MSOS-ProdWireV1-Control-Slice001 | PENDING | Charter + queue align |
-| MSOS-ProdWireV1-Product-Slice002 | PENDING | Sign-in, CTA, nav/button wiring |
+| MSOS-ProdWireV1-Product-Slice002 | **DONE** | Sign-in, CTA, nav/button wiring — merged `main` #170 (`cff9fb5`) |
 | MSOS-ProdWireV1-Platform-Slice003 | PENDING | Compose/Caddy/env + deploy docs |
 | MSOS-ProdWireV1-Witness-Slice004 | PENDING | pytest + operator checklist |
 | MSOS-ProdWireV1-Closeout-Slice005 | PENDING | Chapter COMPLETE + operator check-in |

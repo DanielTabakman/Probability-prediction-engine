@@ -47,6 +47,8 @@ State: `artifacts/orchestrator/HEADLESS_STACK_SUPERVISOR.json`
 
 Run headless stack on a **Hyper-V VM** (loop host). Your daily PC stays clean; restore VM snapshot if the stack misbehaves.
 
+**Loop-host guard:** VM must have `ppe_operator_loop_host.local.cmd` (`PPE_LOOP_HOST=1`); daily PC must have `ppe_operator_no_loop.local.cmd` (`PPE_STACK_FORBIDDEN=1`). See [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md).
+
 On a daily-driver PC until the VM exists: keep `ideHandoff.openCursor: false` so handoff does not steal Cursor focus.
 
 **VM loop host:** [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md) — run headless stack on Hyper-V; keep daily PC stack off.

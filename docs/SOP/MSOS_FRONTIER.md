@@ -39,7 +39,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | Status | Slice | Plane |
 |--------|--------|-------|
 | **PENDING** | `MSOS-ProdWireV1-Control-Slice001` — charter | EVIDENCE |
-| **PENDING** | `MSOS-ProdWireV1-Product-Slice002` — sign-in, CTA, nav/button wiring | PRODUCT |
+| **DONE** | `MSOS-ProdWireV1-Product-Slice002` — sign-in, CTA, nav/button wiring (`main` #170) | PRODUCT |
 | **PENDING** | `MSOS-ProdWireV1-Platform-Slice003` — compose/Caddy/env + deploy docs | EVIDENCE |
 | **PENDING** | `MSOS-ProdWireV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
 | **PENDING** | `MSOS-ProdWireV1-Closeout-Slice005` — closeout + check-in | EVIDENCE |
