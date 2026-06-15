@@ -104,6 +104,14 @@ pip install -r requirements.txt
 python scripts\ppe_operator_env.py
 ```
 
+**Loop-host token (required before starting stack):**
+
+```bat
+copy ppe_operator_loop_host.local.cmd.example ppe_operator_loop_host.local.cmd
+```
+
+This sets `PPE_LOOP_HOST=1`. Without it, `run_ppe_headless_stack.cmd` exits **8** and refuses to start.
+
 Copy notify config from host (or recreate):
 
 ```bat
@@ -165,13 +173,39 @@ Ensure task runs `run_ppe_headless_stack.cmd --ensure` (not legacy windowed `sta
 
 ## Phase 7 — Keep daily PC clean
 
-On the **host** (daily PC), leave stack **stopped**:
+On the **host** (daily PC), install the no-loop guard **once**:
+
+```bat
+copy ppe_operator_no_loop.local.cmd.example ppe_operator_no_loop.local.cmd
+```
+
+This sets `PPE_STACK_FORBIDDEN=1`. Any attempt to start the stack or auto-loop on the host exits **8** with a clear message — only the VM may run the loop.
+
+Leave stack **stopped** on the host:
 
 ```bat
 run_ppe_headless_stack.cmd --stop
 ```
 
-Do not run `run_ppe_desktop_operator.cmd` or `start_ppe_desktop_operator.cmd` on the host.
+Do not run `run_ppe_desktop_operator.cmd` or `start_ppe_desktop_operator.cmd` on the host (guard blocks them anyway).
+
+**Remote agent on VM:** [`PPE_CURSOR_REMOTE_SSH_V1.md`](PPE_CURSOR_REMOTE_SSH_V1.md)
+
+---
+
+## Hard rules (two-loop prevention)
+
+| Machine | File (gitignored) | Env var | Effect |
+|---------|-------------------|---------|--------|
+| **VM only** | `ppe_operator_loop_host.local.cmd` | `PPE_LOOP_HOST=1` | Stack/loop **allowed** |
+| **Host only** | `ppe_operator_no_loop.local.cmd` | `PPE_STACK_FORBIDDEN=1` | Stack/loop **blocked** |
+| Neither / both missing | — | — | Stack **blocked** (safe default) |
+
+Guard script: `scripts/ppe_loop_host_guard.py` · wired into `run_ppe_headless_stack.cmd`, `run_ppe_auto_loop.cmd`, `ensure_stack`.
+
+**Escape hatch (emergency only):** `set PPE_FORCE_STACK=1` bypasses the guard — do not use on the daily PC while the VM is live.
+
+**Stop always works:** `run_ppe_headless_stack.cmd --stop` ignores the guard so you can kill a stray stack on either machine.
 
 ---
 
