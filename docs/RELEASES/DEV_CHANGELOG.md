@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-15
+
+- `32c6713` — control-plane: layer map for watch_ide_build_local.cmd (#164) (`docs/SOP/`)
+
 ## 2026-06-14
 
+- `dcbbc75` — Control-plane: dev changelog
 - `b0070c6` — platform(MSOS-PublicLaunchV1): wire msos_web research-offer env for VPS deploy (#165) (`docs/SOP/`)
 - `cc26158` — control-plane: local IDE BUILD trigger watcher (CONTROL-PLANE) (#163) (`scripts/`)
 
