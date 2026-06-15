@@ -14,6 +14,7 @@ from scripts.ppe_propagate_queue import (
     load_backlog,
     maybe_propagate_queue,
     normalize_backlog_priority,
+    promote_chartered_to_queued,
     promote_first_blocked_with_plan,
     propagate_from_backlog,
     save_backlog,
@@ -309,6 +310,45 @@ class TestPpePropagateQueue(unittest.TestCase):
         self.assertEqual(out.get("chapterId"), "high_chapter")
         roadmap = load_roadmap(self.repo)
         self.assertEqual(roadmap["items"][-1]["planPath"], "docs/SOP/PHASE_PLANS/high_relay.json")
+
+    def test_promote_chartered_to_queued_when_idle(self) -> None:
+        backlog = load_backlog(self.repo)
+        backlog["items"][0]["status"] = "chartered"
+        save_backlog(self.repo, backlog)
+        out = promote_chartered_to_queued(self.repo, apply=True)
+        self.assertTrue(out.get("promoted"))
+        backlog = load_backlog(self.repo)
+        self.assertEqual(backlog["items"][0]["status"], "queued")
+
+    def test_maybe_propagate_repairs_chartered_roadmap_row(self) -> None:
+        from scripts.ppe_roadmap import bootstrap_next_ready, save_roadmap
+        from scripts.ppe_queue import load_queue
+
+        roadmap = load_roadmap(self.repo)
+        roadmap["items"] = [
+            {
+                "planPath": "docs/SOP/PHASE_PLANS/next_relay.json",
+                "status": "chartered",
+                "reason": "live sequence hand-charter",
+            }
+        ]
+        save_roadmap(self.repo, roadmap)
+        backlog = load_backlog(self.repo)
+        backlog["items"][0]["status"] = "chartered"
+        save_backlog(self.repo, backlog)
+
+        out = maybe_propagate_queue(self.repo, apply=True)
+        self.assertTrue(out.get("roadmap_repair") or out.get("chartered_promote") or out.get("propagated"))
+
+        roadmap = load_roadmap(self.repo)
+        self.assertEqual(roadmap["items"][0]["status"], "pending")
+
+        boot = bootstrap_next_ready(self.repo, apply=True)
+        self.assertTrue(boot.get("bootstrapped"))
+        queue = load_queue(self.repo)
+        ready = [i for i in queue["items"] if i.get("status") == "READY"]
+        self.assertEqual(len(ready), 1)
+        self.assertEqual(ready[0]["planPath"], "docs/SOP/PHASE_PLANS/next_relay.json")
 
 
 if __name__ == "__main__":

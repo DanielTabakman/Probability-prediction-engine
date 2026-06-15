@@ -34,9 +34,12 @@ def mark_queue_item_done(
 ) -> tuple[bool, str]:
     """Mark the first matching queue item as DONE."""
     queue = load_queue(repo_root)
-    items = queue.get("items") or []
-    if not isinstance(items, list):
-        raise ValueError("queue: items must be an array")
+    raw_items = queue.get("items")
+    if isinstance(raw_items, list):
+        items = raw_items
+    else:
+        items = []
+        queue["items"] = items
 
     norm = plan_path.replace("\\", "/").strip()
     marked: list[int] = []
@@ -84,9 +87,12 @@ def upsert_queue_item(
 ) -> tuple[bool, str]:
     """Insert or update a queue row by planPath."""
     queue = load_queue(repo_root)
-    items = queue.get("items") or []
-    if not isinstance(items, list):
-        raise ValueError("queue: items must be an array")
+    raw_items = queue.get("items")
+    if isinstance(raw_items, list):
+        items = raw_items
+    else:
+        items = []
+        queue["items"] = items
 
     norm = plan_path.replace("\\", "/").strip()
     idx = find_queue_item_index(queue, norm)

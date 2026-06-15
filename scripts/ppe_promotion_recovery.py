@@ -298,10 +298,26 @@ def try_recover(
     on_main = head_proc.returncode == 0
 
     if closeout_block and on_main:
-        sha = relay.get("product_commit_sha") if relay else None
-        if sha and sha not in (head_proc.stdout.strip(), "null", None):
-            print(f"ppe_promotion_recovery: main at {head_proc.stdout.strip()[:8]}; closeout commit {sha[:8]} may need PR")
-        return _run_control_closeout(repo, phase_plan, slice_id, run_dir)
+        plan_rel = str(phase_plan.relative_to(repo)).replace("\\", "/") if phase_plan.is_relative_to(repo) else str(phase_plan)
+        try:
+            from scripts.ppe_phase_plan_window import non_closeout_slices_pending
+
+            pending = non_closeout_slices_pending(repo, plan_rel)
+        except Exception:
+            pending = []
+        if pending:
+            print(
+                f"ppe_promotion_recovery: skip closeout {slice_id} — "
+                f"non-closeout slices still pending: {pending}"
+            )
+        else:
+            sha = relay.get("product_commit_sha") if relay else None
+            if sha and sha not in (head_proc.stdout.strip(), "null", None):
+                print(
+                    f"ppe_promotion_recovery: main at {head_proc.stdout.strip()[:8]}; "
+                    f"closeout commit {sha[:8]} may need PR"
+                )
+            return _run_control_closeout(repo, phase_plan, slice_id, run_dir)
 
     sl_obj = _slice_obj(plan, slice_id)
     sl_kind = infer_slice_kind(slice_id, sl_obj)

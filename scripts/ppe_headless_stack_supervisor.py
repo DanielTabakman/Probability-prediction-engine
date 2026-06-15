@@ -372,6 +372,20 @@ def ensure_headless_supervisor(
             "action": "none",
         }
 
+    from scripts.ppe_loop_host_guard import loop_host_blocked
+
+    blocked = loop_host_blocked()
+    if blocked:
+        status = stack_status(repo)
+        return {
+            **status,
+            "headless": True,
+            "supervisor_running": False,
+            "started": [],
+            "action": "loop_host_blocked",
+            **blocked,
+        }
+
     if not try_acquire_spawn_lock(repo):
         status = stack_status(repo)
         return {

@@ -10,6 +10,7 @@ from typing import Any
 from scripts.ppe_roadmap import (
     ROADMAP_REL,
     _plan_valid,
+    _set_roadmap_status,
     load_roadmap,
     norm_plan,
     roadmap_enabled,
@@ -18,7 +19,11 @@ from scripts.ppe_roadmap import (
     sync_roadmap_to_queue,
 )
 from scripts.ppe_queue import upsert_queue_item
-from scripts.ppe_queue_health import chapter_marked_complete_in_repo, finalize_chapter_evidence_complete
+from scripts.ppe_queue_health import (
+    chapter_marked_complete_in_repo,
+    finalize_chapter_evidence_complete,
+    roadmap_row_should_activate_for_backlog,
+)
 
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 VALID_BACKLOG_STATUSES = frozenset({"queued", "chartered", "done", "blocked", "skipped"})
@@ -332,6 +337,62 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
     return {"promoted": False, "reason": "no blocked backlog item with planPath"}
 
 
+def _best_chartered_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
+    """Highest-priority chartered backlog row."""
+    candidates: list[tuple[int, dict[str, Any]]] = []
+    for index, item in enumerate(_backlog_items(backlog)):
+        if not isinstance(item, dict):
+            continue
+        if _backlog_item_status(item) == "chartered":
+            candidates.append((index, item))
+    if not candidates:
+        return None
+    _index, item = min(candidates, key=lambda pair: _priority_sort_key(pair[0], pair[1]))
+    return item
+
+
+def promote_chartered_to_queued(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    """Promote top chartered backlog row to queued when manifest is idle and nothing is queued."""
+    repo = repo_root.resolve()
+    if not backlog_enabled(repo) or not backlog_path(repo).is_file():
+        return {"promoted": False, "reason": "no backlog file"}
+
+    backlog = load_backlog(repo)
+    if _best_queued_item(backlog) is not None:
+        return {"promoted": False, "reason": "queued backlog item already exists"}
+
+    try:
+        from scripts.ppe_manifest import load_manifest
+
+        manifest = load_manifest(repo)
+        status = str(manifest.get("status") or "").strip().upper()
+        if status not in ("COMPLETE", ""):
+            return {"promoted": False, "reason": f"manifest is {status}"}
+        if str(manifest.get("phasePlanPath") or "").strip():
+            return {"promoted": False, "reason": "manifest has active plan"}
+    except Exception as exc:
+        return {"promoted": False, "reason": f"manifest check failed: {exc}"}
+
+    item = _best_chartered_item(backlog)
+    if item is None:
+        return {"promoted": False, "reason": "no chartered backlog item"}
+
+    plan_path = norm_plan(str(item.get("planPath") or ""))
+    if plan_path and chapter_marked_complete_in_repo(repo, plan_path):
+        return {"promoted": False, "reason": "chartered chapter evidence already COMPLETE"}
+
+    if apply:
+        item["status"] = "queued"
+        save_backlog(repo, backlog)
+
+    return {
+        "promoted": True,
+        "planPath": plan_path,
+        "chapterId": item.get("chapterId"),
+        "reason": "chartered -> queued for propagate",
+    }
+
+
 def _plan_on_roadmap(roadmap: dict[str, Any], plan_path: str) -> bool:
     norm = norm_plan(plan_path)
     return any(
@@ -354,6 +415,10 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     backlog = load_backlog(repo)
     item = _best_queued_item(backlog)
     if item is None:
+        chartered = promote_chartered_to_queued(repo, apply=apply)
+        if chartered.get("promoted"):
+            backlog = load_backlog(repo)
+            item = _best_queued_item(backlog)
         promoted = promote_first_blocked_with_plan(repo, apply=apply)
         if promoted.get("promoted"):
             sync_backlog_from_roadmap(repo, apply=apply)
@@ -361,6 +426,8 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
             item = _best_queued_item(backlog)
         if item is None:
             out: dict[str, Any] = {"propagated": False, "reason": "no queued backlog item"}
+            if chartered.get("promoted"):
+                out["chartered_promote"] = chartered
             if promoted.get("promoted") or promoted.get("reason"):
                 out["promote"] = promoted
             return out
@@ -403,6 +470,28 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         roadmap = {"version": 1, "notes": "Auto from PHASE_CHAPTER_BACKLOG", "items": []}
 
     if _plan_on_roadmap(roadmap, plan_path):
+        rs = _roadmap_plan_statuses(roadmap).get(plan_path, "")
+        backlog_status = _backlog_item_status(item)
+        if apply and roadmap_row_should_activate_for_backlog(rs, backlog_status):
+            _set_roadmap_status(roadmap, plan_path, "pending")
+            save_roadmap(repo, roadmap)
+            item["status"] = "chartered"
+            save_backlog(repo, backlog)
+            sync_roadmap_to_queue(repo, apply=True)
+            upsert_queue_item(
+                repo,
+                plan_path=plan_path,
+                status="PLANNED",
+                reason=str(item.get("reason") or "backlog propagation"),
+                workerMode=str(item.get("workerMode") or "").strip() or None,
+                selectionPrep=str(item.get("selectionRecord") or item.get("selectionPrep") or "").strip() or None,
+            )
+            return {
+                "propagated": True,
+                "planPath": plan_path,
+                "chapterId": item.get("chapterId"),
+                "reason": "roadmap row activated to pending",
+            }
         if apply:
             item["status"] = "chartered"
             save_backlog(repo, backlog)
@@ -478,6 +567,15 @@ def maybe_propagate_queue(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     from scripts.ppe_roadmap import _first_pending_with_valid_plan, load_roadmap
 
     out: dict[str, Any] = {"skipped": False}
+    try:
+        from scripts.ppe_queue_health import repair_roadmap
+
+        roadmap_fixes, _ = repair_roadmap(repo, apply=True)
+        if roadmap_fixes:
+            out["roadmap_repair"] = roadmap_fixes
+    except Exception as exc:
+        out["roadmap_repair_error"] = str(exc)
+
     recon = reconcile_closed_chapters(repo, apply=apply)
     if any(recon.get(k) for k in recon):
         out["reconcile"] = {k: v for k, v in recon.items() if v}

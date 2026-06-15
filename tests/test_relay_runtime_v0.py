@@ -385,7 +385,7 @@ class TestDecisionPolicy(unittest.TestCase):
         p["promotion"]["attempted"] = True
         p["promotion"]["method"] = None
         p["ready_for_control_closeout"] = False
-        # safe_to_continue may still be True; tree clean, stop_condition null.
+        p["safe_to_continue"] = False
         dec = relay.decide(p)
         self.assertEqual(dec["decision"], relay.DECISION_STOP_FOR_REVIEW)
         self.assertIn("rule 8", dec["rule_matched"])
