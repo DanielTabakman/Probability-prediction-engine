@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "notes": "Multi-clone operator instances on one VM. Copy to PPE_OPERATOR_INSTANCES.local.json and add rows per clone. Coordinator: ppe_multi_operator.cmd status --write",
+  "instances": [
+    {
+      "id": "primary",
+      "label": "Primary PPE repo",
+      "repoRoot": ".",
+      "enabled": true,
+      "ntfyTag": "ppe"
+    }
+  ]
+}

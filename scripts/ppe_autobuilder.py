@@ -320,6 +320,17 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
     except ImportError:
         pass
 
+    propagation_preview: dict[str, Any] = {}
+    instance: dict[str, Any] = {}
+    try:
+        from scripts.ppe_operator_instance import resolve_instance_for_repo
+        from scripts.ppe_propagate_queue import preview_next_chapter
+
+        instance = resolve_instance_for_repo(repo)
+        propagation_preview = preview_next_chapter(repo)
+    except Exception as exc:
+        propagation_preview = {"error": str(exc)}
+
     return {
         "version": 1,
         "as_of": _utc_now(),
@@ -353,6 +364,8 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
         "closeout": closeout,
         "finish_worker": finish_worker,
         "marker_present": marker_present,
+        "propagation_preview": propagation_preview,
+        "instance": instance,
         "automation": _automation_summary(repo),
         "dispatch": dispatch,
         "commands": {

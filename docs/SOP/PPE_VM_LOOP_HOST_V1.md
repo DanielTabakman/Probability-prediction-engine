@@ -6,6 +6,8 @@
 
 **Stack entry (inside VM only):** [`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md) · `run_ppe_headless_stack.cmd`
 
+**Multi-clone (optional):** [`PPE_MULTI_OPERATOR_V1.md`](PPE_MULTI_OPERATOR_V1.md) · [`PPE_OUTPUT_PIPELINE_V1.md`](PPE_OUTPUT_PIPELINE_V1.md)
+
 **Related:** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 
 ---

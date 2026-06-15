@@ -19,6 +19,23 @@ BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 BACKLOG_ACTIVE_STATUSES = frozenset({"blocked", "chartered", "queued"})
 BACKLOG_TERMINAL_STATUSES = frozenset({"done", "skipped"})
 FINALIZE_DONE_REASON = "auto-repair: evidence doc shows chapter COMPLETE"
+ROADMAP_REPAIR_REASON = "auto-repair: backlog status on roadmap normalized"
+ROADMAP_INVALID_TO_VALID = {
+    "chartered": "pending",
+    "blocked": "skipped",
+    "queued": "pending",
+}
+
+
+def roadmap_row_should_activate_for_backlog(roadmap_status: str, backlog_status: str) -> bool:
+    """True when a backlog row is ready to run but the roadmap row is still idle."""
+    rs = str(roadmap_status or "").strip().lower()
+    bs = str(backlog_status or "").strip().lower()
+    if bs not in ("queued", "chartered"):
+        return False
+    if rs in ROADMAP_INVALID_TO_VALID:
+        return True
+    return rs == "skipped"
 
 
 def _norm_plan(path: str) -> str:
@@ -138,6 +155,115 @@ def audit_backlog(repo_root: Path) -> list[Issue]:
                 }
             )
     return issues
+
+
+def audit_roadmap(repo_root: Path) -> list[Issue]:
+    """Detect roadmap rows using backlog vocabulary or other invalid statuses."""
+    repo = repo_root.resolve()
+    try:
+        from scripts.ppe_roadmap import VALID_ROADMAP_STATUSES, load_roadmap, roadmap_enabled, roadmap_path
+    except ImportError:
+        return []
+
+    if not roadmap_enabled(repo) or not roadmap_path(repo).is_file():
+        return []
+
+    roadmap = load_roadmap(repo)
+    issues: list[Issue] = []
+    for i, item in enumerate(roadmap.get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        rs = str(item.get("status") or "").strip().lower()
+        if rs in VALID_ROADMAP_STATUSES:
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        issues.append(
+            {
+                "code": "ROADMAP_INVALID_STATUS",
+                "index": i,
+                "planPath": plan,
+                "status": rs,
+            }
+        )
+    return issues
+
+
+def _roadmap_repair_target(
+    repo: Path,
+    *,
+    status: str,
+    plan_path: str,
+    has_pending: bool,
+) -> tuple[str, bool]:
+    if plan_path and chapter_marked_complete_in_repo(repo, plan_path):
+        return "done", has_pending
+    mapped = ROADMAP_INVALID_TO_VALID.get(status)
+    if mapped == "pending":
+        if has_pending:
+            return "skipped", has_pending
+        return "pending", True
+    if mapped:
+        return mapped, has_pending
+    return "skipped", has_pending
+
+
+def repair_roadmap(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
+    """Normalize invalid roadmap statuses (e.g. chartered/blocked from backlog vocabulary)."""
+    repo = repo_root.resolve()
+    fixes: list[Fix] = []
+    try:
+        from scripts.ppe_roadmap import (
+            VALID_ROADMAP_STATUSES,
+            load_roadmap,
+            roadmap_enabled,
+            roadmap_path,
+            save_roadmap,
+        )
+    except ImportError:
+        return fixes, []
+
+    if not roadmap_enabled(repo) or not roadmap_path(repo).is_file():
+        return fixes, []
+
+    roadmap = load_roadmap(repo)
+    items = roadmap.get("items") or []
+    if not isinstance(items, list):
+        return fixes, [{"code": "INVALID_ROADMAP", "detail": "items must be an array"}]
+
+    has_pending = any(
+        isinstance(it, dict) and str(it.get("status") or "").strip().lower() == "pending" for it in items
+    )
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        prev = str(item.get("status") or "").strip().lower()
+        if prev in VALID_ROADMAP_STATUSES:
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        new_status, has_pending = _roadmap_repair_target(
+            repo,
+            status=prev,
+            plan_path=plan,
+            has_pending=has_pending,
+        )
+        if apply:
+            item["status"] = new_status
+        fixes.append(
+            {
+                "action": "normalize_roadmap_status",
+                "index": i,
+                "planPath": plan,
+                "from": prev,
+                "to": new_status,
+                "reason": ROADMAP_REPAIR_REASON,
+            }
+        )
+
+    if apply and fixes:
+        save_roadmap(repo, roadmap)
+
+    remaining = audit_roadmap(repo) if apply else [i for i in audit_roadmap(repo)]
+    return fixes, remaining
 
 
 def repair_backlog(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
@@ -318,18 +444,68 @@ def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue
     return fixes, remaining
 
 
+def repair_idle_pipeline(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    """When manifest is idle: sync roadmap→queue and bootstrap first pending→READY."""
+    repo = repo_root.resolve()
+    out: dict[str, Any] = {"idle": False}
+    try:
+        from scripts.ppe_manifest import load_manifest
+        from scripts.ppe_queue import load_queue
+        from scripts.ppe_roadmap import bootstrap_next_ready, roadmap_enabled, sync_roadmap_to_queue
+
+        manifest = load_manifest(repo)
+    except Exception as exc:
+        out["error"] = str(exc)
+        return out
+
+    status = str(manifest.get("status") or "").strip().upper()
+    if status not in ("COMPLETE", ""):
+        return out
+    if str(manifest.get("phasePlanPath") or "").strip():
+        return out
+
+    queue = load_queue(repo)
+    if any(
+        isinstance(it, dict) and str(it.get("status") or "").upper() == "READY"
+        for it in (queue.get("items") or [])
+    ):
+        out["idle"] = True
+        out["reason"] = "queue already has READY"
+        return out
+
+    out["idle"] = True
+    if not roadmap_enabled(repo):
+        out["reason"] = "roadmap disabled"
+        return out
+
+    if apply:
+        synced = sync_roadmap_to_queue(repo, apply=True)
+        if synced:
+            out["roadmap_sync"] = synced
+    else:
+        out["would_sync_roadmap"] = True
+
+    boot = bootstrap_next_ready(repo, apply=apply)
+    out["bootstrap"] = boot
+    return out
+
+
 def run_queue_health(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    roadmap_fixes, roadmap_remaining = repair_roadmap(repo_root, apply=apply)
     backlog_fixes, backlog_remaining = repair_backlog(repo_root, apply=apply)
     queue_fixes, queue_remaining = repair_queue(repo_root, apply=apply)
-    fixes = backlog_fixes + queue_fixes
-    remaining = backlog_remaining + queue_remaining
+    idle = repair_idle_pipeline(repo_root, apply=apply)
+    fixes = roadmap_fixes + backlog_fixes + queue_fixes
+    remaining = roadmap_remaining + backlog_remaining + queue_remaining
     return {
         "apply": apply,
         "fixes": fixes,
         "fix_count": len(fixes),
         "remaining_issues": remaining,
+        "roadmap_issues": roadmap_remaining,
         "backlog_issues": backlog_remaining,
         "queue_issues": queue_remaining,
+        "idle_pipeline": idle,
         "ok": len(remaining) == 0,
     }
 

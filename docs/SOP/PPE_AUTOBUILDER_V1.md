@@ -109,7 +109,8 @@ ppe_autobuilder.cmd run-local
 
 | File | Role |
 |------|------|
-| `AUTOBUILDER_STATUS.json` | Machine snapshot (agent reads this first) |
+| `AUTOBUILDER_STATUS.json` | Machine snapshot (agent reads this first); includes `propagation_preview`, `instance` |
+| `MULTI_OPERATOR_STATUS.json` | Multi-clone aggregate (`ppe_multi_operator.cmd`) |
 | `AUTOBUILDER_DIAGNOSE.md` | Human diagnose report |
 | `OPERATOR_STATUS.md` | Legacy verdict summary |
 | `IDE_BUILD_TRIGGER.json` | Cursor Automation trigger |

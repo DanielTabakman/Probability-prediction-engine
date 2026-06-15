@@ -472,6 +472,126 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     }
 
 
+def _next_roadmap_item_after(
+    repo: Path,
+    roadmap: dict[str, Any],
+    *,
+    after_plan: str | None,
+) -> dict[str, Any] | None:
+    """First non-done roadmap row after after_plan (or first eligible when after_plan is None)."""
+    from scripts.ppe_roadmap import _plan_valid
+
+    items = roadmap.get("items") or []
+    passed = after_plan is None or not str(after_plan).strip()
+    after_norm = norm_plan(str(after_plan or ""))
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        plan = norm_plan(str(item.get("planPath") or ""))
+        if not plan:
+            continue
+        if not passed:
+            if plan == after_norm:
+                passed = True
+            continue
+        status = str(item.get("status") or "").strip().lower()
+        if status in ("done", "skipped"):
+            continue
+        if chapter_marked_complete_in_repo(repo, plan):
+            continue
+        ok, _ = _plan_valid(repo, plan)
+        if not ok:
+            continue
+        return item
+    return None
+
+
+def preview_next_chapter(repo_root: Path) -> dict[str, Any]:
+    """Read-only: next chapter after closeout (or bootstrap candidate when idle)."""
+    repo = repo_root.resolve()
+    preview: dict[str, Any] = {"preview": True}
+    active_plan: str | None = None
+
+    try:
+        from scripts.ppe_manifest import load_manifest
+
+        manifest = load_manifest(repo)
+        preview["manifest_status"] = str(manifest.get("status") or "")
+        active_plan = str(manifest.get("phasePlanPath") or "").strip() or None
+        preview["active_plan_path"] = active_plan
+    except Exception as exc:
+        preview["manifest_error"] = str(exc)
+
+    try:
+        from scripts.ppe_roadmap import (
+            _first_pending_with_valid_plan,
+            load_roadmap,
+            roadmap_path,
+        )
+
+        if not roadmap_path(repo).is_file():
+            preview["reason"] = "no roadmap file"
+            return preview
+
+        roadmap = load_roadmap(repo)
+        if active_plan:
+            item = _next_roadmap_item_after(repo, roadmap, after_plan=active_plan)
+            if item:
+                plan = norm_plan(str(item.get("planPath") or ""))
+                preview.update(
+                    {
+                        "next_plan_path": plan,
+                        "next_chapter_id": _chapter_id_from_plan(plan),
+                        "next_source": "roadmap_after_active",
+                        "roadmap_status": str(item.get("status") or ""),
+                    }
+                )
+                return preview
+
+        pending = _first_pending_with_valid_plan(repo, roadmap, apply=False)
+        if pending:
+            plan = norm_plan(str(pending.get("planPath") or ""))
+            preview.update(
+                {
+                    "next_plan_path": plan,
+                    "next_chapter_id": _chapter_id_from_plan(plan),
+                    "next_source": "roadmap_pending_bootstrap",
+                    "roadmap_status": "pending",
+                }
+            )
+            return preview
+    except Exception as exc:
+        preview["roadmap_error"] = str(exc)
+
+    prom = promote_first_blocked_with_plan(repo, apply=False)
+    if prom.get("promoted"):
+        preview["would_promote"] = {
+            "chapterId": prom.get("chapterId"),
+            "planPath": prom.get("planPath"),
+        }
+
+    prop = propagate_from_backlog(repo, apply=False)
+    if prop.get("propagated") or prop.get("dry_run"):
+        preview.update(
+            {
+                "next_plan_path": prop.get("planPath"),
+                "next_chapter_id": prop.get("chapterId") or _chapter_id_from_plan(str(prop.get("planPath") or "")),
+                "next_source": "backlog_propagation",
+            }
+        )
+        return preview
+
+    preview["reason"] = prop.get("reason") or prom.get("reason") or "no next chapter found"
+    return preview
+
+
+def _chapter_id_from_plan(plan_path: str) -> str:
+    name = Path(plan_path).name
+    if name.endswith("_relay.json"):
+        return name[: -len("_relay.json")]
+    return name.replace(".json", "")
+
+
 def maybe_propagate_queue(repo_root: Path, *, apply: bool) -> dict[str, Any]:
     """Hook: sync backlog statuses, propagate first queued row if roadmap has no pending."""
     repo = repo_root.resolve()

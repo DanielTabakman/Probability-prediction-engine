@@ -12,9 +12,12 @@ from scripts.ppe_queue import load_queue
 from scripts.ppe_queue_health import (
     audit_backlog,
     audit_queue,
+    audit_roadmap,
     chapter_marked_complete_in_repo,
     repair_backlog,
     repair_queue,
+    repair_roadmap,
+    run_queue_health,
 )
 
 
@@ -153,6 +156,120 @@ class TestPpeQueueHealth(unittest.TestCase):
         self.assertTrue(
             chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/status_section.json")
         )
+
+    def test_audit_roadmap_detects_backlog_vocabulary(self) -> None:
+        roadmap = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "status": "chartered",
+                },
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/other.json",
+                    "status": "blocked",
+                },
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        issues = audit_roadmap(self.repo)
+        self.assertEqual(len(issues), 2)
+        self.assertEqual(issues[0]["code"], "ROADMAP_INVALID_STATUS")
+
+    def test_repair_roadmap_normalizes_chartered_and_blocked(self) -> None:
+        other_plan = {
+            "name": "other",
+            "slices": [{"sliceId": "O-Closeout", "closeout": {"chapterId": "other"}}],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "other.json").write_text(
+            json.dumps(other_plan),
+            encoding="utf-8",
+        )
+        roadmap = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "status": "chartered",
+                },
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/other.json",
+                    "status": "blocked",
+                },
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        fixes, remaining = repair_roadmap(self.repo, apply=True)
+        self.assertEqual(len(fixes), 2)
+        self.assertEqual(remaining, [])
+        roadmap_data = json.loads(
+            (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(roadmap_data["items"][0]["status"], "done")
+        self.assertEqual(roadmap_data["items"][1]["status"], "skipped")
+
+    def test_repair_roadmap_only_one_pending_from_chartered(self) -> None:
+        for slug in ("other_a", "other_b"):
+            plan = {
+                "name": slug,
+                "slices": [{"sliceId": "O-Closeout", "closeout": {"chapterId": slug}}],
+            }
+            (self.repo / "docs" / "SOP" / "PHASE_PLANS" / f"{slug}.json").write_text(
+                json.dumps(plan),
+                encoding="utf-8",
+            )
+        roadmap = {
+            "version": 1,
+            "items": [
+                {"planPath": "docs/SOP/PHASE_PLANS/other_a.json", "status": "chartered"},
+                {"planPath": "docs/SOP/PHASE_PLANS/other_b.json", "status": "chartered"},
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        repair_roadmap(self.repo, apply=True)
+        roadmap_data = json.loads(
+            (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").read_text(encoding="utf-8")
+        )
+        statuses = [row["status"] for row in roadmap_data["items"]]
+        self.assertEqual(statuses.count("pending"), 1)
+        self.assertEqual(statuses.count("skipped"), 1)
+
+    def test_repair_idle_pipeline_bootstraps_pending(self) -> None:
+        other_plan = {
+            "name": "bootstrap_me",
+            "slices": [{"sliceId": "B-Closeout", "closeout": {"chapterId": "b"}}],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "bootstrap_me.json").write_text(
+            json.dumps(other_plan),
+            encoding="utf-8",
+        )
+        roadmap = {
+            "version": 1,
+            "items": [
+                {"planPath": "docs/SOP/PHASE_PLANS/bootstrap_me.json", "status": "chartered"},
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        from scripts.ppe_queue_health import repair_idle_pipeline, run_queue_health
+
+        result = run_queue_health(self.repo, apply=True)
+        self.assertTrue(result.get("fixes") or result.get("idle_pipeline"))
+        idle = result.get("idle_pipeline") or {}
+        self.assertTrue(idle.get("idle"))
+        boot = idle.get("bootstrap") or {}
+        self.assertTrue(boot.get("bootstrapped") or boot.get("planPath"))
 
 
 if __name__ == "__main__":

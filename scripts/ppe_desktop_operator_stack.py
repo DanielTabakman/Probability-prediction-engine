@@ -18,13 +18,17 @@ LOCAL_TRIGGER_WATCHER_PATTERN = r"ppe_ide_build_local_watcher\.py|watch_ide_buil
 NTFY_CMD_PATTERN = r"ppe_ntfy_listen\.py|watch_ntfy_commands\.cmd"
 
 
-def _powershell_process_match(pattern: str) -> bool:
+def _powershell_process_match(pattern: str, *, repo: Path | None = None) -> bool:
     # Only match worker hosts (python/cmd). Excluding powershell.exe avoids false positives
     # when this probe's own -Command string contains the same regex literal.
     allowed = "@('python.exe','cmd.exe','pwsh.exe')"
+    repo_filter = ""
+    if repo is not None:
+        needle = str(repo.resolve()).replace("'", "''")
+        repo_filter = f" -and $_.CommandLine -like '*{needle}*'"
     ps = (
         "$hits = Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | "
-        f"Where-Object {{ $_.Name -in {allowed} -and $_.CommandLine -match '{pattern}' }}; "
+        f"Where-Object {{ $_.Name -in {allowed} -and $_.CommandLine -match '{pattern}'{repo_filter} }}; "
         "if ($hits) { 'yes' } else { 'no' }"
     )
     try:
@@ -40,13 +44,26 @@ def _powershell_process_match(pattern: str) -> bool:
     return proc.stdout.strip().lower() == "yes"
 
 
-def is_loop_running() -> bool:
+def is_loop_running_for_repo(repo: Path) -> bool:
+    """True when the auto-loop for this repo root is alive."""
+    return _powershell_process_match(LOOP_CMD_PATTERN, repo=repo.resolve())
+
+
+def is_loop_running(repo: Path | None = None) -> bool:
     """True when the Windows auto-loop cmd wrapper is still alive."""
+    if repo is not None:
+        return is_loop_running_for_repo(repo)
     return _powershell_process_match(LOOP_CMD_PATTERN)
 
 
-def is_watch_running() -> bool:
+def is_watch_running_for_repo(repo: Path) -> bool:
+    return _powershell_process_match(WATCH_CMD_PATTERN, repo=repo.resolve())
+
+
+def is_watch_running(repo: Path | None = None) -> bool:
     """True when the mobile watch process is still alive."""
+    if repo is not None:
+        return is_watch_running_for_repo(repo)
     return _powershell_process_match(WATCH_CMD_PATTERN)
 
 
@@ -78,8 +95,8 @@ def is_headless_supervisor_running() -> bool:
 
 
 def stack_status(repo: Path | None = None) -> dict[str, bool]:
-    loop = is_loop_running()
-    watch = is_watch_running()
+    loop = is_loop_running(repo)
+    watch = is_watch_running(repo)
     ntfy_listen = is_ntfy_listen_running()
     local_watcher = is_local_trigger_watcher_running()
     watcher_desired = local_trigger_watcher_desired(repo) if repo is not None else False

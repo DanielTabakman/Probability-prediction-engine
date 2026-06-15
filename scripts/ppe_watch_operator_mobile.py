@@ -242,10 +242,10 @@ def save_state(repo: Path, state: dict[str, Any]) -> None:
     path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
 
-def is_loop_running() -> bool:
-    from scripts.ppe_desktop_operator_stack import is_loop_running as _stack_loop_running
+def is_loop_running(repo: Path) -> bool:
+    from scripts.ppe_desktop_operator_stack import is_loop_running_for_repo
 
-    return _stack_loop_running()
+    return is_loop_running_for_repo(repo)
 
 
 def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
@@ -258,7 +258,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         write_status_report(repo, status)
 
     verdict = str(status.get("verdict") or "")
-    loop_running = is_loop_running()
+    loop_running = is_loop_running(repo)
     prior = load_state(repo)
 
     reset_quiet_stuck_if_awake(repo)
