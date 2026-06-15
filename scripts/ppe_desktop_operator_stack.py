@@ -176,12 +176,12 @@ def restart_stack(repo: Path) -> dict[str, Any]:
 def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
     """Ensure auto-loop + mobile watch are running; start missing pieces when allowed."""
     repo = repo.resolve()
-    if start:
+    before = stack_status(repo)
+    if start and not before["stack_running"]:
         from scripts.ppe_loop_host_guard import loop_host_blocked
 
         blocked = loop_host_blocked()
         if blocked:
-            before = stack_status(repo)
             return {**before, "started": [], "action": "loop_host_blocked", **blocked}
     if headless_stack_mode(repo):
         if not start:
@@ -191,7 +191,6 @@ def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
 
         return ensure_headless_supervisor(repo, detach=True, start=True)
 
-    before = stack_status(repo)
     started: list[str] = []
     from scripts.ppe_ntfy_commands import commands_enabled
 

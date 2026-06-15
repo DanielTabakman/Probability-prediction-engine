@@ -19,6 +19,12 @@ def _stem(path: Path) -> str:
     return path.stem
 
 
+@pytest.fixture(autouse=True)
+def _ppe_test_loop_host(monkeypatch: pytest.MonkeyPatch) -> None:
+    """CI has no VM env; allow stack helpers to start in unit tests."""
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
+
+
 def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
