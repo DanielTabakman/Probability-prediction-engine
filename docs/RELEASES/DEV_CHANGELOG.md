@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-15
 
+- `5943703` — fix(control-plane): operator loop auto-heal and selection unblock (#174) (`scripts/`)
+- `7c13b7f` — feat(control-plane): VM loop-host guard, SSH ops, prod wiring selection (#173) (`scripts/`)
+- `91897d2` — control-plane: Monday workflow radar v1 (friction scan + orphan cleanup) (#172) (`scripts/`)
+- `425d831` — feat(platform): MSOS production wiring platform slice 003 (#171) (`apps/msos-web/`)
+- `cff9fb5` — feat(msos-ui): MSOS production wiring product slice 002 (clean) (#170) (`apps/msos-web/`)
+- `e86e816` — Control-plane: dev changelog
 - `32c6713` — control-plane: layer map for watch_ide_build_local.cmd (#164) (`docs/SOP/`)
 
 ## 2026-06-14
