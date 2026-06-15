@@ -67,6 +67,12 @@ Expect `State : Enabled`.
 Hyper-V Manager → PPE-Loop-Host → Checkpoint → "clean-base"
 ```
 
+Or from an **Administrator** PowerShell on the host:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\create_ppe_loop_host_checkpoint.ps1
+```
+
 Restore this checkpoint anytime the VM stack goes sideways.
 
 ---

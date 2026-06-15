@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_production_wiring_v1`  
 **Priority:** HIGH  
-**Status:** **CHARTERED** 2026-06-14 — blocked until public demo launch COMPLETE  
+**Status:** **COMPLETE** 2026-06-15 — blocked until public demo launch COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_production_wiring_v1_relay.json`](PHASE_PLANS/msos_production_wiring_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md)
 
