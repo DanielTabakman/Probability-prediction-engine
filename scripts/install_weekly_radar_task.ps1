@@ -1,9 +1,9 @@
-# Register Task Scheduler: weekly_digest_monday.cmd every Monday morning (local time).
+# Register Task Scheduler: weekly_digest_monday.cmd (radar + digest) every Monday 04:00 local.
 
 param(
     [Parameter(Mandatory = $true)]
     [string]$RepoRoot,
-    [string]$TaskName = "PPE weekly digest",
+    [string]$TaskName = "PPE weekly radar + digest",
     [string]$RunTime = "04:00",
     [switch]$Unregister
 )
@@ -35,7 +35,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew
 
-$description = "PPE weekly digest: workflow radar + summary + ntfy phone push. See docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md"
+$description = "PPE Monday: workflow radar (friction + orphan cleanup) + weekly digest + ntfy. See docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md"
 
 Register-ScheduledTask `
     -TaskName $TaskName `
@@ -53,4 +53,4 @@ Write-Host "Test now:"
 Write-Host "  cmd /c `"$runner`""
 Write-Host ""
 Write-Host "Remove:"
-Write-Host "  powershell -File scripts\install_weekly_digest_task.ps1 -RepoRoot `"$RepoRoot`" -Unregister"
+Write-Host "  powershell -File scripts\install_weekly_radar_task.ps1 -RepoRoot `"$RepoRoot`" -Unregister"

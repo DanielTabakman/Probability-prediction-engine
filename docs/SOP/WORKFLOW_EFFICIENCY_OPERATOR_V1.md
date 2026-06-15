@@ -72,9 +72,12 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
 | `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
+| `workflow_radar.cmd generate` | Monday workflow friction scan + orphan auto-cleanup ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)) |
+| `workflow_radar.cmd cleanup --dry-run` | Orphan scan only (locks, triggers, job files) |
 | `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; optional Windows toast (`PPE_WEEKLY_DIGEST_TOAST=0` for phone only) |
-| `weekly_digest_monday.cmd` | `generate` + `notify` — **Task Scheduler** entry for Monday reminder |
-| `install_weekly_digest_monday_task.cmd` | Register Monday 09:00 local Task Scheduler job (run once) |
+| `weekly_digest_monday.cmd` | `workflow_radar` + `generate` + `notify` — **Task Scheduler** entry (Monday 04:00) |
+| `install_weekly_radar_monday_task.cmd` | Register Monday 04:00 local Task Scheduler job (run once) |
+| `install_weekly_digest_monday_task.cmd` | Legacy alias — prefer `install_weekly_radar_monday_task.cmd` |
 | `start_ppe_desktop_operator.cmd` | Desktop stack: auto-loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)) |
 | [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) | Paste prompt for new Cursor Agent chat on desktop |
 | `watch_operator_mobile.cmd` | ntfy push on verdict change or loop death (`PPE_NTFY_TOPIC`) |
@@ -87,13 +90,15 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | Arguments | `/c "D:\Users\User\Desktop\Probability prediction engine\weekly_digest_monday.cmd"` |
 | Start in | `D:\Users\User\Desktop\Probability prediction engine` |
 
+Recommended: **Monday 04:00 local** via `install_weekly_radar_monday_task.cmd` (radar + digest + notify). Radar scans workflow friction, auto-cleans stale operator artifacts (build locks, stuck triggers, orphan job files), then refreshes the digest.
+
 From **PowerShell**, run `.cmd` files via **`cmd /c`** (PowerShell does not execute `.cmd` with `&` alone):
 
 ```bat
 cmd /c weekly_digest.cmd notify
 ```
 
-Requires PC on at run time. One-time scheduler: `install_weekly_digest_monday_task.cmd`. Notify reads `artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json`. Disable all notify: `set PPE_NOTIFY=0`. Phone-only: `set PPE_WEEKLY_DIGEST_TOAST=0` in `ppe_operator_notify.local.cmd`.
+Requires PC on at run time. One-time scheduler: `install_weekly_radar_monday_task.cmd`. Radar output: `artifacts/control_plane/WORKFLOW_RADAR_LATEST.md`. Notify reads `artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json`. Disable all notify: `set PPE_NOTIFY=0`. Phone-only: `set PPE_WEEKLY_DIGEST_TOAST=0` in `ppe_operator_notify.local.cmd`.
 
 Data lives under `artifacts/workflow_metrics/` (gitignored).
 

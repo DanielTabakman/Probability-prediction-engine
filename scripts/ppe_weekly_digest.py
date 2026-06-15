@@ -68,6 +68,7 @@ class WeekSection:
     whats_next_lines: list[str]
     merge_count: int
     receipt_anchor: str
+    friction_lines: list[str] = field(default_factory=list)
 
     def to_markdown(self) -> list[str]:
         mon = date.fromisoformat(self.week_monday)
@@ -87,6 +88,10 @@ class WeekSection:
         lines.append("### Behind the scenes")
         lines.append(f"- {self.ops_summary}")
         lines.append("")
+        if self.friction_lines:
+            lines.append("### Workflow friction")
+            lines.extend(self.friction_lines)
+            lines.append("")
         lines.append("### What's next")
         if self.whats_next_lines:
             lines.extend(self.whats_next_lines)
@@ -288,6 +293,15 @@ def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
             lines.append(f"- {_user_facing_next(raw)}")
         lines.append("")
 
+    friction = [str(x) for x in (section.get("friction_lines") or [])]
+    if friction:
+        lines.append("Workflow watch")
+        for raw in friction[:2]:
+            text = raw.lstrip("- ").strip()
+            if text:
+                lines.append(f"- {text}")
+        lines.append("")
+
     if section.get("click_url"):
         lines.append(f"{merge_count} merges to main. Tap for the long read on GitHub.")
     else:
@@ -309,6 +323,7 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
     product_lines: list[str] = []
     ops_summary = ""
     whats_next_lines: list[str] = []
+    friction_lines: list[str] = []
 
     for line in text.splitlines():
         if line.startswith("## Week of "):
@@ -331,6 +346,9 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
         if line.startswith("### What's next"):
             current_section = "next"
             continue
+        if line.startswith("### Workflow friction"):
+            current_section = "friction"
+            continue
         if line.startswith("### "):
             current_section = None
             continue
@@ -344,6 +362,8 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             ops_summary = stripped[2:]
         elif current_section == "next" and stripped.startswith("- "):
             whats_next_lines.append(stripped[2:])
+        elif current_section == "friction" and stripped.startswith("- "):
+            friction_lines.append(stripped)
         elif stripped.startswith("- ") and "merge(s) to `main`" in stripped:
             match = re.search(r"(\d+)\s+merge\(s\)", stripped)
             if match:
@@ -358,6 +378,7 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             "product_lines": product_lines,
             "ops_summary": ops_summary,
             "whats_next_lines": whats_next_lines,
+            "friction_lines": friction_lines,
         }
     return None
 
@@ -574,6 +595,8 @@ def extract_whats_next(repo: Path) -> list[str]:
 
 
 def build_week_section(repo: Path, week_monday: date) -> WeekSection:
+    from scripts.ppe_workflow_radar import load_radar_friction_lines
+
     bullets, total = collect_week_bullets(repo, week_monday)
     product_raw: list[str] = []
     ops_count = 0
@@ -601,6 +624,7 @@ def build_week_section(repo: Path, week_monday: date) -> WeekSection:
         whats_next_lines=extract_whats_next(repo),
         merge_count=total,
         receipt_anchor=anchor,
+        friction_lines=load_radar_friction_lines(repo, week_monday),
     )
 
 
