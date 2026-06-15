@@ -53,10 +53,16 @@ python "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" status --write --bri
 python "%CD%\scripts\ppe_operator_status.py" --repo-root "%CD%" --brief --no-write
 set "STATUS_RC=%ERRORLEVEL%"
 if "%STATUS_RC%"=="7" goto handle_guard_stop
+python "%CD%\scripts\ppe_operator_loop_pass.py" --repo-root "%CD%"
+set "PASS_RC=%ERRORLEVEL%"
+if "%PASS_RC%"=="7" goto handle_guard_stop
+if "%PASS_RC%"=="8" goto loop_idle
+if not "%PASS_RC%"=="0" exit /b %PASS_RC%
 call "%~dp0run_ppe_auto.cmd"
 set "RC=%ERRORLEVEL%"
 if "%RC%"=="7" goto handle_guard_stop
 if not "%RC%"=="0" exit /b %RC%
+:loop_idle
 echo [run_ppe_auto_loop] idle sleep %SLEEP%s — Ctrl+C to stop
 python "%CD%\scripts\ppe_loop_sleep.py" %SLEEP%
 goto loop

@@ -146,13 +146,17 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
             check=False,
         )
 
+    try:
+        manifest = load_manifest(repo)
+        status = str(manifest.get("status") or "").upper()
+        if status == "RUNNING":
+            set_manifest_status(repo, "READY")
+            if exit_code == 0:
+                print("ppe_run: manifest RUNNING -> READY (phase pass finished)")
+    except Exception:
+        pass
+
     if exit_code != 0:
-        try:
-            manifest = load_manifest(repo)
-            if manifest.get("status") == "RUNNING":
-                set_manifest_status(repo, "READY")
-        except Exception:
-            pass
         try:
             from scripts.ui_smoke_diagnose import diagnose_stop_for_review, format_diagnosis
 
