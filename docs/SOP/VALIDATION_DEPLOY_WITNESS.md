@@ -12,7 +12,8 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 | **HTTPS static assets** | PASS |
 | **Demo operator script** | PASS |
 | **Research offer CTA on demo (`app_demo`)** | **pending steward `.env`** — compose on `main`; set **PASS** after VPS `.env` + browser confirms **Research beta (v0)** on Streamlit demo |
-| **Research offer CTA on apex (`msos_web`)** | **pending steward `.env`** — `PPE_RESEARCH_OFFER_*` wired on `msos_web` (Platform-Slice002); set **PASS** after VPS `.env` + browser confirms CTA on Next homepage |
+| **Research offer CTA on apex (`msos_web`)** | **pending steward `.env`** — `PPE_RESEARCH_OFFER_*` wired on `msos_web` build; set **PASS** after VPS rebuild + browser confirms CTA on Next homepage |
+| **PPE embed on Strategy Lab (`msos_web`)** | **pending steward deploy** — `/ppe-embed` Caddy proxy + `NEXT_PUBLIC_PPE_EMBED_URL` build arg; set **PASS** after rebuild confirms live iframe |
 
 **Phase 2 (local):** dual smoke green `20260519_155858` + `20260519_160103` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
 

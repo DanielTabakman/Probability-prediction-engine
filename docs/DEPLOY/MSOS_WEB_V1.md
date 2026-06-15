@@ -15,16 +15,26 @@ See [`Caddyfile`](../../Caddyfile) — `X-Forwarded-Proto` / `X-Forwarded-Host` 
 
 ## Environment (VPS `.env`)
 
-Copy from [`.env.example`](../../.env.example). Keys consumed by **`msos_web`** (same pattern as `app_demo` Streamlit):
+Copy from [`.env.example`](../../.env.example). Keys consumed at **`msos_web` build** (Next.js `NEXT_PUBLIC_*`) and runtime:
 
 | Variable | Service | Purpose |
 |----------|---------|---------|
-| `PPE_RESEARCH_OFFER_URL` | `msos_web`, `app_demo` | `https://` or `mailto:` link for research-beta CTA on apex homepage |
-| `PPE_RESEARCH_OFFER_LABEL` | `msos_web`, `app_demo` | Optional button label (default in app: `Request research beta access`) |
+| `PPE_RESEARCH_OFFER_URL` | `msos_web` build + `app_demo` | Maps to `NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL` at build; research-beta CTA on apex |
+| `PPE_RESEARCH_OFFER_LABEL` | `msos_web` build + `app_demo` | Maps to `NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL` at build |
+| `NEXT_PUBLIC_MSOS_SIGN_IN_URL` | `msos_web` build | Sign-in link target (default `https://app.marketstructureos.com`) |
+| `NEXT_PUBLIC_PPE_EMBED_URL` | `msos_web` build | Strategy Lab iframe src (default `/ppe-embed` — Caddy → `app_demo`) |
 
-When unset, homepage omits the CTA (honest public shell). Set both on VPS so apex and demo stay aligned.
+When research-offer vars are unset, homepage omits the CTA (honest public shell). When embed URL is unset at build, Strategy Lab shows degraded “Embed pending” state.
 
 `PPE_WEB_FEEDBACK_DIR=/data` is set in compose; feedback volume `msos_web_data` is created automatically.
+
+## PPE embed proxy (Caddy)
+
+| Path | Backend | Notes |
+|------|---------|-------|
+| `/ppe-embed/*` | `app_demo:8501` | Same-origin Streamlit demo for Strategy Lab iframe (`NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed`) |
+
+Strip prefix `/ppe-embed` before upstream. See [`MSOS_P1_STACK_ROUTING_ADR.md`](../SOP/MSOS_P1_STACK_ROUTING_ADR.md).
 
 ## Local build
 
@@ -45,6 +55,7 @@ git pull
 # Repo-root .env (not committed) — research beta CTA on apex + demo:
 #   PPE_RESEARCH_OFFER_URL=mailto:you@example.com?subject=PPE%20research%20beta
 #   PPE_RESEARCH_OFFER_LABEL=Request research beta access
+#   NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed
 
 docker compose build msos_web
 docker compose up -d --build
@@ -57,6 +68,7 @@ docker compose up -d --force-recreate caddy msos_web
 2. `https://marketstructureos.com/command-center` — MSOS shell routes load.
 3. `https://app.marketstructureos.com` — Streamlit lab still works behind Access.
 4. With `.env` set — research-beta button visible on apex homepage; link opens mailto/URL.
+5. `/strategy-lab` — PPE embed iframe loads (not “Embed pending”) when built with `NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed`.
 
 Record results in [`docs/SOP/VALIDATION_DEPLOY_WITNESS.md`](../SOP/VALIDATION_DEPLOY_WITNESS.md).
 
