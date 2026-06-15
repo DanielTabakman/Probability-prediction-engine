@@ -11,7 +11,7 @@ REM   run_ppe_desktop_operator.cmd --json
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
-if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
+call "%CD%\call_ppe_operator_local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
 set "PPE_SKIP_ACP=1"
 set "PPE_WORKER_MODE=deterministic"

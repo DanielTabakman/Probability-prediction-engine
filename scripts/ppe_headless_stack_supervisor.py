@@ -261,6 +261,10 @@ def run_supervisor(repo: Path, *, poll_seconds: int = DEFAULT_POLL_SECONDS) -> i
         )
         return 1
 
+    from scripts.ppe_loop_host_guard import require_loop_host
+
+    require_loop_host()
+
     if is_supervisor_running(repo):
         existing = load_state(repo)
         print(
@@ -334,6 +338,20 @@ def ensure_headless_supervisor(
 ) -> dict[str, Any]:
     """Start or verify the headless supervisor and worker stack."""
     repo = repo.resolve()
+    if start:
+        from scripts.ppe_loop_host_guard import loop_host_blocked
+
+        blocked = loop_host_blocked()
+        if blocked:
+            status = stack_status(repo)
+            return {
+                **status,
+                "headless": True,
+                "supervisor_running": is_supervisor_running(repo),
+                "started": [],
+                "action": "loop_host_blocked",
+                **blocked,
+            }
     if not start:
         status = stack_status(repo)
         return {

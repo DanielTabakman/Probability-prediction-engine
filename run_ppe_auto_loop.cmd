@@ -7,11 +7,14 @@ REM Exit 7: guard stop — notify, then sleep+retry when keepLoopAliveOnGuardSto
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
-if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
+call "%CD%\call_ppe_operator_local.cmd"
 if not defined PPE_OPERATOR_PROFILE set "PPE_OPERATOR_PROFILE=local"
 
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
+
+python "%CD%\scripts\ppe_loop_host_guard.py" --require
+if errorlevel 1 exit /b %ERRORLEVEL%
 
 set "SLEEP=120"
 for /f "usebackq delims=" %%s in (`python -c "from pathlib import Path; from scripts.ppe_operator_config import idle_sleep_seconds; print(idle_sleep_seconds(Path('.')))"`) do set "SLEEP=%%s"

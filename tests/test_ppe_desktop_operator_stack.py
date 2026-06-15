@@ -23,7 +23,17 @@ def test_stack_status_all_running():
     assert status["stack_running"] is True
 
 
-def test_ensure_stack_starts_full_when_idle(tmp_path):
+def test_ensure_stack_blocked_without_loop_host(monkeypatch, tmp_path):
+    monkeypatch.delenv("PPE_LOOP_HOST", raising=False)
+    monkeypatch.delenv("PPE_STACK_FORBIDDEN", raising=False)
+    with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=True):
+        result = ensure_stack(tmp_path, start=True)
+    assert result.get("action") == "loop_host_blocked"
+    assert result.get("guard_code") == "not_loop_host"
+
+
+def test_ensure_stack_starts_full_when_idle(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=False):
         with patch("scripts.ppe_ntfy_commands.commands_enabled", return_value=False):
             with patch("scripts.ppe_desktop_operator_stack.is_loop_running", return_value=False):
@@ -53,7 +63,8 @@ def test_ensure_stack_starts_full_when_idle(tmp_path):
     assert result["action"] == "stack"
 
 
-def test_ensure_stack_noop_when_running(tmp_path):
+def test_ensure_stack_noop_when_running(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=False):
         with patch("scripts.ppe_ntfy_commands.commands_enabled", return_value=False):
             with patch("scripts.ppe_desktop_operator_stack.stack_status") as status:
@@ -71,7 +82,8 @@ def test_ensure_stack_noop_when_running(tmp_path):
     assert result["action"] == "none"
 
 
-def test_ensure_stack_starts_ntfy_when_loop_watch_up(tmp_path):
+def test_ensure_stack_starts_ntfy_when_loop_watch_up(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=False):
         with patch("scripts.ppe_ntfy_commands.commands_enabled", return_value=True):
             with patch("scripts.ppe_desktop_operator_stack.start_ntfy_listen_only") as ntfy:

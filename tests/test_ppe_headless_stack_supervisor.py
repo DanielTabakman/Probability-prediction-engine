@@ -50,7 +50,8 @@ def test_worker_specs_respects_ntfy_and_local_watcher(tmp_path):
     assert names == ["loop", "watch"]
 
 
-def test_ensure_headless_supervisor_noop_when_running(tmp_path):
+def test_ensure_headless_supervisor_noop_when_running(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     with patch("scripts.ppe_headless_stack_supervisor.is_supervisor_running", return_value=True):
         with patch(
             "scripts.ppe_headless_stack_supervisor.stack_status",
@@ -61,7 +62,8 @@ def test_ensure_headless_supervisor_noop_when_running(tmp_path):
     assert result["supervisor_running"] is True
 
 
-def test_ensure_headless_supervisor_starts_detached(tmp_path):
+def test_ensure_headless_supervisor_starts_detached(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     clear_state(tmp_path)
     fake_proc = MagicMock()
     fake_proc.pid = 9999
@@ -89,7 +91,8 @@ def test_start_full_stack_uses_headless(tmp_path):
     ensure.assert_called_once_with(tmp_path)
 
 
-def test_ensure_stack_headless_routes_to_supervisor(tmp_path):
+def test_ensure_stack_headless_routes_to_supervisor(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
     from scripts.ppe_desktop_operator_stack import ensure_stack
 
     with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=True):
