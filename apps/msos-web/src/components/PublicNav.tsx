@@ -1,6 +1,10 @@
 import Link from "next/link";
 
+import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
+
 export function PublicNav() {
+  const signInUrl = resolveSignInUrl();
+
   return (
     <nav className="public-nav">
       <div className="brand">
@@ -11,13 +15,17 @@ export function PublicNav() {
         </div>
       </div>
       <div className="nav-links">
-        <span className="sel">Platform</span>
-        <span>Strategy Lab</span>
-        <span>Market surfaces</span>
-        <span>Vision</span>
+        <Link className="sel" href={MSOS_ROUTES.home}>
+          Platform
+        </Link>
+        <Link href={MSOS_ROUTES.strategyLab}>Strategy Lab</Link>
+        <Link href={MSOS_ROUTES.monitor}>Market surfaces</Link>
+        <Link href={MSOS_ROUTES.learn}>Vision</Link>
         <div className="nav-actions">
-          <span className="btn slim dark">Sign in</span>
-          <Link className="btn slim primary" href="/command-center">
+          <a className="btn slim dark" href={signInUrl}>
+            Sign in
+          </a>
+          <Link className="btn slim primary" href={MSOS_ROUTES.commandCenter}>
             Enter Command Center
           </Link>
         </div>
