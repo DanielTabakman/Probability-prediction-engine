@@ -1,9 +1,9 @@
 @echo off
 setlocal
 
-REM Register Task Scheduler: Monday weekly digest + phone ntfy push.
-REM Run once from repo root.
+REM Register Task Scheduler: Monday workflow radar + weekly digest + phone ntfy push.
+REM Run once from repo root. Delegates to install_weekly_radar_monday_task.cmd.
 
 cd /d "%~dp0"
-powershell -NoProfile -ExecutionPolicy Bypass -File "%CD%\scripts\install_weekly_digest_task.ps1" -RepoRoot "%CD%" %*
+call "%~dp0install_weekly_radar_monday_task.cmd" %*
 exit /b %ERRORLEVEL%

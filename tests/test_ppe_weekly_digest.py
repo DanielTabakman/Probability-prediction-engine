@@ -142,11 +142,14 @@ class TestPpeWeeklyDigest(unittest.TestCase):
                 ],
                 "ops_summary": "2 control-plane / planning merge(s)",
                 "whats_next_lines": ["**Next slice:** EVIDENCE (`MSOS-P3-Control-Slice001` — charter)"],
+                "friction_lines": ["- Multiple slices needed 3+ roundtrips — trim BUILD packets."],
             }
         )
         assert "This week in PPE" in phone["phone_title"]
         assert "What's different for you" in phone["phone_body"]
         assert "public homepage" in phone["phone_body"]
+        assert "Workflow watch" in phone["phone_body"]
+        assert "roundtrips" in phone["phone_body"]
 
     def test_format_week_range(self) -> None:
         self.assertEqual(format_week_range("2026-06-01"), "Jun 1-7")
