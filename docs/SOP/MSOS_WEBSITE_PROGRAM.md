@@ -98,9 +98,22 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 **Priority:** HIGH — sequence **phase 3** (long-term workflow canon).  
 **Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · [`POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md`](POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md)
 
-### Later — Access identity + Monitor/History live (backlog stubs)
+### Later — Access identity + Monitor/History live (chartered)
 
-**Phases 4–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md): Cloudflare Access on MSOS routes + per-user scoping; then Monitor/History from combined state. Charter at SELECTION after phase 3.
+Phases **4a–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md).
+
+### Later — E2E witness (chartered)
+
+Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md) — full production journey checklist.
+
+### Commercial — Entitlements + Stripe (chartered)
+
+| Phase | Chapter | When |
+|-------|---------|------|
+| **7a** | [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) | Free accounts; manual paid upgrade; ADR [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
+| **7b** | [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md) | Stripe Checkout — **chartered, BUILD deferred** until operator configures Stripe |
+
+**Intent:** Test willingness to pay via manual/invoice path first (7a); self-serve Stripe when ready (7b) without rework.
 
 ---
 
@@ -110,8 +123,9 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 - Hyperliquid integration beyond honest Pending representation
 - Prediction-market or perps lenses as live tools
 - Broad asset rollout
-- Paywall beyond low-cost validation needs
 - Claims of measured edge, profitability, formal TAM, or traction without evidence
+
+**Commercial note:** Paywall and Stripe are **not deferred indefinitely** — see live sequence phases **7a–7b**. Generic “paywall automation” in backlog is superseded by [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) + [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md).
 
 ---
 
@@ -131,10 +145,14 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 | Post-P8 | `msos_storyboard_visual_parity_v1` | `PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
 | Post-launch | `msos_public_demo_launch_v1` | `PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | Post-launch | `msos_production_wiring_v1` | `PHASE_PLANS/msos_production_wiring_v1_relay.json` |
-| Live seq P2 | `msos_user_state_v1` | `PHASE_PLANS/msos_user_state_v1_relay.json` |
 | Live seq P3 | `msos_workflow_persistence_v1` | `PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
-| Live seq P4–5 | `msos_access_identity_v1`, `msos_monitor_history_live_v1` | _(SELECTION pending)_ |
+| Live seq 4a | `mvp1_snapshot_owner_v1` | `PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
+| Live seq 4b | `msos_access_identity_v1` | `PHASE_PLANS/msos_access_identity_v1_relay.json` |
+| Live seq 5 | `msos_monitor_history_live_v1` | `PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
+| Live seq 6 | `msos_e2e_product_witness_v1` | `PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
+| Live seq 7a | `msos_entitlements_v1` | `PHASE_PLANS/msos_entitlements_v1_relay.json` |
+| Live seq 7b | `msos_billing_stripe_v1` | `PHASE_PLANS/msos_billing_stripe_v1_relay.json` |
 
-**Live product sequence (phases 1–5):** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)
+**Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).

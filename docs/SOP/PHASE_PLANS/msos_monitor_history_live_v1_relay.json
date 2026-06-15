@@ -1,0 +1,71 @@
+{
+  "name": "MSOS_monitor_history_live_v1 (live monitor + history + CC strip)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-MonHistV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+      "buildBranch": "build/auto/MSOS-MonHistV1-Control-Slice001-mon_hist",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-MonHistV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+      "buildBranch": "build/auto/MSOS-MonHistV1-Product-Slice002-mon_hist",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "apps/msos-web/src/components/HistoryContent.tsx",
+        "apps/msos-web/src/components/CommandCenterContent.tsx",
+        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+        "tests/test_msos_web_monitor_history.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MonHistV1-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+      "buildBranch": "build/auto/MSOS-MonHistV1-Witness-Slice003-mon_hist",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MonHistV1-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+      "buildBranch": "build/auto/MSOS-MonHistV1-Closeout-Slice004-mon_hist",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_monitor_history_live_v1",
+        "chapterTitle": "MSOS monitor & history live v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

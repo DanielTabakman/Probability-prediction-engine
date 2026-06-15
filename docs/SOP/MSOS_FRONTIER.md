@@ -19,8 +19,20 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Sprint:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md)
 - **SELECTION:** [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
 - **Last closed:** **MSOS public demo launch v1** — 2026-06-14 on `main`
-- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases 1→5 (wiring → snapshots → workflow → access → monitor/history)
-- **Follow-on (blocked):** `msos_user_state_v1` → `msos_workflow_persistence_v1` → access → monitor/history
+- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases **1→7b** (full product + commercial)
+- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
+- **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
+
+### Live product sequence — phases 4–7 (all chartered)
+
+| Phase | chapterId | Status |
+|-------|-----------|--------|
+| 4a | `mvp1_snapshot_owner_v1` | BLOCKED — PPE `owner_email` |
+| 4b | `msos_access_identity_v1` | BLOCKED — Access on MSOS routes |
+| 5 | `msos_monitor_history_live_v1` | BLOCKED — live monitor/history |
+| 6 | `msos_e2e_product_witness_v1` | BLOCKED — full journey witness |
+| 7a | `msos_entitlements_v1` | BLOCKED — **free tier** + manual paid |
+| 7b | `msos_billing_stripe_v1` | BLOCKED — **Stripe** (BUILD when operator ready) |
 
 ### MSOS production wiring v1 — relay queue — **CHARTERED** (HIGH, phase 1)
 

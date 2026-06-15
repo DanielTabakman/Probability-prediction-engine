@@ -103,7 +103,7 @@ flowchart LR
 
 | MSOS public demo launch v1 | **COMPLETE** 2026-06-14 | [`SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md`](docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md), [`MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md) |
 
-| MSOS live product sequence P1–P3 | **CHARTERED** 2026-06-14 | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — wiring → user state → workflow persistence |
+| MSOS live product sequence P1–7b | **CHARTERED** 2026-06-14 | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — full product + commercial path |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
@@ -131,7 +131,8 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
-| **Live product sequence** | P1–P3 chartered | Phases 4–5 backlog stubs |
+| **Live product sequence** | P1–**7b** chartered | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · Stripe BUILD deferred |
+| **Commercial ADR** | PROPOSED | [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
 
 **After `run_ppe.cmd`:** read `artifacts/orchestrator/LAST_RUN_REPORT.md`; **new Cursor thread** with [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only.
 

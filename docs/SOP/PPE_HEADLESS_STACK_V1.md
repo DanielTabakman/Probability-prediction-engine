@@ -49,6 +49,8 @@ Run headless stack on a **Hyper-V VM** (loop host). Your daily PC stays clean; r
 
 On a daily-driver PC until the VM exists: keep `ideHandoff.openCursor: false` so handoff does not steal Cursor focus.
 
+**VM loop host:** [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md) — run headless stack on Hyper-V; keep daily PC stack off.
+
 See [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md).
 
 ---

@@ -223,20 +223,64 @@
       "reason": "[HIGH] MSOS thesis/expression server store; Command Center from MSOS records \u2014 blocked until user state bridge COMPLETE"
     },
     {
+      "chapterId": "mvp1_snapshot_owner_v1",
+      "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 4a",
+      "reason": "[HIGH] owner_email on PPE frozen evaluations \u2014 blocked until workflow persistence COMPLETE"
+    },
+    {
       "chapterId": "msos_access_identity_v1",
       "status": "blocked",
-      "priority": "medium",
+      "priority": "high",
       "focusPlaybookTier": "P1",
-      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 4",
-      "reason": "[MEDIUM] Cloudflare Access on MSOS routes + per-user scoping \u2014 charter at SELECTION after workflow persistence"
+      "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 4b",
+      "reason": "[HIGH] Cloudflare Access on MSOS routes + user-scoped APIs \u2014 blocked until snapshot owner COMPLETE"
     },
     {
       "chapterId": "msos_monitor_history_live_v1",
       "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 5",
+      "reason": "[HIGH] Monitor/History + updated Command Center from live state \u2014 blocked until access identity COMPLETE"
+    },
+    {
+      "chapterId": "msos_e2e_product_witness_v1",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P1",
-      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 5",
-      "reason": "[MEDIUM] Monitor/History from live MSOS + PPE review state \u2014 charter at SELECTION after access identity"
+      "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 6",
+      "reason": "[MEDIUM] Full storyboard journey operator witness on production \u2014 blocked until monitor/history live COMPLETE"
+    },
+    {
+      "chapterId": "msos_entitlements_v1",
+      "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P4",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
+      "reason": "[HIGH] Free tier accounts + manual paid upgrade path (Stripe hooks, no Stripe SDK) \u2014 blocked until access identity COMPLETE"
+    },
+    {
+      "chapterId": "msos_billing_stripe_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P4",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
+      "reason": "[MEDIUM] Stripe Checkout + webhooks \u2014 BUILD deferred until operator Stripe ready; blocked until entitlements COMPLETE"
     }
   ]
 }
