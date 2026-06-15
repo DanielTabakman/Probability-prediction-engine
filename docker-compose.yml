@@ -3,6 +3,11 @@ services:
     build:
       context: ./apps/msos-web
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MSOS_SIGN_IN_URL: ${NEXT_PUBLIC_MSOS_SIGN_IN_URL:-https://app.marketstructureos.com}
+        NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL: ${PPE_RESEARCH_OFFER_URL:-}
+        NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL: ${PPE_RESEARCH_OFFER_LABEL:-}
+        NEXT_PUBLIC_PPE_EMBED_URL: ${NEXT_PUBLIC_PPE_EMBED_URL:-/ppe-embed}
     container_name: msos_web
     environment:
       - PORT=3000

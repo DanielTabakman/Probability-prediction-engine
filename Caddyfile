@@ -1,4 +1,5 @@
 # Routing: apex (default) -> msos_web:3000 (Next.js MSOS); app.marketstructureos.com -> app_full:8501 (Streamlit).
+# Strategy Lab PPE embed: /ppe-embed/* -> app_demo:8501 (public Streamlit; see MSOS_P1_STACK_ROUTING_ADR).
 # Deploy notes: docs/DEPLOY/MSOS_WEB_V1.md
 #
 # Origin serves HTTP only for now (reliable for raw IP + pre-DNS testing).
@@ -38,6 +39,14 @@
 				header_up X-Forwarded-Host {http.request.host}
 			}
 		}
+		@ppe_embed path /ppe-embed /ppe-embed/*
+		handle @ppe_embed {
+			uri strip_prefix /ppe-embed
+			reverse_proxy app_demo:8501 {
+				header_up X-Forwarded-Proto {forwarded_proto}
+				header_up X-Forwarded-Host {http.request.host}
+			}
+		}
 		handle {
 			reverse_proxy msos_web:3000 {
 				header_up X-Forwarded-Proto {forwarded_proto}
@@ -58,6 +67,14 @@
 		@app host app.marketstructureos.com
 		handle @app {
 			reverse_proxy app_full:8501 {
+				header_up X-Forwarded-Proto {forwarded_proto}
+				header_up X-Forwarded-Host {http.request.host}
+			}
+		}
+		@ppe_embed path /ppe-embed /ppe-embed/*
+		handle @ppe_embed {
+			uri strip_prefix /ppe-embed
+			reverse_proxy app_demo:8501 {
 				header_up X-Forwarded-Proto {forwarded_proto}
 				header_up X-Forwarded-Host {http.request.host}
 			}
