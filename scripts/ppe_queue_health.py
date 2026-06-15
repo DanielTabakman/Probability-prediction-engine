@@ -19,6 +19,24 @@ BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 BACKLOG_ACTIVE_STATUSES = frozenset({"blocked", "chartered", "queued"})
 BACKLOG_TERMINAL_STATUSES = frozenset({"done", "skipped"})
 FINALIZE_DONE_REASON = "auto-repair: evidence doc shows chapter COMPLETE"
+ROADMAP_REPAIR_REASON = "auto-repair: backlog status on roadmap normalized"
+# Backlog-only statuses sometimes land on PHASE_SELECTION_ROADMAP by hand; map to valid roadmap rows.
+ROADMAP_INVALID_TO_VALID = {
+    "chartered": "pending",
+    "blocked": "skipped",
+    "queued": "pending",
+}
+
+
+def roadmap_row_should_activate_for_backlog(roadmap_status: str, backlog_status: str) -> bool:
+    """True when a backlog row is ready to run but the roadmap row is still idle."""
+    rs = str(roadmap_status or "").strip().lower()
+    bs = str(backlog_status or "").strip().lower()
+    if bs not in ("queued", "chartered"):
+        return False
+    if rs in ROADMAP_INVALID_TO_VALID:
+        return True
+    return rs == "skipped"
 
 
 def _norm_plan(path: str) -> str:
@@ -32,8 +50,20 @@ def _closeout_meta(plan: dict[str, Any]) -> dict[str, Any]:
     return {}
 
 
+def _evidence_has_pending_slices(body: str) -> bool:
+    """True when the evidence slice table still lists PENDING rows."""
+    for line in body.splitlines():
+        if "|" not in line:
+            continue
+        for cell in line.split("|"):
+            cell = cell.strip()
+            if re.fullmatch(r"\*{0,2}PENDING\*{0,2}", cell, re.I):
+                return True
+    return False
+
+
 def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
-    """True when phase-plan closeout evidence doc shows chapter COMPLETE."""
+    """True when closeout evidence shows chapter COMPLETE and no slice rows are PENDING."""
     try:
         plan = load_phase_plan(repo_root, plan_path)
     except (FileNotFoundError, json.JSONDecodeError, OSError):
@@ -45,14 +75,18 @@ def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
     evidence = repo_root / evidence_rel
     if not evidence.is_file():
         return False
-    head = evidence.read_text(encoding="utf-8", errors="replace")[:1200]
-    if re.search(r"\*\*Status:\*\*\s*\*\*COMPLETE\*\*", head, re.I):
-        return True
-    if re.search(r"chapter\s+\*\*COMPLETE\*\*", head, re.I):
-        return True
-    if re.search(r"##\s*Chapter status\s*[\r\n]+\s*\*\*COMPLETE\*\*", head, re.I):
-        return True
-    return False
+    body = evidence.read_text(encoding="utf-8", errors="replace")
+    head = body[:1200]
+    complete_header = bool(
+        re.search(r"\*\*Status:\*\*\s*\*\*COMPLETE\*\*", head, re.I)
+        or re.search(r"chapter\s+\*\*COMPLETE\*\*", head, re.I)
+        or re.search(r"##\s*Chapter status\s*[\r\n]+\s*\*\*COMPLETE\*\*", head, re.I)
+    )
+    if not complete_header:
+        return False
+    if _evidence_has_pending_slices(body):
+        return False
+    return True
 
 
 def finalize_chapter_evidence_complete(
@@ -138,6 +172,114 @@ def audit_backlog(repo_root: Path) -> list[Issue]:
                 }
             )
     return issues
+
+
+def audit_roadmap(repo_root: Path) -> list[Issue]:
+    """Detect roadmap rows using backlog vocabulary or other invalid statuses."""
+    repo = repo_root.resolve()
+    try:
+        from scripts.ppe_roadmap import VALID_ROADMAP_STATUSES, load_roadmap, roadmap_enabled, roadmap_path
+    except ImportError:
+        return []
+
+    if not roadmap_enabled(repo) or not roadmap_path(repo).is_file():
+        return []
+
+    roadmap = load_roadmap(repo)
+    issues: list[Issue] = []
+    for i, item in enumerate(roadmap.get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        rs = str(item.get("status") or "").strip().lower()
+        if rs in VALID_ROADMAP_STATUSES:
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        issues.append(
+            {
+                "code": "ROADMAP_INVALID_STATUS",
+                "index": i,
+                "planPath": plan,
+                "status": rs,
+            }
+        )
+    return issues
+
+
+def _roadmap_repair_target(
+    repo: Path,
+    *,
+    status: str,
+    plan_path: str,
+    has_pending: bool,
+) -> tuple[str, bool]:
+    """Return (new_status, has_pending_after)."""
+    if plan_path and chapter_marked_complete_in_repo(repo, plan_path):
+        return "done", has_pending
+    mapped = ROADMAP_INVALID_TO_VALID.get(status)
+    if mapped == "pending":
+        if has_pending:
+            return "skipped", has_pending
+        return "pending", True
+    if mapped:
+        return mapped, has_pending
+    return "skipped", has_pending
+
+
+def repair_roadmap(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
+    """Normalize invalid roadmap statuses (e.g. chartered/blocked from backlog vocabulary)."""
+    repo = repo_root.resolve()
+    fixes: list[Fix] = []
+    try:
+        from scripts.ppe_roadmap import load_roadmap, roadmap_enabled, roadmap_path, save_roadmap
+    except ImportError:
+        return fixes, []
+
+    if not roadmap_enabled(repo) or not roadmap_path(repo).is_file():
+        return fixes, []
+
+    roadmap = load_roadmap(repo)
+    items = roadmap.get("items") or []
+    if not isinstance(items, list):
+        return fixes, [{"code": "INVALID_ROADMAP", "detail": "items must be an array"}]
+
+    has_pending = any(
+        isinstance(it, dict) and str(it.get("status") or "").strip().lower() == "pending" for it in items
+    )
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        prev = str(item.get("status") or "").strip().lower()
+        try:
+            from scripts.ppe_roadmap import VALID_ROADMAP_STATUSES
+        except ImportError:
+            VALID_ROADMAP_STATUSES = frozenset({"done", "pending", "ready", "skipped"})
+        if prev in VALID_ROADMAP_STATUSES:
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        new_status, has_pending = _roadmap_repair_target(
+            repo,
+            status=prev,
+            plan_path=plan,
+            has_pending=has_pending,
+        )
+        if apply:
+            item["status"] = new_status
+        fixes.append(
+            {
+                "action": "normalize_roadmap_status",
+                "index": i,
+                "planPath": plan,
+                "from": prev,
+                "to": new_status,
+                "reason": ROADMAP_REPAIR_REASON,
+            }
+        )
+
+    if apply and fixes:
+        save_roadmap(repo, roadmap)
+
+    remaining = audit_roadmap(repo) if apply else audit_roadmap(repo)
+    return fixes, remaining
 
 
 def repair_backlog(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:
@@ -319,15 +461,17 @@ def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue
 
 
 def run_queue_health(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    roadmap_fixes, roadmap_remaining = repair_roadmap(repo_root, apply=apply)
     backlog_fixes, backlog_remaining = repair_backlog(repo_root, apply=apply)
     queue_fixes, queue_remaining = repair_queue(repo_root, apply=apply)
-    fixes = backlog_fixes + queue_fixes
-    remaining = backlog_remaining + queue_remaining
+    fixes = roadmap_fixes + backlog_fixes + queue_fixes
+    remaining = roadmap_remaining + backlog_remaining + queue_remaining
     return {
         "apply": apply,
         "fixes": fixes,
         "fix_count": len(fixes),
         "remaining_issues": remaining,
+        "roadmap_issues": roadmap_remaining,
         "backlog_issues": backlog_remaining,
         "queue_issues": queue_remaining,
         "ok": len(remaining) == 0,

@@ -593,6 +593,23 @@ def decide(payload: Any) -> dict:
             "invariant_violations": [],
         }
 
+    # Rule 7b: deterministic evidence slice passed — promotion_recovery advances relay.
+    if (
+        sc is None
+        and payload["safe_to_continue"]
+        and not payload["ready_for_control_closeout"]
+        and not promo["performed"]
+        and tests["pytest_status"] == "PASS"
+        and tests["validation_classification"] == "deterministic"
+    ):
+        return {
+            "decision": DECISION_STOP_FOR_REVIEW,
+            "rule_matched": "15.2 rule 7b",
+            "reason": "deterministic evidence slice passed; promotion_recovery advances relay",
+            "schema_violations": [],
+            "invariant_violations": [],
+        }
+
     # Rule 7: clean closure -> CONTINUE.
     if (
         sc is None

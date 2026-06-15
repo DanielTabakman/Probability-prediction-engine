@@ -139,8 +139,72 @@ def _avoid_commands(verdict: str) -> list[str]:
     return []
 
 
+def _maybe_heal_idle_queue(repo: Path) -> dict[str, Any]:
+    """When manifest is idle, repair roadmap drift and bootstrap the next READY row."""
+    out: dict[str, Any] = {}
+    try:
+        manifest = load_manifest(repo)
+    except Exception:
+        return out
+
+    status = str(manifest.get("status") or "").strip().upper()
+    if status not in ("COMPLETE", ""):
+        return out
+    if str(manifest.get("phasePlanPath") or "").strip():
+        return out
+    if _queue_ready_count(repo) > 0:
+        return out
+
+    from scripts.ppe_queue_health import repair_roadmap
+
+    roadmap_fixes, _ = repair_roadmap(repo, apply=True)
+    if roadmap_fixes:
+        out["roadmap_repair"] = roadmap_fixes
+
+    try:
+        from scripts.ppe_propagate_queue import maybe_propagate_queue
+
+        prop = maybe_propagate_queue(repo, apply=True)
+        if prop.get("propagated") or prop.get("roadmap_repair") or prop.get("chartered_promote"):
+            out["propagate"] = prop
+    except Exception as exc:
+        out["propagate_error"] = str(exc)
+
+    if _queue_ready_count(repo) == 0:
+        try:
+            from scripts.ppe_roadmap import bootstrap_next_ready
+
+            boot = bootstrap_next_ready(repo, apply=True)
+            if boot.get("bootstrapped"):
+                out["bootstrap"] = boot
+        except Exception as exc:
+            out["bootstrap_error"] = str(exc)
+
+    if _queue_ready_count(repo) > 0:
+        try:
+            manifest = load_manifest(repo)
+        except Exception:
+            manifest = {}
+        if not str(manifest.get("phasePlanPath") or "").strip():
+            try:
+                from scripts.ppe_auto_select import run_auto_select
+
+                out["auto_select_exit"] = run_auto_select(
+                    repo,
+                    apply=True,
+                    select_only=False,
+                    mark_done=False,
+                    force=False,
+                )
+            except Exception as exc:
+                out["auto_select_error"] = str(exc)
+
+    return out
+
+
 def collect_operator_status(repo: Path) -> dict[str, Any]:
     repo = repo.resolve()
+    idle_heal = _maybe_heal_idle_queue(repo)
     errors: list[str] = []
     try:
         summary = resolve_summary(repo)
@@ -237,6 +301,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "commands": commands,
         "avoid": avoid,
         "errors": errors,
+        "idle_heal": idle_heal or None,
     }
 
 

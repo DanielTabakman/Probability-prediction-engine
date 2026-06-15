@@ -32,6 +32,8 @@ def is_preflight_dirty_exempt(path: str) -> bool:
     p = _norm(path)
     if p in PREFLIGHT_DIRTY_EXEMPT_EXACT:
         return True
+    if p.startswith("ppe_operator") and p.endswith(".local.cmd"):
+        return True
     return any(p.startswith(prefix) for prefix in PREFLIGHT_DIRTY_EXEMPT_PREFIXES)
 
 

@@ -12,9 +12,11 @@ from scripts.ppe_queue import load_queue
 from scripts.ppe_queue_health import (
     audit_backlog,
     audit_queue,
+    audit_roadmap,
     chapter_marked_complete_in_repo,
     repair_backlog,
     repair_queue,
+    repair_roadmap,
 )
 
 
@@ -153,6 +155,86 @@ class TestPpeQueueHealth(unittest.TestCase):
         self.assertTrue(
             chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/status_section.json")
         )
+
+    def test_chapter_not_complete_when_slice_rows_pending(self) -> None:
+        evidence = self.repo / "docs" / "SOP" / "CHAPTER_PENDING_EVIDENCE.md"
+        evidence.write_text(
+            "# Evidence\n\n**Status:** **COMPLETE** 2026-06-15\n\n"
+            "| Slice | Status |\n|-------|--------|\n"
+            "| X-Slice001 | PENDING |\n",
+            encoding="utf-8",
+        )
+        plan = {
+            "name": "pending_slices",
+            "slices": [
+                {
+                    "sliceId": "X-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/CHAPTER_PENDING_EVIDENCE.md"},
+                }
+            ],
+        }
+        plan_path = self.repo / "docs" / "SOP" / "PHASE_PLANS" / "pending_slices.json"
+        plan_path.write_text(json.dumps(plan), encoding="utf-8")
+        self.assertFalse(
+            chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/pending_slices.json")
+        )
+
+    def test_audit_roadmap_detects_backlog_vocabulary(self) -> None:
+        roadmap = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "status": "chartered",
+                },
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/other.json",
+                    "status": "blocked",
+                },
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        issues = audit_roadmap(self.repo)
+        self.assertEqual(len(issues), 2)
+        self.assertEqual(issues[0]["code"], "ROADMAP_INVALID_STATUS")
+
+    def test_repair_roadmap_normalizes_chartered_and_blocked(self) -> None:
+        other_plan = {
+            "name": "other",
+            "slices": [{"sliceId": "O-Closeout", "closeout": {"chapterId": "other"}}],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "other.json").write_text(
+            json.dumps(other_plan),
+            encoding="utf-8",
+        )
+        roadmap = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "status": "chartered",
+                },
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/other.json",
+                    "status": "blocked",
+                },
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").write_text(
+            json.dumps(roadmap, indent=2),
+            encoding="utf-8",
+        )
+        fixes, remaining = repair_roadmap(self.repo, apply=True)
+        self.assertEqual(len(fixes), 2)
+        self.assertEqual(remaining, [])
+        roadmap_data = json.loads(
+            (self.repo / "docs" / "SOP" / "PHASE_SELECTION_ROADMAP.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(roadmap_data["items"][0]["status"], "done")
+        self.assertEqual(roadmap_data["items"][1]["status"], "skipped")
 
 
 if __name__ == "__main__":
