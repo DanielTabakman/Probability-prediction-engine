@@ -27,7 +27,7 @@ def test_command_center_route_and_shell() -> None:
 
 def test_public_nav_links_to_command_center() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
-    assert 'href="/command-center"' in nav
+    assert 'href="/command-center"' in nav or "MSOS_ROUTES.commandCenter" in nav
     assert "Enter Command Center" in nav
 
 
