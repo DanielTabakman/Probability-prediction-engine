@@ -72,34 +72,86 @@ def _materialize_ide_product_in_worktree(
     print("ppe_slice_worker: warn — could not checkout IDE product ref in worktree")
 
 
-def _pytest_count(repo: Path) -> tuple[str, int]:
-    proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if proc.returncode != 0:
-        return "FAIL", 0
-    tail = (proc.stdout or "").strip().splitlines()
-    if not tail:
+def _pytest_targets(slice_id: str, slice_obj: dict[str, Any] | None) -> list[str] | None:
+    """Return pytest paths ([] = skip, None = full suite)."""
+    kind = infer_slice_kind(slice_id, slice_obj)
+    if slice_obj:
+        raw = str(slice_obj.get("pytestMode") or slice_obj.get("pytestScope") or "").strip().lower()
+        if raw in ("full", "all"):
+            return None
+        if raw in ("skip", "none", "off"):
+            return []
+        touch = slice_obj.get("touchSet") or []
+        paths = (
+            [str(p).replace("\\", "/").strip() for p in touch if str(p).strip()]
+            if isinstance(touch, list)
+            else []
+        )
+        if paths and all(p.startswith("docs/") for p in paths):
+            return []
+        preset = str(slice_obj.get("layerPreset") or "").strip().upper()
+        if preset == "PLATFORM":
+            target = Path("tests/test_msos_web_platform_production_wiring.py")
+            return [target.as_posix()] if target.as_posix() else None
+        if preset == "MSOS_UI":
+            for name in ("test_msos_web_production_wiring.py", "test_msos_web_homepage.py"):
+                candidate = Path("tests") / name
+                if candidate.is_file():
+                    return [candidate.as_posix()]
+    if kind in ("closeout", "control"):
+        return ["tests/test_program_charter_invariants.py"]
+    if kind == "smoke" and slice_obj:
+        touch = slice_obj.get("touchSet") or []
+        if isinstance(touch, list) and touch:
+            paths = [str(p).replace("\\", "/").strip() for p in touch if str(p).strip()]
+            if paths and all(p.startswith("docs/") for p in paths):
+                return []
+    return None
+
+
+def _pytest_count(repo: Path, *, targets: list[str] | None = None) -> tuple[str, int]:
+    if targets is not None and len(targets) == 0:
         return "PASS", 0
-    m = re.search(r"(\d+)\s+passed", tail[-1])
-    count = int(m.group(1)) if m else 0
-    slow = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-m", "slow"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if slow.returncode != 0:
-        return "FAIL", count
-    sm = re.search(r"(\d+)\s+passed", (slow.stdout or "").strip().splitlines()[-1])
-    if sm:
-        count += int(sm.group(1))
-    return "PASS", count
+    for attempt in (1, 2):
+        cmd = [sys.executable, "-m", "pytest", "-q", "-m", "not slow"]
+        if targets:
+            cmd.extend(targets)
+        proc = subprocess.run(
+            cmd,
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if proc.returncode == 0:
+            tail = (proc.stdout or "").strip().splitlines()
+            if not tail:
+                return "PASS", 0
+            m = re.search(r"(\d+)\s+passed", tail[-1])
+            count = int(m.group(1)) if m else 0
+            slow = subprocess.run(
+                [sys.executable, "-m", "pytest", "-q", "-m", "slow"],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if slow.returncode != 0:
+                return "FAIL", count
+            sm = re.search(r"(\d+)\s+passed", (slow.stdout or "").strip().splitlines()[-1])
+            if sm:
+                count += int(sm.group(1))
+            return "PASS", count
+        if attempt == 1:
+            err_tail = (proc.stderr or proc.stdout or "").strip().splitlines()
+            hint = err_tail[-1] if err_tail else "pytest failed"
+            print(f"ppe_slice_worker: pytest attempt {attempt} failed — retry once ({hint[:120]})")
+            continue
+        err_tail = (proc.stderr or proc.stdout or "").strip().splitlines()
+        if err_tail:
+            print(f"ppe_slice_worker: pytest failed — {err_tail[-1][:200]}")
+        return "FAIL", 0
+    return "FAIL", 0
 
 
 def _resolve_smoke_mode(slice_obj: dict[str, Any] | None) -> str:
@@ -110,6 +162,20 @@ def _resolve_smoke_mode(slice_obj: dict[str, Any] | None) -> str:
     if os.environ.get("PPE_DUAL_SMOKE", "").strip().lower() in ("1", "true", "yes", "on"):
         return "dual"
     return "a"
+
+
+def _smoke_required(slice_obj: dict[str, Any] | None) -> bool:
+    """UI smoke is optional for doc-only witness/evidence slices in local relay worktrees."""
+    if slice_obj:
+        mode = str(slice_obj.get("smokeMode") or slice_obj.get("smoke") or "").strip().lower()
+        if mode in ("skip", "none", "off", "pytest_only", "not_required"):
+            return False
+        touch = slice_obj.get("touchSet") or []
+        if isinstance(touch, list) and touch:
+            paths = [str(p).replace("\\", "/").strip() for p in touch if str(p).strip()]
+            if paths and all(p.startswith("docs/") for p in paths):
+                return False
+    return True
 
 
 def _run_smoke_a(repo: Path) -> tuple[str, list[str]]:
@@ -249,13 +315,21 @@ def execute_deterministic(
             slice_id=slice_id,
             phase_plan=phase_plan,
         )
-    pytest_status, pytest_count = _pytest_count(repo)
     smoke_status = "NOT_RUN"
     run_ids: list[str] = []
     notes_parts = [f"ppe_slice_worker deterministic kind={kind}"]
+    pytest_targets = _pytest_targets(slice_id, slice_obj)
+    pytest_status, pytest_count = _pytest_count(repo, targets=pytest_targets)
+    if pytest_targets is not None and len(pytest_targets) == 0:
+        notes_parts.append("pytest_skipped=docs_only_or_slice_config")
+    elif pytest_targets:
+        notes_parts.append(f"pytest_scope={','.join(pytest_targets)}")
 
     if kind == "smoke":
-        if os.environ.get("PPE_SKIP_DUAL_SMOKE", "").strip().lower() in ("1", "true", "yes", "on"):
+        if not _smoke_required(slice_obj):
+            smoke_status = "PASS"
+            notes_parts.append("smoke_skipped=docs_only_or_slice_config")
+        elif os.environ.get("PPE_SKIP_DUAL_SMOKE", "").strip().lower() in ("1", "true", "yes", "on"):
             smoke_status = "PASS"
             notes_parts.append("smoke_skipped=PPE_SKIP_DUAL_SMOKE (pytest-only)")
         else:

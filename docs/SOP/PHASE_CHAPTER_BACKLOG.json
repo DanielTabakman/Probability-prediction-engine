@@ -194,7 +194,7 @@
     },
     {
       "chapterId": "msos_production_wiring_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P3",
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
@@ -204,7 +204,7 @@
     },
     {
       "chapterId": "msos_user_state_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",

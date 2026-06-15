@@ -240,6 +240,8 @@ def _run_phase_slices(
                 build_branch=build_branch,
             )
             if rc == 100:
+                if phase_slice_batching_enabled(repo):
+                    mark_slice_complete(repo, norm_plan, slice_id)
                 continue
             return exit_code
 
