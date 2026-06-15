@@ -1,4 +1,12 @@
+import Link from "next/link";
+
+import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
+import { resolveResearchOfferCta } from "@/lib/researchOfferCta";
+
 export function HeroSection() {
+  const signInUrl = resolveSignInUrl();
+  const researchOffer = resolveResearchOfferCta();
+
   return (
     <section>
       <div className="eyebrow">A coherent interface for uncertainty</div>
@@ -9,10 +17,20 @@ export function HeroSection() {
         probability/thesis engine that compares what markets imply with what a human believes.
       </p>
       <div className="hero-actions">
-        <span className="btn primary">
+        <Link className="btn primary" href={MSOS_ROUTES.strategyLab}>
           Explore the platform <span aria-hidden="true">→</span>
-        </span>
-        <span className="btn">Enter Command Center</span>
+        </Link>
+        <Link className="btn" href={MSOS_ROUTES.commandCenter}>
+          Enter Command Center
+        </Link>
+        {researchOffer ? (
+          <a className="btn" href={researchOffer.url}>
+            {researchOffer.label}
+          </a>
+        ) : null}
+        <a className="btn slim dark" href={signInUrl}>
+          Sign in to PPE
+        </a>
       </div>
       <div className="chips">
         <span className="pill">
