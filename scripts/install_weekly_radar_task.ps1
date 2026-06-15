@@ -1,10 +1,11 @@
-# Register Task Scheduler: weekly_digest_monday.cmd (radar + digest) every Monday 04:00 local.
+# Register Task Scheduler: weekly_digest_monday.cmd every Monday 06:00 local.
+# Prep runs immediately; report (digest + ntfy) delivers at 08:00 local (wait inside .cmd).
 
 param(
     [Parameter(Mandatory = $true)]
     [string]$RepoRoot,
-    [string]$TaskName = "PPE weekly radar + digest",
-    [string]$RunTime = "04:00",
+    [string]$TaskName = "PPE Monday morning",
+    [string]$RunTime = "06:00",
     [switch]$Unregister
 )
 
@@ -18,8 +19,14 @@ if (-not (Test-Path -LiteralPath $runner)) {
 
 if ($Unregister) {
     Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "PPE weekly radar + digest" -Confirm:$false -ErrorAction SilentlyContinue
+    Unregister-ScheduledTask -TaskName "PPE weekly digest" -Confirm:$false -ErrorAction SilentlyContinue
     Write-Host "Removed scheduled task: $TaskName"
     exit 0
+}
+
+foreach ($legacy in @("PPE weekly radar + digest", "PPE weekly digest")) {
+    Unregister-ScheduledTask -TaskName $legacy -Confirm:$false -ErrorAction SilentlyContinue
 }
 
 $action = New-ScheduledTaskAction `
@@ -35,7 +42,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew
 
-$description = "PPE Monday: workflow radar (friction + orphan cleanup) + weekly digest + ntfy. See docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md"
+$description = "PPE Monday: 06:00 prep (autoclean + easy fixes), 08:00 report (radar + digest + ntfy). See docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md"
 
 Register-ScheduledTask `
     -TaskName $TaskName `

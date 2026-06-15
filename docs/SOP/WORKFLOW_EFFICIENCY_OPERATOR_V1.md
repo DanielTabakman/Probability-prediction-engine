@@ -87,11 +87,12 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
 | `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
-| `workflow_radar.cmd generate` | Monday workflow friction scan + orphan auto-cleanup ([`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)) |
+| `monday_morning_prep.cmd prep` | Autoclean orphans + queue repair + safe operator fixes |
+| `workflow_radar.cmd generate` | Workflow friction scan (`--no-cleanup` when prep already ran) |
 | `workflow_radar.cmd cleanup --dry-run` | Orphan scan only (locks, triggers, job files) |
 | `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; optional Windows toast (`PPE_WEEKLY_DIGEST_TOAST=0` for phone only) |
-| `weekly_digest_monday.cmd` | `workflow_radar` + `generate` + `notify` — **Task Scheduler** entry (Monday 04:00) |
-| `install_weekly_radar_monday_task.cmd` | Register Monday 04:00 local Task Scheduler job (run once) |
+| `weekly_digest_monday.cmd` | **Single Monday pipeline:** prep → wait until **08:00** → radar → digest → notify |
+| `install_weekly_radar_monday_task.cmd` | Register Task Scheduler: starts **06:00** local, report at **08:00** (run once) |
 | `install_weekly_digest_monday_task.cmd` | Legacy alias — prefer `install_weekly_radar_monday_task.cmd` |
 | `bootstrap_operator_pair.cmd` | One-shot desktop IDE-only + VM SSH setup ([`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)) |
 | `VM_RESTART.cmd` / `VM_STATUS.cmd` | **VM** loop host stack ([`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)) |
@@ -108,7 +109,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | Arguments | `/c "D:\Users\User\Desktop\Probability prediction engine\weekly_digest_monday.cmd"` |
 | Start in | `D:\Users\User\Desktop\Probability prediction engine` |
 
-Recommended: **Monday 04:00 local** via `install_weekly_radar_monday_task.cmd` (radar + digest + notify). Radar scans workflow friction, auto-cleans stale operator artifacts (build locks, stuck triggers, orphan job files), then refreshes the digest.
+Recommended: **Monday 06:00 local** via `install_weekly_radar_monday_task.cmd` — one task runs `weekly_digest_monday.cmd`, which **preps** (autoclean + easy fixes), **waits until 08:00**, then sends the digest + ntfy. Override report time: `set PPE_MONDAY_REPORT_HOUR=8` in `ppe_operator_local.cmd`.
 
 From **PowerShell**, run `.cmd` files via **`cmd /c`** (PowerShell does not execute `.cmd` with `&` alone):
 
