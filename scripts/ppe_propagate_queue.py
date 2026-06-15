@@ -20,9 +20,9 @@ from scripts.ppe_roadmap import (
 )
 from scripts.ppe_queue import upsert_queue_item
 from scripts.ppe_queue_health import (
-    ROADMAP_INVALID_TO_VALID,
     chapter_marked_complete_in_repo,
     finalize_chapter_evidence_complete,
+    roadmap_row_should_activate_for_backlog,
 )
 
 BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
@@ -409,7 +409,8 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
 
     if _plan_on_roadmap(roadmap, plan_path):
         rs = _roadmap_plan_statuses(roadmap).get(plan_path, "")
-        if apply and rs in ROADMAP_INVALID_TO_VALID and _backlog_item_status(item) in ("queued", "chartered"):
+        backlog_status = _backlog_item_status(item)
+        if apply and roadmap_row_should_activate_for_backlog(rs, backlog_status):
             _set_roadmap_status(roadmap, plan_path, "pending")
             save_roadmap(repo, roadmap)
             item["status"] = "chartered"
@@ -427,7 +428,7 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
                 "propagated": True,
                 "planPath": plan_path,
                 "chapterId": item.get("chapterId"),
-                "reason": "roadmap status normalized to pending",
+                "reason": "roadmap row activated to pending",
             }
         if apply:
             item["status"] = "chartered"

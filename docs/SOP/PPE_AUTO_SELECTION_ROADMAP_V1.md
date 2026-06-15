@@ -32,7 +32,7 @@ run_ppe.cmd
 | `selectionPrep` | Optional prep doc path |
 | `workerMode` | e.g. `deterministic` (queue + `PPE_WORKER_MODE`) |
 
-**Auto-repair:** `ppe_queue_health.repair_roadmap` normalizes backlog vocabulary on the roadmap (`chartered` → `pending`, `blocked` → `skipped`) before propagate/bootstrap. Runs from preflight, `run_ppe.cmd`, and closeout hooks.
+**Auto-repair:** `ppe_queue_health.repair_roadmap` normalizes backlog vocabulary on the roadmap (`chartered` → `pending`, `blocked` → `skipped`) before propagate/bootstrap. When the backlog promotes a chapter to `queued`, propagate reactivates matching `skipped` roadmap rows to `pending`. Runs from preflight, `run_ppe.cmd`, closeout, and idle operator-status polls.
 
 Queue mapping: `pending` → `PLANNED`, `ready` → `READY`, `done` → `DONE`.
 

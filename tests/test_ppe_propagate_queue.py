@@ -340,6 +340,52 @@ class TestPpePropagateQueue(unittest.TestCase):
         self.assertEqual(len(ready), 1)
         self.assertEqual(ready[0]["planPath"], "docs/SOP/PHASE_PLANS/next_relay.json")
 
+    def test_propagate_activates_skipped_roadmap_row(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        (plans / "follow_relay.json").write_text(
+            json.dumps(
+                {
+                    "name": "follow",
+                    "sprintSpecPath": "docs/SOP/SPRINT_FOLLOW.md",
+                    "selectionRecord": "docs/SOP/SEL_FOLLOW.md",
+                    "slices": [{"sliceId": "F-Closeout", "closeout": {"chapterId": "follow"}}],
+                }
+            ),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "SPRINT_FOLLOW.md").write_text("# f\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_FOLLOW.md").write_text("# f\n", encoding="utf-8")
+        from scripts.ppe_roadmap import save_roadmap
+
+        save_roadmap(
+            self.repo,
+            {
+                "version": 1,
+                "items": [
+                    {
+                        "planPath": "docs/SOP/PHASE_PLANS/follow_relay.json",
+                        "status": "skipped",
+                        "reason": "future phase",
+                    }
+                ],
+            },
+        )
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {
+                "chapterId": "follow",
+                "status": "queued",
+                "planPath": "docs/SOP/PHASE_PLANS/follow_relay.json",
+            }
+        ]
+        save_backlog(self.repo, backlog)
+        out = propagate_from_backlog(self.repo, apply=True)
+        self.assertTrue(out.get("propagated"))
+        roadmap = load_roadmap(self.repo)
+        self.assertEqual(roadmap["items"][0]["status"], "pending")
+        backlog = load_backlog(self.repo)
+        self.assertEqual(backlog["items"][0]["status"], "chartered")
+
 
 if __name__ == "__main__":
     unittest.main()

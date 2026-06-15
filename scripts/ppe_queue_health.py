@@ -28,6 +28,17 @@ ROADMAP_INVALID_TO_VALID = {
 }
 
 
+def roadmap_row_should_activate_for_backlog(roadmap_status: str, backlog_status: str) -> bool:
+    """True when a backlog row is ready to run but the roadmap row is still idle."""
+    rs = str(roadmap_status or "").strip().lower()
+    bs = str(backlog_status or "").strip().lower()
+    if bs not in ("queued", "chartered"):
+        return False
+    if rs in ROADMAP_INVALID_TO_VALID:
+        return True
+    return rs == "skipped"
+
+
 def _norm_plan(path: str) -> str:
     return str(path or "").replace("\\", "/").strip()
 
