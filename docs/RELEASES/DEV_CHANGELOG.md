@@ -2,8 +2,15 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-16
+
+- `183b22e` — feat(msos-ui): MSOS workflow persistence product slice 002 (server store + API) (#177) (`apps/msos-web/`)
+
 ## 2026-06-15
 
+- `bb037e1` — ops: loop publish control-plane/loop-merge-each-pass (#176) (`docs/SOP/`)
+- `9a7be4b` — feat(control-plane): mergeEachPass nudges green loop PRs in auto loop (#175) (`docs/SOP/`)
+- `1775ed6` — Control-plane: dev changelog
 - `5943703` — fix(control-plane): operator loop auto-heal and selection unblock (#174) (`scripts/`)
 - `7c13b7f` — feat(control-plane): VM loop-host guard, SSH ops, prod wiring selection (#173) (`scripts/`)
 - `91897d2` — control-plane: Monday workflow radar v1 (friction scan + orphan cleanup) (#172) (`scripts/`)
