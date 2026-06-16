@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-16
+
+- **Chapter closed:** MSOS user state v1 — Command Center bridge (`MSOS-UserStateV1-Closeout-Slice005`)
+
 ## 2026-06-15
 
 - `5943703` — fix(control-plane): operator loop auto-heal and selection unblock (#174) (`scripts/`)

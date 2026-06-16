@@ -196,9 +196,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Command Center PPE snapshot bridge \u2014 phase 2",
-      "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] MSOS thesis/expression server store \u2014 phase 3",
+      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     }
   ]
 }
