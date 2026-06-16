@@ -1,15 +1,20 @@
 import Link from "next/link";
 
+import type { WorkflowSummary } from "@/lib/msosWorkflowStore";
 import {
   calibrationStrip,
-  currentWork,
   headlines,
-  kpis,
   labTiles,
   reviewEvents,
 } from "@/data/commandCenterFixtures";
 
-export function CommandCenterContent() {
+type Props = {
+  workflow: WorkflowSummary;
+};
+
+export function CommandCenterContent({ workflow }: Props) {
+  const hasWorkflow = workflow.kpis.some((kpi) => kpi.value !== "0") || workflow.currentWork.length > 0;
+
   return (
     <>
       <header className="topline">
@@ -20,10 +25,12 @@ export function CommandCenterContent() {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Preview data healthy
+            {hasWorkflow ? "MSOS workflow live" : "MSOS workflow empty"}
           </span>
           <span className="btn slim">Share view</span>
-          <span className="btn slim primary">Create thesis</span>
+          <Link href="/strategy-lab/confirm" className="btn slim primary">
+            Create thesis
+          </Link>
           <span className="avatar" aria-hidden="true">
             DT
           </span>
@@ -49,7 +56,7 @@ export function CommandCenterContent() {
       </section>
 
       <section className="kpi-row" aria-label="Key metrics">
-        {kpis.map((kpi) => (
+        {workflow.kpis.map((kpi) => (
           <div key={kpi.label} className="kpi">
             <div className="label">{kpi.label}</div>
             <div className={`num ${kpi.tone ?? ""}`.trim()}>{kpi.value}</div>
@@ -57,6 +64,7 @@ export function CommandCenterContent() {
           </div>
         ))}
       </section>
+      <p className="panel-sub workflow-source-label">{workflow.sourceLabel}</p>
 
       <section className="grid command-layout">
         <div className="panel">
@@ -94,23 +102,29 @@ export function CommandCenterContent() {
               Describe what you think is mispriced. MSOS routes the idea to the right lens and preserves the state of
               the thesis.
             </p>
-            <span className="btn slim primary">Create new thesis →</span>
+            <Link href="/strategy-lab/confirm" className="btn slim primary">
+              Create new thesis →
+            </Link>
           </div>
           <div className="panel-head">
             <div>
               <h2>Current work</h2>
-              <div className="panel-sub">Lifecycle states stay explicit.</div>
+              <div className="panel-sub">Lifecycle states stay explicit — sim-only expression.</div>
             </div>
           </div>
-          {currentWork.map((item) => (
-            <div key={item.name} className="strategy">
-              <div className="row">
-                <span className="name">{item.name}</span>
-                <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
+          {workflow.currentWork.length === 0 ? (
+            <p className="panel-sub">No thesis or expression saved in the MSOS workflow store yet.</p>
+          ) : (
+            workflow.currentWork.map((item) => (
+              <div key={`${item.name}-${item.tag}`} className="strategy">
+                <div className="row">
+                  <span className="name">{item.name}</span>
+                  <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
+                </div>
+                <p>{item.detail}</p>
               </div>
-              <p>{item.detail}</p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="panel">
@@ -141,7 +155,7 @@ export function CommandCenterContent() {
         </div>
       </section>
 
-      <p className="footer-note">Illustrative product preview — no live order transmitted</p>
+      <p className="footer-note">Research demo — workflow store is sim-only; no live order transmitted</p>
     </>
   );
 }

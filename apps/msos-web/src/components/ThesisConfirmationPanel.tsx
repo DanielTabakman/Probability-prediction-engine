@@ -13,8 +13,8 @@ import {
 } from "@/data/thesisConfirmFixtures";
 import {
   THESIS_PERSISTENCE_LABEL,
-  loadThesisRecord,
-  saveThesisRecord,
+  fetchThesisRecord,
+  persistThesisRecord,
   type ThesisLifecycle,
   withLifecycle,
 } from "@/lib/thesisPersistence";
@@ -24,14 +24,16 @@ export function ThesisConfirmationPanel() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setRecord(loadThesisRecord(defaultThesisRecord));
-    setHydrated(true);
+    void fetchThesisRecord(defaultThesisRecord).then((loaded) => {
+      setRecord(loaded);
+      setHydrated(true);
+    });
   }, []);
 
   function persist(nextLifecycle: ThesisLifecycle) {
     const next = withLifecycle(record, nextLifecycle);
     setRecord(next);
-    saveThesisRecord(next);
+    void persistThesisRecord(next);
   }
 
   const isConfirmed = record.lifecycle === "confirmed";
@@ -46,7 +48,7 @@ export function ThesisConfirmationPanel() {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Preview persistence
+            MSOS workflow store
           </span>
           <Link href="/strategy-lab" className="btn slim">
             Back to lab
@@ -171,7 +173,7 @@ export function ThesisConfirmationPanel() {
       </div>
 
       <p className="footer-note">
-        Research demo — confirmation uses preview persistence; no live order transmitted
+        Research demo — confirmation uses the MSOS workflow store; no live order transmitted
       </p>
     </>
   );

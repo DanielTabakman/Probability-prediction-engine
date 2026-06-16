@@ -19,7 +19,10 @@ export type ThesisRecord = {
 export const THESIS_STORAGE_KEY = "msos.thesis.preview.v1";
 
 export const THESIS_PERSISTENCE_LABEL =
-  "Preview persistence — saved in this browser only; not a live account record.";
+  "MSOS workflow store — saved on the server for this research demo; sim-only, no live account record.";
+
+export const THESIS_PREVIEW_MIGRATION_NOTE =
+  "One-time import from browser preview keys (msos.thesis.preview.v1) when server store is empty.";
 
 export function thesisRecordSchema(): Record<string, string> {
   return {
@@ -72,6 +75,47 @@ export function saveThesisRecord(record: ThesisRecord): void {
     return;
   }
   window.localStorage.setItem(THESIS_STORAGE_KEY, JSON.stringify(record));
+}
+
+export async function fetchThesisRecord(fallback: ThesisRecord): Promise<ThesisRecord> {
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+  try {
+    const response = await fetch("/api/theses", { cache: "no-store" });
+    if (!response.ok) {
+      return loadThesisRecord(fallback);
+    }
+    const payload = (await response.json()) as { thesis?: ThesisRecord | null };
+    if (payload.thesis && isThesisRecord(payload.thesis)) {
+      saveThesisRecord(payload.thesis);
+      return payload.thesis;
+    }
+    const preview = loadThesisRecord(fallback);
+    if (preview.updatedAt !== fallback.updatedAt) {
+      await persistThesisRecord(preview);
+      return preview;
+    }
+    return fallback;
+  } catch {
+    return loadThesisRecord(fallback);
+  }
+}
+
+export async function persistThesisRecord(record: ThesisRecord): Promise<void> {
+  saveThesisRecord(record);
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    await fetch("/api/theses", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ thesis: record }),
+    });
+  } catch {
+    // local preview remains as offline fallback
+  }
 }
 
 export function withLifecycle(record: ThesisRecord, lifecycle: ThesisLifecycle): ThesisRecord {

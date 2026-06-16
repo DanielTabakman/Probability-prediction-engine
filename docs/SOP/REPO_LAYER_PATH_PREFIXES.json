@@ -178,9 +178,12 @@
         "apps/msos-web/",
         "tests/test_msos_web_homepage.py",
         "tests/test_msos_web_strategy_lab.py",
+        "tests/test_msos_web_command_center.py",
+        "tests/test_msos_web_workflow_persistence.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
-        "docs/SOP/SPRINT_MSOS_"
+        "docs/SOP/SPRINT_MSOS_",
+        "docs/SOP/REPO_LAYER_PATH_PREFIXES.json"
       ],
       "forbidden_paths": [
         "src/engine/",
