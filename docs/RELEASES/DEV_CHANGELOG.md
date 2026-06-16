@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `e2aa753` — ops: fix_vm_headless.cmd stop popup windows on loop host (#179)
+- `91d0e74` — Control-plane: dev changelog
 - `ac78a1f` — ops: add fix_vm_operator.cmd for VM loop-host recovery (#178)
 - `4f57d4d` — Control-plane: dev changelog
 - `183b22e` — feat(msos-ui): MSOS workflow persistence product slice 002 (server store + API) (#177) (`apps/msos-web/`)
