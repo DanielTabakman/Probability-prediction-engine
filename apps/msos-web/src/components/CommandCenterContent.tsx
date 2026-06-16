@@ -1,15 +1,22 @@
 import Link from "next/link";
 
+import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import {
   calibrationStrip,
-  currentWork,
   headlines,
-  kpis,
   labTiles,
   reviewEvents,
 } from "@/data/commandCenterFixtures";
 
-export function CommandCenterContent() {
+type Props = {
+  summary: CommandCenterSummary;
+};
+
+export function CommandCenterContent({ summary }: Props) {
+  const isLive = summary.status === "live";
+  const kpis = isLive ? summary.kpis : [];
+  const currentWork = isLive ? summary.currentWork : [];
+
   return (
     <>
       <header className="topline">
@@ -20,7 +27,7 @@ export function CommandCenterContent() {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Preview data healthy
+            {isLive ? "Snapshot feed live" : "Snapshot feed unavailable"}
           </span>
           <span className="btn slim">Share view</span>
           <span className="btn slim primary">Create thesis</span>
@@ -48,14 +55,33 @@ export function CommandCenterContent() {
         </div>
       </section>
 
+      {!isLive ? (
+        <section className="panel compact command-center-degraded" aria-live="polite">
+          <span className="tag amber">Snapshot feed unavailable</span>
+          <p>{summary.reason ?? "PPE snapshot database is not reachable from msos_web."}</p>
+          <p className="panel-sub">
+            KPI and current-work panels stay empty until <code>PPE_SNAPSHOT_DB_PATH</code> is wired
+            (platform slice). Preview tiles below remain illustrative only.
+          </p>
+        </section>
+      ) : null}
+
       <section className="kpi-row" aria-label="Key metrics">
-        {kpis.map((kpi) => (
-          <div key={kpi.label} className="kpi">
-            <div className="label">{kpi.label}</div>
-            <div className={`num ${kpi.tone ?? ""}`.trim()}>{kpi.value}</div>
-            <div className="sub">{kpi.sub}</div>
+        {kpis.length === 0 ? (
+          <div className="kpi muted">
+            <div className="label">Snapshot KPIs</div>
+            <div className="num">—</div>
+            <div className="sub">{isLive ? "No snapshots yet" : "Awaiting PPE snapshot DB"}</div>
           </div>
-        ))}
+        ) : (
+          kpis.map((kpi) => (
+            <div key={kpi.label} className="kpi">
+              <div className="label">{kpi.label}</div>
+              <div className={`num ${kpi.tone ?? ""}`.trim()}>{kpi.value}</div>
+              <div className="sub">{kpi.sub}</div>
+            </div>
+          ))
+        )}
       </section>
 
       <section className="grid command-layout">
@@ -99,18 +125,22 @@ export function CommandCenterContent() {
           <div className="panel-head">
             <div>
               <h2>Current work</h2>
-              <div className="panel-sub">Lifecycle states stay explicit.</div>
+              <div className="panel-sub">{summary.sourceLabel} — read-only activity from frozen evaluations.</div>
             </div>
           </div>
-          {currentWork.map((item) => (
-            <div key={item.name} className="strategy">
-              <div className="row">
-                <span className="name">{item.name}</span>
-                <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
+          {currentWork.length === 0 ? (
+            <p className="panel-sub">No recent snapshot rows to display.</p>
+          ) : (
+            currentWork.map((item) => (
+              <div key={`${item.name}-${item.detail}`} className="strategy">
+                <div className="row">
+                  <span className="name">{item.name}</span>
+                  <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
+                </div>
+                <p>{item.detail}</p>
               </div>
-              <p>{item.detail}</p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         <div className="panel">
@@ -141,7 +171,11 @@ export function CommandCenterContent() {
         </div>
       </section>
 
-      <p className="footer-note">Illustrative product preview — no live order transmitted</p>
+      <p className="footer-note">
+        {isLive
+          ? "Snapshot-sourced KPIs and current work — illustrative tiles and headlines remain preview-only."
+          : "Snapshot feed degraded — no fixture KPI fallback. Illustrative preview tiles only."}
+      </p>
     </>
   );
 }

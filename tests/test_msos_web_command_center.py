@@ -20,8 +20,8 @@ def test_command_center_route_and_shell() -> None:
     assert "connectedMarkets" in sidebar
 
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "Preview data healthy" in content
-    assert "no live order transmitted" in content
+    assert "summary.sourceLabel" in content
+    assert "Snapshot feed" in content
     assert "labTiles" in content
 
 
