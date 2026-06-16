@@ -55,7 +55,7 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(encoding="utf-8")
     assert "thesisConfirmHeadline" in panel
     assert "Proceed to expression planning" in panel
-    assert "Preview persistence" in panel
+    assert "MSOS workflow store" in panel
     assert "no live order transmitted" in panel
 
     persistence = (MSOS_WEB / "src" / "lib" / "thesisPersistence.ts").read_text(encoding="utf-8")

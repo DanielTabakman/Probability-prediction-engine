@@ -13,12 +13,13 @@ import { defaultThesisRecord } from "@/data/thesisConfirmFixtures";
 import {
   EXPRESSION_PERSISTENCE_LABEL,
   defaultExpressionRecord,
-  loadExpressionRecord,
-  saveExpressionRecord,
+  fetchExpressionRecord,
+  persistExpressionRecord,
   statusGridForLifecycle,
   withExpressionLifecycle,
 } from "@/lib/expressionPersistence";
-import { loadThesisRecord } from "@/lib/thesisPersistence";
+import { defaultThesisRecord } from "@/data/thesisConfirmFixtures";
+import { fetchThesisRecord } from "@/lib/thesisPersistence";
 
 export function ExpressionPlanningPanel() {
   const [record, setRecord] = useState(defaultExpressionRecord);
@@ -26,16 +27,20 @@ export function ExpressionPlanningPanel() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const thesis = loadThesisRecord(defaultThesisRecord);
-    setThesisConfirmed(thesis.lifecycle === "confirmed");
-    setRecord(loadExpressionRecord(defaultExpressionRecord));
-    setHydrated(true);
+    void Promise.all([
+      fetchThesisRecord(defaultThesisRecord),
+      fetchExpressionRecord(defaultExpressionRecord),
+    ]).then(([thesis, expression]) => {
+      setThesisConfirmed(thesis.lifecycle === "confirmed");
+      setRecord(expression);
+      setHydrated(true);
+    });
   }, []);
 
   function simulateExpression() {
     const next = withExpressionLifecycle(record, "simulated");
     setRecord(next);
-    saveExpressionRecord(next);
+    void persistExpressionRecord(next);
   }
 
   const statusGrid = statusGridForLifecycle(record.lifecycle);

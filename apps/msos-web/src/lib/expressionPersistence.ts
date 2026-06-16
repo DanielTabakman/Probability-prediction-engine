@@ -25,7 +25,7 @@ export type ExpressionRecord = {
 export const EXPRESSION_STORAGE_KEY = "msos.expression.preview.v1";
 
 export const EXPRESSION_PERSISTENCE_LABEL =
-  "Preview persistence — simulated expression saved in this browser only; no live order transmitted.";
+  "MSOS workflow store — simulated expression saved on the server; no live order transmitted.";
 
 export const defaultExpressionRecord: ExpressionRecord = {
   familyId: "range",
@@ -86,6 +86,47 @@ export function saveExpressionRecord(record: ExpressionRecord): void {
     return;
   }
   window.localStorage.setItem(EXPRESSION_STORAGE_KEY, JSON.stringify(record));
+}
+
+export async function fetchExpressionRecord(fallback: ExpressionRecord): Promise<ExpressionRecord> {
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+  try {
+    const response = await fetch("/api/theses/expression", { cache: "no-store" });
+    if (!response.ok) {
+      return loadExpressionRecord(fallback);
+    }
+    const payload = (await response.json()) as { expression?: ExpressionRecord | null };
+    if (payload.expression && isExpressionRecord(payload.expression)) {
+      saveExpressionRecord(payload.expression);
+      return payload.expression;
+    }
+    const preview = loadExpressionRecord(fallback);
+    if (preview.updatedAt !== fallback.updatedAt) {
+      await persistExpressionRecord(preview);
+      return preview;
+    }
+    return fallback;
+  } catch {
+    return loadExpressionRecord(fallback);
+  }
+}
+
+export async function persistExpressionRecord(record: ExpressionRecord): Promise<void> {
+  saveExpressionRecord(record);
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    await fetch("/api/theses/expression", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expression: record }),
+    });
+  } catch {
+    // local preview remains as offline fallback
+  }
 }
 
 export function withExpressionLifecycle(
