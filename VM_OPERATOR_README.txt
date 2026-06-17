@@ -16,6 +16,7 @@ ON THE VM (folder: C:\Users\ppeloop\Probability-prediction-engine)
 2. VM_STATUS.cmd   — check if loop is healthy (window stays open)
 3. VM_START.cmd    — run ONCE after STOP, when you want the loop running
 4. VM_RESTART.cmd  — STOP + wait + START in one click (use instead of START alone)
+5. VM_AUTO.cmd     — same as VM_RESTART (your "make it go" button on the VM)
 
 Order when fixing problems:
   VM_STOP  ->  close blank windows by hand  ->  wait 30 seconds  ->  VM_START once
@@ -35,11 +36,11 @@ If popups return after VM_START: run VM_STOP again and stop — ask for help.
 
 ON THE DESKTOP (folder: C:\Users\USER\Desktop\Probability-prediction-engine)
 ----------------------------------------------------------------------------
-DESKTOP BUILD     — double-click: open Cursor + start IDE BUILD (clipboard prompt)
-DESKTOP CONTINUE  — double-click: after PR merged, advance VM relay (SSH)
-DESKTOP AUTO START — run once after login: PC pushes BUILD/CONTINUE for you
-DESKTOP AUTO STOP  — turn off auto helper
-DESKTOP_STOP.cmd  — run if this PC shows operator popups
+DESKTOP BUILD     — only when phone says IDE_BUILD (opens Cursor on THIS pc)
+DESKTOP CONTINUE  — only after a BUILD merged to main
+DESKTOP STOP      — stop popups on this PC (run if you see blank cmd windows)
+
+NO auto-loop on this PC. The VM runs the loop 24/7 (VM AUTO / VM RESTART on the VM).
 
 Run setup_operator_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop (also runs automatically from DESKTOP_BUILD / VM_UPDATE).
 

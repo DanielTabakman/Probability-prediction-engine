@@ -58,11 +58,13 @@ def append_log(repo: Path, line: str) -> None:
 
 
 def desktop_auto_enabled(repo: Path) -> bool:
+    """Desktop auto is OPT-IN only — default off (causes confusion/popups on daily PC)."""
+    opt_in = repo / "ppe_operator_desktop_auto.local.cmd"
+    if not opt_in.is_file():
+        return False
     env = os.environ.get("PPE_DESKTOP_AUTO", "").strip().lower()
     if env in ("0", "false", "no", "off"):
         return False
-    if env in ("1", "true", "yes", "on"):
-        return True
     return detect_role(repo) == "daily_driver"
 
 
