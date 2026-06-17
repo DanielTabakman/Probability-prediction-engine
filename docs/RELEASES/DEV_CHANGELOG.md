@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `ffa90c7` — ops: fix_vm_stop_all.cmd stop popups and visible logon task (#180)
+- `c2c5421` — Control-plane: dev changelog
 - `e2aa753` — ops: fix_vm_headless.cmd stop popup windows on loop host (#179)
 - `91d0e74` — Control-plane: dev changelog
 - `ac78a1f` — ops: add fix_vm_operator.cmd for VM loop-host recovery (#178)
