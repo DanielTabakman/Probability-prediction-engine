@@ -71,6 +71,8 @@ def cmd_run_phase(repo: Path, plan_path: str) -> int:
     env["PYTHONPATH"] = str(repo)
     if not env.get("PPE_WORKER_MODE") and env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes"):
         env["PPE_WORKER_MODE"] = "deterministic"
+    if env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes"):
+        env.setdefault("PPE_SKIP_SLOW_PYTEST", "1")
     skip_orchestrator = env.get("PPE_SKIP_ACP", "").lower() in ("1", "true", "yes") or (
         env.get("PPE_WORKER_MODE") or ""
     ).strip().lower() in ("deterministic", "local")
