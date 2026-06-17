@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `9e5c423` — Control-plane: dev changelog
 - `b821236` — Control-plane: dev changelog
 - `86ecf96` — Control-plane: dev changelog
 - `442b04a` — Control-plane: dev changelog
@@ -20,6 +21,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `90740b0` — ops(platform): DESKTOP AUTO START pushes BUILD/CONTINUE automatically (#195) (`scripts/`)
 - `062a864` — ops(platform): auto-install operator Desktop shortcuts when appropriate (#194) (`docs/SOP/`)
 - `53c2388` — ops(platform): DESKTOP BUILD and CONTINUE one-click buttons (#193)
 - `bf5c58b` — docs(SOP): VM+desktop operator session handoff and procedure updates (#192) (`docs/SOP/`)
