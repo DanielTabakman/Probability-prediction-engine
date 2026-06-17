@@ -26,6 +26,8 @@ DESKTOP_SHORTCUTS: dict[str, str | None] = {
     "PPE Repo (Desktop)": None,
     "DESKTOP BUILD": "DESKTOP_BUILD.cmd",
     "DESKTOP CONTINUE": "DESKTOP_CONTINUE.cmd",
+    "DESKTOP AUTO START": "DESKTOP_AUTO_START.cmd",
+    "DESKTOP AUTO STOP": "DESKTOP_AUTO_STOP.cmd",
     "DESKTOP STOP": "DESKTOP_STOP.cmd",
 }
 

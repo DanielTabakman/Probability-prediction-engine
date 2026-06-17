@@ -13,7 +13,7 @@
 | When | Command |
 |------|---------|
 | **VM loop** (24/7) | Hyper-V VM: **`VM_RESTART.cmd`** · status: **`VM_STATUS.cmd`** — see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) |
-| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter |
+| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter — or enable **DESKTOP AUTO START** (runs BUILD/CONTINUE for you) |
 
 `ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. It does **not** run the product BUILD or `run_ppe_local` — the director/build worker handles that after you paste the prompt.
 
