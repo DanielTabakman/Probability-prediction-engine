@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `742ad0b` — Control-plane: dev changelog
 - `193de4a` — Control-plane: dev changelog
 - `9e5c423` — Control-plane: dev changelog
 - `b821236` — Control-plane: dev changelog
