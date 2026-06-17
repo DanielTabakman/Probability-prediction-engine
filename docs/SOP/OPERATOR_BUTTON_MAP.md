@@ -1,6 +1,6 @@
 # Operator button map — which machine, which double-click
 
-**Plane:** CONTROL-PLANE · **Canonical layout:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
+**Plane:** CONTROL-PLANE · **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Layout:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
 
 | Symptom / verdict | Machine | Action |
 |-------------------|---------|--------|

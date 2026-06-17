@@ -2,6 +2,8 @@
 
 **Plane:** CONTROL-PLANE · **Status:** canonical operator layout after Hyper-V VM cutover
 
+**Policy (accepted):** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)
+
 Use this doc when opening a **new Cursor thread** after VM/desktop operator work. Companion quick ref: [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) (repo root).
 
 ---

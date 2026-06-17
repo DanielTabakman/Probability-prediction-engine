@@ -255,6 +255,20 @@ Steward/agent may interpret meaning after listing facts, but should not hand-aut
 
 **Otherwise stay conservative:** do not commit, push, or create branches for unclear scope, recovery without charter, or direct `main` push when PR-only delivery applies. Local edits are fine.
 
+## Operator machine layout (hard rule, 2026-06-17)
+
+**Canon:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
+
+| Rule | Detail |
+|------|--------|
+| **Loop host** | **Hyper-V VM only** — headless stack (`PPE_STACK_HEADLESS=1`, `ppe_operator_loop_host.local.cmd`) |
+| **IDE BUILD** | **Daily desktop only** — `ppe_operator_no_loop.local.cmd` (`PPE_STACK_FORBIDDEN=1`) |
+| **Forbidden** | Loop, `run_ppe_auto_local_loop`, or `PPE Desktop Operator` logon tasks on the daily PC |
+| **Product vs relay** | IDE BUILD in Cursor on desktop; `run_ppe_local` continues relay on **VM** after product merge |
+| **Recovery** | VM: `VM_STOP` / `VM_RESTART`; desktop: `DESKTOP_STOP` — see button map |
+
+Agents and stewards must not document or implement desktop-as-loop-host without an explicit ADR amendment.
+
 ## Pre-edit plan
 Before editing, briefly state:
 - understanding of the task
