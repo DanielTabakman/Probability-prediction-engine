@@ -7,13 +7,14 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 ---
 
-## Active BUILD — MSOS live product sequence (phase 1 chartered)
+## Active BUILD — MSOS live product sequence (phase 2 active)
 
 | Field | Value |
 |-------|--------|
 | **Sequence canon** | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) |
-| **Active chapter** | `msos_production_wiring_v1` — [`msos_production_wiring_v1_relay.json`](PHASE_PLANS/msos_production_wiring_v1_relay.json) |
-| **Next (blocked)** | Phase 2 `msos_user_state_v1` → phase 3 `msos_workflow_persistence_v1` |
+| **Active chapter** | `msos_user_state_v1` — [`msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json) |
+| **Last closed** | Phase 1 `msos_production_wiring_v1` — COMPLETE 2026-06-17 |
+| **Next (blocked)** | Phase 3 `msos_workflow_persistence_v1` after user state COMPLETE |
 | **MSOS steering** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).

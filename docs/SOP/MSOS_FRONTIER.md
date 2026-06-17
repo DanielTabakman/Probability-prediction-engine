@@ -13,12 +13,12 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none on MSOS track** — await relay / operator propagate
-- **Next MSOS chapter (chartered, HIGH):** **Production wiring v1** — sign-in, PPE embed, CTAs, wired nav
-- **Relay plan:** [`PHASE_PLANS/msos_production_wiring_v1_relay.json`](PHASE_PLANS/msos_production_wiring_v1_relay.json)
-- **Sprint:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md)
-- **SELECTION:** [`POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md`](POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md)
-- **Last closed:** **MSOS public demo launch v1** — 2026-06-14 on `main`
+- **Active BUILD chapter:** **`msos_user_state_v1`** — Command Center PPE snapshot bridge (phase 2)
+- **Relay plan:** [`PHASE_PLANS/msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json)
+- **Sprint:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md)
+- **SELECTION:** [`POST_MSOS_USER_STATE_V1_SELECTION.md`](POST_MSOS_USER_STATE_V1_SELECTION.md)
+- **Last closed:** **MSOS production wiring v1** — 2026-06-17 on `main`
+- **Next (blocked):** Phase 3 `msos_workflow_persistence_v1` after user state COMPLETE
 - **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases **1→7b** (full product + commercial)
 - **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 - **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
@@ -34,29 +34,29 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | 7a | `msos_entitlements_v1` | BLOCKED — **free tier** + manual paid |
 | 7b | `msos_billing_stripe_v1` | BLOCKED — **Stripe** (BUILD when operator ready) |
 
-### MSOS production wiring v1 — relay queue — **CHARTERED** (HIGH, phase 1)
+### MSOS production wiring v1 — relay queue — **COMPLETE**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-ProdWireV1-Control-Slice001` — charter | EVIDENCE |
-| **DONE** | `MSOS-ProdWireV1-Product-Slice002` — sign-in, CTA, nav/button wiring (`main` #170) | PRODUCT |
-| **PENDING** | `MSOS-ProdWireV1-Platform-Slice003` — compose/Caddy/env + deploy docs | EVIDENCE |
-| **PENDING** | `MSOS-ProdWireV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
-| **PENDING** | `MSOS-ProdWireV1-Closeout-Slice005` — closeout + check-in | EVIDENCE |
+| **CLOSED** | `MSOS-ProdWireV1-Control-Slice001` — charter | EVIDENCE |
+| **CLOSED** | `MSOS-ProdWireV1-Product-Slice002` — sign-in, CTA, nav/button wiring (`main` #170) | PRODUCT |
+| **CLOSED** | `MSOS-ProdWireV1-Platform-Slice003` — compose/Caddy/env + deploy docs (`main` #171) | EVIDENCE |
+| **CLOSED** | `MSOS-ProdWireV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
+| **CLOSED** | `MSOS-ProdWireV1-Closeout-Slice005` — closeout + check-in | EVIDENCE |
 
-**Charter:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · **Precondition met:** public demo launch COMPLETE · **Next:** phase 2 user state bridge
+**Evidence:** [`MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md`](MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md)
 
-### MSOS user state v1 — relay queue — **BLOCKED** (HIGH, phase 2)
+### MSOS user state v1 — relay queue — **ACTIVE** (HIGH, phase 2)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-UserStateV1-Control-Slice001` — charter | EVIDENCE |
-| **PENDING** | `MSOS-UserStateV1-Product-Slice002` — Command Center + snapshot read API | PRODUCT |
-| **PENDING** | `MSOS-UserStateV1-Platform-Slice003` — read-only snapshot volume | EVIDENCE |
+| **CLOSED** | `MSOS-UserStateV1-Control-Slice001` — charter | EVIDENCE |
+| **DONE** | `MSOS-UserStateV1-Product-Slice002` — Command Center + snapshot read API (`main` #184) | PRODUCT |
+| **PENDING** | `MSOS-UserStateV1-Platform-Slice003` — read-only snapshot volume on `msos_web` | EVIDENCE |
 | **PENDING** | `MSOS-UserStateV1-Witness-Slice004` — pytest + operator checklist | EVIDENCE |
 | **PENDING** | `MSOS-UserStateV1-Closeout-Slice005` — closeout | EVIDENCE |
 
-**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · **Blocked until** production wiring COMPLETE
+**Charter:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md) · **Precondition met:** production wiring COMPLETE · **Next:** platform slice then witness/closeout
 
 ### MSOS workflow persistence v1 — relay queue — **BLOCKED** (HIGH, phase 3)
 
@@ -210,7 +210,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P5 | `msos_p5_thesis_confirm` | **done** | — |
 | P6 | `msos_p6_expression_sim` | **done** | — |
 | P7 | `msos_p7_monitoring` | **done** | — |
-| P8 | `msos_p8_tester_release` | **queued / READY** | Relay running — product slice IDE BUILD |
+| P8 | `msos_p8_tester_release` | **done** | — |
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
 
