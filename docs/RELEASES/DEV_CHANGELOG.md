@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `86ecf96` — Control-plane: dev changelog
 - `442b04a` — Control-plane: dev changelog
 - `27b21c3` — Control-plane: dev changelog
 - `ce5fe19` — Control-plane: dev changelog
@@ -18,6 +19,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `53c2388` — ops(platform): DESKTOP BUILD and CONTINUE one-click buttons (#193)
 - `bf5c58b` — docs(SOP): VM+desktop operator session handoff and procedure updates (#192) (`docs/SOP/`)
 - `d567b35` — ops(platform): fix VM_STATUS closing before PHASE line shows (#191)
 - `f2887c2` — ops(platform): always set PPE_STACK_HEADLESS in check_vm_loop (#190)
