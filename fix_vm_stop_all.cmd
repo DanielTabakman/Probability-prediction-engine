@@ -17,6 +17,14 @@ for /f "tokens=2" %%a in ('tasklist /fi "imagename eq python.exe" /fo list ^| fi
   wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine" >nul
   if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
 )
+for /f "tokens=2" %%a in ('tasklist /fi "imagename eq pythonw.exe" /fo list ^| findstr /i "PID:"') do (
+  wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine" >nul
+  if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
+)
+for /f "tokens=2" %%a in ('tasklist /fi "imagename eq cmd.exe" /fo list ^| findstr /i "PID:"') do (
+  wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine run_ppe PPE auto loop watch_operator" >nul
+  if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
+)
 
 echo.
 echo [fix_vm_stop_all] DONE.
