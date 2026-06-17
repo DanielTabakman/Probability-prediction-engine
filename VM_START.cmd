@@ -19,11 +19,9 @@ timeout /t 5 /nobreak >nul
 
 echo.
 echo [VM_START] step 3/4 — ensure loop-host env file...
-if not exist "%CD%\ppe_operator_loop_host.local.cmd" (
-  if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
-    copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
-    echo [VM_START] created ppe_operator_loop_host.local.cmd
-  )
+if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
+  copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
+  echo [VM_START] refreshed ppe_operator_loop_host.local.cmd
 )
 
 echo.
