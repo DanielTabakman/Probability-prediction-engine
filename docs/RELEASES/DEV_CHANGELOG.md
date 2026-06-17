@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `2140a94` — Control-plane: dev changelog
 - `f4fd8fd` — Control-plane: dev changelog
 - `0a8a94e` — Control-plane: dev changelog
 - MSOS-UserStateV1-Product-Slice002 (PRODUCT): Command Center PPE snapshot bridge (#184) (`apps/msos-web/`)
@@ -14,6 +15,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `eb00b15` — ops(platform): add VM_RESTART.cmd stop-wait-start shortcut (#189)
 - `4aeb02b` — ops(platform): VM desktop shortcuts and FIND_PPE_FOLDER (#188) (`scripts/`)
 - `d7bfabb` — ops(platform): add VM_UPDATE.cmd double-click git pull (#187)
 - `f5a7485` — ops(platform): double-click VM operator (no copy-paste) (#186)
