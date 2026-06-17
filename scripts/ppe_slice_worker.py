@@ -80,14 +80,24 @@ def _skip_slow_pytest() -> bool:
 
 
 def _pytest_count(repo: Path) -> tuple[str, int]:
-    proc = subprocess.run(
-        [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if proc.returncode != 0:
+    last_err = ""
+    for attempt in range(2):
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if proc.returncode == 0:
+            break
+        last_err = ((proc.stderr or "") + (proc.stdout or "")).strip()[-500:]
+        if attempt == 0:
+            continue
+        if last_err:
+            print(f"ppe_slice_worker: pytest failed — {last_err}", file=sys.stderr)
+        return "FAIL", 0
+    else:
         return "FAIL", 0
     tail = (proc.stdout or "").strip().splitlines()
     if not tail:
