@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `fef89ce` — docs(control-plane): mark operator ops P0/P2 items done after agent bootstrap (`docs/SOP/`)
+- `204557f` — Control-plane: dev changelog
 - `eacb0f7` — fix(control-plane): VM watchdog task repetition duration for Task Scheduler (#200) (`scripts/`)
 - `dd0ee46` — Control-plane: dev changelog
 - `eda8bea` — ops(control-plane): automate operator pair bootstrap + VM watchdog task (#199) (`docs/SOP/`)
