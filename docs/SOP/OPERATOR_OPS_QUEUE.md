@@ -13,7 +13,7 @@ Mark `status: done` when complete. Product sequence continues via `PHASE_CHAPTER
 | **P1** | Hyper-V checkpoint `clean-base` | Host | Hyper-V Manager (host admin) | **queued** — needs host UI |
 | **P1** | Remove stray `DESKTOP AUTO` shortcuts | Desktop | Auto-refresh shortcuts | **done** (no AUTO icons on Desktop) |
 | **P1** | Cursor Automation zero-click BUILD | Desktop | [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) | optional |
-| **P2** | Schedule VM watchdog | VM | `install_ppe_vm_watchdog_task.cmd` | in progress (agent) |
+| **P2** | Schedule VM watchdog | VM | `install_ppe_vm_watchdog_task.cmd` | **done** (2026-06-17, agent via SSH) |
 | **P2** | IDE-on-VM (single machine) | VM | Separate thread | deferred |
 
 **One-shot bootstrap (desktop):** `bootstrap_operator_pair.cmd` — desktop IDE-only + SSH VM logon task + stack ensure.
