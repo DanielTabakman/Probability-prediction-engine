@@ -12,10 +12,12 @@
 
 | When | Command |
 |------|---------|
-| **Start once** (leave terminal open) | `run_ppe_auto_local_loop.cmd` |
-| **Phone buzzes** (`IDE_BUILD` / operator ping) | `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter |
+| **VM loop** (24/7) | Hyper-V VM: **`VM_RESTART.cmd`** · status: **`VM_STATUS.cmd`** — see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) |
+| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter |
 
-`ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. The director spawns build/finish/triage workers — you do not run gate, mark-ready, or `run_ppe_local` by hand unless the agent asks.
+`ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. It does **not** run the product BUILD or `run_ppe_local` — the director/build worker handles that after you paste the prompt.
+
+**After IDE BUILD in Cursor:** `mark_ide_product_ready.cmd <sliceId>` then **`run_ppe_local.cmd`** on the **VM** (loop host) to continue relay.
 
 Monitor (optional): `.\scripts\watch_ppe_live.ps1`
 
