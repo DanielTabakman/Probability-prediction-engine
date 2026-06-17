@@ -17,6 +17,13 @@ from scripts.ppe_slice_worker_mode import infer_slice_kind, resolve_declared_pla
 PROTOCOL = "CODEX_AUTONOMY_V1"
 SCHEMA_VERSION = "1"
 
+# Steering witness tests must reflect operator main, not stale IDE product SHAs.
+_WITNESS_TEST_PATHS = (
+    "tests/test_msos_p4_charter_witness.py",
+    "tests/test_program_charter_invariants.py",
+    "tests/test_ppe_ide_handoff.py",
+)
+
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -68,8 +75,22 @@ def _materialize_ide_product_in_worktree(
         proc = _git(wt, "checkout", "--detach", ref)
         if proc.returncode == 0:
             print(f"ppe_slice_worker: worktree at IDE product {ref[:12]}")
+            _sync_witness_tests_from_baseline(wt)
             return
     print("ppe_slice_worker: warn — could not checkout IDE product ref in worktree")
+
+
+def _sync_witness_tests_from_baseline(wt: Path, *, baseline: str = "main") -> None:
+    """Refresh charter/witness tests from baseline after IDE product detach."""
+    baseline = baseline.strip() or "main"
+    _git(wt, "fetch", "origin", baseline)
+    ref = f"origin/{baseline}"
+    proc = _git(wt, "checkout", ref, "--", *_WITNESS_TEST_PATHS)
+    if proc.returncode != 0:
+        err = ((proc.stderr or "") + (proc.stdout or "")).strip()[-300:]
+        print(f"ppe_slice_worker: warn — witness test sync from {ref} failed: {err}")
+    else:
+        print(f"ppe_slice_worker: witness tests synced from {ref}")
 
 
 def _skip_slow_pytest() -> bool:
