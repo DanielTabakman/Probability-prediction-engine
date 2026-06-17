@@ -42,6 +42,15 @@ def write_trigger(repo: Path, payload: dict[str, Any]) -> Path:
     return path
 
 
+def trigger_active_for_slice(trigger: dict[str, Any], slice_id: str) -> bool:
+    """True when trigger is already pending or dispatched for this slice."""
+    if not slice_id or not trigger:
+        return False
+    if str(trigger.get("sliceId") or "").strip() != slice_id:
+        return False
+    return str(trigger.get("status") or "").strip().lower() in ("pending", "dispatched")
+
+
 def write_trigger_pending(
     repo: Path,
     *,
@@ -50,7 +59,13 @@ def write_trigger_pending(
     starter_rel: str,
     reason: str,
     source: str,
+    force: bool = False,
 ) -> Path:
+    existing = load_trigger(repo)
+    handoff_at = _utc_now()
+    if not force and trigger_active_for_slice(existing, slice_id):
+        handoff_at = str(existing.get("handoffAt") or handoff_at)
+        return trigger_path(repo)
     return write_trigger(
         repo,
         {
@@ -60,7 +75,7 @@ def write_trigger_pending(
             "starter": starter_rel.replace("\\", "/"),
             "reason": reason,
             "source": source,
-            "handoffAt": _utc_now(),
+            "handoffAt": handoff_at,
         },
     )
 
@@ -133,6 +148,17 @@ def notify_automation(repo: Path, *, handoff: dict[str, Any]) -> dict[str, Any]:
     if not slice_id or not starter:
         return {"ok": False, "reason": "missing slice_id or starter"}
 
+    force = bool(handoff.get("force"))
+    existing = load_trigger(repo)
+    if not force and trigger_active_for_slice(existing, slice_id):
+        return {
+            "ok": True,
+            "trigger": TRIGGER_REL,
+            "skipped": True,
+            "reason": f"trigger already active for {slice_id}",
+            "webhook": {"ok": False, "skipped": True, "reason": "trigger dedup"},
+        }
+
     trigger_file = write_trigger_pending(
         repo,
         slice_id=slice_id,
@@ -140,6 +166,7 @@ def notify_automation(repo: Path, *, handoff: dict[str, Any]) -> dict[str, Any]:
         starter_rel=starter,
         reason=reason,
         source=source,
+        force=force,
     )
     starter_path = repo / starter.replace("/", os.sep)
     starter_content = ""

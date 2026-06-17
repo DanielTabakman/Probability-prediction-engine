@@ -53,6 +53,30 @@ def test_write_trigger_dispatched(tmp_path):
     assert data["workerPid"] == 99
 
 
+def test_notify_automation_dedupes_active_trigger(tmp_path):
+    write_trigger_pending(
+        tmp_path,
+        slice_id="MVP1-Slice002",
+        plan_path="docs/SOP/PHASE_PLANS/foo.json",
+        starter_rel="artifacts/orchestrator/IDE_BUILD_STARTER_MVP1-Slice002.md",
+        reason="first",
+        source="unit",
+    )
+    result = notify_automation(
+        tmp_path,
+        handoff={
+            "slice_id": "MVP1-Slice002",
+            "plan_path": "docs/SOP/PHASE_PLANS/foo.json",
+            "starter": "artifacts/orchestrator/IDE_BUILD_STARTER_MVP1-Slice002.md",
+            "reason": "second",
+            "source": "unit",
+        },
+    )
+    assert result.get("skipped") is True
+    data = load_trigger(tmp_path)
+    assert data["handoffAt"]  # unchanged timestamp from first write
+
+
 def test_notify_automation_skips_webhook_without_url(tmp_path):
     result = notify_automation(
         tmp_path,
