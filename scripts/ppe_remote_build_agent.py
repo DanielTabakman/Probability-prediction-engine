@@ -211,21 +211,42 @@ def _read_run_local_lock(repo: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
-def _run_local_detached(repo: Path) -> dict[str, Any]:
+def _run_local_lock_active(repo: Path, lock: dict[str, Any] | None) -> bool:
+    """True when a run_local worker is alive or lock is fresh (child cmd may still run)."""
+    if not lock:
+        return False
     from scripts.ppe_remote_agent_spawn import process_alive
 
+    pid = lock.get("worker_pid")
+    try:
+        if pid is not None and process_alive(int(pid)):
+            return True
+    except (TypeError, ValueError):
+        pass
+    started = str(lock.get("started_at") or "").strip()
+    if not started:
+        return True
+    try:
+        from datetime import datetime, timezone
+
+        at = datetime.fromisoformat(started.replace("Z", "+00:00"))
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        age_s = (datetime.now(timezone.utc) - at).total_seconds()
+        return age_s < 2700
+    except ValueError:
+        return True
+
+
+def _run_local_detached(repo: Path) -> dict[str, Any]:
     lock = _read_run_local_lock(repo)
-    if lock:
-        pid = lock.get("worker_pid")
-        try:
-            if pid is not None and process_alive(int(pid)):
-                return {
-                    "started": False,
-                    "reason": f"run_local already in flight (pid={pid})",
-                    "worker_pid": int(pid),
-                }
-        except (TypeError, ValueError):
-            pass
+    if _run_local_lock_active(repo, lock):
+        pid = lock.get("worker_pid") if lock else None
+        return {
+            "started": False,
+            "reason": f"run_local already in flight (pid={pid})",
+            "worker_pid": pid,
+        }
 
     log_path = repo / "artifacts/orchestrator/REMOTE_RUN_LOCAL.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)

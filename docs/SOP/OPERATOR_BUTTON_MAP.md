@@ -4,8 +4,9 @@
 
 | Symptom / verdict | Machine | Action |
 |-------------------|---------|--------|
-| `VERDICT=IDE_BUILD` | **Desktop PC** | `DESKTOP_BUILD.cmd` → paste in Cursor Agent → gate → commit → PR |
-| After product PR merged | **Desktop PC** | `DESKTOP_CONTINUE.cmd` (pull + SSH finish on VM) |
+| **Default — do what the agent asked** | **Desktop or VM** | **`DO_THE_THING.cmd`** (queued steps + smart fallback) |
+| `VERDICT=IDE_BUILD` | **Desktop PC** | `DO_THE_THING.cmd` or `DESKTOP_BUILD.cmd` → paste in Cursor Agent → gate → commit → PR |
+| After product PR merged | **Desktop PC** | `DO_THE_THING.cmd` or `DESKTOP_CONTINUE.cmd` (pull + SSH finish on VM) |
 | `PHASE=STACK_DOWN` / `stack_loop=False` | **VM** | `VM_RESTART.cmd` or `VM_AUTO.cmd` |
 | Check health | **VM** | `VM_STATUS.cmd` (wait ~10s for `PHASE=`) |
 | Emergency stop popups | **VM** | `VM_STOP.cmd` |

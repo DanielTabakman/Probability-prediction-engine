@@ -28,7 +28,14 @@ def test_detect_role_daily_driver(tmp_path):
 def test_shortcuts_for_role_vm():
     names = shortcuts_for_role("vm_loop_host")
     assert "VM STATUS" in names
+    assert "DO THE THING" in names
     assert "DESKTOP BUILD" not in names
+
+
+def test_shortcuts_for_role_desktop():
+    names = shortcuts_for_role("daily_driver")
+    assert "DO THE THING" in names
+    assert "DESKTOP BUILD" in names
 
 
 def test_shortcuts_need_refresh_when_missing(tmp_path, monkeypatch):

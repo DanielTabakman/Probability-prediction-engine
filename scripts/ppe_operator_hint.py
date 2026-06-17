@@ -7,8 +7,11 @@ from pathlib import Path
 PPE_GO_CMD = "ppe_go.cmd"
 PPE_GO_HINT = f"{PPE_GO_CMD} → new Agent → Ctrl+V → Enter"
 
+from scripts.ppe_do_the_thing import BUTTON_NAME
+
 DESKTOP_BUILD_CMD = "DESKTOP BUILD"
 DESKTOP_CONTINUE_CMD = "DESKTOP CONTINUE"
+DO_THE_THING_CMD = BUTTON_NAME
 VM_RESTART_CMD = "VM_RESTART"
 
 VERDICT_BUTTON_HINTS: dict[str, str] = {

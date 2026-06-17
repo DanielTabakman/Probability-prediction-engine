@@ -121,10 +121,10 @@ def _maybe_auto_run_local(
     if not is_loop_running():
         return None
     try:
-        from scripts.ppe_remote_build_agent import _read_run_local_lock
+        from scripts.ppe_remote_build_agent import _read_run_local_lock, _run_local_lock_active
 
         lock = _read_run_local_lock(repo)
-        if lock:
+        if _run_local_lock_active(repo, lock):
             return None
     except ImportError:
         pass
