@@ -5,6 +5,11 @@ REM Usage on VM:  Win+R  then  C:\Users\ppeloop\Probability-prediction-engine\fi
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
+if not exist "%CD%\ppe_operator_loop_host.local.cmd" (
+  if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
+    copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
+  )
+)
 call "%CD%\call_ppe_operator_local.cmd" 2>nul
 call "%CD%\ppe_operator_loop_host.local.cmd" 2>nul
 set "PPE_OPERATOR_PROFILE=local"
