@@ -1,43 +1,63 @@
 # PPE near-zero API operator v1
 
-**Plane:** CONTROL-PLANE. **Purpose:** run relay chapters and product BUILD with **minimal headless agent CLI / ACP** usage.
+**Plane:** CONTROL-PLANE. **Purpose:** run relay chapters and product BUILD with **minimal headless agent CLI / ACP** usage — or use the **hybrid local default** when auto-build is enabled.
 
 **Related:** [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md) · [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json)
 
 ---
 
-## Three lanes (default)
+## Two modes
+
+| Mode | Config | On `IDE_BUILD` |
+|------|--------|----------------|
+| **Hybrid local (default)** | `autoRemoteBuild: true`, `preferIdeOverCli: false` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) | Loop/watch start **headless CLI** when agent is installed and usage allows; else IDE handoff |
+| **Strict near-zero** | `ppe_operator_near_zero_api.local.cmd` (gitignored) | **IDE handoff only** — no loop CLI |
+
+---
+
+## Three lanes
 
 | Lane | Entry | API credits? |
 |------|--------|----------------|
 | **Local loop** | `run_ppe_auto_local_loop.cmd` | **No** — control/smoke/closeout |
-| **IDE product** | Cursor Agent + `IDE_BUILD_STARTER` | **IDE plan** (not headless CLI) |
-| **Headless CLI** | phone `build` when explicitly enabled | **Yes** — use sparingly |
+| **IDE product** | Cursor Agent + `IDE_BUILD_STARTER` | **IDE plan** (not ACP relay) |
+| **Headless CLI** | `autoRemoteBuild` when hybrid default | **Yes** — agent CLI on desktop; falls back to IDE handoff on quota |
 
 ---
 
 ## Quick setup
 
-1. [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) already sets `autoRemoteBuild: false` and `ideHandoff.preferIdeOverCli: true`.
-2. Copy [`ppe_operator_near_zero_api.local.cmd.example`](../../ppe_operator_near_zero_api.local.cmd.example) → `ppe_operator_near_zero_api.local.cmd` (gitignored).
-3. Restart stack: `run_ppe_desktop_operator.cmd` or ntfy `restart`.
+### Hybrid default (current local profile)
+
+1. [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) sets `autoRemoteBuild: true` and `preferIdeOverCli: false`.
+2. One-time desktop: `setup_cursor_agent.cmd` → `agent login` → `verify_cursor_agent.cmd`.
+3. Restart stack on loop host: `run_ppe_headless_stack.cmd` or ntfy `restart`.
+
+### Strict IDE-only (optional override)
+
+1. Copy [`ppe_operator_near_zero_api.local.cmd.example`](../../ppe_operator_near_zero_api.local.cmd.example) → `ppe_operator_near_zero_api.local.cmd` (gitignored).
+2. Sets `PPE_AUTO_REMOTE_BUILD=0`, `PPE_FORCE_IDE_HANDOFF=1`, `PPE_PREFER_IDE_OVER_CLI=1`.
+3. Restart stack.
 
 ---
 
 ## What happens on exit 7 (`IDE_BUILD`)
 
-1. **No headless CLI** (unless `PPE_FORCE_CLI_BUILD=1`).
-2. Generate `IDE_BUILD_STARTER_<sliceId>.md` for the **next unmarked** product slice.
-3. Write `artifacts/orchestrator/IDE_BUILD_NOW.md`.
-4. Copy build prompt to **clipboard** (Windows).
-5. **Open Cursor** on repo + starter file.
-6. **ntfy:** `PPE IDE BUILD: <sliceId>`.
+**Hybrid (default):** loop or mobile watch calls `respond_to_ide_build` → headless `agent` / `cursor-sdk` when allowed; ntfy `PPE auto-build started`.
 
-**Automation (recommended):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` (not `.md`) — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
+**When CLI blocked (usage / not installed):** same as IDE handoff below.
 
-**Manual:** new Agent thread → `@` starter → paste handoff prompt.
+**IDE handoff path:**
 
-Closeout (in starter **## When done** or handoff clipboard):
+1. Generate `IDE_BUILD_STARTER_<sliceId>.md` for the **next unmarked** product slice.
+2. Write `artifacts/orchestrator/IDE_BUILD_NOW.md`.
+3. Copy build prompt to **clipboard** (Windows).
+4. **Open Cursor** on repo + starter file (when `PPE_IDE_HANDOFF_OPEN=1`).
+5. **ntfy:** `PPE IDE BUILD: <sliceId>`.
+
+**Automation (optional):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
+
+Closeout:
 
 ```bat
 mark_ide_product_ready.cmd <sliceId> [phasePlan]
@@ -50,20 +70,15 @@ run_ppe_local.cmd
 
 ## Env overrides
 
-| Variable | Default (near-zero) | Effect |
-|----------|---------------------|--------|
-| `PPE_AUTO_REMOTE_BUILD` | `0` | Loop/watch do not start headless CLI |
-| `PPE_FORCE_IDE_HANDOFF` | `1` | phone `build` → IDE handoff |
-| `PPE_PREFER_IDE_OVER_CLI` | `1` | Skip CLI even if agent installed |
-| `PPE_IDE_HANDOFF_OPEN` | `1` | Open Cursor on handoff |
-| `PPE_IDE_HANDOFF_CLIPBOARD` | `1` | Copy prompt to clipboard |
-| `PPE_FORCE_CLI_BUILD` | unset | Set `1` for one emergency CLI build |
+| Variable | Hybrid default | Strict near-zero |
+|----------|----------------|------------------|
+| `PPE_AUTO_REMOTE_BUILD` | `1` | `0` |
+| `PPE_PREFER_IDE_OVER_CLI` | `0` | `1` |
+| `PPE_FORCE_IDE_HANDOFF` | unset | `1` |
+| `PPE_IDE_HANDOFF_OPEN` | `0` (config) | `1` |
+| `PPE_FORCE_CLI_BUILD` | unset | unset — set `1` for one emergency CLI build |
 
-Manual handoff:
-
-```bat
-open_ide_handoff.cmd
-```
+Manual handoff: `open_ide_handoff.cmd`
 
 ---
 
@@ -71,12 +86,12 @@ open_ide_handoff.cmd
 
 - `run_ppe_auto_acp_loop.cmd` without budget
 - `stewardCharter: true` on local profile
-- `autoRemoteBuild: true` while relying on IDE for product
 - Disabling `skipAcp` to “unblock” product slices
+- `autoRemoteBuild: true` **and** `stewardCharter` / full ACP loop at the same time
 
 ---
 
-## Cursor Automations (recommended)
+## Cursor Automations (optional)
 
 Full setup: [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md). Prompt: [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md).
 
@@ -84,7 +99,7 @@ Full setup: [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1
 
 ## Emergency CLI (away from desk)
 
-In `ppe_operator_near_zero_api.local.cmd`:
+In `ppe_operator_near_zero_api.local.cmd` or one-shot env:
 
 ```bat
 set "PPE_FORCE_CLI_BUILD=1"
@@ -92,4 +107,4 @@ set "PPE_FORCE_IDE_HANDOFF=0"
 set "PPE_AUTO_REMOTE_BUILD=1"
 ```
 
-Send `build` on ntfy once, then restore near-zero env and `restart`.
+Send `build` on ntfy once, then restore preferred env and `restart`.

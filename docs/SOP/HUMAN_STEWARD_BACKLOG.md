@@ -16,7 +16,7 @@
 
 ### Product lane automation
 
-- **id:** `product_lane_automation` · **priority:** high · **category:** architecture
+- **id:** `` · **priority:** high · **category:** architecture
 - **added:** 2026-06-17
 - **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
 - **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
@@ -69,6 +69,16 @@
 - **added:** 2026-06-17
 - **summary:** OPERATOR_STATUS needs_human vs informational_stop; skip ntfy on auto-recovered exit 20; workflow radar noise reduction.
 - **policy question:** What deserves a phone ping vs weekly digest only?
+- **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
+
+## Done
+
+### Operator friction cleanup (local profile)
+
+- **id:** `operator_friction_cleanup_2026_06` · **priority:** medium · **category:** operator
+- **added:** 2026-06-17
+- **closed:** 2026-06-17
+- **summary:** focusGate off, stopOnContextEscalate off, procedural exit-20 auto-advance reporting, legacy relay hard-stops demoted, human steward backlog + weekly ntfy hook.
 
 ## Changelog
 

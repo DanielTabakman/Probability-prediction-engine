@@ -17,6 +17,8 @@
 
 **Agents:** not required unless `IDE_BUILD` / `ERROR`.
 
+**Monday ntfy (one-time on loop host VM):** `powershell -File scripts\install_weekly_digest_task.ps1 -RepoRoot "%CD%"` — runs `weekly_digest_monday.cmd` (radar + digest + human backlog titles).
+
 ---
 
 ## Monthly (steward — ~45 min)
