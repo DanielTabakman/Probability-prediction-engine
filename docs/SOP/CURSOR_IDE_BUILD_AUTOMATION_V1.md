@@ -6,9 +6,9 @@
 
 ---
 
-## Recommended: local trigger watcher (desktop)
+## Recommended: local trigger watcher (VM loop host)
 
-**Default on the always-on desktop.** No Cursor cloud Automations required.
+On the **VM**, the headless stack may run [`watch_ide_build_local.cmd`](../../watch_ide_build_local.cmd) — polls `.cursor/IDE_BUILD_TRIGGER.json` and starts local agent CLI. **Default IDE BUILD path with VM+desktop layout:** implement product on **daily desktop** via `DESKTOP_BUILD.cmd` ([`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)).
 
 When handoff fires, [`ppe_ide_handoff.py`](../../scripts/ppe_ide_handoff.py) writes **`.cursor/IDE_BUILD_TRIGGER.json`** with `"status": "pending"`.  
 [`watch_ide_build_local.cmd`](../../watch_ide_build_local.cmd) polls that file and starts the **local agent CLI** against your repo.
@@ -22,7 +22,7 @@ Loop exit 7 → handoff writes trigger (pending)
 
 | Item | Value |
 |------|-------|
-| **Watcher** | `watch_ide_build_local.cmd` (started by `start_ppe_desktop_operator.cmd`) |
+| **Watcher** | `watch_ide_build_local.cmd` (VM headless stack when enabled) — **desktop:** use `DESKTOP_BUILD.cmd` instead |
 | **Config** | `ideHandoff.localTriggerWatcher: true` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) |
 | **Prerequisite** | `setup_cursor_agent.cmd` + `agent login` on the desktop |
 | **Disable** | `PPE_IDE_LOCAL_TRIGGER_WATCHER=0` or `localTriggerWatcher: false` |

@@ -25,6 +25,13 @@ Do NOT create a new context for every tiny action.
 - **Steward thread:** SELECTION, manifest, read `LAST_RUN_REPORT.md` — keep separate from BUILD.
 - **After phase exit:** new Cursor thread; load only `docs/SOP/AGENT_CONTINUITY_BRIEF.md`.
 
+## Operator layout (2026-06)
+
+**Policy:** [`docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md`](SOP/PPE_OPERATOR_LAYOUT_ADR.md) · **Process:** [`docs/SOP/PPE_OPERATOR_PROCESS_V1.md`](SOP/PPE_OPERATOR_PROCESS_V1.md)
+
+- **VM** runs the 24/7 loop; **desktop** runs IDE BUILD only.
+- New operator threads: load [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) + continuity brief — not laptop chat history.
+
 ## Good thread unit
 One thread per sprint or sub-sprint.
 

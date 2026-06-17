@@ -93,9 +93,9 @@ PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=
 2. [`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md) — headless supervisor model
 3. [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) — IDE-native relay, `ppe_go`, director agents
 4. [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) — one-page VM operator card
-5. **This file** — session handoff / two-machine truth
+5. [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) — daily operator process + incident playbook
 6. [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) — symptom → which `.cmd` on which machine
-7. [`OPERATOR_OPS_QUEUE.md`](OPERATOR_OPS_QUEUE.md) — high-priority operator tasks (non-product)
+7. [`OPERATOR_OPS_QUEUE.md`](OPERATOR_OPS_QUEUE.md) — remaining host-only tasks
 
 ---
 

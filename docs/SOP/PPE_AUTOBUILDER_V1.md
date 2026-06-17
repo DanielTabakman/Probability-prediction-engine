@@ -25,11 +25,13 @@ Default `ppe_autobuilder.cmd` (no args) prints brief status and writes `artifact
 
 ## What the autobuilder owns
 
-Three desktop processes (via `start_ppe_desktop_operator.cmd`):
+On the **VM loop host** (headless stack via `run_ppe_headless_stack.cmd` — see [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)):
 
 1. **Loop** — `run_ppe_auto_local_loop.cmd` (relay + guards)
 2. **Watch** — `watch_operator_mobile.cmd` (ntfy + auto-dispatch + post-build finish)
 3. **ntfy commands** — `watch_ntfy_commands.cmd` (phone `build` / `fix`)
+
+Legacy single-machine entry: `start_ppe_desktop_operator.cmd` — **not** for daily desktop when VM is live.
 
 Plus dispatch paths:
 

@@ -257,7 +257,7 @@ Steward/agent may interpret meaning after listing facts, but should not hand-aut
 
 ## Operator machine layout (hard rule, 2026-06-17)
 
-**Canon:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
+**Canon:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) · [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)
 
 | Rule | Detail |
 |------|--------|

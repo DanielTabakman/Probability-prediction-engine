@@ -85,6 +85,7 @@ Cursor on the VM via Remote-SSH is **documented** ([`PPE_CURSOR_REMOTE_SSH_V1.md
 ## Consequences
 
 - Steward / agent docs must not describe the desktop as the primary loop host.
+- **Process runbook:** [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) — daily routine + incident playbook for stewards/agents.
 - New operator automation must target the **VM** for loop/watch/ntfy and the **desktop** for IDE BUILD handoff only.
 - `DESKTOP_OPERATOR_SETUP_STARTER.md` is **IDE-BUILD setup**; loop host setup is [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md).
 - Layer-audit warnings on root `VM_*.cmd` / `DESKTOP_*.cmd` are accepted control-plane operator surface.
