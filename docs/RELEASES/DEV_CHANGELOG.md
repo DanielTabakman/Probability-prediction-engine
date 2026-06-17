@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `193de4a` — Control-plane: dev changelog
 - `9e5c423` — Control-plane: dev changelog
 - `b821236` — Control-plane: dev changelog
 - `86ecf96` — Control-plane: dev changelog
@@ -21,6 +22,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `9d869dc` — fix: VM_AUTO on VM only, disable desktop auto default (#196) (`scripts/`)
 - `90740b0` — ops(platform): DESKTOP AUTO START pushes BUILD/CONTINUE automatically (#195) (`scripts/`)
 - `062a864` — ops(platform): auto-install operator Desktop shortcuts when appropriate (#194) (`docs/SOP/`)
 - `53c2388` — ops(platform): DESKTOP BUILD and CONTINUE one-click buttons (#193)
