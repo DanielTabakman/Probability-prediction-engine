@@ -112,12 +112,12 @@ def _dirty_paths(repo: Path, *, for_loop_host: bool = False) -> list[str]:
         p = line[3:].strip().replace("\\", "/")
         if p and not p.startswith("_worktrees/"):
             paths.append(p)
-    if for_loop_host:
-        try:
-            from scripts.repo_layer_paths import is_preflight_dirty_exempt
+    try:
+        from scripts.repo_layer_paths import is_preflight_dirty_exempt
 
-            paths = [p for p in paths if not is_preflight_dirty_exempt(p)]
-        except ImportError:
+        paths = [p for p in paths if not is_preflight_dirty_exempt(p)]
+    except ImportError:
+        if for_loop_host:
             pass
     return paths
 

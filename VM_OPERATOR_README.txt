@@ -17,6 +17,7 @@ ON THE VM (folder: C:\Users\ppeloop\Probability-prediction-engine)
 3. VM_START.cmd    — run ONCE after STOP, when you want the loop running
 4. VM_RESTART.cmd  — STOP + wait + START in one click (use instead of START alone)
 5. VM_AUTO.cmd     — same as VM_RESTART (your "make it go" button on the VM)
+6. install_ppe_vm_headless_logon_task.cmd — ONCE: auto-start loop after VM reboot
 
 Order when fixing problems:
   VM_STOP  ->  close blank windows by hand  ->  wait 30 seconds  ->  VM_START once
@@ -40,6 +41,7 @@ DESKTOP BUILD     — only when phone says IDE_BUILD (opens Cursor on THIS pc)
 DESKTOP CONTINUE  — only after a BUILD merged to main
 DESKTOP STOP      — stop popups on this PC (run if you see blank cmd windows)
 
+Run setup_desktop_ide_only.cmd ONCE on the desktop (no loop guard + shortcuts).
 NO auto-loop on this PC. The VM runs the loop 24/7 (VM AUTO / VM RESTART on the VM).
 
 Run setup_operator_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop (also runs automatically from DESKTOP_BUILD / VM_UPDATE).

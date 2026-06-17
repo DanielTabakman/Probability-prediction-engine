@@ -2,9 +2,9 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** run the auto-loop on an always-on desktop; monitor and triage from phone.
 
-**New desktop?** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
+**Layout (Hyper-V VM):** see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md). **VM = loop** · **Desktop = IDE BUILD**.
 
-Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
+Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
 
 ---
 
@@ -12,9 +12,9 @@ Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · 
 
 | Device | Tools | Job |
 |--------|-------|-----|
-| **Desktop** (plugged in, never sleeps) | Loop + **Cursor** + RDP host | Loop host; primary Agent machine; optional direct work |
-| **Phone** | **ntfy** + **Termius** + **Microsoft Remote Desktop** | Alerts; quick SSH triage; full Cursor via RDP |
-| **Laptop** | Cursor + Termius (optional) | Alternate BUILD machine if desktop unavailable |
+| **VM** (Hyper-V, always on) | Headless loop + ntfy listen | **Loop host** — relay, control slices, `run_ppe_local` |
+| **Desktop** (daily PC) | Cursor | **IDE BUILD only** — `DESKTOP_BUILD.cmd`, no loop |
+| **Phone** | **ntfy** + **Termius** | Alerts with button hints; SSH triage to VM |
 
 **You do not code by hand.** When something needs judgment, open **Cursor Agent** on the desktop (locally or via phone RDP).
 

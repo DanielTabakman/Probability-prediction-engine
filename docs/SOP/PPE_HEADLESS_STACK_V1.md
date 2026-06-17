@@ -23,6 +23,10 @@ Enable in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json):
 
 Or set `PPE_STACK_HEADLESS=1`.
 
+**VM double-click buttons** (no Win+R): see [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) and [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) — `VM_STATUS`, `VM_RESTART`, `VM_STOP`, `VM_UPDATE`.
+
+The headless supervisor runs an optional **watchdog** every ~10 minutes (`scripts/ppe_vm_watchdog.py`) to restart the stack when `stack_loop=False` (rate-limited).
+
 ---
 
 ## What runs

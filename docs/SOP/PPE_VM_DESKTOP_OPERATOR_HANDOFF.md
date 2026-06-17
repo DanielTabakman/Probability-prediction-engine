@@ -26,6 +26,9 @@ Use this doc when opening a **new Cursor thread** after VM/desktop operator work
 | `VM_STATUS.cmd` | Health check (**wait ~10s** for `PHASE=` line) |
 | `VM_START.cmd` | Start loop once (after STOP) |
 | `VM_RESTART.cmd` | STOP → wait 30s → START (preferred) |
+| `VM_AUTO.cmd` | Alias for VM_RESTART |
+| `VM_WATCHDOG.cmd` | Rate-limited auto-restart if stack down (optional scheduled task) |
+| `install_ppe_vm_headless_logon_task.cmd` | One-time logon auto-start (Phase 6) |
 
 Desktop shortcuts: run `setup_operator_shortcuts.cmd` once (or auto from **DESKTOP_BUILD** / **VM_UPDATE**).
 
@@ -36,15 +39,18 @@ Desktop shortcuts: run `setup_operator_shortcuts.cmd` once (or auto from **DESKT
 ## Healthy VM status (example)
 
 ```text
-PHASE=AWAITING_BUILD VERDICT=IDE_BUILD slice=MSOS-UserStateV1-Product-Slice002 stack_loop=True stack_watch=True next=handoff
+PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=run-local
 ```
 
 | Reading | Meaning |
 |---------|---------|
 | `stack_loop=True` / `stack_watch=True` | Headless stack OK |
-| `VERDICT=IDE_BUILD` | Product slice needs **Cursor BUILD on desktop** |
+| `VERDICT=IDE_BUILD` | Product slice needs **Cursor BUILD on desktop** → `DESKTOP_BUILD.cmd` |
+| `VERDICT=RUN_LOCAL` | Relay continuing on VM after product merge |
 | `PHASE=STACK_DOWN` + `stack_loop=False` | Loop off → double-click **VM_RESTART** on VM |
 | `next=handoff` | Waiting for IDE work, not `run_ppe_local` yet |
+
+**Active chapter:** `msos_user_state_v1` — check `ppe_autobuilder.cmd status --brief` for current slice.
 
 ---
 
@@ -58,9 +64,9 @@ PHASE=AWAITING_BUILD VERDICT=IDE_BUILD slice=MSOS-UserStateV1-Product-Slice002 s
 | 2. Implement slice | **Desktop Cursor** | Open `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md`, build, gate, commit, PR |
 | 3. Optional director handoff | **Desktop** | `ppe_go.cmd` → paste in new Agent chat (`@ppe-director` prompt). *May look like “nothing happened” — it copies to clipboard.* |
 | 4. Mark product ready | Desktop or agent | `mark_ide_product_ready.cmd <sliceId>` (after merge/gate) |
-| 5. Continue relay | **VM** (or desktop if asked) | `run_ppe_local.cmd` — advances control/platform/witness |
+| 5. Continue relay | **VM** (automatic) | Loop runs `run_ppe_local` when product marked ready |
 
-**Active slice (as of session end):** `MSOS-UserStateV1-Product-Slice002` — starter at `artifacts/orchestrator/IDE_BUILD_STARTER_MSOS-UserStateV1-Product-Slice002.md`.
+**Phone ntfy** messages include button hints — see [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
 
 ---
 
@@ -86,8 +92,8 @@ PHASE=AWAITING_BUILD VERDICT=IDE_BUILD slice=MSOS-UserStateV1-Product-Slice002 s
 3. [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) — IDE-native relay, `ppe_go`, director agents
 4. [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) — one-page VM operator card
 5. **This file** — session handoff / two-machine truth
-
-**Stale:** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) still describes desktop as primary loop host — **override with VM layout** when Hyper-V VM is live.
+6. [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) — symptom → which `.cmd` on which machine
+7. [`OPERATOR_OPS_QUEUE.md`](OPERATOR_OPS_QUEUE.md) — high-priority operator tasks (non-product)
 
 ---
 

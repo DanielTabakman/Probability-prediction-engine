@@ -193,6 +193,51 @@ def sync_slice_progress(repo: Path, plan_path: str) -> dict[str, Any]:
     }
 
 
+def heal_stale_relay_state(repo: Path) -> dict[str, Any]:
+    """Abort relay runs stuck staged without relay_result.json (anchor repo)."""
+    changes: list[str] = []
+    relay_state_path = repo / "artifacts" / "relay" / "state" / "run_state.json"
+    if not relay_state_path.is_file():
+        return {"action": "heal_relay_state", "changes": changes}
+    try:
+        state = json.loads(relay_state_path.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, OSError):
+        return {"action": "heal_relay_state", "changes": changes}
+    if not isinstance(state, dict):
+        return {"action": "heal_relay_state", "changes": changes}
+    status = str(state.get("status") or "")
+    run_id = str(state.get("run_id") or "").strip()
+    if status not in ("staged_for_worker", "retry_waiting") or not run_id:
+        return {"action": "heal_relay_state", "changes": changes}
+    result_path = repo / "artifacts" / "relay" / "runs" / run_id / "relay_result.json"
+    if result_path.is_file():
+        return {"action": "heal_relay_state", "changes": changes}
+    relay_script = repo / "scripts" / "relay_runtime_v0.py"
+    if relay_script.is_file():
+        for cmd in ("abort", "reset"):
+            subprocess.run(
+                [sys.executable, str(relay_script), "--repo-root", str(repo), cmd],
+                cwd=repo,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+    changes.append(f"relay reset (stale {status} run_id={run_id})")
+    return {"action": "heal_relay_state", "changes": changes}
+
+
+def loop_host_git_hygiene(repo: Path) -> dict[str, Any]:
+    """Reset transient operator paths that block git pull on the loop host."""
+    changes: list[str] = []
+    for rel in (".cursor/IDE_BUILD_TRIGGER.json",):
+        path = repo / rel
+        proc = _git(repo, "status", "--porcelain", rel)
+        if path.is_file() and (proc.stdout or "").strip():
+            _git(repo, "checkout", "--", rel)
+            changes.append(f"reset {rel}")
+    return {"action": "git_hygiene", "changes": changes}
+
+
 def heal_operator_artifacts(repo: Path) -> dict[str, Any]:
     """Clear stale locks / ACTIVE_RUN that block a fresh relay pass."""
     actions: list[str] = []
@@ -287,6 +332,8 @@ def bootstrap(
         plan_path = ""
 
     if heal:
+        report["steps"].append(loop_host_git_hygiene(repo))
+        report["steps"].append(heal_stale_relay_state(repo))
         report["steps"].append(heal_operator_artifacts(repo))
     if sync_progress and plan_path:
         report["steps"].append(sync_slice_progress(repo, plan_path))
@@ -347,6 +394,9 @@ def main(argv: list[str] | None = None) -> int:
             if action == "heal_artifacts" and step.get("changes"):
                 for ch in step["changes"]:
                     print(f"  heal: {ch}")
+            if action in ("heal_relay_state", "git_hygiene") and step.get("changes"):
+                for ch in step["changes"]:
+                    print(f"  {action}: {ch}")
     return 0
 
 

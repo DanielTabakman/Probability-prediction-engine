@@ -53,7 +53,9 @@ Bottom-left should show **SSH: ppe-vm**. Agent chat in **this** window runs on t
 |------|--------|
 | Product code, PRs | **Host** Cursor (default) |
 | VM stack, ntfy, operator fixes | **Remote-SSH** `ppe-vm` window |
-| Quick status | `ssh ppeloop@desktop-caqll8k` → `.\ppe_autobuilder.cmd status --brief` |
+| Quick status | `ssh ppeloop@desktop-caqll8k` → `.\check_vm_loop.cmd` or `.\VM_STATUS.cmd` |
+| Restart loop | SSH → `cd C:\Users\ppeloop\Probability-prediction-engine` → `.\VM_RESTART.cmd` |
+| Finish after desktop BUILD | Desktop `DESKTOP_CONTINUE.cmd` or SSH → `finish_ide_build.cmd` |
 
 ---
 

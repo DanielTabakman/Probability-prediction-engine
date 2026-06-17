@@ -13,6 +13,27 @@ from scripts.ppe_operator_git_sync import (
 )
 
 
+def test_pull_allows_preflight_exempt_dirty(tmp_path: Path) -> None:
+    repo = tmp_path
+
+    def fake_git(_repo: Path, *args: str):
+        if args[:2] == ("status", "--porcelain"):
+            return type("P", (), {"returncode": 0, "stdout": " M .cursor/IDE_BUILD_TRIGGER.json\n", "stderr": ""})()
+        if args[:2] == ("fetch", "origin"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("pull", "--ff-only"):
+            return type("P", (), {"returncode": 0, "stdout": "Already up to date.", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync.pull_enabled", return_value=True):
+        with patch("scripts.ppe_operator_git_sync.ensure_main_on_loop_host", return_value={"skipped": True}):
+            with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+                with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                    out = pull_main(repo)
+    assert out.get("ok") is True
+    assert out.get("skipped") is not True
+
+
 def test_pull_skips_when_dirty(tmp_path: Path) -> None:
     repo = tmp_path
     with patch("scripts.ppe_operator_git_sync.pull_enabled", return_value=True):

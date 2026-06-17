@@ -431,6 +431,10 @@ def run_deterministic_slice(
         slice_obj=slice_obj,
         marker_repo=repo,
     )
+    if not expected_path.is_file():
+        msg = f"ppe_slice_worker: relay_result not written at {expected_path}"
+        print(msg, file=sys.stderr)
+        return 2, None
     code, text = orch.relay_resume(repo_root=wt)
     print(text)
     relay_dir = relay_run_dir_for_worktree(wt, run_id)
