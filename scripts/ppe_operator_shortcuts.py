@@ -19,6 +19,7 @@ VM_SHORTCUTS: dict[str, str | None] = {
     "VM STOP": "VM_STOP.cmd",
     "VM START": "VM_START.cmd",
     "VM RESTART": "VM_RESTART.cmd",
+    "VM AUTO": "VM_AUTO.cmd",
     "VM UPDATE": "VM_UPDATE.cmd",
 }
 
@@ -26,8 +27,6 @@ DESKTOP_SHORTCUTS: dict[str, str | None] = {
     "PPE Repo (Desktop)": None,
     "DESKTOP BUILD": "DESKTOP_BUILD.cmd",
     "DESKTOP CONTINUE": "DESKTOP_CONTINUE.cmd",
-    "DESKTOP AUTO START": "DESKTOP_AUTO_START.cmd",
-    "DESKTOP AUTO STOP": "DESKTOP_AUTO_STOP.cmd",
     "DESKTOP STOP": "DESKTOP_STOP.cmd",
 }
 

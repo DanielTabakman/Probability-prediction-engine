@@ -1,0 +1,5 @@
+@echo off
+REM OPT-IN ONLY — do not create on daily PC unless you know you want desktop auto.
+REM Default: automation runs on the VM only. See VM_AUTO.cmd on the VM.
+
+set "PPE_DESKTOP_AUTO=1"
