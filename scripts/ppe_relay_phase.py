@@ -238,6 +238,7 @@ def _run_phase_slices(
                 phase_plan=(repo / plan_path).resolve(),
                 slice_id=slice_id,
                 build_branch=build_branch,
+                relay_run_dir=relay_run_dir,
             )
             if rc == 100:
                 continue

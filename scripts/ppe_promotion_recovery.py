@@ -263,6 +263,7 @@ def try_recover(
     phase_plan: Path,
     slice_id: str,
     build_branch: str,
+    relay_run_dir: Path | None = None,
 ) -> int:
     if exit_code == 0:
         return 0
@@ -276,7 +277,7 @@ def try_recover(
     if remaining:
         print(f"ppe_promotion_recovery: queue health {len(remaining)} issue(s) remain")
 
-    run_dir = _find_newest_relay_run(repo)
+    run_dir = relay_run_dir.resolve() if relay_run_dir is not None else _find_newest_relay_run(repo)
     relay = _load_relay_result(run_dir) if run_dir else None
     decision = _load_decision(run_dir) if run_dir else None
     dec_val = (decision or {}).get("decision") if decision else None

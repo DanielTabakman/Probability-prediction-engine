@@ -19,6 +19,7 @@ def main(argv: list[str] | None = None) -> int:
 
     job_path = args.job.resolve()
     result: dict = {"ok": False, "reason": "worker failed"}
+    repo: Path | None = None
     try:
         job = json.loads(job_path.read_text(encoding="utf-8"))
         repo = Path(str(job["repo_root"])).resolve()
@@ -41,6 +42,9 @@ def main(argv: list[str] | None = None) -> int:
             log_path=log_path,
         )
     finally:
+        if repo is not None:
+            lock = repo / "artifacts" / "orchestrator" / "REMOTE_RUN_LOCAL_LOCK.json"
+            lock.unlink(missing_ok=True)
         if args.delete_job and job_path.is_file():
             job_path.unlink(missing_ok=True)
 
