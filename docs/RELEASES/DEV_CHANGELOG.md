@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `eacb0f7` — fix(control-plane): VM watchdog task repetition duration for Task Scheduler (#200) (`scripts/`)
+- `dd0ee46` — Control-plane: dev changelog
 - `eda8bea` — ops(control-plane): automate operator pair bootstrap + VM watchdog task (#199) (`docs/SOP/`)
 - `d1e3457` — control-plane: user_state charter witnesses + VM/desktop operator backlog (#198)
 - `4d7c7a4` — ops(control-plane): VM+desktop operator backlog implementation (#197) (`docs/SOP/`)
