@@ -13,7 +13,7 @@ from scripts.ppe_notify_push import (
     load_ntfy_snooze,
     quiet_hours_until_local,
 )
-from scripts.ppe_operator_hint import append_ppe_go_hint, ppe_go_hint_for_verdict
+from scripts.ppe_operator_hint import append_ppe_go_hint, is_procedural_relay_text, ppe_go_hint_for_verdict
 
 _SLICE_RE = re.compile(r"\[([^\]]+)\]")
 
@@ -50,6 +50,8 @@ def _clean_blocker(blocker: str | None, *, verdict: str, slice_id: str | None) -
     if "PPE_SKIP_ACP" in text or "IDE_PRODUCT_READY" in text:
         if slice_id:
             return f"Slice {slice_id} needs an IDE BUILD in Cursor."
+    if is_procedural_relay_text(text):
+        return "Relay auto-advancing — no action needed on your phone."
     text = re.sub(r"\s*\([^)]*PPE_[^)]*\)", "", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text[:280]

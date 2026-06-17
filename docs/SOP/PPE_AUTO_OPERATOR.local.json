@@ -4,6 +4,7 @@
   "enabled": true,
   "notes": "No API credits: deterministic relay; product BUILD in Cursor IDE, then run_ppe_local.cmd. See PPE_IDE_NATIVE_OPERATOR_V1.md.",
   "propagateBacklog": true,
+  "focusGate": false,
   "stewardCharter": false,
   "workerMode": "deterministic",
   "skipAcp": true,
@@ -23,7 +24,7 @@
   "guards": {
     "enabled": true,
     "blockProductUnderGlobalDeterministic": true,
-    "stopOnContextEscalate": true,
+    "stopOnContextEscalate": false,
     "stopOnContextWatch": false,
     "maxPhaseSlices": 6,
     "phaseSliceBatching": true,

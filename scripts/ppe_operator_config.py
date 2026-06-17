@@ -109,6 +109,21 @@ def guard_stop_sleep_seconds(repo_root: Path) -> int:
         return 300
 
 
+def focus_gate_enabled(repo_root: Path) -> bool:
+    """Env PPE_FOCUS_GATE overrides; else focusGate in operator profile (default on)."""
+    env = os.environ.get("PPE_FOCUS_GATE", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    cfg = load_operator_config(repo_root)
+    if cfg.get("focusGate") is False:
+        return False
+    if cfg.get("focusGate") is True:
+        return True
+    return True
+
+
 def keep_loop_alive_on_guard_stop(repo_root: Path) -> bool:
     cfg = load_operator_config(repo_root)
     if cfg.get("keepLoopAliveOnGuardStop") is False:
@@ -178,6 +193,10 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
         _set("PPE_AUTO_REMOTE_BUILD", "1")
     else:
         _set("PPE_AUTO_REMOTE_BUILD", "0")
+    if focus_gate_enabled(repo_root):
+        _set("PPE_FOCUS_GATE", "1")
+    else:
+        _set("PPE_FOCUS_GATE", "0")
     handoff = cfg.get("ideHandoff")
     if isinstance(handoff, dict) and handoff.get("enabled") is not False:
         _set("PPE_IDE_HANDOFF", "1")
