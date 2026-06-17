@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `7f9b76f` — docs(control-plane): operator process v1 + align runbooks with VM layout ADR (#205) (`docs/SOP/`)
+- `0bd9632` — docs(control-plane): PPE operator layout ADR + policy hard rules (#204) (`docs/SOP/`)
+- `3677151` — Control-plane: dev changelog
 - `cd3ae51` — control-plane: relay closeout hardening (#203) (`scripts/`)
 - `1c76933` — control-plane: relay pytest retry + skip-slow env propagation (#202) (`scripts/`)
 - `e653143` — control-plane: skip slow pytest tier in local relay worktrees (#201) (`scripts/`)
