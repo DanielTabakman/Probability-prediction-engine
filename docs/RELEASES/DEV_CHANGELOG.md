@@ -2,8 +2,17 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-17
+
+- MSOS-UserStateV1-Product-Slice002 (PRODUCT): Command Center PPE snapshot bridge (#184) (`apps/msos-web/`)
+- `0d85ae8` — ops(control-plane): VM bootstrap, loop-host guard fix, prod wiring closeout (#183) (`docs/SOP/`)
+- `70bf9c9` — ops(platform): add VM check_vm_loop and setup_vm_loop_host helpers (#182)
+- `d7a4bd4` — ops(platform): fix VM headless loop popup cmd windows (#181) (`scripts/`)
+- `928bac2` — Control-plane: dev changelog
+
 ## 2026-06-16
 
+- `f5a7485` — ops(platform): double-click VM operator (no copy-paste) (#186)
 - `ffa90c7` — ops: fix_vm_stop_all.cmd stop popups and visible logon task (#180)
 - `c2c5421` — Control-plane: dev changelog
 - `e2aa753` — ops: fix_vm_headless.cmd stop popup windows on loop host (#179)
