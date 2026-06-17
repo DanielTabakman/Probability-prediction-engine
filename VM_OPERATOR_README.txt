@@ -37,6 +37,8 @@ ON THE DESKTOP (folder: C:\Users\USER\Desktop\Probability-prediction-engine)
 ----------------------------------------------------------------------------
 DESKTOP BUILD     — double-click: open Cursor + start IDE BUILD (clipboard prompt)
 DESKTOP CONTINUE  — double-click: after PR merged, advance VM relay (SSH)
+DESKTOP AUTO START — run once after login: PC pushes BUILD/CONTINUE for you
+DESKTOP AUTO STOP  — turn off auto helper
 DESKTOP_STOP.cmd  — run if this PC shows operator popups
 
 Run setup_operator_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop (also runs automatically from DESKTOP_BUILD / VM_UPDATE).
