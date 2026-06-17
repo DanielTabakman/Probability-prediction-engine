@@ -19,10 +19,25 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 ## Daily (local profile)
 
-1. `git checkout main && git pull` — relay closeout patches `docs/SOP` on `main`.
-2. `python scripts/ppe_operator_status.py` — preflight + verdict before looping.
-3. `run_ppe_auto_local_loop.cmd` — startup runs health gate (`--skip-relay`) then writes `OPERATOR_STATUS.md`; read it if the loop stops at preflight (exit 7).
-4. Optional: `workflow_metrics.cmd session start` at desk open
+**Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Process:** [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)
+
+### VM loop host
+
+1. Stack runs via logon task or `VM_RESTART.cmd` — no daily git pull from phone.
+2. `ppe_autobuilder.cmd status --brief` when triaging.
+3. `fix_vm_operator.cmd` when relay stuck.
+
+### Desktop (IDE BUILD)
+
+1. `git pull` before BUILD sessions.
+2. `DESKTOP_BUILD.cmd` on `IDE_BUILD` ntfy.
+3. `DESKTOP_CONTINUE.cmd` after product PR merges.
+
+### Legacy single-machine (no VM)
+
+1. `git checkout main && git pull`
+2. `python scripts/ppe_operator_status.py`
+3. `run_ppe_auto_local_loop.cmd` — only when VM is **not** the loop host
 
 ---
 
@@ -78,8 +93,11 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `weekly_digest_monday.cmd` | `workflow_radar` + `generate` + `notify` — **Task Scheduler** entry (Monday 04:00) |
 | `install_weekly_radar_monday_task.cmd` | Register Monday 04:00 local Task Scheduler job (run once) |
 | `install_weekly_digest_monday_task.cmd` | Legacy alias — prefer `install_weekly_radar_monday_task.cmd` |
-| `start_ppe_desktop_operator.cmd` | Desktop stack: auto-loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)) |
+| `bootstrap_operator_pair.cmd` | One-shot desktop IDE-only + VM SSH setup ([`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)) |
+| `VM_RESTART.cmd` / `VM_STATUS.cmd` | **VM** loop host stack ([`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)) |
+| `DESKTOP_BUILD.cmd` / `DESKTOP_CONTINUE.cmd` | **Desktop** IDE BUILD handoff |
 | [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) | Paste prompt for new Cursor Agent chat on desktop |
+| `start_ppe_desktop_operator.cmd` | **Legacy** — desktop stack when no VM; do not use on daily PC with VM live |
 | `watch_operator_mobile.cmd` | ntfy push on verdict change or loop death (`PPE_NTFY_TOPIC`) |
 
 **Monday popup (local):** Task Scheduler — use **cmd.exe** (paths with spaces break if you paste the `.cmd` directly):

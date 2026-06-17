@@ -98,59 +98,64 @@ Disable: `set PPE_GIT_SYNC=0`, `set PPE_GIT_SYNC_PULL=0`, or `set PPE_GIT_SYNC_M
 
 ---
 
-## Daily start (desktop)
+## Daily start
 
-**One command** (git pull, propagate queue, ensure loop + watch, print verdict):
-
-```bat
-run_ppe_desktop_operator.cmd
-```
-
-Low-level (opens two cmd windows only — no queue/stack check):
+### VM (loop host)
 
 ```bat
-start_ppe_desktop_operator.cmd
+VM_RESTART.cmd
+REM or after one-time install: logon task starts stack automatically
+VM_STATUS.cmd
 ```
+
+### Desktop (IDE BUILD only — no loop)
+
+```bat
+REM one-time:
+setup_desktop_ide_only.cmd
+REM when ntfy says IDE_BUILD:
+DESKTOP_BUILD.cmd
+```
+
+**Legacy (no VM):** `run_ppe_desktop_operator.cmd` / `start_ppe_desktop_operator.cmd` — deprecated when Hyper-V VM is live.
 
 ---
 
 ## Phone workflow when ntfy fires
 
-### Quick triage (Termius)
+### Quick triage (Termius → VM)
 
 ```bat
-cd C:\Users\USER\Desktop\Probability-prediction-engine
-run_ppe_operator.cmd --brief
+cd C:\Users\ppeloop\Probability-prediction-engine
+ppe_autobuilder.cmd status --brief
 type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ```
 
-### Fix with Cursor Agent (Microsoft Remote Desktop)
+### IDE BUILD (desktop Cursor — default)
 
-1. Open **Microsoft Remote Desktop** → connect to `desktop-ge39o15`
-2. Open **Cursor** on the desktop
-3. New Agent thread → load `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` or `AGENT_CONTINUITY_BRIEF.md`
-4. Agent implements / fixes; commit happens on desktop
-5. Loop auto-pulls/pushes — or run `run_ppe_local.cmd` if verdict is `RUN_LOCAL`
+1. On **daily PC**: double-click **DESKTOP BUILD** (or open starter in Cursor)
+2. Gate → commit → PR → **DESKTOP CONTINUE** after merge
+3. VM loop continues relay automatically
 
 ### Verdict matrix
 
-| Verdict | Phone (Termius) | Phone (RDP + Cursor) | Loop auto |
-|---------|-----------------|----------------------|-----------|
-| `SUPPLY_LOW` | Nothing — idle | — | — |
-| `RUN_AUTO` | Watch | — | Runs relay |
-| `RUN_LOCAL` | `run_ppe_local.cmd` | Agent if stuck | Pull + publish |
-| `IDE_BUILD` | Send **`build`** on ntfy | **Cursor Agent BUILD** (or **`build`** from phone) | Pull after push |
-| `ERROR` / `STALE_STATE` | Read reports; restart stack | Agent fix | — |
+| Verdict | Phone | Desktop | VM loop |
+|---------|-------|---------|---------|
+| `SUPPLY_LOW` | Nothing | — | idle |
+| `RUN_AUTO` / `RUN_LOCAL` | — | — | auto relay |
+| `IDE_BUILD` | Read hint | **DESKTOP BUILD** | waits |
+| `ERROR` / `STALE_STATE` | SSH triage | steward chat | `fix_vm_operator.cmd` |
+| `STACK_DOWN` | — | — | **VM_RESTART** |
 
-Restart stack from phone (Termius):
+Restart stack from phone (SSH to **VM**):
 
 ```bat
-start_ppe_desktop_operator.cmd
+VM_RESTART.cmd
 ```
 
 ### Remote commands (ntfy app — no SSH)
 
-When `watch_ntfy_commands.cmd` is running (started automatically by `start_ppe_desktop_operator.cmd`), publish a message **to your ntfy topic** from the phone app:
+When `watch_ntfy_commands.cmd` is running on the **VM** (started by headless stack), publish a message **to your ntfy topic** from the phone app:
 
 | Message | What happens |
 |---------|----------------|
