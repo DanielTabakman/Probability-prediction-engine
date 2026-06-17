@@ -400,6 +400,25 @@ def cmd_write_notify_payload(repo: Path) -> int:
     if click_url:
         summary["click_url"] = click_url
     summary.update(build_phone_digest_notify(summary))
+    try:
+        from scripts.ppe_human_backlog import (
+            open_items,
+            phone_snippet_lines,
+            render_markdown,
+            write_notify_snippet,
+        )
+
+        (repo / "docs/SOP/HUMAN_STEWARD_BACKLOG.md").write_text(
+            render_markdown(repo), encoding="utf-8"
+        )
+        write_notify_snippet(repo)
+        snippet = phone_snippet_lines(repo)
+        if snippet:
+            summary["human_backlog_open"] = len(open_items(repo))
+            body = str(summary.get("phone_body") or "").strip()
+            summary["phone_body"] = f"{body}\n\n" + "\n".join(snippet) if body else "\n".join(snippet)
+    except ImportError:
+        pass
     out = notify_payload_path(repo)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

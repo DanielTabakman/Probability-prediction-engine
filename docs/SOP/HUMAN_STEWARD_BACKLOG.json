@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "notes": "Policy and architecture topics for human review — not auto-loop work. Edit items here; run python scripts/ppe_human_backlog.py render-md to refresh the readable doc. Weekly ntfy digest includes open high-priority titles.",
+  "items": [
+    {
+      "id": "product_lane_automation",
+      "title": "Product lane automation",
+      "status": "open",
+      "priority": "high",
+      "category": "architecture",
+      "summary": "Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.",
+      "policyQuestion": "Stay near-zero-API (local profile) vs pay for full autonomous product slices?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "relay_decision_reconcile",
+      "title": "Relay decision model reconcile",
+      "status": "open",
+      "priority": "medium",
+      "category": "control-plane",
+      "summary": "AUTO_ADVANCE decision (or fold Rule 7b into CONTINUE); align CODEX_AUTONOMY §15 with implementation; auto PR on REPO_STATE_DRIFT for all slice kinds.",
+      "policyQuestion": "How much steward judgment should remain vs machine CONTINUE?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "guard_framework_v2",
+      "title": "Guard framework v2",
+      "status": "open",
+      "priority": "medium",
+      "category": "operator",
+      "summary": "Per-guard block|warn|off policy; context bands advisory-only; drop maxPhaseSlices in favor of batch window only.",
+      "policyQuestion": "Which guards should ever hard-stop the loop vs notify only?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "focus_validation_lifecycle",
+      "title": "Focus / validation lifecycle",
+      "status": "open",
+      "priority": "low",
+      "category": "governance",
+      "summary": "Per-chapter evidence gates in backlog; retire global P8 report gate; re-enable only during tester cohort windows.",
+      "policyQuestion": "When does validation report gate come back after interim COMPLETE?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "selection_backlog_governance",
+      "title": "SELECTION and backlog governance",
+      "status": "open",
+      "priority": "medium",
+      "category": "governance",
+      "summary": "Auto-charter scaffold rows; steward API charter on local profile; parallel MSOS tracks with explicit dependency DAG.",
+      "policyQuestion": "Can MSOS chapters run in parallel or stay strictly linear blocked chains?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "infra_ops_hardening",
+      "title": "Infrastructure / ops hardening",
+      "status": "open",
+      "priority": "low",
+      "category": "operator",
+      "summary": "Health gate warn-only for non-critical issues; soften preflight dirty-tree in sandbox; auto-heal STALE_STATE without exit 7.",
+      "policyQuestion": "How much repo drift is acceptable during operator sandbox?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "founder_canon_policy",
+      "title": "Founder / canon policy",
+      "status": "open",
+      "priority": "high",
+      "category": "governance",
+      "summary": "Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions.",
+      "policyQuestion": "What stays human-only forever vs delegated envelope?",
+      "added": "2026-06-17"
+    },
+    {
+      "id": "observability_human_signal",
+      "title": "Observability — human vs informational stops",
+      "status": "open",
+      "priority": "low",
+      "category": "operator",
+      "summary": "OPERATOR_STATUS needs_human vs informational_stop; skip ntfy on auto-recovered exit 20; workflow radar noise reduction.",
+      "policyQuestion": "What deserves a phone ping vs weekly digest only?",
+      "added": "2026-06-17"
+    }
+  ]
+}
