@@ -15,9 +15,16 @@ echo [check_vm_loop] PPE_LOOP_HOST=%PPE_LOOP_HOST%
 echo [check_vm_loop] PPE_STACK_HEADLESS=%PPE_STACK_HEADLESS%
 echo.
 
-call "%CD%\ppe_autobuilder.cmd" status --brief
+echo [check_vm_loop] Loading... please wait about 10 seconds.
+echo.
+
+python "%CD%\scripts\ppe_operator_env.py"
+if errorlevel 1 goto done
+
+python -u "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" status --brief
 set "RC=%ERRORLEVEL%"
 
+:done
 echo.
 if /i "%~1"=="--no-pause" exit /b %RC%
 echo Press any key to close this window...
