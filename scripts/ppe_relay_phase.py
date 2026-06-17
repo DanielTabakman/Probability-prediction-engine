@@ -14,6 +14,23 @@ from scripts.ppe_slice_worker_mode import resolve_declared_plane, resolve_worker
 from scripts.ppe_promotion_recovery import try_recover
 
 
+def _commit_manifest_delta(repo: Path, message: str) -> None:
+    """Local relay pins manifest status on main so worktree preflight stays clean."""
+    if os.environ.get("PPE_OPERATOR_PROFILE", "").strip().lower() != "local":
+        return
+    proc = subprocess.run(
+        ["git", "status", "--porcelain", "docs/SOP/ACTIVE_PHASE_MANIFEST.json"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if not (proc.stdout or "").strip():
+        return
+    subprocess.run(["git", "add", "docs/SOP/ACTIVE_PHASE_MANIFEST.json"], cwd=repo, check=False)
+    subprocess.run(["git", "commit", "-m", message], cwd=repo, check=False)
+
+
 def _run_slice_cmd(
     repo: Path,
     *,
@@ -134,6 +151,7 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
         manifest["phasePlanPath"] = plan_path.replace("\\", "/")
         manifest["sprintSpecPath"] = sprint_default
         save_manifest(repo, manifest)
+        _commit_manifest_delta(repo, "ops(local): manifest RUNNING for relay pass")
     except Exception as e:
         print(f"WARN: manifest RUNNING: {e}")
 
@@ -160,6 +178,7 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
             status = str(manifest.get("status") or "").upper()
             if status == "RUNNING":
                 set_manifest_status(repo, "READY")
+                _commit_manifest_delta(repo, "ops(local): manifest READY after relay pass")
                 print("ppe_relay_phase: manifest RUNNING -> READY (pass complete)")
         except Exception as e:
             print(f"WARN: manifest READY after pass: {e}")
