@@ -7,17 +7,20 @@ from pathlib import Path
 PPE_GO_CMD = "ppe_go.cmd"
 PPE_GO_HINT = f"{PPE_GO_CMD} → new Agent → Ctrl+V → Enter"
 
+from scripts.ppe_do_the_thing import BUTTON_NAME
+
 DESKTOP_BUILD_CMD = "DESKTOP BUILD"
 DESKTOP_CONTINUE_CMD = "DESKTOP CONTINUE"
+DO_THE_THING_CMD = BUTTON_NAME
 VM_RESTART_CMD = "VM_RESTART"
 
 VERDICT_BUTTON_HINTS: dict[str, str] = {
     "IDE_BUILD": (
-        f"Desktop PC: double-click **{DESKTOP_BUILD_CMD}** → `@ppe-build-worker` + starter in Agent. "
-        f"After merge: **{DESKTOP_CONTINUE_CMD}** (SSH finish on VM)."
+        f"Desktop PC: double-click **{DO_THE_THING_CMD}** (or **{DESKTOP_BUILD_CMD}**) → Agent BUILD. "
+        f"After merge: press **{DO_THE_THING_CMD}** again (runs CONTINUE on VM)."
     ),
-    "RUN_LOCAL": "VM relay finishes automatically when the stack is up — no action needed.",
-    "STACK_DOWN": f"VM: double-click **{VM_RESTART_CMD}** (or VM_AUTO). Desktop must stay loop-off.",
+    "RUN_LOCAL": f"VM relay finishes automatically when the stack is up — or double-click **{DO_THE_THING_CMD}**.",
+    "STACK_DOWN": f"VM: double-click **{DO_THE_THING_CMD}** or **{VM_RESTART_CMD}** (or VM_AUTO). Desktop must stay loop-off.",
     "FIX_PLAN": f"VM: **VM_STATUS** → **fix_vm_operator.cmd** or vm_bootstrap --recover. Desktop: steward chat.",
     "STALE_STATE": f"VM: **fix_vm_operator.cmd** (vm_bootstrap --recover). Check VM_STATUS.",
     "ERROR": f"VM: **VM_STATUS** + artifacts/orchestrator/LAST_RUN_REPORT.md. VM_RESTART if stack_loop=False.",

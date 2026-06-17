@@ -15,6 +15,7 @@ STATE_REL = "artifacts/orchestrator/OPERATOR_SHORTCUTS_STATE.json"
 
 VM_SHORTCUTS: dict[str, str | None] = {
     "PPE Operator Folder": None,
+    "DO THE THING": "DO_THE_THING.cmd",
     "VM STATUS": "VM_STATUS.cmd",
     "VM STOP": "VM_STOP.cmd",
     "VM START": "VM_START.cmd",
@@ -23,8 +24,11 @@ VM_SHORTCUTS: dict[str, str | None] = {
     "VM UPDATE": "VM_UPDATE.cmd",
 }
 
+BUTTON_NAME = "DO THE THING"
+
 DESKTOP_SHORTCUTS: dict[str, str | None] = {
     "PPE Repo (Desktop)": None,
+    "DO THE THING": "DO_THE_THING.cmd",
     "DESKTOP BUILD": "DESKTOP_BUILD.cmd",
     "DESKTOP CONTINUE": "DESKTOP_CONTINUE.cmd",
     "DESKTOP STOP": "DESKTOP_STOP.cmd",
