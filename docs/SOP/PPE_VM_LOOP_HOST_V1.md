@@ -219,13 +219,18 @@ Guard script: `scripts/ppe_loop_host_guard.py` · wired into `run_ppe_headless_s
 
 | Problem | Fix |
 |---------|-----|
-| Stack misbehaving | VM: `run_ppe_headless_stack.cmd --stop` then `--ensure` |
+| Stack misbehaving / popups | VM: **`VM_STOP.cmd`** → close blank windows → **`VM_RESTART.cmd`** once |
+| Check health | VM: **`VM_STATUS.cmd`** (wait ~10s for `PHASE=` line) |
+| Missing scripts on VM | VM: **`VM_UPDATE.cmd`** or `git pull origin main` |
+| Stack misbehaving (CLI) | VM: `run_ppe_headless_stack.cmd --stop` then `--ensure` |
 | Stuck `RUN_LOCAL` / split state | VM: `vm_bootstrap.cmd` then `fix_vm_operator.cmd` |
 | First boot / after checkpoint | VM: `setup_vm_loop_host.cmd` then `vm_bootstrap.cmd --recover` |
-| Daily status | VM: `check_vm_loop.cmd` |
+| Daily status (CLI) | VM: `check_vm_loop.cmd` or `ppe_autobuilder.cmd status --brief` |
 | Worse | Hyper-V → Restore checkpoint **clean-base** → re-run Phase 4–5 |
-| Host focus storms | Confirm no PPE processes on host: `ppe_autobuilder.cmd status` |
+| Host focus storms | Desktop: **`DESKTOP_STOP.cmd`** · confirm `ppe_operator_no_loop.local.cmd` exists |
 | `stack_forbidden` on VM | Remove `ppe_operator_no_loop.local.cmd` (or run `setup_vm_loop_host.cmd` — renames to `.off-vm`) |
+
+**Operator card:** [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) · **Session handoff:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
 
 ---
 
