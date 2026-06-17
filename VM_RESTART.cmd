@@ -5,6 +5,8 @@ REM Same as running VM_STOP then VM_START, but in the right order automatically.
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
+python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
+
 echo [VM_RESTART] step 1/5 — git pull...
 git pull origin main
 if errorlevel 1 (

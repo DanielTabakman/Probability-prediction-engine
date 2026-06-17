@@ -5,6 +5,8 @@ REM Pulls latest code, stops old workers, starts headless loop once.
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
+python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
+
 echo [VM_START] step 1/4 — git pull...
 git pull origin main
 if errorlevel 1 (
