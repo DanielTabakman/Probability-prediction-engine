@@ -198,30 +198,30 @@ python scripts\ppe_operator_git_sync.py --pull
 
 ## When loop stops (desktop / phone)
 
-| Verdict | Phone SSH (Termius) | Phone RDP + Cursor | Loop auto |
-|---------|---------------------|--------------------|-----------|
-| `IDE_BUILD` | Read `OPERATOR_GUARD_REPORT.md` | Agent BUILD on desktop | `git pull` each pass |
-| `RUN_LOCAL` | `run_ppe_local.cmd` | — | pull + publish |
-| `SUPPLY_LOW` | Nothing — idle | — | — |
-| Loop died | `start_ppe_desktop_operator.cmd` | — | — |
+| Verdict | Phone SSH (Termius) | Desktop | VM loop |
+|---------|---------------------|---------|---------|
+| `IDE_BUILD` | Read guard report | **DESKTOP BUILD** | waits |
+| `RUN_LOCAL` | — | — | auto `run_ppe_local` |
+| `STACK_DOWN` | — | — | **VM_RESTART** |
+| Loop died on VM | `VM_STATUS` / `VM_RESTART` | — | — |
 
-Phone triage commands:
+Phone triage (VM):
 
 ```bat
-run_ppe_operator.cmd --brief
+ppe_autobuilder.cmd status --brief
 type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ```
 
 ---
 
-## Git sync between laptop and desktop
+## Git sync between machines
 
 ```
-Any machine (Cursor BUILD) → push → GitHub → desktop loop auto-pulls each pass
-Closeout on desktop → auto-push + PR (no manual phone git)
+Desktop Cursor BUILD → push → GitHub → VM auto-pulls on loop pass
+After merge → DESKTOP CONTINUE (finish on VM)
 ```
 
-Desktop is the **primary** loop host and recommended Cursor Agent machine. Laptop remains optional.
+**VM** is the loop host; **desktop** is IDE BUILD only. See [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md).
 
 ---
 

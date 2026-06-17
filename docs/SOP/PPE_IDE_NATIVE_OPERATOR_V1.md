@@ -4,7 +4,9 @@
 
 **Checklist:** [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
 
-**Desktop loop host:** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
+**Operator layout (canonical):** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
+
+**Desktop IDE BUILD setup:** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) · [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 
 ---
 
@@ -13,7 +15,7 @@
 | When | Command |
 |------|---------|
 | **VM loop** (24/7) | Hyper-V VM: **`VM_RESTART.cmd`** · status: **`VM_STATUS.cmd`** — see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) |
-| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `ppe_go.cmd` → new Agent chat → **Ctrl+V** → Enter — or enable **DESKTOP AUTO START** (runs BUILD/CONTINUE for you) |
+| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `DESKTOP_BUILD.cmd` → paste in Agent — **not** `run_ppe_local` on desktop |
 
 `ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. It does **not** run the product BUILD or `run_ppe_local` — the director/build worker handles that after you paste the prompt.
 

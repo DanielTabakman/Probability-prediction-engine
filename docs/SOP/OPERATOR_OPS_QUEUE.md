@@ -1,6 +1,6 @@
 # Operator ops queue — high priority (non-product)
 
-**Plane:** CONTROL-PLANE · **Not** a relay chapter — operator / VM tasks from the VM+desktop cutover backlog.
+**Plane:** CONTROL-PLANE · **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Not** a relay chapter — operator / VM tasks from the VM+desktop cutover backlog.
 
 Mark `status: done` when complete. Product sequence continues via `PHASE_CHAPTER_BACKLOG.json`.
 
