@@ -210,7 +210,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 2",
-      "reason": "[HIGH] Command Center bridge \u2014 read-only PPE snapshots; honest KPIs/current work \u2014 blocked until production wiring COMPLETE"
+      "reason": "[HIGH] Command Center bridge \u2014 read-only PPE snapshots; honest KPIs/current work \u2014 relay ACTIVE (product slice DONE #184)"
     },
     {
       "chapterId": "msos_workflow_persistence_v1",
