@@ -17,7 +17,7 @@ set "PPE_SKIP_ACP=1"
 set "PPE_STACK_HEADLESS=1"
 
 echo [fix_vm_headless] stopping any visible stack first...
-call "%CD%\fix_vm_stop_all.cmd"
+call "%CD%\fix_vm_stop_all.cmd" --no-pause
 if errorlevel 1 exit /b %ERRORLEVEL%
 
 echo [fix_vm_headless] starting headless stack (no popup windows)...

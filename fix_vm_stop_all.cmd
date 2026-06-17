@@ -30,5 +30,9 @@ echo.
 echo [fix_vm_stop_all] DONE.
 echo   - Close any blank cmd windows still open (click X).
 echo   - Loop is STOPPED. Popups should NOT come back until you start headless again.
-echo   - To start clean (no popups): fix_vm_headless.cmd
+echo   - To start clean (no popups): VM_START.cmd
+if /i "%~1"=="--no-pause" exit /b 0
+echo.
+echo Press any key to close this window...
+pause >nul
 exit /b 0

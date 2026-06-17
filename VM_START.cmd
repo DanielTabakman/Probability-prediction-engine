@@ -14,7 +14,7 @@ if errorlevel 1 (
 
 echo.
 echo [VM_START] step 2/4 — stop old workers (prevents popup storm)...
-call "%~dp0fix_vm_stop_all.cmd"
+call "%~dp0fix_vm_stop_all.cmd" --no-pause
 timeout /t 5 /nobreak >nul
 
 echo.

@@ -15,4 +15,10 @@ echo [check_vm_loop] PPE_STACK_HEADLESS=%PPE_STACK_HEADLESS%
 echo.
 
 call "%CD%\ppe_autobuilder.cmd" status --brief
-exit /b %ERRORLEVEL%
+set "RC=%ERRORLEVEL%"
+
+echo.
+if /i "%~1"=="--no-pause" exit /b %RC%
+echo Press any key to close this window...
+pause >nul
+exit /b %RC%
