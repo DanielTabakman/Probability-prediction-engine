@@ -13,6 +13,7 @@ ppe_operator_near_zero_api.local.cmd
 ppe_operator_cursor.local.cmd
 ppe_operator_loop_host.local.cmd
 ppe_operator_no_loop.local.cmd
+ppe_operator_no_loop.local.cmd.off-vm
 ops/restic/env.local
 
 # Data and DB (optional: remove if you want to track sample DB)
