@@ -72,6 +72,13 @@ def _materialize_ide_product_in_worktree(
     print("ppe_slice_worker: warn — could not checkout IDE product ref in worktree")
 
 
+def _skip_slow_pytest() -> bool:
+    """Local relay worktrees skip slow tier; full gate runs slow on CI/pre-push."""
+    if os.environ.get("PPE_SKIP_SLOW_PYTEST", "").strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    return os.environ.get("PPE_SKIP_ACP", "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def _pytest_count(repo: Path) -> tuple[str, int]:
     proc = subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "-m", "not slow"],
@@ -87,6 +94,8 @@ def _pytest_count(repo: Path) -> tuple[str, int]:
         return "PASS", 0
     m = re.search(r"(\d+)\s+passed", tail[-1])
     count = int(m.group(1)) if m else 0
+    if _skip_slow_pytest():
+        return "PASS", count
     slow = subprocess.run(
         [sys.executable, "-m", "pytest", "-q", "-m", "slow"],
         cwd=repo,
