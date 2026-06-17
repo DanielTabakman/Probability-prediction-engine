@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { WorkflowSummary } from "@/lib/msosWorkflowStore";
+import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import {
   calibrationStrip,
   headlines,
@@ -9,11 +9,17 @@ import {
 } from "@/data/commandCenterFixtures";
 
 type Props = {
-  workflow: WorkflowSummary;
+  summary: CommandCenterSummary;
 };
 
-export function CommandCenterContent({ workflow }: Props) {
-  const hasWorkflow = workflow.kpis.some((kpi) => kpi.value !== "0") || workflow.currentWork.length > 0;
+function statusPill(summary: CommandCenterSummary): string {
+  if (summary.status === "live") return "PPE snapshots live";
+  if (summary.status === "empty") return "No PPE snapshots yet";
+  return "PPE snapshot feed unavailable";
+}
+
+export function CommandCenterContent({ summary }: Props) {
+  const hasLiveData = summary.status === "live" && summary.currentWork.length > 0;
 
   return (
     <>
@@ -25,7 +31,7 @@ export function CommandCenterContent({ workflow }: Props) {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            {hasWorkflow ? "MSOS workflow live" : "MSOS workflow empty"}
+            {statusPill(summary)}
           </span>
           <span className="btn slim">Share view</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
@@ -56,7 +62,7 @@ export function CommandCenterContent({ workflow }: Props) {
       </section>
 
       <section className="kpi-row" aria-label="Key metrics">
-        {workflow.kpis.map((kpi) => (
+        {summary.kpis.map((kpi) => (
           <div key={kpi.label} className="kpi">
             <div className="label">{kpi.label}</div>
             <div className={`num ${kpi.tone ?? ""}`.trim()}>{kpi.value}</div>
@@ -64,7 +70,12 @@ export function CommandCenterContent({ workflow }: Props) {
           </div>
         ))}
       </section>
-      <p className="panel-sub workflow-source-label">{workflow.sourceLabel}</p>
+      <p className="panel-sub workflow-source-label">{summary.sourceLabel}</p>
+      {summary.status === "degraded" && summary.degradedReason ? (
+        <p className="panel-sub degraded-feed-note" role="status">
+          Snapshot feed degraded: {summary.degradedReason}. Showing unavailable state — not fixture preview data.
+        </p>
+      ) : null}
 
       <section className="grid command-layout">
         <div className="panel">
@@ -109,22 +120,26 @@ export function CommandCenterContent({ workflow }: Props) {
           <div className="panel-head">
             <div>
               <h2>Current work</h2>
-              <div className="panel-sub">Lifecycle states stay explicit — sim-only expression.</div>
+              <div className="panel-sub">From PPE snapshots — recent freezes and review status.</div>
             </div>
           </div>
-          {workflow.currentWork.length === 0 ? (
-            <p className="panel-sub">No thesis or expression saved in the MSOS workflow store yet.</p>
-          ) : (
-            workflow.currentWork.map((item) => (
-              <div key={`${item.name}-${item.tag}`} className="strategy">
-                <div className="row">
-                  <span className="name">{item.name}</span>
-                  <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
-                </div>
-                <p>{item.detail}</p>
+          {summary.status === "degraded" ? (
+            <p className="panel-sub">
+              Snapshot database unavailable. Connect read-only access to PPE frozen evaluations to populate this panel.
+            </p>
+          ) : null}
+          {summary.status !== "degraded" && !hasLiveData ? (
+            <p className="panel-sub">No frozen evaluations in the PPE snapshot store yet.</p>
+          ) : null}
+          {summary.currentWork.map((item) => (
+            <div key={item.snapshotId} className="strategy">
+              <div className="row">
+                <span className="name">{item.name}</span>
+                <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
               </div>
-            ))
-          )}
+              <p>{item.detail}</p>
+            </div>
+          ))}
         </div>
 
         <div className="panel">
@@ -155,7 +170,7 @@ export function CommandCenterContent({ workflow }: Props) {
         </div>
       </section>
 
-      <p className="footer-note">Research demo — workflow store is sim-only; no live order transmitted</p>
+      <p className="footer-note">Research demo — KPIs from PPE snapshots (read-only); no live order transmitted</p>
     </>
   );
 }

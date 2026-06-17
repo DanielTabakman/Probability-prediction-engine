@@ -187,6 +187,7 @@
         "tests/test_msos_web_homepage.py",
         "tests/test_msos_web_strategy_lab.py",
         "tests/test_msos_web_command_center.py",
+        "tests/test_msos_web_user_state.py",
         "tests/test_msos_web_workflow_persistence.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",

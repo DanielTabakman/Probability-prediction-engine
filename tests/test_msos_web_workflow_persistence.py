@@ -41,13 +41,13 @@ def test_persistence_libs_call_server_api() -> None:
     assert 'fetch("/api/theses/expression"' in expression
 
 
-def test_command_center_uses_workflow_summary() -> None:
+def test_command_center_uses_snapshot_summary() -> None:
     page = (MSOS_WEB / "src" / "app" / "command-center" / "page.tsx").read_text(encoding="utf-8")
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "loadWorkflowSummary" in page
-    assert "workflow.kpis" in content
-    assert "workflow.currentWork" in content
-    assert "workflow.sourceLabel" in content
+    assert "loadCommandCenterSummary" in page
+    assert "summary.kpis" in content
+    assert "summary.currentWork" in content
+    assert "From PPE snapshots" in content
     assert "Preview data healthy" not in content
 
 

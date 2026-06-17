@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { CommandCenterContent } from "@/components/CommandCenterContent";
-import { loadWorkflowSummary } from "@/lib/msosWorkflowStore";
+import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
 
 export const metadata: Metadata = {
   title: "Command Center | Market Structure OS",
   description:
-    "Authenticated MSOS workspace overview — thesis workflow KPIs from the MSOS server store.",
+    "Authenticated MSOS workspace overview — recent PPE snapshot freezes and review status.",
 };
 
 export default async function CommandCenterPage() {
-  const workflow = await loadWorkflowSummary();
+  const summary = loadCommandCenterSummary();
   return (
     <AppShell activeNavId="command-center">
-      <CommandCenterContent workflow={workflow} />
+      <CommandCenterContent summary={summary} />
     </AppShell>
   );
 }
