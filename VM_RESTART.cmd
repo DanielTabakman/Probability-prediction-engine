@@ -23,11 +23,9 @@ timeout /t 30 /nobreak
 
 echo.
 echo [VM_RESTART] step 4/5 — ensure loop-host env + start headless stack...
-if not exist "%CD%\ppe_operator_loop_host.local.cmd" (
-  if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
-    copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
-    echo [VM_RESTART] created ppe_operator_loop_host.local.cmd
-  )
+if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
+  copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
+  echo [VM_RESTART] refreshed ppe_operator_loop_host.local.cmd
 )
 set "PPE_OPERATOR_PROFILE=local"
 set "PPE_SKIP_ACP=1"

@@ -8,6 +8,7 @@ set "PYTHONPATH=%CD%"
 if exist "%CD%\ppe_operator_loop_host.local.cmd" call "%CD%\ppe_operator_loop_host.local.cmd"
 if exist "%CD%\call_ppe_operator_local.cmd" call "%CD%\call_ppe_operator_local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
+set "PPE_STACK_HEADLESS=1"
 
 echo [check_vm_loop] repo=%CD%
 echo [check_vm_loop] PPE_LOOP_HOST=%PPE_LOOP_HOST%
