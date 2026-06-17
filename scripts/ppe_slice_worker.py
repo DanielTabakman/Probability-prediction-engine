@@ -79,6 +79,12 @@ def _skip_slow_pytest() -> bool:
     return os.environ.get("PPE_SKIP_ACP", "").strip().lower() in ("1", "true", "yes", "on")
 
 
+def _pytest_env(repo: Path) -> dict[str, str]:
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(repo.resolve())
+    return env
+
+
 def _pytest_count(repo: Path) -> tuple[str, int]:
     last_err = ""
     for attempt in range(2):
@@ -88,6 +94,7 @@ def _pytest_count(repo: Path) -> tuple[str, int]:
             capture_output=True,
             text=True,
             check=False,
+            env=_pytest_env(repo),
         )
         if proc.returncode == 0:
             break
@@ -112,6 +119,7 @@ def _pytest_count(repo: Path) -> tuple[str, int]:
         capture_output=True,
         text=True,
         check=False,
+        env=_pytest_env(repo),
     )
     if slow.returncode != 0:
         return "FAIL", count

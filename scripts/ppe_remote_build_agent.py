@@ -197,7 +197,36 @@ def build_ide_prompt(*, slice_id: str, plan_path: str, starter_rel: str, note: s
     return "\n".join(parts)
 
 
+RUN_LOCAL_LOCK_REL = "artifacts/orchestrator/REMOTE_RUN_LOCAL_LOCK.json"
+
+
+def _read_run_local_lock(repo: Path) -> dict[str, Any] | None:
+    path = repo / RUN_LOCAL_LOCK_REL
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
 def _run_local_detached(repo: Path) -> dict[str, Any]:
+    from scripts.ppe_remote_agent_spawn import process_alive
+
+    lock = _read_run_local_lock(repo)
+    if lock:
+        pid = lock.get("worker_pid")
+        try:
+            if pid is not None and process_alive(int(pid)):
+                return {
+                    "started": False,
+                    "reason": f"run_local already in flight (pid={pid})",
+                    "worker_pid": int(pid),
+                }
+        except (TypeError, ValueError):
+            pass
+
     log_path = repo / "artifacts/orchestrator/REMOTE_RUN_LOCAL.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text(f"run_local detached start {_utc_now()}\n", encoding="utf-8")
@@ -220,6 +249,13 @@ def _run_local_detached(repo: Path) -> dict[str, Any]:
     except OSError as exc:
         job_path.unlink(missing_ok=True)
         return {"started": False, "reason": f"failed to spawn run_local worker: {exc}"}
+
+    lock_path = repo / RUN_LOCAL_LOCK_REL
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path.write_text(
+        json.dumps({"worker_pid": proc.pid, "started_at": _utc_now()}, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
     return {
         "started": True,
