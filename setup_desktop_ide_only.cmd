@@ -31,9 +31,9 @@ if exist "%CD%\run_ppe_headless_stack.cmd" call "%CD%\run_ppe_headless_stack.cmd
 
 echo.
 echo [setup_desktop_ide_only] step 3 — remove legacy logon tasks (if any)...
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-  "Unregister-ScheduledTask -TaskName 'PPE Desktop Operator' -Confirm:$false -ErrorAction SilentlyContinue; ^
-   Unregister-ScheduledTask -TaskName 'PPE Headless Stack' -Confirm:$false -ErrorAction SilentlyContinue" 2>nul
+schtasks /Delete /TN "PPE Desktop Operator" /F 2>nul
+schtasks /Delete /TN "PPE Desktop Operator Watchdog" /F 2>nul
+schtasks /Delete /TN "PPE Headless Stack" /F 2>nul
 
 echo.
 echo [setup_desktop_ide_only] step 4 — desktop shortcuts...
