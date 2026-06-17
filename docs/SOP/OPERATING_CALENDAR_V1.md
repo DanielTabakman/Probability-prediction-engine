@@ -12,9 +12,12 @@
 |------|----------|
 | 1–2 tester sessions OR log why skipped | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | Check loop verdict (`run_ppe_operator.cmd --brief`) | `artifacts/orchestrator/OPERATOR_GUARD_REPORT.md` |
+| Scan **human steward backlog** (policy topics) | [`HUMAN_STEWARD_BACKLOG.md`](HUMAN_STEWARD_BACKLOG.md) · Monday ntfy digest |
 | VPS / research beta CTA if still pending | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 
 **Agents:** not required unless `IDE_BUILD` / `ERROR`.
+
+**Monday ntfy (one-time on loop host VM):** `powershell -File scripts\install_weekly_digest_task.ps1 -RepoRoot "%CD%"` — runs `weekly_digest_monday.cmd` (radar + digest + human backlog titles).
 
 ---
 
@@ -24,6 +27,7 @@
 |------|----------|
 | Update playbook **Current stage** table | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) |
 | Review backlog rows — tier + priority still honest | [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) + [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) |
+| **Human steward backlog** — pick one policy/architecture topic | [`HUMAN_STEWARD_BACKLOG.md`](HUMAN_STEWARD_BACKLOG.md) · `python scripts/ppe_human_backlog.py --status` |
 | Metrics vs playbook checkpoints (return rate, paid interest) | [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) draft sections |
 | Log any `urgent: true` bypass — was it justified? | Reality checks or report §3 |
 
