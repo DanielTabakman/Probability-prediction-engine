@@ -4,7 +4,7 @@
 
 **Agent:** `@ppe-autobuilder-operator` · **Entry:** `ppe_autobuilder.cmd`
 
-**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md)
+**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
 
 ---
 
@@ -12,6 +12,7 @@
 
 | You want | Command / agent |
 |----------|-----------------|
+| **Which button?** | [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) |
 | **Status snapshot** | `ppe_autobuilder.cmd status` |
 | **Diagnose stuck pipeline** | `ppe_autobuilder.cmd diagnose` or `@ppe-autobuilder-operator diagnose the autobuilder` |
 | **Auto-fix current phase** | `ppe_autobuilder.cmd advance` |

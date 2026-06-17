@@ -167,13 +167,17 @@ run_ppe_headless_stack.cmd --stop
 
 ## Phase 6 — Auto-start at VM logon (optional)
 
-Inside VM, Task Scheduler or:
+Inside VM, double-click once:
 
 ```bat
-install_ppe_desktop_operator_task.cmd
+install_ppe_vm_headless_logon_task.cmd
 ```
 
-Ensure task runs `run_ppe_headless_stack.cmd --ensure` (not legacy windowed `start_ppe_desktop_operator.cmd`).
+This registers Task Scheduler task **PPE Headless Stack** → `run_ppe_headless_stack.cmd --ensure` at user logon.
+
+To remove: `powershell -File scripts\install_ppe_vm_headless_logon_task.ps1 -RepoRoot . -Unregister`
+
+**Do not** use `install_ppe_desktop_operator_task.cmd` on the VM or daily PC (legacy windowed stack).
 
 ---
 

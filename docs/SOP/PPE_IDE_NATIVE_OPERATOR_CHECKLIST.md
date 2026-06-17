@@ -6,21 +6,28 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Bootstrap
 
-- [ ] Repo includes phase 1+2 operator files (`run_ppe_auto_local_loop.cmd`, `mark_ide_product_ready.cmd`).
-- [ ] On `main` (or merge PR with operator changes) before treating this as canonical.
-- [ ] `docs/SOP/PPE_AUTO_OPERATOR.json` shows `stewardCharter: false`, `skipAcp: true`.
-- [ ] **Desktop first-time:** Cursor Agent on desktop → [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md) (loop host + ntfy + Tailscale).
+- [ ] Repo includes operator files (`VM_*.cmd`, `DESKTOP_*.cmd`, `run_ppe_auto_local_loop.cmd`).
+- [ ] On `main` before treating layout as canonical.
+- [ ] **VM once:** [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md) + `setup_vm_loop_host.cmd` + `install_ppe_vm_headless_logon_task.cmd`.
+- [ ] **Desktop once:** `setup_desktop_ide_only.cmd` — [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md).
 
 ---
 
-## Daily run
+## Daily run (two machines)
 
-- [ ] On **`main`** (or sync before loop): `git checkout main && git pull`.
-- [ ] **Preflight:** `python scripts/ppe_operator_status.py` — read `artifacts/orchestrator/OPERATOR_STATUS.md` before starting the loop.
-- [ ] **Desktop (always-on):** `start_ppe_desktop_operator.cmd` — loop + mobile watch ([`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)).
-- [ ] Or manually: `run_ppe_auto_local_loop.cmd` from repo root (health gate + preflight write `OPERATOR_STATUS.md`) + optional `watch_operator_mobile.cmd`.
-- [ ] Optional second terminal: `.\scripts\watch_ppe_live.ps1`.
-- [ ] Queue fed: `queued` rows in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (local profile does **not** steward-charter when idle).
+- [ ] **VM:** `VM_STATUS.cmd` — expect `stack_loop=True` and sensible `PHASE=` / `VERDICT=`.
+- [ ] **Desktop:** loop **off** (`ppe_operator_no_loop.local.cmd`); use Cursor for IDE BUILD only.
+- [ ] Phone ntfy: follow button hint in message ([`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)).
+- [ ] `IDE_BUILD` ping → desktop `DESKTOP_BUILD.cmd`; after merge → `DESKTOP_CONTINUE.cmd`.
+- [ ] VM `STACK_DOWN` → `VM_RESTART.cmd` on VM (not on desktop).
+
+---
+
+## Daily run (legacy single-machine — deprecated)
+
+- [ ] On **`main`**: `git pull`.
+- [ ] **Preflight:** `python scripts/ppe_operator_status.py`.
+- [ ] Only if no VM: `start_ppe_desktop_operator.cmd` — prefer VM layout above.
 
 ---
 

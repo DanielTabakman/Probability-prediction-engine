@@ -7,7 +7,8 @@ set "PYTHONPATH=%CD%"
 
 python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
 
-echo [VM_RESTART] step 1/5 — git pull...
+echo [VM_RESTART] step 1/5 — git hygiene + pull...
+python "%CD%\scripts\ppe_vm_bootstrap.py" --repo-root "%CD%" --no-sync --no-queue-repair --no-run-local 2>nul
 git pull origin main
 if errorlevel 1 (
   echo [VM_RESTART] git pull failed — fix network or conflicts, then try again.

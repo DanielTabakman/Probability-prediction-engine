@@ -1,10 +1,12 @@
 # Desktop operator setup — Cursor Agent starter
 
-**Plane:** CONTROL-PLANE only. **Machine:** always-on Windows **desktop** (loop host).
+**Plane:** CONTROL-PLANE only.
 
-**Purpose:** one Agent thread on the desktop walks the operator through bootstrap — no copy-paste from laptop chat.
+**Layout (Hyper-V VM live):** **VM = loop host 24/7** · **Desktop = Cursor IDE BUILD only**. Canonical map: [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
 
-**Canonical runbook:** [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
+**Purpose:** one Agent thread on the **desktop** walks IDE-BUILD-only setup — no loop, no API spend.
+
+**Canonical runbook:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) (loop details: [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md))
 
 ---
 
@@ -14,26 +16,27 @@ Do this **once** on the laptop before you close Cursor there:
 
 1. **Nothing to save in chat** — instructions live in this repo on GitHub.
 2. **Working tree clean?** `git status` should show nothing to commit (or commit/push anything you still need).
-3. **On `main`:** `git checkout main` then `git pull` (or use branch `desktop-sync` tracking `origin/main`).
-4. **Ignore old stashes** — `git stash list` may show orchestrator WIP from past branches; **do not apply** on desktop (stale manifest/queue). Drop later with `git stash clear` if you want.
-5. **On desktop:** clone or `git pull`, open this folder in Cursor, paste the prompt below.
+3. **On `main`:** `git checkout main` then `git pull`.
+4. **On desktop:** clone or `git pull`, run **`setup_desktop_ide_only.cmd`** once, open this folder in Cursor.
 
-GitHub `main` is the single source of truth — desktop and laptop are just clones.
+GitHub `main` is the single source of truth — desktop and VM are clones.
 
 ---
 
 ## What to paste in a new Cursor Agent chat (desktop)
 
 ```
-You are setting up this Windows desktop as the PPE loop host (zero API spend).
+You are setting up this Windows desktop for PPE IDE BUILD only (zero API spend).
+The Hyper-V VM runs the operator loop — NOT this machine.
 
 Read and follow ONLY:
+@docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md
 @docs/SOP/DESKTOP_OPERATOR_SETUP_STARTER.md
-@docs/SOP/PPE_MOBILE_OPERATOR_V1.md
+@docs/SOP/OPERATOR_BUTTON_MAP.md
 
 Walk me one step at a time. Run verification commands yourself. Stop after each step until I confirm.
-Do NOT start ACP, run_ppe_auto_acp_loop, or steward charter.
-Do NOT do product IDE BUILD on this machine unless I ask — laptop handles BUILD; desktop runs the loop.
+Do NOT start the loop, run_ppe_auto_local_loop, or install PPE Desktop Operator logon tasks on this PC.
+Do NOT copy ppe_operator_loop_host.local.cmd to the desktop.
 ```
 
 ---
@@ -42,27 +45,26 @@ Do NOT do product IDE BUILD on this machine unless I ask — laptop handles BUIL
 
 | Do | Do not |
 |----|--------|
-| Run commands in **this repo root** on the desktop | Product slice implementation unless operator asks |
-| Verify each step before the next | `run_ppe_auto_acp_loop.cmd` / API relay |
-| Create `ppe_operator_notify.local.cmd` from example (gitignored) | Commit secrets or `ppe_operator_notify.local.cmd` |
-| Create `ppe_operator_git.local.cmd` from example (gitignored) | Commit secrets or `ppe_operator_git.local.cmd` |
-| Use local profile only | Paste laptop chat history |
+| Run **`setup_desktop_ide_only.cmd`** | Install loop-host token on desktop |
+| Verify `ppe_operator_no_loop.local.cmd` exists | `run_ppe_auto_local_loop.cmd` / headless stack on desktop |
+| Install shortcuts via `setup_desktop_shortcuts.cmd` | `PPE Desktop Operator` scheduled task |
+| Use **DESKTOP BUILD / CONTINUE / STOP** | `DESKTOP_AUTO` unless operator explicitly opts in |
 
-**Three devices:** desktop = loop host · phone = ntfy + SSH triage · laptop = Cursor BUILD.
+**Three devices:** VM = loop host · desktop = IDE BUILD · phone = ntfy + SSH triage.
 
 ---
 
-## Prerequisite: repo has mobile operator files
+## Prerequisite: repo has operator files
 
 From repo root, agent checks:
 
 ```bat
-dir start_ppe_desktop_operator.cmd
+dir DESKTOP_BUILD.cmd
+dir setup_desktop_ide_only.cmd
 dir scripts\ppe_notify_push.py
-dir watch_operator_mobile.cmd
 ```
 
-If missing: `git pull origin main` (after mobile-operator PR merged) or ask operator which branch to checkout.
+If missing: `git pull origin main`.
 
 ---
 

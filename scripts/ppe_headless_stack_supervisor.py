@@ -324,8 +324,17 @@ def run_supervisor(repo: Path, *, poll_seconds: int = DEFAULT_POLL_SECONDS) -> i
     if spawned:
         print(f"started workers: {', '.join(spawned)}", flush=True)
 
+    poll_ticks = 0
     while True:
         time.sleep(max(5, poll_seconds))
+        poll_ticks += 1
+        if poll_ticks % 20 == 0:
+            try:
+                from scripts.ppe_vm_watchdog import maybe_supervisor_tick
+
+                maybe_supervisor_tick(repo)
+            except Exception as exc:
+                append_supervisor_log(repo, f"watchdog tick failed: {exc}")
         spawned = ensure_workers(repo, log_handles=log_handles, state=state)
         if spawned:
             print(f"restarted workers: {', '.join(spawned)}", flush=True)
