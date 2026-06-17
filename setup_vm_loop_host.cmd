@@ -13,6 +13,12 @@ if not exist "%SRC%" (
 )
 
 copy /Y "%SRC%" "%DEST%" >nul
+if exist "%CD%\ppe_operator_no_loop.local.cmd" (
+  if not exist "%CD%\ppe_operator_no_loop.local.cmd.off-vm" (
+    ren "%CD%\ppe_operator_no_loop.local.cmd" ppe_operator_no_loop.local.cmd.off-vm
+    echo [setup_vm_loop_host] disabled daily-driver no_loop guard on this VM
+  )
+)
 echo [setup_vm_loop_host] wrote %DEST%
 type "%DEST%"
 exit /b 0

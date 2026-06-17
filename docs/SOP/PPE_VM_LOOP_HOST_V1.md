@@ -220,8 +220,12 @@ Guard script: `scripts/ppe_loop_host_guard.py` · wired into `run_ppe_headless_s
 | Problem | Fix |
 |---------|-----|
 | Stack misbehaving | VM: `run_ppe_headless_stack.cmd --stop` then `--ensure` |
+| Stuck `RUN_LOCAL` / split state | VM: `vm_bootstrap.cmd` then `fix_vm_operator.cmd` |
+| First boot / after checkpoint | VM: `setup_vm_loop_host.cmd` then `vm_bootstrap.cmd --recover` |
+| Daily status | VM: `check_vm_loop.cmd` |
 | Worse | Hyper-V → Restore checkpoint **clean-base** → re-run Phase 4–5 |
 | Host focus storms | Confirm no PPE processes on host: `ppe_autobuilder.cmd status` |
+| `stack_forbidden` on VM | Remove `ppe_operator_no_loop.local.cmd` (or run `setup_vm_loop_host.cmd` — renames to `.off-vm`) |
 
 ---
 
