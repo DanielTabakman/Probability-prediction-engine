@@ -15,9 +15,11 @@ ON THE VM (folder: C:\Users\ppeloop\Probability-prediction-engine)
 1. VM_STOP.cmd     — run this FIRST if popups appear (or before any restart)
 2. VM_STATUS.cmd   — check if loop is healthy (window stays open)
 3. VM_START.cmd    — run ONCE after STOP, when you want the loop running
+4. VM_RESTART.cmd  — STOP + wait + START in one click (use instead of START alone)
 
 Order when fixing problems:
   VM_STOP  ->  close blank windows by hand  ->  wait 30 seconds  ->  VM_START once
+  Or just: VM_RESTART (does stop + wait + start for you)
 
 If popups return after VM_START: run VM_STOP again and stop — ask for help.
 
