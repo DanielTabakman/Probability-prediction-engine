@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `5ea46d7` — control-plane: relay closeout hardening (witness sync + run-local dedupe) (#210) (`scripts/`)
+- `a6f18b3` — docs(control-plane): sync MSOS steering after production wiring closeout (#209) (`docs/SOP/`)
+- `d9d1f20` — control-plane: IDE BUILD friction fixes (#208) (`scripts/`)
+- `36e1ef2` — control-plane: sync witness tests after IDE product detach in relay (#207) (`scripts/`)
+- `b24e20c` — ops(control-plane): human steward backlog + autoRemoteBuild closeout (#206) (`docs/SOP/`)
+- `c60c189` — Control-plane: dev changelog
 - `7f9b76f` — docs(control-plane): operator process v1 + align runbooks with VM layout ADR (#205) (`docs/SOP/`)
 - `0bd9632` — docs(control-plane): PPE operator layout ADR + policy hard rules (#204) (`docs/SOP/`)
 - `3677151` — Control-plane: dev changelog
