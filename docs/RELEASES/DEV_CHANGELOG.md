@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `eda8bea` — ops(control-plane): automate operator pair bootstrap + VM watchdog task (#199) (`docs/SOP/`)
+- `d1e3457` — control-plane: user_state charter witnesses + VM/desktop operator backlog (#198)
+- `4d7c7a4` — ops(control-plane): VM+desktop operator backlog implementation (#197) (`docs/SOP/`)
+- `849cd4d` — Control-plane: dev changelog
 - `742ad0b` — Control-plane: dev changelog
 - `193de4a` — Control-plane: dev changelog
 - `9e5c423` — Control-plane: dev changelog
