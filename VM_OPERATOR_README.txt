@@ -35,9 +35,11 @@ If popups return after VM_START: run VM_STOP again and stop — ask for help.
 
 ON THE DESKTOP (folder: C:\Users\USER\Desktop\Probability-prediction-engine)
 ----------------------------------------------------------------------------
+DESKTOP BUILD     — double-click: open Cursor + start IDE BUILD (clipboard prompt)
+DESKTOP CONTINUE  — double-click: after PR merged, advance VM relay (SSH)
 DESKTOP_STOP.cmd  — run if this PC shows operator popups
 
-Do NOT run VM_START or install_ppe_desktop_operator_task on the desktop.
+Run setup_desktop_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop.
 
 
 WHY COPY-PASTE FAILED
