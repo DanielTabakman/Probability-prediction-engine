@@ -17,10 +17,22 @@ for /f "tokens=2" %%a in ('tasklist /fi "imagename eq python.exe" /fo list ^| fi
   wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine" >nul
   if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
 )
+for /f "tokens=2" %%a in ('tasklist /fi "imagename eq pythonw.exe" /fo list ^| findstr /i "PID:"') do (
+  wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine" >nul
+  if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
+)
+for /f "tokens=2" %%a in ('tasklist /fi "imagename eq cmd.exe" /fo list ^| findstr /i "PID:"') do (
+  wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /i "Probability-prediction-engine run_ppe PPE auto loop watch_operator" >nul
+  if not errorlevel 1 taskkill /PID %%a /F >nul 2>&1
+)
 
 echo.
 echo [fix_vm_stop_all] DONE.
 echo   - Close any blank cmd windows still open (click X).
 echo   - Loop is STOPPED. Popups should NOT come back until you start headless again.
-echo   - To start clean (no popups): fix_vm_headless.cmd
+echo   - To start clean (no popups): VM_START.cmd
+if /i "%~1"=="--no-pause" exit /b 0
+echo.
+echo Press any key to close this window...
+pause >nul
 exit /b 0
