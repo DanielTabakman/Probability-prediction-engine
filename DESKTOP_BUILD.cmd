@@ -7,6 +7,8 @@ set "PYTHONPATH=%CD%"
 if exist "%CD%\ppe_operator_no_loop.local.cmd" call "%CD%\ppe_operator_no_loop.local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
 
+python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
+
 echo [DESKTOP_BUILD] Checking operator status...
 echo.
 

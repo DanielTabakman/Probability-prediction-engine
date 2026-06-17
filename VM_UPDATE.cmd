@@ -24,6 +24,10 @@ if errorlevel 1 (
 )
 
 echo.
+echo [VM_UPDATE] refreshing Desktop shortcuts if needed...
+python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet
+
+echo.
 echo [VM_UPDATE] OK. You should now see these files in this folder:
 echo   VM_STOP.cmd   VM_STATUS.cmd   VM_START.cmd   check_vm_loop.cmd
 dir /b VM_*.cmd check_vm_loop.cmd 2>nul

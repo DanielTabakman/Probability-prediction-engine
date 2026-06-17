@@ -39,7 +39,7 @@ DESKTOP BUILD     — double-click: open Cursor + start IDE BUILD (clipboard pro
 DESKTOP CONTINUE  — double-click: after PR merged, advance VM relay (SSH)
 DESKTOP_STOP.cmd  — run if this PC shows operator popups
 
-Run setup_desktop_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop.
+Run setup_operator_shortcuts.cmd once to put BUILD/CONTINUE on your Desktop (also runs automatically from DESKTOP_BUILD / VM_UPDATE).
 
 
 WHY COPY-PASTE FAILED

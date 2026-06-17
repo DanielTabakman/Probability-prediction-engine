@@ -27,7 +27,7 @@ Use this doc when opening a **new Cursor thread** after VM/desktop operator work
 | `VM_START.cmd` | Start loop once (after STOP) |
 | `VM_RESTART.cmd` | STOP → wait 30s → START (preferred) |
 
-Desktop shortcuts: run `setup_vm_desktop_shortcuts.cmd` once on VM (or use shortcuts already on VM Desktop).
+Desktop shortcuts: run `setup_operator_shortcuts.cmd` once (or auto from **DESKTOP_BUILD** / **VM_UPDATE**).
 
 **Remote triage from daily PC:** `ssh ppeloop@desktop-caqll8k` — see [`PPE_CURSOR_REMOTE_SSH_V1.md`](PPE_CURSOR_REMOTE_SSH_V1.md).
 
