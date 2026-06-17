@@ -3,3 +3,4 @@ REM VM ONLY — copy to ppe_operator_loop_host.local.cmd on PPE-Loop-Host (gitig
 REM Required to start run_ppe_headless_stack / auto-loop on this machine.
 
 set "PPE_LOOP_HOST=1"
+set "PPE_STACK_HEADLESS=1"

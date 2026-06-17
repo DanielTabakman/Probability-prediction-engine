@@ -18,8 +18,8 @@ def _win32_hidden_flags() -> int:
     if sys.platform != "win32":
         return 0
     flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
-    if hasattr(subprocess, "CREATE_NO_WINDOW"):
-        flags |= subprocess.CREATE_NO_WINDOW  # type: ignore[attr-defined]
+    no_window = getattr(subprocess, "CREATE_NO_WINDOW", 0x08000000)
+    flags |= no_window
     return flags
 
 

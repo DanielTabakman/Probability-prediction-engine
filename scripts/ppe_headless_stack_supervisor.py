@@ -123,6 +123,7 @@ def _operator_env(repo: Path) -> dict[str, str]:
     env.setdefault("PPE_OPERATOR_PROFILE", "local")
     env.setdefault("PPE_SKIP_ACP", "1")
     env.setdefault("PPE_WORKER_MODE", "deterministic")
+    env.setdefault("PPE_STACK_HEADLESS", "1")
     return env
 
 
