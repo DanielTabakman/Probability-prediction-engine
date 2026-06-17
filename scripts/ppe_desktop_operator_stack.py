@@ -11,7 +11,7 @@ from typing import Any
 
 from scripts.ppe_operator_config import headless_stack_mode
 
-LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd|ppe_headless_loop_worker\.py"
+LOOP_CMD_PATTERN = r"run_ppe_auto_local_loop|run_ppe_auto_loop\.cmd|ppe_headless_loop_worker\.py|ppe_headless_auto_loop_entry\.py"
 HEADLESS_SUPERVISOR_PATTERN = r"ppe_headless_stack_supervisor\.py"
 WATCH_CMD_PATTERN = r"watch_operator_mobile\.ps1|ppe_watch_operator_mobile\.py"
 LOCAL_TRIGGER_WATCHER_PATTERN = r"ppe_ide_build_local_watcher\.py|watch_ide_build_local\.cmd"

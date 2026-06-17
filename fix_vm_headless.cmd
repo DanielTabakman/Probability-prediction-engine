@@ -11,9 +11,9 @@ set "PPE_OPERATOR_PROFILE=local"
 set "PPE_SKIP_ACP=1"
 set "PPE_STACK_HEADLESS=1"
 
-echo [fix_vm_headless] stopping visible + headless stacks...
-call "%CD%\run_ppe_headless_stack.cmd" --stop
-timeout /t 3 /nobreak >nul
+echo [fix_vm_headless] stopping any visible stack first...
+call "%CD%\fix_vm_stop_all.cmd"
+if errorlevel 1 exit /b %ERRORLEVEL%
 
 echo [fix_vm_headless] starting headless stack (no popup windows)...
 call "%CD%\run_ppe_headless_stack.cmd" --ensure

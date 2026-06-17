@@ -10,12 +10,9 @@ from pathlib import Path
 
 
 def _hidden_flags() -> int:
-    if sys.platform != "win32":
-        return 0
-    flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS  # type: ignore[attr-defined]
-    if hasattr(subprocess, "CREATE_NO_WINDOW"):
-        flags |= subprocess.CREATE_NO_WINDOW  # type: ignore[attr-defined]
-    return flags
+    from scripts.ppe_remote_agent_spawn import _win32_hidden_flags
+
+    return _win32_hidden_flags()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -29,15 +26,16 @@ def main(argv: list[str] | None = None) -> int:
     env.setdefault("PPE_OPERATOR_PROFILE", "local")
     env.setdefault("PPE_SKIP_ACP", "1")
     env.setdefault("PPE_WORKER_MODE", "deterministic")
+    env.setdefault("PPE_STACK_HEADLESS", "1")
     env["PPE_HEADLESS_SUPERVISED_LOOP"] = "1"
 
-    script = repo / "run_ppe_auto_local_loop.cmd"
-    if not script.is_file():
-        print(f"ppe_headless_loop_worker: missing {script}", file=sys.stderr)
+    entry = repo / "scripts" / "ppe_headless_auto_loop_entry.py"
+    if not entry.is_file():
+        print(f"ppe_headless_loop_worker: missing {entry}", file=sys.stderr)
         return 1
 
     proc = subprocess.Popen(
-        ["cmd", "/c", str(script)],
+        [sys.executable, str(entry), "--repo-root", str(repo)],
         cwd=repo,
         env=env,
         stdin=subprocess.DEVNULL,
