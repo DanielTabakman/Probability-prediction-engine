@@ -92,9 +92,61 @@ def _poll_interval_sec() -> int:
 
 
 def trigger_dispatch_key(trigger: dict[str, Any]) -> str:
-    slice_id = str(trigger.get("sliceId") or "").strip()
-    handoff_at = str(trigger.get("handoffAt") or "").strip()
-    return f"{slice_id}:{handoff_at}" if slice_id and handoff_at else slice_id
+    """Dedup key — slice only so new handoffAt timestamps do not re-dispatch."""
+    return str(trigger.get("sliceId") or "").strip()
+
+
+def _dispatch_fail_cooldown_sec() -> int:
+    raw = os.environ.get("PPE_IDE_LOCAL_WATCHER_FAIL_COOLDOWN_SEC", "300").strip()
+    try:
+        return max(30, int(raw))
+    except ValueError:
+        return 300
+
+
+def _parse_utc(value: str) -> datetime | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def watcher_should_skip_cli(repo: Path) -> tuple[bool, str]:
+    """When True, local watcher must not spawn headless agent CLI."""
+    try:
+        from scripts.ppe_ide_handoff import should_attempt_headless_cli
+
+        if not should_attempt_headless_cli(repo, mode="build"):
+            from scripts.ppe_ide_handoff import cli_usage_exhausted, prefer_ide_over_cli
+
+            if prefer_ide_over_cli(repo):
+                return True, "prefer_ide_over_cli"
+            if cli_usage_exhausted(repo):
+                return True, "cli_usage_exhausted"
+            return True, "headless_cli_disabled"
+    except ImportError:
+        pass
+    return False, ""
+
+
+def _slice_dispatch_blocked(state: dict[str, Any], slice_id: str) -> str | None:
+    """Return skip reason when this slice was already dispatched or in fail cooldown."""
+    last = state.get("last_dispatch") if isinstance(state.get("last_dispatch"), dict) else {}
+    if str(last.get("slice_id") or "") != slice_id:
+        return None
+    if last.get("started"):
+        return f"already dispatched for slice {slice_id}"
+    updated = _parse_utc(str(state.get("updatedAt") or ""))
+    if updated is not None:
+        age = (datetime.now(timezone.utc) - updated).total_seconds()
+        if age < _dispatch_fail_cooldown_sec():
+            return f"dispatch fail cooldown ({int(_dispatch_fail_cooldown_sec() - age)}s left)"
+    return None
 
 
 def build_trigger_watcher_prompt(*, slice_id: str, plan_path: str, starter_rel: str) -> str:
@@ -170,6 +222,14 @@ def try_dispatch_from_trigger(repo: Path, trigger: dict[str, Any]) -> dict[str, 
     dispatch_key = trigger_dispatch_key(trigger)
     state = load_state(repo)
     last_dispatch = state.get("last_dispatch") if isinstance(state.get("last_dispatch"), dict) else {}
+    blocked = _slice_dispatch_blocked(state, slice_id)
+    if blocked:
+        return {
+            "action": "local_trigger_watcher",
+            "skipped": True,
+            "reason": blocked,
+            "dispatch_key": dispatch_key,
+        }
     if state.get("last_dispatch_key") == dispatch_key and last_dispatch.get("started"):
         return {
             "action": "local_trigger_watcher",
@@ -184,6 +244,26 @@ def try_dispatch_from_trigger(repo: Path, trigger: dict[str, Any]) -> dict[str, 
             "action": "local_trigger_watcher",
             "skipped": True,
             "reason": f"build already in flight for {slice_id}",
+            "dispatch_key": dispatch_key,
+        }
+
+    skip_cli, skip_reason = watcher_should_skip_cli(repo)
+    if skip_cli:
+        if state.get("last_cli_skip_slice") != slice_id:
+            append_log(repo, f"skip CLI dispatch for {slice_id}: {skip_reason}")
+            save_state(
+                repo,
+                {
+                    **state,
+                    "last_cli_skip_slice": slice_id,
+                    "last_cli_skip_reason": skip_reason,
+                },
+            )
+        return {
+            "action": "local_trigger_watcher",
+            "skipped": True,
+            "reason": skip_reason,
+            "slice_id": slice_id,
             "dispatch_key": dispatch_key,
         }
 
@@ -227,7 +307,11 @@ def try_dispatch_from_trigger(repo: Path, trigger: dict[str, Any]) -> dict[str, 
             {
                 **state,
                 "last_dispatch_key": dispatch_key,
-                "last_dispatch": {"started": False, **out},
+                "last_dispatch": {
+                    "started": False,
+                    "slice_id": slice_id,
+                    **out,
+                },
             },
         )
         return {"action": "local_trigger_watcher", "slice_id": slice_id, "dispatch_key": dispatch_key, **out}

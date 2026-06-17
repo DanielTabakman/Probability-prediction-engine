@@ -26,7 +26,27 @@ def test_local_trigger_watcher_disabled_by_env(tmp_path, monkeypatch):
 
 def test_trigger_dispatch_key():
     key = trigger_dispatch_key({"sliceId": "Slice002", "handoffAt": "2026-06-14T00:00:00Z"})
-    assert key == "Slice002:2026-06-14T00:00:00Z"
+    assert key == "Slice002"
+
+
+def test_try_dispatch_skips_cli_when_prefer_ide(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_IDE_LOCAL_TRIGGER_WATCHER", "1")
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "1")
+    write_trigger_pending(
+        tmp_path,
+        slice_id="MSOS-Slice002",
+        plan_path="docs/SOP/PHASE_PLANS/foo.json",
+        starter_rel="artifacts/orchestrator/IDE_BUILD_STARTER_MSOS-Slice002.md",
+        reason="test",
+        source="unit",
+    )
+    trigger = json.loads((tmp_path / TRIGGER_REL).read_text(encoding="utf-8"))
+    with patch("scripts.ppe_ide_build_local_watcher.agent_available", return_value=True):
+        with patch("scripts.ppe_ide_build_local_watcher.launch_agent_background") as launch:
+            result = try_dispatch_from_trigger(tmp_path, trigger)
+    assert result["skipped"] is True
+    assert result["reason"] == "prefer_ide_over_cli"
+    launch.assert_not_called()
 
 
 def test_try_dispatch_skips_idle(tmp_path):
@@ -36,6 +56,8 @@ def test_try_dispatch_skips_idle(tmp_path):
 
 def test_try_dispatch_starts_agent(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_IDE_LOCAL_TRIGGER_WATCHER", "1")
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "0")
+    monkeypatch.setenv("PPE_AUTO_REMOTE_BUILD", "1")
     write_trigger_pending(
         tmp_path,
         slice_id="MSOS-Slice002",
@@ -60,20 +82,23 @@ def test_try_dispatch_starts_agent(tmp_path, monkeypatch):
     assert data["workerPid"] == 4242
 
 
-def test_try_dispatch_dedupes_same_handoff(tmp_path, monkeypatch):
+def test_try_dispatch_dedupes_same_slice(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_IDE_LOCAL_TRIGGER_WATCHER", "1")
-    trigger = {
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "0")
+    monkeypatch.setenv("PPE_AUTO_REMOTE_BUILD", "1")
+    trigger_a = {
         "status": "pending",
         "sliceId": "MSOS-Slice002",
         "planPath": "docs/SOP/PHASE_PLANS/foo.json",
         "starter": "artifacts/orchestrator/IDE_BUILD_STARTER_MSOS-Slice002.md",
         "handoffAt": "2026-06-14T00:00:00Z",
     }
+    trigger_b = {**trigger_a, "handoffAt": "2026-06-14T00:01:00Z"}
     with patch("scripts.ppe_ide_build_local_watcher.agent_available", return_value=True):
         with patch("scripts.ppe_ide_build_local_watcher.launch_agent_background") as launch:
             launch.return_value = {"started": True, "worker_pid": 1}
-            first = try_dispatch_from_trigger(tmp_path, trigger)
-            second = try_dispatch_from_trigger(tmp_path, trigger)
+            first = try_dispatch_from_trigger(tmp_path, trigger_a)
+            second = try_dispatch_from_trigger(tmp_path, trigger_b)
     assert first["started"] is True
     assert second["skipped"] is True
     assert launch.call_count == 1

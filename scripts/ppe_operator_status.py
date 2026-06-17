@@ -390,7 +390,7 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
     out = repo / NOTIFY_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     verdict = str(status.get("verdict") or "")
-    body = append_ppe_go_hint(str(status.get("blocker") or _format_brief(status)), verdict)
+    body = append_ppe_go_hint(str(status.get("blocker") or _format_brief(status)), verdict, repo=repo)
     payload = {
         "as_of": status.get("as_of"),
         "verdict": status.get("verdict"),
@@ -437,6 +437,7 @@ def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
             body = append_ppe_go_hint(
                 str(auto_build.get("message") or "IDE BUILD ready."),
                 VERDICT_IDE_BUILD,
+                repo=repo,
             )
         else:
             title = f"PPE auto-build started: {auto_build.get('slice_id') or 'IDE_BUILD'}"

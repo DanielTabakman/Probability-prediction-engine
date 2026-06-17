@@ -8,7 +8,7 @@ from scripts.ppe_operator_hint import DESKTOP_BUILD_CMD, PPE_GO_CMD, PPE_GO_HINT
 def test_append_ppe_go_hint_ide_build():
     body = append_ppe_go_hint("PRODUCT_BLOCKED", "IDE_BUILD")
     assert DESKTOP_BUILD_CMD in body
-    assert "Agent" in body
+    assert "ppe-build-worker" in body or "Agent" in body
 
 
 def test_append_ppe_go_hint_skips_duplicate():

@@ -13,7 +13,7 @@ from typing import Any
 
 from scripts.ppe_ide_build_starter import starter_path, write_starter
 from scripts.ppe_notify_push import OUTBOUND_TAG, ntfy_configured, notify_enabled, send_ntfy
-from scripts.ppe_operator_hint import PPE_GO_HINT, append_ppe_go_hint
+from scripts.ppe_operator_hint import DESKTOP_BUILD_CMD, PPE_GO_HINT, append_ppe_go_hint
 
 HANDOFF_STATE_REL = "artifacts/orchestrator/IDE_HANDOFF_STATE.json"
 HANDOFF_NOW_REL = "artifacts/orchestrator/IDE_BUILD_NOW.md"
@@ -362,8 +362,8 @@ def write_handoff_now_doc(
             "",
             "## Do this",
             "",
-            f"1. Run **`ppe_go.cmd`** from repo root → new Agent → **Ctrl+V** → Enter",
-            f"2. Or manual: `@` `{starter_rel}` and paste the prompt below.",
+            f"1. Desktop: double-click **{DESKTOP_BUILD_CMD}** → new Agent → `@ppe-build-worker` + starter.",
+            f"2. Or load only `{starter_rel}` and follow **## When done (required)**.",
             "",
             "```text",
             prompt,
@@ -443,6 +443,7 @@ def launch_ide_handoff(
             "starter": starter_rel,
             "reason": reason,
             "source": source,
+            "force": force,
         },
     )
 
@@ -461,6 +462,7 @@ def launch_ide_handoff(
     body = append_ppe_go_hint(
         f"{reason}\n{HANDOFF_NOW_REL}.{clip_note}{auto_note}",
         "IDE_BUILD",
+        repo=repo,
     )
     notified = False
     # Watch/loop paths already push IDE_BUILD alerts; phone build gets notify_command_result.
