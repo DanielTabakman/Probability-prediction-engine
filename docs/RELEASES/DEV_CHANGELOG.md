@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `ce5fe19` — Control-plane: dev changelog
 - `2140a94` — Control-plane: dev changelog
 - `f4fd8fd` — Control-plane: dev changelog
 - `0a8a94e` — Control-plane: dev changelog
@@ -15,6 +16,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-16
 
+- `f2887c2` — ops(platform): always set PPE_STACK_HEADLESS in check_vm_loop (#190)
 - `eb00b15` — ops(platform): add VM_RESTART.cmd stop-wait-start shortcut (#189)
 - `4aeb02b` — ops(platform): VM desktop shortcuts and FIND_PPE_FOLDER (#188) (`scripts/`)
 - `d7bfabb` — ops(platform): add VM_UPDATE.cmd double-click git pull (#187)
