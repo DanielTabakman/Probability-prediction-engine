@@ -59,19 +59,25 @@ ALL_DECISIONS = frozenset(
 )
 
 # Section 14.2 stop_condition enum (10 values including null).
+# Legacy canon values below are not emitted by current workers; closeout is automated
+# via post_relay_continue / apply_control_closeout_v1 — they fall through to rule 8 if seen.
+LEGACY_REVIEW_STOP_CONDITIONS = frozenset(
+    {
+        "SELECTION_BOUNDARY_REACHED",
+        "CONTROL_PLANE_CLOSEOUT_NEEDED",
+    }
+)
 HARD_STOP_CONDITIONS = frozenset(
     {
         "PREFLIGHT_FAIL",
         "MIXED_PLANE_CONTAMINATION",
         "UNEXPECTED_CONTRACT_CHANGE",
         "REPO_STATE_DRIFT",
-        "SELECTION_BOUNDARY_REACHED",
-        "CONTROL_PLANE_CLOSEOUT_NEEDED",
     }
 )
 REVIEW_STOP_CONDITIONS = frozenset(
     {"SCOPE_AMBIGUITY", "UNCLEAR_TEST_RESULTS", "MAX_RETRIES_EXCEEDED"}
-)
+) | LEGACY_REVIEW_STOP_CONDITIONS
 ALL_STOP_CONDITIONS = HARD_STOP_CONDITIONS | REVIEW_STOP_CONDITIONS
 
 # Exit codes (RELAY_RUNTIME_V0 section 5, reconciled to canonical 4-value enum).

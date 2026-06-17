@@ -139,7 +139,13 @@ Relay chapters with a closeout block get a **PENDING** evidence stub automatical
 
 ### Control/smoke `STOP_FOR_REVIEW` in worktrees
 
-Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` in isolated worktrees — **normal**. Promotion recovery advances the phase; only product slices block on `IDE_PRODUCT_READY`.
+Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` in isolated worktrees — **normal, not a manual review**. `ppe_promotion_recovery` advances the phase automatically; `LAST_RUN_REPORT` buckets these as `auto_advance_promotion_recovery` with `awaiting_user: false`. **Only product slices** block on `IDE_PRODUCT_READY` (operator verdict `IDE_BUILD`).
+
+| Relay signal | You needed? |
+|--------------|-------------|
+| Exit 20 + evidence/control/smoke slice | **No** — loop continues |
+| Exit 20 + product `SCOPE_AMBIGUITY` | **Yes** — IDE BUILD + marker |
+| Guard exit **7** / `PRODUCT_BLOCKED` | **Yes** — `ppe_go.cmd` |
 
 ---
 
@@ -159,6 +165,7 @@ Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` i
 | Signal | You do |
 |--------|--------|
 | Guard exit **7** / `PRODUCT_BLOCKED` | **`ppe_go.cmd`** → Ctrl+V in Agent |
+| Relay exit **20** on control/smoke/witness | **Nothing** — auto-advance (see above) |
 | `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | Fix plan/spec; see guard report |
 | `SCOPE_AMBIGUITY` on product slice | Same as product blocked |
 | Queue idle, no `READY` | Add `queued` row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |

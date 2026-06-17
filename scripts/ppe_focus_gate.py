@@ -30,7 +30,11 @@ TIER_DRIFT = {
 }
 
 
-def focus_gate_enabled() -> bool:
+def focus_gate_enabled(repo: Path | None = None) -> bool:
+    from scripts.ppe_operator_config import focus_gate_enabled as focus_gate_from_config
+
+    if repo is not None:
+        return focus_gate_from_config(repo.resolve())
     env = os.environ.get("PPE_FOCUS_GATE", "").strip().lower()
     if env in ("0", "false", "no", "off"):
         return False
@@ -68,7 +72,7 @@ def validation_report_status(repo: Path) -> str:
 
 
 def validation_report_blocks_selection(repo: Path) -> bool:
-    if not focus_gate_enabled():
+    if not focus_gate_enabled(repo):
         return False
     return validation_report_status(repo) != "COMPLETE"
 
@@ -163,7 +167,7 @@ def evaluate_focus_gate(repo: Path, plan_path: str) -> FocusGateResult:
     urgent = _item_urgent(meta)
     urgent_reason = str(meta.get("urgentReason") or "").strip()
 
-    if not focus_gate_enabled():
+    if not focus_gate_enabled(repo):
         return FocusGateResult(allowed=True, tier=tier)
 
     if not validation_report_blocks_selection(repo):
@@ -231,7 +235,7 @@ def _p8_chapter_marked_complete(repo: Path) -> bool:
 
 def validation_report_gate_issues(repo: Path) -> list[str]:
     """Hard health issues: P8 evidence COMPLETE but validation report still blocks selection."""
-    if not focus_gate_enabled():
+    if not focus_gate_enabled(repo):
         return []
     if not _p8_chapter_marked_complete(repo):
         return []
@@ -252,7 +256,7 @@ def focus_gate_status_summary(repo: Path, plan_path: str | None = None) -> dict[
     out: dict[str, Any] = {
         "report_status": report,
         "blocks_selection": blocks,
-        "enabled": focus_gate_enabled(),
+        "enabled": focus_gate_enabled(repo),
         "issues": validation_report_gate_issues(repo),
     }
     if plan_path:

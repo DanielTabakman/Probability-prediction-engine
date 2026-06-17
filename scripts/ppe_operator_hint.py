@@ -48,8 +48,28 @@ def ppe_go_hint_for_verdict(verdict: str) -> str | None:
     return None
 
 
+PROCEDURAL_RELAY_HINT = (
+    "Auto-advancing — promotion_recovery handles this relay stop; no IDE action needed."
+)
+
+
+def is_procedural_relay_text(text: str) -> bool:
+    lower = text.lower()
+    return any(
+        marker in lower
+        for marker in (
+            "promotion_recovery advances",
+            "rule 7b",
+            "deterministic evidence slice passed",
+            "auto_advance_promotion_recovery",
+        )
+    )
+
+
 def append_ppe_go_hint(text: str, verdict: str, *, phase: str | None = None) -> str:
     """Append operator button hint to blocker/notify body when verdict needs action."""
+    if is_procedural_relay_text(text):
+        return text
     hint = operator_button_hint(verdict, phase=phase) or ppe_go_hint_for_verdict(verdict)
     if not hint:
         return text

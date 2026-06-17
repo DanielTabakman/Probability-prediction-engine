@@ -60,10 +60,60 @@ def _worktree_from_build_branch(repo_root: Path, build_branch: str) -> Optional[
     return p if p.is_dir() else None
 
 
+def _stop_condition_code(relay: dict[str, Any]) -> str:
+    stop_raw = relay.get("stop_condition")
+    if isinstance(stop_raw, dict):
+        return str(stop_raw.get("code") or stop_raw.get("id") or "").strip()
+    if stop_raw is None:
+        return ""
+    return str(stop_raw).strip()
+
+
+def _is_evidence_slice_id(slice_id: str) -> bool:
+    upper = slice_id.upper()
+    if "PRODUCT" in upper:
+        return False
+    return any(k in upper for k in ("CONTROL", "SMOKE", "WITNESS", "PLATFORM", "CLOSEOUT"))
+
+
+def _is_procedural_auto_advance(relay: dict[str, Any]) -> bool:
+    """Relay exit 20 cases that promotion_recovery handles without steward action."""
+    tests = relay.get("tests") if isinstance(relay.get("tests"), dict) else {}
+    promo = relay.get("promotion") if isinstance(relay.get("promotion"), dict) else {}
+    stop_code = _stop_condition_code(relay)
+    slice_id = str(relay.get("slice_id") or relay.get("sliceId") or "")
+
+    if (
+        not stop_code
+        and relay.get("safe_to_continue") is True
+        and relay.get("ready_for_control_closeout") is False
+        and not promo.get("performed")
+        and tests.get("pytest_status") == "PASS"
+        and tests.get("validation_classification") == "deterministic"
+    ):
+        return True
+
+    if stop_code == "UNCLEAR_TEST_RESULTS" and _is_evidence_slice_id(slice_id):
+        return True
+
+    notes = str(relay.get("notes") or "").lower()
+    if "promotion_recovery advances" in notes:
+        return True
+    return False
+
+
 def _infer_attention(*, exit_code: int, relay: Optional[dict[str, Any]]) -> tuple[bool, str, str]:
     """
     Returns: (awaiting_user, status_bucket, next_action)
     """
+    if relay and _is_procedural_auto_advance(relay):
+        return (
+            False,
+            "auto_advance_promotion_recovery",
+            "Relay exit 20 is procedural — promotion_recovery advances the phase automatically. "
+            "No IDE action unless the operator guard later reports IDE_BUILD for a product slice.",
+        )
+
     if exit_code != 0:
         return True, "error_or_stopped", "Investigate wrapper/orchestrator failure (non-zero exit). Open LAST_RUN_REPORT.md and the terminal output."
 
@@ -173,6 +223,15 @@ def _enrich_from_steward_summary(repo_root: Path, report: dict[str, Any]) -> Non
         report["stopped_slice_id"] = slice_id
     status = str(run.get("status") or "")
     if status == "STOP_FOR_REVIEW" and "rule 6" in detail.lower():
+        slice_id = str(stopped.get("sliceId") or report.get("slice_id") or "")
+        if _is_evidence_slice_id(slice_id):
+            report["status_bucket"] = "auto_advance_promotion_recovery"
+            report["awaiting_user"] = False
+            report["next_action"] = (
+                "Evidence/smoke slice — relay rule 6 in a worktree is procedural. "
+                "promotion_recovery advances; no steward action unless smoke env is broken."
+            )
+            return
         report["status_bucket"] = "stop_for_review_smoke_env"
         report["next_action"] = (
             "UI smoke failed with environment-sensitive classification (relay rule 6). "

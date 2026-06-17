@@ -405,6 +405,16 @@ class TestDecisionPolicy(unittest.TestCase):
     def test_hard_vs_review_stop_sets_disjoint(self) -> None:
         self.assertFalse(relay.HARD_STOP_CONDITIONS & relay.REVIEW_STOP_CONDITIONS)
 
+    def test_legacy_stop_conditions_not_hard_blocked(self) -> None:
+        for sc in relay.LEGACY_REVIEW_STOP_CONDITIONS:
+            p = valid_payload()
+            p["stop_condition"] = sc
+            p["safe_to_continue"] = False
+            p["ready_for_control_closeout"] = False
+            p["promotion"]["performed"] = False
+            dec = relay.decide(p)
+            self.assertNotEqual(dec["decision"], relay.DECISION_BLOCKED, msg=sc)
+
 
 # ---------------------------------------------------------------------------
 # State machine transitions (stage / resume / abort / reset)
