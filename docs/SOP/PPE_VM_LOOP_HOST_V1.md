@@ -2,6 +2,8 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** run the headless operator stack on an isolated VM so the daily PC never gets popup/focus storms.
 
+**Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) (accepted 2026-06-17)
+
 **Host:** Windows 10/11 **Pro** with Hyper-V. **Guest:** Windows 10/11.
 
 **Stack entry (inside VM only):** [`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md) · `run_ppe_headless_stack.cmd`
