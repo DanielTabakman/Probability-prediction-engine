@@ -68,4 +68,6 @@ Before retiring a long or noisy thread, run **context window closeout** — not 
 
 Full ritual: [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md)
 
+**Trigger phrases:** `close out thread` · `closeout thread` · `context closeout` · `wrap this chat` (see SOP for full list)
+
 **Next thread after closeout:** `AGENT_CONTINUITY_BRIEF.md` + completed closeout draft (not chat history).

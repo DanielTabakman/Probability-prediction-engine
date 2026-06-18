@@ -420,7 +420,7 @@ def main(argv: list[str] | None = None) -> int:
             priority=args.priority,
             focus_tier=args.focus_tier,
         )
-        print(f"ppe_context_window_closeout: appended build backlog → {path.relative_to(repo)}")
+        print(f"ppe_context_window_closeout: appended build backlog -> {path.relative_to(repo)}")
         return 0
     if args.cmd == "add-human":
         path = add_human_backlog_item(
@@ -431,7 +431,7 @@ def main(argv: list[str] | None = None) -> int:
             category=args.category,
             policy_question=args.policy_question,
         )
-        print(f"ppe_context_window_closeout: appended human backlog → {path.relative_to(repo)}")
+        print(f"ppe_context_window_closeout: appended human backlog -> {path.relative_to(repo)}")
         return 0
 
     snapshot = collect_snapshot(repo)

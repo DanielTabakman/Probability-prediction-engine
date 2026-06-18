@@ -80,6 +80,6 @@ Closed chapter witnesses live in **`tests/test_program_charter_invariants.py`**.
 
 ## Related docs
 
-- [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md)
+- [`COMMIT_POLICY.md`](COMMIT_POLICY.md)
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) → Validation tiers
 - [`IMPLIED_LAB_OPERATOR_RUNBOOK.md`](IMPLIED_LAB_OPERATOR_RUNBOOK.md)

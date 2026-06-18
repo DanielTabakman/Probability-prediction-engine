@@ -60,7 +60,7 @@ Running `implied_lab_ui_smoke_harness.py` **without** `--scenario` exercises eve
 
 ### Commit and merge test gates
 
-Canonical policy: [docs/SOP/COMMIT_POLICY_V1.md](docs/SOP/COMMIT_POLICY_V1.md) and [docs/SOP/TESTING_TIERS_V1.md](docs/SOP/TESTING_TIERS_V1.md).
+Canonical policy: [docs/SOP/COMMIT_POLICY.md](docs/SOP/COMMIT_POLICY.md) and [docs/SOP/TESTING_TIERS_V1.md](docs/SOP/TESTING_TIERS_V1.md).
 
 | When | Command |
 |------|---------|

@@ -145,7 +145,7 @@ Copy a preset from [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.js
 | `docs/VISION/` | `product-canon` | Tier 0–1 | Storyboard gate for P2+ |
 | `docker-compose`, `Caddyfile`, `.github/` | `platform` | CI docker job | Deploy runbook |
 
-Canonical gates: [`COMMIT_POLICY_V1.md`](COMMIT_POLICY_V1.md) · `python scripts/run_pushable_gate.py`
+Canonical gates: [`COMMIT_POLICY.md`](COMMIT_POLICY.md) · `python scripts/run_pushable_gate.py`
 
 ---
 

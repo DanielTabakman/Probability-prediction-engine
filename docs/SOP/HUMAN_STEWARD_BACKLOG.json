@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Policy and architecture topics for human review — not auto-loop work. Edit items here; run python scripts/ppe_human_backlog.py render-md to refresh the readable doc. Weekly ntfy digest includes open high-priority titles.",
+  "notes": "Policy and architecture topics for human review \u2014 not auto-loop work. Edit items here; run python scripts/ppe_human_backlog.py render-md to refresh the readable doc. Weekly ntfy digest includes open high-priority titles.",
   "items": [
     {
       "id": "operator_friction_cleanup_2026_06",
@@ -27,7 +27,7 @@
       "status": "open",
       "priority": "medium",
       "category": "control-plane",
-      "summary": "AUTO_ADVANCE decision (or fold Rule 7b into CONTINUE); align CODEX_AUTONOMY §15 with implementation; auto PR on REPO_STATE_DRIFT for all slice kinds.",
+      "summary": "AUTO_ADVANCE decision (or fold Rule 7b into CONTINUE); align CODEX_AUTONOMY \u00a715 with implementation; auto PR on REPO_STATE_DRIFT for all slice kinds.",
       "policyQuestion": "How much steward judgment should remain vs machine CONTINUE?",
       "added": "2026-06-17"
     },
@@ -83,7 +83,7 @@
     },
     {
       "id": "observability_human_signal",
-      "title": "Observability — human vs informational stops",
+      "title": "Observability \u2014 human vs informational stops",
       "status": "open",
       "priority": "low",
       "category": "operator",
@@ -91,6 +91,17 @@
       "policyQuestion": "What deserves a phone ping vs weekly digest only?",
       "notes": "Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.",
       "added": "2026-06-17"
+    },
+    {
+      "id": "process_library_expansion",
+      "title": "Process library expansion",
+      "status": "open",
+      "priority": "medium",
+      "category": "governance",
+      "summary": "Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.",
+      "added": "2026-06-18",
+      "source": "context_window_closeout",
+      "policyQuestion": "Which ritual should we standardize next after context closeout?"
     }
   ]
 }

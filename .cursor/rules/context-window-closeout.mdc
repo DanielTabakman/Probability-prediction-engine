@@ -1,5 +1,5 @@
 ---
-description: Run context window closeout when ending a long Cursor chat — push/pull sweep, narrative, backlog triage.
+description: Run context window closeout when the user says close out thread, closeout thread, end thread, context closeout, or wrap this chat.
 globs:
   - docs/SOP/**
   - artifacts/control_plane/**
@@ -7,7 +7,9 @@ globs:
 
 # Context window closeout
 
-When the user asks to **close the context**, **end the thread**, **context closeout**, or the chat is too long/noisy to continue:
+**Triggers:** `close out thread` · `closeout thread` · `close this thread` · `end thread` · `context closeout` · `wrap this chat` · `thread handoff`
+
+When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 1. Read [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](../../docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md).
 2. Run `python scripts/ppe_context_window_closeout.py --render` from repo root.

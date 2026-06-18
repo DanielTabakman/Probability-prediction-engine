@@ -117,4 +117,4 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 - [RELAY_ORCHESTRATOR_RUNBOOK_V1.md](RELAY_ORCHESTRATOR_RUNBOOK_V1.md) — slice/phase artifacts; **Shipping (GitHub)** subsection.  
 - [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) — VPS and `main` as source of truth.  
 - [README](../../README.md) — commit/merge test gates; CI runs **ruff + full pytest** (`CI / pytest`) and **Docker entrypoint smoke** (`CI / docker_entrypoint`).
-- [COMMIT_POLICY_V1.md](COMMIT_POLICY_V1.md) — canonical local gate before pushable commits.
+- [COMMIT_POLICY.md](COMMIT_POLICY.md) — canonical local gate before pushable commits.

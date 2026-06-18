@@ -1,101 +1,25 @@
 ---
-description: Auto-commit and push after authorized tasks when COMMIT_POLICY gates pass. Supersedes generic "ask before commit" for this repo.
+description: Auto commit/push/PR for PPE when task is done and gate passes. Overrides global "ask before commit" for this repo.
 alwaysApply: true
 ---
 
-# Auto-commit and auto-push policy
+# Auto-commit (PPE)
 
-**Precedence:** In this repository, this rule overrides `OPERATING_RULES.md` § Git and any generic Cursor user instruction to "ask before commit" or "push only when asked" when the current task or plan is **authorized and complete**. Paste [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into global user rules if agents still hesitate.
+**Canon:** [`docs/SOP/COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) · [`docs/SOP/TESTING_TIERS_V1.md`](../../docs/SOP/TESTING_TIERS_V1.md)
 
-## When to auto-commit
+When the current task is **complete**, do **not** ask permission — **commit and ship**:
 
-**Standing authorization:** commit and push to feature branches when the task is done and the gate passes—do not ask “may I commit?” each time (see `COMMIT_POLICY_V1.md`).
+1. `python scripts/run_pushable_gate.py` (docs-only: tier 0, skip if only `docs/`)
+2. `git status`, `git diff`, `git log -1 --oneline`
+3. **Commit** — one commit per task; message = slice/chapter + plane + intent
+4. On a **feature branch**: `python scripts/run_pushable_gate.py --pre-push`, then **push**, then **open PR to `main`** if none exists ([`GITHUB_ZERO_TOUCH_MERGE.md`](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md))
 
-- All todos / requested work for the current task or plan are complete.
-- **Pushable commit gate** has passed (see Test alignment below).
-- Before committing, the agent must always:
-  - Show `git status`, `git diff`, `git log -1 --oneline`.
-  - Propose **one commit by default** for the task; split into multiple commits only when changes are clearly separate (e.g. docs vs code vs tests).
+**After merge/rebase `origin/main`:** gate → push (do not stop at “merge succeeded”).
 
-## What not to commit (safety exclusions)
+**Hold commits only for:** exploration/review with no implementation, explicit “don’t commit”, unchartered recovery, or safety exclusions below.
 
-- Never auto-commit secrets:
-  - `.env`, `*.env*`, credentials, keys, tokens, or similar sensitive material.
-- Never auto-commit obvious generated noise unless explicitly requested:
-  - `artifacts/`, `.pytest_cache/`, `__pycache__/`, `*.sqlite*`, `*.db`, log files, or other large/generated outputs.
-- Do not change git config.
-- Do not use `git commit --amend` unless the user explicitly requests it.
+**Never commit:** `.env`, credentials, `artifacts/`, caches, local DBs, generated noise ([`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md)). **Never** force-push or `--amend` unless the user asks. **`main`:** PR-only when branch protection applies.
 
-## Auto-push behavior (branch-aware)
+**Viz slices:** run implied-lab smoke before PR merge, not before every commit ([`TESTING_TIERS_V1.md`](../../docs/SOP/TESTING_TIERS_V1.md)).
 
-### Non-main branches
-
-- After auto-commit on any branch **other than** `main` / `master`, the agent should **auto-push** to the branch’s existing upstream.
-- If the current branch has no upstream yet, the first push should be `git push -u origin HEAD` (or equivalent for the default remote).
-- **After push**, if there is no open PR to `main` for this branch, **open one** (`gh pr create --base main --head <branch>`). GitHub will add the `automerge` label ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when the **CI** workflow ([`ci.yml`](../../.github/workflows/ci.yml)) completes **`success`**—i.e. both **`CI / pytest`** and **`CI / docker_entrypoint`** pass—[`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges to `main` and **Deploy VPS** can run. Do not stop at “pushed feature branch” when the intent is to ship.
-- Preconditions for auto-push on non-main branches:
-  - Pushable commit gate passed (ruff + full pytest, or docs-only exception).
-  - The working tree is clean except for the intended changes.
-  - No force push; fast-forward only.
-
-### After merge or rebase of `origin/main`
-
-When `git merge origin/main` or `git rebase origin/main` completes on a **non-main** branch (clean tree, no conflict markers):
-
-1. Run **`python scripts/run_pushable_gate.py`** — it auto-includes commits **ahead of upstream** (not only diff vs `main`). Use **`--pre-push`** when you only want the unpushed commit range.
-2. **`git push`** (or `git push -u origin HEAD` if no upstream). Do **not** stop at "merge succeeded" or ask "want me to push?"
-3. If no open PR to `main` for this branch, **open one** per non-main rules above.
-
-This applies even when the user only asked to "sync main" — syncing is complete only after gate + push (unless push is blocked: force-push, remote rejection, or gate failure).
-
-### `main` / `master` branches
-
-- Same gate as any pushable commit: `python -m ruff check src tests scripts` and `python -m pytest -q`.
-- If the repository uses **PR-only** delivery to `main` (see [docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)), **do not** auto-push directly to `main`. Push a **feature branch** and open a PR so GitHub runs the full **CI** workflow (pytest + docker_entrypoint) before merge.
-- No secrets / artifacts in the commit; no force push or history rewrite.
-
-## When not to auto-push
-
-The agent must NOT auto-push when:
-
-- Push would require `--force`, history rewrite, or unsafe conflict resolution.
-- Remote rejects the push (branch protection, required checks) — surface the error; do not retry with riskier options.
-- Ruff or full pytest failed, or the gate was not run for non-docs-only code changes.
-
-## Test alignment (canonical)
-
-Authoritative detail: [docs/SOP/COMMIT_POLICY_V1.md](../../docs/SOP/COMMIT_POLICY_V1.md) and [docs/SOP/TESTING_TIERS_V1.md](../../docs/SOP/TESTING_TIERS_V1.md).
-
-### WIP commit (fast gate)
-
-```bash
-python scripts/run_pushable_gate.py
-```
-
-Runs ruff + scoped pytest (when diff maps) or fast markers (`-m "not witness and not slow"`). Parallel via `-n auto` unless `PPE_PYTEST_PARALLEL=0`.
-
-### Before push (full gate — required)
-
-```bash
-python scripts/run_pushable_gate.py --pre-push
-```
-
-Matches **`CI / pytest`** (ruff + full `pytest -q`). Run before every push; do not substitute targeted pytest only.
-
-### Docs-only exception
-
-If the change set is **only** under `docs/`, pytest is not required; ruff is optional unless `scripts/` or `src/` changed.
-
-### Implied-lab UI (PR / merge, not commit)
-
-If the task touched `src/viz/**` or UI smoke scripts, run smoke before PR merge (see `TESTING_TIERS_V1.md`):
-
-```bash
-python scripts/run_implied_lab_ui_smoke.py
-```
-
-Use dual smoke only when harness-wide or dual chrome changed. Do not block commit on smoke (environment-sensitive).
-
-### Merge to `main`
-
-GitHub **CI** = **`CI / pytest`** (ruff + full pytest) **and** **`CI / docker_entrypoint`** (Docker + Streamlit smoke). Local `--pre-push` gate should match pytest + ruff before push; docker smoke runs on GitHub unless you replicate it locally.
+**Other repositories:** commit only when the user explicitly asks.
