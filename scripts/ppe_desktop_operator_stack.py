@@ -196,7 +196,10 @@ def ensure_stack(repo: Path, *, start: bool = True) -> dict[str, Any]:
 
     def _ensure_extras(after: dict[str, bool]) -> dict[str, bool]:
         nonlocal started
-        if commands_enabled() and start and not after.get("ntfy_listen_running"):
+        from scripts.ppe_loop_host_guard import loop_host_blocked
+
+        ntfy_allowed = commands_enabled() and loop_host_blocked() is None
+        if ntfy_allowed and start and not after.get("ntfy_listen_running"):
             start_ntfy_listen_only(repo)
             started.append("ntfy_listen")
             after = stack_status(repo)

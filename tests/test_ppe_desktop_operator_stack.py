@@ -74,11 +74,45 @@ def test_ensure_stack_noop_when_running(tmp_path):
 def test_ensure_stack_starts_ntfy_when_loop_watch_up(tmp_path):
     with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=False):
         with patch("scripts.ppe_ntfy_commands.commands_enabled", return_value=True):
-            with patch("scripts.ppe_desktop_operator_stack.start_ntfy_listen_only") as ntfy:
-                with patch(
-                    "scripts.ppe_desktop_operator_stack.stack_status",
-                    side_effect=[
-                        {
+            with patch("scripts.ppe_loop_host_guard.loop_host_blocked", return_value=None):
+                with patch("scripts.ppe_desktop_operator_stack.start_ntfy_listen_only") as ntfy:
+                    with patch(
+                        "scripts.ppe_desktop_operator_stack.stack_status",
+                        side_effect=[
+                            {
+                                "loop_running": True,
+                                "watch_running": True,
+                                "ntfy_listen_running": False,
+                                "local_trigger_watcher_running": True,
+                                "local_trigger_watcher_desired": True,
+                                "stack_running": True,
+                            },
+                            {
+                                "loop_running": True,
+                                "watch_running": True,
+                                "ntfy_listen_running": True,
+                                "local_trigger_watcher_running": True,
+                                "local_trigger_watcher_desired": True,
+                                "stack_running": True,
+                            },
+                        ],
+                    ):
+                        result = ensure_stack(tmp_path, start=True)
+    ntfy.assert_called_once_with(tmp_path)
+    assert result["action"] == "ntfy_listen"
+
+
+def test_ensure_stack_skips_ntfy_on_daily_driver(tmp_path):
+    with patch("scripts.ppe_desktop_operator_stack.headless_stack_mode", return_value=False):
+        with patch("scripts.ppe_ntfy_commands.commands_enabled", return_value=True):
+            with patch(
+                "scripts.ppe_loop_host_guard.loop_host_blocked",
+                return_value={"guard_code": "stack_forbidden", "guard_detail": "daily PC"},
+            ):
+                with patch("scripts.ppe_desktop_operator_stack.start_ntfy_listen_only") as ntfy:
+                    with patch(
+                        "scripts.ppe_desktop_operator_stack.stack_status",
+                        return_value={
                             "loop_running": True,
                             "watch_running": True,
                             "ntfy_listen_running": False,
@@ -86,16 +120,7 @@ def test_ensure_stack_starts_ntfy_when_loop_watch_up(tmp_path):
                             "local_trigger_watcher_desired": True,
                             "stack_running": True,
                         },
-                        {
-                            "loop_running": True,
-                            "watch_running": True,
-                            "ntfy_listen_running": True,
-                            "local_trigger_watcher_running": True,
-                            "local_trigger_watcher_desired": True,
-                            "stack_running": True,
-                        },
-                    ],
-                ):
-                    result = ensure_stack(tmp_path, start=True)
-    ntfy.assert_called_once_with(tmp_path)
-    assert result["action"] == "ntfy_listen"
+                    ):
+                        result = ensure_stack(tmp_path, start=True)
+    ntfy.assert_not_called()
+    assert result["action"] == "none"

@@ -13,9 +13,16 @@ from scripts.ppe_ntfy_commands import (
 
 
 def test_parse_restart_command():
-    assert parse_command_text("restart").name == "restart"
-    assert parse_command_text("PPE restart").name == "restart"
-    assert parse_command_text("/restart").name == "restart"
+    assert parse_command_text("restart") is None
+    assert parse_command_text("PPE restart") is None
+    assert parse_command_text("/restart") is None
+
+
+def test_parse_restart_command_with_secret(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    assert parse_command_text("restart") is None
+    assert parse_command_text("s3cret restart").name == "restart"
+    assert parse_command_text("PPE restart") is None
 
 
 def test_parse_build_command():
