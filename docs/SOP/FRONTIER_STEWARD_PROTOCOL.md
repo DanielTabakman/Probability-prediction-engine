@@ -63,7 +63,7 @@ Minimum acceptable practice:
 
 ## Commit policy (default)
 
-See `docs/SOP/COMMIT_POLICY_V1.md` for the default “when to commit” protocol. Purpose: reduce repeated ambiguity and keep continuity durable.
+See `docs/SOP/COMMIT_POLICY.md` for the default “when to commit” protocol. Purpose: auto-ship when gates pass; revert if needed.
 
 ## Concurrent-agent dispatch — worktree rule (operational; non-gating)
 

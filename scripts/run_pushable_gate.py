@@ -1,6 +1,6 @@
 """Tiered pushable gate for PPE commits.
 
-Canonical local gate runner (see docs/SOP/COMMIT_POLICY_V1.md, docs/SOP/TESTING_TIERS_V1.md).
+Canonical local gate runner (see docs/SOP/COMMIT_POLICY.md, docs/SOP/TESTING_TIERS_V1.md).
 """
 
 from __future__ import annotations
