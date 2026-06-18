@@ -50,7 +50,8 @@ def should_ignore_message(message: dict[str, Any]) -> bool:
         return True
     if is_outbound_message(message):
         return True
-    if str(message.get("title") or "").startswith("PPE OK"):
+    title = str(message.get("title") or "")
+    if title.startswith("PPE OK") or title.startswith("PPE: restart"):
         return True
     return not str(message.get("message") or "").strip()
 
@@ -79,12 +80,16 @@ def parse_command_message(message: dict[str, Any]) -> RemoteCommand | None:
     return parse_command_text(body)
 
 
-def stop_stack_processes() -> int:
+def stop_stack_processes(*, exclude_pid: int | None = None) -> int:
+    pid_filter = ""
+    if exclude_pid is not None:
+        pid_filter = f" -and $_.ProcessId -ne {int(exclude_pid)}"
     ps = (
         "$k=0; Get-CimInstance Win32_Process -EA SilentlyContinue | "
         "Where-Object { $_.CommandLine -match "
         "'run_ppe_auto_local_loop|watch_operator_mobile|ppe_ntfy_listen|ppe_ide_build_local_watcher|"
-        "ppe_headless_stack_supervisor|ppe_watch_operator_mobile|start_ppe_desktop_operator' } | "
+        "ppe_headless_stack_supervisor|ppe_watch_operator_mobile|start_ppe_desktop_operator'"
+        f"{pid_filter} }} | "
         "ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++ }; $k"
     )
     try:
@@ -95,11 +100,26 @@ def stop_stack_processes() -> int:
 
 
 def execute_restart(repo: Path) -> dict[str, Any]:
-    killed = stop_stack_processes()
-    time.sleep(2)
-    from scripts.ppe_desktop_operator_stack import ensure_stack
+    from scripts.ppe_desktop_operator_stack import ensure_stack, stack_status
+    from scripts.ppe_loop_host_guard import loop_host_blocked
 
-    return {"action": "restart", "killed": killed, "stack": ensure_stack(repo.resolve(), start=True)}
+    repo = repo.resolve()
+    blocked = loop_host_blocked()
+    if blocked:
+        return {
+            "action": "restart",
+            "refused": True,
+            "reason": blocked["guard_detail"],
+            "stack": stack_status(repo),
+        }
+
+    killed = stop_stack_processes(exclude_pid=os.getpid())
+    time.sleep(2)
+    stack = ensure_stack(repo, start=True)
+    if not stack.get("loop_running") or not stack.get("watch_running"):
+        time.sleep(5)
+        stack = {**stack, **stack_status(repo)}
+    return {"action": "restart", "killed": killed, "stack": stack}
 
 
 def execute_status(repo: Path) -> dict[str, Any]:
@@ -231,12 +251,31 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
         return False
     action = str(result.get("action") or command.name)
     if action == "restart":
+        if result.get("refused"):
+            return send_ntfy(
+                "PPE: restart refused",
+                f"{result.get('reason') or 'This machine cannot run the operator loop.'}\n"
+                "Use VM_RESTART on the Hyper-V VM. Do not send phone restart from the daily PC.",
+                tags=["ppe", "cmd", OUTBOUND_TAG],
+                priority="high",
+                bypass_throttle=True,
+            )
         stack = result.get("stack") or {}
         loop = "on" if stack.get("loop_running") else "off"
         watch = "on" if stack.get("watch_running") else "off"
+        if loop == "off" or watch == "off":
+            return send_ntfy(
+                "PPE: restart failed",
+                f"Operator stack did not come back up (loop {loop} · watch {watch}).\n"
+                "On the VM double-click VM_RESTART once — avoid phone restart until stack is healthy.",
+                tags=["ppe", "cmd", OUTBOUND_TAG],
+                priority="high",
+                bypass_throttle=True,
+            )
         return send_ntfy(
             "PPE: restarted",
-            f"Desktop stack restarted ({result.get('killed', 0)} old process(es) stopped).\nLoop: {loop} · Watch: {watch}",
+            f"Operator stack restarted ({result.get('killed', 0)} old process(es) stopped).\n"
+            f"Loop: {loop} · Watch: {watch}",
             tags=["ppe", "cmd", OUTBOUND_TAG],
             bypass_throttle=True,
         )

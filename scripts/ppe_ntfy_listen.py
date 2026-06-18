@@ -135,6 +135,12 @@ def process_messages(
             continue
         if last_id and msg_id == last_id:
             continue
+        command = parse_command_message(message)
+        if command is not None and command.name == "restart":
+            # Ack before execute_restart stops workers — otherwise listener dies and replays this message.
+            state = {**state, "last_message_id": msg_id}
+            save_state(repo, state)
+            last_id = msg_id
         outcome = handle_message(repo, message, notify=notify)
         if outcome is not None:
             handled.append(outcome)
