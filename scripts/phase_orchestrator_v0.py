@@ -196,6 +196,24 @@ class Orchestrator:
             f"could not resolve baseline {baseline_local!r}: {err or out}".strip()
         )
 
+    def _worktree_usable(self, wt: Path) -> bool:
+        return (wt / "pyproject.toml").is_file() and (wt / "tests").is_dir()
+
+    def _remove_worktree(self, wt: Path) -> None:
+        _run(["git", "worktree", "remove", "--force", str(wt)], cwd=self.repo_root)
+        if wt.exists():
+            shutil.rmtree(wt, ignore_errors=True)
+        _run(["git", "worktree", "prune"], cwd=self.repo_root)
+
+    def _refresh_worktree_baseline(self, wt: Path, baseline_local: str) -> None:
+        """Reset a reused worktree to the current baseline tip (stale SHAs break pytest)."""
+        _run(["git", "fetch", "origin", baseline_local], cwd=self.repo_root)
+        sha = self._baseline_tip_sha(baseline_local)
+        code, out, err = _run(["git", "reset", "--hard", sha], cwd=wt)
+        if code != 0:
+            msg = (err or out or "").strip()[-300:]
+            print(f"phase_orchestrator: warn worktree refresh failed for {wt.name}: {msg}")
+
     def ensure_worktree(self, baseline_local: str, build_branch: str) -> Path:
         """Create (or reuse) a git worktree for the slice run.
 
@@ -207,7 +225,12 @@ class Orchestrator:
         wt.parent.mkdir(parents=True, exist_ok=True)
 
         if wt.exists():
-            return wt
+            if not self._worktree_usable(wt):
+                print(f"phase_orchestrator: removing broken worktree {wt.name}")
+                self._remove_worktree(wt)
+            else:
+                self._refresh_worktree_baseline(wt, baseline_local)
+                return wt
 
         # Create a new worktree checked out at the baseline branch.
         # Do NOT create the build branch here: relay preflight requires that the build branch
