@@ -125,25 +125,21 @@ def test_monitoring_history_routes_and_panels() -> None:
     history_page = MSOS_WEB / "src" / "app" / "history" / "page.tsx"
     assert monitor_page.is_file()
     assert history_page.is_file()
-    assert "MonitorContent" in monitor_page.read_text(encoding="utf-8")
-    assert "HistoryContent" in history_page.read_text(encoding="utf-8")
-
-    monitor_fixtures = (MSOS_WEB / "src" / "data" / "monitoringFixtures.ts").read_text(encoding="utf-8")
-    assert "Thesis validity" in monitor_fixtures
-    assert "Expression risk" in monitor_fixtures
-    assert "Data & trust" in monitor_fixtures
+    monitor_page_text = monitor_page.read_text(encoding="utf-8")
+    history_page_text = history_page.read_text(encoding="utf-8")
+    assert "MonitorContent" in monitor_page_text
+    assert "HistoryContent" in history_page_text
+    assert "loadMonitorFeed" in monitor_page_text
+    assert "loadHistoryFeed" in history_page_text
 
     monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
-    assert "watchPanels" in monitor
-    assert "no live fills" in monitor
-
-    history_fixtures = (MSOS_WEB / "src" / "data" / "historyFixtures.ts").read_text(encoding="utf-8")
-    assert "observed" in history_fixtures
-    assert "simulated" in history_fixtures
+    assert "feed.watchPanels" in monitor
+    assert "no live order transmitted" in monitor
 
     history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
-    assert "historyEntries" in history
+    assert "feed.entries" in history
     assert "Executed" in history
+    assert "no live positions connected" in history
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/monitor"' in nav
