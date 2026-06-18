@@ -200,7 +200,7 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
     handoff = cfg.get("ideHandoff")
     if isinstance(handoff, dict) and handoff.get("enabled") is not False:
         _set("PPE_IDE_HANDOFF", "1")
-        if handoff.get("preferIdeOverCli") is True or cfg.get("autoRemoteBuild") is False:
+        if handoff.get("preferIdeOverCli") is True:
             _set("PPE_PREFER_IDE_OVER_CLI", "1")
             _set("PPE_FORCE_IDE_HANDOFF", "1")
         if handoff.get("openCursor") is not False:

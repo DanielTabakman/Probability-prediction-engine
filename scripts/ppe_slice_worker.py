@@ -103,6 +103,16 @@ def _skip_slow_pytest() -> bool:
 def _pytest_env(repo: Path) -> dict[str, str]:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(repo.resolve())
+    # Unit tests assert handoff policy in isolation — not operator profile overrides.
+    for key in (
+        "PPE_PREFER_IDE_OVER_CLI",
+        "PPE_FORCE_IDE_HANDOFF",
+        "PPE_FORCE_CLI_BUILD",
+        "PPE_AUTO_REMOTE_BUILD",
+        "PPE_IDE_HANDOFF",
+        "PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED",
+    ):
+        env.pop(key, None)
     return env
 
 

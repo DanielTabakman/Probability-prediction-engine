@@ -105,8 +105,8 @@ def clipboard_on_handoff_enabled() -> bool:
     return True
 
 
-def prefer_ide_over_cli(repo: Path) -> bool:
-    """When True, never start headless agent CLI — use IDE handoff only."""
+def explicit_prefer_ide_over_cli(repo: Path) -> bool:
+    """When True, operator explicitly wants IDE handoff instead of headless CLI."""
     if os.environ.get("PPE_FORCE_CLI_BUILD", "").strip().lower() in ("1", "true", "yes", "on"):
         return False
     env = os.environ.get("PPE_PREFER_IDE_OVER_CLI", "").strip().lower()
@@ -123,6 +123,19 @@ def prefer_ide_over_cli(repo: Path) -> bool:
         handoff = cfg.get("ideHandoff")
         if isinstance(handoff, dict) and handoff.get("preferIdeOverCli") is True:
             return True
+    except ImportError:
+        pass
+    return False
+
+
+def prefer_ide_over_cli(repo: Path) -> bool:
+    """When True, never start headless agent CLI — use IDE handoff only."""
+    if explicit_prefer_ide_over_cli(repo):
+        return True
+    try:
+        from scripts.ppe_operator_config import load_operator_config
+
+        cfg = load_operator_config(repo)
         if cfg.get("autoRemoteBuild") is False:
             return True
     except ImportError:
@@ -197,7 +210,12 @@ def clear_cli_usage_exhausted(repo: Path) -> None:
 
 def should_attempt_headless_cli(repo: Path, *, mode: str = "build", force_handoff: bool = False) -> bool:
     """When True, try headless agent CLI before IDE handoff (build or fix)."""
-    if force_handoff or prefer_ide_over_cli(repo):
+    if force_handoff:
+        return False
+    if mode == "fix":
+        if explicit_prefer_ide_over_cli(repo):
+            return False
+    elif prefer_ide_over_cli(repo):
         return False
     if skip_cli_when_usage_exhausted(repo) and cli_usage_exhausted(repo):
         return False
