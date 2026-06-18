@@ -108,6 +108,33 @@ class TestPhaseOrchestratorWorktree(unittest.TestCase):
             ).stdout.strip()
             self.assertEqual(head, new_sha)
 
+    def test_broken_worktree_is_recreated(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            _git(repo, "init", "-b", "main")
+            (repo / "pyproject.toml").write_text("[project]\nname='t'\n", encoding="utf-8")
+            (repo / "tests").mkdir()
+            (repo / "tests" / "test_ok.py").write_text("def test_ok():\n    assert True\n", encoding="utf-8")
+            _git(repo, "add", ".")
+            _git(repo, "commit", "-m", "init")
+
+            orch = Orchestrator(repo)
+            wt = orch.ensure_worktree(baseline_local="main", build_branch="build/auto/broken-slice")
+            self.assertTrue((wt / "tests").is_dir())
+
+            for child in list(wt.iterdir()):
+                if child.is_dir():
+                    import shutil
+
+                    shutil.rmtree(child)
+                else:
+                    child.unlink()
+            (wt / "artifacts").mkdir()
+
+            wt2 = orch.ensure_worktree(baseline_local="main", build_branch="build/auto/broken-slice")
+            self.assertEqual(wt2, wt)
+            self.assertTrue((wt / "tests" / "test_ok.py").is_file())
+
 
 if __name__ == "__main__":
     unittest.main()
