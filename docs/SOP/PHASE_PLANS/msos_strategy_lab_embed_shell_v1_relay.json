@@ -1,0 +1,106 @@
+{
+  "name": "MSOS_strategy_lab_embed_shell_v1 (Strategy Lab PPE embed shell — storyboard chart region)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-EmbedShellV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Control-Slice001-embed_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-EmbedShellV1-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Product-Slice002-embed_shell",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/",
+        "tests/test_implied_lab_",
+        "tests/test_mvp1_"
+      ]
+    },
+    {
+      "sliceId": "MSOS-EmbedShellV1-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Product-Slice003-embed_shell",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/PpeEmbedBoundary.tsx",
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/app/strategy-lab/page.tsx",
+        "apps/msos-web/src/app/globals.css",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-EmbedShellV1-Platform-Slice004",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Platform-Slice004-embed_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        "Caddyfile",
+        "apps/msos-web/Dockerfile",
+        ".env.example",
+        "docs/DEPLOY/MSOS_WEB_V1.md"
+      ]
+    },
+    {
+      "sliceId": "MSOS-EmbedShellV1-Witness-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Witness-Slice005-embed_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-EmbedShellV1-Closeout-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+      "buildBranch": "build/auto/MSOS-EmbedShellV1-Closeout-Slice006-embed_shell",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_strategy_lab_embed_shell_v1",
+        "chapterTitle": "MSOS Strategy Lab embed shell v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

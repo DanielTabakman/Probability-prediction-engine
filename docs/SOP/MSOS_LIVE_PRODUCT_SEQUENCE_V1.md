@@ -35,6 +35,8 @@
 
 **Operator note:** Phases 7a–7b may start BUILD after **4b** if commercial urgency; default queue order runs **6** first so the product loop is proven before monetization gates expand.
 
+**Parallel UX (not a numbered phase):** [`msos_strategy_lab_embed_shell_v1`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) — MEDIUM priority; replaces box-in-box Streamlit iframe on `/strategy-lab` with storyboard `03_ppe_lab` chart shell. **Blocked until phase 3 COMPLETE**; does not block phases 4a–7.
+
 ---
 
 ## Product completeness bars
@@ -110,3 +112,4 @@ flowchart TB
 |------|--------|
 | 2026-06-14 | v1 — initial phased sequence |
 | 2026-06-14 | v2 — phases 4a–7b chartered (identity, monitor, E2E, entitlements, Stripe deferred) |
+| 2026-06-18 | v3 — parallel UX chapter `msos_strategy_lab_embed_shell_v1` (MEDIUM, post–phase 3) |

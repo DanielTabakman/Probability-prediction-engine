@@ -223,6 +223,16 @@
       "reason": "[HIGH] MSOS thesis/expression server store; Command Center from MSOS records \u2014 blocked until user state bridge COMPLETE"
     },
     {
+      "chapterId": "msos_strategy_lab_embed_shell_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post-wiring Strategy Lab embed shell",
+      "reason": "[MEDIUM] Strategy Lab chart shell \u2014 storyboard 03 region without box-in-box Streamlit chrome; display API or chromeless embed \u2014 blocked until workflow persistence COMPLETE"
+    },
+    {
       "chapterId": "mvp1_snapshot_owner_v1",
       "status": "blocked",
       "priority": "high",

@@ -164,6 +164,12 @@
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
+      "status": "skipped",
+      "reason": "[MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
       "status": "skipped",
       "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",

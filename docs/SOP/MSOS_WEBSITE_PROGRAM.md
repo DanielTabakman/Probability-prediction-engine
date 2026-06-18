@@ -98,6 +98,12 @@ Friends-first/trader-tester conventions; validation report drives next queue sel
 **Priority:** HIGH — sequence **phase 3** (long-term workflow canon).  
 **Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · [`POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md`](POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md)
 
+### Post-bridge — Strategy Lab embed shell v1 (chartered)
+
+**Outcome:** `/strategy-lab` chart region matches storyboard **`03_ppe_lab`** — one cohesive MSOS surface, not full Streamlit app chrome inside an iframe box. PPE math stays in Python via read-only display API and/or chromeless embed-only view.  
+**Priority:** MEDIUM — runs after phase 3 closeout; does not block phases 4a–7.  
+**Charter:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) · [`POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md`](POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md)
+
 ### Later — Access identity + Monitor/History live (chartered)
 
 Phases **4a–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md).
@@ -146,6 +152,7 @@ Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_W
 | Post-launch | `msos_public_demo_launch_v1` | `PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | Post-launch | `msos_production_wiring_v1` | `PHASE_PLANS/msos_production_wiring_v1_relay.json` |
 | Live seq P3 | `msos_workflow_persistence_v1` | `PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
+| Post-P3 UX | `msos_strategy_lab_embed_shell_v1` | `PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json` |
 | Live seq 4a | `mvp1_snapshot_owner_v1` | `PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
 | Live seq 4b | `msos_access_identity_v1` | `PHASE_PLANS/msos_access_identity_v1_relay.json` |
 | Live seq 5 | `msos_monitor_history_live_v1` | `PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
