@@ -1,7 +1,7 @@
 # MSOS monitor & history live v1 — evidence status
 
 **Chapter:** `msos_monitor_history_live_v1`  
-**Status:** **CHARTERED** 2026-06-14  
+**Status:** **COMPLETE** 2026-06-18  
 **Phase plan:** [`PHASE_PLANS/msos_monitor_history_live_v1_relay.json`](PHASE_PLANS/msos_monitor_history_live_v1_relay.json)
 
 | Slice | Status |

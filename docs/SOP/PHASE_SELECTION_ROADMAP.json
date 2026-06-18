@@ -183,7 +183,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[HIGH] Live monitor/history \u2014 phase 5",
       "selectionPrep": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md"
     },
@@ -195,7 +195,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
-      "status": "skipped",
+      "status": "ready",
       "reason": "[HIGH] Free tier + manual paid \u2014 phase 7a",
       "selectionPrep": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md"
     },
