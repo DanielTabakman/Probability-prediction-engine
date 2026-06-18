@@ -2,7 +2,8 @@
   "last_main_sha": "b05f80f0ef0eef588b8aaa8a8670f6602e1ddfcb",
   "recorded_events": [
     "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
-    "chapter_closed:MSOS-DistDemo-Closeout-Slice005"
+    "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
+    "chapter_closed:MSOS-AccessIdV1-Closeout-Slice005"
   ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",

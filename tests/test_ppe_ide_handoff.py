@@ -138,6 +138,8 @@ def test_respond_skips_cli_when_usage_exhausted(tmp_path, monkeypatch):
 
 def test_should_attempt_headless_cli_fix_ignores_auto_remote_build(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_AUTO_REMOTE_BUILD", "0")
+    monkeypatch.delenv("PPE_PREFER_IDE_OVER_CLI", raising=False)
+    monkeypatch.delenv("PPE_FORCE_IDE_HANDOFF", raising=False)
     assert should_attempt_headless_cli(tmp_path, mode="fix") is True
     assert should_attempt_cli_build(tmp_path) is False
 

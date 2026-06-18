@@ -244,7 +244,7 @@
     },
     {
       "chapterId": "msos_access_identity_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",

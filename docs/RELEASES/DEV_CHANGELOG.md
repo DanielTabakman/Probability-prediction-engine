@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-18
 
+- **Chapter closed:** MSOS access identity v1 (`MSOS-AccessIdV1-Closeout-Slice005`)
 - MVP1-SnapshotOwner-Product-Slice002: owner_email on frozen evaluations (#227) (`docs/SOP/`)
 - `618ba79` — ops(control-plane): DESKTOP_VM_MAINTAIN one-click VM upkeep (#226)
 - `72e34fc` — control-plane: desktop zero-click IDE BUILD stack (#225) (`scripts/`)
