@@ -10,6 +10,7 @@ import json
 import re
 import subprocess
 import sys
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -23,9 +24,17 @@ from scripts.ppe_human_backlog import load_backlog as load_human_backlog
 from scripts.ppe_human_backlog import render_markdown as render_human_md
 from scripts.ppe_manifest import load_manifest, resolve_summary
 from scripts.ppe_propagate_queue import backlog_path, load_backlog as load_chapter_backlog
+from scripts.workflow_metrics_cli import (
+    CONTEXT_WINDOWS_FILE,
+    _append_jsonl,
+    _metrics_dir,
+    read_context_windows,
+)
 
 DRAFT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md"
 SNAPSHOT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT.json"
+WHATS_NEXT_JSON_REL = "artifacts/control_plane/WHATS_NEXT.json"
+WHATS_NEXT_MD_REL = "artifacts/control_plane/WHATS_NEXT.md"
 SOP_CLOSEOUT = "docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md"
 
 
@@ -317,6 +326,153 @@ def write_artifacts(repo: Path, snapshot: dict[str, Any]) -> tuple[Path, Path]:
     return json_path, md_path
 
 
+def _chapter_from_snapshot(snapshot: dict[str, Any]) -> str:
+    ms = snapshot.get("manifest_summary") if isinstance(snapshot.get("manifest_summary"), dict) else {}
+    cid = ms.get("chapter_id") or ms.get("chapterId")
+    if cid:
+        return str(cid).strip()
+    manifest = snapshot.get("manifest") if isinstance(snapshot.get("manifest"), dict) else {}
+    plan = str(manifest.get("phasePlanPath") or "").strip().replace("\\", "/")
+    if not plan:
+        return ""
+    stem = Path(plan).stem
+    if stem.endswith("_relay"):
+        return stem[: -len("_relay")]
+    return stem
+
+
+def infer_whats_next(snapshot: dict[str, Any]) -> str:
+    op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
+    cmds = op.get("commands") or []
+    if cmds:
+        return f"Operator: `{cmds[0]}`"
+    verdict = str(op.get("verdict") or "").strip()
+    if verdict:
+        return f"Check operator verdict `{verdict}` and `docs/SOP/AGENT_CONTINUITY_BRIEF.md`."
+    return "Read `docs/SOP/AGENT_CONTINUITY_BRIEF.md` and ask what's next."
+
+
+def build_closeout_record(
+    snapshot: dict[str, Any],
+    *,
+    thread_role: str = "steward",
+    whats_next: str = "",
+    safe_to_switch: bool = True,
+    slices_closed_in_thread: int = 0,
+    triage_counts: dict[str, int] | None = None,
+    notes: str = "",
+) -> dict[str, Any]:
+    pf = snapshot.get("preflight") if isinstance(snapshot.get("preflight"), dict) else {}
+    op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
+    closed_at = str(snapshot.get("generated_at_utc") or _utc_now())
+    next_line = whats_next.strip() or infer_whats_next(snapshot)
+    return {
+        "event": "context_window_closeout",
+        "closeout_id": str(uuid.uuid4()),
+        "closed_at": closed_at,
+        "thread_role": thread_role.strip().lower() or "steward",
+        "chapter_id": _chapter_from_snapshot(snapshot),
+        "head": snapshot.get("head"),
+        "branch": pf.get("branch"),
+        "working_tree": pf.get("working_tree"),
+        "operator_verdict": op.get("verdict"),
+        "whats_next": next_line,
+        "safe_to_switch_agents": bool(safe_to_switch),
+        "slices_closed_in_thread": int(slices_closed_in_thread),
+        "triage_counts": dict(triage_counts or {}),
+        "notes": notes.strip(),
+    }
+
+
+def append_closeout_record(repo: Path, record: dict[str, Any]) -> Path:
+    repo = repo.resolve()
+    path = _metrics_dir(repo) / CONTEXT_WINDOWS_FILE
+    _append_jsonl(path, record)
+    return path
+
+
+def latest_closeout_record(repo: Path) -> dict[str, Any] | None:
+    rows = read_context_windows(repo)
+    return rows[-1] if rows else None
+
+
+def render_whats_next_markdown(record: dict[str, Any]) -> str:
+    closed = str(record.get("closed_at") or "?")
+    role = str(record.get("thread_role") or "steward")
+    chapter = str(record.get("chapter_id") or "(none)")
+    line = str(record.get("whats_next") or infer_whats_next({}))
+    safe = "yes" if record.get("safe_to_switch_agents") else "no"
+    return "\n".join(
+        [
+            "# What's next",
+            "",
+            f"**Last context closeout:** {closed} · **thread:** {role} · **chapter:** `{chapter}` · **safe to switch:** {safe}",
+            "",
+            line,
+            "",
+            "_New Cursor chat: ask **what's next?** — agent reads this file + `AGENT_CONTINUITY_BRIEF.md`._",
+            "",
+        ]
+    )
+
+
+def promote_whats_next(repo: Path, record: dict[str, Any]) -> tuple[Path, Path]:
+    repo = repo.resolve()
+    out_dir = repo / "artifacts" / "control_plane"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    json_path = repo / WHATS_NEXT_JSON_REL
+    md_path = repo / WHATS_NEXT_MD_REL
+    payload = {
+        "generated_at_utc": _utc_now(),
+        "source": "context_window_closeout",
+        "closeout_id": record.get("closeout_id"),
+        "closed_at": record.get("closed_at"),
+        "thread_role": record.get("thread_role"),
+        "chapter_id": record.get("chapter_id"),
+        "whats_next": record.get("whats_next"),
+        "safe_to_switch_agents": record.get("safe_to_switch_agents"),
+        "operator_verdict": record.get("operator_verdict"),
+    }
+    json_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    md_path.write_text(render_whats_next_markdown(record), encoding="utf-8")
+    return json_path, md_path
+
+
+def record_context_closeout(
+    repo: Path,
+    snapshot: dict[str, Any],
+    *,
+    thread_role: str = "steward",
+    whats_next: str = "",
+    safe_to_switch: bool = True,
+    slices_closed_in_thread: int = 0,
+    triage_counts: dict[str, int] | None = None,
+    notes: str = "",
+    promote: bool = True,
+) -> dict[str, Any]:
+    record = build_closeout_record(
+        snapshot,
+        thread_role=thread_role,
+        whats_next=whats_next,
+        safe_to_switch=safe_to_switch,
+        slices_closed_in_thread=slices_closed_in_thread,
+        triage_counts=triage_counts,
+        notes=notes,
+    )
+    append_closeout_record(repo, record)
+    if promote:
+        promote_whats_next(repo, record)
+    return record
+
+
+def load_whats_next_markdown(repo: Path) -> str | None:
+    path = repo / WHATS_NEXT_MD_REL
+    if not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8").strip()
+    return text or None
+
+
 def add_build_backlog_item(
     repo: Path,
     *,
@@ -393,7 +549,23 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Context window closeout gather + backlog helpers")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--render", action="store_true", help="Write JSON snapshot + draft markdown")
+    ap.add_argument(
+        "--record",
+        action="store_true",
+        help="Render + append context_windows.jsonl + promote WHATS_NEXT (use at thread closeout)",
+    )
     ap.add_argument("--json", action="store_true", help="Print snapshot JSON to stdout")
+    ap.add_argument("--thread-role", default="steward", help="steward | ide_build | recovery | exploratory")
+    ap.add_argument("--whats-next", default="", help="One-line next action (default: infer from operator verdict)")
+    ap.add_argument(
+        "--safe-to-switch",
+        choices=("yes", "no"),
+        default="yes",
+        help="AGENT CONTINUITY safe to switch agents",
+    )
+    ap.add_argument("--slices-closed", type=int, default=0, help="Slices closed in this Cursor thread")
+    ap.add_argument("--notes", default="", help="Optional closeout notes")
+    ap.add_argument("--no-promote", action="store_true", help="Skip writing WHATS_NEXT artifacts")
     sub = ap.add_subparsers(dest="cmd")
 
     ab = sub.add_parser("add-build", help="Append blocked row to PHASE_CHAPTER_BACKLOG.json")
@@ -438,10 +610,26 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(snapshot, indent=2))
         return 0
-    if args.render:
+    if args.render or args.record:
         json_path, md_path = write_artifacts(repo, snapshot)
         print(f"ppe_context_window_closeout: wrote {json_path.relative_to(repo)}")
         print(f"ppe_context_window_closeout: wrote {md_path.relative_to(repo)}")
+        if args.record:
+            record = record_context_closeout(
+                repo,
+                snapshot,
+                thread_role=args.thread_role,
+                whats_next=args.whats_next,
+                safe_to_switch=args.safe_to_switch == "yes",
+                slices_closed_in_thread=args.slices_closed,
+                notes=args.notes,
+                promote=not args.no_promote,
+            )
+            jsonl = _metrics_dir(repo) / CONTEXT_WINDOWS_FILE
+            print(f"ppe_context_window_closeout: appended {jsonl.relative_to(repo)}")
+            if not args.no_promote:
+                print(f"ppe_context_window_closeout: promoted {WHATS_NEXT_MD_REL}")
+            print(f"ppe_context_window_closeout: whats_next={record.get('whats_next')}")
         return 0
 
     ap.print_help()

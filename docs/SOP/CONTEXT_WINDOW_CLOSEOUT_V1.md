@@ -66,12 +66,33 @@ Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 ```text
 Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 
-1. python scripts/ppe_context_window_closeout.py --render
-2. Complete every <!-- AGENT_FILL --> section in the draft report.
-3. Operational sweep: commit+gate small ship-now items; push open branches; note open PRs.
-4. Triage follow-ups into buckets (table below); apply build/human backlog rows via script when appropriate.
-5. End with AGENT CONTINUITY block and explicit next-thread load list.
+1. context_window_closeout.cmd --record --whats-next "<one line>"
+2. Complete narrative/triage in draft if needed.
+3. Operational sweep: commit+gate ship-now items; push branches.
+4. End with AGENT CONTINUITY block.
 ```
+
+**New chat:** ask `what's next?` — no `@` files required (see **Tracking v2** below).
+
+---
+
+## Tracking v2 (append + what's next)
+
+Each `--record` closeout:
+
+| Artifact | Purpose |
+|----------|---------|
+| `artifacts/workflow_metrics/context_windows.jsonl` | Append-only history (one row per closeout) |
+| `artifacts/control_plane/WHATS_NEXT.md` | Latest one-liner for agents + operators |
+| `artifacts/control_plane/WHATS_NEXT.json` | Machine payload for tooling |
+
+`OPERATOR_STATUS.md` includes the **What's next** block when `WHATS_NEXT.md` exists. Weekly radar flags **context-chat-churn** when ≥3 closeouts in a week and zero slices closed.
+
+```bat
+context_window_closeout.cmd --record --thread-role steward --whats-next "Continue msos_user_state_v1: run_ppe_local.cmd"
+```
+
+`--record` implies `--render`. Omit `--whats-next` to infer from operator verdict.
 
 ---
 
@@ -158,12 +179,13 @@ Report **doc-state safety** and **repo-state safety** separately ([`FRONTIER_STE
 
 ### 6 — Next thread boot
 
-| Closing thread role | Open new thread with |
-|---------------------|----------------------|
-| Steward / guide | `@docs/SOP/AGENT_CONTINUITY_BRIEF.md` + completed closeout draft |
-| IDE BUILD | Starter file only — **not** this closeout narrative |
-| Recovery | `@docs/SOP/RECOVERY_PROTOCOL.md` + closeout draft park section |
-| Exploratory / planning | Brief + closeout **Meta** section only |
+| Closing thread role | New thread |
+|---------------------|------------|
+| Steward / guide | Ask **`what's next?`** — agent reads `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| IDE BUILD | Starter file only — **not** steward narrative |
+| Recovery | `what's next?` or `@docs/SOP/RECOVERY_PROTOCOL.md` if recovery-specific |
+
+Optional `@artifacts/control_plane/WHATS_NEXT.md` if the agent does not self-read.
 
 **Never** paste orchestrator stdout, full pytest logs, or full `git diff` into the next thread.
 
@@ -194,3 +216,4 @@ Copy final numbers into the draft report **Window ledger** section.
 | Date | Note |
 |------|------|
 | 2026-06-17 | v1 — SOP + `ppe_context_window_closeout.py` gather/triage helpers |
+| 2026-06-18 | v2 — `context_windows.jsonl` tracking, `WHATS_NEXT` promotion, radar churn signal |

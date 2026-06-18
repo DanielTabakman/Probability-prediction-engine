@@ -375,13 +375,26 @@ def _format_brief(status: dict[str, Any]) -> str:
 def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
     out = repo / STATUS_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
+    whats_next_block = ""
+    try:
+        from scripts.ppe_context_window_closeout import load_whats_next_markdown
+
+        wn = load_whats_next_markdown(repo)
+        if wn:
+            # Inject body only (skip duplicate H1 if present).
+            body_lines = wn.splitlines()
+            if body_lines and body_lines[0].startswith("# "):
+                body_lines = body_lines[2:] if len(body_lines) > 2 and not body_lines[1].strip() else body_lines[1:]
+            whats_next_block = "\n## What's next (last context closeout)\n\n" + "\n".join(body_lines).strip() + "\n"
+    except ImportError:
+        pass
     body = f"""# Operator status
 
 **As-of:** {status.get("as_of")}
 **Verdict:** `{status.get("verdict")}`
 
 {_format_human(status)}
-"""
+{whats_next_block}"""
     out.write_text(body, encoding="utf-8")
     return out
 

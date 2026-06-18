@@ -6,13 +6,14 @@ import argparse
 import csv
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 METRICS_DIR = "artifacts/workflow_metrics"
 SESSIONS_FILE = "sessions.jsonl"
 SLICES_FILE = "slices.jsonl"
+CONTEXT_WINDOWS_FILE = "context_windows.jsonl"
 
 SIZE_WEIGHTS = {"S": 1, "M": 2, "L": 3, "XL": 5}
 
@@ -56,6 +57,23 @@ def _parse_iso(ts: str) -> datetime | None:
         return datetime.fromisoformat(ts)
     except ValueError:
         return None
+
+
+def read_context_windows(repo: Path) -> list[dict[str, Any]]:
+    return _read_jsonl(_metrics_dir(repo) / CONTEXT_WINDOWS_FILE)
+
+
+def context_windows_in_week(repo: Path, week_monday: date) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for row in read_context_windows(repo):
+        closed = str(row.get("closed_at") or row.get("generated_at_utc") or "").strip()
+        t = _parse_iso(closed)
+        if not t:
+            continue
+        row_monday = t.date() - timedelta(days=t.date().weekday())
+        if row_monday == week_monday:
+            out.append(row)
+    return out
 
 
 def cmd_session_start(repo: Path, *, notes: str = "") -> int:

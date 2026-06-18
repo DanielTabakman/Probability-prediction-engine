@@ -19,6 +19,7 @@ from scripts.ppe_weekly_digest import (
     week_dates,
 )
 from scripts.workflow_metrics_cli import SLICES_FILE, _metrics_dir, _parse_iso, _read_jsonl
+from scripts.workflow_metrics_cli import context_windows_in_week
 
 RADAR_VERSION = 1
 CONTROL_PLANE_DIR = "artifacts/control_plane"
@@ -293,6 +294,33 @@ def scan_workflow_friction(repo: Path, week_monday: date) -> tuple[list[RadarCan
                 suggested_action="Charter a Workflow-Hardening slice targeting the recurring blocker.",
             )
         )
+
+    ctx_closeouts = context_windows_in_week(repo, week_monday)
+    if ctx_closeouts:
+        signals["context_closeouts"] = len(ctx_closeouts)
+        slices_in_week = _slices_in_week(repo, week_monday)
+        slices_closed = len(slices_in_week)
+        zero_slice_closeouts = sum(
+            1 for c in ctx_closeouts if int(c.get("slices_closed_in_thread") or 0) == 0
+        )
+        if len(ctx_closeouts) >= 3 and slices_closed == 0:
+            signals["context_chat_churn"] = len(ctx_closeouts)
+            candidates.append(
+                RadarCandidate(
+                    id="context-chat-churn",
+                    severity="info",
+                    title="Many context closeouts, no slices closed this week",
+                    evidence=[
+                        f"context_closeouts={len(ctx_closeouts)}",
+                        f"slices_closed_in_week={slices_closed}",
+                        f"zero_slice_closeouts={zero_slice_closeouts}",
+                    ],
+                    suggested_action=(
+                        "Prefer shorter steward threads or run relay between closeouts; "
+                        "see artifacts/workflow_metrics/context_windows.jsonl."
+                    ),
+                )
+            )
 
     return candidates, signals
 
