@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-18
 
+- `ca88993` — fix(control-plane): VM relay unblock (worktrees, ntfy, slice progress) (#217) (`scripts/`)
+- `dea0ebc` — fix(control-plane): make ntfy parsing tests env-safe (#216)
+- `2a015d4` — Control-plane: dev changelog
 - `6c3b9ea` — control-plane: formalize context window closeout ritual (#213) (`docs/SOP/`)
 - `f556add` — fix(control-plane): UserState snapshot mount and loop singleton test (#212) (`docs/SOP/`)
 - `dc1ea0a` — fix(control-plane): stop ntfy phone restart death spiral (#211) (`scripts/`)
