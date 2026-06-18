@@ -28,6 +28,10 @@ When research-offer vars are unset, homepage omits the CTA (honest public shell)
 
 `PPE_WEB_FEEDBACK_DIR=/data` is set in compose; feedback volume `msos_web_data` is created automatically.
 
+## Command Center snapshot mount (user state v1)
+
+`msos_web` mounts the shared `ppe_snapshots` volume **read-only** at `/ppe-snapshots` and sets `PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3` so the Command Center API can read freezes written by `app_full`. See [`MSOS_USER_STATE_SNAPSHOT_MOUNT.md`](MSOS_USER_STATE_SNAPSHOT_MOUNT.md).
+
 ## PPE embed proxy (Caddy)
 
 | Path | Backend | Notes |

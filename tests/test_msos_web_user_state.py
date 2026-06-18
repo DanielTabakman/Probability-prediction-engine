@@ -99,3 +99,12 @@ def test_seeded_snapshot_db_matches_summary_queries() -> None:
         lib = (MSOS_WEB / "src" / "lib" / "commandCenterSummary.ts").read_text(encoding="utf-8")
         assert "ORDER BY fe.created_at DESC" in lib
         assert "status: \"live\"" in lib or "status: 'live'" in lib
+
+
+def test_compose_msos_web_readonly_snapshot_mount() -> None:
+    compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    assert "PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3" in compose
+    assert "ppe_snapshots:/ppe-snapshots:ro" in compose
+    mount_doc = REPO_ROOT / "docs/DEPLOY/MSOS_USER_STATE_SNAPSHOT_MOUNT.md"
+    assert mount_doc.is_file()
+    assert "MSOS-UserStateV1-Platform-Slice003" in mount_doc.read_text(encoding="utf-8")

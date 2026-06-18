@@ -45,7 +45,7 @@
       "touchSet": [
         "docker-compose.yml",
         "docs/DEPLOY/MSOS_WEB_V1.md",
-        "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
+        "docs/DEPLOY/MSOS_USER_STATE_SNAPSHOT_MOUNT.md"
       ]
     },
     {

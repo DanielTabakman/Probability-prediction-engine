@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from scripts.ppe_vm_bootstrap import (
     _evidence_has_pending_slices,
+    _platform_touchset_satisfied,
     _witness_touchset_only_evidence,
     ensure_loop_host_config,
     sync_slice_progress,
@@ -87,3 +88,35 @@ def test_sync_skips_closeout_and_pending_witness(tmp_path):
     assert "MSOS-ProdWireV1-Product-Slice002" in marked
     assert "MSOS-ProdWireV1-Witness-Slice004" not in marked
     assert "MSOS-ProdWireV1-Closeout-Slice005" not in marked
+
+
+def test_platform_touchset_requires_slice_specific_compose_markers(tmp_path):
+    compose = tmp_path / "docker-compose.yml"
+    compose.write_text(
+        "services:\n  msos_web:\n    volumes:\n      - msos_web_data:/data\n",
+        encoding="utf-8",
+    )
+    mount_doc = tmp_path / "docs/DEPLOY/MSOS_USER_STATE_SNAPSHOT_MOUNT.md"
+    mount_doc.parent.mkdir(parents=True)
+    mount_doc.write_text("# mount\n", encoding="utf-8")
+    web_doc = tmp_path / "docs/DEPLOY/MSOS_WEB_V1.md"
+    web_doc.write_text("# web\n", encoding="utf-8")
+    slice_obj = {
+        "touchSet": [
+            "docker-compose.yml",
+            "docs/DEPLOY/MSOS_WEB_V1.md",
+            "docs/DEPLOY/MSOS_USER_STATE_SNAPSHOT_MOUNT.md",
+        ]
+    }
+    assert not _platform_touchset_satisfied(
+        tmp_path, "MSOS-UserStateV1-Platform-Slice003", slice_obj
+    )
+    compose.write_text(
+        compose.read_text(encoding="utf-8")
+        + "      - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots\n"
+        + "      - ppe_snapshots:/ppe-snapshots:ro\n",
+        encoding="utf-8",
+    )
+    assert _platform_touchset_satisfied(
+        tmp_path, "MSOS-UserStateV1-Platform-Slice003", slice_obj
+    )

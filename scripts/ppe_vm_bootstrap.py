@@ -102,6 +102,29 @@ def _touchset_satisfied(repo: Path, slice_obj: dict[str, Any]) -> bool:
     return all((repo / p).is_file() for p in paths)
 
 
+# Slice-specific compose markers — shared touchSet paths (e.g. docker-compose.yml) are not
+# sufficient alone; prior chapters may have already landed the generic files.
+_PLATFORM_COMPOSE_MARKERS: dict[str, tuple[str, ...]] = {
+    "MSOS-UserStateV1-Platform-Slice003": (
+        "PPE_SNAPSHOT_DB_PATH=/ppe-snapshots",
+        "ppe_snapshots:/ppe-snapshots:ro",
+    ),
+}
+
+
+def _platform_touchset_satisfied(repo: Path, slice_id: str, slice_obj: dict[str, Any]) -> bool:
+    if not _touchset_satisfied(repo, slice_obj):
+        return False
+    markers = _PLATFORM_COMPOSE_MARKERS.get(slice_id)
+    if not markers:
+        return True
+    compose = repo / "docker-compose.yml"
+    if not compose.is_file():
+        return False
+    body = compose.read_text(encoding="utf-8", errors="replace")
+    return all(marker in body for marker in markers)
+
+
 def _is_closeout_slice(slice_obj: dict[str, Any]) -> bool:
     return isinstance(slice_obj.get("closeout"), dict)
 
@@ -174,6 +197,11 @@ def sync_slice_progress(repo: Path, plan_path: str) -> dict[str, Any]:
                 if not _evidence_has_pending_slices(body):
                     mark_slice_complete(repo, norm, sid)
                     marked.append(sid)
+            continue
+        if "PLATFORM" in sid.upper():
+            if _platform_touchset_satisfied(repo, sid, sl):
+                mark_slice_complete(repo, norm, sid)
+                marked.append(sid)
             continue
         if _touchset_satisfied(repo, sl):
             mark_slice_complete(repo, norm, sid)
