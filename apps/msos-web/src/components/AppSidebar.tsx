@@ -1,12 +1,24 @@
 import Link from "next/link";
 
 import { connectedMarkets, navItems } from "@/data/commandCenterFixtures";
+import type { EntitlementTier } from "@/lib/msosEntitlements";
+import { tierLabel, upgradeOfferUrl } from "@/lib/msosEntitlements";
 
 type AppSidebarProps = {
   activeNavId?: string;
+  tier?: EntitlementTier | null;
 };
 
-export function AppSidebar({ activeNavId = "command-center" }: AppSidebarProps) {
+function tierTone(tier: EntitlementTier): string {
+  if (tier === "paid") return "teal";
+  if (tier === "research_beta") return "amber";
+  return "";
+}
+
+export function AppSidebar({ activeNavId = "command-center", tier = null }: AppSidebarProps) {
+  const upgradeUrl = upgradeOfferUrl();
+  const showUpgrade = tier === "free" && upgradeUrl;
+
   return (
     <aside className="app-sidebar">
       <div className="brand app-brand">
@@ -16,6 +28,19 @@ export function AppSidebar({ activeNavId = "command-center" }: AppSidebarProps) 
           <small>Market Structure OS</small>
         </div>
       </div>
+
+      {tier ? (
+        <div className="asset on entitlement-badge" data-tier={tier}>
+          <span>Account tier</span>
+          <span className={`tiny-pill ${tierTone(tier)}`.trim()}>{tierLabel(tier)}</span>
+        </div>
+      ) : null}
+
+      {showUpgrade ? (
+        <Link href={upgradeUrl} className="btn slim primary entitlement-upgrade-link">
+          Request upgrade
+        </Link>
+      ) : null}
 
       <nav className="menu" aria-label="Workspace">
         {navItems.map((item) => {
