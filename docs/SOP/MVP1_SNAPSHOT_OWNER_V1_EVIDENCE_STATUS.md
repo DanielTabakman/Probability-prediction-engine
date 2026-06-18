@@ -2,7 +2,7 @@
 
 **Chapter:** `mvp1_snapshot_owner_v1`  
 **Priority:** HIGH  
-**Status:** **CHARTERED** 2026-06-14  
+**Status:** **COMPLETE** 2026-06-18  
 **Phase plan:** [`PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json`](PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json)
 
 | Slice | Status | Notes |
