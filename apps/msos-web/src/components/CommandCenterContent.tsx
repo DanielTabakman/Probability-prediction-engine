@@ -1,12 +1,8 @@
 import Link from "next/link";
 
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
-import {
-  calibrationStrip,
-  headlines,
-  labTiles,
-  reviewEvents,
-} from "@/data/commandCenterFixtures";
+import { buildCalibrationStrip, buildReviewEvents } from "@/lib/monitorHistoryFeed";
+import { headlines, labTiles } from "@/data/commandCenterFixtures";
 
 type Props = {
   summary: CommandCenterSummary;
@@ -20,6 +16,8 @@ function statusPill(summary: CommandCenterSummary): string {
 
 export function CommandCenterContent({ summary }: Props) {
   const hasLiveData = summary.status === "live" && summary.currentWork.length > 0;
+  const calibrationStrip = buildCalibrationStrip(summary);
+  const reviewEvents = buildReviewEvents(summary);
 
   return (
     <>

@@ -254,7 +254,7 @@
     },
     {
       "chapterId": "msos_monitor_history_live_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
@@ -274,7 +274,7 @@
     },
     {
       "chapterId": "msos_entitlements_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
