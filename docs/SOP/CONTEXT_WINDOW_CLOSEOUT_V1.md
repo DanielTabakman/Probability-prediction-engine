@@ -33,6 +33,8 @@ Chapter closeout can happen **without** context closeout when the Cursor thread 
 
 ---
 
+---
+
 ## Triggers (say any of these)
 
 The Agent should run this ritual when you use **any** of:
