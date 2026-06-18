@@ -13,17 +13,31 @@ from scripts.ppe_ntfy_commands import (
 
 
 def test_parse_restart_command():
+    # The VM loop host may set PPE_NTFY_CMD_SECRET globally. These tests assert the
+    # default behavior when no secret is configured, so make that explicit.
+    import os
+
+    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     assert parse_command_text("restart").name == "restart"
     assert parse_command_text("PPE restart").name == "restart"
     assert parse_command_text("/restart").name == "restart"
 
 
 def test_parse_build_command():
+    # Ensure the test is not affected by a globally configured secret.
+    # When a secret is configured, commands must be prefixed with it.
+    # (That behavior is tested separately.)
+    import os
+
+    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     assert parse_command_text("build").name == "build"
     assert parse_command_text("build extra context").args == "extra context"
 
 
 def test_parse_fix_with_note():
+    import os
+
+    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     cmd = parse_command_text("fix loop died after smoke")
     assert cmd is not None
     assert cmd.name == "fix"
