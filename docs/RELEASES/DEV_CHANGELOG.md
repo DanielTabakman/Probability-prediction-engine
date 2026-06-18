@@ -4,6 +4,15 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-18
 
+- `9da27a3` — Merge pull request #224 from DanielTabakman/control-plane/commit-policy-auto
+- `e3a669b` — merge main into control-plane/commit-policy-auto (keep snapshot_owner closeout state)
+- `e364799` — fix(control-plane): operator recovery — close user_state + workflow chapters, advance to snapshot_owner (`docs/SOP/`)
+- **Chapter closed:** MSOS-WorkflowV1-Closeout-Slice005 (promotion recovery) (`MSOS-WorkflowV1-Closeout-Slice005 (promotion recovery)`)
+- `738973a` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `16b837a` — ops: loop publish control-plane/commit-policy-auto (#223) (`docs/SOP/`)
+- **Chapter closed:** MSOS-UserStateV1-Closeout-Slice005 (promotion recovery) (`MSOS-UserStateV1-Closeout-Slice005 (promotion recovery)`)
+- `74de3d2` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `878f79e` — Control-plane: dev changelog
 - `04bab7f` — Merge pull request #215 from DanielTabakman/control-plane/commit-policy-auto
 - `7d240f8` — merge main into control-plane/commit-policy-auto (resolve conflicts)
 - `7cae9b0` — feat(msos-ui): MSOS access identity product slice 002 (scoped APIs) (#222) (`apps/msos-web/`)
