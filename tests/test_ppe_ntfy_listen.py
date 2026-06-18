@@ -10,12 +10,13 @@ from scripts.ppe_ntfy_listen import handle_message, listen_once, load_state, pro
 
 def test_handle_message_restart(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
     with patch("scripts.ppe_ntfy_commands.execute_restart") as restart:
         restart.return_value = {"action": "restart", "killed": 1, "stack": {}}
         with patch("scripts.ppe_ntfy_commands.notify_command_result", return_value=True):
             out = handle_message(
                 tmp_path,
-                {"event": "message", "id": "abc", "message": "restart"},
+                {"event": "message", "id": "abc", "message": "s3cret restart"},
                 notify=True,
             )
     assert out is not None
@@ -46,7 +47,8 @@ def test_state_roundtrip(tmp_path: Path):
 
 def test_process_messages_acks_restart_before_handle(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
-    messages = [{"event": "message", "id": "restart-1", "message": "restart"}]
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    messages = [{"event": "message", "id": "restart-1", "message": "s3cret restart"}]
     with patch("scripts.ppe_ntfy_listen.handle_message") as handle:
         handle.return_value = {"command": "restart"}
         handled, state = process_messages(tmp_path, messages, state={}, notify=False)

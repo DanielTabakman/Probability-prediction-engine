@@ -12,12 +12,12 @@ globs:
 When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 1. Read [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](../../docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md).
-2. Run `python scripts/ppe_context_window_closeout.py --render` from repo root.
-3. Complete every `<!-- AGENT_FILL -->` section in `artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md`.
-4. Operational sweep: gate+commit **ship_now** items; push branches; list open PRs; reconcile `OPERATOR_STATUS` / `LAST_RUN_REPORT`.
-5. Triage follow-ups into buckets; use `add-build` / `add-human` subcommands when rows belong in backlogs.
-6. End with **AGENT CONTINUITY** block and explicit **next thread** load list.
+2. Operational sweep: gate+commit **ship_now** items; push branches; reconcile `OPERATOR_STATUS` / `LAST_RUN_REPORT`.
+3. Triage follow-ups into buckets; use `add-build` / `add-human` when appropriate.
+4. Run `context_window_closeout.cmd --record --whats-next "<one-line next action>"` (implies render).
+5. Complete `<!-- AGENT_FILL -->` sections in draft only when narrative/triage needs capture.
+6. End with **AGENT CONTINUITY** block.
 
 **Not** chapter closeout (`apply_control_closeout_v1`) unless a relay closeout slice is also in scope.
 
-**Next thread:** prefer `AGENT_CONTINUITY_BRIEF.md` + completed closeout draft — not this chat history.
+**Next thread:** user asks `what's next?` — agent **auto-executes** operator verdict per `ppe-unified-run.mdc` (read `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` for context; no @ required).

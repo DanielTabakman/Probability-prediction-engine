@@ -69,7 +69,12 @@ def parse_command_text(text: str) -> RemoteCommand | None:
         tokens = tokens[1:]
     if not tokens or tokens[0] not in KNOWN_COMMANDS:
         return None
-    return RemoteCommand(name=tokens[0], args=" ".join(tokens[1:]).strip())
+    name = tokens[0]
+    # Restart is destructive (kills the listener). Require a configured secret so a bare
+    # "restart" in topic history cannot trigger a loop on an open topic.
+    if name == "restart" and not command_secret():
+        return None
+    return RemoteCommand(name=name, args=" ".join(tokens[1:]).strip())
 
 
 def parse_command_message(message: dict[str, Any]) -> RemoteCommand | None:
@@ -216,7 +221,7 @@ def execute_help(repo: Path) -> dict[str, Any]:
     body = (
         f"{prefix}build - start IDE BUILD when verdict is IDE_BUILD\n"
         f"Desktop: {PPE_GO_HINT}\n"
-        f"{prefix}restart - restart loop + watch on desktop\n"
+        f"{prefix}restart - restart loop + watch on the VM loop host (secret required)\n"
         f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
         f"{prefix}status - friendly operator snapshot\n"
         f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"

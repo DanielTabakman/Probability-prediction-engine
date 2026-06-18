@@ -63,10 +63,11 @@ PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=
 | Step | Where | Command / action |
 |------|--------|------------------|
 | 1. Operator blocks on product | VM loop (automatic) | `VERDICT=IDE_BUILD` in status |
-| 2. Implement slice | **Desktop Cursor** | Open `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md`, build, gate, commit, PR |
-| 3. Optional director handoff | **Desktop** | `ppe_go.cmd` → paste in new Agent chat (`@ppe-director` prompt). *May look like “nothing happened” — it copies to clipboard.* |
-| 4. Mark product ready | Desktop or agent | `mark_ide_product_ready.cmd <sliceId>` (after merge/gate) |
-| 5. Continue relay | **VM** (automatic) | Loop runs `run_ppe_local` when product marked ready |
+| 2. Start BUILD | **Real PC** | Double-click **`DESKTOP BUILD`** — copies prompt to clipboard, opens starter |
+| 3. Paste in Agent | **Real PC Cursor** | New Agent chat → **Ctrl+V** → Enter |
+| 4. Agent closeout | **Real PC** | Gate → commit → `mark_ide_product_ready` (agent runs this) |
+| 5. After PR merge | **Real PC** | **`DESKTOP CONTINUE`** |
+| 6. Continue relay | **VM** (automatic) | Loop runs `run_ppe_local` — no VM action needed |
 
 **Phone ntfy** messages include button hints — see [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
 

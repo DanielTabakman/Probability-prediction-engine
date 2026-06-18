@@ -3,3 +3,5 @@ REM Daily-driver host ONLY — copy to ppe_operator_no_loop.local.cmd (gitignore
 REM Blocks accidental loop/stack start on the real PC when the VM is the loop host.
 
 set "PPE_STACK_FORBIDDEN=1"
+REM Daily PC must not run the ntfy command listener (prevents restart death-spiral on wrong host).
+set "PPE_NTFY_CMD_ENABLED=0"

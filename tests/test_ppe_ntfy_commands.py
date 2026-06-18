@@ -13,14 +13,19 @@ from scripts.ppe_ntfy_commands import (
 
 
 def test_parse_restart_command():
-    # The VM loop host may set PPE_NTFY_CMD_SECRET globally. These tests assert the
-    # default behavior when no secret is configured, so make that explicit.
     import os
 
     os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("restart").name == "restart"
-    assert parse_command_text("PPE restart").name == "restart"
-    assert parse_command_text("/restart").name == "restart"
+    assert parse_command_text("restart") is None
+    assert parse_command_text("PPE restart") is None
+    assert parse_command_text("/restart") is None
+
+
+def test_parse_restart_command_with_secret(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    assert parse_command_text("restart") is None
+    assert parse_command_text("s3cret restart").name == "restart"
+    assert parse_command_text("PPE restart") is None
 
 
 def test_parse_build_command():

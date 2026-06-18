@@ -21,7 +21,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Next (blocked):** Phase 3 `msos_workflow_persistence_v1` after user state COMPLETE
 - **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases **1→7b** (full product + commercial)
 - **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
-- **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
+- **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `embed_shell` (MEDIUM, parallel UX) → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
 
 ### Live product sequence — phases 4–7 (all chartered)
 
@@ -69,6 +69,19 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | **PENDING** | `MSOS-WorkflowV1-Closeout-Slice005` — closeout | EVIDENCE |
 
 **Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · **Blocked until** user state bridge COMPLETE
+
+### MSOS Strategy Lab embed shell v1 — relay queue — **BLOCKED** (MEDIUM, post–phase 3 UX)
+
+| Status | Slice | Plane |
+|--------|--------|-------|
+| **PENDING** | `MSOS-EmbedShellV1-Control-Slice001` — charter | EVIDENCE |
+| **PENDING** | `MSOS-EmbedShellV1-Product-Slice002` — PPE read-only display boundary | PRODUCT |
+| **PENDING** | `MSOS-EmbedShellV1-Product-Slice003` — MSOS chart shell (`03_ppe_lab`) | PRODUCT |
+| **PENDING** | `MSOS-EmbedShellV1-Platform-Slice004` — Caddy/compose/deploy | EVIDENCE |
+| **PENDING** | `MSOS-EmbedShellV1-Witness-Slice005` — pytest + visual witness | EVIDENCE |
+| **PENDING** | `MSOS-EmbedShellV1-Closeout-Slice006` — closeout | EVIDENCE |
+
+**Charter:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) · **Blocked until** workflow persistence COMPLETE · **Does not block** phases 4a–7
 
 ### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
 

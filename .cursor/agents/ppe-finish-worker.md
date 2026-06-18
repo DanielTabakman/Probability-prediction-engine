@@ -8,7 +8,7 @@ You finish one chapter after IDE BUILD already committed.
 ## Steps
 
 1. Confirm `artifacts/orchestrator/IDE_PRODUCT_READY.json` exists (or status says IDE_MARKER_OK).
-2. Run `run_ppe_local.cmd` from repo root.
+2. **Desktop** (`ppe_operator_no_loop.local.cmd` present): run `DESKTOP_CONTINUE.cmd`. **VM loop host:** run `run_ppe_local.cmd`.
 3. Read `artifacts/orchestrator/LAST_RUN_REPORT.md` — summary section only.
 4. Read `artifacts/orchestrator/OPERATOR_STATUS.md`.
 

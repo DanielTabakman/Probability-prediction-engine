@@ -240,6 +240,17 @@ def main(argv: list[str] | None = None) -> int:
         print("ppe_ntfy_listen: remote commands disabled (PPE_NTFY_CMD_ENABLED=0)", file=sys.stderr)
         return 1
 
+    from scripts.ppe_loop_host_guard import loop_host_blocked
+
+    blocked = loop_host_blocked()
+    if blocked:
+        print(
+            f"ppe_ntfy_listen: blocked on this host ({blocked['guard_code']}) — "
+            "phone commands run on the VM loop host only.",
+            file=sys.stderr,
+        )
+        return 8
+
     repo = args.repo_root.resolve()
     bootstrap_operator_notify_env(repo)
     notify = not args.no_notify
