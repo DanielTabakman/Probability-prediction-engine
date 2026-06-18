@@ -3,6 +3,6 @@
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
   "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Command Center PPE snapshot bridge \u2014 phase 2",
+  "notes": "operator recovery: align manifest with PHASE_QUEUE READY (user_state v1)",
   "workerMode": "deterministic"
 }
