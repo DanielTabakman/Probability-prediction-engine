@@ -25,7 +25,12 @@ echo            Close any blank cmd windows by hand if you still see them.
 timeout /t 30 /nobreak
 
 echo.
-echo [VM_RESTART] step 4/5 — ensure loop-host env + start headless stack...
+echo [VM_RESTART] step 4/6 — ensure ntfy restart secret...
+set "PYTHONPATH=%CD%"
+python "%CD%\scripts\ensure_ntfy_cmd_secret.py" --repo-root "%CD%"
+
+echo.
+echo [VM_RESTART] step 5/6 — ensure loop-host env + start headless stack...
 if exist "%CD%\ppe_operator_loop_host.local.cmd.example" (
   copy /Y "%CD%\ppe_operator_loop_host.local.cmd.example" "%CD%\ppe_operator_loop_host.local.cmd" >nul
   echo [VM_RESTART] refreshed ppe_operator_loop_host.local.cmd
@@ -40,7 +45,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [VM_RESTART] step 5/5 — status:
+echo [VM_RESTART] step 6/6 — status:
 call "%CD%\check_vm_loop.cmd" --no-pause
 
 :done
