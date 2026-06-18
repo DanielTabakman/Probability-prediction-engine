@@ -8,7 +8,13 @@ import unittest
 from pathlib import Path
 
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
-from src.viz.frozen_evaluation_store import get_by_id, insert_record, list_recent, open_store
+from src.viz.frozen_evaluation_store import (
+    get_by_id,
+    insert_record,
+    list_recent,
+    open_store,
+    resolve_access_owner_email,
+)
 
 
 class TestFrozenEvaluationStore(unittest.TestCase):
@@ -50,3 +56,44 @@ class TestFrozenEvaluationStore(unittest.TestCase):
                 json.dumps(got)  # serializable
             finally:
                 conn.close()
+
+    def test_owner_email_migration_and_filter(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "owner.sqlite"
+            conn = open_store(p)
+            try:
+                v = {
+                    "verification_summary": {
+                        "as_of_utc": "2026-06-18T12:00:00Z",
+                        "disagreement_category_id": "width_vol",
+                    },
+                }
+                rec_a = build_frozen_evaluation_record(
+                    verification=v,
+                    expiry_str="5MAY26",
+                    owner_email="alice@example.com",
+                )
+                rec_b = build_frozen_evaluation_record(
+                    verification=v,
+                    expiry_str="6MAY26",
+                    owner_email="bob@example.com",
+                )
+                insert_record(conn, rec_a, owner_email="alice@example.com")
+                insert_record(conn, rec_b, owner_email="bob@example.com")
+                all_rows = list_recent(conn, limit=10)
+                self.assertEqual(len(all_rows), 2)
+                alice_rows = list_recent(conn, limit=10, owner_email="alice@example.com")
+                self.assertEqual(len(alice_rows), 1)
+                self.assertEqual(alice_rows[0]["owner_email"], "alice@example.com")
+                got = get_by_id(conn, alice_rows[0]["id"])
+                assert got is not None
+                self.assertEqual(got.get("owner_email"), "alice@example.com")
+            finally:
+                conn.close()
+
+    def test_resolve_access_owner_email(self) -> None:
+        self.assertIsNone(resolve_access_owner_email({}))
+        self.assertEqual(
+            resolve_access_owner_email({"CF-Access-Authenticated-User-Email": "Ops@Example.com"}),
+            "ops@example.com",
+        )

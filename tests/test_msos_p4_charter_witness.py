@@ -29,6 +29,8 @@ MSOS_P7_MONITORING_PLAN = "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json"
 MSOS_P8_TESTER_PLAN = "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json"
 MSOS_PROD_WIRE_PLAN = "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json"
 MSOS_USER_STATE_PLAN = "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json"
+MSOS_WORKFLOW_PLAN = "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json"
+MVP1_SNAPSHOT_OWNER_PLAN = "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json"
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -44,6 +46,8 @@ ALLOWED_READY_PLANS = (
     MSOS_P8_TESTER_PLAN,
     MSOS_PROD_WIRE_PLAN,
     MSOS_USER_STATE_PLAN,
+    MSOS_WORKFLOW_PLAN,
+    MVP1_SNAPSHOT_OWNER_PLAN,
 )
 
 

@@ -8,7 +8,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from src.viz.frozen_evaluation_record import summary_line_for_record
 
@@ -87,6 +87,41 @@ def _migrate_snapshot_reviews_fk(conn: sqlite3.Connection) -> None:
     conn.commit()
 
 
+def _migrate_owner_email_column(conn: sqlite3.Connection) -> None:
+    try:
+        conn.execute("ALTER TABLE frozen_evaluations ADD COLUMN owner_email TEXT")
+    except sqlite3.OperationalError:
+        pass
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS ix_frozen_eval_owner ON frozen_evaluations(owner_email)"
+    )
+
+
+def resolve_access_owner_email(headers: dict[str, str] | Mapping[str, str] | None = None) -> str | None:
+    """Cloudflare Access email from env override or reverse-proxy headers (nullable)."""
+    raw = (os.environ.get("PPE_OWNER_EMAIL") or "").strip()
+    if raw:
+        return raw.lower()
+    if not headers:
+        return None
+    lowered = {str(k).lower(): str(v).strip() for k, v in headers.items() if str(v).strip()}
+    for name in (
+        "cf-access-authenticated-user-email",
+        "x-forwarded-email",
+    ):
+        val = lowered.get(name)
+        if val:
+            return val.lower()
+    return None
+
+
+def _owner_filter_clause(owner_email: str | None) -> tuple[str, list[Any]]:
+    owner = (owner_email or "").strip().lower() or None
+    if not owner:
+        return "", []
+    return " AND fe.owner_email = ?", [owner]
+
+
 def _utc_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -133,6 +168,7 @@ def init_schema(conn: sqlite3.Connection) -> None:
         except sqlite3.OperationalError:
             pass
         _migrate_snapshot_reviews_fk(conn)
+    _migrate_owner_email_column(conn)
     conn.commit()
 
 
@@ -230,6 +266,7 @@ def list_snapshots_pending_review(
     limit: int = 20,
     expiry: str | None = None,
     sort: str = PENDING_SORT_NEWEST,
+    owner_email: str | None = None,
 ) -> list[dict[str, Any]]:
     """Frozen rows with no review row or review_status = pending."""
     init_schema(conn)
@@ -239,6 +276,10 @@ def list_snapshots_pending_review(
     if exp:
         where = f"({where}) AND fe.expiry = ?"
         params.append(exp)
+    owner_clause, owner_params = _owner_filter_clause(owner_email)
+    if owner_clause:
+        where = f"({where}){owner_clause}"
+        params.extend(owner_params)
     order = _pending_order_clause(sort)
     cur = conn.execute(
         f"""
@@ -278,6 +319,7 @@ def list_completed_review_snapshots(
     expiry: str | None = None,
     reviewed_after_utc: str | None = None,
     reviewed_before_utc: str | None = None,
+    owner_email: str | None = None,
 ) -> list[dict[str, Any]]:
     """Frozen rows joined to reviews with status other than `pending` (Phase 6 rollup input)."""
     init_schema(conn)
@@ -303,6 +345,10 @@ def list_completed_review_snapshots(
     if before:
         where_parts.append("sr.reviewed_at_utc <= ?")
         params.append(before)
+    owner_clause, owner_params = _owner_filter_clause(owner_email)
+    if owner_clause:
+        where_parts.append(owner_clause.removeprefix(" AND "))
+        params.extend(owner_params)
     where = " AND ".join(where_parts)
     cur = conn.execute(
         f"""
@@ -341,26 +387,69 @@ def list_completed_review_snapshots(
     return out
 
 
-def insert_record(conn: sqlite3.Connection, record: dict[str, Any]) -> str:
+def insert_record(
+    conn: sqlite3.Connection,
+    record: dict[str, Any],
+    *,
+    owner_email: str | None = None,
+) -> str:
     init_schema(conn)
     rid = str(record["snapshot_id"])
     created = str(record["created_at_utc"])
     exp = str(record.get("expiry") or "")
     summary = summary_line_for_record(record)
+    owner = (owner_email or record.get("owner_email") or "").strip().lower() or None
+    payload = dict(record)
+    if owner:
+        payload["owner_email"] = owner
     conn.execute(
-        "INSERT INTO frozen_evaluations (id, created_at, expiry, summary_line, record_json) VALUES (?, ?, ?, ?, ?)",
-        (rid, created, exp, summary, json.dumps(record, separators=(",", ":"), ensure_ascii=False)),
+        """
+        INSERT INTO frozen_evaluations
+        (id, created_at, expiry, summary_line, record_json, owner_email)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            rid,
+            created,
+            exp,
+            summary,
+            json.dumps(payload, separators=(",", ":"), ensure_ascii=False),
+            owner,
+        ),
     )
     conn.commit()
     return rid
 
 
-def list_recent(conn: sqlite3.Connection, *, limit: int = 50) -> list[dict[str, Any]]:
+def list_recent(
+    conn: sqlite3.Connection,
+    *,
+    limit: int = 50,
+    owner_email: str | None = None,
+) -> list[dict[str, Any]]:
     init_schema(conn)
-    cur = conn.execute(
-        "SELECT id, created_at, expiry, summary_line FROM frozen_evaluations ORDER BY created_at DESC LIMIT ?",
-        (int(limit),),
-    )
+    owner = (owner_email or "").strip().lower() or None
+    if owner:
+        cur = conn.execute(
+            """
+            SELECT id, created_at, expiry, summary_line, owner_email
+            FROM frozen_evaluations
+            WHERE owner_email = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (owner, int(limit)),
+        )
+    else:
+        cur = conn.execute(
+            """
+            SELECT id, created_at, expiry, summary_line, owner_email
+            FROM frozen_evaluations
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (int(limit),),
+        )
     return [dict(row) for row in cur.fetchall()]
 
 

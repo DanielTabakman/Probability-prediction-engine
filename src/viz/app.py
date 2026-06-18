@@ -152,6 +152,17 @@ _cta_private_url, _research_offer = resolve_demo_ctas(
     offer_label=os.environ.get("PPE_RESEARCH_OFFER_LABEL"),
 )
 
+
+def _streamlit_request_headers() -> dict[str, str]:
+    try:
+        ctx = getattr(st, "context", None)
+        headers = getattr(ctx, "headers", None) if ctx is not None else None
+        if headers:
+            return {str(k): str(v) for k, v in headers.items()}
+    except Exception:
+        pass
+    return {}
+
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
 
 if _cta_private_url:
@@ -1696,14 +1707,16 @@ if show_bitcoin_view:
                             if st.button("Freeze this evaluation", key=f"ppe_freeze_btn_{selected_expiry_str}"):
                                 _fv = outputs.get("verification")
                                 if isinstance(_fv, dict) and _fv:
+                                    _owner = _fz_store.resolve_access_owner_email(_streamlit_request_headers())
                                     _rec = build_frozen_evaluation_record(
                                         verification=_fv,
                                         expiry_str=selected_expiry_str,
                                         operator_note=_fz_note or None,
+                                        owner_email=_owner,
                                     )
                                     _conn = _fz_store.open_store()
                                     try:
-                                        _rid = _fz_store.insert_record(_conn, _rec)
+                                        _rid = _fz_store.insert_record(_conn, _rec, owner_email=_owner)
                                         st.success(f"Saved frozen snapshot `{_rid}`")
                                     finally:
                                         _conn.close()
