@@ -2,8 +2,16 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-18
+
+- `6c3b9ea` — control-plane: formalize context window closeout ritual (#213) (`docs/SOP/`)
+- `f556add` — fix(control-plane): UserState snapshot mount and loop singleton test (#212) (`docs/SOP/`)
+- `dc1ea0a` — fix(control-plane): stop ntfy phone restart death spiral (#211) (`scripts/`)
+
 ## 2026-06-17
 
+- `2c86386` — control-plane: consolidate commit policy into COMMIT_POLICY.md (#214) (`docs/SOP/`)
+- `b9ce831` — Control-plane: dev changelog
 - `5ea46d7` — control-plane: relay closeout hardening (witness sync + run-local dedupe) (#210) (`scripts/`)
 - `a6f18b3` — docs(control-plane): sync MSOS steering after production wiring closeout (#209) (`docs/SOP/`)
 - `d9d1f20` — control-plane: IDE BUILD friction fixes (#208) (`scripts/`)

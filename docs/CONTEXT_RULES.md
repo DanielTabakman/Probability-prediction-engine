@@ -70,4 +70,4 @@ Full ritual: [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSE
 
 **Trigger phrases:** `close out thread` · `closeout thread` · `context closeout` · `wrap this chat` (see SOP for full list)
 
-**Next thread after closeout:** ask **what's next?** — agent **auto-executes** the operator verdict (`RUN_LOCAL` / `IDE_BUILD` / `RUN_AUTO`) from `OPERATOR_STATUS.md`, then summarizes (not chat history). See `.cursor/rules/ppe-unified-run.mdc` § What's next.
+**Next thread after closeout:** ask **what's next?** — agent **auto-executes** the operator verdict (`RUN_LOCAL` / `IDE_BUILD` / `RUN_AUTO`) from `OPERATOR_STATUS.md`, then summarizes via `AGENT_CONTINUITY_BRIEF.md` + closeout draft (not chat history). See `.cursor/rules/ppe-unified-run.mdc` § What's next.
