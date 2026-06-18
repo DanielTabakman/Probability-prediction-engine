@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.ppe_ntfy_listen import handle_message, listen_once, load_state, save_state
+from scripts.ppe_ntfy_listen import handle_message, listen_once, load_state, process_messages, save_state
 
 
 def test_handle_message_restart(tmp_path: Path, monkeypatch):
@@ -41,3 +41,13 @@ def test_listen_once_updates_state(tmp_path: Path, monkeypatch):
 def test_state_roundtrip(tmp_path: Path):
     save_state(tmp_path, {"last_message_id": "x"})
     assert load_state(tmp_path)["last_message_id"] == "x"
+
+
+def test_process_messages_acks_restart_before_handle(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
+    messages = [{"event": "message", "id": "restart-1", "message": "restart"}]
+    with patch("scripts.ppe_ntfy_listen.handle_message") as handle:
+        handle.return_value = {"command": "restart"}
+        handled, state = process_messages(tmp_path, messages, state={}, notify=False)
+    assert handled
+    assert load_state(tmp_path)["last_message_id"] == "restart-1"

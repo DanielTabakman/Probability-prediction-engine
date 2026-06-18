@@ -48,6 +48,26 @@ def test_ignore_desktop_ok_title():
     )
 
 
+def test_ignore_restart_reply_title():
+    assert should_ignore_message(
+        {
+            "event": "message",
+            "title": "PPE: restarted",
+            "message": "Operator stack restarted (1 old process(es) stopped).\nLoop: off · Watch: off",
+        }
+    )
+
+
+def test_execute_restart_refused_when_stack_forbidden(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_STACK_FORBIDDEN", "1")
+    with patch("scripts.ppe_ntfy_commands.stop_stack_processes") as stop:
+        from scripts.ppe_ntfy_commands import execute_restart
+
+        result = execute_restart(tmp_path)
+    assert result.get("refused") is True
+    stop.assert_not_called()
+
+
 def test_is_outbound_message_string_tags():
     assert is_outbound_message({"tags": "ppe,from-desktop,ok"})
 
