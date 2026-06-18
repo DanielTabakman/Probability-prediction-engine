@@ -26,7 +26,9 @@ def test_thesis_api_routes_exist() -> None:
     ).read_text(encoding="utf-8")
     assert "export async function GET" in thesis_route
     assert "export async function PUT" in thesis_route
+    assert "requireProtectedIdentity" in thesis_route
     assert "upsertCurrentThesis" in thesis_route
+    assert "identity.email" in thesis_route
     assert "upsertCurrentExpression" in expression_route
     assert "loadWorkflowSummary" in summary_route
 

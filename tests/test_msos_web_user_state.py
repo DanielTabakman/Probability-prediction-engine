@@ -22,6 +22,7 @@ def test_command_center_summary_lib_and_api_exist() -> None:
     assert "frozen_evaluations" in lib
     assert "snapshot_reviews" in lib
     assert "export async function GET" in route
+    assert "requireProtectedIdentity" in route
     assert "loadCommandCenterSummary" in route
 
 
