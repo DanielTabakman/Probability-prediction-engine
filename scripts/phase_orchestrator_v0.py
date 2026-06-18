@@ -187,8 +187,8 @@ class Orchestrator:
         return (self.worktrees_root / leaf).resolve()
 
     def _baseline_tip_sha(self, baseline_local: str) -> str:
-        """Resolve baseline to a commit SHA (prefer origin/<branch>)."""
-        for ref in (f"origin/{baseline_local}", baseline_local):
+        """Resolve baseline to a commit SHA (prefer local branch over origin)."""
+        for ref in (baseline_local, f"origin/{baseline_local}"):
             code, out, err = _run(["git", "rev-parse", "--verify", ref], cwd=self.repo_root)
             if code == 0:
                 return out.strip()

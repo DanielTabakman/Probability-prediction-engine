@@ -9,6 +9,9 @@ from scripts.ppe_remote_build_agent import resolve_build_target
 
 
 def test_parse_build_command():
+    import os
+
+    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     assert parse_command_text("build").name == "build"
     assert parse_command_text("build extra context").args == "extra context"
 
