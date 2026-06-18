@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] PPE snapshot owner_email \u2014 phase 4a",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Live monitor/history \u2014 phase 5",
   "workerMode": "deterministic"
 }
