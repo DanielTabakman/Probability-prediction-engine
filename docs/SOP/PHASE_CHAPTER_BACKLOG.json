@@ -214,7 +214,7 @@
     },
     {
       "chapterId": "msos_workflow_persistence_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
@@ -234,7 +234,7 @@
     },
     {
       "chapterId": "mvp1_snapshot_owner_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",

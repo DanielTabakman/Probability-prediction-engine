@@ -83,7 +83,7 @@ def _product_touchset_on_main(repo: Path, *, slice_id: str, plan_path: str) -> b
         break
     if not touch:
         return False
-    return all((repo / p).is_file() for p in touch)
+    return all((repo / p).exists() for p in touch)
 
 
 def _resolve_slice_and_branch(
