@@ -20,9 +20,18 @@ set "RC=%ERRORLEVEL%"
 
 echo.
 echo ============================================================
-echo  Cursor should open. If not, open it yourself.
-echo  In a NEW Agent chat: press Ctrl+V then Enter.
-echo  (Build prompt is on your clipboard.)
+echo  DESKTOP BUILD — your real PC only (NOT the VM)
+echo ============================================================
+echo.
+echo  The build prompt is already on your clipboard.
+echo.
+echo  1. Open Cursor on THIS machine (repo folder).
+echo  2. Start a NEW Agent chat (not this chat).
+echo  3. Press Ctrl+V, then Enter.
+echo  4. Let the agent finish gate + commit + closeout.
+echo  5. After PR merges: double-click DESKTOP CONTINUE.
+echo.
+echo  The VM loop keeps waiting — you do not run anything on the VM.
 echo ============================================================
 echo.
 

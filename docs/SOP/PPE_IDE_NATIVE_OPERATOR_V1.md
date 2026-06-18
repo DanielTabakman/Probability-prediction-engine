@@ -10,16 +10,26 @@
 
 ---
 
-## Quick start — two commands for you
+## Quick start — two machines, one paste
 
-| When | Command |
-|------|---------|
-| **VM loop** (24/7) | Hyper-V VM: **`VM_RESTART.cmd`** · status: **`VM_STATUS.cmd`** — see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) |
-| **Phone buzzes** (`IDE_BUILD` / operator ping) | **Desktop:** `DESKTOP_BUILD.cmd` → paste in Agent — **not** `run_ppe_local` on desktop |
+| Machine | Your job |
+|---------|----------|
+| **Hyper-V VM** (24/7) | Nothing daily — loop runs itself. Triage: **`VM_STATUS.cmd`** · restart: **`VM_RESTART.cmd`** |
+| **Real daily PC** | **Only when ntfy says `IDE_BUILD`** — see below |
 
-`ppe_go.cmd` refreshes status, copies the `@ppe-director` prompt, and opens Cursor. It does **not** run the product BUILD or `run_ppe_local` — the director/build worker handles that after you paste the prompt.
+### When phone buzzes `IDE_BUILD` (product slice)
 
-**After IDE BUILD in Cursor:** `mark_ide_product_ready.cmd <sliceId>` then **`run_ppe_local.cmd`** on the **VM** (loop host) to continue relay.
+On your **real PC** (not the VM):
+
+1. Double-click **`DESKTOP BUILD`** (`DESKTOP_BUILD.cmd`).
+2. Open a **new** Cursor Agent chat.
+3. **Ctrl+V** → Enter — the prompt is already on your clipboard.
+4. Let the agent finish (gate → commit → closeout).
+5. After PR merges: **`DESKTOP CONTINUE`**.
+
+The VM picks up relay automatically — you do **not** run `run_ppe_local` or fix the VM for product BUILD.
+
+`ppe_go.cmd` is an alternate handoff (director prompt to clipboard). **`DESKTOP BUILD`** is the one-click path for product slices.
 
 Monitor (optional): `.\scripts\watch_ppe_live.ps1`
 

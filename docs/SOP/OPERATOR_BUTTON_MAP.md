@@ -2,11 +2,28 @@
 
 **Plane:** CONTROL-PLANE · **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Layout:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
 
+## IDE BUILD — when phone says `IDE_BUILD` (most common)
+
+**Machine:** your **real daily PC** — never the Hyper-V VM.
+
+| Step | What you do |
+|------|-------------|
+| 1 | Double-click **`DESKTOP BUILD`** (shortcut to `DESKTOP_BUILD.cmd` in repo) |
+| 2 | Cursor opens; build prompt is **already on clipboard** |
+| 3 | **New Agent chat** → **Ctrl+V** → Enter |
+| 4 | Agent implements slice, runs gate, commits, closeout |
+| 5 | After PR merges → double-click **`DESKTOP CONTINUE`** |
+
+You do **not** need Automations, API credits, or `run_ppe_local` on the desktop. The VM loop continues automatically after closeout.
+
+`DO_THE_THING.cmd` exists in the repo folder as a smart fallback; the desktop shortcut you want is **`DESKTOP BUILD`**.
+
+---
+
 | Symptom / verdict | Machine | Action |
 |-------------------|---------|--------|
-| **Default — do what the agent asked** | **Desktop or VM** | **`DO_THE_THING.cmd`** (queued steps + smart fallback) |
-| `VERDICT=IDE_BUILD` | **Desktop PC** | `DO_THE_THING.cmd` or `DESKTOP_BUILD.cmd` → paste in Cursor Agent → gate → commit → PR |
-| After product PR merged | **Desktop PC** | `DO_THE_THING.cmd` or `DESKTOP_CONTINUE.cmd` (pull + SSH finish on VM) |
+| `VERDICT=IDE_BUILD` | **Real PC** | **`DESKTOP BUILD`** → new Agent → **Ctrl+V** → Enter |
+| After product PR merged | **Real PC** | **`DESKTOP CONTINUE`** (pull + SSH finish on VM) |
 | `PHASE=STACK_DOWN` / `stack_loop=False` | **VM** | `VM_RESTART.cmd` or `VM_AUTO.cmd` |
 | Check health | **VM** | `VM_STATUS.cmd` (wait ~10s for `PHASE=`) |
 | Emergency stop popups | **VM** | `VM_STOP.cmd` |

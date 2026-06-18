@@ -16,8 +16,8 @@ VM_RESTART_CMD = "VM_RESTART"
 
 VERDICT_BUTTON_HINTS: dict[str, str] = {
     "IDE_BUILD": (
-        f"Desktop PC: double-click **{DESKTOP_BUILD_CMD}** → `@ppe-build-worker` + starter in Agent. "
-        f"After merge: **{DESKTOP_CONTINUE_CMD}** (SSH finish on VM)."
+        f"Real PC (not VM): double-click **{DESKTOP_BUILD_CMD}** → new Agent chat → **Ctrl+V** → Enter. "
+        f"Prompt is on clipboard. After PR merge: **{DESKTOP_CONTINUE_CMD}**."
     ),
     "RUN_LOCAL": "VM relay finishes automatically when the stack is up — no action needed.",
     "STACK_DOWN": f"VM: double-click **{VM_RESTART_CMD}** (or VM_AUTO). Desktop must stay loop-off.",
