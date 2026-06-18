@@ -57,3 +57,15 @@ Examples:
 If unsure whether to open a new context, ask:
 “What are we optimizing for right now?”
 If the answer changed, start a new context.
+
+## Ending a context (closeout)
+
+Before retiring a long or noisy thread, run **context window closeout** — not the same as relay chapter closeout.
+
+1. `python scripts/ppe_context_window_closeout.py --render`
+2. Complete the draft at `artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md`
+3. Ship small items, push branches, triage the rest into build vs human backlog
+
+Full ritual: [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md)
+
+**Next thread after closeout:** `AGENT_CONTINUITY_BRIEF.md` + completed closeout draft (not chat history).

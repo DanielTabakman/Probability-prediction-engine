@@ -198,7 +198,8 @@ def _build_context_ritual(repo_root: Path) -> dict[str, Any]:
         ],
         "summary": (
             "After this run: open a new Cursor thread; @ AGENT_CONTINUITY_BRIEF.md only; "
-            "read LAST_RUN_REPORT for steward actions. See docs/CONTEXT_RULES.md."
+            "read LAST_RUN_REPORT for steward actions. If the Cursor thread was long/noisy, run "
+            "context window closeout (docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md). See docs/CONTEXT_RULES.md."
         ),
     }
 

@@ -15,7 +15,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Session handoff gate** | [`SOP/HANDOFF.md`](SOP/HANDOFF.md) |
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
-| **Commit / test gates** | [`SOP/COMMIT_POLICY_V1.md`](SOP/COMMIT_POLICY_V1.md) |
+| **Commit / test gates** | [`SOP/COMMIT_POLICY.md`](SOP/COMMIT_POLICY.md) |
 | **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
 | **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
 | **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) · [`SOP/PARALLEL_AGENT_CHECKLIST_V1.md`](SOP/PARALLEL_AGENT_CHECKLIST_V1.md) |
@@ -58,6 +58,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 ## Context rules
 
 - [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor thread vs stay in-session
+- [`SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md) — end a long chat: push/pull sweep, narrative, backlog triage
 - [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only; includes layer presets)
 - [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) — MSOS / PPE / factory folder boundaries
 
