@@ -1,8 +1,8 @@
-{
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Live monitor/history \u2014 phase 5",
-  "workerMode": "deterministic"
-}
+{
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Free tier + manual paid — phase 7a",
+  "workerMode": "deterministic"
+}
