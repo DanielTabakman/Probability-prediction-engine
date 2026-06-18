@@ -1696,22 +1696,30 @@ if show_bitcoin_view:
                             if st.button("Freeze this evaluation", key=f"ppe_freeze_btn_{selected_expiry_str}"):
                                 _fv = outputs.get("verification")
                                 if isinstance(_fv, dict) and _fv:
+                                    _owner_email = _fz_store.resolve_snapshot_owner_email()
                                     _rec = build_frozen_evaluation_record(
                                         verification=_fv,
                                         expiry_str=selected_expiry_str,
                                         operator_note=_fz_note or None,
+                                        owner_email=_owner_email,
                                     )
                                     _conn = _fz_store.open_store()
                                     try:
                                         _rid = _fz_store.insert_record(_conn, _rec)
-                                        st.success(f"Saved frozen snapshot `{_rid}`")
+                                        _owner_hint = f" (owner `{_owner_email}`)" if _owner_email else ""
+                                        st.success(f"Saved frozen snapshot `{_rid}`{_owner_hint}")
                                     finally:
                                         _conn.close()
                                 else:
                                     st.warning("No verification payload to freeze for this run.")
+                            _owner_scope = _fz_store.resolve_snapshot_owner_email()
                             _conn2 = _fz_store.open_store()
                             try:
-                                _fz_rows = _fz_store.list_recent(_conn2, limit=40)
+                                _fz_rows = _fz_store.list_recent(
+                                    _conn2,
+                                    limit=40,
+                                    owner_email=_owner_scope,
+                                )
                             finally:
                                 _conn2.close()
                             if _fz_rows:

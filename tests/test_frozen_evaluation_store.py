@@ -3,12 +3,19 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
 
 from src.viz.frozen_evaluation_record import build_frozen_evaluation_record
-from src.viz.frozen_evaluation_store import get_by_id, insert_record, list_recent, open_store
+from src.viz.frozen_evaluation_store import (
+    get_by_id,
+    insert_record,
+    list_recent,
+    normalize_owner_email,
+    open_store,
+)
 
 
 class TestFrozenEvaluationStore(unittest.TestCase):
@@ -50,3 +57,62 @@ class TestFrozenEvaluationStore(unittest.TestCase):
                 json.dumps(got)  # serializable
             finally:
                 conn.close()
+
+    def test_owner_email_migration_and_filter(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "legacy.sqlite"
+
+            conn = sqlite3.connect(str(p))
+            try:
+                conn.execute(
+                    """
+                    CREATE TABLE frozen_evaluations (
+                        id TEXT PRIMARY KEY,
+                        created_at TEXT NOT NULL,
+                        expiry TEXT NOT NULL,
+                        summary_line TEXT NOT NULL,
+                        record_json TEXT NOT NULL
+                    )
+                    """
+                )
+                conn.execute(
+                    "INSERT INTO frozen_evaluations (id, created_at, expiry, summary_line, record_json) "
+                    "VALUES (?, ?, ?, ?, ?)",
+                    ("legacy-1", "2026-05-04T12:00:00Z", "5MAY26", "legacy", "{}"),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+
+            conn2 = open_store(p)
+            try:
+                v = {
+                    "verification_summary": {"as_of_utc": "2026-05-04T12:00:00Z"},
+                    "density": {"reference_risk_neutral": {"method": "test"}},
+                    "belief_disagreement": {"contract_schema_version": "bd-test-1"},
+                }
+                rec_a = build_frozen_evaluation_record(
+                    verification=v,
+                    expiry_str="5MAY26",
+                    owner_email="Alice@Example.COM",
+                )
+                rec_b = build_frozen_evaluation_record(
+                    verification=v,
+                    expiry_str="5MAY26",
+                    owner_email="bob@example.com",
+                )
+                insert_record(conn2, rec_a)
+                insert_record(conn2, rec_b)
+
+                alice_rows = list_recent(conn2, owner_email="alice@example.com")
+                self.assertEqual(len(alice_rows), 1)
+                self.assertEqual(alice_rows[0]["owner_email"], "alice@example.com")
+
+                all_rows = list_recent(conn2, limit=10)
+                self.assertEqual(len(all_rows), 3)
+                self.assertEqual(normalize_owner_email(" Alice@Example.COM "), "alice@example.com")
+                got = get_by_id(conn2, rec_a["snapshot_id"])
+                assert got is not None
+                self.assertEqual(got["owner_email"], "alice@example.com")
+            finally:
+                conn2.close()

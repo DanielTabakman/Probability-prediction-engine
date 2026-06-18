@@ -22,6 +22,43 @@ REVIEW_STATUSES: tuple[str, ...] = (
 
 _DB_ENV = "PPE_SNAPSHOT_DB_PATH"
 _DEFAULT_REL = Path("data") / "ppe_frozen_evaluations.sqlite3"
+_ACCESS_EMAIL_HEADER_NAMES: tuple[str, ...] = (
+    "Cf-Access-Authenticated-User-Email",
+    "cf-access-authenticated-user-email",
+    "X-Forwarded-Email",
+    "x-forwarded-email",
+)
+
+
+def normalize_owner_email(raw: str | None) -> str | None:
+    email = (raw or "").strip().lower()
+    return email or None
+
+
+def resolve_snapshot_owner_email() -> str | None:
+    """Cloudflare Access email from dev override, WSGI env, or Streamlit request headers."""
+    for env_key in ("PPE_SNAPSHOT_OWNER_EMAIL", "PPE_OWNER_EMAIL", "MSOS_IDENTITY_EMAIL"):
+        email = normalize_owner_email(os.environ.get(env_key))
+        if email:
+            return email
+    for wsgi_key in ("HTTP_CF_ACCESS_AUTHENTICATED_USER_EMAIL", "HTTP_X_FORWARDED_EMAIL"):
+        email = normalize_owner_email(os.environ.get(wsgi_key))
+        if email:
+            return email
+    try:
+        import streamlit as st
+
+        ctx = getattr(st, "context", None)
+        headers = getattr(ctx, "headers", None) if ctx is not None else None
+        if headers is not None:
+            for name in _ACCESS_EMAIL_HEADER_NAMES:
+                raw = headers.get(name) if hasattr(headers, "get") else None
+                email = normalize_owner_email(str(raw) if raw is not None else None)
+                if email:
+                    return email
+    except Exception:
+        pass
+    return None
 
 
 def default_db_path() -> Path:
@@ -43,6 +80,18 @@ def _connect(path: Path) -> sqlite3.Connection:
 def _snapshot_reviews_has_fk(conn: sqlite3.Connection) -> bool:
     rows = conn.execute("PRAGMA foreign_key_list(snapshot_reviews)").fetchall()
     return len(rows) > 0
+
+
+def _frozen_evaluations_has_owner_email(conn: sqlite3.Connection) -> bool:
+    rows = conn.execute("PRAGMA table_info(frozen_evaluations)").fetchall()
+    return any(str(row["name"]) == "owner_email" for row in rows)
+
+
+def _migrate_owner_email_column(conn: sqlite3.Connection) -> None:
+    if _frozen_evaluations_has_owner_email(conn):
+        return
+    conn.execute("ALTER TABLE frozen_evaluations ADD COLUMN owner_email TEXT")
+    conn.commit()
 
 
 def _migrate_snapshot_reviews_fk(conn: sqlite3.Connection) -> None:
@@ -133,6 +182,7 @@ def init_schema(conn: sqlite3.Connection) -> None:
         except sqlite3.OperationalError:
             pass
         _migrate_snapshot_reviews_fk(conn)
+    _migrate_owner_email_column(conn)
     conn.commit()
 
 
@@ -347,20 +397,55 @@ def insert_record(conn: sqlite3.Connection, record: dict[str, Any]) -> str:
     created = str(record["created_at_utc"])
     exp = str(record.get("expiry") or "")
     summary = summary_line_for_record(record)
+    owner_email = normalize_owner_email(record.get("owner_email") if isinstance(record.get("owner_email"), str) else None)
     conn.execute(
-        "INSERT INTO frozen_evaluations (id, created_at, expiry, summary_line, record_json) VALUES (?, ?, ?, ?, ?)",
-        (rid, created, exp, summary, json.dumps(record, separators=(",", ":"), ensure_ascii=False)),
+        """
+        INSERT INTO frozen_evaluations
+        (id, created_at, expiry, summary_line, record_json, owner_email)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """,
+        (
+            rid,
+            created,
+            exp,
+            summary,
+            json.dumps(record, separators=(",", ":"), ensure_ascii=False),
+            owner_email,
+        ),
     )
     conn.commit()
     return rid
 
 
-def list_recent(conn: sqlite3.Connection, *, limit: int = 50) -> list[dict[str, Any]]:
+def list_recent(
+    conn: sqlite3.Connection,
+    *,
+    limit: int = 50,
+    owner_email: str | None = None,
+) -> list[dict[str, Any]]:
     init_schema(conn)
-    cur = conn.execute(
-        "SELECT id, created_at, expiry, summary_line FROM frozen_evaluations ORDER BY created_at DESC LIMIT ?",
-        (int(limit),),
-    )
+    norm_owner = normalize_owner_email(owner_email) if owner_email is not None else None
+    if norm_owner:
+        cur = conn.execute(
+            """
+            SELECT id, created_at, expiry, summary_line, owner_email
+            FROM frozen_evaluations
+            WHERE owner_email = ?
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (norm_owner, int(limit)),
+        )
+    else:
+        cur = conn.execute(
+            """
+            SELECT id, created_at, expiry, summary_line, owner_email
+            FROM frozen_evaluations
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (int(limit),),
+        )
     return [dict(row) for row in cur.fetchall()]
 
 
