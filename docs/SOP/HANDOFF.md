@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — MSOS track active: **`msos_user_state_v1`** (phase 2)
-- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen, **msos_production_wiring_v1** (2026-06-17)
-- Next pending execution step: **relay** — finish `msos_user_state_v1` platform/witness/closeout (`run_ppe_local.cmd`)
+- Active MVP1 focus: **none** — msos user state v1 — command center bridge **COMPLETE** 2026-06-18
+- Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
+- Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MSOS_FRONTIER.md` + `MSOS_USER_STATE_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_USER_STATE_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS user state v1 ACTIVE** — product slice DONE (#184); continue relay (`run_ppe_local.cmd`) for platform → witness → closeout.
+**MSOS user state v1 — Command Center bridge COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -46,10 +46,10 @@ C) AGENT CONTINUITY (required)
 
 ## Recommended next step
 
-1. **Relay:** `run_ppe_local.cmd` — advance `msos_user_state_v1` platform/witness/closeout slices.
-2. **Operator:** loop host (`run_ppe_auto_local_loop.cmd`) should pick up after platform slice lands.
+1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
+2. **Steward:** SELECTION — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md).
 
 
 ## Last updated
 
-2026-06-17 — MSOS user state v1 ACTIVE; production wiring v1 COMPLETE; steering/evidence synced.
+2026-06-18 — MSOS user state v1 — Command Center bridge COMPLETE; closeout job `MSOS-UserStateV1-Closeout-Slice005`.

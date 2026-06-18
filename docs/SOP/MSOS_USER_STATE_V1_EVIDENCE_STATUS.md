@@ -3,7 +3,7 @@
 **Chapter:** `msos_user_state_v1`  
 **Display name:** Command Center bridge (PPE snapshots)  
 **Priority:** HIGH  
-**Status:** **ACTIVE** 2026-06-17 — relay running; production wiring COMPLETE  
+**Status:** **COMPLETE** 2026-06-18 — relay running; production wiring COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md)
 
