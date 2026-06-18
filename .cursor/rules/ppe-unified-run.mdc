@@ -27,4 +27,21 @@ alwaysApply: true
 
 **Closeout automation:** `post_relay_continue` marks the closed plan **DONE** in the queue and clears `phasePlanPath`; agents must not leave feedback (or any closed chapter) as `READY` in the queue.
 
+## What's next? — auto-execute (hard default)
+
+**Triggers:** `what's next` · `whats next` · `do the next thing` · `continue` · `keep going` · steward/operator steering without `read-only` / `explain only`.
+
+**Do not** answer with a plan-only summary. **First tool pass:** read `artifacts/orchestrator/OPERATOR_STATUS.md` or `AUTOBUILDER_STATUS.json`, then **run** the verdict action in shell before your reply.
+
+| Verdict | Agent action (run first) |
+|---------|--------------------------|
+| **`RUN_LOCAL`** | Relay continue after IDE BUILD. **Desktop** (`ppe_operator_no_loop.local.cmd`): `DESKTOP_CONTINUE.cmd`. **VM loop host:** `run_ppe_local.cmd`. Or `@ppe-finish-worker`. Then read `LAST_RUN_REPORT.md` + new verdict. |
+| **`IDE_BUILD`** | Open `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` and **implement** the slice (gate → commit → `mark_ide_product_ready` / closeout). Do **not** run `run_ppe_local` before product code ships. |
+| **`RUN_AUTO`** | `cmd /c run_ppe.cmd` or `ppe_autobuilder.cmd advance` — unattended relay slices. |
+| **`ERROR` / `FIX_PLAN` / `STALE_STATE`** | Triage/fix (`ppe_notify_fix.py`); do not blindly run relay. |
+
+**Skip auto-run only when:** user explicitly asked read-only / explain-only; SSH or `ppe_loop_host_guard` blocks; or triage is required first.
+
+After closeout with another `READY` queue item: run `run_ppe.cmd` or `ppe_auto_select.py --apply` — do not stop at chapter COMPLETE when the user wants the cycle to continue.
+
 Canonical runbook: [`docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).
