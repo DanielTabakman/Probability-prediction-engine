@@ -24,6 +24,11 @@ if errorlevel 1 (
 )
 
 echo.
+echo [VM_UPDATE] ensuring ntfy restart secret...
+set "PYTHONPATH=%CD%"
+python "%CD%\scripts\ensure_ntfy_cmd_secret.py" --repo-root "%CD%"
+
+echo.
 echo [VM_UPDATE] refreshing Desktop shortcuts if needed...
 python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet
 

@@ -13,8 +13,16 @@ def test_ensure_secret_appends(tmp_path):
     assert "PPE_NTFY_CMD_SECRET=s3cret" in path.read_text(encoding="utf-8")
 
 
+def test_ensure_secret_repairs_malformed(tmp_path):
+    path = tmp_path / "ppe_operator_notify.local.cmd"
+    path.write_text('set "PPE_NTFY_TOPIC=t"\nset  PPE_NTFY_CMD_SECRET=ppe-msos-remote\\\n', encoding="utf-8")
+    out = ensure_secret(tmp_path, secret="ppe-msos-remote")
+    assert out["action"] == "repaired"
+    assert 'set "PPE_NTFY_CMD_SECRET=ppe-msos-remote"' in path.read_text(encoding="utf-8")
+
+
 def test_ensure_secret_idempotent(tmp_path):
     path = tmp_path / "ppe_operator_notify.local.cmd"
-    path.write_text('set "PPE_NTFY_CMD_SECRET=existing"\n', encoding="utf-8")
+    path.write_text('set "PPE_NTFY_CMD_SECRET=ppe-msos-remote"\n', encoding="utf-8")
     out = ensure_secret(tmp_path)
     assert out["action"] == "already_set"

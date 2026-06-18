@@ -42,7 +42,8 @@ if exist "%CD%\setup_desktop_shortcuts.cmd" call "%CD%\setup_desktop_shortcuts.c
 echo.
 echo ============================================================
 echo  Desktop is IDE-BUILD-only. Loop runs on the Hyper-V VM.
-echo  Buttons: DO THE THING, DESKTOP BUILD, DESKTOP CONTINUE, DESKTOP STOP
+echo  Zero-click: setup_desktop_zero_click_build.cmd
+echo  Buttons: DESKTOP BUILD, DESKTOP CONTINUE, DESKTOP ZERO CLICK START/STOP
 echo ============================================================
 echo.
 pause
