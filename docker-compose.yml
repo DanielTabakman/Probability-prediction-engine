@@ -12,10 +12,12 @@ services:
     environment:
       - PORT=3000
       - PPE_WEB_FEEDBACK_DIR=/data
+      - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
     volumes:
       - msos_web_data:/data
+      - ppe_snapshots:/ppe-snapshots:ro
     restart: unless-stopped
     networks:
       - web
