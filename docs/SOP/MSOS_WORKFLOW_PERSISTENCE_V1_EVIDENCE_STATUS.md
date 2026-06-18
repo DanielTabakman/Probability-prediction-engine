@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_workflow_persistence_v1`  
 **Priority:** HIGH  
-**Status:** **CHARTERED** 2026-06-14 — blocked until user state bridge COMPLETE  
+**Status:** **COMPLETE** 2026-06-18 — blocked until user state bridge COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_workflow_persistence_v1_relay.json`](PHASE_PLANS/msos_workflow_persistence_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md)
 
