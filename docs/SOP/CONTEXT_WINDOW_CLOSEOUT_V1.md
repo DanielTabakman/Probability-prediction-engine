@@ -33,6 +33,32 @@ Chapter closeout can happen **without** context closeout when the Cursor thread 
 
 ---
 
+## Triggers (say any of these)
+
+The Agent should run this ritual when you use **any** of:
+
+| Phrase | Notes |
+|--------|--------|
+| **close out thread** | Primary operator phrase |
+| **closeout thread** | Same intent |
+| **close this thread** / **end this thread** | |
+| **context closeout** / **close out context** | |
+| **wrap this chat** / **thread handoff** | Informal |
+
+Shorthand paste (minimal):
+
+```text
+close out thread
+```
+
+Full paste (when you want the checklist explicit):
+
+```text
+Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
+```
+
+---
+
 ## Operator one-liner (paste in Agent)
 
 ```text

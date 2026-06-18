@@ -71,6 +71,13 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### Process library expansion
+
+- **id:** `process_library_expansion` · **priority:** medium · **category:** governance
+- **added:** 2026-06-18
+- **summary:** Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.
+- **policy question:** Which ritual should we standardize next after context closeout?
+
 ## Done
 
 ### Operator friction cleanup (local profile)
@@ -82,4 +89,4 @@
 
 ## Changelog
 
-| 2026-06-17 | Auto-render from JSON |
+| 2026-06-18 | Auto-render from JSON |
