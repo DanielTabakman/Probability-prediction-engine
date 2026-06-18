@@ -4,25 +4,34 @@ import { randomUUID } from "crypto";
 
 import type { ExpressionRecord } from "@/lib/expressionPersistence";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
+import { normalizeOwnerEmail } from "@/lib/msosIdentity";
 
 export const MSOS_WORKFLOW_STORE_FILENAME = "msos_workflow_v1.json";
 
 export type StoredThesis = ThesisRecord & {
   id: string;
+  ownerEmail?: string | null;
   linkedSnapshotId?: string | null;
 };
 
 export type StoredExpression = ExpressionRecord & {
   id: string;
   thesisId: string;
+  ownerEmail?: string | null;
+};
+
+type OwnerPointers = {
+  thesisId: string | null;
+  expressionId: string | null;
 };
 
 type WorkflowStoreFile = {
-  version: 1;
+  version: 1 | 2;
   theses: StoredThesis[];
   expressions: StoredExpression[];
   currentThesisId: string | null;
   currentExpressionId: string | null;
+  currentByOwner?: Record<string, OwnerPointers>;
 };
 
 export type WorkflowSummaryKpi = {
@@ -46,11 +55,12 @@ export type WorkflowSummary = {
 };
 
 const EMPTY_STORE: WorkflowStoreFile = {
-  version: 1,
+  version: 2,
   theses: [],
   expressions: [],
   currentThesisId: null,
   currentExpressionId: null,
+  currentByOwner: {},
 };
 
 export function workflowStoreDir(): string {
@@ -65,6 +75,31 @@ export function workflowStorePath(): string {
   return path.join(workflowStoreDir(), MSOS_WORKFLOW_STORE_FILENAME);
 }
 
+function ownerKey(ownerEmail: string): string {
+  const normalized = normalizeOwnerEmail(ownerEmail);
+  return normalized ?? "__anon__";
+}
+
+function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
+  const theses = Array.isArray(raw.theses) ? (raw.theses as StoredThesis[]) : [];
+  const expressions = Array.isArray(raw.expressions) ? (raw.expressions as StoredExpression[]) : [];
+  const currentByOwner: Record<string, OwnerPointers> = { ...(raw.currentByOwner ?? {}) };
+  if (raw.version !== 2) {
+    currentByOwner.__anon__ = {
+      thesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
+      expressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
+    };
+  }
+  return {
+    version: 2,
+    theses,
+    expressions,
+    currentThesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
+    currentExpressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
+    currentByOwner,
+  };
+}
+
 async function readStore(): Promise<WorkflowStoreFile> {
   const filePath = workflowStorePath();
   try {
@@ -73,14 +108,7 @@ async function readStore(): Promise<WorkflowStoreFile> {
     if (!parsed || typeof parsed !== "object") {
       return { ...EMPTY_STORE };
     }
-    const row = parsed as Partial<WorkflowStoreFile>;
-    return {
-      version: 1,
-      theses: Array.isArray(row.theses) ? (row.theses as StoredThesis[]) : [],
-      expressions: Array.isArray(row.expressions) ? (row.expressions as StoredExpression[]) : [],
-      currentThesisId: typeof row.currentThesisId === "string" ? row.currentThesisId : null,
-      currentExpressionId: typeof row.currentExpressionId === "string" ? row.currentExpressionId : null,
-    };
+    return normalizeStore(parsed as Partial<WorkflowStoreFile>);
   } catch {
     return { ...EMPTY_STORE };
   }
@@ -89,7 +117,12 @@ async function readStore(): Promise<WorkflowStoreFile> {
 async function writeStore(store: WorkflowStoreFile): Promise<void> {
   const filePath = workflowStorePath();
   await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+  const payload: WorkflowStoreFile = {
+    ...store,
+    version: 2,
+    currentByOwner: store.currentByOwner ?? {},
+  };
+  await writeFile(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
 function isThesisRecord(value: unknown): value is ThesisRecord {
@@ -120,80 +153,151 @@ function isExpressionRecord(value: unknown): value is ExpressionRecord {
   );
 }
 
-export async function getCurrentThesis(): Promise<StoredThesis | null> {
-  const store = await readStore();
-  if (!store.currentThesisId) return null;
-  return store.theses.find((row) => row.id === store.currentThesisId) ?? null;
+function thesisOwnerMatches(row: StoredThesis, ownerEmail: string): boolean {
+  const key = ownerKey(ownerEmail);
+  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
+  if (key === "__anon__") {
+    return rowOwner === null;
+  }
+  return rowOwner === key;
 }
 
-export async function getCurrentExpression(): Promise<StoredExpression | null> {
+function expressionOwnerMatches(row: StoredExpression, ownerEmail: string): boolean {
+  const key = ownerKey(ownerEmail);
+  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
+  if (key === "__anon__") {
+    return rowOwner === null;
+  }
+  return rowOwner === key;
+}
+
+function pointersForOwner(store: WorkflowStoreFile, ownerEmail: string): OwnerPointers {
+  const key = ownerKey(ownerEmail);
+  return store.currentByOwner?.[key] ?? { thesisId: null, expressionId: null };
+}
+
+function persistPointers(
+  store: WorkflowStoreFile,
+  ownerEmail: string,
+  pointers: OwnerPointers,
+): WorkflowStoreFile {
+  const key = ownerKey(ownerEmail);
+  return {
+    ...store,
+    currentByOwner: {
+      ...(store.currentByOwner ?? {}),
+      [key]: pointers,
+    },
+  };
+}
+
+export async function getCurrentThesis(ownerEmail: string): Promise<StoredThesis | null> {
   const store = await readStore();
-  if (!store.currentExpressionId) return null;
-  return store.expressions.find((row) => row.id === store.currentExpressionId) ?? null;
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (!pointers.thesisId) return null;
+  return (
+    store.theses.find(
+      (row) => row.id === pointers.thesisId && thesisOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function getCurrentExpression(ownerEmail: string): Promise<StoredExpression | null> {
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (!pointers.expressionId) return null;
+  return (
+    store.expressions.find(
+      (row) => row.id === pointers.expressionId && expressionOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
 }
 
 export async function upsertCurrentThesis(
   thesis: ThesisRecord,
+  ownerEmail: string,
   linkedSnapshotId?: string | null,
 ): Promise<StoredThesis> {
   if (!isThesisRecord(thesis)) {
     throw new Error("invalid thesis record");
   }
   const store = await readStore();
-  const existing = store.currentThesisId
-    ? store.theses.find((row) => row.id === store.currentThesisId)
+  const pointers = pointersForOwner(store, ownerEmail);
+  const existing = pointers.thesisId
+    ? store.theses.find(
+        (row) => row.id === pointers.thesisId && thesisOwnerMatches(row, ownerEmail),
+      )
     : undefined;
+  const owner = normalizeOwnerEmail(ownerEmail);
   const next: StoredThesis = {
     ...thesis,
     id: existing?.id ?? randomUUID(),
+    ownerEmail: owner,
     linkedSnapshotId: linkedSnapshotId ?? existing?.linkedSnapshotId ?? null,
   };
   const theses = store.theses.filter((row) => row.id !== next.id);
   theses.push(next);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: next.id,
+    expressionId: pointers.expressionId,
+  });
   await writeStore({
-    ...store,
+    ...nextStore,
     theses,
-    currentThesisId: next.id,
   });
   return next;
 }
 
-export async function upsertCurrentExpression(expression: ExpressionRecord): Promise<StoredExpression> {
+export async function upsertCurrentExpression(
+  expression: ExpressionRecord,
+  ownerEmail: string,
+): Promise<StoredExpression> {
   if (!isExpressionRecord(expression)) {
     throw new Error("invalid expression record");
   }
   const store = await readStore();
-  const thesisId = store.currentThesisId;
+  const pointers = pointersForOwner(store, ownerEmail);
+  const thesisId = pointers.thesisId;
   if (!thesisId) {
     throw new Error("confirm a thesis before saving expression");
   }
-  const existing = store.currentExpressionId
-    ? store.expressions.find((row) => row.id === store.currentExpressionId)
+  const existing = pointers.expressionId
+    ? store.expressions.find(
+        (row) => row.id === pointers.expressionId && expressionOwnerMatches(row, ownerEmail),
+      )
     : undefined;
+  const owner = normalizeOwnerEmail(ownerEmail);
   const next: StoredExpression = {
     ...expression,
     id: existing?.id ?? randomUUID(),
     thesisId,
+    ownerEmail: owner,
   };
   const expressions = store.expressions.filter((row) => row.id !== next.id);
   expressions.push(next);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: next.id,
+  });
   await writeStore({
-    ...store,
+    ...nextStore,
     expressions,
-    currentExpressionId: next.id,
   });
   return next;
 }
 
-export async function loadWorkflowSummary(): Promise<WorkflowSummary> {
+export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowSummary> {
   const store = await readStore();
-  const draftCount = store.theses.filter((row) => row.lifecycle === "draft").length;
-  const confirmedCount = store.theses.filter((row) => row.lifecycle === "confirmed").length;
-  const currentThesis = store.currentThesisId
-    ? store.theses.find((row) => row.id === store.currentThesisId)
+  const scopedTheses = store.theses.filter((row) => thesisOwnerMatches(row, ownerEmail));
+  const scopedExpressions = store.expressions.filter((row) => expressionOwnerMatches(row, ownerEmail));
+  const pointers = pointersForOwner(store, ownerEmail);
+  const draftCount = scopedTheses.filter((row) => row.lifecycle === "draft").length;
+  const confirmedCount = scopedTheses.filter((row) => row.lifecycle === "confirmed").length;
+  const currentThesis = pointers.thesisId
+    ? scopedTheses.find((row) => row.id === pointers.thesisId)
     : undefined;
-  const currentExpression = store.currentExpressionId
-    ? store.expressions.find((row) => row.id === store.currentExpressionId)
+  const currentExpression = pointers.expressionId
+    ? scopedExpressions.find((row) => row.id === pointers.expressionId)
     : undefined;
 
   const kpis: WorkflowSummaryKpi[] = [
@@ -229,8 +333,13 @@ export async function loadWorkflowSummary(): Promise<WorkflowSummary> {
     });
   }
 
+  const owner = normalizeOwnerEmail(ownerEmail);
+  const sourceLabel = owner
+    ? `From MSOS workflow store · ${owner}`
+    : "From MSOS workflow store";
+
   return {
-    sourceLabel: "From MSOS workflow store",
+    sourceLabel,
     kpis,
     currentWork,
   };

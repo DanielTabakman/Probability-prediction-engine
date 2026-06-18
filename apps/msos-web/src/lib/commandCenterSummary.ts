@@ -84,39 +84,63 @@ function openReadonlyDb(filePath: string): Database.Database {
   return new Database(filePath, { readonly: true, fileMustExist: true });
 }
 
-function countSnapshots(db: Database.Database): number {
-  const row = db.prepare("SELECT COUNT(*) AS n FROM frozen_evaluations").get() as { n: number };
+function tableHasOwnerEmail(db: Database.Database): boolean {
+  const cols = db.prepare("PRAGMA table_info(frozen_evaluations)").all() as { name: string }[];
+  return cols.some((col) => col.name === "owner_email");
+}
+
+function ownerFilter(ownerEmail: string | null | undefined, hasOwnerColumn: boolean): { clause: string; params: string[] } {
+  const owner = (ownerEmail ?? "").trim().toLowerCase();
+  if (!owner || !hasOwnerColumn) {
+    return { clause: "", params: [] };
+  }
+  return { clause: " AND fe.owner_email = ?", params: [owner] };
+}
+
+function countSnapshots(db: Database.Database, ownerEmail?: string | null): number {
+  const hasOwnerColumn = tableHasOwnerEmail(db);
+  const { clause, params } = ownerFilter(ownerEmail, hasOwnerColumn);
+  const row = db
+    .prepare(`SELECT COUNT(*) AS n FROM frozen_evaluations fe WHERE 1=1${clause}`)
+    .get(...params) as { n: number };
   return Number(row.n) || 0;
 }
 
-function countPendingReviews(db: Database.Database): number {
+function countPendingReviews(db: Database.Database, ownerEmail?: string | null): number {
+  const hasOwnerColumn = tableHasOwnerEmail(db);
+  const { clause, params } = ownerFilter(ownerEmail, hasOwnerColumn);
   const row = db
     .prepare(
       `
       SELECT COUNT(*) AS n
       FROM frozen_evaluations fe
       LEFT JOIN snapshot_reviews sr ON sr.snapshot_id = fe.id
-      WHERE sr.snapshot_id IS NULL OR sr.review_status = 'pending'
+      WHERE (sr.snapshot_id IS NULL OR sr.review_status = 'pending')${clause}
       `,
     )
-    .get() as { n: number };
+    .get(...params) as { n: number };
   return Number(row.n) || 0;
 }
 
-function countCompletedReviews(db: Database.Database): number {
+function countCompletedReviews(db: Database.Database, ownerEmail?: string | null): number {
+  const hasOwnerColumn = tableHasOwnerEmail(db);
+  const { clause, params } = ownerFilter(ownerEmail, hasOwnerColumn);
   const row = db
     .prepare(
       `
       SELECT COUNT(*) AS n
       FROM snapshot_reviews sr
-      WHERE sr.review_status != 'pending'
+      INNER JOIN frozen_evaluations fe ON fe.id = sr.snapshot_id
+      WHERE sr.review_status != 'pending'${clause}
       `,
     )
-    .get() as { n: number };
+    .get(...params) as { n: number };
   return Number(row.n) || 0;
 }
 
-function listRecentSnapshots(db: Database.Database, limit: number): SnapshotRow[] {
+function listRecentSnapshots(db: Database.Database, limit: number, ownerEmail?: string | null): SnapshotRow[] {
+  const hasOwnerColumn = tableHasOwnerEmail(db);
+  const { clause, params } = ownerFilter(ownerEmail, hasOwnerColumn);
   return db
     .prepare(
       `
@@ -124,15 +148,16 @@ function listRecentSnapshots(db: Database.Database, limit: number): SnapshotRow[
              sr.review_status, sr.reviewed_at_utc
       FROM frozen_evaluations fe
       LEFT JOIN snapshot_reviews sr ON sr.snapshot_id = fe.id
+      WHERE 1=1${clause}
       ORDER BY fe.created_at DESC
       LIMIT ?
       `,
     )
-    .all(limit) as SnapshotRow[];
+    .all(...params, limit) as SnapshotRow[];
 }
 
-function buildSummaryFromDb(db: Database.Database): CommandCenterSummary {
-  const total = countSnapshots(db);
+function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): CommandCenterSummary {
+  const total = countSnapshots(db, ownerEmail);
   if (total === 0) {
     return {
       status: "empty",
@@ -147,9 +172,9 @@ function buildSummaryFromDb(db: Database.Database): CommandCenterSummary {
     };
   }
 
-  const pending = countPendingReviews(db);
-  const completed = countCompletedReviews(db);
-  const rows = listRecentSnapshots(db, RECENT_LIMIT);
+  const pending = countPendingReviews(db, ownerEmail);
+  const completed = countCompletedReviews(db, ownerEmail);
+  const rows = listRecentSnapshots(db, RECENT_LIMIT, ownerEmail);
   const recentSnapshots: CommandCenterSnapshotRow[] = rows.map((row) => ({
     snapshotId: row.id,
     createdAt: row.created_at,
@@ -212,7 +237,7 @@ export function degradedSummary(reason: string): CommandCenterSummary {
   };
 }
 
-export function loadCommandCenterSummary(): CommandCenterSummary {
+export function loadCommandCenterSummary(ownerEmail?: string | null): CommandCenterSummary {
   const dbPath = snapshotDbPath();
   if (!dbReadable(dbPath)) {
     return degradedSummary(`Snapshot database not readable at ${dbPath}`);
@@ -221,7 +246,7 @@ export function loadCommandCenterSummary(): CommandCenterSummary {
   let db: Database.Database | undefined;
   try {
     db = openReadonlyDb(dbPath);
-    return buildSummaryFromDb(db);
+    return buildSummaryFromDb(db, ownerEmail);
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown snapshot read error";
     return degradedSummary(message);

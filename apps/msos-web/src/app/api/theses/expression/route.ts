@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 
 import type { ExpressionRecord } from "@/lib/expressionPersistence";
+import { requireProtectedIdentity } from "@/lib/msosIdentity";
 import { getCurrentExpression, upsertCurrentExpression } from "@/lib/msosWorkflowStore";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const identity = requireProtectedIdentity(request);
+  if (!identity.ok) return identity.response;
   try {
-    const expression = await getCurrentExpression();
+    const expression = await getCurrentExpression(identity.email);
     return NextResponse.json({ expression });
   } catch (err) {
     console.error("expression GET failed", err);
@@ -16,13 +19,15 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
+  const identity = requireProtectedIdentity(request);
+  if (!identity.ok) return identity.response;
   try {
     const body = await request.json();
     const expression = body?.expression as ExpressionRecord | undefined;
     if (!expression) {
       return NextResponse.json({ error: "missing expression" }, { status: 400 });
     }
-    const saved = await upsertCurrentExpression(expression);
+    const saved = await upsertCurrentExpression(expression, identity.email);
     return NextResponse.json({ expression: saved });
   } catch (err) {
     const message = err instanceof Error ? err.message : "failed to save expression";
