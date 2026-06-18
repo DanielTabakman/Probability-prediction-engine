@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-18
 
+- MVP1-SnapshotOwner-Product-Slice002: owner_email on frozen evaluations (#227) (`docs/SOP/`)
+- `618ba79` — ops(control-plane): DESKTOP_VM_MAINTAIN one-click VM upkeep (#226)
+- `72e34fc` — control-plane: desktop zero-click IDE BUILD stack (#225) (`scripts/`)
+- `5f09340` — Control-plane: dev changelog
 - `9da27a3` — Merge pull request #224 from DanielTabakman/control-plane/commit-policy-auto
 - `e3a669b` — merge main into control-plane/commit-policy-auto (keep snapshot_owner closeout state)
 - `e364799` — fix(control-plane): operator recovery — close user_state + workflow chapters, advance to snapshot_owner (`docs/SOP/`)
