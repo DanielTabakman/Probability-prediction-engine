@@ -16,7 +16,7 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
 - **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md))
-- **Last closed chapter:** **MSOS access identity v1** — **COMPLETE** 2026-06-18
+- **Last closed chapter:** **MVP1 snapshot owner v1** — **COMPLETE** 2026-06-18
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
