@@ -18,6 +18,7 @@ def build_frozen_evaluation_record(
     verification: dict[str, Any],
     expiry_str: str,
     operator_note: str | None = None,
+    owner_email: str | None = None,
 ) -> dict[str, Any]:
     """
     Canonical JSON-serializable record for SQLite persistence.
@@ -50,6 +51,7 @@ def build_frozen_evaluation_record(
         "payload_schema_version": PAYLOAD_SCHEMA_VERSION,
         "expiry": str(expiry_str),
         "operator_note": (operator_note or "").strip() or None,
+        "owner_email": (owner_email or "").strip().lower() or None,
         "classifier_version": classifier_version,
         "benchmark_witness": benchmark_witness,
         "data_quality": mvp1.get("data_quality") or vs.get("data_quality"),
