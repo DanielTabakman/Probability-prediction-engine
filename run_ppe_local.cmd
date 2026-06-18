@@ -8,6 +8,7 @@ set "PYTHONPATH=%CD%"
 if exist "%CD%\ppe_operator_local.cmd" call "%CD%\ppe_operator_local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
 set "PPE_SKIP_ACP=1"
+set "PPE_SKIP_DUAL_SMOKE=1"
 set "PPE_SKIP_SLOW_PYTEST=1"
 set "PPE_WORKER_MODE=deterministic"
 

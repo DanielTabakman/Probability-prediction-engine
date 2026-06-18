@@ -78,13 +78,16 @@ def _git_head(repo: Path) -> str:
 
 
 def _gh_open_prs(repo: Path) -> list[dict[str, str]]:
-    proc = subprocess.run(
-        ["gh", "pr", "list", "--json", "number,title,state,headRefName,url,isDraft"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    try:
+        proc = subprocess.run(
+            ["gh", "pr", "list", "--json", "number,title,state,headRefName,url,isDraft"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return []
     if proc.returncode != 0 or not proc.stdout.strip():
         return []
     try:
