@@ -1,8 +1,25 @@
 import Link from "next/link";
 
-import { historyEntries, historyIntro, stateLabels } from "@/data/historyFixtures";
+import type { HistoryFeed, HistoryState } from "@/lib/monitorHistoryFeed";
 
-export function HistoryContent() {
+const stateLabels: Record<HistoryState, string> = {
+  observed: "Observed",
+  saved: "Saved",
+  simulated: "Simulated",
+  reviewed: "Reviewed",
+};
+
+type Props = {
+  feed: HistoryFeed;
+};
+
+function statusPill(feed: HistoryFeed): string {
+  if (feed.status === "live") return "Live timeline";
+  if (feed.status === "empty") return "No history rows yet";
+  return "History feed degraded";
+}
+
+export function HistoryContent({ feed }: Props) {
   return (
     <>
       <header className="topline">
@@ -13,7 +30,7 @@ export function HistoryContent() {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Preview timeline
+            {statusPill(feed)}
           </span>
           <Link href="/monitor" className="btn slim">
             Monitor
@@ -25,13 +42,24 @@ export function HistoryContent() {
         <div className="panel-head">
           <div>
             <h2>Observed → reviewed</h2>
-            <div className="panel-sub">{historyIntro}</div>
+            <div className="panel-sub">{feed.intro}</div>
+            <div className="panel-sub">{feed.sourceLabel}</div>
           </div>
           <span className="tag">07_history</span>
         </div>
 
+        {feed.status === "degraded" && feed.degradedReason ? (
+          <p className="panel-sub degraded-feed-note" role="status">
+            {feed.degradedReason}
+          </p>
+        ) : null}
+
+        {feed.status === "empty" ? (
+          <p className="panel-sub">No workflow or snapshot history rows yet.</p>
+        ) : null}
+
         <div className="history-list">
-          {historyEntries.map((entry) => (
+          {feed.entries.map((entry) => (
             <div key={entry.id} className={`history-row state-${entry.state}`}>
               <div className="history-meta">
                 <span className={`tag history-state ${entry.state}`}>{stateLabels[entry.state]}</span>
@@ -44,11 +72,11 @@ export function HistoryContent() {
         </div>
 
         <div className="history-empty-note">
-          <strong>Executed</strong> — no live positions connected in preview.
+          <strong>Executed</strong> — no live positions connected; preview routing only.
         </div>
       </section>
 
-      <p className="footer-note">Research demo — history fixtures only; no live order transmitted</p>
+      <p className="footer-note">Research demo — live workflow + snapshot history; no live order transmitted</p>
     </>
   );
 }
