@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
   "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Command Center PPE snapshot bridge \u2014 phase 2",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MSOS thesis/expression server store \u2014 phase 3",
   "workerMode": "deterministic"
 }
