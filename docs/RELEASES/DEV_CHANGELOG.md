@@ -4,6 +4,21 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-18
 
+- `04bab7f` — Merge pull request #215 from DanielTabakman/control-plane/commit-policy-auto
+- `7d240f8` — merge main into control-plane/commit-policy-auto (resolve conflicts)
+- `7cae9b0` — feat(msos-ui): MSOS access identity product slice 002 (scoped APIs) (#222) (`apps/msos-web/`)
+- `fab1eff` — ops(local): manifest RUNNING for relay pass (#219) (`docs/SOP/`)
+- `983c945` — Control-plane: dev changelog
+- `72c8f6a` — docs(control-plane): clarify DESKTOP BUILD clipboard paste workflow (`docs/SOP/`)
+- `2683616` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `909cb10` — fix(control-plane): recreate broken relay worktrees before pytest (`scripts/`)
+- `c6ee450` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `d5beb97` — fix(control-plane): unblock VM relay — stale worktrees, gh-less closeout, repair script (`scripts/`)
+- `61999c6` — fix(control-plane): stop ntfy restart death spiral on daily PC (`scripts/`)
+- `e8d6ff2` — control-plane: charter MSOS Strategy Lab embed shell v1 (MEDIUM) (`docs/SOP/`)
+- `9de28b5` — control-plane: merge main into commit-policy-auto (CONTEXT_RULES conflict)
+- `5ad9276` — control-plane: always-on auto-execute for what's next (`docs/SOP/`)
+- `25eca16` — control-plane: whats-next auto-executes RUN_LOCAL continue
 - `ca88993` — fix(control-plane): VM relay unblock (worktrees, ntfy, slice progress) (#217) (`scripts/`)
 - `dea0ebc` — fix(control-plane): make ntfy parsing tests env-safe (#216)
 - `2a015d4` — Control-plane: dev changelog
@@ -13,6 +28,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-17
 
+- `0dc020e` — control-plane: context closeout v2 tracking and whats-next (`scripts/`)
+- `5eb96fa` — control-plane: merge main into commit-policy-auto
+- `1cafbc6` — control-plane: context closeout thread triggers + process library backlog (`docs/SOP/`)
+- `cb346d9` — control-plane: consolidate commit policy into COMMIT_POLICY.md (`docs/SOP/`)
+- `c5e735e` — control-plane: allow context closeout paths in CONTROL layer preset (`docs/SOP/`)
+- `f04ab1d` — control-plane: formalize context window closeout ritual (`scripts/`)
 - `2c86386` — control-plane: consolidate commit policy into COMMIT_POLICY.md (#214) (`docs/SOP/`)
 - `b9ce831` — Control-plane: dev changelog
 - `5ea46d7` — control-plane: relay closeout hardening (witness sync + run-local dedupe) (#210) (`scripts/`)
