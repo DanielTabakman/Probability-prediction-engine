@@ -37,6 +37,9 @@ MSOS_ENTITLEMENTS_PLAN = "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json"
 MSOS_EMBED_SHELL_PLAN = (
     "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json"
 )
+MSOS_E2E_WITNESS_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -58,6 +61,7 @@ ALLOWED_READY_PLANS = (
     MSOS_MONITOR_HISTORY_PLAN,
     MSOS_ENTITLEMENTS_PLAN,
     MSOS_EMBED_SHELL_PLAN,
+    MSOS_E2E_WITNESS_PLAN,
 )
 
 

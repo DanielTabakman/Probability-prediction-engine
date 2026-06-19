@@ -112,8 +112,9 @@ ppe_autobuilder.cmd run-local
 
 | File | Role |
 |------|------|
-| `AUTOBUILDER_STATUS.json` | Machine snapshot (agent reads this first) |
+| `CONTROL_PLANE_STATUS.json` | **Canonical human read** — run `ppe_autobuilder.cmd reconcile` |
+| `AUTOBUILDER_STATUS.json` | Machine snapshot (embedded in control plane) |
 | `AUTOBUILDER_DIAGNOSE.md` | Human diagnose report |
-| `OPERATOR_STATUS.md` | Legacy verdict summary |
+| `OPERATOR_STATUS.md` | Legacy verdict summary (regenerated on reconcile) |
 | `IDE_BUILD_TRIGGER.json` | Cursor Automation trigger |
 | `IDE_PRODUCT_READY.json` | Product slice marker for guards |

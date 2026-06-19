@@ -182,6 +182,33 @@ class TestPpeOperatorGuards(unittest.TestCase):
         rc = run_continuous_guards(self.repo, "docs/SOP/PHASE_PLANS/test_relay.json")
         self.assertEqual(rc, GUARD_SKIP_CHAPTER)
 
+    def test_stripe_deferred_when_operator_prereq_open(self) -> None:
+        stripe_plan = "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json"
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "msos_billing_stripe_v1_relay.json").write_text(
+            json.dumps({"sprintSpecPath": "docs/SOP/SPRINT_TEST.md", "slices": []}),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "HUMAN_STEWARD_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "items": [
+                        {
+                            "id": "stripe_operator_prereq",
+                            "status": "open",
+                            "title": "Stripe operator prerequisites",
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        guard = evaluate_selection_guards(self.repo, stripe_plan)
+        self.assertIsNotNone(guard)
+        assert guard is not None
+        self.assertEqual(guard.exit_code, GUARD_SKIP_CHAPTER)
+        self.assertEqual(guard.reason, "STRIPE_BUILD_DEFERRED")
+
 
 if __name__ == "__main__":
     unittest.main()

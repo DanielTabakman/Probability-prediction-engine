@@ -309,16 +309,21 @@ def main(argv: list[str] | None = None) -> int:
         try:
             from scripts.repo_layer_paths import audit_paths, load_presets, scope_from_preset
 
-            if any(f.startswith("src/") for f in files):
-                preset_name = "PPE_UI" if any(f.startswith("src/viz/") for f in files) else "PPE_CORE"
-            elif any(f.startswith("apps/") for f in files):
-                preset_name = "MSOS_UI"
-            elif all(f.startswith("docs/") for f in files):
-                preset_name = "DOCS_ONLY" if all(f.startswith("docs/SOP/") for f in files) else "DOCS_CANON"
-            else:
-                preset_name = "CONTROL"
-            scope = scope_from_preset(load_presets(repo), preset_name)
-            violations = audit_paths(files, scope)
+            presets = load_presets(repo)
+            violations: list[str] = []
+
+            def _preset_for_path(path: str) -> str:
+                if path.startswith("src/"):
+                    return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
+                if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
+                    return "MSOS_UI"
+                if path.startswith("docs/"):
+                    return "DOCS_ONLY" if path.startswith("docs/SOP/") else "DOCS_CANON"
+                return "CONTROL"
+
+            for path in files:
+                scope = scope_from_preset(presets, _preset_for_path(path))
+                violations.extend(audit_paths([path], scope))
             if violations:
                 print("ERROR: repo layer audit failed for changed files:", file=sys.stderr)
                 for v in violations[:10]:

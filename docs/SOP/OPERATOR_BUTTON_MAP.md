@@ -26,6 +26,8 @@ You do **not** need Automations, API credits, or `run_ppe_local` on the desktop.
 | After product PR merged | **Real PC** | **`DESKTOP CONTINUE`** (pull + SSH finish on VM) |
 | `PHASE=STACK_DOWN` / `stack_loop=False` | **VM** | `VM_RESTART.cmd` or `VM_AUTO.cmd` |
 | Check health | **VM** | `VM_STATUS.cmd` (wait ~10s for `PHASE=`) |
+| Status stale / docs disagree | **Either** | `ppe_request.cmd reconcile` → `CONTROL_PLANE_STATUS.json` |
+| Queue human chapter work | **Steward** | `ppe_request.cmd --chapter-id … --reason "…" [--apply]` |
 | Emergency stop popups | **VM** | `VM_STOP.cmd` |
 | Emergency stop on real PC | **Desktop** | `DESKTOP_STOP.cmd` |
 | Stuck relay / stale state | **VM** | `fix_vm_operator.cmd` (= `vm_bootstrap.cmd --recover`) |
