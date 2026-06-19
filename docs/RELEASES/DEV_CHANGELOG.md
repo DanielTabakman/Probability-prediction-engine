@@ -12,6 +12,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 - MSOS-EmbedShellV1-Product-Slice002: PPE read-only embed display boundary (`src/viz/`)
 - `d8231d3` — control-plane: verdict-aware ntfy fix prompt + IDE_BUILD delegates to build (#233) (`scripts/`)
 - `a5aaed8` — closeout(evidence-plane): MSOS entitlements v1 steering sync (#232) (`docs/SOP/`)
+- **Chapter closed:** MSOS Strategy Lab embed shell v1 (`MSOS-EmbedShellV1-Closeout-Slice006`)
+- **Chapter closed:** MSOS end-to-end product witness v1 (`MSOS-E2EWitV1-Closeout-Slice003`)
 - **Chapter closed:** MSOS entitlements & commercial beta v1 (`MSOS-EntitleV1-Closeout-Slice005`)
 
 ## 2026-06-18

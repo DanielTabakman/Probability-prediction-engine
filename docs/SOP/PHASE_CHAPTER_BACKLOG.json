@@ -224,7 +224,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_embed_shell_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
@@ -264,7 +264,7 @@
     },
     {
       "chapterId": "msos_e2e_product_witness_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
@@ -284,7 +284,7 @@
     },
     {
       "chapterId": "msos_billing_stripe_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",

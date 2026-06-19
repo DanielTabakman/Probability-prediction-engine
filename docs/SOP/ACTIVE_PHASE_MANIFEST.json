@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Stripe billing — phase 7b BUILD deferred",
   "workerMode": "deterministic"
 }
