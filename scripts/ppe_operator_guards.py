@@ -24,6 +24,9 @@ GUARD_REPORT_REL = "artifacts/orchestrator/OPERATOR_GUARD_REPORT.md"
 GUARD_EXIT = 7
 GUARD_SKIP_CHAPTER = 8
 
+STRIPE_BILLING_PLAN = "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json"
+STRIPE_OPERATOR_PREREQ_ID = "stripe_operator_prereq"
+
 
 @dataclass
 class GuardResult:
@@ -136,11 +139,44 @@ def _apply_skip_complete_chapter(repo: Path, plan_path: str) -> None:
         print(f"WARN: manifest update on guard skip: {exc}")
 
 
+def _stripe_build_deferred_guard(repo: Path, plan_path: str) -> GuardResult | None:
+    """Block Stripe auto-SELECTION while operator prereqs or demo gate are open."""
+    norm_plan = plan_path.replace("\\", "/").strip()
+    if norm_plan != STRIPE_BILLING_PLAN:
+        return None
+    try:
+        from scripts.ppe_human_backlog import load_backlog
+
+        for item in load_backlog(repo).get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            if str(item.get("id") or "") != STRIPE_OPERATOR_PREREQ_ID:
+                continue
+            status = str(item.get("status") or "open").strip().lower()
+            if status in ("open", "in_progress"):
+                return GuardResult(
+                    exit_code=GUARD_SKIP_CHAPTER,
+                    reason="STRIPE_BUILD_DEFERRED",
+                    detail=(
+                        "Stripe BUILD deferred — close HUMAN_STEWARD_BACKLOG "
+                        f"{STRIPE_OPERATOR_PREREQ_ID} after E2E demo on production"
+                    ),
+                    plan_path=norm_plan,
+                )
+    except FileNotFoundError:
+        pass
+    return None
+
+
 def evaluate_selection_guards(repo: Path, plan_path: str) -> GuardResult | None:
     """Pre-SELECTION checks: block auto-select when plan config violates guard limits."""
     norm_plan = plan_path.replace("\\", "/").strip()
     if not guards_enabled(repo):
         return None
+
+    stripe_guard = _stripe_build_deferred_guard(repo, norm_plan)
+    if stripe_guard is not None:
+        return stripe_guard
 
     cfg = load_operator_config(repo)
     g = _guards_config(cfg)
