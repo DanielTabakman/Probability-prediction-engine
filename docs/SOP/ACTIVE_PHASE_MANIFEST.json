@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Free tier + manual paid \u2014 phase 7a",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
   "workerMode": "deterministic"
 }
