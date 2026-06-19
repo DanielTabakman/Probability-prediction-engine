@@ -88,13 +88,15 @@ def _respond_fix(
     note: str,
     force_handoff: bool,
 ) -> dict[str, Any]:
-    from scripts.ppe_operator_status import collect_operator_status
+    from scripts.ppe_operator_status import VERDICT_IDE_BUILD, collect_operator_status
     from scripts.ppe_remote_agent import agent_available
     from scripts.ppe_remote_fix_agent import build_fix_prompt, launch_fix_cli
 
     repo = repo.resolve()
     status = collect_operator_status(repo)
     verdict = str(status.get("verdict") or "UNKNOWN")
+    if verdict == VERDICT_IDE_BUILD:
+        return _respond_build(repo, source=source, note=note, force_handoff=force_handoff)
     blocker = str(status.get("blocker") or "")
     prompt = build_fix_prompt(repo, user_note=note)
 

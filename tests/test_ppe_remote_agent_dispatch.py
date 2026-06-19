@@ -8,6 +8,33 @@ from scripts.ppe_ide_handoff import FIX_LOG_REL, mark_cli_usage_exhausted
 from scripts.ppe_remote_agent_dispatch import respond_remote_agent
 
 
+def test_respond_fix_ide_build_delegates_to_build(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NOTIFY", "0")
+    monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
+    monkeypatch.setenv("PPE_PREFER_IDE_OVER_CLI", "1")
+    status = {
+        "verdict": "IDE_BUILD",
+        "blocker": "product slice blocked",
+        "phase_plan_path": "docs/SOP/PHASE_PLANS/foo.json",
+        "commands": [],
+    }
+    target = {
+        "ok": True,
+        "mode": "ide_build",
+        "slice_id": "Slice001",
+        "plan_path": "docs/SOP/PHASE_PLANS/foo.json",
+    }
+    with patch("scripts.ppe_operator_status.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_remote_build_agent.resolve_build_target", return_value=target):
+            with patch("scripts.ppe_remote_build_agent.read_build_lock", return_value=None):
+                with patch("scripts.ppe_ide_handoff.write_starter"):
+                    result = respond_remote_agent(tmp_path, mode="fix", source="test")
+    assert result["mode"] == "ide_handoff"
+    assert result["started"] is True
+    assert result.get("slice_id") == "Slice001"
+    assert (tmp_path / "artifacts/orchestrator/IDE_BUILD_NOW.md").is_file()
+
+
 def test_respond_fix_skips_cli_when_prefer_ide(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NOTIFY", "0")
     monkeypatch.setenv("PPE_IDE_HANDOFF_OPEN", "0")
