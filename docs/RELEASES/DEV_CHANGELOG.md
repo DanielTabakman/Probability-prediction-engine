@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-19
 
+- `99860fe` — control-plane: unified reconcile + human request intake (#238) (`docs/SOP/`)
+- **Chapter closed:** E2E witness DONE, billing stripe READY (#237) (`E2E witness DONE, billing stripe READY (#237)`)
+- `2f57bc4` — ops(local): manifest READY after relay pass (#236) (`docs/SOP/`)
+- `b948f7e` — Control-plane: dev changelog
 - `ae94465` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
 - MSOS-EmbedShellV1-Product-Slice003: storyboard chart shell with chromeless PPE embed (`apps/msos-web/`)
 - `e4e77f6` — ops(local): manifest READY after relay pass (`docs/SOP/`)
