@@ -3,6 +3,6 @@
   "sprintSpecPath": "",
   "selectionRecord": "",
   "status": "COMPLETE",
-  "notes": "E2E witness closed; Stripe BUILD deferred until demo on production",
+  "notes": "MSOS live product sequence COMPLETE through E2E witness; Stripe skipped until operator ready",
   "workerMode": "deterministic"
 }

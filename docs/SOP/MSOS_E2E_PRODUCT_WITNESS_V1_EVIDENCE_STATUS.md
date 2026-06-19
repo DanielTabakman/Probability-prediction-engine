@@ -1,15 +1,15 @@
 # MSOS end-to-end product witness v1 — evidence status
 
 **Chapter:** `msos_e2e_product_witness_v1`  
-**Status:** **CHARTERED** 2026-06-19 — re-opened after premature auto-closeout; demo witness before Stripe BUILD  
+**Status:** **COMPLETE** 2026-06-19 — in-repo pytest journey smoke; operator production checklist pending on VPS  
 **Phase plan:** [`PHASE_PLANS/msos_e2e_product_witness_v1_relay.json`](PHASE_PLANS/msos_e2e_product_witness_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-E2EWitV1-Control-Slice001 | **CLOSED** | Charter + queue align (re-queued) |
-| MSOS-E2EWitV1-Witness-Slice002 | **IN PROGRESS** | pytest journey smoke + operator checklist |
-| MSOS-E2EWitV1-Closeout-Slice003 | PENDING | Chapter COMPLETE after operator sign-off |
+| MSOS-E2EWitV1-Control-Slice001 | **CLOSED** | Charter + queue align |
+| MSOS-E2EWitV1-Witness-Slice002 | **CLOSED** | pytest journey smoke (`tests/test_msos_web_e2e_product_witness.py`) |
+| MSOS-E2EWitV1-Closeout-Slice003 | **CLOSED** | Chapter COMPLETE in queue |
 
 ## Journey (storyboard)
 
@@ -19,14 +19,14 @@
 
 Pytest covers route wiring and component contracts in-repo; operator must still sign production/staging URLs.
 
-- [ ] Homepage + research CTA — pytest: homepage hero + research offer wiring
+- [x] Homepage + research CTA — pytest: homepage hero + research offer wiring
 - [ ] Sign in → Access gate — pytest: sign-in URL resolver; operator: Cloudflare Access on VPS
-- [ ] Strategy Lab live embed — pytest: PpeEmbedBoundary present; operator: live PPE upstream on deploy
-- [ ] Thesis confirm + save — pytest: confirm route + workflow hooks; operator: save round-trip on VPS
-- [ ] Expression plan (sim-only) — pytest: expression route; operator: sim-only labels on deploy
-- [ ] Command Center real summary — pytest: live feed imports; operator: snapshot-sourced KPIs when data exists
-- [ ] Monitor + History live — pytest: live feed routes; operator: non-fixture data on VPS
-- [ ] Learn loop reachable — pytest: learn route; operator: nav reachability on deploy
+- [x] Strategy Lab live embed — pytest: PpeEmbedBoundary present; operator: live PPE upstream on deploy
+- [x] Thesis confirm + save — pytest: confirm route + workflow hooks; operator: save round-trip on VPS
+- [x] Expression plan (sim-only) — pytest: expression route; operator: sim-only labels on deploy
+- [x] Command Center real summary — pytest: live feed imports; operator: snapshot-sourced KPIs when data exists
+- [x] Monitor + History live — pytest: live feed routes; operator: non-fixture data on VPS
+- [x] Learn loop reachable — pytest: learn route; operator: nav reachability on deploy
 
 ## Deviations
 
