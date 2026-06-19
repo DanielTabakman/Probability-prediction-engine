@@ -93,6 +93,17 @@
       "added": "2026-06-17"
     },
     {
+      "id": "msos_production_live_hookup",
+      "title": "MSOS production live hookup (friends-first demo)",
+      "status": "open",
+      "priority": "high",
+      "category": "operator",
+      "summary": "Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.",
+      "policyQuestion": "Protect apex product routes only (recommended) or entire marketstructureos.com for friends-first cohort?",
+      "added": "2026-06-19",
+      "notes": "Do not paste SSH keys in chat. Stripe explicitly out of scope until demo-ready."
+    },
+    {
       "id": "stripe_operator_prereq",
       "title": "Stripe operator prerequisites (phase 7b gate)",
       "status": "open",
