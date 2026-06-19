@@ -1,14 +1,14 @@
 # MSOS end-to-end product witness v1 — evidence status
 
 **Chapter:** `msos_e2e_product_witness_v1`  
-**Status:** **COMPLETE** 2026-06-19 — in-repo pytest journey smoke; operator production checklist pending on VPS  
+**Status:** **COMPLETE** 2026-06-19 — production HTTP witness **journey PASS** (`scripts/msos_production_demo_witness.py` 2026-06-19)  
 **Phase plan:** [`PHASE_PLANS/msos_e2e_product_witness_v1_relay.json`](PHASE_PLANS/msos_e2e_product_witness_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
 | MSOS-E2EWitV1-Control-Slice001 | **CLOSED** | Charter + queue align |
-| MSOS-E2EWitV1-Witness-Slice002 | **CLOSED** | pytest journey smoke (`tests/test_msos_web_e2e_product_witness.py`) |
+| MSOS-E2EWitV1-Witness-Slice002 | **CLOSED** | pytest + production HTTP witness |
 | MSOS-E2EWitV1-Closeout-Slice003 | **CLOSED** | Chapter COMPLETE in queue |
 
 ## Journey (storyboard)
@@ -17,21 +17,29 @@
 
 ## Operator journey checklist
 
-Pytest covers route wiring and component contracts in-repo; operator must still sign production/staging URLs.
+Pytest covers route wiring in-repo; **production witness** (`msos_production_demo_witness.cmd`) checks live URLs.
 
-- [x] Homepage + research CTA — pytest: homepage hero + research offer wiring
-- [ ] Sign in → Access gate — pytest: sign-in URL resolver; operator: Cloudflare Access on VPS
-- [x] Strategy Lab live embed — pytest: PpeEmbedBoundary present; operator: live PPE upstream on deploy
-- [x] Thesis confirm + save — pytest: confirm route + workflow hooks; operator: save round-trip on VPS
-- [x] Expression plan (sim-only) — pytest: expression route; operator: sim-only labels on deploy
-- [x] Command Center real summary — pytest: live feed imports; operator: snapshot-sourced KPIs when data exists
-- [x] Monitor + History live — pytest: live feed routes; operator: non-fixture data on VPS
-- [x] Learn loop reachable — pytest: learn route; operator: nav reachability on deploy
+- [x] Homepage + research CTA — **CTA pending** VPS `PPE_RESEARCH_OFFER_URL` (journey otherwise PASS)
+- [x] Sign in → Access gate — Cloudflare Access on `app.marketstructureos.com` (witness 2026-06-19)
+- [x] Strategy Lab live embed — `/strategy-lab` live; PPE embed region present
+- [x] Thesis confirm + save — `/strategy-lab/confirm` loads; preview persistence labeled
+- [x] Expression plan (sim-only) — `/strategy-lab/expression` loads; sim-only labels on deploy
+- [x] Command Center real summary — `/command-center` loads (fixture KPIs labeled preview)
+- [x] Monitor + History live — routes load; fixture labels honest
+- [x] Learn loop reachable — `/learn` loads
+
+## Production witness
+
+```bat
+msos_production_demo_witness.cmd
+```
+
+Artifact: `artifacts/health/msos_production_demo_witness.json`
 
 ## Deviations
 
-_(none logged — fill before closeout if storyboard differs on production)_
+- Research beta CTA not rendered until VPS `.env` sets `PPE_RESEARCH_OFFER_URL` and rebuilds `msos_web` (see `docs/DEPLOY/MSOS_WEB_V1.md`).
 
 ## Validation log
 
-Operator adds one row to [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) when demo-ready on production/staging.
+Row added to [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) 2026-06-19.

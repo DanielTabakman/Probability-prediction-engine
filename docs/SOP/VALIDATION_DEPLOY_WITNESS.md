@@ -4,16 +4,16 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-05-20 (PR #10 belief-input + relay bundle merged; Deploy VPS re-run) |
-| **Git SHA on VPS** | **`aff44c5`**+ (squash merge #10 on `main`); steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` after [Deploy VPS run 26146497234](https://github.com/DanielTabakman/Probability-prediction-engine/actions/runs/26146497234) **success** |
+| **Date (UTC)** | 2026-06-19 (production HTTP witness — `msos_production_demo_witness.py`) |
+| **Git SHA on VPS** | steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` after latest **Deploy VPS** |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
-| **marketstructureos.com (apex)** | **pending steward deploy** — Caddy → `msos_web:3000` on `main`; set **PASS** after merge + browser confirms Next.js MSOS homepage |
+| **marketstructureos.com (apex)** | **PASS** — Next.js MSOS homepage; full storyboard journey HTTP 200 (witness 2026-06-19) |
 | **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
 | **HTTPS static assets** | PASS |
 | **Demo operator script** | PASS |
-| **Research offer CTA on demo (`app_demo`)** | **pending steward `.env`** — compose on `main`; set **PASS** after VPS `.env` + browser confirms **Research beta (v0)** on Streamlit demo |
-| **Research offer CTA on apex (`msos_web`)** | **pending steward `.env`** — `PPE_RESEARCH_OFFER_*` wired on `msos_web` build; set **PASS** after VPS rebuild + browser confirms CTA on Next homepage |
-| **PPE embed on Strategy Lab (`msos_web`)** | **pending steward deploy** — `/ppe-embed` Caddy proxy + `NEXT_PUBLIC_PPE_EMBED_URL` build arg; set **PASS** after rebuild confirms live iframe |
+| **Research offer CTA on demo (`app_demo`)** | **pending steward `.env`** — Streamlit demo banner |
+| **Research offer CTA on apex (`msos_web`)** | **pending** — run `bash scripts/vps_enable_research_cta.sh <email>` on VPS after `git pull` |
+| **PPE embed on Strategy Lab (`msos_web`)** | **PASS** — `/strategy-lab` shows live PPE embed region (witness 2026-06-19) |
 
 **Phase 2 (local):** dual smoke green `20260519_155858` + `20260519_160103` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
 
@@ -21,16 +21,14 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 **Reliability Slice002 (local):** dual smoke green `20260519_133606` + `20260519_134906` — [`MVP1_RELIABILITY_EVIDENCE_STATUS.md`](MVP1_RELIABILITY_EVIDENCE_STATUS.md).
 
-**Steward follow-up:** set `.env` below → deploy per [`docs/DEPLOY/MSOS_WEB_V1.md`](../DEPLOY/MSOS_WEB_V1.md) → set apex + CTA rows **PASS** after browser confirms Next homepage and research-beta button.
+**Steward follow-up:** enable apex research CTA on VPS:
 
 ```bash
 cd /opt/marketstructureos
 git pull
-# .env (not committed) — shared by msos_web (apex) and app_demo (Streamlit):
-#   PPE_RESEARCH_OFFER_URL=mailto:...
-#   PPE_RESEARCH_OFFER_LABEL=Request research beta access
-docker compose up -d --build
-docker compose up -d --force-recreate caddy msos_web
+bash scripts/vps_enable_research_cta.sh YOUR_EMAIL@example.com
 ```
+
+Or manual `.env` + rebuild per [`docs/DEPLOY/MSOS_WEB_V1.md`](../DEPLOY/MSOS_WEB_V1.md). Re-run `msos_production_demo_witness.cmd` until `research_beta_cta` passes.
 
 **Tracker:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) · **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
