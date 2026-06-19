@@ -48,16 +48,42 @@ export function StrategyLabContent() {
 
           <div className="panel-head">
             <div>
-              <h2>Distribution summary (live PPE)</h2>
+              <h2>Market-implied vs reference vs your belief</h2>
               <div className="panel-sub">
-                Research-demo path: embedded implied lab shows labeled mean and quartiles per expiry — math stays in
-                Python / Streamlit.
+                Reference model: <span className="teal">Lognormal benchmark (PPE)</span> · chart region from
+                read-only display payload or chromeless embed — math stays in Python.
               </div>
             </div>
             <span className="tag">PPE</span>
           </div>
 
           <PpeEmbedBoundary />
+
+          <div className="legend" aria-label="Chart legend">
+            <span>
+              <i className="swatch market" aria-hidden="true" />
+              Market implied
+            </span>
+            <span>
+              <i className="swatch reference" aria-hidden="true" />
+              Reference model (PPE)
+            </span>
+            <span>
+              <i className="swatch belief" aria-hidden="true" />
+              Your belief
+            </span>
+          </div>
+
+          <div className="controls" aria-label="Chart controls (preview)">
+            <div className="control">
+              <div className="control-label">Expected range width</div>
+              <div className="slider preview" aria-hidden="true" />
+            </div>
+            <div className="control muted">
+              <div className="control-label">Tail emphasis</div>
+              <div className="slider preview muted" aria-hidden="true" />
+            </div>
+          </div>
 
           <div className="panel-head compact">
             <div>
