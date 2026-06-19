@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-19
+
+- **Chapter closed:** MSOS entitlements & commercial beta v1 (`MSOS-EntitleV1-Closeout-Slice005`)
+
 ## 2026-06-18
 
 - **Chapter closed:** MSOS monitor & history live v1 (`MSOS-MonHistV1-Closeout-Slice004`)

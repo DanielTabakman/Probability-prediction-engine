@@ -5,7 +5,8 @@
     "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
     "chapter_closed:MSOS-AccessIdV1-Closeout-Slice005",
     "chapter_closed:MVP1-SnapshotOwner-Closeout-Slice004",
-    "chapter_closed:MSOS-MonHistV1-Closeout-Slice004"
+    "chapter_closed:MSOS-MonHistV1-Closeout-Slice004",
+    "chapter_closed:MSOS-EntitleV1-Closeout-Slice005"
   ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",

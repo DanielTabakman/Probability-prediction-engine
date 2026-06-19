@@ -1,7 +1,7 @@
 # MSOS entitlements v1 — evidence status
 
 **Chapter:** `msos_entitlements_v1`  
-**Status:** **CHARTERED** 2026-06-14  
+**Status:** **COMPLETE** 2026-06-19  
 **ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 
 | Slice | Status |
