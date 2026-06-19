@@ -3,6 +3,6 @@
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Stripe billing \u2014 phase 7b BUILD deferred",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Stripe billing — phase 7b BUILD deferred",
   "workerMode": "deterministic"
 }

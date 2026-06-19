@@ -4,11 +4,28 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-19
 
+- `ae94465` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- MSOS-EmbedShellV1-Product-Slice003: storyboard chart shell with chromeless PPE embed (`apps/msos-web/`)
+- `e4e77f6` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- MSOS-EmbedShellV1-Product-Slice002: PPE embed display boundary (#234) (`src/viz/`)
+- `e1b6012` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- MSOS-EmbedShellV1-Product-Slice002: PPE read-only embed display boundary (`src/viz/`)
+- `d8231d3` — control-plane: verdict-aware ntfy fix prompt + IDE_BUILD delegates to build (#233) (`scripts/`)
+- `a5aaed8` — closeout(evidence-plane): MSOS entitlements v1 steering sync (#232) (`docs/SOP/`)
 - **Chapter closed:** MSOS Strategy Lab embed shell v1 (`MSOS-EmbedShellV1-Closeout-Slice006`)
+- **Chapter closed:** MSOS end-to-end product witness v1 (`MSOS-E2EWitV1-Closeout-Slice003`)
 - **Chapter closed:** MSOS entitlements & commercial beta v1 (`MSOS-EntitleV1-Closeout-Slice005`)
 
 ## 2026-06-18
 
+- Merge pull request #235 from DanielTabakman/build/auto/MSOS-EmbedShellV1-Product-Slice003-embed_shell
+- `be37b86` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine into fix/ntfy-fix-prompt
+- `fbdf9f7` — control-plane: verdict-aware ntfy fix prompt + IDE_BUILD delegates to build (`scripts/`)
+- feat(msos-ui): MSOS-EntitleV1-Product-Slice002 tier store and shell badge (#231) (`apps/msos-web/`)
+- `4ce632d` — feat(msos-ui): MSOS monitor history live product slice 002 (#230) (`apps/msos-web/`)
+- `56fbf7b` — ops: loop publish ide/snapshot-owner-pr (#229) (`docs/SOP/`)
+- `55b15d6` — ops: loop publish ide/snapshot-owner-pr (#228) (`scripts/`)
+- `8840d15` — Control-plane: dev changelog
 - **Chapter closed:** MSOS monitor & history live v1 (`MSOS-MonHistV1-Closeout-Slice004`)
 - **Chapter closed:** MVP1 snapshot owner v1 (`MVP1-SnapshotOwner-Closeout-Slice004`)
 - **Chapter closed:** MSOS access identity v1 (`MSOS-AccessIdV1-Closeout-Slice005`)
