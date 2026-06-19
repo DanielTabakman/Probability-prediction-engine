@@ -113,3 +113,4 @@ flowchart TB
 | 2026-06-14 | v1 — initial phased sequence |
 | 2026-06-14 | v2 — phases 4a–7b chartered (identity, monitor, E2E, entitlements, Stripe deferred) |
 | 2026-06-18 | v3 — parallel UX chapter `msos_strategy_lab_embed_shell_v1` (MEDIUM, post–phase 3) |
+| 2026-06-19 | v4 — production hookup charter [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) (relay DONE ≠ production usable) |

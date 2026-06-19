@@ -1,0 +1,11 @@
+@echo off
+REM Copy to ppe_operator_ssh.local.cmd (gitignored) for agent/operator VPS SSH from desktop.
+REM Never commit keys or paste private key material into chat.
+
+set "PPE_VPS_HOST=YOUR.VPS.IP.OR.HOSTNAME"
+set "PPE_VPS_USER=ppe"
+set "PPE_VPS_SSH_KEY=%USERPROFILE%\.ssh\ppe_github_deploy"
+set "PPE_VPS_ROOT=/opt/marketstructureos"
+
+REM Optional: same key as GitHub Actions deploy (scripts/setup_vps_deploy_once.ps1)
+REM Or use a dedicated agent key — add its .pub to VPS authorized_keys only.
