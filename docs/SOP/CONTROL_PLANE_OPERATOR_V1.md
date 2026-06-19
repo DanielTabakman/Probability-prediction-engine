@@ -21,6 +21,8 @@ ppe_request.cmd reconcile
 | `committed.phase_plan_path` | Active chapter (from manifest) |
 | `committed.first_ready_queue_plan` | Next queue row the relay will use |
 | `verdict` / `phase` / `recommended_action` | What to do now |
+| `runtime.build.worker` / `runtime.build.handoff_worker` | Headless vs desktop BUILD agent (`cursor-cli`, `codex-cli`, `manual`) |
+| `runtime.build.worker_pref` | Config: `ideHandoff.buildWorker` (`auto` \| `cursor` \| `codex` \| `manual`) |
 | `alignment.findings` | Drift between manifest, queue, backlog, continuity brief |
 | `runtime` | Full autobuilder snapshot |
 

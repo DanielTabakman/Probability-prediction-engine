@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from scripts.ppe_remote_agent import notify_agent_done, run_agent
+from scripts.ppe_build_worker import WORKER_CODEX_CLI, WORKER_CURSOR_CLI, run_build_worker_cli
+from scripts.ppe_remote_agent import notify_agent_done
 
 
 def _load_job(path: Path) -> dict[str, Any]:
@@ -25,7 +26,10 @@ def run_job(job: dict[str, Any]) -> dict[str, Any]:
     log_path = repo / "artifacts" / "orchestrator" / log_name
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    result = run_agent(repo, prompt=prompt, log_path=log_path)
+    worker = str(job.get("build_worker") or WORKER_CURSOR_CLI)
+    if worker not in (WORKER_CURSOR_CLI, WORKER_CODEX_CLI):
+        worker = WORKER_CURSOR_CLI
+    result = run_build_worker_cli(repo, prompt=prompt, worker=worker, log_path=log_path)  # type: ignore[arg-type]
 
     if job.get("clear_build_lock"):
         from scripts.ppe_remote_build_agent import clear_build_lock

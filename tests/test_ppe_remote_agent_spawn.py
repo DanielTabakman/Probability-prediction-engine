@@ -73,7 +73,7 @@ def test_launch_build_records_worker_pid(tmp_path, monkeypatch):
         with patch("scripts.ppe_ide_product_ready.next_pending_product_slice", return_value="MVP1-Slice002"):
             with patch("scripts.ppe_remote_build_agent.write_starter"):
                 with patch(
-                    "scripts.ppe_remote_build_agent.launch_agent_background",
+                    "scripts.ppe_build_worker.launch_build_worker_background",
                     return_value={"started": True, "worker_pid": 9999, "message": "ok"},
                 ):
                     result = launch_build(tmp_path, source="test")

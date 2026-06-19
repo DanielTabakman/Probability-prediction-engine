@@ -10,7 +10,6 @@ from typing import Any
 
 from scripts.ppe_ide_build_starter import starter_path, write_starter
 from scripts.ppe_operator_status import VERDICT_IDE_BUILD, VERDICT_RUN_LOCAL, collect_operator_status
-from scripts.ppe_remote_agent import launch_agent_background
 from scripts.ppe_remote_agent_spawn import process_alive, spawn_python_worker
 
 BUILD_LOCK_REL = "artifacts/orchestrator/REMOTE_BUILD_LOCK.json"
@@ -111,6 +110,7 @@ def write_build_lock(
     plan_path: str,
     source: str,
     worker_pid: int | None = None,
+    worker: str | None = None,
 ) -> None:
     path = build_lock_path(repo)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -120,6 +120,8 @@ def write_build_lock(
         "source": source,
         "started_at": _utc_now(),
     }
+    if worker:
+        payload["build_worker"] = worker
     if worker_pid is not None:
         payload["worker_pid"] = worker_pid
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -176,25 +178,24 @@ def resolve_build_target(repo: Path) -> dict[str, Any]:
     return {"ok": False, "verdict": verdict, "reason": f"build needs IDE_BUILD or RUN_LOCAL (got {verdict})"}
 
 
-def build_ide_prompt(*, slice_id: str, plan_path: str, starter_rel: str, note: str = "") -> str:
-    parts = [
-        "You are the PPE desktop BUILD agent. The operator sent **build** from their phone.",
-        "",
-        f"SLICE_ID: {slice_id}",
-        f"PHASE_PLAN: {plan_path}",
-        f"Load ONLY `@{starter_rel}`. Implement the product slice within ALLOWED_PATHS.",
-        "",
-        "When done, in order:",
-        "1. python scripts/run_pushable_gate.py",
-        "2. git commit on plan buildBranch",
-        f"3. mark_ide_product_ready.cmd {slice_id} {plan_path}",
-        "4. run_ppe_local.cmd",
-        "",
-        "Execute autonomously; do not ask for confirmation.",
-    ]
-    if note.strip():
-        parts.extend(["", note.strip()])
-    return "\n".join(parts)
+def build_ide_prompt(
+    *,
+    slice_id: str,
+    plan_path: str,
+    starter_rel: str,
+    note: str = "",
+    worker: str | None = None,
+) -> str:
+    from scripts.ppe_build_worker import WORKER_CURSOR_CLI, build_product_prompt
+
+    resolved_worker = worker or WORKER_CURSOR_CLI
+    return build_product_prompt(
+        slice_id=slice_id,
+        starter_rel=starter_rel,
+        plan_path=plan_path,
+        worker=resolved_worker,  # type: ignore[arg-type]
+        note=note,
+    )
 
 
 RUN_LOCAL_LOCK_REL = "artifacts/orchestrator/REMOTE_RUN_LOCAL_LOCK.json"
@@ -287,7 +288,15 @@ def _run_local_detached(repo: Path) -> dict[str, Any]:
     }
 
 
-def launch_build(repo: Path, *, note: str = "", source: str = "phone") -> dict[str, Any]:
+def launch_build(
+    repo: Path,
+    *,
+    note: str = "",
+    source: str = "phone",
+    worker: str | None = None,
+) -> dict[str, Any]:
+    from scripts.ppe_build_worker import WORKER_CURSOR_CLI, launch_build_worker_background, resolve_build_worker
+
     repo = repo.resolve()
     target = resolve_build_target(repo)
     if not target.get("ok"):
@@ -307,20 +316,40 @@ def launch_build(repo: Path, *, note: str = "", source: str = "phone") -> dict[s
             "lock": lock,
         }
 
+    resolved = resolve_build_worker(repo) if worker is None else {"worker": worker}
+    build_worker = str(resolved.get("worker") or WORKER_CURSOR_CLI)
+
     write_starter(repo, slice_id=slice_id, phase_plan=plan_path)
     starter_rel = starter_path(slice_id)
-    prompt = build_ide_prompt(slice_id=slice_id, plan_path=plan_path, starter_rel=starter_rel, note=note)
-    write_build_lock(repo, slice_id=slice_id, plan_path=plan_path, source=source)
+    prompt = build_ide_prompt(
+        slice_id=slice_id,
+        plan_path=plan_path,
+        starter_rel=starter_rel,
+        note=note,
+        worker=build_worker,
+    )
+    write_build_lock(
+        repo,
+        slice_id=slice_id,
+        plan_path=plan_path,
+        source=source,
+        worker=build_worker,
+    )
 
-    out = launch_agent_background(
+    out = launch_build_worker_background(
         repo,
         prompt=prompt,
-        log_name="REMOTE_BUILD_AGENT.log",
-        started_message=f"IDE BUILD started for {slice_id}.",
+        worker=build_worker,  # type: ignore[arg-type]
+        started_message=f"IDE BUILD started for {slice_id} ({build_worker}).",
         clear_build_lock=True,
         notify_ok_title=f"PPE build finished: {slice_id}",
         notify_fail_title=f"PPE build failed: {slice_id}",
-        handoff={"slice_id": slice_id, "plan_path": plan_path, "source": source},
+        handoff={
+            "slice_id": slice_id,
+            "plan_path": plan_path,
+            "source": source,
+            "build_worker": build_worker,
+        },
     )
     if not out.get("started"):
         clear_build_lock(repo)
@@ -335,5 +364,6 @@ def launch_build(repo: Path, *, note: str = "", source: str = "phone") -> dict[s
         "plan_path": plan_path,
         "starter": starter_rel,
         "source": source,
+        "build_worker": build_worker,
         **out,
     }

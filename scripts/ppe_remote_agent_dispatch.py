@@ -11,6 +11,7 @@ from scripts.ppe_ide_handoff import (
     launch_ide_handoff,
     should_attempt_headless_cli,
 )
+from scripts.ppe_build_worker import WORKER_CODEX_CLI, WORKER_CURSOR_CLI
 
 AgentCommandMode = Literal["build", "fix"]
 
@@ -36,7 +37,7 @@ def _respond_build(
     note: str,
     force_handoff: bool,
 ) -> dict[str, Any]:
-    from scripts.ppe_remote_agent import agent_available
+    from scripts.ppe_build_worker import resolve_build_worker
     from scripts.ppe_remote_build_agent import launch_build, read_build_lock, resolve_build_target
 
     repo = repo.resolve()
@@ -57,18 +58,24 @@ def _respond_build(
             "slice_id": slice_id,
         }
 
-    try_cli = (
+    resolved = resolve_build_worker(repo, force_handoff=force_handoff)
+    try_headless = (
         should_attempt_headless_cli(repo, mode="build", force_handoff=force_handoff)
-        and agent_available()
+        and resolved.get("mode") == "headless"
         and not force_handoff
     )
     cli_out: dict[str, Any] = {}
-    if try_cli:
-        cli_out = launch_build(repo, note=note, source=source)
-        if cli_out.get("started"):
-            return cli_out
+    workers_tried: list[str] = []
+    if try_headless:
+        for worker in _headless_worker_chain(resolved):
+            workers_tried.append(worker)
+            cli_out = launch_build(repo, note=note, source=source, worker=worker)
+            if cli_out.get("started"):
+                cli_out["build_worker"] = worker
+                cli_out["workers_tried"] = workers_tried
+                return cli_out
 
-    reason = headless_cli_skip_reason(repo, try_cli=try_cli, cli_out=cli_out)
+    reason = headless_cli_skip_reason(repo, try_cli=try_headless, cli_out=cli_out)
     handoff = launch_ide_handoff(
         repo,
         slice_id=slice_id,
@@ -77,8 +84,19 @@ def _respond_build(
         reason=reason,
         force=force_handoff,
     )
-    handoff["cli_attempted"] = try_cli
+    handoff["cli_attempted"] = try_headless
+    handoff["workers_tried"] = workers_tried
     return handoff
+
+
+def _headless_worker_chain(resolved: dict[str, Any]) -> list[str]:
+    primary = str(resolved.get("worker") or WORKER_CURSOR_CLI)
+    chain = [primary]
+    if primary == WORKER_CURSOR_CLI and resolved.get("codex_cli_available"):
+        chain.append(WORKER_CODEX_CLI)
+    elif primary == WORKER_CODEX_CLI:
+        pass
+    return chain
 
 
 def _respond_fix(
