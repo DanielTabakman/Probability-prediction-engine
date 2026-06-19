@@ -154,6 +154,11 @@ _cta_private_url, _research_offer = resolve_demo_ctas(
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
 
+from src.viz.embed_only_lab import maybe_run_embed_only_early_exit
+
+if maybe_run_embed_only_early_exit():
+    st.stop()
+
 if _cta_private_url:
     hero_left, hero_right = st.columns([3, 1])
     with hero_left:
