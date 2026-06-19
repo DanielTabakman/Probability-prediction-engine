@@ -2,7 +2,9 @@
 
 **Installed in repo:** [`.cursor/rules/auto-commit.mdc`](rules/auto-commit.mdc) (`alwaysApply: true`).
 
-Paste the block below into **Cursor Settings → User Rules** so global “commit only when asked” does not block this repo.
+**Installed globally:** `%USERPROFILE%\.cursor\rules\ppe-probability-engine-git.mdc` (`alwaysApply: true`).
+
+Paste the block below into **Cursor Settings → User Rules** only if the global file is missing or not picked up.
 
 ---
 
