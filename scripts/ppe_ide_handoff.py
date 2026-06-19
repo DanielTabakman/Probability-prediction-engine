@@ -218,7 +218,13 @@ def should_attempt_headless_cli(repo: Path, *, mode: str = "build", force_handof
     elif prefer_ide_over_cli(repo):
         return False
     if skip_cli_when_usage_exhausted(repo) and cli_usage_exhausted(repo):
-        return False
+        try:
+            from scripts.ppe_build_worker import codex_available, codex_cli_exhausted
+
+            if not (codex_available() and not codex_cli_exhausted(repo)):
+                return False
+        except ImportError:
+            return False
     if mode == "build":
         try:
             from scripts.ppe_operator_config import auto_remote_build_enabled
@@ -348,17 +354,24 @@ def open_cursor_for_handoff(repo: Path, starter_file: Path) -> dict[str, Any]:
     return opened
 
 
-def build_handoff_prompt(*, slice_id: str, starter_rel: str, plan_path: str) -> str:
-    from scripts.ppe_ide_build_starter import format_build_closeout_section
+def build_handoff_prompt(
+    *,
+    slice_id: str,
+    starter_rel: str,
+    plan_path: str,
+    worker: str | None = None,
+    repo: Path | None = None,
+) -> str:
+    from scripts.ppe_build_worker import WORKER_MANUAL, build_product_prompt, resolve_build_worker
 
-    return "\n".join(
-        [
-            f"Build product slice **{slice_id}**.",
-            f"Load ONLY `@{starter_rel}` (includes **## When done (required)**).",
-            f"Phase plan: `{plan_path}`.",
-            "",
-            format_build_closeout_section(slice_id=slice_id, phase_plan=plan_path),
-        ]
+    if worker is None and repo is not None:
+        worker = str(resolve_build_worker(repo, for_handoff=True).get("worker") or WORKER_MANUAL)
+    resolved_worker = worker or WORKER_MANUAL
+    return build_product_prompt(
+        slice_id=slice_id,
+        starter_rel=starter_rel,
+        plan_path=plan_path,
+        worker=resolved_worker,  # type: ignore[arg-type]
     )
 
 
@@ -369,22 +382,35 @@ def write_handoff_now_doc(
     starter_rel: str,
     plan_path: str,
     reason: str,
+    worker: str | None = None,
 ) -> Path:
-    prompt = build_handoff_prompt(slice_id=slice_id, starter_rel=starter_rel, plan_path=plan_path)
+    from scripts.ppe_build_worker import WORKER_MANUAL, handoff_instructions, resolve_build_worker
+
+    resolved = resolve_build_worker(repo, for_handoff=True)
+    handoff_worker = worker or str(resolved.get("worker") or WORKER_MANUAL)
+    prompt = build_handoff_prompt(
+        slice_id=slice_id,
+        starter_rel=starter_rel,
+        plan_path=plan_path,
+        worker=handoff_worker,
+        repo=repo,
+    )
+    steps = handoff_instructions(handoff_worker)  # type: ignore[arg-type]
+    numbered = "\n".join(
+        [f"1. Double-click **{DESKTOP_BUILD_CMD}** (build prompt copies to clipboard)."]
+        + [f"{idx}. {step}" for idx, step in enumerate(steps, start=2)]
+    )
     body = "\n".join(
         [
             "# IDE BUILD — action required",
             "",
             f"**Slice:** `{slice_id}`",
+            f"**Worker:** `{handoff_worker}`",
             f"**Reason:** {reason}",
             "",
             "## Do this (real PC only — not the VM)",
             "",
-            f"1. On your **daily desktop**: double-click **{DESKTOP_BUILD_CMD}** in the repo folder.",
-            "2. Open a **new** Cursor Agent chat.",
-            "3. **Ctrl+V** then Enter — the build prompt is already on your clipboard.",
-            "4. Let the agent finish gate, commit, and closeout.",
-            f"5. After PR merge: **DESKTOP CONTINUE**.",
+            numbered,
             "",
             f"Manual fallback: load only `{starter_rel}` and follow **## When done (required)**.",
             "",
@@ -393,6 +419,8 @@ def write_handoff_now_doc(
             "```",
             "",
             f"Full starter: `{starter_rel}`",
+            "",
+            "Status: `ppe_request.cmd reconcile` → `CONTROL_PLANE_STATUS.json`",
         ]
     )
     out = repo / HANDOFF_NOW_REL
@@ -431,16 +459,26 @@ def launch_ide_handoff(
     write_starter(repo, slice_id=slice_id, phase_plan=plan_path)
     starter_rel = starter_path(slice_id)
     starter_file = repo / starter_rel.replace("/", os.sep)
-    prompt = build_handoff_prompt(slice_id=slice_id, starter_rel=starter_rel, plan_path=plan_path)
+    from scripts.ppe_build_worker import WORKER_MANUAL, resolve_build_worker, open_worker_for_handoff
+
+    handoff_worker = str(resolve_build_worker(repo, for_handoff=True).get("worker") or WORKER_MANUAL)
+    prompt = build_handoff_prompt(
+        slice_id=slice_id,
+        starter_rel=starter_rel,
+        plan_path=plan_path,
+        worker=handoff_worker,
+        repo=repo,
+    )
     now_doc = write_handoff_now_doc(
         repo,
         slice_id=slice_id,
         starter_rel=starter_rel,
         plan_path=plan_path,
         reason=reason,
+        worker=handoff_worker,
     )
     clipboard = copy_text_to_clipboard(prompt)
-    cursor = open_cursor_for_handoff(repo, starter_file)
+    opened = open_worker_for_handoff(repo, worker=handoff_worker, starter_file=starter_file)  # type: ignore[arg-type]
 
     state = load_handoff_state(repo)
     state.update(
@@ -450,7 +488,8 @@ def launch_ide_handoff(
             "last_handoff_source": source,
             "last_handoff_reason": reason,
             "last_starter": starter_rel,
-            "cursor_open": cursor.get("ok"),
+            "last_handoff_worker": handoff_worker,
+            "worker_open": opened.get("ok"),
             "clipboard": clipboard.get("ok"),
         }
     )
@@ -501,7 +540,8 @@ def launch_ide_handoff(
         "plan_path": plan_path,
         "starter": starter_rel,
         "now_doc": str(now_doc.relative_to(repo)).replace("\\", "/"),
-        "cursor": cursor,
+        "worker": handoff_worker,
+        "worker_open": opened,
         "clipboard": clipboard,
         "source": source,
         "reason": reason,
@@ -642,16 +682,23 @@ def launch_ide_fix_handoff(
 
 
 def headless_cli_skip_reason(repo: Path, *, try_cli: bool, cli_out: dict[str, Any]) -> str:
-    if prefer_ide_over_cli(repo):
-        return "near-zero API profile — use Cursor IDE Agent"
-    if cli_usage_exhausted(repo):
-        return "agent CLI out of usage — use Cursor IDE Agent"
+    from scripts.ppe_build_worker import codex_available, collect_build_worker_status
     from scripts.ppe_remote_agent import agent_available
 
-    if not agent_available():
-        return "agent CLI not installed — use Cursor IDE Agent"
+    if prefer_ide_over_cli(repo):
+        status = collect_build_worker_status(repo)
+        worker = status.get("handoff_worker") or "manual"
+        return f"near-zero API profile — use desktop BUILD ({worker})"
+    if cli_usage_exhausted(repo):
+        if codex_available():
+            return "Cursor CLI out of usage — desktop BUILD will use Codex when configured"
+        return "agent CLI out of usage — use desktop BUILD (Cursor or Codex)"
+    if not agent_available() and codex_available():
+        return "Cursor CLI not installed — Codex CLI available for headless or desktop BUILD"
+    if not agent_available() and not codex_available():
+        return "No headless BUILD worker — use desktop BUILD (install Cursor agent or codex CLI)"
     if not try_cli:
-        return "CLI skipped — use Cursor IDE Agent"
+        return "CLI skipped — use desktop BUILD"
     return str(cli_out.get("reason") or "CLI unavailable")
 
 
@@ -687,12 +734,33 @@ def maybe_handoff_after_cli_failure(repo: Path, job: dict[str, Any], result: dic
             detail = ""
     stderr = str(result.get("stderr_head") or "")
     combined = f"{detail}\n{stderr}"
-    if text_indicates_usage_exhausted(combined):
-        mark_cli_usage_exhausted(repo, detail=stderr or detail[-300:])
-
     handoff_info = job.get("handoff") or {}
+    build_worker = str(job.get("build_worker") or handoff_info.get("build_worker") or "cursor-cli")
+    if text_indicates_usage_exhausted(combined):
+        if build_worker == "codex-cli":
+            from scripts.ppe_build_worker import mark_codex_usage_exhausted
+
+            mark_codex_usage_exhausted(repo, detail=stderr or detail[-300:])
+        else:
+            mark_cli_usage_exhausted(repo, detail=stderr or detail[-300:])
+
     if not ide_handoff_enabled(repo):
         return None
+
+    mode = str(handoff_info.get("mode") or "build").strip().lower()
+    if mode == "build" and build_worker == "cursor-cli":
+        from scripts.ppe_build_worker import WORKER_CODEX_CLI, codex_available, codex_cli_exhausted
+        from scripts.ppe_remote_build_agent import launch_build
+
+        if codex_available() and not codex_cli_exhausted(repo):
+            fallback = launch_build(
+                repo,
+                note="cursor CLI failed — codex fallback",
+                source=str(handoff_info.get("source") or "cli-failure"),
+                worker=WORKER_CODEX_CLI,
+            )
+            if fallback.get("started"):
+                return fallback
 
     reason = "agent CLI out of usage" if cli_usage_exhausted(repo) else "agent CLI failed"
 

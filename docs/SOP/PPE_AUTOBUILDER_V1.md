@@ -35,8 +35,9 @@ Legacy single-machine entry: `start_ppe_desktop_operator.cmd` — **not** for da
 
 Plus dispatch paths:
 
-- Headless CLI (`agent` / `cursor-sdk`) when `autoRemoteBuild` allows
-- IDE handoff (starter + `IDE_BUILD_TRIGGER.json` + Cursor Automation)
+- Unified BUILD worker ([`ppe_build_worker.py`](../../scripts/ppe_build_worker.py)): **Cursor CLI → Codex CLI → desktop handoff** when `ideHandoff.buildWorker: auto`
+- Headless CLI (`agent` / `codex exec`) when `autoRemoteBuild` allows
+- Desktop handoff (`DESKTOP_BUILD.cmd` → starter + clipboard; opens Cursor or Codex)
 - Post-build watcher (`mark_ide_product_ready` + `run_ppe_local`)
 
 ---

@@ -243,6 +243,13 @@ def _dispatch_profile(repo: Path) -> dict[str, Any]:
     prefer_ide = False
     degraded = False
     reason: str | None = None
+    worker_status: dict[str, Any] = {}
+    try:
+        from scripts.ppe_build_worker import collect_build_worker_status
+
+        worker_status = collect_build_worker_status(repo)
+    except ImportError:
+        pass
     try:
         from scripts.ppe_ide_handoff import cli_usage_exhausted, prefer_ide_over_cli
 
@@ -251,9 +258,12 @@ def _dispatch_profile(repo: Path) -> dict[str, Any]:
             reason = "near_zero_api_profile"
         if cli_usage_exhausted(repo):
             degraded = True
-            reason = "cli_usage_exhausted"
+            reason = reason or "cursor_cli_usage_exhausted"
     except ImportError:
         pass
+    if worker_status.get("codex_cli_exhausted"):
+        degraded = True
+        reason = reason or "codex_cli_usage_exhausted"
     if not degraded:
         try:
             from scripts.ppe_ide_build_automation_health import run_health_checks
@@ -268,6 +278,7 @@ def _dispatch_profile(repo: Path) -> dict[str, Any]:
         "prefer_ide": prefer_ide,
         "degraded": degraded,
         "reason": reason,
+        **worker_status,
     }
 
 
@@ -344,10 +355,16 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
             "plan_path": pending.get("plan_path"),
             "starter": pending.get("starter"),
             "lock": build_lock,
+            "worker": dispatch.get("worker"),
+            "handoff_worker": dispatch.get("handoff_worker"),
+            "worker_pref": dispatch.get("pref"),
+            "worker_reason": dispatch.get("reason"),
             "handoff": {
                 "last_slice": handoff_state.get("last_handoff_slice"),
                 "last_at": handoff_state.get("last_handoff_at"),
+                "last_worker": handoff_state.get("last_handoff_worker"),
                 "cli_usage_exhausted": handoff_state.get("cli_usage_exhausted"),
+                "codex_cli_usage_exhausted": handoff_state.get("codex_cli_usage_exhausted"),
             },
         },
         "closeout": closeout,

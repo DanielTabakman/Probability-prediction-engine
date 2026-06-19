@@ -1,6 +1,6 @@
 @echo off
-REM === DESKTOP ONLY — double-click to start IDE BUILD in Cursor ===
-REM Opens the starter file and copies the build prompt to clipboard.
+REM === DESKTOP ONLY — unified BUILD handoff (Cursor or Codex) ===
+REM Copies build prompt to clipboard via ppe_autobuilder handoff.
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
@@ -19,19 +19,8 @@ python -u "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" handoff
 set "RC=%ERRORLEVEL%"
 
 echo.
-echo ============================================================
-echo  DESKTOP BUILD — your real PC only (NOT the VM)
-echo ============================================================
+python "%CD%\scripts\ppe_build_worker.py" --repo-root "%CD%" print-handoff
 echo.
-echo  The build prompt is already on your clipboard.
-echo.
-echo  1. Open Cursor on THIS machine (repo folder).
-echo  2. Start a NEW Agent chat (not this chat).
-echo  3. Press Ctrl+V, then Enter.
-echo  4. Let the agent finish gate + commit + closeout.
-echo  5. After PR merges: double-click DESKTOP CONTINUE.
-echo.
-echo  The VM loop keeps waiting — you do not run anything on the VM.
 echo ============================================================
 echo.
 

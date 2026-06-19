@@ -9,8 +9,8 @@
 | Step | What you do |
 |------|-------------|
 | 1 | Double-click **`DESKTOP BUILD`** (shortcut to `DESKTOP_BUILD.cmd` in repo) |
-| 2 | Cursor opens; build prompt is **already on clipboard** |
-| 3 | **New Agent chat** → **Ctrl+V** → Enter |
+| 2 | Follow on-screen worker steps (**Cursor Agent** or **Codex** — see `CONTROL_PLANE_STATUS.json` → `runtime.build.handoff_worker`) |
+| 3 | Build prompt is **already on clipboard** — **Ctrl+V** → Enter |
 | 4 | Agent implements slice, runs gate, commits, closeout |
 | 5 | After PR merges → double-click **`DESKTOP CONTINUE`** |
 

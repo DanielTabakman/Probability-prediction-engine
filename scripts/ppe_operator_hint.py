@@ -78,6 +78,7 @@ def resolve_operator_hint(
 
     if verdict == "IDE_BUILD" and repo is not None:
         try:
+            from scripts.ppe_build_worker import collect_build_worker_status
             from scripts.ppe_ide_build_automation_trigger import load_trigger
             from scripts.ppe_ide_handoff import cli_usage_exhausted, prefer_ide_over_cli
             from scripts.ppe_remote_build_agent import read_build_lock
@@ -86,14 +87,22 @@ def resolve_operator_hint(
             trigger = load_trigger(repo)
             trig_status = str(trigger.get("status") or "").lower()
             if lock or trig_status == "dispatched":
+                worker = (lock or {}).get("build_worker") or "auto"
                 return (
-                    "Auto-build in progress — no action unless stuck >30m "
+                    f"Auto-build in progress ({worker}) — no action unless stuck >30m "
                     "(see artifacts/orchestrator/REMOTE_BUILD_AGENT.log)."
                 )
+            worker_status = collect_build_worker_status(repo)
+            handoff_worker = worker_status.get("handoff_worker") or "manual"
             if prefer_ide_over_cli(repo) or cli_usage_exhausted(repo):
+                if handoff_worker == "codex-cli":
+                    return (
+                        f"Real PC: double-click **{DESKTOP_BUILD_CMD}** → open **Codex** → "
+                        f"**Ctrl+V** → Enter. After PR merge: **{DESKTOP_CONTINUE_CMD}**."
+                    )
                 return VERDICT_BUTTON_HINTS["IDE_BUILD"]
             if stack.get("local_trigger_watcher_running"):
-                return "Local watcher will dispatch CLI when allowed — no action unless stuck >30m."
+                return "Local watcher will dispatch headless BUILD when allowed — no action unless stuck >30m."
         except ImportError:
             pass
         if not loop:

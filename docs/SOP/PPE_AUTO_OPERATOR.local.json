@@ -38,6 +38,7 @@
     "openCursor": false,
     "skipCliWhenUsageExhausted": true,
     "preferIdeOverCli": false,
+    "buildWorker": "auto",
     "postBuildWatcher": true,
     "localTriggerWatcher": true
   },
