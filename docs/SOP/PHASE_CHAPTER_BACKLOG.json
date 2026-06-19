@@ -281,16 +281,6 @@
       "selectionRecord": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
       "reason": "[HIGH] Free tier accounts + manual paid upgrade path (Stripe hooks, no Stripe SDK) \u2014 blocked until access identity COMPLETE"
-    },
-    {
-      "chapterId": "msos_billing_stripe_v1",
-      "status": "done",
-      "priority": "medium",
-      "focusPlaybookTier": "P4",
-      "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
-      "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
-      "reason": "[DEFER] Stripe Checkout \u2014 operator dropped until human prereq (stripe_operator_prereq); MSOS live sequence otherwise COMPLETE"
     }
   ]
 }

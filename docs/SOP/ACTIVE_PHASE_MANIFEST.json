@@ -3,6 +3,6 @@
   "sprintSpecPath": "",
   "selectionRecord": "",
   "status": "COMPLETE",
-  "notes": "MSOS live product sequence COMPLETE through E2E witness; Stripe skipped until operator ready",
+  "notes": "MSOS live relay queue idle; Stripe on human backlog only; production demo not operator-signed",
   "workerMode": "deterministic"
 }

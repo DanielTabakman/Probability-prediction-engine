@@ -94,14 +94,16 @@
     },
     {
       "id": "stripe_operator_prereq",
-      "title": "Stripe operator prerequisites (phase 7b gate)",
+      "title": "MSOS Stripe billing — phase 7b (human track)",
       "status": "open",
-      "priority": "high",
+      "priority": "medium",
       "category": "operator",
-      "summary": "Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.",
-      "policyQuestion": "When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.",
+      "summary": "Entire msos_billing_stripe_v1 chapter moved off auto relay queue. Operator work: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. When ready: mark this done and ppe_request.cmd --chapter-id msos_billing_stripe_v1 --reason 'operator Stripe ready' --apply.",
+      "policyQuestion": "When is production demo verified enough to start Stripe BUILD?",
       "added": "2026-06-19",
-      "notes": "Steward 2026-06-19: deferred until website demo-ready on production; Stripe accounts/setup pending."
+      "notes": "Relay plan kept at docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json — not in PHASE_CHAPTER_BACKLOG or auto SELECTION until human closes this item.",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
+      "chapterId": "msos_billing_stripe_v1"
     },
     {
       "id": "process_library_expansion",

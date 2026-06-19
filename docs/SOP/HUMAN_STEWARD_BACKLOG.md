@@ -71,6 +71,14 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### MSOS Stripe billing — phase 7b (human track)
+
+- **id:** `stripe_operator_prereq` · **priority:** medium · **category:** operator
+- **added:** 2026-06-19
+- **summary:** Entire msos_billing_stripe_v1 chapter moved off auto relay queue. Operator work: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. When ready: mark this done and ppe_request.cmd --chapter-id msos_billing_stripe_v1 --reason 'operator Stripe ready' --apply.
+- **policy question:** When is production demo verified enough to start Stripe BUILD?
+- **notes:** Relay plan kept at docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json — not in PHASE_CHAPTER_BACKLOG or auto SELECTION until human closes this item.
+
 ### Process library expansion
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
@@ -89,4 +97,4 @@
 
 ## Changelog
 
-| 2026-06-18 | Auto-render from JSON |
+| 2026-06-19 | Auto-render from JSON |

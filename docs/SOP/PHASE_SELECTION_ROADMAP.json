@@ -202,7 +202,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "status": "done",
-      "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
+      "reason": "[HUMAN] Stripe billing \u2014 human steward backlog only (stripe_operator_prereq)",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     }
   ]

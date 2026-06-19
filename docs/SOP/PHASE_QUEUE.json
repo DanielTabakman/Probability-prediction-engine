@@ -254,7 +254,7 @@
       "status": "DONE",
       "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
-      "doneReason": "deferred by operator 2026-06-19 \u2014 not BUILD; see HUMAN_STEWARD_BACKLOG stripe_operator_prereq"
+      "doneReason": "moved to HUMAN_STEWARD_BACKLOG stripe_operator_prereq — not auto relay"
     }
   ]
 }
