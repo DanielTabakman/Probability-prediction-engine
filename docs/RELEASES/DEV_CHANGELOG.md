@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-19
 
+- **Chapter closed:** MSOS Strategy Lab embed shell v1 (`MSOS-EmbedShellV1-Closeout-Slice006`)
 - **Chapter closed:** MSOS entitlements & commercial beta v1 (`MSOS-EntitleV1-Closeout-Slice005`)
 
 ## 2026-06-18
