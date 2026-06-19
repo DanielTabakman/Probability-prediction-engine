@@ -71,6 +71,14 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### Stripe operator prerequisites (phase 7b gate)
+
+- **id:** `stripe_operator_prereq` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **summary:** Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Steward 2026-06-19: not ready — accounts/setup pending.
+- **policy question:** When done, mark this item done and promote billing_stripe queue row from PLANNED to READY (after E2E witness COMPLETE).
+- **notes:** Checklist: Stripe dashboard account; test mode keys; price IDs for paid tier; STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET in deploy secrets; webhook URL on production domain; legal/business profile if going live.
+
 ### Process library expansion
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
@@ -89,4 +97,4 @@
 
 ## Changelog
 
-| 2026-06-18 | Auto-render from JSON |
+| 2026-06-19 | Auto-render from JSON |

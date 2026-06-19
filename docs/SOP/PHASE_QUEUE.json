@@ -244,15 +244,14 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] E2E product witness \u2014 phase 6",
-      "selectionPrep": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "status": "READY",
+      "reason": "[MEDIUM] E2E product witness \u2014 phase 6 (re-queued; demo before Stripe)",
+      "selectionPrep": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "READY",
-      "reason": "[MEDIUM] Stripe billing \u2014 phase 7b BUILD deferred",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Stripe billing — PLANNED: operator Stripe setup pending (human backlog stripe_operator_prereq); after E2E witness COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     }
   ]

@@ -93,6 +93,17 @@
       "added": "2026-06-17"
     },
     {
+      "id": "stripe_operator_prereq",
+      "title": "Stripe operator prerequisites (phase 7b gate)",
+      "status": "open",
+      "priority": "high",
+      "category": "operator",
+      "summary": "Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Steward 2026-06-19: not ready — accounts/setup pending.",
+      "policyQuestion": "When done, mark this item done and promote billing_stripe queue row from PLANNED to READY (after E2E witness COMPLETE).",
+      "added": "2026-06-19",
+      "notes": "Checklist: Stripe dashboard account; test mode keys; price IDs for paid tier; STRIPE_SECRET_KEY + STRIPE_WEBHOOK_SECRET in deploy secrets; webhook URL on production domain; legal/business profile if going live."
+    },
+    {
       "id": "process_library_expansion",
       "title": "Process library expansion",
       "status": "open",

@@ -201,8 +201,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "ready",
-      "reason": "[MEDIUM] Stripe billing \u2014 phase 7b BUILD deferred",
+      "status": "blocked",
+      "reason": "[MEDIUM] Stripe billing — BUILD deferred: operator Stripe setup pending (human backlog stripe_operator_prereq)",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     }
   ]
