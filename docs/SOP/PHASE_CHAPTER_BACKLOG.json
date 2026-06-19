@@ -264,7 +264,7 @@
     },
     {
       "chapterId": "msos_e2e_product_witness_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
@@ -284,13 +284,13 @@
     },
     {
       "chapterId": "msos_billing_stripe_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
-      "reason": "[MEDIUM] Stripe Checkout + webhooks — BLOCKED: operator Stripe accounts not set up (human backlog stripe_operator_prereq); BUILD only after E2E witness COMPLETE"
+      "reason": "[MEDIUM] Stripe Checkout + webhooks \u2014 BLOCKED: operator Stripe accounts not set up (human backlog stripe_operator_prereq); BUILD only after E2E witness COMPLETE"
     }
   ]
 }

@@ -23,6 +23,8 @@ def _stem(path: Path) -> str:
 def _ppe_test_loop_host(monkeypatch: pytest.MonkeyPatch) -> None:
     """CI has no VM env; allow stack helpers to start in unit tests."""
     monkeypatch.setenv("PPE_LOOP_HOST", "1")
+    # Relay runs pytest during quiet hours on the operator desktop; keep ntfy unit tests deterministic.
+    monkeypatch.setenv("PPE_NTFY_QUIET_HOURS", "0")
 
 
 def pytest_configure(config: pytest.Config) -> None:
