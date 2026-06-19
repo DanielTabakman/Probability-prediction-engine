@@ -11,6 +11,7 @@ REM   ppe_autobuilder.cmd retry-build
 REM   ppe_autobuilder.cmd handoff
 REM   ppe_autobuilder.cmd finish-pending
 REM   ppe_autobuilder.cmd run-local
+REM   ppe_autobuilder.cmd reconcile [--dry-run] [--json]
 REM Agent: @ppe-autobuilder-operator — see docs/SOP/PPE_AUTOBUILDER_V1.md
 
 cd /d "%~dp0"

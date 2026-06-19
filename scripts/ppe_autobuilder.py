@@ -574,6 +574,13 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("run-local", help="Run run_ppe_local when verdict is RUN_LOCAL")
     sub.add_parser("advance", help="Run recommended action for current phase")
 
+    p_reconcile = sub.add_parser(
+        "reconcile",
+        help="Sync backlog/queue + write CONTROL_PLANE_STATUS.json (canonical operator read)",
+    )
+    p_reconcile.add_argument("--dry-run", action="store_true", help="Alignment check only")
+    p_reconcile.add_argument("--json", action="store_true")
+
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -606,6 +613,28 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(f"ppe_autobuilder: diagnose -> {result.get('report_md')}")
         return 0
+
+    if args.command == "reconcile":
+        from scripts.ppe_control_plane import collect_alignment_findings, reconcile_control_plane
+
+        if args.dry_run:
+            findings = collect_alignment_findings(repo)
+            errs = sum(1 for f in findings if f.get("severity") == "error")
+            if args.json:
+                print(json.dumps({"alignment": {"findings": findings}}, indent=2))
+            else:
+                print(f"ppe_autobuilder: reconcile dry-run errors={errs}")
+            return 1 if errs else 0
+        snapshot = reconcile_control_plane(repo, apply=True)
+        align = snapshot.get("alignment") or {}
+        if args.json:
+            print(json.dumps(snapshot, indent=2))
+        else:
+            print(
+                f"ppe_autobuilder: reconcile -> {snapshot.get('artifact')} "
+                f"verdict={snapshot.get('verdict')} passed={align.get('passed')}"
+            )
+        return 0 if align.get("passed", True) else 1
 
     handlers = {
         "ensure": lambda: action_ensure(repo),
