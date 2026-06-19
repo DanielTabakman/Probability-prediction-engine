@@ -113,6 +113,7 @@ def _pytest_env(repo: Path) -> dict[str, str]:
         "PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED",
     ):
         env.pop(key, None)
+    env["PPE_NTFY_QUIET_HOURS"] = "0"
     return env
 
 
