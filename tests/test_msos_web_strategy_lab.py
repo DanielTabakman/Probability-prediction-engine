@@ -22,16 +22,21 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "Strategy Lab / PPE / Distribution summary" in content
     assert "Strategy Lab — research demo" in content
     assert "Live via PPE when embed wired" in content
-    assert "Distribution summary (live PPE)" in content
+    assert "Market-implied vs reference vs your belief" in content
     assert "PpeEmbedBoundary" in content
+    assert 'className="legend"' in content
+    assert 'className="controls"' in content
     assert "no live order transmitted" in content
 
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in embed
+    assert "NEXT_PUBLIC_PPE_DISPLAY_API_URL" in embed
+    assert "embed_only" in embed
     assert "iframe" in embed
     assert "degraded" in embed.lower() or "Embed pending" in embed
-    assert "distribution-summary" in embed
+    assert "distribution_display_boundary" in embed
     assert "Live via PPE" in embed
+    assert "Chromeless embed" in embed or "Native chart" in embed
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:

@@ -1039,6 +1039,89 @@ a {
   margin-top: 8px;
 }
 
+.ppe-chart-region {
+  margin: 12px 0 4px;
+}
+
+.graph {
+  height: 280px;
+  margin: 12px 0 4px;
+  position: relative;
+  background: linear-gradient(180deg, rgba(5, 11, 18, 0.3), transparent);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.graph svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 19px;
+  font-size: 11px;
+  color: #91a4bb;
+  margin-top: 8px;
+}
+
+.legend span {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.swatch {
+  height: 3px;
+  width: 18px;
+  border-radius: 4px;
+  background: var(--orange);
+}
+
+.swatch.reference {
+  background: var(--purple);
+}
+
+.swatch.belief {
+  background: var(--teal);
+}
+
+.controls {
+  display: grid;
+  gap: 11px;
+  margin-top: 12px;
+}
+
+.control {
+  padding: 10px 12px;
+  background: #091522;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 12px;
+}
+
+.control.muted {
+  opacity: 0.65;
+}
+
+.control-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 760;
+}
+
+.slider.preview {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(67, 231, 211, 0.35), rgba(158, 139, 255, 0.35));
+}
+
 .ppe-embed {
   min-height: 280px;
   margin: 12px 0 4px;
@@ -1048,11 +1131,26 @@ a {
   overflow: hidden;
 }
 
+.ppe-embed-chromeless {
+  min-height: 360px;
+}
+
 .ppe-embed-frame {
   width: 100%;
   min-height: 280px;
   border: 0;
   background: #05090f;
+}
+
+.ppe-embed-frame-chromeless {
+  min-height: 360px;
+}
+
+.ppe-embed-live-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 10px 12px 0;
+  line-height: 1.4;
 }
 
 .ppe-embed-degraded {
