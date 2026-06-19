@@ -42,16 +42,17 @@ This matches phases 1–7a already built in repo — we are **turning production
 
 ## Problem statement
 
-Relay queue shows MSOS phases **DONE**, but production still feels like a fixture walkthrough:
+Relay queue shows MSOS phases **DONE** on GitHub — that means **merged to `main`**, not “running on the VPS.”
 
-| Symptom | Root cause |
-|---------|------------|
-| Empty / degraded Command Center & Monitor | Apex traffic is anonymous — no `CF-Access-Authenticated-User-Email` on product APIs |
-| Research beta CTA missing | VPS `.env` lacks `PPE_RESEARCH_OFFER_URL` → witness `research_beta_cta` FAIL |
-| Stale UI copy | VPS image behind `main` or pre-live-hookup build |
-| PPE full lab vs shell split | Snapshots on `app.*`; MSOS shell on apex — by design, but user must sign in on **both** surfaces where Access applies |
+**What is actually wrong (simple):**
 
-**Goal:** A new visitor can discover the site, sign in with Google, use Strategy Lab → save thesis → freeze → see **their** data on Command Center / Monitor / History — same path for everyone.
+| Issue | What it means |
+|-------|----------------|
+| **Deploy failing** | **Deploy VPS** on every `main` push has been **failing** since ~2026-06-18 (`better-sqlite3` Docker build on Alpine). GitHub has the code; the server never rebuilt. |
+| **VPS `.env`** | Research CTA mailto URL — small config on the server (optional GitHub secret later). |
+| **Cloudflare** | `app.*` already has Access. Apex was **public** in the original runbook; MSOS APIs on apex need identity → add Access on **`marketstructureos.com`** (whole hostname), not per-path apps. |
+
+Until deploy succeeds, production is an **old image** — not “unpushed code.”
 
 ---
 
@@ -89,20 +90,20 @@ NEXT_PUBLIC_MSOS_SIGN_IN_URL=https://app.marketstructureos.com
 | 3 | Merge latest `main` (or **Actions → Deploy VPS → Run workflow**) → `docker compose up -d --build msos_web`. |
 | 4 | **Follow-up PR (recommended):** extend `deploy-vps.yml` to write `.env` keys from GitHub secrets so agents never need VPS shell. |
 
-### Track 2 — Cloudflare Access (platform, operator UI)
+### Track 2 — Cloudflare Access (two hostnames only)
 
-Per [`SPRINT_MSOS_ACCESS_IDENTITY_V1.md`](SPRINT_MSOS_ACCESS_IDENTITY_V1.md) — **production operator steps** that relay code cannot do from repo alone:
+Your mental model is **correct**. Cloudflare Access is **per hostname**, not per URL path. One application for `marketstructureos.com` covers **every** route on that host (`/`, `/command-center`, `/strategy-lab`, …). Same for `app.marketstructureos.com`.
 
-1. Zero Trust → Application for `marketstructureos.com` paths:
-   - `/command-center`, `/command-center/*`
-   - `/strategy-lab`, `/strategy-lab/*`
-   - `/monitor`, `/monitor/*`
-   - `/history`, `/history/*`
-2. **Policy:** Allow — **Include: Everyone** (or Login methods: Google, no email restriction). Same IdP as `app.marketstructureos.com`.
-3. Confirm `msos_web` receives `CF-Access-Authenticated-User-Email` (`msosIdentity.ts`).
-4. Keep `/` public unless steward later chooses full-site Access.
+**Original runbook** ([`RUNBOOK_VPS_CLOUDFLARE_ACCESS.md`](../DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md)): apex **public**, `app.*` **behind Access**. MSOS product code on apex expects identity headers on APIs — so for a **usable** apex site, add **one** Access application for `marketstructureos.com` (whole hostname) with the **same Google Allow policy** as `app.*`. You can use one Zero Trust app listing **both** hostnames if you prefer a single login surface.
 
-Document screenshots / policy names in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
+You do **not** create separate Access apps per path. Sprint docs listed paths only to mean “these features need a signed-in user,” not “create new CF policies.”
+
+**Operator steps (simplified):**
+
+1. Zero Trust → Access → Application (self-hosted).
+2. Domains: `marketstructureos.com` and `app.marketstructureos.com` (one app or two — same policy).
+3. Policy: **Allow** — authenticated users via Google (general public, not a named-email list).
+4. Verify signed-in visit sends `CF-Access-Authenticated-User-Email` to `msos_web`.
 
 ### Track 3 — Entitlements on first login (already in repo)
 
