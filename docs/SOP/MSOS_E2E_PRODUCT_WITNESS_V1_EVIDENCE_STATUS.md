@@ -1,7 +1,7 @@
 # MSOS end-to-end product witness v1 — evidence status
 
 **Chapter:** `msos_e2e_product_witness_v1`  
-**Status:** **CHARTERED** 2026-06-14  
+**Status:** **COMPLETE** 2026-06-19  
 **Phase plan:** [`PHASE_PLANS/msos_e2e_product_witness_v1_relay.json`](PHASE_PLANS/msos_e2e_product_witness_v1_relay.json)
 
 ## Operator journey checklist

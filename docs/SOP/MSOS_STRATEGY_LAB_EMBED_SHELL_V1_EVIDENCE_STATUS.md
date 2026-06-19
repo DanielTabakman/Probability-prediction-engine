@@ -3,7 +3,7 @@
 **Chapter:** `msos_strategy_lab_embed_shell_v1`  
 **Display name:** Strategy Lab PPE embed shell — storyboard chart region  
 **Priority:** MEDIUM  
-**Status:** **CHARTERED** 2026-06-18 — blocked until `msos_workflow_persistence_v1` COMPLETE  
+**Status:** **COMPLETE** 2026-06-19 — blocked until `msos_workflow_persistence_v1` COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json`](PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md)
 

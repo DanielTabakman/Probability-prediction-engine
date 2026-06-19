@@ -237,9 +237,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
-      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
+      "status": "READY",
+      "reason": "[MEDIUM] E2E product witness \u2014 phase 6",
+      "selectionPrep": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md"
     }
   ]
 }

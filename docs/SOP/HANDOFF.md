@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos entitlements & commercial beta v1 **COMPLETE** 2026-06-19
+- Active MVP1 focus: **none** — msos end-to-end product witness v1 **COMPLETE** 2026-06-19
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS entitlements & commercial beta v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS end-to-end product witness v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -52,4 +52,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-06-19 — MSOS entitlements & commercial beta v1 COMPLETE; closeout job `MSOS-EntitleV1-Closeout-Slice005`.
+2026-06-19 — MSOS end-to-end product witness v1 COMPLETE; closeout job `MSOS-E2EWitV1-Closeout-Slice003`.
