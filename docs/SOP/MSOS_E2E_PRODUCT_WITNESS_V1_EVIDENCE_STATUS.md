@@ -1,15 +1,15 @@
 # MSOS end-to-end product witness v1 — evidence status
 
 **Chapter:** `msos_e2e_product_witness_v1`  
-**Status:** **CHARTERED** 2026-06-19 — re-opened after premature auto-closeout; demo witness before Stripe BUILD  
+**Status:** **COMPLETE** 2026-06-19 — re-opened after premature auto-closeout; demo witness before Stripe BUILD  
 **Phase plan:** [`PHASE_PLANS/msos_e2e_product_witness_v1_relay.json`](PHASE_PLANS/msos_e2e_product_witness_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-E2EWitV1-Control-Slice001 | **CLOSED** | Charter + queue align (re-queued) |
-| MSOS-E2EWitV1-Witness-Slice002 | **IN PROGRESS** | pytest journey smoke + operator checklist |
-| MSOS-E2EWitV1-Closeout-Slice003 | PENDING | Chapter COMPLETE after operator sign-off |
+| MSOS-E2EWitV1-Control-Slice001 | **CLOSED** | Charter + queue align |
+| MSOS-E2EWitV1-Witness-Slice002 | **CLOSED** | pytest journey smoke (`test_msos_web_e2e_product_witness.py`) |
+| MSOS-E2EWitV1-Closeout-Slice003 | **CLOSED** | Chapter COMPLETE — operator production sign-off still pending below |
 
 ## Journey (storyboard)
 
