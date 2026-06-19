@@ -1,70 +1,83 @@
 # MSOS production live hookup v1
 
-**Purpose:** Close the gap between **relay chapters marked DONE** and **testers can actually use the site** on `marketstructureos.com`. This is the steward charter for “show people what it is,” not a fixture walkthrough.
+**Purpose:** Close the gap between **relay chapters marked DONE** and **anyone can use the full site** on `marketstructureos.com`. Code matches the designed plan in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md); production config and Cloudflare still lag.
 
-**As-of:** 2026-06-19 · **Controlling canon:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · [`RUNBOOK_VPS_CLOUDFLARE_ACCESS.md`](../DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md)
+**As-of:** 2026-06-19 · **Controlling canon:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) · [`RUNBOOK_VPS_CLOUDFLARE_ACCESS.md`](../DEPLOY/RUNBOOK_VPS_CLOUDFLARE_ACCESS.md)
 
-**Operator tools:** `ppe_vps_ssh.cmd` · `msos_production_demo_witness.cmd` · [`CONTROL_PLANE_OPERATOR_V1.md`](CONTROL_PLANE_OPERATOR_V1.md)
+**Operator tools:** merge to `main` → **Deploy VPS** GitHub Action · `msos_production_demo_witness.cmd` · [`CONTROL_PLANE_OPERATOR_V1.md`](CONTROL_PLANE_OPERATOR_V1.md)
+
+---
+
+## Deploy plane — GitHub is enough (desktop SSH optional)
+
+You do **not** need laptop SSH for normal agent work.
+
+| Path | Who uses it | What happens |
+|------|-------------|--------------|
+| **Primary — GitHub → VPS** | Agents + you | PR merges to `main` → [`.github/workflows/deploy-vps.yml`](../../.github/workflows/deploy-vps.yml) SSHs with **repo secrets** (`VPS_HOST`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`) and runs `git pull` + `docker compose up -d --build`. |
+| **One-time bootstrap** | You (once, at home) | [`scripts/setup_vps_deploy_once.ps1`](../scripts/setup_vps_deploy_once.ps1) — deploy key on VPS + secrets in GitHub. After that, agents never touch your laptop. |
+| **Optional — desktop SSH** | Emergency only | `ppe_vps_ssh.cmd` — same commands without waiting for a merge. Skip until Windows/password setup is comfortable. |
+
+**Why SSH exists at all:** GitHub Actions *is* SSH — the workflow connects to the VPS on every `main` push. Desktop SSH duplicates that for one-off ops (broken deploy, `.env` tweak before we automate it). Agents ship **code and docs via PR**; the server pulls from GitHub.
+
+**What still needs the VPS filesystem (not in git):** repo-root `.env` on the server (`PPE_RESEARCH_OFFER_URL`, etc.). Optimal fix: add those values as **GitHub Actions secrets** and extend the deploy workflow to write/sync `.env` before `docker compose` (Track 1 below). Until then, one manual `.env` edit on VPS or a `workflow_dispatch` input.
+
+---
+
+## Product stance — full public website (no friends-only cohort)
+
+Steward decision **2026-06-19:** Do **not** run a separate friends/family allowlist. Same experience for everyone who signs in.
+
+| Layer | Decision |
+|-------|----------|
+| **Audience** | General public — any user who passes Cloudflare Access (Google login). |
+| **Entitlements** | **`free` tier by default** on first login ([`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)). No artificial cripple for v1. |
+| **Access policy** | Cloudflare **Allow** for authenticated users (Google IdP), **not** a named-email tester list. |
+| **Marketing** | Homepage `/` may stay **public** (ADR) for acquisition; **all product routes** behind Access so APIs get identity headers. |
+| **Stripe** | Out of scope until demo is proven (`stripe_operator_prereq` human backlog). |
+
+This matches phases 1–7a already built in repo — we are **turning production on**, not re-designing.
 
 ---
 
 ## Problem statement
 
-The MSOS relay queue drained phases 1–6 (and 7a) as **BUILD-complete**, but production still behaves like a **partial demo**:
+Relay queue shows MSOS phases **DONE**, but production still feels like a fixture walkthrough:
 
-| Symptom | Why testers feel it |
-|---------|---------------------|
-| Anonymous apex traffic | Monitor/CC APIs have no `CF-Access-Authenticated-User-Email` → empty or degraded feeds |
+| Symptom | Root cause |
+|---------|------------|
+| Empty / degraded Command Center & Monitor | Apex traffic is anonymous — no `CF-Access-Authenticated-User-Email` on product APIs |
 | Research beta CTA missing | VPS `.env` lacks `PPE_RESEARCH_OFFER_URL` → witness `research_beta_cta` FAIL |
-| Strategy Lab side panels | `strategyLabFixtures.ts` still drives metrics copy when embed is live |
-| Stale deploy | VPS image behind `main` → old fixture strings on monitor pages |
-| Sign-in only on `app.*` | Full PPE snapshots live on `app.marketstructureos.com`; apex MSOS shell is public |
+| Stale UI copy | VPS image behind `main` or pre-live-hookup build |
+| PPE full lab vs shell split | Snapshots on `app.*`; MSOS shell on apex — by design, but user must sign in on **both** surfaces where Access applies |
 
-**Goal:** A **friends-first cohort** can sign in, save a thesis, freeze in PPE, and see **their** data on Command Center / Monitor / History — with honest labels where data is still preview-only.
-
----
-
-## What “fully hooked up” means (acceptance)
-
-1. **VPS stack current** — `main` deployed; `docker compose ps` healthy.
-2. **Env wired** — research CTA, embed URL, snapshot volume mounted read-only on `msos_web`.
-3. **Identity on product routes** — Cloudflare Access on apex paths that need user scope (phase 4b intent).
-4. **Signed-in journey works** — witness script PASS on production URLs (including `research_beta_cta`).
-5. **Honest UX** — no fixture copy presented as live when workflow + snapshots are available.
-
-**Out of scope for this charter:** Stripe billing (human backlog `stripe_operator_prereq`).
+**Goal:** A new visitor can discover the site, sign in with Google, use Strategy Lab → save thesis → freeze → see **their** data on Command Center / Monitor / History — same path for everyone.
 
 ---
 
-## Gap map (code vs production)
+## Acceptance (“fully hooked up”)
 
-| Area | Repo state | Production gap |
-|------|------------|----------------|
-| PPE embed | `/ppe-embed` in Caddy; `NEXT_PUBLIC_PPE_EMBED_URL` build arg | Confirm VPS build uses `/ppe-embed`; embed loads without “pending” |
-| Workflow store | `msos_web_data` volume + `/api/theses/*` | Works when identity present |
-| Command Center | `api/command-center/summary` + snapshot mount | Needs `ppe_snapshots` + signed-in user |
-| Monitor / History | `loadMonitorFeed` from workflow + snapshots (not fixture file) | Needs identity + freezes |
-| Strategy Lab UI | Embed live; side metrics from fixtures | Optional: `msos_strategy_lab_embed_shell_v1` |
-| Research CTA | `researchOfferCta.ts` | VPS `.env` + `msos_web` rebuild |
-| Access identity | `msos_access_identity_v1` chartered | **Cloudflare policies on apex routes** (operator) |
+1. **Deploy loop** — every `main` merge redeploys VPS; health step in workflow green.
+2. **Production env** — research CTA, embed URL, snapshot volume on `msos_web` (see checklist below).
+3. **Cloudflare Access** — all MSOS **product routes** on apex; **Allow all authenticated Google users** (not email allowlist).
+4. **Identity → data** — workflow store + snapshot reads scoped to `owner_email`.
+5. **Witness PASS** — `msos_production_demo_witness` including `research_beta_cta` and signed-in journey checklist.
+6. **Honest labels** — no fixture copy where live workflow + snapshots exist.
 
 ---
 
-## Execution tracks
+## Optimal implementation order
 
-### Track A — VPS ops (no product code)
+Execute in this order — minimal rework, matches existing sprint evidence.
 
-**Owner:** Operator or agent via `ppe_vps_ssh.cmd` (keys stay local; never paste in chat).
+### Track 1 — Production env + deploy (platform, mostly GitHub)
 
-| Step | Command / action |
-|------|------------------|
-| 1. Local SSH config | Copy `ppe_operator_ssh.local.cmd.example` → `ppe_operator_ssh.local.cmd` (gitignored) |
-| 2. Research CTA | `ppe_vps_ssh.cmd research-cta you@example.com` |
-| 3. Deploy latest | `ppe_vps_ssh.cmd deploy` |
-| 4. Verify | `msos_production_demo_witness.cmd` from desktop (HTTP checks) |
-| 5. Sign-off | Update [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) operator row |
+**Owner:** Operator one-time + optional PR to automate.
 
-**VPS `.env` checklist** (repo root on server):
+| Step | Action |
+|------|--------|
+| 1 | Confirm GitHub deploy secrets set ([`GITHUB_ACTIONS_VPS_DEPLOY.md`](../DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md)). |
+| 2 | On VPS `/opt/marketstructureos/.env` (or future GHA secret sync): |
 
 ```bash
 PPE_RESEARCH_OFFER_URL=mailto:you@example.com?subject=PPE%20research%20beta
@@ -73,66 +86,74 @@ NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed
 NEXT_PUBLIC_MSOS_SIGN_IN_URL=https://app.marketstructureos.com
 ```
 
-After any `.env` change affecting Next build args: `docker compose up -d --build msos_web`.
+| 3 | Merge latest `main` (or **Actions → Deploy VPS → Run workflow**) → `docker compose up -d --build msos_web`. |
+| 4 | **Follow-up PR (recommended):** extend `deploy-vps.yml` to write `.env` keys from GitHub secrets so agents never need VPS shell. |
 
-### Track B — Cloudflare Access on apex (platform)
+### Track 2 — Cloudflare Access (platform, operator UI)
 
-Per [`SPRINT_MSOS_ACCESS_IDENTITY_V1.md`](SPRINT_MSOS_ACCESS_IDENTITY_V1.md):
+Per [`SPRINT_MSOS_ACCESS_IDENTITY_V1.md`](SPRINT_MSOS_ACCESS_IDENTITY_V1.md) — **production operator steps** that relay code cannot do from repo alone:
 
-1. Zero Trust → Application (or extend existing) for `marketstructureos.com` paths:
+1. Zero Trust → Application for `marketstructureos.com` paths:
    - `/command-center`, `/command-center/*`
    - `/strategy-lab`, `/strategy-lab/*`
    - `/monitor`, `/monitor/*`
    - `/history`, `/history/*`
-2. Policy: allow tester emails (same Google IdP as `app.*`).
-3. Homepage `/` may stay **public** (no fake logged-in state).
-4. Confirm `msos_web` receives `CF-Access-Authenticated-User-Email` (see `msosIdentity.ts`).
+2. **Policy:** Allow — **Include: Everyone** (or Login methods: Google, no email restriction). Same IdP as `app.marketstructureos.com`.
+3. Confirm `msos_web` receives `CF-Access-Authenticated-User-Email` (`msosIdentity.ts`).
+4. Keep `/` public unless steward later chooses full-site Access.
 
-**Policy question (steward):** Friends-first demo — protect **product routes only** (recommended) vs protect entire apex?
+Document screenshots / policy names in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
 
-### Track C — Tester journey (evidence)
+### Track 3 — Entitlements on first login (already in repo)
 
-Manual script for cohort feedback sessions:
+Phase 7a code should grant **`free`** on first authenticated API hit. Verify after Track 2 — no separate cohort setup.
 
-1. Open `https://marketstructureos.com` → sign in when prompted on product route.
-2. Strategy Lab → confirm PPE embed loads; freeze an evaluation on `app.*` if needed.
-3. Save thesis / expression (server persistence).
-4. Command Center → see snapshot KPIs scoped to your email.
-5. Monitor / History → live workflow + snapshot metadata (not fixture hero copy).
-6. Research CTA visible where chartered.
+### Track 4 — Production witness + sign-off (evidence)
 
-Record outcome in witness artifacts; file issues via `ppe_request.cmd` if product gaps remain.
+1. Run `msos_production_demo_witness.cmd` (HTTP checks from any machine).
+2. Manual signed-in journey: homepage → sign in → Strategy Lab → freeze on `app.*` → CC → Monitor → History.
+3. Update operator row in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).
 
-### Track D — Product polish (optional relay)
+### Track 5 — Product gaps only if witness fails
 
-Queue only if Track A+B+C still leave misleading UI:
-
-- `msos_strategy_lab_embed_shell_v1` — replace fixture side panels when embed is live.
-- Re-open witness slice if production regressions need automated guard.
-
-Use control plane: `ppe_request.cmd --chapter-id … --reason …` (do not hand-edit queue).
+Queue via `ppe_request.cmd` — do not hand-edit queue. Likely small fixes only; backlog chapters are **DONE**.
 
 ---
 
-## Agent SSH access (secure pattern)
+## Gap map (code vs production)
 
-**Do not** paste private keys or passwords into Cursor chat.
-
-1. **GitHub Actions deploy** (already supported): `scripts/setup_vps_deploy_once.ps1` → secrets `VPS_HOST`, `VPS_USER`, `VPS_SSH_PRIVATE_KEY`.
-2. **Desktop agent ops:** `ppe_operator_ssh.local.cmd` sets `PPE_VPS_HOST`, `PPE_VPS_USER`, `PPE_VPS_SSH_KEY`, `PPE_VPS_ROOT`.
-3. Agents run `ppe_vps_ssh.cmd <subcommand>` which SSHes non-interactively.
-
-Optional: dedicated **agent deploy key** on VPS (`authorized_keys`), separate from your personal key — revoke without losing your login.
+| Area | Repo | Production gap |
+|------|------|----------------|
+| MSOS shell + APIs | DONE (phases 1–5) | Access + identity headers on apex |
+| PPE embed | Caddy `/ppe-embed` | Confirm build arg + running `app_demo` |
+| Workflow + snapshots | volumes + APIs | Needs signed-in user |
+| Entitlements | phase 7a DONE | Verify first-login grant live |
+| Research CTA | `researchOfferCta.ts` | VPS `.env` + rebuild |
+| Strategy Lab shell | embed shell DONE | Deploy + embed env |
+| Stripe | deferred | human backlog only |
 
 ---
 
-## Promotion to relay queue
+## What agents do vs what you do
 
-When steward approves this charter:
+| Task | Agent (via GitHub) | You (operator) |
+|------|-------------------|----------------|
+| Code / docs / witness scripts | PR → merge | Review / merge |
+| VPS deploy | Automatic on `main` | Ensure secrets once |
+| `.env` on VPS | PR to automate from secrets | Until then: one edit on VPS or wait for Track 1 PR |
+| Cloudflare Access policies | Document steps in evidence | Click in Zero Trust UI |
+| Google OAuth client | — | Already done for `app.*` |
 
-1. Mark human backlog item `msos_production_live_hookup` **done** (ops checklist complete).
-2. If product slices remain, add **`msos_production_live_verify_v1`** (or re-queue `msos_e2e_product_witness_v1` platform slice) via `ppe_request.cmd --apply`.
-3. Reconcile: `ppe_request.cmd reconcile` → read `CONTROL_PLANE_STATUS.json`.
+---
+
+## Promotion / queue
+
+This charter is **operator go-live** for chapters already DONE — not a new product phase.
+
+1. Complete Tracks 1–4.
+2. Mark human backlog `msos_production_live_hookup` **done**.
+3. If witness finds code bugs: `ppe_request.cmd --chapter-id <fix-chapter> --reason "production witness FAIL: …" --apply`.
+4. `ppe_request.cmd reconcile` → read `CONTROL_PLANE_STATUS.json`.
 
 ---
 
@@ -141,3 +162,4 @@ When steward approves this charter:
 | Date | Change |
 |------|--------|
 | 2026-06-19 | v1 — charter for production live hookup vs relay-DONE drift |
+| 2026-06-19 | v2 — GitHub-first deploy; full public product (no friends-only); optimal track order |

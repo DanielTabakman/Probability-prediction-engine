@@ -104,10 +104,11 @@ Closeout
 | `ppe_request.cmd ... --apply` | Queue to backlog when appropriate |
 | `ppe_autobuilder.cmd reconcile` | Same reconcile (pipeline SRE entry) |
 | `ppe_autobuilder.cmd status --write` | Lightweight runtime refresh only |
-| `ppe_vps_ssh.cmd deploy` | VPS: `git pull` + `docker compose up -d --build` (needs `ppe_operator_ssh.local.cmd`) |
 | `msos_production_demo_witness.cmd` | HTTP witness against production URLs |
+| **Deploy VPS** (GitHub Actions) | Primary path: merge `main` → auto `git pull` + compose on VPS |
+| `ppe_vps_ssh.cmd deploy` | Optional emergency VPS deploy (needs `ppe_operator_ssh.local.cmd`) |
 
-**Production live hookup charter:** [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) — friends-first demo gap (relay DONE ≠ production usable). SSH keys stay in gitignored `ppe_operator_ssh.local.cmd`; never paste keys in chat.
+**Production live hookup charter:** [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) — relay DONE ≠ production usable. **GitHub deploy is enough** for agents; desktop SSH is optional.
 
 ---
 

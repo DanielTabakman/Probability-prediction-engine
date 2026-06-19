@@ -98,10 +98,10 @@
       "status": "open",
       "priority": "high",
       "category": "operator",
-      "summary": "Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.",
-      "policyQuestion": "Protect apex product routes only (recommended) or entire marketstructureos.com for friends-first cohort?",
+      "summary": "Close relay-DONE vs production-usable gap: GitHub Deploy VPS on main (no laptop SSH required), VPS .env (research CTA, embed), Cloudflare Access on apex product routes with Allow-all-authenticated (not email allowlist), production witness PASS. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md.",
+      "policyQuestion": "Resolved 2026-06-19: full public product, free tier default, product routes behind Access, homepage public.",
       "added": "2026-06-19",
-      "notes": "Do not paste SSH keys in chat. Stripe explicitly out of scope until demo-ready."
+      "notes": "Desktop SSH optional. Stripe out of scope. One-time GitHub deploy secrets via setup_vps_deploy_once.ps1 when operator is home."
     },
     {
       "id": "stripe_operator_prereq",
