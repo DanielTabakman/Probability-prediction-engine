@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_workflow_persistence_v1`  
 **Priority:** HIGH  
-**Status:** **BLOCKED** — MCD phase 3; waiting for `msos_user_state_v1` COMPLETE  
+**Status:** **COMPLETE** 2026-06-20 — MCD phase 3; waiting for `msos_user_state_v1` COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_workflow_persistence_v1_relay.json`](PHASE_PLANS/msos_workflow_persistence_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md)
 

@@ -3,7 +3,7 @@
 **Chapter:** `msos_strategy_lab_embed_shell_v1`  
 **Display name:** Strategy Lab PPE embed shell — storyboard chart region  
 **Priority:** HIGH  
-**Status:** **BLOCKED** — MCD-required; waiting for `msos_workflow_persistence_v1` COMPLETE  
+**Status:** **CHARTERED** — `msos_workflow_persistence_v1` COMPLETE; relay BUILD active  
 **Phase plan:** [`PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json`](PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md)
 
