@@ -28,7 +28,7 @@ JOURNEY_PATHS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you think is true",)),
     ("/strategy-lab/expression", "expression", ("expression",)),
     ("/command-center", "command_center", ("Command Center", "Current work")),
-    ("/monitor", "monitor", ("Monitor", "thesis-validity")),
+    ("/monitor", "monitor", ("Monitor", "Monitoring")),
     ("/history", "history", ("History", "Observed")),
     ("/learn", "learn", ("Learn loop", "comprehension")),
 )
