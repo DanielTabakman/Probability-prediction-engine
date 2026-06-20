@@ -237,7 +237,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Strategy Lab embed shell \u2014 MCD-required; activates when workflow COMPLETE",
+      "reason": "[HIGH] Strategy Lab embed shell — MCD-required; activates when workflow COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "doneReason": "premature closeout reverted 2026-06-20 \u2014 backlog blocked; roadmap skipped until workflow COMPLETE"
     },

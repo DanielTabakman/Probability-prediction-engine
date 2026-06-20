@@ -3,7 +3,7 @@
 **Chapter:** `msos_user_state_v1`  
 **Display name:** Command Center bridge (PPE snapshots)  
 **Priority:** HIGH  
-**Status:** **IN PROGRESS** — Witness-Slice004 next (Product #184 + Platform #212 on `main`)  
+**Status:** **IN PROGRESS** — Closeout-Slice005 next (witness green 2026-06-20)  
 **Phase plan:** [`PHASE_PLANS/msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md)
 
@@ -12,7 +12,7 @@
 | MSOS-UserStateV1-Control-Slice001 | **CLOSED** | Charter + queue align |
 | MSOS-UserStateV1-Product-Slice002 | **DONE** | Command Center + read API — merged `main` #184 |
 | MSOS-UserStateV1-Platform-Slice003 | **CLOSED** | Read-only snapshot volume — `main` #212 + deploy doc |
-| MSOS-UserStateV1-Witness-Slice004 | PENDING | pytest + operator checklist |
+| MSOS-UserStateV1-Witness-Slice004 | **CLOSED** | `pytest tests/test_msos_web_user_state.py tests/test_msos_web_command_center.py` — 7 passed |
 | MSOS-UserStateV1-Closeout-Slice005 | PENDING | Chapter COMPLETE |
 
 ## Operator check-in (required at closeout)
