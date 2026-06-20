@@ -4,6 +4,15 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `7cf1a28` — Merge pull request #255 from DanielTabakman/docs/embed-shell-mcd-priority
+- `3ded840` — docs(control): merge main + witness evidence for UserStateV1 Slice004
+- `767cfdb` — docs(control): revert false user_state closeout; witness slice next (`docs/SOP/`)
+- `41f119d` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `dbec708` — docs(control): reconcile MCD track pipeline after direction pivot (`docs/SOP/`)
+- `d9222d9` — fix(operator): Playwright bootstrap + embed shell MCD priority docs (#254) (`scripts/`)
+- `4823923` — fix(operator): ensure Playwright Chromium on VM bootstrap (`scripts/`)
+- `94370c4` — Control-plane: dev changelog
+- `07e6b31` — docs(control): bump embed shell to HIGH for MCD track (`docs/SOP/`)
 - `6464365` — docs(control): bump embed shell to HIGH for MCD track (#253) (`docs/SOP/`)
 - `7723bc6` — docs: align MSOS around minimum credible demo (#252) (`docs/SOP/`)
 - `e5bcddf` — Control-plane: dev changelog
