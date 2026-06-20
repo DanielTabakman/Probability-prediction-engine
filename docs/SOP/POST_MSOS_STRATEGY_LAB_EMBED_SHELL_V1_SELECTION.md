@@ -2,7 +2,7 @@
 
 **Chapter:** `msos_strategy_lab_embed_shell_v1`  
 **Display name:** Strategy Lab PPE embed shell — storyboard chart region  
-**Priority:** **MEDIUM**  
+**Priority:** **HIGH** (MCD-required)  
 **Relay plan:** [`PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json`](PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md)
 

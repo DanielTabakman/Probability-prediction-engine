@@ -80,7 +80,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Charter:** [`SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md`](SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md) · **Blocked until** user state bridge COMPLETE
 
-### MSOS Strategy Lab embed shell v1 — relay queue — **BLOCKED** (MEDIUM, post–phase 3 UX)
+### MSOS Strategy Lab embed shell v1 — relay queue — **BLOCKED** (HIGH, MCD-required — post–phase 3)
 
 | Status | Slice | Plane |
 |--------|--------|-------|
