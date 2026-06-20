@@ -1,8 +1,8 @@
-{
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "MCD track phase 2 re-opened 2026-06-20 \u2014 Product-Slice002 DONE; Platform-Slice003 next. Post-MCD phases 4a\u20137b built pre-pivot; deferred for product use until MCD PASSED.",
-  "workerMode": "deterministic"
-}
+{
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "MCD phase 2 — Product+Platform slices shipped on main (#184, #212); Witness-Slice004 next. False deterministic closeout reverted 2026-06-20.",
+  "workerMode": "deterministic"
+}

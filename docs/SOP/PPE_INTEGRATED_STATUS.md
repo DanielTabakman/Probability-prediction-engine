@@ -13,9 +13,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 |-------|--------|
 | **MCD gate** | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **NOT PASSED** |
 | **Sequence canon** | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — MCD track 1→3 + embed shell |
-| **Active chapter** | `msos_user_state_v1` — Platform-Slice003 next |
+| **Active chapter** | `msos_user_state_v1` — Witness-Slice004 next |
 | **Relay plan** | [`msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json) |
-| **Last closed slice** | `MSOS-UserStateV1-Product-Slice002` (`main` #184) |
+| **Last closed slice** | `MSOS-UserStateV1-Platform-Slice003` (`main` #212) |
 | **Next (blocked)** | `msos_workflow_persistence_v1` → `msos_strategy_lab_embed_shell_v1` (MCD-required) |
 | **Post-MCD phases 4a–7b** | Built pre-pivot; **deferred** for product focus until MCD PASSED |
 | **MSOS steering** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
