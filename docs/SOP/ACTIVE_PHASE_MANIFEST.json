@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MCD phase 3 \u2014 server thesis/expression store",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
   "workerMode": "deterministic"
 }
