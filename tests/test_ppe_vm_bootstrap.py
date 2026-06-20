@@ -11,8 +11,19 @@ from scripts.ppe_vm_bootstrap import (
     _platform_touchset_satisfied,
     _witness_touchset_only_evidence,
     ensure_loop_host_config,
+    ensure_playwright_chromium,
     sync_slice_progress,
 )
+
+
+def test_ensure_playwright_chromium_runs_install():
+    with patch("scripts.ppe_vm_bootstrap.subprocess.run") as run_mock:
+        run_mock.return_value.returncode = 0
+        out = ensure_playwright_chromium()
+    assert out["ok"] is True
+    assert out["action"] == "ensure_playwright"
+    run_mock.assert_called_once()
+    assert run_mock.call_args[0][0][-2:] == ["install", "chromium"]
 
 
 def test_ensure_loop_host_config_creates_from_example(tmp_path):

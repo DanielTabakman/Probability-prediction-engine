@@ -266,6 +266,33 @@ def loop_host_git_hygiene(repo: Path) -> dict[str, Any]:
     return {"action": "git_hygiene", "changes": changes}
 
 
+def ensure_playwright_chromium(*, timeout_s: int = 600) -> dict[str, Any]:
+    """Install Playwright Chromium when missing (UI smoke slices on the loop host)."""
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=timeout_s,
+        )
+        ok = proc.returncode == 0
+        out: dict[str, Any] = {
+            "action": "ensure_playwright",
+            "ok": ok,
+            "exit_code": proc.returncode,
+        }
+        if not ok:
+            tail = (proc.stderr or proc.stdout or "").strip()
+            if tail:
+                out["error"] = tail[-500:]
+        return out
+    except subprocess.TimeoutExpired:
+        return {"action": "ensure_playwright", "ok": False, "error": "playwright install timed out"}
+    except OSError as exc:
+        return {"action": "ensure_playwright", "ok": False, "error": str(exc)}
+
+
 def heal_operator_artifacts(repo: Path) -> dict[str, Any]:
     """Clear stale locks / ACTIVE_RUN that block a fresh relay pass."""
     actions: list[str] = []
@@ -363,6 +390,7 @@ def bootstrap(
         report["steps"].append(loop_host_git_hygiene(repo))
         report["steps"].append(heal_stale_relay_state(repo))
         report["steps"].append(heal_operator_artifacts(repo))
+        report["steps"].append(ensure_playwright_chromium())
     if sync_progress and plan_path:
         report["steps"].append(sync_slice_progress(repo, plan_path))
     if queue_repair:
