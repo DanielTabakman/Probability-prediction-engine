@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `fc20864` — Merge pull request #249 from DanielTabakman/fix/deploy-no-rebuild-cache
+- `c0e32d4` — fix(deploy): source .env and skip cached rebuild after msos_web no-cache
+- `482b2c1` — Control-plane: dev changelog
 - `044e3c8` — Merge pull request #248 from DanielTabakman/fix/deploy-msos-web-nocache-env
 - `e90916f` — fix(deploy): no-cache msos_web build after env sync
 - `8b9d79d` — platform: sync research CTA env on Deploy VPS from GitHub secrets (#247) (`scripts/`)
