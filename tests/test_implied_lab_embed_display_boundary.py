@@ -92,6 +92,23 @@ def test_wsgi_app_serves_json() -> None:
     assert any(h == ("Content-Type", "application/json; charset=utf-8") for h in headers)
     parsed = json.loads(body.decode("utf-8"))
     assert parsed["kind"] == DISPLAY_PAYLOAD_KIND
+    assert any(h == ("Cache-Control", "no-store") for h in headers)
+
+
+def test_wsgi_app_rejects_unknown_paths() -> None:
+    app = create_display_payload_wsgi_app(lambda: {})
+
+    status: list[str] = []
+    headers: list[tuple[str, str]] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+        headers.extend(hdrs)
+
+    body = b"".join(app({"PATH_INFO": "/full-app"}, start_response))
+    assert status == ["404 Not Found"]
+    assert any(h == ("Content-Type", "text/plain; charset=utf-8") for h in headers)
+    assert body == b"not found"
 
 
 def test_payload_serializes_deterministically() -> None:
