@@ -361,8 +361,8 @@ def run_codex(repo: Path, *, prompt: str, log_path: Path) -> dict[str, Any]:
         str(repo),
         "-s",
         "workspace-write",
-        "-a",
-        "never",
+        "-c",
+        'approval_policy="never"',
         prompt,
     ]
     with log_path.open("a", encoding="utf-8") as log:
