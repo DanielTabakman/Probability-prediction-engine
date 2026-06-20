@@ -5,7 +5,20 @@ alwaysApply: false
 
 # Product focus (on demand)
 
-**Canonical:** [`docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md)
+**Canonical:** [`docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md`](docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md) · [`docs/SOP/MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](docs/SOP/MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md)
+
+## Hard rule (before product or infrastructure implementation)
+
+Ask whether the work advances **one of**:
+
+1. **Minimum Credible Demo** — [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md)
+2. **Seamless PPE-in-MSOS integration** — native module slot / embed shell; no TS math
+3. **Workflow-research ingestion** — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)
+4. **Build-factory reliability / operator relief** — [`BUILD_FACTORY_BOUNDARY_V1.md`](docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md)
+
+If **none** apply → **defer** unless explicitly SELECTION'd.
+
+**Protect:** platform-shaped shell **now**, broad platform **later** — no premature platform sprawl.
 
 ## When to load
 
@@ -21,6 +34,7 @@ alwaysApply: false
 ## Runtime (agents do not re-read full playbook)
 
 - Auto-select / propagate: blocked while [`MSOS_P8_VALIDATION_REPORT_V1.md`](docs/SOP/MSOS_P8_VALIDATION_REPORT_V1.md) is **DRAFT** unless backlog `urgent: true`
+- **MCD gate** supersedes P8 interim authorization for **scope expansion** decisions
 - Disable gate: `PPE_FOCUS_GATE=0` (escape hatch)
 
 ## Urgent IRL

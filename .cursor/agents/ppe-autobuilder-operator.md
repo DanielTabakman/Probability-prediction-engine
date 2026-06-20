@@ -75,3 +75,11 @@ AGENT CONTINUITY
 - **Autobuilder operator** = pipeline SRE (this agent)
 - **Director** = verdict router for manual `ppe_go.cmd` sessions
 - Prefer **this agent** when the user says "run/diagnose/fix the autobuilder"
+
+## Factory boundary (grounded meta only)
+
+Per [`BUILD_FACTORY_BOUNDARY_V1.md`](docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md):
+
+- Meta-infrastructure is allowed when it serves product-slice **throughput**, **operator relief**, **reliability/recovery**, or **workflow-learning ingestion**.
+- **Do not** expand ungrounded control-plane surface — prefer small **product witnesses** over large orchestration churn.
+- Codex fallback is acceptable when it protects throughput during Cursor quota exhaustion.

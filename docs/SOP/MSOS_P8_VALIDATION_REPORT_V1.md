@@ -15,6 +15,7 @@
 | Per-session logging | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) § MSOS P8 friends-first tester metrics |
 | Auto-select / propagate gate | **COMPLETE** — medium/high chapters still require cohort rollup refresh |
 | Next BUILD chapter | Cite **§ Next SELECTION recommendation** below |
+| **Scope expansion authority** | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — MCD gate supersedes this report's interim engineering authorization for widening product/platform scope |
 
 ---
 

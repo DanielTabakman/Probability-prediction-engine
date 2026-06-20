@@ -1,6 +1,7 @@
 # MSOS Website Program — Selected Waterfall Queue
 
 **Canon source:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) (top section, imported 2026-06-01)  
+**Strategic umbrella:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)  
 **Live steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)  
 **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)  
 **Acceleration checklist:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)  
