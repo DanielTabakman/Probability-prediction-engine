@@ -16,6 +16,12 @@ type DisplaySeries = {
   expiry_date: string;
   prices_usd: number[];
   pdf_pct: number[];
+  mean_usd?: number;
+  quartiles_usd?: {
+    q1_usd: number;
+    median_usd: number;
+    q3_usd: number;
+  };
 };
 
 type DisplayPayload = {
@@ -23,6 +29,44 @@ type DisplayPayload = {
   spot_usd: number;
   series_by_expiry: DisplaySeries[];
 };
+
+function isNumberArray(value: unknown): value is number[] {
+  return Array.isArray(value) && value.length > 1 && value.every((item) => typeof item === "number");
+}
+
+function isDisplaySeries(value: unknown): value is DisplaySeries {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const series = value as Partial<DisplaySeries>;
+  return (
+    typeof series.expiry_date === "string" &&
+    isNumberArray(series.prices_usd) &&
+    isNumberArray(series.pdf_pct) &&
+    series.prices_usd.length === series.pdf_pct.length
+  );
+}
+
+function isDisplayPayload(value: unknown): value is DisplayPayload {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const payload = value as Partial<DisplayPayload>;
+  return (
+    payload.kind === "distribution_display_boundary" &&
+    typeof payload.spot_usd === "number" &&
+    Array.isArray(payload.series_by_expiry) &&
+    payload.series_by_expiry.some(isDisplaySeries)
+  );
+}
+
+function formatUsd(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0,
+    style: "currency",
+    currency: "USD",
+  }).format(value);
+}
 
 function buildChromelessEmbedSrc(baseUrl: string): string {
   const withoutHash = baseUrl.replace(/#.*$/, "");
@@ -67,11 +111,8 @@ async function loadDisplayPayload(): Promise<DisplayPayload | null> {
     if (!res.ok) {
       return null;
     }
-    const data = (await res.json()) as DisplayPayload;
-    if (data?.kind !== "distribution_display_boundary") {
-      return null;
-    }
-    if (!data.series_by_expiry?.length) {
+    const data: unknown = await res.json();
+    if (!isDisplayPayload(data)) {
       return null;
     }
     return data;
@@ -91,20 +132,30 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
       : 350;
 
   return (
-    <div className="graph" role="img" aria-label={`Distribution curve for ${series.expiry_date}`}>
-      <svg viewBox="0 0 700 280" preserveAspectRatio="none">
-        <path
-          d={`${path} L 680,250 L 20,250 Z`}
-          stroke="#9e8bff"
-          strokeWidth="4"
-          fill="rgba(158, 139, 255, 0.14)"
-        />
-        <line x1={spotX} y1="38" x2={spotX} y2="250" stroke="#233c55" strokeDasharray="5 8" />
-        <text x={spotX + 4} y="54" fill="#8ea4bd" fontSize="12">
-          spot
-        </text>
-      </svg>
-    </div>
+    <>
+      <div className="graph" role="img" aria-label={`Distribution curve for ${series.expiry_date}`}>
+        <svg viewBox="0 0 700 280" preserveAspectRatio="none">
+          <path
+            d={`${path} L 680,250 L 20,250 Z`}
+            stroke="#9e8bff"
+            strokeWidth="4"
+            fill="rgba(158, 139, 255, 0.14)"
+          />
+          <line x1={spotX} y1="38" x2={spotX} y2="250" stroke="#233c55" strokeDasharray="5 8" />
+          <text x={spotX + 4} y="54" fill="#8ea4bd" fontSize="12">
+            spot
+          </text>
+        </svg>
+      </div>
+      {series.mean_usd !== undefined && series.quartiles_usd ? (
+        <div className="ppe-summary-table" aria-label="PPE display payload summary">
+          <span>Mean {formatUsd(series.mean_usd)}</span>
+          <span>Q1 {formatUsd(series.quartiles_usd.q1_usd)}</span>
+          <span>Median {formatUsd(series.quartiles_usd.median_usd)}</span>
+          <span>Q3 {formatUsd(series.quartiles_usd.q3_usd)}</span>
+        </div>
+      ) : null}
+    </>
   );
 }
 
@@ -112,7 +163,10 @@ export async function PpeEmbedBoundary() {
   const payload = await loadDisplayPayload();
 
   if (payload) {
-    const primary = payload.series_by_expiry[0];
+    const primary = payload.series_by_expiry.find(isDisplaySeries);
+    if (!primary) {
+      return null;
+    }
     return (
       <div className="ppe-chart-region" role="region" aria-label="PPE distribution chart region">
         <p className="ppe-embed-live-note">
@@ -135,7 +189,11 @@ export async function PpeEmbedBoundary() {
             is live. MSOS owns the shell; Python owns all distribution math.
           </p>
           <ul className="ppe-embed-notes">
-            <li>Primary: display payload at <code>/ppe-display-api/display.json</code></li>
+            <li>
+              Primary: display payload at <code>/ppe-display-api/display.json</code> with
+              pre-computed <code>prices_usd</code>, <code>pdf_pct</code>, <code>mean_usd</code>, and
+              <code>quartiles_usd</code>
+            </li>
             <li>Fallback: chromeless embed with <code>?{PPE_EMBED_ONLY_PARAM}=1</code></li>
             <li>Degraded states surface when upstream is unavailable</li>
           </ul>
