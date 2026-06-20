@@ -14,11 +14,11 @@ function allowedOfferUrl(url: string): boolean {
 
 /** Returns CTA when NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL is https:// or mailto:. */
 export function resolveResearchOfferCta(): ResearchOfferCta | null {
-  const url = (process.env.NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL ?? "").trim();
-  if (!url || !allowedOfferUrl(url)) {
+  const raw = (process.env.NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL ?? "").trim().replace(/^["']|["']$/g, "");
+  if (!raw || !allowedOfferUrl(raw)) {
     return null;
   }
-  const label =
-    (process.env.NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL ?? "").trim() || DEFAULT_RESEARCH_OFFER_LABEL;
-  return { url, label };
+  const labelRaw = (process.env.NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL ?? "").trim().replace(/^["']|["']$/g, "");
+  const label = labelRaw || DEFAULT_RESEARCH_OFFER_LABEL;
+  return { url: raw, label };
 }
