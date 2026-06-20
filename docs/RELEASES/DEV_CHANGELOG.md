@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `77ca717` — Merge pull request #256 from DanielTabakman/fix/mcd-user-state-closeout-complete
+- `334b003` — docs(control): complete user_state MCD closeout; queue workflow READY (`docs/SOP/`)
+- `845e324` — Control-plane: dev changelog
 - `7cf1a28` — Merge pull request #255 from DanielTabakman/docs/embed-shell-mcd-priority
 - `3ded840` — docs(control): merge main + witness evidence for UserStateV1 Slice004
 - `767cfdb` — docs(control): revert false user_state closeout; witness slice next (`docs/SOP/`)
