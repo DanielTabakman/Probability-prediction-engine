@@ -4,7 +4,7 @@
 **Visual reference:** storyboard `03_ppe_lab` — [`docs/VISION/MSOS/storyboard-v0.6/prototype/html/03_ppe_lab.html`](../VISION/MSOS/storyboard-v0.6/prototype/html/03_ppe_lab.html)  
 **Prior chapters:** [`SPRINT_MSOS_PRODUCTION_WIRING_V1.md`](SPRINT_MSOS_PRODUCTION_WIRING_V1.md) · [`SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md`](SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md)  
 **SELECTION:** [`POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md`](POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md)  
-**Priority:** **MEDIUM**  
+**Priority:** **HIGH** (MCD-required — [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md))  
 **Baseline:** **`main`**
 
 ---

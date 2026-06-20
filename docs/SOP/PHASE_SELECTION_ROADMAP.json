@@ -166,7 +166,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "status": "done",
-      "reason": "[MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
+      "reason": "[HIGH] Strategy Lab embed shell \u2014 MCD-required; storyboard 03 chart region without box-in-box Streamlit",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
     },
     {
