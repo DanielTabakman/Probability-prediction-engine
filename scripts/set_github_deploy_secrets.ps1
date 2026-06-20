@@ -16,7 +16,8 @@
 param(
     [string] $VpsHost = $env:VPS_HOST,
     [string] $VpsUser = $env:VPS_USER,
-    [string] $PrivateKeyPath = $env:VPS_SSH_PRIVATE_KEY_PATH
+    [string] $PrivateKeyPath = $env:VPS_SSH_PRIVATE_KEY_PATH,
+    [string] $ResearchOfferEmail = $env:PPE_RESEARCH_OFFER_EMAIL
 )
 
 $ErrorActionPreference = "Stop"
@@ -44,5 +45,10 @@ if ($keyRaw -notmatch "BEGIN .+PRIVATE KEY") {
 & $ghExe secret set VPS_HOST --repo $repo --body $VpsHost
 & $ghExe secret set VPS_USER --repo $repo --body $VpsUser
 $keyRaw | & $ghExe secret set VPS_SSH_PRIVATE_KEY --repo $repo
+
+if ($ResearchOfferEmail) {
+    & $ghExe secret set PPE_RESEARCH_OFFER_EMAIL --repo $repo --body $ResearchOfferEmail
+    Write-Host "Set PPE_RESEARCH_OFFER_EMAIL on $repo." -ForegroundColor Green
+}
 
 Write-Host "Set VPS_HOST, VPS_USER, VPS_SSH_PRIVATE_KEY on $repo. Re-run Deploy VPS in Actions." -ForegroundColor Green

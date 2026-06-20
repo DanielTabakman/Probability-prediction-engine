@@ -5,6 +5,7 @@ This repository includes [`.github/workflows/deploy-vps.yml`](../../.github/work
 ```bash
 cd /opt/marketstructureos
 git pull
+bash scripts/vps_sync_production_env.sh
 docker compose up -d --build
 docker compose up -d --force-recreate caddy msos_web
 ```
@@ -46,6 +47,11 @@ In GitHub: **Settings → Secrets and variables → Actions → New repository s
 | `VPS_HOST` | VPS hostname or public IP |
 | `VPS_USER` | SSH login user (must own or access `/opt/marketstructureos` and Docker) |
 | `VPS_SSH_PRIVATE_KEY` | Full PEM private key (including `-----BEGIN` / `END-----` lines) whose **public** key is in that user’s `~/.ssh/authorized_keys` on the VPS |
+| `PPE_RESEARCH_OFFER_EMAIL` | *(optional)* Contact email for research-beta CTA — synced to VPS `.env` on each deploy |
+| `PPE_RESEARCH_OFFER_URL` | *(optional)* Full `mailto:` or `https://` URL; overrides `PPE_RESEARCH_OFFER_EMAIL` when set |
+| `PPE_RESEARCH_OFFER_LABEL` | *(optional)* CTA button label (default: `Request research beta access`) |
+
+Deploy runs [`scripts/vps_sync_production_env.sh`](../../scripts/vps_sync_production_env.sh) before `docker compose` so `msos_web` rebuild picks up research CTA build args.
 
 Do **not** commit keys or paste them into the repo.
 
