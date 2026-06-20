@@ -41,6 +41,7 @@ jobs:
             cd /opt/marketstructureos
             git pull
             bash scripts/vps_sync_production_env.sh
+            docker compose build --no-cache msos_web
             docker compose up -d --build
             docker compose up -d --force-recreate caddy msos_web
 
