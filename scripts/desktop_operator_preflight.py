@@ -86,13 +86,49 @@ def check_agent_cli() -> bool:
 
     exe = resolve_agent_cli()
     if not exe:
-        _warn("agent CLI not installed (ntfy fix unavailable — run setup_cursor_agent.cmd)")
+        _warn("agent CLI not installed (optional fallback — run setup_cursor_agent.cmd)")
         return True
     proc = _run([exe, "status"], cwd=Path.cwd())
     if proc.returncode == 0 and "Not logged in" not in (proc.stdout or ""):
         _ok("agent CLI logged in")
         return True
     _warn("agent CLI not logged in (run: agent login)")
+    return True
+
+
+def check_codex_cli() -> bool:
+    from scripts.ppe_build_worker import codex_available, resolve_codex_cli
+
+    exe = resolve_codex_cli()
+    if not exe:
+        _warn("codex CLI not installed (run setup_codex.cmd)")
+        return True
+    if codex_available():
+        _ok("codex CLI authenticated")
+        return True
+    _warn("codex not logged in (run: codex login)")
+    return True
+
+
+def check_build_worker(repo: Path) -> bool:
+    from scripts.ppe_build_worker import collect_build_worker_status
+
+    status = collect_build_worker_status(repo)
+    worker = status.get("worker")
+    pref = status.get("pref")
+    reason = status.get("reason")
+    print(f"BUILD worker: pref={pref} headless={worker} reason={reason}")
+    if worker in ("cursor-cli", "codex-cli"):
+        _ok(f"headless BUILD worker ready ({worker})")
+        return True
+    if worker == "manual":
+        handoff = status.get("handoff_worker")
+        if handoff == "codex-cli":
+            _warn("headless blocked — desktop Codex handoff available")
+        else:
+            _warn("no headless worker — desktop Codex or Cursor handoff (setup_codex.cmd / setup_cursor_agent.cmd)")
+        return True
+    _warn(f"unexpected worker state: {status}")
     return True
 
 
@@ -132,7 +168,9 @@ def check_operator(repo: Path) -> bool:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Desktop operator bootstrap preflight")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
-    ap.add_argument("--agent-only", action="store_true", help="Check agent CLI login only")
+    ap.add_argument("--agent-only", action="store_true", help="Check Cursor agent CLI login only")
+    ap.add_argument("--codex-only", action="store_true", help="Check Codex CLI + resolved BUILD worker")
+    ap.add_argument("--build-worker", action="store_true", help="Check Codex, Cursor, and resolved BUILD worker")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -143,9 +181,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.agent_only:
         return 0 if check_agent_cli() else 1
 
+    if args.codex_only:
+        return 0 if check_codex_cli() and check_build_worker(repo) else 1
+
+    if args.build_worker:
+        return 0 if check_codex_cli() and check_agent_cli() and check_build_worker(repo) else 1
+
     checks = [
         check_ntfy(),
+        check_codex_cli(),
         check_agent_cli(),
+        check_build_worker(repo),
         check_git_identity(),
         check_gh(),
         check_tailscale(),

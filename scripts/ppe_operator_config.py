@@ -14,9 +14,25 @@ OPERATOR_PROFILE_REL: dict[str, str] = {
 }
 
 
+def _resolve_operator_profile(repo: Path) -> str:
+    profile = (os.environ.get("PPE_OPERATOR_PROFILE") or "").strip().lower()
+    if profile:
+        return profile
+    base = repo / OPERATOR_REL
+    if not base.is_file():
+        return ""
+    try:
+        raw = json.loads(base.read_text(encoding="utf-8-sig"))
+    except (json.JSONDecodeError, OSError):
+        return ""
+    if not isinstance(raw, dict):
+        return ""
+    return str(raw.get("profile") or "").strip().lower()
+
+
 def operator_config_path(repo_root: Path) -> Path:
     repo = repo_root.resolve()
-    profile = (os.environ.get("PPE_OPERATOR_PROFILE") or "").strip().lower()
+    profile = _resolve_operator_profile(repo)
     if profile in OPERATOR_PROFILE_REL:
         profile_path = (repo / OPERATOR_PROFILE_REL[profile]).resolve()
         if profile_path.is_file():
@@ -207,4 +223,7 @@ def apply_operator_env(repo_root: Path) -> dict[str, Any]:
             _set("PPE_IDE_HANDOFF_OPEN", "1")
         if handoff.get("skipCliWhenUsageExhausted") is not False:
             _set("PPE_SKIP_CLI_WHEN_USAGE_EXHAUSTED", "1")
+        build_worker = str(handoff.get("buildWorker") or "").strip().lower()
+        if build_worker in ("auto", "cursor", "codex", "manual"):
+            _set("PPE_BUILD_WORKER", build_worker)
     return {"applied": True, "config": cfg, "config_path": str(operator_config_path(repo_root))}
