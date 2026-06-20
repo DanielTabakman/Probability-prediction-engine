@@ -78,3 +78,27 @@ def test_build_product_prompt_manual_uses_closeout():
         worker=WORKER_MANUAL,
     )
     assert "mark_ide_product_ready.cmd Slice001" in text
+
+
+def test_run_codex_uses_workspace_write_without_legacy_approval_flag(tmp_path, monkeypatch):
+    from scripts.ppe_build_worker import run_codex
+
+    repo = tmp_path
+    log_path = repo / "codex.log"
+    monkeypatch.setattr("scripts.ppe_build_worker.resolve_codex_cli", lambda: "codex")
+    monkeypatch.setattr("scripts.ppe_build_worker.codex_authenticated", lambda: True)
+
+    def fake_run(cmd, **kwargs):
+        assert "-a" not in cmd
+        assert "-s" in cmd and "workspace-write" in cmd
+        assert '-c' in cmd and 'approval_policy="never"' in cmd
+        class Proc:
+            returncode = 0
+            stdout = "ok"
+            stderr = ""
+
+        return Proc()
+
+    monkeypatch.setattr("scripts.ppe_build_worker.subprocess.run", fake_run)
+    out = run_codex(repo, prompt="build slice", log_path=log_path)
+    assert out["ok"] is True
