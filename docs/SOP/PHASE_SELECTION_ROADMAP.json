@@ -153,20 +153,20 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-      "status": "done",
-      "reason": "[HIGH] Command Center PPE snapshot bridge \u2014 phase 2",
+      "status": "pending",
+      "reason": "[HIGH] Command Center PPE snapshot bridge \u2014 MCD phase 2; Platform-Slice003 next (re-opened 2026-06-20)",
       "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "status": "done",
-      "reason": "[HIGH] MSOS thesis/expression server store \u2014 phase 3",
+      "status": "skipped",
+      "reason": "[HIGH] MSOS thesis/expression server store \u2014 MCD phase 3; activates when user state COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-      "status": "done",
-      "reason": "[HIGH] Strategy Lab embed shell \u2014 MCD-required; storyboard 03 chart region without box-in-box Streamlit",
+      "status": "skipped",
+      "reason": "[HIGH] Strategy Lab embed shell \u2014 MCD-required; activates when workflow COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
     },
     {
