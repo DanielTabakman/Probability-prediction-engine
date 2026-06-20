@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `740c15a` — fix(msos-web): complete better-sqlite3 typings for VPS next build (#246) (`apps/msos-web/`)
+- `1fb3fea` — fix(msos-web): add better-sqlite3 module declaration for production build (#245) (`apps/msos-web/`)
+- `8862861` — fix(msos-web): remove duplicate import blocking production build (#244) (`apps/msos-web/`)
+- `d5e4f11` — Control-plane: dev changelog
 - `9a7235c` — fix(msos-web): Alpine build deps for better-sqlite3 — unblock Deploy VPS (`apps/msos-web/`)
 
 ## 2026-06-19
