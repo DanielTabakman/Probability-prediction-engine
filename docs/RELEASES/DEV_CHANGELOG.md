@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `7bb5ae5` — Merge pull request #250 from DanielTabakman/fix/deploy-env-quote
+- `a79637f` — fix(deploy): quote .env values; compose loads env without sourcing (`scripts/`)
+- `799a544` — Control-plane: dev changelog
 - `fc20864` — Merge pull request #249 from DanielTabakman/fix/deploy-no-rebuild-cache
 - `c0e32d4` — fix(deploy): source .env and skip cached rebuild after msos_web no-cache
 - `482b2c1` — Control-plane: dev changelog
