@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- **Chapter closed:** MSOS workflow persistence v1 (`MSOS-WorkflowV1-Closeout-Slice005`)
 - `77ca717` — Merge pull request #256 from DanielTabakman/fix/mcd-user-state-closeout-complete
 - `334b003` — docs(control): complete user_state MCD closeout; queue workflow READY (`docs/SOP/`)
 - `845e324` — Control-plane: dev changelog
