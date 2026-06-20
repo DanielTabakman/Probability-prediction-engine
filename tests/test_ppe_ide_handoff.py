@@ -38,7 +38,8 @@ def test_cli_usage_exhausted_from_log(tmp_path):
 def test_cli_usage_exhausted_from_state(tmp_path):
     mark_cli_usage_exhausted(tmp_path, detail="quota")
     assert cli_usage_exhausted(tmp_path) is True
-    assert should_attempt_cli_build(tmp_path) is False
+    with patch("scripts.ppe_build_worker.codex_available", return_value=False):
+        assert should_attempt_cli_build(tmp_path) is False
 
 
 def test_launch_ide_handoff_writes_starter(tmp_path, monkeypatch):
