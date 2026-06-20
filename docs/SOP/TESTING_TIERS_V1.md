@@ -9,6 +9,7 @@ Purpose: keep **real** validation (unit tests, docker entry, Playwright smoke + 
 | **Scoped** | WIP commit with mappable diff | `python scripts/run_pushable_gate.py` | ruff + targeted test files + core safety net |
 | **Fast** | WIP when scope unmapped | same | ruff + `pytest -m "not witness and not slow"` |
 | **Full** | Before push / PR merge path | `python scripts/run_pushable_gate.py --pre-push` | ruff + full pytest (parallel + slow serial) |
+| **Full + docker** | Before push when runtime/deps changed | `python scripts/run_pre_push_parity.py --docker` | full gate + **`CI / docker_entrypoint`** parity (build, import, Streamlit health) |
 | **Heavy** | Viz slice closeout only | smoke scripts (below) | Playwright + Streamlit + live data + PNGs |
 
 **CI** (`.github/workflows/ci.yml`) runs **full pytest** (parallel + slow serial) + **docker_entrypoint**. PRs labeled **`viz-change`** also run **CI / ui_smoke** (scenario A).
