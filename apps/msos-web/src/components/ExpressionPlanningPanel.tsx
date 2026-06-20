@@ -18,7 +18,6 @@ import {
   statusGridForLifecycle,
   withExpressionLifecycle,
 } from "@/lib/expressionPersistence";
-import { defaultThesisRecord } from "@/data/thesisConfirmFixtures";
 import { fetchThesisRecord } from "@/lib/thesisPersistence";
 
 export function ExpressionPlanningPanel() {
