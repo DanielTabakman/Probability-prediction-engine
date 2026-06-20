@@ -204,17 +204,17 @@
     },
     {
       "chapterId": "msos_user_state_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md \u2014 MCD phase 2",
-      "reason": "[HIGH] Command Center bridge \u2014 read-only PPE snapshots; Product-Slice002 DONE; Platform-Slice003 next (MCD reconcile 2026-06-20)"
+      "reason": "[HIGH] Command Center bridge COMPLETE 2026-06-20 \u2014 MCD phase 2"
     },
     {
       "chapterId": "msos_workflow_persistence_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
@@ -224,7 +224,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_embed_shell_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",

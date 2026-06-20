@@ -196,16 +196,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json",
-      "status": "READY",
-      "reason": "[HIGH] MCD phase 2 — Witness-Slice004 next (Platform #212 on main)",
-      "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md"
+      "status": "DONE",
+      "reason": "[HIGH] MCD phase 2 COMPLETE 2026-06-20",
+      "selectionPrep": "docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "status": "DONE",
-      "reason": "[HIGH] MCD phase 3 — blocked until user state witness COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
-      "doneReason": "queue placeholder — backlog blocked until user state COMPLETE"
+      "status": "READY",
+      "reason": "[HIGH] MCD phase 3 \u2014 server thesis/expression store",
+      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
@@ -237,7 +237,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Strategy Lab embed shell — MCD-required; activates when workflow COMPLETE",
+      "reason": "[HIGH] Strategy Lab embed shell \u2014 MCD-required; activates when workflow COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "doneReason": "premature closeout reverted 2026-06-20 \u2014 backlog blocked; roadmap skipped until workflow COMPLETE"
     },
