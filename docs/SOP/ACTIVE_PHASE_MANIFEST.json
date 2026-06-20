@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Strategy Lab embed shell \u2014 storyboard 03 chart region without box-in-box Streamlit",
+  "status": "RUNNING",
+  "notes": "Re-armed for Codex headless E2E on MSOS-EmbedShellV1-Product-Slice002 (desktop handoff stalled; codex CLI now available).",
   "workerMode": "deterministic"
 }
