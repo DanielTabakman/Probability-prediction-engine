@@ -25,6 +25,17 @@ Do NOT create a new context for every tiny action.
 - **Steward thread:** SELECTION, manifest, read `LAST_RUN_REPORT.md` — keep separate from BUILD.
 - **After phase exit:** new Cursor thread; load only `docs/SOP/AGENT_CONTINUITY_BRIEF.md`.
 
+## Conversation mode (META vs EXECUTE)
+
+Agents classify each turn — see [`.cursor/rules/conversation-mode.mdc`](../.cursor/rules/conversation-mode.mdc).
+
+| Mode | When | Operator loop |
+|------|------|----------------|
+| **META** | Pipeline, orchestrator, rules, process design | Do not auto-run verdict |
+| **EXECUTE** | Ship slice, what's next, IDE BUILD | Auto-run per `ppe-unified-run.mdc` |
+
+**Override anytime:** say `meta` or `execute` (one word). Agent states **Mode: …** at the top of replies; correct if wrong.
+
 ## Operator layout (2026-06)
 
 **Policy:** [`docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md`](SOP/PPE_OPERATOR_LAYOUT_ADR.md) · **Process:** [`docs/SOP/PPE_OPERATOR_PROCESS_V1.md`](SOP/PPE_OPERATOR_PROCESS_V1.md)
@@ -70,4 +81,4 @@ Full ritual: [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSE
 
 **Trigger phrases:** `close out thread` · `closeout thread` · `context closeout` · `wrap this chat` (see SOP for full list)
 
-**Next thread after closeout:** ask **what's next?** — agent **auto-executes** the operator verdict (`RUN_LOCAL` / `IDE_BUILD` / `RUN_AUTO`) from `OPERATOR_STATUS.md`, then summarizes via `AGENT_CONTINUITY_BRIEF.md` + closeout draft (not chat history). See `.cursor/rules/ppe-unified-run.mdc` § What's next.
+**Next thread after closeout:** ask **what's next?** in **EXECUTE** mode — agent auto-runs the operator verdict. META threads skip auto-run unless you switch mode. See `.cursor/rules/conversation-mode.mdc`.
