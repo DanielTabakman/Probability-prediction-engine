@@ -1,13 +1,17 @@
 # Product focus playbook v1
 
-**Purpose:** Keep MSOS + PPE aligned on **wedge proof** before platform expansion. Use for steward SELECTION, scope fights, and “are we drifting?” checks.
+**Purpose:** Keep MSOS + PPE aligned on **Minimum Credible Demo** and **workflow research** before platform expansion. Use for steward SELECTION, scope fights, and “are we drifting?” checks.
 
-**As-of:** 2026-06-12 · **Review cadence:** monthly steward pass · **Hard gate:** MSOS P8 validation report.
+**As-of:** 2026-06-20 · **Review cadence:** monthly steward pass · **Hard gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)
 
 **Related canon (do not duplicate):**
 
 | Doc | Role |
 |-----|------|
+| [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) | Strategic umbrella — ownership, integration, scope |
+| [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | MCD pass/fail criteria |
+| [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Post-MCD workflow research ops |
+| [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`PRODUCT_THESIS.md`](../PRODUCT_THESIS.md) | Product north star (belief ↔ payoff lab) |
 | [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | MSOS waterfall P0–P8 |
 | [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) / [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | Live BUILD queue |
@@ -22,10 +26,25 @@
 | Question | Controlling doc |
 |----------|-----------------|
 | What slice runs next in relay? | Matching **FRONTIER** (MVP1 or MSOS) |
-| Should we add scope / new asset / execution? | **This playbook** + non-widening rule in PPE Master |
-| What do we build after P8? | [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) (evidence-based SELECTION) |
+| Should we add scope / new asset / execution? | **Backplane charter** + this playbook + non-widening rule in PPE Master |
+| Is the product ready for workflow research? | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
+| How to run trader contact? | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| What do we build after MCD? | Validation evidence + workflow research signal — [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) as rollup, not scope authority |
 
-When this playbook and a FRONTIER disagree on **BUILD order**, FRONTIER wins for automation. When they disagree on **whether to widen scope**, this playbook wins until the P8 report updates priorities.
+**Scope precedence:** `BACKPLANE → MCD gate → TRADER_WORKFLOW_RESEARCH → FRONTIER (BUILD order) → LIVE_PRODUCT_SEQUENCE (post-MCD deferred)`.
+
+When this playbook and a FRONTIER disagree on **BUILD order**, FRONTIER wins for automation. When they disagree on **whether to widen scope**, backplane + MCD gate win.
+
+## Hard rule (mirrors `.cursor/rules/product-focus.mdc`)
+
+Before product or infrastructure implementation, the work must advance **one of**:
+
+1. Minimum Credible Demo
+2. Seamless PPE-in-MSOS integration
+3. Workflow-research ingestion
+4. Build-factory reliability / operator relief
+
+If none apply → **defer** unless explicitly SELECTION'd.
 
 ---
 
@@ -56,12 +75,12 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 
 | Priority | Focus | Why |
 |----------|--------|-----|
-| **P0 — Wedge proof** | 10–30 BTC options testers; guided sessions; reality-check rows | Coinbase / SpotGamma: one audience, dense usage before scale |
-| **P1 — Complete chartered MSOS P6–P8** | Sim-only expression → minimal monitoring → tester release | Program chartered; P8 = PMF gate |
+| **P0 — Minimum Credible Demo** | Phases 1→3 + embed shell per [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | Platform-shaped shell + integrated PPE before expansion |
+| **P1 — Trader workflow research** | Guided sessions; signal-ranked logging per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | High-signal workflow learning, not category validation |
 | **P2 — Lab legibility only** | MVP1 slices that improve 15-second comprehension or disagreement clarity | Phase vision; no new math domains |
 | **P3 — Distribution** | Dist demo, public URL, fintwit / newsletter partners | Peers spent founder time on distribution comparable to eng |
-| **P4 — Monetization signal** | Manual paid pilot / research beta (no billing automation) | SpotGamma subscription before “platform” |
-| **Defer** | Execution, Hyperliquid, multi-asset, Polymarket arb, AI assistant, paywall automation | MSOS program + PPE Master non-goals |
+| **P4 — Monetization signal** | Manual paid pilot / research beta (no billing automation) | **Post-MCD** — SpotGamma subscription before “platform” |
+| **Defer** | Execution, Hyperliquid, multi-asset, Polymarket arb, AI assistant, paywall automation, phases 4a–7b | Backplane non-goals unless SELECTION'd |
 
 ---
 
@@ -119,8 +138,8 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 | **P7** (monitoring) | Q2 return hook | Ship **minimum** that drives weekly return |
 | **P8** (tester release) | Q3 PMF gate | Validation report **bosses** next-year queue |
 | **MVP1** (when SELECTION'd) | Q1–Q2 | Only if improves 15-second comprehension or disagreement |
-| **Live product seq P1–P3** | Operator + tester path | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — wiring → snapshots → MSOS workflow store |
-| **Live product seq P4–7b** | Multi-user + commercial | Free tier (7a); Stripe when ready (7b) — [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
+| **Live product seq P1–3 + embed** | MCD track | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — wiring → user state → workflow → embed shell |
+| **Live product seq P4–7b** | Post-MCD deferred | Free tier (7a); Stripe (7b) — **SELECTION only** after MCD |
 
 ---
 
@@ -183,7 +202,7 @@ Stop and escalate if a BUILD packet would:
 1. **Open** BTC implied lab — chart visible without scroll.
 2. **Market-implied:** “What price range does the market lean toward by expiry?”
 3. **User belief:** Adjust belief; switch compare mode.
-4. **Disagreement:** Read disagreement strip — descriptive only, not a trade signal.
+4. **Disagreement:** Read disagreement strip — name **kind** if possible (directional, vol, tail, etc. — see backplane charter); descriptive only, not a trade signal.
 5. **Payoff fit:** Inspect structure stats (debit/credit, max loss, breakevens).
 6. **Save:** Freeze snapshot or confirm thesis (P5 path when in MSOS).
 7. **Close:** “Would you open this before your next options trade?” + log row.
@@ -246,3 +265,4 @@ Full playbook loads: **steward SELECTION**, backlog edits, monthly review ([`OPE
 |------|--------|
 | 2026-06-12 | v1 — initial playbook from product/strategy working session |
 | 2026-06-12 | Runtime gate + backlog mythos + operating calendar |
+| 2026-06-20 | v2 — MCD + workflow research precedence; backplane charter links; post-MCD deferral |

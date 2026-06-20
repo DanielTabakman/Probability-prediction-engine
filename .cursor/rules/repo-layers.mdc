@@ -23,6 +23,10 @@ Path presets: [`docs/SOP/REPO_LAYER_PATH_PREFIXES.json`](docs/SOP/REPO_LAYER_PAT
 | **No cross-runtime imports** | Next app does not import Python `src/` |
 | **Thin `app.py`** | New PPE UI → new module under `src/viz/`, not a monolithic `app.py` |
 | **MSOS ≠ PPE whole product** | MSOS wraps/exposes PPE; PPE remains first Strategy Lab tool ([`MSOS_WEBSITE_PROGRAM.md`](docs/SOP/MSOS_WEBSITE_PROGRAM.md)) |
+| **MSOS owns shell** | Workflow, state, identity/user scope, thesis/expression lifecycle, monitor/history, entitlement display, UX around PPE |
+| **PPE owns math** | Implied distributions, disagreement, evaluation/freeze outputs — Python only |
+| **Native integration surface** | MSOS embeds/renders/displays PPE via stable output contract ([`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](docs/SOP/MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md)); Streamlit may remain compute source |
+| **No duplicate math** | MSOS must not reimplement PPE math in TypeScript — display/proxy/read only |
 
 ## Where to put work
 

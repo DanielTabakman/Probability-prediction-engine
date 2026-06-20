@@ -2,9 +2,30 @@
 
 **Purpose:** Canonical phased plan to make the **apex MSOS shell** a real, **customer-acquirable** product — not a fixture walkthrough. Agents and stewards use this when MSOS UI work touches Command Center data, auth, persistence, or commercial tiers.
 
-**As-of:** 2026-06-14 · **Controlling canon:** [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) · [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) · [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
+**As-of:** 2026-06-20 · **Controlling canon:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) · [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md)
 
 **Live queue:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json)
+
+---
+
+## Strategic interpretation (binding)
+
+- **MSOS** is currently a **platform-shaped shell around PPE** — credible platform UX, **narrow active scope**.
+- The product should feel **platform-ready** but remain focused on thesis → implied probability → disagreement → expression → save/review.
+- **Seamless PPE-in-MSOS UX** is required — native integration surface, not “leave MSOS for Streamlit.”
+- **PPE math** stays in PPE; MSOS integrates outputs via stable contract ([`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md)).
+- **Product completeness** is judged by whether it enables **high-signal workflow contact** ([`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)), not by finishing every commercial phase.
+
+---
+
+## MCD track vs post-MCD track
+
+| Track | Phases | When |
+|-------|--------|------|
+| **MCD (active)** | 1 → 2 → 3 + parallel **embed shell** | **Now** — until [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) **PASSED** |
+| **Post-MCD (deferred)** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after MCD + [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) signal |
+
+Phases 4a–7b remain **chartered** for future multi-user and commercial work — they are **not** the current default BUILD priority.
 
 ---
 
@@ -15,7 +36,7 @@
 | **MSOS** | Thesis lifecycle, expression plans, monitor/history, entitlements | **Server-side workflow store**, user-scoped via Cloudflare Access |
 | **PPE** | Distributions, disagreement, freeze/review **math** | **Streamlit +** `frozen_evaluation_store` (with `owner_email`) |
 | **Commercial** | Free / research_beta / paid tiers | `msos_entitlements` → **Stripe** (phase 7b) |
-| **Link** | “This thesis references snapshot X” | Reference IDs — **no PPE math in TypeScript** |
+| **Link** | Thesis ↔ saved PPE evaluation (snapshot ID internal) | Reference IDs — **no PPE math in TypeScript**; UX favors **disagreement / saved evaluation** language |
 
 ---
 
@@ -33,9 +54,9 @@
 | **7a** | [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) | HIGH | **Free accounts** + manual paid path |
 | **7b** | [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md) | MEDIUM | **Stripe** self-serve pay — BUILD when operator ready |
 
-**Operator note:** Phases 7a–7b may start BUILD after **4b** if commercial urgency; default queue order runs **6** first so the product loop is proven before monetization gates expand.
+**Operator note (post-MCD only):** Phases 7a–7b may start BUILD after **4b** if commercial urgency and MCD **PASSED**; default post-MCD order runs **6** before monetization gates expand.
 
-**Parallel UX (not a numbered phase):** [`msos_strategy_lab_embed_shell_v1`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) — MEDIUM priority; replaces box-in-box Streamlit iframe on `/strategy-lab` with storyboard `03_ppe_lab` chart shell. **Blocked until phase 3 COMPLETE**; does not block phases 4a–7.
+**Parallel UX (MCD-required):** [`msos_strategy_lab_embed_shell_v1`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) — **HIGH for MCD**; replaces box-in-box Streamlit iframe on `/strategy-lab` with storyboard `03_ppe_lab` chart shell. **Blocked until phase 3 COMPLETE**; required for MCD gate criterion §3.
 
 ---
 
@@ -43,11 +64,13 @@
 
 | Bar | Phases required |
 |-----|-----------------|
-| **Solo operator — works** | 1 → 2 → 3 |
-| **Multi-user research beta** | + 4a → 4b → 5 |
-| **Shippable demo / PMF test** | + 6 |
-| **Acquire customers (free)** | + 7a |
-| **Charge self-serve** | + 7b (Stripe) |
+| **Minimum Credible Demo** | 1 → 2 → 3 + **embed shell** — gate: [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
+| **Trader workflow research (primary after MCD)** | MCD passed + sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| **Solo operator — works** | 1 → 2 → 3 (subset of MCD) |
+| **Multi-user research beta** | + 4a → 4b → 5 — **post-MCD, SELECTION only** |
+| **Shippable demo / PMF test** | + 6 — **post-MCD** |
+| **Acquire customers (free)** | + 7a — **post-MCD** |
+| **Charge self-serve** | + 7b (Stripe) — **post-MCD** |
 
 ---
 
@@ -114,3 +137,4 @@ flowchart TB
 | 2026-06-14 | v2 — phases 4a–7b chartered (identity, monitor, E2E, entitlements, Stripe deferred) |
 | 2026-06-18 | v3 — parallel UX chapter `msos_strategy_lab_embed_shell_v1` (MEDIUM, post–phase 3) |
 | 2026-06-19 | v4 — production hookup charter [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) (relay DONE ≠ production usable) |
+| 2026-06-20 | v5 — MCD vs post-MCD tracks; backplane charter; embed shell MCD-required |

@@ -2,6 +2,14 @@
 
 Purpose: live steering document for the **MSOS Website Program** (platform UI / customer-facing shell).
 
+### Active strategic frame (2026-06-20)
+
+- **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).
+- **Active BUILD focus:** user state, workflow persistence, **PPE integration surface** — only insofar as they support [**Minimum Credible Demo**](MINIMUM_CREDIBLE_DEMO_GATE_V1.md).
+- **After MCD passes:** primary focus → [**Trader Workflow Research**](TRADER_WORKFLOW_RESEARCH_V1.md).
+- **Do not expand** platform scope (identity, entitlements, Stripe, multi-asset) before MCD unless **explicitly SELECTION'd**.
+- **Canon:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md)
+
 ### Control rule (hard)
 
 - **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) (waterfall queue, top section) + [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md)
@@ -19,11 +27,13 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **SELECTION:** [`POST_MSOS_USER_STATE_V1_SELECTION.md`](POST_MSOS_USER_STATE_V1_SELECTION.md)
 - **Last closed:** **MSOS production wiring v1** — 2026-06-17 on `main`
 - **Next (blocked):** Phase 3 `msos_workflow_persistence_v1` after user state COMPLETE
-- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — phases **1→7b** (full product + commercial)
-- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
-- **Queued pipeline:** `production_wiring` → `user_state` → `workflow` → `embed_shell` (MEDIUM, parallel UX) → `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe` (BUILD deferred)
+- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — **MCD track** 1→3 + embed shell; phases **4a–7b post-MCD deferred**
+- **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **NOT PASSED**
+- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-MCD unless SELECTION'd**
+- **Queued pipeline (MCD):** `production_wiring` ✓ → `user_state` → `workflow` → `embed_shell` (**MCD-required**)
+- **Queued pipeline (post-MCD, deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe`
 
-### Live product sequence — phases 4–7 (all chartered)
+### Live product sequence — phases 4–7 (chartered, post-MCD deferred)
 
 | Phase | chapterId | Status |
 |-------|-----------|--------|

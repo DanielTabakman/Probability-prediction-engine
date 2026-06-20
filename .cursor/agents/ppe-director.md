@@ -43,6 +43,12 @@ Optional refresh: `python scripts/ppe_operator_status.py` from repo root.
 2. If verdict changed to `RUN_LOCAL` or `RUN_AUTO`, confirm loop can continue.
 3. Return a 5-line summary: verdict before → worker → verdict after → next operator action.
 
+## Strategic routing (scope)
+
+- Route work toward [**Minimum Credible Demo**](docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md) before broad platform expansion.
+- Protect **future-platform readiness** without allowing premature platform sprawl ([`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](docs/SOP/MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md)).
+- Post-MCD phases (identity, entitlements, Stripe) require explicit SELECTION — do not auto-pull forward.
+
 ## Self-refresh (when YOU feel context-heavy)
 
 If this thread has handled 3+ workers or feels noisy:
