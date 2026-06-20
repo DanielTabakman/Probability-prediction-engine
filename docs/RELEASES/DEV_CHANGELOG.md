@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `044e3c8` — Merge pull request #248 from DanielTabakman/fix/deploy-msos-web-nocache-env
+- `e90916f` — fix(deploy): no-cache msos_web build after env sync
+- `8b9d79d` — platform: sync research CTA env on Deploy VPS from GitHub secrets (#247) (`scripts/`)
+- `afbcf31` — Control-plane: dev changelog
 - `740c15a` — fix(msos-web): complete better-sqlite3 typings for VPS next build (#246) (`apps/msos-web/`)
 - `1fb3fea` — fix(msos-web): add better-sqlite3 module declaration for production build (#245) (`apps/msos-web/`)
 - `8862861` — fix(msos-web): remove duplicate import blocking production build (#244) (`apps/msos-web/`)
