@@ -41,8 +41,12 @@ jobs:
             cd /opt/marketstructureos
             git pull
             bash scripts/vps_sync_production_env.sh
+            RESEARCH_URL="$(grep '^PPE_RESEARCH_OFFER_URL=' .env | head -1 | cut -d= -f2- | tr -d '\"')"
+            RESEARCH_LABEL="$(grep '^PPE_RESEARCH_OFFER_LABEL=' .env | head -1 | cut -d= -f2- | tr -d '\"')"
             docker compose build app_demo app_full
-            docker compose build --no-cache msos_web
+            docker compose build --no-cache msos_web \
+              --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
+              --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
             docker compose up -d --force-recreate
 
       - name: Demo site health (no import traceback)
