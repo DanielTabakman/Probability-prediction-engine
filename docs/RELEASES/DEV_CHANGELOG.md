@@ -2,8 +2,18 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-20
+
+- `9a7235c` — fix(msos-web): Alpine build deps for better-sqlite3 — unblock Deploy VPS (`apps/msos-web/`)
+
 ## 2026-06-19
 
+- `a361c4b` — Merge pull request #243 from DanielTabakman/fix/msos-web-docker-deploy
+- `d7f3308` — MSOS production live hookup: charter + VPS SSH operator tooling (#242) (`docs/SOP/`)
+- `7da7212` — evidence: MSOS production demo witness — live journey PASS (#241) (`docs/SOP/`)
+- `10921f8` — control-plane: unified Codex/Cursor BUILD worker (#240) (`scripts/`)
+- `d1301dd` — control-plane: defer Stripe — MSOS sequence idle (#239) (`docs/SOP/`)
+- `9aae17e` — Control-plane: dev changelog
 - `99860fe` — control-plane: unified reconcile + human request intake (#238) (`docs/SOP/`)
 - **Chapter closed:** E2E witness DONE, billing stripe READY (#237) (`E2E witness DONE, billing stripe READY (#237)`)
 - `2f57bc4` — ops(local): manifest READY after relay pass (#236) (`docs/SOP/`)
