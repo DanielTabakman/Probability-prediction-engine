@@ -14,6 +14,7 @@
 | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Post-MCD research ops |
 | [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) | Path/layer presets |
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
+| [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Future interaction-mode ontology (not build scope) |
 
 ---
 
@@ -68,6 +69,8 @@ The core object is increasingly **Disagreement**, not merely “trade.”
 | **hedge / constraint** | Portfolio or risk budget limits expression |
 
 Do not overbuild typed disagreement in app code in control-plane slices.
+
+**Interaction modes (user intent — docs first):** Disagreement is the **current wedge**; Expression Search, Hedging, Scenario Planning, Timing, Monitoring, and Learning/Review inform architecture and language but are **not** active BUILD scope until workflow research + SELECTION. See [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md). Disagreement **types** (table above) describe *what kind of gap*; interaction **modes** describe *why the user came*.
 
 ---
 
@@ -126,3 +129,4 @@ When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins fo
 | Date | Change |
 |------|--------|
 | 2026-06-20 | v1 — platform-shaped shell, PPE module, MCD, disagreement grammar |
+| 2026-06-20 | Link interaction-mode ontology doc (vision; not build scope) |

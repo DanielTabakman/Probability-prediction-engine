@@ -4,6 +4,8 @@ Stable **product vision** (long-range intent) for the Probability Prediction Eng
 
 **MVP1 control plane (scope, phases, audit, behavior contract):** `docs/VISION/PPE_MASTER_MVP1.md` — live MVP1 steering also in `docs/SOP/MVP1_FRONTIER.md`.
 
+**MSOS interaction-mode ontology (vision, not build scope):** `docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md`
+
 ## Product promise
 
 Help people **see** how **market data** and **prediction markets** relate on comparable events—surfacing angles like arbitrage, near-arbitrage, and unusually high-probability setups—without pretending the tool is omniscient. Visualization and **legibility** are first-class; automation and derived questions grow **after** the core picture is trustworthy.

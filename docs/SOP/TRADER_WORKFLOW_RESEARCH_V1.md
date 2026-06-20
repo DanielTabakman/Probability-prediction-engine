@@ -31,8 +31,9 @@
 7. **What do they monitor after entry?**
 8. **What makes them abandon the thesis?**
 9. **Usage mode:** pre-trade, post-trade, research, journal, alert, or expression planner?
+10. **Interaction mode:** why did they open MSOS? (disagreement, expression search, hedging, scenario planning, timing, monitoring, learning/review — see [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md))
 
-Tag answers in validation log rows. Prefer **disagreement** language over internal “snapshot” jargon in notes.
+Tag answers in validation log rows. Prefer **disagreement** language over internal “snapshot” jargon in notes. When logging, include `interaction_mode` and `disagreement_type` where applicable (see interaction modes doc § Research tagging).
 
 ---
 
@@ -82,3 +83,4 @@ After demo, spend **≥50% of session time** on research questions above — not
 | Date | Change |
 |------|--------|
 | 2026-06-20 | v1 — workflow research ops, signal ranking, ingestion path |
+| 2026-06-20 | Research Q10 + tagging — interaction modes ontology |
