@@ -46,13 +46,14 @@ Run from repo root. Tier classification and layer audit are built into the gate 
 |------|---------|---------|
 | **Commit** | `python scripts/run_pushable_gate.py` | Tier 0–2; scoped pytest when mappable, else fast markers |
 | **Push** | `python scripts/run_pushable_gate.py --pre-push` | Full pytest on `upstream..HEAD` — same as **`CI / pytest`** |
+| **Push (CI parity)** | `python scripts/run_pre_push_parity.py` | Same as push row; optional `--docker` adds **`CI / docker_entrypoint`** locally |
 | **Viz PR / merge** | `python scripts/run_implied_lab_ui_smoke.py` (or dual when chartered) | Heavy smoke — **not** a commit gate; see [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md) |
 
 **Docs-only:** diff touches only `docs/` → tier 0 (no pytest). Ruff optional unless `src/` or `scripts/` also changed.
 
 **After `git merge origin/main` or rebase** on a feature branch: run the gate, then **push** — syncing is not done until push succeeds.
 
-**CI on merge:** GitHub **CI** requires **`CI / pytest`** and **`CI / docker_entrypoint`**. Local `--pre-push` covers pytest + ruff; docker smoke runs on GitHub unless replicated locally.
+**CI on merge:** GitHub **CI** requires **`CI / pytest`** and **`CI / docker_entrypoint`**. Local `--pre-push` covers pytest + ruff; add **`python scripts/run_pre_push_parity.py --docker`** (or `run_pre_push_parity.cmd --docker`) when you touched `Dockerfile`, deps, or Streamlit entry — otherwise docker smoke runs only on GitHub.
 
 ## Ship path (feature branches)
 
