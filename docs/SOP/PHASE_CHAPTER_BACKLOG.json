@@ -224,7 +224,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_embed_shell_v1",
-      "status": "queued",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",

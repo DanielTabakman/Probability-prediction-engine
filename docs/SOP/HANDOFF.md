@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos workflow persistence v1 **COMPLETE** 2026-06-20
+- Active MVP1 focus: **none** — msos strategy lab embed shell v1 **COMPLETE** 2026-06-20
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/MSOS_FRONTIER.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS workflow persistence v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS Strategy Lab embed shell v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -52,4 +52,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-06-20 — MSOS workflow persistence v1 COMPLETE; closeout job `MSOS-WorkflowV1-Closeout-Slice005`.
+2026-06-20 — MSOS Strategy Lab embed shell v1 COMPLETE; closeout job `MSOS-EmbedShellV1-Closeout-Slice006`.

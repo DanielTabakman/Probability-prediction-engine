@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
+  "status": "COMPLETE",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE Chapter closeout MSOS-EmbedShellV1-Closeout-Slice006; queue item marked DONE.",
   "workerMode": "deterministic"
 }
