@@ -17,6 +17,8 @@
 
 Exploring -> Draft thesis -> Confirmed thesis -> Expression saved -> Simulated or Executed -> Monitoring -> Reviewed / Resolved
 
+**Interaction modes (orthogonal):** Why the user opened MSOS *now* — Disagreement, Expression Search, Hedging, Scenario Planning, Timing, Monitoring, Learning/Review. Lifecycle states describe *where a thesis is*; interaction modes describe *user intent*. Full taxonomy: [`MSOS_Market_Interaction_Modes_v0.1.md`](../../MSOS_Market_Interaction_Modes_v0.1.md) (vision only — not current build scope).
+
 ## Build rules for Cursor
 
 1. Do not use PPE as the company/platform identity. PPE is the first tool.
