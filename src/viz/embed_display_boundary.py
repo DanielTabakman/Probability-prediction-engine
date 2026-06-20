@@ -20,6 +20,8 @@ DISPLAY_PAYLOAD_HTTP_PATH = "/ppe-display-api/display.json"
 EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
+DISPLAY_PAYLOAD_MODE = "native_json"
+EMBED_ONLY_FALLBACK_MODE = "streamlit_embed_only"
 
 
 def _parse_float(value: str | float | int | None) -> float | None:
@@ -103,8 +105,14 @@ def build_distribution_display_payload(
         "series_by_expiry": series,
         "meta": {
             "read_only": True,
+            "display_mode": DISPLAY_PAYLOAD_MODE,
+            "fallback_mode": EMBED_ONLY_FALLBACK_MODE,
             "embed_query": f"?{EMBED_ONLY_QUERY_PARAM}=1",
             "json_query": f"?{EMBED_JSON_QUERY_PARAM}={EMBED_JSON_QUERY_VALUE}",
+            "embed_json_query": (
+                f"?{EMBED_ONLY_QUERY_PARAM}=1&"
+                f"{EMBED_JSON_QUERY_PARAM}={EMBED_JSON_QUERY_VALUE}"
+            ),
             "http_path": DISPLAY_PAYLOAD_HTTP_PATH,
         },
     }
