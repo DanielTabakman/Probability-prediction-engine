@@ -27,11 +27,13 @@ alwaysApply: true
 
 **Closeout automation:** `post_relay_continue` marks the closed plan **DONE** in the queue and clears `phasePlanPath`; agents must not leave feedback (or any closed chapter) as `READY` in the queue.
 
-## What's next? — auto-execute (hard default)
+## What's next? — auto-execute (EXECUTE mode only)
 
-**Triggers:** `what's next` · `whats next` · `do the next thing` · `continue` · `keep going` · steward/operator steering without `read-only` / `explain only`.
+**Mode gate:** [`conversation-mode.mdc`](conversation-mode.mdc). Auto-execute applies only when **Mode: EXECUTE** (explicit triggers, user override, or clear in-loop ship intent). In **META**, do not read operator status or run verdict commands unless asked.
 
-**Do not** answer with a plan-only summary. **First tool pass:** read `artifacts/orchestrator/OPERATOR_STATUS.md` or `AUTOBUILDER_STATUS.json`, then **run** the verdict action in shell before your reply.
+**EXECUTE triggers:** `what's next` · `whats next` · `do the next thing` · `continue` · `keep going` · `execute` · `in the loop` · `run it` · @ IDE_BUILD starter · steward/operator steering to ship.
+
+**Do not** answer with a plan-only summary in EXECUTE mode. **First tool pass:** read `artifacts/orchestrator/OPERATOR_STATUS.md` or `AUTOBUILDER_STATUS.json`, then **run** the verdict action in shell before your reply.
 
 | Verdict | Agent action (run first) |
 |---------|--------------------------|
@@ -40,7 +42,7 @@ alwaysApply: true
 | **`RUN_AUTO`** | `cmd /c run_ppe.cmd` or `ppe_autobuilder.cmd advance` — unattended relay slices. |
 | **`ERROR` / `FIX_PLAN` / `STALE_STATE`** | Triage/fix (`ppe_notify_fix.py`); do not blindly run relay. |
 
-**Skip auto-run only when:** user explicitly asked read-only / explain-only; SSH or `ppe_loop_host_guard` blocks; or triage is required first.
+**Skip auto-run when:** **Mode: META**; user asked read-only / explain-only; SSH or `ppe_loop_host_guard` blocks; or triage is required first.
 
 After closeout with another `READY` queue item: run `run_ppe.cmd` or `ppe_auto_select.py --apply` — do not stop at chapter COMPLETE when the user wants the cycle to continue.
 

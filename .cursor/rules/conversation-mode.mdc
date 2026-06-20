@@ -1,0 +1,55 @@
+---
+description: Classify each turn as META (on the loop) vs EXECUTE (in the loop). State mode; user override wins.
+alwaysApply: true
+---
+
+# Conversation mode — META vs EXECUTE
+
+Before acting, classify **one** mode for this turn. Put a single line near the top of every reply:
+
+**Mode: META** — working **on** the loop (pipeline, orchestrator, rules, process)
+**Mode: EXECUTE** — working **in** the loop (next slice, operator verdict, IDE BUILD)
+
+**User override wins immediately** and sticks until they switch back:
+
+| User says | Mode |
+|-----------|------|
+| `meta` · `on the loop` · `control plane` · `steward only` · `read-only` · `explain only` | **META** |
+| `execute` · `in the loop` · `run it` · `what's next` · `continue` · `keep going` · `do the next thing` | **EXECUTE** |
+
+Re-classify each turn; prior mode is a hint, not a lock.
+
+## META — on the loop
+
+**Topic:** orchestrator/relay, operator layout (VM/desktop), `.cursor/rules`, steward process, SOP/process design, scripts that *run* the pipeline (not product slices), “how does X work?”, “should we change Y?”
+
+**Do:**
+- Answer the meta question directly
+- Edit control-plane paths when the task requires it
+- Read operator artifacts **only when asked** or when needed for the specific meta question (e.g. “why is the loop stuck?”)
+
+**Do NOT (unless user switches to EXECUTE):**
+- Read `OPERATOR_STATUS.md` / `AUTOBUILDER_STATUS.json` in the first tool pass
+- Run verdict commands (`run_ppe.cmd`, `DESKTOP_CONTINUE.cmd`, `run_ppe_local.cmd`, implement IDE_BUILD starter)
+- End with unprompted “what’s next” / loop-status steering
+
+**When ambiguous → default META.** Safer for pipeline/design chats that aren’t asking to ship.
+
+## EXECUTE — in the loop
+
+**Topic:** ship the next slice, run operator verdict, IDE BUILD starter, fix blocked operator state, relay closeout, “what’s missing for BUILD?”
+
+**Do:** follow [`ppe-unified-run.mdc`](ppe-unified-run.mdc) § What's next — read `OPERATOR_STATUS.md`, run the verdict action, then summarize.
+
+**Strong EXECUTE signals:** `@` IDE_BUILD starter · explicit execute triggers · implementing chartered slice · fixing `ERROR` / `FIX_PLAN` / `STALE_STATE`
+
+## Classify from the first message
+
+| Signal | Mode |
+|--------|------|
+| Design, explain, improve pipeline/rules/orchestrator | META |
+| Product feature question outside active relay slice | META (unless they @ starter or say execute) |
+| “What's next?” / “continue” / “ship the slice” / @ starter | EXECUTE |
+| Mixed (“fix the notify script then run the loop”) | META for the fix; ask or wait for execute before running verdict |
+
+If you misclassified, user corrects with one word — adopt their mode without arguing.

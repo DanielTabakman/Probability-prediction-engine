@@ -20,4 +20,4 @@ When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 **Not** chapter closeout (`apply_control_closeout_v1`) unless a relay closeout slice is also in scope.
 
-**Next thread:** user asks `what's next?` — agent **auto-executes** operator verdict per `ppe-unified-run.mdc` (read `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` for context; no @ required).
+**Next thread:** user asks `what's next?` in **EXECUTE** mode — auto-execute per [`conversation-mode.mdc`](conversation-mode.mdc) + `ppe-unified-run.mdc`. META threads close without forcing operator verdict unless asked.
