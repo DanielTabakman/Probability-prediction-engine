@@ -1,4 +1,4 @@
-# MSOS Strategy Lab embed shell v1 — SELECTION (pending)
+# MSOS Strategy Lab embed shell v1 — SELECTION
 
 **Chapter:** `msos_strategy_lab_embed_shell_v1`  
 **Display name:** Strategy Lab PPE embed shell — storyboard chart region  
@@ -8,9 +8,9 @@
 
 ## Status
 
-**NOT SELECTED** — blocked until **`msos_workflow_persistence_v1` COMPLETE**.
+**SELECTED** 2026-06-20 — steward: replace box-in-box Streamlit iframe on `/strategy-lab` with storyboard-aligned chart shell; PPE math stays in Python.
 
-Chartered **2026-06-18** — steward: replace box-in-box Streamlit iframe on `/strategy-lab` with storyboard-aligned chart shell; PPE math stays in Python.
+**Precondition met:** `msos_workflow_persistence_v1` **COMPLETE** 2026-06-20.
 
 ## Scope (in)
 
