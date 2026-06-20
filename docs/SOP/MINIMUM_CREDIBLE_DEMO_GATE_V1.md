@@ -66,7 +66,7 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 |-------|--------|
 | **Gate** | NOT PASSED |
 | **Last reviewed** | 2026-06-20 |
-| **Blockers** | `msos_user_state_v1` Platform-Slice003 in flight; then `msos_workflow_persistence_v1`; then `msos_strategy_lab_embed_shell_v1` |
+| **Blockers** | `msos_workflow_persistence_v1` BUILD next; then `msos_strategy_lab_embed_shell_v1` |
 | **After pass** | Steward updates status to **PASSED**; primary focus → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
 
 ---
