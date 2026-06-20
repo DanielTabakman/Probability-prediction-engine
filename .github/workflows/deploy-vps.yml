@@ -41,7 +41,6 @@ jobs:
             cd /opt/marketstructureos
             git pull
             bash scripts/vps_sync_production_env.sh
-            set -a && [ -f .env ] && . ./.env && set +a
             docker compose build app_demo app_full
             docker compose build --no-cache msos_web
             docker compose up -d --force-recreate

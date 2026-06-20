@@ -16,10 +16,11 @@ touch "$ENV_FILE"
 set_kv() {
   local key="$1"
   local val="$2"
+  local quoted="${val//\"/\\\"}"
   if grep -q "^${key}=" "$ENV_FILE" 2>/dev/null; then
-    sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+    sed -i "s|^${key}=.*|${key}=\"${quoted}\"|" "$ENV_FILE"
   else
-    echo "${key}=${val}" >>"$ENV_FILE"
+    echo "${key}=\"${quoted}\"" >>"$ENV_FILE"
   fi
 }
 
