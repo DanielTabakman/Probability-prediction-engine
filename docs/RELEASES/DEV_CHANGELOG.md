@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `018d76b` — Merge pull request #251 from DanielTabakman/fix/deploy-explicit-cta-build-args
+- `9a5fe67` — fix(deploy): pass research CTA build-args explicitly to msos_web (`apps/msos-web/`)
+- `88f9a0f` — Control-plane: dev changelog
 - `7bb5ae5` — Merge pull request #250 from DanielTabakman/fix/deploy-env-quote
 - `a79637f` — fix(deploy): quote .env values; compose loads env without sourcing (`scripts/`)
 - `799a544` — Control-plane: dev changelog
