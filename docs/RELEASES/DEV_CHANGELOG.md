@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-20
 
+- `6464365` — docs(control): bump embed shell to HIGH for MCD track (#253) (`docs/SOP/`)
+- `7723bc6` — docs: align MSOS around minimum credible demo (#252) (`docs/SOP/`)
+- `e5bcddf` — Control-plane: dev changelog
 - `018d76b` — Merge pull request #251 from DanielTabakman/fix/deploy-explicit-cta-build-args
 - `9a5fe67` — fix(deploy): pass research CTA build-args explicitly to msos_web (`apps/msos-web/`)
 - `88f9a0f` — Control-plane: dev changelog
