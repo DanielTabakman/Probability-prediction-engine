@@ -71,9 +71,11 @@ def test_respond_fix_cli_failure_handoff_metadata(tmp_path, monkeypatch):
         "blocker": "plan stuck",
         "commands": [],
     }
-    with patch("scripts.ppe_operator_status.collect_operator_status", return_value=status):
-        with patch("scripts.ppe_remote_fix_agent.build_fix_prompt", return_value="fix prompt"):
-            result = respond_remote_agent(tmp_path, mode="fix", source="test")
+    with patch("scripts.ppe_build_worker.codex_available", return_value=False):
+        with patch("scripts.ppe_remote_agent.agent_available", return_value=False):
+            with patch("scripts.ppe_operator_status.collect_operator_status", return_value=status):
+                with patch("scripts.ppe_remote_fix_agent.build_fix_prompt", return_value="fix prompt"):
+                    result = respond_remote_agent(tmp_path, mode="fix", source="test")
     assert result["verdict"] == "STALE_STATE"
     assert result["started"] is True
     assert "IDE_FIX_NOW.md" in str(result.get("now_doc") or "")

@@ -99,6 +99,14 @@ class TestPpeOperatorConfig(unittest.TestCase):
         self.assertEqual(operator_config_path(self.repo), expected)
         self.assertFalse(steward_charter_enabled(self.repo))
 
+    def test_local_profile_from_base_config_when_env_unset(self) -> None:
+        base = self.repo / "docs" / "SOP" / "PPE_AUTO_OPERATOR.json"
+        cfg = json.loads(base.read_text(encoding="utf-8"))
+        cfg["profile"] = "local"
+        base.write_text(json.dumps(cfg), encoding="utf-8")
+        expected = (self.repo / OPERATOR_PROFILE_REL["local"]).resolve()
+        self.assertEqual(operator_config_path(self.repo), expected)
+
     def test_skip_acp_from_config_default(self) -> None:
         self.assertTrue(skip_acp_from_config({"skipAcp": True}))
         self.assertFalse(skip_acp_from_config({"skipAcp": False}))

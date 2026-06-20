@@ -29,9 +29,10 @@
 
 ### Hybrid default (current local profile)
 
-1. [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) sets `autoRemoteBuild: true` and `preferIdeOverCli: false`.
-2. One-time desktop: `setup_cursor_agent.cmd` → `agent login` → `verify_cursor_agent.cmd`.
-3. Restart stack on loop host: `run_ppe_headless_stack.cmd` or ntfy `restart`.
+1. [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) sets `autoRemoteBuild: true`, `buildWorker: codex`, and `preferIdeOverCli: false`.
+2. One-time desktop: **`setup_codex.cmd`** → `codex login` → **`verify_codex.cmd`** (primary BUILD worker).
+3. Optional fallback: `setup_cursor_agent.cmd` → `agent login` → `verify_cursor_agent.cmd`.
+4. Restart stack on loop host: `run_ppe_headless_stack.cmd` or ntfy `restart`.
 
 ### Strict IDE-only (optional override)
 
