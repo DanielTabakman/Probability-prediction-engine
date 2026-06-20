@@ -10,7 +10,7 @@
 
 | Mode | Config | On `IDE_BUILD` |
 |------|--------|----------------|
-| **Hybrid local (default)** | `autoRemoteBuild: true`, `preferIdeOverCli: false` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) | Loop/watch start **headless CLI** when agent is installed and usage allows; else IDE handoff |
+| **Hybrid local (default)** | `autoRemoteBuild: true`, `buildWorker: codex`, `preferIdeOverCli: false` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) | Loop/watch tries **Codex CLI** headless first; desktop Codex handoff or Cursor when blocked |
 | **Strict near-zero** | `ppe_operator_near_zero_api.local.cmd` (gitignored) | **IDE handoff only** — no loop CLI |
 
 ---
