@@ -1,0 +1,90 @@
+{
+  "name": "MSOS_usable_demo_v1 (MSOS shell + PPE usable demo — storyboard BUILD)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-UsableDemoV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+      "buildBranch": "build/auto/MSOS-UsableDemoV1-Control-Slice001-usable_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-UsableDemoV1-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+      "buildBranch": "build/auto/MSOS-UsableDemoV1-Product-Slice002-usable_demo",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/embed_display_boundary.py",
+        "src/viz/display_payload_server.py",
+        "src/viz/embed_only_lab.py",
+        "tests/test_implied_lab_embed_display_boundary.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UsableDemoV1-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+      "buildBranch": "build/auto/MSOS-UsableDemoV1-Product-Slice003-usable_demo",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/PpeEmbedBoundary.tsx",
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/app/strategy-lab/page.tsx",
+        "apps/msos-web/src/app/globals.css",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UsableDemoV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+      "buildBranch": "build/auto/MSOS-UsableDemoV1-Witness-Slice004-usable_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-UsableDemoV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+      "buildBranch": "build/auto/MSOS-UsableDemoV1-Closeout-Slice005-usable_demo",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_usable_demo_v1",
+        "chapterTitle": "MSOS usable demo v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MSOS_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
+          "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
+        ]
+      }
+    }
+  ]
+}

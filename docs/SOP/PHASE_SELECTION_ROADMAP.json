@@ -210,6 +210,12 @@
       "status": "done",
       "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+      "status": "ready",
+      "reason": "[P0] Usable demo BUILD \u2014 MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
+      "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
     }
   ]
 }

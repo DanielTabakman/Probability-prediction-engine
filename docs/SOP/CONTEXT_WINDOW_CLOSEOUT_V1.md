@@ -26,7 +26,7 @@
 
 | Kind | Trigger | Updates | Next thread loads |
 |------|---------|---------|-------------------|
-| **Chapter closeout** | Relay slice with `closeout:` → `CONTINUE` | `HANDOFF`, frontier, `AGENT_CONTINUITY_BRIEF` (automated) | `AGENT_CONTINUITY_BRIEF.md` only |
+| **Chapter closeout** | Relay slice with `closeout:` → `CONTINUE` | `HANDOFF`, frontier, `AGENT_CONTINUITY_BRIEF`, **direction markers** (automated via `sync_product_direction`) | `AGENT_CONTINUITY_BRIEF.md` + `ACTIVE_PRODUCT_DIRECTION.json` |
 | **Context window closeout** | Steward says “close this chat” | Draft report + backlog triage + git/PR sweep | Brief + this report’s **Next thread** section |
 
 Chapter closeout can happen **without** context closeout when the Cursor thread was already short. Context closeout can happen **without** chapter closeout when the thread was exploratory or mixed ad-hoc fixes.
@@ -67,9 +67,10 @@ Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 
 1. context_window_closeout.cmd --record --whats-next "<one line>"
-2. Complete narrative/triage in draft if needed.
-3. Operational sweep: commit+gate ship-now items; push branches.
-4. End with AGENT CONTINUITY block.
+2. sync_product_direction.cmd (if direction JSON changed this thread)
+3. Complete narrative/triage in draft if needed.
+4. Operational sweep: commit+gate ship-now items; push branches.
+5. End with AGENT CONTINUITY block.
 ```
 
 **New chat:** ask `what's next?` — no `@` files required (see **Tracking v2** below).

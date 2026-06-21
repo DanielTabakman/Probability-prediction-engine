@@ -72,11 +72,11 @@ def build_chart_series_from_export_row(row: dict[str, str]) -> dict[str, Any] | 
             {"price_usd": price, "cdf_pct": cdf_pct}
             for price, cdf_pct in chart.get("cumulative_at") or []
         ],
+        "mean_usd": _parse_float(row.get("mean_usd")),
         "quartiles_usd": {
-            "mean": _parse_float(row.get("mean_usd")),
-            "q25": _parse_float(row.get("q25_usd")),
-            "q50": _parse_float(row.get("q50_usd")),
-            "q75": _parse_float(row.get("q75_usd")),
+            "q1_usd": _parse_float(row.get("q25_usd")),
+            "median_usd": _parse_float(row.get("q50_usd")),
+            "q3_usd": _parse_float(row.get("q75_usd")),
         },
     }
 
@@ -120,6 +120,18 @@ def build_distribution_display_payload(
 
 def serialize_distribution_display_payload(payload: dict[str, Any]) -> str:
     return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+
+def build_live_distribution_display_payload() -> dict[str, Any]:
+    """Live Deribit-backed payload for platform WSGI / MSOS display API proxy."""
+    from src.viz.embed_only_lab import _load_export_rows
+
+    as_of_utc, spot_usd, export_rows = _load_export_rows()
+    return build_distribution_display_payload(
+        as_of_utc=as_of_utc,
+        spot_usd=spot_usd,
+        export_rows=export_rows,
+    )
 
 
 def create_display_payload_wsgi_app(

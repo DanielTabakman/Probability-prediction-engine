@@ -42,6 +42,6 @@ export const testerMetricsTemplate = [
 export const nextSelectionRecommendation = {
   title: "Next SELECTION recommendation (preview)",
   recommendation:
-    "Hold MSOS scope at friends-first tester release. Run 2–3 guided sessions; log rows in VALIDATION_REALITY_CHECKS before chartering paywall or live execution.",
+    "Hold MSOS scope at usable demo BUILD. Share production URL when walkable; log optional rows in VALIDATION_REALITY_CHECKS before paywall or live execution.",
   notNow: "No paywall or execution program expansion without new steward SELECTION.",
 };

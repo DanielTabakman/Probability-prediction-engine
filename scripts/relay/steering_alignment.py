@@ -14,6 +14,7 @@ Severity = Literal["error", "warn", "info"]
 
 SOURCE_OF_TRUTH_ORDER = [
     "docs/VISION/PPE_MASTER_MVP1.md",
+    "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
     "docs/SOP/MVP1_FRONTIER.md",
     "docs/SOP/PPE_INTEGRATED_STATUS.md",
     "docs/SOP/HANDOFF.md",

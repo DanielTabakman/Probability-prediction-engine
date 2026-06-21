@@ -301,6 +301,16 @@
       "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
       "reason": "[DEFER] Stripe Checkout \u2014 operator dropped until human prereq (stripe_operator_prereq); MSOS live sequence otherwise COMPLETE"
+    },
+    {
+      "chapterId": "msos_usable_demo_v1",
+      "status": "chartered",
+      "priority": "high",
+      "focusPlaybookTier": "P0",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
+      "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
+      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
     }
   ]
 }

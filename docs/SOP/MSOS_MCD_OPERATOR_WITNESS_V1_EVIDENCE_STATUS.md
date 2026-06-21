@@ -34,6 +34,6 @@ Artifact: `artifacts/health/msos_production_demo_witness.json` · pytest: `tests
 | Research beta CTA | **PASS** — `research_beta_cta` check OK |
 | Signed-in journey (HTTP) | **PASS** — full storyboard route chain |
 | Cloudflare Access on `app.*` | **PASS** |
-| Track B (apex Access policies) | **DEFER** — friends-first public homepage; product routes ungated until cohort needs identity-scoped CC/monitor |
+| Track B (apex Access policies) | **DEFER** — public homepage; product routes ungated until multi-user expansion SELECTION'd |
 
 **Steward note:** VPS deploy from desktop requires `ppe_operator_ssh.local.cmd` (not configured on this host). Production HTML matches post-embed-shell contract without manual deploy this session.

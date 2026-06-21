@@ -35,9 +35,9 @@ alwaysApply: true
 
 | Verdict | Agent action (run first) |
 |---------|--------------------------|
-| **`RUN_LOCAL`** | Relay continue after IDE BUILD. **Desktop** (`ppe_operator_no_loop.local.cmd`): `DESKTOP_CONTINUE.cmd`. **VM loop host:** `run_ppe_local.cmd`. Or `@ppe-finish-worker`. Then read `LAST_RUN_REPORT.md` + new verdict. |
+| **`RUN_LOCAL`** | **Check host first:** `python scripts/ppe_loop_host_guard.py --check`. If `allowed: false` (daily desktop) → **`DESKTOP_CONTINUE.cmd` only** — never `run_ppe_local.cmd`. If `allowed: true` (VM) → `run_ppe_local.cmd` or `@ppe-finish-worker`. See [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc). |
 | **`IDE_BUILD`** | Open `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` and **implement** the slice (gate → commit → `mark_ide_product_ready` / closeout). Do **not** run `run_ppe_local` before product code ships. |
-| **`RUN_AUTO`** | `cmd /c run_ppe.cmd` or `ppe_autobuilder.cmd advance` — unattended relay slices. |
+| **`RUN_AUTO`** | **VM only:** `run_ppe.cmd` or `ppe_autobuilder.cmd advance`. **Desktop:** SSH VM status or merge to `main` — **never** local `run_ppe.cmd`. |
 | **`ERROR` / `FIX_PLAN` / `STALE_STATE`** | Triage/fix (`ppe_notify_fix.py`); do not blindly run relay. |
 
 **Skip auto-run only when:** user explicitly asked read-only / explain-only; SSH or `ppe_loop_host_guard` blocks; or triage is required first.

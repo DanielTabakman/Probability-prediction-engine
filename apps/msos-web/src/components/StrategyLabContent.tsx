@@ -8,13 +8,13 @@ export function StrategyLabContent() {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab / PPE / Distribution summary</div>
-          <h1 className="title">Strategy Lab — research demo</h1>
+          <div className="crumb">Strategy Lab / PPE / Options Distribution Lens</div>
+          <h1 className="title">Strategy Lab — PPE Tool</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Live via PPE when embed wired
+            Preview data healthy
           </span>
           <span className="btn slim">Share view</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
@@ -43,7 +43,7 @@ export function StrategyLabContent() {
               I believe BTC will <span className="selectchip">remain within a narrower range</span> than the market
               prices over <span className="selectchip">30 days</span>.
             </div>
-            <p className="micro">Natural thesis builder first; authoritative stats live in the embedded PPE lab below.</p>
+            <p className="micro">Natural thesis builder first; curve controls below for precision.</p>
           </div>
 
           <div className="panel-head">
@@ -147,7 +147,7 @@ export function StrategyLabContent() {
         </div>
       </section>
 
-      <p className="footer-note">Research demo — fixture panels beside live PPE embed; no live order transmitted</p>
+      <p className="footer-note">Illustrative product storyboard — no live order transmitted</p>
     </>
   );
 }

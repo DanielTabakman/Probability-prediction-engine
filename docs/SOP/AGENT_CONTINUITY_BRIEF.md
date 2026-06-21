@@ -20,11 +20,17 @@
 | Status | COMPLETE |
 | Closed | 2026-06-21 |
 | Evidence | [MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md](docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md) |
-| Next SELECTION | [TRADER_WORKFLOW_RESEARCH_V1.md](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md) |
+| Next SELECTION | [POST_MSOS_USABLE_DEMO_V1_SELECTION.md](docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md) |
 
 ## Active BUILD
 
-**none** — await steward SELECTION.
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
+**`msos_usable_demo_v1`** — BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
+
+- **Sprint:** [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md)
+- **Plan:** [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
+- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `usable-demo-build-v1`)
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ## Steering alignment
 

@@ -23,6 +23,7 @@ Copy from [`.env.example`](../../.env.example). Keys consumed at **`msos_web` bu
 | `PPE_RESEARCH_OFFER_LABEL` | `msos_web` build + `app_demo` | Maps to `NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL` at build |
 | `NEXT_PUBLIC_MSOS_SIGN_IN_URL` | `msos_web` build | Sign-in link target (default `https://app.marketstructureos.com`) |
 | `NEXT_PUBLIC_PPE_EMBED_URL` | `msos_web` build | Strategy Lab iframe src (default `/ppe-embed` — Caddy → `app_demo`) |
+| `NEXT_PUBLIC_PPE_DISPLAY_API_URL` | `msos_web` build | Native chart JSON (default `/ppe-display-api/display.json` — Caddy → `ppe_display_api`) |
 
 When research-offer vars are unset, homepage omits the CTA (honest public shell). When embed URL is unset at build, Strategy Lab shows degraded “Embed pending” state.
 
@@ -37,6 +38,7 @@ When research-offer vars are unset, homepage omits the CTA (honest public shell)
 | Path | Backend | Notes |
 |------|---------|-------|
 | `/ppe-embed/*` | `app_demo:8501` | Same-origin Streamlit demo for Strategy Lab iframe (`NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed`) |
+| `/ppe-display-api/*` | `ppe_display_api:8765` | Read-only distribution display JSON (`embed_display_boundary`; chromeless fallback uses `/ppe-embed?embed_only=1`) |
 
 Strip prefix `/ppe-embed` before upstream. See [`MSOS_P1_STACK_ROUTING_ADR.md`](../SOP/MSOS_P1_STACK_ROUTING_ADR.md).
 

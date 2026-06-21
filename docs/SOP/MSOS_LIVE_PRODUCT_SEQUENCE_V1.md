@@ -18,14 +18,16 @@
 
 ---
 
-## MCD track vs post-MCD track
+## MCD track vs post-demo track
 
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Track | Phases | When |
 |-------|--------|------|
-| **MCD (active)** | 1 → 2 → 3 + parallel **embed shell** | **Now** — until [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) **PASSED** |
-| **Post-MCD (deferred)** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after MCD + [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) signal |
+| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `usable-demo-build-v1` |
+| **Post-demo expansion** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after usable demo is walkable on production URLs |
 
-Phases 4a–7b remain **chartered** for future multi-user and commercial work — they are **not** the current default BUILD priority.
+Phases 4a–7b remain chartered for multi-user and commercial work — they are **not** the current default BUILD priority.
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---
 
@@ -65,7 +67,8 @@ Phases 4a–7b remain **chartered** for future multi-user and commercial work �
 | Bar | Phases required |
 |-----|-----------------|
 | **Minimum Credible Demo** | 1 → 2 → 3 + **embed shell** — gate: [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
-| **Trader workflow research (primary after MCD)** | MCD passed + sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| **Trader workflow research (optional)** | MCD passed + sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) — **not a BUILD gate** |
+| **Usable demo (active BUILD)** | Storyboard implementation + PPE-in-MSOS integration — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](SPRINT_MSOS_USABLE_DEMO_V1.md) |
 | **Solo operator — works** | 1 → 2 → 3 (subset of MCD) |
 | **Multi-user research beta** | + 4a → 4b → 5 — **post-MCD, SELECTION only** |
 | **Shippable demo / PMF test** | + 6 — **post-MCD** |

@@ -62,7 +62,10 @@ def test_chart_series_from_lognormal_row() -> None:
     series = build_chart_series_from_export_row(lognormal)
     assert series is not None
     assert len(series["prices_usd"]) == len(series["pdf_pct"]) == 80
-    assert series["quartiles_usd"]["mean"] == 100_000.0
+    assert series["mean_usd"] == 100_000.0
+    q = series["quartiles_usd"]
+    assert q["q1_usd"] is not None and q["median_usd"] is not None and q["q3_usd"] is not None
+    assert q["q1_usd"] <= q["median_usd"] <= q["q3_usd"]
 
 
 def test_bl_skipped_row_omits_series() -> None:

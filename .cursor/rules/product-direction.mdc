@@ -1,0 +1,46 @@
+---
+description: Product direction SSOT and automatic steering propagation — agents own pivots; operator does not memorize steps.
+alwaysApply: true
+---
+
+# Product direction (agent-owned)
+
+**Canon:** [`docs/SOP/PRODUCT_DIRECTION_PIVOT_V1.md`](../../docs/SOP/PRODUCT_DIRECTION_PIVOT_V1.md) · **SSOT:** [`docs/SOP/ACTIVE_PRODUCT_DIRECTION.json`](../../docs/SOP/ACTIVE_PRODUCT_DIRECTION.json)
+
+## Hard rule — operator does not run this
+
+Direction pivots and steering propagation are **agent/steward responsibility**. The operator states intent in plain language; **you** edit JSON, sync, queue, and commit.
+
+## First tool pass (with continuity brief)
+
+When answering **what's next**, starting BUILD, or any steering/scope question:
+
+1. Read [`ACTIVE_PRODUCT_DIRECTION.json`](../../docs/SOP/ACTIVE_PRODUCT_DIRECTION.json) (`pivotId`, `primaryFocus`, `activeBuildChapterId`).
+2. Read propagated markers in [`MSOS_FRONTIER.md`](../../docs/SOP/MSOS_FRONTIER.md) — if placeholder `_(run sync_product_direction.cmd)_` appears, **run sync immediately**.
+
+## Auto-pivot triggers (you execute — do not advise-only)
+
+| Trigger | Agent action |
+|---------|----------------|
+| Operator changes product focus / deprioritizes an approach | Edit `ACTIVE_PRODUCT_DIRECTION.json` (bump `pivotId`), run `sync_product_direction.cmd`, queue chapter if needed, gate+commit |
+| Friends-first, research-first, or stale "primary focus" in steering | Pivot JSON + sync + fix drift in same pass |
+| Chapter closeout / `post_relay_continue` | Sync runs automatically; verify markers updated |
+| Context window closeout | Run `sync_product_direction.cmd` before final reply |
+| Marker blocks out of sync with JSON | Run `sync_product_direction.cmd` |
+
+## Pivot ritual (agent — every time)
+
+1. Edit [`ACTIVE_PRODUCT_DIRECTION.json`](../../docs/SOP/ACTIVE_PRODUCT_DIRECTION.json) — bump `pivotId`, update `primaryFocus`, `deprecatedApproaches`, `activeBuildChapterId`, `nextStewardAction`.
+2. `sync_product_direction.cmd` (or `python scripts/sync_active_product_direction.py`).
+3. If BUILD track changed: `PHASE_CHAPTER_BACKLOG.json` + `PHASE_QUEUE.json` (`READY` row) + `python scripts/ppe_auto_select.py --apply` when appropriate.
+4. `python scripts/run_pushable_gate.py` → commit (control-plane message).
+
+## Precedence
+
+`ACTIVE_PRODUCT_DIRECTION.json` wins for **what we optimize for**. `MSOS_FRONTIER` / `MVP1_FRONTIER` win for **relay slice order**. Never steer BUILD from retired approaches listed in `deprecatedApproaches`.
+
+## Do not
+
+- Ask the operator to remember sync steps or marker blocks.
+- Hand-edit propagated sections between `<!-- ACTIVE_PRODUCT_DIRECTION:START -->` … `END` — edit JSON and sync.
+- Leave ghost references (friends-first gating, research-as-blocker) after a pivot.

@@ -43,6 +43,9 @@ MSOS_MCD_WITNESS_PLAN = (
 MSOS_E2E_WITNESS_PLAN = (
     "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json"
 )
+MSOS_USABLE_DEMO_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -66,6 +69,7 @@ ALLOWED_READY_PLANS = (
     MSOS_EMBED_SHELL_PLAN,
     MSOS_MCD_WITNESS_PLAN,
     MSOS_E2E_WITNESS_PLAN,
+    MSOS_USABLE_DEMO_PLAN,
 )
 
 

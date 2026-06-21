@@ -7,18 +7,26 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 ---
 
-## Active BUILD — MCD track (phase 2 in flight)
+## Active BUILD — usable demo integration
 
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **MCD gate** | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21 |
-| **Sequence canon** | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — MCD track 1→3 + embed shell |
-| **Active chapter** | `msos_user_state_v1` — Witness-Slice004 next |
-| **Relay plan** | [`msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json) |
-| **Last closed slice** | `MSOS-UserStateV1-Platform-Slice003` (`main` #212) |
-| **Next (blocked)** | `msos_workflow_persistence_v1` → `msos_strategy_lab_embed_shell_v1` (MCD-required) |
-| **Post-MCD phases 4a–7b** | Built pre-pivot; **deferred** for product focus until MCD PASSED |
-| **MSOS steering** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
+| **Direction pivot** | `usable-demo-build-v1` (2026-06-21) |
+| **Primary focus** | BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6 |
+| **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
+| **Active BUILD** | `msos_usable_demo_v1` — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
+| **Relay plan** | [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json) |
+| **Next** | RUN_LOCAL: Product-Slice002-003 shipped — DESKTOP_CONTINUE.cmd or run_ppe_local.cmd for witness/closeout; merge PR #272 |
+
+**Usable demo integration:** One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review
+
+  - `msos_production_wiring_v1`
+  - `msos_user_state_v1`
+  - `msos_workflow_persistence_v1`
+  - `msos_strategy_lab_embed_shell_v1`
+  - `msos_usable_demo_v1`
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
 

@@ -45,11 +45,13 @@ Stop and escalate if a BUILD packet would:
 
 ## Current dominant focus
 
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Priority | Focus |
 |----------|--------|
-| **1** | **Factory stability** — relay, autobuilder, gates, closeout |
-| **2** | **Minimum Credible Demo** — MSOS shell + seamless PPE integration + primitive save/review ([`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)) |
-| **Side channel** | **Light** trader workflow conversations ([`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md)) — do not block factory or MCD |
+| **1** | **Usable demo BUILD** — MSOS shell + PPE integration ([`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md)) |
+| **2** | **Factory stability** — relay, autobuilder, gates, closeout |
+| **Side channel** | Optional validation notes when demo is walkable — **not** a BUILD gate |
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---
 

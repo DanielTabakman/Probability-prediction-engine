@@ -465,6 +465,12 @@ def record_context_closeout(
     append_closeout_record(repo, record)
     if promote:
         promote_whats_next(repo, record)
+    try:
+        from scripts.active_product_direction import sync_product_direction
+
+        record["product_direction_sync"] = sync_product_direction(repo)
+    except Exception as exc:
+        record["product_direction_sync"] = {"error": str(exc)}
     return record
 
 

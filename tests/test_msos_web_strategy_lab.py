@@ -19,9 +19,9 @@ def test_strategy_lab_route_and_shell() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab / PPE / Distribution summary" in content
-    assert "Strategy Lab — research demo" in content
-    assert "Live via PPE when embed wired" in content
+    assert "Strategy Lab / PPE / Options Distribution Lens" in content
+    assert "Strategy Lab — PPE Tool" in content
+    assert "Preview data healthy" in content
     assert "Market-implied vs reference vs your belief" in content
     assert "PpeEmbedBoundary" in content
     assert 'className="legend"' in content
@@ -177,7 +177,7 @@ def test_conclusion_learn_loop_route() -> None:
 
     panel = (MSOS_WEB / "src" / "components" / "ConclusionContent.tsx").read_text(encoding="utf-8")
     assert "testerMetricsTemplate" in panel
-    assert "Friends-first preview" in panel
+    assert "Usable demo preview" in panel
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/learn"' in nav

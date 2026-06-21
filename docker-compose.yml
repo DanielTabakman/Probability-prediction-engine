@@ -8,6 +8,7 @@ services:
         NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL: ${PPE_RESEARCH_OFFER_URL:-}
         NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL: ${PPE_RESEARCH_OFFER_LABEL:-}
         NEXT_PUBLIC_PPE_EMBED_URL: ${NEXT_PUBLIC_PPE_EMBED_URL:-/ppe-embed}
+        NEXT_PUBLIC_PPE_DISPLAY_API_URL: ${NEXT_PUBLIC_PPE_DISPLAY_API_URL:-/ppe-display-api/display.json}
     container_name: msos_web
     environment:
       - PORT=3000
@@ -31,6 +32,16 @@ services:
       - PPE_PRIVATE_APP_URL=https://app.marketstructureos.com
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+    restart: unless-stopped
+    networks:
+      - web
+
+  ppe_display_api:
+    build: .
+    container_name: ppe_display_api
+    command: ["python", "-m", "src.viz.display_payload_server"]
+    environment:
+      - PORT=8765
     restart: unless-stopped
     networks:
       - web
