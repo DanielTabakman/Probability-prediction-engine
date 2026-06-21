@@ -21,16 +21,13 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **`msos_user_state_v1`** — Command Center PPE snapshot bridge (phase 2)
-- **Relay plan:** [`PHASE_PLANS/msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json)
-- **Sprint:** [`SPRINT_MSOS_USER_STATE_V1.md`](SPRINT_MSOS_USER_STATE_V1.md)
-- **SELECTION:** [`POST_MSOS_USER_STATE_V1_SELECTION.md`](POST_MSOS_USER_STATE_V1_SELECTION.md)
-- **Last closed:** **MSOS production wiring v1** — 2026-06-17 on `main`
-- **Next (blocked):** Phase 3 `msos_workflow_persistence_v1` after user state COMPLETE
-- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — **MCD track** 1→3 + embed shell; phases **4a–7b post-MCD deferred**
-- **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **NOT PASSED**
+- **Active BUILD chapter:** **none** — MCD engineering track **COMPLETE** 2026-06-21 (`msos_strategy_lab_embed_shell_v1` closeout #267)
+- **Last closed:** **MSOS Strategy Lab embed shell v1** — Codex headless product slices #263/#264 + closeout #267
+- **Next steward action:** MCD **operator sign-off** + [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) (human backlog `msos_production_live_hookup`); then **PASSED** → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md)
+- **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — MCD track **done**; phases **4a–7b post-MCD deferred**
+- **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **NOT PASSED** (engineering done; sign-off pending)
 - **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-MCD unless SELECTION'd**
-- **Queued pipeline (MCD):** `production_wiring` ✓ → `user_state` → `workflow` → `embed_shell` (**MCD-required**)
+- **Queued pipeline (MCD):** `production_wiring` ✓ → `user_state` ✓ → `workflow` ✓ → `embed_shell` ✓
 - **Queued pipeline (post-MCD, deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe`
 
 ### Live product sequence — phases 4–7 (chartered, post-MCD deferred)
