@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-20 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-21 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -130,6 +130,8 @@ flowchart LR
 | MSOS end-to-end product witness v1 | **COMPLETE** 2026-06-19 | [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](docs/SOP/SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md), [`MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md) |
 
 | MSOS user state v1 — Command Center bridge | **COMPLETE** 2026-06-20 | [`SPRINT_MSOS_USER_STATE_V1.md`](docs/SOP/SPRINT_MSOS_USER_STATE_V1.md), [`MSOS_USER_STATE_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_USER_STATE_V1_EVIDENCE_STATUS.md) |
+
+| MSOS Strategy Lab embed shell v1 | **COMPLETE** 2026-06-21 | [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md), [`MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md) |
 
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
