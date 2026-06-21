@@ -9,9 +9,9 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-UsableDemoV1-Control-Slice001 | PENDING | Charter + direction align |
-| MSOS-UsableDemoV1-Product-Slice002 | PENDING | PPE display boundary hardening |
-| MSOS-UsableDemoV1-Product-Slice003 | PENDING | MSOS chart shell — storyboard `03_ppe_lab` |
+| MSOS-UsableDemoV1-Control-Slice001 | **CLOSED** | Charter + direction align |
+| MSOS-UsableDemoV1-Product-Slice002 | **DONE** | PPE display boundary + WSGI display API |
+| MSOS-UsableDemoV1-Product-Slice003 | **DONE** | MSOS chart shell — storyboard `03_ppe_lab` |
 | MSOS-UsableDemoV1-Witness-Slice004 | PENDING | pytest + operator demo walkthrough |
 | MSOS-UsableDemoV1-Closeout-Slice005 | PENDING | Chapter COMPLETE |
 
