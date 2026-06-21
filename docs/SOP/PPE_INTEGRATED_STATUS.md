@@ -155,7 +155,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **`msos_user_state_v1`** (MCD phase 2) | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
+| **Active relay chapter** | **none** — MCD engineering **COMPLETE**; operator **SUPPLY_LOW** until steward SELECTION | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |

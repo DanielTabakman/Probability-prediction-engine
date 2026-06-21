@@ -65,8 +65,8 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 | Field | Value |
 |-------|--------|
 | **Gate** | NOT PASSED |
-| **Last reviewed** | 2026-06-20 |
-| **Blockers** | `msos_workflow_persistence_v1` BUILD next; then `msos_strategy_lab_embed_shell_v1` |
+| **Last reviewed** | 2026-06-21 |
+| **Blockers** | MCD **engineering path COMPLETE** (phases 1–3 + embed shell on `main`); awaiting **operator sign-off** (§ Operator sign-off) + [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) friends-first cohort |
 | **After pass** | Steward updates status to **PASSED**; primary focus → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
 
 ---
@@ -84,4 +84,5 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 
 | Date | Change |
 |------|--------|
+| 2026-06-21 | Blockers updated — MCD engineering path COMPLETE; sign-off + production live hookup remain |
 | 2026-06-20 | v1 — MCD criteria, BUILD mapping, precedence vs P8 |
