@@ -35,8 +35,17 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "iframe" in embed
     assert "degraded" in embed.lower() or "Embed pending" in embed
     assert "distribution_display_boundary" in embed
+    assert "isDisplayPayload" in embed
+    assert "prices_usd" in embed
+    assert "pdf_pct" in embed
+    assert "mean_usd" in embed
+    assert "quartiles_usd" in embed
+    assert "ppe-summary-table" in embed
     assert "Live via PPE" in embed
     assert "Chromeless embed" in embed or "Native chart" in embed
+
+    styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+    assert ".ppe-summary-table" in styles
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:
