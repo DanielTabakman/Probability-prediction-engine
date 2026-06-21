@@ -144,7 +144,23 @@ def create_display_payload_wsgi_app(
         if path not in ("/", "/display.json"):
             start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
             return [b"not found"]
-        body = serialize_distribution_display_payload(payload_provider()).encode("utf-8")
+        try:
+            payload = payload_provider()
+        except Exception as exc:  # noqa: BLE001 — surface upstream fetch failures as JSON
+            err = json.dumps(
+                {"kind": "display_error", "error": str(exc)},
+                separators=(",", ":"),
+            ).encode("utf-8")
+            start_response(
+                "503 Service Unavailable",
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(err))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [err]
+        body = serialize_distribution_display_payload(payload).encode("utf-8")
         start_response(
             "200 OK",
             [

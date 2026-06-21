@@ -114,6 +114,30 @@ def test_wsgi_app_rejects_unknown_paths() -> None:
     assert body == b"not found"
 
 
+def test_wsgi_app_upstream_failure_returns_503_json() -> None:
+    def _boom() -> dict:
+        raise RuntimeError("Deribit BTC index unavailable for embed display boundary.")
+
+    app = create_display_payload_wsgi_app(_boom)
+    status: list[str] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+
+    body = b"".join(app({"PATH_INFO": "/display.json"}, start_response))
+    assert status == ["503 Service Unavailable"]
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["kind"] == "display_error"
+    assert "Deribit" in parsed["error"]
+
+
+def test_spot_from_cached_deribit_index_accepts_float(monkeypatch) -> None:
+    from src.viz import embed_only_lab as lab
+
+    monkeypatch.setattr(lab, "cached_deribit_index", lambda: 104_320.5)
+    assert lab._spot_from_cached_deribit_index() == 104_320.5
+
+
 def test_payload_serializes_deterministically() -> None:
     rows = _sample_export_rows()
     payload = build_distribution_display_payload(

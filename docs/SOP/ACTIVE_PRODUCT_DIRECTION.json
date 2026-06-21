@@ -10,7 +10,7 @@
   "activeBuildChapterId": "msos_usable_demo_v1",
   "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
   "activeBuildSprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
-  "nextStewardAction": "RUN_LOCAL: Product-Slice002-003 shipped — DESKTOP_CONTINUE.cmd or run_ppe_local.cmd for witness/closeout; merge PR #272",
+  "nextStewardAction": "DESKTOP_CONTINUE.cmd on desktop (never run_ppe_local); VM pull main + relay witness/closeout for msos_usable_demo_v1",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as primary BUILD blocker",
