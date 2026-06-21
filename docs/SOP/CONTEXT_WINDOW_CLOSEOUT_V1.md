@@ -150,6 +150,7 @@ Sort every open item **exactly one** bucket:
 | **ship_now** | ≤15 min, gates pass, in declared plane | Commit + push in this closeout pass |
 | **operator_next** | Loop / relay / IDE BUILD command | `OPERATOR_STATUS` / `run_ppe_local.cmd` / starter file |
 | **build_backlog** | Chartered product/evidence work, not urgent today | [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (`blocked` default) — see [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) |
+| **triggered_ideas** | Great idea, too early — revisit when a chapter matches | [`TRIGGERED_IDEAS.json`](TRIGGERED_IDEAS.json) — see [`TRIGGERED_IDEAS.md`](TRIGGERED_IDEAS.md) |
 | **human_backlog** | Policy, architecture, tradeoff needs you | [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) — see [`HUMAN_STEWARD_BACKLOG.md`](HUMAN_STEWARD_BACKLOG.md) |
 | **park** | Dirty or ambiguous repo state | Named branch/stash + one-line in `HANDOFF.md` only if steward-visible |
 | **drop** | Explicitly ruled out | One-line reason (no backlog row) |
@@ -159,9 +160,10 @@ Sort every open item **exactly one** bucket:
 ```bat
 python scripts/ppe_context_window_closeout.py add-build --chapter-id my_id --reason "[P2] …" --priority medium
 python scripts/ppe_context_window_closeout.py add-human --title "…" --summary "…" --priority medium --category governance
+python scripts/ppe_context_window_closeout.py add-triggered --title "…" --summary "…" --trigger-chapter msos_wallet_connect_v1 --trigger-keyword "wallet connect"
 ```
 
-After `add-human`, run `python scripts/ppe_human_backlog.py render-md`.
+After `add-human`, run `python scripts/ppe_human_backlog.py render-md`. Triggered ideas auto-render on add/dismiss.
 
 ### 5 — AGENT CONTINUITY block (required)
 

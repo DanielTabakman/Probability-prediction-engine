@@ -90,6 +90,12 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
         reason = str(item.get("reason") or "").strip() or f"queue item {i} READY"
         if focus is not None and focus.urgent_bypass:
             reason = f"{reason} (urgent bypass)"
+        try:
+            from scripts.ppe_triggered_ideas import surface_for_plan
+
+            surface_for_plan(repo_root, plan_path)
+        except FileNotFoundError:
+            pass
         return plan_path, reason
 
     if skipped:
