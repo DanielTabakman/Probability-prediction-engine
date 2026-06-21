@@ -346,6 +346,32 @@ def run_build_worker_cli(
     return run_agent(repo, prompt=prompt, log_path=log_path)
 
 
+def _codex_exec_cmd(exe: str, repo: Path, prompt: str) -> list[str]:
+    """Build `codex exec` argv for unattended operator BUILD."""
+    cmd = [
+        exe,
+        "exec",
+        "-C",
+        str(repo),
+        "-c",
+        'approval_policy="never"',
+    ]
+    bypass_env = os.environ.get("PPE_CODEX_BYPASS_SANDBOX", "").strip().lower()
+    bypass = bypass_env in ("1", "true", "yes", "on")
+    if bypass_env in ("0", "false", "no", "off"):
+        bypass = False
+    elif sys.platform == "win32" and bypass_env == "":
+        # Standalone Windows installs often ship without codex-windows-sandbox-setup.exe;
+        # workspace-write sandbox then fails before any shell command runs.
+        bypass = True
+    if bypass:
+        cmd.append("--dangerously-bypass-approvals-and-sandbox")
+    else:
+        cmd.extend(["-s", "workspace-write"])
+    cmd.append(prompt)
+    return cmd
+
+
 def run_codex(repo: Path, *, prompt: str, log_path: Path) -> dict[str, Any]:
     repo = repo.resolve()
     exe = resolve_codex_cli()
@@ -354,17 +380,7 @@ def run_codex(repo: Path, *, prompt: str, log_path: Path) -> dict[str, Any]:
     if not codex_authenticated():
         return {"ok": False, "mode": "codex-cli", "reason": "codex not authenticated (codex login)"}
 
-    cmd = [
-        exe,
-        "exec",
-        "-C",
-        str(repo),
-        "-s",
-        "workspace-write",
-        "-a",
-        "never",
-        prompt,
-    ]
+    cmd = _codex_exec_cmd(exe, repo, prompt)
     with log_path.open("a", encoding="utf-8") as log:
         log.write(f"\n--- codex cli start {_utc_now()} ---\n")
         proc = subprocess.run(
