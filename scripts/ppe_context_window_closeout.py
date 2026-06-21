@@ -517,6 +517,31 @@ def add_build_backlog_item(
     return path
 
 
+def add_triggered_idea_item(
+    repo: Path,
+    *,
+    title: str,
+    summary: str,
+    priority: str = "low",
+    idea_id: str = "",
+    trigger_chapters: list[str] | None = None,
+    trigger_keywords: list[str] | None = None,
+    not_for: list[str] | None = None,
+) -> Path:
+    from scripts.ppe_triggered_ideas import add_item
+
+    return add_item(
+        repo,
+        title=title,
+        summary=summary,
+        idea_id=idea_id,
+        priority=priority,
+        trigger_chapters=trigger_chapters,
+        trigger_keywords=trigger_keywords,
+        not_for=not_for,
+    )
+
+
 def add_human_backlog_item(
     repo: Path,
     *,
@@ -590,6 +615,15 @@ def main(argv: list[str] | None = None) -> int:
     ah.add_argument("--category", default="governance")
     ah.add_argument("--policy-question", default="")
 
+    at = sub.add_parser("add-triggered", help="Park idea in TRIGGERED_IDEAS.json (revisit when chapter matches)")
+    at.add_argument("--title", required=True)
+    at.add_argument("--summary", required=True)
+    at.add_argument("--id", default="")
+    at.add_argument("--priority", default="low", choices=["high", "medium", "low"])
+    at.add_argument("--trigger-chapter", action="append", default=[], dest="trigger_chapters")
+    at.add_argument("--trigger-keyword", action="append", default=[], dest="trigger_keywords")
+    at.add_argument("--not-for", action="append", default=[], dest="not_for")
+
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -613,6 +647,19 @@ def main(argv: list[str] | None = None) -> int:
             policy_question=args.policy_question,
         )
         print(f"ppe_context_window_closeout: appended human backlog -> {path.relative_to(repo)}")
+        return 0
+    if args.cmd == "add-triggered":
+        path = add_triggered_idea_item(
+            repo,
+            title=args.title,
+            summary=args.summary,
+            priority=args.priority,
+            idea_id=args.id,
+            trigger_chapters=args.trigger_chapters,
+            trigger_keywords=args.trigger_keywords,
+            not_for=args.not_for,
+        )
+        print(f"ppe_context_window_closeout: appended triggered idea -> {path.relative_to(repo)}")
         return 0
 
     snapshot = collect_snapshot(repo)

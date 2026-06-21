@@ -93,6 +93,7 @@ Do not set `done` / `chartered` by hand.
 ## Related
 
 - [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
+- [`TRIGGERED_IDEAS.md`](TRIGGERED_IDEAS.md) — park ideas until a chapter trigger fires (`triggered_ideas.cmd`)
 - [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)
 - [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)
 - [`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)
