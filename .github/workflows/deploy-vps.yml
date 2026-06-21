@@ -94,3 +94,31 @@ jobs:
             exit 1
           fi
           echo 'session.html health check passed'
+
+      - name: Checkout (production witnesses)
+        if: success()
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: success()
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Production PPE integration witness
+        if: success()
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -m playwright install chromium
+          python scripts/msos_production_demo_witness.py --write artifacts/health/msos_production_demo_witness.json
+          python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
+
+      - name: Upload production witness artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msos-production-witness
+          path: artifacts/health/
+          if-no-files-found: error

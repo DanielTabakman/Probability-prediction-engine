@@ -105,7 +105,8 @@ Closeout
 | `ppe_autobuilder.cmd reconcile` | Same reconcile (pipeline SRE entry) |
 | `ppe_autobuilder.cmd status --write` | Lightweight runtime refresh only |
 | `ppe_vps_ssh.cmd deploy` | VPS: `git pull` + `docker compose up -d --build` (needs `ppe_operator_ssh.local.cmd`) |
-| `msos_production_demo_witness.cmd` | HTTP witness against production URLs |
+| `msos_production_demo_witness.cmd` | HTTP witness against production URLs (routes + PPE display API + embed surface) |
+| `msos_production_playwright_witness.cmd` | Headless browser witness — screenshots + Confirm thesis click on production |
 
 **Production live hookup charter:** [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) — usable demo gap (relay DONE ≠ production walkable). SSH keys stay in gitignored `ppe_operator_ssh.local.cmd`; never paste keys in chat.
 
