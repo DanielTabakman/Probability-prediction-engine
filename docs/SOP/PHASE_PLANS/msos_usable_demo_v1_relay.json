@@ -25,9 +25,10 @@
       "hardMinutes": 300,
       "maxAttempts": 2,
       "touchSet": [
-        "src/viz/",
-        "tests/test_implied_lab_",
-        "tests/test_mvp1_"
+        "src/viz/embed_display_boundary.py",
+        "src/viz/display_payload_server.py",
+        "src/viz/embed_only_lab.py",
+        "tests/test_implied_lab_embed_display_boundary.py"
       ]
     },
     {
