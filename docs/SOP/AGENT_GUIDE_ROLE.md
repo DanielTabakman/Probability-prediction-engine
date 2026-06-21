@@ -29,7 +29,7 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 ## When `gaps` is empty
 
 - Next action comes from **Next SELECTION** doc in the brief (steward queue).
-- BUILD agent runs slices via `run_ppe.cmd` (full phase), `run_phase.cmd`, or `run_slice.cmd` with phase plan path.
+- BUILD agent runs slices on the **VM loop host** via `run_ppe.cmd` / `run_phase.cmd` / `run_slice.cmd`. On the **daily desktop**, product BUILD only — relay continue via `DESKTOP_CONTINUE.cmd` ([`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)).
 
 ## Cursor context (guide agent)
 
