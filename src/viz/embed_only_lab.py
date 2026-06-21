@@ -63,11 +63,24 @@ def json_payload_requested() -> bool:
     return _query_flag(EMBED_JSON_QUERY_PARAM, EMBED_JSON_QUERY_VALUE)
 
 
+def _spot_from_cached_deribit_index() -> float:
+    """``cached_deribit_index`` returns ``float | None`` (not a ticker dict)."""
+    index = cached_deribit_index()
+    if index is None:
+        return 0.0
+    if isinstance(index, (int, float)):
+        return float(index)
+    if isinstance(index, dict):
+        raw = index.get("index") or index.get("price") or index.get("index_price")
+        if raw is not None:
+            return float(raw)
+    return 0.0
+
+
 def _load_export_rows() -> tuple[str, float, list[dict[str, str]]]:
     import pandas as pd
 
-    index = cached_deribit_index() or {}
-    spot = float(index.get("index") or index.get("price") or 0.0)
+    spot = _spot_from_cached_deribit_index()
     if spot <= 0:
         raise RuntimeError("Deribit BTC index unavailable for embed display boundary.")
     expiries, _diag = cached_option_expiries(10)
