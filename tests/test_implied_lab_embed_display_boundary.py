@@ -8,7 +8,9 @@ from src.viz.distribution_export import build_distribution_export_rows
 from src.viz.embed_display_boundary import (
     DISPLAY_PAYLOAD_HTTP_PATH,
     DISPLAY_PAYLOAD_KIND,
+    DISPLAY_PAYLOAD_MODE,
     DISPLAY_PAYLOAD_SCHEMA_VERSION,
+    EMBED_ONLY_FALLBACK_MODE,
     build_distribution_display_payload,
     build_chart_series_from_export_row,
     create_display_payload_wsgi_app,
@@ -48,6 +50,9 @@ def test_display_payload_schema_and_summary() -> None:
     assert payload["anchor_id"] == DIST_SUMMARY_ANCHOR_ID
     assert payload["summary"]["row_count"] == 2
     assert payload["meta"]["http_path"] == DISPLAY_PAYLOAD_HTTP_PATH
+    assert payload["meta"]["display_mode"] == DISPLAY_PAYLOAD_MODE
+    assert payload["meta"]["fallback_mode"] == EMBED_ONLY_FALLBACK_MODE
+    assert payload["meta"]["embed_json_query"] == "?embed_only=1&format=json"
     assert len(payload["series_by_expiry"]) == 1
 
 
@@ -87,6 +92,23 @@ def test_wsgi_app_serves_json() -> None:
     assert any(h == ("Content-Type", "application/json; charset=utf-8") for h in headers)
     parsed = json.loads(body.decode("utf-8"))
     assert parsed["kind"] == DISPLAY_PAYLOAD_KIND
+    assert any(h == ("Cache-Control", "no-store") for h in headers)
+
+
+def test_wsgi_app_rejects_unknown_paths() -> None:
+    app = create_display_payload_wsgi_app(lambda: {})
+
+    status: list[str] = []
+    headers: list[tuple[str, str]] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+        headers.extend(hdrs)
+
+    body = b"".join(app({"PATH_INFO": "/full-app"}, start_response))
+    assert status == ["404 Not Found"]
+    assert any(h == ("Content-Type", "text/plain; charset=utf-8") for h in headers)
+    assert body == b"not found"
 
 
 def test_payload_serializes_deterministically() -> None:
