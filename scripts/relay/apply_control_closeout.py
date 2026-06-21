@@ -317,7 +317,9 @@ def build_continuity_brief_md(
 
 ## Active BUILD
 
-**none** — await steward SELECTION.
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
+_(run sync_product_direction.cmd — populated from ACTIVE_PRODUCT_DIRECTION.json)_
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ## Steering alignment
 
@@ -423,6 +425,16 @@ def apply_control_closeout(
         "generated_at": _iso_now(),
     }
     (report_dir / "closeout_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    try:
+        from scripts.active_product_direction import sync_product_direction
+
+        sync_report = sync_product_direction(repo)
+        report["product_direction_sync"] = sync_report
+        (report_dir / "closeout_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        print(f"apply_control_closeout: direction sync {sync_report.get('pivotId')}")
+    except Exception as exc:
+        print(f"apply_control_closeout: direction sync skipped: {exc}")
 
     return report
 

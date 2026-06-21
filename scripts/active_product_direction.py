@@ -276,3 +276,21 @@ def propagate(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
     results["updated"].append(whats_next_path)
 
     return results
+
+
+def sync_product_direction(repo: Path) -> dict[str, Any]:
+    """Propagate ACTIVE_PRODUCT_DIRECTION.json to all marker targets (non-dry-run)."""
+    return propagate(repo, dry_run=False)
+
+
+def markers_need_sync(repo: Path) -> bool:
+    """True when any propagation target still has placeholder marker content."""
+    placeholder = "_(run `sync_product_direction.cmd`"
+    direction = load_direction(repo)
+    for rel, _ in [
+        ("docs/SOP/MSOS_FRONTIER.md", render_frontier_block(direction)),
+    ]:
+        path = repo / rel
+        if path.is_file() and placeholder in path.read_text(encoding="utf-8"):
+            return True
+    return False

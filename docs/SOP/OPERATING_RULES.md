@@ -2,6 +2,15 @@
 
 Purpose: lightweight rules for how work gets done in this repo.
 
+## Product direction (agent-owned — hard)
+
+**SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · **Runbook:** [`PRODUCT_DIRECTION_PIVOT_V1.md`](PRODUCT_DIRECTION_PIVOT_V1.md)
+
+- **Operator does not** edit marker blocks or run sync — **agents/stewards do**.
+- When product focus changes: edit JSON (bump `pivotId`) → `sync_product_direction.cmd` → queue if needed → gate+commit.
+- `sync_product_direction.cmd` runs automatically after chapter closeout (`post_relay_continue`); agents run it on context closeout and when steering drift is detected.
+- Propagated sections live between `<!-- ACTIVE_PRODUCT_DIRECTION:START -->` … `END` in frontier, integrated status, playbook, gates — **never hand-edit**; sync from JSON.
+
 ## Default workflow
 1. Read the active feature slice doc (`docs/SOP/SPRINT_00X.md`), `HANDOFF.md`, and directly relevant code/docs.
 2. Write a short pre-edit plan (still required; keep it proportional to scope).

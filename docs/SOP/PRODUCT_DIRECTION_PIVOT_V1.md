@@ -4,6 +4,10 @@
 
 **Single source of truth (SSOT):** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json)
 
+**Who runs this:** **Agents and stewards only.** The operator states intent in plain language; agents edit JSON, sync, queue, and commit. The operator does **not** need to remember sync steps.
+
+**Agent rule:** [`.cursor/rules/product-direction.mdc`](../../.cursor/rules/product-direction.mdc) (always applied).
+
 ---
 
 ## When to pivot
@@ -14,7 +18,11 @@
 
 ---
 
-## How to pivot (5 steps)
+## How to pivot (agent ritual)
+
+### 0. Operator says what changed (plain language)
+
+Example: *"Drop friends-first; beeline to usable demo with PPE in the shell."*
 
 ### 1. Edit the JSON SSOT
 
@@ -31,7 +39,7 @@ Open [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) and update
 | `deprecatedApproaches` | List what agents must **stop** steering by |
 | `nextStewardAction` | One line for operators |
 
-### 2. Propagate to steering docs
+### 2. Propagate (automatic after closeout; agent runs on pivot)
 
 From repo root:
 
@@ -39,11 +47,9 @@ From repo root:
 sync_product_direction.cmd
 ```
 
-Or:
+**Automatic:** `post_relay_continue` / `apply_control_closeout_v1` calls sync after every chapter closeout.
 
-```bash
-python scripts/sync_active_product_direction.py
-```
+**Manual (agent):** direction pivot, context window closeout, or detected marker drift.
 
 This rewrites `<!-- ACTIVE_PRODUCT_DIRECTION:START -->` … `END` blocks in:
 

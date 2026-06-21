@@ -41,7 +41,9 @@ def test_replace_marked_block_on_frontier() -> None:
     assert "msos_usable_demo_v1" in updated
 
 
-def test_direction_json_valid() -> None:
-    raw = json.loads((REPO / DIRECTION_REL).read_text(encoding="utf-8"))
-    assert raw.get("version") == 1
-    assert isinstance(raw.get("deprecatedApproaches"), list)
+def test_sync_product_direction_alias() -> None:
+    from scripts.active_product_direction import load_direction, sync_product_direction
+
+    report = sync_product_direction(REPO)
+    assert report.get("pivotId") == load_direction(REPO).pivot_id
+    assert "docs/SOP/MSOS_FRONTIER.md" in (report.get("updated") or [])
