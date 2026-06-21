@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- MSOS-MCDWitV1-Closeout-Slice003: chapter closeout steering sync (control-plane) (#271) (`docs/SOP/`)
+- `bfdf997` — test(control-plane): allow msos_mcd_production_witness_v1 in charter allowlists (#270)
+- `901584b` — Control-plane: dev changelog
 - **Chapter closed:** MSOS MCD production witness v1 (`MSOS-MCDWitV1-Closeout-Slice003`)
 - `45a4f32` — SELECTION: msos_mcd_production_witness_v1 — MCD PASSED + production sign-off (control-plane) (#269) (`docs/SOP/`)
 - `34c34cc` — Control-plane: dev changelog
