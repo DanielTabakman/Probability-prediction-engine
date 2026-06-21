@@ -140,4 +140,5 @@ When steward approves this charter:
 
 | Date | Change |
 |------|--------|
+| 2026-06-21 | Track A+C signed off via production witness; human backlog `msos_production_live_hookup` done; relay chapter `msos_mcd_production_witness_v1` queued |
 | 2026-06-19 | v1 — charter for production live hookup vs relay-DONE drift |

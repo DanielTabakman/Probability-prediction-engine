@@ -4,7 +4,7 @@
 
 **Strategic context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md)
 
-**Status:** **NOT PASSED** (as-of 2026-06-20) — steward marks **PASSED** in § Status when all required criteria are witness-verified.
+**Status:** **PASSED** (as-of 2026-06-21) — steward sign-off after production witness + MCD criteria matrix in [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md).
 
 ---
 
@@ -64,10 +64,11 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 
 | Field | Value |
 |-------|--------|
-| **Gate** | NOT PASSED |
-| **Last reviewed** | 2026-06-21 |
-| **Blockers** | MCD **engineering path COMPLETE** (phases 1–3 + embed shell on `main`); awaiting **operator sign-off** (§ Operator sign-off) + [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) friends-first cohort |
-| **After pass** | Steward updates status to **PASSED**; primary focus → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| **Gate** | **PASSED** |
+| **Signed off** | 2026-06-21 |
+| **Evidence** | [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md) |
+| **Blockers** | None — production live hookup Track A+C witness PASS; Track B (apex Access) deferred until friends-first cohort needs scoped CC/monitor |
+| **After pass** | Primary focus → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
 
 ---
 
@@ -84,5 +85,6 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 
 | Date | Change |
 |------|--------|
+| 2026-06-21 | **PASSED** — production witness + MCD criteria matrix; relay closeout chapter `msos_mcd_production_witness_v1` |
 | 2026-06-21 | Blockers updated — MCD engineering path COMPLETE; sign-off + production live hookup remain |
 | 2026-06-20 | v1 — MCD criteria, BUILD mapping, precedence vs P8 |
