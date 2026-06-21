@@ -1,6 +1,6 @@
 # Product focus playbook v1
 
-**Purpose:** Keep MSOS + PPE aligned on **Minimum Credible Demo** and **workflow research** before platform expansion. Use for steward SELECTION, scope fights, and “are we drifting?” checks.
+**Purpose:** Keep MSOS + PPE aligned on **usable demo BUILD** (MSOS shell + PPE integration) before platform expansion. Use for steward SELECTION, scope fights, and “are we drifting?” checks. **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json).
 
 **As-of:** 2026-06-20 · **Review cadence:** monthly steward pass · **Hard gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)
 
@@ -10,7 +10,8 @@
 |-----|------|
 | [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) | Strategic umbrella — ownership, integration, scope |
 | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | MCD pass/fail criteria |
-| [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Post-MCD workflow research ops |
+| [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) | **Direction SSOT** — pivot + propagation |
+| [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Optional workflow signal logging (not BUILD gate) |
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`PRODUCT_THESIS.md`](../PRODUCT_THESIS.md) | Product north star (belief ↔ payoff lab) |
 | [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | MSOS waterfall P0–P8 |
@@ -29,9 +30,9 @@
 | Should we add scope / new asset / execution? | **Backplane charter** + this playbook + non-widening rule in PPE Master |
 | Is the product ready for workflow research? | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
 | How to run trader contact? | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
-| What do we build after MCD? | Validation evidence + workflow research signal — [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) as rollup, not scope authority |
+| What do we build after MCD? | **Usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) — then expansion when SELECTION'd |
 
-**Scope precedence:** `BACKPLANE → MCD gate → TRADER_WORKFLOW_RESEARCH → FRONTIER (BUILD order) → LIVE_PRODUCT_SEQUENCE (post-MCD deferred)`.
+**Scope precedence:** `BACKPLANE → ACTIVE_PRODUCT_DIRECTION → MCD gate → FRONTIER (BUILD order) → LIVE_PRODUCT_SEQUENCE (post-demo deferred)`.
 
 When this playbook and a FRONTIER disagree on **BUILD order**, FRONTIER wins for automation. When they disagree on **whether to widen scope**, backplane + MCD gate win.
 
@@ -58,14 +59,16 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 
 ## Current stage (honest)
 
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Signal | Status |
 |--------|--------|
-| PPE implied lab (MVP1) | **Shipped** — belief, disagreement, freeze/review, dist stats legibility |
-| MSOS shell | **P2–P5 complete**; **P6** in flight; **P7–P8** pre-chartered |
-| Paid interest | **N** — [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
-| VPS / research beta URL | **Pending** — steward parallel ([`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md)) |
+| Storyboard v0.6 (design) | **COMPLETE** — implementation BUILD in flight |
+| MSOS shell routes | **Partial** — storyboard screens chartered; integration hardening active |
+| PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
+| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-build-v1` |
 
-**Risk:** Engineering maturity (relay, witnesses, MSOS chapters) can run **ahead of** market pull. This playbook biases **validation over new surface area** until P8.
+**Risk:** Premature "chapter COMPLETE" labels while demo is not walkable. Trust **evidence witness checkboxes** and operator demo script, not backlog status alone.
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---
 
@@ -75,9 +78,9 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 
 | Priority | Focus | Why |
 |----------|--------|-----|
-| **P0 — Minimum Credible Demo** | Phases 1→3 + embed shell per [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | Platform-shaped shell + integrated PPE before expansion |
-| **P1 — Trader workflow research** | Guided sessions; signal-ranked logging per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | High-signal workflow learning, not category validation |
-| **P2 — Lab legibility only** | MVP1 slices that improve 15-second comprehension or disagreement clarity | Phase vision; no new math domains |
+| **P0 — Usable demo BUILD** | MSOS shell + PPE integration per storyboard — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](SPRINT_MSOS_USABLE_DEMO_V1.md) | Walkable production demo is the product milestone |
+| **P1 — MCD criteria hardening** | Embed shell, live paths, save/review visibility per [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | Engineering foundation for demo |
+| **P2 — Workflow signal (optional)** | Log sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) when demo is walkable | Learning channel — not scope authority |
 | **P3 — Distribution** | Dist demo, public URL, fintwit / newsletter partners | Peers spent founder time on distribution comparable to eng |
 | **P4 — Monetization signal** | Manual paid pilot / research beta (no billing automation) | **Post-MCD** — SpotGamma subscription before “platform” |
 | **Defer** | Execution, Hyperliquid, multi-asset, Polymarket arb, AI assistant, paywall automation, phases 4a–7b | Backplane non-goals unless SELECTION'd |

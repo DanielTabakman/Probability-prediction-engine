@@ -29,9 +29,9 @@ On full app: run [MVP1_OPERATOR_RITUAL.md](MVP1_OPERATOR_RITUAL.md) once live in
 
 Manual research brief only — do not expand MVP1 BTC scope. Note whether customer values thesis-to-options translation.
 
-## §15F friends-first spot-check (optional)
+## §15F demo spot-check (optional)
 
-After friends-first / belief-input UX on demo: 5–10 min with 1–2 smart non-experts. Copy a row when done.
+After usable-demo UX on production: 5–10 min with 1–2 testers. Copy a row when done.
 
 | Date | Tester profile | Understood “what this run is saying” without Verification? | Trust strip noticed? | Would open again? | Notes |
 |------|----------------|--------------------------------------------------------------|----------------------|---------------------|-------|
@@ -39,7 +39,7 @@ After friends-first / belief-input UX on demo: 5–10 min with 1–2 smart non-e
 
 Use [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) timing; rubric detail in [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) §15F.
 
-## MSOS P8 friends-first tester metrics (template)
+## MSOS P8 tester metrics (template)
 
 Log after guided MSOS web sessions (`/learn` learn loop). Do **not** auto-widen scope from fixture UI alone.
 
@@ -47,7 +47,7 @@ Log after guided MSOS web sessions (`/learn` learn loop). Do **not** auto-widen 
 |------|----------------|------------------------|----------------------|---------------------------|------------------------------|-------|
 | _fill_ | _e.g. research contact_ | Y/N | Y/N | Y/N | Y/N | Link session notes |
 
-**Next queue recommendation (P8 closeout):** friends-first validation before paywall or live execution SELECTION.
+**Next queue recommendation (P8 closeout):** optional validation logging before paywall or live execution SELECTION.
 
 **Validation rollup:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md) — interim **COMPLETE** 2026-06-13 (0 guided sessions; PMF targets pending).
 

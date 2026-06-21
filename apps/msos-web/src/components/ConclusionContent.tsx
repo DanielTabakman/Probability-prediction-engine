@@ -19,7 +19,7 @@ export function ConclusionContent() {
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Friends-first preview
+            Usable demo preview
           </span>
           <Link href="/command-center" className="btn slim">
             Command Center

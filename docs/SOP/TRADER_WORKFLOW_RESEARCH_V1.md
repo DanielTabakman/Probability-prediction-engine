@@ -1,6 +1,12 @@
 # Trader workflow research v1
 
-**Purpose:** Operational guide for **workflow research and design ingestion** after (or in parallel with late) Minimum Credible Demo work — not generic fintech category validation.
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
+> **Status (pivot `usable-demo-build-v1`):** **Side channel — not primary BUILD gate.**  
+> Run sessions **after** or **in parallel with** usable demo BUILD; log signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).  
+> Scope authority: [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
+
+**Purpose:** Operational guide for **workflow research and design ingestion** — optional signal logging while usable demo BUILD is in flight. **Not** a BUILD gate and **not** friends-first cohort gating.
 
 **Prerequisite gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) (primary focus shifts here when gate **PASSED**; light conversations allowed earlier per [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md))
 

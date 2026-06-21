@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "pivotId": "usable-demo-build-v1",
+  "asOf": "2026-06-21",
+  "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
+  "primaryFocus": "BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6",
+  "currentStage": "build_integration",
+  "designComplete": true,
+  "storyboardRef": "docs/VISION/MSOS/storyboard-v0.6/prototype/html/",
+  "activeBuildChapterId": "msos_usable_demo_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+  "nextStewardAction": "SELECTION queued msos_usable_demo_v1 — run run_ppe.cmd or IDE BUILD from starter",
+  "deprecatedApproaches": [
+    "friends-first / friends-and-family cohort gating before demo ships",
+    "trader workflow research as primary BUILD blocker",
+    "validation-before-build for MSOS shell integration"
+  ],
+  "sideChannels": [
+    {
+      "id": "trader_workflow_research",
+      "doc": "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
+      "role": "optional signal logging while demo is built — not scope authority"
+    },
+    {
+      "id": "validation_log",
+      "doc": "docs/SOP/VALIDATION_REALITY_CHECKS.md",
+      "role": "session notes when testers use the demo — not a gate"
+    }
+  ],
+  "buildTrack": {
+    "label": "Usable demo integration",
+    "outcome": "One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review",
+    "chapters": [
+      "msos_production_wiring_v1",
+      "msos_user_state_v1",
+      "msos_workflow_persistence_v1",
+      "msos_strategy_lab_embed_shell_v1",
+      "msos_usable_demo_v1"
+    ]
+  },
+  "supersedes": {
+    "postMcdResearchFirst": "2026-06-21 pivot — BUILD usable demo is primary; research runs in parallel when demo is walkable"
+  },
+  "propagationTargets": [
+    "docs/SOP/MSOS_FRONTIER.md",
+    "docs/SOP/PPE_INTEGRATED_STATUS.md",
+    "docs/SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md",
+    "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md",
+    "docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md",
+    "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
+    "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
+    "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
+    "artifacts/control_plane/WHATS_NEXT.md"
+  ]
+}

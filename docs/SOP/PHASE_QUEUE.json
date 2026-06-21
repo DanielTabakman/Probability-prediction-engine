@@ -252,7 +252,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] MCD operator witness + production sign-off",
+      "reason": "[HIGH] MCD operator witness + production sign-off \u2014 COMPLETE 2026-06-21",
       "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
@@ -262,6 +262,12 @@
       "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "doneReason": "deferred by operator 2026-06-19 \u2014 not BUILD; see HUMAN_STEWARD_BACKLOG stripe_operator_prereq"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+      "status": "READY",
+      "reason": "[P0] Usable demo BUILD \u2014 MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
+      "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
     }
   ]
 }

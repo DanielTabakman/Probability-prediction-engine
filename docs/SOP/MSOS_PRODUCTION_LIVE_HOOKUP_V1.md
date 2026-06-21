@@ -20,7 +20,7 @@ The MSOS relay queue drained phases 1–6 (and 7a) as **BUILD-complete**, but pr
 | Stale deploy | VPS image behind `main` → old fixture strings on monitor pages |
 | Sign-in only on `app.*` | Full PPE snapshots live on `app.marketstructureos.com`; apex MSOS shell is public |
 
-**Goal:** A **friends-first cohort** can sign in, save a thesis, freeze in PPE, and see **their** data on Command Center / Monitor / History — with honest labels where data is still preview-only.
+**Goal:** An operator or visitor can sign in, walk the MSOS storyboard journey, use Strategy Lab with **PPE inside the shell**, save a thesis, and see honest labels where data is still preview-only — **no friends-first cohort gate**.
 
 ---
 
@@ -88,7 +88,7 @@ Per [`SPRINT_MSOS_ACCESS_IDENTITY_V1.md`](SPRINT_MSOS_ACCESS_IDENTITY_V1.md):
 3. Homepage `/` may stay **public** (no fake logged-in state).
 4. Confirm `msos_web` receives `CF-Access-Authenticated-User-Email` (see `msosIdentity.ts`).
 
-**Policy question (steward):** Friends-first demo — protect **product routes only** (recommended) vs protect entire apex?
+**Policy question (steward):** Early demo — protect **product routes only** (recommended) vs protect entire apex?
 
 ### Track C — Tester journey (evidence)
 

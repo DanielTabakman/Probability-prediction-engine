@@ -107,7 +107,7 @@ Closeout
 | `ppe_vps_ssh.cmd deploy` | VPS: `git pull` + `docker compose up -d --build` (needs `ppe_operator_ssh.local.cmd`) |
 | `msos_production_demo_witness.cmd` | HTTP witness against production URLs |
 
-**Production live hookup charter:** [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) — friends-first demo gap (relay DONE ≠ production usable). SSH keys stay in gitignored `ppe_operator_ssh.local.cmd`; never paste keys in chat.
+**Production live hookup charter:** [`MSOS_PRODUCTION_LIVE_HOOKUP_V1.md`](MSOS_PRODUCTION_LIVE_HOOKUP_V1.md) — usable demo gap (relay DONE ≠ production walkable). SSH keys stay in gitignored `ppe_operator_ssh.local.cmd`; never paste keys in chat.
 
 ---
 

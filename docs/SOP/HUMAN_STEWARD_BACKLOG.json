@@ -94,12 +94,12 @@
     },
     {
       "id": "msos_production_live_hookup",
-      "title": "MSOS production live hookup (friends-first demo)",
+      "title": "MSOS production live hookup (usable demo)",
       "status": "done",
       "priority": "high",
       "category": "operator",
       "summary": "Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.",
-      "policyQuestion": "Protect apex product routes only (recommended) or entire marketstructureos.com for friends-first cohort?",
+      "policyQuestion": "Protect apex product routes only (recommended) or entire marketstructureos.com for early demo cohort?",
       "added": "2026-06-19",
       "closed": "2026-06-21",
       "notes": "Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md."

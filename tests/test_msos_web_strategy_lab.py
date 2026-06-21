@@ -177,7 +177,7 @@ def test_conclusion_learn_loop_route() -> None:
 
     panel = (MSOS_WEB / "src" / "components" / "ConclusionContent.tsx").read_text(encoding="utf-8")
     assert "testerMetricsTemplate" in panel
-    assert "Friends-first preview" in panel
+    assert "Usable demo preview" in panel
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/learn"' in nav

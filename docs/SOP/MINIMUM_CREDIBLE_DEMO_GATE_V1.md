@@ -1,6 +1,6 @@
 # Minimum Credible Demo gate v1
 
-**Purpose:** Operational pass/fail checklist for the **Minimum Credible Demo (MCD)** — the product milestone before broad platform or commercial expansion. Passing shifts primary focus to [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md).
+**Purpose:** Operational pass/fail checklist for the **Minimum Credible Demo (MCD)** — the product milestone before broad platform or commercial expansion. Passing shifts primary focus to **usable demo BUILD** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json).
 
 **Strategic context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md)
 
@@ -67,8 +67,16 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 | **Gate** | **PASSED** |
 | **Signed off** | 2026-06-21 |
 | **Evidence** | [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md) |
-| **Blockers** | None — production live hookup Track A+C witness PASS; Track B (apex Access) deferred until friends-first cohort needs scoped CC/monitor |
-| **After pass** | Primary focus → [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| **Blockers** | None — production live hookup Track A+C witness PASS; Track B (apex Access) deferred until multi-user expansion SELECTION'd |
+| **After pass** | See synced block below — [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) |
+
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
+| Field | Value |
+|-------|--------|
+| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `usable-demo-build-v1` |
+| **Not a blocker** | Trader workflow research — optional parallel signal logging |
+| **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + active relay plan |
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---
 

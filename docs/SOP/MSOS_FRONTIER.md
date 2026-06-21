@@ -2,12 +2,30 @@
 
 Purpose: live steering document for the **MSOS Website Program** (platform UI / customer-facing shell).
 
-### Active strategic frame (2026-06-20)
+### Active strategic frame
+
+<!-- ACTIVE_PRODUCT_DIRECTION:START -->
+**Direction pivot:** `usable-demo-build-v1` · **as-of:** 2026-06-21
+
+- **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
+- **Primary focus:** BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
+- **Stage:** build_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/)); **BUILD** integration is active
+- **Active BUILD chapter:** `msos_usable_demo_v1` · plan [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
+- **Next steward action:** SELECTION queued msos_usable_demo_v1 — run run_ppe.cmd or IDE BUILD from starter
+
+**Retired (do not steer BUILD by these):**
+- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-build-v1`
+- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `usable-demo-build-v1`
+- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `usable-demo-build-v1`
+
+**Side channels (optional, not gates):**
+- **TRADER_WORKFLOW_RESEARCH_V1** ([`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)) — optional signal logging while demo is built — not scope authority
+- **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session notes when testers use the demo — not a gate
+<!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).
-- **Active BUILD focus:** **Trader workflow research** — [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) after MCD **PASSED** 2026-06-21.
-- **After MCD passes:** primary focus → [**Trader Workflow Research**](TRADER_WORKFLOW_RESEARCH_V1.md).
-- **Do not expand** platform scope (identity, entitlements, Stripe, multi-asset) before MCD unless **explicitly SELECTION'd**.
+- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · pivot runbook [`PRODUCT_DIRECTION_PIVOT_V1.md`](PRODUCT_DIRECTION_PIVOT_V1.md)
+- **Do not expand** platform scope (identity, entitlements, Stripe, multi-asset) until usable demo is walkable unless **explicitly SELECTION'd**.
 - **Canon:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md)
 
 ### Control rule (hard)
@@ -21,13 +39,12 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — MCD witness **COMPLETE** 2026-06-21; primary focus **Trader Workflow Research**
+- **Active BUILD chapter:** `msos_usable_demo_v1` — storyboard BUILD + PPE integration ([`SPRINT_MSOS_USABLE_DEMO_V1.md`](SPRINT_MSOS_USABLE_DEMO_V1.md))
 - **Last closed:** **MSOS MCD production witness v1** — 2026-06-21
-- **Next steward action:** Run friends-first sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md); log rows in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md)
-- **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21
-- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-MCD unless SELECTION'd**
-- **Queued pipeline (MCD):** `production_wiring` ✓ → `user_state` ✓ → `workflow` ✓ → `embed_shell` ✓
-- **Queued pipeline (post-MCD, deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe`
+- **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21 (criteria met; demo hardening continues under usable-demo chapter)
+- **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-demo unless SELECTION'd**
+- **Foundation shipped:** `production_wiring` ✓ → `user_state` ✓ → `workflow` ✓ → `embed_shell` ✓ (engineering); **walkable demo** = active BUILD
+- **Expansion pipeline (deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe`
 
 ### Live product sequence — phases 4–7 (chartered, post-MCD deferred)
 
