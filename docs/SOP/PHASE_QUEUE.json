@@ -251,9 +251,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] MCD operator witness + production sign-off",
-      "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",

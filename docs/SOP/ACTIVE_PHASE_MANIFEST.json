@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] MCD operator witness + production sign-off",
+  "phasePlanPath": "",
+  "sprintSpecPath": "",
+  "selectionRecord": "",
+  "status": "COMPLETE",
+  "notes": "MSOS-MCDWitV1-Closeout-Slice003; MCD witness chapter COMPLETE 2026-06-21",
   "workerMode": "deterministic"
 }

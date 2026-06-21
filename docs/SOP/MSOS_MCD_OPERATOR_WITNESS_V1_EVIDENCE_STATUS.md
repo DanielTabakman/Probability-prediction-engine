@@ -2,13 +2,13 @@
 
 **Chapter:** `msos_mcd_production_witness_v1`  
 **Purpose:** Witness-verify [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) criteria on production after embed shell + MCD engineering path COMPLETE.  
-**As-of:** 2026-06-21
+**Status:** **COMPLETE** 2026-06-21
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-MCDWitV1-Control-Slice001 | PENDING | Charter + queue align |
-| MSOS-MCDWitV1-Witness-Slice002 | PENDING | Production HTTP witness + MCD criteria matrix |
-| MSOS-MCDWitV1-Closeout-Slice003 | PENDING | MCD gate PASSED + production live hookup sign-off |
+| MSOS-MCDWitV1-Control-Slice001 | **CLOSED** | Charter + queue align |
+| MSOS-MCDWitV1-Witness-Slice002 | **CLOSED** | Production HTTP witness + MCD criteria matrix |
+| MSOS-MCDWitV1-Closeout-Slice003 | **CLOSED** | MCD gate PASSED + production live hookup sign-off |
 
 ## MCD criteria matrix (production witness 2026-06-21)
 

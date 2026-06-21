@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- **Chapter closed:** MSOS MCD production witness v1 (`MSOS-MCDWitV1-Closeout-Slice003`)
 - `45a4f32` — SELECTION: msos_mcd_production_witness_v1 — MCD PASSED + production sign-off (control-plane) (#269) (`docs/SOP/`)
 - `34c34cc` — Control-plane: dev changelog
 - `fa43a66` — steering: MCD engineering complete — operator idle until sign-off (#268) (`docs/SOP/`)

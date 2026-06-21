@@ -21,8 +21,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Current execution focus (MSOS framing)
 
 - **Integrated status:** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **`msos_mcd_production_witness_v1`** — MCD operator witness + production sign-off (relay)
-- **Last closed:** **MSOS Strategy Lab embed shell v1** — 2026-06-21
+- **Active BUILD chapter:** **none** — MCD witness **COMPLETE** 2026-06-21; primary focus **Trader Workflow Research**
+- **Last closed:** **MSOS MCD production witness v1** — 2026-06-21
 - **Next steward action:** Run friends-first sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md); log rows in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md)
 - **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21
 - **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-MCD unless SELECTION'd**

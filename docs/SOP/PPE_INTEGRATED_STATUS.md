@@ -133,6 +133,8 @@ flowchart LR
 
 | MSOS Strategy Lab embed shell v1 | **COMPLETE** 2026-06-21 | [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md), [`MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md) |
 
+| MSOS MCD production witness v1 | **COMPLETE** 2026-06-21 | [`SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md`](docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md), [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -155,7 +157,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **`msos_mcd_production_witness_v1`** — MCD sign-off witness | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
+| **Active relay chapter** | **none** — MCD witness COMPLETE; **Trader Workflow Research** is primary focus | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
@@ -192,4 +194,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
