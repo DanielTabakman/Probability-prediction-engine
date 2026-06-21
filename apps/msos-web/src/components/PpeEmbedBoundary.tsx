@@ -1,72 +1,18 @@
 /**
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
- * Primary: read-only display payload (pre-computed series from Python).
- * Fallback: chromeless Streamlit embed (`?embed_only=1`) — no nested app chrome.
  */
 
+import {
+  PPE_EMBED_ONLY_PARAM,
+  type DisplayPayload,
+  type DisplaySeries,
+  fetchDisplayPayload,
+  formatUsd,
+  isDisplaySeries,
+  PPE_EMBED_URL,
+} from "@/lib/ppeDisplayPayload";
+
 export const PPE_EMBED_ANCHOR_ID = "distribution-summary";
-export const PPE_EMBED_ONLY_PARAM = "embed_only";
-
-const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim();
-const PPE_DISPLAY_API_URL = (
-  process.env.NEXT_PUBLIC_PPE_DISPLAY_API_URL ?? "/ppe-display-api/display.json"
-).trim();
-
-type DisplaySeries = {
-  expiry_date: string;
-  prices_usd: number[];
-  pdf_pct: number[];
-  mean_usd?: number;
-  quartiles_usd?: {
-    q1_usd: number;
-    median_usd: number;
-    q3_usd: number;
-  };
-};
-
-type DisplayPayload = {
-  kind: string;
-  spot_usd: number;
-  series_by_expiry: DisplaySeries[];
-};
-
-function isNumberArray(value: unknown): value is number[] {
-  return Array.isArray(value) && value.length > 1 && value.every((item) => typeof item === "number");
-}
-
-function isDisplaySeries(value: unknown): value is DisplaySeries {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-  const series = value as Partial<DisplaySeries>;
-  return (
-    typeof series.expiry_date === "string" &&
-    isNumberArray(series.prices_usd) &&
-    isNumberArray(series.pdf_pct) &&
-    series.prices_usd.length === series.pdf_pct.length
-  );
-}
-
-function isDisplayPayload(value: unknown): value is DisplayPayload {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-  const payload = value as Partial<DisplayPayload>;
-  return (
-    payload.kind === "distribution_display_boundary" &&
-    typeof payload.spot_usd === "number" &&
-    Array.isArray(payload.series_by_expiry) &&
-    payload.series_by_expiry.some(isDisplaySeries)
-  );
-}
-
-function formatUsd(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 0,
-    style: "currency",
-    currency: "USD",
-  }).format(value);
-}
 
 function buildChromelessEmbedSrc(baseUrl: string): string {
   const withoutHash = baseUrl.replace(/#.*$/, "");
@@ -100,25 +46,6 @@ function seriesToSvgPath(
     return `${x.toFixed(1)},${y.toFixed(1)}`;
   });
   return `M ${points.join(" L ")}`;
-}
-
-async function loadDisplayPayload(): Promise<DisplayPayload | null> {
-  if (!PPE_DISPLAY_API_URL) {
-    return null;
-  }
-  try {
-    const res = await fetch(PPE_DISPLAY_API_URL, { cache: "no-store" });
-    if (!res.ok) {
-      return null;
-    }
-    const data: unknown = await res.json();
-    if (!isDisplayPayload(data)) {
-      return null;
-    }
-    return data;
-  } catch {
-    return null;
-  }
 }
 
 function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; spotUsd: number }) {
@@ -159,8 +86,12 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
   );
 }
 
-export async function PpeEmbedBoundary() {
-  const payload = await loadDisplayPayload();
+type PpeEmbedBoundaryProps = {
+  payload?: DisplayPayload | null;
+};
+
+export async function PpeEmbedBoundary({ payload: payloadProp }: PpeEmbedBoundaryProps = {}) {
+  const payload = payloadProp === undefined ? await fetchDisplayPayload() : payloadProp;
 
   if (payload) {
     const primary = payload.series_by_expiry.find(isDisplaySeries);
@@ -188,15 +119,6 @@ export async function PpeEmbedBoundary() {
             Chart loads from the read-only display API or a chromeless PPE embed once platform wiring
             is live. MSOS owns the shell; Python owns all distribution math.
           </p>
-          <ul className="ppe-embed-notes">
-            <li>
-              Primary: display payload at <code>/ppe-display-api/display.json</code> with
-              pre-computed <code>prices_usd</code>, <code>pdf_pct</code>, <code>mean_usd</code>, and
-              <code>quartiles_usd</code>
-            </li>
-            <li>Fallback: chromeless embed with <code>?{PPE_EMBED_ONLY_PARAM}=1</code></li>
-            <li>Degraded states surface when upstream is unavailable</li>
-          </ul>
         </div>
       </div>
     );
