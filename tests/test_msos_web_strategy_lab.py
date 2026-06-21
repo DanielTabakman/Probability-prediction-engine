@@ -14,6 +14,7 @@ def test_strategy_lab_route_and_shell() -> None:
     text = page.read_text(encoding="utf-8")
     assert "AppShell" in text
     assert "StrategyLabContent" in text
+    assert "fetchDisplayPayload" in text
     assert 'activeNavId="strategy-lab"' in text
 
 
@@ -21,25 +22,25 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
     assert "Strategy Lab / PPE / Options Distribution Lens" in content
     assert "Strategy Lab — PPE Tool" in content
-    assert "Preview data healthy" in content
+    assert "Live PPE data" in content
+    assert "Preview fixtures" in content
+    assert "buildLabMetricsFromPayload" in content
     assert "Market-implied vs reference vs your belief" in content
     assert "PpeEmbedBoundary" in content
     assert 'className="legend"' in content
     assert 'className="controls"' in content
     assert "no live order transmitted" in content
 
+    lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+    assert "distribution_display_boundary" in lib
+    assert "buildLabMetricsFromPayload" in lib
+
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
-    assert "NEXT_PUBLIC_PPE_EMBED_URL" in embed
-    assert "NEXT_PUBLIC_PPE_DISPLAY_API_URL" in embed
-    assert "embed_only" in embed
+    assert "ppeDisplayPayload" in embed
+    assert "PPE_EMBED_ONLY_PARAM" in embed
     assert "iframe" in embed
     assert "degraded" in embed.lower() or "Embed pending" in embed
-    assert "distribution_display_boundary" in embed
-    assert "isDisplayPayload" in embed
     assert "prices_usd" in embed
-    assert "pdf_pct" in embed
-    assert "mean_usd" in embed
-    assert "quartiles_usd" in embed
     assert "ppe-summary-table" in embed
     assert "Live via PPE" in embed
     assert "Chromeless embed" in embed or "Native chart" in embed

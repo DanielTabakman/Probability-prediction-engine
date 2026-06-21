@@ -2,17 +2,20 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { StrategyLabContent } from "@/components/StrategyLabContent";
+import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
 
 export const metadata: Metadata = {
   title: "Strategy Lab | Market Structure OS",
   description:
-    "MSOS Strategy Lab — PPE options distribution lens. Display/proxy boundary only; authoritative math in Streamlit.",
+    "MSOS Strategy Lab — PPE options distribution lens. Display/proxy boundary only; authoritative math in Python.",
 };
 
-export default function StrategyLabPage() {
+export default async function StrategyLabPage() {
+  const displayPayload = await fetchDisplayPayload();
+
   return (
     <AppShell activeNavId="strategy-lab">
-      <StrategyLabContent />
+      <StrategyLabContent displayPayload={displayPayload} />
     </AppShell>
   );
 }
