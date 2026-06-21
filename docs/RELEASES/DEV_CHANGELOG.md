@@ -4,6 +4,19 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- `0f189f4` — direction(control-plane): usable-demo-build-v1 SSOT + product slices
+- `9c689e7` — Merge origin/main into ops/continue; agent rule — no relay on desktop
+- `4305ed6` — direction(control-plane): WHATS_NEXT RUN_LOCAL after UsableDemo slices 002-003 (`docs/SOP/`)
+- `4eb2d42` — control-plane: msos_usable_demo_v1 backlog status chartered (BUILD in flight) (`docs/SOP/`)
+- `2a95d00` — MSOS-UsableDemoV1-Control-plane: concrete Product-Slice002 touchSet for IDE marker (`docs/SOP/`)
+- MSOS-UsableDemoV1-Product-Slice002-003: PPE display API + storyboard Strategy Lab shell (`src/viz/`)
+- `fc5503d` — direction(control-plane): agent-owned pivot SOP — auto-sync on closeout (`docs/SOP/`)
+- `0e22411` — control-plane: allowlist sync_product_direction for layer audit (`docs/SOP/`)
+- `aba5ef2` — direction(control-plane): drop premature deploy-refresh chapter from pivot slice (`docs/SOP/`)
+- `1e7c884` — direction(control-plane): usable-demo-build-v1 SSOT and steering propagation (`docs/SOP/`)
+- `a8d55e8` — Control-plane: dev changelog
+- `ff06f23` — Control-plane: dev changelog
+- MSOS-MCDWitV1-Closeout-Slice003: chapter closeout steering sync (control-plane) (`docs/SOP/`)
 - MSOS-MCDWitV1-Closeout-Slice003: chapter closeout steering sync (control-plane) (#271) (`docs/SOP/`)
 - `bfdf997` — test(control-plane): allow msos_mcd_production_witness_v1 in charter allowlists (#270)
 - `901584b` — Control-plane: dev changelog
