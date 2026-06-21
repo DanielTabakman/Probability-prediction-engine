@@ -1,0 +1,80 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+import {
+  BELIEF_PRESETS,
+  buildBeliefSentence,
+  loadStoredBeliefPresetId,
+  saveBeliefPresetId,
+  type BeliefPreset,
+  type BeliefPresetId,
+} from "@/lib/beliefPresets";
+
+type BeliefBuilderProps = {
+  expiryLabel: string;
+  selectedId: BeliefPresetId | null;
+  onSelect: (preset: BeliefPreset) => void;
+};
+
+export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuilderProps) {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const stored = loadStoredBeliefPresetId();
+    if (stored) {
+      const preset = BELIEF_PRESETS.find((p) => p.id === stored);
+      if (preset) onSelect(preset);
+    }
+    setHydrated(true);
+  }, [onSelect]);
+
+  function handleSelect(preset: BeliefPreset) {
+    saveBeliefPresetId(preset.id);
+    onSelect(preset);
+  }
+
+  const selected = BELIEF_PRESETS.find((p) => p.id === selectedId) ?? null;
+
+  return (
+    <div className="belief-builder">
+      <h3>What do you believe?</h3>
+      <p className="selectline" aria-live="polite">
+        {selected ? (
+          buildBeliefSentence(selected, expiryLabel)
+        ) : (
+          <>
+            Tap a preset to explore —{" "}
+            <span className="selectchip muted">higher</span>,{" "}
+            <span className="selectchip muted">lower</span>, or{" "}
+            <span className="selectchip muted">volatility</span> vs the market.
+          </>
+        )}
+      </p>
+
+      <div className="belief-preset-grid" role="group" aria-label="Belief presets">
+        {BELIEF_PRESETS.map((preset) => {
+          const active = preset.id === selectedId;
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              className={`belief-preset${active ? " active" : ""}`}
+              aria-pressed={active}
+              onClick={() => handleSelect(preset)}
+              disabled={!hydrated}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="micro">
+        {selected
+          ? "Your view overlays against the market curve — diagnostic, not a trade signal."
+          : "Pick one to update the summary panel and draft your thesis."}
+      </p>
+    </div>
+  );
+}

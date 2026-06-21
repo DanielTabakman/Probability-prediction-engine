@@ -18,6 +18,32 @@ def test_strategy_lab_route_and_shell() -> None:
     assert 'activeNavId="strategy-lab"' in text
 
 
+def test_strategy_lab_belief_presets_interactive() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "beliefPresets.ts").read_text(encoding="utf-8")
+    assert "BELIEF_PRESETS" in lib
+    assert "higher" in lib
+    assert "more_volatility" in lib
+    assert "less_volatility" in lib
+
+    builder = (MSOS_WEB / "src" / "components" / "BeliefBuilder.tsx").read_text(encoding="utf-8")
+    assert '"use client"' in builder
+    assert "belief-preset" in builder
+    assert "aria-pressed" in builder
+
+    panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "StrategyLabInteractivePanel" in panel
+    assert "buildOutcomeFromBelief" in panel
+
+    content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    assert "StrategyLabInteractivePanel" in content
+    assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
+
+    styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+    assert ".belief-preset-grid" in styles
+
+
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
     assert "Strategy Lab / PPE / Options Distribution Lens" in content
@@ -25,11 +51,16 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "Live PPE data" in content
     assert "Preview fixtures" in content
     assert "buildLabMetricsFromPayload" in content
-    assert "Market-implied vs reference vs your belief" in content
-    assert "PpeEmbedBoundary" in content
-    assert 'className="legend"' in content
-    assert 'className="controls"' in content
+    assert "StrategyLabInteractivePanel" in content
     assert "no live order transmitted" in content
+
+    panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "Market-implied vs reference vs your belief" in panel
+    assert "PpeEmbedBoundary" in panel
+    assert 'className="legend"' in panel
+    assert 'className="controls"' in panel
 
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     assert "distribution_display_boundary" in lib
