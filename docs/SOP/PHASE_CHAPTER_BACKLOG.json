@@ -304,7 +304,7 @@
     },
     {
       "chapterId": "msos_usable_demo_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
