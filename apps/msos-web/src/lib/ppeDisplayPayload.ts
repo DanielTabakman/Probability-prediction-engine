@@ -131,12 +131,22 @@ export function buildOutcomeFromPayload(payload: DisplayPayload): LabOutcomeSumm
   };
 }
 
+/** Server-side fetch target (Docker internal); browser uses public relative path. */
+function resolveDisplayApiFetchUrl(): string {
+  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
+  if (serverUrl) {
+    return serverUrl;
+  }
+  return PPE_DISPLAY_API_URL;
+}
+
 export async function fetchDisplayPayload(): Promise<DisplayPayload | null> {
-  if (!PPE_DISPLAY_API_URL) {
+  const fetchUrl = resolveDisplayApiFetchUrl();
+  if (!fetchUrl) {
     return null;
   }
   try {
-    const res = await fetch(PPE_DISPLAY_API_URL, { cache: "no-store" });
+    const res = await fetch(fetchUrl, { cache: "no-store" });
     if (!res.ok) {
       return null;
     }

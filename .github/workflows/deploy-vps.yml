@@ -113,7 +113,7 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install chromium
           python scripts/msos_production_demo_witness.py --write artifacts/health/msos_production_demo_witness.json
-          python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
+          PYTHONPATH=. python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
 
       - name: Upload production witness artifacts
         if: success()
