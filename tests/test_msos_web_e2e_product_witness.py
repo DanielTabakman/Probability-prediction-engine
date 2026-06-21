@@ -46,11 +46,13 @@ def test_e2e_homepage_research_and_lab_ctas() -> None:
 
 
 def test_e2e_strategy_lab_embed_and_workflow_paths() -> None:
-    lab = (COMPONENTS / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    content = (COMPONENTS / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    panel = (COMPONENTS / "StrategyLabInteractivePanel.tsx").read_text(encoding="utf-8")
     embed = (COMPONENTS / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     confirm = (APP / "strategy-lab" / "confirm" / "page.tsx").read_text(encoding="utf-8")
     expression = (APP / "strategy-lab" / "expression" / "page.tsx").read_text(encoding="utf-8")
-    assert "PpeEmbedBoundary" in lab
+    assert "StrategyLabInteractivePanel" in content
+    assert "PpeEmbedBoundary" in panel
     assert "chromeless" in embed.lower() or "embed" in embed.lower()
     assert "confirm" in confirm.lower()
     assert "expression" in expression.lower()
