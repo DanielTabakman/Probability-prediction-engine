@@ -237,9 +237,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
