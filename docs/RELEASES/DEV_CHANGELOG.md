@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- `8492e16` — feat(msos-shell): Strategy Lab clickable belief presets (higher/lower/volatility) (#278) (`apps/msos-web/`)
+- `0dfa4ab` — Control-plane: dev changelog
 - `7f21dcd` — fix(msos-shell): SSR display API + Playwright witness import (#277) (`apps/msos-web/`)
 - `86c8d59` — feat(msos-shell): Strategy Lab live metrics from PPE display API (#276) (`apps/msos-web/`)
 - `d4860ea` — control-plane: triggered ideas parking lot (revisit when chapter matches) (#275) (`docs/SOP/`)
