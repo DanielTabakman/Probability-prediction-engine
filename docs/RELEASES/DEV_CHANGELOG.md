@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- `fa43a66` — steering: MCD engineering complete — operator idle until sign-off (#268) (`docs/SOP/`)
+- MSOS-EmbedShellV1-Closeout-Slice006: chapter closeout steering sync (control-plane) (#267) (`docs/SOP/`)
+- MSOS-EmbedShellV1-Product-Slice003: harden display payload shell (#266)
+- `872a22e` — Control-plane: dev changelog
 - `b7afbc0` — control-plane: META vs EXECUTE conversation mode for agents (#265) (`scripts/`)
 - MSOS-EmbedShellV1-Product-Slice002: Codex headless harden display boundary (#263) (`src/viz/`)
 
