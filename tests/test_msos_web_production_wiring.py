@@ -52,6 +52,7 @@ def test_strategy_lab_embed_boundary_present() -> None:
     assert "ppeDisplayPayload" in embed
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in lib
     assert "NEXT_PUBLIC_PPE_DISPLAY_API_URL" in lib
+    assert "PPE_DISPLAY_API_SERVER_URL" in lib
 
 
 def test_app_sidebar_nav_routes() -> None:
