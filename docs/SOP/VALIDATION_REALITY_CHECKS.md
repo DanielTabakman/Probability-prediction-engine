@@ -6,6 +6,8 @@ Lightweight external validation. Copy a row per session.
 
 | Date | Check | Pass? | Notes |
 |------|--------|-------|-------|
+| 2026-06-21 | **MCD operator sign-off (production witness)** | Y | All 9 MCD criteria witness-verified — [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md). Production journey PASS; research beta CTA OK; embed shell markers on `/strategy-lab`. External 15-min comprehension → first TRADER_WORKFLOW cohort row. |
+| 2026-06-21 | **MSOS production live hookup (Track A+C)** | Y | HTTP witness PASS on `marketstructureos.com`; VPS deploy not run from desktop (no `ppe_operator_ssh.local.cmd`). Track B apex Access deferred. |
 | 2026-06-19 | **MSOS E2E journey (production HTTP witness)** | Y (journey) | `python scripts/msos_production_demo_witness.py` — all storyboard routes HTTP 200 on `marketstructureos.com`; Cloudflare Access on `app.marketstructureos.com`; fixture labels honest on monitor/history/CC. **Research beta CTA:** N until VPS `PPE_RESEARCH_OFFER_URL` set + `msos_web` rebuild. |
 | 2026-05-19 | **Paid interest** — willingness to pay for beta/brief/call | N | Phase2 Product-Slice003 shipped; VPS CTA still pending `.env`; **steward live call required** — [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) §Outreach (**do not mark Y** without real conversation) |
 | 2026-05-19 | **Reviewable cases** — showed freeze + reopen + review on full app | Y | Ritual + evidence clock seeded to targets (see VALIDATION_EVIDENCE_STATUS) |

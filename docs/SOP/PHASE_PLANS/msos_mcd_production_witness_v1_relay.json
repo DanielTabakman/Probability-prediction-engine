@@ -1,0 +1,60 @@
+{
+  "name": "MSOS_mcd_production_witness_v1 (MCD operator witness + production sign-off)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-MCDWitV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
+      "buildBranch": "build/auto/MSOS-MCDWitV1-Control-Slice001-mcd_wit",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-MCDWitV1-Witness-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
+      "buildBranch": "build/auto/MSOS-MCDWitV1-Witness-Slice002-mcd_wit",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "workerMode": "deterministic",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md",
+        "docs/SOP/VALIDATION_REALITY_CHECKS.md",
+        "scripts/msos_production_demo_witness.py",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MCDWitV1-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
+      "buildBranch": "build/auto/MSOS-MCDWitV1-Closeout-Slice003-mcd_wit",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_mcd_production_witness_v1",
+        "chapterTitle": "MSOS MCD production witness v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
+        "carryDocs": [
+          "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md",
+          "docs/SOP/MSOS_PRODUCTION_LIVE_HOOKUP_V1.md",
+          "docs/SOP/VALIDATION_REALITY_CHECKS.md"
+        ]
+      }
+    }
+  ]
+}

@@ -11,7 +11,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 
 | Field | Value |
 |-------|--------|
-| **MCD gate** | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **NOT PASSED** |
+| **MCD gate** | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21 |
 | **Sequence canon** | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — MCD track 1→3 + embed shell |
 | **Active chapter** | `msos_user_state_v1` — Witness-Slice004 next |
 | **Relay plan** | [`msos_user_state_v1_relay.json`](PHASE_PLANS/msos_user_state_v1_relay.json) |
@@ -155,7 +155,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 | Item | Status | Action |
 |------|--------|--------|
-| **Active relay chapter** | **none** — MCD engineering **COMPLETE**; operator **SUPPLY_LOW** until steward SELECTION | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
+| **Active relay chapter** | **`msos_mcd_production_witness_v1`** — MCD sign-off witness | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
 | VPS repo-root `.env` → **Research beta (v0)** CTA | **pending** | [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) |
 | Paid-interest live call | **N** (honest) | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | **Product focus playbook** | v1 installed | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof before platform drift |
