@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-21
 
+- `7f21dcd` — fix(msos-shell): SSR display API + Playwright witness import (#277) (`apps/msos-web/`)
+- `86c8d59` — feat(msos-shell): Strategy Lab live metrics from PPE display API (#276) (`apps/msos-web/`)
+- `d4860ea` — control-plane: triggered ideas parking lot (revisit when chapter matches) (#275) (`docs/SOP/`)
+- `5ab5850` — control-plane(operator): production PPE witness — display API + Playwright screenshots (#274) (`scripts/`)
+- `6b4a40b` — fix(ppe-core): display API crash — live Strategy Lab PPE chart on production (#273) (`docs/SOP/`)
+- `86aa76d` — Control-plane: dev changelog
 - `0f189f4` — direction(control-plane): usable-demo-build-v1 SSOT + product slices
 - `9c689e7` — Merge origin/main into ops/continue; agent rule — no relay on desktop
 - `4305ed6` — direction(control-plane): WHATS_NEXT RUN_LOCAL after UsableDemo slices 002-003 (`docs/SOP/`)
