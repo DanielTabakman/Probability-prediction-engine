@@ -2,8 +2,21 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-21
+
+- `b7afbc0` — control-plane: META vs EXECUTE conversation mode for agents (#265) (`scripts/`)
+- MSOS-EmbedShellV1-Product-Slice002: Codex headless harden display boundary (#263) (`src/viz/`)
+
 ## 2026-06-20
 
+- MSOS-EmbedShellV1-Product-Slice003: harden display payload shell (#264) (`apps/msos-web/`)
+- `6467f6e` — ops: loop publish ops/pre-push-parity-v1 (#262) (`docs/SOP/`)
+- `a9555d5` — dev-factory: pre-push CI parity wrapper (#261) (`docs/SOP/`)
+- `aa6a5e4` — selection(control): re-queue MCD embed shell after workflow closeout (#260) (`docs/SOP/`)
+- `345477d` — ops: loop publish ops/codex-first-build-worker (#259) (`docs/SOP/`)
+- `9118b43` — ops(control): prefer Codex CLI for product BUILD dispatch (#258) (`docs/SOP/`)
+- `ae832e5` — docs(vision): MSOS market interaction modes v0.1 ontology (#257) (`docs/SOP/`)
+- `d362d07` — Control-plane: dev changelog
 - **Chapter closed:** MSOS workflow persistence v1 (`MSOS-WorkflowV1-Closeout-Slice005`)
 - `77ca717` — Merge pull request #256 from DanielTabakman/fix/mcd-user-state-closeout-complete
 - `334b003` — docs(control): complete user_state MCD closeout; queue workflow READY (`docs/SOP/`)
