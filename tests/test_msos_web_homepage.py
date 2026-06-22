@@ -13,12 +13,14 @@ def test_msos_web_package_and_homepage_copy() -> None:
     assert (MSOS_WEB / "src" / "app" / "page.tsx").is_file()
     page = (MSOS_WEB / "src" / "app" / "page.tsx").read_text(encoding="utf-8")
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
+    content = (MSOS_WEB / "src" / "content" / "homepage.ts").read_text(encoding="utf-8")
     assert "HeroSection" in page
-    assert "Market Structure OS" in hero
-    assert "Turn your market thesis" in hero
-    assert "Probability Engine" in hero
-    assert "Strategy Lab" in hero
-    assert "Coming" in hero
+    assert "homepageHero" in hero
+    assert "Market Structure OS" in content
+    assert "Turn your market thesis" in content
+    assert "Probability Engine" in content
+    assert "Strategy Lab" in content
+    assert "Coming" in content
 
 
 def test_msos_web_docker_and_compose_wiring() -> None:

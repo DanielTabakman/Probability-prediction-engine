@@ -1,32 +1,34 @@
 import Link from "next/link";
 
+import { publicNavCopy } from "@/content/publicNav";
 import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
 
 export function PublicNav() {
   const signInUrl = resolveSignInUrl();
+  const nav = publicNavCopy;
 
   return (
     <nav className="public-nav">
       <Link className="brand" href={MSOS_ROUTES.home}>
         <div className="logo" aria-hidden="true" />
         <div>
-          Market Structure OS
-          <small>For traders with a market view</small>
+          {nav.brandName}
+          <small>{nav.brandTagline}</small>
         </div>
       </Link>
       <div className="nav-links">
         <Link className="sel" href={MSOS_ROUTES.home}>
-          Platform
+          {nav.links.platform}
         </Link>
-        <Link href={MSOS_ROUTES.strategyLab}>Strategy Lab</Link>
-        <Link href={MSOS_ROUTES.monitor}>Market surfaces</Link>
-        <Link href={MSOS_ROUTES.learn}>Vision</Link>
+        <Link href={MSOS_ROUTES.strategyLab}>{nav.links.strategyLab}</Link>
+        <Link href={MSOS_ROUTES.monitor}>{nav.links.marketSurfaces}</Link>
+        <Link href={MSOS_ROUTES.learn}>{nav.links.vision}</Link>
         <div className="nav-actions">
           <a className="btn slim dark" href={signInUrl}>
-            Sign in
+            {nav.signInCta}
           </a>
           <Link className="btn slim primary" href={MSOS_ROUTES.commandCenter}>
-            Enter Command Center
+            {nav.enterCommandCenterCta}
           </Link>
         </div>
       </div>

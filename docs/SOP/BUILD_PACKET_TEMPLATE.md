@@ -59,7 +59,17 @@ When the slice adds product surface, assets, or commercial claims, cite [`PRODUC
 
 ## Public copy (`MSOS_UI` / `msos-shell`)
 
-Any slice that changes visitor-visible strings must follow [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) (trader voice, banned jargon, degraded messages). Prefer `apps/msos-web/src/lib/publicCopy.ts` for shared footers and error sanitization.
+Any slice that changes visitor-visible strings must follow [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) (trader voice, banned jargon, degraded messages). Prefer `apps/msos-web/src/content/*.ts` for page copy and `apps/msos-web/src/lib/publicCopy.ts` for shared footers and error sanitization.
+
+**Copy-first:** If a packet exists in `docs/PRODUCT_COPY/packets/`, BUILD implements from the approved packet / content file — do not invent new marketing copy mid-slice. Copy agent process: [`MSOS_COPY_AGENT_V1.md`](MSOS_COPY_AGENT_V1.md).
+
+Optional BUILD packet fields when copy preceded code:
+
+```text
+COPY_PACKET: docs/PRODUCT_COPY/packets/<surface>.vN.md
+CONTENT_FILE: apps/msos-web/src/content/<surface>.ts
+COPY_STATUS: approved
+```
 
 ## Forbidden in packets
 

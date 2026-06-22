@@ -28,8 +28,14 @@ def test_command_center_route_and_shell() -> None:
 
 def test_public_nav_links_to_command_center() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    nav_copy = (MSOS_WEB / "src" / "content" / "publicNav.ts").read_text(encoding="utf-8")
     assert 'href="/command-center"' in nav or "MSOS_ROUTES.commandCenter" in nav
-    assert "Enter Command Center" in nav or "Command Center" in nav
+    assert (
+        "Enter Command Center" in nav
+        or "Command Center" in nav
+        or "Enter Command Center" in nav_copy
+        or "enterCommandCenterCta" in nav
+    )
 
 
 def test_command_center_fixtures_honest_labels() -> None:

@@ -62,6 +62,9 @@ Internal copy (slice IDs, PPE jargon, fixture labels, steward notes) is useful *
 
 | Location | Use for |
 |----------|---------|
+| [`docs/PRODUCT_COPY/packets/`](../PRODUCT_COPY/packets/) | Copy agent drafts (human-readable, versioned) |
+| [`docs/PRODUCT_COPY/SURFACE_INVENTORY.json`](../PRODUCT_COPY/SURFACE_INVENTORY.json) | Surface → file map |
+| [`apps/msos-web/src/content/*.ts`](../../apps/msos-web/src/content/) | **Approved** visitor strings — BUILD imports these |
 | [`apps/msos-web/src/data/*Fixtures.ts`](../../apps/msos-web/src/data/) | Fallback/demo strings when live feeds empty |
 | [`apps/msos-web/src/lib/publicCopy.ts`](../../apps/msos-web/src/lib/publicCopy.ts) | Shared footers, degraded messages, workspace labels |
 | [`apps/msos-web/src/lib/beliefPresets.ts`](../../apps/msos-web/src/lib/beliefPresets.ts) | Belief preset labels + outcome sentences |
@@ -70,7 +73,9 @@ Internal copy (slice IDs, PPE jargon, fixture labels, steward notes) is useful *
 | [`apps/msos-web/src/components/*.tsx`](../../apps/msos-web/src/components/) | Page chrome, headings, empty states — **minimize** inline copy; prefer data/lib |
 | Page `metadata` in `apps/msos-web/src/app/**/page.tsx` | Browser tab + SEO one-liners |
 
-**Prefer:** add reusable strings to `publicCopy.ts` or fixtures — avoid scattering one-off jargon in components.
+**Prefer:** add reusable strings to `apps/msos-web/src/content/` or `publicCopy.ts` — avoid scattering one-off jargon in components.
+
+**Copy agent:** [`MSOS_COPY_AGENT_V1.md`](MSOS_COPY_AGENT_V1.md) · skill `.cursor/skills/msos-copy-editor/` · validate with `python scripts/validate_msos_public_copy.py`
 
 ---
 

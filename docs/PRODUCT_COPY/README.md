@@ -1,0 +1,37 @@
+# MSOS product copy (packets + content files)
+
+**Process:** [`docs/SOP/MSOS_COPY_AGENT_V1.md`](../SOP/MSOS_COPY_AGENT_V1.md) · **Voice canon:** [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](../SOP/MSOS_PUBLIC_COPY_V1.md)
+
+Copy agent drafts live in **`packets/`**. Approved strings ship in **`apps/msos-web/src/content/`**. BUILD agent wires components to content files.
+
+---
+
+## Surface status
+
+| Surface | Packet | Content file | Status | Notes |
+|---------|--------|--------------|--------|-------|
+| homepage | [`packets/homepage.v1.md`](packets/homepage.v1.md) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | approved | Baseline public launch copy |
+| public-nav | — | [`../apps/msos-web/src/content/publicNav.ts`](../apps/msos-web/src/content/publicNav.ts) | approved | Wired via content file |
+| command-center | — | inline components | draft needed | Charter copy packet next |
+| strategy-lab | — | fixtures + components | draft needed | |
+| monitor | — | `monitoringFixtures.ts` | draft needed | |
+| history | — | components | draft needed | |
+| shared | — | [`publicCopy.ts`](../apps/msos-web/src/lib/publicCopy.ts) | approved | Footers, degraded paths |
+
+Update this table when a packet moves to `approved` or a new surface is chartered.
+
+---
+
+## Operator commands (copy thread)
+
+- **“Draft homepage v2”** — new packet version, keep v1 until approved
+- **“Audit banned terms”** — run validator, list fixes by surface
+- **“Promote homepage to content”** — write `content/*.ts`, mark packet approved
+- **“Implement on site”** — hand off to BUILD thread (components import content)
+
+---
+
+## Packets directory
+
+- [`packets/_TEMPLATE.md`](packets/_TEMPLATE.md) — blank starter
+- [`packets/homepage.v1.md`](packets/homepage.v1.md) — current homepage canon

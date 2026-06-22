@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "canon": "docs/SOP/MSOS_PUBLIC_COPY_V1.md",
+  "process": "docs/SOP/MSOS_COPY_AGENT_V1.md",
+  "surfaces": [
+    {
+      "id": "homepage",
+      "label": "Public homepage",
+      "routes": ["/"],
+      "content_file": "apps/msos-web/src/content/homepage.ts",
+      "components": [
+        "apps/msos-web/src/components/HeroSection.tsx",
+        "apps/msos-web/src/components/FeaturesRow.tsx",
+        "apps/msos-web/src/components/ProductWindow.tsx"
+      ],
+      "packet": "docs/PRODUCT_COPY/packets/homepage.v1.md",
+      "status": "approved"
+    },
+    {
+      "id": "public-nav",
+      "label": "Public navigation chrome",
+      "routes": ["/", "/strategy-lab", "/monitor", "/learn"],
+      "content_file": "apps/msos-web/src/content/publicNav.ts",
+      "components": ["apps/msos-web/src/components/PublicNav.tsx"],
+      "packet": null,
+      "status": "approved"
+    },
+    {
+      "id": "command-center",
+      "label": "Command Center",
+      "routes": ["/command-center"],
+      "content_file": null,
+      "components": ["apps/msos-web/src/components/CommandCenterContent.tsx"],
+      "packet": null,
+      "status": "needs_packet"
+    },
+    {
+      "id": "strategy-lab",
+      "label": "Strategy Lab",
+      "routes": ["/strategy-lab"],
+      "content_file": null,
+      "components": [
+        "apps/msos-web/src/components/StrategyLabContent.tsx",
+        "apps/msos-web/src/components/BeliefBuilder.tsx",
+        "apps/msos-web/src/components/ThesisConfirmationPanel.tsx",
+        "apps/msos-web/src/components/ExpressionPlanningPanel.tsx"
+      ],
+      "fixtures": ["apps/msos-web/src/data/strategyLabFixtures.ts"],
+      "packet": null,
+      "status": "needs_packet"
+    },
+    {
+      "id": "monitor",
+      "label": "Market surfaces / Monitor",
+      "routes": ["/monitor"],
+      "content_file": null,
+      "fixtures": ["apps/msos-web/src/data/monitoringFixtures.ts"],
+      "components": ["apps/msos-web/src/components/MonitorContent.tsx"],
+      "packet": null,
+      "status": "needs_packet"
+    },
+    {
+      "id": "history",
+      "label": "History",
+      "routes": ["/history"],
+      "content_file": null,
+      "components": ["apps/msos-web/src/components/HistoryContent.tsx"],
+      "packet": null,
+      "status": "needs_packet"
+    },
+    {
+      "id": "shared",
+      "label": "Shared footers and degraded messages",
+      "routes": ["*"],
+      "content_file": "apps/msos-web/src/lib/publicCopy.ts",
+      "components": ["apps/msos-web/src/components/ConclusionContent.tsx"],
+      "packet": null,
+      "status": "approved"
+    }
+  ]
+}
