@@ -25,7 +25,7 @@ Full index: [`COPY_CONTEXT_INDEX.json`](COPY_CONTEXT_INDEX.json)
 
 | Surface | Packet | Content file | Status | Notes |
 |---------|--------|--------------|--------|-------|
-| homepage | [`packets/homepage.v1.md`](packets/homepage.v1.md) (approved) · [`packets/homepage.v2.md`](packets/homepage.v2.md) (draft) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | v2 draft — sharper h1 + CTA | Conversion-framework pass |
+| homepage | [`packets/homepage.v2.md`](packets/homepage.v2.md) (approved; supersedes v1) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | approved | h1 v1 + CTA Try the lab |
 | public-nav | — | [`../apps/msos-web/src/content/publicNav.ts`](../apps/msos-web/src/content/publicNav.ts) | approved | Wired via content file |
 | command-center | — | inline components | draft needed | Charter copy packet next |
 | strategy-lab | — | fixtures + components | draft needed | |

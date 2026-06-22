@@ -1,15 +1,16 @@
 ---
 surface: homepage
 version: 2
-status: draft
+status: approved
 content_file: apps/msos-web/src/content/homepage.ts
 author: copy-agent
 as_of: 2026-06-22
 north_star: >-
   See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
 notes: >-
-  GPT/conversion-framework pass. Sharp disagreement h1; CTA Try the lab; problem + proof blocks
-  drafted for future BUILD regions — promote hero/features first; BUILD needed for problem/proof sections.
+  Operator 2026-06-22: h1 locked to v1 (B — reason-about thesis). Primary CTA = Try the BTC Options Lab
+  (honest for current product size). Revisit Explore the platform when platform breadth ships.
+  Problem/proof UI sections deferred — not on page today.
 supersedes: docs/PRODUCT_COPY/packets/homepage.v1.md
 ---
 
@@ -31,16 +32,16 @@ Understand value → try BTC Options Lab (primary) or join research beta (second
 For traders with a market view
 
 #### hero.h1
-See where your market view disagrees with options pricing.
+Turn your market thesis into a trade you can reason about.
 
 #### hero.body
-Compare your thesis to what BTC options imply, spot meaningful disagreement, and explore payoff structures that fit your view — without hiding the assumptions or telling you what to trade.
+Market Structure OS helps traders compare market-implied probabilities with their own view, locate meaningful disagreement, and explore structures that fit the thesis — without hiding the assumptions.
 
 #### hero.primaryCta
 Try the BTC Options Lab
 
 #### hero.secondaryCta
-Join research beta
+Open Command Center
 
 #### hero.signInCta
 Sign in
@@ -151,14 +152,21 @@ See where your market view disagrees with BTC options. Compare implied probabili
 
 ---
 
-## v1 → v2 summary
+## Operator decisions (2026-06-22)
 
-| key | v1 | v2 | why |
+| key | Choice | Rationale |
+|-----|--------|-----------|
+| hero.h1 | **B — v1** (reason about) | Operator preference over sharp disagreement line |
+| hero.primaryCta | **A — Try the BTC Options Lab** | Honest entry while product is lab-first; not full platform yet |
+| hero.primaryCta (future) | **Explore the platform** | When Command Center + surfaces feel like a big platform |
+| problem/proof sections | **Skip for now** | No UI blocks on homepage — hero + features enough today |
+
+## v1 → v2 shipped delta
+
+| key | v1 | v2 (shipped) | why |
 |-----|----|----|-----|
-| hero.h1 | Turn your market thesis into a trade you can reason about | See where your market view disagrees with options pricing | Sharper, disagreement-first (GPT + north star) |
-| hero.primaryCta | Explore the platform | Try the BTC Options Lab | Specific path — answers "what happens if I click?" |
-| hero.body | MSOS helps traders compare… | Compare your thesis to what BTC options imply… | You > we; BTC specificity |
-| productCards | feature-leaning | benefit-leaning | Benefits before features |
+| hero.h1 | (same) | (same) | Operator locked B |
+| hero.primaryCta | Explore the platform | Try the BTC Options Lab | Specific, honest demo path |
 
 ---
 

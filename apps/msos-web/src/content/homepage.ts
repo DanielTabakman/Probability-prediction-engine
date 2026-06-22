@@ -1,5 +1,5 @@
 /**
- * Homepage visitor copy — canon: docs/PRODUCT_COPY/packets/homepage.v1.md
+ * Homepage visitor copy — canon: docs/PRODUCT_COPY/packets/homepage.v2.md
  * Copy agent edits this file; BUILD wires components to import from here.
  */
 
@@ -13,7 +13,7 @@ export const homepageHero = {
   eyebrow: "For traders with a market view",
   h1: "Turn your market thesis into a trade you can reason about.",
   body: "Market Structure OS helps traders compare market-implied probabilities with their own view, locate meaningful disagreement, and explore structures that fit the thesis — without hiding the assumptions.",
-  primaryCta: "Explore the platform",
+  primaryCta: "Try the BTC Options Lab",
   secondaryCta: "Open Command Center",
   signInCta: "Sign in",
   pills: [
