@@ -44,7 +44,7 @@ MCD is **not** the full live product sequence through phase 7b. Required enginee
 | **Required** | `msos_strategy_lab_embed_shell_v1` | Seamless PPE-in-MSOS integration surface |
 | **Already shipped (UI)** | MSOS P2–P8 storyboard chapters | Workflow routes exist; wire to live data where MCD criteria need it |
 
-**Post-MCD (deferred unless SELECTION'd):** phases 4a–7b in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — multi-user identity, live monitor/history, E2E witness, entitlements, Stripe.
+**Post-MCD (deferred unless SELECTION'd):** phases 4a–7b in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — multi-user identity, live monitor/history, E2E witness, entitlements, Lemon Squeezy billing.
 
 ---
 
@@ -73,7 +73,7 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `usable-demo-build-v1` |
+| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `usable-demo-lemon-squeezy-v1` |
 | **Not a blocker** | Trader workflow research — optional parallel signal logging |
 | **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + active relay plan |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->

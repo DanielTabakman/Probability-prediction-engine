@@ -155,7 +155,7 @@ Canonical plan: [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_
 | 13.6 | 5 Monitor/history | `msos_monitor_history_live_v1` | **Chartered** |
 | 13.7 | 6 E2E witness | `msos_e2e_product_witness_v1` | **Chartered** |
 | 13.8 | 7a Free + manual paid | `msos_entitlements_v1` | **Chartered** |
-| 13.9 | 7b Stripe | `msos_billing_stripe_v1` | **Chartered** — BUILD deferred |
+| 13.9 | 7b Lemon Squeezy | `msos_billing_lemon_squeezy_v1` | **Chartered** — BUILD after usable demo |
 
 ---
 

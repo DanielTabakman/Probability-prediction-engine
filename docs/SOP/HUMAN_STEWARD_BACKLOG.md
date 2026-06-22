@@ -71,6 +71,14 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### Lemon Squeezy operator prerequisites (phase 7b gate)
+
+- **id:** `lemon_squeezy_operator_prereq` · **priority:** high · **category:** operator
+- **added:** 2026-06-21
+- **summary:** After msos_usable_demo_v1 walkable: Lemon Squeezy account, subscription product, checkout URL in MSOS_UPGRADE_OFFER_URL on VPS. Stage B: webhook signing secret for msos_billing_lemon_squeezy_v1 BUILD.
+- **policy question:** Stage A (checkout link only) when demo walkable; promote msos_billing_lemon_squeezy_v1 to READY when webhooks needed.
+- **notes:** Operator decision 2026-06-21 — MoR for tax/compliance simplicity; manual paid grant OK until webhook BUILD.
+
 ### Process library expansion
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
@@ -87,6 +95,24 @@
 - **closed:** 2026-06-17
 - **summary:** focusGate off, stopOnContextEscalate off, procedural exit-20 auto-advance reporting, legacy relay hard-stops demoted, human steward backlog + weekly ntfy hook.
 
+### MSOS production live hookup (usable demo)
+
+- **id:** `msos_production_live_hookup` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **closed:** 2026-06-21
+- **summary:** Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.
+- **policy question:** Protect apex product routes only (recommended) or entire marketstructureos.com for early demo cohort?
+- **notes:** Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md.
+
+### Stripe operator prerequisites (phase 7b gate)
+
+- **id:** `stripe_operator_prereq` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **closed:** 2026-06-21
+- **summary:** Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.
+- **policy question:** When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.
+- **notes:** Superseded — operator chose Lemon Squeezy (MoR) instead of Stripe.
+
 ## Changelog
 
-| 2026-06-18 | Auto-render from JSON |
+| 2026-06-22 | Auto-render from JSON |

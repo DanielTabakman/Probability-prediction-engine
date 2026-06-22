@@ -113,14 +113,14 @@ Phases **4a–5** in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQU
 
 Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md) — full production journey checklist.
 
-### Commercial — Entitlements + Stripe (chartered)
+### Commercial — Entitlements + Lemon Squeezy (chartered)
 
 | Phase | Chapter | When |
 |-------|---------|------|
 | **7a** | [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) | Free accounts; manual paid upgrade; ADR [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) |
-| **7b** | [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md) | Stripe Checkout — **chartered, BUILD deferred** until operator configures Stripe |
+| **7b** | [`msos_billing_lemon_squeezy_v1`](SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md) | Lemon Squeezy checkout — **BUILD after usable demo walkable** |
 
-**Intent:** Test willingness to pay via manual/invoice path first (7a); self-serve Stripe when ready (7b) without rework.
+**Intent:** Checkout link via `MSOS_UPGRADE_OFFER_URL` (v0); webhook auto-grant when relay BUILD runs (v1). Stripe superseded 2026-06-21.
 
 ---
 
@@ -132,7 +132,7 @@ Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_W
 - Broad asset rollout
 - Claims of measured edge, profitability, formal TAM, or traction without evidence
 
-**Commercial note:** Paywall and Stripe are **not deferred indefinitely** — see live sequence phases **7a–7b**. Generic “paywall automation” in backlog is superseded by [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) + [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md).
+**Commercial note:** Paywall and Lemon Squeezy are chartered in live sequence phases **7a–7b**. Generic “paywall automation” in backlog is superseded by [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) + [`msos_billing_lemon_squeezy_v1`](SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md).
 
 ---
 
@@ -159,7 +159,7 @@ Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_W
 | Live seq 5 | `msos_monitor_history_live_v1` | `PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
 | Live seq 6 | `msos_e2e_product_witness_v1` | `PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
 | Live seq 7a | `msos_entitlements_v1` | `PHASE_PLANS/msos_entitlements_v1_relay.json` |
-| Live seq 7b | `msos_billing_stripe_v1` | `PHASE_PLANS/msos_billing_stripe_v1_relay.json` |
+| Live seq 7b | `msos_billing_lemon_squeezy_v1` | `PHASE_PLANS/msos_billing_lemon_squeezy_v1_relay.json` |
 
 **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 

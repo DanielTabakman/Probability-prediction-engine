@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "pivotId": "usable-demo-build-v1",
+  "pivotId": "usable-demo-lemon-squeezy-v1",
   "asOf": "2026-06-21",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6",
@@ -26,8 +26,20 @@
       "id": "validation_log",
       "doc": "docs/SOP/VALIDATION_REALITY_CHECKS.md",
       "role": "session notes when testers use the demo — not a gate"
+    },
+    {
+      "id": "commercial_billing",
+      "doc": "docs/SOP/SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md",
+      "role": "Lemon Squeezy MoR — checkout link after usable demo; webhook BUILD when demo walkable"
     }
   ],
+  "commercialBilling": {
+    "provider": "lemon_squeezy",
+    "supersedes": "stripe",
+    "stageA": "MSOS_UPGRADE_OFFER_URL checkout link + manual paid grant",
+    "stageBChapterId": "msos_billing_lemon_squeezy_v1",
+    "buildGateChapterId": "msos_usable_demo_v1"
+  },
   "buildTrack": {
     "label": "Usable demo integration",
     "outcome": "One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review",
@@ -40,7 +52,8 @@
     ]
   },
   "supersedes": {
-    "postMcdResearchFirst": "2026-06-21 pivot — BUILD usable demo is primary; research runs in parallel when demo is walkable"
+    "postMcdResearchFirst": "2026-06-21 pivot — BUILD usable demo is primary; research runs in parallel when demo is walkable",
+    "stripePhase7b": "2026-06-21 — operator selected Lemon Squeezy (MoR) over Stripe for self-serve pay"
   },
   "propagationTargets": [
     "docs/SOP/MSOS_FRONTIER.md",

@@ -65,7 +65,7 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 | Storyboard v0.6 (design) | **COMPLETE** — implementation BUILD in flight |
 | MSOS shell routes | **Partial** — storyboard screens chartered; integration hardening active |
 | PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
-| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-build-v1` |
+| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-lemon-squeezy-v1` |
 
 **Risk:** Premature "chapter COMPLETE" labels while demo is not walkable. Trust **evidence witness checkboxes** and operator demo script, not backlog status alone.
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
@@ -142,7 +142,7 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 | **P8** (tester release) | Q3 PMF gate | Validation report **bosses** next-year queue |
 | **MVP1** (when SELECTION'd) | Q1–Q2 | Only if improves 15-second comprehension or disagreement |
 | **Live product seq P1–3 + embed** | MCD track | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — wiring → user state → workflow → embed shell |
-| **Live product seq P4–7b** | Post-MCD deferred | Free tier (7a); Stripe (7b) — **SELECTION only** after MCD |
+| **Live product seq P4–7b** | Post-MCD deferred | Free tier (7a); Lemon Squeezy (7b) — **after usable demo** |
 
 ---
 

@@ -23,7 +23,7 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Track | Phases | When |
 |-------|--------|------|
-| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `usable-demo-build-v1` |
+| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `usable-demo-lemon-squeezy-v1` |
 | **Post-demo expansion** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after usable demo is walkable on production URLs |
 
 Phases 4a–7b remain chartered for multi-user and commercial work — they are **not** the current default BUILD priority.
@@ -37,7 +37,7 @@ Phases 4a–7b remain chartered for multi-user and commercial work — they are 
 |-------|------|----------------|
 | **MSOS** | Thesis lifecycle, expression plans, monitor/history, entitlements | **Server-side workflow store**, user-scoped via Cloudflare Access |
 | **PPE** | Distributions, disagreement, freeze/review **math** | **Streamlit +** `frozen_evaluation_store` (with `owner_email`) |
-| **Commercial** | Free / research_beta / paid tiers | `msos_entitlements` → **Stripe** (phase 7b) |
+| **Commercial** | Free / research_beta / paid tiers | `msos_entitlements` → **Lemon Squeezy** (phase 7b) |
 | **Link** | Thesis ↔ saved PPE evaluation (snapshot ID internal) | Reference IDs — **no PPE math in TypeScript**; UX favors **disagreement / saved evaluation** language |
 
 ---
@@ -54,7 +54,7 @@ Phases 4a–7b remain chartered for multi-user and commercial work — they are 
 | **5** | [`msos_monitor_history_live_v1`](SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md) | HIGH | Monitor + History + CC strip live |
 | **6** | [`msos_e2e_product_witness_v1`](SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md) | MEDIUM | Full journey operator witness |
 | **7a** | [`msos_entitlements_v1`](SPRINT_MSOS_ENTITLEMENTS_V1.md) | HIGH | **Free accounts** + manual paid path |
-| **7b** | [`msos_billing_stripe_v1`](SPRINT_MSOS_BILLING_STRIPE_V1.md) | MEDIUM | **Stripe** self-serve pay — BUILD when operator ready |
+| **7b** | [`msos_billing_lemon_squeezy_v1`](SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md) | MEDIUM | **Lemon Squeezy** self-serve pay — BUILD when usable demo walkable |
 
 **Operator note (post-MCD only):** Phases 7a–7b may start BUILD after **4b** if commercial urgency and MCD **PASSED**; default post-MCD order runs **6** before monetization gates expand.
 
@@ -73,7 +73,7 @@ Phases 4a–7b remain chartered for multi-user and commercial work — they are 
 | **Multi-user research beta** | + 4a → 4b → 5 — **post-MCD, SELECTION only** |
 | **Shippable demo / PMF test** | + 6 — **post-MCD** |
 | **Acquire customers (free)** | + 7a — **post-MCD** |
-| **Charge self-serve** | + 7b (Stripe) — **post-MCD** |
+| **Charge self-serve** | + 7b (Lemon Squeezy) — **post-usable-demo** |
 
 ---
 
@@ -81,8 +81,8 @@ Phases 4a–7b remain chartered for multi-user and commercial work — they are 
 
 See [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md).
 
-1. **Now (phase 7a):** Free tier on first Access login; operator grants `paid` manually; upgrade CTA → mailto/invoice link; log paid interest.
-2. **Later (phase 7b):** Stripe Checkout + webhooks flip entitlements — **chartered, BUILD deferred** until operator configures Stripe.
+1. **Now (phase 7a):** Free tier on first Access login; operator grants `paid` manually.
+2. **After usable demo (phase 7b):** Lemon Squeezy checkout via `MSOS_UPGRADE_OFFER_URL`; manual grant v0 → webhook BUILD when volume warrants.
 
 ---
 
@@ -95,7 +95,7 @@ flowchart TB
   CC[Command Center]
   MSOS[(MSOS workflow DB)]
   SNAP[(PPE snapshots)]
-  STRIPE[Stripe webhooks]
+  STRIPE[Lemon Squeezy webhooks]
 
   CF --> ENT
   CF --> CC
@@ -128,7 +128,7 @@ flowchart TB
 | 5 | Full monitor/history loop live |
 | 6 | Prove end-to-end journey on production URL |
 | 7a | Onboard free users; manually upgrade paid |
-| 7b | Customers pay via Stripe |
+| 7b | Customers pay via Lemon Squeezy |
 
 ---
 

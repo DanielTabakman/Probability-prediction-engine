@@ -22,7 +22,7 @@
 - **summary:** Deferred 2026-06-15. Not needed for Deribit/Polymarket/Yahoo or Cloudflare Access email accounts. Revisit when charter includes wallet connect or on-chain per-user reads.
 - **trigger chapterIds:** `msos_wallet_connect_v1`, `msos_onchain_portfolio_v1`
 - **trigger keywords:** wallet connect, walletconnect, on-chain portfolio, web3 provider, uniblock
-- **not for:** `msos_user_state_v1`, `msos_workflow_persistence_v1`, `msos_access_identity_v1`, `msos_billing_stripe_v1`
+- **not for:** `msos_user_state_v1`, `msos_workflow_persistence_v1`, `msos_access_identity_v1`, `msos_billing_lemon_squeezy_v1`
 
 ## Changelog
 

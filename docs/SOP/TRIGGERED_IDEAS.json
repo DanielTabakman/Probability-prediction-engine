@@ -27,7 +27,7 @@
         "msos_user_state_v1",
         "msos_workflow_persistence_v1",
         "msos_access_identity_v1",
-        "msos_billing_stripe_v1"
+        "msos_billing_lemon_squeezy_v1"
       ]
     }
   ]

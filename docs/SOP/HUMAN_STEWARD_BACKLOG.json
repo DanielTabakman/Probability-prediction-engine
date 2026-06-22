@@ -107,13 +107,25 @@
     {
       "id": "stripe_operator_prereq",
       "title": "Stripe operator prerequisites (phase 7b gate)",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "category": "operator",
       "summary": "Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.",
       "policyQuestion": "When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.",
       "added": "2026-06-19",
-      "notes": "Steward 2026-06-19: deferred until website demo-ready on production; Stripe accounts/setup pending."
+      "closed": "2026-06-21",
+      "notes": "Superseded — operator chose Lemon Squeezy (MoR) instead of Stripe."
+    },
+    {
+      "id": "lemon_squeezy_operator_prereq",
+      "title": "Lemon Squeezy operator prerequisites (phase 7b gate)",
+      "status": "open",
+      "priority": "high",
+      "category": "operator",
+      "summary": "After msos_usable_demo_v1 walkable: Lemon Squeezy account, subscription product, checkout URL in MSOS_UPGRADE_OFFER_URL on VPS. Stage B: webhook signing secret for msos_billing_lemon_squeezy_v1 BUILD.",
+      "policyQuestion": "Stage A (checkout link only) when demo walkable; promote msos_billing_lemon_squeezy_v1 to READY when webhooks needed.",
+      "added": "2026-06-21",
+      "notes": "Operator decision 2026-06-21 — MoR for tax/compliance simplicity; manual paid grant OK until webhook BUILD."
     },
     {
       "id": "process_library_expansion",

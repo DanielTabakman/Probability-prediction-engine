@@ -12,7 +12,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **Direction pivot** | `usable-demo-build-v1` (2026-06-21) |
+| **Direction pivot** | `usable-demo-lemon-squeezy-v1` (2026-06-21) |
 | **Primary focus** | BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6 |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `msos_usable_demo_v1` — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |

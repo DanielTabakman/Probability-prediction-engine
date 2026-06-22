@@ -32,7 +32,7 @@ The MSOS relay queue drained phases 1–6 (and 7a) as **BUILD-complete**, but pr
 4. **Signed-in journey works** — witness script PASS on production URLs (including `research_beta_cta`).
 5. **Honest UX** — no fixture copy presented as live when workflow + snapshots are available.
 
-**Out of scope for this charter:** Stripe billing (human backlog `stripe_operator_prereq`).
+**Out of scope for this charter:** Lemon Squeezy billing (human backlog `lemon_squeezy_operator_prereq`).
 
 ---
 

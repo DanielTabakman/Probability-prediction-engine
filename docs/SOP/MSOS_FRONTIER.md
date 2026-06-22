@@ -5,7 +5,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `usable-demo-build-v1` · **as-of:** 2026-06-21
+**Direction pivot:** `usable-demo-lemon-squeezy-v1` · **as-of:** 2026-06-21
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
 - **Primary focus:** BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
@@ -14,18 +14,19 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Next steward action:** DESKTOP_CONTINUE.cmd on desktop (never run_ppe_local); VM pull main + relay witness/closeout for msos_usable_demo_v1
 
 **Retired (do not steer BUILD by these):**
-- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `usable-demo-build-v1`
+- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-lemon-squeezy-v1`
+- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `usable-demo-lemon-squeezy-v1`
+- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `usable-demo-lemon-squeezy-v1`
 
 **Side channels (optional, not gates):**
 - **TRADER_WORKFLOW_RESEARCH_V1** ([`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)) — optional signal logging while demo is built — not scope authority
 - **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session notes when testers use the demo — not a gate
+- **SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1** ([`SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md`](docs/SOP/SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md)) — Lemon Squeezy MoR — checkout link after usable demo; webhook BUILD when demo walkable
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).
 - **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · pivot runbook [`PRODUCT_DIRECTION_PIVOT_V1.md`](PRODUCT_DIRECTION_PIVOT_V1.md)
-- **Do not expand** platform scope (identity, entitlements, Stripe, multi-asset) until usable demo is walkable unless **explicitly SELECTION'd**.
+- **Do not expand** platform scope (identity, entitlements, billing automation, multi-asset) until usable demo is walkable unless **explicitly SELECTION'd**.
 - **Canon:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md)
 
 ### Control rule (hard)
@@ -44,7 +45,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **MCD gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) — **PASSED** 2026-06-21 (criteria met; demo hardening continues under usable-demo chapter)
 - **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md) — **post-demo unless SELECTION'd**
 - **Foundation shipped:** `production_wiring` ✓ → `user_state` ✓ → `workflow` ✓ → `embed_shell` ✓ (engineering); **walkable demo** = active BUILD
-- **Expansion pipeline (deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_stripe`
+- **Expansion pipeline (deferred):** `snapshot_owner` → `access_identity` → `monitor_history` → `e2e_witness` → `entitlements` → `billing_lemon_squeezy`
 
 ### Live product sequence — phases 4–7 (chartered, post-MCD deferred)
 
@@ -55,7 +56,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | 5 | `msos_monitor_history_live_v1` | BLOCKED — live monitor/history |
 | 6 | `msos_e2e_product_witness_v1` | BLOCKED — full journey witness |
 | 7a | `msos_entitlements_v1` | BLOCKED — **free tier** + manual paid |
-| 7b | `msos_billing_stripe_v1` | BLOCKED — **Stripe** (BUILD when operator ready) |
+| 7b | `msos_billing_lemon_squeezy_v1` | BLOCKED — **Lemon Squeezy** (BUILD after usable demo walkable) |
 
 ### MSOS production wiring v1 — relay queue — **COMPLETE**
 

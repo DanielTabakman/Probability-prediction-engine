@@ -259,9 +259,16 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "status": "DONE",
-      "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
+      "reason": "[SUPERSEDED] Stripe billing \u2014 operator chose Lemon Squeezy 2026-06-21",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
-      "doneReason": "deferred by operator 2026-06-19 \u2014 not BUILD; see HUMAN_STEWARD_BACKLOG stripe_operator_prereq"
+      "doneReason": "superseded by msos_billing_lemon_squeezy_v1"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_billing_lemon_squeezy_v1_relay.json",
+      "status": "DONE",
+      "reason": "[DEFER] Lemon Squeezy billing \u2014 BUILD after usable demo walkable",
+      "selectionPrep": "docs/SOP/POST_MSOS_BILLING_LEMON_SQUEEZY_V1_SELECTION.md",
+      "doneReason": "deferred by operator 2026-06-21 \u2014 see HUMAN_STEWARD_BACKLOG lemon_squeezy_operator_prereq"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",

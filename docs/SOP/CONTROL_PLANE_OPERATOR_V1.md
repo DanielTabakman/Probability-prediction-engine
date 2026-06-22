@@ -37,8 +37,8 @@ When you ask to **do something**, route it — do not hand-edit `PHASE_QUEUE.jso
 ### Build chapter (product / relay work)
 
 ```bat
-ppe_request.cmd --chapter-id msos_billing_stripe_v1 --reason "Stripe checkout after E2E witness"
-ppe_request.cmd --chapter-id msos_billing_stripe_v1 --reason "..." --apply
+ppe_request.cmd --chapter-id msos_billing_lemon_squeezy_v1 --reason "Lemon Squeezy webhooks after usable demo"
+ppe_request.cmd --chapter-id msos_billing_lemon_squeezy_v1 --reason "..." --apply
 ```
 
 | `action` | Meaning |
@@ -55,7 +55,7 @@ ppe_request.cmd --chapter-id msos_billing_stripe_v1 --reason "..." --apply
 ### Policy / architecture (not auto-built)
 
 ```bat
-ppe_request.cmd human --title "Stripe operator accounts" --summary "Need human Stripe setup before BUILD" --apply
+ppe_request.cmd human --title "Lemon Squeezy operator accounts" --summary "Need Lemon Squeezy store + checkout URL before billing BUILD" --apply
 ```
 
 Goes to [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) — steward review, not relay.

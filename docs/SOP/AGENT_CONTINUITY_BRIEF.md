@@ -29,7 +29,7 @@
 
 - **Sprint:** [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md)
 - **Plan:** [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
-- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `usable-demo-build-v1`)
+- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `usable-demo-lemon-squeezy-v1`)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ## Steering alignment
