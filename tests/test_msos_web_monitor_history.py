@@ -38,7 +38,7 @@ def test_monitor_page_uses_live_feed() -> None:
     assert "feed={feed}" in page
     assert "monitoringFixtures" not in content
     assert "feed.watchPanels" in content
-    assert "no live order transmitted" in content
+    assert "DEMO_FOOTER" in content
 
 
 def test_history_page_uses_live_feed() -> None:
@@ -48,8 +48,8 @@ def test_history_page_uses_live_feed() -> None:
     assert "feed={feed}" in page
     assert "historyFixtures" not in content
     assert "feed.entries" in content
-    assert "Executed" in content
-    assert "no live positions connected" in content
+    assert "Live trades" in content
+    assert "not connected" in content
 
 
 def test_command_center_calibration_strip_from_live_summary() -> None:
