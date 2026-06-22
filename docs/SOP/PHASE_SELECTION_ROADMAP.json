@@ -172,7 +172,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] MCD operator witness + production sign-off — COMPLETE 2026-06-21",
+      "reason": "[HIGH] MCD operator witness + production sign-off \u2014 COMPLETE 2026-06-21",
       "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md"
     },
     {
@@ -214,18 +214,18 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "status": "pending",
-      "reason": "[P0 PAUSED] UX design gate",
+      "reason": "[P0 PAUSED] UX design gate — backlog skipped",
       "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[HIGH] Autobuilder happy path \u2014 active factory chapter",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Bounded build repair",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
     },

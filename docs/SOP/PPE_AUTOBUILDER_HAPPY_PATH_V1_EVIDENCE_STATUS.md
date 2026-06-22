@@ -1,6 +1,6 @@
 # PPE autobuilder happy path v1 — evidence status
 
-**Chapter:** `ppe_autobuilder_happy_path_v1` · **Status:** IN_PROGRESS
+**Chapter:** `ppe_autobuilder_happy_path_v1` · **Status:** COMPLETE
 
 ## Shipped
 

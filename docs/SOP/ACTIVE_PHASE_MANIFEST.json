@@ -1,8 +1,15 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
+
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_BOUNDED_REPAIR_V1.md",
+
   "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+
   "status": "READY",
-  "notes": "Factory wave: autobuilder happy path during MSOS usable-demo UX pause (2026-06-15)",
+
+  "notes": "Factory wave chapter 2 — bounded repair after happy path COMPLETE",
+
   "workerMode": "deterministic"
+
 }
