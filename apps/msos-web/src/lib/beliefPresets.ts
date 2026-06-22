@@ -152,7 +152,7 @@ export function buildOutcomeFromBelief(
     tagTone: "teal",
     delta: preset.id === "less_volatility" ? "21%" : "—",
     headline: fixtureHeadlines[preset.id],
-    body: `You selected ${preset.label}. ${preset.directionPhrase.charAt(0).toUpperCase()}${preset.directionPhrase.slice(1)}. Confirm when this matches what you actually believe.`,
+    body: `You picked ${preset.label}. ${preset.directionPhrase.charAt(0).toUpperCase()}${preset.directionPhrase.slice(1)}. Confirm when this matches what you actually believe.`,
     scores: [
       { label: "Market", value: "From options", tone: "amber" },
       { label: "You", value: preset.label, tone: "teal" },
