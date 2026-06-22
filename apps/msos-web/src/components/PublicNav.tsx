@@ -7,13 +7,13 @@ export function PublicNav() {
 
   return (
     <nav className="public-nav">
-      <div className="brand">
+      <Link className="brand" href={MSOS_ROUTES.home}>
         <div className="logo" aria-hidden="true" />
         <div>
           Market Structure OS
-          <small>Probability &amp; thesis intelligence</small>
+          <small>For traders with a market view</small>
         </div>
-      </div>
+      </Link>
       <div className="nav-links">
         <Link className="sel" href={MSOS_ROUTES.home}>
           Platform
