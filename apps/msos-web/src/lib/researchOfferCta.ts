@@ -1,6 +1,6 @@
 /** Research beta CTA — mirrors `src/viz/signup_cta.research_offer_cta` (display only). */
 
-const DEFAULT_RESEARCH_OFFER_LABEL = "Request research beta access";
+const DEFAULT_RESEARCH_OFFER_LABEL = "Join research beta";
 
 export type ResearchOfferCta = {
   url: string;

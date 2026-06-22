@@ -1,23 +1,23 @@
 const FEATURES = [
   {
-    n: "01",
-    title: "Read the market",
-    body: "See the range and shape BTC options imply — updated from live quotes.",
+    kicker: "01 — Read",
+    title: "See what the market implies",
+    body: "Start with options pricing, probabilities, positioning, and other market surfaces.",
   },
   {
-    n: "02",
-    title: "State your view",
-    body: "Higher, lower, more vol, less vol — say what you believe in plain language.",
+    kicker: "02 — State",
+    title: "Add your thesis",
+    body: "Turn your view into something the system can compare against the market.",
   },
   {
-    n: "03",
-    title: "Plan a trade",
-    body: "Match structures to your view with risk limits spelled out upfront.",
+    kicker: "03 — Fit",
+    title: "Explore possible expressions",
+    body: "Compare structures that fit your view, risk limits, and time horizon.",
   },
   {
-    n: "04",
-    title: "Review over time",
-    body: "Track paper trades and learn whether your reads were useful.",
+    kicker: "04 — Learn",
+    title: "Track what happened",
+    body: "Review how the thesis, structure, and outcome evolved over time.",
   },
 ] as const;
 
@@ -25,8 +25,8 @@ export function FeaturesRow() {
   return (
     <section className="features-row" aria-label="How it works">
       {FEATURES.map((feature) => (
-        <article className="feature" key={feature.n}>
-          <div className="n">{feature.n}</div>
+        <article className="feature" key={feature.kicker}>
+          <div className="n">{feature.kicker}</div>
           <h3>{feature.title}</h3>
           <p>{feature.body}</p>
         </article>

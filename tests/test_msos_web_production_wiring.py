@@ -25,7 +25,7 @@ def test_research_offer_cta_env_pattern() -> None:
     text = _load_ts_module(LIB / "researchOfferCta.ts", "researchOfferCta")
     assert "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL" in text
     assert "mailto:" in text
-    assert "Request research beta access" in text
+    assert "Join research beta" in text
 
 
 def test_public_nav_wired_sign_in_and_routes() -> None:

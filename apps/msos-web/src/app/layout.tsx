@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Market Structure OS",
   description:
-    "Market Structure OS — compare what you believe to what BTC options imply.",
+    "Compare your market thesis with what options imply — explore structures without hiding assumptions.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

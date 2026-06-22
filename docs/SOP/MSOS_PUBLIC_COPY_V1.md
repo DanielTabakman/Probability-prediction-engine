@@ -85,11 +85,18 @@ Before marking IDE BUILD ready:
 5. [ ] Live vs demo is obvious (pill, tag, or metric label).
 6. [ ] Witness tests updated if they asserted **old internal strings** — tests should assert structure/wiring, not freeze bad copy.
 
+### Homepage canon (2026-06)
+
+| Element | Copy |
+|---------|------|
+| Primary CTA | Explore the platform |
+| Hero pills | Your thesis stays yours · Expression, not recommendation · BTC options live preview |
+| Product cards | Market Structure OS · Strategy Lab · **Probability Engine** (not “PPE” on homepage) |
+| Command Center preview | Thesis gap (not “Disagreement located” on homepage) |
+
 ---
 
 ## Examples (before → after)
-
-| Before | After |
 |--------|-------|
 | Live via PPE · distribution math stays in Python | From Deribit options — updated with market quotes |
 | MSOS workflow store | Saved to your workspace |

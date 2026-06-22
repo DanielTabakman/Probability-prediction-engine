@@ -15,8 +15,9 @@ def test_msos_web_package_and_homepage_copy() -> None:
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
     assert "HeroSection" in page
     assert "Market Structure OS" in hero
+    assert "Turn your market thesis" in hero
+    assert "Probability Engine" in hero
     assert "Strategy Lab" in hero
-    assert "BTC options" in hero
     assert "Coming" in hero
 
 
