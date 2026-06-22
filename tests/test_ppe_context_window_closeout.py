@@ -11,12 +11,18 @@ from pathlib import Path
 from scripts.ppe_context_window_closeout import (
     append_closeout_record,
     build_closeout_record,
+    build_sweep_commit_message,
     collect_snapshot,
+    committable_dirty_paths,
+    effective_working_tree_clean,
+    infer_commit_plane,
     infer_whats_next,
+    is_never_commit_path,
     load_whats_next_markdown,
     promote_whats_next,
     record_context_closeout,
     render_draft_markdown,
+    run_operational_sweep,
     write_artifacts,
 )
 from scripts.ppe_operator_status import write_status_report
@@ -138,6 +144,60 @@ class TestPpeContextWindowCloseout(unittest.TestCase):
         candidates, signals = scan_workflow_friction(self.repo, week)
         self.assertIn("context_chat_churn", signals)
         self.assertTrue(any(c.id == "context-chat-churn" for c in candidates))
+
+    def test_is_never_commit_path_blocks_artifacts_and_env(self) -> None:
+        self.assertTrue(is_never_commit_path("artifacts/orchestrator/foo.json"))
+        self.assertTrue(is_never_commit_path(".env"))
+        self.assertFalse(is_never_commit_path("docs/SOP/FOO.md"))
+
+    def test_committable_dirty_paths_filters_exempt(self) -> None:
+        preflight = {
+            "modified_untracked_paths": [
+                "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                "artifacts/orchestrator/x.json",
+                "scripts/ppe_context_window_closeout.py",
+            ]
+        }
+        paths = committable_dirty_paths(preflight)
+        self.assertEqual(paths, ["docs/SOP/ACTIVE_PHASE_MANIFEST.json", "scripts/ppe_context_window_closeout.py"])
+
+    def test_effective_working_tree_clean_ignores_artifacts_only(self) -> None:
+        preflight = {"modified_untracked_paths": ["artifacts/orchestrator/x.json"]}
+        self.assertTrue(effective_working_tree_clean(preflight))
+
+    def test_infer_commit_plane_single_plane(self) -> None:
+        self.assertEqual(infer_commit_plane(["docs/SOP/A.md", "docs/SOP/B.md"]), "CONTROL-PLANE")
+
+    def test_build_sweep_commit_message(self) -> None:
+        msg = build_sweep_commit_message(
+            chapter_id="msos_user_state_v1",
+            plane="CONTROL-PLANE",
+            paths=["docs/SOP/FOO.md"],
+        )
+        self.assertIn("msos_user_state_v1", msg)
+        self.assertIn("context-closeout sweep", msg)
+
+    def test_render_draft_marks_sweep_checklist(self) -> None:
+        snapshot = collect_snapshot(self.repo)
+        snapshot["sweep"] = {
+            "safe_to_switch": True,
+            "committed": True,
+            "pushed": True,
+            "park_paths": [],
+            "blockers": [],
+        }
+        md = render_draft_markdown(self.repo, snapshot)
+        self.assertIn("### Auto sweep result", md)
+        self.assertIn("safe_to_switch", md)
+
+    def test_sweep_dry_run_parks_on_main(self) -> None:
+        result = run_operational_sweep(
+            self.repo,
+            dry_run=True,
+            chapter_id="test_chapter",
+        )
+        self.assertIn("actions", result)
+        self.assertIsInstance(result["safe_to_switch"], bool)
 
 
 if __name__ == "__main__":

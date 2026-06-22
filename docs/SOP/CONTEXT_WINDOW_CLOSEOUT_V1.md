@@ -66,12 +66,12 @@ Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 ```text
 Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 
-1. context_window_closeout.cmd --record --whats-next "<one line>"
-2. sync_product_direction.cmd (if direction JSON changed this thread)
-3. Complete narrative/triage in draft if needed.
-4. Operational sweep: commit+gate ship-now items; push branches.
-5. End with AGENT CONTINUITY block.
+1. context_window_closeout.cmd --sweep --whats-next "<one line>"
+2. Complete narrative/triage in draft if sweep parked items (add-build / add-human).
+3. End with AGENT CONTINUITY block.
 ```
+
+`--sweep` runs the operational sweep automatically (gate+commit ship-now, push feature branch, open PR), then `--record`. Fails closed: `safe_to_switch=no` when dirty or unpushed remain.
 
 **New chat:** ask `what's next?` — no `@` files required (see **Tracking v2** below).
 
@@ -117,12 +117,30 @@ Do **not** hand-author branch/ahead/behind/dirty-file facts when the script ran 
 
 ### 2 — Operational sweep (push / pull / threads)
 
-Work through in order; check each box in the draft report.
+**Automatic (preferred):**
+
+```bat
+context_window_closeout.cmd --sweep --whats-next "<one line>"
+```
+
+`--sweep` implies `--record`. It will:
+
+| Step | Behavior |
+|------|----------|
+| **Commit** | Gate + commit committable dirty paths when preflight `build_allowed` (feature branch, single plane) |
+| **Park** | Mixed-plane, on `main`, or blocked paths → no commit; `safe_to_switch=no` |
+| **Push** | Pre-push gate + `git push -u origin HEAD` on feature branches with unpushed commits |
+| **PR** | Open PR to `main` when `gh` available and none exists |
+| **Pull** | `git pull --ff-only` on clean `main` only |
+
+Use `--sweep-dry-run` to preview without git writes. Use `--sweep-no-pr` to skip PR creation.
+
+**Manual fallback** (when sweep parks work — triage into backlog):
 
 | Check | Command / action |
 |-------|------------------|
 | **Pull** | `git fetch` + `git pull --ff-only` on `main` (desktop) or rely on loop `gitSync` (VM) |
-| **Uncommitted work** | Commit with gate (`python scripts/run_pushable_gate.py`) or explicit **PARK** note |
+| **Uncommitted work** | `add-build` / `add-human` / explicit **PARK** note |
 | **Unpushed commits** | `git push -u origin HEAD` on feature branches |
 | **Open PRs** | `gh pr list --author @me` — merge-ready vs draft vs abandoned |
 | **Operator thread** | `artifacts/orchestrator/OPERATOR_STATUS.md` — verdict matches what you think |
@@ -219,4 +237,4 @@ Copy final numbers into the draft report **Window ledger** section.
 | Date | Note |
 |------|------|
 | 2026-06-17 | v1 — SOP + `ppe_context_window_closeout.py` gather/triage helpers |
-| 2026-06-18 | v2 — `context_windows.jsonl` tracking, `WHATS_NEXT` promotion, radar churn signal |
+| 2026-06-21 | v3 — `--sweep` auto gate+commit+push; fail closed on dirty/unpushed |

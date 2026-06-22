@@ -33,9 +33,18 @@ from scripts.workflow_metrics_cli import (
 
 DRAFT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md"
 SNAPSHOT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT.json"
+SWEEP_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_SWEEP.json"
 WHATS_NEXT_JSON_REL = "artifacts/control_plane/WHATS_NEXT.json"
 WHATS_NEXT_MD_REL = "artifacts/control_plane/WHATS_NEXT.md"
 SOP_CLOSEOUT = "docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md"
+
+NEVER_COMMIT_PREFIXES: tuple[str, ...] = (
+    "artifacts/",
+    "_worktrees/",
+    ".pytest_cache/",
+    "__pycache__/",
+)
+NEVER_COMMIT_EXACT: frozenset[str] = frozenset({".env", ".env.local"})
 
 
 def _utc_now() -> str:
@@ -45,6 +54,311 @@ def _utc_now() -> str:
 def _slug_id(text: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "_", text.strip().lower())
     return s.strip("_")[:64] or "item"
+
+
+def _norm_path(path: str) -> str:
+    p = path.replace("\\", "/").strip()
+    if p.startswith("./"):
+        return p[2:]
+    return p
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _current_branch(repo: Path) -> str:
+    proc = _git(repo, "branch", "--show-current")
+    return (proc.stdout or "").strip() if proc.returncode == 0 else ""
+
+
+def is_never_commit_path(path: str) -> bool:
+    p = _norm_path(path)
+    if p in NEVER_COMMIT_EXACT:
+        return True
+    if p.endswith((".sqlite", ".sqlite3", ".db")):
+        return True
+    low = p.lower()
+    if "credentials" in low or low.endswith(".pem"):
+        return True
+    return any(p.startswith(prefix) for prefix in NEVER_COMMIT_PREFIXES)
+
+
+def committable_dirty_paths(preflight: dict[str, Any]) -> list[str]:
+    paths = preflight.get("modified_untracked_paths") or []
+    if not isinstance(paths, list):
+        return []
+    out: list[str] = []
+    for raw in paths:
+        if not isinstance(raw, str):
+            continue
+        p = _norm_path(raw)
+        if is_never_commit_path(p):
+            continue
+        try:
+            from scripts.repo_layer_paths import is_preflight_dirty_exempt
+
+            if is_preflight_dirty_exempt(p):
+                continue
+        except ImportError:
+            pass
+        out.append(p)
+    return sorted(out)
+
+
+def effective_working_tree_clean(preflight: dict[str, Any]) -> bool:
+    return not committable_dirty_paths(preflight)
+
+
+def _classify_path_plane(path: str) -> str:
+    p = _norm_path(path)
+    if p.startswith("docs/SOP/"):
+        return "CONTROL-PLANE"
+    if p.startswith("src/"):
+        return "PRODUCT-PLANE"
+    if p.startswith("tests/") or p.startswith("scripts/"):
+        return "EVIDENCE-PLANE"
+    return "SUSPICIOUS / UNKNOWN"
+
+
+def infer_commit_plane(paths: list[str]) -> str:
+    planes = {_classify_path_plane(p) for p in paths}
+    core = sorted(p for p in planes if p != "SUSPICIOUS / UNKNOWN")
+    if len(core) == 1:
+        return core[0]
+    if core:
+        return "+".join(core)
+    return "UNKNOWN"
+
+
+def build_sweep_commit_message(
+    *,
+    chapter_id: str,
+    plane: str,
+    paths: list[str],
+    override: str = "",
+) -> str:
+    if override.strip():
+        return override.strip()
+    chapter = chapter_id.strip() or "context-closeout"
+    plane_bit = plane.replace(" ", "").lower()
+    if len(paths) == 1:
+        hint = Path(paths[0]).name
+    elif paths:
+        hint = f"{len(paths)} files"
+    else:
+        hint = "sweep"
+    return f"{chapter}: context-closeout sweep {hint} ({plane_bit})"
+
+
+def _run_pushable_gate(repo: Path, *, pre_push: bool = False) -> int:
+    cmd = [sys.executable, str(repo / "scripts" / "run_pushable_gate.py"), "--repo-root", str(repo)]
+    if pre_push:
+        cmd.append("--pre-push")
+    return subprocess.run(cmd, cwd=repo, check=False).returncode
+
+
+def _ahead_count(repo: Path) -> int:
+    proc = _git(repo, "rev-list", "--count", "@{upstream}..HEAD")
+    if proc.returncode == 0:
+        try:
+            return int((proc.stdout or "0").strip() or "0")
+        except ValueError:
+            pass
+    branch = _current_branch(repo)
+    if branch:
+        proc = _git(repo, "rev-list", "--count", f"origin/{branch}..HEAD")
+        if proc.returncode == 0:
+            try:
+                return int((proc.stdout or "0").strip() or "0")
+            except ValueError:
+                pass
+    return 0
+
+
+def _ensure_pr(repo: Path, *, branch: str, title: str, body: str) -> str | None:
+    try:
+        from scripts.ppe_operator_git_sync import _open_pr
+    except ImportError:
+        return None
+    return _open_pr(repo, head=branch, title=title, body=body)
+
+
+def run_operational_sweep(
+    repo: Path,
+    *,
+    dry_run: bool = False,
+    open_pr: bool = True,
+    commit_message: str = "",
+    chapter_id: str = "",
+) -> dict[str, Any]:
+    """Gate+commit ship-now dirty paths, push feature branches, fail closed on remainder."""
+    repo = repo.resolve()
+    result: dict[str, Any] = {
+        "dry_run": dry_run,
+        "ok": True,
+        "safe_to_switch": True,
+        "committed": False,
+        "commit_message": None,
+        "pushed": False,
+        "pr_url": None,
+        "park_reason": None,
+        "park_paths": [],
+        "blockers": [],
+        "actions": [],
+    }
+
+    if not dry_run:
+        fetch = _git(repo, "fetch", "origin")
+        if fetch.returncode != 0:
+            result["actions"].append(
+                {
+                    "action": "fetch",
+                    "ok": False,
+                    "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+                }
+            )
+
+    preflight = _run_json_script(repo, "scripts/frontier_preflight.py") or {}
+    branch = str(preflight.get("branch") or _current_branch(repo) or "")
+    paths = committable_dirty_paths(preflight)
+
+    if branch == "main" and effective_working_tree_clean(preflight):
+        pull_action: dict[str, Any] = {"action": "pull_main"}
+        if dry_run:
+            pull_action["dry_run"] = True
+            pull_action["skipped"] = False
+        else:
+            from scripts.ppe_operator_git_sync import pull_main
+
+            pull_action.update(pull_main(repo))
+        result["actions"].append(pull_action)
+        if not pull_action.get("ok", True) and not pull_action.get("skipped"):
+            result["blockers"].append(
+                f"pull failed: {pull_action.get('error') or pull_action.get('reason') or 'unknown'}"
+            )
+
+    if paths:
+        if branch in ("main", "master"):
+            result["park_paths"] = paths
+            result["park_reason"] = "on main; execution work must use a feature branch"
+            result["blockers"].append(result["park_reason"])
+        elif not preflight.get("build_allowed"):
+            blocker = str(preflight.get("blocker") or "preflight blocked auto-commit")
+            result["park_paths"] = paths
+            result["park_reason"] = blocker
+            result["blockers"].append(f"park: {blocker}")
+        else:
+            plane = infer_commit_plane(paths)
+            msg = build_sweep_commit_message(
+                chapter_id=chapter_id,
+                plane=plane,
+                paths=paths,
+                override=commit_message,
+            )
+            commit_action: dict[str, Any] = {
+                "action": "commit",
+                "paths": paths,
+                "message": msg,
+            }
+            if dry_run:
+                commit_action["dry_run"] = True
+                result["actions"].append(commit_action)
+            else:
+                for p in paths:
+                    add = _git(repo, "add", "--", p)
+                    if add.returncode != 0:
+                        commit_action["ok"] = False
+                        commit_action["error"] = (add.stderr or add.stdout or "git add failed").strip()
+                        result["actions"].append(commit_action)
+                        result["blockers"].append(commit_action["error"])
+                        break
+                else:
+                    gate_rc = _run_pushable_gate(repo, pre_push=False)
+                    if gate_rc != 0:
+                        commit_action["ok"] = False
+                        commit_action["error"] = "pushable gate failed before commit"
+                        result["blockers"].append(commit_action["error"])
+                    else:
+                        commit = _git(repo, "commit", "-m", msg)
+                        commit_action["ok"] = commit.returncode == 0
+                        if commit.returncode == 0:
+                            result["committed"] = True
+                            result["commit_message"] = msg
+                        else:
+                            commit_action["error"] = (commit.stderr or commit.stdout or "git commit failed").strip()
+                            result["blockers"].append(commit_action["error"])
+                    result["actions"].append(commit_action)
+
+    if branch and branch not in ("main", "master", "HEAD"):
+        ahead = _ahead_count(repo)
+        if ahead > 0:
+            push_action: dict[str, Any] = {"action": "push", "branch": branch, "ahead": ahead}
+            if dry_run:
+                push_action["dry_run"] = True
+                result["actions"].append(push_action)
+            else:
+                gate_rc = _run_pushable_gate(repo, pre_push=True)
+                if gate_rc != 0:
+                    push_action["ok"] = False
+                    push_action["error"] = "pre-push gate failed"
+                    result["blockers"].append(push_action["error"])
+                else:
+                    push = _git(repo, "push", "-u", "origin", "HEAD")
+                    push_action["ok"] = push.returncode == 0
+                    if push.returncode == 0:
+                        result["pushed"] = True
+                        if open_pr:
+                            pr_url = _ensure_pr(
+                                repo,
+                                branch=branch,
+                                title=f"context-closeout: {branch}",
+                                body="Auto-published by context window closeout sweep.",
+                            )
+                            if pr_url:
+                                result["pr_url"] = pr_url
+                                push_action["pr_url"] = pr_url
+                    else:
+                        push_action["error"] = (push.stderr or push.stdout or "git push failed").strip()
+                        result["blockers"].append(push_action["error"])
+                result["actions"].append(push_action)
+    elif _ahead_count(repo) > 0 and branch in ("main", "master"):
+        result["blockers"].append("unpushed commits on main — open PR manually (main is PR-only)")
+
+    post = _run_json_script(repo, "scripts/frontier_preflight.py") or preflight
+    dirty_remain = committable_dirty_paths(post)
+    ahead_remain = _ahead_count(repo)
+    if dirty_remain:
+        result["safe_to_switch"] = False
+        result["park_paths"] = dirty_remain
+        if not result["park_reason"]:
+            result["park_reason"] = "dirty working tree after sweep"
+        result["blockers"].append(f"dirty: {len(dirty_remain)} committable path(s) remain")
+    if ahead_remain > 0:
+        result["safe_to_switch"] = False
+        result["blockers"].append(f"unpushed: {ahead_remain} commit(s) ahead of upstream")
+    blocker_text = str(post.get("blocker") or preflight.get("blocker") or "")
+    if "unmerged" in blocker_text.lower() or "conflict" in blocker_text.lower():
+        result["safe_to_switch"] = False
+        result["blockers"].append("unmerged / conflicted paths present")
+
+    result["ok"] = not result["blockers"]
+    return result
+
+
+def write_sweep_artifact(repo: Path, sweep: dict[str, Any]) -> Path:
+    repo = repo.resolve()
+    out_dir = repo / "artifacts" / "control_plane"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = repo / SWEEP_REL
+    path.write_text(json.dumps(sweep, indent=2) + "\n", encoding="utf-8")
+    return path
 
 
 def _run_json_script(repo: Path, rel_script: str) -> dict[str, Any] | None:
@@ -120,7 +434,7 @@ def _operator_verdict(repo: Path) -> dict[str, Any]:
         return {"verdict": "UNKNOWN", "errors": [str(exc)]}
 
 
-def collect_snapshot(repo: Path) -> dict[str, Any]:
+def collect_snapshot(repo: Path, *, sweep: dict[str, Any] | None = None) -> dict[str, Any]:
     repo = repo.resolve()
     preflight = _run_json_script(repo, "scripts/frontier_preflight.py") or {}
     manifest: dict[str, Any] = {}
@@ -147,7 +461,7 @@ def collect_snapshot(repo: Path) -> dict[str, Any]:
         for i in (chapter_backlog.get("items") or [])
         if isinstance(i, dict) and str(i.get("status") or "").lower() == "blocked"
     ]
-    return {
+    payload: dict[str, Any] = {
         "generated_at_utc": _utc_now(),
         "head": _git_head(repo),
         "preflight": preflight,
@@ -173,6 +487,9 @@ def collect_snapshot(repo: Path) -> dict[str, Any]:
         },
         "canon": SOP_CLOSEOUT,
     }
+    if sweep is not None:
+        payload["sweep"] = sweep
+    return payload
 
 
 def _checklist_line(done: bool, label: str) -> str:
@@ -181,6 +498,7 @@ def _checklist_line(done: bool, label: str) -> str:
 
 def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
     pf = snapshot.get("preflight") if isinstance(snapshot.get("preflight"), dict) else {}
+    sweep = snapshot.get("sweep") if isinstance(snapshot.get("sweep"), dict) else {}
     branch = str(pf.get("branch") or "?")
     wt = str(pf.get("working_tree") or "?")
     upstream = str(pf.get("upstream") or "?")
@@ -190,6 +508,14 @@ def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
     prs = snapshot.get("open_prs") if isinstance(snapshot.get("open_prs"), list) else []
     ms = snapshot.get("manifest_summary") if isinstance(snapshot.get("manifest_summary"), dict) else {}
+
+    tree_clean = effective_working_tree_clean(pf) if pf else wt == "clean"
+    if sweep:
+        tree_clean = tree_clean and not sweep.get("park_paths")
+    unpushed_done = bool(sweep.get("pushed")) if sweep else False
+    ahead_remain = _ahead_count(repo) if sweep else None
+    if sweep and ahead_remain == 0:
+        unpushed_done = True
 
     lines = [
         "# Context window closeout (draft)",
@@ -243,13 +569,39 @@ def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
         lines.append("")
 
     lines.extend(["## Operational sweep", ""])
-    tree_clean = wt == "clean"
     lines.append(_checklist_line(tree_clean, "Working tree clean or explicitly PARKED"))
-    lines.append(_checklist_line(False, "Unpushed commits pushed (feature branches)"))
+    lines.append(
+        _checklist_line(
+            unpushed_done or (ahead_remain == 0 if ahead_remain is not None else False),
+            "Unpushed commits pushed (feature branches)",
+        )
+    )
     lines.append(_checklist_line(False, "`main` pulled / ff-only current"))
     lines.append(_checklist_line(len(prs) == 0, f"Open PRs reviewed ({len(prs)} listed below)"))
-    lines.append(_checklist_line(False, "Operator / relay threads reconciled"))
+    lines.append(_checklist_line(bool(sweep), "Operator / relay threads reconciled"))
     lines.append("")
+
+    if sweep:
+        lines.extend(
+            [
+                "### Auto sweep result",
+                "",
+                f"- **safe_to_switch:** {sweep.get('safe_to_switch')}",
+                f"- **committed:** {sweep.get('committed')}",
+                f"- **pushed:** {sweep.get('pushed')}",
+            ]
+        )
+        if sweep.get("commit_message"):
+            lines.append(f"- **commit:** `{sweep.get('commit_message')}`")
+        if sweep.get("pr_url"):
+            lines.append(f"- **pr:** {sweep.get('pr_url')}")
+        if sweep.get("park_reason"):
+            lines.append(f"- **park:** {sweep.get('park_reason')}")
+        if sweep.get("blockers"):
+            lines.append("- **blockers:**")
+            for b in sweep.get("blockers") or []:
+                lines.append(f"  - {b}")
+        lines.append("")
 
     if prs:
         lines.extend(["### Open pull requests", ""])
@@ -600,6 +952,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slices-closed", type=int, default=0, help="Slices closed in this Cursor thread")
     ap.add_argument("--notes", default="", help="Optional closeout notes")
     ap.add_argument("--no-promote", action="store_true", help="Skip writing WHATS_NEXT artifacts")
+    ap.add_argument(
+        "--sweep",
+        action="store_true",
+        help="Operational sweep: gate+commit ship-now, push feature branch, then --record",
+    )
+    ap.add_argument(
+        "--sweep-dry-run",
+        action="store_true",
+        help="Report sweep actions without git commit/push",
+    )
+    ap.add_argument("--sweep-commit-message", default="", help="Override auto sweep commit message")
+    ap.add_argument("--sweep-no-pr", action="store_true", help="Do not open PR after push")
     sub = ap.add_subparsers(dest="cmd")
 
     ab = sub.add_parser("add-build", help="Append blocked row to PHASE_CHAPTER_BACKLOG.json")
@@ -662,7 +1026,31 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ppe_context_window_closeout: appended triggered idea -> {path.relative_to(repo)}")
         return 0
 
-    snapshot = collect_snapshot(repo)
+    if args.sweep:
+        args.record = True
+        args.render = True
+    if args.sweep_dry_run:
+        args.render = True
+
+    sweep_result: dict[str, Any] | None = None
+    if args.sweep or args.sweep_dry_run:
+        pre = collect_snapshot(repo)
+        chapter_id = _chapter_from_snapshot(pre)
+        sweep_result = run_operational_sweep(
+            repo,
+            dry_run=args.sweep_dry_run,
+            open_pr=not args.sweep_no_pr,
+            commit_message=args.sweep_commit_message,
+            chapter_id=chapter_id,
+        )
+        if not args.sweep_dry_run:
+            write_sweep_artifact(repo, sweep_result)
+        print(f"ppe_context_window_closeout: sweep safe_to_switch={sweep_result.get('safe_to_switch')}")
+        if sweep_result.get("blockers"):
+            for blocker in sweep_result["blockers"]:
+                print(f"ppe_context_window_closeout: sweep blocker: {blocker}")
+
+    snapshot = collect_snapshot(repo, sweep=sweep_result)
     if args.json:
         print(json.dumps(snapshot, indent=2))
         return 0
@@ -670,13 +1058,18 @@ def main(argv: list[str] | None = None) -> int:
         json_path, md_path = write_artifacts(repo, snapshot)
         print(f"ppe_context_window_closeout: wrote {json_path.relative_to(repo)}")
         print(f"ppe_context_window_closeout: wrote {md_path.relative_to(repo)}")
+        if sweep_result and not args.sweep_dry_run:
+            print(f"ppe_context_window_closeout: wrote {SWEEP_REL}")
         if args.record:
+            safe = args.safe_to_switch == "yes"
+            if sweep_result is not None:
+                safe = bool(sweep_result.get("safe_to_switch"))
             record = record_context_closeout(
                 repo,
                 snapshot,
                 thread_role=args.thread_role,
                 whats_next=args.whats_next,
-                safe_to_switch=args.safe_to_switch == "yes",
+                safe_to_switch=safe,
                 slices_closed_in_thread=args.slices_closed,
                 notes=args.notes,
                 promote=not args.no_promote,
@@ -686,6 +1079,8 @@ def main(argv: list[str] | None = None) -> int:
             if not args.no_promote:
                 print(f"ppe_context_window_closeout: promoted {WHATS_NEXT_MD_REL}")
             print(f"ppe_context_window_closeout: whats_next={record.get('whats_next')}")
+        if sweep_result and not sweep_result.get("ok") and args.sweep and not args.sweep_dry_run:
+            return 1
         return 0
 
     ap.print_help()
