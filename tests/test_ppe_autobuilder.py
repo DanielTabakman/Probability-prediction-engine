@@ -177,3 +177,39 @@ def test_action_advance_ensure_on_stack_down(tmp_path: Path):
         result = action_advance(tmp_path)
     ensure.assert_called_once()
     assert result["action"] == "ensure"
+
+
+def test_happy_path_enabled_from_env(tmp_path: Path, monkeypatch):
+    from scripts.ppe_autobuilder import happy_path_enabled
+
+    monkeypatch.setenv("PPE_AUTOBUILDER_HAPPY_PATH", "1")
+    assert happy_path_enabled(tmp_path) is True
+    monkeypatch.setenv("PPE_AUTOBUILDER_HAPPY_PATH", "0")
+    assert happy_path_enabled(tmp_path) is False
+
+
+def test_try_autobuilder_happy_path_noop_when_disabled(tmp_path: Path, monkeypatch):
+    from scripts.ppe_autobuilder import try_autobuilder_happy_path
+
+    monkeypatch.setenv("PPE_AUTOBUILDER_HAPPY_PATH", "0")
+    assert try_autobuilder_happy_path(tmp_path) is None
+
+
+def test_try_autobuilder_happy_path_calls_advance(tmp_path: Path, monkeypatch):
+    from scripts.ppe_autobuilder import try_autobuilder_happy_path
+
+    monkeypatch.setenv("PPE_AUTOBUILDER_HAPPY_PATH", "1")
+    with (
+        patch(
+            "scripts.ppe_autobuilder.collect_autobuilder_status",
+            return_value={"phase": PHASE_AWAITING_BUILD, "recommended_action": "retry-build", "dispatch": {}},
+        ),
+        patch(
+            "scripts.ppe_autobuilder.action_advance",
+            return_value={"action": "retry-build", "started": True},
+        ) as advance,
+    ):
+        result = try_autobuilder_happy_path(tmp_path)
+    advance.assert_called_once()
+    assert result is not None
+    assert result.get("happy_path") is True

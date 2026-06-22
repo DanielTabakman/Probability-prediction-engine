@@ -1,0 +1,49 @@
+{
+  "name": "PPE autobuilder onboarding v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_ONBOARDING_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+  "layerPreset": "CONTROL",
+  "slices": [
+    {
+      "sliceId": "PPE-AutobuilderOnboarding-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderOnboarding-Product-Slice002",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-AutobuilderOnboarding-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 20,
+      "hardMinutes": 45,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderOnboarding-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_autobuilder_onboarding_v1",
+        "chapterTitle": "PPE autobuilder onboarding v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_AUTOBUILDER_ONBOARDING_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_AUTOBUILDER_ONBOARDING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      }
+    }
+  ]
+}

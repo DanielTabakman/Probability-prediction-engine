@@ -213,9 +213,45 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
-      "status": "ready",
-      "reason": "[P0] Usable demo BUILD \u2014 MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
+      "status": "pending",
+      "reason": "[P0 PAUSED] UX design gate",
       "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Autobuilder happy path \u2014 active factory chapter",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Bounded build repair",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_timeline_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Timeline artifact",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_onboarding_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Onboarding quickstart",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_agents_index_v1_relay.json",
+      "status": "pending",
+      "reason": "[LOW] AGENTS.md index",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_parallel_slices_v1_relay.json",
+      "status": "pending",
+      "reason": "[LOW] Parallel slice locks",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
     }
   ]
 }

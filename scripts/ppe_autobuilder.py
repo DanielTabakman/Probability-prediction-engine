@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -60,6 +61,50 @@ PHASE_RECOMMENDED: dict[str, str] = {
     PHASE_ERROR: ACTION_DIAGNOSE,
     PHASE_DEGRADED: ACTION_HANDOFF,
 }
+
+HAPPY_PATH_PHASES = frozenset(
+    {
+        PHASE_STACK_DOWN,
+        PHASE_AWAITING_BUILD,
+        PHASE_CLOSEOUT_PENDING,
+        PHASE_RUN_LOCAL_PENDING,
+    }
+)
+
+
+def happy_path_enabled(repo: Path) -> bool:
+    """When True, loop/watch auto-run ppe_autobuilder advance on actionable phases."""
+    env = os.environ.get("PPE_AUTOBUILDER_HAPPY_PATH", "").strip().lower()
+    if env in ("0", "false", "no", "off"):
+        return False
+    if env in ("1", "true", "yes", "on"):
+        return True
+    try:
+        from scripts.ppe_operator_config import load_operator_config
+
+        cfg = load_operator_config(repo.resolve())
+        ab = cfg.get("autobuilder")
+        if isinstance(ab, dict):
+            if ab.get("happyPath") is True:
+                return True
+            if ab.get("happyPath") is False:
+                return False
+    except ImportError:
+        pass
+    return False
+
+
+def try_autobuilder_happy_path(repo: Path) -> dict[str, Any] | None:
+    """Run advance when happy path is on and phase is actionable. Returns None when no-op."""
+    if not happy_path_enabled(repo):
+        return None
+    status = collect_autobuilder_status(repo)
+    phase = str(status.get("phase") or "")
+    if phase not in HAPPY_PATH_PHASES:
+        return None
+    result = action_advance(repo)
+    result["happy_path"] = True
+    return result
 
 
 def _utc_now() -> str:

@@ -420,6 +420,15 @@ def _maybe_auto_remote_build(repo: Path, status: dict[str, Any]) -> dict[str, An
     if str(status.get("verdict") or "") != VERDICT_IDE_BUILD:
         return None
     try:
+        from scripts.ppe_autobuilder import happy_path_enabled, try_autobuilder_happy_path
+
+        if happy_path_enabled(repo):
+            hp = try_autobuilder_happy_path(repo)
+            if hp and not hp.get("skipped"):
+                return hp
+    except ImportError:
+        pass
+    try:
         from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
         from scripts.ppe_operator_config import auto_remote_build_enabled
         from scripts.ppe_remote_build_agent import read_build_lock
@@ -442,7 +451,7 @@ def _notify_mobile(repo: Path, *, status: dict[str, Any] | None = None) -> None:
     if not push.is_file():
         return
     if auto_build and auto_build.get("started"):
-        if auto_build.get("notified"):
+        if auto_build.get("happy_path"):
             return
         mode = str(auto_build.get("mode") or auto_build.get("action") or "build")
         if mode == "ide_handoff":

@@ -15,6 +15,20 @@ EXIT_PASS_HANDLED = 8
 
 def run_loop_pass(repo: Path) -> int:
     """Return 0 to proceed to run_ppe_auto; 7 guard stop; 8 pass handled."""
+    try:
+        from scripts.ppe_autobuilder import try_autobuilder_happy_path
+
+        hp = try_autobuilder_happy_path(repo)
+        if hp and not hp.get("skipped"):
+            action = str(hp.get("action") or "")
+            if action == "run-local" and hp.get("started"):
+                print("ppe_operator_loop_pass: happy_path run-local started")
+                return EXIT_PASS_HANDLED
+            if action in ("finish-pending", "retry-build", "handoff", "ensure") and hp.get("started"):
+                print(f"ppe_operator_loop_pass: happy_path {action}")
+    except ImportError:
+        pass
+
     status = collect_operator_status(repo)
     verdict = str(status.get("verdict") or "")
 

@@ -1,0 +1,57 @@
+{
+  "name": "PPE autobuilder happy path v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+  "layerPreset": "CONTROL",
+  "slices": [
+    {
+      "sliceId": "PPE-AutobuilderHappyPath-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderHappyPath-Product-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 90,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-AutobuilderHappyPath-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 20,
+      "hardMinutes": 45,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderHappyPath-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_autobuilder_happy_path_v1",
+        "chapterTitle": "PPE autobuilder happy path v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_AUTOBUILDER_HAPPY_PATH_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/PPE_AUTOBUILDER_HAPPY_PATH_V1_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

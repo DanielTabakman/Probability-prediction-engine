@@ -1,0 +1,49 @@
+{
+  "name": "PPE autobuilder timeline v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_TIMELINE_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+  "layerPreset": "CONTROL",
+  "slices": [
+    {
+      "sliceId": "PPE-AutobuilderTimeline-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderTimeline-Product-Slice002",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-AutobuilderTimeline-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-AutobuilderTimeline-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_autobuilder_timeline_v1",
+        "chapterTitle": "PPE autobuilder timeline v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_AUTOBUILDER_TIMELINE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_AUTOBUILDER_TIMELINE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      }
+    }
+  ]
+}

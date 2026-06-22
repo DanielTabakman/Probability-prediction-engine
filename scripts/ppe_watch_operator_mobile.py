@@ -162,6 +162,16 @@ def _maybe_auto_remote_build(
     *,
     retry: bool = False,
 ) -> dict[str, Any] | None:
+    try:
+        from scripts.ppe_autobuilder import happy_path_enabled, try_autobuilder_happy_path
+
+        if happy_path_enabled(repo) and not retry:
+            hp = try_autobuilder_happy_path(repo)
+            if hp and not hp.get("skipped"):
+                return hp
+    except ImportError:
+        pass
+
     from scripts.ppe_ide_handoff import ide_handoff_enabled, respond_to_ide_build
     from scripts.ppe_operator_config import auto_remote_build_enabled
     from scripts.ppe_remote_build_agent import read_build_lock, resolve_build_target
@@ -318,7 +328,9 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         blocker = str(status.get("blocker") or verdict)
         if auto_build and auto_build.get("started"):
             slice_id = str(auto_build.get("slice_id") or "")
-            if str(auto_build.get("mode") or auto_build.get("action")) == "ide_handoff":
+            if auto_build.get("happy_path"):
+                pass  # suppress phone ping on zero-click happy path
+            elif str(auto_build.get("mode") or auto_build.get("action")) == "ide_handoff":
                 alerts.append(
                     (
                         f"PPE IDE handoff: {slice_id or verdict}",

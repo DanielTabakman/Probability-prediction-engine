@@ -125,6 +125,14 @@ def main(argv: list[str] | None = None) -> int:
         rc = _run_script(repo, env, "ppe_post_build_watcher.py", "--repo-root", str(repo))
         if rc != 0:
             return rc
+        try:
+            from scripts.ppe_autobuilder import try_autobuilder_happy_path
+
+            hp = try_autobuilder_happy_path(repo)
+            if hp and not hp.get("skipped"):
+                print(f"ppe_headless_auto_loop_entry: happy_path {hp.get('action')}", flush=True)
+        except ImportError:
+            pass
         _run_script(repo, env, "ppe_autobuilder.py", "--repo-root", str(repo), "status", "--write", "--brief")
         status_rc = _run_script(
             repo,

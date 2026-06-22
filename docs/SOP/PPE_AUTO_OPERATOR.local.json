@@ -42,6 +42,9 @@
     "postBuildWatcher": true,
     "localTriggerWatcher": true
   },
+  "autobuilder": {
+    "happyPath": true
+  },
   "desktopStack": {
     "mode": "headless",
     "notes": "One supervisor process + detached workers; use run_ppe_headless_stack.cmd. See PPE_HEADLESS_STACK_V1.md."

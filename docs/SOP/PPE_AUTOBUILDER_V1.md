@@ -60,6 +60,15 @@ Canonical JSON: `artifacts/orchestrator/AUTOBUILDER_STATUS.json`
 
 ---
 
+## Happy path (zero-click)
+
+When `autobuilder.happyPath: true` in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (or `PPE_AUTOBUILDER_HAPPY_PATH=1`):
+
+- Loop, watch, and loop-pass call `try_autobuilder_happy_path()` → `advance` on `STACK_DOWN`, `AWAITING_BUILD`, `CLOSEOUT_PENDING`, `RUN_LOCAL_PENDING`.
+- Successful handoff **suppresses** urgent ntfy (no `ppe_go.cmd` tap required on happy path).
+
+---
+
 ## Commands
 
 ```bat

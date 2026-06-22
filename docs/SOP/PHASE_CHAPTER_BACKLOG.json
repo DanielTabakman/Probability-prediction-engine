@@ -304,61 +304,74 @@
     },
     {
       "chapterId": "msos_usable_demo_v1",
-      "status": "chartered",
+      "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
       "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
-      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
+      "reason": "[P0 PAUSED] UX/storyboard design gate \u2014 resume BUILD when walkable inputs ready (2026-06-15)"
     },
     {
       "chapterId": "ppe_autobuilder_happy_path_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "workerMode": "deterministic",
       "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md",
-      "reason": "[HIGH] Zero-click happy path: advance \u2192 handoff \u2192 watcher \u2192 build-worker \u2192 marker \u2192 run_ppe_local. Factory stability \u2014 charterable during product UX pause."
+      "reason": "[HIGH] Zero-click happy path \u2014 active factory chapter during product UX pause"
     },
     {
       "chapterId": "ppe_autobuilder_bounded_repair_v1",
       "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md",
-      "reason": "[MEDIUM] Bounded gate-failure auto-retry in build-worker before triage-worker escalation"
+      "reason": "[MEDIUM] Bounded gate-failure auto-retry before triage-worker escalation"
     },
     {
       "chapterId": "ppe_autobuilder_timeline_v1",
       "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_timeline_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md",
-      "reason": "[MEDIUM] AUTOBUILDER_TIMELINE artifact from status JSON + relay runs + git commits"
+      "reason": "[MEDIUM] AUTOBUILDER_TIMELINE artifact for stuck-pipeline debugging"
     },
     {
       "chapterId": "ppe_autobuilder_onboarding_v1",
       "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_onboarding_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "canonRef": "docs/SOP/PPE_AUTOBUILDER_COMMERCIAL_MVP_V1.md",
-      "reason": "[MEDIUM] install_operator one-command + stripped template repo + 30-min quickstart + one example chapter (commercial MVP enabler)"
+      "reason": "[MEDIUM] install_operator + quickstart + example chapter"
     },
     {
       "chapterId": "ppe_autobuilder_agents_index_v1",
       "status": "blocked",
       "priority": "low",
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_agents_index_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md",
-      "reason": "[LOW] Root AGENTS.md index pointing to .cursor/agents, layer map, starters, forbidden paths"
+      "reason": "[LOW] Root AGENTS.md agent/layer index"
     },
     {
       "chapterId": "ppe_autobuilder_parallel_slices_v1",
       "status": "blocked",
       "priority": "low",
       "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_parallel_slices_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "canonRef": "docs/SOP/PARALLEL_AGENT_CHECKLIST_V1.md",
-      "reason": "[LOW] Parallel product slices when layer audit confirms disjoint ALLOWED_PATHS; multi-lock BUILD_IN_FLIGHT"
+      "reason": "[LOW] Multi-lock parallel product slices when layer audit allows"
     }
   ]
 }
