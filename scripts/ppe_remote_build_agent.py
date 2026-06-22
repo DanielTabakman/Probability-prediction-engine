@@ -103,6 +103,22 @@ def read_build_lock(repo: Path) -> dict[str, Any] | None:
     return data
 
 
+def read_build_locks(repo: Path) -> list[dict[str, Any]]:
+    """Active build lock(s). Supports legacy single lock or `{ \"locks\": [...] }`."""
+    raw = _read_build_lock_raw(repo)
+    if not raw:
+        return []
+    locks_raw = raw.get("locks")
+    if isinstance(locks_raw, list):
+        out: list[dict[str, Any]] = []
+        for item in locks_raw:
+            if isinstance(item, dict) and item.get("slice_id"):
+                out.append(item)
+        return out
+    lock = read_build_lock(repo)
+    return [lock] if lock else []
+
+
 def write_build_lock(
     repo: Path,
     *,

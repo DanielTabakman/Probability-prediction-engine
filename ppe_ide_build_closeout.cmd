@@ -22,10 +22,10 @@ set "PLAN_PATH=%~2"
 for /f "delims=" %%b in ('git branch --show-current 2^>nul') do set "CUR_BRANCH=%%b"
 echo ppe_ide_build_closeout: branch=!CUR_BRANCH! slice=!SLICE_ID!
 
-echo [1/3] pushable gate...
-python "%CD%\scripts\run_pushable_gate.py"
+echo [1/3] pushable gate (bounded repair)...
+python "%CD%\scripts\ppe_ide_build_closeout.py" --gate-only "!SLICE_ID!" "!PLAN_PATH!"
 if errorlevel 1 (
-  echo ppe_ide_build_closeout: gate failed — fix before mark_ready
+  echo ppe_ide_build_closeout: gate failed — see artifacts/orchestrator/BUILD_REPAIR_HINT.md
   exit /b 1
 )
 

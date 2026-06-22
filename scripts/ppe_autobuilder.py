@@ -12,6 +12,7 @@ from typing import Any
 
 STATUS_JSON_REL = "artifacts/orchestrator/AUTOBUILDER_STATUS.json"
 DIAGNOSE_MD_REL = "artifacts/orchestrator/AUTOBUILDER_DIAGNOSE.md"
+TIMELINE_MD_REL = "artifacts/orchestrator/AUTOBUILDER_TIMELINE.md"
 
 PHASE_STACK_DOWN = "STACK_DOWN"
 PHASE_HEALTHY_IDLE = "HEALTHY_IDLE"
@@ -189,17 +190,25 @@ def _automation_summary(repo: Path) -> dict[str, Any]:
 
 def _build_lock_summary(repo: Path) -> dict[str, Any] | None:
     try:
-        from scripts.ppe_remote_build_agent import read_build_lock
+        from scripts.ppe_remote_build_agent import read_build_lock, read_build_locks
 
+        locks = read_build_locks(repo)
         lock = read_build_lock(repo)
-        if not lock:
+        if not lock and not locks:
             return None
-        return {
-            "slice_id": lock.get("slice_id"),
-            "source": lock.get("source"),
-            "started_at": lock.get("started_at"),
-            "worker_pid": lock.get("worker_pid"),
+        primary = lock or (locks[0] if locks else None)
+        if not primary:
+            return None
+        summary = {
+            "slice_id": primary.get("slice_id"),
+            "source": primary.get("source"),
+            "started_at": primary.get("started_at"),
+            "worker_pid": primary.get("worker_pid"),
         }
+        if len(locks) > 1:
+            summary["locks"] = locks
+            summary["lock_count"] = len(locks)
+        return summary
     except ImportError:
         return None
 
@@ -433,6 +442,77 @@ def write_status_artifact(repo: Path, status: dict[str, Any] | None = None) -> P
     path = status_json_path(repo)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    try:
+        write_autobuilder_timeline(repo, status=data)
+    except Exception:
+        pass
+    return path
+
+
+def write_autobuilder_timeline(repo: Path, *, status: dict[str, Any] | None = None) -> Path:
+    """Human-readable pipeline timeline from status, relay runs, and recent git commits."""
+    repo = repo.resolve()
+    data = status if status is not None else collect_autobuilder_status(repo)
+    lines = [
+        "# Autobuilder timeline",
+        "",
+        f"**As-of:** {data.get('as_of')}",
+        f"**Phase:** `{data.get('phase')}` · **Verdict:** `{data.get('verdict')}`",
+        "",
+        "## Operator",
+        "",
+    ]
+    op = data.get("operator") or {}
+    lines.append(f"- Chapter: {op.get('chapter_name') or '-'}")
+    lines.append(f"- Plan: {op.get('phase_plan_path') or '-'}")
+    build = data.get("build") or {}
+    lines.extend(
+        [
+            "",
+            "## Build",
+            "",
+            f"- Slice: {build.get('slice_id') or '-'}",
+            f"- Lock: {build.get('lock')}",
+            "",
+            "## Recent git (main, last 8)",
+            "",
+            "```",
+        ]
+    )
+    try:
+        import subprocess
+
+        proc = subprocess.run(
+            ["git", "log", "-8", "--oneline", "--decorate"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        lines.append((proc.stdout or proc.stderr or "(no git log)").strip())
+    except OSError:
+        lines.append("(git unavailable)")
+    lines.extend(["```", "", "## Relay runs (newest 5)", ""])
+
+    relay_root = repo / "artifacts" / "relay" / "runs"
+    if relay_root.is_dir():
+        run_dirs = sorted(relay_root.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True)[:5]
+        for run_dir in run_dirs:
+            result = run_dir / "relay_result.json"
+            if result.is_file():
+                try:
+                    payload = json.loads(result.read_text(encoding="utf-8-sig"))
+                    sid = payload.get("slice_id") or payload.get("sliceId") or "?"
+                    lines.append(f"- `{run_dir.name}` — slice `{sid}`")
+                except (OSError, json.JSONDecodeError):
+                    lines.append(f"- `{run_dir.name}`")
+    else:
+        lines.append("- (no relay runs)")
+
+    lines.append("")
+    path = repo / TIMELINE_MD_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
 
 
@@ -527,6 +607,10 @@ def run_diagnose(repo: Path, *, ping_webhook: bool = False) -> dict[str, Any]:
     md_path.parent.mkdir(parents=True, exist_ok=True)
     md_body = "\n".join(lines) + "\n"
     md_path.write_text(md_body, encoding="utf-8")
+    try:
+        timeline_path = write_autobuilder_timeline(repo, status=status)
+    except Exception:
+        timeline_path = None
 
     result = {
         "as_of": status.get("as_of"),
@@ -536,6 +620,7 @@ def run_diagnose(repo: Path, *, ping_webhook: bool = False) -> dict[str, Any]:
         "checks_failed": len(failed),
         "recommended_action": status.get("recommended_action"),
         "report_md": str(md_path.relative_to(repo)).replace("\\", "/"),
+        "timeline_md": str(timeline_path.relative_to(repo)).replace("\\", "/") if timeline_path else None,
         "status_json": STATUS_JSON_REL,
     }
     write_status_artifact(repo, status)

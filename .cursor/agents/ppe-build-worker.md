@@ -24,6 +24,8 @@ python scripts/ppe_layer_audit.py --repo-root . --dirty --layer-preset <from sta
 python scripts/run_pushable_gate.py
 ```
 
+If gate fails during closeout, read `artifacts/orchestrator/BUILD_REPAIR_HINT.md` and fix before re-running closeout (max attempts per `autobuilder.buildRepairMaxAttempts` in operator config).
+
 ## Finish sequence (required, in order)
 
 1. Commit on build branch with policy-style message.
