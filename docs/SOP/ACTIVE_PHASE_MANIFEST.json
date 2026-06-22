@@ -1,8 +1,8 @@
-{
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [P0] Usable demo BUILD — MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
-  "workerMode": "deterministic"
-}
+{
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "P0 product BUILD per ACTIVE_PRODUCT_DIRECTION pivot usable-demo-build-v1; factory chapters remain PLANNED side-channel",
+  "workerMode": "deterministic"
+}
