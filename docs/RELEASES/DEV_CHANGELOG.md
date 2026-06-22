@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-22
 
+- `1e580e8` — docs(msos-shell): add MSOS_PUBLIC_COPY_V1 trader copy canon (#283) (`docs/SOP/`)
+- `318ef86` — Control-plane: dev changelog
 - `48985db` — copy(msos-shell): rewrite public UI for new options traders (#281) (`apps/msos-web/`)
 
 ## 2026-06-21
