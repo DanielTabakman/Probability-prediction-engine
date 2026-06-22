@@ -11,9 +11,10 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 5. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) — only if brief reports `steering_aligned: true` for that track
 6. [`VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — product canon when scope questions arise
 7. [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — wedge proof, priorities, drift guards before widening scope
-8. [`PRODUCT_DIRECTION_PIVOT_V1.md`](PRODUCT_DIRECTION_PIVOT_V1.md) — how agents pivot direction (operator does not memorize this)
-9. [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) — monthly/quarterly steward cadence (on demand)
-10. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
+8. [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) — trader-facing UI copy when reviewing or steering `msos-shell` / Strategy Lab / Command Center
+9. [`PRODUCT_DIRECTION_PIVOT_V1.md`](PRODUCT_DIRECTION_PIVOT_V1.md) — how agents pivot direction (operator does not memorize this)
+10. [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) — monthly/quarterly steward cadence (on demand)
+11. [`GOOGLE_DOCS_CONTROL_PLANE_V1.md`](GOOGLE_DOCS_CONTROL_PLANE_V1.md) — Google Doc roles (MSOS write / Master read-only for Cursor)
 
 ## Do not use as controlling
 

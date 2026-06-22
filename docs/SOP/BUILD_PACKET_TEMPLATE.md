@@ -57,6 +57,10 @@ When the slice adds product surface, assets, or commercial claims, cite [`PRODUC
 - Drift guards checked: yes / N/A — <exception note if steward approved>
 ```
 
+## Public copy (`MSOS_UI` / `msos-shell`)
+
+Any slice that changes visitor-visible strings must follow [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) (trader voice, banned jargon, degraded messages). Prefer `apps/msos-web/src/lib/publicCopy.ts` for shared footers and error sanitization.
+
 ## Forbidden in packets
 
 - Full `HANDOFF.md` gate block pasted inline
