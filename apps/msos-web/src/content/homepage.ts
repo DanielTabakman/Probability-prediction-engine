@@ -26,15 +26,15 @@ export const homepageHero = {
 export const homepageProductCards = [
   {
     title: "Market Structure OS",
-    body: "One workspace for thesis-driven market decisions.",
+    body: "One workspace to go from market view to paper trade — thesis, comparison, and review.",
   },
   {
     title: "Strategy Lab",
-    body: "Build, compare, and monitor strategies from a clear market view.",
+    body: "See live BTC options, state your view, and compare it to what the market prices today.",
   },
   {
     title: "Probability Engine",
-    body: "See where options pricing agrees — or disagrees — with your thesis.",
+    body: "Find where options agree — or disagree — with your thesis before you pick a structure.",
   },
 ] as const;
 
@@ -73,21 +73,21 @@ export const homepageFeatures = [
   {
     kicker: "01 — Read",
     title: "See what the market implies",
-    body: "Start with options pricing, probabilities, positioning, and other market surfaces.",
+    body: "Start with live BTC options — what's priced in, and what range the market expects.",
   },
   {
     kicker: "02 — State",
     title: "Add your thesis",
-    body: "Turn your view into something the system can compare against the market.",
+    body: "State your view in plain terms so you can compare it to the market.",
   },
   {
     kicker: "03 — Fit",
     title: "Explore possible expressions",
-    body: "Compare structures that fit your view, risk limits, and time horizon.",
+    body: "See payoff shapes that fit your view and risk — paper only, no live orders.",
   },
   {
     kicker: "04 — Learn",
     title: "Track what happened",
-    body: "Review how the thesis, structure, and outcome evolved over time.",
+    body: "Review what you believed, what the market implied, and how the thesis played out.",
   },
 ] as const;

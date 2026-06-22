@@ -36,7 +36,7 @@ export type CommandCenterSummary = {
   currentWork: CommandCenterWorkItem[];
 };
 
-const SOURCE_LABEL = "From your saved market snapshots";
+const SOURCE_LABEL = "From your saved views";
 const RECENT_LIMIT = 10;
 
 type SnapshotRow = {
@@ -163,9 +163,9 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
       status: "empty",
       sourceLabel: SOURCE_LABEL,
       kpis: [
-        { label: "Saved snapshots", value: "0", sub: "Capture a view in Strategy Lab" },
+        { label: "Saved views", value: "0", sub: "Save a read in Strategy Lab" },
         { label: "Reviews due", value: "0", sub: "Nothing to review yet" },
-        { label: "Reviews done", value: "0", sub: "Post-mortems appear here" },
+        { label: "Reviews done", value: "0", sub: "Completed reviews appear here" },
       ],
       recentSnapshots: [],
       currentWork: [],
@@ -200,7 +200,7 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
     sourceLabel: SOURCE_LABEL,
     kpis: [
       {
-        label: "Saved snapshots",
+        label: "Saved views",
         value: String(total),
         sub: "Captured market reads",
       },
@@ -213,7 +213,7 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
       {
         label: "Reviews done",
         value: String(completed),
-        sub: "Completed post-mortems",
+        sub: "Completed reviews",
         tone: completed > 0 ? "teal" : undefined,
       },
     ],
@@ -228,7 +228,7 @@ export function degradedSummary(reason: string): CommandCenterSummary {
     sourceLabel: SOURCE_LABEL,
     degradedReason: reason,
     kpis: [
-      { label: "Saved snapshots", value: "—", sub: "History not connected" },
+      { label: "Saved views", value: "—", sub: "History not connected" },
       { label: "Reviews due", value: "—", sub: "Unavailable" },
       { label: "Reviews done", value: "—", sub: "Unavailable" },
     ],

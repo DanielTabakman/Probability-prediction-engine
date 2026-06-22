@@ -3,9 +3,9 @@
 export const conclusionHeadline = "What did you take away?";
 
 export const conclusionNarrative = {
-  lead: "Market Structure OS helps you compare what you believe with what the market is pricing — then plan, paper-trade, and review.",
+  lead: "Compare what you believe with what the market is pricing — then plan, paper-trade, and review.",
   body:
-    "You walked through the market read, stated a view, sketched a trade, and checked monitor/history. The goal is clarity, not hot tips.",
+    "You walked through the market read, stated a view, sketched a paper trade, and checked Monitor and History. The goal is clarity, not hot tips.",
 };
 
 export const learnLoopSteps = [

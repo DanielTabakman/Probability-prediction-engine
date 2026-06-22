@@ -32,8 +32,8 @@ def test_public_nav_links_to_command_center() -> None:
     assert 'href="/command-center"' in nav or "MSOS_ROUTES.commandCenter" in nav
     assert (
         "Enter Command Center" in nav
-        or "Command Center" in nav
-        or "Enter Command Center" in nav_copy
+        or "Open Command Center" in nav
+        or "Open Command Center" in nav_copy
         or "enterCommandCenterCta" in nav
     )
 

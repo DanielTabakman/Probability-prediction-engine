@@ -75,7 +75,7 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
         </svg>
       </div>
       {series.mean_usd !== undefined && series.quartiles_usd ? (
-        <div className="ppe-summary-table" aria-label="PPE display payload summary">
+        <div className="ppe-summary-table" aria-label="BTC options summary stats">
           <span>Mean {formatUsd(series.mean_usd)}</span>
           <span>Q1 {formatUsd(series.quartiles_usd.q1_usd)}</span>
           <span>Median {formatUsd(series.quartiles_usd.median_usd)}</span>

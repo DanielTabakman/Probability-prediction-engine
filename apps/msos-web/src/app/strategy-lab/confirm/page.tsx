@@ -4,9 +4,9 @@ import { AppShell } from "@/components/AppShell";
 import { ThesisConfirmationPanel } from "@/components/ThesisConfirmationPanel";
 
 export const metadata: Metadata = {
-  title: "Thesis confirmation | Strategy Lab | Market Structure OS",
+  title: "Confirm your view | Strategy Lab | Market Structure OS",
   description:
-    "MSOS thesis confirmation — is this what you think is true? Preview persistence only; proceed to expression planning, not execution.",
+    "Lock in your view in plain language — then plan a paper trade. No live orders.",
 };
 
 export default function ThesisConfirmPage() {

@@ -55,7 +55,7 @@ export type CalibrationStrip = {
   href: string;
 };
 
-const WORKFLOW_SOURCE = "Your workspace + saved snapshots";
+const WORKFLOW_SOURCE = "Your workspace + saved views";
 
 function reviewState(row: CommandCenterSnapshotRow): HistoryState {
   const status = (row.reviewStatus ?? "").trim().toLowerCase();
@@ -170,7 +170,7 @@ function buildAlerts(summary: CommandCenterSummary): MonitorAlert[] {
     if (completed > 0) {
       alerts.push({
         title: `${completed} review${completed === 1 ? "" : "s"} complete`,
-        body: "Post-mortems recorded on saved market reads.",
+        body: "Reviews recorded on saved market reads.",
         tone: "teal",
       });
     }
@@ -189,7 +189,7 @@ function healthFromSummary(summary: CommandCenterSummary): { pct: number; label:
   if (summary.status !== "live") {
     return { pct: 0, label: "Waiting for saved reads" };
   }
-  const totalKpi = summary.kpis.find((k) => k.label === "Saved snapshots");
+  const totalKpi = summary.kpis.find((k) => k.label === "Saved views");
   const pendingKpi = summary.kpis.find((k) => k.label === "Reviews due");
   const total = Number(totalKpi?.value ?? "0");
   const pending = Number(pendingKpi?.value ?? "0");
@@ -248,7 +248,7 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
   return {
     status: hasWorkflow || hasSnapshots ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
-    heroTitle: hasWorkflow ? "Thesis & expression watch" : "Monitoring workspace",
+    heroTitle: hasWorkflow ? "Your open ideas" : "Monitor",
     heroSubtitle: hasSnapshots
       ? "Watching your saved views and paper trades."
       : "Save a view in Strategy Lab to start building history.",
@@ -295,7 +295,7 @@ export function buildCalibrationStrip(summary: CommandCenterSummary): Calibratio
     return {
       title: "Track your accuracy",
       body: "Saved history isn't connected yet — Strategy Lab live data still works.",
-      cta: "Open monitor",
+      cta: "Open Monitor",
       href: "/monitor",
     };
   }
@@ -304,15 +304,15 @@ export function buildCalibrationStrip(summary: CommandCenterSummary): Calibratio
   if (pending > 0) {
     return {
       title: "Track your accuracy",
-      body: `${pending} saved view${pending === 1 ? "" : "s"} ready for a post-mortem.`,
-      cta: "Open monitor",
+      body: `${pending} saved view${pending === 1 ? "" : "s"} ready for review.`,
+      cta: "Open Monitor",
       href: "/monitor",
     };
   }
   return {
     title: "Track your accuracy",
     body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
-    cta: "Open monitor",
+    cta: "Open Monitor",
     href: "/monitor",
   };
 }

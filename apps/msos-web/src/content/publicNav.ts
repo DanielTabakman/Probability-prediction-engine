@@ -1,5 +1,5 @@
 /**
- * Public nav copy — canon: docs/SOP/MSOS_PUBLIC_COPY_V1.md
+ * Public nav copy — canon: docs/PRODUCT_COPY/packets/public-nav.v1.md
  * Copy agent edits this file; PublicNav imports from here.
  */
 
@@ -9,9 +9,9 @@ export const publicNavCopy = {
   links: {
     platform: "Platform",
     strategyLab: "Strategy Lab",
-    marketSurfaces: "Market surfaces",
+    marketSurfaces: "Monitor",
     vision: "Vision",
   },
   signInCta: "Sign in",
-  enterCommandCenterCta: "Enter Command Center",
+  enterCommandCenterCta: "Open Command Center",
 } as const;

@@ -23,13 +23,13 @@ export const thesisRestatement = {
 };
 
 export const compareColumns: CompareColumn[] = [
-  { label: "Options market", value: "6.8% range", tone: "amber" },
+  { label: "What options imply", value: "6.8% range", tone: "amber" },
   { label: "Your view", value: "5.4% range", tone: "teal" },
   { label: "Difference", value: "1.4 pts (~21%)", tone: "teal" },
 ];
 
 export const confirmationChecklist: ChecklistItem[] = [
-  { id: "reference", label: "Market reference — live BTC options from Deribit" },
+  { id: "reference", label: "Market data — live BTC options from Deribit" },
   { id: "trust", label: "Data looks current — quotes refreshed recently" },
   { id: "horizon", label: "Timeframe locked — BTC · 30 days" },
 ];

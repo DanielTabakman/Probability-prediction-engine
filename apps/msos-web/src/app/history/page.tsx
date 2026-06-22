@@ -8,7 +8,7 @@ import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
 
 export const metadata: Metadata = {
   title: "History | Market Structure OS",
-  description: "MSOS lifecycle history — observed, saved, simulated, reviewed from live feeds.",
+  description: "Track saved views and paper trades over time.",
 };
 
 export default async function HistoryPage() {

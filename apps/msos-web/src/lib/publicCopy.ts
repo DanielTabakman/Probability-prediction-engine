@@ -4,7 +4,7 @@
 
 export function friendlySnapshotFeedMessage(rawReason?: string | null): string {
   if (!rawReason) {
-    return "Saved snapshots aren't available right now. Strategy Lab live charts still work.";
+    return "Saved views aren't available right now. Strategy Lab live charts still work.";
   }
   const lower = rawReason.toLowerCase();
   if (
@@ -16,7 +16,7 @@ export function friendlySnapshotFeedMessage(rawReason?: string | null): string {
   ) {
     return "Saved history isn't connected yet — we're working on it. Live options data in Strategy Lab still works.";
   }
-  return "Saved snapshots aren't available right now.";
+  return "Saved views aren't available right now.";
 }
 
 export const DEMO_FOOTER =
@@ -24,6 +24,6 @@ export const DEMO_FOOTER =
 
 export const WORKSPACE_SAVED_LABEL = "Saved to your workspace";
 
-export const SNAPSHOT_SOURCE_LABEL = "From your saved market snapshots";
+export const SNAPSHOT_SOURCE_LABEL = "From your saved views";
 
-export const WORKFLOW_SOURCE_LABEL = "Your workspace + saved snapshots";
+export const WORKFLOW_SOURCE_LABEL = "Your workspace + saved views";

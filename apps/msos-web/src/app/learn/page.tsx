@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { ConclusionContent } from "@/components/ConclusionContent";
 
 export const metadata: Metadata = {
-  title: "Learn loop | Market Structure OS",
+  title: "Learn | Market Structure OS",
   description:
     "Reflect on a session — feedback helps improve the demo for new traders.",
 };

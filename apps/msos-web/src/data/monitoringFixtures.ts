@@ -1,8 +1,8 @@
 /** Monitor surface fallback copy (no live fills). */
 
 export const monitorHero = {
-  title: "Thesis & trade watch",
-  subtitle: "Track open ideas and paper trades — no live execution feed yet.",
+  title: "Monitor",
+  subtitle: "Watch your saved views and paper trades — no live order feed yet.",
   healthLabel: "Overall watch status",
   healthPct: 62,
 };
@@ -11,7 +11,7 @@ export const watchPanels = [
   {
     id: "thesis-validity",
     title: "Your view still valid?",
-    body: "Confirmed “calmer than market” thesis is still inside its stated window.",
+    body: "Your “calmer than market” view is still inside the range you set.",
     tone: "teal" as const,
   },
   {

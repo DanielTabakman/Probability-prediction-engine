@@ -19,7 +19,7 @@ export const lensTiles = [
   {
     mark: "B",
     title: "BTC options",
-    description: "Live implied distribution from Deribit — available now",
+    description: "Live BTC options from Deribit — try it now",
     status: "Live",
     live: true,
     href: "/strategy-lab",

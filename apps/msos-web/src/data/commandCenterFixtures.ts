@@ -18,7 +18,7 @@ export const navItems: NavItem[] = [
   { id: "command-center", label: "Command Center", href: "/command-center" },
   { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
   { id: "theses", label: "Theses", href: "#", disabled: true },
-  { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
+  { id: "expression", label: "Plan a trade", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "/monitor" },
   { id: "history", label: "History", href: "/history" },
   { id: "learn", label: "Learn", href: "/learn" },
@@ -27,7 +27,7 @@ export const navItems: NavItem[] = [
 export const calibrationStrip = {
   title: "Track how your views hold up",
   body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
-  cta: "Open monitor",
+  cta: "Open Monitor",
   href: "/monitor",
 };
 
@@ -50,7 +50,7 @@ export const labTiles = [
     mark: "B",
     title: "Strategy Lab",
     description: "Compare your view to what BTC options are pricing — live now",
-    cta: "Open lab",
+    cta: "Try the lab",
     enabled: true,
   },
   {
