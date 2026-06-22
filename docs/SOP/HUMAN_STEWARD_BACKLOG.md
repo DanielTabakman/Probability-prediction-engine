@@ -16,10 +16,18 @@
 
 ### Product lane automation
 
-- **id:** `` · **priority:** high · **category:** architecture
+- **id:** `product_lane_automation` · **priority:** high · **category:** architecture
 - **added:** 2026-06-17
 - **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
 - **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
+
+### Autobuilder landscape and commercial viability review
+
+- **id:** `autobuilder_landscape_review` · **priority:** medium · **category:** architecture
+- **added:** 2026-06-15
+- **summary:** Revisit commercial MVP reference (PPE_AUTOBUILDER_COMMERCIAL_MVP_V1.md): productize operator vs keep internal; un-park after factory chapters + 7-day dogfood.
+- **policy question:** Is the autobuilder a sellable product surface or MSOS/PPE infrastructure only?
+- **notes:** Parked 2026-06-15. Pair with ppe_autobuilder_* production queue when those ship.
 
 ### Relay decision model reconcile
 
@@ -71,6 +79,14 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### Stripe operator prerequisites (phase 7b gate)
+
+- **id:** `stripe_operator_prereq` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **summary:** Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.
+- **policy question:** When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.
+- **notes:** Steward 2026-06-19: deferred until website demo-ready on production; Stripe accounts/setup pending.
+
 ### Process library expansion
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
@@ -87,6 +103,15 @@
 - **closed:** 2026-06-17
 - **summary:** focusGate off, stopOnContextEscalate off, procedural exit-20 auto-advance reporting, legacy relay hard-stops demoted, human steward backlog + weekly ntfy hook.
 
+### MSOS production live hookup (usable demo)
+
+- **id:** `msos_production_live_hookup` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **closed:** 2026-06-21
+- **summary:** Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.
+- **policy question:** Protect apex product routes only (recommended) or entire marketstructureos.com for early demo cohort?
+- **notes:** Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md.
+
 ## Changelog
 
-| 2026-06-18 | Auto-render from JSON |
+| 2026-06-22 | Auto-render from JSON |

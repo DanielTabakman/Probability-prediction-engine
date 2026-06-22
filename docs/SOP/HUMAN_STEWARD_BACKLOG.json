@@ -13,6 +13,7 @@
       "added": "2026-06-17"
     },
     {
+      "id": "product_lane_automation",
       "title": "Product lane automation",
       "status": "open",
       "priority": "high",
@@ -20,6 +21,17 @@
       "summary": "Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.",
       "policyQuestion": "Stay near-zero-API (local profile) vs pay for full autonomous product slices?",
       "added": "2026-06-17"
+    },
+    {
+      "id": "autobuilder_landscape_review",
+      "title": "Autobuilder landscape and commercial viability review",
+      "status": "open",
+      "priority": "medium",
+      "category": "architecture",
+      "summary": "Revisit commercial MVP reference (PPE_AUTOBUILDER_COMMERCIAL_MVP_V1.md): productize operator vs keep internal; un-park after factory chapters + 7-day dogfood.",
+      "policyQuestion": "Is the autobuilder a sellable product surface or MSOS/PPE infrastructure only?",
+      "notes": "Parked 2026-06-15. Pair with ppe_autobuilder_* production queue when those ship.",
+      "added": "2026-06-15"
     },
     {
       "id": "relay_decision_reconcile",
