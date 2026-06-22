@@ -2,8 +2,16 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-22
+
+- `48985db` — copy(msos-shell): rewrite public UI for new options traders (#281) (`apps/msos-web/`)
+
 ## 2026-06-21
 
+- `8c600d4` — test(msos-shell): fix monitor/history witness after copy pass (#282)
+- `765145c` — control-plane: Monday 6am prep, 8am unified report pipeline (#280) (`docs/SOP/`)
+- `b6bcac8` — test(msos-shell): witness checks StrategyLabInteractivePanel embed wiring (#279)
+- `ea9c70b` — Control-plane: dev changelog
 - `8492e16` — feat(msos-shell): Strategy Lab clickable belief presets (higher/lower/volatility) (#278) (`apps/msos-web/`)
 - `0dfa4ab` — Control-plane: dev changelog
 - `7f21dcd` — fix(msos-shell): SSR display API + Playwright witness import (#277) (`apps/msos-web/`)
