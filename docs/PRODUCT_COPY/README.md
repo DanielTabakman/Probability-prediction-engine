@@ -6,6 +6,20 @@ Copy agent drafts live in **`packets/`**. Approved strings ship in **`apps/msos-
 
 ---
 
+## Start a copy session
+
+Say **"let's work on copy"** in Cursor — agent loads:
+
+| Layer | Doc |
+|-------|-----|
+| 0 — Vision | [`LAYER_0_VISION_AND_PRINCIPLES.md`](LAYER_0_VISION_AND_PRINCIPLES.md) |
+| 1 — Pages | [`LAYER_1_PAGE_CATALOG.md`](LAYER_1_PAGE_CATALOG.md) |
+| Handoff | [`HANDOFF_2026-06-22.md`](HANDOFF_2026-06-22.md) |
+
+Full index: [`COPY_CONTEXT_INDEX.json`](COPY_CONTEXT_INDEX.json)
+
+---
+
 ## Surface status
 
 | Surface | Packet | Content file | Status | Notes |
@@ -16,6 +30,7 @@ Copy agent drafts live in **`packets/`**. Approved strings ship in **`apps/msos-
 | strategy-lab | — | fixtures + components | draft needed | |
 | monitor | — | `monitoringFixtures.ts` | draft needed | |
 | history | — | components | draft needed | |
+| learn | — | `ConclusionContent.tsx` | draft needed | Vision / conclusion route |
 | shared | — | [`publicCopy.ts`](../apps/msos-web/src/lib/publicCopy.ts) | approved | Footers, degraded paths |
 
 Update this table when a packet moves to `approved` or a new surface is chartered.

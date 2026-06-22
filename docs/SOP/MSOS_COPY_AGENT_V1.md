@@ -10,6 +10,24 @@
 
 A **dedicated copy agent** writes and revises MSOS visitor-facing text so the operator does not draft every string by hand. The copy agent **does not** implement React, routes, or PPE wiring — it ships **approved words** into content files and copy packets; the BUILD agent wires them.
 
+**Auto-activation:** Say *"let's work on copy"* in any Cursor thread — skill `msos-copy-editor` and rule `.cursor/rules/msos-copy-agent.mdc` load **layered context** (vision → pages → strings). No paste required.
+
+---
+
+## Context layers (reliable anchor in the weeds)
+
+| Layer | Artifact | When |
+|-------|----------|------|
+| **0 — Vision** | [`LAYER_0_VISION_AND_PRINCIPLES.md`](../PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md) | Every copy session — north star, JTBD, voice, hierarchy |
+| **1 — Pages** | [`LAYER_1_PAGE_CATALOG.md`](../PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md) | Page purpose, regions, what's on each route |
+| **1b — Handoff** | [`HANDOFF_2026-06-22.md`](../PRODUCT_COPY/HANDOFF_2026-06-22.md) | Shipped PRs, priority queue, product-truth limits |
+| **2 — Surface** | [`SURFACE_INVENTORY.json`](../PRODUCT_COPY/SURFACE_INVENTORY.json) + [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) | Surface selected — files + voice rules |
+| **3 — Strings** | [`packets/`](../PRODUCT_COPY/packets/) + [`content/*.ts`](../apps/msos-web/src/content/) | Specific headline, CTA, or panel copy |
+
+Index: [`COPY_CONTEXT_INDEX.json`](../PRODUCT_COPY/COPY_CONTEXT_INDEX.json)
+
+**Conversation flow:** Discuss Layer 0–1 freely; drop to Layer 3 only when drafting or revising specific strings. Tie every weed back to region job (Layer 1) + principle (Layer 0).
+
 ---
 
 ## Roles
@@ -52,11 +70,15 @@ A **dedicated copy agent** writes and revises MSOS visitor-facing text so the op
 
 ## Starting a copy session (operator)
 
+**Easiest:** open any thread and say **"let's work on copy"** — agent bootstraps layers 0–1 and asks what page to focus on.
+
+Or:
+
 1. Open a **dedicated Cursor thread** (not the relay BUILD thread).
 2. Paste [`COPY_AGENT_LAUNCH_PROMPT.md`](../CONTROL_PLANE/PROMPTS/COPY_AGENT_LAUNCH_PROMPT.md) or invoke skill **`msos-copy-editor`**.
-3. **If continuing website copy work:** read [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](../PRODUCT_COPY/HANDOFF_2026-06-22.md) first — priority queue, shipped PRs, do-not-over-promise list.
-4. Say which surface to work on (e.g. `homepage`, `strategy-lab`, `command-center`) or “audit all surfaces for banned terms.”
-5. Review the packet; when happy, tell the copy agent to **promote to content file** and mark packet `status: approved`.
+3. Agent reads Layer 0 → Layer 1 → handoff automatically.
+4. Discuss page purpose or name a surface (e.g. `strategy-lab`, `command-center`).
+5. When happy with a draft, say **promote to content** — agent updates `content/*.ts` and marks packet `approved`.
 
 ---
 

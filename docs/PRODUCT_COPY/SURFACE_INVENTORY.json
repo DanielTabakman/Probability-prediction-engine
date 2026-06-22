@@ -66,7 +66,19 @@
       "content_file": null,
       "components": ["apps/msos-web/src/components/HistoryContent.tsx"],
       "packet": null,
-      "status": "needs_packet"
+      "status": "needs_packet",
+      "layer1_section": "History"
+    },
+    {
+      "id": "learn",
+      "label": "Learn / Vision",
+      "routes": ["/learn"],
+      "content_file": null,
+      "components": ["apps/msos-web/src/components/ConclusionContent.tsx"],
+      "fixtures": ["apps/msos-web/src/data/conclusionFixtures.ts"],
+      "packet": null,
+      "status": "needs_packet",
+      "layer1_section": "Learn / Vision"
     },
     {
       "id": "shared",

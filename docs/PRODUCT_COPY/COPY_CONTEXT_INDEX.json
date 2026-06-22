@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "description": "Load order for MSOS copy agent — vision → pages → surface → strings",
+  "enterCopyModeTriggers": [
+    "let's work on copy",
+    "lets work on copy",
+    "work on copy",
+    "copy session",
+    "website copy",
+    "website wording",
+    "homepage copy",
+    "page copy",
+    "marketing copy",
+    "trader-facing copy",
+    "msos copy",
+    "copy agent"
+  ],
+  "layers": [
+    {
+      "id": "layer-0",
+      "label": "Vision & principles",
+      "path": "docs/PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md",
+      "when": "Every copy session — first read"
+    },
+    {
+      "id": "layer-1",
+      "label": "Page catalog",
+      "path": "docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md",
+      "when": "Every copy session — purpose and regions before drafting"
+    },
+    {
+      "id": "layer-1-handoff",
+      "label": "Session handoff queue",
+      "path": "docs/PRODUCT_COPY/HANDOFF_2026-06-22.md",
+      "when": "Every copy session — what's shipped, priority queue, product truth"
+    },
+    {
+      "id": "layer-2",
+      "label": "Surface map",
+      "path": "docs/PRODUCT_COPY/SURFACE_INVENTORY.json",
+      "when": "When a surface is selected or audit requested"
+    },
+    {
+      "id": "layer-2-voice",
+      "label": "Voice & banned terms",
+      "path": "docs/SOP/MSOS_PUBLIC_COPY_V1.md",
+      "when": "Before drafting or promoting strings"
+    },
+    {
+      "id": "layer-3",
+      "label": "Surface packet",
+      "path": "docs/PRODUCT_COPY/packets/{surface}.vN.md",
+      "when": "Weeds — specific string edits for one surface"
+    },
+    {
+      "id": "layer-3-content",
+      "label": "Shippable content file",
+      "path": "apps/msos-web/src/content/{surface}.ts",
+      "when": "Weeds — approved strings in code"
+    }
+  ],
+  "directionSsot": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json"
+}

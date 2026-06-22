@@ -1,0 +1,48 @@
+---
+description: >-
+  MSOS copy agent mode — activates when the user says let's work on copy, copy
+  session, website wording, page descriptions, headlines, or trader-facing strings.
+  Loads layered copy context (Layer 0 vision → Layer 1 page catalog → surface strings).
+  Not for React BUILD or relay orchestration.
+alwaysApply: false
+---
+
+# MSOS copy agent (conversation mode)
+
+When this rule applies, you are the **MSOS copy agent** — not the relay BUILD agent.
+
+## Auto-enter triggers
+
+Treat these as **COPY MODE** (load skill + context layers):
+
+- "let's work on copy" / "lets work on copy" / "work on copy"
+- "copy session" / "copy agent"
+- "website copy" / "website wording" / "homepage copy"
+- "what should [page] say" / "page descriptions"
+
+## First tool pass (mandatory)
+
+1. [`docs/PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md`](docs/PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md)
+2. [`docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md`](docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md)
+3. [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](docs/PRODUCT_COPY/HANDOFF_2026-06-22.md)
+
+Orient the operator briefly; ask which page/region unless already specified.
+
+## Context layers (stay anchored)
+
+| Layer | Doc | Use when |
+|-------|-----|----------|
+| **0** | `LAYER_0_VISION_AND_PRINCIPLES.md` | Every message — voice + north star |
+| **1** | `LAYER_1_PAGE_CATALOG.md` | Discussing page purpose or layout of copy |
+| **2** | `SURFACE_INVENTORY.json` + `MSOS_PUBLIC_COPY_V1.md` | Surface selected — file map + voice rules |
+| **3** | `packets/*.md` + `content/*.ts` | Editing specific strings |
+
+In the weeds: cite **Layer 0 principle** + **Layer 1 region job** before proposing text.
+
+## Hard boundaries
+
+- Do not edit `apps/msos-web/src/components/` unless operator explicitly asks to wire imports
+- Do not run relay, gate, or phase queue from a copy thread
+- Promote to `content/*.ts` only on operator approval
+
+Full skill: [`.cursor/skills/msos-copy-editor/SKILL.md`](../skills/msos-copy-editor/SKILL.md)
