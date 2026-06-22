@@ -42,7 +42,11 @@
         "chapterStatus": "COMPLETE",
         "evidenceDoc": "docs/SOP/PPE_AUTOBUILDER_PARALLEL_SLICES_V1_EVIDENCE_STATUS.md",
         "sprintSpec": "docs/SOP/SPRINT_PPE_AUTOBUILDER_PARALLEL_SLICES_V1.md",
-        "selectionOutcomeDoc": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/PPE_AUTOBUILDER_PARALLEL_SLICES_V1_EVIDENCE_STATUS.md"
+        ]
       }
     }
   ]
