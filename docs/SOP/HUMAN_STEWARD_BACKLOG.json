@@ -13,6 +13,7 @@
       "added": "2026-06-17"
     },
     {
+      "id": "product_lane_automation",
       "title": "Product lane automation",
       "status": "open",
       "priority": "high",
@@ -20,6 +21,17 @@
       "summary": "Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.",
       "policyQuestion": "Stay near-zero-API (local profile) vs pay for full autonomous product slices?",
       "added": "2026-06-17"
+    },
+    {
+      "id": "autobuilder_landscape_review",
+      "title": "Autobuilder landscape and commercial viability review",
+      "status": "open",
+      "priority": "medium",
+      "category": "architecture",
+      "summary": "Revisit 2026-06-15 analysis: PPE autobuilder vs Devin/Factory/SWE-AF/Cursor; governance-vs-autonomy tradeoffs; whether to productize the operator stack or keep it founder-internal tooling.",
+      "policyQuestion": "Is the autobuilder a sellable product surface (governed relay factory) or internal MSOS/PPE infrastructure only?",
+      "notes": "Cursor thread captured comparison matrix, happy-path gaps, and borrow-list. Pair with production queue chapters ppe_autobuilder_* when those ship.",
+      "added": "2026-06-15"
     },
     {
       "id": "relay_decision_reconcile",

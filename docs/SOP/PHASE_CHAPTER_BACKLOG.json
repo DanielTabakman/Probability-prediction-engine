@@ -321,6 +321,38 @@
       "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
       "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
       "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
+    },
+    {
+      "chapterId": "ppe_autobuilder_happy_path_v1",
+      "status": "blocked",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md",
+      "reason": "[HIGH] Zero-click happy path: advance \u2192 handoff \u2192 local watcher \u2192 build-worker \u2192 post-build marker \u2192 run_ppe_local without phone ping or ppe_go.cmd"
+    },
+    {
+      "chapterId": "ppe_autobuilder_bounded_repair_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md \u2014 build-worker repair loop",
+      "reason": "[MEDIUM] Bounded gate-failure auto-retry in build-worker (N attempts) before triage-worker escalation"
+    },
+    {
+      "chapterId": "ppe_autobuilder_timeline_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "canonRef": "docs/SOP/PPE_AUTOBUILDER_V1.md \u2014 observability",
+      "reason": "[MEDIUM] AUTOBUILDER_TIMELINE artifact from status JSON + relay runs + git commits for stuck-pipeline debugging"
+    },
+    {
+      "chapterId": "ppe_autobuilder_parallel_slices_v1",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "P2",
+      "canonRef": "docs/SOP/PARALLEL_AGENT_CHECKLIST_V1.md",
+      "reason": "[LOW] Parallel product slices when layer audit confirms disjoint ALLOWED_PATHS; extend BUILD_IN_FLIGHT to multi-lock"
     }
   ]
 }
