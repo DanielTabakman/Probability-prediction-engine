@@ -9,7 +9,10 @@
     "chapter_closed:MSOS-EntitleV1-Closeout-Slice005",
     "chapter_closed:MSOS-EmbedShellV1-Closeout-Slice006",
     "chapter_closed:MSOS-WorkflowV1-Closeout-Slice005",
-    "chapter_closed:MSOS-MCDWitV1-Closeout-Slice003"
+    "chapter_closed:MSOS-MCDWitV1-Closeout-Slice003",
+    "chapter_closed:PPE-AutobuilderOnboarding-Closeout-Slice004",
+    "chapter_closed:PPE-AutobuilderAgentsIndex-Closeout-Slice004",
+    "chapter_closed:PPE-AutobuilderParallel-Closeout-Slice004"
   ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",

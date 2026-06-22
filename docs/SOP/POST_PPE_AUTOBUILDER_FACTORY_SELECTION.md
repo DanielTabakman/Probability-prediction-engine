@@ -6,14 +6,14 @@
 
 **SELECTED** — factory stability wave (`ppe_autobuilder_*`) runs while **MSOS usable demo BUILD is paused** for human UX/storyboard design.
 
-| Chapter | Order | Status at SELECTION |
-|---------|-------|---------------------|
-| `ppe_autobuilder_happy_path_v1` | 1 | **READY** (active) |
-| `ppe_autobuilder_bounded_repair_v1` | 2 | blocked + plan |
-| `ppe_autobuilder_timeline_v1` | 3 | blocked + plan |
-| `ppe_autobuilder_onboarding_v1` | 4 | blocked + plan |
-| `ppe_autobuilder_agents_index_v1` | 5 | blocked + plan |
-| `ppe_autobuilder_parallel_slices_v1` | 6 | blocked + plan |
+| Chapter | Order | Status |
+|---------|-------|--------|
+| `ppe_autobuilder_happy_path_v1` | 1 | **COMPLETE** |
+| `ppe_autobuilder_bounded_repair_v1` | 2 | **COMPLETE** |
+| `ppe_autobuilder_timeline_v1` | 3 | **COMPLETE** |
+| `ppe_autobuilder_onboarding_v1` | 4 | **COMPLETE** |
+| `ppe_autobuilder_agents_index_v1` | 5 | **COMPLETE** |
+| `ppe_autobuilder_parallel_slices_v1` | 6 | **COMPLETE** |
 
 **Paused:** `msos_usable_demo_v1` → backlog `blocked` (UX design gate — resume when storyboard BUILD inputs are ready).
 

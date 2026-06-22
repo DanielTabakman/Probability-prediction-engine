@@ -1,14 +1,14 @@
 {
 
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
+  "phasePlanPath": "",
 
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_BOUNDED_REPAIR_V1.md",
+  "sprintSpecPath": "",
 
-  "selectionRecord": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+  "selectionRecord": "",
 
-  "status": "READY",
+  "status": "COMPLETE",
 
-  "notes": "Factory wave chapter 2 — bounded repair after happy path COMPLETE",
+  "notes": "Factory wave complete (ppe_autobuilder_* chapters 1-6). MSOS usable demo paused (UX design). Resume when backlog msos_usable_demo_v1 un-skipped.",
 
   "workerMode": "deterministic"
 

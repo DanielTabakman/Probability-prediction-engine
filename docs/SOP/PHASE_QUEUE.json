@@ -266,7 +266,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[P0 PAUSED] UX design gate — skipped in backlog until storyboard ready",
+      "reason": "[P0 PAUSED] UX design gate \u2014 backlog skipped; do not auto-select",
       "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
     },
     {
@@ -278,33 +278,38 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Bounded build repair",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "doneReason": "factory wave relay closeout 2026-06-15"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_timeline_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Timeline artifact",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "doneReason": "factory wave relay closeout 2026-06-15"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_onboarding_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Onboarding quickstart",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_agents_index_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[LOW] AGENTS.md index",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_parallel_slices_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[LOW] Parallel slice locks",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     }
   ]
 }

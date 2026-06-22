@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-21 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-22 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -143,6 +143,14 @@ flowchart LR
 
 | MSOS MCD production witness v1 | **COMPLETE** 2026-06-21 | [`SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md`](docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md), [`MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md) |
 
+| PPE autobuilder timeline v1 | **COMPLETE** 2026-06-22 | [`SPRINT_PPE_AUTOBUILDER_TIMELINE_V1.md`](docs/SOP/SPRINT_PPE_AUTOBUILDER_TIMELINE_V1.md), [`PPE_AUTOBUILDER_TIMELINE_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_AUTOBUILDER_TIMELINE_V1_EVIDENCE_STATUS.md) |
+
+| PPE autobuilder onboarding v1 | **COMPLETE** 2026-06-22 | [`SPRINT_PPE_AUTOBUILDER_ONBOARDING_V1.md`](docs/SOP/SPRINT_PPE_AUTOBUILDER_ONBOARDING_V1.md), [`PPE_AUTOBUILDER_ONBOARDING_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_AUTOBUILDER_ONBOARDING_V1_EVIDENCE_STATUS.md) |
+
+| PPE autobuilder agents index v1 | **COMPLETE** 2026-06-22 | [`SPRINT_PPE_AUTOBUILDER_AGENTS_INDEX_V1.md`](docs/SOP/SPRINT_PPE_AUTOBUILDER_AGENTS_INDEX_V1.md), [`PPE_AUTOBUILDER_AGENTS_INDEX_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_AUTOBUILDER_AGENTS_INDEX_V1_EVIDENCE_STATUS.md) |
+
+| PPE autobuilder parallel slices v1 | **COMPLETE** 2026-06-22 | [`SPRINT_PPE_AUTOBUILDER_PARALLEL_SLICES_V1.md`](docs/SOP/SPRINT_PPE_AUTOBUILDER_PARALLEL_SLICES_V1.md), [`PPE_AUTOBUILDER_PARALLEL_SLICES_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_AUTOBUILDER_PARALLEL_SLICES_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -202,4 +210,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
