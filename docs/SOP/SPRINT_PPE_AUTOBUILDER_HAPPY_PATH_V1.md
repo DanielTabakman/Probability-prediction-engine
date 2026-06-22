@@ -26,6 +26,6 @@ Zero-click product slice pipeline: loop/watch call `ppe_autobuilder advance` on 
 | sliceId | Plane | Goal |
 |---------|-------|------|
 | `PPE-AutobuilderHappyPath-Control-Slice001` | CONTROL | Charter + update `PPE_AUTOBUILDER_V1.md` |
-| `PPE-AutobuilderHappyPath-Product-Slice002` | EVIDENCE | Implement happy path wiring + config (`scripts/`, tests) |
+| `PPE-AutobuilderHappyPath-Factory-Slice002` | EVIDENCE | Implement happy path wiring + config (`scripts/`, tests) |
 | `PPE-AutobuilderHappyPath-Witness-Slice003` | EVIDENCE | Evidence doc + pytest |
 | `PPE-AutobuilderHappyPath-Closeout-Slice004` | CONTROL | Relay closeout |

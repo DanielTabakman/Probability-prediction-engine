@@ -15,7 +15,7 @@
       "maxAttempts": 1
     },
     {
-      "sliceId": "PPE-AutobuilderHappyPath-Product-Slice002",
+      "sliceId": "PPE-AutobuilderHappyPath-Factory-Slice002",
       "layerPreset": "CONTROL",
       "sprintSpecPath": "docs/SOP/SPRINT_PPE_AUTOBUILDER_HAPPY_PATH_V1.md",
       "declaredPlane": "EVIDENCE-PLANE",

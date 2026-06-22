@@ -14,7 +14,7 @@
       "maxAttempts": 1
     },
     {
-      "sliceId": "PPE-AutobuilderAgentsIndex-Product-Slice002",
+      "sliceId": "PPE-AutobuilderAgentsIndex-Factory-Slice002",
       "layerPreset": "CONTROL",
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 20,
