@@ -27,7 +27,7 @@ Full index: [`COPY_CONTEXT_INDEX.json`](COPY_CONTEXT_INDEX.json)
 |---------|--------|--------------|--------|-------|
 | homepage | [`packets/homepage.v2.md`](packets/homepage.v2.md) (approved; supersedes v1) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | approved | h1 v1 + CTA Try the lab |
 | public-nav | [`packets/public-nav.v1.md`](packets/public-nav.v1.md) | [`../apps/msos-web/src/content/publicNav.ts`](../apps/msos-web/src/content/publicNav.ts) | approved | Monitor · Open Command Center |
-| command-center | — | inline components | draft needed | Charter copy packet next |
+| command-center | [`packets/command-center.v1.md`](packets/command-center.v1.md) | [`commandCenter.ts`](../apps/msos-web/src/content/commandCenter.ts) | draft | Operator review deferred |
 | strategy-lab | [`packets/strategy-lab.v1.md`](packets/strategy-lab.v1.md) | `strategyLab.ts` + confirm/expression | approved | Full BUILD pass to content |
 | monitor | — | `monitoringFixtures.ts` | draft needed | |
 | history | — | components | draft needed | |
@@ -36,7 +36,7 @@ Full index: [`COPY_CONTEXT_INDEX.json`](COPY_CONTEXT_INDEX.json)
 
 Update this table when a packet moves to `approved` or a new surface is chartered.
 
-**Continuing from BUILD/UX thread (2026-06-22):** read [`HANDOFF_2026-06-22.md`](HANDOFF_2026-06-22.md) — homepage done; next: `public-nav` → `strategy-lab` → `command-center`.
+**Continuing from BUILD/UX thread (2026-06-22):** read [`HANDOFF_2026-06-22.md`](HANDOFF_2026-06-22.md) — homepage + strategy-lab done; command-center draft wired; next: `monitor` → `history` → `learn`.
 
 ---
 

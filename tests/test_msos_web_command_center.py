@@ -14,12 +14,17 @@ def test_command_center_route_and_shell() -> None:
     text = page.read_text(encoding="utf-8")
     assert "AppShell" in text
     assert "CommandCenterContent" in text
+    assert "commandCenterMetadata" in text
 
     sidebar = (MSOS_WEB / "src" / "components" / "AppSidebar.tsx").read_text(encoding="utf-8")
     assert "navItems" in sidebar
     assert "connectedMarkets" in sidebar
 
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert "commandCenterPageHeader" in content
+    assert "Command Center" in cc_copy
+    assert "Save a view" in cc_copy
     assert "friendlySnapshotFeedMessage" in content
     assert "DEMO_FOOTER" in content
     assert "labTiles" in content
@@ -40,7 +45,9 @@ def test_public_nav_links_to_command_center() -> None:
 
 def test_command_center_fixtures_honest_labels() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert "Live" in fixtures or "Live" in fixtures.lower()
-    assert "Planned" in fixtures
-    assert "Soon" in fixtures
-    assert "disabled: true" in fixtures
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert "commandCenterLabTiles" in fixtures or "labTiles" in fixtures
+    assert "Live" in cc_copy
+    assert "Planned" in cc_copy
+    assert "Soon" in cc_copy
+    assert "disabled: true" in cc_copy

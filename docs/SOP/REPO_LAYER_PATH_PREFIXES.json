@@ -280,6 +280,13 @@
       "typical_plane": "CONTROL-PLANE",
       "allowed_paths": [
         ".gitignore",
+        ".github/",
+        ".env.example",
+        "AGENTS.md",
+        "Dockerfile",
+        "install_operator.cmd",
+        "ppe_ide_build_closeout.cmd",
+        "scripts/docker_streamlit_entrypoint.sh",
         "scripts/",
         "docs/SOP/",
         "docs/PRODUCT_COPY/",

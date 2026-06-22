@@ -17,7 +17,7 @@ def test_command_center_summary_lib_and_api_exist() -> None:
     ).read_text(encoding="utf-8")
     assert "loadCommandCenterSummary" in lib
     assert "PPE_SNAPSHOT_DB_PATH" in lib
-    assert "From your saved market snapshots" in lib
+    assert "From your saved views" in lib
     assert "degradedSummary" in lib
     assert "frozen_evaluations" in lib
     assert "snapshot_reviews" in lib

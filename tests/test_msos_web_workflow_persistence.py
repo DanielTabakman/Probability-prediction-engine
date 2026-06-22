@@ -50,7 +50,7 @@ def test_command_center_uses_snapshot_summary() -> None:
     assert "summary.kpis" in content
     assert "summary.currentWork" in content
     lib = (MSOS_WEB / "src" / "lib" / "commandCenterSummary.ts").read_text(encoding="utf-8")
-    assert "From your saved market snapshots" in lib
+    assert "From your saved views" in lib
 
 
 def test_workflow_store_json_shape_documented() -> None:

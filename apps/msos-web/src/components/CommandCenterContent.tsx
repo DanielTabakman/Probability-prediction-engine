@@ -1,8 +1,17 @@
 import Link from "next/link";
 
+import {
+  commandCenterCalibrationLinks,
+  commandCenterContextPanel,
+  commandCenterPageHeader,
+  commandCenterRecentWork,
+  commandCenterStartHere,
+  commandCenterStatusPills,
+  commandCenterThesisPrompt,
+} from "@/content/commandCenter";
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
+import { labTiles, headlines } from "@/data/commandCenterFixtures";
 import { buildCalibrationStrip, buildReviewEvents } from "@/lib/monitorHistoryFeed";
-import { headlines, labTiles } from "@/data/commandCenterFixtures";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 type Props = {
@@ -10,9 +19,9 @@ type Props = {
 };
 
 function statusPill(summary: CommandCenterSummary): string {
-  if (summary.status === "live") return "Saved reads connected";
-  if (summary.status === "empty") return "No saved reads yet";
-  return "History offline";
+  if (summary.status === "live") return commandCenterStatusPills.live;
+  if (summary.status === "empty") return commandCenterStatusPills.empty;
+  return commandCenterStatusPills.degraded;
 }
 
 export function CommandCenterContent({ summary }: Props) {
@@ -24,17 +33,17 @@ export function CommandCenterContent({ summary }: Props) {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Home</div>
-          <h1 className="title">Command Center</h1>
+          <div className="crumb">{commandCenterPageHeader.crumb}</div>
+          <h1 className="title">{commandCenterPageHeader.title}</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
             {statusPill(summary)}
           </span>
-          <span className="btn slim">Share</span>
+          <span className="btn slim">{commandCenterPageHeader.shareButton}</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            New view
+            {commandCenterPageHeader.primaryCta}
           </Link>
           <span className="avatar" aria-hidden="true">
             DT
@@ -52,10 +61,10 @@ export function CommandCenterContent({ summary }: Props) {
             {calibrationStrip.cta}
           </Link>
           <Link href="/history" className="btn slim">
-            History
+            {commandCenterCalibrationLinks.history}
           </Link>
           <Link href="/learn" className="btn slim">
-            Learn
+            {commandCenterCalibrationLinks.learn}
           </Link>
         </div>
       </section>
@@ -80,10 +89,10 @@ export function CommandCenterContent({ summary }: Props) {
         <div className="panel">
           <div className="panel-head">
             <div>
-              <h2>Start here</h2>
-              <div className="panel-sub">Open a market and compare it to your view.</div>
+              <h2>{commandCenterStartHere.title}</h2>
+              <div className="panel-sub">{commandCenterStartHere.subtitle}</div>
             </div>
-            <span className="tag">Explore</span>
+            <span className="tag">{commandCenterStartHere.tag}</span>
           </div>
           <div className="lab-list">
             {labTiles.map((tile) => (
@@ -107,26 +116,23 @@ export function CommandCenterContent({ summary }: Props) {
 
         <div className="panel">
           <div className="new-thesis">
-            <h3>Have a view?</h3>
-            <p>
-              Say what you think is mispriced. We&apos;ll keep your idea on file so you can plan and review
-              later.
-            </p>
+            <h3>{commandCenterThesisPrompt.title}</h3>
+            <p>{commandCenterThesisPrompt.body}</p>
             <Link href="/strategy-lab/confirm" className="btn slim primary">
-              Save a view →
+              {commandCenterThesisPrompt.cta}
             </Link>
           </div>
           <div className="panel-head">
             <div>
-              <h2>Recent work</h2>
-              <div className="panel-sub">Saved market reads and review status.</div>
+              <h2>{commandCenterRecentWork.title}</h2>
+              <div className="panel-sub">{commandCenterRecentWork.subtitle}</div>
             </div>
           </div>
           {summary.status === "degraded" ? (
-            <p className="panel-sub">Saved history isn&apos;t loading yet. Strategy Lab still has live data.</p>
+            <p className="panel-sub">{commandCenterRecentWork.degradedNote}</p>
           ) : null}
           {summary.status !== "degraded" && !hasLiveData ? (
-            <p className="panel-sub">Nothing saved yet — start in Strategy Lab.</p>
+            <p className="panel-sub">{commandCenterRecentWork.emptyNote}</p>
           ) : null}
           {summary.currentWork.map((item) => (
             <div key={item.snapshotId} className="strategy">
@@ -142,8 +148,8 @@ export function CommandCenterContent({ summary }: Props) {
         <div className="panel">
           <div className="panel-head">
             <div>
-              <h2>Context &amp; alerts</h2>
-              <div className="panel-sub">News and reminders that might change your view.</div>
+              <h2>{commandCenterContextPanel.title}</h2>
+              <div className="panel-sub">{commandCenterContextPanel.subtitle}</div>
             </div>
           </div>
           {headlines.map((item) => (
@@ -152,7 +158,7 @@ export function CommandCenterContent({ summary }: Props) {
               <p>{item.body}</p>
             </div>
           ))}
-          <div className="side-label inline">To review</div>
+          <div className="side-label inline">{commandCenterContextPanel.reviewLabel}</div>
           <div className="timeline">
             {reviewEvents.map((event) => (
               <div key={event.title} className="event">

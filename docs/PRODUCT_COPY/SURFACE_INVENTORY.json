@@ -29,10 +29,10 @@
       "id": "command-center",
       "label": "Command Center",
       "routes": ["/command-center"],
-      "content_file": null,
+      "content_file": "apps/msos-web/src/content/commandCenter.ts",
       "components": ["apps/msos-web/src/components/CommandCenterContent.tsx"],
-      "packet": null,
-      "status": "needs_packet"
+      "packet": "docs/PRODUCT_COPY/packets/command-center.v1.md",
+      "status": "draft"
     },
     {
       "id": "strategy-lab",

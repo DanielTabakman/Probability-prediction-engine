@@ -61,8 +61,10 @@ def test_strategy_lab_embed_boundary_present() -> None:
 
 def test_app_sidebar_nav_routes() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'href: "/command-center"' in fixtures
-    assert 'href: "/strategy-lab"' in fixtures
-    assert 'href: "/monitor"' in fixtures
-    assert 'href: "/history"' in fixtures
-    assert 'href: "/learn"' in fixtures
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert "commandCenterNavItems" in fixtures or "navItems" in fixtures
+    assert 'href: "/command-center"' in cc_copy
+    assert 'href: "/strategy-lab"' in cc_copy
+    assert 'href: "/monitor"' in cc_copy
+    assert 'href: "/history"' in cc_copy
+    assert 'href: "/learn"' in cc_copy

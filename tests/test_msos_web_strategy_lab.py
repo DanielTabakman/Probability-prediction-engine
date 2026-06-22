@@ -121,9 +121,11 @@ def test_thesis_confirmation_route_and_narrative() -> None:
 
 def test_nav_enables_strategy_lab() -> None:
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'id: "strategy-lab"' in nav
-    assert 'href: "/strategy-lab"' in nav
-    assert "disabled: true" not in nav.split("strategy-lab")[1].split("theses")[0]
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert "commandCenterNavItems" in nav or "navItems" in nav
+    assert 'id: "strategy-lab"' in cc_copy
+    assert 'href: "/strategy-lab"' in cc_copy
+    assert "disabled: true" not in cc_copy.split("strategy-lab")[1].split("theses")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert 'href="/strategy-lab"' in cc
@@ -167,10 +169,10 @@ def test_expression_planning_route_and_narrative() -> None:
 
 
 def test_nav_enables_expression_planning() -> None:
-    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'id: "expression"' in nav
-    assert 'href: "/strategy-lab/expression"' in nav
-    expression_block = nav.split('id: "expression"')[1].split("monitor")[0]
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert 'id: "expression"' in cc_copy
+    assert 'href: "/strategy-lab/expression"' in cc_copy
+    expression_block = cc_copy.split('id: "expression"')[1].split("monitor")[0]
     assert "disabled: true" not in expression_block
 
 
@@ -195,9 +197,9 @@ def test_monitoring_history_routes_and_panels() -> None:
     assert "Live trades" in history
     assert "not connected" in history
 
-    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'href: "/monitor"' in nav
-    assert 'href: "/history"' in nav
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert 'href: "/monitor"' in cc_copy
+    assert 'href: "/history"' in cc_copy
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "calibrationStrip" in cc
@@ -218,5 +220,5 @@ def test_conclusion_learn_loop_route() -> None:
     assert "testerMetricsTemplate" in panel
     assert "Research preview" in panel
 
-    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'href: "/learn"' in nav
+    cc_copy = (MSOS_WEB / "src" / "content" / "commandCenter.ts").read_text(encoding="utf-8")
+    assert 'href: "/learn"' in cc_copy

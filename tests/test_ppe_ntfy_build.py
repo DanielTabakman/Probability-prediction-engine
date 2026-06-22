@@ -8,12 +8,12 @@ from scripts.ppe_ntfy_commands import parse_command_text
 from scripts.ppe_remote_build_agent import resolve_build_target
 
 
-def test_parse_build_command():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("build").name == "build"
-    assert parse_command_text("build extra context").args == "extra context"
+def test_parse_build_command(monkeypatch):
+    monkeypatch.delenv("PPE_NTFY_CMD_SECRET", raising=False)
+    assert parse_command_text("build") is None
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    assert parse_command_text("s3cret build").name == "build"
+    assert parse_command_text("s3cret build extra context").args == "extra context"
 
 
 def test_resolve_build_ide_build(monkeypatch, tmp_path):

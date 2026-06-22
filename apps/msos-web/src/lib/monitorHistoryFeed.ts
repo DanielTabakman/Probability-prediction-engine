@@ -3,6 +3,7 @@ import {
   type CommandCenterSummary,
   type CommandCenterSnapshotRow,
 } from "@/lib/commandCenterSummary";
+import { commandCenterCalibrationStrip } from "@/content/commandCenter";
 import { getCurrentExpression, getCurrentThesis } from "@/lib/msosWorkflowStore";
 
 export type MonitorWatchPanel = {
@@ -293,27 +294,27 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
 export function buildCalibrationStrip(summary: CommandCenterSummary): CalibrationStrip {
   if (summary.status === "degraded") {
     return {
-      title: "Track your accuracy",
-      body: "Saved history isn't connected yet — Strategy Lab live data still works.",
-      cta: "Open Monitor",
-      href: "/monitor",
+      title: commandCenterCalibrationStrip.title,
+      body: commandCenterCalibrationStrip.bodyDegraded,
+      cta: commandCenterCalibrationStrip.cta,
+      href: commandCenterCalibrationStrip.href,
     };
   }
   const pendingKpi = summary.kpis.find((k) => k.label === "Reviews due");
   const pending = Number(pendingKpi?.value ?? "0");
   if (pending > 0) {
     return {
-      title: "Track your accuracy",
-      body: `${pending} saved view${pending === 1 ? "" : "s"} ready for review.`,
-      cta: "Open Monitor",
-      href: "/monitor",
+      title: commandCenterCalibrationStrip.title,
+      body: commandCenterCalibrationStrip.bodyPending(pending),
+      cta: commandCenterCalibrationStrip.cta,
+      href: commandCenterCalibrationStrip.href,
     };
   }
   return {
-    title: "Track your accuracy",
-    body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
-    cta: "Open Monitor",
-    href: "/monitor",
+    title: commandCenterCalibrationStrip.title,
+    body: commandCenterCalibrationStrip.bodyDefault,
+    cta: commandCenterCalibrationStrip.cta,
+    href: commandCenterCalibrationStrip.href,
   };
 }
 
