@@ -18,6 +18,7 @@ from scripts.ppe_notify_push import (
     notify_enabled,
 )
 from scripts.ppe_ntfy_commands import (
+    command_security_warnings,
     commands_enabled,
     execute_command,
     notify_command_result,
@@ -254,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
     repo = args.repo_root.resolve()
     bootstrap_operator_notify_env(repo)
     notify = not args.no_notify
+
+    for warning in command_security_warnings():
+        print(f"ppe_ntfy_listen: WARNING: {warning}", file=sys.stderr, flush=True)
 
     if args.once:
         result = listen_once(repo, notify=notify)

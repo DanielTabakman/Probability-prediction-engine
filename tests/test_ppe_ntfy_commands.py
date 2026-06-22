@@ -29,24 +29,49 @@ def test_parse_restart_command_with_secret(monkeypatch):
 
 
 def test_parse_build_command():
-    # Ensure the test is not affected by a globally configured secret.
-    # When a secret is configured, commands must be prefixed with it.
-    # (That behavior is tested separately.)
     import os
 
     os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("build").name == "build"
-    assert parse_command_text("build extra context").args == "extra context"
+    assert parse_command_text("build") is None
+
+
+def test_parse_build_command_with_secret(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    assert parse_command_text("s3cret build").name == "build"
+    assert parse_command_text("s3cret build extra context").args == "extra context"
 
 
 def test_parse_fix_with_note():
     import os
 
     os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    cmd = parse_command_text("fix loop died after smoke")
+    assert parse_command_text("fix loop died after smoke") is None
+
+
+def test_parse_fix_with_note_and_secret(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    cmd = parse_command_text("s3cret fix loop died after smoke")
     assert cmd is not None
     assert cmd.name == "fix"
     assert cmd.args == "loop died after smoke"
+
+
+def test_help_allowed_without_secret():
+    import os
+
+    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
+    cmd = parse_command_text("help")
+    assert cmd is not None
+    assert cmd.name == "help"
+
+
+def test_command_security_warnings_when_no_secret(monkeypatch):
+    monkeypatch.delenv("PPE_NTFY_CMD_SECRET", raising=False)
+    monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
+    from scripts.ppe_ntfy_commands import command_security_warnings
+
+    msgs = command_security_warnings()
+    assert any("PPE_NTFY_CMD_SECRET" in m for m in msgs)
 
 
 def test_parse_requires_secret_when_configured(monkeypatch):
