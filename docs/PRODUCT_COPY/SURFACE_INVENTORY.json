@@ -37,17 +37,20 @@
     {
       "id": "strategy-lab",
       "label": "Strategy Lab",
-      "routes": ["/strategy-lab"],
-      "content_file": null,
+      "routes": ["/strategy-lab", "/strategy-lab/confirm", "/strategy-lab/expression"],
+      "content_file": "apps/msos-web/src/content/strategyLab.ts",
       "components": [
         "apps/msos-web/src/components/StrategyLabContent.tsx",
         "apps/msos-web/src/components/BeliefBuilder.tsx",
         "apps/msos-web/src/components/ThesisConfirmationPanel.tsx",
         "apps/msos-web/src/components/ExpressionPlanningPanel.tsx"
       ],
-      "fixtures": ["apps/msos-web/src/data/strategyLabFixtures.ts"],
-      "packet": null,
-      "status": "needs_packet"
+      "fixtures": [
+        "apps/msos-web/src/data/strategyLabFixtures.ts",
+        "apps/msos-web/src/data/thesisConfirmFixtures.ts"
+      ],
+      "packet": "docs/PRODUCT_COPY/packets/strategy-lab.v1.md",
+      "status": "approved"
     },
     {
       "id": "monitor",

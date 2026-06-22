@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
-import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { strategyLabDefaultOutcome, strategyLabPageHeader } from "@/content/strategyLab";
+import { strategyLabMetrics } from "@/data/strategyLabFixtures";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   buildLabMetricsFromPayload,
@@ -23,17 +24,17 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab · BTC options</div>
-          <h1 className="title">Strategy Lab</h1>
+          <div className="crumb">{strategyLabPageHeader.crumb}</div>
+          <h1 className="title">{strategyLabPageHeader.title}</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            {live ? "Live market data" : "Demo data"}
+            {live ? strategyLabPageHeader.liveDataPill : strategyLabPageHeader.demoDataPill}
           </span>
-          <span className="btn slim">Share</span>
+          <span className="btn slim">{strategyLabPageHeader.shareButton}</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Save your view
+            {strategyLabPageHeader.saveViewCta}
           </Link>
           <span className="avatar" aria-hidden="true">
             DT
@@ -54,7 +55,7 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
         <StrategyLabInteractivePanel
           displayPayload={displayPayload}
           live={live}
-          defaultOutcome={outcomeSummary}
+          defaultOutcome={strategyLabDefaultOutcome}
         />
       </section>
 

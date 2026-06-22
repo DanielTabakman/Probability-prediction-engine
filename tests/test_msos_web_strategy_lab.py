@@ -46,9 +46,11 @@ def test_strategy_lab_belief_presets_interactive() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab · BTC options" in content
-    assert "Live market data" in content
-    assert "Demo data" in content
+    strategy_copy = (MSOS_WEB / "src" / "content" / "strategyLab.ts").read_text(encoding="utf-8")
+    assert "strategyLabPageHeader" in content
+    assert "Strategy Lab · BTC options" in strategy_copy
+    assert "Live market data" in strategy_copy
+    assert "Demo data" in strategy_copy
     assert "buildLabMetricsFromPayload" in content
     assert "StrategyLabInteractivePanel" in content
     assert "DEMO_FOOTER" in content
@@ -56,7 +58,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "Market vs your view" in panel
+    assert "strategyLabChartPanel" in panel
+    assert "Market vs your view" in strategy_copy
     assert "PpeEmbedBoundary" in panel
     assert 'className="legend"' in panel
     assert 'className="controls"' in panel
@@ -80,10 +83,12 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "strategyLabFixtures.ts").read_text(encoding="utf-8")
-    assert "Live" in fixtures
-    assert "Planned" in fixtures
-    assert "Soon" in fixtures
-    assert "BTC options" in fixtures
+    strategy_copy = (MSOS_WEB / "src" / "content" / "strategyLab.ts").read_text(encoding="utf-8")
+    assert "strategyLabLensTiles" in fixtures or "lensTiles" in fixtures
+    assert "Live" in strategy_copy
+    assert "Planned" in strategy_copy
+    assert "Soon" in strategy_copy
+    assert "BTC options" in strategy_copy
 
 
 def test_thesis_confirmation_route_and_narrative() -> None:
@@ -94,11 +99,14 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert 'activeNavId="strategy-lab"' in text
 
     fixtures = (MSOS_WEB / "src" / "data" / "thesisConfirmFixtures.ts").read_text(encoding="utf-8")
-    assert "Is this what you actually believe?" in fixtures
+    thesis_copy = (MSOS_WEB / "src" / "content" / "thesisConfirm.ts").read_text(encoding="utf-8")
+    assert "thesisConfirmHeadline" in fixtures
+    assert "Is this what you actually believe?" in thesis_copy
 
     panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(encoding="utf-8")
     assert "thesisConfirmHeadline" in panel
-    assert "Plan a paper trade" in panel
+    assert "thesisConfirmPageHeader" in panel
+    assert "Plan a paper trade" in thesis_copy
     assert "WORKSPACE_SAVED_LABEL" in panel
     assert "DEMO_FOOTER" in panel
 
@@ -140,11 +148,13 @@ def test_expression_planning_route_and_narrative() -> None:
     panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "Paper only" in panel
-    assert "Save paper trade" in panel
+    expr_copy = (MSOS_WEB / "src" / "content" / "expressionPlanning.ts").read_text(encoding="utf-8")
+    assert "expressionPlanningPageHeader" in panel
+    assert "Paper only" in expr_copy
+    assert "Save paper trade" in expr_copy
     assert "DEMO_FOOTER" in panel
-    assert "Why this structure" in panel
-    assert "Structure types" in panel
+    assert "expressionPlanningPanels" in panel
+    assert "Structure types" in expr_copy
 
     persistence = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
     assert "msos.expression.preview.v1" in persistence
