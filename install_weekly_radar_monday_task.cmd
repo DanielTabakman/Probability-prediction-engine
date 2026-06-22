@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-REM Register Task Scheduler: Monday 04:00 workflow radar + weekly digest + notify.
+REM Register Task Scheduler: Monday 06:00 prep + 08:00 report (single pipeline).
 REM Run once from repo root.
 
 cd /d "%~dp0"
