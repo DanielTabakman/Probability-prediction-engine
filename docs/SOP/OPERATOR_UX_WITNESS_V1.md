@@ -26,4 +26,8 @@ Artifacts: `artifacts/health/msos_production_demo_witness.json` and `artifacts/h
 2. Follow [`DEMO_OPERATOR_SCRIPT.md`](DEMO_OPERATOR_SCRIPT.md)
 3. Log notes in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) — optional
 
-Fixture warnings in the HTTP witness (e.g. old storyboard copy) are **non-blocking** until the live-metrics product slice ships.
+Fixture warnings in the HTTP witness (e.g. old storyboard copy) are **non-blocking** — but any visitor-visible string must follow [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md). Agents fix copy in the same pass; operators judge tone on walkthrough.
+
+## Public copy (agents — `msos-shell`)
+
+Before asking the operator to UX-walkthrough, grep new UI for banned jargon (`PPE`, `fixture`, `workflow store`, raw errors). Canon: [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) · helpers: `apps/msos-web/src/lib/publicCopy.ts`.

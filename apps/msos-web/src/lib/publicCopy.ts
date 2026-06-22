@@ -1,4 +1,6 @@
-/** User-facing degraded / status messages — hide internal errors from the UI. */
+/** User-facing degraded / status messages — hide internal errors from the UI.
+ *  Canon: docs/SOP/MSOS_PUBLIC_COPY_V1.md
+ */
 
 export function friendlySnapshotFeedMessage(rawReason?: string | null): string {
   if (!rawReason) {

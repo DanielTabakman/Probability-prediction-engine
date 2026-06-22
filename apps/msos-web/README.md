@@ -4,6 +4,8 @@
 
 Next.js 15 App Router + TypeScript public homepage (MSOS P2). No PPE math in this tree — display only.
 
+**Public copy canon:** [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](../../docs/SOP/MSOS_PUBLIC_COPY_V1.md) · shared helpers: `src/lib/publicCopy.ts`
+
 ## Commands
 
 ```bash
