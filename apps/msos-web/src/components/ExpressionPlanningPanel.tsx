@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
+  expressionPlanningGate,
+  expressionPlanningPageHeader,
+  expressionPlanningPanels,
+} from "@/content/expressionPlanning";
+import {
   expressionFamilies,
   expressionRiskNote,
   optimizationBasis,
@@ -50,16 +55,16 @@ export function ExpressionPlanningPanel() {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Plan a trade</div>
-          <h1 className="title">Paper trade planner</h1>
+          <div className="crumb">{expressionPlanningPageHeader.crumb}</div>
+          <h1 className="title">{expressionPlanningPageHeader.title}</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot amber" aria-hidden="true" />
-            Paper only — no orders sent
+            {expressionPlanningPageHeader.paperOnlyPill}
           </span>
           <Link href="/strategy-lab/confirm" className="btn slim">
-            Back to thesis
+            {expressionPlanningPageHeader.backToThesis}
           </Link>
           <span className="avatar" aria-hidden="true">
             DT
@@ -69,10 +74,10 @@ export function ExpressionPlanningPanel() {
 
       {!thesisConfirmed && hydrated ? (
         <div className="panel thesis-gate">
-          <h2>Confirm your view first</h2>
-          <p>Save and confirm what you believe in Strategy Lab before sketching a trade structure.</p>
+          <h2>{expressionPlanningGate.title}</h2>
+          <p>{expressionPlanningGate.body}</p>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Confirm view
+            {expressionPlanningGate.cta}
           </Link>
         </div>
       ) : (
@@ -80,8 +85,8 @@ export function ExpressionPlanningPanel() {
           <div className="panel">
             <div className="panel-head">
               <div>
-                <h2>Structure types</h2>
-                <div className="panel-sub">Which trade shapes fit your view — and which don&apos;t.</div>
+                <h2>{expressionPlanningPanels.structureTypesTitle}</h2>
+                <div className="panel-sub">{expressionPlanningPanels.structureTypesSub}</div>
               </div>
             </div>
             {expressionFamilies.map((family) => (
@@ -102,7 +107,7 @@ export function ExpressionPlanningPanel() {
                 </span>
               </div>
             ))}
-            <div className="side-label rails-label">Where to trade</div>
+            <div className="side-label rails-label">{expressionPlanningPanels.whereToTrade}</div>
             {venueRails.map((venue) => (
               <div key={venue.id} className={`venue${venue.dimmed ? " dimmed" : ""}`}>
                 <div>
@@ -116,7 +121,7 @@ export function ExpressionPlanningPanel() {
 
           <div className="panel ticket">
             <div className="route">
-              <div className="best">Suggested structure</div>
+              <div className="best">{expressionPlanningPanels.suggestedStructure}</div>
               <h2>{record.planHeadline}</h2>
               <p>{record.planSummary}</p>
               <div className="legs" aria-label="Expression legs">
@@ -143,8 +148,8 @@ export function ExpressionPlanningPanel() {
           <div className="panel execution-metrics">
             <div className="panel-head">
               <div>
-                <h2>Why this structure</h2>
-                <div className="panel-sub">How well it matches your view and risk limits.</div>
+                <h2>{expressionPlanningPanels.whyStructureTitle}</h2>
+                <div className="panel-sub">{expressionPlanningPanels.whyStructureSub}</div>
               </div>
             </div>
             {optimizationBasis.map((line) => (
@@ -156,7 +161,7 @@ export function ExpressionPlanningPanel() {
             <div className="risk-note">{expressionRiskNote}</div>
             <div className="exec-actions">
               <button type="button" className="btn slim" disabled={!hydrated}>
-                Watch without trading
+                {expressionPlanningPanels.watchWithoutTrading}
               </button>
               <button
                 type="button"
@@ -164,10 +169,12 @@ export function ExpressionPlanningPanel() {
                 disabled={!hydrated || isSimulated}
                 onClick={simulateExpression}
               >
-                {isSimulated ? "Saved as paper trade" : "Save paper trade"}
+                {isSimulated
+                  ? expressionPlanningPanels.savedPaperTrade
+                  : expressionPlanningPanels.savePaperTrade}
               </button>
               <button type="button" className="btn slim dark" disabled={!hydrated}>
-                Review order (coming soon)
+                {expressionPlanningPanels.reviewOrderComingSoon}
               </button>
             </div>
             {isSimulated ? (

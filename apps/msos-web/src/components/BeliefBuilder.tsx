@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { strategyLabBeliefBuilder } from "@/content/strategyLab";
 import {
   BELIEF_PRESETS,
   buildBeliefSentence,
@@ -35,20 +36,22 @@ export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuild
   }
 
   const selected = BELIEF_PRESETS.find((p) => p.id === selectedId) ?? null;
+  const [chipHigher, chipLower, chipMoreVol, chipLessVol] = strategyLabBeliefBuilder.pickOneChips;
 
   return (
     <div className="belief-builder">
-      <h3>What do you believe?</h3>
+      <h3>{strategyLabBeliefBuilder.title}</h3>
       <p className="selectline" aria-live="polite">
         {selected ? (
           buildBeliefSentence(selected, expiryLabel)
         ) : (
           <>
-            Pick one —{" "}
-            <span className="selectchip muted">higher</span>,{" "}
-            <span className="selectchip muted">lower</span>,{" "}
-            <span className="selectchip muted">more vol</span>, or{" "}
-            <span className="selectchip muted">less vol</span> than options imply.
+            {strategyLabBeliefBuilder.pickOnePrefix}{" "}
+            <span className="selectchip muted">{chipHigher}</span>,{" "}
+            <span className="selectchip muted">{chipLower}</span>,{" "}
+            <span className="selectchip muted">{chipMoreVol}</span>, or{" "}
+            <span className="selectchip muted">{chipLessVol}</span>{" "}
+            {strategyLabBeliefBuilder.pickOneSuffix}
           </>
         )}
       </p>
@@ -72,9 +75,7 @@ export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuild
       </div>
 
       <p className="micro">
-        {selected
-          ? "This compares your view to the market curve — not a trade recommendation."
-          : "Tap a button to see how your view differs from what options price."}
+        {selected ? strategyLabBeliefBuilder.hintSelected : strategyLabBeliefBuilder.hintDefault}
       </p>
     </div>
   );

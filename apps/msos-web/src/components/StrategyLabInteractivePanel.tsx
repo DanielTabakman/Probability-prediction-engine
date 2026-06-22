@@ -5,7 +5,12 @@ import { useCallback, useMemo, useState } from "react";
 
 import { BeliefBuilder } from "@/components/BeliefBuilder";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
-import { lensTiles } from "@/data/strategyLabFixtures";
+import {
+  strategyLabChartPanel,
+  strategyLabLensSection,
+  strategyLabLensTiles,
+  strategyLabOutcomePanel,
+} from "@/content/strategyLab";
 import {
   buildOutcomeFromBelief,
   findBeliefPreset,
@@ -59,17 +64,16 @@ export function StrategyLabInteractivePanel({
 
         <div className="panel-head">
           <div>
-            <h2>Market vs your view</h2>
-            <div className="panel-sub">
-              Purple curve = what BTC options imply today. Your selection shows where you disagree.
-            </div>
+            <h2>{strategyLabChartPanel.title}</h2>
+            <div className="panel-sub">{strategyLabChartPanel.subtitle}</div>
           </div>
-          <span className="tag">Options</span>
+          <span className="tag">{strategyLabChartPanel.tag}</span>
         </div>
 
         {selectedPreset ? (
           <p className="belief-active-banner" role="status">
-            Your view: <strong>{selectedPreset.label}</strong> — compare to the chart below.
+            {strategyLabChartPanel.beliefBannerPrefix}{" "}
+            <strong>{selectedPreset.label}</strong> {strategyLabChartPanel.beliefBannerSuffix}
           </p>
         ) : null}
 
@@ -78,37 +82,38 @@ export function StrategyLabInteractivePanel({
         <div className="legend" aria-label="Chart legend">
           <span>
             <i className="swatch market" aria-hidden="true" />
-            Options market
+            {strategyLabChartPanel.legendMarket}
           </span>
           <span>
             <i className="swatch reference" aria-hidden="true" />
-            Reference curve
+            {strategyLabChartPanel.legendReference}
           </span>
           <span className={selectedPresetId ? "legend-active" : undefined}>
             <i className="swatch belief" aria-hidden="true" />
-            Your view{selectedPreset ? `: ${selectedPreset.label}` : ""}
+            {strategyLabChartPanel.legendBeliefPrefix}
+            {selectedPreset ? `: ${selectedPreset.label}` : ""}
           </span>
         </div>
 
-        <div className="controls" aria-label="Fine-tuning (coming soon)">
+        <div className="controls" aria-label={strategyLabChartPanel.controlsAriaLabel}>
           <div className="control">
-            <div className="control-label">Range width</div>
+            <div className="control-label">{strategyLabChartPanel.rangeWidthLabel}</div>
             <div className="slider preview" aria-hidden="true" />
           </div>
           <div className="control muted">
-            <div className="control-label">Tail weight</div>
+            <div className="control-label">{strategyLabChartPanel.tailWeightLabel}</div>
             <div className="slider preview muted" aria-hidden="true" />
           </div>
         </div>
 
         <div className="panel-head compact">
           <div>
-            <h2>Other markets</h2>
-            <div className="panel-sub">BTC options are live. More assets coming.</div>
+            <h2>{strategyLabLensSection.title}</h2>
+            <div className="panel-sub">{strategyLabLensSection.subtitle}</div>
           </div>
         </div>
         <div className="lab-list compact">
-          {lensTiles.map((tile) =>
+          {strategyLabLensTiles.map((tile) =>
             tile.live && tile.href ? (
               <Link key={tile.title} href={tile.href} className="lab-tile">
                 <div className="lab-mark">{tile.mark}</div>
@@ -135,8 +140,8 @@ export function StrategyLabInteractivePanel({
       <div className="panel outcome">
         <div className="panel-head">
           <div>
-            <h2>What this means</h2>
-            <div className="panel-sub">Decision support — not financial advice.</div>
+            <h2>{strategyLabOutcomePanel.title}</h2>
+            <div className="panel-sub">{strategyLabOutcomePanel.subtitle}</div>
           </div>
           <span className={`tag ${outcome.tagTone}`}>{outcome.tag}</span>
         </div>
@@ -155,13 +160,13 @@ export function StrategyLabInteractivePanel({
           <div>
             <strong>
               {selectedPreset
-                ? `Next: confirm your “${selectedPreset.label.toLowerCase()}” view`
-                : "Next: pick how you disagree with the market"}
+                ? strategyLabOutcomePanel.decisionNextWithPreset(selectedPreset.label)
+                : strategyLabOutcomePanel.decisionNextDefault}
             </strong>
-            <p>Then explore trade structures that fit — paper only on this demo.</p>
+            <p>{strategyLabOutcomePanel.decisionBody}</p>
           </div>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Confirm view →
+            {strategyLabOutcomePanel.confirmCta}
           </Link>
         </div>
       </div>
