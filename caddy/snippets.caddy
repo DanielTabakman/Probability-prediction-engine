@@ -1,0 +1,78 @@
+# Shared Caddy snippets (imported by Caddyfile and Caddyfile.tls).
+
+(security_headers) {
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+}
+
+(hsts_header) {
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
+}
+
+(forwarded_proto_cloudflare) {
+	map {http.request.header.X-Forwarded-Proto} {forwarded_proto} {
+		https https
+		HTTPS https
+		http http
+		HTTP http
+		default https
+	}
+}
+
+(forwarded_proto_direct) {
+	map {http.request.header.X-Forwarded-Proto} {forwarded_proto} {
+		https https
+		HTTPS https
+		http http
+		HTTP http
+		default {http.request.scheme}
+	}
+}
+
+(msos_site_routes) {
+	@app host app.marketstructureos.com
+	handle @app {
+		reverse_proxy app_full:8501 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+	@ppe_embed path /ppe-embed /ppe-embed/*
+	handle @ppe_embed {
+		uri strip_prefix /ppe-embed
+		reverse_proxy app_demo:8501 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+	@ppe_display_api path /ppe-display-api /ppe-display-api/*
+	handle @ppe_display_api {
+		uri strip_prefix /ppe-display-api
+		reverse_proxy ppe_display_api:8765 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+	handle {
+		header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+		reverse_proxy msos_web:3000 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
+}
+
+(site_handlers_cloudflare) {
+	import forwarded_proto_cloudflare
+	import msos_site_routes
+}
+
+(site_handlers_direct) {
+	import forwarded_proto_direct
+	import msos_site_routes
+}

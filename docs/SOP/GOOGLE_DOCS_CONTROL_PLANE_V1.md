@@ -164,6 +164,8 @@ If you want this to run automatically (not just in Cursor), use the workflow:
 - `GOOGLE_OAUTH_CLIENT_SECRET`
 - `GOOGLE_OAUTH_REFRESH_TOKEN`
 
+**OAuth scopes (CI):** GitHub Actions uses the minimal sync scopes in [`scripts/google_oauth_scopes.py`](../../scripts/google_oauth_scopes.py) (`documents` + `drive.readonly`). The refresh token must include at least those scopes. If sync fails with `insufficientPermissions` after a scope change, re-run OAuth consent (see [`MCP_GOOGLE_DOCS_SETUP.md`](MCP_GOOGLE_DOCS_SETUP.md)) and update `GOOGLE_OAUTH_REFRESH_TOKEN` in GitHub secrets. Local Cursor MCP may still use broader MCP scopes; that is separate from CI.
+
 ### What it does
 
 1. Generates a fresh local mirror snapshot:
