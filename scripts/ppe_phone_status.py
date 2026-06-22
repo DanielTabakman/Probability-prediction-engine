@@ -13,7 +13,7 @@ from scripts.ppe_notify_push import (
     load_ntfy_snooze,
     quiet_hours_until_local,
 )
-from scripts.ppe_operator_hint import append_ppe_go_hint, is_procedural_relay_text, ppe_go_hint_for_verdict
+from scripts.ppe_operator_hint import append_ppe_go_hint, ppe_go_hint_for_verdict
 
 _SLICE_RE = re.compile(r"\[([^\]]+)\]")
 
@@ -50,8 +50,6 @@ def _clean_blocker(blocker: str | None, *, verdict: str, slice_id: str | None) -
     if "PPE_SKIP_ACP" in text or "IDE_PRODUCT_READY" in text:
         if slice_id:
             return f"Slice {slice_id} needs an IDE BUILD in Cursor."
-    if is_procedural_relay_text(text):
-        return "Relay auto-advancing — no action needed on your phone."
     text = re.sub(r"\s*\([^)]*PPE_[^)]*\)", "", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text[:280]
@@ -89,12 +87,23 @@ def _stack_line(stack: dict[str, Any] | None) -> str:
     return f"Desktop: loop {loop} · watch {watch} · phone cmds {listen}"
 
 
-def _next_step(status: dict[str, Any], *, slice_id: str | None) -> str:
+def _next_step(
+    status: dict[str, Any],
+    *,
+    slice_id: str | None,
+    stack: dict[str, Any] | None = None,
+) -> str:
     verdict = str(status.get("verdict") or "")
+    loop_running = bool((stack or {}).get("loop_running"))
     if verdict in ("RUN_AUTO", "SUPPLY_LOW"):
         return "Nothing needed on your phone - auto-loop is running."
     if verdict == "RUN_LOCAL":
-        return "Run finish on the desktop (run_ppe_local.cmd), then loop continues."
+        if loop_running:
+            return (
+                "Loop is running and will finish this chapter on the desktop — "
+                "no phone action unless stuck for hours. Send build to nudge."
+            )
+        return "Loop is off — send restart from phone or run run_ppe_desktop_operator.cmd on the PC."
     hint = ppe_go_hint_for_verdict(verdict)
     if hint:
         return f"On desktop: {hint}"
@@ -148,7 +157,7 @@ def format_phone_status(
         lines.append(detail)
 
     lines.append("")
-    lines.append(_next_step(status, slice_id=slice_id))
+    lines.append(_next_step(status, slice_id=slice_id, stack=stack))
 
     if stack is not None:
         lines.append("")

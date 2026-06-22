@@ -89,7 +89,8 @@ _FALLBACK_PREFIXES: tuple[str, ...] = (
     "docs/SOP/PHASE_PLANS/",
 )
 
-_MAX_SCOPED_FILES = 45
+# scripts/ppe_* maps to ~64 test files; keep headroom for CORE_SCOPE + changed tests.
+_MAX_SCOPED_FILES = 96
 
 
 def _glob_tests(repo: Path, pattern: str) -> list[str]:

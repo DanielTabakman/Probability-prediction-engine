@@ -2,9 +2,9 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** run the auto-loop on an always-on desktop; monitor and triage from phone.
 
-**Layout (Hyper-V VM):** see [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md). **VM = loop** · **Desktop = IDE BUILD**.
+**New desktop?** [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
 
-Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
+Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
 
 ---
 
@@ -12,9 +12,9 @@ Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · 
 
 | Device | Tools | Job |
 |--------|-------|-----|
-| **VM** (Hyper-V, always on) | Headless loop + ntfy listen | **Loop host** — relay, control slices, `run_ppe_local` |
-| **Desktop** (daily PC) | Cursor | **IDE BUILD only** — `DESKTOP_BUILD.cmd`, no loop |
-| **Phone** | **ntfy** + **Termius** | Alerts with button hints; SSH triage to VM |
+| **Desktop** (plugged in, never sleeps) | Loop + **Cursor** + RDP host | Loop host; primary Agent machine; optional direct work |
+| **Phone** | **ntfy** + **Termius** + **Microsoft Remote Desktop** | Alerts; quick SSH triage; full Cursor via RDP |
+| **Laptop** | Cursor + Termius (optional) | Alternate BUILD machine if desktop unavailable |
 
 **You do not code by hand.** When something needs judgment, open **Cursor Agent** on the desktop (locally or via phone RDP).
 
@@ -87,75 +87,68 @@ Configured in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) →
 | Setting | Default | Behavior |
 |---------|---------|----------|
 | `pullEachPass` | true | Each loop pass: `git fetch` + `git pull --ff-only origin main` |
-| `publishEachPass` | true | Push unpushed commits on feature branches + open PR |
-| `mergeEachPass` | true | Label loop PRs `automerge` and squash-merge when CI is green |
 | `pushAfterCommit` | true | After closeout / `run_ppe_local` success: push + open PR |
 | `openPrOnPush` | true | `gh pr create` when publishing from `main` |
 
-Disable: `set PPE_GIT_SYNC=0`, `set PPE_GIT_SYNC_PULL=0`, or `set PPE_GIT_SYNC_MERGE=0`.
+Disable: `set PPE_GIT_SYNC=0` or `set PPE_GIT_SYNC_PULL=0`.
 
 **You do not manually `git pull` from the phone** — the loop pulls laptop/desktop pushes automatically.
 
 ---
 
-## Daily start
+## Daily start (desktop)
 
-### VM (loop host)
-
-```bat
-VM_RESTART.cmd
-REM or after one-time install: logon task starts stack automatically
-VM_STATUS.cmd
-```
-
-### Desktop (IDE BUILD only — no loop)
+**One command** (git pull, propagate queue, ensure loop + watch, print verdict):
 
 ```bat
-REM one-time:
-setup_desktop_ide_only.cmd
-REM when ntfy says IDE_BUILD:
-DESKTOP_BUILD.cmd
+run_ppe_desktop_operator.cmd
 ```
 
-**Legacy (no VM):** `run_ppe_desktop_operator.cmd` / `start_ppe_desktop_operator.cmd` — deprecated when Hyper-V VM is live.
+Low-level (opens two cmd windows only — no queue/stack check):
+
+```bat
+start_ppe_desktop_operator.cmd
+```
 
 ---
 
 ## Phone workflow when ntfy fires
 
-### Quick triage (Termius → VM)
+### Quick triage (Termius)
 
 ```bat
-cd C:\Users\ppeloop\Probability-prediction-engine
-ppe_autobuilder.cmd status --brief
+cd C:\Users\USER\Desktop\Probability-prediction-engine
+run_ppe_operator.cmd --brief
 type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ```
 
-### IDE BUILD (desktop Cursor — default)
+### Fix with Cursor Agent (Microsoft Remote Desktop)
 
-1. On **daily PC**: double-click **DESKTOP BUILD** (or open starter in Cursor)
-2. Gate → commit → PR → **DESKTOP CONTINUE** after merge
-3. VM loop continues relay automatically
+1. Open **Microsoft Remote Desktop** → connect to `desktop-ge39o15`
+2. Open **Cursor** on the desktop
+3. New Agent thread → load `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` or `AGENT_CONTINUITY_BRIEF.md`
+4. Agent implements / fixes; commit happens on desktop
+5. Loop auto-pulls/pushes — or run `run_ppe_local.cmd` if verdict is `RUN_LOCAL`
 
 ### Verdict matrix
 
-| Verdict | Phone | Desktop | VM loop |
-|---------|-------|---------|---------|
-| `SUPPLY_LOW` | Nothing | — | idle |
-| `RUN_AUTO` / `RUN_LOCAL` | — | — | auto relay |
-| `IDE_BUILD` | Read hint | **DESKTOP BUILD** | waits |
-| `ERROR` / `STALE_STATE` | SSH triage | steward chat | `fix_vm_operator.cmd` |
-| `STACK_DOWN` | — | — | **VM_RESTART** |
+| Verdict | Phone (Termius) | Phone (RDP + Cursor) | Loop auto |
+|---------|-----------------|----------------------|-----------|
+| `SUPPLY_LOW` | Nothing — idle | — | — |
+| `RUN_AUTO` | Watch | — | Runs relay |
+| `RUN_LOCAL` | `run_ppe_local.cmd` | Agent if stuck | Pull + publish |
+| `IDE_BUILD` | Send **`build`** on ntfy | **Cursor Agent BUILD** (or **`build`** from phone) | Pull after push |
+| `ERROR` / `STALE_STATE` | Read reports; restart stack | Agent fix | — |
 
-Restart stack from phone (SSH to **VM**):
+Restart stack from phone (Termius):
 
 ```bat
-VM_RESTART.cmd
+start_ppe_desktop_operator.cmd
 ```
 
 ### Remote commands (ntfy app — no SSH)
 
-When `watch_ntfy_commands.cmd` is running on the **VM** (started by headless stack), publish a message **to your ntfy topic** from the phone app:
+When `watch_ntfy_commands.cmd` is running (started automatically by `start_ppe_desktop_operator.cmd`), publish a message **to your ntfy topic** from the phone app:
 
 | Message | What happens |
 |---------|----------------|
@@ -208,7 +201,13 @@ Disable remote commands: `set PPE_NTFY_CMD_ENABLED=0` in `ppe_operator_notify.lo
 | Cursor Agent starts fixing a block | **ntfy** (title: **PPE fixing: …**) — agent runs `ppe_notify_fix.py --working` |
 | Cursor Agent finishes a fix | **ntfy** (title: **PPE fixed (VERDICT): …** or **PPE fix done: …**) — agent runs `ppe_notify_fix.py --resolved` |
 | Stuck verdict clears (watch poll) | **ntfy** (title: **PPE fixed: RUN_AUTO** / **RUN_LOCAL** — includes prior blocker) |
+| Loop down >45m without maintenance (24/7 gap) | **ntfy** (title: **PPE: loop down … (24/7 gap)**) |
+| 8am morning digest (watch poll) | **ntfy** — dynamic title from today's plan; full copy in `docs/RELEASES/MORNING_REPORT_LATEST.md` |
 | Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
+
+**Morning report sections:** yesterday output · product git diff · runtime (uptime vs prior day, maintenance vs gap) · today's build plan · get-ahead blockers · business playbook (main topic). Steward Mon/Thu nudges use **`PPE_NTFY_STEWARD_TOPIC`** (separate subscription).
+
+**Maintenance:** intentional desktop downtime only — `maintenance on` from phone or `PPE_OPERATOR_MAINTENANCE=1`. Does **not** include quiet hours or IDE waits. After `restart`, if maintenance is still on you get a reminder to send `maintenance off`.
 
 Disable progress pings: `set PPE_NTFY_PROGRESS=0` in `ppe_operator_notify.local.cmd`.
 
@@ -227,6 +226,14 @@ install_ppe_desktop_operator_task.cmd
 ```
 
 Runs `run_ppe_desktop_operator.cmd` at user logon (git pull, queue propagate, start stack if missing).
+
+**Morning digest fallback** (if watch missed the 8am window):
+
+```bat
+install_morning_report_task.cmd
+```
+
+Runs `morning_report.cmd` daily at **08:05** local. Same once-per-day guard as watch — safe to run both.
 
 Manual Task Scheduler fields:
 
@@ -254,6 +261,9 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_QUIET_START` / `PPE_NTFY_QUIET_END` | No | `01:00` / `08:00` local — one stuck ping allowed per night |
 | `PPE_NTFY_MORNING_REPORT` | No | `1` — 8am digest when watch is running |
 | `PPE_NTFY_MORNING_REPORT_AT` | No | `08:00` local |
+| `PPE_NTFY_GAP_ALERT` | No | `1` — ping when loop off without maintenance past threshold |
+| `PPE_NTFY_GAP_ALERT_MIN` | No | `45` — minutes before gap alert |
+| `PPE_OPERATOR_MAINTENANCE` | No | `1` on desktop marks intentional downtime |
 | `PPE_NTFY_CMD_POLL_SEC` | No | `30` — phone command poll interval |
 | `PPE_GIT_SYNC` | No | enabled |
 | `PPE_GIT_SYNC_PULL` | No | enabled |

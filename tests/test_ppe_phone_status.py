@@ -33,6 +33,7 @@ def test_format_phone_status_readable():
     )
     assert "Running (finish step)" in body
     assert "MVP1 distribution quant v2" in body
+    assert "Loop is running" in body
     assert "loop on" in body
     assert "VERDICT=" not in body
 

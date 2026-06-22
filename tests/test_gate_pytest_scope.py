@@ -18,6 +18,11 @@ class TestGatePytestScope(unittest.TestCase):
         self.assertIn("tests/test_ppe_auto_select.py", paths)
         self.assertIn("tests/test_run_pushable_gate.py", paths)
 
+    def test_scripts_ppe_notify_maps_without_fallback(self) -> None:
+        paths = resolve_scoped_tests(["scripts/ppe_notify_push.py"], REPO)
+        assert paths is not None
+        self.assertIn("tests/test_ppe_notify_push.py", paths)
+
     def test_src_viz_maps_to_viz_tests(self) -> None:
         paths = resolve_scoped_tests(["src/viz/app.py"], REPO)
         assert paths is not None

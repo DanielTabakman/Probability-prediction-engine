@@ -21,7 +21,7 @@ from scripts.ppe_notify_push import (
 )
 from scripts.ppe_phone_status import format_phone_status, phone_status_title
 
-KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze"})
+KNOWN_COMMANDS = frozenset({"build", "restart", "fix", "status", "help", "snooze", "maintenance"})
 
 
 @dataclass(frozen=True)
@@ -50,8 +50,7 @@ def should_ignore_message(message: dict[str, Any]) -> bool:
         return True
     if is_outbound_message(message):
         return True
-    title = str(message.get("title") or "")
-    if title.startswith("PPE OK") or title.startswith("PPE: restart"):
+    if str(message.get("title") or "").startswith("PPE OK"):
         return True
     return not str(message.get("message") or "").strip()
 
@@ -69,12 +68,7 @@ def parse_command_text(text: str) -> RemoteCommand | None:
         tokens = tokens[1:]
     if not tokens or tokens[0] not in KNOWN_COMMANDS:
         return None
-    name = tokens[0]
-    # Restart is destructive (kills the listener). Require a configured secret so a bare
-    # "restart" in topic history cannot trigger a loop on an open topic.
-    if name == "restart" and not command_secret():
-        return None
-    return RemoteCommand(name=name, args=" ".join(tokens[1:]).strip())
+    return RemoteCommand(name=tokens[0], args=" ".join(tokens[1:]).strip())
 
 
 def parse_command_message(message: dict[str, Any]) -> RemoteCommand | None:
@@ -85,16 +79,11 @@ def parse_command_message(message: dict[str, Any]) -> RemoteCommand | None:
     return parse_command_text(body)
 
 
-def stop_stack_processes(*, exclude_pid: int | None = None) -> int:
-    pid_filter = ""
-    if exclude_pid is not None:
-        pid_filter = f" -and $_.ProcessId -ne {int(exclude_pid)}"
+def stop_stack_processes() -> int:
     ps = (
         "$k=0; Get-CimInstance Win32_Process -EA SilentlyContinue | "
-        "Where-Object { $_.CommandLine -match "
-        "'run_ppe_auto_local_loop|watch_operator_mobile|ppe_ntfy_listen|ppe_ide_build_local_watcher|"
-        "ppe_headless_stack_supervisor|ppe_watch_operator_mobile|start_ppe_desktop_operator'"
-        f"{pid_filter} }} | "
+        "Where-Object { $_.CommandLine -match 'run_ppe_auto_local_loop|watch_operator_mobile' "
+        "-and $_.CommandLine -notmatch 'ppe_ntfy_listen' } | "
         "ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue; $k++ }; $k"
     )
     try:
@@ -105,26 +94,11 @@ def stop_stack_processes(*, exclude_pid: int | None = None) -> int:
 
 
 def execute_restart(repo: Path) -> dict[str, Any]:
-    from scripts.ppe_desktop_operator_stack import ensure_stack, stack_status
-    from scripts.ppe_loop_host_guard import loop_host_blocked
-
-    repo = repo.resolve()
-    blocked = loop_host_blocked()
-    if blocked:
-        return {
-            "action": "restart",
-            "refused": True,
-            "reason": blocked["guard_detail"],
-            "stack": stack_status(repo),
-        }
-
-    killed = stop_stack_processes(exclude_pid=os.getpid())
+    killed = stop_stack_processes()
     time.sleep(2)
-    stack = ensure_stack(repo, start=True)
-    if not stack.get("loop_running") or not stack.get("watch_running"):
-        time.sleep(5)
-        stack = {**stack, **stack_status(repo)}
-    return {"action": "restart", "killed": killed, "stack": stack}
+    from scripts.ppe_desktop_operator_stack import ensure_stack
+
+    return {"action": "restart", "killed": killed, "stack": ensure_stack(repo.resolve(), start=True)}
 
 
 def execute_status(repo: Path) -> dict[str, Any]:
@@ -132,17 +106,16 @@ def execute_status(repo: Path) -> dict[str, Any]:
     from scripts.ppe_operator_status import collect_operator_status
 
     repo = repo.resolve()
+    ack_sent = send_ntfy(
+        "PPE: checking...",
+        "Desktop received status — gathering operator snapshot.",
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_throttle=True,
+    )
     status = collect_operator_status(repo)
     stack = stack_status()
     body = format_phone_status(status, stack=stack, repo=repo)
-    try:
-        from scripts.ppe_autobuilder import collect_autobuilder_status, format_status_brief, write_status_artifact
-
-        ab = collect_autobuilder_status(repo)
-        write_status_artifact(repo, ab)
-        body = f"{body}\n\nAutobuilder: {format_status_brief(ab)}"
-    except Exception:
-        pass
     title = phone_status_title(status)
     sent = send_ntfy(
         title,
@@ -150,7 +123,13 @@ def execute_status(repo: Path) -> dict[str, Any]:
         tags=["ppe", "cmd", OUTBOUND_TAG],
         bypass_throttle=True,
     )
-    return {"action": "status", "body": body, "notified": sent, "title": title}
+    return {
+        "action": "status",
+        "body": body,
+        "notified": sent,
+        "ack_notified": ack_sent,
+        "title": title,
+    }
 
 
 def execute_build(repo: Path, *, note: str = "") -> dict[str, Any]:
@@ -214,6 +193,47 @@ def execute_snooze(repo: Path, *, note: str = "") -> dict[str, Any]:
     }
 
 
+def execute_maintenance(repo: Path, *, note: str = "") -> dict[str, Any]:
+    from scripts.ppe_desktop_operator_stack import stack_status
+    from scripts.ppe_operator_maintenance import set_maintenance
+
+    repo = repo.resolve()
+    args = (note or "").strip()
+    lower = args.lower()
+
+    if lower in ("off", "end", "clear", "done"):
+        set_maintenance(repo, False, set_by="phone")
+        stack = stack_status()
+        loop = "on" if stack.get("loop_running") else "off"
+        body = "Maintenance off. Loop should run 24/7 again."
+        if loop == "off":
+            body += " Loop is off now - send restart when ready."
+        sent = send_ntfy(
+            "PPE maintenance off",
+            body,
+            tags=["ppe", "cmd", OUTBOUND_TAG],
+            priority="low",
+            bypass_snooze=True,
+            bypass_throttle=True,
+        )
+        return {"action": "maintenance", "active": False, "notified": sent}
+
+    reason = args if args and lower not in ("on", "start") else "manual desktop work"
+    payload = set_maintenance(repo, True, reason=reason, set_by="phone")
+    sent = send_ntfy(
+        "PPE maintenance on",
+        (
+            f"{payload.get('reason')}. Loop downtime won't count against 24/7 uptime. "
+            "Send maintenance off when done, then restart if needed."
+        ),
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_snooze=True,
+        bypass_throttle=True,
+    )
+    return {"action": "maintenance", "active": True, "notified": sent, "payload": payload}
+
+
 def execute_help(repo: Path) -> dict[str, Any]:
     prefix = f"{command_secret()} " if command_secret() else ""
     from scripts.ppe_operator_hint import PPE_GO_HINT
@@ -221,10 +241,11 @@ def execute_help(repo: Path) -> dict[str, Any]:
     body = (
         f"{prefix}build - start IDE BUILD when verdict is IDE_BUILD\n"
         f"Desktop: {PPE_GO_HINT}\n"
-        f"{prefix}restart - restart loop + watch on the VM loop host (secret required)\n"
+        f"{prefix}restart - restart loop + watch on desktop\n"
         f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
         f"{prefix}status - friendly operator snapshot\n"
         f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
+        f"{prefix}maintenance [on|off|note] - mark intentional downtime (desktop work)\n"
         f"{prefix}help - this list"
     )
     sent = send_ntfy(
@@ -248,39 +269,36 @@ def execute_command(repo: Path, command: RemoteCommand) -> dict[str, Any]:
         return execute_fix(repo, note=command.args)
     if command.name == "snooze":
         return execute_snooze(repo, note=command.args)
+    if command.name == "maintenance":
+        return execute_maintenance(repo, note=command.args)
     return execute_help(repo)
 
 
-def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> bool:
+def notify_command_result(command: RemoteCommand, result: dict[str, Any], repo: Path | None = None) -> bool:
     if not notify_enabled() or not ntfy_configured():
         return False
     action = str(result.get("action") or command.name)
     if action == "restart":
-        if result.get("refused"):
-            return send_ntfy(
-                "PPE: restart refused",
-                f"{result.get('reason') or 'This machine cannot run the operator loop.'}\n"
-                "Use VM_RESTART on the Hyper-V VM. Do not send phone restart from the daily PC.",
-                tags=["ppe", "cmd", OUTBOUND_TAG],
-                priority="high",
-                bypass_throttle=True,
-            )
         stack = result.get("stack") or {}
         loop = "on" if stack.get("loop_running") else "off"
         watch = "on" if stack.get("watch_running") else "off"
-        if loop == "off" or watch == "off":
-            return send_ntfy(
-                "PPE: restart failed",
-                f"Operator stack did not come back up (loop {loop} · watch {watch}).\n"
-                "On the VM double-click VM_RESTART once — avoid phone restart until stack is healthy.",
-                tags=["ppe", "cmd", OUTBOUND_TAG],
-                priority="high",
-                bypass_throttle=True,
-            )
+        body = (
+            f"Desktop stack restarted ({result.get('killed', 0)} old process(es) stopped).\n"
+            f"Loop: {loop} · Watch: {watch}"
+        )
+        root = (repo or Path.cwd()).resolve()
+        try:
+            from scripts.ppe_operator_maintenance import is_maintenance_active
+
+            if is_maintenance_active(root):
+                body += (
+                    "\n\nMaintenance still ON — gap downtime won't count until you send maintenance off."
+                )
+        except ImportError:
+            pass
         return send_ntfy(
             "PPE: restarted",
-            f"Operator stack restarted ({result.get('killed', 0)} old process(es) stopped).\n"
-            f"Loop: {loop} · Watch: {watch}",
+            body,
             tags=["ppe", "cmd", OUTBOUND_TAG],
             bypass_throttle=True,
         )
@@ -305,7 +323,7 @@ def notify_command_result(command: RemoteCommand, result: dict[str, Any]) -> boo
             priority="high",
             bypass_throttle=True,
         )
-    if action in ("status", "snooze"):
+    if action in ("status", "snooze", "maintenance"):
         return bool(result.get("notified"))
     return bool(result.get("notified"))
 
@@ -326,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     result = execute_command(args.repo_root.resolve(), cmd)
     if not args.no_notify:
-        notify_command_result(cmd, result)
+        notify_command_result(cmd, result, args.repo_root.resolve())
     print(json.dumps(result, indent=2) if args.json else result)
     return 0 if result.get("started", True) else 1
 

@@ -13,36 +13,17 @@ from scripts.ppe_ntfy_commands import (
 
 
 def test_parse_restart_command():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("restart") is None
-    assert parse_command_text("PPE restart") is None
-    assert parse_command_text("/restart") is None
-
-
-def test_parse_restart_command_with_secret(monkeypatch):
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    assert parse_command_text("restart") is None
-    assert parse_command_text("s3cret restart").name == "restart"
-    assert parse_command_text("PPE restart") is None
+    assert parse_command_text("restart").name == "restart"
+    assert parse_command_text("PPE restart").name == "restart"
+    assert parse_command_text("/restart").name == "restart"
 
 
 def test_parse_build_command():
-    # Ensure the test is not affected by a globally configured secret.
-    # When a secret is configured, commands must be prefixed with it.
-    # (That behavior is tested separately.)
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     assert parse_command_text("build").name == "build"
     assert parse_command_text("build extra context").args == "extra context"
 
 
 def test_parse_fix_with_note():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
     cmd = parse_command_text("fix loop died after smoke")
     assert cmd is not None
     assert cmd.name == "fix"
@@ -67,28 +48,14 @@ def test_ignore_desktop_ok_title():
     )
 
 
-def test_ignore_restart_reply_title():
-    assert should_ignore_message(
-        {
-            "event": "message",
-            "title": "PPE: restarted",
-            "message": "Operator stack restarted (1 old process(es) stopped).\nLoop: off · Watch: off",
-        }
-    )
-
-
-def test_execute_restart_refused_when_stack_forbidden(tmp_path, monkeypatch):
-    monkeypatch.setenv("PPE_STACK_FORBIDDEN", "1")
-    with patch("scripts.ppe_ntfy_commands.stop_stack_processes") as stop:
-        from scripts.ppe_ntfy_commands import execute_restart
-
-        result = execute_restart(tmp_path)
-    assert result.get("refused") is True
-    stop.assert_not_called()
-
-
 def test_is_outbound_message_string_tags():
     assert is_outbound_message({"tags": "ppe,from-desktop,ok"})
+
+
+def test_parse_maintenance_command():
+    assert parse_command_text("maintenance on").name == "maintenance"
+    assert parse_command_text("maintenance off").args == "off"
+    assert parse_command_text("maintenance fixing viz").args == "fixing viz"
 
 
 def test_execute_restart_calls_stack(tmp_path, monkeypatch):

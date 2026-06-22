@@ -68,7 +68,6 @@ class WeekSection:
     whats_next_lines: list[str]
     merge_count: int
     receipt_anchor: str
-    friction_lines: list[str] = field(default_factory=list)
 
     def to_markdown(self) -> list[str]:
         mon = date.fromisoformat(self.week_monday)
@@ -88,10 +87,6 @@ class WeekSection:
         lines.append("### Behind the scenes")
         lines.append(f"- {self.ops_summary}")
         lines.append("")
-        if self.friction_lines:
-            lines.append("### Workflow friction")
-            lines.extend(self.friction_lines)
-            lines.append("")
         lines.append("### What's next")
         if self.whats_next_lines:
             lines.extend(self.whats_next_lines)
@@ -150,7 +145,7 @@ def _repo_is_public_on_github(repo: Path) -> bool:
     return not bool(data.get("isPrivate"))
 
 
-def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
+def resolve_blob_click_url(repo: Path, rel: str, *, branch: str = "main") -> str | None:
     if not _repo_is_public_on_github(repo):
         return None
     try:
@@ -169,8 +164,12 @@ def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
     match = _GITHUB_REMOTE_RE.match((proc.stdout or "").strip())
     if not match:
         return None
-    rel = DIGEST_REL.replace("\\", "/")
-    return f"https://github.com/{match.group(1)}/{match.group(2)}/blob/{branch}/{rel}"
+    rel_norm = rel.replace("\\", "/")
+    return f"https://github.com/{match.group(1)}/{match.group(2)}/blob/{branch}/{rel_norm}"
+
+
+def resolve_digest_click_url(repo: Path, *, branch: str = "main") -> str | None:
+    return resolve_blob_click_url(repo, DIGEST_REL, branch=branch)
 
 
 def _phone_product_line(raw: str) -> str:
@@ -242,7 +241,12 @@ def _user_facing_next(raw: str) -> str:
     return _phone_next_line(raw)
 
 
-def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
+def build_phone_digest_notify(
+    section: dict[str, Any],
+    *,
+    factory_lines: list[str] | None = None,
+    uptime_line: str | None = None,
+) -> dict[str, str]:
     week = str(section["week_monday"])
     merge_count = int(section.get("merge_count") or 0)
     product_lines = [str(x) for x in (section.get("product_lines") or [])]
@@ -293,14 +297,14 @@ def build_phone_digest_notify(section: dict[str, Any]) -> dict[str, str]:
             lines.append(f"- {_user_facing_next(raw)}")
         lines.append("")
 
-    friction = [str(x) for x in (section.get("friction_lines") or [])]
-    if friction:
-        lines.append("Workflow watch")
-        for raw in friction[:2]:
-            text = raw.lstrip("- ").strip()
-            if text:
-                lines.append(f"- {text}")
+    if factory_lines:
+        lines.append("Build factory this week")
+        for item in factory_lines[:6]:
+            lines.append(f"- {item}")
         lines.append("")
+
+    if uptime_line:
+        lines.extend(["Runtime", uptime_line, ""])
 
     if section.get("click_url"):
         lines.append(f"{merge_count} merges to main. Tap for the long read on GitHub.")
@@ -323,7 +327,6 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
     product_lines: list[str] = []
     ops_summary = ""
     whats_next_lines: list[str] = []
-    friction_lines: list[str] = []
 
     for line in text.splitlines():
         if line.startswith("## Week of "):
@@ -346,9 +349,6 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
         if line.startswith("### What's next"):
             current_section = "next"
             continue
-        if line.startswith("### Workflow friction"):
-            current_section = "friction"
-            continue
         if line.startswith("### "):
             current_section = None
             continue
@@ -362,8 +362,6 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             ops_summary = stripped[2:]
         elif current_section == "next" and stripped.startswith("- "):
             whats_next_lines.append(stripped[2:])
-        elif current_section == "friction" and stripped.startswith("- "):
-            friction_lines.append(stripped)
         elif stripped.startswith("- ") and "merge(s) to `main`" in stripped:
             match = re.search(r"(\d+)\s+merge\(s\)", stripped)
             if match:
@@ -378,7 +376,6 @@ def parse_latest_week_summary(text: str) -> dict[str, Any] | None:
             "product_lines": product_lines,
             "ops_summary": ops_summary,
             "whats_next_lines": whats_next_lines,
-            "friction_lines": friction_lines,
         }
     return None
 
@@ -399,26 +396,38 @@ def cmd_write_notify_payload(repo: Path) -> int:
     click_url = resolve_digest_click_url(repo)
     if click_url:
         summary["click_url"] = click_url
-    summary.update(build_phone_digest_notify(summary))
+    factory_lines: list[str] = []
     try:
-        from scripts.ppe_human_backlog import (
-            open_items,
-            phone_snippet_lines,
-            render_markdown,
-            write_notify_snippet,
-        )
+        from scripts.ppe_operator_day_plan import build_week_factory_lines
 
-        (repo / "docs/SOP/HUMAN_STEWARD_BACKLOG.md").write_text(
-            render_markdown(repo), encoding="utf-8"
+        factory_lines = build_week_factory_lines(repo)
+    except Exception as exc:
+        print(f"ppe_weekly_digest: build factory outlook skipped: {exc}", file=sys.stderr)
+    uptime_line: str | None = None
+    try:
+        from scripts.ppe_notify_push import _load_send_state, _prune_send_state
+        from scripts.ppe_operator_daily_metrics import week_uptime_summary_line
+
+        sends = _prune_send_state(_load_send_state(repo))
+        uptime_line = week_uptime_summary_line(repo, str(summary["week_monday"]), sends=sends)
+    except Exception as exc:
+        print(f"ppe_weekly_digest: uptime summary skipped: {exc}", file=sys.stderr)
+    summary.update(
+        build_phone_digest_notify(
+            summary,
+            factory_lines=factory_lines or None,
+            uptime_line=uptime_line,
         )
-        write_notify_snippet(repo)
-        snippet = phone_snippet_lines(repo)
-        if snippet:
-            summary["human_backlog_open"] = len(open_items(repo))
-            body = str(summary.get("phone_body") or "").strip()
-            summary["phone_body"] = f"{body}\n\n" + "\n".join(snippet) if body else "\n".join(snippet)
-    except ImportError:
-        pass
+    )
+    try:
+        from scripts.ppe_steward_scoreboard import format_digest_commitment_lines
+
+        commitment = format_digest_commitment_lines(repo)
+        if commitment:
+            body = str(summary.get("phone_body") or "")
+            summary["phone_body"] = (body + "\n" + "\n".join(commitment)).strip()
+    except Exception as exc:
+        print(f"ppe_weekly_digest: steward commitments skipped: {exc}", file=sys.stderr)
     out = notify_payload_path(repo)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -614,8 +623,6 @@ def extract_whats_next(repo: Path) -> list[str]:
 
 
 def build_week_section(repo: Path, week_monday: date) -> WeekSection:
-    from scripts.ppe_workflow_radar import load_radar_friction_lines
-
     bullets, total = collect_week_bullets(repo, week_monday)
     product_raw: list[str] = []
     ops_count = 0
@@ -643,7 +650,6 @@ def build_week_section(repo: Path, week_monday: date) -> WeekSection:
         whats_next_lines=extract_whats_next(repo),
         merge_count=total,
         receipt_anchor=anchor,
-        friction_lines=load_radar_friction_lines(repo, week_monday),
     )
 
 

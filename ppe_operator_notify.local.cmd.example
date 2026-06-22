@@ -3,6 +3,10 @@ REM Copy to ppe_operator_notify.local.cmd (gitignored) and set your ntfy topic.
 REM Subscribe to the same topic in the ntfy app on your phone.
 
 set "PPE_NTFY_TOPIC=ppe-your-secret-topic-here"
+REM Human commitments (Mon/Thu nudges) — separate subscription in ntfy app:
+set "PPE_NTFY_STEWARD_TOPIC=ppe-your-steward-topic-here"
+REM Steward channel daily cap (default 4):
+REM set "PPE_NTFY_STEWARD_DAILY_CAP=4"
 REM Volume control (defaults: cap 40/day, chapter-only progress, heartbeat every 24h):
 REM set "PPE_NTFY_DAILY_CAP=40"
 REM set "PPE_NTFY_PROGRESS=chapter"
@@ -20,16 +24,22 @@ REM set "PPE_NTFY_QUIET_END=08:00"
 REM 8am local digest (requires watch_operator_mobile running).
 REM set "PPE_NTFY_MORNING_REPORT=1"
 REM set "PPE_NTFY_MORNING_REPORT_AT=08:00"
-REM Phone command poll interval (default 30s; SSE optional via PPE_NTFY_CMD_SSE=1):
-REM set "PPE_NTFY_CMD_POLL_SEC=30"
+REM Phone commands: SSE (instant) preferred; poll is fallback if stream drops.
+REM set "PPE_NTFY_CMD_SSE=1"
+REM set "PPE_NTFY_CMD_POLL_SEC=15"
 REM Weekly digest to phone (skip desktop toast):
 REM set "PPE_WEEKLY_DIGEST_TOAST=0"
 REM Optional private server or authenticated topic:
 REM set "PPE_NTFY_SERVER=https://ntfy.sh"
 REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
-REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | help
+REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | maintenance | help
 REM Snooze examples from phone: snooze | snooze 6 | snooze 30m | snooze until 08:00 | snooze clear
-REM Optional secret prefix (required for restart): set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
+REM Maintenance (intentional downtime for morning metrics): maintenance on | maintenance off
+REM Or on desktop while working: set "PPE_OPERATOR_MAINTENANCE=1"
+REM Gap alert when loop is off without maintenance (24/7 target):
+REM set "PPE_NTFY_GAP_ALERT=1"
+REM set "PPE_NTFY_GAP_ALERT_MIN=45"
+REM Optional secret prefix: set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
 REM Near-zero API (recommended): copy ppe_operator_near_zero_api.local.cmd.example
 REM Legacy headless CLI auto-build: set "PPE_AUTO_REMOTE_BUILD=1"

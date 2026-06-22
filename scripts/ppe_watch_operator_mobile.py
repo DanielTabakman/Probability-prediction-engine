@@ -97,44 +97,6 @@ def _stuck_alert_hours() -> float:
         return 8.0
 
 
-def _auto_run_local_retry_due(prior: dict[str, Any]) -> bool:
-    """Retry run_local when RUN_LOCAL persists after a failed or stale attempt."""
-    last = prior.get("last_auto_run_local") or {}
-    if not last:
-        return True
-    if last.get("started"):
-        at = _parse_utc(str(last.get("at") or ""))
-        if at is not None:
-            elapsed = (datetime.now(timezone.utc) - at).total_seconds()
-            if elapsed < 600:
-                return False
-    return True
-
-
-def _maybe_auto_run_local(
-    repo: Path,
-    status: dict[str, Any],
-    prior: dict[str, Any],
-) -> dict[str, Any] | None:
-    if str(status.get("verdict") or "") != VERDICT_RUN_LOCAL:
-        return None
-    if not is_loop_running():
-        return None
-    try:
-        from scripts.ppe_remote_build_agent import _read_run_local_lock, _run_local_lock_active
-
-        lock = _read_run_local_lock(repo)
-        if _run_local_lock_active(repo, lock):
-            return None
-    except ImportError:
-        pass
-    if not _auto_run_local_retry_due(prior):
-        return None
-    from scripts.ppe_autobuilder import action_run_local
-
-    return action_run_local(repo)
-
-
 def _auto_build_retry_due(prior: dict[str, Any], verdict: str) -> bool:
     """Retry auto-build when IDE_BUILD stays stuck (prior build failed or never started)."""
     if verdict != VERDICT_IDE_BUILD:
@@ -306,10 +268,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     prior_loop = bool(prior.get("loop_running"))
 
     auto_build: dict[str, Any] | None = None
-    auto_run_local: dict[str, Any] | None = None
-    if verdict == VERDICT_RUN_LOCAL:
-        auto_run_local = _maybe_auto_run_local(repo, status, prior)
-    elif verdict == VERDICT_IDE_BUILD and verdict != prior_verdict:
+    if verdict == VERDICT_IDE_BUILD and verdict != prior_verdict:
         auto_build = _maybe_auto_remote_build(repo, status, prior, retry=False)
     elif verdict == VERDICT_IDE_BUILD:
         auto_build = _maybe_auto_remote_build(repo, status, prior, retry=True)
@@ -322,7 +281,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                 alerts.append(
                     (
                         f"PPE IDE handoff: {slice_id or verdict}",
-                        append_ppe_go_hint(blocker, VERDICT_IDE_BUILD, repo=repo),
+                        append_ppe_go_hint(blocker, VERDICT_IDE_BUILD),
                     )
                 )
             else:
@@ -333,7 +292,7 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
                     )
                 )
         else:
-            alerts.append((f"PPE operator: {verdict}", append_ppe_go_hint(blocker, verdict, repo=repo)))
+            alerts.append((f"PPE operator: {verdict}", append_ppe_go_hint(blocker, verdict)))
 
     prior_blocker = str(prior.get("last_blocker") or "").strip()
     current_blocker = str(status.get("blocker") or "").strip()
@@ -423,9 +382,6 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
             new_state["last_auto_build_slice"] = auto_build.get("slice_id")
             new_state["last_auto_build_at"] = _utc_now()
 
-    if auto_run_local:
-        new_state["last_auto_run_local"] = {**auto_run_local, "at": _utc_now()}
-
     post_finish: dict[str, Any] | None = None
     try:
         from scripts.ppe_post_build_watcher import try_finish_pending_ide_build
@@ -436,15 +392,27 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     except Exception as exc:
         post_finish = {"action": "post_build_watcher", "error": str(exc)}
 
-    try:
-        from scripts.ppe_autobuilder import write_status_artifact, collect_autobuilder_status
-
-        autobuilder_path = write_status_artifact(repo, collect_autobuilder_status(repo))
-        new_state["autobuilder_status"] = str(autobuilder_path.relative_to(repo)).replace("\\", "/")
-    except Exception as exc:
-        new_state["autobuilder_error"] = str(exc)
-
     save_state(repo, new_state)
+
+    try:
+        from scripts.ppe_operator_daily_metrics import record_watch_sample
+
+        record_watch_sample(repo, loop_running=loop_running, verdict=verdict)
+    except Exception:
+        pass
+
+    gap_alert: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_uptime_gap import maybe_send_gap_alert
+
+        gap_alert = maybe_send_gap_alert(
+            repo,
+            loop_running=loop_running,
+            verdict=verdict,
+            prior=prior,
+        )
+    except Exception as exc:
+        gap_alert = {"sent": False, "error": str(exc)}
 
     return {
         "verdict": verdict,
@@ -453,9 +421,9 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
         "alerts_sent": sent,
         "heartbeat_sent": heartbeat_sent,
         "auto_build": auto_build,
-        "auto_run_local": auto_run_local,
         "post_build_finish": post_finish,
         "morning_report": morning_report,
+        "gap_alert": gap_alert,
         "state_path": str(state_path(repo)),
     }
 

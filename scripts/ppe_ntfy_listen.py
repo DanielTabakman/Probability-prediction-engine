@@ -114,7 +114,7 @@ def handle_message(repo: Path, message: dict[str, Any], *, notify: bool = True) 
         return None
     result = execute_command(repo, command)
     if notify:
-        notify_command_result(command, result)
+        notify_command_result(command, result, repo)
     return {"command": command.name, "args": command.args, "result": result, "message_id": message.get("id")}
 
 
@@ -135,12 +135,6 @@ def process_messages(
             continue
         if last_id and msg_id == last_id:
             continue
-        command = parse_command_message(message)
-        if command is not None and command.name == "restart":
-            # Ack before execute_restart stops workers — otherwise listener dies and replays this message.
-            state = {**state, "last_message_id": msg_id}
-            save_state(repo, state)
-            last_id = msg_id
         outcome = handle_message(repo, message, notify=notify)
         if outcome is not None:
             handled.append(outcome)
@@ -239,17 +233,6 @@ def main(argv: list[str] | None = None) -> int:
     if not commands_enabled():
         print("ppe_ntfy_listen: remote commands disabled (PPE_NTFY_CMD_ENABLED=0)", file=sys.stderr)
         return 1
-
-    from scripts.ppe_loop_host_guard import loop_host_blocked
-
-    blocked = loop_host_blocked()
-    if blocked:
-        print(
-            f"ppe_ntfy_listen: blocked on this host ({blocked['guard_code']}) — "
-            "phone commands run on the VM loop host only.",
-            file=sys.stderr,
-        )
-        return 8
 
     repo = args.repo_root.resolve()
     bootstrap_operator_notify_env(repo)

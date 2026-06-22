@@ -142,14 +142,33 @@ class TestPpeWeeklyDigest(unittest.TestCase):
                 ],
                 "ops_summary": "2 control-plane / planning merge(s)",
                 "whats_next_lines": ["**Next slice:** EVIDENCE (`MSOS-P3-Control-Slice001` — charter)"],
-                "friction_lines": ["- Multiple slices needed 3+ roundtrips — trim BUILD packets."],
             }
         )
         assert "This week in PPE" in phone["phone_title"]
         assert "What's different for you" in phone["phone_body"]
         assert "public homepage" in phone["phone_body"]
-        assert "Workflow watch" in phone["phone_body"]
-        assert "roundtrips" in phone["phone_body"]
+
+    def test_build_phone_digest_includes_factory_block(self) -> None:
+        phone = build_phone_digest_notify(
+            {
+                "week_monday": "2026-06-01",
+                "merge_count": 3,
+                "product_lines": [],
+                "ops_summary": "",
+                "whats_next_lines": [],
+            },
+            factory_lines=["Chapter: MVP1 track", "Will block: IDE BUILD for Slice004"],
+        )
+        assert "Build factory this week" in phone["phone_body"]
+        assert "Slice004" in phone["phone_body"]
+
+    def test_build_phone_digest_includes_uptime(self) -> None:
+        phone = build_phone_digest_notify(
+            {"week_monday": "2026-06-01", "merge_count": 1, "product_lines": [], "ops_summary": "", "whats_next_lines": []},
+            uptime_line="Loop uptime: 88% (21h up, gap 1h) — +5 pt vs prior week",
+        )
+        assert "Runtime" in phone["phone_body"]
+        assert "88%" in phone["phone_body"]
 
     def test_format_week_range(self) -> None:
         self.assertEqual(format_week_range("2026-06-01"), "Jun 1-7")
