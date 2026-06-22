@@ -1,0 +1,25 @@
+{
+  "terminalAllowlist": [
+    "git",
+    "gh",
+    "python scripts/",
+    "ppe_autobuilder.cmd",
+    "DESKTOP_CONTINUE.cmd",
+    "finish_ide_build.cmd",
+    "run_ppe_local.cmd",
+    "run_ppe_auto_local_loop.cmd",
+    "morning_report.cmd"
+  ],
+  "autoRun": {
+    "allow_instructions": [
+      "git push to origin on feature branches in the Probability-prediction-engine repo is routine when the pushable gate has passed.",
+      "gh pr create, gh pr list, and gh pr close for this repo are routine operator actions.",
+      "PPE operator scripts (ppe_autobuilder, run_pushable_gate, DESKTOP_CONTINUE, finish_ide_build, ppe_auto_select) are routine and should not require approval.",
+      "ssh ppeloop@desktop-caqll8k for VM relay continuation is the documented desktop to VM handoff."
+    ],
+    "block_instructions": [
+      "git push --force to main or master should always prompt for approval.",
+      "Deleting production data, .env secrets, or force-resetting git history should prompt."
+    ]
+  }
+}
