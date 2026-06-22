@@ -54,8 +54,9 @@ A **dedicated copy agent** writes and revises MSOS visitor-facing text so the op
 
 1. Open a **dedicated Cursor thread** (not the relay BUILD thread).
 2. Paste [`COPY_AGENT_LAUNCH_PROMPT.md`](../CONTROL_PLANE/PROMPTS/COPY_AGENT_LAUNCH_PROMPT.md) or invoke skill **`msos-copy-editor`**.
-3. Say which surface to work on (e.g. `homepage`, `strategy-lab`, `command-center`) or “audit all surfaces for banned terms.”
-4. Review the packet; when happy, tell the copy agent to **promote to content file** and mark packet `status: approved`.
+3. **If continuing website copy work:** read [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](../PRODUCT_COPY/HANDOFF_2026-06-22.md) first — priority queue, shipped PRs, do-not-over-promise list.
+4. Say which surface to work on (e.g. `homepage`, `strategy-lab`, `command-center`) or “audit all surfaces for banned terms.”
+5. Review the packet; when happy, tell the copy agent to **promote to content file** and mark packet `status: approved`.
 
 ---
 

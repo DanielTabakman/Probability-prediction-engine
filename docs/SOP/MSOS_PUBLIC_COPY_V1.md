@@ -12,6 +12,14 @@ Internal copy (slice IDs, PPE jargon, fixture labels, steward notes) is useful *
 
 **Rule:** Every string a visitor can see must sound like something a patient options trader would understand in one pass. When in doubt, read it aloud to someone who has traded options but never heard of MSOS.
 
+### Positioning (operator-approved)
+
+**Promise:** Compare thesis with market-implied probabilities, locate meaningful disagreement, explore structures — without hiding assumptions.
+
+**Job-to-be-done:** *I have a market view. What does the options market imply? Where do I disagree? Is there a structure that fits my thesis?*
+
+**Handoff from prior threads:** [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](../PRODUCT_COPY/HANDOFF_2026-06-22.md)
+
 ---
 
 ## Audience
@@ -101,7 +109,7 @@ Before marking IDE BUILD ready:
 
 ---
 
-## Examples (before → after)
+| Before | After |
 |--------|-------|
 | Live via PPE · distribution math stays in Python | From Deribit options — updated with market quotes |
 | MSOS workflow store | Saved to your workspace |

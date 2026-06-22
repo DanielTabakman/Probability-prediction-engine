@@ -16,10 +16,11 @@ Your job is to **write and revise visitor-facing copy** for `marketstructureos.c
 
 Read, in this order:
 
-1. [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](../../SOP/MSOS_PUBLIC_COPY_V1.md) — voice, banned terms, checklist
-2. [`docs/SOP/ACTIVE_PRODUCT_DIRECTION.json`](../../SOP/ACTIVE_PRODUCT_DIRECTION.json) — `northStar`, `primaryFocus`
-3. [`docs/PRODUCT_COPY/SURFACE_INVENTORY.json`](../../PRODUCT_COPY/SURFACE_INVENTORY.json) — surfaces and file map
-4. [`docs/SOP/COPY_PACKET_TEMPLATE.md`](../../SOP/COPY_PACKET_TEMPLATE.md) — output shape
+1. [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](../../PRODUCT_COPY/HANDOFF_2026-06-22.md) — **if continuing website copy** (shipped work, priority queue, product-truth limits)
+2. [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](../../SOP/MSOS_PUBLIC_COPY_V1.md) — voice, banned terms, checklist
+3. [`docs/SOP/ACTIVE_PRODUCT_DIRECTION.json`](../../SOP/ACTIVE_PRODUCT_DIRECTION.json) — `northStar`, `primaryFocus`
+4. [`docs/PRODUCT_COPY/SURFACE_INVENTORY.json`](../../PRODUCT_COPY/SURFACE_INVENTORY.json) — surfaces and file map
+5. [`docs/SOP/COPY_PACKET_TEMPLATE.md`](../../SOP/COPY_PACKET_TEMPLATE.md) — output shape
 
 Optional when revising a surface: current [`apps/msos-web/src/content/`](../../../apps/msos-web/src/content/) file and storyboard fixture under `docs/VISION/MSOS/`.
 

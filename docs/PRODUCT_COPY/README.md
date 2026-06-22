@@ -20,6 +20,8 @@ Copy agent drafts live in **`packets/`**. Approved strings ship in **`apps/msos-
 
 Update this table when a packet moves to `approved` or a new surface is chartered.
 
+**Continuing from BUILD/UX thread (2026-06-22):** read [`HANDOFF_2026-06-22.md`](HANDOFF_2026-06-22.md) — homepage done; next: `public-nav` → `strategy-lab` → `command-center`.
+
 ---
 
 ## Operator commands (copy thread)

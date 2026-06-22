@@ -10,11 +10,12 @@ description: >-
 
 ## Quick start
 
-1. Read [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](docs/SOP/MSOS_PUBLIC_COPY_V1.md)
-2. Read [`docs/SOP/ACTIVE_PRODUCT_DIRECTION.json`](docs/SOP/ACTIVE_PRODUCT_DIRECTION.json) (`northStar`)
-3. Read [`docs/PRODUCT_COPY/SURFACE_INVENTORY.json`](docs/PRODUCT_COPY/SURFACE_INVENTORY.json)
-4. Draft in [`docs/PRODUCT_COPY/packets/`](docs/PRODUCT_COPY/packets/) using [`docs/SOP/COPY_PACKET_TEMPLATE.md`](docs/SOP/COPY_PACKET_TEMPLATE.md)
-5. Run `python scripts/validate_msos_public_copy.py`
+1. Read [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](docs/PRODUCT_COPY/HANDOFF_2026-06-22.md) when continuing website copy (priority queue + shipped PRs)
+2. Read [`docs/SOP/MSOS_PUBLIC_COPY_V1.md`](docs/SOP/MSOS_PUBLIC_COPY_V1.md)
+3. Read [`docs/SOP/ACTIVE_PRODUCT_DIRECTION.json`](docs/SOP/ACTIVE_PRODUCT_DIRECTION.json) (`northStar`)
+4. Read [`docs/PRODUCT_COPY/SURFACE_INVENTORY.json`](docs/PRODUCT_COPY/SURFACE_INVENTORY.json)
+5. Draft in [`docs/PRODUCT_COPY/packets/`](docs/PRODUCT_COPY/packets/) using [`docs/SOP/COPY_PACKET_TEMPLATE.md`](docs/SOP/COPY_PACKET_TEMPLATE.md)
+6. Run `python scripts/validate_msos_public_copy.py`
 
 Full process: [`docs/SOP/MSOS_COPY_AGENT_V1.md`](docs/SOP/MSOS_COPY_AGENT_V1.md)
 
