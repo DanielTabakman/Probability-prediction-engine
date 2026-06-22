@@ -13,6 +13,7 @@ Say **"let's work on copy"** in Cursor — agent loads:
 | Layer | Doc |
 |-------|-----|
 | 0 — Vision | [`LAYER_0_VISION_AND_PRINCIPLES.md`](LAYER_0_VISION_AND_PRINCIPLES.md) |
+| 0b — Conversion | [`LAYER_0_CONVERSION_FRAMEWORK.md`](LAYER_0_CONVERSION_FRAMEWORK.md) |
 | 1 — Pages | [`LAYER_1_PAGE_CATALOG.md`](LAYER_1_PAGE_CATALOG.md) |
 | Handoff | [`HANDOFF_2026-06-22.md`](HANDOFF_2026-06-22.md) |
 
@@ -24,7 +25,7 @@ Full index: [`COPY_CONTEXT_INDEX.json`](COPY_CONTEXT_INDEX.json)
 
 | Surface | Packet | Content file | Status | Notes |
 |---------|--------|--------------|--------|-------|
-| homepage | [`packets/homepage.v1.md`](packets/homepage.v1.md) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | approved | Baseline public launch copy |
+| homepage | [`packets/homepage.v1.md`](packets/homepage.v1.md) (approved) · [`packets/homepage.v2.md`](packets/homepage.v2.md) (draft) | [`../apps/msos-web/src/content/homepage.ts`](../apps/msos-web/src/content/homepage.ts) | v2 draft — sharper h1 + CTA | Conversion-framework pass |
 | public-nav | — | [`../apps/msos-web/src/content/publicNav.ts`](../apps/msos-web/src/content/publicNav.ts) | approved | Wired via content file |
 | command-center | — | inline components | draft needed | Charter copy packet next |
 | strategy-lab | — | fixtures + components | draft needed | |

@@ -33,7 +33,23 @@
 
 ## Homepage (`/`)
 
-**Surface id:** `homepage` · **Status:** approved · **Content:** `apps/msos-web/src/content/homepage.ts`
+**Surface id:** `homepage` · **Status:** v2 draft in progress · **Content:** `apps/msos-web/src/content/homepage.ts` · **Draft packet:** [`packets/homepage.v2.md`](packets/homepage.v2.md)
+
+### One job (conversion)
+
+**Get the visitor to understand the value and try the demo** — primary path: Strategy Lab. Secondary: research beta. Not: explain MSOS architecture.
+
+### Decision funnel (this page)
+
+| Stage | Region that answers it |
+|-------|------------------------|
+| Do I get it? | Hero h1 + body |
+| Is this for me? | Eyebrow + BTC/options specificity |
+| Do I care? | **Problem block (missing in UI)** — thesis→structure pain |
+| Do I believe you? | Pills, preview window, proof line |
+| What next? | Primary CTA |
+
+See [`LAYER_0_CONVERSION_FRAMEWORK.md`](LAYER_0_CONVERSION_FRAMEWORK.md) § Homepage skeleton.
 
 ### Purpose
 
@@ -48,11 +64,14 @@ Cold traffic — no account yet. May know options, may not know MSOS.
 | Region | Job | Copy notes |
 |--------|-----|------------|
 | **Public nav** | Orient + enter product | See `public-nav` surface |
-| **Hero** | Hook + primary CTA | Eyebrow, h1, body, pills; primary CTA → Strategy Lab |
-| **Product cards** | Hierarchy lock | MSOS → Strategy Lab → Probability Engine |
+| **Hero** | Hook + primary CTA | Eyebrow, h1, body, pills; **v2: sharper disagreement h1** |
+| **Problem** | Name the pain | **Not built yet** — copy can be drafted; BUILD needed for section |
+| **Product cards** | Hierarchy (benefits > features) | MSOS → Strategy Lab → Probability Engine — cards are feature-leaning; v2 benefits pass |
 | **Lens tags** | Honest roadmap | BTC Live; others Coming/Planned |
-| **Command Center preview** | Show the hub | Demo window; **Thesis gap** label (not “Disagreement located”) |
-| **Features row** | Read → State → Fit → Learn | Four-step storyboard arc |
+| **Command Center preview** | Proof / show the hub | Demo window; **Thesis gap** label |
+| **Features row** | How it works (Read→State→Fit→Learn) | Maps to GPT “3–4 steps” |
+| **Proof prose** | Credibility line | **Not built yet** — e.g. “Built for options traders…” |
+| **CTA repeat** | Second chance to try lab | **Not built yet** — footer CTA block |
 
 ### Locked decisions (don’t re-litigate without operator)
 

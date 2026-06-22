@@ -2,7 +2,7 @@
 
 Use for **copy agent** output. One packet per surface revision. BUILD agent implements from **approved** packets only.
 
-**Canon:** [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) · [`MSOS_COPY_AGENT_V1.md`](MSOS_COPY_AGENT_V1.md)
+**Canon:** [`MSOS_PUBLIC_COPY_V1.md`](MSOS_PUBLIC_COPY_V1.md) · [`MSOS_COPY_AGENT_V1.md`](MSOS_COPY_AGENT_V1.md) · [`LAYER_0_CONVERSION_FRAMEWORK.md`](../PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md)
 
 ---
 
@@ -29,6 +29,22 @@ notes: ""                  # operator feedback, open questions
 ### Audience reminder
 
 One line: who reads this surface and what they need in one pass.
+
+### Conversion job (required)
+
+One line: this surface's **single job** and primary CTA path. See [`LAYER_0_CONVERSION_FRAMEWORK.md`](../PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md) § One page = one job.
+
+### Three-pass (major strings)
+
+For hero h1, section titles, and CTAs — document all three passes in notes:
+
+| Pass | Purpose |
+|------|---------|
+| Literal | What the product does |
+| Customer value | Why it matters |
+| Decision / action | What the user can do now |
+
+Ship pass 2–3 on marketing surfaces.
 
 ### Strings
 
@@ -76,15 +92,20 @@ Only for revisions, not first draft.
 
 ## Copy agent checklist (before marking `review`)
 
-1. [ ] Every string read aloud — new BTC options trader test
-2. [ ] No banned terms (run `python scripts/validate_msos_public_copy.py`)
-3. [ ] Non-advisory: no buy/sell, no “AI recommends”
-4. [ ] Product hierarchy correct (MSOS → Strategy Lab → Probability Engine on homepage)
-5. [ ] Live vs demo honest where relevant
-6. [ ] Keys align with target `content/*.ts` export
+1. [ ] **Decision funnel** — page answers get it → for me → care → believe → next (in order)
+2. [ ] **Three-pass** on hero + primary CTA
+3. [ ] **So what?** on every sentence
+4. [ ] Every string read aloud — new BTC options trader test
+5. [ ] No banned terms (run `python scripts/validate_msos_public_copy.py`)
+6. [ ] Non-advisory: no buy/sell, no “AI recommends”
+7. [ ] Product hierarchy correct (MSOS → Strategy Lab → Probability Engine on homepage)
+8. [ ] Live vs demo honest where relevant
+9. [ ] Keys align with target `content/*.ts` export
+10. [ ] **Pre-publish:** clarity, specificity, desire, proof, action, customer language ([`LAYER_0_CONVERSION_FRAMEWORK.md`](../PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md))
 
 ## Operator checklist (before `approved`)
 
 1. [ ] Tone matches brand — would you show this to a trader friend?
 2. [ ] Nothing over-promises shipped features
-3. [ ] Approve or leave inline `notes:` for next draft
+3. [ ] h1 lives at copy hierarchy level 3–5 (not “what it is”)
+4. [ ] Approve or leave inline `notes:` for next draft

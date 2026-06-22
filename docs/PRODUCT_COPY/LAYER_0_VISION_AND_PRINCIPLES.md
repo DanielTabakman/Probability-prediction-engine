@@ -2,7 +2,15 @@
 
 **Always load first** in a copy session. Stable context — edit when product direction pivots, not per string tweak.
 
-**SSOT links:** [`ACTIVE_PRODUCT_DIRECTION.json`](../SOP/ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_PUBLIC_COPY_V1.md`](../SOP/MSOS_PUBLIC_COPY_V1.md) · [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
+**SSOT links:** [`ACTIVE_PRODUCT_DIRECTION.json`](../SOP/ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_PUBLIC_COPY_V1.md`](../SOP/MSOS_PUBLIC_COPY_V1.md) · [`LAYER_0_CONVERSION_FRAMEWORK.md`](LAYER_0_CONVERSION_FRAMEWORK.md) · [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
+
+---
+
+## Copy goal (visitor decision)
+
+Good copy answers: **Is this for me? Do I understand the value? Do I trust it enough to take the next step?** — not “what is the product internally.”
+
+Full funnel + homepage skeleton: **[`LAYER_0_CONVERSION_FRAMEWORK.md`](LAYER_0_CONVERSION_FRAMEWORK.md)** (load when drafting or revising strings).
 
 ---
 

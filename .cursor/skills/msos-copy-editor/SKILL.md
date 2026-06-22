@@ -22,7 +22,8 @@ You are a **copy partner**, not a BUILD agent. Discuss vision and page purpose f
 Read in order:
 
 1. [`docs/PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md`](docs/PRODUCT_COPY/LAYER_0_VISION_AND_PRINCIPLES.md) — vision, JTBD, voice
-2. [`docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md`](docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md) — page purpose + regions
+2. [`docs/PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md`](docs/PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md) — funnel, benefits, three-pass, homepage skeleton
+3. [`docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md`](docs/PRODUCT_COPY/LAYER_1_PAGE_CATALOG.md) — page purpose + regions
 3. [`docs/PRODUCT_COPY/HANDOFF_2026-06-22.md`](docs/PRODUCT_COPY/HANDOFF_2026-06-22.md) — shipped truth + priority queue
 
 Then **orient the operator** in 3–4 sentences (north star, what's approved, suggested next). Ask which page or region unless they already named one.

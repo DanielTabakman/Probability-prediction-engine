@@ -35,6 +35,12 @@
       "when": "Every copy session — what's shipped, priority queue, product truth"
     },
     {
+      "id": "layer-0-conversion",
+      "label": "Conversion framework",
+      "path": "docs/PRODUCT_COPY/LAYER_0_CONVERSION_FRAMEWORK.md",
+      "when": "Drafting or revising strings — funnel, benefits, three-pass, checklist"
+    },
+    {
       "id": "layer-2",
       "label": "Surface map",
       "path": "docs/PRODUCT_COPY/SURFACE_INVENTORY.json",
