@@ -1,4 +1,4 @@
-/** Preview/fixture data for Strategy Lab (P4 — no PPE math; display only). */
+/** Preview/fixture data for Strategy Lab (display only — no distribution math). */
 
 export type LabMetric = {
   label: string;
@@ -7,57 +7,57 @@ export type LabMetric = {
 };
 
 export const strategyLabMetrics: LabMetric[] = [
-  { label: "Selected market", value: "BTC / Options" },
-  { label: "Horizon", value: "30 days" },
+  { label: "Market", value: "BTC options" },
+  { label: "Expiry", value: "30 days" },
   { label: "Spot", value: "$104,320" },
-  { label: "Market width", value: "6.8%", tone: "amber" },
+  { label: "Market range", value: "6.8%", tone: "amber" },
   { label: "Your range", value: "5.4%", tone: "teal" },
-  { label: "Trust", value: "Good", tone: "teal" },
+  { label: "Data", value: "Demo", tone: "teal" },
 ];
 
 export const lensTiles = [
   {
-    mark: "P",
-    title: "Options Distribution Lens — BTC",
-    description: "Live via PPE · BTC options preview enabled",
-    status: "LIVE",
+    mark: "B",
+    title: "BTC options",
+    description: "Live implied distribution from Deribit — available now",
+    status: "Live",
     live: true,
     href: "/strategy-lab",
   },
   {
-    mark: "O",
-    title: "Options Distribution Lens — ETH",
-    description: "Planned: same PPE workflow for next asset",
+    mark: "E",
+    title: "ETH options",
+    description: "Same workflow — coming next",
     status: "Soon",
     live: false,
   },
   {
-    mark: "E",
-    title: "Event Probability Lens",
-    description: "Planned: outcome markets and implied odds",
+    mark: "P",
+    title: "Event markets",
+    description: "Elections, macro events, and other outcome markets",
     status: "Planned",
     live: false,
   },
   {
     mark: "L",
-    title: "Leverage & Positioning Lens",
-    description: "Planned: funding, OI, crowding and perp pressure",
+    title: "Positioning & funding",
+    description: "Open interest, funding, and crowding signals",
     status: "Planned",
     live: false,
   },
 ];
 
 export const outcomeSummary = {
-  tag: "Worth inspecting",
+  tag: "Worth a look",
   tagTone: "amber" as const,
   delta: "21%",
-  headline: "Your range is 21% narrower than market pricing.",
+  headline: "You think BTC will move less than options are pricing.",
   body:
-    "The options market implies a 6.8% 30-day range. Your stated thesis implies a 5.4% range. Difference: 1.4 points, or 20.6% of the market-implied width.",
+    "Options imply about a 6.8% range over 30 days. Your view is closer to 5.4% — roughly 21% tighter than the market's implied band.",
   scores: [
-    { label: "Market view", value: "Wider", tone: "amber" as const },
-    { label: "Your thesis", value: "Narrower", tone: "teal" as const },
-    { label: "Materiality", value: "Above threshold", tone: "teal" as const },
-    { label: "Trust", value: "Good", tone: "teal" as const },
+    { label: "Market", value: "Wider range", tone: "amber" as const },
+    { label: "Your view", value: "Tighter range", tone: "teal" as const },
+    { label: "Gap", value: "Meaningful", tone: "teal" as const },
+    { label: "Data", value: "Demo", tone: "teal" as const },
   ],
 };

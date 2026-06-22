@@ -6,7 +6,7 @@ import { ExpressionPlanningPanel } from "@/components/ExpressionPlanningPanel";
 export const metadata: Metadata = {
   title: "Expression planning | Strategy Lab | Market Structure OS",
   description:
-    "MSOS expression planning — compare families, optimized plan ticket, sim-only save. No live order transmission.",
+    "Paper trade planner — compare structure types to your view. No live orders.",
 };
 
 export default function ExpressionPlanningPage() {

@@ -8,7 +8,7 @@ import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
 
 export const metadata: Metadata = {
   title: "Monitor | Market Structure OS",
-  description: "MSOS thesis and expression monitoring from workflow + PPE snapshot review metadata.",
+  description: "Watch saved views and paper trades from your workspace.",
 };
 
 export default async function MonitorPage() {

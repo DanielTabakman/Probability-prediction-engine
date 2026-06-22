@@ -102,31 +102,31 @@ export function buildLabMetricsFromPayload(payload: DisplayPayload): LabMetric[]
   const median = lognormal?.["Median terminal price (50th %)"] ?? "—";
 
   return [
-    { label: "Selected market", value: "BTC / Options" },
+    { label: "Market", value: "BTC options" },
     { label: "Expiry", value: primary?.expiry_date ?? "—" },
     { label: "Spot", value: formatUsd(payload.spot_usd) },
-    { label: "Market width (IQR)", value: marketWidth, tone: "amber" },
+    { label: "Market range (IQR)", value: marketWidth, tone: "amber" },
     { label: "Market median", value: median, tone: "teal" },
-    { label: "Data", value: "Live via PPE", tone: "teal" },
+    { label: "Data", value: "Live · Deribit", tone: "teal" },
   ];
 }
 
 export function buildOutcomeFromPayload(payload: DisplayPayload): LabOutcomeSummary {
   const lognormal = primaryLognormalRow(payload);
-  const marketWidth = lognormal?.["Implied range width (IQR)"] ?? "the market-implied range";
+  const marketWidth = lognormal?.["Implied range width (IQR)"] ?? "the range options imply";
   const mean = lognormal?.["Risk-neutral mean"] ?? "—";
 
   return {
-    tag: "Live read",
+    tag: "Live market",
     tagTone: "teal",
     delta: "—",
-    headline: "Market-implied distribution is loaded from PPE.",
-    body: `Options-implied summary for the selected expiry: mean ${mean}, interquartile width ${marketWidth}. Set your belief below and confirm when ready — thesis controls are still a guided draft on this pass.`,
+    headline: "Here's what BTC options are pricing right now.",
+    body: `For the selected expiry, the middle of the distribution is around ${mean} and the middle-50% range is ${marketWidth}. Pick a view above to compare your belief to this curve — then confirm when you're ready to plan a trade.`,
     scores: [
-      { label: "Market view", value: "From Deribit", tone: "amber" },
-      { label: "Your thesis", value: "Draft — confirm next", tone: "teal" },
-      { label: "Materiality", value: "Inspect after confirm", tone: "teal" },
-      { label: "Trust", value: "Live feed", tone: "teal" },
+      { label: "Market", value: "Deribit options", tone: "amber" },
+      { label: "Your view", value: "Pick above", tone: "teal" },
+      { label: "Next step", value: "Confirm", tone: "teal" },
+      { label: "Data", value: "Live", tone: "teal" },
     ],
   };
 }

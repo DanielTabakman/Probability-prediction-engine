@@ -36,7 +36,7 @@ export type CommandCenterSummary = {
   currentWork: CommandCenterWorkItem[];
 };
 
-const SOURCE_LABEL = "From PPE snapshots";
+const SOURCE_LABEL = "From your saved market snapshots";
 const RECENT_LIMIT = 10;
 
 type SnapshotRow = {
@@ -51,17 +51,17 @@ type SnapshotRow = {
 function reviewTag(status: string | null): { tag: string; tone?: string } {
   switch ((status ?? "").trim().toLowerCase()) {
     case "supportive":
-      return { tag: "Review: supportive", tone: "teal" };
+      return { tag: "Held up", tone: "teal" };
     case "contradictory":
-      return { tag: "Review: contradictory", tone: "amber" };
+      return { tag: "Didn't hold", tone: "amber" };
     case "contaminated":
-      return { tag: "Review: contaminated", tone: "red" };
+      return { tag: "Bad data", tone: "red" };
     case "not_judgeable":
-      return { tag: "Review: not judgeable" };
+      return { tag: "Unclear" };
     case "pending":
-      return { tag: "Review pending", tone: "amber" };
+      return { tag: "Review due", tone: "amber" };
     default:
-      return { tag: "Awaiting review", tone: "amber" };
+      return { tag: "Needs review", tone: "amber" };
   }
 }
 
@@ -163,9 +163,9 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
       status: "empty",
       sourceLabel: SOURCE_LABEL,
       kpis: [
-        { label: "Frozen snapshots", value: "0", sub: "Freeze evaluations in Strategy Lab" },
-        { label: "Reviews pending", value: "0", sub: "No snapshot rows yet" },
-        { label: "Reviews completed", value: "0", sub: "Outcome reviews appear here" },
+        { label: "Saved snapshots", value: "0", sub: "Capture a view in Strategy Lab" },
+        { label: "Reviews due", value: "0", sub: "Nothing to review yet" },
+        { label: "Reviews done", value: "0", sub: "Post-mortems appear here" },
       ],
       recentSnapshots: [],
       currentWork: [],
@@ -190,7 +190,7 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
       snapshotId: row.snapshotId,
       name: row.summaryLine,
       tag,
-      detail: `${row.expiry} · frozen ${row.createdAt}`,
+      detail: `${row.expiry} · saved ${row.createdAt}`,
       tagTone: tone,
     };
   });
@@ -200,20 +200,20 @@ function buildSummaryFromDb(db: Database.Database, ownerEmail?: string | null): 
     sourceLabel: SOURCE_LABEL,
     kpis: [
       {
-        label: "Frozen snapshots",
+        label: "Saved snapshots",
         value: String(total),
-        sub: "PPE implied-lab freezes",
+        sub: "Captured market reads",
       },
       {
-        label: "Reviews pending",
+        label: "Reviews due",
         value: String(pending),
-        sub: "Awaiting outcome review",
+        sub: "Check whether your view held up",
         tone: pending > 0 ? "amber" : undefined,
       },
       {
-        label: "Reviews completed",
+        label: "Reviews done",
         value: String(completed),
-        sub: "Non-pending review statuses",
+        sub: "Completed post-mortems",
         tone: completed > 0 ? "teal" : undefined,
       },
     ],
@@ -228,9 +228,9 @@ export function degradedSummary(reason: string): CommandCenterSummary {
     sourceLabel: SOURCE_LABEL,
     degradedReason: reason,
     kpis: [
-      { label: "Frozen snapshots", value: "—", sub: "Snapshot database unavailable" },
-      { label: "Reviews pending", value: "—", sub: "Read-only feed offline" },
-      { label: "Reviews completed", value: "—", sub: "Check PPE_SNAPSHOT_DB_PATH mount" },
+      { label: "Saved snapshots", value: "—", sub: "History not connected" },
+      { label: "Reviews due", value: "—", sub: "Unavailable" },
+      { label: "Reviews done", value: "—", sub: "Unavailable" },
     ],
     recentSnapshots: [],
     currentWork: [],

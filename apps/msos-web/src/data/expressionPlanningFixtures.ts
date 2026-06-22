@@ -1,4 +1,4 @@
-/** Preview/fixture data for expression planning (P6 — display + sim-only boundary). */
+/** Expression planning copy (display + paper-trade boundary). */
 
 export type FamilyTag = "safe" | "selected" | "excluded" | "alt";
 
@@ -41,30 +41,30 @@ export type OptimizationLine = {
 export const expressionFamilies: ExpressionFamily[] = [
   {
     id: "observe",
-    title: "Observe only",
-    description: "Lowest action risk; monitor thesis without exposure.",
-    tag: "Safe",
+    title: "Watch only",
+    description: "Track the idea without putting on risk.",
+    tag: "Low risk",
     tagTone: "safe",
   },
   {
     id: "range",
-    title: "Defined-risk range structure",
-    description: "Best fit under constraints for narrower-range thesis.",
-    tag: "Selected",
+    title: "Defined-risk range trade",
+    description: "Fits a “calmer than the market” view with capped downside.",
+    tag: "Best fit",
     tagTone: "selected",
   },
   {
     id: "premium",
-    title: "Unbounded premium selling",
-    description: "Excluded by max-loss constraint.",
+    title: "Open-ended short vol",
+    description: "Ruled out — unlimited loss under your constraints.",
     tag: "Excluded",
     tagTone: "excluded",
     dimmed: true,
   },
   {
     id: "perp",
-    title: "Perp directional proxy",
-    description: "Poor thesis fit for range-width claim.",
+    title: "Perp directional bet",
+    description: "Poor match for a range-width view.",
     tag: "Alt",
     tagTone: "alt",
     dimmed: true,
@@ -74,29 +74,29 @@ export const expressionFamilies: ExpressionFamily[] = [
 export const venueRails: VenueRail[] = [
   {
     id: "deribit",
-    title: "Deribit Options",
-    description: "Eligible for options structure · connected",
+    title: "Deribit options",
+    description: "Eligible for this structure · connected",
     tag: "Connected",
   },
   {
     id: "hyperliquid",
     title: "Hyperliquid",
-    description: "Pending: future perps / positioning rail, not this options structure",
-    tag: "Pending",
+    description: "Perps rail — not for this options structure",
+    tag: "Coming soon",
     dimmed: true,
   },
   {
     id: "manual",
-    title: "Manual / external log",
-    description: "Record execution elsewhere",
+    title: "Log elsewhere",
+    description: "Record the trade in your own journal or broker",
     tag: "Available",
   },
 ];
 
 export const optimizedPlan = {
-  headline: "Defined-risk range structure",
+  headline: "Defined-risk range trade",
   summary:
-    "Best-fit available structure for the confirmed thesis under selected constraints, available venue and current market data. This is not optimized for guaranteed profit.",
+    "A structure that matches your confirmed view under the constraints you set. This is not a guarantee of profit — it is a starting point for discussion.",
 };
 
 export const planLegs: PlanLeg[] = [
@@ -107,28 +107,28 @@ export const planLegs: PlanLeg[] = [
 ];
 
 export const statusGridPlanned: StatusCell[] = [
-  { label: "Thesis", value: "Confirmed", tone: "teal" },
-  { label: "Expression", value: "Planned", tone: "amber" },
+  { label: "View", value: "Confirmed", tone: "teal" },
+  { label: "Trade plan", value: "Draft", tone: "amber" },
   { label: "Execution", value: "None" },
   { label: "Monitoring", value: "Ready" },
-  { label: "Review", value: "Expiry" },
+  { label: "Review", value: "At expiry" },
 ];
 
 export const statusGridSimulated: StatusCell[] = [
-  { label: "Thesis", value: "Confirmed", tone: "teal" },
-  { label: "Expression", value: "Simulated", tone: "teal" },
+  { label: "View", value: "Confirmed", tone: "teal" },
+  { label: "Trade plan", value: "Paper", tone: "teal" },
   { label: "Execution", value: "None" },
   { label: "Monitoring", value: "Ready" },
-  { label: "Review", value: "Expiry" },
+  { label: "Review", value: "At expiry" },
 ];
 
 export const optimizationBasis: OptimizationLine[] = [
-  { label: "Thesis fit", value: "Strong", tone: "teal" },
-  { label: "Max loss constraint", value: "Bounded", tone: "teal" },
-  { label: "Available venue", value: "Deribit" },
+  { label: "Fits your view", value: "Strong", tone: "teal" },
+  { label: "Max loss", value: "Capped", tone: "teal" },
+  { label: "Venue", value: "Deribit" },
   { label: "Liquidity / cost", value: "Estimate", tone: "amber" },
   { label: "Profit guarantee", value: "None", tone: "red" },
 ];
 
 export const expressionRiskNote =
-  "Suggested expression means best fit under the assumptions shown. The user still owns the thesis and final decision.";
+  "This is a suggested structure, not advice. You own the view and the final decision.";

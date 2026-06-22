@@ -7,19 +7,20 @@ import {
   nextSelectionRecommendation,
   testerMetricsTemplate,
 } from "@/data/conclusionFixtures";
+import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 export function ConclusionContent() {
   return (
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Conclusion / Learn loop</div>
-          <h1 className="title">Tester release — learn loop</h1>
+          <div className="crumb">Learn</div>
+          <h1 className="title">Reflect</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            Usable demo preview
+            Research preview
           </span>
           <Link href="/command-center" className="btn slim">
             Command Center
@@ -28,13 +29,12 @@ export function ConclusionContent() {
       </header>
 
       <section className="panel conclusion-hero">
-        <div className="panel-sub">Storyboard 09_conclusion</div>
         <h2 className="conclusion-question">{conclusionHeadline}</h2>
         <p className="conclusion-lead">{conclusionNarrative.lead}</p>
         <p className="bodycopy">{conclusionNarrative.body}</p>
       </section>
 
-      <section className="learn-loop-strip" aria-label="Learn loop steps">
+      <section className="learn-loop-strip" aria-label="How a session flows">
         {learnLoopSteps.map((step, index) => (
           <div key={step.id} className="learn-step">
             <span className="learn-index">{index + 1}</span>
@@ -49,11 +49,8 @@ export function ConclusionContent() {
       <section className="work conclusion-layout">
         <div className="panel">
           <div className="panel-head">
-            <h2>Tester metrics template</h2>
-            <div className="panel-sub">
-              Copy rows into{" "}
-              <code className="inline-code">docs/SOP/VALIDATION_REALITY_CHECKS.md</code> after sessions.
-            </div>
+            <h2>Feedback prompts</h2>
+            <div className="panel-sub">Optional — helps us improve the demo for new traders.</div>
           </div>
           {testerMetricsTemplate.map((row) => (
             <div key={row.metric} className="metric-row">
@@ -86,9 +83,7 @@ export function ConclusionContent() {
         </aside>
       </section>
 
-      <p className="footer-note">
-        Research demo — validation signals are manual; commercial Streamlit outreach runs in parallel
-      </p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }

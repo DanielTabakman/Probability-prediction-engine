@@ -25,7 +25,7 @@ export type ExpressionRecord = {
 export const EXPRESSION_STORAGE_KEY = "msos.expression.preview.v1";
 
 export const EXPRESSION_PERSISTENCE_LABEL =
-  "MSOS workflow store — simulated expression saved on the server; no live order transmitted.";
+  "Paper trade plan saved to your workspace — no order was sent.";
 
 export const defaultExpressionRecord: ExpressionRecord = {
   familyId: "range",

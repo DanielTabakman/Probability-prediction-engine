@@ -1,42 +1,42 @@
-/** Preview/fixture data for Monitor surface (P7 — no live fills). */
+/** Monitor surface fallback copy (no live fills). */
 
 export const monitorHero = {
-  title: "Thesis & expression monitor",
-  subtitle: "Fixture state only — observed / saved / simulated distinctions; no live execution feed.",
-  healthLabel: "Composite watch status",
+  title: "Thesis & trade watch",
+  subtitle: "Track open ideas and paper trades — no live execution feed yet.",
+  healthLabel: "Overall watch status",
   healthPct: 62,
 };
 
 export const watchPanels = [
   {
     id: "thesis-validity",
-    title: "Thesis validity",
-    body: "Confirmed BTC narrower-range thesis still within stated horizon. No automatic invalidation.",
+    title: "Your view still valid?",
+    body: "Confirmed “calmer than market” thesis is still inside its stated window.",
     tone: "teal" as const,
   },
   {
     id: "expression-risk",
-    title: "Expression risk",
-    body: "Simulated range expression saved — margin and gap risk shown as preview placeholders only.",
+    title: "Structure risk",
+    body: "Paper range trade on file — margin and gap risk shown as placeholders.",
     tone: "amber" as const,
   },
   {
     id: "data-trust",
-    title: "Data & trust",
-    body: "PPE embed healthy in preview. Trust context: Good (fixture). Refresh cadence not live.",
+    title: "Market data",
+    body: "Options quotes look healthy. Refresh cadence is demo-mode.",
     tone: "teal" as const,
   },
 ];
 
 export const monitorAlerts = [
   {
-    title: "Review queue item",
-    body: "Outcome review due tomorrow for narrower-range candidate.",
+    title: "Review due",
+    body: "Check whether your range idea still matches the market — due tomorrow.",
     tone: "teal" as const,
   },
   {
-    title: "Trust check",
-    body: "Confirm data freshness on one saved thesis before sharing externally.",
+    title: "Data check",
+    body: "Confirm quotes are fresh on one saved idea before sharing it.",
     tone: "amber" as const,
   },
 ];

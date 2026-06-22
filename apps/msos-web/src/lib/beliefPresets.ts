@@ -1,5 +1,5 @@
 /**
- * Strategy Lab belief presets — UX copy and persistence only (no distribution math).
+ * Strategy Lab belief presets — UX copy only (no distribution math).
  */
 
 import type { DisplayPayload, LabOutcomeSummary } from "@/lib/ppeDisplayPayload";
@@ -18,26 +18,26 @@ export const BELIEF_PRESETS: BeliefPreset[] = [
   {
     id: "higher",
     label: "Higher",
-    directionPhrase: "finish above where options imply",
-    volatilityPhrase: "similar volatility to the market",
+    directionPhrase: "finish higher than options imply",
+    volatilityPhrase: "similar vol to the market",
   },
   {
     id: "lower",
     label: "Lower",
-    directionPhrase: "finish below where options imply",
-    volatilityPhrase: "similar volatility to the market",
+    directionPhrase: "finish lower than options imply",
+    volatilityPhrase: "similar vol to the market",
   },
   {
     id: "more_volatility",
     label: "More volatility",
-    directionPhrase: "move in a wider band than options price",
-    volatilityPhrase: "more volatility than the market",
+    directionPhrase: "swing in a wider range than options price",
+    volatilityPhrase: "more vol than the market",
   },
   {
     id: "less_volatility",
     label: "Less volatility",
-    directionPhrase: "stay in a tighter band than options price",
-    volatilityPhrase: "less volatility than the market",
+    directionPhrase: "stay in a tighter range than options price",
+    volatilityPhrase: "less vol than the market",
   },
 ];
 
@@ -73,7 +73,7 @@ export function saveBeliefPresetId(id: BeliefPresetId): void {
 }
 
 export function buildBeliefSentence(preset: BeliefPreset, expiryLabel: string): string {
-  return `I believe BTC will ${preset.directionPhrase} over ${expiryLabel}.`;
+  return `I think BTC will ${preset.directionPhrase} by ${expiryLabel}.`;
 }
 
 function marketWidthFromPayload(payload: DisplayPayload | null | undefined): string {
@@ -82,7 +82,7 @@ function marketWidthFromPayload(payload: DisplayPayload | null | undefined): str
     const method = (row.Method ?? row.method ?? "").toLowerCase();
     return method.includes("lognormal") || method.includes("reference");
   });
-  return lognormal?.["Implied range width (IQR)"] ?? "the market-implied range";
+  return lognormal?.["Implied range width (IQR)"] ?? "the range options imply";
 }
 
 function expiryLabelFromPayload(payload: DisplayPayload | null | undefined): string {
@@ -105,59 +105,59 @@ export function buildOutcomeFromBelief(
     const base = buildOutcomeFromPayload(payload);
 
     const headlines: Record<BeliefPresetId, string> = {
-      higher: "You expect BTC higher than the options-implied center.",
-      lower: "You expect BTC lower than the options-implied center.",
-      more_volatility: "You expect more movement than options are pricing.",
-      less_volatility: "You expect a calmer path than options are pricing.",
+      higher: "You're bullish versus what options are pricing.",
+      lower: "You're bearish versus what options are pricing.",
+      more_volatility: "You expect bigger moves than the market is pricing.",
+      less_volatility: "You expect a calmer path than the market is pricing.",
     };
 
     const bodies: Record<BeliefPresetId, string> = {
-      higher: `For ${expiry}, the market-implied distribution centers on live Deribit quotes. Your preset (${preset.label}): you think spot finishes above where the curve peaks. Market interquartile width: ${marketWidth}. Confirm when this matches your view.`,
-      lower: `For ${expiry}, options imply a distribution from live Deribit data. Your preset (${preset.label}): you think spot finishes below where the curve peaks. Market interquartile width: ${marketWidth}. Confirm when ready.`,
-      more_volatility: `For ${expiry}, the market prices an interquartile width of ${marketWidth}. Your preset (${preset.label}): you think realized movement could exceed that band. Shape disagreement only — not a trade signal.`,
-      less_volatility: `For ${expiry}, the market prices an interquartile width of ${marketWidth}. Your preset (${preset.label}): you think price may stay tighter than options imply. Exploratory until you confirm the thesis.`,
+      higher: `For ${expiry}, live Deribit options set the baseline. You picked **${preset.label}** — you think spot finishes above where the curve peaks. The market's middle-50% range is about ${marketWidth}. Confirm when that matches your view.`,
+      lower: `For ${expiry}, the chart shows what BTC options imply today. You picked **${preset.label}** — you think spot finishes below that center. Middle-50% range: ${marketWidth}.`,
+      more_volatility: `For ${expiry}, options price a range of about ${marketWidth}. You picked **${preset.label}** — you think realized moves could exceed that. This flags a disagreement in shape, not a trade signal.`,
+      less_volatility: `For ${expiry}, options price a range of about ${marketWidth}. You picked **${preset.label}** — you think price may chop inside a tighter band. Save the view when you're ready to plan a trade.`,
     };
 
     const scoreMarket: Record<BeliefPresetId, string> = {
-      higher: "Center skew up",
-      lower: "Center skew down",
-      more_volatility: "Wider band",
-      less_volatility: "Narrower band",
+      higher: "Skewed up",
+      lower: "Skewed down",
+      more_volatility: "Wider",
+      less_volatility: "Tighter",
     };
 
     return {
-      tag: "Belief selected",
+      tag: "Your view",
       tagTone: "teal",
       delta: "—",
       headline: headlines[preset.id],
-      body: bodies[preset.id],
+      body: bodies[preset.id].replace(/\*\*(.*?)\*\*/g, "$1"),
       scores: [
-        { label: "Market view", value: scoreMarket[preset.id], tone: "amber" },
-        { label: "Your thesis", value: preset.label, tone: "teal" },
-        { label: "Materiality", value: "Inspect on confirm", tone: "teal" },
-        { label: "Data", value: base.scores[3]?.value ?? "Live feed", tone: "teal" },
+        { label: "Market", value: scoreMarket[preset.id], tone: "amber" },
+        { label: "You", value: preset.label, tone: "teal" },
+        { label: "Next step", value: "Confirm view", tone: "teal" },
+        { label: "Data", value: base.scores[3]?.value ?? "Live", tone: "teal" },
       ],
     };
   }
 
   const fixtureHeadlines: Record<BeliefPresetId, string> = {
-    higher: "You expect BTC to finish higher than the market center.",
-    lower: "You expect BTC to finish lower than the market center.",
-    more_volatility: "You expect wider swings than the market is pricing.",
-    less_volatility: "Your range is narrower than market pricing.",
+    higher: "You think BTC ends higher than the market center.",
+    lower: "You think BTC ends lower than the market center.",
+    more_volatility: "You think swings will be wider than options imply.",
+    less_volatility: "You think price will be calmer than options imply.",
   };
 
   return {
-    tag: "Belief selected",
+    tag: "Your view",
     tagTone: "teal",
     delta: preset.id === "less_volatility" ? "21%" : "—",
     headline: fixtureHeadlines[preset.id],
-    body: `Preset: ${preset.label}. ${preset.directionPhrase}; ${preset.volatilityPhrase}. Adjust or confirm when this matches what you think.`,
+    body: `You selected ${preset.label}. ${preset.directionPhrase.charAt(0).toUpperCase()}${preset.directionPhrase.slice(1)}. Confirm when this matches what you actually believe.`,
     scores: [
-      { label: "Market view", value: "From options", tone: "amber" },
-      { label: "Your thesis", value: preset.label, tone: "teal" },
-      { label: "Materiality", value: "Preview", tone: "teal" },
-      { label: "Trust", value: "Fixture", tone: "teal" },
+      { label: "Market", value: "From options", tone: "amber" },
+      { label: "You", value: preset.label, tone: "teal" },
+      { label: "Gap", value: "Demo", tone: "teal" },
+      { label: "Data", value: "Demo", tone: "teal" },
     ],
   };
 }

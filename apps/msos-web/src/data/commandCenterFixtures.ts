@@ -1,4 +1,4 @@
-/** Preview/fixture data for Command Center (P3 — no live APIs). */
+/** Preview/fixture data for Command Center (fallback when live feeds are empty). */
 
 export type NavItem = {
   id: string;
@@ -21,56 +21,56 @@ export const navItems: NavItem[] = [
   { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "/monitor" },
   { id: "history", label: "History", href: "/history" },
-  { id: "learn", label: "Learn loop", href: "/learn" },
+  { id: "learn", label: "Learn", href: "/learn" },
 ];
 
 export const calibrationStrip = {
-  title: "Calibration loop",
-  body: "Review observed vs saved vs simulated theses — executed count stays zero until live routing ships.",
+  title: "Track how your views hold up",
+  body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
   cta: "Open monitor",
   href: "/monitor",
 };
 
 export const connectedMarkets: MarketAsset[] = [
-  { label: "BTC / Options", status: "LIVE", live: true },
-  { label: "ETH / Options", status: "Soon" },
-  { label: "Event Markets", status: "Planned" },
-  { label: "Perp Positioning", status: "Planned" },
+  { label: "BTC options", status: "Live", live: true },
+  { label: "ETH options", status: "Soon" },
+  { label: "Event markets", status: "Planned" },
+  { label: "Perp positioning", status: "Planned" },
 ];
 
 export const kpis = [
-  { label: "Draft theses", value: "3", tone: "amber" as const, sub: "Resume research" },
-  { label: "Confirmed theses", value: "2", tone: "teal" as const, sub: "1 awaiting review" },
-  { label: "Simulations / live", value: "1 / 0", sub: "No connected live positions" },
-  { label: "Reviews due", value: "4", tone: "red" as const, sub: "1 trust warning" },
+  { label: "Draft ideas", value: "3", tone: "amber" as const, sub: "Pick up where you left off" },
+  { label: "Confirmed views", value: "2", tone: "teal" as const, sub: "1 waiting for review" },
+  { label: "Paper / live", value: "1 / 0", sub: "No live trades connected" },
+  { label: "Reviews due", value: "4", tone: "red" as const, sub: "Check stale data on one idea" },
 ];
 
 export const labTiles = [
   {
-    mark: "P",
-    title: "Strategy Lab — PPE Tool",
-    description: "Live now: options distribution lens · BTC enabled in preview",
-    cta: "Open PPE",
+    mark: "B",
+    title: "Strategy Lab",
+    description: "Compare your view to what BTC options are pricing — live now",
+    cta: "Open lab",
     enabled: true,
   },
   {
-    mark: "O",
-    title: "Options Distribution Lens — ETH",
-    description: "Planned: same PPE workflow for next asset",
+    mark: "E",
+    title: "ETH options",
+    description: "Same workflow — coming next",
     tag: "Soon",
     enabled: false,
   },
   {
-    mark: "E",
-    title: "Event Probability Lens",
-    description: "Planned: outcome markets and implied odds",
+    mark: "P",
+    title: "Event markets",
+    description: "Outcome markets and implied odds",
     tag: "Planned",
     enabled: false,
   },
   {
     mark: "L",
-    title: "Leverage & Positioning Lens",
-    description: "Planned: funding, OI, crowding and perp pressure",
+    title: "Positioning & funding",
+    description: "Funding, open interest, and crowding",
     tag: "Planned",
     enabled: false,
   },
@@ -78,43 +78,43 @@ export const labTiles = [
 
 export const currentWork = [
   {
-    name: "BTC range premium",
-    tag: "Draft thesis",
+    name: "BTC range — vol looks rich",
+    tag: "Draft",
     tagTone: "amber" as const,
-    detail: "Exploring in PPE · expression not selected.",
+    detail: "Exploring in Strategy Lab · no trade plan yet",
   },
   {
     name: "Downside tail hedge",
     tag: "Confirmed",
-    detail: "Expression saved · monitoring rules pending.",
+    detail: "Trade structure saved · alerts not set up yet",
   },
   {
-    name: "Narrower-range thesis",
-    tag: "Simulation",
-    detail: "Simulated only · no live position connected.",
+    name: "Calmer-than-market view",
+    tag: "Paper only",
+    detail: "Simulated — not connected to a broker",
   },
 ];
 
 export const headlines = [
   {
-    title: "Volatility surface update",
-    body: "BTC options width increased versus reference horizon.",
+    title: "Volatility picked up",
+    body: "BTC option ranges widened versus last week.",
   },
   {
-    title: "News context",
-    body: "Macro calendar: two high-impact releases this week.",
+    title: "Macro calendar",
+    body: "Two high-impact releases this week — worth a glance before sizing.",
   },
 ];
 
 export const reviewEvents = [
   {
-    title: "Review range candidate",
-    body: "Outcome review due tomorrow.",
+    title: "Range trade idea",
+    body: "Time to check whether your view still holds — review due tomorrow.",
     tone: "teal" as const,
   },
   {
-    title: "Trust warning",
-    body: "Confirm data freshness on one saved thesis.",
+    title: "Stale quote check",
+    body: "One saved idea may be using older market data — refresh before sharing.",
     tone: "amber" as const,
   },
 ];

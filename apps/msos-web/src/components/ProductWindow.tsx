@@ -5,28 +5,28 @@ export function ProductWindow() {
         <span className="traffic" />
         <span className="traffic" />
         <span className="traffic" />
-        <div className="url">app.marketstructureos.com / command-center</div>
+        <div className="url">marketstructureos.com / strategy-lab</div>
       </div>
       <div className="window-content">
         <div className="lens-head">
           <div>
-            <strong>Command Center</strong>
-            <div className="micro">Read surfaces → state thesis → fit expression → learn</div>
+            <strong>Strategy Lab</strong>
+            <div className="micro">Market read → your view → paper plan</div>
           </div>
-          <span className="tag">Preview</span>
+          <span className="tag">Live demo</span>
         </div>
         <div className="belief-card">
-          <div className="micro">MARKET SURFACE COMPARISON</div>
+          <div className="micro">YOU VS THE MARKET</div>
           <div className="belief-grid">
             <div className="small-panel">
-              <div className="k">Market implies</div>
+              <div className="k">Options imply</div>
               <div className="v amber">Wider range</div>
-              <div className="micro">Options distribution lens</div>
+              <div className="micro">From Deribit quotes</div>
             </div>
             <div className="small-panel">
-              <div className="k">Your thesis</div>
-              <div className="v teal">Narrower range</div>
-              <div className="micro">Human-defined belief</div>
+              <div className="k">Your view</div>
+              <div className="v teal">Tighter range</div>
+              <div className="micro">Less vol than priced</div>
             </div>
           </div>
           <div className="compare">
@@ -36,13 +36,13 @@ export function ProductWindow() {
           </div>
           <div className="callout">
             <div>
-              <div className="micro">DISAGREEMENT LOCATED</div>
+              <div className="micro">GAP</div>
               <div className="delta">21%</div>
             </div>
             <div>
-              <span className="tag amber">Worth inspecting</span>
+              <span className="tag amber">Worth a look</span>
               <div className="micro" style={{ marginTop: 9 }}>
-                Your range is 21% narrower than market pricing
+                You expect about 21% less movement than options price
               </div>
             </div>
           </div>

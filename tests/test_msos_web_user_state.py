@@ -17,7 +17,7 @@ def test_command_center_summary_lib_and_api_exist() -> None:
     ).read_text(encoding="utf-8")
     assert "loadCommandCenterSummary" in lib
     assert "PPE_SNAPSHOT_DB_PATH" in lib
-    assert "From PPE snapshots" in lib
+    assert "From your saved market snapshots" in lib
     assert "degradedSummary" in lib
     assert "frozen_evaluations" in lib
     assert "snapshot_reviews" in lib
@@ -33,11 +33,9 @@ def test_command_center_page_uses_snapshot_summary() -> None:
     )
     assert "loadCommandCenterSummary" in page
     assert "summary={summary}" in page
-    assert "From PPE snapshots" in content
+    assert "friendlySnapshotFeedMessage" in content
     assert "summary.kpis" in content
     assert "summary.currentWork" in content
-    assert "not fixture preview data" in content
-    assert "Draft thesis" not in content
 
 
 def test_seeded_snapshot_db_matches_summary_queries() -> None:

@@ -1,47 +1,47 @@
-/** Preview/fixture data for conclusion / learn loop (P8 — friends-first tester release). */
+/** Learn / reflection page copy. */
 
-export const conclusionHeadline = "What did you learn from this run?";
+export const conclusionHeadline = "What did you take away?";
 
 export const conclusionNarrative = {
-  lead: "MSOS is a research demo — capture comprehension signals before widening scope or commercial packaging.",
+  lead: "Market Structure OS helps you compare what you believe with what the market is pricing — then plan, paper-trade, and review.",
   body:
-    "You moved from market read → thesis → expression plan → monitor/history. The learn loop closes when a tester can explain the disagreement readout without jargon.",
+    "You walked through the market read, stated a view, sketched a trade, and checked monitor/history. The goal is clarity, not hot tips.",
 };
 
 export const learnLoopSteps = [
-  { id: "read", label: "Read surfaces", detail: "Strategy Lab + PPE embed" },
-  { id: "thesis", label: "State thesis", detail: "Confirm what you think is true" },
-  { id: "express", label: "Plan expression", detail: "Sim-only — no live order" },
-  { id: "monitor", label: "Monitor & review", detail: "Fixture watch panels" },
-  { id: "learn", label: "Learn loop", detail: "Record signals below" },
+  { id: "read", label: "Read the market", detail: "Strategy Lab · live BTC options" },
+  { id: "thesis", label: "State your view", detail: "Confirm in plain language" },
+  { id: "express", label: "Plan a trade", detail: "Paper only — no live order" },
+  { id: "monitor", label: "Watch & review", detail: "Track ideas over time" },
+  { id: "learn", label: "Reflect", detail: "Note what clicked and what didn't" },
 ];
 
 export const testerMetricsTemplate = [
   {
-    metric: "Comprehension",
-    prompt: "Could the tester name the main object in ~5 min?",
-    fixture: "Pending — log in VALIDATION_REALITY_CHECKS",
+    metric: "Clarity",
+    prompt: "Could you explain the main chart to a friend in five minutes?",
+    fixture: "Your notes",
   },
   {
-    metric: "Thesis confirm",
-    prompt: "Did confirmation copy feel honest (no hidden authority)?",
-    fixture: "Pending",
+    metric: "Honesty",
+    prompt: "Did the confirmation step feel straightforward — no hidden “AI says buy”?",
+    fixture: "Your notes",
   },
   {
-    metric: "Return monitoring",
-    prompt: "Would they open monitor/history again within a week?",
-    fixture: "Pending",
+    metric: "Would return",
+    prompt: "Would you open Monitor or History again this week?",
+    fixture: "Your notes",
   },
   {
-    metric: "Paid interest",
-    prompt: "Willingness to pay for beta/brief/call (steward call required)",
-    fixture: "Not recorded — no auto-widening",
+    metric: "Worth paying for",
+    prompt: "Would beta access or a research brief be worth it? (optional)",
+    fixture: "Optional — tell us in feedback",
   },
 ];
 
 export const nextSelectionRecommendation = {
-  title: "Next SELECTION recommendation (preview)",
+  title: "What's next",
   recommendation:
-    "Hold MSOS scope at usable demo BUILD. Share production URL when walkable; log optional rows in VALIDATION_REALITY_CHECKS before paywall or live execution.",
-  notNow: "No paywall or execution program expansion without new steward SELECTION.",
+    "Keep exploring the live demo. Share feedback on anything confusing — we're prioritizing clarity for new options traders.",
+  notNow: "Live brokerage routing and paid tiers are not open yet.",
 };

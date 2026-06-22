@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 import type { HistoryFeed, HistoryState } from "@/lib/monitorHistoryFeed";
+import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 const stateLabels: Record<HistoryState, string> = {
-  observed: "Observed",
+  observed: "Looked",
   saved: "Saved",
-  simulated: "Simulated",
+  simulated: "Paper",
   reviewed: "Reviewed",
 };
 
@@ -14,9 +15,9 @@ type Props = {
 };
 
 function statusPill(feed: HistoryFeed): string {
-  if (feed.status === "live") return "Live timeline";
-  if (feed.status === "empty") return "No history rows yet";
-  return "History feed degraded";
+  if (feed.status === "live") return "Timeline active";
+  if (feed.status === "empty") return "Nothing saved yet";
+  return "Offline";
 }
 
 export function HistoryContent({ feed }: Props) {
@@ -24,7 +25,7 @@ export function HistoryContent({ feed }: Props) {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">History / Lifecycle trail</div>
+          <div className="crumb">History</div>
           <h1 className="title">History</h1>
         </div>
         <div className="tools">
@@ -41,21 +42,21 @@ export function HistoryContent({ feed }: Props) {
       <section className="panel history-panel">
         <div className="panel-head">
           <div>
-            <h2>Observed → reviewed</h2>
+            <h2>Your trail</h2>
             <div className="panel-sub">{feed.intro}</div>
             <div className="panel-sub">{feed.sourceLabel}</div>
           </div>
-          <span className="tag">07_history</span>
+          <span className="tag">History</span>
         </div>
 
-        {feed.status === "degraded" && feed.degradedReason ? (
+        {feed.status === "degraded" ? (
           <p className="panel-sub degraded-feed-note" role="status">
-            {feed.degradedReason}
+            {friendlySnapshotFeedMessage(feed.degradedReason)}
           </p>
         ) : null}
 
         {feed.status === "empty" ? (
-          <p className="panel-sub">No workflow or snapshot history rows yet.</p>
+          <p className="panel-sub">Save a view in Strategy Lab to start building history.</p>
         ) : null}
 
         <div className="history-list">
@@ -72,11 +73,11 @@ export function HistoryContent({ feed }: Props) {
         </div>
 
         <div className="history-empty-note">
-          <strong>Executed</strong> — no live positions connected; preview routing only.
+          <strong>Live trades</strong> — not connected on this demo. Paper plans only.
         </div>
       </section>
 
-      <p className="footer-note">Research demo — live workflow + snapshot history; no live order transmitted</p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }
