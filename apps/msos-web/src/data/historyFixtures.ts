@@ -1,4 +1,4 @@
-/** Preview/fixture data for History surface (P7). */
+/** History surface fallback copy. */
 
 export type HistoryState = "observed" | "saved" | "simulated" | "executed" | "reviewed";
 
@@ -11,43 +11,43 @@ export type HistoryEntry = {
 };
 
 export const historyIntro =
-  "Lifecycle history uses preview fixtures — executed rows are empty until live routing exists.";
+  "Your trail from first look → saved view → paper trade → post-mortem. Live fills will appear here when connected.";
 
 export const historyEntries: HistoryEntry[] = [
   {
     id: "h1",
-    title: "BTC range premium — distribution observed",
+    title: "BTC range — first look",
     state: "observed",
-    timestamp: "2026-06-10 · Strategy Lab",
-    detail: "PPE embed session; no thesis saved yet.",
+    timestamp: "Jun 10 · Strategy Lab",
+    detail: "Browsed the options curve; nothing saved yet.",
   },
   {
     id: "h2",
-    title: "Narrower-range thesis draft",
+    title: "Calmer-than-market view",
     state: "saved",
-    timestamp: "2026-06-11 · Thesis confirmation",
-    detail: "Preview persistence in browser only.",
+    timestamp: "Jun 11 · Thesis confirmation",
+    detail: "View saved to your workspace.",
   },
   {
     id: "h3",
-    title: "Range expression simulation",
+    title: "Range trade — paper",
     state: "simulated",
-    timestamp: "2026-06-11 · Expression planning",
-    detail: "Sim-only save — order not transmitted.",
+    timestamp: "Jun 11 · Expression planning",
+    detail: "Paper plan only — no order sent.",
   },
   {
     id: "h4",
-    title: "Downside tail hedge review",
+    title: "Tail hedge post-mortem",
     state: "reviewed",
-    timestamp: "2026-06-09 · Command Center",
-    detail: "Steward review marked complete (fixture).",
+    timestamp: "Jun 9 · Command Center",
+    detail: "Review marked complete.",
   },
 ];
 
 export const stateLabels: Record<HistoryState, string> = {
-  observed: "Observed",
+  observed: "Looked",
   saved: "Saved",
-  simulated: "Simulated",
-  executed: "Executed",
+  simulated: "Paper",
+  executed: "Live",
   reviewed: "Reviewed",
 };

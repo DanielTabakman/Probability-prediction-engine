@@ -99,10 +99,9 @@ export async function PpeEmbedBoundary({ payload: payloadProp }: PpeEmbedBoundar
       return null;
     }
     return (
-      <div className="ppe-chart-region" role="region" aria-label="PPE distribution chart region">
+      <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
         <p className="ppe-embed-live-note">
-          <span className="tag teal">Live via PPE</span> Native chart from read-only display payload —
-          distribution math stays in Python.
+          <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
         </p>
         <NativeDistributionChart series={primary} spotUsd={payload.spot_usd} />
       </div>
@@ -111,14 +110,11 @@ export async function PpeEmbedBoundary({ payload: payloadProp }: PpeEmbedBoundar
 
   if (!PPE_EMBED_URL) {
     return (
-      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="PPE implied lab embed">
+      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
         <div className="ppe-embed-placeholder">
-          <span className="tag amber">Embed pending</span>
-          <h3>PPE distribution chart region</h3>
-          <p>
-            Chart loads from the read-only display API or a chromeless PPE embed once platform wiring
-            is live. MSOS owns the shell; Python owns all distribution math.
-          </p>
+          <span className="tag amber">Loading</span>
+          <h3>Chart unavailable</h3>
+          <p>Live options data could not be loaded. Try refreshing the page.</p>
         </div>
       </div>
     );
@@ -127,13 +123,12 @@ export async function PpeEmbedBoundary({ payload: payloadProp }: PpeEmbedBoundar
   const embedSrc = buildChromelessEmbedSrc(PPE_EMBED_URL);
 
   return (
-    <div className="ppe-embed ppe-embed-chromeless" role="region" aria-label="PPE chromeless embed">
+    <div className="ppe-embed ppe-embed-chromeless" role="region" aria-label="Options chart">
       <p className="ppe-embed-live-note">
-        <span className="tag teal">Live via PPE</span> Chromeless embed — distribution summary and
-        chart only (<code>?{PPE_EMBED_ONLY_PARAM}=1</code>), no nested Streamlit chrome.
+        <span className="tag teal">Live</span> Interactive chart from live options data.
       </p>
       <iframe
-        title="PPE Strategy Lab — chromeless distribution view"
+        title="BTC options distribution"
         src={embedSrc}
         className="ppe-embed-frame ppe-embed-frame-chromeless"
         loading="lazy"

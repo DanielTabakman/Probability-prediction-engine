@@ -1,15 +1,16 @@
 import Link from "next/link";
 
 import type { MonitorFeed } from "@/lib/monitorHistoryFeed";
+import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 type Props = {
   feed: MonitorFeed;
 };
 
 function statusPill(feed: MonitorFeed): string {
-  if (feed.status === "live") return "MSOS + PPE snapshots live";
-  if (feed.status === "empty") return "Monitoring ready — add thesis or freeze";
-  return "Monitoring feed degraded";
+  if (feed.status === "live") return "Watching your ideas";
+  if (feed.status === "empty") return "Ready when you save a view";
+  return "Offline";
 }
 
 export function MonitorContent({ feed }: Props) {
@@ -17,12 +18,15 @@ export function MonitorContent({ feed }: Props) {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Monitor / Thesis &amp; expression watch</div>
+          <div className="crumb">Monitor</div>
           <h1 className="title">Monitor</h1>
         </div>
         <div className="tools">
           <span className="pill">
-            <span className={`dot ${feed.status === "degraded" ? "red" : feed.status === "live" ? "teal" : "amber"}`} aria-hidden="true" />
+            <span
+              className={`dot ${feed.status === "degraded" ? "red" : feed.status === "live" ? "teal" : "amber"}`}
+              aria-hidden="true"
+            />
             {statusPill(feed)}
           </span>
           <Link href="/command-center" className="btn slim">
@@ -41,18 +45,22 @@ export function MonitorContent({ feed }: Props) {
             </div>
             <span className="tag teal">Watch</span>
           </div>
-          {feed.status === "degraded" && feed.degradedReason ? (
+          {feed.status === "degraded" ? (
             <p className="panel-sub degraded-feed-note" role="status">
-              {feed.degradedReason}
+              {friendlySnapshotFeedMessage(feed.degradedReason)}
             </p>
           ) : null}
-          <div className="meter" aria-hidden="true" style={{ ["--meter-pct" as string]: `${feed.healthPct}%` }} />
+          <div
+            className="meter"
+            aria-hidden="true"
+            style={{ ["--meter-pct" as string]: `${feed.healthPct}%` }}
+          />
           <div className="side-label">{feed.healthLabel}</div>
 
-          <div className="watch-grid" aria-label="Monitoring panels">
+          <div className="watch-grid" aria-label="Watch list">
             {feed.watchPanels.map((panel) => (
               <div key={panel.id} className="watch">
-                <span className={`tag ${panel.tone}`}>{panel.id}</span>
+                <span className={`tag ${panel.tone}`}>{panel.title.split(" ")[0]}</span>
                 <h3>{panel.title}</h3>
                 <p>{panel.body}</p>
               </div>
@@ -62,8 +70,8 @@ export function MonitorContent({ feed }: Props) {
 
         <aside className="panel monitor-side">
           <div className="panel-head">
-            <h2>Alerts &amp; calibration</h2>
-            <div className="panel-sub">From MSOS workflow + PPE review metadata — not trade advice.</div>
+            <h2>Alerts</h2>
+            <div className="panel-sub">Reminders — not trade advice.</div>
           </div>
           {feed.alerts.map((alert) => (
             <div key={alert.title} className="alert">
@@ -80,7 +88,7 @@ export function MonitorContent({ feed }: Props) {
         </aside>
       </section>
 
-      <p className="footer-note">Research demo — live workflow + snapshot monitoring; no live order transmitted</p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }

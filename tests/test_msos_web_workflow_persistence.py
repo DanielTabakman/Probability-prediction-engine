@@ -13,7 +13,7 @@ def test_workflow_store_module_exists() -> None:
     assert "loadWorkflowSummary" in lib
     assert "upsertCurrentThesis" in lib
     assert "MSOS_WORKFLOW_STORE_PATH" in lib
-    assert "From MSOS workflow store" in lib
+    assert "Your workspace" in lib
 
 
 def test_thesis_api_routes_exist() -> None:
@@ -49,8 +49,8 @@ def test_command_center_uses_snapshot_summary() -> None:
     assert "loadCommandCenterSummary" in page
     assert "summary.kpis" in content
     assert "summary.currentWork" in content
-    assert "From PPE snapshots" in content
-    assert "Preview data healthy" not in content
+    lib = (MSOS_WEB / "src" / "lib" / "commandCenterSummary.ts").read_text(encoding="utf-8")
+    assert "From your saved market snapshots" in lib
 
 
 def test_workflow_store_json_shape_documented() -> None:

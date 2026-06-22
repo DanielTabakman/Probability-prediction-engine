@@ -3,15 +3,16 @@ import Link from "next/link";
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import { buildCalibrationStrip, buildReviewEvents } from "@/lib/monitorHistoryFeed";
 import { headlines, labTiles } from "@/data/commandCenterFixtures";
+import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 type Props = {
   summary: CommandCenterSummary;
 };
 
 function statusPill(summary: CommandCenterSummary): string {
-  if (summary.status === "live") return "PPE snapshots live";
-  if (summary.status === "empty") return "No PPE snapshots yet";
-  return "PPE snapshot feed unavailable";
+  if (summary.status === "live") return "Saved reads connected";
+  if (summary.status === "empty") return "No saved reads yet";
+  return "History offline";
 }
 
 export function CommandCenterContent({ summary }: Props) {
@@ -23,7 +24,7 @@ export function CommandCenterContent({ summary }: Props) {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Workspace / Overview</div>
+          <div className="crumb">Home</div>
           <h1 className="title">Command Center</h1>
         </div>
         <div className="tools">
@@ -31,9 +32,9 @@ export function CommandCenterContent({ summary }: Props) {
             <span className="dot" aria-hidden="true" />
             {statusPill(summary)}
           </span>
-          <span className="btn slim">Share view</span>
+          <span className="btn slim">Share</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Create thesis
+            New view
           </Link>
           <span className="avatar" aria-hidden="true">
             DT
@@ -41,7 +42,7 @@ export function CommandCenterContent({ summary }: Props) {
         </div>
       </header>
 
-      <section className="calibration-strip panel compact" aria-label="Calibration loop">
+      <section className="calibration-strip panel compact" aria-label="Review loop">
         <div>
           <h2>{calibrationStrip.title}</h2>
           <p>{calibrationStrip.body}</p>
@@ -54,7 +55,7 @@ export function CommandCenterContent({ summary }: Props) {
             History
           </Link>
           <Link href="/learn" className="btn slim">
-            Learn loop
+            Learn
           </Link>
         </div>
       </section>
@@ -69,9 +70,9 @@ export function CommandCenterContent({ summary }: Props) {
         ))}
       </section>
       <p className="panel-sub workflow-source-label">{summary.sourceLabel}</p>
-      {summary.status === "degraded" && summary.degradedReason ? (
+      {summary.status === "degraded" ? (
         <p className="panel-sub degraded-feed-note" role="status">
-          Snapshot feed degraded: {summary.degradedReason}. Showing unavailable state — not fixture preview data.
+          {friendlySnapshotFeedMessage(summary.degradedReason)}
         </p>
       ) : null}
 
@@ -79,8 +80,8 @@ export function CommandCenterContent({ summary }: Props) {
         <div className="panel">
           <div className="panel-head">
             <div>
-              <h2>Strategy Lab &amp; market lenses</h2>
-              <div className="panel-sub">Open a surface and interrogate what is currently priced.</div>
+              <h2>Start here</h2>
+              <div className="panel-sub">Open a market and compare it to your view.</div>
             </div>
             <span className="tag">Explore</span>
           </div>
@@ -106,28 +107,26 @@ export function CommandCenterContent({ summary }: Props) {
 
         <div className="panel">
           <div className="new-thesis">
-            <h3>Start with a belief</h3>
+            <h3>Have a view?</h3>
             <p>
-              Describe what you think is mispriced. MSOS routes the idea to the right lens and preserves the state of
-              the thesis.
+              Say what you think is mispriced. We&apos;ll keep your idea on file so you can plan and review
+              later.
             </p>
             <Link href="/strategy-lab/confirm" className="btn slim primary">
-              Create new thesis →
+              Save a view →
             </Link>
           </div>
           <div className="panel-head">
             <div>
-              <h2>Current work</h2>
-              <div className="panel-sub">From PPE snapshots — recent freezes and review status.</div>
+              <h2>Recent work</h2>
+              <div className="panel-sub">Saved market reads and review status.</div>
             </div>
           </div>
           {summary.status === "degraded" ? (
-            <p className="panel-sub">
-              Snapshot database unavailable. Connect read-only access to PPE frozen evaluations to populate this panel.
-            </p>
+            <p className="panel-sub">Saved history isn&apos;t loading yet. Strategy Lab still has live data.</p>
           ) : null}
           {summary.status !== "degraded" && !hasLiveData ? (
-            <p className="panel-sub">No frozen evaluations in the PPE snapshot store yet.</p>
+            <p className="panel-sub">Nothing saved yet — start in Strategy Lab.</p>
           ) : null}
           {summary.currentWork.map((item) => (
             <div key={item.snapshotId} className="strategy">
@@ -143,8 +142,8 @@ export function CommandCenterContent({ summary }: Props) {
         <div className="panel">
           <div className="panel-head">
             <div>
-              <h2>Context, news &amp; alerts</h2>
-              <div className="panel-sub">What could change a thesis today.</div>
+              <h2>Context &amp; alerts</h2>
+              <div className="panel-sub">News and reminders that might change your view.</div>
             </div>
           </div>
           {headlines.map((item) => (
@@ -153,7 +152,7 @@ export function CommandCenterContent({ summary }: Props) {
               <p>{item.body}</p>
             </div>
           ))}
-          <div className="side-label inline">Review queue</div>
+          <div className="side-label inline">To review</div>
           <div className="timeline">
             {reviewEvents.map((event) => (
               <div key={event.title} className="event">
@@ -168,7 +167,7 @@ export function CommandCenterContent({ summary }: Props) {
         </div>
       </section>
 
-      <p className="footer-note">Research demo — KPIs from PPE snapshots (read-only); no live order transmitted</p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }

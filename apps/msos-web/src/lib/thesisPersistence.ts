@@ -19,7 +19,7 @@ export type ThesisRecord = {
 export const THESIS_STORAGE_KEY = "msos.thesis.preview.v1";
 
 export const THESIS_PERSISTENCE_LABEL =
-  "MSOS workflow store — saved on the server for this research demo; sim-only, no live account record.";
+  "Saved to your workspace on this demo — paper trading only, not a brokerage record.";
 
 export const THESIS_PREVIEW_MIGRATION_NOTE =
   "One-time import from browser preview keys (msos.thesis.preview.v1) when server store is empty.";

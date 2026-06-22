@@ -55,7 +55,7 @@ export type CalibrationStrip = {
   href: string;
 };
 
-const WORKFLOW_SOURCE = "From MSOS workflow + PPE snapshots";
+const WORKFLOW_SOURCE = "Your workspace + saved snapshots";
 
 function reviewState(row: CommandCenterSnapshotRow): HistoryState {
   const status = (row.reviewStatus ?? "").trim().toLowerCase();
@@ -74,7 +74,7 @@ function formatTimestamp(raw: string): string {
 function snapshotHistoryEntries(rows: CommandCenterSnapshotRow[]): HistoryEntry[] {
   return rows.map((row) => {
     const state = reviewState(row);
-    const tag = state === "reviewed" ? "Review recorded" : "Awaiting review";
+    const tag = state === "reviewed" ? "Reviewed" : "Review due";
     return {
       id: `snap-${row.snapshotId}`,
       state,
@@ -137,7 +137,7 @@ function buildWatchPanels(
     const latest = summary.recentSnapshots[0];
     panels.push({
       id: "C",
-      title: "Latest PPE freeze",
+      title: "Latest saved read",
       body: `${latest.summaryLine} · ${latest.expiry}`,
       tone: "teal",
     });
@@ -146,7 +146,7 @@ function buildWatchPanels(
     panels.push({
       id: "—",
       title: "No active watch items",
-      body: "Create a thesis in Strategy Lab or freeze an evaluation to populate monitoring.",
+      body: "Save a view in Strategy Lab to start monitoring.",
       tone: "muted",
     });
   }
@@ -156,21 +156,21 @@ function buildWatchPanels(
 function buildAlerts(summary: CommandCenterSummary): MonitorAlert[] {
   const alerts: MonitorAlert[] = [];
   if (summary.status === "live") {
-    const pendingKpi = summary.kpis.find((k) => k.label === "Reviews pending");
+    const pendingKpi = summary.kpis.find((k) => k.label === "Reviews due");
     const pending = Number(pendingKpi?.value ?? "0");
     if (pending > 0) {
       alerts.push({
         title: `${pending} review${pending === 1 ? "" : "s"} due`,
-        body: "Outcome reviews pending on frozen PPE snapshots — not trade advice.",
+        body: "Check whether your saved views still match the market — not trade advice.",
         tone: "amber",
       });
     }
-    const completedKpi = summary.kpis.find((k) => k.label === "Reviews completed");
+    const completedKpi = summary.kpis.find((k) => k.label === "Reviews done");
     const completed = Number(completedKpi?.value ?? "0");
     if (completed > 0) {
       alerts.push({
-        title: `${completed} review${completed === 1 ? "" : "s"} recorded`,
-        body: "Recorded snapshot reviews in the PPE store.",
+        title: `${completed} review${completed === 1 ? "" : "s"} complete`,
+        body: "Post-mortems recorded on saved market reads.",
         tone: "teal",
       });
     }
@@ -178,7 +178,7 @@ function buildAlerts(summary: CommandCenterSummary): MonitorAlert[] {
   if (alerts.length === 0) {
     alerts.push({
       title: "Monitoring ready",
-      body: "Workflow and snapshot feeds connected — no alerts raised.",
+      body: "Your workspace is connected — no alerts right now.",
       tone: "teal",
     });
   }
@@ -187,20 +187,20 @@ function buildAlerts(summary: CommandCenterSummary): MonitorAlert[] {
 
 function healthFromSummary(summary: CommandCenterSummary): { pct: number; label: string } {
   if (summary.status !== "live") {
-    return { pct: 0, label: "Awaiting workflow + snapshot data" };
+    return { pct: 0, label: "Waiting for saved reads" };
   }
-  const totalKpi = summary.kpis.find((k) => k.label === "Frozen snapshots");
-  const pendingKpi = summary.kpis.find((k) => k.label === "Reviews pending");
+  const totalKpi = summary.kpis.find((k) => k.label === "Saved snapshots");
+  const pendingKpi = summary.kpis.find((k) => k.label === "Reviews due");
   const total = Number(totalKpi?.value ?? "0");
   const pending = Number(pendingKpi?.value ?? "0");
   if (total === 0) {
-    return { pct: 25, label: "Snapshots empty — freeze in Strategy Lab" };
+    return { pct: 25, label: "Save a read in Strategy Lab" };
   }
   const reviewed = Math.max(0, total - pending);
   const pct = Math.round((reviewed / total) * 100);
   return {
     pct: Math.max(10, pct),
-    label: `${reviewed}/${total} snapshots reviewed`,
+    label: `${reviewed}/${total} reads reviewed`,
   };
 }
 
@@ -216,22 +216,22 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
     return {
       status: "degraded",
       sourceLabel: WORKFLOW_SOURCE,
-      heroTitle: "Monitor feed unavailable",
-      heroSubtitle: summary.degradedReason ?? "Snapshot database not readable.",
+      heroTitle: "Monitor unavailable",
+      heroSubtitle: "Saved history isn't connected yet. Strategy Lab still works.",
       healthPct: 0,
-      healthLabel: "Degraded",
+      healthLabel: "Offline",
       watchPanels: [
         {
           id: "!",
-          title: "Snapshot feed offline",
-          body: "Check PPE_SNAPSHOT_DB_PATH mount on msos_web.",
+          title: "History offline",
+          body: "We're connecting saved market reads. Live options in Strategy Lab still work.",
           tone: "red",
         },
       ],
       alerts: [
         {
-          title: "Read-only snapshot mount required",
-          body: summary.degradedReason ?? "Database unavailable",
+          title: "Saved reads unavailable",
+          body: "Try again later or continue in Strategy Lab.",
           tone: "red",
         },
       ],
@@ -250,8 +250,8 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
     sourceLabel: WORKFLOW_SOURCE,
     heroTitle: hasWorkflow ? "Thesis & expression watch" : "Monitoring workspace",
     heroSubtitle: hasSnapshots
-      ? "Live MSOS workflow + PPE snapshot review metadata (scoped to you)."
-      : "MSOS workflow connected — freeze evaluations to add snapshot watch.",
+      ? "Watching your saved views and paper trades."
+      : "Save a view in Strategy Lab to start building history.",
     healthPct: pct,
     healthLabel: label,
     watchPanels,
@@ -271,7 +271,7 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
     return {
       status: "degraded",
       sourceLabel: WORKFLOW_SOURCE,
-      intro: summary.degradedReason ?? "Snapshot database unavailable.",
+      intro: "Saved history isn't available right now.",
       entries: [],
       degradedReason: summary.degradedReason,
     };
@@ -285,7 +285,7 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
   return {
     status: entries.length > 0 ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
-    intro: "Observed → saved → simulated → reviewed — Executed stays empty until live routing ships.",
+    intro: "From first look → saved view → paper trade → review. Live fills appear when connected.",
     entries,
   };
 }
@@ -293,25 +293,25 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
 export function buildCalibrationStrip(summary: CommandCenterSummary): CalibrationStrip {
   if (summary.status === "degraded") {
     return {
-      title: "Calibration loop",
-      body: "Snapshot feed unavailable — connect read-only PPE frozen evaluations to enable review hooks.",
+      title: "Track your accuracy",
+      body: "Saved history isn't connected yet — Strategy Lab live data still works.",
       cta: "Open monitor",
       href: "/monitor",
     };
   }
-  const pendingKpi = summary.kpis.find((k) => k.label === "Reviews pending");
+  const pendingKpi = summary.kpis.find((k) => k.label === "Reviews due");
   const pending = Number(pendingKpi?.value ?? "0");
   if (pending > 0) {
     return {
-      title: "Calibration loop",
-      body: `${pending} outcome review${pending === 1 ? "" : "s"} due on frozen snapshots — observed vs saved vs simulated.`,
+      title: "Track your accuracy",
+      body: `${pending} saved view${pending === 1 ? "" : "s"} ready for a post-mortem.`,
       cta: "Open monitor",
       href: "/monitor",
     };
   }
   return {
-    title: "Calibration loop",
-    body: "Review observed vs saved vs simulated theses — executed count stays zero until live routing ships.",
+    title: "Track your accuracy",
+    body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
     cta: "Open monitor",
     href: "/monitor",
   };
@@ -326,8 +326,8 @@ export function buildReviewEvents(summary: CommandCenterSummary): MonitorAlert[]
     return {
       title: row.summaryLine,
       body: pending
-        ? `Review due · frozen ${formatTimestamp(row.createdAt)}`
-        : `Review: ${row.reviewStatus} · ${formatTimestamp(row.reviewedAtUtc ?? row.createdAt)}`,
+        ? `Review due · saved ${formatTimestamp(row.createdAt)}`
+        : `Reviewed · ${formatTimestamp(row.reviewedAtUtc ?? row.createdAt)}`,
       tone: pending ? "amber" : "teal",
     };
   });

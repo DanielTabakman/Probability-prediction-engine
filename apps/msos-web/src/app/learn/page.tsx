@@ -6,7 +6,7 @@ import { ConclusionContent } from "@/components/ConclusionContent";
 export const metadata: Metadata = {
   title: "Learn loop | Market Structure OS",
   description:
-    "MSOS tester release conclusion — learn loop narrative and validation metrics template (preview).",
+    "Reflect on a session — feedback helps improve the demo for new traders.",
 };
 
 export default function LearnPage() {

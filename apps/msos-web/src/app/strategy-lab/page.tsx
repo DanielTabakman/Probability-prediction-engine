@@ -7,7 +7,7 @@ import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
 export const metadata: Metadata = {
   title: "Strategy Lab | Market Structure OS",
   description:
-    "MSOS Strategy Lab — PPE options distribution lens. Display/proxy boundary only; authoritative math in Python.",
+    "Compare your view to what BTC options imply — live Deribit data on the demo.",
 };
 
 export default async function StrategyLabPage() {

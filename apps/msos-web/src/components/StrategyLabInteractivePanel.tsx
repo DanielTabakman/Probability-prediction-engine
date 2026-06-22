@@ -59,18 +59,17 @@ export function StrategyLabInteractivePanel({
 
         <div className="panel-head">
           <div>
-            <h2>Market-implied vs reference vs your belief</h2>
+            <h2>Market vs your view</h2>
             <div className="panel-sub">
-              Reference model: <span className="teal">Lognormal benchmark (PPE)</span> · chart region from
-              read-only display payload or chromeless embed — math stays in Python.
+              Purple curve = what BTC options imply today. Your selection shows where you disagree.
             </div>
           </div>
-          <span className="tag">PPE</span>
+          <span className="tag">Options</span>
         </div>
 
         {selectedPreset ? (
           <p className="belief-active-banner" role="status">
-            Your belief: <strong>{selectedPreset.label}</strong> — compare to the market curve below.
+            Your view: <strong>{selectedPreset.label}</strong> — compare to the chart below.
           </p>
         ) : null}
 
@@ -79,33 +78,33 @@ export function StrategyLabInteractivePanel({
         <div className="legend" aria-label="Chart legend">
           <span>
             <i className="swatch market" aria-hidden="true" />
-            Market implied
+            Options market
           </span>
           <span>
             <i className="swatch reference" aria-hidden="true" />
-            Reference model (PPE)
+            Reference curve
           </span>
           <span className={selectedPresetId ? "legend-active" : undefined}>
             <i className="swatch belief" aria-hidden="true" />
-            Your belief{selectedPreset ? `: ${selectedPreset.label}` : ""}
+            Your view{selectedPreset ? `: ${selectedPreset.label}` : ""}
           </span>
         </div>
 
-        <div className="controls" aria-label="Chart controls (preview)">
+        <div className="controls" aria-label="Fine-tuning (coming soon)">
           <div className="control">
-            <div className="control-label">Expected range width</div>
+            <div className="control-label">Range width</div>
             <div className="slider preview" aria-hidden="true" />
           </div>
           <div className="control muted">
-            <div className="control-label">Tail emphasis</div>
+            <div className="control-label">Tail weight</div>
             <div className="slider preview muted" aria-hidden="true" />
           </div>
         </div>
 
         <div className="panel-head compact">
           <div>
-            <h2>Market lenses</h2>
-            <div className="panel-sub">BTC options live via PPE; other lenses planned or pending.</div>
+            <h2>Other markets</h2>
+            <div className="panel-sub">BTC options are live. More assets coming.</div>
           </div>
         </div>
         <div className="lab-list compact">
@@ -136,8 +135,8 @@ export function StrategyLabInteractivePanel({
       <div className="panel outcome">
         <div className="panel-head">
           <div>
-            <h2>What this run is saying</h2>
-            <div className="panel-sub">Decision support, not trade advice.</div>
+            <h2>What this means</h2>
+            <div className="panel-sub">Decision support — not financial advice.</div>
           </div>
           <span className={`tag ${outcome.tagTone}`}>{outcome.tag}</span>
         </div>
@@ -156,13 +155,13 @@ export function StrategyLabInteractivePanel({
           <div>
             <strong>
               {selectedPreset
-                ? `Candidate: ${selectedPreset.label.toLowerCase()} disagreement`
-                : "Candidate: pick a belief preset above"}
+                ? `Next: confirm your “${selectedPreset.label.toLowerCase()}” view`
+                : "Next: pick how you disagree with the market"}
             </strong>
-            <p>Potential expression families available after thesis confirmation.</p>
+            <p>Then explore trade structures that fit — paper only on this demo.</p>
           </div>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Confirm thesis →
+            Confirm view →
           </Link>
         </div>
       </div>

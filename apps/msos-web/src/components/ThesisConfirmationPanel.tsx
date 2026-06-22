@@ -18,6 +18,7 @@ import {
   type ThesisLifecycle,
   withLifecycle,
 } from "@/lib/thesisPersistence";
+import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 
 export function ThesisConfirmationPanel() {
   const [record, setRecord] = useState(defaultThesisRecord);
@@ -42,13 +43,13 @@ export function ThesisConfirmationPanel() {
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab / Thesis confirmation</div>
-          <h1 className="title">Thesis confirmation</h1>
+          <div className="crumb">Strategy Lab · Confirm</div>
+          <h1 className="title">Confirm your view</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            MSOS workflow store
+            {WORKSPACE_SAVED_LABEL}
           </span>
           <Link href="/strategy-lab" className="btn slim">
             Back to lab
@@ -61,7 +62,6 @@ export function ThesisConfirmationPanel() {
 
       <div className="confirm-wrap">
         <section className="panel truth">
-          <div className="panel-sub">Screen 04 — confirmation narrative</div>
           <h2 className="question">{thesisConfirmHeadline}</h2>
           <p className="thesis">
             {thesisRestatement.prefix}{" "}
@@ -78,17 +78,17 @@ export function ThesisConfirmationPanel() {
             ))}
           </div>
 
-          <div className="semantic-lock" aria-label="Reference context">
+          <div className="semantic-lock" aria-label="Context">
             <div className="lock">
-              <h3>Reference</h3>
+              <h3>Market</h3>
               <p>{record.referenceLabel}</p>
             </div>
             <div className="lock">
-              <h3>Trust</h3>
-              <p>{record.trustLabel} — preview fixture</p>
+              <h3>Data quality</h3>
+              <p>{record.trustLabel}</p>
             </div>
             <div className="lock">
-              <h3>Instrument</h3>
+              <h3>Timeframe</h3>
               <p>
                 {record.instrument} · {record.horizonDays} days
               </p>
@@ -100,8 +100,8 @@ export function ThesisConfirmationPanel() {
           <div className="panel">
             <div className="panel-head">
               <div>
-                <h2>Readiness checks</h2>
-                <div className="panel-sub">Honest labels — no hidden authority.</div>
+                <h2>Before you continue</h2>
+                <div className="panel-sub">Quick sanity checks — no hidden “AI says buy.”</div>
               </div>
             </div>
             {confirmationChecklist.map((item) => (
@@ -116,7 +116,7 @@ export function ThesisConfirmationPanel() {
 
           <div className="panel">
             <div className="panel-head compact">
-              <h2>Thesis lifecycle</h2>
+              <h2>Status</h2>
             </div>
             <div className="state-timeline" role="list" aria-label="Thesis lifecycle">
               {lifecycleSteps.map((step) => (
@@ -140,7 +140,7 @@ export function ThesisConfirmationPanel() {
 
           <div className="proceed">
             <h3>Next step</h3>
-            <p>Expression planning opens after confirmation — not live execution.</p>
+            <p>Plan a paper trade after you confirm — no live orders on this demo.</p>
             <div className="confirm-actions">
               <button
                 type="button"
@@ -148,7 +148,7 @@ export function ThesisConfirmationPanel() {
                 disabled={!hydrated || isConfirmed}
                 onClick={() => persist("draft")}
               >
-                Save draft thesis
+                Save draft
               </button>
               <button
                 type="button"
@@ -156,25 +156,23 @@ export function ThesisConfirmationPanel() {
                 disabled={!hydrated || isConfirmed}
                 onClick={() => persist("confirmed")}
               >
-                Confirm thesis
+                Confirm view
               </button>
             </div>
             {isConfirmed ? (
               <Link href="/strategy-lab/expression" className="btn slim primary proceed-cta">
-                Proceed to expression planning
+                Plan a paper trade
               </Link>
             ) : (
-              <span className="btn slim primary proceed-cta muted" title="Confirm thesis first">
-                Proceed to expression planning
+              <span className="btn slim primary proceed-cta muted" title="Confirm your view first">
+                Plan a paper trade
               </span>
             )}
           </div>
         </aside>
       </div>
 
-      <p className="footer-note">
-        Research demo — confirmation uses the MSOS workflow store; no live order transmitted
-      </p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }

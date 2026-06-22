@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   buildLabMetricsFromPayload,
   type DisplayPayload,
@@ -22,17 +23,17 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab / PPE / Options Distribution Lens</div>
-          <h1 className="title">Strategy Lab — PPE Tool</h1>
+          <div className="crumb">Strategy Lab · BTC options</div>
+          <h1 className="title">Strategy Lab</h1>
         </div>
         <div className="tools">
           <span className="pill">
             <span className="dot" aria-hidden="true" />
-            {live ? "Live PPE data" : "Preview fixtures"}
+            {live ? "Live market data" : "Demo data"}
           </span>
-          <span className="btn slim">Share view</span>
+          <span className="btn slim">Share</span>
           <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Save draft thesis
+            Save your view
           </Link>
           <span className="avatar" aria-hidden="true">
             DT
@@ -57,11 +58,7 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
         />
       </section>
 
-      <p className="footer-note">
-        {live
-          ? "Live market-implied data from PPE — sim-only; no order transmitted."
-          : "Illustrative product storyboard — no live order transmitted"}
-      </p>
+      <p className="footer-note">{DEMO_FOOTER}</p>
     </>
   );
 }

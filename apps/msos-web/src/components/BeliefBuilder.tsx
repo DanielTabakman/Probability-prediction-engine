@@ -44,10 +44,11 @@ export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuild
           buildBeliefSentence(selected, expiryLabel)
         ) : (
           <>
-            Tap a preset to explore —{" "}
+            Pick one —{" "}
             <span className="selectchip muted">higher</span>,{" "}
-            <span className="selectchip muted">lower</span>, or{" "}
-            <span className="selectchip muted">volatility</span> vs the market.
+            <span className="selectchip muted">lower</span>,{" "}
+            <span className="selectchip muted">more vol</span>, or{" "}
+            <span className="selectchip muted">less vol</span> than options imply.
           </>
         )}
       </p>
@@ -72,8 +73,8 @@ export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuild
 
       <p className="micro">
         {selected
-          ? "Your view overlays against the market curve — diagnostic, not a trade signal."
-          : "Pick one to update the summary panel and draft your thesis."}
+          ? "This compares your view to the market curve — not a trade recommendation."
+          : "Tap a button to see how your view differs from what options price."}
       </p>
     </div>
   );

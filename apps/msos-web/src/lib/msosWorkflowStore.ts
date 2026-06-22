@@ -302,15 +302,15 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
 
   const kpis: WorkflowSummaryKpi[] = [
     {
-      label: "Draft thesis",
+      label: "Draft views",
       value: String(draftCount),
-      sub: "MSOS workflow store",
+      sub: "Your workspace",
       tone: draftCount > 0 ? "amber" : undefined,
     },
     {
-      label: "Confirmed thesis",
+      label: "Confirmed views",
       value: String(confirmedCount),
-      sub: "MSOS workflow store",
+      sub: "Your workspace",
       tone: confirmedCount > 0 ? "teal" : undefined,
     },
   ];
@@ -335,8 +335,8 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
 
   const owner = normalizeOwnerEmail(ownerEmail);
   const sourceLabel = owner
-    ? `From MSOS workflow store · ${owner}`
-    : "From MSOS workflow store";
+    ? `Your workspace · ${owner}`
+    : "Your workspace";
 
   return {
     sourceLabel,

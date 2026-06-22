@@ -46,18 +46,17 @@ def test_strategy_lab_belief_presets_interactive() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab / PPE / Options Distribution Lens" in content
-    assert "Strategy Lab — PPE Tool" in content
-    assert "Live PPE data" in content
-    assert "Preview fixtures" in content
+    assert "Strategy Lab · BTC options" in content
+    assert "Live market data" in content
+    assert "Demo data" in content
     assert "buildLabMetricsFromPayload" in content
     assert "StrategyLabInteractivePanel" in content
-    assert "no live order transmitted" in content
+    assert "DEMO_FOOTER" in content
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "Market-implied vs reference vs your belief" in panel
+    assert "Market vs your view" in panel
     assert "PpeEmbedBoundary" in panel
     assert 'className="legend"' in panel
     assert 'className="controls"' in panel
@@ -70,11 +69,10 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "ppeDisplayPayload" in embed
     assert "PPE_EMBED_ONLY_PARAM" in embed
     assert "iframe" in embed
-    assert "degraded" in embed.lower() or "Embed pending" in embed
+    assert "degraded" in embed.lower() or "unavailable" in embed.lower()
     assert "prices_usd" in embed
     assert "ppe-summary-table" in embed
-    assert "Live via PPE" in embed
-    assert "Chromeless embed" in embed or "Native chart" in embed
+    assert "Deribit" in embed or "Live" in embed
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
@@ -82,10 +80,10 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "strategyLabFixtures.ts").read_text(encoding="utf-8")
-    assert "LIVE" in fixtures
+    assert "Live" in fixtures
     assert "Planned" in fixtures
     assert "Soon" in fixtures
-    assert "BTC / Options" in fixtures
+    assert "BTC options" in fixtures
 
 
 def test_thesis_confirmation_route_and_narrative() -> None:
@@ -96,13 +94,13 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert 'activeNavId="strategy-lab"' in text
 
     fixtures = (MSOS_WEB / "src" / "data" / "thesisConfirmFixtures.ts").read_text(encoding="utf-8")
-    assert "Is this what you think is true?" in fixtures
+    assert "Is this what you actually believe?" in fixtures
 
     panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(encoding="utf-8")
     assert "thesisConfirmHeadline" in panel
-    assert "Proceed to expression planning" in panel
-    assert "MSOS workflow store" in panel
-    assert "no live order transmitted" in panel
+    assert "Plan a paper trade" in panel
+    assert "WORKSPACE_SAVED_LABEL" in panel
+    assert "DEMO_FOOTER" in panel
 
     persistence = (MSOS_WEB / "src" / "lib" / "thesisPersistence.ts").read_text(encoding="utf-8")
     assert "msos.thesis.preview.v1" in persistence
@@ -133,20 +131,20 @@ def test_expression_planning_route_and_narrative() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "expressionPlanningFixtures.ts").read_text(
         encoding="utf-8"
     )
-    assert "Defined-risk range structure" in fixtures
+    assert "Defined-risk range trade" in fixtures
     assert "Hyperliquid" in fixtures
-    assert "Pending" in fixtures
+    assert "Coming soon" in fixtures
     assert "Profit guarantee" in fixtures
     assert '"None"' in fixtures
 
     panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "Order not transmitted" in panel
-    assert "Simulate expression" in panel
-    assert "no live order transmitted" in panel
-    assert "Optimization basis" in panel
-    assert "Expression families" in panel
+    assert "Paper only" in panel
+    assert "Save paper trade" in panel
+    assert "DEMO_FOOTER" in panel
+    assert "Why this structure" in panel
+    assert "Structure types" in panel
 
     persistence = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
     assert "msos.expression.preview.v1" in persistence
@@ -180,12 +178,12 @@ def test_monitoring_history_routes_and_panels() -> None:
 
     monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
     assert "feed.watchPanels" in monitor
-    assert "no live order transmitted" in monitor
+    assert "DEMO_FOOTER" in monitor
 
     history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
     assert "feed.entries" in history
-    assert "Executed" in history
-    assert "no live positions connected" in history
+    assert "Live trades" in history
+    assert "not connected" in history
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/monitor"' in nav
@@ -203,13 +201,12 @@ def test_conclusion_learn_loop_route() -> None:
     assert 'activeNavId="learn"' in page.read_text(encoding="utf-8")
 
     fixtures = (MSOS_WEB / "src" / "data" / "conclusionFixtures.ts").read_text(encoding="utf-8")
-    assert "What did you learn from this run?" in fixtures
-    assert "VALIDATION_REALITY_CHECKS" in fixtures
+    assert "What did you take away?" in fixtures
     assert "nextSelectionRecommendation" in fixtures
 
     panel = (MSOS_WEB / "src" / "components" / "ConclusionContent.tsx").read_text(encoding="utf-8")
     assert "testerMetricsTemplate" in panel
-    assert "Usable demo preview" in panel
+    assert "Research preview" in panel
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/learn"' in nav

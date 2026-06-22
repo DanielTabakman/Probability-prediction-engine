@@ -1,4 +1,4 @@
-/** Preview/fixture data for thesis confirmation (P5 — display + persistence boundary). */
+/** Thesis confirmation copy (display + persistence boundary). */
 
 import type { ThesisLifecycle, ThesisRecord } from "@/lib/thesisPersistence";
 
@@ -13,25 +13,25 @@ export type ChecklistItem = {
   label: string;
 };
 
-export const thesisConfirmHeadline = "Is this what you think is true?";
+export const thesisConfirmHeadline = "Is this what you actually believe?";
 
 export const thesisRestatement = {
-  prefix: "I believe BTC will",
-  emphasis: "remain within a narrower range",
-  suffix: "than the market prices over",
+  prefix: "I think BTC will",
+  emphasis: "move in a tighter range",
+  suffix: "than options are pricing over the next",
   horizon: "30 days",
 };
 
 export const compareColumns: CompareColumn[] = [
-  { label: "Market view", value: "6.8% range", tone: "amber" },
-  { label: "Your thesis", value: "5.4% range", tone: "teal" },
-  { label: "Gap", value: "1.4 pts (21%)", tone: "teal" },
+  { label: "Options market", value: "6.8% range", tone: "amber" },
+  { label: "Your view", value: "5.4% range", tone: "teal" },
+  { label: "Difference", value: "1.4 pts (~21%)", tone: "teal" },
 ];
 
 export const confirmationChecklist: ChecklistItem[] = [
-  { id: "reference", label: "Reference named — BTC options distribution via PPE embed" },
-  { id: "trust", label: "Trust context reviewed — Good (preview fixture)" },
-  { id: "horizon", label: "Horizon and instrument locked — BTC / 30 days" },
+  { id: "reference", label: "Market reference — live BTC options from Deribit" },
+  { id: "trust", label: "Data looks current — quotes refreshed recently" },
+  { id: "horizon", label: "Timeframe locked — BTC · 30 days" },
 ];
 
 export const lifecycleSteps: { id: ThesisLifecycle; label: string }[] = [
@@ -40,13 +40,12 @@ export const lifecycleSteps: { id: ThesisLifecycle; label: string }[] = [
   { id: "confirmed", label: "Confirmed" },
 ];
 
-/** Default thesis snapshot seeded from Strategy Lab fixtures (Phase A). */
 export const defaultThesisRecord: ThesisRecord = {
-  instrument: "BTC / Options",
+  instrument: "BTC options",
   horizonDays: 30,
   marketRangePct: 6.8,
   thesisRangePct: 5.4,
-  referenceLabel: "PPE distribution summary (embedded lab)",
+  referenceLabel: "BTC options · live implied distribution",
   trustLabel: "Good",
   lifecycle: "exploring",
   updatedAt: "2026-06-11T00:00:00.000Z",

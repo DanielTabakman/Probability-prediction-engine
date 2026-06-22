@@ -16,8 +16,8 @@ def test_msos_web_package_and_homepage_copy() -> None:
     assert "HeroSection" in page
     assert "Market Structure OS" in hero
     assert "Strategy Lab" in hero
-    assert "PPE" in hero
-    assert "Planned" in hero
+    assert "BTC options" in hero
+    assert "Coming" in hero
 
 
 def test_msos_web_docker_and_compose_wiring() -> None:

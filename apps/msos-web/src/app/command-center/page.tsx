@@ -9,7 +9,7 @@ import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
 export const metadata: Metadata = {
   title: "Command Center | Market Structure OS",
   description:
-    "Authenticated MSOS workspace overview — recent PPE snapshot freezes and review status.",
+    "Track saved views and paper trades — reminders only, not trade advice.",
 };
 
 export default async function CommandCenterPage() {

@@ -9,19 +9,18 @@ export function HeroSection() {
 
   return (
     <section>
-      <div className="eyebrow">A coherent interface for uncertainty</div>
-      <h1>Market Structure OS for legible market theses.</h1>
+      <div className="eyebrow">See what the market prices. State what you believe.</div>
+      <h1>Compare your view to what BTC options imply.</h1>
       <p>
-        Market Structure OS is the company and software platform. The Strategy Lab is where users
-        design, test and monitor thesis-driven strategies. PPE is the first tool inside the lab — a
-        probability/thesis engine that compares what markets imply with what a human believes.
+        Market Structure OS helps options traders read implied distributions, spell out a view in plain
+        language, and sketch paper trades — without pretending the platform knows better than you.
       </p>
       <div className="hero-actions">
         <Link className="btn primary" href={MSOS_ROUTES.strategyLab}>
-          Explore the platform <span aria-hidden="true">→</span>
+          Open Strategy Lab <span aria-hidden="true">→</span>
         </Link>
         <Link className="btn" href={MSOS_ROUTES.commandCenter}>
-          Enter Command Center
+          Command Center
         </Link>
         {researchOffer ? (
           <a className="btn" href={researchOffer.url}>
@@ -29,38 +28,38 @@ export function HeroSection() {
           </a>
         ) : null}
         <a className="btn slim dark" href={signInUrl}>
-          Sign in to PPE
+          Sign in
         </a>
       </div>
       <div className="chips">
         <span className="pill">
           <span className="dot" />
-          Human-owned theses
+          Your view, your decision
         </span>
         <span className="pill">
           <span className="dot amber" />
-          Fit, not recommendation
+          Fit ideas to structures — not buy/sell tips
         </span>
-        <span className="pill">Preview includes BTC options through PPE</span>
+        <span className="pill">Live BTC options on the demo</span>
       </div>
       <div className="semantic-lock">
         <div className="lock">
-          <h3>MSOS</h3>
-          <p>Company and platform identity.</p>
+          <h3>Read</h3>
+          <p>What is the options market pricing for this expiry?</p>
         </div>
         <div className="lock">
-          <h3>Strategy Lab</h3>
-          <p>Workspace for designing thesis-driven market strategies.</p>
+          <h3>State</h3>
+          <p>Where do you disagree — level, vol, or both?</p>
         </div>
         <div className="lock">
-          <h3>PPE</h3>
-          <p>First tool: probability/thesis comparison engine.</p>
+          <h3>Plan</h3>
+          <p>Paper-trade structures that match your view.</p>
         </div>
       </div>
       <div className="lens-row" aria-label="Market lens availability">
-        <span className="tag">BTC options (PPE) — Preview</span>
-        <span className="tag muted">Prediction markets — Planned</span>
-        <span className="tag muted">Perpetual positioning — Planned</span>
+        <span className="tag">BTC options — Live</span>
+        <span className="tag muted">Event markets — Coming</span>
+        <span className="tag muted">Perp positioning — Coming</span>
       </div>
     </section>
   );
