@@ -1,0 +1,36 @@
+# Phase B — Cloudflare **Full (strict)** with Cloudflare Origin Certificate on the VPS.
+# Prerequisites: certs/cloudflare-origin.pem + certs/cloudflare-origin-key.pem (see certs/README.md).
+# Set PPE_CADDYFILE=./Caddyfile.tls in repo-root .env on the VPS, then docker compose up -d caddy.
+
+import caddy/snippets.caddy
+
+{
+	auto_https off
+}
+
+:443 {
+	tls /certs/cloudflare-origin.pem /certs/cloudflare-origin-key.pem
+	encode gzip
+	import security_headers
+	import hsts_header
+
+	@cloudflare header CF-Ray *
+	handle @cloudflare {
+		import site_handlers_cloudflare
+	}
+	handle {
+		import site_handlers_direct
+	}
+}
+
+:80 {
+	@cloudflare header CF-Ray *
+	handle @cloudflare {
+		redir https://{host}{uri} permanent
+	}
+	encode gzip
+	import security_headers
+	handle {
+		import site_handlers_direct
+	}
+}

@@ -7,6 +7,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
+def _caddy_text() -> str:
+    return (REPO_ROOT / "Caddyfile").read_text(encoding="utf-8") + (
+        REPO_ROOT / "caddy" / "snippets.caddy"
+    ).read_text(encoding="utf-8")
+
+
 def test_msos_web_dockerfile_next_public_build_args() -> None:
     dockerfile = (REPO_ROOT / "apps" / "msos-web" / "Dockerfile").read_text(encoding="utf-8")
     for key in (
@@ -27,7 +33,7 @@ def test_compose_msos_web_build_args_and_embed_default() -> None:
 
 
 def test_caddy_ppe_embed_proxy_to_app_demo() -> None:
-    caddy = (REPO_ROOT / "Caddyfile").read_text(encoding="utf-8")
+    caddy = _caddy_text()
     assert "/ppe-embed" in caddy
     assert "app_demo:8501" in caddy
     assert "strip_prefix /ppe-embed" in caddy
