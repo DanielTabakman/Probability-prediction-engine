@@ -6,13 +6,16 @@ import json
 
 from src.viz.distribution_export import build_distribution_export_rows
 from src.viz.embed_display_boundary import (
+    BELIEF_OVERLAY_KIND,
     DISPLAY_PAYLOAD_HTTP_PATH,
     DISPLAY_PAYLOAD_KIND,
     DISPLAY_PAYLOAD_MODE,
     DISPLAY_PAYLOAD_SCHEMA_VERSION,
     EMBED_ONLY_FALLBACK_MODE,
+    build_belief_overlay_response,
     build_distribution_display_payload,
     build_chart_series_from_export_row,
+    clamp_belief_mult,
     create_display_payload_wsgi_app,
     serialize_distribution_display_payload,
 )
@@ -148,6 +151,60 @@ def test_spot_from_cached_deribit_index_accepts_float(monkeypatch) -> None:
 
     monkeypatch.setattr(lab, "cached_deribit_index", lambda: 104_320.5)
     assert lab._spot_from_cached_deribit_index() == 104_320.5
+
+
+def test_belief_overlay_response_and_wsgi() -> None:
+    rows = _sample_export_rows()
+    payload = build_distribution_display_payload(
+        as_of_utc="2026-06-06T12:00:00+00:00",
+        spot_usd=99_000.0,
+        export_rows=rows,
+    )
+    expiry = payload["series_by_expiry"][0]["expiry_date"]
+    overlay = build_belief_overlay_response(
+        payload,
+        expiry_date=expiry,
+        forward_mult=1.08,
+        vol_mult=1.2,
+    )
+    assert overlay["kind"] == BELIEF_OVERLAY_KIND
+    assert overlay["expiry_date"] == expiry
+    assert len(overlay["pdf_pct"]) == len(payload["series_by_expiry"][0]["pdf_pct"])
+    assert overlay["forward_mult"] == clamp_belief_mult("forward_mult", 1.08)
+    assert overlay["vol_mult"] == clamp_belief_mult("vol_mult", 1.2)
+
+    app = create_display_payload_wsgi_app(lambda: payload)
+    status: list[str] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+
+    body = b"".join(
+        app(
+            {
+                "PATH_INFO": "/belief-overlay.json",
+                "QUERY_STRING": f"expiry={expiry}&forward_mult=1.08&vol_mult=1.2",
+            },
+            start_response,
+        )
+    )
+    assert status == ["200 OK"]
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["kind"] == BELIEF_OVERLAY_KIND
+    assert parsed["expiry_date"] == expiry
+
+
+def test_wsgi_belief_overlay_requires_expiry() -> None:
+    app = create_display_payload_wsgi_app(lambda: {})
+    status: list[str] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+
+    body = b"".join(app({"PATH_INFO": "/belief-overlay.json", "QUERY_STRING": ""}, start_response))
+    assert status == ["400 Bad Request"]
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["kind"] == "belief_overlay_error"
 
 
 def test_payload_serializes_deterministically() -> None:

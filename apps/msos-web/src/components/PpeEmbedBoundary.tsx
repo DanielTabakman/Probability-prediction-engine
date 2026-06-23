@@ -120,6 +120,7 @@ type PpeEmbedBoundaryProps = {
   selectedExpiry?: string | null;
   beliefPresetId?: BeliefPresetId | null;
   beliefLabel?: string | null;
+  beliefPdfPct?: number[] | null;
 };
 
 export function PpeEmbedBoundary({
@@ -129,6 +130,7 @@ export function PpeEmbedBoundary({
   selectedExpiry = null,
   beliefPresetId = null,
   beliefLabel = null,
+  beliefPdfPct = null,
 }: PpeEmbedBoundaryProps) {
   if (dataMode === "loading") {
     return (
@@ -165,11 +167,12 @@ export function PpeEmbedBoundary({
       return null;
     }
     const beliefOverlay =
-      beliefPresetId && primary.belief_presets
+      beliefPdfPct ??
+      (beliefPresetId && primary.belief_presets
         ? primary.belief_presets[beliefPresetId]?.pdf_pct
         : beliefPresetId && payload.belief_presets
           ? payload.belief_presets[beliefPresetId]?.pdf_pct
-          : null;
+          : null);
 
     return (
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">

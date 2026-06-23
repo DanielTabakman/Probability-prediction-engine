@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
+import { BeliefFineTuning } from "@/components/BeliefFineTuning";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
 import {
@@ -14,7 +15,14 @@ import {
   type BeliefPresetId,
 } from "@/lib/beliefPresets";
 import {
+  fetchBeliefOverlayPdf,
+  tuningFromPreset,
+  tuningMatchesPreset,
+  type BeliefTuning,
+} from "@/lib/beliefTuning";
+import {
   buildOutcomeFromPayload,
+  findSeriesByExpiry,
   type DisplayPayload,
   type LabOutcomeSummary,
 } from "@/lib/ppeDisplayPayload";
@@ -39,10 +47,49 @@ export function StrategyLabInteractivePanel({
   expiryOptions,
 }: StrategyLabInteractivePanelProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
+  const [tuning, setTuning] = useState<BeliefTuning | null>(null);
+  const [tunedPdfPct, setTunedPdfPct] = useState<number[] | null>(null);
 
   const handleSelect = useCallback((preset: BeliefPreset) => {
     setSelectedPresetId(preset.id);
+    setTuning(tuningFromPreset(preset.id));
+    setTunedPdfPct(null);
   }, []);
+
+  const handleTuningChange = useCallback((next: BeliefTuning) => {
+    setTuning(next);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPresetId || !tuning || !live || !displayPayload || !selectedExpiry) {
+      setTunedPdfPct(null);
+      return;
+    }
+
+    if (tuningMatchesPreset(selectedPresetId, tuning)) {
+      const series = findSeriesByExpiry(displayPayload, selectedExpiry);
+      const presetPdf =
+        series?.belief_presets?.[selectedPresetId]?.pdf_pct ??
+        displayPayload.belief_presets?.[selectedPresetId]?.pdf_pct ??
+        null;
+      setTunedPdfPct(presetPdf);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void fetchBeliefOverlayPdf(selectedExpiry, tuning).then((pdf) => {
+        if (!cancelled) {
+          setTunedPdfPct(pdf);
+        }
+      });
+    }, 180);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [selectedPresetId, tuning, live, displayPayload, selectedExpiry]);
 
   const outcome = useMemo(() => {
     if (!selectedPresetId) {
@@ -91,6 +138,7 @@ export function StrategyLabInteractivePanel({
           selectedExpiry={selectedExpiry}
           beliefPresetId={selectedPresetId}
           beliefLabel={selectedPreset?.label ?? null}
+          beliefPdfPct={tunedPdfPct}
         />
 
         <div className="legend" aria-label="Chart legend">
@@ -108,16 +156,16 @@ export function StrategyLabInteractivePanel({
           </span>
         </div>
 
-        <div className="controls" aria-label="Fine-tuning (coming soon)">
-          <div className="control">
-            <div className="control-label">Range width</div>
-            <div className="slider preview" aria-hidden="true" />
+        {selectedPreset && tuning ? (
+          <BeliefFineTuning tuning={tuning} disabled={!live} onChange={handleTuningChange} />
+        ) : (
+          <div className="controls muted" aria-label="Fine-tuning">
+            <div className="control muted">
+              <div className="control-label">Fine-tuning</div>
+              <div className="control-value">Pick a view above to adjust center and range.</div>
+            </div>
           </div>
-          <div className="control muted">
-            <div className="control-label">Tail weight</div>
-            <div className="slider preview muted" aria-hidden="true" />
-          </div>
-        </div>
+        )}
 
         <div className="panel-head compact">
           <div>

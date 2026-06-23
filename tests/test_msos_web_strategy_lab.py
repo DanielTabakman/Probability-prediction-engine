@@ -39,12 +39,23 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     assert "PpeEmbedBoundary" in panel
     assert "beliefPresetId" in panel
     assert "selectedExpiry" in panel
+    assert "BeliefFineTuning" in panel
+    assert "beliefTuning" in panel
     assert "PpeEmbedBoundary" not in content
     assert "buildOutcomeFromBelief" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
+    tuning = (MSOS_WEB / "src" / "lib" / "beliefTuning.ts").read_text(encoding="utf-8")
+    assert "fetchBeliefOverlayPdf" in tuning
+    assert "belief-overlay.json" in tuning
+
+    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
+    assert "slider-input" in fine
+    assert "Center shift" in fine
+
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".belief-preset-grid" in styles
+    assert ".slider-input" in styles
 
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
@@ -66,7 +77,10 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "beliefPresetId" in panel
     assert "selectedExpiry" in panel
     assert 'className="legend"' in panel
-    assert 'className="controls"' in panel
+    assert "BeliefFineTuning" in panel
+
+    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
+    assert 'className="controls"' in fine
 
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     assert "distribution_display_boundary" in lib
