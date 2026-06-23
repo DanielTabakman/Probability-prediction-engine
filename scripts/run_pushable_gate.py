@@ -315,6 +315,8 @@ def main(argv: list[str] | None = None) -> int:
             def _preset_for_path(path: str) -> str:
                 if path.startswith("src/"):
                     return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
+                if path.startswith("tests/test_implied_lab_"):
+                    return "PPE_UI"
                 if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
                     return "MSOS_UI"
                 if path.startswith("docs/"):

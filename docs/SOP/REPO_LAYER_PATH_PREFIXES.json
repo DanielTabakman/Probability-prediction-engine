@@ -213,6 +213,7 @@
         "tests/test_msos_web_user_state.py",
         "tests/test_msos_web_workflow_persistence.py",
         "tests/test_msos_web_e2e_product_witness.py",
+        "tests/test_msos_web_production_wiring.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_",
