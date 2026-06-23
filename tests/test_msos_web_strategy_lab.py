@@ -180,6 +180,9 @@ def test_expression_planning_route_and_narrative() -> None:
     assert "Suggested trade vs market" in (
         MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
     ).read_text(encoding="utf-8")
+    assert "BTC price at expiry" in (
+        MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
+    ).read_text(encoding="utf-8")
 
     suggestion_lib = (MSOS_WEB / "src" / "lib" / "ppeStrategySuggestion.ts").read_text(
         encoding="utf-8"

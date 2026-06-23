@@ -51,6 +51,7 @@ export type StrategySuggestionPayload = {
     overlay?: {
       prices_usd: number[];
       payoff_pct: number[];
+      payoff_usd?: number[];
     };
     summary?: StrategySuggestionSummary;
     review?: StrategySuggestionReview;
