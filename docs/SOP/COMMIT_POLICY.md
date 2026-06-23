@@ -63,6 +63,9 @@ On any branch **other than** `main` / `master`, after gate + commit:
 2. `git push` (`git push -u origin HEAD` if no upstream).
 3. If no open PR to `main`, `gh pr create --base main --head <branch>`.
 4. Merge when CI is green per [`GITHUB_ZERO_TOUCH_MERGE.md`](GITHUB_ZERO_TOUCH_MERGE.md).
+5. **Production deploy:** every push to **`main`** runs **Deploy VPS** ([`deploy-vps.yml`](../../.github/workflows/deploy-vps.yml)). After merge (or when shipping MSOS/product to production), run  
+   `python scripts/ensure_production_deploy.py --trigger --wait`  
+   so agents confirm **VPS deploy** finished — witness flakes no longer fail the deploy job.
 
 **`main`:** PR-only when branch protection applies — do not push product work directly to `main`.
 

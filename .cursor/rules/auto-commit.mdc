@@ -14,9 +14,13 @@ When the current task is **complete**, do **not** ask permission — **commit an
 3. **Commit** — one commit per task; message = slice/chapter + plane + intent
 4. On a **feature branch**: `python scripts/run_pushable_gate.py --pre-push`, then **push**, then **open PR to `main`** if none exists ([`GITHUB_ZERO_TOUCH_MERGE.md`](../../docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md)).
 
-**Zero-touch merge (default — do not ask the operator):** PRs to `main` get the **`automerge`** label automatically ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when **CI** is green, [`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges without a manual click. **Deploy VPS** runs on every push to `main`. Your job ends at **push + open PR** (or push to existing PR branch) — never stop to ask “may I merge?”
+**Zero-touch merge (default — do not ask the operator):** PRs to `main` get the **`automerge`** label automatically ([`label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml)); when **CI** is green, [`merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) squash-merges without a manual click. **Deploy VPS** runs on every push to `main` **and** is dispatched again immediately after auto-merge. Your job ends at **push + open PR** — never stop to ask “may I merge?”
 
-5. After opening/updating a PR, optionally `gh pr view <n> --json state,mergedAt` on the next pass; report **merged** + deploy workflow link, not a merge approval request.
+5. **After PR merge (MSOS / production-facing slices):** run  
+   `python scripts/ensure_production_deploy.py --trigger --wait`  
+   and report the Deploy VPS URL + whether **VPS deploy** succeeded. Witness failures are non-blocking; production ship is the SSH rebuild job.
+
+6. Optionally `gh pr view <n> --json state,mergedAt` on the next pass; report **merged** + deploy status, not a merge approval request.
 
 **Hold commits only for:** exploration/review with no implementation, explicit “don’t commit”, unchartered recovery, or safety exclusions below.
 
