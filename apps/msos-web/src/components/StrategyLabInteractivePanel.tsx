@@ -5,19 +5,21 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
+import { BeliefFineTuning } from "@/components/BeliefFineTuning";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
+import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
 import {
-  buildBeliefViewLabel,
-  buildOutcomeFromView,
-  EMPTY_BELIEF_VIEW,
-  hasBeliefView,
-  type BeliefView,
-} from "@/lib/beliefPresets";
-import {
+  buildTuningLabel,
   fetchBeliefOverlayPdf,
-  presetIdForTuningCache,
-  tuningFromView,
+  isMarketTuning,
+  loadStoredBeliefTuning,
+  MARKET_TUNING,
+  nudgeTuning,
+  presetIdForTuning,
+  saveBeliefTuning,
+  type BeliefNudgeAxis,
+  type BeliefTuning,
 } from "@/lib/beliefTuning";
 import {
   buildOutcomeFromPayload,
@@ -45,33 +47,63 @@ export function StrategyLabInteractivePanel({
   onExpiryChange,
   expiryOptions,
 }: StrategyLabInteractivePanelProps) {
-  const [view, setView] = useState<BeliefView>(EMPTY_BELIEF_VIEW);
+  const [tuning, setTuning] = useState<BeliefTuning>(MARKET_TUNING);
   const [beliefPdfPct, setBeliefPdfPct] = useState<number[] | null>(null);
-
-  const handleViewChange = useCallback((next: BeliefView) => {
-    setView(next);
-    setBeliefPdfPct(null);
-  }, []);
-
-  const tuning = useMemo(() => tuningFromView(view), [view]);
-  const viewLabel = buildBeliefViewLabel(view);
-  const active = hasBeliefView(view);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (!active || !live || !displayPayload || !selectedExpiry) {
-      setBeliefPdfPct(null);
+    setTuning(loadStoredBeliefTuning());
+    setHydrated(true);
+  }, []);
+
+  const applyTuning = useCallback((next: BeliefTuning) => {
+    setTuning(next);
+    saveBeliefTuning(next);
+  }, []);
+
+  const handleNudge = useCallback(
+    (axis: BeliefNudgeAxis) => {
+      setTuning((prev) => {
+        const next = nudgeTuning(prev, axis);
+        saveBeliefTuning(next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const handleReset = useCallback(() => {
+    applyTuning(MARKET_TUNING);
+    setBeliefPdfPct(null);
+  }, [applyTuning]);
+
+  const handleFineTuning = useCallback(
+    (next: BeliefTuning) => {
+      applyTuning(next);
+    },
+    [applyTuning],
+  );
+
+  const viewLabel = buildTuningLabel(tuning);
+  const active = !isMarketTuning(tuning);
+
+  useEffect(() => {
+    if (!hydrated || !active || !live || !displayPayload || !selectedExpiry) {
+      if (!active) setBeliefPdfPct(null);
       return;
     }
 
-    const cachePresetId = presetIdForTuningCache(view, tuning);
+    const cachePresetId = presetIdForTuning(tuning);
     if (cachePresetId) {
       const series = findSeriesByExpiry(displayPayload, selectedExpiry);
       const presetPdf =
         series?.belief_presets?.[cachePresetId]?.pdf_pct ??
         displayPayload.belief_presets?.[cachePresetId]?.pdf_pct ??
         null;
-      setBeliefPdfPct(presetPdf);
-      return;
+      if (presetPdf) {
+        setBeliefPdfPct(presetPdf);
+        return;
+      }
     }
 
     let cancelled = false;
@@ -87,18 +119,18 @@ export function StrategyLabInteractivePanel({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [active, view, tuning, live, displayPayload, selectedExpiry]);
+  }, [hydrated, active, tuning, live, displayPayload, selectedExpiry]);
 
   const outcome = useMemo(() => {
     if (!active) {
       return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
     }
     try {
-      return buildOutcomeFromView(view, displayPayload, live, selectedExpiry);
+      return buildOutcomeFromTuning(tuning, displayPayload, live, selectedExpiry);
     } catch {
       return defaultOutcome;
     }
-  }, [active, view, displayPayload, live, defaultOutcome, selectedExpiry]);
+  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry]);
 
   return (
     <>
@@ -107,15 +139,16 @@ export function StrategyLabInteractivePanel({
           expiryLabel={selectedExpiry}
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
-          view={view}
-          onChange={handleViewChange}
+          tuning={tuning}
+          onNudge={handleNudge}
+          onReset={handleReset}
         />
 
         <div className="panel-head">
           <div>
             <h2>Market vs your view</h2>
             <div className="panel-sub">
-              Purple curve = what BTC options imply today. Teal dashed = your belief when selected.
+              Purple curve = what BTC options imply today. Teal dashed = your belief when adjusted.
             </div>
           </div>
           <span className="tag">Options</span>
@@ -135,6 +168,8 @@ export function StrategyLabInteractivePanel({
           beliefLabel={active ? viewLabel : null}
           beliefPdfPct={beliefPdfPct}
         />
+
+        <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
 
         <div className="legend" aria-label="Chart legend">
           <span>
