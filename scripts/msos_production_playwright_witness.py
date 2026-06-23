@@ -121,7 +121,7 @@ def run_playwright_witness(
 
         lab_url = f"{base}/strategy-lab"
         page.goto(lab_url, wait_until="networkidle", timeout=90_000)
-        higher = page.get_byRole("button", name="Higher", exact=True)
+        higher = page.get_by_role("button", name="Higher", exact=True)
         belief_ok = higher.count() > 0
         belief_curve_ok = False
         if belief_ok:
