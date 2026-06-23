@@ -174,6 +174,11 @@ export function seriesPathWithYRange(
   const xMax = prices[prices.length - 1];
   const span = yMax - yMin || 1;
   const box = chartInnerBox(layout);
+  const points = prices.map((price, index) => {
+    const x = priceToChartX(price, xMin, xMax, layout);
+    const y = box.y1 - ((values[index] - yMin) / span) * box.innerH;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
   return `M ${points.join(" L ")}`;
 }
 

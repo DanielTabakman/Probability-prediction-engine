@@ -168,6 +168,23 @@ def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     return False, "no PPE chart/embed region in Strategy Lab HTML"
 
 
+def validate_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
+    """Strategy Lab page JS must ship labeled chart axes (not pre-#320 legend copy)."""
+    chunks = sorted(set(re.findall(r"/_next/static/chunks/app/strategy-lab/page-[^\"']+\.js", html)))
+    if not chunks:
+        return False, "strategy-lab page bundle missing from HTML"
+    base = base_url.rstrip("/")
+    for rel in chunks:
+        status, body, err = _fetch(f"{base}{rel}")
+        if status != 200 or err:
+            return False, err or f"strategy-lab bundle HTTP {status}"
+        if "Reference curve" in body or "Options market" in body:
+            return False, "strategy-lab bundle still ships pre-labeled-axis legend copy — rebuild msos_web"
+        if "BTC price at expiry" not in body:
+            return False, "strategy-lab bundle missing labeled axis copy (BTC price at expiry)"
+    return True, None
+
+
 def _collect_fixture_warnings(html: str) -> list[dict[str, str]]:
     warnings: list[dict[str, str]] = []
     if FIXTURE_PREVIEW_SPOT in html or FIXTURE_SAMPLE_SPOT in html:
@@ -282,6 +299,11 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
     lab_url = f"{base}/strategy-lab"
     lab_status, lab_body, lab_err = _fetch(lab_url)
     lab_ok, lab_msg = validate_strategy_lab_html(lab_body) if lab_status == 200 else (False, lab_err)
+    bundle_ok, bundle_msg = (
+        validate_strategy_lab_client_bundle(lab_body, base_url=base)
+        if lab_status == 200 and lab_ok
+        else (False, lab_msg or lab_err)
+    )
     checks.append(
         {
             "id": "strategy_lab_ppe_surface",
@@ -290,6 +312,16 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
             "status": lab_status,
             "error": lab_msg or lab_err,
             "missing_phrases": [],
+        }
+    )
+    checks.append(
+        {
+            "id": "strategy_lab_labeled_axes_bundle",
+            "url": lab_url,
+            "ok": bundle_ok and lab_status == 200,
+            "status": lab_status,
+            "error": bundle_msg,
+            "missing_phrases": [] if bundle_ok else ["BTC price at expiry"],
         }
     )
     if lab_status == 200:
@@ -325,7 +357,14 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
 
     failed = [c for c in checks if not c.get("ok")]
     optional_ids = frozenset({"research_beta_cta"})
-    integration_ids = frozenset({"ppe_display_api", "ppe_belief_overlay_api", "strategy_lab_ppe_surface"})
+    integration_ids = frozenset(
+        {
+            "ppe_display_api",
+            "ppe_belief_overlay_api",
+            "strategy_lab_ppe_surface",
+            "strategy_lab_labeled_axes_bundle",
+        }
+    )
     journey_failed = [c for c in failed if c["id"] not in optional_ids]
     integration_failed = [c for c in failed if c["id"] in integration_ids]
     return {

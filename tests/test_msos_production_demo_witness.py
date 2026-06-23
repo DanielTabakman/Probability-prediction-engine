@@ -10,6 +10,7 @@ from scripts.msos_production_demo_witness import (
     _has_research_cta,
     validate_belief_overlay_api_response,
     validate_display_api_response,
+    validate_strategy_lab_client_bundle,
     validate_strategy_lab_html,
 )
 
@@ -83,6 +84,46 @@ def test_validate_strategy_lab_html_placeholder_chart() -> None:
     ok, err = validate_strategy_lab_html(html)
     assert ok is False
     assert "sample" in (err or "").lower() or "placeholder" in (err or "").lower()
+
+
+def test_validate_strategy_lab_client_bundle_rejects_stale_legend() -> None:
+    html = '<script src="/_next/static/chunks/app/strategy-lab/page-stale.js"></script>'
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("page-stale.js"):
+            return 200, "Options market Reference curve", None
+        return 404, "", "not found"
+
+    import scripts.msos_production_demo_witness as witness
+
+    original = witness._fetch
+    witness._fetch = fake_fetch
+    try:
+        ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
+    finally:
+        witness._fetch = original
+    assert ok is False
+    assert "pre-labeled-axis" in (err or "")
+
+
+def test_validate_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
+    html = '<script src="/_next/static/chunks/app/strategy-lab/page-new.js"></script>'
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("page-new.js"):
+            return 200, "BTC price at expiry Market view", None
+        return 404, "", "not found"
+
+    import scripts.msos_production_demo_witness as witness
+
+    original = witness._fetch
+    witness._fetch = fake_fetch
+    try:
+        ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
+    finally:
+        witness._fetch = original
+    assert ok is True
+    assert err is None
 
 
 def test_collect_fixture_warnings() -> None:
