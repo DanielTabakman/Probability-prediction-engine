@@ -54,6 +54,17 @@ def test_display_payload_schema_and_summary() -> None:
     assert payload["meta"]["fallback_mode"] == EMBED_ONLY_FALLBACK_MODE
     assert payload["meta"]["embed_json_query"] == "?embed_only=1&format=json"
     assert len(payload["series_by_expiry"]) == 1
+    assert "belief_presets" in payload
+    assert set(payload["belief_presets"]) == {
+        "higher",
+        "lower",
+        "more_volatility",
+        "less_volatility",
+    }
+    primary = payload["series_by_expiry"][0]
+    belief_higher = payload["belief_presets"]["higher"]["pdf_pct"]
+    assert len(belief_higher) == len(primary["pdf_pct"])
+    assert max(belief_higher) > 0
 
 
 def test_chart_series_from_lognormal_row() -> None:

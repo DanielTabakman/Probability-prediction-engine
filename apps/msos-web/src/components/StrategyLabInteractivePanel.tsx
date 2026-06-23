@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { BeliefBuilder } from "@/components/BeliefBuilder";
+import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
 import {
   buildOutcomeFromBelief,
@@ -21,7 +22,6 @@ type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
   live: boolean;
   defaultOutcome: LabOutcomeSummary;
-  chartRegion: ReactNode;
 };
 
 function expiryLabel(payload: DisplayPayload | null): string {
@@ -32,7 +32,6 @@ export function StrategyLabInteractivePanel({
   displayPayload,
   live,
   defaultOutcome,
-  chartRegion,
 }: StrategyLabInteractivePanelProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
 
@@ -66,7 +65,7 @@ export function StrategyLabInteractivePanel({
           <div>
             <h2>Market vs your view</h2>
             <div className="panel-sub">
-              Purple curve = what BTC options imply today. Your selection shows where you disagree.
+              Purple curve = what BTC options imply today. Teal dashed = your belief when selected.
             </div>
           </div>
           <span className="tag">Options</span>
@@ -78,7 +77,11 @@ export function StrategyLabInteractivePanel({
           </p>
         ) : null}
 
-        {chartRegion}
+        <PpeEmbedBoundary
+          payload={displayPayload}
+          beliefPresetId={selectedPresetId}
+          beliefLabel={selectedPreset?.label ?? null}
+        />
 
         <div className="legend" aria-label="Chart legend">
           <span>

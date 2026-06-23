@@ -24,11 +24,18 @@ export type DisplaySeries = {
 
 export type DisplaySummaryRow = Record<string, string>;
 
+export type BeliefPresetOverlay = {
+  pdf_pct: number[];
+  forward_usd?: number;
+  atm_iv_annual?: number;
+};
+
 export type DisplayPayload = {
   kind: string;
   spot_usd: number;
   as_of_utc?: string;
   series_by_expiry: DisplaySeries[];
+  belief_presets?: Partial<Record<string, BeliefPresetOverlay>>;
   summary?: {
     table_rows?: DisplaySummaryRow[];
   };
