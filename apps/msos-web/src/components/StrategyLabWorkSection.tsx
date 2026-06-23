@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { ExpiryPicker } from "@/components/ExpiryPicker";
@@ -12,6 +12,7 @@ import {
   type DisplayPayload,
   type LabMetric,
 } from "@/lib/ppeDisplayPayload";
+import { saveStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 
 const DEMO_EXPIRY_OPTIONS = ["30 days", "60 days", "90 days"];
 
@@ -34,7 +35,14 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
 
   const handleExpiryChange = useCallback((expiry: string) => {
     setSelectedExpiry(expiry);
+    saveStrategyLabExpiry(expiry);
   }, []);
+
+  useEffect(() => {
+    if (resolvedExpiry) {
+      saveStrategyLabExpiry(resolvedExpiry);
+    }
+  }, [resolvedExpiry]);
 
   const metrics: LabMetric[] = useMemo(() => {
     if (!live || !displayPayload) {

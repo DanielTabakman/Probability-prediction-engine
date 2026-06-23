@@ -17,7 +17,7 @@ import {
 export const PPE_EMBED_ANCHOR_ID = "distribution-summary";
 
 /** Map pre-computed price/pdf arrays to SVG path (linear scale only — no new math). */
-function seriesToSvgPath(
+export function seriesToSvgPath(
   prices: number[],
   pdf: number[],
   width: number,

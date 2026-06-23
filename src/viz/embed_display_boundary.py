@@ -20,6 +20,7 @@ DISPLAY_PAYLOAD_KIND = "distribution_display_boundary"
 DISPLAY_PAYLOAD_HTTP_PATH = "/ppe-display-api/display.json"
 BELIEF_OVERLAY_KIND = "belief_overlay"
 BELIEF_OVERLAY_HTTP_PATH = "/ppe-display-api/belief-overlay.json"
+STRATEGY_SUGGESTION_HTTP_PATH = "/ppe-display-api/strategy-suggestion.json"
 EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
@@ -265,7 +266,7 @@ def build_live_distribution_display_payload() -> dict[str, Any]:
 def create_display_payload_wsgi_app(
     payload_provider: Callable[[], dict[str, Any]],
 ) -> Callable[..., Any]:
-    """Minimal WSGI app for platform proxy (display.json + belief-overlay.json)."""
+    """Minimal WSGI app for platform proxy (display, belief overlay, strategy suggestion)."""
 
     def app(environ: dict[str, Any], start_response: Callable[..., Any]) -> list[bytes]:
         path = (environ.get("PATH_INFO") or "").rstrip("/") or "/"
@@ -340,6 +341,66 @@ def create_display_payload_wsgi_app(
             )
             body = json.dumps(overlay, separators=(",", ":"), sort_keys=True).encode("utf-8")
             status = "200 OK" if overlay.get("kind") == BELIEF_OVERLAY_KIND else "404 Not Found"
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
+        if path == "/strategy-suggestion.json":
+            from src.viz.strategy_suggestion_boundary import (
+                STRATEGY_SUGGESTION_KIND,
+                build_strategy_suggestion_response,
+            )
+
+            qs = parse_qs(environ.get("QUERY_STRING") or "", keep_blank_values=False)
+            expiry = (qs.get("expiry") or [""])[0].strip()
+            forward_mult = _query_float(environ, "forward_mult", 1.0)
+            vol_mult = _query_float(environ, "vol_mult", 1.0)
+            if not expiry:
+                err = json.dumps(
+                    {"kind": "strategy_suggestion_error", "error": "expiry query param required"},
+                    separators=(",", ":"),
+                ).encode("utf-8")
+                start_response(
+                    "400 Bad Request",
+                    [
+                        ("Content-Type", "application/json; charset=utf-8"),
+                        ("Content-Length", str(len(err))),
+                        ("Cache-Control", "no-store"),
+                    ],
+                )
+                return [err]
+            try:
+                suggestion = build_strategy_suggestion_response(
+                    expiry_date=expiry,
+                    forward_mult=forward_mult,
+                    vol_mult=vol_mult,
+                )
+            except Exception as exc:  # noqa: BLE001
+                err = json.dumps(
+                    {"kind": "strategy_suggestion_error", "error": str(exc)},
+                    separators=(",", ":"),
+                ).encode("utf-8")
+                start_response(
+                    "503 Service Unavailable",
+                    [
+                        ("Content-Type", "application/json; charset=utf-8"),
+                        ("Content-Length", str(len(err))),
+                        ("Cache-Control", "no-store"),
+                    ],
+                )
+                return [err]
+            body = json.dumps(suggestion, separators=(",", ":"), sort_keys=True).encode("utf-8")
+            status = (
+                "200 OK"
+                if suggestion.get("kind") == STRATEGY_SUGGESTION_KIND
+                else "404 Not Found"
+            )
             start_response(
                 status,
                 [
