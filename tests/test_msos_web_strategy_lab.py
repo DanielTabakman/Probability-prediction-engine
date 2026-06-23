@@ -44,20 +44,25 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     assert "Higher" in builder
     assert "More vol" in builder
     assert "PpeEmbedBoundary" not in content
-    assert "buildOutcomeFromView" in panel
+    assert "buildOutcomeFromTuning" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
     tuning = (MSOS_WEB / "src" / "lib" / "beliefTuning.ts").read_text(encoding="utf-8")
     assert "fetchBeliefOverlayPdf" in tuning
-    assert "tuningFromView" in tuning
+    assert "nudgeTuning" in tuning
+    assert "loadStoredBeliefTuning" in tuning
+
+    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
+    assert "slider-input" in fine
 
     presets = (MSOS_WEB / "src" / "lib" / "beliefPresets.ts").read_text(encoding="utf-8")
-    assert "toggleBeliefDirection" in presets
-    assert "toggleBeliefVolatility" in presets
+    assert "buildOutcomeFromTuning" in presets
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".belief-axis-pair" in styles
     assert ".belief-preset" in styles
+    assert ".slider-input" in styles
+    assert "Reset to market" in builder
 
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
@@ -80,6 +85,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "beliefPdfPct" in panel
     assert "selectedExpiry" in panel
     assert 'className="legend"' in panel
+    assert "BeliefFineTuning" in panel
     assert "belief-axis-pair" in builder
 
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")

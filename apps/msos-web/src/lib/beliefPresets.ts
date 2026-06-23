@@ -114,6 +114,21 @@ export function viewFromPresetId(id: BeliefPresetId): BeliefView {
   }
 }
 
+export function tuningFromView(view: BeliefView): {
+  forward_mult: number;
+  vol_mult: number;
+} {
+  let forward_mult = 1.0;
+  if (view.direction === "higher") forward_mult = BELIEF_DIRECTION_MULT;
+  if (view.direction === "lower") forward_mult = 2 - BELIEF_DIRECTION_MULT;
+
+  let vol_mult = 1.0;
+  if (view.volatility === "more") vol_mult = BELIEF_VOL_MORE_MULT;
+  if (view.volatility === "less") vol_mult = BELIEF_VOL_LESS_MULT;
+
+  return { forward_mult, vol_mult };
+}
+
 export function buildBeliefViewLabel(view: BeliefView): string {
   const parts: string[] = [];
   if (view.direction === "higher") parts.push("Higher");
@@ -222,41 +237,62 @@ export function buildOutcomeFromView(
   live: boolean,
   expiryDate?: string,
 ): LabOutcomeSummary {
-  const label = buildBeliefViewLabel(view);
-  if (!hasBeliefView(view)) {
-    throw new Error("Belief view is empty");
-  }
+  return buildOutcomeFromTuning(tuningFromView(view), payload, live, expiryDate);
+}
+
+export function buildOutcomeFromTuning(
+  tuning: { forward_mult: number; vol_mult: number },
+  payload: DisplayPayload | null | undefined,
+  live: boolean,
+  expiryDate?: string,
+): LabOutcomeSummary {
+  const forwardHigh = tuning.forward_mult > 1.002;
+  const forwardLow = tuning.forward_mult < 0.998;
+  const volHigh = tuning.vol_mult > 1.02;
+  const volLow = tuning.vol_mult < 0.98;
+  const labelParts: string[] = [];
+  if (forwardHigh) labelParts.push("Higher");
+  if (forwardLow) labelParts.push("Lower");
+  if (volHigh) labelParts.push("More vol");
+  if (volLow) labelParts.push("Less vol");
+  const label = labelParts.length ? labelParts.join(" · ") : "Custom view";
+
+  const phraseParts: string[] = [];
+  if (forwardHigh) phraseParts.push("finish higher than options imply");
+  if (forwardLow) phraseParts.push("finish lower than options imply");
+  if (volHigh) phraseParts.push("with more vol than the market");
+  if (volLow) phraseParts.push("with less vol than the market");
+  const phrase = phraseParts.length ? phraseParts.join(" ") : "differ from what options imply";
+
   if (live && payload) {
     const marketWidth = marketWidthFromPayload(payload);
     const expiry = expiryLabelFromPayload(payload, expiryDate);
     const base = buildOutcomeFromPayload(payload);
-    const phrase = buildBeliefViewPhrase(view);
 
     let headline = "Your view differs from what options are pricing.";
-    if (view.direction === "higher" && !view.volatility) {
+    if (forwardHigh && !volHigh && !volLow) {
       headline = "You're bullish versus what options are pricing.";
-    } else if (view.direction === "lower" && !view.volatility) {
+    } else if (forwardLow && !volHigh && !volLow) {
       headline = "You're bearish versus what options are pricing.";
-    } else if (!view.direction && view.volatility === "more") {
+    } else if (!forwardHigh && !forwardLow && volHigh) {
       headline = "You expect bigger moves than the market is pricing.";
-    } else if (!view.direction && view.volatility === "less") {
+    } else if (!forwardHigh && !forwardLow && volLow) {
       headline = "You expect a calmer path than the market is pricing.";
-    } else if (view.direction && view.volatility) {
+    } else if ((forwardHigh || forwardLow) && (volHigh || volLow)) {
       headline = "You're disagreeing on both price level and range width.";
     }
 
-    const body = `For ${expiry}, live Deribit options set the baseline. You picked **${label}** — you think BTC will ${phrase}. The market's middle-50% range is about ${marketWidth}. Confirm when that matches your view.`;
+    const body = `For ${expiry}, live Deribit options set the baseline. Your view is **${label}** — you think BTC will ${phrase}. The market's middle-50% range is about ${marketWidth}. Confirm when that matches your view.`;
 
-    const marketScore =
-      view.direction === "higher"
-        ? "Skewed up"
-        : view.direction === "lower"
-          ? "Skewed down"
-          : view.volatility === "more"
-            ? "Wider"
-            : view.volatility === "less"
-              ? "Tighter"
-              : "Mixed";
+    const marketScore = forwardHigh
+      ? "Skewed up"
+      : forwardLow
+        ? "Skewed down"
+        : volHigh
+          ? "Wider"
+          : volLow
+            ? "Tighter"
+            : "Mixed";
 
     return {
       tag: "Your view",
@@ -273,13 +309,12 @@ export function buildOutcomeFromView(
     };
   }
 
-  const phrase = buildBeliefViewPhrase(view);
   return {
     tag: "Your view",
     tagTone: "teal",
-    delta: view.volatility === "less" && !view.direction ? "21%" : "—",
+    delta: volLow && !forwardHigh && !forwardLow ? "21%" : "—",
     headline: `You think BTC will ${phrase}.`,
-    body: `You selected ${label}. Confirm when this matches what you actually believe.`,
+    body: `Your view: ${label}. Confirm when this matches what you actually believe.`,
     scores: [
       { label: "Market", value: "From options", tone: "amber" },
       { label: "You", value: label, tone: "teal" },
