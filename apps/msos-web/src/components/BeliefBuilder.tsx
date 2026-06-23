@@ -4,11 +4,16 @@ import { useEffect, useState } from "react";
 
 import { ExpiryPicker } from "@/components/ExpiryPicker";
 import {
-  BELIEF_PRESETS,
-  loadStoredBeliefPresetId,
-  saveBeliefPresetId,
-  type BeliefPreset,
-  type BeliefPresetId,
+  buildBeliefViewLabel,
+  buildBeliefViewPhrase,
+  hasBeliefView,
+  loadStoredBeliefView,
+  saveBeliefView,
+  toggleBeliefDirection,
+  toggleBeliefVolatility,
+  type BeliefDirection,
+  type BeliefView,
+  type BeliefVolatility,
 } from "@/lib/beliefPresets";
 
 type BeliefBuilderProps = {
@@ -16,43 +21,75 @@ type BeliefBuilderProps = {
   expiryOptions: string[];
   onExpiryChange: (expiry: string) => void;
   expiryPickerDisabled?: boolean;
-  selectedId: BeliefPresetId | null;
-  onSelect: (preset: BeliefPreset) => void;
+  view: BeliefView;
+  onChange: (view: BeliefView) => void;
 };
+
+function BeliefPairButton({
+  label,
+  active,
+  disabled,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`belief-preset${active ? " active" : ""}`}
+      aria-pressed={active}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+}
 
 export function BeliefBuilder({
   expiryLabel,
   expiryOptions,
   onExpiryChange,
   expiryPickerDisabled = false,
-  selectedId,
-  onSelect,
+  view,
+  onChange,
 }: BeliefBuilderProps) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const stored = loadStoredBeliefPresetId();
-    if (stored) {
-      const preset = BELIEF_PRESETS.find((p) => p.id === stored);
-      if (preset) onSelect(preset);
+    const stored = loadStoredBeliefView();
+    if (hasBeliefView(stored)) {
+      onChange(stored);
     }
     setHydrated(true);
-  }, [onSelect]);
+  }, [onChange]);
 
-  function handleSelect(preset: BeliefPreset) {
-    saveBeliefPresetId(preset.id);
-    onSelect(preset);
+  function applyView(next: BeliefView) {
+    saveBeliefView(next);
+    onChange(next);
   }
 
-  const selected = BELIEF_PRESETS.find((p) => p.id === selectedId) ?? null;
+  function handleDirection(direction: BeliefDirection) {
+    applyView(toggleBeliefDirection(view, direction));
+  }
+
+  function handleVolatility(volatility: BeliefVolatility) {
+    applyView(toggleBeliefVolatility(view, volatility));
+  }
+
+  const active = hasBeliefView(view);
+  const viewLabel = buildBeliefViewLabel(view);
 
   return (
     <div className="belief-builder">
       <h3>What do you believe?</h3>
       <p className="selectline" aria-live="polite">
-        {selected ? (
+        {active ? (
           <>
-            I think BTC will {selected.directionPhrase} by{" "}
+            I think BTC will {buildBeliefViewPhrase(view)} by{" "}
             <ExpiryPicker
               value={expiryLabel}
               options={expiryOptions}
@@ -64,37 +101,62 @@ export function BeliefBuilder({
           </>
         ) : (
           <>
-            Pick one —{" "}
-            <span className="selectchip muted">higher</span>,{" "}
-            <span className="selectchip muted">lower</span>,{" "}
-            <span className="selectchip muted">more vol</span>, or{" "}
-            <span className="selectchip muted">less vol</span> than options imply.
+            Tap <strong>Higher</strong> or <strong>Lower</strong> for price,{" "}
+            <strong>More vol</strong> or <strong>Less vol</strong> for range — by{" "}
+            <ExpiryPicker
+              value={expiryLabel}
+              options={expiryOptions}
+              onChange={onExpiryChange}
+              disabled={expiryPickerDisabled}
+              className="selectchip"
+            />
+            .
           </>
         )}
       </p>
 
-      <div className="belief-preset-grid" role="group" aria-label="Belief presets">
-        {BELIEF_PRESETS.map((preset) => {
-          const active = preset.id === selectedId;
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              className={`belief-preset${active ? " active" : ""}`}
-              aria-pressed={active}
-              onClick={() => handleSelect(preset)}
+      <div className="belief-axis-list" aria-label="Belief controls">
+        <div className="belief-axis-row" role="group" aria-label="Price versus market">
+          <span className="belief-axis-label">Price</span>
+          <div className="belief-axis-pair">
+            <BeliefPairButton
+              label="Higher"
+              active={view.direction === "higher"}
               disabled={!hydrated}
-            >
-              {preset.label}
-            </button>
-          );
-        })}
+              onClick={() => handleDirection("higher")}
+            />
+            <BeliefPairButton
+              label="Lower"
+              active={view.direction === "lower"}
+              disabled={!hydrated}
+              onClick={() => handleDirection("lower")}
+            />
+          </div>
+        </div>
+
+        <div className="belief-axis-row" role="group" aria-label="Volatility versus market">
+          <span className="belief-axis-label">Volatility</span>
+          <div className="belief-axis-pair">
+            <BeliefPairButton
+              label="More vol"
+              active={view.volatility === "more"}
+              disabled={!hydrated}
+              onClick={() => handleVolatility("more")}
+            />
+            <BeliefPairButton
+              label="Less vol"
+              active={view.volatility === "less"}
+              disabled={!hydrated}
+              onClick={() => handleVolatility("less")}
+            />
+          </div>
+        </div>
       </div>
 
       <p className="micro">
-        {selected
-          ? "This compares your view to the market curve — not a trade recommendation."
-          : "Tap a button to see how your view differs from what options price."}
+        {active
+          ? `Your view: ${viewLabel}. Tap again to clear a button. Chart updates as you push.`
+          : "Push the buttons to see how your view differs from what options price."}
       </p>
     </div>
   );

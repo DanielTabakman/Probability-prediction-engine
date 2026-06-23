@@ -2,8 +2,14 @@
  * Strategy Lab belief fine-tuning — display/proxy only (math in Python).
  */
 
-import type { BeliefPresetId } from "@/lib/beliefPresets";
-import { BELIEF_PRESET_MULTS } from "@/lib/beliefPresets";
+import type { BeliefPresetId, BeliefView } from "@/lib/beliefPresets";
+import {
+  BELIEF_DIRECTION_MULT,
+  BELIEF_VOL_LESS_MULT,
+  BELIEF_VOL_MORE_MULT,
+  BELIEF_PRESET_MULTS,
+  presetIdFromView,
+} from "@/lib/beliefPresets";
 
 export const PPE_BELIEF_OVERLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_BELIEF_OVERLAY_API_URL ?? "/ppe-display-api/belief-overlay.json"
@@ -32,6 +38,21 @@ export type BeliefOverlayResponse = {
   vol_mult?: number;
   error?: string;
 };
+
+export function tuningFromView(view: BeliefView): BeliefTuning {
+  let forward_mult = 1.0;
+  if (view.direction === "higher") forward_mult = BELIEF_DIRECTION_MULT;
+  if (view.direction === "lower") forward_mult = 2 - BELIEF_DIRECTION_MULT;
+
+  let vol_mult = 1.0;
+  if (view.volatility === "more") vol_mult = BELIEF_VOL_MORE_MULT;
+  if (view.volatility === "less") vol_mult = BELIEF_VOL_LESS_MULT;
+
+  return {
+    forward_mult: clampTuningValue("forward_mult", forward_mult),
+    vol_mult: clampTuningValue("vol_mult", vol_mult),
+  };
+}
 
 export function tuningFromPreset(presetId: BeliefPresetId): BeliefTuning {
   const mults = BELIEF_PRESET_MULTS[presetId];
@@ -88,6 +109,20 @@ export async function fetchBeliefOverlayPdf(
   } catch {
     return null;
   }
+}
+
+export function tuningMatchesView(view: BeliefView, tuning: BeliefTuning): boolean {
+  const expected = tuningFromView(view);
+  return (
+    Math.abs(expected.forward_mult - tuning.forward_mult) < 0.0001 &&
+    Math.abs(expected.vol_mult - tuning.vol_mult) < 0.0001
+  );
+}
+
+export function presetIdForTuningCache(view: BeliefView, tuning: BeliefTuning): BeliefPresetId | null {
+  const presetId = presetIdFromView(view);
+  if (!presetId) return null;
+  return tuningMatchesPreset(presetId, tuning) ? presetId : null;
 }
 
 export function tuningMatchesPreset(presetId: BeliefPresetId, tuning: BeliefTuning): boolean {
