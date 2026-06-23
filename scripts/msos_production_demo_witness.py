@@ -93,6 +93,27 @@ def validate_display_api_response(
     return True, None, data
 
 
+def validate_belief_overlay_api_response(
+    status: int,
+    body: str,
+) -> tuple[bool, str | None]:
+    if status != 200:
+        snippet = (body or "")[:200].strip()
+        return False, f"HTTP {status}" + (f": {snippet}" if snippet else "")
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return False, "invalid JSON"
+    if not isinstance(data, dict):
+        return False, "payload not an object"
+    if data.get("kind") != "belief_overlay":
+        return False, f"unexpected kind {data.get('kind')!r}"
+    pdf = data.get("pdf_pct")
+    if not isinstance(pdf, list) or len(pdf) < 2:
+        return False, "pdf_pct missing or too short"
+    return True, None
+
+
 def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     """Strategy Lab must expose a live PPE surface, not degraded embed placeholder."""
     if "Sample mode — not live market data" in html:
@@ -172,6 +193,30 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
         }
     )
 
+    overlay_ok = False
+    overlay_msg: str | None = "display API unavailable for overlay probe"
+    overlay_url = f"{base}/ppe-display-api/belief-overlay.json"
+    if d_ok and d_data:
+        series = d_data.get("series_by_expiry") or []
+        expiry = series[0].get("expiry_date") if series else None
+        if expiry:
+            overlay_url = (
+                f"{overlay_url}?expiry={expiry}&forward_mult=1.06&vol_mult=1.0"
+            )
+            o_status, o_body, o_err = _fetch(overlay_url)
+            overlay_ok, overlay_msg = validate_belief_overlay_api_response(o_status, o_body)
+            if o_err and not overlay_ok:
+                overlay_msg = o_err
+    checks.append(
+        {
+            "id": "ppe_belief_overlay_api",
+            "url": overlay_url,
+            "ok": overlay_ok,
+            "status": 200 if overlay_ok else 0,
+            "error": overlay_msg,
+        }
+    )
+
     lab_url = f"{base}/strategy-lab"
     lab_status, lab_body, lab_err = _fetch(lab_url)
     lab_ok, lab_msg = validate_strategy_lab_html(lab_body) if lab_status == 200 else (False, lab_err)
@@ -218,7 +263,7 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
 
     failed = [c for c in checks if not c.get("ok")]
     optional_ids = frozenset({"research_beta_cta"})
-    integration_ids = frozenset({"ppe_display_api", "strategy_lab_ppe_surface"})
+    integration_ids = frozenset({"ppe_display_api", "ppe_belief_overlay_api", "strategy_lab_ppe_surface"})
     journey_failed = [c for c in failed if c["id"] not in optional_ids]
     integration_failed = [c for c in failed if c["id"] in integration_ids]
     return {

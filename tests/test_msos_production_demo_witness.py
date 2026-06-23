@@ -8,6 +8,7 @@ from scripts.msos_production_demo_witness import (
     FIXTURE_PREVIEW_SPOT,
     _collect_fixture_warnings,
     _has_research_cta,
+    validate_belief_overlay_api_response,
     validate_display_api_response,
     validate_strategy_lab_html,
 )
@@ -48,6 +49,19 @@ def test_validate_display_api_response_display_error_kind() -> None:
     ok, err, _ = validate_display_api_response(503, body)
     assert ok is False
     assert "Deribit" in (err or "")
+
+
+def test_validate_belief_overlay_api_response_ok() -> None:
+    body = json.dumps({"kind": "belief_overlay", "pdf_pct": [0.0, 12.5, 0.0]})
+    ok, err = validate_belief_overlay_api_response(200, body)
+    assert ok is True
+    assert err is None
+
+
+def test_validate_belief_overlay_api_response_not_found() -> None:
+    ok, err = validate_belief_overlay_api_response(404, "not found")
+    assert ok is False
+    assert "404" in (err or "")
 
 
 def test_validate_strategy_lab_html_native_chart() -> None:
