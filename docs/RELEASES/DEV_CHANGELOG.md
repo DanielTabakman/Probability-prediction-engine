@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-23
+
+- `d8a1f92` — Control-plane: dev changelog
+
 ## 2026-06-22
 
+- `53bf89a` — fix(msos-web): pass Strategy Lab chart as server slot to client panel (#290) (`apps/msos-web/`)
 - `adfe5cb` — fix(msos-web): Strategy Lab crash when picking a belief view (#289) (`apps/msos-web/`)
 - `5f617af` — ops(control-plane): permissions.json + queue/manifest direction reconcile (#287) (`docs/SOP/`)
 - `ce32b30` — copy(msos-shell): homepage trader positioning pass (#284) (`apps/msos-web/`)
