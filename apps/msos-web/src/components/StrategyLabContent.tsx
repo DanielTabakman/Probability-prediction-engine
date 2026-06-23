@@ -1,13 +1,8 @@
 import Link from "next/link";
 
-import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
-import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
-import {
-  buildLabMetricsFromPayload,
-  type DisplayPayload,
-  type LabMetric,
-} from "@/lib/ppeDisplayPayload";
+import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
 
 type StrategyLabContentProps = {
   displayPayload?: DisplayPayload | null;
@@ -15,9 +10,6 @@ type StrategyLabContentProps = {
 
 export function StrategyLabContent({ displayPayload = null }: StrategyLabContentProps) {
   const live = displayPayload != null;
-  const metrics: LabMetric[] = live
-    ? buildLabMetricsFromPayload(displayPayload)
-    : strategyLabMetrics;
 
   return (
     <>
@@ -41,22 +33,7 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
         </div>
       </header>
 
-      <section className="metrics" aria-label="Lab context">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="metric">
-            <div className="label">{metric.label}</div>
-            <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
-          </div>
-        ))}
-      </section>
-
-      <section className="work strategy-lab-work">
-        <StrategyLabInteractivePanel
-          displayPayload={displayPayload}
-          live={live}
-          defaultOutcome={outcomeSummary}
-        />
-      </section>
+      <StrategyLabWorkSection displayPayload={displayPayload} />
 
       <p className="footer-note">{DEMO_FOOTER}</p>
     </>

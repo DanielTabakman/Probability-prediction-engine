@@ -20,6 +20,7 @@ export type DisplaySeries = {
     median_usd: number;
     q3_usd: number;
   };
+  belief_presets?: Partial<Record<string, BeliefPresetOverlay>>;
 };
 
 export type DisplaySummaryRow = Record<string, string>;
@@ -102,15 +103,46 @@ function primaryLognormalRow(payload: DisplayPayload): DisplaySummaryRow | undef
   });
 }
 
-export function buildLabMetricsFromPayload(payload: DisplayPayload): LabMetric[] {
-  const primary = payload.series_by_expiry.find(isDisplaySeries);
-  const lognormal = primaryLognormalRow(payload);
+export function listExpiryDates(payload: DisplayPayload): string[] {
+  return payload.series_by_expiry.filter(isDisplaySeries).map((series) => series.expiry_date);
+}
+
+export function findSeriesByExpiry(
+  payload: DisplayPayload,
+  expiryDate: string,
+): DisplaySeries | undefined {
+  return payload.series_by_expiry.find(
+    (series) => isDisplaySeries(series) && series.expiry_date === expiryDate,
+  );
+}
+
+function summaryRowForExpiry(
+  payload: DisplayPayload,
+  expiryDate: string,
+): DisplaySummaryRow | undefined {
+  const rows = payload.summary?.table_rows ?? [];
+  return rows.find((row) => {
+    const method = (row.Method ?? row.method ?? "").toLowerCase();
+    const expiry = row.Expiry ?? row.expiry_date ?? row.expiry ?? "";
+    const isLognormal = method.includes("lognormal") || method.includes("reference");
+    return isLognormal && String(expiry).startsWith(expiryDate.slice(0, 10));
+  });
+}
+
+export function buildLabMetricsFromPayload(
+  payload: DisplayPayload,
+  expiryDate?: string,
+): LabMetric[] {
+  const dates = listExpiryDates(payload);
+  const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
+  const primary = resolvedExpiry ? findSeriesByExpiry(payload, resolvedExpiry) : undefined;
+  const lognormal = resolvedExpiry ? summaryRowForExpiry(payload, resolvedExpiry) : primaryLognormalRow(payload);
   const marketWidth = lognormal?.["Implied range width (IQR)"] ?? "—";
   const median = lognormal?.["Median terminal price (50th %)"] ?? "—";
 
   return [
     { label: "Market", value: "BTC options" },
-    { label: "Expiry", value: primary?.expiry_date ?? "—" },
+    { label: "Expiry", value: primary?.expiry_date ?? resolvedExpiry ?? "—" },
     { label: "Spot", value: formatUsd(payload.spot_usd) },
     { label: "Market range (IQR)", value: marketWidth, tone: "amber" },
     { label: "Market median", value: median, tone: "teal" },

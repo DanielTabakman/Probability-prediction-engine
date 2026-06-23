@@ -127,12 +127,12 @@ def build_distribution_display_payload(
 ) -> dict[str, Any]:
     """JSON-serializable read-only payload for MSOS chart shell (no new math)."""
     summary = summary_panel_contract(export_rows)
-    series = [
-        s
-        for row in export_rows
-        if (s := build_chart_series_from_export_row(row)) is not None
-    ]
-    belief_presets = build_belief_preset_overlays(series[0]) if series else {}
+    series = []
+    for row in export_rows:
+        if (s := build_chart_series_from_export_row(row)) is not None:
+            s["belief_presets"] = build_belief_preset_overlays(s)
+            series.append(s)
+    belief_presets = series[0].get("belief_presets", {}) if series else {}
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
