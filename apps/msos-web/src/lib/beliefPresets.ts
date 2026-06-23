@@ -7,6 +7,17 @@ import { buildOutcomeFromPayload } from "@/lib/ppeDisplayPayload";
 
 export type BeliefPresetId = "higher" | "lower" | "more_volatility" | "less_volatility";
 
+/** Mirror Python BELIEF_PRESET_DISPLAY_SHIFTS — display routing only. */
+export const BELIEF_PRESET_MULTS: Record<
+  BeliefPresetId,
+  { forward_mult: number; vol_mult: number }
+> = {
+  higher: { forward_mult: 1.06, vol_mult: 1.0 },
+  lower: { forward_mult: 0.94, vol_mult: 1.0 },
+  more_volatility: { forward_mult: 1.0, vol_mult: 1.35 },
+  less_volatility: { forward_mult: 1.0, vol_mult: 0.65 },
+};
+
 export type BeliefPreset = {
   id: BeliefPresetId;
   label: string;
