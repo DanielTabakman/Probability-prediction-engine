@@ -2,10 +2,9 @@
 
 /**
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
- * Client component: rendered inside Strategy Lab interactive panel after belief picks.
- * Live payload is fetched server-side in strategy-lab/page.tsx and passed down.
  */
 
+import type { BeliefPresetId } from "@/lib/beliefPresets";
 import {
   PPE_EMBED_ONLY_PARAM,
   type DisplayPayload,
@@ -51,8 +50,29 @@ function seriesToSvgPath(
   return `M ${points.join(" L ")}`;
 }
 
-function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; spotUsd: number }) {
-  const path = seriesToSvgPath(series.prices_usd, series.pdf_pct, 700, 280, 20);
+function filledAreaPath(linePath: string): string {
+  if (!linePath) return "";
+  return `${linePath} L 680,250 L 20,250 Z`;
+}
+
+type NativeDistributionChartProps = {
+  series: DisplaySeries;
+  spotUsd: number;
+  beliefPdfPct?: number[] | null;
+  beliefLabel?: string | null;
+};
+
+function NativeDistributionChart({
+  series,
+  spotUsd,
+  beliefPdfPct,
+  beliefLabel,
+}: NativeDistributionChartProps) {
+  const marketPath = seriesToSvgPath(series.prices_usd, series.pdf_pct, 700, 280, 20);
+  const beliefPath =
+    beliefPdfPct && beliefPdfPct.length === series.prices_usd.length
+      ? seriesToSvgPath(series.prices_usd, beliefPdfPct, 700, 280, 20)
+      : "";
   const spotX =
     series.prices_usd.length > 1
       ? 20 +
@@ -61,16 +81,29 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
           660
       : 350;
 
+  const ariaLabel = beliefLabel
+    ? `Distribution curves for ${series.expiry_date} — market vs your ${beliefLabel} view`
+    : `Distribution curve for ${series.expiry_date}`;
+
   return (
     <>
-      <div className="graph" role="img" aria-label={`Distribution curve for ${series.expiry_date}`}>
+      <div className="graph" role="img" aria-label={ariaLabel}>
         <svg viewBox="0 0 700 280" preserveAspectRatio="none">
           <path
-            d={`${path} L 680,250 L 20,250 Z`}
+            d={filledAreaPath(marketPath)}
             stroke="#9e8bff"
             strokeWidth="4"
             fill="rgba(158, 139, 255, 0.14)"
           />
+          {beliefPath ? (
+            <path
+              d={filledAreaPath(beliefPath)}
+              stroke="#2dd4bf"
+              strokeWidth="3"
+              strokeDasharray="6 4"
+              fill="rgba(45, 212, 191, 0.16)"
+            />
+          ) : null}
           <line x1={spotX} y1="38" x2={spotX} y2="250" stroke="#233c55" strokeDasharray="5 8" />
           <text x={spotX + 4} y="54" fill="#8ea4bd" fontSize="12">
             spot
@@ -91,20 +124,42 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
 
 type PpeEmbedBoundaryProps = {
   payload: DisplayPayload | null;
+  beliefPresetId?: BeliefPresetId | null;
+  beliefLabel?: string | null;
 };
 
-export function PpeEmbedBoundary({ payload }: PpeEmbedBoundaryProps) {
+export function PpeEmbedBoundary({
+  payload,
+  beliefPresetId = null,
+  beliefLabel = null,
+}: PpeEmbedBoundaryProps) {
   if (payload) {
     const primary = payload.series_by_expiry.find(isDisplaySeries);
     if (!primary) {
       return null;
     }
+    const beliefOverlay =
+      beliefPresetId && payload.belief_presets
+        ? payload.belief_presets[beliefPresetId]?.pdf_pct
+        : null;
+
     return (
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
         <p className="ppe-embed-live-note">
           <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
+          {beliefOverlay ? (
+            <>
+              {" "}
+              <span className="tag teal">Your view</span> Teal dashed curve = your belief preset.
+            </>
+          ) : null}
         </p>
-        <NativeDistributionChart series={primary} spotUsd={payload.spot_usd} />
+        <NativeDistributionChart
+          series={primary}
+          spotUsd={payload.spot_usd}
+          beliefPdfPct={beliefOverlay}
+          beliefLabel={beliefLabel}
+        />
       </div>
     );
   }

@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
@@ -56,7 +55,6 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
           displayPayload={displayPayload}
           live={live}
           defaultOutcome={outcomeSummary}
-          chartRegion={<PpeEmbedBoundary payload={displayPayload} />}
         />
       </section>
 

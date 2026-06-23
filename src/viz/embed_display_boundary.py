@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from typing import Any, Callable
 
-from src.engine.implied_distribution import build_distribution_chart_data
+from src.engine.implied_distribution import build_distribution_chart_data, lognormal_pdf
 from src.viz.distribution_summary_panel import summary_panel_contract
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_TITLE
 
@@ -22,6 +22,44 @@ EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
 DISPLAY_PAYLOAD_MODE = "native_json"
 EMBED_ONLY_FALLBACK_MODE = "streamlit_embed_only"
+
+# MSOS Strategy Lab belief presets — illustrative lognormal shifts vs market reference (display only).
+BELIEF_PRESET_DISPLAY_SHIFTS: dict[str, dict[str, float]] = {
+    "higher": {"forward_mult": 1.06, "vol_mult": 1.0},
+    "lower": {"forward_mult": 0.94, "vol_mult": 1.0},
+    "more_volatility": {"forward_mult": 1.0, "vol_mult": 1.35},
+    "less_volatility": {"forward_mult": 1.0, "vol_mult": 0.65},
+}
+
+
+def _peak_scaled_pdf_pct(pdf: list[float]) -> list[float]:
+    """Match ``build_distribution_chart_data`` y-axis scaling (peak ≈ 25%)."""
+    max_pdf = max(pdf) if pdf else 0.0
+    if max_pdf <= 0:
+        return [0.0] * len(pdf)
+    return [float(d) / max_pdf * 25.0 for d in pdf]
+
+
+def build_belief_preset_overlays(series: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Pre-computed belief curves on the market price grid for MSOS chart overlay."""
+    forward = float(series.get("forward_usd") or 0.0)
+    vol = float(series.get("atm_iv_annual") or 0.0)
+    t_years = float(series.get("T_years") or 0.0)
+    prices = series.get("prices_usd") or []
+    if forward <= 0 or vol <= 0 or t_years <= 0 or not prices:
+        return {}
+
+    overlays: dict[str, dict[str, Any]] = {}
+    for preset_id, mults in BELIEF_PRESET_DISPLAY_SHIFTS.items():
+        belief_forward = forward * float(mults["forward_mult"])
+        belief_vol = vol * float(mults["vol_mult"])
+        pdf = lognormal_pdf(belief_forward, belief_vol, t_years, prices)
+        overlays[preset_id] = {
+            "pdf_pct": _peak_scaled_pdf_pct(pdf),
+            "forward_usd": belief_forward,
+            "atm_iv_annual": belief_vol,
+        }
+    return overlays
 
 
 def _parse_float(value: str | float | int | None) -> float | None:
@@ -94,6 +132,7 @@ def build_distribution_display_payload(
         for row in export_rows
         if (s := build_chart_series_from_export_row(row)) is not None
     ]
+    belief_presets = build_belief_preset_overlays(series[0]) if series else {}
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
@@ -103,6 +142,7 @@ def build_distribution_display_payload(
         "title": DIST_SUMMARY_TITLE,
         "summary": summary,
         "series_by_expiry": series,
+        "belief_presets": belief_presets,
         "meta": {
             "read_only": True,
             "display_mode": DISPLAY_PAYLOAD_MODE,

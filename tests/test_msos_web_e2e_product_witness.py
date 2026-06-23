@@ -52,8 +52,8 @@ def test_e2e_strategy_lab_embed_and_workflow_paths() -> None:
     confirm = (APP / "strategy-lab" / "confirm" / "page.tsx").read_text(encoding="utf-8")
     expression = (APP / "strategy-lab" / "expression" / "page.tsx").read_text(encoding="utf-8")
     assert "StrategyLabInteractivePanel" in content
-    assert "PpeEmbedBoundary" in content
-    assert "chartRegion" in panel
+    assert "PpeEmbedBoundary" in panel
+    assert "beliefPresetId" in panel
     assert "chromeless" in embed.lower() or "embed" in embed.lower()
     assert "confirm" in confirm.lower()
     assert "expression" in expression.lower()

@@ -35,10 +35,9 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     )
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
     assert "StrategyLabInteractivePanel" in panel
-    assert "chartRegion" in panel
-    assert "PpeEmbedBoundary" not in panel
-    assert "PpeEmbedBoundary" in content
-    assert "chartRegion=" in content
+    assert "PpeEmbedBoundary" in panel
+    assert "beliefPresetId" in panel
+    assert "PpeEmbedBoundary" not in content
     assert "buildOutcomeFromBelief" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
@@ -59,7 +58,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
         encoding="utf-8"
     )
     assert "Market vs your view" in panel
-    assert "chartRegion" in panel
+    assert "PpeEmbedBoundary" in panel
+    assert "beliefPresetId" in panel
     assert 'className="legend"' in panel
     assert 'className="controls"' in panel
 
@@ -69,7 +69,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert '"use client"' in embed
-    assert "async function PpeEmbedBoundary" not in embed
+    assert "beliefPdfPct" in embed
+    assert "belief_presets" in embed or "beliefPresetId" in embed
     assert "ppeDisplayPayload" in embed
     assert "PPE_EMBED_ONLY_PARAM" in embed
     assert "iframe" in embed
