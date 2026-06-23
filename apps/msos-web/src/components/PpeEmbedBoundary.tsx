@@ -1,12 +1,15 @@
+"use client";
+
 /**
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
+ * Client component: rendered inside Strategy Lab interactive panel after belief picks.
+ * Live payload is fetched server-side in strategy-lab/page.tsx and passed down.
  */
 
 import {
   PPE_EMBED_ONLY_PARAM,
   type DisplayPayload,
   type DisplaySeries,
-  fetchDisplayPayload,
   formatUsd,
   isDisplaySeries,
   PPE_EMBED_URL,
@@ -87,12 +90,10 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
 }
 
 type PpeEmbedBoundaryProps = {
-  payload?: DisplayPayload | null;
+  payload: DisplayPayload | null;
 };
 
-export async function PpeEmbedBoundary({ payload: payloadProp }: PpeEmbedBoundaryProps = {}) {
-  const payload = payloadProp === undefined ? await fetchDisplayPayload() : payloadProp;
-
+export function PpeEmbedBoundary({ payload }: PpeEmbedBoundaryProps) {
   if (payload) {
     const primary = payload.series_by_expiry.find(isDisplaySeries);
     if (!primary) {
