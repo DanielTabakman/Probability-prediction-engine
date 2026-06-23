@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-22
 
+- `adfe5cb` — fix(msos-web): Strategy Lab crash when picking a belief view (#289) (`apps/msos-web/`)
+- `5f617af` — ops(control-plane): permissions.json + queue/manifest direction reconcile (#287) (`docs/SOP/`)
+- `ce32b30` — copy(msos-shell): homepage trader positioning pass (#284) (`apps/msos-web/`)
+- `cbc342b` — Control-plane: dev changelog
 - `1e580e8` — docs(msos-shell): add MSOS_PUBLIC_COPY_V1 trader copy canon (#283) (`docs/SOP/`)
 - `318ef86` — Control-plane: dev changelog
 - `48985db` — copy(msos-shell): rewrite public UI for new options traders (#281) (`apps/msos-web/`)
