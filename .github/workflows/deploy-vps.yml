@@ -24,7 +24,7 @@ jobs:
       PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
     steps:
       - name: SSH deploy
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         env:
           PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
           PPE_RESEARCH_OFFER_EMAIL: ${{ github.event_name == 'workflow_dispatch' && inputs.research_offer_email || secrets.PPE_RESEARCH_OFFER_EMAIL }}
