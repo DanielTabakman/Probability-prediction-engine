@@ -50,13 +50,15 @@ def test_strategy_lab_embed_boundary_present() -> None:
     )
     work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
-    assert "StrategyLabWorkSection" in content
+    assert "StrategyLabClientShell" in content
     assert "StrategyLabInteractivePanel" in work
     assert "PpeEmbedBoundary" in lab
     assert "beliefPresetId" in lab
-    assert "listExpiryDates" in lib
+    assert "fetchDisplayPayloadClient" in lib
+    assert "fetchDisplayPayloadFromUrl" in lib
     assert "selectedExpiry" in embed
     assert "ppeDisplayPayload" in embed
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in lib

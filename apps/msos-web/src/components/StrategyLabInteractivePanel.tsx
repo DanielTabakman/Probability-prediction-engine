@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
+import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
@@ -21,6 +22,7 @@ import {
 type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
   live: boolean;
+  dataMode: LabDataMode;
   defaultOutcome: LabOutcomeSummary;
   selectedExpiry: string;
   onExpiryChange: (expiry: string) => void;
@@ -30,6 +32,7 @@ type StrategyLabInteractivePanelProps = {
 export function StrategyLabInteractivePanel({
   displayPayload,
   live,
+  dataMode,
   defaultOutcome,
   selectedExpiry,
   onExpiryChange,
@@ -83,6 +86,8 @@ export function StrategyLabInteractivePanel({
 
         <PpeEmbedBoundary
           payload={displayPayload}
+          live={live}
+          dataMode={dataMode}
           selectedExpiry={selectedExpiry}
           beliefPresetId={selectedPresetId}
           beliefLabel={selectedPreset?.label ?? null}

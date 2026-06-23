@@ -49,12 +49,14 @@ def test_strategy_lab_belief_presets_interactive() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
     picker = (MSOS_WEB / "src" / "components" / "ExpiryPicker.tsx").read_text(encoding="utf-8")
-    assert "StrategyLabWorkSection" in content
+    copy = (MSOS_WEB / "src" / "lib" / "strategyLabCopy.ts").read_text(encoding="utf-8")
+    assert "StrategyLabClientShell" in content
+    assert "fetchDisplayPayloadClient" in shell
+    assert "Sample mode" in copy
     assert "ExpiryPicker" in work
-    assert "ExpiryPicker" in picker
-    assert "buildLabMetricsFromPayload" in work
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
@@ -73,10 +75,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert '"use client"' in embed
     assert "beliefPdfPct" in embed
-    assert "belief_presets" in embed or "beliefPresetId" in embed
+    assert "dataMode" in embed
     assert "ppeDisplayPayload" in embed
-    assert "PPE_EMBED_ONLY_PARAM" in embed
-    assert "iframe" in embed
     assert "degraded" in embed.lower() or "unavailable" in embed.lower()
     assert "prices_usd" in embed
     assert "ppe-summary-table" in embed
@@ -85,6 +85,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
     assert ".expiry-picker" in styles
+    assert ".lab-data-banner" in styles
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:
@@ -116,7 +117,7 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert "exploring" in persistence
     assert "confirmed" in persistence
 
-    lab = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    lab = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     assert 'href="/strategy-lab/confirm"' in lab
 
 

@@ -170,22 +170,18 @@ export function buildOutcomeFromPayload(payload: DisplayPayload): LabOutcomeSumm
   };
 }
 
-/** Server-side fetch target (Docker internal); browser uses public relative path. */
-function resolveDisplayApiFetchUrl(): string {
-  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
-  if (serverUrl) {
-    return serverUrl;
-  }
-  return PPE_DISPLAY_API_URL;
-}
-
-export async function fetchDisplayPayload(): Promise<DisplayPayload | null> {
-  const fetchUrl = resolveDisplayApiFetchUrl();
+export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<DisplayPayload | null> {
   if (!fetchUrl) {
     return null;
   }
   try {
-    const res = await fetch(fetchUrl, { cache: "no-store" });
+    const res = await fetch(fetchUrl, {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "msos-web/1",
+      },
+    });
     if (!res.ok) {
       return null;
     }
@@ -197,4 +193,22 @@ export async function fetchDisplayPayload(): Promise<DisplayPayload | null> {
   } catch {
     return null;
   }
+}
+
+/** Browser / public-path fetch (relative display API). */
+export async function fetchDisplayPayloadClient(): Promise<DisplayPayload | null> {
+  return fetchDisplayPayloadFromUrl(PPE_DISPLAY_API_URL);
+}
+
+/** Server-side fetch target (Docker internal); browser uses public relative path. */
+function resolveDisplayApiFetchUrl(): string {
+  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
+  if (serverUrl) {
+    return serverUrl;
+  }
+  return PPE_DISPLAY_API_URL;
+}
+
+export async function fetchDisplayPayload(): Promise<DisplayPayload | null> {
+  return fetchDisplayPayloadFromUrl(resolveDisplayApiFetchUrl());
 }
