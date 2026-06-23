@@ -1792,6 +1792,46 @@ button.btn:disabled {
   min-height: 500px;
 }
 
+.expression-chart {
+  padding: 12px 16px 0;
+}
+
+.expression-chart-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.expression-chart-legend {
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.expression-chart-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.legend-market::before {
+  background: #9e8bff;
+}
+
+.legend-belief::before {
+  background: #2dd4bf;
+}
+
+.legend-payoff::before {
+  background: #4ade80;
+}
+
 .route {
   padding: 16px;
   border-radius: 14px;
