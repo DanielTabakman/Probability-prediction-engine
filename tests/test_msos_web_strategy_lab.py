@@ -175,6 +175,16 @@ def test_expression_planning_route_and_narrative() -> None:
     assert "DEMO_FOOTER" in panel
     assert "Why this structure" in panel
     assert "Structure types" in panel
+    assert "ExpressionPayoffChart" in panel
+    assert "fetchStrategySuggestion" in panel
+    assert "Suggested trade vs market" in (
+        MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
+    ).read_text(encoding="utf-8")
+
+    suggestion_lib = (MSOS_WEB / "src" / "lib" / "ppeStrategySuggestion.ts").read_text(
+        encoding="utf-8"
+    )
+    assert "strategy-suggestion.json" in suggestion_lib
 
     persistence = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
     assert "msos.expression.preview.v1" in persistence
