@@ -57,14 +57,22 @@ def test_validate_strategy_lab_html_native_chart() -> None:
     assert err is None
 
 
-def test_validate_strategy_lab_html_degraded() -> None:
-    ok, err = validate_strategy_lab_html('<div class="ppe-embed-degraded">Embed pending</div>')
+def test_validate_strategy_lab_html_sample_mode() -> None:
+    html = '<div class="lab-data-banner demo">Sample mode — not live market data</div>'
+    ok, err = validate_strategy_lab_html(html)
     assert ok is False
-    assert "degraded" in (err or "").lower() or "pending" in (err or "").lower()
+    assert "sample" in (err or "").lower()
+
+
+def test_validate_strategy_lab_html_placeholder_chart() -> None:
+    html = '<div class="ppe-embed-degraded"><h3>Placeholder chart</h3></div>'
+    ok, err = validate_strategy_lab_html(html)
+    assert ok is False
+    assert "sample" in (err or "").lower() or "placeholder" in (err or "").lower()
 
 
 def test_collect_fixture_warnings() -> None:
-    html = f"Spot {FIXTURE_PREVIEW_SPOT} Illustrative product storyboard Preview data healthy"
+    html = "Spot Sample only Illustrative product storyboard Preview data healthy"
     warnings = _collect_fixture_warnings(html)
     ids = {w["id"] for w in warnings}
     assert "fixture_preview_metrics" in ids
