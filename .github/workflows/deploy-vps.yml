@@ -1,4 +1,9 @@
 # Deploy production stack on the VPS (see docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md).
+#
+# Job 1 (vps-deploy) is the production ship gate — must pass for a green workflow.
+# Job 2 (production-witness) runs integration witnesses; failures are reported but do
+# not fail the deploy (continue-on-error) so production is not left stale when a
+# witness flakes after SSH rebuild succeeded.
 name: Deploy VPS
 
 on:
@@ -16,7 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  vps-deploy:
+    name: VPS deploy
     runs-on: ubuntu-latest
     env:
       PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
@@ -50,7 +56,6 @@ jobs:
             docker compose up -d --force-recreate
 
       - name: Demo site health (no import traceback)
-        if: success()
         run: |
           set -euo pipefail
           code="000"
@@ -79,7 +84,6 @@ jobs:
           echo 'Demo site health check passed (no import traceback in HTML)'
 
       - name: Session notebook health
-        if: success()
         run: |
           set -euo pipefail
           code=$(curl -sS -o /tmp/session_body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/session.html || true)
@@ -95,18 +99,21 @@ jobs:
           fi
           echo 'session.html health check passed'
 
+  production-witness:
+    name: Production witness
+    needs: vps-deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
       - name: Checkout (production witnesses)
-        if: success()
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: success()
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Production PPE integration witness
-        if: success()
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
@@ -116,7 +123,6 @@ jobs:
           PYTHONPATH=. python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
 
       - name: Upload production witness artifacts
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: msos-production-witness

@@ -38,6 +38,23 @@ Optional **VPS cron** for uptime if you want zero GitHub runner use for probes (
 
 Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newer push starts).
 
+## Workflow jobs
+
+| Job | Required | Purpose |
+|-----|----------|---------|
+| **VPS deploy** | Yes | SSH `git pull`, rebuild containers, basic site health |
+| **Production witness** | No (`continue-on-error`) | HTTP + Playwright integration checks; artifacts uploaded when green |
+
+A red **Production witness** row does **not** mean production stayed stale — check **VPS deploy** first.
+
+## Agent helper after merge
+
+```bash
+python scripts/ensure_production_deploy.py --trigger --wait
+```
+
+Dispatches **Deploy VPS** when `origin/main` has no successful run yet, then waits for the workflow to finish.
+
 ## Required repository secrets
 
 In GitHub: **Settings → Secrets and variables → Actions → New repository secret**

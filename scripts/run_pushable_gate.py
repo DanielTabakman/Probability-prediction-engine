@@ -313,6 +313,8 @@ def main(argv: list[str] | None = None) -> int:
             violations: list[str] = []
 
             def _preset_for_path(path: str) -> str:
+                if path.startswith(".github/") or path.startswith("docs/DEPLOY/"):
+                    return "PLATFORM"
                 if path.startswith("src/"):
                     return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
                 if path.startswith("tests/test_implied_lab_"):
