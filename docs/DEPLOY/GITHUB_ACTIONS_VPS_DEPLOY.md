@@ -42,10 +42,12 @@ Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newe
 
 | Job | Required | Purpose |
 |-----|----------|---------|
-| **VPS deploy** | Yes | SSH `git pull`, rebuild containers, basic site health |
+| **VPS deploy** | Yes | SSH `git pull`, rebuild containers, site health, **MSOS web bundle ship verify** |
 | **Production witness** | No (`continue-on-error`) | HTTP + Playwright integration checks; artifacts uploaded when green |
 
 A red **Production witness** row does **not** mean production stayed stale — check **VPS deploy** first.
+
+**Ship verify (required):** after SSH rebuild, the **VPS deploy** job runs [`scripts/verify_msos_web_ship.py`](../../scripts/verify_msos_web_ship.py). It fails the deploy if `/strategy-lab` page JS still contains stale legend copy (`Reference curve`, `Options market`) or is missing labeled-axis strings (`BTC price at expiry`). This catches green deploys that did not actually ship a fresh `msos_web` image.
 
 ## Agent helper after merge
 
@@ -53,7 +55,7 @@ A red **Production witness** row does **not** mean production stayed stale — c
 python scripts/ensure_production_deploy.py --trigger --wait
 ```
 
-Dispatches **Deploy VPS** when `origin/main` has no successful run yet, then waits for the workflow to finish.
+Dispatches **Deploy VPS** when `origin/main` has no successful run yet, waits for the workflow, then runs **msos_web ship verify** (same check as the deploy workflow). If the workflow is green but the client bundle is stale, it dispatches **one** redeploy automatically when `--trigger` is set.
 
 ## Required repository secrets
 
