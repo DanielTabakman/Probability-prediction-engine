@@ -316,6 +316,7 @@
         "tests/conftest.py",
         "tests/test_program_charter_invariants.py",
         "tests/test_msos_p4_charter_witness.py",
+        "tests/test_msos_production_demo_witness.py",
         "tests/test_workflow_metrics_cli.py",
         ".cursor/rules/",
         ".cursor/USER_RULES_GIT_SNIPPET.md",

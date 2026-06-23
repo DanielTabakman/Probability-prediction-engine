@@ -28,6 +28,7 @@ DISPLAY_PAYLOAD_KIND = "distribution_display_boundary"
 
 # Known storyboard fixture copy — warn until live-metrics slice wires display API into UI.
 FIXTURE_PREVIEW_SPOT = "$104,320"
+FIXTURE_SAMPLE_SPOT = "Sample only"
 
 JOURNEY_PATHS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("/", "homepage", ("Market Structure OS", "Explore the platform")),
@@ -94,9 +95,14 @@ def validate_display_api_response(
 
 def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     """Strategy Lab must expose a live PPE surface, not degraded embed placeholder."""
+    if "Sample mode — not live market data" in html:
+        return False, "Strategy Lab rendered sample fixtures — live display API not loaded"
+    if "Placeholder chart" in html and "ppe-chart-region" not in html:
+        return False, "PPE chart in sample placeholder state"
     if "Embed pending" in html or "ppe-embed-degraded" in html:
-        return False, "PPE embed degraded or pending"
-    if "ppe-chart-region" in html or "ppe-embed-chromeless" in html:
+        if "Placeholder chart" in html:
+            return False, "PPE embed in sample/degraded state"
+    if "ppe-chart-region" in html:
         return True, None
     if "Live via PPE" in html and "Native chart" in html:
         return True, None
@@ -107,11 +113,11 @@ def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
 
 def _collect_fixture_warnings(html: str) -> list[dict[str, str]]:
     warnings: list[dict[str, str]] = []
-    if FIXTURE_PREVIEW_SPOT in html:
+    if FIXTURE_PREVIEW_SPOT in html or FIXTURE_SAMPLE_SPOT in html:
         warnings.append(
             {
                 "id": "fixture_preview_metrics",
-                "detail": f"Hardcoded storyboard spot {FIXTURE_PREVIEW_SPOT} still in UI",
+                "detail": "Hardcoded sample spot still in Strategy Lab UI — live display API may not be wired",
             }
         )
     if "Illustrative product storyboard" in html:

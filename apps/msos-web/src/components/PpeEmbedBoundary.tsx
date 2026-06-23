@@ -5,25 +5,16 @@
  */
 
 import type { BeliefPresetId } from "@/lib/beliefPresets";
+import type { LabDataMode } from "@/lib/strategyLabCopy";
 import {
-  PPE_EMBED_ONLY_PARAM,
   type DisplayPayload,
   type DisplaySeries,
   formatUsd,
+  findSeriesByExpiry,
   isDisplaySeries,
-  PPE_EMBED_URL,
 } from "@/lib/ppeDisplayPayload";
 
 export const PPE_EMBED_ANCHOR_ID = "distribution-summary";
-
-function buildChromelessEmbedSrc(baseUrl: string): string {
-  const withoutHash = baseUrl.replace(/#.*$/, "");
-  const [path, query = ""] = withoutHash.split("?");
-  const params = new URLSearchParams(query);
-  params.set(PPE_EMBED_ONLY_PARAM, "1");
-  const qs = params.toString();
-  return qs ? `${path}?${qs}` : `${path}?${PPE_EMBED_ONLY_PARAM}=1`;
-}
 
 /** Map pre-computed price/pdf arrays to SVG path (linear scale only — no new math). */
 function seriesToSvgPath(
@@ -124,24 +115,61 @@ function NativeDistributionChart({
 
 type PpeEmbedBoundaryProps = {
   payload: DisplayPayload | null;
+  live?: boolean;
+  dataMode?: LabDataMode;
+  selectedExpiry?: string | null;
   beliefPresetId?: BeliefPresetId | null;
   beliefLabel?: string | null;
 };
 
 export function PpeEmbedBoundary({
   payload,
+  live = false,
+  dataMode = "demo",
+  selectedExpiry = null,
   beliefPresetId = null,
   beliefLabel = null,
 }: PpeEmbedBoundaryProps) {
+  if (dataMode === "loading") {
+    return (
+      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
+        <div className="ppe-embed-placeholder">
+          <span className="tag teal">Loading</span>
+          <h3>Loading live chart</h3>
+          <p>Fetching BTC options distribution from Deribit…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!live || !payload) {
+    return (
+      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
+        <div className="ppe-embed-placeholder">
+          <span className="tag amber">Sample</span>
+          <h3>Placeholder chart</h3>
+          <p>
+            This view uses sample fixtures — not live Deribit quotes. Refresh when you are online;
+            live data loads automatically when the display API is reachable.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (payload) {
-    const primary = payload.series_by_expiry.find(isDisplaySeries);
+    const primary =
+      (selectedExpiry && findSeriesByExpiry(payload, selectedExpiry)) ||
+      payload.series_by_expiry.find(isDisplaySeries);
     if (!primary) {
       return null;
     }
     const beliefOverlay =
-      beliefPresetId && payload.belief_presets
-        ? payload.belief_presets[beliefPresetId]?.pdf_pct
-        : null;
+      beliefPresetId && primary.belief_presets
+        ? primary.belief_presets[beliefPresetId]?.pdf_pct
+        : beliefPresetId && payload.belief_presets
+          ? payload.belief_presets[beliefPresetId]?.pdf_pct
+          : null;
 
     return (
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
@@ -164,32 +192,5 @@ export function PpeEmbedBoundary({
     );
   }
 
-  if (!PPE_EMBED_URL) {
-    return (
-      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
-        <div className="ppe-embed-placeholder">
-          <span className="tag amber">Loading</span>
-          <h3>Chart unavailable</h3>
-          <p>Live options data could not be loaded. Try refreshing the page.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const embedSrc = buildChromelessEmbedSrc(PPE_EMBED_URL);
-
-  return (
-    <div className="ppe-embed ppe-embed-chromeless" role="region" aria-label="Options chart">
-      <p className="ppe-embed-live-note">
-        <span className="tag teal">Live</span> Interactive chart from live options data.
-      </p>
-      <iframe
-        title="BTC options distribution"
-        src={embedSrc}
-        className="ppe-embed-frame ppe-embed-frame-chromeless"
-        loading="lazy"
-        referrerPolicy="strict-origin-when-cross-origin"
-      />
-    </div>
-  );
+  return null;
 }

@@ -85,15 +85,25 @@ function marketWidthFromPayload(payload: DisplayPayload | null | undefined): str
   return lognormal?.["Implied range width (IQR)"] ?? "the range options imply";
 }
 
-function expiryLabelFromPayload(payload: DisplayPayload | null | undefined): string {
+function expiryLabelFromPayload(
+  payload: DisplayPayload | null | undefined,
+  expiryDate?: string,
+): string {
+  if (payload && expiryDate) {
+    const match = payload.series_by_expiry.find((series) => series.expiry_date === expiryDate);
+    if (match?.expiry_date) {
+      return match.expiry_date;
+    }
+  }
   const primary = payload?.series_by_expiry?.[0];
-  return primary?.expiry_date ?? "the selected expiry";
+  return primary?.expiry_date ?? expiryDate ?? "the selected expiry";
 }
 
 export function buildOutcomeFromBelief(
   presetId: BeliefPresetId,
   payload: DisplayPayload | null | undefined,
   live: boolean,
+  expiryDate?: string,
 ): LabOutcomeSummary {
   const preset = findBeliefPreset(presetId);
   if (!preset) {
@@ -101,7 +111,7 @@ export function buildOutcomeFromBelief(
   }
   if (live && payload) {
     const marketWidth = marketWidthFromPayload(payload);
-    const expiry = expiryLabelFromPayload(payload);
+    const expiry = expiryLabelFromPayload(payload, expiryDate);
     const base = buildOutcomeFromPayload(payload);
 
     const headlines: Record<BeliefPresetId, string> = {
