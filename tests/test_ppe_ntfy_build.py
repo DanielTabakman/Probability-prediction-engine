@@ -12,8 +12,13 @@ def test_parse_build_command():
     import os
 
     os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("build").name == "build"
-    assert parse_command_text("build extra context").args == "extra context"
+    assert parse_command_text("build") is None
+
+
+def test_parse_build_command_with_secret(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    assert parse_command_text("s3cret build").name == "build"
+    assert parse_command_text("s3cret build extra context").args == "extra context"
 
 
 def test_resolve_build_ide_build(monkeypatch, tmp_path):

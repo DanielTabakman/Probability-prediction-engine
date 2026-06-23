@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN groupadd --gid 1001 ppe \
     && useradd --uid 1001 --gid ppe --create-home --shell /usr/sbin/nologin ppe
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+COPY requirements-prod.txt /app/requirements-prod.txt
+RUN pip install --no-cache-dir -r /app/requirements-prod.txt
 
 COPY . /app
 RUN chmod +x /app/scripts/docker_streamlit_entrypoint.sh \

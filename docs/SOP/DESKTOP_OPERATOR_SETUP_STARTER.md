@@ -90,6 +90,7 @@ On **desktop**:
 
 ```bat
 copy ppe_operator_notify.local.cmd.example ppe_operator_notify.local.cmd
+python scripts\bootstrap_operator_notify_secret.py
 ```
 
 Edit `PPE_NTFY_TOPIC=` to match phone subscription.
