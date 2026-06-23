@@ -7,6 +7,7 @@ import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
 import { BeliefFineTuning } from "@/components/BeliefFineTuning";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
+import { DEFAULT_CURVE_LABELS } from "@/lib/chartCurveLabels";
 import { lensTiles } from "@/data/strategyLabFixtures";
 import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
 import {
@@ -171,18 +172,15 @@ export function StrategyLabInteractivePanel({
 
         <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
 
-        <div className="legend" aria-label="Chart legend">
+        <div className="legend chart-curve-legend" aria-label="Chart legend">
           <span>
             <i className="swatch market" aria-hidden="true" />
-            Options market
-          </span>
-          <span>
-            <i className="swatch reference" aria-hidden="true" />
-            Reference curve
+            {DEFAULT_CURVE_LABELS.market_legend}
           </span>
           <span className={active ? "legend-active" : undefined}>
             <i className="swatch belief" aria-hidden="true" />
-            Your view{active ? `: ${viewLabel}` : ""}
+            {DEFAULT_CURVE_LABELS.belief_legend}
+            {active ? `: ${viewLabel}` : ""}
           </span>
         </div>
 

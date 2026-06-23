@@ -12,6 +12,7 @@ from typing import Any, Callable
 from urllib.parse import parse_qs
 
 from src.engine.implied_distribution import build_distribution_chart_data, lognormal_pdf
+from src.viz.curve_display_labels import build_curve_display_labels
 from src.viz.distribution_summary_panel import summary_panel_contract
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_TITLE
 
@@ -138,6 +139,7 @@ def build_belief_overlay_response(
         "forward_mult": overlay["forward_mult"],
         "vol_mult": overlay["vol_mult"],
         "tuning_bounds": BELIEF_TUNING_BOUNDS,
+        "curve_labels": build_curve_display_labels(),
     }
 
 
@@ -205,6 +207,7 @@ def build_chart_series_from_export_row(row: dict[str, str]) -> dict[str, Any] | 
             "median_usd": _parse_float(row.get("q50_usd")),
             "q3_usd": _parse_float(row.get("q75_usd")),
         },
+        "curve_labels": build_curve_display_labels(),
     }
 
 
@@ -222,6 +225,7 @@ def build_distribution_display_payload(
             s["belief_presets"] = build_belief_preset_overlays(s)
             series.append(s)
     belief_presets = series[0].get("belief_presets", {}) if series else {}
+    curve_labels = build_curve_display_labels()
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
@@ -232,6 +236,7 @@ def build_distribution_display_payload(
         "summary": summary,
         "series_by_expiry": series,
         "belief_presets": belief_presets,
+        "curve_labels": curve_labels,
         "meta": {
             "read_only": True,
             "display_mode": DISPLAY_PAYLOAD_MODE,

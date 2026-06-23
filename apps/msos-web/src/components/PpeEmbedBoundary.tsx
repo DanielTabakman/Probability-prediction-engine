@@ -4,8 +4,10 @@
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
  */
 
+import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import type { BeliefPresetId } from "@/lib/beliefPresets";
 import type { LabDataMode } from "@/lib/strategyLabCopy";
+import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
 import {
   type DisplayPayload,
   type DisplaySeries,
@@ -41,11 +43,6 @@ export function seriesToSvgPath(
   return `M ${points.join(" L ")}`;
 }
 
-function filledAreaPath(linePath: string): string {
-  if (!linePath) return "";
-  return `${linePath} L 680,250 L 20,250 Z`;
-}
-
 type NativeDistributionChartProps = {
   series: DisplaySeries;
   spotUsd: number;
@@ -59,48 +56,21 @@ function NativeDistributionChart({
   beliefPdfPct,
   beliefLabel,
 }: NativeDistributionChartProps) {
-  const marketPath = seriesToSvgPath(series.prices_usd, series.pdf_pct, 700, 280, 20);
-  const beliefPath =
-    beliefPdfPct && beliefPdfPct.length === series.prices_usd.length
-      ? seriesToSvgPath(series.prices_usd, beliefPdfPct, 700, 280, 20)
-      : "";
-  const spotX =
-    series.prices_usd.length > 1
-      ? 20 +
-        ((spotUsd - series.prices_usd[0]) /
-          (series.prices_usd[series.prices_usd.length - 1] - series.prices_usd[0] || 1)) *
-          660
-      : 350;
-
   const ariaLabel = beliefLabel
     ? `Distribution curves for ${series.expiry_date} — market vs your ${beliefLabel} view`
     : `Distribution curve for ${series.expiry_date}`;
+  const curveLabels = resolveCurveLabels(series.curve_labels);
 
   return (
     <>
-      <div className="graph" role="img" aria-label={ariaLabel}>
-        <svg viewBox="0 0 700 280" preserveAspectRatio="none">
-          <path
-            d={filledAreaPath(marketPath)}
-            stroke="#9e8bff"
-            strokeWidth="4"
-            fill="rgba(158, 139, 255, 0.14)"
-          />
-          {beliefPath ? (
-            <path
-              d={filledAreaPath(beliefPath)}
-              stroke="#2dd4bf"
-              strokeWidth="3"
-              strokeDasharray="6 4"
-              fill="rgba(45, 212, 191, 0.16)"
-            />
-          ) : null}
-          <line x1={spotX} y1="38" x2={spotX} y2="250" stroke="#233c55" strokeDasharray="5 8" />
-          <text x={spotX + 4} y="54" fill="#8ea4bd" fontSize="12">
-            spot
-          </text>
-        </svg>
-      </div>
+      <LabeledDistributionChart
+        pricesUsd={series.prices_usd}
+        marketPdfPct={series.pdf_pct}
+        beliefPdfPct={beliefPdfPct}
+        spotUsd={spotUsd}
+        ariaLabel={ariaLabel}
+        curveLabels={curveLabels}
+      />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
         <div className="ppe-summary-table" aria-label="PPE display payload summary">
           <span>Mean {formatUsd(series.mean_usd)}</span>
@@ -178,15 +148,16 @@ export function PpeEmbedBoundary({
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
         <p className="ppe-embed-live-note">
           <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
+          Purple curve = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).market_legend}.
           {beliefOverlay ? (
             <>
               {" "}
-              <span className="tag teal">Your view</span> Teal dashed curve = your belief preset.
+              Teal dashed = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).belief_legend}.
             </>
           ) : null}
         </p>
         <NativeDistributionChart
-          series={primary}
+          series={{ ...primary, curve_labels: primary.curve_labels ?? payload.curve_labels }}
           spotUsd={payload.spot_usd}
           beliefPdfPct={beliefOverlay}
           beliefLabel={beliefLabel}

@@ -4,6 +4,7 @@
  * Expression payoff vs market — pre-computed arrays from Python only.
  */
 
+import { ChartCurveLegend } from "@/components/ChartCurveLegend";
 import {
   LABELED_CHART_LAYOUT,
   buildPayoffAxisTicks,
@@ -15,7 +16,9 @@ import {
   seriesPathInLayout,
   seriesPathWithYRange,
   valueToChartY,
+  CHART_AXIS_STYLE,
 } from "@/lib/chartAxisDisplay";
+import { DEFAULT_CURVE_LABELS, type CurveDisplayLabels } from "@/lib/chartCurveLabels";
 import { formatUsd } from "@/lib/ppeDisplayPayload";
 
 type ExpressionPayoffChartProps = {
@@ -26,6 +29,7 @@ type ExpressionPayoffChartProps = {
   payoffUsd?: number[];
   spotUsd: number;
   expiryLabel: string;
+  curveLabels?: CurveDisplayLabels;
   loading?: boolean;
   error?: string | null;
 };
@@ -43,6 +47,7 @@ export function ExpressionPayoffChart({
   payoffUsd,
   spotUsd,
   expiryLabel,
+  curveLabels = DEFAULT_CURVE_LABELS,
   loading = false,
   error = null,
 }: ExpressionPayoffChartProps) {
@@ -103,11 +108,12 @@ export function ExpressionPayoffChart({
     <div className="expression-chart">
       <div className="expression-chart-head">
         <div className="panel-sub">Suggested trade vs market at {expiryLabel}</div>
-        <div className="expression-chart-legend" aria-hidden="true">
-          <span className="legend-market">Market</span>
-          {beliefPath ? <span className="legend-belief">Your view</span> : null}
-          {payoffPath ? <span className="legend-payoff">Payoff at expiry</span> : null}
-        </div>
+        <ChartCurveLegend
+          labels={curveLabels}
+          showBelief={Boolean(beliefPath)}
+          showPayoff={Boolean(payoffPath)}
+          className="expression-chart-legend chart-curve-legend"
+        />
       </div>
       <div
         className="graph graph-labeled"
@@ -186,7 +192,7 @@ export function ExpressionPayoffChart({
             textAnchor="middle"
             transform={`rotate(-90 12 ${(box.y0 + box.y1) / 2})`}
           >
-            Distribution
+            Distribution ({curveLabels.market_method ?? "Black–Scholes lognormal"})
           </text>
           {usePayoffUsd ? (
             <text
