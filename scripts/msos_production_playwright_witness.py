@@ -121,7 +121,28 @@ def run_playwright_witness(
 
         lab_url = f"{base}/strategy-lab"
         page.goto(lab_url, wait_until="networkidle", timeout=90_000)
-        confirm = page.get_by_role("link", name=re.compile(r"Confirm thesis", re.I))
+        higher = page.get_byRole("button", name="Higher", exact=True)
+        belief_ok = higher.count() > 0
+        if belief_ok:
+            higher.first.click()
+            page.wait_for_timeout(500)
+            page.screenshot(path=str(shot_dir / "strategy_lab_after_belief.png"), full_page=True)
+        checks.append(
+            {
+                "id": "click_belief_higher",
+                "url": lab_url,
+                "ok": belief_ok and "Your view" in page.content(),
+                "status": 200 if belief_ok else 0,
+                "error": None
+                if belief_ok and "Your view" in page.content()
+                else "Belief preset click failed or outcome did not update",
+                "screenshot": str((shot_dir / "strategy_lab_after_belief.png").as_posix())
+                if belief_ok
+                else None,
+            }
+        )
+
+        confirm = page.get_by_role("link", name=re.compile(r"Confirm view", re.I))
         confirm_ok = confirm.count() > 0
         if confirm_ok:
             confirm.first.click()
@@ -134,7 +155,7 @@ def run_playwright_witness(
                 "url": lab_url,
                 "ok": confirm_ok,
                 "status": 200 if confirm_ok else 0,
-                "error": None if confirm_ok else "Confirm thesis link not found",
+                "error": None if confirm_ok else "Confirm view link not found",
                 "screenshot": str((shot_dir / "thesis_confirm_after_click.png").as_posix())
                 if confirm_ok
                 else None,

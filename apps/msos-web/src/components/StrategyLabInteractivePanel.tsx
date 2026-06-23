@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 
 import { BeliefBuilder } from "@/components/BeliefBuilder";
-import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
 import {
   buildOutcomeFromBelief,
@@ -22,6 +21,7 @@ type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
   live: boolean;
   defaultOutcome: LabOutcomeSummary;
+  chartRegion: ReactNode;
 };
 
 function expiryLabel(payload: DisplayPayload | null): string {
@@ -32,6 +32,7 @@ export function StrategyLabInteractivePanel({
   displayPayload,
   live,
   defaultOutcome,
+  chartRegion,
 }: StrategyLabInteractivePanelProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
 
@@ -77,7 +78,7 @@ export function StrategyLabInteractivePanel({
           </p>
         ) : null}
 
-        <PpeEmbedBoundary payload={displayPayload} />
+        {chartRegion}
 
         <div className="legend" aria-label="Chart legend">
           <span>
