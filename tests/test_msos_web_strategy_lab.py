@@ -66,6 +66,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "buildLabMetricsFromPayload" in lib
 
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
+    assert '"use client"' in embed
+    assert "async function PpeEmbedBoundary" not in embed
     assert "ppeDisplayPayload" in embed
     assert "PPE_EMBED_ONLY_PARAM" in embed
     assert "iframe" in embed

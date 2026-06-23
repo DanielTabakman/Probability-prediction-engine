@@ -43,7 +43,11 @@ export function StrategyLabInteractivePanel({
     if (!selectedPresetId) {
       return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
     }
-    return buildOutcomeFromBelief(selectedPresetId, displayPayload, live);
+    try {
+      return buildOutcomeFromBelief(selectedPresetId, displayPayload, live);
+    } catch {
+      return defaultOutcome;
+    }
   }, [selectedPresetId, displayPayload, live, defaultOutcome]);
 
   const selectedPreset = findBeliefPreset(selectedPresetId);
