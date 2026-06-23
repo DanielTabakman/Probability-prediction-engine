@@ -170,19 +170,9 @@ def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
 
 def validate_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
     """Strategy Lab page JS must ship labeled chart axes (not pre-#320 legend copy)."""
-    chunks = sorted(set(re.findall(r"/_next/static/chunks/app/strategy-lab/page-[^\"']+\.js", html)))
-    if not chunks:
-        return False, "strategy-lab page bundle missing from HTML"
-    base = base_url.rstrip("/")
-    for rel in chunks:
-        status, body, err = _fetch(f"{base}{rel}")
-        if status != 200 or err:
-            return False, err or f"strategy-lab bundle HTTP {status}"
-        if "Reference curve" in body or "Options market" in body:
-            return False, "strategy-lab bundle still ships pre-labeled-axis legend copy — rebuild msos_web"
-        if "BTC price at expiry" not in body:
-            return False, "strategy-lab bundle missing labeled axis copy (BTC price at expiry)"
-    return True, None
+    from scripts.verify_msos_web_ship import verify_strategy_lab_client_bundle as _verify
+
+    return _verify(html, base_url=base_url)
 
 
 def _collect_fixture_warnings(html: str) -> list[dict[str, str]]:

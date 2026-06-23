@@ -94,16 +94,16 @@ def test_validate_strategy_lab_client_bundle_rejects_stale_legend() -> None:
             return 200, "Options market Reference curve", None
         return 404, "", "not found"
 
-    import scripts.msos_production_demo_witness as witness
+    import scripts.verify_msos_web_ship as ship
 
-    original = witness._fetch
-    witness._fetch = fake_fetch
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
     try:
         ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
     finally:
-        witness._fetch = original
+        ship.fetch_url = original
     assert ok is False
-    assert "pre-labeled-axis" in (err or "")
+    assert "stale" in (err or "")
 
 
 def test_validate_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
@@ -114,14 +114,14 @@ def test_validate_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
             return 200, "BTC price at expiry Market view", None
         return 404, "", "not found"
 
-    import scripts.msos_production_demo_witness as witness
+    import scripts.verify_msos_web_ship as ship
 
-    original = witness._fetch
-    witness._fetch = fake_fetch
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
     try:
         ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
     finally:
-        witness._fetch = original
+        ship.fetch_url = original
     assert ok is True
     assert err is None
 
