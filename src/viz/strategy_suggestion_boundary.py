@@ -273,6 +273,7 @@ def build_strategy_suggestion_response(
             "overlay": {
                 "prices_usd": prices,
                 "payoff_pct": _peak_scaled(payoff_usd),
+                "payoff_usd": payoff_usd,
             },
             "summary": {
                 "net_cost_usd": vals.get("net_cost_usd", summary.get("cost_usd")),

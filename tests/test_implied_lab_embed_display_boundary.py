@@ -270,6 +270,7 @@ def test_build_strategy_suggestion_response(strategy_mocks: str) -> None:
     suggested = payload["suggested"]
     assert suggested["legs"]
     assert len(suggested["overlay"]["payoff_pct"]) == len(suggested["overlay"]["prices_usd"])
+    assert len(suggested["overlay"]["payoff_usd"]) == len(suggested["overlay"]["prices_usd"])
     assert len(payload["market"]["pdf_pct"]) > 0
     assert suggested["summary"]["max_gain_usd"] is not None
 

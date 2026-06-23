@@ -279,6 +279,7 @@ export function ExpressionPlanningPanel() {
               marketPdfPct={market?.pdf_pct ?? []}
               beliefPdfPct={market?.belief_pdf_pct}
               payoffPct={overlay?.payoff_pct ?? []}
+              payoffUsd={overlay?.payoff_usd}
               spotUsd={suggestion?.spot_usd ?? 0}
               expiryLabel={expiry ?? suggestion?.expiry_date ?? "selected expiry"}
               loading={suggestionLoading}
