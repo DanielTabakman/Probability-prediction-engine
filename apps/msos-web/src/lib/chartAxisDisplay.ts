@@ -174,10 +174,21 @@ export function seriesPathWithYRange(
   const xMax = prices[prices.length - 1];
   const span = yMax - yMin || 1;
   const box = chartInnerBox(layout);
-  const points = prices.map((price, index) => {
-    const x = priceToChartX(price, xMin, xMax, layout);
-    const y = box.y1 - ((values[index] - yMin) / span) * box.innerH;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
   return `M ${points.join(" L ")}`;
 }
+
+/** Distribution-only layout (Strategy Lab) — left Y + bottom X, no P&L axis. */
+export const LABELED_DISTRIBUTION_LAYOUT: ChartLayout = {
+  width: 700,
+  height: 318,
+  padLeft: 58,
+  padRight: 16,
+  padTop: 18,
+  padBottom: 42,
+};
+
+export const CHART_AXIS_STYLE = {
+  gridStroke: "rgba(255, 255, 255, 0.06)",
+  axisStroke: "rgba(255, 255, 255, 0.14)",
+  labelFill: "#8ea4bd",
+} as const;

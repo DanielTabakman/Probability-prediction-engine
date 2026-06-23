@@ -94,6 +94,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert '"use client"' in embed
+    assert "LabeledDistributionChart" in embed
     assert "beliefPdfPct" in embed
     assert "dataMode" in embed
     assert "ppeDisplayPayload" in embed
@@ -101,6 +102,11 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "prices_usd" in embed
     assert "ppe-summary-table" in embed
     assert "Deribit" in embed or "Live" in embed
+    labeled = (MSOS_WEB / "src" / "components" / "LabeledDistributionChart.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "BTC price at expiry" in labeled
+    assert "graph-labeled" in labeled
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
