@@ -126,7 +126,7 @@ def run_playwright_witness(
         belief_curve_ok = False
         if belief_ok:
             higher.first.click()
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(1500)
             html = page.content()
             belief_curve_ok = "strokeDasharray" in html or "#2dd4bf" in html
             page.screenshot(path=str(shot_dir / "strategy_lab_after_belief.png"), full_page=True)
