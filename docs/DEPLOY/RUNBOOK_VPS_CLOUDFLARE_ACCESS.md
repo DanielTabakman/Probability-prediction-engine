@@ -109,6 +109,8 @@ Until Phase B is done, **do not** use **Full (strict)** with an HTTP-only origin
 
 **Security headers:** both Phase A and B Caddy configs import [`caddy/snippets.caddy`](../../caddy/snippets.caddy) (`X-Content-Type-Options`, `Referrer-Policy`, etc.). MSOS Next routes also get a baseline CSP. HSTS is enabled only on Phase B (`:443`).
 
+**Operator checklist:** one-page post-hardening steps (ntfy, VPS smoke, Phase B TLS) — [`SECURITY_OPERATOR_CHECKLIST_V1.md`](SECURITY_OPERATOR_CHECKLIST_V1.md).
+
 ### 6) Bring up the stack (first boot)
 
 From `/opt/marketstructureos`:
