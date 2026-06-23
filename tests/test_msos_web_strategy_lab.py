@@ -37,25 +37,27 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
     assert "StrategyLabInteractivePanel" in panel
     assert "PpeEmbedBoundary" in panel
-    assert "beliefPresetId" in panel
+    assert "beliefPdfPct" in panel
     assert "selectedExpiry" in panel
-    assert "BeliefFineTuning" in panel
-    assert "beliefTuning" in panel
+    assert "BeliefBuilder" in panel
+    assert "belief-axis-pair" in builder
+    assert "Higher" in builder
+    assert "More vol" in builder
     assert "PpeEmbedBoundary" not in content
-    assert "buildOutcomeFromBelief" in panel
+    assert "buildOutcomeFromView" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
     tuning = (MSOS_WEB / "src" / "lib" / "beliefTuning.ts").read_text(encoding="utf-8")
     assert "fetchBeliefOverlayPdf" in tuning
-    assert "belief-overlay.json" in tuning
+    assert "tuningFromView" in tuning
 
-    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
-    assert "slider-input" in fine
-    assert "Center shift" in fine
+    presets = (MSOS_WEB / "src" / "lib" / "beliefPresets.ts").read_text(encoding="utf-8")
+    assert "toggleBeliefDirection" in presets
+    assert "toggleBeliefVolatility" in presets
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
-    assert ".belief-preset-grid" in styles
-    assert ".slider-input" in styles
+    assert ".belief-axis-pair" in styles
+    assert ".belief-preset" in styles
 
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
@@ -72,15 +74,13 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
+    builder = (MSOS_WEB / "src" / "components" / "BeliefBuilder.tsx").read_text(encoding="utf-8")
     assert "Market vs your view" in panel
     assert "PpeEmbedBoundary" in panel
-    assert "beliefPresetId" in panel
+    assert "beliefPdfPct" in panel
     assert "selectedExpiry" in panel
     assert 'className="legend"' in panel
-    assert "BeliefFineTuning" in panel
-
-    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
-    assert 'className="controls"' in fine
+    assert "belief-axis-pair" in builder
 
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     assert "distribution_display_boundary" in lib

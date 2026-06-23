@@ -5,20 +5,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
-import { BeliefFineTuning } from "@/components/BeliefFineTuning";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { lensTiles } from "@/data/strategyLabFixtures";
 import {
-  buildOutcomeFromBelief,
-  findBeliefPreset,
-  type BeliefPreset,
-  type BeliefPresetId,
+  buildBeliefViewLabel,
+  buildOutcomeFromView,
+  EMPTY_BELIEF_VIEW,
+  hasBeliefView,
+  type BeliefView,
 } from "@/lib/beliefPresets";
 import {
   fetchBeliefOverlayPdf,
-  tuningFromPreset,
-  tuningMatchesPreset,
-  type BeliefTuning,
+  presetIdForTuningCache,
+  tuningFromView,
 } from "@/lib/beliefTuning";
 import {
   buildOutcomeFromPayload,
@@ -46,33 +45,32 @@ export function StrategyLabInteractivePanel({
   onExpiryChange,
   expiryOptions,
 }: StrategyLabInteractivePanelProps) {
-  const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
-  const [tuning, setTuning] = useState<BeliefTuning | null>(null);
-  const [tunedPdfPct, setTunedPdfPct] = useState<number[] | null>(null);
+  const [view, setView] = useState<BeliefView>(EMPTY_BELIEF_VIEW);
+  const [beliefPdfPct, setBeliefPdfPct] = useState<number[] | null>(null);
 
-  const handleSelect = useCallback((preset: BeliefPreset) => {
-    setSelectedPresetId(preset.id);
-    setTuning(tuningFromPreset(preset.id));
-    setTunedPdfPct(null);
+  const handleViewChange = useCallback((next: BeliefView) => {
+    setView(next);
+    setBeliefPdfPct(null);
   }, []);
 
-  const handleTuningChange = useCallback((next: BeliefTuning) => {
-    setTuning(next);
-  }, []);
+  const tuning = useMemo(() => tuningFromView(view), [view]);
+  const viewLabel = buildBeliefViewLabel(view);
+  const active = hasBeliefView(view);
 
   useEffect(() => {
-    if (!selectedPresetId || !tuning || !live || !displayPayload || !selectedExpiry) {
-      setTunedPdfPct(null);
+    if (!active || !live || !displayPayload || !selectedExpiry) {
+      setBeliefPdfPct(null);
       return;
     }
 
-    if (tuningMatchesPreset(selectedPresetId, tuning)) {
+    const cachePresetId = presetIdForTuningCache(view, tuning);
+    if (cachePresetId) {
       const series = findSeriesByExpiry(displayPayload, selectedExpiry);
       const presetPdf =
-        series?.belief_presets?.[selectedPresetId]?.pdf_pct ??
-        displayPayload.belief_presets?.[selectedPresetId]?.pdf_pct ??
+        series?.belief_presets?.[cachePresetId]?.pdf_pct ??
+        displayPayload.belief_presets?.[cachePresetId]?.pdf_pct ??
         null;
-      setTunedPdfPct(presetPdf);
+      setBeliefPdfPct(presetPdf);
       return;
     }
 
@@ -80,29 +78,27 @@ export function StrategyLabInteractivePanel({
     const timer = window.setTimeout(() => {
       void fetchBeliefOverlayPdf(selectedExpiry, tuning).then((pdf) => {
         if (!cancelled) {
-          setTunedPdfPct(pdf);
+          setBeliefPdfPct(pdf);
         }
       });
-    }, 180);
+    }, 120);
 
     return () => {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [selectedPresetId, tuning, live, displayPayload, selectedExpiry]);
+  }, [active, view, tuning, live, displayPayload, selectedExpiry]);
 
   const outcome = useMemo(() => {
-    if (!selectedPresetId) {
+    if (!active) {
       return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
     }
     try {
-      return buildOutcomeFromBelief(selectedPresetId, displayPayload, live, selectedExpiry);
+      return buildOutcomeFromView(view, displayPayload, live, selectedExpiry);
     } catch {
       return defaultOutcome;
     }
-  }, [selectedPresetId, displayPayload, live, defaultOutcome, selectedExpiry]);
-
-  const selectedPreset = findBeliefPreset(selectedPresetId);
+  }, [active, view, displayPayload, live, defaultOutcome, selectedExpiry]);
 
   return (
     <>
@@ -111,8 +107,8 @@ export function StrategyLabInteractivePanel({
           expiryLabel={selectedExpiry}
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
-          selectedId={selectedPresetId}
-          onSelect={handleSelect}
+          view={view}
+          onChange={handleViewChange}
         />
 
         <div className="panel-head">
@@ -125,9 +121,9 @@ export function StrategyLabInteractivePanel({
           <span className="tag">Options</span>
         </div>
 
-        {selectedPreset ? (
+        {active ? (
           <p className="belief-active-banner" role="status">
-            Your view: <strong>{selectedPreset.label}</strong> — compare to the chart below.
+            Your view: <strong>{viewLabel}</strong> — compare to the chart below.
           </p>
         ) : null}
 
@@ -136,9 +132,8 @@ export function StrategyLabInteractivePanel({
           live={live}
           dataMode={dataMode}
           selectedExpiry={selectedExpiry}
-          beliefPresetId={selectedPresetId}
-          beliefLabel={selectedPreset?.label ?? null}
-          beliefPdfPct={tunedPdfPct}
+          beliefLabel={active ? viewLabel : null}
+          beliefPdfPct={beliefPdfPct}
         />
 
         <div className="legend" aria-label="Chart legend">
@@ -150,22 +145,11 @@ export function StrategyLabInteractivePanel({
             <i className="swatch reference" aria-hidden="true" />
             Reference curve
           </span>
-          <span className={selectedPresetId ? "legend-active" : undefined}>
+          <span className={active ? "legend-active" : undefined}>
             <i className="swatch belief" aria-hidden="true" />
-            Your view{selectedPreset ? `: ${selectedPreset.label}` : ""}
+            Your view{active ? `: ${viewLabel}` : ""}
           </span>
         </div>
-
-        {selectedPreset && tuning ? (
-          <BeliefFineTuning tuning={tuning} disabled={!live} onChange={handleTuningChange} />
-        ) : (
-          <div className="controls muted" aria-label="Fine-tuning">
-            <div className="control muted">
-              <div className="control-label">Fine-tuning</div>
-              <div className="control-value">Pick a view above to adjust center and range.</div>
-            </div>
-          </div>
-        )}
 
         <div className="panel-head compact">
           <div>
@@ -220,8 +204,8 @@ export function StrategyLabInteractivePanel({
         <div className="decision-strip">
           <div>
             <strong>
-              {selectedPreset
-                ? `Next: confirm your “${selectedPreset.label.toLowerCase()}” view`
+              {active
+                ? `Next: confirm your “${viewLabel.toLowerCase()}” view`
                 : "Next: pick how you disagree with the market"}
             </strong>
             <p>Then explore trade structures that fit — paper only on this demo.</p>

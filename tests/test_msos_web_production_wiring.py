@@ -56,7 +56,7 @@ def test_strategy_lab_embed_boundary_present() -> None:
     assert "StrategyLabClientShell" in content
     assert "StrategyLabInteractivePanel" in work
     assert "PpeEmbedBoundary" in lab
-    assert "beliefPresetId" in lab
+    assert "beliefPdfPct" in lab
     assert "fetchDisplayPayloadClient" in lib
     assert "fetchDisplayPayloadFromUrl" in lib
     assert "selectedExpiry" in embed
