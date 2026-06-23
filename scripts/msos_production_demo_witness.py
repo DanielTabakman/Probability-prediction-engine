@@ -32,13 +32,13 @@ FIXTURE_SAMPLE_SPOT = "Sample only"
 
 JOURNEY_PATHS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("/", "homepage", ("Market Structure OS", "Explore the platform")),
-    ("/strategy-lab", "strategy_lab", ("Strategy Lab", "PPE")),
-    ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you think is true",)),
+    ("/strategy-lab", "strategy_lab", ("Strategy Lab", "Deribit")),
+    ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you actually believe?",)),
     ("/strategy-lab/expression", "expression", ("expression",)),
-    ("/command-center", "command_center", ("Command Center", "Current work")),
-    ("/monitor", "monitor", ("Monitor", "Monitoring")),
-    ("/history", "history", ("History", "Observed")),
-    ("/learn", "learn", ("Learn loop", "comprehension")),
+    ("/command-center", "command_center", ("Command Center", "Monitor")),
+    ("/monitor", "monitor", ("Monitor", "Command Center")),
+    ("/history", "history", ("History", "Live trades")),
+    ("/learn", "learn", ("Reflect", "What did you take away?")),
 )
 
 
