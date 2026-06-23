@@ -29,6 +29,7 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     assert '"use client"' in builder
     assert "belief-preset" in builder
     assert "aria-pressed" in builder
+    assert "ExpiryPicker" in builder
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
@@ -37,6 +38,7 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     assert "StrategyLabInteractivePanel" in panel
     assert "PpeEmbedBoundary" in panel
     assert "beliefPresetId" in panel
+    assert "selectedExpiry" in panel
     assert "PpeEmbedBoundary" not in content
     assert "buildOutcomeFromBelief" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
@@ -47,12 +49,12 @@ def test_strategy_lab_belief_presets_interactive() -> None:
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab · BTC options" in content
-    assert "Live market data" in content
-    assert "Demo data" in content
-    assert "buildLabMetricsFromPayload" in content
-    assert "StrategyLabInteractivePanel" in content
-    assert "DEMO_FOOTER" in content
+    work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
+    picker = (MSOS_WEB / "src" / "components" / "ExpiryPicker.tsx").read_text(encoding="utf-8")
+    assert "StrategyLabWorkSection" in content
+    assert "ExpiryPicker" in work
+    assert "ExpiryPicker" in picker
+    assert "buildLabMetricsFromPayload" in work
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
@@ -60,6 +62,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "Market vs your view" in panel
     assert "PpeEmbedBoundary" in panel
     assert "beliefPresetId" in panel
+    assert "selectedExpiry" in panel
     assert 'className="legend"' in panel
     assert 'className="controls"' in panel
 
@@ -81,6 +84,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
+    assert ".expiry-picker" in styles
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:

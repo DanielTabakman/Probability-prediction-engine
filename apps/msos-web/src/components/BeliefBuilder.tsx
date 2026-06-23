@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+import { ExpiryPicker } from "@/components/ExpiryPicker";
 import {
   BELIEF_PRESETS,
-  buildBeliefSentence,
   loadStoredBeliefPresetId,
   saveBeliefPresetId,
   type BeliefPreset,
@@ -13,11 +13,21 @@ import {
 
 type BeliefBuilderProps = {
   expiryLabel: string;
+  expiryOptions: string[];
+  onExpiryChange: (expiry: string) => void;
+  expiryPickerDisabled?: boolean;
   selectedId: BeliefPresetId | null;
   onSelect: (preset: BeliefPreset) => void;
 };
 
-export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuilderProps) {
+export function BeliefBuilder({
+  expiryLabel,
+  expiryOptions,
+  onExpiryChange,
+  expiryPickerDisabled = false,
+  selectedId,
+  onSelect,
+}: BeliefBuilderProps) {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -41,7 +51,17 @@ export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuild
       <h3>What do you believe?</h3>
       <p className="selectline" aria-live="polite">
         {selected ? (
-          buildBeliefSentence(selected, expiryLabel)
+          <>
+            I think BTC will {selected.directionPhrase} by{" "}
+            <ExpiryPicker
+              value={expiryLabel}
+              options={expiryOptions}
+              onChange={onExpiryChange}
+              disabled={expiryPickerDisabled}
+              className="selectchip"
+            />
+            .
+          </>
         ) : (
           <>
             Pick one —{" "}

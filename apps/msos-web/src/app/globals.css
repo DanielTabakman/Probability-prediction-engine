@@ -1032,6 +1032,54 @@ a {
   font-weight: 700;
 }
 
+.expiry-picker {
+  position: relative;
+  display: inline-flex;
+  vertical-align: baseline;
+}
+
+.expiry-picker-face {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: rgba(67, 231, 211, 0.12);
+  border: 1px solid rgba(67, 231, 211, 0.22);
+  color: var(--teal);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.expiry-picker-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.expiry-label {
+  color: inherit;
+  font-weight: inherit;
+}
+
+.metric-expiry-value .expiry-picker-face,
+.metric-expiry-value.expiry-label {
+  font-size: 22px;
+  font-weight: 800;
+  color: #eaf7ff;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-bottom: 1px dashed rgba(67, 231, 211, 0.45);
+  border-radius: 0;
+}
+
+.metric-expiry-value .expiry-picker-select {
+  cursor: pointer;
+}
+
 .belief-preset-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

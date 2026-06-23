@@ -62,6 +62,7 @@ def test_display_payload_schema_and_summary() -> None:
         "less_volatility",
     }
     primary = payload["series_by_expiry"][0]
+    assert "belief_presets" in primary
     belief_higher = payload["belief_presets"]["higher"]["pdf_pct"]
     assert len(belief_higher) == len(primary["pdf_pct"])
     assert max(belief_higher) > 0

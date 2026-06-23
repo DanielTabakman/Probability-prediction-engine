@@ -10,6 +10,7 @@ import {
   type DisplayPayload,
   type DisplaySeries,
   formatUsd,
+  findSeriesByExpiry,
   isDisplaySeries,
   PPE_EMBED_URL,
 } from "@/lib/ppeDisplayPayload";
@@ -124,24 +125,30 @@ function NativeDistributionChart({
 
 type PpeEmbedBoundaryProps = {
   payload: DisplayPayload | null;
+  selectedExpiry?: string | null;
   beliefPresetId?: BeliefPresetId | null;
   beliefLabel?: string | null;
 };
 
 export function PpeEmbedBoundary({
   payload,
+  selectedExpiry = null,
   beliefPresetId = null,
   beliefLabel = null,
 }: PpeEmbedBoundaryProps) {
   if (payload) {
-    const primary = payload.series_by_expiry.find(isDisplaySeries);
+    const primary =
+      (selectedExpiry && findSeriesByExpiry(payload, selectedExpiry)) ||
+      payload.series_by_expiry.find(isDisplaySeries);
     if (!primary) {
       return null;
     }
     const beliefOverlay =
-      beliefPresetId && payload.belief_presets
-        ? payload.belief_presets[beliefPresetId]?.pdf_pct
-        : null;
+      beliefPresetId && primary.belief_presets
+        ? primary.belief_presets[beliefPresetId]?.pdf_pct
+        : beliefPresetId && payload.belief_presets
+          ? payload.belief_presets[beliefPresetId]?.pdf_pct
+          : null;
 
     return (
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">

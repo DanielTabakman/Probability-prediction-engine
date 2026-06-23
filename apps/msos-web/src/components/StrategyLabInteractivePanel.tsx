@@ -22,16 +22,18 @@ type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
   live: boolean;
   defaultOutcome: LabOutcomeSummary;
+  selectedExpiry: string;
+  onExpiryChange: (expiry: string) => void;
+  expiryOptions: string[];
 };
-
-function expiryLabel(payload: DisplayPayload | null): string {
-  return payload?.series_by_expiry?.[0]?.expiry_date ?? "the selected expiry";
-}
 
 export function StrategyLabInteractivePanel({
   displayPayload,
   live,
   defaultOutcome,
+  selectedExpiry,
+  onExpiryChange,
+  expiryOptions,
 }: StrategyLabInteractivePanelProps) {
   const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
 
@@ -44,11 +46,11 @@ export function StrategyLabInteractivePanel({
       return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
     }
     try {
-      return buildOutcomeFromBelief(selectedPresetId, displayPayload, live);
+      return buildOutcomeFromBelief(selectedPresetId, displayPayload, live, selectedExpiry);
     } catch {
       return defaultOutcome;
     }
-  }, [selectedPresetId, displayPayload, live, defaultOutcome]);
+  }, [selectedPresetId, displayPayload, live, defaultOutcome, selectedExpiry]);
 
   const selectedPreset = findBeliefPreset(selectedPresetId);
 
@@ -56,7 +58,9 @@ export function StrategyLabInteractivePanel({
     <>
       <div className="panel chart">
         <BeliefBuilder
-          expiryLabel={expiryLabel(displayPayload)}
+          expiryLabel={selectedExpiry}
+          expiryOptions={expiryOptions}
+          onExpiryChange={onExpiryChange}
           selectedId={selectedPresetId}
           onSelect={handleSelect}
         />
@@ -79,6 +83,7 @@ export function StrategyLabInteractivePanel({
 
         <PpeEmbedBoundary
           payload={displayPayload}
+          selectedExpiry={selectedExpiry}
           beliefPresetId={selectedPresetId}
           beliefLabel={selectedPreset?.label ?? null}
         />
