@@ -16,6 +16,7 @@ from src.engine.implied_distribution import build_distribution_chart_data
 from src.engine.strategy_scanner import build_universal_strategy
 from src.viz.app_cache import CACHE_TTL, cached_forward_iv, cached_marks_full, cached_option_expiries
 from src.viz.decision_ready_review import build_decision_ready_review_payload
+from src.viz.curve_display_labels import build_curve_display_labels
 from src.viz.embed_display_boundary import (
     BELIEF_TUNING_BOUNDS,
     build_belief_overlay_from_mults,
@@ -264,6 +265,7 @@ def build_strategy_suggestion_response(
             "prices_usd": prices,
             "pdf_pct": market_pdf[: len(prices)] if len(market_pdf) == len(prices) else market_pdf,
             "belief_pdf_pct": belief_pdf if len(belief_pdf) == len(prices) else [],
+            "curve_labels": build_curve_display_labels(),
         },
         "suggested": {
             "preset_id": preset_id,

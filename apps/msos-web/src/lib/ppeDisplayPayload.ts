@@ -2,6 +2,8 @@
  * Read-only PPE display payload (pre-computed in Python). No distribution math here.
  */
 
+import type { CurveDisplayLabels } from "@/lib/chartCurveLabels";
+
 export const PPE_DISPLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_DISPLAY_API_URL ?? "/ppe-display-api/display.json"
 ).trim();
@@ -21,6 +23,7 @@ export type DisplaySeries = {
     q3_usd: number;
   };
   belief_presets?: Partial<Record<string, BeliefPresetOverlay>>;
+  curve_labels?: CurveDisplayLabels;
 };
 
 export type DisplaySummaryRow = Record<string, string>;
@@ -40,6 +43,7 @@ export type DisplayPayload = {
   summary?: {
     table_rows?: DisplaySummaryRow[];
   };
+  curve_labels?: CurveDisplayLabels;
 };
 
 export type LabMetric = {

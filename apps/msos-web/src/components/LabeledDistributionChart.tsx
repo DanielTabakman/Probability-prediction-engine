@@ -4,6 +4,7 @@
  * Labeled distribution chart — pre-computed price/pdf arrays only (no math in TS).
  */
 
+import { ChartCurveLegend } from "@/components/ChartCurveLegend";
 import {
   CHART_AXIS_STYLE,
   LABELED_DISTRIBUTION_LAYOUT,
@@ -15,6 +16,7 @@ import {
   seriesPathInLayout,
   valueToChartY,
 } from "@/lib/chartAxisDisplay";
+import { DEFAULT_CURVE_LABELS, type CurveDisplayLabels } from "@/lib/chartCurveLabels";
 import { formatUsd } from "@/lib/ppeDisplayPayload";
 
 type LabeledDistributionChartProps = {
@@ -23,6 +25,7 @@ type LabeledDistributionChartProps = {
   beliefPdfPct?: number[] | null;
   spotUsd: number;
   ariaLabel: string;
+  curveLabels?: CurveDisplayLabels;
   layout?: ChartLayout;
 };
 
@@ -38,6 +41,7 @@ export function LabeledDistributionChart({
   beliefPdfPct,
   spotUsd,
   ariaLabel,
+  curveLabels = DEFAULT_CURVE_LABELS,
   layout = LABELED_DISTRIBUTION_LAYOUT,
 }: LabeledDistributionChartProps) {
   if (!pricesUsd.length || pricesUsd.length !== marketPdfPct.length) {
@@ -59,7 +63,9 @@ export function LabeledDistributionChart({
   const { gridStroke, axisStroke, labelFill } = CHART_AXIS_STYLE;
 
   return (
-    <div className="graph graph-labeled" role="img" aria-label={ariaLabel}>
+    <div className="labeled-distribution-chart">
+      <ChartCurveLegend labels={curveLabels} showBelief={Boolean(beliefPath)} />
+      <div className="graph graph-labeled" role="img" aria-label={ariaLabel}>
       <svg viewBox={`0 0 ${layout.width} ${layout.height}`} preserveAspectRatio="xMidYMid meet">
         {priceTicks.map((price) => {
           const x = priceToChartX(price, xMin, xMax, layout);
@@ -106,7 +112,7 @@ export function LabeledDistributionChart({
           textAnchor="middle"
           transform={`rotate(-90 12 ${(box.y0 + box.y1) / 2})`}
         >
-          Distribution
+          Distribution ({curveLabels.market_method ?? "Black–Scholes lognormal"})
         </text>
 
         <path
@@ -129,6 +135,7 @@ export function LabeledDistributionChart({
           spot {formatUsd(spotUsd)}
         </text>
       </svg>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
  */
 
+import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import type { BeliefPresetId } from "@/lib/beliefPresets";
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
@@ -58,6 +59,7 @@ function NativeDistributionChart({
   const ariaLabel = beliefLabel
     ? `Distribution curves for ${series.expiry_date} — market vs your ${beliefLabel} view`
     : `Distribution curve for ${series.expiry_date}`;
+  const curveLabels = resolveCurveLabels(series.curve_labels);
 
   return (
     <>
@@ -67,6 +69,7 @@ function NativeDistributionChart({
         beliefPdfPct={beliefPdfPct}
         spotUsd={spotUsd}
         ariaLabel={ariaLabel}
+        curveLabels={curveLabels}
       />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
         <div className="ppe-summary-table" aria-label="PPE display payload summary">
@@ -145,15 +148,16 @@ export function PpeEmbedBoundary({
       <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
         <p className="ppe-embed-live-note">
           <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
+          Purple curve = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).market_legend}.
           {beliefOverlay ? (
             <>
               {" "}
-              <span className="tag teal">Your view</span> Teal dashed curve = your belief preset.
+              Teal dashed = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).belief_legend}.
             </>
           ) : null}
         </p>
         <NativeDistributionChart
-          series={primary}
+          series={{ ...primary, curve_labels: primary.curve_labels ?? payload.curve_labels }}
           spotUsd={payload.spot_usd}
           beliefPdfPct={beliefOverlay}
           beliefLabel={beliefLabel}

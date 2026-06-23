@@ -3,6 +3,7 @@
  */
 
 import type { BeliefTuning } from "@/lib/beliefTuning";
+import type { CurveDisplayLabels } from "@/lib/chartCurveLabels";
 import type { PlanLeg } from "@/data/expressionPlanningFixtures";
 
 export const PPE_STRATEGY_SUGGESTION_API_URL = (
@@ -42,6 +43,7 @@ export type StrategySuggestionPayload = {
     prices_usd: number[];
     pdf_pct: number[];
     belief_pdf_pct?: number[];
+    curve_labels?: CurveDisplayLabels;
   };
   suggested?: {
     preset_id?: string;

@@ -7,6 +7,7 @@ import json
 import pytest
 
 from src.viz.distribution_export import build_distribution_export_rows
+from src.viz.curve_display_labels import build_curve_display_labels
 from src.viz.embed_display_boundary import (
     BELIEF_OVERLAY_KIND,
     DISPLAY_PAYLOAD_HTTP_PATH,
@@ -72,6 +73,9 @@ def test_display_payload_schema_and_summary() -> None:
     }
     primary = payload["series_by_expiry"][0]
     assert "belief_presets" in primary
+    assert "curve_labels" in payload
+    assert payload["curve_labels"]["market_legend"] == "Market view [Black–Scholes lognormal]"
+    assert primary["curve_labels"]["market_legend"] == payload["curve_labels"]["market_legend"]
     belief_higher = payload["belief_presets"]["higher"]["pdf_pct"]
     assert len(belief_higher) == len(primary["pdf_pct"])
     assert max(belief_higher) > 0
@@ -178,6 +182,7 @@ def test_belief_overlay_response_and_wsgi() -> None:
     assert len(overlay["pdf_pct"]) == len(payload["series_by_expiry"][0]["pdf_pct"])
     assert overlay["forward_mult"] == clamp_belief_mult("forward_mult", 1.08)
     assert overlay["vol_mult"] == clamp_belief_mult("vol_mult", 1.2)
+    assert overlay["curve_labels"]["belief_legend"] == "Your view [Belief lognormal]"
 
     app = create_display_payload_wsgi_app(lambda: payload)
     status: list[str] = []
@@ -272,7 +277,15 @@ def test_build_strategy_suggestion_response(strategy_mocks: str) -> None:
     assert len(suggested["overlay"]["payoff_pct"]) == len(suggested["overlay"]["prices_usd"])
     assert len(suggested["overlay"]["payoff_usd"]) == len(suggested["overlay"]["prices_usd"])
     assert len(payload["market"]["pdf_pct"]) > 0
+    assert payload["market"]["curve_labels"]["market_legend"] == "Market view [Black–Scholes lognormal]"
     assert suggested["summary"]["max_gain_usd"] is not None
+
+
+def test_curve_display_labels_ssot() -> None:
+    labels = build_curve_display_labels()
+    assert labels["market_legend"] == "Market view [Black–Scholes lognormal]"
+    assert labels["belief_legend"] == "Your view [Belief lognormal]"
+    assert labels["payoff_legend"] == "Payoff at expiry [Structure P&L]"
 
 
 def test_strategy_suggestion_wsgi(strategy_mocks: str) -> None:

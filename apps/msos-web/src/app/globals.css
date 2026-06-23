@@ -1815,14 +1815,21 @@ button.btn:disabled {
   margin-bottom: 8px;
 }
 
-.expression-chart-legend {
+.expression-chart-legend,
+.chart-curve-legend {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   font-size: 10px;
   color: var(--muted);
 }
 
-.expression-chart-legend span::before {
+.labeled-distribution-chart .chart-curve-legend {
+  margin-bottom: 8px;
+}
+
+.expression-chart-legend span::before,
+.chart-curve-legend span::before {
   content: "";
   display: inline-block;
   width: 14px;

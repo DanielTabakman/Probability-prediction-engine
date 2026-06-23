@@ -84,7 +84,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "PpeEmbedBoundary" in panel
     assert "beliefPdfPct" in panel
     assert "selectedExpiry" in panel
-    assert 'className="legend"' in panel
+    assert 'className="legend chart-curve-legend"' in panel or 'className="legend"' in panel
     assert "BeliefFineTuning" in panel
     assert "belief-axis-pair" in builder
 
@@ -95,6 +95,8 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert '"use client"' in embed
     assert "LabeledDistributionChart" in embed
+    assert "resolveCurveLabels" in embed
+    assert "Black–Scholes lognormal" in embed or "curve_labels" in embed
     assert "beliefPdfPct" in embed
     assert "dataMode" in embed
     assert "ppeDisplayPayload" in embed
@@ -107,6 +109,11 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     )
     assert "BTC price at expiry" in labeled
     assert "graph-labeled" in labeled
+    assert "ChartCurveLegend" in labeled
+    assert "Black–Scholes lognormal" in labeled
+
+    curve_labels = (MSOS_WEB / "src" / "lib" / "chartCurveLabels.ts").read_text(encoding="utf-8")
+    assert "Market view [Black–Scholes lognormal]" in curve_labels
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
@@ -183,6 +190,7 @@ def test_expression_planning_route_and_narrative() -> None:
     assert "Structure types" in panel
     assert "ExpressionPayoffChart" in panel
     assert "fetchStrategySuggestion" in panel
+    assert "resolveCurveLabels" in panel
     assert "Suggested trade vs market" in (
         MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
     ).read_text(encoding="utf-8")

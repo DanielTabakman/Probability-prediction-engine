@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ExpressionPayoffChart } from "@/components/ExpressionPayoffChart";
 import {
   expressionFamilies,
@@ -282,6 +283,7 @@ export function ExpressionPlanningPanel() {
               payoffUsd={overlay?.payoff_usd}
               spotUsd={suggestion?.spot_usd ?? 0}
               expiryLabel={expiry ?? suggestion?.expiry_date ?? "selected expiry"}
+              curveLabels={resolveCurveLabels(market?.curve_labels)}
               loading={suggestionLoading}
               error={suggestionError}
             />
