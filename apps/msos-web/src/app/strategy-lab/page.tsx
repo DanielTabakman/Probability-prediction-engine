@@ -4,6 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import { StrategyLabContent } from "@/components/StrategyLabContent";
 import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Strategy Lab | Market Structure OS",
   description:

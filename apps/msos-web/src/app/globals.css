@@ -957,6 +957,52 @@ a {
 }
 
 /* Strategy Lab (P4) */
+.pill.live .dot {
+  background: #2dd4bf;
+  box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.18);
+}
+
+.pill.demo.sample,
+.pill.loading {
+  border-color: rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.08);
+  color: #f6d58b;
+}
+
+.pill.demo.sample .dot,
+.pill.loading .dot {
+  background: #fbbf24;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.16);
+}
+
+.lab-data-banner {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.lab-data-banner.demo {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  color: #f3e2b6;
+}
+
+.lab-data-banner.loading {
+  background: rgba(67, 231, 211, 0.06);
+  border: 1px solid rgba(67, 231, 211, 0.18);
+  color: #c5d8e8;
+}
+
+.lab-data-banner p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b7c9da;
+}
+
 .metrics {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

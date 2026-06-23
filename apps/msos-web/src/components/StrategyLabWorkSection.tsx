@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { ExpiryPicker } from "@/components/ExpiryPicker";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
@@ -16,10 +17,11 @@ const DEMO_EXPIRY_OPTIONS = ["30 days", "60 days", "90 days"];
 
 type StrategyLabWorkSectionProps = {
   displayPayload: DisplayPayload | null;
+  dataMode: LabDataMode;
 };
 
-export function StrategyLabWorkSection({ displayPayload }: StrategyLabWorkSectionProps) {
-  const live = displayPayload != null;
+export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLabWorkSectionProps) {
+  const live = dataMode === "live" && displayPayload != null;
   const expiryOptions = useMemo(
     () => (live && displayPayload ? listExpiryDates(displayPayload) : DEMO_EXPIRY_OPTIONS),
     [live, displayPayload],
@@ -68,6 +70,7 @@ export function StrategyLabWorkSection({ displayPayload }: StrategyLabWorkSectio
         <StrategyLabInteractivePanel
           displayPayload={displayPayload}
           live={live}
+          dataMode={dataMode}
           defaultOutcome={outcomeSummary}
           selectedExpiry={resolvedExpiry}
           onExpiryChange={handleExpiryChange}
