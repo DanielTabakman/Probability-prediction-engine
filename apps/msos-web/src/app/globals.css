@@ -1258,6 +1258,26 @@ a {
   overflow: hidden;
 }
 
+.graph.graph-labeled {
+  height: 318px;
+  overflow: visible;
+}
+
+.labeled-distribution-chart {
+  margin: 12px 0 4px;
+}
+
+.labeled-distribution-chart .graph.graph-labeled {
+  margin: 0;
+}
+
+.graph.graph-labeled svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .graph-labeled {
   height: 318px;
 }
