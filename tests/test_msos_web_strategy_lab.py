@@ -33,11 +33,13 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "StrategyLabInteractivePanel" in panel
-    assert "buildOutcomeFromBelief" in panel
-
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "StrategyLabInteractivePanel" in content
+    assert "StrategyLabInteractivePanel" in panel
+    assert "chartRegion" in panel
+    assert "PpeEmbedBoundary" not in panel
+    assert "PpeEmbedBoundary" in content
+    assert "chartRegion=" in content
+    assert "buildOutcomeFromBelief" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
@@ -57,7 +59,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
         encoding="utf-8"
     )
     assert "Market vs your view" in panel
-    assert "PpeEmbedBoundary" in panel
+    assert "chartRegion" in panel
     assert 'className="legend"' in panel
     assert 'className="controls"' in panel
 

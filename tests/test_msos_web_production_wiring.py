@@ -52,7 +52,8 @@ def test_strategy_lab_embed_boundary_present() -> None:
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     assert "StrategyLabInteractivePanel" in content
-    assert "PpeEmbedBoundary" in lab
+    assert "chartRegion" in lab
+    assert "PpeEmbedBoundary" in content
     assert "ppeDisplayPayload" in embed
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in lib
     assert "NEXT_PUBLIC_PPE_DISPLAY_API_URL" in lib
