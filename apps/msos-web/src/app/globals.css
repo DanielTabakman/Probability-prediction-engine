@@ -1832,6 +1832,20 @@ button.btn:disabled {
   background: #4ade80;
 }
 
+.expression-chart-error {
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.22);
+}
+
+.expression-chart-error p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
 .route {
   padding: 16px;
   border-radius: 14px;

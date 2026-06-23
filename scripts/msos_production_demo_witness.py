@@ -114,6 +114,42 @@ def validate_belief_overlay_api_response(
     return True, None
 
 
+def validate_strategy_suggestion_api_response(
+    status: int,
+    body: str,
+) -> tuple[bool, str | None]:
+    if status != 200:
+        snippet = (body or "")[:200].strip()
+        return False, f"HTTP {status}" + (f": {snippet}" if snippet else "")
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return False, "invalid JSON"
+    if not isinstance(data, dict):
+        return False, "payload not an object"
+    if data.get("kind") != "strategy_suggestion_boundary":
+        return False, f"unexpected kind {data.get('kind')!r}"
+    suggested = data.get("suggested")
+    if not isinstance(suggested, dict):
+        return False, "suggested block missing"
+    legs = suggested.get("legs")
+    if not isinstance(legs, list) or not legs:
+        return False, "suggested.legs empty"
+    market = data.get("market")
+    if not isinstance(market, dict):
+        return False, "market block missing"
+    pdf = market.get("pdf_pct")
+    if not isinstance(pdf, list) or len(pdf) < 2:
+        return False, "market.pdf_pct missing or too short"
+    overlay = suggested.get("overlay")
+    if not isinstance(overlay, dict):
+        return False, "suggested.overlay missing"
+    payoff = overlay.get("payoff_pct")
+    if not isinstance(payoff, list) or len(payoff) < 2:
+        return False, "suggested.overlay.payoff_pct missing or too short"
+    return True, None
+
+
 def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     """Strategy Lab must expose a live PPE surface, not degraded embed placeholder."""
     if "Sample mode — not live market data" in html:
@@ -214,6 +250,32 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
             "ok": overlay_ok,
             "status": 200 if overlay_ok else 0,
             "error": overlay_msg,
+        }
+    )
+
+    suggestion_ok = False
+    suggestion_msg: str | None = "display API unavailable for strategy suggestion probe"
+    suggestion_url = f"{base}/ppe-display-api/strategy-suggestion.json"
+    if d_ok and d_data:
+        series = d_data.get("series_by_expiry") or []
+        expiry = series[0].get("expiry_date") if series else None
+        if expiry:
+            suggestion_url = (
+                f"{suggestion_url}?expiry={expiry}&forward_mult=1.0&vol_mult=0.7"
+            )
+            s_status, s_body, s_err = _fetch(suggestion_url)
+            suggestion_ok, suggestion_msg = validate_strategy_suggestion_api_response(
+                s_status, s_body
+            )
+            if s_err and not suggestion_ok:
+                suggestion_msg = s_err
+    checks.append(
+        {
+            "id": "ppe_strategy_suggestion_api",
+            "url": suggestion_url,
+            "ok": suggestion_ok,
+            "status": 200 if suggestion_ok else 0,
+            "error": suggestion_msg,
         }
     )
 

@@ -221,7 +221,12 @@ export function ExpressionPlanningPanel() {
         </div>
       </header>
 
-      {!thesisConfirmed && hydrated ? (
+      {!hydrated ? (
+        <div className="panel thesis-gate" aria-live="polite">
+          <h2>Loading your workspace</h2>
+          <p>Pulling your confirmed view and live trade suggestion from Strategy Lab…</p>
+        </div>
+      ) : !thesisConfirmed ? (
         <div className="panel thesis-gate">
           <h2>Confirm your view first</h2>
           <p>Save and confirm what you believe in Strategy Lab before sketching a trade structure.</p>

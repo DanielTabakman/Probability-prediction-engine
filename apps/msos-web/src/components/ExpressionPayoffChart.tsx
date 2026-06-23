@@ -37,8 +37,13 @@ export function ExpressionPayoffChart({
   }
   if (error) {
     return (
-      <div className="expression-chart panel-sub" role="status">
-        {error}
+      <div className="expression-chart expression-chart-error" role="status">
+        <div className="panel-sub">Trade vs market</div>
+        <p>{error}</p>
+        <p className="micro">
+          Open Strategy Lab, pick an expiry, confirm your view, then return here. Hard-refresh if you
+          just deployed.
+        </p>
       </div>
     );
   }
