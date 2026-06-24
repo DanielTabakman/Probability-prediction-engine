@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { AppShell } from "@/components/AppShell";
 import { CommandCenterContent } from "@/components/CommandCenterContent";
 import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
-import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
+import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentityCore";
 
 export const metadata: Metadata = {
   title: "Command Center | Market Structure OS",

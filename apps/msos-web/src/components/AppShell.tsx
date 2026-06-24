@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { getOrCreateEntitlement } from "@/lib/msosEntitlements";
-import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
+import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentityCore";
 
 type AppShellProps = {
   children: React.ReactNode;

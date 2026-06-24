@@ -118,6 +118,25 @@ def test_homepage_product_window_rich_preview() -> None:
     assert "Demo" in window
 
 
+def test_middleware_edge_safe_session_cookie() -> None:
+    """Middleware runs on Edge — must not import Node crypto (runtime 500 on every route)."""
+    middleware = (MSOS_WEB / "src" / "middleware.ts").read_text(encoding="utf-8")
+    assert 'from "crypto"' not in middleware
+    assert "crypto.randomUUID()" in middleware
+    assert "MSOS_SESSION_COOKIE" in middleware
+
+
+def test_workflow_auth_split_avoids_import_cycle() -> None:
+    """Route auth must not import next/headers; identity core must not import workflow owner."""
+    auth = (MSOS_WEB / "src" / "lib" / "msosWorkflowAuth.ts").read_text(encoding="utf-8")
+    core = (MSOS_WEB / "src" / "lib" / "msosIdentityCore.ts").read_text(encoding="utf-8")
+    owner = (MSOS_WEB / "src" / "lib" / "msosWorkflowOwner.ts").read_text(encoding="utf-8")
+    assert "next/headers" not in auth
+    assert "next/headers" in owner
+    assert "msosWorkflowOwner" not in core
+    assert "msosIdentityCore" in auth
+
+
 def test_command_center_uses_snapshot_summary() -> None:
     page = (MSOS_WEB / "src" / "app" / "command-center" / "page.tsx").read_text(encoding="utf-8")
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")

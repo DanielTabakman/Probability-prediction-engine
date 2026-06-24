@@ -10,11 +10,12 @@ MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
 
 def test_msos_identity_module_exists() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "msosIdentity.ts").read_text(encoding="utf-8")
-    assert "resolveMsosIdentityFromHeaders" in lib
+    core = (MSOS_WEB / "src" / "lib" / "msosIdentityCore.ts").read_text(encoding="utf-8")
+    auth = (MSOS_WEB / "src" / "lib" / "msosWorkflowAuth.ts").read_text(encoding="utf-8")
     assert "requireProtectedIdentity" in lib
-    assert "cf-access-authenticated-user-email" in lib
-    assert "requireProtectedIdentity" in lib
-    assert "authentication required" in lib
+    assert "resolveMsosIdentityFromHeaders" in core
+    assert "cf-access-authenticated-user-email" in core
+    assert "authentication required" in auth
 
 
 def test_protected_api_routes_require_identity() -> None:
