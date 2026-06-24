@@ -4,7 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-24
 
-_No merges to `main`._
+- `b81ba68` — Merge pull request #325 from DanielTabakman/fix/homepage-demo-label
+- `943923b` — MSOS homepage: Demo label + sidebar logo links home (`apps/msos-web/`)
+- `5261a03` — MSOS homepage UX: simplify, tutorial, button feedback (#324) (`apps/msos-web/`)
+- `4c45faa` — Control-plane: dev changelog
 
 ## 2026-06-23
 
