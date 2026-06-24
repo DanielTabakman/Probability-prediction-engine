@@ -161,6 +161,7 @@ export function StrategyLabInteractivePanel({
           </p>
         ) : null}
 
+        <div data-tour="lab-chart">
         <PpeEmbedBoundary
           payload={displayPayload}
           live={live}
@@ -169,6 +170,7 @@ export function StrategyLabInteractivePanel({
           beliefLabel={active ? viewLabel : null}
           beliefPdfPct={beliefPdfPct}
         />
+        </div>
 
         <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
 

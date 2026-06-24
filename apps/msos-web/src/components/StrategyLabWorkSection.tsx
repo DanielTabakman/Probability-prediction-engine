@@ -55,7 +55,7 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
 
   return (
     <>
-      <section className="metrics" aria-label="Lab context">
+      <section className="metrics" aria-label="Lab context" data-tour="lab-expiry">
         {metrics.map((metric) => (
           <div key={metric.label} className="metric">
             <div className="label">{metric.label}</div>

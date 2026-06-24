@@ -145,7 +145,57 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  cursor: default;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease,
+    opacity 0.15s ease;
+}
+
+a.btn:hover,
+button.btn:hover:not(:disabled) {
+  border-color: rgba(67, 231, 211, 0.45);
+  box-shadow: 0 0 0 1px rgba(67, 231, 211, 0.12);
+}
+
+a.btn:active,
+button.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+a.btn:focus-visible,
+button.btn:focus-visible {
+  outline: 2px solid rgba(67, 231, 211, 0.55);
+  outline-offset: 2px;
+}
+
+.btn.primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 0 0 1px rgba(83, 170, 255, 0.25);
+}
+
+.btn-pending {
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.btn-feedback {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--teal);
+  animation: btn-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .btn.primary {
@@ -224,6 +274,197 @@ a {
   gap: 14px;
   margin-top: 30px;
   flex-wrap: wrap;
+}
+
+.hero-hint {
+  margin: 18px 0 0;
+}
+
+.pill.compact {
+  font-size: 11px;
+  padding: 6px 10px;
+}
+
+.nav-text-btn {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.nav-text-btn:hover {
+  color: var(--teal);
+}
+
+.product-window-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.product-window-link:hover {
+  border-color: rgba(67, 231, 211, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+.feature-cta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.belief-bounds-note,
+.belief-tail-note {
+  margin-top: 10px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(3, 8, 14, 0.72);
+  cursor: pointer;
+}
+
+.modal-card {
+  position: relative;
+  width: min(440px, 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0b1522;
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.modal-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.modal-lead {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.modal-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.modal-field input,
+.modal-field textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #08121e;
+  color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.modal-success {
+  color: var(--teal);
+  font-size: 13px;
+}
+
+.modal-error {
+  color: #f87171;
+  font-size: 12px;
+}
+
+.modal-foot {
+  margin: 14px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.platform-tutorial-root {
+  position: absolute;
+  inset: 0;
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.platform-tutorial-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 8, 14, 0.55);
+  pointer-events: auto;
+}
+
+.platform-tutorial-spotlight {
+  position: absolute;
+  border-radius: 14px;
+  border: 2px solid rgba(67, 231, 211, 0.7);
+  box-shadow: 0 0 0 9999px rgba(3, 8, 14, 0.45);
+  pointer-events: none;
+}
+
+.platform-tutorial-card {
+  position: absolute;
+  z-index: 2;
+  pointer-events: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(67, 231, 211, 0.35);
+  background: #0b1522;
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.platform-tutorial-kicker {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+
+.platform-tutorial-card h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.platform-tutorial-card p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.platform-tutorial-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .chips {

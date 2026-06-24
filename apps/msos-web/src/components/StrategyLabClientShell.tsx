@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
+import { PlatformTutorial } from "@/components/PlatformTutorial";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   fetchDisplayPayloadClient,
@@ -18,6 +20,10 @@ import {
   LAB_LOADING_BANNER_BODY,
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
+import {
+  PLATFORM_TUTORIAL_QUERY,
+  isPlatformTutorialComplete,
+} from "@/lib/platformTutorial";
 
 type StrategyLabClientShellProps = {
   initialPayload: DisplayPayload | null;
@@ -28,8 +34,17 @@ function resolveInitialMode(initialPayload: DisplayPayload | null): LabDataMode 
 }
 
 export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShellProps) {
+  const searchParams = useSearchParams();
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+
+  useEffect(() => {
+    const forced = searchParams.get(PLATFORM_TUTORIAL_QUERY) === "1";
+    if (forced || !isPlatformTutorialComplete()) {
+      setTutorialOpen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (initialPayload) {
@@ -75,8 +90,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
             <span className="dot" aria-hidden="true" />
             {pillLabel}
           </span>
-          <span className="btn slim">Share</span>
-          <Link href="/strategy-lab/confirm" className="btn slim primary">
+          <Link href="/strategy-lab/confirm" className="btn slim primary" data-tour="lab-confirm">
             Save your view
           </Link>
           <span className="avatar" aria-hidden="true">
@@ -103,6 +117,8 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       ) : null}
 
       <StrategyLabWorkSection displayPayload={payload} dataMode={mode} />
+
+      <PlatformTutorial active={tutorialOpen} onClose={() => setTutorialOpen(false)} />
 
       <p className="footer-note">{DEMO_FOOTER}</p>
     </>

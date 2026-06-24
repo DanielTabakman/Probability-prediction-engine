@@ -29,10 +29,10 @@ def test_e2e_journey_routes_exist() -> None:
 def test_e2e_public_nav_covers_journey_entry_points() -> None:
     nav = (COMPONENTS / "PublicNav.tsx").read_text(encoding="utf-8")
     routes = (LIB / "msosPublicUrls.ts").read_text(encoding="utf-8")
-    assert "MSOS_ROUTES.strategyLab" in nav
+    assert "MSOS_ROUTES.strategyLab" in nav or "strategy-lab" in nav
     assert "MSOS_ROUTES.commandCenter" in nav
     assert "MSOS_ROUTES.monitor" in nav
-    assert "MSOS_ROUTES.learn" in nav
+    assert "Restart tour" in nav
     assert "resolveSignInUrl" in nav
     for segment in ("/strategy-lab", "/command-center", "/monitor", "/history", "/learn"):
         assert segment in routes
@@ -40,9 +40,10 @@ def test_e2e_public_nav_covers_journey_entry_points() -> None:
 
 def test_e2e_homepage_research_and_lab_ctas() -> None:
     hero = (COMPONENTS / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert "resolveResearchOfferCta" in hero
-    assert "MSOS_ROUTES.strategyLab" in hero
-    assert "MSOS_ROUTES.commandCenter" in hero
+    assert "ResearchBetaModal" in hero
+    assert "strategyLabTutorialHref" in hero
+    nav = (COMPONENTS / "PublicNav.tsx").read_text(encoding="utf-8")
+    assert "MSOS_ROUTES.commandCenter" in nav
 
 
 def test_e2e_strategy_lab_embed_and_workflow_paths() -> None:
