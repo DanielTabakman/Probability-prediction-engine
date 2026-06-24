@@ -176,6 +176,18 @@ def _resolve_pytest_profile(
     return "fast", None, "fast (markers)"
 
 
+def _touches_msos_web(files: list[str]) -> bool:
+    return any(f.replace("\\", "/").startswith("apps/msos-web/") for f in files)
+
+
+def _msos_web_gate_commands(files: list[str], *, pre_push: bool) -> list[list[str]]:
+    if not _touches_msos_web(files):
+        return []
+    if pre_push:
+        return [["python", "scripts/verify_msos_web_build.py"]]
+    return [["python", "scripts/verify_msos_web_build.py", "--witness-only"]]
+
+
 def _classify(
     files: list[str],
     *,
@@ -347,6 +359,15 @@ def main(argv: list[str] | None = None) -> int:
         rc = _run(cmd, cwd=repo)
         if rc != 0:
             return rc
+
+    msos_cmds = _msos_web_gate_commands(files, pre_push=args.pre_push)
+    for cmd in msos_cmds:
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
+    if plan.tier >= 1 or msos_cmds:
+        print("\033[1;32mAll checks passed!\033[0m")
     return 0
 
 
