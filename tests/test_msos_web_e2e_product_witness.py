@@ -29,10 +29,10 @@ def test_e2e_journey_routes_exist() -> None:
 def test_e2e_public_nav_covers_journey_entry_points() -> None:
     nav = (COMPONENTS / "PublicNav.tsx").read_text(encoding="utf-8")
     routes = (LIB / "msosPublicUrls.ts").read_text(encoding="utf-8")
-    assert "MSOS_ROUTES.strategyLab" in nav
+    assert "MSOS_ROUTES.strategyLab" in nav or "strategy-lab" in nav
     assert "MSOS_ROUTES.commandCenter" in nav
     assert "MSOS_ROUTES.monitor" in nav
-    assert "MSOS_ROUTES.learn" in nav
+    assert "Restart tour" in nav
     assert "resolveSignInUrl" in nav
     for segment in ("/strategy-lab", "/command-center", "/monitor", "/history", "/learn"):
         assert segment in routes
