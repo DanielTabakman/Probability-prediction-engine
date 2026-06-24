@@ -34,11 +34,16 @@ export const confirmationChecklist: ChecklistItem[] = [
   { id: "horizon", label: "Timeframe locked — BTC · 30 days" },
 ];
 
-export const lifecycleSteps: { id: ThesisLifecycle; label: string }[] = [
-  { id: "exploring", label: "Exploring" },
-  { id: "draft", label: "Draft" },
+export const lifecycleSteps = [
+  { id: "pending", label: "Pending" },
   { id: "confirmed", label: "Confirmed" },
-];
+] as const;
+
+export type LifecycleDisplayId = (typeof lifecycleSteps)[number]["id"];
+
+export function lifecycleDisplayId(lifecycle: ThesisLifecycle): LifecycleDisplayId {
+  return lifecycle === "confirmed" ? "confirmed" : "pending";
+}
 
 export const defaultThesisRecord: ThesisRecord = {
   instrument: "BTC options",

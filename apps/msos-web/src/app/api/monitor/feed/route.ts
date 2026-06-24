@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   const identity = requireProtectedIdentity(request);
   if (!identity.ok) return identity.response;
   try {
-    const feed = await loadMonitorFeed(identity.email || null);
+    const feed = await loadMonitorFeed(identity.email);
     return NextResponse.json(feed);
   } catch (err) {
     console.error("monitor feed GET failed", err);

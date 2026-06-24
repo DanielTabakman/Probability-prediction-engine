@@ -82,7 +82,7 @@ export async function fetchThesisRecord(fallback: ThesisRecord): Promise<ThesisR
     return fallback;
   }
   try {
-    const response = await fetch("/api/theses", { cache: "no-store" });
+    const response = await fetch("/api/theses", { cache: "no-store", credentials: "include" });
     if (!response.ok) {
       return loadThesisRecord(fallback);
     }
@@ -111,6 +111,7 @@ export async function persistThesisRecord(record: ThesisRecord): Promise<void> {
     await fetch("/api/theses", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ thesis: record }),
     });
   } catch {

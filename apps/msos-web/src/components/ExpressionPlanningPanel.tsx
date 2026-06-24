@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
-import { ExpressionPayoffChart } from "@/components/ExpressionPayoffChart";
+import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
 import {
   expressionFamilies,
   expressionRiskNote,
@@ -33,9 +33,9 @@ import {
 } from "@/lib/ppeStrategySuggestion";
 import {
   fetchDisplayPayload,
-  formatUsd,
   listExpiryDates,
 } from "@/lib/ppeDisplayPayload";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
@@ -69,7 +69,10 @@ function familiesWithSelection(selectedId: string): ExpressionFamily[] {
   });
 }
 
-function optimizationFromSuggestion(payload: StrategySuggestionPayload | null): OptimizationLine[] {
+function optimizationFromSuggestion(
+  payload: StrategySuggestionPayload | null,
+  formatMoney: (usd: number) => string,
+): OptimizationLine[] {
   const summary = payload?.suggested?.summary;
   const glance = payload?.suggested?.belief_vs_market_glance;
   const fit =
@@ -81,19 +84,19 @@ function optimizationFromSuggestion(payload: StrategySuggestionPayload | null): 
   const breakevens = summary?.breakevens_usd ?? [];
   const beText =
     breakevens.length > 0
-      ? breakevens.map((value) => formatUsd(value)).join(" · ")
+      ? breakevens.map((value) => formatMoney(value)).join(" · ")
       : "See chart";
 
   return [
     { label: "Fits your view", value: fit, tone: "teal" },
     {
       label: "Max gain",
-      value: typeof maxGain === "number" ? formatUsd(maxGain) : "—",
+      value: typeof maxGain === "number" ? formatMoney(maxGain) : "—",
       tone: "teal",
     },
     {
       label: "Max loss",
-      value: typeof maxLoss === "number" ? formatUsd(Math.abs(maxLoss)) : "Capped",
+      value: typeof maxLoss === "number" ? formatMoney(Math.abs(maxLoss)) : "Capped",
       tone: "amber",
     },
     { label: "Breakevens", value: beText },
@@ -113,6 +116,7 @@ export function ExpressionPlanningPanel() {
   const [expiry, setExpiry] = useState<string | null>(null);
   const [savePending, setSavePending] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const { currency, formatMoney } = useDisplayCurrency();
 
   useEffect(() => {
     void Promise.all([
@@ -227,7 +231,7 @@ export function ExpressionPlanningPanel() {
 
   const families = familiesWithSelection(livePlan.familyId);
   const optimizationLines = suggestion?.suggested
-    ? optimizationFromSuggestion(suggestion)
+    ? optimizationFromSuggestion(suggestion, formatMoney)
     : optimizationBasis;
   const statusGrid = statusGridForLifecycle(lastSavedAt ? "simulated" : record.lifecycle);
   const market = suggestion?.market;
@@ -307,7 +311,7 @@ export function ExpressionPlanningPanel() {
           </div>
 
           <div className="panel ticket">
-            <ExpressionPayoffChart
+            <ExpressionPayoffChartFrame
               pricesUsd={market?.prices_usd ?? overlay?.prices_usd ?? []}
               marketPdfPct={market?.pdf_pct ?? []}
               beliefPdfPct={market?.belief_pdf_pct}
@@ -362,23 +366,48 @@ export function ExpressionPlanningPanel() {
             ) : null}
             <div className="risk-note">{expressionRiskNote}</div>
             <div className="exec-actions">
-              <button type="button" className="btn slim" disabled={!hydrated}>
-                Watch without trading
-              </button>
-              <button
-                type="button"
-                className="btn slim primary"
-                disabled={!hydrated || savePending}
-                onClick={() => void simulateExpression()}
-              >
-                {savePending ? "Saving…" : lastSavedAt ? "Save again" : "Save paper trade"}
-              </button>
-              <button type="button" className="btn slim dark" disabled={!hydrated}>
-                Review order (coming soon)
-              </button>
+              {lastSavedAt ? (
+                <>
+                  <Link
+                    href="/strategy-lab/expression"
+                    className="btn slim primary"
+                    onClick={() => {
+                      setLastSavedAt(null);
+                      setRecord(defaultExpressionRecord);
+                    }}
+                  >
+                    Plan another trade
+                  </Link>
+                  <Link href="/monitor" className="btn slim">
+                    Monitor paper trades
+                  </Link>
+                  <Link href="/history" className="btn slim dark">
+                    View history
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button type="button" className="btn slim" disabled={!hydrated}>
+                    Watch without trading
+                  </button>
+                  <button
+                    type="button"
+                    className="btn slim primary"
+                    disabled={!hydrated || savePending}
+                    onClick={() => void simulateExpression()}
+                  >
+                    {savePending ? "Saving…" : "Save paper trade"}
+                  </button>
+                  <button type="button" className="btn slim dark" disabled={!hydrated}>
+                    Review order (coming soon)
+                  </button>
+                </>
+              )}
             </div>
             {lastSavedAt ? (
-              <p className="micro persistence-note">{EXPRESSION_PERSISTENCE_LABEL}</p>
+              <p className="micro persistence-note">
+                {EXPRESSION_PERSISTENCE_LABEL} Amounts shown in {currency}.
+              </p>
             ) : null}
           </div>
         </section>
