@@ -10,6 +10,8 @@ from scripts.run_pushable_gate import (
     FAST_PYTEST_MARKER,
     GatePlan,
     _classify,
+    _msos_web_gate_commands,
+    _touches_msos_web,
     _union_paths,
     pytest_cmd,
     pytest_commands,
@@ -46,6 +48,21 @@ class TestRunPushableGateTiers(unittest.TestCase):
             ["docs/SOP/HANDOFF.md", "src/viz/app.py"],
         )
         self.assertEqual(merged, ["docs/SOP/HANDOFF.md", "src/viz/app.py"])
+
+    def test_touches_msos_web_prefix(self) -> None:
+        self.assertTrue(_touches_msos_web(["apps/msos-web/src/middleware.ts"]))
+        self.assertFalse(_touches_msos_web(["docs/SOP/HANDOFF.md"]))
+
+    def test_msos_web_gate_pre_push_full_build(self) -> None:
+        cmds = _msos_web_gate_commands(["apps/msos-web/src/page.tsx"], pre_push=True)
+        self.assertEqual(cmds, [["python", "scripts/verify_msos_web_build.py"]])
+
+    def test_msos_web_gate_wip_witness_only(self) -> None:
+        cmds = _msos_web_gate_commands(["apps/msos-web/src/page.tsx"], pre_push=False)
+        self.assertEqual(
+            cmds,
+            [["python", "scripts/verify_msos_web_build.py", "--witness-only"]],
+        )
 
 
 class TestResolveChangedFiles(unittest.TestCase):

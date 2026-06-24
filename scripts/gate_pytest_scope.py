@@ -29,6 +29,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("scripts/run_implied_lab", ("tests/test_ui_smoke_*.py", "tests/test_scenario_timeout_defaults.py")),
     ("scripts/run_mvp1_dual", ("tests/test_ui_smoke_*.py", "tests/test_scenario_timeout_defaults.py")),
     ("scripts/run_pushable_gate", ("tests/test_run_pushable_gate.py", "tests/test_gate_pytest_scope.py")),
+    ("scripts/verify_msos_web_build", ("tests/test_verify_msos_web_build.py",)),
     (
         "scripts/run_codebase_health_gate",
         ("tests/test_codebase_health_gate.py", "tests/test_relay_runtime_v0.py"),

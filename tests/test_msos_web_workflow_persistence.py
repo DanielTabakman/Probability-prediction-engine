@@ -118,6 +118,25 @@ def test_homepage_product_window_rich_preview() -> None:
     assert "Demo" in window
 
 
+def test_verify_msos_web_build_script_and_ci() -> None:
+    import subprocess
+    import sys
+
+    repo = REPO_ROOT
+    proc = subprocess.run(
+        [sys.executable, "scripts/verify_msos_web_build.py", "--witness-only"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+    )
+    assert proc.returncode == 0, proc.stderr or proc.stdout
+    ci = (repo / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    assert "msos_web_build:" in ci
+    assert "verify_msos_web_build.py" in ci
+    gate = (repo / "scripts" / "run_pushable_gate.py").read_text(encoding="utf-8")
+    assert "_msos_web_gate_commands" in gate
+
+
 def test_middleware_edge_safe_session_cookie() -> None:
     """Middleware runs on Edge — must not import Node crypto (runtime 500 on every route)."""
     middleware = (MSOS_WEB / "src" / "middleware.ts").read_text(encoding="utf-8")

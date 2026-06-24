@@ -39,6 +39,21 @@ jobs:
       - name: Run slow tests (serial)
         run: python -m pytest -q -m slow
 
+  msos_web_build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/msos-web/package-lock.json
+
+      - name: MSOS Next.js production build (Edge middleware + compile)
+        run: python scripts/verify_msos_web_build.py
+
   docker_entrypoint:
     runs-on: ubuntu-latest
     timeout-minutes: 8
