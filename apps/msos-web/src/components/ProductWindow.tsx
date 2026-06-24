@@ -15,9 +15,9 @@ export function ProductWindow() {
         <div className="lens-head">
           <div>
             <strong>Strategy Lab</strong>
-            <div className="micro">Purple market curve vs your teal belief — click to open live demo.</div>
+            <div className="micro">Illustrative preview — click to open Strategy Lab (Deribit data when online).</div>
           </div>
-          <span className="tag">Live</span>
+          <span className="tag muted">Demo</span>
         </div>
         <div className="belief-card">
           <div className="micro">Market comparison</div>
