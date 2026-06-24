@@ -769,6 +769,11 @@ button.btn:focus-visible {
 .app-brand {
   font-size: 16px;
   margin-bottom: 29px;
+  cursor: pointer;
+}
+
+.app-brand:hover {
+  color: var(--teal);
 }
 
 .app-sidebar .logo {

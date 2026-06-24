@@ -3,6 +3,7 @@ import Link from "next/link";
 import { connectedMarkets, navItems } from "@/data/commandCenterFixtures";
 import type { EntitlementTier } from "@/lib/msosEntitlements";
 import { tierLabel, upgradeOfferUrl } from "@/lib/msosEntitlements";
+import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
 
 type AppSidebarProps = {
   activeNavId?: string;
@@ -21,13 +22,13 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
 
   return (
     <aside className="app-sidebar">
-      <div className="brand app-brand">
+      <Link className="brand app-brand" href={MSOS_ROUTES.home}>
         <div className="logo" aria-hidden="true" />
         <div>
           MSOS
           <small>Market Structure OS</small>
         </div>
-      </div>
+      </Link>
 
       {tier ? (
         <div className="asset on entitlement-badge" data-tier={tier}>
