@@ -2,8 +2,41 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-24
+
+_No merges to `main`._
+
 ## 2026-06-23
 
+- `f97739a` — fix(deploy): ensure_production_deploy import without PYTHONPATH (#323) (`scripts/`)
+- `d06263c` — fix(deploy): required msos_web ship verify gate after VPS deploy (#322) (`scripts/`)
+- `a9783ef` — fix(msos): Strategy Lab labeled axes CSS + production bundle witness (#321) (`apps/msos-web/`)
+- `621d04a` — MSOS charts: labeled axes and curve method legends (#320) (`apps/msos-web/`)
+- `24d20ac` — MSOS expression chart: axis labels, price grid, dual P&L scale (#319) (`apps/msos-web/`)
+- `be6d211` — build(deps): Bump actions/checkout from 4 to 7 (#298)
+- `a975b46` — fix(deploy): auto redeploy after merge; split VPS deploy from witness (#318) (`docs/SOP/`)
+- `37280a4` — fix(msos): expression loading state + deploy witness for strategy-suggestion API (#317) (`apps/msos-web/`)
+- `614a671` — MSOS expression: live trade suggestion vs market chart (PPE strategy-suggestion API) (#316) (`apps/msos-web/`)
+- `7354ded` — fix(deploy): production witness belief overlay + Playwright API typo (#315) (`scripts/`)
+- `b4d8990` — fix(deploy): witness belief-overlay API + trigger production refresh (#314) (`scripts/`)
+- `a5f3536` — MSOS Strategy Lab: nudge buttons, fine sliders, persistent belief tuning (#313) (`apps/msos-web/`)
+- `bce5ad7` — docs(deploy): security operator checklist v1 (#312) (`docs/SOP/`)
+- `7e2dac4` — build(deps): Update google-api-python-client requirement (#304)
+- `8392eba` — build(deps): Update google-auth requirement from >=2.25.0 to >=2.55.0 (#311)
+- `3f5e65a` — build(deps): Bump actions/github-script from 7 to 9 (#300)
+- `b69d64d` — build(deps): Update google-auth-oauthlib requirement (#310)
+- `1585ec4` — build(deps): Update cursor-sdk requirement from >=0.1.0 to >=0.1.8 (#306)
+- `6ab9a5c` — build(deps-dev): Bump @types/node in /apps/msos-web (#302) (`apps/msos-web/`)
+- `a937f2a` — build(deps): Update pytest-xdist requirement from >=3.5.0 to >=3.8.0 (#307)
+- `135771e` — build(deps): Bump actions/setup-node from 4 to 6 (#301)
+- `9695745` — build(deps): Bump appleboy/ssh-action from 1.0.3 to 1.2.5 (#297)
+- `5c89f15` — Platform security hardening v1 (#296) (`scripts/`)
+- `0c3db8c` — MSOS Strategy Lab: belief button pairs for price and vol (#295) (`apps/msos-web/`)
+- `efc334f` — MSOS-PublicLaunchV1 Product Slice: belief fine-tuning sliders (#294) (`apps/msos-web/`)
+- `81a9ba4` — fix(control): align deploy witness needles and document zero-touch merge (#293) (`scripts/`)
+- `f0efe08` — feat(strategy-lab): clickable expiries and clear live vs sample labeling (#292) (`apps/msos-web/`)
+- `6383eab` — feat(strategy-lab): belief preset curve overlay on distribution chart (#291) (`apps/msos-web/`)
+- `efa40eb` — Control-plane: dev changelog
 - `d8a1f92` — Control-plane: dev changelog
 
 ## 2026-06-22
