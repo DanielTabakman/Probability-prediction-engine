@@ -105,15 +105,26 @@
       "notes": "Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md."
     },
     {
+      "id": "lemon_squeezy_operator_prereq",
+      "title": "Lemon Squeezy operator prerequisites (billing v1)",
+      "status": "open",
+      "priority": "high",
+      "category": "operator",
+      "summary": "Create Lemon Squeezy store + subscription product, set MSOS_UPGRADE_OFFER_URL on VPS, configure webhook at /api/billing/lemon-squeezy/webhook with LEMONSQUEEZY_WEBHOOK_SECRET. Runbook: LEMON_SQUEEZY_OPERATOR_SETUP_V1.md",
+      "policyQuestion": "When checkout + first test payment witness pass, mark this item done.",
+      "added": "2026-06-24",
+      "notes": "Replaces stripe_operator_prereq — operator chose Lemon Squeezy MoR 2026-06-21."
+    },
+    {
       "id": "stripe_operator_prereq",
       "title": "Stripe operator prerequisites (phase 7b gate)",
-      "status": "open",
+      "status": "cancelled",
       "priority": "high",
       "category": "operator",
       "summary": "Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.",
       "policyQuestion": "When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.",
       "added": "2026-06-19",
-      "notes": "Steward 2026-06-19: deferred until website demo-ready on production; Stripe accounts/setup pending."
+      "notes": "Superseded by lemon_squeezy_operator_prereq 2026-06-24."
     },
     {
       "id": "process_library_expansion",

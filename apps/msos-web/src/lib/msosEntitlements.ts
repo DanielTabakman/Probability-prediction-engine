@@ -127,6 +127,71 @@ export function getOrCreateEntitlement(ownerEmail: string): MsosEntitlement | nu
   }
 }
 
+export type GrantEntitlementInput = {
+  ownerEmail: string;
+  tier: EntitlementTier;
+  grantedBy: string;
+  notes?: string | null;
+  billingCustomerId?: string | null;
+  billingSubscriptionId?: string | null;
+  subscriptionStatus?: SubscriptionStatus;
+};
+
+/** Operator grant or billing webhook — upserts entitlement row. */
+export function grantEntitlement(input: GrantEntitlementInput): MsosEntitlement | null {
+  const email = normalizeOwnerEmail(input.ownerEmail);
+  if (!email) return null;
+
+  const db = ensureDb();
+  try {
+    const now = utcNow();
+    const existing = getEntitlement(email);
+    const subscriptionStatus = input.subscriptionStatus ?? existing?.subscriptionStatus ?? "none";
+    const notes = input.notes ?? existing?.notes ?? null;
+    const billingCustomerId =
+      input.billingCustomerId ?? existing?.stripeCustomerId ?? null;
+    const billingSubscriptionId =
+      input.billingSubscriptionId ?? existing?.stripeSubscriptionId ?? null;
+
+    if (existing) {
+      db.prepare(
+        `UPDATE msos_entitlements
+         SET tier = ?, granted_at_utc = ?, granted_by = ?, notes = ?,
+             stripe_customer_id = ?, stripe_subscription_id = ?, subscription_status = ?
+         WHERE owner_email = ?`,
+      ).run(
+        input.tier,
+        now,
+        input.grantedBy,
+        notes,
+        billingCustomerId,
+        billingSubscriptionId,
+        subscriptionStatus,
+        email,
+      );
+    } else {
+      db.prepare(
+        `INSERT INTO msos_entitlements
+         (owner_email, tier, granted_at_utc, granted_by, notes,
+          stripe_customer_id, stripe_subscription_id, subscription_status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).run(
+        email,
+        input.tier,
+        now,
+        input.grantedBy,
+        notes,
+        billingCustomerId,
+        billingSubscriptionId,
+        subscriptionStatus,
+      );
+    }
+    return getEntitlement(email);
+  } finally {
+    db.close();
+  }
+}
+
 export function tierMeetsRequirement(
   current: EntitlementTier,
   required: EntitlementTier,

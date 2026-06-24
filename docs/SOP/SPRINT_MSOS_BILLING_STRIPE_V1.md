@@ -1,5 +1,7 @@
 # MSOS billing Stripe v1
 
+> **SUPERSEDED 2026-06-21** — Operator chose **Lemon Squeezy** (MoR). See [`SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md`](SPRINT_MSOS_BILLING_LEMON_SQUEEZY_V1.md). Do not BUILD this chapter unless operator reverts.
+
 **Display name:** Stripe Checkout + subscription webhooks · **chapterId:** `msos_billing_stripe_v1`  
 **Controlling canon:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)  
 **Prior chapter:** [`SPRINT_MSOS_ENTITLEMENTS_V1.md`](SPRINT_MSOS_ENTITLEMENTS_V1.md)  

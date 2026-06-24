@@ -39,7 +39,7 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
 
       {showUpgrade ? (
         <Link href={upgradeUrl} className="btn slim primary entitlement-upgrade-link">
-          Request upgrade
+          Upgrade
         </Link>
       ) : null}
 

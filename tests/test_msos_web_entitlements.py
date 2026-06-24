@@ -35,7 +35,7 @@ def test_app_sidebar_shows_tier_badge() -> None:
     shell = (MSOS_WEB / "src" / "components" / "AppShell.tsx").read_text(encoding="utf-8")
     assert "tierLabel" in sidebar
     assert "entitlement-badge" in sidebar
-    assert "Request upgrade" in sidebar
+    assert "Upgrade" in sidebar
     assert "getOrCreateEntitlement" in shell
 
 

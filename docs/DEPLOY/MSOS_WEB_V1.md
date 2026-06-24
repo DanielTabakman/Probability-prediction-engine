@@ -24,8 +24,10 @@ Copy from [`.env.example`](../../.env.example). Keys consumed at **`msos_web` bu
 | `NEXT_PUBLIC_MSOS_SIGN_IN_URL` | `msos_web` build | Sign-in link target (default `https://app.marketstructureos.com`) |
 | `NEXT_PUBLIC_PPE_EMBED_URL` | `msos_web` build | Strategy Lab iframe src (default `/ppe-embed` — Caddy → `app_demo`) |
 | `NEXT_PUBLIC_PPE_DISPLAY_API_URL` | `msos_web` build | Native chart JSON (default `/ppe-display-api/display.json` — Caddy → `ppe_display_api`) |
+| `MSOS_UPGRADE_OFFER_URL` | `msos_web` runtime | Lemon Squeezy checkout URL for free-tier upgrade CTA |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | `msos_web` runtime | Lemon Squeezy webhook HMAC secret — auto-grant `paid` tier |
 
-When research-offer vars are unset, homepage omits the CTA (honest public shell). When embed URL is unset at build, Strategy Lab shows degraded “Embed pending” state.
+When research-offer vars are unset, homepage omits the CTA (honest public shell). When embed URL is unset at build, Strategy Lab shows degraded “Embed pending” state. Billing setup: [`LEMON_SQUEEZY_OPERATOR_SETUP_V1.md`](../SOP/LEMON_SQUEEZY_OPERATOR_SETUP_V1.md).
 
 `PPE_WEB_FEEDBACK_DIR=/data` is set in compose; feedback volume `msos_web_data` is created automatically.
 
