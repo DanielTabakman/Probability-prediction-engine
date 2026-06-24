@@ -8,6 +8,7 @@ import {
   type BeliefNudgeAxis,
   type BeliefTuning,
 } from "@/lib/beliefTuning";
+import { BELIEF_TAIL_LIMIT_NOTE } from "@/lib/beliefTuningCopy";
 
 type BeliefBuilderProps = {
   expiryLabel: string;
@@ -54,7 +55,7 @@ export function BeliefBuilder({
   const phrase = buildTuningPhrase(tuning);
 
   return (
-    <div className="belief-builder">
+    <div className="belief-builder" data-tour="lab-belief">
       <div className="belief-builder-head">
         <h3>What do you believe?</h3>
         <button
@@ -131,9 +132,10 @@ export function BeliefBuilder({
 
       <p className="micro">
         {active
-          ? `Your view: ${viewLabel}. Buttons nudge the curve; sliders fine-tune. Expiry changes keep your view.`
+          ? `Your view: ${viewLabel}. Buttons nudge the curve; sliders fine-tune.`
           : "Each button push nudges the teal curve. Use Reset to return to the market view."}
       </p>
+      <p className="micro belief-tail-note">{BELIEF_TAIL_LIMIT_NOTE}</p>
     </div>
   );
 }

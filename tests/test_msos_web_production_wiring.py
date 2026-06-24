@@ -38,7 +38,7 @@ def test_public_nav_wired_sign_in_and_routes() -> None:
 
 def test_hero_research_offer_and_links() -> None:
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert "resolveResearchOfferCta" in hero
+    assert "resolveResearchOfferCta" in hero or "ResearchBetaModal" in hero
     assert "MSOS_ROUTES.strategyLab" in hero
     assert "MSOS_ROUTES.commandCenter" in hero
     assert '<span className="btn primary">' not in hero

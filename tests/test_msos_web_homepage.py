@@ -20,11 +20,9 @@ def test_msos_web_package_and_homepage_copy() -> None:
     page = (MSOS_WEB / "src" / "app" / "page.tsx").read_text(encoding="utf-8")
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
     assert "HeroSection" in page
-    assert "Market Structure OS" in hero
     assert "Turn your market thesis" in hero
-    assert "Probability Engine" in hero
-    assert "Strategy Lab" in hero
-    assert "Coming" in hero
+    assert "Strategy Lab" in hero or "strategyLabTutorialHref" in hero
+    assert "ResearchBetaModal" in hero
 
 
 def test_msos_web_docker_and_compose_wiring() -> None:

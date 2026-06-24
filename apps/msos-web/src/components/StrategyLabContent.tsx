@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { StrategyLabClientShell } from "@/components/StrategyLabClientShell";
 import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
 
@@ -6,5 +8,9 @@ type StrategyLabContentProps = {
 };
 
 export function StrategyLabContent({ displayPayload = null }: StrategyLabContentProps) {
-  return <StrategyLabClientShell initialPayload={displayPayload} />;
+  return (
+    <Suspense fallback={<p className="footer-note">Loading Strategy Lab…</p>}>
+      <StrategyLabClientShell initialPayload={displayPayload} />
+    </Suspense>
+  );
 }
