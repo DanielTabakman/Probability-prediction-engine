@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 
-import { devAllowsAnonymousIdentity, resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
-import { MSOS_SESSION_COOKIE, parseSessionFromCookieHeader } from "@/lib/msosSession";
+import { devAllowsAnonymousIdentity, resolveMsosIdentityFromHeaders } from "@/lib/msosIdentityCore";
+import { MSOS_SESSION_COOKIE } from "@/lib/msosSession";
 
 /** Server components — email, session:uuid, or empty legacy anon bucket. */
 export async function resolveWorkflowOwnerId(): Promise<string> {
@@ -13,13 +13,4 @@ export async function resolveWorkflowOwnerId(): Promise<string> {
   if (session) return `session:${session}`;
   if (devAllowsAnonymousIdentity()) return "";
   return "";
-}
-
-export function resolveWorkflowOwnerFromRequest(request: Request): string | null {
-  const email = resolveMsosIdentityFromHeaders(request.headers);
-  if (email) return email;
-  const session = parseSessionFromCookieHeader(request.headers.get("cookie"));
-  if (session) return `session:${session}`;
-  if (devAllowsAnonymousIdentity()) return "";
-  return null;
 }

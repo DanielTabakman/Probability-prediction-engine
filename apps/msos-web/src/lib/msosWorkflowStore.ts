@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 
 import type { ExpressionRecord } from "@/lib/expressionPersistence";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
-import { normalizeOwnerEmail } from "@/lib/msosIdentity";
+import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
 
 export const MSOS_WORKFLOW_STORE_FILENAME = "msos_workflow_v1.json";
