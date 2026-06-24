@@ -17,13 +17,15 @@ import {
 } from "@/data/expressionPlanningFixtures";
 import { defaultThesisRecord } from "@/data/thesisConfirmFixtures";
 import { loadStoredBeliefTuning } from "@/lib/beliefTuning";
+import { fetchThesisRecord, type ThesisRecord } from "@/lib/thesisPersistence";
 import {
   EXPRESSION_PERSISTENCE_LABEL,
   defaultExpressionRecord,
   fetchExpressionRecord,
-  persistExpressionRecord,
+  savePaperTrade,
   statusGridForLifecycle,
-  withExpressionLifecycle,
+  type BeliefSnapshot,
+  type PaperTradeMarkSnapshot,
 } from "@/lib/expressionPersistence";
 import {
   fetchStrategySuggestion,
@@ -35,7 +37,6 @@ import {
   listExpiryDates,
 } from "@/lib/ppeDisplayPayload";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
-import { fetchThesisRecord } from "@/lib/thesisPersistence";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 function familyIdForPreset(presetId?: string): string {
@@ -103,19 +104,23 @@ function optimizationFromSuggestion(payload: StrategySuggestionPayload | null): 
 
 export function ExpressionPlanningPanel() {
   const [record, setRecord] = useState(defaultExpressionRecord);
+  const [thesis, setThesis] = useState<ThesisRecord>(defaultThesisRecord);
   const [thesisConfirmed, setThesisConfirmed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [suggestion, setSuggestion] = useState<StrategySuggestionPayload | null>(null);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
   const [expiry, setExpiry] = useState<string | null>(null);
+  const [savePending, setSavePending] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
 
   useEffect(() => {
     void Promise.all([
       fetchThesisRecord(defaultThesisRecord),
       fetchExpressionRecord(defaultExpressionRecord),
-    ]).then(([thesis, expression]) => {
-      setThesisConfirmed(thesis.lifecycle === "confirmed");
+    ]).then(([loadedThesis, expression]) => {
+      setThesis(loadedThesis);
+      setThesisConfirmed(loadedThesis.lifecycle === "confirmed");
       setRecord(expression);
       setHydrated(true);
     });
@@ -163,12 +168,6 @@ export function ExpressionPlanningPanel() {
     };
   }, [hydrated, thesisConfirmed]);
 
-  function simulateExpression() {
-    const next = withExpressionLifecycle(record, "simulated");
-    setRecord(next);
-    void persistExpressionRecord(next);
-  }
-
   const livePlan = useMemo(() => {
     const suggested = suggestion?.suggested;
     if (!suggested?.legs?.length) {
@@ -192,12 +191,45 @@ export function ExpressionPlanningPanel() {
     };
   }, [suggestion, record]);
 
+  async function simulateExpression() {
+    const tuning = loadStoredBeliefTuning();
+    const beliefSnapshot: BeliefSnapshot = {
+      forwardMult: tuning.forward_mult,
+      volMult: tuning.vol_mult,
+    };
+    const summary = suggestion?.suggested?.summary;
+    const markAtSave: PaperTradeMarkSnapshot = {
+      spotUsd: suggestion?.spot_usd,
+      netCostUsd: summary?.net_cost_usd ?? null,
+      maxGainUsd: summary?.max_gain_usd ?? null,
+      maxLossUsd: summary?.max_loss_usd ?? null,
+      markedAt: new Date().toISOString(),
+    };
+    const next = {
+      familyId: livePlan.familyId,
+      planHeadline: livePlan.headline,
+      planSummary: livePlan.summary,
+      legs: livePlan.legs,
+      lifecycle: "simulated" as const,
+      updatedAt: new Date().toISOString(),
+      savedAt: new Date().toISOString(),
+      expiryDate: expiry ?? suggestion?.expiry_date,
+      instrument: thesis.instrument,
+      beliefSnapshot,
+      markAtSave,
+    };
+    setSavePending(true);
+    const saved = await savePaperTrade(next);
+    setRecord(saved);
+    setLastSavedAt(saved.savedAt ?? saved.updatedAt);
+    setSavePending(false);
+  }
+
   const families = familiesWithSelection(livePlan.familyId);
   const optimizationLines = suggestion?.suggested
     ? optimizationFromSuggestion(suggestion)
     : optimizationBasis;
-  const statusGrid = statusGridForLifecycle(record.lifecycle);
-  const isSimulated = record.lifecycle === "simulated";
+  const statusGrid = statusGridForLifecycle(lastSavedAt ? "simulated" : record.lifecycle);
   const market = suggestion?.market;
   const overlay = suggestion?.suggested?.overlay;
 
@@ -336,16 +368,16 @@ export function ExpressionPlanningPanel() {
               <button
                 type="button"
                 className="btn slim primary"
-                disabled={!hydrated || isSimulated}
-                onClick={simulateExpression}
+                disabled={!hydrated || savePending}
+                onClick={() => void simulateExpression()}
               >
-                {isSimulated ? "Saved as paper trade" : "Save paper trade"}
+                {savePending ? "Saving…" : lastSavedAt ? "Save again" : "Save paper trade"}
               </button>
               <button type="button" className="btn slim dark" disabled={!hydrated}>
                 Review order (coming soon)
               </button>
             </div>
-            {isSimulated ? (
+            {lastSavedAt ? (
               <p className="micro persistence-note">{EXPRESSION_PERSISTENCE_LABEL}</p>
             ) : null}
           </div>

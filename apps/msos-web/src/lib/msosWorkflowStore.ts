@@ -261,11 +261,15 @@ export async function upsertCurrentExpression(
   if (!thesisId) {
     throw new Error("confirm a thesis before saving expression");
   }
-  const existing = pointers.expressionId
-    ? store.expressions.find(
-        (row) => row.id === pointers.expressionId && expressionOwnerMatches(row, ownerEmail),
-      )
-    : undefined;
+  const existing =
+    expression.lifecycle === "planned" && pointers.expressionId
+      ? store.expressions.find(
+          (row) =>
+            row.id === pointers.expressionId &&
+            expressionOwnerMatches(row, ownerEmail) &&
+            row.lifecycle === "planned",
+        )
+      : undefined;
   const owner = normalizeOwnerEmail(ownerEmail);
   const next: StoredExpression = {
     ...expression,
@@ -286,10 +290,61 @@ export async function upsertCurrentExpression(
   return next;
 }
 
+export async function appendPaperTrade(
+  expression: ExpressionRecord,
+  ownerEmail: string,
+): Promise<StoredExpression> {
+  if (!isExpressionRecord(expression)) {
+    throw new Error("invalid expression record");
+  }
+  if (expression.lifecycle !== "simulated") {
+    throw new Error("paper trades must use simulated lifecycle");
+  }
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  const thesisId = pointers.thesisId;
+  if (!thesisId) {
+    throw new Error("confirm a thesis before saving a paper trade");
+  }
+  const owner = normalizeOwnerEmail(ownerEmail);
+  const savedAt = expression.savedAt ?? expression.updatedAt ?? new Date().toISOString();
+  const next: StoredExpression = {
+    ...expression,
+    lifecycle: "simulated",
+    savedAt,
+    updatedAt: savedAt,
+    id: randomUUID(),
+    thesisId,
+    ownerEmail: owner,
+  };
+  const expressions = [...store.expressions, next];
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: next.id,
+  });
+  await writeStore({
+    ...nextStore,
+    expressions,
+  });
+  return next;
+}
+
+export async function listPaperTrades(ownerEmail: string): Promise<StoredExpression[]> {
+  const store = await readStore();
+  return store.expressions
+    .filter((row) => expressionOwnerMatches(row, ownerEmail) && row.lifecycle === "simulated")
+    .sort((a, b) => {
+      const aTs = Date.parse(a.savedAt ?? a.updatedAt);
+      const bTs = Date.parse(b.savedAt ?? b.updatedAt);
+      return (Number.isNaN(bTs) ? 0 : bTs) - (Number.isNaN(aTs) ? 0 : aTs);
+    });
+}
+
 export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowSummary> {
   const store = await readStore();
   const scopedTheses = store.theses.filter((row) => thesisOwnerMatches(row, ownerEmail));
   const scopedExpressions = store.expressions.filter((row) => expressionOwnerMatches(row, ownerEmail));
+  const paperTrades = scopedExpressions.filter((row) => row.lifecycle === "simulated");
   const pointers = pointersForOwner(store, ownerEmail);
   const draftCount = scopedTheses.filter((row) => row.lifecycle === "draft").length;
   const confirmedCount = scopedTheses.filter((row) => row.lifecycle === "confirmed").length;
@@ -312,6 +367,12 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
       value: String(confirmedCount),
       sub: "Your workspace",
       tone: confirmedCount > 0 ? "teal" : undefined,
+    },
+    {
+      label: "Paper trades",
+      value: String(paperTrades.length),
+      sub: "Saved plans",
+      tone: paperTrades.length > 0 ? "teal" : undefined,
     },
   ];
 

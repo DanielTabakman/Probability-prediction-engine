@@ -41,6 +41,32 @@ def test_persistence_libs_call_server_api() -> None:
     assert "persistThesisRecord" in thesis
     assert "fetchExpressionRecord" in expression
     assert 'fetch("/api/theses/expression"' in expression
+    assert "savePaperTrade" in expression
+    assert 'fetch("/api/theses/paper-trades"' in expression
+
+
+def test_paper_trades_api_route_exists() -> None:
+    route = (
+        MSOS_WEB / "src" / "app" / "api" / "theses" / "paper-trades" / "route.ts"
+    ).read_text(encoding="utf-8")
+    assert "appendPaperTrade" in route
+    assert "listPaperTrades" in route
+    assert "export async function POST" in route
+    assert "export async function GET" in route
+
+
+def test_workflow_store_supports_paper_trade_ledger() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
+    assert "appendPaperTrade" in lib
+    assert "listPaperTrades" in lib
+    assert "Paper trades" in lib
+
+
+def test_monitor_history_feed_lists_paper_trades() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "monitorHistoryFeed.ts").read_text(encoding="utf-8")
+    assert "listPaperTrades" in lib
+    assert "paperTradeHistoryEntries" in lib
+    assert "markLineForTrade" in lib
 
 
 def test_command_center_uses_snapshot_summary() -> None:

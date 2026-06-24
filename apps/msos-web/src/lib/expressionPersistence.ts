@@ -13,6 +13,20 @@ import {
 
 export type ExpressionLifecycle = "planned" | "simulated";
 
+export type BeliefSnapshot = {
+  forwardMult: number;
+  volMult: number;
+};
+
+/** Mark captured at paper-trade save (display/proxy fields only — no TS math). */
+export type PaperTradeMarkSnapshot = {
+  spotUsd?: number;
+  netCostUsd?: number | null;
+  maxGainUsd?: number | null;
+  maxLossUsd?: number | null;
+  markedAt: string;
+};
+
 export type ExpressionRecord = {
   familyId: string;
   planHeadline: string;
@@ -20,6 +34,12 @@ export type ExpressionRecord = {
   legs: PlanLeg[];
   lifecycle: ExpressionLifecycle;
   updatedAt: string;
+  /** Paper-trade metadata (optional on planned drafts). */
+  expiryDate?: string;
+  instrument?: string;
+  beliefSnapshot?: BeliefSnapshot;
+  markAtSave?: PaperTradeMarkSnapshot;
+  savedAt?: string;
 };
 
 export const EXPRESSION_STORAGE_KEY = "msos.expression.preview.v1";
@@ -126,6 +146,37 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
     });
   } catch {
     // local preview remains as offline fallback
+  }
+}
+
+export async function savePaperTrade(record: ExpressionRecord): Promise<ExpressionRecord> {
+  const payload: ExpressionRecord = {
+    ...record,
+    lifecycle: "simulated",
+    savedAt: record.savedAt ?? new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveExpressionRecord(payload);
+  if (typeof window === "undefined") {
+    return payload;
+  }
+  try {
+    const response = await fetch("/api/theses/paper-trades", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ expression: payload }),
+    });
+    if (!response.ok) {
+      return payload;
+    }
+    const body = (await response.json()) as { expression?: ExpressionRecord };
+    if (body.expression && isExpressionRecord(body.expression)) {
+      saveExpressionRecord(body.expression);
+      return body.expression;
+    }
+    return payload;
+  } catch {
+    return payload;
   }
 }
 

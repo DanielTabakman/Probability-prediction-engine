@@ -63,6 +63,7 @@ export function MonitorContent({ feed }: Props) {
                 <span className={`tag ${panel.tone}`}>{panel.title.split(" ")[0]}</span>
                 <h3>{panel.title}</h3>
                 <p>{panel.body}</p>
+                {panel.markLine ? <p className="micro watch-mark">{panel.markLine}</p> : null}
               </div>
             ))}
           </div>
