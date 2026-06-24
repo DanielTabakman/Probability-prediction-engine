@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 
 import { AppShell } from "@/components/AppShell";
 import { MonitorContent } from "@/components/MonitorContent";
 import { loadMonitorFeed } from "@/lib/monitorHistoryFeed";
-import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentity";
+import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
 
 export const metadata: Metadata = {
   title: "Monitor | Market Structure OS",
@@ -12,9 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default async function MonitorPage() {
-  const requestHeaders = await headers();
-  const ownerEmail = resolveMsosIdentityFromHeaders(requestHeaders);
-  const feed = await loadMonitorFeed(ownerEmail);
+  const ownerId = await resolveWorkflowOwnerId();
+  const feed = await loadMonitorFeed(ownerId);
   return (
     <AppShell activeNavId="monitor">
       <MonitorContent feed={feed} />

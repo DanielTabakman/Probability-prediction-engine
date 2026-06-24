@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { resolveWorkflowOwnerFromRequest } from "@/lib/msosWorkflowOwner";
+
 export const ACCESS_EMAIL_HEADERS = [
   "cf-access-authenticated-user-email",
   "x-forwarded-email",
@@ -33,14 +35,11 @@ export function devAllowsAnonymousIdentity(): boolean {
   return process.env.MSOS_IDENTITY_DEV_ALLOW_ANON === "1";
 }
 
-/** Protected MSOS API routes require an authenticated owner email unless dev anon is enabled. */
+/** Workflow APIs accept Access email or msos_session cookie owner scope. */
 export function requireProtectedIdentity(request: Request): MsosIdentityResult {
-  const email = resolveMsosIdentityFromHeaders(request.headers);
-  if (email) {
-    return { ok: true, email };
-  }
-  if (devAllowsAnonymousIdentity()) {
-    return { ok: true, email: "" };
+  const owner = resolveWorkflowOwnerFromRequest(request);
+  if (owner !== null) {
+    return { ok: true, email: owner };
   }
   return {
     ok: false,

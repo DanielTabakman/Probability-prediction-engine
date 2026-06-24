@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import type { ExpressionRecord } from "@/lib/expressionPersistence";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 import { normalizeOwnerEmail } from "@/lib/msosIdentity";
+import { scopeOwnerId } from "@/lib/msosSession";
 
 export const MSOS_WORKFLOW_STORE_FILENAME = "msos_workflow_v1.json";
 
@@ -76,7 +77,16 @@ export function workflowStorePath(): string {
 }
 
 function ownerKey(ownerEmail: string): string {
+  const scoped = scopeOwnerId(ownerEmail);
+  if (scoped?.startsWith("session:")) return scoped;
   const normalized = normalizeOwnerEmail(ownerEmail);
+  return normalized ?? "__anon__";
+}
+
+function storedOwnerKey(raw: string | null | undefined): string {
+  const scoped = scopeOwnerId(raw);
+  if (scoped?.startsWith("session:")) return scoped;
+  const normalized = normalizeOwnerEmail(raw);
   return normalized ?? "__anon__";
 }
 
@@ -154,21 +164,11 @@ function isExpressionRecord(value: unknown): value is ExpressionRecord {
 }
 
 function thesisOwnerMatches(row: StoredThesis, ownerEmail: string): boolean {
-  const key = ownerKey(ownerEmail);
-  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
-  if (key === "__anon__") {
-    return rowOwner === null;
-  }
-  return rowOwner === key;
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
 function expressionOwnerMatches(row: StoredExpression, ownerEmail: string): boolean {
-  const key = ownerKey(ownerEmail);
-  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
-  if (key === "__anon__") {
-    return rowOwner === null;
-  }
-  return rowOwner === key;
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
 function pointersForOwner(store: WorkflowStoreFile, ownerEmail: string): OwnerPointers {
@@ -228,7 +228,7 @@ export async function upsertCurrentThesis(
         (row) => row.id === pointers.thesisId && thesisOwnerMatches(row, ownerEmail),
       )
     : undefined;
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const next: StoredThesis = {
     ...thesis,
     id: existing?.id ?? randomUUID(),
@@ -270,7 +270,7 @@ export async function upsertCurrentExpression(
             row.lifecycle === "planned",
         )
       : undefined;
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const next: StoredExpression = {
     ...expression,
     id: existing?.id ?? randomUUID(),
@@ -306,7 +306,7 @@ export async function appendPaperTrade(
   if (!thesisId) {
     throw new Error("confirm a thesis before saving a paper trade");
   }
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const savedAt = expression.savedAt ?? expression.updatedAt ?? new Date().toISOString();
   const next: StoredExpression = {
     ...expression,
@@ -394,7 +394,7 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
     });
   }
 
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const sourceLabel = owner
     ? `Your workspace · ${owner}`
     : "Your workspace";

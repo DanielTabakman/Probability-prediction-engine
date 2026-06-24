@@ -43,6 +43,7 @@ def test_persistence_libs_call_server_api() -> None:
     assert 'fetch("/api/theses/expression"' in expression
     assert "savePaperTrade" in expression
     assert 'fetch("/api/theses/paper-trades"' in expression
+    assert 'credentials: "include"' in expression
 
 
 def test_paper_trades_api_route_exists() -> None:
@@ -67,6 +68,54 @@ def test_monitor_history_feed_lists_paper_trades() -> None:
     assert "listPaperTrades" in lib
     assert "paperTradeHistoryEntries" in lib
     assert "markLineForTrade" in lib
+
+
+def test_workflow_session_scoping_exists() -> None:
+    session = (MSOS_WEB / "src" / "lib" / "msosSession.ts").read_text(encoding="utf-8")
+    middleware = (MSOS_WEB / "src" / "middleware.ts").read_text(encoding="utf-8")
+    owner = (MSOS_WEB / "src" / "lib" / "msosWorkflowOwner.ts").read_text(encoding="utf-8")
+    assert "msos_session" in session
+    assert "MSOS_SESSION_COOKIE" in middleware
+    assert "resolveWorkflowOwnerId" in owner
+
+
+def test_display_currency_module_exists() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "displayCurrency.ts").read_text(encoding="utf-8")
+    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    assert "formatMoney" in lib
+    assert "CAD" in lib
+    assert "CurrencySelect" in nav
+
+
+def test_expression_chart_fullscreen_frame() -> None:
+    frame = (MSOS_WEB / "src" / "components" / "ExpressionPayoffChartFrame.tsx").read_text(
+        encoding="utf-8"
+    )
+    panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "chart-fullscreen-backdrop" in frame
+    assert "Monitor paper trades" in panel
+    assert 'credentials: "include"' in (
+        MSOS_WEB / "src" / "lib" / "expressionPersistence.ts"
+    ).read_text(encoding="utf-8")
+
+
+def test_confirm_page_pending_lifecycle() -> None:
+    fixtures = (MSOS_WEB / "src" / "data" / "thesisConfirmFixtures.ts").read_text(encoding="utf-8")
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "lifecycleDisplayId" in fixtures
+    assert '"Pending"' in fixtures or "'Pending'" in fixtures
+    assert "lifecycleDisplayId" in panel
+
+
+def test_homepage_product_window_rich_preview() -> None:
+    window = (MSOS_WEB / "src" / "components" / "ProductWindow.tsx").read_text(encoding="utf-8")
+    assert "callout" in window
+    assert "Thesis gap" in window
+    assert "Demo" in window
 
 
 def test_command_center_uses_snapshot_summary() -> None:

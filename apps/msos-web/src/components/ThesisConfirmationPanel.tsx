@@ -7,6 +7,7 @@ import {
   compareColumns,
   confirmationChecklist,
   defaultThesisRecord,
+  lifecycleDisplayId,
   lifecycleSteps,
   thesisConfirmHeadline,
   thesisRestatement,
@@ -38,6 +39,7 @@ export function ThesisConfirmationPanel() {
   }
 
   const isConfirmed = record.lifecycle === "confirmed";
+  const activeLifecycle = lifecycleDisplayId(record.lifecycle);
 
   return (
     <>
@@ -123,8 +125,8 @@ export function ThesisConfirmationPanel() {
                 <div
                   key={step.id}
                   role="listitem"
-                  className={`state-step${record.lifecycle === step.id ? " active" : ""}${
-                    lifecycleSteps.findIndex((s) => s.id === record.lifecycle) >
+                  className={`state-step${activeLifecycle === step.id ? " active" : ""}${
+                    lifecycleSteps.findIndex((s) => s.id === activeLifecycle) >
                     lifecycleSteps.findIndex((s) => s.id === step.id)
                       ? " done"
                       : ""

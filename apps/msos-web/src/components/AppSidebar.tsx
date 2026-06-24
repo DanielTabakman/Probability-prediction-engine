@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { connectedMarkets, navItems } from "@/data/commandCenterFixtures";
+import { CurrencySelect } from "@/components/CurrencySelect";
 import type { EntitlementTier } from "@/lib/msosEntitlements";
 import { tierLabel, upgradeOfferUrl } from "@/lib/msosEntitlements";
 import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
@@ -29,6 +30,8 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
           <small>Market Structure OS</small>
         </div>
       </Link>
+
+      <CurrencySelect className="sidebar-currency" />
 
       {tier ? (
         <div className="asset on entitlement-badge" data-tier={tier}>

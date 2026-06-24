@@ -113,7 +113,7 @@ export async function fetchExpressionRecord(fallback: ExpressionRecord): Promise
     return fallback;
   }
   try {
-    const response = await fetch("/api/theses/expression", { cache: "no-store" });
+    const response = await fetch("/api/theses/expression", { cache: "no-store", credentials: "include" });
     if (!response.ok) {
       return loadExpressionRecord(fallback);
     }
@@ -142,6 +142,7 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
     await fetch("/api/theses/expression", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ expression: record }),
     });
   } catch {
@@ -164,6 +165,7 @@ export async function savePaperTrade(record: ExpressionRecord): Promise<Expressi
     const response = await fetch("/api/theses/paper-trades", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ expression: payload }),
     });
     if (!response.ok) {

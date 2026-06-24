@@ -2595,6 +2595,113 @@ button.btn:disabled {
   }
 }
 
+.currency-select select {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 6px 24px 6px 10px;
+  cursor: pointer;
+}
+
+.currency-select select:hover {
+  border-color: rgba(45, 212, 191, 0.45);
+}
+
+.nav-currency {
+  margin-left: 4px;
+}
+
+.sidebar-currency {
+  margin-bottom: 18px;
+}
+
+.currency-badge {
+  opacity: 0.75;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.expression-chart-expand {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: zoom-in;
+  position: relative;
+}
+
+.expression-chart-expand-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.expression-chart-expand:hover .expression-chart-expand-hint,
+.expression-chart-expand:focus-visible .expression-chart-expand-hint {
+  opacity: 1;
+}
+
+.chart-fullscreen-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(2, 6, 12, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.chart-fullscreen-panel {
+  width: min(1100px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  background: rgba(8, 14, 22, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px 18px 20px;
+}
+
+.chart-fullscreen-close {
+  margin-left: auto;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.chart-fullscreen-inner .graph-labeled {
+  min-height: 420px;
+}
+
+.watch-mark {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
 @media (max-width: 640px) {
   .metrics {
     grid-template-columns: repeat(2, 1fr);

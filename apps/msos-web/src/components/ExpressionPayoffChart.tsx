@@ -19,7 +19,7 @@ import {
   CHART_AXIS_STYLE,
 } from "@/lib/chartAxisDisplay";
 import { DEFAULT_CURVE_LABELS, type CurveDisplayLabels } from "@/lib/chartCurveLabels";
-import { formatUsd } from "@/lib/ppeDisplayPayload";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 type ExpressionPayoffChartProps = {
   pricesUsd: number[];
@@ -32,6 +32,7 @@ type ExpressionPayoffChartProps = {
   curveLabels?: CurveDisplayLabels;
   loading?: boolean;
   error?: string | null;
+  className?: string;
 };
 
 const LAYOUT = LABELED_CHART_LAYOUT;
@@ -50,7 +51,9 @@ export function ExpressionPayoffChart({
   curveLabels = DEFAULT_CURVE_LABELS,
   loading = false,
   error = null,
+  className = "",
 }: ExpressionPayoffChartProps) {
+  const { currency, formatMoney } = useDisplayCurrency();
   if (loading) {
     return (
       <div className="expression-chart panel-sub" aria-live="polite">
@@ -105,9 +108,12 @@ export function ExpressionPayoffChart({
   const spotX = priceToChartX(spotUsd, xMin, xMax, LAYOUT);
 
   return (
-    <div className="expression-chart">
+    <div className={`expression-chart ${className}`.trim()}>
       <div className="expression-chart-head">
-        <div className="panel-sub">Suggested trade vs market at {expiryLabel}</div>
+        <div className="panel-sub">
+          Suggested trade vs market at {expiryLabel}
+          <span className="micro currency-badge"> · {currency}</span>
+        </div>
         <ChartCurveLegend
           labels={curveLabels}
           showBelief={Boolean(beliefPath)}
@@ -240,7 +246,7 @@ export function ExpressionPayoffChart({
             strokeDasharray="5 8"
           />
           <text x={spotX + 4} y={box.y0 + 12} fill={LABEL_FILL} fontSize="10">
-            spot {formatUsd(spotUsd)}
+            spot {formatMoney(spotUsd)}
           </text>
         </svg>
       </div>
