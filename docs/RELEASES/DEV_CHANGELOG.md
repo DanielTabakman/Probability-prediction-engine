@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-24
 
+- `4344aff` — Merge pull request #326 from DanielTabakman/feat/paper-trade-ledger-v1
+- `c24e956` — MSOS paper-trade ledger: save list history + monitor marks (Phase A/B) (`apps/msos-web/`)
+- `cd55b40` — Control-plane: dev changelog
 - `b81ba68` — Merge pull request #325 from DanielTabakman/fix/homepage-demo-label
 - `943923b` — MSOS homepage: Demo label + sidebar logo links home (`apps/msos-web/`)
 - `5261a03` — MSOS homepage UX: simplify, tutorial, button feedback (#324) (`apps/msos-web/`)
