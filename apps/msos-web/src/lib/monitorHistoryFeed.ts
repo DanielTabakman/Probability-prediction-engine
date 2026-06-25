@@ -178,7 +178,7 @@ function markPartsForTrade(
   return {
     savedSpotUsd: saved?.spotUsd,
     currentSpotUsd,
-    maxLossUsd: saved?.maxLossUsd,
+    maxLossUsd: saved?.maxLossUsd ?? undefined,
     asOfUtc,
   };
 }
