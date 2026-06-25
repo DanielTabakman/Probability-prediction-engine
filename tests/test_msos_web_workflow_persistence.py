@@ -67,6 +67,7 @@ def test_paper_trades_api_route_exists() -> None:
 def test_workflow_store_supports_paper_trade_manage() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
     assert "deletePaperTrade" in lib
+    assert "restorePaperTrade" in lib
     assert "clearPaperTrades" in lib
     assert "closePaperTrade" in lib
     assert "effectivePaperTradeStatus" in lib
@@ -89,6 +90,8 @@ def test_monitor_history_feed_lists_paper_trades() -> None:
     monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
     history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
     assert "PaperTradeManageActions" not in monitor
+    assert "MonitorWatchList" in monitor
+    assert "MonitorDeleteNotice" in monitor
     assert "PaperTradeManageActions" in history
 
 
@@ -111,14 +114,24 @@ def test_paper_trade_detail_route_exists() -> None:
     assert "PaperTradeDetailContent" in page
 
 
+def test_paper_trade_detail_redirects_after_delete() -> None:
+    actions = (MSOS_WEB / "src" / "components" / "PaperTradeManageActions.tsx").read_text(encoding="utf-8")
+    assert "router.push(`/monitor?deleted=1" in actions
+    assert "stashPaperTradeUndo" in actions
+    restore_route = (
+        MSOS_WEB / "src" / "app" / "api" / "theses" / "paper-trades" / "restore" / "route.ts"
+    ).read_text(encoding="utf-8")
+    assert "restorePaperTrade" in restore_route
+
+
 def test_expression_save_returns_error_surface() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
     panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
         encoding="utf-8"
     )
     assert "deletePaperTradeById" in lib
-    assert "clearAllPaperTrades" in lib
-    assert "closePaperTradeById" in lib
+    assert "restorePaperTrade" in lib
+    assert "deletePaperTradeWithUndo" in lib
     assert "saveError" in panel
 
 
