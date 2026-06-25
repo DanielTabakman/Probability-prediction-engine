@@ -28,6 +28,7 @@ type ExpressionPayoffChartProps = {
   payoffPct: number[];
   payoffUsd?: number[];
   spotUsd: number;
+  marketExpectationUsd?: number;
   expiryLabel: string;
   curveLabels?: CurveDisplayLabels;
   loading?: boolean;
@@ -47,6 +48,7 @@ export function ExpressionPayoffChart({
   payoffPct,
   payoffUsd,
   spotUsd,
+  marketExpectationUsd,
   expiryLabel,
   curveLabels = DEFAULT_CURVE_LABELS,
   loading = false,
@@ -106,6 +108,10 @@ export function ExpressionPayoffChart({
     : [0, payoffMax * 0.5, payoffMax];
 
   const spotX = priceToChartX(spotUsd, xMin, xMax, LAYOUT);
+  const marketX =
+    typeof marketExpectationUsd === "number" && marketExpectationUsd > 0
+      ? priceToChartX(marketExpectationUsd, xMin, xMax, LAYOUT)
+      : null;
 
   return (
     <div className={`expression-chart ${className}`.trim()}>
@@ -246,8 +252,24 @@ export function ExpressionPayoffChart({
             strokeDasharray="5 8"
           />
           <text x={spotX + 4} y={box.y0 + 12} fill={LABEL_FILL} fontSize="10">
-            spot {formatMoney(spotUsd)}
+            today {formatMoney(spotUsd)}
           </text>
+          {marketX != null ? (
+            <>
+              <line
+                x1={marketX}
+                y1={box.y0}
+                x2={marketX}
+                y2={box.y1}
+                stroke="#9e8bff"
+                strokeDasharray="4 6"
+                strokeOpacity={0.85}
+              />
+              <text x={marketX + 4} y={box.y0 + 24} fill="#9e8bff" fontSize="10">
+                market guess {formatMoney(marketExpectationUsd!)}
+              </text>
+            </>
+          ) : null}
         </svg>
       </div>
     </div>

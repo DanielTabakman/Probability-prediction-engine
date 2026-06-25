@@ -32,6 +32,12 @@ export type BeliefVsMarketGlance = {
   width_relation_label?: string;
   disagreement_type_line?: string;
   largest_gap_display?: string;
+  forward_usd?: number;
+  market_modal_usd?: number;
+  belief_peak_usd?: number;
+  digest_lines?: string[];
+  fit_bridge_bullets?: string[];
+  shape_gap_strength?: string;
 };
 
 export type StrategySuggestionPayload = {

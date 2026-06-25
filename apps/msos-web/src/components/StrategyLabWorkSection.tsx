@@ -4,8 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { ExpiryPicker } from "@/components/ExpiryPicker";
+import { ExpiryMarketContextStrip } from "@/components/ExpiryMarketContextStrip";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { buildExpiryMarketContext } from "@/lib/expiryMarketContext";
 import {
   buildLabMetricsFromPayload,
   listExpiryDates,
@@ -53,26 +55,39 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
     return buildLabMetricsFromPayload(displayPayload, resolvedExpiry);
   }, [live, displayPayload, resolvedExpiry]);
 
+  const expiryContext = useMemo(() => {
+    if (!live || !displayPayload) return null;
+    return buildExpiryMarketContext(displayPayload, resolvedExpiry);
+  }, [live, displayPayload, resolvedExpiry]);
+
   return (
     <>
-      <section className="metrics" aria-label="Lab context" data-tour="lab-expiry">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="metric">
-            <div className="label">{metric.label}</div>
-            {metric.label === "Expiry" ? (
-              <ExpiryPicker
-                className="metric-expiry-value"
-                value={resolvedExpiry}
-                options={expiryOptions}
-                onChange={handleExpiryChange}
-                disabled={expiryOptions.length <= 1}
-              />
-            ) : (
-              <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
-            )}
-          </div>
-        ))}
-      </section>
+      {expiryContext ? (
+        <ExpiryMarketContextStrip
+          context={expiryContext}
+          expiryOptions={expiryOptions}
+          onExpiryChange={handleExpiryChange}
+        />
+      ) : (
+        <section className="metrics metrics-compact" aria-label="Lab context" data-tour="lab-expiry">
+          {metrics.map((metric) => (
+            <div key={metric.label} className="metric">
+              <div className="label">{metric.label}</div>
+              {metric.label === "Expiry" ? (
+                <ExpiryPicker
+                  className="metric-expiry-value"
+                  value={resolvedExpiry}
+                  options={expiryOptions}
+                  onChange={handleExpiryChange}
+                  disabled={expiryOptions.length <= 1}
+                />
+              ) : (
+                <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
+              )}
+            </div>
+          ))}
+        </section>
+      )}
 
       <section className="work strategy-lab-work">
         <StrategyLabInteractivePanel

@@ -157,6 +157,7 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
 export async function savePaperTrade(record: ExpressionRecord): Promise<{
   expression: ExpressionRecord;
   ok: boolean;
+  authRequired?: boolean;
   error?: string;
 }> {
   const payload: ExpressionRecord = {
@@ -179,6 +180,14 @@ export async function savePaperTrade(record: ExpressionRecord): Promise<{
     });
     if (!response.ok) {
       const body = (await response.json().catch(() => ({}))) as { error?: string };
+      if (response.status === 401) {
+        return {
+          expression: payload,
+          ok: false,
+          authRequired: true,
+          error: "Sign in to save paper trades to your profile.",
+        };
+      }
       return {
         expression: payload,
         ok: false,

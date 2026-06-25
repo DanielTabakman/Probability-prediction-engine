@@ -15,7 +15,7 @@ export const PLATFORM_TUTORIAL_STEPS: PlatformTutorialStep[] = [
   {
     id: "expiry",
     title: "Pick an expiry",
-    body: "Choose when your view applies. The chart and metrics update to that BTC options expiry.",
+    body: "Choose when your view applies. You'll see today's BTC price, the market's best guess for that date, and the typical range — then the chart updates.",
     anchor: "[data-tour='lab-expiry']",
   },
   {

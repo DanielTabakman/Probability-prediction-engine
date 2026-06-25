@@ -143,33 +143,52 @@ export function buildLabMetricsFromPayload(
   const lognormal = resolvedExpiry ? summaryRowForExpiry(payload, resolvedExpiry) : primaryLognormalRow(payload);
   const marketWidth = lognormal?.["Implied range width (IQR)"] ?? "—";
   const median = lognormal?.["Median terminal price (50th %)"] ?? "—";
+  const medianFromSeries = primary?.quartiles_usd?.median_usd ?? primary?.mean_usd;
 
   return [
-    { label: "Market", value: "BTC options" },
     { label: "Expiry", value: primary?.expiry_date ?? resolvedExpiry ?? "—" },
-    { label: "Spot", value: formatUsd(payload.spot_usd) },
-    { label: "Market range (IQR)", value: marketWidth, tone: "amber" },
-    { label: "Market median", value: median, tone: "teal" },
+    { label: "Today's BTC", value: formatUsd(payload.spot_usd) },
+    {
+      label: "Market best guess",
+      value:
+        typeof medianFromSeries === "number"
+          ? formatUsd(medianFromSeries)
+          : median,
+      tone: "teal",
+    },
+    { label: "Typical range", value: marketWidth, tone: "amber" },
     { label: "Data", value: "Live · Deribit", tone: "teal" },
   ];
 }
 
-export function buildOutcomeFromPayload(payload: DisplayPayload): LabOutcomeSummary {
-  const lognormal = primaryLognormalRow(payload);
+export function buildOutcomeFromPayload(
+  payload: DisplayPayload,
+  expiryDate?: string,
+): LabOutcomeSummary {
+  const dates = listExpiryDates(payload);
+  const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
+  const lognormal = resolvedExpiry
+    ? summaryRowForExpiry(payload, resolvedExpiry)
+    : primaryLognormalRow(payload);
+  const series = resolvedExpiry ? findSeriesByExpiry(payload, resolvedExpiry) : undefined;
   const marketWidth = lognormal?.["Implied range width (IQR)"] ?? "the range options imply";
-  const mean = lognormal?.["Risk-neutral mean"] ?? "—";
+  const medianUsd = series?.quartiles_usd?.median_usd;
+  const medianLabel =
+    typeof medianUsd === "number"
+      ? formatUsd(medianUsd)
+      : lognormal?.["Median terminal price (50th %)"] ?? lognormal?.["Risk-neutral mean"] ?? "—";
 
   return {
     tag: "Live market",
     tagTone: "teal",
     delta: "—",
-    headline: "Here's what BTC options are pricing right now.",
-    body: `For the selected expiry, the middle of the distribution is around ${mean} and the middle-50% range is ${marketWidth}. Pick a view above to compare your belief to this curve — then confirm when you're ready to plan a trade.`,
+    headline: "Here's what BTC options are pricing for your date.",
+    body: `For ${resolvedExpiry ?? "this expiry"}, the market's best guess is around ${medianLabel} and the middle-50% range is ${marketWidth}. Pick a view above to compare yours to the purple curve — then confirm when you're ready to plan a trade.`,
     scores: [
-      { label: "Market", value: "Deribit options", tone: "amber" },
+      { label: "Today's BTC", value: formatUsd(payload.spot_usd), tone: "amber" },
+      { label: "Market guess", value: medianLabel, tone: "teal" },
       { label: "Your view", value: "Pick above", tone: "teal" },
       { label: "Next step", value: "Confirm", tone: "teal" },
-      { label: "Data", value: "Live", tone: "teal" },
     ],
   };
 }

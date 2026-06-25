@@ -2004,6 +2004,134 @@ button.btn:disabled {
   cursor: not-allowed;
 }
 
+.metrics-compact {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.expiry-market-context {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: rgba(13, 25, 40, 0.93);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.expiry-market-context-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.expiry-market-context-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.expiry-market-context-cell {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(9, 21, 34, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.expiry-market-context-k {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #71869f;
+  font-weight: 760;
+}
+
+.expiry-market-context-v {
+  font-size: 15px;
+  font-weight: 760;
+  margin-top: 5px;
+}
+
+.expiry-market-context-v.teal {
+  color: var(--teal);
+}
+
+.expiry-market-context-v.amber {
+  color: var(--amber);
+}
+
+.expiry-market-context-note {
+  margin: 10px 0 0;
+}
+
+.lab-advanced-toggle {
+  margin: 10px 0 8px;
+}
+
+.lab-advanced-markets {
+  margin-top: 10px;
+}
+
+.lab-advanced-markets summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.exec-layout-slim {
+  grid-template-columns: 1fr 360px;
+}
+
+.planner-intro {
+  margin: 6px 0 0;
+  max-width: 52ch;
+}
+
+.planner-glossary,
+.planner-advanced {
+  margin-top: 12px;
+}
+
+.planner-glossary summary,
+.planner-advanced summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.planner-glossary ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.trade-pros-cons {
+  margin: 0 0 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.trade-pros-cons-block h3 {
+  font-size: 12px;
+  margin: 0 0 6px;
+  color: #eaf7ff;
+}
+
+.trade-pros-cons-block ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #b7c9da;
+}
+
+.trade-pros-cons-block.risks h3 {
+  color: #f5c98a;
+}
+
+.trade-pros-cons-foot {
+  margin: 0;
+}
+
 /* Expression planning (P6 — storyboard 05_execution) */
 .exec-layout {
   display: grid;
@@ -2301,6 +2429,14 @@ button.btn:disabled {
   }
 
   .exec-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .exec-layout-slim {
+    grid-template-columns: 1fr;
+  }
+
+  .expiry-market-context-grid {
     grid-template-columns: 1fr;
   }
 

@@ -23,3 +23,15 @@ export function resolveSignInUrl(): string {
   }
   return DEFAULT_SIGN_IN_URL;
 }
+
+/** Sign-in URL with post-auth return path (browser only). */
+export function resolveSignInUrlWithReturn(returnPath: string): string {
+  const base = resolveSignInUrl();
+  if (typeof window === "undefined") {
+    return base;
+  }
+  const path = returnPath.startsWith("/") ? returnPath : `/${returnPath}`;
+  const returnTo = `${window.location.origin}${path}`;
+  const separator = base.includes("?") ? "&" : "?";
+  return `${base}${separator}returnTo=${encodeURIComponent(returnTo)}`;
+}
