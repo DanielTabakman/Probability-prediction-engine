@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PaperTradeManageActions } from "@/components/PaperTradeManageActions";
 import type { HistoryFeed, HistoryState } from "@/lib/monitorHistoryFeed";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
@@ -60,17 +61,42 @@ export function HistoryContent({ feed }: Props) {
         ) : null}
 
         <div className="history-list">
-          {feed.entries.map((entry) => (
-            <div key={entry.id} className={`history-row state-${entry.state}`}>
-              <div className="history-meta">
-                <span className={`tag history-state ${entry.state}`}>{stateLabels[entry.state]}</span>
-                <span className="history-ts">{entry.timestamp}</span>
+          {feed.entries.map((entry) => {
+            const row = (
+              <>
+                <div className="history-meta">
+                  <span className={`tag history-state ${entry.state}`}>{stateLabels[entry.state]}</span>
+                  {entry.statusTag ? <span className="tag muted">{entry.statusTag}</span> : null}
+                  <span className="history-ts">{entry.timestamp}</span>
+                </div>
+                <h3>{entry.title}</h3>
+                <p>{entry.detail}</p>
+              </>
+            );
+            return entry.href ? (
+              <Link key={entry.id} href={entry.href} className={`history-row state-${entry.state} history-link`}>
+                {row}
+              </Link>
+            ) : (
+              <div key={entry.id} className={`history-row state-${entry.state}`}>
+                {row}
               </div>
-              <h3>{entry.title}</h3>
-              <p>{entry.detail}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
+
+        {feed.entries.some((entry) => entry.tradeId) ? (
+          <PaperTradeManageActions
+            trades={feed.entries
+              .filter((entry) => entry.tradeId && entry.paperTradeStatus)
+              .map((entry) => ({
+                id: entry.tradeId as string,
+                title: entry.title,
+                status: entry.paperTradeStatus as "open" | "closed" | "expired",
+              }))}
+            variant="history"
+          />
+        ) : null}
 
         <div className="history-empty-note">
           <strong>Live trades</strong> — not connected on this demo. Paper plans only.

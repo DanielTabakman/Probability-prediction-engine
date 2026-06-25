@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
-import type { ExpressionRecord } from "@/lib/expressionPersistence";
+import type { ExpressionRecord, PaperTradeStatus } from "@/lib/expressionPersistence";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
@@ -311,6 +311,7 @@ export async function appendPaperTrade(
   const next: StoredExpression = {
     ...expression,
     lifecycle: "simulated",
+    paperTradeStatus: expression.paperTradeStatus ?? "open",
     savedAt,
     updatedAt: savedAt,
     id: randomUUID(),
@@ -329,15 +330,136 @@ export async function appendPaperTrade(
   return next;
 }
 
+export function effectivePaperTradeStatus(trade: StoredExpression): PaperTradeStatus {
+  const stored = trade.paperTradeStatus ?? "open";
+  if (stored === "closed") {
+    return "closed";
+  }
+  const exp = trade.expiryDate?.trim();
+  if (exp) {
+    const iso = exp.length <= 10 ? `${exp}T23:59:59.999Z` : exp;
+    const end = Date.parse(iso);
+    if (!Number.isNaN(end) && end < Date.now()) {
+      return "expired";
+    }
+  }
+  return stored === "expired" ? "expired" : "open";
+}
+
+function withEffectiveStatus(trade: StoredExpression): StoredExpression {
+  const status = effectivePaperTradeStatus(trade);
+  if (status === trade.paperTradeStatus) {
+    return trade;
+  }
+  return { ...trade, paperTradeStatus: status };
+}
+
 export async function listPaperTrades(ownerEmail: string): Promise<StoredExpression[]> {
   const store = await readStore();
   return store.expressions
     .filter((row) => expressionOwnerMatches(row, ownerEmail) && row.lifecycle === "simulated")
+    .map(withEffectiveStatus)
     .sort((a, b) => {
       const aTs = Date.parse(a.savedAt ?? a.updatedAt);
       const bTs = Date.parse(b.savedAt ?? b.updatedAt);
       return (Number.isNaN(bTs) ? 0 : bTs) - (Number.isNaN(aTs) ? 0 : aTs);
     });
+}
+
+export async function listOpenPaperTrades(ownerEmail: string): Promise<StoredExpression[]> {
+  const trades = await listPaperTrades(ownerEmail);
+  return trades.filter((row) => effectivePaperTradeStatus(row) === "open");
+}
+
+export async function getPaperTradeById(
+  ownerEmail: string,
+  tradeId: string,
+): Promise<StoredExpression | null> {
+  const store = await readStore();
+  const row = store.expressions.find(
+    (expression) =>
+      expression.id === tradeId &&
+      expression.lifecycle === "simulated" &&
+      expressionOwnerMatches(expression, ownerEmail),
+  );
+  return row ? withEffectiveStatus(row) : null;
+}
+
+export async function deletePaperTrade(ownerEmail: string, tradeId: string): Promise<boolean> {
+  const store = await readStore();
+  const target = store.expressions.find(
+    (row) =>
+      row.id === tradeId &&
+      row.lifecycle === "simulated" &&
+      expressionOwnerMatches(row, ownerEmail),
+  );
+  if (!target) {
+    return false;
+  }
+  const expressions = store.expressions.filter((row) => row.id !== tradeId);
+  const pointers = pointersForOwner(store, ownerEmail);
+  const expressionId = pointers.expressionId === tradeId ? null : pointers.expressionId;
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId,
+  });
+  await writeStore({ ...nextStore, expressions });
+  return true;
+}
+
+export async function clearPaperTrades(ownerEmail: string): Promise<number> {
+  const store = await readStore();
+  const toRemove = new Set(
+    store.expressions
+      .filter(
+        (row) => row.lifecycle === "simulated" && expressionOwnerMatches(row, ownerEmail),
+      )
+      .map((row) => row.id),
+  );
+  if (toRemove.size === 0) {
+    return 0;
+  }
+  const expressions = store.expressions.filter((row) => !toRemove.has(row.id));
+  const pointers = pointersForOwner(store, ownerEmail);
+  const expressionId =
+    pointers.expressionId && toRemove.has(pointers.expressionId) ? null : pointers.expressionId;
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId,
+  });
+  await writeStore({ ...nextStore, expressions });
+  return toRemove.size;
+}
+
+export async function closePaperTrade(
+  ownerEmail: string,
+  tradeId: string,
+): Promise<StoredExpression | null> {
+  const store = await readStore();
+  const idx = store.expressions.findIndex(
+    (row) =>
+      row.id === tradeId &&
+      row.lifecycle === "simulated" &&
+      expressionOwnerMatches(row, ownerEmail),
+  );
+  if (idx < 0) {
+    return null;
+  }
+  const current = store.expressions[idx];
+  if (effectivePaperTradeStatus(current) !== "open") {
+    return withEffectiveStatus(current);
+  }
+  const closedAt = new Date().toISOString();
+  const next: StoredExpression = {
+    ...current,
+    paperTradeStatus: "closed",
+    closedAt,
+    updatedAt: closedAt,
+  };
+  const expressions = [...store.expressions];
+  expressions[idx] = next;
+  await writeStore({ ...store, expressions });
+  return next;
 }
 
 export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowSummary> {

@@ -50,10 +50,27 @@ def test_paper_trades_api_route_exists() -> None:
     route = (
         MSOS_WEB / "src" / "app" / "api" / "theses" / "paper-trades" / "route.ts"
     ).read_text(encoding="utf-8")
+    by_id = (
+        MSOS_WEB / "src" / "app" / "api" / "theses" / "paper-trades" / "[id]" / "route.ts"
+    ).read_text(encoding="utf-8")
     assert "appendPaperTrade" in route
+    assert "clearPaperTrades" in route
     assert "listPaperTrades" in route
     assert "export async function POST" in route
     assert "export async function GET" in route
+    assert "export async function DELETE" in route
+    assert "deletePaperTrade" in by_id
+    assert "closePaperTrade" in by_id
+    assert "export async function PATCH" in by_id
+
+
+def test_workflow_store_supports_paper_trade_manage() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
+    assert "deletePaperTrade" in lib
+    assert "clearPaperTrades" in lib
+    assert "closePaperTrade" in lib
+    assert "effectivePaperTradeStatus" in lib
+    assert "paperTradeStatus" in lib
 
 
 def test_workflow_store_supports_paper_trade_ledger() -> None:
@@ -68,6 +85,40 @@ def test_monitor_history_feed_lists_paper_trades() -> None:
     assert "listPaperTrades" in lib
     assert "paperTradeHistoryEntries" in lib
     assert "markLineForTrade" in lib
+    assert "healthFromPaperTrades" in lib
+    assert "PaperTradeManageActions" in (
+        MSOS_WEB / "src" / "components" / "MonitorContent.tsx"
+    ).read_text(encoding="utf-8")
+
+
+def test_confirm_page_uses_live_lab_context() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "buildCompareColumnsFromLab" in lib
+    assert "buildThesisDraftFromLab" in lib
+    assert "buildThesisLabContext" in panel or "buildCompareColumnsFromLab" in panel
+    assert "fetchDisplayPayloadClient" in panel
+
+
+def test_paper_trade_detail_route_exists() -> None:
+    page = (MSOS_WEB / "src" / "app" / "monitor" / "paper" / "[id]" / "page.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "getPaperTradeById" in page
+    assert "PaperTradeDetailContent" in page
+
+
+def test_expression_save_returns_error_surface() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
+    panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "deletePaperTradeById" in lib
+    assert "clearAllPaperTrades" in lib
+    assert "closePaperTradeById" in lib
+    assert "saveError" in panel
 
 
 def test_workflow_session_scoping_exists() -> None:
@@ -160,7 +211,8 @@ def test_command_center_uses_snapshot_summary() -> None:
     page = (MSOS_WEB / "src" / "app" / "command-center" / "page.tsx").read_text(encoding="utf-8")
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "loadCommandCenterSummary" in page
-    assert "summary.kpis" in content
+    assert "loadWorkflowSummary" in page
+    assert "workflow" in content
     assert "summary.currentWork" in content
     lib = (MSOS_WEB / "src" / "lib" / "commandCenterSummary.ts").read_text(encoding="utf-8")
     assert "From your saved market snapshots" in lib
