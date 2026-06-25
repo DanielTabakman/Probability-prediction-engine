@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/AppShell";
 import { PaperTradeDetailContent } from "@/components/PaperTradeDetailContent";
+import { resolveDisplayCurrency } from "@/lib/displayCurrencyServer";
 import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
 import { getPaperTradeById } from "@/lib/msosWorkflowStore";
 import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
@@ -19,6 +20,7 @@ type PageProps = {
 export default async function PaperTradeDetailPage({ params }: PageProps) {
   const { id } = await params;
   const ownerId = await resolveWorkflowOwnerId();
+  const displayCurrency = await resolveDisplayCurrency();
   const [trade, display] = await Promise.all([
     getPaperTradeById(ownerId ?? "", id),
     fetchDisplayPayload(),
@@ -28,7 +30,11 @@ export default async function PaperTradeDetailPage({ params }: PageProps) {
   }
   return (
     <AppShell activeNavId="monitor">
-      <PaperTradeDetailContent trade={trade} currentSpotUsd={display?.spot_usd ?? null} />
+      <PaperTradeDetailContent
+        trade={trade}
+        currentSpotUsd={display?.spot_usd ?? null}
+        displayCurrency={displayCurrency}
+      />
     </AppShell>
   );
 }

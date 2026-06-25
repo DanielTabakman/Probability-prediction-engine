@@ -12,13 +12,8 @@ import {
 } from "@/lib/msosWorkflowStore";
 import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
 import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
-
-export type MonitorMarkParts = {
-  savedSpotUsd?: number;
-  currentSpotUsd?: number | null;
-  maxLossUsd?: number;
-  asOfUtc?: string;
-};
+import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
+import { formatMarkLine } from "@/lib/monitorMarkLine";
 
 export type MonitorWatchPanel = {
   id: string;
@@ -169,31 +164,6 @@ function workflowHistoryEntries(
     }
   }
   return entries;
-}
-
-export function formatMarkLine(
-  parts: MonitorMarkParts,
-  formatUsdAmount: (usd: number) => string,
-): string | undefined {
-  const { savedSpotUsd, currentSpotUsd, maxLossUsd, asOfUtc } = parts;
-  if (savedSpotUsd == null && currentSpotUsd == null) {
-    return undefined;
-  }
-  const lines: string[] = [];
-  if (typeof savedSpotUsd === "number" && currentSpotUsd != null) {
-    lines.push(`Spot ${formatUsdAmount(savedSpotUsd)} → ${formatUsdAmount(currentSpotUsd)}`);
-  } else if (typeof savedSpotUsd === "number") {
-    lines.push(`Saved at ${formatUsdAmount(savedSpotUsd)}`);
-  } else if (currentSpotUsd != null) {
-    lines.push(`Spot now ${formatUsdAmount(currentSpotUsd)}`);
-  }
-  if (typeof maxLossUsd === "number") {
-    lines.push(`max loss ${formatUsdAmount(Math.abs(maxLossUsd))}`);
-  }
-  if (asOfUtc?.trim()) {
-    lines.push(`as of ${formatTimestamp(asOfUtc)} UTC`);
-  }
-  return lines.length > 0 ? lines.join(" · ") : undefined;
 }
 
 function markPartsForTrade(
@@ -515,3 +485,6 @@ export function buildReviewEvents(summary: CommandCenterSummary): MonitorAlert[]
     };
   });
 }
+
+export type { MonitorMarkParts } from "@/lib/monitorMarkLine";
+export { formatMarkLine } from "@/lib/monitorMarkLine";

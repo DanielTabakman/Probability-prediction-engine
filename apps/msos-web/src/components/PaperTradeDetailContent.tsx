@@ -1,17 +1,19 @@
-"use client";
-
 import Link from "next/link";
 
 import { PaperTradeRowActions } from "@/components/PaperTradeManageActions";
 import { effectivePaperTradeStatus } from "@/lib/msosWorkflowStore";
 import type { StoredExpression } from "@/lib/msosWorkflowStore";
-import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
-import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
+import {
+  displayCurrencyDisclaimer,
+  formatMoney,
+  type DisplayCurrency,
+} from "@/lib/displayCurrency";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 type Props = {
   trade: StoredExpression;
   currentSpotUsd: number | null;
+  displayCurrency?: DisplayCurrency;
 };
 
 function statusLabel(status: string): string {
@@ -20,8 +22,12 @@ function statusLabel(status: string): string {
   return "Open";
 }
 
-export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
-  const { currency, formatMoney } = useDisplayCurrency();
+export function PaperTradeDetailContent({
+  trade,
+  currentSpotUsd,
+  displayCurrency = "USD",
+}: Props) {
+  const fmt = (usd: number) => formatMoney(usd, displayCurrency);
   const status = effectivePaperTradeStatus(trade);
   const mark = trade.markAtSave;
   const belief = trade.beliefSnapshot;
@@ -45,7 +51,7 @@ export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
       </header>
 
       <section className="panel paper-trade-detail">
-        <p className="micro display-currency-note">{displayCurrencyDisclaimer(currency)}</p>
+        <p className="micro display-currency-note">{displayCurrencyDisclaimer(displayCurrency)}</p>
         <div className="panel-head">
           <div>
             <h2>Plan summary</h2>
@@ -83,24 +89,24 @@ export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
             <h3>Marks at save</h3>
             <div className="line">
               <span>Spot</span>
-              <strong>{typeof mark.spotUsd === "number" ? formatMoney(mark.spotUsd) : "—"}</strong>
+              <strong>{typeof mark.spotUsd === "number" ? fmt(mark.spotUsd) : "—"}</strong>
             </div>
             {currentSpotUsd != null ? (
               <div className="line">
                 <span>Spot now</span>
-                <strong>{formatMoney(currentSpotUsd)}</strong>
+                <strong>{fmt(currentSpotUsd)}</strong>
               </div>
             ) : null}
             <div className="line">
               <span>Max loss</span>
               <strong>
-                {typeof mark.maxLossUsd === "number" ? formatMoney(Math.abs(mark.maxLossUsd)) : "—"}
+                {typeof mark.maxLossUsd === "number" ? fmt(Math.abs(mark.maxLossUsd)) : "—"}
               </strong>
             </div>
             <div className="line">
               <span>Max gain</span>
               <strong>
-                {typeof mark.maxGainUsd === "number" ? formatMoney(mark.maxGainUsd) : "—"}
+                {typeof mark.maxGainUsd === "number" ? fmt(mark.maxGainUsd) : "—"}
               </strong>
             </div>
           </div>

@@ -6,7 +6,8 @@ import type { MouseEvent } from "react";
 import { useState } from "react";
 
 import { deletePaperTradeWithUndo } from "@/lib/expressionPersistence";
-import { formatMarkLine, type MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
+import { formatMarkLine } from "@/lib/monitorMarkLine";
+import type { MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
 import { goToMonitorAfterDeleteFromRouter } from "@/lib/monitorNav";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 

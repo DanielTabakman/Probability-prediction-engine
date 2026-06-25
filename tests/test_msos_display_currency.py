@@ -36,11 +36,23 @@ def test_monitor_ssr_reads_currency_cookie() -> None:
     assert "DISPLAY_CURRENCY_COOKIE" in server
 
 
-def test_paper_trade_detail_uses_display_currency_hook() -> None:
+def test_paper_trade_detail_uses_server_display_currency() -> None:
     detail = (MSOS_WEB / "src" / "components" / "PaperTradeDetailContent.tsx").read_text(encoding="utf-8")
-    assert '"use client"' in detail
-    assert "useDisplayCurrency" in detail
+    page = (MSOS_WEB / "src" / "app" / "monitor" / "paper" / "[id]" / "page.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "use client" not in detail
+    assert "displayCurrency" in detail
     assert "formatMoney" in detail
+    assert "resolveDisplayCurrency" in page
+
+
+def test_monitor_mark_line_is_client_safe() -> None:
+    mark = (MSOS_WEB / "src" / "lib" / "monitorMarkLine.ts").read_text(encoding="utf-8")
+    watch = (MSOS_WEB / "src" / "components" / "MonitorWatchList.tsx").read_text(encoding="utf-8")
+    assert "formatMarkLine" in mark
+    assert 'import { formatMarkLine } from "@/lib/monitorMarkLine"' in watch
+    assert 'import type { MonitorWatchPanel } from "@/lib/monitorHistoryFeed"' in watch
 
 
 def test_deploy_docs_list_fx_env_vars() -> None:
