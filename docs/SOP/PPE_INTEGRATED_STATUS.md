@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `msos_usable_demo_v1` — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
 | **Relay plan** | [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json) |
-| **Next** | DESKTOP_CONTINUE.cmd on desktop (never run_ppe_local); VM pull main + relay witness/closeout for msos_usable_demo_v1 |
+| **Next** | IDE_BUILD MSOS-UsableDemoV1-Product-Slice002 (msos_usable_demo_v1); PR #330 merged — smoke workflow manage on production |
 
 **Usable demo integration:** One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review
 

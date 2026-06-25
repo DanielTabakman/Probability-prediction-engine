@@ -11,7 +11,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
 - **Stage:** build_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/)); **BUILD** integration is active
 - **Active BUILD chapter:** `msos_usable_demo_v1` · plan [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
-- **Next steward action:** DESKTOP_CONTINUE.cmd on desktop (never run_ppe_local); VM pull main + relay witness/closeout for msos_usable_demo_v1
+- **Next steward action:** IDE_BUILD MSOS-UsableDemoV1-Product-Slice002 (msos_usable_demo_v1); PR #330 merged — smoke workflow manage on production
 
 **Retired (do not steer BUILD by these):**
 - ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-build-v1`

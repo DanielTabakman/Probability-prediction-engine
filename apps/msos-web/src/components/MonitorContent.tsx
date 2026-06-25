@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { PaperTradeManageActions } from "@/components/PaperTradeManageActions";
-import type { MonitorFeed } from "@/lib/monitorHistoryFeed";
+import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 type Props = {
@@ -14,13 +13,25 @@ function statusPill(feed: MonitorFeed): string {
   return "Offline";
 }
 
+function activeWatchCount(panels: MonitorWatchPanel[]): number {
+  return panels.filter((panel) => panel.id !== "—").length;
+}
+
+function actionableAlerts(feed: MonitorFeed) {
+  return feed.alerts.filter((alert) => alert.title !== "Monitoring ready");
+}
+
 export function MonitorContent({ feed }: Props) {
+  const watchCount = activeWatchCount(feed.watchPanels);
+  const alerts = actionableAlerts(feed);
+
   return (
     <>
       <header className="topline">
         <div>
           <div className="crumb">Monitor</div>
           <h1 className="title">Monitor</h1>
+          <p className="monitor-lead">{feed.heroSubtitle}</p>
         </div>
         <div className="tools">
           <span className="pill">
@@ -30,79 +41,73 @@ export function MonitorContent({ feed }: Props) {
             />
             {statusPill(feed)}
           </span>
-          <Link href="/command-center" className="btn slim">
-            Command Center
+          <Link href="/history" className="btn slim">
+            History
           </Link>
         </div>
       </header>
 
-      <section className="work monitor-layout">
-        <div className="panel">
-          <div className="statushero">
-            <div>
-              <div className="panel-sub">{feed.sourceLabel}</div>
-              <h1>{feed.heroTitle}</h1>
-              <p>{feed.heroSubtitle}</p>
-            </div>
-            <span className="tag teal">Watch</span>
-          </div>
-          {feed.status === "degraded" ? (
-            <p className="panel-sub degraded-feed-note" role="status">
-              {friendlySnapshotFeedMessage(feed.degradedReason)}
-            </p>
-          ) : null}
+      <section className="panel monitor-panel">
+        {feed.status === "degraded" ? (
+          <p className="panel-sub degraded-feed-note" role="status">
+            {friendlySnapshotFeedMessage(feed.degradedReason)}
+          </p>
+        ) : null}
+
+        <div className="monitor-summary" aria-label="Watch status">
+          <span className="monitor-summary-label">{feed.healthLabel}</span>
           <div
-            className="meter"
+            className="meter monitor-meter"
             aria-hidden="true"
             style={{ ["--meter-pct" as string]: `${feed.healthPct}%` }}
           />
-          <div className="side-label">{feed.healthLabel}</div>
-
-          <div className="watch-grid" aria-label="Watch list">
-            {feed.watchPanels.map((panel) => {
-              const card = (
-                <>
-                  <span className={`tag ${panel.tone}`}>{panel.title.split(" ")[0]}</span>
-                  <h3>{panel.title}</h3>
-                  <p>{panel.body}</p>
-                  {panel.markLine ? <p className="micro watch-mark">{panel.markLine}</p> : null}
-                </>
-              );
-              return panel.href ? (
-                <Link key={panel.id} href={panel.href} className="watch watch-link">
-                  {card}
-                </Link>
-              ) : (
-                <div key={panel.id} className="watch">
-                  {card}
-                </div>
-              );
-            })}
-          </div>
-
-          {feed.manageEnabled ? (
-            <PaperTradeManageActions trades={feed.paperTrades} variant="monitor" />
-          ) : null}
         </div>
 
-        <aside className="panel monitor-side">
-          <div className="panel-head">
-            <h2>Alerts</h2>
-            <div className="panel-sub">Reminders — not trade advice.</div>
-          </div>
-          {feed.alerts.map((alert) => (
-            <div key={alert.title} className="alert">
-              <span className={`spot ${alert.tone}`} aria-hidden="true" />
-              <div>
-                <h4>{alert.title}</h4>
-                <p>{alert.body}</p>
+        <div className="panel-head compact">
+          <h2>Watching now</h2>
+          {watchCount > 0 ? <span className="tag teal">{watchCount} active</span> : null}
+        </div>
+
+        <div className="monitor-watch-list" aria-label="Watch list">
+          {feed.watchPanels.map((panel) => {
+            const row = (
+              <>
+                {panel.badge ? (
+                  <div className="monitor-watch-meta">
+                    <span className={`tag ${panel.tone}`}>{panel.badge}</span>
+                  </div>
+                ) : null}
+                <h3>{panel.title}</h3>
+                <p>{panel.body}</p>
+                {panel.markLine ? <p className="micro watch-mark">{panel.markLine}</p> : null}
+              </>
+            );
+            return panel.href ? (
+              <Link key={panel.id} href={panel.href} className="monitor-watch-row monitor-watch-link">
+                {row}
+              </Link>
+            ) : (
+              <div key={panel.id} className="monitor-watch-row">
+                {row}
               </div>
-            </div>
-          ))}
-          <Link href="/history" className="btn slim primary monitor-history-link">
-            View history →
-          </Link>
-        </aside>
+            );
+          })}
+        </div>
+
+        {alerts.length > 0 ? (
+          <div className="monitor-alerts" aria-label="Needs attention">
+            <div className="side-label inline">Needs attention</div>
+            {alerts.map((alert) => (
+              <div key={alert.title} className="monitor-alert">
+                <span className={`spot ${alert.tone}`} aria-hidden="true" />
+                <div>
+                  <strong>{alert.title}</strong>
+                  <p>{alert.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       <p className="footer-note">{DEMO_FOOTER}</p>

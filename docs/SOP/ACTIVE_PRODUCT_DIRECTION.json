@@ -10,7 +10,7 @@
   "activeBuildChapterId": "msos_usable_demo_v1",
   "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
   "activeBuildSprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
-  "nextStewardAction": "DESKTOP_CONTINUE.cmd on desktop (never run_ppe_local); VM pull main + relay witness/closeout for msos_usable_demo_v1",
+  "nextStewardAction": "IDE_BUILD MSOS-UsableDemoV1-Product-Slice002 (msos_usable_demo_v1); PR #330 merged — smoke workflow manage on production",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as primary BUILD blocker",

@@ -86,9 +86,10 @@ def test_monitor_history_feed_lists_paper_trades() -> None:
     assert "paperTradeHistoryEntries" in lib
     assert "markLineForTrade" in lib
     assert "healthFromPaperTrades" in lib
-    assert "PaperTradeManageActions" in (
-        MSOS_WEB / "src" / "components" / "MonitorContent.tsx"
-    ).read_text(encoding="utf-8")
+    monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+    history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
+    assert "PaperTradeManageActions" not in monitor
+    assert "PaperTradeManageActions" in history
 
 
 def test_confirm_page_uses_live_lab_context() -> None:
