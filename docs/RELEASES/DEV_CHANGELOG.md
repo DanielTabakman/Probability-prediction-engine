@@ -2,8 +2,16 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-25
+
+- `7c88fb9` — MSOS-PublicLaunchV1: workflow manage — paper trades, live confirm, monitor detail (#330) (`apps/msos-web/`)
+
 ## 2026-06-24
 
+- `6b4a739` — CI: msos_web next build gate (#329) (`scripts/`)
+- `06dde7f` — Fix MSOS 500: Edge middleware crypto + break identity import cycle (#328) (`apps/msos-web/`)
+- `1e86277` — MSOS UX: richer demo, currency, session history, chart expand (#327) (`apps/msos-web/`)
+- `97cade0` — Control-plane: dev changelog
 - `4344aff` — Merge pull request #326 from DanielTabakman/feat/paper-trade-ledger-v1
 - `c24e956` — MSOS paper-trade ledger: save list history + monitor marks (Phase A/B) (`apps/msos-web/`)
 - `cd55b40` — Control-plane: dev changelog
