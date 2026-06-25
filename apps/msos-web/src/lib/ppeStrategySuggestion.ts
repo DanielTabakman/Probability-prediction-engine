@@ -28,6 +28,12 @@ export type StrategySuggestionReview = {
   linkage_line?: string;
 };
 
+export type TradeReviewBlock = {
+  strengths?: string[];
+  risks?: string[];
+  plain_leg_summary?: string;
+};
+
 export type BeliefVsMarketGlance = {
   width_relation_label?: string;
   disagreement_type_line?: string;
@@ -63,6 +69,7 @@ export type StrategySuggestionPayload = {
     };
     summary?: StrategySuggestionSummary;
     review?: StrategySuggestionReview;
+    trade_review?: TradeReviewBlock | null;
     expression_family?: string | null;
     belief_vs_market_glance?: BeliefVsMarketGlance | null;
   };

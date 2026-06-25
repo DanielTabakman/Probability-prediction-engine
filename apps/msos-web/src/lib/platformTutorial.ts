@@ -2,6 +2,7 @@
 
 export const PLATFORM_TUTORIAL_STORAGE_KEY = "msos.platform.tutorial.completed.v1";
 export const PLATFORM_TUTORIAL_QUERY = "tutorial";
+export const PLATFORM_TUTORIAL_BEGINNER_QUERY = "beginner";
 
 export type PlatformTutorialStep = {
   id: string;
@@ -43,6 +44,37 @@ export const PLATFORM_TUTORIAL_STEPS: PlatformTutorialStep[] = [
     anchor: "[data-tour='lab-confirm']",
   },
 ];
+
+export const PLATFORM_TUTORIAL_BEGINNER_STEPS: PlatformTutorialStep[] = [
+  {
+    id: "expiry",
+    title: "Pick a date",
+    body: "Choose when your idea applies. You'll see today's BTC price and what the market expects on that date.",
+    anchor: "[data-tour='lab-expiry']",
+  },
+  {
+    id: "belief",
+    title: "Say how you disagree",
+    body: "Tap Higher/Lower if you think BTC lands above or below what options imply. Tap More/Less vol if you expect a wider or calmer range.",
+    anchor: "[data-tour='lab-belief']",
+  },
+  {
+    id: "chart",
+    title: "Read the chart",
+    body: "Purple = what the market believes. Teal = your view. You don't need to understand every detail — just whether they look similar or different.",
+    anchor: "[data-tour='lab-chart']",
+  },
+  {
+    id: "confirm",
+    title: "Lock your view",
+    body: "When the chart matches your thinking, confirm — then we'll sketch a paper trade that fits. No real money moves.",
+    anchor: "[data-tour='lab-confirm']",
+  },
+];
+
+export function resolveTutorialSteps(beginner: boolean): PlatformTutorialStep[] {
+  return beginner ? PLATFORM_TUTORIAL_BEGINNER_STEPS : PLATFORM_TUTORIAL_STEPS;
+}
 
 export function isPlatformTutorialComplete(): boolean {
   if (typeof window === "undefined") return true;

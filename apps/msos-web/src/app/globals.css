@@ -2132,6 +2132,43 @@ button.btn:disabled {
   margin: 0;
 }
 
+.plain-leg-summary {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(67, 231, 211, 0.06);
+  border: 1px solid rgba(67, 231, 211, 0.14);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #c5d8e8;
+}
+
+.save-success-callout {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(67, 231, 211, 0.08);
+  border: 1px solid rgba(67, 231, 211, 0.2);
+}
+
+.save-success-callout strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--teal);
+}
+
+.save-success-callout p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #b7c9da;
+}
+
+.pending-trade-banner a {
+  color: var(--teal);
+  font-weight: 700;
+}
+
 /* Expression planning (P6 — storyboard 05_execution) */
 .exec-layout {
   display: grid;
@@ -2884,6 +2921,25 @@ button.btn:disabled {
   .belief-axis-row {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+
+  .belief-preset {
+    min-height: 44px;
+    padding: 12px 10px;
+  }
+
+  .expiry-market-context-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exec-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .exec-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .learn-loop-strip {

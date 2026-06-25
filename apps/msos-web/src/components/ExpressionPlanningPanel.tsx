@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
 import { TradeProsConsCard } from "@/components/TradeProsConsCard";
+import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import {
   expressionFamilies,
   expressionRiskNote,
@@ -41,7 +42,7 @@ import {
   stashPendingPaperTrade,
   takePendingPaperTrade,
 } from "@/lib/msosWorkflowClient";
-import { buildTradeProsCons } from "@/lib/tradeReviewCopy";
+import { buildPlainLegSummary, buildTradeProsCons } from "@/lib/tradeReviewCopy";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
@@ -287,6 +288,12 @@ export function ExpressionPlanningPanel() {
     suggestion?.suggested?.summary ?? null,
     suggestion?.suggested?.review?.payoff_line ?? null,
     formatMoney,
+    suggestion?.suggested?.trade_review,
+  );
+  const plainLegSummary = buildPlainLegSummary(
+    suggestion?.suggested?.trade_review,
+    suggestion?.suggested?.review?.payoff_line ?? null,
+    suggestion?.suggested?.review?.structure_line ?? null,
   );
 
   return (
@@ -327,6 +334,8 @@ export function ExpressionPlanningPanel() {
           </Link>
         </div>
       ) : (
+        <>
+          <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
         <section className="exec-layout exec-layout-slim" aria-label="Expression planning layout">
           <div className="panel ticket">
             <ExpressionPayoffChartFrame
@@ -356,6 +365,11 @@ export function ExpressionPlanningPanel() {
                   </div>
                 ))}
               </div>
+              {plainLegSummary ? (
+                <p className="plain-leg-summary" role="note">
+                  <strong>In plain terms:</strong> {plainLegSummary}
+                </p>
+              ) : null}
               <details className="planner-glossary">
                 <summary>New to options? Quick glossary</summary>
                 <ul className="micro">
@@ -436,6 +450,13 @@ export function ExpressionPlanningPanel() {
             <div className="exec-actions">
               {lastSavedAt ? (
                 <>
+                  <div className="save-success-callout" role="status">
+                    <strong>Paper trade saved</strong>
+                    <p>
+                      We&apos;ll track how this sketch would have done versus live BTC until expiry —
+                      no orders were sent.
+                    </p>
+                  </div>
                   <Link href="/strategy-lab" className="btn slim primary">
                     Plan another trade
                   </Link>
@@ -474,6 +495,7 @@ export function ExpressionPlanningPanel() {
             ) : null}
           </div>
         </section>
+        </>
       )}
 
       <p className="footer-note">{DEMO_FOOTER}</p>
