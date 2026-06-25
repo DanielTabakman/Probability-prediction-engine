@@ -141,15 +141,15 @@ export function ExpressionPlanningPanel() {
   useEffect(() => {
     if (!hydrated || !thesisConfirmed) return;
 
-    let cancelled = false;
+    const abort = { cancelled: false };
     async function resumePendingSave() {
       const pending = takePendingPaperTrade<ExpressionRecord>();
       if (!pending) return;
       const signedIn = await hasWorkflowIdentity();
-      if (!signedIn || cancelled) return;
+      if (!signedIn || abort.cancelled) return;
       setSavePending(true);
       const result = await savePaperTrade(pending);
-      if (cancelled) return;
+      if (abort.cancelled) return;
       setRecord(result.expression);
       if (result.ok) {
         setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
@@ -161,14 +161,14 @@ export function ExpressionPlanningPanel() {
 
     void resumePendingSave();
     return () => {
-      cancelled = true;
+      abort.cancelled = true;
     };
   }, [hydrated, thesisConfirmed]);
 
   useEffect(() => {
     if (!hydrated || !thesisConfirmed) return;
 
-    let cancelled = false;
+    const abort = { cancelled: false };
     async function loadSuggestion() {
       setSuggestionLoading(true);
       setSuggestionError(null);
@@ -181,16 +181,16 @@ export function ExpressionPlanningPanel() {
         expiryOptions[0] ||
         storedExpiry;
       if (!resolvedExpiry) {
-        if (!cancelled) {
+        if (!abort.cancelled) {
           setSuggestionError("Pick an expiry in Strategy Lab first.");
           setSuggestionLoading(false);
         }
         return;
       }
-      if (!cancelled) setExpiry(resolvedExpiry);
+      if (!abort.cancelled) setExpiry(resolvedExpiry);
 
       const payload = await fetchStrategySuggestion(resolvedExpiry, tuning);
-      if (cancelled) return;
+      if (abort.cancelled) return;
       if (!payload) {
         setSuggestion(null);
         setSuggestionError("Live trade suggestion unavailable — showing demo structure.");
@@ -203,7 +203,7 @@ export function ExpressionPlanningPanel() {
 
     void loadSuggestion();
     return () => {
-      cancelled = true;
+      abort.cancelled = true;
     };
   }, [hydrated, thesisConfirmed]);
 
