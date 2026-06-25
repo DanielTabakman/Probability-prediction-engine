@@ -4,14 +4,21 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
-  compareColumns,
   confirmationChecklist,
   defaultThesisRecord,
   lifecycleDisplayId,
   lifecycleSteps,
   thesisConfirmHeadline,
-  thesisRestatement,
 } from "@/data/thesisConfirmFixtures";
+import {
+  buildCompareColumnsFromLab,
+  buildConfirmChecklist,
+  buildThesisDraftFromLab,
+  buildThesisRestatement,
+} from "@/lib/buildThesisLabContext";
+import { loadStoredBeliefTuning, type BeliefTuning } from "@/lib/beliefTuning";
+import { fetchDisplayPayloadClient, type DisplayPayload } from "@/lib/ppeDisplayPayload";
+import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import {
   THESIS_PERSISTENCE_LABEL,
   fetchThesisRecord,
@@ -24,18 +31,54 @@ import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 export function ThesisConfirmationPanel() {
   const [record, setRecord] = useState(defaultThesisRecord);
   const [hydrated, setHydrated] = useState(false);
+  const [persistError, setPersistError] = useState<string | null>(null);
+  const [displayPayload, setDisplayPayload] = useState<DisplayPayload | null>(null);
+  const [tuning, setTuning] = useState<BeliefTuning>(loadStoredBeliefTuning());
+  const [expiry, setExpiry] = useState<string | null>(null);
 
   useEffect(() => {
-    void fetchThesisRecord(defaultThesisRecord).then((loaded) => {
-      setRecord(loaded);
+    void (async () => {
+      const [loaded, payload] = await Promise.all([
+        fetchThesisRecord(defaultThesisRecord),
+        fetchDisplayPayloadClient(),
+      ]);
+      const storedExpiry =
+        loadStoredStrategyLabExpiry() ||
+        payload?.series_by_expiry?.[0]?.expiry_date ||
+        loaded.expiryDate ||
+        null;
+      const storedTuning = loadStoredBeliefTuning();
+      const draft = buildThesisDraftFromLab(payload, storedTuning, storedExpiry);
+      setDisplayPayload(payload);
+      setTuning(storedTuning);
+      setExpiry(storedExpiry);
+      setRecord({ ...loaded, ...draft, lifecycle: loaded.lifecycle, updatedAt: loaded.updatedAt });
       setHydrated(true);
-    });
+    })();
   }, []);
 
-  function persist(nextLifecycle: ThesisLifecycle) {
-    const next = withLifecycle(record, nextLifecycle);
+  const columns = buildCompareColumnsFromLab(displayPayload, tuning);
+  const restatement = buildThesisRestatement(tuning, expiry ?? `${record.horizonDays} days`);
+  const checklist = hydrated
+    ? buildConfirmChecklist(expiry, Boolean(displayPayload))
+    : confirmationChecklist;
+
+  async function persist(nextLifecycle: ThesisLifecycle) {
+    const draft = buildThesisDraftFromLab(displayPayload, tuning, expiry);
+    const next = withLifecycle(
+      {
+        ...record,
+        ...draft,
+        updatedAt: new Date().toISOString(),
+      },
+      nextLifecycle,
+    );
     setRecord(next);
-    void persistThesisRecord(next);
+    setPersistError(null);
+    const ok = await persistThesisRecord(next);
+    if (!ok) {
+      setPersistError("Could not save to server — stored locally only.");
+    }
   }
 
   const isConfirmed = record.lifecycle === "confirmed";
@@ -66,13 +109,17 @@ export function ThesisConfirmationPanel() {
         <section className="panel truth">
           <h2 className="question">{thesisConfirmHeadline}</h2>
           <p className="thesis">
-            {thesisRestatement.prefix}{" "}
-            <em>{thesisRestatement.emphasis}</em> {thesisRestatement.suffix}{" "}
-            <em>{thesisRestatement.horizon}</em>.
+            {restatement.prefix}{" "}
+            <em>{restatement.emphasis}</em> {restatement.suffix}{" "}
+            <em>{restatement.horizon}</em>.
           </p>
 
+          {record.disagreementLine ? (
+            <p className="panel-sub">{record.disagreementLine}</p>
+          ) : null}
+
           <div className="compare-row" aria-label="Market vs thesis comparison">
-            {compareColumns.map((col) => (
+            {columns.map((col) => (
               <div key={col.label} className="compare-box">
                 <div className="k">{col.label}</div>
                 <div className={`v ${col.tone ?? ""}`.trim()}>{col.value}</div>
@@ -92,7 +139,7 @@ export function ThesisConfirmationPanel() {
             <div className="lock">
               <h3>Timeframe</h3>
               <p>
-                {record.instrument} · {record.horizonDays} days
+                {record.instrument} · {expiry ?? `${record.horizonDays} days`}
               </p>
             </div>
           </div>
@@ -106,7 +153,7 @@ export function ThesisConfirmationPanel() {
                 <div className="panel-sub">Quick sanity checks — no hidden “AI says buy.”</div>
               </div>
             </div>
-            {confirmationChecklist.map((item) => (
+            {checklist.map((item) => (
               <div key={item.id} className="check-row">
                 <span className="checkmark" aria-hidden="true">
                   ✓
@@ -138,6 +185,11 @@ export function ThesisConfirmationPanel() {
               ))}
             </div>
             <p className="micro persistence-note">{THESIS_PERSISTENCE_LABEL}</p>
+            {persistError ? (
+              <p className="micro degraded-feed-note" role="alert">
+                {persistError}
+              </p>
+            ) : null}
           </div>
 
           <div className="proceed">
@@ -148,7 +200,7 @@ export function ThesisConfirmationPanel() {
                 type="button"
                 className="btn slim"
                 disabled={!hydrated || isConfirmed}
-                onClick={() => persist("draft")}
+                onClick={() => void persist("draft")}
               >
                 Save draft
               </button>
@@ -156,7 +208,7 @@ export function ThesisConfirmationPanel() {
                 type="button"
                 className="btn slim primary"
                 disabled={!hydrated || isConfirmed}
-                onClick={() => persist("confirmed")}
+                onClick={() => void persist("confirmed")}
               >
                 Confirm view
               </button>

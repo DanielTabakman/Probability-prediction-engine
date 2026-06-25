@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import type { ExpressionRecord } from "@/lib/expressionPersistence";
 import { requireProtectedIdentity } from "@/lib/msosIdentity";
-import { appendPaperTrade, listPaperTrades } from "@/lib/msosWorkflowStore";
+import { appendPaperTrade, clearPaperTrades, listPaperTrades } from "@/lib/msosWorkflowStore";
 
 export const runtime = "nodejs";
 
@@ -38,5 +38,17 @@ export async function POST(request: Request) {
       message.includes("confirm a thesis") || message.includes("simulated lifecycle") ? 400 : 500;
     console.error("paper-trades POST failed", err);
     return NextResponse.json({ error: message }, { status });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const identity = requireProtectedIdentity(request);
+  if (!identity.ok) return identity.response;
+  try {
+    const removed = await clearPaperTrades(identity.email);
+    return NextResponse.json({ removed });
+  } catch (err) {
+    console.error("paper-trades DELETE all failed", err);
+    return NextResponse.json({ error: "failed to clear paper trades" }, { status: 500 });
   }
 }

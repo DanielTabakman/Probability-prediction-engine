@@ -115,6 +115,7 @@ export function ExpressionPlanningPanel() {
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
   const [expiry, setExpiry] = useState<string | null>(null);
   const [savePending, setSavePending] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
   const { currency, formatMoney } = useDisplayCurrency();
 
@@ -223,9 +224,14 @@ export function ExpressionPlanningPanel() {
       markAtSave,
     };
     setSavePending(true);
-    const saved = await savePaperTrade(next);
-    setRecord(saved);
-    setLastSavedAt(saved.savedAt ?? saved.updatedAt);
+    setSaveError(null);
+    const result = await savePaperTrade(next);
+    setRecord(result.expression);
+    if (result.ok) {
+      setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
+    } else {
+      setSaveError(result.error ?? "Could not save paper trade.");
+    }
     setSavePending(false);
   }
 
@@ -387,9 +393,9 @@ export function ExpressionPlanningPanel() {
                 </>
               ) : (
                 <>
-                  <button type="button" className="btn slim" disabled={!hydrated}>
+                  <Link href="/monitor" className="btn slim">
                     Watch without trading
-                  </button>
+                  </Link>
                   <button
                     type="button"
                     className="btn slim primary"
@@ -398,12 +404,14 @@ export function ExpressionPlanningPanel() {
                   >
                     {savePending ? "Saving…" : "Save paper trade"}
                   </button>
-                  <button type="button" className="btn slim dark" disabled={!hydrated}>
-                    Review order (coming soon)
-                  </button>
                 </>
               )}
             </div>
+            {saveError ? (
+              <p className="micro degraded-feed-note" role="alert">
+                {saveError}
+              </p>
+            ) : null}
             {lastSavedAt ? (
               <p className="micro persistence-note">
                 {EXPRESSION_PERSISTENCE_LABEL} Amounts shown in {currency}.

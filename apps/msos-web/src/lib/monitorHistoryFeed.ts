@@ -4,7 +4,9 @@ import {
   type CommandCenterSnapshotRow,
 } from "@/lib/commandCenterSummary";
 import type { StoredExpression } from "@/lib/msosWorkflowStore";
+import type { PaperTradeStatus } from "@/lib/expressionPersistence";
 import {
+  effectivePaperTradeStatus,
   getCurrentThesis,
   listPaperTrades,
 } from "@/lib/msosWorkflowStore";
@@ -16,6 +18,15 @@ export type MonitorWatchPanel = {
   body: string;
   tone: string;
   markLine?: string;
+  href?: string;
+  tradeId?: string;
+  status?: PaperTradeStatus;
+};
+
+export type PaperTradeSummary = {
+  id: string;
+  title: string;
+  status: PaperTradeStatus;
 };
 
 export type MonitorAlert = {
@@ -33,6 +44,8 @@ export type MonitorFeed = {
   healthLabel: string;
   watchPanels: MonitorWatchPanel[];
   alerts: MonitorAlert[];
+  paperTrades: PaperTradeSummary[];
+  manageEnabled: boolean;
   degradedReason?: string;
 };
 
@@ -44,6 +57,10 @@ export type HistoryEntry = {
   timestamp: string;
   title: string;
   detail: string;
+  href?: string;
+  tradeId?: string;
+  statusTag?: string;
+  paperTradeStatus?: PaperTradeStatus;
 };
 
 export type HistoryFeed = {
@@ -91,13 +108,21 @@ function snapshotHistoryEntries(rows: CommandCenterSnapshotRow[]): HistoryEntry[
   });
 }
 
+function statusLabel(status: PaperTradeStatus): string {
+  if (status === "closed") return "Closed";
+  if (status === "expired") return "Expired";
+  return "Open";
+}
+
 function paperTradeHistoryEntries(trades: StoredExpression[]): HistoryEntry[] {
   return trades.map((expression) => {
+    const status = effectivePaperTradeStatus(expression);
     const expiry = expression.expiryDate?.trim();
     const instrument = expression.instrument?.trim();
     const legs = expression.legs.length;
     const detailParts = [
       expression.planSummary,
+      `${statusLabel(status)}`,
       expiry ? `exp ${expiry}` : null,
       instrument ? instrument : null,
       legs > 0 ? `${legs} leg${legs === 1 ? "" : "s"}` : null,
@@ -108,6 +133,10 @@ function paperTradeHistoryEntries(trades: StoredExpression[]): HistoryEntry[] {
       timestamp: formatTimestamp(expression.savedAt ?? expression.updatedAt),
       title: expression.planHeadline,
       detail: detailParts.join(" · "),
+      href: `/monitor/paper/${expression.id}`,
+      tradeId: expression.id,
+      statusTag: statusLabel(status),
+      paperTradeStatus: status,
     };
   });
 }
@@ -175,20 +204,25 @@ function buildWatchPanels(
       tone: thesis.lifecycle === "confirmed" ? "teal" : "amber",
     });
   }
-  paperTrades.slice(0, 6).forEach((expression) => {
+  paperTrades.forEach((expression) => {
+    const status = effectivePaperTradeStatus(expression);
     const expiry = expression.expiryDate?.trim();
     panels.push({
       id: `paper-${expression.id}`,
       title: expression.planHeadline,
       body: [
+        statusLabel(status),
         `${expression.legs.length} leg${expression.legs.length === 1 ? "" : "s"}`,
         expiry ? `exp ${expiry}` : null,
         expression.instrument?.trim() ?? null,
       ]
         .filter(Boolean)
         .join(" · "),
-      tone: "teal",
+      tone: status === "open" ? "teal" : status === "closed" ? "muted" : "amber",
       markLine: markLineForTrade(expression, currentSpotUsd, marketAsOfUtc),
+      href: `/monitor/paper/${expression.id}`,
+      tradeId: expression.id,
+      status,
     });
   });
   if (summary.status === "live" && summary.recentSnapshots.length > 0) {
@@ -268,6 +302,21 @@ function healthFromSummary(
   };
 }
 
+function healthFromPaperTrades(trades: StoredExpression[]): { pct: number; label: string } {
+  const open = trades.filter((row) => effectivePaperTradeStatus(row) === "open").length;
+  const closed = trades.filter((row) => effectivePaperTradeStatus(row) === "closed").length;
+  const expired = trades.filter((row) => effectivePaperTradeStatus(row) === "expired").length;
+  const total = trades.length;
+  const pct = open > 0 ? 70 : closed > 0 ? 45 : 30;
+  const parts = [`${open} open`];
+  if (closed) parts.push(`${closed} closed`);
+  if (expired) parts.push(`${expired} expired`);
+  return {
+    pct,
+    label: `${parts.join(" · ")} · ${total} saved`,
+  };
+}
+
 export async function loadMonitorFeed(ownerEmail: string | null): Promise<MonitorFeed> {
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
@@ -306,9 +355,16 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
         },
       ],
       degradedReason: summary.degradedReason,
+      paperTrades: [],
+      manageEnabled: false,
     };
   }
 
+  const paperTradeSummaries: PaperTradeSummary[] = paperTrades.map((trade) => ({
+    id: trade.id,
+    title: trade.planHeadline,
+    status: effectivePaperTradeStatus(trade),
+  }));
   const watchPanels = buildWatchPanels(
     thesis,
     paperTrades,
@@ -317,7 +373,9 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
     marketAsOfUtc,
   );
   const alerts = buildAlerts(summary);
-  const { pct, label } = healthFromSummary(summary, hasPaperTrades);
+  const health = hasPaperTrades
+    ? healthFromPaperTrades(paperTrades)
+    : healthFromSummary(summary, hasPaperTrades);
   const hasSnapshots = summary.status === "live" && summary.recentSnapshots.length > 0;
 
   return {
@@ -329,10 +387,12 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
       : hasSnapshots
         ? "Watching your saved views."
         : "Save a paper trade in Strategy Lab to start building history.",
-    healthPct: pct,
-    healthLabel: label,
+    healthPct: health.pct,
+    healthLabel: health.label,
     watchPanels,
     alerts,
+    paperTrades: paperTradeSummaries,
+    manageEnabled: hasPaperTrades,
   };
 }
 

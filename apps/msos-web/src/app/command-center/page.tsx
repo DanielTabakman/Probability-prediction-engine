@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { CommandCenterContent } from "@/components/CommandCenterContent";
 import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
 import { resolveMsosIdentityFromHeaders } from "@/lib/msosIdentityCore";
+import { loadWorkflowSummary } from "@/lib/msosWorkflowStore";
 
 export const metadata: Metadata = {
   title: "Command Center | Market Structure OS",
@@ -15,10 +16,13 @@ export const metadata: Metadata = {
 export default async function CommandCenterPage() {
   const requestHeaders = await headers();
   const ownerEmail = resolveMsosIdentityFromHeaders(requestHeaders);
-  const summary = loadCommandCenterSummary(ownerEmail);
+  const [summary, workflow] = await Promise.all([
+    loadCommandCenterSummary(ownerEmail),
+    loadWorkflowSummary(ownerEmail ?? ""),
+  ]);
   return (
     <AppShell activeNavId="command-center">
-      <CommandCenterContent summary={summary} />
+      <CommandCenterContent summary={summary} workflow={workflow} />
     </AppShell>
   );
 }

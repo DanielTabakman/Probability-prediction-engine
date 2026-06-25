@@ -13,6 +13,8 @@ import {
 
 export type ExpressionLifecycle = "planned" | "simulated";
 
+export type PaperTradeStatus = "open" | "closed" | "expired";
+
 export type BeliefSnapshot = {
   forwardMult: number;
   volMult: number;
@@ -40,6 +42,8 @@ export type ExpressionRecord = {
   beliefSnapshot?: BeliefSnapshot;
   markAtSave?: PaperTradeMarkSnapshot;
   savedAt?: string;
+  paperTradeStatus?: PaperTradeStatus;
+  closedAt?: string;
 };
 
 export const EXPRESSION_STORAGE_KEY = "msos.expression.preview.v1";
@@ -150,16 +154,21 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
   }
 }
 
-export async function savePaperTrade(record: ExpressionRecord): Promise<ExpressionRecord> {
+export async function savePaperTrade(record: ExpressionRecord): Promise<{
+  expression: ExpressionRecord;
+  ok: boolean;
+  error?: string;
+}> {
   const payload: ExpressionRecord = {
     ...record,
     lifecycle: "simulated",
+    paperTradeStatus: "open",
     savedAt: record.savedAt ?? new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
   saveExpressionRecord(payload);
   if (typeof window === "undefined") {
-    return payload;
+    return { expression: payload, ok: true };
   }
   try {
     const response = await fetch("/api/theses/paper-trades", {
@@ -169,16 +178,66 @@ export async function savePaperTrade(record: ExpressionRecord): Promise<Expressi
       body: JSON.stringify({ expression: payload }),
     });
     if (!response.ok) {
-      return payload;
+      const body = (await response.json().catch(() => ({}))) as { error?: string };
+      return {
+        expression: payload,
+        ok: false,
+        error: body.error ?? "Could not save paper trade — confirm your view first.",
+      };
     }
     const body = (await response.json()) as { expression?: ExpressionRecord };
     if (body.expression && isExpressionRecord(body.expression)) {
       saveExpressionRecord(body.expression);
-      return body.expression;
+      return { expression: body.expression, ok: true };
     }
-    return payload;
+    return { expression: payload, ok: true };
   } catch {
-    return payload;
+    return {
+      expression: payload,
+      ok: false,
+      error: "Network error — paper trade saved locally only.",
+    };
+  }
+}
+
+export async function deletePaperTradeById(tradeId: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function clearAllPaperTrades(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch("/api/theses/paper-trades", {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function closePaperTradeById(tradeId: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ action: "close" }),
+    });
+    return response.ok;
+  } catch {
+    return false;
   }
 }
 
