@@ -2418,6 +2418,27 @@ button.btn:disabled {
   color: var(--red);
 }
 
+.not-found-shell {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.not-found-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 24px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 .monitor-watch-link:hover {
   background: rgba(255, 255, 255, 0.02);
 }

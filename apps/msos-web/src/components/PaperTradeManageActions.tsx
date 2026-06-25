@@ -12,6 +12,7 @@ import {
   deletePaperTradeById,
 } from "@/lib/expressionPersistence";
 import { clearPaperTradeUndo, stashPaperTradeUndo } from "@/lib/paperTradeUndo";
+import { goToMonitorAfterDelete } from "@/lib/monitorNav";
 
 type Props = {
   trades: PaperTradeSummary[];
@@ -153,8 +154,7 @@ export function PaperTradeRowActions({
     stashPaperTradeUndo(trade);
     const ok = await deletePaperTradeById(trade.id);
     if (ok) {
-      const label = encodeURIComponent(title);
-      router.push(`/monitor?deleted=1&title=${label}`);
+      goToMonitorAfterDelete(title);
       return;
     }
     clearPaperTradeUndo();

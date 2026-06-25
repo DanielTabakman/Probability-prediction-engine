@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { MouseEvent } from "react";
 import { useState } from "react";
 
 import { deletePaperTradeWithUndo } from "@/lib/expressionPersistence";
 import type { MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
+import { goToMonitorAfterDeleteFromRouter } from "@/lib/monitorNav";
 
 type Props = {
   panels: MonitorWatchPanel[];
@@ -14,6 +15,7 @@ type Props = {
 
 export function MonitorWatchList({ panels }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function handleDelete(event: MouseEvent, tradeId: string, title: string) {
@@ -25,9 +27,10 @@ export function MonitorWatchList({ panels }: Props) {
     setBusyId(tradeId);
     const result = await deletePaperTradeWithUndo(tradeId);
     if (result.ok) {
-      const label = encodeURIComponent(result.title ?? title);
-      router.push(`/monitor?deleted=1&title=${label}`);
-      router.refresh();
+      goToMonitorAfterDeleteFromRouter(router, result.title ?? title, pathname);
+      if (!pathname.startsWith("/monitor/paper/")) {
+        router.refresh();
+      }
     }
     setBusyId(null);
   }

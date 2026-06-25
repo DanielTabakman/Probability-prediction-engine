@@ -116,8 +116,10 @@ def test_paper_trade_detail_route_exists() -> None:
 
 def test_paper_trade_detail_redirects_after_delete() -> None:
     actions = (MSOS_WEB / "src" / "components" / "PaperTradeManageActions.tsx").read_text(encoding="utf-8")
-    assert "router.push(`/monitor?deleted=1" in actions
+    nav = (MSOS_WEB / "src" / "lib" / "monitorNav.ts").read_text(encoding="utf-8")
+    assert "goToMonitorAfterDelete" in actions
     assert "stashPaperTradeUndo" in actions
+    assert "window.location.assign" in nav
     restore_route = (
         MSOS_WEB / "src" / "app" / "api" / "theses" / "paper-trades" / "restore" / "route.ts"
     ).read_text(encoding="utf-8")

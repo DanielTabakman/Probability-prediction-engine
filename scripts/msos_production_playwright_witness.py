@@ -36,6 +36,8 @@ JOURNEY: tuple[tuple[str, str], ...] = (
     ("/strategy-lab", "strategy_lab"),
     ("/strategy-lab/confirm", "thesis_confirm"),
     ("/command-center", "command_center"),
+    ("/monitor", "monitor"),
+    ("/history", "history"),
 )
 
 
@@ -117,6 +119,10 @@ def run_playwright_witness(
                             "detail": "Storyboard disclaimer footer still visible",
                         }
                     )
+            elif path in ("/monitor", "/history"):
+                not_found = "This page could not be found" in html or ">404<" in html
+                entry["ok"] = not not_found
+                entry["error"] = "route rendered Next.js 404 page" if not_found else None
             checks.append(entry)
 
         lab_url = f"{base}/strategy-lab"
