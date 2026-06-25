@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/AppShell";
 import { PaperTradeDetailContent } from "@/components/PaperTradeDetailContent";
@@ -24,7 +24,7 @@ export default async function PaperTradeDetailPage({ params }: PageProps) {
     fetchDisplayPayload(),
   ]);
   if (!trade) {
-    notFound();
+    redirect("/monitor");
   }
   return (
     <AppShell activeNavId="monitor">

@@ -113,7 +113,7 @@ export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
           ))}
         </div>
 
-        <PaperTradeRowActions tradeId={trade.id} title={trade.planHeadline} status={status} />
+        <PaperTradeRowActions trade={trade} status={status} />
       </section>
 
       <p className="footer-note">{DEMO_FOOTER}</p>
