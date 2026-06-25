@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 
 import { PaperTradeRowActions } from "@/components/PaperTradeManageActions";
 import { effectivePaperTradeStatus } from "@/lib/msosWorkflowStore";
 import type { StoredExpression } from "@/lib/msosWorkflowStore";
-import { formatUsd } from "@/lib/ppeDisplayPayload";
+import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 type Props = {
@@ -18,6 +21,7 @@ function statusLabel(status: string): string {
 }
 
 export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
+  const { currency, formatMoney } = useDisplayCurrency();
   const status = effectivePaperTradeStatus(trade);
   const mark = trade.markAtSave;
   const belief = trade.beliefSnapshot;
@@ -41,6 +45,7 @@ export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
       </header>
 
       <section className="panel paper-trade-detail">
+        <p className="micro display-currency-note">{displayCurrencyDisclaimer(currency)}</p>
         <div className="panel-head">
           <div>
             <h2>Plan summary</h2>
@@ -78,24 +83,24 @@ export function PaperTradeDetailContent({ trade, currentSpotUsd }: Props) {
             <h3>Marks at save</h3>
             <div className="line">
               <span>Spot</span>
-              <strong>{typeof mark.spotUsd === "number" ? formatUsd(mark.spotUsd) : "—"}</strong>
+              <strong>{typeof mark.spotUsd === "number" ? formatMoney(mark.spotUsd) : "—"}</strong>
             </div>
             {currentSpotUsd != null ? (
               <div className="line">
                 <span>Spot now</span>
-                <strong>{formatUsd(currentSpotUsd)}</strong>
+                <strong>{formatMoney(currentSpotUsd)}</strong>
               </div>
             ) : null}
             <div className="line">
               <span>Max loss</span>
               <strong>
-                {typeof mark.maxLossUsd === "number" ? formatUsd(Math.abs(mark.maxLossUsd)) : "—"}
+                {typeof mark.maxLossUsd === "number" ? formatMoney(Math.abs(mark.maxLossUsd)) : "—"}
               </strong>
             </div>
             <div className="line">
               <span>Max gain</span>
               <strong>
-                {typeof mark.maxGainUsd === "number" ? formatUsd(mark.maxGainUsd) : "—"}
+                {typeof mark.maxGainUsd === "number" ? formatMoney(mark.maxGainUsd) : "—"}
               </strong>
             </div>
           </div>

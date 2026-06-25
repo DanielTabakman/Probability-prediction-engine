@@ -43,6 +43,7 @@ import {
   takePendingPaperTrade,
 } from "@/lib/msosWorkflowClient";
 import { buildPlainLegSummary, buildTradeProsCons } from "@/lib/tradeReviewCopy";
+import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
@@ -490,7 +491,7 @@ export function ExpressionPlanningPanel() {
             ) : null}
             {lastSavedAt ? (
               <p className="micro persistence-note">
-                {EXPRESSION_PERSISTENCE_LABEL} Amounts shown in {currency}.
+                {EXPRESSION_PERSISTENCE_LABEL} {displayCurrencyDisclaimer(currency)}
               </p>
             ) : null}
           </div>

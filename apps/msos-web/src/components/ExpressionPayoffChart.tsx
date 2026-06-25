@@ -145,7 +145,7 @@ export function ExpressionPayoffChart({
                   fontSize="10"
                   textAnchor="middle"
                 >
-                  {formatAxisPrice(price)}
+                  {formatAxisPrice(price, currency)}
                 </text>
               </g>
             );
@@ -183,7 +183,7 @@ export function ExpressionPayoffChart({
                   fontSize="9"
                   textAnchor="start"
                 >
-                  {formatAxisPayoff(tick)}
+                  {formatAxisPayoff(tick, currency)}
                 </text>
               </g>
             );

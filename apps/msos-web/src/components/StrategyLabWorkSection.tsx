@@ -15,6 +15,7 @@ import {
   type LabMetric,
 } from "@/lib/ppeDisplayPayload";
 import { saveStrategyLabExpiry } from "@/lib/strategyLabExpiry";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 const DEMO_EXPIRY_OPTIONS = ["30 days", "60 days", "90 days"];
 
@@ -24,6 +25,7 @@ type StrategyLabWorkSectionProps = {
 };
 
 export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLabWorkSectionProps) {
+  const { formatMoney } = useDisplayCurrency();
   const live = dataMode === "live" && displayPayload != null;
   const expiryOptions = useMemo(
     () => (live && displayPayload ? listExpiryDates(displayPayload) : DEMO_EXPIRY_OPTIONS),
@@ -52,8 +54,8 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
         metric.label === "Expiry" ? { ...metric, value: resolvedExpiry } : metric,
       );
     }
-    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry);
-  }, [live, displayPayload, resolvedExpiry]);
+    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry, formatMoney);
+  }, [live, displayPayload, resolvedExpiry, formatMoney]);
 
   const expiryContext = useMemo(() => {
     if (!live || !displayPayload) return null;

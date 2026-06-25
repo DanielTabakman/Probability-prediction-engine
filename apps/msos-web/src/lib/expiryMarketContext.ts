@@ -4,7 +4,6 @@
 
 import {
   findSeriesByExpiry,
-  formatUsd,
   listExpiryDates,
   type DisplayPayload,
 } from "@/lib/ppeDisplayPayload";
@@ -13,8 +12,11 @@ export type ExpiryMarketContext = {
   expiryDate: string;
   spotUsd: number;
   marketBestGuessUsd: number | null;
-  marketBestGuessLabel: string;
-  typicalRangeLabel: string;
+  /** Pre-formatted fallback when numeric median unavailable (from Python summary row). */
+  marketBestGuessFallback: string;
+  typicalRangeUsd: { q1: number; q3: number } | null;
+  /** Pre-formatted fallback when q1/q3 unavailable. */
+  typicalRangeFallback: string;
   dataLabel: string;
 };
 
@@ -62,18 +64,16 @@ export function buildExpiryMarketContext(
 
   const q1 = series?.quartiles_usd?.q1_usd;
   const q3 = series?.quartiles_usd?.q3_usd;
-  let typicalRangeLabel = lognormal?.["Implied range width (IQR)"] ?? "—";
-  if (typeof q1 === "number" && typeof q3 === "number") {
-    typicalRangeLabel = `${formatUsd(q1)} – ${formatUsd(q3)}`;
-  }
+  const typicalRangeUsd =
+    typeof q1 === "number" && typeof q3 === "number" ? { q1, q3 } : null;
 
   return {
     expiryDate: resolvedExpiry,
     spotUsd: payload.spot_usd,
-    marketBestGuessUsd: marketBestGuessUsd,
-    marketBestGuessLabel:
-      marketBestGuessUsd != null ? formatUsd(marketBestGuessUsd) : (lognormal?.["Median terminal price (50th %)"] ?? "—"),
-    typicalRangeLabel,
+    marketBestGuessUsd,
+    marketBestGuessFallback: lognormal?.["Median terminal price (50th %)"] ?? "—",
+    typicalRangeUsd,
+    typicalRangeFallback: lognormal?.["Implied range width (IQR)"] ?? "—",
     dataLabel: "Live · Deribit",
   };
 }

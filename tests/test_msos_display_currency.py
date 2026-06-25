@@ -1,0 +1,49 @@
+"""MSOS display currency — multi-fiat display-only layer (msos-shell)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+MSOS_WEB = REPO / "apps" / "msos-web"
+
+
+def test_display_currency_supports_multi_fiat() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "displayCurrency.ts").read_text(encoding="utf-8")
+    assert "EUR" in lib
+    assert "GBP" in lib
+    assert "AUD" in lib
+    assert "CHF" in lib
+    assert "formatAxisAmount" in lib
+    assert "displayCurrencyDisclaimer" in lib
+    assert "parseDisplayCurrencyFromCookie" in lib
+    assert "fxPerUsd" in lib
+
+
+def test_chart_axis_respects_display_currency() -> None:
+    axis = (MSOS_WEB / "src" / "lib" / "chartAxisDisplay.ts").read_text(encoding="utf-8")
+    chart = (MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx").read_text(encoding="utf-8")
+    dist = (MSOS_WEB / "src" / "components" / "LabeledDistributionChart.tsx").read_text(encoding="utf-8")
+    assert "formatAxisPrice(value, currency)" in axis or "formatAxisAmount" in axis
+    assert "formatAxisPrice(price, currency)" in chart
+    assert "formatAxisPrice(price, currency)" in dist
+
+
+def test_monitor_ssr_reads_currency_cookie() -> None:
+    monitor_page = (MSOS_WEB / "src" / "app" / "monitor" / "page.tsx").read_text(encoding="utf-8")
+    server = (MSOS_WEB / "src" / "lib" / "displayCurrencyServer.ts").read_text(encoding="utf-8")
+    assert "resolveDisplayCurrency" in monitor_page
+    assert "DISPLAY_CURRENCY_COOKIE" in server
+
+
+def test_paper_trade_detail_uses_display_currency_hook() -> None:
+    detail = (MSOS_WEB / "src" / "components" / "PaperTradeDetailContent.tsx").read_text(encoding="utf-8")
+    assert '"use client"' in detail
+    assert "useDisplayCurrency" in detail
+    assert "formatMoney" in detail
+
+
+def test_deploy_docs_list_fx_env_vars() -> None:
+    doc = (REPO / "docs" / "DEPLOY" / "MSOS_WEB_V1.md").read_text(encoding="utf-8")
+    assert "NEXT_PUBLIC_MSOS_EUR_PER_USD" in doc
+    assert "NEXT_PUBLIC_MSOS_GBP_PER_USD" in doc

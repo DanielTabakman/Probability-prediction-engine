@@ -22,6 +22,7 @@ import {
   type BeliefNudgeAxis,
   type BeliefTuning,
 } from "@/lib/beliefTuning";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import {
   buildOutcomeFromPayload,
   findSeriesByExpiry,
@@ -48,6 +49,7 @@ export function StrategyLabInteractivePanel({
   onExpiryChange,
   expiryOptions,
 }: StrategyLabInteractivePanelProps) {
+  const { formatMoney } = useDisplayCurrency();
   const [tuning, setTuning] = useState<BeliefTuning>(MARKET_TUNING);
   const [beliefPdfPct, setBeliefPdfPct] = useState<number[] | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -126,7 +128,7 @@ export function StrategyLabInteractivePanel({
   const outcome = useMemo(() => {
     if (!active) {
       return live && displayPayload
-        ? buildOutcomeFromPayload(displayPayload, selectedExpiry)
+        ? buildOutcomeFromPayload(displayPayload, selectedExpiry, formatMoney)
         : defaultOutcome;
     }
     try {
@@ -134,7 +136,7 @@ export function StrategyLabInteractivePanel({
     } catch {
       return defaultOutcome;
     }
-  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry]);
+  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry, formatMoney]);
 
   return (
     <>

@@ -41,12 +41,16 @@ export function ExpiryMarketContextStrip({
           <div className="expiry-market-context-v teal">
             {context.marketBestGuessUsd != null
               ? formatMoney(context.marketBestGuessUsd)
-              : context.marketBestGuessLabel}
+              : context.marketBestGuessFallback}
           </div>
         </div>
         <div className="expiry-market-context-cell">
           <div className="expiry-market-context-k">Typical range (middle 50%)</div>
-          <div className="expiry-market-context-v amber">{context.typicalRangeLabel}</div>
+          <div className="expiry-market-context-v amber">
+            {context.typicalRangeUsd
+              ? `${formatMoney(context.typicalRangeUsd.q1)} – ${formatMoney(context.typicalRangeUsd.q3)}`
+              : context.typicalRangeFallback}
+          </div>
         </div>
       </div>
       <p className="micro expiry-market-context-note">

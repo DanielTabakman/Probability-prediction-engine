@@ -156,6 +156,7 @@ def test_display_currency_module_exists() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
     assert "formatMoney" in lib
     assert "CAD" in lib
+    assert "EUR" in lib
     assert "CurrencySelect" in nav
 
 

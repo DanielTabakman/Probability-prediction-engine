@@ -10,7 +10,15 @@ import {
   getCurrentThesis,
   listPaperTrades,
 } from "@/lib/msosWorkflowStore";
-import { fetchDisplayPayload, formatUsd } from "@/lib/ppeDisplayPayload";
+import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
+import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
+
+export type MonitorMarkParts = {
+  savedSpotUsd?: number;
+  currentSpotUsd?: number | null;
+  maxLossUsd?: number;
+  asOfUtc?: string;
+};
 
 export type MonitorWatchPanel = {
   id: string;
@@ -19,6 +27,7 @@ export type MonitorWatchPanel = {
   tone: string;
   badge?: string;
   markLine?: string;
+  markParts?: MonitorMarkParts;
   href?: string;
   tradeId?: string;
   status?: PaperTradeStatus;
@@ -162,31 +171,56 @@ function workflowHistoryEntries(
   return entries;
 }
 
-function markLineForTrade(
+export function formatMarkLine(
+  parts: MonitorMarkParts,
+  formatUsdAmount: (usd: number) => string,
+): string | undefined {
+  const { savedSpotUsd, currentSpotUsd, maxLossUsd, asOfUtc } = parts;
+  if (savedSpotUsd == null && currentSpotUsd == null) {
+    return undefined;
+  }
+  const lines: string[] = [];
+  if (typeof savedSpotUsd === "number" && currentSpotUsd != null) {
+    lines.push(`Spot ${formatUsdAmount(savedSpotUsd)} → ${formatUsdAmount(currentSpotUsd)}`);
+  } else if (typeof savedSpotUsd === "number") {
+    lines.push(`Saved at ${formatUsdAmount(savedSpotUsd)}`);
+  } else if (currentSpotUsd != null) {
+    lines.push(`Spot now ${formatUsdAmount(currentSpotUsd)}`);
+  }
+  if (typeof maxLossUsd === "number") {
+    lines.push(`max loss ${formatUsdAmount(Math.abs(maxLossUsd))}`);
+  }
+  if (asOfUtc?.trim()) {
+    lines.push(`as of ${formatTimestamp(asOfUtc)} UTC`);
+  }
+  return lines.length > 0 ? lines.join(" · ") : undefined;
+}
+
+function markPartsForTrade(
   trade: StoredExpression,
   currentSpotUsd: number | null,
   asOfUtc?: string,
-): string | undefined {
+): MonitorMarkParts | undefined {
   const saved = trade.markAtSave;
   if (!saved?.spotUsd && currentSpotUsd == null) {
     return undefined;
   }
-  const savedSpot = saved?.spotUsd;
-  const parts: string[] = [];
-  if (typeof savedSpot === "number" && currentSpotUsd != null) {
-    parts.push(`Spot ${formatUsd(savedSpot)} → ${formatUsd(currentSpotUsd)}`);
-  } else if (typeof savedSpot === "number") {
-    parts.push(`Saved at ${formatUsd(savedSpot)}`);
-  } else if (currentSpotUsd != null) {
-    parts.push(`Spot now ${formatUsd(currentSpotUsd)}`);
-  }
-  if (typeof saved?.maxLossUsd === "number") {
-    parts.push(`max loss ${formatUsd(Math.abs(saved.maxLossUsd))}`);
-  }
-  if (asOfUtc?.trim()) {
-    parts.push(`as of ${formatTimestamp(asOfUtc)} UTC`);
-  }
-  return parts.length > 0 ? parts.join(" · ") : undefined;
+  return {
+    savedSpotUsd: saved?.spotUsd,
+    currentSpotUsd,
+    maxLossUsd: saved?.maxLossUsd,
+    asOfUtc,
+  };
+}
+
+function markLineForTrade(
+  trade: StoredExpression,
+  currentSpotUsd: number | null,
+  asOfUtc?: string,
+  formatUsdAmount: (usd: number) => string = (usd) => formatMoney(usd, "USD"),
+): string | undefined {
+  const parts = markPartsForTrade(trade, currentSpotUsd, asOfUtc);
+  return parts ? formatMarkLine(parts, formatUsdAmount) : undefined;
 }
 
 function buildWatchPanels(
@@ -195,6 +229,7 @@ function buildWatchPanels(
   summary: CommandCenterSummary,
   currentSpotUsd: number | null,
   marketAsOfUtc?: string,
+  formatUsdAmount: (usd: number) => string = (usd) => formatMoney(usd, "USD"),
 ): MonitorWatchPanel[] {
   const panels: MonitorWatchPanel[] = [];
   if (thesis) {
@@ -221,7 +256,8 @@ function buildWatchPanels(
         .join(" · "),
       tone: status === "open" ? "teal" : status === "closed" ? "muted" : "amber",
       badge: statusLabel(status),
-      markLine: markLineForTrade(expression, currentSpotUsd, marketAsOfUtc),
+      markLine: markLineForTrade(expression, currentSpotUsd, marketAsOfUtc, formatUsdAmount),
+      markParts: markPartsForTrade(expression, currentSpotUsd, marketAsOfUtc),
       href: `/monitor/paper/${expression.id}`,
       tradeId: expression.id,
       status,
@@ -320,7 +356,11 @@ function healthFromPaperTrades(trades: StoredExpression[]): { pct: number; label
   };
 }
 
-export async function loadMonitorFeed(ownerEmail: string | null): Promise<MonitorFeed> {
+export async function loadMonitorFeed(
+  ownerEmail: string | null,
+  displayCurrency: DisplayCurrency = "USD",
+): Promise<MonitorFeed> {
+  const fmt = (usd: number) => formatMoney(usd, displayCurrency);
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
   const [thesis, paperTrades, display] = await Promise.all([
@@ -375,6 +415,7 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
     summary,
     currentSpotUsd,
     marketAsOfUtc,
+    fmt,
   );
   const alerts = buildAlerts(summary);
   const health = hasPaperTrades

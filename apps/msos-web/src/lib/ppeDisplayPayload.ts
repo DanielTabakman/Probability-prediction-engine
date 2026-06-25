@@ -3,6 +3,7 @@
  */
 
 import type { CurveDisplayLabels } from "@/lib/chartCurveLabels";
+import { formatMoney } from "@/lib/displayCurrency";
 
 export const PPE_DISPLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_DISPLAY_API_URL ?? "/ppe-display-api/display.json"
@@ -91,12 +92,15 @@ export function isDisplayPayload(value: unknown): value is DisplayPayload {
   );
 }
 
+/** USD-only formatting — prefer formatMoney(usd, currency) at UI boundaries. */
 export function formatUsd(value: number): string {
-  return new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 0,
-    style: "currency",
-    currency: "USD",
-  }).format(value);
+  return formatMoney(value, "USD");
+}
+
+export type MoneyFormatter = (usd: number) => string;
+
+function resolveMoneyFormatter(formatter?: MoneyFormatter): MoneyFormatter {
+  return formatter ?? formatUsd;
 }
 
 function primaryLognormalRow(payload: DisplayPayload): DisplaySummaryRow | undefined {
@@ -136,7 +140,9 @@ function summaryRowForExpiry(
 export function buildLabMetricsFromPayload(
   payload: DisplayPayload,
   expiryDate?: string,
+  formatUsdAmount: MoneyFormatter = formatUsd,
 ): LabMetric[] {
+  const fmt = resolveMoneyFormatter(formatUsdAmount);
   const dates = listExpiryDates(payload);
   const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
   const primary = resolvedExpiry ? findSeriesByExpiry(payload, resolvedExpiry) : undefined;
@@ -147,12 +153,12 @@ export function buildLabMetricsFromPayload(
 
   return [
     { label: "Expiry", value: primary?.expiry_date ?? resolvedExpiry ?? "—" },
-    { label: "Today's BTC", value: formatUsd(payload.spot_usd) },
+    { label: "Today's BTC", value: fmt(payload.spot_usd) },
     {
       label: "Market best guess",
       value:
         typeof medianFromSeries === "number"
-          ? formatUsd(medianFromSeries)
+          ? fmt(medianFromSeries)
           : median,
       tone: "teal",
     },
@@ -164,7 +170,9 @@ export function buildLabMetricsFromPayload(
 export function buildOutcomeFromPayload(
   payload: DisplayPayload,
   expiryDate?: string,
+  formatUsdAmount: MoneyFormatter = formatUsd,
 ): LabOutcomeSummary {
+  const fmt = resolveMoneyFormatter(formatUsdAmount);
   const dates = listExpiryDates(payload);
   const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
   const lognormal = resolvedExpiry
@@ -175,7 +183,7 @@ export function buildOutcomeFromPayload(
   const medianUsd = series?.quartiles_usd?.median_usd;
   const medianLabel =
     typeof medianUsd === "number"
-      ? formatUsd(medianUsd)
+      ? fmt(medianUsd)
       : lognormal?.["Median terminal price (50th %)"] ?? lognormal?.["Risk-neutral mean"] ?? "—";
 
   return {
@@ -185,7 +193,7 @@ export function buildOutcomeFromPayload(
     headline: "Here's what BTC options are pricing for your date.",
     body: `For ${resolvedExpiry ?? "this expiry"}, the market's best guess is around ${medianLabel} and the middle-50% range is ${marketWidth}. Pick a view above to compare yours to the purple curve — then confirm when you're ready to plan a trade.`,
     scores: [
-      { label: "Today's BTC", value: formatUsd(payload.spot_usd), tone: "amber" },
+      { label: "Today's BTC", value: fmt(payload.spot_usd), tone: "amber" },
       { label: "Market guess", value: medianLabel, tone: "teal" },
       { label: "Your view", value: "Pick above", tone: "teal" },
       { label: "Next step", value: "Confirm", tone: "teal" },
