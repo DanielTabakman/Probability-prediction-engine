@@ -17,6 +17,7 @@ export type MonitorWatchPanel = {
   title: string;
   body: string;
   tone: string;
+  badge?: string;
   markLine?: string;
   href?: string;
   tradeId?: string;
@@ -200,8 +201,9 @@ function buildWatchPanels(
     panels.push({
       id: "thesis",
       title: `${thesis.instrument} thesis`,
-      body: `${thesis.lifecycle} · ${thesis.horizonDays}d horizon · ${thesis.referenceLabel}`,
+      body: `${thesis.horizonDays}d horizon · ${thesis.referenceLabel}`,
       tone: thesis.lifecycle === "confirmed" ? "teal" : "amber",
+      badge: thesis.lifecycle === "confirmed" ? "Confirmed" : "Draft",
     });
   }
   paperTrades.forEach((expression) => {
@@ -211,7 +213,6 @@ function buildWatchPanels(
       id: `paper-${expression.id}`,
       title: expression.planHeadline,
       body: [
-        statusLabel(status),
         `${expression.legs.length} leg${expression.legs.length === 1 ? "" : "s"}`,
         expiry ? `exp ${expiry}` : null,
         expression.instrument?.trim() ?? null,
@@ -219,6 +220,7 @@ function buildWatchPanels(
         .filter(Boolean)
         .join(" · "),
       tone: status === "open" ? "teal" : status === "closed" ? "muted" : "amber",
+      badge: statusLabel(status),
       markLine: markLineForTrade(expression, currentSpotUsd, marketAsOfUtc),
       href: `/monitor/paper/${expression.id}`,
       tradeId: expression.id,
@@ -232,6 +234,7 @@ function buildWatchPanels(
       title: "Latest saved read",
       body: `${latest.summaryLine} · ${latest.expiry}`,
       tone: "teal",
+      badge: "Snapshot",
     });
   }
   if (panels.length === 0) {
@@ -345,6 +348,7 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
           title: "History offline",
           body: "We're connecting saved market reads. Live options in Strategy Lab still work.",
           tone: "red",
+          badge: "Offline",
         },
       ],
       alerts: [
