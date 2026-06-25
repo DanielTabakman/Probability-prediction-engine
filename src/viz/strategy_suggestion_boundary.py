@@ -45,6 +45,57 @@ def _strip_md(text: str) -> str:
     return re.sub(r"\*\*(.*?)\*\*", r"\1", text or "").strip()
 
 
+def _build_trade_review(
+    verification: dict[str, Any] | None,
+    review: dict[str, Any] | None,
+) -> dict[str, Any]:
+    """Plain-language strengths/risks + leg summary for MSOS (existing contract fields only)."""
+    strengths: list[str] = []
+    risks: list[str] = []
+    plain_leg = ""
+
+    if isinstance(review, dict):
+        payoff = _strip_md(str(review.get("payoff_line") or ""))
+        payoff = payoff.replace("Payoff shape (illustrative read):", "").strip()
+        if payoff:
+            plain_leg = payoff
+            strengths.append(payoff)
+        structure = _strip_md(str(review.get("structure_line") or ""))
+        if structure and not plain_leg:
+            plain_leg = structure[:320]
+
+    bd = None
+    if isinstance(verification, dict):
+        raw_bd = verification.get("belief_disagreement")
+        if isinstance(raw_bd, dict):
+            bd = raw_bd
+    if bd:
+        families = bd.get("strategy_families") or []
+        if isinstance(families, list):
+            for fam in families[:2]:
+                if not isinstance(fam, dict):
+                    continue
+                rationale = _strip_md(str(fam.get("fit_rationale") or ""))
+                if rationale and rationale not in strengths:
+                    strengths.append(rationale)
+                tfm = _strip_md(str(fam.get("tradeoff_failure_mode") or ""))
+                if tfm:
+                    risks.append(tfm)
+
+    glance = verification.get("belief_vs_market_glance") if isinstance(verification, dict) else None
+    if isinstance(glance, dict):
+        for line in glance.get("fit_bridge_bullets") or []:
+            plain = _strip_md(str(line)).lstrip("- ").strip()
+            if plain and plain not in risks:
+                risks.append(plain)
+
+    return {
+        "strengths": strengths[:4],
+        "risks": risks[:4],
+        "plain_leg_summary": plain_leg,
+    }
+
+
 def _find_expiry(expiries: list[dict[str, Any]], expiry_date: str) -> dict[str, Any] | None:
     target = str(expiry_date or "").strip()
     if not target:
@@ -292,6 +343,7 @@ def build_strategy_suggestion_response(
             }
             if review
             else {},
+            "trade_review": _build_trade_review(verification, review),
             "expression_family": vs.get("expression_family"),
             "belief_vs_market_glance": glance if isinstance(glance, dict) else None,
         },

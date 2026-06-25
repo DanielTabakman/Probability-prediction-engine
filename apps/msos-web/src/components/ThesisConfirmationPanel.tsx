@@ -7,7 +7,6 @@ import {
   confirmationChecklist,
   defaultThesisRecord,
   lifecycleDisplayId,
-  lifecycleSteps,
   thesisConfirmHeadline,
 } from "@/data/thesisConfirmFixtures";
 import {
@@ -150,10 +149,10 @@ export function ThesisConfirmationPanel() {
             <div className="panel-head">
               <div>
                 <h2>Before you continue</h2>
-                <div className="panel-sub">Quick sanity checks — no hidden “AI says buy.”</div>
+                <div className="panel-sub">Two quick checks — no hidden “AI says buy.”</div>
               </div>
             </div>
-            {checklist.map((item) => (
+            {checklist.slice(0, 3).map((item) => (
               <div key={item.id} className="check-row">
                 <span className="checkmark" aria-hidden="true">
                   ✓
@@ -161,35 +160,6 @@ export function ThesisConfirmationPanel() {
                 <span>{item.label}</span>
               </div>
             ))}
-          </div>
-
-          <div className="panel">
-            <div className="panel-head compact">
-              <h2>Status</h2>
-            </div>
-            <div className="state-timeline" role="list" aria-label="Thesis lifecycle">
-              {lifecycleSteps.map((step) => (
-                <div
-                  key={step.id}
-                  role="listitem"
-                  className={`state-step${activeLifecycle === step.id ? " active" : ""}${
-                    lifecycleSteps.findIndex((s) => s.id === activeLifecycle) >
-                    lifecycleSteps.findIndex((s) => s.id === step.id)
-                      ? " done"
-                      : ""
-                  }`}
-                >
-                  <span className="state-dot" aria-hidden="true" />
-                  <span>{step.label}</span>
-                </div>
-              ))}
-            </div>
-            <p className="micro persistence-note">{THESIS_PERSISTENCE_LABEL}</p>
-            {persistError ? (
-              <p className="micro degraded-feed-note" role="alert">
-                {persistError}
-              </p>
-            ) : null}
           </div>
 
           <div className="proceed">
@@ -222,6 +192,15 @@ export function ThesisConfirmationPanel() {
                 Plan a paper trade
               </span>
             )}
+            <p className="micro persistence-note">{THESIS_PERSISTENCE_LABEL}</p>
+            <p className="micro" aria-label="Thesis lifecycle status">
+              Status: {activeLifecycle}
+            </p>
+            {persistError ? (
+              <p className="micro degraded-feed-note" role="alert">
+                {persistError}
+              </p>
+            ) : null}
           </div>
         </aside>
       </div>

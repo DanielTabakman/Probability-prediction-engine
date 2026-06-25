@@ -28,10 +28,22 @@ export type StrategySuggestionReview = {
   linkage_line?: string;
 };
 
+export type TradeReviewBlock = {
+  strengths?: string[];
+  risks?: string[];
+  plain_leg_summary?: string;
+};
+
 export type BeliefVsMarketGlance = {
   width_relation_label?: string;
   disagreement_type_line?: string;
   largest_gap_display?: string;
+  forward_usd?: number;
+  market_modal_usd?: number;
+  belief_peak_usd?: number;
+  digest_lines?: string[];
+  fit_bridge_bullets?: string[];
+  shape_gap_strength?: string;
 };
 
 export type StrategySuggestionPayload = {
@@ -57,6 +69,7 @@ export type StrategySuggestionPayload = {
     };
     summary?: StrategySuggestionSummary;
     review?: StrategySuggestionReview;
+    trade_review?: TradeReviewBlock | null;
     expression_family?: string | null;
     belief_vs_market_glance?: BeliefVsMarketGlance | null;
   };

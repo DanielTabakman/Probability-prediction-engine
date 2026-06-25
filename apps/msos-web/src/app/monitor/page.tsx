@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { MonitorContent } from "@/components/MonitorContent";
+import { resolveDisplayCurrency } from "@/lib/displayCurrencyServer";
 import { loadMonitorFeed } from "@/lib/monitorHistoryFeed";
 import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
 
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
 
 export default async function MonitorPage() {
   const ownerId = await resolveWorkflowOwnerId();
-  const feed = await loadMonitorFeed(ownerId);
+  const displayCurrency = await resolveDisplayCurrency();
+  const feed = await loadMonitorFeed(ownerId, displayCurrency);
   return (
     <AppShell activeNavId="monitor">
       <MonitorContent feed={feed} />

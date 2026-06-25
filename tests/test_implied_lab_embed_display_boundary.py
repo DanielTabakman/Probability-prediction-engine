@@ -279,6 +279,10 @@ def test_build_strategy_suggestion_response(strategy_mocks: str) -> None:
     assert len(payload["market"]["pdf_pct"]) > 0
     assert payload["market"]["curve_labels"]["market_legend"] == "Market view [Black–Scholes lognormal]"
     assert suggested["summary"]["max_gain_usd"] is not None
+    trade_review = suggested.get("trade_review")
+    assert isinstance(trade_review, dict)
+    assert isinstance(trade_review.get("strengths"), list)
+    assert isinstance(trade_review.get("risks"), list)
 
 
 def test_curve_display_labels_ssot() -> None:

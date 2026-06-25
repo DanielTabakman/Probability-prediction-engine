@@ -12,6 +12,7 @@ import {
 type PlatformTutorialProps = {
   active: boolean;
   onClose: () => void;
+  steps?: PlatformTutorialStep[];
 };
 
 type AnchorRect = {
@@ -83,12 +84,12 @@ function TutorialCard({
   );
 }
 
-export function PlatformTutorial({ active, onClose }: PlatformTutorialProps) {
+export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_STEPS }: PlatformTutorialProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [anchor, setAnchor] = useState<AnchorRect | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  const step = PLATFORM_TUTORIAL_STEPS[stepIndex];
+  const step = steps[stepIndex];
 
   const refreshAnchor = useCallback(() => {
     if (!step) return;
@@ -112,7 +113,7 @@ export function PlatformTutorial({ active, onClose }: PlatformTutorialProps) {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onResize, true);
     };
-  }, [active, stepIndex, refreshAnchor]);
+  }, [active, stepIndex, refreshAnchor, steps]);
 
   const finish = useCallback(() => {
     markPlatformTutorialComplete();
@@ -120,12 +121,12 @@ export function PlatformTutorial({ active, onClose }: PlatformTutorialProps) {
   }, [onClose]);
 
   const handleNext = useCallback(() => {
-    if (stepIndex + 1 >= PLATFORM_TUTORIAL_STEPS.length) {
+    if (stepIndex + 1 >= steps.length) {
       finish();
       return;
     }
     setStepIndex((value) => value + 1);
-  }, [finish, stepIndex]);
+  }, [finish, stepIndex, steps.length]);
 
   if (!active || !mounted || !step) {
     return null;
@@ -148,7 +149,7 @@ export function PlatformTutorial({ active, onClose }: PlatformTutorialProps) {
       <TutorialCard
         step={step}
         index={stepIndex}
-        total={PLATFORM_TUTORIAL_STEPS.length}
+        total={steps.length}
         anchor={anchor}
         onBack={() => setStepIndex((value) => Math.max(0, value - 1))}
         onNext={handleNext}

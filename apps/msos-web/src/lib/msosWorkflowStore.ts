@@ -407,6 +407,39 @@ export async function deletePaperTrade(ownerEmail: string, tradeId: string): Pro
   return true;
 }
 
+export async function restorePaperTrade(
+  ownerEmail: string,
+  trade: StoredExpression,
+): Promise<StoredExpression | null> {
+  if (trade.lifecycle !== "simulated") {
+    return null;
+  }
+  if (!expressionOwnerMatches(trade, ownerEmail)) {
+    return null;
+  }
+  const store = await readStore();
+  const existing = store.expressions.find(
+    (row) => row.id === trade.id && expressionOwnerMatches(row, ownerEmail),
+  );
+  if (existing) {
+    return withEffectiveStatus(existing);
+  }
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
+  const restored: StoredExpression = {
+    ...trade,
+    ownerEmail: owner,
+    lifecycle: "simulated",
+  };
+  const expressions = [...store.expressions, restored];
+  const pointers = pointersForOwner(store, ownerEmail);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId ?? trade.thesisId,
+    expressionId: pointers.expressionId ?? trade.id,
+  });
+  await writeStore({ ...nextStore, expressions });
+  return withEffectiveStatus(restored);
+}
+
 export async function clearPaperTrades(ownerEmail: string): Promise<number> {
   const store = await readStore();
   const toRemove = new Set(

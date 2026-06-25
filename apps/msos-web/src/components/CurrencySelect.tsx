@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import {
   DISPLAY_CURRENCY_OPTIONS,
+  currencyHint,
   loadStoredDisplayCurrency,
   saveDisplayCurrency,
   type DisplayCurrency,
@@ -23,12 +24,13 @@ export function CurrencySelect({ className = "" }: { className?: string }) {
   }
 
   return (
-    <label className={`currency-select ${className}`.trim()}>
+    <label className={`currency-select ${className}`.trim()} title={currencyHint(currency)}>
       <span className="sr-only">Display currency</span>
       <select
         value={currency}
         onChange={(event) => onChange(event.target.value as DisplayCurrency)}
         aria-label="Display currency"
+        title={currencyHint(currency)}
       >
         {DISPLAY_CURRENCY_OPTIONS.map((opt) => (
           <option key={opt.id} value={opt.id}>

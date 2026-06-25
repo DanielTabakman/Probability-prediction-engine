@@ -11,10 +11,10 @@ import { LabeledDistributionChart } from "@/components/LabeledDistributionChart"
 import {
   type DisplayPayload,
   type DisplaySeries,
-  formatUsd,
   findSeriesByExpiry,
   isDisplaySeries,
 } from "@/lib/ppeDisplayPayload";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 export const PPE_EMBED_ANCHOR_ID = "distribution-summary";
 
@@ -56,6 +56,7 @@ function NativeDistributionChart({
   beliefPdfPct,
   beliefLabel,
 }: NativeDistributionChartProps) {
+  const { formatMoney } = useDisplayCurrency();
   const ariaLabel = beliefLabel
     ? `Distribution curves for ${series.expiry_date} — market vs your ${beliefLabel} view`
     : `Distribution curve for ${series.expiry_date}`;
@@ -73,10 +74,10 @@ function NativeDistributionChart({
       />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
         <div className="ppe-summary-table" aria-label="PPE display payload summary">
-          <span>Mean {formatUsd(series.mean_usd)}</span>
-          <span>Q1 {formatUsd(series.quartiles_usd.q1_usd)}</span>
-          <span>Median {formatUsd(series.quartiles_usd.median_usd)}</span>
-          <span>Q3 {formatUsd(series.quartiles_usd.q3_usd)}</span>
+          <span>Mean {formatMoney(series.mean_usd)}</span>
+          <span>Q1 {formatMoney(series.quartiles_usd.q1_usd)}</span>
+          <span>Median {formatMoney(series.quartiles_usd.median_usd)}</span>
+          <span>Q3 {formatMoney(series.quartiles_usd.q3_usd)}</span>
         </div>
       ) : null}
     </>

@@ -5,10 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
+import { TradeProsConsCard } from "@/components/TradeProsConsCard";
+import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import {
   expressionFamilies,
   expressionRiskNote,
-  optimizationBasis,
   optimizedPlan,
   planLegs,
   type ExpressionFamily,
@@ -23,8 +24,8 @@ import {
   defaultExpressionRecord,
   fetchExpressionRecord,
   savePaperTrade,
-  statusGridForLifecycle,
   type BeliefSnapshot,
+  type ExpressionRecord,
   type PaperTradeMarkSnapshot,
 } from "@/lib/expressionPersistence";
 import {
@@ -35,6 +36,14 @@ import {
   fetchDisplayPayload,
   listExpiryDates,
 } from "@/lib/ppeDisplayPayload";
+import { resolveSignInUrlWithReturn } from "@/lib/msosPublicUrls";
+import {
+  hasWorkflowIdentity,
+  stashPendingPaperTrade,
+  takePendingPaperTrade,
+} from "@/lib/msosWorkflowClient";
+import { buildPlainLegSummary, buildTradeProsCons } from "@/lib/tradeReviewCopy";
+import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
@@ -78,7 +87,7 @@ function optimizationFromSuggestion(
   const fit =
     glance?.width_relation_label?.trim() ||
     glance?.disagreement_type_line?.trim() ||
-    "From your view";
+    "Matches your stated view";
   const maxLoss = summary?.max_loss_usd;
   const maxGain = summary?.max_gain_usd;
   const breakevens = summary?.breakevens_usd ?? [];
@@ -90,18 +99,16 @@ function optimizationFromSuggestion(
   return [
     { label: "Fits your view", value: fit, tone: "teal" },
     {
-      label: "Max gain",
+      label: "Best case",
       value: typeof maxGain === "number" ? formatMoney(maxGain) : "—",
       tone: "teal",
     },
     {
-      label: "Max loss",
+      label: "Worst case",
       value: typeof maxLoss === "number" ? formatMoney(Math.abs(maxLoss)) : "Capped",
       tone: "amber",
     },
-    { label: "Breakevens", value: beText },
-    { label: "Venue", value: "Deribit" },
-    { label: "Profit guarantee", value: "None", tone: "red" },
+    { label: "Break-even prices", value: beText },
   ];
 }
 
@@ -134,7 +141,34 @@ export function ExpressionPlanningPanel() {
   useEffect(() => {
     if (!hydrated || !thesisConfirmed) return;
 
-    let cancelled = false;
+    const abort = { cancelled: false };
+    async function resumePendingSave() {
+      const pending = takePendingPaperTrade<ExpressionRecord>();
+      if (!pending) return;
+      const signedIn = await hasWorkflowIdentity();
+      if (!signedIn || abort.cancelled) return;
+      setSavePending(true);
+      const result = await savePaperTrade(pending);
+      if (abort.cancelled) return;
+      setRecord(result.expression);
+      if (result.ok) {
+        setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
+      } else if (!result.authRequired) {
+        setSaveError(result.error ?? "Could not save paper trade.");
+      }
+      setSavePending(false);
+    }
+
+    void resumePendingSave();
+    return () => {
+      abort.cancelled = true;
+    };
+  }, [hydrated, thesisConfirmed]);
+
+  useEffect(() => {
+    if (!hydrated || !thesisConfirmed) return;
+
+    const abort = { cancelled: false };
     async function loadSuggestion() {
       setSuggestionLoading(true);
       setSuggestionError(null);
@@ -147,16 +181,16 @@ export function ExpressionPlanningPanel() {
         expiryOptions[0] ||
         storedExpiry;
       if (!resolvedExpiry) {
-        if (!cancelled) {
+        if (!abort.cancelled) {
           setSuggestionError("Pick an expiry in Strategy Lab first.");
           setSuggestionLoading(false);
         }
         return;
       }
-      if (!cancelled) setExpiry(resolvedExpiry);
+      if (!abort.cancelled) setExpiry(resolvedExpiry);
 
       const payload = await fetchStrategySuggestion(resolvedExpiry, tuning);
-      if (cancelled) return;
+      if (abort.cancelled) return;
       if (!payload) {
         setSuggestion(null);
         setSuggestionError("Live trade suggestion unavailable — showing demo structure.");
@@ -169,7 +203,7 @@ export function ExpressionPlanningPanel() {
 
     void loadSuggestion();
     return () => {
-      cancelled = true;
+      abort.cancelled = true;
     };
   }, [hydrated, thesisConfirmed]);
 
@@ -223,12 +257,23 @@ export function ExpressionPlanningPanel() {
       beliefSnapshot,
       markAtSave,
     };
+
+    const signedIn = await hasWorkflowIdentity();
+    if (!signedIn) {
+      stashPendingPaperTrade(next);
+      window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
+      return;
+    }
+
     setSavePending(true);
     setSaveError(null);
     const result = await savePaperTrade(next);
     setRecord(result.expression);
     if (result.ok) {
       setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
+    } else if (result.authRequired) {
+      stashPendingPaperTrade(next);
+      window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
     } else {
       setSaveError(result.error ?? "Could not save paper trade.");
     }
@@ -236,12 +281,24 @@ export function ExpressionPlanningPanel() {
   }
 
   const families = familiesWithSelection(livePlan.familyId);
-  const optimizationLines = suggestion?.suggested
-    ? optimizationFromSuggestion(suggestion, formatMoney)
-    : optimizationBasis;
-  const statusGrid = statusGridForLifecycle(lastSavedAt ? "simulated" : record.lifecycle);
+  const optimizationLines = optimizationFromSuggestion(suggestion, formatMoney);
   const market = suggestion?.market;
   const overlay = suggestion?.suggested?.overlay;
+  const glance = suggestion?.suggested?.belief_vs_market_glance;
+  const marketExpectationUsd =
+    glance?.market_modal_usd ?? glance?.forward_usd ?? undefined;
+  const prosCons = buildTradeProsCons(
+    glance,
+    suggestion?.suggested?.summary ?? null,
+    suggestion?.suggested?.review?.payoff_line ?? null,
+    formatMoney,
+    suggestion?.suggested?.trade_review,
+  );
+  const plainLegSummary = buildPlainLegSummary(
+    suggestion?.suggested?.trade_review,
+    suggestion?.suggested?.review?.payoff_line ?? null,
+    suggestion?.suggested?.review?.structure_line ?? null,
+  );
 
   return (
     <>
@@ -249,6 +306,9 @@ export function ExpressionPlanningPanel() {
         <div>
           <div className="crumb">Plan a trade</div>
           <h1 className="title">Paper trade planner</h1>
+          <p className="panel-sub planner-intro">
+            Sketch how this trade pays off at expiry — paper only, no orders sent.
+          </p>
         </div>
         <div className="tools">
           <span className="pill">
@@ -278,44 +338,9 @@ export function ExpressionPlanningPanel() {
           </Link>
         </div>
       ) : (
-        <section className="exec-layout" aria-label="Expression planning layout">
-          <div className="panel">
-            <div className="panel-head">
-              <div>
-                <h2>Structure types</h2>
-                <div className="panel-sub">Which trade shapes fit your view — and which don&apos;t.</div>
-              </div>
-            </div>
-            {families.map((family) => (
-              <div
-                key={family.id}
-                className={`option-row${family.dimmed ? " dimmed" : ""}`}
-              >
-                <div>
-                  <h3>{family.title}</h3>
-                  <p>{family.description}</p>
-                </div>
-                <span
-                  className={`tag${family.tagTone === "selected" ? " amber" : ""}${
-                    family.tagTone === "excluded" ? " red" : ""
-                  }`}
-                >
-                  {family.tag}
-                </span>
-              </div>
-            ))}
-            <div className="side-label rails-label">Where to trade</div>
-            {venueRails.map((venue) => (
-              <div key={venue.id} className={`venue${venue.dimmed ? " dimmed" : ""}`}>
-                <div>
-                  <h3>{venue.title}</h3>
-                  <p>{venue.description}</p>
-                </div>
-                <span className="tag">{venue.tag}</span>
-              </div>
-            ))}
-          </div>
-
+        <>
+          <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
+        <section className="exec-layout exec-layout-slim" aria-label="Expression planning layout">
           <div className="panel ticket">
             <ExpressionPayoffChartFrame
               pricesUsd={market?.prices_usd ?? overlay?.prices_usd ?? []}
@@ -324,6 +349,7 @@ export function ExpressionPlanningPanel() {
               payoffPct={overlay?.payoff_pct ?? []}
               payoffUsd={overlay?.payoff_usd}
               spotUsd={suggestion?.spot_usd ?? 0}
+              marketExpectationUsd={marketExpectationUsd}
               expiryLabel={expiry ?? suggestion?.expiry_date ?? "selected expiry"}
               curveLabels={resolveCurveLabels(market?.curve_labels)}
               loading={suggestionLoading}
@@ -343,14 +369,32 @@ export function ExpressionPlanningPanel() {
                   </div>
                 ))}
               </div>
-            </div>
-            <div className="status-grid" aria-label="Lifecycle status">
-              {statusGrid.map((cell) => (
-                <div key={cell.label} className="status-cell">
-                  <div className="k">{cell.label}</div>
-                  <div className={`v${cell.tone ? ` ${cell.tone}` : ""}`.trim()}>{cell.value}</div>
-                </div>
-              ))}
+              {plainLegSummary ? (
+                <p className="plain-leg-summary" role="note">
+                  <strong>In plain terms:</strong> {plainLegSummary}
+                </p>
+              ) : null}
+              <details className="planner-glossary">
+                <summary>New to options? Quick glossary</summary>
+                <ul className="micro">
+                  <li>
+                    <strong>Expiry</strong> — the date your options settle; payoff is judged on BTC price
+                    then.
+                  </li>
+                  <li>
+                    <strong>Strike</strong> — the price level each option is tied to.
+                  </li>
+                  <li>
+                    <strong>Spread</strong> — buying and selling legs together to cap risk.
+                  </li>
+                  <li>
+                    <strong>Max loss</strong> — worst case you pay (paper sketch, not a guarantee).
+                  </li>
+                  <li>
+                    <strong>Break-even</strong> — BTC prices where you neither win nor lose net.
+                  </li>
+                </ul>
+              </details>
             </div>
           </div>
 
@@ -358,10 +402,11 @@ export function ExpressionPlanningPanel() {
             <div className="panel-head">
               <div>
                 <h2>Why this structure</h2>
-                <div className="panel-sub">How well it matches your view and risk limits.</div>
+                <div className="panel-sub">How it matches your view and risk limits.</div>
               </div>
             </div>
-            {(optimizationLines).map((line) => (
+            <TradeProsConsCard strengths={prosCons.strengths} risks={prosCons.risks} />
+            {optimizationLines.map((line) => (
               <div key={line.label} className="line">
                 <span>{line.label}</span>
                 <strong className={line.tone ?? ""}>{line.value}</strong>
@@ -371,17 +416,52 @@ export function ExpressionPlanningPanel() {
               <p className="micro">{suggestion.suggested.review.linkage_line}</p>
             ) : null}
             <div className="risk-note">{expressionRiskNote}</div>
+
+            <details className="planner-advanced">
+              <summary>Structure types (advanced)</summary>
+              {families.map((family) => (
+                <div
+                  key={family.id}
+                  className={`option-row${family.dimmed ? " dimmed" : ""}`}
+                >
+                  <div>
+                    <h3>{family.title}</h3>
+                    <p>{family.description}</p>
+                  </div>
+                  <span
+                    className={`tag${family.tagTone === "selected" ? " amber" : ""}${
+                      family.tagTone === "excluded" ? " red" : ""
+                    }`}
+                  >
+                    {family.tag}
+                  </span>
+                </div>
+              ))}
+              <p className="micro side-label rails-label">Where to trade (paper log)</p>
+              {venueRails
+                .filter((venue) => venue.id === "deribit")
+                .map((venue) => (
+                  <div key={venue.id} className="venue">
+                    <div>
+                      <h3>{venue.title}</h3>
+                      <p>{venue.description}</p>
+                    </div>
+                    <span className="tag">{venue.tag}</span>
+                  </div>
+                ))}
+            </details>
+
             <div className="exec-actions">
               {lastSavedAt ? (
                 <>
-                  <Link
-                    href="/strategy-lab/expression"
-                    className="btn slim primary"
-                    onClick={() => {
-                      setLastSavedAt(null);
-                      setRecord(defaultExpressionRecord);
-                    }}
-                  >
+                  <div className="save-success-callout" role="status">
+                    <strong>Paper trade saved</strong>
+                    <p>
+                      We&apos;ll track how this sketch would have done versus live BTC until expiry —
+                      no orders were sent.
+                    </p>
+                  </div>
+                  <Link href="/strategy-lab" className="btn slim primary">
                     Plan another trade
                   </Link>
                   <Link href="/monitor" className="btn slim">
@@ -392,19 +472,14 @@ export function ExpressionPlanningPanel() {
                   </Link>
                 </>
               ) : (
-                <>
-                  <Link href="/monitor" className="btn slim">
-                    Watch without trading
-                  </Link>
-                  <button
-                    type="button"
-                    className="btn slim primary"
-                    disabled={!hydrated || savePending}
-                    onClick={() => void simulateExpression()}
-                  >
-                    {savePending ? "Saving…" : "Save paper trade"}
-                  </button>
-                </>
+                <button
+                  type="button"
+                  className="btn slim primary"
+                  disabled={!hydrated || savePending}
+                  onClick={() => void simulateExpression()}
+                >
+                  {savePending ? "Saving…" : "Save paper trade"}
+                </button>
               )}
             </div>
             {saveError ? (
@@ -412,13 +487,19 @@ export function ExpressionPlanningPanel() {
                 {saveError}
               </p>
             ) : null}
+            {!lastSavedAt ? (
+              <p className="micro persistence-note">
+                Sign in to save this plan to your profile — no order is sent.
+              </p>
+            ) : null}
             {lastSavedAt ? (
               <p className="micro persistence-note">
-                {EXPRESSION_PERSISTENCE_LABEL} Amounts shown in {currency}.
+                {EXPRESSION_PERSISTENCE_LABEL} {displayCurrencyDisclaimer(currency)}
               </p>
             ) : null}
           </div>
         </section>
+        </>
       )}
 
       <p className="footer-note">{DEMO_FOOTER}</p>

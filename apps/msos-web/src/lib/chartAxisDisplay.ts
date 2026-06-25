@@ -2,7 +2,7 @@
  * Chart axis display helpers — linear scale only (no distribution math).
  */
 
-import { formatUsd } from "@/lib/ppeDisplayPayload";
+import { formatAxisAmount, formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
 
 export type ChartLayout = {
   width: number;
@@ -75,29 +75,17 @@ export function valueToChartY(
   return box.y1 - (value / (yMax || 1)) * box.innerH;
 }
 
-export function formatAxisPrice(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1_000_000) {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
-  }
-  if (abs >= 10_000) {
-    return `$${Math.round(value / 1000)}k`;
-  }
-  if (abs >= 1000) {
-    return `$${(value / 1000).toFixed(1)}k`;
-  }
-  return formatUsd(value);
+export function formatAxisPrice(value: number, currency: DisplayCurrency = "USD"): string {
+  return formatAxisAmount(value, currency);
 }
 
-export function formatAxisPayoff(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 10_000) {
-    return `$${Math.round(value / 1000)}k`;
-  }
-  if (abs >= 1000) {
-    return `$${(value / 1000).toFixed(1)}k`;
-  }
-  return formatUsd(value);
+export function formatAxisPayoff(value: number, currency: DisplayCurrency = "USD"): string {
+  return formatAxisAmount(value, currency);
+}
+
+/** @deprecated Prefer formatMoney from displayCurrency — USD-only alias for legacy call sites. */
+export function formatUsd(value: number): string {
+  return formatMoney(value, "USD");
 }
 
 function niceStep(span: number, targetTicks: number): number {
