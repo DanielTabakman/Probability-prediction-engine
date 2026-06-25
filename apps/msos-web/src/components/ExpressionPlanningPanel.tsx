@@ -436,14 +436,7 @@ export function ExpressionPlanningPanel() {
             <div className="exec-actions">
               {lastSavedAt ? (
                 <>
-                  <Link
-                    href="/strategy-lab/expression"
-                    className="btn slim primary"
-                    onClick={() => {
-                      setLastSavedAt(null);
-                      setRecord(defaultExpressionRecord);
-                    }}
-                  >
+                  <Link href="/strategy-lab" className="btn slim primary">
                     Plan another trade
                   </Link>
                   <Link href="/monitor" className="btn slim">
