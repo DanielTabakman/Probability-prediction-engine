@@ -28,16 +28,17 @@ DISPLAY_PAYLOAD_KIND = "distribution_display_boundary"
 
 # Known storyboard fixture copy — warn until live-metrics slice wires display API into UI.
 FIXTURE_PREVIEW_SPOT = "$104,320"
+FIXTURE_SAMPLE_SPOT = "Sample only"
 
 JOURNEY_PATHS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ("/", "homepage", ("Market Structure OS", "Explore the platform")),
-    ("/strategy-lab", "strategy_lab", ("Strategy Lab", "PPE")),
-    ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you think is true",)),
+    ("/strategy-lab", "strategy_lab", ("Strategy Lab", "Deribit")),
+    ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you actually believe?",)),
     ("/strategy-lab/expression", "expression", ("expression",)),
-    ("/command-center", "command_center", ("Command Center", "Current work")),
-    ("/monitor", "monitor", ("Monitor", "Monitoring")),
-    ("/history", "history", ("History", "Observed")),
-    ("/learn", "learn", ("Learn loop", "comprehension")),
+    ("/command-center", "command_center", ("Command Center", "Monitor")),
+    ("/monitor", "monitor", ("Monitor", "Command Center")),
+    ("/history", "history", ("History", "Live trades")),
+    ("/learn", "learn", ("Reflect", "What did you take away?")),
 )
 
 
@@ -92,11 +93,73 @@ def validate_display_api_response(
     return True, None, data
 
 
+def validate_belief_overlay_api_response(
+    status: int,
+    body: str,
+) -> tuple[bool, str | None]:
+    if status != 200:
+        snippet = (body or "")[:200].strip()
+        return False, f"HTTP {status}" + (f": {snippet}" if snippet else "")
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return False, "invalid JSON"
+    if not isinstance(data, dict):
+        return False, "payload not an object"
+    if data.get("kind") != "belief_overlay":
+        return False, f"unexpected kind {data.get('kind')!r}"
+    pdf = data.get("pdf_pct")
+    if not isinstance(pdf, list) or len(pdf) < 2:
+        return False, "pdf_pct missing or too short"
+    return True, None
+
+
+def validate_strategy_suggestion_api_response(
+    status: int,
+    body: str,
+) -> tuple[bool, str | None]:
+    if status != 200:
+        snippet = (body or "")[:200].strip()
+        return False, f"HTTP {status}" + (f": {snippet}" if snippet else "")
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return False, "invalid JSON"
+    if not isinstance(data, dict):
+        return False, "payload not an object"
+    if data.get("kind") != "strategy_suggestion_boundary":
+        return False, f"unexpected kind {data.get('kind')!r}"
+    suggested = data.get("suggested")
+    if not isinstance(suggested, dict):
+        return False, "suggested block missing"
+    legs = suggested.get("legs")
+    if not isinstance(legs, list) or not legs:
+        return False, "suggested.legs empty"
+    market = data.get("market")
+    if not isinstance(market, dict):
+        return False, "market block missing"
+    pdf = market.get("pdf_pct")
+    if not isinstance(pdf, list) or len(pdf) < 2:
+        return False, "market.pdf_pct missing or too short"
+    overlay = suggested.get("overlay")
+    if not isinstance(overlay, dict):
+        return False, "suggested.overlay missing"
+    payoff = overlay.get("payoff_pct")
+    if not isinstance(payoff, list) or len(payoff) < 2:
+        return False, "suggested.overlay.payoff_pct missing or too short"
+    return True, None
+
+
 def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     """Strategy Lab must expose a live PPE surface, not degraded embed placeholder."""
+    if "Sample mode — not live market data" in html:
+        return False, "Strategy Lab rendered sample fixtures — live display API not loaded"
+    if "Placeholder chart" in html and "ppe-chart-region" not in html:
+        return False, "PPE chart in sample placeholder state"
     if "Embed pending" in html or "ppe-embed-degraded" in html:
-        return False, "PPE embed degraded or pending"
-    if "ppe-chart-region" in html or "ppe-embed-chromeless" in html:
+        if "Placeholder chart" in html:
+            return False, "PPE embed in sample/degraded state"
+    if "ppe-chart-region" in html:
         return True, None
     if "Live via PPE" in html and "Native chart" in html:
         return True, None
@@ -105,13 +168,20 @@ def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
     return False, "no PPE chart/embed region in Strategy Lab HTML"
 
 
+def validate_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
+    """Strategy Lab page JS must ship labeled chart axes (not pre-#320 legend copy)."""
+    from scripts.verify_msos_web_ship import verify_strategy_lab_client_bundle as _verify
+
+    return _verify(html, base_url=base_url)
+
+
 def _collect_fixture_warnings(html: str) -> list[dict[str, str]]:
     warnings: list[dict[str, str]] = []
-    if FIXTURE_PREVIEW_SPOT in html:
+    if FIXTURE_PREVIEW_SPOT in html or FIXTURE_SAMPLE_SPOT in html:
         warnings.append(
             {
                 "id": "fixture_preview_metrics",
-                "detail": f"Hardcoded storyboard spot {FIXTURE_PREVIEW_SPOT} still in UI",
+                "detail": "Hardcoded sample spot still in Strategy Lab UI — live display API may not be wired",
             }
         )
     if "Illustrative product storyboard" in html:
@@ -166,9 +236,64 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
         }
     )
 
+    overlay_ok = False
+    overlay_msg: str | None = "display API unavailable for overlay probe"
+    overlay_url = f"{base}/ppe-display-api/belief-overlay.json"
+    if d_ok and d_data:
+        series = d_data.get("series_by_expiry") or []
+        expiry = series[0].get("expiry_date") if series else None
+        if expiry:
+            overlay_url = (
+                f"{overlay_url}?expiry={expiry}&forward_mult=1.06&vol_mult=1.0"
+            )
+            o_status, o_body, o_err = _fetch(overlay_url)
+            overlay_ok, overlay_msg = validate_belief_overlay_api_response(o_status, o_body)
+            if o_err and not overlay_ok:
+                overlay_msg = o_err
+    checks.append(
+        {
+            "id": "ppe_belief_overlay_api",
+            "url": overlay_url,
+            "ok": overlay_ok,
+            "status": 200 if overlay_ok else 0,
+            "error": overlay_msg,
+        }
+    )
+
+    suggestion_ok = False
+    suggestion_msg: str | None = "display API unavailable for strategy suggestion probe"
+    suggestion_url = f"{base}/ppe-display-api/strategy-suggestion.json"
+    if d_ok and d_data:
+        series = d_data.get("series_by_expiry") or []
+        expiry = series[0].get("expiry_date") if series else None
+        if expiry:
+            suggestion_url = (
+                f"{suggestion_url}?expiry={expiry}&forward_mult=1.0&vol_mult=0.7"
+            )
+            s_status, s_body, s_err = _fetch(suggestion_url)
+            suggestion_ok, suggestion_msg = validate_strategy_suggestion_api_response(
+                s_status, s_body
+            )
+            if s_err and not suggestion_ok:
+                suggestion_msg = s_err
+    checks.append(
+        {
+            "id": "ppe_strategy_suggestion_api",
+            "url": suggestion_url,
+            "ok": suggestion_ok,
+            "status": 200 if suggestion_ok else 0,
+            "error": suggestion_msg,
+        }
+    )
+
     lab_url = f"{base}/strategy-lab"
     lab_status, lab_body, lab_err = _fetch(lab_url)
     lab_ok, lab_msg = validate_strategy_lab_html(lab_body) if lab_status == 200 else (False, lab_err)
+    bundle_ok, bundle_msg = (
+        validate_strategy_lab_client_bundle(lab_body, base_url=base)
+        if lab_status == 200 and lab_ok
+        else (False, lab_msg or lab_err)
+    )
     checks.append(
         {
             "id": "strategy_lab_ppe_surface",
@@ -177,6 +302,16 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
             "status": lab_status,
             "error": lab_msg or lab_err,
             "missing_phrases": [],
+        }
+    )
+    checks.append(
+        {
+            "id": "strategy_lab_labeled_axes_bundle",
+            "url": lab_url,
+            "ok": bundle_ok and lab_status == 200,
+            "status": lab_status,
+            "error": bundle_msg,
+            "missing_phrases": [] if bundle_ok else ["BTC price at expiry"],
         }
     )
     if lab_status == 200:
@@ -212,7 +347,14 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
 
     failed = [c for c in checks if not c.get("ok")]
     optional_ids = frozenset({"research_beta_cta"})
-    integration_ids = frozenset({"ppe_display_api", "strategy_lab_ppe_surface"})
+    integration_ids = frozenset(
+        {
+            "ppe_display_api",
+            "ppe_belief_overlay_api",
+            "strategy_lab_ppe_surface",
+            "strategy_lab_labeled_axes_bundle",
+        }
+    )
     journey_failed = [c for c in failed if c["id"] not in optional_ids]
     integration_failed = [c for c in failed if c["id"] in integration_ids]
     return {

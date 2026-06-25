@@ -12,14 +12,14 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  actions: read
+  actions: write
 
 jobs:
   merge-labeled:
     runs-on: ubuntu-latest
     if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v9
         with:
           script: |
             const run = context.payload.workflow_run;
@@ -94,4 +94,18 @@ jobs:
                 merge_method: 'squash',
               });
               core.notice(`Merged PR #${number} (squash) after green CI + automerge label`);
+
+              try {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  workflow_id: 'deploy-vps.yml',
+                  ref: defaultBranch,
+                });
+                core.notice(`Dispatched Deploy VPS on ${defaultBranch} after merge`);
+              } catch (dispatchErr) {
+                core.warning(
+                  `Deploy VPS dispatch after merge failed (push to ${defaultBranch} should still trigger deploy): ${dispatchErr.message}`,
+                );
+              }
             }

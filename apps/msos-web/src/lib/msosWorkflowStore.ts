@@ -2,9 +2,10 @@ import { mkdir, readFile, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
-import type { ExpressionRecord } from "@/lib/expressionPersistence";
+import type { ExpressionRecord, PaperTradeStatus } from "@/lib/expressionPersistence";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
-import { normalizeOwnerEmail } from "@/lib/msosIdentity";
+import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
+import { scopeOwnerId } from "@/lib/msosSession";
 
 export const MSOS_WORKFLOW_STORE_FILENAME = "msos_workflow_v1.json";
 
@@ -76,7 +77,16 @@ export function workflowStorePath(): string {
 }
 
 function ownerKey(ownerEmail: string): string {
+  const scoped = scopeOwnerId(ownerEmail);
+  if (scoped?.startsWith("session:")) return scoped;
   const normalized = normalizeOwnerEmail(ownerEmail);
+  return normalized ?? "__anon__";
+}
+
+function storedOwnerKey(raw: string | null | undefined): string {
+  const scoped = scopeOwnerId(raw);
+  if (scoped?.startsWith("session:")) return scoped;
+  const normalized = normalizeOwnerEmail(raw);
   return normalized ?? "__anon__";
 }
 
@@ -154,21 +164,11 @@ function isExpressionRecord(value: unknown): value is ExpressionRecord {
 }
 
 function thesisOwnerMatches(row: StoredThesis, ownerEmail: string): boolean {
-  const key = ownerKey(ownerEmail);
-  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
-  if (key === "__anon__") {
-    return rowOwner === null;
-  }
-  return rowOwner === key;
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
 function expressionOwnerMatches(row: StoredExpression, ownerEmail: string): boolean {
-  const key = ownerKey(ownerEmail);
-  const rowOwner = normalizeOwnerEmail(row.ownerEmail ?? null);
-  if (key === "__anon__") {
-    return rowOwner === null;
-  }
-  return rowOwner === key;
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
 function pointersForOwner(store: WorkflowStoreFile, ownerEmail: string): OwnerPointers {
@@ -228,7 +228,7 @@ export async function upsertCurrentThesis(
         (row) => row.id === pointers.thesisId && thesisOwnerMatches(row, ownerEmail),
       )
     : undefined;
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const next: StoredThesis = {
     ...thesis,
     id: existing?.id ?? randomUUID(),
@@ -261,12 +261,16 @@ export async function upsertCurrentExpression(
   if (!thesisId) {
     throw new Error("confirm a thesis before saving expression");
   }
-  const existing = pointers.expressionId
-    ? store.expressions.find(
-        (row) => row.id === pointers.expressionId && expressionOwnerMatches(row, ownerEmail),
-      )
-    : undefined;
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const existing =
+    expression.lifecycle === "planned" && pointers.expressionId
+      ? store.expressions.find(
+          (row) =>
+            row.id === pointers.expressionId &&
+            expressionOwnerMatches(row, ownerEmail) &&
+            row.lifecycle === "planned",
+        )
+      : undefined;
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const next: StoredExpression = {
     ...expression,
     id: existing?.id ?? randomUUID(),
@@ -286,10 +290,183 @@ export async function upsertCurrentExpression(
   return next;
 }
 
+export async function appendPaperTrade(
+  expression: ExpressionRecord,
+  ownerEmail: string,
+): Promise<StoredExpression> {
+  if (!isExpressionRecord(expression)) {
+    throw new Error("invalid expression record");
+  }
+  if (expression.lifecycle !== "simulated") {
+    throw new Error("paper trades must use simulated lifecycle");
+  }
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  const thesisId = pointers.thesisId;
+  if (!thesisId) {
+    throw new Error("confirm a thesis before saving a paper trade");
+  }
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
+  const savedAt = expression.savedAt ?? expression.updatedAt ?? new Date().toISOString();
+  const next: StoredExpression = {
+    ...expression,
+    lifecycle: "simulated",
+    paperTradeStatus: expression.paperTradeStatus ?? "open",
+    savedAt,
+    updatedAt: savedAt,
+    id: randomUUID(),
+    thesisId,
+    ownerEmail: owner,
+  };
+  const expressions = [...store.expressions, next];
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: next.id,
+  });
+  await writeStore({
+    ...nextStore,
+    expressions,
+  });
+  return next;
+}
+
+export function effectivePaperTradeStatus(trade: StoredExpression): PaperTradeStatus {
+  const stored = trade.paperTradeStatus ?? "open";
+  if (stored === "closed") {
+    return "closed";
+  }
+  const exp = trade.expiryDate?.trim();
+  if (exp) {
+    const iso = exp.length <= 10 ? `${exp}T23:59:59.999Z` : exp;
+    const end = Date.parse(iso);
+    if (!Number.isNaN(end) && end < Date.now()) {
+      return "expired";
+    }
+  }
+  return stored === "expired" ? "expired" : "open";
+}
+
+function withEffectiveStatus(trade: StoredExpression): StoredExpression {
+  const status = effectivePaperTradeStatus(trade);
+  if (status === trade.paperTradeStatus) {
+    return trade;
+  }
+  return { ...trade, paperTradeStatus: status };
+}
+
+export async function listPaperTrades(ownerEmail: string): Promise<StoredExpression[]> {
+  const store = await readStore();
+  return store.expressions
+    .filter((row) => expressionOwnerMatches(row, ownerEmail) && row.lifecycle === "simulated")
+    .map(withEffectiveStatus)
+    .sort((a, b) => {
+      const aTs = Date.parse(a.savedAt ?? a.updatedAt);
+      const bTs = Date.parse(b.savedAt ?? b.updatedAt);
+      return (Number.isNaN(bTs) ? 0 : bTs) - (Number.isNaN(aTs) ? 0 : aTs);
+    });
+}
+
+export async function listOpenPaperTrades(ownerEmail: string): Promise<StoredExpression[]> {
+  const trades = await listPaperTrades(ownerEmail);
+  return trades.filter((row) => effectivePaperTradeStatus(row) === "open");
+}
+
+export async function getPaperTradeById(
+  ownerEmail: string,
+  tradeId: string,
+): Promise<StoredExpression | null> {
+  const store = await readStore();
+  const row = store.expressions.find(
+    (expression) =>
+      expression.id === tradeId &&
+      expression.lifecycle === "simulated" &&
+      expressionOwnerMatches(expression, ownerEmail),
+  );
+  return row ? withEffectiveStatus(row) : null;
+}
+
+export async function deletePaperTrade(ownerEmail: string, tradeId: string): Promise<boolean> {
+  const store = await readStore();
+  const target = store.expressions.find(
+    (row) =>
+      row.id === tradeId &&
+      row.lifecycle === "simulated" &&
+      expressionOwnerMatches(row, ownerEmail),
+  );
+  if (!target) {
+    return false;
+  }
+  const expressions = store.expressions.filter((row) => row.id !== tradeId);
+  const pointers = pointersForOwner(store, ownerEmail);
+  const expressionId = pointers.expressionId === tradeId ? null : pointers.expressionId;
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId,
+  });
+  await writeStore({ ...nextStore, expressions });
+  return true;
+}
+
+export async function clearPaperTrades(ownerEmail: string): Promise<number> {
+  const store = await readStore();
+  const toRemove = new Set(
+    store.expressions
+      .filter(
+        (row) => row.lifecycle === "simulated" && expressionOwnerMatches(row, ownerEmail),
+      )
+      .map((row) => row.id),
+  );
+  if (toRemove.size === 0) {
+    return 0;
+  }
+  const expressions = store.expressions.filter((row) => !toRemove.has(row.id));
+  const pointers = pointersForOwner(store, ownerEmail);
+  const expressionId =
+    pointers.expressionId && toRemove.has(pointers.expressionId) ? null : pointers.expressionId;
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId,
+  });
+  await writeStore({ ...nextStore, expressions });
+  return toRemove.size;
+}
+
+export async function closePaperTrade(
+  ownerEmail: string,
+  tradeId: string,
+): Promise<StoredExpression | null> {
+  const store = await readStore();
+  const idx = store.expressions.findIndex(
+    (row) =>
+      row.id === tradeId &&
+      row.lifecycle === "simulated" &&
+      expressionOwnerMatches(row, ownerEmail),
+  );
+  if (idx < 0) {
+    return null;
+  }
+  const current = store.expressions[idx];
+  if (effectivePaperTradeStatus(current) !== "open") {
+    return withEffectiveStatus(current);
+  }
+  const closedAt = new Date().toISOString();
+  const next: StoredExpression = {
+    ...current,
+    paperTradeStatus: "closed",
+    closedAt,
+    updatedAt: closedAt,
+  };
+  const expressions = [...store.expressions];
+  expressions[idx] = next;
+  await writeStore({ ...store, expressions });
+  return next;
+}
+
 export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowSummary> {
   const store = await readStore();
   const scopedTheses = store.theses.filter((row) => thesisOwnerMatches(row, ownerEmail));
   const scopedExpressions = store.expressions.filter((row) => expressionOwnerMatches(row, ownerEmail));
+  const paperTrades = scopedExpressions.filter((row) => row.lifecycle === "simulated");
   const pointers = pointersForOwner(store, ownerEmail);
   const draftCount = scopedTheses.filter((row) => row.lifecycle === "draft").length;
   const confirmedCount = scopedTheses.filter((row) => row.lifecycle === "confirmed").length;
@@ -313,6 +490,12 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
       sub: "Your workspace",
       tone: confirmedCount > 0 ? "teal" : undefined,
     },
+    {
+      label: "Paper trades",
+      value: String(paperTrades.length),
+      sub: "Saved plans",
+      tone: paperTrades.length > 0 ? "teal" : undefined,
+    },
   ];
 
   const currentWork: WorkflowSummaryWorkItem[] = [];
@@ -333,7 +516,7 @@ export async function loadWorkflowSummary(ownerEmail: string): Promise<WorkflowS
     });
   }
 
-  const owner = normalizeOwnerEmail(ownerEmail);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
   const sourceLabel = owner
     ? `Your workspace · ${owner}`
     : "Your workspace";

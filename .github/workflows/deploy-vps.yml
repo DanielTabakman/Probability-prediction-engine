@@ -1,4 +1,9 @@
 # Deploy production stack on the VPS (see docs/DEPLOY/GITHUB_ACTIONS_VPS_DEPLOY.md).
+#
+# Job 1 (vps-deploy) is the production ship gate — must pass for a green workflow.
+# Job 2 (production-witness) runs integration witnesses; failures are reported but do
+# not fail the deploy (continue-on-error) so production is not left stale when a
+# witness flakes after SSH rebuild succeeded.
 name: Deploy VPS
 
 on:
@@ -16,7 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  vps-deploy:
+    name: VPS deploy
     runs-on: ubuntu-latest
     env:
       PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
@@ -24,7 +30,7 @@ jobs:
       PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
     steps:
       - name: SSH deploy
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         env:
           PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
           PPE_RESEARCH_OFFER_EMAIL: ${{ github.event_name == 'workflow_dispatch' && inputs.research_offer_email || secrets.PPE_RESEARCH_OFFER_EMAIL }}
@@ -38,8 +44,12 @@ jobs:
           command_timeout: 20m
           envs: PPE_RESEARCH_OFFER_URL,PPE_RESEARCH_OFFER_EMAIL,PPE_RESEARCH_OFFER_LABEL
           script: |
+            set -euo pipefail
             cd /opt/marketstructureos
-            git pull
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            echo "Deployed commit: $(git rev-parse HEAD)"
             bash scripts/vps_sync_production_env.sh
             RESEARCH_URL="$(grep '^PPE_RESEARCH_OFFER_URL=' .env | head -1 | cut -d= -f2- | tr -d '\"')"
             RESEARCH_LABEL="$(grep '^PPE_RESEARCH_OFFER_LABEL=' .env | head -1 | cut -d= -f2- | tr -d '\"')"
@@ -47,10 +57,10 @@ jobs:
             docker compose build --no-cache msos_web \
               --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
               --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
+            docker compose up -d --force-recreate msos_web
             docker compose up -d --force-recreate
 
       - name: Demo site health (no import traceback)
-        if: success()
         run: |
           set -euo pipefail
           code="000"
@@ -79,7 +89,6 @@ jobs:
           echo 'Demo site health check passed (no import traceback in HTML)'
 
       - name: Session notebook health
-        if: success()
         run: |
           set -euo pipefail
           code=$(curl -sS -o /tmp/session_body.html -w "%{http_code}" --max-time 60 https://marketstructureos.com/session.html || true)
@@ -95,18 +104,38 @@ jobs:
           fi
           echo 'session.html health check passed'
 
+      - name: Checkout (MSOS ship verify)
+        uses: actions/checkout@v7
+
+      - name: Verify MSOS web client bundle shipped
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6; do
+            if python scripts/verify_msos_web_ship.py; then
+              echo "msos_web ship verify passed"
+              exit 0
+            fi
+            echo "Attempt $attempt/6: msos_web bundle not fresh yet (waiting 30s)"
+            sleep 30
+          done
+          echo "msos_web ship verify failed — stale client bundle still served"
+          exit 1
+
+  production-witness:
+    name: Production witness
+    needs: vps-deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
       - name: Checkout (production witnesses)
-        if: success()
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        if: success()
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Production PPE integration witness
-        if: success()
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
@@ -116,7 +145,6 @@ jobs:
           PYTHONPATH=. python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
 
       - name: Upload production witness artifacts
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: msos-production-witness

@@ -12,7 +12,7 @@ Purpose: keep **real** validation (unit tests, docker entry, Playwright smoke + 
 | **Full + docker** | Before push when runtime/deps changed | `python scripts/run_pre_push_parity.py --docker` | full gate + **`CI / docker_entrypoint`** parity (build, import, Streamlit health) |
 | **Heavy** | Viz slice closeout only | smoke scripts (below) | Playwright + Streamlit + live data + PNGs |
 
-**CI** (`.github/workflows/ci.yml`) runs **full pytest** (parallel + slow serial) + **docker_entrypoint**. PRs labeled **`viz-change`** also run **CI / ui_smoke** (scenario A).
+**CI** (`.github/workflows/ci.yml`) runs **full pytest** (parallel + slow serial), **`msos_web_build`** (`python scripts/verify_msos_web_build.py` — `next build` + Edge middleware witness), and **docker_entrypoint**. PRs labeled **`viz-change`** also run **CI / ui_smoke** (scenario A).
 
 **Scheduled codebase health** (`.github/workflows/codebase-health.yml`) runs **Monday 14:30 UTC** on `main`:
 
@@ -60,7 +60,8 @@ Force scoped: `python scripts/run_pushable_gate.py --scoped`
 ## Pushable gate
 
 - **Default** — tier 0/1/2; **scoped** when mappable else **fast** pytest.
-- **`--pre-push`** — **full** pytest on commits ahead of upstream. **Required before `git push`.**
+- **`--pre-push`** — **full** pytest on commits ahead of upstream; when `apps/msos-web/` changed, also runs **`python scripts/verify_msos_web_build.py`** (full `next build`). **Required before `git push`.**
+- **WIP MSOS commits** — `verify_msos_web_build.py --witness-only` (middleware Edge safety; no npm required locally).
 - **`--full`** — force full pytest without pre-push scope.
 
 ## UI smoke (heavy — not in pytest)

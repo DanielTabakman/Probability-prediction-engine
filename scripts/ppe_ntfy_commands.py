@@ -38,6 +38,28 @@ def command_secret() -> str:
     return os.environ.get("PPE_NTFY_CMD_SECRET", "").strip()
 
 
+def command_security_warnings() -> list[str]:
+    """Startup hints when remote commands are enabled but under-protected."""
+    if not commands_enabled():
+        return []
+    warnings: list[str] = []
+    if not command_secret():
+        warnings.append(
+            "PPE_NTFY_CMD_SECRET is unset — only 'help' is accepted on this topic; "
+            "set a long random secret in ppe_operator_notify.local.cmd for build/fix/restart/status/snooze."
+        )
+    elif len(command_secret()) < 12:
+        warnings.append(
+            "PPE_NTFY_CMD_SECRET is short — use a long random value (16+ chars) to resist topic guessing."
+        )
+    token = os.environ.get("PPE_NTFY_TOKEN", "").strip()
+    if not token and (os.environ.get("PPE_NTFY_SERVER", "https://ntfy.sh").strip().rstrip("/") == "https://ntfy.sh"):
+        warnings.append(
+            "PPE_NTFY_TOKEN is unset on ntfy.sh — consider a private ntfy server or ACL token for the topic."
+        )
+    return warnings
+
+
 def is_outbound_message(message: dict[str, Any]) -> bool:
     tags = message.get("tags") or []
     if isinstance(tags, str):
@@ -70,9 +92,8 @@ def parse_command_text(text: str) -> RemoteCommand | None:
     if not tokens or tokens[0] not in KNOWN_COMMANDS:
         return None
     name = tokens[0]
-    # Restart is destructive (kills the listener). Require a configured secret so a bare
-    # "restart" in topic history cannot trigger a loop on an open topic.
-    if name == "restart" and not command_secret():
+    # Without a shared secret, only help is allowed (no stack/agent side effects on open topics).
+    if not secret and name != "help":
         return None
     return RemoteCommand(name=name, args=" ".join(tokens[1:]).strip())
 

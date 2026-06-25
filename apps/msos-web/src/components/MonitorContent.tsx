@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PaperTradeManageActions } from "@/components/PaperTradeManageActions";
 import type { MonitorFeed } from "@/lib/monitorHistoryFeed";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
@@ -58,14 +59,30 @@ export function MonitorContent({ feed }: Props) {
           <div className="side-label">{feed.healthLabel}</div>
 
           <div className="watch-grid" aria-label="Watch list">
-            {feed.watchPanels.map((panel) => (
-              <div key={panel.id} className="watch">
-                <span className={`tag ${panel.tone}`}>{panel.title.split(" ")[0]}</span>
-                <h3>{panel.title}</h3>
-                <p>{panel.body}</p>
-              </div>
-            ))}
+            {feed.watchPanels.map((panel) => {
+              const card = (
+                <>
+                  <span className={`tag ${panel.tone}`}>{panel.title.split(" ")[0]}</span>
+                  <h3>{panel.title}</h3>
+                  <p>{panel.body}</p>
+                  {panel.markLine ? <p className="micro watch-mark">{panel.markLine}</p> : null}
+                </>
+              );
+              return panel.href ? (
+                <Link key={panel.id} href={panel.href} className="watch watch-link">
+                  {card}
+                </Link>
+              ) : (
+                <div key={panel.id} className="watch">
+                  {card}
+                </div>
+              );
+            })}
           </div>
+
+          {feed.manageEnabled ? (
+            <PaperTradeManageActions trades={feed.paperTrades} variant="monitor" />
+          ) : null}
         </div>
 
         <aside className="panel monitor-side">

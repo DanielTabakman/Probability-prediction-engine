@@ -1,21 +1,25 @@
+import Link from "next/link";
+
+import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
+
 export function ProductWindow() {
   return (
-    <section className="product-window" aria-label="Command Center preview">
+    <Link className="product-window product-window-link" href={MSOS_ROUTES.strategyLab}>
       <div className="window-head">
         <span className="traffic" />
         <span className="traffic" />
         <span className="traffic" />
-        <div className="url">marketstructureos.com / command-center</div>
+        <div className="url">marketstructureos.com / strategy-lab</div>
       </div>
       <div className="window-content">
         <div className="lens-head">
           <div>
-            <strong>Command Center</strong>
+            <strong>Strategy Lab</strong>
             <div className="micro">
               Compare the market&apos;s view with yours — then find the cleanest expression.
             </div>
           </div>
-          <span className="tag">Live demo</span>
+          <span className="tag muted">Demo</span>
         </div>
         <div className="belief-card">
           <div className="micro">Market comparison</div>
@@ -26,7 +30,7 @@ export function ProductWindow() {
               <div className="micro">Options-implied distribution</div>
             </div>
             <div className="small-panel">
-              <div className="k">Your thesis</div>
+              <div className="k">Your view</div>
               <div className="v teal">Narrower expected range</div>
               <div className="micro">Your stated market view</div>
             </div>
@@ -50,6 +54,6 @@ export function ProductWindow() {
           </div>
         </div>
       </div>
-    </section>
+    </Link>
   );
 }

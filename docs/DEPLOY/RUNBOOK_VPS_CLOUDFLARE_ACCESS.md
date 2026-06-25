@@ -100,10 +100,16 @@ In Cloudflare → **SSL/TLS** → **Overview**:
 When you want **Full (strict)** (Cloudflare → origin must be **HTTPS** with a trusted cert):
 
 1. Cloudflare → **SSL/TLS** → **Origin Server** → **Create certificate** (15-year origin cert). Include hostnames such as `marketstructureos.com` and `*.marketstructureos.com` (or at least `app.marketstructureos.com`).
-2. Save the PEM bundle and private key on the VPS (example paths): `/opt/marketstructureos/certs/cloudflare-origin.pem` and `cloudflare-origin-key.pem`.
-3. Extend **Caddy** to terminate TLS on **:443** using those files (`tls /path/to.pem /path/to.key`), keep the same `reverse_proxy` routes, then set Cloudflare to **Full (strict)**.
+2. Save the PEM bundle and private key on the VPS under the repo `certs/` directory: `certs/cloudflare-origin.pem` and `certs/cloudflare-origin-key.pem` (`chmod 600` on the key). See [`certs/README.md`](../../certs/README.md).
+3. In repo-root `.env` on the VPS: `PPE_CADDYFILE=./Caddyfile.tls`
+4. Reload Caddy: `docker compose up -d caddy` (mounts `./Caddyfile.tls`, terminates TLS on **:443**, adds HSTS + security headers).
+5. Cloudflare → **SSL/TLS** → **Overview** → set mode to **Full (strict)**.
 
 Until Phase B is done, **do not** use **Full (strict)** with an HTTP-only origin or the edge will fail to connect.
+
+**Security headers:** both Phase A and B Caddy configs import [`caddy/snippets.caddy`](../../caddy/snippets.caddy) (`X-Content-Type-Options`, `Referrer-Policy`, etc.). MSOS Next routes also get a baseline CSP. HSTS is enabled only on Phase B (`:443`).
+
+**Operator checklist:** one-page post-hardening steps (ntfy, VPS smoke, Phase B TLS) — [`SECURITY_OPERATOR_CHECKLIST_V1.md`](SECURITY_OPERATOR_CHECKLIST_V1.md).
 
 ### 6) Bring up the stack (first boot)
 

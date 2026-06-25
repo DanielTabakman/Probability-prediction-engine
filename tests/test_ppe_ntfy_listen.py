@@ -28,8 +28,8 @@ def test_listen_once_updates_state(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
     monkeypatch.setenv("PPE_NTFY_TOPIC", "topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
-    monkeypatch.delenv("PPE_NTFY_CMD_SECRET", raising=False)
-    messages = [{"event": "message", "id": "m1", "message": "status"}]
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    messages = [{"event": "message", "id": "m1", "message": "s3cret status"}]
     with patch("scripts.ppe_ntfy_listen.poll_messages", return_value=messages):
         with patch("scripts.ppe_ntfy_commands.execute_status") as status:
             status.return_value = {"action": "status", "body": "ok", "notified": True}

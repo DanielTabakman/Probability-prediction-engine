@@ -5,6 +5,12 @@
 
 export type ThesisLifecycle = "exploring" | "draft" | "confirmed";
 
+export type ThesisBeliefSnapshot = {
+  forwardMult: number;
+  volMult: number;
+  viewLabel?: string;
+};
+
 export type ThesisRecord = {
   instrument: string;
   horizonDays: number;
@@ -14,6 +20,11 @@ export type ThesisRecord = {
   trustLabel: string;
   lifecycle: ThesisLifecycle;
   updatedAt: string;
+  /** Captured from Strategy Lab at confirm time. */
+  expiryDate?: string;
+  beliefSnapshot?: ThesisBeliefSnapshot;
+  disagreementLine?: string;
+  spotUsdAtConfirm?: number;
 };
 
 export const THESIS_STORAGE_KEY = "msos.thesis.preview.v1";
@@ -82,7 +93,7 @@ export async function fetchThesisRecord(fallback: ThesisRecord): Promise<ThesisR
     return fallback;
   }
   try {
-    const response = await fetch("/api/theses", { cache: "no-store" });
+    const response = await fetch("/api/theses", { cache: "no-store", credentials: "include" });
     if (!response.ok) {
       return loadThesisRecord(fallback);
     }
@@ -102,19 +113,21 @@ export async function fetchThesisRecord(fallback: ThesisRecord): Promise<ThesisR
   }
 }
 
-export async function persistThesisRecord(record: ThesisRecord): Promise<void> {
+export async function persistThesisRecord(record: ThesisRecord): Promise<boolean> {
   saveThesisRecord(record);
   if (typeof window === "undefined") {
-    return;
+    return true;
   }
   try {
-    await fetch("/api/theses", {
+    const response = await fetch("/api/theses", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ thesis: record }),
     });
+    return response.ok;
   } catch {
-    // local preview remains as offline fallback
+    return false;
   }
 }
 

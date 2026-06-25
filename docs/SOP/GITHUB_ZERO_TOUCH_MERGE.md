@@ -6,7 +6,7 @@ Purpose: define how changes reach **`main` without a human merge click** when au
 
 - **Human in the loop for design and repair, not for routine merge.** The steward defines priorities, slice scope, and recovery when something is wrong—not a standing approval gate on every green PR.
 - **Merge when checks pass.** Use GitHub **auto-merge** on pull requests so the platform merges as soon as required status checks succeed (no manual “Merge” click for the common case).
-- **Ship on `main`.** After merge, [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) runs on pushes to **`main`**; the VPS reconciles with GitHub. See [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md).
+- **Ship on `main`.** After merge, [deploy-vps.yml](../../.github/workflows/deploy-vps.yml) runs on pushes to **`main`** (and is re-dispatched after auto-merge); the VPS reconciles with GitHub. The **VPS deploy** job is the ship gate; production witnesses run separately and do not fail deploy. See [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md).
 
 This doc is the **GitHub-side contract**. Relay/orchestrator promotion still produces a branch and PR (or equivalent); this layer completes the path to **`main`** and the live site.
 
@@ -32,7 +32,7 @@ Use this when **Allow auto-merge** is greyed out (typical for **private** repos 
 1. **One-time:** set **Settings → Actions → General → Workflow permissions** to **Read and write** (see below).  
 2. Merge these workflow files to **`main`** so they run on the default branch.  
 3. Open a **non-draft** PR to **`main`** from a branch in this repo — **`automerge`** is applied automatically; when **CI** is green, **Merge on green** squash-merges.  
-4. **Deploy VPS** runs on push to **`main`**.
+4. **Deploy VPS** runs on push to **`main`** and is **dispatched again** by merge-on-green immediately after squash-merge. The workflow has two jobs: **VPS deploy** (required — SSH rebuild) and **Production witness** (non-blocking — integration checks). Agents should run `python scripts/ensure_production_deploy.py --trigger --wait` after shipping production-facing slices.
 
 **Draft PRs:** no **`automerge`** label while draft; when you mark **Ready for review**, the label workflow runs again and the usual CI → merge path applies.
 

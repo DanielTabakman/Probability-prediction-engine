@@ -16,6 +16,8 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
+from scripts.google_oauth_scopes import SYNC_GOOGLE_SCOPES
+
 
 def _load_env_file_if_present(env_path: Path) -> None:
     try:
@@ -89,9 +91,7 @@ def main() -> int:
         token_uri=(os.environ.get("GOOGLE_OAUTH_TOKEN_URI") or "https://oauth2.googleapis.com/token").strip(),
         client_id=_required_env("GOOGLE_OAUTH_CLIENT_ID"),
         client_secret=_required_env("GOOGLE_OAUTH_CLIENT_SECRET"),
-        scopes=[
-            "https://www.googleapis.com/auth/drive",
-        ],
+        scopes=list(SYNC_GOOGLE_SCOPES),
     )
     creds.refresh(Request())
 

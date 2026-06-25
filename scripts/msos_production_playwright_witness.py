@@ -121,21 +121,24 @@ def run_playwright_witness(
 
         lab_url = f"{base}/strategy-lab"
         page.goto(lab_url, wait_until="networkidle", timeout=90_000)
-        higher = page.get_byRole("button", name="Higher", exact=True)
+        higher = page.get_by_role("button", name="Higher", exact=True)
         belief_ok = higher.count() > 0
+        belief_curve_ok = False
         if belief_ok:
             higher.first.click()
-            page.wait_for_timeout(500)
+            page.wait_for_timeout(1500)
+            html = page.content()
+            belief_curve_ok = "strokeDasharray" in html or "#2dd4bf" in html
             page.screenshot(path=str(shot_dir / "strategy_lab_after_belief.png"), full_page=True)
         checks.append(
             {
                 "id": "click_belief_higher",
                 "url": lab_url,
-                "ok": belief_ok and "Your view" in page.content(),
+                "ok": belief_ok and "Your view" in page.content() and belief_curve_ok,
                 "status": 200 if belief_ok else 0,
                 "error": None
-                if belief_ok and "Your view" in page.content()
-                else "Belief preset click failed or outcome did not update",
+                if belief_ok and "Your view" in page.content() and belief_curve_ok
+                else "Belief preset click failed or belief curve did not render",
                 "screenshot": str((shot_dir / "strategy_lab_after_belief.png").as_posix())
                 if belief_ok
                 else None,

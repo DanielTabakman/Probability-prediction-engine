@@ -45,6 +45,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from scripts.google_oauth_scopes import SYNC_GOOGLE_SCOPES
 from scripts.msos.repo_truth_snapshot import build_repo_truth_snapshot  # noqa: E402
 
 
@@ -104,16 +105,8 @@ def _mcp_refresh_token() -> str | None:
     return v or None
 
 
-# Must match @a-bonus/google-docs-mcp auth scopes (token was granted with these).
-_MCP_GOOGLE_SCOPES = [
-    "https://www.googleapis.com/auth/documents",
-    "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/script.external_request",
-    "https://www.googleapis.com/auth/gmail.modify",
-    "https://www.googleapis.com/auth/calendar.events",
-]
-
+# CI sync uses minimal scopes (see scripts/google_oauth_scopes.py). MCP tokens may
+# include broader grants; refresh still works when the token is a superset.
 
 def _oauth_creds() -> Credentials:
     client_id = _required_env("GOOGLE_OAUTH_CLIENT_ID")
@@ -127,7 +120,7 @@ def _oauth_creds() -> Credentials:
         token_uri=token_uri,
         client_id=client_id,
         client_secret=client_secret,
-        scopes=_MCP_GOOGLE_SCOPES,
+        scopes=list(SYNC_GOOGLE_SCOPES),
     )
     creds.refresh(Request())
     return creds

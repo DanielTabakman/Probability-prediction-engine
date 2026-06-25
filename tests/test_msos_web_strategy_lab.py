@@ -29,39 +29,64 @@ def test_strategy_lab_belief_presets_interactive() -> None:
     assert '"use client"' in builder
     assert "belief-preset" in builder
     assert "aria-pressed" in builder
+    assert "ExpiryPicker" in builder
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
     assert "StrategyLabInteractivePanel" in panel
-    assert "chartRegion" in panel
-    assert "PpeEmbedBoundary" not in panel
-    assert "PpeEmbedBoundary" in content
-    assert "chartRegion=" in content
-    assert "buildOutcomeFromBelief" in panel
+    assert "PpeEmbedBoundary" in panel
+    assert "beliefPdfPct" in panel
+    assert "selectedExpiry" in panel
+    assert "BeliefBuilder" in panel
+    assert "belief-axis-pair" in builder
+    assert "Higher" in builder
+    assert "More vol" in builder
+    assert "PpeEmbedBoundary" not in content
+    assert "buildOutcomeFromTuning" in panel
     assert "Guided thesis draft — interactive belief controls ship in a follow-on slice." not in content
 
+    tuning = (MSOS_WEB / "src" / "lib" / "beliefTuning.ts").read_text(encoding="utf-8")
+    assert "fetchBeliefOverlayPdf" in tuning
+    assert "nudgeTuning" in tuning
+    assert "loadStoredBeliefTuning" in tuning
+
+    fine = (MSOS_WEB / "src" / "components" / "BeliefFineTuning.tsx").read_text(encoding="utf-8")
+    assert "slider-input" in fine
+
+    presets = (MSOS_WEB / "src" / "lib" / "beliefPresets.ts").read_text(encoding="utf-8")
+    assert "buildOutcomeFromTuning" in presets
+
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
-    assert ".belief-preset-grid" in styles
+    assert ".belief-axis-pair" in styles
+    assert ".belief-preset" in styles
+    assert ".slider-input" in styles
+    assert "Reset to market" in builder
 
 
 def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    assert "Strategy Lab · BTC options" in content
-    assert "Live market data" in content
-    assert "Demo data" in content
-    assert "buildLabMetricsFromPayload" in content
-    assert "StrategyLabInteractivePanel" in content
-    assert "DEMO_FOOTER" in content
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
+    picker = (MSOS_WEB / "src" / "components" / "ExpiryPicker.tsx").read_text(encoding="utf-8")
+    copy = (MSOS_WEB / "src" / "lib" / "strategyLabCopy.ts").read_text(encoding="utf-8")
+    assert "StrategyLabClientShell" in content
+    assert "fetchDisplayPayloadClient" in shell
+    assert "Sample mode" in copy
+    assert "ExpiryPicker" in work
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
+    builder = (MSOS_WEB / "src" / "components" / "BeliefBuilder.tsx").read_text(encoding="utf-8")
     assert "Market vs your view" in panel
-    assert "chartRegion" in panel
-    assert 'className="legend"' in panel
-    assert 'className="controls"' in panel
+    assert "PpeEmbedBoundary" in panel
+    assert "beliefPdfPct" in panel
+    assert "selectedExpiry" in panel
+    assert 'className="legend chart-curve-legend"' in panel or 'className="legend"' in panel
+    assert "BeliefFineTuning" in panel
+    assert "belief-axis-pair" in builder
 
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     assert "distribution_display_boundary" in lib
@@ -69,17 +94,31 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
 
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     assert '"use client"' in embed
-    assert "async function PpeEmbedBoundary" not in embed
+    assert "LabeledDistributionChart" in embed
+    assert "resolveCurveLabels" in embed
+    assert "Black–Scholes lognormal" in embed or "curve_labels" in embed
+    assert "beliefPdfPct" in embed
+    assert "dataMode" in embed
     assert "ppeDisplayPayload" in embed
-    assert "PPE_EMBED_ONLY_PARAM" in embed
-    assert "iframe" in embed
     assert "degraded" in embed.lower() or "unavailable" in embed.lower()
     assert "prices_usd" in embed
     assert "ppe-summary-table" in embed
     assert "Deribit" in embed or "Live" in embed
+    labeled = (MSOS_WEB / "src" / "components" / "LabeledDistributionChart.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "BTC price at expiry" in labeled
+    assert "graph-labeled" in labeled
+    assert "ChartCurveLegend" in labeled
+    assert "Black–Scholes lognormal" in labeled
+
+    curve_labels = (MSOS_WEB / "src" / "lib" / "chartCurveLabels.ts").read_text(encoding="utf-8")
+    assert "Market view [Black–Scholes lognormal]" in curve_labels
 
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".ppe-summary-table" in styles
+    assert ".expiry-picker" in styles
+    assert ".lab-data-banner" in styles
 
 
 def test_strategy_lab_fixtures_honest_lens_labels() -> None:
@@ -111,7 +150,7 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert "exploring" in persistence
     assert "confirmed" in persistence
 
-    lab = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    lab = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     assert 'href="/strategy-lab/confirm"' in lab
 
 
@@ -149,6 +188,20 @@ def test_expression_planning_route_and_narrative() -> None:
     assert "DEMO_FOOTER" in panel
     assert "Why this structure" in panel
     assert "Structure types" in panel
+    assert "ExpressionPayoffChart" in panel
+    assert "fetchStrategySuggestion" in panel
+    assert "resolveCurveLabels" in panel
+    assert "Suggested trade vs market" in (
+        MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
+    ).read_text(encoding="utf-8")
+    assert "BTC price at expiry" in (
+        MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
+    ).read_text(encoding="utf-8")
+
+    suggestion_lib = (MSOS_WEB / "src" / "lib" / "ppeStrategySuggestion.ts").read_text(
+        encoding="utf-8"
+    )
+    assert "strategy-suggestion.json" in suggestion_lib
 
     persistence = (MSOS_WEB / "src" / "lib" / "expressionPersistence.ts").read_text(encoding="utf-8")
     assert "msos.expression.preview.v1" in persistence

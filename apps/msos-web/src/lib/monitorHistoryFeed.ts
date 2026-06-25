@@ -3,13 +3,30 @@ import {
   type CommandCenterSummary,
   type CommandCenterSnapshotRow,
 } from "@/lib/commandCenterSummary";
-import { getCurrentExpression, getCurrentThesis } from "@/lib/msosWorkflowStore";
+import type { StoredExpression } from "@/lib/msosWorkflowStore";
+import type { PaperTradeStatus } from "@/lib/expressionPersistence";
+import {
+  effectivePaperTradeStatus,
+  getCurrentThesis,
+  listPaperTrades,
+} from "@/lib/msosWorkflowStore";
+import { fetchDisplayPayload, formatUsd } from "@/lib/ppeDisplayPayload";
 
 export type MonitorWatchPanel = {
   id: string;
   title: string;
   body: string;
   tone: string;
+  markLine?: string;
+  href?: string;
+  tradeId?: string;
+  status?: PaperTradeStatus;
+};
+
+export type PaperTradeSummary = {
+  id: string;
+  title: string;
+  status: PaperTradeStatus;
 };
 
 export type MonitorAlert = {
@@ -27,6 +44,8 @@ export type MonitorFeed = {
   healthLabel: string;
   watchPanels: MonitorWatchPanel[];
   alerts: MonitorAlert[];
+  paperTrades: PaperTradeSummary[];
+  manageEnabled: boolean;
   degradedReason?: string;
 };
 
@@ -38,6 +57,10 @@ export type HistoryEntry = {
   timestamp: string;
   title: string;
   detail: string;
+  href?: string;
+  tradeId?: string;
+  statusTag?: string;
+  paperTradeStatus?: PaperTradeStatus;
 };
 
 export type HistoryFeed = {
@@ -85,54 +108,123 @@ function snapshotHistoryEntries(rows: CommandCenterSnapshotRow[]): HistoryEntry[
   });
 }
 
+function statusLabel(status: PaperTradeStatus): string {
+  if (status === "closed") return "Closed";
+  if (status === "expired") return "Expired";
+  return "Open";
+}
+
+function paperTradeHistoryEntries(trades: StoredExpression[]): HistoryEntry[] {
+  return trades.map((expression) => {
+    const status = effectivePaperTradeStatus(expression);
+    const expiry = expression.expiryDate?.trim();
+    const instrument = expression.instrument?.trim();
+    const legs = expression.legs.length;
+    const detailParts = [
+      expression.planSummary,
+      `${statusLabel(status)}`,
+      expiry ? `exp ${expiry}` : null,
+      instrument ? instrument : null,
+      legs > 0 ? `${legs} leg${legs === 1 ? "" : "s"}` : null,
+    ].filter(Boolean);
+    return {
+      id: `paper-${expression.id}`,
+      state: "simulated" as HistoryState,
+      timestamp: formatTimestamp(expression.savedAt ?? expression.updatedAt),
+      title: expression.planHeadline,
+      detail: detailParts.join(" · "),
+      href: `/monitor/paper/${expression.id}`,
+      tradeId: expression.id,
+      statusTag: statusLabel(status),
+      paperTradeStatus: status,
+    };
+  });
+}
+
 function workflowHistoryEntries(
   thesis: Awaited<ReturnType<typeof getCurrentThesis>>,
-  expression: Awaited<ReturnType<typeof getCurrentExpression>>,
+  paperTrades: StoredExpression[],
 ): HistoryEntry[] {
-  const entries: HistoryEntry[] = [];
-  if (thesis) {
-    entries.push({
-      id: `thesis-${thesis.id}`,
-      state: thesis.lifecycle === "confirmed" ? "saved" : "observed",
-      timestamp: formatTimestamp(thesis.updatedAt),
-      title: `${thesis.instrument} thesis`,
-      detail: `${thesis.horizonDays}d · ${thesis.referenceLabel} · ${thesis.trustLabel}`,
-    });
-  }
-  if (expression) {
-    entries.push({
-      id: `expr-${expression.id}`,
-      state: expression.lifecycle === "simulated" ? "simulated" : "saved",
-      timestamp: formatTimestamp(expression.updatedAt),
-      title: expression.planHeadline,
-      detail: expression.planSummary,
-    });
+  const entries: HistoryEntry[] = paperTradeHistoryEntries(paperTrades);
+  if (thesis && thesis.lifecycle === "confirmed") {
+    const hasThesisEntry = entries.some((row) => row.id === `thesis-${thesis.id}`);
+    if (!hasThesisEntry) {
+      entries.push({
+        id: `thesis-${thesis.id}`,
+        state: "saved",
+        timestamp: formatTimestamp(thesis.updatedAt),
+        title: `${thesis.instrument} thesis`,
+        detail: `${thesis.horizonDays}d · ${thesis.referenceLabel} · ${thesis.trustLabel}`,
+      });
+    }
   }
   return entries;
 }
 
+function markLineForTrade(
+  trade: StoredExpression,
+  currentSpotUsd: number | null,
+  asOfUtc?: string,
+): string | undefined {
+  const saved = trade.markAtSave;
+  if (!saved?.spotUsd && currentSpotUsd == null) {
+    return undefined;
+  }
+  const savedSpot = saved?.spotUsd;
+  const parts: string[] = [];
+  if (typeof savedSpot === "number" && currentSpotUsd != null) {
+    parts.push(`Spot ${formatUsd(savedSpot)} → ${formatUsd(currentSpotUsd)}`);
+  } else if (typeof savedSpot === "number") {
+    parts.push(`Saved at ${formatUsd(savedSpot)}`);
+  } else if (currentSpotUsd != null) {
+    parts.push(`Spot now ${formatUsd(currentSpotUsd)}`);
+  }
+  if (typeof saved?.maxLossUsd === "number") {
+    parts.push(`max loss ${formatUsd(Math.abs(saved.maxLossUsd))}`);
+  }
+  if (asOfUtc?.trim()) {
+    parts.push(`as of ${formatTimestamp(asOfUtc)} UTC`);
+  }
+  return parts.length > 0 ? parts.join(" · ") : undefined;
+}
+
 function buildWatchPanels(
   thesis: Awaited<ReturnType<typeof getCurrentThesis>>,
-  expression: Awaited<ReturnType<typeof getCurrentExpression>>,
+  paperTrades: StoredExpression[],
   summary: CommandCenterSummary,
+  currentSpotUsd: number | null,
+  marketAsOfUtc?: string,
 ): MonitorWatchPanel[] {
   const panels: MonitorWatchPanel[] = [];
   if (thesis) {
     panels.push({
-      id: "A",
+      id: "thesis",
       title: `${thesis.instrument} thesis`,
       body: `${thesis.lifecycle} · ${thesis.horizonDays}d horizon · ${thesis.referenceLabel}`,
       tone: thesis.lifecycle === "confirmed" ? "teal" : "amber",
     });
   }
-  if (expression) {
+  paperTrades.forEach((expression) => {
+    const status = effectivePaperTradeStatus(expression);
+    const expiry = expression.expiryDate?.trim();
     panels.push({
-      id: "B",
+      id: `paper-${expression.id}`,
       title: expression.planHeadline,
-      body: `${expression.lifecycle} expression · ${expression.familyId}`,
-      tone: expression.lifecycle === "simulated" ? "teal" : "amber",
+      body: [
+        statusLabel(status),
+        `${expression.legs.length} leg${expression.legs.length === 1 ? "" : "s"}`,
+        expiry ? `exp ${expiry}` : null,
+        expression.instrument?.trim() ?? null,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      tone: status === "open" ? "teal" : status === "closed" ? "muted" : "amber",
+      markLine: markLineForTrade(expression, currentSpotUsd, marketAsOfUtc),
+      href: `/monitor/paper/${expression.id}`,
+      tradeId: expression.id,
+      status,
     });
-  }
+  });
   if (summary.status === "live" && summary.recentSnapshots.length > 0) {
     const latest = summary.recentSnapshots[0];
     panels.push({
@@ -185,8 +277,14 @@ function buildAlerts(summary: CommandCenterSummary): MonitorAlert[] {
   return alerts;
 }
 
-function healthFromSummary(summary: CommandCenterSummary): { pct: number; label: string } {
+function healthFromSummary(
+  summary: CommandCenterSummary,
+  hasPaperTrades = false,
+): { pct: number; label: string } {
   if (summary.status !== "live") {
+    if (hasPaperTrades) {
+      return { pct: 50, label: "Paper trades saved — snapshot reviews offline" };
+    }
     return { pct: 0, label: "Waiting for saved reads" };
   }
   const totalKpi = summary.kpis.find((k) => k.label === "Saved snapshots");
@@ -204,15 +302,36 @@ function healthFromSummary(summary: CommandCenterSummary): { pct: number; label:
   };
 }
 
+function healthFromPaperTrades(trades: StoredExpression[]): { pct: number; label: string } {
+  const open = trades.filter((row) => effectivePaperTradeStatus(row) === "open").length;
+  const closed = trades.filter((row) => effectivePaperTradeStatus(row) === "closed").length;
+  const expired = trades.filter((row) => effectivePaperTradeStatus(row) === "expired").length;
+  const total = trades.length;
+  const pct = open > 0 ? 70 : closed > 0 ? 45 : 30;
+  const parts = [`${open} open`];
+  if (closed) parts.push(`${closed} closed`);
+  if (expired) parts.push(`${expired} expired`);
+  return {
+    pct,
+    label: `${parts.join(" · ")} · ${total} saved`,
+  };
+}
+
 export async function loadMonitorFeed(ownerEmail: string | null): Promise<MonitorFeed> {
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
-  const [thesis, expression] = await Promise.all([
+  const [thesis, paperTrades, display] = await Promise.all([
     getCurrentThesis(email),
-    getCurrentExpression(email),
+    listPaperTrades(email),
+    fetchDisplayPayload(),
   ]);
+  const currentSpotUsd = display?.spot_usd ?? null;
+  const marketAsOfUtc = display?.as_of_utc;
 
-  if (summary.status === "degraded") {
+  const hasPaperTrades = paperTrades.length > 0;
+  const hasWorkflow = Boolean(thesis || hasPaperTrades);
+
+  if (summary.status === "degraded" && !hasWorkflow) {
     return {
       status: "degraded",
       sourceLabel: WORKFLOW_SOURCE,
@@ -236,38 +355,54 @@ export async function loadMonitorFeed(ownerEmail: string | null): Promise<Monito
         },
       ],
       degradedReason: summary.degradedReason,
+      paperTrades: [],
+      manageEnabled: false,
     };
   }
 
-  const watchPanels = buildWatchPanels(thesis, expression, summary);
+  const paperTradeSummaries: PaperTradeSummary[] = paperTrades.map((trade) => ({
+    id: trade.id,
+    title: trade.planHeadline,
+    status: effectivePaperTradeStatus(trade),
+  }));
+  const watchPanels = buildWatchPanels(
+    thesis,
+    paperTrades,
+    summary,
+    currentSpotUsd,
+    marketAsOfUtc,
+  );
   const alerts = buildAlerts(summary);
-  const { pct, label } = healthFromSummary(summary);
-  const hasWorkflow = Boolean(thesis || expression);
+  const health = hasPaperTrades
+    ? healthFromPaperTrades(paperTrades)
+    : healthFromSummary(summary, hasPaperTrades);
   const hasSnapshots = summary.status === "live" && summary.recentSnapshots.length > 0;
 
   return {
     status: hasWorkflow || hasSnapshots ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
-    heroTitle: hasWorkflow ? "Thesis & expression watch" : "Monitoring workspace",
-    heroSubtitle: hasSnapshots
-      ? "Watching your saved views and paper trades."
-      : "Save a view in Strategy Lab to start building history.",
-    healthPct: pct,
-    healthLabel: label,
+    heroTitle: hasPaperTrades ? "Paper trade watch" : hasWorkflow ? "Thesis watch" : "Monitoring workspace",
+    heroSubtitle: hasPaperTrades
+      ? `${paperTrades.length} saved paper trade${paperTrades.length === 1 ? "" : "s"} — marks refresh when Deribit data is online.`
+      : hasSnapshots
+        ? "Watching your saved views."
+        : "Save a paper trade in Strategy Lab to start building history.",
+    healthPct: health.pct,
+    healthLabel: health.label,
     watchPanels,
     alerts,
+    paperTrades: paperTradeSummaries,
+    manageEnabled: hasPaperTrades,
   };
 }
 
 export async function loadHistoryFeed(ownerEmail: string | null): Promise<HistoryFeed> {
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
-  const [thesis, expression] = await Promise.all([
-    getCurrentThesis(email),
-    getCurrentExpression(email),
-  ]);
+  const [thesis, paperTrades] = await Promise.all([getCurrentThesis(email), listPaperTrades(email)]);
 
-  if (summary.status === "degraded") {
+  const hasPaperTrades = paperTrades.length > 0;
+  if (summary.status === "degraded" && !hasPaperTrades && !thesis) {
     return {
       status: "degraded",
       sourceLabel: WORKFLOW_SOURCE,
@@ -278,15 +413,18 @@ export async function loadHistoryFeed(ownerEmail: string | null): Promise<Histor
   }
 
   const entries = [
-    ...workflowHistoryEntries(thesis, expression),
-    ...snapshotHistoryEntries(summary.recentSnapshots),
+    ...workflowHistoryEntries(thesis, paperTrades),
+    ...(summary.status === "live" ? snapshotHistoryEntries(summary.recentSnapshots) : []),
   ].sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
   return {
     status: entries.length > 0 ? "live" : "empty",
     sourceLabel: WORKFLOW_SOURCE,
-    intro: "From first look → saved view → paper trade → review. Live fills appear when connected.",
+    intro: hasPaperTrades
+      ? "Paper trades and saved views in your workspace — newest first."
+      : "From first look → saved view → paper trade → review. Live fills appear when connected.",
     entries,
+    degradedReason: summary.status === "degraded" ? summary.degradedReason : undefined,
   };
 }
 

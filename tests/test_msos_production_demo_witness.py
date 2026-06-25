@@ -8,7 +8,9 @@ from scripts.msos_production_demo_witness import (
     FIXTURE_PREVIEW_SPOT,
     _collect_fixture_warnings,
     _has_research_cta,
+    validate_belief_overlay_api_response,
     validate_display_api_response,
+    validate_strategy_lab_client_bundle,
     validate_strategy_lab_html,
 )
 
@@ -50,6 +52,19 @@ def test_validate_display_api_response_display_error_kind() -> None:
     assert "Deribit" in (err or "")
 
 
+def test_validate_belief_overlay_api_response_ok() -> None:
+    body = json.dumps({"kind": "belief_overlay", "pdf_pct": [0.0, 12.5, 0.0]})
+    ok, err = validate_belief_overlay_api_response(200, body)
+    assert ok is True
+    assert err is None
+
+
+def test_validate_belief_overlay_api_response_not_found() -> None:
+    ok, err = validate_belief_overlay_api_response(404, "not found")
+    assert ok is False
+    assert "404" in (err or "")
+
+
 def test_validate_strategy_lab_html_native_chart() -> None:
     html = '<div class="ppe-chart-region"><span>Live via PPE</span> Native chart'
     ok, err = validate_strategy_lab_html(html)
@@ -57,14 +72,62 @@ def test_validate_strategy_lab_html_native_chart() -> None:
     assert err is None
 
 
-def test_validate_strategy_lab_html_degraded() -> None:
-    ok, err = validate_strategy_lab_html('<div class="ppe-embed-degraded">Embed pending</div>')
+def test_validate_strategy_lab_html_sample_mode() -> None:
+    html = '<div class="lab-data-banner demo">Sample mode — not live market data</div>'
+    ok, err = validate_strategy_lab_html(html)
     assert ok is False
-    assert "degraded" in (err or "").lower() or "pending" in (err or "").lower()
+    assert "sample" in (err or "").lower()
+
+
+def test_validate_strategy_lab_html_placeholder_chart() -> None:
+    html = '<div class="ppe-embed-degraded"><h3>Placeholder chart</h3></div>'
+    ok, err = validate_strategy_lab_html(html)
+    assert ok is False
+    assert "sample" in (err or "").lower() or "placeholder" in (err or "").lower()
+
+
+def test_validate_strategy_lab_client_bundle_rejects_stale_legend() -> None:
+    html = '<script src="/_next/static/chunks/app/strategy-lab/page-stale.js"></script>'
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("page-stale.js"):
+            return 200, "Options market Reference curve", None
+        return 404, "", "not found"
+
+    import scripts.verify_msos_web_ship as ship
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is False
+    assert "stale" in (err or "")
+
+
+def test_validate_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
+    html = '<script src="/_next/static/chunks/app/strategy-lab/page-new.js"></script>'
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("page-new.js"):
+            return 200, "BTC price at expiry Market view", None
+        return 404, "", "not found"
+
+    import scripts.verify_msos_web_ship as ship
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = validate_strategy_lab_client_bundle(html, base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is True
+    assert err is None
 
 
 def test_collect_fixture_warnings() -> None:
-    html = f"Spot {FIXTURE_PREVIEW_SPOT} Illustrative product storyboard Preview data healthy"
+    html = "Spot Sample only Illustrative product storyboard Preview data healthy"
     warnings = _collect_fixture_warnings(html)
     ids = {w["id"] for w in warnings}
     assert "fixture_preview_metrics" in ids

@@ -2,32 +2,24 @@
 
 /**
  * PPE embed boundary — display/proxy only; no distribution math in TypeScript.
- * Client component: rendered inside Strategy Lab interactive panel after belief picks.
- * Live payload is fetched server-side in strategy-lab/page.tsx and passed down.
  */
 
+import { resolveCurveLabels } from "@/lib/chartCurveLabels";
+import type { BeliefPresetId } from "@/lib/beliefPresets";
+import type { LabDataMode } from "@/lib/strategyLabCopy";
+import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
 import {
-  PPE_EMBED_ONLY_PARAM,
   type DisplayPayload,
   type DisplaySeries,
   formatUsd,
+  findSeriesByExpiry,
   isDisplaySeries,
-  PPE_EMBED_URL,
 } from "@/lib/ppeDisplayPayload";
 
 export const PPE_EMBED_ANCHOR_ID = "distribution-summary";
 
-function buildChromelessEmbedSrc(baseUrl: string): string {
-  const withoutHash = baseUrl.replace(/#.*$/, "");
-  const [path, query = ""] = withoutHash.split("?");
-  const params = new URLSearchParams(query);
-  params.set(PPE_EMBED_ONLY_PARAM, "1");
-  const qs = params.toString();
-  return qs ? `${path}?${qs}` : `${path}?${PPE_EMBED_ONLY_PARAM}=1`;
-}
-
 /** Map pre-computed price/pdf arrays to SVG path (linear scale only — no new math). */
-function seriesToSvgPath(
+export function seriesToSvgPath(
   prices: number[],
   pdf: number[],
   width: number,
@@ -51,32 +43,34 @@ function seriesToSvgPath(
   return `M ${points.join(" L ")}`;
 }
 
-function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; spotUsd: number }) {
-  const path = seriesToSvgPath(series.prices_usd, series.pdf_pct, 700, 280, 20);
-  const spotX =
-    series.prices_usd.length > 1
-      ? 20 +
-        ((spotUsd - series.prices_usd[0]) /
-          (series.prices_usd[series.prices_usd.length - 1] - series.prices_usd[0] || 1)) *
-          660
-      : 350;
+type NativeDistributionChartProps = {
+  series: DisplaySeries;
+  spotUsd: number;
+  beliefPdfPct?: number[] | null;
+  beliefLabel?: string | null;
+};
+
+function NativeDistributionChart({
+  series,
+  spotUsd,
+  beliefPdfPct,
+  beliefLabel,
+}: NativeDistributionChartProps) {
+  const ariaLabel = beliefLabel
+    ? `Distribution curves for ${series.expiry_date} — market vs your ${beliefLabel} view`
+    : `Distribution curve for ${series.expiry_date}`;
+  const curveLabels = resolveCurveLabels(series.curve_labels);
 
   return (
     <>
-      <div className="graph" role="img" aria-label={`Distribution curve for ${series.expiry_date}`}>
-        <svg viewBox="0 0 700 280" preserveAspectRatio="none">
-          <path
-            d={`${path} L 680,250 L 20,250 Z`}
-            stroke="#9e8bff"
-            strokeWidth="4"
-            fill="rgba(158, 139, 255, 0.14)"
-          />
-          <line x1={spotX} y1="38" x2={spotX} y2="250" stroke="#233c55" strokeDasharray="5 8" />
-          <text x={spotX + 4} y="54" fill="#8ea4bd" fontSize="12">
-            spot
-          </text>
-        </svg>
-      </div>
+      <LabeledDistributionChart
+        pricesUsd={series.prices_usd}
+        marketPdfPct={series.pdf_pct}
+        beliefPdfPct={beliefPdfPct}
+        spotUsd={spotUsd}
+        ariaLabel={ariaLabel}
+        curveLabels={curveLabels}
+      />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
         <div className="ppe-summary-table" aria-label="PPE display payload summary">
           <span>Mean {formatUsd(series.mean_usd)}</span>
@@ -91,50 +85,86 @@ function NativeDistributionChart({ series, spotUsd }: { series: DisplaySeries; s
 
 type PpeEmbedBoundaryProps = {
   payload: DisplayPayload | null;
+  live?: boolean;
+  dataMode?: LabDataMode;
+  selectedExpiry?: string | null;
+  beliefPresetId?: BeliefPresetId | null;
+  beliefLabel?: string | null;
+  beliefPdfPct?: number[] | null;
 };
 
-export function PpeEmbedBoundary({ payload }: PpeEmbedBoundaryProps) {
-  if (payload) {
-    const primary = payload.series_by_expiry.find(isDisplaySeries);
-    if (!primary) {
-      return null;
-    }
-    return (
-      <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
-        <p className="ppe-embed-live-note">
-          <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
-        </p>
-        <NativeDistributionChart series={primary} spotUsd={payload.spot_usd} />
-      </div>
-    );
-  }
-
-  if (!PPE_EMBED_URL) {
+export function PpeEmbedBoundary({
+  payload,
+  live = false,
+  dataMode = "demo",
+  selectedExpiry = null,
+  beliefPresetId = null,
+  beliefLabel = null,
+  beliefPdfPct = null,
+}: PpeEmbedBoundaryProps) {
+  if (dataMode === "loading") {
     return (
       <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
         <div className="ppe-embed-placeholder">
-          <span className="tag amber">Loading</span>
-          <h3>Chart unavailable</h3>
-          <p>Live options data could not be loaded. Try refreshing the page.</p>
+          <span className="tag teal">Loading</span>
+          <h3>Loading live chart</h3>
+          <p>Fetching BTC options distribution from Deribit…</p>
         </div>
       </div>
     );
   }
 
-  const embedSrc = buildChromelessEmbedSrc(PPE_EMBED_URL);
+  if (!live || !payload) {
+    return (
+      <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
+        <div className="ppe-embed-placeholder">
+          <span className="tag amber">Sample</span>
+          <h3>Placeholder chart</h3>
+          <p>
+            This view uses sample fixtures — not live Deribit quotes. Refresh when you are online;
+            live data loads automatically when the display API is reachable.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div className="ppe-embed ppe-embed-chromeless" role="region" aria-label="Options chart">
-      <p className="ppe-embed-live-note">
-        <span className="tag teal">Live</span> Interactive chart from live options data.
-      </p>
-      <iframe
-        title="BTC options distribution"
-        src={embedSrc}
-        className="ppe-embed-frame ppe-embed-frame-chromeless"
-        loading="lazy"
-        referrerPolicy="strict-origin-when-cross-origin"
-      />
-    </div>
-  );
+  if (payload) {
+    const primary =
+      (selectedExpiry && findSeriesByExpiry(payload, selectedExpiry)) ||
+      payload.series_by_expiry.find(isDisplaySeries);
+    if (!primary) {
+      return null;
+    }
+    const beliefOverlay =
+      beliefPdfPct ??
+      (beliefPresetId && primary.belief_presets
+        ? primary.belief_presets[beliefPresetId]?.pdf_pct
+        : beliefPresetId && payload.belief_presets
+          ? payload.belief_presets[beliefPresetId]?.pdf_pct
+          : null);
+
+    return (
+      <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
+        <p className="ppe-embed-live-note">
+          <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
+          Purple curve = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).market_legend}.
+          {beliefOverlay ? (
+            <>
+              {" "}
+              Teal dashed = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).belief_legend}.
+            </>
+          ) : null}
+        </p>
+        <NativeDistributionChart
+          series={{ ...primary, curve_labels: primary.curve_labels ?? payload.curve_labels }}
+          spotUsd={payload.spot_usd}
+          beliefPdfPct={beliefOverlay}
+          beliefLabel={beliefLabel}
+        />
+      </div>
+    );
+  }
+
+  return null;
 }

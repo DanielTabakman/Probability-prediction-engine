@@ -63,6 +63,9 @@ On any branch **other than** `main` / `master`, after gate + commit:
 2. `git push` (`git push -u origin HEAD` if no upstream).
 3. If no open PR to `main`, `gh pr create --base main --head <branch>`.
 4. Merge when CI is green per [`GITHUB_ZERO_TOUCH_MERGE.md`](GITHUB_ZERO_TOUCH_MERGE.md).
+5. **Production deploy:** every push to **`main`** runs **Deploy VPS** ([`deploy-vps.yml`](../../.github/workflows/deploy-vps.yml)). The **VPS deploy** job includes a required **msos_web ship verify** ([`verify_msos_web_ship.py`](../../scripts/verify_msos_web_ship.py)) so green deploys cannot serve stale Next.js client bundles. **CI** also runs [`verify_msos_web_build.py`](../../scripts/verify_msos_web_build.py) (`next build`) on every PR/push — catches Edge middleware and compile failures that string-only pytest witnesses miss. After merge (or when shipping MSOS/product to production), run  
+   `python scripts/ensure_production_deploy.py --trigger --wait`  
+   — waits for deploy and confirms ship verify (auto-redeploy once if workflow green but bundle stale).
 
 **`main`:** PR-only when branch protection applies — do not push product work directly to `main`.
 

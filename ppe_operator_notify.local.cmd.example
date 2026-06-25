@@ -29,7 +29,8 @@ REM set "PPE_NTFY_SERVER=https://ntfy.sh"
 REM set "PPE_NTFY_TOKEN=your-token-if-using-auth"
 REM Phone commands (watch_ntfy_commands.cmd): build | restart | fix | status | snooze | help
 REM Snooze examples from phone: snooze | snooze 6 | snooze 30m | snooze until 08:00 | snooze clear
-REM Optional secret prefix (required for restart): set "PPE_NTFY_CMD_SECRET=my-secret" then send "my-secret build"
+REM Required for build/fix/restart/status/snooze (help works without secret):
+set "PPE_NTFY_CMD_SECRET=your-long-random-secret-here"
 REM Disable phone commands: set "PPE_NTFY_CMD_ENABLED=0"
 REM Near-zero API (recommended): copy ppe_operator_near_zero_api.local.cmd.example
 REM Legacy headless CLI auto-build: set "PPE_AUTO_REMOTE_BUILD=1"

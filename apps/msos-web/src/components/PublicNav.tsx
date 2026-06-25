@@ -1,9 +1,21 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { ActionLink } from "@/components/ActionLink";
+import { CurrencySelect } from "@/components/CurrencySelect";
 import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
+import { clearPlatformTutorialComplete } from "@/lib/platformTutorial";
 
 export function PublicNav() {
   const signInUrl = resolveSignInUrl();
+  const router = useRouter();
+
+  const restartTour = () => {
+    clearPlatformTutorialComplete();
+    router.push("/strategy-lab?tutorial=1");
+  };
 
   return (
     <nav className="public-nav">
@@ -18,16 +30,19 @@ export function PublicNav() {
         <Link className="sel" href={MSOS_ROUTES.home}>
           Platform
         </Link>
-        <Link href={MSOS_ROUTES.strategyLab}>Strategy Lab</Link>
-        <Link href={MSOS_ROUTES.monitor}>Market surfaces</Link>
-        <Link href={MSOS_ROUTES.learn}>Vision</Link>
+        <ActionLink href={MSOS_ROUTES.strategyLab}>Strategy Lab</ActionLink>
+        <ActionLink href={MSOS_ROUTES.monitor}>Monitor</ActionLink>
+        <button type="button" className="nav-text-btn" onClick={restartTour}>
+          Restart tour
+        </button>
+        <CurrencySelect className="nav-currency" />
         <div className="nav-actions">
           <a className="btn slim dark" href={signInUrl}>
             Sign in
           </a>
-          <Link className="btn slim primary" href={MSOS_ROUTES.commandCenter}>
-            Enter Command Center
-          </Link>
+          <ActionLink className="btn slim primary" href={MSOS_ROUTES.commandCenter}>
+            Command Center
+          </ActionLink>
         </div>
       </div>
     </nav>

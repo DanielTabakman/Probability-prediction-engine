@@ -3,7 +3,7 @@ import path from "path";
 
 import Database from "better-sqlite3";
 
-import { normalizeOwnerEmail } from "@/lib/msosIdentity";
+import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { workflowStoreDir } from "@/lib/msosWorkflowStore";
 
 export type EntitlementTier = "free" | "research_beta" | "paid";

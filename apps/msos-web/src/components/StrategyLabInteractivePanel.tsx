@@ -1,18 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
+import { BeliefFineTuning } from "@/components/BeliefFineTuning";
+import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
+import { DEFAULT_CURVE_LABELS } from "@/lib/chartCurveLabels";
 import { lensTiles } from "@/data/strategyLabFixtures";
+import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
 import {
-  buildOutcomeFromBelief,
-  findBeliefPreset,
-  type BeliefPreset,
-  type BeliefPresetId,
-} from "@/lib/beliefPresets";
+  buildTuningLabel,
+  fetchBeliefOverlayPdf,
+  isMarketTuning,
+  loadStoredBeliefTuning,
+  MARKET_TUNING,
+  nudgeTuning,
+  presetIdForTuning,
+  saveBeliefTuning,
+  type BeliefNudgeAxis,
+  type BeliefTuning,
+} from "@/lib/beliefTuning";
 import {
   buildOutcomeFromPayload,
+  findSeriesByExpiry,
   type DisplayPayload,
   type LabOutcomeSummary,
 } from "@/lib/ppeDisplayPayload";
@@ -20,90 +32,158 @@ import {
 type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
   live: boolean;
+  dataMode: LabDataMode;
   defaultOutcome: LabOutcomeSummary;
-  chartRegion: ReactNode;
+  selectedExpiry: string;
+  onExpiryChange: (expiry: string) => void;
+  expiryOptions: string[];
 };
-
-function expiryLabel(payload: DisplayPayload | null): string {
-  return payload?.series_by_expiry?.[0]?.expiry_date ?? "the selected expiry";
-}
 
 export function StrategyLabInteractivePanel({
   displayPayload,
   live,
+  dataMode,
   defaultOutcome,
-  chartRegion,
+  selectedExpiry,
+  onExpiryChange,
+  expiryOptions,
 }: StrategyLabInteractivePanelProps) {
-  const [selectedPresetId, setSelectedPresetId] = useState<BeliefPresetId | null>(null);
+  const [tuning, setTuning] = useState<BeliefTuning>(MARKET_TUNING);
+  const [beliefPdfPct, setBeliefPdfPct] = useState<number[] | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
-  const handleSelect = useCallback((preset: BeliefPreset) => {
-    setSelectedPresetId(preset.id);
+  useEffect(() => {
+    setTuning(loadStoredBeliefTuning());
+    setHydrated(true);
   }, []);
 
+  const applyTuning = useCallback((next: BeliefTuning) => {
+    setTuning(next);
+    saveBeliefTuning(next);
+  }, []);
+
+  const handleNudge = useCallback(
+    (axis: BeliefNudgeAxis) => {
+      setTuning((prev) => {
+        const next = nudgeTuning(prev, axis);
+        saveBeliefTuning(next);
+        return next;
+      });
+    },
+    [],
+  );
+
+  const handleReset = useCallback(() => {
+    applyTuning(MARKET_TUNING);
+    setBeliefPdfPct(null);
+  }, [applyTuning]);
+
+  const handleFineTuning = useCallback(
+    (next: BeliefTuning) => {
+      applyTuning(next);
+    },
+    [applyTuning],
+  );
+
+  const viewLabel = buildTuningLabel(tuning);
+  const active = !isMarketTuning(tuning);
+
+  useEffect(() => {
+    if (!hydrated || !active || !live || !displayPayload || !selectedExpiry) {
+      if (!active) setBeliefPdfPct(null);
+      return;
+    }
+
+    const cachePresetId = presetIdForTuning(tuning);
+    if (cachePresetId) {
+      const series = findSeriesByExpiry(displayPayload, selectedExpiry);
+      const presetPdf =
+        series?.belief_presets?.[cachePresetId]?.pdf_pct ??
+        displayPayload.belief_presets?.[cachePresetId]?.pdf_pct ??
+        null;
+      if (presetPdf) {
+        setBeliefPdfPct(presetPdf);
+        return;
+      }
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void fetchBeliefOverlayPdf(selectedExpiry, tuning).then((pdf) => {
+        if (!cancelled) {
+          setBeliefPdfPct(pdf);
+        }
+      });
+    }, 120);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [hydrated, active, tuning, live, displayPayload, selectedExpiry]);
+
   const outcome = useMemo(() => {
-    if (!selectedPresetId) {
+    if (!active) {
       return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
     }
     try {
-      return buildOutcomeFromBelief(selectedPresetId, displayPayload, live);
+      return buildOutcomeFromTuning(tuning, displayPayload, live, selectedExpiry);
     } catch {
       return defaultOutcome;
     }
-  }, [selectedPresetId, displayPayload, live, defaultOutcome]);
-
-  const selectedPreset = findBeliefPreset(selectedPresetId);
+  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry]);
 
   return (
     <>
       <div className="panel chart">
         <BeliefBuilder
-          expiryLabel={expiryLabel(displayPayload)}
-          selectedId={selectedPresetId}
-          onSelect={handleSelect}
+          expiryLabel={selectedExpiry}
+          expiryOptions={expiryOptions}
+          onExpiryChange={onExpiryChange}
+          tuning={tuning}
+          onNudge={handleNudge}
+          onReset={handleReset}
         />
 
         <div className="panel-head">
           <div>
             <h2>Market vs your view</h2>
             <div className="panel-sub">
-              Purple curve = what BTC options imply today. Your selection shows where you disagree.
+              Purple curve = what BTC options imply today. Teal dashed = your belief when adjusted.
             </div>
           </div>
           <span className="tag">Options</span>
         </div>
 
-        {selectedPreset ? (
+        {active ? (
           <p className="belief-active-banner" role="status">
-            Your view: <strong>{selectedPreset.label}</strong> — compare to the chart below.
+            Your view: <strong>{viewLabel}</strong> — compare to the chart below.
           </p>
         ) : null}
 
-        {chartRegion}
-
-        <div className="legend" aria-label="Chart legend">
-          <span>
-            <i className="swatch market" aria-hidden="true" />
-            Options market
-          </span>
-          <span>
-            <i className="swatch reference" aria-hidden="true" />
-            Reference curve
-          </span>
-          <span className={selectedPresetId ? "legend-active" : undefined}>
-            <i className="swatch belief" aria-hidden="true" />
-            Your view{selectedPreset ? `: ${selectedPreset.label}` : ""}
-          </span>
+        <div data-tour="lab-chart">
+        <PpeEmbedBoundary
+          payload={displayPayload}
+          live={live}
+          dataMode={dataMode}
+          selectedExpiry={selectedExpiry}
+          beliefLabel={active ? viewLabel : null}
+          beliefPdfPct={beliefPdfPct}
+        />
         </div>
 
-        <div className="controls" aria-label="Fine-tuning (coming soon)">
-          <div className="control">
-            <div className="control-label">Range width</div>
-            <div className="slider preview" aria-hidden="true" />
-          </div>
-          <div className="control muted">
-            <div className="control-label">Tail weight</div>
-            <div className="slider preview muted" aria-hidden="true" />
-          </div>
+        <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
+
+        <div className="legend chart-curve-legend" aria-label="Chart legend">
+          <span>
+            <i className="swatch market" aria-hidden="true" />
+            {DEFAULT_CURVE_LABELS.market_legend}
+          </span>
+          <span className={active ? "legend-active" : undefined}>
+            <i className="swatch belief" aria-hidden="true" />
+            {DEFAULT_CURVE_LABELS.belief_legend}
+            {active ? `: ${viewLabel}` : ""}
+          </span>
         </div>
 
         <div className="panel-head compact">
@@ -159,8 +239,8 @@ export function StrategyLabInteractivePanel({
         <div className="decision-strip">
           <div>
             <strong>
-              {selectedPreset
-                ? `Next: confirm your “${selectedPreset.label.toLowerCase()}” view`
+              {active
+                ? `Next: confirm your “${viewLabel.toLowerCase()}” view`
                 : "Next: pick how you disagree with the market"}
             </strong>
             <p>Then explore trade structures that fit — paper only on this demo.</p>

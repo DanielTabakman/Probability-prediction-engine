@@ -38,9 +38,10 @@ def test_public_nav_wired_sign_in_and_routes() -> None:
 
 def test_hero_research_offer_and_links() -> None:
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert "resolveResearchOfferCta" in hero
-    assert "MSOS_ROUTES.strategyLab" in hero
-    assert "MSOS_ROUTES.commandCenter" in hero
+    assert "resolveResearchOfferCta" in hero or "ResearchBetaModal" in hero
+    assert "strategyLabTutorialHref" in hero
+    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    assert "MSOS_ROUTES.commandCenter" in nav
     assert '<span className="btn primary">' not in hero
 
 
@@ -48,12 +49,18 @@ def test_strategy_lab_embed_boundary_present() -> None:
     lab = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
+    work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     embed = (MSOS_WEB / "src" / "components" / "PpeEmbedBoundary.tsx").read_text(encoding="utf-8")
     lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
-    assert "StrategyLabInteractivePanel" in content
-    assert "chartRegion" in lab
-    assert "PpeEmbedBoundary" in content
+    assert "StrategyLabClientShell" in content
+    assert "StrategyLabInteractivePanel" in work
+    assert "PpeEmbedBoundary" in lab
+    assert "beliefPdfPct" in lab
+    assert "fetchDisplayPayloadClient" in lib
+    assert "fetchDisplayPayloadFromUrl" in lib
+    assert "selectedExpiry" in embed
     assert "ppeDisplayPayload" in embed
     assert "NEXT_PUBLIC_PPE_EMBED_URL" in lib
     assert "NEXT_PUBLIC_PPE_DISPLAY_API_URL" in lib

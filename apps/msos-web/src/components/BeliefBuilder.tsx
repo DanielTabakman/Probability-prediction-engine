@@ -1,81 +1,141 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { ExpiryPicker } from "@/components/ExpiryPicker";
 import {
-  BELIEF_PRESETS,
-  buildBeliefSentence,
-  loadStoredBeliefPresetId,
-  saveBeliefPresetId,
-  type BeliefPreset,
-  type BeliefPresetId,
-} from "@/lib/beliefPresets";
+  buildTuningLabel,
+  buildTuningPhrase,
+  isMarketTuning,
+  type BeliefNudgeAxis,
+  type BeliefTuning,
+} from "@/lib/beliefTuning";
+import { BELIEF_TAIL_LIMIT_NOTE } from "@/lib/beliefTuningCopy";
 
 type BeliefBuilderProps = {
   expiryLabel: string;
-  selectedId: BeliefPresetId | null;
-  onSelect: (preset: BeliefPreset) => void;
+  expiryOptions: string[];
+  onExpiryChange: (expiry: string) => void;
+  expiryPickerDisabled?: boolean;
+  tuning: BeliefTuning;
+  onNudge: (axis: BeliefNudgeAxis) => void;
+  onReset: () => void;
 };
 
-export function BeliefBuilder({ expiryLabel, selectedId, onSelect }: BeliefBuilderProps) {
-  const [hydrated, setHydrated] = useState(false);
+function BeliefPairButton({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`belief-preset${active ? " active" : ""}`}
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+}
 
-  useEffect(() => {
-    const stored = loadStoredBeliefPresetId();
-    if (stored) {
-      const preset = BELIEF_PRESETS.find((p) => p.id === stored);
-      if (preset) onSelect(preset);
-    }
-    setHydrated(true);
-  }, [onSelect]);
-
-  function handleSelect(preset: BeliefPreset) {
-    saveBeliefPresetId(preset.id);
-    onSelect(preset);
-  }
-
-  const selected = BELIEF_PRESETS.find((p) => p.id === selectedId) ?? null;
+export function BeliefBuilder({
+  expiryLabel,
+  expiryOptions,
+  onExpiryChange,
+  expiryPickerDisabled = false,
+  tuning,
+  onNudge,
+  onReset,
+}: BeliefBuilderProps) {
+  const active = !isMarketTuning(tuning);
+  const viewLabel = buildTuningLabel(tuning);
+  const phrase = buildTuningPhrase(tuning);
 
   return (
-    <div className="belief-builder">
-      <h3>What do you believe?</h3>
+    <div className="belief-builder" data-tour="lab-belief">
+      <div className="belief-builder-head">
+        <h3>What do you believe?</h3>
+        <button
+          type="button"
+          className="btn slim dark belief-reset"
+          onClick={onReset}
+          disabled={!active}
+        >
+          Reset to market
+        </button>
+      </div>
+
       <p className="selectline" aria-live="polite">
-        {selected ? (
-          buildBeliefSentence(selected, expiryLabel)
+        {active ? (
+          <>
+            I think BTC will {phrase} by{" "}
+            <ExpiryPicker
+              value={expiryLabel}
+              options={expiryOptions}
+              onChange={onExpiryChange}
+              disabled={expiryPickerDisabled}
+              className="selectchip"
+            />
+            .
+          </>
         ) : (
           <>
-            Pick one —{" "}
-            <span className="selectchip muted">higher</span>,{" "}
-            <span className="selectchip muted">lower</span>,{" "}
-            <span className="selectchip muted">more vol</span>, or{" "}
-            <span className="selectchip muted">less vol</span> than options imply.
+            Push the buttons for a rough shape, then drag the sliders below for fine control — by{" "}
+            <ExpiryPicker
+              value={expiryLabel}
+              options={expiryOptions}
+              onChange={onExpiryChange}
+              disabled={expiryPickerDisabled}
+              className="selectchip"
+            />
+            .
           </>
         )}
       </p>
 
-      <div className="belief-preset-grid" role="group" aria-label="Belief presets">
-        {BELIEF_PRESETS.map((preset) => {
-          const active = preset.id === selectedId;
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              className={`belief-preset${active ? " active" : ""}`}
-              aria-pressed={active}
-              onClick={() => handleSelect(preset)}
-              disabled={!hydrated}
-            >
-              {preset.label}
-            </button>
-          );
-        })}
+      <div className="belief-axis-list" aria-label="Belief controls">
+        <div className="belief-axis-row" role="group" aria-label="Price versus market">
+          <span className="belief-axis-label">Price</span>
+          <div className="belief-axis-pair">
+            <BeliefPairButton
+              label="Higher"
+              active={tuning.forward_mult > 1.002}
+              onClick={() => onNudge("higher")}
+            />
+            <BeliefPairButton
+              label="Lower"
+              active={tuning.forward_mult < 0.998}
+              onClick={() => onNudge("lower")}
+            />
+          </div>
+        </div>
+
+        <div className="belief-axis-row" role="group" aria-label="Volatility versus market">
+          <span className="belief-axis-label">Volatility</span>
+          <div className="belief-axis-pair">
+            <BeliefPairButton
+              label="More vol"
+              active={tuning.vol_mult > 1.02}
+              onClick={() => onNudge("more_vol")}
+            />
+            <BeliefPairButton
+              label="Less vol"
+              active={tuning.vol_mult < 0.98}
+              onClick={() => onNudge("less_vol")}
+            />
+          </div>
+        </div>
       </div>
 
       <p className="micro">
-        {selected
-          ? "This compares your view to the market curve — not a trade recommendation."
-          : "Tap a button to see how your view differs from what options price."}
+        {active
+          ? `Your view: ${viewLabel}. Buttons nudge the curve; sliders fine-tune.`
+          : "Each button push nudges the teal curve. Use Reset to return to the market view."}
       </p>
+      <p className="micro belief-tail-note">{BELIEF_TAIL_LIMIT_NOTE}</p>
     </div>
   );
 }

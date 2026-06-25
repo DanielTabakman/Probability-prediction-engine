@@ -167,11 +167,11 @@ When `watch_ntfy_commands.cmd` is running on the **VM** (started by headless sta
 | `status` | Desktop replies on ntfy with loop/watch state + operator brief |
 | `help` | Lists commands |
 
-**Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`build`**. No SSH, no RDP, no opening Cursor manually.
+**Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`my-secret build`** (prefix with `PPE_NTFY_CMD_SECRET`). No SSH, no RDP, no opening Cursor manually.
 
 **Fully automatic (default):** when `autoRemoteBuild` is true in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (or `PPE_AUTO_REMOTE_BUILD=1`), the **loop** and **mobile watch** start the desktop **agent CLI** on `IDE_BUILD` without a phone tap. Phone `build` remains a manual override. Disable: `set PPE_AUTO_REMOTE_BUILD=0`.
 
-Optional shared secret (set `PPE_NTFY_CMD_SECRET` in `ppe_operator_notify.local.cmd`):
+Set `PPE_NTFY_CMD_SECRET` in `ppe_operator_notify.local.cmd` (required for every command except `help`):
 
 ```text
 my-secret build
@@ -245,7 +245,7 @@ Manual Task Scheduler fields:
 | `PPE_NTFY_TOPIC` | Yes for mobile push | — |
 | `PPE_NTFY_SERVER` | No | `https://ntfy.sh` |
 | `PPE_NTFY_CMD_ENABLED` | No | enabled; `0` disables phone commands |
-| `PPE_NTFY_CMD_SECRET` | No | optional shared secret prefix for commands |
+| `PPE_NTFY_CMD_SECRET` | **Yes** for phone commands (except `help`) | long random string — prefix every command, e.g. `my-secret build` |
 | `PPE_NOTIFY` | No | enabled; `0` disables |
 | `PPE_WEEKLY_DIGEST_TOAST` | No | enabled; `0` skips Windows toast (phone push still uses ntfy) |
 | `PPE_NTFY_HEARTBEAT_HOURS` | No | `6` — OK ping interval while loop running; `0` disables |
@@ -263,6 +263,7 @@ Manual Task Scheduler fields:
 
 ## Related
 
+- [`SECURITY_OPERATOR_CHECKLIST_V1.md`](../DEPLOY/SECURITY_OPERATOR_CHECKLIST_V1.md) — ntfy secret, VPS smoke, Phase B TLS
 - [`DESKTOP_OPERATOR_SETUP_STARTER.md`](DESKTOP_OPERATOR_SETUP_STARTER.md)
 - [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)

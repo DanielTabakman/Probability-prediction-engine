@@ -90,6 +90,7 @@ On **desktop**:
 
 ```bat
 copy ppe_operator_notify.local.cmd.example ppe_operator_notify.local.cmd
+python scripts\bootstrap_operator_notify_secret.py
 ```
 
 Edit `PPE_NTFY_TOPIC=` to match phone subscription.
@@ -227,6 +228,7 @@ After merge → DESKTOP CONTINUE (finish on VM)
 
 ## Related
 
+- [`SECURITY_OPERATOR_CHECKLIST_V1.md`](../DEPLOY/SECURITY_OPERATOR_CHECKLIST_V1.md) — ntfy secret, VPS smoke, Phase B TLS
 - [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
 - [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md)

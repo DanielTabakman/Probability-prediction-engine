@@ -13,6 +13,22 @@ import {
 
 export type ExpressionLifecycle = "planned" | "simulated";
 
+export type PaperTradeStatus = "open" | "closed" | "expired";
+
+export type BeliefSnapshot = {
+  forwardMult: number;
+  volMult: number;
+};
+
+/** Mark captured at paper-trade save (display/proxy fields only — no TS math). */
+export type PaperTradeMarkSnapshot = {
+  spotUsd?: number;
+  netCostUsd?: number | null;
+  maxGainUsd?: number | null;
+  maxLossUsd?: number | null;
+  markedAt: string;
+};
+
 export type ExpressionRecord = {
   familyId: string;
   planHeadline: string;
@@ -20,6 +36,14 @@ export type ExpressionRecord = {
   legs: PlanLeg[];
   lifecycle: ExpressionLifecycle;
   updatedAt: string;
+  /** Paper-trade metadata (optional on planned drafts). */
+  expiryDate?: string;
+  instrument?: string;
+  beliefSnapshot?: BeliefSnapshot;
+  markAtSave?: PaperTradeMarkSnapshot;
+  savedAt?: string;
+  paperTradeStatus?: PaperTradeStatus;
+  closedAt?: string;
 };
 
 export const EXPRESSION_STORAGE_KEY = "msos.expression.preview.v1";
@@ -93,7 +117,7 @@ export async function fetchExpressionRecord(fallback: ExpressionRecord): Promise
     return fallback;
   }
   try {
-    const response = await fetch("/api/theses/expression", { cache: "no-store" });
+    const response = await fetch("/api/theses/expression", { cache: "no-store", credentials: "include" });
     if (!response.ok) {
       return loadExpressionRecord(fallback);
     }
@@ -122,10 +146,98 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
     await fetch("/api/theses/expression", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ expression: record }),
     });
   } catch {
     // local preview remains as offline fallback
+  }
+}
+
+export async function savePaperTrade(record: ExpressionRecord): Promise<{
+  expression: ExpressionRecord;
+  ok: boolean;
+  error?: string;
+}> {
+  const payload: ExpressionRecord = {
+    ...record,
+    lifecycle: "simulated",
+    paperTradeStatus: "open",
+    savedAt: record.savedAt ?? new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  saveExpressionRecord(payload);
+  if (typeof window === "undefined") {
+    return { expression: payload, ok: true };
+  }
+  try {
+    const response = await fetch("/api/theses/paper-trades", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ expression: payload }),
+    });
+    if (!response.ok) {
+      const body = (await response.json().catch(() => ({}))) as { error?: string };
+      return {
+        expression: payload,
+        ok: false,
+        error: body.error ?? "Could not save paper trade — confirm your view first.",
+      };
+    }
+    const body = (await response.json()) as { expression?: ExpressionRecord };
+    if (body.expression && isExpressionRecord(body.expression)) {
+      saveExpressionRecord(body.expression);
+      return { expression: body.expression, ok: true };
+    }
+    return { expression: payload, ok: true };
+  } catch {
+    return {
+      expression: payload,
+      ok: false,
+      error: "Network error — paper trade saved locally only.",
+    };
+  }
+}
+
+export async function deletePaperTradeById(tradeId: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function clearAllPaperTrades(): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch("/api/theses/paper-trades", {
+      method: "DELETE",
+      credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function closePaperTradeById(tradeId: string): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ action: "close" }),
+    });
+    return response.ok;
+  } catch {
+    return false;
   }
 }
 
