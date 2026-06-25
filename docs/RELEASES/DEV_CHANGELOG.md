@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-25
 
+- `6581bfc` — control-plane: final closeout steer after msos_usable_demo relay pass (#333) (`docs/SOP/`)
+- `8caa8ca` — MSOS monitor layout + context closeout steering (#332) (`docs/SOP/`)
+- `b86565f` — MSOS workflow manage + monitor cleanup (#331) (`apps/msos-web/`)
+- `59658b6` — Control-plane: dev changelog
 - `7c88fb9` — MSOS-PublicLaunchV1: workflow manage — paper trades, live confirm, monitor detail (#330) (`apps/msos-web/`)
 
 ## 2026-06-24
