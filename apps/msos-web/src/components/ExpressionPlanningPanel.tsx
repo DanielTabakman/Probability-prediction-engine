@@ -160,6 +160,9 @@ export function ExpressionPlanningPanel() {
     }
 
     void resumePendingSave();
+    return () => {
+      cancelled = true;
+    };
   }, [hydrated, thesisConfirmed]);
 
   useEffect(() => {
