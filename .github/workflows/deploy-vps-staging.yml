@@ -6,24 +6,56 @@ on:
   workflow_dispatch:
     inputs:
       git_ref:
-        description: "Git ref to deploy (branch or origin/branch; default staging)"
+        description: "Git ref to deploy (branch name or origin/branch; default main)"
         required: false
-        default: "staging"
+        default: "main"
+      ensure_dns:
+        description: "Try Cloudflare CNAME staging -> apex (needs CLOUDFLARE_API_TOKEN secret)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 concurrency:
   group: deploy-vps-staging
   cancel-in-progress: true
 
 jobs:
+  ensure-staging-dns:
+    name: Staging DNS (optional)
+    runs-on: ubuntu-latest
+    if: inputs.ensure_dns == 'true'
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Ensure Cloudflare CNAME staging -> apex
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+            echo "CLOUDFLARE_API_TOKEN not configured — add DNS manually:"
+            echo "  CNAME staging -> marketstructureos.com (Proxied)"
+            exit 0
+          fi
+          python scripts/cloudflare_ensure_staging_dns.py
+
   vps-staging-deploy:
     name: VPS staging deploy
+    needs: [ensure-staging-dns]
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
     env:
       PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
       PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
       PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
     steps:
-      - name: SSH staging deploy
+      - name: SSH staging bootstrap + deploy
         uses: appleboy/ssh-action@v1.2.5
         env:
           PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
@@ -40,11 +72,16 @@ jobs:
           envs: PPE_RESEARCH_OFFER_URL,PPE_RESEARCH_OFFER_EMAIL,PPE_RESEARCH_OFFER_LABEL,GIT_REF
           script: |
             set -euo pipefail
-            REF="${GIT_REF:-staging}"
+            REF="${GIT_REF:-main}"
             if [[ "$REF" != origin/* ]]; then
               REF="origin/${REF}"
             fi
-            bash /opt/marketstructureos/scripts/vps_deploy_staging.sh "$REF"
+            cd /opt/marketstructureos
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            bash scripts/vps_bootstrap_staging.sh
+            bash scripts/vps_deploy_staging.sh "$REF"
 
       - name: Checkout (staging verify)
         uses: actions/checkout@v7
@@ -53,16 +90,18 @@ jobs:
         run: |
           set -euo pipefail
           code="000"
-          for attempt in 1 2 3 4 5 6; do
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
             code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 60 https://staging.marketstructureos.com/ || true)
             if [ "$code" = "200" ]; then
               break
             fi
-            echo "Attempt $attempt/6: staging HTTP $code (waiting 30s)"
+            echo "Attempt $attempt: staging HTTP $code (waiting 30s for DNS/stack)"
             sleep 30
           done
           if [ "$code" != "200" ]; then
-            echo "Staging health check failed (HTTP $code) — add Cloudflare DNS A staging → VPS?"
+            echo "Staging health check failed (HTTP $code)"
+            echo "Add Cloudflare DNS: CNAME staging -> marketstructureos.com (Proxied)"
+            echo "Or set CLOUDFLARE_API_TOKEN + re-run with ensure_dns=true"
             exit 1
           fi
           python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com

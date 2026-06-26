@@ -12,8 +12,8 @@ Shared PPE services (`app_demo`, `ppe_display_api`, snapshots) are the same stac
 
 ## One-time VPS setup
 
-1. **DNS** (Cloudflare): **A** record `staging` → VPS IPv4 (**Proxied**).
-2. **Second checkout** on the VPS:
+1. **DNS** (Cloudflare): **CNAME** `staging` → `marketstructureos.com` (**Proxied**). Same VPS as production; Caddy routes by hostname. Automated when `CLOUDFLARE_API_TOKEN` is set in GitHub Actions secrets (see workflow **Deploy VPS Staging**).
+2. **Second checkout** on the VPS (automated by `scripts/vps_bootstrap_staging.sh` on first staging deploy):
 
 ```bash
 sudo mkdir -p /opt/marketstructureos-staging
@@ -28,7 +28,7 @@ cp /opt/marketstructureos/.env .env     # optional — research CTA, etc.
 
 ## Deploy staging (operator)
 
-**GitHub Actions (recommended):** Actions → **Deploy VPS Staging** → Run workflow → optional `git_ref` (default `staging`).
+**GitHub Actions (recommended):** Actions → **Deploy VPS Staging** → Run workflow → optional `git_ref` (default `main`).
 
 **SSH on VPS:**
 
