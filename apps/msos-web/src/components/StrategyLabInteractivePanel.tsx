@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import Link from "next/link";
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
 import { BeliefFineTuning } from "@/components/BeliefFineTuning";
@@ -22,6 +22,7 @@ import {
   type BeliefNudgeAxis,
   type BeliefTuning,
 } from "@/lib/beliefTuning";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import {
   buildOutcomeFromPayload,
   findSeriesByExpiry,
@@ -48,9 +49,11 @@ export function StrategyLabInteractivePanel({
   onExpiryChange,
   expiryOptions,
 }: StrategyLabInteractivePanelProps) {
+  const { formatMoney } = useDisplayCurrency();
   const [tuning, setTuning] = useState<BeliefTuning>(MARKET_TUNING);
   const [beliefPdfPct, setBeliefPdfPct] = useState<number[] | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [showFineTuning, setShowFineTuning] = useState(false);
 
   useEffect(() => {
     setTuning(loadStoredBeliefTuning());
@@ -124,14 +127,16 @@ export function StrategyLabInteractivePanel({
 
   const outcome = useMemo(() => {
     if (!active) {
-      return live && displayPayload ? buildOutcomeFromPayload(displayPayload) : defaultOutcome;
+      return live && displayPayload
+        ? buildOutcomeFromPayload(displayPayload, selectedExpiry, formatMoney)
+        : defaultOutcome;
     }
     try {
       return buildOutcomeFromTuning(tuning, displayPayload, live, selectedExpiry);
     } catch {
       return defaultOutcome;
     }
-  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry]);
+  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry, formatMoney]);
 
   return (
     <>
@@ -140,6 +145,7 @@ export function StrategyLabInteractivePanel({
           expiryLabel={selectedExpiry}
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
+          hideInlineExpiryPicker={false}
           tuning={tuning}
           onNudge={handleNudge}
           onReset={handleReset}
@@ -149,7 +155,7 @@ export function StrategyLabInteractivePanel({
           <div>
             <h2>Market vs your view</h2>
             <div className="panel-sub">
-              Purple curve = what BTC options imply today. Teal dashed = your belief when adjusted.
+              Purple = what option prices imply for this date. Teal = your view when adjusted.
             </div>
           </div>
           <span className="tag">Options</span>
@@ -162,17 +168,27 @@ export function StrategyLabInteractivePanel({
         ) : null}
 
         <div data-tour="lab-chart">
-        <PpeEmbedBoundary
-          payload={displayPayload}
-          live={live}
-          dataMode={dataMode}
-          selectedExpiry={selectedExpiry}
-          beliefLabel={active ? viewLabel : null}
-          beliefPdfPct={beliefPdfPct}
-        />
+          <PpeEmbedBoundary
+            payload={displayPayload}
+            live={live}
+            dataMode={dataMode}
+            selectedExpiry={selectedExpiry}
+            beliefLabel={active ? viewLabel : null}
+            beliefPdfPct={beliefPdfPct}
+          />
         </div>
 
-        <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
+        <button
+          type="button"
+          className="btn slim dark lab-advanced-toggle"
+          aria-expanded={showFineTuning}
+          onClick={() => setShowFineTuning((open) => !open)}
+        >
+          {showFineTuning ? "Hide fine-tuning sliders" : "Adjust more (sliders)"}
+        </button>
+        {showFineTuning ? (
+          <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
+        ) : null}
 
         <div className="legend chart-curve-legend" aria-label="Chart legend">
           <span>
@@ -186,35 +202,32 @@ export function StrategyLabInteractivePanel({
           </span>
         </div>
 
-        <div className="panel-head compact">
-          <div>
-            <h2>Other markets</h2>
-            <div className="panel-sub">BTC options are live. More assets coming.</div>
+        <details className="lab-advanced-markets">
+          <summary>Other markets (coming soon)</summary>
+          <div className="lab-list compact">
+            {lensTiles.map((tile) =>
+              tile.live && tile.href ? (
+                <Link key={tile.title} href={tile.href} className="lab-tile">
+                  <div className="lab-mark">{tile.mark}</div>
+                  <div>
+                    <h3>{tile.title}</h3>
+                    <p>{tile.description}</p>
+                  </div>
+                  <span className="tiny-pill">{tile.status}</span>
+                </Link>
+              ) : (
+                <div key={tile.title} className="lab-tile muted">
+                  <div className="lab-mark">{tile.mark}</div>
+                  <div>
+                    <h3>{tile.title}</h3>
+                    <p>{tile.description}</p>
+                  </div>
+                  <span className="tag muted">{tile.status}</span>
+                </div>
+              ),
+            )}
           </div>
-        </div>
-        <div className="lab-list compact">
-          {lensTiles.map((tile) =>
-            tile.live && tile.href ? (
-              <Link key={tile.title} href={tile.href} className="lab-tile">
-                <div className="lab-mark">{tile.mark}</div>
-                <div>
-                  <h3>{tile.title}</h3>
-                  <p>{tile.description}</p>
-                </div>
-                <span className="tiny-pill">{tile.status}</span>
-              </Link>
-            ) : (
-              <div key={tile.title} className="lab-tile muted">
-                <div className="lab-mark">{tile.mark}</div>
-                <div>
-                  <h3>{tile.title}</h3>
-                  <p>{tile.description}</p>
-                </div>
-                <span className="tag muted">{tile.status}</span>
-              </div>
-            ),
-          )}
-        </div>
+        </details>
       </div>
 
       <div className="panel outcome">

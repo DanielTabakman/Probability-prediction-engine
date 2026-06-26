@@ -19,4 +19,8 @@
 
 **First slice:** `MSOS-UsableDemoV1-Control-Slice001` (charter accept)
 
-**Operator:** run `run_ppe.cmd` or open IDE BUILD starter after manifest READY.
+**Operator:** after manifest READY, run `run_ppe.cmd` or open IDE BUILD starter.
+
+## Closeout note (2026-06-25)
+
+`msos_usable_demo_v1` marked **COMPLETE** — operator confirmed walkable demo. Next BUILD: [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md).

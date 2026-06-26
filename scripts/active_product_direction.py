@@ -58,6 +58,20 @@ class Direction:
     def current_stage(self) -> str:
         return str(self.raw.get("currentStage") or "")
 
+    @property
+    def milestone_label(self) -> str:
+        ms = self.raw.get("productMilestone") or {}
+        if isinstance(ms, dict):
+            return str(ms.get("label") or "")
+        return ""
+
+    @property
+    def milestone_charter(self) -> str:
+        ms = self.raw.get("productMilestone") or {}
+        if isinstance(ms, dict):
+            return str(ms.get("charter") or "")
+        return ""
+
 
 def load_direction(repo: Path) -> Direction:
     path = repo / DIRECTION_REL
@@ -89,6 +103,28 @@ def _side_channel_lines(direction: Direction) -> str:
     return "\n".join(lines) if lines else "- _(none)_"
 
 
+def _workstream_lines(direction: Direction) -> str:
+    streams = direction.raw.get("workstreams") or []
+    if not isinstance(streams, list) or not streams:
+        return "- _(none)_"
+    lines: list[str] = []
+    for ws in streams:
+        if not isinstance(ws, dict):
+            continue
+        label = str(ws.get("label") or ws.get("id") or "workstream")
+        status = str(ws.get("status") or "active")
+        doc = str(ws.get("doc") or "")
+        chapter = str(ws.get("chapterId") or "")
+        suffix = f" · `{chapter}`" if chapter else ""
+        if doc:
+            lines.append(
+                f"- **{label}** ({status}){suffix} — [`{Path(doc).name}`]({doc})"
+            )
+        else:
+            lines.append(f"- **{label}** ({status}){suffix}")
+    return "\n".join(lines) if lines else "- _(none)_"
+
+
 def _build_track_block(direction: Direction) -> str:
     track = direction.raw.get("buildTrack") or {}
     if not isinstance(track, dict):
@@ -105,14 +141,24 @@ def _build_track_block(direction: Direction) -> str:
 
 
 def render_frontier_block(direction: Direction) -> str:
+    milestone_block = ""
+    if direction.milestone_label:
+        charter = direction.milestone_charter
+        charter_link = f" · [`{Path(charter).name}`]({charter})" if charter else ""
+        milestone_block = (
+            f"\n- **Product milestone:** **{direction.milestone_label}**{charter_link}"
+        )
+    workstreams = ""
+    if direction.current_stage == "trader_workflow_integration":
+        workstreams = f"\n\n**Workstreams (milestone):**\n{_workstream_lines(direction)}"
     return f"""{MARKER_START}
 **Direction pivot:** `{direction.pivot_id}` · **as-of:** {direction.as_of}
 
 - **North star:** {direction.north_star}
-- **Primary focus:** {direction.primary_focus}
-- **Stage:** {direction.current_stage} — storyboard design **complete** ([`storyboard-v0.6`]({direction.storyboard_ref})); **BUILD** integration is active
-- **Active BUILD chapter:** `{direction.active_chapter_id}` · plan [`{Path(direction.active_plan_path).name}`]({direction.active_plan_path})
-- **Next steward action:** {direction.next_steward_action}
+- **Primary focus:** {direction.primary_focus}{milestone_block}
+- **Stage:** {direction.current_stage} — storyboard design **complete** ([`storyboard-v0.6`]({direction.storyboard_ref}))
+- **Active relay chapter:** `{direction.active_chapter_id}` · plan [`{Path(direction.active_plan_path).name}`]({direction.active_plan_path})
+- **Next steward action:** {direction.next_steward_action}{workstreams}
 
 **Retired (do not steer BUILD by these):**
 {_deprecated_lines(direction)}
@@ -138,6 +184,27 @@ def render_integrated_status_block(direction: Direction) -> str:
 
 
 def render_playbook_stage_block(direction: Direction) -> str:
+    if direction.current_stage == "trader_workflow_integration":
+        return f"""{MARKER_START}
+| Signal | Status |
+|--------|--------|
+| **Product milestone** | **{direction.milestone_label}** — [`{Path(direction.milestone_charter).name}`]({direction.milestone_charter}) |
+| Usable demo foundation | **COMPLETE** 2026-06-25 |
+| Self-serve onboarding | **ACTIVE** — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md) |
+| Wedge depth (relay) | **ACTIVE** — `{direction.active_chapter_id}` |
+| Learning loop | **ACTIVE** — research sessions + validation log ingestion |
+| Friends-first gating | **RETIRED** — pivot `{direction.pivot_id}` |
+
+**Risk:** Treating crypto chapter or a single feature as the whole milestone — judge **milestone complete-when** in charter, not relay closeout alone.
+{MARKER_END}"""
+    if direction.current_stage == "multi_asset_expansion":
+        return f"""{MARKER_START}
+| Signal | Status |
+|--------|--------|
+| Usable demo (`msos_usable_demo_v1`) | **COMPLETE** — operator confirmed walkable demo 2026-06-25 |
+| Active BUILD | **Crypto multi-asset** — [`{Path(direction.active_sprint).name}`]({direction.active_sprint}) |
+| Friends-first / research-first gating | **RETIRED** — pivot `{direction.pivot_id}` |
+{MARKER_END}"""
     return f"""{MARKER_START}
 | Signal | Status |
 |--------|--------|
@@ -151,6 +218,24 @@ def render_playbook_stage_block(direction: Direction) -> str:
 
 
 def render_mcd_after_pass_block(direction: Direction) -> str:
+    if direction.current_stage == "trader_workflow_integration":
+        return f"""{MARKER_START}
+| Field | Value |
+|-------|--------|
+| **Product milestone** | **{direction.milestone_label}** per pivot `{direction.pivot_id}` |
+| **MCD / usable demo** | **COMPLETE** — foundation for workflow integration |
+| **Learning loop** | **Active workstream** — not a BUILD blocker |
+| **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + milestone charter + active relay plan |
+{MARKER_END}"""
+    if direction.current_stage == "multi_asset_expansion":
+        return f"""{MARKER_START}
+| Field | Value |
+|-------|--------|
+| **Usable demo milestone** | **COMPLETE** — [`MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md`](MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md) |
+| **Active BUILD** | `{direction.active_chapter_id}` per pivot `{direction.pivot_id}` |
+| **Not a blocker** | Trader workflow research — optional parallel signal logging |
+| **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + active relay plan |
+{MARKER_END}"""
     return f"""{MARKER_START}
 | Field | Value |
 |-------|--------|
@@ -161,6 +246,22 @@ def render_mcd_after_pass_block(direction: Direction) -> str:
 
 
 def render_factory_focus_block(direction: Direction) -> str:
+    if direction.current_stage == "trader_workflow_integration":
+        return f"""{MARKER_START}
+| Priority | Focus |
+|----------|--------|
+| **1** | **Trader workflow integration** — milestone charter + four workstreams |
+| **2** | **Active relay** — `{direction.active_chapter_id}` (wedge depth) |
+| **3** | **Factory stability** — relay, autobuilder, gates, closeout |
+{MARKER_END}"""
+    if direction.current_stage == "multi_asset_expansion":
+        return f"""{MARKER_START}
+| Priority | Focus |
+|----------|--------|
+| **1** | **Crypto multi-asset BUILD** — BTC + ETH + registry ([`{Path(direction.active_sprint).name}`]({direction.active_sprint})) |
+| **2** | **Factory stability** — relay, autobuilder, gates, closeout |
+| **Side channel** | Optional validation notes when testers use the demo — **not** a BUILD gate |
+{MARKER_END}"""
     return f"""{MARKER_START}
 | Priority | Focus |
 |----------|--------|
@@ -171,6 +272,26 @@ def render_factory_focus_block(direction: Direction) -> str:
 
 
 def render_live_sequence_track_block(direction: Direction) -> str:
+    if direction.current_stage == "trader_workflow_integration":
+        return f"""{MARKER_START}
+| Track | Phases | When |
+|-------|--------|------|
+| **Foundation** | MCD + usable demo + embed shell | **COMPLETE** |
+| **Trader workflow integration (active)** | Self-serve + wedge depth + loop fidelity + learning loop | **Now** — pivot `{direction.pivot_id}` |
+| **Post-milestone** | Equity wedge · commercial pilot · modes 2–7 | **SELECTION after** milestone complete-when |
+
+Phases 4a–7b remain chartered — they are **not** the umbrella milestone; they support workflow when SELECTION'd.
+{MARKER_END}"""
+    if direction.current_stage == "multi_asset_expansion":
+        return f"""{MARKER_START}
+| Track | Phases | When |
+|-------|--------|------|
+| **Usable demo** | Storyboard BUILD + production wiring + embed shell + walkable witness | **COMPLETE** 2026-06-25 |
+| **Crypto multi-asset (active)** | Deribit ETH + asset registry + MSOS selector | **Now** — pivot `{direction.pivot_id}` |
+| **Post-crypto expansion** | 4a → 4b → 5 → 6 → 7a → 7b · equity options | **Only when SELECTION'd** after crypto chapter |
+
+Phases 4a–7b remain chartered for multi-user and commercial work — they are **not** the current default BUILD priority.
+{MARKER_END}"""
     return f"""{MARKER_START}
 | Track | Phases | When |
 |-------|--------|------|
@@ -182,16 +303,28 @@ Phases 4a–7b remain chartered for multi-user and commercial work — they are 
 
 
 def render_trader_research_banner(direction: Direction) -> str:
+    if direction.current_stage == "trader_workflow_integration":
+        return f"""{MARKER_START}
+> **Status (pivot `{direction.pivot_id}`):** **Learning loop workstream** — part of milestone [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md).  
+> Run self-serve and interview sessions; log **strong+** signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md); triage to backlog. **Not** a relay blocker.  
+> Scope authority: [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
+{MARKER_END}"""
     return f"""{MARKER_START}
 > **Status (pivot `{direction.pivot_id}`):** **Side channel — not primary BUILD gate.**  
-> Run sessions **after** or **in parallel with** usable demo BUILD; log signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).  
+> Run sessions on the walkable demo; log signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).  
 > Scope authority: [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 {MARKER_END}"""
 
 
 def render_continuity_active_build(direction: Direction) -> str:
+    milestone = ""
+    if direction.milestone_label:
+        charter = direction.milestone_charter
+        milestone = f"""**Milestone:** **{direction.milestone_label}** — [`{Path(charter).name}`]({charter})
+
+"""
     return f"""{MARKER_START}
-**`{direction.active_chapter_id}`** — {direction.primary_focus}
+{milestone}**Active relay:** `{direction.active_chapter_id}` — {direction.primary_focus}
 
 - **Sprint:** [`{Path(direction.active_sprint).name}`]({direction.active_sprint})
 - **Plan:** [`{Path(direction.active_plan_path).name}`]({direction.active_plan_path})
@@ -200,16 +333,19 @@ def render_continuity_active_build(direction: Direction) -> str:
 
 
 def render_whats_next(direction: Direction) -> str:
+    milestone_line = ""
+    if direction.milestone_label:
+        milestone_line = f"\n**Milestone:** {direction.milestone_label}\n"
     return f"""# What's next
 
 {MARKER_START}
 **Direction pivot:** `{direction.pivot_id}` · **as-of:** {direction.as_of}
-
+{milestone_line}
 **Primary focus:** {direction.primary_focus}
 
 **Next action:** {direction.next_steward_action}
 
-**Design complete:** storyboard v0.6 · **BUILD active:** `{direction.active_chapter_id}`
+**Active relay:** `{direction.active_chapter_id}`
 {MARKER_END}
 
 _New Cursor chat: ask **what's next?** — agent reads this file + `AGENT_CONTINUITY_BRIEF.md` + [`ACTIVE_PRODUCT_DIRECTION.json`](docs/SOP/ACTIVE_PRODUCT_DIRECTION.json)._

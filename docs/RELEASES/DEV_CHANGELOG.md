@@ -2,8 +2,30 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-26
+
+- `9995655` — steward: Trader Workflow Integration v1 milestone (#345)
+- `c0ef2ba` — Control-plane: dev changelog
+- `d620253` — PPE-CryptoMA-Core-Slice002: parameterize Deribit fetch + export asset_id (#343) (`docs/SOP/`)
+- `842380c` — Control-plane: dev changelog
+- `99a43ed` — fix(msos): lab setup row for expiry + currency UX (#342) (`apps/msos-web/`)
+- `dee0ee0` — MSOS journey crawler: fix 404 false positives in deploy witness (#340) (`scripts/`)
+- `b3b1c54` — build(deps): Bump actions/upload-artifact from 4 to 7 (#299)
+- `56e62e8` — MSOS onboarding polish: auth return, leg tips, monitor welcome (#338) (`apps/msos-web/`)
+- `52141bd` — MSOS: journey crawler in production deploy witness (#337) (`docs/SOP/`)
+
 ## 2026-06-25
 
+- `924968f` — build(deps): Bump better-sqlite3 in /apps/msos-web (#303) (`apps/msos-web/`)
+- `e31485a` — build(deps): Update google-api-python-client requirement (#336)
+- `ee9732f` — MSOS playwright witness: dismiss tutorial scrim in CI (#346) (`scripts/`)
+- `f80e7b3` — deploy witness: export PYTHONPATH for all production health scripts (#344)
+- `fe25b64` — MSOS paper planner UX: clarity for new options users (#334) (`apps/msos-web/`)
+- `29cb1cf` — Control-plane: dev changelog
+- `6581bfc` — control-plane: final closeout steer after msos_usable_demo relay pass (#333) (`docs/SOP/`)
+- `8caa8ca` — MSOS monitor layout + context closeout steering (#332) (`docs/SOP/`)
+- `b86565f` — MSOS workflow manage + monitor cleanup (#331) (`apps/msos-web/`)
+- `59658b6` — Control-plane: dev changelog
 - `7c88fb9` — MSOS-PublicLaunchV1: workflow manage — paper trades, live confirm, monitor detail (#330) (`apps/msos-web/`)
 
 ## 2026-06-24

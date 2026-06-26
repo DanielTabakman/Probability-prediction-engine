@@ -19,8 +19,9 @@ REPO = Path(__file__).resolve().parents[1]
 
 def test_load_direction_has_pivot() -> None:
     d = load_direction(REPO)
-    assert d.pivot_id == "usable-demo-build-v1"
-    assert d.active_chapter_id == "msos_usable_demo_v1"
+    assert d.pivot_id == "trader-workflow-integration-v1"
+    assert d.active_chapter_id == "ppe_crypto_multi_asset_v1"
+    assert d.milestone_label == "Trader Workflow Integration v1"
 
 
 def test_render_frontier_block_contains_markers() -> None:
@@ -28,7 +29,7 @@ def test_render_frontier_block_contains_markers() -> None:
     block = render_frontier_block(d)
     assert block.startswith(MARKER_START)
     assert block.endswith(MARKER_END)
-    assert "usable demo" in block.lower()
+    assert "workstream" in block.lower()
 
 
 def test_replace_marked_block_on_frontier() -> None:
@@ -38,7 +39,7 @@ def test_replace_marked_block_on_frontier() -> None:
     d = load_direction(REPO)
     updated, ok = _replace_marked_block(text, render_frontier_block(d))
     assert ok
-    assert "msos_usable_demo_v1" in updated
+    assert "ppe_crypto_multi_asset_v1" in updated
 
 
 def test_sync_product_direction_alias() -> None:

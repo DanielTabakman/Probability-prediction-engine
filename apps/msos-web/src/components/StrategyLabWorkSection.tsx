@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
-import { ExpiryPicker } from "@/components/ExpiryPicker";
+import { ExpiryMarketContextStrip } from "@/components/ExpiryMarketContextStrip";
+import { LabSetupRow } from "@/components/LabSetupRow";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
+import { buildExpiryMarketContext } from "@/lib/expiryMarketContext";
 import {
   buildLabMetricsFromPayload,
   listExpiryDates,
@@ -13,6 +15,7 @@ import {
   type LabMetric,
 } from "@/lib/ppeDisplayPayload";
 import { saveStrategyLabExpiry } from "@/lib/strategyLabExpiry";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 const DEMO_EXPIRY_OPTIONS = ["30 days", "60 days", "90 days"];
 
@@ -22,6 +25,7 @@ type StrategyLabWorkSectionProps = {
 };
 
 export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLabWorkSectionProps) {
+  const { formatMoney } = useDisplayCurrency();
   const live = dataMode === "live" && displayPayload != null;
   const expiryOptions = useMemo(
     () => (live && displayPayload ? listExpiryDates(displayPayload) : DEMO_EXPIRY_OPTIONS),
@@ -50,29 +54,42 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
         metric.label === "Expiry" ? { ...metric, value: resolvedExpiry } : metric,
       );
     }
-    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry);
+    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry, formatMoney);
+  }, [live, displayPayload, resolvedExpiry, formatMoney]);
+
+  const expiryContext = useMemo(() => {
+    if (!live || !displayPayload) return null;
+    return buildExpiryMarketContext(displayPayload, resolvedExpiry);
   }, [live, displayPayload, resolvedExpiry]);
 
   return (
     <>
-      <section className="metrics" aria-label="Lab context" data-tour="lab-expiry">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="metric">
-            <div className="label">{metric.label}</div>
-            {metric.label === "Expiry" ? (
-              <ExpiryPicker
-                className="metric-expiry-value"
-                value={resolvedExpiry}
-                options={expiryOptions}
-                onChange={handleExpiryChange}
-                disabled={expiryOptions.length <= 1}
-              />
-            ) : (
-              <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
-            )}
+      {expiryContext ? (
+        <ExpiryMarketContextStrip
+          context={expiryContext}
+          expiryOptions={expiryOptions}
+          onExpiryChange={handleExpiryChange}
+        />
+      ) : (
+        <section className="expiry-market-context" aria-label="Lab context">
+          <LabSetupRow
+            expiry={resolvedExpiry}
+            expiryOptions={expiryOptions}
+            onExpiryChange={handleExpiryChange}
+            expiryDisabled={expiryOptions.length <= 1}
+          />
+          <div className="metrics metrics-compact metrics-after-setup">
+            {metrics
+              .filter((metric) => metric.label !== "Expiry")
+              .map((metric) => (
+                <div key={metric.label} className="metric">
+                  <div className="label">{metric.label}</div>
+                  <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
+                </div>
+              ))}
           </div>
-        ))}
-      </section>
+        </section>
+      )}
 
       <section className="work strategy-lab-work">
         <StrategyLabInteractivePanel

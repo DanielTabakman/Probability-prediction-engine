@@ -4,11 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import type { PaperTradeSummary } from "@/lib/monitorHistoryFeed";
+import type { PaperTradeStatus } from "@/lib/expressionPersistence";
+import type { StoredExpression } from "@/lib/msosWorkflowStore";
 import {
   clearAllPaperTrades,
   closePaperTradeById,
   deletePaperTradeById,
 } from "@/lib/expressionPersistence";
+import { clearPaperTradeUndo, stashPaperTradeUndo } from "@/lib/paperTradeUndo";
+import { goToMonitorAfterDelete } from "@/lib/monitorNav";
 
 type Props = {
   trades: PaperTradeSummary[];
@@ -123,48 +127,46 @@ export function PaperTradeManageActions({ trades, variant = "monitor" }: Props) 
 }
 
 export function PaperTradeRowActions({
-  tradeId,
-  title,
+  trade,
   status,
 }: {
-  tradeId: string;
-  title: string;
-  status: string;
+  trade: StoredExpression;
+  status: PaperTradeStatus;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const title = trade.planHeadline;
 
-  async function run(action: () => Promise<boolean>, okMessage: string) {
+  async function runClose() {
     setBusy(true);
-    const ok = await action();
-    setMessage(ok ? okMessage : "Action failed — try again.");
+    const ok = await closePaperTradeById(trade.id);
+    setMessage(ok ? "Marked closed." : "Action failed — try again.");
     if (ok) router.refresh();
+    setBusy(false);
+  }
+
+  async function runDelete() {
+    setBusy(true);
+    stashPaperTradeUndo(trade);
+    const ok = await deletePaperTradeById(trade.id);
+    if (ok) {
+      goToMonitorAfterDelete(title);
+      return;
+    }
+    clearPaperTradeUndo();
+    setMessage("Could not delete paper trade — try again.");
     setBusy(false);
   }
 
   return (
     <div className="paper-trade-detail-actions">
       {status === "open" ? (
-        <button
-          type="button"
-          className="btn slim"
-          disabled={busy}
-          onClick={() => void run(() => closePaperTradeById(tradeId), "Marked closed.")}
-        >
+        <button type="button" className="btn slim" disabled={busy} onClick={() => void runClose()}>
           Mark closed
         </button>
       ) : null}
-      <button
-        type="button"
-        className="btn slim dark"
-        disabled={busy}
-        onClick={() => {
-          if (window.confirm(`Delete paper trade “${title}”?`)) {
-            void run(() => deletePaperTradeById(tradeId), "Deleted.");
-          }
-        }}
-      >
+      <button type="button" className="btn slim dark" disabled={busy} onClick={() => void runDelete()}>
         Delete
       </button>
       {message ? (

@@ -1,0 +1,116 @@
+{
+  "name": "ppe_crypto_multi_asset_v1 (Deribit BTC + ETH)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-CryptoMA-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Control-Slice001-crypto_ma",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-CryptoMA-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Core-Slice002-crypto_ma",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "src/data/fetch_deribit.py",
+        "src/viz/distribution_export.py",
+        "tests/test_distribution_export.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoMA-UI-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-UI-Slice003-crypto_ma",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app_cache.py",
+        "src/viz/embed_display_boundary.py",
+        "src/viz/strategy_suggestion_boundary.py",
+        "src/viz/app.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoMA-Product-Slice004",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Product-Slice004-crypto_ma",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabClientShell.tsx",
+        "apps/msos-web/src/lib/ppeDisplayPayload.ts",
+        "apps/msos-web/src/lib/buildThesisLabContext.ts",
+        "apps/msos-web/src/data/commandCenterFixtures.ts"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoMA-Platform-Slice005",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Platform-Slice005-crypto_ma",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/msos_production_demo_witness.py",
+        "docker-compose.yml",
+        "Caddyfile"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoMA-Witness-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Witness-Slice006-crypto_ma",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-CryptoMA-Closeout-Slice007",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoMA-Closeout-Slice007-crypto_ma",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_crypto_multi_asset_v1",
+        "chapterTitle": "PPE crypto multi-asset v1 (BTC + ETH)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
+        ]
+      }
+    }
+  ]
+}

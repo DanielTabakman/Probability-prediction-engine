@@ -1,0 +1,24 @@
+# Tradeable asset registry (v1) — Deribit crypto wedge
+# Consumed by PPE core/viz from slice PPE-CryptoMA-Core-Slice002 onward.
+# MSOS reads display payload metadata only — no math in TypeScript.
+
+version: 1
+default_asset_id: BTC
+
+assets:
+  BTC:
+    label: "BTC options"
+    venue: deribit
+    deribit_currency: BTC
+    price_unit: USD
+    spread_width: 5000
+    trust_notes: []
+
+  ETH:
+    label: "ETH options"
+    venue: deribit
+    deribit_currency: ETH
+    price_unit: USD
+    spread_width: 500
+    trust_notes:
+      - "Thinner books than BTC — BL curve may be noisier; surface trust state in lab."

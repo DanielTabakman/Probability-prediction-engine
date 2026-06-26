@@ -172,7 +172,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] MCD operator witness + production sign-off — COMPLETE 2026-06-21",
+      "reason": "[HIGH] MCD operator witness + production sign-off \u2014 COMPLETE 2026-06-21",
       "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md"
     },
     {
@@ -213,9 +213,21 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
-      "status": "ready",
-      "reason": "[P0] Usable demo BUILD \u2014 MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
+      "status": "done",
+      "reason": "[P0] Usable demo BUILD \u2014 COMPLETE 2026-06-25",
       "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+      "status": "ready",
+      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+      "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "status": "skipped",
+      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 after crypto chapter + G-04 validation",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
     }
   ]
 }

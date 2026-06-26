@@ -24,6 +24,13 @@ Copy from [`.env.example`](../../.env.example). Keys consumed at **`msos_web` bu
 | `NEXT_PUBLIC_MSOS_SIGN_IN_URL` | `msos_web` build | Sign-in link target (default `https://app.marketstructureos.com`) |
 | `NEXT_PUBLIC_PPE_EMBED_URL` | `msos_web` build | Strategy Lab iframe src (default `/ppe-embed` — Caddy → `app_demo`) |
 | `NEXT_PUBLIC_PPE_DISPLAY_API_URL` | `msos_web` build | Native chart JSON (default `/ppe-display-api/display.json` — Caddy → `ppe_display_api`) |
+| `NEXT_PUBLIC_MSOS_CAD_PER_USD` | `msos_web` build | Display-only FX: CAD per 1 USD (default `1.36`) |
+| `NEXT_PUBLIC_MSOS_EUR_PER_USD` | `msos_web` build | Display-only FX: EUR per 1 USD (default `0.92`) |
+| `NEXT_PUBLIC_MSOS_GBP_PER_USD` | `msos_web` build | Display-only FX: GBP per 1 USD (default `0.79`) |
+| `NEXT_PUBLIC_MSOS_AUD_PER_USD` | `msos_web` build | Display-only FX: AUD per 1 USD (default `1.53`) |
+| `NEXT_PUBLIC_MSOS_CHF_PER_USD` | `msos_web` build | Display-only FX: CHF per 1 USD (default `0.88`) |
+
+Display currency is **UI-only** — Deribit/PPE math stays USD. Rebuild `msos_web` after changing FX env vars.
 
 When research-offer vars are unset, homepage omits the CTA (honest public shell). When embed URL is unset at build, Strategy Lab shows degraded “Embed pending” state.
 

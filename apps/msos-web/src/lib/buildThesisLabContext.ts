@@ -31,33 +31,48 @@ function daysUntilExpiry(expiry: string): number {
   return Math.max(1, Math.ceil((parsed - Date.now()) / 86_400_000));
 }
 
+function buildDifferencePlain(marketPct: number, thesisPct: number, viewLabel: string): string {
+  if (!marketPct) {
+    return viewLabel;
+  }
+  const diff = marketPct - thesisPct;
+  if (Math.abs(diff) < 0.3) {
+    return "About the same range width as options imply";
+  }
+  const rel = Math.round((Math.abs(diff) / marketPct) * 100);
+  if (diff > 0) {
+    return `You expect a calmer market — ~${rel}% narrower than options imply`;
+  }
+  return `You expect more swing than options imply — ~${rel}% wider`;
+}
+
 export function buildCompareColumnsFromLab(
   payload: DisplayPayload | null,
   tuning: BeliefTuning,
 ): CompareColumn[] {
   if (!payload) {
     return [
-      { label: "Options market", value: "Live data loading…", tone: "amber" },
+      { label: "What options price in", value: "Loading live data…", tone: "amber" },
       { label: "Your view", value: buildTuningLabel(tuning), tone: "teal" },
-      { label: "Difference", value: "—", tone: "teal" },
+      { label: "The gap", value: "—", tone: "teal" },
     ];
   }
   const marketWidthStr = marketWidthFromPayload(payload);
   const marketPct = parsePctFromWidth(marketWidthStr) ?? 0;
   const thesisPct = Math.round(marketPct * tuning.vol_mult * 10) / 10;
-  const diff = Math.abs(marketPct - thesisPct);
-  const rel = marketPct > 0 ? Math.round((diff / marketPct) * 100) : 0;
   const viewLabel = buildTuningLabel(tuning);
   return [
     {
-      label: "Options market",
-      value: marketWidthStr.includes("%") ? marketWidthStr : `${marketPct}% range`,
+      label: "What options price in",
+      value: marketWidthStr.includes("%")
+        ? `Typical swing about ${marketWidthStr}`
+        : `Typical swing about ${marketPct}%`,
       tone: "amber",
     },
     { label: "Your view", value: viewLabel, tone: "teal" },
     {
-      label: "Difference",
-      value: marketPct ? `${diff.toFixed(1)} pts (~${rel}%)` : viewLabel,
+      label: "The gap",
+      value: buildDifferencePlain(marketPct, thesisPct, viewLabel),
       tone: "teal",
     },
   ];

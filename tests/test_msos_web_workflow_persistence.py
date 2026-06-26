@@ -67,6 +67,7 @@ def test_paper_trades_api_route_exists() -> None:
 def test_workflow_store_supports_paper_trade_manage() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "msosWorkflowStore.ts").read_text(encoding="utf-8")
     assert "deletePaperTrade" in lib
+    assert "restorePaperTrade" in lib
     assert "clearPaperTrades" in lib
     assert "closePaperTrade" in lib
     assert "effectivePaperTradeStatus" in lib
@@ -87,8 +88,12 @@ def test_monitor_history_feed_lists_paper_trades() -> None:
     assert "markLineForTrade" in lib
     assert "healthFromPaperTrades" in lib
     monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+    watch_list = (MSOS_WEB / "src" / "components" / "MonitorWatchList.tsx").read_text(encoding="utf-8")
     history = (MSOS_WEB / "src" / "components" / "HistoryContent.tsx").read_text(encoding="utf-8")
     assert "PaperTradeManageActions" not in monitor
+    assert "MonitorWatchList" in monitor
+    assert "Delete" in watch_list
+    assert "panel.tradeId" in watch_list
     assert "PaperTradeManageActions" in history
 
 
@@ -117,9 +122,24 @@ def test_expression_save_returns_error_surface() -> None:
         encoding="utf-8"
     )
     assert "deletePaperTradeById" in lib
-    assert "clearAllPaperTrades" in lib
-    assert "closePaperTradeById" in lib
+    assert "deletePaperTradeWithUndo" in lib
+    assert "restorePaperTrade" in lib
     assert "saveError" in panel
+
+
+def test_paper_trade_detail_redirects_when_missing() -> None:
+    page = (MSOS_WEB / "src" / "app" / "monitor" / "paper" / "[id]" / "page.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert 'redirect("/monitor")' in page
+    assert "notFound()" not in page
+
+
+def test_delete_from_detail_hard_navigates_to_monitor() -> None:
+    actions = (MSOS_WEB / "src" / "components" / "PaperTradeManageActions.tsx").read_text(encoding="utf-8")
+    nav = (MSOS_WEB / "src" / "lib" / "monitorNav.ts").read_text(encoding="utf-8")
+    assert "goToMonitorAfterDelete" in actions
+    assert "window.location.assign" in nav
 
 
 def test_workflow_session_scoping_exists() -> None:
@@ -133,10 +153,13 @@ def test_workflow_session_scoping_exists() -> None:
 
 def test_display_currency_module_exists() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "displayCurrency.ts").read_text(encoding="utf-8")
-    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    setup = (MSOS_WEB / "src" / "components" / "LabSetupRow.tsx").read_text(encoding="utf-8")
+    sidebar = (MSOS_WEB / "src" / "components" / "AppSidebar.tsx").read_text(encoding="utf-8")
     assert "formatMoney" in lib
-    assert "CAD" in lib
-    assert "CurrencySelect" in nav
+    assert "EUR" in lib
+    assert "CurrencySelect" in setup
+    assert "LabSetupRow" in setup
+    assert "CurrencySelect" in sidebar
 
 
 def test_expression_chart_fullscreen_frame() -> None:

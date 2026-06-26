@@ -17,7 +17,7 @@ import {
   valueToChartY,
 } from "@/lib/chartAxisDisplay";
 import { DEFAULT_CURVE_LABELS, type CurveDisplayLabels } from "@/lib/chartCurveLabels";
-import { formatUsd } from "@/lib/ppeDisplayPayload";
+import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 type LabeledDistributionChartProps = {
   pricesUsd: number[];
@@ -44,6 +44,7 @@ export function LabeledDistributionChart({
   curveLabels = DEFAULT_CURVE_LABELS,
   layout = LABELED_DISTRIBUTION_LAYOUT,
 }: LabeledDistributionChartProps) {
+  const { currency, formatMoney } = useDisplayCurrency();
   if (!pricesUsd.length || pricesUsd.length !== marketPdfPct.length) {
     return null;
   }
@@ -73,7 +74,7 @@ export function LabeledDistributionChart({
             <g key={`x-grid-${price}`}>
               <line x1={x} y1={box.y0} x2={x} y2={box.y1} stroke={gridStroke} />
               <text x={x} y={box.y1 + 16} fill={labelFill} fontSize="10" textAnchor="middle">
-                {formatAxisPrice(price)}
+                {formatAxisPrice(price, currency)}
               </text>
             </g>
           );
@@ -132,7 +133,7 @@ export function LabeledDistributionChart({
         ) : null}
         <line x1={spotX} y1={box.y0} x2={spotX} y2={box.y1} stroke="#233c55" strokeDasharray="5 8" />
         <text x={spotX + 4} y={box.y0 + 12} fill={labelFill} fontSize="10">
-          spot {formatUsd(spotUsd)}
+          spot {formatMoney(spotUsd)}
         </text>
       </svg>
       </div>

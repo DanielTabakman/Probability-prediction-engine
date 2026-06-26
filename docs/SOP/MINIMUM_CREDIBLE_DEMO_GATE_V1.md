@@ -73,9 +73,10 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `usable-demo-build-v1` |
-| **Not a blocker** | Trader workflow research — optional parallel signal logging |
-| **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + active relay plan |
+| **Product milestone** | **Trader Workflow Integration v1** per pivot `trader-workflow-integration-v1` |
+| **MCD / usable demo** | **COMPLETE** — foundation for workflow integration |
+| **Learning loop** | **Active workstream** — not a BUILD blocker |
+| **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + milestone charter + active relay plan |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---

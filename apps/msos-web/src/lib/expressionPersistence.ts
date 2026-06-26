@@ -3,6 +3,8 @@
  * Preview: browser localStorage only — sim-only save, no order transmission.
  */
 
+import type { StoredExpression } from "@/lib/msosWorkflowStore";
+import { clearPaperTradeUndo, stashPaperTradeUndo } from "@/lib/paperTradeUndo";
 import {
   optimizedPlan,
   planLegs,
@@ -157,6 +159,7 @@ export async function persistExpressionRecord(record: ExpressionRecord): Promise
 export async function savePaperTrade(record: ExpressionRecord): Promise<{
   expression: ExpressionRecord;
   ok: boolean;
+  authRequired?: boolean;
   error?: string;
 }> {
   const payload: ExpressionRecord = {
@@ -179,6 +182,14 @@ export async function savePaperTrade(record: ExpressionRecord): Promise<{
     });
     if (!response.ok) {
       const body = (await response.json().catch(() => ({}))) as { error?: string };
+      if (response.status === 401) {
+        return {
+          expression: payload,
+          ok: false,
+          authRequired: true,
+          error: "Sign in to save paper trades to your profile.",
+        };
+      }
       return {
         expression: payload,
         ok: false,
@@ -206,6 +217,52 @@ export async function deletePaperTradeById(tradeId: string): Promise<boolean> {
     const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
       method: "DELETE",
       credentials: "include",
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function fetchPaperTradeByIdClient(tradeId: string): Promise<StoredExpression | null> {
+  if (typeof window === "undefined") return null;
+  try {
+    const response = await fetch(`/api/theses/paper-trades/${encodeURIComponent(tradeId)}`, {
+      cache: "no-store",
+      credentials: "include",
+    });
+    if (!response.ok) return null;
+    const body = (await response.json()) as { expression?: StoredExpression };
+    return body.expression ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function deletePaperTradeWithUndo(
+  tradeId: string,
+): Promise<{ ok: boolean; title?: string }> {
+  const trade = await fetchPaperTradeByIdClient(tradeId);
+  if (!trade) {
+    return { ok: false };
+  }
+  stashPaperTradeUndo(trade);
+  const ok = await deletePaperTradeById(tradeId);
+  if (!ok) {
+    clearPaperTradeUndo();
+    return { ok: false };
+  }
+  return { ok: true, title: trade.planHeadline };
+}
+
+export async function restorePaperTrade(expression: StoredExpression): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  try {
+    const response = await fetch("/api/theses/paper-trades/restore", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ expression }),
     });
     return response.ok;
   } catch {

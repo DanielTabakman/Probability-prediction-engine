@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
+import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   fetchDisplayPayloadClient,
@@ -21,8 +22,10 @@ import {
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
 import {
+  PLATFORM_TUTORIAL_BEGINNER_QUERY,
   PLATFORM_TUTORIAL_QUERY,
   isPlatformTutorialComplete,
+  resolveTutorialSteps,
 } from "@/lib/platformTutorial";
 
 type StrategyLabClientShellProps = {
@@ -38,10 +41,15 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [tutorialBeginner, setTutorialBeginner] = useState(false);
 
   useEffect(() => {
     const forced = searchParams.get(PLATFORM_TUTORIAL_QUERY) === "1";
-    if (forced || !isPlatformTutorialComplete()) {
+    const beginner =
+      searchParams.get(PLATFORM_TUTORIAL_BEGINNER_QUERY) === "1" ||
+      searchParams.get(PLATFORM_TUTORIAL_QUERY) === "beginner";
+    setTutorialBeginner(beginner);
+    if (forced || beginner || !isPlatformTutorialComplete()) {
       setTutorialOpen(true);
     }
   }, [searchParams]);
@@ -116,9 +124,15 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         </div>
       ) : null}
 
+      <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
+
       <StrategyLabWorkSection displayPayload={payload} dataMode={mode} />
 
-      <PlatformTutorial active={tutorialOpen} onClose={() => setTutorialOpen(false)} />
+      <PlatformTutorial
+        active={tutorialOpen}
+        onClose={() => setTutorialOpen(false)}
+        steps={resolveTutorialSteps(tutorialBeginner)}
+      />
 
       <p className="footer-note">{DEMO_FOOTER}</p>
     </>

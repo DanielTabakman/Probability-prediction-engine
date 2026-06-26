@@ -1,5 +1,7 @@
 /** Public MSOS URLs — display only; no auth logic in TypeScript. */
 
+import { stashPostAuthReturnPath } from "@/lib/postAuthReturn";
+
 const DEFAULT_SIGN_IN_URL = "https://app.marketstructureos.com";
 
 export const MSOS_ROUTES = {
@@ -22,4 +24,17 @@ export function resolveSignInUrl(): string {
     return raw;
   }
   return DEFAULT_SIGN_IN_URL;
+}
+
+/** Sign-in URL with post-auth return path (browser only). */
+export function resolveSignInUrlWithReturn(returnPath: string): string {
+  const base = resolveSignInUrl();
+  if (typeof window === "undefined") {
+    return base;
+  }
+  const path = returnPath.startsWith("/") ? returnPath : `/${returnPath}`;
+  stashPostAuthReturnPath(path);
+  const returnTo = `${window.location.origin}${path}`;
+  const separator = base.includes("?") ? "&" : "?";
+  return `${base}${separator}returnTo=${encodeURIComponent(returnTo)}`;
 }

@@ -304,13 +304,35 @@
     },
     {
       "chapterId": "msos_usable_demo_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
       "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
-      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
+      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 COMPLETE 2026-06-25"
+    },
+    {
+      "chapterId": "ppe_crypto_multi_asset_v1",
+      "status": "queued",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "urgent": true,
+      "urgentReason": "Workstream B — wedge depth inside trader-workflow-integration v1 milestone",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md — workstream B",
+      "reason": "[MEDIUM] Deribit ETH + asset registry — workstream B of trader-workflow-integration v1"
+    },
+    {
+      "chapterId": "ppe_equity_options_v1",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "Defer",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+      "canonRef": "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md \u2014 G-04",
+      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until ppe_crypto_multi_asset_v1 COMPLETE + validation signal"
     }
   ]
 }

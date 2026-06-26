@@ -1,6 +1,6 @@
 "use client";
 
-import { ExpiryPicker } from "@/components/ExpiryPicker";
+import { ExpiryPicker, formatExpiryLabel } from "@/components/ExpiryPicker";
 import {
   buildTuningLabel,
   buildTuningPhrase,
@@ -15,6 +15,8 @@ type BeliefBuilderProps = {
   expiryOptions: string[];
   onExpiryChange: (expiry: string) => void;
   expiryPickerDisabled?: boolean;
+  /** When true, expiry is chosen in the strip above — show date as text only. */
+  hideInlineExpiryPicker?: boolean;
   tuning: BeliefTuning;
   onNudge: (axis: BeliefNudgeAxis) => void;
   onReset: () => void;
@@ -46,6 +48,7 @@ export function BeliefBuilder({
   expiryOptions,
   onExpiryChange,
   expiryPickerDisabled = false,
+  hideInlineExpiryPicker = false,
   tuning,
   onNudge,
   onReset,
@@ -53,6 +56,17 @@ export function BeliefBuilder({
   const active = !isMarketTuning(tuning);
   const viewLabel = buildTuningLabel(tuning);
   const phrase = buildTuningPhrase(tuning);
+  const expiryChip = hideInlineExpiryPicker ? (
+    <span className="selectchip muted">{formatExpiryLabel(expiryLabel)}</span>
+  ) : (
+    <ExpiryPicker
+      value={expiryLabel}
+      options={expiryOptions}
+      onChange={onExpiryChange}
+      disabled={expiryPickerDisabled}
+      className="selectchip"
+    />
+  );
 
   return (
     <div className="belief-builder" data-tour="lab-belief">
@@ -71,27 +85,12 @@ export function BeliefBuilder({
       <p className="selectline" aria-live="polite">
         {active ? (
           <>
-            I think BTC will {phrase} by{" "}
-            <ExpiryPicker
-              value={expiryLabel}
-              options={expiryOptions}
-              onChange={onExpiryChange}
-              disabled={expiryPickerDisabled}
-              className="selectchip"
-            />
-            .
+            I think BTC will {phrase} by {expiryChip}.
           </>
         ) : (
           <>
-            Push the buttons for a rough shape, then drag the sliders below for fine control — by{" "}
-            <ExpiryPicker
-              value={expiryLabel}
-              options={expiryOptions}
-              onChange={onExpiryChange}
-              disabled={expiryPickerDisabled}
-              className="selectchip"
-            />
-            .
+            Use the buttons below to say how you disagree with the market — for{" "}
+            {expiryChip}.
           </>
         )}
       </p>

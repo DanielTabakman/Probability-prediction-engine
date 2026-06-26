@@ -5,22 +5,31 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `usable-demo-build-v1` · **as-of:** 2026-06-21
+**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-25
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
-- **Primary focus:** BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
-- **Stage:** build_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/)); **BUILD** integration is active
-- **Active BUILD chapter:** `msos_usable_demo_v1` · plan [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
-- **Next steward action:** IDE_BUILD MSOS-UsableDemoV1-Product-Slice002 (msos_usable_demo_v1); PR #330 merged — smoke workflow manage on production
+- **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
+- **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
+- **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
+- **Active relay chapter:** `ppe_crypto_multi_asset_v1` · plan [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)
+- **Next steward action:** Execute crypto relay chapter (workstream B); parallel: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md
+
+**Workstreams (milestone):**
+- **Self-serve onboarding** (active) — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
+- **Wedge depth (BTC + ETH)** (active) · `ppe_crypto_multi_asset_v1` — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
+- **Workflow loop fidelity (P4–P7)** (active) — [`MSOS_Market_Interaction_Modes_v0.1.md`](docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
+- **Learning loop (research → backlog)** (active) — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)
 
 **Retired (do not steer BUILD by these):**
-- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `usable-demo-build-v1`
+- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `trader-workflow-integration-v1`
+- ~~trader workflow research as BUILD blocker (research informs; does not block relay)~~ — **retired** by pivot `trader-workflow-integration-v1`
+- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `trader-workflow-integration-v1`
+- ~~single-chapter milestones (demo-only, crypto-only) as top-level product frame~~ — **retired** by pivot `trader-workflow-integration-v1`
+- ~~operator-led live demo sessions as default client onboarding~~ — **retired** by pivot `trader-workflow-integration-v1`
 
 **Side channels (optional, not gates):**
-- **TRADER_WORKFLOW_RESEARCH_V1** ([`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)) — optional signal logging while demo is built — not scope authority
-- **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session notes when testers use the demo — not a gate
+- **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session + paid-interest log — feeds learning loop workstream
+- **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — next milestone candidate — after trader-workflow-integration v1 + G-04 signal
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).
@@ -249,6 +258,10 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 | P8 | `msos_p8_tester_release` | **done** | — |
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
+
+### Post-demo multi-asset — workstream B (active relay)
+
+**`ppe_crypto_multi_asset_v1`** is workstream **B** inside [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md). **READY** in [`PHASE_QUEUE.json`](PHASE_QUEUE.json).
 
 ### Non-goals (MSOS track)
 

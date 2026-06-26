@@ -1,5 +1,10 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
+import { MonitorDeleteNotice } from "@/components/MonitorDeleteNotice";
+import { MonitorWatchList } from "@/components/MonitorWatchList";
+import { MonitorWelcomeCard } from "@/components/MonitorWelcomeCard";
+import { MonitorEmptyState } from "@/components/MonitorEmptyState";
 import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
@@ -24,6 +29,8 @@ function actionableAlerts(feed: MonitorFeed) {
 export function MonitorContent({ feed }: Props) {
   const watchCount = activeWatchCount(feed.watchPanels);
   const alerts = actionableAlerts(feed);
+  const firstTrade = feed.paperTrades[0];
+  const firstTradeHref = firstTrade ? `/monitor/paper/${firstTrade.id}` : undefined;
 
   return (
     <>
@@ -48,6 +55,19 @@ export function MonitorContent({ feed }: Props) {
       </header>
 
       <section className="panel monitor-panel">
+        <Suspense fallback={null}>
+          <MonitorDeleteNotice />
+        </Suspense>
+
+        {feed.paperTrades.length > 0 ? (
+          <Suspense fallback={null}>
+            <MonitorWelcomeCard
+              paperTradeCount={feed.paperTrades.length}
+              firstTradeHref={firstTradeHref}
+            />
+          </Suspense>
+        ) : null}
+
         {feed.status === "degraded" ? (
           <p className="panel-sub degraded-feed-note" role="status">
             {friendlySnapshotFeedMessage(feed.degradedReason)}
@@ -68,31 +88,11 @@ export function MonitorContent({ feed }: Props) {
           {watchCount > 0 ? <span className="tag teal">{watchCount} active</span> : null}
         </div>
 
-        <div className="monitor-watch-list" aria-label="Watch list">
-          {feed.watchPanels.map((panel) => {
-            const row = (
-              <>
-                {panel.badge ? (
-                  <div className="monitor-watch-meta">
-                    <span className={`tag ${panel.tone}`}>{panel.badge}</span>
-                  </div>
-                ) : null}
-                <h3>{panel.title}</h3>
-                <p>{panel.body}</p>
-                {panel.markLine ? <p className="micro watch-mark">{panel.markLine}</p> : null}
-              </>
-            );
-            return panel.href ? (
-              <Link key={panel.id} href={panel.href} className="monitor-watch-row monitor-watch-link">
-                {row}
-              </Link>
-            ) : (
-              <div key={panel.id} className="monitor-watch-row">
-                {row}
-              </div>
-            );
-          })}
-        </div>
+        <MonitorWatchList panels={feed.watchPanels} />
+
+        {feed.paperTrades.length === 0 && feed.status !== "degraded" ? (
+          <MonitorEmptyState />
+        ) : null}
 
         {alerts.length > 0 ? (
           <div className="monitor-alerts" aria-label="Needs attention">
