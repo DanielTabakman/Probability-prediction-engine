@@ -143,6 +143,10 @@ jobs:
           python -m playwright install chromium
           python scripts/msos_production_demo_witness.py --write artifacts/health/msos_production_demo_witness.json
           PYTHONPATH=. python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
+          PYTHONPATH=. python scripts/msos_journey_crawler.py \
+            --base-url https://marketstructureos.com \
+            --flows routes missing-paper delete-paper \
+            --write-dir artifacts/health/msos_journey_crawler
 
       - name: Upload production witness artifacts
         uses: actions/upload-artifact@v4
