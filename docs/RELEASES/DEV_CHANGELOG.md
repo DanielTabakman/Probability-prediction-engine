@@ -4,6 +4,15 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- `d69776d` — fix(msos-web): keep platform tour step card in viewport (#362)
+- `e48f7f3` — feat(msos): self-serve onboarding v1 complete + equity undefer (#363) (`docs/SOP/`)
+- `6fafd5b` — feat(deploy): auto-bootstrap staging VPS + Cloudflare CNAME helper (#360) (`scripts/`)
+- `544976e` — fix(deploy): apex MSOS guard + staging environment (#357) (`scripts/`)
+- `598a9da` — control-plane: post-crypto closeout direction sync (#356) (`docs/SOP/`)
+- `a40c32a` — control-plane: always block Defer-tier propagate regardless of focus gate env (#355) (`scripts/`)
+- `f967837` — control-plane: focus-gate roadmap bootstrap and auto-select (#354) (`scripts/`)
+- `0d46de6` — control-plane: block Defer-tier backlog from auto-propagate (#353) (`docs/SOP/`)
+- `b0e7821` — Control-plane: dev changelog
 - **Chapter closed:** ppe_crypto_multi_asset_v1 chapter COMPLETE (#351) (`ppe_crypto_multi_asset_v1 chapter COMPLETE (#351)`)
 - `857fd73` — control plane/context closeout crypto complete (#350) (`apps/msos-web/`)
 - `1a61bcf` — control-plane: align direction test with crypto chapter complete (#349)
