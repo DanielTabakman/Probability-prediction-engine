@@ -4,6 +4,21 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- `b006529` — control-plane: Cursor-first BUILD worker checker (verify_build_worker.cmd) (`docs/SOP/`)
+- `7664ffc` — product(ppe-core): PPE-Universe-Core-Slice002 registry v2 (#376) (`docs/SOP/`)
+- `a349360` — control(evidence): PPE-Universe-Control-Slice001 charter witness CLOSED (#375) (`docs/SOP/`)
+- **Chapter closed:** PPE-Equity-Closeout-Slice008 chapter COMPLETE (#374) (`PPE-Equity-Closeout-Slice008 chapter COMPLETE (#374)`)
+- `c305e38` — control-plane: fix Codex CLI discovery on Windows (#373) (`docs/SOP/`)
+- `c302f71` — control(evidence): PPE-Equity-Witness-Slice007 NVDA pytest witness (#372) (`docs/SOP/`)
+- `74e7154` — platform: PPE-Equity-Platform-Slice006 NVDA production witness (#369) (`scripts/`)
+- `0cf3968` — product(msos-ui): PPE-Equity-Product-Slice005 NVDA Strategy Lab (#368) (`apps/msos-web/`)
+- `dba695a` — platform: auto-retarget stacked PRs to main after parent merge (#371)
+- `7c15cee` — ppe_tradeable_universe_program_v1: charter tier-1 asset expansion program (#370) (`docs/SOP/`)
+- `f5d9247` — product(ppe-ui): PPE-Equity-UI-Slice004 NVDA lab path (#367) (`src/viz/`)
+- `fd8707f` — product(ppe-core): PPE-Equity-Core-Slice003 forward/IV, trust, export (#366) (`scripts/`)
+- `ac230a7` — product(ppe-core): PPE-Equity-Core-Slice002 fetch_equity_options + NVDA registry (#365) (`scripts/`)
+- `94082df` — control(evidence): PPE-Equity-Control-Slice001 charter + adapter ADR (#364) (`docs/SOP/`)
+- `084d1ef` — Control-plane: dev changelog
 - **Chapter closed:** PPE equity options v1 (single ticker) (`PPE-Equity-Closeout-Slice008`)
 - `d69776d` — fix(msos-web): keep platform tour step card in viewport (#362)
 - `e48f7f3` — feat(msos): self-serve onboarding v1 complete + equity undefer (#363) (`docs/SOP/`)
