@@ -74,7 +74,7 @@ def test_strategy_lab_hierarchy_and_embed_boundary() -> None:
     assert "StrategyLabClientShell" in content
     assert "fetchDisplayPayloadClient" in shell
     assert "Sample mode" in copy
-    assert "ExpiryPicker" in work
+    assert "LabSetupRow" in work
 
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
