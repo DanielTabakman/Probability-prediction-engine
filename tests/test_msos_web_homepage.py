@@ -55,8 +55,10 @@ def test_platform_tutorial_wiring() -> None:
     assert "lab-asset" in lib
     assert "BTC or ETH" in lib
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
-    assert 'data-tour="lab-asset"' in shell
+    assert "LabAssetPicker" in shell
+    assert 'data-tour="lab-asset"' in picker
 
 
 def test_features_row_self_serve_entry() -> None:
