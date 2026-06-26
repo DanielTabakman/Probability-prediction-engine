@@ -47,6 +47,23 @@ def test_paper_trade_detail_uses_server_display_currency() -> None:
     assert "resolveDisplayCurrency" in page
 
 
+def test_belief_expiry_picker_enabled() -> None:
+    panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "hideInlineExpiryPicker={false}" in panel
+
+
+def test_lab_setup_row_has_expiry_and_currency() -> None:
+    setup = (MSOS_WEB / "src" / "components" / "LabSetupRow.tsx").read_text(encoding="utf-8")
+    strip = (MSOS_WEB / "src" / "components" / "ExpiryMarketContextStrip.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "LabSetupRow" in strip
+    assert "Display currency" in setup
+    assert "ExpiryPicker" in setup
+
+
 def test_monitor_mark_line_is_client_safe() -> None:
     mark = (MSOS_WEB / "src" / "lib" / "monitorMarkLine.ts").read_text(encoding="utf-8")
     watch = (MSOS_WEB / "src" / "components" / "MonitorWatchList.tsx").read_text(encoding="utf-8")

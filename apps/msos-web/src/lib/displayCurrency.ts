@@ -36,10 +36,10 @@ const LOCALE_BY_CURRENCY: Record<DisplayCurrency, string> = {
 
 export const DISPLAY_CURRENCY_OPTIONS: { id: DisplayCurrency; label: string }[] = [
   { id: "USD", label: "USD" },
-  { id: "CAD", label: "CAD ($)" },
-  { id: "EUR", label: "EUR (€)" },
-  { id: "GBP", label: "GBP (£)" },
-  { id: "AUD", label: "AUD ($)" },
+  { id: "CAD", label: "CAD" },
+  { id: "EUR", label: "EUR" },
+  { id: "GBP", label: "GBP" },
+  { id: "AUD", label: "AUD" },
   { id: "CHF", label: "CHF" },
 ];
 

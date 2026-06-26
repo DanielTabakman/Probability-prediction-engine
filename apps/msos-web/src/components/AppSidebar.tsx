@@ -31,7 +31,7 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
         </div>
       </Link>
 
-      <CurrencySelect className="sidebar-currency" />
+      <CurrencySelect className="sidebar-currency" variant="sidebar" />
 
       {tier ? (
         <div className="asset on entitlement-badge" data-tier={tier}>
