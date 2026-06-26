@@ -36,5 +36,5 @@ def test_command_center_fixtures_honest_labels() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert "Live" in fixtures or "Live" in fixtures.lower()
     assert "Planned" in fixtures
-    assert "Soon" in fixtures
+    assert '"ETH options", status: "Live"' in fixtures
     assert "disabled: true" in fixtures
