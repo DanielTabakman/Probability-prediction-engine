@@ -228,6 +228,25 @@ class TestPpeFocusGate(unittest.TestCase):
         self.assertFalse(focus.allowed)
         self.assertIn("Defer", focus.reason)
 
+    def test_defer_tier_blocks_even_when_focus_gate_disabled(self) -> None:
+        os.environ.pop("PPE_FOCUS_GATE", None)
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "equity",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "Defer",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        focus = evaluate_focus_gate(self.repo, self.plan_rel)
+        self.assertFalse(focus.allowed)
+
     def test_format_ide_focus_block(self) -> None:
         text = format_ide_focus_block(tier="P2", urgent_bypass=False)
         self.assertIn("North star", text)
