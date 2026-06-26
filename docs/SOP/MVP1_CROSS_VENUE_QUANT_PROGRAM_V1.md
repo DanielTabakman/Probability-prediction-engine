@@ -23,12 +23,14 @@ Not auto-trade. Not execution. Screening + evidence first.
 | 1 | `msos_storyboard_visual_parity_v1` | MEDIUM · 1 | P8 COMPLETE | MSOS visual parity |
 | 2 | `msos_public_demo_launch_v1` | MEDIUM · 1 | storyboard COMPLETE | Public demo + research beta CTA |
 | 3 | **`mvp1_cross_venue_prob_panel`** | MEDIUM · 2 | public demo COMPLETE | CSV export + daily snapshot (**PR #149** implementation) |
-| 4 | **`mvp1_cross_venue_scan_v1`** | MEDIUM · 3 | prob panel COMPLETE | Live scan → ranked report (no manual CSV) |
-| 5 | **`mvp1_cross_venue_backtest_v1`** | LOW | scan COMPLETE + snapshot history | Resolution scores, Brier, gap-bucket stats |
+| 4 | **`mvp1_cross_venue_scan_v1`** | **LOW · sideChannel** | prob panel COMPLETE | Live scan → ranked report (auto-promotes when relay idle) |
+| 5 | **`mvp1_cross_venue_backtest_v1`** | **LOW · sideChannel** | scan COMPLETE + snapshot history | Resolution scores, Brier, gap-bucket stats |
 
 **Next program (after cross-venue):** [`MVP1_MARKET_REGISTRY_PROGRAM_V1.md`](MVP1_MARKET_REGISTRY_PROGRAM_V1.md) — medium slots 4–6, low equity provider.
 
 Mechanical order: **high → medium → low**; within medium, **backlog file order** (slots 1–3 above).
+
+**Side-channel auto-run (scan + backtest):** rows with `"sideChannel": true` promote via [`ppe_propagate_queue.py`](../../scripts/ppe_propagate_queue.py) only when manifest is **COMPLETE** with empty `phasePlanPath`, the queue has **no READY** item, and no other side-channel row is already `queued`/`chartered`. Main-track `chartered` rows do **not** block side-channel promotion.
 
 ---
 

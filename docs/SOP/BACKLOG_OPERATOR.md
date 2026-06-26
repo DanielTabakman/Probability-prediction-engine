@@ -43,6 +43,7 @@ When a relay plan already exists, add `planPath` and `selectionRecord` (copy a n
 | `focusPlaybookTier` | Semantic tier: `P0`–`P4` or `defer` (playbook stack) |
 | `urgent` | `true` = bypass validation-report gate (log reason) |
 | `urgentReason` | One line — shown in operator skip messages |
+| `sideChannel` | `true` = spare-time auto-promote when manifest idle and queue has no READY (main-track chartered OK) |
 | `focusPlaybookTier` | **Required** on chartered rows with `planPath` — gate uses tier + `priority` (P2 + `low` proceeds while report DRAFT) |
 
 ## Focus gate (auto-select)
@@ -68,7 +69,7 @@ Omit `priority` → treated as **medium**.
 
 Scheduling (`ppe_propagate_queue.py`): **high → medium → low**; ties break by position in the file.
 
-One chapter runs at a time: while a row is `chartered` or `queued`, nothing else promotes.
+One chapter runs at a time on the **main track**: while a main-track row is `chartered` or `queued`, no other main-track row promotes. **`sideChannel: true`** rows are an exception — they may promote when manifest is idle even if a main-track chapter is `chartered`.
 
 ## Status
 

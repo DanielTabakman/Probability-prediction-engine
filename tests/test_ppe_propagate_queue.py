@@ -225,6 +225,39 @@ class TestPpePropagateQueue(unittest.TestCase):
         self.assertFalse(out.get("promoted"))
         self.assertIn("pipeline busy", str(out.get("reason", "")).lower())
 
+    def test_promote_side_channel_when_main_chartered_and_manifest_idle(self) -> None:
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        (plans / "side_relay.json").write_text(
+            json.dumps(
+                {
+                    "name": "side",
+                    "sprintSpecPath": "docs/SOP/SPRINT_SIDE.md",
+                    "selectionRecord": "docs/SOP/SEL_SIDE.md",
+                    "slices": [{"sliceId": "S-Closeout", "closeout": {"chapterId": "side"}}],
+                }
+            ),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "SPRINT_SIDE.md").write_text("# s\n", encoding="utf-8")
+        (self.repo / "docs" / "SOP" / "SEL_SIDE.md").write_text("# s\n", encoding="utf-8")
+        backlog = load_backlog(self.repo)
+        backlog["items"] = [
+            {"chapterId": "main", "status": "chartered", "planPath": "docs/SOP/PHASE_PLANS/next_relay.json"},
+            {
+                "chapterId": "side",
+                "status": "blocked",
+                "priority": "low",
+                "focusPlaybookTier": "P2",
+                "sideChannel": True,
+                "planPath": "docs/SOP/PHASE_PLANS/side_relay.json",
+            },
+        ]
+        save_backlog(self.repo, backlog)
+        save_manifest(self.repo, {"phasePlanPath": "", "status": "COMPLETE", "notes": ""})
+        out = promote_first_blocked_with_plan(self.repo, apply=True)
+        self.assertTrue(out.get("promoted"))
+        self.assertTrue(out.get("sideChannel"))
+
     def test_normalize_backlog_priority_defaults_medium(self) -> None:
         self.assertEqual(normalize_backlog_priority({}), "medium")
         self.assertEqual(normalize_backlog_priority({"priority": "HIGH"}), "high")
