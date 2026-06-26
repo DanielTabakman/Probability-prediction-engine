@@ -140,10 +140,11 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
 
   const regionRect = useMemo(() => {
     if (!region) return null;
-    const x0 = timeToX(parseMs(region.time_start_utc), scale);
-    const x1 = timeToX(parseMs(region.time_end_utc), scale);
-    const yTop = priceToY(region.price_max_usd, yMin, yMax);
-    const yBot = priceToY(region.price_min_usd, yMin, yMax);
+    const box = region.region;
+    const x0 = timeToX(parseMs(box.time_start_utc), scale);
+    const x1 = timeToX(parseMs(box.time_end_utc), scale);
+    const yTop = priceToY(box.price_max_usd, yMin, yMax);
+    const yBot = priceToY(box.price_min_usd, yMin, yMax);
     return { x: Math.min(x0, x1), y: Math.min(yTop, yBot), w: Math.abs(x1 - x0), h: Math.abs(yBot - yTop) };
   }, [region, scale, yMin, yMax]);
 
