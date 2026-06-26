@@ -80,6 +80,17 @@ def merge_each_pass_enabled(repo: Path) -> bool:
     return bool(g.get("mergeEachPass", True))
 
 
+def retarget_stacked_enabled(repo: Path) -> bool:
+    if not git_sync_enabled(repo):
+        return False
+    if _env_disabled("PPE_GIT_SYNC_RETARGET"):
+        return False
+    g = _git_sync_cfg(repo)
+    if g.get("retargetStackedPrs") is False:
+        return False
+    return bool(g.get("retargetStackedPrs", True))
+
+
 def _current_branch(repo: Path) -> str:
     proc = _git(repo, "branch", "--show-current")
     return (proc.stdout or "").strip() if proc.returncode == 0 else ""
@@ -394,6 +405,21 @@ def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
     return result
 
 
+def check_and_retarget_stacked_prs(repo: Path) -> dict[str, Any]:
+    """Retarget open PRs still based on a branch that already merged to main."""
+    repo = repo.resolve()
+    if not retarget_stacked_enabled(repo):
+        return {"action": "retarget_stacked", "skipped": True, "reason": "disabled"}
+    if not _gh_available():
+        return {"action": "retarget_stacked", "skipped": True, "reason": "gh not available"}
+
+    from scripts.retarget_stacked_prs import scan_and_retarget_stacked_prs
+
+    cfg = _git_sync_cfg(repo)
+    main = (str(cfg.get("pullBranch") or "main")).strip() or "main"
+    return scan_and_retarget_stacked_prs(repo, main=main)
+
+
 def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str) -> str | None:
     if not _gh_available():
         print("ppe_operator_git_sync: gh not available; skip PR", file=sys.stderr)
@@ -553,6 +579,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Label loop PRs automerge and squash-merge when CI is green",
     )
+    ap.add_argument(
+        "--retarget-stacked",
+        action="store_true",
+        help="Retarget child PRs to main when parent branch already merged",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
@@ -566,8 +597,10 @@ def main(argv: list[str] | None = None) -> int:
         results.append(maybe_auto_publish(repo))
     if args.check_merge:
         results.append(check_and_nudge_merges(repo))
+    if args.retarget_stacked:
+        results.append(check_and_retarget_stacked_prs(repo))
     if not results:
-        ap.error("specify --pull, --publish, --auto-publish, and/or --check-merge")
+        ap.error("specify --pull, --publish, --auto-publish, --check-merge, and/or --retarget-stacked")
         return 2
 
     if args.json:

@@ -1,0 +1,41 @@
+# Retarget stacked PRs when a parent slice merges to main.
+# See docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md § Stacked PRs
+name: Retarget stacked PRs
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  retarget-children:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Retarget child PRs to main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/retarget_stacked_prs.py \
+            --repo-root . \
+            --parent-branch "${{ github.event.pull_request.head.ref }}" \
+            --merged-pr "${{ github.event.pull_request.number }}"
+
+      - name: Scan for any other stale stacked bases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python scripts/retarget_stacked_prs.py --repo-root . --scan

@@ -68,7 +68,7 @@ def _run_auto(repo: Path, env: dict[str, str]) -> int:
 
 
 def _git_sync(repo: Path, env: dict[str, str]) -> int:
-    for step in ("--pull", "--auto-publish", "--check-merge"):
+    for step in ("--pull", "--auto-publish", "--check-merge", "--retarget-stacked"):
         rc = _run_script(repo, env, "ppe_operator_git_sync.py", "--repo-root", str(repo), step)
         if rc != 0:
             return rc

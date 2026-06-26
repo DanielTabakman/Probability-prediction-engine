@@ -16,6 +16,7 @@
     "pullEachPass": true,
     "publishEachPass": true,
     "mergeEachPass": true,
+    "retargetStackedPrs": true,
     "pullBranch": "main",
     "checkoutMainWhenOpsBranch": true,
     "pushAfterCommit": true,
