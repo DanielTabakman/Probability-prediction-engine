@@ -5,21 +5,24 @@ from __future__ import annotations
 import pytest
 
 from src.data.assets_registry import (
+    asset_venue,
     default_asset_id,
     deribit_currency,
     get_asset,
+    is_asset_enabled,
     load_assets_registry,
     spread_width_for_asset,
 )
 
 
 def test_assets_registry_schema() -> None:
+    load_assets_registry.cache_clear()
     reg = load_assets_registry()
     assert reg.get("version") == 1
     assert default_asset_id() == "BTC"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
-    assert set(assets) >= {"BTC", "ETH"}
+    assert set(assets) >= {"BTC", "ETH", "NVDA"}
     for asset_id in ("BTC", "ETH"):
         entry = assets[asset_id]
         assert entry.get("venue") == "deribit"
@@ -28,6 +31,9 @@ def test_assets_registry_schema() -> None:
         assert isinstance(entry.get("spread_width"), (int, float))
         assert entry.get("spread_width") > 0
         assert isinstance(entry.get("label"), str) and entry["label"]
+    nvda = assets["NVDA"]
+    assert nvda.get("venue") == "equity"
+    assert nvda.get("enabled") is False
 
 
 def test_deribit_currency_from_registry() -> None:
@@ -44,3 +50,14 @@ def test_spread_width_for_asset() -> None:
 def test_get_asset_unknown_raises() -> None:
     with pytest.raises(KeyError, match="unknown asset_id"):
         get_asset("DOGE")
+
+
+def test_deribit_currency_rejects_equity_asset() -> None:
+    load_assets_registry.cache_clear()
+    with pytest.raises(ValueError, match="equity venue"):
+        deribit_currency("NVDA")
+
+
+def test_spread_width_for_equity_registry() -> None:
+    load_assets_registry.cache_clear()
+    assert spread_width_for_asset("NVDA") == 25.0

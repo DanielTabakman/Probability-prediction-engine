@@ -1,4 +1,4 @@
-"""Load tradeable asset registry from config/assets.yaml (Deribit crypto wedge v1)."""
+"""Load tradeable asset registry from config/assets.yaml (Deribit crypto + equity wedge v1)."""
 
 from __future__ import annotations
 
@@ -45,8 +45,28 @@ def get_asset(asset_id: str | None = None) -> dict[str, Any]:
     return entry
 
 
+def asset_venue(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    return str(entry.get("venue") or "deribit").strip().lower()
+
+
+def is_asset_enabled(asset_id: str | None = None) -> bool:
+    entry = get_asset(asset_id)
+    if asset_venue(asset_id) == "equity":
+        return entry.get("enabled") is True
+    return True
+
+
+def equity_symbol(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    sym = entry.get("equity_symbol") or asset_id or default_asset_id()
+    return _normalize_asset_id(str(sym))
+
+
 def deribit_currency(asset_id: str | None = None) -> str:
     entry = get_asset(asset_id)
+    if asset_venue(asset_id) == "equity":
+        raise ValueError(f"asset {asset_id!r} is equity venue, not deribit")
     currency = _normalize_asset_id(str(entry.get("deribit_currency") or asset_id or default_asset_id()))
     if not currency:
         raise ValueError(f"asset {asset_id!r} missing deribit_currency")
@@ -56,6 +76,8 @@ def deribit_currency(asset_id: str | None = None) -> str:
 def spread_width_for_asset(asset_id: str | None = None) -> float:
     entry = get_asset(asset_id)
     width = entry.get("spread_width")
-    if width is None:
-        return 5000.0 if deribit_currency(asset_id) == "BTC" else 500.0
-    return float(width)
+    if width is not None:
+        return float(width)
+    if asset_venue(asset_id) == "equity":
+        return 25.0
+    return 5000.0 if deribit_currency(asset_id) == "BTC" else 500.0
