@@ -1,4 +1,4 @@
-"""Load tradeable asset registry from config/assets.yaml (Deribit crypto + equity wedge v1)."""
+"""Load tradeable asset registry from config/assets.yaml (registry v2)."""
 
 from __future__ import annotations
 
@@ -10,6 +10,7 @@ import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 ASSETS_PATH = _REPO_ROOT / "config" / "assets.yaml"
+TIER1_MANIFEST_PATH = _REPO_ROOT / "config" / "assets_tier1_manifest.yaml"
 
 
 def _normalize_asset_id(asset_id: str) -> str:
@@ -25,6 +26,23 @@ def load_assets_registry() -> dict[str, Any]:
     return data
 
 
+@lru_cache(maxsize=1)
+def load_tier1_manifest() -> dict[str, Any]:
+    if not TIER1_MANIFEST_PATH.is_file():
+        return {}
+    with TIER1_MANIFEST_PATH.open(encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    return data if isinstance(data, dict) else {}
+
+
+def registry_version() -> int:
+    reg = load_assets_registry()
+    try:
+        return int(reg.get("version") or 1)
+    except (TypeError, ValueError):
+        return 1
+
+
 def default_asset_id() -> str:
     reg = load_assets_registry()
     asset_id = _normalize_asset_id(str(reg.get("default_asset_id") or "BTC"))
@@ -33,13 +51,21 @@ def default_asset_id() -> str:
     return asset_id
 
 
-def get_asset(asset_id: str | None = None) -> dict[str, Any]:
+def _assets_mapping() -> dict[str, Any]:
     reg = load_assets_registry()
     assets = reg.get("assets")
     if not isinstance(assets, dict):
         raise ValueError("assets registry must define assets mapping")
+    return assets
+
+
+def list_asset_ids() -> list[str]:
+    return sorted(_normalize_asset_id(aid) for aid in _assets_mapping())
+
+
+def get_asset(asset_id: str | None = None) -> dict[str, Any]:
     aid = _normalize_asset_id(asset_id or default_asset_id())
-    entry = assets.get(aid)
+    entry = _assets_mapping().get(aid)
     if not isinstance(entry, dict):
         raise KeyError(f"unknown asset_id: {aid}")
     return entry
@@ -55,6 +81,78 @@ def is_asset_enabled(asset_id: str | None = None) -> bool:
     if asset_venue(asset_id) == "equity":
         return entry.get("enabled") is True
     return True
+
+
+def list_enabled_asset_ids() -> list[str]:
+    return [aid for aid in list_asset_ids() if is_asset_enabled(aid)]
+
+
+def asset_class(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    raw = entry.get("asset_class")
+    if raw:
+        return str(raw).strip().lower()
+    if asset_venue(asset_id) == "equity":
+        return "equity_mega"
+    return "crypto"
+
+
+def asset_tier(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    return str(entry.get("tier") or "core").strip().lower()
+
+
+def catalog_group(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    catalog = entry.get("catalog")
+    if isinstance(catalog, dict) and catalog.get("group"):
+        return str(catalog["group"]).strip().lower()
+    legacy = entry.get("catalog_group")
+    if legacy:
+        return str(legacy).strip().lower()
+    return asset_class(asset_id)
+
+
+def catalog_group_order() -> list[dict[str, str]]:
+    manifest = load_tier1_manifest()
+    catalog = manifest.get("catalog")
+    if not isinstance(catalog, dict):
+        return []
+    order = catalog.get("group_order")
+    if not isinstance(order, list):
+        return []
+    out: list[dict[str, str]] = []
+    for row in order:
+        if not isinstance(row, dict):
+            continue
+        gid = str(row.get("id") or "").strip()
+        label = str(row.get("label") or gid).strip()
+        if gid:
+            out.append({"id": gid, "label": label})
+    return out
+
+
+def catalog_entry_for_asset(asset_id: str) -> dict[str, Any]:
+    aid = _normalize_asset_id(asset_id)
+    entry = get_asset(aid)
+    trust = entry.get("trust_notes")
+    notes = [str(n) for n in trust] if isinstance(trust, list) else []
+    return {
+        "id": aid,
+        "label": str(entry.get("label") or f"{aid} options"),
+        "asset_class": asset_class(aid),
+        "venue": asset_venue(aid),
+        "tier": asset_tier(aid),
+        "catalog_group": catalog_group(aid),
+        "price_unit": str(entry.get("price_unit") or "USD"),
+        "trust_notes": notes,
+    }
+
+
+def list_catalog_entries(*, enabled_only: bool = True) -> list[dict[str, Any]]:
+    """Enabled assets with catalog picker metadata (no prices or curves)."""
+    ids = list_enabled_asset_ids() if enabled_only else list_asset_ids()
+    return [catalog_entry_for_asset(aid) for aid in ids]
 
 
 def equity_symbol(asset_id: str | None = None) -> str:

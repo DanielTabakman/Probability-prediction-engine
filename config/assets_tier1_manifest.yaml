@@ -26,7 +26,7 @@ chapters:
     status: complete
   ppe_equity_options_v1:
     assets: [NVDA]
-    status: in_progress
+    status: complete
   ppe_deribit_crypto_tier1_v1:
     assets: [SOL, BNB, XRP]
   ppe_equity_universe_tier1a_v1:
