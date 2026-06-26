@@ -129,6 +129,32 @@ def test_strategy_lab_fixtures_honest_lens_labels() -> None:
     assert "BTC options" in fixtures
 
 
+def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+    thesis_ctx = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
+    fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+
+    assert 'LAB_ASSET_QUERY_PARAM = "asset"' in payload_lib
+    assert "SUPPORTED_LAB_ASSET_IDS" in payload_lib
+    assert "buildDisplayApiUrl" in payload_lib
+    assert "price_axis_label" in payload_lib
+    assert "ETH price at expiry" in payload_lib
+    assert "fetchDisplayPayloadClient(" in shell
+    assert "normalizeLabAssetId" in shell
+    assert "belief-axis-pair" in shell
+    assert "data-asset={assetId}" in shell
+    assert "assetMeta.label" in shell
+
+    assert "resolveDisplayAssetMeta" in thesis_ctx
+    assert "I think ${asset.id} will" in thesis_ctx
+
+    eth_connected = fixtures.split('label: "ETH options"')[1].split("Event markets")[0]
+    assert "Live" in eth_connected
+    eth_tile = fixtures.split('title: "ETH options"')[1].split("Event markets")[0]
+    assert "enabled: true" in eth_tile
+
+
 def test_thesis_confirmation_route_and_narrative() -> None:
     page = MSOS_WEB / "src" / "app" / "strategy-lab" / "confirm" / "page.tsx"
     assert page.is_file()
@@ -151,7 +177,7 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert "confirmed" in persistence
 
     lab = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
-    assert 'href="/strategy-lab/confirm"' in lab
+    assert "/strategy-lab/confirm" in lab
 
 
 def test_nav_enables_strategy_lab() -> None:

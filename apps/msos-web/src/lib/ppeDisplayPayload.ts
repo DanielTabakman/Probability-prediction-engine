@@ -13,6 +13,70 @@ export const PPE_EMBED_ONLY_PARAM = "embed_only";
 
 export const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim();
 
+export const LAB_ASSET_QUERY_PARAM = "asset";
+
+export const DEFAULT_LAB_ASSET_ID = "BTC";
+
+export const SUPPORTED_LAB_ASSET_IDS = ["BTC", "ETH"] as const;
+
+export type LabAssetId = (typeof SUPPORTED_LAB_ASSET_IDS)[number];
+
+export type DisplayAssetMeta = {
+  id: string;
+  label: string;
+  price_axis_label?: string;
+  instrument_label?: string;
+};
+
+const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
+  BTC: {
+    id: "BTC",
+    label: "BTC options",
+    price_axis_label: "BTC price at expiry",
+    instrument_label: "BTC options",
+  },
+  ETH: {
+    id: "ETH",
+    label: "ETH options",
+    price_axis_label: "ETH price at expiry",
+    instrument_label: "ETH options",
+  },
+};
+
+export function normalizeLabAssetId(value: string | null | undefined): LabAssetId {
+  const upper = (value ?? "").trim().toUpperCase();
+  if (upper === "ETH") {
+    return "ETH";
+  }
+  return DEFAULT_LAB_ASSET_ID;
+}
+
+export function resolveDisplayAssetMeta(
+  payload: DisplayPayload | null | undefined,
+  assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
+): DisplayAssetMeta {
+  const payloadAsset = payload?.asset;
+  if (payloadAsset?.id && payloadAsset.id.toUpperCase() === assetId) {
+    const fallback = LAB_ASSET_FALLBACKS[assetId];
+    return {
+      ...fallback,
+      ...payloadAsset,
+      id: assetId,
+      label: payloadAsset.label || fallback.label,
+    };
+  }
+  return LAB_ASSET_FALLBACKS[assetId];
+}
+
+export function buildDisplayApiUrl(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
+  const base = PPE_DISPLAY_API_URL;
+  if (assetId === DEFAULT_LAB_ASSET_ID) {
+    return base;
+  }
+  const separator = base.includes("?") ? "&" : "?";
+  return `${base}${separator}${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+}
+
 export type DisplaySeries = {
   expiry_date: string;
   prices_usd: number[];
@@ -45,6 +109,7 @@ export type DisplayPayload = {
     table_rows?: DisplaySummaryRow[];
   };
   curve_labels?: CurveDisplayLabels;
+  asset?: DisplayAssetMeta;
 };
 
 export type LabMetric = {
@@ -141,8 +206,11 @@ export function buildLabMetricsFromPayload(
   payload: DisplayPayload,
   expiryDate?: string,
   formatUsdAmount: MoneyFormatter = formatUsd,
+  assetMeta?: DisplayAssetMeta,
 ): LabMetric[] {
   const fmt = resolveMoneyFormatter(formatUsdAmount);
+  const asset = assetMeta ?? resolveDisplayAssetMeta(payload);
+  const spotLabel = `Today's ${asset.id}`;
   const dates = listExpiryDates(payload);
   const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
   const primary = resolvedExpiry ? findSeriesByExpiry(payload, resolvedExpiry) : undefined;
@@ -153,7 +221,7 @@ export function buildLabMetricsFromPayload(
 
   return [
     { label: "Expiry", value: primary?.expiry_date ?? resolvedExpiry ?? "—" },
-    { label: "Today's BTC", value: fmt(payload.spot_usd) },
+    { label: spotLabel, value: fmt(payload.spot_usd) },
     {
       label: "Market best guess",
       value:
@@ -171,8 +239,12 @@ export function buildOutcomeFromPayload(
   payload: DisplayPayload,
   expiryDate?: string,
   formatUsdAmount: MoneyFormatter = formatUsd,
+  assetMeta?: DisplayAssetMeta,
 ): LabOutcomeSummary {
   const fmt = resolveMoneyFormatter(formatUsdAmount);
+  const asset = assetMeta ?? resolveDisplayAssetMeta(payload);
+  const instrument = asset.instrument_label ?? asset.label;
+  const spotLabel = `Today's ${asset.id}`;
   const dates = listExpiryDates(payload);
   const resolvedExpiry = expiryDate && dates.includes(expiryDate) ? expiryDate : dates[0];
   const lognormal = resolvedExpiry
@@ -190,10 +262,10 @@ export function buildOutcomeFromPayload(
     tag: "Live market",
     tagTone: "teal",
     delta: "—",
-    headline: "Here's what BTC options are pricing for your date.",
+    headline: `Here's what ${instrument} are pricing for your date.`,
     body: `For ${resolvedExpiry ?? "this expiry"}, the market's best guess is around ${medianLabel} and the middle-50% range is ${marketWidth}. Pick a view above to compare yours to the purple curve — then confirm when you're ready to plan a trade.`,
     scores: [
-      { label: "Today's BTC", value: fmt(payload.spot_usd), tone: "amber" },
+      { label: spotLabel, value: fmt(payload.spot_usd), tone: "amber" },
       { label: "Market guess", value: medianLabel, tone: "teal" },
       { label: "Your view", value: "Pick above", tone: "teal" },
       { label: "Next step", value: "Confirm", tone: "teal" },
@@ -227,8 +299,10 @@ export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<Disp
 }
 
 /** Browser / public-path fetch (relative display API). */
-export async function fetchDisplayPayloadClient(): Promise<DisplayPayload | null> {
-  return fetchDisplayPayloadFromUrl(PPE_DISPLAY_API_URL);
+export async function fetchDisplayPayloadClient(
+  assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
+): Promise<DisplayPayload | null> {
+  return fetchDisplayPayloadFromUrl(buildDisplayApiUrl(assetId));
 }
 
 /** Server-side fetch target (Docker internal); browser uses public relative path. */
@@ -240,6 +314,13 @@ function resolveDisplayApiFetchUrl(): string {
   return PPE_DISPLAY_API_URL;
 }
 
-export async function fetchDisplayPayload(): Promise<DisplayPayload | null> {
-  return fetchDisplayPayloadFromUrl(resolveDisplayApiFetchUrl());
+export async function fetchDisplayPayload(
+  assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
+): Promise<DisplayPayload | null> {
+  const serverUrl = resolveDisplayApiFetchUrl();
+  const fetchUrl =
+    assetId === DEFAULT_LAB_ASSET_ID
+      ? serverUrl
+      : `${serverUrl}${serverUrl.includes("?") ? "&" : "?"}${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+  return fetchDisplayPayloadFromUrl(fetchUrl);
 }

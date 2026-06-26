@@ -1,16 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
+  DEFAULT_LAB_ASSET_ID,
+  LAB_ASSET_QUERY_PARAM,
+  SUPPORTED_LAB_ASSET_IDS,
   fetchDisplayPayloadClient,
+  normalizeLabAssetId,
+  resolveDisplayAssetMeta,
   type DisplayPayload,
+  type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
 import {
   LAB_DATA_DEMO_PILL,
@@ -36,12 +42,33 @@ function resolveInitialMode(initialPayload: DisplayPayload | null): LabDataMode 
   return initialPayload ? "live" : "loading";
 }
 
+function buildAssetHref(
+  pathname: string,
+  searchParams: URLSearchParams,
+  assetId: LabAssetId,
+): string {
+  const params = new URLSearchParams(searchParams.toString());
+  if (assetId === DEFAULT_LAB_ASSET_ID) {
+    params.delete(LAB_ASSET_QUERY_PARAM);
+  } else {
+    params.set(LAB_ASSET_QUERY_PARAM, assetId);
+  }
+  const qs = params.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
+}
+
 export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShellProps) {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const selectedAssetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialBeginner, setTutorialBeginner] = useState(false);
+  const assetMeta = useMemo(
+    () => resolveDisplayAssetMeta(payload, selectedAssetId),
+    [payload, selectedAssetId],
+  );
 
   useEffect(() => {
     const forced = searchParams.get(PLATFORM_TUTORIAL_QUERY) === "1";
@@ -55,50 +82,77 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   }, [searchParams]);
 
   useEffect(() => {
-    if (initialPayload) {
-      setPayload(initialPayload);
-      setMode("live");
-      return;
-    }
-
     let cancelled = false;
+    setMode("loading");
+
     void (async () => {
-      const livePayload = await fetchDisplayPayloadClient();
+      const livePayload = await fetchDisplayPayloadClient(selectedAssetId);
       if (cancelled) {
         return;
       }
       if (livePayload) {
         setPayload(livePayload);
         setMode("live");
-      } else {
-        setPayload(null);
-        setMode("demo");
+        return;
       }
+      if (selectedAssetId === DEFAULT_LAB_ASSET_ID && initialPayload) {
+        setPayload(initialPayload);
+        setMode("live");
+        return;
+      }
+      setPayload(null);
+      setMode("demo");
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [initialPayload]);
+  }, [selectedAssetId, initialPayload]);
 
   const pillLabel =
     mode === "live" ? LAB_DATA_LIVE_PILL : mode === "loading" ? LAB_DATA_LOADING_PILL : LAB_DATA_DEMO_PILL;
   const pillClass =
     mode === "live" ? "pill live" : mode === "loading" ? "pill loading" : "pill demo sample";
 
+  const assetSwitchParams = useMemo(() => new URLSearchParams(searchParams.toString()), [searchParams]);
+
   return (
     <>
       <header className="topline">
         <div>
-          <div className="crumb">Strategy Lab · BTC options</div>
+          <div className="crumb">Strategy Lab · {assetMeta.label}</div>
           <h1 className="title">Strategy Lab</h1>
+          <nav className="belief-axis-pair" aria-label="Options asset" style={{ marginTop: 10, maxWidth: 220 }}>
+            {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
+              const active = assetId === selectedAssetId;
+              return (
+                <Link
+                  key={assetId}
+                  href={buildAssetHref(pathname, assetSwitchParams, assetId)}
+                  className={`belief-preset${active ? " active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                  data-asset={assetId}
+                >
+                  {assetId}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
         <div className="tools">
           <span className={pillClass} role="status">
             <span className="dot" aria-hidden="true" />
             {pillLabel}
           </span>
-          <Link href="/strategy-lab/confirm" className="btn slim primary" data-tour="lab-confirm">
+          <Link
+            href={
+              selectedAssetId === DEFAULT_LAB_ASSET_ID
+                ? "/strategy-lab/confirm"
+                : `/strategy-lab/confirm?${LAB_ASSET_QUERY_PARAM}=${selectedAssetId}`
+            }
+            className="btn slim primary"
+            data-tour="lab-confirm"
+          >
             Save your view
           </Link>
           <span className="avatar" aria-hidden="true">
