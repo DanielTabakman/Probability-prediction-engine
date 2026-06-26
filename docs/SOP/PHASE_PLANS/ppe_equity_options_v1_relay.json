@@ -114,7 +114,7 @@
         "evidenceDoc": "docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md",
         "sprintSpec": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
         "selectionOutcomeDoc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
-        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
         "carryDocs": [
           "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
         ]

@@ -36,6 +36,24 @@ Use this when **Allow auto-merge** is greyed out (typical for **private** repos 
 
 **Draft PRs:** no **`automerge`** label while draft; when you mark **Ready for review**, the label workflow runs again and the usual CI → merge path applies.
 
+### Stacked PRs (multi-slice chapters)
+
+When slice **A** merges to **`main`** before slice **B** is ready, open **B** with base = A’s branch for review. **Merge-on-green only watches PRs targeting `main`**, so children must be retargeted after the parent lands.
+
+**Automatic (no machine required):**
+
+1. **[`retarget-stacked-prs.yml`](../../.github/workflows/retarget-stacked-prs.yml)** — on any merge to **`main`**, retargets open PRs whose base was the merged head branch, then scans for any other stale stacks.
+2. **`merge-on-green`** + **`automerge`** label — after retarget, CI re-runs on the child PR; squash-merge when green.
+
+**Desktop loop (optional backup when the operator host is online):**
+
+- `ppe_operator_git_sync.py --retarget-stacked` (also runs each headless loop pass when `gitSync.retargetStackedPrs` is true).
+- Laptop one-shot: `python scripts/retarget_stacked_prs.py --scan`
+
+**Agent convention:** prefer **one PR → `main` per layer** when possible. If you stack for review, expect GitHub Actions to retarget children within minutes of the parent merge — no manual `gh pr edit` required.
+
+**Why this matters for laptop-only work:** push slices from any machine; GitHub retargets and merges the chain; **Deploy VPS** runs on **`main`** without the desktop operator.
+
 **Why a label:** merge-on-green only merges PRs that carry **`automerge`**, so stray or fork PRs are not merged by mistake (fork heads are skipped by the label workflow).
 
 **Permissions:** Uses the default **`GITHUB_TOKEN`** with `contents: write` and `pull-requests: write` (declared in the workflow). The workflow file must live on the **default branch** to receive `workflow_run` events.
@@ -111,6 +129,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 | PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. |
 | Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**. **Private Free:** confirm **Merge on green** ran (Actions tab) and **Workflow permissions** allow read/write. |
 | Merged but site old | [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D; confirm **Deploy VPS** run for that commit. |
+| Child PR green but not merging | Base may still be a feature branch — wait for **Retarget stacked PRs** workflow or run `python scripts/retarget_stacked_prs.py --scan`. |
 
 ## Related
 

@@ -1,0 +1,20 @@
+{
+  "name": "ppe_cme_commodity_v1 (CME GC SI CL — DEFERRED)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md",
+  "deferred": true,
+  "slices": [
+    {
+      "sliceId": "PPE-CME-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md",
+      "buildBranch": "build/auto/PPE-CME-Control-Slice001-cme",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "notes": "DEFERRED — do not auto-select until validation gates pass"
+    }
+  ]
+}
