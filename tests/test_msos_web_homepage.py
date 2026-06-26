@@ -38,24 +38,15 @@ def test_hero_simplified_with_tutorial_and_research_modal() -> None:
     assert '"use client"' in hero
     assert "ResearchBetaModal" in hero
     assert "strategyLabTutorialHref" in hero
-    assert "strategyLabBeginnerTourHref" in hero
-    assert "Take the 2-min tour" in hero
     assert "ActionLink" in hero
     assert "semantic-lock" not in hero
     assert "Open Command Center" not in hero
 
 
-def test_public_nav_retake_tour() -> None:
+def test_public_nav_restart_tour() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
-    assert "Retake tour" in nav
-    assert "strategyLabRetakeTourHref" in nav
-
-
-def test_strategy_lab_retake_tour_button() -> None:
-    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
-    assert "Retake tour" in shell
-    assert "strategyLabRetakeTourHref" in shell
-    assert "clearPlatformTutorialComplete" in shell
+    assert "Restart tour" in nav
+    assert "clearPlatformTutorialComplete" in nav
 
 
 def test_platform_tutorial_wiring() -> None:

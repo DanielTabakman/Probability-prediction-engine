@@ -32,7 +32,7 @@ def test_e2e_public_nav_covers_journey_entry_points() -> None:
     assert "MSOS_ROUTES.strategyLab" in nav or "strategy-lab" in nav
     assert "MSOS_ROUTES.commandCenter" in nav
     assert "MSOS_ROUTES.monitor" in nav
-    assert "Restart tour" in nav or "Retake tour" in nav
+    assert "Restart tour" in nav
     assert "resolveSignInUrl" in nav
     for segment in ("/strategy-lab", "/command-center", "/monitor", "/history", "/learn"):
         assert segment in routes

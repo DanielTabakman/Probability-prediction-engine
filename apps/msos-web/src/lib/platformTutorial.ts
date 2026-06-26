@@ -109,13 +109,3 @@ export function strategyLabTutorialHref(force = false): string {
   }
   return "/strategy-lab";
 }
-
-/** Short guided tour (~2 min) — beginner copy, four steps. */
-export function strategyLabBeginnerTourHref(): string {
-  return `/strategy-lab?${PLATFORM_TUTORIAL_QUERY}=1&${PLATFORM_TUTORIAL_BEGINNER_QUERY}=1`;
-}
-
-/** Re-open the platform tour (clears completion when URL loads). */
-export function strategyLabRetakeTourHref(beginner = false): string {
-  return beginner ? strategyLabBeginnerTourHref() : `/strategy-lab?${PLATFORM_TUTORIAL_QUERY}=1`;
-}

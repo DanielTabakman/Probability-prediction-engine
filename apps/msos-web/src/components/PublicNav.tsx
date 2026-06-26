@@ -1,13 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { ActionLink } from "@/components/ActionLink";
 import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
-import { strategyLabRetakeTourHref } from "@/lib/platformTutorial";
+import { clearPlatformTutorialComplete } from "@/lib/platformTutorial";
 
 export function PublicNav() {
   const signInUrl = resolveSignInUrl();
+  const router = useRouter();
+
+  const restartTour = () => {
+    clearPlatformTutorialComplete();
+    router.push("/strategy-lab?tutorial=1");
+  };
 
   return (
     <nav className="public-nav">
@@ -24,9 +31,9 @@ export function PublicNav() {
         </Link>
         <ActionLink href={MSOS_ROUTES.strategyLab}>Strategy Lab</ActionLink>
         <ActionLink href={MSOS_ROUTES.monitor}>Monitor</ActionLink>
-        <Link className="nav-text-btn" href={strategyLabRetakeTourHref()}>
-          Retake tour
-        </Link>
+        <button type="button" className="nav-text-btn" onClick={restartTour}>
+          Restart tour
+        </button>
         <div className="nav-actions">
           <a className="btn slim dark" href={signInUrl}>
             Sign in
