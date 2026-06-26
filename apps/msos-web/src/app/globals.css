@@ -409,7 +409,7 @@ button.btn:focus-visible {
 }
 
 .platform-tutorial-spotlight {
-  position: absolute;
+  position: fixed;
   border-radius: 14px;
   border: 2px solid rgba(67, 231, 211, 0.7);
   box-shadow: 0 0 0 9999px rgba(3, 8, 14, 0.45);
@@ -417,7 +417,7 @@ button.btn:focus-visible {
 }
 
 .platform-tutorial-card {
-  position: absolute;
+  position: fixed;
   z-index: 2;
   pointer-events: auto;
   border-radius: 14px;

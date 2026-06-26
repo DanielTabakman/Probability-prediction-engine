@@ -3,15 +3,16 @@
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { clearPlatformTutorialComplete } from "@/lib/platformTutorial";
+import { clearPlatformTutorialComplete, strategyLabForcedTourHref } from "@/lib/platformTutorial";
 
 type RestartTourButtonProps = {
   className?: string;
   children: ReactNode;
+  beginner?: boolean;
 };
 
 /** Clears tour completion and opens Strategy Lab — only use for explicit restart CTAs. */
-export function RestartTourButton({ className, children }: RestartTourButtonProps) {
+export function RestartTourButton({ className, children, beginner = false }: RestartTourButtonProps) {
   const router = useRouter();
 
   return (
@@ -20,7 +21,7 @@ export function RestartTourButton({ className, children }: RestartTourButtonProp
       className={className}
       onClick={() => {
         clearPlatformTutorialComplete();
-        router.push("/strategy-lab");
+        router.push(strategyLabForcedTourHref(beginner));
       }}
     >
       {children}
