@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- **Chapter closed:** PPE equity options v1 (single ticker) (`PPE-Equity-Closeout-Slice008`)
 - `d69776d` — fix(msos-web): keep platform tour step card in viewport (#362)
 - `e48f7f3` — feat(msos): self-serve onboarding v1 complete + equity undefer (#363) (`docs/SOP/`)
 - `6fafd5b` — feat(deploy): auto-bootstrap staging VPS + Cloudflare CNAME helper (#360) (`scripts/`)

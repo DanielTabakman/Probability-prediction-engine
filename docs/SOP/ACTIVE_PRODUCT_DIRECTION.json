@@ -27,12 +27,19 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-26",
       "evidence": "docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_equity_options_v1",
+      "label": "PPE equity options v1 (NVDA)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-26",
+      "evidence": "docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_equity_options_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
-  "nextStewardAction": "Finish ppe_equity_options_v1 closeout → ppe_tradeable_universe_v1 → urgent SOL chapter (ppe_deribit_crypto_tier1_v1); equity index batches defer behind SOL",
+  "activeBuildChapterId": "ppe_tradeable_universe_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+  "nextStewardAction": "Run ppe_auto_select --apply (done) then run_ppe.cmd on ppe_tradeable_universe_v1 Control-Slice001",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -77,7 +84,12 @@
     {
       "id": "equity_options_v1",
       "doc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
-      "role": "next relay chapter — NVDA single-ticker equity options"
+      "role": "COMPLETE — NVDA single-ticker equity wedge"
+    },
+    {
+      "id": "tradeable_universe_v1",
+      "doc": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
+      "role": "active relay — registry v2 + catalog API"
     }
   ],
   "buildTrack": {
@@ -86,7 +98,8 @@
     "chapters": [
       "ppe_crypto_multi_asset_v1",
       "msos_self_serve_onboarding_v1",
-      "ppe_equity_options_v1"
+      "ppe_equity_options_v1",
+      "ppe_tradeable_universe_v1"
     ]
   },
   "supersedes": {

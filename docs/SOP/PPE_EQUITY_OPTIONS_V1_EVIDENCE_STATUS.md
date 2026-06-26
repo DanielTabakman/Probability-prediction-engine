@@ -1,7 +1,7 @@
 # PPE equity options v1 — evidence status
 
 **Chapter:** `ppe_equity_options_v1`  
-**Status:** **IN PROGRESS** (SELECTED 2026-06-26)  
+**Status:** **COMPLETE** 2026-06-26  
 **SELECTION:** [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_equity_options_v1_relay.json`](PHASE_PLANS/ppe_equity_options_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_EQUITY_OPTIONS_V1.md`](SPRINT_PPE_EQUITY_OPTIONS_V1.md)  
@@ -16,7 +16,7 @@
 | PPE-Equity-Product-Slice005 | **CLOSED** | MSOS Strategy Lab NVDA ticker selector |
 | PPE-Equity-Platform-Slice006 | **CLOSED** | Production demo witness NVDA probe |
 | PPE-Equity-Witness-Slice007 | **CLOSED** | `tests/test_ppe_equity_witness.py` — flake handling + checklist |
-| PPE-Equity-Closeout-Slice008 | PENDING | Chapter close |
+| PPE-Equity-Closeout-Slice008 | **CLOSED** | Chapter steering sync + queue promote |
 
 ---
 

@@ -26,7 +26,7 @@
 | MSOS friction | `SUPPORTED_LAB_ASSET_IDS` hardcoding blocks scale |
 | Canon | G-05 bounded multi-asset — infrastructure before breadth |
 
-**Blocked until:** `ppe_equity_options_v1` **COMPLETE** (NVDA equity adapter witness green).
+**Blocked until:** ~~`ppe_equity_options_v1` **COMPLETE**~~ **satisfied** 2026-06-26.
 
 **First slice:** `PPE-Universe-Control-Slice001`
 
