@@ -89,4 +89,4 @@ See [`PPE_EQUITY_OPTIONS_ADAPTER_ADR.md`](PPE_EQUITY_OPTIONS_ADAPTER_ADR.md) for
 
 ## Sprint status
 
-**SELECTED** — SELECTION 2026-06-26; Control-Slice001 in progress.
+**IN PROGRESS** — Slices 001–007 CLOSED; Closeout-Slice008 pending.
