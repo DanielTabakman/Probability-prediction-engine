@@ -82,7 +82,8 @@ In Cloudflare DNS for `marketstructureos.com`:
 
 - **A** record: `@` → your VPS IPv4 (**Proxied**)
 - **A** record: `app` → your VPS IPv4 (**Proxied**)
-- **A** record: `staging` → your VPS IPv4 (**Proxied**) — optional; for MSOS staging shell
+- **A** record: `staging` → VPS IPv4 (**Proxied**) — optional; for MSOS staging shell
+- **Or CNAME:** `staging` → `marketstructureos.com` (**Proxied**) — preferred (no origin IP needed)
 
 ### 5) Cloudflare TLS mode (pick one)
 
