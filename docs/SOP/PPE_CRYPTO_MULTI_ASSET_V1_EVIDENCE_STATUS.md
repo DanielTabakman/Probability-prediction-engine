@@ -1,7 +1,7 @@
 # PPE crypto multi-asset v1 — evidence status
 
 **Chapter:** `ppe_crypto_multi_asset_v1`  
-**Status:** **IN PROGRESS** — SELECTION 2026-06-25 (G-05)  
+**Status:** **COMPLETE** 2026-06-26 — SELECTION 2026-06-25 (G-05)  
 **SELECTION:** [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
@@ -10,11 +10,11 @@
 |-------|--------|-------|
 | PPE-CryptoMA-Control-Slice001 | **CLOSED** | `config/assets.yaml` registry scaffold; SELECTION finalized |
 | PPE-CryptoMA-Core-Slice002 | **CLOSED** | Parameterized Deribit fetch (`currency`); `assets_registry.py`; export `asset_id` |
-| PPE-CryptoMA-UI-Slice003 | PENDING | Streamlit selector + embed `asset` payload |
-| PPE-CryptoMA-Product-Slice004 | PENDING | MSOS Strategy Lab asset switcher |
-| PPE-CryptoMA-Platform-Slice005 | PENDING | Deploy witness + display API query param |
-| PPE-CryptoMA-Witness-Slice006 | PENDING | pytest + operator checklist |
-| PPE-CryptoMA-Closeout-Slice007 | PENDING | Chapter COMPLETE |
+| PPE-CryptoMA-UI-Slice003 | **CLOSED** | Streamlit selector + embed `asset` payload |
+| PPE-CryptoMA-Product-Slice004 | **CLOSED** | MSOS Strategy Lab asset switcher |
+| PPE-CryptoMA-Platform-Slice005 | **CLOSED** | Deploy witness + display API query param |
+| PPE-CryptoMA-Witness-Slice006 | **CLOSED** | pytest + operator checklist |
+| PPE-CryptoMA-Closeout-Slice007 | **CLOSED** | Chapter COMPLETE |
 
 ---
 

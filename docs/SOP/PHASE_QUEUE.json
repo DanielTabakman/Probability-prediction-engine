@@ -272,12 +272,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
       "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "urgent": true,
-      "urgentReason": "Operator SELECTION \u2014 crypto before stocks"
+      "urgentReason": "Operator SELECTION \u2014 crypto before stocks",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",

@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "Milestone trader-workflow-integration-v1 — active relay ppe_crypto_multi_asset_v1 (workstream B)",
+  "status": "COMPLETE",
+  "notes": "ppe_crypto_multi_asset_v1 chapter COMPLETE 2026-06-26",
   "workerMode": "deterministic"
 }
