@@ -39,6 +39,19 @@ def test_equity_witness_slice007_closed_in_evidence_doc() -> None:
     assert "**CLOSED**" in row
 
 
+def test_equity_closeout_slice008_closed_in_evidence_doc() -> None:
+    body = EVIDENCE.read_text(encoding="utf-8")
+    assert "**COMPLETE** 2026-06-26" in body.split("**Status:**", 1)[1].split("\n", 1)[0]
+    row = body.split("PPE-Equity-Closeout-Slice008", 1)[1].split("\n", 1)[0]
+    assert "**CLOSED**" in row
+
+
+def test_equity_chapter_complete_selection_points_tradeable_universe() -> None:
+    sel = (SOP / "POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md").read_text(encoding="utf-8")
+    assert "**COMPLETE**" in sel
+    assert "POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md" in sel
+
+
 def test_production_demo_witness_probes_nvda() -> None:
     assert "NVDA" in MULTI_ASSET_DISPLAY_PROBE_IDS
 
