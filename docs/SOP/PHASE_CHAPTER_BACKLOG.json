@@ -357,12 +357,14 @@
     {
       "chapterId": "ppe_deribit_crypto_tier1_v1",
       "status": "chartered",
-      "priority": "medium",
-      "focusPlaybookTier": "P2",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "urgent": true,
+      "urgentReason": "Operator SOL-first \u2014 first tier-1 batch after universe infra; before equity index batches",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 2",
-      "reason": "[MEDIUM] SOL BNB XRP on Deribit \u2014 registry + witness batch"
+      "reason": "[HIGH] SOL (+ BNB/XRP) on Deribit \u2014 operator-priority tier-1 crypto batch"
     },
     {
       "chapterId": "ppe_equity_universe_tier1a_v1",

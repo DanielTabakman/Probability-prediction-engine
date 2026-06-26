@@ -12,9 +12,11 @@
 
 **SELECTED** 2026-06-26 — batch chapter #2 in tradeable universe program.
 
+**Operator priority (2026-06-26):** **SOL first** among new tradables — run immediately after `ppe_tradeable_universe_v1` closeout; defer equity index batches (SPY/QQQ) until SOL witness green.
+
 **Blocked until:** `ppe_tradeable_universe_v1` **COMPLETE**.
 
-**Assets:** SOL, BNB, XRP (from [`config/assets_tier1_manifest.yaml`](../../config/assets_tier1_manifest.yaml))
+**Assets:** SOL (primary), BNB, XRP (from [`config/assets_tier1_manifest.yaml`](../../config/assets_tier1_manifest.yaml))
 
 **First slice:** `PPE-CryptoT1-Control-Slice001`
 

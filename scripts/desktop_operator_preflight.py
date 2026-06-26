@@ -117,12 +117,16 @@ def check_build_worker(repo: Path) -> bool:
     worker = status.get("worker")
     pref = status.get("pref")
     reason = status.get("reason")
-    print(f"BUILD worker: pref={pref} headless={worker} reason={reason}")
-    if worker in ("cursor-cli", "codex-cli"):
+    mode = status.get("mode")
+    handoff = status.get("handoff_worker")
+    print(
+        f"BUILD worker: pref={pref} worker={worker} mode={mode} "
+        f"handoff={handoff} reason={reason}"
+    )
+    if mode == "headless" and worker in ("cursor-cli", "codex-cli"):
         _ok(f"headless BUILD worker ready ({worker})")
         return True
-    if worker == "manual":
-        handoff = status.get("handoff_worker")
+    if worker == "manual" or mode == "manual":
         if handoff == "codex-cli":
             _warn("headless blocked — desktop Codex handoff available")
         else:

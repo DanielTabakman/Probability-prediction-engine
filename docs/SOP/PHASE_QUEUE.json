@@ -296,26 +296,30 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[HIGH] Tradeable universe infrastructure \u2014 catalog API + MSOS picker",
+      "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
       "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Deribit crypto tier-1 SOL BNB XRP",
-      "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
+      "reason": "[HIGH] SOL-first Deribit tier-1 (SOL + BNB + XRP) \u2014 operator urgent",
+      "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+      "urgent": true,
+      "urgentReason": "Operator SOL-first \u2014 first tier-1 batch after universe infra",
+      "focusPlaybookTier": "P1"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Equity indices SPY QQQ IWM",
+      "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
     },
     {
@@ -333,7 +337,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Commodity ETF options GLD SLV USO",
+      "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
       "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
     },
     {

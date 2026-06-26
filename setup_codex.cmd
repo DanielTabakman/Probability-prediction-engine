@@ -14,6 +14,12 @@ if %ERRORLEVEL%==0 (
   goto :auth
 )
 
+if exist "%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe" (
+  echo [setup_codex] found standalone install at %LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe
+  "%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe" --version
+  goto :auth
+)
+
 if exist "%APPDATA%\npm\codex.cmd" (
   echo [setup_codex] found %APPDATA%\npm\codex.cmd
   echo Add npm global bin to PATH if codex is not found in new shells.
@@ -29,15 +35,21 @@ if errorlevel 1 (
 )
 
 :auth
+set "CODEX_EXE="
 where codex >nul 2>&1
-if errorlevel 1 (
-  echo [setup_codex] codex not on PATH yet — open a new terminal or add npm global bin.
+if %ERRORLEVEL%==0 set "CODEX_EXE=codex"
+if not defined CODEX_EXE if exist "%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe" (
+  set "CODEX_EXE=%LOCALAPPDATA%\Programs\OpenAI\Codex\bin\codex.exe"
+)
+if not defined CODEX_EXE if exist "%APPDATA%\npm\codex.cmd" set "CODEX_EXE=%APPDATA%\npm\codex.cmd"
+if not defined CODEX_EXE (
+  echo [setup_codex] codex not found — open a new terminal or re-run setup.
   exit /b 1
 )
 
 echo.
 echo [setup_codex] checking login status...
-codex login status
+"%CODEX_EXE%" login status
 if errorlevel 1 (
   echo.
   echo [setup_codex] run: codex login

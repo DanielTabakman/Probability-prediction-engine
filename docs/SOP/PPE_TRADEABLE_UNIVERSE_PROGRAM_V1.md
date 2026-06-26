@@ -42,6 +42,8 @@ Universe infrastructure (`ppe_tradeable_universe_v1`) **blocked until** `ppe_equ
 
 Mechanical order: finish **0**, then **1**, then **2–6** may interleave by steward SELECTION but default backlog order is crypto → indices → mega caps → commodity proxy.
 
+**Operator override (2026-06-26):** After **1** completes, chapter **2** (`ppe_deribit_crypto_tier1_v1`, **SOL**) is **urgent/high** — do not promote equity index batches (3–5) ahead of SOL witness.
+
 ---
 
 ## Target catalog (~25–30 enabled assets)

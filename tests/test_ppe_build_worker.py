@@ -13,12 +13,23 @@ from scripts.ppe_build_worker import (
     build_product_prompt,
     load_build_worker_pref,
     resolve_build_worker,
+    resolve_codex_cli,
 )
 
 
 def test_load_build_worker_pref_from_env(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_BUILD_WORKER", "codex")
     assert load_build_worker_pref(tmp_path) == PREF_CODEX
+
+
+def test_resolve_codex_cli_finds_standalone_windows_install(tmp_path, monkeypatch):
+    fake_exe = tmp_path / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
+    fake_exe.parent.mkdir(parents=True, exist_ok=True)
+    fake_exe.write_text("", encoding="utf-8")
+    monkeypatch.setattr("scripts.ppe_build_worker.shutil.which", lambda _name: None)
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.delenv("APPDATA", raising=False)
+    assert resolve_codex_cli() == str(fake_exe)
 
 
 def test_resolve_auto_prefers_cursor_when_available(tmp_path, monkeypatch):
