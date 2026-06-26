@@ -326,7 +326,7 @@
     },
     {
       "chapterId": "ppe_equity_options_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
