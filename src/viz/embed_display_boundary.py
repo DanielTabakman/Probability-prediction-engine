@@ -11,8 +11,15 @@ import json
 from typing import Any, Callable
 from urllib.parse import parse_qs
 
+from src.data.assets_registry import asset_venue, default_asset_id
 from src.engine.implied_distribution import build_distribution_chart_data, lognormal_pdf
 from src.viz.curve_display_labels import build_curve_display_labels
+from src.viz.lab_asset_selection import (
+    LAB_ASSET_QUERY_PARAM,
+    display_asset_meta,
+    lab_asset_id_from_environ,
+    normalize_lab_asset_id,
+)
 from src.viz.distribution_summary_panel import summary_panel_contract
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_TITLE
 
@@ -167,6 +174,13 @@ def _parse_float(value: str | float | int | None) -> float | None:
         return None
 
 
+def _chart_bounds_usd(forward: float, asset_id: str) -> tuple[float, float]:
+    aid = str(asset_id or default_asset_id()).strip().upper()
+    if asset_venue(aid) == "equity":
+        return max(1.0, forward * 0.35), forward * 2.5
+    return max(1000.0, forward * 0.4), forward * 2.2
+
+
 def build_chart_series_from_export_row(row: dict[str, str]) -> dict[str, Any] | None:
     """Lognormal reference curve for one expiry export row (skipped BL rows omitted)."""
     distribution = str(row.get("distribution") or "")
@@ -177,8 +191,8 @@ def build_chart_series_from_export_row(row: dict[str, str]) -> dict[str, Any] | 
     t_years = _parse_float(row.get("T_years"))
     if forward is None or vol is None or t_years is None or forward <= 0 or vol <= 0:
         return None
-    price_min = max(1000.0, forward * 0.4)
-    price_max = forward * 2.2
+    asset_id = str(row.get("asset") or default_asset_id()).strip().upper()
+    price_min, price_max = _chart_bounds_usd(forward, asset_id)
     chart = build_distribution_chart_data(
         forward=forward,
         vol_annual=vol,
@@ -216,8 +230,13 @@ def build_distribution_display_payload(
     as_of_utc: str,
     spot_usd: float,
     export_rows: list[dict[str, str]],
+    asset_id: str | None = None,
 ) -> dict[str, Any]:
     """JSON-serializable read-only payload for MSOS chart shell (no new math)."""
+    aid = normalize_lab_asset_id(asset_id)
+    if asset_id is None and export_rows and export_rows[0].get("asset"):
+        aid = normalize_lab_asset_id(str(export_rows[0]["asset"]))
+    asset_block = display_asset_meta(aid)
     summary = summary_panel_contract(export_rows)
     series = []
     for row in export_rows:
@@ -231,6 +250,7 @@ def build_distribution_display_payload(
         "kind": DISPLAY_PAYLOAD_KIND,
         "as_of_utc": as_of_utc,
         "spot_usd": spot_usd,
+        "asset": asset_block,
         "anchor_id": DIST_SUMMARY_ANCHOR_ID,
         "title": DIST_SUMMARY_TITLE,
         "summary": summary,
@@ -256,20 +276,28 @@ def serialize_distribution_display_payload(payload: dict[str, Any]) -> str:
     return json.dumps(payload, separators=(",", ":"), sort_keys=True)
 
 
-def build_live_distribution_display_payload() -> dict[str, Any]:
-    """Live Deribit-backed payload for platform WSGI / MSOS display API proxy."""
+def build_live_distribution_display_payload(
+    *,
+    asset_id: str | None = None,
+    environ: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Live options-backed payload for platform WSGI / MSOS display API proxy."""
     from src.viz.embed_only_lab import _load_export_rows
 
-    as_of_utc, spot_usd, export_rows = _load_export_rows()
+    aid = normalize_lab_asset_id(asset_id)
+    if environ is not None and asset_id is None:
+        aid = lab_asset_id_from_environ(environ)
+    as_of_utc, spot_usd, export_rows = _load_export_rows(asset_id=aid)
     return build_distribution_display_payload(
         as_of_utc=as_of_utc,
         spot_usd=spot_usd,
         export_rows=export_rows,
+        asset_id=aid,
     )
 
 
 def create_display_payload_wsgi_app(
-    payload_provider: Callable[[], dict[str, Any]],
+    payload_provider: Callable[..., dict[str, Any]],
 ) -> Callable[..., Any]:
     """Minimal WSGI app for platform proxy (display, belief overlay, strategy suggestion)."""
 
@@ -277,7 +305,7 @@ def create_display_payload_wsgi_app(
         path = (environ.get("PATH_INFO") or "").rstrip("/") or "/"
         if path in ("/", "/display.json"):
             try:
-                payload = payload_provider()
+                payload = payload_provider(environ)
             except Exception as exc:  # noqa: BLE001 — surface upstream fetch failures as JSON
                 err = json.dumps(
                     {"kind": "display_error", "error": str(exc)},
@@ -323,7 +351,7 @@ def create_display_payload_wsgi_app(
                 )
                 return [err]
             try:
-                payload = payload_provider()
+                payload = payload_provider(environ)
             except Exception as exc:  # noqa: BLE001
                 err = json.dumps(
                     {"kind": "belief_overlay_error", "error": str(exc)},
