@@ -240,3 +240,131 @@ def fetch_equity_spot(symbol: str | None = None, *, asset_id: str | None = None)
     except Exception as exc:
         logger.warning("equity spot failed for %s: %s", sym, exc)
     return None
+
+
+def _normalize_iv_decimal(iv: float | None) -> float | None:
+    if iv is None:
+        return None
+    try:
+        val = float(iv)
+    except (TypeError, ValueError):
+        return None
+    if val <= 0:
+        return None
+    if val > 2.0:
+        return val / 100.0
+    return val
+
+
+def fetch_equity_forward_and_iv_for_expiry(
+    expiry_ts: int,
+    spot_price: float,
+    *,
+    asset_id: str | None = None,
+    symbol: str | None = None,
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
+) -> dict[str, Any] | None:
+    """
+    Forward + ATM IV for one equity expiry.
+    v1: forward = spot (no dividend/carry); ATM IV from nearest call impliedVolatility.
+    """
+    sym = _resolve_symbol(asset_id=asset_id, symbol=symbol)
+    spot = float(spot_price)
+    atm_candidates: list[tuple[float, float | None]] = []
+    for _expiry, row_expiry_ts, option_type, row in _iter_chain_rows(sym, max_expiries=max_expiries):
+        if row_expiry_ts != int(expiry_ts) or option_type != "call":
+            continue
+        strike = row.get("strike")
+        if strike is None:
+            continue
+        try:
+            strike_f = float(strike)
+        except (TypeError, ValueError):
+            continue
+        iv = _normalize_iv_decimal(row.get("impliedVolatility"))
+        atm_candidates.append((strike_f, iv))
+    if not atm_candidates:
+        return None
+    _strike, iv = min(atm_candidates, key=lambda pair: abs(pair[0] - spot))
+    return {
+        "forward": spot,
+        "atm_iv": iv if iv is not None else 0.35,
+        "expiry_ts": int(expiry_ts),
+        "spot": spot,
+    }
+
+
+def fetch_equity_option_marks_by_expiry_full(
+    expiry_ts: int,
+    symbol: str | None = None,
+    *,
+    asset_id: str | None = None,
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
+) -> dict[str, list[dict[str, Any]]]:
+    """Call and put marks for one expiry (Deribit full-mark shape)."""
+    sym = _resolve_symbol(asset_id=asset_id, symbol=symbol)
+    res_calls: list[dict[str, Any]] = []
+    res_puts: list[dict[str, Any]] = []
+    for expiry, row_expiry_ts, option_type, row in _iter_chain_rows(sym, max_expiries=max_expiries):
+        if row_expiry_ts != int(expiry_ts):
+            continue
+        strike = row.get("strike")
+        if strike is None:
+            continue
+        try:
+            strike_f = float(strike)
+        except (TypeError, ValueError):
+            continue
+        mark = _row_mark_usd(row)
+        if mark is None:
+            continue
+        oi = row.get("openInterest")
+        try:
+            open_interest = int(oi) if oi is not None and not pd.isna(oi) else 0
+        except (TypeError, ValueError):
+            open_interest = 0
+        entry = {
+            "strike": strike_f,
+            "mark_btc": float(mark),
+            "open_interest": open_interest,
+            "expiry_date_str": expiry,
+        }
+        if option_type == "call":
+            res_calls.append(entry)
+        else:
+            res_puts.append(entry)
+    res_calls.sort(key=lambda x: x["strike"])
+    res_puts.sort(key=lambda x: x["strike"])
+    return {"calls": res_calls, "puts": res_puts}
+
+
+MIN_EQUITY_CALL_MARKS_FOR_BL = 3
+MIN_EQUITY_TOTAL_OPEN_INTEREST = 100
+
+
+def assess_equity_chain_trust(
+    call_marks: list[dict[str, Any]],
+    *,
+    min_marks: int = MIN_EQUITY_CALL_MARKS_FOR_BL,
+    min_total_oi: int = MIN_EQUITY_TOTAL_OPEN_INTEREST,
+) -> dict[str, Any]:
+    """Trust flags for equity option chains (v1 honest labeling)."""
+    flags: list[str] = ["dividend_caveat_unmodeled"]
+    if len(call_marks) < min_marks:
+        flags.append("insufficient_marks")
+    total_oi = sum(int(m.get("open_interest") or 0) for m in call_marks)
+    if total_oi < min_total_oi:
+        flags.append("thin_open_interest")
+    return {
+        "trust_flags": flags,
+        "trust_ok": "insufficient_marks" not in flags,
+        "total_open_interest": total_oi,
+    }
+
+
+def format_equity_trust_suffix(trust: dict[str, Any]) -> str:
+    flags = trust.get("trust_flags") or []
+    extra = [f for f in flags if f != "dividend_caveat_unmodeled"]
+    if not extra:
+        return "dividend_caveat_unmodeled"
+    return "|".join(flags)

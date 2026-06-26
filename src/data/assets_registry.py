@@ -81,3 +81,13 @@ def spread_width_for_asset(asset_id: str | None = None) -> float:
     if asset_venue(asset_id) == "equity":
         return 25.0
     return 5000.0 if deribit_currency(asset_id) == "BTC" else 500.0
+
+
+def contract_multiplier(asset_id: str | None = None) -> float:
+    entry = get_asset(asset_id)
+    mult = entry.get("contract_multiplier")
+    if mult is not None:
+        return float(mult)
+    if asset_venue(asset_id) == "equity":
+        return 100.0
+    return 1.0

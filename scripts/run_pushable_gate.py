@@ -342,6 +342,8 @@ def main(argv: list[str] | None = None) -> int:
                     return "PLATFORM"
                 if path.startswith("tests/test_fetch_") or path.startswith("tests/test_assets_registry"):
                     return "PPE_CORE"
+                if path.startswith("tests/test_equity_distribution"):
+                    return "PPE_CORE"
                 if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
                     return "MSOS_UI"
                 if path.startswith("docs/"):
