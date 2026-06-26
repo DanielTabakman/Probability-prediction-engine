@@ -203,14 +203,71 @@ def _priority_sort_key(index: int, item: dict[str, Any]) -> tuple[int, int]:
     return (PRIORITY_RANK[normalize_backlog_priority(item)], index)
 
 
-def _pipeline_busy(backlog: dict[str, Any]) -> bool:
-    """True when a chapter is already queued or chartered in the backlog pipeline."""
+def _is_side_channel(item: dict[str, Any]) -> bool:
+    raw = item.get("sideChannel")
+    if raw is True:
+        return True
+    if isinstance(raw, str) and raw.strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    return False
+
+
+def _pipeline_busy(backlog: dict[str, Any], *, main_track_only: bool = False) -> bool:
     for item in _backlog_items(backlog):
         if not isinstance(item, dict):
+            continue
+        if main_track_only and _is_side_channel(item):
             continue
         if _backlog_item_status(item) in ("chartered", "queued"):
             return True
     return False
+
+
+def _main_pipeline_busy(backlog: dict[str, Any]) -> bool:
+    return _pipeline_busy(backlog, main_track_only=True)
+
+
+def _side_channel_pipeline_busy(backlog: dict[str, Any]) -> bool:
+    for item in _backlog_items(backlog):
+        if not isinstance(item, dict) or not _is_side_channel(item):
+            continue
+        if _backlog_item_status(item) in ("chartered", "queued"):
+            return True
+    return False
+
+
+def _manifest_idle(repo: Path) -> tuple[bool, str]:
+    try:
+        from scripts.ppe_manifest import load_manifest
+        manifest = load_manifest(repo)
+    except Exception as exc:
+        return False, f"manifest check failed: {exc}"
+    status = str(manifest.get("status") or "").strip().upper()
+    if status not in ("COMPLETE", ""):
+        return False, f"manifest is {status}"
+    if str(manifest.get("phasePlanPath") or "").strip():
+        return False, "manifest has active plan"
+    return True, "manifest idle"
+
+
+def _queue_has_ready(repo: Path) -> bool:
+    from scripts.ppe_queue import load_queue
+    queue = load_queue(repo)
+    return any(
+        isinstance(it, dict) and str(it.get("status") or "").strip().upper() == "READY"
+        for it in (queue.get("items") or [])
+    )
+
+
+def _side_channel_idle_eligible(repo: Path, backlog: dict[str, Any]) -> tuple[bool, str]:
+    idle_ok, idle_reason = _manifest_idle(repo)
+    if not idle_ok:
+        return False, idle_reason
+    if _queue_has_ready(repo):
+        return False, "queue has READY item"
+    if _side_channel_pipeline_busy(backlog):
+        return False, "side channel already queued or chartered"
+    return True, "idle spare-time window"
 
 
 def _best_queued_item(backlog: dict[str, Any]) -> dict[str, Any] | None:
@@ -257,27 +314,16 @@ def _blocked_with_plan_sorted(
     return candidates
 
 
-def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str, Any]:
-    """Promote highest-priority blocked row with valid planPath when pipeline is idle."""
-    repo = repo_root.resolve()
-    if not backlog_enabled(repo):
-        return {"promoted": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
-    if not backlog_path(repo).is_file():
-        return {"promoted": False, "reason": "no backlog file"}
-
-    backlog = load_backlog(repo)
-    if not isinstance(backlog.get("items"), list):
-        return {"promoted": False, "reason": "invalid backlog items"}
-
-    if _best_queued_item(backlog) is not None:
-        return {"promoted": False, "reason": "queued backlog item already exists"}
-
-    if _pipeline_busy(backlog):
-        return {"promoted": False, "reason": "pipeline busy (chartered or queued chapter in backlog)"}
-
+def _promote_blocked_candidates(
+    repo: Path,
+    backlog: dict[str, Any],
+    candidates: list[tuple[int, dict[str, Any], str]],
+    *,
+    apply: bool,
+) -> dict[str, Any] | None:
     finalized_plans: list[str] = []
     focus_blocked: list[str] = []
-    for _index, item, plan_path in _blocked_with_plan_sorted(backlog):
+    for _index, item, plan_path in candidates:
         fg = _focus_gate_blocks(repo, plan_path)
         if fg:
             focus_blocked.append(f"{plan_path}: {fg}")
@@ -306,20 +352,26 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             finalized_plans.append(plan_path)
             continue
         if not apply:
-            return {
+            out: dict[str, Any] = {
                 "promoted": True,
                 "dry_run": True,
                 "planPath": plan_path,
                 "chapterId": item.get("chapterId"),
             }
+            if _is_side_channel(item):
+                out["sideChannel"] = True
+            return out
         item["status"] = "queued"
         save_backlog(repo, backlog)
-        return {
+        out = {
             "promoted": True,
             "planPath": plan_path,
             "chapterId": item.get("chapterId"),
         }
-
+        if _is_side_channel(item):
+            out["sideChannel"] = True
+            out["reason"] = "side channel spare-time promotion"
+        return out
     if finalized_plans:
         return {
             "promoted": False,
@@ -334,6 +386,47 @@ def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str
             "reason": "focus gate blocked eligible backlog rows",
             "focusGate": focus_blocked,
         }
+    return None
+
+
+def promote_first_blocked_with_plan(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    """Promote highest-priority blocked row with valid planPath when pipeline is idle."""
+    repo = repo_root.resolve()
+    if not backlog_enabled(repo):
+        return {"promoted": False, "reason": "PPE_AUTO_PROPAGATE_QUEUE disabled"}
+    if not backlog_path(repo).is_file():
+        return {"promoted": False, "reason": "no backlog file"}
+
+    backlog = load_backlog(repo)
+    if not isinstance(backlog.get("items"), list):
+        return {"promoted": False, "reason": "invalid backlog items"}
+
+    if _best_queued_item(backlog) is not None:
+        return {"promoted": False, "reason": "queued backlog item already exists"}
+
+    sorted_blocked = _blocked_with_plan_sorted(backlog)
+    main_blocked = [row for row in sorted_blocked if not _is_side_channel(row[1])]
+    side_blocked = [row for row in sorted_blocked if _is_side_channel(row[1])]
+
+    if not _main_pipeline_busy(backlog):
+        main_out = _promote_blocked_candidates(repo, backlog, main_blocked, apply=apply)
+        if main_out is not None:
+            return main_out
+
+    side_ok, side_reason = _side_channel_idle_eligible(repo, backlog)
+    if side_blocked and side_ok:
+        side_out = _promote_blocked_candidates(repo, backlog, side_blocked, apply=apply)
+        if side_out is not None:
+            return side_out
+
+    if _pipeline_busy(backlog):
+        if side_blocked and not side_ok:
+            return {
+                "promoted": False,
+                "reason": f"pipeline busy; side channel not eligible ({side_reason})",
+            }
+        return {"promoted": False, "reason": "pipeline busy (chartered or queued chapter in backlog)"}
+
     return {"promoted": False, "reason": "no blocked backlog item with planPath"}
 
 

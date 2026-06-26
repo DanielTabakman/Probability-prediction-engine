@@ -134,32 +134,34 @@
     },
     {
       "chapterId": "cross_venue_arb_charter_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
-      "focusPlaybookTier": "Defer",
+      "focusPlaybookTier": "P2",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md",
-      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 0c",
-      "reason": "[LOW] Cross-venue arb charter \u2014 scan + backtest side channel; spare-time BUILD only"
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
+      "reason": "[LOW] Charter COMPLETE — scan/backtest auto-run when idle"
     },
     {
       "chapterId": "mvp1_cross_venue_scan_v1",
       "status": "blocked",
       "priority": "low",
-      "focusPlaybookTier": "Defer",
+      "focusPlaybookTier": "P2",
+      "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
-      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 4",
-      "reason": "[LOW] Ranked PM vs options gap report \u2014 blocked until operator SELECTs spare-time BUILD"
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
+      "reason": "[LOW] Ranked gap report — sideChannel auto when idle"
     },
     {
       "chapterId": "mvp1_cross_venue_backtest_v1",
       "status": "blocked",
       "priority": "low",
-      "focusPlaybookTier": "Defer",
+      "focusPlaybookTier": "P2",
+      "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
-      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md \u2014 chapter 5",
-      "reason": "[LOW] Gap resolution scoring \u2014 blocked until scan COMPLETE + \u226514 daily snapshots"
+      "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
+      "reason": "[LOW] Gap scoring — after scan + snapshots"
     },
     {
       "chapterId": "mvp1_bl_density_smoothing_v1",
