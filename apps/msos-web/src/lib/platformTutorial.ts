@@ -103,9 +103,27 @@ export function clearPlatformTutorialComplete(): void {
   }
 }
 
-export function strategyLabTutorialHref(force = false): string {
-  if (force || !isPlatformTutorialComplete()) {
-    return `/strategy-lab?${PLATFORM_TUTORIAL_QUERY}=1`;
-  }
+export function hasTutorialSearchParams(searchParams: URLSearchParams): boolean {
+  return (
+    searchParams.has(PLATFORM_TUTORIAL_QUERY) || searchParams.has(PLATFORM_TUTORIAL_BEGINNER_QUERY)
+  );
+}
+
+export function stripTutorialSearchParams(searchParams: URLSearchParams): URLSearchParams {
+  const next = new URLSearchParams(searchParams.toString());
+  next.delete(PLATFORM_TUTORIAL_QUERY);
+  next.delete(PLATFORM_TUTORIAL_BEGINNER_QUERY);
+  return next;
+}
+
+export function resolveTutorialBeginnerMode(searchParams: URLSearchParams): boolean {
+  return (
+    searchParams.get(PLATFORM_TUTORIAL_BEGINNER_QUERY) === "1" ||
+    searchParams.get(PLATFORM_TUTORIAL_QUERY) === "beginner"
+  );
+}
+
+/** Strategy Lab entry — tour auto-opens on first visit via localStorage, not query params. */
+export function strategyLabTutorialHref(): string {
   return "/strategy-lab";
 }

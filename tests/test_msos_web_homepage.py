@@ -45,8 +45,10 @@ def test_hero_simplified_with_tutorial_and_research_modal() -> None:
 
 def test_public_nav_restart_tour() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    restart = (MSOS_WEB / "src" / "components" / "RestartTourButton.tsx").read_text(encoding="utf-8")
     assert "Restart tour" in nav
-    assert "clearPlatformTutorialComplete" in nav
+    assert "RestartTourButton" in nav
+    assert "clearPlatformTutorialComplete" in restart
 
 
 def test_platform_tutorial_wiring() -> None:

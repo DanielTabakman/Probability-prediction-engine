@@ -1,6 +1,4 @@
-import Link from "next/link";
-
-import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
+import { RestartTourButton } from "@/components/RestartTourButton";
 
 const FEATURES = [
   {
@@ -29,9 +27,7 @@ export function FeaturesRow() {
       <div className="feature feature-cta">
         <h3>Ready?</h3>
         <p>Walk through Strategy Lab with the guided tour — or jump straight in.</p>
-        <Link className="btn slim primary" href="/strategy-lab?tutorial=1">
-          Start the tour
-        </Link>
+        <RestartTourButton className="btn slim primary">Start the tour</RestartTourButton>
       </div>
     </section>
   );
