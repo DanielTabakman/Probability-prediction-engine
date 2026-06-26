@@ -48,9 +48,9 @@ Stop and escalate if a BUILD packet would:
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Priority | Focus |
 |----------|--------|
-| **1** | **Usable demo BUILD** — MSOS shell + PPE integration ([`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md)) |
-| **2** | **Factory stability** — relay, autobuilder, gates, closeout |
-| **Side channel** | Optional validation notes when demo is walkable — **not** a BUILD gate |
+| **1** | **Trader workflow integration** — milestone charter + four workstreams |
+| **2** | **Active relay** — `ppe_crypto_multi_asset_v1` (wedge depth) |
+| **3** | **Factory stability** — relay, autobuilder, gates, closeout |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---

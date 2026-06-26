@@ -20,14 +20,14 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
-### Post-demo multi-asset — chartered (blocked)
+### Post-demo multi-asset — milestone workstream B
 
-Operator SELECTION 2026-06-25: **crypto first**, stocks later. Do not BUILD until gates clear.
+**`ppe_crypto_multi_asset_v1`** is workstream **B** of [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md). **READY** in queue.
 
-| Priority | chapterId | Status | Blocker | Plan |
-|----------|-----------|--------|---------|------|
-| MEDIUM | `ppe_crypto_multi_asset_v1` | **blocked** | `msos_usable_demo_v1` COMPLETE | [`ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
-| DEFER | `ppe_equity_options_v1` | **blocked** | crypto chapter COMPLETE + G-04 validation | [`ppe_equity_options_v1_relay.json`](PHASE_PLANS/ppe_equity_options_v1_relay.json) |
+| Priority | chapterId | Status | Notes | Plan |
+|----------|-----------|--------|-------|------|
+| MEDIUM | `ppe_crypto_multi_asset_v1` | **READY** (workstream B) | Active relay chapter | [`ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
+| DEFER | `ppe_equity_options_v1` | **blocked** | After milestone complete-when + G-04 | [`ppe_equity_options_v1_relay.json`](PHASE_PLANS/ppe_equity_options_v1_relay.json) |
 
 **SELECTION:** [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md) · **Equity (deferred):** [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)
 
