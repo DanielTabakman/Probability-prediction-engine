@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Sync VM crypto closeout to main (fix loop-host git push); reconcile equity queue vs DEFER gates; continue milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md
+- **Next steward action:** Milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md; charter next relay chapter when steward SELECTION adds READY queue item (equity remains DEFER until G-04)
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (active) — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)

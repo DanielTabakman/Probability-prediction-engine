@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | Sync VM crypto closeout to main (fix loop-host git push); reconcile equity queue vs DEFER gates; continue milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md |
+| **Next** | Milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md; charter next relay chapter when steward SELECTION adds READY queue item (equity remains DEFER until G-04) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
