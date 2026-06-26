@@ -62,12 +62,14 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Signal | Status |
 |--------|--------|
-| Storyboard v0.6 (design) | **COMPLETE** — implementation BUILD in flight |
-| MSOS shell routes | **Partial** — storyboard screens chartered; integration hardening active |
-| PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
-| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-build-v1` |
+| **Product milestone** | **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) |
+| Usable demo foundation | **COMPLETE** 2026-06-25 |
+| Self-serve onboarding | **ACTIVE** — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md) |
+| Wedge depth (relay) | **ACTIVE** — `ppe_crypto_multi_asset_v1` |
+| Learning loop | **ACTIVE** — research sessions + validation log ingestion |
+| Friends-first gating | **RETIRED** — pivot `trader-workflow-integration-v1` |
 
-**Risk:** Premature "chapter COMPLETE" labels while demo is not walkable. Trust **evidence witness checkboxes** and operator demo script, not backlog status alone.
+**Risk:** Treating crypto chapter or a single feature as the whole milestone — judge **milestone complete-when** in charter, not relay closeout alone.
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---

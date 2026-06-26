@@ -1,8 +1,8 @@
 # Trader workflow research v1
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-> **Status (pivot `usable-demo-build-v1`):** **Side channel — not primary BUILD gate.**  
-> Run sessions **after** or **in parallel with** usable demo BUILD; log signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md).  
+> **Status (pivot `trader-workflow-integration-v1`):** **Learning loop workstream** — part of milestone [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md).  
+> Run self-serve and interview sessions; log **strong+** signal in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md); triage to backlog. **Not** a relay blocker.  
 > Scope authority: [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md).
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 

@@ -12,20 +12,16 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **Direction pivot** | `usable-demo-build-v1` (2026-06-21) |
-| **Primary focus** | BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6 |
+| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-25) |
+| **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `msos_usable_demo_v1` — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
-| **Relay plan** | [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json) |
-| **Next** | Production smoke workflow manage (#330–#332); VM relay advanced msos_usable_demo_v1 — fix VM git push credentials; new chat: what's next? |
+| **Active BUILD** | `ppe_crypto_multi_asset_v1` — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md) |
+| **Relay plan** | [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
+| **Next** | Execute crypto relay chapter (workstream B); parallel: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md |
 
-**Usable demo integration:** One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review
+**Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
-  - `msos_production_wiring_v1`
-  - `msos_user_state_v1`
-  - `msos_workflow_persistence_v1`
-  - `msos_strategy_lab_embed_shell_v1`
-  - `msos_usable_demo_v1`
+  - `ppe_crypto_multi_asset_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).

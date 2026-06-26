@@ -10,7 +10,9 @@
 
 ## Status
 
-**CHARTERED** — **blocked** until `msos_usable_demo_v1` **COMPLETE** unless steward overrides.
+**SELECTED** — workstream **B** of [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md).
+
+**First slice:** `PPE-CryptoMA-Control-Slice001`
 
 ## SELECTION rationale (2026-06-25)
 
@@ -20,7 +22,7 @@
 | BTC wedge stability | Reference loop shipped; expansion is parameterization + second currency |
 | Venue | **Deribit only** — ETH uses same API as BTC |
 | Stocks | **Explicitly out of scope** — see `ppe_equity_options_v1` (deferred) |
-| Active demo track | **Blocked until** `msos_usable_demo_v1` **COMPLETE** unless steward overrides |
+| Active demo track | Usable demo **COMPLETE** — workstream B relay (crypto) active |
 
 **First slice:** `PPE-CryptoMA-Control-Slice001`
 
