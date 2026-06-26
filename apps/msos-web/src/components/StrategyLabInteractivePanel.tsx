@@ -145,7 +145,7 @@ export function StrategyLabInteractivePanel({
           expiryLabel={selectedExpiry}
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
-          hideInlineExpiryPicker={live}
+          hideInlineExpiryPicker={false}
           tuning={tuning}
           onNudge={handleNudge}
           onReset={handleReset}

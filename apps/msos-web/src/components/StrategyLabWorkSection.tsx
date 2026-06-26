@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
-import { ExpiryPicker } from "@/components/ExpiryPicker";
 import { ExpiryMarketContextStrip } from "@/components/ExpiryMarketContextStrip";
+import { LabSetupRow } from "@/components/LabSetupRow";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
 import { buildExpiryMarketContext } from "@/lib/expiryMarketContext";
@@ -71,23 +71,23 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
           onExpiryChange={handleExpiryChange}
         />
       ) : (
-        <section className="metrics metrics-compact" aria-label="Lab context" data-tour="lab-expiry">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="metric">
-              <div className="label">{metric.label}</div>
-              {metric.label === "Expiry" ? (
-                <ExpiryPicker
-                  className="metric-expiry-value"
-                  value={resolvedExpiry}
-                  options={expiryOptions}
-                  onChange={handleExpiryChange}
-                  disabled={expiryOptions.length <= 1}
-                />
-              ) : (
-                <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
-              )}
-            </div>
-          ))}
+        <section className="expiry-market-context" aria-label="Lab context">
+          <LabSetupRow
+            expiry={resolvedExpiry}
+            expiryOptions={expiryOptions}
+            onExpiryChange={handleExpiryChange}
+            expiryDisabled={expiryOptions.length <= 1}
+          />
+          <div className="metrics metrics-compact metrics-after-setup">
+            {metrics
+              .filter((metric) => metric.label !== "Expiry")
+              .map((metric) => (
+                <div key={metric.label} className="metric">
+                  <div className="label">{metric.label}</div>
+                  <div className={`value ${metric.tone ?? ""}`.trim()}>{metric.value}</div>
+                </div>
+              ))}
+          </div>
         </section>
       )}
 

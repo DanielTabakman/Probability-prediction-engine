@@ -1,6 +1,6 @@
 "use client";
 
-import { ExpiryPicker } from "@/components/ExpiryPicker";
+import { LabSetupRow } from "@/components/LabSetupRow";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import type { ExpiryMarketContext } from "@/lib/expiryMarketContext";
 
@@ -20,17 +20,13 @@ export function ExpiryMarketContextStrip({
   const { formatMoney } = useDisplayCurrency();
 
   return (
-    <section className="expiry-market-context" aria-label="Market context for selected expiry" data-tour="lab-expiry">
-      <div className="expiry-market-context-row">
-        <span className="expiry-market-context-k">Expiry</span>
-        <ExpiryPicker
-          className="metric-expiry-value"
-          value={context.expiryDate}
-          options={expiryOptions}
-          onChange={onExpiryChange}
-          disabled={expiryPickerDisabled || expiryOptions.length <= 1}
-        />
-      </div>
+    <section className="expiry-market-context" aria-label="Market context for selected expiry">
+      <LabSetupRow
+        expiry={context.expiryDate}
+        expiryOptions={expiryOptions}
+        onExpiryChange={onExpiryChange}
+        expiryDisabled={expiryPickerDisabled}
+      />
       <div className="expiry-market-context-grid">
         <div className="expiry-market-context-cell">
           <div className="expiry-market-context-k">Today&apos;s BTC</div>

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ActionLink } from "@/components/ActionLink";
-import { CurrencySelect } from "@/components/CurrencySelect";
 import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
 import { clearPlatformTutorialComplete } from "@/lib/platformTutorial";
 
@@ -35,7 +34,6 @@ export function PublicNav() {
         <button type="button" className="nav-text-btn" onClick={restartTour}>
           Restart tour
         </button>
-        <CurrencySelect className="nav-currency" />
         <div className="nav-actions">
           <a className="btn slim dark" href={signInUrl}>
             Sign in

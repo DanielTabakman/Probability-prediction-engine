@@ -153,11 +153,13 @@ def test_workflow_session_scoping_exists() -> None:
 
 def test_display_currency_module_exists() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "displayCurrency.ts").read_text(encoding="utf-8")
-    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    setup = (MSOS_WEB / "src" / "components" / "LabSetupRow.tsx").read_text(encoding="utf-8")
+    sidebar = (MSOS_WEB / "src" / "components" / "AppSidebar.tsx").read_text(encoding="utf-8")
     assert "formatMoney" in lib
-    assert "CAD" in lib
     assert "EUR" in lib
-    assert "CurrencySelect" in nav
+    assert "CurrencySelect" in setup
+    assert "LabSetupRow" in setup
+    assert "CurrencySelect" in sidebar
 
 
 def test_expression_chart_fullscreen_frame() -> None:
