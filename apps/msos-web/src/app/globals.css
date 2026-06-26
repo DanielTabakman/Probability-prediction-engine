@@ -2169,6 +2169,62 @@ button.btn:disabled {
   font-weight: 700;
 }
 
+.leg-with-tip {
+  position: relative;
+  cursor: help;
+}
+
+.leg-tip-hint {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.monitor-welcome-card,
+.monitor-empty-state {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 13px;
+  background: rgba(67, 231, 211, 0.06);
+  border: 1px solid rgba(67, 231, 211, 0.18);
+}
+
+.monitor-welcome-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.monitor-welcome-card strong,
+.monitor-empty-state strong {
+  display: block;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+
+.monitor-welcome-card p,
+.monitor-empty-state p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b7c9da;
+  max-width: 52ch;
+}
+
+.monitor-welcome-cta {
+  margin-top: 4px;
+}
+
 /* Expression planning (P6 — storyboard 05_execution) */
 .exec-layout {
   display: grid;
@@ -3011,6 +3067,31 @@ button.btn:disabled {
   .exec-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .legs .leg {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 8px;
+    min-height: 44px;
+  }
+
+  .monitor-welcome-card {
+    flex-direction: column;
+  }
+
+  .monitor-watch-row {
+    padding: 12px 10px;
+  }
+
+  .platform-tutorial-card {
+    left: 12px !important;
+    right: 12px;
+    max-width: none !important;
+  }
+
+  .graph-labeled {
+    min-height: 220px;
   }
 
   .learn-loop-strip {
