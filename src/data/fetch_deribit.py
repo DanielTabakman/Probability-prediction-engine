@@ -12,6 +12,9 @@ import requests
 
 DERIBIT_BASE = "https://www.deribit.com/api/v2"
 
+# Nearest listed expiries for implied distribution / Strategy Lab (Deribit BTC ~13 dates today).
+DEFAULT_OPTION_EXPIRIES_MAX = 20
+
 logger = logging.getLogger(__name__)
 
 # Set on failed get_instruments; cleared on success (for implied-lab debug UI).
@@ -323,7 +326,7 @@ def fetch_deribit_btc_futures_forward_curve(max_contracts: int = 12) -> list[dic
 
 
 def fetch_deribit_option_expiries(
-    max_expiries: int = 12,
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
     *,
     currency: str = "BTC",
 ) -> list[dict[str, Any]]:
@@ -339,7 +342,9 @@ def fetch_deribit_option_expiries(
     return out
 
 
-def fetch_deribit_btc_option_expiries(max_expiries: int = 12) -> list[dict[str, Any]]:
+def fetch_deribit_btc_option_expiries(
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
+) -> list[dict[str, Any]]:
     """BTC option expiries (compat wrapper)."""
     return fetch_deribit_option_expiries(max_expiries, currency="BTC")
 
@@ -738,7 +743,7 @@ def fetch_deribit_options_summary(
     exp_ts = sorted(set(i.get("expiration_timestamp") for i in instruments if i.get("expiration_timestamp")))
     result["expiries"] = [
         datetime.fromtimestamp(ts / 1000, tz=timezone.utc).strftime("%Y-%m-%d")
-        for ts in exp_ts[:15]
+        for ts in exp_ts[:DEFAULT_OPTION_EXPIRIES_MAX]
     ]
 
     # Sample: pick one expiry, get first N instruments and fetch tickers (with small delay)

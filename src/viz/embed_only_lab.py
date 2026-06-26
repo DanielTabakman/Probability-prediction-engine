@@ -83,7 +83,7 @@ def _load_export_rows() -> tuple[str, float, list[dict[str, str]]]:
     spot = _spot_from_cached_deribit_index()
     if spot <= 0:
         raise RuntimeError("Deribit BTC index unavailable for embed display boundary.")
-    expiries, _diag = cached_option_expiries(10)
+    expiries, _diag = cached_option_expiries()
     if not expiries:
         raise RuntimeError("No option expiries available for embed display boundary.")
     run_ts = pd.Timestamp.now(tz="UTC")

@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.data.fetch_deribit import (
+    DEFAULT_OPTION_EXPIRIES_MAX,
     fetch_deribit_btc_index,
     fetch_deribit_btc_option_expiries,
     fetch_deribit_btc_option_marks_by_expiry_full,
@@ -43,7 +44,7 @@ def default_snapshot_path(
 
 def collect_distribution_stats_snapshot(
     *,
-    max_expiries: int = 10,
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
     output: Path | None = None,
     snapshot_root: Path = DEFAULT_SNAPSHOT_ROOT,
     spot_fn: Callable[[], float | None] | None = None,
@@ -93,7 +94,7 @@ def _default_spot() -> float | None:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Collect BTC distribution stats CSV snapshot")
-    ap.add_argument("--max-expiries", type=int, default=10)
+    ap.add_argument("--max-expiries", type=int, default=DEFAULT_OPTION_EXPIRIES_MAX)
     ap.add_argument(
         "--output",
         type=Path,

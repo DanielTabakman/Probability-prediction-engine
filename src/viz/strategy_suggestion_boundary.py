@@ -212,7 +212,7 @@ def build_strategy_suggestion_response(
     vol_m = clamp_belief_mult("vol_mult", vol_mult)
 
     as_of_utc, spot_usd, export_rows = _load_export_rows()
-    expiries, _diag = cached_option_expiries(10)
+    expiries, _diag = cached_option_expiries()
     expiry = _find_expiry(expiries, expiry_date)
     if expiry is None:
         return {"kind": "strategy_suggestion_error", "error": f"expiry not found: {expiry_date}"}

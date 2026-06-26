@@ -319,7 +319,7 @@ if show_bitcoin_view:
             maybe_submit_prefetch(
                 key="deribit_option_expiries",
                 label="deribit option expiries",
-                fn=lambda: _cached_option_expiries(10),
+                fn=lambda: _cached_option_expiries(),
             )
     except Exception:
         pass
@@ -339,7 +339,7 @@ if show_bitcoin_view:
     if is_full and run_implied and current_btc is not None:
         try:
             with st.spinner("Loading expiries and option marks…"):
-                expiries, expiry_fetch_diag = _cached_option_expiries(10)
+                expiries, expiry_fetch_diag = _cached_option_expiries()
             if expiries:
                 run_ts_export = pd.Timestamp.now(tz="UTC")
                 as_of_export = run_ts_export.isoformat()
