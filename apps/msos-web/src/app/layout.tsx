@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Market Structure OS",
   description:
     "Compare your market thesis with what options imply — explore structures without hiding assumptions.",
+  icons: {
+    icon: [{ url: "/brand/msos-mark-color.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
