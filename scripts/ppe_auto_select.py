@@ -79,6 +79,15 @@ def choose_next_plan(repo_root: Path) -> tuple[str | None, str]:
             skipped.append(f"{plan_path}: {guard.detail}")
             continue
         try:
+            from scripts.ppe_focus_gate import evaluate_focus_gate
+
+            focus = evaluate_focus_gate(repo_root, plan_path)
+            if not focus.allowed:
+                skipped.append(f"{plan_path}: {focus.reason}")
+                continue
+        except ImportError:
+            pass
+        try:
             from scripts.ppe_focus_gate import evaluate_focus_gate, focus_gate_skip_code
 
             focus = evaluate_focus_gate(repo_root, plan_path)
