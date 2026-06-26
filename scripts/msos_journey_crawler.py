@@ -40,14 +40,20 @@ MSOS_JOURNEY_ROUTES: tuple[tuple[str, str], ...] = (
     ("/learn", "learn"),
 )
 
-NOT_FOUND_MARKERS: tuple[str, ...] = (
-    "This page could not be found",
-    "404: This page could not be found",
-    "This page isn&#x27;t available",
-    "This page isn't available",
-    ">404<",
-    "Page not found",
-)
+# Positive content per route key — bundled JS includes not-found.tsx strings on every page,
+# so HTML substring checks false-positive. Prefer visible DOM + expected copy.
+ROUTE_EXPECTED_CONTENT: dict[str, str] = {
+    "homepage": "Turn your market thesis into a trade",
+    "strategy_lab": "Strategy Lab",
+    "thesis_confirm": "Confirm your view",
+    "expression_plan": "Paper trade planner",
+    "command_center": "Command Center",
+    "monitor": "Watching now",
+    "history": "History",
+    "learn": "Reflect",
+}
+
+MONITOR_EXPECTED = ROUTE_EXPECTED_CONTENT["monitor"]
 
 
 def _utc_now() -> str:
@@ -65,13 +71,46 @@ def _ensure_playwright() -> None:
         ) from exc
 
 
-def page_looks_like_404(html: str, title: str = "") -> str | None:
+def route_expected_content(route_key: str) -> str | None:
+    return ROUTE_EXPECTED_CONTENT.get(route_key)
+
+
+def page_looks_like_404(
+    html: str,
+    title: str = "",
+    *,
+    expected_content: str | None = None,
+) -> str | None:
+    """Static HTML heuristic for unit tests — production crawl uses page_looks_like_404_live."""
+    if expected_content and expected_content in html:
+        return None
     combined = f"{title}\n{html}"
-    for marker in NOT_FOUND_MARKERS:
-        if marker in combined:
-            return f"page contains 404 marker: {marker!r}"
     if re.search(r"<title[^>]*>\s*404\b", combined, re.I):
         return "document title is 404"
+    if title.strip().startswith("404"):
+        return f"document title suggests 404: {title!r}"
+    return None
+
+
+def page_looks_like_404_live(page: Any, *, expected_content: str | None = None) -> str | None:
+    """Detect a rendered 404 without matching not-found strings bundled in client JS."""
+    if expected_content:
+        locator = page.get_by_text(expected_content, exact=False).first
+        try:
+            if locator.is_visible(timeout=2_000):
+                return None
+        except Exception:
+            pass
+    try:
+        if page.locator("main.not-found-shell").is_visible():
+            return "not-found shell is visible"
+    except Exception:
+        pass
+    title = page.title()
+    if re.search(r"\b404\b", title):
+        return f"document title suggests 404: {title!r}"
+    if expected_content:
+        return f"expected content missing: {expected_content!r}"
     return None
 
 
@@ -80,10 +119,10 @@ def crawl_static_routes(page: Any, *, base: str) -> list[dict[str, Any]]:
     for path, key in MSOS_JOURNEY_ROUTES:
         url = f"{base}{path}"
         response = page.goto(url, wait_until="domcontentloaded", timeout=90_000)
-        html = page.content()
-        title = page.title()
+        page.wait_for_timeout(300)
         status = response.status if response else 0
-        not_found_err = page_looks_like_404(html, title)
+        expected = route_expected_content(key)
+        not_found_err = page_looks_like_404_live(page, expected_content=expected)
         checks.append(
             {
                 "flow": "routes",
@@ -104,10 +143,8 @@ def flow_missing_paper_trade(page: Any, *, base: str) -> dict[str, Any]:
     response = page.goto(url, wait_until="domcontentloaded", timeout=90_000)
     page.wait_for_timeout(500)
     final_url = page.url
-    html = page.content()
-    title = page.title()
     status = response.status if response else 0
-    not_found_err = page_looks_like_404(html, title)
+    not_found_err = page_looks_like_404_live(page, expected_content=MONITOR_EXPECTED)
     still_on_detail = "/monitor/paper/" in final_url
     ok = not still_on_detail and not_found_err is None and status == 200
     error = None
@@ -215,9 +252,7 @@ def flow_delete_paper_trade(page: Any, context: Any, *, base: str) -> dict[str, 
     page.wait_for_timeout(400)
 
     final_url = page.url
-    html = page.content()
-    title_text = page.title()
-    not_found_err = page_looks_like_404(html, title_text)
+    not_found_err = page_looks_like_404_live(page, expected_content=MONITOR_EXPECTED)
     on_monitor = "/monitor" in final_url and "/monitor/paper/" not in final_url
     ok = on_monitor and not_found_err is None
     error = None
