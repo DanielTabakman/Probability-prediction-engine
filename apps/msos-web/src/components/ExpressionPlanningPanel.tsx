@@ -7,6 +7,7 @@ import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
 import { TradeProsConsCard } from "@/components/TradeProsConsCard";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
+import { PlanLegRow } from "@/components/PlanLegRow";
 import {
   expressionFamilies,
   expressionRiskNote,
@@ -37,6 +38,7 @@ import {
   listExpiryDates,
 } from "@/lib/ppeDisplayPayload";
 import { resolveSignInUrlWithReturn } from "@/lib/msosPublicUrls";
+import { stashPostAuthReturnPath } from "@/lib/postAuthReturn";
 import {
   hasWorkflowIdentity,
   stashPendingPaperTrade,
@@ -261,6 +263,7 @@ export function ExpressionPlanningPanel() {
     const signedIn = await hasWorkflowIdentity();
     if (!signedIn) {
       stashPendingPaperTrade(next);
+      stashPostAuthReturnPath("/strategy-lab/expression");
       window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
       return;
     }
@@ -273,6 +276,7 @@ export function ExpressionPlanningPanel() {
       setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
     } else if (result.authRequired) {
       stashPendingPaperTrade(next);
+      stashPostAuthReturnPath("/strategy-lab/expression");
       window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
     } else {
       setSaveError(result.error ?? "Could not save paper trade.");
@@ -361,12 +365,7 @@ export function ExpressionPlanningPanel() {
               <p>{livePlan.summary}</p>
               <div className="legs" aria-label="Expression legs">
                 {livePlan.legs.map((leg) => (
-                  <div key={`${leg.side}-${leg.strike}-${leg.instrument}`} className="leg">
-                    <span className={leg.side === "BUY" ? "buy" : "sell"}>{leg.side}</span>
-                    <span>{leg.instrument}</span>
-                    <span>{leg.strike}</span>
-                    <span>{leg.tenor}</span>
-                  </div>
+                  <PlanLegRow key={`${leg.side}-${leg.strike}-${leg.instrument}`} leg={leg} />
                 ))}
               </div>
               {plainLegSummary ? (
@@ -464,7 +463,7 @@ export function ExpressionPlanningPanel() {
                   <Link href="/strategy-lab" className="btn slim primary">
                     Plan another trade
                   </Link>
-                  <Link href="/monitor" className="btn slim">
+                  <Link href="/monitor?welcome=1" className="btn slim">
                     Monitor paper trades
                   </Link>
                   <Link href="/history" className="btn slim dark">

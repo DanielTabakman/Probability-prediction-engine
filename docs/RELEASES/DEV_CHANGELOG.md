@@ -2,8 +2,19 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-26
+
+- `99a43ed` — fix(msos): lab setup row for expiry + currency UX (#342) (`apps/msos-web/`)
+- `dee0ee0` — MSOS journey crawler: fix 404 false positives in deploy witness (#340) (`scripts/`)
+- `b3b1c54` — build(deps): Bump actions/upload-artifact from 4 to 7 (#299)
+- `56e62e8` — MSOS onboarding polish: auth return, leg tips, monitor welcome (#338) (`apps/msos-web/`)
+- `52141bd` — MSOS: journey crawler in production deploy witness (#337) (`docs/SOP/`)
+
 ## 2026-06-25
 
+- `f80e7b3` — deploy witness: export PYTHONPATH for all production health scripts (#344)
+- `fe25b64` — MSOS paper planner UX: clarity for new options users (#334) (`apps/msos-web/`)
+- `29cb1cf` — Control-plane: dev changelog
 - `6581bfc` — control-plane: final closeout steer after msos_usable_demo relay pass (#333) (`docs/SOP/`)
 - `8caa8ca` — MSOS monitor layout + context closeout steering (#332) (`docs/SOP/`)
 - `b86565f` — MSOS workflow manage + monitor cleanup (#331) (`apps/msos-web/`)

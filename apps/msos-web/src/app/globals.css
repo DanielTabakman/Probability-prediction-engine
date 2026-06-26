@@ -2023,6 +2023,51 @@ button.btn:disabled {
   margin-bottom: 10px;
 }
 
+.lab-setup-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 28px;
+  margin-bottom: 12px;
+}
+
+.lab-setup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lab-setup-k {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #71869f;
+  font-weight: 760;
+}
+
+.lab-setup-expiry .expiry-picker-face {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--teal);
+  background: rgba(67, 231, 211, 0.12);
+  border: 1px solid rgba(67, 231, 211, 0.22);
+  padding: 4px 9px;
+  border-radius: 8px;
+}
+
+.lab-setup-expiry .expiry-picker-select {
+  cursor: pointer;
+}
+
+.metrics-after-setup {
+  margin-top: 4px;
+}
+
+.metrics-after-setup.metrics-compact {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .expiry-market-context-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2167,6 +2212,62 @@ button.btn:disabled {
 .pending-trade-banner a {
   color: var(--teal);
   font-weight: 700;
+}
+
+.leg-with-tip {
+  position: relative;
+  cursor: help;
+}
+
+.leg-tip-hint {
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.monitor-welcome-card,
+.monitor-empty-state {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 13px;
+  background: rgba(67, 231, 211, 0.06);
+  border: 1px solid rgba(67, 231, 211, 0.18);
+}
+
+.monitor-welcome-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.monitor-welcome-card strong,
+.monitor-empty-state strong {
+  display: block;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+
+.monitor-welcome-card p,
+.monitor-empty-state p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #b7c9da;
+  max-width: 52ch;
+}
+
+.monitor-welcome-cta {
+  margin-top: 4px;
 }
 
 /* Expression planning (P6 — storyboard 05_execution) */
@@ -2878,11 +2979,31 @@ button.btn:disabled {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  color: inherit;
+  color: var(--text);
   font-size: 12px;
   font-weight: 650;
   padding: 6px 24px 6px 10px;
   cursor: pointer;
+}
+
+.currency-select select option {
+  color: #0a1628;
+  background: #ffffff;
+}
+
+.currency-select-setup select {
+  color: var(--teal);
+  background: rgba(67, 231, 211, 0.12);
+  border: 1px solid rgba(67, 231, 211, 0.22);
+  font-size: 15px;
+  font-weight: 800;
+  padding: 4px 28px 4px 9px;
+  min-width: 5.5rem;
+}
+
+.currency-select-sidebar select {
+  color: var(--text);
+  width: 100%;
 }
 
 .currency-select select:hover {
@@ -3011,6 +3132,31 @@ button.btn:disabled {
   .exec-actions .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .legs .leg {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 10px 8px;
+    min-height: 44px;
+  }
+
+  .monitor-welcome-card {
+    flex-direction: column;
+  }
+
+  .monitor-watch-row {
+    padding: 12px 10px;
+  }
+
+  .platform-tutorial-card {
+    left: 12px !important;
+    right: 12px;
+    max-width: none !important;
+  }
+
+  .graph-labeled {
+    min-height: 220px;
   }
 
   .learn-loop-strip {
