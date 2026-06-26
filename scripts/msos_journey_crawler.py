@@ -25,6 +25,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from scripts.msos_playwright_session import prepare_msos_browser_context
 from scripts.msos_production_demo_witness import DEFAULT_BASE
 
 DEFAULT_OUT = Path("artifacts/health/msos_journey_crawler")
@@ -291,7 +292,7 @@ def run_journey_crawler(
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1440, "height": 900})
+        context = prepare_msos_browser_context(browser)
         page = context.new_page()
 
         if "routes" in flows:

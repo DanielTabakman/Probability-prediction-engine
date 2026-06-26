@@ -22,6 +22,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
+from scripts.msos_playwright_session import (
+    dismiss_platform_tutorial_if_visible,
+    prepare_msos_browser_context,
+)
 from scripts.msos_production_demo_witness import (
     DEFAULT_BASE,
     _utc_now,
@@ -68,7 +72,7 @@ def run_playwright_witness(
 
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1440, "height": 900})
+        context = prepare_msos_browser_context(browser)
         page = context.new_page()
 
         api_resp = context.request.get(f"{base}/ppe-display-api/display.json", timeout=60_000)
@@ -121,6 +125,7 @@ def run_playwright_witness(
 
         lab_url = f"{base}/strategy-lab"
         page.goto(lab_url, wait_until="networkidle", timeout=90_000)
+        dismiss_platform_tutorial_if_visible(page)
         higher = page.get_by_role("button", name="Higher", exact=True)
         belief_ok = higher.count() > 0
         belief_curve_ok = False
@@ -146,6 +151,7 @@ def run_playwright_witness(
         )
 
         confirm = page.get_by_role("link", name=re.compile(r"Confirm view", re.I))
+        dismiss_platform_tutorial_if_visible(page)
         confirm_ok = confirm.count() > 0
         if confirm_ok:
             confirm.first.click()
