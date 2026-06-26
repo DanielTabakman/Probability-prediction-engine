@@ -20,6 +20,16 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
+### Post-demo multi-asset — chartered (blocked)
+
+Operator SELECTION 2026-06-25: **crypto first**, stocks later. Do not BUILD until gates clear.
+
+| Priority | chapterId | Status | Blocker | Plan |
+|----------|-----------|--------|---------|------|
+| MEDIUM | `ppe_crypto_multi_asset_v1` | **blocked** | `msos_usable_demo_v1` COMPLETE | [`ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
+| DEFER | `ppe_equity_options_v1` | **blocked** | crypto chapter COMPLETE + G-04 validation | [`ppe_equity_options_v1_relay.json`](PHASE_PLANS/ppe_equity_options_v1_relay.json) |
+
+**SELECTION:** [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md) · **Equity (deferred):** [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)
 
 ### Phase 2 on `main` — relay queue (baseline **`main`**) — **COMPLETE** (2026-05-19)
 
