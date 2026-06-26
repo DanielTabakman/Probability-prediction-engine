@@ -64,8 +64,8 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 |--------|--------|
 | Storyboard v0.6 (design) | **COMPLETE** — implementation BUILD in flight |
 | MSOS shell routes | **Partial** — storyboard screens chartered; integration hardening active |
-| PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
-| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-build-v1` |
+| PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md) |
+| Friends-first / research-first gating | **RETIRED** — pivot `crypto-multi-asset-v1` |
 
 **Risk:** Premature "chapter COMPLETE" labels while demo is not walkable. Trust **evidence witness checkboxes** and operator demo script, not backlog status alone.
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->

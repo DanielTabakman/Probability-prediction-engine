@@ -10,7 +10,9 @@
 
 ## Status
 
-**CHARTERED** — **blocked** until `msos_usable_demo_v1` **COMPLETE** unless steward overrides.
+**SELECTED** — 2026-06-25 steward SELECTION after `msos_usable_demo_v1` **COMPLETE**.
+
+**First slice:** `PPE-CryptoMA-Control-Slice001`
 
 ## SELECTION rationale (2026-06-25)
 

@@ -23,7 +23,7 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Track | Phases | When |
 |-------|--------|------|
-| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `usable-demo-build-v1` |
+| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `crypto-multi-asset-v1` |
 | **Post-demo expansion** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after usable demo is walkable on production URLs |
 
 Phases 4a–7b remain chartered for multi-user and commercial work — they are **not** the current default BUILD priority.

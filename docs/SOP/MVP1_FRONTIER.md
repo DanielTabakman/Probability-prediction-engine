@@ -26,7 +26,7 @@ Operator SELECTION 2026-06-25: **crypto first**, stocks later. Do not BUILD unti
 
 | Priority | chapterId | Status | Blocker | Plan |
 |----------|-----------|--------|---------|------|
-| MEDIUM | `ppe_crypto_multi_asset_v1` | **blocked** | `msos_usable_demo_v1` COMPLETE | [`ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
+| MEDIUM | `ppe_crypto_multi_asset_v1` | **chartered / SELECTED** | First slice `PPE-CryptoMA-Control-Slice001` | [`ppe_crypto_multi_asset_v1_relay.json`](PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json) |
 | DEFER | `ppe_equity_options_v1` | **blocked** | crypto chapter COMPLETE + G-04 validation | [`ppe_equity_options_v1_relay.json`](PHASE_PLANS/ppe_equity_options_v1_relay.json) |
 
 **SELECTION:** [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md) · **Equity (deferred):** [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)

@@ -1,20 +1,21 @@
 {
   "version": 1,
-  "pivotId": "usable-demo-build-v1",
-  "asOf": "2026-06-21",
+  "pivotId": "crypto-multi-asset-v1",
+  "asOf": "2026-06-25",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
-  "primaryFocus": "BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6",
-  "currentStage": "build_integration",
+  "primaryFocus": "G-05 crypto expansion — Deribit ETH + asset registry after usable demo COMPLETE",
+  "currentStage": "multi_asset_expansion",
   "designComplete": true,
   "storyboardRef": "docs/VISION/MSOS/storyboard-v0.6/prototype/html/",
-  "activeBuildChapterId": "msos_usable_demo_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md",
-  "nextStewardAction": "Production smoke workflow manage (#330–#332); VM relay advanced msos_usable_demo_v1 — fix VM git push credentials; new chat: what's next?",
+  "activeBuildChapterId": "ppe_crypto_multi_asset_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+  "nextStewardAction": "First slice PPE-CryptoMA-Control-Slice001 — run_ppe.cmd or IDE BUILD starter after manifest READY",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as primary BUILD blocker",
-    "validation-before-build for MSOS shell integration"
+    "validation-before-build for MSOS shell integration",
+    "stocks before crypto multi-asset automation"
   ],
   "sideChannels": [
     {
@@ -26,21 +27,22 @@
       "id": "validation_log",
       "doc": "docs/SOP/VALIDATION_REALITY_CHECKS.md",
       "role": "session notes when testers use the demo — not a gate"
+    },
+    {
+      "id": "equity_options_deferred",
+      "doc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+      "role": "chartered deferred — NVDA/LEAPS after crypto chapter + G-04 signal"
     }
   ],
   "buildTrack": {
-    "label": "Usable demo integration",
-    "outcome": "One walkable MSOS product on production URLs: storyboard routes + live PPE in Strategy Lab chart region + honest save/review",
+    "label": "Crypto multi-asset expansion",
+    "outcome": "BTC + ETH on Deribit with shared asset registry, MSOS selector, same distribution semantics",
     "chapters": [
-      "msos_production_wiring_v1",
-      "msos_user_state_v1",
-      "msos_workflow_persistence_v1",
-      "msos_strategy_lab_embed_shell_v1",
-      "msos_usable_demo_v1"
+      "ppe_crypto_multi_asset_v1"
     ]
   },
   "supersedes": {
-    "postMcdResearchFirst": "2026-06-21 pivot — BUILD usable demo is primary; research runs in parallel when demo is walkable"
+    "usableDemoBuildV1": "2026-06-25 — msos_usable_demo_v1 COMPLETE; pivot to G-05 crypto expansion"
   },
   "propagationTargets": [
     "docs/SOP/MSOS_FRONTIER.md",
@@ -51,6 +53,7 @@
     "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
     "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
     "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
+    "docs/SOP/MVP1_FRONTIER.md",
     "artifacts/control_plane/WHATS_NEXT.md"
   ]
 }

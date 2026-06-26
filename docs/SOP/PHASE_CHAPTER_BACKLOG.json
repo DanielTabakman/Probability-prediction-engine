@@ -304,23 +304,25 @@
     },
     {
       "chapterId": "msos_usable_demo_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
       "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
-      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
+      "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 COMPLETE 2026-06-25"
     },
     {
       "chapterId": "ppe_crypto_multi_asset_v1",
-      "status": "blocked",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
+      "urgent": true,
+      "urgentReason": "Operator SELECTION 2026-06-25 \u2014 G-05 crypto expansion (ETH) after usable demo COMPLETE",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
       "canonRef": "docs/VISION/PPE_MASTER_MVP1.md \u2014 G-05",
-      "reason": "[MEDIUM] Deribit ETH expansion + asset registry \u2014 blocked until msos_usable_demo_v1 COMPLETE; crypto before stocks"
+      "reason": "[MEDIUM] Deribit ETH expansion + asset registry \u2014 SELECTED 2026-06-25; crypto before stocks"
     },
     {
       "chapterId": "ppe_equity_options_v1",

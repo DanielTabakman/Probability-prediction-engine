@@ -73,7 +73,7 @@ MCD **supersedes** “interim engineering authorization” from [`MSOS_P8_VALIDA
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `usable-demo-build-v1` |
+| **After pass (updated)** | Primary focus → **BUILD usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) pivot `crypto-multi-asset-v1` |
 | **Not a blocker** | Trader workflow research — optional parallel signal logging |
 | **BUILD authority** | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) + active relay plan |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->

@@ -5,22 +5,24 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `usable-demo-build-v1` · **as-of:** 2026-06-21
+**Direction pivot:** `crypto-multi-asset-v1` · **as-of:** 2026-06-25
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
-- **Primary focus:** BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
-- **Stage:** build_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/)); **BUILD** integration is active
-- **Active BUILD chapter:** `msos_usable_demo_v1` · plan [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
-- **Next steward action:** Production smoke workflow manage (#330–#332); VM relay advanced msos_usable_demo_v1 — fix VM git push credentials; new chat: what's next?
+- **Primary focus:** G-05 crypto expansion — Deribit ETH + asset registry after usable demo COMPLETE
+- **Stage:** multi_asset_expansion — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/)); **BUILD** integration is active
+- **Active BUILD chapter:** `ppe_crypto_multi_asset_v1` · plan [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)
+- **Next steward action:** First slice PPE-CryptoMA-Control-Slice001 — run_ppe.cmd or IDE BUILD starter after manifest READY
 
 **Retired (do not steer BUILD by these):**
-- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `usable-demo-build-v1`
-- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `usable-demo-build-v1`
+- ~~friends-first / friends-and-family cohort gating before demo ships~~ — **retired** by pivot `crypto-multi-asset-v1`
+- ~~trader workflow research as primary BUILD blocker~~ — **retired** by pivot `crypto-multi-asset-v1`
+- ~~validation-before-build for MSOS shell integration~~ — **retired** by pivot `crypto-multi-asset-v1`
+- ~~stocks before crypto multi-asset automation~~ — **retired** by pivot `crypto-multi-asset-v1`
 
 **Side channels (optional, not gates):**
 - **TRADER_WORKFLOW_RESEARCH_V1** ([`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)) — optional signal logging while demo is built — not scope authority
 - **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session notes when testers use the demo — not a gate
+- **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — chartered deferred — NVDA/LEAPS after crypto chapter + G-04 signal
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).

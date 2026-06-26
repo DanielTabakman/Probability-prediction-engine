@@ -25,11 +25,11 @@
 ## Active BUILD
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**`msos_usable_demo_v1`** — BUILD usable demo — MSOS shell with PPE integrated per storyboard v0.6
+**`ppe_crypto_multi_asset_v1`** — G-05 crypto expansion — Deribit ETH + asset registry after usable demo COMPLETE
 
-- **Sprint:** [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md)
-- **Plan:** [`msos_usable_demo_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json)
-- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `usable-demo-build-v1`)
+- **Sprint:** [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
+- **Plan:** [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)
+- **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `crypto-multi-asset-v1`)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ## Steering alignment
