@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- **Chapter closed:** ppe_crypto_multi_asset_v1 chapter COMPLETE (#351) (`ppe_crypto_multi_asset_v1 chapter COMPLETE (#351)`)
+- `857fd73` — control plane/context closeout crypto complete (#350) (`apps/msos-web/`)
+- `1a61bcf` — control-plane: align direction test with crypto chapter complete (#349)
+- `f05d9e9` — control-plane: context closeout — crypto chapter complete, direction sync (#348) (`docs/SOP/`)
+- `96c02c2` — PPE-CryptoMA-Product-Slice004: MSOS Strategy Lab BTC/ETH asset switcher (#347) (`apps/msos-web/`)
+- `0fd8757` — Control-plane: dev changelog
 - `9995655` — steward: Trader Workflow Integration v1 milestone (#345)
 - `c0ef2ba` — Control-plane: dev changelog
 - `d620253` — PPE-CryptoMA-Core-Slice002: parameterize Deribit fetch + export asset_id (#343) (`docs/SOP/`)
@@ -16,6 +22,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-25
 
+- `5929ff8` — docs: reserve pale-gold MSOS mark for future premium tier (#352)
 - `924968f` — build(deps): Bump better-sqlite3 in /apps/msos-web (#303) (`apps/msos-web/`)
 - `e31485a` — build(deps): Update google-api-python-client requirement (#336)
 - `ee9732f` — MSOS playwright witness: dismiss tutorial scrim in CI (#346) (`scripts/`)
