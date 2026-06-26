@@ -135,15 +135,30 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Production PPE integration witness
+      - name: Install production witness dependencies
         run: |
           set -euo pipefail
           export PYTHONPATH=.
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           python -m playwright install chromium
+
+      - name: Production demo witness
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
           python scripts/msos_production_demo_witness.py --write artifacts/health/msos_production_demo_witness.json
+
+      - name: Production playwright witness
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
           python scripts/msos_production_playwright_witness.py --write-dir artifacts/health/msos_production_playwright
+
+      - name: MSOS journey crawler witness
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
           python scripts/msos_journey_crawler.py \
             --base-url https://marketstructureos.com \
             --flows routes missing-paper delete-paper \
