@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { connectedMarkets, navItems } from "@/data/commandCenterFixtures";
 import { CurrencySelect } from "@/components/CurrencySelect";
+import { MsosLogo } from "@/components/MsosLogo";
 import type { EntitlementTier } from "@/lib/msosEntitlements";
 import { tierLabel, upgradeOfferUrl } from "@/lib/msosEntitlements";
 import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
@@ -24,7 +25,7 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
   return (
     <aside className="app-sidebar">
       <Link className="brand app-brand" href={MSOS_ROUTES.home}>
-        <div className="logo" aria-hidden="true" />
+        <MsosLogo className="logo" size={32} />
         <div>
           MSOS
           <small>Market Structure OS</small>

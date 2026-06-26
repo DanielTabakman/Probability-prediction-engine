@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ActionLink } from "@/components/ActionLink";
+import { MsosLogo } from "@/components/MsosLogo";
 import { MSOS_ROUTES, resolveSignInUrl } from "@/lib/msosPublicUrls";
 import { clearPlatformTutorialComplete } from "@/lib/platformTutorial";
 
@@ -19,7 +20,7 @@ export function PublicNav() {
   return (
     <nav className="public-nav">
       <Link className="brand" href={MSOS_ROUTES.home}>
-        <div className="logo" aria-hidden="true" />
+        <MsosLogo className="logo" size={38} />
         <div>
           Market Structure OS
           <small>For traders with a market view</small>
