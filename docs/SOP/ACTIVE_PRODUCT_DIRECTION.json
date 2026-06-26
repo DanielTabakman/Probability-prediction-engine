@@ -3,7 +3,7 @@
   "pivotId": "trader-workflow-integration-v1",
   "asOf": "2026-06-25",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
-  "primaryFocus": "Trader workflow integration — self-serve disagreement loop + learning ingestion into product",
+  "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
   "designComplete": true,
   "storyboardRef": "docs/VISION/MSOS/storyboard-v0.6/prototype/html/",
@@ -11,7 +11,7 @@
     "id": "trader_workflow_integration_v1",
     "label": "Trader Workflow Integration v1",
     "charter": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md",
-    "outcome": "Trader self-serves thesis → disagreement → expression → save/review; strong+ workflow signals ship as product changes"
+    "outcome": "Trader uses MSOS during their trading process — imply, disagree, express, return — with strong+ signals shipping back as product"
   },
   "priorMilestones": [
     {
@@ -74,7 +74,7 @@
   ],
   "buildTrack": {
     "label": "Trader Workflow Integration v1",
-    "outcome": "Self-serve disagreement loop + ETH wedge + workflow research ingestion",
+    "outcome": "MSOS in the trading process — imply, disagree, express, return; not a demo-only visit",
     "chapters": [
       "ppe_crypto_multi_asset_v1"
     ]

@@ -27,7 +27,7 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 **Milestone:** **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 
-**Active relay:** `ppe_crypto_multi_asset_v1` — Trader workflow integration — self-serve disagreement loop + learning ingestion into product
+**Active relay:** `ppe_crypto_multi_asset_v1` — Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 
 - **Sprint:** [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
 - **Plan:** [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)

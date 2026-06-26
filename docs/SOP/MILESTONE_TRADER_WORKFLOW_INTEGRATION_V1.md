@@ -8,9 +8,11 @@
 
 ## What this milestone is
 
+**Goal:** A trader **uses MSOS as part of their trading process** — not a one-off demo tour.
+
 **Not** a single relay chapter. **Not** “ship ETH” or “finish demo” in isolation.
 
-**Trader Workflow Integration v1** means a BTC options trader can **self-serve** through the MSOS disagreement loop — discover what the market implies, state where they disagree, sketch an expression, save/review, and return — **without operator-led demos**, with enough fidelity that **workflow research produces strong+ signals** that ship back as product changes.
+**Trader Workflow Integration v1** means the product fits a real decision loop: before or during a trade idea, the trader opens MSOS to see what options imply, where they disagree, what expression fits, and they **come back** to check or review — self-serve, without operator hand-holding. Workflow research confirms *where* in the process it lands and ships fixes from **strong+** signals.
 
 Canon loop (backplane): **thesis → implied probability → disagreement → expression → save/review → monitor/history**.
 
@@ -42,11 +44,11 @@ Canon loop (backplane): **thesis → implied probability → disagreement → ex
 
 ## Milestone complete when
 
-1. **Self-serve:** ≥3 external testers complete the loop via public URL + tour **without** a scheduled operator demo (logged in validation).
-2. **Workflow signal:** ≥1 **strong+** observation triaged to a shippable backlog row or merged product slice.
+1. **Process fit:** ≥3 external traders report using MSOS **during** their trading process (pre-trade research, structure selection, or post-entry review) — not just “completed the tour” (logged in validation with `signal: strong+` or `very_strong`).
+2. **Return without prompt:** ≥2 of those return within 7 days **without** a scheduled follow-up (strongest process-integration signal).
 3. **Wedge depth:** BTC + ETH selector live in Strategy Lab with witness green (crypto chapter COMPLETE).
-4. **Tutorial contract:** `verify_demo_tutorial_contract.py` + production tutorial crawl green after feature changes.
-5. **Loop coherence:** Steward sign-off that P4→P7 journey matches storyboard semantics for the **Disagreement** interaction mode (mode 1).
+4. **Loop coherence:** P4→P7 journey matches storyboard semantics for **Disagreement** mode; tutorial contract green on production.
+5. **Learning shipped:** ≥1 **strong+** observation from (1)–(2) triaged to merged product work or backlog row.
 
 ---
 
@@ -62,7 +64,7 @@ Canon loop (backplane): **thesis → implied probability → disagreement → ex
 
 ## How BUILD agents use this
 
-- **Scope test:** Does the slice advance self-serve loop, wedge depth, loop fidelity, or learning ingestion?
+- **Scope test:** Does the slice help a trader **use MSOS in their process** (onboarding, wedge depth, loop fidelity, or learning ingestion)?
 - **Relay order:** FRONTIER queue still controls slice automation; this doc controls **why**.
 - **Tutorial rule:** Any visitor-visible workflow change → update tour in same PR ([`CLIENT_SELF_SERVE_DEMO_V1.md`](CLIENT_SELF_SERVE_DEMO_V1.md)).
 

@@ -8,7 +8,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 **Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-25
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
-- **Primary focus:** Trader workflow integration — self-serve disagreement loop + learning ingestion into product
+- **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `ppe_crypto_multi_asset_v1` · plan [`ppe_crypto_multi_asset_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json)
