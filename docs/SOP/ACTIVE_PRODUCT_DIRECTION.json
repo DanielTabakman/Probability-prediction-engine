@@ -32,7 +32,7 @@
   "activeBuildChapterId": "ppe_equity_options_v1",
   "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
   "activeBuildSprint": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
-  "nextStewardAction": "Run ppe_auto_select --apply to promote ppe_equity_options_v1 after self-serve closeout; then run_ppe.cmd",
+  "nextStewardAction": "Finish ppe_equity_options_v1 closeout → ppe_tradeable_universe_v1 → urgent SOL chapter (ppe_deribit_crypto_tier1_v1); equity index batches defer behind SOL",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

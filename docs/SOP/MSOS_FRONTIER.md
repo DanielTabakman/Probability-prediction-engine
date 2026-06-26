@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `ppe_equity_options_v1` · plan [`ppe_equity_options_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json)
-- **Next steward action:** Run ppe_auto_select --apply to promote ppe_equity_options_v1 after self-serve closeout; then run_ppe.cmd
+- **Next steward action:** Finish ppe_equity_options_v1 closeout → ppe_tradeable_universe_v1 → urgent SOL chapter (ppe_deribit_crypto_tier1_v1); equity index batches defer behind SOL
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
