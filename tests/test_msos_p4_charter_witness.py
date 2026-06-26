@@ -49,6 +49,12 @@ MSOS_USABLE_DEMO_PLAN = (
 PPE_CRYPTO_MA_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json"
 )
+MSOS_SELF_SERVE_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json"
+)
+PPE_EQUITY_PLAN = (
+    "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -74,6 +80,8 @@ ALLOWED_READY_PLANS = (
     MSOS_E2E_WITNESS_PLAN,
     MSOS_USABLE_DEMO_PLAN,
     PPE_CRYPTO_MA_PLAN,
+    MSOS_SELF_SERVE_PLAN,
+    PPE_EQUITY_PLAN,
 )
 
 

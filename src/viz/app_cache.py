@@ -12,6 +12,7 @@ import streamlit as st
 from src.data import fetch_polymarket_markets, fetch_yahoo_prices
 from src.data.fetch_btc_options import fetch_btc_options_summary
 from src.data.fetch_deribit import (
+    DEFAULT_OPTION_EXPIRIES_MAX,
     fetch_deribit_btc_futures_forward_curve,
     fetch_deribit_btc_index,
     fetch_deribit_btc_option_book_marks,
@@ -83,7 +84,7 @@ def cached_options_for_chart():
 
 
 @st.cache_data(ttl=CACHE_TTL_OPTION_EXPIRIES)
-def cached_option_expiries(max_expiries):
+def cached_option_expiries(max_expiries=DEFAULT_OPTION_EXPIRIES_MAX):
     rows = fetch_deribit_btc_option_expiries(max_expiries=max_expiries)
     return rows, last_deribit_instruments_diagnostic()
 

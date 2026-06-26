@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
@@ -15,30 +15,82 @@ type PlatformTutorialProps = {
   steps?: PlatformTutorialStep[];
 };
 
-type AnchorRect = {
+type ViewportRect = {
   top: number;
   left: number;
   width: number;
   height: number;
 };
 
-function measureAnchor(selector: string): AnchorRect | null {
+type CardPlacement = {
+  top: number;
+  left: number;
+};
+
+const CARD_GAP = 12;
+const VIEWPORT_PADDING = 16;
+const CARD_MAX_WIDTH = 360;
+const CARD_FALLBACK_HEIGHT = 190;
+
+function measureAnchorViewport(selector: string): ViewportRect | null {
   const node = document.querySelector(selector);
   if (!node) return null;
   const rect = node.getBoundingClientRect();
   return {
-    top: rect.top + window.scrollY,
-    left: rect.left + window.scrollX,
+    top: rect.top,
+    left: rect.left,
     width: rect.width,
     height: rect.height,
   };
+}
+
+function scrollAnchorIntoView(selector: string): void {
+  const node = document.querySelector(selector);
+  if (!node) return;
+  node.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+}
+
+function computeCardPlacement(
+  anchor: ViewportRect | null,
+  cardHeight: number,
+  cardWidth: number,
+): CardPlacement {
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const width = Math.min(cardWidth, viewportWidth - VIEWPORT_PADDING * 2);
+
+  if (!anchor) {
+    return {
+      top: VIEWPORT_PADDING + 80,
+      left: VIEWPORT_PADDING,
+    };
+  }
+
+  const spaceBelow = viewportHeight - (anchor.top + anchor.height + CARD_GAP);
+  const spaceAbove = anchor.top - CARD_GAP;
+  const placeAbove = spaceBelow < cardHeight && spaceAbove > spaceBelow;
+
+  let top = placeAbove
+    ? anchor.top - CARD_GAP - cardHeight
+    : anchor.top + anchor.height + CARD_GAP;
+
+  top = Math.max(
+    VIEWPORT_PADDING,
+    Math.min(top, viewportHeight - cardHeight - VIEWPORT_PADDING),
+  );
+
+  let left = Math.max(VIEWPORT_PADDING, anchor.left);
+  left = Math.min(left, viewportWidth - width - VIEWPORT_PADDING);
+
+  return { top, left };
 }
 
 function TutorialCard({
   step,
   index,
   total,
-  anchor,
+  placement,
+  cardRef,
   onBack,
   onNext,
   onSkip,
@@ -46,20 +98,19 @@ function TutorialCard({
   step: PlatformTutorialStep;
   index: number;
   total: number;
-  anchor: AnchorRect | null;
+  placement: CardPlacement;
+  cardRef: React.RefObject<HTMLDivElement | null>;
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
 }) {
-  const top = anchor ? anchor.top + anchor.height + 12 : 120;
-  const left = anchor ? Math.max(16, anchor.left) : 24;
-
   return (
     <div
+      ref={cardRef}
       className="platform-tutorial-card"
       role="dialog"
       aria-labelledby={`tutorial-title-${step.id}`}
-      style={{ top, left, maxWidth: 360 }}
+      style={{ top: placement.top, left: placement.left, maxWidth: CARD_MAX_WIDTH }}
     >
       <div className="platform-tutorial-kicker">
         Step {index + 1} of {total}
@@ -86,34 +137,57 @@ function TutorialCard({
 
 export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_STEPS }: PlatformTutorialProps) {
   const [stepIndex, setStepIndex] = useState(0);
-  const [anchor, setAnchor] = useState<AnchorRect | null>(null);
+  const [anchor, setAnchor] = useState<ViewportRect | null>(null);
+  const [placement, setPlacement] = useState<CardPlacement>({
+    top: VIEWPORT_PADDING + 80,
+    left: VIEWPORT_PADDING,
+  });
   const [mounted, setMounted] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const step = steps[stepIndex];
 
-  const refreshAnchor = useCallback(() => {
+  const refreshLayout = useCallback(() => {
     if (!step) return;
-    setAnchor(measureAnchor(step.anchor));
+    const nextAnchor = measureAnchorViewport(step.anchor);
+    setAnchor(nextAnchor);
+
+    const cardNode = cardRef.current;
+    const cardHeight = cardNode?.offsetHeight ?? CARD_FALLBACK_HEIGHT;
+    const cardWidth = cardNode?.offsetWidth ?? CARD_MAX_WIDTH;
+    setPlacement(computeCardPlacement(nextAnchor, cardHeight, cardWidth));
   }, [step]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useLayoutEffect(() => {
+    if (!active || !step) return;
+    scrollAnchorIntoView(step.anchor);
+    refreshLayout();
+    const afterScroll = window.setTimeout(refreshLayout, 350);
+    const afterScrollLong = window.setTimeout(refreshLayout, 700);
+    return () => {
+      window.clearTimeout(afterScroll);
+      window.clearTimeout(afterScrollLong);
+    };
+  }, [active, stepIndex, step, refreshLayout]);
+
   useEffect(() => {
     if (!active) {
       setStepIndex(0);
       return;
     }
-    refreshAnchor();
-    const onResize = () => refreshAnchor();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("scroll", onResize, true);
+    refreshLayout();
+    const onViewportChange = () => refreshLayout();
+    window.addEventListener("resize", onViewportChange);
+    window.addEventListener("scroll", onViewportChange, true);
     return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("scroll", onResize, true);
+      window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("scroll", onViewportChange, true);
     };
-  }, [active, stepIndex, refreshAnchor, steps]);
+  }, [active, stepIndex, refreshLayout]);
 
   const finish = useCallback(() => {
     markPlatformTutorialComplete();
@@ -150,7 +224,8 @@ export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_ST
         step={step}
         index={stepIndex}
         total={steps.length}
-        anchor={anchor}
+        placement={placement}
+        cardRef={cardRef}
         onBack={() => setStepIndex((value) => Math.max(0, value - 1))}
         onNext={handleNext}
         onSkip={finish}

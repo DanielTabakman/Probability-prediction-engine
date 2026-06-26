@@ -1,11 +1,9 @@
-import Link from "next/link";
-
-import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
+import { RestartTourButton } from "@/components/RestartTourButton";
 
 const FEATURES = [
   {
     title: "Read the market",
-    body: "Live BTC options distribution from Deribit — what the chain implies at your expiry.",
+    body: "Live BTC and ETH options from Deribit — what the chain implies at your expiry.",
   },
   {
     title: "State your view",
@@ -19,7 +17,7 @@ const FEATURES = [
 
 export function FeaturesRow() {
   return (
-    <section className="features-row" aria-label="How it works">
+    <section className="features-row" aria-label="How it works" data-self-serve-entry="features">
       {FEATURES.map((feature) => (
         <article className="feature" key={feature.title}>
           <h3>{feature.title}</h3>
@@ -29,9 +27,12 @@ export function FeaturesRow() {
       <div className="feature feature-cta">
         <h3>Ready?</h3>
         <p>Walk through Strategy Lab with the guided tour — or jump straight in.</p>
-        <Link className="btn slim primary" href="/strategy-lab?tutorial=1">
-          Start the tour
-        </Link>
+        <RestartTourButton className="btn slim primary">Start the tour</RestartTourButton>
+        <p className="micro" style={{ marginTop: 8 }}>
+          <RestartTourButton className="nav-text-btn" beginner>
+            New to options? Try the simpler tour
+          </RestartTourButton>
+        </p>
       </div>
     </section>
   );

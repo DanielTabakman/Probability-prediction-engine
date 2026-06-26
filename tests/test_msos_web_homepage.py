@@ -21,8 +21,9 @@ def test_msos_web_package_and_homepage_copy() -> None:
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
     assert "HeroSection" in page
     assert "Turn your market thesis" in hero
-    assert "Strategy Lab" in hero or "strategyLabTutorialHref" in hero
+    assert "strategyLabForcedTourHref" in hero or "strategyLabTutorialHref" in hero
     assert "ResearchBetaModal" in hero
+    assert 'data-self-serve-entry="homepage"' in page
 
 
 def test_msos_web_docker_and_compose_wiring() -> None:
@@ -33,27 +34,41 @@ def test_msos_web_docker_and_compose_wiring() -> None:
     assert "msos_web:3000" in caddy
 
 
-def test_hero_simplified_with_tutorial_and_research_modal() -> None:
+def test_hero_self_serve_ctas() -> None:
     hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert '"use client"' in hero
-    assert "ResearchBetaModal" in hero
-    assert "strategyLabTutorialHref" in hero
-    assert "ActionLink" in hero
-    assert "semantic-lock" not in hero
-    assert "Open Command Center" not in hero
+    assert "Start guided tour" in hero
+    assert "strategyLabForcedTourHref" in hero
+    assert "BTC and ETH" in hero
+    assert "BTC + ETH options live" in hero
 
 
 def test_public_nav_restart_tour() -> None:
     nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
+    restart = (MSOS_WEB / "src" / "components" / "RestartTourButton.tsx").read_text(encoding="utf-8")
     assert "Restart tour" in nav
-    assert "clearPlatformTutorialComplete" in nav
+    assert "RestartTourButton" in nav
+    assert "strategyLabForcedTourHref" in restart
 
 
 def test_platform_tutorial_wiring() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "platformTutorial.ts").read_text(encoding="utf-8")
-    assert "PLATFORM_TUTORIAL_STEPS" in lib
+    assert "lab-asset" in lib
+    assert "BTC or ETH" in lib
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
+    assert 'data-tour="lab-asset"' in shell
+
+
+def test_features_row_self_serve_entry() -> None:
+    features = (MSOS_WEB / "src" / "components" / "FeaturesRow.tsx").read_text(encoding="utf-8")
+    assert 'data-self-serve-entry="features"' in features
+    assert "BTC and ETH" in features
+    assert "beginner" in features
+
+
+def test_expiry_context_strip_uses_asset_ticker() -> None:
+    strip = (MSOS_WEB / "src" / "components" / "ExpiryMarketContextStrip.tsx").read_text(encoding="utf-8")
+    assert "assetTicker" in strip
 
 
 def test_belief_bounds_copy_explains_limits() -> None:

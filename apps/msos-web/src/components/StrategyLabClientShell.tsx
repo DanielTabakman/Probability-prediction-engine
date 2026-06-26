@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
@@ -28,10 +28,11 @@ import {
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
 import {
-  PLATFORM_TUTORIAL_BEGINNER_QUERY,
-  PLATFORM_TUTORIAL_QUERY,
+  hasTutorialSearchParams,
   isPlatformTutorialComplete,
+  resolveTutorialBeginnerMode,
   resolveTutorialSteps,
+  stripTutorialSearchParams,
 } from "@/lib/platformTutorial";
 
 type StrategyLabClientShellProps = {
@@ -59,6 +60,7 @@ function buildAssetHref(
 
 export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const selectedAssetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
@@ -70,15 +72,30 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     [payload, selectedAssetId],
   );
 
-  useEffect(() => {
-    const forced = searchParams.get(PLATFORM_TUTORIAL_QUERY) === "1";
-    const beginner =
-      searchParams.get(PLATFORM_TUTORIAL_BEGINNER_QUERY) === "1" ||
-      searchParams.get(PLATFORM_TUTORIAL_QUERY) === "beginner";
-    setTutorialBeginner(beginner);
-    if (forced || beginner || !isPlatformTutorialComplete()) {
-      setTutorialOpen(true);
+  const closeTutorial = useCallback(() => {
+    setTutorialOpen(false);
+    if (hasTutorialSearchParams(searchParams)) {
+      const next = stripTutorialSearchParams(searchParams);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }
+  }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    const beginner = resolveTutorialBeginnerMode(searchParams);
+    setTutorialBeginner(beginner);
+
+    if (hasTutorialSearchParams(searchParams)) {
+      setTutorialOpen(true);
+      return;
+    }
+
+    if (!isPlatformTutorialComplete()) {
+      setTutorialOpen(true);
+      return;
+    }
+
+    setTutorialOpen(false);
   }, [searchParams]);
 
   useEffect(() => {
@@ -122,7 +139,12 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         <div>
           <div className="crumb">Strategy Lab · {assetMeta.label}</div>
           <h1 className="title">Strategy Lab</h1>
-          <nav className="belief-axis-pair" aria-label="Options asset" style={{ marginTop: 10, maxWidth: 220 }}>
+          <nav
+            className="belief-axis-pair"
+            aria-label="Options asset"
+            style={{ marginTop: 10, maxWidth: 220 }}
+            data-tour="lab-asset"
+          >
             {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
               const active = assetId === selectedAssetId;
               return (
@@ -184,7 +206,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
 
       <PlatformTutorial
         active={tutorialOpen}
-        onClose={() => setTutorialOpen(false)}
+        onClose={closeTutorial}
         steps={resolveTutorialSteps(tutorialBeginner)}
       />
 

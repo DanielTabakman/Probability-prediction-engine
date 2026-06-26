@@ -288,6 +288,19 @@
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "status": "DONE",
+      "reason": "[P0] Self-serve onboarding \u2014 COMPLETE 2026-06-26",
+      "selectionPrep": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
+      "doneReason": "IDE BUILD closeout 2026-06-26"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "status": "READY",
+      "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
       "status": "PLANNED",
       "reason": "[MEDIUM] Bounded build repair \u2014 factory side-channel after P0 usable demo",

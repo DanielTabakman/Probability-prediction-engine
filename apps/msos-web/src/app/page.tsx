@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="page">
       <PublicNav />
-      <main className="hero">
+      <main className="hero" data-self-serve-entry="homepage">
         <HeroSection />
         <ProductWindow />
       </main>

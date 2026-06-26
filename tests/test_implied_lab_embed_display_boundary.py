@@ -248,7 +248,7 @@ def strategy_mocks(monkeypatch: pytest.MonkeyPatch) -> str:
     )
     monkeypatch.setattr(
         "src.viz.strategy_suggestion_boundary.cached_option_expiries",
-        lambda _n: (
+        lambda *_args, **_kwargs: (
             [{"expiry_date_str": expiry_str, "expiry_ts": expiry_ts}],
             {},
         ),

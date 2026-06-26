@@ -112,6 +112,8 @@ def test_manifest_points_at_known_active_or_closed_plan() -> None:
         "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
     }
     assert manifest.get("phasePlanPath") in allowed
     assert manifest["status"] in ("COMPLETE", "READY", "RUNNING")

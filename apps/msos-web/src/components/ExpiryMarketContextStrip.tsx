@@ -9,6 +9,7 @@ type ExpiryMarketContextStripProps = {
   expiryOptions: string[];
   onExpiryChange: (expiry: string) => void;
   expiryPickerDisabled?: boolean;
+  assetTicker?: string;
 };
 
 export function ExpiryMarketContextStrip({
@@ -16,6 +17,7 @@ export function ExpiryMarketContextStrip({
   expiryOptions,
   onExpiryChange,
   expiryPickerDisabled = false,
+  assetTicker = "BTC",
 }: ExpiryMarketContextStripProps) {
   const { formatMoney } = useDisplayCurrency();
 
@@ -29,7 +31,7 @@ export function ExpiryMarketContextStrip({
       />
       <div className="expiry-market-context-grid">
         <div className="expiry-market-context-cell">
-          <div className="expiry-market-context-k">Today&apos;s BTC</div>
+          <div className="expiry-market-context-k">Today&apos;s {assetTicker}</div>
           <div className="expiry-market-context-v">{formatMoney(context.spotUsd)}</div>
         </div>
         <div className="expiry-market-context-cell">

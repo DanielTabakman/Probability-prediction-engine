@@ -15,13 +15,15 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-26) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `` — [``]() |
-| **Relay plan** | [``]() |
-| **Next** | Milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md; charter next relay chapter when steward SELECTION adds READY queue item (equity remains DEFER until G-04) |
+| **Active BUILD** | `ppe_equity_options_v1` — [`SPRINT_PPE_EQUITY_OPTIONS_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md) |
+| **Relay plan** | [`ppe_equity_options_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json) |
+| **Next** | Run ppe_auto_select --apply to promote ppe_equity_options_v1 after self-serve closeout; then run_ppe.cmd |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
   - `ppe_crypto_multi_asset_v1`
+  - `msos_self_serve_onboarding_v1`
+  - `ppe_equity_options_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
