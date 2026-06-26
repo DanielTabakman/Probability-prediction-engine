@@ -149,7 +149,7 @@ jobs:
             --write-dir artifacts/health/msos_journey_crawler
 
       - name: Upload production witness artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: msos-production-witness
           path: artifacts/health/
