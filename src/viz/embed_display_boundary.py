@@ -11,7 +11,15 @@ import json
 from typing import Any, Callable
 from urllib.parse import parse_qs
 
-from src.data.assets_registry import asset_venue, default_asset_id
+from src.data.assets_registry import (
+    asset_venue,
+    catalog_group_order,
+    default_asset_id,
+    get_asset,
+    is_asset_enabled,
+    list_catalog_entries,
+    registry_version,
+)
 from src.engine.implied_distribution import build_distribution_chart_data, lognormal_pdf
 from src.viz.curve_display_labels import build_curve_display_labels
 from src.viz.lab_asset_selection import (
@@ -26,6 +34,7 @@ from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_
 DISPLAY_PAYLOAD_SCHEMA_VERSION = 1
 DISPLAY_PAYLOAD_KIND = "distribution_display_boundary"
 DISPLAY_PAYLOAD_HTTP_PATH = "/ppe-display-api/display.json"
+CATALOG_PAYLOAD_HTTP_PATH = "/ppe-display-api/catalog.json"
 BELIEF_OVERLAY_KIND = "belief_overlay"
 BELIEF_OVERLAY_HTTP_PATH = "/ppe-display-api/belief-overlay.json"
 STRATEGY_SUGGESTION_HTTP_PATH = "/ppe-display-api/strategy-suggestion.json"
@@ -33,6 +42,8 @@ EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
 DISPLAY_PAYLOAD_MODE = "native_json"
+CATALOG_PAYLOAD_KIND = "asset_catalog"
+CATALOG_PAYLOAD_SCHEMA_VERSION = 1
 EMBED_ONLY_FALLBACK_MODE = "streamlit_embed_only"
 
 # MSOS Strategy Lab belief presets — illustrative lognormal shifts vs market reference (display only).
@@ -276,6 +287,138 @@ def serialize_distribution_display_payload(payload: dict[str, Any]) -> str:
     return json.dumps(payload, separators=(",", ":"), sort_keys=True)
 
 
+def build_asset_catalog_response() -> dict[str, Any]:
+    """Grouped enabled assets for MSOS / Streamlit pickers (metadata only — no prices)."""
+    entries = list_catalog_entries(enabled_only=True)
+    by_group: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        gid = str(entry.get("catalog_group") or "other")
+        by_group.setdefault(gid, []).append(entry)
+
+    groups: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in catalog_group_order():
+        gid = str(row.get("id") or "").strip()
+        if not gid or gid not in by_group:
+            continue
+        groups.append(
+            {
+                "id": gid,
+                "label": str(row.get("label") or gid),
+                "assets": by_group[gid],
+            }
+        )
+        seen.add(gid)
+    for gid in sorted(by_group):
+        if gid in seen:
+            continue
+        groups.append(
+            {
+                "id": gid,
+                "label": gid.replace("_", " ").title(),
+                "assets": by_group[gid],
+            }
+        )
+
+    return {
+        "schema_version": CATALOG_PAYLOAD_SCHEMA_VERSION,
+        "kind": CATALOG_PAYLOAD_KIND,
+        "default_asset_id": default_asset_id(),
+        "groups": groups,
+        "meta": {
+            "read_only": True,
+            "http_path": CATALOG_PAYLOAD_HTTP_PATH,
+            "registry_version": registry_version(),
+        },
+    }
+
+
+def serialize_asset_catalog_payload(payload: dict[str, Any]) -> str:
+    return json.dumps(payload, separators=(",", ":"), sort_keys=True)
+
+
+def validate_asset_catalog_payload(payload: dict[str, Any]) -> tuple[bool, str | None]:
+    if payload.get("kind") != CATALOG_PAYLOAD_KIND:
+        return False, f"expected kind {CATALOG_PAYLOAD_KIND!r}"
+    if not payload.get("default_asset_id"):
+        return False, "missing default_asset_id"
+    groups = payload.get("groups")
+    if not isinstance(groups, list) or not groups:
+        return False, "groups must be a non-empty list"
+    asset_ids: list[str] = []
+    for group in groups:
+        if not isinstance(group, dict):
+            return False, "group must be object"
+        assets = group.get("assets")
+        if not isinstance(assets, list) or not assets:
+            return False, f"group {group.get('id')!r} has no assets"
+        for asset in assets:
+            if not isinstance(asset, dict) or not asset.get("id"):
+                return False, "asset entry missing id"
+            asset_ids.append(str(asset["id"]))
+    if payload["default_asset_id"] not in asset_ids:
+        return False, "default_asset_id not present in grouped assets"
+    return True, None
+
+
+def _sample_export_row(asset_id: str) -> list[dict[str, str]]:
+    """Minimal export row for mocked display-boundary witness (no vendor I/O)."""
+    return [
+        {
+            "asset": asset_id,
+            "distribution": "market_implied_bl",
+            "expiry_date": "2030-01-01",
+            "forward_usd": "100000",
+            "atm_iv": "0.5",
+            "spot_usd": "99000",
+            "trust_state": "ok",
+        },
+        {
+            "asset": asset_id,
+            "distribution": "lognormal_reference",
+            "expiry_date": "2030-01-01",
+            "forward_usd": "100000",
+            "atm_iv": "0.5",
+            "spot_usd": "99000",
+            "trust_state": "ok",
+        },
+    ]
+
+
+def witness_display_boundary_for_asset(asset_id: str, *, live: bool = False) -> tuple[bool, str]:
+    """Registry + display payload witness for one asset (mocked or live)."""
+    aid = str(asset_id or "").strip().upper()
+    if not is_asset_enabled(aid):
+        return True, "skipped (disabled)"
+    try:
+        get_asset(aid)
+    except KeyError:
+        return False, "unknown asset_id"
+
+    catalog_ids = {e["id"] for e in list_catalog_entries(enabled_only=True)}
+    if aid not in catalog_ids:
+        return False, "missing from enabled catalog entries"
+
+    if live:
+        try:
+            payload = build_live_distribution_display_payload(asset_id=aid)
+        except Exception as exc:  # noqa: BLE001
+            return False, f"live display boundary failed: {exc}"
+    else:
+        payload = build_distribution_display_payload(
+            as_of_utc="2026-01-01T00:00:00Z",
+            spot_usd=100_000.0 if asset_venue(aid) == "deribit" else 140.0,
+            export_rows=_sample_export_row(aid),
+            asset_id=aid,
+        )
+
+    if payload.get("kind") != DISPLAY_PAYLOAD_KIND:
+        return False, f"unexpected payload kind {payload.get('kind')!r}"
+    if str((payload.get("asset") or {}).get("id")) != aid:
+        return False, "payload asset id mismatch"
+    return True, "display boundary ok"
+
+
 def build_live_distribution_display_payload(
     *,
     asset_id: str | None = None,
@@ -321,6 +464,19 @@ def create_display_payload_wsgi_app(
                 )
                 return [err]
             body = serialize_distribution_display_payload(payload).encode("utf-8")
+            start_response(
+                "200 OK",
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
+        if path == "/catalog.json":
+            catalog = build_asset_catalog_response()
+            body = serialize_asset_catalog_payload(catalog).encode("utf-8")
             start_response(
                 "200 OK",
                 [

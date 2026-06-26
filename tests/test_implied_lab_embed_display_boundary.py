@@ -10,17 +10,22 @@ from src.viz.distribution_export import build_distribution_export_rows
 from src.viz.curve_display_labels import build_curve_display_labels
 from src.viz.embed_display_boundary import (
     BELIEF_OVERLAY_KIND,
+    CATALOG_PAYLOAD_HTTP_PATH,
+    CATALOG_PAYLOAD_KIND,
     DISPLAY_PAYLOAD_HTTP_PATH,
     DISPLAY_PAYLOAD_KIND,
     DISPLAY_PAYLOAD_MODE,
     DISPLAY_PAYLOAD_SCHEMA_VERSION,
     EMBED_ONLY_FALLBACK_MODE,
+    build_asset_catalog_response,
     build_belief_overlay_response,
     build_distribution_display_payload,
     build_chart_series_from_export_row,
     clamp_belief_mult,
     create_display_payload_wsgi_app,
     serialize_distribution_display_payload,
+    validate_asset_catalog_payload,
+    witness_display_boundary_for_asset,
 )
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID
 from src.viz.strategy_suggestion_boundary import (
@@ -124,6 +129,43 @@ def test_wsgi_app_serves_json() -> None:
     parsed = json.loads(body.decode("utf-8"))
     assert parsed["kind"] == DISPLAY_PAYLOAD_KIND
     assert any(h == ("Cache-Control", "no-store") for h in headers)
+
+
+def test_asset_catalog_response_grouped_enabled_assets() -> None:
+    catalog = build_asset_catalog_response()
+    ok, err = validate_asset_catalog_payload(catalog)
+    assert ok is True, err
+    assert catalog["kind"] == CATALOG_PAYLOAD_KIND
+    assert catalog["default_asset_id"] == "BTC"
+    assert catalog["meta"]["http_path"] == CATALOG_PAYLOAD_HTTP_PATH
+    crypto = next(g for g in catalog["groups"] if g["id"] == "crypto")
+    ids = [a["id"] for a in crypto["assets"]]
+    assert ids == ["BTC", "ETH"]
+    assert all("venue" in a and "asset_class" in a for a in crypto["assets"])
+
+
+def test_wsgi_app_serves_catalog_json() -> None:
+    app = create_display_payload_wsgi_app(lambda _environ: {})
+
+    status: list[str] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+
+    body = b"".join(app({"PATH_INFO": "/catalog.json"}, start_response))
+    assert status == ["200 OK"]
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["kind"] == CATALOG_PAYLOAD_KIND
+    assert validate_asset_catalog_payload(parsed)[0] is True
+
+
+def test_witness_display_boundary_mocked_btc_eth_nvda_skip() -> None:
+    for aid in ("BTC", "ETH"):
+        ok, detail = witness_display_boundary_for_asset(aid, live=False)
+        assert ok is True, detail
+    ok_nvda, detail_nvda = witness_display_boundary_for_asset("NVDA", live=False)
+    assert ok_nvda is True
+    assert "skip" in detail_nvda.lower()
 
 
 def test_wsgi_app_rejects_unknown_paths() -> None:
