@@ -63,3 +63,15 @@ def test_roadmap_lists_universe_program_after_equity() -> None:
     equity_idx = paths.index("docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json")
     universe_idx = paths.index("docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json")
     assert universe_idx > equity_idx
+
+
+def test_manifest_points_at_tradeable_universe_chapter() -> None:
+    manifest = json.loads((SOP / "ACTIVE_PHASE_MANIFEST.json").read_text(encoding="utf-8"))
+    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
+    assert manifest.get("status") == "READY"
+
+
+def test_universe_control_slice_closed_in_evidence_doc() -> None:
+    body = UNIVERSE_EVIDENCE.read_text(encoding="utf-8")
+    row = body.split("PPE-Universe-Control-Slice001", 1)[1].split("\n", 1)[0]
+    assert "**CLOSED**" in row

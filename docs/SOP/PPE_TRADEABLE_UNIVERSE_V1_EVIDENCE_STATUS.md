@@ -9,7 +9,7 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| PPE-Universe-Control-Slice001 | PENDING | Charter |
+| PPE-Universe-Control-Slice001 | **CLOSED** | Program + ADR + tier1 manifest + evidence stub (charter witness green) |
 | PPE-Universe-Core-Slice002 | PENDING | Registry v2 |
 | PPE-Universe-Core-Slice003 | PENDING | catalog.json + witness script |
 | PPE-Universe-UI-Slice004 | PENDING | Streamlit selector |
@@ -22,7 +22,7 @@
 
 ## Gates (at SELECTION)
 
-- [ ] `ppe_equity_options_v1` COMPLETE
+- [x] `ppe_equity_options_v1` COMPLETE (2026-06-26)
 - [x] Program + ADR + tier1 manifest chartered
 - [x] Steward SELECTION 2026-06-26
 
