@@ -14,13 +14,23 @@ MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
 
 
 def test_journey_crawler_module_exports_routes() -> None:
-    from scripts.msos_journey_crawler import MSOS_JOURNEY_ROUTES, page_looks_like_404
+    from scripts.msos_journey_crawler import (
+        MSOS_JOURNEY_ROUTES,
+        ROUTE_EXPECTED_CONTENT,
+        page_looks_like_404,
+        route_expected_content,
+    )
 
     paths = {path for path, _ in MSOS_JOURNEY_ROUTES}
     assert "/monitor" in paths
-    assert "/history" in paths
+    assert route_expected_content("monitor") == "Watching now"
+    assert ROUTE_EXPECTED_CONTENT["monitor"] == "Watching now"
     assert page_looks_like_404("<title>404: This page could not be found</title>") is not None
-    assert page_looks_like_404("<h1>Monitor</h1>") is None
+    assert page_looks_like_404("<h1>Monitor</h1>", expected_content="Watching now") is None
+    assert (
+        page_looks_like_404("<main class='not-found-shell'>This page isn't available</main>")
+        is None
+    )
 
 
 def test_paper_trade_detail_redirects_when_missing() -> None:
