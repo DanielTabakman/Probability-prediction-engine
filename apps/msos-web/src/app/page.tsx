@@ -7,11 +7,13 @@ export default function HomePage() {
   return (
     <div className="page">
       <PublicNav />
-      <main className="hero" data-self-serve-entry="homepage">
-        <HeroSection />
-        <ProductWindow />
+      <main className="home-main" data-self-serve-entry="homepage">
+        <section className="hero" aria-label="Introduction">
+          <HeroSection />
+          <ProductWindow />
+        </section>
+        <FeaturesRow />
       </main>
-      <FeaturesRow />
     </div>
   );
 }
