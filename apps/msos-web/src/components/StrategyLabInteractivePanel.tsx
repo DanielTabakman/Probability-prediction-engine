@@ -26,6 +26,7 @@ import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import {
   buildOutcomeFromPayload,
   findSeriesByExpiry,
+  type DisplayAssetMeta,
   type DisplayPayload,
   type LabOutcomeSummary,
 } from "@/lib/ppeDisplayPayload";
@@ -38,6 +39,7 @@ type StrategyLabInteractivePanelProps = {
   selectedExpiry: string;
   onExpiryChange: (expiry: string) => void;
   expiryOptions: string[];
+  assetMeta: DisplayAssetMeta;
 };
 
 export function StrategyLabInteractivePanel({
@@ -48,6 +50,7 @@ export function StrategyLabInteractivePanel({
   selectedExpiry,
   onExpiryChange,
   expiryOptions,
+  assetMeta,
 }: StrategyLabInteractivePanelProps) {
   const { formatMoney } = useDisplayCurrency();
   const [tuning, setTuning] = useState<BeliefTuning>(MARKET_TUNING);
@@ -112,7 +115,7 @@ export function StrategyLabInteractivePanel({
 
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      void fetchBeliefOverlayPdf(selectedExpiry, tuning).then((pdf) => {
+      void fetchBeliefOverlayPdf(selectedExpiry, tuning, assetMeta.id).then((pdf) => {
         if (!cancelled) {
           setBeliefPdfPct(pdf);
         }
@@ -123,20 +126,20 @@ export function StrategyLabInteractivePanel({
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [hydrated, active, tuning, live, displayPayload, selectedExpiry]);
+  }, [hydrated, active, tuning, live, displayPayload, selectedExpiry, assetMeta.id]);
 
   const outcome = useMemo(() => {
     if (!active) {
       return live && displayPayload
-        ? buildOutcomeFromPayload(displayPayload, selectedExpiry, formatMoney)
+        ? buildOutcomeFromPayload(displayPayload, selectedExpiry, formatMoney, assetMeta)
         : defaultOutcome;
     }
     try {
-      return buildOutcomeFromTuning(tuning, displayPayload, live, selectedExpiry);
+      return buildOutcomeFromTuning(tuning, displayPayload, live, selectedExpiry, assetMeta);
     } catch {
       return defaultOutcome;
     }
-  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry, formatMoney]);
+  }, [active, tuning, displayPayload, live, defaultOutcome, selectedExpiry, formatMoney, assetMeta]);
 
   return (
     <>
@@ -146,6 +149,7 @@ export function StrategyLabInteractivePanel({
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
           hideInlineExpiryPicker={false}
+          assetTicker={assetMeta.id}
           tuning={tuning}
           onNudge={handleNudge}
           onReset={handleReset}
@@ -175,6 +179,7 @@ export function StrategyLabInteractivePanel({
             selectedExpiry={selectedExpiry}
             beliefLabel={active ? viewLabel : null}
             beliefPdfPct={beliefPdfPct}
+            assetMeta={assetMeta}
           />
         </div>
 

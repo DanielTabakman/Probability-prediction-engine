@@ -4,6 +4,7 @@
 
 import type { BeliefPresetId } from "@/lib/beliefPresets";
 import { BELIEF_PRESET_MULTS } from "@/lib/beliefPresets";
+import { DEFAULT_LAB_ASSET_ID, LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
 
 export const PPE_BELIEF_OVERLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_BELIEF_OVERLAY_API_URL ?? "/ppe-display-api/belief-overlay.json"
@@ -175,6 +176,7 @@ export function buildTuningPhrase(tuning: BeliefTuning): string {
 export function buildBeliefOverlayFetchUrl(
   expiry: string,
   tuning: BeliefTuning,
+  assetId: string = DEFAULT_LAB_ASSET_ID,
   baseUrl = PPE_BELIEF_OVERLAY_API_URL,
 ): string {
   const params = new URLSearchParams({
@@ -182,6 +184,10 @@ export function buildBeliefOverlayFetchUrl(
     forward_mult: String(tuning.forward_mult),
     vol_mult: String(tuning.vol_mult),
   });
+  const normalizedAsset = assetId.trim().toUpperCase();
+  if (normalizedAsset && normalizedAsset !== DEFAULT_LAB_ASSET_ID) {
+    params.set(LAB_ASSET_QUERY_PARAM, normalizedAsset);
+  }
   const separator = baseUrl.includes("?") ? "&" : "?";
   return `${baseUrl}${separator}${params.toString()}`;
 }
@@ -189,10 +195,11 @@ export function buildBeliefOverlayFetchUrl(
 export async function fetchBeliefOverlayPdf(
   expiry: string,
   tuning: BeliefTuning,
+  assetId: string = DEFAULT_LAB_ASSET_ID,
 ): Promise<number[] | null> {
   if (!expiry || isMarketTuning(tuning)) return null;
   try {
-    const res = await fetch(buildBeliefOverlayFetchUrl(expiry, tuning), {
+    const res = await fetch(buildBeliefOverlayFetchUrl(expiry, tuning, assetId), {
       cache: "no-store",
       headers: { Accept: "application/json", "User-Agent": "msos-web/1" },
     });
