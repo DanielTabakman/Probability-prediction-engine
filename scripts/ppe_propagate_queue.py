@@ -473,6 +473,14 @@ def propagate_from_backlog(repo_root: Path, *, apply: bool) -> dict[str, Any]:
         rs = _roadmap_plan_statuses(roadmap).get(plan_path, "")
         backlog_status = _backlog_item_status(item)
         if apply and roadmap_row_should_activate_for_backlog(rs, backlog_status):
+            fg_activate = _focus_gate_blocks(repo, plan_path)
+            if fg_activate:
+                return {
+                    "propagated": False,
+                    "reason": f"focus gate: {fg_activate}",
+                    "planPath": plan_path,
+                    "chapterId": item.get("chapterId"),
+                }
             _set_roadmap_status(roadmap, plan_path, "pending")
             save_roadmap(repo, roadmap)
             item["status"] = "chartered"

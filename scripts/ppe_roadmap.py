@@ -151,6 +151,14 @@ def _first_pending_with_valid_plan(
                 _set_roadmap_status(roadmap, plan, "done")
                 finalize_chapter_evidence_complete(repo_root, plan, apply=True)
             continue
+        try:
+            from scripts.ppe_focus_gate import evaluate_focus_gate
+
+            focus = evaluate_focus_gate(repo_root, plan)
+            if not focus.allowed:
+                continue
+        except ImportError:
+            pass
         return item
     return None
 
