@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pivotId": "trader-workflow-integration-v1",
-  "asOf": "2026-06-25",
+  "asOf": "2026-06-26",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
@@ -20,12 +20,19 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-25",
       "evidence": "docs/SOP/MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_crypto_multi_asset_v1",
+      "label": "PPE crypto multi-asset v1 (BTC + ETH)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-26",
+      "evidence": "docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_crypto_multi_asset_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
-  "nextStewardAction": "Execute crypto relay chapter (workstream B); parallel: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md",
+  "activeBuildChapterId": "",
+  "activeBuildPlanPath": "",
+  "activeBuildSprint": "",
+  "nextStewardAction": "Sync VM crypto closeout to main (fix loop-host git push); reconcile equity queue vs DEFER gates; continue milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -45,7 +52,7 @@
       "label": "Wedge depth (BTC + ETH)",
       "chapterId": "ppe_crypto_multi_asset_v1",
       "doc": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
-      "status": "active"
+      "status": "complete"
     },
     {
       "id": "workflow_loop_fidelity",

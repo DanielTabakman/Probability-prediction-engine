@@ -71,12 +71,26 @@
 - **policy question:** What deserves a phone ping vs weekly digest only?
 - **notes:** Partial: LAST_RUN_REPORT auto_advance_promotion_recovery + phone procedural hints shipped 2026-06-17.
 
+### Stripe operator prerequisites (phase 7b gate)
+
+- **id:** `stripe_operator_prereq` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **summary:** Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production.
+- **policy question:** When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY.
+- **notes:** Steward 2026-06-19: deferred until website demo-ready on production; Stripe accounts/setup pending.
+
 ### Process library expansion
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
 - **added:** 2026-06-18
 - **summary:** Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.
 - **policy question:** Which ritual should we standardize next after context closeout?
+
+### VM loop-host git push credentials
+
+- **id:** `vm_loop_host_git_push_credentials` · **priority:** high · **category:** ops
+- **added:** 2026-06-26
+- **summary:** run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.
 
 ## Done
 
@@ -87,6 +101,15 @@
 - **closed:** 2026-06-17
 - **summary:** focusGate off, stopOnContextEscalate off, procedural exit-20 auto-advance reporting, legacy relay hard-stops demoted, human steward backlog + weekly ntfy hook.
 
+### MSOS production live hookup (usable demo)
+
+- **id:** `msos_production_live_hookup` · **priority:** high · **category:** operator
+- **added:** 2026-06-19
+- **closed:** 2026-06-21
+- **summary:** Close relay-DONE vs production-usable gap: VPS .env (research CTA, embed), deploy latest main, Cloudflare Access on apex product routes, production witness PASS, tester journey sign-off. Charter: MSOS_PRODUCTION_LIVE_HOOKUP_V1.md; SSH via ppe_operator_ssh.local.cmd.
+- **policy question:** Protect apex product routes only (recommended) or entire marketstructureos.com for early demo cohort?
+- **notes:** Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md.
+
 ## Changelog
 
-| 2026-06-18 | Auto-render from JSON |
+| 2026-06-26 | Auto-render from JSON |

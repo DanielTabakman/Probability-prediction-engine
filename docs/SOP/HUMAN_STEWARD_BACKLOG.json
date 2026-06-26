@@ -125,6 +125,16 @@
       "added": "2026-06-18",
       "source": "context_window_closeout",
       "policyQuestion": "Which ritual should we standardize next after context closeout?"
+    },
+    {
+      "id": "vm_loop_host_git_push_credentials",
+      "title": "VM loop-host git push credentials",
+      "status": "open",
+      "priority": "high",
+      "category": "ops",
+      "summary": "run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.",
+      "added": "2026-06-26",
+      "source": "context_window_closeout"
     }
   ]
 }
