@@ -142,7 +142,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
           <nav
             className="belief-axis-pair"
             aria-label="Options asset"
-            style={{ marginTop: 10, maxWidth: 220 }}
+            style={{ marginTop: 10, maxWidth: 300 }}
             data-tour="lab-asset"
           >
             {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
