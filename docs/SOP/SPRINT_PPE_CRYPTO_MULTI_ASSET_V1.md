@@ -108,4 +108,4 @@ Equities, third crypto, Polymarket, execution, entitlements per asset.
 
 ## Sprint status
 
-**CHARTERED** — blocked until `msos_usable_demo_v1` **COMPLETE**.
+**SELECTED** — SELECTION 2026-06-25 after usable demo COMPLETE.

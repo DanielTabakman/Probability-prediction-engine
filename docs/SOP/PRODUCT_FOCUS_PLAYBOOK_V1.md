@@ -1,6 +1,6 @@
 # Product focus playbook v1
 
-**Purpose:** Keep MSOS + PPE aligned on **usable demo BUILD** (MSOS shell + PPE integration) before platform expansion. Use for steward SELECTION, scope fights, and “are we drifting?” checks. **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json).
+**Purpose:** Keep MSOS + PPE aligned on **Trader Workflow Integration v1** — self-serve disagreement loop + learning ingestion. **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) · **Milestone charter:** [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md).
 
 **As-of:** 2026-06-20 · **Review cadence:** monthly steward pass · **Hard gate:** [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md)
 
@@ -30,7 +30,7 @@
 | Should we add scope / new asset / execution? | **Backplane charter** + this playbook + non-widening rule in PPE Master |
 | Is the product ready for workflow research? | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) |
 | How to run trader contact? | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) |
-| What do we build after MCD? | **Usable demo** per [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) — then expansion when SELECTION'd |
+| What do we build after MCD? | **Trader Workflow Integration v1** per [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) |
 
 **Scope precedence:** `BACKPLANE → ACTIVE_PRODUCT_DIRECTION → MCD gate → FRONTIER (BUILD order) → LIVE_PRODUCT_SEQUENCE (post-demo deferred)`.
 
@@ -62,12 +62,14 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Signal | Status |
 |--------|--------|
-| Storyboard v0.6 (design) | **COMPLETE** — implementation BUILD in flight |
-| MSOS shell routes | **Partial** — storyboard screens chartered; integration hardening active |
-| PPE inside MSOS | **BUILD** — embed shell + display boundary per [`SPRINT_MSOS_USABLE_DEMO_V1.md`](docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md) |
-| Friends-first / research-first gating | **RETIRED** — pivot `usable-demo-build-v1` |
+| **Product milestone** | **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) |
+| Usable demo foundation | **COMPLETE** 2026-06-25 |
+| Self-serve onboarding | **ACTIVE** — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md) |
+| Wedge depth (relay) | **ACTIVE** — `ppe_crypto_multi_asset_v1` |
+| Learning loop | **ACTIVE** — research sessions + validation log ingestion |
+| Friends-first gating | **RETIRED** — pivot `trader-workflow-integration-v1` |
 
-**Risk:** Premature "chapter COMPLETE" labels while demo is not walkable. Trust **evidence witness checkboxes** and operator demo script, not backlog status alone.
+**Risk:** Treating crypto chapter or a single feature as the whole milestone — judge **milestone complete-when** in charter, not relay closeout alone.
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---
@@ -78,8 +80,8 @@ Use this order when choosing steward SELECTION or saying no to scope creep.
 
 | Priority | Focus | Why |
 |----------|--------|-----|
-| **P0 — Usable demo BUILD** | MSOS shell + PPE integration per storyboard — [`SPRINT_MSOS_USABLE_DEMO_V1.md`](SPRINT_MSOS_USABLE_DEMO_V1.md) | Walkable production demo is the product milestone |
-| **P1 — MCD criteria hardening** | Embed shell, live paths, save/review visibility per [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | Engineering foundation for demo |
+| **P0 — Trader workflow integration** | Milestone v1 — self-serve loop + learning ingestion — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) | Umbrella milestone; relay chapters are workstreams |
+| **P1 — Wedge depth (relay)** | ETH + asset registry — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md) | Workstream B — current automated BUILD |
 | **P2 — Workflow signal (optional)** | Log sessions per [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) when demo is walkable | Learning channel — not scope authority |
 | **P3 — Distribution** | Dist demo, public URL, fintwit / newsletter partners | Peers spent founder time on distribution comparable to eng |
 | **P4 — Monetization signal** | Manual paid pilot / research beta (no billing automation) | **Post-MCD** — SpotGamma subscription before “platform” |

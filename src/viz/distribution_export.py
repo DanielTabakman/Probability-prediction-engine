@@ -6,6 +6,7 @@ import csv
 import io
 from typing import Any, Callable
 
+from src.data.assets_registry import default_asset_id
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
     density_distribution_stats,
@@ -115,8 +116,10 @@ def build_distribution_export_rows(
     forward_iv_fn: Callable[[int, float], dict[str, Any] | None],
     marks_full_fn: Callable[[int], dict[str, Any]],
     now_ms: float,
+    asset_id: str | None = None,
 ) -> list[dict[str, str]]:
     """One lognormal row + one BL row per expiry (BL skipped when marks gate fails)."""
+    asset = (asset_id or default_asset_id()).strip().upper()
     rows: list[dict[str, str]] = []
     for exp in expiries:
         expiry_date = str(exp.get("expiry_date_str") or "")
@@ -146,7 +149,7 @@ def build_distribution_export_rows(
         rows.append(
             _stats_row(
                 as_of_utc=as_of_utc,
-                asset="BTC",
+                asset=asset,
                 expiry_date=expiry_date,
                 T_years=T_years,
                 distribution="lognormal_reference",
@@ -165,7 +168,7 @@ def build_distribution_export_rows(
             rows.append(
                 _stats_row(
                     as_of_utc=as_of_utc,
-                    asset="BTC",
+                    asset=asset,
                     expiry_date=expiry_date,
                     T_years=T_years,
                     distribution="market_implied_bl",
@@ -186,7 +189,7 @@ def build_distribution_export_rows(
             rows.append(
                 _stats_row(
                     as_of_utc=as_of_utc,
-                    asset="BTC",
+                    asset=asset,
                     expiry_date=expiry_date,
                     T_years=T_years,
                     distribution="market_implied_bl",
@@ -204,7 +207,7 @@ def build_distribution_export_rows(
         rows.append(
             _stats_row(
                 as_of_utc=as_of_utc,
-                asset="BTC",
+                asset=asset,
                 expiry_date=expiry_date,
                 T_years=T_years,
                 distribution="market_implied_bl",

@@ -54,10 +54,32 @@ def test_build_distribution_export_rows_lognormal_and_skipped_bl() -> None:
         now_ms=exp_ts - 86400000 * 30,
     )
     assert len(rows) == 2
+    assert rows[0]["asset"] == "BTC"
     assert rows[0]["distribution"] == "lognormal_reference"
     assert rows[0]["mean_usd"]
     assert rows[1]["distribution"] == "market_implied_bl"
     assert rows[1]["bl_status"].startswith("skipped")
+
+
+def test_build_distribution_export_rows_asset_id_eth() -> None:
+    exp_ts = 1893456000000
+
+    def _fwd_iv(_exp: int, _spot: float) -> dict:
+        return {"forward": 3000.0, "atm_iv": 0.7}
+
+    def _marks(_exp: int) -> dict:
+        return {"calls": []}
+
+    rows = build_distribution_export_rows(
+        as_of_utc="2026-06-06T12:00:00+00:00",
+        spot_usd=2900.0,
+        expiries=[{"expiry_date_str": "2030-01-01", "expiry_ts": exp_ts}],
+        forward_iv_fn=_fwd_iv,
+        marks_full_fn=_marks,
+        now_ms=exp_ts - 86400000 * 30,
+        asset_id="ETH",
+    )
+    assert all(row["asset"] == "ETH" for row in rows)
 
 
 def test_serialize_distribution_export_csv_header() -> None:

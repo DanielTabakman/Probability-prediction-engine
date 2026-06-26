@@ -265,9 +265,19 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
+      "status": "DONE",
+      "reason": "[P0] Usable demo BUILD \u2014 COMPLETE 2026-06-25",
+      "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
+      "doneReason": "steward closeout 2026-06-25 \u2014 operator confirmed walkable demo; evidence COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
       "status": "READY",
-      "reason": "[P0] Usable demo BUILD — MSOS shell + PPE per storyboard (direction pivot 2026-06-21)",
-      "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md"
+      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+      "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+      "focusPlaybookTier": "P2",
+      "urgent": true,
+      "urgentReason": "Operator SELECTION \u2014 crypto before stocks"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
@@ -279,7 +289,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Bounded build repair — factory side-channel after P0 usable demo",
+      "reason": "[MEDIUM] Bounded build repair \u2014 factory side-channel after P0 usable demo",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
     },
     {

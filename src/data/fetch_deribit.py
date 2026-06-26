@@ -1,5 +1,5 @@
 """
-Fetch Bitcoin options from Deribit (public API, no auth). Rate limit: ~1 req/sec sustained for get_instruments.
+Fetch crypto options from Deribit (public API, no auth). Rate limit: ~1 req/sec sustained for get_instruments.
 """
 from __future__ import annotations
 
@@ -16,6 +16,11 @@ logger = logging.getLogger(__name__)
 
 # Set on failed get_instruments; cleared on success (for implied-lab debug UI).
 _LAST_INSTRUMENTS_DIAGNOSTIC: str | None = None
+
+
+def _deribit_currency(currency: str = "BTC") -> str:
+    c = str(currency or "BTC").strip().upper()
+    return c or "BTC"
 
 
 def last_deribit_instruments_diagnostic() -> str | None:
@@ -93,14 +98,20 @@ def _request(method: str, params: dict[str, Any] | None = None) -> dict | list |
     return out
 
 
-def fetch_deribit_btc_options_instruments(expired: bool = False) -> list[dict[str, Any]]:
+def fetch_deribit_options_instruments(
+    currency: str = "BTC",
+    *,
+    expired: bool = False,
+) -> list[dict[str, Any]]:
     """
-    List BTC option instruments. Each has instrument_name, strike, expiration_timestamp, option_type (call/put).
+    List option instruments for a Deribit currency (BTC, ETH, …).
+    Each has instrument_name, strike, expiration_timestamp, option_type (call/put).
     """
     global _LAST_INSTRUMENTS_DIAGNOSTIC
+    cur = _deribit_currency(currency)
     out, err = _deribit_public_request(
         "get_instruments",
-        {"currency": "BTC", "kind": "option", "expired": str(expired).lower()},
+        {"currency": cur, "kind": "option", "expired": str(expired).lower()},
     )
     if isinstance(out, list):
         _LAST_INSTRUMENTS_DIAGNOSTIC = None
@@ -109,15 +120,22 @@ def fetch_deribit_btc_options_instruments(expired: bool = False) -> list[dict[st
     return []
 
 
-def fetch_deribit_btc_options_for_chart(
+def fetch_deribit_btc_options_instruments(expired: bool = False) -> list[dict[str, Any]]:
+    """List BTC option instruments (compat wrapper)."""
+    return fetch_deribit_options_instruments("BTC", expired=expired)
+
+
+def fetch_deribit_options_for_chart(
     instruments: list[dict[str, Any]] | None = None,
+    *,
+    currency: str = "BTC",
 ) -> list[dict[str, Any]]:
     """
     List of options with expiry_date (datetime), strike, option_type for plotting on (date, price) chart.
     No ticker calls; uses get_instruments once unless instruments is provided.
     """
     if instruments is None:
-        instruments = fetch_deribit_btc_options_instruments(expired=False)
+        instruments = fetch_deribit_options_instruments(currency, expired=False)
     out = []
     for i in instruments:
         ts = i.get("expiration_timestamp")
@@ -133,6 +151,13 @@ def fetch_deribit_btc_options_for_chart(
     return out
 
 
+def fetch_deribit_btc_options_for_chart(
+    instruments: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """BTC options for chart (compat wrapper)."""
+    return fetch_deribit_options_for_chart(instruments, currency="BTC")
+
+
 def fetch_deribit_ticker(instrument_name: str) -> dict[str, Any] | None:
     """Get ticker (mark_price, last, bid, ask, etc.) for one instrument."""
     out = _request("ticker", {"instrument_name": instrument_name})
@@ -141,9 +166,10 @@ def fetch_deribit_ticker(instrument_name: str) -> dict[str, Any] | None:
     return None
 
 
-def fetch_deribit_btc_index() -> float | None:
-    """Get BTC spot/index price from Deribit perpetual. Fallback when Yahoo fails."""
-    ticker = fetch_deribit_ticker("BTC-PERPETUAL")
+def fetch_deribit_index(currency: str = "BTC") -> float | None:
+    """Get spot/index price from Deribit perpetual. Fallback when Yahoo fails."""
+    cur = _deribit_currency(currency)
+    ticker = fetch_deribit_ticker(f"{cur}-PERPETUAL")
     if not isinstance(ticker, dict):
         return None
     idx = ticker.get("index_price") or ticker.get("indexPrice")
@@ -153,6 +179,11 @@ def fetch_deribit_btc_index() -> float | None:
         except (TypeError, ValueError):
             pass
     return _ticker_price(ticker)
+
+
+def fetch_deribit_btc_index() -> float | None:
+    """BTC index (compat wrapper)."""
+    return fetch_deribit_index("BTC")
 
 
 def _ticker_price(ticker: dict[str, Any] | None) -> float | None:
@@ -208,10 +239,16 @@ def _mark_prices_by_instrument_from_book_summary(rows: list | None) -> dict[str,
     return out
 
 
-def fetch_deribit_btc_option_book_marks() -> dict[str, float]:
-    """All BTC option mark prices in one request (preferred over many public/ticker calls)."""
-    book = _request("get_book_summary_by_currency", {"currency": "BTC", "kind": "option"})
+def fetch_deribit_option_book_marks(currency: str = "BTC") -> dict[str, float]:
+    """All option mark prices in one request (preferred over many public/ticker calls)."""
+    cur = _deribit_currency(currency)
+    book = _request("get_book_summary_by_currency", {"currency": cur, "kind": "option"})
     return _mark_prices_by_instrument_from_book_summary(book if isinstance(book, list) else None)
+
+
+def fetch_deribit_btc_option_book_marks() -> dict[str, float]:
+    """BTC option book marks (compat wrapper)."""
+    return fetch_deribit_option_book_marks("BTC")
 
 
 def _option_mark_btc_from_book_or_ticker(name: str, book_marks: dict[str, float]) -> float | None:
@@ -221,13 +258,17 @@ def _option_mark_btc_from_book_or_ticker(name: str, book_marks: dict[str, float]
     return _ticker_price(fetch_deribit_ticker(name))
 
 
-def fetch_deribit_btc_futures_forward_curve(max_contracts: int = 12) -> list[dict[str, Any]]:
+def fetch_deribit_futures_forward_curve(
+    max_contracts: int = 12,
+    *,
+    currency: str = "BTC",
+) -> list[dict[str, Any]]:
     """
-    Option B "see into the future": list of BTC futures with (expiry_date, mark_price).
-    Excludes perpetual. Returns sorted by expiry; each point is (expiry_date, price) for the chart.
-    Uses one get_book_summary_by_currency(BTC, future) for marks instead of N ticker calls.
+    List futures with (expiry_date, mark_price) for a Deribit currency.
+    Excludes perpetual. Uses one get_book_summary_by_currency for marks.
     """
-    out = _request("get_instruments", {"currency": "BTC", "kind": "future", "expired": "false"})
+    cur = _deribit_currency(currency)
+    out = _request("get_instruments", {"currency": cur, "kind": "future", "expired": "false"})
     if not isinstance(out, list):
         return []
     # Exclude perpetual (expiration_timestamp very large, e.g. year 3000)
@@ -238,7 +279,7 @@ def fetch_deribit_btc_futures_forward_curve(max_contracts: int = 12) -> list[dic
     dated.sort(key=lambda i: i.get("expiration_timestamp") or 0)
     dated = dated[:max_contracts]
 
-    book = _request("get_book_summary_by_currency", {"currency": "BTC", "kind": "future"})
+    book = _request("get_book_summary_by_currency", {"currency": cur, "kind": "future"})
     mark_by_name = _mark_prices_by_instrument_from_book_summary(book if isinstance(book, list) else None)
 
     result = []
@@ -276,11 +317,18 @@ def fetch_deribit_btc_futures_forward_curve(max_contracts: int = 12) -> list[dic
     return [r for r in result if r.get("mark_price") is not None]
 
 
-def fetch_deribit_btc_option_expiries(max_expiries: int = 12) -> list[dict[str, Any]]:
-    """
-    List of BTC option expiries: {expiry_ts, expiry_date_str} for use in distribution chart.
-    """
-    instruments = fetch_deribit_btc_options_instruments(expired=False)
+def fetch_deribit_btc_futures_forward_curve(max_contracts: int = 12) -> list[dict[str, Any]]:
+    """BTC futures forward curve (compat wrapper)."""
+    return fetch_deribit_futures_forward_curve(max_contracts, currency="BTC")
+
+
+def fetch_deribit_option_expiries(
+    max_expiries: int = 12,
+    *,
+    currency: str = "BTC",
+) -> list[dict[str, Any]]:
+    """Option expiries: {expiry_ts, expiry_date_str} for distribution chart."""
+    instruments = fetch_deribit_options_instruments(currency, expired=False)
     exp_ts = sorted(set(i.get("expiration_timestamp") for i in instruments if i.get("expiration_timestamp")))
     out = []
     for ts in exp_ts[:max_expiries]:
@@ -291,12 +339,21 @@ def fetch_deribit_btc_option_expiries(max_expiries: int = 12) -> list[dict[str, 
     return out
 
 
-def fetch_deribit_btc_option_marks_by_expiry(expiry_ts: int) -> list[dict[str, Any]]:
+def fetch_deribit_btc_option_expiries(max_expiries: int = 12) -> list[dict[str, Any]]:
+    """BTC option expiries (compat wrapper)."""
+    return fetch_deribit_option_expiries(max_expiries, currency="BTC")
+
+
+def fetch_deribit_option_marks_by_expiry(
+    expiry_ts: int,
+    *,
+    currency: str = "BTC",
+) -> list[dict[str, Any]]:
     """
-    Get call option (strike, mark_btc) for one expiry. Uses get_book_summary_by_currency
-    for one request, then filters by expiry. Returns list of {strike, mark_btc} for calls.
+    Call option (strike, mark_btc) for one expiry. mark_btc is native-coin premium from Deribit.
     """
-    instruments = fetch_deribit_btc_options_instruments(expired=False)
+    cur = _deribit_currency(currency)
+    instruments = fetch_deribit_options_instruments(cur, expired=False)
     calls_for_exp = [
         i for i in instruments
         if i.get("option_type") == "call" and i.get("expiration_timestamp") == expiry_ts
@@ -305,7 +362,7 @@ def fetch_deribit_btc_option_marks_by_expiry(expiry_ts: int) -> list[dict[str, A
         return []
     names = {i.get("instrument_name") for i in calls_for_exp if i.get("instrument_name")}
     strike_by_name = {i.get("instrument_name"): i.get("strike") for i in calls_for_exp if i.get("strike") is not None}
-    out = _request("get_book_summary_by_currency", {"currency": "BTC", "kind": "option"})
+    out = _request("get_book_summary_by_currency", {"currency": cur, "kind": "option"})
     if not isinstance(out, list):
         return []
     result = []
@@ -326,19 +383,26 @@ def fetch_deribit_btc_option_marks_by_expiry(expiry_ts: int) -> list[dict[str, A
     return result
 
 
-def fetch_deribit_btc_option_marks_by_expiry_full(expiry_ts: int) -> dict[str, list[dict[str, Any]]]:
-    """
-    Get call and put option (strike, mark_btc) for one expiry. One book summary request.
-    Returns {"calls": [{strike, mark_btc}, ...], "puts": [{strike, mark_btc}, ...]}.
-    """
-    instruments = fetch_deribit_btc_options_instruments(expired=False)
+def fetch_deribit_btc_option_marks_by_expiry(expiry_ts: int) -> list[dict[str, Any]]:
+    """BTC call marks by expiry (compat wrapper)."""
+    return fetch_deribit_option_marks_by_expiry(expiry_ts, currency="BTC")
+
+
+def fetch_deribit_option_marks_by_expiry_full(
+    expiry_ts: int,
+    *,
+    currency: str = "BTC",
+) -> dict[str, list[dict[str, Any]]]:
+    """Call and put marks for one expiry. mark_btc is native-coin premium from Deribit."""
+    cur = _deribit_currency(currency)
+    instruments = fetch_deribit_options_instruments(cur, expired=False)
     for_exp = [i for i in instruments if i.get("expiration_timestamp") == expiry_ts]
     calls = [i for i in for_exp if i.get("option_type") == "call"]
     puts = [i for i in for_exp if i.get("option_type") == "put"]
     names_to_strike = {i.get("instrument_name"): i.get("strike") for i in for_exp if i.get("strike") is not None and i.get("instrument_name")}
     call_names = {i.get("instrument_name") for i in calls if i.get("instrument_name")}
     put_names = {i.get("instrument_name") for i in puts if i.get("instrument_name")}
-    out = _request("get_book_summary_by_currency", {"currency": "BTC", "kind": "option"})
+    out = _request("get_book_summary_by_currency", {"currency": cur, "kind": "option"})
     if not isinstance(out, list):
         return {"calls": [], "puts": []}
     res_calls = []
@@ -364,15 +428,22 @@ def fetch_deribit_btc_option_marks_by_expiry_full(expiry_ts: int) -> dict[str, l
     return {"calls": res_calls, "puts": res_puts}
 
 
+def fetch_deribit_btc_option_marks_by_expiry_full(expiry_ts: int) -> dict[str, list[dict[str, Any]]]:
+    """BTC full marks by expiry (compat wrapper)."""
+    return fetch_deribit_option_marks_by_expiry_full(expiry_ts, currency="BTC")
+
+
 def fetch_deribit_forward_and_iv_for_expiry(
     expiry_ts: int,
     spot_price: float,
+    *,
+    currency: str = "BTC",
 ) -> dict[str, Any] | None:
     """
-    Get forward price and ATM implied vol for a given option expiry.
-    Picks a call with strike nearest to spot, fetches ticker; returns index_price (forward) and mark_iv.
+    Forward price and ATM implied vol for a given option expiry.
+    Picks a call with strike nearest to spot; returns index_price (forward) and mark_iv.
     """
-    instruments = fetch_deribit_btc_options_instruments(expired=False)
+    instruments = fetch_deribit_options_instruments(currency, expired=False)
     calls = [i for i in instruments if i.get("option_type") == "call" and i.get("expiration_timestamp") == expiry_ts]
     if not calls:
         return None
@@ -405,22 +476,24 @@ def fetch_deribit_forward_and_iv_for_expiry(
     return {"forward": forward, "atm_iv": iv, "expiry_ts": expiry_ts}
 
 
-def fetch_deribit_btc_tight_bull_spreads(
+def fetch_deribit_tight_bull_spreads(
     spot_price: float,
     spread_width: float = 5000.0,
     max_expiries: int = 5,
     instruments: list[dict[str, Any]] | None = None,
     option_book_marks: dict[str, float] | None = None,
+    *,
+    currency: str = "BTC",
 ) -> list[dict[str, Any]]:
     """
     Tight bull call spreads: long call K_low, short call K_high (same expiry).
     For each expiry pick two strikes near spot (K_low = round(spot/width)*width, K_high = K_low + width).
     Returns list of {expiry_date, K_low, K_high, cost_usd, max_loss, max_gain, rr_ratio, instrument_low, instrument_high}.
     Pass instruments from a prior get_instruments call to avoid duplicate large downloads.
-    Pass option_book_marks from fetch_deribit_btc_option_book_marks() to avoid one large book call per task.
+    Pass option_book_marks from fetch_deribit_option_book_marks() to avoid one large book call per task.
     """
     if instruments is None:
-        instruments = fetch_deribit_btc_options_instruments(expired=False)
+        instruments = fetch_deribit_options_instruments(currency, expired=False)
     calls = [i for i in instruments if i.get("option_type") == "call"]
     if not calls:
         return []
@@ -464,7 +537,7 @@ def fetch_deribit_btc_tight_bull_spreads(
             "instrument_high": n_hi,
         })
 
-    marks = option_book_marks if option_book_marks is not None else fetch_deribit_btc_option_book_marks()
+    marks = option_book_marks if option_book_marks is not None else fetch_deribit_option_book_marks(currency)
 
     result = []
     for row in rows:
@@ -475,7 +548,7 @@ def fetch_deribit_btc_tight_bull_spreads(
         cost_btc = float(mark_low) - float(mark_high)
         if cost_btc <= 0:
             continue
-        cost_usd = cost_btc * spot_price  # Deribit option premiums in BTC
+        cost_usd = cost_btc * spot_price  # native-coin premium × spot USD
         width = row["k_high"] - row["k_low"]
         max_gain = width - cost_usd
         max_loss = cost_usd
@@ -495,6 +568,24 @@ def fetch_deribit_btc_tight_bull_spreads(
     return result
 
 
+def fetch_deribit_btc_tight_bull_spreads(
+    spot_price: float,
+    spread_width: float = 5000.0,
+    max_expiries: int = 5,
+    instruments: list[dict[str, Any]] | None = None,
+    option_book_marks: dict[str, float] | None = None,
+) -> list[dict[str, Any]]:
+    """BTC tight bull spreads (compat wrapper)."""
+    return fetch_deribit_tight_bull_spreads(
+        spot_price,
+        spread_width=spread_width,
+        max_expiries=max_expiries,
+        instruments=instruments,
+        option_book_marks=option_book_marks,
+        currency="BTC",
+    )
+
+
 def fetch_deribit_spreads_around_predictions(
     btc_questions: list[dict[str, Any]],
     current_spot: float,
@@ -503,6 +594,8 @@ def fetch_deribit_spreads_around_predictions(
     min_target_strike: float = 10000.0,
     instruments: list[dict[str, Any]] | None = None,
     option_book_marks: dict[str, float] | None = None,
+    *,
+    currency: str = "BTC",
 ) -> list[dict[str, Any]]:
     """
     Bull call spreads aligned with Polymarket predictions. For each question:
@@ -511,7 +604,7 @@ def fetch_deribit_spreads_around_predictions(
     Returns list with question info + spread cost, R:R, approx_implied_prob.
     """
     if instruments is None:
-        instruments = fetch_deribit_btc_options_instruments(expired=False)
+        instruments = fetch_deribit_options_instruments(currency, expired=False)
     calls = [i for i in instruments if i.get("option_type") == "call"]
     if not calls:
         return []
@@ -576,7 +669,7 @@ def fetch_deribit_spreads_around_predictions(
             "n_hi": n_hi,
         })
 
-    marks = option_book_marks if option_book_marks is not None else fetch_deribit_btc_option_book_marks()
+    marks = option_book_marks if option_book_marks is not None else fetch_deribit_option_book_marks(currency)
 
     result = []
     for row in pending:
@@ -588,7 +681,7 @@ def fetch_deribit_spreads_around_predictions(
         if cost_btc <= 0:
             continue
         k_low, k_high = row["k_low"], row["k_high"]
-        cost_usd = cost_btc * current_spot  # Deribit option premiums in BTC
+        cost_usd = cost_btc * current_spot  # native-coin premium × spot USD
         width = k_high - k_low
         max_gain = width - cost_usd
         max_loss = cost_usd
@@ -614,12 +707,13 @@ def fetch_deribit_spreads_around_predictions(
     return result
 
 
-def fetch_deribit_btc_options_summary(
+def fetch_deribit_options_summary(
     max_tickers: int = 20,
+    *,
+    currency: str = "BTC",
 ) -> dict[str, Any]:
     """
-    Get BTC options list from Deribit, then fetch mark_price for up to max_tickers
-    (to respect rate limits). Groups by expiry; returns expiries, counts, and sample rows with mark.
+    Options list from Deribit for a currency, then mark_price for up to max_tickers.
     """
     result = {
         "available": False,
@@ -629,8 +723,9 @@ def fetch_deribit_btc_options_summary(
         "puts_count": 0,
         "sample": [],
         "source": "deribit",
+        "currency": _deribit_currency(currency),
     }
-    instruments = fetch_deribit_btc_options_instruments(expired=False)
+    instruments = fetch_deribit_options_instruments(currency, expired=False)
     if not instruments:
         return result
 
@@ -675,3 +770,8 @@ def fetch_deribit_btc_options_summary(
         })
     result["sample"] = sample
     return result
+
+
+def fetch_deribit_btc_options_summary(max_tickers: int = 20) -> dict[str, Any]:
+    """BTC options summary (compat wrapper)."""
+    return fetch_deribit_options_summary(max_tickers=max_tickers, currency="BTC")
