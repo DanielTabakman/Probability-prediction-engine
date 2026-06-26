@@ -1,0 +1,244 @@
+# Tier-1 tradeable universe — charter staging manifest
+# Merged into config/assets.yaml per relay chapter (enabled: false until witness).
+# Program: docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md
+
+program_id: ppe_tradeable_universe_program_v1
+version: 1
+notes: >
+  BTC and ETH already live in config/assets.yaml. NVDA ships via ppe_equity_options_v1.
+  Remaining rows land disabled; flip enabled after witness_asset_catalog.py passes.
+
+catalog:
+  group_order:
+    - id: crypto
+      label: Crypto
+    - id: equity_index
+      label: Indices
+    - id: equity_mega
+      label: Mega caps
+    - id: commodity_proxy
+      label: Commodities (ETF options)
+
+# chapter_id → asset ids introduced by that relay chapter
+chapters:
+  ppe_crypto_multi_asset_v1:
+    assets: [BTC, ETH]
+    status: complete
+  ppe_equity_options_v1:
+    assets: [NVDA]
+    status: in_progress
+  ppe_deribit_crypto_tier1_v1:
+    assets: [SOL, BNB, XRP]
+  ppe_equity_universe_tier1a_v1:
+    assets: [SPY, QQQ, IWM]
+  ppe_equity_universe_tier1b_v1:
+    assets: [AAPL, MSFT, AMZN, GOOGL, META]
+  ppe_equity_universe_tier1c_v1:
+    assets: [TSLA, AMD, COIN]
+  ppe_commodity_proxy_tier1_v1:
+    assets: [GLD, SLV, USO]
+
+asset_templates:
+  SOL:
+    label: "SOL options"
+    asset_class: crypto
+    catalog_group: crypto
+    venue: deribit
+    deribit_currency: SOL
+    tier: extended
+    spread_width: 50
+    trust_notes:
+      - "Thinner books than BTC/ETH — surface trust state when OI low."
+  BNB:
+    label: "BNB options"
+    asset_class: crypto
+    catalog_group: crypto
+    venue: deribit
+    deribit_currency: BNB
+    tier: experimental
+    spread_width: 25
+    trust_notes:
+      - "Verify Deribit listing before enable; may be delisted or illiquid."
+  XRP:
+    label: "XRP options"
+    asset_class: crypto
+    catalog_group: crypto
+    venue: deribit
+    deribit_currency: XRP
+    tier: experimental
+    spread_width: 10
+    trust_notes:
+      - "Verify Deribit listing before enable; may be delisted or illiquid."
+
+  SPY:
+    label: "SPY options"
+    asset_class: equity_index
+    catalog_group: equity_index
+    venue: equity
+    equity_symbol: SPY
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Index ETF options; dividends on underlying not modeled in v1."
+  QQQ:
+    label: "QQQ options"
+    asset_class: equity_index
+    catalog_group: equity_index
+    venue: equity
+    equity_symbol: QQQ
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Index ETF options; dividends on underlying not modeled in v1."
+  IWM:
+    label: "IWM options"
+    asset_class: equity_index
+    catalog_group: equity_index
+    venue: equity
+    equity_symbol: IWM
+    data_source: yfinance
+    tier: extended
+    spread_width: 10
+    contract_multiplier: 100
+    trust_notes:
+      - "Russell 2000 ETF; can be thinner than SPY/QQQ."
+
+  AAPL:
+    label: "AAPL options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: AAPL
+    data_source: yfinance
+    tier: core
+    spread_width: 10
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  MSFT:
+    label: "MSFT options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: MSFT
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  AMZN:
+    label: "AMZN options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: AMZN
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  GOOGL:
+    label: "GOOGL options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: GOOGL
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  META:
+    label: "META options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: META
+    data_source: yfinance
+    tier: core
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  TSLA:
+    label: "TSLA options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: TSLA
+    data_source: yfinance
+    tier: core
+    spread_width: 25
+    contract_multiplier: 100
+    trust_notes:
+      - "High vol name; wide spreads possible. Dividends not modeled."
+  AMD:
+    label: "AMD options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: AMD
+    data_source: yfinance
+    tier: extended
+    spread_width: 10
+    contract_multiplier: 100
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+  COIN:
+    label: "COIN options"
+    asset_class: equity_mega
+    catalog_group: equity_mega
+    venue: equity
+    equity_symbol: COIN
+    data_source: yfinance
+    tier: extended
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Crypto-equity proxy; earnings gap risk. Dividends not modeled."
+
+  GLD:
+    label: "GLD options (gold ETF)"
+    asset_class: commodity_proxy
+    catalog_group: commodity_proxy
+    venue: equity
+    equity_symbol: GLD
+    data_source: yfinance
+    tier: core
+    spread_width: 5
+    contract_multiplier: 100
+    trust_notes:
+      - "ETF options — gold exposure, not COMEX GC futures."
+      - "Dividends on GLD not modeled in v1."
+  SLV:
+    label: "SLV options (silver ETF)"
+    asset_class: commodity_proxy
+    catalog_group: commodity_proxy
+    venue: equity
+    equity_symbol: SLV
+    data_source: yfinance
+    tier: extended
+    spread_width: 2
+    contract_multiplier: 100
+    trust_notes:
+      - "ETF options — silver exposure, not COMEX SI futures."
+  USO:
+    label: "USO options (oil ETF)"
+    asset_class: commodity_proxy
+    catalog_group: commodity_proxy
+    venue: equity
+    equity_symbol: USO
+    data_source: yfinance
+    tier: extended
+    spread_width: 2
+    contract_multiplier: 100
+    trust_notes:
+      - "ETF options — crude exposure via USO; roll/contango not modeled."
+      - "Imperfect oil hedge vs CL futures."

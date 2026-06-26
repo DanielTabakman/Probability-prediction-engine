@@ -1,0 +1,66 @@
+{
+  "name": "ppe_commodity_proxy_tier1_v1 (GLD SLV USO ETF options)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-CommProxy-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CommProxy-Control-Slice001-comm_proxy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-CommProxy-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CommProxy-Core-Slice002-comm_proxy",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "src/viz/embed_display_boundary.py",
+        "scripts/witness_asset_catalog.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CommProxy-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CommProxy-Witness-Slice003-comm_proxy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-CommProxy-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CommProxy-Closeout-Slice004-comm_proxy",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_commodity_proxy_tier1_v1",
+        "chapterTitle": "PPE commodity proxy tier-1 v1 (ETF options)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
+        "carryDocs": [
+          "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
+        ]
+      }
+    }
+  ]
+}

@@ -343,6 +343,76 @@
       "selectionRecord": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
       "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md \u2014 workstream A",
       "reason": "[P0] Self-serve public URL + guided tour \u2014 COMPLETE 2026-06-26"
+    },
+    {
+      "chapterId": "ppe_tradeable_universe_v1",
+      "status": "chartered",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
+      "reason": "[HIGH] Registry v2 + catalog.json + witness harness \u2014 gates tier-1 asset batches; blocked on ppe_equity_options_v1 COMPLETE"
+    },
+    {
+      "chapterId": "ppe_deribit_crypto_tier1_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 2",
+      "reason": "[MEDIUM] SOL BNB XRP on Deribit \u2014 registry + witness batch"
+    },
+    {
+      "chapterId": "ppe_equity_universe_tier1a_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 3",
+      "reason": "[MEDIUM] SPY QQQ IWM index ETF options"
+    },
+    {
+      "chapterId": "ppe_equity_universe_tier1b_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 4",
+      "reason": "[MEDIUM] AAPL MSFT AMZN GOOGL META mega caps batch 1"
+    },
+    {
+      "chapterId": "ppe_equity_universe_tier1c_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 5",
+      "reason": "[MEDIUM] TSLA AMD COIN mega caps batch 2"
+    },
+    {
+      "chapterId": "ppe_commodity_proxy_tier1_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 6",
+      "reason": "[MEDIUM] GLD SLV USO commodity ETF options (honest proxy labels)"
+    },
+    {
+      "chapterId": "ppe_cme_commodity_v1",
+      "status": "deferred",
+      "priority": "low",
+      "focusPlaybookTier": "Defer",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_cme_commodity_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md \u2014 chapter 7 DEFER",
+      "reason": "[LOW DEFER] CME GC SI CL \u2014 validation pull after ETF proxies"
     }
   ]
 }

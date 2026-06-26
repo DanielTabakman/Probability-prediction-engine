@@ -234,6 +234,48 @@
       "status": "ready",
       "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+      "status": "pending",
+      "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
+      "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
+      "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Equity mega caps batch 1",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Equity mega caps batch 2",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "pending",
+      "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_cme_commodity_v1_relay.json",
+      "status": "skipped",
+      "reason": "[LOW DEFER] CME GC SI CL \u2014 validation-gated after ETF proxies",
+      "selectionPrep": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
     }
   ]
 }

@@ -301,6 +301,42 @@
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[HIGH] Tradeable universe infrastructure \u2014 catalog API + MSOS picker",
+      "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Deribit crypto tier-1 SOL BNB XRP",
+      "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Equity indices SPY QQQ IWM",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Equity mega caps batch 1",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Equity mega caps batch 2",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Commodity ETF options GLD SLV USO",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
       "status": "PLANNED",
       "reason": "[MEDIUM] Bounded build repair \u2014 factory side-channel after P0 usable demo",

@@ -1,0 +1,125 @@
+{
+  "name": "ppe_tradeable_universe_v1 (registry v2 + catalog API + MSOS picker)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-Universe-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Control-Slice001-universe",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-Universe-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Core-Slice002-universe",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "config/assets_tier1_manifest.yaml",
+        "src/data/assets_registry.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Universe-Core-Slice003",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Core-Slice003-universe",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/embed_display_boundary.py",
+        "scripts/witness_asset_catalog.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Universe-UI-Slice004",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-UI-Slice004-universe",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/lab_asset_selection.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Universe-Product-Slice005",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Product-Slice005-universe",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabClientShell.tsx",
+        "apps/msos-web/src/lib/ppeDisplayPayload.ts"
+      ]
+    },
+    {
+      "sliceId": "PPE-Universe-Platform-Slice006",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Platform-Slice006-universe",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/msos_production_demo_witness.py",
+        "Caddyfile"
+      ]
+    },
+    {
+      "sliceId": "PPE-Universe-Witness-Slice007",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Witness-Slice007-universe",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-Universe-Closeout-Slice008",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+      "buildBranch": "build/auto/PPE-Universe-Closeout-Slice008-universe",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_tradeable_universe_v1",
+        "chapterTitle": "PPE tradeable universe v1 (infrastructure)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
+          "config/assets_tier1_manifest.yaml"
+        ]
+      }
+    }
+  ]
+}

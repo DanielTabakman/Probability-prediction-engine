@@ -1,0 +1,66 @@
+{
+  "name": "ppe_deribit_crypto_tier1_v1 (SOL + BNB + XRP)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-CryptoT1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoT1-Control-Slice001-crypto_t1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-CryptoT1-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoT1-Core-Slice002-crypto_t1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "config/assets_tier1_manifest.yaml",
+        "tests/test_distribution_export.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoT1-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoT1-Witness-Slice003-crypto_t1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/witness_asset_catalog.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CryptoT1-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-CryptoT1-Closeout-Slice004-crypto_t1",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_deribit_crypto_tier1_v1",
+        "chapterTitle": "PPE Deribit crypto tier-1 v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      }
+    }
+  ]
+}
