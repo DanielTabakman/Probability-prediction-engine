@@ -88,4 +88,4 @@ BTC/ETH remain `enabled: true`. NVDA follows equity chapter enablement.
 
 ## Sprint status
 
-**IN PROGRESS** — Core-Slice003 CLOSED; UI-Slice004 Streamlit selector next.
+**IN PROGRESS** — UI-Slice004 CLOSED; Product-Slice005 MSOS catalog picker next.

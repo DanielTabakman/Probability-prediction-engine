@@ -12,7 +12,7 @@
 | PPE-Universe-Control-Slice001 | **CLOSED** | Program + ADR + tier1 manifest + evidence stub (charter witness green) |
 | PPE-Universe-Core-Slice002 | **CLOSED** | Registry v2 schema + `list_enabled_asset_ids` / `list_catalog_entries` |
 | PPE-Universe-Core-Slice003 | **CLOSED** | `catalog.json` route + `witness_asset_catalog.py` scaffold |
-| PPE-Universe-UI-Slice004 | PENDING | Streamlit selector |
+| PPE-Universe-UI-Slice004 | **CLOSED** | `lab_asset_selection.py` uses `list_enabled_asset_ids()` only |
 | PPE-Universe-Product-Slice005 | PENDING | MSOS catalog picker |
 | PPE-Universe-Platform-Slice006 | PENDING | Deploy witness |
 | PPE-Universe-Witness-Slice007 | PENDING | pytest |
@@ -31,7 +31,7 @@
 - [x] `catalog.json` returns grouped enabled assets (`/ppe-display-api/catalog.json`)
 - [x] `witness_asset_catalog.py --asset BTC` green (mocked scaffold)
 - [ ] MSOS picker loads from catalog (no hardcoded allowlist)
-- [ ] Streamlit selector registry-driven
+- [x] Streamlit selector registry-driven (`list_enabled_asset_ids`)
 - [ ] Production demo witness catalog smoke
 
 ## Operator sign-off
