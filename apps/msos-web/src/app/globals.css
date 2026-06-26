@@ -55,12 +55,15 @@ a {
 }
 
 .page {
-  position: relative;
   min-height: 100vh;
   max-width: 1600px;
   margin: 0 auto;
-  overflow: hidden;
-  padding-bottom: 160px;
+}
+
+/* Homepage: hero + features in normal flow — never absolutely position the feature row (overlaps CTAs). */
+.home-main {
+  display: flex;
+  flex-direction: column;
 }
 
 .public-nav {
@@ -670,13 +673,12 @@ button.btn:focus-visible {
 }
 
 .features-row {
-  position: absolute;
-  left: clamp(24px, 4vw, 70px);
-  right: clamp(24px, 4vw, 70px);
-  bottom: 34px;
+  position: static;
+  margin: 48px clamp(24px, 4vw, 70px) 34px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 14px;
+  flex-shrink: 0;
 }
 
 .feature {
@@ -717,13 +719,8 @@ button.btn:focus-visible {
   }
 
   .features-row {
-    position: static;
-    margin: 40px clamp(24px, 4vw, 70px) 0;
+    margin-top: 40px;
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .page {
-    padding-bottom: 40px;
   }
 }
 
@@ -1562,6 +1559,22 @@ button.btn:focus-visible {
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
+}
+
+.ppe-summary-stat-with-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: help;
+}
+
+.ppe-summary-stat-text {
+  min-width: 0;
+}
+
+.ppe-summary-stat-tip-hint {
+  flex-shrink: 0;
+  opacity: 0.65;
 }
 
 .legend {
