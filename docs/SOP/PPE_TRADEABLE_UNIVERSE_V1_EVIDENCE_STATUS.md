@@ -10,7 +10,7 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | PPE-Universe-Control-Slice001 | **CLOSED** | Program + ADR + tier1 manifest + evidence stub (charter witness green) |
-| PPE-Universe-Core-Slice002 | PENDING | Registry v2 |
+| PPE-Universe-Core-Slice002 | **CLOSED** | Registry v2 schema + `list_enabled_asset_ids` / `list_catalog_entries` |
 | PPE-Universe-Core-Slice003 | PENDING | catalog.json + witness script |
 | PPE-Universe-UI-Slice004 | PENDING | Streamlit selector |
 | PPE-Universe-Product-Slice005 | PENDING | MSOS catalog picker |
