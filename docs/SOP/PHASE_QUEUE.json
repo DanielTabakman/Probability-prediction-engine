@@ -273,7 +273,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 COMPLETE 2026-06-26",
       "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "urgent": true,
@@ -316,6 +316,12 @@
       "status": "PLANNED",
       "reason": "[LOW] Parallel slice locks",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "status": "READY",
+      "reason": "[P0] Self-serve onboarding \u2014 workstream A SELECTION 2026-06-26",
+      "selectionPrep": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md"
     }
   ]
 }

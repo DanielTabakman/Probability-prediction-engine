@@ -103,6 +103,39 @@ def _side_channel_lines(direction: Direction) -> str:
     return "\n".join(lines) if lines else "- _(none)_"
 
 
+def _workstream_row(direction: Direction, ws_id: str, *, fallback_label: str) -> str:
+    """One markdown table row for a milestone workstream."""
+    for ws in direction.raw.get("workstreams") or []:
+        if not isinstance(ws, dict) or str(ws.get("id") or "") != ws_id:
+            continue
+        label = str(ws.get("label") or fallback_label)
+        status = str(ws.get("status") or "active").strip().lower()
+        chapter = str(ws.get("chapterId") or "").strip()
+        doc = str(ws.get("doc") or "").strip()
+        status_word = "COMPLETE" if status == "complete" else status.upper()
+        if chapter and doc:
+            return (
+                f"| {label} | **{status_word}** — `{chapter}` · "
+                f"[`{Path(doc).name}`]({doc}) |"
+            )
+        if doc:
+            return f"| {label} | **{status_word}** — [`{Path(doc).name}`]({doc}) |"
+        if chapter:
+            return f"| {label} | **{status_word}** — `{chapter}` |"
+        return f"| {label} | **{status_word}** |"
+    return f"| {fallback_label} | **ACTIVE** |"
+
+
+def _active_workstream_label(direction: Direction) -> str:
+    chapter = direction.active_chapter_id
+    for ws in direction.raw.get("workstreams") or []:
+        if not isinstance(ws, dict):
+            continue
+        if str(ws.get("chapterId") or "") == chapter:
+            return str(ws.get("label") or chapter)
+    return chapter or "active relay"
+
+
 def _workstream_lines(direction: Direction) -> str:
     streams = direction.raw.get("workstreams") or []
     if not isinstance(streams, list) or not streams:
@@ -190,8 +223,8 @@ def render_playbook_stage_block(direction: Direction) -> str:
 |--------|--------|
 | **Product milestone** | **{direction.milestone_label}** — [`{Path(direction.milestone_charter).name}`]({direction.milestone_charter}) |
 | Usable demo foundation | **COMPLETE** 2026-06-25 |
-| Self-serve onboarding | **ACTIVE** — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md) |
-| Wedge depth (relay) | **ACTIVE** — `{direction.active_chapter_id}` |
+{_workstream_row(direction, "self_serve_onboarding", fallback_label="Self-serve onboarding")}
+{_workstream_row(direction, "wedge_depth", fallback_label="Wedge depth (BTC + ETH)")}
 | Learning loop | **ACTIVE** — research sessions + validation log ingestion |
 | Friends-first gating | **RETIRED** — pivot `{direction.pivot_id}` |
 
@@ -251,7 +284,7 @@ def render_factory_focus_block(direction: Direction) -> str:
 | Priority | Focus |
 |----------|--------|
 | **1** | **Trader workflow integration** — milestone charter + four workstreams |
-| **2** | **Active relay** — `{direction.active_chapter_id}` (wedge depth) |
+| **2** | **Active relay** — `{direction.active_chapter_id}` ({_active_workstream_label(direction)}) |
 | **3** | **Factory stability** — relay, autobuilder, gates, closeout |
 {MARKER_END}"""
     if direction.current_stage == "multi_asset_expansion":

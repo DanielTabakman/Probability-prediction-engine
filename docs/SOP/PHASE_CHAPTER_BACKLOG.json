@@ -314,15 +314,15 @@
     },
     {
       "chapterId": "ppe_crypto_multi_asset_v1",
-      "status": "queued",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "urgent": true,
-      "urgentReason": "Workstream B — wedge depth inside trader-workflow-integration v1 milestone",
+      "urgentReason": "Workstream B \u2014 wedge depth inside trader-workflow-integration v1 milestone",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
-      "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md — workstream B",
-      "reason": "[MEDIUM] Deribit ETH + asset registry — workstream B of trader-workflow-integration v1"
+      "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md \u2014 workstream B",
+      "reason": "[MEDIUM] Deribit ETH + asset registry \u2014 workstream B of trader-workflow-integration v1"
     },
     {
       "chapterId": "ppe_equity_options_v1",
@@ -333,6 +333,16 @@
       "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
       "canonRef": "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md \u2014 G-04",
       "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until G-04 validation signal + steward SELECTION (crypto COMPLETE 2026-06-26)"
+    },
+    {
+      "chapterId": "msos_self_serve_onboarding_v1",
+      "status": "chartered",
+      "priority": "high",
+      "focusPlaybookTier": "P0",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md \u2014 workstream A",
+      "reason": "[P0] Self-serve public URL + guided tour \u2014 workstream A of trader-workflow-integration v1"
     }
   ]
 }

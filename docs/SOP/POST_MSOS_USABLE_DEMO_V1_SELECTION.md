@@ -23,4 +23,4 @@
 
 ## Closeout note (2026-06-25)
 
-`msos_usable_demo_v1` marked **COMPLETE** — operator confirmed walkable demo. Next BUILD: [`POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md`](POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md).
+`msos_usable_demo_v1` marked **COMPLETE** — operator confirmed walkable demo. Next BUILD: [`POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md`](POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md).

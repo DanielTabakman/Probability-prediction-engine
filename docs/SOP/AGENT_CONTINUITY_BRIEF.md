@@ -28,10 +28,10 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 **Milestone:** **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 
-**Active relay:** `` — Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
+**Active relay:** `msos_self_serve_onboarding_v1` — Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 
-- **Sprint:** [``]()
-- **Plan:** [``]()
+- **Sprint:** [`SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md`](docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md)
+- **Plan:** [`msos_self_serve_onboarding_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json)
 - **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `trader-workflow-integration-v1`)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
