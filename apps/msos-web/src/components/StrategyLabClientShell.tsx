@@ -24,8 +24,10 @@ import {
 import {
   PLATFORM_TUTORIAL_BEGINNER_QUERY,
   PLATFORM_TUTORIAL_QUERY,
+  clearPlatformTutorialComplete,
   isPlatformTutorialComplete,
   resolveTutorialSteps,
+  strategyLabRetakeTourHref,
 } from "@/lib/platformTutorial";
 
 type StrategyLabClientShellProps = {
@@ -48,6 +50,9 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     const beginner =
       searchParams.get(PLATFORM_TUTORIAL_BEGINNER_QUERY) === "1" ||
       searchParams.get(PLATFORM_TUTORIAL_QUERY) === "beginner";
+    if (forced || beginner) {
+      clearPlatformTutorialComplete();
+    }
     setTutorialBeginner(beginner);
     if (forced || beginner || !isPlatformTutorialComplete()) {
       setTutorialOpen(true);
@@ -98,6 +103,9 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
             <span className="dot" aria-hidden="true" />
             {pillLabel}
           </span>
+          <Link href={strategyLabRetakeTourHref()} className="btn slim">
+            Retake tour
+          </Link>
           <Link href="/strategy-lab/confirm" className="btn slim primary" data-tour="lab-confirm">
             Save your view
           </Link>

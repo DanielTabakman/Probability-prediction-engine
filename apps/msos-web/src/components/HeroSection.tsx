@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ActionButton, ActionLink } from "@/components/ActionLink";
 import { ResearchBetaModal } from "@/components/ResearchBetaModal";
 import { resolveSignInUrl } from "@/lib/msosPublicUrls";
-import { strategyLabTutorialHref } from "@/lib/platformTutorial";
+import { strategyLabBeginnerTourHref, strategyLabTutorialHref } from "@/lib/platformTutorial";
 import { resolveResearchOfferCta } from "@/lib/researchOfferCta";
 
 export function HeroSection() {
@@ -24,6 +24,9 @@ export function HeroSection() {
       <div className="hero-actions">
         <ActionLink className="btn primary" href={strategyLabTutorialHref()}>
           Explore the platform <span aria-hidden="true">→</span>
+        </ActionLink>
+        <ActionLink className="btn slim" href={strategyLabBeginnerTourHref()}>
+          Take the 2-min tour
         </ActionLink>
         <ActionButton className="btn" onClick={() => setResearchOpen(true)}>
           {researchOffer?.label ?? "Request research beta"}
