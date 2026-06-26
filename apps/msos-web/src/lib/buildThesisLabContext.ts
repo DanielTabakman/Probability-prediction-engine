@@ -5,7 +5,11 @@
 import type { CompareColumn } from "@/data/thesisConfirmFixtures";
 import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
 import { buildTuningLabel, buildTuningPhrase, type BeliefTuning } from "@/lib/beliefTuning";
-import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
+import {
+  resolveDisplayAssetMeta,
+  type DisplayAssetMeta,
+  type DisplayPayload,
+} from "@/lib/ppeDisplayPayload";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 
 function parsePctFromWidth(value: string): number | null {
@@ -78,10 +82,15 @@ export function buildCompareColumnsFromLab(
   ];
 }
 
-export function buildThesisRestatement(tuning: BeliefTuning, expiryLabel: string) {
+export function buildThesisRestatement(
+  tuning: BeliefTuning,
+  expiryLabel: string,
+  assetMeta?: DisplayAssetMeta,
+) {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(null);
   const phrase = buildTuningPhrase(tuning);
   return {
-    prefix: "I think BTC will",
+    prefix: `I think ${asset.id} will`,
     emphasis: phrase,
     suffix: "over the selected horizon —",
     horizon: expiryLabel,
@@ -92,7 +101,10 @@ export function buildThesisDraftFromLab(
   payload: DisplayPayload | null,
   tuning: BeliefTuning,
   expiry: string | null,
+  assetMeta?: DisplayAssetMeta,
 ): Partial<ThesisRecord> {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(payload);
+  const instrument = asset.instrument_label ?? asset.label;
   const resolvedExpiry = expiry?.trim() || payload?.series_by_expiry?.[0]?.expiry_date || "";
   const marketWidthStr = payload ? marketWidthFromPayload(payload) : "—";
   const marketPct = parsePctFromWidth(marketWidthStr) ?? 6.8;
@@ -102,13 +114,13 @@ export function buildThesisDraftFromLab(
     : null;
 
   return {
-    instrument: "BTC options",
+    instrument,
     horizonDays: resolvedExpiry ? daysUntilExpiry(resolvedExpiry) : 30,
     marketRangePct: marketPct,
     thesisRangePct: thesisPct,
     referenceLabel: payload
-      ? `BTC options · live · exp ${resolvedExpiry || "—"}`
-      : "BTC options · live implied distribution",
+      ? `${instrument} · live · exp ${resolvedExpiry || "—"}`
+      : `${instrument} · live implied distribution`,
     trustLabel: payload ? "Good · Deribit" : "Offline · demo values",
     expiryDate: resolvedExpiry || undefined,
     beliefSnapshot: {
@@ -121,12 +133,18 @@ export function buildThesisDraftFromLab(
   };
 }
 
-export function buildConfirmChecklist(expiry: string | null, live: boolean) {
+export function buildConfirmChecklist(
+  expiry: string | null,
+  live: boolean,
+  assetMeta?: DisplayAssetMeta,
+) {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(null);
+  const instrument = asset.instrument_label ?? asset.label;
   return [
     {
       id: "reference",
       label: live
-        ? "Market reference — live BTC options from Deribit"
+        ? `Market reference — live ${instrument} from Deribit`
         : "Market reference — offline; confirm when live data returns",
     },
     {
@@ -136,7 +154,7 @@ export function buildConfirmChecklist(expiry: string | null, live: boolean) {
     {
       id: "horizon",
       label: expiry
-        ? `Timeframe locked — BTC · exp ${expiry}`
+        ? `Timeframe locked — ${asset.id} · exp ${expiry}`
         : "Timeframe — pick an expiry in Strategy Lab",
     },
   ];

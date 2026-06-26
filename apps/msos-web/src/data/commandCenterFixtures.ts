@@ -33,7 +33,7 @@ export const calibrationStrip = {
 
 export const connectedMarkets: MarketAsset[] = [
   { label: "BTC options", status: "Live", live: true },
-  { label: "ETH options", status: "Soon" },
+  { label: "ETH options", status: "Live", live: true },
   { label: "Event markets", status: "Planned" },
   { label: "Perp positioning", status: "Planned" },
 ];
@@ -56,9 +56,9 @@ export const labTiles = [
   {
     mark: "E",
     title: "ETH options",
-    description: "Same workflow — coming next",
-    tag: "Soon",
-    enabled: false,
+    description: "Same workflow — live on Deribit",
+    cta: "Open lab",
+    enabled: true,
   },
   {
     mark: "P",
