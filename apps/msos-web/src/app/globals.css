@@ -1431,6 +1431,60 @@ button.btn:focus-visible {
   gap: 8px;
 }
 
+.lab-asset-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lab-asset-field {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(9, 21, 34, 0.92);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.lab-asset-field.active {
+  border-color: rgba(67, 231, 211, 0.55);
+  background: rgba(67, 231, 211, 0.08);
+  box-shadow: 0 0 0 1px rgba(67, 231, 211, 0.12);
+}
+
+.lab-asset-k {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 760;
+}
+
+.lab-asset-select select {
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 780;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(4, 12, 20, 0.95);
+  color: #c5d8e8;
+}
+
+.lab-asset-field.active .lab-asset-select select {
+  border-color: rgba(67, 231, 211, 0.45);
+  color: var(--teal);
+}
+
+.lab-asset-select select:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 .belief-preset {
   appearance: none;
   cursor: pointer;

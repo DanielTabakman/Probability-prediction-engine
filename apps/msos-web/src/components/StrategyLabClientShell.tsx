@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
@@ -11,13 +12,18 @@ import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   DEFAULT_LAB_ASSET_ID,
   LAB_ASSET_QUERY_PARAM,
-  SUPPORTED_LAB_ASSET_IDS,
   fetchDisplayPayloadClient,
   normalizeLabAssetId,
   resolveDisplayAssetMeta,
   type DisplayPayload,
   type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
+import {
+  FALLBACK_ASSET_PICKER,
+  bucketsFromCatalog,
+  fetchAssetCatalog,
+  listSelectableAssetIds,
+} from "@/lib/ppeAssetCatalog";
 import {
   LAB_DATA_DEMO_PILL,
   LAB_DATA_LIVE_PILL,
@@ -62,7 +68,13 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedAssetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
+  const [catalogAssetIds, setCatalogAssetIds] = useState<string[]>(() =>
+    listSelectableAssetIds(FALLBACK_ASSET_PICKER),
+  );
+  const selectedAssetId = normalizeLabAssetId(
+    searchParams.get(LAB_ASSET_QUERY_PARAM),
+    catalogAssetIds,
+  );
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
   const [tutorialOpen, setTutorialOpen] = useState(false);
@@ -100,6 +112,20 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
 
   useEffect(() => {
     let cancelled = false;
+    void (async () => {
+      const catalog = await fetchAssetCatalog();
+      if (cancelled || !catalog) {
+        return;
+      }
+      setCatalogAssetIds(listSelectableAssetIds(bucketsFromCatalog(catalog)));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     setMode("loading");
 
     void (async () => {
@@ -132,6 +158,10 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     mode === "live" ? "pill live" : mode === "loading" ? "pill loading" : "pill demo sample";
 
   const assetSwitchParams = useMemo(() => new URLSearchParams(searchParams.toString()), [searchParams]);
+  const buildAssetHrefForPicker = useCallback(
+    (assetId: string) => buildAssetHref(pathname, assetSwitchParams, assetId),
+    [pathname, assetSwitchParams],
+  );
 
   return (
     <>
@@ -139,26 +169,11 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         <div>
           <div className="crumb">Strategy Lab · {assetMeta.label}</div>
           <h1 className="title">Strategy Lab</h1>
-          <nav
-            className="belief-axis-pair"
-            aria-label="Options asset"
-            style={{ marginTop: 10, maxWidth: 300 }}
-            data-tour="lab-asset"
-          >
-            {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
-              const active = assetId === selectedAssetId;
-              return (
-                <Link
-                  key={assetId}
-                  href={buildAssetHref(pathname, assetSwitchParams, assetId)}
-                  className={`belief-preset${active ? " active" : ""}`}
-                  aria-current={active ? "page" : undefined}
-                  data-asset={assetId}
-                >
-                  {assetId}
-                </Link>
-              );
-            })}
+          <nav aria-label="Options asset" style={{ marginTop: 10, maxWidth: 420 }}>
+            <LabAssetPicker
+              selectedAssetId={selectedAssetId}
+              buildAssetHref={buildAssetHrefForPicker}
+            />
           </nav>
         </div>
         <div className="tools">
