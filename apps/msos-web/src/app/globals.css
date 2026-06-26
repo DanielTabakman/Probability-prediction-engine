@@ -1265,6 +1265,34 @@ button.btn:focus-visible {
   min-height: 464px;
 }
 
+.options-horizon-work {
+  padding: 0 4px 24px;
+}
+
+.options-horizon-chart-wrap {
+  background: rgba(8, 16, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.options-horizon-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.options-horizon-preview {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(80, 200, 160, 0.25);
+  background: rgba(80, 200, 160, 0.06);
+}
+
 .belief-builder {
   background: rgba(67, 231, 211, 0.045);
   border: 1px solid rgba(67, 231, 211, 0.18);

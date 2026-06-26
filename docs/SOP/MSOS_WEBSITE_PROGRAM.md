@@ -16,6 +16,7 @@ Portable agent canon for the MSOS customer-facing website/platform program. PPE 
 - **Market Structure OS / MSOS** = company and software platform.
 - **Command Center** = authenticated home and ongoing work surface.
 - **Strategy Lab** = workspace for forming/testing theses and designing expressions.
+- **Options Horizon** = chart-first workspace (price × time + options-implied forward + region thesis); **Planned** until [`OPTIONS_HORIZON_PROGRAM_V1.md`](OPTIONS_HORIZON_PROGRAM_V1.md) chapters ship — peer to Strategy Lab, not PPE.
 - **PPE** = first tool inside Strategy Lab (not the whole platform).
 - **BTC options** = first enabled PPE surface, not permanent product identity.
 - **Existing PPE engine/math truth** remains controlling for calculations.

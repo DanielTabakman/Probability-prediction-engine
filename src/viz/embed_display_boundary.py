@@ -600,6 +600,21 @@ def create_display_payload_wsgi_app(
             )
             return [body]
 
+        from src.viz.horizon_display_boundary import handle_horizon_wsgi_path
+
+        horizon_result = handle_horizon_wsgi_path(path, environ)
+        if horizon_result is not None:
+            status, body = horizon_result
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
         start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
         return [b"not found"]
 
