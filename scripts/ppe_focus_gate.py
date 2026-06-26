@@ -170,6 +170,13 @@ def evaluate_focus_gate(repo: Path, plan_path: str) -> FocusGateResult:
     if not focus_gate_enabled(repo):
         return FocusGateResult(allowed=True, tier=tier)
 
+    if tier.lower() == "defer":
+        return FocusGateResult(
+            allowed=False,
+            reason="focusPlaybookTier Defer — steward SELECTION required before propagate",
+            tier=tier,
+        )
+
     if not validation_report_blocks_selection(repo):
         return FocusGateResult(allowed=True, tier=tier)
 

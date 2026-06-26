@@ -207,6 +207,27 @@ class TestPpeFocusGate(unittest.TestCase):
         p8.write_text("**Status:** **COMPLETE** 2026-06-12\n", encoding="utf-8")
         self.assertEqual(validation_report_gate_issues(self.repo), [])
 
+    def test_defer_tier_blocks_even_when_report_complete(self) -> None:
+        self._write_complete_report()
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "items": [
+                        {
+                            "chapterId": "equity",
+                            "planPath": self.plan_rel,
+                            "focusPlaybookTier": "Defer",
+                            "priority": "low",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        focus = evaluate_focus_gate(self.repo, self.plan_rel)
+        self.assertFalse(focus.allowed)
+        self.assertIn("Defer", focus.reason)
+
     def test_format_ide_focus_block(self) -> None:
         text = format_ide_focus_block(tier="P2", urgent_bypass=False)
         self.assertIn("North star", text)
