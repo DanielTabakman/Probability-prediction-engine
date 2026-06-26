@@ -86,3 +86,5 @@ docker compose up -d --force-recreate caddy msos_web
 Record results in [`docs/SOP/VALIDATION_DEPLOY_WITNESS.md`](../SOP/VALIDATION_DEPLOY_WITNESS.md).
 
 **Status:** compose + Caddy wired in-repo; VPS witness **PASS** after steward runs steps above and confirms URLs.
+
+**Staging:** experiments on `staging.marketstructureos.com` — see [`MSOS_STAGING_V1.md`](MSOS_STAGING_V1.md). Production apex must stay Next.js; deploy fails if Streamlit appears on `marketstructureos.com`.

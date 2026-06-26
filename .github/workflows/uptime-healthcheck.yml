@@ -20,16 +20,10 @@ jobs:
             exit 1
           fi
 
-      - name: Demo homepage must not show traceback
+      - name: Checkout (uptime verify)
+        uses: actions/checkout@v7
+
+      - name: Apex must be Next.js MSOS (not Streamlit)
         run: |
           set -euo pipefail
-          body=$(curl -fsS --max-time 60 https://marketstructureos.com/)
-          if echo "$body" | grep -q 'ModuleNotFoundError'; then
-            echo 'Demo site HTML contains ModuleNotFoundError'
-            exit 1
-          fi
-          if echo "$body" | grep -q 'Traceback (most recent call last)'; then
-            echo 'Demo site HTML contains a Python traceback'
-            exit 1
-          fi
-          echo "OK"
+          python scripts/verify_msos_web_ship.py --apex-only

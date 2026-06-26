@@ -1,4 +1,5 @@
-# Routing: apex (default) -> msos_web:3000 (Next.js MSOS); app.marketstructureos.com -> app_full:8501 (Streamlit).
+# Routing: apex (default) -> msos_web:3000 (Next.js MSOS); staging.marketstructureos.com -> msos_web_staging:3001.
+# app.marketstructureos.com -> app_full:8501 (Streamlit).
 # Strategy Lab PPE embed: /ppe-embed/* -> app_demo:8501 (public Streamlit; see MSOS_P1_STACK_ROUTING_ADR).
 # Display API: /ppe-display-api/* -> ppe_display_api:8765 (read-only JSON; embed_display_boundary).
 # Deploy notes: docs/DEPLOY/MSOS_WEB_V1.md

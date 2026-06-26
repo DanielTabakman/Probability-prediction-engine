@@ -1,9 +1,10 @@
 ## Runbook: VPS + Docker + Caddy + Cloudflare Access + R2 backups
 
-This runbook deploys two hostnames on one VPS:
+This runbook deploys hostnames on one VPS:
 
-- **`marketstructureos.com`**: public **demo** (no login, snapshots disabled)
-- **`app.marketstructureos.com`**: **full** app (Google login via Cloudflare Access, snapshots enabled + persisted + backed up)
+- **`marketstructureos.com`**: public **MSOS Next.js shell** (homepage, Strategy Lab, Command Center — no login)
+- **`staging.marketstructureos.com`**: **staging MSOS shell** for experiments (see [`MSOS_STAGING_V1.md`](MSOS_STAGING_V1.md))
+- **`app.marketstructureos.com`**: **full** Streamlit lab (Google login via Cloudflare Access, snapshots enabled + persisted + backed up)
 
 ### 0) What you need
 
@@ -81,6 +82,7 @@ In Cloudflare DNS for `marketstructureos.com`:
 
 - **A** record: `@` → your VPS IPv4 (**Proxied**)
 - **A** record: `app` → your VPS IPv4 (**Proxied**)
+- **A** record: `staging` → your VPS IPv4 (**Proxied**) — optional; for MSOS staging shell
 
 ### 5) Cloudflare TLS mode (pick one)
 
