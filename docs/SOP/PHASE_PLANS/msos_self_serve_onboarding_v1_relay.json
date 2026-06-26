@@ -1,0 +1,85 @@
+{
+  "name": "MSOS_self_serve_onboarding_v1 (public URL + guided tour — workstream A)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-SelfServeV1-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+      "buildBranch": "build/auto/MSOS-SelfServeV1-Control-Slice001-self_serve",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-SelfServeV1-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+      "buildBranch": "build/auto/MSOS-SelfServeV1-Product-Slice002-self_serve",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/platformTutorial.ts",
+        "apps/msos-web/src/components/PlatformTutorial.tsx",
+        "apps/msos-web/src/components/StrategyLabClientShell.tsx",
+        "apps/msos-web/src/components/StrategyLabWorkSection.tsx",
+        "apps/msos-web/src/components/ExpiryMarketContextStrip.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-SelfServeV1-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+      "buildBranch": "build/auto/MSOS-SelfServeV1-Product-Slice003-self_serve",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/HeroSection.tsx",
+        "apps/msos-web/src/components/FeaturesRow.tsx",
+        "apps/msos-web/src/components/PublicNav.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-SelfServeV1-Witness-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+      "buildBranch": "build/auto/MSOS-SelfServeV1-Witness-Slice004-self_serve",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md",
+        "tests/test_msos_web_homepage.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-SelfServeV1-Closeout-Slice005",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+      "buildBranch": "build/auto/MSOS-SelfServeV1-Closeout-Slice005-self_serve",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_self_serve_onboarding_v1",
+        "chapterTitle": "MSOS self-serve onboarding v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+      }
+    }
+  ]
+}

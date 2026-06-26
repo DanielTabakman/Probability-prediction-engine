@@ -65,7 +65,7 @@ Everything else serves that loop for **10–30 obsessed testers**, not breadth o
 | **Product milestone** | **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) |
 | Usable demo foundation | **COMPLETE** 2026-06-25 |
 | Self-serve onboarding | **ACTIVE** — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md) |
-| Wedge depth (relay) | **ACTIVE** — `` |
+| Wedge depth (relay) | **ACTIVE** — `msos_self_serve_onboarding_v1` |
 | Learning loop | **ACTIVE** — research sessions + validation log ingestion |
 | Friends-first gating | **RETIRED** — pivot `trader-workflow-integration-v1` |
 

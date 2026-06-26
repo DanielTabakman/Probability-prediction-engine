@@ -1,4 +1,4 @@
-# PPE equity options v1 — SELECTION (DEFERRED)
+# PPE equity options v1 — SELECTION
 
 **Chapter:** `ppe_equity_options_v1`  
 **Display name:** Equity options expansion (single-ticker v1)  
@@ -10,22 +10,26 @@
 
 ## Status
 
-**NOT SELECTED** — chartered placeholder only.
+**SELECTED** — steward SELECTION 2026-06-26 (usable demo + crypto wedge complete; G-04 validation optional signal, not a hard gate).
 
-### Hard gates (all required before SELECTION)
+**First slice:** `PPE-Equity-Control-Slice001`
 
-1. `ppe_crypto_multi_asset_v1` **COMPLETE**
-2. `msos_usable_demo_v1` **COMPLETE** + MCD criteria met
-3. **G-04 signal:** row in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) for NVIDIA/LEAPS or equivalent equity demand
-4. Steward approves **one** seed ticker (default: `NVDA`)
-
-### First slice at SELECTION
-
-`PPE-Equity-Control-Slice001`
+**Queue order:** after `msos_self_serve_onboarding_v1` closeout.
 
 ---
 
-## Scope preview (not authorized until SELECTION)
+## SELECTION rationale
+
+| Input | Decision |
+|-------|----------|
+| `msos_usable_demo_v1` | **COMPLETE** |
+| `ppe_crypto_multi_asset_v1` | **COMPLETE** |
+| Operator intent | Equity wedge back on the BUILD table |
+| Seed ticker | **NVDA** (default) unless steward overrides at Control slice |
+
+---
+
+## Scope (authorized at SELECTION)
 
 - New adapter: `src/data/fetch_equity_options.py` (yfinance v0 or steward-approved vendor)
 - Registry entry per equity symbol in `config/assets.yaml`
@@ -39,4 +43,3 @@
 
 - Multi-ticker scanner
 - Live broker execution
-- Replacing manual G-04 briefs until signal exists

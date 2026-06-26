@@ -1,18 +1,18 @@
-# PPE equity options v1 — relay sprint spec (DEFERRED)
+# PPE equity options v1 — relay sprint spec
 
 **Controlling canon:** [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — G-04/G-05  
-**Prior chapter:** [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md) (must be COMPLETE)  
+**Prior chapter:** [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md) — **COMPLETE**  
 **Validation brief:** [`briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md`](briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md)  
 **SELECTION:** [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)  
 **Baseline:** **`main`**
 
 ---
 
-## Sprint intent (when selected)
+## Sprint intent
 
 Ship **one liquid equity options name** (default NVDA) through the same belief → implied distribution → disagreement → expression workflow, with honest trust labeling for chain quality and corporate-action caveats.
 
-**Priority:** LOW — deferred until crypto chapter + validation signal.
+**Priority:** P2 — queued after `msos_self_serve_onboarding_v1`.
 
 ---
 

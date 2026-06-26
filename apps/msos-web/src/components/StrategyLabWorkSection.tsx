@@ -62,6 +62,8 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
     return buildExpiryMarketContext(displayPayload, resolvedExpiry);
   }, [live, displayPayload, resolvedExpiry]);
 
+  const assetTicker = displayPayload?.asset?.id?.toUpperCase() ?? "BTC";
+
   return (
     <>
       {expiryContext ? (
@@ -69,6 +71,7 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
           context={expiryContext}
           expiryOptions={expiryOptions}
           onExpiryChange={handleExpiryChange}
+          assetTicker={assetTicker}
         />
       ) : (
         <section className="expiry-market-context" aria-label="Lab context">

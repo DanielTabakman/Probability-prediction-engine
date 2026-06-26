@@ -93,6 +93,10 @@ export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_ST
 
   const refreshAnchor = useCallback(() => {
     if (!step) return;
+    const node = document.querySelector(step.anchor);
+    if (node) {
+      node.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
     setAnchor(measureAnchor(step.anchor));
   }, [step]);
 

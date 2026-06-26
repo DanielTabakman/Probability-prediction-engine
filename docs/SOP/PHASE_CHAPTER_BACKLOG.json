@@ -294,13 +294,13 @@
     },
     {
       "chapterId": "msos_billing_stripe_v1",
-      "status": "done",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
-      "reason": "[DEFER] Stripe Checkout \u2014 operator dropped until human prereq (stripe_operator_prereq); MSOS live sequence otherwise COMPLETE"
+      "reason": "[P4] Stripe Checkout \u2014 queued after usable demo; operator enables when stripe_operator_prereq complete"
     },
     {
       "chapterId": "msos_usable_demo_v1",
@@ -327,12 +327,22 @@
     {
       "chapterId": "ppe_equity_options_v1",
       "status": "blocked",
-      "priority": "low",
-      "focusPlaybookTier": "Defer",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
       "canonRef": "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md \u2014 G-04",
-      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until G-04 validation signal + steward SELECTION (crypto COMPLETE 2026-06-26)"
+      "reason": "[P2] Single-ticker equity options (default NVDA) \u2014 SELECTED; runs after msos_self_serve_onboarding_v1"
+    },
+    {
+      "chapterId": "msos_self_serve_onboarding_v1",
+      "status": "chartered",
+      "priority": "high",
+      "focusPlaybookTier": "P0",
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md \u2014 workstream A",
+      "reason": "[P0] Self-serve public URL + guided tour \u2014 workstream A"
     }
   ]
 }

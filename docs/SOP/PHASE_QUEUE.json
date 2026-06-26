@@ -258,10 +258,9 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "DONE",
-      "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
-      "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
-      "doneReason": "deferred by operator 2026-06-19 \u2014 not BUILD; see HUMAN_STEWARD_BACKLOG stripe_operator_prereq"
+      "status": "PLANNED",
+      "reason": "[P4] Stripe billing \u2014 re-queued after usable demo; operator enables when stripe_operator_prereq complete",
+      "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
@@ -286,6 +285,31 @@
       "reason": "[HIGH] Autobuilder happy path \u2014 active factory chapter",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED; after self-serve chapter",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+      "status": "DONE",
+      "reason": "[MEDIUM] Deribit BTC + ETH — COMPLETE 2026-06-26",
+      "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "status": "READY",
+      "reason": "[P0] Self-serve onboarding — workstream A",
+      "selectionPrep": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[P2] Equity options NVDA v1 — SELECTED; after self-serve chapter",
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",

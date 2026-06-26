@@ -52,8 +52,17 @@ def test_public_nav_restart_tour() -> None:
 def test_platform_tutorial_wiring() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "platformTutorial.ts").read_text(encoding="utf-8")
     assert "PLATFORM_TUTORIAL_STEPS" in lib
+    assert "lab-asset" in lib
+    assert "BTC or ETH" in lib
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
+    assert 'data-tour="lab-asset"' in shell
+
+
+def test_expiry_context_strip_uses_asset_ticker() -> None:
+    strip = (MSOS_WEB / "src" / "components" / "ExpiryMarketContextStrip.tsx").read_text(encoding="utf-8")
+    assert "assetTicker" in strip
+    assert "{assetTicker}" in strip
 
 
 def test_belief_bounds_copy_explains_limits() -> None:

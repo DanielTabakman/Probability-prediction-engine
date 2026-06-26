@@ -122,7 +122,12 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         <div>
           <div className="crumb">Strategy Lab · {assetMeta.label}</div>
           <h1 className="title">Strategy Lab</h1>
-          <nav className="belief-axis-pair" aria-label="Options asset" style={{ marginTop: 10, maxWidth: 220 }}>
+          <nav
+            className="belief-axis-pair"
+            aria-label="Options asset"
+            style={{ marginTop: 10, maxWidth: 220 }}
+            data-tour="lab-asset"
+          >
             {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
               const active = assetId === selectedAssetId;
               return (

@@ -14,9 +14,15 @@ export type PlatformTutorialStep = {
 
 export const PLATFORM_TUTORIAL_STEPS: PlatformTutorialStep[] = [
   {
+    id: "asset",
+    title: "BTC or ETH",
+    body: "Switch crypto asset here — the same implied-distribution workflow runs for BTC and ETH options on Deribit.",
+    anchor: "[data-tour='lab-asset']",
+  },
+  {
     id: "expiry",
     title: "Pick an expiry",
-    body: "Choose when your view applies. You'll see today's BTC price, the market's best guess for that date, and the typical range — then the chart updates.",
+    body: "Choose when your view applies. You'll see today's price, what options imply for that date, and the typical range — then the chart updates.",
     anchor: "[data-tour='lab-expiry']",
   },
   {
@@ -47,21 +53,27 @@ export const PLATFORM_TUTORIAL_STEPS: PlatformTutorialStep[] = [
 
 export const PLATFORM_TUTORIAL_BEGINNER_STEPS: PlatformTutorialStep[] = [
   {
+    id: "asset",
+    title: "Pick BTC or ETH",
+    body: "Both use the same tour — switch anytime if you care about ETH options instead of BTC.",
+    anchor: "[data-tour='lab-asset']",
+  },
+  {
     id: "expiry",
     title: "Pick a date",
-    body: "Choose when your idea applies. You'll see today's BTC price and what the market expects on that date.",
+    body: "Choose when your idea applies. You'll see today's price and what the market expects on that date.",
     anchor: "[data-tour='lab-expiry']",
   },
   {
     id: "belief",
     title: "Say how you disagree",
-    body: "Tap Higher/Lower if you think BTC lands above or below what options imply. Tap More/Less vol if you expect a wider or calmer range.",
+    body: "Tap Higher/Lower if you think price lands above or below what options imply. Tap More/Less vol if you expect a wider or calmer range.",
     anchor: "[data-tour='lab-belief']",
   },
   {
     id: "chart",
     title: "Read the chart",
-    body: "Purple = what the market believes. Teal = your view. You don't need to understand every detail — just whether they look similar or different.",
+    body: "Purple = what the market believes. Teal = your view. You don't need every detail — just whether they look similar or different.",
     anchor: "[data-tour='lab-chart']",
   },
   {

@@ -11,11 +11,11 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
-- **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md; charter next relay chapter when steward SELECTION adds READY queue item (equity remains DEFER until G-04)
+- **Active relay chapter:** `msos_self_serve_onboarding_v1` · plan [`msos_self_serve_onboarding_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json)
+- **Next steward action:** IDE BUILD msos_self_serve_onboarding_v1 slice 003+; equity + stripe re-queued (no Defer tier)
 
 **Workstreams (milestone):**
-- **Self-serve onboarding** (active) — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
+- **Self-serve onboarding** (active) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
 - **Wedge depth (BTC + ETH)** (complete) · `ppe_crypto_multi_asset_v1` — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
 - **Workflow loop fidelity (P4–P7)** (active) — [`MSOS_Market_Interaction_Modes_v0.1.md`](docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
 - **Learning loop (research → backlog)** (active) — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)
@@ -29,7 +29,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Side channels (optional, not gates):**
 - **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session + paid-interest log — feeds learning loop workstream
-- **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — next milestone candidate — after trader-workflow-integration v1 + G-04 signal
+- **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — queued wedge after self-serve — NVDA single-ticker equity options
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).

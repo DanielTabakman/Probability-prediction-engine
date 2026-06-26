@@ -219,14 +219,20 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
-      "status": "ready",
-      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+      "status": "done",
+      "reason": "[MEDIUM] Deribit BTC + ETH — COMPLETE 2026-06-26",
       "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+      "status": "ready",
+      "reason": "[P0] Self-serve onboarding — workstream A",
+      "selectionPrep": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
-      "status": "skipped",
-      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 after crypto chapter + G-04 validation",
+      "status": "pending",
+      "reason": "[P2] Single-ticker equity options (default NVDA) \u2014 SELECTED after self-serve chapter",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
     }
   ]

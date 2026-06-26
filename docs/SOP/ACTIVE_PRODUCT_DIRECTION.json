@@ -29,10 +29,10 @@
       "evidence": "docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "",
-  "activeBuildPlanPath": "",
-  "activeBuildSprint": "",
-  "nextStewardAction": "Milestone workstreams: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md; charter next relay chapter when steward SELECTION adds READY queue item (equity remains DEFER until G-04)",
+  "activeBuildChapterId": "msos_self_serve_onboarding_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
+  "nextStewardAction": "IDE BUILD msos_self_serve_onboarding_v1 slice 003+; equity + stripe re-queued (no Defer tier)",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -44,6 +44,7 @@
     {
       "id": "self_serve_onboarding",
       "label": "Self-serve onboarding",
+      "chapterId": "msos_self_serve_onboarding_v1",
       "doc": "docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md",
       "status": "active"
     },
@@ -74,16 +75,18 @@
       "role": "session + paid-interest log — feeds learning loop workstream"
     },
     {
-      "id": "equity_options_deferred",
+      "id": "equity_options_v1",
       "doc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
-      "role": "next milestone candidate — after trader-workflow-integration v1 + G-04 signal"
+      "role": "queued wedge after self-serve — NVDA single-ticker equity options"
     }
   ],
   "buildTrack": {
     "label": "Trader Workflow Integration v1",
     "outcome": "MSOS in the trading process — imply, disagree, express, return; not a demo-only visit",
     "chapters": [
-      "ppe_crypto_multi_asset_v1"
+      "ppe_crypto_multi_asset_v1",
+      "msos_self_serve_onboarding_v1",
+      "ppe_equity_options_v1"
     ]
   },
   "supersedes": {

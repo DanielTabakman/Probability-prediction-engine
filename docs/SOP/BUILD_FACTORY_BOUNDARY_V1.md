@@ -49,7 +49,7 @@ Stop and escalate if a BUILD packet would:
 | Priority | Focus |
 |----------|--------|
 | **1** | **Trader workflow integration** — milestone charter + four workstreams |
-| **2** | **Active relay** — `` (wedge depth) |
+| **2** | **Active relay** — `msos_self_serve_onboarding_v1` (wedge depth) |
 | **3** | **Factory stability** — relay, autobuilder, gates, closeout |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
