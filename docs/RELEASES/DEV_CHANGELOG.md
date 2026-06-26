@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- `d620253` — PPE-CryptoMA-Core-Slice002: parameterize Deribit fetch + export asset_id (#343) (`docs/SOP/`)
+- `842380c` — Control-plane: dev changelog
 - `99a43ed` — fix(msos): lab setup row for expiry + currency UX (#342) (`apps/msos-web/`)
 - `dee0ee0` — MSOS journey crawler: fix 404 false positives in deploy witness (#340) (`scripts/`)
 - `b3b1c54` — build(deps): Bump actions/upload-artifact from 4 to 7 (#299)
@@ -12,6 +14,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-25
 
+- `ee9732f` — MSOS playwright witness: dismiss tutorial scrim in CI (#346) (`scripts/`)
 - `f80e7b3` — deploy witness: export PYTHONPATH for all production health scripts (#344)
 - `fe25b64` — MSOS paper planner UX: clarity for new options users (#334) (`apps/msos-web/`)
 - `29cb1cf` — Control-plane: dev changelog
