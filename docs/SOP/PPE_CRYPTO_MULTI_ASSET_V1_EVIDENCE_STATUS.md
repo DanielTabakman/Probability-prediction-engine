@@ -9,7 +9,7 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | PPE-CryptoMA-Control-Slice001 | **CLOSED** | `config/assets.yaml` registry scaffold; SELECTION finalized |
-| PPE-CryptoMA-Core-Slice002 | PENDING | Parameterize Deribit fetch + export `asset_id` |
+| PPE-CryptoMA-Core-Slice002 | **CLOSED** | Parameterized Deribit fetch (`currency`); `assets_registry.py`; export `asset_id` |
 | PPE-CryptoMA-UI-Slice003 | PENDING | Streamlit selector + embed `asset` payload |
 | PPE-CryptoMA-Product-Slice004 | PENDING | MSOS Strategy Lab asset switcher |
 | PPE-CryptoMA-Platform-Slice005 | PENDING | Deploy witness + display API query param |
