@@ -1,0 +1,68 @@
+# Deploy MSOS staging shell on the VPS (does not touch production msos_web).
+# See docs/DEPLOY/MSOS_STAGING_V1.md
+name: Deploy VPS Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: "Git ref to deploy (branch or origin/branch; default staging)"
+        required: false
+        default: "staging"
+
+concurrency:
+  group: deploy-vps-staging
+  cancel-in-progress: true
+
+jobs:
+  vps-staging-deploy:
+    name: VPS staging deploy
+    runs-on: ubuntu-latest
+    env:
+      PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+      PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+      PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+    steps:
+      - name: SSH staging deploy
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+          PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+          PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+          GIT_REF: ${{ inputs.git_ref }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          script_stop: true
+          command_timeout: 25m
+          envs: PPE_RESEARCH_OFFER_URL,PPE_RESEARCH_OFFER_EMAIL,PPE_RESEARCH_OFFER_LABEL,GIT_REF
+          script: |
+            set -euo pipefail
+            REF="${GIT_REF:-staging}"
+            if [[ "$REF" != origin/* ]]; then
+              REF="origin/${REF}"
+            fi
+            bash /opt/marketstructureos/scripts/vps_deploy_staging.sh "$REF"
+
+      - name: Checkout (staging verify)
+        uses: actions/checkout@v7
+
+      - name: Verify staging apex is Next.js MSOS
+        run: |
+          set -euo pipefail
+          code="000"
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 60 https://staging.marketstructureos.com/ || true)
+            if [ "$code" = "200" ]; then
+              break
+            fi
+            echo "Attempt $attempt/6: staging HTTP $code (waiting 30s)"
+            sleep 30
+          done
+          if [ "$code" != "200" ]; then
+            echo "Staging health check failed (HTTP $code) — add Cloudflare DNS A staging → VPS?"
+            exit 1
+          fi
+          python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com

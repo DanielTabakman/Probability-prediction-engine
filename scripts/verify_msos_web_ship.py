@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """Verify production MSOS web shipped the expected client bundles (no Playwright).
 
-Fails when strategy-lab page JS still contains pre-labeled-axis copy or is missing
-axis strings — catches stale msos_web images after a green Deploy VPS run.
+Fails when:
+- Apex homepage serves Streamlit instead of Next.js MSOS shell
+- strategy-lab page JS still contains pre-labeled-axis copy or is missing axis strings
+
+Catches stale msos_web images or Caddy routing regressions after a green Deploy VPS run.
 
 Usage:
   python scripts/verify_msos_web_ship.py
   python scripts/verify_msos_web_ship.py --base-url https://marketstructureos.com
+  python scripts/verify_msos_web_ship.py --apex-only
 """
 
 from __future__ import annotations
@@ -25,6 +29,10 @@ STALE_STRATEGY_LAB_MARKERS = ("Reference curve", "Options market")
 
 # Required in strategy-lab page chunk when labeled axes ship.
 REQUIRED_STRATEGY_LAB_MARKERS = ("BTC price at expiry",)
+
+# Apex must be Next.js MSOS — not legacy Streamlit demo on marketstructureos.com.
+STREAMLIT_APEX_MARKERS = ("stApp", "stDeployButton", "streamlit.io", "Made with Streamlit")
+REQUIRED_APEX_MSOS_MARKERS = ("_next/static", "Market Structure OS")
 
 
 def fetch_url(url: str, *, timeout: float = 30.0) -> tuple[int, str, str | None]:
@@ -64,8 +72,34 @@ def verify_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool
     return True, None
 
 
+def verify_msos_web_apex(*, base_url: str = DEFAULT_BASE) -> tuple[bool, str | None]:
+    """Apex homepage must serve Next.js MSOS shell — not Streamlit."""
+    base = base_url.rstrip("/")
+    status, body, err = fetch_url(f"{base}/")
+    if status != 200 or err:
+        return False, err or f"homepage HTTP {status}"
+    if "Traceback (most recent call last)" in body or "ModuleNotFoundError" in body:
+        return False, "homepage HTML contains server error"
+    streamlit_hits = [m for m in STREAMLIT_APEX_MARKERS if m in body]
+    if streamlit_hits:
+        return False, (
+            "apex homepage serves Streamlit "
+            f"({', '.join(streamlit_hits)}) — expected Next.js MSOS on msos_web:3000"
+        )
+    missing = [m for m in REQUIRED_APEX_MSOS_MARKERS if m not in body]
+    if missing:
+        return False, (
+            "apex homepage missing MSOS Next.js markers "
+            f"({', '.join(missing)}) — Caddy may not route to msos_web"
+        )
+    return True, None
+
+
 def verify_msos_web_ship(*, base_url: str = DEFAULT_BASE) -> tuple[bool, str | None]:
     """HTTP ship gate for MSOS Next.js client bundles."""
+    ok, detail = verify_msos_web_apex(base_url=base_url)
+    if not ok:
+        return False, detail
     base = base_url.rstrip("/")
     status, body, err = fetch_url(f"{base}/strategy-lab")
     if status != 200 or err:
@@ -78,9 +112,17 @@ def verify_msos_web_ship(*, base_url: str = DEFAULT_BASE) -> tuple[bool, str | N
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Verify MSOS web client bundles on production")
     parser.add_argument("--base-url", default=DEFAULT_BASE)
+    parser.add_argument(
+        "--apex-only",
+        action="store_true",
+        help="Only verify apex homepage routes to Next.js MSOS (skip strategy-lab bundle check)",
+    )
     args = parser.parse_args(argv)
 
-    ok, detail = verify_msos_web_ship(base_url=args.base_url)
+    if args.apex_only:
+        ok, detail = verify_msos_web_apex(base_url=args.base_url)
+    else:
+        ok, detail = verify_msos_web_ship(base_url=args.base_url)
     if ok:
         print(f"msos_web ship verify OK ({args.base_url.rstrip('/')})")
         return 0

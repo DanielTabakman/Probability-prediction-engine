@@ -24,6 +24,8 @@ def test_msos_web_csp_in_snippets() -> None:
     text = (REPO_ROOT / "caddy" / "snippets.caddy").read_text(encoding="utf-8")
     assert "Content-Security-Policy" in text
     assert "msos_web:3000" in text
+    assert "msos_web_staging:3001" in text
+    assert "staging.marketstructureos.com" in text
 
 
 def test_caddyfile_tls_origin_cert_paths() -> None:

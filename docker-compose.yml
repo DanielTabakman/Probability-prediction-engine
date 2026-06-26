@@ -20,6 +20,56 @@ services:
     volumes:
       - msos_web_data:/data
       - ppe_snapshots:/ppe-snapshots:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+    restart: unless-stopped
+    networks:
+      - web
+
+  msos_web_staging:
+    profiles: ["staging"]
+    build:
+      context: ./apps/msos-web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MSOS_SIGN_IN_URL: ${NEXT_PUBLIC_MSOS_SIGN_IN_URL:-https://app.marketstructureos.com}
+        NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL: ${PPE_RESEARCH_OFFER_URL:-}
+        NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL: ${PPE_RESEARCH_OFFER_LABEL:-}
+        NEXT_PUBLIC_PPE_EMBED_URL: ${NEXT_PUBLIC_PPE_EMBED_URL:-/ppe-embed}
+        NEXT_PUBLIC_PPE_DISPLAY_API_URL: ${NEXT_PUBLIC_PPE_DISPLAY_API_URL:-/ppe-display-api/display.json}
+    container_name: msos_web_staging
+    environment:
+      - PORT=3001
+      - PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api:8765/display.json
+      - PPE_WEB_FEEDBACK_DIR=/data/staging
+      - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
+      - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
+      - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+    volumes:
+      - msos_web_staging_data:/data
+      - ppe_snapshots:/ppe-snapshots:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3001/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
     restart: unless-stopped
     networks:
       - web
@@ -81,6 +131,8 @@ volumes:
     name: ppe_snapshots
   msos_web_data:
     name: msos_web_data
+  msos_web_staging_data:
+    name: msos_web_staging_data
   caddy_data:
   caddy_config:
 

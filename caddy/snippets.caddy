@@ -35,6 +35,14 @@
 }
 
 (msos_site_routes) {
+	@staging host staging.marketstructureos.com
+	handle @staging {
+		header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'"
+		reverse_proxy msos_web_staging:3001 {
+			header_up X-Forwarded-Proto {forwarded_proto}
+			header_up X-Forwarded-Host {http.request.host}
+		}
+	}
 	@app host app.marketstructureos.com
 	handle @app {
 		reverse_proxy app_full:8501 {

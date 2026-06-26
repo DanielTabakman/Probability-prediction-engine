@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Deploy MSOS staging shell on the VPS without touching production msos_web.
+#
+# Staging uses a separate git checkout under /opt/marketstructureos-staging and
+# docker compose profile "staging" (msos_web_staging on port 3001).
+# Caddy routes staging.marketstructureos.com → msos_web_staging:3001.
+#
+# Usage (on VPS or via Deploy VPS Staging workflow):
+#   bash scripts/vps_deploy_staging.sh                    # origin/staging
+#   bash scripts/vps_deploy_staging.sh origin/my-feature
+#
+# One-time VPS setup:
+#   sudo mkdir -p /opt/marketstructureos-staging
+#   sudo chown -R $USER:$USER /opt/marketstructureos-staging
+#   git clone <repo> /opt/marketstructureos-staging   # or git worktree add
+#   Cloudflare DNS: A staging → VPS IP (proxied)
+#
+set -euo pipefail
+
+REF="${1:-origin/staging}"
+STAGING_ROOT="${PPE_STAGING_ROOT:-/opt/marketstructureos-staging}"
+
+if [[ ! -d "$STAGING_ROOT/.git" ]]; then
+  echo "vps_deploy_staging: missing git checkout at ${STAGING_ROOT}" >&2
+  echo "Clone the repo there first (see docs/DEPLOY/MSOS_STAGING_V1.md)." >&2
+  exit 1
+fi
+
+cd "$STAGING_ROOT"
+git fetch origin
+BRANCH="${REF#origin/}"
+if git show-ref --verify --quiet "refs/remotes/${REF}" 2>/dev/null; then
+  git checkout -B "$BRANCH" "$REF"
+elif git show-ref --verify --quiet "refs/heads/${BRANCH}" 2>/dev/null; then
+  git checkout "$BRANCH"
+  git pull --ff-only origin "$BRANCH" || true
+else
+  echo "vps_deploy_staging: ref ${REF} not found" >&2
+  exit 1
+fi
+
+echo "Staging deploy commit: $(git rev-parse HEAD)"
+
+if [[ -f scripts/vps_sync_production_env.sh ]]; then
+  bash scripts/vps_sync_production_env.sh
+fi
+
+RESEARCH_URL="$(grep '^PPE_RESEARCH_OFFER_URL=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+RESEARCH_LABEL="$(grep '^PPE_RESEARCH_OFFER_LABEL=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
+
+docker compose build app_demo app_full ppe_display_api
+docker compose build --no-cache msos_web_staging \
+  --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
+  --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
+docker compose --profile staging up -d --force-recreate msos_web_staging
+
+# Shared Caddy from production root — reload routes if production checkout is newer.
+PROD_ROOT="${PPE_VPS_ROOT:-/opt/marketstructureos}"
+if [[ -d "$PROD_ROOT" && "$PROD_ROOT" != "$STAGING_ROOT" ]]; then
+  (cd "$PROD_ROOT" && git pull --ff-only origin main 2>/dev/null || true)
+  (cd "$PROD_ROOT" && docker compose up -d --force-recreate caddy) || true
+fi
+
+echo "vps_deploy_staging: msos_web_staging up — https://staging.marketstructureos.com/"

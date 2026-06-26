@@ -39,3 +39,40 @@ def test_verify_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
         ship.fetch_url = original
     assert ok is True
     assert err is None
+
+
+def test_verify_msos_web_apex_rejects_streamlit() -> None:
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("/"):
+            return 200, "<html><body class='stApp'>Made with Streamlit</body></html>", None
+        return 404, "", "not found"
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = ship.verify_msos_web_apex(base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is False
+    assert "Streamlit" in (err or "")
+
+
+def test_verify_msos_web_apex_accepts_nextjs() -> None:
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("/"):
+            return (
+                200,
+                '<html><script src="/_next/static/chunks/app/page.js"></script>'
+                "<title>Market Structure OS</title></html>",
+                None,
+            )
+        return 404, "", "not found"
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = ship.verify_msos_web_apex(base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is True
+    assert err is None
