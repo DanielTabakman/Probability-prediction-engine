@@ -22,3 +22,16 @@ assets:
     spread_width: 500
     trust_notes:
       - "Thinner books than BTC — BL curve may be noisier; surface trust state in lab."
+
+  NVDA:
+    label: "NVDA options"
+    venue: equity
+    equity_symbol: NVDA
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: false
+    spread_width: 25
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+      - "LEAPS chain may be thin — BL trust state surfaced when OI/volume low."
