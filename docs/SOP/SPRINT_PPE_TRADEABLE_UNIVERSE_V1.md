@@ -88,4 +88,4 @@ BTC/ETH remain `enabled: true`. NVDA follows equity chapter enablement.
 
 ## Sprint status
 
-**SELECTED** — SELECTION 2026-06-26; blocked on `ppe_equity_options_v1` COMPLETE.
+**IN PROGRESS** — Control-Slice001 CLOSED; Core-Slice002 registry v2 next.
