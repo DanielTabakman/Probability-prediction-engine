@@ -332,7 +332,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
       "canonRef": "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md \u2014 G-04",
-      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until ppe_crypto_multi_asset_v1 COMPLETE + validation signal"
+      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until G-04 validation signal + steward SELECTION (crypto COMPLETE 2026-06-26)"
     }
   ]
 }
