@@ -311,6 +311,26 @@
       "selectionRecord": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
       "canonRef": "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json \u2014 usable-demo-build-v1",
       "reason": "[P0] Storyboard design complete; BUILD walkable MSOS shell + PPE integration demo \u2014 direction pivot 2026-06-21"
+    },
+    {
+      "chapterId": "ppe_crypto_multi_asset_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
+      "canonRef": "docs/VISION/PPE_MASTER_MVP1.md \u2014 G-05",
+      "reason": "[MEDIUM] Deribit ETH expansion + asset registry \u2014 blocked until msos_usable_demo_v1 COMPLETE; crypto before stocks"
+    },
+    {
+      "chapterId": "ppe_equity_options_v1",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "Defer",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+      "canonRef": "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md \u2014 G-04",
+      "reason": "[DEFER] Single-ticker equity options (default NVDA) \u2014 blocked until ppe_crypto_multi_asset_v1 COMPLETE + validation signal"
     }
   ]
 }

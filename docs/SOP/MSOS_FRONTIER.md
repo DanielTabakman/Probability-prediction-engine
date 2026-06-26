@@ -250,6 +250,10 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation state.
 
+### Post-demo multi-asset (chartered — blocked)
+
+Crypto expansion (Deribit ETH) and equity options (single-ticker v1) are **chartered** in [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json). **Blocked** until `msos_usable_demo_v1` COMPLETE (crypto) and validation signal (equity). See [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) post-demo table.
+
 ### Non-goals (MSOS track)
 
 - Rewriting PPE math in frontend code

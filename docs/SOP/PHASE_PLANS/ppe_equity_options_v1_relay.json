@@ -1,0 +1,124 @@
+{
+  "name": "ppe_equity_options_v1 (single-ticker equity options — DEFERRED)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-Equity-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Control-Slice001-equity",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-Equity-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Core-Slice002-equity",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "src/data/fetch_equity_options.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Equity-Core-Slice003",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Core-Slice003-equity",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/data/fetch_equity_options.py",
+        "src/viz/distribution_export.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Equity-UI-Slice004",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-UI-Slice004-equity",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app_cache.py",
+        "src/viz/embed_display_boundary.py",
+        "src/viz/app.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Equity-Product-Slice005",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Product-Slice005-equity",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabClientShell.tsx",
+        "apps/msos-web/src/lib/buildThesisLabContext.ts"
+      ]
+    },
+    {
+      "sliceId": "PPE-Equity-Platform-Slice006",
+      "layerPreset": "PLATFORM",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Platform-Slice006-equity",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/msos_production_demo_witness.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-Equity-Witness-Slice007",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Witness-Slice007-equity",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-Equity-Closeout-Slice008",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+      "buildBranch": "build/auto/PPE-Equity-Closeout-Slice008-equity",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_equity_options_v1",
+        "chapterTitle": "PPE equity options v1 (single ticker)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
+        ]
+      }
+    }
+  ]
+}
