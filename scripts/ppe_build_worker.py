@@ -44,6 +44,19 @@ def resolve_codex_cli() -> str | None:
         candidate = Path(npm_global) / "npm" / "codex.cmd"
         if candidate.is_file():
             return str(candidate)
+    # Standalone Windows installer (chatgpt.com/codex/install.ps1)
+    local_app = os.environ.get("LOCALAPPDATA", "").strip()
+    if local_app:
+        candidate = Path(local_app) / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
+        if candidate.is_file():
+            return str(candidate)
+    # npm global / Unix-style local bin
+    home = os.environ.get("USERPROFILE") or os.environ.get("HOME", "")
+    if home:
+        for name in ("codex.exe", "codex"):
+            candidate = Path(home) / ".local" / "bin" / name
+            if candidate.is_file():
+                return str(candidate)
     return None
 
 
