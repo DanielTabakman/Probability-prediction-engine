@@ -8,6 +8,7 @@ import os
 import sys
 import traceback
 from concurrent.futures import ThreadPoolExecutor, wait
+from functools import partial
 from pathlib import Path
 
 # Streamlit puts `src/viz` on sys.path; `src.*` imports need the repo root.
@@ -50,6 +51,7 @@ from src.viz.app_cache import (
     cached_deribit_summary as _cached_deribit_summary,
     cached_forward_curve as _cached_forward_curve,
     cached_forward_iv as _cached_forward_iv,
+    cached_lab_spot as _cached_lab_spot,
     cached_marks_full as _cached_marks_full,
     cached_option_book_marks as _cached_option_book_marks,
     cached_option_expiries as _cached_option_expiries,
@@ -82,6 +84,7 @@ from src.engine.strategy_scanner import (
     payoff_target_to_strikes_with_work,
 )
 from src.viz.implied_lab_state import build_implied_lab_state
+from src.viz.lab_asset_selection import render_lab_asset_selector
 from src.viz.implied_lab_derive import derive_lab_outputs
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.implied_lab_provenance import (
@@ -336,27 +339,42 @@ if show_bitcoin_view:
                 "not the same as illustrative strategy families in the belief panel."
             )
 
-    if is_full and run_implied and current_btc is not None:
+    lab_asset_id = render_lab_asset_selector(key="implied_lab_asset_id") if is_full else "BTC"
+    lab_spot_raw = _cached_lab_spot(lab_asset_id) if is_full else None
+    if isinstance(lab_spot_raw, (int, float)):
+        lab_spot = float(lab_spot_raw)
+    elif isinstance(lab_spot_raw, dict):
+        _raw = lab_spot_raw.get("index") or lab_spot_raw.get("price")
+        lab_spot = float(_raw) if _raw is not None else None
+    else:
+        lab_spot = None
+    implied_anchor_spot = lab_spot if lab_spot and lab_spot > 0 else current_btc
+
+    if is_full and run_implied and implied_anchor_spot is not None:
         try:
             with st.spinner("Loading expiries and option marks…"):
-                expiries, expiry_fetch_diag = _cached_option_expiries()
+                expiries, expiry_fetch_diag = _cached_option_expiries(asset_id=lab_asset_id)
             if expiries:
                 run_ts_export = pd.Timestamp.now(tz="UTC")
                 as_of_export = run_ts_export.isoformat()
                 now_ms_export = run_ts_export.timestamp() * 1000
+                _fwd_iv = partial(_cached_forward_iv, asset_id=lab_asset_id)
+                _marks = partial(_cached_marks_full, asset_id=lab_asset_id)
                 export_rows = build_distribution_export_rows(
                     as_of_utc=as_of_export,
-                    spot_usd=float(current_btc),
+                    spot_usd=float(implied_anchor_spot),
                     expiries=expiries,
-                    forward_iv_fn=_cached_forward_iv,
-                    marks_full_fn=_cached_marks_full,
+                    forward_iv_fn=_fwd_iv,
+                    marks_full_fn=_marks,
                     now_ms=now_ms_export,
+                    asset_id=lab_asset_id,
                 )
                 render_distribution_summary_panel(export_rows)
+                _export_slug = lab_asset_id.lower()
                 st.download_button(
                     "Download distribution stats (CSV)",
                     data=serialize_distribution_export_csv(export_rows).encode("utf-8"),
-                    file_name="ppe_btc_distribution_stats.csv",
+                    file_name=f"ppe_{_export_slug}_distribution_stats.csv",
                     mime="text/csv",
                     key="implied_dist_export_csv",
                 )
@@ -377,10 +395,10 @@ if show_bitcoin_view:
                         if btc_questions:
                             cv_rows = build_cross_venue_panel_rows(
                                 as_of_utc=as_of_export,
-                                spot_usd=float(current_btc),
+                                spot_usd=float(implied_anchor_spot),
                                 btc_questions=btc_questions,
-                                forward_iv_fn=_cached_forward_iv,
-                                marks_full_fn=_cached_marks_full,
+                                forward_iv_fn=_fwd_iv,
+                                marks_full_fn=_marks,
                                 instruments_fn=_cached_option_instruments,
                                 option_book_marks_fn=_cached_option_book_marks,
                             )
@@ -489,8 +507,10 @@ if show_bitcoin_view:
                         right_verification_slot = st.empty()
                     with col_controls:
                         # Only fetch data for the selected expiry to keep this step fast.
-                        fwd_iv = _cached_forward_iv(selected["expiry_ts"], current_btc)
-                        forward = (fwd_iv.get("forward") or current_btc) if fwd_iv else current_btc
+                        fwd_iv = _cached_forward_iv(
+                            selected["expiry_ts"], implied_anchor_spot, lab_asset_id
+                        )
+                        forward = (fwd_iv.get("forward") or implied_anchor_spot) if fwd_iv else implied_anchor_spot
                         vol = (fwd_iv.get("atm_iv") or 0.6) if fwd_iv else 0.6
                         if vol <= 0:
                             vol = 0.6
@@ -511,7 +531,7 @@ if show_bitcoin_view:
                             num_points=100,
                         )
                         # One book summary for both chart and strategy scanner
-                        marks_full = _cached_marks_full(selected["expiry_ts"])
+                        marks_full = _cached_marks_full(selected["expiry_ts"], lab_asset_id)
                         call_marks = marks_full.get("calls") or []
                         put_marks = marks_full.get("puts") or []
                         base_strategy = build_universal_strategy(forward, call_marks, put_marks)

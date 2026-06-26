@@ -54,9 +54,12 @@ def test_display_payload_schema_and_summary() -> None:
         as_of_utc="2026-06-06T12:00:00+00:00",
         spot_usd=99_000.0,
         export_rows=rows,
+        asset_id="BTC",
     )
     assert payload["schema_version"] == DISPLAY_PAYLOAD_SCHEMA_VERSION
     assert payload["kind"] == DISPLAY_PAYLOAD_KIND
+    assert payload["asset"]["id"] == "BTC"
+    assert payload["asset"]["price_axis_label"] == "BTC price at expiry"
     assert payload["anchor_id"] == DIST_SUMMARY_ANCHOR_ID
     assert payload["summary"]["row_count"] == 2
     assert payload["meta"]["http_path"] == DISPLAY_PAYLOAD_HTTP_PATH
@@ -106,7 +109,7 @@ def test_wsgi_app_serves_json() -> None:
         spot_usd=99_000.0,
         export_rows=rows,
     )
-    app = create_display_payload_wsgi_app(lambda: payload)
+    app = create_display_payload_wsgi_app(lambda _environ: payload)
 
     status: list[str] = []
     headers: list[tuple[str, str]] = []
@@ -124,7 +127,7 @@ def test_wsgi_app_serves_json() -> None:
 
 
 def test_wsgi_app_rejects_unknown_paths() -> None:
-    app = create_display_payload_wsgi_app(lambda: {})
+    app = create_display_payload_wsgi_app(lambda _environ: {})
 
     status: list[str] = []
     headers: list[tuple[str, str]] = []
@@ -140,7 +143,7 @@ def test_wsgi_app_rejects_unknown_paths() -> None:
 
 
 def test_wsgi_app_upstream_failure_returns_503_json() -> None:
-    def _boom() -> dict:
+    def _boom(_environ: dict) -> dict:
         raise RuntimeError("Deribit BTC index unavailable for embed display boundary.")
 
     app = create_display_payload_wsgi_app(_boom)
@@ -156,11 +159,94 @@ def test_wsgi_app_upstream_failure_returns_503_json() -> None:
     assert "Deribit" in parsed["error"]
 
 
+def test_distribution_export_routes_nvda_to_equity(monkeypatch) -> None:
+    exp_ts = 1893456000000
+    captured: list[str] = []
+
+    def _fake_equity(**kwargs):
+        captured.append(str(kwargs.get("asset_id")))
+        return [{"asset": "NVDA", "distribution": "lognormal_reference", "expiry_date": "2030-01-01"}]
+
+    monkeypatch.setattr(
+        "src.data.equity_distribution_export.build_equity_distribution_export_rows",
+        _fake_equity,
+    )
+    rows = build_distribution_export_rows(
+        as_of_utc="2026-06-06T12:00:00+00:00",
+        spot_usd=140.0,
+        expiries=[{"expiry_date_str": "2030-01-01", "expiry_ts": exp_ts}],
+        forward_iv_fn=lambda _e, _s: {"forward": 140.0, "atm_iv": 0.4},
+        marks_full_fn=lambda _e: {"calls": []},
+        now_ms=exp_ts - 86400000 * 30,
+        asset_id="NVDA",
+    )
+    assert captured == ["NVDA"]
+    assert rows[0]["asset"] == "NVDA"
+
+
+def test_chart_series_equity_bounds() -> None:
+    row = {
+        "distribution": "lognormal_reference",
+        "forward_usd": "150.00",
+        "atm_iv_annual": "0.450000",
+        "T_years": "0.500000",
+        "mean_usd": "150.00",
+        "q25_usd": "130.00",
+        "q50_usd": "148.00",
+        "q75_usd": "170.00",
+        "expiry_date": "2027-01-15",
+        "asset": "NVDA",
+    }
+    series = build_chart_series_from_export_row(row)
+    assert series is not None
+    assert series["price_min_usd"] == max(1.0, 150.0 * 0.35)
+    assert series["price_max_usd"] == 150.0 * 2.5
+
+
+def test_spot_for_asset_uses_cached_lab_spot(monkeypatch) -> None:
+    from src.viz import embed_only_lab as lab
+
+    monkeypatch.setattr(lab, "cached_lab_spot", lambda _aid: 142.5)
+    assert lab._spot_for_asset("NVDA") == 142.5
+
+
+def test_wsgi_display_respects_asset_query(monkeypatch) -> None:
+    rows = _sample_export_rows()
+    payload = build_distribution_display_payload(
+        as_of_utc="2026-06-06T12:00:00+00:00",
+        spot_usd=99_000.0,
+        export_rows=rows,
+        asset_id="ETH",
+    )
+
+    def _provider(environ: dict) -> dict:
+        from src.viz.embed_display_boundary import lab_asset_id_from_environ
+
+        assert lab_asset_id_from_environ(environ) == "ETH"
+        return payload
+
+    app = create_display_payload_wsgi_app(_provider)
+    status: list[str] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(code)
+
+    body = b"".join(
+        app(
+            {"PATH_INFO": "/display.json", "QUERY_STRING": "asset=ETH"},
+            start_response,
+        )
+    )
+    assert status == ["200 OK"]
+    parsed = json.loads(body.decode("utf-8"))
+    assert parsed["asset"]["id"] == "ETH"
+
+
 def test_spot_from_cached_deribit_index_accepts_float(monkeypatch) -> None:
     from src.viz import embed_only_lab as lab
 
-    monkeypatch.setattr(lab, "cached_deribit_index", lambda: 104_320.5)
-    assert lab._spot_from_cached_deribit_index() == 104_320.5
+    monkeypatch.setattr(lab, "cached_lab_spot", lambda _aid: 104_320.5)
+    assert lab._spot_for_asset("BTC") == 104_320.5
 
 
 def test_belief_overlay_response_and_wsgi() -> None:
@@ -184,7 +270,7 @@ def test_belief_overlay_response_and_wsgi() -> None:
     assert overlay["vol_mult"] == clamp_belief_mult("vol_mult", 1.2)
     assert overlay["curve_labels"]["belief_legend"] == "Your view [Belief lognormal]"
 
-    app = create_display_payload_wsgi_app(lambda: payload)
+    app = create_display_payload_wsgi_app(lambda _environ: payload)
     status: list[str] = []
 
     def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
@@ -206,7 +292,7 @@ def test_belief_overlay_response_and_wsgi() -> None:
 
 
 def test_wsgi_belief_overlay_requires_expiry() -> None:
-    app = create_display_payload_wsgi_app(lambda: {})
+    app = create_display_payload_wsgi_app(lambda _environ: {})
     status: list[str] = []
 
     def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
@@ -293,7 +379,7 @@ def test_curve_display_labels_ssot() -> None:
 
 
 def test_strategy_suggestion_wsgi(strategy_mocks: str) -> None:
-    app = create_display_payload_wsgi_app(lambda: {})
+    app = create_display_payload_wsgi_app(lambda _environ: {})
     status: list[str] = []
 
     def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
@@ -314,7 +400,7 @@ def test_strategy_suggestion_wsgi(strategy_mocks: str) -> None:
 
 
 def test_strategy_suggestion_wsgi_requires_expiry() -> None:
-    app = create_display_payload_wsgi_app(lambda: {})
+    app = create_display_payload_wsgi_app(lambda _environ: {})
     status: list[str] = []
 
     def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
