@@ -6,7 +6,7 @@
 # Caddy routes staging.marketstructureos.com → msos_web_staging:3001.
 #
 # Usage (on VPS or via Deploy VPS Staging workflow):
-#   bash scripts/vps_deploy_staging.sh                    # origin/staging
+#   bash scripts/vps_deploy_staging.sh                    # origin/main
 #   bash scripts/vps_deploy_staging.sh origin/my-feature
 #
 # One-time VPS setup:
@@ -17,13 +17,12 @@
 #
 set -euo pipefail
 
-REF="${1:-origin/staging}"
+REF="${1:-origin/main}"
 STAGING_ROOT="${PPE_STAGING_ROOT:-/opt/marketstructureos-staging}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if [[ ! -d "$STAGING_ROOT/.git" ]]; then
-  echo "vps_deploy_staging: missing git checkout at ${STAGING_ROOT}" >&2
-  echo "Clone the repo there first (see docs/DEPLOY/MSOS_STAGING_V1.md)." >&2
-  exit 1
+  bash "${SCRIPT_DIR}/vps_bootstrap_staging.sh"
 fi
 
 cd "$STAGING_ROOT"
@@ -33,7 +32,10 @@ if git show-ref --verify --quiet "refs/remotes/${REF}" 2>/dev/null; then
   git checkout -B "$BRANCH" "$REF"
 elif git show-ref --verify --quiet "refs/heads/${BRANCH}" 2>/dev/null; then
   git checkout "$BRANCH"
-  git pull --ff-only origin "$BRANCH" || true
+  git pull --ff-only origin "$BRANCH" 2>/dev/null || true
+elif [[ "$REF" != "origin/main" ]] && git show-ref --verify --quiet "refs/remotes/origin/main" 2>/dev/null; then
+  echo "vps_deploy_staging: ref ${REF} not found — falling back to origin/main" >&2
+  git checkout -B staging origin/main
 else
   echo "vps_deploy_staging: ref ${REF} not found" >&2
   exit 1
