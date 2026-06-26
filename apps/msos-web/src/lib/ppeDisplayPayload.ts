@@ -17,7 +17,7 @@ export const LAB_ASSET_QUERY_PARAM = "asset";
 
 export const DEFAULT_LAB_ASSET_ID = "BTC";
 
-export const SUPPORTED_LAB_ASSET_IDS = ["BTC", "ETH"] as const;
+export const SUPPORTED_LAB_ASSET_IDS = ["BTC", "ETH", "NVDA"] as const;
 
 export type LabAssetId = (typeof SUPPORTED_LAB_ASSET_IDS)[number];
 
@@ -41,12 +41,18 @@ const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
     price_axis_label: "ETH price at expiry",
     instrument_label: "ETH options",
   },
+  NVDA: {
+    id: "NVDA",
+    label: "NVDA options",
+    price_axis_label: "NVDA price at expiry",
+    instrument_label: "NVDA options",
+  },
 };
 
 export function normalizeLabAssetId(value: string | null | undefined): LabAssetId {
   const upper = (value ?? "").trim().toUpperCase();
-  if (upper === "ETH") {
-    return "ETH";
+  if ((SUPPORTED_LAB_ASSET_IDS as readonly string[]).includes(upper)) {
+    return upper as LabAssetId;
   }
   return DEFAULT_LAB_ASSET_ID;
 }
@@ -231,7 +237,11 @@ export function buildLabMetricsFromPayload(
       tone: "teal",
     },
     { label: "Typical range", value: marketWidth, tone: "amber" },
-    { label: "Data", value: "Live · Deribit", tone: "teal" },
+    {
+      label: "Data",
+      value: asset.id === "NVDA" ? "Live · equity chain" : "Live · Deribit",
+      tone: "teal",
+    },
   ];
 }
 

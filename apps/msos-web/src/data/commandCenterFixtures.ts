@@ -34,6 +34,7 @@ export const calibrationStrip = {
 export const connectedMarkets: MarketAsset[] = [
   { label: "BTC options", status: "Live", live: true },
   { label: "ETH options", status: "Live", live: true },
+  { label: "NVDA options", status: "Live", live: true },
   { label: "Event markets", status: "Planned" },
   { label: "Perp positioning", status: "Planned" },
 ];
@@ -57,6 +58,13 @@ export const labTiles = [
     mark: "E",
     title: "ETH options",
     description: "Same workflow — live on Deribit",
+    cta: "Open lab",
+    enabled: true,
+  },
+  {
+    mark: "N",
+    title: "NVDA options",
+    description: "Equity LEAPS — live chain with trust caveats",
     cta: "Open lab",
     enabled: true,
   },

@@ -121,7 +121,11 @@ export function buildThesisDraftFromLab(
     referenceLabel: payload
       ? `${instrument} · live · exp ${resolvedExpiry || "—"}`
       : `${instrument} · live implied distribution`,
-    trustLabel: payload ? "Good · Deribit" : "Offline · demo values",
+    trustLabel: payload
+      ? asset.id === "NVDA"
+        ? "Caution · dividends unmodeled"
+        : "Good · Deribit"
+      : "Offline · demo values",
     expiryDate: resolvedExpiry || undefined,
     beliefSnapshot: {
       forwardMult: tuning.forward_mult,

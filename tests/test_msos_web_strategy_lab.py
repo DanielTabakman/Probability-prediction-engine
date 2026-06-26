@@ -140,6 +140,8 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     assert "buildDisplayApiUrl" in payload_lib
     assert "price_axis_label" in payload_lib
     assert "ETH price at expiry" in payload_lib
+    assert "NVDA price at expiry" in payload_lib
+    assert '"NVDA"' in payload_lib
     assert "fetchDisplayPayloadClient(" in shell
     assert "normalizeLabAssetId" in shell
     assert "belief-axis-pair" in shell
@@ -151,8 +153,12 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
 
     eth_connected = fixtures.split('label: "ETH options"')[1].split("Event markets")[0]
     assert "Live" in eth_connected
-    eth_tile = fixtures.split('title: "ETH options"')[1].split("Event markets")[0]
+    eth_tile = fixtures.split('title: "ETH options"')[1].split("NVDA options")[0]
     assert "enabled: true" in eth_tile
+    nvda_connected = fixtures.split('label: "NVDA options"')[1].split("Event markets")[0]
+    assert "Live" in nvda_connected
+    nvda_tile = fixtures.split('title: "NVDA options"')[1].split("Event markets")[0]
+    assert "enabled: true" in nvda_tile
 
 
 def test_thesis_confirmation_route_and_narrative() -> None:
