@@ -132,20 +132,26 @@ def test_strategy_lab_fixtures_honest_lens_labels() -> None:
 def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+    catalog_lib = (MSOS_WEB / "src" / "lib" / "ppeAssetCatalog.ts").read_text(encoding="utf-8")
+    picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     thesis_ctx = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
     fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
 
     assert 'LAB_ASSET_QUERY_PARAM = "asset"' in payload_lib
-    assert "SUPPORTED_LAB_ASSET_IDS" in payload_lib
+    assert "KNOWN_LAB_ASSET_IDS" in payload_lib
+    assert "normalizeLabAssetId" in payload_lib
     assert "buildDisplayApiUrl" in payload_lib
     assert "price_axis_label" in payload_lib
     assert "ETH price at expiry" in payload_lib
     assert "NVDA price at expiry" in payload_lib
     assert '"NVDA"' in payload_lib
     assert "fetchDisplayPayloadClient(" in shell
-    assert "normalizeLabAssetId" in shell
-    assert "belief-axis-pair" in shell
-    assert "data-asset={assetId}" in shell
+    assert "LabAssetPicker" in shell
+    assert "fetchAssetCatalog" in shell
+    assert "catalog.json" in catalog_lib
+    assert "asset_catalog" in catalog_lib
+    assert "lab-asset-picker" in picker
+    assert 'data-tour="lab-asset"' in picker
     assert "assetMeta.label" in shell
 
     assert "resolveDisplayAssetMeta" in thesis_ctx

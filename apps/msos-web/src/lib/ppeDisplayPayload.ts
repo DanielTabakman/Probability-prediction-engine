@@ -17,9 +17,15 @@ export const LAB_ASSET_QUERY_PARAM = "asset";
 
 export const DEFAULT_LAB_ASSET_ID = "BTC";
 
-export const SUPPORTED_LAB_ASSET_IDS = ["BTC", "ETH", "NVDA"] as const;
+/** Known assets for static copy fallbacks — not a runtime allowlist gate. */
+export const KNOWN_LAB_ASSET_IDS = ["BTC", "ETH", "NVDA"] as const;
 
-export type LabAssetId = (typeof SUPPORTED_LAB_ASSET_IDS)[number];
+export type KnownLabAssetId = (typeof KNOWN_LAB_ASSET_IDS)[number];
+
+/** Catalog-driven asset id (see ppeAssetCatalog.ts for selectable set). */
+export type LabAssetId = string;
+
+const LAB_ASSET_ID_PATTERN = /^[A-Z][A-Z0-9._-]{0,11}$/;
 
 export type DisplayAssetMeta = {
   id: string;
@@ -28,7 +34,7 @@ export type DisplayAssetMeta = {
   instrument_label?: string;
 };
 
-const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
+const LAB_ASSET_FALLBACKS: Record<KnownLabAssetId, DisplayAssetMeta> = {
   BTC: {
     id: "BTC",
     label: "BTC options",
@@ -49,12 +55,32 @@ const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
   },
 };
 
-export function normalizeLabAssetId(value: string | null | undefined): LabAssetId {
+export function normalizeLabAssetId(
+  value: string | null | undefined,
+  allowedIds?: readonly string[],
+): LabAssetId {
   const upper = (value ?? "").trim().toUpperCase();
-  if ((SUPPORTED_LAB_ASSET_IDS as readonly string[]).includes(upper)) {
-    return upper as LabAssetId;
+  if (!upper || !LAB_ASSET_ID_PATTERN.test(upper)) {
+    return DEFAULT_LAB_ASSET_ID;
   }
-  return DEFAULT_LAB_ASSET_ID;
+  if (allowedIds && allowedIds.length > 0) {
+    const allowed = new Set(allowedIds.map((id) => id.toUpperCase()));
+    return allowed.has(upper) ? upper : DEFAULT_LAB_ASSET_ID;
+  }
+  return upper;
+}
+
+function fallbackMetaForAsset(assetId: string): DisplayAssetMeta {
+  const known = LAB_ASSET_FALLBACKS[assetId as KnownLabAssetId];
+  if (known) {
+    return known;
+  }
+  return {
+    id: assetId,
+    label: `${assetId} options`,
+    price_axis_label: `${assetId} price at expiry`,
+    instrument_label: `${assetId} options`,
+  };
 }
 
 export function resolveDisplayAssetMeta(
@@ -62,16 +88,17 @@ export function resolveDisplayAssetMeta(
   assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
 ): DisplayAssetMeta {
   const payloadAsset = payload?.asset;
-  if (payloadAsset?.id && payloadAsset.id.toUpperCase() === assetId) {
-    const fallback = LAB_ASSET_FALLBACKS[assetId];
+  const normalizedId = assetId.toUpperCase();
+  if (payloadAsset?.id && payloadAsset.id.toUpperCase() === normalizedId) {
+    const fallback = fallbackMetaForAsset(normalizedId);
     return {
       ...fallback,
       ...payloadAsset,
-      id: assetId,
+      id: normalizedId,
       label: payloadAsset.label || fallback.label,
     };
   }
-  return LAB_ASSET_FALLBACKS[assetId];
+  return fallbackMetaForAsset(normalizedId);
 }
 
 export function buildDisplayApiUrl(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
