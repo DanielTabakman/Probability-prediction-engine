@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-26
 
+- `9995655` — steward: Trader Workflow Integration v1 milestone (#345)
+- `c0ef2ba` — Control-plane: dev changelog
 - `d620253` — PPE-CryptoMA-Core-Slice002: parameterize Deribit fetch + export asset_id (#343) (`docs/SOP/`)
 - `842380c` — Control-plane: dev changelog
 - `99a43ed` — fix(msos): lab setup row for expiry + currency UX (#342) (`apps/msos-web/`)
@@ -14,6 +16,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-25
 
+- `924968f` — build(deps): Bump better-sqlite3 in /apps/msos-web (#303) (`apps/msos-web/`)
+- `e31485a` — build(deps): Update google-api-python-client requirement (#336)
 - `ee9732f` — MSOS playwright witness: dismiss tutorial scrim in CI (#346) (`scripts/`)
 - `f80e7b3` — deploy witness: export PYTHONPATH for all production health scripts (#344)
 - `fe25b64` — MSOS paper planner UX: clarity for new options users (#334) (`apps/msos-web/`)
