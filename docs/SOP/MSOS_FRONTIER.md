@@ -31,6 +31,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **VALIDATION_REALITY_CHECKS** ([`VALIDATION_REALITY_CHECKS.md`](docs/SOP/VALIDATION_REALITY_CHECKS.md)) — session + paid-interest log — feeds learning loop workstream
 - **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — COMPLETE — NVDA single-ticker equity wedge
 - **POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION** ([`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)) — active relay — registry v2 + catalog API
+- **POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md)) — side channel — chart-first region thesis tool; LOW priority; pre-execution; after tradeable universe
+- **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — side channel — Polymarket vs BTC options gap scan + backtest; LOW spare-time only; prob panel COMPLETE
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).
