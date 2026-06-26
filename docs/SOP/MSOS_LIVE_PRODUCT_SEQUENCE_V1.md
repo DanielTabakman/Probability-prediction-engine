@@ -23,10 +23,11 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Track | Phases | When |
 |-------|--------|------|
-| **Usable demo (active)** | Storyboard BUILD + production wiring + embed shell + walkable witness | **Now** — pivot `crypto-multi-asset-v1` |
-| **Post-demo expansion** | 4a → 4b → 5 → 6 → 7a → 7b | **Only when SELECTION'd** after usable demo is walkable on production URLs |
+| **Foundation** | MCD + usable demo + embed shell | **COMPLETE** |
+| **Trader workflow integration (active)** | Self-serve + wedge depth + loop fidelity + learning loop | **Now** — pivot `trader-workflow-integration-v1` |
+| **Post-milestone** | Equity wedge · commercial pilot · modes 2–7 | **SELECTION after** milestone complete-when |
 
-Phases 4a–7b remain chartered for multi-user and commercial work — they are **not** the current default BUILD priority.
+Phases 4a–7b remain chartered — they are **not** the umbrella milestone; they support workflow when SELECTION'd.
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 ---

@@ -1,48 +1,87 @@
 {
   "version": 1,
-  "pivotId": "crypto-multi-asset-v1",
+  "pivotId": "trader-workflow-integration-v1",
   "asOf": "2026-06-25",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
-  "primaryFocus": "G-05 crypto expansion — Deribit ETH + asset registry after usable demo COMPLETE",
-  "currentStage": "multi_asset_expansion",
+  "primaryFocus": "Trader workflow integration — self-serve disagreement loop + learning ingestion into product",
+  "currentStage": "trader_workflow_integration",
   "designComplete": true,
   "storyboardRef": "docs/VISION/MSOS/storyboard-v0.6/prototype/html/",
+  "productMilestone": {
+    "id": "trader_workflow_integration_v1",
+    "label": "Trader Workflow Integration v1",
+    "charter": "docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md",
+    "outcome": "Trader self-serves thesis → disagreement → expression → save/review; strong+ workflow signals ship as product changes"
+  },
+  "priorMilestones": [
+    {
+      "id": "msos_usable_demo_v1",
+      "label": "Usable demo",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-25",
+      "evidence": "docs/SOP/MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md"
+    }
+  ],
   "activeBuildChapterId": "ppe_crypto_multi_asset_v1",
   "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
   "activeBuildSprint": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
-  "nextStewardAction": "First slice PPE-CryptoMA-Control-Slice001 — run_ppe.cmd or IDE BUILD starter after manifest READY",
+  "nextStewardAction": "Execute crypto relay chapter (workstream B); parallel: self-serve URL + validation sessions per MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
-    "trader workflow research as primary BUILD blocker",
+    "trader workflow research as BUILD blocker (research informs; does not block relay)",
     "validation-before-build for MSOS shell integration",
-    "stocks before crypto multi-asset automation"
+    "single-chapter milestones (demo-only, crypto-only) as top-level product frame",
+    "operator-led live demo sessions as default client onboarding"
+  ],
+  "workstreams": [
+    {
+      "id": "self_serve_onboarding",
+      "label": "Self-serve onboarding",
+      "doc": "docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md",
+      "status": "active"
+    },
+    {
+      "id": "wedge_depth",
+      "label": "Wedge depth (BTC + ETH)",
+      "chapterId": "ppe_crypto_multi_asset_v1",
+      "doc": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
+      "status": "active"
+    },
+    {
+      "id": "workflow_loop_fidelity",
+      "label": "Workflow loop fidelity (P4–P7)",
+      "doc": "docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md",
+      "status": "active"
+    },
+    {
+      "id": "learning_loop",
+      "label": "Learning loop (research → backlog)",
+      "doc": "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
+      "status": "active"
+    }
   ],
   "sideChannels": [
     {
-      "id": "trader_workflow_research",
-      "doc": "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
-      "role": "optional signal logging while demo is built — not scope authority"
-    },
-    {
       "id": "validation_log",
       "doc": "docs/SOP/VALIDATION_REALITY_CHECKS.md",
-      "role": "session notes when testers use the demo — not a gate"
+      "role": "session + paid-interest log — feeds learning loop workstream"
     },
     {
       "id": "equity_options_deferred",
       "doc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
-      "role": "chartered deferred — NVDA/LEAPS after crypto chapter + G-04 signal"
+      "role": "next milestone candidate — after trader-workflow-integration v1 + G-04 signal"
     }
   ],
   "buildTrack": {
-    "label": "Crypto multi-asset expansion",
-    "outcome": "BTC + ETH on Deribit with shared asset registry, MSOS selector, same distribution semantics",
+    "label": "Trader Workflow Integration v1",
+    "outcome": "Self-serve disagreement loop + ETH wedge + workflow research ingestion",
     "chapters": [
       "ppe_crypto_multi_asset_v1"
     ]
   },
   "supersedes": {
-    "usableDemoBuildV1": "2026-06-25 — msos_usable_demo_v1 COMPLETE; pivot to G-05 crypto expansion"
+    "cryptoMultiAssetAsMilestone": "2026-06-25 — crypto is workstream B inside trader-workflow-integration v1",
+    "usableDemoBuildV1": "2026-06-25 — foundation complete; subsumed by milestone v1"
   },
   "propagationTargets": [
     "docs/SOP/MSOS_FRONTIER.md",
@@ -52,6 +91,7 @@
     "docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md",
     "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
     "docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md",
+    "docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md",
     "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
     "docs/SOP/MVP1_FRONTIER.md",
     "artifacts/control_plane/WHATS_NEXT.md"

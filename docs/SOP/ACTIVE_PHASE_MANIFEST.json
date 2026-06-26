@@ -3,6 +3,6 @@
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+  "notes": "Milestone trader-workflow-integration-v1 — active relay ppe_crypto_multi_asset_v1 (workstream B)",
   "workerMode": "deterministic"
 }
