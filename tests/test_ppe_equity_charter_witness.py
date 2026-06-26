@@ -38,13 +38,19 @@ def test_equity_adr_documents_nvda_scaffold() -> None:
     assert "venue: equity" in body
 
 
-def test_manifest_points_at_equity_chapter() -> None:
+def test_equity_chapter_closed_queue_and_manifest() -> None:
+    queue = json.loads((SOP / "PHASE_QUEUE.json").read_text(encoding="utf-8"))
+    row = next(
+        item for item in queue["items"]
+        if item.get("planPath") == "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json"
+    )
+    assert row["status"] == "DONE"
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json"
-    assert manifest.get("status") in ("READY", "RUNNING")
+    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
+    assert manifest.get("status") == "READY"
 
 
-def test_equity_sprint_selected_not_deferred() -> None:
+def test_equity_sprint_complete_not_deferred() -> None:
     body = EQUITY_SPRINT.read_text(encoding="utf-8")
     assert "DEFERRED" not in body.split("## Sprint status")[0]
-    assert "SELECTED" in body
+    assert "COMPLETE" in body
