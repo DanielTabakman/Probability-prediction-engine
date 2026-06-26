@@ -267,3 +267,22 @@ def test_conclusion_learn_loop_route() -> None:
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/learn"' in nav
+
+
+def test_onboarding_polish_wiring() -> None:
+    monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+    layout = (MSOS_WEB / "src" / "app" / "layout.tsx").read_text(encoding="utf-8")
+    planner = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "MonitorWelcomeCard" in monitor
+    assert "MonitorEmptyState" in monitor
+    assert "PostAuthReturnHandler" in layout
+    assert "PlanLegRow" in planner
+    assert "welcome=1" in planner
+    assert "stashPostAuthReturnPath" in (
+        MSOS_WEB / "src" / "lib" / "msosPublicUrls.ts"
+    ).read_text(encoding="utf-8")
+    assert "planLegTooltip" in (MSOS_WEB / "src" / "lib" / "planLegTooltips.ts").read_text(
+        encoding="utf-8"
+    )
