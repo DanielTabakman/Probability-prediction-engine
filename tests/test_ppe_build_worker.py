@@ -141,3 +141,76 @@ def test_run_codex_bypasses_sandbox_on_windows(tmp_path, monkeypatch):
     monkeypatch.setattr("scripts.ppe_build_worker.subprocess.run", fake_run)
     out = run_codex(repo, prompt="build slice", log_path=log_path)
     assert out["ok"] is True
+
+
+def test_cursor_first_ok_when_cursor_headless(tmp_path, monkeypatch):
+    from scripts.ppe_build_worker import PREF_AUTO, WORKER_CURSOR_CLI, evaluate_cursor_first_policy
+
+    monkeypatch.delenv("PPE_BUILD_WORKER", raising=False)
+    with (
+        patch("scripts.ppe_build_worker.load_build_worker_pref", return_value=PREF_AUTO),
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": PREF_AUTO,
+                "worker": WORKER_CURSOR_CLI,
+                "mode": "headless",
+                "reason": "auto_cursor_cli",
+                "cursor_cli_available": True,
+                "cursor_cli_exhausted": False,
+                "codex_cli_available": True,
+                "codex_cli_exhausted": False,
+            },
+        ),
+    ):
+        policy = evaluate_cursor_first_policy(tmp_path)
+    assert policy["verdict"] == "ok"
+    assert "Cursor CLI headless" in policy["detail"]
+
+
+def test_cursor_first_warn_when_codex_pref_skips_cursor(tmp_path, monkeypatch):
+    from scripts.ppe_build_worker import PREF_CODEX, WORKER_CODEX_CLI, evaluate_cursor_first_policy
+
+    with (
+        patch("scripts.ppe_build_worker.load_build_worker_pref", return_value=PREF_CODEX),
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": PREF_CODEX,
+                "worker": WORKER_CODEX_CLI,
+                "mode": "headless",
+                "reason": "buildWorker=codex",
+                "cursor_cli_available": True,
+                "cursor_cli_exhausted": False,
+                "codex_cli_available": True,
+                "codex_cli_exhausted": False,
+            },
+        ),
+    ):
+        policy = evaluate_cursor_first_policy(tmp_path)
+    assert policy["verdict"] == "warn"
+    assert "buildWorker=codex" in policy["detail"]
+
+
+def test_cursor_first_ok_when_cursor_exhausted_codex_fallback(tmp_path):
+    from scripts.ppe_build_worker import PREF_AUTO, WORKER_CODEX_CLI, evaluate_cursor_first_policy
+
+    with (
+        patch("scripts.ppe_build_worker.load_build_worker_pref", return_value=PREF_AUTO),
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": PREF_AUTO,
+                "worker": WORKER_CODEX_CLI,
+                "mode": "headless",
+                "reason": "auto_codex_cli",
+                "cursor_cli_available": True,
+                "cursor_cli_exhausted": True,
+                "codex_cli_available": True,
+                "codex_cli_exhausted": False,
+            },
+        ),
+    ):
+        policy = evaluate_cursor_first_policy(tmp_path)
+    assert policy["verdict"] == "ok"
+    assert "exhausted" in policy["detail"]

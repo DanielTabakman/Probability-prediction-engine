@@ -512,6 +512,66 @@ def format_handoff_banner(repo: Path) -> str:
     return "\n".join(lines)
 
 
+def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
+    """Check BUILD dispatch uses Cursor CLI before Codex when Cursor has quota."""
+    repo = repo.resolve()
+    pref = load_build_worker_pref(repo)
+    status = collect_build_worker_status(repo)
+    cursor_available = bool(status.get("cursor_cli_available"))
+    cursor_exhausted = bool(status.get("cursor_cli_exhausted"))
+    codex_available = bool(status.get("codex_cli_available"))
+    codex_exhausted = bool(status.get("codex_cli_exhausted"))
+    worker = status.get("worker")
+    mode = status.get("mode")
+    reason = status.get("reason")
+    cursor_has_quota = cursor_available and not cursor_exhausted
+
+    verdict = "warn"
+    detail = "No headless worker with quota"
+
+    if pref == PREF_MANUAL:
+        verdict = "info"
+        detail = "manual handoff — CLI token order not applicable"
+    elif pref == PREF_CODEX:
+        verdict = "warn"
+        detail = "buildWorker=codex prefers Codex — set auto for Cursor-first"
+        if cursor_has_quota and worker == WORKER_CODEX_CLI and mode == "headless":
+            detail = "Cursor has quota but Codex is headless (buildWorker=codex)"
+    elif cursor_has_quota:
+        if mode == "headless" and worker == WORKER_CURSOR_CLI:
+            verdict = "ok"
+            detail = "Cursor CLI headless; Codex reserved as fallback"
+        elif mode == "headless" and worker == WORKER_CODEX_CLI:
+            verdict = "warn"
+            detail = "Cursor has quota but Codex is headless — check agent CLI"
+        elif mode == "manual":
+            verdict = "warn"
+            detail = "Cursor has quota but only manual handoff — check agent login"
+    elif cursor_exhausted and worker == WORKER_CODEX_CLI and mode == "headless":
+        verdict = "ok"
+        detail = "Cursor quota exhausted — Codex headless fallback is correct"
+    elif not cursor_available and codex_available and not codex_exhausted:
+        verdict = "ok"
+        detail = "Cursor unavailable — Codex fallback active"
+    elif pref == PREF_CURSOR and worker == WORKER_CURSOR_CLI and mode == "headless":
+        verdict = "ok"
+        detail = "buildWorker=cursor — Cursor CLI headless"
+
+    return {
+        "verdict": verdict,
+        "detail": detail,
+        "pref": pref,
+        "worker": worker,
+        "mode": mode,
+        "reason": reason,
+        "cursor_has_quota": cursor_has_quota,
+        "cursor_cli_available": cursor_available,
+        "cursor_cli_exhausted": cursor_exhausted,
+        "codex_cli_available": codex_available,
+        "codex_cli_exhausted": codex_exhausted,
+    }
+
+
 def collect_build_worker_status(repo: Path) -> dict[str, Any]:
     resolved = resolve_build_worker(repo)
     handoff = resolve_build_worker(repo, for_handoff=True)
@@ -535,12 +595,25 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("print-handoff", help="Print DESKTOP BUILD instructions for current worker")
     p_status = sub.add_parser("status", help="Show resolved worker")
     p_status.add_argument("--json", action="store_true")
+    p_cursor = sub.add_parser("cursor-first", help="Check Cursor-before-Codex BUILD policy")
+    p_cursor.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
     if args.command == "print-handoff":
         print(format_handoff_banner(repo))
         return 0
+
+    if args.command == "cursor-first":
+        policy = evaluate_cursor_first_policy(repo)
+        if args.json:
+            print(json.dumps(policy, indent=2))
+        else:
+            print(
+                f"cursor-first: {policy['verdict']} — {policy['detail']} "
+                f"(pref={policy['pref']} worker={policy['worker']} mode={policy['mode']})"
+            )
+        return 0 if policy["verdict"] in ("ok", "info") else 1
 
     status = collect_build_worker_status(repo)
     if args.json:
