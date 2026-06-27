@@ -255,7 +255,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[MEDIUM] Equity mega caps batch 1",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
     },
@@ -267,7 +267,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
       "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
     },
@@ -276,6 +276,12 @@
       "status": "skipped",
       "reason": "[LOW DEFER] CME GC SI CL \u2014 validation-gated after ETF proxies",
       "selectionPrep": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
+      "status": "pending",
+      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     }
   ]
 }
