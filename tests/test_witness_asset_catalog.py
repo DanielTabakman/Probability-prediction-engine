@@ -14,7 +14,8 @@ def test_run_witness_all_enabled_mocked() -> None:
     by_id = {r["asset_id"]: r for r in report["results"]}
     assert by_id["BTC"]["ok"] is True
     assert by_id["ETH"]["ok"] is True
-    assert by_id["NVDA"].get("skipped") is True
+    assert by_id["NVDA"]["ok"] is True
+    assert by_id["NVDA"].get("skipped") is not True
 
 
 def test_main_json_stdout(capsys) -> None:

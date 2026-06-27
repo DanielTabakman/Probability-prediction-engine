@@ -47,14 +47,13 @@ def test_assets_registry_schema_v2() -> None:
     nvda = assets["NVDA"]
     assert nvda.get("venue") == "equity"
     assert nvda.get("asset_class") == "equity_mega"
-    assert nvda.get("enabled") is False
+    assert nvda.get("enabled") is True
     assert nvda.get("catalog", {}).get("group") == "equity_mega"
 
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH"]
-    assert "NVDA" not in list_enabled_asset_ids()
+    assert list_enabled_asset_ids() == ["BTC", "ETH", "NVDA"]
     assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA"}
 
 
@@ -73,8 +72,10 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH"]
-    assert all(e["venue"] == "deribit" for e in entries)
+    assert [e["id"] for e in entries] == ["BTC", "ETH", "NVDA"]
+    assert all(e["venue"] == "deribit" for e in entries if e["id"] != "NVDA")
+    nvda = next(e for e in entries if e["id"] == "NVDA")
+    assert nvda["venue"] == "equity"
 
 
 def test_catalog_group_order_from_tier1_manifest() -> None:
@@ -119,4 +120,4 @@ def test_asset_class_and_group_helpers() -> None:
     assert asset_tier("BTC") == "core"
     assert asset_venue("NVDA") == "equity"
     assert is_asset_enabled("BTC") is True
-    assert is_asset_enabled("NVDA") is False
+    assert is_asset_enabled("NVDA") is True

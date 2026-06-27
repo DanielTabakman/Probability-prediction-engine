@@ -141,6 +141,8 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     crypto = next(g for g in catalog["groups"] if g["id"] == "crypto")
     ids = [a["id"] for a in crypto["assets"]]
     assert ids == ["BTC", "ETH"]
+    mega = next(g for g in catalog["groups"] if g["id"] == "equity_mega")
+    assert [a["id"] for a in mega["assets"]] == ["NVDA"]
     assert all("venue" in a and "asset_class" in a for a in crypto["assets"])
 
 
@@ -159,13 +161,11 @@ def test_wsgi_app_serves_catalog_json() -> None:
     assert validate_asset_catalog_payload(parsed)[0] is True
 
 
-def test_witness_display_boundary_mocked_btc_eth_nvda_skip() -> None:
-    for aid in ("BTC", "ETH"):
+def test_witness_display_boundary_mocked_btc_eth_nvda() -> None:
+    for aid in ("BTC", "ETH", "NVDA"):
         ok, detail = witness_display_boundary_for_asset(aid, live=False)
         assert ok is True, detail
-    ok_nvda, detail_nvda = witness_display_boundary_for_asset("NVDA", live=False)
-    assert ok_nvda is True
-    assert "skip" in detail_nvda.lower()
+        assert "skip" not in detail.lower()
 
 
 def test_wsgi_app_rejects_unknown_paths() -> None:

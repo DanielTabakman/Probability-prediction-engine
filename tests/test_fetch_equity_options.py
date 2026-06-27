@@ -93,9 +93,9 @@ def test_fetch_equity_option_book_marks(mock_ticker: MagicMock) -> None:
     assert marks["NVDA260718P00180000"] == 8.0
 
 
-def test_nvda_registry_equity_venue_disabled_by_default() -> None:
+def test_nvda_registry_equity_venue_enabled() -> None:
     load_assets_registry.cache_clear()
     assert asset_venue("NVDA") == "equity"
     assert equity_symbol("NVDA") == "NVDA"
-    assert is_asset_enabled("NVDA") is False
+    assert is_asset_enabled("NVDA") is True
     assert is_asset_enabled("BTC") is True
