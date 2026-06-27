@@ -23,6 +23,7 @@ def test_command_center_route_and_shell() -> None:
     assert "friendlySnapshotFeedMessage" in content
     assert "DEMO_FOOTER" in content
     assert "labTiles" in content
+    assert "labHref" in content
     assert "summary.kpis" in content
 
 

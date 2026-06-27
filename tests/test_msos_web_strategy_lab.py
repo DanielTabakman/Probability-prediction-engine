@@ -152,6 +152,9 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     assert "asset_catalog" in catalog_lib
     assert "lab-asset-picker" in picker
     assert 'data-tour="lab-asset"' in picker
+    assert "switchable" in picker
+    assert "active && assets.length <= 1" in picker
+    assert "buildStrategyLabPath" in payload_lib
     assert "assetMeta.label" in shell
 
     assert "resolveDisplayAssetMeta" in thesis_ctx
@@ -199,7 +202,7 @@ def test_nav_enables_strategy_lab() -> None:
     assert "disabled: true" not in nav.split("strategy-lab")[1].split("theses")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert 'href="/strategy-lab"' in cc
+    assert "labHref" in cc
 
 
 def test_expression_planning_route_and_narrative() -> None:

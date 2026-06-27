@@ -408,7 +408,8 @@ button.btn:focus-visible {
   position: fixed;
   inset: 0;
   background: rgba(3, 8, 14, 0.55);
-  pointer-events: auto;
+  /* Keep highlighted controls (e.g. asset picker) clickable during the tour. */
+  pointer-events: none;
 }
 
 .platform-tutorial-spotlight {
@@ -1448,6 +1449,14 @@ button.btn:focus-visible {
   border-color: rgba(67, 231, 211, 0.55);
   background: rgba(67, 231, 211, 0.08);
   box-shadow: 0 0 0 1px rgba(67, 231, 211, 0.12);
+}
+
+.lab-asset-field.switchable {
+  cursor: pointer;
+}
+
+.lab-asset-field.switchable:hover {
+  border-color: rgba(67, 231, 211, 0.35);
 }
 
 .lab-asset-k {

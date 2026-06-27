@@ -54,6 +54,7 @@ export const labTiles = [
     description: "Compare your view to what BTC options are pricing — live now",
     cta: "Open lab",
     enabled: true,
+    labHref: "/strategy-lab",
   },
   {
     mark: "E",
@@ -61,6 +62,7 @@ export const labTiles = [
     description: "Same workflow — live on Deribit",
     cta: "Open lab",
     enabled: true,
+    labHref: "/strategy-lab?asset=ETH",
   },
   {
     mark: "N",
@@ -68,6 +70,7 @@ export const labTiles = [
     description: "Equity LEAPS — live chain with trust caveats",
     cta: "Open lab",
     enabled: true,
+    labHref: "/strategy-lab?asset=NVDA",
   },
   {
     mark: "P",
