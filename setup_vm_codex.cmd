@@ -19,11 +19,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo [setup_vm_codex] step 2/4 — INTERACTIVE Codex login on VM
-echo   A browser window may open on the VM (or follow the URL shown).
-echo   Sign in with the same ChatGPT account you use for Codex on desktop.
+echo [setup_vm_codex] step 2/4 — Codex login on VM (device code)
+echo   WRONG: localhost:1455 URL  ^|  RIGHT: auth.openai.com/codex/device + code
 echo.
-ssh -t %VM_HOST% "cd /d %VM_REPO% && codex login"
+ssh %VM_HOST% -- "cd /d %VM_REPO% && codex login --device-auth"
 if errorlevel 1 (
   echo codex login failed or was cancelled.
   goto done
