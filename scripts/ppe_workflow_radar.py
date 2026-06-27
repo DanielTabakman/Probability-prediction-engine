@@ -153,6 +153,7 @@ class RadarReport:
     orphans: list[OrphanFinding] = field(default_factory=list)
     cleanup_actions: list[CleanupAction] = field(default_factory=list)
     summary_line: str = ""
+    token_economy: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -164,6 +165,7 @@ class RadarReport:
             "orphans": [o.to_dict() for o in self.orphans],
             "cleanup_actions": [a.to_dict() for a in self.cleanup_actions],
             "summary_line": self.summary_line,
+            "token_economy": dict(self.token_economy),
         }
 
 
@@ -543,6 +545,44 @@ def _rank_severity(severity: Severity) -> int:
     return {"escalate": 0, "watch": 1, "info": 2}[severity]
 
 
+def _token_friction_candidates(repo: Path) -> tuple[list[RadarCandidate], dict[str, Any]]:
+    try:
+        from scripts.ppe_token_audit import build_token_audit, scan_token_friction
+    except ImportError:
+        return [], {}
+
+    report = build_token_audit(repo)
+    data = report.to_dict()
+    summary = {
+        "verdict": report.verdict,
+        "always_on_est_tokens_per_turn": data["always_on_est_tokens_per_turn"],
+        "starter_count": len(data["starters"]),
+        "starter_max_lines": data["starter_line_max"],
+    }
+    from scripts.ppe_token_audit import scan_token_friction
+
+    candidates: list[RadarCandidate] = []
+    for sig in scan_token_friction(repo):
+        sid = str(sig.get("id") or "token")
+        severity = sig.get("severity")
+        if severity not in ("escalate", "watch", "info"):
+            continue
+        detail = str(sig.get("detail") or "")
+        action = "token_audit.cmd --prune-stale; regenerate starters; verify_codex.cmd"
+        if sid == "always-on-rules-heavy":
+            action = "Keep ppe-operator-core + ppe-desktop-vm-layout always-on only."
+        candidates.append(
+            RadarCandidate(
+                id=sid,
+                severity=severity,  # type: ignore[arg-type]
+                title=f"Token: {sid.replace('-', ' ')}",
+                evidence=[detail],
+                suggested_action=action,
+            )
+        )
+    return candidates, summary
+
+
 def _build_summary(candidates: list[RadarCandidate], orphans: list[OrphanFinding], cleanup: list[CleanupAction]) -> str:
     orphan_stale = [o for o in orphans if o.auto_cleanable]
     parts: list[str] = []
@@ -581,8 +621,13 @@ def build_radar_report(
         if cleanup and not cleanup_dry_run:
             orphans = scan_orphans(repo)
 
+    token_candidates, token_summary = _token_friction_candidates(repo)
+    if token_summary.get("verdict"):
+        signals["token_verdict"] = 1 if token_summary["verdict"] != "OK" else 0
+    candidates.extend(token_candidates)
+
     candidates.sort(key=lambda c: (_rank_severity(c.severity), c.id))
-    capped = candidates[:3]
+    capped = candidates[:5]
 
     return RadarReport(
         week_monday=week_monday.isoformat(),
@@ -592,6 +637,7 @@ def build_radar_report(
         orphans=orphans,
         cleanup_actions=cleanup,
         summary_line=_build_summary(capped, orphans, cleanup),
+        token_economy=token_summary,
     )
 
 
@@ -633,6 +679,16 @@ def render_radar_markdown(report: RadarReport) -> str:
         for a in report.cleanup_actions:
             lines.append(f"- `{a.action}` {a.target}: {a.result}")
         lines.append("")
+
+    if report.token_economy:
+        te = report.token_economy
+        lines.extend([
+            "## Token economy",
+            "",
+            f"- Verdict: `{te.get('verdict', '?')}` · always-on ~{te.get('always_on_est_tokens_per_turn', '?')} tok/turn",
+            f"- Starters: {te.get('starter_count', 0)} on disk · max {te.get('starter_max_lines', 0)} lines",
+            "",
+        ])
 
     lines.append("Promotion: steward SELECTION → Workflow-Hardening-Slice-00N (advisory only).")
     return "\n".join(lines).rstrip() + "\n"

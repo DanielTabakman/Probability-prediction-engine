@@ -1,0 +1,27 @@
+---
+description: PPE operator core — verdict auto-execute, context discipline. Minimal always-on footprint.
+alwaysApply: true
+---
+
+# PPE operator core
+
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+
+## What's next (auto-execute)
+
+Read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-only).
+
+| Verdict | Action |
+|---------|--------|
+| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. VM → `run_ppe_local.cmd` |
+| `IDE_BUILD` | New thread; `@` slim `IDE_BUILD_STARTER_*.md` only |
+| `RUN_AUTO` | VM relay only; desktop → SSH status |
+| `ERROR`/`FIX_PLAN`/`STALE_STATE` | `ppe_notify_fix.py` |
+
+Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
+
+## Token discipline
+
+- New thread per slice; starter file only — no log/diff paste.
+- After closeout: new thread + continuity brief only.
+- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`auto-commit.mdc`](auto-commit.mdc), [`product-direction.mdc`](product-direction.mdc).
