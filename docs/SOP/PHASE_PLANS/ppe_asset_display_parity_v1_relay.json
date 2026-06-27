@@ -60,7 +60,7 @@
       "maxAttempts": 2,
       "touchSet": [
         ".github/workflows/deploy-vps.yml",
-        "tests/test_display_payload_cache.py"
+        "tests/test_implied_lab_embed_display_boundary.py"
       ]
     },
     {
