@@ -81,7 +81,8 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `verify_build_worker.cmd` | Codex-first BUILD worker policy check |
 | `setup_vm_codex.cmd` | **Desktop:** one-time Codex install + login on VM loop host |
 | `verify_codex.cmd` | Codex CLI login + resolved worker |
-| `clear_build_worker_quota.cmd` | Clear stale Cursor CLI exhaustion markers |
+| `token_audit.cmd` | Token economy audit (rules, starters, build worker) |
+| `regenerate_ide_starters.cmd` | Bulk refresh on-disk IDE starters |
 | `setup_codex.cmd` | One-time Codex CLI install + login |
 | `generate_ide_build_starter.cmd` | One-file IDE BUILD bundle |
 | `generate_build_packet.cmd` | Slim paths-only BUILD packet |
