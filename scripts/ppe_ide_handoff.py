@@ -183,6 +183,8 @@ def cli_usage_exhausted(repo: Path) -> bool:
     if os.environ.get("PPE_FORCE_CLI_BUILD", "").strip().lower() in ("1", "true", "yes", "on"):
         return False
     state = load_handoff_state(repo)
+    if state.get("cli_usage_log_cleared_at"):
+        return False
     if state.get("cli_usage_exhausted"):
         return True
     return any(text_indicates_usage_exhausted(_log_tail(repo, log_rel=log_rel)) for log_rel in REMOTE_AGENT_LOGS)
@@ -205,6 +207,7 @@ def clear_cli_usage_exhausted(repo: Path) -> None:
     state.pop("cli_usage_exhausted", None)
     state.pop("cli_usage_exhausted_at", None)
     state.pop("cli_usage_detail", None)
+    state["cli_usage_log_cleared_at"] = _utc_now()
     save_handoff_state(repo, state)
 
 

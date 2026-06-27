@@ -10,7 +10,7 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 | Currency | Lever |
 |----------|--------|
-| **Tokens** | Local auto loop + IDE BUILD starter (one file) |
+| **Tokens** | VM local loop (no LLM) + Codex headless BUILD + IDE starter only when blocked |
 | **User time** | Guard resume → generated starter; ≤2 roundtrips per slice |
 | **Computer time** | `run_pushable_gate.py` tiered gate (unchanged) |
 | **Real-life time** | `workflow_metrics.cmd summary` — weighted slices per active hour |
@@ -78,6 +78,10 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | Command | Purpose |
 |---------|---------|
 | `run_ppe_operator.cmd` | Status-only verdict (`--brief`, `--notify`, `--json`); auto-loop runs full preflight at startup |
+| `verify_build_worker.cmd` | Codex-first BUILD worker policy check |
+| `verify_codex.cmd` | Codex CLI login + resolved worker |
+| `clear_build_worker_quota.cmd` | Clear stale Cursor CLI exhaustion markers |
+| `setup_codex.cmd` | One-time Codex CLI install + login |
 | `generate_ide_build_starter.cmd` | One-file IDE BUILD bundle |
 | `generate_build_packet.cmd` | Slim paths-only BUILD packet |
 | `python scripts/ppe_context_preflight.py` | Advisory band check before BUILD |

@@ -2,7 +2,7 @@
   "version": 1,
   "profile": "local",
   "enabled": true,
-  "notes": "No API credits: deterministic relay; product BUILD prefers Cursor CLI then Codex fallback (ideHandoff.buildWorker=auto). Run verify_build_worker.cmd to confirm. See PPE_IDE_NATIVE_OPERATOR_V1.md.",
+  "notes": "No API credits: deterministic relay; product BUILD prefers Codex CLI headless (ideHandoff.buildWorker=codex). Cursor CLI/IDE reserved for exceptions. Run verify_build_worker.cmd + verify_codex.cmd. See PPE_NEAR_ZERO_API_OPERATOR_V1.md.",
   "propagateBacklog": true,
   "focusGate": false,
   "stewardCharter": false,
@@ -39,7 +39,7 @@
     "openCursor": false,
     "skipCliWhenUsageExhausted": true,
     "preferIdeOverCli": false,
-    "buildWorker": "auto",
+    "buildWorker": "codex",
     "postBuildWatcher": true,
     "localTriggerWatcher": true
   },

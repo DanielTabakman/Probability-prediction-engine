@@ -106,8 +106,8 @@ def _respond_fix(
     note: str,
     force_handoff: bool,
 ) -> dict[str, Any]:
+    from scripts.ppe_build_worker import resolve_build_worker
     from scripts.ppe_operator_status import VERDICT_IDE_BUILD, collect_operator_status
-    from scripts.ppe_remote_agent import agent_available
     from scripts.ppe_remote_fix_agent import build_fix_prompt, launch_fix_cli
 
     repo = repo.resolve()
@@ -118,22 +118,28 @@ def _respond_fix(
     blocker = str(status.get("blocker") or "")
     prompt = build_fix_prompt(repo, user_note=note)
 
+    resolved = resolve_build_worker(repo, force_handoff=force_handoff)
     try_cli = (
         should_attempt_headless_cli(repo, mode="fix", force_handoff=force_handoff)
-        and agent_available()
+        and resolved.get("mode") == "headless"
         and not force_handoff
     )
     cli_out: dict[str, Any] = {}
+    workers_tried: list[str] = []
     if try_cli:
-        cli_out = launch_fix_cli(
-            repo,
-            user_note=note,
-            source=source,
-            status=status,
-            prompt=prompt,
-        )
-        if cli_out.get("started"):
-            return cli_out
+        for worker in _headless_worker_chain(resolved):
+            workers_tried.append(worker)
+            cli_out = launch_fix_cli(
+                repo,
+                user_note=note,
+                source=source,
+                status=status,
+                prompt=prompt,
+                worker=worker,
+            )
+            if cli_out.get("started"):
+                cli_out["workers_tried"] = workers_tried
+                return cli_out
 
     reason = headless_cli_skip_reason(repo, try_cli=try_cli, cli_out=cli_out)
     handoff = launch_ide_fix_handoff(
@@ -146,4 +152,5 @@ def _respond_fix(
         force=force_handoff,
     )
     handoff["cli_attempted"] = try_cli
+    handoff["workers_tried"] = workers_tried
     return handoff
