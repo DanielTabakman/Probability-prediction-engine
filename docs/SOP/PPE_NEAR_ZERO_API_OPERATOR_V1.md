@@ -30,9 +30,10 @@
 ### Hybrid default (current local profile)
 
 1. [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) sets `autoRemoteBuild: true`, `buildWorker: codex`, and `preferIdeOverCli: false`.
-2. One-time desktop: **`setup_codex.cmd`** → `codex login` → **`verify_codex.cmd`** (primary BUILD worker).
-3. Optional fallback: `setup_cursor_agent.cmd` → `agent login` → `verify_cursor_agent.cmd`.
-4. Restart stack on loop host: `run_ppe_headless_stack.cmd` or ntfy `restart`.
+2. One-time desktop: **`setup_codex.cmd`** → `codex login` → **`verify_codex.cmd`** (fallback / IDE handoff).
+3. One-time **VM loop host:** from daily PC run **`setup_vm_codex.cmd`** (SSH install + interactive `codex login` on VM) — enables **zero-click** headless BUILD on `IDE_BUILD`.
+4. Optional fallback: `setup_cursor_agent.cmd` → `agent login` → `verify_cursor_agent.cmd`.
+5. Restart stack on loop host: `run_ppe_headless_stack.cmd` or ntfy `restart` (or step 4 of `setup_vm_codex.cmd`).
 
 ### Strict IDE-only (optional override)
 

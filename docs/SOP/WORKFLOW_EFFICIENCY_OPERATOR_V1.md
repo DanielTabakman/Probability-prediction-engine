@@ -79,6 +79,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 |---------|---------|
 | `run_ppe_operator.cmd` | Status-only verdict (`--brief`, `--notify`, `--json`); auto-loop runs full preflight at startup |
 | `verify_build_worker.cmd` | Codex-first BUILD worker policy check |
+| `setup_vm_codex.cmd` | **Desktop:** one-time Codex install + login on VM loop host |
 | `verify_codex.cmd` | Codex CLI login + resolved worker |
 | `clear_build_worker_quota.cmd` | Clear stale Cursor CLI exhaustion markers |
 | `setup_codex.cmd` | One-time Codex CLI install + login |
