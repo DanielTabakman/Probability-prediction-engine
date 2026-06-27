@@ -26,6 +26,8 @@ Read-only: queue audit, `codebase_health_report`, `control_plane_consistency_che
 python scripts/run_codebase_health_gate.py --repo-root .
 ```
 
+**Module coverage map:** [`MODULE_TEST_COVERAGE_V1.md`](MODULE_TEST_COVERAGE_V1.md) (regenerate via `python scripts/generate_module_test_coverage_map.py --write`).
+
 ## Pytest markers
 
 Auto-applied in `tests/conftest.py`:
