@@ -46,6 +46,24 @@ Mechanical order: finish **0**, then **1**, then **2–6** may interleave by ste
 
 ---
 
+## Meta infrastructure (2026-06-27 — charter before bulk enable)
+
+Before tier-1 **content** batches merge `enabled: true` at scale, complete meta chapters in [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md):
+
+| # | Chapter | Gate |
+|---|---------|------|
+| 1 | `ppe_asset_display_parity_v1` | Live UX + WSGI cache + deploy warm |
+| 2 | `ppe_asset_enablement_pipeline_v1` | `enable_asset_batch.py` + group witness |
+| 3 | `ppe_cache_isolation_audit_v1` | No cross-asset cache bleed |
+| 4 | `ppe_display_cache_ops_v1` | Scheduled warm + cache health |
+| 5 | `msos_workflow_asset_parity_v1` | P4→P7 asset propagation |
+| 6 | `ppe_trust_surface_v1` | Trust labels in MSOS |
+| 7 | `msos_production_multi_asset_witness_v1` | Prod regression per enabled asset |
+
+Content batches (crypto tier1, equity tier1a/b/c, commodity proxy) may **BUILD** registry rows in parallel; **`enabled: true`** requires meta **#1–#3** COMPLETE unless steward documents exception in evidence.
+
+---
+
 ## Target catalog (~25–30 enabled assets)
 
 | Group | IDs | Venue |

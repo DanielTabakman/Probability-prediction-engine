@@ -1,0 +1,50 @@
+{
+  "name": "ppe_trust_surface_v1 (trust_state + trust_notes in MSOS)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-TrustSurf-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-TrustSurf-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/embed_display_boundary.py",
+        "src/viz/distribution_summary_panel.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-TrustSurf-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/StrategyLabClientShell.tsx",
+        "apps/msos-web/src/components/LabAssetPicker.tsx"
+      ]
+    },
+    {
+      "sliceId": "PPE-TrustSurf-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

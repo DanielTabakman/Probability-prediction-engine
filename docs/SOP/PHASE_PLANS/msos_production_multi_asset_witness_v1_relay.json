@@ -1,0 +1,49 @@
+{
+  "name": "msos_production_multi_asset_witness_v1 (prod display.json per enabled asset)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-MultiAssetWit-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-MultiAssetWit-Platform-Slice002",
+      "layerPreset": "PLATFORM",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/msos_production_multi_asset_witness.py",
+        ".github/workflows/deploy-vps.yml"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MultiAssetWit-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/msos_production_playwright_witness.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-MultiAssetWit-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}
