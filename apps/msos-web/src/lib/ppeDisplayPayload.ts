@@ -9,6 +9,9 @@ export const PPE_DISPLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_DISPLAY_API_URL ?? "/ppe-display-api/display.json"
 ).trim();
 
+/** Cold equity chains can take 30–120s; keep MSOS in Loading until then. */
+export const DISPLAY_PAYLOAD_FETCH_TIMEOUT_MS = 120_000;
+
 export const PPE_EMBED_ONLY_PARAM = "embed_only";
 
 export const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim();
@@ -345,6 +348,7 @@ export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<Disp
         Accept: "application/json",
         "User-Agent": "msos-web/1",
       },
+      signal: AbortSignal.timeout(DISPLAY_PAYLOAD_FETCH_TIMEOUT_MS),
     });
     if (!res.ok) {
       return null;
