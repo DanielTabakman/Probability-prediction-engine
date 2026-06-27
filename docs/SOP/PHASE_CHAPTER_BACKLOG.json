@@ -387,7 +387,7 @@
     },
     {
       "chapterId": "ppe_deribit_crypto_tier1_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
@@ -399,7 +399,7 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1a_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
