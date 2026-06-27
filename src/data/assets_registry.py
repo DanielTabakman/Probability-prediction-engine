@@ -78,8 +78,10 @@ def asset_venue(asset_id: str | None = None) -> str:
 
 def is_asset_enabled(asset_id: str | None = None) -> bool:
     entry = get_asset(asset_id)
-    if asset_venue(asset_id) == "equity":
+    if "enabled" in entry:
         return entry.get("enabled") is True
+    if asset_venue(asset_id) == "equity":
+        return False
     return True
 
 

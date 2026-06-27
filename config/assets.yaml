@@ -47,3 +47,46 @@ assets:
     trust_notes:
       - "Dividends and corporate actions not modeled in v1."
       - "LEAPS chain may be thin — BL trust state surfaced when OI/volume low."
+
+  SOL:
+    label: "SOL options"
+    asset_class: crypto
+    tier: extended
+    venue: deribit
+    deribit_currency: SOL
+    price_unit: USD
+    spread_width: 50
+    enabled: false
+    catalog:
+      group: crypto
+    trust_notes:
+      - "Thinner books than BTC/ETH — surface trust state when OI low."
+      - "Deribit SOL options delisted 2026-06-27 (0 live instruments); enable after relist + witness."
+
+  BNB:
+    label: "BNB options"
+    asset_class: crypto
+    tier: experimental
+    venue: deribit
+    deribit_currency: BNB
+    price_unit: USD
+    spread_width: 25
+    enabled: false
+    catalog:
+      group: crypto
+    trust_notes:
+      - "Deribit BNB options delisted 2026-06-27 (0 live instruments); enable after relist + witness."
+
+  XRP:
+    label: "XRP options"
+    asset_class: crypto
+    tier: experimental
+    venue: deribit
+    deribit_currency: XRP
+    price_unit: USD
+    spread_width: 10
+    enabled: false
+    catalog:
+      group: crypto
+    trust_notes:
+      - "Deribit XRP options delisted 2026-06-27 (0 live instruments); enable after relist + witness."
