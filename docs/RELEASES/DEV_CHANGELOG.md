@@ -2,8 +2,20 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-27
+
+_No merges to `main`._
+
 ## 2026-06-26
 
+- `d195355` — product(msos-ui): PPE-Universe-Product-Slice005 catalog crypto/stocks asset picker (#382) (`apps/msos-web/`)
+- `00cc042` — Control-plane: cross-venue sideChannel auto-run on idle manifest (#383)
+- `254b859` — Control-plane: cross-venue sideChannel auto-run on idle manifest (#381) (`docs/SOP/`)
+- `a1bada5` — fix(msos-shell): stop homepage feature cards overlapping hero CTAs (#380) (`apps/msos-web/`)
+- `473e586` — Options Horizon v1: chart workspace, surface archive, MSOS route (#379) (`apps/msos-web/`)
+- `214ecff` — product(ppe-ui): PPE-Universe-UI-Slice004 registry-driven lab selector (#378) (`docs/SOP/`)
+- `786fd2a` — product(ppe-core): PPE-Universe-Core-Slice003 catalog.json + witness (#377) (`docs/SOP/`)
+- `582c164` — Control-plane: dev changelog
 - `b006529` — control-plane: Cursor-first BUILD worker checker (verify_build_worker.cmd) (`docs/SOP/`)
 - `7664ffc` — product(ppe-core): PPE-Universe-Core-Slice002 registry v2 (#376) (`docs/SOP/`)
 - `a349360` — control(evidence): PPE-Universe-Control-Slice001 charter witness CLOSED (#375) (`docs/SOP/`)
