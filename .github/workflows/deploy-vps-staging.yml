@@ -19,7 +19,7 @@ on:
           - "false"
 
 concurrency:
-  group: deploy-vps-staging
+  group: deploy-vps
   cancel-in-progress: true
 
 jobs:

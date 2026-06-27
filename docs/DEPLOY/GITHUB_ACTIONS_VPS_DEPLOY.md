@@ -36,7 +36,7 @@ Optional **VPS cron** for uptime if you want zero GitHub runner use for probes (
 - **Every push to `main`** (including merges that land on `main`).
 - **Manual:** GitHub → **Actions** → **Deploy VPS** → **Run workflow** (`workflow_dispatch`).
 
-Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newer push starts).
+Only one deploy runs at a time (`concurrency` cancels an in-flight job if a newer push starts). **Deploy VPS Staging** shares the same concurrency group so production and staging never fight over Caddy **:80**.
 
 ## Workflow jobs
 
