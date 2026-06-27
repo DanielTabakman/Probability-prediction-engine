@@ -57,6 +57,8 @@ export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-marketstructureos}"
 docker compose build --no-cache msos_web_staging \
   --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
   --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
+# Remove orphan from prior marketstructureos-staging compose project (wrong network).
+docker rm -f msos_web_staging 2>/dev/null || true
 docker compose --profile staging up -d --force-recreate msos_web_staging
 
 # Shared Caddy from production root — reload routes if production checkout is newer.
