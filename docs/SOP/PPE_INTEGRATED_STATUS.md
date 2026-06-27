@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_asset_display_parity_v1` — [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md) |
-| **Relay plan** | [`ppe_asset_display_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json) |
-| **Next** | Relay closeout PPE-DisplayParity-Closeout-Slice005; product slices 002–004 pre-shipped on main |
+| **Active BUILD** | `mvp1_cross_venue_backtest_v1` — [`SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md`](docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md) |
+| **Relay plan** | [`mvp1_cross_venue_backtest_v1_relay.json`](docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json) |
+| **Next** | Relay closeout MVP1-CrossVenueBacktest-Closeout-Slice004; product slice 002 on main (#415) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 

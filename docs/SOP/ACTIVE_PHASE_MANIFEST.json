@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #1 \u2014 display parity (PLANNED queue; no autobuilder preempt)",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Gap scoring backtest \u2014 product slice shipped (#415)",
   "workerMode": "deterministic"
 }
