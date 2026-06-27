@@ -92,6 +92,12 @@
 - **added:** 2026-06-26
 - **summary:** run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.
 
+### ppeloop gh auth setup-git
+
+- **id:** `ppeloop_gh_auth_setup_git` · **priority:** medium · **category:** ops
+- **added:** 2026-06-27
+- **summary:** VM loop cannot push ops/loop-publish branches; run gh auth setup-git on ppeloop@desktop-caqll8k
+
 ## Done
 
 ### Operator friction cleanup (local profile)
@@ -112,4 +118,4 @@
 
 ## Changelog
 
-| 2026-06-26 | Auto-render from JSON |
+| 2026-06-27 | Auto-render from JSON |

@@ -3,6 +3,6 @@
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
   "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
   "status": "COMPLETE",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Ranked gap report \u2014 sideChannel auto when idle Chapter closeout MVP1-CrossVenueScan-Closeout-Slice004; queue item marked DONE.",
+  "notes": "mvp1_cross_venue_scan_v1 closed 2026-06-27; manifest idle pending steward SELECTION",
   "workerMode": "deterministic"
 }
