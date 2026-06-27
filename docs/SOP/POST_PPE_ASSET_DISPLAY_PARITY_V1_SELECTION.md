@@ -2,7 +2,7 @@
 
 **Chapter:** `ppe_asset_display_parity_v1`  
 **Display name:** Asset display parity (MSOS live mode for every enabled asset)  
-**Program:** [`PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md`](PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md)  
+**Program:** [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md) · chapter **#1**  
 **ADR:** [`PPE_ASSET_DISPLAY_PARITY_ADR.md`](PPE_ASSET_DISPLAY_PARITY_ADR.md)  
 **Relay plan:** [`PHASE_PLANS/ppe_asset_display_parity_v1_relay.json`](PHASE_PLANS/ppe_asset_display_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md)
@@ -53,4 +53,4 @@
 
 ## Next chapter after closeout
 
-[`POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md`](POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md) (SOL / BNB / XRP batch).
+[`POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md`](POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md) (meta infra #2).

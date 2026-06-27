@@ -25,6 +25,13 @@ This file merges archived chapters, steward parallel work, engineering gates, an
   - `msos_self_serve_onboarding_v1`
   - `ppe_equity_options_v1`
   - `ppe_tradeable_universe_v1`
+  - `ppe_asset_display_parity_v1`
+  - `ppe_asset_enablement_pipeline_v1`
+  - `ppe_cache_isolation_audit_v1`
+  - `ppe_display_cache_ops_v1`
+  - `msos_workflow_asset_parity_v1`
+  - `ppe_trust_surface_v1`
+  - `msos_production_multi_asset_witness_v1`
   - `ppe_deribit_crypto_tier1_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 

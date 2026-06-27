@@ -1,8 +1,9 @@
 # PPE asset display parity v1 — evidence status
 
 **Chapter:** `ppe_asset_display_parity_v1`  
-**Status:** **IN PROGRESS** (SELECTED 2026-06-27)  
+**Status:** **CHARTERED** — BUILD on PR #391; closeout pending production verify  
 **SELECTION:** [`POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md`](POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md)  
+**Program:** [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md) · meta chapter **#1**  
 **Phase plan:** [`PHASE_PLANS/ppe_asset_display_parity_v1_relay.json`](PHASE_PLANS/ppe_asset_display_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md)  
 **ADR:** [`PPE_ASSET_DISPLAY_PARITY_ADR.md`](PPE_ASSET_DISPLAY_PARITY_ADR.md)

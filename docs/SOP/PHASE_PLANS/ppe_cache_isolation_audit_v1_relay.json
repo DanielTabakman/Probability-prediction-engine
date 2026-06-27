@@ -1,0 +1,51 @@
+{
+  "name": "ppe_cache_isolation_audit_v1 (asset-key cache witness suite)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_CACHE_ISOLATION_AUDIT_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-CacheIso-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-CacheIso-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/embed_only_lab.py",
+        "src/data/fetch_deribit.py",
+        "src/data/fetch_equity_options.py",
+        "tests/test_cache_isolation_witness.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CacheIso-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/enable_asset_batch.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CacheIso-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

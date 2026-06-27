@@ -32,6 +32,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — COMPLETE — NVDA single-ticker equity wedge
 - **POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION** ([`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)) — COMPLETE — registry v2 + catalog API
 - **POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION** ([`POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md`](docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md)) — active relay — SOL/BNB/XRP tier-1 batch (operator SOL-first)
+- **PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1** ([`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)) — meta infra stack (7 chapters) — charter before bulk enabled: true at scale
 - **POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md)) — side channel — chart-first region thesis tool; LOW priority; pre-execution; after tradeable universe
 - **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->

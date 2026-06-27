@@ -1,0 +1,52 @@
+{
+  "name": "msos_workflow_asset_parity_v1 (P4-P7 asset propagation)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-WfAsset-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-WfAsset-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/app/strategy-lab/confirm/",
+        "apps/msos-web/src/app/strategy-lab/expression/",
+        "apps/msos-web/src/lib/monitorHistoryFeed.ts",
+        "apps/msos-web/src/components/ThesisConfirmationPanel.tsx",
+        "apps/msos-web/src/components/ExpressionPlanningPanel.tsx"
+      ]
+    },
+    {
+      "sliceId": "MSOS-WfAsset-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "tests/"
+      ]
+    },
+    {
+      "sliceId": "MSOS-WfAsset-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}
