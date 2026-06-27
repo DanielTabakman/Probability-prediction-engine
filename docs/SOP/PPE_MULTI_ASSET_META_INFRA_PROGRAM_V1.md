@@ -87,3 +87,16 @@ Before any `enabled: true`:
 2. No cross-asset cache bleed in CI isolation suite.
 3. Strategy Lab **and** confirm/expression/monitor honor `?asset=` for every enabled name.
 4. Production witness covers **all** enabled catalog assets after each deploy.
+
+---
+
+## Autobuilder boundary (binding)
+
+Meta infra ships via **IDE BUILD** on `build/ppe-meta-infra-v1` → PR → merge. It does **not** preempt the VM relay loop.
+
+| Rule | Detail |
+|------|--------|
+| Queue status | Meta chapters stay **`PLANNED`** until steward promotes after merge |
+| Manifest | Do **not** point `ACTIVE_PHASE_MANIFEST` at meta plans while tier-1 content is **RUNNING** |
+| Selection | Autobuilder continues **`ppe_equity_universe_tier1a_v1`** (or next content batch) unchanged |
+| Desktop | No local `run_ppe.cmd` / relay — merge to `main`; VM pulls on next pass |

@@ -115,6 +115,7 @@ export function buildThesisDraftFromLab(
 
   return {
     instrument,
+    assetId: asset.id,
     horizonDays: resolvedExpiry ? daysUntilExpiry(resolvedExpiry) : 30,
     marketRangePct: marketPct,
     thesisRangePct: thesisPct,

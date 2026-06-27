@@ -281,6 +281,17 @@ def build_distribution_display_payload(
             series.append(s)
     belief_presets = series[0].get("belief_presets", {}) if series else {}
     curve_labels = build_curve_display_labels()
+    trust_states = {
+        str(row.get("trust_state") or "ok").strip().lower()
+        for row in export_rows
+        if row.get("trust_state")
+    }
+    if "thin_chain" in trust_states:
+        trust_state = "thin_chain"
+    elif trust_states & {"error", "fail", "degraded"}:
+        trust_state = "degraded"
+    else:
+        trust_state = "ok"
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
@@ -293,10 +304,12 @@ def build_distribution_display_payload(
         "series_by_expiry": series,
         "belief_presets": belief_presets,
         "curve_labels": curve_labels,
+        "trust_state": trust_state,
         "meta": {
             "read_only": True,
             "display_mode": DISPLAY_PAYLOAD_MODE,
             "fallback_mode": EMBED_ONLY_FALLBACK_MODE,
+            "trust_state": trust_state,
             "embed_query": f"?{EMBED_ONLY_QUERY_PARAM}=1",
             "json_query": f"?{EMBED_JSON_QUERY_PARAM}={EMBED_JSON_QUERY_VALUE}",
             "embed_json_query": (
@@ -532,6 +545,21 @@ def create_display_payload_wsgi_app(
                     ("Content-Type", "application/json; charset=utf-8"),
                     ("Content-Length", str(len(body))),
                     ("Cache-Control", display_cache_control_header()),
+                ],
+            )
+            return [body]
+
+        if path == "/cache-status.json":
+            from src.viz.display_payload_cache import display_cache_status
+
+            status_payload = display_cache_status()
+            body = json.dumps(status_payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+            start_response(
+                "200 OK",
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
                 ],
             )
             return [body]

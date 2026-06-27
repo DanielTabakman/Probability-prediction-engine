@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
@@ -34,8 +35,10 @@ import {
   type StrategySuggestionPayload,
 } from "@/lib/ppeStrategySuggestion";
 import {
-  fetchDisplayPayload,
+  fetchDisplayPayloadClient,
+  LAB_ASSET_QUERY_PARAM,
   listExpiryDates,
+  normalizeLabAssetId,
 } from "@/lib/ppeDisplayPayload";
 import { resolveSignInUrlWithReturn } from "@/lib/msosPublicUrls";
 import { stashPostAuthReturnPath } from "@/lib/postAuthReturn";
@@ -115,6 +118,8 @@ function optimizationFromSuggestion(
 }
 
 export function ExpressionPlanningPanel() {
+  const searchParams = useSearchParams();
+  const assetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [record, setRecord] = useState(defaultExpressionRecord);
   const [thesis, setThesis] = useState<ThesisRecord>(defaultThesisRecord);
   const [thesisConfirmed, setThesisConfirmed] = useState(false);
@@ -176,7 +181,7 @@ export function ExpressionPlanningPanel() {
       setSuggestionError(null);
       const tuning = loadStoredBeliefTuning();
       const storedExpiry = loadStoredStrategyLabExpiry();
-      const display = await fetchDisplayPayload();
+      const display = await fetchDisplayPayloadClient(assetId);
       const expiryOptions = display ? listExpiryDates(display) : [];
       const resolvedExpiry =
         (storedExpiry && expiryOptions.includes(storedExpiry) && storedExpiry) ||
@@ -207,7 +212,7 @@ export function ExpressionPlanningPanel() {
     return () => {
       abort.cancelled = true;
     };
-  }, [hydrated, thesisConfirmed]);
+  }, [hydrated, thesisConfirmed, assetId]);
 
   const livePlan = useMemo(() => {
     const suggested = suggestion?.suggested;

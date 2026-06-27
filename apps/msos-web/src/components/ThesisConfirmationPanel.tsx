@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
@@ -16,7 +17,13 @@ import {
   buildThesisRestatement,
 } from "@/lib/buildThesisLabContext";
 import { loadStoredBeliefTuning, type BeliefTuning } from "@/lib/beliefTuning";
-import { fetchDisplayPayloadClient, type DisplayPayload } from "@/lib/ppeDisplayPayload";
+import {
+  buildStrategyLabPath,
+  fetchDisplayPayloadClient,
+  LAB_ASSET_QUERY_PARAM,
+  normalizeLabAssetId,
+  type DisplayPayload,
+} from "@/lib/ppeDisplayPayload";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import {
   THESIS_PERSISTENCE_LABEL,
@@ -28,6 +35,8 @@ import {
 import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 
 export function ThesisConfirmationPanel() {
+  const searchParams = useSearchParams();
+  const assetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [record, setRecord] = useState(defaultThesisRecord);
   const [hydrated, setHydrated] = useState(false);
   const [persistError, setPersistError] = useState<string | null>(null);
@@ -39,7 +48,7 @@ export function ThesisConfirmationPanel() {
     void (async () => {
       const [loaded, payload] = await Promise.all([
         fetchThesisRecord(defaultThesisRecord),
-        fetchDisplayPayloadClient(),
+        fetchDisplayPayloadClient(assetId),
       ]);
       const storedExpiry =
         loadStoredStrategyLabExpiry() ||
@@ -54,7 +63,7 @@ export function ThesisConfirmationPanel() {
       setRecord({ ...loaded, ...draft, lifecycle: loaded.lifecycle, updatedAt: loaded.updatedAt });
       setHydrated(true);
     })();
-  }, []);
+  }, [assetId]);
 
   const columns = buildCompareColumnsFromLab(displayPayload, tuning);
   const restatement = buildThesisRestatement(tuning, expiry ?? `${record.horizonDays} days`);
@@ -95,7 +104,7 @@ export function ThesisConfirmationPanel() {
             <span className="dot" aria-hidden="true" />
             {WORKSPACE_SAVED_LABEL}
           </span>
-          <Link href="/strategy-lab" className="btn slim">
+          <Link href={buildStrategyLabPath(assetId)} className="btn slim">
             Back to lab
           </Link>
           <span className="avatar" aria-hidden="true">

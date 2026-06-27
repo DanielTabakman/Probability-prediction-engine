@@ -156,6 +156,12 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install chromium
 
+      - name: Production multi-asset display witness
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
+          python scripts/msos_production_multi_asset_witness.py --write artifacts/health/msos_production_multi_asset_witness.json
+
       - name: Production demo witness
         run: |
           set -euo pipefail

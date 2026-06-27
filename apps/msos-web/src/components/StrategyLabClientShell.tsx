@@ -92,6 +92,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     () => resolveDisplayAssetMeta(payload, selectedAssetId),
     [payload, selectedAssetId],
   );
+  const trustState = payload?.trust_state ?? payload?.meta?.trust_state;
 
   const closeTutorial = useCallback(() => {
     setTutorialOpen(false);
@@ -236,6 +237,16 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         <div className="lab-data-banner loading" role="status" aria-live="polite">
           <span className="tag teal">Loading</span>
           <p>{labLoadingBannerBody(assetMeta)}</p>
+        </div>
+      ) : null}
+
+      {mode === "live" && trustState === "thin_chain" ? (
+        <div className="lab-data-banner loading" role="status">
+          <span className="tag amber">Thin chain</span>
+          <p>
+            Options liquidity is limited for {assetMeta.label}. Curves may be approximate — check
+            catalog trust notes before trading.
+          </p>
         </div>
       ) : null}
 

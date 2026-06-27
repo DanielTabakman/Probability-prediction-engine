@@ -163,6 +163,7 @@ export type DisplayPayload = {
   kind: string;
   spot_usd: number;
   as_of_utc?: string;
+  trust_state?: string;
   series_by_expiry: DisplaySeries[];
   belief_presets?: Partial<Record<string, BeliefPresetOverlay>>;
   summary?: {
@@ -170,6 +171,11 @@ export type DisplayPayload = {
   };
   curve_labels?: CurveDisplayLabels;
   asset?: DisplayAssetMeta;
+  meta?: {
+    trust_state?: string;
+    display_depth?: string;
+    read_only?: boolean;
+  };
 };
 
 export type LabMetric = {

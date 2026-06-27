@@ -38,6 +38,33 @@ def clear_display_payload_cache() -> None:
         _CACHE.clear()
 
 
+def display_cache_status() -> dict[str, Any]:
+    """In-process cache health for ops / cache-status.json."""
+    from src.data.assets_registry import list_enabled_asset_ids
+
+    now = time.monotonic()
+    ttl = display_cache_ttl_seconds()
+    entries: list[dict[str, Any]] = []
+    with _LOCK:
+        for (aid, depth), (stored_at, _payload) in _CACHE.items():
+            age_s = max(0.0, now - stored_at)
+            entries.append(
+                {
+                    "asset_id": aid,
+                    "depth": depth,
+                    "age_seconds": round(age_s, 1),
+                    "fresh": ttl > 0 and age_s < ttl,
+                }
+            )
+    return {
+        "enabled": cache_enabled(),
+        "ttl_seconds": ttl,
+        "entry_count": len(entries),
+        "entries": sorted(entries, key=lambda row: (row["asset_id"], row["depth"])),
+        "enabled_assets": list_enabled_asset_ids(),
+    }
+
+
 def get_cached_display_payload(
     asset_id: str,
     depth: str,

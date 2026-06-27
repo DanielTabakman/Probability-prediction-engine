@@ -531,6 +531,20 @@ def test_display_payload_cache_keys_by_asset_and_depth() -> None:
     assert calls == [("BTC", "full"), ("ETH", "full"), ("BTC", "summary")]
 
 
+def test_display_wsgi_cache_status_route() -> None:
+    app = create_display_payload_wsgi_app(lambda _environ: {})
+    headers: list[tuple[str, str]] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        headers.extend(hdrs)
+
+    body = b"".join(app({"PATH_INFO": "/cache-status.json", "QUERY_STRING": ""}, start_response))
+    parsed = json.loads(body.decode("utf-8"))
+    assert "ttl_seconds" in parsed
+    assert "enabled_assets" in parsed
+    assert dict(headers).get("Content-Type") == "application/json; charset=utf-8"
+
+
 def test_display_payload_cache_disabled_rebuilds_each_time() -> None:
     clear_display_payload_cache()
     calls = {"n": 0}
