@@ -786,5 +786,87 @@ class TestCLISmoke(unittest.TestCase):
             self.assertEqual(code, relay.EXIT_CONTINUE)
 
 
+class TestCLIFlow(unittest.TestCase):
+    """End-to-end CLI paths via relay.main (stage → resume → reset)."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self._tmp.name).resolve()
+        subprocess.run(["git", "init", "-q", "-b", "main"], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit",
+             "--allow-empty", "-q", "-m", "init"],
+            cwd=self.repo, check=True,
+        )
+        subprocess.run(["git", "branch", "baseline"], cwd=self.repo, check=True)
+        spec = self.repo / "docs" / "SOP" / "SPRINT_999_PHASE_2.md"
+        spec.parent.mkdir(parents=True, exist_ok=True)
+        spec.write_text("# Sprint 999 stub\n", encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit",
+             "-q", "-m", "sprint spec"],
+            cwd=self.repo, check=True,
+        )
+        self.root = str(self.repo)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _stage_argv(self) -> list[str]:
+        return [
+            "--repo-root", self.root,
+            "stage", relay.JOB_RUN_SLICE,
+            "--slice-id", "Sprint999-Slice001",
+            "--sprint-spec-path", "docs/SOP/SPRINT_999_PHASE_2.md",
+            "--declared-plane", "PRODUCT-PLANE",
+            "--baseline-branch", "baseline",
+            "--build-branch", "build/test-slice",
+        ]
+
+    def test_main_stage_run_selected_slice_cli(self) -> None:
+        code = relay.main(self._stage_argv())
+        self.assertEqual(code, relay.EXIT_CONTINUE)
+        runtime = relay.Runtime(self.repo)
+        state = runtime.load_run_state()
+        self.assertEqual(state["status"], relay.STATE_STAGED_FOR_WORKER)
+
+    def test_main_stage_then_resume_continue_cli(self) -> None:
+        code = relay.main(self._stage_argv())
+        self.assertEqual(code, relay.EXIT_CONTINUE)
+        runtime = relay.Runtime(self.repo)
+        state = runtime.load_run_state()
+        run_id = state["run_id"]
+        payload = valid_payload()
+        payload.update(
+            {
+                "run_id": run_id,
+                "slice_id": "Sprint999-Slice001",
+                "build_branch": "build/test-slice",
+                "baseline_branch": "baseline",
+            }
+        )
+        (runtime.run_dir(run_id) / "relay_result.json").write_text(
+            json.dumps(payload), encoding="utf-8"
+        )
+        code = relay.main(["--repo-root", self.root, "resume"])
+        self.assertEqual(code, relay.EXIT_CONTINUE)
+        self.assertEqual(
+            runtime.load_run_state()["status"],
+            relay.STATE_DECIDED_CONTINUE,
+        )
+
+    def test_main_abort_then_reset_cli(self) -> None:
+        code = relay.main(self._stage_argv())
+        self.assertEqual(code, relay.EXIT_CONTINUE)
+        code = relay.main(["--repo-root", self.root, "abort"])
+        self.assertEqual(code, relay.EXIT_REFUSAL)
+        runtime = relay.Runtime(self.repo)
+        self.assertEqual(runtime.load_run_state()["status"], relay.STATE_ABORTED)
+        code = relay.main(["--repo-root", self.root, "reset"])
+        self.assertEqual(code, relay.EXIT_CONTINUE)
+        self.assertEqual(runtime.load_run_state()["status"], relay.STATE_IDLE)
+
+
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()

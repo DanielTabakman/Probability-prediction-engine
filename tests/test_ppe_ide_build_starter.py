@@ -72,6 +72,12 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
         self.assertIn("`renders`", md)
         self.assertIn("## Recommended loads", md)
         self.assertIn("touchSet", md)
+        line_count = len(md.splitlines())
+        self.assertLessEqual(
+            line_count,
+            100,
+            msg=f"IDE starter should stay ≤100 lines for token economy (got {line_count})",
+        )
 
     def test_format_build_closeout_section(self) -> None:
         body = format_build_closeout_section(

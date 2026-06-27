@@ -1,47 +1,26 @@
 ---
-description: Unified relay phase run (run_ppe.cmd) and context discipline. Load for BUILD/steering or when the user wants work executed without manual SOP steps.
-alwaysApply: true
+description: Relay runbook detail — load on demand. Verdict auto-execute lives in ppe-operator-core.mdc.
+alwaysApply: false
 ---
 
-# PPE unified run (operator + agents)
+# PPE unified run (on demand)
 
-**Operator (human):** from repo root — **policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md)
+**Always-on operator behavior:** [`ppe-operator-core.mdc`](ppe-operator-core.mdc)
+
+Load for full relay/operator runbook detail.
+
+**Operator layout:** [`PPE_OPERATOR_LAYOUT_ADR.md`](docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md)
 
 | Machine | Loop | After IDE BUILD |
 |---------|------|-----------------|
-| **Hyper-V VM** | `run_ppe_headless_stack.cmd --ensure` / `VM_RESTART.cmd` · auto via logon task | `run_ppe_local.cmd` (automatic in loop) |
-| **Daily desktop** | **Off** (`ppe_operator_no_loop.local.cmd`) | `DESKTOP_BUILD.cmd` → merge → `DESKTOP_CONTINUE.cmd` |
+| **VM** | `run_ppe_headless_stack.cmd` / auto loop | `run_ppe_local.cmd` |
+| **Desktop** | Off | `DESKTOP_BUILD.cmd` → merge → `DESKTOP_CONTINUE.cmd` |
 
-- **No API credits (VM loop):** `run_ppe_auto_local_loop.cmd` runs **on VM only** (local profile per [`PPE_AUTO_OPERATOR.local.json`](docs/SOP/PPE_AUTO_OPERATOR.local.json)). Runbook: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md) · [`PPE_OPERATOR_PROCESS_V1.md`](docs/SOP/PPE_OPERATOR_PROCESS_V1.md).
-- **With API credits:** **`run_ppe_auto_acp_loop.cmd`** (ACP + steward when idle).
-- Legacy: **`run_ppe_auto.cmd`** / **`run_ppe_auto_loop.cmd`**. Escape hatches: `run_ppe.cmd`, `--dry-run`, `--status`, `--continuous`.
+- Local profile: `run_ppe_auto_local_loop.cmd` on **VM only** ([`PPE_AUTO_OPERATOR.local.json`](docs/SOP/PPE_AUTO_OPERATOR.local.json)).
+- With API credits: `run_ppe_auto_acp_loop.cmd` — do not run without budget.
 
-**Agents (steward BUILD):**
+**Steward:** update `ACTIVE_PHASE_MANIFEST.json` or `PHASE_QUEUE.json` at SELECTION; do not paste orchestrator logs.
 
-1. At **SELECTION**, update [`docs/SOP/ACTIVE_PHASE_MANIFEST.json`](docs/SOP/ACTIVE_PHASE_MANIFEST.json): `phasePlanPath`, `sprintSpecPath`, `status: READY` — or add the chapter to [`PHASE_QUEUE.json`](docs/SOP/PHASE_QUEUE.json) as `READY` and let `run_ppe.cmd` auto-select.
-2. Tell the operator: run `run_ppe.cmd` (do not ask them to hand-edit HANDOFF/FRONTIER or paste orchestrator logs).
-3. **Do not stop after chapter closeout** when the user asked for an auto cycle: run `python scripts/ppe_auto_select.py --repo-root . --apply` (or `run_ppe.cmd`) so the next `READY` queue item starts; use `--continuous` only when multiple chartered chapters are queued.
-4. After phase exit: read `artifacts/orchestrator/LAST_RUN_REPORT.md`; use a **new** Cursor thread with [`AGENT_CONTINUITY_BRIEF.md`](docs/SOP/AGENT_CONTINUITY_BRIEF.md) only ([`docs/CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
+**Closeout:** `post_relay_continue` marks queue DONE; read `LAST_RUN_REPORT.md`; new thread with continuity brief only.
 
-**No active chapter:** manifest `COMPLETE` + empty `phasePlanPath` is normal — add a **`queued`** row to `PHASE_CHAPTER_BACKLOG.json` or run **`run_ppe_auto_local.cmd`** (propagate; no steward API on local profile) before plain `run_ppe.cmd`.
-
-**Closeout automation:** `post_relay_continue` marks the closed plan **DONE** in the queue and clears `phasePlanPath`; agents must not leave feedback (or any closed chapter) as `READY` in the queue.
-
-## What's next? — auto-execute (hard default)
-
-**Triggers:** `what's next` · `whats next` · `do the next thing` · `continue` · `keep going` · steward/operator steering without `read-only` / `explain only`.
-
-**Do not** answer with a plan-only summary. **First tool pass:** read `artifacts/orchestrator/OPERATOR_STATUS.md` or `AUTOBUILDER_STATUS.json`, then **run** the verdict action in shell before your reply.
-
-| Verdict | Agent action (run first) |
-|---------|--------------------------|
-| **`RUN_LOCAL`** | **Check host first:** `python scripts/ppe_loop_host_guard.py --check`. If `allowed: false` (daily desktop) → **`DESKTOP_CONTINUE.cmd` only** — never `run_ppe_local.cmd`. If `allowed: true` (VM) → `run_ppe_local.cmd` or `@ppe-finish-worker`. See [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc). |
-| **`IDE_BUILD`** | Open `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` and **implement** the slice (gate → commit → `mark_ide_product_ready` / closeout). Do **not** run `run_ppe_local` before product code ships. |
-| **`RUN_AUTO`** | **VM only:** `run_ppe.cmd` or `ppe_autobuilder.cmd advance`. **Desktop:** SSH VM status or merge to `main` — **never** local `run_ppe.cmd`. |
-| **`ERROR` / `FIX_PLAN` / `STALE_STATE`** | Triage/fix (`ppe_notify_fix.py`); do not blindly run relay. |
-
-**Skip auto-run only when:** user explicitly asked read-only / explain-only; SSH or `ppe_loop_host_guard` blocks; or triage is required first.
-
-After closeout with another `READY` queue item: run `run_ppe.cmd` or `ppe_auto_select.py --apply` — do not stop at chapter COMPLETE when the user wants the cycle to continue.
-
-Canonical runbook: [`docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).
+Canonical runbook: [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md).

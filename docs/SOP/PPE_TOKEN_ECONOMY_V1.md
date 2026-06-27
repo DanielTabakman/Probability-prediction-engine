@@ -73,6 +73,7 @@ Reserve Cursor for **exceptions**; default product BUILD goes to **Codex CLI** (
 | After closeout: new thread + `AGENT_CONTINUITY_BRIEF.md` only | Drop orchestrator noise |
 | `python scripts/ppe_context_preflight.py` before BUILD | Advisory band check |
 | `clear_build_worker_quota.cmd` after plan reset | Clears stale CLI exhaustion from old logs |
+| **`token_audit.cmd`** weekly or before BUILD | Rules/starter overhead + Codex routing report |
 
 | Avoid | Why |
 |-------|-----|
@@ -87,6 +88,7 @@ When Cursor quota returns: keep **Codex for implementation**; use Cursor only fo
 
 ## Related
 
+- [`WORKFLOW_CONTEXT_AUDIT_002.md`](WORKFLOW_CONTEXT_AUDIT_002.md)
 - [`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)

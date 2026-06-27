@@ -1,0 +1,49 @@
+---
+description: PPE operator core — verdict auto-execute, context discipline, continuity. Minimal always-on footprint.
+alwaysApply: true
+---
+
+# PPE operator core
+
+**Machine layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Token economy:** [`docs/SOP/PPE_TOKEN_ECONOMY_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_V1.md)
+
+## What's next / BUILD (auto-execute)
+
+**Triggers:** `what's next` · `continue` · `keep going` · steering without read-only.
+
+Do **not** advise-only. First tool pass: read `OPERATOR_STATUS.md` (or `AUTOBUILDER_STATUS.json`), then **run** the verdict action before replying.
+
+| Verdict | Action |
+|---------|--------|
+| `RUN_LOCAL` | Guard first. Desktop → `DESKTOP_CONTINUE.cmd` only. VM → `run_ppe_local.cmd` |
+| `IDE_BUILD` | New thread; `@` `IDE_BUILD_STARTER_*.md` only — gate → commit → `mark_ide_product_ready` |
+| `RUN_AUTO` | VM → `run_ppe.cmd` / `ppe_autobuilder.cmd advance`. Desktop → SSH status, not local relay |
+| `ERROR` / `FIX_PLAN` / `STALE_STATE` | `ppe_notify_fix.py` triage |
+
+**Skip auto-run:** explicit read-only; guard blocks; triage required.
+
+**Continuity reads (steering):** `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`, `WHATS_NEXT.md` when present.
+
+## Context discipline (save tokens)
+
+- **New thread** per slice/chapter — BUILD starter only, not steward chat.
+- **No** pasted orchestrator stdout, full pytest logs, or full `git diff`.
+- After closeout: new thread + `AGENT_CONTINUITY_BRIEF.md` only ([`CONTEXT_RULES.md`](docs/CONTEXT_RULES.md)).
+- Relay BUILD = fresh worker per slice; Cursor steward ≠ BUILD chat.
+
+## On-demand rules (load when relevant)
+
+| Rule | When |
+|------|------|
+| [`product-direction.mdc`](product-direction.mdc) | Pivots, SELECTION, scope fights |
+| [`repo-layers.mdc`](repo-layers.mdc) | Editing `src/`, `apps/`, product BUILD |
+| [`auto-commit.mdc`](auto-commit.mdc) | Task complete + gate passes |
+| [`context-budget.mdc`](context-budget.mdc) | Before heavy BUILD / retries |
+
+## Compact steward duties
+
+- Do not treat `CURRENT_FRONTIER.md` as live steering — use `MVP1_FRONTIER.md` / `MSOS_FRONTIER.md`.
+- Direction pivots: agent-owned — edit JSON, `sync_product_direction.cmd`, gate+commit.
+- After closeout with queued work: `run_ppe.cmd` or `ppe_auto_select.py --apply`.
+- **Google Docs:** never write PPE Master via MCP; MSOS Repo Truth via sync scripts only.
+- **Fix blocked state:** `ppe_notify_fix.py --working` at start, `--resolved` before final reply.

@@ -1,6 +1,6 @@
 ---
 description: Auto commit/push/PR for PPE when task is done and gate passes. Overrides global "ask before commit" for this repo.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Auto-commit (PPE)

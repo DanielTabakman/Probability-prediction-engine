@@ -6,7 +6,6 @@ import argparse
 import subprocess
 from pathlib import Path
 
-from scripts.ppe_build_packet import build_packet_text
 from scripts.ppe_context_bands import advisory_actions, classify_line_count, score_text, worst_band
 from scripts.ppe_manifest import (
     format_acceptance_checklist,
@@ -17,8 +16,8 @@ from scripts.repo_layer_paths import find_slice_in_plan, resolve_slice_layer_sco
 
 STARTER_DIR = "artifacts/orchestrator"
 CONTINUITY_BRIEF = "docs/SOP/AGENT_CONTINUITY_BRIEF.md"
-CONTINUITY_EXCERPT_LINES = 40
-ACCEPTANCE_MAX_LINES = 80
+STARTER_LINE_TARGET = 100
+ACCEPTANCE_MAX_LINES = 40
 
 
 def _git_head(repo: Path) -> str | None:
@@ -70,15 +69,8 @@ def format_ide_build_resume(slice_id: str, phase_plan: str) -> str:
     )
 
 
-def _continuity_excerpt(repo: Path, max_lines: int = CONTINUITY_EXCERPT_LINES) -> str:
-    p = repo / CONTINUITY_BRIEF
-    if not p.is_file():
-        return f"_({CONTINUITY_BRIEF} not found — regenerate via closeout.)_\n"
-    lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
-    excerpt = "\n".join(lines[:max_lines])
-    if len(lines) > max_lines:
-        excerpt += f"\n\n_(truncated — full file: `{CONTINUITY_BRIEF}`)_"
-    return excerpt
+def _continuity_pointer() -> str:
+    return f"_Steering: `{CONTINUITY_BRIEF}` if scope unclear — do not paste the full brief into chat._"
 
 
 def _slice_map_row(sprint_text: str, slice_id: str) -> str | None:
@@ -174,11 +166,8 @@ def _acceptance_excerpt(sprint_text: str, sprint_path: str, *, max_lines: int = 
 def _context_ritual_bullets() -> str:
     return "\n".join(
         [
-            "- Open a **new** Cursor Agent thread for this BUILD (not the steward thread).",
-            "- Do **not** paste orchestrator stdout, full pytest logs, or full `git diff`.",
-            "- Include **AGENT CONTINUITY** block in your return (see BUILD packet template).",
-            "- Relay BUILD uses a fresh ACP worker; this IDE thread is separate.",
-            "- After chapter closeout: new thread with `AGENT_CONTINUITY_BRIEF.md` only.",
+            "- **New** Agent thread — this starter + `## Recommended loads` only.",
+            "- No orchestrator stdout, full pytest logs, or full `git diff` in chat.",
         ]
     )
 
@@ -222,7 +211,6 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         phase_plan=norm_plan,
         layer_preset=scope.layer_preset,
     )
-    packet = build_packet_text(repo, slice_id=slice_id, phase_plan=norm_plan)
 
     try:
         from scripts.ppe_focus_gate import evaluate_focus_gate, format_ide_focus_block
@@ -247,10 +235,6 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     starter_body_parts.extend([
         loads_block,
         "",
-        "## Continuity excerpt",
-        "",
-        _continuity_excerpt(repo),
-        "",
         "## Slice intent",
         "",
         slice_row,
@@ -259,11 +243,7 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         "",
         acceptance_block,
         "",
-        "## Slim BUILD packet",
-        "",
-        "```text",
-        packet.rstrip(),
-        "```",
+        _continuity_pointer(),
         "",
         "## Context ritual",
         "",
@@ -283,7 +263,7 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     band_section = [
         "## Context band",
         "",
-        f"- **Starter file:** `{starter_scored['band']}` ({starter_scored['line_count']} lines)",
+        f"- **Starter file:** `{starter_scored['band']}` ({starter_scored['line_count']} lines; target ≤{STARTER_LINE_TARGET})",
     ]
     if sprint_lines is not None:
         band_section.append(f"- **Sprint spec:** `{sprint_band}` ({sprint_lines} lines — `{sprint_path}`)")

@@ -153,6 +153,7 @@ class RadarReport:
     orphans: list[OrphanFinding] = field(default_factory=list)
     cleanup_actions: list[CleanupAction] = field(default_factory=list)
     summary_line: str = ""
+    token_economy: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -164,6 +165,7 @@ class RadarReport:
             "orphans": [o.to_dict() for o in self.orphans],
             "cleanup_actions": [a.to_dict() for a in self.cleanup_actions],
             "summary_line": self.summary_line,
+            "token_economy": dict(self.token_economy),
         }
 
 
@@ -543,6 +545,92 @@ def _rank_severity(severity: Severity) -> int:
     return {"escalate": 0, "watch": 1, "info": 2}[severity]
 
 
+def _token_friction_candidates(repo: Path) -> tuple[list[RadarCandidate], dict[str, Any]]:
+    try:
+        from scripts.ppe_token_audit import (
+            ALWAYS_ON_CHAR_TARGET,
+            STARTER_LINE_TARGET,
+            build_token_audit,
+        )
+    except ImportError:
+        return [], {}
+
+    report = build_token_audit(repo)
+    data = report.to_dict()
+    summary = {
+        "always_on_est_tokens_per_turn": data["always_on_est_tokens_per_turn"],
+        "starter_count": len(data["starters"]),
+        "stale_starter_count": len(data["stale_starter_ids"]),
+    }
+    signals: list[tuple[str, Severity, str]] = []
+    if data["always_on_total_chars"] > ALWAYS_ON_CHAR_TARGET:
+        signals.append(
+            (
+                "always-on-rules-heavy",
+                "watch",
+                f"{data['always_on_est_tokens_per_turn']} est tok/turn from always-on rules",
+            )
+        )
+    over = sum(1 for s in data["starters"] if s.get("over_target"))
+    if over:
+        signals.append(
+            (
+                "starters-over-budget",
+                "watch",
+                f"{over} starter(s) exceed {STARTER_LINE_TARGET} lines",
+            )
+        )
+    if data["stale_starter_ids"]:
+        signals.append(
+            (
+                "stale-ide-starters",
+                "info",
+                f"{len(data['stale_starter_ids'])} stale starter file(s)",
+            )
+        )
+    resolved = (data.get("build_worker") or {}).get("resolved") or {}
+    if resolved.get("mode") == "manual" and resolved.get("reason") not in (
+        "manual_handoff",
+        "near_zero_api_profile",
+        "desktop_handoff",
+    ):
+        signals.append(
+            (
+                "headless-build-fallback",
+                "escalate",
+                f"IDE handoff fallback: {resolved.get('reason')}",
+            )
+        )
+    if resolved.get("codex_cli_exhausted"):
+        signals.append(
+            (
+                "codex-cli-exhausted",
+                "watch",
+                "Codex CLI quota exhausted — Cursor IDE BUILD likely",
+            )
+        )
+
+    candidates: list[RadarCandidate] = []
+    for sid, severity, detail in signals:
+        action = "Run token_audit.cmd; verify_codex.cmd; regenerate slim starters."
+        if sid == "always-on-rules-heavy":
+            action = "Keep ppe-operator-core + ppe-desktop-vm-layout always-on only."
+        elif sid == "headless-build-fallback":
+            action = "Run verify_codex.cmd and verify_build_worker.cmd on desktop."
+        elif sid == "stale-ide-starters":
+            action = "Run token_audit.cmd --prune-stale."
+        candidates.append(
+            RadarCandidate(
+                id=sid,
+                severity=severity,
+                title=f"Token economy: {sid.replace('-', ' ')}",
+                evidence=[detail],
+                suggested_action=action,
+            )
+        )
+    return candidates, summary
+
+
 def _build_summary(candidates: list[RadarCandidate], orphans: list[OrphanFinding], cleanup: list[CleanupAction]) -> str:
     orphan_stale = [o for o in orphans if o.auto_cleanable]
     parts: list[str] = []
@@ -581,8 +669,13 @@ def build_radar_report(
         if cleanup and not cleanup_dry_run:
             orphans = scan_orphans(repo)
 
+    token_candidates, token_summary = _token_friction_candidates(repo)
+    if token_summary:
+        signals["token_always_on_est_tok"] = int(token_summary.get("always_on_est_tokens_per_turn") or 0)
+    candidates.extend(token_candidates)
+
     candidates.sort(key=lambda c: (_rank_severity(c.severity), c.id))
-    capped = candidates[:3]
+    capped = candidates[:5]
 
     return RadarReport(
         week_monday=week_monday.isoformat(),
@@ -592,6 +685,7 @@ def build_radar_report(
         orphans=orphans,
         cleanup_actions=cleanup,
         summary_line=_build_summary(capped, orphans, cleanup),
+        token_economy=token_summary,
     )
 
 
@@ -633,6 +727,19 @@ def render_radar_markdown(report: RadarReport) -> str:
         for a in report.cleanup_actions:
             lines.append(f"- `{a.action}` {a.target}: {a.result}")
         lines.append("")
+
+    if report.token_economy:
+        te = report.token_economy
+        lines.extend(
+            [
+                "## Token economy",
+                "",
+                f"- Always-on est overhead: ~{te.get('always_on_est_tokens_per_turn', '?')} tok/turn",
+                f"- IDE starters on disk: {te.get('starter_count', 0)}",
+                f"- Stale starters: {te.get('stale_starter_count', 0)}",
+                "",
+            ]
+        )
 
     lines.append("Promotion: steward SELECTION → Workflow-Hardening-Slice-00N (advisory only).")
     return "\n".join(lines).rstrip() + "\n"

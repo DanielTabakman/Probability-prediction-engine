@@ -41,4 +41,6 @@ You do **not** need Automations, API credits, or `run_ppe_local` on the desktop.
 - Desktop = **IDE BUILD only** (`ppe_operator_no_loop.local.cmd`).
 - Do **not** enable `DESKTOP_AUTO` on the daily PC unless you explicitly opt in.
 
+**Canonical scripts (5 surfaces):** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+
 Phone ntfy messages append the same hints via `scripts/ppe_operator_hint.py`.

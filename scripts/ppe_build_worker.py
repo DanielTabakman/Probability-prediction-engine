@@ -30,9 +30,40 @@ PREF_CURSOR: BuildWorkerPref = "cursor"
 PREF_CODEX: BuildWorkerPref = "codex"
 PREF_MANUAL: BuildWorkerPref = "manual"
 
+BUILD_WORKER_EVENTS_REL = "artifacts/orchestrator/build_worker_events.jsonl"
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def append_build_worker_event(repo: Path, payload: dict[str, Any]) -> None:
+    """Append structured BUILD worker routing event (gitignored artifacts dir)."""
+    repo = repo.resolve()
+    path = repo / BUILD_WORKER_EVENTS_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    row = {"ts": _utc_now(), **payload}
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, sort_keys=True) + "\n")
+
+
+def read_build_worker_events(repo: Path, *, limit: int = 20) -> list[dict[str, Any]]:
+    path = repo.resolve() / BUILD_WORKER_EVENTS_REL
+    if not path.is_file():
+        return []
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    out: list[dict[str, Any]] = []
+    for line in lines[-limit:]:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            row = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(row, dict):
+            out.append(row)
+    return out
 
 
 def iter_codex_cli_candidates() -> list[str]:
@@ -171,6 +202,10 @@ def mark_codex_usage_exhausted(repo: Path, *, detail: str = "") -> None:
         }
     )
     save_handoff_state(repo, state)
+    append_build_worker_event(
+        repo,
+        {"event": "codex_usage_exhausted", "detail": detail[:500] if detail else ""},
+    )
 
 
 def _worker_available(worker: WorkerKind, repo: Path) -> bool:
@@ -262,7 +297,7 @@ def _worker_result(
     reason: str,
     mode: Literal["headless", "manual"],
 ) -> dict[str, Any]:
-    return {
+    result = {
         "worker": worker,
         "pref": pref,
         "mode": mode,
@@ -272,6 +307,8 @@ def _worker_result(
         "cursor_cli_exhausted": _cursor_cli_exhausted(repo),
         "codex_cli_exhausted": _codex_cli_exhausted(repo),
     }
+    append_build_worker_event(repo, {"event": "worker_resolve", **result})
+    return result
 
 
 def build_product_prompt(
