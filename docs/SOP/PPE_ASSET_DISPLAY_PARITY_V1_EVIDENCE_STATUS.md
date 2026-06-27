@@ -1,7 +1,7 @@
 # PPE asset display parity v1 — evidence status
 
 **Chapter:** `ppe_asset_display_parity_v1`  
-**Status:** **IN PROGRESS** (SELECTED 2026-06-27)  
+**Status:** **COMPLETE** (closed 2026-06-27)  
 **SELECTION:** [`POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md`](POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_asset_display_parity_v1_relay.json`](PHASE_PLANS/ppe_asset_display_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md)  
@@ -13,7 +13,7 @@
 | PPE-DisplayParity-Core-Slice002 | **CLOSED** | WSGI TTL cache + depth param + warm script |
 | PPE-DisplayParity-Product-Slice003 | **CLOSED** | MSOS SSR prefetch + client loading UX |
 | PPE-DisplayParity-Platform-Slice004 | **CLOSED** | Deploy warm + pytest |
-| PPE-DisplayParity-Closeout-Slice005 | PENDING | Production verify + chapter close |
+| PPE-DisplayParity-Closeout-Slice005 | **CLOSED** | Chapter closeout VM 2026-06-27 |
 
 ---
 

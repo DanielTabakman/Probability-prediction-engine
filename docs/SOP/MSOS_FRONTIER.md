@@ -11,8 +11,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
-- **Active relay chapter:** `ppe_asset_display_parity_v1` · plan [`ppe_asset_display_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json)
-- **Next steward action:** Relay closeout PPE-DisplayParity-Closeout-Slice005; product slices 002–004 pre-shipped on main
+- **Active relay chapter:** `mvp1_cross_venue_backtest_v1` · plan [`mvp1_cross_venue_backtest_v1_relay.json`](docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json)
+- **Next steward action:** Relay closeout MVP1-CrossVenueBacktest-Closeout-Slice004; product slice 002 on main (#415)
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
