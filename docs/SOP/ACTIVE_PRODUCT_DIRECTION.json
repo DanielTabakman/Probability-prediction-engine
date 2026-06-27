@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pivotId": "trader-workflow-integration-v1",
-  "asOf": "2026-06-26",
+  "asOf": "2026-06-27",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
@@ -34,12 +34,26 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-26",
       "evidence": "docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_tradeable_universe_v1",
+      "label": "PPE tradeable universe v1",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_deribit_crypto_tier1_v1",
+      "label": "Deribit crypto tier-1 (SOL BNB XRP)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_tradeable_universe_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
-  "nextStewardAction": "Run ppe_auto_select --apply (done) then run_ppe.cmd on ppe_tradeable_universe_v1 Control-Slice001",
+  "activeBuildChapterId": "ppe_equity_universe_tier1a_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+  "nextStewardAction": "VM loop continues ppe_equity_universe_tier1a_v1 relay (SPY QQQ IWM); desktop idle unless IDE_BUILD",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -89,7 +103,7 @@
     {
       "id": "tradeable_universe_v1",
       "doc": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
-      "role": "active relay — registry v2 + catalog API"
+      "role": "COMPLETE — registry v2 + catalog API + MSOS picker"
     },
     {
       "id": "options_horizon_v1",
@@ -109,7 +123,9 @@
       "ppe_crypto_multi_asset_v1",
       "msos_self_serve_onboarding_v1",
       "ppe_equity_options_v1",
-      "ppe_tradeable_universe_v1"
+      "ppe_tradeable_universe_v1",
+      "ppe_deribit_crypto_tier1_v1",
+      "ppe_equity_universe_tier1a_v1"
     ]
   },
   "supersedes": {

@@ -12,12 +12,12 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-26) |
+| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_tradeable_universe_v1` — [`SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md`](docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md) |
-| **Relay plan** | [`ppe_tradeable_universe_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json) |
-| **Next** | Run ppe_auto_select --apply (done) then run_ppe.cmd on ppe_tradeable_universe_v1 Control-Slice001 |
+| **Active BUILD** | `ppe_equity_universe_tier1a_v1` — [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md) |
+| **Relay plan** | [`ppe_equity_universe_tier1a_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json) |
+| **Next** | VM loop continues ppe_equity_universe_tier1a_v1 relay (SPY QQQ IWM); desktop idle unless IDE_BUILD |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -25,6 +25,8 @@ This file merges archived chapters, steward parallel work, engineering gates, an
   - `msos_self_serve_onboarding_v1`
   - `ppe_equity_options_v1`
   - `ppe_tradeable_universe_v1`
+  - `ppe_deribit_crypto_tier1_v1`
+  - `ppe_equity_universe_tier1a_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
