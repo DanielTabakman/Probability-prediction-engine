@@ -56,9 +56,9 @@ if ($ZoneId) {
     & $ghExe secret set CLOUDFLARE_ZONE_ID --repo $repo --body $ZoneId
     Write-Host "Set CLOUDFLARE_ZONE_ID on $repo." -ForegroundColor Green
 } else {
-    Write-Host "CLOUDFLARE_ZONE_ID optional — script resolves zone by name if omitted." -ForegroundColor DarkGray
+    Write-Host 'CLOUDFLARE_ZONE_ID optional - script resolves zone by name if omitted.' -ForegroundColor DarkGray
 }
 
 Write-Host ""
 Write-Host "Next: GitHub Actions -> Deploy VPS Staging -> Run workflow" -ForegroundColor Cyan
-Write-Host "Or: gh workflow run deploy-vps-staging.yml --ref main" -ForegroundColor DarkGray
+Write-Host 'Or: gh workflow run deploy-vps-staging.yml --ref main' -ForegroundColor DarkGray
