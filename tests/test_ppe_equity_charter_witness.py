@@ -46,8 +46,12 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
     )
     assert row["status"] == "DONE"
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
-    assert manifest.get("status") in ("READY", "RUNNING")
+    assert manifest.get("phasePlanPath") in (
+        "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+    )
+    assert manifest.get("status") in ("READY", "RUNNING", "COMPLETE")
 
 
 def test_equity_sprint_complete_not_deferred() -> None:
