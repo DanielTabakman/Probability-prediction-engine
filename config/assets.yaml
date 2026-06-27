@@ -40,7 +40,7 @@ assets:
     price_unit: USD
     contract_multiplier: 100
     data_source: yfinance
-    enabled: false
+    enabled: true
     spread_width: 25
     catalog:
       group: equity_mega
