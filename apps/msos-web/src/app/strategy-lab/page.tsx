@@ -2,18 +2,28 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { StrategyLabContent } from "@/components/StrategyLabContent";
-import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
+import {
+  fetchDisplayPayload,
+  normalizeLabAssetId,
+} from "@/lib/ppeDisplayPayload";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Strategy Lab | Market Structure OS",
   description:
-    "Compare your view to what BTC options imply — live Deribit data on the demo.",
+    "Compare your view to what options imply — live market data on the demo.",
 };
 
-export default async function StrategyLabPage() {
-  const displayPayload = await fetchDisplayPayload();
+type StrategyLabPageProps = {
+  searchParams: Promise<{ asset?: string | string[] }>;
+};
+
+export default async function StrategyLabPage({ searchParams }: StrategyLabPageProps) {
+  const params = await searchParams;
+  const rawAsset = Array.isArray(params.asset) ? params.asset[0] : params.asset;
+  const assetId = normalizeLabAssetId(rawAsset);
+  const displayPayload = await fetchDisplayPayload(assetId);
 
   return (
     <AppShell activeNavId="strategy-lab">

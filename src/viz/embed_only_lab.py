@@ -91,7 +91,11 @@ def _spot_for_asset(asset_id: str) -> float:
     return 0.0
 
 
-def _load_export_rows(*, asset_id: str | None = None) -> tuple[str, float, list[dict[str, str]]]:
+def _load_export_rows(
+    *,
+    asset_id: str | None = None,
+    max_expiries: int | None = None,
+) -> tuple[str, float, list[dict[str, str]]]:
     import pandas as pd
 
     aid = normalize_lab_asset_id(asset_id)
@@ -101,6 +105,8 @@ def _load_export_rows(*, asset_id: str | None = None) -> tuple[str, float, list[
     expiries, _diag = cached_option_expiries(asset_id=aid)
     if not expiries:
         raise RuntimeError(f"No option expiries available for embed display boundary ({aid}).")
+    if max_expiries is not None and max_expiries > 0:
+        expiries = expiries[:max_expiries]
     run_ts = pd.Timestamp.now(tz="UTC")
     as_of_utc = run_ts.isoformat()
     now_ms = run_ts.timestamp() * 1000

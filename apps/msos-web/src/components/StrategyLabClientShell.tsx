@@ -46,8 +46,14 @@ type StrategyLabClientShellProps = {
   initialPayload: DisplayPayload | null;
 };
 
-function resolveInitialMode(initialPayload: DisplayPayload | null): LabDataMode {
-  return initialPayload ? "live" : "loading";
+function resolveInitialMode(
+  initialPayload: DisplayPayload | null,
+  assetId: LabAssetId,
+): LabDataMode {
+  if (initialPayload && isPayloadForSelectedAsset(initialPayload, assetId)) {
+    return "live";
+  }
+  return "loading";
 }
 
 function buildAssetHref(
@@ -77,7 +83,9 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     catalogAssetIds,
   );
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
-  const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
+  const [mode, setMode] = useState<LabDataMode>(() =>
+    resolveInitialMode(initialPayload, selectedAssetId),
+  );
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [tutorialBeginner, setTutorialBeginner] = useState(false);
   const assetMeta = useMemo(
@@ -127,7 +135,15 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
 
   useEffect(() => {
     let cancelled = false;
-    setMode("loading");
+    const ssrMatches =
+      initialPayload !== null && isPayloadForSelectedAsset(initialPayload, selectedAssetId);
+
+    if (ssrMatches) {
+      setPayload(initialPayload);
+      setMode("live");
+    } else {
+      setMode("loading");
+    }
 
     void (async () => {
       const livePayload = await fetchDisplayPayloadClient(selectedAssetId);
@@ -137,6 +153,9 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       if (livePayload && isPayloadForSelectedAsset(livePayload, selectedAssetId)) {
         setPayload(livePayload);
         setMode("live");
+        return;
+      }
+      if (ssrMatches && initialPayload) {
         return;
       }
       if (selectedAssetId === DEFAULT_LAB_ASSET_ID && initialPayload) {
