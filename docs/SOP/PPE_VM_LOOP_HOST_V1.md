@@ -234,6 +234,7 @@ Guard script: `scripts/ppe_loop_host_guard.py` · wired into `run_ppe_headless_s
 | Daily status (CLI) | VM: `check_vm_loop.cmd` or `ppe_autobuilder.cmd status --brief` |
 | Worse | Hyper-V → Restore checkpoint **clean-base** → re-run Phase 4–5 |
 | Host focus storms | Desktop: **`DESKTOP_STOP.cmd`** · confirm `ppe_operator_no_loop.local.cmd` exists |
+| Headless Codex on VM (auto IDE BUILD) | Daily PC: **`setup_vm_codex.cmd`** once (install + `codex login` on VM) |
 | `stack_forbidden` on VM | Remove `ppe_operator_no_loop.local.cmd` (or run `setup_vm_loop_host.cmd` — renames to `.off-vm`) |
 
 **Operator card:** [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) · **Session handoff:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
