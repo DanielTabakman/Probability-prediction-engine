@@ -67,8 +67,14 @@ def test_roadmap_lists_universe_program_after_equity() -> None:
 
 def test_manifest_points_at_tradeable_universe_chapter() -> None:
     manifest = json.loads((SOP / "ACTIVE_PHASE_MANIFEST.json").read_text(encoding="utf-8"))
-    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
-    assert manifest.get("status") in ("READY", "RUNNING")
+    plan = manifest.get("phasePlanPath")
+    universe_plan = "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
+    if plan == universe_plan:
+        assert manifest.get("status") in ("READY", "RUNNING", "COMPLETE")
+        return
+    queue = json.loads((SOP / "PHASE_QUEUE.json").read_text(encoding="utf-8"))
+    row = next(item for item in queue["items"] if item.get("planPath") == universe_plan)
+    assert row["status"] == "DONE"
 
 
 def test_universe_control_slice_closed_in_evidence_doc() -> None:

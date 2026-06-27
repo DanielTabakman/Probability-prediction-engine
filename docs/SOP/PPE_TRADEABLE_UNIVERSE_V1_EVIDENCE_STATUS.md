@@ -1,7 +1,7 @@
 # PPE tradeable universe v1 — evidence status
 
 **Chapter:** `ppe_tradeable_universe_v1`  
-**Status:** **CHARTERED** (SELECTED 2026-06-26)  
+**Status:** **COMPLETE** 2026-06-27 (SELECTED 2026-06-26)  
 **SELECTION:** [`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_tradeable_universe_v1_relay.json`](PHASE_PLANS/ppe_tradeable_universe_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md`](SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md)  

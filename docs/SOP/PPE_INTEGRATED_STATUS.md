@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-26 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-27 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -146,6 +146,10 @@ flowchart LR
 
 | PPE equity options v1 (single ticker) | **COMPLETE** 2026-06-26 | [`SPRINT_PPE_EQUITY_OPTIONS_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md), [`PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md) |
 
+| PPE tradeable universe v1 (infrastructure) | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md`](docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md), [`PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md) |
+
+| PPE Deribit crypto tier-1 v1 | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md`](docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md), [`PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -205,4 +209,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
