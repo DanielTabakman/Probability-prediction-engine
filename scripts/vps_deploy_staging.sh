@@ -61,10 +61,12 @@ docker compose build --no-cache msos_web_staging \
 docker rm -f msos_web_staging 2>/dev/null || true
 docker compose --profile staging up -d --force-recreate msos_web_staging
 
-# Shared Caddy from production root — reload routes if production checkout is newer.
+# Reload shared Caddy routes (avoid --force-recreate — races production deploy on :80).
 if [[ -d "$PROD_ROOT" && "$PROD_ROOT" != "$STAGING_ROOT" ]]; then
   (cd "$PROD_ROOT" && git pull --ff-only origin main 2>/dev/null || true)
-  (cd "$PROD_ROOT" && docker compose up -d --force-recreate caddy) || true
+  (cd "$PROD_ROOT" && docker compose restart caddy) \
+    || (cd "$PROD_ROOT" && docker compose up -d caddy) \
+    || true
 fi
 
 echo "vps_deploy_staging: msos_web_staging up — https://staging.marketstructureos.com/"
