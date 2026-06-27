@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_equity_universe_tier1a_v1` — [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md) |
-| **Relay plan** | [`ppe_equity_universe_tier1a_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json) |
-| **Next** | VM loop continues ppe_equity_universe_tier1a_v1 relay (SPY QQQ IWM); desktop idle unless IDE_BUILD |
+| **Active BUILD** | `ppe_commodity_proxy_tier1_v1` — [`SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md`](docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md) |
+| **Relay plan** | [`ppe_commodity_proxy_tier1_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json) |
+| **Next** | VM run_ppe.cmd on ppe_commodity_proxy_tier1_v1; finish gh auth setup-git on ppeloop for loop publish |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
