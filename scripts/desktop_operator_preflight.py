@@ -128,6 +128,24 @@ def check_cursor_tokens_first(repo: Path) -> bool:
     return False
 
 
+def check_codex_tokens_first(repo: Path) -> bool:
+    from scripts.ppe_build_worker import evaluate_codex_first_policy
+
+    policy = evaluate_codex_first_policy(repo)
+    line = (
+        f"Codex-first: pref={policy.get('pref')} worker={policy.get('worker')} "
+        f"mode={policy.get('mode')} codex_quota={policy.get('codex_has_quota')}"
+    )
+    print(line)
+    verdict = str(policy.get("verdict") or "warn")
+    detail = str(policy.get("detail") or "")
+    if verdict == "ok" or verdict == "info":
+        _ok(detail)
+        return True
+    _warn(detail)
+    return False
+
+
 def check_build_worker(repo: Path) -> bool:
     from scripts.ppe_build_worker import collect_build_worker_status
 
@@ -198,6 +216,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Check Cursor CLI is used before Codex when Cursor has quota",
     )
+    ap.add_argument(
+        "--codex-first",
+        action="store_true",
+        help="Check Codex CLI is preferred to preserve Cursor quota (local default)",
+    )
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -220,6 +243,15 @@ def main(argv: list[str] | None = None) -> int:
             if check_agent_cli()
             and check_codex_cli()
             and check_cursor_tokens_first(repo)
+            and check_build_worker(repo)
+            else 1
+        )
+
+    if args.codex_first:
+        return (
+            0
+            if check_codex_cli()
+            and check_codex_tokens_first(repo)
             and check_build_worker(repo)
             else 1
         )

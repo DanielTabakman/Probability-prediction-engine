@@ -7,7 +7,6 @@ from typing import Any
 
 from scripts.ppe_operator_hint import resolve_operator_hint
 from scripts.ppe_operator_status import VERDICT_IDE_BUILD, VERDICT_RUN_LOCAL, collect_operator_status
-from scripts.ppe_remote_agent import launch_agent_background
 
 CONTINUITY_BRIEF = "docs/SOP/AGENT_CONTINUITY_BRIEF.md"
 
@@ -102,17 +101,24 @@ def launch_fix_cli(
     source: str = "phone",
     status: dict[str, Any] | None = None,
     prompt: str | None = None,
+    worker: str | None = None,
 ) -> dict[str, Any]:
     """Start headless CLI fix worker only (no IDE handoff)."""
+    from scripts.ppe_build_worker import WORKER_CURSOR_CLI, launch_build_worker_background, resolve_build_worker
+
     repo = repo.resolve()
     if status is None:
         status = collect_operator_status(repo)
     if prompt is None:
         prompt = build_fix_prompt(repo, user_note=user_note)
 
-    out = launch_agent_background(
+    resolved = resolve_build_worker(repo) if worker is None else {"worker": worker}
+    build_worker = str(resolved.get("worker") or WORKER_CURSOR_CLI)
+
+    out = launch_build_worker_background(
         repo,
         prompt=prompt,
+        worker=build_worker,  # type: ignore[arg-type]
         log_name="REMOTE_FIX_AGENT.log",
         started_message="Fix agent started on desktop.",
         notify_ok_title="PPE fix finished",
@@ -123,9 +129,10 @@ def launch_fix_cli(
             "blocker": str(status.get("blocker") or ""),
             "source": source,
             "user_note": user_note,
+            "build_worker": build_worker,
         },
     )
-    return {"action": "fix", **out}
+    return {"action": "fix", "build_worker": build_worker, **out}
 
 
 def launch_fix_agent(repo: Path, *, user_note: str = "") -> dict[str, Any]:
