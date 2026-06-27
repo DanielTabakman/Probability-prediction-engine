@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_equity_universe_tier1a_v1` — [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md) |
-| **Relay plan** | [`ppe_equity_universe_tier1a_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json) |
-| **Next** | VM loop continues ppe_equity_universe_tier1a_v1 relay (SPY QQQ IWM); desktop idle unless IDE_BUILD |
+| **Active BUILD** | `ppe_commodity_proxy_tier1_v1` — [`SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md`](docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md) |
+| **Relay plan** | [`ppe_commodity_proxy_tier1_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json) |
+| **Next** | VM run_ppe.cmd on ppe_commodity_proxy_tier1_v1; finish gh auth setup-git on ppeloop for loop publish |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -152,6 +152,12 @@ flowchart LR
 
 | PPE Deribit crypto tier-1 v1 | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md`](docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md), [`PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md) |
 
+| PPE equity universe tier-1a v1 (indices) | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md), [`PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md) |
+
+| PPE equity universe tier-1b v1 (mega caps batch 1) | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md), [`PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md) |
+
+| PPE equity universe tier-1c v1 (mega caps batch 2) | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md), [`PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -211,4 +217,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md`](docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
-_No merges to `main`._
+- **Chapter closed:** PPE Deribit crypto tier-1 v1 (`PPE-CryptoT1-Closeout-Slice004`)
+- **Chapter closed:** PPE equity universe tier-1a v1 (indices) (`PPE-EqT1a-Closeout-Slice004`)
 
 ## 2026-06-26
 

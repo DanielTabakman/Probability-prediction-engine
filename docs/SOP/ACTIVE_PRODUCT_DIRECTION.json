@@ -48,12 +48,33 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-27",
       "evidence": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_equity_universe_tier1a_v1",
+      "label": "Equity tier-1a (SPY QQQ IWM)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_equity_universe_tier1b_v1",
+      "label": "Equity tier-1b (mega caps batch 1)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_equity_universe_tier1c_v1",
+      "label": "Equity tier-1c (TSLA AMD COIN)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_equity_universe_tier1a_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
-  "nextStewardAction": "VM loop continues ppe_equity_universe_tier1a_v1 relay (SPY QQQ IWM); desktop idle unless IDE_BUILD",
+  "activeBuildChapterId": "ppe_commodity_proxy_tier1_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+  "nextStewardAction": "VM run_ppe.cmd on ppe_commodity_proxy_tier1_v1; finish gh auth setup-git on ppeloop for loop publish",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

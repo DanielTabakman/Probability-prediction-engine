@@ -352,34 +352,38 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "urgent": true,
       "urgentReason": "Operator SOL-first \u2014 first tier-1 batch after universe infra",
-      "focusPlaybookTier": "P1"
+      "focusPlaybookTier": "P1",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Equity mega caps batch 1",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Equity mega caps batch 2",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
       "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
     },
@@ -412,6 +416,12 @@
       "status": "PLANNED",
       "reason": "[LOW] Parallel slice locks",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
+      "status": "READY",
+      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     }
   ]
 }
