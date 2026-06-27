@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
   "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Equity mega caps batch 1",
   "workerMode": "deterministic"
 }
