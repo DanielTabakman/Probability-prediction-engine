@@ -42,6 +42,10 @@ EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
 DISPLAY_PAYLOAD_MODE = "native_json"
+DISPLAY_DEPTH_QUERY_PARAM = "depth"
+DISPLAY_DEPTH_FULL = "full"
+DISPLAY_DEPTH_SUMMARY = "summary"
+DISPLAY_SUMMARY_MAX_EXPIRIES = 5
 CATALOG_PAYLOAD_KIND = "asset_catalog"
 CATALOG_PAYLOAD_SCHEMA_VERSION = 1
 EMBED_ONLY_FALLBACK_MODE = "streamlit_embed_only"
@@ -171,6 +175,27 @@ def _query_float(environ: dict[str, Any], key: str, default: float) -> float:
         return default
 
 
+def _query_str(environ: dict[str, Any], key: str, default: str) -> str:
+    raw = parse_qs(environ.get("QUERY_STRING") or "", keep_blank_values=False).get(key)
+    if not raw:
+        return default
+    value = str(raw[0]).strip().lower()
+    return value or default
+
+
+def display_depth_from_environ(environ: dict[str, Any]) -> str:
+    depth = _query_str(environ, DISPLAY_DEPTH_QUERY_PARAM, DISPLAY_DEPTH_FULL)
+    if depth not in (DISPLAY_DEPTH_FULL, DISPLAY_DEPTH_SUMMARY):
+        return DISPLAY_DEPTH_FULL
+    return depth
+
+
+def max_expiries_for_depth(depth: str) -> int | None:
+    if str(depth or "").strip().lower() == DISPLAY_DEPTH_SUMMARY:
+        return DISPLAY_SUMMARY_MAX_EXPIRIES
+    return None
+
+
 def _parse_float(value: str | float | int | None) -> float | None:
     if value is None:
         return None
@@ -256,6 +281,17 @@ def build_distribution_display_payload(
             series.append(s)
     belief_presets = series[0].get("belief_presets", {}) if series else {}
     curve_labels = build_curve_display_labels()
+    trust_states = {
+        str(row.get("trust_state") or "ok").strip().lower()
+        for row in export_rows
+        if row.get("trust_state")
+    }
+    if "thin_chain" in trust_states:
+        trust_state = "thin_chain"
+    elif trust_states & {"error", "fail", "degraded"}:
+        trust_state = "degraded"
+    else:
+        trust_state = "ok"
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
@@ -268,10 +304,12 @@ def build_distribution_display_payload(
         "series_by_expiry": series,
         "belief_presets": belief_presets,
         "curve_labels": curve_labels,
+        "trust_state": trust_state,
         "meta": {
             "read_only": True,
             "display_mode": DISPLAY_PAYLOAD_MODE,
             "fallback_mode": EMBED_ONLY_FALLBACK_MODE,
+            "trust_state": trust_state,
             "embed_query": f"?{EMBED_ONLY_QUERY_PARAM}=1",
             "json_query": f"?{EMBED_JSON_QUERY_PARAM}={EMBED_JSON_QUERY_VALUE}",
             "embed_json_query": (
@@ -423,6 +461,7 @@ def build_live_distribution_display_payload(
     *,
     asset_id: str | None = None,
     environ: dict[str, Any] | None = None,
+    display_depth: str | None = None,
 ) -> dict[str, Any]:
     """Live options-backed payload for platform WSGI / MSOS display API proxy."""
     from src.viz.embed_only_lab import _load_export_rows
@@ -430,13 +469,49 @@ def build_live_distribution_display_payload(
     aid = normalize_lab_asset_id(asset_id)
     if environ is not None and asset_id is None:
         aid = lab_asset_id_from_environ(environ)
-    as_of_utc, spot_usd, export_rows = _load_export_rows(asset_id=aid)
-    return build_distribution_display_payload(
+    depth = display_depth or (
+        display_depth_from_environ(environ) if environ is not None else DISPLAY_DEPTH_FULL
+    )
+    max_expiries = max_expiries_for_depth(depth)
+    as_of_utc, spot_usd, export_rows = _load_export_rows(
+        asset_id=aid,
+        max_expiries=max_expiries,
+    )
+    payload = build_distribution_display_payload(
         as_of_utc=as_of_utc,
         spot_usd=spot_usd,
         export_rows=export_rows,
         asset_id=aid,
     )
+    meta = payload.setdefault("meta", {})
+    if isinstance(meta, dict):
+        meta["display_depth"] = depth
+    return payload
+
+
+def build_cached_live_distribution_display_payload(environ: dict[str, Any]) -> dict[str, Any]:
+    """WSGI provider: TTL cache keyed by asset + depth."""
+    from src.viz.display_payload_cache import get_cached_display_payload
+
+    aid = lab_asset_id_from_environ(environ)
+    depth = display_depth_from_environ(environ)
+    return get_cached_display_payload(
+        aid,
+        depth,
+        lambda: build_live_distribution_display_payload(
+            asset_id=aid,
+            display_depth=depth,
+        ),
+    )
+
+
+def display_cache_control_header() -> str:
+    from src.viz.display_payload_cache import cache_enabled, display_cache_ttl_seconds
+
+    ttl = display_cache_ttl_seconds()
+    if cache_enabled() and ttl > 0:
+        return f"public, max-age={ttl}"
+    return "no-store"
 
 
 def create_display_payload_wsgi_app(
@@ -464,6 +539,21 @@ def create_display_payload_wsgi_app(
                 )
                 return [err]
             body = serialize_distribution_display_payload(payload).encode("utf-8")
+            start_response(
+                "200 OK",
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", display_cache_control_header()),
+                ],
+            )
+            return [body]
+
+        if path == "/cache-status.json":
+            from src.viz.display_payload_cache import display_cache_status
+
+            status_payload = display_cache_status()
+            body = json.dumps(status_payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
             start_response(
                 "200 OK",
                 [

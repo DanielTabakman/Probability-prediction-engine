@@ -1,0 +1,51 @@
+{
+  "name": "ppe_asset_enablement_pipeline_v1 (batch witness + enable_asset_batch.py)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-EnablePipe-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-EnablePipe-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/witness_asset_catalog.py",
+        "scripts/enable_asset_batch.py",
+        "src/data/assets_registry.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-EnablePipe-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docs/SOP/ASSET_ENABLEMENT_RUNBOOK_V1.md",
+        "tests/"
+      ]
+    },
+    {
+      "sliceId": "PPE-EnablePipe-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}

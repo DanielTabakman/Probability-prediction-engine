@@ -59,6 +59,11 @@ jobs:
               --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
             docker compose up -d --force-recreate msos_web
             docker compose up -d --force-recreate
+            echo "Warming display payload cache for enabled assets…"
+            docker compose exec -T ppe_display_api \
+              python scripts/warm_display_payload_cache.py \
+              --base-url http://127.0.0.1:8765 \
+              || echo "display cache warm failed (non-fatal; first user hit may be slow)"
 
       - name: Demo site health (no import traceback)
         run: |
@@ -150,6 +155,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           python -m playwright install chromium
+
+      - name: Production multi-asset display witness
+        run: |
+          set -euo pipefail
+          export PYTHONPATH=.
+          python scripts/msos_production_multi_asset_witness.py --write artifacts/health/msos_production_multi_asset_witness.json
 
       - name: Production demo witness
         run: |

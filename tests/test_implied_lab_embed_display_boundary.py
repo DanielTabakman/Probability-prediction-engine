@@ -3,19 +3,25 @@
 from __future__ import annotations
 
 import json
+import os
+from unittest.mock import patch
 
 import pytest
 
 from src.viz.distribution_export import build_distribution_export_rows
 from src.viz.curve_display_labels import build_curve_display_labels
+from src.viz.display_payload_cache import clear_display_payload_cache, get_cached_display_payload
 from src.viz.embed_display_boundary import (
     BELIEF_OVERLAY_KIND,
     CATALOG_PAYLOAD_HTTP_PATH,
     CATALOG_PAYLOAD_KIND,
+    DISPLAY_DEPTH_FULL,
+    DISPLAY_DEPTH_SUMMARY,
     DISPLAY_PAYLOAD_HTTP_PATH,
     DISPLAY_PAYLOAD_KIND,
     DISPLAY_PAYLOAD_MODE,
     DISPLAY_PAYLOAD_SCHEMA_VERSION,
+    DISPLAY_SUMMARY_MAX_EXPIRIES,
     EMBED_ONLY_FALLBACK_MODE,
     build_asset_catalog_response,
     build_belief_overlay_response,
@@ -23,6 +29,9 @@ from src.viz.embed_display_boundary import (
     build_chart_series_from_export_row,
     clamp_belief_mult,
     create_display_payload_wsgi_app,
+    display_cache_control_header,
+    display_depth_from_environ,
+    max_expiries_for_depth,
     serialize_distribution_display_payload,
     validate_asset_catalog_payload,
     witness_display_boundary_for_asset,
@@ -128,7 +137,8 @@ def test_wsgi_app_serves_json() -> None:
     assert any(h == ("Content-Type", "application/json; charset=utf-8") for h in headers)
     parsed = json.loads(body.decode("utf-8"))
     assert parsed["kind"] == DISPLAY_PAYLOAD_KIND
-    assert any(h == ("Cache-Control", "no-store") for h in headers)
+    cache_header = dict(headers).get("Cache-Control", "")
+    assert cache_header == display_cache_control_header()
 
 
 def test_asset_catalog_response_grouped_enabled_assets() -> None:
@@ -454,3 +464,98 @@ def test_strategy_suggestion_wsgi_requires_expiry() -> None:
     assert status == ["400 Bad Request"]
     parsed = json.loads(body.decode("utf-8"))
     assert parsed["kind"] == "strategy_suggestion_error"
+
+
+def test_display_depth_helpers() -> None:
+    assert max_expiries_for_depth(DISPLAY_DEPTH_FULL) is None
+    assert max_expiries_for_depth(DISPLAY_DEPTH_SUMMARY) == DISPLAY_SUMMARY_MAX_EXPIRIES
+    environ = {"QUERY_STRING": "depth=summary&asset=NVDA"}
+    assert display_depth_from_environ(environ) == DISPLAY_DEPTH_SUMMARY
+    assert display_depth_from_environ({"QUERY_STRING": "depth=invalid"}) == DISPLAY_DEPTH_FULL
+
+
+def test_display_wsgi_sets_cache_control_when_enabled(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("PPE_DISPLAY_CACHE_ENABLED", "1")
+    monkeypatch.setenv("PPE_DISPLAY_CACHE_TTL_SECONDS", "90")
+    payload = build_distribution_display_payload(
+        as_of_utc="2026-06-06T12:00:00+00:00",
+        spot_usd=99_000.0,
+        export_rows=_sample_export_rows(),
+        asset_id="BTC",
+    )
+    app = create_display_payload_wsgi_app(lambda _environ: payload)
+    headers: list[tuple[str, str]] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        headers.extend(hdrs)
+
+    app({"PATH_INFO": "/display.json", "QUERY_STRING": ""}, start_response)
+    cache_header = dict(headers).get("Cache-Control", "")
+    assert cache_header == display_cache_control_header()
+    assert "max-age=90" in cache_header
+
+
+def test_display_payload_cache_returns_same_payload_within_ttl() -> None:
+    clear_display_payload_cache()
+    calls = {"n": 0}
+
+    def builder() -> dict:
+        calls["n"] += 1
+        return {"kind": "distribution_display_boundary", "n": calls["n"]}
+
+    with patch.dict(os.environ, {"PPE_DISPLAY_CACHE_ENABLED": "1", "PPE_DISPLAY_CACHE_TTL_SECONDS": "60"}):
+        first = get_cached_display_payload("BTC", "full", builder)
+        second = get_cached_display_payload("BTC", "full", builder)
+
+    assert first == second == {"kind": "distribution_display_boundary", "n": 1}
+    assert calls["n"] == 1
+
+
+def test_display_payload_cache_keys_by_asset_and_depth() -> None:
+    clear_display_payload_cache()
+    calls: list[tuple[str, str]] = []
+
+    def builder(asset_id: str, depth: str):
+        def _inner() -> dict:
+            calls.append((asset_id, depth))
+            return {"asset_id": asset_id, "depth": depth}
+
+        return _inner
+
+    with patch.dict(os.environ, {"PPE_DISPLAY_CACHE_ENABLED": "1", "PPE_DISPLAY_CACHE_TTL_SECONDS": "60"}):
+        get_cached_display_payload("BTC", "full", builder("BTC", "full"))
+        get_cached_display_payload("ETH", "full", builder("ETH", "full"))
+        get_cached_display_payload("BTC", "summary", builder("BTC", "summary"))
+        get_cached_display_payload("BTC", "full", builder("BTC", "full"))
+
+    assert calls == [("BTC", "full"), ("ETH", "full"), ("BTC", "summary")]
+
+
+def test_display_wsgi_cache_status_route() -> None:
+    app = create_display_payload_wsgi_app(lambda _environ: {})
+    headers: list[tuple[str, str]] = []
+
+    def start_response(code: str, hdrs: list[tuple[str, str]]) -> None:
+        headers.extend(hdrs)
+
+    body = b"".join(app({"PATH_INFO": "/cache-status.json", "QUERY_STRING": ""}, start_response))
+    parsed = json.loads(body.decode("utf-8"))
+    assert "ttl_seconds" in parsed
+    assert "enabled_assets" in parsed
+    assert dict(headers).get("Content-Type") == "application/json; charset=utf-8"
+
+
+def test_display_payload_cache_disabled_rebuilds_each_time() -> None:
+    clear_display_payload_cache()
+    calls = {"n": 0}
+
+    def builder() -> dict:
+        calls["n"] += 1
+        return {"n": calls["n"]}
+
+    with patch.dict(os.environ, {"PPE_DISPLAY_CACHE_ENABLED": "0"}):
+        get_cached_display_payload("BTC", "full", builder)
+        get_cached_display_payload("BTC", "full", builder)
+
+    assert calls["n"] == 2
+

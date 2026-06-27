@@ -22,6 +22,7 @@ export type ThesisRecord = {
   updatedAt: string;
   /** Captured from Strategy Lab at confirm time. */
   expiryDate?: string;
+  assetId?: string;
   beliefSnapshot?: ThesisBeliefSnapshot;
   disagreementLine?: string;
   spotUsdAtConfirm?: number;

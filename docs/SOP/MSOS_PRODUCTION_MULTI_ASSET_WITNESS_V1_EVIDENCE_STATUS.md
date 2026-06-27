@@ -1,0 +1,20 @@
+# MSOS production multi-asset witness v1 — evidence status
+
+**Chapter:** `msos_production_multi_asset_witness_v1`  
+**Status:** **CHARTERED** (SELECTED 2026-06-27)  
+**SELECTION:** [`POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md`](POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md)  
+**Phase plan:** [`PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json`](PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json)
+
+| Slice | Status | Notes |
+|-------|--------|-------|
+| MSOS-MultiAssetWit-Control-Slice001 | PENDING | Witness spec |
+| MSOS-MultiAssetWit-Platform-Slice002 | PENDING | Script + deploy hook |
+| MSOS-MultiAssetWit-Product-Slice003 | PENDING | Playwright spot |
+| MSOS-MultiAssetWit-Closeout-Slice004 | PENDING | Chapter close |
+
+## Production SLA (draft)
+
+| Venue | display.json timeout |
+|-------|---------------------|
+| deribit | 60s |
+| equity | 180s |

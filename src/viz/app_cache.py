@@ -72,34 +72,55 @@ def cached_lab_spot(asset_id: str | None = None):
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_option_instruments():
-    """Single get_instruments(option) payload; reused for spreads + options chart."""
-    return fetch_deribit_btc_options_instruments(expired=False)
+def cached_option_instruments(asset_id: str | None = None):
+    """Single get_instruments(option) payload; keyed by asset for cache isolation."""
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        return []
+    from src.data.fetch_deribit import fetch_deribit_options_instruments
+
+    return fetch_deribit_options_instruments(deribit_currency(aid), expired=False)
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_option_book_marks():
-    """Single get_book_summary_by_currency(BTC, option); reused for spread marks (no per-ticker storm)."""
-    return fetch_deribit_btc_option_book_marks()
+def cached_option_book_marks(asset_id: str | None = None):
+    """Book summary by currency; keyed by asset for cache isolation."""
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        return []
+    from src.data.fetch_deribit import fetch_deribit_option_book_marks
+
+    return fetch_deribit_option_book_marks(currency=deribit_currency(aid))
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_bull_spreads(spot_price, spread_width, max_expiries):
-    inst = cached_option_instruments()
-    marks = cached_option_book_marks()
-    return fetch_deribit_btc_tight_bull_spreads(
+def cached_bull_spreads(spot_price, spread_width, max_expiries, asset_id: str | None = None):
+    aid = _norm_asset_id(asset_id)
+    inst = cached_option_instruments(aid)
+    marks = cached_option_book_marks(aid)
+    if asset_venue(aid) == "equity":
+        return []
+    from src.data.fetch_deribit import fetch_deribit_tight_bull_spreads
+
+    return fetch_deribit_tight_bull_spreads(
         spot_price=spot_price,
         spread_width=spread_width,
         max_expiries=max_expiries,
         instruments=inst,
         option_book_marks=marks,
+        currency=deribit_currency(aid),
     )
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_options_for_chart():
-    inst = cached_option_instruments()
-    return fetch_deribit_btc_options_for_chart(instruments=inst)
+def cached_options_for_chart(asset_id: str | None = None):
+    aid = _norm_asset_id(asset_id)
+    inst = cached_option_instruments(aid)
+    if asset_venue(aid) == "equity":
+        return []
+    from src.data.fetch_deribit import fetch_deribit_options_for_chart
+
+    return fetch_deribit_options_for_chart(instruments=inst, currency=deribit_currency(aid))
 
 
 @st.cache_data(ttl=CACHE_TTL_OPTION_EXPIRIES)

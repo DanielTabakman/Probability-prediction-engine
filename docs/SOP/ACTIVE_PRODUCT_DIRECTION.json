@@ -106,6 +106,11 @@
       "role": "COMPLETE — registry v2 + catalog API + MSOS picker"
     },
     {
+      "id": "multi_asset_meta_infra_v1",
+      "doc": "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md",
+      "role": "IDE BUILD side channel — 7 meta chapters; PLANNED in queue; does not preempt tier1a relay"
+    },
+    {
       "id": "options_horizon_v1",
       "doc": "docs/SOP/POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md",
       "role": "side channel — chart-first region thesis tool; LOW priority; pre-execution; after tradeable universe"

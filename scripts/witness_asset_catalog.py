@@ -19,6 +19,8 @@ from src.data.assets_registry import (
     asset_venue,
     get_asset,
     is_asset_enabled,
+    list_asset_ids_for_catalog_group,
+    list_asset_ids_for_manifest_chapter,
     list_enabled_asset_ids,
 )
 from src.viz.embed_display_boundary import (
@@ -33,6 +35,11 @@ from src.viz.embed_display_boundary import (
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Witness tradeable asset catalog + display boundary")
     ap.add_argument("--asset", help="Single asset id (e.g. BTC, ETH, NVDA)")
+    ap.add_argument("--group", help="Witness all assets in catalog.group (e.g. crypto, equity_index)")
+    ap.add_argument(
+        "--manifest-slice",
+        help="Witness assets declared in tier1 manifest chapter id",
+    )
     ap.add_argument("--all-enabled", action="store_true", help="Witness every enabled registry asset")
     ap.add_argument("--live", action="store_true", help="Use live vendor fetch for display boundary")
     ap.add_argument("--json", action="store_true", help="Emit JSON report on stdout")
@@ -100,6 +107,10 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     if args.asset:
         asset_ids = [str(args.asset).strip().upper()]
+    elif args.group:
+        asset_ids = list_asset_ids_for_catalog_group(args.group, enabled_only=False)
+    elif args.manifest_slice:
+        asset_ids = list_asset_ids_for_manifest_chapter(args.manifest_slice)
     elif args.all_enabled:
         asset_ids = list_enabled_asset_ids()
     else:

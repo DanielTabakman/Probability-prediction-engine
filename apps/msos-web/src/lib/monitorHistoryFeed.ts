@@ -11,7 +11,11 @@ import {
   listPaperTrades,
 } from "@/lib/msosWorkflowStore";
 import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
-import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
+import {
+  DEFAULT_LAB_ASSET_ID,
+  fetchDisplayPayload,
+  normalizeLabAssetId,
+} from "@/lib/ppeDisplayPayload";
 import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
 import { formatMarkLine } from "@/lib/monitorMarkLine";
 
@@ -333,11 +337,12 @@ export async function loadMonitorFeed(
   const fmt = (usd: number) => formatMoney(usd, displayCurrency);
   const summary = loadCommandCenterSummary(ownerEmail);
   const email = ownerEmail ?? "";
-  const [thesis, paperTrades, display] = await Promise.all([
+  const [thesis, paperTrades] = await Promise.all([
     getCurrentThesis(email),
     listPaperTrades(email),
-    fetchDisplayPayload(),
   ]);
+  const displayAssetId = normalizeLabAssetId(thesis?.assetId ?? DEFAULT_LAB_ASSET_ID);
+  const display = await fetchDisplayPayload(displayAssetId);
   const currentSpotUsd = display?.spot_usd ?? null;
   const marketAsOfUtc = display?.as_of_utc;
 

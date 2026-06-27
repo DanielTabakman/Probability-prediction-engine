@@ -155,6 +155,33 @@ def list_catalog_entries(*, enabled_only: bool = True) -> list[dict[str, Any]]:
     return [catalog_entry_for_asset(aid) for aid in ids]
 
 
+def list_asset_ids_for_catalog_group(group_id: str, *, enabled_only: bool = False) -> list[str]:
+    """Asset ids whose catalog.group matches (e.g. crypto, equity_index)."""
+    gid = str(group_id or "").strip().lower()
+    if not gid:
+        return []
+    ids = list_enabled_asset_ids() if enabled_only else list_asset_ids()
+    return sorted(aid for aid in ids if catalog_group(aid) == gid)
+
+
+def list_asset_ids_for_manifest_chapter(chapter_id: str) -> list[str]:
+    """Asset ids declared for a tier-1 manifest chapter (may be disabled in registry)."""
+    cid = str(chapter_id or "").strip()
+    if not cid:
+        return []
+    manifest = load_tier1_manifest()
+    chapters = manifest.get("chapters")
+    if not isinstance(chapters, dict):
+        return []
+    chapter = chapters.get(cid)
+    if not isinstance(chapter, dict):
+        return []
+    assets = chapter.get("assets")
+    if not isinstance(assets, list):
+        return []
+    return sorted(_normalize_asset_id(str(aid)) for aid in assets if str(aid).strip())
+
+
 def equity_symbol(asset_id: str | None = None) -> str:
     entry = get_asset(asset_id)
     sym = entry.get("equity_symbol") or asset_id or default_asset_id()

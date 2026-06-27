@@ -1,0 +1,51 @@
+{
+  "name": "ppe_display_cache_ops_v1 (scheduled warm + cache health)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_DISPLAY_CACHE_OPS_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-CacheOps-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-CacheOps-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/embed_display_boundary.py",
+        "scripts/warm_display_payload_cache.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-CacheOps-Platform-Slice003",
+      "layerPreset": "PLATFORM",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "docker-compose.yml",
+        ".github/workflows/deploy-vps.yml",
+        "docs/SOP/PPE_DISPLAY_CACHE_OPS_V1.md"
+      ]
+    },
+    {
+      "sliceId": "PPE-CacheOps-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    }
+  ]
+}
