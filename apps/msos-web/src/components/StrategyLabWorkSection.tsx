@@ -11,6 +11,7 @@ import { buildExpiryMarketContext } from "@/lib/expiryMarketContext";
 import {
   buildLabMetricsFromPayload,
   listExpiryDates,
+  type DisplayAssetMeta,
   type DisplayPayload,
   type LabMetric,
 } from "@/lib/ppeDisplayPayload";
@@ -22,9 +23,14 @@ const DEMO_EXPIRY_OPTIONS = ["30 days", "60 days", "90 days"];
 type StrategyLabWorkSectionProps = {
   displayPayload: DisplayPayload | null;
   dataMode: LabDataMode;
+  assetMeta: DisplayAssetMeta;
 };
 
-export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLabWorkSectionProps) {
+export function StrategyLabWorkSection({
+  displayPayload,
+  dataMode,
+  assetMeta,
+}: StrategyLabWorkSectionProps) {
   const { formatMoney } = useDisplayCurrency();
   const live = dataMode === "live" && displayPayload != null;
   const expiryOptions = useMemo(
@@ -54,15 +60,15 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
         metric.label === "Expiry" ? { ...metric, value: resolvedExpiry } : metric,
       );
     }
-    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry, formatMoney);
-  }, [live, displayPayload, resolvedExpiry, formatMoney]);
+    return buildLabMetricsFromPayload(displayPayload, resolvedExpiry, formatMoney, assetMeta);
+  }, [live, displayPayload, resolvedExpiry, formatMoney, assetMeta]);
 
   const expiryContext = useMemo(() => {
     if (!live || !displayPayload) return null;
     return buildExpiryMarketContext(displayPayload, resolvedExpiry);
   }, [live, displayPayload, resolvedExpiry]);
 
-  const assetTicker = displayPayload?.asset?.id?.toUpperCase() ?? "BTC";
+  const assetTicker = assetMeta.id;
 
   return (
     <>
@@ -103,6 +109,7 @@ export function StrategyLabWorkSection({ displayPayload, dataMode }: StrategyLab
           selectedExpiry={resolvedExpiry}
           onExpiryChange={handleExpiryChange}
           expiryOptions={expiryOptions}
+          assetMeta={assetMeta}
         />
       </section>
     </>

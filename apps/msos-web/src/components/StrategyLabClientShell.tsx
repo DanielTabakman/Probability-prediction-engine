@@ -13,6 +13,7 @@ import {
   DEFAULT_LAB_ASSET_ID,
   LAB_ASSET_QUERY_PARAM,
   fetchDisplayPayloadClient,
+  isPayloadForSelectedAsset,
   normalizeLabAssetId,
   resolveDisplayAssetMeta,
   type DisplayPayload,
@@ -26,11 +27,11 @@ import {
 } from "@/lib/ppeAssetCatalog";
 import {
   LAB_DATA_DEMO_PILL,
-  LAB_DATA_LIVE_PILL,
   LAB_DATA_LOADING_PILL,
-  LAB_DEMO_BANNER_BODY,
   LAB_DEMO_BANNER_TITLE,
-  LAB_LOADING_BANNER_BODY,
+  labDataLivePill,
+  labDemoBannerBody,
+  labLoadingBannerBody,
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
 import {
@@ -133,7 +134,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       if (cancelled) {
         return;
       }
-      if (livePayload) {
+      if (livePayload && isPayloadForSelectedAsset(livePayload, selectedAssetId)) {
         setPayload(livePayload);
         setMode("live");
         return;
@@ -153,7 +154,11 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   }, [selectedAssetId, initialPayload]);
 
   const pillLabel =
-    mode === "live" ? LAB_DATA_LIVE_PILL : mode === "loading" ? LAB_DATA_LOADING_PILL : LAB_DATA_DEMO_PILL;
+    mode === "live"
+      ? labDataLivePill(assetMeta)
+      : mode === "loading"
+        ? LAB_DATA_LOADING_PILL
+        : LAB_DATA_DEMO_PILL;
   const pillClass =
     mode === "live" ? "pill live" : mode === "loading" ? "pill loading" : "pill demo sample";
 
@@ -203,7 +208,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
           <span className="tag amber">Sample</span>
           <div>
             <strong>{LAB_DEMO_BANNER_TITLE}</strong>
-            <p>{LAB_DEMO_BANNER_BODY}</p>
+            <p>{labDemoBannerBody(assetMeta)}</p>
           </div>
         </div>
       ) : null}
@@ -211,13 +216,13 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       {mode === "loading" ? (
         <div className="lab-data-banner loading" role="status" aria-live="polite">
           <span className="tag teal">Loading</span>
-          <p>{LAB_LOADING_BANNER_BODY}</p>
+          <p>{labLoadingBannerBody(assetMeta)}</p>
         </div>
       ) : null}
 
       <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
 
-      <StrategyLabWorkSection displayPayload={payload} dataMode={mode} />
+      <StrategyLabWorkSection displayPayload={payload} dataMode={mode} assetMeta={assetMeta} />
 
       <PlatformTutorial
         active={tutorialOpen}

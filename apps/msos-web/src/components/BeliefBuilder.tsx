@@ -17,6 +17,7 @@ type BeliefBuilderProps = {
   expiryPickerDisabled?: boolean;
   /** When true, expiry is chosen in the strip above — show date as text only. */
   hideInlineExpiryPicker?: boolean;
+  assetTicker?: string;
   tuning: BeliefTuning;
   onNudge: (axis: BeliefNudgeAxis) => void;
   onReset: () => void;
@@ -49,6 +50,7 @@ export function BeliefBuilder({
   onExpiryChange,
   expiryPickerDisabled = false,
   hideInlineExpiryPicker = false,
+  assetTicker = "BTC",
   tuning,
   onNudge,
   onReset,
@@ -85,7 +87,7 @@ export function BeliefBuilder({
       <p className="selectline" aria-live="polite">
         {active ? (
           <>
-            I think BTC will {phrase} by {expiryChip}.
+            I think {assetTicker} will {phrase} by {expiryChip}.
           </>
         ) : (
           <>

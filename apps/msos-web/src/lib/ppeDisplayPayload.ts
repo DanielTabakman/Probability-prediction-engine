@@ -70,6 +70,23 @@ export function normalizeLabAssetId(
   return upper;
 }
 
+/** Human label for where option quotes come from (display copy only). */
+export function optionsSourceLabel(asset: DisplayAssetMeta): string {
+  return asset.id === "NVDA" ? "equity options chain" : "Deribit options";
+}
+
+/** True when a live payload matches the asset the user selected in the lab. */
+export function isPayloadForSelectedAsset(
+  payload: DisplayPayload | null | undefined,
+  assetId: LabAssetId,
+): boolean {
+  const payloadAssetId = payload?.asset?.id?.toUpperCase();
+  if (!payloadAssetId) {
+    return assetId.toUpperCase() === DEFAULT_LAB_ASSET_ID;
+  }
+  return payloadAssetId === assetId.toUpperCase();
+}
+
 function fallbackMetaForAsset(assetId: string): DisplayAssetMeta {
   const known = LAB_ASSET_FALLBACKS[assetId as KnownLabAssetId];
   if (known) {
