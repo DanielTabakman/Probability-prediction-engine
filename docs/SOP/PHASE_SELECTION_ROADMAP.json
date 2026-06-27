@@ -282,6 +282,12 @@
       "status": "done",
       "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Meta #1 \u2014 display parity (PLANNED queue; no autobuilder preempt)",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md"
     }
   ]
 }

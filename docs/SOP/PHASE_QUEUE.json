@@ -310,8 +310,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[HIGH] Meta #1 IDE BUILD \u2014 display parity; PLANNED (no autobuilder preempt)",
+      "status": "READY",
+      "reason": "[HIGH] Meta #1 \u2014 display parity (PLANNED queue; no autobuilder preempt)",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md"
     },
     {

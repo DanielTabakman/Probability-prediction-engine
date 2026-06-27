@@ -3,6 +3,12 @@
   "baselineBranch": "main",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md",
+  "preCompletedSliceIds": [
+    "PPE-DisplayParity-Control-Slice001",
+    "PPE-DisplayParity-Core-Slice002",
+    "PPE-DisplayParity-Product-Slice003",
+    "PPE-DisplayParity-Platform-Slice004"
+  ],
   "slices": [
     {
       "sliceId": "PPE-DisplayParity-Control-Slice001",
@@ -71,7 +77,20 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_asset_display_parity_v1",
+        "chapterTitle": "PPE asset display parity v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md",
+          "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
+        ]
+      }
     }
   ]
 }

@@ -61,6 +61,9 @@ PPE_TRADEABLE_UNIVERSE_PLAN = (
 PPE_COMMODITY_PROXY_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json"
 )
+PPE_DISPLAY_PARITY_PLAN = (
+    "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -90,6 +93,7 @@ ALLOWED_READY_PLANS = (
     PPE_EQUITY_PLAN,
     PPE_TRADEABLE_UNIVERSE_PLAN,
     PPE_COMMODITY_PROXY_PLAN,
+    PPE_DISPLAY_PARITY_PLAN,
 )
 
 
