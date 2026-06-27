@@ -376,9 +376,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Equity mega caps batch 2",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
@@ -418,7 +419,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     }
