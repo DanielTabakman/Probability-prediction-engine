@@ -28,10 +28,10 @@
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 **Milestone:** **Trader Workflow Integration v1** — [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 
-**Active relay:** `` — Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
+**Active relay:** `ppe_asset_display_parity_v1` — Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 
-- **Sprint:** [``]()
-- **Plan:** [``]()
+- **Sprint:** [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md)
+- **Plan:** [`ppe_asset_display_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json)
 - **Direction SSOT:** [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) (pivot `trader-workflow-integration-v1`)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 

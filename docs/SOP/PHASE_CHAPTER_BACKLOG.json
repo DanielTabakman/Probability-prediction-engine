@@ -387,7 +387,7 @@
     },
     {
       "chapterId": "ppe_asset_display_parity_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
