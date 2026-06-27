@@ -1,7 +1,7 @@
 # PPE Deribit crypto tier-1 v1 — evidence status
 
 **Chapter:** `ppe_deribit_crypto_tier1_v1`  
-**Status:** **CHARTERED** (SELECTED 2026-06-26)
+**Status:** **COMPLETE** 2026-06-27 (SELECTED 2026-06-26)
 
 | Slice | Status |
 |-------|--------|

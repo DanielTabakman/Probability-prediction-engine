@@ -231,19 +231,19 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
-      "status": "pending",
+      "status": "done",
       "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
       "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
     },

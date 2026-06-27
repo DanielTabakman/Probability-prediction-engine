@@ -139,18 +139,18 @@
       "focusPlaybookTier": "P2",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md",
       "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
-      "reason": "[LOW] Charter COMPLETE — scan/backtest auto-run when idle"
+      "reason": "[LOW] Charter COMPLETE \u2014 scan/backtest auto-run when idle"
     },
     {
       "chapterId": "mvp1_cross_venue_scan_v1",
-      "status": "blocked",
+      "status": "queued",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
-      "reason": "[LOW] Ranked gap report — sideChannel auto when idle"
+      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle"
     },
     {
       "chapterId": "mvp1_cross_venue_backtest_v1",
@@ -161,7 +161,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
-      "reason": "[LOW] Gap scoring — after scan + snapshots"
+      "reason": "[LOW] Gap scoring \u2014 after scan + snapshots"
     },
     {
       "chapterId": "mvp1_bl_density_smoothing_v1",
@@ -377,7 +377,7 @@
     },
     {
       "chapterId": "ppe_tradeable_universe_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
