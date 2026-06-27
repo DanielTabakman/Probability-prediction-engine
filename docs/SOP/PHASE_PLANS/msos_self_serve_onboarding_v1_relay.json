@@ -1,5 +1,5 @@
 {
-  "name": "MSOS_self_serve_onboarding_v1 (public URL + guided tour — workstream A)",
+  "name": "MSOS_self_serve_onboarding_v1 (public URL + guided tour \u2014 workstream A)",
   "baselineBranch": "main",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
@@ -23,7 +23,11 @@
       "workerMode": "local-agent",
       "susMinutes": 90,
       "hardMinutes": 240,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/app/sign-up/page.tsx",
+        "apps/msos-web/src/components/PostAuthReturnHandler.tsx"
+      ]
     },
     {
       "sliceId": "MSOS-SelfServeV1-Product-Slice003",
@@ -34,7 +38,11 @@
       "workerMode": "local-agent",
       "susMinutes": 90,
       "hardMinutes": 240,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/app/strategy-lab/page.tsx",
+        "apps/msos-web/src/lib/publicCopy.ts"
+      ]
     },
     {
       "sliceId": "MSOS-SelfServeV1-Witness-Slice004",

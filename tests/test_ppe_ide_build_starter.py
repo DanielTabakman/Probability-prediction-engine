@@ -27,6 +27,18 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
                             "declaredPlane": "PRODUCT-PLANE",
                             "layerPreset": "PPE_UI",
                             "buildBranch": "build/auto/Ch-Product-Slice002-local",
+                            "touchSet": ["src/viz/app.py"],
+                            "acceptance": [
+                                {
+                                    "id": "renders",
+                                    "check": "App renders",
+                                    "verify": "tests/test_app_smoke.py",
+                                }
+                            ],
+                        },
+                        {
+                            "sliceId": "Ch-Closeout",
+                            "closeout": {"chapterId": "ch"},
                         },
                     ],
                 }
@@ -55,6 +67,11 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
         self.assertIn("## When done (required)", md)
         self.assertIn("mark_ide_product_ready.cmd Ch-Product-Slice002", md)
         self.assertIn("run_ppe_local.cmd", md)
+        self.assertIn("## Layer scope", md)
+        self.assertIn("## Acceptance checklist", md)
+        self.assertIn("`renders`", md)
+        self.assertIn("## Recommended loads", md)
+        self.assertIn("touchSet", md)
 
     def test_format_build_closeout_section(self) -> None:
         body = format_build_closeout_section(

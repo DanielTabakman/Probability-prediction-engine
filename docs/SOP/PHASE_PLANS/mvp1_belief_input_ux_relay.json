@@ -16,7 +16,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 90,
       "hardMinutes": 240,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/mvp1_lab_ui.py",
+        "src/viz/belief_uncertainty.py"
+      ]
     },
     {
       "sliceId": "MVP1-BeliefInput-Smoke-Slice003",

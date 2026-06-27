@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+/** Agent: msos-shell Strategy Lab SSR — fetches Python display JSON; no TS math. Tests: tests/test_msos_web_strategy_lab.py */
 import { AppShell } from "@/components/AppShell";
 import { StrategyLabContent } from "@/components/StrategyLabContent";
 import {
