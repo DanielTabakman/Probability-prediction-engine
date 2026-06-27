@@ -208,7 +208,7 @@ export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_ST
 
   return createPortal(
     <div className="platform-tutorial-root" aria-live="polite">
-      <div className="platform-tutorial-scrim" onClick={finish} aria-hidden="true" />
+      <div className="platform-tutorial-scrim" aria-hidden="true" />
       {anchor ? (
         <div
           className="platform-tutorial-spotlight"

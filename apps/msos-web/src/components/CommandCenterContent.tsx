@@ -103,7 +103,7 @@ export function CommandCenterContent({ summary, workflow }: Props) {
                   <p>{tile.description}</p>
                 </div>
                 {tile.enabled ? (
-                  <Link href="/strategy-lab" className="btn slim primary">
+                  <Link href={"labHref" in tile && tile.labHref ? tile.labHref : "/strategy-lab"} className="btn slim primary">
                     {tile.cta}
                   </Link>
                 ) : (

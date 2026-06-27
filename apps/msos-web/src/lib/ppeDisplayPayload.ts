@@ -118,6 +118,13 @@ export function resolveDisplayAssetMeta(
   return fallbackMetaForAsset(normalizedId);
 }
 
+export function buildStrategyLabPath(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
+  if (assetId === DEFAULT_LAB_ASSET_ID) {
+    return "/strategy-lab";
+  }
+  return `/strategy-lab?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+}
+
 export function buildDisplayApiUrl(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
   const base = PPE_DISPLAY_API_URL;
   if (assetId === DEFAULT_LAB_ASSET_ID) {

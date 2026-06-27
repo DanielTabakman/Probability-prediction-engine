@@ -36,15 +36,44 @@ function AssetCategorySelect({
   onSelect,
 }: AssetCategorySelectProps) {
   const canPick = assets.length > 0;
-  const disabled = !canPick || assets.length <= 1;
+  const singleAssetId = assets.length === 1 ? assets[0].id : null;
+  // Only lock the control when this bucket is active and has no alternate within it.
+  const disabled = !canPick || (active && assets.length <= 1);
+  const switchTarget = !active && singleAssetId ? singleAssetId : null;
 
   return (
-    <div className={`lab-asset-field${active ? " active" : ""}`}>
+    <div
+      className={`lab-asset-field${active ? " active" : ""}${switchTarget ? " switchable" : ""}`}
+      onClick={
+        switchTarget
+          ? () => {
+              onSelect(switchTarget);
+            }
+          : undefined
+      }
+      onKeyDown={
+        switchTarget
+          ? (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                onSelect(switchTarget);
+              }
+            }
+          : undefined
+      }
+      role={switchTarget ? "button" : undefined}
+      tabIndex={switchTarget ? 0 : undefined}
+    >
       <span className="lab-asset-k">{label}</span>
       <label className="lab-asset-select">
         <select
           value={value}
           disabled={disabled}
+          onClick={(event) => {
+            if (switchTarget) {
+              event.stopPropagation();
+            }
+          }}
           onChange={(event) => {
             const next = event.target.value;
             if (next) {

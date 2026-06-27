@@ -152,6 +152,9 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     assert "asset_catalog" in catalog_lib
     assert "lab-asset-picker" in picker
     assert 'data-tour="lab-asset"' in picker
+    assert "switchable" in picker
+    assert "active && assets.length <= 1" in picker
+    assert "buildStrategyLabPath" in payload_lib
     assert "assetMeta.label" in shell
 
     assert "resolveDisplayAssetMeta" in thesis_ctx
