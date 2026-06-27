@@ -35,35 +35,44 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def resolve_codex_cli() -> str | None:
-    exe = shutil.which("codex")
-    if exe:
-        return exe
-    npm_global = os.environ.get("APPDATA", "").strip()
-    if npm_global:
-        candidate = Path(npm_global) / "npm" / "codex.cmd"
-        if candidate.is_file():
-            return str(candidate)
-    # Standalone Windows installer (chatgpt.com/codex/install.ps1)
+def iter_codex_cli_candidates() -> list[str]:
+    """Ordered Codex CLI paths — standalone Windows install before npm stub."""
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def add(path: Path | str | None) -> None:
+        if path is None:
+            return
+        resolved = Path(path)
+        if not resolved.is_file():
+            return
+        key = str(resolved.resolve())
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append(str(resolved))
+
     local_app = os.environ.get("LOCALAPPDATA", "").strip()
     if local_app:
-        candidate = Path(local_app) / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
-        if candidate.is_file():
-            return str(candidate)
-    # npm global / Unix-style local bin
+        add(Path(local_app) / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe")
+
+    which = shutil.which("codex")
+    if which:
+        add(which)
+
+    npm_global = os.environ.get("APPDATA", "").strip()
+    if npm_global:
+        add(Path(npm_global) / "npm" / "codex.cmd")
+
     home = os.environ.get("USERPROFILE") or os.environ.get("HOME", "")
     if home:
         for name in ("codex.exe", "codex"):
-            candidate = Path(home) / ".local" / "bin" / name
-            if candidate.is_file():
-                return str(candidate)
-    return None
+            add(Path(home) / ".local" / "bin" / name)
+
+    return candidates
 
 
-def codex_authenticated() -> bool:
-    exe = resolve_codex_cli()
-    if not exe:
-        return False
+def _codex_login_ok(exe: str) -> bool:
     proc = subprocess.run(
         [exe, "login", "status"],
         capture_output=True,
@@ -71,6 +80,23 @@ def codex_authenticated() -> bool:
         check=False,
     )
     return proc.returncode == 0
+
+
+def resolve_codex_cli() -> str | None:
+    candidates = iter_codex_cli_candidates()
+    if not candidates:
+        return None
+    for exe in candidates:
+        if _codex_login_ok(exe):
+            return exe
+    return candidates[0]
+
+
+def codex_authenticated() -> bool:
+    exe = resolve_codex_cli()
+    if not exe:
+        return False
+    return _codex_login_ok(exe)
 
 
 def codex_available() -> bool:

@@ -22,6 +22,26 @@ def test_load_build_worker_pref_from_env(tmp_path, monkeypatch):
     assert load_build_worker_pref(tmp_path) == PREF_CODEX
 
 
+def test_resolve_codex_cli_prefers_authenticated_standalone(tmp_path, monkeypatch):
+    npm_stub = tmp_path / "npm" / "codex.cmd"
+    npm_stub.parent.mkdir(parents=True)
+    npm_stub.write_text("@echo broken\n", encoding="utf-8")
+    standalone = tmp_path / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
+    standalone.parent.mkdir(parents=True)
+    standalone.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr("scripts.ppe_build_worker.shutil.which", lambda _name: str(npm_stub))
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.setenv("APPDATA", str(tmp_path / "npm_parent"))
+    monkeypatch.delenv("USERPROFILE", raising=False)
+
+    def fake_login(exe: str) -> bool:
+        return str(exe).endswith("codex.exe")
+
+    monkeypatch.setattr("scripts.ppe_build_worker._codex_login_ok", fake_login)
+    assert resolve_codex_cli() == str(standalone)
+
+
 def test_resolve_codex_cli_finds_standalone_windows_install(tmp_path, monkeypatch):
     fake_exe = tmp_path / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
     fake_exe.parent.mkdir(parents=True, exist_ok=True)
@@ -29,6 +49,7 @@ def test_resolve_codex_cli_finds_standalone_windows_install(tmp_path, monkeypatc
     monkeypatch.setattr("scripts.ppe_build_worker.shutil.which", lambda _name: None)
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
     monkeypatch.delenv("APPDATA", raising=False)
+    monkeypatch.setattr("scripts.ppe_build_worker._codex_login_ok", lambda exe: str(exe) == str(fake_exe))
     assert resolve_codex_cli() == str(fake_exe)
 
 
