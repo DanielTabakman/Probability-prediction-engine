@@ -16,7 +16,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 60,
       "hardMinutes": 180,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/implied_lab_ui_smoke_harness.py",
+        "tests/test_implied_lab_ui_smoke.py"
+      ]
     },
     {
       "sliceId": "MVP1-SmokeRegression-Witness-Slice003",

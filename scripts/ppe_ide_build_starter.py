@@ -8,7 +8,11 @@ from pathlib import Path
 
 from scripts.ppe_build_packet import build_packet_text
 from scripts.ppe_context_bands import advisory_actions, classify_line_count, score_text, worst_band
-from scripts.ppe_manifest import load_phase_plan
+from scripts.ppe_manifest import (
+    format_acceptance_checklist,
+    load_phase_plan,
+    recommended_loads_for_slice,
+)
 from scripts.repo_layer_paths import find_slice_in_plan, resolve_slice_layer_scope
 
 STARTER_DIR = "artifacts/orchestrator"
@@ -90,6 +94,67 @@ def _slice_map_row(sprint_text: str, slice_id: str) -> str | None:
     return None
 
 
+def _scope_section(scope) -> str:
+    allowed = "\n".join(f"  - {p}" for p in scope.allowed_paths) or "  - (from preset)"
+    forbidden = "\n".join(f"  - {p}" for p in scope.forbidden_paths) or "  - (from preset)"
+    touch = scope.touch_set or ()
+    touch_block = (
+        "\n".join(f"  - {p}" for p in touch) if touch else "  - _(none — add touchSet for PRODUCT slices)_"
+    )
+    return "\n".join(
+        [
+            "## Layer scope",
+            "",
+            f"**Layer preset:** `{scope.layer_preset}` · **Layer:** `{scope.layer}`",
+            "",
+            "**ALLOWED_PATHS:**",
+            allowed,
+            "",
+            "**FORBIDDEN_PATHS:**",
+            forbidden,
+            "",
+            "**touchSet:**",
+            touch_block,
+        ]
+    )
+
+
+def _acceptance_section(sl: dict, sprint_text: str, sprint_path: str) -> str:
+    raw = sl.get("acceptance")
+    if isinstance(raw, list) and raw:
+        valid = [item for item in raw if isinstance(item, dict)]
+        if valid:
+            return "## Acceptance checklist\n\n" + format_acceptance_checklist(valid)
+    body = (
+        _acceptance_excerpt(sprint_text, sprint_path)
+        if sprint_text and sprint_path
+        else f"_Read sprint spec at `{sprint_path}`._"
+    )
+    return "## Acceptance excerpt\n\n" + body
+
+
+def _recommended_loads_section(
+    repo: Path, *, sl: dict, slice_id: str, phase_plan: str, layer_preset: str | None
+) -> str:
+    loads = recommended_loads_for_slice(
+        repo,
+        slice_obj=sl,
+        slice_id=slice_id,
+        phase_plan=phase_plan,
+        layer_preset=layer_preset,
+    )
+    bullets = "\n".join(f"- `{p}`" for p in loads)
+    return "\n".join(
+        [
+            "## Recommended loads (minimal context)",
+            "",
+            bullets,
+            "",
+            f"Preflight: `python scripts/ppe_context_preflight.py --phase-plan {phase_plan} --slice-id {slice_id}`",
+        ]
+    )
+
+
 def _acceptance_excerpt(sprint_text: str, sprint_path: str, *, max_lines: int = ACCEPTANCE_MAX_LINES) -> str:
     parts: list[str] = []
     for line in sprint_text.splitlines():
@@ -148,10 +213,14 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     if not slice_row:
         slice_row = f"| {slice_id} | {declared_plane} | {scope.layer_preset or '?'} | (see phase plan) |"
 
-    acceptance = (
-        _acceptance_excerpt(sprint_text, sprint_path)
-        if sprint_text and sprint_path
-        else f"_Read sprint spec at `{sprint_path}`._"
+    acceptance_block = _acceptance_section(sl, sprint_text, sprint_path)
+    scope_block = _scope_section(scope)
+    loads_block = _recommended_loads_section(
+        repo,
+        sl=sl,
+        slice_id=slice_id,
+        phase_plan=norm_plan,
+        layer_preset=scope.layer_preset,
     )
     packet = build_packet_text(repo, slice_id=slice_id, phase_plan=norm_plan)
 
@@ -176,6 +245,8 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     if focus_section:
         starter_body_parts.extend([focus_section, ""])
     starter_body_parts.extend([
+        loads_block,
+        "",
         "## Continuity excerpt",
         "",
         _continuity_excerpt(repo),
@@ -184,9 +255,9 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         "",
         slice_row,
         "",
-        "## Acceptance excerpt",
+        scope_block,
         "",
-        acceptance,
+        acceptance_block,
         "",
         "## Slim BUILD packet",
         "",

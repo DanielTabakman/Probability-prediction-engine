@@ -1,0 +1,38 @@
+---
+description: Core PPE agent behavior — verdicts, layers, AI/human split, commit policy (merged essentials).
+alwaysApply: true
+---
+
+# PPE core agent
+
+**Canon:** [`docs/SOP/AI_HUMAN_DIVISION_V1.md`](../../docs/SOP/AI_HUMAN_DIVISION_V1.md) · [`docs/SOP/CURSOR_RULES_MAP.md`](../../docs/SOP/CURSOR_RULES_MAP.md)
+
+## What's next (auto-execute)
+
+1. Read `artifacts/orchestrator/OPERATOR_STATUS.md` or `AUTOBUILDER_STATUS.json`.
+2. Run the verdict action before replying (`RUN_LOCAL` / `IDE_BUILD` / `RUN_AUTO`).
+3. **Desktop:** `ppe_loop_host_guard.py --check` — if `allowed: false`, `DESKTOP_CONTINUE.cmd` only (never `run_ppe_local.cmd` on desktop).
+
+## BUILD discipline
+
+- Stay inside BUILD packet `ALLOWED_PATHS` / slice `touchSet` ([`REPO_LAYER_MAP_V1.md`](../../docs/SOP/REPO_LAYER_MAP_V1.md)).
+- Load [`docs/SOP/agent_index/`](../../docs/SOP/agent_index/) for the slice `layerPreset`.
+- Preflight: `python scripts/ppe_context_preflight.py --phase-plan … --slice-id …` → use `recommended_loads`.
+- Phase plan schema: [`PHASE_PLAN_SLICE_SCHEMA.md`](../../docs/SOP/PHASE_PLAN_SLICE_SCHEMA.md).
+
+## AI / human split
+
+- **AI-first:** factory JSON, starters, gates — agents own sync and execution.
+- **Human-first:** trader UI, public copy, operator buttons — do not AI-ify.
+- **Direction SSOT:** `ACTIVE_PRODUCT_DIRECTION.json` — not stale frontier prose.
+
+## Commit (this workspace)
+
+When task complete and `python scripts/run_pushable_gate.py` passes: commit, push feature branch, open PR to `main` — do not ask.
+
+Never commit secrets, `artifacts/`, caches.
+
+## Context
+
+- New BUILD thread per slice; continuity via `AGENT_CONTINUITY_BRIEF.md` + IDE BUILD starter — not chat history.
+- See [`docs/CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md) for thread boundaries.

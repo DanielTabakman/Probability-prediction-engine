@@ -8,7 +8,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/run_pushable_gate.py",
+        "tests/test_validation_chapter.py"
+      ]
     },
     {
       "sliceId": "Validation-Chapter-UX-Slice002",
@@ -16,7 +20,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/app.py",
+        "src/viz/mvp1_lab_ui.py"
+      ]
     },
     {
       "sliceId": "Validation-Chapter-Deploy-Slice003",
@@ -24,7 +32,11 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 10,
       "hardMinutes": 20,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "closeout": {
+        "chapterId": "validation_chapter",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

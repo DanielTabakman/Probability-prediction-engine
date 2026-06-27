@@ -36,6 +36,18 @@
         "src/viz/embed_only_lab.py",
         "src/viz/display_payload_server.py",
         "scripts/warm_display_payload_cache.py"
+      ],
+      "acceptance": [
+        {
+          "id": "cache-wired",
+          "check": "display_payload_cache wired into WSGI provider",
+          "verify": "tests/test_implied_lab_embed_display_boundary.py"
+        },
+        {
+          "id": "warm-script",
+          "check": "warm_display_payload_cache script exists and runs",
+          "verify": "scripts/warm_display_payload_cache.py"
+        }
       ]
     },
     {
@@ -52,6 +64,13 @@
         "apps/msos-web/src/app/strategy-lab/page.tsx",
         "apps/msos-web/src/components/StrategyLabClientShell.tsx",
         "apps/msos-web/src/lib/ppeDisplayPayload.ts"
+      ],
+      "acceptance": [
+        {
+          "id": "ssr-live-mode",
+          "check": "Strategy Lab SSR uses display payload when API healthy",
+          "verify": "tests/test_msos_web_strategy_lab.py"
+        }
       ]
     },
     {

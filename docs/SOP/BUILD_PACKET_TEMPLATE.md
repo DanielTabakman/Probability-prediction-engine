@@ -2,7 +2,7 @@
 
 Use this template when sending a relay BUILD packet to Cursor or documenting a slice handoff. **Paths only** — do not inline sprint specs, HANDOFF gate blocks, or ledger history.
 
-**Layer map (required for all BUILD packets):** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · presets [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.json)
+**Layer map (required for all BUILD packets):** [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · presets [`REPO_LAYER_PATH_PREFIXES.json`](REPO_LAYER_PATH_PREFIXES.json) · slice schema [`PHASE_PLAN_SLICE_SCHEMA.md`](PHASE_PLAN_SLICE_SCHEMA.md)
 
 ## Required fields
 

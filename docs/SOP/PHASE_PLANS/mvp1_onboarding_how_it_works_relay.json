@@ -16,7 +16,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 90,
       "hardMinutes": 240,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/tutorial.py",
+        "src/viz/app.py"
+      ]
     },
     {
       "sliceId": "MVP1-OnboardingHowItWorks-Smoke-Slice003",

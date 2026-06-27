@@ -16,7 +16,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 25,
       "hardMinutes": 45,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/run_mvp1_dual_implied_lab_smoke.py",
+        "tests/test_mvp1_smoke.py"
+      ]
     },
     {
       "sliceId": "MVP1-Reliability-Deploy-Slice003",

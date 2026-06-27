@@ -1,6 +1,9 @@
 """
 Streamlit dashboard: market data and prediction market probabilities.
 Bitcoin view: price chart with Polymarket questions overlaid, implied value, options & futures.
+
+Agent: ppe-ui entry — keep thin; delegates to app_* and mvp1_* modules.
+Tests: tests/test_app_ tests/test_mvp1_ tests/test_implied_lab_
 """
 from __future__ import annotations
 

@@ -15,7 +15,8 @@ from scripts.ppe_context_bands import (
     score_build_packet,
     worst_band,
 )
-from scripts.ppe_manifest import load_phase_plan
+from scripts.ppe_manifest import load_phase_plan, recommended_loads_for_slice
+from scripts.repo_layer_paths import find_slice_in_plan, resolve_slice_layer_scope
 from scripts.ppe_operator_config import _guards_config, load_operator_config
 
 
@@ -70,19 +71,38 @@ def run_preflight(
             pass
 
     packet_report: dict[str, object] | None = None
+    recommended_loads: list[str] | None = None
     if slice_id:
         text = build_packet_text(repo, slice_id=slice_id, phase_plan=norm_plan)
         packet_report = score_build_packet(text)
         bands.append(str(packet_report["band"]))
+        sl = find_slice_in_plan(plan, slice_id)
+        if sl is not None:
+            declared = str(sl.get("declaredPlane") or "EVIDENCE-PLANE")
+            scope = resolve_slice_layer_scope(
+                repo,
+                slice_obj=sl,
+                slice_id=slice_id,
+                declared_plane=declared,
+            )
+            recommended_loads = recommended_loads_for_slice(
+                repo,
+                slice_obj=sl,
+                slice_id=slice_id,
+                phase_plan=norm_plan,
+                layer_preset=scope.layer_preset,
+            )
 
     overall = worst_band(*bands) if bands else "NORMAL"
     return {
         "phase_plan": norm_plan,
+        "slice_id": slice_id,
         "slice_count": slice_count,
         "max_phase_slices": max_slices,
         "slice_count_band": slice_band,
         "sprint_specs": spec_reports,
         "build_packet": packet_report,
+        "recommended_loads": recommended_loads,
         "overall_band": overall,
         "advisory_actions": advisory_actions(overall),
     }
@@ -105,6 +125,12 @@ def _print_report(report: dict[str, object]) -> None:
     bp = report.get("build_packet")
     if isinstance(bp, dict):
         print(f"  build_packet: {bp.get('band')} ({bp.get('line_count')} lines)")
+
+    loads = report.get("recommended_loads")
+    if isinstance(loads, list) and loads:
+        print("  recommended_loads:")
+        for path in loads:
+            print(f"    - {path}")
 
     print(f"  overall (advisory): {report['overall_band']}")
     for action in report.get("advisory_actions") or []:

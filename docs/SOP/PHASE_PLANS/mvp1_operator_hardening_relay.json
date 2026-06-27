@@ -16,7 +16,11 @@
       "declaredPlane": "PRODUCT-PLANE",
       "susMinutes": 45,
       "hardMinutes": 90,
-      "maxAttempts": 2
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/run_pushable_gate.py",
+        "tests/test_run_pushable_gate.py"
+      ]
     },
     {
       "sliceId": "MVP1-OperatorHardening-Witness-Slice003",

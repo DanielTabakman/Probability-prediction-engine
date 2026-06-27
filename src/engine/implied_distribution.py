@@ -1,6 +1,9 @@
 """
 Implied probability distribution from options (lognormal model + market-implied via Breeden-Litzenberger).
 Phase 1: lognormal. Phase 2: market-implied density + anomaly detection.
+
+Agent: ppe-core math — no Streamlit; consumed by src/viz/ and tests only.
+Tests: tests/test_implied*
 """
 from __future__ import annotations
 
