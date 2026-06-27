@@ -50,14 +50,16 @@ fi
 RESEARCH_URL="$(grep '^PPE_RESEARCH_OFFER_URL=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
 RESEARCH_LABEL="$(grep '^PPE_RESEARCH_OFFER_LABEL=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '\"' || true)"
 
-docker compose build app_demo app_full ppe_display_api
+PROD_ROOT="${PPE_VPS_ROOT:-/opt/marketstructureos}"
+# Share the production compose project/network so Caddy can reach msos_web_staging:3001.
+export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-marketstructureos}"
+
 docker compose build --no-cache msos_web_staging \
   --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
   --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
 docker compose --profile staging up -d --force-recreate msos_web_staging
 
 # Shared Caddy from production root — reload routes if production checkout is newer.
-PROD_ROOT="${PPE_VPS_ROOT:-/opt/marketstructureos}"
 if [[ -d "$PROD_ROOT" && "$PROD_ROOT" != "$STAGING_ROOT" ]]; then
   (cd "$PROD_ROOT" && git pull --ff-only origin main 2>/dev/null || true)
   (cd "$PROD_ROOT" && docker compose up -d --force-recreate caddy) || true
