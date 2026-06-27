@@ -22,6 +22,26 @@ def test_load_build_worker_pref_from_env(tmp_path, monkeypatch):
     assert load_build_worker_pref(tmp_path) == PREF_CODEX
 
 
+def test_resolve_codex_cli_prefers_authenticated_standalone(tmp_path, monkeypatch):
+    npm_stub = tmp_path / "npm" / "codex.cmd"
+    npm_stub.parent.mkdir(parents=True)
+    npm_stub.write_text("@echo broken\n", encoding="utf-8")
+    standalone = tmp_path / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
+    standalone.parent.mkdir(parents=True)
+    standalone.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr("scripts.ppe_build_worker.shutil.which", lambda _name: str(npm_stub))
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    monkeypatch.setenv("APPDATA", str(tmp_path / "npm_parent"))
+    monkeypatch.delenv("USERPROFILE", raising=False)
+
+    def fake_login(exe: str) -> bool:
+        return str(exe).endswith("codex.exe")
+
+    monkeypatch.setattr("scripts.ppe_build_worker._codex_login_ok", fake_login)
+    assert resolve_codex_cli() == str(standalone)
+
+
 def test_resolve_codex_cli_finds_standalone_windows_install(tmp_path, monkeypatch):
     fake_exe = tmp_path / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
     fake_exe.parent.mkdir(parents=True, exist_ok=True)
@@ -29,6 +49,7 @@ def test_resolve_codex_cli_finds_standalone_windows_install(tmp_path, monkeypatc
     monkeypatch.setattr("scripts.ppe_build_worker.shutil.which", lambda _name: None)
     monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
     monkeypatch.delenv("APPDATA", raising=False)
+    monkeypatch.setattr("scripts.ppe_build_worker._codex_login_ok", lambda exe: str(exe) == str(fake_exe))
     assert resolve_codex_cli() == str(fake_exe)
 
 
@@ -214,3 +235,78 @@ def test_cursor_first_ok_when_cursor_exhausted_codex_fallback(tmp_path):
         policy = evaluate_cursor_first_policy(tmp_path)
     assert policy["verdict"] == "ok"
     assert "exhausted" in policy["detail"]
+
+
+def test_codex_first_ok_when_codex_headless(tmp_path):
+    from scripts.ppe_build_worker import PREF_CODEX, WORKER_CODEX_CLI, evaluate_codex_first_policy
+
+    with (
+        patch("scripts.ppe_build_worker.load_build_worker_pref", return_value=PREF_CODEX),
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": PREF_CODEX,
+                "worker": WORKER_CODEX_CLI,
+                "mode": "headless",
+                "reason": "buildWorker=codex",
+                "cursor_cli_available": True,
+                "cursor_cli_exhausted": False,
+                "codex_cli_available": True,
+                "codex_cli_exhausted": False,
+            },
+        ),
+    ):
+        policy = evaluate_codex_first_policy(tmp_path)
+    assert policy["verdict"] == "ok"
+    assert "Codex CLI headless" in policy["detail"]
+
+
+def test_codex_first_warn_when_auto_uses_cursor(tmp_path):
+    from scripts.ppe_build_worker import PREF_AUTO, WORKER_CURSOR_CLI, evaluate_codex_first_policy
+
+    with (
+        patch("scripts.ppe_build_worker.load_build_worker_pref", return_value=PREF_AUTO),
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": PREF_AUTO,
+                "worker": WORKER_CURSOR_CLI,
+                "mode": "headless",
+                "reason": "auto_cursor_cli",
+                "cursor_cli_available": True,
+                "cursor_cli_exhausted": False,
+                "codex_cli_available": True,
+                "codex_cli_exhausted": False,
+            },
+        ),
+    ):
+        policy = evaluate_codex_first_policy(tmp_path)
+    assert policy["verdict"] == "warn"
+    assert "buildWorker=codex" in policy["detail"]
+
+
+def test_resolve_codex_prefers_codex_when_available(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_BUILD_WORKER", "codex")
+    with (
+        patch("scripts.ppe_build_worker.codex_available", return_value=True),
+        patch("scripts.ppe_build_worker._codex_cli_exhausted", return_value=False),
+        patch("scripts.ppe_ide_handoff.prefer_ide_over_cli", return_value=False),
+    ):
+        out = resolve_build_worker(tmp_path)
+    assert out["worker"] == WORKER_CODEX_CLI
+    assert out["mode"] == "headless"
+
+
+def test_clear_cli_usage_exhausted_ignores_stale_log(tmp_path):
+    from scripts.ppe_ide_handoff import clear_cli_usage_exhausted, cli_usage_exhausted
+
+    log_dir = tmp_path / "artifacts" / "orchestrator"
+    log_dir.mkdir(parents=True)
+    fix_log = log_dir / "REMOTE_FIX_AGENT.log"
+    fix_log.write_text(
+        "out of usage. Switch to Auto, or ask your admin to increase your limit.\n",
+        encoding="utf-8",
+    )
+    assert cli_usage_exhausted(tmp_path) is True
+    clear_cli_usage_exhausted(tmp_path)
+    assert cli_usage_exhausted(tmp_path) is False

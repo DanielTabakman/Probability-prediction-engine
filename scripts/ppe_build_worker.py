@@ -35,35 +35,44 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def resolve_codex_cli() -> str | None:
-    exe = shutil.which("codex")
-    if exe:
-        return exe
-    npm_global = os.environ.get("APPDATA", "").strip()
-    if npm_global:
-        candidate = Path(npm_global) / "npm" / "codex.cmd"
-        if candidate.is_file():
-            return str(candidate)
-    # Standalone Windows installer (chatgpt.com/codex/install.ps1)
+def iter_codex_cli_candidates() -> list[str]:
+    """Ordered Codex CLI paths — standalone Windows install before npm stub."""
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def add(path: Path | str | None) -> None:
+        if path is None:
+            return
+        resolved = Path(path)
+        if not resolved.is_file():
+            return
+        key = str(resolved.resolve())
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append(str(resolved))
+
     local_app = os.environ.get("LOCALAPPDATA", "").strip()
     if local_app:
-        candidate = Path(local_app) / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe"
-        if candidate.is_file():
-            return str(candidate)
-    # npm global / Unix-style local bin
+        add(Path(local_app) / "Programs" / "OpenAI" / "Codex" / "bin" / "codex.exe")
+
+    which = shutil.which("codex")
+    if which:
+        add(which)
+
+    npm_global = os.environ.get("APPDATA", "").strip()
+    if npm_global:
+        add(Path(npm_global) / "npm" / "codex.cmd")
+
     home = os.environ.get("USERPROFILE") or os.environ.get("HOME", "")
     if home:
         for name in ("codex.exe", "codex"):
-            candidate = Path(home) / ".local" / "bin" / name
-            if candidate.is_file():
-                return str(candidate)
-    return None
+            add(Path(home) / ".local" / "bin" / name)
+
+    return candidates
 
 
-def codex_authenticated() -> bool:
-    exe = resolve_codex_cli()
-    if not exe:
-        return False
+def _codex_login_ok(exe: str) -> bool:
     proc = subprocess.run(
         [exe, "login", "status"],
         capture_output=True,
@@ -71,6 +80,23 @@ def codex_authenticated() -> bool:
         check=False,
     )
     return proc.returncode == 0
+
+
+def resolve_codex_cli() -> str | None:
+    candidates = iter_codex_cli_candidates()
+    if not candidates:
+        return None
+    for exe in candidates:
+        if _codex_login_ok(exe):
+            return exe
+    return candidates[0]
+
+
+def codex_authenticated() -> bool:
+    exe = resolve_codex_cli()
+    if not exe:
+        return False
+    return _codex_login_ok(exe)
 
 
 def codex_available() -> bool:
@@ -512,19 +538,91 @@ def format_handoff_banner(repo: Path) -> str:
     return "\n".join(lines)
 
 
-def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
-    """Check BUILD dispatch uses Cursor CLI before Codex when Cursor has quota."""
+def _build_worker_policy_context(repo: Path) -> dict[str, Any]:
     repo = repo.resolve()
     pref = load_build_worker_pref(repo)
     status = collect_build_worker_status(repo)
     cursor_available = bool(status.get("cursor_cli_available"))
     cursor_exhausted = bool(status.get("cursor_cli_exhausted"))
-    codex_available = bool(status.get("codex_cli_available"))
+    codex_available_flag = bool(status.get("codex_cli_available"))
     codex_exhausted = bool(status.get("codex_cli_exhausted"))
     worker = status.get("worker")
     mode = status.get("mode")
     reason = status.get("reason")
     cursor_has_quota = cursor_available and not cursor_exhausted
+    codex_has_quota = codex_available_flag and not codex_exhausted
+    return {
+        "pref": pref,
+        "worker": worker,
+        "mode": mode,
+        "reason": reason,
+        "cursor_has_quota": cursor_has_quota,
+        "cursor_cli_available": cursor_available,
+        "cursor_cli_exhausted": cursor_exhausted,
+        "codex_cli_available": codex_available_flag,
+        "codex_cli_exhausted": codex_exhausted,
+        "codex_has_quota": codex_has_quota,
+    }
+
+
+def evaluate_codex_first_policy(repo: Path) -> dict[str, Any]:
+    """Check BUILD dispatch prefers Codex CLI to preserve Cursor quota (local default)."""
+    ctx = _build_worker_policy_context(repo)
+    pref = ctx["pref"]
+    worker = ctx["worker"]
+    mode = ctx["mode"]
+    reason = ctx["reason"]
+
+    verdict = "warn"
+    detail = "No headless worker with quota"
+
+    if pref == PREF_MANUAL:
+        verdict = "info"
+        detail = "manual handoff — CLI token order not applicable"
+    elif pref == PREF_CURSOR:
+        if mode == "headless" and worker == WORKER_CURSOR_CLI:
+            verdict = "warn"
+            detail = "buildWorker=cursor uses Cursor CLI — set codex to preserve Cursor quota"
+        elif mode == "manual":
+            verdict = "info"
+            detail = "buildWorker=cursor with manual handoff"
+    elif pref == PREF_CODEX:
+        if mode == "headless" and worker == WORKER_CODEX_CLI:
+            verdict = "ok"
+            detail = "Codex CLI headless (buildWorker=codex)"
+        elif mode == "manual" and worker == WORKER_CODEX_CLI:
+            verdict = "warn"
+            detail = "Codex desktop handoff — run setup_codex.cmd and codex login for headless"
+        elif mode == "manual":
+            verdict = "warn"
+            detail = "Codex unavailable — install/login (setup_codex.cmd) or desktop Codex handoff"
+    elif pref == PREF_AUTO:
+        if mode == "headless" and worker == WORKER_CODEX_CLI:
+            verdict = "ok"
+            detail = "auto fell back to Codex headless (Cursor blocked or exhausted)"
+        elif mode == "headless" and worker == WORKER_CURSOR_CLI and ctx["codex_has_quota"]:
+            verdict = "warn"
+            detail = "auto prefers Cursor CLI — set buildWorker=codex to preserve Cursor quota"
+        elif mode == "headless" and worker == WORKER_CURSOR_CLI:
+            verdict = "info"
+            detail = "auto uses Cursor CLI headless (Codex unavailable)"
+        elif mode == "manual":
+            verdict = "warn"
+            detail = "No headless worker — verify_codex.cmd then clear_build_worker_quota.cmd if stale"
+
+    return {**ctx, "verdict": verdict, "detail": detail}
+
+
+def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
+    """Check BUILD dispatch uses Cursor CLI before Codex when Cursor has quota."""
+    ctx = _build_worker_policy_context(repo)
+    pref = ctx["pref"]
+    worker = ctx["worker"]
+    mode = ctx["mode"]
+    reason = ctx["reason"]
+    cursor_has_quota = ctx["cursor_has_quota"]
+    codex_available_flag = ctx["codex_cli_available"]
+    codex_exhausted = ctx["codex_cli_exhausted"]
 
     verdict = "warn"
     detail = "No headless worker with quota"
@@ -535,8 +633,8 @@ def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
     elif pref == PREF_CODEX:
         verdict = "warn"
         detail = "buildWorker=codex prefers Codex — set auto for Cursor-first"
-        if cursor_has_quota and worker == WORKER_CODEX_CLI and mode == "headless":
-            detail = "Cursor has quota but Codex is headless (buildWorker=codex)"
+        if ctx["codex_has_quota"] and worker == WORKER_CODEX_CLI and mode == "headless":
+            detail = "buildWorker=codex — Codex headless (Cursor-first check not applicable)"
     elif cursor_has_quota:
         if mode == "headless" and worker == WORKER_CURSOR_CLI:
             verdict = "ok"
@@ -547,29 +645,17 @@ def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
         elif mode == "manual":
             verdict = "warn"
             detail = "Cursor has quota but only manual handoff — check agent login"
-    elif cursor_exhausted and worker == WORKER_CODEX_CLI and mode == "headless":
+    elif ctx["cursor_cli_exhausted"] and worker == WORKER_CODEX_CLI and mode == "headless":
         verdict = "ok"
         detail = "Cursor quota exhausted — Codex headless fallback is correct"
-    elif not cursor_available and codex_available and not codex_exhausted:
+    elif not ctx["cursor_cli_available"] and codex_available_flag and not codex_exhausted:
         verdict = "ok"
         detail = "Cursor unavailable — Codex fallback active"
     elif pref == PREF_CURSOR and worker == WORKER_CURSOR_CLI and mode == "headless":
         verdict = "ok"
         detail = "buildWorker=cursor — Cursor CLI headless"
 
-    return {
-        "verdict": verdict,
-        "detail": detail,
-        "pref": pref,
-        "worker": worker,
-        "mode": mode,
-        "reason": reason,
-        "cursor_has_quota": cursor_has_quota,
-        "cursor_cli_available": cursor_available,
-        "cursor_cli_exhausted": cursor_exhausted,
-        "codex_cli_available": codex_available,
-        "codex_cli_exhausted": codex_exhausted,
-    }
+    return {**ctx, "verdict": verdict, "detail": detail}
 
 
 def collect_build_worker_status(repo: Path) -> dict[str, Any]:
@@ -597,6 +683,8 @@ def main(argv: list[str] | None = None) -> int:
     p_status.add_argument("--json", action="store_true")
     p_cursor = sub.add_parser("cursor-first", help="Check Cursor-before-Codex BUILD policy")
     p_cursor.add_argument("--json", action="store_true")
+    p_codex = sub.add_parser("codex-first", help="Check Codex-before-Cursor BUILD policy")
+    p_codex.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -611,6 +699,17 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(
                 f"cursor-first: {policy['verdict']} — {policy['detail']} "
+                f"(pref={policy['pref']} worker={policy['worker']} mode={policy['mode']})"
+            )
+        return 0 if policy["verdict"] in ("ok", "info") else 1
+
+    if args.command == "codex-first":
+        policy = evaluate_codex_first_policy(repo)
+        if args.json:
+            print(json.dumps(policy, indent=2))
+        else:
+            print(
+                f"codex-first: {policy['verdict']} — {policy['detail']} "
                 f"(pref={policy['pref']} worker={policy['worker']} mode={policy['mode']})"
             )
         return 0 if policy["verdict"] in ("ok", "info") else 1
