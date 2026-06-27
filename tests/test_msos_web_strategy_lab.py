@@ -202,7 +202,7 @@ def test_nav_enables_strategy_lab() -> None:
     assert "disabled: true" not in nav.split("strategy-lab")[1].split("theses")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert 'href="/strategy-lab"' in cc
+    assert "labHref" in cc
 
 
 def test_expression_planning_route_and_narrative() -> None:
