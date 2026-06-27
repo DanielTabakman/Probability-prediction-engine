@@ -15,8 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md))
-- **Last closed chapter:** **PPE commodity proxy tier-1 v1 (ETF options)** — **COMPLETE** 2026-06-27
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md))
+- **Last closed chapter:** **PPE equity universe tier-1a v1 (indices)** — **COMPLETE** 2026-06-27
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 

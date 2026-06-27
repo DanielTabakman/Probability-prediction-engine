@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — ppe commodity proxy tier-1 v1 (etf options) **COMPLETE** 2026-06-27
+- Active MVP1 focus: **none** — ppe equity universe tier-1a v1 (indices) **COMPLETE** 2026-06-27
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`
+- Next pending execution step: **steward SELECTION** — `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**PPE commodity proxy tier-1 v1 (ETF options) COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**PPE equity universe tier-1a v1 (indices) COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -47,9 +47,9 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md).
+2. **Steward:** SELECTION — [`POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md).
 
 
 ## Last updated
 
-2026-06-27 — PPE commodity proxy tier-1 v1 (ETF options) COMPLETE; closeout job `PPE-CommProxy-Closeout-Slice004`.
+2026-06-27 — PPE equity universe tier-1a v1 (indices) COMPLETE; closeout job `PPE-EqT1a-Closeout-Slice004`.
