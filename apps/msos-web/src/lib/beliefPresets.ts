@@ -2,8 +2,8 @@
  * Strategy Lab belief controls — UX copy only (no distribution math).
  */
 
-import type { DisplayPayload, LabOutcomeSummary } from "@/lib/ppeDisplayPayload";
-import { buildOutcomeFromPayload } from "@/lib/ppeDisplayPayload";
+import type { DisplayAssetMeta, DisplayPayload, LabOutcomeSummary } from "@/lib/ppeDisplayPayload";
+import { buildOutcomeFromPayload, optionsSourceLabel, resolveDisplayAssetMeta } from "@/lib/ppeDisplayPayload";
 
 export type BeliefPresetId = "higher" | "lower" | "more_volatility" | "less_volatility";
 
@@ -191,12 +191,17 @@ export function saveBeliefView(view: BeliefView): void {
   window.localStorage.setItem(BELIEF_STORAGE_KEY, JSON.stringify(view));
 }
 
-export function buildBeliefSentence(view: BeliefView, expiryLabel: string): string {
+export function buildBeliefSentence(
+  view: BeliefView,
+  expiryLabel: string,
+  assetMeta?: DisplayAssetMeta,
+): string {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(null);
   const phrase = buildBeliefViewPhrase(view);
   if (!phrase) {
     return `Pick how you disagree with options by ${expiryLabel}.`;
   }
-  return `I think BTC will ${phrase} by ${expiryLabel}.`;
+  return `I think ${asset.id} will ${phrase} by ${expiryLabel}.`;
 }
 
 function marketWidthFromPayload(payload: DisplayPayload | null | undefined): string {
@@ -236,8 +241,9 @@ export function buildOutcomeFromView(
   payload: DisplayPayload | null | undefined,
   live: boolean,
   expiryDate?: string,
+  assetMeta?: DisplayAssetMeta,
 ): LabOutcomeSummary {
-  return buildOutcomeFromTuning(tuningFromView(view), payload, live, expiryDate);
+  return buildOutcomeFromTuning(tuningFromView(view), payload, live, expiryDate, assetMeta);
 }
 
 export function buildOutcomeFromTuning(
@@ -245,7 +251,10 @@ export function buildOutcomeFromTuning(
   payload: DisplayPayload | null | undefined,
   live: boolean,
   expiryDate?: string,
+  assetMeta?: DisplayAssetMeta,
 ): LabOutcomeSummary {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(payload);
+  const sourceLabel = optionsSourceLabel(asset);
   const forwardHigh = tuning.forward_mult > 1.002;
   const forwardLow = tuning.forward_mult < 0.998;
   const volHigh = tuning.vol_mult > 1.02;
@@ -267,7 +276,7 @@ export function buildOutcomeFromTuning(
   if (live && payload) {
     const marketWidth = marketWidthFromPayload(payload);
     const expiry = expiryLabelFromPayload(payload, expiryDate);
-    const base = buildOutcomeFromPayload(payload);
+    const base = buildOutcomeFromPayload(payload, expiryDate, undefined, asset);
 
     let headline = "Your view differs from what options are pricing.";
     if (forwardHigh && !volHigh && !volLow) {
@@ -282,7 +291,7 @@ export function buildOutcomeFromTuning(
       headline = "You're disagreeing on both price level and range width.";
     }
 
-    const body = `For ${expiry}, live Deribit options set the baseline. Your view is **${label}** — you think BTC will ${phrase}. The market's middle-50% range is about ${marketWidth}. Confirm when that matches your view.`;
+    const body = `For ${expiry}, live ${sourceLabel} set the baseline. Your view is **${label}** — you think ${asset.id} will ${phrase}. The market's middle-50% range is about ${marketWidth}. Confirm when that matches your view.`;
 
     const marketScore = forwardHigh
       ? "Skewed up"
@@ -313,7 +322,7 @@ export function buildOutcomeFromTuning(
     tag: "Your view",
     tagTone: "teal",
     delta: volLow && !forwardHigh && !forwardLow ? "21%" : "—",
-    headline: `You think BTC will ${phrase}.`,
+    headline: `You think ${asset.id} will ${phrase}.`,
     body: `Your view: ${label}. Confirm when this matches what you actually believe.`,
     scores: [
       { label: "Market", value: "From options", tone: "amber" },

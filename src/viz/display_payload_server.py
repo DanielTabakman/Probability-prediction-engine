@@ -13,7 +13,9 @@ from src.viz.embed_display_boundary import (
 
 def main() -> None:
     port = int(os.environ.get("PORT", "8765"))
-    app = create_display_payload_wsgi_app(build_live_distribution_display_payload)
+    app = create_display_payload_wsgi_app(
+        lambda environ: build_live_distribution_display_payload(environ=environ)
+    )
     with make_server("", port, app) as httpd:
         print(f"ppe_display_api listening on :{port}", flush=True)
         httpd.serve_forever()

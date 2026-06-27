@@ -1,24 +1,49 @@
-# Tradeable asset registry (v1) — Deribit crypto wedge
-# Consumed by PPE core/viz from slice PPE-CryptoMA-Core-Slice002 onward.
-# MSOS reads display payload metadata only — no math in TypeScript.
+# Tradeable asset registry (v2) — SSOT for PPE fetch + catalog metadata
+# Consumed by PPE core/viz; MSOS reads catalog.json / display payload only.
+# Tier-1 staging rows: config/assets_tier1_manifest.yaml (merged per relay chapter).
 
-version: 1
+version: 2
 default_asset_id: BTC
 
 assets:
   BTC:
     label: "BTC options"
+    asset_class: crypto
+    tier: core
     venue: deribit
     deribit_currency: BTC
     price_unit: USD
     spread_width: 5000
+    catalog:
+      group: crypto
     trust_notes: []
 
   ETH:
     label: "ETH options"
+    asset_class: crypto
+    tier: core
     venue: deribit
     deribit_currency: ETH
     price_unit: USD
     spread_width: 500
+    catalog:
+      group: crypto
     trust_notes:
       - "Thinner books than BTC — BL curve may be noisier; surface trust state in lab."
+
+  NVDA:
+    label: "NVDA options"
+    asset_class: equity_mega
+    tier: core
+    venue: equity
+    equity_symbol: NVDA
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: false
+    spread_width: 25
+    catalog:
+      group: equity_mega
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+      - "LEAPS chain may be thin — BL trust state surfaced when OI/volume low."

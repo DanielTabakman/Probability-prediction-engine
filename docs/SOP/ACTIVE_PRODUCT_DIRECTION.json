@@ -27,12 +27,19 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-26",
       "evidence": "docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_equity_options_v1",
+      "label": "PPE equity options v1 (NVDA)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-26",
+      "evidence": "docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_equity_options_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md",
-  "nextStewardAction": "Run ppe_auto_select --apply to promote ppe_equity_options_v1 after self-serve closeout; then run_ppe.cmd",
+  "activeBuildChapterId": "ppe_tradeable_universe_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
+  "nextStewardAction": "Run ppe_auto_select --apply (done) then run_ppe.cmd on ppe_tradeable_universe_v1 Control-Slice001",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -77,7 +84,22 @@
     {
       "id": "equity_options_v1",
       "doc": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
-      "role": "next relay chapter — NVDA single-ticker equity options"
+      "role": "COMPLETE — NVDA single-ticker equity wedge"
+    },
+    {
+      "id": "tradeable_universe_v1",
+      "doc": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
+      "role": "active relay — registry v2 + catalog API"
+    },
+    {
+      "id": "options_horizon_v1",
+      "doc": "docs/SOP/POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md",
+      "role": "side channel — chart-first region thesis tool; LOW priority; pre-execution; after tradeable universe"
+    },
+    {
+      "id": "cross_venue_arb_v1",
+      "doc": "docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md",
+      "role": "side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest"
     }
   ],
   "buildTrack": {
@@ -86,7 +108,8 @@
     "chapters": [
       "ppe_crypto_multi_asset_v1",
       "msos_self_serve_onboarding_v1",
-      "ppe_equity_options_v1"
+      "ppe_equity_options_v1",
+      "ppe_tradeable_universe_v1"
     ]
   },
   "supersedes": {

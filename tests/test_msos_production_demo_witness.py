@@ -29,6 +29,36 @@ def test_validate_display_api_response_ok() -> None:
         {
             "kind": "distribution_display_boundary",
             "spot_usd": 64000.0,
+            "asset": {"id": "ETH", "label": "ETH options"},
+            "series_by_expiry": [{"expiry_date": "2030-01-01", "prices_usd": [1, 2], "pdf_pct": [1, 2]}],
+        }
+    )
+    ok, err, data = validate_display_api_response(200, body, expected_asset_id="ETH")
+    assert ok is True
+    assert err is None
+    assert data is not None
+    assert data["spot_usd"] == 64000.0
+
+
+def test_validate_display_api_response_asset_mismatch() -> None:
+    body = json.dumps(
+        {
+            "kind": "distribution_display_boundary",
+            "spot_usd": 140.0,
+            "asset": {"id": "BTC", "label": "BTC options"},
+            "series_by_expiry": [{"expiry_date": "2030-01-01", "prices_usd": [1, 2], "pdf_pct": [1, 2]}],
+        }
+    )
+    ok, err, _ = validate_display_api_response(200, body, expected_asset_id="NVDA")
+    assert ok is False
+    assert "NVDA" in (err or "")
+
+
+def test_validate_display_api_response_ok_without_asset_probe() -> None:
+    body = json.dumps(
+        {
+            "kind": "distribution_display_boundary",
+            "spot_usd": 64000.0,
             "series_by_expiry": [{"expiry_date": "2030-01-01", "prices_usd": [1, 2], "pdf_pct": [1, 2]}],
         }
     )

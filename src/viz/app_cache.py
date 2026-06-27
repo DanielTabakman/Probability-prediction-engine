@@ -10,6 +10,7 @@ from __future__ import annotations
 import streamlit as st
 
 from src.data import fetch_polymarket_markets, fetch_yahoo_prices
+from src.data.assets_registry import asset_venue, default_asset_id, deribit_currency
 from src.data.fetch_btc_options import fetch_btc_options_summary
 from src.data.fetch_deribit import (
     DEFAULT_OPTION_EXPIRIES_MAX,
@@ -23,6 +24,9 @@ from src.data.fetch_deribit import (
     fetch_deribit_btc_options_summary,
     fetch_deribit_btc_tight_bull_spreads,
     fetch_deribit_forward_and_iv_for_expiry,
+    fetch_deribit_index,
+    fetch_deribit_option_expiries,
+    fetch_deribit_option_marks_by_expiry_full,
     last_deribit_instruments_diagnostic,
 )
 
@@ -30,6 +34,10 @@ from src.data.fetch_deribit import (
 CACHE_TTL = 120
 # Shorter TTL for option expiries so a transient empty result is not stuck as long.
 CACHE_TTL_OPTION_EXPIRIES = 30
+
+
+def _norm_asset_id(asset_id: str | None) -> str:
+    return (asset_id or default_asset_id()).strip().upper()
 
 
 @st.cache_data(ttl=CACHE_TTL)
@@ -50,6 +58,17 @@ def cached_forward_curve(max_contracts):
 @st.cache_data(ttl=CACHE_TTL)
 def cached_deribit_index():
     return fetch_deribit_btc_index()
+
+
+@st.cache_data(ttl=CACHE_TTL)
+def cached_lab_spot(asset_id: str | None = None):
+    """Spot/index for implied lab (Deribit index or equity Yahoo spot)."""
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        from src.data.fetch_equity_options import fetch_equity_spot
+
+        return fetch_equity_spot(asset_id=aid)
+    return fetch_deribit_index(deribit_currency(aid))
 
 
 @st.cache_data(ttl=CACHE_TTL)
@@ -84,19 +103,47 @@ def cached_options_for_chart():
 
 
 @st.cache_data(ttl=CACHE_TTL_OPTION_EXPIRIES)
-def cached_option_expiries(max_expiries=DEFAULT_OPTION_EXPIRIES_MAX):
-    rows = fetch_deribit_btc_option_expiries(max_expiries=max_expiries)
-    return rows, last_deribit_instruments_diagnostic()
+def cached_option_expiries(max_expiries=DEFAULT_OPTION_EXPIRIES_MAX, asset_id: str | None = None):
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        from src.data.fetch_equity_options import fetch_equity_option_expiries
+
+        rows = fetch_equity_option_expiries(asset_id=aid, max_expiries=max_expiries)
+        normalized = [
+            {
+                "expiry_date_str": str(r["expiry_date_str"]),
+                "expiry_ts": int(r["expiration_timestamp"]),
+            }
+            for r in rows
+        ]
+        return normalized, {}
+    return fetch_deribit_option_expiries(
+        max_expiries, currency=deribit_currency(aid)
+    ), last_deribit_instruments_diagnostic()
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_forward_iv(expiry_ts, spot):
-    return fetch_deribit_forward_and_iv_for_expiry(expiry_ts, spot)
+def cached_forward_iv(expiry_ts, spot, asset_id: str | None = None):
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        from src.data.fetch_equity_options import fetch_equity_forward_and_iv_for_expiry
+
+        return fetch_equity_forward_and_iv_for_expiry(expiry_ts, spot, asset_id=aid)
+    return fetch_deribit_forward_and_iv_for_expiry(
+        expiry_ts, spot, currency=deribit_currency(aid)
+    )
 
 
 @st.cache_data(ttl=CACHE_TTL)
-def cached_marks_full(expiry_ts):
-    return fetch_deribit_btc_option_marks_by_expiry_full(expiry_ts)
+def cached_marks_full(expiry_ts, asset_id: str | None = None):
+    aid = _norm_asset_id(asset_id)
+    if asset_venue(aid) == "equity":
+        from src.data.fetch_equity_options import fetch_equity_option_marks_by_expiry_full
+
+        return fetch_equity_option_marks_by_expiry_full(expiry_ts, asset_id=aid)
+    return fetch_deribit_option_marks_by_expiry_full(
+        expiry_ts, currency=deribit_currency(aid)
+    )
 
 
 @st.cache_data(ttl=CACHE_TTL)
@@ -107,4 +154,3 @@ def cached_btc_options_summary():
 @st.cache_data(ttl=CACHE_TTL)
 def cached_deribit_summary(max_tickers):
     return fetch_deribit_btc_options_summary(max_tickers=max_tickers)
-

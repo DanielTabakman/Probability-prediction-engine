@@ -17,6 +17,7 @@ export type MarketAsset = {
 export const navItems: NavItem[] = [
   { id: "command-center", label: "Command Center", href: "/command-center" },
   { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
+  { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
   { id: "theses", label: "Theses", href: "#", disabled: true },
   { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "/monitor" },
@@ -34,6 +35,7 @@ export const calibrationStrip = {
 export const connectedMarkets: MarketAsset[] = [
   { label: "BTC options", status: "Live", live: true },
   { label: "ETH options", status: "Live", live: true },
+  { label: "NVDA options", status: "Live", live: true },
   { label: "Event markets", status: "Planned" },
   { label: "Perp positioning", status: "Planned" },
 ];
@@ -57,6 +59,13 @@ export const labTiles = [
     mark: "E",
     title: "ETH options",
     description: "Same workflow — live on Deribit",
+    cta: "Open lab",
+    enabled: true,
+  },
+  {
+    mark: "N",
+    title: "NVDA options",
+    description: "Equity LEAPS — live chain with trust caveats",
     cta: "Open lab",
     enabled: true,
   },

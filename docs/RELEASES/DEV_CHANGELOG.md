@@ -2,8 +2,45 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-27
+
+_No merges to `main`._
+
 ## 2026-06-26
 
+- `d195355` — product(msos-ui): PPE-Universe-Product-Slice005 catalog crypto/stocks asset picker (#382) (`apps/msos-web/`)
+- `00cc042` — Control-plane: cross-venue sideChannel auto-run on idle manifest (#383)
+- `254b859` — Control-plane: cross-venue sideChannel auto-run on idle manifest (#381) (`docs/SOP/`)
+- `a1bada5` — fix(msos-shell): stop homepage feature cards overlapping hero CTAs (#380) (`apps/msos-web/`)
+- `473e586` — Options Horizon v1: chart workspace, surface archive, MSOS route (#379) (`apps/msos-web/`)
+- `214ecff` — product(ppe-ui): PPE-Universe-UI-Slice004 registry-driven lab selector (#378) (`docs/SOP/`)
+- `786fd2a` — product(ppe-core): PPE-Universe-Core-Slice003 catalog.json + witness (#377) (`docs/SOP/`)
+- `582c164` — Control-plane: dev changelog
+- `b006529` — control-plane: Cursor-first BUILD worker checker (verify_build_worker.cmd) (`docs/SOP/`)
+- `7664ffc` — product(ppe-core): PPE-Universe-Core-Slice002 registry v2 (#376) (`docs/SOP/`)
+- `a349360` — control(evidence): PPE-Universe-Control-Slice001 charter witness CLOSED (#375) (`docs/SOP/`)
+- **Chapter closed:** PPE-Equity-Closeout-Slice008 chapter COMPLETE (#374) (`PPE-Equity-Closeout-Slice008 chapter COMPLETE (#374)`)
+- `c305e38` — control-plane: fix Codex CLI discovery on Windows (#373) (`docs/SOP/`)
+- `c302f71` — control(evidence): PPE-Equity-Witness-Slice007 NVDA pytest witness (#372) (`docs/SOP/`)
+- `74e7154` — platform: PPE-Equity-Platform-Slice006 NVDA production witness (#369) (`scripts/`)
+- `0cf3968` — product(msos-ui): PPE-Equity-Product-Slice005 NVDA Strategy Lab (#368) (`apps/msos-web/`)
+- `dba695a` — platform: auto-retarget stacked PRs to main after parent merge (#371)
+- `7c15cee` — ppe_tradeable_universe_program_v1: charter tier-1 asset expansion program (#370) (`docs/SOP/`)
+- `f5d9247` — product(ppe-ui): PPE-Equity-UI-Slice004 NVDA lab path (#367) (`src/viz/`)
+- `fd8707f` — product(ppe-core): PPE-Equity-Core-Slice003 forward/IV, trust, export (#366) (`scripts/`)
+- `ac230a7` — product(ppe-core): PPE-Equity-Core-Slice002 fetch_equity_options + NVDA registry (#365) (`scripts/`)
+- `94082df` — control(evidence): PPE-Equity-Control-Slice001 charter + adapter ADR (#364) (`docs/SOP/`)
+- `084d1ef` — Control-plane: dev changelog
+- **Chapter closed:** PPE equity options v1 (single ticker) (`PPE-Equity-Closeout-Slice008`)
+- `d69776d` — fix(msos-web): keep platform tour step card in viewport (#362)
+- `e48f7f3` — feat(msos): self-serve onboarding v1 complete + equity undefer (#363) (`docs/SOP/`)
+- `6fafd5b` — feat(deploy): auto-bootstrap staging VPS + Cloudflare CNAME helper (#360) (`scripts/`)
+- `544976e` — fix(deploy): apex MSOS guard + staging environment (#357) (`scripts/`)
+- `598a9da` — control-plane: post-crypto closeout direction sync (#356) (`docs/SOP/`)
+- `a40c32a` — control-plane: always block Defer-tier propagate regardless of focus gate env (#355) (`scripts/`)
+- `f967837` — control-plane: focus-gate roadmap bootstrap and auto-select (#354) (`scripts/`)
+- `0d46de6` — control-plane: block Defer-tier backlog from auto-propagate (#353) (`docs/SOP/`)
+- `b0e7821` — Control-plane: dev changelog
 - **Chapter closed:** ppe_crypto_multi_asset_v1 chapter COMPLETE (#351) (`ppe_crypto_multi_asset_v1 chapter COMPLETE (#351)`)
 - `857fd73` — control plane/context closeout crypto complete (#350) (`apps/msos-web/`)
 - `1a61bcf` — control-plane: align direction test with crypto chapter complete (#349)

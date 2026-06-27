@@ -9,10 +9,13 @@ import type { BeliefPresetId } from "@/lib/beliefPresets";
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
 import {
+  type DisplayAssetMeta,
   type DisplayPayload,
   type DisplaySeries,
   findSeriesByExpiry,
   isDisplaySeries,
+  optionsSourceLabel,
+  resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
@@ -48,6 +51,7 @@ type NativeDistributionChartProps = {
   spotUsd: number;
   beliefPdfPct?: number[] | null;
   beliefLabel?: string | null;
+  priceAxisLabel: string;
 };
 
 function NativeDistributionChart({
@@ -55,6 +59,7 @@ function NativeDistributionChart({
   spotUsd,
   beliefPdfPct,
   beliefLabel,
+  priceAxisLabel,
 }: NativeDistributionChartProps) {
   const { formatMoney } = useDisplayCurrency();
   const ariaLabel = beliefLabel
@@ -71,6 +76,7 @@ function NativeDistributionChart({
         spotUsd={spotUsd}
         ariaLabel={ariaLabel}
         curveLabels={curveLabels}
+        priceAxisLabel={priceAxisLabel}
       />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
         <div className="ppe-summary-table" aria-label="PPE display payload summary">
@@ -92,6 +98,7 @@ type PpeEmbedBoundaryProps = {
   beliefPresetId?: BeliefPresetId | null;
   beliefLabel?: string | null;
   beliefPdfPct?: number[] | null;
+  assetMeta?: DisplayAssetMeta;
 };
 
 export function PpeEmbedBoundary({
@@ -102,14 +109,20 @@ export function PpeEmbedBoundary({
   beliefPresetId = null,
   beliefLabel = null,
   beliefPdfPct = null,
+  assetMeta,
 }: PpeEmbedBoundaryProps) {
+  const asset = assetMeta ?? resolveDisplayAssetMeta(payload);
+  const instrument = asset.instrument_label ?? asset.label;
+  const priceAxisLabel = asset.price_axis_label ?? `${asset.id} price at expiry`;
+  const sourceLabel = optionsSourceLabel(asset);
+
   if (dataMode === "loading") {
     return (
       <div className="ppe-embed ppe-embed-degraded" role="region" aria-label="Options chart">
         <div className="ppe-embed-placeholder">
           <span className="tag teal">Loading</span>
           <h3>Loading live chart</h3>
-          <p>Fetching BTC options distribution from Deribit…</p>
+          <p>Fetching {instrument} distribution from {sourceLabel}…</p>
         </div>
       </div>
     );
@@ -146,9 +159,9 @@ export function PpeEmbedBoundary({
           : null);
 
     return (
-      <div className="ppe-chart-region" role="region" aria-label="BTC options distribution">
+      <div className="ppe-chart-region" role="region" aria-label={`${instrument} distribution`}>
         <p className="ppe-embed-live-note">
-          <span className="tag teal">Live</span> From Deribit options — updated with market quotes.
+          <span className="tag teal">Live</span> From {sourceLabel} — updated with market quotes.
           Purple curve = {resolveCurveLabels(primary.curve_labels ?? payload.curve_labels).market_legend}.
           {beliefOverlay ? (
             <>
@@ -162,6 +175,7 @@ export function PpeEmbedBoundary({
           spotUsd={payload.spot_usd}
           beliefPdfPct={beliefOverlay}
           beliefLabel={beliefLabel}
+          priceAxisLabel={priceAxisLabel}
         />
       </div>
     );

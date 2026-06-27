@@ -8,6 +8,7 @@ export const MSOS_ROUTES = {
   home: "/",
   commandCenter: "/command-center",
   strategyLab: "/strategy-lab",
+  optionsHorizon: "/options-horizon",
   monitor: "/monitor",
   history: "/history",
   learn: "/learn",

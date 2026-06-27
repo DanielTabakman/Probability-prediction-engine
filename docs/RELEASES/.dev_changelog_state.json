@@ -1,5 +1,5 @@
 {
-  "last_main_sha": "5929ff82691df724f98e1161a238fde5e711d70a",
+  "last_main_sha": "d195355b86acc271a980a29b2e2c69320a11bbfe",
   "recorded_events": [
     "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
     "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
@@ -9,7 +9,8 @@
     "chapter_closed:MSOS-EntitleV1-Closeout-Slice005",
     "chapter_closed:MSOS-EmbedShellV1-Closeout-Slice006",
     "chapter_closed:MSOS-WorkflowV1-Closeout-Slice005",
-    "chapter_closed:MSOS-MCDWitV1-Closeout-Slice003"
+    "chapter_closed:MSOS-MCDWitV1-Closeout-Slice003",
+    "chapter_closed:PPE-Equity-Closeout-Slice008"
   ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",
@@ -492,6 +493,38 @@
     "1a61bcf778bf55dbf8a16b5d7b9d71e7a57d375c",
     "857fd736a12943f84d518ca636e62685cb38a08d",
     "7aa43783be20cbb28e2ed817acddb5abe5d14bf7",
-    "5929ff82691df724f98e1161a238fde5e711d70a"
+    "5929ff82691df724f98e1161a238fde5e711d70a",
+    "b0e7821974191aa5ce4eb8684849f38480820aa8",
+    "0d46de63b179b9bcd42e555f5ded2b62720e980c",
+    "f96783775a631582da6ff37f26672c52ad6e3d06",
+    "a40c32ad75b8e124f0c830e803c0871fc8305e95",
+    "598a9da34a93b7320ca50d7f3e2c7bb7b67245fd",
+    "544976e1f6adaef9c302fe3c5d8140b788fa1cd0",
+    "6fafd5bcf1b1c41fc62106327b391e50d0e53420",
+    "e48f7f339b0c1e1866edf51cc5c31345f6401915",
+    "d69776db7d30cb3ec8f4d9695cebe65201039054",
+    "084d1ef0662cbcccac9eeb99a5182baea511a604",
+    "94082dfadafc5dd6c030b4d1868c61d769c77ca5",
+    "ac230a74889c34471638ce1466e37cb3a1195edc",
+    "fd8707fbcff82d11690c1deab9f7eebd717cbad8",
+    "f5d924791b40b91ae2784b727378105e9336e08b",
+    "7c15ceed57e3734fab5613231fcbec1eb2fe7f29",
+    "dba695a9a3524acf23335904abb52d1a586ce44a",
+    "0cf39680370b66158a00f69116951f6f82ec8758",
+    "74e71548b3704b9e066b7372bbc1511454961c02",
+    "c302f712d89f097c972f74431c49411447ea9f35",
+    "c305e38d34efc340fbb3b751159a1b17789281e6",
+    "7d82915732f23a639745882818809fab3901459a",
+    "a3493604e2e5f2de26f0e2541f7c4af5416f10bc",
+    "7664ffc45a8d377ccea4b220ef78fa7be1b094f6",
+    "b006529dc54c1db083013f1321470a45968b3ff9",
+    "582c16423feab574392ba956656483165d0f4038",
+    "786fd2ace371f5222b8a5217eb26451b44eeb451",
+    "214ecff91139003d8b921996700f8b7eddced54e",
+    "473e58606df7496a684f07f65b16730774f168ef",
+    "a1bada58f39d584db8e4e6aebf4e847c8d5cf57b",
+    "254b8597697c1b39036f46c2382e5479206d308b",
+    "00cc04202d8aed684754f579eda27f5669f179fa",
+    "d195355b86acc271a980a29b2e2c69320a11bbfe"
   ]
 }

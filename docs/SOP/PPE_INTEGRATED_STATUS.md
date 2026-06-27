@@ -15,15 +15,16 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-26) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_equity_options_v1` — [`SPRINT_PPE_EQUITY_OPTIONS_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md) |
-| **Relay plan** | [`ppe_equity_options_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json) |
-| **Next** | Run ppe_auto_select --apply to promote ppe_equity_options_v1 after self-serve closeout; then run_ppe.cmd |
+| **Active BUILD** | `ppe_tradeable_universe_v1` — [`SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md`](docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md) |
+| **Relay plan** | [`ppe_tradeable_universe_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json) |
+| **Next** | Run ppe_auto_select --apply (done) then run_ppe.cmd on ppe_tradeable_universe_v1 Control-Slice001 |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
   - `ppe_crypto_multi_asset_v1`
   - `msos_self_serve_onboarding_v1`
   - `ppe_equity_options_v1`
+  - `ppe_tradeable_universe_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
@@ -143,6 +144,8 @@ flowchart LR
 
 | PPE crypto multi-asset v1 (BTC + ETH) | **COMPLETE** 2026-06-26 | [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md), [`PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md) |
 
+| PPE equity options v1 (single ticker) | **COMPLETE** 2026-06-26 | [`SPRINT_PPE_EQUITY_OPTIONS_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md), [`PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -202,4 +205,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

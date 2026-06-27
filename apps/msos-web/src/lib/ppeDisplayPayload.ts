@@ -17,9 +17,15 @@ export const LAB_ASSET_QUERY_PARAM = "asset";
 
 export const DEFAULT_LAB_ASSET_ID = "BTC";
 
-export const SUPPORTED_LAB_ASSET_IDS = ["BTC", "ETH"] as const;
+/** Known assets for static copy fallbacks — not a runtime allowlist gate. */
+export const KNOWN_LAB_ASSET_IDS = ["BTC", "ETH", "NVDA"] as const;
 
-export type LabAssetId = (typeof SUPPORTED_LAB_ASSET_IDS)[number];
+export type KnownLabAssetId = (typeof KNOWN_LAB_ASSET_IDS)[number];
+
+/** Catalog-driven asset id (see ppeAssetCatalog.ts for selectable set). */
+export type LabAssetId = string;
+
+const LAB_ASSET_ID_PATTERN = /^[A-Z][A-Z0-9._-]{0,11}$/;
 
 export type DisplayAssetMeta = {
   id: string;
@@ -28,7 +34,7 @@ export type DisplayAssetMeta = {
   instrument_label?: string;
 };
 
-const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
+const LAB_ASSET_FALLBACKS: Record<KnownLabAssetId, DisplayAssetMeta> = {
   BTC: {
     id: "BTC",
     label: "BTC options",
@@ -41,14 +47,57 @@ const LAB_ASSET_FALLBACKS: Record<LabAssetId, DisplayAssetMeta> = {
     price_axis_label: "ETH price at expiry",
     instrument_label: "ETH options",
   },
+  NVDA: {
+    id: "NVDA",
+    label: "NVDA options",
+    price_axis_label: "NVDA price at expiry",
+    instrument_label: "NVDA options",
+  },
 };
 
-export function normalizeLabAssetId(value: string | null | undefined): LabAssetId {
+export function normalizeLabAssetId(
+  value: string | null | undefined,
+  allowedIds?: readonly string[],
+): LabAssetId {
   const upper = (value ?? "").trim().toUpperCase();
-  if (upper === "ETH") {
-    return "ETH";
+  if (!upper || !LAB_ASSET_ID_PATTERN.test(upper)) {
+    return DEFAULT_LAB_ASSET_ID;
   }
-  return DEFAULT_LAB_ASSET_ID;
+  if (allowedIds && allowedIds.length > 0) {
+    const allowed = new Set(allowedIds.map((id) => id.toUpperCase()));
+    return allowed.has(upper) ? upper : DEFAULT_LAB_ASSET_ID;
+  }
+  return upper;
+}
+
+/** Human label for where option quotes come from (display copy only). */
+export function optionsSourceLabel(asset: DisplayAssetMeta): string {
+  return asset.id === "NVDA" ? "equity options chain" : "Deribit options";
+}
+
+/** True when a live payload matches the asset the user selected in the lab. */
+export function isPayloadForSelectedAsset(
+  payload: DisplayPayload | null | undefined,
+  assetId: LabAssetId,
+): boolean {
+  const payloadAssetId = payload?.asset?.id?.toUpperCase();
+  if (!payloadAssetId) {
+    return assetId.toUpperCase() === DEFAULT_LAB_ASSET_ID;
+  }
+  return payloadAssetId === assetId.toUpperCase();
+}
+
+function fallbackMetaForAsset(assetId: string): DisplayAssetMeta {
+  const known = LAB_ASSET_FALLBACKS[assetId as KnownLabAssetId];
+  if (known) {
+    return known;
+  }
+  return {
+    id: assetId,
+    label: `${assetId} options`,
+    price_axis_label: `${assetId} price at expiry`,
+    instrument_label: `${assetId} options`,
+  };
 }
 
 export function resolveDisplayAssetMeta(
@@ -56,16 +105,17 @@ export function resolveDisplayAssetMeta(
   assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
 ): DisplayAssetMeta {
   const payloadAsset = payload?.asset;
-  if (payloadAsset?.id && payloadAsset.id.toUpperCase() === assetId) {
-    const fallback = LAB_ASSET_FALLBACKS[assetId];
+  const normalizedId = assetId.toUpperCase();
+  if (payloadAsset?.id && payloadAsset.id.toUpperCase() === normalizedId) {
+    const fallback = fallbackMetaForAsset(normalizedId);
     return {
       ...fallback,
       ...payloadAsset,
-      id: assetId,
+      id: normalizedId,
       label: payloadAsset.label || fallback.label,
     };
   }
-  return LAB_ASSET_FALLBACKS[assetId];
+  return fallbackMetaForAsset(normalizedId);
 }
 
 export function buildDisplayApiUrl(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
@@ -231,7 +281,11 @@ export function buildLabMetricsFromPayload(
       tone: "teal",
     },
     { label: "Typical range", value: marketWidth, tone: "amber" },
-    { label: "Data", value: "Live · Deribit", tone: "teal" },
+    {
+      label: "Data",
+      value: asset.id === "NVDA" ? "Live · equity chain" : "Live · Deribit",
+      tone: "teal",
+    },
   ];
 }
 

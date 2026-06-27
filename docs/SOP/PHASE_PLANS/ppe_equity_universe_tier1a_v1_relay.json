@@ -1,0 +1,63 @@
+{
+  "name": "ppe_equity_universe_tier1a_v1 (SPY + QQQ + IWM)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-EqT1a-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+      "buildBranch": "build/auto/PPE-EqT1a-Control-Slice001-eq_t1a",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-EqT1a-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+      "buildBranch": "build/auto/PPE-EqT1a-Core-Slice002-eq_t1a",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "src/data/fetch_equity_options.py",
+        "scripts/witness_asset_catalog.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-EqT1a-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+      "buildBranch": "build/auto/PPE-EqT1a-Witness-Slice003-eq_t1a",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "PPE-EqT1a-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+      "buildBranch": "build/auto/PPE-EqT1a-Closeout-Slice004-eq_t1a",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_equity_universe_tier1a_v1",
+        "chapterTitle": "PPE equity universe tier-1a v1 (indices)",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+      }
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
@@ -11,20 +12,26 @@ import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   DEFAULT_LAB_ASSET_ID,
   LAB_ASSET_QUERY_PARAM,
-  SUPPORTED_LAB_ASSET_IDS,
   fetchDisplayPayloadClient,
+  isPayloadForSelectedAsset,
   normalizeLabAssetId,
   resolveDisplayAssetMeta,
   type DisplayPayload,
   type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
 import {
+  FALLBACK_ASSET_PICKER,
+  bucketsFromCatalog,
+  fetchAssetCatalog,
+  listSelectableAssetIds,
+} from "@/lib/ppeAssetCatalog";
+import {
   LAB_DATA_DEMO_PILL,
-  LAB_DATA_LIVE_PILL,
   LAB_DATA_LOADING_PILL,
-  LAB_DEMO_BANNER_BODY,
   LAB_DEMO_BANNER_TITLE,
-  LAB_LOADING_BANNER_BODY,
+  labDataLivePill,
+  labDemoBannerBody,
+  labLoadingBannerBody,
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
 import {
@@ -62,7 +69,13 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const selectedAssetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
+  const [catalogAssetIds, setCatalogAssetIds] = useState<string[]>(() =>
+    listSelectableAssetIds(FALLBACK_ASSET_PICKER),
+  );
+  const selectedAssetId = normalizeLabAssetId(
+    searchParams.get(LAB_ASSET_QUERY_PARAM),
+    catalogAssetIds,
+  );
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() => resolveInitialMode(initialPayload));
   const [tutorialOpen, setTutorialOpen] = useState(false);
@@ -100,6 +113,20 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
 
   useEffect(() => {
     let cancelled = false;
+    void (async () => {
+      const catalog = await fetchAssetCatalog();
+      if (cancelled || !catalog) {
+        return;
+      }
+      setCatalogAssetIds(listSelectableAssetIds(bucketsFromCatalog(catalog)));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
     setMode("loading");
 
     void (async () => {
@@ -107,7 +134,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       if (cancelled) {
         return;
       }
-      if (livePayload) {
+      if (livePayload && isPayloadForSelectedAsset(livePayload, selectedAssetId)) {
         setPayload(livePayload);
         setMode("live");
         return;
@@ -127,11 +154,19 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   }, [selectedAssetId, initialPayload]);
 
   const pillLabel =
-    mode === "live" ? LAB_DATA_LIVE_PILL : mode === "loading" ? LAB_DATA_LOADING_PILL : LAB_DATA_DEMO_PILL;
+    mode === "live"
+      ? labDataLivePill(assetMeta)
+      : mode === "loading"
+        ? LAB_DATA_LOADING_PILL
+        : LAB_DATA_DEMO_PILL;
   const pillClass =
     mode === "live" ? "pill live" : mode === "loading" ? "pill loading" : "pill demo sample";
 
   const assetSwitchParams = useMemo(() => new URLSearchParams(searchParams.toString()), [searchParams]);
+  const buildAssetHrefForPicker = useCallback(
+    (assetId: string) => buildAssetHref(pathname, assetSwitchParams, assetId),
+    [pathname, assetSwitchParams],
+  );
 
   return (
     <>
@@ -139,26 +174,11 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         <div>
           <div className="crumb">Strategy Lab · {assetMeta.label}</div>
           <h1 className="title">Strategy Lab</h1>
-          <nav
-            className="belief-axis-pair"
-            aria-label="Options asset"
-            style={{ marginTop: 10, maxWidth: 220 }}
-            data-tour="lab-asset"
-          >
-            {SUPPORTED_LAB_ASSET_IDS.map((assetId) => {
-              const active = assetId === selectedAssetId;
-              return (
-                <Link
-                  key={assetId}
-                  href={buildAssetHref(pathname, assetSwitchParams, assetId)}
-                  className={`belief-preset${active ? " active" : ""}`}
-                  aria-current={active ? "page" : undefined}
-                  data-asset={assetId}
-                >
-                  {assetId}
-                </Link>
-              );
-            })}
+          <nav aria-label="Options asset" style={{ marginTop: 10, maxWidth: 420 }}>
+            <LabAssetPicker
+              selectedAssetId={selectedAssetId}
+              buildAssetHref={buildAssetHrefForPicker}
+            />
           </nav>
         </div>
         <div className="tools">
@@ -188,7 +208,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
           <span className="tag amber">Sample</span>
           <div>
             <strong>{LAB_DEMO_BANNER_TITLE}</strong>
-            <p>{LAB_DEMO_BANNER_BODY}</p>
+            <p>{labDemoBannerBody(assetMeta)}</p>
           </div>
         </div>
       ) : null}
@@ -196,13 +216,13 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       {mode === "loading" ? (
         <div className="lab-data-banner loading" role="status" aria-live="polite">
           <span className="tag teal">Loading</span>
-          <p>{LAB_LOADING_BANNER_BODY}</p>
+          <p>{labLoadingBannerBody(assetMeta)}</p>
         </div>
       ) : null}
 
       <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
 
-      <StrategyLabWorkSection displayPayload={payload} dataMode={mode} />
+      <StrategyLabWorkSection displayPayload={payload} dataMode={mode} assetMeta={assetMeta} />
 
       <PlatformTutorial
         active={tutorialOpen}

@@ -26,6 +26,7 @@ type LabeledDistributionChartProps = {
   spotUsd: number;
   ariaLabel: string;
   curveLabels?: CurveDisplayLabels;
+  priceAxisLabel?: string;
   layout?: ChartLayout;
 };
 
@@ -42,6 +43,7 @@ export function LabeledDistributionChart({
   spotUsd,
   ariaLabel,
   curveLabels = DEFAULT_CURVE_LABELS,
+  priceAxisLabel = "BTC price at expiry",
   layout = LABELED_DISTRIBUTION_LAYOUT,
 }: LabeledDistributionChartProps) {
   const { currency, formatMoney } = useDisplayCurrency();
@@ -103,7 +105,7 @@ export function LabeledDistributionChart({
           fontSize="10"
           textAnchor="middle"
         >
-          BTC price at expiry
+          {priceAxisLabel}
         </text>
         <text
           x={12}

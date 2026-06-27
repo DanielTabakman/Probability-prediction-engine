@@ -110,6 +110,24 @@ def check_codex_cli() -> bool:
     return True
 
 
+def check_cursor_tokens_first(repo: Path) -> bool:
+    from scripts.ppe_build_worker import evaluate_cursor_first_policy
+
+    policy = evaluate_cursor_first_policy(repo)
+    line = (
+        f"Cursor-first: pref={policy.get('pref')} worker={policy.get('worker')} "
+        f"mode={policy.get('mode')} cursor_quota={policy.get('cursor_has_quota')}"
+    )
+    print(line)
+    verdict = str(policy.get("verdict") or "warn")
+    detail = str(policy.get("detail") or "")
+    if verdict == "ok" or verdict == "info":
+        _ok(detail)
+        return True
+    _warn(detail)
+    return False
+
+
 def check_build_worker(repo: Path) -> bool:
     from scripts.ppe_build_worker import collect_build_worker_status
 
@@ -117,12 +135,16 @@ def check_build_worker(repo: Path) -> bool:
     worker = status.get("worker")
     pref = status.get("pref")
     reason = status.get("reason")
-    print(f"BUILD worker: pref={pref} headless={worker} reason={reason}")
-    if worker in ("cursor-cli", "codex-cli"):
+    mode = status.get("mode")
+    handoff = status.get("handoff_worker")
+    print(
+        f"BUILD worker: pref={pref} worker={worker} mode={mode} "
+        f"handoff={handoff} reason={reason}"
+    )
+    if mode == "headless" and worker in ("cursor-cli", "codex-cli"):
         _ok(f"headless BUILD worker ready ({worker})")
         return True
-    if worker == "manual":
-        handoff = status.get("handoff_worker")
+    if worker == "manual" or mode == "manual":
         if handoff == "codex-cli":
             _warn("headless blocked — desktop Codex handoff available")
         else:
@@ -171,6 +193,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--agent-only", action="store_true", help="Check Cursor agent CLI login only")
     ap.add_argument("--codex-only", action="store_true", help="Check Codex CLI + resolved BUILD worker")
     ap.add_argument("--build-worker", action="store_true", help="Check Codex, Cursor, and resolved BUILD worker")
+    ap.add_argument(
+        "--cursor-first",
+        action="store_true",
+        help="Check Cursor CLI is used before Codex when Cursor has quota",
+    )
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -186,6 +213,16 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.build_worker:
         return 0 if check_codex_cli() and check_agent_cli() and check_build_worker(repo) else 1
+
+    if args.cursor_first:
+        return (
+            0
+            if check_agent_cli()
+            and check_codex_cli()
+            and check_cursor_tokens_first(repo)
+            and check_build_worker(repo)
+            else 1
+        )
 
     checks = [
         check_ntfy(),

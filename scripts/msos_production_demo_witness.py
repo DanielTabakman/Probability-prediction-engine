@@ -25,6 +25,8 @@ from typing import Any
 DEFAULT_BASE = "https://marketstructureos.com"
 APP_HOST = "https://app.marketstructureos.com"
 DISPLAY_PAYLOAD_KIND = "distribution_display_boundary"
+LAB_ASSET_QUERY_PARAM = "asset"
+MULTI_ASSET_DISPLAY_PROBE_IDS: tuple[str, ...] = ("ETH", "NVDA")
 
 # Known storyboard fixture copy — warn until live-metrics slice wires display API into UI.
 FIXTURE_PREVIEW_SPOT = "$104,320"
@@ -69,6 +71,8 @@ def _has_research_cta(html: str) -> bool:
 def validate_display_api_response(
     status: int,
     body: str,
+    *,
+    expected_asset_id: str | None = None,
 ) -> tuple[bool, str | None, dict[str, Any] | None]:
     """True when display.json returns live distribution payload (not 500 / display_error)."""
     if status != 200:
@@ -90,6 +94,12 @@ def validate_display_api_response(
     series = data.get("series_by_expiry")
     if not isinstance(series, list) or not series:
         return False, "series_by_expiry empty", data
+    if expected_asset_id:
+        asset = data.get("asset")
+        aid = str((asset or {}).get("id") or "").strip().upper()
+        want = expected_asset_id.strip().upper()
+        if aid != want:
+            return False, f"asset.id {aid!r} != {want!r}", data
     return True, None, data
 
 
@@ -236,6 +246,24 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
         }
     )
 
+    for asset_id in MULTI_ASSET_DISPLAY_PROBE_IDS:
+        asset_url = f"{display_url}?{LAB_ASSET_QUERY_PARAM}={asset_id}"
+        a_status, a_body, a_err = _fetch(asset_url)
+        a_ok, a_msg, a_data = validate_display_api_response(
+            a_status, a_body, expected_asset_id=asset_id
+        )
+        checks.append(
+            {
+                "id": f"ppe_display_api_{asset_id.lower()}",
+                "url": asset_url,
+                "ok": a_ok,
+                "status": a_status,
+                "error": a_msg or a_err,
+                "spot_usd": (a_data or {}).get("spot_usd"),
+                "asset_id": asset_id,
+            }
+        )
+
     overlay_ok = False
     overlay_msg: str | None = "display API unavailable for overlay probe"
     overlay_url = f"{base}/ppe-display-api/belief-overlay.json"
@@ -317,6 +345,30 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
     if lab_status == 200:
         warnings.extend(_collect_fixture_warnings(lab_body))
 
+    nvda_lab_url = f"{base}/strategy-lab?{LAB_ASSET_QUERY_PARAM}=NVDA"
+    nvda_status, nvda_body, nvda_err = _fetch(nvda_lab_url)
+    nvda_html_ok, nvda_html_msg = (
+        validate_strategy_lab_html(nvda_body) if nvda_status == 200 else (False, nvda_err)
+    )
+    nvda_surface_ok = (
+        nvda_status == 200
+        and nvda_html_ok
+        and "NVDA" in nvda_body
+        and 'data-asset="NVDA"' in nvda_body
+    )
+    checks.append(
+        {
+            "id": "strategy_lab_nvda_asset",
+            "url": nvda_lab_url,
+            "ok": nvda_surface_ok,
+            "status": nvda_status,
+            "error": None
+            if nvda_surface_ok
+            else (nvda_html_msg or nvda_err or "NVDA asset switcher not in Strategy Lab HTML"),
+            "missing_phrases": [] if nvda_surface_ok else ["NVDA"],
+        }
+    )
+
     home_status, home_body, home_err = _fetch(f"{base}/")
     cta_ok = home_status == 200 and _has_research_cta(home_body)
     checks.append(
@@ -350,9 +402,12 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
     integration_ids = frozenset(
         {
             "ppe_display_api",
+            "ppe_display_api_eth",
+            "ppe_display_api_nvda",
             "ppe_belief_overlay_api",
             "strategy_lab_ppe_surface",
             "strategy_lab_labeled_axes_bundle",
+            "strategy_lab_nvda_asset",
         }
     )
     journey_failed = [c for c in failed if c["id"] not in optional_ids]

@@ -1,0 +1,56 @@
+"""Charter witness for PPE equity options v1 (Control-Slice001)."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from scripts.ppe_manifest import validate_phase_plan
+
+REPO = Path(__file__).resolve().parents[1]
+SOP = REPO / "docs" / "SOP"
+
+EQUITY_PLAN = SOP / "PHASE_PLANS" / "ppe_equity_options_v1_relay.json"
+EQUITY_SPRINT = SOP / "SPRINT_PPE_EQUITY_OPTIONS_V1.md"
+EQUITY_SELECTION = SOP / "POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md"
+EQUITY_EVIDENCE = SOP / "PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md"
+EQUITY_ADR = SOP / "PPE_EQUITY_OPTIONS_ADAPTER_ADR.md"
+MANIFEST = SOP / "ACTIVE_PHASE_MANIFEST.json"
+
+
+def test_equity_charter_artifacts_exist() -> None:
+    for path in (EQUITY_PLAN, EQUITY_SPRINT, EQUITY_SELECTION, EQUITY_EVIDENCE, EQUITY_ADR):
+        assert path.is_file(), f"missing charter artifact: {path.relative_to(REPO)}"
+
+
+def test_equity_phase_plan_valid() -> None:
+    plan = json.loads(EQUITY_PLAN.read_text(encoding="utf-8"))
+    assert not validate_phase_plan(plan)
+    assert plan["slices"][0]["sliceId"] == "PPE-Equity-Control-Slice001"
+    closeout = plan["slices"][-1].get("closeout") or {}
+    assert closeout.get("chapterId") == "ppe_equity_options_v1"
+
+
+def test_equity_adr_documents_nvda_scaffold() -> None:
+    body = EQUITY_ADR.read_text(encoding="utf-8")
+    assert "NVDA" in body
+    assert "enabled: false" in body
+    assert "venue: equity" in body
+
+
+def test_equity_chapter_closed_queue_and_manifest() -> None:
+    queue = json.loads((SOP / "PHASE_QUEUE.json").read_text(encoding="utf-8"))
+    row = next(
+        item for item in queue["items"]
+        if item.get("planPath") == "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json"
+    )
+    assert row["status"] == "DONE"
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    assert manifest.get("phasePlanPath") == "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
+    assert manifest.get("status") == "READY"
+
+
+def test_equity_sprint_complete_not_deferred() -> None:
+    body = EQUITY_SPRINT.read_text(encoding="utf-8")
+    assert "DEFERRED" not in body.split("## Sprint status")[0]
+    assert "COMPLETE" in body
