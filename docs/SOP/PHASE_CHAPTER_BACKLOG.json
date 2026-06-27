@@ -143,7 +143,7 @@
     },
     {
       "chapterId": "mvp1_cross_venue_scan_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
@@ -387,7 +387,7 @@
     },
     {
       "chapterId": "ppe_asset_display_parity_v1",
-      "status": "chartered",
+      "status": "queued",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
@@ -499,7 +499,7 @@
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",

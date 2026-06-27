@@ -69,12 +69,26 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-27",
       "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_commodity_proxy_tier1_v1",
+      "label": "Commodity ETF options (GLD SLV USO)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "mvp1_cross_venue_scan_v1",
+      "label": "MVP1 cross-venue scan v1",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-27",
+      "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_commodity_proxy_tier1_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
-  "nextStewardAction": "VM run_ppe.cmd on ppe_commodity_proxy_tier1_v1; finish gh auth setup-git on ppeloop for loop publish",
+  "activeBuildChapterId": "",
+  "activeBuildPlanPath": "",
+  "activeBuildSprint": "",
+  "nextStewardAction": "Manifest COMPLETE — steward SELECTION for next READY chapter; VM loop RUN_AUTO (HEALTHY_IDLE); finish gh auth setup-git on ppeloop",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
