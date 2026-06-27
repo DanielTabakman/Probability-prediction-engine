@@ -243,25 +243,25 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-      "status": "pending",
+      "status": "done",
       "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Equity mega caps batch 1",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Equity mega caps batch 2",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
     },
