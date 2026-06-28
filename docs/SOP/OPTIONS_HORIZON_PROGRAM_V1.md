@@ -2,9 +2,9 @@
 
 **Purpose:** Canonical map for **Options Horizon** — chart-first region thesis workspace in MSOS, separate from Strategy Lab / PPE.
 
-**As-of:** 2026-06-26 · **Milestone:** [`MILESTONE_OPTIONS_HORIZON_V1.md`](MILESTONE_OPTIONS_HORIZON_V1.md)
+**As-of:** 2026-06-27 · **Milestone:** [`MILESTONE_OPTIONS_HORIZON_V1.md`](MILESTONE_OPTIONS_HORIZON_V1.md)
 
-**Vision contracts:** [`docs/VISION/OPTIONS_HORIZON/`](../VISION/OPTIONS_HORIZON/)
+**Vision contracts:** [`docs/VISION/OPTIONS_HORIZON/`](../VISION/OPTIONS_HORIZON/) — incl. [`CHART_DISPLAY_CONTRACT_V1.md`](../VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md)
 
 ---
 
@@ -35,7 +35,9 @@ Not a broker. Not TradingView clone. Not PPE distribution histogram.
 | 3 | `horizon_readonly_chart_v1` | LOW | chart payload COMPLETE | MSOS `/options-horizon` read-only chart |
 | 4a | `horizon_region_draw_v1` | LOW | readonly chart COMPLETE | Box tool + RegionIntent save |
 | 4b | `horizon_expression_bridge_v1` | LOW | region draw COMPLETE | Implied mass, payoff preview, Strategy Lab link |
-| 5a | `horizon_replay_scrubber_v1` | LOW · DEFER | ≥30d archive + H3 COMPLETE | Timeline scrub of past implied surfaces |
+| **4c** | **`horizon_chart_polish_v1`** | **LOW · CHARTERED** | H4 COMPLETE | Implied overlay, axis/legend parity, expiry selector — [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md) |
+| **4d** | **`horizon_region_workflow_v1`** | **LOW · CHARTERED** | chart polish COMPLETE | RegionIntent MSOS persistence — [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) |
+| 5a | `horizon_replay_scrubber_v1` | LOW · DEFER | ≥30d archive + 4c COMPLETE | Timeline scrub of past implied surfaces |
 | 5b | `horizon_liquidation_overlay_v1` | LOW · DEFER | validation + vendor | Liquidation levels on historical pane |
 | 5c | `horizon_outcome_ghosts_v1` | LOW · DEFER | replay scrubber | Post-expiry implied vs realized |
 
@@ -81,11 +83,9 @@ Contract: [`SURFACE_ARCHIVE_CONTRACT_V1.md`](../VISION/OPTIONS_HORIZON/SURFACE_A
 
 | Chapter | SELECTION | Evidence |
 |---------|-----------|----------|
-| charter | [`POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md) | — |
-| surface archive | TBD | TBD |
-| chart payload | TBD | TBD |
-| readonly chart | TBD | TBD |
-| region + bridge | TBD | TBD |
+| charter | [`POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md) | [`OPTIONS_HORIZON_V1_EVIDENCE_STATUS.md`](OPTIONS_HORIZON_V1_EVIDENCE_STATUS.md) |
+| chart polish | [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md) | [`OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md`](OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md) |
+| region workflow | [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) | [`OPTIONS_HORIZON_REGION_WORKFLOW_V1_EVIDENCE_STATUS.md`](OPTIONS_HORIZON_REGION_WORKFLOW_V1_EVIDENCE_STATUS.md) |
 
 ---
 

@@ -147,8 +147,8 @@
     },
     {
       "id": "options_horizon_v1",
-      "doc": "docs/SOP/POST_OPTIONS_HORIZON_CHARTER_V1_SELECTION.md",
-      "role": "side channel — chart-first region thesis tool; LOW priority; pre-execution; after tradeable universe"
+      "doc": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
+      "role": "side channel — H0–H4 shipped; chart polish + region workflow CHARTERED (P2); promote horizon_chart_polish_v1 to READY when prioritized"
     },
     {
       "id": "cross_venue_arb_v1",

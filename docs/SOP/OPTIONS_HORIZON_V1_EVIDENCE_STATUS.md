@@ -1,11 +1,11 @@
 # Options Horizon v1 — evidence status
 
 **Program:** [`OPTIONS_HORIZON_PROGRAM_V1.md`](OPTIONS_HORIZON_PROGRAM_V1.md)  
-**As-of:** 2026-06-26
+**As-of:** 2026-06-27
 
 ---
 
-## Shipped in this pass
+## Shipped in this pass (H0–H4)
 
 | Chapter | Status | Evidence |
 |---------|--------|----------|
@@ -18,11 +18,22 @@
 
 ---
 
+## Chartered follow-on (ready to promote)
+
+| Chapter | Status | SELECTION |
+|---------|--------|-----------|
+| `horizon_chart_polish_v1` | **CHARTERED** | [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md) — implied overlay, axis parity, expiry selector |
+| `horizon_region_workflow_v1` | **CHARTERED** | [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) — after chart polish |
+
+Promote to `READY` in [`PHASE_QUEUE.json`](PHASE_QUEUE.json) when operator prioritizes Options Horizon (LOW / P2 — does not preempt meta-infra or tier-1 assets).
+
+---
+
 ## Deferred (by design)
 
 | Chapter | Gate |
 |---------|------|
-| `horizon_replay_scrubber_v1` | ≥30 days surface archive |
+| `horizon_replay_scrubber_v1` | ≥30 days surface archive + chart polish |
 | `horizon_liquidation_overlay_v1` | Data vendor TBD |
 | `horizon_outcome_ghosts_v1` | After replay scrubber |
 

@@ -568,6 +568,26 @@
       "reason": "[LOW] Implied mass in region + expression preview + Strategy Lab deep-link"
     },
     {
+      "chapterId": "horizon_chart_polish_v1",
+      "status": "chartered",
+      "priority": "low",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
+      "canonRef": "docs/VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md",
+      "reason": "[LOW CHARTERED] Options Horizon chart polish \u2014 implied overlay, axis parity, expiry selector; promote to READY when prioritized"
+    },
+    {
+      "chapterId": "horizon_region_workflow_v1",
+      "status": "chartered",
+      "priority": "low",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
+      "canonRef": "docs/VISION/OPTIONS_HORIZON/REGION_INTENT_SCHEMA_V1.md",
+      "reason": "[LOW CHARTERED] RegionIntent MSOS persistence \u2014 blocked until horizon_chart_polish_v1 COMPLETE"
+    },
+    {
       "chapterId": "horizon_replay_scrubber_v1",
       "status": "deferred",
       "priority": "low",

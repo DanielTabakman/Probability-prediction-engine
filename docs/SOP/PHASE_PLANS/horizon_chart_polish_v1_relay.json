@@ -1,0 +1,75 @@
+{
+  "name": "horizon_chart_polish_v1 (implied overlay + axis parity + expiry selector)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+  "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "Horizon-ChartPolish-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+      "buildBranch": "build/auto/Horizon-ChartPolish-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "Horizon-ChartPolish-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+      "buildBranch": "build/auto/Horizon-ChartPolish-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/OptionsHorizonChart.tsx",
+        "apps/msos-web/src/components/OptionsHorizonClient.tsx",
+        "apps/msos-web/src/lib/horizonChartPayload.ts",
+        "apps/msos-web/src/app/globals.css"
+      ]
+    },
+    {
+      "sliceId": "Horizon-ChartPolish-Product-Slice003",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+      "buildBranch": "build/auto/Horizon-ChartPolish-Product-Slice003",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 75,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/OptionsHorizonChart.tsx",
+        "apps/msos-web/src/components/OptionsHorizonClient.tsx",
+        "apps/msos-web/src/components/LabeledDistributionChart.tsx",
+        "apps/msos-web/src/lib/chartAxisDisplay.ts"
+      ]
+    },
+    {
+      "sliceId": "Horizon-ChartPolish-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+      "buildBranch": "build/auto/Horizon-ChartPolish-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "horizon_chart_polish_v1",
+        "chapterTitle": "Options Horizon chart polish v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
+          "docs/VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md"
+        ]
+      }
+    }
+  ]
+}
