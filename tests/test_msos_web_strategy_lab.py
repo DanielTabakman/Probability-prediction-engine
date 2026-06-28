@@ -275,6 +275,9 @@ def test_strategy_lab_workflow_stepper_not_primary_nav() -> None:
     assert "ContextRail" in (
         MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx"
     ).read_text(encoding="utf-8")
+    rail = (MSOS_WEB / "src" / "components" / "ContextRail.tsx").read_text(encoding="utf-8")
+    assert "context-rail-mobile" in rail
+    assert "context-rail-sheet-toggle" in rail
 
 
 def test_monitoring_history_routes_and_panels() -> None:
