@@ -437,7 +437,7 @@
     },
     {
       "chapterId": "ppe_trust_surface_v1",
-      "status": "chartered",
+      "status": "queued",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
@@ -447,7 +447,7 @@
     },
     {
       "chapterId": "msos_production_multi_asset_witness_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",

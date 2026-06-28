@@ -43,7 +43,19 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_production_multi_asset_witness_v1",
+        "chapterTitle": "MSOS production multi-asset witness v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
+        ]
+      }
     }
   ]
 }
