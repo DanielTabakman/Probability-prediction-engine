@@ -427,7 +427,7 @@
     },
     {
       "chapterId": "msos_workflow_asset_parity_v1",
-      "status": "active",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
