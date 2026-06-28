@@ -12,7 +12,7 @@ from typing import Any
 import requests
 import yaml
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
+_REPO_ROOT = Path(__file__).resolve().parents[1]
 VENUE_MAP_PATH = _REPO_ROOT / "config" / "asset_venue_source_map.yaml"
 DERIBIT_BASE = "https://www.deribit.com/api/v2"
 BYBIT_BASE = "https://api.bybit.com/v5"

@@ -76,7 +76,7 @@ Discovery picks the **live** venue with the most instruments. **Prefers wired ad
 
 1. Implement `src/data/fetch_<venue>_options.py` (Deribit-shaped normalization)
 2. Add venue to `asset_venue_source_map.yaml` + `discovery.crypto_scan_order` or `equity_scan_order`
-3. Register in `src/data/asset_source_discovery.py` (`FETCH_MODULE_BY_VENUE`, `scan_*`)
+3. Register in `scripts/asset_source_discovery_core.py` (`FETCH_MODULE_BY_VENUE`, `scan_*`)
 4. Wire `app_cache` + `distribution_export` venue branches
 5. Extend ADR venue table
 

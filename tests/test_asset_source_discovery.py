@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from src.data import asset_source_discovery as disc
+from scripts import asset_source_discovery_core as disc
 
 
 def test_pick_best_venue_prefers_wired_with_more_options() -> None:

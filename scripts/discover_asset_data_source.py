@@ -21,7 +21,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from src.data.asset_source_discovery import discover_asset_source  # noqa: E402
+from scripts.asset_source_discovery_core import discover_asset_source  # noqa: E402
 from src.data.assets_registry import get_asset, load_assets_registry  # noqa: E402
 
 

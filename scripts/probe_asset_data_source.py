@@ -34,7 +34,7 @@ from src.data.assets_registry import (  # noqa: E402
     list_asset_ids_for_catalog_group,
     list_asset_ids_for_manifest_chapter,
 )
-from src.data.asset_source_discovery import scan_bybit_crypto  # noqa: E402
+from scripts.asset_source_discovery_core import scan_bybit_crypto  # noqa: E402
 
 VENUE_MAP_PATH = _REPO_ROOT / "config" / "asset_venue_source_map.yaml"
 DERIBIT_BASE = "https://www.deribit.com/api/v2"
