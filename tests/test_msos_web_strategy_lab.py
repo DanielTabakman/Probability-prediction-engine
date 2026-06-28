@@ -313,8 +313,11 @@ def test_monitoring_history_routes_and_panels() -> None:
 def test_conclusion_learn_loop_route() -> None:
     page = MSOS_WEB / "src" / "app" / "learn" / "page.tsx"
     assert page.is_file()
-    assert "ConclusionContent" in page.read_text(encoding="utf-8")
-    assert 'activeNavId="learn"' in page.read_text(encoding="utf-8")
+    learn_page = page.read_text(encoding="utf-8")
+    assert "ConclusionContent" in learn_page
+    assert 'activeNavId="learn"' in learn_page
+    assert "searchParams: Promise" in learn_page
+    assert "await searchParams" in learn_page
 
     fixtures = (MSOS_WEB / "src" / "data" / "conclusionFixtures.ts").read_text(encoding="utf-8")
     assert "What did you take away?" in fixtures

@@ -1,0 +1,25 @@
+{
+  "name": "ppe_sol_bybit_ship_v1 (PR #425 merge + SOL live)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+  "selectionRecord": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+  "slices": [
+    {
+      "sliceId": "PPE-SOLBybit-Ship-Slice001",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/ppe-sol-bybit-adapter",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2,
+      "touchSet": [
+        "config/assets.yaml",
+        "src/data/fetch_bybit_options.py",
+        "tests/test_probe_asset_data_source.py"
+      ],
+      "intent": "Rebase build/ppe-sol-bybit-adapter on main; resolve conflicts; green CI; merge PR #425 so SOL (Bybit) is enabled in catalog."
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 # PPE Deribit crypto tier-1 v1 — evidence status
 
-**Chapter:** `ppe_deribit_crypto_tier1_v1`  
-**Status:** **STAGED** (registry merged; enable blocked — Deribit delist)  
-**SELECTED:** 2026-06-26 · **Registry merge:** 2026-06-27
+**Chapter:** `ppe_deribit_crypto_tier1_v1` / **`ppe_sol_bybit_ship_v1`**  
+**Status:** **SHIP IN PR** — Bybit adapter on [`PR #425`](https://github.com/DanielTabakman/Probability-prediction-engine/pull/425); rebase on `main` required before automerge  
+**SELECTED:** 2026-06-26 · **Bybit adapter:** 2026-06-28 · **Registry merge:** 2026-06-27
 
 | Slice | Status | Notes |
 |-------|--------|-------|
@@ -28,11 +28,11 @@ Public API `get_instruments` (`kind=option`, `expired=false`):
 | BNB | **0** | — |
 | XRP | **0** | — |
 
-**Steward decision:** Document **skip enable** per SELECTION non-goals — Deribit has delisted tier-1 crypto options. Rows stay `enabled: false` until relist + `witness_asset_catalog.py --asset SOL --live` green.
+**Steward decision (2026-06-28):** Deribit delisted SOL/BNB/XRP options. **SOL** routes to **Bybit** (`fetch_bybit_options.py`, ~318 live instruments). Ship via **PR #425** branch `build/ppe-sol-bybit-adapter` (probe tests fixed; rebase on `main` pending). Queue: **`ppe_sol_bybit_ship_v1`** READY.
 
 ## Per-asset witness
 
-- [ ] SOL enabled + witness green — **blocked** (0 Deribit instruments)
+- [ ] SOL enabled + witness green — **PR #425** (Bybit venue; merge blocked on main rebase)
 - [x] BNB documented skip (0 Deribit instruments)
 - [x] XRP documented skip (0 Deribit instruments)
 
