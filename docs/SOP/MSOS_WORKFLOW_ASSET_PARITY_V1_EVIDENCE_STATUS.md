@@ -1,7 +1,7 @@
 # MSOS workflow asset parity v1 — evidence status
 
 **Chapter:** `msos_workflow_asset_parity_v1`  
-**Status:** **CHARTERED** (SELECTED 2026-06-27)  
+**Status:** **READY** (BUILD in flight 2026-06-28)  
 **SELECTION:** [`POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md`](POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json`](PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json)
 

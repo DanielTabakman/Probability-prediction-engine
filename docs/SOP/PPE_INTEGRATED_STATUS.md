@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `` — [``]() |
-| **Relay plan** | [``]() |
-| **Next** | Steward SELECTION — next trader-workflow relay slice (SOL Bybit live; horizon chart polish COMPLETE) |
+| **Active BUILD** | `msos_workflow_asset_parity_v1` — [`SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md`](docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md) |
+| **Relay plan** | [`msos_workflow_asset_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json) |
+| **Next** | Relay msos_workflow_asset_parity_v1 — P4→P7 asset propagation (Strategy Lab → confirm → expression → monitor) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
