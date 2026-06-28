@@ -32,7 +32,7 @@ def test_assets_registry_schema_v2() -> None:
     assert default_asset_id() == "BTC"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
-    assert set(assets) >= {"BTC", "ETH", "NVDA"}
+    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
     for asset_id in ("BTC", "ETH"):
         entry = assets[asset_id]
         assert entry.get("venue") == "deribit"
@@ -54,7 +54,7 @@ def test_assets_registry_schema_v2() -> None:
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
     assert list_enabled_asset_ids() == ["BTC", "ETH", "NVDA"]
-    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA"}
+    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
 
 
 def test_catalog_entry_shape() -> None:
@@ -94,6 +94,15 @@ def test_deribit_currency_from_registry() -> None:
 def test_spread_width_for_asset() -> None:
     assert spread_width_for_asset("BTC") == 5000.0
     assert spread_width_for_asset("ETH") == 500.0
+    load_assets_registry.cache_clear()
+    assert spread_width_for_asset("SOL") == 50.0
+
+
+def test_disabled_crypto_tier1_staging_rows() -> None:
+    load_assets_registry.cache_clear()
+    for aid in ("SOL", "BNB", "XRP"):
+        assert is_asset_enabled(aid) is False
+        assert get_asset(aid).get("enabled") is False
 
 
 def test_get_asset_unknown_raises() -> None:

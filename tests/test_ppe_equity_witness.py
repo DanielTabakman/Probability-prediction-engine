@@ -58,10 +58,20 @@ def test_production_demo_witness_probes_nvda() -> None:
 
 def test_equity_product_test_modules_importable() -> None:
     pytest.importorskip("yfinance")
-    import tests.test_fetch_equity_options  # noqa: F401
-    import tests.test_equity_distribution_export  # noqa: F401
-    import tests.test_msos_production_demo_witness  # noqa: F401
-    import tests.test_msos_web_strategy_lab  # noqa: F401
+    import importlib.util
+
+    test_dir = Path(__file__).resolve().parent
+    for stem in (
+        "test_fetch_equity_options",
+        "test_equity_distribution_export",
+        "test_msos_production_demo_witness",
+        "test_msos_web_strategy_lab",
+    ):
+        path = test_dir / f"{stem}.py"
+        spec = importlib.util.spec_from_file_location(stem, path)
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
 
 
 @patch.object(fetch_equity_options.yf, "Ticker")
