@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `270b2bb` — Control-plane: dev changelog
 - `bb90af9` — ppe_crypto_tier1: SOL live via Bybit options adapter (#425) (`src/viz/`)
 - `f22b721` — fix(deploy): unblock VPS build for #436 context rail ship (#442) (`docs/SOP/`)
 - `c2a0321` — chore(control-plane): horizon collector, demo debrief, build efficiency levers (#440) (`docs/SOP/`)
@@ -29,6 +30,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `258eb81` — control-plane: advance queue to cache isolation after enablement closeout (#444) (`docs/SOP/`)
 - `4ecb96a` — ops-manifest-complete-enablement-pipeline (`docs/SOP/`)
 - `ca44d8b` — backfill-closeout-enablepipe-slice004 (`docs/SOP/`)
 - `20b51cc` — ops(local): manifest READY after relay pass (`docs/SOP/`)
