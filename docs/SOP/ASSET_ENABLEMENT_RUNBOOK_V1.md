@@ -1,7 +1,8 @@
 # Asset enablement runbook v1
 
 **Program:** [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)  
-**Chapter:** `ppe_asset_enablement_pipeline_v1` (BUILD fills commands)
+**Chapter:** `ppe_asset_enablement_pipeline_v1` (BUILD fills commands)  
+**Data sources:** [`ASSET_DATA_SOURCE_DISCOVERY_V1.md`](ASSET_DATA_SOURCE_DISCOVERY_V1.md)
 
 ---
 
@@ -14,6 +15,9 @@ Enabling a **batch** of tier-1 assets (e.g. SPY/QQQ/IWM) after meta infra chapte
 ## Standard path (target — implemented by enablement pipeline chapter)
 
 ```bash
+# 0. Discover live source (agents — mandatory; see ASSET_DATA_SOURCE_DISCOVERY_V1.md)
+python scripts/probe_asset_data_source.py --group equity_index --json
+
 # 1. Dry-run: show registry diffs + witness plan
 python scripts/enable_asset_batch.py --group equity_index --dry-run
 

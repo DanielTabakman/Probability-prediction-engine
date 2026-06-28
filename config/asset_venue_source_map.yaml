@@ -1,0 +1,54 @@
+# Asset venue → data source map (reference for agents + probe script)
+# SSOT for routing: config/assets.yaml (per asset). This file documents probes + fallbacks.
+# SOP: docs/SOP/ASSET_DATA_SOURCE_DISCOVERY_V1.md
+
+version: 1
+
+venues:
+  deribit:
+    label: Deribit public API
+    fetch_module: src.data.fetch_deribit
+    api_base: https://www.deribit.com/api/v2
+    registry_fields:
+      - deribit_currency
+    enable_requires: live_option_instruments_gt_0
+    notes: >
+      Crypto options implied lab. No API key for public endpoints.
+      Index via get_index_price; chain via get_instruments (kind=option).
+
+  equity:
+    label: Yahoo Finance (yfinance)
+    fetch_module: src.data.fetch_equity_options
+    registry_fields:
+      - equity_symbol
+      - data_source
+    default_data_source: yfinance
+    enable_requires: yfinance_option_expiries_gt_0
+    notes: >
+      US equity + ETF options. Normalized to Deribit-shaped marks for the engine.
+      Commodity proxies (GLD, SLV, USO) use this venue with asset_class commodity_proxy.
+
+# When primary venue probe fails — research targets only (not implemented until SELECTION).
+research_alternatives:
+  SOL:
+    primary: deribit
+    status: delisted_options_2026-06-27
+    candidates:
+      - id: okx
+        note: SOL options on OKX — needs new venue adapter + SELECTION
+      - id: bybit
+        note: SOL USDT options — needs new venue adapter + SELECTION
+      - id: spot_only
+        note: Deribit sol_usd index + SOL_USDC spot exist; not sufficient for implied options lab
+  BNB:
+    primary: deribit
+    status: delisted_options_2026-06-27
+    candidates:
+      - id: binance_european_options
+        note: Check regional listing; new adapter required
+  XRP:
+    primary: deribit
+    status: delisted_options_2026-06-27
+    candidates:
+      - id: deribit
+        note: Re-check periodically — may relist
