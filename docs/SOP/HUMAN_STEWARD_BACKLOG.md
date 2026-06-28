@@ -83,8 +83,9 @@
 
 - **id:** `process_library_expansion` · **priority:** medium · **category:** governance
 - **added:** 2026-06-18
-- **summary:** Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.
+- **summary:** Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass. IDE BUILD thread close shipped 2026-06-28 (agent-continuity + suggest_thread_rotate).
 - **policy question:** Which ritual should we standardize next after context closeout?
+- **notes:** IDE BUILD thread rotate done — infer_suggest_thread_rotate in ppe_operator_status.py.
 
 ### VM loop-host git push credentials
 
@@ -118,4 +119,4 @@
 
 ## Changelog
 
-| 2026-06-27 | Auto-render from JSON |
+| 2026-06-28 | Auto-render from JSON |

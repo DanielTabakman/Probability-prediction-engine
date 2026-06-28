@@ -349,6 +349,8 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
             "manifest_status": operator_status.get("manifest_status"),
             "phase_plan_path": operator_status.get("phase_plan_path"),
             "guard_reason": (operator_status.get("guard") or {}).get("reason"),
+            "suggest_thread_rotate": operator_status.get("suggest_thread_rotate"),
+            "thread_rotate_reason": operator_status.get("thread_rotate_reason"),
         },
         "build": {
             "slice_id": pending.get("slice_id"),

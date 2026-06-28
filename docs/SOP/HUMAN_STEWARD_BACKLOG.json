@@ -121,10 +121,11 @@
       "status": "open",
       "priority": "medium",
       "category": "governance",
-      "summary": "Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.",
+      "summary": "Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass. IDE BUILD thread close shipped 2026-06-28 (agent-continuity + suggest_thread_rotate).",
       "added": "2026-06-18",
       "source": "context_window_closeout",
-      "policyQuestion": "Which ritual should we standardize next after context closeout?"
+      "policyQuestion": "Which ritual should we standardize next after context closeout?",
+      "notes": "IDE BUILD thread rotate done — infer_suggest_thread_rotate in ppe_operator_status.py."
     },
     {
       "id": "vm_loop_host_git_push_credentials",

@@ -42,6 +42,52 @@ VERDICT_ERROR = "ERROR"
 
 STOP_VERDICTS = frozenset({VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR})
 
+THREAD_ROTATE_FOOTER = (
+    "Close this chat → open a new thread → ask what's next? "
+    "(optional: close out thread for context window ritual)."
+)
+
+_THREAD_ROTATE_MESSAGES = {
+    "IDE_BUILD": "New thread recommended for IDE BUILD.",
+    "RUN_LOCAL": "New thread recommended after run_ppe_local / chapter continue.",
+    "CHAPTER_CLOSEOUT": "New thread recommended after chapter closeout.",
+}
+
+
+def infer_suggest_thread_rotate(
+    *,
+    verdict: str,
+    manifest_status: str,
+    plan_path: str | None,
+) -> dict[str, Any]:
+    """Advisory signal: nudge operator to rotate the what's-next thread at finish lines."""
+    status = str(manifest_status or "").strip().upper()
+    plan = str(plan_path or "").strip()
+
+    if verdict == VERDICT_IDE_BUILD:
+        return {
+            "suggest_thread_rotate": True,
+            "thread_rotate_reason": "IDE_BUILD",
+            "thread_rotate_message": _THREAD_ROTATE_MESSAGES["IDE_BUILD"],
+        }
+    if verdict == VERDICT_RUN_LOCAL:
+        return {
+            "suggest_thread_rotate": True,
+            "thread_rotate_reason": "RUN_LOCAL",
+            "thread_rotate_message": _THREAD_ROTATE_MESSAGES["RUN_LOCAL"],
+        }
+    if verdict == VERDICT_RUN_AUTO and status == "COMPLETE" and not plan:
+        return {
+            "suggest_thread_rotate": True,
+            "thread_rotate_reason": "CHAPTER_CLOSEOUT",
+            "thread_rotate_message": _THREAD_ROTATE_MESSAGES["CHAPTER_CLOSEOUT"],
+        }
+    return {
+        "suggest_thread_rotate": False,
+        "thread_rotate_reason": None,
+        "thread_rotate_message": None,
+    }
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
@@ -291,6 +337,11 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 
     commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
     avoid = _avoid_commands(verdict)
+    rotate = infer_suggest_thread_rotate(
+        verdict=verdict,
+        manifest_status=manifest_status,
+        plan_path=plan_path or "",
+    )
 
     return {
         "as_of": _utc_now(),
@@ -312,6 +363,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "avoid": avoid,
         "errors": errors,
         "idle_heal": idle_heal or None,
+        **rotate,
     }
 
 
@@ -362,6 +414,16 @@ def _format_human(status: dict[str, Any]) -> str:
         lines.extend(["", "Errors:"])
         for e in errors:
             lines.append(f"  - {e}")
+    if status.get("suggest_thread_rotate"):
+        lines.extend(
+            [
+                "",
+                "Thread rotate (recommended)",
+                f"Reason: {status.get('thread_rotate_reason')}",
+                str(status.get("thread_rotate_message") or ""),
+                THREAD_ROTATE_FOOTER,
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 

@@ -192,6 +192,10 @@ Optional `@artifacts/control_plane/WHATS_NEXT.md` if the agent does not self-rea
 
 **Never** paste orchestrator stdout, full pytest logs, or full `git diff` into the next thread.
 
+### Agent thread-rotation nudge (advisory)
+
+See [`agent-continuity.mdc`](../../.cursor/rules/agent-continuity.mdc) **Thread rotation**. Machine signal: `ppe_operator_status.py --json` → `suggest_thread_rotate`.
+
 ---
 
 ## Window ledger (optional)

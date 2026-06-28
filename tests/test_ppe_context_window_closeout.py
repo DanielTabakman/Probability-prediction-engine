@@ -19,7 +19,13 @@ from scripts.ppe_context_window_closeout import (
     render_draft_markdown,
     write_artifacts,
 )
-from scripts.ppe_operator_status import write_status_report
+from scripts.ppe_operator_status import (
+    VERDICT_IDE_BUILD,
+    VERDICT_RUN_AUTO,
+    VERDICT_RUN_LOCAL,
+    infer_suggest_thread_rotate,
+    write_status_report,
+)
 from scripts.ppe_workflow_radar import scan_workflow_friction
 from scripts.workflow_metrics_cli import CONTEXT_WINDOWS_FILE, _metrics_dir, read_context_windows
 
@@ -97,6 +103,41 @@ class TestPpeContextWindowCloseout(unittest.TestCase):
     def test_infer_whats_next_from_operator_commands(self) -> None:
         snap = {"operator": {"commands": ["run_ppe_local.cmd"], "verdict": "RUN_LOCAL"}}
         self.assertIn("run_ppe_local.cmd", infer_whats_next(snap))
+
+    def test_infer_suggest_thread_rotate_verdicts(self) -> None:
+        ide = infer_suggest_thread_rotate(
+            verdict=VERDICT_IDE_BUILD, manifest_status="READY", plan_path="docs/plan.json"
+        )
+        self.assertTrue(ide["suggest_thread_rotate"])
+        self.assertEqual(ide["thread_rotate_reason"], "IDE_BUILD")
+
+        closeout = infer_suggest_thread_rotate(
+            verdict=VERDICT_RUN_AUTO, manifest_status="COMPLETE", plan_path=""
+        )
+        self.assertTrue(closeout["suggest_thread_rotate"])
+
+        idle = infer_suggest_thread_rotate(
+            verdict=VERDICT_RUN_AUTO, manifest_status="READY", plan_path="docs/plan.json"
+        )
+        self.assertFalse(idle["suggest_thread_rotate"])
+
+    def test_operator_status_includes_thread_rotate_block(self) -> None:
+        status = {
+            "as_of": "2026-06-10T12:00:00Z",
+            "verdict": VERDICT_IDE_BUILD,
+            "exit_code": 7,
+            "phase_plan_path": "docs/SOP/PHASE_PLANS/x_relay.json",
+            "commands": ["ppe_go.cmd"],
+            "avoid": [],
+            "preflight_warnings": [],
+            "errors": [],
+            "suggest_thread_rotate": True,
+            "thread_rotate_reason": "IDE_BUILD",
+            "thread_rotate_message": "New thread recommended for IDE BUILD.",
+        }
+        path = write_status_report(self.repo, status)
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("Thread rotate (recommended)", text)
 
     def test_operator_status_includes_whats_next_block(self) -> None:
         snapshot = {
