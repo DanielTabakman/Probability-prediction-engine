@@ -4,6 +4,77 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- **Chapter closed:** MSOS-MultiAssetWit-Closeout-Slice004 (VM recovery) (`MSOS-MultiAssetWit-Closeout-Slice004 (VM recovery)`)
+- `3b379a1` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `bb0551b` — Control-plane: dev changelog
+- `59523b8` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `82a5a97` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `2388a77` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `237c586` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `1cbd6ca` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- **Chapter closed:** PPE-TrustSurf-Closeout-Slice004 (`PPE-TrustSurf-Closeout-Slice004`)
+- `d17e91d` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `89862d2` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `18ab5b3` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `d849b8c` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `0e13df0` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `db557f2` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `ae73026` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `2f152f7` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `e8af632` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `81dfa0d` — ops: resolve merge with main closeout evidence
+- `92682d5` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `01ba8bc` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `584f68c` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `186d4ae` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `a9353ff` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `616d61c` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `2a93bdf` — ops: resolve manifest merge conflict after loop publish
+- `435ab2e` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `7c2d5be` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `d7539e2` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `f829aa5` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `250f320` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `7d99be4` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `4f7fd3d` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `48589e5` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `9e5bb7f` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `5a597f0` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `389403b` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `29c4543` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `e0f8f68` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `aef53de` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `836b231` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `eda8ce5` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `9c180a0` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `afbc086` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `671c690` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `f31ea65` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `4efb6a0` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `9941870` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `0dea0c2` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `5f87b5a` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `4bad227` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `32d2a41` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `43ac3ee` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `c950e1f` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `57419aa` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `2f021e6` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `8f7d3cc` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `bf7a21f` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `51e76f5` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `ae5604e` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `9a7aff8` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `1399055` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `06ffa25` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `f64c664` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `aeb8b7b` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `c7ca527` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `f5c7eff` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `a3aef19` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `4cd3a07` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `f160356` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `61a1547` — ops(local): manifest READY after relay pass (`docs/SOP/`)
 - ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#537)
 - `f8f2f63` — Control-plane: dev changelog
 - ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#536)
@@ -105,6 +176,21 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `cd24415` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- **Chapter closed:** Horizon-ChartPolish-Closeout-Slice004 (promotion recovery) (`Horizon-ChartPolish-Closeout-Slice004 (promotion recovery)`)
+- `663d36c` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `ea31491` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `beb0092` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `487fd8b` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `2330a37` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `fc53c05` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `3e6a4f6` — ops(local): manifest READY after relay pass (`docs/SOP/`)
+- `ee4ea03` — ops(local): manifest RUNNING for relay pass (`docs/SOP/`)
+- `aaefc41` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `725645c` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `d2f1dbb` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `5398cbd` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
+- `a85c959` — ops(local): manifest READY after relay pass (`docs/SOP/`)
 - `646325b` — ops: loop publish ops/loop-publish-20260628061103-3e6a4f6 (#462)
 - `8aa71e9` — fix(msos-ui): session-aware lab asset default replaces BTC fallback (#459) (`apps/msos-web/`)
 - `d96c9a9` — ppe_cache_isolation_audit: hook isolation pytest in enable_asset_batch (#457) (`scripts/`)
