@@ -335,11 +335,12 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation; trader workflow loop fidelity",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
       "focusPlaybookTier": "P1",
-      "workerMode": "local-agent"
+      "workerMode": "local-agent",
+      "doneReason": "Workflow asset parity COMPLETE 2026-06-28 (#495 #507); P4\u2192P7 ?asset= propagation"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",

@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `msos_workflow_asset_parity_v1` — [`SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md`](docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md) |
-| **Relay plan** | [`msos_workflow_asset_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json) |
-| **Next** | Relay msos_workflow_asset_parity_v1 — P4→P7 asset propagation (Strategy Lab → confirm → expression → monitor) |
+| **Active BUILD** | `` — [``]() |
+| **Relay plan** | [``]() |
+| **Next** | Steward SELECTION — promote ppe_trust_surface_v1 when prioritized (POST_PPE_TRUST_SURFACE_V1_SELECTION.md) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -162,6 +162,8 @@ flowchart LR
 
 | Options Horizon chart polish v1 | **COMPLETE** 2026-06-28 | [`SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md`](docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md), [`OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md`](docs/SOP/OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md) |
 
+| MSOS workflow asset parity v1 | **COMPLETE** 2026-06-28 | [`SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md`](docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md), [`MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -221,4 +223,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_TRUST_SURFACE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

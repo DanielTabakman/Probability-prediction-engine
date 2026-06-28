@@ -11,7 +11,7 @@
 
 ## Status
 
-**READY** 2026-06-28 — promoted after horizon chart polish closeout; dependencies satisfied (display parity + enablement pipeline COMPLETE).
+**COMPLETE** 2026-06-28 — chapter closed; P4→P7 asset propagation shipped (#495 #507).
 
 **First slice:** `MSOS-WfAsset-Control-Slice001`
 
