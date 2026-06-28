@@ -52,6 +52,8 @@ Response includes `default_asset_id`, grouped enabled assets, labels, `asset_cla
 
 Commodity proxies (GLD, SLV, USO) use `venue: equity` with `asset_class: commodity_proxy` and honest UI labels.
 
+**Agent discovery:** Before enablement or tier-1 batch BUILD, run [`ASSET_DATA_SOURCE_DISCOVERY_V1.md`](ASSET_DATA_SOURCE_DISCOVERY_V1.md) — `scripts/probe_asset_data_source.py` + [`config/asset_venue_source_map.yaml`](../../config/asset_venue_source_map.yaml).
+
 ### 5. MSOS picker
 
 - Fetch `catalog.json` on Strategy Lab load.
