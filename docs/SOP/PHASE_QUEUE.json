@@ -322,6 +322,12 @@
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[HIGH] Meta #5 \u2014 workflow asset parity; promoted after enablement (demo validation)",
+      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",
       "status": "PLANNED",
       "reason": "[HIGH] Meta #3 IDE BUILD \u2014 cache isolation audit",
@@ -332,12 +338,6 @@
       "status": "PLANNED",
       "reason": "[MEDIUM] Meta #4 IDE BUILD \u2014 display cache ops",
       "selectionPrep": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[HIGH] Meta #5 IDE BUILD \u2014 workflow asset parity",
-      "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",

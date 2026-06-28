@@ -433,7 +433,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md \u2014 chapter 5",
-      "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation"
+      "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation; promoted in queue after enablement"
     },
     {
       "chapterId": "ppe_trust_surface_v1",
@@ -617,7 +617,7 @@
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "canonRef": "docs/SOP/PPE_COST_ACCOUNTING_V1.md",
-      "reason": "[P2] Workflow cost accounting — lane tags, auto slice-close, summary --by-lane"
+      "reason": "[P2] Workflow cost accounting \u2014 lane tags, auto slice-close, summary --by-lane"
     }
   ]
 }

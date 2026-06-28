@@ -51,7 +51,7 @@ curl -s "http://localhost:8765/horizon/surface.json?latest=1" | head
 
 ## Witness checklist
 
-- [ ] Daily surface collector on VM cron
+- [ ] Daily surface collector on VM cron — `install_horizon_surface_collector_task.cmd` ([`HORIZON_SURFACE_COLLECTOR_OPS_V1.md`](HORIZON_SURFACE_COLLECTOR_OPS_V1.md))
 - [ ] MSOS nav shows Options Horizon
 - [ ] Region draw → implied mass % → Open in Strategy Lab
 - [ ] No execution copy in UI

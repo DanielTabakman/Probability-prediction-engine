@@ -9,10 +9,14 @@ export const metadata: Metadata = {
     "Reflect on a session — feedback helps improve the demo for new traders.",
 };
 
-export default function LearnPage() {
+export default function LearnPage({
+  searchParams,
+}: {
+  searchParams?: { debrief?: string };
+}) {
   return (
     <AppShell activeNavId="learn">
-      <ConclusionContent />
+      <ConclusionContent highlightDebrief={searchParams?.debrief === "1"} />
     </AppShell>
   );
 }
