@@ -318,6 +318,7 @@
         "tests/test_ppe_propagate_queue.py",
         "tests/test_ppe_queue_health.py",
         "tests/test_ppe_roadmap.py",
+        "tests/test_probe_asset_data_source.py",
         "tests/test_codebase_health_gate.py",
         "tests/conftest.py",
         "tests/test_program_charter_invariants.py",
