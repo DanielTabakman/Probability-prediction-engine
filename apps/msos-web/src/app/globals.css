@@ -1247,6 +1247,26 @@ button.btn:focus-visible {
   color: #c5d8e8;
 }
 
+.lab-data-banner.thin-chain,
+.lab-data-banner.degraded {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  color: #f3e2b6;
+}
+
+.lab-trust-notes {
+  grid-column: 1 / -1;
+  margin: 8px 0 0;
+  padding: 0 0 0 16px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #9fb0c0;
+}
+
+.lab-trust-notes li + li {
+  margin-top: 4px;
+}
+
 .lab-data-banner p {
   margin: 4px 0 0;
   font-size: 13px;

@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   FALLBACK_ASSET_PICKER,
   assetBucketForId,
   bucketsFromCatalog,
   fetchAssetCatalog,
+  findCatalogAsset,
+  trustNotesForAsset,
   type AssetPickerBuckets,
   type CatalogAsset,
 } from "@/lib/ppeAssetCatalog";
@@ -124,6 +126,10 @@ export function LabAssetPicker({
   const activeBucket = assetBucketForId(selectedAssetId, buckets);
   const cryptoValue = activeBucket === "crypto" ? selectedAssetId : "";
   const stocksValue = activeBucket === "stocks" ? selectedAssetId : "";
+  const trustNotes = useMemo(
+    () => trustNotesForAsset(findCatalogAsset(buckets, selectedAssetId)),
+    [buckets, selectedAssetId],
+  );
 
   function navigate(assetId: string) {
     router.push(buildAssetHref(assetId));
@@ -150,6 +156,13 @@ export function LabAssetPicker({
         placeholder="Pick stocks"
         onSelect={navigate}
       />
+      {trustNotes.length > 0 ? (
+        <ul className="lab-trust-notes" aria-label={`Trust notes for ${selectedAssetId}`}>
+          {trustNotes.map((note) => (
+            <li key={note}>{note}</li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

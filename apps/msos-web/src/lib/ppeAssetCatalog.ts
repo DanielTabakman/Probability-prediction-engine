@@ -18,6 +18,7 @@ export type CatalogAsset = {
   venue?: string;
   tier?: string;
   catalog_group?: string;
+  trust_notes?: string[];
 };
 
 export type CatalogGroup = {
@@ -44,10 +45,25 @@ const STOCK_GROUP_IDS = new Set(["equity_index", "equity_mega", "commodity_proxy
 /** Static fallback when catalog.json is unavailable (matches legacy lab allowlist). */
 export const FALLBACK_ASSET_PICKER: AssetPickerBuckets = {
   crypto: [
-    { id: "BTC", label: "BTC options", catalog_group: "crypto" },
-    { id: "ETH", label: "ETH options", catalog_group: "crypto" },
+    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
+    {
+      id: "ETH",
+      label: "ETH options",
+      catalog_group: "crypto",
+      trust_notes: ["Thinner books than BTC — BL curve may be noisier; surface trust state in lab."],
+    },
   ],
-  stocks: [{ id: "NVDA", label: "NVDA options", catalog_group: "equity_mega" }],
+  stocks: [
+    {
+      id: "NVDA",
+      label: "NVDA options",
+      catalog_group: "equity_mega",
+      trust_notes: [
+        "Dividends and corporate actions not modeled in v1.",
+        "LEAPS chain may be thin — BL trust state surfaced when OI/volume low.",
+      ],
+    },
+  ],
 };
 
 export function isAssetCatalogPayload(value: unknown): value is AssetCatalogPayload {
@@ -105,6 +121,21 @@ export function assetBucketForId(
     return "stocks";
   }
   return null;
+}
+
+export function findCatalogAsset(
+  buckets: AssetPickerBuckets,
+  assetId: string,
+): CatalogAsset | undefined {
+  const upper = assetId.toUpperCase();
+  return [...buckets.crypto, ...buckets.stocks].find((asset) => asset.id.toUpperCase() === upper);
+}
+
+export function trustNotesForAsset(asset: CatalogAsset | undefined): string[] {
+  if (!asset?.trust_notes?.length) {
+    return [];
+  }
+  return asset.trust_notes.map((note) => note.trim()).filter(Boolean);
 }
 
 export async function fetchAssetCatalog(): Promise<AssetCatalogPayload | null> {
