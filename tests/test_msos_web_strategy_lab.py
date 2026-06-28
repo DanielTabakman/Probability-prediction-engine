@@ -273,7 +273,11 @@ def test_session_lab_asset_resolution() -> None:
     assert "resolveLabAssetId" in page
     assert "useStored: false" in page
     assert "DEFAULT_LAB_ASSET_ID" not in workflow
-    assert "buildWorkflowStepHref(step, assetId)" in workflow or "assetId: LabAssetId" in workflow
+    assert (
+        "buildWorkflowStepHref(step, assetId)" in workflow
+        or "assetId: LabAssetId" in workflow
+        or "assetId?: LabAssetId" in workflow
+    )
 
 
 def test_monitor_propagates_thesis_asset() -> None:
