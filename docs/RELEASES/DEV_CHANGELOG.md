@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `12405ff` — ops(local): manifest READY after relay pass (#453)
+- `3baadd6` — Control-plane: dev changelog
 - `3519e37` — ops(local): manifest READY after relay pass (#449)
 - `82738d8` — ops(local): manifest READY after relay pass (#450) (`docs/SOP/`)
 - `5c2bf38` — Control-plane: dev changelog
@@ -37,6 +39,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `b593b4f` — ops(local): manifest READY after relay pass (#454)
 - `8a6aeae` — fix(msos-ui): plan and monitor asset parity across workflow (#451) (`apps/msos-web/`)
 - `61cd876` — fix(msos-ui): confirm page asset parity and readable gap copy (#448) (`apps/msos-web/`)
 - `258eb81` — control-plane: advance queue to cache isolation after enablement closeout (#444) (`docs/SOP/`)
