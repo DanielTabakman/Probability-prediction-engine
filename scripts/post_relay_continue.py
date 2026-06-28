@@ -240,6 +240,13 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"post_relay_continue: closeout OK for {slice_id}")
     try:
+        from scripts.ppe_workflow_cost import record_relay_closeout
+
+        if record_relay_closeout(repo, slice_id=slice_id, plan_path=args.phase_plan):
+            print(f"post_relay_continue: workflow cost recorded for {slice_id}")
+    except Exception as exc:
+        print(f"post_relay_continue: workflow cost skipped: {exc}")
+    try:
         from scripts.ppe_google_docs_refresh import run_google_docs_refresh
 
         gdocs_rc = run_google_docs_refresh(repo, write_report=True)
