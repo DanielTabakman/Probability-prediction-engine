@@ -175,3 +175,25 @@ def test_check_merge_waits_when_ci_pending(tmp_path: Path) -> None:
     assert out["merged"] == []
     assert len(out["pending"]) == 1
     run_mock.assert_not_called()
+
+
+def test_publish_reports_timeout(tmp_path: Path) -> None:
+    repo = tmp_path
+
+    def fake_git(_repo: Path, *args: str):
+        if args[:2] == ("push", "origin"):
+            return type(
+                "P",
+                (),
+                {"returncode": 124, "stdout": "", "stderr": "command timed out after 120s"},
+            )()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync.push_enabled", return_value=True):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._ahead_count", return_value=1):
+                with patch("scripts.ppe_operator_git_sync._short_head", return_value="abc1234"):
+                    with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                        out = publish_ahead(repo)
+    assert out["ok"] is False
+    assert out.get("timed_out") is True

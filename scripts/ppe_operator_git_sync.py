@@ -12,14 +12,42 @@ from pathlib import Path
 from typing import Any
 
 
+def _subprocess_timeout() -> int | None:
+    raw = os.environ.get("PPE_GIT_CMD_TIMEOUT", "120").strip().lower()
+    if raw in ("0", "none", "off", "false", "no"):
+        return None
+    try:
+        return max(1, int(raw))
+    except ValueError:
+        return 120
+
+
+def _run_cmd(
+    argv: list[str],
+    *,
+    cwd: Path,
+    timeout: int | None = None,
+) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            argv,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired as exc:
+        return subprocess.CompletedProcess(
+            argv,
+            returncode=124,
+            stdout=(exc.stdout or "") if isinstance(exc.stdout, str) else "",
+            stderr=f"command timed out after {exc.timeout}s",
+        )
+
+
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    return _run_cmd(["git", *args], cwd=repo, timeout=_subprocess_timeout())
 
 
 def _env_disabled(key: str) -> bool:
@@ -424,12 +452,11 @@ def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str
     if not _gh_available():
         print("ppe_operator_git_sync: gh not available; skip PR", file=sys.stderr)
         return None
-    existing = subprocess.run(
+    timeout = _subprocess_timeout()
+    existing = _run_cmd(
         ["gh", "pr", "list", "--head", head, "--json", "url", "--limit", "1"],
         cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
+        timeout=timeout,
     )
     if existing.returncode == 0 and existing.stdout.strip():
         try:
@@ -438,13 +465,14 @@ def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str
                 return str(data[0].get("url") or "")
         except json.JSONDecodeError:
             pass
-    proc = subprocess.run(
+    proc = _run_cmd(
         ["gh", "pr", "create", "--base", base, "--head", head, "--title", title, "--body", body],
         cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
+        timeout=timeout,
     )
+    if proc.returncode == 124:
+        print("ppe_operator_git_sync: gh pr create timed out", file=sys.stderr)
+        return None
     if proc.returncode != 0:
         print(proc.stderr or proc.stdout, file=sys.stderr)
         return None
@@ -480,6 +508,14 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
     else:
         push = _git(repo, "push", "-u", "origin", "HEAD")
 
+    if push.returncode == 124:
+        return {
+            "action": "push",
+            "ok": False,
+            "branch": publish_branch,
+            "error": (push.stderr or "git push timed out").strip(),
+            "timed_out": True,
+        }
     if push.returncode != 0:
         return {
             "action": "push",
