@@ -25,7 +25,7 @@
 | Gap | Strategy Lab asset-aware; confirm/monitor still BTC-default |
 | Canon loop | thesis → disagree → express → monitor must preserve asset |
 
-**Blocked until:** `ppe_asset_display_parity_v1` **COMPLETE**.
+**Blocked until:** `ppe_asset_display_parity_v1` **COMPLETE** (satisfied). **Queue:** runs **immediately after** `ppe_asset_enablement_pipeline_v1` (promoted 2026-06-28 — demo validation signal).
 
 ---
 

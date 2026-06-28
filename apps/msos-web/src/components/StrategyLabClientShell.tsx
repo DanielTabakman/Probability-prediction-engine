@@ -261,6 +261,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         active={tutorialOpen}
         onClose={closeTutorial}
         steps={resolveTutorialSteps(tutorialBeginner)}
+        completeHref="/learn?debrief=1"
       />
 
       <p className="footer-note">{DEMO_FOOTER}</p>

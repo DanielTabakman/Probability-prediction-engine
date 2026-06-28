@@ -2881,75 +2881,8 @@ button.btn:disabled {
     margin-top: 8px;
   }
 
-  .work {
-    grid-template-columns: 1fr;
-    padding-bottom: 68px;
-  }
-
-  .context-rail-mobile {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 120;
-    margin: 0;
-    padding: 0;
-    max-height: min(72vh, 640px);
-    background: rgba(4, 10, 18, 0.98);
-    border-top: 1px solid rgba(67, 231, 211, 0.22);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
-    transform: translateY(calc(100% - 54px));
-    transition: transform 0.22s ease;
-  }
-
-  .context-rail-mobile.is-open {
-    transform: translateY(0);
-  }
-
-  .context-rail-sheet-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 14px 16px;
-    border: 0;
-    background: transparent;
-    color: var(--teal);
-    font-size: 13px;
-    font-weight: 750;
-    cursor: pointer;
-    text-align: left;
-  }
-
-  .context-rail-sheet-chevron {
-    color: #8ea4bd;
-    font-size: 12px;
-  }
-
-  .context-rail-sheet-body {
-    overflow-y: auto;
-    max-height: calc(min(72vh, 640px) - 54px);
-    padding: 0 12px 16px;
-  }
-
-  .context-rail-mobile:not(.is-open) .context-rail-sheet-body {
-    visibility: hidden;
-    max-height: 0;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .context-rail-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: 110;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: rgba(0, 0, 0, 0.45);
-    cursor: pointer;
+  .context-rail {
+    order: 2;
   }
 
   .compare-row {
@@ -2958,6 +2891,10 @@ button.btn:disabled {
 
   .metrics {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .work {
+    grid-template-columns: 1fr;
   }
 
   .exec-layout {
@@ -3556,4 +3493,64 @@ button.btn:disabled {
   .learn-loop-strip {
     grid-template-columns: 1fr;
   }
+}
+
+/* Demo session debrief (/learn?debrief=1) */
+.demo-debrief-highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.demo-debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.demo-debrief-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.demo-debrief-field fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.demo-debrief-field legend {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.demo-debrief-field input[type="text"],
+.demo-debrief-field textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+}
+
+.demo-debrief-notes {
+  grid-column: 1 / -1;
+}
+
+.demo-debrief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.demo-debrief-preview {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--bg);
+  overflow-x: auto;
 }
