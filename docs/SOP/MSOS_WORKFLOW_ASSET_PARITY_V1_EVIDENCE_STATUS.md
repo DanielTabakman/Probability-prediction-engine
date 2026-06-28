@@ -8,8 +8,8 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | MSOS-WfAsset-Control-Slice001 | IN_PROGRESS | Propagation matrix (Confirm row verified) |
-| MSOS-WfAsset-Product-Slice002 | IN_PROGRESS | Confirm + Plan + Monitor copy asset-aware; strategy suggestion fetch passes `?asset=` (backend math still BTC-default) |
-| MSOS-WfAsset-Witness-Slice003 | IN_PROGRESS | Confirm + Plan + Monitor asset witnesses |
+| MSOS-WfAsset-Product-Slice002 | **CLOSED** | Confirm + Plan + Monitor copy asset-aware; strategy suggestion fetch passes `?asset=` (backend math still BTC-default) |
+| MSOS-WfAsset-Witness-Slice003 | **CLOSED** | P4→P7 integration witnesses in `test_msos_web_strategy_lab.py` — NVDA + SOL |
 | MSOS-WfAsset-Closeout-Slice004 | PENDING | Chapter close |
 
 ## Asset propagation matrix (target)

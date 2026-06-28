@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
+SOP = REPO_ROOT / "docs" / "SOP"
 
 
 def test_strategy_lab_route_and_shell() -> None:
@@ -464,3 +467,108 @@ def test_strategy_lab_forward_consistency_panel() -> None:
     assert "fetchForwardConsistencyPayload" in lib
     assert "isForwardConsistencyPayload" in lib
     assert ".forward-consistency" in styles
+
+
+# --- MSOS workflow asset parity v1 (Witness-Slice003) ---
+
+_LAB_ASSET_QUERY_PARAM = "asset"
+_WORKFLOW_STEPS = {
+    "compare": "/strategy-lab",
+    "confirm": "/strategy-lab/confirm",
+    "plan": "/strategy-lab/expression",
+}
+_NON_BTC_ASSETS = ("NVDA", "SOL")
+
+
+def _build_workflow_step_href(step: str, asset_id: str) -> str:
+    path = _WORKFLOW_STEPS[step]
+    normalized = asset_id.strip().upper()
+    if not normalized:
+        return path
+    return f"{path}?{_LAB_ASSET_QUERY_PARAM}={normalized}"
+
+
+def _relabel_plan_legs_for_asset(legs: list[dict[str, str]], asset_id: str) -> list[dict[str, str]]:
+    ticker = asset_id.strip().upper()
+    if not ticker or ticker == "BTC":
+        return legs
+    out: list[dict[str, str]] = []
+    for leg in legs:
+        instrument = leg["instrument"]
+        if re.match(r"^BTC\b", instrument, re.IGNORECASE):
+            instrument = re.sub(r"^BTC\b", ticker, instrument, count=1, flags=re.IGNORECASE)
+        out.append({**leg, "instrument": instrument})
+    return out
+
+
+def test_workflow_asset_parity_hrefs_preserve_nvda_and_sol() -> None:
+    for asset in _NON_BTC_ASSETS:
+        for step in _WORKFLOW_STEPS:
+            href = _build_workflow_step_href(step, asset)
+            parsed = urlparse(href)
+            params = parse_qs(parsed.query)
+            assert params.get(_LAB_ASSET_QUERY_PARAM) == [asset], href
+
+
+def test_workflow_asset_parity_p4_lab_resolves_url_asset() -> None:
+    page = (MSOS_WEB / "src" / "app" / "strategy-lab" / "page.tsx").read_text(encoding="utf-8")
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+
+    assert "resolveLabAssetId" in page
+    assert "fetchDisplayPayload" in page or "fetchDisplayPayloadServer" in page
+    assert "resolveLabAssetId" in shell
+    assert 'buildWorkflowStepHref("confirm"' in shell
+    assert "buildDisplayApiUrl" in payload_lib
+    assert "LAB_ASSET_QUERY_PARAM" in payload_lib
+
+
+def test_workflow_asset_parity_p5_confirm_venue_copy() -> None:
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(encoding="utf-8")
+    ctx = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
+    payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+
+    assert "buildThesisDraftFromLab(payload, storedTuning, storedExpiry, assetMeta)" in panel
+    assert "optionsVenueReferenceLabel" in ctx
+    assert 'id === "NVDA"' in payload_lib
+    assert 'id === "SOL"' in payload_lib
+    assert "Bybit" in payload_lib
+
+
+def test_workflow_asset_parity_p6_expression_urls_include_asset() -> None:
+    panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(encoding="utf-8")
+    suggestion = (MSOS_WEB / "src" / "lib" / "ppeStrategySuggestion.ts").read_text(encoding="utf-8")
+    tuning = (MSOS_WEB / "src" / "lib" / "beliefTuning.ts").read_text(encoding="utf-8")
+
+    assert "fetchStrategySuggestion(resolvedExpiry, tuning, assetId)" in panel
+    assert "relabelPlanLegsForAsset" in panel
+    assert "LAB_ASSET_QUERY_PARAM" in suggestion
+    assert "LAB_ASSET_QUERY_PARAM" in tuning
+
+
+def test_workflow_asset_parity_p6_plan_leg_relabel_non_btc() -> None:
+    sample_legs = [
+        {"side": "BUY", "instrument": "BTC Put", "strike": "Strike 90k", "tenor": "30d"},
+        {"side": "SELL", "instrument": "BTC Call", "strike": "Strike 110k", "tenor": "30d"},
+    ]
+    for asset in _NON_BTC_ASSETS:
+        relabeled = _relabel_plan_legs_for_asset(sample_legs, asset)
+        assert relabeled[0]["instrument"] == f"{asset} Put"
+        assert "BTC" not in relabeled[0]["instrument"]
+
+
+def test_workflow_asset_parity_p7_monitor_resolves_thesis_asset() -> None:
+    feed = (MSOS_WEB / "src" / "lib" / "monitorHistoryFeed.ts").read_text(encoding="utf-8")
+    monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+
+    assert "thesisAssetId: thesis?.assetId" in feed
+    assert "fetchDisplayPayload(displayAssetId)" in feed
+    assert "assetTicker={feed.assetTicker}" in monitor
+
+
+def test_workflow_asset_parity_witness_evidence_and_plan() -> None:
+    evidence = (SOP / "MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md").read_text(encoding="utf-8")
+    plan = (SOP / "PHASE_PLANS" / "msos_workflow_asset_parity_v1_relay.json").read_text(encoding="utf-8")
+    assert "MSOS-WfAsset-Witness-Slice003" in evidence
+    assert "Monitor" in evidence
+    assert "MSOS-WfAsset-Witness-Slice003" in plan
