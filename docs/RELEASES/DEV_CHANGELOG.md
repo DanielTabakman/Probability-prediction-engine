@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `5d8885f` — feat(product): Forward Consistency v1 — parity engine, API, Strategy Lab panel (#447) (`apps/msos-web/`)
+- `a58bd5a` — product(PPE-CacheIso-Core-Slice002): asset-key cache isolation witnesses (#446) (`scripts/`)
+- `a12627e` — ops(local): manifest RUNNING for relay pass (#445) (`docs/SOP/`)
+- `a5ac185` — Control-plane: dev changelog
 - `270b2bb` — Control-plane: dev changelog
 - `bb90af9` — ppe_crypto_tier1: SOL live via Bybit options adapter (#425) (`src/viz/`)
 - `f22b721` — fix(deploy): unblock VPS build for #436 context rail ship (#442) (`docs/SOP/`)
@@ -30,6 +34,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `61cd876` — fix(msos-ui): confirm page asset parity and readable gap copy (#448) (`apps/msos-web/`)
 - `258eb81` — control-plane: advance queue to cache isolation after enablement closeout (#444) (`docs/SOP/`)
 - `4ecb96a` — ops-manifest-complete-enablement-pipeline (`docs/SOP/`)
 - `ca44d8b` — backfill-closeout-enablepipe-slice004 (`docs/SOP/`)
