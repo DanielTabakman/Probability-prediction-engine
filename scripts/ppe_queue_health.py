@@ -19,6 +19,7 @@ BACKLOG_REL = "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
 BACKLOG_ACTIVE_STATUSES = frozenset({"blocked", "chartered", "queued"})
 BACKLOG_TERMINAL_STATUSES = frozenset({"done", "skipped"})
 FINALIZE_DONE_REASON = "auto-repair: evidence doc shows chapter COMPLETE"
+PREMATURE_REOPEN_REASON = "auto-repair: chapter closeout reverted — evidence/slices still pending"
 ROADMAP_REPAIR_REASON = "auto-repair: backlog status on roadmap normalized"
 # Backlog-only statuses sometimes land on PHASE_SELECTION_ROADMAP by hand; map to valid roadmap rows.
 ROADMAP_INVALID_TO_VALID = {
@@ -371,6 +372,92 @@ def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
             )
 
     return issues, fixes
+
+
+def heal_premature_chapter_closeout(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[str]]:
+    """Re-open manifest/queue when a chapter was marked DONE/COMPLETE but evidence is not complete."""
+    repo = repo_root.resolve()
+    fixes: list[Fix] = []
+    actions: list[str] = []
+
+    try:
+        from scripts.ppe_manifest import load_manifest, save_manifest
+
+        manifest = load_manifest(repo)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return fixes, actions
+
+    manifest_status = str(manifest.get("status") or "").upper()
+    manifest_plan = _norm_plan(str(manifest.get("phasePlanPath") or ""))
+    queue = load_queue(repo)
+    items = list(queue.get("items") or [])
+    if not isinstance(items, list):
+        return fixes, actions
+
+    reopened_plan: str | None = None
+
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        if not plan:
+            continue
+        qst = str(item.get("status") or "").upper()
+        if qst == "READY" and not chapter_marked_complete_in_repo(repo, plan):
+            if manifest_status == "COMPLETE" and not manifest_plan:
+                reopened_plan = reopened_plan or plan
+                actions.append(f"queue READY {plan} while manifest idle COMPLETE")
+            continue
+        if qst != "DONE" or chapter_marked_complete_in_repo(repo, plan):
+            continue
+        fixes.append(
+            {
+                "action": "reopen_chapter",
+                "index": i,
+                "planPath": plan,
+                "reason": PREMATURE_REOPEN_REASON,
+            }
+        )
+        if apply:
+            item["status"] = "READY"
+            item.pop("doneReason", None)
+            reopened_plan = plan
+
+    if apply and fixes:
+        queue["items"] = items
+        save_queue(repo, queue)
+
+    target_plan = reopened_plan or (
+        manifest_plan
+        if manifest_status in ("READY", "RUNNING") and manifest_plan
+        else None
+    )
+    if apply and manifest_status == "COMPLETE" and not manifest_plan and target_plan:
+        manifest["status"] = "READY"
+        manifest["phasePlanPath"] = target_plan
+        prev = str(manifest.get("notes") or "").strip()
+        manifest["notes"] = f"{prev} {PREMATURE_REOPEN_REASON}".strip() if prev else PREMATURE_REOPEN_REASON
+        save_manifest(repo, manifest)
+        actions.append(f"manifest reopened -> READY {target_plan}")
+
+        try:
+            from scripts.ppe_roadmap import load_roadmap, roadmap_enabled, roadmap_path, save_roadmap
+
+            if roadmap_enabled(repo) and roadmap_path(repo).is_file():
+                road = load_roadmap(repo)
+                for row in road.get("items") or []:
+                    if not isinstance(row, dict):
+                        continue
+                    if _norm_plan(str(row.get("planPath") or "")) != target_plan:
+                        continue
+                    if str(row.get("status") or "").strip().lower() == "done":
+                        row["status"] = "ready"
+                        actions.append(f"roadmap {target_plan} -> ready")
+                save_roadmap(repo, road)
+        except Exception:
+            pass
+
+    return fixes, actions
 
 
 def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue]]:

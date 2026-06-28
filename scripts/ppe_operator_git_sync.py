@@ -507,23 +507,93 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
     }
 
 
-def _runtime_sop_only_dirty(repo: Path) -> bool:
-    dirty = _dirty_paths(repo)
-    if not dirty:
-        return True
-    runtime_names = {
+RUNTIME_SOP_EXACT: frozenset[str] = frozenset(
+    {
         "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
         "docs/SOP/PHASE_QUEUE.json",
         "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
         "docs/SOP/PHASE_SELECTION_ROADMAP.json",
     }
+)
+
+
+def is_runtime_sop_path(path: str) -> bool:
+    p = path.replace("\\", "/").strip()
+    if p in RUNTIME_SOP_EXACT:
+        return True
+    if p.startswith("docs/SOP/PHASE_") and p.endswith(".json"):
+        return True
+    if p.startswith("docs/SOP/") and p.endswith("_EVIDENCE_STATUS.md"):
+        return True
+    if p.startswith("docs/SOP/") and p.endswith("_SELECTION.md"):
+        return False
+    if p.startswith("docs/SOP/") and p in {
+        "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
+        "docs/SOP/HANDOFF.md",
+        "docs/SOP/MVP1_FRONTIER.md",
+        "docs/SOP/PPE_INTEGRATED_STATUS.md",
+    }:
+        return True
+    return False
+
+
+def _runtime_sop_only_dirty(repo: Path) -> bool:
+    dirty = _dirty_paths(repo)
+    if not dirty:
+        return True
     for p in dirty:
         if p.startswith("artifacts/"):
             continue
-        if p in runtime_names or (p.startswith("docs/SOP/PHASE_") and p.endswith(".json")):
+        if is_runtime_sop_path(p):
+            continue
+        if p.startswith("docs/RELEASES/"):
             continue
         return False
     return True
+
+
+def reset_runtime_sop_drift_from_origin(repo: Path) -> dict[str, Any]:
+    """Discard uncommitted control-plane drift on the loop host so main sync can proceed."""
+    repo = repo.resolve()
+    target = (str(_git_sync_cfg(repo).get("pullBranch") or "main")).strip() or "main"
+    current = _current_branch(repo)
+    dirty = _dirty_paths(repo, for_loop_host=True)
+    reset_paths = sorted(
+        {
+            p
+            for p in dirty
+            if is_runtime_sop_path(p) or p.startswith("docs/RELEASES/")
+        }
+    )
+    if not reset_paths:
+        return {"action": "reset_runtime_sop", "skipped": True, "reason": "no runtime SOP drift"}
+    if not _loop_host_transient_branch(current, target) and not _runtime_sop_only_dirty(repo):
+        return {
+            "action": "reset_runtime_sop",
+            "skipped": True,
+            "reason": f"branch {current!r} has non-runtime product dirty paths",
+            "dirty": dirty[:8],
+        }
+
+    fetch = _git(repo, "fetch", "origin")
+    if fetch.returncode != 0:
+        return {
+            "action": "reset_runtime_sop",
+            "ok": False,
+            "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+        }
+
+    changes: list[str] = []
+    for rel in reset_paths:
+        proc = _git(repo, "checkout", f"origin/{target}", "--", rel)
+        if proc.returncode == 0:
+            changes.append(f"reset {rel} from origin/{target}")
+    return {
+        "action": "reset_runtime_sop",
+        "ok": True,
+        "branch": current,
+        "changes": changes,
+    }
 
 
 def maybe_auto_publish(repo: Path) -> dict[str, Any]:

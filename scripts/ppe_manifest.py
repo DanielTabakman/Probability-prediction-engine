@@ -171,6 +171,20 @@ def maybe_mark_manifest_complete(
                     f"non-closeout slices still pending: {pending}"
                 )
                 return False
+            closeout = sl.get("closeout") if isinstance(sl.get("closeout"), dict) else {}
+            evidence_rel = str(closeout.get("evidenceDoc") or "").strip()
+            if evidence_rel:
+                evidence_path = repo_root / evidence_rel.replace("\\", "/")
+                if evidence_path.is_file():
+                    from scripts.ppe_queue_health import _evidence_has_pending_slices
+
+                    body = evidence_path.read_text(encoding="utf-8", errors="replace")
+                    if _evidence_has_pending_slices(body):
+                        print(
+                            f"maybe_mark_manifest_complete: skip closeout {slice_id} — "
+                            "evidence doc still lists PENDING slices"
+                        )
+                        return False
             manifest["status"] = "COMPLETE"
             save_manifest(repo_root, manifest)
             return True
