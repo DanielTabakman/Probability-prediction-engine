@@ -59,6 +59,7 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
         "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
         "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",
     )
     assert status in ("READY", "RUNNING", "COMPLETE")
     if status == "COMPLETE":

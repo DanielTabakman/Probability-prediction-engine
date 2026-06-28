@@ -70,6 +70,9 @@ MVP1_CROSS_VENUE_BACKTEST_PLAN = (
 PPE_ENABLEMENT_PIPELINE_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json"
 )
+PPE_CACHE_ISOLATION_PLAN = (
+    "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -102,6 +105,7 @@ ALLOWED_READY_PLANS = (
     PPE_DISPLAY_PARITY_PLAN,
     MVP1_CROSS_VENUE_BACKTEST_PLAN,
     PPE_ENABLEMENT_PIPELINE_PLAN,
+    PPE_CACHE_ISOLATION_PLAN,
 )
 
 
