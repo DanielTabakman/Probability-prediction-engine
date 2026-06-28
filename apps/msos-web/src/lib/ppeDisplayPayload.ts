@@ -18,7 +18,11 @@ export const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim(
 
 export const LAB_ASSET_QUERY_PARAM = "asset";
 
-export const DEFAULT_LAB_ASSET_ID = "BTC";
+/** Registry / bare display API default — avoid for UI; use `resolveLabAssetId`. */
+export const REGISTRY_DEFAULT_ASSET_ID = "BTC";
+
+/** @deprecated Prefer `resolveLabAssetId` / `ABSOLUTE_FALLBACK_ASSET_ID` for UI defaults. */
+export const DEFAULT_LAB_ASSET_ID = REGISTRY_DEFAULT_ASSET_ID;
 
 /** Known assets for static copy fallbacks — not a runtime allowlist gate. */
 export const KNOWN_LAB_ASSET_IDS = ["BTC", "ETH", "NVDA"] as const;
@@ -61,14 +65,15 @@ const LAB_ASSET_FALLBACKS: Record<KnownLabAssetId, DisplayAssetMeta> = {
 export function normalizeLabAssetId(
   value: string | null | undefined,
   allowedIds?: readonly string[],
+  fallback: LabAssetId = REGISTRY_DEFAULT_ASSET_ID,
 ): LabAssetId {
   const upper = (value ?? "").trim().toUpperCase();
   if (!upper || !LAB_ASSET_ID_PATTERN.test(upper)) {
-    return DEFAULT_LAB_ASSET_ID;
+    return fallback;
   }
   if (allowedIds && allowedIds.length > 0) {
     const allowed = new Set(allowedIds.map((id) => id.toUpperCase()));
-    return allowed.has(upper) ? upper : DEFAULT_LAB_ASSET_ID;
+    return allowed.has(upper) ? upper : fallback;
   }
   return upper;
 }
@@ -85,7 +90,7 @@ export function isPayloadForSelectedAsset(
 ): boolean {
   const payloadAssetId = payload?.asset?.id?.toUpperCase();
   if (!payloadAssetId) {
-    return assetId.toUpperCase() === DEFAULT_LAB_ASSET_ID;
+    return false;
   }
   return payloadAssetId === assetId.toUpperCase();
 }
@@ -121,20 +126,22 @@ export function resolveDisplayAssetMeta(
   return fallbackMetaForAsset(normalizedId);
 }
 
-export function buildStrategyLabPath(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
-  if (assetId === DEFAULT_LAB_ASSET_ID) {
+export function buildStrategyLabPath(assetId: LabAssetId): string {
+  const normalized = assetId.trim().toUpperCase();
+  if (!normalized) {
     return "/strategy-lab";
   }
-  return `/strategy-lab?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+  return `/strategy-lab?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(normalized)}`;
 }
 
-export function buildDisplayApiUrl(assetId: LabAssetId = DEFAULT_LAB_ASSET_ID): string {
+export function buildDisplayApiUrl(assetId: LabAssetId): string {
   const base = PPE_DISPLAY_API_URL;
-  if (assetId === DEFAULT_LAB_ASSET_ID) {
+  const normalized = assetId.trim().toUpperCase();
+  if (!normalized || normalized === REGISTRY_DEFAULT_ASSET_ID) {
     return base;
   }
   const separator = base.includes("?") ? "&" : "?";
-  return `${base}${separator}${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+  return `${base}${separator}${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(normalized)}`;
 }
 
 export type DisplaySeries = {

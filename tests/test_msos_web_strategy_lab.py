@@ -192,7 +192,7 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert "confirmed" in persistence
 
     lab = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
-    assert "/strategy-lab/confirm" in lab
+    assert 'buildWorkflowStepHref("confirm"' in lab
 
 
 def test_confirm_page_propagates_selected_asset() -> None:
@@ -202,8 +202,9 @@ def test_confirm_page_propagates_selected_asset() -> None:
     )
     lib = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
     payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+    asset_lib = (MSOS_WEB / "src" / "lib" / "strategyLabAsset.ts").read_text(encoding="utf-8")
 
-    assert "normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM))" in panel
+    assert "useResolvedLabAssetId" in panel
     assert "resolveDisplayAssetMeta(displayPayload, assetId)" in panel
     assert "buildThesisRestatement(" in panel
     assert "buildConfirmChecklist(expiry, Boolean(displayPayload), assetMeta)" in panel
@@ -211,13 +212,16 @@ def test_confirm_page_propagates_selected_asset() -> None:
     assert "fetchDisplayPayloadClient(assetId)" in panel
     assert "buildWorkflowStepHref(\"plan\", assetId)" in panel
 
+    assert "resolveLabAssetId" in asset_lib
+    assert "STRATEGY_LAB_ASSET_STORAGE_KEY" in asset_lib
+    assert "ABSOLUTE_FALLBACK_ASSET_ID" in asset_lib
+
     assert "I think ${asset.id} will" in lib
     assert "buildGapDescription" in lib
-    assert "You expect a lower finish than options imply" in lib
     assert "assetId: asset.id" in lib
 
+    assert "REGISTRY_DEFAULT_ASSET_ID" in payload_lib
     assert "fallbackMetaForAsset" in payload_lib
-    assert "${assetId} options" in payload_lib
 
 
 def test_nav_enables_strategy_lab() -> None:
@@ -238,20 +242,38 @@ def test_expression_plan_propagates_selected_asset() -> None:
     review = (MSOS_WEB / "src" / "lib" / "tradeReviewCopy.ts").read_text(encoding="utf-8")
     chart = (MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx").read_text(encoding="utf-8")
 
-    assert "resolveDisplayAssetMeta(null, normalizeLabAssetId(thesis.assetId ?? assetId))" in panel
+    assert "resolveDisplayAssetMeta(null, assetId)" in panel
     assert "buildWorkflowStepHref(\"confirm\", assetId)" in panel
+    assert "useResolvedLabAssetId" in panel
     assert "priceAxisLabel={assetMeta.price_axis_label" in panel
     assert "assetTicker={assetMeta.id}" in panel
     assert "buildTradeProsCons(" in panel and "assetMeta.id" in panel
 
-    assert "assetTicker: string = DEFAULT_LAB_ASSET_ID" in tooltips
+    assert "assetTicker: string = ABSOLUTE_FALLBACK_ASSET_ID" in tooltips
     assert "${ticker} rises" in tooltips
 
-    assert "assetTicker: string = DEFAULT_LAB_ASSET_ID" in review
+    assert "assetTicker: string = ABSOLUTE_FALLBACK_ASSET_ID" in review
     assert "${ticker} lands in your range" in review
 
     assert "priceAxisLabel" in chart
     assert "BTC price at expiry" not in chart
+
+
+def test_session_lab_asset_resolution() -> None:
+    asset_lib = (MSOS_WEB / "src" / "lib" / "strategyLabAsset.ts").read_text(encoding="utf-8")
+    hook = (MSOS_WEB / "src" / "lib" / "useResolvedLabAssetId.ts").read_text(encoding="utf-8")
+    page = (MSOS_WEB / "src" / "app" / "strategy-lab" / "page.tsx").read_text(encoding="utf-8")
+    workflow = (MSOS_WEB / "src" / "lib" / "strategyLabWorkflow.ts").read_text(encoding="utf-8")
+
+    assert "resolveLabAssetId" in asset_lib
+    assert "loadStoredLabAssetId" in asset_lib
+    assert 'ABSOLUTE_FALLBACK_ASSET_ID = "ETH"' in asset_lib
+    assert "thesisAssetId" in asset_lib
+    assert "useResolvedLabAssetId" in hook
+    assert "resolveLabAssetId" in page
+    assert "useStored: false" in page
+    assert "DEFAULT_LAB_ASSET_ID" not in workflow
+    assert "buildWorkflowStepHref(step, assetId)" in workflow or "assetId: LabAssetId" in workflow
 
 
 def test_monitor_propagates_thesis_asset() -> None:

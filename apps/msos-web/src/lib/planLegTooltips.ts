@@ -1,5 +1,5 @@
 import type { PlanLeg } from "@/data/expressionPlanningFixtures";
-import { DEFAULT_LAB_ASSET_ID } from "@/lib/ppeDisplayPayload";
+import { ABSOLUTE_FALLBACK_ASSET_ID } from "@/lib/strategyLabAsset";
 
 function instrumentKind(instrument: string): "put" | "call" | "other" {
   const lower = instrument.toLowerCase();
@@ -9,8 +9,8 @@ function instrumentKind(instrument: string): "put" | "call" | "other" {
 }
 
 /** Plain-language hover / long-press hint for one leg row (display only). */
-export function planLegTooltip(leg: PlanLeg, assetTicker: string = DEFAULT_LAB_ASSET_ID): string {
-  const ticker = assetTicker.trim() || DEFAULT_LAB_ASSET_ID;
+export function planLegTooltip(leg: PlanLeg, assetTicker: string = ABSOLUTE_FALLBACK_ASSET_ID): string {
+  const ticker = assetTicker.trim() || ABSOLUTE_FALLBACK_ASSET_ID;
   const kind = instrumentKind(leg.instrument);
   const strike = leg.strike.replace(/^Strike\s*/i, "").trim() || leg.strike;
   if (leg.side === "BUY") {
