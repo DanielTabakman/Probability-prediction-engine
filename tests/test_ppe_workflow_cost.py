@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.ppe_workflow_cost import (
+    backfill_recent_slices,
     default_size_for_slice,
     infer_relay_worker_lane,
     maybe_record_slice_close,
+    operator_lane_line,
     record_relay_closeout,
     slice_already_recorded,
     summarize_by_lane,
@@ -80,6 +83,40 @@ class TestPpeWorkflowCost(unittest.TestCase):
             self.repo, slice_id="PPE-Test-Control-Slice001", slice_obj={"workerMode": "deterministic"}
         )
         self.assertEqual(lane, "deterministic-local")
+
+    def test_backfill_from_progress(self) -> None:
+        orch = self.repo / "artifacts" / "orchestrator"
+        orch.mkdir(parents=True)
+        (orch / "PHASE_SLICE_PROGRESS.json").write_text(
+            json.dumps(
+                {
+                    "planPath": "plan.json",
+                    "completedSliceIds": ["PPE-Test-Control-Slice001", "PPE-Test-Product-Slice002"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        plan_path = self.repo / "plan.json"
+        plan_path.write_text(
+            '{"slices":[{"sliceId":"PPE-Test-Control-Slice001","workerMode":"deterministic"},'
+            '{"sliceId":"PPE-Test-Product-Slice002","workerMode":"local-agent"}]}',
+            encoding="utf-8",
+        )
+        result = backfill_recent_slices(self.repo, limit=5)
+        self.assertEqual(len(result["recorded"]), 2)
+        summary = summarize_by_lane(self.repo, days=7)
+        self.assertIn("est_usd_total", summary)
+        self.assertIn("deterministic-local", summary["by_lane"])
+
+    def test_operator_lane_line_empty(self) -> None:
+        self.assertIn("no slices logged", operator_lane_line(self.repo))
+
+    def test_format_human_includes_lane_line(self) -> None:
+        from scripts.ppe_operator_status import _format_human
+
+        status = {"verdict": "RUN_AUTO", "supply": {"backlog": {}, "queue_ready": 0}}
+        text = _format_human(status, self.repo)
+        self.assertIn("Cost lanes", text)
 
 
 if __name__ == "__main__":

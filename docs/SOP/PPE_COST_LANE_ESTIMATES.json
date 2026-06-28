@@ -1,0 +1,9 @@
+{
+  "deterministic-local": 0.0,
+  "cursor-cli": 2.5,
+  "codex-cli": 2.0,
+  "manual": 1.0,
+  "acp": 3.0,
+  "local-agent": 1.5,
+  "unspecified": 0.5
+}
