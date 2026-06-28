@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `ppe_asset_enablement_pipeline_v1` — [`SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md`](docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md) |
 | **Relay plan** | [`ppe_asset_enablement_pipeline_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json) |
-| **Next** | IDE BUILD PPE-EnablePipe-Core-Slice002; backtest side channel COMPLETE 2026-06-28 |
+| **Next** | VM RUN_AUTO — ppe_asset_enablement_pipeline_v1 Control-Slice001 relay; horizon chart polish product slices shipped (#429/#430) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
