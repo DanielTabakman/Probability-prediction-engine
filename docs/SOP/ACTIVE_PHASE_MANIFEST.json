@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #7 \u2014 production multi-asset witness",
+  "status": "COMPLETE",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #7 \u2014 production multi-asset witness Chapter closeout MSOS-MultiAssetWit-Closeout-Slice004 via VM recovery.",
   "workerMode": "local-agent"
 }
