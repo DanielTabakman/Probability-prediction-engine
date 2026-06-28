@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Probe live data availability for a registry asset before enablement or BUILD.
 
-Agents MUST run this (or read its JSON output in evidence) when:
-- Operator asks where an asset's data comes from
-- Enabling a new tier-1 batch row
-- Primary venue may have delisted (e.g. Deribit SOL options)
+For **new** assets or wrong venue, run discover_asset_data_source.py first (multi-venue scan).
+Use this script to verify the **current** registry row after changes.
 
 Examples:
+  python scripts/discover_asset_data_source.py --asset SOL
   python scripts/probe_asset_data_source.py --asset SOL
   python scripts/probe_asset_data_source.py --asset NVDA --json
   python scripts/probe_asset_data_source.py --manifest-slice ppe_deribit_crypto_tier1_v1
@@ -35,6 +34,7 @@ from src.data.assets_registry import (  # noqa: E402
     list_asset_ids_for_catalog_group,
     list_asset_ids_for_manifest_chapter,
 )
+from src.data.asset_source_discovery import scan_bybit_crypto  # noqa: E402
 
 VENUE_MAP_PATH = _REPO_ROOT / "config" / "asset_venue_source_map.yaml"
 DERIBIT_BASE = "https://www.deribit.com/api/v2"
@@ -117,6 +117,21 @@ def probe_equity(asset_id: str) -> dict[str, Any]:
     }
 
 
+def probe_bybit(asset_id: str) -> dict[str, Any]:
+    entry = get_asset(asset_id)
+    coin = str(entry.get("bybit_base_coin") or asset_id).strip().upper()
+    row = scan_bybit_crypto(coin)
+    return {
+        "venue": "bybit",
+        "base_coin": coin,
+        "option_instruments": row.get("options_count", 0),
+        "index_price_usd": row.get("index_price_usd"),
+        "options_available": bool(row.get("options_available")),
+        "errors": row.get("errors") or {},
+        "fetch_module": row.get("fetch_module") or "src.data.fetch_bybit_options",
+    }
+
+
 def probe_asset(asset_id: str) -> dict[str, Any]:
     aid = asset_id.strip().upper()
     try:
@@ -127,6 +142,8 @@ def probe_asset(asset_id: str) -> dict[str, Any]:
     venue = asset_venue(aid)
     if venue == "deribit":
         vendor = probe_deribit(aid)
+    elif venue == "bybit":
+        vendor = probe_bybit(aid)
     elif venue == "equity":
         vendor = probe_equity(aid)
     else:
@@ -203,6 +220,12 @@ def main(argv: list[str] | None = None) -> int:
             if r.get("venue") == "deribit":
                 print(
                     f"  Deribit {vp.get('currency')}: "
+                    f"{vp.get('option_instruments', 0)} options, "
+                    f"index={vp.get('index_price_usd')}"
+                )
+            elif r.get("venue") == "bybit":
+                print(
+                    f"  Bybit {vp.get('base_coin')}: "
                     f"{vp.get('option_instruments', 0)} options, "
                     f"index={vp.get('index_price_usd')}"
                 )

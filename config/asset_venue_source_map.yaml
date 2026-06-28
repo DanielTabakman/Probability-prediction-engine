@@ -1,8 +1,14 @@
-# Asset venue → data source map (reference for agents + probe script)
+# Asset venue → data source map (reference for agents + discovery/probe scripts)
 # SSOT for routing: config/assets.yaml (per asset). This file documents probes + fallbacks.
 # SOP: docs/SOP/ASSET_DATA_SOURCE_DISCOVERY_V1.md
 
 version: 1
+
+# Multi-venue scan order when operator asks for a new asset (discover_asset_data_source.py)
+discovery:
+  crypto_scan_order: [deribit, bybit]
+  equity_scan_order: [equity]
+  min_options_to_enable: 1
 
 venues:
   deribit:
@@ -16,6 +22,17 @@ venues:
       Crypto options implied lab. No API key for public endpoints.
       Index via get_index_price; chain via get_instruments (kind=option).
 
+  bybit:
+    label: Bybit v5 public API
+    fetch_module: src.data.fetch_bybit_options
+    api_base: https://api.bybit.com/v5
+    registry_fields:
+      - bybit_base_coin
+    enable_requires: live_option_instruments_gt_0
+    notes: >
+      USDT-settled crypto options fallback when Deribit delists (e.g. SOL).
+      Requires fetch_bybit_options adapter — discovery reports build_adapter if missing.
+
   equity:
     label: Yahoo Finance (yfinance)
     fetch_module: src.data.fetch_equity_options
@@ -28,27 +45,11 @@ venues:
       US equity + ETF options. Normalized to Deribit-shaped marks for the engine.
       Commodity proxies (GLD, SLV, USO) use this venue with asset_class commodity_proxy.
 
-# When primary venue probe fails — research targets only (not implemented until SELECTION).
+# Historical / research notes (discovery scans live vendors first — do not trust stale rows)
 research_alternatives:
   SOL:
-    primary: deribit
-    status: delisted_options_2026-06-27
-    candidates:
-      - id: okx
-        note: SOL options on OKX — needs new venue adapter + SELECTION
-      - id: bybit
-        note: SOL USDT options — needs new venue adapter + SELECTION
-      - id: spot_only
-        note: Deribit sol_usd index + SOL_USDC spot exist; not sufficient for implied options lab
+    note: Deribit delisted 2026-06-27; discovery auto-scans Bybit
   BNB:
-    primary: deribit
-    status: delisted_options_2026-06-27
-    candidates:
-      - id: binance_european_options
-        note: Check regional listing; new adapter required
+    note: Deribit 0 instruments 2026-06-27; try Bybit scan
   XRP:
-    primary: deribit
-    status: delisted_options_2026-06-27
-    candidates:
-      - id: deribit
-        note: Re-check periodically — may relist
+    note: Deribit 0 instruments 2026-06-27; try Bybit scan
