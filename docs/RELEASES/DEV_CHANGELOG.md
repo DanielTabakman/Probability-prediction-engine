@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#537)
+- `f8f2f63` — Control-plane: dev changelog
 - ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#536)
 - ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#535)
 - ops: loop publish build/auto/MSOS-MultiAssetWit-Product-Slice003 (#534)
