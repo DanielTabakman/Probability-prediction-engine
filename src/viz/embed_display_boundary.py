@@ -38,6 +38,7 @@ CATALOG_PAYLOAD_HTTP_PATH = "/ppe-display-api/catalog.json"
 BELIEF_OVERLAY_KIND = "belief_overlay"
 BELIEF_OVERLAY_HTTP_PATH = "/ppe-display-api/belief-overlay.json"
 STRATEGY_SUGGESTION_HTTP_PATH = "/ppe-display-api/strategy-suggestion.json"
+FORWARD_CONSISTENCY_HTTP_PATH = "/ppe-display-api/forward-consistency.json"
 EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
@@ -690,7 +691,21 @@ def create_display_payload_wsgi_app(
             )
             return [body]
 
+        from src.viz.forward_consistency_boundary import handle_forward_consistency_wsgi_path
         from src.viz.horizon_display_boundary import handle_horizon_wsgi_path
+
+        fc_result = handle_forward_consistency_wsgi_path(path, environ)
+        if fc_result is not None:
+            status, body = fc_result
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
 
         horizon_result = handle_horizon_wsgi_path(path, environ)
         if horizon_result is not None:
