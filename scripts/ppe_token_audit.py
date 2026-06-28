@@ -238,8 +238,8 @@ def build_recommendations(report: TokenAuditReport) -> list[str]:
         )
     if report.stale_starter_ids:
         recs.append(f"Remove {len(report.stale_starter_ids)} stale starter(s): token_audit.cmd --prune-stale")
+    bw = report.build_worker.get("resolved") or {}
     if _headless_fallback_actionable(report):
-        bw = report.build_worker.get("resolved") or {}
         reason = str(bw.get("reason") or "")
         recs.append(f"Headless BUILD → IDE fallback ({reason}). Run verify_codex.cmd.")
     if bw.get("codex_cli_exhausted"):
