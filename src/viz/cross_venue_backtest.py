@@ -13,6 +13,8 @@ from src.viz.cross_venue_export import CSV_COLUMNS
 BACKTEST_JSON_VERSION = 1
 DEFAULT_GAP_COLUMN = "gap_bl_minus_pm_pct"
 DEFAULT_MIN_SNAPSHOTS = 14
+DEFAULT_SNAPSHOT_ROOT = Path("artifacts") / "cross_venue_snapshots"
+DEFAULT_REPORT_ROOT = Path("artifacts") / "cross_venue_backtest"
 
 GAP_BUCKETS: tuple[tuple[float, float | None, str], ...] = (
     (0.0, 2.0, "0-2"),
@@ -80,6 +82,11 @@ def discover_snapshot_csvs(root: Path) -> list[Path]:
         return []
     paths = sorted(root.rglob("ppe_cross_venue_prob_panel_*.csv"))
     return paths
+
+
+def find_latest_snapshot_csv(root: Path = DEFAULT_SNAPSHOT_ROOT) -> Path | None:
+    paths = discover_snapshot_csvs(root)
+    return paths[-1] if paths else None
 
 
 def merge_snapshot_history(csv_paths: list[Path]) -> dict[str, list[dict[str, str]]]:
@@ -364,3 +371,16 @@ def render_cross_venue_backtest_markdown(report: dict[str, Any]) -> str:
 
 def serialize_cross_venue_backtest_json(report: dict[str, Any]) -> str:
     return json.dumps(report, indent=2, sort_keys=True) + "\n"
+
+
+def write_cross_venue_backtest_reports(
+    report: dict[str, Any],
+    *,
+    report_root: Path = DEFAULT_REPORT_ROOT,
+) -> tuple[Path, Path]:
+    report_root.mkdir(parents=True, exist_ok=True)
+    md_path = report_root / "latest_report.md"
+    json_path = report_root / "latest_summary.json"
+    md_path.write_text(render_cross_venue_backtest_markdown(report), encoding="utf-8")
+    json_path.write_text(serialize_cross_venue_backtest_json(report), encoding="utf-8")
+    return md_path, json_path

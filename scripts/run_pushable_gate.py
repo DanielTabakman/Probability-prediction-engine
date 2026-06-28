@@ -188,6 +188,25 @@ def _msos_web_gate_commands(files: list[str], *, pre_push: bool) -> list[list[st
     return [["python", "scripts/verify_msos_web_build.py", "--witness-only"]]
 
 
+def _touches_assets_yaml(files: list[str]) -> bool:
+    return any(f.replace("\\", "/") == "config/assets.yaml" for f in files)
+
+
+def _asset_enablement_gate_commands(files: list[str], *, base_ref: str) -> list[list[str]]:
+    if not _touches_assets_yaml(files):
+        return []
+    return [
+        [
+            "python",
+            "scripts/gate_asset_enablement_diff.py",
+            "--base-ref",
+            base_ref,
+            "--changed-file",
+            "config/assets.yaml",
+        ]
+    ]
+
+
 def _classify(
     files: list[str],
     *,
@@ -381,7 +400,13 @@ def main(argv: list[str] | None = None) -> int:
         if rc != 0:
             return rc
 
-    if plan.tier >= 1 or msos_cmds:
+    enablement_cmds = _asset_enablement_gate_commands(files, base_ref=args.base_ref)
+    for cmd in enablement_cmds:
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
+    if plan.tier >= 1 or msos_cmds or enablement_cmds:
         print("\033[1;32mAll checks passed!\033[0m")
     return 0
 

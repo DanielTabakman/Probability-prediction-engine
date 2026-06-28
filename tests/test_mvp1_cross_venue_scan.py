@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from src.viz.cross_venue_scan import (
     build_cross_venue_scan_report,
+    filter_cross_venue_rows,
     rank_cross_venue_rows,
     render_cross_venue_scan_markdown,
     serialize_cross_venue_scan_json,
+    write_cross_venue_scan_reports,
 )
 
 
@@ -47,6 +51,20 @@ def test_build_cross_venue_scan_report_caps_rows() -> None:
     assert report["row_count"] == 3
     assert report["entries"][0]["rank"] == 1
     assert report["entries"][-1]["question"] == "q3"
+
+
+def test_filter_cross_venue_rows_match_status() -> None:
+    rows = [
+        _sample_row(question="ok", gap="5.00"),
+        {**_sample_row(question="skip", gap="9.00"), "match_status": "insufficient_data"},
+    ]
+    assert len(filter_cross_venue_rows(rows)) == 1
+
+
+def test_write_cross_venue_scan_reports(tmp_path: Path) -> None:
+    report = build_cross_venue_scan_report([_sample_row(question="BTC 100k", gap="7.50")])
+    md_path, json_path = write_cross_venue_scan_reports(report, report_root=tmp_path)
+    assert md_path.name == "latest.md" and json_path.name == "latest.json"
 
 
 def test_render_and_serialize_scan_report() -> None:
