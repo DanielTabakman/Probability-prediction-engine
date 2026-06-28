@@ -13,7 +13,7 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 | **Tokens** | VM local loop (no LLM) + Codex headless BUILD + IDE starter only when blocked |
 | **User time** | Guard resume → generated starter; ≤2 roundtrips per slice |
 | **Computer time** | `run_pushable_gate.py` tiered gate (unchanged) |
-| **Real-life time** | `workflow_metrics.cmd summary` — weighted slices per active hour |
+| **Real-life time** | `workflow_metrics.cmd summary --by-lane` — throughput + lane mix |
 
 ---
 
@@ -87,8 +87,8 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `generate_build_packet.cmd` | Slim paths-only BUILD packet |
 | `python scripts/ppe_context_preflight.py` | Advisory band check before BUILD |
 | `workflow_metrics.cmd session start/stop` | Session logging (~30s) |
-| `workflow_metrics.cmd slice close` | Per-slice roundtrips + size |
-| `workflow_metrics.cmd summary --days 7` | Throughput review |
+| `workflow_metrics.cmd slice close` | Per-slice roundtrips + size + `--worker-lane` |
+| `workflow_metrics.cmd summary --days 7 --by-lane` | Throughput + lane rollup |
 | `workflow_metrics.cmd export-csv` | Paste into Sheet tabs |
 | `dev_changelog.cmd refresh` | Update rolling dev release notes ([`docs/RELEASES/DEV_CHANGELOG.md`](../RELEASES/DEV_CHANGELOG.md)) |
 | `weekly_digest.cmd generate` | Monday-style human summary ([`docs/RELEASES/WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md)) |
@@ -140,4 +140,5 @@ Data lives under `artifacts/workflow_metrics/` (gitignored).
 
 - [`PPE_MOBILE_OPERATOR_V1.md`](PPE_MOBILE_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
+- [`PPE_COST_ACCOUNTING_V1.md`](PPE_COST_ACCOUNTING_V1.md)
 - [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md)
