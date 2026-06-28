@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `28f5484` — feat(msos-ui): Playwright Live pill spot check for NVDA and ETH (#527) (`apps/msos-web/`)
+- `b9d240b` — control-plane: close ppe_trust_surface_v1 and promote multi-asset witness (#526) (`docs/SOP/`)
+- `127cf93` — ops: loop publish ops/loop-publish-20260628175546-2e0096b (#525) (`docs/SOP/`)
+- `99016e3` — product: PPE-TrustSurf-Product-Slice003 MSOS trust banners and notes (#524) (`apps/msos-web/`)
+- `79407cc` — control-plane: promote ppe_trust_surface_v1 to READY (#523) (`docs/SOP/`)
+- `5df0b92` — Control-plane: dev changelog
 - `24342a8` — ops: loop publish ops/loop-publish-20260628160437-0e13df0 (#503)
 - `d45d7d2` — ops: loop publish ops/loop-publish-20260628162028-d849b8c (#514)
 - `1e8a03a` — ops: loop publish ops/loop-publish-20260628162447-d849b8c (#516)
