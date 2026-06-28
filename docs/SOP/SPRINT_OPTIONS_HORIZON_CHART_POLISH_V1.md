@@ -12,7 +12,13 @@
 
 Upgrade `/options-horizon` from v1 SVG spike to **credible chart UX**: axis parity with Strategy Lab, visible options-implied distribution, expiry selector — **display only**, no TypeScript math.
 
-**Priority:** LOW / P2 — side channel; promote to `READY` explicitly.
+**Priority:** LOW / P2 — side channel; **COMPLETE** 2026-06-28.
+
+---
+
+## Sprint status
+
+**COMPLETE** 2026-06-28 — Product-Slice002+003 merged (#429); closeout evidence green.
 
 ---
 

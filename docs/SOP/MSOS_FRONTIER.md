@@ -11,8 +11,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
-- **Active relay chapter:** `ppe_sol_bybit_ship_v1` · plan [`ppe_sol_bybit_ship_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json)
-- **Next steward action:** IDE BUILD ppe_sol_bybit_ship_v1 — rebase PR #425 on main, green CI, automerge (SOL Bybit live)
+- **Active relay chapter:** `` · plan [``]()
+- **Next steward action:** Steward SELECTION — next trader-workflow relay slice (SOL Bybit live; horizon chart polish COMPLETE)
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
@@ -32,7 +32,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **POST_PPE_EQUITY_OPTIONS_V1_SELECTION** ([`POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md)) — COMPLETE — NVDA single-ticker equity wedge
 - **POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION** ([`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)) — COMPLETE — registry v2 + catalog API + MSOS picker
 - **PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1** ([`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)) — IDE BUILD side channel — 7 meta chapters; PLANNED in queue; does not preempt tier1a relay
-- **POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)) — side channel — H0–H4 shipped; chart polish + region workflow CHARTERED (P2); promote horizon_chart_polish_v1 to READY when prioritized
+- **POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)) — COMPLETE — chart polish (#429); region workflow CHARTERED (P2)
 - **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
