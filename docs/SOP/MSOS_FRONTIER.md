@@ -11,13 +11,13 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
-- **Active relay chapter:** `msos_workflow_asset_parity_v1` · plan [`msos_workflow_asset_parity_v1_relay.json`](docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json)
-- **Next steward action:** Relay msos_workflow_asset_parity_v1 — P4→P7 asset propagation (Strategy Lab → confirm → expression → monitor)
+- **Active relay chapter:** `` · plan [``]()
+- **Next steward action:** Steward SELECTION — promote ppe_trust_surface_v1 when prioritized (POST_PPE_TRUST_SURFACE_V1_SELECTION.md)
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
 - **Wedge depth (BTC + ETH)** (complete) · `ppe_crypto_multi_asset_v1` — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
-- **Workflow loop fidelity (P4–P7)** (active) — [`MSOS_Market_Interaction_Modes_v0.1.md`](docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
+- **Workflow loop fidelity (P4–P7)** (complete) — [`MSOS_Market_Interaction_Modes_v0.1.md`](docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
 - **Learning loop (research → backlog)** (active) — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)
 
 **Retired (do not steer BUILD by these):**
@@ -33,6 +33,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION** ([`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)) — COMPLETE — registry v2 + catalog API + MSOS picker
 - **PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1** ([`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)) — IDE BUILD side channel — 7 meta chapters; PLANNED in queue; does not preempt tier1a relay
 - **POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)) — COMPLETE — chart polish (#429); region workflow CHARTERED (P2)
+- **POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION** ([`POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md`](docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md)) — COMPLETE — P4→P7 ?asset= propagation (#495 #507)
 - **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 

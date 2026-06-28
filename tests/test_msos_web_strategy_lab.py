@@ -570,5 +570,6 @@ def test_workflow_asset_parity_witness_evidence_and_plan() -> None:
     evidence = (SOP / "MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md").read_text(encoding="utf-8")
     plan = (SOP / "PHASE_PLANS" / "msos_workflow_asset_parity_v1_relay.json").read_text(encoding="utf-8")
     assert "MSOS-WfAsset-Witness-Slice003" in evidence
+    assert "**COMPLETE**" in evidence
     assert "Monitor" in evidence
     assert "MSOS-WfAsset-Witness-Slice003" in plan

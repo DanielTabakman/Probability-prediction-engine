@@ -1,18 +1,18 @@
 # MSOS workflow asset parity v1 — evidence status
 
 **Chapter:** `msos_workflow_asset_parity_v1`  
-**Status:** **READY** (BUILD in flight 2026-06-28)  
+**Status:** **COMPLETE** 2026-06-28  
 **SELECTION:** [`POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md`](POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json`](PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-WfAsset-Control-Slice001 | IN_PROGRESS | Propagation matrix (Confirm row verified) |
-| MSOS-WfAsset-Product-Slice002 | **CLOSED** | Confirm + Plan + Monitor copy asset-aware; strategy suggestion fetch passes `?asset=` (backend math still BTC-default) |
-| MSOS-WfAsset-Witness-Slice003 | **CLOSED** | P4→P7 integration witnesses in `test_msos_web_strategy_lab.py` — NVDA + SOL |
-| MSOS-WfAsset-Closeout-Slice004 | PENDING | Chapter close |
+| MSOS-WfAsset-Control-Slice001 | **COMPLETE** | Propagation matrix in evidence |
+| MSOS-WfAsset-Product-Slice002 | **COMPLETE** | Confirm + Plan + Monitor copy asset-aware; strategy suggestion fetch passes `?asset=` (#495) |
+| MSOS-WfAsset-Witness-Slice003 | **COMPLETE** | P4→P7 integration witnesses in `test_msos_web_strategy_lab.py` — NVDA + SOL (#507) |
+| MSOS-WfAsset-Closeout-Slice004 | **COMPLETE** | Chapter close 2026-06-28 |
 
-## Asset propagation matrix (target)
+## Asset propagation matrix (verified)
 
 | Surface | Reads `?asset=` / thesis asset | SSR fetch asset-aware |
 |---------|-------------------------------|------------------------|
@@ -21,12 +21,13 @@
 | Expression | yes (`?asset=` + thesis `assetId` → copy + chart axis + strategy suggestion query) | partial (display fetch; backend suggestion math still BTC-default until PPE slice) |
 | Monitor | yes (`thesis.assetId` → `assetTicker` + spot labels) | yes (`fetchDisplayPayload(displayAssetId)`) |
 
-**Confirm rule (Product-Slice002):** any workflow step that builds trader-facing copy from lab context must pass `resolveDisplayAssetMeta(payload, assetId)` — never rely on payload-only or BTC fixtures after hydration.
+## Witness (chapter close)
 
-**Plan rule:** expression planner links, glossary, pros/cons, leg tooltips, and payoff chart axis use `assetMeta.id` from `thesis.assetId ?? ?asset=`.
+- [x] `?asset=` propagates Strategy Lab → confirm → expression workflow links (#495)
+- [x] Venue-aware confirm checklist/trust labels (Deribit / Bybit / equity chain)
+- [x] Strategy suggestion + belief overlay fetch pass `?asset=` (#495)
+- [x] Paper trade persistence stores optional `assetId`
+- [x] Monitor feed resolves `thesis.assetId` for display fetch and `assetTicker`
+- [x] Integration witnesses NVDA + SOL in `test_msos_web_strategy_lab.py` (#507)
 
-**Session default rule:** when `?asset=` is missing, `resolveLabAssetId` picks URL → thesis → `localStorage` last pick → catalog default → allowlist[0] → `ETH` — never silently assume BTC in UI.
-
-**Monitor rule:** `loadMonitorFeed` exposes `assetTicker` from confirmed thesis; empty/welcome cards and hero subtitle follow.
-
-**Gap rule:** “The gap” must describe the disagreement in plain language (`buildGapDescription`) — not collapse to a one-word view label when implied range width is missing or zero.
+**Known gap (non-blocking):** PPE strategy-suggestion backend math remains BTC-default until a future PPE_CORE slice.
