@@ -8,7 +8,7 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MVP1-CrossVenueBacktest-Control-Slice001 | PENDING | Charter + evidence stub |
+| MVP1-CrossVenueBacktest-Control-Slice001 | **CLOSED** | Evidence stub + queue wiring (#417) |
 | MVP1-CrossVenueBacktest-Product-Slice002 | **CLOSED** | `cross_venue_backtest.py` Brier + gap buckets (#415) |
 | MVP1-CrossVenueBacktest-Closeout-Slice004 | PENDING | Chapter closeout + run script follow-on |
 
