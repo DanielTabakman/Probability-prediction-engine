@@ -6,7 +6,7 @@ import csv
 import io
 from typing import Any, Callable
 
-from src.data.assets_registry import asset_venue, default_asset_id
+from src.data.assets_registry import asset_venue, default_asset_id, is_usd_premium_options_venue
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
     density_distribution_stats,
@@ -120,7 +120,7 @@ def build_distribution_export_rows(
 ) -> list[dict[str, str]]:
     """One lognormal row + one BL row per expiry (BL skipped when marks gate fails)."""
     asset = (asset_id or default_asset_id()).strip().upper()
-    if asset_venue(asset) == "equity":
+    if is_usd_premium_options_venue(asset):
         from src.data.equity_distribution_export import build_equity_distribution_export_rows
 
         return build_equity_distribution_export_rows(

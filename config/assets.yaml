@@ -52,16 +52,16 @@ assets:
     label: "SOL options"
     asset_class: crypto
     tier: extended
-    venue: deribit
-    deribit_currency: SOL
+    venue: bybit
+    bybit_base_coin: SOL
     price_unit: USD
     spread_width: 50
-    enabled: false
+    enabled: true
     catalog:
       group: crypto
     trust_notes:
-      - "Thinner books than BTC/ETH — surface trust state when OI low."
-      - "Deribit SOL options delisted 2026-06-27 (0 live instruments); enable after relist + witness."
+      - "Bybit USDT-settled SOL options; thinner than BTC/ETH on Deribit."
+      - "Venue: Bybit public API (Deribit SOL options delisted 2026-06-27)."
 
   BNB:
     label: "BNB options"

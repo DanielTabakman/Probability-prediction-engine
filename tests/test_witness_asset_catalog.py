@@ -8,7 +8,7 @@ from scripts import witness_asset_catalog as witness_mod
 
 
 def test_run_witness_all_enabled_mocked() -> None:
-    report = witness_mod.run_witness(["BTC", "ETH", "NVDA"], live=False)
+    report = witness_mod.run_witness(["BTC", "ETH", "NVDA", "SOL"], live=False)
     assert report["catalog_ok"] is True
     assert report["ok"] is True
     by_id = {r["asset_id"]: r for r in report["results"]}

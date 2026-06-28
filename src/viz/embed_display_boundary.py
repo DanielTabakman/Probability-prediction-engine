@@ -212,7 +212,7 @@ def _parse_float(value: str | float | int | None) -> float | None:
 
 def _chart_bounds_usd(forward: float, asset_id: str) -> tuple[float, float]:
     aid = str(asset_id or default_asset_id()).strip().upper()
-    if asset_venue(aid) == "equity":
+    if asset_venue(aid) in ("equity", "bybit"):
         return max(1.0, forward * 0.35), forward * 2.5
     return max(1000.0, forward * 0.4), forward * 2.2
 
