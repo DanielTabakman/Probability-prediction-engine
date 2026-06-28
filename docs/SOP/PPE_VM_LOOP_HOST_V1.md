@@ -169,7 +169,13 @@ run_ppe_headless_stack.cmd --stop
 
 ## Phase 6 — Auto-start at VM logon (optional)
 
-Inside VM, double-click once:
+Inside VM, double-click once (recommended — logon stack + watchdog + horizon collector):
+
+```bat
+setup_vm_hands_off.cmd
+```
+
+Or headless logon task only:
 
 ```bat
 install_ppe_vm_headless_logon_task.cmd
