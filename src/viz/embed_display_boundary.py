@@ -272,11 +272,18 @@ def build_distribution_display_payload(
     spot_usd: float,
     export_rows: list[dict[str, str]],
     asset_id: str | None = None,
+    honor_selectable_only: bool = True,
 ) -> dict[str, Any]:
     """JSON-serializable read-only payload for MSOS chart shell (no new math)."""
-    aid = normalize_lab_asset_id(asset_id)
+    if asset_id is not None and not honor_selectable_only:
+        aid = str(asset_id).strip().upper() or default_asset_id()
+    else:
+        aid = normalize_lab_asset_id(asset_id)
     if asset_id is None and export_rows and export_rows[0].get("asset"):
-        aid = normalize_lab_asset_id(str(export_rows[0]["asset"]))
+        if honor_selectable_only:
+            aid = normalize_lab_asset_id(str(export_rows[0]["asset"]))
+        else:
+            aid = str(export_rows[0]["asset"]).strip().upper() or default_asset_id()
     export_rows = annotate_export_rows_trust(export_rows)
     asset_block = display_asset_meta(aid)
     summary = summary_panel_contract(export_rows)
@@ -419,19 +426,35 @@ def _sample_export_row(asset_id: str) -> list[dict[str, str]]:
     ]
 
 
-def witness_display_boundary_for_asset(asset_id: str, *, live: bool = False) -> tuple[bool, str]:
-    """Registry + display payload witness for one asset (mocked or live)."""
+def witness_display_boundary_for_asset(
+    asset_id: str,
+    *,
+    live: bool = False,
+    pre_enable: bool = False,
+) -> tuple[bool, str]:
+    """Registry + display payload witness for one asset (mocked or live).
+
+    When ``pre_enable`` is true, disabled registry rows are validated for enablement
+    (catalog.group + mocked display payload) instead of being skipped.
+    """
     aid = str(asset_id or "").strip().upper()
-    if not is_asset_enabled(aid):
-        return True, "skipped (disabled)"
     try:
-        get_asset(aid)
+        entry = get_asset(aid)
     except KeyError:
         return False, "unknown asset_id"
 
-    catalog_ids = {e["id"] for e in list_catalog_entries(enabled_only=True)}
-    if aid not in catalog_ids:
-        return False, "missing from enabled catalog entries"
+    enabled = is_asset_enabled(aid)
+    if not enabled and not pre_enable:
+        return True, "skipped (disabled)"
+
+    if enabled:
+        catalog_ids = {e["id"] for e in list_catalog_entries(enabled_only=True)}
+        if aid not in catalog_ids:
+            return False, "missing from enabled catalog entries"
+    else:
+        catalog = entry.get("catalog")
+        if not isinstance(catalog, dict) or not str(catalog.get("group") or "").strip():
+            return False, "registry row missing catalog.group"
 
     if live:
         try:
@@ -444,6 +467,7 @@ def witness_display_boundary_for_asset(asset_id: str, *, live: bool = False) -> 
             spot_usd=100_000.0 if asset_venue(aid) == "deribit" else 140.0,
             export_rows=_sample_export_row(aid),
             asset_id=aid,
+            honor_selectable_only=enabled or not pre_enable,
         )
 
     if payload.get("kind") != DISPLAY_PAYLOAD_KIND:

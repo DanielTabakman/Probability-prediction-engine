@@ -125,38 +125,21 @@ def _run_cache_isolation_pytest() -> tuple[bool, dict]:
     return ok, report
 
 
-def _run_witness_subprocess(cmd: list[str]) -> tuple[bool, dict]:
-    proc = subprocess.run(cmd, cwd=_REPO_ROOT, capture_output=True, text=True)
-    try:
-        report = json.loads(proc.stdout) if proc.stdout.strip() else {"ok": False}
-    except json.JSONDecodeError:
-        report = {"ok": False, "detail": proc.stdout or proc.stderr}
-    return proc.returncode == 0 and bool(report.get("ok")), report
-
-
 def _run_witness(
     args: argparse.Namespace,
     asset_ids: list[str],
     *,
     live: bool,
 ) -> tuple[bool, dict]:
-    """Run witness gate via group/manifest CLI or in-process asset list."""
-    witness_script = str(_REPO_ROOT / "scripts" / "witness_asset_catalog.py")
-    cmd = [sys.executable, witness_script, "--json"]
-    if args.group:
-        cmd.extend(["--group", args.group])
-    elif args.manifest_slice:
-        cmd.extend(["--manifest-slice", args.manifest_slice])
-    elif asset_ids:
-        from scripts import witness_asset_catalog as witness_mod
+    """Pre-enable witness on assets slated for enablement."""
+    del args
+    if not asset_ids:
+        return True, {"ok": True, "results": []}
 
-        report = witness_mod.run_witness(asset_ids, live=live)
-        return bool(report.get("ok")), report
-    else:
-        return False, {"ok": False, "detail": "no witness target"}
-    if live:
-        cmd.append("--live")
-    return _run_witness_subprocess(cmd)
+    from scripts import witness_asset_catalog as witness_mod
+
+    report = witness_mod.run_witness(asset_ids, live=live, pre_enable=True)
+    return bool(report.get("ok")), report
 
 
 def main(argv: list[str] | None = None) -> int:
