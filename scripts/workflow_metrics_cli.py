@@ -275,14 +275,17 @@ def cmd_summary(repo: Path, *, days: int = 7, by_lane: bool = False) -> int:
     print(f"  avg_slice_roundtrips: {avg_slice_roundtrips:.2f}")
 
     if by_lane:
-        from scripts.ppe_workflow_cost import summarize_by_lane
+        from scripts.ppe_workflow_cost import format_lane_summary_line, summarize_by_lane
 
         lane_summary = summarize_by_lane(repo, days=days)
+        print(f"  {format_lane_summary_line(lane_summary)}")
         print("  by_lane:")
         for lane, count in (lane_summary.get("by_lane") or {}).items():
             print(f"    {lane}: {count}")
         if lane_summary.get("api_calls_total"):
             print(f"  api_calls_total: {lane_summary['api_calls_total']}")
+        if lane_summary.get("est_usd_total"):
+            print(f"  est_usd_total (advisory): {lane_summary['est_usd_total']}")
     return 0
 
 
@@ -372,6 +375,10 @@ def main(argv: list[str] | None = None) -> int:
     p_sum.add_argument("--days", type=int, default=7)
     p_sum.add_argument("--by-lane", action="store_true", help="Include worker-lane rollup")
 
+    p_backfill = sub.add_parser("backfill", help="Backfill recent slice closes from progress + git log")
+    p_backfill.add_argument("--limit", type=int, default=10)
+    p_backfill.add_argument("--dry-run", action="store_true")
+
     sub.add_parser("export-csv")
 
     args = ap.parse_args(argv)
@@ -401,6 +408,15 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "summary":
         return cmd_summary(repo, days=args.days, by_lane=args.by_lane)
+    if args.command == "backfill":
+        from scripts.ppe_workflow_cost import backfill_recent_slices
+
+        result = backfill_recent_slices(repo, limit=args.limit, dry_run=args.dry_run)
+        mode = "dry-run" if result.get("dry_run") else "applied"
+        print(f"workflow_metrics backfill ({mode}): recorded={len(result.get('recorded') or [])} skipped={len(result.get('skipped') or [])}")
+        for sid in result.get("recorded") or []:
+            print(f"  + {sid}")
+        return 0
     if args.command == "export-csv":
         return cmd_export_csv(repo)
 

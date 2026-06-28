@@ -32,7 +32,12 @@ Cross-refs: [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md) · [`WORKFLOW_E
 ```bat
 workflow_metrics.cmd slice close --slice-id MySlice --size M --roundtrips 2 --worker-lane manual
 workflow_metrics.cmd summary --days 7 --by-lane
+workflow_metrics.cmd backfill --limit 10
 ```
+
+**Backfill** reads `artifacts/orchestrator/PHASE_SLICE_PROGRESS.json` + recent `git log` slice IDs; dedupes like auto-record.
+
+**Advisory USD:** [`PPE_COST_LANE_ESTIMATES.json`](PPE_COST_LANE_ESTIMATES.json) — rough $/slice by lane in summary and `OPERATOR_STATUS`.
 
 ### Weekly (Monday)
 
