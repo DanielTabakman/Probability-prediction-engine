@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `54ec8f6` — ppe_cache_isolation_audit: evidence COMPLETE for chapter closeout (`docs/SOP/`)
+- `41badca` — Control-plane: dev changelog
 - `7808bb7` — ops: loop publish ops/loop-publish-20260628061056-ee4ea03 (#461) (`docs/SOP/`)
 - `0a5428b` — Control-plane: dev changelog
 - `4b4af42` — ops(local): manifest READY after relay pass (#458)
