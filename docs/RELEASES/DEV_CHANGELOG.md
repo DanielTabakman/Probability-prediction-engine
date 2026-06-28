@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `3519e37` — ops(local): manifest READY after relay pass (#449)
+- `82738d8` — ops(local): manifest READY after relay pass (#450) (`docs/SOP/`)
+- `5c2bf38` — Control-plane: dev changelog
 - `5d8885f` — feat(product): Forward Consistency v1 — parity engine, API, Strategy Lab panel (#447) (`apps/msos-web/`)
 - `a58bd5a` — product(PPE-CacheIso-Core-Slice002): asset-key cache isolation witnesses (#446) (`scripts/`)
 - `a12627e` — ops(local): manifest RUNNING for relay pass (#445) (`docs/SOP/`)
@@ -34,6 +37,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `8a6aeae` — fix(msos-ui): plan and monitor asset parity across workflow (#451) (`apps/msos-web/`)
 - `61cd876` — fix(msos-ui): confirm page asset parity and readable gap copy (#448) (`apps/msos-web/`)
 - `258eb81` — control-plane: advance queue to cache isolation after enablement closeout (#444) (`docs/SOP/`)
 - `4ecb96a` — ops-manifest-complete-enablement-pipeline (`docs/SOP/`)
