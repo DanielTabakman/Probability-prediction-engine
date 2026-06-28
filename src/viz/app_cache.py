@@ -164,7 +164,7 @@ def cached_option_expiries(max_expiries=DEFAULT_OPTION_EXPIRIES_MAX, asset_id: s
         return normalized, {}
     return fetch_deribit_option_expiries(
         max_expiries, currency=deribit_currency(aid)
-    ), last_deribit_instruments_diagnostic()
+    ), last_deribit_instruments_diagnostic(deribit_currency(aid))
 
 
 @st.cache_data(ttl=CACHE_TTL)
