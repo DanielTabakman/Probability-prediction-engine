@@ -111,6 +111,33 @@ def test_discover_main_json_exit_enable_path() -> None:
         "next_action": "enable_existing_row",
         "scan_results": [],
     }
-    with patch.object(cli, "discover_asset_source", return_value=fake_report):
+    with patch.object(cli, "discover_one", return_value=fake_report):
         code = cli.main(["--asset", "BTC", "--json"])
     assert code == 0
+
+
+def test_discover_batch_rollup() -> None:
+    from scripts import discover_asset_data_source as cli
+
+    reports = [
+        {"asset_id": "BTC", "ok": True, "next_action": "already_enabled"},
+        {"asset_id": "SOL", "ok": True, "next_action": "switch_venue_and_enable"},
+    ]
+    with patch.object(cli, "discover_one", side_effect=reports):
+        summary = cli.discover_batch(["BTC", "SOL"], asset_kind="auto")
+    assert summary["count"] == 2
+    assert summary["actionable_count"] == 1
+    assert summary["next_action_rollup"]["already_enabled"] == 1
+    assert summary["next_action_rollup"]["switch_venue_and_enable"] == 1
+
+
+def test_resolve_batch_asset_ids_group() -> None:
+    from scripts import discover_asset_data_source as cli
+
+    args = cli._parse_args(["--group", "crypto"])
+    with patch(
+        "scripts.discover_asset_data_source.list_asset_ids_for_catalog_group",
+        return_value=["BTC", "ETH", "SOL"],
+    ):
+        ids = cli.resolve_batch_asset_ids(args)
+    assert ids == ["BTC", "ETH", "SOL"]

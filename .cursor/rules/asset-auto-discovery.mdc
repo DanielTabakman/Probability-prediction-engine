@@ -5,15 +5,26 @@ alwaysApply: true
 
 # Asset auto-discovery (mandatory)
 
-**When the operator asks to add, enable, hook up, or ship any asset** (e.g. "get SOL down", "add SPY", "enable BNB"):
+**When the operator asks to add, enable, hook up, or ship any asset or batch**
+(e.g. "get SOL down", "enable all crypto", "hook up tier-1 tradeables"):
 
 ## First tool pass — before replying
+
+Single asset:
 
 ```bash
 python scripts/discover_asset_data_source.py --asset <ID> --json
 ```
 
-Read `next_action` + `agent_steps` from JSON. **Do not ask** which exchange or data vendor.
+Batch / universe (same ritual — discover every row, then execute each `next_action`):
+
+```bash
+python scripts/discover_asset_data_source.py --group crypto --json
+python scripts/discover_asset_data_source.py --manifest-slice ppe_deribit_crypto_tier1_v1 --json
+python scripts/discover_asset_data_source.py --all-registry --json
+```
+
+Read `next_action` + `agent_steps` from JSON (per asset in batch `reports[]`). **Do not ask** which exchange or data vendor.
 
 ## Execute in the same session (no advise-only)
 

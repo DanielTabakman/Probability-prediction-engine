@@ -6,15 +6,25 @@
 
 ---
 
-## Operator says "add / enable / hook up asset X"
+## Operator says "add / enable / hook up asset X" (or a batch)
 
 **Agent runs first (same turn, before replying):**
 
 ```bash
+# one asset
 python scripts/discover_asset_data_source.py --asset X --json
+
+# catalog group (crypto, equity_index, equity_mega, commodity_proxy)
+python scripts/discover_asset_data_source.py --group crypto --json
+
+# tier-1 manifest chapter
+python scripts/discover_asset_data_source.py --manifest-slice ppe_deribit_crypto_tier1_v1 --json
+
+# entire config/assets.yaml registry
+python scripts/discover_asset_data_source.py --all-registry --json
 ```
 
-Then **execute** `next_action` from the JSON. Do not ask which exchange.
+Then **execute** `next_action` for each report (batch JSON has `reports[]` + `next_action_rollup`). Do not ask which exchange.
 
 | Command | When |
 |---------|------|
