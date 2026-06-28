@@ -46,16 +46,22 @@ JOURNEY: tuple[tuple[str, str], ...] = (
 )
 
 # Non-BTC catalog spot checks — NVDA (equity) + one crypto (ETH).
-LIVE_PILL_EXPECTED: dict[str, str] = {
-    "NVDA": "Live · equity options chain",
-    "ETH": "Live · Deribit options",
-}
+REQUIRED_LIVE_PILL_SPOTS: tuple[tuple[str, str], ...] = (
+    ("NVDA", "Live · equity options chain"),
+    ("ETH", "Live · Deribit options"),
+)
+
+LIVE_PILL_EXPECTED: dict[str, str] = dict(REQUIRED_LIVE_PILL_SPOTS)
 
 LIVE_PILL_SPOT_ASSETS: tuple[str, ...] = tuple(
     aid for aid in MULTI_ASSET_DISPLAY_PROBE_IDS if aid in LIVE_PILL_EXPECTED
 )
 
 LIVE_PILL_WAIT_MS = 120_000
+
+
+def _missing_live_pill_spot_assets() -> list[str]:
+    return [aid for aid, _ in REQUIRED_LIVE_PILL_SPOTS if aid not in LIVE_PILL_SPOT_ASSETS]
 
 
 def validate_strategy_lab_live_pill_html(
@@ -264,6 +270,20 @@ def run_playwright_witness(
                 else None,
             }
         )
+
+        for asset_id in _missing_live_pill_spot_assets():
+            checks.append(
+                {
+                    "id": f"strategy_lab_live_pill_{asset_id.lower()}",
+                    "url": None,
+                    "ok": False,
+                    "status": 0,
+                    "error": f"{asset_id} missing from multi-asset display probe catalog",
+                    "asset_id": asset_id,
+                    "expected_pill": LIVE_PILL_EXPECTED[asset_id],
+                    "screenshot": None,
+                }
+            )
 
         for asset_id in LIVE_PILL_SPOT_ASSETS:
             expected_pill = LIVE_PILL_EXPECTED[asset_id]
