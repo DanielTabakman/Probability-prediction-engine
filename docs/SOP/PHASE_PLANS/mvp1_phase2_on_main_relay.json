@@ -74,7 +74,12 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_phase2_on_main",
+        "chapterTitle": "MVP1_phase2_on_main (post-reliability SELECTION)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

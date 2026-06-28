@@ -45,7 +45,12 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_display_cache_ops_v1",
+        "chapterTitle": "ppe_display_cache_ops_v1 (scheduled warm + cache health)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

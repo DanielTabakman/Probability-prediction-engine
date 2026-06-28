@@ -24,6 +24,18 @@
         "scripts/witness_asset_catalog.py",
         "scripts/enable_asset_batch.py",
         "src/data/assets_registry.py"
+      ],
+      "acceptance": [
+        {
+          "id": "witness-group",
+          "check": "witness_asset_catalog supports --group and --manifest-slice",
+          "verify": "tests/test_witness_asset_catalog.py"
+        },
+        {
+          "id": "enable-batch",
+          "check": "enable_asset_batch dry-run and apply paths work",
+          "verify": "tests/test_ppe_asset_enablement_pipeline.py"
+        }
       ]
     },
     {
@@ -37,6 +49,18 @@
       "touchSet": [
         "docs/SOP/ASSET_ENABLEMENT_RUNBOOK_V1.md",
         "tests/"
+      ],
+      "acceptance": [
+        {
+          "id": "runbook-complete",
+          "check": "ASSET_ENABLEMENT_RUNBOOK_V1 documents manifest slice to enable flow",
+          "verify": "docs/SOP/ASSET_ENABLEMENT_RUNBOOK_V1.md"
+        },
+        {
+          "id": "pipeline-tests",
+          "check": "Enablement pipeline tests pass",
+          "verify": "tests/test_ppe_asset_enablement_pipeline.py"
+        }
       ]
     },
     {

@@ -11,6 +11,7 @@ from scripts.run_pushable_gate import (
     GatePlan,
     _classify,
     _msos_web_gate_commands,
+    _phase_plan_gate_commands,
     _touches_msos_web,
     _union_paths,
     pytest_cmd,
@@ -63,6 +64,17 @@ class TestRunPushableGateTiers(unittest.TestCase):
             cmds,
             [["python", "scripts/verify_msos_web_build.py", "--witness-only"]],
         )
+
+    def test_phase_plan_gate_commands(self) -> None:
+        cmds = _phase_plan_gate_commands(
+            [
+                "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
+                "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+            ]
+        )
+        self.assertEqual(len(cmds), 2)
+        self.assertIn("--strict", cmds[0])
+        self.assertIn("--manifest", cmds[1][-1])
 
 
 class TestResolveChangedFiles(unittest.TestCase):

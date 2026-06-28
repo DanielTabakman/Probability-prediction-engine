@@ -34,7 +34,12 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_onboarding_how_it_works",
+        "chapterTitle": "MVP1_onboarding_how_it_works (post-belief-input SELECTION)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

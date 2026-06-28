@@ -46,7 +46,12 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_workflow_asset_parity_v1",
+        "chapterTitle": "msos_workflow_asset_parity_v1 (P4-P7 asset propagation)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

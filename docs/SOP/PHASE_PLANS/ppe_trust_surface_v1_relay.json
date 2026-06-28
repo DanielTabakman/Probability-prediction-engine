@@ -44,7 +44,12 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_trust_surface_v1",
+        "chapterTitle": "ppe_trust_surface_v1 (trust_state + trust_notes in MSOS)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

@@ -34,7 +34,12 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 10,
       "hardMinutes": 20,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_reliability",
+        "chapterTitle": "MVP1_reliability (post-commercial-ops SELECTION)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

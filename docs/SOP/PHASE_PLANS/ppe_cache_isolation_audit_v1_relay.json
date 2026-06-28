@@ -45,7 +45,12 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_cache_isolation_audit_v1",
+        "chapterTitle": "ppe_cache_isolation_audit_v1 (asset-key cache witness suite)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

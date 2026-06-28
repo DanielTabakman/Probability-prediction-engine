@@ -1,5 +1,5 @@
 {
-  "name": "ppe_cme_commodity_v1 (CME GC SI CL — DEFERRED)",
+  "name": "ppe_cme_commodity_v1 (CME GC SI CL \u2014 DEFERRED)",
   "baselineBranch": "main",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md",
@@ -14,7 +14,12 @@
       "susMinutes": 15,
       "hardMinutes": 30,
       "maxAttempts": 1,
-      "notes": "DEFERRED — do not auto-select until validation gates pass"
+      "notes": "DEFERRED \u2014 do not auto-select until validation gates pass",
+      "closeout": {
+        "chapterId": "ppe_cme_commodity_v1",
+        "chapterTitle": "ppe_cme_commodity_v1 (CME GC SI CL \u2014 DEFERRED)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

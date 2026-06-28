@@ -34,7 +34,12 @@
       "declaredPlane": "CONTROL-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_belief_input_ux",
+        "chapterTitle": "MVP1_belief_input_ux (post-friends-first SELECTION)",
+        "chapterStatus": "COMPLETE"
+      }
     }
   ]
 }

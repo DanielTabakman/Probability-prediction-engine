@@ -180,6 +180,20 @@ def _touches_msos_web(files: list[str]) -> bool:
     return any(f.replace("\\", "/").startswith("apps/msos-web/") for f in files)
 
 
+def _phase_plan_gate_commands(files: list[str]) -> list[list[str]]:
+    """Validate changed phase plans and manifest against agent slice schema."""
+    norm = [f.replace("\\", "/") for f in files]
+    cmds: list[list[str]] = []
+    for path in norm:
+        if path.startswith("docs/SOP/PHASE_PLANS/") and path.endswith(".json"):
+            cmds.append(
+                ["python", "-m", "scripts.validate_phase_plans", "--phase-plan", path, "--strict"]
+            )
+    if "docs/SOP/ACTIVE_PHASE_MANIFEST.json" in norm:
+        cmds.append(["python", "-m", "scripts.validate_phase_plans", "--manifest"])
+    return cmds
+
+
 def _msos_web_gate_commands(files: list[str], *, pre_push: bool) -> list[list[str]]:
     if not _touches_msos_web(files):
         return []
@@ -369,6 +383,11 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
         except FileNotFoundError:
             pass
+
+    for cmd in _phase_plan_gate_commands(files):
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
 
     for cmd in plan.commands:
         rc = _run(cmd, cwd=repo)
