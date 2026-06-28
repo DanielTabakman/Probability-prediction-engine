@@ -1,7 +1,7 @@
 # PPE trust surface v1 — evidence status
 
 **Chapter:** `ppe_trust_surface_v1`  
-**Status:** **RUNNING** (SELECTED 2026-06-27; promoted READY 2026-06-28)  
+**Status:** **COMPLETE** 2026-06-28 (SELECTED 2026-06-27; promoted READY 2026-06-28)  
 **SELECTION:** [`POST_PPE_TRUST_SURFACE_V1_SELECTION.md`](POST_PPE_TRUST_SURFACE_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_trust_surface_v1_relay.json`](PHASE_PLANS/ppe_trust_surface_v1_relay.json)
 
