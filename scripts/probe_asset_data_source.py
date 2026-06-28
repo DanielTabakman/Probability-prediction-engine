@@ -28,6 +28,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from src.data.assets_registry import (  # noqa: E402
     asset_venue,
+    bybit_base_coin,
     deribit_currency,
     equity_symbol,
     get_asset,
@@ -129,6 +130,7 @@ def probe_bybit(asset_id: str) -> dict[str, Any]:
         "options_available": bool(row.get("options_available")),
         "errors": row.get("errors") or {},
         "fetch_module": row.get("fetch_module") or "src.data.fetch_bybit_options",
+        "api_base": "https://api.bybit.com/v5",
     }
 
 

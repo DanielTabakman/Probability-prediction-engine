@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
-from src.data.assets_registry import default_asset_id
+from src.data.assets_registry import asset_venue, default_asset_id
 from src.data.fetch_equity_options import (
     assess_equity_chain_trust,
     format_equity_trust_suffix,
@@ -153,6 +153,7 @@ def build_equity_distribution_export_rows(
         )
         prices = dist["prices"]
         ln_stats = lognormal_distribution_stats(forward, vol, T_years)
+        trust_flags = ["dividend_caveat_unmodeled"] if asset_venue(asset) == "equity" else ["usdt_settled_options"]
         rows.append(
             _stats_row(
                 as_of_utc=as_of_utc,
@@ -165,7 +166,7 @@ def build_equity_distribution_export_rows(
                 atm_iv_annual=vol,
                 spot_usd=spot_usd,
                 call_marks_count="",
-                bl_status=format_equity_trust_suffix({"trust_flags": ["dividend_caveat_unmodeled"]}),
+                bl_status=format_equity_trust_suffix({"trust_flags": trust_flags}),
             )
         )
 

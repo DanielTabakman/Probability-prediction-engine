@@ -76,6 +76,21 @@ def asset_venue(asset_id: str | None = None) -> str:
     return str(entry.get("venue") or "deribit").strip().lower()
 
 
+def is_usd_premium_options_venue(asset_id: str | None = None) -> bool:
+    """Equity and Bybit USDT options — premiums already in USD (mark_btc field misnomer)."""
+    return asset_venue(asset_id) in ("equity", "bybit")
+
+
+def bybit_base_coin(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    if asset_venue(asset_id) != "bybit":
+        raise ValueError(f"asset {asset_id!r} is not bybit venue")
+    coin = _normalize_asset_id(str(entry.get("bybit_base_coin") or asset_id or ""))
+    if not coin:
+        raise ValueError(f"asset {asset_id!r} missing bybit_base_coin")
+    return coin
+
+
 def is_asset_enabled(asset_id: str | None = None) -> bool:
     entry = get_asset(asset_id)
     if "enabled" in entry:
@@ -192,8 +207,11 @@ def equity_symbol(asset_id: str | None = None) -> str:
 
 def deribit_currency(asset_id: str | None = None) -> str:
     entry = get_asset(asset_id)
-    if asset_venue(asset_id) == "equity":
+    venue = asset_venue(asset_id)
+    if venue == "equity":
         raise ValueError(f"asset {asset_id!r} is equity venue, not deribit")
+    if venue == "bybit":
+        raise ValueError(f"asset {asset_id!r} is bybit venue, not deribit")
     currency = _normalize_asset_id(str(entry.get("deribit_currency") or asset_id or default_asset_id()))
     if not currency:
         raise ValueError(f"asset {asset_id!r} missing deribit_currency")

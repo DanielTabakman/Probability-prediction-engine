@@ -31,7 +31,7 @@ venues:
     enable_requires: live_option_instruments_gt_0
     notes: >
       USDT-settled crypto options fallback when Deribit delists (e.g. SOL).
-      Requires fetch_bybit_options adapter — discovery reports build_adapter if missing.
+      Premiums in USD — equity-style export path via fetch_bybit_options.
 
   equity:
     label: Yahoo Finance (yfinance)
@@ -48,7 +48,7 @@ venues:
 # Historical / research notes (discovery scans live vendors first — do not trust stale rows)
 research_alternatives:
   SOL:
-    note: Deribit delisted 2026-06-27; discovery auto-scans Bybit
+    note: Deribit delisted 2026-06-27; discovery auto-scans Bybit; live via fetch_bybit_options
   BNB:
     note: Deribit 0 instruments 2026-06-27; try Bybit scan
   XRP:
