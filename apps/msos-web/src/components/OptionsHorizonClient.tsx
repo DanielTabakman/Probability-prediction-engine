@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import type { ChangeEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 
+import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
 import { OptionsHorizonChart } from "@/components/OptionsHorizonChart";
 import {
   fetchHorizonChartPayload,
@@ -21,11 +23,16 @@ type OptionsHorizonClientProps = {
   initialPayload: HorizonChartPayload | null;
 };
 
+function expiryTsFromUtc(expiryUtc: string): number {
+  return Math.floor(new Date(expiryUtc).getTime() / 1000);
+}
+
 export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientProps) {
   const [payload, setPayload] = useState<HorizonChartPayload | null>(initialPayload);
   const [region, setRegion] = useState<HorizonRegionIntent | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(!initialPayload);
+  const [expiryLoading, setExpiryLoading] = useState(false);
 
   useEffect(() => {
     setRegion(loadHorizonRegion());
@@ -85,6 +92,28 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
     [payload],
   );
 
+  const expiryOptions =
+    payload?.forward.curve.map((pt) => ({
+      expiryDate: pt.expiry_date,
+      expiryTs: expiryTsFromUtc(pt.expiry_utc),
+    })) ?? [];
+
+  const selectedExpiryTs = payload?.implied?.expiry_ts ?? expiryOptions[0]?.expiryTs ?? "";
+  const impliedChartLayout = { width: 360, height: 260, padLeft: 54, padRight: 14, padTop: 14, padBottom: 38 };
+
+  const onExpiryChange = useCallback(async (event: ChangeEvent<HTMLSelectElement>) => {
+    const nextExpiryTs = Number(event.target.value);
+    if (!Number.isFinite(nextExpiryTs)) return;
+    setExpiryLoading(true);
+    const nextPayload = await fetchHorizonChartPayload({ expiryTs: nextExpiryTs });
+    if (nextPayload) {
+      setPayload(nextPayload);
+      setRegion(null);
+      setPreview(null);
+    }
+    setExpiryLoading(false);
+  }, []);
+
   if (loading) {
     return <p className="footer-note">Loading Options Horizon…</p>;
   }
@@ -111,7 +140,80 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
         </div>
       </header>
 
-      <OptionsHorizonChart payload={payload} region={region} onRegionChange={onRegionChange} />
+      <div className="options-horizon-layout">
+        <OptionsHorizonChart payload={payload} region={region} onRegionChange={onRegionChange} />
+
+        <aside className="options-horizon-side" aria-label="Options Horizon chart controls">
+          <section className="options-horizon-panel">
+            <label className="options-horizon-field">
+              <span>Expiry</span>
+              <select
+                value={selectedExpiryTs}
+                onChange={onExpiryChange}
+                disabled={expiryLoading || !expiryOptions.length}
+              >
+                {expiryOptions.map((option) => (
+                  <option key={option.expiryTs} value={option.expiryTs}>
+                    {option.expiryDate}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="options-horizon-stat-grid">
+              <div>
+                <span>Spot</span>
+                <strong>
+                  ${payload.spot_usd.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+                </strong>
+              </div>
+              <div>
+                <span>Implied forward</span>
+                <strong>
+                  {payload.implied
+                    ? `$${payload.implied.forward_usd.toLocaleString("en-US", { maximumFractionDigits: 0 })}`
+                    : "Unavailable"}
+                </strong>
+              </div>
+              <div>
+                <span>ATM IV</span>
+                <strong>
+                  {payload.implied
+                    ? `${(payload.implied.atm_iv_annual * 100).toFixed(1)}%`
+                    : "Unavailable"}
+                </strong>
+              </div>
+            </div>
+            <p className="micro">
+              Display-only options context. Changing expiry refetches the Python chart payload.
+            </p>
+          </section>
+
+          <section className="options-horizon-panel options-horizon-distribution-panel">
+            <div>
+              <p className="eyebrow">Implied distribution</p>
+              <h2>{payload.implied?.expiry_date ?? "Selected expiry"}</h2>
+            </div>
+            {payload.implied ? (
+              <LabeledDistributionChart
+                pricesUsd={payload.implied.prices_usd}
+                marketPdfPct={payload.implied.pdf_pct}
+                spotUsd={payload.spot_usd}
+                ariaLabel={`Options-implied distribution for ${payload.asset_id} at ${payload.implied.expiry_date}`}
+                curveLabels={{
+                  market_legend: "Options-implied probability",
+                  belief_legend: "Your view",
+                  payoff_legend: "Payoff at expiry",
+                  market_method: "Python payload",
+                }}
+                priceAxisLabel="Price at expiry"
+                layout={impliedChartLayout}
+              />
+            ) : (
+              <p className="micro">Implied distribution unavailable for this expiry.</p>
+            )}
+          </section>
+        </aside>
+      </div>
 
       {preview ? (
         <div className="panel-sub options-horizon-preview" role="status">
