@@ -11,7 +11,7 @@
 
 ## Status
 
-**SELECTED** 2026-06-27 — meta infra chapter #5.
+**READY** 2026-06-28 — promoted after horizon chart polish closeout; dependencies satisfied (display parity + enablement pipeline COMPLETE).
 
 **First slice:** `MSOS-WfAsset-Control-Slice001`
 

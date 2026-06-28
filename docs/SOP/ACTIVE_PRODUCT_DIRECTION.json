@@ -85,10 +85,10 @@
       "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "",
-  "activeBuildPlanPath": "",
-  "activeBuildSprint": "",
-  "nextStewardAction": "Steward SELECTION — next trader-workflow relay slice (SOL Bybit live; horizon chart polish COMPLETE)",
+  "activeBuildChapterId": "msos_workflow_asset_parity_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md",
+  "nextStewardAction": "Relay msos_workflow_asset_parity_v1 — P4→P7 asset propagation (Strategy Lab → confirm → expression → monitor)",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

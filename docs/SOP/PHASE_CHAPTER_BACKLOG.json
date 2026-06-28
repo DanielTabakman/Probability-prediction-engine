@@ -427,7 +427,7 @@
     },
     {
       "chapterId": "msos_workflow_asset_parity_v1",
-      "status": "chartered",
+      "status": "active",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
@@ -447,7 +447,7 @@
     },
     {
       "chapterId": "msos_production_multi_asset_witness_v1",
-      "status": "chartered",
+      "status": "queued",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
@@ -581,7 +581,7 @@
     },
     {
       "chapterId": "horizon_chart_polish_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",

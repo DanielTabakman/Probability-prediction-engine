@@ -297,7 +297,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md"
     },

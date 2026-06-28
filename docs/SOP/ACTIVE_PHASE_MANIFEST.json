@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "",
-  "selectionRecord": "",
-  "status": "COMPLETE",
-  "notes": "horizon_chart_polish_v1 COMPLETE 2026-06-28 — awaiting steward SELECTION for next relay chapter",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation; trader workflow loop fidelity",
   "workerMode": "local-agent"
 }

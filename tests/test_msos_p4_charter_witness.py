@@ -73,6 +73,9 @@ PPE_ENABLEMENT_PIPELINE_PLAN = (
 PPE_CACHE_ISOLATION_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json"
 )
+MSOS_WF_ASSET_PARITY_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -106,6 +109,7 @@ ALLOWED_READY_PLANS = (
     MVP1_CROSS_VENUE_BACKTEST_PLAN,
     PPE_ENABLEMENT_PIPELINE_PLAN,
     PPE_CACHE_ISOLATION_PLAN,
+    MSOS_WF_ASSET_PARITY_PLAN,
 )
 
 
