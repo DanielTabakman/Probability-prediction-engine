@@ -17,9 +17,12 @@ export const STRATEGY_LAB_WORKFLOW_STEPS: { id: StrategyLabWorkflowStep; label: 
   { id: "plan", label: "Plan paper trade" },
 ];
 
-export function buildWorkflowStepHref(step: StrategyLabWorkflowStep, assetId: LabAssetId): string {
+export function buildWorkflowStepHref(
+  step: StrategyLabWorkflowStep,
+  assetId?: LabAssetId,
+): string {
   const path = STEP_PATHS[step];
-  const normalized = assetId.trim().toUpperCase();
+  const normalized = (assetId ?? "").trim().toUpperCase();
   if (!normalized) {
     return path;
   }
