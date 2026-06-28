@@ -7,9 +7,9 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-WfAsset-Control-Slice001 | PENDING | Propagation matrix |
-| MSOS-WfAsset-Product-Slice002 | PENDING | confirm/expression/monitor |
-| MSOS-WfAsset-Witness-Slice003 | PENDING | P4→P7 tests |
+| MSOS-WfAsset-Control-Slice001 | IN_PROGRESS | Propagation matrix (Confirm row verified) |
+| MSOS-WfAsset-Product-Slice002 | IN_PROGRESS | Confirm asset-aware copy + gap; expression/monitor TBD |
+| MSOS-WfAsset-Witness-Slice003 | IN_PROGRESS | Confirm panel asset witness added |
 | MSOS-WfAsset-Closeout-Slice004 | PENDING | Chapter close |
 
 ## Asset propagation matrix (target)
@@ -17,6 +17,10 @@
 | Surface | Reads `?asset=` / thesis asset | SSR fetch asset-aware |
 |---------|-------------------------------|------------------------|
 | Strategy Lab | yes (display parity) | yes |
-| Confirm | TBD | TBD |
-| Expression | TBD | TBD |
-| Monitor | TBD | TBD |
+| Confirm | yes (`?asset=` → `resolveDisplayAssetMeta`) | yes (`fetchDisplayPayloadClient(assetId)`) |
+| Expression | partial (`?asset=` fetch; some BTC-hardcoded help copy) | partial (display fetch; strategy suggestion API still BTC-default) |
+| Monitor | partial (`thesis.assetId` in feed) | partial |
+
+**Confirm rule (Product-Slice002):** any workflow step that builds trader-facing copy from lab context must pass `resolveDisplayAssetMeta(payload, assetId)` — never rely on payload-only or BTC fixtures after hydration.
+
+**Gap rule:** “The gap” must describe the disagreement in plain language (`buildGapDescription`) — not collapse to a one-word view label when implied range width is missing or zero.

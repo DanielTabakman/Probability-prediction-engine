@@ -104,8 +104,11 @@ def test_confirm_page_uses_live_lab_context() -> None:
     )
     assert "buildCompareColumnsFromLab" in lib
     assert "buildThesisDraftFromLab" in lib
+    assert "buildGapDescription" in lib or "You expect a lower finish than options imply" in lib
     assert "buildThesisLabContext" in panel or "buildCompareColumnsFromLab" in panel
     assert "fetchDisplayPayloadClient" in panel
+    assert "resolveDisplayAssetMeta" in panel
+    assert "assetMeta" in panel
 
 
 def test_paper_trade_detail_route_exists() -> None:
