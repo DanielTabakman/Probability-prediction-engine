@@ -17,8 +17,8 @@ DEFAULT_OPTION_EXPIRIES_MAX = 20
 
 logger = logging.getLogger(__name__)
 
-# Set on failed get_instruments; cleared on success (for implied-lab debug UI).
-_LAST_INSTRUMENTS_DIAGNOSTIC: str | None = None
+# Set on failed get_instruments per currency; cleared on success (for implied-lab debug UI).
+_LAST_INSTRUMENTS_DIAGNOSTIC: dict[str, str | None] = {}
 
 
 def _deribit_currency(currency: str = "BTC") -> str:
@@ -26,8 +26,13 @@ def _deribit_currency(currency: str = "BTC") -> str:
     return c or "BTC"
 
 
-def last_deribit_instruments_diagnostic() -> str | None:
-    return _LAST_INSTRUMENTS_DIAGNOSTIC
+def last_deribit_instruments_diagnostic(currency: str = "BTC") -> str | None:
+    return _LAST_INSTRUMENTS_DIAGNOSTIC.get(_deribit_currency(currency))
+
+
+def clear_deribit_instruments_diagnostics() -> None:
+    """Test helper: reset per-currency instrument diagnostics."""
+    _LAST_INSTRUMENTS_DIAGNOSTIC.clear()
 
 
 def _deribit_public_request(
@@ -117,9 +122,9 @@ def fetch_deribit_options_instruments(
         {"currency": cur, "kind": "option", "expired": str(expired).lower()},
     )
     if isinstance(out, list):
-        _LAST_INSTRUMENTS_DIAGNOSTIC = None
+        _LAST_INSTRUMENTS_DIAGNOSTIC[cur] = None
         return out
-    _LAST_INSTRUMENTS_DIAGNOSTIC = err or "No instrument list returned."
+    _LAST_INSTRUMENTS_DIAGNOSTIC[cur] = err or "No instrument list returned."
     return []
 
 
