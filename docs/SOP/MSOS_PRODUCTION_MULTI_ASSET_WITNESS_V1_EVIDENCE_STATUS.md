@@ -7,10 +7,10 @@
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-MultiAssetWit-Control-Slice001 | PENDING | Witness spec |
-| MSOS-MultiAssetWit-Platform-Slice002 | PENDING | Script + deploy hook |
-| MSOS-MultiAssetWit-Product-Slice003 | PENDING | Playwright spot |
-| MSOS-MultiAssetWit-Closeout-Slice004 | PENDING | Chapter close |
+| MSOS-MultiAssetWit-Control-Slice001 | **COMPLETE** | Witness spec |
+| MSOS-MultiAssetWit-Platform-Slice002 | **COMPLETE** | Script + deploy hook |
+| MSOS-MultiAssetWit-Product-Slice003 | **COMPLETE** | Playwright spot |
+| MSOS-MultiAssetWit-Closeout-Slice004 | **COMPLETE** | Chapter close |
 
 ## Production SLA (draft)
 
