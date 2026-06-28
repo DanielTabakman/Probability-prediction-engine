@@ -54,8 +54,61 @@ def test_send_ntfy_urgent_bypasses_daily_cap(tmp_path, monkeypatch):
     response.__exit__ = MagicMock(return_value=False)
 
     with patch("urllib.request.urlopen", return_value=response) as urlopen:
+        assert push.send_ntfy("PPE operator: ERROR", "boom", tags=["ppe"], priority="urgent") is True
+    urlopen.assert_called_once()
+
+
+def test_send_ntfy_loop_down_excluded_from_daily_cap(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "t")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_DAILY_CAP", "1")
+    monkeypatch.setenv("PPE_NTFY_MIN_INTERVAL_SEC", "0")
+    monkeypatch.setenv("PPE_REPO_ROOT", str(tmp_path))
+    push.record_ntfy_send("routine", tags=["ppe"], priority="default", repo=tmp_path)
+
+    response = MagicMock()
+    response.status = 200
+    response.__enter__ = MagicMock(return_value=response)
+    response.__exit__ = MagicMock(return_value=False)
+
+    with patch("urllib.request.urlopen", return_value=response) as urlopen:
         assert push.send_ntfy("PPE loop stopped", "down", tags=["ppe"], priority="urgent") is True
     urlopen.assert_called_once()
+
+
+def test_send_ntfy_loop_down_cooldown_blocks_repeat(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "t")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_NTFY_LOOP_DOWN_COOLDOWN_MIN", "30")
+    monkeypatch.setenv("PPE_NTFY_MIN_INTERVAL_SEC", "0")
+    monkeypatch.setenv("PPE_REPO_ROOT", str(tmp_path))
+    push.mark_loop_down_alerted(tmp_path)
+
+    response = MagicMock()
+    response.status = 200
+    response.__enter__ = MagicMock(return_value=response)
+    response.__exit__ = MagicMock(return_value=False)
+
+    with patch("urllib.request.urlopen", return_value=response) as urlopen:
+        assert push.send_ntfy("PPE loop stopped", "down", tags=["ppe"], priority="urgent") is False
+    urlopen.assert_not_called()
+
+
+def test_build_quota_snapshot_excludes_loop_down(tmp_path):
+    sends = [
+        {"title": "PPE loop stopped", "category": "critical", "counts_toward_cap": False},
+        {"title": "PPE operator: IDE_BUILD", "category": "ide_build", "counts_toward_cap": True},
+    ]
+    snap = push.build_quota_snapshot(sends=sends)
+    assert snap["count"] == 1
+    assert snap["loop_down_excluded"] == 1
+
+
+def test_loop_recovery_clears_pending(tmp_path):
+    push.mark_loop_down_alerted(tmp_path)
+    assert push.loop_down_recovery_pending(tmp_path) is True
+    push.clear_loop_down_pending(tmp_path)
+    assert push.loop_down_recovery_pending(tmp_path) is False
 
 
 def test_quota_exceeded_updates_status_file(tmp_path, monkeypatch):

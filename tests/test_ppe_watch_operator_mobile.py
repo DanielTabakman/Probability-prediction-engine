@@ -78,6 +78,33 @@ def test_auto_build_retry_when_never_started():
     assert _auto_build_retry_due(prior, "IDE_BUILD") is True
 
 
+def test_watch_once_alerts_when_loop_recovers(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+
+    status = {
+        "verdict": "RUN_AUTO",
+        "blocker": None,
+        "phase_plan_path": "docs/SOP/PHASE_PLANS/foo.json",
+        "commands": [],
+    }
+
+    (tmp_path / "artifacts/control_plane").mkdir(parents=True)
+    from scripts.ppe_notify_push import mark_loop_down_alerted
+
+    mark_loop_down_alerted(tmp_path)
+
+    with patch("scripts.ppe_watch_operator_mobile.collect_operator_status", return_value=status):
+        with patch("scripts.ppe_watch_operator_mobile.is_loop_running", return_value=True):
+            with patch("scripts.ppe_watch_operator_mobile._heartbeat_due", return_value=False):
+                with patch("scripts.ppe_watch_operator_mobile.load_state", return_value={"loop_running": False}):
+                    with patch("scripts.ppe_watch_operator_mobile.send_ntfy", return_value=True) as send:
+                        result = watch_once(tmp_path, write_report=False)
+
+    assert result["alerts_sent"] == 1
+    assert send.call_args[0][0] == "PPE loop back"
+
+
 def test_watch_once_alerts_when_stuck_clears(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "test-topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")

@@ -13,6 +13,7 @@ from typing import Any
 
 from scripts.ppe_notify_push import (
     is_ntfy_quiet_hours,
+    loop_down_recovery_pending,
     mark_quiet_stuck_sent,
     ntfy_configured,
     notify_enabled,
@@ -363,6 +364,14 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
             )
         )
 
+    if loop_running and not prior_loop and loop_down_recovery_pending(repo):
+        alerts.append(
+            (
+                "PPE loop back",
+                "Loop is running again on the VM. Phone: status for full brief.",
+            )
+        )
+
     morning_report: dict[str, Any] | None = None
     try:
         from scripts.ppe_morning_report import maybe_send_morning_report
@@ -388,7 +397,11 @@ def watch_once(repo: Path, *, write_report: bool = True) -> dict[str, Any]:
     if alerts and notify_enabled() and ntfy_configured():
         for title, body in alerts:
             priority = "urgent" if title == "PPE loop stopped" else "high"
+            if title == "PPE loop back":
+                priority = "default"
             tags = ["ppe", "watch", "stuck"] if "still stuck" in title.lower() else ["ppe", "watch"]
+            if title == "PPE loop back":
+                tags = ["ppe", "watch", "recovery"]
             if send_ntfy(title, body, tags=tags, priority=priority):
                 sent += 1
                 if "still stuck" in title.lower():

@@ -13,6 +13,8 @@ REM set "PPE_NTFY_HEARTBEAT_HOURS=0"
 REM Stuck reminder while verdict unchanged (IDE_BUILD, ERROR, etc.). Default 8; 2 = every 2h.
 REM During quiet hours: one stuck ping per night, then silence until morning.
 REM set "PPE_NTFY_STUCK_HOURS=2"
+REM Loop-down cooldown (default 30m) — stops restart death-spiral ntfy spam; loop-down excluded from daily cap.
+REM set "PPE_NTFY_LOOP_DOWN_COOLDOWN_MIN=30"
 REM Quiet hours: mute routine auto-alerts (phone cmds + stuck + urgent still work).
 REM set "PPE_NTFY_QUIET_HOURS=1"
 REM set "PPE_NTFY_QUIET_START=01:00"

@@ -19,9 +19,11 @@ DEFAULT_NTFY_SERVER = "https://ntfy.sh"
 SNOOZE_REL = "artifacts/control_plane/NTFY_SNOOZE.json"
 QUIET_ALERT_REL = "artifacts/control_plane/NTFY_QUIET_ALERT_STATE.json"
 SEND_STATE_REL = "artifacts/control_plane/NTFY_SEND_STATE.json"
+LOOP_DOWN_STATE_REL = "artifacts/control_plane/NTFY_LOOP_DOWN_STATE.json"
 QUOTA_STATUS_REL = "artifacts/control_plane/NTFY_QUOTA_STATUS.json"
 OUTBOUND_TAG = "from-desktop"
 DEFAULT_DAILY_CAP = 40
+DEFAULT_LOOP_DOWN_COOLDOWN_MIN = 30.0
 DEFAULT_DEDUP_MINUTES = 45.0
 DEFAULT_MIN_INTERVAL_SEC = 120.0
 DEFAULT_WARN_PCT = 80
@@ -376,6 +378,84 @@ def send_state_path(repo: Path | None = None) -> Path:
     return (repo or repo_root()).resolve() / SEND_STATE_REL
 
 
+def loop_down_state_path(repo: Path | None = None) -> Path:
+    return (repo or repo_root()).resolve() / LOOP_DOWN_STATE_REL
+
+
+def is_loop_down_alert(title: str) -> bool:
+    lower = (title or "").lower()
+    return "loop stopped" in lower or "stack down" in lower
+
+
+def is_loop_recovery_alert(title: str) -> bool:
+    lower = (title or "").lower()
+    return "loop back" in lower or "stack back" in lower
+
+
+def loop_down_cooldown_minutes() -> float:
+    raw = os.environ.get("PPE_NTFY_LOOP_DOWN_COOLDOWN_MIN", str(DEFAULT_LOOP_DOWN_COOLDOWN_MIN)).strip()
+    try:
+        return max(5.0, float(raw))
+    except ValueError:
+        return DEFAULT_LOOP_DOWN_COOLDOWN_MIN
+
+
+def load_loop_down_state(repo: Path | None = None) -> dict[str, Any]:
+    path = loop_down_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_loop_down_state(repo: Path | None, state: dict[str, Any]) -> None:
+    path = loop_down_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def loop_down_alert_in_cooldown(repo: Path | None = None) -> bool:
+    state = load_loop_down_state(repo)
+    last_at = _parse_utc(str(state.get("last_alert_at") or ""))
+    if last_at is None:
+        return False
+    if last_at.tzinfo is None:
+        last_at = last_at.replace(tzinfo=timezone.utc)
+    elapsed = (datetime.now(timezone.utc) - last_at).total_seconds() / 60.0
+    return elapsed < loop_down_cooldown_minutes()
+
+
+def mark_loop_down_alerted(repo: Path | None = None) -> None:
+    state = load_loop_down_state(repo)
+    state["last_alert_at"] = _utc_now()
+    state["down_pending"] = True
+    save_loop_down_state(repo, state)
+
+
+def loop_down_recovery_pending(repo: Path | None = None) -> bool:
+    return bool(load_loop_down_state(repo).get("down_pending"))
+
+
+def clear_loop_down_pending(repo: Path | None = None) -> None:
+    state = load_loop_down_state(repo)
+    if not state:
+        return
+    state = {k: v for k, v in state.items() if k != "down_pending"}
+    if state:
+        save_loop_down_state(repo, state)
+    else:
+        path = loop_down_state_path(repo)
+        if path.is_file():
+            path.unlink(missing_ok=True)
+
+
+def cap_eligible_sends(sends: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [item for item in sends if item.get("counts_toward_cap", True)]
+
+
 def quota_status_path(repo: Path | None = None) -> Path:
     return (repo or repo_root()).resolve() / QUOTA_STATUS_REL
 
@@ -462,6 +542,8 @@ def categorize_send_title(title: str) -> str:
         return "ide_build"
     if "loop stopped" in lower or "stack down" in lower:
         return "critical"
+    if "loop back" in lower or "stack back" in lower:
+        return "recovery"
     if "still stuck" in lower:
         return "stuck"
     if "fixing" in lower or "fix done" in lower or lower.startswith("ppe fixed"):
@@ -513,11 +595,15 @@ def build_quota_snapshot(
     skip_reason: str = "",
 ) -> dict[str, Any]:
     cap = cap if cap is not None else ntfy_daily_cap()
-    count = len(sends)
-    breakdown = summarize_sends(sends)
+    billed = cap_eligible_sends(sends)
+    count = len(billed)
+    breakdown = summarize_sends(billed)
+    loop_down_excluded = len(sends) - count
     return {
         "as_of": _utc_now(),
         "count": count,
+        "raw_count": len(sends),
+        "loop_down_excluded": loop_down_excluded,
         "cap": cap,
         "remaining": max(0, cap - count),
         "warn_threshold": ntfy_warn_threshold(),
@@ -645,11 +731,20 @@ def should_throttle_ntfy(
     repo: Path | None = None,
 ) -> tuple[bool, str]:
     """Return (allow_send, skip_reason)."""
-    if bypass_throttle or priority == "urgent":
+    if bypass_throttle:
+        return True, ""
+
+    if is_loop_down_alert(title):
+        if loop_down_alert_in_cooldown(repo):
+            return False, f"loop down cooldown ({loop_down_cooldown_minutes():g}m)"
+        return True, ""
+
+    if priority == "urgent":
         return True, ""
 
     state = _load_send_state(repo)
     sends = _prune_send_state(state)
+    billed = cap_eligible_sends(sends)
     now = datetime.now(timezone.utc)
     fp = _message_fingerprint(title, tags, priority)
     dedup_minutes = _heartbeat_dedup_minutes() if _is_heartbeat_message(title, tags) else ntfy_dedup_minutes()
@@ -667,10 +762,10 @@ def should_throttle_ntfy(
             return False, f"dedup ({dedup_minutes:g}m window)"
 
     cap = ntfy_daily_cap()
-    if len(sends) >= cap:
+    if len(billed) >= cap:
         snap = build_quota_snapshot(sends=sends, cap=cap, skipped_title=title, skip_reason="daily cap")
         write_quota_status_file(snap, repo)
-        _maybe_notify_quota_exceeded(repo, state, sends, skipped_title=title)
+        _maybe_notify_quota_exceeded(repo, state, billed, skipped_title=title)
         return False, f"daily cap ({cap})"
 
     min_gap = ntfy_min_interval_seconds()
@@ -692,7 +787,10 @@ def record_ntfy_send(
     tags: list[str] | None = None,
     priority: str = "default",
     repo: Path | None = None,
+    counts_toward_cap: bool | None = None,
 ) -> None:
+    if counts_toward_cap is None:
+        counts_toward_cap = not is_loop_down_alert(title)
     state = _load_send_state(repo)
     sends = _prune_send_state(state)
     sends.append(
@@ -702,11 +800,12 @@ def record_ntfy_send(
             "title": title[:160],
             "priority": priority,
             "category": categorize_send_title(title),
+            "counts_toward_cap": counts_toward_cap,
         }
     )
     state["sends"] = sends
     write_quota_status_file(build_quota_snapshot(sends=sends), repo)
-    _maybe_notify_quota_warn(repo, state, sends)
+    _maybe_notify_quota_warn(repo, state, cap_eligible_sends(sends))
     _save_send_state(state, repo)
 
 
@@ -764,6 +863,10 @@ def send_ntfy(
             ok = 200 <= response.status < 300
             if ok:
                 record_ntfy_send(title, tags=outbound_tags, priority=priority, repo=repo_root())
+                if is_loop_down_alert(title):
+                    mark_loop_down_alerted(repo_root())
+                elif is_loop_recovery_alert(title):
+                    clear_loop_down_pending(repo_root())
             return ok
     except urllib.error.URLError as exc:
         print(f"ppe_notify_push: ntfy failed: {exc}", file=sys.stderr)
