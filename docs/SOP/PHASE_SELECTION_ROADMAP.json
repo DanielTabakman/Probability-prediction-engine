@@ -306,6 +306,12 @@
       "status": "skipped",
       "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
+      "status": "ready",
+      "reason": "[MEDIUM] Meta #6 \u2014 trust_state in MSOS",
+      "selectionPrep": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md"
     }
   ]
 }

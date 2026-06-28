@@ -28,7 +28,11 @@ from src.viz.lab_asset_selection import (
     lab_asset_id_from_environ,
     normalize_lab_asset_id,
 )
-from src.viz.distribution_summary_panel import summary_panel_contract
+from src.viz.distribution_summary_panel import (
+    aggregate_trust_state,
+    annotate_export_rows_trust,
+    summary_panel_contract,
+)
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_TITLE
 
 DISPLAY_PAYLOAD_SCHEMA_VERSION = 1
@@ -273,6 +277,7 @@ def build_distribution_display_payload(
     aid = normalize_lab_asset_id(asset_id)
     if asset_id is None and export_rows and export_rows[0].get("asset"):
         aid = normalize_lab_asset_id(str(export_rows[0]["asset"]))
+    export_rows = annotate_export_rows_trust(export_rows)
     asset_block = display_asset_meta(aid)
     summary = summary_panel_contract(export_rows)
     series = []
@@ -282,17 +287,7 @@ def build_distribution_display_payload(
             series.append(s)
     belief_presets = series[0].get("belief_presets", {}) if series else {}
     curve_labels = build_curve_display_labels()
-    trust_states = {
-        str(row.get("trust_state") or "ok").strip().lower()
-        for row in export_rows
-        if row.get("trust_state")
-    }
-    if "thin_chain" in trust_states:
-        trust_state = "thin_chain"
-    elif trust_states & {"error", "fail", "degraded"}:
-        trust_state = "degraded"
-    else:
-        trust_state = "ok"
+    trust_state = aggregate_trust_state(export_rows)
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
