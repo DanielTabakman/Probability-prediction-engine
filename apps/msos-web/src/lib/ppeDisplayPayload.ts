@@ -18,8 +18,11 @@ export const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim(
 
 export const LAB_ASSET_QUERY_PARAM = "asset";
 
-/** Registry / bare display API default — avoid for UI; use `resolveLabAssetId`. */
-export const REGISTRY_DEFAULT_ASSET_ID = "BTC";
+/** System-wide default asset when registry/catalog/session provide nothing else. */
+export const SYSTEM_DEFAULT_ASSET_ID = "ETH";
+
+/** Registry / bare display API default — matches config/assets.yaml. */
+export const REGISTRY_DEFAULT_ASSET_ID = SYSTEM_DEFAULT_ASSET_ID;
 
 /** @deprecated Prefer `resolveLabAssetId` / `ABSOLUTE_FALLBACK_ASSET_ID` for UI defaults. */
 export const DEFAULT_LAB_ASSET_ID = REGISTRY_DEFAULT_ASSET_ID;

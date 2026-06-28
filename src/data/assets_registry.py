@@ -45,9 +45,9 @@ def registry_version() -> int:
 
 def default_asset_id() -> str:
     reg = load_assets_registry()
-    asset_id = _normalize_asset_id(str(reg.get("default_asset_id") or "BTC"))
+    asset_id = _normalize_asset_id(str(reg.get("default_asset_id") or "ETH"))
     if not asset_id:
-        return "BTC"
+        return "ETH"
     return asset_id
 
 
