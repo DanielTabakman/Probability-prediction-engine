@@ -20,9 +20,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo [bootstrap_operator_pair] VM logon task + headless stack...
+echo [bootstrap_operator_pair] VM logon task + watchdog + horizon collector + headless stack...
 ssh -o BatchMode=yes %VM_HOST% "powershell -NoProfile -ExecutionPolicy Bypass -File %VM_REPO%\scripts\install_ppe_vm_headless_logon_task.ps1 -RepoRoot %VM_REPO%"
 ssh -o BatchMode=yes %VM_HOST% "powershell -NoProfile -ExecutionPolicy Bypass -File %VM_REPO%\scripts\install_ppe_vm_watchdog_task.ps1 -RepoRoot %VM_REPO%" 2>nul
+ssh -o BatchMode=yes %VM_HOST% "powershell -NoProfile -ExecutionPolicy Bypass -File %VM_REPO%\scripts\install_ppe_horizon_surface_collector_task.ps1 -RepoRoot %VM_REPO%"
 ssh -o BatchMode=yes %VM_HOST% "cd /d %VM_REPO% && run_ppe_headless_stack.cmd --ensure"
 
 echo.
