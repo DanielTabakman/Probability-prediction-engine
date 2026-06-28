@@ -74,3 +74,5 @@ def test_app_sidebar_nav_routes() -> None:
     assert 'href: "/monitor"' in fixtures
     assert 'href: "/history"' in fixtures
     assert 'href: "/learn"' in fixtures
+    assert "secondaryNavItems" in fixtures
+    assert 'href: "/options-horizon"' in fixtures

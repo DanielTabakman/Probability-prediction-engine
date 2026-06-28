@@ -1,0 +1,36 @@
+---
+description: Auto-discover and hook up asset data sources when operator asks for a new tradable. Always run discover first; never ask which exchange.
+alwaysApply: true
+---
+
+# Asset auto-discovery (mandatory)
+
+**When the operator asks to add, enable, hook up, or ship any asset** (e.g. "get SOL down", "add SPY", "enable BNB"):
+
+## First tool pass — before replying
+
+```bash
+python scripts/discover_asset_data_source.py --asset <ID> --json
+```
+
+Read `next_action` + `agent_steps` from JSON. **Do not ask** which exchange or data vendor.
+
+## Execute in the same session (no advise-only)
+
+| `next_action` | Agent does |
+|---------------|------------|
+| `enable_existing_row` | Witness + `enable_asset_batch.py --apply` + gate + commit |
+| `merge_registry_and_enable` | Merge manifest row, set recommended venue, witness, enable, PR |
+| `switch_venue_and_enable` | Update registry venue (e.g. deribit → bybit), wire routing if needed, enable, PR |
+| `build_adapter` | Implement fetch adapter for recommended venue (copy existing pattern), then enable |
+| `already_enabled` | Report live; optional prod witness only |
+| `blocked_no_live_options` | Document skip in evidence; do **not** enable |
+
+## Rules
+
+1. **Existing wired venue wins** — if Deribit has options, use Deribit; only scan fallbacks when primary is empty or registry venue is wrong.
+2. **Scan order** — `config/asset_venue_source_map.yaml` → `discovery.crypto_scan_order` / `equity_scan_order`.
+3. **New vendor** — only `build_adapter` when scan finds live options but `wired: false` in discovery JSON.
+4. **Never** tell the operator to check Deribit/Bybit/Yahoo manually.
+
+Canon: [`ASSET_DATA_SOURCE_DISCOVERY_V1.md`](../../docs/SOP/ASSET_DATA_SOURCE_DISCOVERY_V1.md)

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ExpressionPlanningPage() {
   return (
-    <AppShell activeNavId="expression">
+    <AppShell activeNavId="strategy-lab">
       <ExpressionPlanningPanel />
     </AppShell>
   );

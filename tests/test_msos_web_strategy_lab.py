@@ -199,7 +199,7 @@ def test_nav_enables_strategy_lab() -> None:
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'id: "strategy-lab"' in nav
     assert 'href: "/strategy-lab"' in nav
-    assert "disabled: true" not in nav.split("strategy-lab")[1].split("theses")[0]
+    assert "disabled: true" not in nav.split("strategy-lab")[1].split("monitor")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "labHref" in cc
@@ -210,7 +210,7 @@ def test_expression_planning_route_and_narrative() -> None:
     assert page.is_file()
     text = page.read_text(encoding="utf-8")
     assert "ExpressionPlanningPanel" in text
-    assert 'activeNavId="expression"' in text
+    assert 'activeNavId="strategy-lab"' in text
 
     fixtures = (MSOS_WEB / "src" / "data" / "expressionPlanningFixtures.ts").read_text(
         encoding="utf-8"
@@ -251,15 +251,30 @@ def test_expression_planning_route_and_narrative() -> None:
     thesis_panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert 'href="/strategy-lab/expression"' in thesis_panel
+    assert "buildWorkflowStepHref" in thesis_panel
+    assert '"plan"' in thesis_panel
 
 
-def test_nav_enables_expression_planning() -> None:
+def test_strategy_lab_workflow_stepper_not_primary_nav() -> None:
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert 'id: "expression"' in nav
-    assert 'href: "/strategy-lab/expression"' in nav
-    expression_block = nav.split('id: "expression"')[1].split("monitor")[0]
-    assert "disabled: true" not in expression_block
+    assert 'id: "expression"' not in nav.split("secondaryNavItems")[0]
+
+    workflow = (MSOS_WEB / "src" / "lib" / "strategyLabWorkflow.ts").read_text(encoding="utf-8")
+    assert '"/strategy-lab/expression"' in workflow
+    assert "buildWorkflowStepHref" in workflow
+    assert "Plan paper trade" in workflow
+
+    stepper = (MSOS_WEB / "src" / "components" / "WorkflowStepper.tsx").read_text(encoding="utf-8")
+    assert "workflow-stepper" in stepper
+    assert "ContextRail" in (
+        MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx"
+    ).read_text(encoding="utf-8")
+    assert "ContextRail" in (
+        MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx"
+    ).read_text(encoding="utf-8")
+    assert "ContextRail" in (
+        MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx"
+    ).read_text(encoding="utf-8")
 
 
 def test_monitoring_history_routes_and_panels() -> None:
@@ -308,6 +323,7 @@ def test_conclusion_learn_loop_route() -> None:
 
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'href: "/learn"' in nav
+    assert "secondaryNavItems" in nav
 
 
 def test_onboarding_polish_wiring() -> None:
