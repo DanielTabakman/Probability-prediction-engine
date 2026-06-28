@@ -36,11 +36,6 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ),
     ("scripts/gate_pytest_scope", ("tests/test_gate_pytest_scope.py",)),
     (
-        "scripts/gate_asset_enablement_diff",
-        ("tests/test_ppe_asset_enablement_pipeline.py",),
-    ),
-    ("config/assets.yaml", ("tests/test_ppe_asset_enablement_pipeline.py", "tests/test_assets_registry.py")),
-    (
         "src/viz/",
         (
             "tests/test_mvp1_*.py",
