@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md",
   "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
   "workerMode": "local-agent"
 }
