@@ -85,10 +85,10 @@
       "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_sol_bybit_ship_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
-  "nextStewardAction": "IDE BUILD ppe_sol_bybit_ship_v1 — rebase PR #425 on main, green CI, automerge (SOL Bybit live)",
+  "activeBuildChapterId": "ppe_asset_enablement_pipeline_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
+  "nextStewardAction": "VM RUN_AUTO — ppe_asset_enablement_pipeline_v1 relay; SOL live via Bybit (PR #425 merged)",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
