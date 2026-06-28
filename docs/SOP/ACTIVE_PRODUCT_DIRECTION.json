@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pivotId": "trader-workflow-integration-v1",
-  "asOf": "2026-06-27",
+  "asOf": "2026-06-28",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
@@ -95,7 +95,7 @@
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "Steward SELECTION — promote ppe_trust_surface_v1 when prioritized (POST_PPE_TRUST_SURFACE_V1_SELECTION.md)",
+  "nextStewardAction": "VM ops (ppeloop): git pull && install_cross_venue_collector_task.cmd — daily PM vs options gap pipeline shipped (#529). Relay: finish msos_production_multi_asset_witness_v1 (ppe_go → run_ppe_local); then SELECTION ppe_trust_surface_v1 when prioritized.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -165,7 +165,7 @@
     {
       "id": "cross_venue_arb_v1",
       "doc": "docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md",
-      "role": "side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest"
+      "role": "COMPLETE — scan/backtest CLIs + daily collector pipeline (#529); VM install: install_cross_venue_collector_task.cmd (CROSS_VENUE_COLLECTOR_OPS_V1.md)"
     }
   ],
   "buildTrack": {

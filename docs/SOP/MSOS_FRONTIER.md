@@ -5,14 +5,14 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-27
+**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-28
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Steward SELECTION — promote ppe_trust_surface_v1 when prioritized (POST_PPE_TRUST_SURFACE_V1_SELECTION.md)
+- **Next steward action:** VM ops (ppeloop): git pull && install_cross_venue_collector_task.cmd — daily PM vs options gap pipeline shipped (#529). Relay: finish msos_production_multi_asset_witness_v1 (ppe_go → run_ppe_local); then SELECTION ppe_trust_surface_v1 when prioritized.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
@@ -34,7 +34,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1** ([`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)) — IDE BUILD side channel — 7 meta chapters; PLANNED in queue; does not preempt tier1a relay
 - **POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)) — COMPLETE — chart polish (#429); region workflow CHARTERED (P2)
 - **POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION** ([`POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md`](docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md)) — COMPLETE — P4→P7 ?asset= propagation (#495 #507)
-- **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — side channel — PM vs BTC options gap scan + backtest; auto-promotes on idle manifest
+- **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — COMPLETE — scan/backtest CLIs + daily collector pipeline (#529); VM install: install_cross_venue_collector_task.cmd (CROSS_VENUE_COLLECTOR_OPS_V1.md)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).

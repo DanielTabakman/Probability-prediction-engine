@@ -139,6 +139,16 @@
       "notes": "Verified 2026-06-27: gh auth logged in on VM; ops/loop-publish PRs merging (#413-426)."
     },
     {
+      "id": "cross_venue_collector_vm_install",
+      "title": "Cross-venue collector VM task (ppeloop)",
+      "status": "open",
+      "priority": "medium",
+      "category": "ops",
+      "summary": "After #529 merge on main: on ppeloop run git pull, install_cross_venue_collector_task.cmd (daily 07:15), smoke run_cross_venue_daily.cmd. Runbook: CROSS_VENUE_COLLECTOR_OPS_V1.md.",
+      "added": "2026-06-28",
+      "source": "context_window_closeout"
+    },
+    {
       "id": "ppeloop_gh_auth_setup_git",
       "title": "ppeloop gh auth setup-git",
       "status": "done",
