@@ -37,11 +37,14 @@ import {
   type StrategySuggestionPayload,
 } from "@/lib/ppeStrategySuggestion";
 import {
+  buildStrategyLabPath,
   fetchDisplayPayloadClient,
   LAB_ASSET_QUERY_PARAM,
   listExpiryDates,
   normalizeLabAssetId,
+  resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
+import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 import { resolveSignInUrlWithReturn } from "@/lib/msosPublicUrls";
 import { stashPostAuthReturnPath } from "@/lib/postAuthReturn";
 import {
@@ -270,8 +273,8 @@ export function ExpressionPlanningPanel() {
     const signedIn = await hasWorkflowIdentity();
     if (!signedIn) {
       stashPendingPaperTrade(next);
-      stashPostAuthReturnPath("/strategy-lab/expression");
-      window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
+      stashPostAuthReturnPath(planPath);
+      window.location.assign(resolveSignInUrlWithReturn(planPath));
       return;
     }
 
@@ -283,8 +286,8 @@ export function ExpressionPlanningPanel() {
       setLastSavedAt(result.expression.savedAt ?? result.expression.updatedAt);
     } else if (result.authRequired) {
       stashPendingPaperTrade(next);
-      stashPostAuthReturnPath("/strategy-lab/expression");
-      window.location.assign(resolveSignInUrlWithReturn("/strategy-lab/expression"));
+      stashPostAuthReturnPath(planPath);
+      window.location.assign(resolveSignInUrlWithReturn(planPath));
     } else {
       setSaveError(result.error ?? "Could not save paper trade.");
     }
@@ -298,12 +301,20 @@ export function ExpressionPlanningPanel() {
   const glance = suggestion?.suggested?.belief_vs_market_glance;
   const marketExpectationUsd =
     glance?.market_modal_usd ?? glance?.forward_usd ?? undefined;
+  const assetMeta = useMemo(
+    () => resolveDisplayAssetMeta(null, normalizeLabAssetId(thesis.assetId ?? assetId)),
+    [thesis.assetId, assetId],
+  );
+  const planPath = buildWorkflowStepHref("plan", assetId);
+  const confirmPath = buildWorkflowStepHref("confirm", assetId);
+
   const prosCons = buildTradeProsCons(
     glance,
     suggestion?.suggested?.summary ?? null,
     suggestion?.suggested?.review?.payoff_line ?? null,
     formatMoney,
     suggestion?.suggested?.trade_review,
+    assetMeta.id,
   );
   const plainLegSummary = buildPlainLegSummary(
     suggestion?.suggested?.trade_review,
@@ -326,7 +337,7 @@ export function ExpressionPlanningPanel() {
             <span className="dot amber" aria-hidden="true" />
             Paper only — no orders sent
           </span>
-          <Link href="/strategy-lab/confirm" className="btn slim">
+          <Link href={confirmPath} className="btn slim">
             Back to thesis
           </Link>
           <span className="avatar" aria-hidden="true">
@@ -344,13 +355,13 @@ export function ExpressionPlanningPanel() {
         <div className="panel thesis-gate">
           <h2>Confirm your view first</h2>
           <p>Save and confirm what you believe in Strategy Lab before sketching a trade structure.</p>
-          <Link href="/strategy-lab/confirm" className="btn slim primary">
+          <Link href={confirmPath} className="btn slim primary">
             Confirm view
           </Link>
         </div>
       ) : (
         <>
-          <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
+          <PendingPaperTradeBanner returnPath={planPath} />
           <WorkflowStepper currentStep="plan" assetId={assetId} />
           <section className="work" aria-label="Expression planning layout">
             <div className="panel ticket">
@@ -363,6 +374,7 @@ export function ExpressionPlanningPanel() {
               spotUsd={suggestion?.spot_usd ?? 0}
               marketExpectationUsd={marketExpectationUsd}
               expiryLabel={expiry ?? suggestion?.expiry_date ?? "selected expiry"}
+              priceAxisLabel={assetMeta.price_axis_label ?? `${assetMeta.id} price at expiry`}
               curveLabels={resolveCurveLabels(market?.curve_labels)}
               loading={suggestionLoading}
               error={suggestionError}
@@ -373,7 +385,11 @@ export function ExpressionPlanningPanel() {
               <p>{livePlan.summary}</p>
               <div className="legs" aria-label="Expression legs">
                 {livePlan.legs.map((leg) => (
-                  <PlanLegRow key={`${leg.side}-${leg.strike}-${leg.instrument}`} leg={leg} />
+                  <PlanLegRow
+                    key={`${leg.side}-${leg.strike}-${leg.instrument}`}
+                    leg={leg}
+                    assetTicker={assetMeta.id}
+                  />
                 ))}
               </div>
               {plainLegSummary ? (
@@ -385,8 +401,8 @@ export function ExpressionPlanningPanel() {
                 <summary>New to options? Quick glossary</summary>
                 <ul className="micro">
                   <li>
-                    <strong>Expiry</strong> — the date your options settle; payoff is judged on BTC price
-                    then.
+                    <strong>Expiry</strong> — the date your options settle; payoff is judged on{" "}
+                    {assetMeta.id} price then.
                   </li>
                   <li>
                     <strong>Strike</strong> — the price level each option is tied to.
@@ -398,7 +414,8 @@ export function ExpressionPlanningPanel() {
                     <strong>Max loss</strong> — worst case you pay (paper sketch, not a guarantee).
                   </li>
                   <li>
-                    <strong>Break-even</strong> — BTC prices where you neither win nor lose net.
+                    <strong>Break-even</strong> — {assetMeta.id} prices where you neither win nor lose
+                    net.
                   </li>
                 </ul>
               </details>
@@ -465,11 +482,11 @@ export function ExpressionPlanningPanel() {
                     <div className="save-success-callout" role="status">
                       <strong>Paper trade saved</strong>
                       <p>
-                        We&apos;ll track how this sketch would have done versus live BTC until expiry —
-                        no orders were sent.
+                        We&apos;ll track how this sketch would have done versus live {assetMeta.id}{" "}
+                        until expiry — no orders were sent.
                       </p>
                     </div>
-                    <Link href="/strategy-lab" className="btn slim primary">
+                    <Link href={buildStrategyLabPath(assetId)} className="btn slim primary">
                       Plan another trade
                     </Link>
                     <Link href="/monitor?welcome=1" className="btn slim">

@@ -7,6 +7,7 @@ import type {
   StrategySuggestionSummary,
   TradeReviewBlock,
 } from "@/lib/ppeStrategySuggestion";
+import { DEFAULT_LAB_ASSET_ID } from "@/lib/ppeDisplayPayload";
 
 export function stripReviewMd(text: string): string {
   return text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1").trim();
@@ -51,7 +52,9 @@ export function buildTradeProsCons(
   reviewPayoffLine: string | null | undefined,
   formatMoney: (usd: number) => string,
   tradeReview?: TradeReviewBlock | null,
+  assetTicker: string = DEFAULT_LAB_ASSET_ID,
 ): TradeProsCons {
+  const ticker = assetTicker.trim() || DEFAULT_LAB_ASSET_ID;
   const apiStrengths = firstLines(tradeReview?.strengths, 4);
   const apiRisks = firstLines(tradeReview?.risks, 4);
   if (apiStrengths.length || apiRisks.length) {
@@ -92,7 +95,9 @@ export function buildTradeProsCons(
   }
 
   if (typeof summary?.max_gain_usd === "number" && summary.max_gain_usd > 0) {
-    strengths.push(`Best case is about ${formatMoney(summary.max_gain_usd)} if BTC lands in your range.`);
+    strengths.push(
+      `Best case is about ${formatMoney(summary.max_gain_usd)} if ${ticker} lands in your range.`,
+    );
   }
 
   const payoff = reviewPayoffLine?.trim();
@@ -107,10 +112,12 @@ export function buildTradeProsCons(
 
   if ((summary?.breakevens_usd?.length ?? 0) > 0) {
     const be = summary!.breakevens_usd!.map((value) => formatMoney(value)).join(" and ");
-    risks.push(`You need BTC near ${be} at expiry to break even on this sketch.`);
+    risks.push(`You need ${ticker} near ${be} at expiry to break even on this sketch.`);
   }
 
-  risks.push("If BTC moves outside the range you expect, profit shrinks or you take the max loss.");
+  risks.push(
+    `If ${ticker} moves outside the range you expect, profit shrinks or you take the max loss.`,
+  );
   risks.push("This is an illustrative paper plan — not advice and not a live order.");
 
   return {
