@@ -1,7 +1,6 @@
 import Link from "next/link";
 
-import { connectedMarkets, navItems } from "@/data/commandCenterFixtures";
-import { CurrencySelect } from "@/components/CurrencySelect";
+import { navItems, secondaryNavItems } from "@/data/commandCenterFixtures";
 import { MsosLogo } from "@/components/MsosLogo";
 import type { EntitlementTier } from "@/lib/msosEntitlements";
 import { tierLabel, upgradeOfferUrl } from "@/lib/msosEntitlements";
@@ -32,21 +31,6 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
         </div>
       </Link>
 
-      <CurrencySelect className="sidebar-currency" variant="sidebar" />
-
-      {tier ? (
-        <div className="asset on entitlement-badge" data-tier={tier}>
-          <span>Account tier</span>
-          <span className={`tiny-pill ${tierTone(tier)}`.trim()}>{tierLabel(tier)}</span>
-        </div>
-      ) : null}
-
-      {showUpgrade ? (
-        <Link href={upgradeUrl} className="btn slim primary entitlement-upgrade-link">
-          Request upgrade
-        </Link>
-      ) : null}
-
       <nav className="menu" aria-label="Workspace">
         {navItems.map((item) => {
           const active = item.id === activeNavId;
@@ -68,18 +52,36 @@ export function AppSidebar({ activeNavId = "command-center", tier = null }: AppS
         })}
       </nav>
 
-      <div className="side-label">Connected markets</div>
-      {connectedMarkets.map((asset) => (
-        <div key={asset.label} className={`asset ${asset.live ? "on" : "off"}`}>
-          <span>{asset.label}</span>
-          {asset.live ? <span className="tiny-pill">{asset.status}</span> : <span>{asset.status}</span>}
-        </div>
-      ))}
+      <div className="sidebar-footer">
+        {tier ? (
+          <div className="asset on entitlement-badge" data-tier={tier}>
+            <span>Account tier</span>
+            <span className={`tiny-pill ${tierTone(tier)}`.trim()}>{tierLabel(tier)}</span>
+          </div>
+        ) : null}
 
-      <div className="side-label">System</div>
-      <div className="asset on">
-        <span>Trust state</span>
-        <span className="teal">Good</span>
+        {showUpgrade ? (
+          <Link href={upgradeUrl} className="btn slim primary entitlement-upgrade-link">
+            Request upgrade
+          </Link>
+        ) : null}
+
+        <nav className="sidebar-secondary" aria-label="More">
+          <div className="side-label">More</div>
+          {secondaryNavItems.map((item) => {
+            const active = item.id === activeNavId;
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={active ? "active" : undefined}
+                aria-current={active ? "page" : undefined}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
     </aside>
   );

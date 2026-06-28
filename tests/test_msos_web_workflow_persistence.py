@@ -159,7 +159,7 @@ def test_display_currency_module_exists() -> None:
     assert "EUR" in lib
     assert "CurrencySelect" in setup
     assert "LabSetupRow" in setup
-    assert "CurrencySelect" in sidebar
+    assert "CurrencySelect" not in sidebar
 
 
 def test_expression_chart_fullscreen_frame() -> None:

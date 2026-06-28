@@ -8,6 +8,7 @@ import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
+import { WorkflowStepper } from "@/components/WorkflowStepper";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   DEFAULT_LAB_ASSET_ID,
@@ -251,6 +252,8 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       ) : null}
 
       <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
+
+      <WorkflowStepper currentStep="compare" assetId={selectedAssetId} />
 
       <StrategyLabWorkSection displayPayload={payload} dataMode={mode} assetMeta={assetMeta} />
 

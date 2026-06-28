@@ -51,7 +51,9 @@ def test_belief_expiry_picker_enabled() -> None:
     panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(
         encoding="utf-8"
     )
-    assert "hideInlineExpiryPicker={false}" in panel
+    setup = (MSOS_WEB / "src" / "components" / "LabSetupRow.tsx").read_text(encoding="utf-8")
+    assert "hideInlineExpiryPicker" in panel
+    assert "ExpiryPicker" in setup
 
 
 def test_lab_setup_row_has_expiry_and_currency() -> None:

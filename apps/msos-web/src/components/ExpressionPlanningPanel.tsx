@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
+import { ContextRail } from "@/components/ContextRail";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
 import { TradeProsConsCard } from "@/components/TradeProsConsCard";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { PlanLegRow } from "@/components/PlanLegRow";
+import { WorkflowStepper } from "@/components/WorkflowStepper";
 import {
   expressionFamilies,
   expressionRiskNote,
@@ -349,8 +351,9 @@ export function ExpressionPlanningPanel() {
       ) : (
         <>
           <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
-        <section className="exec-layout exec-layout-slim" aria-label="Expression planning layout">
-          <div className="panel ticket">
+          <WorkflowStepper currentStep="plan" assetId={assetId} />
+          <section className="work" aria-label="Expression planning layout">
+            <div className="panel ticket">
             <ExpressionPayoffChartFrame
               pricesUsd={market?.prices_usd ?? overlay?.prices_usd ?? []}
               marketPdfPct={market?.pdf_pct ?? []}
@@ -402,106 +405,108 @@ export function ExpressionPlanningPanel() {
             </div>
           </div>
 
-          <div className="panel execution-metrics">
-            <div className="panel-head">
-              <div>
-                <h2>Why this structure</h2>
-                <div className="panel-sub">How it matches your view and risk limits.</div>
+          <ContextRail>
+            <div className="panel execution-metrics">
+              <div className="panel-head">
+                <div>
+                  <h2>Why this structure</h2>
+                  <div className="panel-sub">How it matches your view and risk limits.</div>
+                </div>
               </div>
-            </div>
-            <TradeProsConsCard strengths={prosCons.strengths} risks={prosCons.risks} />
-            {optimizationLines.map((line) => (
-              <div key={line.label} className="line">
-                <span>{line.label}</span>
-                <strong className={line.tone ?? ""}>{line.value}</strong>
-              </div>
-            ))}
-            {suggestion?.suggested?.review?.linkage_line ? (
-              <p className="micro">{suggestion.suggested.review.linkage_line}</p>
-            ) : null}
-            <div className="risk-note">{expressionRiskNote}</div>
-
-            <details className="planner-advanced">
-              <summary>Structure types (advanced)</summary>
-              {families.map((family) => (
-                <div
-                  key={family.id}
-                  className={`option-row${family.dimmed ? " dimmed" : ""}`}
-                >
-                  <div>
-                    <h3>{family.title}</h3>
-                    <p>{family.description}</p>
-                  </div>
-                  <span
-                    className={`tag${family.tagTone === "selected" ? " amber" : ""}${
-                      family.tagTone === "excluded" ? " red" : ""
-                    }`}
-                  >
-                    {family.tag}
-                  </span>
+              <TradeProsConsCard strengths={prosCons.strengths} risks={prosCons.risks} />
+              {optimizationLines.map((line) => (
+                <div key={line.label} className="line">
+                  <span>{line.label}</span>
+                  <strong className={line.tone ?? ""}>{line.value}</strong>
                 </div>
               ))}
-              <p className="micro side-label rails-label">Where to trade (paper log)</p>
-              {venueRails
-                .filter((venue) => venue.id === "deribit")
-                .map((venue) => (
-                  <div key={venue.id} className="venue">
+              {suggestion?.suggested?.review?.linkage_line ? (
+                <p className="micro">{suggestion.suggested.review.linkage_line}</p>
+              ) : null}
+              <div className="risk-note">{expressionRiskNote}</div>
+
+              <details className="planner-advanced">
+                <summary>Structure types (advanced)</summary>
+                {families.map((family) => (
+                  <div
+                    key={family.id}
+                    className={`option-row${family.dimmed ? " dimmed" : ""}`}
+                  >
                     <div>
-                      <h3>{venue.title}</h3>
-                      <p>{venue.description}</p>
+                      <h3>{family.title}</h3>
+                      <p>{family.description}</p>
                     </div>
-                    <span className="tag">{venue.tag}</span>
+                    <span
+                      className={`tag${family.tagTone === "selected" ? " amber" : ""}${
+                        family.tagTone === "excluded" ? " red" : ""
+                      }`}
+                    >
+                      {family.tag}
+                    </span>
                   </div>
                 ))}
-            </details>
+                <p className="micro side-label rails-label">Where to trade (paper log)</p>
+                {venueRails
+                  .filter((venue) => venue.id === "deribit")
+                  .map((venue) => (
+                    <div key={venue.id} className="venue">
+                      <div>
+                        <h3>{venue.title}</h3>
+                        <p>{venue.description}</p>
+                      </div>
+                      <span className="tag">{venue.tag}</span>
+                    </div>
+                  ))}
+              </details>
 
-            <div className="exec-actions">
+              <div className="exec-actions">
+                {lastSavedAt ? (
+                  <>
+                    <div className="save-success-callout" role="status">
+                      <strong>Paper trade saved</strong>
+                      <p>
+                        We&apos;ll track how this sketch would have done versus live BTC until expiry —
+                        no orders were sent.
+                      </p>
+                    </div>
+                    <Link href="/strategy-lab" className="btn slim primary">
+                      Plan another trade
+                    </Link>
+                    <Link href="/monitor?welcome=1" className="btn slim">
+                      Monitor paper trades
+                    </Link>
+                    <Link href="/history" className="btn slim dark">
+                      View history
+                    </Link>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn slim primary"
+                    disabled={!hydrated || savePending}
+                    onClick={() => void simulateExpression()}
+                  >
+                    {savePending ? "Saving…" : "Save paper trade"}
+                  </button>
+                )}
+              </div>
+              {saveError ? (
+                <p className="micro degraded-feed-note" role="alert">
+                  {saveError}
+                </p>
+              ) : null}
+              {!lastSavedAt ? (
+                <p className="micro persistence-note">
+                  Sign in to save this plan to your profile — no order is sent.
+                </p>
+              ) : null}
               {lastSavedAt ? (
-                <>
-                  <div className="save-success-callout" role="status">
-                    <strong>Paper trade saved</strong>
-                    <p>
-                      We&apos;ll track how this sketch would have done versus live BTC until expiry —
-                      no orders were sent.
-                    </p>
-                  </div>
-                  <Link href="/strategy-lab" className="btn slim primary">
-                    Plan another trade
-                  </Link>
-                  <Link href="/monitor?welcome=1" className="btn slim">
-                    Monitor paper trades
-                  </Link>
-                  <Link href="/history" className="btn slim dark">
-                    View history
-                  </Link>
-                </>
-              ) : (
-                <button
-                  type="button"
-                  className="btn slim primary"
-                  disabled={!hydrated || savePending}
-                  onClick={() => void simulateExpression()}
-                >
-                  {savePending ? "Saving…" : "Save paper trade"}
-                </button>
-              )}
+                <p className="micro persistence-note">
+                  {EXPRESSION_PERSISTENCE_LABEL} {displayCurrencyDisclaimer(currency)}
+                </p>
+              ) : null}
             </div>
-            {saveError ? (
-              <p className="micro degraded-feed-note" role="alert">
-                {saveError}
-              </p>
-            ) : null}
-            {!lastSavedAt ? (
-              <p className="micro persistence-note">
-                Sign in to save this plan to your profile — no order is sent.
-              </p>
-            ) : null}
-            {lastSavedAt ? (
-              <p className="micro persistence-note">
-                {EXPRESSION_PERSISTENCE_LABEL} {displayCurrencyDisclaimer(currency)}
-              </p>
-            ) : null}
-          </div>
+          </ContextRail>
         </section>
         </>
       )}
