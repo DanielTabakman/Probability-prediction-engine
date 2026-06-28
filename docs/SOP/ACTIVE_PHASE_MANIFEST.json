@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Meta #6 \u2014 trust_state in MSOS",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #7 \u2014 production multi-asset witness",
   "workerMode": "local-agent"
 }

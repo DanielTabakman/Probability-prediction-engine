@@ -309,9 +309,15 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[MEDIUM] Meta #6 \u2014 trust_state in MSOS",
       "selectionPrep": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness",
+      "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md"
     }
   ]
 }
