@@ -9,7 +9,7 @@
 |-------|--------|-------|
 | PPE-TrustSurf-Control-Slice001 | **COMPLETE** | Trust field contract (this doc §Trust field contract) |
 | PPE-TrustSurf-Core-Slice002 | **COMPLETE** | Per-row trust_state + payload aggregation |
-| PPE-TrustSurf-Product-Slice003 | PENDING | MSOS lab + picker trust copy/banners |
+| PPE-TrustSurf-Product-Slice003 | **COMPLETE** | MSOS thin-chain/degraded banners + catalog trust_notes in picker |
 | PPE-TrustSurf-Closeout-Slice004 | PENDING | Chapter close |
 
 ---
@@ -70,6 +70,6 @@ Per-row `trust_state` source of truth for Core-Slice002: set on export rows wher
 ## Witness checklist (chapter closeout)
 
 - [ ] `pytest` contract for trust fields on mocked thin-chain fixture
-- [ ] MSOS lab banner for `thin_chain` (amber) — distinct from Sample mode
-- [ ] Catalog `trust_notes` rendered in picker or lab footer for enabled assets
+- [x] MSOS lab banner for `thin_chain` (amber) — distinct from Sample mode
+- [x] Catalog `trust_notes` rendered in picker or lab footer for enabled assets
 - [ ] Evidence COMPLETE

@@ -566,6 +566,27 @@ def test_workflow_asset_parity_p7_monitor_resolves_thesis_asset() -> None:
     assert "assetTicker={feed.assetTicker}" in monitor
 
 
+def test_trust_surface_product_slice_lab_trust_ui() -> None:
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
+    catalog_lib = (MSOS_WEB / "src" / "lib" / "ppeAssetCatalog.ts").read_text(encoding="utf-8")
+    copy = (MSOS_WEB / "src" / "lib" / "strategyLabCopy.ts").read_text(encoding="utf-8")
+    css = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+
+    assert "trust_state" in shell
+    assert 'lab-data-banner thin-chain"' in shell
+    assert 'lab-data-banner degraded"' in shell
+    assert "LAB_THIN_CHAIN_BANNER_TITLE" in shell
+    assert 'tag amber">Sample</span>' in shell
+    assert "lab-trust-notes" in picker
+    assert "trustNotesForAsset" in picker
+    assert "trust_notes" in catalog_lib
+    assert "findCatalogAsset" in catalog_lib
+    assert "labThinChainBannerBody" in copy
+    assert ".lab-data-banner.thin-chain" in css
+    assert ".lab-trust-notes" in css
+
+
 def test_workflow_asset_parity_witness_evidence_and_plan() -> None:
     evidence = (SOP / "MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md").read_text(encoding="utf-8")
     plan = (SOP / "PHASE_PLANS" / "msos_workflow_asset_parity_v1_relay.json").read_text(encoding="utf-8")
