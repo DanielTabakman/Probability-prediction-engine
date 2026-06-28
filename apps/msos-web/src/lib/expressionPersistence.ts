@@ -41,6 +41,7 @@ export type ExpressionRecord = {
   /** Paper-trade metadata (optional on planned drafts). */
   expiryDate?: string;
   instrument?: string;
+  assetId?: string;
   beliefSnapshot?: BeliefSnapshot;
   markAtSave?: PaperTradeMarkSnapshot;
   savedAt?: string;

@@ -11,6 +11,8 @@ import {
   type BeliefTuning,
 } from "@/lib/beliefTuning";
 import {
+  optionsTrustSourceLabel,
+  optionsVenueReferenceLabel,
   resolveDisplayAssetMeta,
   type DisplayAssetMeta,
   type DisplayPayload,
@@ -161,11 +163,7 @@ export function buildThesisDraftFromLab(
     referenceLabel: payload
       ? `${instrument} · live · exp ${resolvedExpiry || "—"}`
       : `${instrument} · live implied distribution`,
-    trustLabel: payload
-      ? asset.id === "NVDA"
-        ? "Caution · dividends unmodeled"
-        : "Good · Deribit"
-      : "Offline · demo values",
+    trustLabel: payload ? optionsTrustSourceLabel(asset) : "Offline · demo values",
     expiryDate: resolvedExpiry || undefined,
     beliefSnapshot: {
       forwardMult: tuning.forward_mult,
@@ -188,7 +186,7 @@ export function buildConfirmChecklist(
     {
       id: "reference",
       label: live
-        ? `Market reference — live ${instrument} from Deribit`
+        ? `Market reference — live ${instrument} from ${optionsVenueReferenceLabel(asset)}`
         : "Market reference — offline; confirm when live data returns",
     },
     {
