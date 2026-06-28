@@ -21,6 +21,9 @@ if errorlevel 1 exit /b %ERRORLEVEL%
 call "%~dp0token_audit.cmd" --prune-stale
 if errorlevel 1 exit /b %ERRORLEVEL%
 
+call "%~dp0run_cross_venue_backtest.cmd"
+if errorlevel 1 echo weekly_digest_monday: cross-venue backtest failed — continuing
+
 python "%CD%\scripts\ppe_workflow_radar.py" --repo-root "%CD%" generate --no-cleanup
 if errorlevel 1 exit /b %ERRORLEVEL%
 
