@@ -19,8 +19,10 @@ python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
 
 set "EXTRA="
+set "PASSTHRU=%*"
 if /i "%~1"=="--recover" (
   set "EXTRA=--run-local --ensure-stack"
+  set "PASSTHRU="
   shift
 )
 if /i "%~1"=="--check" (
@@ -28,7 +30,7 @@ if /i "%~1"=="--check" (
   exit /b %ERRORLEVEL%
 )
 
-python "%CD%\scripts\ppe_vm_bootstrap.py" --repo-root "%CD%" %EXTRA% %*
+python "%CD%\scripts\ppe_vm_bootstrap.py" --repo-root "%CD%" %EXTRA% %PASSTHRU%
 set "RC=%ERRORLEVEL%"
 if /i "%~1"=="--recover" (
   echo.

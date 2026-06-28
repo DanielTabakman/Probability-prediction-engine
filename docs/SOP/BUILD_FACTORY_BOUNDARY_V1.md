@@ -49,7 +49,7 @@ Stop and escalate if a BUILD packet would:
 | Priority | Focus |
 |----------|--------|
 | **1** | **Trader workflow integration** — milestone charter + four workstreams |
-| **2** | **Active relay** — `ppe_asset_enablement_pipeline_v1` (ppe_asset_enablement_pipeline_v1) |
+| **2** | **Active relay** — `` (Workflow loop fidelity (P4–P7)) |
 | **3** | **Factory stability** — relay, autobuilder, gates, closeout |
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 

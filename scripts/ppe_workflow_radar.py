@@ -641,7 +641,7 @@ def build_radar_report(
     )
 
 
-def render_radar_markdown(report: RadarReport) -> str:
+def render_radar_markdown(report: RadarReport, *, repo: Path | None = None) -> str:
     lines = [
         "# Workflow radar (latest)",
         "",
@@ -691,6 +691,14 @@ def render_radar_markdown(report: RadarReport) -> str:
         ])
 
     lines.append("Promotion: steward SELECTION → Workflow-Hardening-Slice-00N (advisory only).")
+    if repo is not None:
+        try:
+            from scripts.ppe_workflow_cost import format_lane_summary_line, summarize_by_lane
+
+            lines.insert(6, f"**{format_lane_summary_line(summarize_by_lane(repo, days=7))}**")
+            lines.insert(7, "")
+        except Exception:
+            pass
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -704,7 +712,7 @@ def write_radar_artifacts(repo: Path, report: RadarReport) -> tuple[Path, Path]:
     payload = json.dumps(report.to_dict(), indent=2, sort_keys=True) + "\n"
     week_path.write_text(payload, encoding="utf-8")
     latest_json.write_text(payload, encoding="utf-8")
-    latest_md.write_text(render_radar_markdown(report), encoding="utf-8")
+    latest_md.write_text(render_radar_markdown(report, repo=repo), encoding="utf-8")
     return week_path, latest_md
 
 

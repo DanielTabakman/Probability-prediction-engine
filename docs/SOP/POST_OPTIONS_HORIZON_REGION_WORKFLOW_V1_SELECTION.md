@@ -25,7 +25,7 @@
 | v1 gap | `localStorage` only in `horizonRegion.ts` |
 | Dependency | Chart polish chapter ships first so persisted regions attach to a credible UI |
 
-**Blocked until:** `horizon_chart_polish_v1` **COMPLETE**.
+**Blocked until:** `horizon_chart_polish_v1` **COMPLETE** (2026-06-28).
 
 ---
 

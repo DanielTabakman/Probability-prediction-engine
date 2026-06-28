@@ -1,14 +1,24 @@
 import Link from "next/link";
 
-export function MonitorEmptyState() {
+import { buildStrategyLabPath } from "@/lib/ppeDisplayPayload";
+
+type MonitorEmptyStateProps = {
+  assetTicker?: string;
+};
+
+export function MonitorEmptyState({ assetTicker }: MonitorEmptyStateProps) {
+  const ticker = assetTicker?.trim();
+  const spotPhrase = ticker ? `live ${ticker}` : "live spot";
+  const labHref = buildStrategyLabPath(ticker ?? "");
+
   return (
     <div className="monitor-empty-state" role="status">
       <strong>No paper trades yet</strong>
       <p>
-        Save a sketch in Strategy Lab after you confirm your view — we&apos;ll show live BTC versus
-        your saved prices here. No broker connection required.
+        Save a sketch in Strategy Lab after you confirm your view — we&apos;ll show {spotPhrase}{" "}
+        versus your saved prices here. No broker connection required.
       </p>
-      <Link href="/strategy-lab" className="btn slim primary">
+      <Link href={labHref} className="btn slim primary">
         Open Strategy Lab
       </Link>
     </div>

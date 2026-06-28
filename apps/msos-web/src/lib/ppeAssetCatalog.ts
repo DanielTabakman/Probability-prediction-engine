@@ -18,6 +18,7 @@ export type CatalogAsset = {
   venue?: string;
   tier?: string;
   catalog_group?: string;
+  trust_notes?: string[];
 };
 
 export type CatalogGroup = {
@@ -44,10 +45,25 @@ const STOCK_GROUP_IDS = new Set(["equity_index", "equity_mega", "commodity_proxy
 /** Static fallback when catalog.json is unavailable (matches legacy lab allowlist). */
 export const FALLBACK_ASSET_PICKER: AssetPickerBuckets = {
   crypto: [
-    { id: "BTC", label: "BTC options", catalog_group: "crypto" },
-    { id: "ETH", label: "ETH options", catalog_group: "crypto" },
+    {
+      id: "ETH",
+      label: "ETH options",
+      catalog_group: "crypto",
+      trust_notes: ["Thinner books than BTC — BL curve may be noisier; surface trust state in lab."],
+    },
+    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
   ],
-  stocks: [{ id: "NVDA", label: "NVDA options", catalog_group: "equity_mega" }],
+  stocks: [
+    {
+      id: "NVDA",
+      label: "NVDA options",
+      catalog_group: "equity_mega",
+      trust_notes: [
+        "Dividends and corporate actions not modeled in v1.",
+        "LEAPS chain may be thin — BL trust state surfaced when OI/volume low.",
+      ],
+    },
+  ],
 };
 
 export function isAssetCatalogPayload(value: unknown): value is AssetCatalogPayload {
@@ -107,12 +123,43 @@ export function assetBucketForId(
   return null;
 }
 
+export function findCatalogAsset(
+  buckets: AssetPickerBuckets,
+  assetId: string,
+): CatalogAsset | undefined {
+  const upper = assetId.toUpperCase();
+  return [...buckets.crypto, ...buckets.stocks].find((asset) => asset.id.toUpperCase() === upper);
+}
+
+export function trustNotesForAsset(asset: CatalogAsset | undefined): string[] {
+  if (!asset?.trust_notes?.length) {
+    return [];
+  }
+  return asset.trust_notes.map((note) => note.trim()).filter(Boolean);
+}
+
 export async function fetchAssetCatalog(): Promise<AssetCatalogPayload | null> {
-  if (!PPE_CATALOG_API_URL) {
+  return fetchAssetCatalogFromUrl(PPE_CATALOG_API_URL);
+}
+
+function resolveCatalogApiFetchUrl(): string {
+  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
+  if (serverUrl) {
+    return serverUrl.replace(/display\.json(\?.*)?$/i, "catalog.json");
+  }
+  return PPE_CATALOG_API_URL;
+}
+
+export async function fetchAssetCatalogServer(): Promise<AssetCatalogPayload | null> {
+  return fetchAssetCatalogFromUrl(resolveCatalogApiFetchUrl());
+}
+
+async function fetchAssetCatalogFromUrl(fetchUrl: string): Promise<AssetCatalogPayload | null> {
+  if (!fetchUrl) {
     return null;
   }
   try {
-    const res = await fetch(PPE_CATALOG_API_URL, {
+    const res = await fetch(fetchUrl, {
       cache: "no-store",
       headers: {
         Accept: "application/json",

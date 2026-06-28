@@ -28,7 +28,11 @@ from src.viz.lab_asset_selection import (
     lab_asset_id_from_environ,
     normalize_lab_asset_id,
 )
-from src.viz.distribution_summary_panel import summary_panel_contract
+from src.viz.distribution_summary_panel import (
+    aggregate_trust_state,
+    annotate_export_rows_trust,
+    summary_panel_contract,
+)
 from src.viz.implied_lab_legibility import DIST_SUMMARY_ANCHOR_ID, DIST_SUMMARY_TITLE
 
 DISPLAY_PAYLOAD_SCHEMA_VERSION = 1
@@ -38,6 +42,7 @@ CATALOG_PAYLOAD_HTTP_PATH = "/ppe-display-api/catalog.json"
 BELIEF_OVERLAY_KIND = "belief_overlay"
 BELIEF_OVERLAY_HTTP_PATH = "/ppe-display-api/belief-overlay.json"
 STRATEGY_SUGGESTION_HTTP_PATH = "/ppe-display-api/strategy-suggestion.json"
+FORWARD_CONSISTENCY_HTTP_PATH = "/ppe-display-api/forward-consistency.json"
 EMBED_ONLY_QUERY_PARAM = "embed_only"
 EMBED_JSON_QUERY_PARAM = "format"
 EMBED_JSON_QUERY_VALUE = "json"
@@ -212,7 +217,7 @@ def _parse_float(value: str | float | int | None) -> float | None:
 
 def _chart_bounds_usd(forward: float, asset_id: str) -> tuple[float, float]:
     aid = str(asset_id or default_asset_id()).strip().upper()
-    if asset_venue(aid) == "equity":
+    if asset_venue(aid) in ("equity", "bybit"):
         return max(1.0, forward * 0.35), forward * 2.5
     return max(1000.0, forward * 0.4), forward * 2.2
 
@@ -279,6 +284,7 @@ def build_distribution_display_payload(
             aid = normalize_lab_asset_id(str(export_rows[0]["asset"]))
         else:
             aid = str(export_rows[0]["asset"]).strip().upper() or default_asset_id()
+    export_rows = annotate_export_rows_trust(export_rows)
     asset_block = display_asset_meta(aid)
     summary = summary_panel_contract(export_rows)
     series = []
@@ -288,17 +294,7 @@ def build_distribution_display_payload(
             series.append(s)
     belief_presets = series[0].get("belief_presets", {}) if series else {}
     curve_labels = build_curve_display_labels()
-    trust_states = {
-        str(row.get("trust_state") or "ok").strip().lower()
-        for row in export_rows
-        if row.get("trust_state")
-    }
-    if "thin_chain" in trust_states:
-        trust_state = "thin_chain"
-    elif trust_states & {"error", "fail", "degraded"}:
-        trust_state = "degraded"
-    else:
-        trust_state = "ok"
+    trust_state = aggregate_trust_state(export_rows)
     return {
         "schema_version": DISPLAY_PAYLOAD_SCHEMA_VERSION,
         "kind": DISPLAY_PAYLOAD_KIND,
@@ -714,7 +710,21 @@ def create_display_payload_wsgi_app(
             )
             return [body]
 
+        from src.viz.forward_consistency_boundary import handle_forward_consistency_wsgi_path
         from src.viz.horizon_display_boundary import handle_horizon_wsgi_path
+
+        fc_result = handle_forward_consistency_wsgi_path(path, environ)
+        if fc_result is not None:
+            status, body = fc_result
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
 
         horizon_result = handle_horizon_wsgi_path(path, environ)
         if horizon_result is not None:

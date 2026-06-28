@@ -48,6 +48,7 @@ Response includes `default_asset_id`, grouped enabled assets, labels, `asset_cla
 | `venue` | Fetch module | Normalization |
 |---------|--------------|---------------|
 | `deribit` | `fetch_deribit.py` | Native |
+| `bybit` | `fetch_bybit_options.py` | Deribit-shaped instruments; USDT premiums (equity-style export) |
 | `equity` | `fetch_equity_options.py` | Deribit-shaped marks for engine |
 
 Commodity proxies (GLD, SLV, USO) use `venue: equity` with `asset_class: commodity_proxy` and honest UI labels.

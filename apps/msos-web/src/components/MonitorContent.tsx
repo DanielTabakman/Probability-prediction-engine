@@ -64,6 +64,7 @@ export function MonitorContent({ feed }: Props) {
             <MonitorWelcomeCard
               paperTradeCount={feed.paperTrades.length}
               firstTradeHref={firstTradeHref}
+              assetTicker={feed.assetTicker}
             />
           </Suspense>
         ) : null}
@@ -91,7 +92,7 @@ export function MonitorContent({ feed }: Props) {
         <MonitorWatchList panels={feed.watchPanels} />
 
         {feed.paperTrades.length === 0 && feed.status !== "degraded" ? (
-          <MonitorEmptyState />
+          <MonitorEmptyState assetTicker={feed.assetTicker} />
         ) : null}
 
         {alerts.length > 0 ? (

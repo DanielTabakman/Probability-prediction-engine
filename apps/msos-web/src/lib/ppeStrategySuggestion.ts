@@ -5,6 +5,8 @@
 import type { BeliefTuning } from "@/lib/beliefTuning";
 import type { CurveDisplayLabels } from "@/lib/chartCurveLabels";
 import type { PlanLeg } from "@/data/expressionPlanningFixtures";
+import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
+import { ABSOLUTE_FALLBACK_ASSET_ID } from "@/lib/strategyLabAsset";
 
 export const PPE_STRATEGY_SUGGESTION_API_URL = (
   process.env.NEXT_PUBLIC_PPE_STRATEGY_SUGGESTION_API_URL ??
@@ -78,12 +80,14 @@ export type StrategySuggestionPayload = {
 export function buildStrategySuggestionFetchUrl(
   expiry: string,
   tuning: BeliefTuning,
+  assetId: string = ABSOLUTE_FALLBACK_ASSET_ID,
   baseUrl = PPE_STRATEGY_SUGGESTION_API_URL,
 ): string {
   const params = new URLSearchParams({
     expiry,
     forward_mult: String(tuning.forward_mult),
     vol_mult: String(tuning.vol_mult),
+    [LAB_ASSET_QUERY_PARAM]: assetId.trim().toUpperCase(),
   });
   const separator = baseUrl.includes("?") ? "&" : "?";
   return `${baseUrl}${separator}${params.toString()}`;
@@ -92,10 +96,11 @@ export function buildStrategySuggestionFetchUrl(
 export async function fetchStrategySuggestion(
   expiry: string,
   tuning: BeliefTuning,
+  assetId: string = ABSOLUTE_FALLBACK_ASSET_ID,
 ): Promise<StrategySuggestionPayload | null> {
   if (!expiry) return null;
   try {
-    const res = await fetch(buildStrategySuggestionFetchUrl(expiry, tuning), {
+    const res = await fetch(buildStrategySuggestionFetchUrl(expiry, tuning, assetId), {
       cache: "no-store",
       headers: { Accept: "application/json", "User-Agent": "msos-web/1" },
     });

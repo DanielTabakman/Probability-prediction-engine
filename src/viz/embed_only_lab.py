@@ -32,6 +32,7 @@ from src.viz.lab_asset_selection import (
     normalize_lab_asset_id,
     render_lab_asset_selector,
 )
+from src.viz.app_env import env_flag as _env_flag
 from src.viz.plotly_theme import apply_chart_theme
 
 _EMBED_ONLY_CSS = """
@@ -212,6 +213,11 @@ def run_embed_only_lab_page() -> None:
         export_rows=export_rows,
         asset_id=asset_id,
     )
+    if _env_flag("PPE_SHOW_DEBUG_UI", False) or st.query_params.get("forward_consistency") == "1":
+        from src.viz.forward_consistency_spike import render_forward_consistency_spike
+
+        with st.expander("Forward consistency (debug)", expanded=False):
+            render_forward_consistency_spike()
 
 
 def maybe_run_embed_only_early_exit() -> bool:

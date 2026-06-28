@@ -263,7 +263,31 @@ def loop_host_git_hygiene(repo: Path) -> dict[str, Any]:
         if path.is_file() and (proc.stdout or "").strip():
             _git(repo, "checkout", "--", rel)
             changes.append(f"reset {rel}")
-    return {"action": "git_hygiene", "changes": changes}
+    for temp_script in repo.glob("scripts/_*.py"):
+        if temp_script.is_file():
+            temp_script.unlink(missing_ok=True)
+            changes.append(f"removed {temp_script.relative_to(repo).as_posix()}")
+    sop_reset: dict[str, Any] = {"skipped": True}
+    try:
+        from scripts.ppe_operator_git_sync import reset_runtime_sop_drift_from_origin
+
+        sop_reset = reset_runtime_sop_drift_from_origin(repo)
+        changes.extend(sop_reset.get("changes") or [])
+    except ImportError:
+        sop_reset = {"skipped": True, "reason": "ppe_operator_git_sync unavailable"}
+    return {"action": "git_hygiene", "changes": changes, "sop_reset": sop_reset}
+
+
+def heal_premature_chapter_closeout_step(repo: Path) -> dict[str, Any]:
+    from scripts.ppe_queue_health import heal_premature_chapter_closeout
+
+    fixes, actions = heal_premature_chapter_closeout(repo, apply=True)
+    return {
+        "action": "heal_premature_closeout",
+        "fix_count": len(fixes),
+        "fixes": fixes,
+        "actions": actions,
+    }
 
 
 def ensure_playwright_chromium(*, timeout_s: int = 600) -> dict[str, Any]:
@@ -390,6 +414,7 @@ def bootstrap(
         report["steps"].append(loop_host_git_hygiene(repo))
         report["steps"].append(heal_stale_relay_state(repo))
         report["steps"].append(heal_operator_artifacts(repo))
+        report["steps"].append(heal_premature_chapter_closeout_step(repo))
         report["steps"].append(ensure_playwright_chromium())
     if sync_progress and plan_path:
         report["steps"].append(sync_slice_progress(repo, plan_path))

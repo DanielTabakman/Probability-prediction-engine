@@ -4,8 +4,15 @@
 
 import type { CompareColumn } from "@/data/thesisConfirmFixtures";
 import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
-import { buildTuningLabel, buildTuningPhrase, type BeliefTuning } from "@/lib/beliefTuning";
 import {
+  buildTuningLabel,
+  buildTuningPhrase,
+  isMarketTuning,
+  type BeliefTuning,
+} from "@/lib/beliefTuning";
+import {
+  optionsTrustSourceLabel,
+  optionsVenueReferenceLabel,
   resolveDisplayAssetMeta,
   type DisplayAssetMeta,
   type DisplayPayload,
@@ -35,19 +42,53 @@ function daysUntilExpiry(expiry: string): number {
   return Math.max(1, Math.ceil((parsed - Date.now()) / 86_400_000));
 }
 
-function buildDifferencePlain(marketPct: number, thesisPct: number, viewLabel: string): string {
-  if (!marketPct) {
-    return viewLabel;
+function buildGapDescription(tuning: BeliefTuning, marketPct: number, thesisPct: number): string {
+  if (isMarketTuning(tuning)) {
+    return "Matches what options imply";
   }
-  const diff = marketPct - thesisPct;
-  if (Math.abs(diff) < 0.3) {
-    return "About the same range width as options imply";
+
+  const forwardHigh = tuning.forward_mult > 1.002;
+  const forwardLow = tuning.forward_mult < 0.998;
+  const volHigh = tuning.vol_mult > 1.02;
+  const volLow = tuning.vol_mult < 0.98;
+
+  if (forwardHigh && !volHigh && !volLow) {
+    return "You expect a higher finish than options imply";
   }
-  const rel = Math.round((Math.abs(diff) / marketPct) * 100);
-  if (diff > 0) {
-    return `You expect a calmer market — ~${rel}% narrower than options imply`;
+  if (forwardLow && !volHigh && !volLow) {
+    return "You expect a lower finish than options imply";
   }
-  return `You expect more swing than options imply — ~${rel}% wider`;
+  if (!forwardHigh && !forwardLow && volHigh) {
+    return "You expect bigger swings than options imply";
+  }
+  if (!forwardHigh && !forwardLow && volLow) {
+    return "You expect a calmer path than options imply";
+  }
+  if ((forwardHigh || forwardLow) && (volHigh || volLow)) {
+    const direction = forwardHigh ? "higher" : "lower";
+    const vol = volHigh ? "with more vol" : "with less vol";
+    return `You expect ${direction} ${vol} than options imply`;
+  }
+
+  if (marketPct >= 0.3) {
+    const diff = marketPct - thesisPct;
+    if (Math.abs(diff) < 0.3) {
+      return "About the same range width as options imply";
+    }
+    const rel = Math.round((Math.abs(diff) / marketPct) * 100);
+    if (diff > 0) {
+      return `You expect a calmer market — ~${rel}% narrower than options imply`;
+    }
+    return `You expect more swing than options imply — ~${rel}% wider`;
+  }
+
+  if (forwardHigh || forwardLow) {
+    return forwardHigh
+      ? "You lean higher versus what options imply"
+      : "You lean lower versus what options imply";
+  }
+
+  return "Your view differs from what options imply";
 }
 
 export function buildCompareColumnsFromLab(
@@ -76,7 +117,7 @@ export function buildCompareColumnsFromLab(
     { label: "Your view", value: viewLabel, tone: "teal" },
     {
       label: "The gap",
-      value: buildDifferencePlain(marketPct, thesisPct, viewLabel),
+      value: buildGapDescription(tuning, marketPct, thesisPct),
       tone: "teal",
     },
   ];
@@ -110,7 +151,7 @@ export function buildThesisDraftFromLab(
   const marketPct = parsePctFromWidth(marketWidthStr) ?? 6.8;
   const thesisPct = Math.round(marketPct * tuning.vol_mult * 10) / 10;
   const outcome = payload
-    ? buildOutcomeFromTuning(tuning, payload, true, resolvedExpiry || undefined)
+    ? buildOutcomeFromTuning(tuning, payload, true, resolvedExpiry || undefined, asset)
     : null;
 
   return {
@@ -122,11 +163,7 @@ export function buildThesisDraftFromLab(
     referenceLabel: payload
       ? `${instrument} · live · exp ${resolvedExpiry || "—"}`
       : `${instrument} · live implied distribution`,
-    trustLabel: payload
-      ? asset.id === "NVDA"
-        ? "Caution · dividends unmodeled"
-        : "Good · Deribit"
-      : "Offline · demo values",
+    trustLabel: payload ? optionsTrustSourceLabel(asset) : "Offline · demo values",
     expiryDate: resolvedExpiry || undefined,
     beliefSnapshot: {
       forwardMult: tuning.forward_mult,
@@ -149,7 +186,7 @@ export function buildConfirmChecklist(
     {
       id: "reference",
       label: live
-        ? `Market reference — live ${instrument} from Deribit`
+        ? `Market reference — live ${instrument} from ${optionsVenueReferenceLabel(asset)}`
         : "Market reference — offline; confirm when live data returns",
     },
     {

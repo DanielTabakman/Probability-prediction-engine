@@ -83,12 +83,19 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-27",
       "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "msos_workflow_asset_parity_v1",
+      "label": "MSOS workflow asset parity v1 (P4→P7)",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-28",
+      "evidence": "docs/SOP/MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "ppe_asset_enablement_pipeline_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
-  "nextStewardAction": "VM RUN_AUTO — ppe_asset_enablement_pipeline_v1 Control-Slice001 relay; horizon chart polish product slices shipped (#429/#430)",
+  "activeBuildChapterId": "",
+  "activeBuildPlanPath": "",
+  "activeBuildSprint": "",
+  "nextStewardAction": "Steward SELECTION — promote ppe_trust_surface_v1 when prioritized (POST_PPE_TRUST_SURFACE_V1_SELECTION.md)",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -115,7 +122,7 @@
       "id": "workflow_loop_fidelity",
       "label": "Workflow loop fidelity (P4–P7)",
       "doc": "docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md",
-      "status": "active"
+      "status": "complete"
     },
     {
       "id": "learning_loop",
@@ -148,7 +155,12 @@
     {
       "id": "options_horizon_v1",
       "doc": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
-      "role": "side channel — H0–H4 shipped; chart polish + region workflow CHARTERED (P2); promote horizon_chart_polish_v1 to READY when prioritized"
+      "role": "COMPLETE — chart polish (#429); region workflow CHARTERED (P2)"
+    },
+    {
+      "id": "msos_workflow_asset_parity_v1",
+      "doc": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
+      "role": "COMPLETE — P4→P7 ?asset= propagation (#495 #507)"
     },
     {
       "id": "cross_venue_arb_v1",

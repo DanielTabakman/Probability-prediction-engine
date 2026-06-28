@@ -13,12 +13,19 @@ import {
 type MonitorWelcomeCardProps = {
   paperTradeCount: number;
   firstTradeHref?: string;
+  assetTicker?: string;
 };
 
-export function MonitorWelcomeCard({ paperTradeCount, firstTradeHref }: MonitorWelcomeCardProps) {
+export function MonitorWelcomeCard({
+  paperTradeCount,
+  firstTradeHref,
+  assetTicker,
+}: MonitorWelcomeCardProps) {
   const searchParams = useSearchParams();
   const welcomeQuery = searchParams.get(MONITOR_WELCOME_QUERY) === "1";
   const [visible, setVisible] = useState(false);
+  const ticker = assetTicker?.trim();
+  const spotPhrase = ticker ? `live ${ticker}` : "live spot";
 
   useEffect(() => {
     setVisible(shouldShowMonitorWelcome(paperTradeCount, welcomeQuery));
@@ -38,8 +45,8 @@ export function MonitorWelcomeCard({ paperTradeCount, firstTradeHref }: MonitorW
       <div>
         <strong>Your first paper trade is on the watch list</strong>
         <p>
-          We compare live BTC to the prices you saved at — no orders, no broker connection. Tap a
-          trade to see how the sketch is tracking until expiry.
+          We compare {spotPhrase} to the prices you saved at — no orders, no broker connection. Tap
+          a trade to see how the sketch is tracking until expiry.
         </p>
         {firstTradeHref ? (
           <Link href={firstTradeHref} className="btn slim primary monitor-welcome-cta">

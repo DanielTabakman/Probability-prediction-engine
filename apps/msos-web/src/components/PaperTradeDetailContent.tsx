@@ -8,6 +8,7 @@ import {
   formatMoney,
   type DisplayCurrency,
 } from "@/lib/displayCurrency";
+import { resolveDisplayAssetMeta } from "@/lib/ppeDisplayPayload";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 type Props = {
@@ -31,6 +32,10 @@ export function PaperTradeDetailContent({
   const status = effectivePaperTradeStatus(trade);
   const mark = trade.markAtSave;
   const belief = trade.beliefSnapshot;
+  const instrumentLabel =
+    trade.instrument?.trim() ||
+    resolveDisplayAssetMeta(null).instrument_label ||
+    "Options";
 
   return (
     <>
@@ -63,7 +68,7 @@ export function PaperTradeDetailContent({
         <div className="semantic-lock">
           <div className="lock">
             <h3>Instrument</h3>
-            <p>{trade.instrument ?? "BTC options"}</p>
+            <p>{instrumentLabel}</p>
           </div>
           <div className="lock">
             <h3>Expiry</h3>

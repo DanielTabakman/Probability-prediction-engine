@@ -91,15 +91,15 @@ Writes under `artifacts/distribution_snapshots/YYYY-MM-DD/`. Schedule via Task S
 
 ---
 
-## Cross-venue snapshot collector (MVP)
-
-Headless daily CSV capture (same schema as implied-lab **Download cross-venue prob panel (CSV)**):
+## Cross-venue quant workflow
 
 ```bat
 python scripts/collect_cross_venue_snapshot.py
+python scripts/run_cross_venue_scan.py
+python scripts/run_cross_venue_backtest.py
 ```
 
-Writes under `artifacts/cross_venue_snapshots/YYYY-MM-DD/`. Requires Deribit + Polymarket network access; not run by the relay loop.
+See [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md).
 
 ---
 

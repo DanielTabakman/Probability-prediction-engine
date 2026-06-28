@@ -291,21 +291,33 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
-      "status": "chartered",
+      "status": "done",
       "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
-      "status": "chartered",
+      "status": "skipped",
       "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
+      "status": "done",
+      "reason": "[MEDIUM] Meta #6 \u2014 trust_state in MSOS",
+      "selectionPrep": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness",
+      "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md"
     }
   ]
 }

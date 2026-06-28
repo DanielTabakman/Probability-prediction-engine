@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
-  "workerMode": "deterministic"
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #7 \u2014 production multi-asset witness",
+  "workerMode": "local-agent"
 }

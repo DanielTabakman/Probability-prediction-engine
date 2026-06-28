@@ -151,7 +151,7 @@ def cmd_session_stop(
     return 0
 
 
-def cmd_slice_close(
+def append_slice_close_row(
     repo: Path,
     *,
     slice_id: str,
@@ -160,17 +160,19 @@ def cmd_slice_close(
     rework: int = 0,
     session_id: str | None = None,
     notes: str = "",
-) -> int:
+    worker_lane: str | None = None,
+    api_calls: int | None = None,
+    source: str | None = None,
+) -> None:
     size_u = size.upper()
     if size_u not in SIZE_WEIGHTS:
-        print(f"workflow_metrics: invalid size {size!r} (use S|M|L|XL)")
-        return 1
+        raise ValueError(f"invalid size {size!r} (use S|M|L|XL)")
 
     if not session_id:
         start = _open_session(_read_jsonl(_metrics_dir(repo) / SESSIONS_FILE))
         session_id = str(start.get("session_id") or "") if start else ""
 
-    row = {
+    row: dict[str, Any] = {
         "slice_id": slice_id,
         "status": "closed",
         "planned_size": size_u,
@@ -182,24 +184,76 @@ def cmd_slice_close(
         "primary_session_id": session_id or None,
         "notes": notes,
     }
+    lane = (worker_lane or "").strip()
+    if lane:
+        row["worker_lane"] = lane
+    if api_calls is not None:
+        row["api_calls"] = api_calls
+    src = (source or "").strip()
+    if src:
+        row["source"] = src
     _append_jsonl(_metrics_dir(repo) / SLICES_FILE, row)
-    print(f"workflow_metrics: slice_close {slice_id} size={size_u} roundtrips={roundtrips}")
+
+
+def cmd_slice_close(
+    repo: Path,
+    *,
+    slice_id: str,
+    size: str,
+    roundtrips: int,
+    rework: int = 0,
+    session_id: str | None = None,
+    notes: str = "",
+    worker_lane: str | None = None,
+    api_calls: int | None = None,
+    source: str | None = None,
+) -> int:
+    try:
+        append_slice_close_row(
+            repo,
+            slice_id=slice_id,
+            size=size,
+            roundtrips=roundtrips,
+            rework=rework,
+            session_id=session_id,
+            notes=notes,
+            worker_lane=worker_lane,
+            api_calls=api_calls,
+            source=source or "manual",
+        )
+    except ValueError as exc:
+        print(f"workflow_metrics: {exc}")
+        return 1
+    size_u = size.upper()
+    lane_msg = f" lane={worker_lane}" if worker_lane else ""
+    print(f"workflow_metrics: slice_close {slice_id} size={size_u} roundtrips={roundtrips}{lane_msg}")
     return 0
 
 
-def cmd_summary(repo: Path, *, days: int = 7) -> int:
-    sessions = _read_jsonl(_metrics_dir(repo) / SESSIONS_FILE)
+def _slices_in_days(repo: Path, days: int) -> list[dict[str, Any]]:
     slices = _read_jsonl(_metrics_dir(repo) / SLICES_FILE)
+    if days <= 0:
+        return slices
+    cutoff = datetime.now(timezone.utc).timestamp() - days * 86400
+    return [
+        row
+        for row in slices
+        if (t := _parse_iso(str(row.get("completed_at") or ""))) and t.timestamp() >= cutoff
+    ]
+
+
+def cmd_summary(repo: Path, *, days: int = 7, by_lane: bool = False) -> int:
+    sessions = _read_jsonl(_metrics_dir(repo) / SESSIONS_FILE)
+    slices_window = _slices_in_days(repo, days)
 
     stops = [s for s in sessions if s.get("event") == "session_stop"]
     if days > 0:
         cutoff = datetime.now(timezone.utc).timestamp() - days * 86400
-        filtered: list[dict[str, Any]] = []
-        for s in stops:
-            t = _parse_iso(str(s.get("ended_at") or ""))
-            if t and t.timestamp() >= cutoff:
-                filtered.append(s)
-        stops = filtered
+        stops = [
+            s
+            for s in stops
+            if (t := _parse_iso(str(s.get("ended_at") or ""))) and t.timestamp() >= cutoff
+        ]
 
     total_active = sum(float(s.get("active_minutes") or 0) for s in stops)
     total_weighted = sum(int(s.get("weighted_slices_completed") or 0) for s in stops)
@@ -207,10 +261,8 @@ def cmd_summary(repo: Path, *, days: int = 7) -> int:
     avg_load_vals = [int(s.get("cognitive_load_1_5") or 0) for s in stops if s.get("cognitive_load_1_5")]
     avg_load = sum(avg_load_vals) / len(avg_load_vals) if avg_load_vals else 0.0
 
-    slices_closed = len(slices)
-    slice_roundtrips = [int(s.get("roundtrips") or 0) for s in slices if s.get("roundtrips") is not None]
+    slice_roundtrips = [int(s.get("roundtrips") or 0) for s in slices_window if s.get("roundtrips") is not None]
     avg_slice_roundtrips = sum(slice_roundtrips) / len(slice_roundtrips) if slice_roundtrips else 0.0
-
     wsph = (total_weighted / (total_active / 60.0)) if total_active > 0 else 0.0
 
     print(f"workflow_metrics summary (last {days} days)")
@@ -219,8 +271,18 @@ def cmd_summary(repo: Path, *, days: int = 7) -> int:
     print(f"  weighted_slices_per_active_hour: {wsph:.2f}")
     print(f"  avg_cognitive_load: {avg_load:.2f}")
     print(f"  session_roundtrips_total: {total_roundtrips}")
-    print(f"  slices_logged: {slices_closed}")
+    print(f"  slices_logged: {len(slices_window)}")
     print(f"  avg_slice_roundtrips: {avg_slice_roundtrips:.2f}")
+
+    if by_lane:
+        from scripts.ppe_workflow_cost import summarize_by_lane
+
+        lane_summary = summarize_by_lane(repo, days=days)
+        print("  by_lane:")
+        for lane, count in (lane_summary.get("by_lane") or {}).items():
+            print(f"    {lane}: {count}")
+        if lane_summary.get("api_calls_total"):
+            print(f"  api_calls_total: {lane_summary['api_calls_total']}")
     return 0
 
 
@@ -258,6 +320,9 @@ def cmd_export_csv(repo: Path) -> int:
         "size_weight_actual",
         "roundtrips",
         "rework_count",
+        "worker_lane",
+        "api_calls",
+        "source",
         "primary_session_id",
         "notes",
     ]
@@ -295,9 +360,17 @@ def main(argv: list[str] | None = None) -> int:
     s_close.add_argument("--rework", type=int, default=0)
     s_close.add_argument("--session-id", default=None)
     s_close.add_argument("--notes", default="")
+    s_close.add_argument(
+        "--worker-lane",
+        default=None,
+        help="Cost lane: deterministic-local | cursor-cli | codex-cli | manual | acp | local-agent",
+    )
+    s_close.add_argument("--api-calls", type=int, default=None)
+    s_close.add_argument("--source", default="manual")
 
     p_sum = sub.add_parser("summary")
     p_sum.add_argument("--days", type=int, default=7)
+    p_sum.add_argument("--by-lane", action="store_true", help="Include worker-lane rollup")
 
     sub.add_parser("export-csv")
 
@@ -322,9 +395,12 @@ def main(argv: list[str] | None = None) -> int:
             rework=args.rework,
             session_id=args.session_id,
             notes=args.notes,
+            worker_lane=args.worker_lane,
+            api_calls=args.api_calls,
+            source=args.source,
         )
     if args.command == "summary":
-        return cmd_summary(repo, days=args.days)
+        return cmd_summary(repo, days=args.days, by_lane=args.by_lane)
     if args.command == "export-csv":
         return cmd_export_csv(repo)
 

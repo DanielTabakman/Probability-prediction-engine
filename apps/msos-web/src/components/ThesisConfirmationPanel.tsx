@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   confirmationChecklist,
@@ -22,11 +21,11 @@ import { loadStoredBeliefTuning, type BeliefTuning } from "@/lib/beliefTuning";
 import {
   buildStrategyLabPath,
   fetchDisplayPayloadClient,
-  LAB_ASSET_QUERY_PARAM,
-  normalizeLabAssetId,
+  resolveDisplayAssetMeta,
   type DisplayPayload,
 } from "@/lib/ppeDisplayPayload";
 import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
+import { useResolvedLabAssetId } from "@/lib/useResolvedLabAssetId";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import {
   THESIS_PERSISTENCE_LABEL,
@@ -38,9 +37,8 @@ import {
 import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 
 export function ThesisConfirmationPanel() {
-  const searchParams = useSearchParams();
-  const assetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [record, setRecord] = useState(defaultThesisRecord);
+  const assetId = useResolvedLabAssetId({ thesisAssetId: record.assetId });
   const [hydrated, setHydrated] = useState(false);
   const [persistError, setPersistError] = useState<string | null>(null);
   const [displayPayload, setDisplayPayload] = useState<DisplayPayload | null>(null);
@@ -59,7 +57,8 @@ export function ThesisConfirmationPanel() {
         loaded.expiryDate ||
         null;
       const storedTuning = loadStoredBeliefTuning();
-      const draft = buildThesisDraftFromLab(payload, storedTuning, storedExpiry);
+      const assetMeta = resolveDisplayAssetMeta(payload, assetId);
+      const draft = buildThesisDraftFromLab(payload, storedTuning, storedExpiry, assetMeta);
       setDisplayPayload(payload);
       setTuning(storedTuning);
       setExpiry(storedExpiry);
@@ -68,14 +67,22 @@ export function ThesisConfirmationPanel() {
     })();
   }, [assetId]);
 
+  const assetMeta = useMemo(
+    () => resolveDisplayAssetMeta(displayPayload, assetId),
+    [displayPayload, assetId],
+  );
   const columns = buildCompareColumnsFromLab(displayPayload, tuning);
-  const restatement = buildThesisRestatement(tuning, expiry ?? `${record.horizonDays} days`);
+  const restatement = buildThesisRestatement(
+    tuning,
+    expiry ?? `${record.horizonDays} days`,
+    assetMeta,
+  );
   const checklist = hydrated
-    ? buildConfirmChecklist(expiry, Boolean(displayPayload))
+    ? buildConfirmChecklist(expiry, Boolean(displayPayload), assetMeta)
     : confirmationChecklist;
 
   async function persist(nextLifecycle: ThesisLifecycle) {
-    const draft = buildThesisDraftFromLab(displayPayload, tuning, expiry);
+    const draft = buildThesisDraftFromLab(displayPayload, tuning, expiry, assetMeta);
     const next = withLifecycle(
       {
         ...record,

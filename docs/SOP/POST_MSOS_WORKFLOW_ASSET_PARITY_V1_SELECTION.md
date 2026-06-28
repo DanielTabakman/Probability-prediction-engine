@@ -11,7 +11,7 @@
 
 ## Status
 
-**SELECTED** 2026-06-27 — meta infra chapter #5.
+**COMPLETE** 2026-06-28 — chapter closed; P4→P7 asset propagation shipped (#495 #507).
 
 **First slice:** `MSOS-WfAsset-Control-Slice001`
 
@@ -25,7 +25,7 @@
 | Gap | Strategy Lab asset-aware; confirm/monitor still BTC-default |
 | Canon loop | thesis → disagree → express → monitor must preserve asset |
 
-**Blocked until:** `ppe_asset_display_parity_v1` **COMPLETE**.
+**Blocked until:** `ppe_asset_display_parity_v1` **COMPLETE** (satisfied). **Queue:** runs **immediately after** `ppe_asset_enablement_pipeline_v1` (promoted 2026-06-28 — demo validation signal).
 
 ---
 

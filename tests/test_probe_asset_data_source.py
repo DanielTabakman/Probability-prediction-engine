@@ -10,22 +10,22 @@ from scripts import probe_asset_data_source as probe_mod
 def test_probe_deribit_reports_option_count() -> None:
     with patch.object(probe_mod, "_deribit_get") as mock_get:
         mock_get.side_effect = [
-            ([{"instrument_name": "SOL-1JAN26-100-C"}], None),
-            ({"index_price": 70.5}, None),
+            ([{"instrument_name": "BNB-1JAN26-700-C"}], None),
+            ({"index_price": 700.0}, None),
         ]
-        out = probe_mod.probe_deribit("SOL")
+        out = probe_mod.probe_deribit("BNB")
     assert out["option_instruments"] == 1
     assert out["options_available"] is True
-    assert out["index_price_usd"] == 70.5
+    assert out["index_price_usd"] == 700.0
 
 
 def test_probe_deribit_zero_options_blocked() -> None:
     with patch.object(probe_mod, "_deribit_get") as mock_get:
         mock_get.side_effect = [
             ([], None),
-            ({"index_price": 70.0}, None),
+            ({"index_price": 700.0}, None),
         ]
-        out = probe_mod.probe_asset("SOL")
+        out = probe_mod.probe_asset("BNB")
     assert out["ok"] is False
     assert out["enable_recommendation"] == "block_until_source_available"
     assert "research_alternatives" in out
