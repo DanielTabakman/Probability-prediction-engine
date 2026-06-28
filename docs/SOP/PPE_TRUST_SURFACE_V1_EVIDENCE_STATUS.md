@@ -10,7 +10,7 @@
 | PPE-TrustSurf-Control-Slice001 | **COMPLETE** | Trust field contract (this doc §Trust field contract) |
 | PPE-TrustSurf-Core-Slice002 | **COMPLETE** | Per-row trust_state + payload aggregation |
 | PPE-TrustSurf-Product-Slice003 | **COMPLETE** | MSOS thin-chain/degraded banners + catalog trust_notes in picker |
-| PPE-TrustSurf-Closeout-Slice004 | PENDING | Chapter close |
+| PPE-TrustSurf-Closeout-Slice004 | **COMPLETE** | Chapter close |
 
 ---
 

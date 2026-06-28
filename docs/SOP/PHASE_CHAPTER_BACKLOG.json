@@ -437,7 +437,7 @@
     },
     {
       "chapterId": "ppe_trust_surface_v1",
-      "status": "queued",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",

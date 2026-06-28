@@ -79,6 +79,9 @@ MSOS_WF_ASSET_PARITY_PLAN = (
 PPE_TRUST_SURFACE_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json"
 )
+MSOS_MULTI_ASSET_WITNESS_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -114,6 +117,7 @@ ALLOWED_READY_PLANS = (
     PPE_CACHE_ISOLATION_PLAN,
     MSOS_WF_ASSET_PARITY_PLAN,
     PPE_TRUST_SURFACE_PLAN,
+    MSOS_MULTI_ASSET_WITNESS_PLAN,
 )
 
 
