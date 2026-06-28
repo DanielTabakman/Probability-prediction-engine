@@ -195,6 +195,31 @@ def test_thesis_confirmation_route_and_narrative() -> None:
     assert "/strategy-lab/confirm" in lab
 
 
+def test_confirm_page_propagates_selected_asset() -> None:
+    """Confirm must honor ?asset= for any catalog id (SOL, NVDA, …), not BTC fixtures."""
+    panel = (MSOS_WEB / "src" / "components" / "ThesisConfirmationPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    lib = (MSOS_WEB / "src" / "lib" / "buildThesisLabContext.ts").read_text(encoding="utf-8")
+    payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
+
+    assert "normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM))" in panel
+    assert "resolveDisplayAssetMeta(displayPayload, assetId)" in panel
+    assert "buildThesisRestatement(" in panel
+    assert "buildConfirmChecklist(expiry, Boolean(displayPayload), assetMeta)" in panel
+    assert "buildThesisDraftFromLab(payload, storedTuning, storedExpiry, assetMeta)" in panel
+    assert "fetchDisplayPayloadClient(assetId)" in panel
+    assert "buildWorkflowStepHref(\"plan\", assetId)" in panel
+
+    assert "I think ${asset.id} will" in lib
+    assert "buildGapDescription" in lib
+    assert "You expect a lower finish than options imply" in lib
+    assert "assetId: asset.id" in lib
+
+    assert "fallbackMetaForAsset" in payload_lib
+    assert "${assetId} options" in payload_lib
+
+
 def test_nav_enables_strategy_lab() -> None:
     nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
     assert 'id: "strategy-lab"' in nav
