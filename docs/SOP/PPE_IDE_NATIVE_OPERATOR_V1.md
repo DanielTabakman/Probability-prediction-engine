@@ -93,11 +93,17 @@ Writes under `artifacts/distribution_snapshots/YYYY-MM-DD/`. Schedule via Task S
 
 ## Cross-venue quant workflow
 
+Daily + weekly pipeline: [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md)
+
 ```bat
+run_cross_venue_daily.cmd
+REM or step-by-step:
 python scripts/collect_cross_venue_snapshot.py
 python scripts/run_cross_venue_scan.py
 python scripts/run_cross_venue_backtest.py
 ```
+
+VM: `install_cross_venue_collector_task.cmd` (daily 07:15). Weekly backtest via `weekly_digest_monday.cmd`.
 
 See [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md).
 
