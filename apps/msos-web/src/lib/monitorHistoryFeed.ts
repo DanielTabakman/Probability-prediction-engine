@@ -15,6 +15,7 @@ import {
   DEFAULT_LAB_ASSET_ID,
   fetchDisplayPayload,
   normalizeLabAssetId,
+  resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
 import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
 import { formatMarkLine } from "@/lib/monitorMarkLine";
@@ -49,6 +50,7 @@ export type MonitorFeed = {
   sourceLabel: string;
   heroTitle: string;
   heroSubtitle: string;
+  assetTicker: string;
   healthPct: number;
   healthLabel: string;
   watchPanels: MonitorWatchPanel[];
@@ -342,6 +344,7 @@ export async function loadMonitorFeed(
     listPaperTrades(email),
   ]);
   const displayAssetId = normalizeLabAssetId(thesis?.assetId ?? DEFAULT_LAB_ASSET_ID);
+  const assetTicker = resolveDisplayAssetMeta(null, displayAssetId).id;
   const display = await fetchDisplayPayload(displayAssetId);
   const currentSpotUsd = display?.spot_usd ?? null;
   const marketAsOfUtc = display?.as_of_utc;
@@ -355,6 +358,7 @@ export async function loadMonitorFeed(
       sourceLabel: WORKFLOW_SOURCE,
       heroTitle: "Monitor unavailable",
       heroSubtitle: "Saved history isn't connected yet. Strategy Lab still works.",
+      assetTicker,
       healthPct: 0,
       healthLabel: "Offline",
       watchPanels: [
@@ -403,10 +407,11 @@ export async function loadMonitorFeed(
     sourceLabel: WORKFLOW_SOURCE,
     heroTitle: hasPaperTrades ? "Paper trade watch" : hasWorkflow ? "Thesis watch" : "Monitoring workspace",
     heroSubtitle: hasPaperTrades
-      ? `${paperTrades.length} saved paper trade${paperTrades.length === 1 ? "" : "s"} — marks refresh when Deribit data is online.`
+      ? `${paperTrades.length} saved paper trade${paperTrades.length === 1 ? "" : "s"} on ${assetTicker} — marks refresh when market data is online.`
       : hasSnapshots
         ? "Watching your saved views."
         : "Save a paper trade in Strategy Lab to start building history.",
+    assetTicker,
     healthPct: health.pct,
     healthLabel: health.label,
     watchPanels,

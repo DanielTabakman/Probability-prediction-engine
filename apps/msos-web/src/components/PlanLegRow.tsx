@@ -3,10 +3,11 @@ import { planLegTooltip } from "@/lib/planLegTooltips";
 
 type PlanLegRowProps = {
   leg: PlanLeg;
+  assetTicker?: string;
 };
 
-export function PlanLegRow({ leg }: PlanLegRowProps) {
-  const tip = planLegTooltip(leg);
+export function PlanLegRow({ leg, assetTicker }: PlanLegRowProps) {
+  const tip = planLegTooltip(leg, assetTicker);
   return (
     <div
       className="leg leg-with-tip"
