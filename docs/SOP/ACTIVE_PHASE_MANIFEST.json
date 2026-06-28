@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md",
   "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Gap scoring backtest \u2014 product slice shipped (#415)",
   "workerMode": "deterministic"
 }
