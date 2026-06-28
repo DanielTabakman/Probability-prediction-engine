@@ -1,0 +1,67 @@
+{
+  "name": "forward_consistency_v1 (parity engine + API + Strategy Lab panel)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_V1.md",
+  "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "FC-Core-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_V1.md",
+      "buildBranch": "build/auto/FC-Core-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "FC-Core-Product-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_V1.md",
+      "buildBranch": "build/forward-consistency-v1",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/forward_consistency.py",
+        "src/data/forward_consistency_quotes.py",
+        "src/viz/forward_consistency_boundary.py",
+        "src/viz/forward_consistency_spike.py",
+        "src/viz/embed_display_boundary.py",
+        "src/viz/embed_only_lab.py",
+        "apps/msos-web/src/lib/forwardConsistency.ts",
+        "apps/msos-web/src/components/ForwardConsistencyPanel.tsx",
+        "apps/msos-web/src/components/StrategyLabWorkSection.tsx",
+        "apps/msos-web/src/app/globals.css",
+        "tests/test_forward_consistency_engine.py",
+        "tests/test_forward_consistency_boundary.py",
+        "tests/test_msos_web_strategy_lab.py"
+      ]
+    },
+    {
+      "sliceId": "FC-Core-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_V1.md",
+      "buildBranch": "build/auto/FC-Core-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "forward_consistency_v1",
+        "chapterTitle": "Forward Consistency v1 — core spine",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/FORWARD_CONSISTENCY_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_FORWARD_CONSISTENCY_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md",
+          "docs/VISION/FORWARD_CONSISTENCY/JSON_CONTRACT_V1.md"
+        ]
+      }
+    }
+  ]
+}

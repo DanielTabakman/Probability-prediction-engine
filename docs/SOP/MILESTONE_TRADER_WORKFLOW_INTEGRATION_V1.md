@@ -37,8 +37,9 @@ Canon loop (backplane): **thesis → implied probability → disagreement → ex
 | **B** | **Wedge depth** | `ppe_crypto_multi_asset_v1` relay | ETH + asset registry; same distribution semantics as BTC |
 | **C** | **Workflow loop fidelity** | Storyboard P4–P7 surfaces + [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Disagreement → confirm → expression → monitor/history feels coherent end-to-end |
 | **D** | **Learning loop** | [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) + [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) | Sessions logged; strong+ signals triaged to shippable backlog |
+| **E** | **Forward consistency** | [`FORWARD_CONSISTENCY_PROGRAM_V1.md`](FORWARD_CONSISTENCY_PROGRAM_V1.md) | Option-implied vs futures/perp parity in Strategy Lab (research-only) |
 
-**Active relay execution** (automation): workstream **B** — `ppe_crypto_multi_asset_v1` is the current `READY` chapter. Workstreams A, C, D run in parallel via product slices and operator/steward activity — not blocked on crypto COMPLETE.
+**Active relay execution** (automation): workstream **B** — `ppe_crypto_multi_asset_v1` is the current `READY` chapter. Workstreams A, C, D run in parallel via product slices and operator/steward activity — not blocked on crypto COMPLETE. Workstream **E** (`forward_consistency_*` chapters) runs on **side channel** when main track idle.
 
 ---
 

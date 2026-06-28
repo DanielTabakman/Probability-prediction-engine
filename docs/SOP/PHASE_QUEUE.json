@@ -450,6 +450,30 @@
       "status": "PLANNED",
       "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_charter_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[P2] Forward Consistency program charter \u2014 side channel when idle",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_CHARTER_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[P2] Forward Consistency core spine (PR #447) \u2014 side channel",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_bybit_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[P2] Bybit SOL parity \u2014 after forward_consistency_v1 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_surfaces_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[LOW] Horizon + Command Center glance \u2014 after bybit COMPLETE",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_SURFACES_V1_SELECTION.md"
     }
   ]
 }

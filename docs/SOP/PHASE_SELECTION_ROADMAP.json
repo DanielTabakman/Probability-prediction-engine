@@ -291,7 +291,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md"
     },
@@ -306,6 +306,30 @@
       "status": "skipped",
       "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_charter_v1_relay.json",
+      "status": "pending",
+      "reason": "[P2] Forward Consistency program charter \u2014 side channel when idle",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_CHARTER_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_v1_relay.json",
+      "status": "pending",
+      "reason": "[P2] Forward Consistency core spine (PR #447) \u2014 side channel",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_bybit_v1_relay.json",
+      "status": "skipped",
+      "reason": "[P2] Bybit SOL parity \u2014 after forward_consistency_v1 COMPLETE",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_surfaces_v1_relay.json",
+      "status": "skipped",
+      "reason": "[LOW] Horizon + Command Center glance \u2014 after bybit COMPLETE",
+      "selectionPrep": "docs/SOP/POST_FORWARD_CONSISTENCY_SURFACES_V1_SELECTION.md"
     }
   ]
 }

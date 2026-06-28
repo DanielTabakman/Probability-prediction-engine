@@ -397,7 +397,7 @@
     },
     {
       "chapterId": "ppe_asset_enablement_pipeline_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
@@ -622,6 +622,64 @@
       "focusPlaybookTier": "Defer",
       "canonRef": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md \u2014 chapter 5c",
       "reason": "[LOW DEFER] Post-expiry implied vs realized ghosts"
+    },
+    {
+      "chapterId": "forward_consistency_charter_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "sideChannel": true,
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_charter_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_CHARTER_V1_SELECTION.md",
+      "canonRef": "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md",
+      "reason": "[P2] Forward Consistency program charter \u2014 milestone, JSON contract, relay queue"
+    },
+    {
+      "chapterId": "forward_consistency_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "sideChannel": true,
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_V1_SELECTION.md",
+      "canonRef": "docs/SOP/MILESTONE_FORWARD_CONSISTENCY_V1.md \u2014 chapter 1",
+      "reason": "[P2] Core spine \u2014 engine, API, Strategy Lab panel (Deribit BTC/ETH); PR #447"
+    },
+    {
+      "chapterId": "forward_consistency_bybit_v1",
+      "status": "blocked",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_bybit_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md",
+      "canonRef": "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md \u2014 chapter 2",
+      "reason": "[P2] Bybit SOL parity path \u2014 blocked until forward_consistency_v1 COMPLETE"
+    },
+    {
+      "chapterId": "forward_consistency_surfaces_v1",
+      "status": "blocked",
+      "priority": "low",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/forward_consistency_surfaces_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_SURFACES_V1_SELECTION.md",
+      "canonRef": "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md \u2014 chapter 3",
+      "reason": "[LOW] Horizon + Command Center glance \u2014 blocked until forward_consistency_bybit_v1 COMPLETE"
+    },
+    {
+      "chapterId": "forward_consistency_archive_v1",
+      "status": "deferred",
+      "priority": "low",
+      "focusPlaybookTier": "Defer",
+      "canonRef": "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md \u2014 chapter 4a",
+      "reason": "[LOW DEFER] Arb check snapshot archive + persistence"
+    },
+    {
+      "chapterId": "forward_consistency_expression_bridge_v1",
+      "status": "deferred",
+      "priority": "low",
+      "focusPlaybookTier": "Defer",
+      "canonRef": "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md \u2014 chapter 4b",
+      "reason": "[LOW DEFER] POSSIBLE_ARB legs \u2192 Expression Lab simulation prefill"
     },
     {
       "chapterId": "ppe_workflow_cost_accounting_v1",

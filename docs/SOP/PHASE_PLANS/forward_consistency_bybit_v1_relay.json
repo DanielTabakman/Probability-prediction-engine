@@ -1,0 +1,56 @@
+{
+  "name": "forward_consistency_bybit_v1 (SOL + Bybit bid/ask parity)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_BYBIT_V1.md",
+  "selectionRecord": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "FC-Bybit-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_BYBIT_V1.md",
+      "buildBranch": "build/auto/FC-Bybit-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "FC-Bybit-Product-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_BYBIT_V1.md",
+      "buildBranch": "build/auto/FC-Bybit-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/data/fetch_bybit_options.py",
+        "src/data/forward_consistency_quotes.py",
+        "tests/test_forward_consistency_boundary.py"
+      ]
+    },
+    {
+      "sliceId": "FC-Bybit-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_BYBIT_V1.md",
+      "buildBranch": "build/auto/FC-Bybit-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "forward_consistency_bybit_v1",
+        "chapterTitle": "Forward Consistency Bybit v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/FORWARD_CONSISTENCY_BYBIT_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_FORWARD_CONSISTENCY_BYBIT_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_FORWARD_CONSISTENCY_BYBIT_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_FORWARD_CONSISTENCY_SURFACES_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/FORWARD_CONSISTENCY_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}
