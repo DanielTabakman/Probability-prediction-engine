@@ -22,8 +22,8 @@
 
 | Chapter | Status | SELECTION |
 |---------|--------|-----------|
-| `horizon_chart_polish_v1` | **CHARTERED** | [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md) — implied overlay, axis parity, expiry selector |
-| `horizon_region_workflow_v1` | **CHARTERED** | [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) — after chart polish |
+| `horizon_chart_polish_v1` | **COMPLETE** | [`OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md`](OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md) — grid, expiry selector, implied panel (#429) |
+| `horizon_region_workflow_v1` | **CHARTERED** | [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) — promote to READY when prioritized |
 
 Promote to `READY` in [`PHASE_QUEUE.json`](PHASE_QUEUE.json) when operator prioritizes Options Horizon (LOW / P2 — does not preempt meta-infra or tier-1 assets).
 
