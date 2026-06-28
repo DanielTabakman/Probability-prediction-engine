@@ -78,9 +78,30 @@ export function normalizeLabAssetId(
   return upper;
 }
 
+/** Venue name for trader-facing copy (display only — not routing). */
+export function optionsVenueReferenceLabel(asset: DisplayAssetMeta): string {
+  const id = asset.id.toUpperCase();
+  if (id === "NVDA") {
+    return "equity options chain";
+  }
+  if (id === "SOL") {
+    return "Bybit";
+  }
+  return "Deribit";
+}
+
 /** Human label for where option quotes come from (display copy only). */
 export function optionsSourceLabel(asset: DisplayAssetMeta): string {
-  return asset.id === "NVDA" ? "equity options chain" : "Deribit options";
+  const venue = optionsVenueReferenceLabel(asset);
+  return venue === "equity options chain" ? venue : `${venue} options`;
+}
+
+/** Trust strip label for confirm / thesis draft (display only). */
+export function optionsTrustSourceLabel(asset: DisplayAssetMeta): string {
+  if (asset.id.toUpperCase() === "NVDA") {
+    return "Caution · dividends unmodelled";
+  }
+  return `Good · ${optionsVenueReferenceLabel(asset)}`;
 }
 
 /** True when a live payload matches the asset the user selected in the lab. */
@@ -306,7 +327,10 @@ export function buildLabMetricsFromPayload(
     { label: "Typical range", value: marketWidth, tone: "amber" },
     {
       label: "Data",
-      value: asset.id === "NVDA" ? "Live · equity chain" : "Live · Deribit",
+      value:
+        asset.id === "NVDA"
+          ? "Live · equity chain"
+          : `Live · ${optionsVenueReferenceLabel(asset)}`,
       tone: "teal",
     },
   ];

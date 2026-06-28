@@ -8,7 +8,7 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | MSOS-WfAsset-Control-Slice001 | IN_PROGRESS | Propagation matrix (Confirm row verified) |
-| MSOS-WfAsset-Product-Slice002 | IN_PROGRESS | Confirm + Plan + Monitor copy asset-aware; strategy suggestion API still BTC-default |
+| MSOS-WfAsset-Product-Slice002 | IN_PROGRESS | Confirm + Plan + Monitor copy asset-aware; strategy suggestion fetch passes `?asset=` (backend math still BTC-default) |
 | MSOS-WfAsset-Witness-Slice003 | IN_PROGRESS | Confirm + Plan + Monitor asset witnesses |
 | MSOS-WfAsset-Closeout-Slice004 | PENDING | Chapter close |
 
@@ -18,7 +18,7 @@
 |---------|-------------------------------|------------------------|
 | Strategy Lab | yes (display parity) | yes |
 | Confirm | yes (`?asset=` → `resolveDisplayAssetMeta`) | yes (`fetchDisplayPayloadClient(assetId)`) |
-| Expression | yes (`?asset=` + thesis `assetId` → copy + chart axis) | partial (display fetch; strategy suggestion API still BTC-default) |
+| Expression | yes (`?asset=` + thesis `assetId` → copy + chart axis + strategy suggestion query) | partial (display fetch; backend suggestion math still BTC-default until PPE slice) |
 | Monitor | yes (`thesis.assetId` → `assetTicker` + spot labels) | yes (`fetchDisplayPayload(displayAssetId)`) |
 
 **Confirm rule (Product-Slice002):** any workflow step that builds trader-facing copy from lab context must pass `resolveDisplayAssetMeta(payload, assetId)` — never rely on payload-only or BTC fixtures after hydration.
