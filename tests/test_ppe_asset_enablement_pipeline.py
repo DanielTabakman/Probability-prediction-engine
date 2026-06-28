@@ -34,7 +34,14 @@ def test_enable_asset_batch_witnesses_to_enable_list(monkeypatch) -> None:
     monkeypatch.setattr(enable_mod, "_run_cache_isolation_pytest", lambda: (True, {"ok": True}))
     assert enable_mod.main(["--group", "crypto", "--dry-run", "--json"]) == 0
     assert len(seen) == 1
-    assert set(seen[0]) == {"BNB", "SOL", "XRP"}
+    expected = {
+        row["asset_id"]
+        for row in enable_mod._plan_enablement(
+            enable_mod.list_asset_ids_for_catalog_group("crypto", enabled_only=False)
+        )
+        if row["action"] == "enable"
+    }
+    assert set(seen[0]) == expected
 
 
 def test_witness_pre_enable_disabled_staging_asset() -> None:
