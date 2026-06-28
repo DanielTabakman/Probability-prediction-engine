@@ -6,9 +6,9 @@ import Link from "next/link";
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { BeliefBuilder } from "@/components/BeliefBuilder";
 import { BeliefFineTuning } from "@/components/BeliefFineTuning";
+import { ContextRail } from "@/components/ContextRail";
 import { PpeEmbedBoundary } from "@/components/PpeEmbedBoundary";
 import { DEFAULT_CURVE_LABELS } from "@/lib/chartCurveLabels";
-import { lensTiles } from "@/data/strategyLabFixtures";
 import { buildOutcomeFromTuning } from "@/lib/beliefPresets";
 import {
   buildTuningLabel,
@@ -30,6 +30,7 @@ import {
   type DisplayPayload,
   type LabOutcomeSummary,
 } from "@/lib/ppeDisplayPayload";
+import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 
 type StrategyLabInteractivePanelProps = {
   displayPayload: DisplayPayload | null;
@@ -148,7 +149,7 @@ export function StrategyLabInteractivePanel({
           expiryLabel={selectedExpiry}
           expiryOptions={expiryOptions}
           onExpiryChange={onExpiryChange}
-          hideInlineExpiryPicker={false}
+          hideInlineExpiryPicker
           assetTicker={assetMeta.id}
           tuning={tuning}
           onNudge={handleNudge}
@@ -206,68 +207,43 @@ export function StrategyLabInteractivePanel({
             {active ? `: ${viewLabel}` : ""}
           </span>
         </div>
-
-        <details className="lab-advanced-markets">
-          <summary>Other markets (coming soon)</summary>
-          <div className="lab-list compact">
-            {lensTiles.map((tile) =>
-              tile.live && tile.href ? (
-                <Link key={tile.title} href={tile.href} className="lab-tile">
-                  <div className="lab-mark">{tile.mark}</div>
-                  <div>
-                    <h3>{tile.title}</h3>
-                    <p>{tile.description}</p>
-                  </div>
-                  <span className="tiny-pill">{tile.status}</span>
-                </Link>
-              ) : (
-                <div key={tile.title} className="lab-tile muted">
-                  <div className="lab-mark">{tile.mark}</div>
-                  <div>
-                    <h3>{tile.title}</h3>
-                    <p>{tile.description}</p>
-                  </div>
-                  <span className="tag muted">{tile.status}</span>
-                </div>
-              ),
-            )}
-          </div>
-        </details>
       </div>
 
-      <div className="panel outcome">
-        <div className="panel-head">
-          <div>
-            <h2>What this means</h2>
-            <div className="panel-sub">Decision support — not financial advice.</div>
-          </div>
-          <span className={`tag ${outcome.tagTone}`}>{outcome.tag}</span>
-        </div>
-        {outcome.delta !== "—" ? <div className="bigdelta">{outcome.delta}</div> : null}
-        <h2 className="outcome-headline">{outcome.headline}</h2>
-        <p className="bodycopy">{outcome.body}</p>
-        <div className="score">
-          {outcome.scores.map((item) => (
-            <div key={item.label} className="small-panel">
-              <div className="k">{item.label}</div>
-              <div className={`v ${item.tone}`}>{item.value}</div>
+      <ContextRail>
+        <div className="panel outcome">
+          <div className="panel-head">
+            <div>
+              <h2>What this means</h2>
+              <div className="panel-sub">Decision support — not financial advice.</div>
             </div>
-          ))}
-        </div>
-        <div className="decision-strip">
-          <div>
-            <strong>
-              {active
-                ? `Next: confirm your “${viewLabel.toLowerCase()}” view`
-                : "Next: pick how you disagree with the market"}
-            </strong>
-            <p>Then explore trade structures that fit — paper only on this demo.</p>
+            <span className={`tag ${outcome.tagTone}`}>{outcome.tag}</span>
           </div>
-          <Link href="/strategy-lab/confirm" className="btn slim primary">
-            Confirm view →
-          </Link>
+          {outcome.delta !== "—" ? <div className="bigdelta">{outcome.delta}</div> : null}
+          <h2 className="outcome-headline">{outcome.headline}</h2>
+          <p className="bodycopy">{outcome.body}</p>
+          <div className="score">
+            {outcome.scores.map((item) => (
+              <div key={item.label} className="small-panel">
+                <div className="k">{item.label}</div>
+                <div className={`v ${item.tone}`}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+          <div className="decision-strip">
+            <div>
+              <strong>
+                {active
+                  ? `Next: confirm your “${viewLabel.toLowerCase()}” view`
+                  : "Next: pick how you disagree with the market"}
+              </strong>
+              <p>Then explore trade structures that fit — paper only on this demo.</p>
+            </div>
+            <Link href={buildWorkflowStepHref("confirm", assetMeta.id)} className="btn slim primary">
+              Confirm view →
+            </Link>
+          </div>
         </div>
-      </div>
+      </ContextRail>
     </>
   );
 }

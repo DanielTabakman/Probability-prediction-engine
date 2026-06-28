@@ -17,9 +17,10 @@ def test_command_center_route_and_shell() -> None:
 
     sidebar = (MSOS_WEB / "src" / "components" / "AppSidebar.tsx").read_text(encoding="utf-8")
     assert "navItems" in sidebar
-    assert "connectedMarkets" in sidebar
+    assert "secondaryNavItems" in sidebar
 
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
+    assert "connectedMarkets" in content
     assert "friendlySnapshotFeedMessage" in content
     assert "DEMO_FOOTER" in content
     assert "labTiles" in content
@@ -38,4 +39,4 @@ def test_command_center_fixtures_honest_labels() -> None:
     assert "Live" in fixtures or "Live" in fixtures.lower()
     assert "Planned" in fixtures
     assert '"ETH options", status: "Live"' in fixtures
-    assert "disabled: true" in fixtures
+    assert "enabled: false" in fixtures

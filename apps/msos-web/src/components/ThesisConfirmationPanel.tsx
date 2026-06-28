@@ -10,6 +10,8 @@ import {
   lifecycleDisplayId,
   thesisConfirmHeadline,
 } from "@/data/thesisConfirmFixtures";
+import { ContextRail } from "@/components/ContextRail";
+import { WorkflowStepper } from "@/components/WorkflowStepper";
 import {
   buildCompareColumnsFromLab,
   buildConfirmChecklist,
@@ -24,6 +26,7 @@ import {
   normalizeLabAssetId,
   type DisplayPayload,
 } from "@/lib/ppeDisplayPayload";
+import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import {
   THESIS_PERSISTENCE_LABEL,
@@ -113,7 +116,9 @@ export function ThesisConfirmationPanel() {
         </div>
       </header>
 
-      <div className="confirm-wrap">
+      <WorkflowStepper currentStep="confirm" assetId={assetId} />
+
+      <div className="work confirm-wrap">
         <section className="panel truth">
           <h2 className="question">{thesisConfirmHeadline}</h2>
           <p className="thesis">
@@ -153,7 +158,7 @@ export function ThesisConfirmationPanel() {
           </div>
         </section>
 
-        <aside className="confirm-right">
+        <ContextRail>
           <div className="panel">
             <div className="panel-head">
               <div>
@@ -193,7 +198,7 @@ export function ThesisConfirmationPanel() {
               </button>
             </div>
             {isConfirmed ? (
-              <Link href="/strategy-lab/expression" className="btn slim primary proceed-cta">
+              <Link href={buildWorkflowStepHref("plan", assetId)} className="btn slim primary proceed-cta">
                 Plan a paper trade
               </Link>
             ) : (
@@ -211,7 +216,7 @@ export function ThesisConfirmationPanel() {
               </p>
             ) : null}
           </div>
-        </aside>
+        </ContextRail>
       </div>
 
       <p className="footer-note">{DEMO_FOOTER}</p>

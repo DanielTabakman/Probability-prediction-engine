@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import { buildCalibrationStrip, buildReviewEvents } from "@/lib/monitorHistoryFeed";
 import type { WorkflowSummary } from "@/lib/msosWorkflowStore";
-import { headlines, labTiles } from "@/data/commandCenterFixtures";
+import { connectedMarkets, headlines, labTiles } from "@/data/commandCenterFixtures";
+import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
 type Props = {
@@ -60,8 +61,11 @@ export function CommandCenterContent({ summary, workflow }: Props) {
           <Link href="/history" className="btn slim">
             History
           </Link>
-          <Link href="/learn" className="btn slim">
+          <Link href={MSOS_ROUTES.learn} className="btn slim">
             Learn
+          </Link>
+          <Link href={MSOS_ROUTES.optionsHorizon} className="btn slim">
+            Options Horizon
           </Link>
         </div>
       </section>
@@ -93,6 +97,14 @@ export function CommandCenterContent({ summary, workflow }: Props) {
               <div className="panel-sub">Open a market and compare it to your view.</div>
             </div>
             <span className="tag">Explore</span>
+          </div>
+          <div className="connected-markets-row" aria-label="Connected markets">
+            {connectedMarkets.map((asset) => (
+              <span key={asset.label} className={`connected-market-pill ${asset.live ? "live" : "off"}`}>
+                {asset.label}
+                {asset.live ? <span className="tiny-pill">{asset.status}</span> : <span>{asset.status}</span>}
+              </span>
+            ))}
           </div>
           <div className="lab-list">
             {labTiles.map((tile) => (

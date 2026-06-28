@@ -17,11 +17,13 @@ export type MarketAsset = {
 export const navItems: NavItem[] = [
   { id: "command-center", label: "Command Center", href: "/command-center" },
   { id: "strategy-lab", label: "Strategy Lab", href: "/strategy-lab" },
-  { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
-  { id: "theses", label: "Theses", href: "#", disabled: true },
-  { id: "expression", label: "Expression & Execution", href: "/strategy-lab/expression" },
   { id: "monitor", label: "Monitor", href: "/monitor" },
   { id: "history", label: "History", href: "/history" },
+];
+
+/** Secondary destinations — linked from Command Center and sidebar footer, not primary nav. */
+export const secondaryNavItems: NavItem[] = [
+  { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
   { id: "learn", label: "Learn", href: "/learn" },
 ];
 
