@@ -86,18 +86,6 @@
 - **summary:** Formalize more operator rituals beyond context window closeout: SELECTION pass closeout, recovery closeout, weekly steward pass, IDE BUILD thread close.
 - **policy question:** Which ritual should we standardize next after context closeout?
 
-### VM loop-host git push credentials
-
-- **id:** `vm_loop_host_git_push_credentials` · **priority:** high · **category:** ops
-- **added:** 2026-06-26
-- **summary:** run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.
-
-### ppeloop gh auth setup-git
-
-- **id:** `ppeloop_gh_auth_setup_git` · **priority:** medium · **category:** ops
-- **added:** 2026-06-27
-- **summary:** VM loop cannot push ops/loop-publish branches; run gh auth setup-git on ppeloop@desktop-caqll8k
-
 ## Done
 
 ### Operator friction cleanup (local profile)
@@ -116,6 +104,22 @@
 - **policy question:** Protect apex product routes only (recommended) or entire marketstructureos.com for early demo cohort?
 - **notes:** Track A+C witness PASS 2026-06-21; Track B apex Access deferred. See MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md.
 
+### VM loop-host git push credentials
+
+- **id:** `vm_loop_host_git_push_credentials` · **priority:** high · **category:** ops
+- **added:** 2026-06-26
+- **closed:** 2026-06-27
+- **summary:** run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.
+- **notes:** Verified 2026-06-27: gh auth logged in on VM; ops/loop-publish PRs merging (#413-426).
+
+### ppeloop gh auth setup-git
+
+- **id:** `ppeloop_gh_auth_setup_git` · **priority:** medium · **category:** ops
+- **added:** 2026-06-27
+- **closed:** 2026-06-27
+- **summary:** VM loop cannot push ops/loop-publish branches; run gh auth setup-git on ppeloop@desktop-caqll8k
+- **notes:** Same resolution as vm_loop_host_git_push_credentials — loop publish working.
+
 ## Changelog
 
-| 2026-06-27 | Auto-render from JSON |
+| 2026-06-28 | Auto-render from JSON |
