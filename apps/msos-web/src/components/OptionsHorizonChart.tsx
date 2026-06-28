@@ -3,7 +3,9 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
+  CHART_AXIS_STYLE,
   LABELED_CHART_LAYOUT,
+  buildPriceAxisTicks,
   chartInnerBox,
   formatAxisPrice,
 } from "@/lib/chartAxisDisplay";
@@ -21,7 +23,6 @@ type OptionsHorizonChartProps = {
 type TimeScale = {
   tMin: number;
   tMax: number;
-  dates: string[];
 };
 
 function parseMs(iso: string): number {
@@ -43,7 +44,7 @@ function buildTimeScale(payload: HorizonChartPayload): TimeScale {
   stamps.push(now);
   const tMin = Math.min(...stamps);
   const tMax = Math.max(...stamps, now + 7 * 86400000);
-  return { tMin, tMax, dates: [] };
+  return { tMin, tMax };
 }
 
 function timeToX(t: number, scale: TimeScale): number {
@@ -68,6 +69,16 @@ function xToTime(x: number, scale: TimeScale): number {
   return scale.tMin + ratio * (scale.tMax - scale.tMin);
 }
 
+function formatTimeTick(ms: number): string {
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(new Date(ms));
+}
+
+function buildTimeTicks(scale: TimeScale, count = 5): number[] {
+  const span = scale.tMax - scale.tMin;
+  if (span <= 0) return [scale.tMin];
+  return Array.from({ length: count }, (_, index) => scale.tMin + (span * index) / (count - 1));
+}
+
 export function OptionsHorizonChart({ payload, region, onRegionChange }: OptionsHorizonChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [drag, setDrag] = useState<{ x0: number; y0: number; x1: number; y1: number } | null>(null);
@@ -75,10 +86,14 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
   const scale = useMemo(() => buildTimeScale(payload), [payload]);
   const prices = payload.historical.series.map((r) => r.close_usd);
   const forwardPrices = payload.forward.curve.map((r) => r.mark_price_usd);
-  const allPrices = [...prices, ...forwardPrices, payload.spot_usd];
+  const impliedPrices = payload.implied?.prices_usd ?? [];
+  const allPrices = [...prices, ...forwardPrices, ...impliedPrices, payload.spot_usd];
   const yMin = Math.min(...allPrices) * 0.92;
   const yMax = Math.max(...allPrices) * 1.08;
+  const box = chartInnerBox(LAYOUT);
   const nowX = timeToX(Date.now(), scale);
+  const priceTicks = useMemo(() => buildPriceAxisTicks(yMin, yMax, 5), [yMin, yMax]);
+  const timeTicks = useMemo(() => buildTimeTicks(scale, 5), [scale]);
 
   const histPath = useMemo(() => {
     const pts = payload.historical.series;
@@ -149,6 +164,8 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
   }, [region, scale, yMin, yMax]);
 
   const volMax = Math.max(...payload.historical.series.map((r) => r.volume ?? 0), 1);
+  const impliedPdfPeak = Math.max(...(payload.implied?.pdf_pct ?? []), 0);
+  const impliedExpiryX = payload.implied ? timeToX(parseMs(`${payload.implied.expiry_date}T00:00:00Z`), scale) : null;
 
   return (
     <div className="options-horizon-chart-wrap">
@@ -164,46 +181,65 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
         onPointerLeave={onPointerUp}
       >
         <rect x={0} y={0} width={LAYOUT.width} height={LAYOUT.height} fill="transparent" />
+        <rect
+          x={box.x0}
+          y={box.y0}
+          width={box.innerW}
+          height={box.innerH}
+          fill="rgba(255,255,255,0.012)"
+          stroke={CHART_AXIS_STYLE.axisStroke}
+        />
+        {priceTicks.map((tick) => {
+          const y = priceToY(tick, yMin, yMax);
+          return (
+            <g key={`price-${tick}`}>
+              <line x1={box.x0} x2={box.x1} y1={y} y2={y} stroke={CHART_AXIS_STYLE.gridStroke} />
+              <text x={box.x0 - 8} y={y + 4} textAnchor="end" fill={CHART_AXIS_STYLE.labelFill} fontSize={10}>
+                {formatAxisPrice(tick)}
+              </text>
+            </g>
+          );
+        })}
+        {timeTicks.map((tick) => {
+          const x = timeToX(tick, scale);
+          return (
+            <g key={`time-${tick}`}>
+              <line x1={x} x2={x} y1={box.y0} y2={box.y1} stroke={CHART_AXIS_STYLE.gridStroke} />
+              <text x={x} y={box.y1 + 20} textAnchor="middle" fill={CHART_AXIS_STYLE.labelFill} fontSize={10}>
+                {formatTimeTick(tick)}
+              </text>
+            </g>
+          );
+        })}
         {payload.historical.series.map((row) => {
           const x = timeToX(parseMs(row.timestamp_utc), scale);
           const v = row.volume ?? 0;
-          const h = (v / volMax) * 24;
-          const box = chartInnerBox(LAYOUT);
+          const h = (v / volMax) * 34;
           return (
             <rect
               key={row.timestamp_utc}
-              x={x - 1}
+              x={x - 1.5}
               y={box.y1 - h}
-              width={2}
+              width={3}
               height={h}
-              fill="rgba(120, 140, 170, 0.35)"
+              fill="rgba(85, 187, 255, 0.2)"
             />
           );
         })}
         <line
           x1={nowX}
           x2={nowX}
-          y1={chartInnerBox(LAYOUT).y0}
-          y2={chartInnerBox(LAYOUT).y1}
-          stroke="rgba(255,255,255,0.2)"
+          y1={box.y0}
+          y2={box.y1}
+          stroke="rgba(242, 182, 87, 0.35)"
           strokeDasharray="4 4"
         />
+        <text x={nowX + 6} y={box.y0 + 14} fill="#f2b657" fontSize={10}>
+          Now
+        </text>
         {histPath ? (
-          <path d={histPath} fill="none" stroke="rgba(100, 200, 255, 0.9)" strokeWidth={2} />
+          <path d={histPath} fill="none" stroke="rgba(85, 187, 255, 0.95)" strokeWidth={2.4} />
         ) : null}
-        {payload.forward.curve.map((pt) => {
-          const x = timeToX(parseMs(pt.expiry_utc), scale);
-          const y = priceToY(pt.mark_price_usd, yMin, yMax);
-          return (
-            <circle
-              key={pt.expiry_date}
-              cx={x}
-              cy={y}
-              r={4}
-              fill="rgba(255, 180, 80, 0.9)"
-            />
-          );
-        })}
         {payload.forward.curve.length > 1 ? (
           <polyline
             points={payload.forward.curve
@@ -214,11 +250,41 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
               })
               .join(" ")}
             fill="none"
-            stroke="rgba(255, 180, 80, 0.55)"
-            strokeWidth={1.5}
-            strokeDasharray="6 4"
+            stroke="rgba(242, 182, 87, 0.78)"
+            strokeWidth={2}
+            strokeDasharray="7 5"
           />
         ) : null}
+        {payload.forward.curve.map((pt) => {
+          const x = timeToX(parseMs(pt.expiry_utc), scale);
+          const y = priceToY(pt.mark_price_usd, yMin, yMax);
+          return (
+            <g key={pt.expiry_date}>
+              <circle cx={x} cy={y} r={4.5} fill="#f2b657" stroke="#07111c" strokeWidth={1.2} />
+              <text x={x + 7} y={y - 7} fill="#c6d5e4" fontSize={9}>
+                {pt.expiry_date.slice(5)}
+              </text>
+            </g>
+          );
+        })}
+        {payload.implied && impliedExpiryX !== null && impliedPdfPeak > 0
+          ? payload.implied.prices_usd.map((price, index) => {
+              const pdf = payload.implied?.pdf_pct[index] ?? 0;
+              const y = priceToY(price, yMin, yMax);
+              const width = 4 + (pdf / impliedPdfPeak) * 32;
+              return (
+                <line
+                  key={`implied-contour-${price}-${index}`}
+                  x1={impliedExpiryX - width}
+                  x2={impliedExpiryX + width}
+                  y1={y}
+                  y2={y}
+                  stroke="rgba(158, 139, 255, 0.34)"
+                  strokeWidth={1.2}
+                />
+              );
+            })
+          : null}
         {regionRect ? (
           <rect
             x={regionRect.x}
@@ -241,9 +307,39 @@ export function OptionsHorizonChart({ payload, region, onRegionChange }: Options
             strokeDasharray="4 3"
           />
         ) : null}
-        <text x={chartInnerBox(LAYOUT).x0} y={LAYOUT.height - 8} fill="#8ea4bd" fontSize={11}>
-          {formatAxisPrice(yMin)} – {formatAxisPrice(yMax)}
-        </text>
+        <g className="options-horizon-svg-legend">
+          <circle cx={box.x0} cy={LAYOUT.height - 12} r={3} fill="#55bbff" />
+          <text x={box.x0 + 9} y={LAYOUT.height - 8} fill="#8ea4bd" fontSize={10}>
+            Spot history
+          </text>
+          <line
+            x1={box.x0 + 98}
+            x2={box.x0 + 120}
+            y1={LAYOUT.height - 12}
+            y2={LAYOUT.height - 12}
+            stroke="#f2b657"
+            strokeWidth={2}
+            strokeDasharray="7 5"
+          />
+          <text x={box.x0 + 127} y={LAYOUT.height - 8} fill="#8ea4bd" fontSize={10}>
+            Forward curve
+          </text>
+          <rect x={box.x0 + 230} y={LAYOUT.height - 18} width={14} height={8} fill="rgba(85, 187, 255, 0.2)" />
+          <text x={box.x0 + 251} y={LAYOUT.height - 8} fill="#8ea4bd" fontSize={10}>
+            Volume
+          </text>
+          <line
+            x1={box.x0 + 310}
+            x2={box.x0 + 332}
+            y1={LAYOUT.height - 12}
+            y2={LAYOUT.height - 12}
+            stroke="rgba(158, 139, 255, 0.72)"
+            strokeWidth={2}
+          />
+          <text x={box.x0 + 339} y={LAYOUT.height - 8} fill="#8ea4bd" fontSize={10}>
+            Implied expiry
+          </text>
+        </g>
       </svg>
       <p className="micro">Drag on the chart to draw a thesis region (simulation only).</p>
     </div>
