@@ -8,7 +8,7 @@
 | Slice | Status | Notes |
 |-------|--------|-------|
 | PPE-TrustSurf-Control-Slice001 | **COMPLETE** | Trust field contract (this doc §Trust field contract) |
-| PPE-TrustSurf-Core-Slice002 | PENDING | Payload trust aggregation where missing |
+| PPE-TrustSurf-Core-Slice002 | **COMPLETE** | Per-row trust_state + payload aggregation |
 | PPE-TrustSurf-Product-Slice003 | PENDING | MSOS lab + picker trust copy/banners |
 | PPE-TrustSurf-Closeout-Slice004 | PENDING | Chapter close |
 

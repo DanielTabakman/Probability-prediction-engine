@@ -131,6 +131,65 @@ def render_distribution_summary_panel(export_rows: list[dict[str, str]]) -> None
     )
 
 
+def trust_state_from_export_row(row: dict[str, str]) -> str:
+    """Map one export row to canonical trust_state (ok | thin_chain | degraded)."""
+    existing = str(row.get("trust_state") or "").strip().lower()
+    if existing in ("ok", "thin_chain", "degraded", "error", "fail"):
+        if existing in ("error", "fail"):
+            return "degraded"
+        return existing
+
+    if str(row.get("distribution") or "") != "market_implied_bl":
+        return "ok"
+
+    bl_status = str(row.get("bl_status") or "").strip().lower()
+    base = bl_status.split("|")[0].strip()
+
+    if base.startswith("skipped:insufficient_marks"):
+        try:
+            mark_count = int(str(row.get("call_marks_count") or "0"))
+        except ValueError:
+            mark_count = 0
+        return "thin_chain" if mark_count > 0 else "degraded"
+
+    if base.startswith("skipped:"):
+        return "degraded"
+
+    if "thin_open_interest" in bl_status or base.startswith("computed_caution"):
+        return "thin_chain"
+
+    if "insufficient_marks" in bl_status:
+        return "degraded"
+
+    return "ok"
+
+
+def annotate_export_rows_trust(
+    export_rows: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    """Return export rows with per-row trust_state populated."""
+    annotated: list[dict[str, str]] = []
+    for row in export_rows:
+        copy = dict(row)
+        copy["trust_state"] = trust_state_from_export_row(copy)
+        annotated.append(copy)
+    return annotated
+
+
+def aggregate_trust_state(export_rows: list[dict[str, str]]) -> str:
+    """Roll up per-row trust_state for display.json (thin_chain wins, then degraded)."""
+    trust_states = {
+        str(row.get("trust_state") or "ok").strip().lower()
+        for row in export_rows
+        if row.get("trust_state")
+    }
+    if "thin_chain" in trust_states:
+        return "thin_chain"
+    if trust_states & {"error", "fail", "degraded"}:
+        return "degraded"
+    return "ok"
+
+
 def summary_panel_contract(export_rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Test helper: anchor + title + row count without Streamlit."""
     return {
