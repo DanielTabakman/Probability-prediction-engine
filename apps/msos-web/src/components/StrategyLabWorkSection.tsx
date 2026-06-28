@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { ExpiryMarketContextStrip } from "@/components/ExpiryMarketContextStrip";
+import { ForwardConsistencyPanel } from "@/components/ForwardConsistencyPanel";
 import { LabSetupRow } from "@/components/LabSetupRow";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
 import { outcomeSummary, strategyLabMetrics } from "@/data/strategyLabFixtures";
@@ -99,6 +100,13 @@ export function StrategyLabWorkSection({
           </div>
         </section>
       )}
+
+      <ForwardConsistencyPanel
+        assetMeta={assetMeta}
+        expiryDate={resolvedExpiry}
+        displayPayload={displayPayload}
+        live={live}
+      />
 
       <section className="work strategy-lab-work">
         <StrategyLabInteractivePanel

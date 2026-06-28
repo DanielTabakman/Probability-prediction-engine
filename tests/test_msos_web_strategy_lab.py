@@ -349,3 +349,15 @@ def test_onboarding_polish_wiring() -> None:
     assert "planLegTooltip" in (MSOS_WEB / "src" / "lib" / "planLegTooltips.ts").read_text(
         encoding="utf-8"
     )
+
+
+def test_strategy_lab_forward_consistency_panel() -> None:
+    work = (MSOS_WEB / "src" / "components" / "StrategyLabWorkSection.tsx").read_text(encoding="utf-8")
+    panel = (MSOS_WEB / "src" / "components" / "ForwardConsistencyPanel.tsx").read_text(encoding="utf-8")
+    lib = (MSOS_WEB / "src" / "lib" / "forwardConsistency.ts").read_text(encoding="utf-8")
+    styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+    assert "ForwardConsistencyPanel" in work
+    assert "No-Arbitrage Check" in panel
+    assert "fetchForwardConsistencyPayload" in lib
+    assert "isForwardConsistencyPayload" in lib
+    assert ".forward-consistency" in styles
