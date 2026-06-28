@@ -11,11 +11,9 @@ import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { WorkflowStepper } from "@/components/WorkflowStepper";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
-  DEFAULT_LAB_ASSET_ID,
   LAB_ASSET_QUERY_PARAM,
   fetchDisplayPayloadClient,
   isPayloadForSelectedAsset,
-  normalizeLabAssetId,
   resolveDisplayAssetMeta,
   type DisplayPayload,
   type LabAssetId,
@@ -26,6 +24,8 @@ import {
   fetchAssetCatalog,
   listSelectableAssetIds,
 } from "@/lib/ppeAssetCatalog";
+import { resolveLabAssetId, saveStoredLabAssetId } from "@/lib/strategyLabAsset";
+import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 import {
   LAB_DATA_DEMO_PILL,
   LAB_DATA_LOADING_PILL,
@@ -63,11 +63,7 @@ function buildAssetHref(
   assetId: LabAssetId,
 ): string {
   const params = new URLSearchParams(searchParams.toString());
-  if (assetId === DEFAULT_LAB_ASSET_ID) {
-    params.delete(LAB_ASSET_QUERY_PARAM);
-  } else {
-    params.set(LAB_ASSET_QUERY_PARAM, assetId);
-  }
+  params.set(LAB_ASSET_QUERY_PARAM, assetId.trim().toUpperCase());
   const qs = params.toString();
   return qs ? `${pathname}?${qs}` : pathname;
 }
@@ -79,9 +75,17 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   const [catalogAssetIds, setCatalogAssetIds] = useState<string[]>(() =>
     listSelectableAssetIds(FALLBACK_ASSET_PICKER),
   );
-  const selectedAssetId = normalizeLabAssetId(
-    searchParams.get(LAB_ASSET_QUERY_PARAM),
-    catalogAssetIds,
+  const [catalogDefault, setCatalogDefault] = useState<string | null>(null);
+  const queryAsset = searchParams.get(LAB_ASSET_QUERY_PARAM);
+  const selectedAssetId = useMemo(
+    () =>
+      resolveLabAssetId({
+        query: queryAsset,
+        allowedIds: catalogAssetIds,
+        catalogDefault,
+        useStored: true,
+      }),
+    [queryAsset, catalogAssetIds, catalogDefault],
   );
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() =>
@@ -129,11 +133,23 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         return;
       }
       setCatalogAssetIds(listSelectableAssetIds(bucketsFromCatalog(catalog)));
+      setCatalogDefault(catalog.default_asset_id);
     })();
     return () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    saveStoredLabAssetId(selectedAssetId);
+  }, [selectedAssetId]);
+
+  useEffect(() => {
+    if (queryAsset?.trim()) {
+      return;
+    }
+    router.replace(buildAssetHref(pathname, searchParams, selectedAssetId), { scroll: false });
+  }, [queryAsset, pathname, router, searchParams, selectedAssetId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -158,11 +174,6 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         return;
       }
       if (ssrMatches && initialPayload) {
-        return;
-      }
-      if (selectedAssetId === DEFAULT_LAB_ASSET_ID && initialPayload) {
-        setPayload(initialPayload);
-        setMode("live");
         return;
       }
       setPayload(null);
@@ -208,11 +219,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
             {pillLabel}
           </span>
           <Link
-            href={
-              selectedAssetId === DEFAULT_LAB_ASSET_ID
-                ? "/strategy-lab/confirm"
-                : `/strategy-lab/confirm?${LAB_ASSET_QUERY_PARAM}=${selectedAssetId}`
-            }
+            href={buildWorkflowStepHref("confirm", selectedAssetId)}
             className="btn slim primary"
             data-tour="lab-confirm"
           >
@@ -251,7 +258,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         </div>
       ) : null}
 
-      <PendingPaperTradeBanner returnPath="/strategy-lab/expression" />
+      <PendingPaperTradeBanner returnPath={buildWorkflowStepHref("plan", selectedAssetId)} />
 
       <WorkflowStepper currentStep="compare" assetId={selectedAssetId} />
 

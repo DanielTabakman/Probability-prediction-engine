@@ -108,11 +108,27 @@ export function assetBucketForId(
 }
 
 export async function fetchAssetCatalog(): Promise<AssetCatalogPayload | null> {
-  if (!PPE_CATALOG_API_URL) {
+  return fetchAssetCatalogFromUrl(PPE_CATALOG_API_URL);
+}
+
+function resolveCatalogApiFetchUrl(): string {
+  const serverUrl = process.env.PPE_DISPLAY_API_SERVER_URL?.trim();
+  if (serverUrl) {
+    return serverUrl.replace(/display\.json(\?.*)?$/i, "catalog.json");
+  }
+  return PPE_CATALOG_API_URL;
+}
+
+export async function fetchAssetCatalogServer(): Promise<AssetCatalogPayload | null> {
+  return fetchAssetCatalogFromUrl(resolveCatalogApiFetchUrl());
+}
+
+async function fetchAssetCatalogFromUrl(fetchUrl: string): Promise<AssetCatalogPayload | null> {
+  if (!fetchUrl) {
     return null;
   }
   try {
-    const res = await fetch(PPE_CATALOG_API_URL, {
+    const res = await fetch(fetchUrl, {
       cache: "no-store",
       headers: {
         Accept: "application/json",

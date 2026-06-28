@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
@@ -39,12 +38,11 @@ import {
 import {
   buildStrategyLabPath,
   fetchDisplayPayloadClient,
-  LAB_ASSET_QUERY_PARAM,
   listExpiryDates,
-  normalizeLabAssetId,
   resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
 import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
+import { useResolvedLabAssetId } from "@/lib/useResolvedLabAssetId";
 import { resolveSignInUrlWithReturn } from "@/lib/msosPublicUrls";
 import { stashPostAuthReturnPath } from "@/lib/postAuthReturn";
 import {
@@ -123,10 +121,9 @@ function optimizationFromSuggestion(
 }
 
 export function ExpressionPlanningPanel() {
-  const searchParams = useSearchParams();
-  const assetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [record, setRecord] = useState(defaultExpressionRecord);
   const [thesis, setThesis] = useState<ThesisRecord>(defaultThesisRecord);
+  const assetId = useResolvedLabAssetId({ thesisAssetId: thesis.assetId });
   const [thesisConfirmed, setThesisConfirmed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [suggestion, setSuggestion] = useState<StrategySuggestionPayload | null>(null);
@@ -302,8 +299,8 @@ export function ExpressionPlanningPanel() {
   const marketExpectationUsd =
     glance?.market_modal_usd ?? glance?.forward_usd ?? undefined;
   const assetMeta = useMemo(
-    () => resolveDisplayAssetMeta(null, normalizeLabAssetId(thesis.assetId ?? assetId)),
-    [thesis.assetId, assetId],
+    () => resolveDisplayAssetMeta(null, assetId),
+    [assetId],
   );
   const planPath = buildWorkflowStepHref("plan", assetId);
   const confirmPath = buildWorkflowStepHref("confirm", assetId);

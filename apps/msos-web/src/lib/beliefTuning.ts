@@ -4,7 +4,8 @@
 
 import type { BeliefPresetId } from "@/lib/beliefPresets";
 import { BELIEF_PRESET_MULTS } from "@/lib/beliefPresets";
-import { DEFAULT_LAB_ASSET_ID, LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
+import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
+import { ABSOLUTE_FALLBACK_ASSET_ID } from "@/lib/strategyLabAsset";
 
 export const PPE_BELIEF_OVERLAY_API_URL = (
   process.env.NEXT_PUBLIC_PPE_BELIEF_OVERLAY_API_URL ?? "/ppe-display-api/belief-overlay.json"
@@ -176,18 +177,15 @@ export function buildTuningPhrase(tuning: BeliefTuning): string {
 export function buildBeliefOverlayFetchUrl(
   expiry: string,
   tuning: BeliefTuning,
-  assetId: string = DEFAULT_LAB_ASSET_ID,
+  assetId: string = ABSOLUTE_FALLBACK_ASSET_ID,
   baseUrl = PPE_BELIEF_OVERLAY_API_URL,
 ): string {
   const params = new URLSearchParams({
     expiry,
     forward_mult: String(tuning.forward_mult),
     vol_mult: String(tuning.vol_mult),
+    [LAB_ASSET_QUERY_PARAM]: assetId.trim().toUpperCase(),
   });
-  const normalizedAsset = assetId.trim().toUpperCase();
-  if (normalizedAsset && normalizedAsset !== DEFAULT_LAB_ASSET_ID) {
-    params.set(LAB_ASSET_QUERY_PARAM, normalizedAsset);
-  }
   const separator = baseUrl.includes("?") ? "&" : "?";
   return `${baseUrl}${separator}${params.toString()}`;
 }
@@ -195,7 +193,7 @@ export function buildBeliefOverlayFetchUrl(
 export async function fetchBeliefOverlayPdf(
   expiry: string,
   tuning: BeliefTuning,
-  assetId: string = DEFAULT_LAB_ASSET_ID,
+  assetId: string = ABSOLUTE_FALLBACK_ASSET_ID,
 ): Promise<number[] | null> {
   if (!expiry || isMarketTuning(tuning)) return null;
   try {

@@ -25,6 +25,8 @@
 
 **Plan rule:** expression planner links, glossary, pros/cons, leg tooltips, and payoff chart axis use `assetMeta.id` from `thesis.assetId ?? ?asset=`.
 
-**Monitor rule:** `loadMonitorFeed` exposes `assetTicker` from confirmed thesis; empty/welcome cards use it for spot copy (generic fallback when unknown).
+**Session default rule:** when `?asset=` is missing, `resolveLabAssetId` picks URL → thesis → `localStorage` last pick → catalog default → allowlist[0] → `ETH` — never silently assume BTC in UI.
+
+**Monitor rule:** `loadMonitorFeed` exposes `assetTicker` from confirmed thesis; empty/welcome cards and hero subtitle follow.
 
 **Gap rule:** “The gap” must describe the disagreement in plain language (`buildGapDescription`) — not collapse to a one-word view label when implied range width is missing or zero.

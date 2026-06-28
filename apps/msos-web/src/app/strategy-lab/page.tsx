@@ -3,9 +3,13 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import { StrategyLabContent } from "@/components/StrategyLabContent";
 import {
-  fetchDisplayPayload,
-  normalizeLabAssetId,
-} from "@/lib/ppeDisplayPayload";
+  bucketsFromCatalog,
+  FALLBACK_ASSET_PICKER,
+  fetchAssetCatalogServer,
+  listSelectableAssetIds,
+} from "@/lib/ppeAssetCatalog";
+import { fetchDisplayPayload } from "@/lib/ppeDisplayPayload";
+import { resolveLabAssetId } from "@/lib/strategyLabAsset";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +26,16 @@ type StrategyLabPageProps = {
 export default async function StrategyLabPage({ searchParams }: StrategyLabPageProps) {
   const params = await searchParams;
   const rawAsset = Array.isArray(params.asset) ? params.asset[0] : params.asset;
-  const assetId = normalizeLabAssetId(rawAsset);
+  const catalog = await fetchAssetCatalogServer();
+  const allowedIds = catalog
+    ? listSelectableAssetIds(bucketsFromCatalog(catalog))
+    : listSelectableAssetIds(FALLBACK_ASSET_PICKER);
+  const assetId = resolveLabAssetId({
+    query: rawAsset,
+    catalogDefault: catalog?.default_asset_id,
+    allowedIds,
+    useStored: false,
+  });
   const displayPayload = await fetchDisplayPayload(assetId);
 
   return (

@@ -12,11 +12,10 @@ import {
 } from "@/lib/msosWorkflowStore";
 import { formatMoney, type DisplayCurrency } from "@/lib/displayCurrency";
 import {
-  DEFAULT_LAB_ASSET_ID,
   fetchDisplayPayload,
-  normalizeLabAssetId,
   resolveDisplayAssetMeta,
 } from "@/lib/ppeDisplayPayload";
+import { resolveLabAssetId } from "@/lib/strategyLabAsset";
 import type { MonitorMarkParts } from "@/lib/monitorMarkLine";
 import { formatMarkLine } from "@/lib/monitorMarkLine";
 
@@ -343,7 +342,10 @@ export async function loadMonitorFeed(
     getCurrentThesis(email),
     listPaperTrades(email),
   ]);
-  const displayAssetId = normalizeLabAssetId(thesis?.assetId ?? DEFAULT_LAB_ASSET_ID);
+  const displayAssetId = resolveLabAssetId({
+    thesisAssetId: thesis?.assetId,
+    useStored: false,
+  });
   const assetTicker = resolveDisplayAssetMeta(null, displayAssetId).id;
   const display = await fetchDisplayPayload(displayAssetId);
   const currentSpotUsd = display?.spot_usd ?? null;
