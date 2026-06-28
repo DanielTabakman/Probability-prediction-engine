@@ -397,7 +397,7 @@
     },
     {
       "chapterId": "ppe_asset_enablement_pipeline_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
@@ -407,7 +407,7 @@
     },
     {
       "chapterId": "ppe_cache_isolation_audit_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",

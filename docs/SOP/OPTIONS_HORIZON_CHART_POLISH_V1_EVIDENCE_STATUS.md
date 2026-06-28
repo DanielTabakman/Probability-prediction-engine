@@ -1,7 +1,7 @@
 # Options Horizon chart polish v1 — evidence status
 
 **Chapter:** `horizon_chart_polish_v1`  
-**Status:** **CHARTERED** (2026-06-27)  
+**Status:** **COMPLETE** 2026-06-28 (2026-06-27)  
 **SELECTION:** [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/horizon_chart_polish_v1_relay.json`](PHASE_PLANS/horizon_chart_polish_v1_relay.json)  
 **Vision:** [`CHART_DISPLAY_CONTRACT_V1.md`](../VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md)
