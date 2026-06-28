@@ -150,7 +150,7 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     assert catalog["meta"]["http_path"] == CATALOG_PAYLOAD_HTTP_PATH
     crypto = next(g for g in catalog["groups"] if g["id"] == "crypto")
     ids = [a["id"] for a in crypto["assets"]]
-    assert ids == ["BTC", "ETH"]
+    assert ids == ["BTC", "ETH", "SOL"]
     mega = next(g for g in catalog["groups"] if g["id"] == "equity_mega")
     assert [a["id"] for a in mega["assets"]] == ["NVDA"]
     assert all("venue" in a and "asset_class" in a for a in crypto["assets"])

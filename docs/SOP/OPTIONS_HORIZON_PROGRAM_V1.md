@@ -52,7 +52,7 @@ Not a broker. Not TradingView clone. Not PPE distribution histogram.
 | Chart payload API | `GET /ppe-display-api/horizon/chart.json?asset=BTC&expiry_ts=...` |
 | Region schema | [`REGION_INTENT_SCHEMA_V1.md`](../VISION/OPTIONS_HORIZON/REGION_INTENT_SCHEMA_V1.md) |
 
-**Daily ritual (after H1 ships):** run surface collector on schedule (same pattern as [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md)).
+**Daily ritual (after H1 ships):** run surface collector on schedule — [`HORIZON_SURFACE_COLLECTOR_OPS_V1.md`](HORIZON_SURFACE_COLLECTOR_OPS_V1.md) (`install_horizon_surface_collector_task.cmd` on VM).
 
 ---
 

@@ -433,7 +433,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md \u2014 chapter 5",
-      "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation"
+      "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation; promoted in queue after enablement"
     },
     {
       "chapterId": "ppe_trust_surface_v1",
@@ -454,6 +454,18 @@
       "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md \u2014 chapter 7",
       "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness"
+    },
+    {
+      "chapterId": "ppe_sol_bybit_ship_v1",
+      "status": "ready",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "urgent": true,
+      "urgentReason": "Operator SOL-first — merge PR #425 (Bybit adapter); rebase on main required",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
+      "selectionRecord": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md — SOL Bybit ship",
+      "reason": "[P0] Ship SOL via Bybit — PR #425 rebase + CI + automerge"
     },
     {
       "chapterId": "ppe_deribit_crypto_tier1_v1",
@@ -610,6 +622,14 @@
       "focusPlaybookTier": "Defer",
       "canonRef": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md \u2014 chapter 5c",
       "reason": "[LOW DEFER] Post-expiry implied vs realized ghosts"
+    },
+    {
+      "chapterId": "ppe_workflow_cost_accounting_v1",
+      "status": "done",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "canonRef": "docs/SOP/PPE_COST_ACCOUNTING_V1.md",
+      "reason": "[P2] Workflow cost accounting \u2014 lane tags, auto slice-close, summary --by-lane"
     }
   ]
 }

@@ -33,6 +33,11 @@ jobs:
       - name: Ruff (syntax / undefined names)
         run: python -m ruff check src tests scripts
 
+      - name: Token economy audit (repo overhead)
+        run: python scripts/ppe_token_audit.py --repo-root . --no-history --fail-on-watch
+        env:
+          PYTHONPATH: .
+
       - name: Run tests (parallel, excluding slow)
         run: python -m pytest -q -n auto -m "not slow"
 

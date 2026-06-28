@@ -1,6 +1,6 @@
 ---
 description: Repo layer boundaries (MSOS shell, PPE UI/core, dev factory). Required before editing src/, apps/, or scripts/.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Repo layer boundaries

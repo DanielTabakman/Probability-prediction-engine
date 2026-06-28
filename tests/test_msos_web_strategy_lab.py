@@ -275,6 +275,9 @@ def test_strategy_lab_workflow_stepper_not_primary_nav() -> None:
     assert "ContextRail" in (
         MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx"
     ).read_text(encoding="utf-8")
+    rail = (MSOS_WEB / "src" / "components" / "ContextRail.tsx").read_text(encoding="utf-8")
+    assert "context-rail-mobile" in rail
+    assert "context-rail-sheet-toggle" in rail
 
 
 def test_monitoring_history_routes_and_panels() -> None:
@@ -310,8 +313,11 @@ def test_monitoring_history_routes_and_panels() -> None:
 def test_conclusion_learn_loop_route() -> None:
     page = MSOS_WEB / "src" / "app" / "learn" / "page.tsx"
     assert page.is_file()
-    assert "ConclusionContent" in page.read_text(encoding="utf-8")
-    assert 'activeNavId="learn"' in page.read_text(encoding="utf-8")
+    learn_page = page.read_text(encoding="utf-8")
+    assert "ConclusionContent" in learn_page
+    assert 'activeNavId="learn"' in learn_page
+    assert "searchParams: Promise" in learn_page
+    assert "await searchParams" in learn_page
 
     fixtures = (MSOS_WEB / "src" / "data" / "conclusionFixtures.ts").read_text(encoding="utf-8")
     assert "What did you take away?" in fixtures

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DemoSessionDebrief } from "@/components/DemoSessionDebrief";
 import {
   conclusionHeadline,
   conclusionNarrative,
@@ -9,7 +10,11 @@ import {
 } from "@/data/conclusionFixtures";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
-export function ConclusionContent() {
+type ConclusionContentProps = {
+  highlightDebrief?: boolean;
+};
+
+export function ConclusionContent({ highlightDebrief = false }: ConclusionContentProps) {
   return (
     <>
       <header className="topline">
@@ -45,6 +50,8 @@ export function ConclusionContent() {
           </div>
         ))}
       </section>
+
+      <DemoSessionDebrief highlight={highlightDebrief} />
 
       <section className="work conclusion-layout">
         <div className="panel">

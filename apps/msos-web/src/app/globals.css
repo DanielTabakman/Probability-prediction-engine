@@ -3494,3 +3494,63 @@ button.btn:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+/* Demo session debrief (/learn?debrief=1) */
+.demo-debrief-highlight {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.demo-debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.demo-debrief-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.demo-debrief-field fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.demo-debrief-field legend {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.demo-debrief-field input[type="text"],
+.demo-debrief-field textarea {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+}
+
+.demo-debrief-notes {
+  grid-column: 1 / -1;
+}
+
+.demo-debrief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.demo-debrief-preview {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--bg);
+  overflow-x: auto;
+}

@@ -13,6 +13,7 @@ type PlatformTutorialProps = {
   active: boolean;
   onClose: () => void;
   steps?: PlatformTutorialStep[];
+  completeHref?: string;
 };
 
 type ViewportRect = {
@@ -135,7 +136,12 @@ function TutorialCard({
   );
 }
 
-export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_STEPS }: PlatformTutorialProps) {
+export function PlatformTutorial({
+  active,
+  onClose,
+  steps = PLATFORM_TUTORIAL_STEPS,
+  completeHref,
+}: PlatformTutorialProps) {
   const [stepIndex, setStepIndex] = useState(0);
   const [anchor, setAnchor] = useState<ViewportRect | null>(null);
   const [placement, setPlacement] = useState<CardPlacement>({
@@ -192,7 +198,10 @@ export function PlatformTutorial({ active, onClose, steps = PLATFORM_TUTORIAL_ST
   const finish = useCallback(() => {
     markPlatformTutorialComplete();
     onClose();
-  }, [onClose]);
+    if (completeHref && typeof window !== "undefined") {
+      window.location.assign(completeHref);
+    }
+  }, [completeHref, onClose]);
 
   const handleNext = useCallback(() => {
     if (stepIndex + 1 >= steps.length) {

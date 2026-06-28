@@ -49,11 +49,14 @@ def test_assets_registry_schema_v2() -> None:
     assert nvda.get("asset_class") == "equity_mega"
     assert nvda.get("enabled") is True
     assert nvda.get("catalog", {}).get("group") == "equity_mega"
+    sol = assets["SOL"]
+    assert sol.get("venue") == "bybit"
+    assert sol.get("enabled") is True
 
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH", "NVDA"]
+    assert list_enabled_asset_ids() == ["BTC", "ETH", "NVDA", "SOL"]
     assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
 
 
@@ -72,10 +75,12 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH", "NVDA"]
-    assert all(e["venue"] == "deribit" for e in entries if e["id"] != "NVDA")
+    assert [e["id"] for e in entries] == ["BTC", "ETH", "NVDA", "SOL"]
+    assert all(e["venue"] == "deribit" for e in entries if e["id"] in ("BTC", "ETH"))
     nvda = next(e for e in entries if e["id"] == "NVDA")
     assert nvda["venue"] == "equity"
+    sol = next(e for e in entries if e["id"] == "SOL")
+    assert sol["venue"] == "bybit"
 
 
 def test_catalog_group_order_from_tier1_manifest() -> None:
@@ -100,7 +105,7 @@ def test_spread_width_for_asset() -> None:
 
 def test_disabled_crypto_tier1_staging_rows() -> None:
     load_assets_registry.cache_clear()
-    for aid in ("SOL", "BNB", "XRP"):
+    for aid in ("BNB", "XRP"):
         assert is_asset_enabled(aid) is False
         assert get_asset(aid).get("enabled") is False
 
@@ -114,6 +119,12 @@ def test_deribit_currency_rejects_equity_asset() -> None:
     load_assets_registry.cache_clear()
     with pytest.raises(ValueError, match="equity venue"):
         deribit_currency("NVDA")
+
+
+def test_deribit_currency_rejects_bybit_asset() -> None:
+    load_assets_registry.cache_clear()
+    with pytest.raises(ValueError, match="bybit venue"):
+        deribit_currency("SOL")
 
 
 def test_spread_width_for_equity_registry() -> None:

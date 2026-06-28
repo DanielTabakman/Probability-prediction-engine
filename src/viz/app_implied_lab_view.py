@@ -67,6 +67,10 @@ from src.viz.cross_venue_export import (
     build_cross_venue_panel_rows,
     serialize_cross_venue_export_csv,
 )
+from src.viz.cross_venue_scan import (
+    build_cross_venue_scan_report,
+    render_cross_venue_scan_markdown,
+)
 from src.viz.decision_ready_review import build_decision_ready_review_payload
 from src.viz.distribution_export import (
     build_distribution_export_rows,
@@ -297,6 +301,13 @@ def render_implied_lab_bitcoin_section(
                                     mime="text/csv",
                                     key="cross_venue_prob_panel_csv",
                                 )
+                                scan_report = build_cross_venue_scan_report(cv_rows, max_rows=8)
+                                with st.expander("Cross-venue gap scan (top matches)", expanded=bool(scan_report.get("row_count"))):
+                                    if scan_report.get("row_count"):
+                                        st.markdown(render_cross_venue_scan_markdown(scan_report))
+                                        st.caption("Headless: python scripts/run_cross_venue_scan.py")
+                                    else:
+                                        st.caption("No rankable gaps (check match_status / BL marks).")
                     except Exception:
                         pass
                 expiry_options = [e["expiry_date_str"] for e in expiries]

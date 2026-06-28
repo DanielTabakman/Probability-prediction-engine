@@ -7,12 +7,14 @@ from pathlib import Path
 from src.viz.cross_venue_backtest import (
     brier_score_pct,
     build_cross_venue_backtest_report,
+    find_latest_snapshot_csv,
     gap_bucket_label,
     infer_resolved_outcome,
     merge_snapshot_history,
     render_cross_venue_backtest_markdown,
     score_question_series,
     serialize_cross_venue_backtest_json,
+    write_cross_venue_backtest_reports,
 )
 from src.viz.cross_venue_export import CSV_COLUMNS, serialize_cross_venue_export_csv
 
@@ -128,3 +130,17 @@ def test_merge_snapshot_history_sorts_by_as_of(tmp_path: Path) -> None:
 def test_csv_columns_contract() -> None:
     row = _row(as_of="2026-05-01T12:00:00+00:00")
     assert set(row.keys()) == set(CSV_COLUMNS)
+
+
+def test_find_latest_snapshot_csv(tmp_path: Path) -> None:
+    older = tmp_path / "2026-05-01" / "ppe_cross_venue_prob_panel_100000Z.csv"
+    newer = tmp_path / "2026-05-02" / "ppe_cross_venue_prob_panel_120000Z.csv"
+    _write_snapshot(older, [_row(as_of="2026-05-01T12:00:00+00:00")])
+    _write_snapshot(newer, [_row(as_of="2026-05-02T12:00:00+00:00")])
+    assert find_latest_snapshot_csv(tmp_path) == newer
+
+
+def test_write_cross_venue_backtest_reports(tmp_path: Path) -> None:
+    report = build_cross_venue_backtest_report([], min_snapshots=14)
+    md_path, json_path = write_cross_venue_backtest_reports(report, report_root=tmp_path)
+    assert md_path.name == "latest_report.md" and json_path.name == "latest_summary.json"

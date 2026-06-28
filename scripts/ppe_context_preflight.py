@@ -70,10 +70,19 @@ def run_preflight(
             pass
 
     packet_report: dict[str, object] | None = None
+    starter_report: dict[str, object] | None = None
     if slice_id:
         text = build_packet_text(repo, slice_id=slice_id, phase_plan=norm_plan)
         packet_report = score_build_packet(text)
         bands.append(str(packet_report["band"]))
+        from scripts.ppe_ide_build_starter import starter_path, starter_line_band
+
+        sp = repo / starter_path(slice_id)
+        if sp.is_file():
+            st_lines = len(sp.read_text(encoding="utf-8", errors="replace").splitlines())
+            st_band = starter_line_band(st_lines)
+            starter_report = {"path": starter_path(slice_id), "line_count": st_lines, "band": st_band}
+            bands.append(st_band)
 
     overall = worst_band(*bands) if bands else "NORMAL"
     return {
@@ -83,6 +92,7 @@ def run_preflight(
         "slice_count_band": slice_band,
         "sprint_specs": spec_reports,
         "build_packet": packet_report,
+        "ide_starter": starter_report,
         "overall_band": overall,
         "advisory_actions": advisory_actions(overall),
     }
@@ -105,6 +115,10 @@ def _print_report(report: dict[str, object]) -> None:
     bp = report.get("build_packet")
     if isinstance(bp, dict):
         print(f"  build_packet: {bp.get('band')} ({bp.get('line_count')} lines)")
+
+    st = report.get("ide_starter")
+    if isinstance(st, dict):
+        print(f"  ide_starter: {st.get('band')} ({st.get('line_count')} lines) — {st.get('path')}")
 
     print(f"  overall (advisory): {report['overall_band']}")
     for action in report.get("advisory_actions") or []:

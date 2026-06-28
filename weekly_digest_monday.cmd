@@ -18,6 +18,9 @@ if errorlevel 1 exit /b %ERRORLEVEL%
 call "%~dp0monday_morning_prep.cmd" wait
 if errorlevel 1 exit /b %ERRORLEVEL%
 
+call "%~dp0token_audit.cmd" --prune-stale
+if errorlevel 1 exit /b %ERRORLEVEL%
+
 python "%CD%\scripts\ppe_workflow_radar.py" --repo-root "%CD%" generate --no-cleanup
 if errorlevel 1 exit /b %ERRORLEVEL%
 

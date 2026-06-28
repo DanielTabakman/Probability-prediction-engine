@@ -190,6 +190,13 @@ def mark_product_ready(
         write_trigger_idle(repo, completed_slice=slice_id)
     except ImportError:
         pass
+    try:
+        from scripts.ppe_workflow_cost import record_ide_product_ready
+
+        if record_ide_product_ready(repo, slice_id=slice_id):
+            print(f"ppe_ide_product_ready: workflow cost recorded for {slice_id}")
+    except Exception as exc:
+        print(f"ppe_ide_product_ready: workflow cost skipped: {exc}")
     return 0, str(out)
 
 

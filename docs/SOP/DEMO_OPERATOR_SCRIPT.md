@@ -25,6 +25,8 @@ For **public demo** (`PPE_ENABLE_SNAPSHOTS=0`) or live walkthrough. Exploration 
 
 7. **Close (30s):** “We freeze what the system saw before outcomes so cases can be reviewed later — that’s on the private app, not this public demo.”
 
+8. **Log session (60s):** Open **Learn** (`/learn`) or finish the Strategy Lab tour — use **Log this session**. Copy the validation row or run `log_demo_session.cmd` on your desktop repo after the call.
+
 ## Reality Check #1 (demo clarity)
 
 After the session, ask: “What was the main object on screen?” Pass if they mention the chart / market-implied curve / disagreement readout.

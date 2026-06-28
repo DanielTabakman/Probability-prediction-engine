@@ -30,6 +30,13 @@ STALE_STRATEGY_LAB_MARKERS = ("Reference curve", "Options market")
 # Required in strategy-lab page chunk when labeled axes ship.
 REQUIRED_STRATEGY_LAB_MARKERS = ("BTC price at expiry",)
 
+# Mobile ContextRail bottom sheet (#436) — must ship on workflow confirm route.
+REQUIRED_CONTEXT_RAIL_MARKERS = (
+    "context-rail-mobile",
+    "context-rail-sheet-toggle",
+    "Summary & next steps",
+)
+
 # Apex must be Next.js MSOS — not legacy Streamlit demo on marketstructureos.com.
 STREAMLIT_APEX_MARKERS = ("stApp", "stDeployButton", "streamlit.io", "Made with Streamlit")
 REQUIRED_APEX_MSOS_MARKERS = ("_next/static", "Market Structure OS")
@@ -72,6 +79,24 @@ def verify_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool
     return True, None
 
 
+def verify_mobile_context_rail_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
+    """Strategy Lab confirm route must ship mobile ContextRail bottom sheet."""
+    chunks = sorted(set(re.findall(r"/_next/static/chunks/[^\"']+\.js", html)))
+    if not chunks:
+        return False, "strategy-lab/confirm page bundles missing from HTML"
+    base = base_url.rstrip("/")
+    for rel in chunks:
+        status, body, err = fetch_url(f"{base}{rel}")
+        if status != 200 or err:
+            continue
+        if all(marker in body for marker in REQUIRED_CONTEXT_RAIL_MARKERS):
+            return True, None
+    return False, (
+        "strategy-lab/confirm bundles missing mobile context rail "
+        f"({', '.join(REQUIRED_CONTEXT_RAIL_MARKERS)})"
+    )
+
+
 def verify_msos_web_apex(*, base_url: str = DEFAULT_BASE) -> tuple[bool, str | None]:
     """Apex homepage must serve Next.js MSOS shell — not Streamlit."""
     base = base_url.rstrip("/")
@@ -106,7 +131,15 @@ def verify_msos_web_ship(*, base_url: str = DEFAULT_BASE) -> tuple[bool, str | N
         return False, err or f"strategy-lab HTTP {status}"
     if "Traceback (most recent call last)" in body or "ModuleNotFoundError" in body:
         return False, "strategy-lab HTML contains server error"
-    return verify_strategy_lab_client_bundle(body, base_url=base)
+    ok, detail = verify_strategy_lab_client_bundle(body, base_url=base)
+    if not ok:
+        return False, detail
+    confirm_status, confirm_body, confirm_err = fetch_url(f"{base}/strategy-lab/confirm")
+    if confirm_status != 200 or confirm_err:
+        return False, confirm_err or f"strategy-lab/confirm HTTP {confirm_status}"
+    if "Traceback (most recent call last)" in confirm_body or "ModuleNotFoundError" in confirm_body:
+        return False, "strategy-lab/confirm HTML contains server error"
+    return verify_mobile_context_rail_bundle(confirm_body, base_url=base)
 
 
 def main(argv: list[str] | None = None) -> int:

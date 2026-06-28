@@ -26,15 +26,15 @@ Universe v1 (`catalog.json`, registry v2, dynamic picker) proves **one** asset p
 
 ## Meta chapter sequence (relay order)
 
-Run **before or alongside** tier-1 batches. Default: finish **#1–#4** before equity tier1a; **#5–#7** before program closeout at ~20 assets.
+Run **before or alongside** tier-1 batches. Default: finish **#1–#2**, then **#5** (workflow parity), then **#3–#4**; **#6–#7** before program closeout at ~20 assets.
 
 | # | Chapter | Priority | Delivers |
 |---|---------|----------|----------|
 | 1 | [`ppe_asset_display_parity_v1`](POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md) | **HIGH** | WSGI TTL cache, asset SSR prefetch, deploy warm, Live UX |
 | 2 | [`ppe_asset_enablement_pipeline_v1`](POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md) | **HIGH** | Batch witness + scripted enable gate; `--group` witness |
+| 5 | [`msos_workflow_asset_parity_v1`](POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md) | **HIGH** | P4→P7 `?asset=` propagation — **queued #2 after enablement** (demo validation) |
 | 3 | [`ppe_cache_isolation_audit_v1`](POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md) | **HIGH** | Asset-keyed cache audit + pytest isolation witnesses |
 | 4 | [`ppe_display_cache_ops_v1`](POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md) | **MEDIUM** | Scheduled warm, cache health endpoint, ops runbook |
-| 5 | [`msos_workflow_asset_parity_v1`](POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md) | **HIGH** | P4→P7 `?asset=` propagation; monitor/thesis asset-aware |
 | 6 | [`ppe_trust_surface_v1`](POST_PPE_TRUST_SURFACE_V1_SELECTION.md) | **MEDIUM** | `trust_state` + `trust_notes` surfaced consistently in MSOS |
 | 7 | [`msos_production_multi_asset_witness_v1`](POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md) | **HIGH** | Production witness: catalog + display per enabled asset |
 
