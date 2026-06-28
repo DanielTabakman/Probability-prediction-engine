@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `8655062` — fix(msos-ui): optional assetId in workflow step href builder (#493) (`apps/msos-web/`)
+- `db18a06` — Control-plane: dev changelog
 - `9269d1c` — horizon_chart_polish: closeout evidence COMPLETE + manifest idle (#491) (`docs/SOP/`)
 - `9445887` — ops: loop publish ops/loop-publish-20260628123222-3c11472 (#490) (`docs/SOP/`)
 - `4d99fb5` — ops: loop publish ops/loop-publish-20260628080002-094de88 (#470) (`docs/SOP/`)
