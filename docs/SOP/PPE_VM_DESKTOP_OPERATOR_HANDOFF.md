@@ -36,6 +36,8 @@ Desktop shortcuts: run `setup_operator_shortcuts.cmd` once (or auto from **DESKT
 
 **Remote triage from daily PC:** `ssh ppeloop@desktop-caqll8k` — see [`PPE_CURSOR_REMOTE_SSH_V1.md`](PPE_CURSOR_REMOTE_SSH_V1.md).
 
+**Remote publish (agents):** `vm_remote_publish.cmd` — commits staged `docs/SOP/*` on the VM and **loop-publishes** via `ops/loop-publish-*` + PR. **Do not** `git push origin main` over SSH (no TTY → credential hang; main is PR-only anyway). Use `DESKTOP_CONTINUE.cmd --no-pause` for non-interactive agent runs.
+
 ---
 
 ## Healthy VM status (example)
