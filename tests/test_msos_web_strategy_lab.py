@@ -230,6 +230,44 @@ def test_nav_enables_strategy_lab() -> None:
     assert "labHref" in cc
 
 
+def test_expression_plan_propagates_selected_asset() -> None:
+    panel = (MSOS_WEB / "src" / "components" / "ExpressionPlanningPanel.tsx").read_text(
+        encoding="utf-8"
+    )
+    tooltips = (MSOS_WEB / "src" / "lib" / "planLegTooltips.ts").read_text(encoding="utf-8")
+    review = (MSOS_WEB / "src" / "lib" / "tradeReviewCopy.ts").read_text(encoding="utf-8")
+    chart = (MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx").read_text(encoding="utf-8")
+
+    assert "resolveDisplayAssetMeta(null, normalizeLabAssetId(thesis.assetId ?? assetId))" in panel
+    assert "buildWorkflowStepHref(\"confirm\", assetId)" in panel
+    assert "priceAxisLabel={assetMeta.price_axis_label" in panel
+    assert "assetTicker={assetMeta.id}" in panel
+    assert "buildTradeProsCons(" in panel and "assetMeta.id" in panel
+
+    assert "assetTicker: string = DEFAULT_LAB_ASSET_ID" in tooltips
+    assert "${ticker} rises" in tooltips
+
+    assert "assetTicker: string = DEFAULT_LAB_ASSET_ID" in review
+    assert "${ticker} lands in your range" in review
+
+    assert "priceAxisLabel" in chart
+    assert "BTC price at expiry" not in chart
+
+
+def test_monitor_propagates_thesis_asset() -> None:
+    feed = (MSOS_WEB / "src" / "lib" / "monitorHistoryFeed.ts").read_text(encoding="utf-8")
+    monitor = (MSOS_WEB / "src" / "components" / "MonitorContent.tsx").read_text(encoding="utf-8")
+    empty = (MSOS_WEB / "src" / "components" / "MonitorEmptyState.tsx").read_text(encoding="utf-8")
+    welcome = (MSOS_WEB / "src" / "components" / "MonitorWelcomeCard.tsx").read_text(encoding="utf-8")
+
+    assert "assetTicker: string" in feed
+    assert "resolveDisplayAssetMeta(null, displayAssetId).id" in feed
+    assert "assetTicker={feed.assetTicker}" in monitor
+    assert "assetTicker?: string" in empty
+    assert "live ${ticker}" in empty or "live ${ticker}" in welcome
+    assert "assetTicker?: string" in welcome
+
+
 def test_expression_planning_route_and_narrative() -> None:
     page = MSOS_WEB / "src" / "app" / "strategy-lab" / "expression" / "page.tsx"
     assert page.is_file()
@@ -260,7 +298,7 @@ def test_expression_planning_route_and_narrative() -> None:
     assert "Suggested trade vs market" in (
         MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
     ).read_text(encoding="utf-8")
-    assert "BTC price at expiry" in (
+    assert "priceAxisLabel" in (
         MSOS_WEB / "src" / "components" / "ExpressionPayoffChart.tsx"
     ).read_text(encoding="utf-8")
 

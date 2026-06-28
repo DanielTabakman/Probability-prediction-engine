@@ -30,6 +30,7 @@ type ExpressionPayoffChartProps = {
   spotUsd: number;
   marketExpectationUsd?: number;
   expiryLabel: string;
+  priceAxisLabel?: string;
   curveLabels?: CurveDisplayLabels;
   loading?: boolean;
   error?: string | null;
@@ -50,6 +51,7 @@ export function ExpressionPayoffChart({
   spotUsd,
   marketExpectationUsd,
   expiryLabel,
+  priceAxisLabel = "Price at expiry",
   curveLabels = DEFAULT_CURVE_LABELS,
   loading = false,
   error = null,
@@ -194,7 +196,7 @@ export function ExpressionPayoffChart({
           <line x1={box.x1} y1={box.y0} x2={box.x1} y2={box.y1} stroke={AXIS_STROKE} />
 
           <text x={(box.x0 + box.x1) / 2} y={LAYOUT.height - 6} fill={LABEL_FILL} fontSize="10" textAnchor="middle">
-            BTC price at expiry
+            {priceAxisLabel}
           </text>
           <text
             x={12}
