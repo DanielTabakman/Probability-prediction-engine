@@ -36,7 +36,9 @@ Hierarchy: **MSOS → Options Horizon** (peer to Strategy Lab) → consumes PPE 
 | **H1** | Surface archive | `horizon_surface_archive_v1` | Daily options surface snapshots + query API |
 | **H2** | Chart payload | `horizon_chart_payload_v1` | JSON contract + Streamlit spike |
 | **H3** | Read-only chart | `horizon_readonly_chart_v1` | MSOS `/options-horizon` spot + volume + forward |
-| **H4** | Region + bridge | `horizon_region_draw_v1`, `horizon_expression_bridge_v1` | Box draw, implied mass, Strategy Lab deep-link |
+| **H4** | Region + bridge | `horizon_region_draw_v1`, `horizon_expression_bridge_v1` | Box draw, implied mass, Strategy Lab deep-link — **COMPLETE** (v1 spike) |
+| **H4c** | Chart polish | `horizon_chart_polish_v1` | Implied overlay, axis/legend parity, expiry selector — **CHARTERED** |
+| **H4d** | Region workflow | `horizon_region_workflow_v1` | MSOS persistence for RegionIntent — **CHARTERED** |
 | **H5** | Deferred overlays | `horizon_replay_scrubber_v1`, etc. | Replay after ≥30d archive; liquidation TBD |
 
 ---
