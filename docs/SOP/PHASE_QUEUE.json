@@ -317,8 +317,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[HIGH] Meta #2 IDE BUILD \u2014 enablement pipeline",
+      "status": "READY",
+      "reason": "[HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md"
     },
     {
@@ -428,9 +428,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[LOW] Gap scoring backtest \u2014 product slice shipped (#415)",
-      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
+      "doneReason": "marked DONE by manual closeout recovery 2026-06-28"
     }
   ]
 }
