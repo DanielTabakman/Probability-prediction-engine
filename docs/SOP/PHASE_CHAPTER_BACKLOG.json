@@ -610,6 +610,14 @@
       "focusPlaybookTier": "Defer",
       "canonRef": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md \u2014 chapter 5c",
       "reason": "[LOW DEFER] Post-expiry implied vs realized ghosts"
+    },
+    {
+      "chapterId": "ppe_workflow_cost_accounting_v1",
+      "status": "done",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "canonRef": "docs/SOP/PPE_COST_ACCOUNTING_V1.md",
+      "reason": "[P2] Workflow cost accounting — lane tags, auto slice-close, summary --by-lane"
     }
   ]
 }
