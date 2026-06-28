@@ -618,6 +618,16 @@
       "focusPlaybookTier": "P2",
       "canonRef": "docs/SOP/PPE_COST_ACCOUNTING_V1.md",
       "reason": "[P2] Workflow cost accounting \u2014 lane tags, auto slice-close, summary --by-lane"
+    },
+    {
+      "chapterId": "ppe_operator_multi_lane_v1",
+      "status": "chartered",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_operator_multi_lane_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_OPERATOR_MULTI_LANE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_OPERATOR_MULTI_LANE_V1.md",
+      "reason": "[MEDIUM] One loop driver + per-lane IDE checkout \u2014 blocked until ppe_display_cache_ops_v1 COMPLETE (meta #4)"
     }
   ]
 }
