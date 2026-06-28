@@ -7,6 +7,7 @@ import io
 from typing import Any, Callable
 
 from src.data.assets_registry import asset_venue, default_asset_id, is_usd_premium_options_venue
+from src.viz.distribution_summary_panel import annotate_export_rows_trust
 from src.engine.implied_distribution import (
     build_distribution_chart_data,
     density_distribution_stats,
@@ -123,7 +124,8 @@ def build_distribution_export_rows(
     if is_usd_premium_options_venue(asset):
         from src.data.equity_distribution_export import build_equity_distribution_export_rows
 
-        return build_equity_distribution_export_rows(
+        return annotate_export_rows_trust(
+            build_equity_distribution_export_rows(
             as_of_utc=as_of_utc,
             spot_usd=spot_usd,
             expiries=expiries,
@@ -131,6 +133,7 @@ def build_distribution_export_rows(
             marks_full_fn=marks_full_fn,
             now_ms=now_ms,
             asset_id=asset,
+            )
         )
     rows: list[dict[str, str]] = []
     for exp in expiries:
@@ -232,7 +235,7 @@ def build_distribution_export_rows(
                 bl_ln_mean_gap_usd=float(bl_stats["mean_usd"]) - float(ln_stats["mean_usd"]),
             )
         )
-    return rows
+    return annotate_export_rows_trust(rows)
 
 
 def serialize_distribution_export_csv(rows: list[dict[str, str]]) -> str:

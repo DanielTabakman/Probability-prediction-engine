@@ -44,7 +44,19 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_trust_surface_v1",
+        "chapterTitle": "PPE trust surface v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_TRUST_SURFACE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
+        ]
+      }
     }
   ]
 }

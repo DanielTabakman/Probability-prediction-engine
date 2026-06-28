@@ -29,10 +29,14 @@ import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 import {
   LAB_DATA_DEMO_PILL,
   LAB_DATA_LOADING_PILL,
+  LAB_DEGRADED_BANNER_TITLE,
   LAB_DEMO_BANNER_TITLE,
+  LAB_THIN_CHAIN_BANNER_TITLE,
   labDataLivePill,
+  labDegradedBannerBody,
   labDemoBannerBody,
   labLoadingBannerBody,
+  labThinChainBannerBody,
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
 import {
@@ -249,12 +253,22 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       ) : null}
 
       {mode === "live" && trustState === "thin_chain" ? (
-        <div className="lab-data-banner loading" role="status">
+        <div className="lab-data-banner thin-chain" role="status">
           <span className="tag amber">Thin chain</span>
-          <p>
-            Options liquidity is limited for {assetMeta.label}. Curves may be approximate — check
-            catalog trust notes before trading.
-          </p>
+          <div>
+            <strong>{LAB_THIN_CHAIN_BANNER_TITLE}</strong>
+            <p>{labThinChainBannerBody(assetMeta)}</p>
+          </div>
+        </div>
+      ) : null}
+
+      {mode === "live" && trustState === "degraded" ? (
+        <div className="lab-data-banner degraded" role="status">
+          <span className="tag amber">Caution</span>
+          <div>
+            <strong>{LAB_DEGRADED_BANNER_TITLE}</strong>
+            <p>{labDegradedBannerBody(assetMeta)}</p>
+          </div>
         </div>
       ) : null}
 

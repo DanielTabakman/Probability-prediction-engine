@@ -154,6 +154,9 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     mega = next(g for g in catalog["groups"] if g["id"] == "equity_mega")
     assert [a["id"] for a in mega["assets"]] == ["NVDA"]
     assert all("venue" in a and "asset_class" in a for a in crypto["assets"])
+    nvda = mega["assets"][0]
+    assert isinstance(nvda.get("trust_notes"), list)
+    assert nvda["trust_notes"]
 
 
 def test_wsgi_app_serves_catalog_json() -> None:
