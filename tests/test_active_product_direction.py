@@ -20,7 +20,7 @@ REPO = Path(__file__).resolve().parents[1]
 def test_load_direction_has_pivot() -> None:
     d = load_direction(REPO)
     assert d.pivot_id == "trader-workflow-integration-v1"
-    assert d.active_chapter_id == "ppe_asset_enablement_pipeline_v1"
+    assert d.active_chapter_id == "ppe_sol_bybit_ship_v1"
     assert d.milestone_label == "Trader Workflow Integration v1"
     prior = {m["id"]: m for m in d.raw.get("priorMilestones", [])}
     assert prior["ppe_crypto_multi_asset_v1"]["status"] == "COMPLETE"
