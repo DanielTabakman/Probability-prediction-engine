@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from src.data.assets_registry import load_assets_registry
+from src.data.assets_registry import default_asset_id, load_assets_registry
 from src.viz.lab_asset_selection import (
     LAB_ASSET_QUERY_PARAM,
     display_asset_meta,
@@ -24,8 +24,9 @@ def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
     assert normalize_lab_asset_id("ETH") == "ETH"
     assert normalize_lab_asset_id("NVDA") == "NVDA"
     assert normalize_lab_asset_id("SOL") == "SOL"
-    assert normalize_lab_asset_id("DOGE") == "BTC"
-    assert normalize_lab_asset_id(None) == "BTC"
+    default = default_asset_id()
+    assert normalize_lab_asset_id("DOGE") == default
+    assert normalize_lab_asset_id(None) == default
 
 
 def test_lab_asset_id_from_environ_query_param() -> None:
