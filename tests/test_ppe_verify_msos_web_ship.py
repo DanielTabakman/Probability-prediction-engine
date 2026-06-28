@@ -76,3 +76,46 @@ def test_verify_msos_web_apex_accepts_nextjs() -> None:
         ship.fetch_url = original
     assert ok is True
     assert err is None
+
+
+def test_verify_mobile_context_rail_bundle_accepts_shipped_markers() -> None:
+    html = (
+        '<script src="/_next/static/chunks/app/strategy-lab/confirm/page.js"></script>'
+        '<script src="/_next/static/chunks/shared.js"></script>'
+    )
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("shared.js"):
+            return (
+                200,
+                "context-rail-mobile context-rail-sheet-toggle Summary & next steps",
+                None,
+            )
+        return 404, "", "not found"
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = ship.verify_mobile_context_rail_bundle(html, base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is True
+    assert err is None
+
+
+def test_verify_mobile_context_rail_bundle_rejects_missing_markers() -> None:
+    html = '<script src="/_next/static/chunks/app/strategy-lab/confirm/page.js"></script>'
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("page.js"):
+            return 200, "context-rail desktop only", None
+        return 404, "", "not found"
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = ship.verify_mobile_context_rail_bundle(html, base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is False
+    assert "mobile context rail" in (err or "")
