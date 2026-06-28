@@ -456,6 +456,18 @@
       "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness"
     },
     {
+      "chapterId": "ppe_sol_bybit_ship_v1",
+      "status": "ready",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "urgent": true,
+      "urgentReason": "Operator SOL-first — merge PR #425 (Bybit adapter); rebase on main required",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
+      "selectionRecord": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+      "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md — SOL Bybit ship",
+      "reason": "[P0] Ship SOL via Bybit — PR #425 rebase + CI + automerge"
+    },
+    {
       "chapterId": "ppe_deribit_crypto_tier1_v1",
       "status": "done",
       "priority": "high",

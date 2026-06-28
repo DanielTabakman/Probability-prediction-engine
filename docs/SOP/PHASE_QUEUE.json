@@ -316,6 +316,16 @@
       "doneReason": "marked DONE by post_relay_continue (chapter closeout VM 2026-06-27)"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
+      "status": "READY",
+      "reason": "[P0] Operator SOL — ship PR #425 (Bybit adapter + enabled SOL)",
+      "selectionPrep": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+      "urgent": true,
+      "urgentReason": "SOL blocked until PR #425 rebased on main and merged",
+      "focusPlaybookTier": "P1",
+      "workerMode": "local-agent"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
       "status": "READY",
       "reason": "[HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
