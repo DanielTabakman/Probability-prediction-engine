@@ -31,6 +31,11 @@ def infer_slice_kind(slice_id: str, slice_obj: dict[str, Any] | None) -> str:
         return "smoke"
     if "CONTROL" in sid or "CHARTER" in sid:
         return "control"
+    if slice_obj:
+        plane = str(slice_obj.get("declaredPlane") or "").strip()
+        preset = str(slice_obj.get("layerPreset") or "").strip().upper()
+        if preset == "PPE_CORE" and plane == "PRODUCT-PLANE":
+            return "product"
     if "PRODUCT" in sid:
         return "product"
     return "evidence"
