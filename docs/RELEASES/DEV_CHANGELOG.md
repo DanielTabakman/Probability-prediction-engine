@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `48bf49a` — ops(local): manifest READY after relay pass (#452)
+- `2bf70f7` — Control-plane: dev changelog
 - `88bba14` — Control-plane: dev changelog
 - `12405ff` — ops(local): manifest READY after relay pass (#453)
 - `3baadd6` — Control-plane: dev changelog
@@ -40,6 +42,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-27
 
+- `d96c9a9` — ppe_cache_isolation_audit: hook isolation pytest in enable_asset_batch (#457) (`scripts/`)
 - `61abcf2` — ops(local): manifest READY after relay pass (#455)
 - `b593b4f` — ops(local): manifest READY after relay pass (#454)
 - `8a6aeae` — fix(msos-ui): plan and monitor asset parity across workflow (#451) (`apps/msos-web/`)
