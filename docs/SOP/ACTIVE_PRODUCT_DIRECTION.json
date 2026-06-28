@@ -85,10 +85,10 @@
       "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md"
     }
   ],
-  "activeBuildChapterId": "mvp1_cross_venue_backtest_v1",
-  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
-  "activeBuildSprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md",
-  "nextStewardAction": "Relay closeout MVP1-CrossVenueBacktest-Closeout-Slice004; product slice 002 on main (#415)",
+  "activeBuildChapterId": "ppe_asset_enablement_pipeline_v1",
+  "activeBuildPlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
+  "activeBuildSprint": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
+  "nextStewardAction": "IDE BUILD PPE-EnablePipe-Core-Slice002; backtest side channel COMPLETE 2026-06-28",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

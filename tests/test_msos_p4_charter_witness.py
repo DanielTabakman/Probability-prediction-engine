@@ -67,6 +67,9 @@ PPE_DISPLAY_PARITY_PLAN = (
 MVP1_CROSS_VENUE_BACKTEST_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json"
 )
+PPE_ENABLEMENT_PIPELINE_PLAN = (
+    "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -98,6 +101,7 @@ ALLOWED_READY_PLANS = (
     PPE_COMMODITY_PROXY_PLAN,
     PPE_DISPLAY_PARITY_PLAN,
     MVP1_CROSS_VENUE_BACKTEST_PLAN,
+    PPE_ENABLEMENT_PIPELINE_PLAN,
 )
 
 
