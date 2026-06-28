@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md",
   "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness Chapter closeout backfill",
   "workerMode": "deterministic"
 }
