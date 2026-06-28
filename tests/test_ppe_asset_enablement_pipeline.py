@@ -42,6 +42,7 @@ def test_enable_asset_batch_witness_uses_manifest_slice(monkeypatch) -> None:
         return True, {"ok": True, "results": []}
 
     monkeypatch.setattr(enable_mod, "_run_witness_subprocess", fake_subprocess)
+    monkeypatch.setattr(enable_mod, "_run_cache_isolation_pytest", lambda: (True, {"ok": True}))
     args = enable_mod._parse_args(
         ["--manifest-slice", "ppe_equity_universe_tier1a_v1", "--dry-run"]
     )
@@ -50,6 +51,44 @@ def test_enable_asset_batch_witness_uses_manifest_slice(monkeypatch) -> None:
     assert len(calls) == 1
     assert "--manifest-slice" in calls[0]
     assert "ppe_equity_universe_tier1a_v1" in calls[0]
+
+
+def test_enable_asset_batch_runs_cache_isolation_pytest(monkeypatch) -> None:
+    isolation_calls: list[str] = []
+
+    def fake_subprocess(cmd):
+        return True, {"ok": True, "results": []}
+
+    def fake_isolation():
+        isolation_calls.append("run")
+        return True, {"ok": True}
+
+    monkeypatch.setattr(enable_mod, "_run_witness_subprocess", fake_subprocess)
+    monkeypatch.setattr(enable_mod, "_run_cache_isolation_pytest", fake_isolation)
+    monkeypatch.setattr(
+        enable_mod,
+        "_plan_enablement",
+        lambda asset_ids: [{"asset_id": "SOL", "action": "enable", "detail": "would set enabled: true"}],
+    )
+    assert enable_mod.main(["--group", "crypto", "--dry-run", "--json"]) == 0
+    assert isolation_calls == ["run"]
+
+
+def test_enable_asset_batch_skip_isolation(monkeypatch) -> None:
+    def fake_subprocess(cmd):
+        return True, {"ok": True, "results": []}
+
+    def fail_isolation():
+        raise AssertionError("isolation should be skipped")
+
+    monkeypatch.setattr(enable_mod, "_run_witness_subprocess", fake_subprocess)
+    monkeypatch.setattr(enable_mod, "_run_cache_isolation_pytest", fail_isolation)
+    monkeypatch.setattr(
+        enable_mod,
+        "_plan_enablement",
+        lambda asset_ids: [{"asset_id": "SOL", "action": "enable", "detail": "would set enabled: true"}],
+    )
+    assert enable_mod.main(["--group", "crypto", "--dry-run", "--skip-isolation", "--json"]) == 0
 
 
 def test_witness_group_cli_json(capsys) -> None:
