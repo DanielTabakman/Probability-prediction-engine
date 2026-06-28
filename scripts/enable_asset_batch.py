@@ -42,6 +42,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap.add_argument("--dry-run", action="store_true", help="Print plan only; do not write YAML")
     ap.add_argument("--apply", action="store_true", help="Write enabled: true after witness pass")
     ap.add_argument("--skip-witness", action="store_true", help="Skip witness subprocess (not for prod)")
+    ap.add_argument(
+        "--skip-isolation",
+        action="store_true",
+        help="Skip cache isolation pytest (not for prod enablement)",
+    )
     ap.add_argument("--live-witness", action="store_true", help="Run witness with --live vendor fetch")
     ap.add_argument("--json", action="store_true", help="Emit JSON report")
     return ap.parse_args(argv)
@@ -100,6 +105,26 @@ def _apply_enablement(asset_ids: list[str]) -> list[dict]:
     return applied
 
 
+def _run_cache_isolation_pytest() -> tuple[bool, dict]:
+    """Run parametrized cache isolation witnesses (meta infra chapter 3 gate)."""
+    cmd = [
+        sys.executable,
+        "-m",
+        "pytest",
+        "tests/test_cache_isolation_witness.py",
+        "-q",
+    ]
+    proc = subprocess.run(cmd, cwd=_REPO_ROOT, capture_output=True, text=True)
+    ok = proc.returncode == 0
+    report = {
+        "ok": ok,
+        "returncode": proc.returncode,
+        "stdout": (proc.stdout or "")[-800:],
+        "stderr": (proc.stderr or "")[-800:],
+    }
+    return ok, report
+
+
 def _run_witness_subprocess(cmd: list[str]) -> tuple[bool, dict]:
     proc = subprocess.run(cmd, cwd=_REPO_ROOT, capture_output=True, text=True)
     try:
@@ -153,17 +178,24 @@ def main(argv: list[str] | None = None) -> int:
     if to_enable and not args.skip_witness and (args.apply or args.dry_run):
         witness_ok, witness_report = _run_witness(args, to_enable, live=bool(args.live_witness))
 
+    isolation_ok = True
+    isolation_report: dict | None = None
+    if to_enable and not args.skip_isolation and (args.apply or args.dry_run):
+        isolation_ok, isolation_report = _run_cache_isolation_pytest()
+
     applied: list[dict] = []
-    if args.apply and witness_ok and to_enable:
+    if args.apply and witness_ok and isolation_ok and to_enable:
         applied = _apply_enablement(to_enable)
 
     report = {
-        "ok": witness_ok and all(r["action"] != "error" for r in plan),
+        "ok": witness_ok and isolation_ok and all(r["action"] != "error" for r in plan),
         "mode": "apply" if args.apply else "dry-run",
         "asset_ids": asset_ids,
         "plan": plan,
         "witness_ok": witness_ok,
         "witness": witness_report,
+        "isolation_ok": isolation_ok,
+        "isolation": isolation_report,
         "applied": applied,
     }
 
@@ -175,11 +207,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {row['asset_id']}: {row['action'].upper()} — {row['detail']}")
         if to_enable:
             print(f"witness: {'OK' if witness_ok else 'FAIL'}")
+            print(f"cache isolation: {'OK' if isolation_ok else 'FAIL'}")
         if applied:
             for row in applied:
                 print(f"  applied {row['asset_id']}: {row['detail']}")
 
-    if not witness_ok:
+    if not witness_ok or not isolation_ok:
         return 1
     if args.apply and to_enable and not applied:
         return 1
