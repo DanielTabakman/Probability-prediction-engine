@@ -102,7 +102,11 @@ class TestPpeWorkflowRadar(unittest.TestCase):
                 {"slice_id": "B", "completed_at": completed, "roundtrips": 3},
             ]
         )
-        self.assertEqual(cmd_generate(self.repo, week_monday=self.week, run_cleanup=False), 0)
+        with mock.patch(
+            "scripts.ppe_workflow_radar._token_friction_candidates",
+            return_value=([], {"verdict": "OK"}),
+        ):
+            self.assertEqual(cmd_generate(self.repo, week_monday=self.week, run_cleanup=False), 0)
         self.assertTrue(radar_json_path(self.repo, self.week).is_file())
         lines = load_radar_friction_lines(self.repo, self.week)
         self.assertTrue(lines)

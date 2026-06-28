@@ -1,4 +1,4 @@
-"""Tests for IDE BUILD starter generation."""
+"""Tests for minimal IDE BUILD starter generation."""
 
 from __future__ import annotations
 
@@ -7,7 +7,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.ppe_ide_build_starter import build_starter_md, format_build_closeout_section
+from scripts.ppe_ide_build_starter import (
+    STARTER_LINE_ESCALATE,
+    build_starter_md,
+    format_build_closeout_section,
+    starter_line_band,
+)
 
 
 class TestPpeIdeBuildStarter(unittest.TestCase):
@@ -27,6 +32,10 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
                             "declaredPlane": "PRODUCT-PLANE",
                             "layerPreset": "PPE_UI",
                             "buildBranch": "build/auto/Ch-Product-Slice002-local",
+                            "touchSet": ["src/viz/app.py"],
+                            "acceptance": [
+                                {"id": "renders", "check": "App renders", "verify": "tests/test_app_smoke.py"},
+                            ],
                         },
                     ],
                 }
@@ -37,7 +46,6 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
             "## Sprint intent\n\nDo thing.\n\n## Slice map\n\n| Ch-Product-Slice002 | PRODUCT | PPE_UI | x |\n",
             encoding="utf-8",
         )
-        (self.repo / "docs" / "SOP" / "AGENT_CONTINUITY_BRIEF.md").write_text("# brief\n", encoding="utf-8")
         presets_src = Path(__file__).resolve().parents[1] / "docs" / "SOP" / "REPO_LAYER_PATH_PREFIXES.json"
         if presets_src.is_file():
             (self.repo / "docs" / "SOP" / "REPO_LAYER_PATH_PREFIXES.json").write_text(
@@ -48,19 +56,19 @@ class TestPpeIdeBuildStarter(unittest.TestCase):
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def test_closeout_section_in_starter(self) -> None:
+    def test_minimal_starter_under_budget(self) -> None:
         md = build_starter_md(self.repo, slice_id="Ch-Product-Slice002", phase_plan=self.plan_rel)
-        self.assertIn("## Focus (3 lines", md)
-        self.assertIn("North star", md)
-        self.assertIn("## When done (required)", md)
-        self.assertIn("mark_ide_product_ready.cmd Ch-Product-Slice002", md)
-        self.assertIn("run_ppe_local.cmd", md)
+        lines = len(md.splitlines())
+        self.assertLessEqual(lines, STARTER_LINE_ESCALATE, msg=f"starter too long: {lines} lines")
+        self.assertIn("**Acceptance:**", md)
+        self.assertIn("`renders`", md)
+        self.assertIn("touchSet", md)
+        self.assertNotIn("Continuity excerpt", md)
+        self.assertNotIn("Slim BUILD packet", md)
+        self.assertEqual(starter_line_band(lines), "NORMAL")
 
     def test_format_build_closeout_section(self) -> None:
-        body = format_build_closeout_section(
-            slice_id="Ch-Product-Slice002",
-            phase_plan=self.plan_rel,
-        )
+        body = format_build_closeout_section(slice_id="Ch-Product-Slice002", phase_plan=self.plan_rel)
         self.assertIn("run_pushable_gate.py", body)
         self.assertIn(self.plan_rel, body)
 

@@ -1,6 +1,6 @@
 ---
 description: Product direction SSOT and automatic steering propagation — agents own pivots; operator does not memorize steps.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Product direction (agent-owned)

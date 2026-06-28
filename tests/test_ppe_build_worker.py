@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from scripts.ppe_build_worker import (
+    BUILD_WORKER_EVENTS_REL,
     PREF_AUTO,
     PREF_CODEX,
     WORKER_CODEX_CLI,
@@ -12,6 +13,7 @@ from scripts.ppe_build_worker import (
     WORKER_MANUAL,
     build_product_prompt,
     load_build_worker_pref,
+    read_build_worker_events,
     resolve_build_worker,
     resolve_codex_cli,
 )
@@ -310,3 +312,17 @@ def test_clear_cli_usage_exhausted_ignores_stale_log(tmp_path):
     assert cli_usage_exhausted(tmp_path) is True
     clear_cli_usage_exhausted(tmp_path)
     assert cli_usage_exhausted(tmp_path) is False
+
+
+def test_resolve_build_worker_logs_event(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_BUILD_WORKER", "codex")
+    with (
+        patch("scripts.ppe_build_worker.codex_available", return_value=True),
+        patch("scripts.ppe_build_worker._codex_cli_exhausted", return_value=False),
+        patch("scripts.ppe_ide_handoff.prefer_ide_over_cli", return_value=False),
+    ):
+        resolve_build_worker(tmp_path)
+    events = read_build_worker_events(tmp_path, limit=5)
+    assert events
+    assert events[-1].get("event") == "worker_resolve"
+    assert (tmp_path / BUILD_WORKER_EVENTS_REL).is_file()
