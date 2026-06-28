@@ -146,7 +146,7 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     ok, err = validate_asset_catalog_payload(catalog)
     assert ok is True, err
     assert catalog["kind"] == CATALOG_PAYLOAD_KIND
-    assert catalog["default_asset_id"] == "BTC"
+    assert catalog["default_asset_id"] == "ETH"
     assert catalog["meta"]["http_path"] == CATALOG_PAYLOAD_HTTP_PATH
     crypto = next(g for g in catalog["groups"] if g["id"] == "crypto")
     ids = [a["id"] for a in crypto["assets"]]
