@@ -1,9 +1,9 @@
 """Witness enabled assets: registry row + catalog entry + display boundary scaffold.
 
 Usage:
-  python -m scripts.witness_asset_catalog --asset BTC
-  python -m scripts.witness_asset_catalog --all-enabled
-  python -m scripts.witness_asset_catalog --group crypto --pre-enable
+  python scripts/witness_asset_catalog.py --asset BTC
+  python scripts/witness_asset_catalog.py --all-enabled
+  python scripts/witness_asset_catalog.py --all-enabled --live
 
 CI uses mocked display-boundary checks by default; ``--live`` hits vendor fetch paths.
 """
@@ -13,14 +13,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from src.data.assets_registry import (  # noqa: E402
+from src.data.assets_registry import (
     asset_venue,
     get_asset,
     is_asset_enabled,
@@ -28,8 +23,10 @@ from src.data.assets_registry import (  # noqa: E402
     list_asset_ids_for_manifest_chapter,
     list_enabled_asset_ids,
 )
-from src.viz.embed_display_boundary import (  # noqa: E402
+from src.viz.embed_display_boundary import (
+    CATALOG_PAYLOAD_KIND,
     build_asset_catalog_response,
+    build_distribution_display_payload,
     validate_asset_catalog_payload,
     witness_display_boundary_for_asset,
 )
@@ -37,18 +34,13 @@ from src.viz.embed_display_boundary import (  # noqa: E402
 
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Witness tradeable asset catalog + display boundary")
-    ap.add_argument("--asset", action="append", default=[], help="Asset id (repeatable)")
+    ap.add_argument("--asset", help="Single asset id (e.g. BTC, ETH, NVDA)")
     ap.add_argument("--group", help="Witness all assets in catalog.group (e.g. crypto, equity_index)")
     ap.add_argument(
         "--manifest-slice",
         help="Witness assets declared in tier1 manifest chapter id",
     )
     ap.add_argument("--all-enabled", action="store_true", help="Witness every enabled registry asset")
-    ap.add_argument(
-        "--pre-enable",
-        action="store_true",
-        help="Validate disabled registry rows (enablement gate; mocked display boundary)",
-    )
     ap.add_argument("--live", action="store_true", help="Use live vendor fetch for display boundary")
     ap.add_argument("--json", action="store_true", help="Emit JSON report on stdout")
     return ap.parse_args(argv)
@@ -64,7 +56,6 @@ def run_witness(
     asset_ids: list[str],
     *,
     live: bool = False,
-    pre_enable: bool = False,
 ) -> dict[str, Any]:
     catalog_ok, catalog_msg, catalog = witness_catalog_shape()
     results: list[dict[str, Any]] = []
@@ -78,7 +69,7 @@ def run_witness(
             all_ok = False
             continue
 
-        if not is_asset_enabled(aid) and not pre_enable:
+        if not is_asset_enabled(aid):
             results.append(
                 {
                     "asset_id": aid,
@@ -90,7 +81,7 @@ def run_witness(
             )
             continue
 
-        ok, detail = witness_display_boundary_for_asset(aid, live=live, pre_enable=pre_enable)
+        ok, detail = witness_display_boundary_for_asset(aid, live=live)
         results.append(
             {
                 "asset_id": aid,
@@ -107,28 +98,25 @@ def run_witness(
         "catalog_ok": catalog_ok,
         "catalog_detail": catalog_msg,
         "enabled_count": len(list_enabled_asset_ids()),
-        "pre_enable": pre_enable,
         "results": results,
         "catalog": catalog if catalog_ok else None,
     }
 
 
-def resolve_asset_ids(args: argparse.Namespace) -> list[str]:
-    if args.asset:
-        return sorted({str(a).strip().upper() for a in args.asset if str(a).strip()})
-    if args.group:
-        return list_asset_ids_for_catalog_group(args.group, enabled_only=False)
-    if args.manifest_slice:
-        return list_asset_ids_for_manifest_chapter(args.manifest_slice)
-    if args.all_enabled:
-        return list_enabled_asset_ids()
-    return ["BTC", "ETH", "NVDA"]
-
-
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
-    asset_ids = resolve_asset_ids(args)
-    report = run_witness(asset_ids, live=bool(args.live), pre_enable=bool(args.pre_enable))
+    if args.asset:
+        asset_ids = [str(args.asset).strip().upper()]
+    elif args.group:
+        asset_ids = list_asset_ids_for_catalog_group(args.group, enabled_only=False)
+    elif args.manifest_slice:
+        asset_ids = list_asset_ids_for_manifest_chapter(args.manifest_slice)
+    elif args.all_enabled:
+        asset_ids = list_enabled_asset_ids()
+    else:
+        asset_ids = ["BTC", "ETH", "NVDA"]
+
+    report = run_witness(asset_ids, live=bool(args.live))
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
