@@ -35,8 +35,16 @@ python -c "from src.data.horizon_surface_archive import archive_meta, default_ar
 On **Hyper-V loop host** (`ppeloop`), from repo root after `git pull`:
 
 ```bash
+setup_vm_hands_off.cmd
+```
+
+Or install collector only:
+
+```bash
 install_horizon_surface_collector_task.cmd
 ```
+
+`setup_vm_hands_off.cmd` is idempotent — registers logon stack, watchdog, daily collector, ensures stack is running, and seeds one archive snapshot.
 
 | Item | Value |
 |------|--------|
