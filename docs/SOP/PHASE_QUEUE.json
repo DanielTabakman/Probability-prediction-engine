@@ -364,9 +364,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness",
-      "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
