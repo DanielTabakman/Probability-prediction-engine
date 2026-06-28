@@ -1,5 +1,4 @@
 import {
-  DEFAULT_LAB_ASSET_ID,
   LAB_ASSET_QUERY_PARAM,
   type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
@@ -18,15 +17,13 @@ export const STRATEGY_LAB_WORKFLOW_STEPS: { id: StrategyLabWorkflowStep; label: 
   { id: "plan", label: "Plan paper trade" },
 ];
 
-export function buildWorkflowStepHref(
-  step: StrategyLabWorkflowStep,
-  assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
-): string {
+export function buildWorkflowStepHref(step: StrategyLabWorkflowStep, assetId: LabAssetId): string {
   const path = STEP_PATHS[step];
-  if (assetId === DEFAULT_LAB_ASSET_ID) {
+  const normalized = assetId.trim().toUpperCase();
+  if (!normalized) {
     return path;
   }
-  return `${path}?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(assetId)}`;
+  return `${path}?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(normalized)}`;
 }
 
 export function workflowStepIndex(step: StrategyLabWorkflowStep): number {

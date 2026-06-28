@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -22,12 +21,11 @@ import { loadStoredBeliefTuning, type BeliefTuning } from "@/lib/beliefTuning";
 import {
   buildStrategyLabPath,
   fetchDisplayPayloadClient,
-  LAB_ASSET_QUERY_PARAM,
-  normalizeLabAssetId,
   resolveDisplayAssetMeta,
   type DisplayPayload,
 } from "@/lib/ppeDisplayPayload";
 import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
+import { useResolvedLabAssetId } from "@/lib/useResolvedLabAssetId";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import {
   THESIS_PERSISTENCE_LABEL,
@@ -39,9 +37,8 @@ import {
 import { DEMO_FOOTER, WORKSPACE_SAVED_LABEL } from "@/lib/publicCopy";
 
 export function ThesisConfirmationPanel() {
-  const searchParams = useSearchParams();
-  const assetId = normalizeLabAssetId(searchParams.get(LAB_ASSET_QUERY_PARAM));
   const [record, setRecord] = useState(defaultThesisRecord);
+  const assetId = useResolvedLabAssetId({ thesisAssetId: record.assetId });
   const [hydrated, setHydrated] = useState(false);
   const [persistError, setPersistError] = useState<string | null>(null);
   const [displayPayload, setDisplayPayload] = useState<DisplayPayload | null>(null);

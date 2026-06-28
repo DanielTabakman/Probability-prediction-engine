@@ -7,7 +7,7 @@ import type {
   StrategySuggestionSummary,
   TradeReviewBlock,
 } from "@/lib/ppeStrategySuggestion";
-import { DEFAULT_LAB_ASSET_ID } from "@/lib/ppeDisplayPayload";
+import { ABSOLUTE_FALLBACK_ASSET_ID } from "@/lib/strategyLabAsset";
 
 export function stripReviewMd(text: string): string {
   return text.replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1").trim();
@@ -52,9 +52,9 @@ export function buildTradeProsCons(
   reviewPayoffLine: string | null | undefined,
   formatMoney: (usd: number) => string,
   tradeReview?: TradeReviewBlock | null,
-  assetTicker: string = DEFAULT_LAB_ASSET_ID,
+  assetTicker: string = ABSOLUTE_FALLBACK_ASSET_ID,
 ): TradeProsCons {
-  const ticker = assetTicker.trim() || DEFAULT_LAB_ASSET_ID;
+  const ticker = assetTicker.trim() || ABSOLUTE_FALLBACK_ASSET_ID;
   const apiStrengths = firstLines(tradeReview?.strengths, 4);
   const apiRisks = firstLines(tradeReview?.risks, 4);
   if (apiStrengths.length || apiRisks.length) {

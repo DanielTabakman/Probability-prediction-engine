@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { buildStrategyLabPath, DEFAULT_LAB_ASSET_ID } from "@/lib/ppeDisplayPayload";
+import { buildStrategyLabPath } from "@/lib/ppeDisplayPayload";
 
 type MonitorEmptyStateProps = {
   assetTicker?: string;
@@ -9,9 +9,7 @@ type MonitorEmptyStateProps = {
 export function MonitorEmptyState({ assetTicker }: MonitorEmptyStateProps) {
   const ticker = assetTicker?.trim();
   const spotPhrase = ticker ? `live ${ticker}` : "live spot";
-  const labHref = buildStrategyLabPath(
-    ticker && ticker.toUpperCase() !== DEFAULT_LAB_ASSET_ID ? ticker : DEFAULT_LAB_ASSET_ID,
-  );
+  const labHref = buildStrategyLabPath(ticker ?? "");
 
   return (
     <div className="monitor-empty-state" role="status">
