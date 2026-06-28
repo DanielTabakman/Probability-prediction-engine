@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- `9269d1c` — horizon_chart_polish: closeout evidence COMPLETE + manifest idle (#491) (`docs/SOP/`)
+- `9445887` — ops: loop publish ops/loop-publish-20260628123222-3c11472 (#490) (`docs/SOP/`)
+- `4d99fb5` — ops: loop publish ops/loop-publish-20260628080002-094de88 (#470) (`docs/SOP/`)
+- `f7e9831` — Control-plane: dev changelog
 - `54ec8f6` — ppe_cache_isolation_audit: evidence COMPLETE for chapter closeout (`docs/SOP/`)
 - `41badca` — Control-plane: dev changelog
 - `7808bb7` — ops: loop publish ops/loop-publish-20260628061056-ee4ea03 (#461) (`docs/SOP/`)
