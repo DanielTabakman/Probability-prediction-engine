@@ -1,7 +1,7 @@
 # PPE asset enablement pipeline v1 — evidence status
 
 **Chapter:** `ppe_asset_enablement_pipeline_v1`  
-**Status:** **CHARTERED** (SELECTED 2026-06-27)  
+**Status:** **COMPLETE** 2026-06-28 (SELECTED 2026-06-27)  
 **SELECTION:** [`POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md`](POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json`](PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json)
 

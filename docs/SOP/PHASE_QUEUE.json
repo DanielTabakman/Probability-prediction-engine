@@ -318,7 +318,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
       "status": "READY",
-      "reason": "[P0] Operator SOL — ship PR #425 (Bybit adapter + enabled SOL)",
+      "reason": "[P0] Operator SOL \u2014 ship PR #425 (Bybit adapter + enabled SOL)",
       "selectionPrep": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
       "urgent": true,
       "urgentReason": "SOL blocked until PR #425 rebased on main and merged",
@@ -442,6 +442,12 @@
       "reason": "[LOW] Gap scoring backtest \u2014 product slice shipped (#415)",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "doneReason": "marked DONE by manual closeout recovery 2026-06-28"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md"
     }
   ]
 }

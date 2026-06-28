@@ -11,8 +11,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
-- **Active relay chapter:** `ppe_asset_enablement_pipeline_v1` · plan [`ppe_asset_enablement_pipeline_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json)
-- **Next steward action:** VM RUN_AUTO — ppe_asset_enablement_pipeline_v1 Control-Slice001 relay; horizon chart polish product slices shipped (#429/#430)
+- **Active relay chapter:** `ppe_sol_bybit_ship_v1` · plan [`ppe_sol_bybit_ship_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json)
+- **Next steward action:** IDE BUILD ppe_sol_bybit_ship_v1 — rebase PR #425 on main, green CI, automerge (SOL Bybit live)
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)

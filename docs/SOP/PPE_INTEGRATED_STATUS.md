@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-27 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-06-28 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -15,9 +15,9 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Direction pivot** | `trader-workflow-integration-v1` (2026-06-27) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
-| **Active BUILD** | `ppe_asset_enablement_pipeline_v1` — [`SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md`](docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md) |
-| **Relay plan** | [`ppe_asset_enablement_pipeline_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json) |
-| **Next** | VM RUN_AUTO — ppe_asset_enablement_pipeline_v1 Control-Slice001 relay; horizon chart polish product slices shipped (#429/#430) |
+| **Active BUILD** | `ppe_sol_bybit_ship_v1` — [`SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md`](docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md) |
+| **Relay plan** | [`ppe_sol_bybit_ship_v1_relay.json`](docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json) |
+| **Next** | IDE BUILD ppe_sol_bybit_ship_v1 — rebase PR #425 on main, green CI, automerge (SOL Bybit live) |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -158,6 +158,8 @@ flowchart LR
 
 | PPE equity universe tier-1c v1 (mega caps batch 2) | **COMPLETE** 2026-06-27 | [`SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md`](docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md), [`PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md) |
 
+| PPE asset enablement pipeline v1 | **COMPLETE** 2026-06-28 | [`SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md`](docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md), [`PPE_ASSET_ENABLEMENT_PIPELINE_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_ASSET_ENABLEMENT_PIPELINE_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -217,4 +219,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md`](docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md`](docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
