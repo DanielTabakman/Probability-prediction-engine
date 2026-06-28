@@ -54,6 +54,7 @@ import { buildPlainLegSummary, buildTradeProsCons } from "@/lib/tradeReviewCopy"
 import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
+import { relabelPlanLegsForAsset } from "@/lib/planLegDisplay";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 function familyIdForPreset(presetId?: string): string {
@@ -198,7 +199,7 @@ export function ExpressionPlanningPanel() {
       }
       if (!abort.cancelled) setExpiry(resolvedExpiry);
 
-      const payload = await fetchStrategySuggestion(resolvedExpiry, tuning);
+      const payload = await fetchStrategySuggestion(resolvedExpiry, tuning, assetId);
       if (abort.cancelled) return;
       if (!payload) {
         setSuggestion(null);
@@ -234,10 +235,10 @@ export function ExpressionPlanningPanel() {
     return {
       headline: suggested.name ?? suggested.preset_label ?? optimizedPlan.headline,
       summary,
-      legs: suggested.legs,
+      legs: relabelPlanLegsForAsset(suggested.legs, assetId),
       familyId: familyIdForPreset(suggested.preset_id),
     };
-  }, [suggestion, record]);
+  }, [suggestion, record, assetId]);
 
   async function simulateExpression() {
     const tuning = loadStoredBeliefTuning();
@@ -263,6 +264,7 @@ export function ExpressionPlanningPanel() {
       savedAt: new Date().toISOString(),
       expiryDate: expiry ?? suggestion?.expiry_date,
       instrument: thesis.instrument,
+      assetId,
       beliefSnapshot,
       markAtSave,
     };

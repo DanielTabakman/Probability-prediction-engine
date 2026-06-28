@@ -219,8 +219,10 @@ def test_confirm_page_propagates_selected_asset() -> None:
     assert "I think ${asset.id} will" in lib
     assert "buildGapDescription" in lib
     assert "assetId: asset.id" in lib
+    assert "optionsVenueReferenceLabel" in lib
+    assert "optionsTrustSourceLabel" in lib
 
-    assert "REGISTRY_DEFAULT_ASSET_ID" in payload_lib
+    assert "optionsVenueReferenceLabel" in payload_lib
     assert "fallbackMetaForAsset" in payload_lib
 
 
@@ -248,6 +250,18 @@ def test_expression_plan_propagates_selected_asset() -> None:
     assert "priceAxisLabel={assetMeta.price_axis_label" in panel
     assert "assetTicker={assetMeta.id}" in panel
     assert "buildTradeProsCons(" in panel and "assetMeta.id" in panel
+    assert "fetchStrategySuggestion(resolvedExpiry, tuning, assetId)" in panel
+    assert "relabelPlanLegsForAsset" in panel
+    assert "assetId," in panel or "assetId:" in panel
+
+    suggestion_lib = (MSOS_WEB / "src" / "lib" / "ppeStrategySuggestion.ts").read_text(
+        encoding="utf-8"
+    )
+    assert "LAB_ASSET_QUERY_PARAM" in suggestion_lib
+    assert "buildStrategySuggestionFetchUrl" in suggestion_lib
+
+    leg_display = (MSOS_WEB / "src" / "lib" / "planLegDisplay.ts").read_text(encoding="utf-8")
+    assert "relabelPlanLegsForAsset" in leg_display
 
     assert "assetTicker: string = ABSOLUTE_FALLBACK_ASSET_ID" in tooltips
     assert "${ticker} rises" in tooltips
@@ -273,7 +287,11 @@ def test_session_lab_asset_resolution() -> None:
     assert "resolveLabAssetId" in page
     assert "useStored: false" in page
     assert "DEFAULT_LAB_ASSET_ID" not in workflow
-    assert "buildWorkflowStepHref(step, assetId)" in workflow or "assetId: LabAssetId" in workflow
+    assert (
+        "buildWorkflowStepHref(step, assetId)" in workflow
+        or "assetId: LabAssetId" in workflow
+        or "assetId?: LabAssetId" in workflow
+    )
 
 
 def test_monitor_propagates_thesis_asset() -> None:
