@@ -341,9 +341,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Meta #3 IDE BUILD \u2014 cache isolation audit",
-      "selectionPrep": "docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json",
@@ -447,7 +448,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md"
     }
