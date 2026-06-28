@@ -29,7 +29,7 @@ def test_assets_registry_schema_v2() -> None:
     reg = load_assets_registry()
     assert registry_version() == 2
     assert reg.get("version") == 2
-    assert default_asset_id() == "BTC"
+    assert default_asset_id() == "ETH"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
     assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
@@ -93,7 +93,7 @@ def test_catalog_group_order_from_tier1_manifest() -> None:
 def test_deribit_currency_from_registry() -> None:
     assert deribit_currency("BTC") == "BTC"
     assert deribit_currency("ETH") == "ETH"
-    assert deribit_currency(None) == "BTC"
+    assert deribit_currency(None) == "ETH"
 
 
 def test_spread_width_for_asset() -> None:

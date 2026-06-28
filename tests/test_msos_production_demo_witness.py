@@ -163,3 +163,71 @@ def test_collect_fixture_warnings() -> None:
     assert "fixture_preview_metrics" in ids
     assert "fixture_footer" in ids
     assert "fixture_preview_pill" in ids
+
+
+def test_playwright_live_pill_spot_assets_cover_nvda_and_non_btc_crypto() -> None:
+    from scripts.msos_production_playwright_witness import LIVE_PILL_SPOT_ASSETS
+    from scripts.msos_production_demo_witness import MULTI_ASSET_DISPLAY_PROBE_IDS
+
+    assert "NVDA" in LIVE_PILL_SPOT_ASSETS
+    assert "ETH" in LIVE_PILL_SPOT_ASSETS
+    assert "BTC" not in LIVE_PILL_SPOT_ASSETS
+    assert set(LIVE_PILL_SPOT_ASSETS).issubset(set(MULTI_ASSET_DISPLAY_PROBE_IDS))
+
+
+def test_playwright_validate_strategy_lab_live_pill_html_nvda_ok() -> None:
+    from scripts.msos_production_playwright_witness import (
+        LIVE_PILL_EXPECTED,
+        validate_strategy_lab_live_pill_html,
+    )
+
+    html = (
+        '<header><div class="crumb">Strategy Lab · NVDA options</div>'
+        '<span class="pill live" role="status"><span class="dot"></span>'
+        "Live · equity options chain</span></header>"
+        '<div data-asset="NVDA"></div>'
+    )
+    ok, err = validate_strategy_lab_live_pill_html(
+        html,
+        asset_id="NVDA",
+        expected_pill=LIVE_PILL_EXPECTED["NVDA"],
+    )
+    assert ok is True
+    assert err is None
+
+
+def test_playwright_validate_strategy_lab_live_pill_html_eth_ok() -> None:
+    from scripts.msos_production_playwright_witness import (
+        LIVE_PILL_EXPECTED,
+        validate_strategy_lab_live_pill_html,
+    )
+
+    html = (
+        '<span class="pill live" role="status">Live · Deribit options</span>'
+        "Strategy Lab · ETH options ETH"
+    )
+    ok, err = validate_strategy_lab_live_pill_html(
+        html,
+        asset_id="ETH",
+        expected_pill=LIVE_PILL_EXPECTED["ETH"],
+    )
+    assert ok is True
+    assert err is None
+
+
+def test_playwright_validate_strategy_lab_live_pill_html_sample_mode() -> None:
+    from scripts.msos_production_playwright_witness import (
+        LIVE_PILL_EXPECTED,
+        validate_strategy_lab_live_pill_html,
+    )
+
+    html = '<div class="lab-data-banner demo">Sample mode — not live market data</div>'
+    ok, err = validate_strategy_lab_live_pill_html(
+        html,
+        asset_id="NVDA",
+        expected_pill=LIVE_PILL_EXPECTED["NVDA"],
+    )
+    assert ok is False
+    assert err is not None
+    assert "sample" in err.lower()
+

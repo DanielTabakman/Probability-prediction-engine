@@ -4,6 +4,26 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-28
 
+- ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#537)
+- `f8f2f63` — Control-plane: dev changelog
+- ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#536)
+- ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#535)
+- ops: loop publish build/auto/MSOS-MultiAssetWit-Product-Slice003 (#534)
+- ops: loop publish build/auto/MSOS-MultiAssetWit-Product-Slice003 (#533) (`scripts/`)
+- `bb69281` — control-plane: whats-next after cross-venue collector #529 merge (#532) (`docs/SOP/`)
+- `e8460b4` — Control-plane: dev changelog
+- `be830cd` — ppe_asset_enablement_pipeline: Core-Slice002 pre-enable witness gate (#438) (`scripts/`)
+- `f00f0f5` — control: cross-venue daily pipeline + VM scheduler (#529) (`docs/SOP/`)
+- `953a591` — control: cost accounting v2 — operator lane line, backfill, USD estimates (#530) (`docs/SOP/`)
+- `b714767` — chore(control-plane): VM hands-off setup — stack, watchdog, horizon collector (#531) (`docs/SOP/`)
+- `8c58929` — ops(control-plane): close VM loop-host git push human backlog items (#528) (`docs/SOP/`)
+- `c04df36` — Control-plane: dev changelog
+- `28f5484` — feat(msos-ui): Playwright Live pill spot check for NVDA and ETH (#527) (`apps/msos-web/`)
+- `b9d240b` — control-plane: close ppe_trust_surface_v1 and promote multi-asset witness (#526) (`docs/SOP/`)
+- `127cf93` — ops: loop publish ops/loop-publish-20260628175546-2e0096b (#525) (`docs/SOP/`)
+- `99016e3` — product: PPE-TrustSurf-Product-Slice003 MSOS trust banners and notes (#524) (`apps/msos-web/`)
+- `79407cc` — control-plane: promote ppe_trust_surface_v1 to READY (#523) (`docs/SOP/`)
+- `5df0b92` — Control-plane: dev changelog
 - `24342a8` — ops: loop publish ops/loop-publish-20260628160437-0e13df0 (#503)
 - `d45d7d2` — ops: loop publish ops/loop-publish-20260628162028-d849b8c (#514)
 - `1e8a03a` — ops: loop publish ops/loop-publish-20260628162447-d849b8c (#516)

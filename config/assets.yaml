@@ -3,7 +3,7 @@
 # Tier-1 staging rows: config/assets_tier1_manifest.yaml (merged per relay chapter).
 
 version: 2
-default_asset_id: BTC
+default_asset_id: ETH
 
 assets:
   BTC:

@@ -45,13 +45,13 @@ const STOCK_GROUP_IDS = new Set(["equity_index", "equity_mega", "commodity_proxy
 /** Static fallback when catalog.json is unavailable (matches legacy lab allowlist). */
 export const FALLBACK_ASSET_PICKER: AssetPickerBuckets = {
   crypto: [
-    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
     {
       id: "ETH",
       label: "ETH options",
       catalog_group: "crypto",
       trust_notes: ["Thinner books than BTC — BL curve may be noisier; surface trust state in lab."],
     },
+    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
   ],
   stocks: [
     {

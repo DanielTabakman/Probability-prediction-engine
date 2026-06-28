@@ -278,13 +278,15 @@ def test_expression_plan_propagates_selected_asset() -> None:
 
 def test_session_lab_asset_resolution() -> None:
     asset_lib = (MSOS_WEB / "src" / "lib" / "strategyLabAsset.ts").read_text(encoding="utf-8")
+    payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     hook = (MSOS_WEB / "src" / "lib" / "useResolvedLabAssetId.ts").read_text(encoding="utf-8")
     page = (MSOS_WEB / "src" / "app" / "strategy-lab" / "page.tsx").read_text(encoding="utf-8")
     workflow = (MSOS_WEB / "src" / "lib" / "strategyLabWorkflow.ts").read_text(encoding="utf-8")
 
     assert "resolveLabAssetId" in asset_lib
     assert "loadStoredLabAssetId" in asset_lib
-    assert 'ABSOLUTE_FALLBACK_ASSET_ID = "ETH"' in asset_lib
+    assert 'ABSOLUTE_FALLBACK_ASSET_ID = SYSTEM_DEFAULT_ASSET_ID' in asset_lib
+    assert 'SYSTEM_DEFAULT_ASSET_ID = "ETH"' in payload_lib
     assert "thesisAssetId" in asset_lib
     assert "useResolvedLabAssetId" in hook
     assert "resolveLabAssetId" in page

@@ -52,6 +52,7 @@ def test_build_distribution_export_rows_lognormal_and_skipped_bl() -> None:
         forward_iv_fn=_fwd_iv,
         marks_full_fn=_marks,
         now_ms=exp_ts - 86400000 * 30,
+        asset_id="BTC",
     )
     assert len(rows) == 2
     assert rows[0]["asset"] == "BTC"

@@ -14,6 +14,7 @@ import argparse
 import json
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -28,6 +29,8 @@ from scripts.msos_playwright_session import (
 )
 from scripts.msos_production_demo_witness import (
     DEFAULT_BASE,
+    LAB_ASSET_QUERY_PARAM,
+    MULTI_ASSET_DISPLAY_PROBE_IDS,
     _utc_now,
     validate_display_api_response,
     validate_strategy_lab_html,
@@ -41,6 +44,103 @@ JOURNEY: tuple[tuple[str, str], ...] = (
     ("/strategy-lab/confirm", "thesis_confirm"),
     ("/command-center", "command_center"),
 )
+
+# Non-BTC catalog spot checks — NVDA (equity) + one crypto (ETH).
+REQUIRED_LIVE_PILL_SPOTS: tuple[tuple[str, str], ...] = (
+    ("NVDA", "Live · equity options chain"),
+    ("ETH", "Live · Deribit options"),
+)
+
+LIVE_PILL_EXPECTED: dict[str, str] = dict(REQUIRED_LIVE_PILL_SPOTS)
+
+LIVE_PILL_SPOT_ASSETS: tuple[str, ...] = tuple(
+    aid for aid in MULTI_ASSET_DISPLAY_PROBE_IDS if aid in LIVE_PILL_EXPECTED
+)
+
+LIVE_PILL_WAIT_MS = 120_000
+
+
+def _missing_live_pill_spot_assets() -> list[str]:
+    return [aid for aid, _ in REQUIRED_LIVE_PILL_SPOTS if aid not in LIVE_PILL_SPOT_ASSETS]
+
+
+def validate_strategy_lab_live_pill_html(
+    html: str,
+    *,
+    asset_id: str,
+    expected_pill: str,
+) -> tuple[bool, str | None]:
+    """True when Strategy Lab shows the live data pill for the requested asset."""
+    if "Sample mode — not live market data" in html:
+        return False, "Strategy Lab rendered sample fixtures — live display API not loaded"
+    if "Sample data · not live" in html:
+        return False, "Live pill shows sample/demo mode"
+    if expected_pill not in html:
+        return False, f"expected live pill {expected_pill!r} not in page HTML"
+    if 'class="pill live"' not in html and "pill live" not in html:
+        return False, "live pill CSS class not present (may still be loading or demo)"
+    aid = asset_id.strip().upper()
+    if aid not in html:
+        return False, f"{aid} not present in Strategy Lab HTML"
+    return True, None
+
+
+def _wait_for_live_pill_html(
+    page: Any,
+    *,
+    asset_id: str,
+    expected_pill: str,
+    timeout_ms: int = LIVE_PILL_WAIT_MS,
+) -> tuple[str, bool, str | None]:
+    deadline = time.monotonic() + timeout_ms / 1000
+    last_html = ""
+    last_err: str | None = "live pill did not appear within timeout"
+    while time.monotonic() < deadline:
+        last_html = page.content()
+        if "Sample data · not live" in last_html or "Sample mode — not live market data" in last_html:
+            return last_html, False, "Strategy Lab in sample/demo mode"
+        ok, err = validate_strategy_lab_live_pill_html(
+            last_html,
+            asset_id=asset_id,
+            expected_pill=expected_pill,
+        )
+        if ok:
+            return last_html, True, None
+        if "Loading live data" not in last_html:
+            last_err = err
+        page.wait_for_timeout(750)
+    return last_html, False, last_err
+
+
+def _spot_check_strategy_lab_live_pill(
+    page: Any,
+    *,
+    base: str,
+    asset_id: str,
+    expected_pill: str,
+    shot_dir: Path,
+) -> dict[str, Any]:
+    url = f"{base}/strategy-lab?{LAB_ASSET_QUERY_PARAM}={asset_id}"
+    page.goto(url, wait_until="networkidle", timeout=90_000)
+    dismiss_platform_tutorial_if_visible(page)
+    _, ok, err = _wait_for_live_pill_html(
+        page,
+        asset_id=asset_id,
+        expected_pill=expected_pill,
+    )
+    key = f"strategy_lab_live_pill_{asset_id.lower()}"
+    shot_path = shot_dir / f"{key}.png"
+    page.screenshot(path=str(shot_path), full_page=True)
+    return {
+        "id": key,
+        "url": url,
+        "ok": ok,
+        "status": 200,
+        "error": err,
+        "asset_id": asset_id,
+        "expected_pill": expected_pill,
+        "screenshot": str(shot_path.as_posix()),
+    }
 
 
 def _ensure_playwright() -> None:
@@ -170,6 +270,32 @@ def run_playwright_witness(
                 else None,
             }
         )
+
+        for asset_id in _missing_live_pill_spot_assets():
+            checks.append(
+                {
+                    "id": f"strategy_lab_live_pill_{asset_id.lower()}",
+                    "url": None,
+                    "ok": False,
+                    "status": 0,
+                    "error": f"{asset_id} missing from multi-asset display probe catalog",
+                    "asset_id": asset_id,
+                    "expected_pill": LIVE_PILL_EXPECTED[asset_id],
+                    "screenshot": None,
+                }
+            )
+
+        for asset_id in LIVE_PILL_SPOT_ASSETS:
+            expected_pill = LIVE_PILL_EXPECTED[asset_id]
+            checks.append(
+                _spot_check_strategy_lab_live_pill(
+                    page,
+                    base=base,
+                    asset_id=asset_id,
+                    expected_pill=expected_pill,
+                    shot_dir=shot_dir,
+                )
+            )
 
         browser.close()
 

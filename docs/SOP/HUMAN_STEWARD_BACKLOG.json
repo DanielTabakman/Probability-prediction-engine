@@ -129,22 +129,36 @@
     {
       "id": "vm_loop_host_git_push_credentials",
       "title": "VM loop-host git push credentials",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "category": "ops",
       "summary": "run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.",
       "added": "2026-06-26",
+      "closed": "2026-06-27",
+      "source": "context_window_closeout",
+      "notes": "Verified 2026-06-27: gh auth logged in on VM; ops/loop-publish PRs merging (#413-426)."
+    },
+    {
+      "id": "cross_venue_collector_vm_install",
+      "title": "Cross-venue collector VM task (ppeloop)",
+      "status": "open",
+      "priority": "medium",
+      "category": "ops",
+      "summary": "After #529 merge on main: on ppeloop run git pull, install_cross_venue_collector_task.cmd (daily 07:15), smoke run_cross_venue_daily.cmd. Runbook: CROSS_VENUE_COLLECTOR_OPS_V1.md.",
+      "added": "2026-06-28",
       "source": "context_window_closeout"
     },
     {
       "id": "ppeloop_gh_auth_setup_git",
       "title": "ppeloop gh auth setup-git",
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "category": "ops",
       "summary": "VM loop cannot push ops/loop-publish branches; run gh auth setup-git on ppeloop@desktop-caqll8k",
       "added": "2026-06-27",
-      "source": "context_window_closeout"
+      "closed": "2026-06-27",
+      "source": "context_window_closeout",
+      "notes": "Same resolution as vm_loop_host_git_push_credentials — loop publish working."
     }
   ]
 }

@@ -315,7 +315,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     }
 
 
-def _format_human(status: dict[str, Any]) -> str:
+def _format_human(status: dict[str, Any], repo: Path | None = None) -> str:
     lines = [
         f"VERDICT: {status.get('verdict')}",
         "",
@@ -336,6 +336,13 @@ def _format_human(status: dict[str, Any]) -> str:
         f"blocked={backlog.get('blocked', 0)} "
         f"queue_READY={supply.get('queue_ready', 0)}"
     )
+    try:
+        from scripts.ppe_workflow_cost import operator_lane_line
+
+        if repo is not None:
+            lines.append(operator_lane_line(repo))
+    except Exception:
+        pass
     next_promo = supply.get("next_promotable_blocked")
     if isinstance(next_promo, dict) and next_promo.get("chapterId"):
         lines.append(f"Next after closeout: {next_promo.get('chapterId')} ({next_promo.get('planPath')})")
@@ -393,7 +400,7 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 **As-of:** {status.get("as_of")}
 **Verdict:** `{status.get("verdict")}`
 
-{_format_human(status)}
+{_format_human(status, repo)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
     return out
@@ -540,7 +547,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.brief:
         print(_format_brief(status))
     else:
-        print(_format_human(status), end="")
+        print(_format_human(status, repo), end="")
 
     if args.notify and status.get("verdict") in STOP_VERDICTS:
         from scripts.ppe_guard_notify_dedup import record_guard_notify, should_skip_guard_notify

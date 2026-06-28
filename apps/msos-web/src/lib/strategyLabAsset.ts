@@ -1,17 +1,18 @@
 /**
  * Strategy Lab asset selection — session + thesis aware (display only).
- * Prefer last-selected / confirmed asset over registry BTC default.
+ * Prefer last-selected / confirmed asset over registry default.
  */
 
 import {
   LAB_ASSET_QUERY_PARAM,
+  SYSTEM_DEFAULT_ASSET_ID,
   type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
 
 export const STRATEGY_LAB_ASSET_STORAGE_KEY = "msos.strategy_lab.asset.v1";
 
-/** Last-resort UI fallback when catalog + session are unavailable (not registry SSOT). */
-export const ABSOLUTE_FALLBACK_ASSET_ID = "ETH";
+/** Last-resort UI fallback when catalog + session are unavailable. */
+export const ABSOLUTE_FALLBACK_ASSET_ID = SYSTEM_DEFAULT_ASSET_ID;
 
 const LAB_ASSET_ID_PATTERN = /^[A-Z][A-Z0-9._-]{0,11}$/;
 
