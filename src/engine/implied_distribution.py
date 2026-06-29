@@ -330,20 +330,57 @@ def build_distribution_chart_data(
     }
 
 
-def market_implied_density_breeden_litzenberger(
+_SG_SMOOTH_COEFFS: dict[int, tuple[tuple[float, ...], float]] = {
+    3: ((1.0, 1.0, 1.0), 3.0),
+    5: ((-3.0, 12.0, 17.0, 12.0, -3.0), 35.0),
+}
+
+
+def _savitzky_golay_smooth(values: list[float], window: int = 5) -> list[float]:
+    """Centered Savitzky-Golay smooth (quadratic, deriv=0) on a uniform grid."""
+    n = len(values)
+    if n < 3:
+        return list(values)
+    eff_window = window if n >= window else 3
+    coeffs, norm = _SG_SMOOTH_COEFFS[eff_window]
+    half = eff_window // 2
+    out = list(values)
+    for i in range(half, n - half):
+        segment = values[i - half : i + half + 1]
+        out[i] = sum(c * v for c, v in zip(coeffs, segment, strict=True)) / norm
+    return out
+
+
+def smooth_bl_density(
+    prices: list[float],
+    pdf_raw: list[float],
+    *,
+    window: int = 5,
+) -> list[float]:
+    """
+    Smooth a Breeden-Litzenberger density on a price grid before final normalization.
+
+    Applies Savitzky-Golay filtering, clamps negatives to zero, then area-normalizes
+    via trapezoid integration so the result integrates to ~1.
+    """
+    if len(prices) < 2 or len(pdf_raw) != len(prices):
+        return [0.0] * len(pdf_raw)
+    if max(pdf_raw) <= 0:
+        return [0.0] * len(pdf_raw)
+    smoothed = _savitzky_golay_smooth(pdf_raw, window=window)
+    smoothed = [max(0.0, float(v)) for v in smoothed]
+    return _normalize_density(prices, smoothed)
+
+
+def _bl_density_from_calls(
     strikes: list[float],
     call_prices_usd: list[float],
     price_grid: list[float],
 ) -> list[float]:
-    """
-    Risk-neutral density from call prices via Breeden-Litzenberger: q(K) = d²C/dK² (r=0).
-    strikes and call_prices_usd must be same length, sorted by strike.
-    Returns density on price_grid; values clamped >= 0 and normalized to integrate to 1.
-    """
+    """Raw B-L second derivative mapped onto price_grid (not area-normalized)."""
     if len(strikes) < 3 or len(strikes) != len(call_prices_usd):
         return [0.0] * len(price_grid)
     n = len(strikes)
-    # Second derivative at interior points
     q_at_strikes = [0.0] * n
     for i in range(1, n - 1):
         dk_plus = strikes[i + 1] - strikes[i]
@@ -355,8 +392,7 @@ def market_implied_density_breeden_litzenberger(
             - (call_prices_usd[i] - call_prices_usd[i - 1]) / dk_minus
         ) / (dk_plus + dk_minus)
         q_at_strikes[i] = max(0.0, d2)
-    # Interpolate onto price_grid (linear in density)
-    out = []
+    out: list[float] = []
     for p in price_grid:
         if p <= strikes[0] or p >= strikes[-1]:
             out.append(0.0)
@@ -369,12 +405,31 @@ def market_implied_density_breeden_litzenberger(
                 break
         else:
             out.append(0.0)
-    # Normalize so integral ~ 1
-    step = (price_grid[-1] - price_grid[0]) / max(len(price_grid) - 1, 1)
-    total = sum(out) * step
-    if total > 0:
-        out = [x / total for x in out]
     return out
+
+
+def market_implied_density_breeden_litzenberger(
+    strikes: list[float],
+    call_prices_usd: list[float],
+    price_grid: list[float],
+    *,
+    apply_smoothing: bool = True,
+    smooth_window: int = 5,
+) -> list[float]:
+    """
+    Risk-neutral density from call prices via Breeden-Litzenberger: q(K) = d²C/dK² (r=0).
+
+    strikes and call_prices_usd must be same length, sorted by strike.
+    When apply_smoothing is True (default), the raw second-derivative grid is passed
+    through smooth_bl_density before normalization. Returns density on price_grid;
+    values clamped >= 0 and normalized to integrate to 1.
+    """
+    if len(strikes) < 3 or len(strikes) != len(call_prices_usd):
+        return [0.0] * len(price_grid)
+    raw = _bl_density_from_calls(strikes, call_prices_usd, price_grid)
+    if apply_smoothing:
+        return smooth_bl_density(price_grid, raw, window=smooth_window)
+    return _normalize_density(price_grid, raw)
 
 
 def l2_distance_pdf(

@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import math
+
 from src.engine.implied_distribution import (
+    _integrate_density_trapezoid,
     density_distribution_stats,
     lognormal_cdf,
     lognormal_distribution_stats,
     lognormal_pdf,
+    market_implied_density_breeden_litzenberger,
     probability_above_strike_ladder_from_density,
     probability_above_strike_ladder_lognormal,
     probability_above_strike_lognormal,
@@ -74,3 +78,24 @@ def test_probability_above_strike_ladder_from_density() -> None:
     ladder = probability_above_strike_ladder_from_density(prices, pdf, [90_000.0, 110_000.0])
     assert len(ladder) == 2
     assert ladder[0]["p_above"] > ladder[1]["p_above"]
+
+
+def _bs_call(forward: float, strike: float, vol: float, T: float) -> float:
+    sigma_sqrt_t = vol * math.sqrt(T)
+    d1 = (math.log(forward / strike) + 0.5 * sigma_sqrt_t**2) / sigma_sqrt_t
+    d2 = d1 - sigma_sqrt_t
+    nd1 = 0.5 * (1.0 + math.erf(d1 / math.sqrt(2.0)))
+    nd2 = 0.5 * (1.0 + math.erf(d2 / math.sqrt(2.0)))
+    return forward * nd1 - strike * nd2
+
+
+def test_market_implied_bl_smoothed_integrates_on_fixture() -> None:
+    forward, vol, T = 100_000.0, 0.55, 0.25
+    strikes = [70_000.0 + i * 5_000.0 for i in range(15)]
+    calls = [_bs_call(forward, k, vol, T) for k in strikes]
+    step = (145_000.0 - 65_000.0) / 79
+    grid = [65_000.0 + i * step for i in range(80)]
+    pdf = market_implied_density_breeden_litzenberger(strikes, calls, grid)
+    assert min(pdf) >= 0.0
+    assert max(pdf) > 0.0
+    assert abs(_integrate_density_trapezoid(grid, pdf) - 1.0) < 0.05
