@@ -4,6 +4,25 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `3df2073` — feat(ppe-ui): exposure menu display boundary (Slice004) (#692) (`src/viz/`)
+- `005ab5c` — ops: loop publish ops/loop-publish-20260629194915-abe3b86 (#689)
+- `f3b1308` — ops: loop publish ops/loop-publish-20260629190007-4b0cc88 (#687)
+- `a6b4c90` — ops: loop publish ops/loop-publish-20260629185511-4b0cc88 (#683)
+- `6518756` — ops: loop publish ops/loop-publish-20260629185249-4b0cc88 (#681)
+- `02fcdcd` — ops: loop publish ops/loop-publish-20260629184614-4b0cc88 (#674)
+- `943eb1e` — ops: loop publish ops/loop-publish-20260629184358-4b0cc88 (#671)
+- `c986b3a` — ops: loop publish ops/loop-publish-20260629184307-4b0cc88 (#670)
+- `0640139` — ops: loop publish ops/loop-publish-20260629184019-4b0cc88 (#667)
+- `de2d1c7` — ops: loop publish ops/loop-publish-20260629183821-4b0cc88 (#665)
+- `5b9dee0` — ops: loop publish ops/loop-publish-20260629183716-4b0cc88 (#664)
+- `bec54a5` — ops: loop publish ops/loop-publish-20260629183703-4b0cc88 (#663)
+- `4649b79` — ops: loop publish ops/loop-publish-20260629183600-4b0cc88 (#662)
+- `0134f0e` — ops: loop publish ops/loop-publish-20260629183355-4b0cc88 (#660)
+- `e3acf8c` — ops: loop publish ops/loop-publish-20260629183336-4b0cc88 (#659)
+- `851ecee` — ops: loop publish ops/loop-publish-20260629183115-4b0cc88 (#657)
+- `11cde1e` — ops: loop publish ops/loop-publish-20260629182854-4b0cc88 (#654)
+- `5d05ce4` — ops: loop publish ops/loop-publish-20260629182651-4b0cc88 (#652)
+- `389a8ea` — Control-plane: dev changelog
 - `5d2487d` — ops: loop publish ops/loop-publish-20260629173415-4b0cc88 (#605)
 - `45768bb` — ops: loop publish ops/loop-publish-20260629173536-4b0cc88 (#606)
 - `cfe1197` — ops: loop publish ops/loop-publish-20260629173654-4b0cc88 (#609)
