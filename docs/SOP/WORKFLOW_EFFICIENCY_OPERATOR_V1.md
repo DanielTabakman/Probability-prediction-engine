@@ -71,12 +71,12 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 - Generated BUILD packet target ≤~80 lines
 - One Cursor thread per slice/chapter; no SELECTION+BUILD+PR mega-thread
 
-### Burst mode (adaptive)
+### Burst mode (adaptive — default)
 
 - **Start:** `python scripts/ppe_burst_plan.py --write` → `artifacts/control_plane/BURST_PLAN.json`
 - **Cap:** `min(remaining_slices, band_cap)` where band_cap is NORMAL→3 workers, WATCH→1, ESCALATE→0
 - **Sub-agents:** `IDE_BUILD` / `RUN_LOCAL` → **`@ppe-director`** spawns build/finish workers only
-- **Handoff:** `ppe_go.cmd --burst`
+- **Handoff:** `ppe_go.cmd` (burst default); `ppe_go.cmd --single` for one-shot
 - Canon: [`.cursor/rules/ppe-burst-mode.mdc`](../../.cursor/rules/ppe-burst-mode.mdc)
 
 ---
