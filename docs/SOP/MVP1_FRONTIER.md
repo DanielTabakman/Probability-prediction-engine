@@ -15,8 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — `horizon_replay_scrubber_v1` **CHARTERED** (PLANNED; promote when `archive_meta.replay_ready`) — [`POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md)
-- **Last closed chapter:** **Options Horizon region workflow v1** — **COMPLETE** 2026-06-29
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md`](docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md))
+- **Last closed chapter:** **MVP1 B-L density smoothing v1** — **COMPLETE** 2026-06-29
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
