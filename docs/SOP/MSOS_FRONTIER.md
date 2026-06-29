@@ -268,6 +268,16 @@ See [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) for propagation s
 
 **`ppe_crypto_multi_asset_v1`** is workstream **B** inside [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md). **READY** in [`PHASE_QUEUE.json`](PHASE_QUEUE.json).
 
+### Exposure menu v1 — module program — **CHARTERED**
+
+| Status | Chapter | Notes |
+|--------|---------|-------|
+| **CHARTERED** | `ppe_exposure_menu_v1` | Standalone `/exposure` — multi-rail path menu (stock + options + Planned perps). NVDA + BTC v0. |
+
+**Program:** [`EXPOSURE_MENU_PROGRAM_V1.md`](EXPOSURE_MENU_PROGRAM_V1.md) · **SELECTION:** [`POST_PPE_EXPOSURE_MENU_V1_SELECTION.md`](POST_PPE_EXPOSURE_MENU_V1_SELECTION.md) · **Relay:** [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json)
+
+Promote to **READY** when steward prioritizes over horizon replay / meta-infra.
+
 ### Non-goals (MSOS track)
 
 - Rewriting PPE math in frontend code

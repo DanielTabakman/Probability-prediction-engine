@@ -1,0 +1,273 @@
+# Exposure path catalog v1
+# Program: docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md
+# Engine activates paths per asset_class + direction; fills live fields when data exists.
+
+program_id: exposure_menu_v1
+version: 1
+
+sort_order:
+  - spot_equity
+  - listed_options_defined_risk
+  - listed_options_leaps
+  - listed_options_aggressive
+  - etf_proxy
+  - perp
+
+# Default sort within group: catalog row order (simplest first)
+
+path_templates:
+  long_stock:
+    path_id: long_stock
+    instrument_rail: spot_equity
+    label: "Own shares"
+    direction: long
+    headline: "Full upside and downside — no expiry"
+    capital_shape: "100% of position at risk on spot move"
+    leverage: none
+    time_bound: none
+    liquidity: high
+    sort_group: spot_equity
+    pros:
+      - "Simplest path — no theta decay"
+      - "Full participation in spot moves"
+    cons:
+      - "Full downside if price falls"
+      - "More capital per unit of exposure than options"
+    recommendation_status: path_not_recommendation
+
+  long_leaps_call:
+    path_id: long_leaps_call
+    instrument_rail: listed_options
+    label: "Long LEAPS call"
+    direction: long
+    headline: "Leveraged upside with premium at risk"
+    capital_shape: "Premium at risk; leverage vs spot"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_leaps
+    structure: long_call
+    min_horizon_days: 270
+    pros:
+      - "Less capital than owning shares for similar upside bias"
+      - "Defined max loss (premium paid)"
+    cons:
+      - "Time decay; must be right before expiry"
+      - "LEAPS chain may be thin — check trust badge"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  bull_call_spread_leaps:
+    path_id: bull_call_spread_leaps
+    instrument_rail: listed_options
+    label: "Bull call spread (LEAPS)"
+    direction: long
+    headline: "Defined-risk bullish options structure"
+    capital_shape: "Net debit at risk; capped upside above short strike"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_defined_risk
+    structure: bull_call_spread
+    min_horizon_days: 270
+    pros:
+      - "Lower cost than naked long call"
+      - "Max loss known at entry"
+    cons:
+      - "Upside capped at short call strike"
+      - "Still subject to time decay"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  long_near_dated_call:
+    path_id: long_near_dated_call
+    instrument_rail: listed_options
+    label: "Long call (3–6 months)"
+    direction: long
+    headline: "Shorter-dated bullish options"
+    capital_shape: "Premium at risk"
+    leverage: high
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_aggressive
+    structure: long_call
+    min_horizon_days: 60
+    max_horizon_days: 200
+    pros:
+      - "Lower premium than LEAPS"
+      - "More leverage per dollar if move is near-term"
+    cons:
+      - "Faster time decay"
+      - "Timing risk higher than LEAPS"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  long_otm_call:
+    path_id: long_otm_call
+    instrument_rail: listed_options
+    label: "Long OTM call"
+    direction: long
+    headline: "High leverage, low probability payoff"
+    capital_shape: "Small premium; likely total loss if spot stays below strike"
+    leverage: high
+    time_bound: dated
+    liquidity: low
+    sort_group: listed_options_aggressive
+    structure: long_call_otm
+    pros:
+      - "Low cash outlay for large notional exposure if right"
+    cons:
+      - "Low probability of profit vs ATM structures"
+      - "Sensitive to vol and time"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  cash_secured_put:
+    path_id: cash_secured_put
+    instrument_rail: listed_options
+    label: "Short put (cash-secured style)"
+    direction: short
+    headline: "Get paid to potentially buy at lower price"
+    capital_shape: "Obligation to buy at strike if assigned"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_defined_risk
+    structure: short_put
+    pros:
+      - "Premium income if spot stays above strike"
+      - "Effective entry lower than spot if assigned"
+    cons:
+      - "Downside like long stock below strike"
+      - "Not a pure short exposure — assignment risk"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  sector_etf_proxy:
+    path_id: sector_etf_proxy
+    instrument_rail: etf_proxy
+    label: "Sector ETF proxy"
+    direction: long
+    headline: "Broader semiconductor exposure — not single-name"
+    capital_shape: "ETF spot move risk"
+    leverage: none
+    time_bound: none
+    liquidity: planned
+    sort_group: etf_proxy
+    status: planned
+    pros:
+      - "Diversified sector exposure"
+    cons:
+      - "Not pure NVDA beta — includes other holdings"
+      - "Not connected in v0 — Planned only"
+    recommendation_status: path_not_recommendation
+
+  perp_long:
+    path_id: perp_long
+    instrument_rail: perp
+    label: "Perpetual futures (long)"
+    direction: long
+    headline: "Leveraged crypto exposure — not connected yet"
+    capital_shape: "Margin at risk; funding applies"
+    leverage: high
+    time_bound: none
+    liquidity: planned
+    sort_group: perp
+    status: planned
+    pros:
+      - "High capital efficiency on crypto"
+    cons:
+      - "Funding, liquidation, venue risk"
+      - "Not connected in v0 — Planned only"
+    recommendation_status: path_not_recommendation
+
+  crypto_spot:
+    path_id: crypto_spot
+    instrument_rail: spot_equity
+    label: "Hold spot (index price)"
+    direction: long
+    headline: "Full delta on underlying — no expiry"
+    capital_shape: "100% at risk on spot move"
+    leverage: none
+    time_bound: none
+    liquidity: high
+    sort_group: spot_equity
+    pros:
+      - "Simplest crypto exposure"
+      - "No theta"
+    cons:
+      - "Full downside"
+      - "Capital intensive vs options"
+    recommendation_status: path_not_recommendation
+
+  crypto_long_call:
+    path_id: crypto_long_call
+    instrument_rail: listed_options
+    label: "Long call"
+    direction: long
+    headline: "Leveraged upside on crypto options"
+    capital_shape: "Premium at risk (coin-denominated on Deribit)"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_leaps
+    structure: long_call
+    pros:
+      - "Defined max loss in premium"
+      - "Less capital than spot for upside bias"
+    cons:
+      - "Time decay"
+      - "Coin-margined semantics on Deribit"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+  crypto_bull_call_spread:
+    path_id: crypto_bull_call_spread
+    instrument_rail: listed_options
+    label: "Bull call spread"
+    direction: long
+    headline: "Defined-risk bullish spread"
+    capital_shape: "Net debit at risk"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_defined_risk
+    structure: bull_call_spread
+    pros:
+      - "Cheaper than naked call"
+      - "Max loss known"
+    cons:
+      - "Capped upside"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
+asset_bindings:
+  equity_mega:
+    long:
+      - long_stock
+      - bull_call_spread_leaps
+      - long_leaps_call
+      - long_near_dated_call
+      - long_otm_call
+      - sector_etf_proxy
+    short:
+      - cash_secured_put
+    neutral: []
+
+  crypto:
+    long:
+      - crypto_spot
+      - crypto_bull_call_spread
+      - crypto_long_call
+      - perp_long
+    short: []
+    neutral: []
+
+# v0 proof assets (must match asset_bindings keys via assets.yaml asset_class)
+proof_assets:
+  - NVDA
+  - BTC
+
+illustrative_size:
+  equity_shares: 100
+  crypto_notional_usd: 10000

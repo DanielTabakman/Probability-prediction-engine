@@ -52,6 +52,7 @@ Storyboard **Lens** ≈ analytical module in product language.
 | `PROJECTION` | How does options-implied structure look in **price × time**? | `options_horizon` |
 | `CONSISTENCY` | Do **related executable markets agree** after spreads and costs? | `forward_consistency` |
 | `EXPOSURE` | What **structure fits** a view under constraints (simulation)? | `expression_planner` |
+| `EXPOSURE_PATH` | What **ways exist** to get exposure to an asset (multi-rail menu)? | `exposure_menu` |
 | `EVENT_GAP` | How do **event markets** compare to options-implied probabilities? | `cross_venue_event_gap` |
 | `POSITIONING` | Where is leverage / positioning concentrated? | *(planned)* |
 | `REPLAY` | How did implied structure **evolve** over time? | *(horizon replay — planned)* |
@@ -104,7 +105,7 @@ Two axes — avoids overloading one “lane” label.
 
 | Pillar | Module examples |
 |--------|-----------------|
-| **WORKFLOW** | Workflow surfaces; expression planner (process fit) |
+| **WORKFLOW** | Workflow surfaces; expression planner (process fit); exposure menu (front door) |
 | **EDGE** | Forward consistency, cross-venue scan, expression fit math |
 | **LEGIBILITY** | Implied distribution, Options Horizon, trust surface |
 | **INFRA** | Catalog, cache health, multi-asset witnesses *(meta, not analytical modules)* |
@@ -132,6 +133,7 @@ Update at every module SELECTION / closeout. **Advance?** = steward yes/no for n
 | 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** | **yes** — radar T1–T2 |
 | 4 | `expression_planner` | Expression planner | EXPOSURE | EDGE + WORKFLOW | TRADER | `/strategy-lab/expression` | strategy suggestion boundary | T2→T3 | P1 | **LIVE** | exposure optimization depth |
 | 5 | `cross_venue_event_gap` | Cross-venue scan | EVENT_GAP | EDGE | RESEARCH | `artifacts/cross_venue_reports/` | scan JSON | T3→T3 | side | **LIVE** (ops) | backtest when history deep |
+| 6 | `exposure_menu` | Exposure menu | EXPOSURE_PATH | WORKFLOW + LEGIBILITY | TRADER | `/exposure` | `/ppe-display-api/exposure-menu.json` | —→T2 | P1 | **CHARTERED** | **yes** — v0 BUILD when READY |
 | — | *workflow* | Thesis / confirm / monitor | — | WORKFLOW | TRADER | P3–P7 routes | MSOS workflow store | — | P0 | **LIVE** | asset parity, return loop |
 
 \*Horizon replay chapters are T3+ under same module program.
@@ -256,6 +258,7 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 | [`OPTIONS_HORIZON_PROGRAM_V1.md`](OPTIONS_HORIZON_PROGRAM_V1.md) | PROJECTION module program |
 | [`FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md`](FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md) | CONSISTENCY module program |
 | [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md) | EVENT_GAP ops program |
+| [`EXPOSURE_MENU_PROGRAM_V1.md`](EXPOSURE_MENU_PROGRAM_V1.md) | EXPOSURE_PATH module program |
 
 ---
 
@@ -263,4 +266,5 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 
 | Date | Change |
 |------|--------|
+| 2026-06-29 | `exposure_menu` row — EXPOSURE_PATH class, CHARTERED v0 |
 | 2026-06-29 | v1 draft — pillars, tiers, archive charter, registry table, HTML map |

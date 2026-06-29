@@ -332,6 +332,16 @@
           <td>Backtest when deep</td>
         </tr>
         <tr>
+          <td>6</td>
+          <td><strong>Exposure menu</strong><br><code>exposure_menu</code><br>/exposure</td>
+          <td><span class="tag tag-wf">WORKFLOW</span> <span class="tag tag-leg">LEGIBILITY</span></td>
+          <td>TRADER</td>
+          <td class="tier">→ T2</td>
+          <td class="prio-p1">P1</td>
+          <td class="status-partial">CHARTERED</td>
+          <td class="advance-yes">YES — v0 BUILD</td>
+        </tr>
+        <tr>
           <td>—</td>
           <td><strong>Workflow</strong> (thesis, confirm, monitor, history)</td>
           <td><span class="tag tag-wf">WORKFLOW</span></td>
@@ -373,9 +383,11 @@
   ──────────                    ────────                         ────
   Implied distribution ──┐
   Options Horizon ───────┼──► Market relationship ──► Thesis ──► Expression ──► Monitor
-                         │    (disagreement today;              planner          ▲
-  Forward consistency ───┘     more modes later)                  (sim only)     │
-       (trust signal) ─────────────────────────────────────────────────────────────┘
+                         │    (disagreement today)              planner          ▲
+  Exposure menu ─────────┼──► (exposure-first front door)        (sim only)     │
+       (path menu)       │         │ deep-link options paths                      │
+  Forward consistency ───┘         └──────────────────────────────────────────────┘
+       (trust signal)
       </pre>
     </div>
 
@@ -410,6 +422,12 @@
         <div class="meta">EVENT_GAP · T3 ops · side channel</div>
         <p>PM vs options gap — research lane. VM daily task shipped.</p>
         <div class="next"><strong>Next:</strong> Backtest when ≥14d history; not trader nav.</div>
+      </div>
+      <div class="card">
+        <h3>6 · Exposure menu</h3>
+        <div class="meta">EXPOSURE_PATH · CHARTERED · P1 · <span class="advance-yes">ADVANCE</span></div>
+        <p>“I want NVDA exposure” → menu of paths (stock, LEAPS, spreads, Planned perps). Own /exposure route.</p>
+        <div class="next"><strong>Next:</strong> SELECTION → READY → relay v0 (NVDA + BTC).</div>
       </div>
       <div class="card">
         <h3>Meta infra (not modules)</h3>
