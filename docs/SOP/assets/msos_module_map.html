@@ -112,6 +112,20 @@
         border: 1px solid var(--line);
       }
       .flow-item small { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
+      .flow-desc {
+        display: block;
+        color: var(--text);
+        font-size: 0.76rem;
+        margin-top: 6px;
+        line-height: 1.4;
+        opacity: 0.88;
+      }
+      .flow-intro {
+        font-size: 0.84rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin: -4px 0 14px;
+      }
       .flow-arrow {
         display: flex;
         align-items: center;
@@ -240,29 +254,79 @@
     </div>
 
     <h2>Data → processing → output</h2>
+    <p class="flow-intro">
+      Raw market and operator inputs flow through Python (fetch, math, serialize). MSOS reads the results —
+      it never recomputes distributions in the browser. Each box below is <em>what it is</em> (label) plus
+      <em>what it means</em> in plain language.
+    </p>
     <div class="flow">
       <div class="flow-col">
-        <h3>Sources</h3>
-        <div class="flow-item">Deribit options chain<small>BTC, ETH, tier-1 crypto</small></div>
-        <div class="flow-item">Deribit futures / perp<small>Consistency, horizon forward</small></div>
-        <div class="flow-item">Polymarket<small>Cross-venue event probs</small></div>
-        <div class="flow-item">Asset registry / catalog<small>Enabled assets, venues</small></div>
-        <div class="flow-item">MSOS workflow store<small>Theses, paper trades</small></div>
+        <h3>Inputs (what we read)</h3>
+        <div class="flow-item">
+          Deribit options chain
+          <small>BTC, ETH, tier-1 crypto</small>
+          <span class="flow-desc">Live calls and puts across strikes and expiries — the starting point for “what price levels the options market is actually pricing in.”</span>
+        </div>
+        <div class="flow-item">
+          Deribit futures / perp
+          <small>Consistency, horizon forward</small>
+          <span class="flow-desc">Forward levels and funding context — anchors time horizons and checks that option-implied forwards agree with listed futures.</span>
+        </div>
+        <div class="flow-item">
+          Polymarket
+          <small>Cross-venue event probs</small>
+          <span class="flow-desc">Crowd-priced yes/no event contracts — compared against options-implied odds in research scans, not live trader execution.</span>
+        </div>
+        <div class="flow-item">
+          Asset registry / catalog
+          <small>Enabled assets, venues</small>
+          <span class="flow-desc">Which symbols are turned on, which venue feeds them, and trust labels — modules only run on assets we have explicitly enabled and witnessed.</span>
+        </div>
+        <div class="flow-item">
+          MSOS workflow store
+          <small>Theses, paper trades</small>
+          <span class="flow-desc">What the trader wrote down — thesis text, saved views, simulated legs — the human intent layer on top of market data.</span>
+        </div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-col">
-        <h3>Processing (Python)</h3>
-        <div class="flow-item">src/data/* fetchers</div>
-        <div class="flow-item">src/engine/* math</div>
-        <div class="flow-item">src/viz/* boundaries</div>
-        <div class="flow-item">scripts/collect_*<small>VM scheduled archives</small></div>
+        <h3>Processing (what Python does)</h3>
+        <div class="flow-item">
+          src/data/* fetchers
+          <span class="flow-desc">Pulls fresh quotes from venues, normalizes symbols, and caches with honest as-of timestamps so the UI can label staleness.</span>
+        </div>
+        <div class="flow-item">
+          src/engine/* math
+          <span class="flow-desc">Extracts risk-neutral densities, solves payoffs and strikes, runs consistency checks — all quant work lives here, not in TypeScript.</span>
+        </div>
+        <div class="flow-item">
+          src/viz/* boundaries
+          <span class="flow-desc">Streamlit lab panels and display-API serializers — turns engine objects into stable JSON shapes MSOS can render read-only.</span>
+        </div>
+        <div class="flow-item">
+          scripts/collect_*
+          <small>VM scheduled archives</small>
+          <span class="flow-desc">Scheduled snapshot jobs on the loop host — archives surfaces and status for replay, backtests, and operator evidence; not the live trader path.</span>
+        </div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-col">
-        <h3>Outputs</h3>
-        <div class="flow-item">/ppe-display-api/*.json<small>MSOS fetch only</small></div>
-        <div class="flow-item">artifacts/*<small>Ops reports, snapshots</small></div>
-        <div class="flow-item">apps/msos-web routes<small>Read-only UI</small></div>
+        <h3>Outputs (what humans see)</h3>
+        <div class="flow-item">
+          /ppe-display-api/*.json
+          <small>MSOS fetch only</small>
+          <span class="flow-desc">Pre-computed, contract-shaped payloads the Next.js app fetches — charts and summary cards without redoing distribution math in the browser.</span>
+        </div>
+        <div class="flow-item">
+          artifacts/*
+          <small>Ops reports, snapshots</small>
+          <span class="flow-desc">Cross-venue scans, surface archives, relay closeout evidence — for operators and research, not primary trader navigation.</span>
+        </div>
+        <div class="flow-item">
+          apps/msos-web routes
+          <small>Read-only UI</small>
+          <span class="flow-desc">Pages traders open — Strategy Lab, Options Horizon, workflow — display and simulation only; no order routing or brokerage hooks.</span>
+        </div>
       </div>
     </div>
 
