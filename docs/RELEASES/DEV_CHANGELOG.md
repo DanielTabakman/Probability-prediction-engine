@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `2c4d7dc` — docs(control): sync module map — exposure menu LIVE (#580) (`docs/SOP/`)
+- `d190784` — ops: loop publish ops/loop-publish-20260629164316-f06b517 (#578)
+- `adc2ea6` — ops: loop publish ops/loop-publish-20260629164324-f06b517 (#579) (`docs/SOP/`)
+- `60c5f23` — Control-plane: dev changelog
 - `7470251` — ops: loop publish ops/loop-publish-20260629151046-082d745 (#560)
 - `4fae86d` — ops: loop publish ops/loop-publish-20260629151139-082d745 (#562)
 - `7883a2d` — ops: loop publish ops/loop-publish-20260629151207-082d745 (#563)
