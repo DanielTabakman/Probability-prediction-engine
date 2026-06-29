@@ -1,7 +1,7 @@
 # MVP1 B–L density smoothing v1 — evidence status
 
 **Chapter:** `mvp1_bl_density_smoothing_v1`  
-**Status:** **IN_PROGRESS** (Slice002 merged #551 2026-06-29)  
+**Status:** **COMPLETE** 2026-06-29 (Slice002 merged #551 2026-06-29)  
 **Phase plan:** [`PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json`](PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json)
 
 | Slice | Status | Notes |
