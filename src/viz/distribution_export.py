@@ -199,7 +199,9 @@ def build_distribution_export_rows(
 
         strikes = [float(m["strike"]) for m in call_marks]
         call_usd = [float(m.get("mark_btc") or 0.0) * forward for m in call_marks]
-        market_pdf = market_implied_density_breeden_litzenberger(strikes, call_usd, prices)
+        market_pdf = market_implied_density_breeden_litzenberger(
+            strikes, call_usd, prices, apply_smoothing=True
+        )
         if not market_pdf or max(market_pdf) <= 1e-20:
             rows.append(
                 _stats_row(
@@ -231,7 +233,7 @@ def build_distribution_export_rows(
                 atm_iv_annual=vol,
                 spot_usd=spot_usd,
                 call_marks_count=str(len(call_marks)),
-                bl_status="computed",
+                bl_status="computed:smoothed",
                 bl_ln_mean_gap_usd=float(bl_stats["mean_usd"]) - float(ln_stats["mean_usd"]),
             )
         )

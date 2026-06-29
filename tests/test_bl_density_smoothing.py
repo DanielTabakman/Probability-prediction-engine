@@ -7,9 +7,13 @@ import math
 from src.engine.implied_distribution import (
     _bl_density_from_calls,
     _integrate_density_trapezoid,
+    build_distribution_chart_data,
     market_implied_density_breeden_litzenberger,
     smooth_bl_density,
 )
+from src.viz.distribution_export import build_distribution_export_rows
+from src.viz.implied_lab_derive import derive_lab_outputs
+from src.viz.implied_lab_provenance import build_trust_strip_lines
 
 
 def _black_scholes_call(forward: float, strike: float, vol: float, T: float) -> float:
@@ -115,3 +119,106 @@ def test_bl_density_from_calls_matches_unsmoothed_pipeline() -> None:
     )
     assert len(expected) == len(actual)
     assert all(abs(a - b) < 1e-12 for a, b in zip(actual, expected, strict=True))
+
+
+def _lab_state(*, bl_smoothing: bool | None = None) -> dict:
+    state = {
+        "mode": "exact_strikes",
+        "qty": 1,
+        "strikes_exact": {"k1": 90_000.0, "k2": 95_000.0, "k3": 105_000.0, "k4": 110_000.0},
+        "legs_enabled": {"use_k1": True, "use_k2": True, "use_k3": True, "use_k4": True},
+        "polarity": {"long_k1": False, "long_k2": True, "long_k3": True, "long_k4": False},
+        "user_belief": {"enabled": False},
+    }
+    if bl_smoothing is not None:
+        state["bl_density_smoothing_enabled"] = bl_smoothing
+    return state
+
+
+def _lab_market_data(forward: float = 100_000.0) -> dict:
+    vol, T = 0.5, 0.25
+    dist = build_distribution_chart_data(
+        forward=forward,
+        vol_annual=vol,
+        T_years=T,
+        price_min=forward * 0.75,
+        price_max=forward * 1.35,
+        num_points=41,
+    )
+    strikes = [85_000.0 + i * 5_000.0 for i in range(9)]
+    calls = [_black_scholes_call(forward, k, vol, T) for k in strikes]
+    call_marks = [
+        {"strike": k, "mark_btc": c / forward}
+        for k, c in zip(strikes, calls, strict=True)
+    ]
+    return {
+        "forward": forward,
+        "vol": vol,
+        "T_years": T,
+        "dist": dist,
+        "put_by_k": {90_000.0: 0.01, 95_000.0: 0.02},
+        "call_by_k": {105_000.0: 0.02, 110_000.0: 0.01},
+        "call_marks": call_marks,
+        "data_sources": ["test"],
+        "as_of_utc": "2026-06-29T00:00:00Z",
+    }
+
+
+def test_derive_lab_outputs_chart_uses_smoothed_bl_by_default() -> None:
+    outputs = derive_lab_outputs(_lab_state(), _lab_market_data())
+    helpers = outputs["chart_helpers"]
+    assert helpers.get("bl_density_smoothing_applied") is True
+    pdf = helpers.get("market_pdf_raw") or []
+    assert pdf and max(pdf) > 0.0
+    prices = _lab_market_data()["dist"]["prices"]
+    assert abs(_integrate_density_trapezoid(prices, pdf) - 1.0) < 0.08
+
+
+def test_derive_lab_outputs_raw_toggle_differs_from_smoothed() -> None:
+    market = _lab_market_data()
+    smooth = derive_lab_outputs(_lab_state(bl_smoothing=True), market)
+    raw = derive_lab_outputs(_lab_state(bl_smoothing=False), market)
+    smooth_pdf = smooth["chart_helpers"]["market_pdf_raw"]
+    raw_pdf = raw["chart_helpers"]["market_pdf_raw"]
+    assert smooth_pdf != raw_pdf
+    assert raw["chart_helpers"]["bl_density_smoothing_applied"] is False
+
+
+def test_trust_strip_labels_bl_smoothing_mode() -> None:
+    outputs = derive_lab_outputs(_lab_state(), _lab_market_data())
+    lines = build_trust_strip_lines(outputs["verification"])
+    joined = "\n".join(lines)
+    assert "Savitzky–Golay smoothed" in joined
+    mi = outputs["verification"]["density"]["market_implied"]
+    assert mi.get("bl_density_smoothing") == "applied"
+
+
+def test_export_bl_row_reflects_smoothed_density() -> None:
+    exp_ts = 1893456000000
+    forward, vol, T = 100_000.0, 0.5, 0.25
+    strikes = [85_000.0 + i * 5_000.0 for i in range(9)]
+    calls = [_black_scholes_call(forward, k, vol, T) for k in strikes]
+
+    def _fwd_iv(_exp: int, _spot: float) -> dict:
+        return {"forward": forward, "atm_iv": vol}
+
+    def _marks(_exp: int) -> dict:
+        return {
+            "calls": [
+                {"strike": k, "mark_btc": c / forward}
+                for k, c in zip(strikes, calls, strict=True)
+            ],
+        }
+
+    rows = build_distribution_export_rows(
+        as_of_utc="2026-06-29T00:00:00+00:00",
+        spot_usd=99_000.0,
+        expiries=[{"expiry_date_str": "2030-01-01", "expiry_ts": exp_ts}],
+        forward_iv_fn=_fwd_iv,
+        marks_full_fn=_marks,
+        now_ms=exp_ts - 86400000 * 30,
+        asset_id="BTC",
+    )
+    bl_row = next(r for r in rows if r["distribution"] == "market_implied_bl")
+    assert bl_row["bl_status"] == "computed:smoothed"
+    assert float(bl_row["mean_usd"]) > 0.0
