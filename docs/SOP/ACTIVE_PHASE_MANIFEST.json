@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [HIGH] Meta #7 \u2014 production multi-asset witness Chapter closeout MSOS-MultiAssetWit-Closeout-Slice004 via VM recovery. Chapter closeout PPE-CacheOps-Closeout-Slice004",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REGION_WORKFLOW_V1.md",
+  "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Options Horizon region workflow \u2014 after chart polish",
   "workerMode": "local-agent"
 }
