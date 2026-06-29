@@ -1,0 +1,57 @@
+{
+  "name": "mvp1_distribution_timeseries_collector_v1 (VM daily distribution stats collector)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MVP1-DistTs-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+      "buildBranch": "build/auto/MVP1-DistTs-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MVP1-DistTs-Product-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+      "buildBranch": "build/auto/MVP1-DistTs-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "scripts/collect_distribution_stats_snapshot.py",
+        "install_distribution_stats_collector_task.cmd",
+        "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md",
+        "tests/test_collect_distribution_stats_snapshot.py"
+      ]
+    },
+    {
+      "sliceId": "MVP1-DistTs-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+      "buildBranch": "build/auto/MVP1-DistTs-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "mvp1_distribution_timeseries_collector_v1",
+        "chapterTitle": "MVP1 distribution timeseries collector v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
+        ]
+      }
+    }
+  ]
+}

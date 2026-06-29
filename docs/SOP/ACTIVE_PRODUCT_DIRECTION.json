@@ -95,7 +95,7 @@
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "SELECTION: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop.",
+  "nextStewardAction": "BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
