@@ -18,6 +18,8 @@ Read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-onl
 | `RUN_AUTO` | VM relay only; desktop → SSH status |
 | `ERROR`/`FIX_PLAN`/`STALE_STATE` | `ppe_notify_fix.py` |
 
+**Burst (optional):** user says `burst mode` / `keep going` / `what's next until watch` → load [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc); chain up to **2** verdict cycles, then context closeout.
+
 Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 
 ## Token discipline

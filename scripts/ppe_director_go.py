@@ -18,6 +18,9 @@ from scripts.ppe_operator_status import (
 )
 
 DIRECTOR_PROMPT = "@ppe-director Director pass. Terminal loop running."
+DIRECTOR_BURST_PROMPT = (
+    "@ppe-director Burst mode. Execute verdicts until WATCH stop or max 3 workers. Terminal loop running."
+)
 
 HANDOFF_VERDICTS = PPE_GO_VERDICTS
 
@@ -43,7 +46,7 @@ def open_cursor_focus(repo: Path, focus: Path | None) -> dict[str, Any]:
     return opened
 
 
-def run_director_go(repo: Path, *, open_ide: bool = True) -> dict[str, Any]:
+def run_director_go(repo: Path, *, open_ide: bool = True, burst: bool = False) -> dict[str, Any]:
     repo = repo.resolve()
     status = collect_operator_status(repo)
     write_status_report(repo, status)
@@ -51,18 +54,20 @@ def run_director_go(repo: Path, *, open_ide: bool = True) -> dict[str, Any]:
     verdict = str(status.get("verdict") or "ERROR")
     blocker = str(status.get("blocker") or "").strip()
     needs_handoff = verdict in HANDOFF_VERDICTS
+    prompt = DIRECTOR_BURST_PROMPT if burst else DIRECTOR_PROMPT
 
     result: dict[str, Any] = {
         "verdict": verdict,
         "blocker": blocker,
         "needs_handoff": needs_handoff,
-        "prompt": DIRECTOR_PROMPT if needs_handoff else None,
+        "burst": burst,
+        "prompt": prompt if needs_handoff else None,
         "clipboard": None,
         "cursor": None,
     }
 
     if needs_handoff:
-        result["clipboard"] = copy_text_to_clipboard(DIRECTOR_PROMPT)
+        result["clipboard"] = copy_text_to_clipboard(prompt)
         if open_ide:
             focus = repo / STATUS_REPORT_REL
             result["cursor"] = open_cursor_focus(repo, focus if focus.is_file() else None)
@@ -105,9 +110,14 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Refresh operator status and hand off to @ppe-director")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--no-open", action="store_true", help="Do not open Cursor (tests / CI)")
+    ap.add_argument(
+        "--burst",
+        action="store_true",
+        help="Copy burst-mode @ppe-director prompt (chain workers until WATCH stop)",
+    )
     args = ap.parse_args(argv)
 
-    result = run_director_go(args.repo_root, open_ide=not args.no_open)
+    result = run_director_go(args.repo_root, open_ide=not args.no_open, burst=args.burst)
     print(format_user_banner(result), end="")
 
     verdict = str(result.get("verdict") or "")
@@ -116,7 +126,8 @@ def main(argv: list[str] | None = None) -> int:
     if result.get("needs_handoff"):
         clip = result.get("clipboard") or {}
         if clip.get("ok") is False and not clip.get("skipped"):
-            print("Warning: clipboard copy failed — paste manually:", DIRECTOR_PROMPT, file=sys.stderr)
+            prompt = result.get("prompt") or DIRECTOR_PROMPT
+            print("Warning: clipboard copy failed — paste manually:", prompt, file=sys.stderr)
         return 0
     return 0
 
