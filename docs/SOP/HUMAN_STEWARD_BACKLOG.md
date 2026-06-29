@@ -112,6 +112,14 @@
 - **summary:** run_ppe_local closeout on VM failed to push ops/loop-publish branch (wincredman / no TTY). Fix GitHub auth on ppeloop@desktop-caqll8k so steering docs reach main.
 - **notes:** Verified 2026-06-27: gh auth logged in on VM; ops/loop-publish PRs merging (#413-426).
 
+### Cross-venue collector VM task (ppeloop)
+
+- **id:** `cross_venue_collector_vm_install` · **priority:** medium · **category:** ops
+- **added:** 2026-06-28
+- **closed:** 2026-06-29
+- **summary:** After #529 merge on main: on ppeloop run git pull, install_cross_venue_collector_task.cmd (daily 07:15), smoke run_cross_venue_daily.cmd. Runbook: CROSS_VENUE_COLLECTOR_OPS_V1.md.
+- **notes:** 2026-06-29: tasks confirmed on ppeloop (Horizon 06:30 + Cross-Venue 07:15 Ready); smoke run wrote 2026-06-29 snapshot + latest.md/json.
+
 ### ppeloop gh auth setup-git
 
 - **id:** `ppeloop_gh_auth_setup_git` · **priority:** medium · **category:** ops
@@ -122,4 +130,4 @@
 
 ## Changelog
 
-| 2026-06-28 | Auto-render from JSON |
+| 2026-06-29 | Auto-render from JSON |

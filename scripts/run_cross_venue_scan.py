@@ -37,7 +37,19 @@ def run_cross_venue_scan(
     return report, md_path, json_path
 
 
+def _configure_stdio_utf8() -> None:
+    """Avoid UnicodeEncodeError on Windows cp1252 consoles (e.g. minus sign in gap table)."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _configure_stdio_utf8()
     ap = argparse.ArgumentParser(description="Rank cross-venue probability gaps")
     ap.add_argument("--from-snapshot", type=Path, default=None)
     ap.add_argument("--latest-snapshot", action="store_true")
