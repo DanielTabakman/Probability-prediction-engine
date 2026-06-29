@@ -1,7 +1,8 @@
 # Forward consistency radar — program v1
 
 **Module ID:** `forward_consistency`  
-**Registry:** [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md)  
+**Registry:** [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) · [`PPE_MODULE_REGISTRY.json`](PPE_MODULE_REGISTRY.json)  
+**SELECTION:** [`POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md`](POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md) (chapter 1 SELECTED 2026-06-29)
 **Class:** `CONSISTENCY`  
 **Pillars:** EDGE + LEGIBILITY  
 **First ship-to:** OPERATOR → Monitor hook at T4  
