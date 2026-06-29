@@ -254,7 +254,7 @@ def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
     changed = False
     # Canonical evidence docs use a top-level **Status:** line (not ## Chapter status).
     new_text, n = re.subn(
-        r"(^\*\*Status:\*\*\s+)\*\*[^*\n]+\*\*(?:\s+\d{4}-\d{2}-\d{2})?",
+        r"(^\*\*Status:\*\*\s+)\*\*[^*\n]+\*\*(?:\s+\d{4}-\d{2}-\d{2})?(?:\s+\([^)]*\))?",
         rf"\1**{spec.chapter_status}** {spec.closed_date}",
         text,
         count=1,
@@ -272,6 +272,16 @@ def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
             flags=re.DOTALL,
         )
         changed = True
+    if str(spec.chapter_status or "").strip().upper() == "COMPLETE":
+        table_text, table_n = re.subn(
+            r"\|\s*\*{0,2}PENDING\*{0,2}\s*\|",
+            "| COMPLETE |",
+            text,
+            flags=re.IGNORECASE,
+        )
+        if table_n:
+            text = table_text
+            changed = True
     if changed:
         path.write_text(text, encoding="utf-8")
 

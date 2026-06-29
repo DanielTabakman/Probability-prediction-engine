@@ -140,6 +140,41 @@ def test_patch_evidence_status_header(tmp_path: Path) -> None:
     assert "ACTIVE" not in text
 
 
+def test_patch_evidence_slice_table_marks_complete_on_closeout(tmp_path: Path) -> None:
+    """Closeout must clear PENDING slice rows so maybe_mark_manifest_complete can run."""
+    sop = tmp_path / "docs" / "SOP"
+    sop.mkdir(parents=True)
+    evidence = sop / "TEST_EVIDENCE.md"
+    evidence.write_text(
+        "# Test chapter — evidence status\n\n"
+        "**Status:** **IN_PROGRESS** 2026-06-01\n\n"
+        "| Slice | Status | Notes |\n"
+        "|-------|--------|-------|\n"
+        "| Test-Control-Slice001 | PENDING | Charter |\n"
+        "| Test-Product-Slice002 | COMPLETE | Core |\n"
+        "| Test-Closeout-Slice003 | **PENDING** | Closeout |\n",
+        encoding="utf-8",
+    )
+    spec = CloseoutSpec(
+        chapter_id="test_chapter",
+        chapter_title="Test chapter",
+        chapter_status="COMPLETE",
+        closed_date="2026-06-29",
+        evidence_doc="docs/SOP/TEST_EVIDENCE.md",
+        sprint_spec="docs/SOP/SPRINT_TEST.md",
+        next_selection_doc="docs/SOP/POST_TEST_SELECTION.md",
+    )
+    from scripts.ppe_queue_health import _evidence_has_pending_slices
+    from scripts.relay.apply_control_closeout import patch_evidence_chapter_status
+
+    assert _evidence_has_pending_slices(evidence.read_text(encoding="utf-8"))
+    patch_evidence_chapter_status(tmp_path, spec)
+    text = evidence.read_text(encoding="utf-8")
+    assert "**Status:** **COMPLETE** 2026-06-29" in text
+    assert "PENDING" not in text
+    assert not _evidence_has_pending_slices(text)
+
+
 def test_find_closeout_in_plan(tmp_path: Path) -> None:
     from scripts.relay.apply_control_closeout import find_closeout_for_slice, load_phase_plan
 
