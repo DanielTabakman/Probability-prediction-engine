@@ -2,7 +2,7 @@
 
 **Chapter:** `ppe_exposure_menu_v1`  
 **Module:** `exposure_menu`  
-**Status:** **CHARTERED** — BUILD not started  
+**Status:** **SELECTED** — relay active (control slice next)  
 **SELECTION:** [`POST_PPE_EXPOSURE_MENU_V1_SELECTION.md`](POST_PPE_EXPOSURE_MENU_V1_SELECTION.md)  
 **Program:** [`EXPOSURE_MENU_PROGRAM_V1.md`](EXPOSURE_MENU_PROGRAM_V1.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json)
