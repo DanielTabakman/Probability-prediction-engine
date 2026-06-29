@@ -5,8 +5,11 @@ import { MonitorDeleteNotice } from "@/components/MonitorDeleteNotice";
 import { MonitorWatchList } from "@/components/MonitorWatchList";
 import { MonitorWelcomeCard } from "@/components/MonitorWelcomeCard";
 import { MonitorEmptyState } from "@/components/MonitorEmptyState";
-import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
+import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
+import type { MonitorFeed } from "@/lib/monitorHistoryFeed";
+import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
+import { reviewTagForStatus } from "@/lib/snapshotReview";
 
 type Props = {
   feed: MonitorFeed;
@@ -26,7 +29,12 @@ function actionableAlerts(feed: MonitorFeed) {
   return feed.alerts.filter((alert) => alert.title !== "Monitoring ready");
 }
 
-export function MonitorContent({ feed }: Props) {
+export async function MonitorContent({ feed }: Props) {
+  const ownerId = await resolveWorkflowOwnerId();
+  const summary = loadCommandCenterSummary(ownerId);
+  const snapshotRows =
+    summary.status === "live" ? summary.recentSnapshots.slice(0, 8) : [];
+
   const watchCount = activeWatchCount(feed.watchPanels);
   const alerts = actionableAlerts(feed);
   const firstTrade = feed.paperTrades[0];
@@ -90,6 +98,36 @@ export function MonitorContent({ feed }: Props) {
         </div>
 
         <MonitorWatchList panels={feed.watchPanels} />
+
+        {snapshotRows.length > 0 ? (
+          <div className="monitor-snapshot-list" aria-label="Saved reads">
+            <div className="panel-head compact">
+              <h2>Saved reads</h2>
+              <span className="tag">Snapshots</span>
+            </div>
+            <p className="panel-sub micro">
+              Open a frozen market read to record a post-mortem — paper / research only.
+            </p>
+            {snapshotRows.map((row) => {
+              const { tag, tone } = reviewTagForStatus(row.reviewStatus);
+              return (
+                <Link
+                  key={row.snapshotId}
+                  href={`/monitor/snapshot/${row.snapshotId}`}
+                  className="monitor-watch-row monitor-watch-link"
+                >
+                  <div className="monitor-watch-meta">
+                    <span className={`tag ${tone ?? "amber"}`}>{tag}</span>
+                  </div>
+                  <h3>{row.summaryLine}</h3>
+                  <p>
+                    {row.expiry} · saved {row.createdAt}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        ) : null}
 
         {feed.paperTrades.length === 0 && feed.status !== "degraded" ? (
           <MonitorEmptyState assetTicker={feed.assetTicker} />
