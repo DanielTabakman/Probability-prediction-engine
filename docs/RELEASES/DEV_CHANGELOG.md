@@ -4,6 +4,20 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `fd4615f` — ops: loop publish ops/loop-publish-20260629204553-7211b5c (#740)
+- `fdb5729` — ops: loop publish ops/loop-publish-20260629204558-7211b5c (#741) (`docs/SOP/`)
+- `45371a2` — ops: loop publish ops/loop-publish-20260629204107-8b3d3d0 (#736)
+- `a2b10d7` — ops: loop publish ops/loop-publish-20260629203241-590087c (#727)
+- `70d05d9` — ops: loop publish ops/loop-publish-20260629203053-0ebc3f4 (#726)
+- `57f6edd` — ops: loop publish ops/loop-publish-20260629202832-e770c6a (#724)
+- `50f6b1e` — ops: loop publish ops/loop-publish-20260629202611-e770c6a (#723)
+- `055ec79` — ops: loop publish ops/loop-publish-20260629202355-e770c6a (#721)
+- `44016b3` — ops: loop publish ops/loop-publish-20260629202307-e770c6a (#720)
+- `20540f6` — ops: loop publish ops/loop-publish-20260629202138-e770c6a (#718)
+- `6fedc75` — ops: loop publish ops/loop-publish-20260629201922-e770c6a (#715)
+- `77af39b` — ops: loop publish ops/loop-publish-20260629201723-e770c6a (#713)
+- `9e30ba4` — ops: loop publish ops/loop-publish-20260629201356-e770c6a (#711)
+- `be9679d` — Control-plane: dev changelog
 - `c30296f` — ops: loop publish ops/loop-publish-20260629201209-e770c6a (#709)
 - `68a523c` — ops: loop publish ops/loop-publish-20260629201147-e770c6a (#708)
 - `3930bef` — ops: loop publish ops/loop-publish-20260629200815-e770c6a (#705)
