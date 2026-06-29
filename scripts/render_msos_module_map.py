@@ -32,6 +32,13 @@ PRIO_CLASS = {
     "side": "prio-side",
 }
 
+CHARTER_CLASS = {
+    "live": "charter-live",
+    "chartered": "charter-chartered",
+    "selected": "charter-selected",
+    "planned": "charter-planned",
+}
+
 
 def _repo_root(start: Path | None = None) -> Path:
     here = (start or Path(__file__)).resolve()
@@ -65,6 +72,61 @@ def _status_cell(status: str, suffix: str = "") -> str:
 def _prio_cell(priority: str) -> str:
     css = PRIO_CLASS.get(priority, "prio-side")
     return f'<td class="{css}">{_esc(priority)}</td>'
+
+
+def _doc_link(path: str | None, label: str) -> str:
+    if not path:
+        return ""
+    return f' <a class="doc-link" href="../{path.removeprefix("docs/SOP/")}">{_esc(label)}</a>'
+
+
+def _overview_areas_html(overview: dict[str, Any]) -> str:
+    blocks: list[str] = []
+    for area in overview.get("areas", []):
+        charter_cls = CHARTER_CLASS.get(area.get("charter_class", "planned"), "charter-planned")
+        highlight = " overview-highlight" if area.get("highlight") else ""
+        docs = ""
+        if area.get("program_doc"):
+            docs += _doc_link(area["program_doc"], "program")
+        if area.get("selection_doc"):
+            docs += _doc_link(area["selection_doc"], "SELECTION")
+        blocks.append(
+            f'      <article class="overview-card{highlight}">\n'
+            f'        <div class="overview-head">\n'
+            f'          <h3>{_esc(area.get("display_name", ""))}</h3>\n'
+            f'          <span class="charter-badge {charter_cls}">{_esc(area.get("charter", ""))}</span>\n'
+            f"        </div>\n"
+            f'        <div class="overview-meta">{_pillar_tags(area.get("pillars", []))}'
+            f' · <span class="tier">{_esc(area.get("status", ""))}</span>'
+            f' · tier {_esc(area.get("tier", ""))}'
+            f' · {_esc(area.get("route", ""))}{docs}</div>\n'
+            f'        <dl class="overview-dl">\n'
+            f'          <dt>Can do now</dt><dd>{_esc(area.get("can_do_now", ""))}</dd>\n'
+            f'          <dt>Why it matters</dt><dd>{_esc(area.get("why_important", ""))}</dd>\n'
+            f'          <dt>Your work</dt><dd>{_esc(area.get("your_work", ""))}</dd>\n'
+            f'          <dt>Next step</dt><dd class="next-step">{_esc(area.get("next_step", ""))}</dd>\n'
+            f"        </dl>\n"
+            f"      </article>"
+        )
+    return "\n".join(blocks)
+
+
+def _milestone_banner_html(overview: dict[str, Any]) -> str:
+    ms = overview.get("active_milestone", {})
+    if not ms:
+        return ""
+    charter = ms.get("charter_doc", "")
+    charter_link = _doc_link(charter, "milestone charter") if charter else ""
+    return (
+        '    <section class="milestone-banner">\n'
+        f'      <div class="milestone-kicker">Active milestone</div>\n'
+        f'      <h2 class="milestone-title">{_esc(ms.get("label", ""))}</h2>\n'
+        f'      <p class="milestone-north">{_esc(ms.get("north_star", ""))}</p>\n'
+        f'      <p><strong>Outcome:</strong> {_esc(ms.get("outcome", ""))}</p>\n'
+        f'      <p class="milestone-focus"><strong>Your focus today:</strong> {_esc(ms.get("your_focus_today", ""))}</p>\n'
+        f'      <p class="milestone-complete"><strong>Complete when:</strong> {_esc(ms.get("complete_when", ""))}{charter_link}</p>\n'
+        "    </section>"
+    )
 
 
 def render_html(data: dict[str, Any], *, repo_root: Path) -> str:
@@ -137,31 +199,13 @@ def render_html(data: dict[str, Any], *, repo_root: Path) -> str:
             f"<td>{_esc(tier['delivers'])}</td><td>{q}</td></tr>"
         )
 
-    cards: list[str] = []
-    for mod in data.get("modules", []):
-        advance_badge = ' · <span class="advance-yes">ADVANCE</span>' if mod.get("advance_highlight") else ""
-        cards.append(
-            '      <div class="card">\n'
-            f'        <h3>{_esc(mod["display_name"])}</h3>\n'
-            f'        <div class="meta">{_esc(mod.get("class", ""))} · '
-            f'{_esc(mod.get("tier_current", ""))} · {_esc(mod.get("priority", ""))}{advance_badge}</div>\n'
-            f'        <p>{_esc(mod.get("card_summary", ""))}</p>\n'
-            f'        <div class="next"><strong>Next:</strong> {_esc(mod.get("advance", ""))}</div>\n'
-            "      </div>"
-        )
-
-    meta = data.get("meta_infra_card", {})
-    cards.append(
-        '      <div class="card">\n'
-        f'        <h3>{_esc(meta.get("display_name", "Meta infra"))}</h3>\n'
-        f'        <div class="meta">{_esc(meta.get("detail", ""))}</div>\n'
-        f'        <p>{_esc(meta.get("card_summary", ""))}</p>\n'
-        f'        <div class="next"><strong>Next:</strong> {_esc(meta.get("advance", ""))}</div>\n'
-        "      </div>"
-    )
+    cards: list[str] = []  # legacy; overview grid replaces bottom cards
 
     open_path = html_abs.resolve()
-    file_url = open_path.as_uri()
+
+    overview = data.get("development_overview", {})
+    milestone_html = _milestone_banner_html(overview)
+    overview_html = _overview_areas_html(overview)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -170,7 +214,7 @@ def render_html(data: dict[str, Any], *, repo_root: Path) -> str:
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#05090f" />
-    <title>MSOS module map — operator</title>
+    <title>MSOS development dashboard</title>
     <style>
       :root {{
         --bg: #05090f;
@@ -378,24 +422,98 @@ def render_html(data: dict[str, Any], *, repo_root: Path) -> str:
         line-height: 1.5;
       }}
       footer {{ margin-top: 32px; font-size: 0.72rem; color: var(--muted); }}
+      .milestone-banner {{
+        background: linear-gradient(145deg, #0a1a28, #102840);
+        border: 1px solid var(--teal);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 20px;
+        max-width: 56rem;
+      }}
+      .milestone-kicker {{
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--teal);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }}
+      .milestone-title {{ margin: 0 0 8px; font-size: 1.2rem; }}
+      .milestone-north {{ color: var(--text); font-size: 0.95rem; margin: 0 0 10px; }}
+      .milestone-focus {{ color: var(--amber); margin: 10px 0 6px; }}
+      .milestone-complete {{ color: var(--muted); font-size: 0.82rem; margin: 0; }}
+      .overview-grid {{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 14px;
+        margin-bottom: 8px;
+      }}
+      .overview-card {{
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }}
+      .overview-card.overview-highlight {{
+        border-color: var(--amber);
+        box-shadow: 0 0 0 1px rgba(242, 182, 87, 0.15);
+      }}
+      .overview-head {{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }}
+      .overview-head h3 {{ margin: 0; font-size: 1rem; }}
+      .charter-badge {{
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 3px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }}
+      .charter-live {{ background: rgba(110,231,168,0.15); color: var(--green); }}
+      .charter-chartered {{ background: rgba(67,231,211,0.12); color: var(--teal); }}
+      .charter-selected {{ background: rgba(242,182,87,0.18); color: var(--amber); }}
+      .charter-planned {{ background: rgba(142,164,189,0.12); color: var(--muted); }}
+      .overview-meta {{ font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }}
+      .overview-dl {{ margin: 0; font-size: 0.8rem; }}
+      .overview-dl dt {{
+        color: var(--teal);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 8px;
+        font-weight: 700;
+      }}
+      .overview-dl dt:first-child {{ margin-top: 0; }}
+      .overview-dl dd {{ margin: 4px 0 0; color: var(--muted); }}
+      .overview-dl dd.next-step {{ color: var(--text); }}
+      a.doc-link {{ color: var(--teal); margin-left: 4px; }}
+      .details-section {{ margin-top: 28px; opacity: 0.95; }}
     </style>
   </head>
   <body>
-    <h1>MSOS module map</h1>
+    <h1>MSOS development dashboard</h1>
     <p class="sub">
-      Auto-generated from <a href="../PPE_MODULE_REGISTRY.json">PPE_MODULE_REGISTRY.json</a>
-      · Markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
+      What we are building, where it stands, and what you should focus on.
       · As-of {as_of}
+      · <a href="../PPE_MODULE_REGISTRY.json">JSON</a>
+      · <a href="../PPE_MODULE_REGISTRY_V1.md">docs</a>
     </p>
 
-    <div class="open-box">
-      <strong>How to open (local file on your PC)</strong><br />
-      Path: <code>{_esc(open_path)}</code><br />
-      Double-click the file in File Explorer, or paste into your browser address bar:<br />
-      <code>{_esc(file_url)}</code><br />
-      Regenerate after editing JSON: <code>python scripts/render_msos_module_map.py</code>
+{milestone_html}
+
+    <h2>Main parts — status &amp; your workflow</h2>
+    <div class="overview-grid">
+{overview_html}
     </div>
 
+    <div class="details-section">
     <h2>MSOS pillars</h2>
     <div class="pillars">
 {chr(10).join(pillars_html)}
@@ -476,18 +594,15 @@ def render_html(data: dict[str, Any], *, repo_root: Path) -> str:
       </pre>
     </div>
 
-    <h2>Module cards — where we left off</h2>
-    <div class="cards">
-{chr(10).join(cards)}
-    </div>
-
     <h2>Active BUILD priorities</h2>
     <div class="note">
       <strong>Milestone:</strong> {_esc(data.get("milestone_note", ""))}
     </div>
+    </div>
 
     <footer>
-      Generated by scripts/render_msos_module_map.py · SSOT: docs/SOP/PPE_MODULE_REGISTRY.json · noindex
+      <strong>Open:</strong> double-click <strong>MODULE MAP</strong> on Desktop, or <code>OPEN_MODULE_MAP.cmd</code> in repo.<br />
+      Path: <code>{_esc(open_path)}</code> · Generated by scripts/render_msos_module_map.py · noindex
     </footer>
   </body>
 </html>

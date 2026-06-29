@@ -8,9 +8,9 @@
 
 **Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html)
 
-**Open (zero manual steps):** Double-click **`MODULE MAP`** on your Desktop (after `setup_desktop_shortcuts.cmd` once), or double-click [`OPEN_MODULE_MAP.cmd`](../../OPEN_MODULE_MAP.cmd) in the repo root, or say **“open the dashboard”** in any Cursor agent thread.
+**Open (zero manual steps):** Double-click **`MODULE MAP`** on your Desktop, or say **“open the dashboard”** in any Cursor agent thread.
 
-**Regenerate only (no browser):** `python scripts/render_msos_module_map.py --write`
+The dashboard opens with **active milestone + every main part** (chartered?, can do now, why it matters, your work, next step). Edit [`PPE_MODULE_REGISTRY.json`](PPE_MODULE_REGISTRY.json) → `development_overview` section to update that view.
 
 **As-of:** 2026-06-29
 

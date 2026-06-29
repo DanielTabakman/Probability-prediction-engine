@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#05090f" />
-    <title>MSOS module map — operator</title>
+    <title>MSOS development dashboard</title>
     <style>
       :root {
         --bg: #05090f;
@@ -213,24 +213,195 @@
         line-height: 1.5;
       }
       footer { margin-top: 32px; font-size: 0.72rem; color: var(--muted); }
+      .milestone-banner {
+        background: linear-gradient(145deg, #0a1a28, #102840);
+        border: 1px solid var(--teal);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 20px;
+        max-width: 56rem;
+      }
+      .milestone-kicker {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--teal);
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .milestone-title { margin: 0 0 8px; font-size: 1.2rem; }
+      .milestone-north { color: var(--text); font-size: 0.95rem; margin: 0 0 10px; }
+      .milestone-focus { color: var(--amber); margin: 10px 0 6px; }
+      .milestone-complete { color: var(--muted); font-size: 0.82rem; margin: 0; }
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 14px;
+        margin-bottom: 8px;
+      }
+      .overview-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .overview-card.overview-highlight {
+        border-color: var(--amber);
+        box-shadow: 0 0 0 1px rgba(242, 182, 87, 0.15);
+      }
+      .overview-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .overview-head h3 { margin: 0; font-size: 1rem; }
+      .charter-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 3px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .charter-live { background: rgba(110,231,168,0.15); color: var(--green); }
+      .charter-chartered { background: rgba(67,231,211,0.12); color: var(--teal); }
+      .charter-selected { background: rgba(242,182,87,0.18); color: var(--amber); }
+      .charter-planned { background: rgba(142,164,189,0.12); color: var(--muted); }
+      .overview-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; line-height: 1.5; }
+      .overview-dl { margin: 0; font-size: 0.8rem; }
+      .overview-dl dt {
+        color: var(--teal);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 8px;
+        font-weight: 700;
+      }
+      .overview-dl dt:first-child { margin-top: 0; }
+      .overview-dl dd { margin: 4px 0 0; color: var(--muted); }
+      .overview-dl dd.next-step { color: var(--text); }
+      a.doc-link { color: var(--teal); margin-left: 4px; }
+      .details-section { margin-top: 28px; opacity: 0.95; }
     </style>
   </head>
   <body>
-    <h1>MSOS module map</h1>
+    <h1>MSOS development dashboard</h1>
     <p class="sub">
-      Auto-generated from <a href="../PPE_MODULE_REGISTRY.json">PPE_MODULE_REGISTRY.json</a>
-      · Markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
+      What we are building, where it stands, and what you should focus on.
       · As-of 2026-06-29
+      · <a href="../PPE_MODULE_REGISTRY.json">JSON</a>
+      · <a href="../PPE_MODULE_REGISTRY_V1.md">docs</a>
     </p>
 
-    <div class="open-box">
-      <strong>How to open (local file on your PC)</strong><br />
-      Path: <code>C:\Users\USER\Desktop\Probability-prediction-engine\docs\SOP\assets\msos_module_map.html</code><br />
-      Double-click the file in File Explorer, or paste into your browser address bar:<br />
-      <code>file:///C:/Users/USER/Desktop/Probability-prediction-engine/docs/SOP/assets/msos_module_map.html</code><br />
-      Regenerate after editing JSON: <code>python scripts/render_msos_module_map.py</code>
+    <section class="milestone-banner">
+      <div class="milestone-kicker">Active milestone</div>
+      <h2 class="milestone-title">Trader Workflow Integration v1</h2>
+      <p class="milestone-north">See what options imply, where you disagree, and what payoff fits — then come back as part of your process.</p>
+      <p><strong>Outcome:</strong> Traders use MSOS during their trading process (not just a demo tour); strong+ validation signals ship as product.</p>
+      <p class="milestone-focus"><strong>Your focus today:</strong> Learning loop — log trader sessions, watch for return-without-prompt. Relay: forward consistency radar when prioritized. VM: cross-venue collector already scheduled.</p>
+      <p class="milestone-complete"><strong>Complete when:</strong> ≥3 traders use MSOS during process; ≥2 return within 7 days without a scheduled follow-up; BTC+ETH live; P4→P7 loop green. <a class="doc-link" href="../MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md">milestone charter</a></p>
+    </section>
+
+    <h2>Main parts — status &amp; your workflow</h2>
+    <div class="overview-grid">
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>Implied distribution</h3>
+          <span class="charter-badge charter-live">LIVE · chartered (Strategy Lab / PPE core)</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-leg">LEGIBILITY</span> · <span class="tier">LIVE</span> · tier T2 → T4 · /strategy-lab</div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>Open Strategy Lab — BTC/ETH + enabled assets; view implied distribution, overlay belief, read disagreement.</dd>
+          <dt>Why it matters</dt><dd>Core legibility — answers what options price at an expiry. Disagreement is today&#x27;s main market-relationship mode.</dd>
+          <dt>Your work</dt><dd>Use it in real pre-trade research; log strong+ signals in validation. No BUILD unless steward queues relationship-mode expansion.</dd>
+          <dt>Next step</dt><dd class="next-step">Multi-asset parity in daily use; additional relationship modes (T4 charter).</dd>
+        </dl>
+      </article>
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>Options Horizon</h3>
+          <span class="charter-badge charter-chartered">CHARTERED · program doc + relay chapters</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-leg">LEGIBILITY</span> · <span class="tier">LIVE</span> · tier T2 → replay archive · /options-horizon <a class="doc-link" href="../OPTIONS_HORIZON_PROGRAM_V1.md">program</a></div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>Chart-first price × time view; implied forward overlay; region thesis (polish + workflow chapters in flight).</dd>
+          <dt>Why it matters</dt><dd>Projection legibility — where structure points in time × price, not the distribution histogram.</dd>
+          <dt>Your work</dt><dd>Walk the route when testing wedge depth; note UX gaps for validation log. Surface archive collector on VM when chapter ships.</dd>
+          <dt>Next step</dt><dd class="next-step">Region workflow persistence; daily surface archive for replay.</dd>
+        </dl>
+      </article>
+      <article class="overview-card overview-highlight">
+        <div class="overview-head">
+          <h3>Forward consistency</h3>
+          <span class="charter-badge charter-selected">SELECTED · relay ch.1 ready</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-edge">EDGE</span> <span class="tag tag-leg">LEGIBILITY</span> · <span class="tier">PARTIAL</span> · tier T1 → T3 · Strategy Lab panel today; /forward-consistency planned <a class="doc-link" href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program</a> <a class="doc-link" href="../POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md">SELECTION</a></div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>Per asset/expiry check in Strategy Lab panel — synthetic forward vs future after spreads (research only).</dd>
+          <dt>Why it matters</dt><dd>Trust + edge testing — is data honest, and is there a testable dislocation? Not an arb detector.</dd>
+          <dt>Your work</dt><dd>Prioritize IDE BUILD for ppe_forward_consistency_radar_v1 when operator says IDE_BUILD — dashboard heatmap first.</dd>
+          <dt>Next step</dt><dd class="next-step">Relay slice 1: quality flags + dashboard.json → slice 2: MSOS heatmap page.</dd>
+        </dl>
+      </article>
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>Expression planner</h3>
+          <span class="charter-badge charter-live">LIVE · P6 expression sim</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-edge">EDGE</span> <span class="tag tag-wf">WORKFLOW</span> · <span class="tier">LIVE</span> · tier T2 → T3 · /strategy-lab/expression</div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>After thesis confirm — suggested structure under constraints; paper trade save; simulation only.</dd>
+          <dt>Why it matters</dt><dd>Closes the loop from disagreement to expression — optimal exposure fit without execution.</dd>
+          <dt>Your work</dt><dd>Run full P4→P7 path in user tests; capture where expression step breaks process fit.</dd>
+          <dt>Next step</dt><dd class="next-step">Deeper exposure optimization; optional history if replay needed.</dd>
+        </dl>
+      </article>
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>Cross-venue scan</h3>
+          <span class="charter-badge charter-live">LIVE · ops side-channel</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-edge">EDGE</span> · <span class="tier">LIVE (ops)</span> · tier T3 · artifacts/cross_venue_reports/ <a class="doc-link" href="../MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md">program</a></div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>Daily PM vs Deribit BTC gap snapshot + ranked report on VM; backtest when ≥14d history.</dd>
+          <dt>Why it matters</dt><dd>Research edge lane — event market vs options-implied; feeds learning, not trader nav.</dd>
+          <dt>Your work</dt><dd>Ensure VM task installed after pull; skim latest.md weekly. No trader-facing BUILD unless validation pulls it.</dd>
+          <dt>Next step</dt><dd class="next-step">Backtest digest when snapshot history deep enough.</dd>
+        </dl>
+      </article>
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>MSOS workflow</h3>
+          <span class="charter-badge charter-live">LIVE · P3–P7 shipped</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-wf">WORKFLOW</span> · <span class="tier">LIVE</span> · tier ongoing · Command Center, confirm, monitor, history</div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>Full thesis → confirm → expression → monitor/history loop with asset propagation.</dd>
+          <dt>Why it matters</dt><dd>This is the product — modules feed the workflow; workflow is how traders return.</dd>
+          <dt>Your work</dt><dd>Primary validation target: do traders return without you? Log sessions per TRADER_WORKFLOW_RESEARCH_V1.</dd>
+          <dt>Next step</dt><dd class="next-step">Self-serve onboarding polish; return-without-prompt evidence for milestone.</dd>
+        </dl>
+      </article>
+      <article class="overview-card">
+        <div class="overview-head">
+          <h3>Multi-asset meta infra</h3>
+          <span class="charter-badge charter-chartered">CHARTERED · 7-chapter program</span>
+        </div>
+        <div class="overview-meta"><span class="tag tag-infra">INFRA</span> · <span class="tier">MOSTLY COMPLETE</span> · tier ops ·  <a class="doc-link" href="../PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md">program</a></div>
+        <dl class="overview-dl">
+          <dt>Can do now</dt><dd>~25-asset catalog, enablement pipeline, trust surface, prod multi-asset witness.</dd>
+          <dt>Why it matters</dt><dd>Scale without one-off fixes — every new asset is registry row + witness, not a new MSOS build.</dd>
+          <dt>Your work</dt><dd>Enable batches via enable_asset_batch.py; green witness after deploy. Display cache ops when queued.</dd>
+          <dt>Next step</dt><dd class="next-step">Display cache warm schedule; forward consistency radar as meta-adjacent trust tool.</dd>
+        </dl>
+      </article>
     </div>
 
+    <div class="details-section">
     <h2>MSOS pillars</h2>
     <div class="pillars">
       <div class="pillar">
@@ -394,53 +565,15 @@
       </pre>
     </div>
 
-    <h2>Module cards — where we left off</h2>
-    <div class="cards">
-      <div class="card">
-        <h3>Implied distribution</h3>
-        <div class="meta">DISTRIBUTION · T2 · P0</div>
-        <p>Primary legibility module in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
-        <div class="next"><strong>Next:</strong> Additional market-relationship modes (T4); multi-asset parity</div>
-      </div>
-      <div class="card">
-        <h3>Options Horizon</h3>
-        <div class="meta">PROJECTION · T2 · P1</div>
-        <p>Price × time projection; surface archive chartered for replay.</p>
-        <div class="next"><strong>Next:</strong> Surface archive + replay chapters</div>
-      </div>
-      <div class="card">
-        <h3>Forward consistency</h3>
-        <div class="meta">CONSISTENCY · T1 · P2 · <span class="advance-yes">ADVANCE</span></div>
-        <p>Strategy Lab panel live; dashboard and heatmap not built. Target T3 with daily status snapshots only.</p>
-        <div class="next"><strong>Next:</strong> YES — relay ppe_forward_consistency_radar_v1 (dashboard + heatmap)</div>
-      </div>
-      <div class="card">
-        <h3>Expression planner</h3>
-        <div class="meta">EXPOSURE · T2 · P1</div>
-        <p>Structure fit under constraints — simulation only.</p>
-        <div class="next"><strong>Next:</strong> Exposure optimization depth</div>
-      </div>
-      <div class="card">
-        <h3>Cross-venue scan</h3>
-        <div class="meta">EVENT_GAP · T3 · side</div>
-        <p>Polymarket vs options gap — research lane. VM daily task shipped.</p>
-        <div class="next"><strong>Next:</strong> Backtest when history deep</div>
-      </div>
-      <div class="card">
-        <h3>Meta infra</h3>
-        <div class="meta">Cache, trust, witnesses, enablement</div>
-        <p>Cross-cutting infra supporting all modules at scale.</p>
-        <div class="next"><strong>Next:</strong> Display cache ops; forward consistency radar relay</div>
-      </div>
-    </div>
-
     <h2>Active BUILD priorities</h2>
     <div class="note">
       <strong>Milestone:</strong> Trader Workflow Integration v1 — process fit over platform breadth. Relay queue: crypto multi-asset, self-serve onboarding, universe tiers. Module registry maps what exists vs what slice runs next (FRONTIER still controls relay order).
     </div>
+    </div>
 
     <footer>
-      Generated by scripts/render_msos_module_map.py · SSOT: docs/SOP/PPE_MODULE_REGISTRY.json · noindex
+      <strong>Open:</strong> double-click <strong>MODULE MAP</strong> on Desktop, or <code>OPEN_MODULE_MAP.cmd</code> in repo.<br />
+      Path: <code>C:\Users\USER\Desktop\Probability-prediction-engine\docs\SOP\assets\msos_module_map.html</code> · Generated by scripts/render_msos_module_map.py · noindex
     </footer>
   </body>
 </html>

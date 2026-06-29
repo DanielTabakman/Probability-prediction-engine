@@ -27,7 +27,9 @@ def test_render_includes_module_display_names() -> None:
     assert "Options Horizon" in html
     assert "Forward consistency" in html
     assert "Expression planner" in html
-    assert "PPE_MODULE_REGISTRY.json" in html
+    assert "MSOS development dashboard" in html
+    assert "Your work" in html
+    assert "Can do now" in html
 
 
 def test_html_matches_registry_ssot() -> None:
