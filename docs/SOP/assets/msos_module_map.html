@@ -180,6 +180,16 @@
       .card p { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); }
       .card .next { font-size: 0.78rem; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
       .card .next strong { color: var(--amber); }
+      .card .gather, .card .action, .card .bottleneck { font-size: 0.78rem; margin: 0 0 6px; padding-left: 10px; border-left: 2px solid var(--line); }
+      .card .gather { border-left-color: var(--leg); }
+      .card .action { border-left-color: var(--teal); }
+      .card .bottleneck { border-left-color: var(--amber); margin-bottom: 0; }
+      .card .gather strong, .card .action strong, .card .bottleneck strong { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+      .card .gather strong { color: var(--leg); }
+      .card .action strong { color: var(--teal); }
+      .card .bottleneck strong { color: var(--amber); }
+      .card-ongoing { border-color: var(--teal); box-shadow: 0 0 0 1px rgba(67,231,211,0.12); }
+      .last-updated { display: inline-block; font-size: 0.78rem; color: var(--green); background: rgba(110, 231, 168, 0.1); border: 1px solid rgba(110, 231, 168, 0.25); border-radius: 6px; padding: 2px 8px; margin-left: 6px; font-weight: 600; }
       .note {
         background: var(--panel);
         border: 1px dashed var(--line);
@@ -217,18 +227,6 @@
       }
       .maint-note strong { color: var(--teal); }
       .maint-note code { font-size: 0.72rem; }
-      .last-updated {
-        display: inline-block;
-        font-size: 0.78rem;
-        color: var(--green);
-        background: rgba(110, 231, 168, 0.1);
-        border: 1px solid rgba(110, 231, 168, 0.25);
-        border-radius: 6px;
-        padding: 2px 8px;
-        margin-left: 6px;
-        font-weight: 600;
-      }
-      .last-updated time { font-weight: 600; }
       .flow-intro {
         font-size: 0.84rem;
         color: var(--muted);
@@ -278,6 +276,47 @@
       .backlog-panel li { margin-bottom: 6px; }
       .backlog-panel .tag-line { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
       .backlog-panel.defer { border-style: dashed; opacity: 0.85; }
+      .right-now {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--teal);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.82rem;
+        max-width: 52rem;
+        margin-bottom: 12px;
+      }
+      .right-now > strong { color: var(--teal); display: block; margin-bottom: 8px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+      .right-now ul { margin: 0 0 8px; padding-left: 1.2rem; }
+      .right-now li { margin-bottom: 4px; }
+      .right-now-links { font-size: 0.76rem; color: var(--muted); }
+      .right-now-links a { color: var(--teal); }
+      .quick-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+        max-width: 52rem;
+      }
+      .quick-links a {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--panel2);
+        color: var(--teal);
+        text-decoration: none;
+      }
+      .quick-links a:hover { border-color: var(--teal); }
+      .quick-links a.planned { color: var(--muted); border-style: dashed; }
+      .flow-desc {
+        font-size: 0.82rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin: -4px 0 12px;
+      }
+      .archive-hint { color: var(--violet); font-weight: 600; }
+      .last-updated time { font-weight: 600; }
     </style>
   </head>
   <body>
@@ -286,8 +325,8 @@
       Living operator chart — modules, data, tiers, priorities.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-29T18:00:00Z">
-        Last updated: 2026-06-29 <time datetime="2026-06-29T18:00:00Z">18:00 UTC</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-29T15:15:00Z">
+        Last updated: 2026-06-29 <time datetime="2026-06-29T15:15:00Z">15:15 UTC</time>
       </span>
     </p>
 
@@ -297,10 +336,36 @@
       Agents bump <code>#map-last-updated</code> (date <em>and</em> UTC time) at steward closeout.
     </div>
 
+    <div class="right-now" id="map-right-now">
+      <strong>Right now</strong>
+      <ul>
+        <li><strong>Milestone:</strong> <a href="../MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md">Trader Workflow Integration v1</a> — process fit over platform breadth</li>
+        <li><strong>Last closed:</strong> Options Horizon region workflow v1 (2026-06-29)</li>
+        <li><strong>Relay queue hint:</strong> <code>mvp1_bl_density_smoothing_v1</code> first (supply refresh) · forward consistency ch.1–2 after queue clears</li>
+      </ul>
+      <span class="right-now-links">
+        <a href="../PPE_INTEGRATED_STATUS.md">Integrated status</a>
+        · <a href="../AGENT_CONTINUITY_BRIEF.md">Continuity brief</a>
+        · <a href="../HUMAN_STEWARD_BACKLOG.md">Steward backlog</a>
+      </span>
+    </div>
+
+    <div class="quick-links" id="map-quick-links">
+      <a href="https://app.marketstructureos.com/options-horizon">/options-horizon</a>
+      <a href="https://app.marketstructureos.com/strategy-lab">/strategy-lab</a>
+      <a href="https://app.marketstructureos.com/strategy-lab/expression">/strategy-lab/expression</a>
+      <a href="https://app.marketstructureos.com/exposure">/exposure</a>
+      <a class="planned" href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">/forward-consistency (planned)</a>
+    </div>
+
     <h2>Your attention — human to-do</h2>
     <div class="op-section todo-panel">
       <h3>Bottlenecks — needs you to keep it moving</h3>
       <ol>
+        <li>
+          <strong>Exposure menu v0 — approve READY → relay</strong>
+          <span class="why">Chartered front door for “I want X exposure” · NVDA + BTC paths.</span>
+        </li>
         <li>
           <strong>VM collectors — confirm tasks on ppeloop</strong>
           <span class="why"><code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
@@ -321,11 +386,11 @@
       <ul>
         <li>
           <strong>Horizon replay scrubber</strong>
-          <span class="when">Chartered · promote SELECTION when <code>archive_meta.replay_ready</code> (~30 daily surface snapshots on ppeloop)</span>
+          <span class="when">Chartered · <span class="archive-hint">~8 / 30</span> daily surface snapshots (steward est.) · promote SELECTION when <code>archive_meta.replay_ready</code></span>
         </li>
         <li>
           <strong>Cross-venue backtest scoring</strong>
-          <span class="when">Needs ≥14 daily PM ↔ Deribit snapshots · scan runs today; backtest thin until history deepens</span>
+          <span class="when"><span class="archive-hint">~6 / 14</span> daily PM ↔ Deribit snapshots (steward est.) · scan runs today; backtest thin until history deepens</span>
         </li>
         <li>
           <strong>Forward consistency T3 archive</strong>
@@ -343,12 +408,8 @@
       <h3>Last closeouts — what landed on main</h3>
       <ul>
         <li>
-          <strong>Exposure menu v0</strong>
-          <span class="when">2026-06-29 · SELECTION approved — relay active (NVDA + BTC)</span>
-        </li>
-        <li>
           <strong>Forward consistency radar ch.1–2</strong>
-          <span class="when">2026-06-29 · SELECTION approved — queued after trader workflow horizon nav</span>
+          <span class="when">2026-06-29 · SELECTION approved — relay queued after supply refresh</span>
         </li>
         <li>
           <strong>Options Horizon region workflow v1</strong>
@@ -367,12 +428,8 @@
           <span class="when">2026-06-28 · trust labels in MSOS; scripted enable ritual</span>
         </li>
         <li>
-          <strong>Options Horizon chart polish + equity/crypto universe tiers</strong>
-          <span class="when">2026-06-27–28 · tier-1 batches on registry/catalog</span>
-        </li>
-        <li>
-          <strong>PPE module registry + operator map (this page)</strong>
-          <span class="when">2026-06-29 · living chart for modules and operator attention</span>
+          <strong>Exposure menu chartered + module registry map</strong>
+          <span class="when">2026-06-29 · /exposure path menu; this operator chart</span>
         </li>
       </ul>
     </div>
@@ -428,6 +485,10 @@
     </div>
 
     <h2>Data → processing → output</h2>
+    <p class="flow-desc">
+      Venues and registry feed Python math; MSOS only reads display boundaries and archives — never recomputes options math in the browser.
+      VM collectors grow history for replay and research lanes without blocking trader routes.
+    </p>
     <div class="flow">
       <div class="flow-col">
         <h3>Sources</h3>
@@ -526,8 +587,18 @@
           <td>TRADER</td>
           <td class="tier">→ T2</td>
           <td class="prio-p1">P1</td>
-          <td class="status-partial">SELECTED</td>
-          <td class="advance-yes">YES — relay active</td>
+          <td class="status-partial">CHARTERED</td>
+          <td class="advance-yes">YES — v0 BUILD</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td><strong>Universe expansion</strong><br><code>tradeable_universe</code><br>meta infra · rolling</td>
+          <td><span class="tag tag-infra">INFRA</span></td>
+          <td>OPERATOR</td>
+          <td class="tier">ongoing</td>
+          <td class="prio-p0">P0</td>
+          <td class="status-live">LIVE (rolling)</td>
+          <td>Next asset group witness</td>
         </tr>
         <tr>
           <td>—</td>
@@ -548,15 +619,47 @@
         <tr>
           <th>Tier</th>
           <th>Delivers</th>
+          <th>What you gather</th>
+          <th>What you can do</th>
           <th>Charter question</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td class="tier">T0</td><td>Types, fixtures, unit tests</td><td>What is the output shape?</td></tr>
-        <tr><td class="tier">T1</td><td>Display boundary API</td><td>Can MSOS fetch honest JSON?</td></tr>
-        <tr><td class="tier">T2</td><td>MSOS read-only page</td><td>Can a human inspect it?</td></tr>
-        <tr><td class="tier">T3</td><td>Archive + collector</td><td><strong>Why</strong> collect? What subset? How often?</td></tr>
-        <tr><td class="tier">T4</td><td>Workflow / Monitor hook</td><td>Does it close the trader loop?</td></tr>
+        <tr>
+          <td class="tier">T0</td>
+          <td>Types, fixtures, unit tests</td>
+          <td>Fixture JSON, unit test cases</td>
+          <td>Review output shape in pytest</td>
+          <td>What is the output shape?</td>
+        </tr>
+        <tr>
+          <td class="tier">T1</td>
+          <td>Display boundary API</td>
+          <td>Live venue quotes → boundary JSON</td>
+          <td>curl / pytest boundary; MSOS can fetch</td>
+          <td>Can MSOS fetch honest JSON?</td>
+        </tr>
+        <tr>
+          <td class="tier">T2</td>
+          <td>MSOS read-only page</td>
+          <td>Same as T1 per page load</td>
+          <td>Open route; inspect as a trader</td>
+          <td>Can a human inspect it?</td>
+        </tr>
+        <tr>
+          <td class="tier">T3</td>
+          <td>Archive + collector</td>
+          <td>Scheduled snapshots → <code>artifacts/</code></td>
+          <td>Replay, backtest, operator trust history</td>
+          <td><strong>Why</strong> collect? What subset? How often?</td>
+        </tr>
+        <tr>
+          <td class="tier">T4</td>
+          <td>Workflow / Monitor hook</td>
+          <td>Saved thesis + module payloads</td>
+          <td>Deep-link, monitor cards, return loop</td>
+          <td>Does it close the trader loop?</td>
+        </tr>
       </tbody>
     </table>
 
@@ -579,49 +682,64 @@
       </pre>
     </div>
 
-    <h2>Module cards — where we left off</h2>
+    <h2>Module cards — gather, act, bottleneck</h2>
+    <p class="flow-intro">Per module: what you learn, what you can do, what is stuck waiting on you.</p>
     <div class="cards">
       <div class="card">
         <h3>1 · Implied distribution</h3>
         <div class="meta">DISTRIBUTION · T2 live · P0</div>
-        <p>Primary legibility tool in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
-        <div class="next"><strong>Next:</strong> Additional relationship modes (charter T4); multi-asset parity.</div>
+        <div class="gather"><strong>Gather</strong> Deribit chain for enabled asset → implied PDF at selected expiry.</div>
+        <div class="action"><strong>Act</strong> Open Strategy Lab; overlay disagreement; save thesis from market relationship.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Additional relationship modes need T4 charter — not blocking daily use.</div>
       </div>
       <div class="card">
         <h3>2 · Options Horizon</h3>
         <div class="meta">PROJECTION · T2 live · P1</div>
-        <p>Price × time projection; surface archive chartered for replay.</p>
-        <div class="next"><strong>Next:</strong> Chart polish relay; daily surface collector on VM.</div>
+        <div class="gather"><strong>Gather</strong> Spot, volume, forward curve, implied surface for asset × horizon.</div>
+        <div class="action"><strong>Act</strong> Mark regions; save region intent; compare structure over price × time.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Replay scrubber blocked on archive depth (~8/30 snapshots).</div>
       </div>
       <div class="card">
         <h3>3 · Forward consistency</h3>
         <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">SELECTED</span></div>
-        <p>Lab panel live; dashboard + heatmap chartered — relay ch.1–2 approved 2026-06-29.</p>
-        <div class="next"><strong>Next:</strong> BUILD ch.1 (dashboard.json) → ch.2 (/forward-consistency) after supply refresh queue.</div>
+        <div class="gather"><strong>Gather</strong> Futures/perp vs options-implied forward per asset × expiry.</div>
+        <div class="action"><strong>Act</strong> Lab panel today; after BUILD — operator radar at /forward-consistency.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Relay ch.1–2 queued behind supply refresh — not a new SELECTION.</div>
       </div>
       <div class="card">
         <h3>4 · Expression planner</h3>
         <div class="meta">EXPOSURE · T2 live · P1</div>
-        <p>Optimal exposure / structure fit under constraints — simulation only.</p>
-        <div class="next"><strong>Next:</strong> Deeper exposure optimization; optional T3 if replay needed.</div>
+        <div class="gather"><strong>Gather</strong> Constraints + view from thesis; chain for structure candidates.</div>
+        <div class="action"><strong>Act</strong> Run sim-only exposure fit; compare structures under risk caps.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Depth optimization is P1 backlog — core path works today.</div>
       </div>
       <div class="card">
         <h3>5 · Cross-venue scan</h3>
         <div class="meta">EVENT_GAP · T3 ops · side channel</div>
-        <p>PM vs options gap — research lane. VM daily task shipped.</p>
-        <div class="next"><strong>Next:</strong> Backtest when ≥14d history; not trader nav.</div>
+        <div class="gather"><strong>Gather</strong> Daily PM event probs + Deribit-implied probs → ranked gap report.</div>
+        <div class="action"><strong>Act</strong> Read <code>artifacts/cross_venue_reports/</code>; run scan CLI on demand.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Backtest needs ~14d history (~6/14) — research lane, not trader nav.</div>
       </div>
       <div class="card">
         <h3>6 · Exposure menu</h3>
         <div class="meta">EXPOSURE_PATH · CHARTERED · P1 · <span class="advance-yes">ADVANCE</span></div>
-        <p>“I want NVDA exposure” → menu of paths (stock, LEAPS, spreads, Planned perps). Own /exposure route.</p>
-        <div class="next"><strong>Next:</strong> SELECTION → READY → relay v0 (NVDA + BTC).</div>
+        <div class="gather"><strong>Gather</strong> Asset catalog + path templates (stock, options, spreads, planned perps).</div>
+        <div class="action"><strong>Act</strong> After BUILD: pick “I want NVDA exposure” → deep-link to lab/horizon paths.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Needs your READY sign-off → relay v0 (NVDA + BTC).</div>
+      </div>
+      <div class="card card-ongoing">
+        <h3>7 · Universe expansion</h3>
+        <div class="meta">INFRA · rolling program · P0 · <a href="../PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md">meta infra program</a></div>
+        <div class="gather"><strong>Gather</strong> Discovery JSON per asset; witness PASS; registry + catalog rows.</div>
+        <div class="action"><strong>Act</strong> Pick batch → enable_asset_batch → trust caveats → Live pill in MSOS picker.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> You pick the next group; witness before promoting trust labels.</div>
       </div>
       <div class="card">
         <h3>Meta infra (not modules)</h3>
         <div class="meta">Cache, trust, witnesses, enablement</div>
-        <p>Cross-cutting — supports all modules scaling to ~25 assets.</p>
-        <div class="next"><strong>Next:</strong> Expand witness groups as new asset batches enable; cache ops cadence.</div>
+        <div class="gather"><strong>Gather</strong> Deploy SHA, cache health, prod witness logs, enablement evidence.</div>
+        <div class="action"><strong>Act</strong> Warm cache after deploy; run witnesses; sign off trust for new symbols.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong> Production live hookup (Access, .env) — see steward backlog.</div>
       </div>
     </div>
 
@@ -634,8 +752,9 @@
 
     <footer>
       Open locally: <code>docs/SOP/assets/msos_module_map.html</code>
-      · <code>git pull</code> then browser refresh for latest
-      · Update shipped / waiting / to-do at steward closeout · noindex
+      · <code>git pull</code> then refresh · Gate: <code>tests/test_msos_module_map_operator_sections.py</code>
+      · Patch: <code>python scripts/patch_msos_module_map.py</code>
+      · noindex
     </footer>
   </body>
 </html>
