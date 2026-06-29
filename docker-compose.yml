@@ -93,6 +93,28 @@ services:
     command: ["python", "-m", "src.viz.display_payload_server"]
     environment:
       - PORT=8765
+      - PPE_DISPLAY_CACHE_ENABLED=1
+      - PPE_DISPLAY_CACHE_TTL_SECONDS=120
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=90
+    restart: unless-stopped
+    networks:
+      - web
+
+  ppe_display_cache_refresh:
+    build: .
+    container_name: ppe_display_cache_refresh
+    command:
+      [
+        "python",
+        "scripts/run_display_cache_refresh.py",
+        "--loop",
+        "--base-url",
+        "http://ppe_display_api:8765",
+      ]
+    environment:
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=90
+    depends_on:
+      - ppe_display_api
     restart: unless-stopped
     networks:
       - web

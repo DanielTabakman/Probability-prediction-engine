@@ -351,9 +351,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[MEDIUM] Meta #4 IDE BUILD \u2014 display cache ops",
-      "selectionPrep": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md",
+      "doneReason": "IDE BUILD closeout 2026-06-28"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",

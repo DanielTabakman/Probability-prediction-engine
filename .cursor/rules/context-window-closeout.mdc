@@ -12,11 +12,12 @@ globs:
 When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 1. Read [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](../../docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md).
-2. Operational sweep: gate+commit **ship_now** items; push branches; reconcile `OPERATOR_STATUS` / `LAST_RUN_REPORT`; run `sync_product_direction.cmd` if direction JSON changed or markers are stale.
-3. Triage follow-ups into buckets; use `add-build` / `add-human` when appropriate.
-4. Run `context_window_closeout.cmd --record --whats-next "<one-line next action>"` (implies render).
-5. Complete `<!-- AGENT_FILL -->` sections in draft only when narrative/triage needs capture.
-6. End with **AGENT CONTINUITY** block.
+2. Run **`context_window_closeout.cmd --record`** (implies **auto-ship**: gate → commit → push → open PR → `automerge` label). Do **not** ask permission to commit, push, open PR, or merge.
+3. Triage anything **blocked** by auto-ship (mixed-plane, gate fail) into backlog/park via draft report only when needed.
+4. Complete `<!-- AGENT_FILL -->` sections in draft only when narrative/triage needs capture.
+5. End with a **one-line** operator summary — **never** narrate commits, PR numbers, merge steps, or git commands unless auto-ship **blocked** and recovery is required.
+
+**Operator-facing tone:** "Thread closed — work shipped" or "Thread closed — one item parked (see draft)." Not a git play-by-play.
 
 **Not** chapter closeout (`apply_control_closeout_v1`) unless a relay closeout slice is also in scope.
 

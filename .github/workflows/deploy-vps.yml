@@ -57,7 +57,7 @@ jobs:
             docker compose build --no-cache msos_web \
               --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL=${RESEARCH_URL}" \
               --build-arg "NEXT_PUBLIC_PPE_RESEARCH_OFFER_LABEL=${RESEARCH_LABEL:-Request research beta access}"
-            docker compose up -d --force-recreate msos_web app_demo app_full ppe_display_api
+            docker compose up -d --force-recreate msos_web app_demo app_full ppe_display_api ppe_display_cache_refresh
             docker compose up -d caddy
             echo "Warming display payload cache for enabled assets…"
             docker compose exec -T ppe_display_api \

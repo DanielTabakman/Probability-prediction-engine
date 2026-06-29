@@ -64,16 +64,40 @@ Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 ## Operator one-liner (paste in Agent)
 
 ```text
+close out thread
+```
+
+That runs **auto-ship + record** — no git narration to the operator.
+
+Explicit checklist (optional):
+
+```text
 Run CONTEXT WINDOW CLOSEOUT per @docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
 
-1. context_window_closeout.cmd --record --whats-next "<one line>"
-2. sync_product_direction.cmd (if direction JSON changed this thread)
-3. Complete narrative/triage in draft if needed.
-4. Operational sweep: commit+gate ship-now items; push branches.
-5. End with AGENT CONTINUITY block.
+context_window_closeout.cmd --record
 ```
 
 **New chat:** ask `what's next?` — no `@` files required (see **Tracking v2** below).
+
+---
+
+## Auto-ship (default on `--record`)
+
+`context_window_closeout.cmd --record` runs **`ppe_context_closeout_ship.py`** before writing the draft:
+
+| Step | Behavior |
+|------|----------|
+| **Clean tree, unpushed commits** | Push + open PR if missing + `automerge` label |
+| **Dirty shippable files** | Branch `ops/closeout-*` if on `main` → gate → commit → push → PR |
+| **Mixed-plane dirty** | **Park** — no unsafe auto-commit; recovery thread |
+| **Gate failure** | Unstage + park paths in draft report |
+| **Merge** | **Never** ask the operator — CI + merge-on-green |
+
+Skip auto-ship (triage-only): `context_window_closeout.cmd --record --no-ship`
+
+Preview only: `context_window_closeout.cmd --ship-dry-run --render`
+
+**Operator rule:** agents report **"thread closed — shipped"** or **"thread closed — parked (recovery)"** — not commit/PR/merge play-by-play.
 
 ---
 
@@ -115,16 +139,18 @@ Reads: git preflight, manifest, operator verdict, open PRs (if `gh` available). 
 
 Do **not** hand-author branch/ahead/behind/dirty-file facts when the script ran successfully.
 
-### 2 — Operational sweep (push / pull / threads)
+### 2 — Operational sweep (automatic)
 
-Work through in order; check each box in the draft report.
+**Default:** `context_window_closeout.cmd --record` runs auto-ship (`scripts/ppe_context_closeout_ship.py`).
+
+Manual checklist (only when `--no-ship` or auto-ship blocked):
 
 | Check | Command / action |
 |-------|------------------|
 | **Pull** | `git fetch` + `git pull --ff-only` on `main` (desktop) or rely on loop `gitSync` (VM) |
-| **Uncommitted work** | Commit with gate (`python scripts/run_pushable_gate.py`) or explicit **PARK** note |
-| **Unpushed commits** | `git push -u origin HEAD` on feature branches |
-| **Open PRs** | `gh pr list --author @me` — merge-ready vs draft vs abandoned |
+| **Uncommitted work** | Auto-ship commits or **PARK** in draft |
+| **Unpushed commits** | Auto-ship push + PR |
+| **Open PRs** | Auto-ship labels `automerge`; CI merges — no operator click |
 | **Operator thread** | `artifacts/orchestrator/OPERATOR_STATUS.md` — verdict matches what you think |
 | **Relay thread** | `artifacts/orchestrator/LAST_RUN_REPORT.md` if a phase run happened this session |
 | **IDE BUILD starter** | If `IDE_BUILD` pending, note `artifacts/orchestrator/IDE_BUILD_STARTER_*.md` path |
@@ -219,4 +245,5 @@ Copy final numbers into the draft report **Window ledger** section.
 | Date | Note |
 |------|------|
 | 2026-06-17 | v1 — SOP + `ppe_context_window_closeout.py` gather/triage helpers |
+| 2026-06-28 | v3 — `--record` default auto-ship (`ppe_context_closeout_ship.py`); operator silence on git/PR |
 | 2026-06-18 | v2 — `context_windows.jsonl` tracking, `WHATS_NEXT` promotion, radar churn signal |

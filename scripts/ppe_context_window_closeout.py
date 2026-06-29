@@ -179,7 +179,12 @@ def _checklist_line(done: bool, label: str) -> str:
     return f"- [{'x' if done else ' '}] {label}"
 
 
-def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
+def render_draft_markdown(
+    repo: Path,
+    snapshot: dict[str, Any],
+    *,
+    ship_report: dict[str, Any] | None = None,
+) -> str:
     pf = snapshot.get("preflight") if isinstance(snapshot.get("preflight"), dict) else {}
     branch = str(pf.get("branch") or "?")
     wt = str(pf.get("working_tree") or "?")
@@ -244,12 +249,35 @@ def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
 
     lines.extend(["## Operational sweep", ""])
     tree_clean = wt == "clean"
-    lines.append(_checklist_line(tree_clean, "Working tree clean or explicitly PARKED"))
-    lines.append(_checklist_line(False, "Unpushed commits pushed (feature branches)"))
+    ship = ship_report if isinstance(ship_report, dict) else {}
+    ship_ok = ship.get("ok") is True and not ship.get("blocked")
+    parked = ship.get("parked") if isinstance(ship.get("parked"), list) else []
+    if ship:
+        tree_clean = tree_clean or (ship_ok and not parked)
+    pushed_ok = any(
+        isinstance(s, dict)
+        and s.get("step") in ("publish", "publish_ahead")
+        and s.get("ok") is True
+        for s in (ship.get("steps") or [])
+    )
+    prs_reviewed = len(prs) == 0 or pushed_ok or ship_ok
+    lines.append(_checklist_line(tree_clean or bool(parked), "Working tree clean or explicitly PARKED"))
+    lines.append(_checklist_line(pushed_ok or tree_clean, "Unpushed commits pushed (feature branches)"))
     lines.append(_checklist_line(False, "`main` pulled / ff-only current"))
-    lines.append(_checklist_line(len(prs) == 0, f"Open PRs reviewed ({len(prs)} listed below)"))
+    lines.append(_checklist_line(prs_reviewed, f"Open PRs reviewed ({len(prs)} listed below)"))
+    lines.append(_checklist_line(ship_ok, "Auto-ship sweep (gate → commit → push → PR)"))
     lines.append(_checklist_line(False, "Operator / relay threads reconciled"))
-    lines.append("")
+    if ship:
+        lines.extend(["", "### Auto-ship sweep", ""])
+        lines.append(f"- **ok:** `{ship.get('ok')}` · **blocked:** `{ship.get('blocked')}`")
+        if parked:
+            lines.append(f"- **parked paths:** {len(parked)} (mixed-plane or gate failure)")
+        for row in ship.get("steps") or []:
+            if not isinstance(row, dict):
+                continue
+            detail = row.get("detail") or row.get("reason") or row.get("pr_url") or ""
+            lines.append(f"- `{row.get('step')}` — ok={row.get('ok')} {detail}".rstrip())
+        lines.append("")
 
     if prs:
         lines.extend(["### Open pull requests", ""])
@@ -318,14 +346,22 @@ def render_draft_markdown(repo: Path, snapshot: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def write_artifacts(repo: Path, snapshot: dict[str, Any]) -> tuple[Path, Path]:
+def write_artifacts(
+    repo: Path,
+    snapshot: dict[str, Any],
+    *,
+    ship_report: dict[str, Any] | None = None,
+) -> tuple[Path, Path]:
     repo = repo.resolve()
     out_dir = repo / "artifacts" / "control_plane"
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = repo / SNAPSHOT_REL
     md_path = repo / DRAFT_REL
-    json_path.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
-    md_path.write_text(render_draft_markdown(repo, snapshot), encoding="utf-8")
+    payload = dict(snapshot)
+    if ship_report is not None:
+        payload["ship_report"] = ship_report
+    json_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    md_path.write_text(render_draft_markdown(repo, snapshot, ship_report=ship_report), encoding="utf-8")
     return json_path, md_path
 
 
@@ -344,7 +380,16 @@ def _chapter_from_snapshot(snapshot: dict[str, Any]) -> str:
     return stem
 
 
-def infer_whats_next(snapshot: dict[str, Any]) -> str:
+def infer_whats_next(snapshot: dict[str, Any], *, ship_report: dict[str, Any] | None = None) -> str:
+    ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
+    if isinstance(ship, dict):
+        if ship.get("blocked"):
+            return "Recovery: finish parked closeout ship (see CONTEXT_WINDOW_CLOSEOUT_DRAFT.md) or open a recovery thread."
+        if ship.get("ok") and any(
+            isinstance(s, dict) and s.get("step") in ("publish", "publish_ahead") and s.get("ok")
+            for s in (ship.get("steps") or [])
+        ):
+            return "Shipped — CI auto-merges when green. Ask what's next? for operator verdict."
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
     cmds = op.get("commands") or []
     if cmds:
@@ -364,11 +409,15 @@ def build_closeout_record(
     slices_closed_in_thread: int = 0,
     triage_counts: dict[str, int] | None = None,
     notes: str = "",
+    ship_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     pf = snapshot.get("preflight") if isinstance(snapshot.get("preflight"), dict) else {}
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
     closed_at = str(snapshot.get("generated_at_utc") or _utc_now())
-    next_line = whats_next.strip() or infer_whats_next(snapshot)
+    ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
+    next_line = whats_next.strip() or infer_whats_next(snapshot, ship_report=ship if isinstance(ship, dict) else None)
+    if isinstance(ship, dict) and ship.get("blocked"):
+        safe_to_switch = False
     return {
         "event": "context_window_closeout",
         "closeout_id": str(uuid.uuid4()),
@@ -384,6 +433,8 @@ def build_closeout_record(
         "slices_closed_in_thread": int(slices_closed_in_thread),
         "triage_counts": dict(triage_counts or {}),
         "notes": notes.strip(),
+        "ship_ok": None if not isinstance(ship, dict) else ship.get("ok"),
+        "ship_blocked": None if not isinstance(ship, dict) else ship.get("blocked"),
     }
 
 
@@ -452,6 +503,7 @@ def record_context_closeout(
     triage_counts: dict[str, int] | None = None,
     notes: str = "",
     promote: bool = True,
+    ship_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     record = build_closeout_record(
         snapshot,
@@ -461,6 +513,7 @@ def record_context_closeout(
         slices_closed_in_thread=slices_closed_in_thread,
         triage_counts=triage_counts,
         notes=notes,
+        ship_report=ship_report,
     )
     append_closeout_record(repo, record)
     if promote:
@@ -586,8 +639,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--record",
         action="store_true",
-        help="Render + append context_windows.jsonl + promote WHATS_NEXT (use at thread closeout)",
+        help="Render + auto-ship + append context_windows.jsonl + promote WHATS_NEXT",
     )
+    ap.add_argument(
+        "--ship",
+        action="store_true",
+        help="Run operational sweep (gate → commit → push → PR) before render/record",
+    )
+    ap.add_argument(
+        "--no-ship",
+        action="store_true",
+        help="Skip auto-ship even with --record (triage-only closeout)",
+    )
+    ap.add_argument("--ship-dry-run", action="store_true", help="Preview auto-ship without git mutations")
     ap.add_argument("--json", action="store_true", help="Print snapshot JSON to stdout")
     ap.add_argument("--thread-role", default="steward", help="steward | ide_build | recovery | exploratory")
     ap.add_argument("--whats-next", default="", help="One-line next action (default: infer from operator verdict)")
@@ -663,30 +727,51 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     snapshot = collect_snapshot(repo)
+    ship_report: dict[str, Any] | None = None
+    do_ship = args.ship or (args.record and not args.no_ship)
+    if do_ship:
+        from scripts.ppe_context_closeout_ship import run_operational_sweep
+
+        ship_report = run_operational_sweep(repo, dry_run=args.ship_dry_run)
+        if not args.ship_dry_run:
+            snapshot = collect_snapshot(repo)
+        if ship_report.get("ok"):
+            print("ppe_context_window_closeout: auto-ship ok")
+        elif ship_report.get("blocked"):
+            print("ppe_context_window_closeout: auto-ship blocked — see draft report", file=sys.stderr)
+        else:
+            print("ppe_context_window_closeout: auto-ship incomplete", file=sys.stderr)
+
     if args.json:
-        print(json.dumps(snapshot, indent=2))
-        return 0
+        payload = dict(snapshot)
+        if ship_report is not None:
+            payload["ship_report"] = ship_report
+        print(json.dumps(payload, indent=2))
+        return 0 if not ship_report or ship_report.get("ok") else 1
     if args.render or args.record:
-        json_path, md_path = write_artifacts(repo, snapshot)
+        json_path, md_path = write_artifacts(repo, snapshot, ship_report=ship_report)
         print(f"ppe_context_window_closeout: wrote {json_path.relative_to(repo)}")
         print(f"ppe_context_window_closeout: wrote {md_path.relative_to(repo)}")
         if args.record:
+            safe = args.safe_to_switch == "yes" and not (ship_report and ship_report.get("blocked"))
             record = record_context_closeout(
                 repo,
                 snapshot,
                 thread_role=args.thread_role,
                 whats_next=args.whats_next,
-                safe_to_switch=args.safe_to_switch == "yes",
+                safe_to_switch=safe,
                 slices_closed_in_thread=args.slices_closed,
                 notes=args.notes,
                 promote=not args.no_promote,
+                ship_report=ship_report,
             )
             jsonl = _metrics_dir(repo) / CONTEXT_WINDOWS_FILE
             print(f"ppe_context_window_closeout: appended {jsonl.relative_to(repo)}")
             if not args.no_promote:
                 print(f"ppe_context_window_closeout: promoted {WHATS_NEXT_MD_REL}")
             print(f"ppe_context_window_closeout: whats_next={record.get('whats_next')}")
-        return 0
+        exit_code = 0 if not ship_report or ship_report.get("ok") else 1
+        return exit_code
 
     ap.print_help()
     return 0

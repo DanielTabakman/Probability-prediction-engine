@@ -45,7 +45,19 @@
       "declaredPlane": "EVIDENCE-PLANE",
       "susMinutes": 15,
       "hardMinutes": 30,
-      "maxAttempts": 1
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_display_cache_ops_v1",
+        "chapterTitle": "PPE display cache ops v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_DISPLAY_CACHE_OPS_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_DISPLAY_CACHE_OPS_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
+        ]
+      }
     }
   ]
 }

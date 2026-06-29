@@ -10,7 +10,11 @@ import pytest
 
 from src.viz.distribution_export import build_distribution_export_rows
 from src.viz.curve_display_labels import build_curve_display_labels
-from src.viz.display_payload_cache import clear_display_payload_cache, get_cached_display_payload
+from src.viz.display_payload_cache import (
+    clear_display_payload_cache,
+    display_cache_status,
+    get_cached_display_payload,
+)
 from src.viz.embed_display_boundary import (
     BELIEF_OVERLAY_KIND,
     CATALOG_PAYLOAD_HTTP_PATH,
@@ -535,6 +539,7 @@ def test_display_payload_cache_keys_by_asset_and_depth() -> None:
 
 
 def test_display_wsgi_cache_status_route() -> None:
+    clear_display_payload_cache()
     app = create_display_payload_wsgi_app(lambda _environ: {})
     headers: list[tuple[str, str]] = []
 
@@ -544,8 +549,28 @@ def test_display_wsgi_cache_status_route() -> None:
     body = b"".join(app({"PATH_INFO": "/cache-status.json", "QUERY_STRING": ""}, start_response))
     parsed = json.loads(body.decode("utf-8"))
     assert "ttl_seconds" in parsed
+    assert "refresh_seconds" in parsed
     assert "enabled_assets" in parsed
+    assert "assets" in parsed
     assert dict(headers).get("Content-Type") == "application/json; charset=utf-8"
+
+
+def test_display_cache_status_tracks_last_warm() -> None:
+    clear_display_payload_cache()
+    calls = {"n": 0}
+
+    def builder() -> dict:
+        calls["n"] += 1
+        return {"n": calls["n"]}
+
+    with patch.dict(os.environ, {"PPE_DISPLAY_CACHE_ENABLED": "1", "PPE_DISPLAY_CACHE_TTL_SECONDS": "60"}):
+        get_cached_display_payload("BTC", "full", builder)
+        status = display_cache_status()
+
+    btc = next(row for row in status["assets"] if row["asset_id"] == "BTC")
+    assert btc["last_warm_utc"]
+    assert btc["fresh"] is True
+    assert btc["cached_depths"] == ["full"]
 
 
 def test_display_payload_cache_disabled_rebuilds_each_time() -> None:
