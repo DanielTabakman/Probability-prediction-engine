@@ -1,0 +1,72 @@
+{
+  "name": "msos_trader_review_loop_v1 (MSOS snapshot post-mortem review loop)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-RevLoop-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+      "buildBranch": "build/auto/MSOS-RevLoop-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-RevLoop-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+      "buildBranch": "build/auto/MSOS-RevLoop-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 300,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/app/api/snapshots/[id]/review/route.ts",
+        "apps/msos-web/src/app/monitor/snapshot/[id]/page.tsx",
+        "apps/msos-web/src/components/SnapshotReviewForm.tsx",
+        "apps/msos-web/src/lib/snapshotReview.ts",
+        "apps/msos-web/src/components/MonitorContent.tsx",
+        "tests/test_msos_web_snapshot_review.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-RevLoop-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+      "buildBranch": "build/auto/MSOS-RevLoop-Witness-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 30,
+      "hardMinutes": 60,
+      "maxAttempts": 1,
+      "touchSet": [
+        "tests/test_msos_web_snapshot_review.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-RevLoop-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+      "buildBranch": "build/auto/MSOS-RevLoop-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_trader_review_loop_v1",
+        "chapterTitle": "MSOS trader review loop v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}
