@@ -4,7 +4,13 @@
 
 **Status:** Living draft — improve as we go.
 
-**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser)
+**Machine SSOT:** [`PPE_MODULE_REGISTRY.json`](PPE_MODULE_REGISTRY.json) — edit this first, then regenerate HTML.
+
+**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html)
+
+**Regenerate map:** `python scripts/render_msos_module_map.py --write` or [`render_msos_module_map.cmd`](../../render_msos_module_map.cmd) at repo root.
+
+**Open locally:** `docs/SOP/assets/msos_module_map.html` in your repo folder — double-click in File Explorer or drag into Chrome/Edge.
 
 **As-of:** 2026-06-29
 
@@ -123,13 +129,15 @@ Modules can move ship-to later (e.g. consistency: OPERATOR → TRADER Monitor ho
 
 ## Registered modules (living table)
 
-Update at every module SELECTION / closeout. **Advance?** = steward yes/no for next tier or chapter.
+**Source of truth:** [`PPE_MODULE_REGISTRY.json`](PPE_MODULE_REGISTRY.json). The table below mirrors JSON for markdown readers; if they drift, JSON wins until re-synced.
+
+Update JSON at every module SELECTION / closeout, then run `python scripts/render_msos_module_map.py --write`.
 
 | # | Module ID | Display name | Class | Pillar | Ship-to | Route / artifact | Boundary API | Tier (cur→tgt) | Priority | Status | Advance? |
 |---|-----------|--------------|-------|--------|---------|------------------|--------------|----------------|----------|--------|----------|
 | 1 | `implied_distribution` | Implied distribution | DISTRIBUTION | LEGIBILITY | TRADER | `/strategy-lab` | `/ppe-display-api/display.json` | T2→T4 | P0 | **LIVE** | T4: richer relationship modes |
 | 2 | `options_horizon` | Options Horizon | PROJECTION | LEGIBILITY | TRADER | `/options-horizon` | `/ppe-display-api/horizon/*.json` | T2→T5* | P1 | **LIVE** | chart polish + archive |
-| 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** | **yes** — radar T1–T2 |
+| 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** | [`ppe_forward_consistency_radar_v1`](POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md) SELECTED |
 | 4 | `expression_planner` | Expression planner | EXPOSURE | EDGE + WORKFLOW | TRADER | `/strategy-lab/expression` | strategy suggestion boundary | T2→T3 | P1 | **LIVE** | exposure optimization depth |
 | 5 | `cross_venue_event_gap` | Cross-venue scan | EVENT_GAP | EDGE | RESEARCH | `artifacts/cross_venue_reports/` | scan JSON | T3→T3 | side | **LIVE** (ops) | backtest when history deep |
 | — | *workflow* | Thesis / confirm / monitor | — | WORKFLOW | TRADER | P3–P7 routes | MSOS workflow store | — | P0 | **LIVE** | asset parity, return loop |
@@ -235,7 +243,7 @@ Queue via [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FR
 
 ### Step 6 — Closeout
 
-Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_module_map.html).
+Evidence COMPLETE → update [`PPE_MODULE_REGISTRY.json`](PPE_MODULE_REGISTRY.json) → `python scripts/render_msos_module_map.py --write`.
 
 ---
 
@@ -264,3 +272,4 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 draft — pillars, tiers, archive charter, registry table, HTML map |
+| 2026-06-29 | v1.1 — JSON SSOT + auto-render HTML; forward consistency radar SELECTION |

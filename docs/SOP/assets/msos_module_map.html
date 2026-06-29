@@ -18,7 +18,6 @@
         --amber: #f2b657;
         --violet: #a78bfa;
         --green: #6ee7a8;
-        --red: #ff6478;
         --wf: #43e7d3;
         --edge: #f2b657;
         --leg: #a78bfa;
@@ -34,8 +33,18 @@
         padding: 16px 18px 48px;
       }
       h1 { font-size: 1.35rem; margin: 0 0 6px; }
-      .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; max-width: 52rem; }
+      .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; max-width: 56rem; }
       .sub a { color: var(--teal); }
+      .open-box {
+        background: var(--panel2);
+        border: 1px solid var(--teal);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 20px;
+        font-size: 0.82rem;
+        max-width: 56rem;
+      }
+      .open-box code { color: var(--teal); word-break: break-all; }
       h2 {
         font-size: 0.72rem;
         text-transform: uppercase;
@@ -48,7 +57,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 10px;
-        margin-bottom: 8px;
       }
       .pillar {
         background: var(--panel);
@@ -67,7 +75,7 @@
         gap: 8px 16px;
         font-size: 0.75rem;
         color: var(--muted);
-        margin-bottom: 16px;
+        margin: 12px 0 16px;
       }
       .legend i {
         display: inline-block;
@@ -187,7 +195,7 @@
         padding: 12px 14px;
         font-size: 0.82rem;
         color: var(--muted);
-        max-width: 52rem;
+        max-width: 56rem;
       }
       .note strong { color: var(--text); }
       .loop-diagram {
@@ -210,11 +218,18 @@
   <body>
     <h1>MSOS module map</h1>
     <p class="sub">
-      Living operator chart — modules, data, tiers, priorities.
-      Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
-      · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      · As-of 2026-06-29 (draft)
+      Auto-generated from <a href="../PPE_MODULE_REGISTRY.json">PPE_MODULE_REGISTRY.json</a>
+      · Markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
+      · As-of 2026-06-29
     </p>
+
+    <div class="open-box">
+      <strong>How to open (local file on your PC)</strong><br />
+      Path: <code>C:\Users\USER\Desktop\Probability-prediction-engine\docs\SOP\assets\msos_module_map.html</code><br />
+      Double-click the file in File Explorer, or paste into your browser address bar:<br />
+      <code>file:///C:/Users/USER/Desktop/Probability-prediction-engine/docs/SOP/assets/msos_module_map.html</code><br />
+      Regenerate after editing JSON: <code>python scripts/render_msos_module_map.py</code>
+    </div>
 
     <h2>MSOS pillars</h2>
     <div class="pillars">
@@ -233,10 +248,10 @@
     </div>
 
     <div class="legend">
-      <span><i style="background:var(--wf)"></i> Workflow pillar</span>
-      <span><i style="background:var(--edge)"></i> Edge pillar</span>
-      <span><i style="background:var(--leg)"></i> Legibility pillar</span>
-      <span>T0 contract → T4 workflow hook</span>
+      <span><i style="background:var(--wf)"></i> Workflow</span>
+      <span><i style="background:var(--edge)"></i> Edge</span>
+      <span><i style="background:var(--leg)"></i> Legibility</span>
+      <span>T0 → T4 integration tiers</span>
     </div>
 
     <h2>Data → processing → output</h2>
@@ -244,8 +259,8 @@
       <div class="flow-col">
         <h3>Sources</h3>
         <div class="flow-item">Deribit options chain<small>BTC, ETH, tier-1 crypto</small></div>
-        <div class="flow-item">Deribit futures / perp<small>Consistency, horizon forward</small></div>
-        <div class="flow-item">Polymarket<small>Cross-venue event probs</small></div>
+        <div class="flow-item">Deribit futures / perp<small>Forward consistency, Options Horizon forward</small></div>
+        <div class="flow-item">Polymarket<small>Cross-venue event probabilities</small></div>
         <div class="flow-item">Asset registry / catalog<small>Enabled assets, venues</small></div>
         <div class="flow-item">MSOS workflow store<small>Theses, paper trades</small></div>
       </div>
@@ -289,7 +304,7 @@
           <td class="tier">T2 → T4</td>
           <td class="prio-p0">P0</td>
           <td class="status-live">LIVE</td>
-          <td>More relationship modes</td>
+          <td>Additional market-relationship modes (T4); multi-asset parity</td>
         </tr>
         <tr>
           <td>2</td>
@@ -299,7 +314,7 @@
           <td class="tier">T2 → T5</td>
           <td class="prio-p1">P1</td>
           <td class="status-live">LIVE</td>
-          <td>Chart polish + archive</td>
+          <td>Surface archive + replay chapters</td>
         </tr>
         <tr>
           <td>3</td>
@@ -309,7 +324,7 @@
           <td class="tier">T1 → T3</td>
           <td class="prio-p2">P2</td>
           <td class="status-partial">PARTIAL</td>
-          <td class="advance-yes">YES — radar T1–T2</td>
+          <td class="advance-yes">YES — relay ppe_forward_consistency_radar_v1 (dashboard + heatmap)</td>
         </tr>
         <tr>
           <td>4</td>
@@ -319,17 +334,17 @@
           <td class="tier">T2 → T3</td>
           <td class="prio-p1">P1</td>
           <td class="status-live">LIVE</td>
-          <td>Exposure depth</td>
+          <td>Exposure optimization depth</td>
         </tr>
         <tr>
           <td>5</td>
           <td><strong>Cross-venue scan</strong><br><code>cross_venue_event_gap</code><br>artifacts/cross_venue_reports/</td>
           <td><span class="tag tag-edge">EDGE</span></td>
           <td>RESEARCH</td>
-          <td class="tier">T3</td>
+          <td class="tier">T3 → T3</td>
           <td class="prio-side">side</td>
           <td class="status-live">LIVE (ops)</td>
-          <td>Backtest when deep</td>
+          <td>Backtest when history deep</td>
         </tr>
         <tr>
           <td>—</td>
@@ -339,7 +354,7 @@
           <td class="tier">—</td>
           <td class="prio-p0">P0</td>
           <td class="status-live">LIVE</td>
-          <td>Asset parity, return loop</td>
+          <td>Return loop + workflow research ingestion</td>
         </tr>
       </tbody>
     </table>
@@ -363,7 +378,7 @@
     </table>
 
     <div class="note" style="margin-top:12px">
-      <strong>T3 rule:</strong> No collector slice without a written archive charter (hypothesis, consumer, granularity, retention, non-goals). Do not archive every market tick.
+      <strong>T3 rule:</strong> No collector slice without archive charter (hypothesis, consumer, granularity, retention, non-goals).
     </div>
 
     <h2>Trader loop (simplified)</h2>
@@ -372,63 +387,60 @@
   LEGIBILITY                    WORKFLOW                         EDGE
   ──────────                    ────────                         ────
   Implied distribution ──┐
-  Options Horizon ───────┼──► Market relationship ──► Thesis ──► Expression ──► Monitor
-                         │    (disagreement today;              planner          ▲
-  Forward consistency ───┘     more modes later)                  (sim only)     │
-       (trust signal) ─────────────────────────────────────────────────────────────┘
+  Options Horizon ───────┼──► Market relationship ──► Thesis ──► Expression planner ──► Monitor
+                         │    (disagreement today;              (sim only)              ▲
+  Forward consistency ───┘     more modes later)                                        │
+       (trust signal) ────────────────────────────────────────────────────────────────────┘
       </pre>
     </div>
 
     <h2>Module cards — where we left off</h2>
     <div class="cards">
       <div class="card">
-        <h3>1 · Implied distribution</h3>
-        <div class="meta">DISTRIBUTION · T2 live · P0</div>
-        <p>Primary legibility tool in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
-        <div class="next"><strong>Next:</strong> Additional relationship modes (charter T4); multi-asset parity.</div>
+        <h3>Implied distribution</h3>
+        <div class="meta">DISTRIBUTION · T2 · P0</div>
+        <p>Primary legibility module in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
+        <div class="next"><strong>Next:</strong> Additional market-relationship modes (T4); multi-asset parity</div>
       </div>
       <div class="card">
-        <h3>2 · Options Horizon</h3>
-        <div class="meta">PROJECTION · T2 live · P1</div>
+        <h3>Options Horizon</h3>
+        <div class="meta">PROJECTION · T2 · P1</div>
         <p>Price × time projection; surface archive chartered for replay.</p>
-        <div class="next"><strong>Next:</strong> Chart polish relay; daily surface collector on VM.</div>
+        <div class="next"><strong>Next:</strong> Surface archive + replay chapters</div>
       </div>
       <div class="card">
-        <h3>3 · Forward consistency</h3>
-        <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">ADVANCE</span></div>
-        <p>Lab panel live; dashboard + heatmap not built. Target T3 with daily status snapshots only.</p>
-        <div class="next"><strong>Next:</strong> SELECTION → relay ch.1–2 (dashboard payload + /forward-consistency).</div>
+        <h3>Forward consistency</h3>
+        <div class="meta">CONSISTENCY · T1 · P2 · <span class="advance-yes">ADVANCE</span></div>
+        <p>Strategy Lab panel live; dashboard and heatmap not built. Target T3 with daily status snapshots only.</p>
+        <div class="next"><strong>Next:</strong> YES — relay ppe_forward_consistency_radar_v1 (dashboard + heatmap)</div>
       </div>
       <div class="card">
-        <h3>4 · Expression planner</h3>
-        <div class="meta">EXPOSURE · T2 live · P1</div>
-        <p>Optimal exposure / structure fit under constraints — simulation only.</p>
-        <div class="next"><strong>Next:</strong> Deeper exposure optimization; optional T3 if replay needed.</div>
+        <h3>Expression planner</h3>
+        <div class="meta">EXPOSURE · T2 · P1</div>
+        <p>Structure fit under constraints — simulation only.</p>
+        <div class="next"><strong>Next:</strong> Exposure optimization depth</div>
       </div>
       <div class="card">
-        <h3>5 · Cross-venue scan</h3>
-        <div class="meta">EVENT_GAP · T3 ops · side channel</div>
-        <p>PM vs options gap — research lane. VM daily task shipped.</p>
-        <div class="next"><strong>Next:</strong> Backtest when ≥14d history; not trader nav.</div>
+        <h3>Cross-venue scan</h3>
+        <div class="meta">EVENT_GAP · T3 · side</div>
+        <p>Polymarket vs options gap — research lane. VM daily task shipped.</p>
+        <div class="next"><strong>Next:</strong> Backtest when history deep</div>
       </div>
       <div class="card">
-        <h3>Meta infra (not modules)</h3>
+        <h3>Meta infra</h3>
         <div class="meta">Cache, trust, witnesses, enablement</div>
-        <p>Cross-cutting — supports all modules scaling to ~25 assets.</p>
-        <div class="next"><strong>Next:</strong> prod multi-asset witness; workflow asset parity.</div>
+        <p>Cross-cutting infra supporting all modules at scale.</p>
+        <div class="next"><strong>Next:</strong> Display cache ops; forward consistency radar relay</div>
       </div>
     </div>
 
-    <h2>Active BUILD priorities (milestone)</h2>
+    <h2>Active BUILD priorities</h2>
     <div class="note">
-      <strong>Trader Workflow Integration v1</strong> — process fit over platform breadth.
-      Relay queue: crypto multi-asset, self-serve onboarding, universe tiers.
-      Module registry does not replace FRONTIER — it maps <em>what</em> exists vs <em>what slice runs next</em>.
+      <strong>Milestone:</strong> Trader Workflow Integration v1 — process fit over platform breadth. Relay queue: crypto multi-asset, self-serve onboarding, universe tiers. Module registry maps what exists vs what slice runs next (FRONTIER still controls relay order).
     </div>
 
     <footer>
-      Open this file locally: <code>docs/SOP/assets/msos_module_map.html</code>
-      · Update when registry table changes · noindex
+      Generated by scripts/render_msos_module_map.py · SSOT: docs/SOP/PPE_MODULE_REGISTRY.json · noindex
     </footer>
   </body>
 </html>

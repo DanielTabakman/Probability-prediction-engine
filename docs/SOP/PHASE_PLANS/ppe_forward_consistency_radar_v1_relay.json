@@ -1,0 +1,62 @@
+{
+  "name": "ppe_forward_consistency_radar_v1 (dashboard boundary + quality flags)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-FCR-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-FCR-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/forward_consistency.py",
+        "src/data/forward_consistency_quotes.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-FCR-UI-Slice003",
+      "layerPreset": "PPE_UI",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/forward_consistency_boundary.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-FCR-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_forward_consistency_radar_v1",
+        "chapterTitle": "PPE forward consistency radar v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+          "docs/SOP/PPE_MODULE_REGISTRY_V1.md"
+        ]
+      }
+    }
+  ]
+}

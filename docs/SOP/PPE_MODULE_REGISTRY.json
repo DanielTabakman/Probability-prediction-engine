@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-06-29",
+  "registry_doc": "docs/SOP/PPE_MODULE_REGISTRY_V1.md",
+  "html_output": "docs/SOP/assets/msos_module_map.html",
+  "pillars": [
+    {
+      "id": "WORKFLOW",
+      "label": "Workflow",
+      "css_class": "",
+      "summary": "Trader process — relate to market, thesis, express, return, review. Disagreement is one relationship mode today; more planned."
+    },
+    {
+      "id": "EDGE",
+      "label": "Edge",
+      "css_class": "edge",
+      "summary": "Find and test executable dislocations and structure fit — simulation only, not order routing."
+    },
+    {
+      "id": "LEGIBILITY",
+      "label": "Legibility",
+      "css_class": "leg",
+      "summary": "Honest readable market structure — implied distributions, projection, trust labels."
+    }
+  ],
+  "integration_tiers": [
+    {
+      "id": "T0",
+      "delivers": "Types, fixtures, unit tests",
+      "charter_question": "What is the output shape?"
+    },
+    {
+      "id": "T1",
+      "delivers": "Display boundary API",
+      "charter_question": "Can MSOS fetch honest JSON?"
+    },
+    {
+      "id": "T2",
+      "delivers": "MSOS read-only page",
+      "charter_question": "Can a human inspect it?"
+    },
+    {
+      "id": "T3",
+      "delivers": "Archive + collector",
+      "charter_question": "Why collect? What subset? How often?"
+    },
+    {
+      "id": "T4",
+      "delivers": "Workflow / Monitor hook",
+      "charter_question": "Does it close the trader loop?"
+    }
+  ],
+  "data_flow": {
+    "sources": [
+      {
+        "label": "Deribit options chain",
+        "detail": "BTC, ETH, tier-1 crypto"
+      },
+      {
+        "label": "Deribit futures / perp",
+        "detail": "Forward consistency, Options Horizon forward"
+      },
+      {
+        "label": "Polymarket",
+        "detail": "Cross-venue event probabilities"
+      },
+      {
+        "label": "Asset registry / catalog",
+        "detail": "Enabled assets, venues"
+      },
+      {
+        "label": "MSOS workflow store",
+        "detail": "Theses, paper trades"
+      }
+    ],
+    "processing": [
+      {
+        "label": "src/data/* fetchers",
+        "detail": ""
+      },
+      {
+        "label": "src/engine/* math",
+        "detail": ""
+      },
+      {
+        "label": "src/viz/* boundaries",
+        "detail": ""
+      },
+      {
+        "label": "scripts/collect_*",
+        "detail": "VM scheduled archives"
+      }
+    ],
+    "outputs": [
+      {
+        "label": "/ppe-display-api/*.json",
+        "detail": "MSOS fetch only"
+      },
+      {
+        "label": "artifacts/*",
+        "detail": "Ops reports, snapshots"
+      },
+      {
+        "label": "apps/msos-web routes",
+        "detail": "Read-only UI"
+      }
+    ]
+  },
+  "milestone_note": "Trader Workflow Integration v1 — process fit over platform breadth. Relay queue: crypto multi-asset, self-serve onboarding, universe tiers. Module registry maps what exists vs what slice runs next (FRONTIER still controls relay order).",
+  "modules": [
+    {
+      "ordinal": 1,
+      "module_id": "implied_distribution",
+      "display_name": "Implied distribution",
+      "class": "DISTRIBUTION",
+      "pillars": ["LEGIBILITY"],
+      "ship_to": "TRADER",
+      "route": "/strategy-lab",
+      "boundary_api": "/ppe-display-api/display.json",
+      "tier_current": "T2",
+      "tier_target": "T4",
+      "priority": "P0",
+      "status": "LIVE",
+      "advance": "Additional market-relationship modes (T4); multi-asset parity",
+      "card_summary": "Primary legibility module in Strategy Lab. Disagreement overlay is the main market-relationship mode.",
+      "program_doc": null
+    },
+    {
+      "ordinal": 2,
+      "module_id": "options_horizon",
+      "display_name": "Options Horizon",
+      "class": "PROJECTION",
+      "pillars": ["LEGIBILITY"],
+      "ship_to": "TRADER",
+      "route": "/options-horizon",
+      "boundary_api": "/ppe-display-api/horizon/*.json",
+      "tier_current": "T2",
+      "tier_target": "T5",
+      "priority": "P1",
+      "status": "LIVE",
+      "advance": "Surface archive + replay chapters",
+      "card_summary": "Price × time projection; surface archive chartered for replay.",
+      "program_doc": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md"
+    },
+    {
+      "ordinal": 3,
+      "module_id": "forward_consistency",
+      "display_name": "Forward consistency",
+      "class": "CONSISTENCY",
+      "pillars": ["EDGE", "LEGIBILITY"],
+      "ship_to": "OPERATOR",
+      "route": "/forward-consistency (planned)",
+      "boundary_api": "/ppe-display-api/forward-consistency.json",
+      "tier_current": "T1",
+      "tier_target": "T3",
+      "priority": "P2",
+      "status": "PARTIAL",
+      "advance_highlight": true,
+      "advance": "YES — relay ppe_forward_consistency_radar_v1 (dashboard + heatmap)",
+      "card_summary": "Strategy Lab panel live; dashboard and heatmap not built. Target T3 with daily status snapshots only.",
+      "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+    },
+    {
+      "ordinal": 4,
+      "module_id": "expression_planner",
+      "display_name": "Expression planner",
+      "class": "EXPOSURE",
+      "pillars": ["EDGE", "WORKFLOW"],
+      "ship_to": "TRADER",
+      "route": "/strategy-lab/expression",
+      "boundary_api": "strategy suggestion boundary",
+      "tier_current": "T2",
+      "tier_target": "T3",
+      "priority": "P1",
+      "status": "LIVE",
+      "advance": "Exposure optimization depth",
+      "card_summary": "Structure fit under constraints — simulation only.",
+      "program_doc": null
+    },
+    {
+      "ordinal": 5,
+      "module_id": "cross_venue_event_gap",
+      "display_name": "Cross-venue scan",
+      "class": "EVENT_GAP",
+      "pillars": ["EDGE"],
+      "ship_to": "RESEARCH",
+      "route": "artifacts/cross_venue_reports/",
+      "boundary_api": "scan JSON",
+      "tier_current": "T3",
+      "tier_target": "T3",
+      "priority": "side",
+      "status": "LIVE",
+      "status_suffix": " (ops)",
+      "advance": "Backtest when history deep",
+      "card_summary": "Polymarket vs options gap — research lane. VM daily task shipped.",
+      "program_doc": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
+    }
+  ],
+  "workflow_surface": {
+    "display_name": "Workflow",
+    "detail": "thesis, confirm, monitor, history",
+    "pillars": ["WORKFLOW"],
+    "ship_to": "TRADER",
+    "route": "P3–P7 routes",
+    "boundary_api": "MSOS workflow store",
+    "priority": "P0",
+    "status": "LIVE",
+    "advance": "Return loop + workflow research ingestion",
+    "card_summary": "MSOS lifecycle surfaces — not a PPE analytical module."
+  },
+  "meta_infra_card": {
+    "display_name": "Meta infra",
+    "detail": "Cache, trust, witnesses, enablement",
+    "advance": "Display cache ops; forward consistency radar relay",
+    "card_summary": "Cross-cutting infra supporting all modules at scale."
+  }
+}
