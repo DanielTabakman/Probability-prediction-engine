@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `c30296f` — ops: loop publish ops/loop-publish-20260629201209-e770c6a (#709)
+- `68a523c` — ops: loop publish ops/loop-publish-20260629201147-e770c6a (#708)
+- `3930bef` — ops: loop publish ops/loop-publish-20260629200815-e770c6a (#705)
+- `40a0b8d` — ops: loop publish ops/loop-publish-20260629200144-e770c6a (#699)
+- `4ebd620` — ops: loop publish ops/loop-publish-20260629195742-e770c6a (#697)
+- `39548b2` — Control-plane: dev changelog
 - `3df2073` — feat(ppe-ui): exposure menu display boundary (Slice004) (#692) (`src/viz/`)
 - `005ab5c` — ops: loop publish ops/loop-publish-20260629194915-abe3b86 (#689)
 - `f3b1308` — ops: loop publish ops/loop-publish-20260629190007-4b0cc88 (#687)
