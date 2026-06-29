@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md.
+- **Next steward action:** BUILD: ppe_exposure_menu_v1 READY (operator priority). Then asset batch wave 1 (tier1a→commodity) per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. Wave 2 blocked until wave 1 evidence COMPLETE.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
