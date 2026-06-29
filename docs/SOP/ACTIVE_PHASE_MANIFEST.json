@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "steward SELECTION 2026-06-29 \u2014 exposure menu v0 approved (NVDA + BTC); BL density deferred",
   "workerMode": "local-agent"
 }

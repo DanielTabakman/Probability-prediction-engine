@@ -165,7 +165,7 @@
     },
     {
       "chapterId": "mvp1_bl_density_smoothing_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
@@ -684,12 +684,12 @@
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
-      "urgentReason": "Operator SELECTION 2026-06-29 — exposure menu v0 front door",
+      "urgentReason": "Operator SELECTION 2026-06-29 \u2014 exposure menu v0 front door",
       "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
       "canonRef": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
-      "reason": "[P1] Exposure menu v0 — NVDA + BTC multi-rail paths; steward SELECTION approved"
+      "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION approved"
     }
   ]
 }
