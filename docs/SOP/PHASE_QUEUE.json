@@ -446,13 +446,14 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
       "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
       "urgent": true,
       "urgentReason": "Operator approved exposure menu over BL density smoothing",
       "focusPlaybookTier": "P1",
-      "workerMode": "local-agent"
+      "workerMode": "local-agent",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",

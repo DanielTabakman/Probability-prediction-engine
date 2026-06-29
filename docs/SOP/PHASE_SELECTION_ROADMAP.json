@@ -297,7 +297,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
       "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md"
     },

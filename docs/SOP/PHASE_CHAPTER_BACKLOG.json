@@ -690,7 +690,7 @@
     },
     {
       "chapterId": "ppe_exposure_menu_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
