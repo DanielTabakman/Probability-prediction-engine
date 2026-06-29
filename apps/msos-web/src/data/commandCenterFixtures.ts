@@ -23,6 +23,7 @@ export const navItems: NavItem[] = [
 
 /** Secondary destinations — linked from Command Center and sidebar footer, not primary nav. */
 export const secondaryNavItems: NavItem[] = [
+  { id: "exposure", label: "Exposure menu", href: "/exposure" },
   { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
   { id: "learn", label: "Learn", href: "/learn" },
 ];
