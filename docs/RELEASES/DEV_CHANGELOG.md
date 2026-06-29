@@ -4,6 +4,19 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `7470251` — ops: loop publish ops/loop-publish-20260629151046-082d745 (#560)
+- `4fae86d` — ops: loop publish ops/loop-publish-20260629151139-082d745 (#562)
+- `7883a2d` — ops: loop publish ops/loop-publish-20260629151207-082d745 (#563)
+- `fd680e3` — docs(control): MSOS operator map dashboard on main (#557) (`docs/SOP/`)
+- `7be6008` — control-plane: make adaptive burst the default what's next path (#577) (`scripts/`)
+- `eb14c41` — product(msos-ui): PPE-ExposureMenu-Product-Slice005 /exposure page (#576) (`apps/msos-web/`)
+- `9c0bf2a` — feat(ppe-core): exposure path menu CLI (Slice003) (#575) (`scripts/`)
+- `2a0edc7` — feat(ppe-core): exposure path menu core engine + catalog activation (#574) (`scripts/`)
+- `be4d4b7` — ops: VM cross-venue collector witness + scan UTF-8 console fix (#572) (`docs/SOP/`)
+- `1137e40` — SELECTION: volume-ordered asset batch wave 1 (#571) (`docs/SOP/`)
+- `143d58d` — ops: loop publish ops/loop-publish-20260629152347-5e2d7b6 (#570) (`docs/SOP/`)
+- `231a338` — fix(control-closeout): mark evidence slice table COMPLETE on chapter closeout (#569) (`docs/SOP/`)
+- `cac6a04` — Control-plane: dev changelog
 - `f2c21e1` — SELECTION: exposure menu v0 READY — defer BL density smoothing (#568) (`docs/SOP/`)
 - `ffb7963` — ops: loop publish ops/loop-publish-20260629151817-d190460 (#567)
 - `7bdc778` — ops: loop publish ops/loop-publish-20260629151518-d190460 (#566) (`docs/SOP/`)
