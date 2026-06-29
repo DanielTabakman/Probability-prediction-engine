@@ -60,6 +60,14 @@ ssh ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engin
 
 ---
 
+## Witness (ppeloop VM)
+
+| Date | Check |
+|------|--------|
+| 2026-06-29 | Task `PPE Cross-Venue Daily` registered (07:15); smoke `run_cross_venue_daily.cmd` → `artifacts/cross_venue_snapshots/2026-06-29/*.csv` + `artifacts/cross_venue_reports/latest.md` |
+
+---
+
 ## Weekly backtest (Monday pipeline)
 
 `weekly_digest_monday.cmd` runs `run_cross_venue_backtest.cmd` after the workflow radar — non-fatal when history is thin. Does not block relay chapters.
