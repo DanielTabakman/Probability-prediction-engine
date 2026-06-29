@@ -243,6 +243,7 @@
         "tests/test_msos_web_access_identity.py",
         "tests/test_msos_web_e2e_product_witness.py",
         "tests/test_msos_web_production_wiring.py",
+        "tests/test_msos_web_distribution_download.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",
         "docs/SOP/SPRINT_MSOS_",
