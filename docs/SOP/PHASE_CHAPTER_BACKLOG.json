@@ -165,7 +165,7 @@
     },
     {
       "chapterId": "mvp1_bl_density_smoothing_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
@@ -490,7 +490,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 ch.1",
-      "reason": "[MEDIUM] Asset batch wave 1 \u2014 SPY QQQ IWM (re-charter; enable pending)"
+      "reason": "[MEDIUM] Asset batch wave 1 batch 1 (OI #1-3) \u2014 SPY QQQ IWM \u2014 DUE"
     },
     {
       "chapterId": "ppe_equity_universe_tier1b_v1",
@@ -499,8 +499,8 @@
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 ch.2",
-      "reason": "[MEDIUM] Asset batch wave 1 \u2014 AAPL MSFT AMZN GOOGL META"
+      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 2",
+      "reason": "[MEDIUM] Asset batch wave 1 batch 2 (OI vol order) \u2014 TSLA AMD AAPL MSFT AMZN \u2014 blocked until batch 1 retrospect"
     },
     {
       "chapterId": "ppe_equity_universe_tier1c_v1",
@@ -509,8 +509,8 @@
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 ch.3",
-      "reason": "[MEDIUM] Asset batch wave 1 \u2014 TSLA AMD COIN"
+      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 3",
+      "reason": "[MEDIUM] Asset batch wave 1 batch 3 (OI vol order) \u2014 COIN SLV GLD GOOGL META"
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
@@ -519,8 +519,8 @@
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 ch.4",
-      "reason": "[MEDIUM] Asset batch wave 1 \u2014 GLD SLV USO commodity ETF proxies"
+      "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 4",
+      "reason": "[MEDIUM] Asset batch wave 1 batch 4 (OI vol order) \u2014 USO"
     },
     {
       "chapterId": "ppe_cme_commodity_v1",
@@ -684,12 +684,12 @@
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
-      "urgentReason": "Operator SELECTION 2026-06-29 — exposure menu v0 front door",
+      "urgentReason": "Operator SELECTION 2026-06-29 \u2014 exposure menu v0 front door",
       "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
       "canonRef": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
-      "reason": "[P1] Exposure menu v0 — NVDA + BTC multi-rail paths; steward SELECTION approved"
+      "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION approved"
     },
     {
       "chapterId": "ppe_asset_batch_wave2_v1",

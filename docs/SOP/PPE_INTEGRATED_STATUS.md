@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md. |
+| **Next** | BUILD: ppe_exposure_menu_v1 READY (operator priority). Then asset batch wave 1 (tier1a→commodity) per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. Wave 2 blocked until wave 1 evidence COMPLETE. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 

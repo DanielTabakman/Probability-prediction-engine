@@ -117,15 +117,13 @@ python scripts/msos_production_multi_asset_witness.py   # when meta #7 COMPLETE
 
 ## Wave 1 chapter order (default)
 
-**Relay queue (2026-06-29):** after `ppe_exposure_menu_v1` READY → wave 1 chapters.
-
-Mechanical order from [`POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md`](POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md) and [`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md):
+**Relay queue (2026-06-29):** volume-ordered batches per [`POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md`](POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md). Rank by summed options OI (yfinance, top 3 expiries). **Retrospect gate** after batch 1 before batch 2.
 
 1. `ppe_deribit_crypto_tier1_v1` — SOL live; skip BNB/XRP when Deribit delisted
-2. `ppe_equity_universe_tier1a_v1` — SPY, QQQ, IWM
-3. `ppe_equity_universe_tier1b_v1` — AAPL, MSFT, AMZN, GOOGL, META
-4. `ppe_equity_universe_tier1c_v1` — TSLA, AMD, COIN
-5. `ppe_commodity_proxy_tier1_v1` — GLD, SLV, USO
+2. **`ppe_equity_universe_tier1a_v1`** — SPY, QQQ, IWM (**batch 1 — due now**)
+3. `ppe_equity_universe_tier1b_v1` — TSLA, AMD, AAPL, MSFT, AMZN (batch 2 — post-retrospect)
+4. `ppe_equity_universe_tier1c_v1` — COIN, SLV, GLD, GOOGL, META (batch 3)
+5. `ppe_commodity_proxy_tier1_v1` — USO (batch 4)
 
 Skip ids with `blocked_no_live_options`; document in chapter evidence.
 
