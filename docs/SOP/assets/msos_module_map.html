@@ -205,6 +205,67 @@
         line-height: 1.5;
       }
       footer { margin-top: 32px; font-size: 0.72rem; color: var(--muted); }
+      .maint-note {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.78rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin-bottom: 16px;
+      }
+      .maint-note strong { color: var(--teal); }
+      .maint-note code { font-size: 0.72rem; }
+      .flow-intro {
+        font-size: 0.84rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin: -4px 0 14px;
+      }
+      .op-section { max-width: 52rem; margin-bottom: 8px; }
+      .shipped-panel, .time-panel, .todo-panel {
+        background: var(--panel);
+        border-radius: 10px;
+        padding: 14px 16px;
+      }
+      .shipped-panel { border: 1px solid rgba(110, 231, 168, 0.35); }
+      .time-panel { border: 1px solid var(--violet); }
+      .todo-panel { border: 1px solid var(--amber); }
+      .shipped-panel h3 { margin: 0 0 10px; font-size: 0.95rem; color: var(--green); }
+      .time-panel h3 { margin: 0 0 10px; font-size: 0.95rem; color: var(--violet); }
+      .todo-panel h3 { margin: 0 0 10px; font-size: 0.95rem; color: var(--amber); }
+      .shipped-panel ul, .time-panel ul, .todo-panel ol {
+        margin: 0;
+        padding-left: 1.2rem;
+        font-size: 0.84rem;
+      }
+      .shipped-panel li, .time-panel li, .todo-panel li { margin-bottom: 8px; }
+      .shipped-panel li:last-child, .time-panel li:last-child, .todo-panel li:last-child { margin-bottom: 0; }
+      .shipped-panel .when, .time-panel .when, .todo-panel .why {
+        display: block;
+        font-size: 0.76rem;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .backlog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 12px;
+        margin-bottom: 8px;
+        max-width: 52rem;
+      }
+      .backlog-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .backlog-panel h3 { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); font-weight: 700; }
+      .backlog-panel ul { margin: 0; padding-left: 1.1rem; font-size: 0.78rem; }
+      .backlog-panel li { margin-bottom: 6px; }
+      .backlog-panel .tag-line { display: block; font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+      .backlog-panel.defer { border-style: dashed; opacity: 0.85; }
     </style>
   </head>
   <body>
@@ -215,6 +276,120 @@
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
       · As-of 2026-06-29 (draft)
     </p>
+
+    <div class="maint-note">
+      <strong>Is it up to date when I refresh?</strong>
+      Browser refresh only reloads <em>this file on disk</em>.
+      Run <code>git pull</code> first if agents merged changes — then refresh (or reopen the file).
+      Nothing here polls relay, VM, or production live; edit this HTML at steward closeout when priorities shift.
+    </div>
+
+    <h2>Recently shipped</h2>
+    <div class="op-section shipped-panel">
+      <h3>Last closeouts — what landed on main</h3>
+      <ul>
+        <li>
+          <strong>Options Horizon region workflow v1</strong>
+          <span class="when">2026-06-29 · mark regions, save intent on /options-horizon</span>
+        </li>
+        <li>
+          <strong>PPE display cache ops v1</strong>
+          <span class="when">2026-06-29 · warm schedule, cache health, ops runbook</span>
+        </li>
+        <li>
+          <strong>MSOS workflow asset parity + prod multi-asset witness</strong>
+          <span class="when">2026-06-28 · ?asset= through workflow; witness beyond BTC-only</span>
+        </li>
+        <li>
+          <strong>PPE trust surface + asset enablement pipeline</strong>
+          <span class="when">2026-06-28 · trust labels in MSOS; scripted enable ritual</span>
+        </li>
+        <li>
+          <strong>Options Horizon chart polish + equity/crypto universe tiers</strong>
+          <span class="when">2026-06-27–28 · tier-1 batches on registry/catalog</span>
+        </li>
+        <li>
+          <strong>PPE module registry + operator map (this page)</strong>
+          <span class="when">2026-06-29 · living chart for modules and operator attention</span>
+        </li>
+      </ul>
+    </div>
+
+    <h2>Waiting on time / data</h2>
+    <p class="flow-intro">
+      Blocked by clock or archive depth — not a human decision today. VM daily collectors must keep running.
+    </p>
+    <div class="op-section time-panel">
+      <h3>Needs more days of snapshots</h3>
+      <ul>
+        <li>
+          <strong>Horizon replay scrubber</strong>
+          <span class="when">Chartered · promote SELECTION when <code>archive_meta.replay_ready</code> (~30 daily surface snapshots on ppeloop)</span>
+        </li>
+        <li>
+          <strong>Cross-venue backtest scoring</strong>
+          <span class="when">Needs ≥14 daily PM ↔ Deribit snapshots · scan runs today; backtest thin until history deepens</span>
+        </li>
+        <li>
+          <strong>Forward consistency T3 archive</strong>
+          <span class="when">After radar dashboard (T1–T2) ships · then daily status snapshots per archive charter</span>
+        </li>
+        <li>
+          <strong>Horizon surface replay UX</strong>
+          <span class="when">Daily <code>collect_horizon_surface_snapshot</code> on VM — archive grows ~1 day at a time</span>
+        </li>
+      </ul>
+    </div>
+
+    <h2>Your attention — human to-do</h2>
+    <div class="op-section todo-panel">
+      <h3>Bottlenecks — needs you to keep it moving</h3>
+      <ol>
+        <li>
+          <strong>Forward consistency — approve relay ch.1–2 SELECTION</strong>
+          <span class="why">Lab panel exists; no MSOS /forward-consistency dashboard yet.</span>
+        </li>
+        <li>
+          <strong>Exposure menu v0 — approve READY → relay</strong>
+          <span class="why">Chartered front door for “I want X exposure” · NVDA + BTC paths.</span>
+        </li>
+        <li>
+          <strong>VM collectors — confirm tasks on ppeloop</strong>
+          <span class="why"><code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
+        </li>
+        <li>
+          <strong>Next asset batch — pick the group</strong>
+          <span class="why">Sign off trust caveats after witness before Live pill on new symbols.</span>
+        </li>
+      </ol>
+    </div>
+
+    <h2>When you have bandwidth — backlog</h2>
+    <p class="flow-intro">Secondary — pick when bottlenecks above are clear.</p>
+    <div class="backlog-grid">
+      <div class="backlog-panel">
+        <h3>Product depth</h3>
+        <ul>
+          <li>Self-serve onboarding polish<span class="tag-line">Trader Workflow · P1</span></li>
+          <li>Relationship modes beyond disagreement<span class="tag-line">Implied distribution T4</span></li>
+          <li>Expression optimizer depth<span class="tag-line">P1 · sim only</span></li>
+        </ul>
+      </div>
+      <div class="backlog-panel">
+        <h3>Ops hygiene</h3>
+        <ul>
+          <li>Cache warm after deploy<span class="tag-line"><code>warm_display_payload_cache.py</code></span></li>
+          <li>Monthly operating calendar<span class="tag-line"><code>OPERATING_CALENDAR_V1.md</code></span></li>
+        </ul>
+      </div>
+      <div class="backlog-panel defer">
+        <h3>Parked — SELECTION required</h3>
+        <ul>
+          <li>Live execution / order routing<span class="tag-line">Non-goal</span></li>
+          <li>Paywall automation · AI assistant<span class="tag-line">Product focus defer</span></li>
+        </ul>
+      </div>
+    </div>
 
     <h2>MSOS pillars</h2>
     <div class="pillars">
@@ -433,7 +608,7 @@
         <h3>Meta infra (not modules)</h3>
         <div class="meta">Cache, trust, witnesses, enablement</div>
         <p>Cross-cutting — supports all modules scaling to ~25 assets.</p>
-        <div class="next"><strong>Next:</strong> prod multi-asset witness; workflow asset parity.</div>
+        <div class="next"><strong>Next:</strong> Expand witness groups as new asset batches enable; cache ops cadence.</div>
       </div>
     </div>
 
@@ -445,8 +620,9 @@
     </div>
 
     <footer>
-      Open this file locally: <code>docs/SOP/assets/msos_module_map.html</code>
-      · Update when registry table changes · noindex
+      Open locally: <code>docs/SOP/assets/msos_module_map.html</code>
+      · <code>git pull</code> then browser refresh for latest
+      · Update shipped / waiting / to-do at steward closeout · noindex
     </footer>
   </body>
 </html>
