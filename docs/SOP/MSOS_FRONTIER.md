@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Relay: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop.
+- **Next steward action:** SELECTION: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
