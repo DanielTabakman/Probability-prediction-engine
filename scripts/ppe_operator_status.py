@@ -414,6 +414,12 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 {_format_human(status, repo)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
+    try:
+        from scripts.ppe_operator_compass import sync_compass
+
+        sync_compass(repo, status=status, patch_map=True)
+    except Exception:
+        pass
     return out
 
 
