@@ -1,0 +1,58 @@
+{
+  "name": "msos_forward_consistency_radar_v1 (MSOS /forward-consistency dashboard)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "MSOS-FCR-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/MSOS-FCR-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "MSOS-FCR-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/MSOS-FCR-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/forwardConsistency.ts",
+        "apps/msos-web/src/components/ForwardConsistencyPanel.tsx",
+        "apps/msos-web/src/app/forward-consistency",
+        "apps/msos-web/src/data/commandCenterFixtures.ts",
+        "tests/test_msos_web_forward_consistency_dashboard.py"
+      ]
+    },
+    {
+      "sliceId": "MSOS-FCR-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/MSOS-FCR-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "msos_forward_consistency_radar_v1",
+        "chapterTitle": "MSOS forward consistency radar v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+        "carryDocs": [
+          "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}

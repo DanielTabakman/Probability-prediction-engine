@@ -1,0 +1,73 @@
+{
+  "name": "ppe_forward_consistency_radar_v1 (dashboard payload + quality flags)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-FCR-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/PPE-FCR-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-FCR-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/PPE-FCR-Core-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/forward_consistency.py",
+        "src/data/forward_consistency_quotes.py",
+        "tests/test_forward_consistency_engine.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-FCR-UI-Slice003",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/PPE-FCR-UI-Slice003",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/viz/forward_consistency_boundary.py",
+        "src/viz/embed_display_boundary.py",
+        "fixtures/forward_consistency_dashboard_v1.json",
+        "tests/test_forward_consistency_boundary.py"
+      ]
+    },
+    {
+      "sliceId": "PPE-FCR-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+      "buildBranch": "build/auto/PPE-FCR-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_forward_consistency_radar_v1",
+        "chapterTitle": "PPE forward consistency radar v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "carryDocs": [
+          "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}
