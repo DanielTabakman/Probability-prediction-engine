@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from scripts.ppe_director_go import DIRECTOR_BURST_PROMPT, DIRECTOR_PROMPT, format_user_banner, run_director_go
+from scripts.ppe_director_go import DIRECTOR_PROMPT, format_user_banner, run_director_go
 from scripts.ppe_operator_status import VERDICT_RUN_AUTO
 
 
@@ -45,10 +45,20 @@ def test_run_director_go_burst_prompt(tmp_path, monkeypatch):
         "blocker": "PRODUCT_BLOCKED",
         "exit_code": 7,
     }
+    fake_plan = {
+        "max_cycles": 2,
+        "overall_band": "NORMAL",
+        "remaining_count": 2,
+        "prompt": "@ppe-director Adaptive burst mode. max_workers=2",
+        "burst_allowed": True,
+    }
     with patch("scripts.ppe_director_go.collect_operator_status", return_value=fake_status):
         with patch("scripts.ppe_director_go.write_status_report"):
-            with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
-                result = run_director_go(tmp_path, open_ide=False, burst=True)
+            with patch("scripts.ppe_director_go.compute_burst_plan", return_value=fake_plan):
+                with patch("scripts.ppe_director_go.write_burst_plan"):
+                    with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
+                        result = run_director_go(tmp_path, open_ide=False, burst=True)
     assert result["burst"] is True
-    assert result["prompt"] == DIRECTOR_BURST_PROMPT
-    assert "Burst mode" in result["prompt"]
+    assert result["prompt"] == fake_plan["prompt"]
+    assert "Adaptive burst" in result["prompt"]
+    assert result["burst_plan"]["max_cycles"] == 2

@@ -1,60 +1,69 @@
 ---
-description: PPE burst mode — chain operator verdicts until WATCH stop heuristics or cycle cap. Load when user says burst, keep going, or what's next until watch.
+description: PPE burst mode — adaptive preflight sizing + director subagents. Load when user says burst, keep going, or what's next until watch.
 alwaysApply: false
 ---
 
-# PPE burst mode (advisory)
+# PPE burst mode (adaptive)
 
 **Canon:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](../../docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](../../docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · [`ppe-operator-core.mdc`](ppe-operator-core.mdc)
 
-**Default:** one verdict per thread (`ppe-operator-core.mdc`). **Burst** chains multiple verdict cycles in one thread until a stop condition fires — then **context closeout** and a fresh thread.
+**Default:** one verdict per thread. **Burst** chains work until the **adaptive cap** or a stop condition fires — then **context closeout** and a fresh thread.
+
+## Start (mandatory)
+
+```bat
+python scripts/ppe_burst_plan.py --write --json
+```
+
+Read `artifacts/control_plane/BURST_PLAN.json` — it holds `max_cycles`, `overall_band`, `remaining_count`, `use_director`, and the director prompt.
+
+| Field | Meaning |
+|-------|---------|
+| `max_cycles` | `min(remaining_slices, band_cap)` — band cap: NORMAL→3 workers / 2 single-agent; WATCH→1; ESCALATE→0 |
+| `use_director` | **true** for `IDE_BUILD` / `RUN_LOCAL` — **must** invoke `@ppe-director`; do not implement product slices in the steward thread |
+| `burst_allowed` | **false** → single verdict only; split slice or trim spec first |
+
+**Handoff:** `ppe_go.cmd --burst` runs preflight + writes `BURST_PLAN.json` + copies adaptive director prompt.
 
 ## Triggers
 
-User says any of:
+- `burst mode` · `keep going` · `run until watch` · `what's next until watch` · `what's next? burst`
 
-- `burst mode` · `keep going` · `run until watch` · `what's next until watch`
-- `what's next? burst` · `what's next keep going`
+## Routing
 
-Also: `@ppe-director` with **Burst mode** in the prompt (see [`.cursor/agents/ppe-director.md`](../agents/ppe-director.md)).
+| Verdict | Burst path |
+|---------|------------|
+| `IDE_BUILD` · `RUN_LOCAL` | **`@ppe-director`** → spawn `ppe-build-worker` / `ppe-finish-worker` only |
+| `FIX_PLAN` · `STALE_STATE` · `ERROR` | **`@ppe-director`** → **one** `ppe-triage-worker` max |
+| `RUN_AUTO` · `SUPPLY_LOW` | No burst — loop driving or queue idle |
 
-## Loop (every cycle)
+## Loop (director burst)
 
-1. Read `artifacts/orchestrator/OPERATOR_STATUS.md` (refresh: `python scripts/ppe_operator_status.py`).
-2. **Execute** the verdict — same table as `ppe-operator-core.mdc` (not advise-only).
-3. Re-read `OPERATOR_STATUS.md`.
-4. If any **stop** below → exit burst; else next cycle.
-
-**Machine guard (desktop relay):** run `python scripts/ppe_loop_host_guard.py --check` before `run_ppe_local.cmd`, `finish_ide_build.cmd`, or relay advance. If `"allowed": false` → desktop actions only (`DESKTOP_CONTINUE.cmd`, IDE BUILD).
+1. Read `BURST_PLAN.json` + `OPERATOR_STATUS.md`.
+2. Spawn the worker for the current verdict (build/finish/triage only).
+3. Re-read status; re-run `ppe_burst_plan.py --write` if plan path unchanged and cycles remain.
+4. Stop when `workers_run >= max_cycles` or any stop below.
 
 ## Stop conditions (any one)
 
 | Stop | Meaning |
 |------|---------|
-| **Cycle cap** | **2** verdict executions in a single-agent burst; **3** workers spawned in a `@ppe-director` burst |
-| **Settled** | Verdict `RUN_AUTO` — loop is driving; nothing left for IDE |
-| **Triage** | `ERROR` · `FIX_PLAN` · `STALE_STATE` · `SUPPLY_LOW` |
-| **Stuck** | Same verdict **and** same blocker text after two consecutive re-reads |
-| **WATCH band** | Any heuristic from audit §3.4: pasted full pytest/diff/logs; mixed SELECTION+BUILD+PR in this burst; thread feels noisy; 2+ full slice cycles already done |
-| **ESCALATE** | Full phase planning + BUILD + merge in one burst — **stop immediately**, do not push through |
-| **Read-only** | User asked a question only, or guard blocks execution |
-
-**Do not** use burst to chain unrelated product slices or edit steering docs mid-BUILD.
+| **Adaptive cap** | `workers_run >= BURST_PLAN.max_cycles` |
+| **ESCALATE band** | `max_cycles == 0` — do not burst |
+| **Settled** | Verdict `RUN_AUTO` |
+| **Stuck** | Same verdict + blocker twice in a row |
+| **WATCH (runtime)** | Pasted full logs/diff; mixed SELECTION+BUILD+PR; thread noisy |
+| **Read-only / guard block** | Desktop relay guard `"allowed": false` for VM-only cmds |
 
 ## After burst stops
 
-1. If shippable work landed: `context_window_closeout.cmd --record` (auto-ship per [`context-window-closeout.mdc`](context-window-closeout.mdc)).
-2. If blocked: one-line summary + what the operator should do; optional `--record --no-ship` for triage only.
-3. **Next thread:** ask `what's next?` (single verdict) or `burst mode` again if queue is hot.
+1. Shippable work → `context_window_closeout.cmd --record`
+2. Blocked → one-line summary; `--record --no-ship` if triage only
+3. Next thread: `what's next?` or `ppe_go.cmd --burst`
 
-## Efficiency notes
+## Forbidden
 
-- Prefer **`@ppe-director` burst** when verdict is `IDE_BUILD` / `RUN_LOCAL` — workers stay path-only; director thread stays thin.
-- Prefer **VM loop** for unattended multi-chapter relay; burst is for **desktop IDE** efficiency between ntfy interrupts.
-- Burst accepts **WATCH** as a deliberate stop — it does **not** target a context-window percentage (Cursor exposes no reliable meter).
-
-## Forbidden in burst
-
-- `run_ppe_auto_local_loop.cmd` / `run_ppe_auto_loop.cmd` on desktop
-- Pasting orchestrator stdout, full sprint specs, or `RELAY_RUNTIME_V0.md`
-- SELECTION + BUILD + PR merge in one burst (ESCALATE — split threads)
+- Implementing `IDE_BUILD` in the steward thread during burst (use `ppe-build-worker`)
+- `run_ppe_auto_local_loop.cmd` on desktop
+- Pasting full sprint specs or orchestrator stdout
+- SELECTION + BUILD + PR merge in one burst

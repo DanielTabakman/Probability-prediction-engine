@@ -12,6 +12,16 @@ ESCALATE_LINE_THRESHOLD = 400
 _BAND_RANK = {"NORMAL": 0, "WATCH": 1, "ESCALATE": 2}
 
 
+def max_burst_cycles(band: str, *, director: bool = True) -> int:
+    """Advisory cap for burst mode (director workers or single-agent verdict cycles)."""
+    ceiling = 3 if director else 2
+    if band == "ESCALATE":
+        return 0
+    if band == "WATCH":
+        return 1
+    return ceiling
+
+
 def classify_line_count(line_count: int) -> Band:
     if line_count > ESCALATE_LINE_THRESHOLD:
         return "ESCALATE"
