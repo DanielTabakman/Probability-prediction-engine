@@ -112,6 +112,20 @@
         border: 1px solid var(--line);
       }
       .flow-item small { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
+      .flow-desc {
+        display: block;
+        color: var(--text);
+        font-size: 0.76rem;
+        margin-top: 6px;
+        line-height: 1.4;
+        opacity: 0.88;
+      }
+      .flow-intro {
+        font-size: 0.84rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin: -4px 0 14px;
+      }
       .flow-arrow {
         display: flex;
         align-items: center;
@@ -180,6 +194,58 @@
       .card p { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); }
       .card .next { font-size: 0.78rem; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
       .card .next strong { color: var(--amber); }
+      .card .gather, .card .action, .card .bottleneck {
+        font-size: 0.78rem;
+        margin: 0 0 6px;
+        padding-left: 10px;
+        border-left: 2px solid var(--line);
+      }
+      .card .gather { border-left-color: var(--leg); }
+      .card .action { border-left-color: var(--teal); }
+      .card .bottleneck { border-left-color: var(--amber); margin-bottom: 0; }
+      .card .gather strong, .card .action strong, .card .bottleneck strong {
+        display: block;
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 2px;
+      }
+      .card .gather strong { color: var(--leg); }
+      .card .action strong { color: var(--teal); }
+      .card .bottleneck strong { color: var(--amber); }
+      .card-ongoing { border-color: var(--teal); box-shadow: 0 0 0 1px rgba(67,231,211,0.12); }
+      .todo-panel {
+        background: var(--panel);
+        border: 1px solid var(--amber);
+        border-radius: 10px;
+        padding: 14px 16px;
+        max-width: 52rem;
+        margin-bottom: 8px;
+      }
+      .todo-panel h3 {
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        color: var(--amber);
+      }
+      .todo-panel ol {
+        margin: 0;
+        padding-left: 1.2rem;
+        font-size: 0.84rem;
+      }
+      .todo-panel li { margin-bottom: 8px; }
+      .todo-panel li:last-child { margin-bottom: 0; }
+      .todo-panel .why { color: var(--muted); font-size: 0.76rem; display: block; margin-top: 2px; }
+      .explain-box {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        max-width: 52rem;
+        margin-bottom: 12px;
+      }
+      .explain-box strong { color: var(--text); }
       .note {
         background: var(--panel);
         border: 1px dashed var(--line);
@@ -216,6 +282,33 @@
       · As-of 2026-06-29 (draft)
     </p>
 
+    <h2>Your attention — human to-do</h2>
+    <div class="todo-panel">
+      <h3>What needs you to keep things moving</h3>
+      <ol>
+        <li>
+          <strong>Forward consistency — approve the next relay slice</strong>
+          <span class="why">Bottleneck: lab panel exists but no MSOS dashboard. Nothing advances until steward SELECTION → relay ch.1–2 is prioritized.</span>
+        </li>
+        <li>
+          <strong>VM daily collectors — confirm installed on ppeloop</strong>
+          <span class="why">Bottleneck: horizon replay and cross-venue backtest need scheduled snapshots. Run <code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
+        </li>
+        <li>
+          <strong>Next asset / market batch — pick the group</strong>
+          <span class="why">Bottleneck: each new market needs your sign-off on trust caveats after witness. Ongoing program — see card #6 below.</span>
+        </li>
+        <li>
+          <strong>Horizon replay scrubber — wait or promote</strong>
+          <span class="why">Bottleneck: chartered but blocked until archive has ~30 days of daily surfaces (<code>archive_meta.replay_ready</code>).</span>
+        </li>
+        <li>
+          <strong>Cross-venue (research, optional) — read scan when history deepens</strong>
+          <span class="why">Not blocking trader workflow. After ≥14 daily snapshots, glance at <code>artifacts/cross_venue_reports/latest.md</code> if researching PM vs options gaps.</span>
+        </li>
+      </ol>
+    </div>
+
     <h2>MSOS pillars</h2>
     <div class="pillars">
       <div class="pillar">
@@ -240,29 +333,77 @@
     </div>
 
     <h2>Data → processing → output</h2>
+    <p class="flow-intro">
+      Raw inputs flow through Python; MSOS reads the results. Each box: label, then what it means in plain language.
+    </p>
     <div class="flow">
       <div class="flow-col">
-        <h3>Sources</h3>
-        <div class="flow-item">Deribit options chain<small>BTC, ETH, tier-1 crypto</small></div>
-        <div class="flow-item">Deribit futures / perp<small>Consistency, horizon forward</small></div>
-        <div class="flow-item">Polymarket<small>Cross-venue event probs</small></div>
-        <div class="flow-item">Asset registry / catalog<small>Enabled assets, venues</small></div>
-        <div class="flow-item">MSOS workflow store<small>Theses, paper trades</small></div>
+        <h3>Inputs (what we read)</h3>
+        <div class="flow-item">
+          Deribit options chain
+          <small>BTC, ETH, tier-1 crypto</small>
+          <span class="flow-desc">Live calls and puts — starting point for “what price levels options are pricing in.”</span>
+        </div>
+        <div class="flow-item">
+          Deribit futures / perp
+          <small>Consistency, horizon forward</small>
+          <span class="flow-desc">Forward levels and funding — anchors horizons and checks option-implied forwards vs futures.</span>
+        </div>
+        <div class="flow-item">
+          Polymarket
+          <small>Cross-venue event probs</small>
+          <span class="flow-desc">Crowd-priced event contracts — fed into research scans comparing PM odds to options-implied probs.</span>
+        </div>
+        <div class="flow-item">
+          Asset registry / catalog
+          <small>Enabled assets, venues</small>
+          <span class="flow-desc">Which symbols are on, which venue feeds them, trust labels — modules only run on witnessed assets.</span>
+        </div>
+        <div class="flow-item">
+          MSOS workflow store
+          <small>Theses, paper trades</small>
+          <span class="flow-desc">What the trader wrote down — thesis, saved views, simulated legs — human intent on top of market data.</span>
+        </div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-col">
-        <h3>Processing (Python)</h3>
-        <div class="flow-item">src/data/* fetchers</div>
-        <div class="flow-item">src/engine/* math</div>
-        <div class="flow-item">src/viz/* boundaries</div>
-        <div class="flow-item">scripts/collect_*<small>VM scheduled archives</small></div>
+        <h3>Processing (what Python does)</h3>
+        <div class="flow-item">
+          src/data/* fetchers
+          <span class="flow-desc">Pull quotes, normalize symbols, cache with honest as-of timestamps.</span>
+        </div>
+        <div class="flow-item">
+          src/engine/* math
+          <span class="flow-desc">Risk-neutral densities, payoff solving, consistency checks — quant work stays here.</span>
+        </div>
+        <div class="flow-item">
+          src/viz/* boundaries
+          <span class="flow-desc">Serializers that turn engine output into JSON MSOS can render read-only.</span>
+        </div>
+        <div class="flow-item">
+          scripts/collect_*
+          <small>VM scheduled archives</small>
+          <span class="flow-desc">Daily snapshot jobs on the loop host — replay, backtests, operator evidence.</span>
+        </div>
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-col">
-        <h3>Outputs</h3>
-        <div class="flow-item">/ppe-display-api/*.json<small>MSOS fetch only</small></div>
-        <div class="flow-item">artifacts/*<small>Ops reports, snapshots</small></div>
-        <div class="flow-item">apps/msos-web routes<small>Read-only UI</small></div>
+        <h3>Outputs (what humans see)</h3>
+        <div class="flow-item">
+          /ppe-display-api/*.json
+          <small>MSOS fetch only</small>
+          <span class="flow-desc">Pre-computed payloads — charts and cards without redoing math in the browser.</span>
+        </div>
+        <div class="flow-item">
+          artifacts/*
+          <small>Ops reports, snapshots</small>
+          <span class="flow-desc">Cross-venue scans, surface archives, relay evidence — operators and research.</span>
+        </div>
+        <div class="flow-item">
+          apps/msos-web routes
+          <small>Read-only UI</small>
+          <span class="flow-desc">Strategy Lab, Options Horizon, workflow — display and simulation only.</span>
+        </div>
       </div>
     </div>
 
@@ -329,7 +470,17 @@
           <td class="tier">T3</td>
           <td class="prio-side">side</td>
           <td class="status-live">LIVE (ops)</td>
-          <td>Backtest when deep</td>
+          <td>Backtest when ≥14d history</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td><strong>Universe expansion</strong><br><code>tradeable_universe</code><br>meta infra + batches</td>
+          <td><span class="tag tag-infra">INFRA</span></td>
+          <td>OPERATOR</td>
+          <td class="tier">ongoing</td>
+          <td class="prio-p0">P0</td>
+          <td class="status-live">LIVE (rolling)</td>
+          <td>Next asset group witness</td>
         </tr>
         <tr>
           <td>—</td>
@@ -344,21 +495,51 @@
       </tbody>
     </table>
 
-    <h2>Integration tiers (charter depth)</h2>
+    <h2>Integration tiers — gather info, then take action</h2>
+    <p class="flow-intro">
+      Each tier is a ladder: first you can <em>inspect</em> honest output, then you can <em>act</em> on it.
+      Modules stop at the tier they are chartered for — not every tool needs T4.
+    </p>
     <table>
       <thead>
         <tr>
           <th>Tier</th>
-          <th>Delivers</th>
+          <th>What you gather (information)</th>
+          <th>What you can do (action)</th>
           <th>Charter question</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td class="tier">T0</td><td>Types, fixtures, unit tests</td><td>What is the output shape?</td></tr>
-        <tr><td class="tier">T1</td><td>Display boundary API</td><td>Can MSOS fetch honest JSON?</td></tr>
-        <tr><td class="tier">T2</td><td>MSOS read-only page</td><td>Can a human inspect it?</td></tr>
-        <tr><td class="tier">T3</td><td>Archive + collector</td><td><strong>Why</strong> collect? What subset? How often?</td></tr>
-        <tr><td class="tier">T4</td><td>Workflow / Monitor hook</td><td>Does it close the trader loop?</td></tr>
+        <tr>
+          <td class="tier">T0</td>
+          <td>Output shape, semantic copy, fixture JSON — “what would this module return?”</td>
+          <td>Approve or reject the contract before UI work; catch wrong labels early</td>
+          <td>What is the output shape?</td>
+        </tr>
+        <tr>
+          <td class="tier">T1</td>
+          <td>Live JSON from display boundary — trust fields, as-of, data sources</td>
+          <td>Wire MSOS fetch; verify API matches Streamlit lab; no trader-facing page yet</td>
+          <td>Can MSOS fetch honest JSON?</td>
+        </tr>
+        <tr>
+          <td class="tier">T2</td>
+          <td>Visual read in MSOS — charts, summary cards, trust strip</td>
+          <td><strong>Trader acts:</strong> relate belief to market, read disagreement, switch asset/expiry, start thesis</td>
+          <td>Can a human inspect and decide in MSOS?</td>
+        </tr>
+        <tr>
+          <td class="tier">T3</td>
+          <td>Historical snapshots in <code>artifacts/</code> — time series for replay and research</td>
+          <td><strong>Operator/research acts:</strong> replay past surfaces, run backtests, witness drift; not daily trader nav</td>
+          <td><strong>Why</strong> collect? What subset? How often?</td>
+        </tr>
+        <tr>
+          <td class="tier">T4</td>
+          <td>Saved workflow hooks — monitor feed, deep-links, command-center cards</td>
+          <td><strong>Trader returns:</strong> monitor paper trade, review history, adjust expression after market moves</td>
+          <td>Does it close the trader loop?</td>
+        </tr>
       </tbody>
     </table>
 
@@ -379,43 +560,74 @@
       </pre>
     </div>
 
-    <h2>Module cards — where we left off</h2>
+    <h2>Module cards — gather, act, bottleneck</h2>
+    <p class="flow-intro">
+      Every module should answer: what do I learn, what can I do with it, and what is stuck waiting on a human decision.
+    </p>
     <div class="cards">
       <div class="card">
         <h3>1 · Implied distribution</h3>
-        <div class="meta">DISTRIBUTION · T2 live · P0</div>
-        <p>Primary legibility tool in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
-        <div class="next"><strong>Next:</strong> Additional relationship modes (charter T4); multi-asset parity.</div>
+        <div class="meta">DISTRIBUTION · T2 live → T4 · P0</div>
+        <p>Primary legibility tool in Strategy Lab. Disagreement overlay is the main market-relationship mode today.</p>
+        <div class="gather"><strong>Gather</strong>Market-implied density curve, disagreement category, strategy-family fit, trust/as-of strip.</div>
+        <div class="action"><strong>Act</strong>Set your belief, compare to market, copy trade ticket, save thesis, open expression planner.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>Prod witness still BTC/ETH-heavy; richer relationship modes need steward SELECTION (T4).</div>
       </div>
       <div class="card">
         <h3>2 · Options Horizon</h3>
-        <div class="meta">PROJECTION · T2 live · P1</div>
-        <p>Price × time projection; surface archive chartered for replay.</p>
-        <div class="next"><strong>Next:</strong> Chart polish relay; daily surface collector on VM.</div>
+        <div class="meta">PROJECTION · T2 live → T5 · P1</div>
+        <p>Price × time projection — how implied structure evolves across expiries.</p>
+        <div class="gather"><strong>Gather</strong>Surface projection chart, region intents, forward context per expiry.</div>
+        <div class="action"><strong>Act</strong>Mark regions of interest, save workflow intent, switch asset/expiry to compare horizons.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>Replay scrubber chartered but blocked until ~30d daily archive; VM surface collector must stay running.</div>
       </div>
       <div class="card">
         <h3>3 · Forward consistency</h3>
-        <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">ADVANCE</span></div>
-        <p>Lab panel live; dashboard + heatmap not built. Target T3 with daily status snapshots only.</p>
-        <div class="next"><strong>Next:</strong> SELECTION → relay ch.1–2 (dashboard payload + /forward-consistency).</div>
+        <div class="meta">CONSISTENCY · T1 partial → T3 · P2 · <span class="advance-yes">ADVANCE</span></div>
+        <p>Do related executable markets agree after spreads and costs? Trust signal before you trust the distribution read.</p>
+        <div class="gather"><strong>Gather</strong>Forward vs futures agreement flags, net edge after costs, WATCH vs OK status per expiry.</div>
+        <div class="action"><strong>Act</strong>Operator: decide if today’s distribution read is trustworthy; trader: defer expression if flags are red.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>No MSOS dashboard page yet — <em>your SELECTION approval</em> needed to start relay ch.1–2.</div>
       </div>
       <div class="card">
         <h3>4 · Expression planner</h3>
-        <div class="meta">EXPOSURE · T2 live · P1</div>
-        <p>Optimal exposure / structure fit under constraints — simulation only.</p>
-        <div class="next"><strong>Next:</strong> Deeper exposure optimization; optional T3 if replay needed.</div>
+        <div class="meta">EXPOSURE · T2 live → T3 · P1</div>
+        <p>Structure fit under constraints — simulation only, not order routing.</p>
+        <div class="gather"><strong>Gather</strong>Suggested structures, debit/credit, max gain/loss, breakevens under your belief overlay.</div>
+        <div class="action"><strong>Act</strong>Simulate legs, save paper trade, link back to thesis for monitor/review.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>Deeper exposure optimization not built; non-BTC assets need workflow asset parity (card #6).</div>
       </div>
       <div class="card">
         <h3>5 · Cross-venue scan</h3>
-        <div class="meta">EVENT_GAP · T3 ops · side channel</div>
-        <p>PM vs options gap — research lane. VM daily task shipped.</p>
-        <div class="next"><strong>Next:</strong> Backtest when ≥14d history; not trader nav.</div>
+        <div class="meta">EVENT_GAP · T3 ops · RESEARCH lane · side channel</div>
+        <p><strong>Not just data collection.</strong> Three automated steps on the VM: (1) snapshot CSV — Polymarket vs Deribit implied probs for matched events; (2) <strong>scan</strong> — rank gaps and write <code>latest.md</code> + JSON; (3) <strong>backtest</strong> — score persistence once ≥14 daily snapshots exist. No trader nav page — you read artifacts when researching.</p>
+        <div class="gather"><strong>Gather</strong>Ranked gap report: which event markets disagree most with options-implied odds, with as-of and source notes.</div>
+        <div class="action"><strong>Act</strong>Research only: open <code>artifacts/cross_venue_reports/latest.md</code>, decide if a gap warrants deeper study or a future product slice — not a daily trading workflow today.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>History still accumulating on VM; backtest stays thin until daily task has run ~2 weeks. Optional glance — never blocks Strategy Lab.</div>
+      </div>
+      <div class="card card-ongoing">
+        <h3>6 · Universe expansion (more markets)</h3>
+        <div class="meta">INFRA · ongoing · P0 · rolling program</div>
+        <p><strong>Ongoing for months.</strong> Add SOL, equity LEAPS, commodities, etc. — not one slice. Each batch: discover venue → enable registry row → witness live chain → warm cache → prod witness. Canon: <a href="../PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md">multi-asset meta infra program</a>.</p>
+        <div class="gather"><strong>Gather</strong>Discovery JSON per asset, witness pass/fail, trust caveats (<code>thin_chain</code>, venue gaps), catalog enabled count.</div>
+        <div class="action"><strong>Act</strong>Pick next asset group (crypto tier-1 → equity tier-1a → …), run discover → enable → witness ritual; sign off on trust labels before traders see Live pill.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>Meta infra chapters #1–#2 (display parity + enablement pipeline) must stay green before each batch — your pick of <em>which group next</em> unblocks the queue.</div>
       </div>
       <div class="card">
-        <h3>Meta infra (not modules)</h3>
-        <div class="meta">Cache, trust, witnesses, enablement</div>
-        <p>Cross-cutting — supports all modules scaling to ~25 assets.</p>
-        <div class="next"><strong>Next:</strong> prod multi-asset witness; workflow asset parity.</div>
+        <h3>Workflow (thesis · confirm · monitor · history)</h3>
+        <div class="meta">WORKFLOW · P0 · not an analytical module</div>
+        <p>Carries market relationship through save, return, and review — closes the trader loop across modules.</p>
+        <div class="gather"><strong>Gather</strong>Saved theses, paper trades, monitor marks, lifecycle history from workflow store.</div>
+        <div class="action"><strong>Act</strong>Confirm thesis, watch paper trades, review past decisions, return after market moves.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong><code>?asset=</code> propagation across P4–P7 for non-BTC assets — workflow asset parity chapter queued.</div>
+      </div>
+      <div class="card">
+        <h3>Meta infra (cache · trust · witnesses)</h3>
+        <div class="meta">Cross-cutting · supports card #6 and all modules</div>
+        <p>Enablement pipeline, cache isolation, prod multi-asset witness — scales platform to ~25 assets without repeated fire drills.</p>
+        <div class="gather"><strong>Gather</strong>Cache health, witness reports, trust surface consistency between Streamlit and MSOS.</div>
+        <div class="action"><strong>Act</strong>Run witness after deploy, warm display cache, approve enablement batch before flipping <code>enabled: true</code>.</div>
+        <div class="bottleneck"><strong>Bottleneck</strong>Production multi-asset witness still BTC-centric until chapter #7 closes — blocks confident “Live” for new groups.</div>
       </div>
     </div>
 
@@ -423,7 +635,8 @@
     <div class="note">
       <strong>Trader Workflow Integration v1</strong> — process fit over platform breadth.
       Relay queue: crypto multi-asset, self-serve onboarding, universe tiers.
-      Module registry does not replace FRONTIER — it maps <em>what</em> exists vs <em>what slice runs next</em>.
+      <strong>Universe expansion (card #6)</strong> runs in parallel for as long as new markets are added — not a one-and-done slice.
+      Module registry maps <em>what</em> exists vs <em>what slice runs next</em>; your to-do list above is the operator view.
     </div>
 
     <footer>
