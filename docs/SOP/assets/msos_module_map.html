@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#05090f" />
+    <title>MSOS module map — operator</title>
+    <style>
+      :root {
+        --bg: #05090f;
+        --panel: #0e1c2d;
+        --panel2: #122438;
+        --line: #1e3145;
+        --text: #edf5ff;
+        --muted: #8ea4bd;
+        --teal: #43e7d3;
+        --amber: #f2b657;
+        --violet: #a78bfa;
+        --green: #6ee7a8;
+        --red: #ff6478;
+        --wf: #43e7d3;
+        --edge: #f2b657;
+        --leg: #a78bfa;
+        --infra: #8ea4bd;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.45;
+        padding: 16px 18px 48px;
+      }
+      h1 { font-size: 1.35rem; margin: 0 0 6px; }
+      .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; max-width: 52rem; }
+      .sub a { color: var(--teal); }
+      h2 {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--teal);
+        margin: 28px 0 12px;
+        font-weight: 700;
+      }
+      .pillars {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .pillar {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        border-left: 3px solid var(--teal);
+      }
+      .pillar.edge { border-left-color: var(--edge); }
+      .pillar.leg { border-left-color: var(--leg); }
+      .pillar strong { display: block; font-size: 0.95rem; margin-bottom: 4px; }
+      .pillar span { font-size: 0.8rem; color: var(--muted); }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 16px;
+      }
+      .legend i {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        gap: 8px;
+        align-items: stretch;
+        margin-bottom: 24px;
+        overflow-x: auto;
+      }
+      @media (max-width: 900px) {
+        .flow { grid-template-columns: 1fr; }
+        .flow-arrow { display: none; }
+      }
+      .flow-col {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        min-width: 160px;
+      }
+      .flow-col h3 {
+        margin: 0 0 10px;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+      }
+      .flow-item {
+        font-size: 0.82rem;
+        padding: 6px 8px;
+        margin-bottom: 6px;
+        background: var(--panel2);
+        border-radius: 6px;
+        border: 1px solid var(--line);
+      }
+      .flow-item small { display: block; color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
+      .flow-arrow {
+        display: flex;
+        align-items: center;
+        color: var(--muted);
+        font-size: 1.4rem;
+        padding: 0 4px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      th, td {
+        padding: 8px 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th {
+        background: var(--panel2);
+        color: var(--muted);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      tr:last-child td { border-bottom: none; }
+      tr:hover td { background: rgba(67, 231, 211, 0.04); }
+      .tag {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.68rem;
+        font-weight: 600;
+        margin: 1px 2px 1px 0;
+      }
+      .tag-wf { background: rgba(67,231,211,0.15); color: var(--wf); }
+      .tag-edge { background: rgba(242,182,87,0.15); color: var(--edge); }
+      .tag-leg { background: rgba(167,139,250,0.15); color: var(--leg); }
+      .tag-infra { background: rgba(142,164,189,0.15); color: var(--infra); }
+      .status-live { color: var(--green); }
+      .status-partial { color: var(--amber); }
+      .status-planned { color: var(--muted); }
+      .tier { font-family: ui-monospace, monospace; font-size: 0.72rem; color: var(--teal); }
+      .prio-p0 { color: var(--green); font-weight: 700; }
+      .prio-p1 { color: var(--teal); }
+      .prio-p2 { color: var(--amber); }
+      .prio-side { color: var(--muted); }
+      .advance-yes { color: var(--green); font-weight: 600; }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .card h3 { margin: 0 0 8px; font-size: 0.95rem; }
+      .card .meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 10px; }
+      .card p { margin: 0 0 8px; font-size: 0.82rem; color: var(--muted); }
+      .card .next { font-size: 0.78rem; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+      .card .next strong { color: var(--amber); }
+      .note {
+        background: var(--panel);
+        border: 1px dashed var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        max-width: 52rem;
+      }
+      .note strong { color: var(--text); }
+      .loop-diagram {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px;
+        font-size: 0.8rem;
+        overflow-x: auto;
+      }
+      .loop-diagram pre {
+        margin: 0;
+        color: var(--muted);
+        font-family: ui-monospace, "Cascadia Code", monospace;
+        line-height: 1.5;
+      }
+      footer { margin-top: 32px; font-size: 0.72rem; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <h1>MSOS module map</h1>
+    <p class="sub">
+      Living operator chart — modules, data, tiers, priorities.
+      Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
+      · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
+      · As-of 2026-06-29 (draft)
+    </p>
+
+    <h2>MSOS pillars</h2>
+    <div class="pillars">
+      <div class="pillar">
+        <strong>Workflow</strong>
+        <span>Trader process — relate to market, thesis, express, return, review. Disagreement is one relationship mode today; more planned.</span>
+      </div>
+      <div class="pillar edge">
+        <strong>Edge</strong>
+        <span>Find and test executable dislocations and structure fit — simulation only, not order routing.</span>
+      </div>
+      <div class="pillar leg">
+        <strong>Legibility</strong>
+        <span>Honest readable market structure — implied distributions, projection, trust labels.</span>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span><i style="background:var(--wf)"></i> Workflow pillar</span>
+      <span><i style="background:var(--edge)"></i> Edge pillar</span>
+      <span><i style="background:var(--leg)"></i> Legibility pillar</span>
+      <span>T0 contract → T4 workflow hook</span>
+    </div>
+
+    <h2>Data → processing → output</h2>
+    <div class="flow">
+      <div class="flow-col">
+        <h3>Sources</h3>
+        <div class="flow-item">Deribit options chain<small>BTC, ETH, tier-1 crypto</small></div>
+        <div class="flow-item">Deribit futures / perp<small>Consistency, horizon forward</small></div>
+        <div class="flow-item">Polymarket<small>Cross-venue event probs</small></div>
+        <div class="flow-item">Asset registry / catalog<small>Enabled assets, venues</small></div>
+        <div class="flow-item">MSOS workflow store<small>Theses, paper trades</small></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-col">
+        <h3>Processing (Python)</h3>
+        <div class="flow-item">src/data/* fetchers</div>
+        <div class="flow-item">src/engine/* math</div>
+        <div class="flow-item">src/viz/* boundaries</div>
+        <div class="flow-item">scripts/collect_*<small>VM scheduled archives</small></div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-col">
+        <h3>Outputs</h3>
+        <div class="flow-item">/ppe-display-api/*.json<small>MSOS fetch only</small></div>
+        <div class="flow-item">artifacts/*<small>Ops reports, snapshots</small></div>
+        <div class="flow-item">apps/msos-web routes<small>Read-only UI</small></div>
+      </div>
+    </div>
+
+    <h2>Registered modules</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Module</th>
+          <th>Pillar</th>
+          <th>Ship-to</th>
+          <th>Tier</th>
+          <th>Prio</th>
+          <th>Status</th>
+          <th>Advance?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td><strong>Implied distribution</strong><br><code>implied_distribution</code><br>/strategy-lab</td>
+          <td><span class="tag tag-leg">LEGIBILITY</span></td>
+          <td>TRADER</td>
+          <td class="tier">T2 → T4</td>
+          <td class="prio-p0">P0</td>
+          <td class="status-live">LIVE</td>
+          <td>More relationship modes</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td><strong>Options Horizon</strong><br><code>options_horizon</code><br>/options-horizon</td>
+          <td><span class="tag tag-leg">LEGIBILITY</span></td>
+          <td>TRADER</td>
+          <td class="tier">T2 → T5</td>
+          <td class="prio-p1">P1</td>
+          <td class="status-live">LIVE</td>
+          <td>Chart polish + archive</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td><strong>Forward consistency</strong><br><code>forward_consistency</code><br>/forward-consistency (planned)</td>
+          <td><span class="tag tag-edge">EDGE</span> <span class="tag tag-leg">LEGIBILITY</span></td>
+          <td>OPERATOR</td>
+          <td class="tier">T1 → T3</td>
+          <td class="prio-p2">P2</td>
+          <td class="status-partial">PARTIAL</td>
+          <td class="advance-yes">YES — radar T1–T2</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td><strong>Expression planner</strong><br><code>expression_planner</code><br>/strategy-lab/expression</td>
+          <td><span class="tag tag-edge">EDGE</span> <span class="tag tag-wf">WORKFLOW</span></td>
+          <td>TRADER</td>
+          <td class="tier">T2 → T3</td>
+          <td class="prio-p1">P1</td>
+          <td class="status-live">LIVE</td>
+          <td>Exposure depth</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><strong>Cross-venue scan</strong><br><code>cross_venue_event_gap</code><br>artifacts/cross_venue_reports/</td>
+          <td><span class="tag tag-edge">EDGE</span></td>
+          <td>RESEARCH</td>
+          <td class="tier">T3</td>
+          <td class="prio-side">side</td>
+          <td class="status-live">LIVE (ops)</td>
+          <td>Backtest when deep</td>
+        </tr>
+        <tr>
+          <td>—</td>
+          <td><strong>Workflow</strong> (thesis, confirm, monitor, history)</td>
+          <td><span class="tag tag-wf">WORKFLOW</span></td>
+          <td>TRADER</td>
+          <td class="tier">—</td>
+          <td class="prio-p0">P0</td>
+          <td class="status-live">LIVE</td>
+          <td>Asset parity, return loop</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Integration tiers (charter depth)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Delivers</th>
+          <th>Charter question</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="tier">T0</td><td>Types, fixtures, unit tests</td><td>What is the output shape?</td></tr>
+        <tr><td class="tier">T1</td><td>Display boundary API</td><td>Can MSOS fetch honest JSON?</td></tr>
+        <tr><td class="tier">T2</td><td>MSOS read-only page</td><td>Can a human inspect it?</td></tr>
+        <tr><td class="tier">T3</td><td>Archive + collector</td><td><strong>Why</strong> collect? What subset? How often?</td></tr>
+        <tr><td class="tier">T4</td><td>Workflow / Monitor hook</td><td>Does it close the trader loop?</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note" style="margin-top:12px">
+      <strong>T3 rule:</strong> No collector slice without a written archive charter (hypothesis, consumer, granularity, retention, non-goals). Do not archive every market tick.
+    </div>
+
+    <h2>Trader loop (simplified)</h2>
+    <div class="loop-diagram">
+      <pre>
+  LEGIBILITY                    WORKFLOW                         EDGE
+  ──────────                    ────────                         ────
+  Implied distribution ──┐
+  Options Horizon ───────┼──► Market relationship ──► Thesis ──► Expression ──► Monitor
+                         │    (disagreement today;              planner          ▲
+  Forward consistency ───┘     more modes later)                  (sim only)     │
+       (trust signal) ─────────────────────────────────────────────────────────────┘
+      </pre>
+    </div>
+
+    <h2>Module cards — where we left off</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>1 · Implied distribution</h3>
+        <div class="meta">DISTRIBUTION · T2 live · P0</div>
+        <p>Primary legibility tool in Strategy Lab. Disagreement overlay is the main market-relationship mode.</p>
+        <div class="next"><strong>Next:</strong> Additional relationship modes (charter T4); multi-asset parity.</div>
+      </div>
+      <div class="card">
+        <h3>2 · Options Horizon</h3>
+        <div class="meta">PROJECTION · T2 live · P1</div>
+        <p>Price × time projection; surface archive chartered for replay.</p>
+        <div class="next"><strong>Next:</strong> Chart polish relay; daily surface collector on VM.</div>
+      </div>
+      <div class="card">
+        <h3>3 · Forward consistency</h3>
+        <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">ADVANCE</span></div>
+        <p>Lab panel live; dashboard + heatmap not built. Target T3 with daily status snapshots only.</p>
+        <div class="next"><strong>Next:</strong> SELECTION → relay ch.1–2 (dashboard payload + /forward-consistency).</div>
+      </div>
+      <div class="card">
+        <h3>4 · Expression planner</h3>
+        <div class="meta">EXPOSURE · T2 live · P1</div>
+        <p>Optimal exposure / structure fit under constraints — simulation only.</p>
+        <div class="next"><strong>Next:</strong> Deeper exposure optimization; optional T3 if replay needed.</div>
+      </div>
+      <div class="card">
+        <h3>5 · Cross-venue scan</h3>
+        <div class="meta">EVENT_GAP · T3 ops · side channel</div>
+        <p>PM vs options gap — research lane. VM daily task shipped.</p>
+        <div class="next"><strong>Next:</strong> Backtest when ≥14d history; not trader nav.</div>
+      </div>
+      <div class="card">
+        <h3>Meta infra (not modules)</h3>
+        <div class="meta">Cache, trust, witnesses, enablement</div>
+        <p>Cross-cutting — supports all modules scaling to ~25 assets.</p>
+        <div class="next"><strong>Next:</strong> prod multi-asset witness; workflow asset parity.</div>
+      </div>
+    </div>
+
+    <h2>Active BUILD priorities (milestone)</h2>
+    <div class="note">
+      <strong>Trader Workflow Integration v1</strong> — process fit over platform breadth.
+      Relay queue: crypto multi-asset, self-serve onboarding, universe tiers.
+      Module registry does not replace FRONTIER — it maps <em>what</em> exists vs <em>what slice runs next</em>.
+    </div>
+
+    <footer>
+      Open this file locally: <code>docs/SOP/assets/msos_module_map.html</code>
+      · Update when registry table changes · noindex
+    </footer>
+  </body>
+</html>

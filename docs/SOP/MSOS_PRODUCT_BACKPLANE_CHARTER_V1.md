@@ -15,6 +15,7 @@
 | [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) | Path/layer presets |
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Future interaction-mode ontology (not build scope) |
+| [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) | Analytical modules — tiers, pillars, data map ([`assets/msos_module_map.html`](assets/msos_module_map.html)) |
 
 ---
 
@@ -25,6 +26,7 @@
 - It should look and feel like a credible platform.
 - It should be architected so it can evolve into a broader platform later.
 - **Active scope is narrow:** MSOS exists to hold PPE and deliver a smooth **thesis → market-implied probability → disagreement → expression → save/review** workflow.
+- **Three product pillars:** **workflow** (trader process), **edge** (find/test dislocations — simulation only), **legibility** (honest readable market structure). **Market relationship** (disagreement today; more modes later) lives inside workflow — see module registry.
 
 **PPE** is the **first real product module** inside MSOS — not a separate product the user must leave MSOS to use.
 
