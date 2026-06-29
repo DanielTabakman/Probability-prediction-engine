@@ -121,6 +121,85 @@ context_window_closeout.cmd --record --thread-role operator --whats-next "Contin
 
 ---
 
+## Thread insight capture (`--capture`)
+
+Rich Cursor threads often contain decisions and deferrals that never land in git. **Capture** distills them once (while the thread is still loaded) and routes **every** item to an actionable destination — no passive log.
+
+### Routing rules (one line each)
+
+| Rule | Route |
+|------|--------|
+| Can ship in ≤15 min? | `ship_now` — implement in this thread **before** capture |
+| Needs action when chapter X? | `triggered` |
+| Needs your policy call? | `human` |
+| Real product slice? | `build` |
+| Explicitly rejected? | `drop` |
+
+`python scripts/ppe_thread_capture.py rules` prints these lines.
+
+### Who generates insights?
+
+| Step | Who | When |
+|------|-----|------|
+| **Distill** | Agent in the dying thread | End of thread — no bullet cap |
+| **`ship_now` work** | Agent | Before writing capture JSON |
+| **Write JSON** | Agent | `artifacts/control_plane/THREAD_CAPTURE_PENDING.json` |
+| **Route + commit** | `ppe_thread_capture.py` | `context_window_closeout.cmd --record --capture` |
+| **Show operator** | Agent | **Numbered list in chat** (mandatory) |
+
+The script does **not** re-read chat history.
+
+### Where each item goes
+
+| `route` | Audit (`THREAD_INSIGHTS.json`) | Also |
+|---------|-------------------------------|------|
+| `ship_now` | Yes (`shipped_in_thread`) | Work already done in thread |
+| `triggered` | Yes | `TRIGGERED_IDEAS.json` — alert at SELECTION |
+| `human` | Yes | `HUMAN_STEWARD_BACKLOG.json` |
+| `build` | Yes | `PHASE_CHAPTER_BACKLOG.json` (`blocked`) |
+| `drop` | Yes (marked dropped) | — |
+
+`log` is **removed** — if it needs follow-up, use `triggered` / `human` / `build` / `ship_now`.
+
+### Operator phrases
+
+```text
+close out thread capture
+```
+
+Agent ritual: distill (all items) → `ship_now` first → write JSON → `context_window_closeout.cmd --record --capture` → **paste numbered summary in chat**.
+
+```bat
+python scripts/ppe_thread_capture.py example
+python scripts/ppe_thread_capture.py summary --file artifacts/control_plane/THREAD_CAPTURE_PENDING.json
+```
+
+### Capture JSON shape (minimal)
+
+```json
+{
+  "thread_role": "steward",
+  "insights": [
+    {
+      "kind": "note",
+      "text": "Fix typo in CONTEXT_RULES.md.",
+      "route": "ship_now"
+    },
+    {
+      "kind": "defer",
+      "text": "Revisit multi-provider Web3 when wallet chapter charters.",
+      "route": "triggered",
+      "title": "Web3 provider routing revisit",
+      "trigger_chapters": ["msos_wallet_connect_v1"]
+    }
+  ]
+}
+```
+
+Kinds: `decision` · `surprise` · `defer` · `note`.
+
+---
+
 ## Steps (agent checklist)
 
 ### 1 — Machine facts (script)
@@ -249,4 +328,5 @@ Copy final numbers into the draft report **Window ledger** section.
 |------|------|
 | 2026-06-17 | v1 — SOP + `ppe_context_window_closeout.py` gather/triage helpers |
 | 2026-06-28 | v3 — `--record` default auto-ship (`ppe_context_closeout_ship.py`); operator silence on git/PR |
+| 2026-06-29 | v4 — thread insight capture: no `log` route, `ship_now`, numbered closeout summary, no bullet cap |
 | 2026-06-18 | v2 — `context_windows.jsonl` tracking, `WHATS_NEXT` promotion, radar churn signal |

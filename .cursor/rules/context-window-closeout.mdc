@@ -7,17 +7,32 @@ globs:
 
 # Context window closeout
 
-**Triggers:** `close out thread` · `closeout thread` · `close this thread` · `end thread` · `context closeout` · `wrap this chat` · `thread handoff`
+**Triggers:** `close out thread` · `closeout thread` · `close this thread` · `end thread` · `context closeout` · `wrap this chat` · `thread handoff` · **`close out thread capture`** · **`close out thread --capture`**
 
 When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 1. Read [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](../../docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md).
-2. Run **`context_window_closeout.cmd --record`** (implies **auto-ship**: gate → commit → push → open PR → `automerge` label). Do **not** ask permission to commit, push, open PR, or merge.
-3. Triage anything **blocked** by auto-ship (mixed-plane, gate fail) into backlog/park via draft report only when needed.
-4. Complete `<!-- AGENT_FILL -->` sections in draft only when narrative/triage needs capture.
-5. End with a **one-line** operator summary — **never** narrate commits, PR numbers, merge steps, or git commands unless auto-ship **blocked** and recovery is required.
+2. **If capture requested** (`capture` / `--capture` in the phrase):
+   - Distill **all** insights worth keeping from this thread (no bullet cap — long lists OK). Do **not** paste chat history into the capture file.
+   - **Route each item** (no passive `log`):
+     - **≤15 min, gates pass** → `ship_now` — **implement in this thread first**, then capture
+     - **Action when chapter X** → `triggered`
+     - **Policy / tradeoff** → `human`
+     - **Chartered product slice** → `build`
+     - **Ruled out** → `drop`
+   - Write `artifacts/control_plane/THREAD_CAPTURE_PENDING.json` (`python scripts/ppe_thread_capture.py example` · `python scripts/ppe_thread_capture.py rules`).
+3. Run **`context_window_closeout.cmd --record --capture`** (auto-ship). Do **not** ask permission to commit, push, open PR, or merge.
+4. Triage auto-ship blockers into backlog/park via draft only when needed.
+5. **End with the numbered insight list in chat** — copy from script output or `python scripts/ppe_thread_capture.py summary --file artifacts/control_plane/THREAD_CAPTURE_PENDING.json`. Format:
 
-**Operator-facing tone:** "Thread closed — work shipped" or "Thread closed — one item parked (see draft)." Not a git play-by-play.
+```text
+Thread closed — N insight(s) captured:
+1. [kind/route] …
+2. [kind/route] …
+Routed: ship_now=… triggered=… human=… build=… drop=…
+```
+
+**Never** narrate commits, PR numbers, or merge steps unless auto-ship **blocked**.
 
 **Not** chapter closeout (`apply_control_closeout_v1`) unless a relay closeout slice is also in scope.
 

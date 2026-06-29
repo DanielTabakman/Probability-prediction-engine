@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "notes": "Audit trail of context-closeout captures (every item is actionable). Populated by --capture; items also route to backlogs or ship_now in-thread.",
+  "items": []
+}

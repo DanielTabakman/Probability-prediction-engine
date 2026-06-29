@@ -701,6 +701,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slices-closed", type=int, default=0, help="Slices closed in this Cursor thread")
     ap.add_argument("--notes", default="", help="Optional closeout notes")
     ap.add_argument("--no-promote", action="store_true", help="Skip writing WHATS_NEXT artifacts")
+    ap.add_argument(
+        "--capture",
+        action="store_true",
+        help="Apply thread insight capture (default file: artifacts/control_plane/THREAD_CAPTURE_PENDING.json)",
+    )
+    ap.add_argument(
+        "--capture-file",
+        type=Path,
+        default=None,
+        help="Capture JSON path (implies --capture when used with --record)",
+    )
     sub = ap.add_subparsers(dest="cmd")
 
     ab = sub.add_parser("add-build", help="Append blocked row to PHASE_CHAPTER_BACKLOG.json")
@@ -790,6 +801,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ppe_context_window_closeout: wrote {json_path.relative_to(repo)}")
         print(f"ppe_context_window_closeout: wrote {md_path.relative_to(repo)}")
         if args.record:
+            exit_code = 0 if not ship_report or ship_report.get("ok") else 1
             safe = args.safe_to_switch == "yes" and not (ship_report and ship_report.get("blocked"))
             record = record_context_closeout(
                 repo,
@@ -807,7 +819,46 @@ def main(argv: list[str] | None = None) -> int:
             if not args.no_promote:
                 print(f"ppe_context_window_closeout: promoted {WHATS_NEXT_MD_REL}")
             print(f"ppe_context_window_closeout: whats_next={record.get('whats_next')}")
-        exit_code = 0 if not ship_report or ship_report.get("ok") else 1
+            capture_path = args.capture_file
+            do_capture = bool(args.capture or capture_path is not None)
+            if do_capture and capture_path is None:
+                from scripts.ppe_thread_capture import default_capture_path
+
+                capture_path = default_capture_path(repo)
+            if do_capture and capture_path is not None:
+                from scripts.ppe_thread_capture import apply_capture, load_capture_file
+
+                cap_file = capture_path.resolve()
+                if not cap_file.is_file():
+                    print(
+                        f"ppe_context_window_closeout: capture file missing: {cap_file.relative_to(repo)}",
+                        file=sys.stderr,
+                    )
+                    exit_code = 1
+                else:
+                    capture = load_capture_file(cap_file)
+                    cap_report = apply_capture(
+                        repo,
+                        capture,
+                        closeout_id=str(record.get("closeout_id") or ""),
+                        head=str(snapshot.get("head") or ""),
+                        chapter_id=str(record.get("chapter_id") or ""),
+                        thread_role=args.thread_role,
+                    )
+                    c = cap_report.get("counts") or {}
+                    summary = cap_report.get("operator_summary") or ""
+                    if summary:
+                        print(summary)
+                    print(
+                        "ppe_context_window_closeout: capture applied "
+                        f"ship_now={c.get('ship_now', 0)} triggered={c.get('triggered', 0)} "
+                        f"human={c.get('human', 0)} build={c.get('build', 0)} "
+                        f"drop={c.get('drop', 0)} errors={c.get('errors', 0)}"
+                    )
+                    if not cap_report.get("ok"):
+                        exit_code = 1
+        else:
+            exit_code = 0 if not ship_report or ship_report.get("ok") else 1
         return exit_code
 
     ap.print_help()
