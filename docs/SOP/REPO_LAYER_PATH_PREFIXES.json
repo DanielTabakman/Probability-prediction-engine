@@ -321,6 +321,7 @@
         "tests/test_active_product_direction.py",
         "tests/test_manifest_",
         "tests/test_canonical_docs",
+        "tests/test_msos_module_map_operator_sections.py",
         "tests/test_ppe_dev_changelog.py",
         "tests/test_ppe_weekly_digest.py",
         "tests/test_ppe_workflow_radar.py",
