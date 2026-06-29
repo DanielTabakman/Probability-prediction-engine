@@ -212,6 +212,7 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 | MSOS frontier | [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) |
 | MSOS acceleration | [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) |
 | Product focus playbook | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) |
+| **Module registry + map** | [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) · [HTML map](assets/msos_module_map.html) |
 | MSOS P1 ADR | [`MSOS_P1_STACK_ROUTING_ADR.md`](MSOS_P1_STACK_ROUTING_ADR.md) |
 | Session handoff | [`HANDOFF.md`](HANDOFF.md) |
 | Deploy + CTA witness | [`VALIDATION_DEPLOY_WITNESS.md`](VALIDATION_DEPLOY_WITNESS.md) |
