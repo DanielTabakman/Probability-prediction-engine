@@ -381,34 +381,6 @@
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Equity mega caps batch 1",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Equity mega caps batch 2",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
-      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
-    },
-    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
       "status": "PLANNED",
       "reason": "[MEDIUM] Bounded build repair \u2014 factory side-channel after P0 usable demo",
@@ -481,6 +453,30 @@
       "urgentReason": "Operator approved exposure menu over BL density smoothing",
       "focusPlaybookTier": "P1",
       "workerMode": "local-agent"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.1 \u2014 SPY QQQ IWM (re-charter; registry enable pending)",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 AAPL MSFT AMZN GOOGL META",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 TSLA AMD COIN",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO commodity ETF proxies",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",

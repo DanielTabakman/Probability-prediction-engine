@@ -1,7 +1,8 @@
 # PPE commodity proxy tier-1 v1 — evidence status
 
 **Chapter:** `ppe_commodity_proxy_tier1_v1`  
-**Status:** **CHARTERED** (SELECTED 2026-06-26)
+**Program:** [`PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md`](PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md)  
+**Status:** **PENDING** (wave 1 ch.4 — after tier1c witness green)
 
 | Slice | Status |
 |-------|--------|

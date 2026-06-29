@@ -52,30 +52,30 @@
     {
       "id": "ppe_equity_universe_tier1a_v1",
       "label": "Equity tier-1a (SPY QQQ IWM)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_equity_universe_tier1b_v1",
       "label": "Equity tier-1b (mega caps batch 1)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_equity_universe_tier1c_v1",
       "label": "Equity tier-1c (TSLA AMD COIN)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_commodity_proxy_tier1_v1",
       "label": "Commodity ETF options (GLD SLV USO)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "mvp1_cross_venue_scan_v1",
@@ -95,7 +95,7 @@
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md.",
+  "nextStewardAction": "BUILD: ppe_exposure_menu_v1 READY (operator priority). Then asset batch wave 1 (tier1a→commodity) per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. Wave 2 blocked until wave 1 evidence COMPLETE.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

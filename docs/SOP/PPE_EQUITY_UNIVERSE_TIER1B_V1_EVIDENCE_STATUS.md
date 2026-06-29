@@ -1,7 +1,8 @@
 # PPE equity universe tier-1b v1 — evidence status
 
 **Chapter:** `ppe_equity_universe_tier1b_v1`  
-**Status:** **COMPLETE** 2026-06-27 (SELECTED 2026-06-26)
+**Program:** [`PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md`](PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md)  
+**Status:** **PENDING** (wave 1 ch.2 — after tier1a witness green)
 
 | Slice | Status |
 |-------|--------|

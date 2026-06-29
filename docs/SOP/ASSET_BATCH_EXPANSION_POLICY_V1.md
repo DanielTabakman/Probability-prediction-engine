@@ -117,9 +117,11 @@ python scripts/msos_production_multi_asset_witness.py   # when meta #7 COMPLETE
 
 ## Wave 1 chapter order (default)
 
-Mechanical order from [`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md):
+**Relay queue (2026-06-29):** after `ppe_exposure_menu_v1` READY → wave 1 chapters.
 
-1. `ppe_deribit_crypto_tier1_v1` — SOL, BNB, XRP (SOL done; finish BNB/XRP when live)
+Mechanical order from [`POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md`](POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md) and [`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md):
+
+1. `ppe_deribit_crypto_tier1_v1` — SOL live; skip BNB/XRP when Deribit delisted
 2. `ppe_equity_universe_tier1a_v1` — SPY, QQQ, IWM
 3. `ppe_equity_universe_tier1b_v1` — AAPL, MSFT, AMZN, GOOGL, META
 4. `ppe_equity_universe_tier1c_v1` — TSLA, AMD, COIN

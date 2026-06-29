@@ -31,12 +31,20 @@ chapters:
     assets: [SOL, BNB, XRP]
   ppe_equity_universe_tier1a_v1:
     assets: [SPY, QQQ, IWM]
+    status: queued
+    wave: ppe_asset_batch_wave1_v1
   ppe_equity_universe_tier1b_v1:
     assets: [AAPL, MSFT, AMZN, GOOGL, META]
+    status: queued
+    wave: ppe_asset_batch_wave1_v1
   ppe_equity_universe_tier1c_v1:
     assets: [TSLA, AMD, COIN]
+    status: queued
+    wave: ppe_asset_batch_wave1_v1
   ppe_commodity_proxy_tier1_v1:
     assets: [GLD, SLV, USO]
+    status: queued
+    wave: ppe_asset_batch_wave1_v1
 
 asset_templates:
   SOL:
