@@ -13,9 +13,9 @@ import {
   type HorizonChartPayload,
 } from "@/lib/horizonChartPayload";
 import {
-  loadHorizonRegion,
+  fetchHorizonRegion,
   newRegionId,
-  saveHorizonRegion,
+  persistHorizonRegion,
   type HorizonRegionIntent,
 } from "@/lib/horizonRegion";
 
@@ -35,7 +35,7 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
   const [expiryLoading, setExpiryLoading] = useState(false);
 
   useEffect(() => {
-    setRegion(loadHorizonRegion());
+    void fetchHorizonRegion().then(setRegion);
   }, []);
 
   useEffect(() => {
@@ -87,7 +87,7 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
         setPreview("Could not compute implied mass for this region.");
       }
       setRegion(intent);
-      saveHorizonRegion(intent);
+      void persistHorizonRegion(intent);
     },
     [payload],
   );
@@ -125,7 +125,7 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
     );
   }
 
-  const labLink = strategyLabDeepLink(payload);
+  const labLink = strategyLabDeepLink(payload, region?.id);
 
   return (
     <div className="options-horizon-work">

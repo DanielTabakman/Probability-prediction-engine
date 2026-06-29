@@ -3,6 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 
 import type { ExpressionRecord, PaperTradeStatus } from "@/lib/expressionPersistence";
+import type { HorizonRegionIntent } from "@/lib/horizonRegion";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
@@ -21,15 +22,22 @@ export type StoredExpression = ExpressionRecord & {
   ownerEmail?: string | null;
 };
 
+export type StoredHorizonRegion = HorizonRegionIntent & {
+  kind: "horizon_region";
+  ownerEmail?: string | null;
+};
+
 type OwnerPointers = {
   thesisId: string | null;
   expressionId: string | null;
+  horizonRegionId: string | null;
 };
 
 type WorkflowStoreFile = {
   version: 1 | 2;
   theses: StoredThesis[];
   expressions: StoredExpression[];
+  horizonRegions?: StoredHorizonRegion[];
   currentThesisId: string | null;
   currentExpressionId: string | null;
   currentByOwner?: Record<string, OwnerPointers>;
@@ -59,6 +67,7 @@ const EMPTY_STORE: WorkflowStoreFile = {
   version: 2,
   theses: [],
   expressions: [],
+  horizonRegions: [],
   currentThesisId: null,
   currentExpressionId: null,
   currentByOwner: {},
@@ -90,20 +99,36 @@ function storedOwnerKey(raw: string | null | undefined): string {
   return normalized ?? "__anon__";
 }
 
+function normalizeOwnerPointers(raw: Partial<OwnerPointers> | undefined): OwnerPointers {
+  return {
+    thesisId: typeof raw?.thesisId === "string" ? raw.thesisId : null,
+    expressionId: typeof raw?.expressionId === "string" ? raw.expressionId : null,
+    horizonRegionId: typeof raw?.horizonRegionId === "string" ? raw.horizonRegionId : null,
+  };
+}
+
 function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
   const theses = Array.isArray(raw.theses) ? (raw.theses as StoredThesis[]) : [];
   const expressions = Array.isArray(raw.expressions) ? (raw.expressions as StoredExpression[]) : [];
-  const currentByOwner: Record<string, OwnerPointers> = { ...(raw.currentByOwner ?? {}) };
+  const horizonRegions = Array.isArray(raw.horizonRegions)
+    ? (raw.horizonRegions as StoredHorizonRegion[])
+    : [];
+  const currentByOwner: Record<string, OwnerPointers> = {};
+  for (const [key, pointers] of Object.entries(raw.currentByOwner ?? {})) {
+    currentByOwner[key] = normalizeOwnerPointers(pointers);
+  }
   if (raw.version !== 2) {
     currentByOwner.__anon__ = {
       thesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
       expressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
+      horizonRegionId: null,
     };
   }
   return {
     version: 2,
     theses,
     expressions,
+    horizonRegions,
     currentThesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
     currentExpressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
     currentByOwner,
@@ -163,6 +188,28 @@ function isExpressionRecord(value: unknown): value is ExpressionRecord {
   );
 }
 
+function isHorizonRegionIntent(value: unknown): value is HorizonRegionIntent {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  const region = row.region;
+  if (!region || typeof region !== "object") return false;
+  const box = region as Record<string, unknown>;
+  return (
+    row.schema_version === 1 &&
+    typeof row.id === "string" &&
+    typeof row.asset_id === "string" &&
+    typeof row.venue === "string" &&
+    typeof row.created_at_utc === "string" &&
+    typeof box.time_start_utc === "string" &&
+    typeof box.time_end_utc === "string" &&
+    typeof box.price_min_usd === "number" &&
+    typeof box.price_max_usd === "number" &&
+    (row.bias === "bullish_in_region" ||
+      row.bias === "bearish_in_region" ||
+      row.bias === "neutral")
+  );
+}
+
 function thesisOwnerMatches(row: StoredThesis, ownerEmail: string): boolean {
   return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
@@ -173,7 +220,11 @@ function expressionOwnerMatches(row: StoredExpression, ownerEmail: string): bool
 
 function pointersForOwner(store: WorkflowStoreFile, ownerEmail: string): OwnerPointers {
   const key = ownerKey(ownerEmail);
-  return store.currentByOwner?.[key] ?? { thesisId: null, expressionId: null };
+  return normalizeOwnerPointers(store.currentByOwner?.[key]);
+}
+
+function horizonRegionOwnerMatches(row: StoredHorizonRegion, ownerEmail: string): boolean {
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
 function persistPointers(
@@ -240,6 +291,7 @@ export async function upsertCurrentThesis(
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: next.id,
     expressionId: pointers.expressionId,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({
     ...nextStore,
@@ -282,6 +334,7 @@ export async function upsertCurrentExpression(
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: pointers.thesisId,
     expressionId: next.id,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({
     ...nextStore,
@@ -322,6 +375,7 @@ export async function appendPaperTrade(
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: pointers.thesisId,
     expressionId: next.id,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({
     ...nextStore,
@@ -402,6 +456,7 @@ export async function deletePaperTrade(ownerEmail: string, tradeId: string): Pro
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: pointers.thesisId,
     expressionId,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({ ...nextStore, expressions });
   return true;
@@ -435,6 +490,7 @@ export async function restorePaperTrade(
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: pointers.thesisId ?? trade.thesisId,
     expressionId: pointers.expressionId ?? trade.id,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({ ...nextStore, expressions });
   return withEffectiveStatus(restored);
@@ -459,6 +515,7 @@ export async function clearPaperTrades(ownerEmail: string): Promise<number> {
   const nextStore = persistPointers(store, ownerEmail, {
     thesisId: pointers.thesisId,
     expressionId,
+    horizonRegionId: pointers.horizonRegionId,
   });
   await writeStore({ ...nextStore, expressions });
   return toRemove.size;
@@ -492,6 +549,69 @@ export async function closePaperTrade(
   const expressions = [...store.expressions];
   expressions[idx] = next;
   await writeStore({ ...store, expressions });
+  return next;
+}
+
+export async function getHorizonRegionById(
+  ownerEmail: string,
+  regionId: string,
+): Promise<StoredHorizonRegion | null> {
+  const store = await readStore();
+  return (
+    store.horizonRegions?.find(
+      (row) => row.id === regionId && horizonRegionOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function getCurrentHorizonRegion(ownerEmail: string): Promise<StoredHorizonRegion | null> {
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (!pointers.horizonRegionId) return null;
+  return (
+    store.horizonRegions?.find(
+      (row) => row.id === pointers.horizonRegionId && horizonRegionOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function upsertHorizonRegion(
+  region: HorizonRegionIntent,
+  ownerEmail: string,
+): Promise<StoredHorizonRegion> {
+  if (!isHorizonRegionIntent(region)) {
+    throw new Error("invalid horizon region");
+  }
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  const existing =
+    store.horizonRegions?.find(
+      (row) => row.id === region.id && horizonRegionOwnerMatches(row, ownerEmail),
+    ) ??
+    (pointers.horizonRegionId
+      ? store.horizonRegions?.find(
+          (row) =>
+            row.id === pointers.horizonRegionId && horizonRegionOwnerMatches(row, ownerEmail),
+        )
+      : undefined);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
+  const next: StoredHorizonRegion = {
+    ...region,
+    id: existing?.id ?? region.id,
+    kind: "horizon_region",
+    ownerEmail: owner,
+  };
+  const horizonRegions = (store.horizonRegions ?? []).filter((row) => row.id !== next.id);
+  horizonRegions.push(next);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: pointers.expressionId,
+    horizonRegionId: next.id,
+  });
+  await writeStore({
+    ...nextStore,
+    horizonRegions,
+  });
   return next;
 }
 

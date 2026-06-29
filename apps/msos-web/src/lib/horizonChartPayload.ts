@@ -122,10 +122,15 @@ export async function fetchHorizonRegionPreview(query: {
   }
 }
 
-export function strategyLabDeepLink(payload: HorizonChartPayload): string {
+export function strategyLabDeepLink(
+  payload: HorizonChartPayload,
+  regionId?: string | null,
+): string {
   const implied = payload.implied;
   const params = new URLSearchParams();
   params.set("asset", payload.asset_id);
   if (implied?.expiry_date) params.set("expiry", implied.expiry_date);
+  if (implied?.expiry_ts) params.set("expiry_ts", String(implied.expiry_ts));
+  if (regionId) params.set("region_id", regionId);
   return `/strategy-lab?${params.toString()}`;
 }

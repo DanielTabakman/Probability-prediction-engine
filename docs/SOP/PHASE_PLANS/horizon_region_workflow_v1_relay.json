@@ -28,7 +28,8 @@
         "apps/msos-web/src/lib/horizonRegion.ts",
         "apps/msos-web/src/components/OptionsHorizonClient.tsx",
         "apps/msos-web/src/lib/msosWorkflowStore.ts",
-        "apps/msos-web/src/app/api/theses"
+        "apps/msos-web/src/app/api/theses",
+        "tests/test_msos_web_horizon_region_workflow.py"
       ]
     },
     {

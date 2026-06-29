@@ -61,6 +61,7 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
         "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",
         "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
