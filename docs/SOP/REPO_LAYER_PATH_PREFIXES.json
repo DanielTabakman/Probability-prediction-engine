@@ -238,6 +238,7 @@
         "tests/test_msos_web_command_center.py",
         "tests/test_msos_web_user_state.py",
         "tests/test_msos_web_workflow_persistence.py",
+        "tests/test_msos_web_horizon_region_workflow.py",
         "tests/test_msos_web_access_identity.py",
         "tests/test_msos_web_e2e_product_witness.py",
         "tests/test_msos_web_production_wiring.py",
