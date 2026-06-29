@@ -2,8 +2,22 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-29
+
+- `da0d2c0` — Horizon-RegionWf-Closeout-Slice003: sync chapter closeout to main (#548) (`docs/SOP/`)
+- `b36ae99` — control-plane: adaptive burst sizing with director subagents (#546) (`scripts/`)
+- `9981982` — docs(control-plane): PPE module registry, map, and forward consistency program (#545) (`docs/SOP/`)
+- `3271c64` — control-plane: add PPE burst mode for chained operator verdicts (#544) (`docs/SOP/`)
+- `e36c79a` — Horizon-RegionWf-Product-Slice002: persist RegionIntent via MSOS workflow store (#543) (`docs/SOP/`)
+- `54dd285` — PPE display cache ops v1 — scheduled warm + cache health closeout (#541) (`docs/SOP/`)
+
 ## 2026-06-28
 
+- `37ee1f2` — control-plane: charter horizon_replay_scrubber_v1 + VM collector ops (#549) (`docs/SOP/`)
+- `78633d1` — ops(control-plane): VM remote publish with SSH/git timeouts (#540) (`docs/SOP/`)
+- `f3da5b6` — ops: closeout msos multi asset witness manifest queue (#539) (`docs/SOP/`)
+- ops: build/auto/MSOS-MultiAssetWit-Product-Slice003 (#538)
+- `bfb670d` — Control-plane: dev changelog
 - **Chapter closed:** MSOS-MultiAssetWit-Closeout-Slice004 (VM recovery) (`MSOS-MultiAssetWit-Closeout-Slice004 (VM recovery)`)
 - `3b379a1` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine
 - `bb0551b` — Control-plane: dev changelog
