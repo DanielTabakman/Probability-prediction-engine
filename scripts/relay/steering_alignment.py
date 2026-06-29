@@ -282,6 +282,19 @@ def check_steering_alignment(
                         f"{expected_evidence_doc} does not contain COMPLETE",
                     )
                 )
+            try:
+                from scripts.ppe_queue_health import _evidence_has_pending_slices
+
+                if _evidence_has_pending_slices(ev_text):
+                    findings.append(
+                        AlignmentFinding(
+                            "evidence_pending_slices",
+                            "error",
+                            f"{expected_evidence_doc} still lists PENDING slice rows",
+                        )
+                    )
+            except ImportError:
+                pass
             if expected_closed_date and expected_closed_date not in ev_text:
                 findings.append(
                     AlignmentFinding(

@@ -1247,6 +1247,17 @@ def dispatch_apply_control_closeout_v1(
     closeout_raw = find_closeout_for_slice(plan, sid)
     if closeout_raw is None:
         return EXIT_REFUSAL, f"refusal: no closeout block for slice {sid!r} in plan"
+    plan_rel = str(phase_plan_path.resolve().relative_to(repo)).replace("\\", "/")
+    if not force:
+        from scripts.ppe_queue_health import validate_chapter_closeout_ready
+
+        ready, blockers = validate_chapter_closeout_ready(repo, plan_rel)
+        if not ready:
+            return (
+                EXIT_BLOCKED,
+                "blocked: chapter not ready for closeout\n"
+                + "\n".join(f"  - {b}" for b in blockers),
+            )
     spec = CloseoutSpec.from_dict(closeout_raw, slice_id=sid)
     report = apply_control_closeout(
         repo,
@@ -1352,6 +1363,25 @@ def dispatch_control_plane_consistency_check(runtime: Runtime) -> Tuple[int, str
                     "message": "section 14.2 enum value not mentioned anywhere in doc",
                 }
             )
+
+    # 5. Queue DONE rows must match evidence-complete chapters (no paper closeouts).
+    try:
+        from scripts.ppe_queue_health import audit_queue
+
+        queue_issues, _ = audit_queue(repo)
+        for issue in queue_issues:
+            if issue.get("code") != "PREMATURE_CHAPTER_CLOSEOUT":
+                continue
+            findings.append(
+                {
+                    "severity": "error",
+                    "doc": "docs/SOP/PHASE_QUEUE.json",
+                    "locator": issue.get("planPath", ""),
+                    "message": issue.get("detail", "premature chapter closeout"),
+                }
+            )
+    except Exception:
+        pass
 
     return _write_consistency_report(runtime, findings)
 

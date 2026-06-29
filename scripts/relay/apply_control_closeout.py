@@ -359,6 +359,34 @@ def apply_control_closeout(
     phase_plan_path: str | None = None,
 ) -> dict[str, Any]:
     repo = repo_root.resolve()
+    plan_rel = str(phase_plan_path or "").replace("\\", "/").strip()
+    if plan_rel:
+        from scripts.ppe_queue_health import validate_chapter_closeout_ready
+
+        ready, blockers = validate_chapter_closeout_ready(repo, plan_rel)
+        if not ready:
+            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            report = {
+                "job": "apply_control_closeout_v1",
+                "passed": False,
+                "blocked": True,
+                "blockers": blockers,
+                "phase_plan_path": plan_rel,
+                "slice_id": closeout.slice_id,
+                "generated_at": _iso_now(),
+            }
+            cp_dir = repo / "artifacts" / "control_plane" / ts
+            cp_dir.mkdir(parents=True, exist_ok=True)
+            (cp_dir / "closeout_report.json").write_text(
+                json.dumps(report, indent=2),
+                encoding="utf-8",
+            )
+            print(
+                "apply_control_closeout: blocked — chapter not ready for closeout: "
+                + "; ".join(blockers)
+            )
+            return report
+
     if phase_plan_path:
         try:
             from scripts.relay.ensure_evidence_doc_stub import ensure_evidence_doc_stub
