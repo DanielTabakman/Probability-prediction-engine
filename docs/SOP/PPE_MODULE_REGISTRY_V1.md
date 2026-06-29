@@ -130,10 +130,10 @@ Update at every module SELECTION / closeout. **Advance?** = steward yes/no for n
 |---|-----------|--------------|-------|--------|---------|------------------|--------------|----------------|----------|--------|----------|
 | 1 | `implied_distribution` | Implied distribution | DISTRIBUTION | LEGIBILITY | TRADER | `/strategy-lab` | `/ppe-display-api/display.json` | T2→T4 | P0 | **LIVE** | T4: richer relationship modes |
 | 2 | `options_horizon` | Options Horizon | PROJECTION | LEGIBILITY | TRADER | `/options-horizon` | `/ppe-display-api/horizon/*.json` | T2→T5* | P1 | **LIVE** | chart polish + archive |
-| 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** | **yes** — radar T1–T2 |
+| 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** · **SELECTED** ch.1–2 | **yes** — radar T1–T2 queued |
 | 4 | `expression_planner` | Expression planner | EXPOSURE | EDGE + WORKFLOW | TRADER | `/strategy-lab/expression` | strategy suggestion boundary | T2→T3 | P1 | **LIVE** | exposure optimization depth |
 | 5 | `cross_venue_event_gap` | Cross-venue scan | EVENT_GAP | EDGE | RESEARCH | `artifacts/cross_venue_reports/` | scan JSON | T3→T3 | side | **LIVE** (ops) | backtest when history deep |
-| 6 | `exposure_menu` | Exposure menu | EXPOSURE_PATH | WORKFLOW + LEGIBILITY | TRADER | `/exposure` | `/ppe-display-api/exposure-menu.json` | —→T2 | P1 | **CHARTERED** | **yes** — v0 BUILD when READY |
+| 6 | `exposure_menu` | Exposure menu | EXPOSURE_PATH | WORKFLOW + LEGIBILITY | TRADER | `/exposure` | `/ppe-display-api/exposure-menu.json` | —→T2 | P1 | **SELECTED** | **yes** — v0 BUILD active |
 | — | *workflow* | Thesis / confirm / monitor | — | WORKFLOW | TRADER | P3–P7 routes | MSOS workflow store | — | P0 | **LIVE** | asset parity, return loop |
 
 \*Horizon replay chapters are T3+ under same module program.

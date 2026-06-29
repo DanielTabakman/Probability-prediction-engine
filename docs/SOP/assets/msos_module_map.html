@@ -217,6 +217,18 @@
       }
       .maint-note strong { color: var(--teal); }
       .maint-note code { font-size: 0.72rem; }
+      .last-updated {
+        display: inline-block;
+        font-size: 0.78rem;
+        color: var(--green);
+        background: rgba(110, 231, 168, 0.1);
+        border: 1px solid rgba(110, 231, 168, 0.25);
+        border-radius: 6px;
+        padding: 2px 8px;
+        margin-left: 6px;
+        font-weight: 600;
+      }
+      .last-updated time { font-weight: 600; }
       .flow-intro {
         font-size: 0.84rem;
         color: var(--muted);
@@ -274,45 +286,30 @@
       Living operator chart — modules, data, tiers, priorities.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      · As-of 2026-06-29 (draft)
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-29T18:00:00Z">
+        Last updated: 2026-06-29 <time datetime="2026-06-29T18:00:00Z">18:00 UTC</time>
+      </span>
     </p>
 
     <div class="maint-note">
-      <strong>Is it up to date when I refresh?</strong>
-      Browser refresh only reloads <em>this file on disk</em>.
-      Run <code>git pull</code> first if agents merged changes — then refresh (or reopen the file).
-      Nothing here polls relay, VM, or production live; edit this HTML at steward closeout when priorities shift.
+      <strong>Refresh workflow:</strong> If you <code>git pull</code> often, browser refresh is usually enough.
+      This file tracks your current branch — it does not poll relay or VM live.
+      Agents bump <code>#map-last-updated</code> (date <em>and</em> UTC time) at steward closeout.
     </div>
 
-    <h2>Recently shipped</h2>
-    <div class="op-section shipped-panel">
-      <h3>Last closeouts — what landed on main</h3>
-      <ul>
+    <h2>Your attention — human to-do</h2>
+    <div class="op-section todo-panel">
+      <h3>Bottlenecks — needs you to keep it moving</h3>
+      <ol>
         <li>
-          <strong>Options Horizon region workflow v1</strong>
-          <span class="when">2026-06-29 · mark regions, save intent on /options-horizon</span>
+          <strong>VM collectors — confirm tasks on ppeloop</strong>
+          <span class="why"><code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
         </li>
         <li>
-          <strong>PPE display cache ops v1</strong>
-          <span class="when">2026-06-29 · warm schedule, cache health, ops runbook</span>
+          <strong>Next asset batch — pick the group</strong>
+          <span class="why">Sign off trust caveats after witness before Live pill on new symbols.</span>
         </li>
-        <li>
-          <strong>MSOS workflow asset parity + prod multi-asset witness</strong>
-          <span class="when">2026-06-28 · ?asset= through workflow; witness beyond BTC-only</span>
-        </li>
-        <li>
-          <strong>PPE trust surface + asset enablement pipeline</strong>
-          <span class="when">2026-06-28 · trust labels in MSOS; scripted enable ritual</span>
-        </li>
-        <li>
-          <strong>Options Horizon chart polish + equity/crypto universe tiers</strong>
-          <span class="when">2026-06-27–28 · tier-1 batches on registry/catalog</span>
-        </li>
-        <li>
-          <strong>PPE module registry + operator map (this page)</strong>
-          <span class="when">2026-06-29 · living chart for modules and operator attention</span>
-        </li>
-      </ul>
+      </ol>
     </div>
 
     <h2>Waiting on time / data</h2>
@@ -341,27 +338,43 @@
       </ul>
     </div>
 
-    <h2>Your attention — human to-do</h2>
-    <div class="op-section todo-panel">
-      <h3>Bottlenecks — needs you to keep it moving</h3>
-      <ol>
+    <h2>Recently shipped</h2>
+    <div class="op-section shipped-panel">
+      <h3>Last closeouts — what landed on main</h3>
+      <ul>
         <li>
-          <strong>Forward consistency — approve relay ch.1–2 SELECTION</strong>
-          <span class="why">Lab panel exists; no MSOS /forward-consistency dashboard yet.</span>
+          <strong>Exposure menu v0</strong>
+          <span class="when">2026-06-29 · SELECTION approved — relay active (NVDA + BTC)</span>
         </li>
         <li>
-          <strong>Exposure menu v0 — approve READY → relay</strong>
-          <span class="why">Chartered front door for “I want X exposure” · NVDA + BTC paths.</span>
+          <strong>Forward consistency radar ch.1–2</strong>
+          <span class="when">2026-06-29 · SELECTION approved — queued after trader workflow horizon nav</span>
         </li>
         <li>
-          <strong>VM collectors — confirm tasks on ppeloop</strong>
-          <span class="why"><code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
+          <strong>Options Horizon region workflow v1</strong>
+          <span class="when">2026-06-29 · mark regions, save intent on /options-horizon</span>
         </li>
         <li>
-          <strong>Next asset batch — pick the group</strong>
-          <span class="why">Sign off trust caveats after witness before Live pill on new symbols.</span>
+          <strong>PPE display cache ops v1</strong>
+          <span class="when">2026-06-29 · warm schedule, cache health, ops runbook</span>
         </li>
-      </ol>
+        <li>
+          <strong>MSOS workflow asset parity + prod multi-asset witness</strong>
+          <span class="when">2026-06-28 · ?asset= through workflow; witness beyond BTC-only</span>
+        </li>
+        <li>
+          <strong>PPE trust surface + asset enablement pipeline</strong>
+          <span class="when">2026-06-28 · trust labels in MSOS; scripted enable ritual</span>
+        </li>
+        <li>
+          <strong>Options Horizon chart polish + equity/crypto universe tiers</strong>
+          <span class="when">2026-06-27–28 · tier-1 batches on registry/catalog</span>
+        </li>
+        <li>
+          <strong>PPE module registry + operator map (this page)</strong>
+          <span class="when">2026-06-29 · living chart for modules and operator attention</span>
+        </li>
+      </ul>
     </div>
 
     <h2>When you have bandwidth — backlog</h2>
@@ -483,8 +496,8 @@
           <td>OPERATOR</td>
           <td class="tier">T1 → T3</td>
           <td class="prio-p2">P2</td>
-          <td class="status-partial">PARTIAL</td>
-          <td class="advance-yes">YES — radar T1–T2</td>
+          <td class="status-partial">PARTIAL · SELECTED</td>
+          <td class="advance-yes">YES — relay queued</td>
         </tr>
         <tr>
           <td>4</td>
@@ -513,8 +526,8 @@
           <td>TRADER</td>
           <td class="tier">→ T2</td>
           <td class="prio-p1">P1</td>
-          <td class="status-partial">CHARTERED</td>
-          <td class="advance-yes">YES — v0 BUILD</td>
+          <td class="status-partial">SELECTED</td>
+          <td class="advance-yes">YES — relay active</td>
         </tr>
         <tr>
           <td>—</td>
@@ -582,9 +595,9 @@
       </div>
       <div class="card">
         <h3>3 · Forward consistency</h3>
-        <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">ADVANCE</span></div>
-        <p>Lab panel live; dashboard + heatmap not built. Target T3 with daily status snapshots only.</p>
-        <div class="next"><strong>Next:</strong> SELECTION → relay ch.1–2 (dashboard payload + /forward-consistency).</div>
+        <div class="meta">CONSISTENCY · T1 partial · P2 · <span class="advance-yes">SELECTED</span></div>
+        <p>Lab panel live; dashboard + heatmap chartered — relay ch.1–2 approved 2026-06-29.</p>
+        <div class="next"><strong>Next:</strong> BUILD ch.1 (dashboard.json) → ch.2 (/forward-consistency) after supply refresh queue.</div>
       </div>
       <div class="card">
         <h3>4 · Expression planner</h3>

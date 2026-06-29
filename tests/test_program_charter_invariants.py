@@ -129,6 +129,7 @@ def test_manifest_points_at_known_active_or_closed_plan() -> None:
         "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
         "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
         "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",

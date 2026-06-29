@@ -11,11 +11,9 @@
 
 ## Status
 
-**CHARTERED** 2026-06-29 — standalone exposure-path menu; **P1 side channel** (trader workflow front door).
+**SELECTED** 2026-06-29 — operator-approved relay; **P1 side channel** (trader workflow front door). Deferred BL density smoothing.
 
 **First slice:** `PPE-ExposureMenu-Control-Slice001`
-
-**Promote to `READY` when:** steward prioritizes exposure menu over horizon replay / meta-infra (not auto-selected).
 
 ---
 

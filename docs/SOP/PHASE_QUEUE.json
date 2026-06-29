@@ -473,9 +473,19 @@
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
       "status": "READY",
-      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 supply refresh 2026-06-29 (first runnable)",
+      "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
+      "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
+      "urgent": true,
+      "urgentReason": "Operator approved exposure menu over BL density smoothing",
+      "focusPlaybookTier": "P1",
+      "workerMode": "local-agent"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu v0",
       "selectionPrep": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md"
     },
     {
@@ -489,6 +499,18 @@
       "status": "PLANNED",
       "reason": "[MEDIUM] Trader workflow horizon nav",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Forward consistency radar ch.1 — dashboard payload + quality flags; P2 side channel",
+      "selectionPrep": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Forward consistency radar ch.2 — MSOS /forward-consistency heatmap",
+      "selectionPrep": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
