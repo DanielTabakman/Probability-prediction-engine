@@ -71,6 +71,18 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 - Generated BUILD packet target ≤~80 lines
 - One Cursor thread per slice/chapter; no SELECTION+BUILD+PR mega-thread
 
+### Burst mode (optional efficiency)
+
+When the operator wants more than one verdict per thread without waiting for a new chat:
+
+- **Triggers:** `burst mode` · `keep going` · `what's next until watch`
+- **Single-agent:** up to **2** verdict cycles, then `context_window_closeout.cmd --record`
+- **Director (`@ppe-director` + burst):** up to **3** workers, then closeout
+- **Stops at WATCH**, not at a context-window percentage — see [`.cursor/rules/ppe-burst-mode.mdc`](../../.cursor/rules/ppe-burst-mode.mdc)
+- **Handoff:** `ppe_go.cmd --burst` copies burst director prompt to clipboard
+
+Unattended multi-chapter work still belongs on the **VM loop**, not Cursor burst.
+
 ---
 
 ## Commands
