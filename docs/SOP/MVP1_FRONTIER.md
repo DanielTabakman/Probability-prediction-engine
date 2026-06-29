@@ -15,8 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md))
-- **Last closed chapter:** **PPE display cache ops v1** — **COMPLETE** 2026-06-29
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`OPTIONS_HORIZON_PROGRAM_V1.md`](docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md))
+- **Last closed chapter:** **Options Horizon region workflow v1** — **COMPLETE** 2026-06-29
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 

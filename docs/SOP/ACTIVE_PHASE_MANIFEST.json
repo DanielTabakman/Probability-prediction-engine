@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REGION_WORKFLOW_V1.md",
   "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Options Horizon region workflow \u2014 after chart polish",
+  "status": "COMPLETE",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Options Horizon region workflow \u2014 after chart polish Auto-finalized COMPLETE manifest before next SELECTION. Chapter closeout Horizon-RegionWf-Closeout-Slice003; queue item marked DONE.",
   "workerMode": "local-agent"
 }

@@ -303,7 +303,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md"
     },
