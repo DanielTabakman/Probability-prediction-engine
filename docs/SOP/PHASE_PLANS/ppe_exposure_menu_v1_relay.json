@@ -1,0 +1,85 @@
+{
+  "name": "PPE_exposure_menu_v1 (exposure path menu — NVDA + BTC)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "PPE-ExposureMenu-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-Control-Slice001-exposure_menu",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "PPE-ExposureMenu-Core-Slice002",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-Core-Slice002-exposure_menu",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": ["src/engine/", "scripts/", "config/exposure_path_catalog.yaml"]
+    },
+    {
+      "sliceId": "PPE-ExposureMenu-CLI-Slice003",
+      "layerPreset": "PPE_CORE",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-CLI-Slice003-exposure_menu",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": ["scripts/", "tests/"]
+    },
+    {
+      "sliceId": "PPE-ExposureMenu-UI-Slice004",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-UI-Slice004-exposure_menu",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 60,
+      "hardMinutes": 180,
+      "maxAttempts": 2,
+      "touchSet": ["src/viz/", "tests/"]
+    },
+    {
+      "sliceId": "PPE-ExposureMenu-Product-Slice005",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-Product-Slice005-exposure_menu",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 120,
+      "hardMinutes": 360,
+      "maxAttempts": 2,
+      "touchSet": ["apps/msos-web/", "tests/test_msos_web_strategy_lab.py"]
+    },
+    {
+      "sliceId": "PPE-ExposureMenu-Closeout-Slice006",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+      "buildBranch": "build/auto/PPE-ExposureMenu-Closeout-Slice006-exposure_menu",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_exposure_menu_v1",
+        "chapterTitle": "PPE Exposure menu v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
+        "nextSelectionDoc": "docs/SOP/PPE_MODULE_REGISTRY_V1.md",
+        "carryDocs": ["docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md"]
+      }
+    }
+  ]
+}
