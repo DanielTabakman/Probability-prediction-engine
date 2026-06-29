@@ -28,6 +28,14 @@ ROADMAP_INVALID_TO_VALID = {
     "queued": "pending",
 }
 
+# Wave-1 asset expansion order (ASSET_BATCH_EXPANSION_POLICY_V1).
+WAVE1_ASSET_PLAN_ORDER: tuple[str, ...] = (
+    "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+    "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+    "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+    "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+)
+
 
 def roadmap_row_should_activate_for_backlog(roadmap_status: str, backlog_status: str) -> bool:
     """True when a backlog row is ready to run but the roadmap row is still idle."""
@@ -61,6 +69,47 @@ def _evidence_has_pending_slices(body: str) -> bool:
             if re.fullmatch(r"\*{0,2}PENDING\*{0,2}", cell, re.I):
                 return True
     return False
+
+
+def validate_chapter_closeout_ready(repo_root: Path, plan_path: str) -> tuple[bool, list[str]]:
+    """Hard gate: chapter may close only when progress + evidence show no pending work."""
+    repo = repo_root.resolve()
+    norm = _norm_plan(plan_path)
+    blockers: list[str] = []
+    if not norm:
+        return False, ["empty plan_path"]
+
+    try:
+        from scripts.ppe_phase_plan_window import non_closeout_slices_pending
+
+        pending_progress = non_closeout_slices_pending(repo, norm)
+        if pending_progress:
+            blockers.append(
+                "relay slice progress incomplete: "
+                + ", ".join(pending_progress)
+            )
+    except Exception as exc:
+        blockers.append(f"slice progress check failed: {exc}")
+
+    try:
+        plan = load_phase_plan(repo, norm)
+    except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+        return False, [f"plan load failed: {exc}"]
+
+    closeout = _closeout_meta(plan)
+    evidence_rel = str(closeout.get("evidenceDoc") or "").strip()
+    if not evidence_rel:
+        blockers.append("closeout block missing evidenceDoc")
+    else:
+        evidence = repo / evidence_rel.replace("\\", "/")
+        if not evidence.is_file():
+            blockers.append(f"evidence doc missing: {evidence_rel}")
+        else:
+            body = evidence.read_text(encoding="utf-8", errors="replace")
+            if _evidence_has_pending_slices(body):
+                blockers.append("evidence doc still lists PENDING slice rows")
+
+    return (len(blockers) == 0, blockers)
 
 
 def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
@@ -371,7 +420,238 @@ def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
                 }
             )
 
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        status = str(item.get("status") or "").upper()
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        if status != "DONE" or not plan:
+            continue
+        if not chapter_marked_complete_in_repo(repo, plan):
+            issues.append(
+                {
+                    "code": "PREMATURE_CHAPTER_CLOSEOUT",
+                    "index": i,
+                    "planPath": plan,
+                    "detail": "queue DONE but evidence/slices not complete",
+                }
+            )
+
     return issues, fixes
+
+
+def revert_premature_evidence_complete_header(
+    repo_root: Path,
+    plan_path: str,
+    *,
+    apply: bool,
+) -> bool:
+    """Revert evidence **Status:** COMPLETE when slice table still has PENDING rows."""
+    repo = repo_root.resolve()
+    norm = _norm_plan(plan_path)
+    if not norm:
+        return False
+    try:
+        plan = load_phase_plan(repo, norm)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return False
+    closeout = _closeout_meta(plan)
+    evidence_rel = str(closeout.get("evidenceDoc") or "").strip()
+    if not evidence_rel:
+        return False
+    path = repo / evidence_rel.replace("\\", "/")
+    if not path.is_file():
+        return False
+    text = path.read_text(encoding="utf-8", errors="replace")
+    if not _evidence_has_pending_slices(text):
+        return False
+    head = text[:1200]
+    if not re.search(r"\*\*Status:\*\*\s*\*\*COMPLETE\*\*", head, re.I):
+        return False
+    if not apply:
+        return True
+    new_text, n = re.subn(
+        r"(^\*\*Status:\*\*\s+)\*\*COMPLETE\*\*[^\n]*",
+        r"\1**IN PROGRESS** — premature closeout reverted; finish pending slices before COMPLETE",
+        text,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    if n:
+        path.write_text(new_text, encoding="utf-8")
+        return True
+    return False
+
+
+def repair_backlog_premature_done(repo_root: Path, *, apply: bool) -> list[Fix]:
+    """Re-charter backlog rows marked done while evidence is not truly complete."""
+    repo = repo_root.resolve()
+    fixes: list[Fix] = []
+    try:
+        from scripts.ppe_propagate_queue import backlog_path, load_backlog, save_backlog
+    except ImportError:
+        return fixes
+    if not backlog_path(repo).is_file():
+        return fixes
+    backlog = load_backlog(repo)
+    for item in backlog.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        status = str(item.get("status") or "").strip().lower()
+        if status != "done" or not plan:
+            continue
+        if chapter_marked_complete_in_repo(repo, plan):
+            continue
+        fixes.append(
+            {
+                "action": "backlog_recharter",
+                "planPath": plan,
+                "chapterId": item.get("chapterId"),
+                "reason": PREMATURE_REOPEN_REASON,
+            }
+        )
+        if apply:
+            item["status"] = "chartered"
+    if apply and fixes:
+        save_backlog(repo, backlog)
+    return fixes
+
+
+def repair_integrated_premature_complete(repo_root: Path, *, apply: bool) -> list[Fix]:
+    """Downgrade integrated-status COMPLETE rows when evidence still has pending slices."""
+    repo = repo_root.resolve()
+    path = repo / "docs/SOP/PPE_INTEGRATED_STATUS.md"
+    if not path.is_file():
+        return []
+    fixes: list[Fix] = []
+    text = path.read_text(encoding="utf-8", errors="replace")
+
+    plans: set[str] = set()
+    queue = load_queue(repo)
+    for item in queue.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        if plan:
+            plans.add(plan)
+    try:
+        from scripts.ppe_propagate_queue import backlog_path, load_backlog
+
+        if backlog_path(repo).is_file():
+            for item in load_backlog(repo).get("items") or []:
+                if not isinstance(item, dict):
+                    continue
+                plan = _norm_plan(str(item.get("planPath") or ""))
+                if plan:
+                    plans.add(plan)
+    except ImportError:
+        pass
+
+    for plan in sorted(plans):
+        if chapter_marked_complete_in_repo(repo, plan):
+            continue
+        try:
+            plan_obj = load_phase_plan(repo, plan)
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            continue
+        title = str(_closeout_meta(plan_obj).get("chapterTitle") or "").strip()
+        if not title or title not in text:
+            continue
+        pattern = re.compile(
+            rf"(\|\s*{re.escape(title)}\s*\|\s*)\*\*COMPLETE\*\*",
+            re.I,
+        )
+        if not pattern.search(text):
+            continue
+        fixes.append({"action": "integrated_downgrade", "planPath": plan, "chapterTitle": title})
+        if apply:
+            text = pattern.sub(r"\1**IN PROGRESS**", text, count=1)
+    if apply and fixes:
+        path.write_text(text, encoding="utf-8")
+    return fixes
+
+
+def promote_wave1_asset_head_ready(repo_root: Path, *, apply: bool) -> list[Fix]:
+    """Set the first incomplete Wave-1 asset chapter to READY (others stay PLANNED)."""
+    repo = repo_root.resolve()
+    queue = load_queue(repo)
+    items = list(queue.get("items") or [])
+    if not isinstance(items, list):
+        return []
+
+    head_plan: str | None = None
+    for plan in WAVE1_ASSET_PLAN_ORDER:
+        if not chapter_marked_complete_in_repo(repo, plan):
+            head_plan = plan
+            break
+    if not head_plan:
+        return []
+
+    fixes: list[Fix] = []
+    for i, item in enumerate(items):
+        if not isinstance(item, dict):
+            continue
+        plan = _norm_plan(str(item.get("planPath") or ""))
+        if plan not in WAVE1_ASSET_PLAN_ORDER:
+            continue
+        st = str(item.get("status") or "").upper()
+        if plan == head_plan and st in ("PLANNED", "DONE"):
+            fixes.append({"action": "wave1_promote_ready", "index": i, "planPath": plan})
+            if apply:
+                item["status"] = "READY"
+                item.pop("doneReason", None)
+        elif plan != head_plan and st == "READY" and not chapter_marked_complete_in_repo(repo, plan):
+            fixes.append({"action": "wave1_demote_planned", "index": i, "planPath": plan})
+            if apply:
+                item["status"] = "PLANNED"
+                item.pop("doneReason", None)
+
+    if apply and fixes:
+        queue["items"] = items
+        save_queue(repo, queue)
+    return fixes
+
+
+def repair_direction_premature_milestones(repo_root: Path, *, apply: bool) -> list[Fix]:
+    """Mark priorMilestones IN_PROGRESS when linked evidence is not chapter-complete."""
+    repo = repo_root.resolve()
+    direction_path = repo / "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json"
+    if not direction_path.is_file():
+        return []
+    try:
+        from scripts.ppe_propagate_queue import backlog_path, load_backlog
+    except ImportError:
+        return []
+
+    plan_by_chapter: dict[str, str] = {}
+    if backlog_path(repo).is_file():
+        for item in load_backlog(repo).get("items") or []:
+            if not isinstance(item, dict):
+                continue
+            cid = str(item.get("chapterId") or "").strip()
+            plan = _norm_plan(str(item.get("planPath") or ""))
+            if cid and plan:
+                plan_by_chapter[cid] = plan
+
+    data = json.loads(direction_path.read_text(encoding="utf-8-sig"))
+    fixes: list[Fix] = []
+    for ms in data.get("priorMilestones") or []:
+        if not isinstance(ms, dict):
+            continue
+        if str(ms.get("status") or "").upper() != "COMPLETE":
+            continue
+        cid = str(ms.get("id") or "").strip()
+        plan = plan_by_chapter.get(cid, "")
+        if not plan or chapter_marked_complete_in_repo(repo, plan):
+            continue
+        fixes.append({"action": "direction_milestone_reopen", "chapterId": cid, "planPath": plan})
+        if apply:
+            ms["status"] = "IN_PROGRESS"
+            ms.pop("closedOn", None)
+    if apply and fixes:
+        direction_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return fixes
 
 
 def heal_premature_chapter_closeout(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[str]]:
@@ -394,7 +674,7 @@ def heal_premature_chapter_closeout(repo_root: Path, *, apply: bool) -> tuple[li
     if not isinstance(items, list):
         return fixes, actions
 
-    reopened_plan: str | None = None
+    reopened_plans: list[str] = []
 
     for i, item in enumerate(items):
         if not isinstance(item, dict):
@@ -405,7 +685,6 @@ def heal_premature_chapter_closeout(repo_root: Path, *, apply: bool) -> tuple[li
         qst = str(item.get("status") or "").upper()
         if qst == "READY" and not chapter_marked_complete_in_repo(repo, plan):
             if manifest_status == "COMPLETE" and not manifest_plan:
-                reopened_plan = reopened_plan or plan
                 actions.append(f"queue READY {plan} while manifest idle COMPLETE")
             continue
         if qst != "DONE" or chapter_marked_complete_in_repo(repo, plan):
@@ -418,15 +697,33 @@ def heal_premature_chapter_closeout(repo_root: Path, *, apply: bool) -> tuple[li
                 "reason": PREMATURE_REOPEN_REASON,
             }
         )
-        if apply:
-            item["status"] = "READY"
-            item.pop("doneReason", None)
-            reopened_plan = plan
+        if plan not in reopened_plans:
+            reopened_plans.append(plan)
 
-    if apply and fixes:
+    if apply and reopened_plans:
+        first_ready = reopened_plans[0]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            plan = _norm_plan(str(item.get("planPath") or ""))
+            if plan not in reopened_plans:
+                continue
+            item["status"] = "READY" if plan == first_ready else "PLANNED"
+            item.pop("doneReason", None)
         queue["items"] = items
         save_queue(repo, queue)
+        for plan in reopened_plans:
+            if revert_premature_evidence_complete_header(repo, plan, apply=True):
+                actions.append(f"evidence reverted {plan}")
+        backlog_fixes = repair_backlog_premature_done(repo, apply=True)
+        fixes.extend(backlog_fixes)
+        integrated_fixes = repair_integrated_premature_complete(repo, apply=True)
+        fixes.extend(integrated_fixes)
+        direction_fixes = repair_direction_premature_milestones(repo, apply=True)
+        fixes.extend(direction_fixes)
+        actions.append(f"queue reopened {len(reopened_plans)} chapter(s); READY={first_ready}")
 
+    reopened_plan = reopened_plans[0] if reopened_plans else None
     target_plan = reopened_plan or (
         manifest_plan
         if manifest_status in ("READY", "RUNNING") and manifest_plan
@@ -548,13 +845,26 @@ def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue
 
 
 def run_queue_health(repo_root: Path, *, apply: bool) -> dict[str, Any]:
+    heal_fixes, heal_actions = heal_premature_chapter_closeout(repo_root, apply=apply)
     roadmap_fixes, roadmap_remaining = repair_roadmap(repo_root, apply=apply)
     backlog_fixes, backlog_remaining = repair_backlog(repo_root, apply=apply)
+    backlog_premature = repair_backlog_premature_done(repo_root, apply=apply)
+    integrated_fixes = repair_integrated_premature_complete(repo_root, apply=apply)
+    wave1_fixes = promote_wave1_asset_head_ready(repo_root, apply=apply)
     queue_fixes, queue_remaining = repair_queue(repo_root, apply=apply)
-    fixes = roadmap_fixes + backlog_fixes + queue_fixes
+    fixes = (
+        heal_fixes
+        + roadmap_fixes
+        + backlog_fixes
+        + backlog_premature
+        + integrated_fixes
+        + wave1_fixes
+        + queue_fixes
+    )
     remaining = roadmap_remaining + backlog_remaining + queue_remaining
     return {
         "apply": apply,
+        "heal_actions": heal_actions,
         "fixes": fixes,
         "fix_count": len(fixes),
         "remaining_issues": remaining,

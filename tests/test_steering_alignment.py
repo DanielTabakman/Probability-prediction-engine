@@ -43,6 +43,26 @@ def test_steering_aligned_fixture(tmp_path: Path) -> None:
     assert report.passed, report.findings
 
 
+def test_steering_fails_when_evidence_has_pending_slices(tmp_path: Path) -> None:
+    sop = tmp_path / "docs" / "SOP"
+    sop.mkdir(parents=True)
+    for name in ("HANDOFF.md", "MVP1_FRONTIER.md", "PPE_INTEGRATED_STATUS.md"):
+        (sop / name).write_text("# stub\n", encoding="utf-8")
+    evidence = sop / "BAD_EVIDENCE.md"
+    evidence.write_text(
+        "# evidence\n\n**Status:** **COMPLETE** 2026-06-27\n\n| Slice | Status |\n|-------|--------|\n| X | PENDING |\n",
+        encoding="utf-8",
+    )
+    report = check_steering_alignment(
+        tmp_path,
+        expected_chapter_title="Bad Chapter",
+        expected_closed_date="2026-06-27",
+        expected_evidence_doc="docs/SOP/BAD_EVIDENCE.md",
+    )
+    assert not report.passed
+    assert any(f.check == "evidence_pending_slices" for f in report.findings)
+
+
 def test_next_selection_mismatch_detected(tmp_path: Path) -> None:
     handoff = tmp_path / "docs" / "SOP"
     handoff.mkdir(parents=True)

@@ -56,7 +56,7 @@
     },
     {
       "chapterId": "msos_p3_command_center",
-      "status": "done",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P3",
@@ -72,7 +72,7 @@
     },
     {
       "chapterId": "repo_housekeeping_v1",
-      "status": "done",
+      "status": "chartered",
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "workerMode": "deterministic",
       "chapterTitle": "Repo housekeeping v1",
@@ -90,7 +90,7 @@
     },
     {
       "chapterId": "mvp1_distribution_stats_legibility",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
@@ -107,7 +107,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_distribution_demo",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
@@ -143,7 +143,7 @@
     },
     {
       "chapterId": "mvp1_cross_venue_scan_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
@@ -154,7 +154,7 @@
     },
     {
       "chapterId": "mvp1_cross_venue_backtest_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
@@ -208,7 +208,7 @@
     },
     {
       "chapterId": "msos_storyboard_visual_parity_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
@@ -218,7 +218,7 @@
     },
     {
       "chapterId": "msos_public_demo_launch_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P3",
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
@@ -248,7 +248,7 @@
     },
     {
       "chapterId": "msos_workflow_persistence_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
@@ -258,7 +258,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_embed_shell_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P0",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
@@ -278,7 +278,7 @@
     },
     {
       "chapterId": "mvp1_snapshot_owner_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
@@ -288,7 +288,7 @@
     },
     {
       "chapterId": "msos_access_identity_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
@@ -298,7 +298,7 @@
     },
     {
       "chapterId": "msos_monitor_history_live_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
@@ -318,7 +318,7 @@
     },
     {
       "chapterId": "msos_entitlements_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
@@ -328,7 +328,7 @@
     },
     {
       "chapterId": "msos_billing_stripe_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
@@ -380,7 +380,7 @@
     },
     {
       "chapterId": "ppe_tradeable_universe_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
@@ -460,7 +460,7 @@
     },
     {
       "chapterId": "ppe_sol_bybit_ship_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
@@ -472,7 +472,7 @@
     },
     {
       "chapterId": "ppe_deribit_crypto_tier1_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "urgent": true,
@@ -484,7 +484,7 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1a_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
@@ -494,7 +494,7 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1b_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
@@ -504,7 +504,7 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1c_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
@@ -514,7 +514,7 @@
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
-      "status": "done",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
