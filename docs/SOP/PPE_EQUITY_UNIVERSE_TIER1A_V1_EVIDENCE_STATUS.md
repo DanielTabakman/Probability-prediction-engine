@@ -1,7 +1,8 @@
 # PPE equity universe tier-1a v1 — evidence status
 
 **Chapter:** `ppe_equity_universe_tier1a_v1`  
-**Status:** **COMPLETE** 2026-06-27 (SELECTED 2026-06-26)
+**Program:** [`PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md`](PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md)  
+**Status:** **IN PROGRESS** (re-charter 2026-06-29 — registry enable pending)
 
 | Slice | Status |
 |-------|--------|

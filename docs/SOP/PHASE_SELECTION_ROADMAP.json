@@ -248,30 +248,6 @@
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md"
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Equity indices \u2014 SPY QQQ IWM",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Equity mega caps batch 1",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Equity mega caps batch 2",
-      "selectionPrep": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
-    },
-    {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Commodity ETF options \u2014 GLD SLV USO",
-      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
-    },
-    {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cme_commodity_v1_relay.json",
       "status": "skipped",
       "reason": "[LOW DEFER] CME GC SI CL \u2014 validation-gated after ETF proxies",
@@ -326,9 +302,33 @@
       "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.1 \u2014 SPY QQQ IWM (re-charter)",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 mega caps batch 1",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
-      "status": "pending",
-      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu v0",
+      "status": "done",
+      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu + wave 1",
       "selectionPrep": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md"
     },
     {
@@ -346,13 +346,13 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
       "status": "pending",
-      "reason": "[MEDIUM] Forward consistency radar ch.1 — dashboard payload + quality flags; P2 side channel",
+      "reason": "[MEDIUM] Forward consistency radar ch.1 \u2014 dashboard payload + quality flags; P2 side channel",
       "selectionPrep": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
       "status": "pending",
-      "reason": "[MEDIUM] Forward consistency radar ch.2 — MSOS /forward-consistency heatmap",
+      "reason": "[MEDIUM] Forward consistency radar ch.2 \u2014 MSOS /forward-consistency heatmap",
       "selectionPrep": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },
     {
