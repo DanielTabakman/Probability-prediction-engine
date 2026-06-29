@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from scripts.ppe_burst_plan import compute_burst_plan, write_burst_plan
 from scripts.ppe_ide_handoff import _detached_open, copy_text_to_clipboard, resolve_cursor_executable
 from scripts.ppe_operator_hint import PPE_GO_HINT, PPE_GO_VERDICTS
 from scripts.ppe_operator_status import (
@@ -18,9 +19,10 @@ from scripts.ppe_operator_status import (
 )
 
 DIRECTOR_PROMPT = "@ppe-director Director pass. Terminal loop running."
-DIRECTOR_BURST_PROMPT = (
-    "@ppe-director Burst mode. Execute verdicts until WATCH stop or max 3 workers. Terminal loop running."
-)
+
+
+def _burst_prompt_from_plan(plan: dict[str, Any]) -> str:
+    return str(plan.get("prompt") or DIRECTOR_PROMPT)
 
 HANDOFF_VERDICTS = PPE_GO_VERDICTS
 
@@ -54,13 +56,21 @@ def run_director_go(repo: Path, *, open_ide: bool = True, burst: bool = False) -
     verdict = str(status.get("verdict") or "ERROR")
     blocker = str(status.get("blocker") or "").strip()
     needs_handoff = verdict in HANDOFF_VERDICTS
-    prompt = DIRECTOR_BURST_PROMPT if burst else DIRECTOR_PROMPT
+
+    burst_plan: dict[str, Any] | None = None
+    if burst:
+        burst_plan = compute_burst_plan(repo, status)
+        write_burst_plan(repo, burst_plan)
+        prompt = _burst_prompt_from_plan(burst_plan)
+    else:
+        prompt = DIRECTOR_PROMPT
 
     result: dict[str, Any] = {
         "verdict": verdict,
         "blocker": blocker,
         "needs_handoff": needs_handoff,
         "burst": burst,
+        "burst_plan": burst_plan,
         "prompt": prompt if needs_handoff else None,
         "clipboard": None,
         "cursor": None,
@@ -95,9 +105,16 @@ def format_user_banner(result: dict[str, Any]) -> str:
             [
                 f"  {PPE_GO_HINT}",
                 "",
-                "  (Cursor opening; prompt copied to clipboard)",
             ]
         )
+        if result.get("burst") and isinstance(result.get("burst_plan"), dict):
+            bp = result["burst_plan"]
+            lines.append(
+                f"  Burst: max_workers={bp.get('max_cycles')} band={bp.get('overall_band')} "
+                f"remaining={bp.get('remaining_count')}"
+            )
+            lines.append("")
+        lines.append("  (Cursor opening; prompt copied to clipboard)")
     else:
         for line in USER_LINES.get(verdict, ["See artifacts/orchestrator/OPERATOR_STATUS.md"]):
             lines.append(f"  {line}")

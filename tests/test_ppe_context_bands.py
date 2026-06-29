@@ -30,6 +30,13 @@ class TestPpeContextBands(unittest.TestCase):
         self.assertEqual(worst_band("NORMAL", "WATCH"), "WATCH")
         self.assertEqual(worst_band("WATCH", "ESCALATE", "NORMAL"), "ESCALATE")
 
+    def test_max_burst_cycles(self) -> None:
+        from scripts.ppe_context_bands import max_burst_cycles
+
+        self.assertEqual(max_burst_cycles("NORMAL", director=True), 3)
+        self.assertEqual(max_burst_cycles("WATCH", director=False), 1)
+        self.assertEqual(max_burst_cycles("ESCALATE", director=True), 0)
+
     def test_score_build_packet(self) -> None:
         text = "\n".join(["line"] * 250)
         scored = score_build_packet(text)
