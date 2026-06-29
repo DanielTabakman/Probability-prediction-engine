@@ -386,5 +386,103 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
+def run_gate_for_paths(
+    repo: Path,
+    files: list[str],
+    *,
+    pre_push: bool = False,
+    pytest_profile: PytestProfile | None = None,
+    force_scoped: bool = False,
+) -> int:
+    """Run tiered gate for an explicit path list (e.g. unstaged closeout ship)."""
+    repo = repo.resolve()
+    if str(repo) not in sys.path:
+        sys.path.insert(0, str(repo))
+
+    profile: PytestProfile = pytest_profile or ("full" if pre_push else "fast")
+    plan = _classify(
+        files,
+        repo=repo,
+        pytest_profile=profile,
+        force_scoped=force_scoped,
+    )
+    if pre_push and plan.tier >= 1:
+        plan = GatePlan(
+            tier=plan.tier,
+            reason=f"{plan.reason}; pre-push",
+            commands=_tier_commands(
+                plan.tier,
+                repo=repo,
+                pytest_profile="full",
+                files=files,
+                force_scoped=force_scoped,
+            ),
+        )
+
+    print(f"pushable gate: tier={plan.tier} ({plan.reason})")
+    print(f"pytest profile: {profile}")
+    if files:
+        print(f"changed_files={len(files)}")
+
+    if files and plan.tier >= 1 and os.environ.get("PPE_LAYER_AUDIT", "1") != "0":
+        try:
+            from scripts.repo_layer_paths import audit_paths, load_presets, scope_from_preset
+
+            presets = load_presets(repo)
+            violations: list[str] = []
+
+            def _preset_for_path(path: str) -> str:
+                if (
+                    path in ("docker-compose.yml", "Caddyfile", "Caddyfile.tls")
+                    or path.startswith("caddy/")
+                ):
+                    return "PLATFORM"
+                if path.startswith(".github/") or path.startswith("docs/DEPLOY/"):
+                    return "PLATFORM"
+                if path.startswith("config/"):
+                    return "PPE_CORE"
+                if path.startswith("src/"):
+                    return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
+                if path.startswith("tests/test_implied_lab_"):
+                    return "PPE_UI"
+                if path.startswith("tests/test_caddy"):
+                    return "PLATFORM"
+                if path.startswith("tests/test_fetch_") or path.startswith("tests/test_assets_registry"):
+                    return "PPE_CORE"
+                if path.startswith("tests/test_equity_distribution"):
+                    return "PPE_CORE"
+                if path.startswith("tests/test_horizon_"):
+                    return "PPE_CORE"
+                if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
+                    return "MSOS_UI"
+                if path.startswith("docs/"):
+                    return "DOCS_ONLY" if path.startswith("docs/SOP/") else "DOCS_CANON"
+                return "CONTROL"
+
+            for path in files:
+                scope = scope_from_preset(presets, _preset_for_path(path))
+                violations.extend(audit_paths([path], scope))
+            if violations:
+                print("ERROR: repo layer audit failed for changed files:", file=sys.stderr)
+                for v in violations[:10]:
+                    print(f"  {v}", file=sys.stderr)
+                return 1
+        except FileNotFoundError:
+            pass
+
+    for cmd in plan.commands:
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
+    msos_cmds = _msos_web_gate_commands(files, pre_push=pre_push)
+    for cmd in msos_cmds:
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
+    return 0
+
+
 if __name__ == "__main__":
     raise SystemExit(main())
