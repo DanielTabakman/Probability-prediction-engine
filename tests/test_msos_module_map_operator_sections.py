@@ -86,6 +86,13 @@ def test_module_map_integration_tiers_actionable_columns() -> None:
     assert "What you can do" in html
 
 
+def test_module_map_exposure_menu_live() -> None:
+    html = _html()
+    assert "Exposure menu v0 — /exposure route live" in html
+    assert "6 · Exposure menu" in html and "T2 live" in html
+    assert "approve READY → relay" not in html
+
+
 def test_module_map_no_duplicate_operator_h2() -> None:
     html = _html()
     for title in OPERATOR_H2_ORDER:
