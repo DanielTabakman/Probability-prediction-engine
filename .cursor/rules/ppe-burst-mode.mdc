@@ -1,13 +1,13 @@
 ---
-description: PPE burst mode — adaptive preflight sizing + director subagents. Load when user says burst, keep going, or what's next until watch.
+description: PPE adaptive burst — default what's next path. Preflight sizing + director subagents.
 alwaysApply: false
 ---
 
-# PPE burst mode (adaptive)
+# PPE burst mode (adaptive — default)
 
 **Canon:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](../../docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](../../docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · [`ppe-operator-core.mdc`](ppe-operator-core.mdc)
 
-**Default:** one verdict per thread. **Burst** chains work until the **adaptive cap** or a stop condition fires — then **context closeout** and a fresh thread.
+**Default:** every **`what's next?`** runs adaptive burst until the **band cap** or a stop condition — then **context closeout** and a fresh thread. **`ppe_go.cmd --single`** opts out to one director handoff.
 
 ## Start (mandatory)
 
@@ -23,11 +23,11 @@ Read `artifacts/control_plane/BURST_PLAN.json` — it holds `max_cycles`, `overa
 | `use_director` | **true** for `IDE_BUILD` / `RUN_LOCAL` — **must** invoke `@ppe-director`; do not implement product slices in the steward thread |
 | `burst_allowed` | **false** → single verdict only; split slice or trim spec first |
 
-**Handoff:** `ppe_go.cmd --burst` runs preflight + writes `BURST_PLAN.json` + copies adaptive director prompt.
+**Handoff:** `ppe_go.cmd` runs preflight + writes `BURST_PLAN.json` + copies adaptive director prompt (burst default).
 
-## Triggers
+## Also triggers burst refresh
 
-- `burst mode` · `keep going` · `run until watch` · `what's next until watch` · `what's next? burst`
+- `keep going` · `run until watch` · `what's next until watch`
 
 ## Routing
 
@@ -59,7 +59,7 @@ Read `artifacts/control_plane/BURST_PLAN.json` — it holds `max_cycles`, `overa
 
 1. Shippable work → `context_window_closeout.cmd --record`
 2. Blocked → one-line summary; `--record --no-ship` if triage only
-3. Next thread: `what's next?` or `ppe_go.cmd --burst`
+3. Next thread: `what's next?` or `ppe_go.cmd`
 
 ## Forbidden
 

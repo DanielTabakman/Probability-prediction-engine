@@ -210,7 +210,7 @@ Report **doc-state safety** and **repo-state safety** separately ([`FRONTIER_STE
 
 | Closing thread role | New thread |
 |---------------------|------------|
-| Steward / guide | Ask **`what's next?`** — agent **auto-executes** operator verdict, then reads `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| Steward / guide | Ask **`what's next?`** — agent runs adaptive burst (preflight + director when allowed), then reads `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
 | IDE BUILD | Starter file only — **not** steward narrative |
 | Recovery | `what's next?` or `@docs/SOP/RECOVERY_PROTOCOL.md` if recovery-specific |
 

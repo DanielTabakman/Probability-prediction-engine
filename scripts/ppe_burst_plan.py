@@ -17,7 +17,7 @@ from scripts.ppe_operator_status import (
     VERDICT_RUN_LOCAL,
     VERDICT_STALE_STATE,
     VERDICT_ERROR,
-    collect_operator_status,
+    prepare_operator_status,
 )
 from scripts.ppe_phase_plan_window import non_closeout_slices_pending
 
@@ -57,7 +57,7 @@ def _resolve_product_slice(repo: Path, status: dict[str, Any]) -> str | None:
 def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
     repo = repo.resolve()
     if status is None:
-        status = collect_operator_status(repo)
+        status = prepare_operator_status(repo)
 
     verdict = str(status.get("verdict") or VERDICT_ERROR)
     plan_path = str(status.get("phase_plan_path") or "").strip() or None
