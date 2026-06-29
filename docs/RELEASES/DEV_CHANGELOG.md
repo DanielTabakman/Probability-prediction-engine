@@ -4,6 +4,19 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `f2c21e1` — SELECTION: exposure menu v0 READY — defer BL density smoothing (#568) (`docs/SOP/`)
+- `ffb7963` — ops: loop publish ops/loop-publish-20260629151817-d190460 (#567)
+- `7bdc778` — ops: loop publish ops/loop-publish-20260629151518-d190460 (#566) (`docs/SOP/`)
+- `ae68273` — ops: loop publish ops/loop-publish-20260629151249-082d745 (#564)
+- `ecfb92b` — SELECTION: forward consistency radar ch.1–2 — approve relay queue (#559) (`docs/SOP/`)
+- `5735eda` — ops: loop publish ops/loop-publish-20260629151052-082d745 (#561)
+- `b973285` — mvp1_bl_density_smoothing_v1: wire smoothed BL into chart, export, trust strip (Slice003) (#558) (`src/viz/`)
+- `d14ce81` — ppe_equity_universe_tier1a: enable SPY QQQ IWM index ETFs (#556) (`docs/SOP/`)
+- `bcc7028` — SELECTION: trader workflow supply refresh — unblock BL density relay (#553) (`docs/SOP/`)
+- `ba5aad1` — control(docs): charter exposure_menu module (EXPOSURE_PATH v0) (#554) (`docs/SOP/`)
+- `31c86ba` — ops: context closeout ship (chore/asset-batch-expansion-policy-v1) (#552) (`docs/SOP/`)
+- MVP1-BLDensitySmooth-Product-Slice002: smooth BL density on price grid (#551) (`scripts/`)
+- `7e6b47c` — Control-plane: dev changelog
 - `da0d2c0` — Horizon-RegionWf-Closeout-Slice003: sync chapter closeout to main (#548) (`docs/SOP/`)
 - `b36ae99` — control-plane: adaptive burst sizing with director subagents (#546) (`scripts/`)
 - `9981982` — docs(control-plane): PPE module registry, map, and forward consistency program (#545) (`docs/SOP/`)
