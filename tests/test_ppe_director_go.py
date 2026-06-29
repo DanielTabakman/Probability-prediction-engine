@@ -11,34 +11,36 @@ from scripts.ppe_operator_status import VERDICT_RUN_AUTO
 def test_run_director_go_run_auto_no_handoff(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     fake_status = {"verdict": VERDICT_RUN_AUTO, "blocker": None, "exit_code": 0}
-    with patch("scripts.ppe_director_go.collect_operator_status", return_value=fake_status):
+    with patch("scripts.ppe_director_go.prepare_operator_status", return_value=fake_status):
         with patch("scripts.ppe_director_go.write_status_report"):
             result = run_director_go(tmp_path, open_ide=False)
     assert result["needs_handoff"] is False
     assert result["prompt"] is None
+    assert result["burst"] is True
     banner = format_user_banner(result)
     assert "RUN_AUTO" in banner
     assert "Nothing to do" in banner
 
 
-def test_run_director_go_ide_build_handoff(tmp_path, monkeypatch):
+def test_run_director_go_single_ide_build_handoff(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     fake_status = {
         "verdict": "IDE_BUILD",
         "blocker": "PRODUCT_BLOCKED",
         "exit_code": 7,
     }
-    with patch("scripts.ppe_director_go.collect_operator_status", return_value=fake_status):
+    with patch("scripts.ppe_director_go.prepare_operator_status", return_value=fake_status):
         with patch("scripts.ppe_director_go.write_status_report"):
             with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
-                result = run_director_go(tmp_path, open_ide=False)
+                result = run_director_go(tmp_path, open_ide=False, burst=False)
     assert result["needs_handoff"] is True
+    assert result["burst"] is False
     assert result["prompt"] == DIRECTOR_PROMPT
     banner = format_user_banner(result)
     assert "Ctrl+V" in banner
 
 
-def test_run_director_go_burst_prompt(tmp_path, monkeypatch):
+def test_run_director_go_burst_default_prompt(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     fake_status = {
         "verdict": "IDE_BUILD",
@@ -52,12 +54,12 @@ def test_run_director_go_burst_prompt(tmp_path, monkeypatch):
         "prompt": "@ppe-director Adaptive burst mode. max_workers=2",
         "burst_allowed": True,
     }
-    with patch("scripts.ppe_director_go.collect_operator_status", return_value=fake_status):
+    with patch("scripts.ppe_director_go.prepare_operator_status", return_value=fake_status):
         with patch("scripts.ppe_director_go.write_status_report"):
             with patch("scripts.ppe_director_go.compute_burst_plan", return_value=fake_plan):
                 with patch("scripts.ppe_director_go.write_burst_plan"):
                     with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
-                        result = run_director_go(tmp_path, open_ide=False, burst=True)
+                        result = run_director_go(tmp_path, open_ide=False)
     assert result["burst"] is True
     assert result["prompt"] == fake_plan["prompt"]
     assert "Adaptive burst" in result["prompt"]

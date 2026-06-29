@@ -82,6 +82,18 @@ MVP1_BL_DENSITY_SMOOTHING_PLAN = (
 PPE_EXPOSURE_MENU_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json"
 )
+MSOS_TRADER_REVIEW_LOOP_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json"
+)
+MSOS_DIST_DOWNLOAD_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json"
+)
+MSOS_CROSS_VENUE_LAB_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json"
+)
+MVP1_DIST_TIMESERIES_PLAN = (
+    "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json"
+)
 MSOS_WF_ASSET_PARITY_PLAN = (
     "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json"
 )
@@ -126,6 +138,10 @@ ALLOWED_READY_PLANS = (
     PPE_CACHE_ISOLATION_PLAN,
     HORIZON_REGION_WORKFLOW_PLAN,
     PPE_EXPOSURE_MENU_PLAN,
+    MSOS_TRADER_REVIEW_LOOP_PLAN,
+    MSOS_DIST_DOWNLOAD_PLAN,
+    MSOS_CROSS_VENUE_LAB_PLAN,
+    MVP1_DIST_TIMESERIES_PLAN,
     MVP1_BL_DENSITY_SMOOTHING_PLAN,
     MSOS_WF_ASSET_PARITY_PLAN,
     PPE_TRUST_SURFACE_PLAN,
