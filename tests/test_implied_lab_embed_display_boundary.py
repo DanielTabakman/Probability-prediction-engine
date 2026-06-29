@@ -587,3 +587,56 @@ def test_display_payload_cache_disabled_rebuilds_each_time() -> None:
 
     assert calls["n"] == 2
 
+
+# --- Exposure menu boundary (PPE-ExposureMenu-UI-Slice004) ---
+
+
+def test_exposure_menu_offline_fixture_contract() -> None:
+    from src.viz.exposure_menu_boundary import load_offline_fixture
+
+    payload = load_offline_fixture()
+    assert payload["kind"] == "exposure_paths"
+    assert payload["asset_id"] == "NVDA"
+    assert payload["recommendation_status"] == "path_not_recommendation"
+    assert payload["live_path_count"] >= 3
+
+
+def test_exposure_menu_wsgi_route() -> None:
+    from src.viz.exposure_menu_boundary import build_exposure_menu_response
+
+    app = create_display_payload_wsgi_app(lambda _environ: {})
+    status: list[str] = []
+
+    def start_response(st: str, hdrs: list[tuple[str, str]]) -> None:
+        status.append(st)
+
+    report = {
+        "kind": "exposure_paths",
+        "asset_id": "NVDA",
+        "direction": "long",
+        "horizon": "any",
+        "status": "ok",
+        "live_path_count": 3,
+        "paths": [],
+        "recommendation_status": "path_not_recommendation",
+        "footer_copy": "Paths for comparison only — simulation and research support, not trade recommendations.",
+    }
+    with patch(
+        "src.viz.exposure_menu_boundary.find_exposure_paths",
+        return_value=report,
+    ):
+        body = b"".join(
+            app(
+                {
+                    "PATH_INFO": "/exposure-menu.json",
+                    "QUERY_STRING": "asset=NVDA&direction=long",
+                },
+                start_response,
+            )
+        )
+    assert status[0] == "200 OK"
+    payload = json.loads(body.decode("utf-8"))
+    assert payload["kind"] == "exposure_paths"
+    assert payload["asset_id"] == "NVDA"
+    assert build_exposure_menu_response({"QUERY_STRING": "asset=NVDA&direction=long&offline=1"})["asset_id"] == "NVDA"
+

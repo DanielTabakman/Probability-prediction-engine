@@ -710,8 +710,22 @@ def create_display_payload_wsgi_app(
             )
             return [body]
 
+        from src.viz.exposure_menu_boundary import handle_exposure_menu_wsgi_path
         from src.viz.forward_consistency_boundary import handle_forward_consistency_wsgi_path
         from src.viz.horizon_display_boundary import handle_horizon_wsgi_path
+
+        exposure_result = handle_exposure_menu_wsgi_path(path, environ)
+        if exposure_result is not None:
+            status, body = exposure_result
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
 
         fc_result = handle_forward_consistency_wsgi_path(path, environ)
         if fc_result is not None:
