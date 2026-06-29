@@ -31,6 +31,7 @@ chapters:
     assets: [SOL, BNB, XRP]
   ppe_equity_universe_tier1a_v1:
     assets: [SPY, QQQ, IWM]
+    status: complete
   ppe_equity_universe_tier1b_v1:
     assets: [AAPL, MSFT, AMZN, GOOGL, META]
   ppe_equity_universe_tier1c_v1:

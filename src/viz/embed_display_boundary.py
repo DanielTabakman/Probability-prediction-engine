@@ -486,9 +486,13 @@ def build_live_distribution_display_payload(
     """Live options-backed payload for platform WSGI / MSOS display API proxy."""
     from src.viz.embed_only_lab import _load_export_rows
 
-    aid = normalize_lab_asset_id(asset_id)
-    if environ is not None and asset_id is None:
+    if asset_id is not None:
+        aid = str(asset_id).strip().upper()
+        get_asset(aid)
+    elif environ is not None:
         aid = lab_asset_id_from_environ(environ)
+    else:
+        aid = normalize_lab_asset_id(None)
     depth = display_depth or (
         display_depth_from_environ(environ) if environ is not None else DISPLAY_DEPTH_FULL
     )
@@ -502,6 +506,7 @@ def build_live_distribution_display_payload(
         spot_usd=spot_usd,
         export_rows=export_rows,
         asset_id=aid,
+        honor_selectable_only=is_asset_enabled(aid),
     )
     meta = payload.setdefault("meta", {})
     if isinstance(meta, dict):

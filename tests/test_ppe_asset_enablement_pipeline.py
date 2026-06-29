@@ -132,3 +132,19 @@ def test_witness_group_pre_enable_cli_json(capsys) -> None:
 def test_witness_manifest_slice_tier1a() -> None:
     ids = witness_mod.list_asset_ids_for_manifest_chapter("ppe_equity_universe_tier1a_v1")
     assert ids == ["IWM", "QQQ", "SPY"]
+
+
+def test_witness_pre_enable_live_honors_explicit_asset_id(monkeypatch) -> None:
+    from src.viz import embed_display_boundary as boundary
+
+    def fake_live(*, asset_id: str | None = None, environ=None, display_depth=None):
+        assert asset_id == "SPY"
+        return {
+            "kind": boundary.DISPLAY_PAYLOAD_KIND,
+            "asset": {"id": "SPY"},
+        }
+
+    monkeypatch.setattr(boundary, "build_live_distribution_display_payload", fake_live)
+    ok, detail = boundary.witness_display_boundary_for_asset("SPY", live=True, pre_enable=True)
+    assert ok is True
+    assert detail == "display boundary ok"

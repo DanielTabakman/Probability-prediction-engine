@@ -32,7 +32,7 @@ def test_assets_registry_schema_v2() -> None:
     assert default_asset_id() == "ETH"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
-    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
+    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP", "SPY", "QQQ", "IWM"}
     for asset_id in ("BTC", "ETH"):
         entry = assets[asset_id]
         assert entry.get("venue") == "deribit"
@@ -56,8 +56,8 @@ def test_assets_registry_schema_v2() -> None:
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH", "NVDA", "SOL"]
-    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
+    assert list_enabled_asset_ids() == ["BTC", "ETH", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
+    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP", "SPY", "QQQ", "IWM"}
 
 
 def test_catalog_entry_shape() -> None:
@@ -75,7 +75,7 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH", "NVDA", "SOL"]
+    assert [e["id"] for e in entries] == ["BTC", "ETH", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
     assert all(e["venue"] == "deribit" for e in entries if e["id"] in ("BTC", "ETH"))
     nvda = next(e for e in entries if e["id"] == "NVDA")
     assert nvda["venue"] == "equity"

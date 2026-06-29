@@ -15,8 +15,8 @@ from src.viz.lab_asset_selection import (
 def test_list_selectable_lab_asset_ids_uses_enabled_registry_only() -> None:
     load_assets_registry.cache_clear()
     ids = list_selectable_lab_asset_ids()
-    assert ids == ["BTC", "ETH", "SOL", "NVDA"]
-    assert "NVDA" in ids
+    assert ids == ["BTC", "ETH", "SOL", "IWM", "QQQ", "SPY", "NVDA"]
+    assert "SPY" in ids
 
 
 def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
