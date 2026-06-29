@@ -441,6 +441,12 @@ def propagate(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
     if not dry_run:
         wn_full.parent.mkdir(parents=True, exist_ok=True)
         wn_full.write_text(wn_content, encoding="utf-8")
+        try:
+            from scripts.ppe_context_window_closeout import refresh_parked_recovery_surfaces
+
+            refresh_parked_recovery_surfaces(repo)
+        except Exception:
+            pass
     results["updated"].append(whats_next_path)
 
     return results

@@ -35,6 +35,9 @@ DRAFT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md"
 SNAPSHOT_REL = "artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT.json"
 WHATS_NEXT_JSON_REL = "artifacts/control_plane/WHATS_NEXT.json"
 WHATS_NEXT_MD_REL = "artifacts/control_plane/WHATS_NEXT.md"
+PARKED_RECOVERY_JSON_REL = "artifacts/control_plane/PARKED_RECOVERY.json"
+PARKED_MARKER_START = "<!-- PARKED_RECOVERY:START -->"
+PARKED_MARKER_END = "<!-- PARKED_RECOVERY:END -->"
 SOP_CLOSEOUT = "docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md"
 
 
@@ -380,11 +383,163 @@ def _chapter_from_snapshot(snapshot: dict[str, Any]) -> str:
     return stem
 
 
+def load_closeout_snapshot(repo: Path) -> dict[str, Any] | None:
+    path = repo.resolve() / SNAPSHOT_REL
+    if not path.is_file():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def parked_recovery_line() -> str:
+    return (
+        "Recovery: finish parked closeout ship "
+        f"(see `{DRAFT_REL}`) or open a recovery thread."
+    )
+
+
+def detect_parked_recovery(repo: Path) -> dict[str, Any]:
+    """True when a blocked closeout left dirty paths that still need recovery."""
+    repo = repo.resolve()
+    snapshot = load_closeout_snapshot(repo) or {}
+    ship = snapshot.get("ship_report") if isinstance(snapshot.get("ship_report"), dict) else {}
+    record = latest_closeout_record(repo) or {}
+
+    blocked = bool(ship.get("blocked")) or bool(record.get("ship_blocked"))
+    parked_paths = [str(p) for p in (ship.get("parked") or []) if str(p).strip()]
+
+    from scripts.ppe_context_closeout_ship import committable_dirty_paths
+
+    dirty_now = committable_dirty_paths(repo)
+    if parked_paths:
+        outstanding = [p for p in parked_paths if p in dirty_now]
+    elif blocked:
+        outstanding = list(dirty_now)
+    else:
+        outstanding = []
+
+    if not blocked:
+        return {"active": False, "reason": "no_blocked_closeout"}
+
+    if not outstanding:
+        return {
+            "active": False,
+            "resolved": True,
+            "reason": "parked_paths_clean",
+            "blocked": blocked,
+            "parked_paths": parked_paths,
+        }
+
+    reason = ""
+    for step in ship.get("steps") or []:
+        if isinstance(step, dict) and step.get("reason"):
+            reason = str(step["reason"])
+            break
+    if not reason:
+        reason = "mixed-plane dirty — parked for recovery thread"
+
+    return {
+        "active": True,
+        "blocked": True,
+        "reason": reason,
+        "parked_paths": outstanding,
+        "all_parked_paths": parked_paths or outstanding,
+        "dirty_paths": dirty_now,
+        "closed_at": record.get("closed_at") or snapshot.get("generated_at_utc"),
+        "closeout_id": record.get("closeout_id"),
+        "recovery_line": parked_recovery_line(),
+        "draft_path": DRAFT_REL,
+        "safe_to_switch_agents": False,
+    }
+
+
+def render_parked_recovery_block(state: dict[str, Any]) -> str:
+    paths = state.get("parked_paths") or state.get("all_parked_paths") or []
+    closed = str(state.get("closed_at") or "?")
+    reason = str(state.get("reason") or "closeout auto-ship blocked")
+    path_lines = "\n".join(f"- `{p}`" for p in paths[:12])
+    extra = ""
+    if len(paths) > 12:
+        extra = f"\n- _…and {len(paths) - 12} more_"
+    return "\n".join(
+        [
+            PARKED_MARKER_START,
+            "## Parked recovery (action required)",
+            "",
+            f"**Since:** {closed} · **reason:** {reason}",
+            "",
+            "**Do this before normal BUILD/loop:** open a **recovery** thread and finish the parked closeout ship "
+            f"(see [`{DRAFT_REL}`]({DRAFT_REL})).",
+            "",
+            f"**Parked paths ({len(paths)}):**",
+            path_lines + extra,
+            "",
+            f"**Recovery line:** {state.get('recovery_line') or parked_recovery_line()}",
+            PARKED_MARKER_END,
+        ]
+    )
+
+
+def merge_whats_next_with_parked(base_md: str, state: dict[str, Any]) -> str:
+    pattern = re.compile(
+        re.escape(PARKED_MARKER_START) + r".*?" + re.escape(PARKED_MARKER_END),
+        flags=re.DOTALL,
+    )
+    stripped = pattern.sub("", base_md).strip()
+    if not state.get("active"):
+        if stripped != base_md.strip():
+            return stripped + ("\n" if stripped else "")
+        return base_md
+    block = render_parked_recovery_block(state)
+    lines = stripped.splitlines()
+    if lines and lines[0].startswith("# "):
+        head = lines[0]
+        rest = lines[1:]
+        while rest and not rest[0].strip():
+            rest = rest[1:]
+        body = "\n".join(rest).strip()
+        merged = head + "\n\n" + block
+        if body:
+            merged += "\n\n" + body
+        return merged + "\n"
+    return block + "\n\n" + stripped + "\n"
+
+
+def write_parked_recovery_artifact(repo: Path, state: dict[str, Any]) -> Path:
+    repo = repo.resolve()
+    out_dir = repo / "artifacts" / "control_plane"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    path = repo / PARKED_RECOVERY_JSON_REL
+    payload = {
+        "generated_at_utc": _utc_now(),
+        **state,
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def refresh_parked_recovery_surfaces(repo: Path) -> dict[str, Any]:
+    """Re-detect parked state and patch WHATS_NEXT + PARKED_RECOVERY.json."""
+    repo = repo.resolve()
+    state = detect_parked_recovery(repo)
+    write_parked_recovery_artifact(repo, state)
+    wn_path = repo / WHATS_NEXT_MD_REL
+    if wn_path.is_file():
+        original = wn_path.read_text(encoding="utf-8")
+        updated = merge_whats_next_with_parked(original, state)
+        if updated != original:
+            wn_path.write_text(updated, encoding="utf-8")
+    return state
+
+
 def infer_whats_next(snapshot: dict[str, Any], *, ship_report: dict[str, Any] | None = None) -> str:
     ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
     if isinstance(ship, dict):
         if ship.get("blocked"):
-            return "Recovery: finish parked closeout ship (see CONTEXT_WINDOW_CLOSEOUT_DRAFT.md) or open a recovery thread."
+            return parked_recovery_line()
         if ship.get("ok") and any(
             isinstance(s, dict) and s.get("step") in ("publish", "publish_ahead") and s.get("ok")
             for s in (ship.get("steps") or [])
@@ -415,9 +570,13 @@ def build_closeout_record(
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
     closed_at = str(snapshot.get("generated_at_utc") or _utc_now())
     ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
-    next_line = whats_next.strip() or infer_whats_next(snapshot, ship_report=ship if isinstance(ship, dict) else None)
     if isinstance(ship, dict) and ship.get("blocked"):
+        next_line = infer_whats_next(snapshot, ship_report=ship)
         safe_to_switch = False
+    else:
+        next_line = whats_next.strip() or infer_whats_next(
+            snapshot, ship_report=ship if isinstance(ship, dict) else None
+        )
     return {
         "event": "context_window_closeout",
         "closeout_id": str(uuid.uuid4()),
@@ -524,6 +683,7 @@ def record_context_closeout(
         record["product_direction_sync"] = sync_product_direction(repo)
     except Exception as exc:
         record["product_direction_sync"] = {"error": str(exc)}
+    record["parked_recovery"] = refresh_parked_recovery_surfaces(repo)
     return record
 
 
@@ -664,6 +824,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slices-closed", type=int, default=0, help="Slices closed in this Cursor thread")
     ap.add_argument("--notes", default="", help="Optional closeout notes")
     ap.add_argument("--no-promote", action="store_true", help="Skip writing WHATS_NEXT artifacts")
+    ap.add_argument(
+        "--refresh-parked",
+        action="store_true",
+        help="Detect parked closeout recovery and patch WHATS_NEXT + PARKED_RECOVERY.json",
+    )
     sub = ap.add_subparsers(dest="cmd")
 
     ab = sub.add_parser("add-build", help="Append blocked row to PHASE_CHAPTER_BACKLOG.json")
@@ -690,6 +855,20 @@ def main(argv: list[str] | None = None) -> int:
 
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
+
+    if args.refresh_parked:
+        state = refresh_parked_recovery_surfaces(repo)
+        if args.json:
+            print(json.dumps(state, indent=2))
+        elif state.get("active"):
+            paths = state.get("parked_paths") or []
+            print(
+                f"ppe_context_window_closeout: PARKED_RECOVERY active "
+                f"({len(paths)} path(s)) — see {PARKED_RECOVERY_JSON_REL}"
+            )
+        else:
+            print("ppe_context_window_closeout: no active parked recovery")
+        return 0
 
     if args.cmd == "add-build":
         path = add_build_backlog_item(

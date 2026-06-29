@@ -39,8 +39,11 @@ VERDICT_FIX_PLAN = "FIX_PLAN"
 VERDICT_SUPPLY_LOW = "SUPPLY_LOW"
 VERDICT_STALE_STATE = "STALE_STATE"
 VERDICT_ERROR = "ERROR"
+VERDICT_PARKED_RECOVERY = "PARKED_RECOVERY"
 
-STOP_VERDICTS = frozenset({VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR})
+STOP_VERDICTS = frozenset(
+    {VERDICT_IDE_BUILD, VERDICT_FIX_PLAN, VERDICT_STALE_STATE, VERDICT_ERROR, VERDICT_PARKED_RECOVERY}
+)
 
 
 def _utc_now() -> str:
@@ -111,6 +114,11 @@ def _commands_for_verdict(
         return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_LOCAL:
         return [PPE_GO_HINT]
+    if verdict == VERDICT_PARKED_RECOVERY:
+        return [
+            "Open recovery thread — finish parked closeout (artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md)",
+            "python scripts/ppe_context_window_closeout.py --refresh-parked --json",
+        ]
     if verdict in ("FIX_PLAN", "STALE_STATE", "ERROR"):
         return [PPE_GO_HINT]
     if verdict == VERDICT_RUN_AUTO:
@@ -131,6 +139,8 @@ def _commands_for_verdict(
 
 
 def _avoid_commands(verdict: str) -> list[str]:
+    if verdict == VERDICT_PARKED_RECOVERY:
+        return ["run_ppe_auto_local_loop.cmd  (finish parked recovery first)"]
     if verdict == VERDICT_IDE_BUILD:
         return ["run_ppe_auto_local_loop.cmd  (will hit PRODUCT_BLOCKED)"]
     if verdict == VERDICT_RUN_LOCAL:
@@ -292,6 +302,20 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
     avoid = _avoid_commands(verdict)
 
+    parked_recovery: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_context_window_closeout import refresh_parked_recovery_surfaces
+
+        parked_recovery = refresh_parked_recovery_surfaces(repo)
+        if parked_recovery.get("active"):
+            verdict = VERDICT_PARKED_RECOVERY
+            exit_code = GUARD_EXIT
+            blocker = str(parked_recovery.get("recovery_line") or "parked closeout recovery required")
+            commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
+            avoid = _avoid_commands(verdict)
+    except Exception:
+        pass
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
@@ -312,6 +336,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "avoid": avoid,
         "errors": errors,
         "idle_heal": idle_heal or None,
+        "parked_recovery": parked_recovery,
     }
 
 
@@ -328,6 +353,14 @@ def _format_human(status: dict[str, Any], repo: Path | None = None) -> str:
         lines.append(f"Plan: {status['phase_plan_path']}")
     if status.get("blocker"):
         lines.append(f"Blocker: {status['blocker']}")
+    parked = status.get("parked_recovery") or {}
+    if parked.get("active"):
+        paths = parked.get("parked_paths") or []
+        lines.append(f"Parked recovery: {len(paths)} path(s) — see artifacts/control_plane/PARKED_RECOVERY.json")
+        for p in paths[:5]:
+            lines.append(f"  - {p}")
+        if len(paths) > 5:
+            lines.append(f"  - …and {len(paths) - 5} more")
     supply = status.get("supply") or {}
     backlog = supply.get("backlog") or {}
     lines.append(
@@ -383,6 +416,17 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
     out = repo / STATUS_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     whats_next_block = ""
+    parked_block = ""
+    parked = status.get("parked_recovery") or {}
+    if parked.get("active"):
+        paths = parked.get("parked_paths") or []
+        parked_block = (
+            "\n## Parked recovery (action required)\n\n"
+            f"**{len(paths)}** unfinished closeout path(s). "
+            f"See `artifacts/control_plane/CONTEXT_WINDOW_CLOSEOUT_DRAFT.md` and "
+            "`artifacts/control_plane/PARKED_RECOVERY.json`.\n\n"
+            f"**Recovery:** {parked.get('recovery_line') or 'finish parked closeout ship'}\n"
+        )
     try:
         from scripts.ppe_context_window_closeout import load_whats_next_markdown
 
@@ -400,7 +444,7 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 **As-of:** {status.get("as_of")}
 **Verdict:** `{status.get("verdict")}`
 
-{_format_human(status, repo)}
+{parked_block}{_format_human(status, repo)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
     return out

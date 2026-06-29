@@ -7,19 +7,23 @@ import tempfile
 import unittest
 from datetime import date, datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.ppe_context_window_closeout import (
     append_closeout_record,
     build_closeout_record,
     collect_snapshot,
+    detect_parked_recovery,
     infer_whats_next,
     load_whats_next_markdown,
+    merge_whats_next_with_parked,
     promote_whats_next,
     record_context_closeout,
+    refresh_parked_recovery_surfaces,
     render_draft_markdown,
     write_artifacts,
 )
-from scripts.ppe_operator_status import write_status_report
+from scripts.ppe_operator_status import VERDICT_PARKED_RECOVERY, collect_operator_status, write_status_report
 from scripts.ppe_workflow_radar import scan_workflow_friction
 from scripts.workflow_metrics_cli import CONTEXT_WINDOWS_FILE, _metrics_dir, read_context_windows
 
@@ -97,6 +101,84 @@ class TestPpeContextWindowCloseout(unittest.TestCase):
     def test_infer_whats_next_from_operator_commands(self) -> None:
         snap = {"operator": {"commands": ["run_ppe_local.cmd"], "verdict": "RUN_LOCAL"}}
         self.assertIn("run_ppe_local.cmd", infer_whats_next(snap))
+
+    def test_infer_whats_next_blocked_ship_is_recovery(self) -> None:
+        snap = {"ship_report": {"blocked": True, "parked": ["docs/SOP/a.md"]}}
+        self.assertIn("Recovery", infer_whats_next(snap))
+
+    def test_detect_parked_recovery_active_when_paths_still_dirty(self) -> None:
+        cp = self.repo / "artifacts" / "control_plane"
+        cp.mkdir(parents=True)
+        (cp / "CONTEXT_WINDOW_CLOSEOUT.json").write_text(
+            json.dumps(
+                {
+                    "ship_report": {
+                        "blocked": True,
+                        "parked": ["docs/SOP/a.md", "scripts/b.py"],
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "a.md").write_text("dirty\n", encoding="utf-8")
+        with patch(
+            "scripts.ppe_context_closeout_ship.committable_dirty_paths",
+            return_value=["docs/SOP/a.md", "scripts/b.py"],
+        ):
+            state = detect_parked_recovery(self.repo)
+        self.assertTrue(state["active"])
+        self.assertIn("docs/SOP/a.md", state["parked_paths"])
+
+    def test_detect_parked_recovery_resolved_when_clean(self) -> None:
+        cp = self.repo / "artifacts" / "control_plane"
+        cp.mkdir(parents=True)
+        (cp / "CONTEXT_WINDOW_CLOSEOUT.json").write_text(
+            json.dumps({"ship_report": {"blocked": True, "parked": ["docs/SOP/a.md"]}}),
+            encoding="utf-8",
+        )
+        state = detect_parked_recovery(self.repo)
+        self.assertFalse(state["active"])
+        self.assertTrue(state.get("resolved"))
+
+    def test_refresh_parked_recovery_patches_whats_next(self) -> None:
+        cp = self.repo / "artifacts" / "control_plane"
+        cp.mkdir(parents=True)
+        (cp / "CONTEXT_WINDOW_CLOSEOUT.json").write_text(
+            json.dumps({"ship_report": {"blocked": True, "parked": ["docs/SOP/a.md"]}}),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "a.md").write_text("dirty\n", encoding="utf-8")
+        (cp / "WHATS_NEXT.md").write_text("# What's next\n\nNormal direction line.\n", encoding="utf-8")
+        with patch(
+            "scripts.ppe_context_closeout_ship.committable_dirty_paths",
+            return_value=["docs/SOP/a.md"],
+        ):
+            refresh_parked_recovery_surfaces(self.repo)
+        wn = (cp / "WHATS_NEXT.md").read_text(encoding="utf-8")
+        self.assertIn("Parked recovery", wn)
+        self.assertIn("Normal direction line", wn)
+
+    def test_merge_whats_next_removes_parked_block_when_resolved(self) -> None:
+        base = "# What's next\n\n<!-- PARKED_RECOVERY:START -->\nold\n<!-- PARKED_RECOVERY:END -->\n\nok\n"
+        merged = merge_whats_next_with_parked(base, {"active": False})
+        self.assertNotIn("PARKED_RECOVERY", merged)
+        self.assertIn("ok", merged)
+
+    def test_operator_status_parked_recovery_verdict(self) -> None:
+        cp = self.repo / "artifacts" / "control_plane"
+        cp.mkdir(parents=True)
+        (cp / "CONTEXT_WINDOW_CLOSEOUT.json").write_text(
+            json.dumps({"ship_report": {"blocked": True, "parked": ["docs/SOP/a.md"]}}),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "a.md").write_text("dirty\n", encoding="utf-8")
+        with patch(
+            "scripts.ppe_context_closeout_ship.committable_dirty_paths",
+            return_value=["docs/SOP/a.md"],
+        ):
+            status = collect_operator_status(self.repo)
+        self.assertEqual(status["verdict"], VERDICT_PARKED_RECOVERY)
+        self.assertTrue((status.get("parked_recovery") or {}).get("active"))
 
     def test_operator_status_includes_whats_next_block(self) -> None:
         snapshot = {
