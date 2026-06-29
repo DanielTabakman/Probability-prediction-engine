@@ -47,7 +47,7 @@
         "evidenceDoc": "docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md",
         "sprintSpec": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
         "selectionOutcomeDoc": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
-        "nextSelectionDoc": "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
         "carryDocs": [
           "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
         ]

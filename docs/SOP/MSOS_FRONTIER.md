@@ -12,12 +12,13 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** BUILD: ppe_exposure_menu_v1 READY (operator priority). Then asset batch wave 1 (tier1a→commodity) per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. Wave 2 blocked until wave 1 evidence COMPLETE.
+- **Next steward action:** BUILD: `ppe_exposure_menu_v1` READY (operator priority). Then **Trader Learning Spine** queue per [`TRADER_LEARNING_SPINE_PROGRAM_V1.md`](docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md): review loop → dist download → cross-venue panel → dist timeseries collector. Asset batch wave 1 parallel.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
 - **Wedge depth (BTC + ETH)** (complete) · `ppe_crypto_multi_asset_v1` — [`SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md`](docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md)
 - **Workflow loop fidelity (P4–P7)** (complete) — [`MSOS_Market_Interaction_Modes_v0.1.md`](docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
+- **Trader Learning Spine** (active) — [`TRADER_LEARNING_SPINE_PROGRAM_V1.md`](docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md)
 - **Learning loop (research → backlog)** (active) — [`TRADER_WORKFLOW_RESEARCH_V1.md`](docs/SOP/TRADER_WORKFLOW_RESEARCH_V1.md)
 
 **Retired (do not steer BUILD by these):**
