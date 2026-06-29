@@ -29,6 +29,58 @@ from src.viz.disagreement_thresholds import (
 from src.viz.implied_lab_provenance import build_verification_payload
 
 
+def _bl_smoothing_enabled(state: dict[str, Any]) -> bool:
+    """Chart/export default: Savitzky–Golay smoothed B-L; opt out via state flag."""
+    flag = state.get("bl_density_smoothing_enabled")
+    if flag is None:
+        return True
+    return bool(flag)
+
+
+def _compute_market_bl_pdf(
+    strikes: list[float],
+    call_usd: list[float],
+    prices: list[float],
+    *,
+    apply_smoothing: bool,
+) -> list[float]:
+    return market_implied_density_breeden_litzenberger(
+        strikes,
+        call_usd,
+        prices,
+        apply_smoothing=apply_smoothing,
+    )
+
+
+def _patch_verification_bl_smoothing(
+    verification: dict[str, Any],
+    *,
+    smoothing_applied: bool,
+    breeden_computed: bool,
+) -> None:
+    """Trust-strip honesty: label raw vs smoothed on overlay_basis when BL is shown."""
+    if not breeden_computed:
+        return
+    vs = verification.get("verification_summary")
+    if isinstance(vs, dict):
+        mode = "Savitzky–Golay smoothed" if smoothing_applied else "raw (unsmoothed)"
+        bl_note = f"Market-implied BL density: {mode}."
+        ob = vs.get("overlay_basis")
+        if isinstance(ob, str) and ob.strip():
+            vs["overlay_basis"] = f"{ob.strip()} · {bl_note}"
+        else:
+            vs["overlay_basis"] = bl_note
+    density = verification.get("density")
+    if isinstance(density, dict):
+        mi = density.get("market_implied")
+        if isinstance(mi, dict):
+            mi["bl_density_smoothing"] = "applied" if smoothing_applied else "raw"
+            if smoothing_applied:
+                mi["method_when_computed"] = (
+                    "Breeden–Litzenberger (second derivative) + Savitzky–Golay smoothing"
+                )
+
+
 def _belief_verification_block(
     *,
     enabled: bool,
@@ -497,11 +549,16 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
     call_by_k: dict[float, float] = market_data["call_by_k"]
 
     call_marks = market_data.get("call_marks") or []
+    bl_smoothing = _bl_smoothing_enabled(state)
     market_pdf_raw: list[float] = []
+    breeden_computed = False
     if len(call_marks) >= 3:
         strikes = [m["strike"] for m in call_marks]
         call_usd = [float(m.get("mark_btc") or 0.0) * forward for m in call_marks]
-        market_pdf_raw = market_implied_density_breeden_litzenberger(strikes, call_usd, prices)
+        market_pdf_raw = _compute_market_bl_pdf(
+            strikes, call_usd, prices, apply_smoothing=bl_smoothing
+        )
+        breeden_computed = bool(market_pdf_raw) and max(market_pdf_raw) > 1e-20
 
     # Determine strikes based on mode ownership.
     solve_work: dict[str, Any] | None = None
@@ -551,6 +608,11 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                 if _gap_fail is not None
                 else None,
             )
+            _patch_verification_bl_smoothing(
+                verification_fail,
+                smoothing_applied=bl_smoothing,
+                breeden_computed=breeden_computed,
+            )
             return {
                 "strategy": None,
                 "overlay": overlay_fail,
@@ -559,6 +621,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
                     "market_pdf_raw": market_pdf_raw,
                     "market_pct": market_pct,
                     "anomalous": anomalous,
+                    "bl_density_smoothing_applied": bl_smoothing if breeden_computed else None,
                     **belief_pack["chart_helpers_extra"],
                 },
                 "belief_summary": belief_pack["belief_summary"],
@@ -675,6 +738,11 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
         lab_mode=state.get("mode"),
         belief_largest_gap_price_usd=float(_gap_ok) if _gap_ok is not None else None,
     )
+    _patch_verification_bl_smoothing(
+        verification_ok,
+        smoothing_applied=bl_smoothing,
+        breeden_computed=breeden_computed,
+    )
 
     return {
         "strategy": strategy,
@@ -684,6 +752,7 @@ def derive_lab_outputs(state: dict[str, Any], market_data: dict[str, Any]) -> di
             "market_pdf_raw": market_pdf_raw,
             "market_pct": market_pct,
             "anomalous": anomalous,
+            "bl_density_smoothing_applied": bl_smoothing if breeden_computed else None,
             **belief_pack["chart_helpers_extra"],
         },
         "belief_summary": belief_pack["belief_summary"],
