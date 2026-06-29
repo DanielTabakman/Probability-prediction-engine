@@ -38,7 +38,6 @@ from src.viz.app_panels import (
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
-    render_mvp1_friends_first_above_fold as _render_mvp1_friends_first_above_fold,
     render_mvp1_primary_output_compact as _render_mvp1_primary_output_compact,
     render_trust_strip as _render_trust_strip,
     render_width_vol_candidate_strip_payload as _render_width_vol_candidate_strip_payload,
@@ -1246,17 +1245,7 @@ def render_implied_lab_expiry_workspace(
                     ("\n\n" if belief_txt else "") + belief_hints
                 )
 
-        if not post_mvp_implied_lab_ui:
-            _v_above = (
-                outputs.get("verification")
-                if isinstance(outputs.get("verification"), dict)
-                else None
-            )
-            if _v_above:
-                with right_above_fold_slot.container():
-                    _render_mvp1_friends_first_above_fold(_v_above)
-        else:
-            right_above_fold_slot.empty()
+        right_above_fold_slot.empty()
 
         with right_chart_slot.container():
             st.markdown("##### Market-implied view (chart)")

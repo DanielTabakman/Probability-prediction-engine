@@ -22,7 +22,7 @@ def test_msos_web_package_and_homepage_copy() -> None:
     assert "HeroSection" in page
     assert "Turn your market thesis" in hero
     assert "strategyLabForcedTourHref" in hero or "strategyLabTutorialHref" in hero
-    assert "ResearchBetaModal" in hero
+    assert "ResearchBetaModal" not in hero
     assert 'data-self-serve-entry="homepage"' in page
 
 
@@ -40,6 +40,7 @@ def test_hero_self_serve_ctas() -> None:
     assert "strategyLabForcedTourHref" in hero
     assert "BTC and ETH" in hero
     assert "BTC + ETH options live" in hero
+    assert "ResearchBetaModal" not in hero
 
 
 def test_public_nav_restart_tour() -> None:

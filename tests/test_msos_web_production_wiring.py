@@ -21,11 +21,10 @@ def test_msos_public_urls_default_sign_in() -> None:
     assert "NEXT_PUBLIC_MSOS_SIGN_IN_URL" in text
 
 
-def test_research_offer_cta_env_pattern() -> None:
-    text = _load_ts_module(LIB / "researchOfferCta.ts", "researchOfferCta")
-    assert "NEXT_PUBLIC_PPE_RESEARCH_OFFER_URL" in text
-    assert "mailto:" in text
-    assert "Join research beta" in text
+def test_hero_strategy_lab_links() -> None:
+    hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
+    assert "ResearchBetaModal" not in hero
+    assert "strategyLabTutorialHref" in hero
 
 
 def test_public_nav_wired_sign_in_and_routes() -> None:
@@ -34,15 +33,6 @@ def test_public_nav_wired_sign_in_and_routes() -> None:
     assert 'href={signInUrl}' in nav or "href={signInUrl}" in nav
     assert 'href="/strategy-lab"' in nav or "MSOS_ROUTES.strategyLab" in nav
     assert "<span className=\"btn slim dark\">Sign in</span>" not in nav
-
-
-def test_hero_research_offer_and_links() -> None:
-    hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert "resolveResearchOfferCta" in hero or "ResearchBetaModal" in hero
-    assert "strategyLabTutorialHref" in hero
-    nav = (MSOS_WEB / "src" / "components" / "PublicNav.tsx").read_text(encoding="utf-8")
-    assert "MSOS_ROUTES.commandCenter" in nav
-    assert '<span className="btn primary">' not in hero
 
 
 def test_strategy_lab_embed_boundary_present() -> None:

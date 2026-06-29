@@ -55,7 +55,6 @@ from src.viz.app_panels import (
     render_implied_lab_summary_card as _render_implied_lab_summary_card,
     render_implied_lab_trade_ticket_panel as _render_implied_lab_trade_ticket_panel,
     render_implied_lab_verification as _render_implied_lab_verification,
-    render_mvp1_friends_first_above_fold as _render_mvp1_friends_first_above_fold,
     render_mvp1_primary_output_compact as _render_mvp1_primary_output_compact,
     render_trust_strip as _render_trust_strip,
     render_width_vol_candidate_strip_payload as _render_width_vol_candidate_strip_payload,

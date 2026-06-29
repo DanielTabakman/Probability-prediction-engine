@@ -7,7 +7,7 @@ import json
 from scripts.msos_production_demo_witness import (
     FIXTURE_PREVIEW_SPOT,
     _collect_fixture_warnings,
-    _has_research_cta,
+    _has_homepage_self_serve_cta,
     validate_belief_overlay_api_response,
     validate_display_api_response,
     validate_strategy_lab_client_bundle,
@@ -15,13 +15,13 @@ from scripts.msos_production_demo_witness import (
 )
 
 
-def test_has_research_cta_positive() -> None:
-    html = '<a href="mailto:a@b.com">Request research beta access</a>'
-    assert _has_research_cta(html) is True
+def test_has_homepage_self_serve_cta_positive() -> None:
+    html = '<a href="/strategy-lab?tour=1">Start guided tour</a>'
+    assert _has_homepage_self_serve_cta(html) is True
 
 
-def test_has_research_cta_negative() -> None:
-    assert _has_research_cta("<p>Explore the platform</p>") is False
+def test_has_homepage_self_serve_cta_negative() -> None:
+    assert _has_homepage_self_serve_cta("<p>Explore the platform</p>") is False
 
 
 def test_validate_display_api_response_ok() -> None:

@@ -61,10 +61,10 @@ def _fetch(url: str, *, timeout: float = 30.0) -> tuple[int, str, str | None]:
         return 0, "", str(exc)
 
 
-def _has_research_cta(html: str) -> bool:
+def _has_homepage_self_serve_cta(html: str) -> bool:
     return bool(
-        re.search(r"Request research beta access", html, re.IGNORECASE)
-        or re.search(r"research beta", html, re.IGNORECASE)
+        re.search(r"Start guided tour", html, re.IGNORECASE)
+        or re.search(r"strategy-lab", html, re.IGNORECASE)
     )
 
 
@@ -370,15 +370,15 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
     )
 
     home_status, home_body, home_err = _fetch(f"{base}/")
-    cta_ok = home_status == 200 and _has_research_cta(home_body)
+    cta_ok = home_status == 200 and _has_homepage_self_serve_cta(home_body)
     checks.append(
         {
-            "id": "research_beta_cta",
+            "id": "homepage_self_serve_cta",
             "url": f"{base}/",
             "ok": cta_ok,
             "status": home_status,
-            "error": None if cta_ok else (home_err or "CTA not in HTML — set PPE_RESEARCH_OFFER_URL on VPS and rebuild msos_web"),
-            "missing_phrases": [] if cta_ok else ["Request research beta access"],
+            "error": None if cta_ok else (home_err or "Homepage missing Strategy Lab self-serve CTA"),
+            "missing_phrases": [] if cta_ok else ["Start guided tour"],
         }
     )
 
@@ -398,7 +398,7 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
     )
 
     failed = [c for c in checks if not c.get("ok")]
-    optional_ids = frozenset({"research_beta_cta"})
+    optional_ids = frozenset()
     integration_ids = frozenset(
         {
             "ppe_display_api",

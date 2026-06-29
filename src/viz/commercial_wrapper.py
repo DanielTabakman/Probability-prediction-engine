@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from src.viz.signup_cta import private_app_cta_url, research_offer_cta
+from src.viz.signup_cta import private_app_cta_url
 
 COMMERCIAL_FORBIDDEN_SIGNAL_TOKENS = (
     "best trade",
@@ -30,10 +30,6 @@ DEMO_BANNER = (
     "**Public demo:** no saved snapshot history here. "
     "**Get full access** opens the full app with saves and reviews."
 )
-RESEARCH_OFFER_BLURB = (
-    "**Research beta (v0):** BTC options market-structure readouts and anomaly inspection — "
-    "decision support only, not investment advice or promised returns."
-)
 
 
 def assert_commercial_copy_safe(text: str) -> None:
@@ -50,7 +46,6 @@ class CommercialSurfaceCopy:
     private_app_label: str
     private_app_caption: str
     demo_banner: str
-    research_offer_blurb: str
 
 
 @dataclass(frozen=True)
@@ -66,14 +61,12 @@ def commercial_surface_copy() -> CommercialSurfaceCopy:
         private_app_label=PRIVATE_APP_CTA_LABEL,
         private_app_caption=PRIVATE_APP_CTA_CAPTION,
         demo_banner=DEMO_BANNER,
-        research_offer_blurb=RESEARCH_OFFER_BLURB,
     )
     for value in (
         copy.tagline,
         copy.private_app_label,
         copy.private_app_caption,
         copy.demo_banner,
-        copy.research_offer_blurb,
         COMMERCIAL_BOUNDARY_CAPTION,
     ):
         assert_commercial_copy_safe(value)
@@ -91,14 +84,6 @@ def operator_checklist() -> tuple[OperatorChecklistItem, ...]:
             step_id="env_private_url",
             label="Configure full-app URL",
             detail="Set `PPE_PRIVATE_APP_URL` to an https:// URL for the **Get full access** CTA.",
-        ),
-        OperatorChecklistItem(
-            step_id="env_offer_url",
-            label="Configure research-offer URL",
-            detail=(
-                "Set `PPE_RESEARCH_OFFER_URL` to https:// or mailto:; optional "
-                "`PPE_RESEARCH_OFFER_LABEL` overrides the button label."
-            ),
         ),
         OperatorChecklistItem(
             step_id="commercial_boundary",
@@ -127,20 +112,9 @@ def resolve_demo_ctas(
     *,
     snapshots_enabled: bool,
     private_app_url: str | None,
-    offer_url: str | None,
-    offer_label: str | None = None,
-) -> tuple[str | None, tuple[str, str] | None]:
-    """Resolve demo CTAs using env gates; validates offer label when present."""
-    private_url = private_app_cta_url(
+) -> str | None:
+    """Resolve private-app CTA URL using env gates."""
+    return private_app_cta_url(
         snapshots_enabled=snapshots_enabled,
         private_app_url=private_app_url,
     )
-    offer = research_offer_cta(
-        snapshots_enabled=snapshots_enabled,
-        offer_url=offer_url,
-        offer_label=offer_label,
-    )
-    if offer is not None:
-        _url, label = offer
-        assert_commercial_copy_safe(label)
-    return private_url, offer

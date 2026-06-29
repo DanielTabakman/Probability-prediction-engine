@@ -40,7 +40,7 @@ def test_e2e_public_nav_covers_journey_entry_points() -> None:
 
 def test_e2e_homepage_research_and_lab_ctas() -> None:
     hero = (COMPONENTS / "HeroSection.tsx").read_text(encoding="utf-8")
-    assert "ResearchBetaModal" in hero
+    assert "ResearchBetaModal" not in hero
     assert "strategyLabTutorialHref" in hero
     nav = (COMPONENTS / "PublicNav.tsx").read_text(encoding="utf-8")
     assert "MSOS_ROUTES.commandCenter" in nav

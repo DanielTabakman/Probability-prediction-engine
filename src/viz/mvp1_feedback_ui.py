@@ -1,8 +1,7 @@
-"""MVP1 friends-first feedback capture UI (§15F rubric; local persistence only)."""
+"""MVP1 feedback capture UI (§15F rubric; opt-in via PPE_ENABLE_FEEDBACK=1)."""
 
 from __future__ import annotations
 
-import os
 from typing import Any
 
 import streamlit as st
@@ -19,9 +18,7 @@ from src.viz.mvp1_feedback_store import (
 
 def feedback_panel_enabled() -> bool:
     """Public demo disables feedback by default (no shared server-side SQLite on open host)."""
-    if (os.environ.get("PPE_ENABLE_FEEDBACK") or "").strip():
-        return env_flag("PPE_ENABLE_FEEDBACK", False)
-    return env_flag("PPE_ENABLE_SNAPSHOTS", True)
+    return env_flag("PPE_ENABLE_FEEDBACK", False)
 
 _LIKERT_LABELS = {
     1: "1 — Strongly disagree",

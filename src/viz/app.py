@@ -34,11 +34,9 @@ PAGE_TITLE = "Probability Engine"
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
 _show_debug_ui = _env_flag("PPE_SHOW_DEBUG_UI", False)
 _commercial_copy = commercial_surface_copy()
-_cta_private_url, _research_offer = resolve_demo_ctas(
+_cta_private_url = resolve_demo_ctas(
     snapshots_enabled=_snapshots_enabled,
     private_app_url=os.environ.get("PPE_PRIVATE_APP_URL"),
-    offer_url=os.environ.get("PPE_RESEARCH_OFFER_URL"),
-    offer_label=os.environ.get("PPE_RESEARCH_OFFER_LABEL"),
 )
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
@@ -62,13 +60,6 @@ if _cta_private_url:
             st.markdown(f"[{_commercial_copy.private_app_label}]({_cta_private_url})")
         st.caption(_commercial_copy.private_app_caption)
     st.info(_commercial_copy.demo_banner)
-    if _research_offer:
-        _offer_url, _offer_label = _research_offer
-        st.markdown(_commercial_copy.research_offer_blurb)
-        if hasattr(st, "link_button"):
-            st.link_button(_offer_label, _offer_url, use_container_width=False)
-        else:
-            st.markdown(f"[{_offer_label}]({_offer_url})")
 else:
     st.title(PAGE_TITLE)
     st.caption(_commercial_copy.tagline)

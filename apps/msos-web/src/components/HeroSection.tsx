@@ -1,17 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
-import { ActionButton, ActionLink } from "@/components/ActionLink";
-import { ResearchBetaModal } from "@/components/ResearchBetaModal";
+import { ActionLink } from "@/components/ActionLink";
 import { resolveSignInUrl } from "@/lib/msosPublicUrls";
 import { strategyLabForcedTourHref, strategyLabTutorialHref } from "@/lib/platformTutorial";
-import { resolveResearchOfferCta } from "@/lib/researchOfferCta";
 
 export function HeroSection() {
   const signInUrl = resolveSignInUrl();
-  const researchOffer = resolveResearchOfferCta();
-  const [researchOpen, setResearchOpen] = useState(false);
 
   return (
     <section>
@@ -28,9 +22,6 @@ export function HeroSection() {
         <ActionLink className="btn" href={strategyLabTutorialHref()}>
           Jump to Strategy Lab
         </ActionLink>
-        <ActionButton className="btn" onClick={() => setResearchOpen(true)}>
-          {researchOffer?.label ?? "Request research beta"}
-        </ActionButton>
         <a className="btn slim dark" href={signInUrl}>
           Sign in
         </a>
@@ -41,7 +32,6 @@ export function HeroSection() {
           BTC + ETH options live · paper trading only
         </span>
       </p>
-      <ResearchBetaModal open={researchOpen} onClose={() => setResearchOpen(false)} />
     </section>
   );
 }
