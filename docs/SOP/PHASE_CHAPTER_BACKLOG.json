@@ -601,11 +601,13 @@
     },
     {
       "chapterId": "horizon_replay_scrubber_v1",
-      "status": "deferred",
+      "status": "chartered",
       "priority": "low",
-      "focusPlaybookTier": "Defer",
+      "focusPlaybookTier": "P2",
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md",
       "canonRef": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md \u2014 chapter 5a",
-      "reason": "[LOW DEFER] Replay scrubber \u2014 requires \u226530 days surface archive"
+      "reason": "[LOW CHARTERED] Replay scrubber \u2014 promote to READY when archive_meta.replay_ready (\u226530d); horizon collector on VM"
     },
     {
       "chapterId": "horizon_liquidation_overlay_v1",

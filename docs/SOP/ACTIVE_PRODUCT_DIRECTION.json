@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pivotId": "trader-workflow-integration-v1",
-  "asOf": "2026-06-28",
+  "asOf": "2026-06-29",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
@@ -95,7 +95,7 @@
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "VM ops (ppeloop): git pull && install_cross_venue_collector_task.cmd — daily PM vs options gap pipeline shipped (#529). Relay: finish msos_production_multi_asset_witness_v1 (ppe_go → run_ppe_local); then SELECTION ppe_trust_surface_v1 when prioritized.",
+  "nextStewardAction": "SELECTION: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",

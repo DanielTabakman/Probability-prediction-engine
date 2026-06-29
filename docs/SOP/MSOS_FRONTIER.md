@@ -5,14 +5,14 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-28
+**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-29
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** VM ops (ppeloop): git pull && install_cross_venue_collector_task.cmd — daily PM vs options gap pipeline shipped (#529). Relay: finish msos_production_multi_asset_witness_v1 (ppe_go → run_ppe_local); then SELECTION ppe_trust_surface_v1 when prioritized.
+- **Next steward action:** SELECTION: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)

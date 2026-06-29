@@ -26,6 +26,7 @@ GUARD_SKIP_CHAPTER = 8
 
 STRIPE_BILLING_PLAN = "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json"
 STRIPE_OPERATOR_PREREQ_ID = "stripe_operator_prereq"
+HORIZON_REPLAY_SCRUBBER_PLAN = "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json"
 
 
 @dataclass
@@ -168,6 +169,32 @@ def _stripe_build_deferred_guard(repo: Path, plan_path: str) -> GuardResult | No
     return None
 
 
+def _horizon_replay_archive_guard(repo: Path, norm_plan: str) -> GuardResult | None:
+    """Block replay scrubber SELECTION until surface archive hits replay_ready."""
+    if norm_plan != HORIZON_REPLAY_SCRUBBER_PLAN:
+        return None
+    try:
+        from src.data.horizon_surface_archive import archive_meta, default_archive_root
+
+        meta = archive_meta(default_archive_root())
+        if meta.get("replay_ready"):
+            return None
+        days = meta.get("available_days", 0)
+        return GuardResult(
+            exit_code=GUARD_SKIP_CHAPTER,
+            reason="SKIP_CHAPTER_ARCHIVE_NOT_READY",
+            detail=f"horizon replay gate: available_days={days} (need replay_ready)",
+            plan_path=norm_plan,
+        )
+    except Exception as exc:
+        return GuardResult(
+            exit_code=GUARD_SKIP_CHAPTER,
+            reason="SKIP_CHAPTER_ARCHIVE_NOT_READY",
+            detail=f"horizon archive check failed: {exc}",
+            plan_path=norm_plan,
+        )
+
+
 def evaluate_selection_guards(repo: Path, plan_path: str) -> GuardResult | None:
     """Pre-SELECTION checks: block auto-select when plan config violates guard limits."""
     norm_plan = plan_path.replace("\\", "/").strip()
@@ -177,6 +204,10 @@ def evaluate_selection_guards(repo: Path, plan_path: str) -> GuardResult | None:
     stripe_guard = _stripe_build_deferred_guard(repo, norm_plan)
     if stripe_guard is not None:
         return stripe_guard
+
+    replay_guard = _horizon_replay_archive_guard(repo, norm_plan)
+    if replay_guard is not None:
+        return replay_guard
 
     cfg = load_operator_config(repo)
     g = _guards_config(cfg)
