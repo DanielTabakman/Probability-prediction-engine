@@ -6,7 +6,7 @@
 **Pillars:** EDGE + LEGIBILITY  
 **First ship-to:** OPERATOR → Monitor hook at T4  
 **As-of:** 2026-06-29  
-**Status:** Living draft
+**Status:** **SELECTION COMPLETE** (relay ch.1–2) — chapters queued **PLANNED** after trader-workflow supply refresh
 
 ---
 
@@ -188,3 +188,4 @@ Pattern: [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md)
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 draft program + archive charter proposal |
+| 2026-06-29 | Operator SELECTION — relay ch.1–2 approved; queued after horizon nav |
