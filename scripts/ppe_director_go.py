@@ -14,7 +14,7 @@ from scripts.ppe_operator_status import (
     STATUS_REPORT_REL,
     VERDICT_RUN_AUTO,
     VERDICT_SUPPLY_LOW,
-    collect_operator_status,
+    prepare_operator_status,
     write_status_report,
 )
 
@@ -48,9 +48,9 @@ def open_cursor_focus(repo: Path, focus: Path | None) -> dict[str, Any]:
     return opened
 
 
-def run_director_go(repo: Path, *, open_ide: bool = True, burst: bool = False) -> dict[str, Any]:
+def run_director_go(repo: Path, *, open_ide: bool = True, burst: bool = True) -> dict[str, Any]:
     repo = repo.resolve()
-    status = collect_operator_status(repo)
+    status = prepare_operator_status(repo)
     write_status_report(repo, status)
 
     verdict = str(status.get("verdict") or "ERROR")
@@ -128,13 +128,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--no-open", action="store_true", help="Do not open Cursor (tests / CI)")
     ap.add_argument(
-        "--burst",
+        "--single",
         action="store_true",
-        help="Copy burst-mode @ppe-director prompt (chain workers until WATCH stop)",
+        help="Single @ppe-director handoff (no adaptive burst preflight)",
     )
     args = ap.parse_args(argv)
 
-    result = run_director_go(args.repo_root, open_ide=not args.no_open, burst=args.burst)
+    result = run_director_go(args.repo_root, open_ide=not args.no_open, burst=not args.single)
     print(format_user_banner(result), end="")
 
     verdict = str(result.get("verdict") or "")

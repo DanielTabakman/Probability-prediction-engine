@@ -99,6 +99,19 @@ def test_compute_burst_plan_run_auto_not_allowed(tmp_path) -> None:
     assert plan["burst_allowed"] is False
 
 
+def test_prepare_operator_status_applies_env_before_collect(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_operator_status import prepare_operator_status
+
+    monkeypatch.chdir(tmp_path)
+    fake_status = {"verdict": VERDICT_IDE_BUILD, "guard": {"reason": "PRODUCT_BLOCKED"}}
+    with patch("scripts.ppe_operator_config.apply_operator_env") as mock_env:
+        with patch("scripts.ppe_operator_status.collect_operator_status", return_value=fake_status) as mock_collect:
+            out = prepare_operator_status(tmp_path)
+    mock_env.assert_called_once_with(tmp_path)
+    mock_collect.assert_called_once_with(tmp_path)
+    assert out["verdict"] == VERDICT_IDE_BUILD
+
+
 def test_write_burst_plan(tmp_path) -> None:
     plan = {"max_cycles": 2, "verdict": VERDICT_IDE_BUILD}
     path = write_burst_plan(tmp_path, plan)

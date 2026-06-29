@@ -141,12 +141,14 @@
     {
       "id": "cross_venue_collector_vm_install",
       "title": "Cross-venue collector VM task (ppeloop)",
-      "status": "open",
+      "status": "done",
       "priority": "medium",
       "category": "ops",
       "summary": "After #529 merge on main: on ppeloop run git pull, install_cross_venue_collector_task.cmd (daily 07:15), smoke run_cross_venue_daily.cmd. Runbook: CROSS_VENUE_COLLECTOR_OPS_V1.md.",
       "added": "2026-06-28",
-      "source": "context_window_closeout"
+      "closed": "2026-06-29",
+      "source": "context_window_closeout",
+      "notes": "2026-06-29: tasks confirmed on ppeloop (Horizon 06:30 + Cross-Venue 07:15 Ready); smoke run wrote 2026-06-29 snapshot + latest.md/json."
     },
     {
       "id": "ppeloop_gh_auth_setup_git",

@@ -315,6 +315,17 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     }
 
 
+def prepare_operator_status(repo: Path) -> dict[str, Any]:
+    """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
+    try:
+        from scripts.ppe_operator_config import apply_operator_env
+
+        apply_operator_env(repo)
+    except Exception:
+        pass
+    return collect_operator_status(repo)
+
+
 def _format_human(status: dict[str, Any], repo: Path | None = None) -> str:
     lines = [
         f"VERDICT: {status.get('verdict')}",
@@ -529,13 +540,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
-    try:
-        from scripts.ppe_operator_config import apply_operator_env
-
-        apply_operator_env(repo)
-    except Exception:
-        pass
-    status = collect_operator_status(repo)
+    status = prepare_operator_status(repo)
 
     if not args.no_write:
         report = write_status_report(repo, status)

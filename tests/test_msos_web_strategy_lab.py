@@ -596,3 +596,67 @@ def test_workflow_asset_parity_witness_evidence_and_plan() -> None:
     assert "**COMPLETE**" in evidence
     assert "Monitor" in evidence
     assert "MSOS-WfAsset-Witness-Slice003" in plan
+
+
+# --- PPE Exposure menu v1 (Product-Slice005) ---
+
+
+def test_exposure_menu_route_and_shell() -> None:
+    page = MSOS_WEB / "src" / "app" / "exposure" / "page.tsx"
+    assert page.is_file()
+    text = page.read_text(encoding="utf-8")
+    assert "AppShell" in text
+    assert "ExposureMenuClient" in text
+    assert 'activeNavId="exposure"' in text
+    assert "fetchExposureMenu" in text
+    assert "searchParams: Promise" in text
+
+
+def test_exposure_menu_boundary_proxy_no_ts_math() -> None:
+    lib = (MSOS_WEB / "src" / "lib" / "ppeExposureMenu.ts").read_text(encoding="utf-8")
+    client = (MSOS_WEB / "src" / "components" / "ExposureMenuClient.tsx").read_text(encoding="utf-8")
+    card = (MSOS_WEB / "src" / "components" / "ExposurePathCard.tsx").read_text(encoding="utf-8")
+
+    assert "exposure-menu.json" in lib
+    assert "fetchExposureMenuClient" in lib
+    assert "isExposureMenuPayload" in lib
+    assert "buildExposureMenuFetchUrl" in lib
+    assert "path_not_recommendation" not in client
+    assert "Math." not in lib
+    assert "Math." not in client
+    assert "Math." not in card
+    assert "fetchExposureMenuClient" in client
+    assert "exposure-path-grid" in client
+    assert "not trade recommendations" in client.lower() or "comparison only" in client.lower()
+
+
+def test_exposure_menu_fixtures_and_deep_links() -> None:
+    fixtures = (MSOS_WEB / "src" / "data" / "exposureMenuFixtures.ts").read_text(encoding="utf-8")
+    assert "DEMO_EXPOSURE_MENU_NVDA_LONG" in fixtures
+    assert "DEMO_EXPOSURE_MENU_BTC_LONG" in fixtures
+    assert "path_not_recommendation" in fixtures
+    assert "Paths for comparison only" in fixtures
+    assert "/strategy-lab?asset=NVDA" in fixtures
+    assert "/strategy-lab?asset=BTC" in fixtures
+
+    nvda_block = fixtures.split("DEMO_EXPOSURE_MENU_NVDA_LONG")[1].split("DEMO_EXPOSURE_MENU_BTC_LONG")[0]
+    assert nvda_block.index("long_stock") < nvda_block.index("long_otm_call")
+
+    card = (MSOS_WEB / "src" / "components" / "ExposurePathCard.tsx").read_text(encoding="utf-8")
+    assert "Open in Strategy Lab" in card
+    assert "deep_link" in card
+
+
+def test_exposure_menu_secondary_nav() -> None:
+    nav = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
+    assert 'id: "exposure"' in nav
+    assert 'href: "/exposure"' in nav
+    assert "secondaryNavItems" in nav
+
+    urls = (MSOS_WEB / "src" / "lib" / "msosPublicUrls.ts").read_text(encoding="utf-8")
+    assert "exposure:" in urls or 'exposure: "/exposure"' in urls
+
+    styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
+    assert ".exposure-path-grid" in styles
+    assert ".exposure-menu-work" in styles
+

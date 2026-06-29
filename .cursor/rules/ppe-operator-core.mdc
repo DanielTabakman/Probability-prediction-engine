@@ -11,14 +11,22 @@ alwaysApply: true
 
 Read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-only).
 
+**Default path (adaptive burst):**
+
+1. `python scripts/ppe_burst_plan.py --write`
+2. Read `artifacts/control_plane/BURST_PLAN.json` + load [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc)
+3. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
+4. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
+
 | Verdict | Action |
 |---------|--------|
-| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. VM → `run_ppe_local.cmd` |
-| `IDE_BUILD` | New thread; `@` slim `IDE_BUILD_STARTER_*.md` only |
-| `RUN_AUTO` | VM relay only; desktop → SSH status |
-| `ERROR`/`FIX_PLAN`/`STALE_STATE` | `ppe_notify_fix.py` |
+| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. VM → `run_ppe_local.cmd` (burst: `@ppe-director` → finish worker) |
+| `IDE_BUILD` | Burst: `@ppe-director` → build worker. Single escape: `ppe_go.cmd --single` or `@` slim `IDE_BUILD_STARTER_*.md` only |
+| `RUN_AUTO` | VM relay only; desktop → SSH status — no burst |
+| `SUPPLY_LOW` | Summarize supply; no burst |
+| `ERROR`/`FIX_PLAN`/`STALE_STATE` | Burst: `@ppe-director` → one triage worker max; else `ppe_notify_fix.py` |
 
-**Burst (optional):** user says `burst mode` / `keep going` / `what's next until watch` → run `python scripts/ppe_burst_plan.py --write`, load [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc). If `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread.
+**Handoff:** `ppe_go.cmd` (burst default). **`ppe_go.cmd --single`** for one-shot director prompt.
 
 Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 

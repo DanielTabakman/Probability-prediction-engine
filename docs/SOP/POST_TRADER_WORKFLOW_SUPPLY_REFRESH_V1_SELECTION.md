@@ -23,6 +23,8 @@ Relay queue hit `SUPPLY_LOW` because `horizon_replay_scrubber_v1` was **READY** 
 
 ## Relay order (mechanical)
 
+Superseded for **spine chapters** by [`POST_TRADER_LEARNING_SPINE_V1_SELECTION.md`](POST_TRADER_LEARNING_SPINE_V1_SELECTION.md).
+
 1. `mvp1_bl_density_smoothing_v1` — **medium** · side channel  
 2. `msos_strategy_lab_dist_download_v1` — **medium**  
 3. `msos_trader_workflow_horizon_nav_v1` — **medium**  

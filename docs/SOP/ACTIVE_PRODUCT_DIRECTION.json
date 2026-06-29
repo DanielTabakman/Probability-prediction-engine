@@ -52,30 +52,30 @@
     {
       "id": "ppe_equity_universe_tier1a_v1",
       "label": "Equity tier-1a (SPY QQQ IWM)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_equity_universe_tier1b_v1",
       "label": "Equity tier-1b (mega caps batch 1)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_equity_universe_tier1c_v1",
       "label": "Equity tier-1c (TSLA AMD COIN)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "ppe_commodity_proxy_tier1_v1",
       "label": "Commodity ETF options (GLD SLV USO)",
-      "status": "COMPLETE",
-      "closedOn": "2026-06-27",
-      "evidence": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+      "status": "REOPENED",
+      "reopenedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md"
     },
     {
       "id": "mvp1_cross_venue_scan_v1",
@@ -95,7 +95,7 @@
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md.",
+  "nextStewardAction": "BUILD: ppe_exposure_menu_v1 READY (operator priority). Then Trader Learning Spine queue: msos_trader_review_loop_v1 → dist_download → cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -123,6 +123,12 @@
       "label": "Workflow loop fidelity (P4–P7)",
       "doc": "docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md",
       "status": "complete"
+    },
+    {
+      "id": "learning_spine",
+      "label": "Trader Learning Spine (save → review → track)",
+      "doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "status": "active"
     },
     {
       "id": "learning_loop",
@@ -163,6 +169,11 @@
       "role": "COMPLETE — P4→P7 ?asset= propagation (#495 #507)"
     },
     {
+      "id": "trader_learning_spine_v1",
+      "doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "role": "ACTIVE — P0 spine: msos_trader_review_loop_v1 chartered; dist download + cross-venue + dist timeseries queued"
+    },
+    {
       "id": "cross_venue_arb_v1",
       "doc": "docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md",
       "role": "COMPLETE — scan/backtest CLIs + daily collector pipeline (#529); VM install: install_cross_venue_collector_task.cmd (CROSS_VENUE_COLLECTOR_OPS_V1.md)"
@@ -177,7 +188,11 @@
       "ppe_equity_options_v1",
       "ppe_tradeable_universe_v1",
       "ppe_deribit_crypto_tier1_v1",
-      "ppe_equity_universe_tier1a_v1"
+      "ppe_exposure_menu_v1",
+      "msos_trader_review_loop_v1",
+      "msos_strategy_lab_dist_download_v1",
+      "msos_cross_venue_strategy_lab_v1",
+      "mvp1_distribution_timeseries_collector_v1"
     ]
   },
   "supersedes": {
