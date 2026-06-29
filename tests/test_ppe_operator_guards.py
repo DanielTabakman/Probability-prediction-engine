@@ -209,6 +209,18 @@ class TestPpeOperatorGuards(unittest.TestCase):
         self.assertEqual(guard.exit_code, GUARD_SKIP_CHAPTER)
         self.assertEqual(guard.reason, "STRIPE_BUILD_DEFERRED")
 
+    def test_horizon_replay_skipped_when_archive_not_ready(self) -> None:
+        replay_plan = "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json"
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "horizon_replay_scrubber_v1_relay.json").write_text(
+            json.dumps({"sprintSpecPath": "docs/SOP/SPRINT_TEST.md", "slices": []}),
+            encoding="utf-8",
+        )
+        guard = evaluate_selection_guards(self.repo, replay_plan)
+        self.assertIsNotNone(guard)
+        assert guard is not None
+        self.assertEqual(guard.exit_code, GUARD_SKIP_CHAPTER)
+        self.assertEqual(guard.reason, "SKIP_CHAPTER_ARCHIVE_NOT_READY")
+
 
 if __name__ == "__main__":
     unittest.main()

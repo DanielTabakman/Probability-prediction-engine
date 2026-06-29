@@ -37,7 +37,7 @@ Not a broker. Not TradingView clone. Not PPE distribution histogram.
 | 4b | `horizon_expression_bridge_v1` | LOW | region draw COMPLETE | Implied mass, payoff preview, Strategy Lab link |
 | **4c** | **`horizon_chart_polish_v1`** | **LOW · CHARTERED** | H4 COMPLETE | Implied overlay, axis/legend parity, expiry selector — [`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md) |
 | **4d** | **`horizon_region_workflow_v1`** | **LOW · CHARTERED** | chart polish COMPLETE | RegionIntent MSOS persistence — [`POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md) |
-| 5a | `horizon_replay_scrubber_v1` | LOW · DEFER | ≥30d archive + 4c COMPLETE | Timeline scrub of past implied surfaces |
+| 5a | `horizon_replay_scrubber_v1` | LOW · **CHARTERED** | `archive_meta.replay_ready` (≥30d) + region workflow COMPLETE | Timeline scrub — [`POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md`](POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md) |
 | 5b | `horizon_liquidation_overlay_v1` | LOW · DEFER | validation + vendor | Liquidation levels on historical pane |
 | 5c | `horizon_outcome_ghosts_v1` | LOW · DEFER | replay scrubber | Post-expiry implied vs realized |
 

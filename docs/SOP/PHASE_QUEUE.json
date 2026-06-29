@@ -465,6 +465,12 @@
       "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
+      "status": "READY",
+      "reason": "[LOW] Options Horizon replay scrubber \u2014 gated on archive_meta.replay_ready",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     }
   ]
 }

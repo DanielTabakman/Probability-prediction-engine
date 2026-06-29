@@ -318,6 +318,12 @@
       "status": "done",
       "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness",
       "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
+      "status": "ready",
+      "reason": "[LOW] Options Horizon replay scrubber \u2014 gated on archive_meta.replay_ready",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     }
   ]
 }

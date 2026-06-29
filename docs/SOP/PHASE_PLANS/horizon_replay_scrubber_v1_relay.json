@@ -1,0 +1,58 @@
+{
+  "name": "horizon_replay_scrubber_v1 (timeline scrub of archived implied surfaces)",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+  "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md",
+  "slices": [
+    {
+      "sliceId": "Horizon-ReplayScrub-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+      "buildBranch": "build/auto/Horizon-ReplayScrub-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "Horizon-ReplayScrub-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+      "buildBranch": "build/auto/Horizon-ReplayScrub-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/components/OptionsHorizonClient.tsx",
+        "apps/msos-web/src/components/OptionsHorizonChart.tsx",
+        "apps/msos-web/src/lib/horizonChartPayload.ts",
+        "tests/test_msos_web_horizon_replay_scrubber.py"
+      ]
+    },
+    {
+      "sliceId": "Horizon-ReplayScrub-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+      "buildBranch": "build/auto/Horizon-ReplayScrub-Closeout-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "horizon_replay_scrubber_v1",
+        "chapterTitle": "Options Horizon replay scrubber v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
+        "carryDocs": [
+          "docs/VISION/OPTIONS_HORIZON/SURFACE_ARCHIVE_CONTRACT_V1.md",
+          "docs/SOP/HORIZON_SURFACE_COLLECTOR_OPS_V1.md"
+        ]
+      }
+    }
+  ]
+}

@@ -12,12 +12,12 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-28) |
+| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-29) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | VM ops (ppeloop): git pull && install_cross_venue_collector_task.cmd — daily PM vs options gap pipeline shipped (#529). Relay: finish msos_production_multi_asset_witness_v1 (ppe_go → run_ppe_local); then SELECTION ppe_trust_surface_v1 when prioritized. |
+| **Next** | Relay: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
