@@ -16,5 +16,5 @@
 | Field | Value |
 |-------|--------|
 | `replay_threshold_days` | 30 |
-| `replay_ready` | false (promote queue to READY when true) |
+| `replay_ready` | false (promote queue to READY when true; backlog **blocked** until gate) |
 | Collector | [`HORIZON_SURFACE_COLLECTOR_OPS_V1.md`](HORIZON_SURFACE_COLLECTOR_OPS_V1.md) |

@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "",
-  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_REGION_WORKFLOW_V1.md",
-  "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
-  "status": "COMPLETE",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [LOW] Options Horizon region workflow \u2014 after chart polish Auto-finalized COMPLETE manifest before next SELECTION. Chapter closeout Horizon-RegionWf-Closeout-Slice003; queue item marked DONE.",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md",
+  "selectionRecord": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
+  "status": "READY",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] B\u2013L density smoothing \u2014 supply refresh 2026-06-29 (first runnable)",
   "workerMode": "local-agent"
 }
