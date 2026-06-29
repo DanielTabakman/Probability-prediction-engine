@@ -18,7 +18,7 @@ def test_max_burst_cycles_bands() -> None:
 
 
 def _write_plan(repo, rel: str, slices: list[dict]) -> None:
-    path = repo / rel.replace("/", "\\")
+    path = repo / rel
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(
