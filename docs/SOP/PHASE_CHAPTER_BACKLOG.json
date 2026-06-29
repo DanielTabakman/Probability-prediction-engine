@@ -417,7 +417,7 @@
     },
     {
       "chapterId": "ppe_display_cache_ops_v1",
-      "status": "queued",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json",
