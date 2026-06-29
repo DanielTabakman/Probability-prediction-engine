@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `c2e4e49` — ops: loop publish ops/loop-publish-20260629171017-9a42907 (#585)
+- `3cd81ac` — ops: loop publish ops/loop-publish-20260629170818-ecb5243 (#584)
+- `42fe4c9` — ops: loop publish ops/loop-publish-20260629170809-ecb5243 (#583) (`docs/SOP/`)
+- `88340eb` — control-plane: Trader Learning Spine charter + review loop queue (#581) (`docs/SOP/`)
+- `436ee9d` — Control-plane: dev changelog
 - `2c4d7dc` — docs(control): sync module map — exposure menu LIVE (#580) (`docs/SOP/`)
 - `d190784` — ops: loop publish ops/loop-publish-20260629164316-f06b517 (#578)
 - `adc2ea6` — ops: loop publish ops/loop-publish-20260629164324-f06b517 (#579) (`docs/SOP/`)
