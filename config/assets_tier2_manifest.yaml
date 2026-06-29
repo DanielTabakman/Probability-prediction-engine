@@ -1,0 +1,73 @@
+# Tier-2 tradeable universe — staging manifest (~100 liquid names)
+# Policy: docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md
+# Merged into config/assets.yaml per chunk (enabled: false until witness).
+#
+# Steward: fill chunk asset lists before "asset batch wave 2".
+# Agent: do NOT invent tickers — execute chunks in order.
+
+program_id: ppe_tradeable_universe_tier2_v1
+version: 1
+target_enabled_count: 100
+chunk_size: 10
+prerequisite_program: ppe_tradeable_universe_program_v1  # tier-1 closeout
+
+catalog:
+  group_order:
+    - id: equity_index
+      label: Indices
+    - id: equity_mega
+      label: Mega caps
+    - id: equity_sector_etf
+      label: Sector ETFs
+    - id: equity_liquid
+      label: Liquid equities
+    - id: crypto
+      label: Crypto
+
+# chunks[] — 10 ids each; agent runs next chunk with status != complete
+chunks:
+  tier2_chunk_01_indices:
+    assets: [DIA, VTI, EEM, TLT, HYG]
+    status: pending
+  tier2_chunk_02_mega:
+    assets: [JPM, V, MA, UNH, HD]
+    status: pending
+  tier2_chunk_03_mega:
+    assets: [JNJ, PG, XOM, CVX, LLY]
+    status: pending
+  tier2_chunk_04_tech:
+    assets: [AVGO, ORCL, CRM, NFLX, INTC]
+    status: pending
+  tier2_chunk_05_tech:
+    assets: [ADBE, CSCO, QCOM, IBM, NOW]
+    status: pending
+  tier2_chunk_06_sector_etf:
+    assets: [XLF, XLE, XLK, XLV, XLI]
+    status: pending
+  tier2_chunk_07_sector_etf:
+    assets: [XLP, XLY, XLU, XLB, SMH]
+    status: pending
+  tier2_chunk_08_liquid:
+    assets: [BAC, WFC, DIS, BA, F]
+    status: pending
+  tier2_chunk_09_liquid:
+    assets: [GM, PFE, MRK, COST, WMT]
+    status: pending
+  tier2_chunk_10_crypto:
+    assets: [DOGE, MATIC, LINK, AVAX, DOT]
+    status: pending
+
+# Default templates — copy into assets.yaml on merge (extend per asset as needed)
+asset_templates:
+  DIA:
+    label: "DIA options"
+    asset_class: equity_index
+    catalog_group: equity_index
+    venue: equity
+    equity_symbol: DIA
+    data_source: yfinance
+    tier: extended
+    spread_width: 15
+    contract_multiplier: 100
+    trust_notes:
+      - "Dow ETF options; dividends not modeled in v1."
