@@ -5,7 +5,9 @@ alwaysApply: true
 
 # Asset auto-discovery (mandatory)
 
-**When the operator asks to add, enable, hook up, or ship any asset** (e.g. "get SOL down", "add SPY", "enable BNB"):
+**When the operator asks to add, enable, hook up, or ship any asset** (e.g. "get SOL down", "add SPY", "enable BNB") **or run a batch wave** (`asset batch wave 1`, `tier-2 batch`, `finish tier-1`):
+
+**Batch waves:** read [`ASSET_BATCH_EXPANSION_POLICY_V1.md`](../../docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md) first — pick next manifest chapter/chunk, discover every id, witness, enable, gate, commit. One chunk per thread unless operator said `until blocked`.
 
 ## First tool pass — before replying
 

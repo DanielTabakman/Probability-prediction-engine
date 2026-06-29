@@ -2,7 +2,8 @@
 
 **Program:** [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)  
 **Chapter:** `ppe_asset_enablement_pipeline_v1` (BUILD fills commands)  
-**Data sources:** [`ASSET_DATA_SOURCE_DISCOVERY_V1.md`](ASSET_DATA_SOURCE_DISCOVERY_V1.md)
+**Data sources:** [`ASSET_DATA_SOURCE_DISCOVERY_V1.md`](ASSET_DATA_SOURCE_DISCOVERY_V1.md)  
+**Batch waves (10 → 100 → 1000):** [`ASSET_BATCH_EXPANSION_POLICY_V1.md`](ASSET_BATCH_EXPANSION_POLICY_V1.md)
 
 ---
 
