@@ -1,5 +1,5 @@
 @echo off
-REM Regenerate MSOS module map HTML from PPE_MODULE_REGISTRY.json
+REM Regenerate only (no browser). To refresh + open: OPEN_MODULE_MAP.cmd
+cd /d "%~dp0"
 python scripts\render_msos_module_map.py --write
-if errorlevel 1 exit /b 1
-echo Open: docs\SOP\assets\msos_module_map.html
+exit /b %ERRORLEVEL%

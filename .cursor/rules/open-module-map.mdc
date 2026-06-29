@@ -1,0 +1,26 @@
+---
+description: Open MSOS module map dashboard when the user says open the dashboard, open module map, open module registry, show module map, or show what we are building.
+alwaysApply: true
+---
+
+# Open module map dashboard
+
+**Triggers:** `open the dashboard` · `open module map` · `open module registry` · `show module map` · `show what we're building` · `show what we are building` · `module dashboard`
+
+When the user uses any trigger above:
+
+1. **Run immediately** from repo root (do not tell the user to run it themselves):
+
+```bat
+OPEN_MODULE_MAP.cmd
+```
+
+Or: `python scripts/open_msos_module_map.py`
+
+2. Reply in one line: dashboard refreshed and opened in the browser.
+
+**What it does:** Regenerates `docs/SOP/assets/msos_module_map.html` from `docs/SOP/PPE_MODULE_REGISTRY.json`, then opens it locally.
+
+**Desktop icon:** `MODULE MAP` shortcut — install once via `setup_desktop_shortcuts.cmd` (same as DESKTOP BUILD).
+
+**Read-only / Ask mode:** If shell is blocked, give the absolute path to `OPEN_MODULE_MAP.cmd` only as fallback.

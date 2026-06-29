@@ -8,9 +8,9 @@
 
 **Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html)
 
-**Regenerate map:** `python scripts/render_msos_module_map.py --write` or [`render_msos_module_map.cmd`](../../render_msos_module_map.cmd) at repo root.
+**Open (zero manual steps):** Double-click **`MODULE MAP`** on your Desktop (after `setup_desktop_shortcuts.cmd` once), or double-click [`OPEN_MODULE_MAP.cmd`](../../OPEN_MODULE_MAP.cmd) in the repo root, or say **“open the dashboard”** in any Cursor agent thread.
 
-**Open locally:** `docs/SOP/assets/msos_module_map.html` in your repo folder — double-click in File Explorer or drag into Chrome/Edge.
+**Regenerate only (no browser):** `python scripts/render_msos_module_map.py --write`
 
 **As-of:** 2026-06-29
 
