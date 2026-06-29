@@ -468,9 +468,39 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
-      "status": "READY",
-      "reason": "[LOW] Options Horizon replay scrubber \u2014 gated on archive_meta.replay_ready",
+      "status": "PLANNED",
+      "reason": "[LOW BLOCKED] Replay scrubber \u2014 gated on archive_meta.replay_ready (\u226530d); do not ready until gate",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
+      "status": "READY",
+      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 supply refresh 2026-06-29 (first runnable)",
+      "selectionPrep": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] MSOS distribution CSV download",
+      "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Trader workflow horizon nav",
+      "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[LOW] Cross-venue MSOS embed panel",
+      "selectionPrep": "docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[LOW] VM distribution stats collector",
+      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md"
     }
   ]
 }

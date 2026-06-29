@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | SELECTION: horizon_replay_scrubber_v1 CHARTERED — promote PHASE_QUEUE row to READY when archive_meta.replay_ready (≥30d; VM horizon collector daily). VM ops: install_cross_venue_collector_task.cmd + install_horizon_surface_collector_task.cmd on ppeloop. |
+| **Next** | BUILD: mvp1_bl_density_smoothing_v1 queued first (supply refresh 2026-06-29). Replay scrubber blocked until archive replay_ready (~30d). See POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
