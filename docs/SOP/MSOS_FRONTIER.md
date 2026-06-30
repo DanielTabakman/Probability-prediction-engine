@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY). Spine relay: let VM finish msos_trader_review_loop_v1 closeout only (product on main — do not re-BUILD RevLoop or DistDl). Then spine queue: cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
+- **Next steward action:** Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY in PHASE_QUEUE.json). Spine relay: finish closeout only for [msos_trader_review_loop_v1, msos_strategy_lab_dist_download_v1] — product on main; do NOT re-BUILD (see OPERATOR_STATUS Mode). Then spine queue: msos_cross_venue_strategy_lab_v1 → mvp1_distribution_timeseries_collector_v1. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)

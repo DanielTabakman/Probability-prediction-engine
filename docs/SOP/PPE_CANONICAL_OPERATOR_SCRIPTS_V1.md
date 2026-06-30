@@ -83,9 +83,10 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 ## Agent rule
 
 1. Read `artifacts/orchestrator/OPERATOR_STATUS.md` (or run `ppe_operator_status.py`).
-2. Map verdict → **one row** in the table above.
-3. Do not invent a new script path when a canonical surface already exists.
-4. Add new automation as a **helper** unless steward promotes it in this doc.
+2. Check **`Mode:`** — `CLOSEOUT_ONLY` means product on main; **do NOT re-implement** product slices.
+3. Map verdict → **one row** in the table above ([`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) for role load order).
+4. Do not invent a new script path when a canonical surface already exists.
+5. Add new automation as a **helper** unless steward promotes it in this doc.
 
 Relay orchestration detail: [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md).
 

@@ -73,6 +73,8 @@ Chartered chapters in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQ
 | [`ppe-director`](../../.cursor/agents/ppe-director.md) | Route toward MCD before broad expansion; protect future-platform readiness without premature sprawl |
 | [`ppe-autobuilder-operator`](../../.cursor/agents/ppe-autobuilder-operator.md) | Build meta-infrastructure only when grounded in (a–e); prefer product workers over control-plane churn |
 
+**No parallel Cursor Skills layer:** PPE operator workflows use rules + generated `OPERATOR_STATUS` (`Mode:` / `CLOSEOUT_ONLY`) + starters + subagents ([`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)). Do not bulk-migrate SOP/rules into skills.
+
 ---
 
 ## Changelog

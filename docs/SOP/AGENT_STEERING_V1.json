@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "asOf": "2026-06-30",
+  "closeoutOnlyChapterIds": [
+    "msos_trader_review_loop_v1",
+    "msos_strategy_lab_dist_download_v1"
+  ],
+  "nextBuildCandidateId": "msos_trader_workflow_horizon_nav_v1",
+  "nextBuildCandidateNote": "promote READY in PHASE_QUEUE.json",
+  "spineQueueAfterCloseout": [
+    "msos_cross_venue_strategy_lab_v1",
+    "mvp1_distribution_timeseries_collector_v1"
+  ],
+  "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+}
