@@ -4265,3 +4265,79 @@ button.btn:disabled {
   background: var(--bg);
   overflow-x: auto;
 }
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feedback-form-compact {
+  margin-top: 8px;
+}
+
+.feedback-form select,
+.demo-debrief-field select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.feedback-success {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgba(67, 231, 211, 0.12);
+  border: 1px solid rgba(67, 231, 211, 0.35);
+  color: var(--text);
+}
+
+.feedback-strip {
+  margin-top: 20px;
+}
+
+.feedback-strip-details {
+  border: none;
+}
+
+.feedback-strip-summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+
+.feedback-strip-summary::-webkit-details-marker {
+  display: none;
+}
+
+.feedback-strip-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.operator-feedback-scroll {
+  overflow-x: auto;
+}
+
+.operator-feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.operator-feedback-table th,
+.operator-feedback-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.operator-feedback-table th {
+  color: var(--muted);
+  font-weight: 600;
+}

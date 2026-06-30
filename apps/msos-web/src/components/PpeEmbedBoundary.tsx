@@ -79,7 +79,7 @@ function NativeDistributionChart({
         priceAxisLabel={priceAxisLabel}
       />
       {series.mean_usd !== undefined && series.quartiles_usd ? (
-        <div className="ppe-summary-table" aria-label="PPE display payload summary">
+        <div className="ppe-summary-table" aria-label="Distribution summary">
           <span>Mean {formatMoney(series.mean_usd)}</span>
           <span>Q1 {formatMoney(series.quartiles_usd.q1_usd)}</span>
           <span>Median {formatMoney(series.quartiles_usd.median_usd)}</span>
@@ -135,7 +135,7 @@ export function PpeEmbedBoundary({
           <span className="tag amber">Sample</span>
           <h3>Placeholder chart</h3>
           <p>
-            This view uses sample fixtures — not live Deribit quotes. Refresh when you are online;
+            This view uses sample data — not live Deribit quotes. Refresh when you are online;
             live data loads automatically when the display API is reachable.
           </p>
         </div>
