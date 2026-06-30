@@ -101,6 +101,58 @@ def test_sync_skips_closeout_and_pending_witness(tmp_path):
     assert "MSOS-ProdWireV1-Closeout-Slice005" not in marked
 
 
+def test_sync_skips_witness_when_test_touchset_but_evidence_pending(tmp_path):
+    """Witness slices must not auto-complete from touchSet files while evidence is PENDING."""
+    plan_path = "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json"
+    plan_dir = tmp_path / "docs/SOP/PHASE_PLANS"
+    plan_dir.mkdir(parents=True)
+    evidence = tmp_path / "docs/SOP/MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md"
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    evidence.write_text(
+        "# evidence\n\n| Slice | Status |\n|-------|--------|\n| X | PENDING |\n",
+        encoding="utf-8",
+    )
+    test_file = tmp_path / "tests/test_msos_web_snapshot_review.py"
+    test_file.parent.mkdir(parents=True)
+    test_file.write_text("def test_ok(): assert True\n", encoding="utf-8")
+    selection = tmp_path / "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md"
+    selection.write_text("SELECTED", encoding="utf-8")
+    product_touch = tmp_path / "apps/msos-web/src/lib/snapshotReview.ts"
+    product_touch.parent.mkdir(parents=True)
+    product_touch.write_text("export const x = 1;\n", encoding="utf-8")
+    plan = {
+        "selectionRecord": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
+        "slices": [
+            {"sliceId": "MSOS-RevLoop-Control-Slice001"},
+            {
+                "sliceId": "MSOS-RevLoop-Product-Slice002",
+                "touchSet": ["apps/msos-web/src/lib/snapshotReview.ts"],
+            },
+            {
+                "sliceId": "MSOS-RevLoop-Witness-Slice003",
+                "touchSet": ["tests/test_msos_web_snapshot_review.py"],
+            },
+            {
+                "sliceId": "MSOS-RevLoop-Closeout-Slice004",
+                "closeout": {
+                    "chapterId": "msos_trader_review_loop_v1",
+                    "evidenceDoc": "docs/SOP/MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md",
+                },
+            },
+        ],
+    }
+    plan_file = plan_dir / "msos_trader_review_loop_v1_relay.json"
+    plan_file.write_text(json.dumps(plan), encoding="utf-8")
+
+    with patch("scripts.ppe_manifest.load_phase_plan") as load_plan:
+        load_plan.return_value = plan
+        out = sync_slice_progress(tmp_path, plan_path)
+
+    marked = set(out.get("marked") or [])
+    assert "MSOS-RevLoop-Witness-Slice003" not in marked
+    assert "MSOS-RevLoop-Closeout-Slice004" not in marked
+
+
 def test_platform_touchset_requires_slice_specific_compose_markers(tmp_path):
     compose = tmp_path / "docker-compose.yml"
     compose.write_text(

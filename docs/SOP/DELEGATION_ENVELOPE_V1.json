@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "policyId": "balanced-smart-delegation-v1",
+  "asOf": "2026-06-30",
+  "notes": "Machine SSOT for agent vs human authority. Classify via scripts/ppe_delegation_envelope.py. Canon: docs/SOP/DELEGATION_ENVELOPE_V1.md",
+  "tiers": {
+    "auto": {
+      "label": "Delegated — ship",
+      "action": "Gate pass → commit → push → PR/merge per COMMIT_POLICY; no operator ask."
+    },
+    "auto_notify": {
+      "label": "Delegated — ship + ping",
+      "action": "Same as auto; append one line to weekly digest / ntfy when configured."
+    },
+    "steward_packet": {
+      "label": "Draft only",
+      "action": "Agent writes decision packet (HUMAN_STEWARD_BACKLOG or TRIGGERED_IDEAS); no steering merge until operator ack."
+    },
+    "human_only": {
+      "label": "Stop",
+      "action": "Surface in chat; do not commit or merge without explicit operator instruction."
+    }
+  },
+  "tierRank": {
+    "auto": 0,
+    "auto_notify": 1,
+    "steward_packet": 2,
+    "human_only": 3
+  },
+  "pathRules": [
+    {
+      "id": "secrets",
+      "tier": "human_only",
+      "prefixes": [".env", ".env.", "credentials", "secrets/"],
+      "reason": "Credentials and secrets never auto-ship"
+    },
+    {
+      "id": "product_direction_pivot",
+      "tier": "human_only",
+      "exact": ["docs/SOP/ACTIVE_PRODUCT_DIRECTION.json"],
+      "jsonFields": ["pivotId", "northStar", "primaryFocus", "currentStage"],
+      "reason": "Product direction pivot — operator intent required"
+    },
+    {
+      "id": "ppe_master_canon",
+      "tier": "steward_packet",
+      "prefixes": ["docs/VISION/PPE_MASTER"],
+      "reason": "Strategic canon — agent may draft PR; operator confirms meaning"
+    },
+    {
+      "id": "billing_stripe",
+      "tier": "human_only",
+      "prefixes": ["docs/SOP/MSOS_BILLING", "docs/SOP/SPRINT_MSOS_BILLING"],
+      "reason": "Billing / Stripe — operator prerequisites gate"
+    },
+    {
+      "id": "production_access",
+      "tier": "human_only",
+      "prefixes": ["docs/DEPLOY/", "docs/SOP/MSOS_ACCESS", "docs/SOP/RUNBOOK_VPS"],
+      "reason": "Production access and deploy topology"
+    },
+    {
+      "id": "control_plane_hygiene",
+      "tier": "auto",
+      "prefixes": [
+        "docs/SOP/PHASE_QUEUE.json",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+        "docs/SOP/TRIGGERED_IDEAS",
+        "docs/SOP/HUMAN_STEWARD_BACKLOG",
+        "docs/SOP/THREAD_INSIGHTS",
+        "docs/SOP/UX_EXECUTION_BACKLOG",
+        "docs/SOP/REPO_LAYER_PATH_PREFIXES.json",
+        "docs/SOP/DELEGATION_ENVELOPE",
+        "scripts/ppe_delegation_envelope.py",
+        "scripts/ppe_triggered_ideas.py",
+        "scripts/ppe_human_backlog.py",
+        "scripts/ppe_remote_build_policy.py",
+        "scripts/ppe_thread_capture.py",
+        "tests/test_ppe_delegation",
+        "tests/test_ppe_remote_build",
+        "tests/test_ppe_thread_capture"
+      ],
+      "reason": "Control-plane hygiene — delegated queue/backlog/registry maintenance"
+    },
+    {
+      "id": "evidence_closeout",
+      "tier": "auto",
+      "suffix": "_EVIDENCE_STATUS.md",
+      "exact": ["docs/SOP/AGENT_CONTINUITY_BRIEF.md", "docs/SOP/HANDOFF.md"],
+      "reason": "Evidence and closeout steering after witness/gate"
+    },
+    {
+      "id": "operator_local",
+      "tier": "auto",
+      "prefixes": ["docs/SOP/PPE_AUTO_OPERATOR.local.json", "ppe_operator", "artifacts/control_plane/CREDIT_BUDGET"],
+      "reason": "Local operator profile — machine-specific; gitignored where noted"
+    },
+    {
+      "id": "deploy_workflows",
+      "tier": "auto_notify",
+      "prefixes": [".github/workflows/deploy", ".github/workflows/msos"],
+      "reason": "Deploy workflow edits — ship but operator should know"
+    },
+    {
+      "id": "product_code",
+      "tier": "auto",
+      "prefixes": ["src/", "apps/", "tests/test_msos", "tests/test_mvp1", "tests/test_implied"],
+      "reason": "Product slices — gate + auto-ship when chartered BUILD complete"
+    }
+  ],
+  "escalators": [
+    {
+      "id": "mixed_plane",
+      "planesGte": 2,
+      "bumpTo": "steward_packet",
+      "unlessPassType": "RECOVERY",
+      "reason": "Mixed-plane dirty state — RECOVERY pass only, else steward packet"
+    },
+    {
+      "id": "large_diff",
+      "fileCountGte": 25,
+      "bumpTo": "auto_notify",
+      "reason": "Large diff — ship but notify operator"
+    },
+    {
+      "id": "force_push",
+      "when": "git_force_push",
+      "bumpTo": "human_only",
+      "reason": "Force push requires explicit operator instruction"
+    },
+    {
+      "id": "main_direct",
+      "when": "branch_is_main",
+      "bumpTo": "steward_packet",
+      "reason": "Direct main edits — PR-only delivery preferred"
+    }
+  ],
+  "smartDefaults": {
+    "gatePassedAutoShip": true,
+    "uxBacklogReadyPromotion": "auto",
+    "relayCloseoutSteering": "auto",
+    "contextWindowCloseout": "auto",
+    "vmRecoveryStashReset": "auto_notify"
+  },
+  "integrations": {
+    "run_pushable_gate": "block_human_only",
+    "operator_status_hint": true
+  }
+}

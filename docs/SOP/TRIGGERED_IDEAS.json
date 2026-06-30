@@ -34,7 +34,7 @@
       "id": "surface_thread_insights_at_selection",
       "title": "Skim THREAD_INSIGHTS during SELECTION",
       "summary": "When burst or what's next runs SELECTION, agent should skim recent THREAD_INSIGHTS.md entries for the active chapter_id (not only TRIGGERED_IDEAS alerts).",
-      "status": "parked",
+      "status": "surfaced",
       "priority": "low",
       "added": "2026-06-30",
       "triggers": {
@@ -45,7 +45,8 @@
           "what's next",
           "burst"
         ]
-      }
+      },
+      "surfacedAt": "2026-06-30T21:00:24Z"
     },
     {
       "id": "merge_thread_insight_capture_tooling",

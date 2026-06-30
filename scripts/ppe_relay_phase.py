@@ -135,6 +135,26 @@ def run_phase(repo_root: Path, plan_path: str) -> int:
     plan = windowed_phase_plan(repo, norm_plan) if phase_slice_batching_enabled(repo) else load_phase_plan(repo, plan_path)
     batch_slices = plan.get("slices") or []
     if phase_slice_batching_enabled(repo) and not batch_slices:
+        from scripts.ppe_ide_product_ready import load_marker
+
+        marker = load_marker(repo)
+        manifest = load_manifest(repo)
+        mstat = str(manifest.get("status") or "").upper()
+        if marker and mstat not in ("COMPLETE", ""):
+            try:
+                from scripts.ppe_queue_health import chapter_marked_complete_in_repo
+
+                chapter_closed = chapter_marked_complete_in_repo(repo, norm_plan)
+            except Exception:
+                chapter_closed = False
+            if not chapter_closed:
+                print(
+                    "ppe_relay_phase: batch empty but chapter not closed — "
+                    "stale progress or closeout pending; "
+                    "run: python scripts/ppe_repair_relay_progress.py",
+                    file=sys.stderr,
+                )
+                return 2
         print("ppe_relay_phase: all slices complete for plan (batching)")
         return 0
     if phase_slice_batching_enabled(repo):
@@ -233,10 +253,10 @@ def _run_phase_slices(
         if relay_run_dir is not None:
             post_cmd.extend(["--relay-run-dir", str(relay_run_dir)])
         subprocess.run(post_cmd, cwd=repo, check=False)
+        is_closeout = isinstance(sl.get("closeout"), dict)
         if exit_code == 0:
-            if phase_slice_batching_enabled(repo):
+            if phase_slice_batching_enabled(repo) and not is_closeout:
                 mark_slice_complete(repo, norm_plan, slice_id)
-            is_closeout = isinstance(sl.get("closeout"), dict)
             if not is_closeout:
                 try:
                     from scripts.ppe_progress_notify import notify_slice_complete
@@ -260,7 +280,7 @@ def _run_phase_slices(
                 relay_run_dir=relay_run_dir,
             )
             if rc == 100:
-                if phase_slice_batching_enabled(repo):
+                if phase_slice_batching_enabled(repo) and not is_closeout:
                     mark_slice_complete(repo, norm_plan, slice_id)
                 continue
             return exit_code
