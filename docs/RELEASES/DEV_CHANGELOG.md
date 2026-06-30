@@ -4,6 +4,15 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `505f2c9` — control-plane: smart delegation envelope for agent auto-ship (#1011) (`docs/SOP/`)
+- `4eef8e1` — control-plane: Option A product BUILD + mid-month credit burn boost (#1009) (`docs/SOP/`)
+- `7f4d706` — product(msos-web): prominent homepage guided tour CTA (#1008) (`apps/msos-web/`)
+- `c999a59` — ops(local): manifest READY after relay pass (#1006)
+- `01818f5` — ops(local): manifest READY after relay pass (#1007)
+- `154b11f` — ops: context closeout ship (control-plane/tracking-parked-v2) (#1005) (`docs/SOP/`)
+- `4771d42` — perf(msos-web): speed guided tour entry — no live-data gate + fetch cache (#1004) (`apps/msos-web/`)
+- `c32276f` — control-plane: thread-role separation v2 (#993) (`scripts/`)
+- `fd9ca3b` — Control-plane: dev changelog
 - `e1bdc95` — Merge pull request #1003 from DanielTabakman/fix/research-console-unicode
 - `70019b0` — fix(research): Windows-safe research_status console output (`docs/SOP/`)
 - `376351a` — Control-plane: dev changelog
