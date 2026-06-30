@@ -55,7 +55,9 @@ Optional refresh: `python scripts/ppe_operator_status.py` from repo root.
 
 1. Re-read `artifacts/orchestrator/OPERATOR_STATUS.md`.
 2. If verdict changed to `RUN_LOCAL` or `RUN_AUTO`, confirm loop can continue.
-3. Return a 5-line summary: verdict before → worker → verdict after → next operator action.
+3. Return a short summary: verdict before → worker → verdict after → **operator: nothing** (or thread rotate).
+4. **Never** ask the operator to choose paths (`Want me to…?`). If VM status shows `IDE_BUILD` and local status is stale → trust VM and spawn the next worker.
+5. **Product wins:** do not block on control-plane branch cleanup — ship patches via worker/gate when clean, else proceed with BUILD.
 
 ## Strategic routing (scope)
 

@@ -455,9 +455,15 @@ def _format_human(
     if isinstance(burst, dict):
         lines.extend(_format_burst_summary(burst))
 
+    lines.extend(
+        [
+            "",
+            "Operator: nothing required — agents auto-execute below.",
+        ]
+    )
     cmds = status.get("commands") or []
     if cmds:
-        lines.extend(["", "Do this:"])
+        lines.extend(["", "Agent action (auto-execute — not operator):"])
         for i, cmd in enumerate(cmds, 1):
             lines.append(f"  {i}. {cmd}")
     avoid = status.get("avoid") or []

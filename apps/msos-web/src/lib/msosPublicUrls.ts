@@ -10,6 +10,7 @@ export const MSOS_ROUTES = {
   strategyLab: "/strategy-lab",
   exposure: "/exposure",
   optionsHorizon: "/options-horizon",
+  forwardConsistency: "/forward-consistency",
   monitor: "/monitor",
   history: "/history",
   learn: "/learn",

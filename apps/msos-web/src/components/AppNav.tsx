@@ -23,9 +23,23 @@ export function buildOptionsHorizonPath(assetId: string): string {
   return `${MSOS_ROUTES.optionsHorizon}?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(normalized)}`;
 }
 
+export const LAB_EXPIRY_QUERY_PARAM = "expiry";
+
 export function buildStrategyLabPathWithAsset(assetId: string): string {
   const normalized = normalizeNavAssetId(assetId);
   return `${MSOS_ROUTES.strategyLab}?${LAB_ASSET_QUERY_PARAM}=${encodeURIComponent(normalized)}`;
+}
+
+export function buildStrategyLabPathWithAssetAndExpiry(
+  assetId: string,
+  expiryDate: string,
+): string {
+  const normalized = normalizeNavAssetId(assetId);
+  const params = new URLSearchParams({
+    [LAB_ASSET_QUERY_PARAM]: normalized,
+    [LAB_EXPIRY_QUERY_PARAM]: expiryDate,
+  });
+  return `${MSOS_ROUTES.strategyLab}?${params.toString()}`;
 }
 
 export function assetAwareModuleHref(moduleHref: string, assetId: string): string {

@@ -33,6 +33,7 @@ export const navItems: NavItem[] = [
 export const secondaryNavItems: NavItem[] = [
   { id: "exposure", label: "Exposure menu", href: "/exposure" },
   { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
+  { id: "forward-consistency", label: "Forward consistency", href: "/forward-consistency" },
   { id: "learn", label: "Learn", href: "/learn" },
 ];
 
