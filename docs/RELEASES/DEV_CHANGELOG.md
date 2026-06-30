@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `5642459` — ops: loop publish ops/loop-publish-20260630071150-4dc8a62 (#790)
+- `4659a91` — ops: loop publish ops/loop-publish-20260630071158-4dc8a62 (#791) (`docs/SOP/`)
+- `a57996f` — docs(msos): UX design philosophy for user-facing modules (#789) (`docs/SOP/`)
+- product(msos-ui): MSOS-DistDl-Product-Slice002 Strategy Lab CSV download (#582) (`apps/msos-web/`)
+- `6f0492a` — Control-plane: dev changelog
 - `0f420e6` — ops: loop publish ops/loop-publish-20260630061538-bb4336c (#788) (`docs/SOP/`)
 - `6d13cea` — ops: context closeout ship (control/ppe-exposure-menu-closeout) (#786) (`docs/SOP/`)
 - `8996679` — Control-plane: dev changelog
