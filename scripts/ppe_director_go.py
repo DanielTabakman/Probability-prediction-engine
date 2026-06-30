@@ -108,6 +108,7 @@ def format_user_banner(result: dict[str, Any]) -> str:
     if result.get("needs_handoff"):
         lines.extend(
             [
+                "  THREAD_ROLE: operator (included in clipboard prompt)",
                 f"  {PPE_GO_HINT}",
                 "",
             ]

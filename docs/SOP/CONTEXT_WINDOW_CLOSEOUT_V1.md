@@ -90,6 +90,7 @@ context_window_closeout.cmd --record
 | **Clean tree, unpushed commits** | Push + open PR if missing + `automerge` label |
 | **Dirty shippable files** | Branch `ops/closeout-*` if on `main` → gate → commit → push → PR |
 | **Mixed-plane dirty** | **Park** — no unsafe auto-commit; recovery thread |
+| **Charter / explore closeout + mixed-plane** | **Park** in draft — no branch surgery; next thread: operator `what's next?` or same charter topic |
 | **Gate failure** | Unstage + park paths in draft report |
 | **Merge** | **Never** ask the operator — CI + merge-on-green |
 
