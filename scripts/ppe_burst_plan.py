@@ -152,6 +152,13 @@ def write_burst_plan(repo: Path, plan: dict[str, Any]) -> Path:
     return out
 
 
+def refresh_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Compute adaptive burst plan and write BURST_PLAN.json (operator status parity)."""
+    plan = compute_burst_plan(repo, status)
+    write_burst_plan(repo, plan)
+    return plan
+
+
 def load_burst_plan(repo: Path) -> dict[str, Any] | None:
     path = repo / BURST_PLAN_REL
     if not path.is_file():
