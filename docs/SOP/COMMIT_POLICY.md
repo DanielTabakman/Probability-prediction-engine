@@ -90,6 +90,17 @@ Example: `MSOS-PublicLaunchV1-Platform-Slice002: Caddy route stub (platform-plan
 
 **Never** force-push, `git commit --amend`, or change git config unless the user explicitly asks.
 
+## Thread role vs ship
+
+| Role | Auto-ship when done? | Mixed-plane / branch recovery |
+|------|----------------------|-------------------------------|
+| **operator** / **ide_build** | Yes | Operator thread — [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) |
+| **charter** | Yes for docs/control-plane on clean gate | **Park** — do not stash/checkout in charter thread |
+| **neutral** | Yes if user requested implementation | **Park** — operator thread |
+| **explore** | Hold unless user asked to implement | **Park** |
+
+Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) (`alwaysApply: true`).
+
 ## Cursor and global user rules
 
 **Precedence:** For this workspace, [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc) overrides generic Cursor user rules such as “commit only when asked.”
