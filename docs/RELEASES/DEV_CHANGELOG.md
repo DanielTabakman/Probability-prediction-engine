@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- Merge pull request #792 from DanielTabakman/build/auto/MSOS-RevLoop-Product-Slice002
+- merge(main): resolve conflicts for MSOS-RevLoop-Product-Slice002
+- `3ae1ecc` — Control-plane: dev changelog
+- `5e7b6bd` — docs(msos): insight collect — living module UX frames (`docs/SOP/`)
+- MSOS-RevLoop-Product-Slice002 (PRODUCT): mark IDE build complete
 - `5642459` — ops: loop publish ops/loop-publish-20260630071150-4dc8a62 (#790)
 - `4659a91` — ops: loop publish ops/loop-publish-20260630071158-4dc8a62 (#791) (`docs/SOP/`)
 - `a57996f` — docs(msos): UX design philosophy for user-facing modules (#789) (`docs/SOP/`)
@@ -42,6 +47,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine into build/auto/MSOS-RevLoop-Product-Slice002
+- MSOS-RevLoop-Product-Slice002 (PRODUCT): allowlist snapshot review witness test (`docs/SOP/`)
+- MSOS-RevLoop-Product-Slice002 (PRODUCT): snapshot review API and monitor post-mortem (`apps/msos-web/`)
 - `e0febc9` — ops: loop publish ops/loop-publish-20260630061532-bb4336c (#787)
 - `2f04787` — ops: loop publish ops/loop-publish-20260630051659-3e1f4bd (#784)
 - `38419a2` — ops: loop publish ops/loop-publish-20260630042130-a1220fe (#754)
