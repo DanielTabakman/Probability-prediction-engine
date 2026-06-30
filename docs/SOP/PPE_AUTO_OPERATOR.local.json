@@ -33,7 +33,13 @@
   },
   "guardStopSleepSeconds": 300,
   "keepLoopAliveOnGuardStop": true,
-  "autoRemoteBuild": true,
+  "autoRemoteBuild": false,
+  "remoteBuildPolicy": {
+    "midMonthBurnBoost": true,
+    "enableAfterDay": 16,
+    "underuseThresholdPct": 0.35,
+    "notes": "Option A default (manual DESKTOP_BUILD). After day 16, if CREDIT_BUDGET.used_pct < 35%, autoRemoteBuild turns ON for rest of month. Record: ppe_remote_build_policy.cmd record --used-pct 0.15"
+  },
   "ideHandoff": {
     "enabled": true,
     "openCursor": false,
