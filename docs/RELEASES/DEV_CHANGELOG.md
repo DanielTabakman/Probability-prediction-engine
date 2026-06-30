@@ -4,6 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `19f7b6a` — Merge pull request #1000 from DanielTabakman/feat/research-pipeline-hardening-v1
+- `e73bd18` — fix(msos-web): pin guided tour to BTC and fix lab hydration crash (#1002) (`apps/msos-web/`)
+- `fd838d2` — Control-plane: dev changelog
+- `f46c0dd` — control-plane: land thread-insight routes and promote horizon_nav READY (`docs/SOP/`)
+- `804f30b` — Research pipeline hardening: stale health, summary, MSOS panel, tradeability backtest (`scripts/`)
+- `061e1ba` — fix(msos-web): pin guided tour to BTC and fix lab hydration crash (`apps/msos-web/`)
+- `bcdc877` — Control-plane: research pipeline registry, health, tradeability (`scripts/`)
+- `45a125f` — perf(msos-web): speed guided tour entry with prefetch and client-first lab (`apps/msos-web/`)
 - `ed22eb9` — ops: loop publish ops/loop-publish-20260630202151-fcff4a17 (#1001)
 - `6ef2ba1` — ux(msos-web): simplify Command Center into module launchpad (#998) (`apps/msos-web/`)
 - `6ccb816` — Control-plane: dev changelog
