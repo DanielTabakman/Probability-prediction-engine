@@ -523,15 +523,16 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Trader workflow horizon nav",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
-      "workerMode": "local-agent"
+      "workerMode": "local-agent",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[MEDIUM] Forward consistency radar ch.1 \u2014 dashboard payload + quality flags; P2 side channel",
       "selectionPrep": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },
