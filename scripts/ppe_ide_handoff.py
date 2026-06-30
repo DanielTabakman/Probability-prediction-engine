@@ -211,6 +211,21 @@ def clear_cli_usage_exhausted(repo: Path) -> None:
     save_handoff_state(repo, state)
 
 
+def clear_codex_cli_usage_exhausted(repo: Path) -> None:
+    state = load_handoff_state(repo)
+    state.pop("codex_cli_usage_exhausted", None)
+    state.pop("codex_cli_usage_exhausted_at", None)
+    state.pop("codex_cli_usage_detail", None)
+    state["codex_cli_usage_log_cleared_at"] = _utc_now()
+    save_handoff_state(repo, state)
+
+
+def clear_build_worker_quota(repo: Path) -> None:
+    """Clear stale Cursor/Codex CLI exhaustion markers (does not grant new quota)."""
+    clear_cli_usage_exhausted(repo)
+    clear_codex_cli_usage_exhausted(repo)
+
+
 def should_attempt_headless_cli(repo: Path, *, mode: str = "build", force_handoff: bool = False) -> bool:
     """When True, try headless agent CLI before IDE handoff (build or fix)."""
     if force_handoff:
