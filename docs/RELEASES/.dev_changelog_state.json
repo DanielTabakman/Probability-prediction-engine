@@ -1,5 +1,5 @@
 {
-  "last_main_sha": "e0febc9286f21cb90bc6735ddd9b04b43ea6eecb",
+  "last_main_sha": "d38370c2cdc577033d229f31c1e1d767c111be7b",
   "recorded_events": [
     "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
     "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
@@ -973,6 +973,19 @@
     "89966797a69567b7646c8393206b0c5f6011bf24",
     "6d13ceabb5c45966e5cc07061ef2784f1c2ee861",
     "0f420e6d54f0598b40eb876ee81fd25c5e831d0a",
-    "e0febc9286f21cb90bc6735ddd9b04b43ea6eecb"
+    "e0febc9286f21cb90bc6735ddd9b04b43ea6eecb",
+    "6f0492a1853f5a0e0eaeee76ee7a407750af7739",
+    "7f38dfa3e507e858e5868f7d51f9aa78632f8618",
+    "a57996f5210cdc3c270c5ec60ff2104b7fa55003",
+    "4659a91eaada88d28f1247be94f3e19b508713a1",
+    "5642459ba72cc9f09dafe9b0bc312aa6f189d1cc",
+    "bc92f603b326452ee2dccbcbfd984187d64046ba",
+    "7d77eb02f4faada80d833ddeaa074ef789c73aff",
+    "007763aba4bb7188dff994ddb9bb55cede30a54d",
+    "a787ab9a3dba08c950ee33483ff40f2bd75759d6",
+    "5e7b6bd929123c303de4cba5fbc0e5b3d4dcaacd",
+    "3ae1ecce4cd653e4b7f6d099ec3eb691e832c8cd",
+    "c90ceae7d64d6f0ea4ddb51761a971d1141defd3",
+    "d38370c2cdc577033d229f31c1e1d767c111be7b"
   ]
 }

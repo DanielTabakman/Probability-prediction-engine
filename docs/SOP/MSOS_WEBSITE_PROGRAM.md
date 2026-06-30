@@ -5,7 +5,8 @@
 **Live steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md)  
 **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md)  
 **Acceleration checklist:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md)  
-**Storyboard gate (P2+):** [`docs/VISION/MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)
+**Storyboard gate (P2+):** [`docs/VISION/MSOS_STORYBOARD_GATE.md`](../VISION/MSOS_STORYBOARD_GATE.md)  
+**UX design philosophy (user-facing modules):** [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md)
 
 Portable agent canon for the MSOS customer-facing website/platform program. PPE engine math and MVP1 evidence contracts remain unchanged unless a dedicated SELECTION chapter says otherwise.
 
