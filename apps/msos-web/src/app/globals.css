@@ -2620,6 +2620,67 @@ button.btn:disabled {
   margin: 10px 0 0;
 }
 
+.cross-venue-research {
+  margin: 16px 0 20px;
+  padding: 14px 16px;
+}
+
+.cross-venue-research-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cross-venue-research-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cross-venue-research-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.cross-venue-research-note,
+.cross-venue-research-footer {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.cross-venue-research-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.cross-venue-research-k {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cross-venue-research-v {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cross-venue-research-v.teal {
+  color: var(--teal);
+}
+
+.cross-venue-research-v.muted {
+  color: var(--muted);
+}
+
 .forward-consistency {
   margin: 16px 0 20px;
   padding: 14px 16px;

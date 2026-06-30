@@ -15,6 +15,20 @@
 
 ## Active (parked / surfaced)
 
+### Merge thread insight capture tooling (PR #737)
+
+- **id:** `merge_thread_insight_capture_tooling` · **priority:** medium · **status:** parked
+- **added:** 2026-06-30
+- **summary:** Merge PR #737 so context_window_closeout --capture routes via ppe_thread_capture.py on main.
+- **trigger keywords:** thread insight, context closeout, ppe_thread_capture
+
+### Skim THREAD_INSIGHTS during SELECTION
+
+- **id:** `surface_thread_insights_at_selection` · **priority:** low · **status:** parked
+- **added:** 2026-06-30
+- **summary:** When burst or what's next runs SELECTION, agent should skim recent THREAD_INSIGHTS.md entries for the active chapter_id (not only TRIGGERED_IDEAS alerts).
+- **trigger keywords:** selection, what's next, burst
+
 ### Revisit Uniblock vs single Web3 provider
 
 - **id:** `web3_uniblock_revisit` · **priority:** low · **status:** parked
@@ -26,4 +40,4 @@
 
 ## Changelog
 
-| 2026-06-21 | Auto-render from JSON |
+| 2026-06-30 | Auto-render from JSON |

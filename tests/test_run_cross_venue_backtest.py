@@ -41,4 +41,5 @@ def test_run_cross_venue_backtest_writes_reports(tmp_path: Path) -> None:
     path.write_text(serialize_cross_venue_export_csv(rows), encoding="utf-8")
     report, md_path, json_path = run_cross_venue_backtest(snapshot_root=snap_root, report_root=tmp_path / "out")
     assert report["resolved_count"] == 1
+    assert report.get("strategy_ready") is True
     assert md_path.name == "latest_report.md" and json_path.name == "latest_summary.json"

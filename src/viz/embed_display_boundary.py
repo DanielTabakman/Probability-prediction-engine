@@ -753,6 +753,21 @@ def create_display_payload_wsgi_app(
             )
             return [body]
 
+        from src.viz.cross_venue_research_boundary import handle_cross_venue_research_wsgi_path
+
+        cv_research = handle_cross_venue_research_wsgi_path(path, environ)
+        if cv_research is not None:
+            status, body = cv_research
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
         start_response("404 Not Found", [("Content-Type", "text/plain; charset=utf-8")])
         return [b"not found"]
 

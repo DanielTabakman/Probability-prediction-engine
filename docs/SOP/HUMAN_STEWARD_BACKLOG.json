@@ -22,6 +22,17 @@
       "added": "2026-06-17"
     },
     {
+      "id": "operator_vs_charter_thread_habit",
+      "title": "Operator vs charter Cursor thread habit",
+      "status": "open",
+      "priority": "medium",
+      "category": "operator",
+      "summary": "Pin one long-lived Operator Cursor chat for what's next?; use Charter thread opener for UX, data, and SELECTION — never mix relay status into those threads.",
+      "policyQuestion": "Which thread roles become pinned bookmarks vs fresh chats per slice?",
+      "added": "2026-06-30",
+      "notes": "Filed from THREAD_INSIGHTS closeout (control_plane_thread_roles)."
+    },
+    {
       "id": "relay_decision_reconcile",
       "title": "Relay decision model reconcile",
       "status": "open",

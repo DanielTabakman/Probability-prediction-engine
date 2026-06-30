@@ -22,6 +22,8 @@ Or step-by-step:
 collect_cross_venue_snapshot.cmd
 run_cross_venue_scan.cmd --latest-snapshot
 run_cross_venue_backtest.cmd
+run_cross_venue_tradeability.cmd
+run_cross_venue_tradeability_backtest.cmd
 ```
 
 | Step | Artifact |
@@ -29,6 +31,11 @@ run_cross_venue_backtest.cmd
 | Snapshot | `artifacts/cross_venue_snapshots/YYYY-MM-DD/*.csv` |
 | Scan | `artifacts/cross_venue_reports/latest.md` + `latest.json` |
 | Backtest | `artifacts/cross_venue_backtest/latest_report.md` |
+| Tradeability | `artifacts/cross_venue_tradeability/latest.json` |
+| Tradeability backtest | `artifacts/cross_venue_tradeability_backtest/latest_report.json` |
+
+Unified rollup: `python scripts/research_summary.py --write` → `artifacts/control_plane/RESEARCH_SUMMARY.json`  
+Human status: `research_status.cmd`
 
 Backtest needs **≥14 daily snapshots** per question; warns when history is still thin.
 
@@ -77,3 +84,5 @@ ssh ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engin
 ## Relay note
 
 Cross-venue **relay chapters** are COMPLETE and `sideChannel: true` in the queue. This ops doc covers **headless data + screening** only — not auto-trade.
+
+**Pipeline:** [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) · `run_research_daily.cmd` · [`config/research_pipeline_registry.json`](../../config/research_pipeline_registry.json)

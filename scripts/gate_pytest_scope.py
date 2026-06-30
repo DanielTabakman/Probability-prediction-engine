@@ -16,6 +16,12 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("scripts/relay", ("tests/test_relay_runtime_v0.py",)),
     ("scripts/ppe_auto_select.py", ("tests/test_ppe_auto_select.py",)),
     ("scripts/ppe_", ("tests/test_ppe_*.py",)),
+    ("scripts/research_", ("tests/test_research_*.py",)),
+    ("scripts/validate_research_pipeline_registry.py", ("tests/test_validate_research_pipeline_registry.py",)),
+    ("scripts/run_cross_venue_tradeability_backtest.py", ("tests/test_cross_venue_tradeability_backtest.py",)),
+    ("scripts/run_research_daily.py", ("tests/test_run_research_daily.py", "tests/test_research_pipeline_integration.py")),
+    ("scripts/run_cross_venue_tradeability.py", ("tests/test_cross_venue_tradeability.py",)),
+    ("scripts/run_cross_venue_collector_dev.py", ("tests/test_research_pipeline_integration.py",)),
     ("scripts/post_relay", ("tests/test_apply_control_closeout.py", "tests/test_write_last_run_report.py")),
     ("scripts/phase_orchestrator", ("tests/test_phase_orchestrator_worktree.py",)),
     (
@@ -35,6 +41,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
         ("tests/test_codebase_health_gate.py", "tests/test_relay_runtime_v0.py"),
     ),
     ("scripts/gate_pytest_scope", ("tests/test_gate_pytest_scope.py",)),
+    ("config/research_pipeline_registry.json", ("tests/test_research_pipeline_registry.py", "tests/test_research_archive_health.py", "tests/test_validate_research_pipeline_registry.py")),
     (
         "src/viz/",
         (
@@ -49,6 +56,8 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "tests/test_ui_smoke_*.py",
             "tests/test_belief_*.py",
             "tests/test_app_entrypoint_import.py",
+            "tests/test_cross_venue_*.py",
+            "tests/test_research_summary.py",
         ),
     ),
     (
@@ -73,7 +82,7 @@ _PREFIX_TEST_GLOBS: tuple[tuple[str, tuple[str, ...]], ...] = (
             "tests/test_frozen_*.py",
         ),
     ),
-    ("apps/msos-web/", ("tests/test_msos_web_homepage.py", "tests/test_msos_web_strategy_lab.py", "tests/test_msos_web_feedback.py")),
+    ("apps/msos-web/", ("tests/test_msos_web_homepage.py", "tests/test_msos_web_strategy_lab.py", "tests/test_msos_web_feedback.py", "tests/test_msos_web_cross_venue_panel.py")),
     (
         ".github/workflows/",
         ("tests/test_run_pushable_gate.py", "tests/test_codebase_health_gate.py"),
