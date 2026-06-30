@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from scripts.ppe_burst_plan import compute_burst_plan, write_burst_plan
+from scripts.ppe_burst_plan import refresh_burst_plan
 from scripts.ppe_ide_handoff import _detached_open, copy_text_to_clipboard, resolve_cursor_executable
 from scripts.ppe_operator_hint import PPE_GO_HINT, PPE_GO_VERDICTS
 from scripts.ppe_operator_status import (
@@ -51,16 +51,17 @@ def open_cursor_focus(repo: Path, focus: Path | None) -> dict[str, Any]:
 def run_director_go(repo: Path, *, open_ide: bool = True, burst: bool = True) -> dict[str, Any]:
     repo = repo.resolve()
     status = prepare_operator_status(repo)
-    write_status_report(repo, status)
+    write_status_report(repo, status, sync_burst=burst)
 
     verdict = str(status.get("verdict") or "ERROR")
     blocker = str(status.get("blocker") or "").strip()
     needs_handoff = verdict in HANDOFF_VERDICTS
 
-    burst_plan: dict[str, Any] | None = None
-    if burst:
-        burst_plan = compute_burst_plan(repo, status)
-        write_burst_plan(repo, burst_plan)
+    burst_plan: dict[str, Any] | None = status.get("burst_plan") if burst else None
+    if burst and burst_plan is None:
+        burst_plan = refresh_burst_plan(repo, status)
+        status["burst_plan"] = burst_plan
+    if burst and burst_plan:
         prompt = _burst_prompt_from_plan(burst_plan)
     else:
         prompt = DIRECTOR_PROMPT
