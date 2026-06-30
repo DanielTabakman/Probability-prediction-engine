@@ -37,6 +37,8 @@ Do NOT create a new context for every tiny action.
 | **Explore** | `Explore thread` | No |
 | **Default** | User question only | No — do not lead with `OPERATOR_STATUS` |
 
+When an agent **offers to implement** something, it must say **Relay: off | on | parked | conflict** in one line so you know whether the work touches the autobuilder queue. Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../.cursor/rules/ppe-thread-roles.mdc) § Relay disclosure.
+
 Do **not** mix operator queue work with UX design, data programs, or SELECTION in one thread.
 
 ## Operator layout (2026-06)
