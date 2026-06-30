@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
-import { buildCalibrationStrip, buildReviewEvents } from "@/lib/monitorHistoryFeed";
-import type { WorkflowSummary } from "@/lib/msosWorkflowStore";
-import { connectedMarkets, headlines, labTiles } from "@/data/commandCenterFixtures";
+import { buildCalibrationStrip, type CalibrationStrip } from "@/lib/monitorHistoryFeed";
+import type { WorkflowSummary, WorkflowSummaryWorkItem } from "@/lib/msosWorkflowStore";
+import { moduleCards, plannedModules } from "@/data/commandCenterFixtures";
 import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 
@@ -12,189 +12,191 @@ type Props = {
   workflow: WorkflowSummary;
 };
 
-function statusPill(summary: CommandCenterSummary, workflow: WorkflowSummary): string {
-  const hasWorkflow = workflow.currentWork.length > 0 || workflow.kpis.some((k) => k.value !== "0");
-  if (hasWorkflow) return "Workspace connected";
-  if (summary.status === "live") return "Saved reads connected";
+type ResumeItem = {
+  key: string;
+  name: string;
+  tag: string;
+  detail: string;
+  tagTone?: string;
+  href: string;
+};
+
+const RESUME_LIMIT = 2;
+
+function reviewsDueCount(summary: CommandCenterSummary): number {
+  const raw = summary.kpis.find((k) => k.label === "Reviews due")?.value ?? "0";
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function dataTrustLabel(summary: CommandCenterSummary): string {
+  if (summary.status === "degraded") return "Saved reads offline";
+  if (summary.status === "live") return "Saved reads live";
   if (summary.status === "empty") return "No saved reads yet";
-  return "History offline";
+  return "Ready";
+}
+
+function heroStatLine(summary: CommandCenterSummary, workflow: WorkflowSummary): string | null {
+  const pending = reviewsDueCount(summary);
+  if (pending > 0) return `${pending} review${pending === 1 ? "" : "s"} due`;
+
+  if (summary.status === "live") {
+    const saved = summary.kpis.find((k) => k.label === "Saved snapshots");
+    const total = Number(saved?.value ?? "0");
+    if (total > 0) return `${total} saved view${total === 1 ? "" : "s"}`;
+  }
+
+  if (workflow.currentWork.length > 0) {
+    return `${workflow.currentWork.length} in progress`;
+  }
+
+  return null;
+}
+
+function resolveHeroPrimary(
+  summary: CommandCenterSummary,
+  workflow: WorkflowSummary,
+  calibration: CalibrationStrip,
+): { cta: string; href: string } {
+  if (reviewsDueCount(summary) > 0) {
+    return { cta: calibration.cta, href: calibration.href };
+  }
+  if (workflow.currentWork.some((item) => item.tag === "Draft")) {
+    return { cta: "Resume in Strategy Lab", href: MSOS_ROUTES.strategyLab };
+  }
+  if (summary.status === "empty" && workflow.currentWork.length === 0) {
+    return { cta: "Open Strategy Lab", href: MSOS_ROUTES.strategyLab };
+  }
+  return { cta: calibration.cta, href: calibration.href };
+}
+
+function buildResumeItems(summary: CommandCenterSummary, workflow: WorkflowSummary): ResumeItem[] {
+  const items: ResumeItem[] = [];
+
+  workflow.currentWork.forEach((item: WorkflowSummaryWorkItem, index) => {
+    items.push({
+      key: `wf-${index}-${item.name}`,
+      name: item.name,
+      tag: item.tag,
+      detail: item.detail,
+      tagTone: item.tagTone,
+      href: MSOS_ROUTES.strategyLab,
+    });
+  });
+
+  summary.currentWork.forEach((item) => {
+    items.push({
+      key: item.snapshotId,
+      name: item.name,
+      tag: item.tag,
+      detail: item.detail,
+      tagTone: item.tagTone,
+      href: `/monitor/snapshot/${item.snapshotId}`,
+    });
+  });
+
+  return items.slice(0, RESUME_LIMIT);
 }
 
 export function CommandCenterContent({ summary, workflow }: Props) {
-  const hasSnapshotWork = summary.status === "live" && summary.currentWork.length > 0;
-  const hasWorkflowWork = workflow.currentWork.length > 0;
-  const hasLiveData = hasSnapshotWork || hasWorkflowWork;
   const calibrationStrip = buildCalibrationStrip(summary);
-  const reviewEvents = buildReviewEvents(summary);
-  const mergedKpis = [...workflow.kpis, ...summary.kpis.filter((k) => !workflow.kpis.some((w) => w.label === k.label))];
+  const heroPrimary = resolveHeroPrimary(summary, workflow, calibrationStrip);
+  const heroStat = heroStatLine(summary, workflow);
+  const resumeItems = buildResumeItems(summary, workflow);
+  const hasResume = resumeItems.length > 0;
 
   return (
     <>
       <header className="topline">
         <div>
           <div className="crumb">Home</div>
-          <h1 className="title">Command Center</h1>
+          <h1 className="title">Home</h1>
         </div>
         <div className="tools">
           <span className="pill">
-            <span className="dot" aria-hidden="true" />
-            {statusPill(summary, workflow)}
-          </span>
-          <Link href="/strategy-lab/confirm" className="btn slim primary">
-            New view
-          </Link>
-          <span className="avatar" aria-hidden="true">
-            DT
+            <span
+              className={`dot ${summary.status === "degraded" ? "red" : summary.status === "live" ? "teal" : ""}`}
+              aria-hidden="true"
+            />
+            {dataTrustLabel(summary)}
           </span>
         </div>
       </header>
 
-      <section className="calibration-strip panel compact" aria-label="Review loop">
-        <div>
+      <section className="command-hero panel compact" aria-label="Your status">
+        <div className="command-hero-main">
           <h2>{calibrationStrip.title}</h2>
           <p>{calibrationStrip.body}</p>
+          {heroStat ? <p className="command-hero-stat">{heroStat}</p> : null}
+          {summary.status === "degraded" ? (
+            <p className="command-hero-note" role="status">
+              {friendlySnapshotFeedMessage(summary.degradedReason)}
+            </p>
+          ) : null}
         </div>
-        <div className="calibration-actions">
-          <Link href={calibrationStrip.href} className="btn slim primary">
-            {calibrationStrip.cta}
+        <div className="command-hero-actions">
+          <Link href={heroPrimary.href} className="btn slim primary">
+            {heroPrimary.cta}
           </Link>
-          <Link href="/history" className="btn slim">
+          <Link href={MSOS_ROUTES.history} className="command-hero-secondary">
             History
           </Link>
-          <Link href={MSOS_ROUTES.learn} className="btn slim">
-            Learn
-          </Link>
-          <Link href={MSOS_ROUTES.optionsHorizon} className="btn slim">
-            Options Horizon
-          </Link>
         </div>
       </section>
 
-      <section className="kpi-row" aria-label="Key metrics">
-        {mergedKpis.map((kpi) => (
-          <div key={kpi.label} className="kpi">
-            <div className="label">{kpi.label}</div>
-            <div className={`num ${kpi.tone ?? ""}`.trim()}>{kpi.value}</div>
-            <div className="sub">{kpi.sub}</div>
-          </div>
+      <section className="module-card-grid" aria-label="Open a tool">
+        {moduleCards.map((card) => (
+          <Link key={card.title} href={card.href} className="module-card panel">
+            <div className="module-card-mark" aria-hidden="true">
+              {card.mark}
+            </div>
+            <h2>{card.title}</h2>
+            <p>{card.description}</p>
+            <span className="module-card-cta btn slim primary">{card.cta}</span>
+            {card.live ? <span className="module-card-badge tiny-pill teal">Live</span> : null}
+          </Link>
         ))}
       </section>
-      <p className="panel-sub workflow-source-label">
-        {workflow.sourceLabel}
-        {summary.status === "live" ? ` · ${summary.sourceLabel}` : ""}
-      </p>
-      {summary.status === "degraded" ? (
-        <p className="panel-sub degraded-feed-note" role="status">
-          {friendlySnapshotFeedMessage(summary.degradedReason)}
-        </p>
-      ) : null}
 
-      <section className="grid command-layout">
-        <div className="panel">
-          <div className="panel-head">
-            <div>
-              <h2>Start here</h2>
-              <div className="panel-sub">Open a market and compare it to your view.</div>
-            </div>
-            <span className="tag">Explore</span>
-          </div>
-          <div className="connected-markets-row" aria-label="Connected markets">
-            {connectedMarkets.map((asset) => (
-              <span key={asset.label} className={`connected-market-pill ${asset.live ? "live" : "off"}`}>
-                {asset.label}
-                {asset.live ? <span className="tiny-pill">{asset.status}</span> : <span>{asset.status}</span>}
-              </span>
-            ))}
-          </div>
-          <div className="lab-list">
-            {labTiles.map((tile) => (
-              <div key={tile.title} className={`lab-tile${tile.enabled ? "" : " muted"}`}>
-                <div className="lab-mark">{tile.mark}</div>
-                <div>
-                  <h3>{tile.title}</h3>
-                  <p>{tile.description}</p>
-                </div>
-                {tile.enabled ? (
-                  <Link href={"labHref" in tile && tile.labHref ? tile.labHref : "/strategy-lab"} className="btn slim primary">
-                    {tile.cta}
-                  </Link>
-                ) : (
-                  <span className="tag muted">{tile.tag}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      <details className="planned-modules panel compact">
+        <summary>More modules coming</summary>
+        <ul className="planned-modules-list">
+          {plannedModules.map((item) => (
+            <li key={item.label}>
+              <span>{item.label}</span>
+              <span className="tag muted">{item.status}</span>
+            </li>
+          ))}
+        </ul>
+      </details>
 
-        <div className="panel">
-          <div className="new-thesis">
-            <h3>Have a view?</h3>
-            <p>
-              Say what you think is mispriced. We&apos;ll keep your idea on file so you can plan and review
-              later.
-            </p>
-            <Link href="/strategy-lab/confirm" className="btn slim primary">
-              Save a view →
+      <section className="command-resume panel" aria-label="Resume">
+        <div className="panel-head">
+          <div>
+            <h2>Resume</h2>
+            <div className="panel-sub">Pick up a draft, paper trade, or saved read.</div>
+          </div>
+          {hasResume ? (
+            <Link href={MSOS_ROUTES.monitor} className="command-resume-all">
+              See all in Monitor →
             </Link>
-          </div>
-          <div className="panel-head">
-            <div>
-              <h2>Recent work</h2>
-              <div className="panel-sub">Confirmed views, paper trades, and saved market reads.</div>
-            </div>
-          </div>
-          {summary.status === "degraded" && !hasWorkflowWork ? (
-            <p className="panel-sub">Saved history isn&apos;t loading yet. Strategy Lab still has live data.</p>
           ) : null}
-          {!hasLiveData ? (
-            <p className="panel-sub">Nothing saved yet — start in Strategy Lab.</p>
-          ) : null}
-          {workflow.currentWork.map((item, index) => (
-            <div key={`wf-${item.name}-${index}`} className="strategy">
+        </div>
+        {!hasResume ? (
+          <p className="panel-sub command-resume-empty">
+            Nothing saved yet — open Strategy Lab and compare your view to the market.
+          </p>
+        ) : (
+          resumeItems.map((item) => (
+            <Link key={item.key} href={item.href} className="strategy strategy-link">
               <div className="row">
                 <span className="name">{item.name}</span>
                 <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
               </div>
               <p>{item.detail}</p>
-            </div>
-          ))}
-          {summary.currentWork.map((item) => (
-            <div key={item.snapshotId} className="strategy">
-              <div className="row">
-                <span className="name">{item.name}</span>
-                <span className={`tag${item.tagTone ? ` ${item.tagTone}` : ""}`}>{item.tag}</span>
-              </div>
-              <p>{item.detail}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="panel">
-          <div className="panel-head">
-            <div>
-              <h2>Context &amp; alerts</h2>
-              <div className="panel-sub">News and reminders that might change your view.</div>
-            </div>
-          </div>
-          {headlines.map((item) => (
-            <div key={item.title} className="headline">
-              <h4>{item.title}</h4>
-              <p>{item.body}</p>
-            </div>
-          ))}
-          <div className="side-label inline">To review</div>
-          <div className="timeline">
-            {reviewEvents.map((event) => (
-              <div key={event.title} className="event">
-                <span className={`spot ${event.tone}`} aria-hidden="true" />
-                <div>
-                  <h4>{event.title}</h4>
-                  <p>{event.body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+            </Link>
+          ))
+        )}
       </section>
 
       <p className="footer-note">{DEMO_FOOTER}</p>

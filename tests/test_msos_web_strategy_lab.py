@@ -165,14 +165,9 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     assert "resolveDisplayAssetMeta" in thesis_ctx
     assert "I think ${asset.id} will" in thesis_ctx
 
-    eth_connected = fixtures.split('label: "ETH options"')[1].split("Event markets")[0]
-    assert "Live" in eth_connected
-    eth_tile = fixtures.split('title: "ETH options"')[1].split("NVDA options")[0]
-    assert "enabled: true" in eth_tile
-    nvda_connected = fixtures.split('label: "NVDA options"')[1].split("Event markets")[0]
-    assert "Live" in nvda_connected
-    nvda_tile = fixtures.split('title: "NVDA options"')[1].split("Event markets")[0]
-    assert "enabled: true" in nvda_tile
+    assert '"ETH"' in payload_lib
+    assert '"NVDA"' in catalog_lib or '"NVDA"' in payload_lib
+    assert "KNOWN_LAB_ASSET_IDS" in payload_lib
 
 
 def test_thesis_confirmation_route_and_narrative() -> None:
@@ -238,7 +233,8 @@ def test_nav_enables_strategy_lab() -> None:
     assert "disabled: true" not in nav.split("strategy-lab")[1].split("monitor")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "labHref" in cc
+    assert "moduleCards" in cc
+    assert "MSOS_ROUTES.strategyLab" in cc
 
 
 def test_expression_plan_propagates_selected_asset() -> None:
@@ -416,7 +412,7 @@ def test_monitoring_history_routes_and_panels() -> None:
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "calibrationStrip" in cc
-    assert 'href="/history"' in cc
+    assert "MSOS_ROUTES.history" in cc
 
 
 def test_conclusion_learn_loop_route() -> None:

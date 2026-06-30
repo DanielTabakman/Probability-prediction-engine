@@ -50,12 +50,3 @@ def test_history_page_uses_live_feed() -> None:
     assert "feed.entries" in content
     assert "Live trades" in content
     assert "not connected" in content
-
-
-def test_command_center_calibration_strip_from_live_summary() -> None:
-    content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "buildCalibrationStrip" in content
-    assert "buildReviewEvents" in content
-    assert "calibrationStrip.title" in content
-    assert "reviewEvents.map" in content
-    assert "commandCenterFixtures" not in content or "headlines" in content

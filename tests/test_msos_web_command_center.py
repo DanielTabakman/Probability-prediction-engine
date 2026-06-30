@@ -20,12 +20,20 @@ def test_command_center_route_and_shell() -> None:
     assert "secondaryNavItems" in sidebar
 
     content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "connectedMarkets" in content
+    assert "moduleCards" in content
+    assert "buildCalibrationStrip" in content
     assert "friendlySnapshotFeedMessage" in content
     assert "DEMO_FOOTER" in content
-    assert "labTiles" in content
-    assert "labHref" in content
-    assert "summary.kpis" in content
+    assert "module-card-grid" in content
+    assert "resumeItems" in content
+    assert "headlines" not in content
+    assert "buildReviewEvents" not in content
+
+
+def test_command_center_calibration_strip_from_live_summary() -> None:
+    content = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
+    assert "buildCalibrationStrip" in content
+    assert "calibrationStrip.title" in content
 
 
 def test_public_nav_links_to_command_center() -> None:
@@ -36,7 +44,7 @@ def test_public_nav_links_to_command_center() -> None:
 
 def test_command_center_fixtures_honest_labels() -> None:
     fixtures = (MSOS_WEB / "src" / "data" / "commandCenterFixtures.ts").read_text(encoding="utf-8")
-    assert "Live" in fixtures or "Live" in fixtures.lower()
+    assert "moduleCards" in fixtures
+    assert "live: true" in fixtures
     assert "Planned" in fixtures
-    assert '"ETH options", status: "Live"' in fixtures
-    assert "enabled: false" in fixtures
+    assert "plannedModules" in fixtures
