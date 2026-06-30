@@ -300,7 +300,11 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 
     chapter_mode: dict[str, Any] = {}
     try:
-        from scripts.ppe_chapter_mode import resolve_chapter_mode
+        from scripts.ppe_chapter_mode import (
+            is_loop_host_allowed,
+            resolve_chapter_mode,
+            resolve_operator_commands,
+        )
 
         chapter_mode = resolve_chapter_mode(
             repo,
@@ -309,6 +313,13 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
             guard_reason=guard.reason if guard.reason else None,
             chapter_name=str(summary.get("chapter_name") or "") or None,
         )
+        loop_ok = is_loop_host_allowed()
+        commands, avoid = resolve_operator_commands(
+            verdict=verdict,
+            chapter_mode=chapter_mode,
+            loop_host_allowed=loop_ok,
+        )
+        chapter_mode["loop_host_allowed"] = loop_ok
     except Exception:
         pass
 
@@ -444,9 +455,15 @@ def _format_human(
     if isinstance(burst, dict):
         lines.extend(_format_burst_summary(burst))
 
+    lines.extend(
+        [
+            "",
+            "Operator: nothing required — agents auto-execute below.",
+        ]
+    )
     cmds = status.get("commands") or []
     if cmds:
-        lines.extend(["", "Do this:"])
+        lines.extend(["", "Agent action (auto-execute — not operator):"])
         for i, cmd in enumerate(cmds, 1):
             lines.append(f"  {i}. {cmd}")
     avoid = status.get("avoid") or []

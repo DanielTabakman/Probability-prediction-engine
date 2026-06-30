@@ -230,12 +230,6 @@ def compose_steward_action_snippet(repo: Path) -> str:
     return " ".join(parts)
 
 
-def slice_product_on_main(repo: Path, *, slice_id: str, phase_plan: str) -> bool:
-    from scripts.ppe_ide_product_ready import _product_touchset_on_main
-
-    return _product_touchset_on_main(repo, slice_id=slice_id, plan_path=phase_plan)
-
-
 def _load_direction_raw(repo: Path) -> dict[str, Any]:
     path = repo / DIRECTION_REL
     if not path.is_file():
@@ -245,3 +239,114 @@ def _load_direction_raw(repo: Path) -> dict[str, Any]:
     except (json.JSONDecodeError, OSError):
         return {}
     return data if isinstance(data, dict) else {}
+
+
+def is_loop_host_allowed() -> bool:
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        return bool(loop_host_start_allowed()[0])
+    except Exception:
+        return False
+
+
+def resolve_operator_commands(
+    *,
+    verdict: str,
+    chapter_mode: dict[str, Any] | None,
+    loop_host_allowed: bool,
+) -> tuple[list[str], list[str]]:
+    """Return (commands, avoid) tailored to chapter mode and machine role."""
+    info = chapter_mode or {}
+    do_not_rebuild = bool(info.get("do_not_rebuild"))
+    mode = str(info.get("mode") or "")
+
+    if do_not_rebuild and verdict in ("RUN_LOCAL", "IDE_BUILD"):
+        if loop_host_allowed:
+            return (
+                ["run_ppe_local.cmd (witness/closeout only — do NOT re-BUILD product)"],
+                [
+                    "Re-implementing product slices (CLOSEOUT_ONLY)",
+                    "run_ppe_auto_local_loop.cmd (use run_ppe_local.cmd once first)",
+                ],
+            )
+        return (
+            ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"],
+            [
+                "run_ppe_local.cmd on desktop (forbidden — use DESKTOP_CONTINUE)",
+                "IDE BUILD / re-implement product (CLOSEOUT_ONLY)",
+            ],
+        )
+
+    if verdict == "IDE_BUILD" and mode == MODE_IDE_BUILD:
+        from scripts.ppe_operator_hint import PPE_GO_HINT
+
+        return (
+            [PPE_GO_HINT],
+            ["run_ppe_auto_local_loop.cmd  (will hit PRODUCT_BLOCKED)"],
+        )
+
+    if verdict == "RUN_LOCAL":
+        if loop_host_allowed:
+            return (
+                ["run_ppe_local.cmd"],
+                ["run_ppe_auto_local_loop.cmd  (use run_ppe_local.cmd once first)"],
+            )
+        return (
+            ["DESKTOP_CONTINUE.cmd --no-pause"],
+            ["run_ppe_local.cmd on desktop (forbidden — use DESKTOP_CONTINUE)"],
+        )
+
+    if verdict in ("FIX_PLAN", "STALE_STATE", "ERROR"):
+        from scripts.ppe_operator_hint import PPE_GO_HINT
+
+        return ([PPE_GO_HINT], [])
+
+    if verdict == "RUN_AUTO":
+        if loop_host_allowed:
+            return (["run_ppe_auto_local_loop.cmd"], [])
+        return (
+            [
+                "ssh ppeloop@desktop-caqll8k \"cd /d C:\\Users\\ppeloop\\Probability-prediction-engine && ppe_autobuilder.cmd status --brief\""
+            ],
+            ["run_ppe.cmd / run_ppe_auto_local_loop on desktop (forbidden on daily PC)"],
+        )
+
+    if verdict == "SUPPLY_LOW":
+        return (
+            [
+                "Add status=queued rows to docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                "run_ppe_auto_local_loop.cmd  (will idle-sleep until work appears)",
+            ],
+            [],
+        )
+
+    return ([], [])
+
+
+def prune_closeout_chapter(repo: Path, *, plan_path: str) -> bool:
+    """Remove chapter from closeoutOnlyChapterIds after relay closeout completes."""
+    chapter_id = plan_chapter_id(plan_path)
+    if not chapter_id:
+        return False
+    path = repo / STEERING_REL
+    if not path.is_file():
+        return False
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return False
+    if not isinstance(data, dict):
+        return False
+    ids = data.get("closeoutOnlyChapterIds") or []
+    if not isinstance(ids, list) or chapter_id not in ids:
+        return False
+    data["closeoutOnlyChapterIds"] = [str(i) for i in ids if str(i) != chapter_id]
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return True
+
+
+def slice_product_on_main(repo: Path, *, slice_id: str, phase_plan: str) -> bool:
+    from scripts.ppe_ide_product_ready import _product_touchset_on_main
+
+    return _product_touchset_on_main(repo, slice_id=slice_id, plan_path=phase_plan)

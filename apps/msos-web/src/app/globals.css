@@ -2836,6 +2836,129 @@ button.btn:disabled {
   color: var(--muted);
 }
 
+.fcr-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.fcr-heatmap-panel {
+  margin-bottom: 16px;
+}
+
+.fcr-heatmap-scroll {
+  overflow-x: auto;
+}
+
+.fcr-heatmap {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.fcr-heatmap th,
+.fcr-heatmap td {
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.fcr-heatmap th {
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fcr-heatmap th[scope="row"] {
+  text-align: left;
+  color: var(--text);
+}
+
+.fcr-heatmap-empty {
+  color: var(--muted);
+}
+
+.fcr-heatmap-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  min-width: 88px;
+  padding: 8px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background: rgba(13, 25, 40, 0.6);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.fcr-heatmap-cell:hover {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.fcr-heatmap-cell.selected {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.25);
+}
+
+.fcr-heatmap-cell.teal {
+  background: rgba(45, 212, 191, 0.08);
+}
+
+.fcr-heatmap-cell.amber {
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.fcr-heatmap-cell.muted {
+  color: var(--muted);
+}
+
+.fcr-heatmap-status {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fcr-heatmap-edge {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.fcr-detail {
+  margin-bottom: 16px;
+}
+
+.fcr-detail-actions {
+  margin-bottom: 8px;
+}
+
+.fcr-quality-flags {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.fcr-raw-drawer summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.fcr-raw-json {
+  margin: 12px 0 0;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 11px;
+  line-height: 1.4;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+.fcr-footer {
+  margin-top: 16px;
+  color: var(--muted);
+}
+
 .lab-advanced-toggle {
   margin: 10px 0 8px;
 }

@@ -2,6 +2,8 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** run relay chapters without Cursor API / ACP when credits are exhausted.
 
+**Verdict → command (SSOT):** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · human buttons: [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) · agent routing: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+
 **Checklist:** [`PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md`](PPE_IDE_NATIVE_OPERATOR_CHECKLIST.md)
 
 **Operator layout (canonical):** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
@@ -45,7 +47,7 @@ Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`. Control/wi
 |-------|------|
 | `@ppe-director` | Read `OPERATOR_STATUS.md`; spawn workers; never run `run_ppe_auto_local_loop` |
 | `@ppe-build-worker` | One product slice from `IDE_BUILD_STARTER_*.md` → gate → commit → mark ready → `run_ppe_local` |
-| `@ppe-finish-worker` | `RUN_LOCAL` only — `run_ppe_local.cmd` when marker present |
+| `@ppe-finish-worker` | `RUN_LOCAL` / `CLOSEOUT_ONLY` — VM: `run_ppe_local.cmd`; desktop: `DESKTOP_CONTINUE.cmd` |
 | `@ppe-triage-worker` | `FIX_PLAN` / `STALE_STATE` / `ERROR` diagnosis |
 
 Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/ppe_director_go.py`](../../scripts/ppe_director_go.py).

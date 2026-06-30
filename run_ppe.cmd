@@ -46,6 +46,9 @@ del "%SEL_OUT%" >nul 2>nul
 if "%SELECT_ONLY%"=="1" exit /b %SEL_RC%
 if not "%SEL_RC%"=="0" exit /b %SEL_RC%
 
+python "%REPO_ROOT%\scripts\ppe_loop_host_guard.py" --require
+if errorlevel 1 exit /b 8
+
 if "%CONTINUOUS%"=="1" (
   python "%REPO_ROOT%\scripts\ppe_run.py" --repo-root "%REPO_ROOT%" --continuous %*
   exit /b %ERRORLEVEL%

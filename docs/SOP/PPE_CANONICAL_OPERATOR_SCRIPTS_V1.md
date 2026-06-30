@@ -87,6 +87,7 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 3. Map verdict → **one row** in the table above ([`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) for role load order).
 4. Do not invent a new script path when a canonical surface already exists.
 5. Add new automation as a **helper** unless steward promotes it in this doc.
+6. **Run** mapped commands in-thread (or via `@ppe-director` workers) — do **not** reply with "What you should do" checklists or choice questions for the operator ([`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) § Operator-facing replies).
 
 Relay orchestration detail: [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](RELAY_ORCHESTRATOR_RUNBOOK_V1.md).
 

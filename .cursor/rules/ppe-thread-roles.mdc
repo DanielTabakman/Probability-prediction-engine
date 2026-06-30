@@ -1,6 +1,6 @@
 ---
 description: PPE thread roles — operator vs charter/topic separation. Prevents relay queue from hijacking UX, data, and planning threads.
-alwaysApply: false
+alwaysApply: true
 ---
 
 # PPE thread roles
@@ -9,13 +9,13 @@ alwaysApply: false
 
 ## Roles
 
-| Role | Optimize for | Relay / queue |
-|------|----------------|---------------|
-| **operator** | Verdict, burst, autobuilder, triage | **Yes** — read `OPERATOR_STATUS.md`, run verdict |
-| **ide_build** | One product slice | Only via `IDE_BUILD_STARTER_*.md` / `IDE_BUILD_NOW.md` |
-| **charter** | SELECTION, programs, UX/data design, backlog rows | **No** — charter docs only; park relay for operator thread |
-| **explore** | Questions, reviews, tradeoffs (Ask-style in Agent) | **No** |
-| **neutral** (default) | User's actual question | **No** — do not open with operator status |
+| Role | Optimize for | Relay / queue | Git / ship |
+|------|----------------|---------------|------------|
+| **operator** | Verdict, burst, autobuilder, triage | **Yes** — read `OPERATOR_STATUS.md`, run verdict | Branch recovery, relay, stash, mixed-plane → [`RECOVERY_PROTOCOL.md`](../../docs/SOP/RECOVERY_PROTOCOL.md) |
+| **ide_build** | One product slice | Only via `IDE_BUILD_STARTER_*.md` / `IDE_BUILD_NOW.md` | Gate → commit → mark ready on slice branch |
+| **charter** | SELECTION, programs, UX/data design, policy | **No** — park relay for operator thread | Docs/control-plane only; see § Charter ship |
+| **explore** | Questions, reviews, tradeoffs | **No** | Hold unless user asked for implementation |
+| **neutral** (default) | User's actual question | **No** — do not open with operator status | Ship **only** when user requested implementation; see § Neutral |
 
 ## Detect role (first user message in thread)
 
@@ -37,6 +37,7 @@ alwaysApply: false
 
 - `charter thread` / `topic thread` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
 - Explicit program-only load: e.g. "Load only `@docs/SOP/UX_EXECUTION_BACKLOG_V1.md`" with no operator @
+- Control-plane / agent-policy work scoped to `docs/SOP/`, `.cursor/rules/`, `scripts/` (no relay)
 
 **Explore** — any of:
 
@@ -50,6 +51,50 @@ alwaysApply: false
 2. **Operator** → follow [`ppe-operator-core.mdc`](ppe-operator-core.mdc) auto-execute path.
 3. **Neutral** → answer the user's task; do **not** lead with relay verdict or `IDE_BUILD` blockers. One-line pointer to operator thread is OK if they asked about queue health.
 
+## Response shape (charter / explore / neutral)
+
+Do **not** end replies with operator noise unless the user asked about queue, branch, or relay:
+
+- No `RUN_LOCAL` / `DESKTOP_CONTINUE` / stash / checkout instructions
+- No "switch back to branch X" or stash pop playbooks
+- No summarizing `OPERATOR_STATUS` or next BUILD candidate
+
+**Instead:** finish the chartered answer; if relay or branch recovery is needed, one line: *"Operator thread: what's next?"* (or park in draft on context closeout).
+
+## Neutral contract
+
+- Answer the question first; scope stays on the user's topic.
+- **Do not** open with `OPERATOR_STATUS`, burst plan, or IDE_BUILD blockers.
+- **Commit/ship** only when the user requested implementation and the task is complete ([`auto-commit.mdc`](auto-commit.mdc)).
+- **Do not** run branch surgery, stash management, or mixed-plane recovery — defer to operator thread.
+- Queue health question → one-line pointer to operator thread; do not run relay.
+
+## Charter ship (docs / control-plane)
+
+Charter threads **may** gate → commit → push → PR for:
+
+- `docs/SOP/`, `.cursor/rules/`, `scripts/`, `tests/` (control-plane)
+- Program/backlog docs and SELECTION artifacts
+
+**When gate fails** (mixed-plane dirty tree, wrong branch, layer audit on unrelated paths):
+
+- **Do not** stash, checkout, or rebase to recover in a charter thread
+- Report what blocked ship in one short paragraph
+- Park: *"Operator thread: recovery + ship"* — operator owns [`RECOVERY_PROTOCOL.md`](../../docs/SOP/RECOVERY_PROTOCOL.md)
+
+Charter threads **must not** implement product `src/` slices unless that is the explicit chartered task (use IDE BUILD or operator thread for relay product work).
+
+## Commit behavior
+
+| Role | Ship when task done? |
+|------|----------------------|
+| **operator** / **ide_build** | Yes — per [`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) |
+| **charter** | Yes for docs/control-plane on a clean gate; **park** if mixed-plane (see § Charter ship) |
+| **neutral** | Yes **if** user requested implementation; hold for Q&A-only |
+| **explore** | Hold unless user asked to implement |
+
+Ask/read-only mode overrides all rows.
+
 ## Charter thread may
 
 - Read/edit program docs (`*_PROGRAM_V1.md`, `UX_EXECUTION_BACKLOG_V1.md`, SELECTION, `PHASE_CHAPTER_BACKLOG.json`, `ACTIVE_PRODUCT_DIRECTION.json` for scope)
@@ -61,6 +106,7 @@ alwaysApply: false
 - Summarize `OPERATOR_STATUS` or steer work to current `IDE_BUILD` slice
 - Spawn `@ppe-director`, `@ppe-build-worker`, or `@ppe-finish-worker`
 - Run `ppe_go.cmd`, `run_ppe_local.cmd`, or `DESKTOP_CONTINUE.cmd` unless user switches to operator role
+- Branch/stash/recovery gymnastics (operator thread only)
 
 ## UX execution vs UX charter
 
