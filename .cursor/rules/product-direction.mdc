@@ -13,7 +13,9 @@ Direction pivots and steering propagation are **agent/steward responsibility**. 
 
 ## First tool pass (with continuity brief)
 
-When answering **what's next**, starting BUILD, or any steering/scope question:
+**Gate:** operator or charter thread only ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc)). Skip on neutral bug-fix threads unless steering is the ask.
+
+When answering **what's next** (operator), starting BUILD, charter scope, or steering questions:
 
 1. Read [`ACTIVE_PRODUCT_DIRECTION.json`](../../docs/SOP/ACTIVE_PRODUCT_DIRECTION.json) (`pivotId`, `primaryFocus`, `activeBuildChapterId`).
 2. Read propagated markers in [`MSOS_FRONTIER.md`](../../docs/SOP/MSOS_FRONTIER.md) — if placeholder `_(run sync_product_direction.cmd)_` appears, **run sync immediately**.

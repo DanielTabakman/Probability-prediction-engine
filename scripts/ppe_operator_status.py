@@ -28,6 +28,7 @@ from scripts.ppe_propagate_queue import (
     promote_first_blocked_with_plan,
 )
 from scripts.ppe_queue import load_queue
+from scripts.ppe_thread_roles import infer_suggest_thread_rotate
 
 STATUS_REPORT_REL = "artifacts/orchestrator/OPERATOR_STATUS.md"
 NOTIFY_REL = "artifacts/control_plane/OPERATOR_STATUS_NOTIFY.json"
@@ -291,6 +292,11 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 
     commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
     avoid = _avoid_commands(verdict)
+    rotate = infer_suggest_thread_rotate(
+        verdict=verdict,
+        manifest_status=manifest_status,
+        plan_path=plan_path or "",
+    )
 
     return {
         "as_of": _utc_now(),
@@ -312,6 +318,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "avoid": avoid,
         "errors": errors,
         "idle_heal": idle_heal or None,
+        **rotate,
     }
 
 
@@ -431,6 +438,18 @@ def _format_human(
         lines.extend(["", "Errors:"])
         for e in errors:
             lines.append(f"  - {e}")
+    if status.get("suggest_thread_rotate"):
+        from scripts.ppe_thread_roles import THREAD_ROTATE_FOOTER
+
+        lines.extend(
+            [
+                "",
+                "Thread rotate (recommended)",
+                f"Reason: {status.get('thread_rotate_reason')}",
+                str(status.get("thread_rotate_message") or ""),
+                THREAD_ROTATE_FOOTER,
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 

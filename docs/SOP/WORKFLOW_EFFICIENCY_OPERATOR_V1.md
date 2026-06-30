@@ -71,6 +71,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 - Sprint spec ≤200 lines → NORMAL; 201–400 → WATCH; >400 → ESCALATE (continuous run stops)
 - Generated BUILD packet target ≤~80 lines
 - One Cursor thread per slice/chapter; no SELECTION+BUILD+PR mega-thread
+- **Thread roles:** operator vs charter — [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md); do not open UX/data threads without `Charter thread` lock
 
 ### Burst mode (adaptive — default)
 

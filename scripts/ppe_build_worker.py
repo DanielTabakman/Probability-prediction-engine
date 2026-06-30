@@ -317,6 +317,7 @@ def build_product_prompt(
     note: str = "",
 ) -> str:
     from scripts.ppe_ide_build_starter import format_build_closeout_section
+    from scripts.ppe_thread_roles import IDE_BUILD_THREAD_OPENER, prepend_role_opener
 
     closeout = format_build_closeout_section(slice_id=slice_id, phase_plan=plan_path)
     if worker == WORKER_CODEX_CLI:
@@ -358,7 +359,7 @@ def build_product_prompt(
         ]
     if note.strip():
         parts.extend(["", note.strip()])
-    return "\n".join(parts)
+    return prepend_role_opener("\n".join(parts), IDE_BUILD_THREAD_OPENER)
 
 
 def handoff_instructions(worker: WorkerKind) -> list[str]:

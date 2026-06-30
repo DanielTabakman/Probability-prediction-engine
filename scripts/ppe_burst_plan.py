@@ -131,18 +131,22 @@ def format_burst_director_prompt(
     verdict: str,
     burst_allowed: bool,
 ) -> str:
+    from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
+
     if not burst_allowed:
-        return (
+        body = (
             "@ppe-director Burst blocked (band=ESCALATE or max_cycles=0). "
             "Read artifacts/control_plane/BURST_PLAN.json. Triage only — do not chain BUILD workers."
         )
-    return (
-        f"@ppe-director Adaptive burst mode. max_workers={max_cycles} "
-        f"(band={overall_band}, remaining_slices={remaining}, verdict={verdict}). "
-        "Read artifacts/control_plane/BURST_PLAN.json first. "
-        "Spawn ppe-build-worker / ppe-finish-worker only for IDE_BUILD and RUN_LOCAL. "
-        "Triage verdicts: one ppe-triage-worker max. Terminal loop running."
-    )
+    else:
+        body = (
+            f"@ppe-director Adaptive burst mode. max_workers={max_cycles} "
+            f"(band={overall_band}, remaining_slices={remaining}, verdict={verdict}). "
+            "Read artifacts/control_plane/BURST_PLAN.json first. "
+            "Spawn ppe-build-worker / ppe-finish-worker only for IDE_BUILD and RUN_LOCAL. "
+            "Triage verdicts: one ppe-triage-worker max. Terminal loop running."
+        )
+    return prepend_role_opener(body, OPERATOR_THREAD_OPENER)
 
 
 def write_burst_plan(repo: Path, plan: dict[str, Any]) -> Path:

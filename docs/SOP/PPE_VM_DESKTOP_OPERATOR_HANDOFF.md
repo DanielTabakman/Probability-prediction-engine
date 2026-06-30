@@ -102,12 +102,25 @@ PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=
 
 ---
 
-## New thread starter (desktop steward)
+## New thread starters
+
+Copy-paste from [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md). Summary:
+
+### Operator thread (relay + what's next)
 
 ```text
-Load @docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md and @docs/SOP/AGENT_CONTINUITY_BRIEF.md.
+Operator thread. THREAD_ROLE: operator.
+Load @docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md
 VM loop host: ppeloop@DESKTOP-CAQLL8K. Desktop is IDE BUILD only.
-Continue MSOS live sequence from operator status; do not restart VM loop unless STACK_DOWN.
+Run what's next; do not restart VM loop unless STACK_DOWN.
+```
+
+### Charter thread (UX, data, SELECTION — no relay)
+
+```text
+Charter thread. THREAD_ROLE: charter.
+Do NOT read OPERATOR_STATUS. Load only your program doc.
+Park relay work for the operator thread.
 ```
 
 ---

@@ -381,6 +381,8 @@ def _chapter_from_snapshot(snapshot: dict[str, Any]) -> str:
 
 
 def infer_whats_next(snapshot: dict[str, Any], *, ship_report: dict[str, Any] | None = None) -> str:
+    from scripts.ppe_thread_roles import infer_next_thread_role, suggested_opener_for_role
+
     ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
     if isinstance(ship, dict):
         if ship.get("blocked"):
@@ -389,21 +391,27 @@ def infer_whats_next(snapshot: dict[str, Any], *, ship_report: dict[str, Any] | 
             isinstance(s, dict) and s.get("step") in ("publish", "publish_ahead") and s.get("ok")
             for s in (ship.get("steps") or [])
         ):
-            return "Shipped — CI auto-merges when green. Ask what's next? for operator verdict."
+            return "Shipped — CI auto-merges when green. Open operator thread and ask what's next?"
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
+    closing_role = str(snapshot.get("closeout_thread_role") or "operator")
+    next_role = infer_next_thread_role(
+        closing_role=closing_role,
+        operator_verdict=str(op.get("verdict") or ""),
+    )
+    opener = suggested_opener_for_role(next_role)
     cmds = op.get("commands") or []
     if cmds:
-        return f"Operator: `{cmds[0]}`"
+        return f"Next thread role: **{next_role}**. Opener: `{opener}` · Operator: `{cmds[0]}`"
     verdict = str(op.get("verdict") or "").strip()
     if verdict:
-        return f"Check operator verdict `{verdict}` and `docs/SOP/AGENT_CONTINUITY_BRIEF.md`."
-    return "Read `docs/SOP/AGENT_CONTINUITY_BRIEF.md` and ask what's next."
+        return f"Next thread role: **{next_role}**. Opener: `{opener}` · Verdict `{verdict}` — see `AGENT_CONTINUITY_BRIEF.md`."
+    return f"Next thread role: **{next_role}**. Opener: `{opener}` · Read `AGENT_CONTINUITY_BRIEF.md`."
 
 
 def build_closeout_record(
     snapshot: dict[str, Any],
     *,
-    thread_role: str = "steward",
+    thread_role: str = "operator",
     whats_next: str = "",
     safe_to_switch: bool = True,
     slices_closed_in_thread: int = 0,
@@ -411,18 +419,28 @@ def build_closeout_record(
     notes: str = "",
     ship_report: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    from scripts.ppe_thread_roles import infer_next_thread_role, normalize_thread_role, suggested_opener_for_role
+
     pf = snapshot.get("preflight") if isinstance(snapshot.get("preflight"), dict) else {}
     op = snapshot.get("operator") if isinstance(snapshot.get("operator"), dict) else {}
     closed_at = str(snapshot.get("generated_at_utc") or _utc_now())
     ship = ship_report if isinstance(ship_report, dict) else snapshot.get("ship_report")
-    next_line = whats_next.strip() or infer_whats_next(snapshot, ship_report=ship if isinstance(ship, dict) else None)
+    role_norm = normalize_thread_role(thread_role)
+    snap_for_infer = {**snapshot, "closeout_thread_role": role_norm}
+    next_line = whats_next.strip() or infer_whats_next(snap_for_infer, ship_report=ship if isinstance(ship, dict) else None)
+    next_role = infer_next_thread_role(
+        closing_role=role_norm,
+        operator_verdict=str(op.get("verdict") or ""),
+    )
     if isinstance(ship, dict) and ship.get("blocked"):
         safe_to_switch = False
     return {
         "event": "context_window_closeout",
         "closeout_id": str(uuid.uuid4()),
         "closed_at": closed_at,
-        "thread_role": thread_role.strip().lower() or "steward",
+        "thread_role": role_norm,
+        "next_thread_role": next_role,
+        "suggested_opener": suggested_opener_for_role(next_role),
         "chapter_id": _chapter_from_snapshot(snapshot),
         "head": snapshot.get("head"),
         "branch": pf.get("branch"),
@@ -451,8 +469,12 @@ def latest_closeout_record(repo: Path) -> dict[str, Any] | None:
 
 
 def render_whats_next_markdown(record: dict[str, Any]) -> str:
+    from scripts.ppe_thread_roles import normalize_thread_role, suggested_opener_for_role
+
     closed = str(record.get("closed_at") or "?")
-    role = str(record.get("thread_role") or "steward")
+    role = normalize_thread_role(str(record.get("thread_role") or "operator"))
+    next_role = normalize_thread_role(str(record.get("next_thread_role") or role))
+    opener = str(record.get("suggested_opener") or suggested_opener_for_role(next_role))
     chapter = str(record.get("chapter_id") or "(none)")
     line = str(record.get("whats_next") or infer_whats_next({}))
     safe = "yes" if record.get("safe_to_switch_agents") else "no"
@@ -460,11 +482,14 @@ def render_whats_next_markdown(record: dict[str, Any]) -> str:
         [
             "# What's next",
             "",
-            f"**Last context closeout:** {closed} · **thread:** {role} · **chapter:** `{chapter}` · **safe to switch:** {safe}",
+            f"**Last context closeout:** {closed} · **closed as:** {role} · **chapter:** `{chapter}` · **safe to switch:** {safe}",
+            "",
+            f"**Next thread role:** `{next_role}`",
+            f"**Suggested opener:** {opener}",
             "",
             line,
             "",
-            "_New Cursor chat: ask **what's next?** — agent reads this file + `AGENT_CONTINUITY_BRIEF.md`._",
+            "_Operator relay: open operator thread and ask **what's next?** Charter work: use **Charter thread** opener in `docs/SOP/THREAD_STARTERS_V1.md`._",
             "",
         ]
     )
@@ -482,6 +507,8 @@ def promote_whats_next(repo: Path, record: dict[str, Any]) -> tuple[Path, Path]:
         "closeout_id": record.get("closeout_id"),
         "closed_at": record.get("closed_at"),
         "thread_role": record.get("thread_role"),
+        "next_thread_role": record.get("next_thread_role"),
+        "suggested_opener": record.get("suggested_opener"),
         "chapter_id": record.get("chapter_id"),
         "whats_next": record.get("whats_next"),
         "safe_to_switch_agents": record.get("safe_to_switch_agents"),
@@ -496,7 +523,7 @@ def record_context_closeout(
     repo: Path,
     snapshot: dict[str, Any],
     *,
-    thread_role: str = "steward",
+    thread_role: str = "operator",
     whats_next: str = "",
     safe_to_switch: bool = True,
     slices_closed_in_thread: int = 0,
@@ -659,7 +686,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--ship-dry-run", action="store_true", help="Preview auto-ship without git mutations")
     ap.add_argument("--json", action="store_true", help="Print snapshot JSON to stdout")
-    ap.add_argument("--thread-role", default="steward", help="steward | ide_build | recovery | exploratory")
+    ap.add_argument(
+        "--thread-role",
+        default="operator",
+        help="operator | charter | ide_build | recovery | explore (legacy: steward→operator, exploratory→charter)",
+    )
     ap.add_argument("--whats-next", default="", help="One-line next action (default: infer from operator verdict)")
     ap.add_argument(
         "--safe-to-switch",

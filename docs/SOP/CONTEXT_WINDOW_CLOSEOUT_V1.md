@@ -114,7 +114,7 @@ Each `--record` closeout:
 `OPERATOR_STATUS.md` includes the **What's next** block when `WHATS_NEXT.md` exists. Weekly radar flags **context-chat-churn** when ≥3 closeouts in a week and zero slices closed.
 
 ```bat
-context_window_closeout.cmd --record --thread-role steward --whats-next "Continue msos_user_state_v1: run_ppe_local.cmd"
+context_window_closeout.cmd --record --thread-role operator --whats-next "Continue msos_user_state_v1: run_ppe_local.cmd"
 ```
 
 `--record` implies `--render`. Omit `--whats-next` to infer from operator verdict.
@@ -208,9 +208,12 @@ Report **doc-state safety** and **repo-state safety** separately ([`FRONTIER_STE
 
 ### 6 — Next thread boot
 
+**Thread roles:** [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)
+
 | Closing thread role | New thread |
 |---------------------|------------|
-| Steward / guide | Ask **`what's next?`** — agent runs adaptive burst (preflight + director when allowed), then reads `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| **Operator** / steward relay | Ask **`what's next?`** in operator thread — burst + director when allowed; `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| **Charter** / topic | Same charter doc or new `Charter thread` opener — **not** operator unless relay blocked |
 | IDE BUILD | Starter file only — **not** steward narrative |
 | Recovery | `what's next?` or `@docs/SOP/RECOVERY_PROTOCOL.md` if recovery-specific |
 

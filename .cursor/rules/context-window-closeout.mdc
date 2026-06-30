@@ -21,4 +21,4 @@ When the user uses any trigger above, or the chat is too long/noisy to continue:
 
 **Not** chapter closeout (`apply_control_closeout_v1`) unless a relay closeout slice is also in scope.
 
-**Next thread:** user asks `what's next?` — agent runs adaptive burst per `ppe-operator-core.mdc` (preflight + `@ppe-director` when allowed). **`ppe_go.cmd --single`** for one-shot handoff. Context: `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` (no @ required).
+**Next thread:** user asks `what's next?` in an **operator thread** — agent runs adaptive burst per `ppe-operator-core.mdc` (preflight + `@ppe-director` when allowed). Charter threads: see [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md). **`ppe_go.cmd --single`** for one-shot handoff. Context: `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` (no @ required).
