@@ -48,6 +48,54 @@ assets:
       - "Dividends and corporate actions not modeled in v1."
       - "LEAPS chain may be thin — BL trust state surfaced when OI/volume low."
 
+  SPY:
+    label: "SPY options"
+    asset_class: equity_index
+    tier: core
+    venue: equity
+    equity_symbol: SPY
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 15
+    catalog:
+      group: equity_index
+    trust_notes:
+      - "Index ETF options; dividends on underlying not modeled in v1."
+
+  QQQ:
+    label: "QQQ options"
+    asset_class: equity_index
+    tier: core
+    venue: equity
+    equity_symbol: QQQ
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 15
+    catalog:
+      group: equity_index
+    trust_notes:
+      - "Index ETF options; dividends on underlying not modeled in v1."
+
+  IWM:
+    label: "IWM options"
+    asset_class: equity_index
+    tier: extended
+    venue: equity
+    equity_symbol: IWM
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 10
+    catalog:
+      group: equity_index
+    trust_notes:
+      - "Russell 2000 ETF; can be thinner than SPY/QQQ."
+
   SOL:
     label: "SOL options"
     asset_class: crypto

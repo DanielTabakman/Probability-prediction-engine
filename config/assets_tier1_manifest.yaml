@@ -31,7 +31,7 @@ chapters:
     assets: [SOL, BNB, XRP]
   ppe_equity_universe_tier1a_v1:
     assets: [SPY, QQQ, IWM]
-    status: in_progress
+    status: complete
     wave: ppe_asset_batch_wave1_v1
     volume_batch: 1
     volume_rank_note: "OI ranks 1-3 among remaining tier-1 (2026-06-29)"
