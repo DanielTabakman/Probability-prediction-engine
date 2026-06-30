@@ -129,6 +129,12 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     asset_ids = resolve_asset_ids(args)
     report = run_witness(asset_ids, live=bool(args.live), pre_enable=bool(args.pre_enable))
+    try:
+        from scripts.ppe_tracking_hub import record_asset_witness
+
+        record_asset_witness(_REPO_ROOT, report)
+    except Exception:
+        pass
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:

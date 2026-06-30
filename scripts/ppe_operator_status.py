@@ -380,6 +380,13 @@ def _format_human(
             lines.append(operator_lane_line(repo))
     except Exception:
         pass
+    if repo is not None:
+        try:
+            from scripts.ppe_tracking_hub import format_operator_tracking_lines
+
+            lines.extend(format_operator_tracking_lines(repo))
+        except Exception:
+            pass
     next_promo = supply.get("next_promotable_blocked")
     if isinstance(next_promo, dict) and next_promo.get("chapterId"):
         lines.append(f"Next after closeout: {next_promo.get('chapterId')} ({next_promo.get('planPath')})")
