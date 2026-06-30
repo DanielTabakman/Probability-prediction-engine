@@ -271,12 +271,209 @@ AUTOBUILDER_SECTION = """
     </div>
 """
 
+EXTRA_SECTIONS = """
+    <h2 id="burst-mode">Burst mode — adaptive director</h2>
+    <p class="flow-desc">
+      Default for <code>what's next?</code> — preflight sizes work, then <code>@ppe-director</code> spawns workers until band cap or stop.
+      Canon: <a href="../WORKFLOW_EFFICIENCY_OPERATOR_V1.md">workflow efficiency</a>
+      · Entry: <code>ppe_go.cmd</code> (burst) · <code>ppe_go.cmd --single</code> (one-shot)
+    </p>
+
+    <div class="ab-flow">
+      <pre>
+<span class="hl-ph">what's next?</span> ──► <span class="hl-dt">ppe_burst_plan.py --write</span> ──► BURST_PLAN.json
+                         │
+                         ├── burst_allowed=false ──► single verdict only (split slice first)
+                         │
+                         └── use_director=true ──► <span class="hl-dt">@ppe-director</span>
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+            IDE_BUILD         RUN_LOCAL      FIX_PLAN/ERROR
+         build-worker      finish-worker    triage-worker (max 1)
+                    │               │               │
+                    └───────────────┴───────────────┘
+                                    ▼
+                         re-read OPERATOR_STATUS · re-plan if cycles remain
+                                    ▼
+                         stop: cap · RUN_AUTO · stuck · WATCH band · guard block
+      </pre>
+    </div>
+
+    <div class="ab-panel">
+      <h3>BURST_PLAN.json — key fields</h3>
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Meaning</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>max_cycles</code></td><td>Workers this burst — NORMAL→3, WATCH→1, ESCALATE→0</td></tr>
+          <tr><td><code>use_director</code></td><td><strong>true</strong> for IDE_BUILD / RUN_LOCAL — steward thread must not implement product</td></tr>
+          <tr><td><code>burst_allowed</code></td><td><strong>false</strong> → one verdict only; trim spec or split slice</td></tr>
+          <tr><td><code>overall_band</code></td><td>NORMAL / WATCH / ESCALATE from context audit</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-bottom: 24px">
+      <strong>Forbidden in burst:</strong> implementing <code>IDE_BUILD</code> in the steward thread ·
+      <code>run_ppe_auto_local_loop</code> on desktop · pasting full sprint specs.
+      After stop: <code>context_window_closeout.cmd --record</code> → fresh thread.
+    </div>
+
+    <h2 id="asset-batch">Asset batch enablement</h2>
+    <p class="flow-desc">
+      One operator phrase → agent runs a manifest chunk end-to-end (discover, witness, enable, gate, PR).
+      Canon: <a href="../ASSET_BATCH_EXPANSION_POLICY_V1.md">ASSET_BATCH_EXPANSION_POLICY_V1.md</a>
+      · Manifest: <code>config/assets_tier1_manifest.yaml</code>
+    </p>
+
+    <div class="ab-panel">
+      <h3>Operator triggers</h3>
+      <table>
+        <thead>
+          <tr><th>Say this</th><th>Wave</th><th>Agent does</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>asset batch wave 1</code> / <code>finish tier-1</code></td>
+            <td>Tier-1 (~25–30)</td>
+            <td>Next uncomplete manifest chapter · 3–5 ids · one chunk per thread</td>
+          </tr>
+          <tr>
+            <td><code>asset batch wave 2</code> / <code>tier-2 batch</code></td>
+            <td>Tier-2 (~100)</td>
+            <td>Next tier-2 chunk (10 ids) after tier-1 closeout</td>
+          </tr>
+          <tr>
+            <td><code>asset batch wave N until blocked</code></td>
+            <td>Any</td>
+            <td>Consecutive chunks until witness/gate/prerequisite fail</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="ab-flow">
+      <pre>
+Pick chunk ──► <span class="hl-dt">discover_asset_data_source.py --asset ID --json</span> (each id)
+            │     execute next_action — never ask operator which exchange
+            ▼
+Witness ──► probe_asset_data_source · witness_asset_catalog --live
+            ▼
+Enable ──► enable_asset_batch.py --apply --live-witness
+            ▼
+Gate ──► run_pushable_gate.py · commit · PR
+            ▼
+Ops ──► warm_display_payload_cache · prod multi-asset witness when ready
+            ▼
+Close chunk ──► manifest status complete · evidence doc · trust sign-off for Live pill
+      </pre>
+    </div>
+
+    <div class="ab-panel">
+      <h3>Discovery next_action → agent</h3>
+      <table>
+        <thead>
+          <tr><th>next_action</th><th>Agent</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>enable_existing_row</code></td><td>Witness + enable</td></tr>
+          <tr><td><code>merge_registry_and_enable</code></td><td>Merge manifest row + venue from discovery</td></tr>
+          <tr><td><code>switch_venue_and_enable</code></td><td>Fix venue (e.g. deribit → bybit)</td></tr>
+          <tr><td><code>build_adapter</code></td><td>Implement adapter slice first</td></tr>
+          <tr><td><code>blocked_no_live_options</code></td><td>Log skip — <strong>do not enable</strong></td></tr>
+          <tr><td><code>already_enabled</code></td><td>Skip · optional prod witness</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="closeout-lifecycle">Chapter closeout lifecycle</h2>
+    <p class="flow-desc">
+      Product BUILD and chapter closeout are separate steps. <code>run_ppe_local</code> does <strong>not</strong> implement product code — it advances relay and runs control closeout.
+      Canon: <a href="../RELAY_ORCHESTRATOR_RUNBOOK_V1.md">relay runbook</a>
+      · <a href="../PPE_IDE_NATIVE_OPERATOR_V1.md">IDE native operator</a>
+    </p>
+
+    <div class="ab-flow">
+      <pre>
+<span class="hl-ph">IDE_BUILD</span> slice ──► Agent implements product · gate · commit · PR · merge
+                │
+                ▼ <span class="hl-dt">mark_ide_product_ready</span> (IDE_PRODUCT_READY.json marker)
+                │
+                ▼ verdict becomes <span class="hl-ph">RUN_LOCAL</span>
+                │
+    Desktop ──► <span class="hl-dt">DESKTOP_CONTINUE.cmd</span> (SSH finish on VM)
+    VM ───────► <span class="hl-dt">run_ppe_local.cmd</span>
+                │
+                ▼ relay slice: control closeout + propagate queue
+                │
+                ▼ <span class="hl-dt">apply_control_closeout_v1</span>
+                   updates MVP1_FRONTIER · HANDOFF · PPE_INTEGRATED_STATUS · AGENT_CONTINUITY_BRIEF
+                │
+                ▼ verdict returns to <span class="hl-ph">RUN_AUTO</span> (next slice)
+      </pre>
+    </div>
+
+    <div class="ab-panel">
+      <h3>Who runs what</h3>
+      <table>
+        <thead>
+          <tr><th>Step</th><th>Machine</th><th>Script / agent</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Implement product slice</td>
+            <td>Desktop</td>
+            <td><code>DESKTOP_BUILD.cmd</code> → <code>@ppe-build-worker</code></td>
+          </tr>
+          <tr>
+            <td>Mark build complete</td>
+            <td>Desktop (agent) or VM watcher</td>
+            <td><code>mark_ide_product_ready.cmd</code> · <code>finish_ide_build.cmd</code></td>
+          </tr>
+          <tr>
+            <td>Advance relay closeout</td>
+            <td><strong>VM only</strong></td>
+            <td><code>run_ppe_local.cmd</code> · <code>@ppe-finish-worker</code></td>
+          </tr>
+          <tr>
+            <td>Desktop handoff after merge</td>
+            <td>Desktop</td>
+            <td><code>DESKTOP_CONTINUE.cmd</code> — not the same as <code>run_ppe_local</code></td>
+          </tr>
+          <tr>
+            <td>Context window end (chat)</td>
+            <td>Either</td>
+            <td><code>context_window_closeout.cmd</code> — <em>not</em> chapter closeout</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note" style="margin-bottom: 24px">
+      <strong>Chapter not closed until:</strong> <code>apply_control_closeout_v1</code> PASS,
+      steering alignment green, evidence doc updated, and changes on <code>main</code>.
+      Post-build watcher auto-runs mark + <code>run_ppe_local</code> when agent stops after commit.
+    </div>
+"""
+
+MARKER_BURST = 'id="burst-mode"'
+MARKER_ASSET = 'id="asset-batch"'
+MARKER_CLOSEOUT = 'id="closeout-lifecycle"'
+
 
 def inject(html: str) -> str:
     if MARKER not in html:
         html = html.replace(
             "    <h2>MSOS pillars</h2>",
-            AUTOBUILDER_SECTION + "\n    <h2>MSOS pillars</h2>",
+            AUTOBUILDER_SECTION + EXTRA_SECTIONS + "\n    <h2>MSOS pillars</h2>",
+            1,
+        )
+    elif MARKER_BURST not in html:
+        html = html.replace(
+            "    <h2>MSOS pillars</h2>",
+            EXTRA_SECTIONS + "\n    <h2>MSOS pillars</h2>",
             1,
         )
     if ".ab-grid {" not in html:
@@ -287,7 +484,11 @@ def inject(html: str) -> str:
         )
     html = html.replace(
         "Living operator chart — modules, data, tiers, priorities.",
+        "Living operator chart — modules, data, tiers, priorities, and operator factory.",
+    )
+    html = html.replace(
         "Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.",
+        "Living operator chart — modules, data, tiers, priorities, and operator factory.",
     )
     if 'href="#autobuilder"' not in html:
         html = re.sub(
@@ -296,6 +497,15 @@ def inject(html: str) -> str:
             html,
             count=1,
         )
+    if 'href="#burst-mode"' not in html and 'href="#autobuilder"' in html:
+        html = html.replace(
+            '        · <a href="#autobuilder">Autobuilder</a>\n',
+            '        · <a href="#autobuilder">Autobuilder</a>\n'
+            '        · <a href="#burst-mode">Burst</a>\n'
+            '        · <a href="#asset-batch">Assets</a>\n'
+            '        · <a href="#closeout-lifecycle">Closeout</a>\n',
+            1,
+        )
     return html
 
 
@@ -303,9 +513,10 @@ def main() -> int:
     html = MAP.read_text(encoding="utf-8")
     html = inject(html)
     MAP.write_text(html, encoding="utf-8")
-    if MARKER not in html:
-        raise SystemExit("inject failed")
-    print(f"injected autobuilder section into {MAP.relative_to(REPO)}")
+    for marker in (MARKER, MARKER_BURST, MARKER_ASSET, MARKER_CLOSEOUT):
+        if marker not in html:
+            raise SystemExit(f"inject failed: missing {marker}")
+    print(f"injected operator reference sections into {MAP.relative_to(REPO)}")
     return 0
 
 

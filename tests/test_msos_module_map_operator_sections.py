@@ -124,6 +124,17 @@ def test_module_map_autobuilder_section() -> None:
     assert "@ppe-build-worker" in html
 
 
+def test_module_map_operator_reference_sections() -> None:
+    html = _html()
+    assert 'id="burst-mode"' in html
+    assert "BURST_PLAN.json" in html
+    assert 'id="asset-batch"' in html
+    assert "discover_asset_data_source.py" in html
+    assert 'id="closeout-lifecycle"' in html
+    assert "apply_control_closeout_v1" in html
+    assert 'href="#burst-mode"' in html
+
+
 def test_module_map_no_duplicate_operator_h2() -> None:
     html = _html()
     for title in OPERATOR_H2_ORDER:
