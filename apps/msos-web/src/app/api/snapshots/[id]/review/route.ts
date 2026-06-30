@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireProtectedIdentity } from "@/lib/msosIdentity";
 import { isValidReviewStatus, upsertSnapshotReview } from "@/lib/snapshotReview";
+import { appendProductUsageEvent } from "@/lib/webProductUsage";
 
 export const runtime = "nodejs";
 
@@ -57,6 +58,18 @@ export async function POST(request: Request, context: RouteContext) {
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.httpStatus });
+  }
+
+  try {
+    await appendProductUsageEvent({
+      event_name: "review_submit",
+      source: "msos-web",
+      snapshot_id: sid,
+      owner_email: identity.email || undefined,
+      review_status: reviewStatus,
+    });
+  } catch (err) {
+    console.error("usage append failed", err);
   }
 
   return NextResponse.json({ ok: true, review: result.review });

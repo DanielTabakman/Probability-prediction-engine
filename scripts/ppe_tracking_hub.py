@@ -291,6 +291,21 @@ def collect_factory_signals(repo: Path, *, days: int = 7) -> dict[str, Any]:
     }
 
 
+def collect_product_usage(repo: Path, *, days: int = 7) -> dict[str, Any]:
+    from scripts.ppe_product_usage import summarize_usage
+    return summarize_usage(repo, days=days)
+
+
+def format_usage_line(usage: dict[str, Any]) -> str | None:
+    total = int(usage.get("total_events") or 0)
+    if total <= 0 and not usage.get("exists"):
+        return None
+    users = int(usage.get("unique_users") or 0)
+    top = usage.get("top_event")
+    top_s = f" top={top}" if top else ""
+    return f"Product usage: events={total} users={users}{top_s}"
+
+
 def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
     return {
         "generated_at_utc": _utc_now(),
@@ -299,6 +314,7 @@ def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
         "assets": collect_asset_enablement(repo),
         "trader_outcomes": collect_trader_outcomes(repo),
         "factory": collect_factory_signals(repo, days=days),
+        "product_usage": collect_product_usage(repo, days=days),
     }
 
 
@@ -326,6 +342,11 @@ def format_operator_tracking_lines(repo: Path, *, days: int = 7) -> list[str]:
             lines.append(f"Assets: enabled={enabled}/{target}")
         else:
             lines.append(f"Assets: enabled={enabled} registered={assets.get('total_registered', 0)}")
+
+    usage = snap.get("product_usage") or {}
+    usage_line = format_usage_line(usage)
+    if usage_line:
+        lines.append(usage_line)
 
     trader = snap.get("trader_outcomes") or {}
     if trader.get("db_exists"):
@@ -375,6 +396,14 @@ def render_tracking_markdown(snap: dict[str, Any]) -> str:
     for key in ("enabled_count", "total_registered", "target_enabled_count", "gap_to_target"):
         if key in assets and assets[key] is not None:
             lines.append(f"- **{key}:** {assets[key]}")
+    lines.extend(["", "## Product usage", ""])
+    usage = snap.get("product_usage") or {}
+    for key in ("exists", "total_events", "unique_users", "top_event", "path"):
+        if key in usage:
+            lines.append(f"- **{key}:** {usage[key]}")
+    by_event = usage.get("by_event") or {}
+    if by_event:
+        lines.append(f"- **by_event:** {by_event}")
     lines.extend(["", "## Trader outcomes", ""])
     trader = snap.get("trader_outcomes") or {}
     for key in (

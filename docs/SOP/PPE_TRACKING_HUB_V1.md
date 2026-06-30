@@ -19,6 +19,8 @@ Unified tracking for factory throughput, validation sessions, steering drift, as
 | Steering drift | direction JSON vs manifest | On `ppe_tracking_status.cmd` |
 | Asset enablement | `config/assets.yaml` | On status / radar |
 | Trader outcomes | SQLite frozen store | On status (when DB exists) |
+| Product usage (MSOS) | `ppe_product_usage.jsonl` | On `ppe_product_usage.cmd` / status |
+| Cursor billing reconcile | manual JSON + workflow cost | On `ppe_token_reconcile.cmd` |
 | Incident slices | `incident_flag` on slice rows | Auto when roundtrips ≥3 or rework >0 |
 
 ---
@@ -49,14 +51,14 @@ workflow_metrics.cmd summary --days 7 --by-lane --include-validation
 | `ppe_context_window_closeout.py` | `context_closeout` |
 | `ppe_operator_status.py` | Surfaces tracking lines in `OPERATOR_STATUS.md` |
 | `ppe_workflow_radar.py` | Weekly friction from steering / assets / trader backlog |
+| `ppe_product_usage.cmd` | MSOS usage JSONL summary for tracking hub |
+| `ppe_token_reconcile.cmd` | Monthly Cursor USD vs advisory ledger |
 
 ---
 
 ## Not in v1 (parked)
 
-- MSOS web runtime usage telemetry (Q-009) — needs product backend slice
-- Cursor dashboard billing reconcile — still manual monthly per [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](PPE_TOKEN_ECONOMY_MONITOR_V1.md)
-- Google Sheets workflow metrics ledger — optional manual companion to JSONL
+- Google Sheets workflow metrics ledger — optional manual companion to JSONL (see [`WORKFLOW_METRICS_SHEET_SYNC_V1.md`](WORKFLOW_METRICS_SHEET_SYNC_V1.md))
 
 ---
 

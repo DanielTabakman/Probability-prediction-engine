@@ -3,6 +3,7 @@ import "./globals.css";
 
 import { NavigationProgressProvider } from "@/components/NavigationProgressProvider";
 import { PostAuthReturnHandler } from "@/components/PostAuthReturnHandler";
+import { ProductUsageBeacon } from "@/components/ProductUsageBeacon";
 
 export const metadata: Metadata = {
   title: "Market Structure OS",
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         <NavigationProgressProvider>
+          <ProductUsageBeacon />
           <PostAuthReturnHandler />
           {children}
         </NavigationProgressProvider>

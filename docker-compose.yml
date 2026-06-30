@@ -14,6 +14,7 @@ services:
       - PORT=3000
       - PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api:8765/display.json
       - PPE_WEB_FEEDBACK_DIR=/data
+      - PPE_PRODUCT_USAGE_DIR=/data
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
@@ -52,6 +53,7 @@ services:
       - PORT=3001
       - PPE_DISPLAY_API_SERVER_URL=http://ppe_display_api:8765/display.json
       - PPE_WEB_FEEDBACK_DIR=/data/staging
+      - PPE_PRODUCT_USAGE_DIR=/data/staging
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}

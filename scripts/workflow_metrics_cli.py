@@ -370,6 +370,8 @@ def cmd_export_csv(repo: Path) -> int:
     out_dir = _metrics_dir(repo)
     sessions = _read_jsonl(out_dir / SESSIONS_FILE)
     slices = _read_jsonl(out_dir / SLICES_FILE)
+    events = _read_jsonl(out_dir / EVENTS_FILE)
+    context_windows = _read_jsonl(out_dir / CONTEXT_WINDOWS_FILE)
 
     sessions_csv = out_dir / "sessions_export.csv"
     slices_csv = out_dir / "weekly_summary.csv"
@@ -404,6 +406,8 @@ def cmd_export_csv(repo: Path) -> int:
         "api_calls",
         "source",
         "primary_session_id",
+        "slice_kind",
+        "incident_flag",
         "notes",
     ]
     with slices_csv.open("w", encoding="utf-8", newline="") as fh:
@@ -412,8 +416,24 @@ def cmd_export_csv(repo: Path) -> int:
         for row in slices:
             w.writerow({k: row.get(k, "") for k in slice_fields})
 
+    events_csv = out_dir / "events_export.csv"
+    event_fields = ["event_id", "timestamp", "event_type", "session_id", "slice_id", "value_1", "value_2", "note"]
+    with events_csv.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=event_fields, extrasaction="ignore")
+        w.writeheader()
+        for row in events:
+            w.writerow({k: row.get(k, "") for k in event_fields})
+    ctx_csv = out_dir / "context_windows_export.csv"
+    ctx_fields = ["closeout_id", "closed_at", "thread_role", "chapter_id", "whats_next", "slices_closed_in_thread", "operator_verdict", "safe_to_switch_agents", "notes"]
+    with ctx_csv.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=ctx_fields, extrasaction="ignore")
+        w.writeheader()
+        for row in context_windows:
+            w.writerow({k: row.get(k, "") for k in ctx_fields})
     print(f"workflow_metrics: wrote {sessions_csv}")
     print(f"workflow_metrics: wrote {slices_csv}")
+    print(f"workflow_metrics: wrote {events_csv}")
+    print(f"workflow_metrics: wrote {ctx_csv}")
     return 0
 
 
