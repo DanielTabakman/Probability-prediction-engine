@@ -266,6 +266,7 @@
         "tests/test_msos_web_distribution_download.py",
         "tests/test_msos_web_snapshot_review.py",
         "tests/test_msos_web_cross_venue_panel.py",
+        "tests/test_msos_web_forward_consistency_dashboard.py",
         "tests/test_msos_web_product_usage.py",
         "docs/VISION/MSOS/",
         "docs/SOP/MSOS_",

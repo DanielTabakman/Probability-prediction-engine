@@ -59,6 +59,37 @@ Before any relay command on desktop: `python scripts/ppe_loop_host_guard.py --ch
 
 ---
 
+## Operator-facing replies (`what's next?`)
+
+Agents **run** the verdict, then summarize — they do **not** delegate relay work back to the operator.
+
+| Operator does | Agent does |
+|---------------|------------|
+| Ask `what's next?` (or fresh operator thread after closeout) | Read status, burst plan, guard; execute or spawn `@ppe-director` workers |
+| Double-click **`DESKTOP BUILD`** / **`DESKTOP CONTINUE`** when phone ntfy says `IDE_BUILD` (outside agent thread) | `DESKTOP_CONTINUE.cmd`, `@ppe-director`, build/finish workers, gate, commit, mark ready |
+| Nothing else by default | Queue promotion, branch preflight, recovery — without asking |
+
+**Forbidden in operator-thread replies:**
+
+- **"What you should do"** sections listing agent commands as operator steps
+- **Choice questions** at the end (`Want me to start BUILD or finish the branch first?`)
+- Instructing operator to **manually** open IDE BUILD threads when burst can spawn `ppe-build-worker`
+- Long steering paste (PHASE_QUEUE promotion, spine queue) as numbered operator todos — one-line FYI is enough
+
+**VM authoritative:** If VM brief / SSH status disagrees with stale local `OPERATOR_STATUS.md` (common on dirty feature branches), trust VM and advance product — do not ask the operator to reconcile.
+
+**Priority without asking:** `IDE_BUILD` / finish closeout on the relay queue wins over local control-plane patch work. Commit patches when gate-clean; never block product waiting for operator choice.
+
+**Example (good):**
+
+> **Verdict:** `IDE_BUILD` · FCR slice002 (VM SSOT). Burst spawned build worker. **You:** nothing. **Next:** worker ships slice → mark ready → `DESKTOP_CONTINUE`.
+
+**Example (bad — do not send):**
+
+> On this desktop: 1) Open new IDE BUILD thread 2) Run DESKTOP_BUILD… Want me to start FCR or finish operator-status followups first?
+
+---
+
 ## UX agents
 
 | Task | Agent | Thread |
@@ -127,5 +158,8 @@ Built-in Cursor skills (PR babysit, security review) are optional for generic ta
 | Steward + operator + BUILD in one thread | Separate threads per role |
 | Pasting `OPERATOR_STATUS` into charter threads | One-line pointer to operator thread |
 | Re-implementing product when `CLOSEOUT_ONLY` | Finish relay / `DESKTOP_CONTINUE` |
+| "What you should do" + relay cmds as operator steps | Agent auto-execute; operator: nothing / `what's next?` |
+| Choice questions (`Want me to…?`) at end of reply | Decide per verdict; spawn workers; advance product |
+| Stale local status vs VM `IDE_BUILD` — ask operator | Trust VM; `@ppe-director` → build worker |
 | Branch/stash recovery in charter or neutral threads | Operator thread + recovery protocol |
 | Charter reply ending with operator handoff noise | Finish topic; optional one-line operator pointer |

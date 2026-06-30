@@ -4,6 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- feat(msos): forward consistency dashboard (MSOS-FCR-Product-Slice002) (#1027) (`apps/msos-web/`)
+- `68d2e66` — control-plane: tighten PPE thread roles (always-on + ship boundaries) (#1026) (`docs/SOP/`)
+- `00c9230` — fix(control-plane): mode-aware operator commands and relay guards (#1025) (`docs/SOP/`)
+- `27fc967` — ops: loop publish ops/loop-publish-20260630225514-0759af4c (#1024) (`docs/SOP/`)
+- `3d6d7a1` — fix(control-plane): CLOSEOUT_ONLY mode, agent routing, steering SSOT (#1020) (`docs/SOP/`)
+- `4a18380` — PPE-FCR-Core-Slice002: quality flags + dashboard matrix builder (#1018) (`src/engine/`)
+- `18458e1` — control-plane: consolidate desktop/VM handoff docs under canonical scripts SSOT (#1015) (`docs/SOP/`)
+- `da5c321` — Control-plane: dev changelog
 - product(msos-ui): MSOS-HorizonNav-Product-Slice002 cross-module horizon nav (#1014) (`apps/msos-web/`)
 - `3408d98` — ops(local): manifest RUNNING for relay pass (#1012)
 - `99776ef` — ops(local): manifest RUNNING for relay pass (#1013) (`docs/SOP/`)
