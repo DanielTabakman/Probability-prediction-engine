@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `9988847` — Control-plane: dev changelog
 - `09ca8ac` — ops: loop publish ops/loop-publish-20260630082933-5ceb031 (#845)
 - `97bba8c` — ops: loop publish ops/loop-publish-20260630082945-5ceb031 (#846)
 - `f59aefe` — ops: loop publish ops/loop-publish-20260630085340-5ceb031 (#870)
