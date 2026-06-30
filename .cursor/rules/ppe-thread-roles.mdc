@@ -1,6 +1,6 @@
 ---
 description: PPE thread roles — operator vs charter/topic separation. Prevents relay queue from hijacking UX, data, and planning threads.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # PPE thread roles
