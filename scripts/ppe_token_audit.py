@@ -338,7 +338,7 @@ def render_token_audit_markdown(report: TokenAuditReport) -> str:
         "## Fixed overhead",
         "",
         f"- Always-on: {data['always_on_total_chars']} chars (~{data['always_on_est_tokens_per_turn']} tok/turn)",
-        f"- Targets: ≤{ALWAYS_ON_CHAR_TARGET} chars normal · ≤{ALWAYS_ON_CHAR_ESCALATE} escalate",
+        f"- Targets: <={ALWAYS_ON_CHAR_TARGET} chars normal · <={ALWAYS_ON_CHAR_ESCALATE} escalate",
         "",
     ]
     for row in data["always_on_rules"]:
@@ -347,7 +347,7 @@ def render_token_audit_markdown(report: TokenAuditReport) -> str:
     if data["starters"]:
         lines.append(
             f"- {len(data['starters'])} on disk · median {data['starter_line_median']} · max {data['starter_line_max']}"
-            f" (target ≤{STARTER_LINE_TARGET})"
+            f" (target <={STARTER_LINE_TARGET})"
         )
         for row in data["starters"]:
             flag = " **OVER**" if row["over_target"] else ""

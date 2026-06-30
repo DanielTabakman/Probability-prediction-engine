@@ -1,6 +1,6 @@
 ---
 description: Auto-discover and hook up asset data sources when operator asks for a new tradable. Always run discover first; never ask which exchange.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # Asset auto-discovery (mandatory)

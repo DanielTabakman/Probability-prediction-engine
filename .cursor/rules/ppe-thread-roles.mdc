@@ -1,6 +1,6 @@
 ---
 description: PPE thread roles — operator vs charter/topic separation. Prevents relay queue from hijacking UX, data, and planning threads.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # PPE thread roles
@@ -50,6 +50,29 @@ alwaysApply: true
 1. **Charter / explore / ide_build** → **never** read `OPERATOR_STATUS.md`, `BURST_PLAN.json`, or run burst/`@ppe-director` unless the user **explicitly** switches role ("switch to operator", `what's next?`).
 2. **Operator** → follow [`ppe-operator-core.mdc`](ppe-operator-core.mdc) auto-execute path.
 3. **Neutral** → answer the user's task; do **not** lead with relay verdict or `IDE_BUILD` blockers. One-line pointer to operator thread is OK if they asked about queue health.
+
+## Relay disclosure (when offering work)
+
+When proposing to implement, fix, or ship something, state relay impact in **one line** before starting (or when scope shifts from Q&A to implementation):
+
+| Label | Meaning |
+|-------|---------|
+| **Relay: off** | In-thread only — no `OPERATOR_STATUS`, burst, queue advance, `@ppe-director`, or `mark_ide_product_ready`. Default for charter / explore / neutral. Ship = gate → commit → PR when task completes. |
+| **Relay: on** | Current IDE_BUILD slice or operator verdict path — may read status, mark ready, `DESKTOP_CONTINUE`, spawn build/finish workers. Default for operator / ide_build. |
+| **Relay: parked** | Design, spec, or review here; execution belongs in operator thread (`what's next?`) or a dedicated `IDE_BUILD_STARTER_*.md`. |
+| **Relay: conflict** | Can implement here, but branch or dirty tree may block ship without operator recovery — say what is blocked. |
+
+**When required:** first offer of scoped work (`I can add…`, `I can fix…`), or when two valid paths exist (relay queue vs self-contained).
+
+**Skip when obvious:** pure Q&A, operator thread already running `what's next?` (implicit **Relay: on**), or read-only explore with no implementation offer.
+
+**Example (good):**
+
+> **Relay: off** — I'll add the feedback form in this thread; no queue advance. Ship via gate → PR when done.
+
+**Example (good):**
+
+> **Relay: on** — this is slice002 from the current starter; I'll gate, commit, and mark ready when complete.
 
 ## Response shape (charter / explore / neutral)
 
