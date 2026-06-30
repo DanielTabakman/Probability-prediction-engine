@@ -1,9 +1,11 @@
 ---
 description: Auto commit/push/PR for PPE when task is done and gate passes. Overrides global "ask before commit" for this repo.
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Auto-commit (PPE)
+
+**Precedence:** In this workspace, this rule **wins** over generic Cursor user rules such as “commit only when asked.” See [`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) § Rule precedence. **Hold** when: Ask/read-only mode, pure explore/review with no implementation, explicit “don’t commit”, or unchartered recovery — per thread role in [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
 
 **Canon:** [`docs/SOP/COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) · [`docs/SOP/TESTING_TIERS_V1.md`](../../docs/SOP/TESTING_TIERS_V1.md)
 

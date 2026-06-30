@@ -67,6 +67,16 @@ alwaysApply: false
 - **Charter / design** → backlog, philosophy, acceptance — `@ppe-ux-charter` (no relay)
 - **Execute UX backlog through relay** → **operator thread** + `@ppe-ux-director` (relay may override backlog order)
 
+## Commit behavior (with [`auto-commit.mdc`](auto-commit.mdc))
+
+| Role | Ship when task done? |
+|------|----------------------|
+| **operator** / **ide_build** | Yes — gate → commit → push → PR per [`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) |
+| **neutral** | Yes **if** user requested implementation and work is complete; hold for Q&A-only threads |
+| **charter** / **explore** | Hold for planning/review-only; ship when user chartered doc/code work and it is complete |
+
+Ask/read-only mode overrides all rows — no commits regardless of role.
+
 ## Closeout
 
 - **Operator thread** closeout → next thread: `what's next?` (operator role)

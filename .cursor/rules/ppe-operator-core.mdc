@@ -40,4 +40,4 @@ Also skip when thread role is charter / explore / neutral (see thread-roles). Sk
 
 - New thread per slice; starter file only — no log/diff paste.
 - After closeout: new thread + continuity brief only.
-- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`auto-commit.mdc`](auto-commit.mdc), [`product-direction.mdc`](product-direction.mdc).
+- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Auto-commit: always-on [`auto-commit.mdc`](auto-commit.mdc).

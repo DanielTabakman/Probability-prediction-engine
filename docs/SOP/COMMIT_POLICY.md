@@ -90,11 +90,21 @@ Example: `MSOS-PublicLaunchV1-Platform-Slice002: Caddy route stub (platform-plan
 
 **Never** force-push, `git commit --amend`, or change git config unless the user explicitly asks.
 
-## Cursor and global user rules
+## Rule precedence (agents)
 
-**Precedence:** For this workspace, [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc) overrides generic Cursor user rules such as “commit only when asked.”
+Resolve conflicts in this order (top wins for this repo):
 
-Optional: paste [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into **Cursor Settings → User Rules** so global rules do not block auto-commit here.
+| Priority | Source | Commit behavior |
+|----------|--------|-----------------|
+| 1 | **Ask / read-only mode** | No writes — guidance only |
+| 2 | User says **“don’t commit”** (this thread) | Hold until released |
+| 3 | **[`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)** (`alwaysApply: true`) | Auto-ship when task complete + gate passes |
+| 4 | **Thread role** ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)) | Operator / ide_build / neutral with implementation → ship; charter / explore with **no** implementation → hold |
+| 5 | Generic Cursor **user rule** (“commit only when asked”) | Applies to **other repos only** — must not block rows 3–4 here |
+
+**Do not** ask “may I commit?” or “may I push?” when priority 3 applies and none of 1–2 block.
+
+**Global user rules:** If agents still hesitate, paste [`.cursor/USER_RULES_GIT_SNIPPET.md`](../../.cursor/USER_RULES_GIT_SNIPPET.md) into **Cursor Settings → User Rules** (replace or augment the generic “commit only when asked” block with the PPE exception).
 
 ## Related docs
 
