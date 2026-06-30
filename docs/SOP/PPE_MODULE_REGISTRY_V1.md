@@ -142,6 +142,22 @@ Update at every module SELECTION / closeout. **Advance?** = steward yes/no for n
 
 ---
 
+## Research pipeline — collect, test, trade (later)
+
+**Canon:** [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) · **Visual:** [`assets/msos_module_map.html`](assets/msos_module_map.html) § Research pipeline
+
+| Layer | Role | PPE today |
+|-------|------|-----------|
+| **Collector** | `scripts/collect_*.py` → `artifacts/` with a fixed archive contract | cross-venue, horizon surface, distribution stats |
+| **Test** | `scripts/run_*` reads **matching** archives → report MD/JSON | cross-venue scan + backtest |
+| **Strategy** | Consumes test reports → trade rules | **Deferred** — no autotrader |
+
+**Reference pair:** `cross_venue_event_gap` collector + `cross_venue_scan` / `cross_venue_backtest` tests ([`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md)).
+
+New collectors require an **archive charter** (why · what · cadence · consumers). New tests must declare which archive contract they read.
+
+---
+
 ## Data sources → processing → outputs (summary)
 
 Detail in [`assets/msos_module_map.html`](assets/msos_module_map.html).
@@ -260,6 +276,7 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 | [`OPTIONS_HORIZON_PROGRAM_V1.md`](OPTIONS_HORIZON_PROGRAM_V1.md) | PROJECTION module program |
 | [`FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md`](FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md) | CONSISTENCY module program |
 | [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md) | EVENT_GAP ops program |
+| [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) | Collect → test → strategy layers + registries |
 | [`EXPOSURE_MENU_PROGRAM_V1.md`](EXPOSURE_MENU_PROGRAM_V1.md) | EXPOSURE_PATH module program |
 
 ---
@@ -268,6 +285,7 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 
 | Date | Change |
 |------|--------|
+| 2026-06-30 | Research pipeline v1 — collectors / tests / strategies split; HTML map section |
 | 2026-06-30 | Steward sync — exposure_menu LIVE; workflow post-mortem on main |
 | 2026-06-29 | `exposure_menu` row — EXPOSURE_PATH class, CHARTERED v0 |
 | 2026-06-29 | v1 draft — pillars, tiers, archive charter, registry table, HTML map |

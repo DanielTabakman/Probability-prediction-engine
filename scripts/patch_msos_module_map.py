@@ -11,6 +11,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 MAP = REPO / "docs" / "SOP" / "assets" / "msos_module_map.html"
 
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
 MARKER_RIGHT_NOW = 'id="map-right-now"'
 MARKER_GATHER_CARD = 'class="gather"'
 
@@ -278,8 +281,10 @@ def main() -> None:
     html = _inject_card_css(html)
 
     from scripts.msos_map_autobuilder_section import inject as inject_autobuilder_section
+    from scripts.msos_map_research_pipeline_section import inject as inject_research_pipeline_section
 
     html = inject_autobuilder_section(html)
+    html = inject_research_pipeline_section(html)
 
     if MARKER_RIGHT_NOW not in html:
         header_match = re.search(
@@ -321,6 +326,7 @@ def main() -> None:
         "<code>tests/test_msos_module_map_operator_sections.py</code>\n"
         "      · Sync: <code>python scripts/ppe_operator_compass.py --sync-map</code>\n"
         "      · Cards patch: <code>python scripts/patch_msos_module_map.py</code>\n"
+        "      · Research pipeline: <code>python scripts/msos_map_research_pipeline_section.py</code>\n"
         "      · noindex\n"
         "    </footer>",
         html,

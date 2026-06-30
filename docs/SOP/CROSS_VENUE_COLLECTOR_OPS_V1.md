@@ -77,3 +77,5 @@ ssh ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engin
 ## Relay note
 
 Cross-venue **relay chapters** are COMPLETE and `sideChannel: true` in the queue. This ops doc covers **headless data + screening** only — not auto-trade.
+
+**Architecture:** collectors vs tests vs strategies — [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) · [HTML map § Research pipeline](assets/msos_module_map.html#research-pipeline)

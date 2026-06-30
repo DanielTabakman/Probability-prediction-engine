@@ -124,6 +124,18 @@ def test_module_map_autobuilder_section() -> None:
     assert "@ppe-build-worker" in html
 
 
+def test_module_map_research_pipeline_section() -> None:
+    html = _html()
+    assert 'id="research-pipeline"' in html
+    assert "Research pipeline — collect, test, trade (later)" in html
+    assert "RESEARCH_PIPELINE_V1.md" in html
+    assert 'href="#research-pipeline"' in html
+    assert "cross_venue_event_gap" in html
+    assert "Collector ↔ test matrix" in html
+    assert "collect_cross_venue_snapshot" in html
+    assert "run_cross_venue_backtest" in html
+
+
 def test_module_map_no_duplicate_operator_h2() -> None:
     html = _html()
     for title in OPERATOR_H2_ORDER:
