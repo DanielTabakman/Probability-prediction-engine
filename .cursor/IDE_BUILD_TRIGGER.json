@@ -1,11 +1,6 @@
 {
   "version": 1,
   "status": "idle",
-<<<<<<< HEAD
-  "clearedAt": "2026-06-30T18:57:48Z",
+  "clearedAt": "2026-06-30T18:54:27Z",
   "lastCompletedSlice": "MSOS-RevLoop-Product-Slice002"
-=======
-  "clearedAt": "2026-06-30T17:35:50Z",
-  "lastCompletedSlice": "MSOS-DistDl-Product-Slice002"
->>>>>>> 1fb5cb205045dcc9ba51faaa5ac94d1d8983154a
 }
