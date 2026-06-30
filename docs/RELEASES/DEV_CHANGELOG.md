@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `ed22eb9` — ops: loop publish ops/loop-publish-20260630202151-fcff4a17 (#1001)
+- `6ef2ba1` — ux(msos-web): simplify Command Center into module launchpad (#998) (`apps/msos-web/`)
+- `6ccb816` — Control-plane: dev changelog
 - `d2d3eb8` — ops: loop publish ops/loop-publish-20260630191149-acae2b6b (#988)
 - `1c52fec` — ops: loop publish ops/loop-publish-20260630191156-acae2b6b (#989) (`docs/SOP/`)
 - `128c960` — control-plane: unified PPE tracking hub v1 (#999) (`scripts/`)
