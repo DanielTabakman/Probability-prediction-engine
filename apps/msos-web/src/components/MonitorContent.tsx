@@ -6,7 +6,7 @@ import { MonitorWatchList } from "@/components/MonitorWatchList";
 import { MonitorWelcomeCard } from "@/components/MonitorWelcomeCard";
 import { MonitorEmptyState } from "@/components/MonitorEmptyState";
 import { loadCommandCenterSummary } from "@/lib/commandCenterSummary";
-import type { MonitorFeed } from "@/lib/monitorHistoryFeed";
+import type { MonitorFeed, MonitorWatchPanel } from "@/lib/monitorHistoryFeed";
 import { resolveWorkflowOwnerId } from "@/lib/msosWorkflowOwner";
 import { DEMO_FOOTER, friendlySnapshotFeedMessage } from "@/lib/publicCopy";
 import { reviewTagForStatus } from "@/lib/snapshotReview";

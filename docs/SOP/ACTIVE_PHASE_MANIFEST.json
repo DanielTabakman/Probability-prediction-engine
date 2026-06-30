@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
   "status": "READY",
-  "notes": "steward SELECTION 2026-06-29 \u2014 exposure menu v0 approved (NVDA + BTC); BL density deferred",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [P0 SPINE] MSOS snapshot post-mortem review loop",
   "workerMode": "local-agent"
 }

@@ -4,7 +4,7 @@
 
 **Status:** Living draft — improve as we go.
 
-**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser)
+**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser — top panels auto-sync via `ppe_operator_compass.py`)
 
 **As-of:** 2026-06-29
 

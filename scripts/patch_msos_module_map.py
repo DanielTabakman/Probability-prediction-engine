@@ -315,7 +315,8 @@ def main() -> None:
         "      Open locally: <code>docs/SOP/assets/msos_module_map.html</code>\n"
         "      · <code>git pull</code> then refresh · Gate: "
         "<code>tests/test_msos_module_map_operator_sections.py</code>\n"
-        "      · Patch: <code>python scripts/patch_msos_module_map.py</code>\n"
+        "      · Sync: <code>python scripts/ppe_operator_compass.py --sync-map</code>\n"
+        "      · Cards patch: <code>python scripts/patch_msos_module_map.py</code>\n"
         "      · noindex\n"
         "    </footer>",
         html,

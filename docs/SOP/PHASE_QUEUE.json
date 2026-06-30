@@ -446,18 +446,19 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
       "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
       "urgent": true,
       "urgentReason": "Operator approved exposure menu over BL density smoothing",
       "focusPlaybookTier": "P1",
-      "workerMode": "local-agent"
+      "workerMode": "local-agent",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[P0 SPINE] MSOS snapshot post-mortem \u2014 close save\u2192review loop in shell",
+      "status": "READY",
+      "reason": "[P0 SPINE] MSOS snapshot post-mortem review loop",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
       "focusPlaybookTier": "P1",
       "workerMode": "local-agent",
@@ -473,7 +474,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[P2 SPINE] Cross-venue gap panel in MSOS Strategy Lab embed",
+      "reason": "[P2 SPINE] Cross-venue MSOS embed panel",
       "selectionPrep": "docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md",
       "sideChannel": true,
       "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
@@ -481,7 +482,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[P2 SPINE] VM daily distribution stats collector + retention ops",
+      "reason": "[P2 SPINE] VM distribution stats collector",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
       "sideChannel": true,
       "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
@@ -513,7 +514,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu v0",
+      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu + wave 1",
       "selectionPrep": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
