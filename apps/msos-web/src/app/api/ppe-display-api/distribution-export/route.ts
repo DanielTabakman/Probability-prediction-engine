@@ -5,6 +5,7 @@ import {
   LAB_ASSET_QUERY_PARAM,
   normalizeAssetId,
 } from "@/lib/distributionExportUpstream";
+import { appendProductUsageEvent } from "@/lib/webProductUsage";
 
 export const runtime = "nodejs";
 
@@ -27,6 +28,16 @@ export async function GET(request: NextRequest) {
     }
     const csv = await upstreamResponse.text();
     const slug = asset.toLowerCase();
+    try {
+      await appendProductUsageEvent({
+        event_name: "distribution_export",
+        source: "msos-web",
+        asset_id: asset,
+        path: request.nextUrl.pathname,
+      });
+    } catch (err) {
+      console.error("usage append failed", err);
+    }
     return new NextResponse(csv, {
       status: 200,
       headers: {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { appendWebFeedback } from "@/lib/webFeedback";
+import { appendProductUsageEvent } from "@/lib/webProductUsage";
 
 export const runtime = "nodejs";
 
@@ -63,6 +64,17 @@ export async function POST(request: Request) {
       reality_check_row: asTrimmed(body?.reality_check_row, 500),
       session_started_at: asTrimmed(body?.session_started_at, 40),
     });
+
+    try {
+      await appendProductUsageEvent({
+        event_name: "feedback_submit",
+        source: asTrimmed(body?.source, 80) || "operator_session_notebook",
+        path: "/api/feedback",
+        review_status: confusion,
+      });
+    } catch (err) {
+      console.error("usage append failed", err);
+    }
 
     return NextResponse.json({ ok: true, id: record.id });
   } catch (err) {
