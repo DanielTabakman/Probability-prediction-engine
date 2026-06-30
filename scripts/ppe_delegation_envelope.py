@@ -20,6 +20,7 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 ENVELOPE_REL = "docs/SOP/DELEGATION_ENVELOPE_V1.json"
+AUTO_NOTIFY_LOG_REL = "artifacts/control_plane/DELEGATION_AUTO_NOTIFY.jsonl"
 TIER_RANK = {"auto": 0, "auto_notify": 1, "steward_packet": 2, "human_only": 3}
 
 
@@ -102,6 +103,62 @@ def _max_tier(a: str, b: str) -> str:
     return a if TIER_RANK.get(a, 0) >= TIER_RANK.get(b, 0) else b
 
 
+def _top_level_json_keys_changed(repo: Path, path: str) -> set[str] | None:
+    """Top-level keys whose values differ vs HEAD. None when JSON cannot be compared."""
+    norm = _norm(path)
+    full = repo / norm
+    new_data: dict[str, Any] | None = None
+    old_data: dict[str, Any] | None = None
+    if full.is_file():
+        try:
+            raw = json.loads(full.read_text(encoding="utf-8-sig"))
+            new_data = raw if isinstance(raw, dict) else {}
+        except (json.JSONDecodeError, OSError):
+            return None
+    head = subprocess.run(
+        ["git", "show", f"HEAD:{norm}"],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if head.returncode == 0 and (head.stdout or "").strip():
+        try:
+            raw = json.loads(head.stdout)
+            old_data = raw if isinstance(raw, dict) else {}
+        except json.JSONDecodeError:
+            return None
+    elif not full.is_file():
+        return set()
+    else:
+        old_data = {}
+    if new_data is None:
+        return None
+    changed: set[str] = set()
+    for key in set(old_data.keys()) | set(new_data.keys()):
+        if old_data.get(key) != new_data.get(key):
+            changed.add(key)
+    return changed
+
+
+def _tier_for_matched_rule(repo: Path, path: str, rule: dict[str, Any]) -> tuple[str, str]:
+    base_tier = str(rule.get("tier") or "auto")
+    reason = str(rule.get("reason") or rule.get("id") or base_tier)
+    sensitive = rule.get("jsonFieldsHumanOnly") or rule.get("jsonFields") or []
+    if not sensitive:
+        return base_tier, reason
+    changed = _top_level_json_keys_changed(repo, path)
+    if changed is None:
+        return _max_tier(base_tier, "steward_packet"), "JSON diff unclear — operator review"
+    hit = changed & {str(k) for k in sensitive}
+    if hit:
+        fields = ", ".join(sorted(hit))
+        return "human_only", f"operator fields changed ({fields})"
+    if changed:
+        return "auto", "steering sync only (delegated)"
+    return base_tier, reason
+
+
 def classify_paths(
     repo: Path,
     paths: list[str],
@@ -128,13 +185,12 @@ def classify_paths(
         matched_reason = "default product/control delegation"
         for rule in rules:
             if _match_rule(path, rule):
-                rt = str(rule.get("tier") or "auto")
+                rt, matched_reason = _tier_for_matched_rule(repo, path, rule)
                 if rank_map.get(rt, 0) >= rank_map.get(tier, 0):
                     tier = rt
-                    matched_reason = str(rule.get("reason") or rule.get("id") or rt)
         path_tiers[path] = tier
         worst = _max_tier(worst, tier)
-        if tier != "auto":
+        if tier not in ("auto",):
             reasons.append(f"{path}: {matched_reason}")
 
     for esc in env.get("escalators") or []:
@@ -198,6 +254,74 @@ def current_branch(repo: Path) -> str:
         check=False,
     )
     return (out.stdout or "").strip()
+
+
+def auto_notify_log_path(repo: Path) -> Path:
+    return repo.resolve() / AUTO_NOTIFY_LOG_REL
+
+
+def record_auto_notify(
+    repo: Path,
+    verdict: DelegationVerdict,
+    paths: list[str],
+    *,
+    branch: str = "",
+) -> Path | None:
+    """Append auto_notify shipment to digest log (gitignored artifact)."""
+    if verdict.tier != "auto_notify":
+        return None
+    from datetime import datetime, timezone
+
+    row = {
+        "at_utc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "tier": verdict.tier,
+        "branch": branch or current_branch(repo),
+        "file_count": len(paths),
+        "sample_paths": paths[:5],
+        "reasons": verdict.reasons[:3],
+    }
+    out = auto_notify_log_path(repo)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with out.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(row, sort_keys=True) + "\n")
+    return out
+
+
+def load_auto_notify_snippet(repo: Path, *, max_rows: int = 5) -> list[str]:
+    """Recent auto_notify lines for weekly digest."""
+    p = auto_notify_log_path(repo)
+    if not p.is_file():
+        return []
+    try:
+        rows = [json.loads(ln) for ln in p.read_text(encoding="utf-8").splitlines() if ln.strip()]
+    except json.JSONDecodeError:
+        return []
+    lines: list[str] = []
+    for row in rows[-max_rows:]:
+        if not isinstance(row, dict):
+            continue
+        n = row.get("file_count", "?")
+        br = row.get("branch") or "?"
+        at = str(row.get("at_utc") or "")[:10]
+        lines.append(f"- [{at}] auto_notify ship ({n} files, branch {br})")
+    return lines
+
+
+def operator_delegation_hint(repo: Path) -> str | None:
+    """One-line hint for OPERATOR_STATUS when dirty tree triggers delegation tier."""
+    paths = git_changed_paths(repo)
+    if not paths:
+        return None
+    verdict = classify_paths(repo, paths, branch=current_branch(repo))
+    if verdict.tier == "human_only":
+        detail = verdict.reasons[0] if verdict.reasons else "human_only path"
+        return f"Delegation human_only: {detail}"
+    if verdict.tier == "steward_packet":
+        detail = verdict.reasons[0] if verdict.reasons else "steward_packet"
+        return f"Delegation steward_packet: {detail}"
+    if verdict.tier == "auto_notify":
+        return "Delegation auto_notify: large/deploy diff — see weekly digest"
+    return None
 
 
 def gate_check(repo: Path, paths: list[str], *, pass_type: str = "") -> int:

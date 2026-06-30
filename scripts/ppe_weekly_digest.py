@@ -454,6 +454,16 @@ def cmd_write_notify_payload(repo: Path) -> int:
             summary["phone_body"] = f"{body}\n\n" + "\n".join(snippet) if body else "\n".join(snippet)
     except ImportError:
         pass
+    try:
+        from scripts.ppe_delegation_envelope import load_auto_notify_snippet
+
+        auto_lines = load_auto_notify_snippet(repo)
+        if auto_lines:
+            summary["delegation_auto_notify"] = auto_lines
+            body = str(summary.get("phone_body") or "").strip()
+            summary["phone_body"] = f"{body}\n\n" + "\n".join(auto_lines) if body else "\n".join(auto_lines)
+    except ImportError:
+        pass
     out = notify_payload_path(repo)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")

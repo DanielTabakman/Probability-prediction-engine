@@ -36,10 +36,10 @@
     },
     {
       "id": "product_direction_pivot",
-      "tier": "human_only",
+      "tier": "auto",
       "exact": ["docs/SOP/ACTIVE_PRODUCT_DIRECTION.json"],
-      "jsonFields": ["pivotId", "northStar", "primaryFocus", "currentStage"],
-      "reason": "Product direction pivot — operator intent required"
+      "jsonFieldsHumanOnly": ["pivotId", "northStar", "primaryFocus", "currentStage"],
+      "reason": "Product direction pivot fields require operator intent"
     },
     {
       "id": "ppe_master_canon",
