@@ -5,7 +5,7 @@ import {
   fetchDisplayPayloadFromUrl,
   type LabAssetId,
 } from "@/lib/ppeDisplayPayload";
-import { strategyLabForcedTourHref } from "@/lib/platformTutorial";
+import { PLATFORM_TOUR_DEFAULT_ASSET, strategyLabForcedTourHref } from "@/lib/platformTutorial";
 
 type PrefetchRouter = {
   prefetch: (href: string) => void;
@@ -25,7 +25,7 @@ export async function warmStrategyLabData(assetId: LabAssetId = DEFAULT_LAB_ASSE
 export function warmStrategyLabEntry(
   router?: PrefetchRouter,
   tourHref: string = strategyLabForcedTourHref(),
-  assetId: LabAssetId = DEFAULT_LAB_ASSET_ID,
+  assetId: LabAssetId = PLATFORM_TOUR_DEFAULT_ASSET,
 ): void {
   router?.prefetch(tourHref);
 

@@ -54,6 +54,9 @@ def test_platform_tutorial_wiring() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "platformTutorial.ts").read_text(encoding="utf-8")
     assert "lab-asset" in lib
     assert "BTC or ETH" in lib
+    assert "PLATFORM_TOUR_DEFAULT_ASSET" in lib
+    assert "LAB_ASSET_QUERY_PARAM" in lib
+    assert "asset=BTC" in lib or "PLATFORM_TOUR_DEFAULT_ASSET" in lib
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell

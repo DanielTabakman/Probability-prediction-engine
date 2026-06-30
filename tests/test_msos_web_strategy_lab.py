@@ -282,12 +282,15 @@ def test_session_lab_asset_resolution() -> None:
     workflow = (MSOS_WEB / "src" / "lib" / "strategyLabWorkflow.ts").read_text(encoding="utf-8")
 
     assert "resolveLabAssetId" in asset_lib
+    assert "resolveTourLabAssetId" in asset_lib
     assert "loadStoredLabAssetId" in asset_lib
     assert 'ABSOLUTE_FALLBACK_ASSET_ID = SYSTEM_DEFAULT_ASSET_ID' in asset_lib
     assert 'SYSTEM_DEFAULT_ASSET_ID = "ETH"' in payload_lib
     assert "thesisAssetId" in asset_lib
     assert "useResolvedLabAssetId" in hook
     assert "resolveLabAssetId" in shell
+    assert "clientReady" in shell
+    assert "resolveTourLabAssetId" in shell
     assert "DEFAULT_LAB_ASSET_ID" not in workflow
     assert (
         "buildWorkflowStepHref(step, assetId)" in workflow
