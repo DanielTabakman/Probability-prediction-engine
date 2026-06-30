@@ -363,7 +363,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
-      "status": "pending",
+      "status": "done",
       "reason": "[P2 SPINE] Cross-venue MSOS embed panel",
       "selectionPrep": "docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md"
     },

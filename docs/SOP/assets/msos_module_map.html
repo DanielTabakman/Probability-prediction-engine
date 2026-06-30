@@ -476,8 +476,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-30T17:41:06Z">
-        Last updated: 2026-06-30 <time datetime="2026-06-30T17:41:06Z">13:41 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-30T20:54:00Z">
+        Last updated: 2026-06-30 <time datetime="2026-06-30T20:54:00Z">16:54 EDT</time>
       </span>
     </p>
 
@@ -517,8 +517,8 @@
     <div class="op-section todo-panel" id="map-do-now">
       <ol>
         <li>
-          <strong>Finish chapter closeout — msos_strategy_lab_dist_download_v1 (MSOS Strategy Lab distribution CSV download)</strong>
-          <span class="why">IDE product marker present — finish chapter with run_ppe_local · docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json · DESKTOP_CONTINUE.cmd <em class="compass-src">(operator_status)</em></span>
+          <strong>Finish chapter closeout — msos_trader_review_loop_v1 (MSOS snapshot post-mortem review loop)</strong>
+          <span class="why">IDE product marker present — finish chapter with run_ppe_local · docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json · DESKTOP_CONTINUE.cmd <em class="compass-src">(operator_status)</em></span>
         </li>
         <li>
           <strong>Asset batch — ppe_equity_universe_tier1a_v1</strong>
@@ -532,12 +532,28 @@
     <div class="op-section crack-panel" id="map-crack-catcher">
       <ul>
         <li>
-          <strong>Horizon replay scrubber</strong>
-          <span class="why">1 / 30 daily surface snapshots · promote when archive_meta.replay_ready <em class="compass-src">(horizon_surface_archive)</em></span>
+          <strong>Stale collector — Cross-venue PM ↔ Deribit options</strong>
+          <span class="why">last snapshot never · check VM scheduled task <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
         </li>
         <li>
           <strong>Cross-venue backtest scoring</strong>
-          <span class="why">0 / 14 daily PM ↔ Deribit snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(cross_venue_snapshots)</em></span>
+          <span class="why">0 / 14 daily snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
+        </li>
+        <li>
+          <strong>Stale collector — Options Horizon surface</strong>
+          <span class="why">last snapshot 2026-06-28T02:02:03Z · check VM scheduled task <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
+        </li>
+        <li>
+          <strong>Horizon replay scrubber</strong>
+          <span class="why">1 / 30 daily snapshots · promote when archive_meta.replay_ready <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
+        </li>
+        <li>
+          <strong>Stale collector — BTC distribution stats</strong>
+          <span class="why">last snapshot never · check VM scheduled task <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
+        </li>
+        <li>
+          <strong>Distribution timeseries archive</strong>
+          <span class="why">0 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
         </li>
         <li>
           <strong>Product lane automation</strong>
@@ -610,9 +626,9 @@
           <tr>
             <td>6</td>
             <td><strong>Exposure menu</strong><br><code>exposure_menu</code></td>
-            <td>—→T2</td>
-            <td><span class="status-partial">SELECTED</span></td>
-            <td>**yes** — v0 BUILD active</td>
+            <td>T2→T2</td>
+            <td><span class="status-live">LIVE</span></td>
+            <td>T4: save path to workflow</td>
           </tr>
         </tbody>
       </table>
@@ -624,16 +640,7 @@
     </p>
     <div class="op-section time-panel" id="map-waiting-on-time">
       <h3>Needs more days of snapshots</h3>
-      <ul>
-        <li>
-          <strong>Horizon replay scrubber</strong>
-          <span class="why">1 / 30 daily surface snapshots · promote when archive_meta.replay_ready <em class="compass-src">(horizon_surface_archive)</em></span>
-        </li>
-        <li>
-          <strong>Cross-venue backtest scoring</strong>
-          <span class="why">0 / 14 daily PM ↔ Deribit snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(cross_venue_snapshots)</em></span>
-        </li>
-      </ul>
+      <p class="flow-intro compass-empty">No archive-depth gates active.</p>
     </div>
 
     <h2>Recently shipped</h2>
