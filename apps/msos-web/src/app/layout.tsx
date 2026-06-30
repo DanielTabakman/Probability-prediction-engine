@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { NavigationProgressProvider } from "@/components/NavigationProgressProvider";
 import { PostAuthReturnHandler } from "@/components/PostAuthReturnHandler";
 
 export const metadata: Metadata = {
@@ -16,8 +17,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <PostAuthReturnHandler />
-        {children}
+        <NavigationProgressProvider>
+          <PostAuthReturnHandler />
+          {children}
+        </NavigationProgressProvider>
       </body>
     </html>
   );
