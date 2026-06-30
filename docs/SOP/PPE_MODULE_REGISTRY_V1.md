@@ -6,7 +6,7 @@
 
 **Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser — top panels auto-sync via `ppe_operator_compass.py`)
 
-**As-of:** 2026-06-29
+**As-of:** 2026-06-30
 
 **Controlling context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) · [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md)
 
@@ -133,8 +133,8 @@ Update at every module SELECTION / closeout. **Advance?** = steward yes/no for n
 | 3 | `forward_consistency` | Forward consistency | CONSISTENCY | EDGE + LEGIBILITY | OPERATOR | `/forward-consistency` (planned) | `/ppe-display-api/forward-consistency.json` | T1→T3 | P2 | **PARTIAL** · **SELECTED** ch.1–2 | **yes** — radar T1–T2 queued |
 | 4 | `expression_planner` | Expression planner | EXPOSURE | EDGE + WORKFLOW | TRADER | `/strategy-lab/expression` | strategy suggestion boundary | T2→T3 | P1 | **LIVE** | exposure optimization depth |
 | 5 | `cross_venue_event_gap` | Cross-venue scan | EVENT_GAP | EDGE | RESEARCH | `artifacts/cross_venue_reports/` | scan JSON | T3→T3 | side | **LIVE** (ops) | backtest when history deep |
-| 6 | `exposure_menu` | Exposure menu | EXPOSURE_PATH | WORKFLOW + LEGIBILITY | TRADER | `/exposure` | `/ppe-display-api/exposure-menu.json` | —→T2 | P1 | **SELECTED** | **yes** — v0 BUILD active |
-| — | *workflow* | Thesis / confirm / monitor | — | WORKFLOW | TRADER | P3–P7 routes | MSOS workflow store | — | P0 | **LIVE** | asset parity, return loop |
+| 6 | `exposure_menu` | Exposure menu | EXPOSURE_PATH | WORKFLOW + LEGIBILITY | TRADER | `/exposure` | `/ppe-display-api/exposure-menu.json` | T2→T2 | P1 | **LIVE** | T4: save path to workflow |
+| — | *workflow* | Thesis / confirm / monitor | — | WORKFLOW | TRADER | P3–P7 routes | MSOS workflow store | T2→T4 | P0 | **LIVE** | MSOS post-mortem write (#590); horizon_nav deep links next |
 
 \*Horizon replay chapters are T3+ under same module program.
 
@@ -268,5 +268,6 @@ Evidence COMPLETE → update this table + [`msos_module_map.html`](assets/msos_m
 
 | Date | Change |
 |------|--------|
+| 2026-06-30 | Steward sync — exposure_menu LIVE; workflow post-mortem on main |
 | 2026-06-29 | `exposure_menu` row — EXPOSURE_PATH class, CHARTERED v0 |
 | 2026-06-29 | v1 draft — pillars, tiers, archive charter, registry table, HTML map |

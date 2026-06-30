@@ -1,7 +1,7 @@
 {
   "version": 1,
   "pivotId": "trader-workflow-integration-v1",
-  "asOf": "2026-06-29",
+  "asOf": "2026-06-30",
   "northStar": "See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.",
   "primaryFocus": "Trader workflow integration — MSOS used as part of the trading process, not a one-off demo",
   "currentStage": "trader_workflow_integration",
@@ -90,12 +90,19 @@
       "status": "COMPLETE",
       "closedOn": "2026-06-28",
       "evidence": "docs/SOP/MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md"
+    },
+    {
+      "id": "ppe_exposure_menu_v1",
+      "label": "PPE exposure menu v1",
+      "status": "COMPLETE",
+      "closedOn": "2026-06-29",
+      "evidence": "docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md"
     }
   ],
   "activeBuildChapterId": "",
   "activeBuildPlanPath": "",
   "activeBuildSprint": "",
-  "nextStewardAction": "BUILD: ppe_exposure_menu_v1 READY (operator priority). Then Trader Learning Spine queue: msos_trader_review_loop_v1 → dist_download → cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.",
+  "nextStewardAction": "Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY). Spine relay: let VM finish msos_trader_review_loop_v1 closeout only (product on main — do not re-BUILD RevLoop or DistDl). Then spine queue: cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.",
   "deprecatedApproaches": [
     "friends-first / friends-and-family cohort gating before demo ships",
     "trader workflow research as BUILD blocker (research informs; does not block relay)",
@@ -171,7 +178,12 @@
     {
       "id": "trader_learning_spine_v1",
       "doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "role": "ACTIVE — P0 spine: msos_trader_review_loop_v1 chartered; dist download + cross-venue + dist timeseries queued"
+      "role": "ACTIVE — RevLoop + DistDl product on main; VM closeout in flight. Next UX BUILD: horizon_nav (#3 in UX_EXECUTION_BACKLOG_V1.md)"
+    },
+    {
+      "id": "ux_execution_backlog_v1",
+      "doc": "docs/SOP/UX_EXECUTION_BACKLOG_V1.md",
+      "role": "ACTIVE — prioritized UX/workflow BUILD map; relay queue wins over backlog order"
     },
     {
       "id": "cross_venue_arb_v1",

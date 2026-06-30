@@ -12,12 +12,12 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
 | Field | Value |
 |-------|--------|
-| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-29) |
+| **Direction pivot** | `trader-workflow-integration-v1` (2026-06-30) |
 | **Primary focus** | Trader workflow integration — MSOS used as part of the trading process, not a one-off demo |
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | BUILD: ppe_exposure_menu_v1 READY (operator priority). Then Trader Learning Spine queue: msos_trader_review_loop_v1 → dist_download → cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. |
+| **Next** | Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY). Spine relay: let VM finish msos_trader_review_loop_v1 closeout only (product on main — do not re-BUILD RevLoop or DistDl). Then spine queue: cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
