@@ -18,7 +18,19 @@
 | **ide_build** | `IDE BUILD thread` + `@IDE_BUILD_STARTER_*.md` | Starter file only | `OPERATOR_STATUS`, burst plan, relay queue |
 | **charter** | `Charter thread` + one program doc | Stated program/SELECTION doc only | `OPERATOR_STATUS`, `BURST_PLAN.json`, `@ppe-director` |
 | **explore** | `Explore thread` / review only | User @ files only | Relay, commits unless asked |
-| **neutral** | User question | Answer scope only | Do not lead with operator status |
+| **neutral** | User question | Answer scope only | Do not lead with operator status; no branch/stash recovery |
+
+### Ship + recovery by role
+
+| Role | May commit/PR | Branch recovery / mixed-plane |
+|------|---------------|-------------------------------|
+| **operator** | Yes | Yes — [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) |
+| **ide_build** | Yes (slice branch) | Prefer clean slice branch; escalate mixed-plane to operator |
+| **charter** | Yes — docs/control-plane when gate clean | **No** — park one line to operator thread |
+| **explore** | Only if user asked to implement | **No** |
+| **neutral** | Only if user asked to implement | **No** |
+
+Charter/explore/neutral: do **not** end replies with relay verdicts, stash pop, or checkout instructions unless the user asked about git/queue. See [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) § Response shape.
 
 ### Operator thread — BUILD load order
 
@@ -132,3 +144,5 @@ Built-in Cursor skills (PR babysit, security review) are optional for generic ta
 | "What you should do" + relay cmds as operator steps | Agent auto-execute; operator: nothing / `what's next?` |
 | Choice questions (`Want me to…?`) at end of reply | Decide per verdict; spawn workers; advance product |
 | Stale local status vs VM `IDE_BUILD` — ask operator | Trust VM; `@ppe-director` → build worker |
+| Branch/stash recovery in charter or neutral threads | Operator thread + recovery protocol |
+| Charter reply ending with operator handoff noise | Finish topic; optional one-line operator pointer |

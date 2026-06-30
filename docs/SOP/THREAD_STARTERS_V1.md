@@ -71,6 +71,15 @@ Topic: asset batch / data collection
 Load only: @docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md (or relevant program doc).
 ```
 
+Control-plane / agent policy (no relay):
+
+```text
+Charter thread. THREAD_ROLE: charter.
+Topic: agent rules / SOP / commit policy / thread roles
+Load only: relevant docs/SOP or .cursor/rules files.
+Do NOT read OPERATOR_STATUS. Ship docs/control-plane if gate passes; park mixed-plane to operator thread.
+```
+
 ---
 
 ## Explore / review
@@ -113,3 +122,5 @@ Run what's next; do not restart VM loop unless STACK_DOWN.
 | `@ppe-ux-director` for UX brainstorming | Charter thread + `@ppe-ux-charter` |
 | Steward + operator + BUILD in one thread | Separate operator vs charter vs IDE BUILD |
 | Pasting `OPERATOR_STATUS` into charter threads | One-line "see operator thread" if needed |
+| Charter thread ending with stash/checkout/relay commands | Finish topic; one line: "Operator thread: what's next?" |
+| Branch/stash recovery in charter or neutral threads | Operator thread + [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) |
