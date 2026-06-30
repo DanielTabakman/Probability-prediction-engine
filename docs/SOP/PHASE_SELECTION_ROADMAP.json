@@ -339,13 +339,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[P1 SPINE] MSOS distribution CSV download",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[MEDIUM] Trader workflow horizon nav",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
     },
