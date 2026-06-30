@@ -457,27 +457,29 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[P0 SPINE] MSOS snapshot post-mortem review loop",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
       "focusPlaybookTier": "P1",
       "workerMode": "local-agent",
-      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[P1 SPINE] MSOS distribution CSV download",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md",
       "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[P2 SPINE] Cross-venue MSOS embed panel",
       "selectionPrep": "docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md",
       "sideChannel": true,
-      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
@@ -520,8 +522,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
-      "status": "READY",
-      "reason": "[MEDIUM] Trader workflow horizon nav — promoted READY per UX_EXECUTION_BACKLOG_V1 2026-06-30",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Trader workflow horizon nav",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "workerMode": "local-agent"

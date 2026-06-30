@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- **Chapter closed:** MSOS trader review loop v1 (`MSOS-RevLoop-Closeout-Slice004`)
 - `e1bdc95` — Merge pull request #1003 from DanielTabakman/fix/research-console-unicode
 - `70019b0` — fix(research): Windows-safe research_status console output (`docs/SOP/`)
 - `376351a` — Control-plane: dev changelog

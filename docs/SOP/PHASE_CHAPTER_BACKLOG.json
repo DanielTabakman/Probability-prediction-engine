@@ -638,7 +638,7 @@
     },
     {
       "chapterId": "msos_trader_review_loop_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
@@ -668,7 +668,7 @@
     },
     {
       "chapterId": "msos_cross_venue_strategy_lab_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
