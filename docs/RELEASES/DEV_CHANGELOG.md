@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `0f420e6` — ops: loop publish ops/loop-publish-20260630061538-bb4336c (#788) (`docs/SOP/`)
+- `6d13cea` — ops: context closeout ship (control/ppe-exposure-menu-closeout) (#786) (`docs/SOP/`)
+- `8996679` — Control-plane: dev changelog
 - `2e78594` — ops: loop publish ops/loop-publish-20260630051704-3e1f4bd (#785)
 - `f6a66ad` — ops: loop publish ops/loop-publish-20260630045903-2b4f377 (#783)
 - `374cb3f` — ops: loop publish ops/loop-publish-20260630045857-2b4f377 (#782) (`docs/SOP/`)
@@ -34,6 +37,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `e0febc9` — ops: loop publish ops/loop-publish-20260630061532-bb4336c (#787)
 - `2f04787` — ops: loop publish ops/loop-publish-20260630051659-3e1f4bd (#784)
 - `38419a2` — ops: loop publish ops/loop-publish-20260630042130-a1220fe (#754)
 - `0258684` — ops: loop publish ops/loop-publish-20260630042215-a1220fe (#755)
