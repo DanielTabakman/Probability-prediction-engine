@@ -278,14 +278,24 @@ def build_cross_venue_backtest_report(
         round(sum(float(r["brier_bl"]) for r in scored) / len(scored), 6) if scored else None
     )
 
+    resolved_count = len(scored)
+    strategy_ready = resolved_count > 0 and mean_brier_pm is not None and mean_brier_bl is not None
+    strategy_ready_reason = (
+        f"{resolved_count} resolved questions with Brier scores"
+        if strategy_ready
+        else ("no resolved questions yet" if resolved_count == 0 else "insufficient Brier aggregate")
+    )
+
     return {
         "version": BACKTEST_JSON_VERSION,
         "as_of_utc": as_of_utc or datetime.now(tz=UTC).isoformat(),
         "snapshot_files": len(csv_paths),
         "min_snapshots": min_snapshots,
         "gap_column": gap_column,
-        "resolved_count": len(scored),
+        "resolved_count": resolved_count,
         "pending_count": len(pending),
+        "strategy_ready": strategy_ready,
+        "strategy_ready_reason": strategy_ready_reason,
         "mean_brier_pm": mean_brier_pm,
         "mean_brier_bl": mean_brier_bl,
         "mean_brier_delta_bl_minus_pm": (
@@ -307,6 +317,7 @@ def render_cross_venue_backtest_markdown(report: dict[str, Any]) -> str:
         f"**Snapshot files:** {report.get('snapshot_files', 0)}",
         f"**Resolved questions:** {report.get('resolved_count', 0)}",
         f"**Pending:** {report.get('pending_count', 0)}",
+        f"**Strategy-ready (accuracy):** {report.get('strategy_ready', False)}",
         "",
     ]
     if report.get("mean_brier_pm") is not None:

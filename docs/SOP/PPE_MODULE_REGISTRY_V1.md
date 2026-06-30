@@ -142,6 +142,20 @@ Update at every module SELECTION / closeout. **Advance?** = steward yes/no for n
 
 ---
 
+## Research pipeline — collect, test, trade (later)
+
+**Canon:** [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) · **Registry:** [`config/research_pipeline_registry.json`](../../config/research_pipeline_registry.json)
+
+| Layer | Role | Commands |
+|-------|------|----------|
+| **Collector** | `scripts/collect_*.py` → `artifacts/` | `run_research_daily.cmd` · per-collector install tasks |
+| **Test** | scan · backtest · tradeability | registry `min_calendar_days` gates each test |
+| **Strategy** | consumes `strategy_ready` in test JSON | **Deferred** |
+
+Health: `python scripts/research_archive_health.py --write` → `artifacts/control_plane/RESEARCH_ARCHIVE_HEALTH.json`
+
+---
+
 ## Data sources → processing → outputs (summary)
 
 Detail in [`assets/msos_module_map.html`](assets/msos_module_map.html).
