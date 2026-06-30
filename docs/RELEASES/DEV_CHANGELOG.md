@@ -2,8 +2,19 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-06-30
+
+- `e18d06d` — ops: loop publish ops/loop-publish-20260630040628-d3617e5 (#753) (`docs/SOP/`)
+- **Chapter closed:** PPE Exposure menu v1 COMPLETE (#746) (`PPE Exposure menu v1 COMPLETE (#746)`)
+
 ## 2026-06-29
 
+- `5783599` — ops: loop publish ops/loop-publish-20260630040623-d3617e5 (#752)
+- `73c545e` — ops: loop publish ops/loop-publish-20260629210950-07fb600 (#751)
+- `4c25e4b` — ops: loop publish ops/loop-publish-20260629210812-07fb600 (#749)
+- `4c7ac8f` — ops: loop publish ops/loop-publish-20260629210519-07fb600 (#748)
+- `48d436c` — ops: loop publish ops/loop-publish-20260629210006-8caba4d (#745) (`docs/SOP/`)
+- `49e7d50` — Control-plane: dev changelog
 - `fd4615f` — ops: loop publish ops/loop-publish-20260629204553-7211b5c (#740)
 - `fdb5729` — ops: loop publish ops/loop-publish-20260629204558-7211b5c (#741) (`docs/SOP/`)
 - `45371a2` — ops: loop publish ops/loop-publish-20260629204107-8b3d3d0 (#736)
