@@ -4,11 +4,32 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `0bb13d0` — ops: loop publish ops/loop-publish-20260630045448-a1220fe (#781)
+- `2b40969` — ops: loop publish ops/loop-publish-20260630045142-a1220fe (#779)
+- `a9cd2d0` — ops: loop publish ops/loop-publish-20260630045209-a1220fe (#780)
+- `dbd45e7` — ops: loop publish ops/loop-publish-20260630044951-a1220fe (#778)
+- `f67db6a` — ops: loop publish ops/loop-publish-20260630044729-a1220fe (#775)
+- `0ad4d25` — ops: loop publish ops/loop-publish-20260630044323-a1220fe (#772)
+- `06f688b` — ops: loop publish ops/loop-publish-20260630044156-a1220fe (#771)
+- `69dfdf3` — ops: loop publish ops/loop-publish-20260630043958-a1220fe (#770)
+- `2433220` — ops: loop publish ops/loop-publish-20260630043709-a1220fe (#768)
+- `fbc6b26` — ops: loop publish ops/loop-publish-20260630043447-a1220fe (#767)
+- `fd74fcc` — ops: loop publish ops/loop-publish-20260630043416-a1220fe (#766)
+- `20c0554` — ops: loop publish ops/loop-publish-20260630043225-a1220fe (#765)
+- `d60887b` — ops: loop publish ops/loop-publish-20260630043158-a1220fe (#764)
+- `5aa9dfc` — ops: loop publish ops/loop-publish-20260630042903-a1220fe (#761)
+- `dd749d5` — ops: loop publish ops/loop-publish-20260630043009-a1220fe (#763)
+- `a0978d6` — ops: loop publish ops/loop-publish-20260630042931-a1220fe (#762)
+- `444ed26` — ops: loop publish ops/loop-publish-20260630042705-a1220fe (#759)
+- `b77fa28` — ops: loop publish ops/loop-publish-20260630042346-a1220fe (#756)
+- `74e9bf4` — ops: loop publish ops/loop-publish-20260630042436-a1220fe (#757) (`docs/SOP/`)
+- `ec3b7bf` — Control-plane: dev changelog
 - `e18d06d` — ops: loop publish ops/loop-publish-20260630040628-d3617e5 (#753) (`docs/SOP/`)
 - **Chapter closed:** PPE Exposure menu v1 COMPLETE (#746) (`PPE Exposure menu v1 COMPLETE (#746)`)
 
 ## 2026-06-29
 
+- `24faf09` — ops: loop publish ops/loop-publish-20260630044920-a1220fe (#777)
 - `5783599` — ops: loop publish ops/loop-publish-20260630040623-d3617e5 (#752)
 - `73c545e` — ops: loop publish ops/loop-publish-20260629210950-07fb600 (#751)
 - `4c25e4b` — ops: loop publish ops/loop-publish-20260629210812-07fb600 (#749)
