@@ -146,6 +146,14 @@ def main(argv: list[str] | None = None) -> int:
             pass
         print(f"post_relay_continue: manifest status -> COMPLETE ({slice_id})")
         try:
+            from scripts.ppe_chapter_mode import prune_closeout_chapter
+
+            plan_rel_for_prune = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")
+            if prune_closeout_chapter(repo, plan_path=plan_rel_for_prune):
+                print(f"post_relay_continue: pruned {plan_rel_for_prune} from AGENT_STEERING closeout list")
+        except Exception as exc:
+            print(f"post_relay_continue: closeout steering prune skipped: {exc}")
+        try:
             plan_rel = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")
         except ValueError:
             plan_rel = ""
