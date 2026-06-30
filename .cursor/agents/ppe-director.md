@@ -41,7 +41,7 @@ Optional refresh: `python scripts/ppe_operator_status.py` from repo root.
 | IDE_BUILD | Spawn **ppe-build-worker** with starter path from IDE_BUILD_NOW or `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md`. |
 | FIX_PLAN | Spawn **ppe-triage-worker** with blocker text. |
 | STALE_STATE | Spawn **ppe-triage-worker**; point at `artifacts/orchestrator/LAST_RUN_REPORT.md`. |
-| SUPPLY_LOW | Summarize supply block; tell operator to queue backlog or run SELECTION. Stop. |
+| SUPPLY_LOW | Refresh status (supply auto-heal); if still idle run `ppe_control_plane.py reconcile` or **ppe-triage-worker**. Operator: nothing. |
 | ERROR | Spawn **ppe-triage-worker** with errors from status. |
 
 ## Spawning workers

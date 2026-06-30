@@ -162,4 +162,19 @@ Built-in Cursor skills (PR babysit, security review) are optional for generic ta
 | Choice questions (`Want me to…?`) at end of reply | Decide per verdict; spawn workers; advance product |
 | Stale local status vs VM `IDE_BUILD` — ask operator | Trust VM; `@ppe-director` → build worker |
 | Branch/stash recovery in charter or neutral threads | Operator thread + recovery protocol |
+
+---
+
+## Edge cases (known gaps + mitigations)
+
+| Gap | Mitigation (in repo) | If it still happens |
+|-----|----------------------|---------------------|
+| **Burst off** (`ESCALATE`, `burst_allowed=false`) | Agent runs single verdict path; `ppe_go.cmd --single` | Agent still must execute one command — never advise-only checklist |
+| **Subagent reply drift** | `@ppe-director` summary rules; workers die when done | Parent operator thread owns operator-facing reply |
+| **Product wins vs dirty preflight** | Gate fails loudly; [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) for mixed-plane | Agent runs recovery **without** asking operator to pick BUILD vs cleanup |
+| **Stale desktop status** | `scripts/ppe_vm_status_bridge.py` SSH merge on status refresh | `OPERATOR_STATUS.md` shows **VM authoritative** block |
+| **SUPPLY_LOW idle queue** | `_maybe_heal_supply` + steering candidate promote in `ppe_operator_status.py` | Agent runs `ppe_control_plane.py reconcile` — operator: nothing |
+| **SSH / VM unreachable** | Bridge skips silently; local status used | VM triage: `VM_STATUS.cmd` on VM — not operator homework on desktop |
+
+Disable VM bridge for debugging: `set PPE_VM_STATUS_BRIDGE=0`.
 | Charter reply ending with operator handoff noise | Finish topic; optional one-line operator pointer |

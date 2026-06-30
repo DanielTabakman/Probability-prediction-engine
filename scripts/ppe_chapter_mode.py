@@ -315,8 +315,8 @@ def resolve_operator_commands(
     if verdict == "SUPPLY_LOW":
         return (
             [
-                "Add status=queued rows to docs/SOP/PHASE_CHAPTER_BACKLOG.json",
-                "run_ppe_auto_local_loop.cmd  (will idle-sleep until work appears)",
+                "python scripts/ppe_operator_status.py  (supply auto-heal + re-check)",
+                "If still SUPPLY_LOW: python scripts/ppe_control_plane.py reconcile",
             ],
             [],
         )

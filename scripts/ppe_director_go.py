@@ -35,8 +35,8 @@ USER_LINES: dict[str, list[str]] = {
         "Nothing to do — terminal loop is running.",
     ],
     VERDICT_SUPPLY_LOW: [
-        "Queue is idle — add a queued row to PHASE_CHAPTER_BACKLOG.json",
-        "or run SELECTION. Loop will idle-sleep until work appears.",
+        "Supply auto-heal runs on status refresh — agent re-checks OPERATOR_STATUS.md.",
+        "If still idle: python scripts/ppe_control_plane.py reconcile (agent runs this).",
     ],
 }
 

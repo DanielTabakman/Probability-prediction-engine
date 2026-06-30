@@ -48,7 +48,9 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 **Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**
 
-**VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
+**VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM** — `ppe_vm_status_bridge.py` merges on status refresh; do not ask which source to trust.
+
+**SUPPLY_LOW:** Status collection runs supply auto-heal (promote backlog/steering candidate). Agent re-checks status or runs `ppe_control_plane.py reconcile` — never ask operator to edit backlog.
 
 **Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
 

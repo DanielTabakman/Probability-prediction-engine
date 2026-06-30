@@ -14,6 +14,10 @@ You finish one chapter after IDE BUILD already committed.
 
 If `run_ppe_local.cmd` fails, fix and retry once; then stop with a short failure summary.
 
+## Reply to director
+
+Return facts only — verdict before/after, commands run. **Do not** ask the operator to choose next steps or run relay commands manually.
+
 ## Return
 
 - `run_ppe_local` exit code

@@ -118,8 +118,8 @@ def _commands_for_verdict(
         return ["run_ppe_auto_local_loop.cmd"]
     if verdict == VERDICT_SUPPLY_LOW:
         return [
-            "Add status=queued rows to docs/SOP/PHASE_CHAPTER_BACKLOG.json",
-            "run_ppe_auto_local_loop.cmd  (will idle-sleep until work appears)",
+            "python scripts/ppe_operator_status.py  (supply auto-heal + re-check)",
+            "If still SUPPLY_LOW: python scripts/ppe_control_plane.py reconcile",
         ]
     if verdict == VERDICT_STALE_STATE:
         return [
@@ -202,6 +202,100 @@ def _maybe_heal_idle_queue(repo: Path) -> dict[str, Any]:
                 )
             except Exception as exc:
                 out["auto_select_error"] = str(exc)
+
+    return out
+
+
+def promote_steering_build_candidate(repo: Path, *, apply: bool) -> dict[str, Any]:
+    """Promote AGENT_STEERING nextBuildCandidateId roadmap row to READY when valid."""
+    try:
+        from scripts.ppe_chapter_mode import load_agent_steering, plan_chapter_id
+        from scripts.ppe_roadmap import (
+            _plan_valid,
+            _set_roadmap_status,
+            load_roadmap,
+            norm_plan,
+            roadmap_enabled,
+            save_roadmap,
+        )
+        from scripts.ppe_queue import upsert_queue_item
+    except ImportError as exc:
+        return {"promoted": False, "reason": str(exc)}
+
+    chapter_id = str(load_agent_steering(repo).get("nextBuildCandidateId") or "").strip()
+    if not chapter_id:
+        return {"promoted": False, "reason": "no nextBuildCandidateId"}
+    if not roadmap_enabled(repo):
+        return {"promoted": False, "reason": "roadmap disabled"}
+
+    roadmap = load_roadmap(repo)
+    for item in roadmap.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        plan = norm_plan(str(item.get("planPath") or ""))
+        if plan_chapter_id(plan) != chapter_id:
+            continue
+        row_status = str(item.get("status") or "").strip().lower()
+        if row_status != "pending":
+            return {"promoted": False, "reason": f"roadmap row {chapter_id} is {row_status}"}
+        ok, err = _plan_valid(repo, plan)
+        if not ok:
+            return {"promoted": False, "reason": err}
+        if not apply:
+            return {"promoted": True, "chapter_id": chapter_id, "planPath": plan, "dry_run": True}
+        _set_roadmap_status(roadmap, plan, "ready")
+        save_roadmap(repo, roadmap)
+        upsert_queue_item(repo, plan_path=plan, status="READY")
+        return {"promoted": True, "chapter_id": chapter_id, "planPath": plan}
+
+    return {"promoted": False, "reason": f"{chapter_id} not found on roadmap"}
+
+
+def _maybe_heal_supply(repo: Path) -> dict[str, Any]:
+    """Promote queue/backlog/steering rows when supply is low (agent-owned, not operator)."""
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        return {}
+    if _queue_ready_count(repo) > 0:
+        return {}
+
+    out: dict[str, Any] = {}
+    try:
+        from scripts.ppe_propagate_queue import (
+            maybe_propagate_queue,
+            promote_chartered_to_queued,
+            promote_first_blocked_with_plan,
+        )
+        from scripts.ppe_roadmap import bootstrap_next_ready
+
+        steps: list[tuple[str, Any]] = [
+            ("promote_blocked", lambda: promote_first_blocked_with_plan(repo, apply=True)),
+            ("promote_chartered", lambda: promote_chartered_to_queued(repo, apply=True)),
+            ("propagate", lambda: maybe_propagate_queue(repo, apply=True)),
+            ("steering_candidate", lambda: promote_steering_build_candidate(repo, apply=True)),
+            ("bootstrap", lambda: bootstrap_next_ready(repo, apply=True)),
+        ]
+        for name, fn in steps:
+            result = fn()
+            if not isinstance(result, dict):
+                continue
+            if result.get("promoted") or result.get("propagated") or result.get("bootstrapped"):
+                out[name] = result
+    except Exception as exc:
+        out["error"] = str(exc)
+
+    if _queue_ready_count(repo) > 0:
+        try:
+            from scripts.ppe_auto_select import run_auto_select
+
+            out["auto_select_exit"] = run_auto_select(
+                repo,
+                apply=True,
+                select_only=False,
+                mark_done=False,
+                force=False,
+            )
+        except Exception as exc:
+            out["auto_select_error"] = str(exc)
 
     return out
 
@@ -290,6 +384,32 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         exit_code = 0
         blocker = "phase RUNNING — waiting for in-flight pass to finish"
 
+    supply_heal: dict[str, Any] = {}
+    if verdict == VERDICT_SUPPLY_LOW:
+        supply_heal = _maybe_heal_supply(repo)
+        if _queue_ready_count(repo) > 0:
+            summary = resolve_summary(repo)
+            plan_path = str(summary.get("phase_plan_path") or "").strip() or None
+            manifest_status = str(summary.get("status") or "").strip().upper()
+            if plan_path:
+                try:
+                    guard = evaluate_continuous_guards(repo, plan_path)
+                except Exception as exc:
+                    errors.append(f"guard evaluation failed: {exc}")
+                    guard = GuardResult(exit_code=0, plan_path=plan_path or "")
+                if guard.exit_code == GUARD_EXIT and guard.reason == "PRODUCT_BLOCKED":
+                    verdict = VERDICT_IDE_BUILD
+                    blocker = guard.detail or guard.reason
+                elif guard.reason == "IDE_MARKER_OK":
+                    verdict = VERDICT_RUN_LOCAL
+                    blocker = "IDE product marker present — finish chapter with run_ppe_local"
+                else:
+                    verdict = VERDICT_RUN_AUTO
+                    blocker = "supply heal promoted READY queue item"
+            else:
+                verdict = VERDICT_RUN_AUTO
+                blocker = "supply heal promoted READY queue item"
+
     commands = _commands_for_verdict(verdict=verdict, plan_path=plan_path, product_slice=product_slice)
     avoid = _avoid_commands(verdict)
     rotate = infer_suggest_thread_rotate(
@@ -299,6 +419,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     )
 
     chapter_mode: dict[str, Any] = {}
+    loop_ok = False
     try:
         from scripts.ppe_chapter_mode import (
             is_loop_host_allowed,
@@ -306,6 +427,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
             resolve_operator_commands,
         )
 
+        loop_ok = is_loop_host_allowed()
         chapter_mode = resolve_chapter_mode(
             repo,
             verdict=verdict,
@@ -313,7 +435,6 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
             guard_reason=guard.reason if guard.reason else None,
             chapter_name=str(summary.get("chapter_name") or "") or None,
         )
-        loop_ok = is_loop_host_allowed()
         commands, avoid = resolve_operator_commands(
             verdict=verdict,
             chapter_mode=chapter_mode,
@@ -321,9 +442,9 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         )
         chapter_mode["loop_host_allowed"] = loop_ok
     except Exception:
-        pass
+        loop_ok = False
 
-    return {
+    payload: dict[str, Any] = {
         "as_of": _utc_now(),
         "verdict": verdict,
         "chapter_mode": chapter_mode or None,
@@ -344,8 +465,18 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "avoid": avoid,
         "errors": errors,
         "idle_heal": idle_heal or None,
+        "supply_heal": supply_heal or None,
         **rotate,
     }
+
+    try:
+        from scripts.ppe_vm_status_bridge import apply_vm_authoritative
+
+        payload = apply_vm_authoritative(payload, loop_host_allowed=loop_ok, repo=repo)
+    except Exception:
+        pass
+
+    return payload
 
 
 def prepare_operator_status(repo: Path) -> dict[str, Any]:
@@ -454,6 +585,30 @@ def _format_human(
     burst = burst_plan if burst_plan is not None else status.get("burst_plan")
     if isinstance(burst, dict):
         lines.extend(_format_burst_summary(burst))
+
+    if status.get("vm_authoritative"):
+        vm = status.get("vm_status") if isinstance(status.get("vm_status"), dict) else {}
+        local_v = status.get("local_verdict") or "?"
+        lines.extend(
+            [
+                "",
+                "VM authoritative (desktop local status was stale):",
+                f"  Local verdict was: `{local_v}` → using VM `{status.get('verdict')}`",
+            ]
+        )
+        if vm.get("slice_id"):
+            lines.append(f"  VM slice: {vm.get('slice_id')}")
+        if vm.get("chapter_name"):
+            lines.append(f"  VM chapter: {vm.get('chapter_name')}")
+
+    supply_heal = status.get("supply_heal")
+    if isinstance(supply_heal, dict) and supply_heal:
+        lines.extend(["", "Supply auto-heal (agent):"])
+        for key in sorted(supply_heal.keys()):
+            if key == "error":
+                lines.append(f"  - error: {supply_heal[key]}")
+            else:
+                lines.append(f"  - {key}: applied")
 
     lines.extend(
         [
