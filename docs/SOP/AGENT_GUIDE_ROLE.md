@@ -34,9 +34,10 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 
 ## Cursor context (guide agent)
 
-- **Guide role:** SELECTION, gaps checklist, and “what’s next” only — not long implementation in this thread.
+- **Operator thread:** relay verdict via `what's next?` — see [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md).
+- **Charter thread:** SELECTION, gaps checklist, program docs — **no** `OPERATOR_STATUS`; use `@ppe-ux-charter` for UX planning.
 - Do **not** accumulate full-phase BUILD, PR fixes, and planning in one Cursor chat; see [`CONTEXT_RULES.md`](../CONTEXT_RULES.md).
-- Point the build path to relay/orchestrator; BUILD packets use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).
+- Point BUILD path to relay/orchestrator; BUILD packets use [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md).
 
 ## Relay closeout (automatic)
 

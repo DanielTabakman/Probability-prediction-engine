@@ -10,6 +10,7 @@ from typing import Any
 from scripts.ppe_burst_plan import refresh_burst_plan
 from scripts.ppe_ide_handoff import _detached_open, copy_text_to_clipboard, resolve_cursor_executable
 from scripts.ppe_operator_hint import PPE_GO_HINT, PPE_GO_VERDICTS
+from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 from scripts.ppe_operator_status import (
     STATUS_REPORT_REL,
     VERDICT_RUN_AUTO,
@@ -18,7 +19,10 @@ from scripts.ppe_operator_status import (
     write_status_report,
 )
 
-DIRECTOR_PROMPT = "@ppe-director Director pass. Terminal loop running."
+DIRECTOR_PROMPT = prepend_role_opener(
+    "@ppe-director Director pass. Terminal loop running.",
+    OPERATOR_THREAD_OPENER,
+)
 
 
 def _burst_prompt_from_plan(plan: dict[str, Any]) -> str:

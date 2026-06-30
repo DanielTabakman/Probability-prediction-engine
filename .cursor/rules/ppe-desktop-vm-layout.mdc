@@ -14,7 +14,7 @@ alwaysApply: true
 | **Hyper-V VM** (`PPE_LOOP_HOST=1`) | **Yes** — `run_ppe_local`, headless stack, auto loop | No (blocks → `IDE_BUILD`) | Automatic in loop |
 | **Daily desktop** (`PPE_STACK_FORBIDDEN` or no loop token) | **Never** | **Yes** — Cursor IDE BUILD | **`DESKTOP_CONTINUE.cmd`** (SSH → VM `finish_ide_build.cmd`) |
 
-Reading `OPERATOR_STATUS.md` / `ppe_operator_status.py` on **either** machine is fine. **Executing relay** is VM-only.
+Reading `OPERATOR_STATUS.md` / `ppe_operator_status.py` is fine on **operator** threads (either machine). **Charter/topic threads:** do not read unless switching role ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc)). **Executing relay** is VM-only.
 
 ## Before any relay command (mandatory)
 

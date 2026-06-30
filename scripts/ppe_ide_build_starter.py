@@ -151,6 +151,9 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     touch = tuple(scope.touch_set or ())
 
     parts = [
+        "IDE BUILD thread. THREAD_ROLE: ide_build.",
+        "Load only this starter — do not read OPERATOR_STATUS.",
+        "",
         f"# IDE BUILD — `{slice_id}`",
         "",
         f"`{head[:12]}` · `{declared_plane}` · `{scope.layer_preset}` · branch `{build_branch}`",

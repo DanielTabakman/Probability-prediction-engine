@@ -7,7 +7,7 @@ alwaysApply: false
 
 **Canon:** [`WORKFLOW_CONTEXT_AUDIT_001.md`](../../docs/SOP/WORKFLOW_CONTEXT_AUDIT_001.md) · [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](../../docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · [`ppe-operator-core.mdc`](ppe-operator-core.mdc)
 
-**Default:** every **`what's next?`** runs adaptive burst until the **band cap** or a stop condition — then **context closeout** and a fresh thread. **`ppe_go.cmd --single`** opts out to one director handoff.
+**Default:** every **`what's next?`** in an **operator thread** runs adaptive burst until the **band cap** or a stop condition — then **context closeout** and a fresh thread. Charter/explore/neutral threads: see [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc). **`ppe_go.cmd --single`** opts out to one director handoff.
 
 ## Start (mandatory)
 
@@ -26,6 +26,8 @@ Read `artifacts/control_plane/BURST_PLAN.json` — it holds `max_cycles`, `overa
 **Handoff:** `ppe_go.cmd` runs preflight + writes `BURST_PLAN.json` + copies adaptive director prompt (burst default).
 
 ## Also triggers burst refresh
+
+Operator thread only:
 
 - `keep going` · `run until watch` · `what's next until watch`
 
