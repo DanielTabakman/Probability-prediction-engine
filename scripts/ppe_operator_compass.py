@@ -127,15 +127,34 @@ def _archive_crack_catcher_items(repo: Path) -> list[dict[str, str]]:
         "implied_distribution_ts": "feeds dist timeseries charts when collector task live",
     }
     out: list[dict[str, str]] = []
+    seen: set[str] = set()
     for item in build_archive_health(repo).get("collectors") or []:
-        if not isinstance(item, dict) or item.get("ready"):
+        if not isinstance(item, dict):
             continue
         cid = str(item.get("id") or "")
+        if item.get("stale"):
+            key = f"stale_{cid}"
+            if key not in seen:
+                seen.add(key)
+                out.append(
+                    {
+                        "id": key,
+                        "title": f"Stale collector — {item.get('label') or cid}",
+                        "why": f"last snapshot {item.get('last_snapshot_utc') or 'never'} · check VM scheduled task",
+                        "source": str(item.get("archive_root") or cid),
+                    }
+                )
+        if item.get("ready"):
+            continue
+        key = f"archive_{cid}"
+        if key in seen:
+            continue
+        seen.add(key)
         have = int(item.get("calendar_days") or 0)
         need = int(item.get("min_calendar_days") or 0)
         out.append(
             {
-                "id": f"archive_{cid}",
+                "id": key,
                 "title": titles.get(cid, str(item.get("label") or cid)),
                 "why": f"{have} / {need} daily snapshots · {tails.get(cid, 'VM collector must keep running')}",
                 "source": str(item.get("archive_root") or cid),

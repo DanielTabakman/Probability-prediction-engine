@@ -138,6 +138,14 @@ def run_research_daily(
             break
         results["tests"].append(outcome)
 
+    if not dry_run:
+        try:
+            from src.viz.research_summary import write_research_summary
+
+            write_research_summary(repo)
+        except Exception:
+            pass
+
     return results
 
 

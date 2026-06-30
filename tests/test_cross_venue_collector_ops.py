@@ -16,6 +16,8 @@ def test_cross_venue_collector_cmd_wrappers_exist() -> None:
         "run_cross_venue_daily.cmd",
         "run_research_daily.cmd",
         "run_cross_venue_collector_dev.cmd",
+        "run_cross_venue_tradeability_backtest.cmd",
+        "research_status.cmd",
         "install_cross_venue_collector_task.cmd",
         "install_distribution_collector_task.cmd",
     ):

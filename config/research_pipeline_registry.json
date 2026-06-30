@@ -9,6 +9,7 @@
       "archive_root": "artifacts/cross_venue_snapshots",
       "file_glob": "**/ppe_cross_venue_prob_panel_*.csv",
       "min_calendar_days": 14,
+      "stale_hours": 36,
       "install_task": "install_cross_venue_collector_task.cmd",
       "schedule": "daily 07:15 VM"
     },
@@ -20,6 +21,7 @@
       "archive_root": "artifacts/horizon_surface_archive",
       "file_glob": "**/horizon_surface_*.json",
       "min_calendar_days": 30,
+      "stale_hours": 36,
       "install_task": "install_horizon_surface_collector_task.cmd",
       "schedule": "daily 06:30 VM"
     },
@@ -31,6 +33,7 @@
       "archive_root": "artifacts/distribution_snapshots",
       "file_glob": "**/ppe_btc_distribution_stats_*.csv",
       "min_calendar_days": 7,
+      "stale_hours": 36,
       "install_task": "install_distribution_collector_task.cmd",
       "schedule": "daily 07:45 VM"
     }
@@ -67,6 +70,17 @@
       "min_calendar_days": 1,
       "report_root": "artifacts/cross_venue_tradeability",
       "run_args": ["--latest-snapshot"],
+      "fatal": false
+    },
+    {
+      "id": "cross_venue_tradeability_backtest",
+      "label": "Cross-venue tradeability backtest",
+      "script": "scripts/run_cross_venue_tradeability_backtest.py",
+      "cmd": "run_cross_venue_tradeability_backtest.cmd",
+      "reads_collectors": ["cross_venue_event_gap"],
+      "min_calendar_days": 14,
+      "report_root": "artifacts/cross_venue_tradeability_backtest",
+      "run_args": [],
       "fatal": false
     }
   ]

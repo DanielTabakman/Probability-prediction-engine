@@ -26,6 +26,7 @@ def test_collector_health_counts_calendar_days(tmp_path: Path) -> None:
     assert item["calendar_days"] == 2
     assert item["file_count"] == 1
     assert item["ready"] is False
+    assert "last_snapshot_utc" in item
 
 
 def test_build_archive_health_writes_json(tmp_path: Path) -> None:

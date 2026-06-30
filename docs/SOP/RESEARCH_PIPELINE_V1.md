@@ -17,9 +17,15 @@
 | `run_cross_venue_collector_dev.cmd --interval 300 --count 12` | Dev high-cadence smoke (not production) |
 | `run_cross_venue_tradeability.cmd` | Net gap after spread proxy on latest snapshot |
 | `install_distribution_collector_task.cmd` | VM daily distribution stats (07:45) |
+| `research_status.cmd` | Human-readable pipeline status |
+| `run_cross_venue_tradeability_backtest.cmd` | Historical tradeability vs resolution |
 
 Health JSON: `artifacts/control_plane/RESEARCH_ARCHIVE_HEALTH.json`  
-Daily summary: `artifacts/control_plane/RESEARCH_DAILY_LAST.json`
+Summary JSON: `artifacts/control_plane/RESEARCH_SUMMARY.json`  
+Daily summary: `artifacts/control_plane/RESEARCH_DAILY_LAST.json`  
+MSOS panel: `/ppe-display-api/cross-venue-research.json` (Strategy Lab, BTC)
+
+Stale collectors: `stale: true` when last snapshot is older than `stale_hours` (default 36h).
 
 ---
 
@@ -54,6 +60,7 @@ Full list: `config/research_pipeline_registry.json`
 | `cross_venue_scan` | cross-venue | 1 | `artifacts/cross_venue_reports/` |
 | `cross_venue_backtest` | cross-venue | 14 | `artifacts/cross_venue_backtest/` |
 | `cross_venue_tradeability` | cross-venue | 1 | `artifacts/cross_venue_tradeability/` |
+| `cross_venue_tradeability_backtest` | cross-venue | 14 | `artifacts/cross_venue_tradeability_backtest/` |
 
 **Backtest** adds `strategy_ready` when resolved questions have Brier scores.  
 **Tradeability** adds `strategy_ready` when net gap after spread proxy > 0 on latest snapshot.

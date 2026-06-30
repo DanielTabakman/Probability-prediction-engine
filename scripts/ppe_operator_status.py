@@ -481,6 +481,12 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
     except Exception:
         pass
     try:
+        from src.viz.research_summary import write_research_summary
+
+        write_research_summary(repo)
+    except Exception:
+        pass
+    try:
         from scripts.ppe_operator_compass import sync_compass
 
         sync_compass(repo, status=status, patch_map=True)

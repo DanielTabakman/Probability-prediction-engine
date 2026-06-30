@@ -18,6 +18,28 @@ from scripts.research_pipeline_registry import collectors  # noqa: E402
 
 DAY_DIR = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 HEALTH_JSON_REL = "artifacts/control_plane/RESEARCH_ARCHIVE_HEALTH.json"
+DEFAULT_STALE_HOURS = 36
+
+
+def _latest_snapshot(root: Path, file_glob: str) -> tuple[str | None, str | None, float | None]:
+    latest_mtime: float | None = None
+    latest_rel: str | None = None
+    for path in root.glob(file_glob):
+        if not path.is_file():
+            continue
+        mtime = path.stat().st_mtime
+        if latest_mtime is None or mtime > latest_mtime:
+            latest_mtime = mtime
+            latest_rel = str(path)
+    if latest_mtime is None:
+        return None, None, None
+    iso = (
+        datetime.fromtimestamp(latest_mtime, tz=UTC)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+    return iso, latest_rel, latest_mtime
 
 
 def _calendar_days(root: Path) -> set[str]:
@@ -41,9 +63,18 @@ def collector_health(repo: Path, spec: dict[str, Any]) -> dict[str, Any]:
     root = repo / archive_rel
     file_glob = str(spec.get("file_glob") or "**/*")
     min_days = int(spec.get("min_calendar_days") or 0)
+    stale_hours = float(spec.get("stale_hours") or DEFAULT_STALE_HOURS)
     days = _calendar_days(root)
     have = len(days)
     ready = have >= min_days if min_days > 0 else have > 0
+    last_utc, last_path, last_mtime = _latest_snapshot(root, file_glob)
+    hours_since: float | None = None
+    stale = False
+    if last_mtime is not None:
+        hours_since = round((datetime.now(tz=UTC).timestamp() - last_mtime) / 3600.0, 2)
+        stale = hours_since > stale_hours
+    elif min_days > 0:
+        stale = True
     return {
         "id": str(spec.get("id") or ""),
         "label": str(spec.get("label") or spec.get("id") or ""),
@@ -53,11 +84,20 @@ def collector_health(repo: Path, spec: dict[str, Any]) -> dict[str, Any]:
         "file_count": _count_files(root, file_glob),
         "ready": ready,
         "latest_day": max(days) if days else None,
+        "last_snapshot_utc": last_utc,
+        "last_snapshot_path": last_path,
+        "hours_since_snapshot": hours_since,
+        "stale_hours": stale_hours,
+        "stale": stale,
     }
 
 
 def build_archive_health(repo: Path) -> dict[str, Any]:
-    items = [collector_health(repo, spec) for spec in collectors(repo)]
+    try:
+        specs = collectors(repo)
+    except FileNotFoundError:
+        specs = []
+    items = [collector_health(repo, spec) for spec in specs]
     return {
         "version": 1,
         "as_of_utc": datetime.now(tz=UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
@@ -69,7 +109,10 @@ def format_health_line(item: dict[str, Any]) -> str:
     have = int(item.get("calendar_days") or 0)
     need = int(item.get("min_calendar_days") or 0)
     label = str(item.get("label") or item.get("id") or "collector")
-    return f"{label}: {have}/{need} days"
+    tail = " · STALE" if item.get("stale") else ""
+    if not item.get("stale") and item.get("last_snapshot_utc"):
+        tail = f" · last {item.get('last_snapshot_utc')}"
+    return f"{label}: {have}/{need} days{tail}"
 
 
 def write_archive_health(repo: Path) -> Path:

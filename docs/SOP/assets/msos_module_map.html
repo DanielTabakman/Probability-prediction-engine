@@ -889,6 +889,9 @@
       SSOT: <code>config/research_pipeline_registry.json</code>
       · Canon: <a href="../RESEARCH_PIPELINE_V1.md">RESEARCH_PIPELINE_V1.md</a>
       · Daily: <code>run_research_daily.cmd</code>
+      · Status: <code>research_status.cmd</code>
+      · Summary: <code>artifacts/control_plane/RESEARCH_SUMMARY.json</code>
+      · MSOS panel: <code>/ppe-display-api/cross-venue-research.json</code> (Strategy Lab, BTC)
     </p>
 
     <div class="rp-layers">
@@ -899,8 +902,8 @@
       </div>
       <div class="rp-layer test">
         <h3>2 · Tests</h3>
-        <p>Scan · backtest · tradeability — registry picks eligible tests by archive depth.</p>
-        <span class="status live">Live — 3 tests on cross-venue</span>
+        <p>Scan · backtest · tradeability · tradeability backtest — registry picks eligible tests by archive depth.</p>
+        <span class="status live">Live — 4 tests on cross-venue</span>
       </div>
       <div class="rp-layer strategy">
         <h3>3 · Strategies</h3>
@@ -913,7 +916,7 @@
       <pre>
 <span class="hl-col">run_research_daily</span> ──► collectors ──► artifacts/
                               │
-                              ├──► <span class="hl-test">scan</span> (≥1d) · <span class="hl-test">backtest</span> (≥14d) · <span class="hl-test">tradeability</span> (≥1d)
+                              ├──► <span class="hl-test">scan</span> (≥1d) · <span class="hl-test">backtest</span> (≥14d) · <span class="hl-test">tradeability</span> (≥1d) · <span class="hl-test">tradeability backtest</span> (≥14d)
                               │
                               └──► <span class="hl-str">strategy (future)</span>
       </pre>
@@ -926,6 +929,7 @@
         <li><code>run_cross_venue_scan.cmd --latest-snapshot</code></li>
         <li><code>run_cross_venue_backtest.cmd</code></li>
         <li><code>run_cross_venue_tradeability.cmd</code></li>
+        <li><code>run_cross_venue_tradeability_backtest.cmd</code> (≥14d history)</li>
         <li>Dev smoke: <code>run_cross_venue_collector_dev.cmd --interval 300 --count 12</code></li>
       </ol>
     </div>
@@ -945,7 +949,7 @@
           <tr>
             <td><code>cross_venue_event_gap</code></td>
             <td><code>artifacts/cross_venue_snapshots/</code></td>
-            <td>scan · backtest · tradeability</td>
+            <td>scan · backtest · tradeability · tradeability backtest</td>
             <td><code>install_cross_venue_collector_task.cmd</code></td>
           </tr>
           <tr>
@@ -967,7 +971,9 @@
     <div class="note" style="margin-bottom: 24px">
       <strong>Health artifacts:</strong>
       <code>artifacts/control_plane/RESEARCH_ARCHIVE_HEALTH.json</code>
+      · <code>RESEARCH_SUMMARY.json</code>
       · <code>RESEARCH_DAILY_LAST.json</code>
+      · stale collectors flagged when last snapshot &gt; 36h
       · also in <code>OPERATOR_STATUS.md</code> Research archives lines.
     </div>
 

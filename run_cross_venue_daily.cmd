@@ -11,9 +11,15 @@ call "%~dp0collect_cross_venue_snapshot.cmd"
 if errorlevel 1 exit /b %ERRORLEVEL%
 
 call "%~dp0run_cross_venue_scan.cmd" --latest-snapshot %*
+if errorlevel 1 (
+  echo run_cross_venue_daily: scan FAILED exit=%ERRORLEVEL%
+  exit /b %ERRORLEVEL%
+)
+
+call "%~dp0run_cross_venue_tradeability.cmd" %*
 set "RC=%ERRORLEVEL%"
 if errorlevel 1 (
-  echo run_cross_venue_daily: scan FAILED exit=%RC%
+  echo run_cross_venue_daily: tradeability FAILED exit=%RC%
 ) else (
   echo run_cross_venue_daily: OK
 )
