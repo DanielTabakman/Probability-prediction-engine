@@ -55,6 +55,8 @@ AGENT CONTINUITY
 - Safe to switch agents? YES
 - Exact reason: slice complete; state in OPERATOR_STATUS + relay artifacts
 - Handoff: docs/SOP/AGENT_CONTINUITY_BRIEF.md after closeout
+
+Do **not** end with operator choice questions — director owns next worker spawn.
 ```
 
 ## Forbidden

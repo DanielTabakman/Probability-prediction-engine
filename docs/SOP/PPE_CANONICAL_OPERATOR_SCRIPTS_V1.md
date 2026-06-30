@@ -36,7 +36,7 @@ Guard before any relay on desktop: `python scripts/ppe_loop_host_guard.py --chec
 | `IDE_BUILD` | `DESKTOP_BUILD.cmd` → implement slice → gate → commit → `mark_ide_product_ready` | Wait — ntfy operator for desktop BUILD |
 | `RUN_LOCAL` | **`DESKTOP_CONTINUE.cmd`** only (after product PR merged to `main`) | `run_ppe_local.cmd` or `@ppe-finish-worker` |
 | `RUN_AUTO` | SSH `ppe_autobuilder.cmd status --brief` — **do not** local `run_ppe.cmd` | `run_ppe.cmd` or loop advance |
-| `SUPPLY_LOW` | Charter / merge to `main`; VM pulls on next pass | Idle until `main` has queued work |
+| `SUPPLY_LOW` | Agent: supply auto-heal on status refresh; `ppe_control_plane.py reconcile` if still idle. Operator: nothing. | VM idle until `main` has queued work |
 | `ERROR` / `FIX_PLAN` / `STALE_STATE` | Triage; `@ppe-director` when burst allowed | `fix_vm_operator.cmd` or loop triage |
 
 **Common mistake:** `RUN_LOCAL` on desktop **≠** `run_ppe_local.cmd`. On the daily PC it **always** means **`DESKTOP_CONTINUE.cmd`**.

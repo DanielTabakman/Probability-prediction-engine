@@ -14,6 +14,7 @@ export const MSOS_ROUTES = {
   monitor: "/monitor",
   history: "/history",
   learn: "/learn",
+  feedback: "/feedback",
 } as const;
 
 /** Private app / Cloudflare Access entry (NEXT_PUBLIC_MSOS_SIGN_IN_URL or legacy alias). */
