@@ -13,6 +13,7 @@ Dedicated thread for queue, VM status, burst, and triage. Open **one** long-live
 ```text
 Operator thread. THREAD_ROLE: operator.
 Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
+Auto-execute — do not ask operator to choose paths or run relay commands.
 Do not mix UX charter or SELECTION planning here.
 ```
 

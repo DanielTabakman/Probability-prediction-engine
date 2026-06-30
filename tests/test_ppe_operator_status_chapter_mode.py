@@ -39,6 +39,9 @@ class TestOperatorStatusChapterMode(unittest.TestCase):
             "avoid": ["run_ppe_local.cmd on desktop (forbidden — use DESKTOP_CONTINUE)"],
         }
         text = _format_human(status, Path("."))
+        self.assertIn("CLOSEOUT_ONLY", text)
+        self.assertIn("Agent action", text)
+        self.assertIn("Operator: nothing required", text)
         self.assertIn("DESKTOP_CONTINUE", text)
 
 

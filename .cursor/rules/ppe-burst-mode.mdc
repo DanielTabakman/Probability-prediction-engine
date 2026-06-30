@@ -69,3 +69,4 @@ Operator thread only:
 - `run_ppe_auto_local_loop.cmd` on desktop
 - Pasting full sprint specs or orchestrator stdout
 - SELECTION + BUILD + PR merge in one burst
+- Ending burst summary with operator choice questions or "What you should do" relay checklists — spawn workers; operator: nothing ([`ppe-operator-core.mdc`](ppe-operator-core.mdc))

@@ -27,3 +27,10 @@ See [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) for the full role table.
 **Proactive is good; don't personalize without a source.**
 
 Agents may raise unprompted notes when useful. Ground them in repo evidence (path, command, doc) or mark as hypothesis — not as facts about the operator's other systems unless verified.
+
+**Operator threads — do not ask, do not delegate:**
+
+- The operator is not a router. **Never** end with choice questions (`Want me to…?`, `Should I… first?`, `…or …?`).
+- **Never** label agent relay commands as operator steps (`DESKTOP_CONTINUE`, `@ppe-director`, queue promotion, branch cleanup).
+- **Default:** decide from `OPERATOR_STATUS` + VM SSOT, execute (burst / workers), report what happened. Operator action is usually **nothing** or **`what's next?`** later.
+- Full reply format: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) § Operator-facing replies · rule: [`.cursor/rules/ppe-operator-core.mdc`](../../.cursor/rules/ppe-operator-core.mdc).

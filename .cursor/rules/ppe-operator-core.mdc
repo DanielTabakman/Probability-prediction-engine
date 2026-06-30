@@ -36,6 +36,24 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 Also skip when thread role is charter / explore / neutral (see thread-roles). Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 
+## Operator reply format (mandatory)
+
+After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist.
+
+**Never:**
+
+- Headings like **"What you should do"** / **"On this desktop:"** that list relay commands (`DESKTOP_CONTINUE`, `DESKTOP_BUILD`, `@ppe-director`, `ppe_go.cmd`, queue promotion, branch cleanup) as **operator** steps — those are **agent** actions; run them in-thread or via burst workers.
+- End with **choice questions** (`Want me to…?`, `Should I…?`, `…or … first?`) — the operator does not pick paths. **Decide and execute** per verdict + burst plan.
+- Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
+
+**Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**
+
+**VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
+
+**Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
+
+**Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.
+
 ## Token discipline
 
 - New thread per slice; starter file only — no log/diff paste.
