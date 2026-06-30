@@ -56,10 +56,9 @@ def test_run_director_go_burst_default_prompt(tmp_path, monkeypatch):
     }
     with patch("scripts.ppe_director_go.prepare_operator_status", return_value=fake_status):
         with patch("scripts.ppe_director_go.write_status_report"):
-            with patch("scripts.ppe_director_go.compute_burst_plan", return_value=fake_plan):
-                with patch("scripts.ppe_director_go.write_burst_plan"):
-                    with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
-                        result = run_director_go(tmp_path, open_ide=False)
+            with patch("scripts.ppe_director_go.refresh_burst_plan", return_value=fake_plan):
+                with patch("scripts.ppe_director_go.copy_text_to_clipboard", return_value={"ok": True}):
+                    result = run_director_go(tmp_path, open_ide=False)
     assert result["burst"] is True
     assert result["prompt"] == fake_plan["prompt"]
     assert "Adaptive burst" in result["prompt"]

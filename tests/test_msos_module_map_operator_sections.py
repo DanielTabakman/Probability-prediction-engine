@@ -114,6 +114,16 @@ def test_module_map_exposure_menu_live() -> None:
     assert "VM collectors — confirm tasks" not in html
 
 
+def test_module_map_autobuilder_section() -> None:
+    html = _html()
+    assert 'id="autobuilder"' in html
+    assert "Autobuilder — how the factory runs" in html
+    assert "PPE_AUTOBUILDER_V1.md" in html
+    assert "DESKTOP_BUILD.cmd" in html
+    assert "AWAITING_BUILD" in html
+    assert "@ppe-build-worker" in html
+
+
 def test_module_map_no_duplicate_operator_h2() -> None:
     html = _html()
     for title in OPERATOR_H2_ORDER:
