@@ -15,15 +15,19 @@ def test_distribution_export_route_proxies_upstream() -> None:
     route = (
         MSOS_WEB / "src" / "app" / "api" / "ppe-display-api" / "distribution-export" / "route.ts"
     )
+    lib = MSOS_WEB / "src" / "lib" / "distributionExportUpstream.ts"
     assert route.is_file()
-    text = route.read_text(encoding="utf-8")
-    assert "buildDistributionExportUpstreamUrl" in text
-    assert "PPE_DISPLAY_API_SERVER_URL" in text
-    assert "distribution-export.csv" in text
-    assert "text/csv" in text
-    assert "Content-Disposition" in text
-    assert "distribution_export_error" in text
-    assert "Math." not in text
+    assert lib.is_file()
+    route_text = route.read_text(encoding="utf-8")
+    lib_text = lib.read_text(encoding="utf-8")
+    assert "buildDistributionExportUpstreamUrl" in route_text
+    assert "buildDistributionExportUpstreamUrl" in lib_text
+    assert "PPE_DISPLAY_API_SERVER_URL" in lib_text
+    assert "distribution-export.csv" in lib_text
+    assert "text/csv" in route_text
+    assert "Content-Disposition" in route_text
+    assert "distribution_export_error" in route_text
+    assert "Math." not in route_text
 
 
 def test_strategy_lab_content_download_button_and_honest_copy() -> None:
@@ -40,13 +44,11 @@ def test_strategy_lab_content_download_button_and_honest_copy() -> None:
 
 def test_distribution_export_asset_param_witness_btc_and_nvda() -> None:
     content = (MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx").read_text(encoding="utf-8")
-    route = (
-        MSOS_WEB / "src" / "app" / "api" / "ppe-display-api" / "distribution-export" / "route.ts"
-    ).read_text(encoding="utf-8")
+    lib = (MSOS_WEB / "src" / "lib" / "distributionExportUpstream.ts").read_text(encoding="utf-8")
     for asset in PROOF_ASSETS:
         assert asset in content or "asset" in content.lower()
-    assert "encodeURIComponent" in route
-    assert "LAB_ASSET_QUERY_PARAM" in route
+    assert "encodeURIComponent" in lib
+    assert "LAB_ASSET_QUERY_PARAM" in lib
 
 
 def test_distribution_download_sprint_and_phase_plan_touch_set() -> None:
@@ -62,7 +64,5 @@ def test_distribution_download_sprint_and_phase_plan_touch_set() -> None:
 
 
 def test_distribution_export_public_api_path_contract() -> None:
-    route = (
-        MSOS_WEB / "src" / "app" / "api" / "ppe-display-api" / "distribution-export" / "route.ts"
-    ).read_text(encoding="utf-8")
-    assert "/ppe-display-api/distribution-export.csv" in route
+    lib = (MSOS_WEB / "src" / "lib" / "distributionExportUpstream.ts").read_text(encoding="utf-8")
+    assert "/ppe-display-api/distribution-export.csv" in lib

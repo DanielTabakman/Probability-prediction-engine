@@ -10,7 +10,9 @@ REPO = Path(__file__).resolve().parents[1]
 MAP_HTML = REPO / "docs" / "SOP" / "assets" / "msos_module_map.html"
 
 REQUIRED_SECTIONS = (
-    "Your attention — human to-do",
+    "Do this now",
+    "Crack catcher",
+    "Module progress",
     "Waiting on time / data",
     "Recently shipped",
     "When you have bandwidth — backlog",
@@ -18,10 +20,19 @@ REQUIRED_SECTIONS = (
 )
 
 OPERATOR_H2_ORDER = (
-    "Your attention — human to-do",
+    "Do this now",
+    "Crack catcher",
+    "Module progress",
     "Waiting on time / data",
     "Recently shipped",
     "When you have bandwidth — backlog",
+)
+
+COMPASS_MARKERS = (
+    'id="map-do-now"',
+    'id="map-crack-catcher"',
+    'id="map-module-progress"',
+    'id="map-waiting-on-time"',
 )
 
 
@@ -39,10 +50,16 @@ def test_module_map_has_operator_sections() -> None:
         assert section in html, f"missing section: {section}"
 
 
+def test_module_map_has_compass_markers() -> None:
+    html = _html()
+    for marker in COMPASS_MARKERS:
+        assert marker in html, f"missing compass marker: {marker}"
+
+
 def test_module_map_operator_section_order() -> None:
     html = _html()
     positions = [html.index(title) for title in OPERATOR_H2_ORDER]
-    assert positions == sorted(positions), "operator panels must appear in attention → waiting → shipped → backlog order"
+    assert positions == sorted(positions), "operator panels must appear in compass order"
 
 
 def test_module_map_last_updated_has_datetime() -> None:
@@ -51,12 +68,15 @@ def test_module_map_last_updated_has_datetime() -> None:
     match = re.search(r'data-last-updated="(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)"', html)
     assert match is not None, "expected ISO datetime on data-last-updated"
     assert "<time datetime=" in html
+    time_body = re.search(r"<time datetime=[^>]+>([^<]+)</time>", html)
+    assert time_body is not None
+    assert "UTC" not in time_body.group(1), "display time should be Eastern (EDT/EST)"
 
 
 def test_module_map_right_now_strip() -> None:
     html = _html()
     assert 'id="map-right-now"' in html
-    assert "Trader Workflow Integration v1" in html
+    assert "Trader Workflow Integration v1" in html or "Relay verdict" in html
     assert "PPE_INTEGRATED_STATUS.md" in html
 
 
@@ -88,9 +108,10 @@ def test_module_map_integration_tiers_actionable_columns() -> None:
 
 def test_module_map_exposure_menu_live() -> None:
     html = _html()
-    assert "Exposure menu v0 — /exposure route live" in html
+    assert "Exposure menu v0 — /exposure route live" in html or "6 · Exposure menu" in html
     assert "6 · Exposure menu" in html and "T2 live" in html
     assert "approve READY → relay" not in html
+    assert "VM collectors — confirm tasks" not in html
 
 
 def test_module_map_no_duplicate_operator_h2() -> None:

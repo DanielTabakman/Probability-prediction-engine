@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | BUILD: ppe_exposure_menu_v1 READY (operator priority). Then asset batch wave 1 (tier1a→commodity) per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. Wave 2 blocked until wave 1 evidence COMPLETE. |
+| **Next** | BUILD: ppe_exposure_menu_v1 READY (operator priority). Then Trader Learning Spine queue: msos_trader_review_loop_v1 → dist_download → cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -26,7 +26,11 @@ This file merges archived chapters, steward parallel work, engineering gates, an
   - `ppe_equity_options_v1`
   - `ppe_tradeable_universe_v1`
   - `ppe_deribit_crypto_tier1_v1`
-  - `ppe_equity_universe_tier1a_v1`
+  - `ppe_exposure_menu_v1`
+  - `msos_trader_review_loop_v1`
+  - `msos_strategy_lab_dist_download_v1`
+  - `msos_cross_venue_strategy_lab_v1`
+  - `mvp1_distribution_timeseries_collector_v1`
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 **P1 decision:** Phased hybrid — **`apps/msos-web/`** (Next.js) MSOS shell; **Streamlit** PPE unchanged; **Cloudflare Access** on `app.*`; long-term MSOS workflow store server-side (phase 3) with PPE snapshot read feed (phase 2).
@@ -174,6 +178,8 @@ flowchart LR
 
 | MVP1 B-L density smoothing v1 | **COMPLETE** 2026-06-29 | [`SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md`](docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md), [`MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md`](docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md) |
 
+| PPE Exposure menu v1 | **COMPLETE** 2026-06-29 | [`SPRINT_PPE_EXPOSURE_MENU_V1.md`](docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md), [`PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -234,4 +240,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md`](docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`PPE_MODULE_REGISTRY_V1.md`](docs/SOP/PPE_MODULE_REGISTRY_V1.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
