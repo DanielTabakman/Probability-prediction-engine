@@ -520,9 +520,11 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Trader workflow horizon nav",
-      "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+      "status": "READY",
+      "reason": "[MEDIUM] Trader workflow horizon nav — promoted READY per UX_EXECUTION_BACKLOG_V1 2026-06-30",
+      "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
+      "focusPlaybookTier": "P2",
+      "workerMode": "local-agent"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",

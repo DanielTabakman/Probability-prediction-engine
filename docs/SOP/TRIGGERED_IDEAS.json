@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Park ideas with revisit triggers — surfaced when a matching chapter/plan enters SELECTION. Dismiss when processed: python scripts/ppe_triggered_ideas.py dismiss <id> [--purge]",
+  "notes": "Park ideas with revisit triggers \u2014 surfaced when a matching chapter/plan enters SELECTION. Dismiss when processed: python scripts/ppe_triggered_ideas.py dismiss <id> [--purge]",
   "items": [
     {
       "id": "web3_uniblock_revisit",
@@ -29,6 +29,40 @@
         "msos_access_identity_v1",
         "msos_billing_stripe_v1"
       ]
+    },
+    {
+      "id": "surface_thread_insights_at_selection",
+      "title": "Skim THREAD_INSIGHTS during SELECTION",
+      "summary": "When burst or what's next runs SELECTION, agent should skim recent THREAD_INSIGHTS.md entries for the active chapter_id (not only TRIGGERED_IDEAS alerts).",
+      "status": "parked",
+      "priority": "low",
+      "added": "2026-06-30",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "SELECTION",
+          "what's next",
+          "burst"
+        ]
+      }
+    },
+    {
+      "id": "merge_thread_insight_capture_tooling",
+      "title": "Merge thread insight capture tooling (PR #737)",
+      "summary": "Merge PR #737 so context_window_closeout --capture routes via ppe_thread_capture.py on main.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-06-30",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "thread insight",
+          "context closeout",
+          "ppe_thread_capture"
+        ]
+      }
     }
   ]
 }
