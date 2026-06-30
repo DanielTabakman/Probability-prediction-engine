@@ -105,8 +105,9 @@ def test_upsert_review_sqlite_mirror_python_statuses() -> None:
         assert row == ("supportive", "ok")
 
         lib = (MSOS_WEB / "src" / "lib" / "snapshotReview.ts").read_text(encoding="utf-8")
+        shared = (MSOS_WEB / "src" / "lib" / "snapshotReviewShared.ts").read_text(encoding="utf-8")
         for status in REVIEW_STATUSES:
-            assert f'"{status}"' in lib
+            assert f'"{status}"' in shared or f'"{status}"' in lib
 
 
 def test_review_loop_sprint_and_phase_plan_touch_set() -> None:
