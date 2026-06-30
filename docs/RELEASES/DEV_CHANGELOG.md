@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `e1bdc95` — Merge pull request #1003 from DanielTabakman/fix/research-console-unicode
+- `70019b0` — fix(research): Windows-safe research_status console output (`docs/SOP/`)
+- `376351a` — Control-plane: dev changelog
 - `19f7b6a` — Merge pull request #1000 from DanielTabakman/feat/research-pipeline-hardening-v1
 - `e73bd18` — fix(msos-web): pin guided tour to BTC and fix lab hydration crash (#1002) (`apps/msos-web/`)
 - `fd838d2` — Control-plane: dev changelog
