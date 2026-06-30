@@ -33,7 +33,6 @@ Evaluate clarity, playability, and verifiability of **user-facing MSOS modules**
 - [ ] Errors show debug path when needed (`IMPLIED_LAB_SMOKE.md` pattern where applicable).
 - [ ] Terminology consistent with module class (distribution vs horizon vs exposure, etc.).
 - [ ] Advanced math collapsed by default unless module charter says otherwise.
-- [ ] Module row in [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](../SOP/MSOS_UX_DESIGN_PHILOSOPHY_V1.md) **Insight collect** section matches shipped UX (update at closeout).
 
 ## Required outputs
 

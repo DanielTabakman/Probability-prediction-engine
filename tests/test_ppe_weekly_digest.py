@@ -156,6 +156,17 @@ class TestPpeWeeklyDigest(unittest.TestCase):
 
     def test_write_notify_payload(self) -> None:
         self._seed_changelog()
+        # Compass sync during notify needs module map + registry on disk
+        src_map = Path(__file__).resolve().parents[1] / "docs/SOP/assets/msos_module_map.html"
+        (self.repo / "docs/SOP/assets").mkdir(parents=True, exist_ok=True)
+        (self.repo / "docs/SOP/assets/msos_module_map.html").write_text(
+            src_map.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        reg = Path(__file__).resolve().parents[1] / "docs/SOP/PPE_MODULE_REGISTRY_V1.md"
+        if reg.is_file():
+            (self.repo / "docs/SOP/PPE_MODULE_REGISTRY_V1.md").write_text(
+                reg.read_text(encoding="utf-8"), encoding="utf-8"
+            )
         cmd_backfill(self.repo, weeks=1)
         self.assertEqual(cmd_write_notify_payload(self.repo), 0)
         payload = notify_payload_path(self.repo)
@@ -164,6 +175,7 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         assert "in_short" in raw
         assert "phone_title" in raw
         assert "phone_body" in raw
+        assert "Your compass" in raw or "compass_do_now_count" in raw
 
     def test_generate_and_backfill_idempotent(self) -> None:
         self._seed_changelog()
