@@ -4,6 +4,31 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `dce69d8` — ops: loop publish ops/loop-publish-20260630073703-8de14f1 (#798)
+- `7198605` — ops: loop publish ops/loop-publish-20260630074107-8de14f1 (#802)
+- `de001cf` — ops: loop publish ops/loop-publish-20260630074226-8de14f1 (#803)
+- `2b3ae8e` — ops: loop publish ops/loop-publish-20260630074329-8de14f1 (#804)
+- `5e797ca` — ops: loop publish ops/loop-publish-20260630074550-8de14f1 (#806)
+- `16ab481` — ops: loop publish ops/loop-publish-20260630074603-8de14f1 (#807)
+- `4da984a` — ops: loop publish ops/loop-publish-20260630074741-8de14f1 (#808)
+- `396a69a` — ops: loop publish ops/loop-publish-20260630075020-8de14f1 (#810)
+- `3375506` — ops: loop publish ops/loop-publish-20260630075626-e8951c9 (#816)
+- `0347efa` — ops: loop publish ops/loop-publish-20260630075605-e8951c9 (#815)
+- `ef269bf` — ops: loop publish ops/loop-publish-20260630075301-15883af (#813)
+- `8e0f6ef` — ops: loop publish ops/loop-publish-20260630075344-e8951c9 (#814)
+- `ca27717` — ops: loop publish ops/loop-publish-20260630075121-15883af (#812)
+- `9148871` — ops: loop publish ops/loop-publish-20260630075108-15883af (#811)
+- `e05f5e8` — ops: loop publish ops/loop-publish-20260630074812-8de14f1 (#809)
+- `1e670fa` — ops: loop publish ops/loop-publish-20260630074454-8de14f1 (#805)
+- `4add91d` — ops: loop publish ops/loop-publish-20260630074044-8de14f1 (#801)
+- `bd5c020` — ops: loop publish ops/loop-publish-20260630073945-8de14f1 (#800)
+- `7892732` — ops: loop publish ops/loop-publish-20260630073843-8de14f1 (#799)
+- `3687f32` — ops: loop publish ops/loop-publish-20260630073622-8de14f1 (#797)
+- `1b8393b` — ops: loop publish ops/loop-publish-20260630073404-8de14f1 (#795)
+- `c0d4440` — ops: loop publish ops/loop-publish-20260630073526-8de14f1 (#796)
+- `eedef03` — ops: loop publish ops/loop-publish-20260630073138-8de14f1 (#794)
+- `ac9d946` — ops: loop publish ops/loop-publish-20260630073101-8de14f1 (#793)
+- `665c4f9` — Control-plane: dev changelog
 - Merge pull request #792 from DanielTabakman/build/auto/MSOS-RevLoop-Product-Slice002
 - merge(main): resolve conflicts for MSOS-RevLoop-Product-Slice002
 - `3ae1ecc` — Control-plane: dev changelog
