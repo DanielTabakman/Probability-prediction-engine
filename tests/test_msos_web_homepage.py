@@ -54,11 +54,24 @@ def test_platform_tutorial_wiring() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "platformTutorial.ts").read_text(encoding="utf-8")
     assert "lab-asset" in lib
     assert "BTC or ETH" in lib
+    assert "PLATFORM_TOUR_DEFAULT_ASSET" in lib
+    assert "LAB_ASSET_QUERY_PARAM" in lib
+    assert "asset=BTC" in lib or "PLATFORM_TOUR_DEFAULT_ASSET" in lib
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
+    assert "TourPreparingOverlay" in shell
     assert "LabAssetPicker" in shell
     assert 'data-tour="lab-asset"' in picker
+    loading = (MSOS_WEB / "src" / "app" / "strategy-lab" / "loading.tsx").read_text(encoding="utf-8")
+    assert "Opening Strategy Lab" in loading
+    restart = (MSOS_WEB / "src" / "components" / "RestartTourButton.tsx").read_text(encoding="utf-8")
+    assert "Opening tour" in restart
+    hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
+    assert "scheduleStrategyLabTourPrefetch" in hero
+    assert "warmStrategyLabEntry" in restart or "Opening tour" in hero
+    layout = (MSOS_WEB / "src" / "app" / "layout.tsx").read_text(encoding="utf-8")
+    assert "NavigationProgressProvider" in layout
 
 
 def test_features_row_self_serve_entry() -> None:

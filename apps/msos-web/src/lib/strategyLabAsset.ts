@@ -68,6 +68,29 @@ export type ResolveLabAssetOptions = {
   useStored?: boolean;
 };
 
+export const TOUR_LAB_ASSET_IDS = ["BTC", "ETH"] as const;
+
+/** Tour entry — crypto only; ignores last-session stock picks (e.g. NVDA). */
+export function resolveTourLabAssetId(options: {
+  query?: string | null;
+  allowedIds?: readonly string[];
+}): LabAssetId {
+  const fromQuery = pickAllowedLabAssetId(options.query, options.allowedIds);
+  if (
+    fromQuery &&
+    TOUR_LAB_ASSET_IDS.includes(fromQuery as (typeof TOUR_LAB_ASSET_IDS)[number])
+  ) {
+    return fromQuery;
+  }
+  for (const preferred of TOUR_LAB_ASSET_IDS) {
+    const picked = pickAllowedLabAssetId(preferred, options.allowedIds);
+    if (picked) {
+      return picked;
+    }
+  }
+  return ABSOLUTE_FALLBACK_ASSET_ID;
+}
+
 /** Resolution order: URL → thesis → last session → catalog default → allowlist[0] → ETH. */
 export function resolveLabAssetId(options: ResolveLabAssetOptions = {}): LabAssetId {
   const useStored = options.useStored !== false;

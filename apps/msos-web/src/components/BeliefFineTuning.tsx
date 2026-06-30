@@ -19,7 +19,7 @@ export function BeliefFineTuning({ tuning, onChange }: BeliefFineTuningProps) {
   const volBounds = BELIEF_TUNING_BOUNDS.vol_mult;
 
   return (
-    <div className="controls belief-fine-tuning" aria-label="Fine-tune your view" data-tour="lab-tuning">
+    <div className="controls belief-fine-tuning" aria-label="Fine-tune your view">
       <div className="control">
         <div className="control-label">Center shift</div>
         <div className="control-value">{formatCenterShiftLabel(tuning.forward_mult)}</div>

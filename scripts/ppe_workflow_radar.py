@@ -626,6 +626,16 @@ def build_radar_report(
         signals["token_verdict"] = 1 if token_summary["verdict"] != "OK" else 0
     candidates.extend(token_candidates)
 
+    try:
+        from scripts.ppe_tracking_hub import scan_tracking_friction
+
+        tracking_candidates = scan_tracking_friction(repo, week_monday)
+        candidates.extend(tracking_candidates)
+        if tracking_candidates:
+            signals["tracking_friction"] = len(tracking_candidates)
+    except Exception:
+        pass
+
     candidates.sort(key=lambda c: (_rank_severity(c.severity), c.id))
     capped = candidates[:5]
 

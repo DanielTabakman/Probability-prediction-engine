@@ -112,6 +112,12 @@ def main(argv: list[str] | None = None) -> int:
         notes=args.notes,
     )
     jsonl_path = append_jsonl(repo, row)
+    try:
+        from scripts.ppe_tracking_hub import record_validation_session
+
+        record_validation_session(repo, row)
+    except Exception:
+        pass
     md_ok = append_validation_md(repo, row) if args.append_validation_md else False
 
     print(format_markdown_row(row))

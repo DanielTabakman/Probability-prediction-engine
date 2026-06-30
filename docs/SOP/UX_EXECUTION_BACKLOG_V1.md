@@ -8,7 +8,7 @@
 
 **As-of:** 2026-06-30 (steward sync)
 
-**Next UX BUILD candidate:** #3 `msos_trader_workflow_horizon_nav_v1` — promote to **READY** in `PHASE_QUEUE.json` before relay.
+**Next UX BUILD candidate:** #3 `msos_trader_workflow_horizon_nav_v1` — **READY** in `PHASE_QUEUE.json` (promoted 2026-06-30).
 
 ---
 
@@ -30,7 +30,7 @@ Run `@ux_legibility_reviewer` checklist at closeout when user-visible copy/layou
 
 | # | Priority | Item | Chapter / program | Relay plan | Queue status | Worker | UX outcome |
 |---|----------|------|-------------------|------------|--------------|--------|------------|
-| 3 | **P1** | Cross-module deep links | `msos_trader_workflow_horizon_nav_v1` | [`msos_trader_workflow_horizon_nav_v1_relay.json`](PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json) | PLANNED → **promote READY** | `@ppe-build-worker` after SELECTION | Exposure → Lab, Horizon region → Lab as obvious next actions |
+| 3 | **P1** | Cross-module deep links | `msos_trader_workflow_horizon_nav_v1` | [`msos_trader_workflow_horizon_nav_v1_relay.json`](PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json) | **READY** | `@ppe-build-worker` after spine closeout | Exposure → Lab, Horizon region → Lab as obvious next actions |
 | 4 | **P2** | Forward consistency radar (engine) | `ppe_forward_consistency_radar_v1` | [`ppe_forward_consistency_radar_v1_relay.json`](PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json) | PLANNED | `@ppe-build-worker` | Trust/edge payload for consistency module |
 | 5 | **P2** | Forward consistency MSOS surface | `msos_forward_consistency_radar_v1` | [`msos_forward_consistency_radar_v1_relay.json`](PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json) | PLANNED | `@ppe-build-worker` | `/forward-consistency` radar heatmap |
 | 6 | **P2** | Cross-venue Strategy Lab card | `msos_cross_venue_strategy_lab_v1` | [`msos_cross_venue_strategy_lab_v1_relay.json`](PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json) | PLANNED | `@ppe-build-worker` | Read-only gap/backtest credibility card (not signals) |

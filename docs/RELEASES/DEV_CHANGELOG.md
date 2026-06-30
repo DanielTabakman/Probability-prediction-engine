@@ -4,6 +4,32 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `19f7b6a` — Merge pull request #1000 from DanielTabakman/feat/research-pipeline-hardening-v1
+- `e73bd18` — fix(msos-web): pin guided tour to BTC and fix lab hydration crash (#1002) (`apps/msos-web/`)
+- `fd838d2` — Control-plane: dev changelog
+- `f46c0dd` — control-plane: land thread-insight routes and promote horizon_nav READY (`docs/SOP/`)
+- `804f30b` — Research pipeline hardening: stale health, summary, MSOS panel, tradeability backtest (`scripts/`)
+- `061e1ba` — fix(msos-web): pin guided tour to BTC and fix lab hydration crash (`apps/msos-web/`)
+- `bcdc877` — Control-plane: research pipeline registry, health, tradeability (`scripts/`)
+- `45a125f` — perf(msos-web): speed guided tour entry with prefetch and client-first lab (`apps/msos-web/`)
+- `ed22eb9` — ops: loop publish ops/loop-publish-20260630202151-fcff4a17 (#1001)
+- `6ef2ba1` — ux(msos-web): simplify Command Center into module launchpad (#998) (`apps/msos-web/`)
+- `6ccb816` — Control-plane: dev changelog
+- `d2d3eb8` — ops: loop publish ops/loop-publish-20260630191149-acae2b6b (#988)
+- `1c52fec` — ops: loop publish ops/loop-publish-20260630191156-acae2b6b (#989) (`docs/SOP/`)
+- `128c960` — control-plane: unified PPE tracking hub v1 (#999) (`scripts/`)
+- `d265a42` — ops(local): manifest READY after relay pass (#997)
+- `5b35c2e` — ops(local): manifest READY after relay pass (#996) (`docs/SOP/`)
+- `ac90c6e` — perf(msos-web): speed guided tour entry with prefetch and client-first lab (#994) (`apps/msos-web/`)
+- `1dcb1bf` — fix(msos-web): add visible loading feedback for guided tour entry (#992) (`apps/msos-web/`)
+- `ca891c9` — docs(steward): sync UX execution backlog and product direction steering (#990) (`docs/SOP/`)
+- `7626288` — ops: loop publish ops/loop-publish-20260630190526-e6b76c15 (#987)
+- `76d647f` — ops: loop publish ops/loop-publish-20260630190520-e6b76c15 (#986) (`docs/SOP/`)
+- control(msos-revloop): mark MSOS-RevLoop-Product-Slice002 IDE product ready (#985)
+- `1fb5cb2` — ops: loop publish ops/loop-publish-20260630183950-30874bc8 (#982)
+- `bff359d` — ops: loop publish ops/loop-publish-20260630183957-30874bc8 (#983)
+- `713397e` — ops: loop publish ops/loop-publish-20260630183557-2743c397 (#981)
+- `72168c4` — Control-plane: dev changelog
 - `a8f7890` — ops: loop publish ops/loop-publish-20260630174312-39227b0f (#949)
 - `c5d641b` — ops: loop publish ops/loop-publish-20260630174527-39227b0f (#952)
 - `b624fd3` — ops: loop publish ops/loop-publish-20260630174724-39227b0f (#953)

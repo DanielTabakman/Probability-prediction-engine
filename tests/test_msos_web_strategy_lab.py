@@ -17,7 +17,9 @@ def test_strategy_lab_route_and_shell() -> None:
     text = page.read_text(encoding="utf-8")
     assert "AppShell" in text
     assert "StrategyLabContent" in text
-    assert "fetchDisplayPayload" in text
+    assert "fetchDisplayPayloadClient" in (
+        MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx"
+    ).read_text(encoding="utf-8")
     assert 'activeNavId="strategy-lab"' in text
 
 
@@ -163,14 +165,9 @@ def test_strategy_lab_asset_switcher_and_eth_copy() -> None:
     assert "resolveDisplayAssetMeta" in thesis_ctx
     assert "I think ${asset.id} will" in thesis_ctx
 
-    eth_connected = fixtures.split('label: "ETH options"')[1].split("Event markets")[0]
-    assert "Live" in eth_connected
-    eth_tile = fixtures.split('title: "ETH options"')[1].split("NVDA options")[0]
-    assert "enabled: true" in eth_tile
-    nvda_connected = fixtures.split('label: "NVDA options"')[1].split("Event markets")[0]
-    assert "Live" in nvda_connected
-    nvda_tile = fixtures.split('title: "NVDA options"')[1].split("Event markets")[0]
-    assert "enabled: true" in nvda_tile
+    assert '"ETH"' in payload_lib
+    assert '"NVDA"' in catalog_lib or '"NVDA"' in payload_lib
+    assert "KNOWN_LAB_ASSET_IDS" in payload_lib
 
 
 def test_thesis_confirmation_route_and_narrative() -> None:
@@ -236,7 +233,8 @@ def test_nav_enables_strategy_lab() -> None:
     assert "disabled: true" not in nav.split("strategy-lab")[1].split("monitor")[0]
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
-    assert "labHref" in cc
+    assert "moduleCards" in cc
+    assert "MSOS_ROUTES.strategyLab" in cc
 
 
 def test_expression_plan_propagates_selected_asset() -> None:
@@ -280,17 +278,19 @@ def test_session_lab_asset_resolution() -> None:
     asset_lib = (MSOS_WEB / "src" / "lib" / "strategyLabAsset.ts").read_text(encoding="utf-8")
     payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
     hook = (MSOS_WEB / "src" / "lib" / "useResolvedLabAssetId.ts").read_text(encoding="utf-8")
-    page = (MSOS_WEB / "src" / "app" / "strategy-lab" / "page.tsx").read_text(encoding="utf-8")
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     workflow = (MSOS_WEB / "src" / "lib" / "strategyLabWorkflow.ts").read_text(encoding="utf-8")
 
     assert "resolveLabAssetId" in asset_lib
+    assert "resolveTourLabAssetId" in asset_lib
     assert "loadStoredLabAssetId" in asset_lib
     assert 'ABSOLUTE_FALLBACK_ASSET_ID = SYSTEM_DEFAULT_ASSET_ID' in asset_lib
     assert 'SYSTEM_DEFAULT_ASSET_ID = "ETH"' in payload_lib
     assert "thesisAssetId" in asset_lib
     assert "useResolvedLabAssetId" in hook
-    assert "resolveLabAssetId" in page
-    assert "useStored: false" in page
+    assert "resolveLabAssetId" in shell
+    assert "clientReady" in shell
+    assert "resolveTourLabAssetId" in shell
     assert "DEFAULT_LAB_ASSET_ID" not in workflow
     assert (
         "buildWorkflowStepHref(step, assetId)" in workflow
@@ -415,7 +415,7 @@ def test_monitoring_history_routes_and_panels() -> None:
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "calibrationStrip" in cc
-    assert 'href="/history"' in cc
+    assert "MSOS_ROUTES.history" in cc
 
 
 def test_conclusion_learn_loop_route() -> None:
@@ -513,13 +513,13 @@ def test_workflow_asset_parity_hrefs_preserve_nvda_and_sol() -> None:
 
 
 def test_workflow_asset_parity_p4_lab_resolves_url_asset() -> None:
-    page = (MSOS_WEB / "src" / "app" / "strategy-lab" / "page.tsx").read_text(encoding="utf-8")
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    prefetch = (MSOS_WEB / "src" / "lib" / "prefetchStrategyLab.ts").read_text(encoding="utf-8")
     payload_lib = (MSOS_WEB / "src" / "lib" / "ppeDisplayPayload.ts").read_text(encoding="utf-8")
 
-    assert "resolveLabAssetId" in page
-    assert "fetchDisplayPayload" in page or "fetchDisplayPayloadServer" in page
     assert "resolveLabAssetId" in shell
+    assert "fetchDisplayPayloadClient" in shell
+    assert "warmStrategyLabEntry" in prefetch
     assert 'buildWorkflowStepHref("confirm"' in shell
     assert "buildDisplayApiUrl" in payload_lib
     assert "LAB_ASSET_QUERY_PARAM" in payload_lib

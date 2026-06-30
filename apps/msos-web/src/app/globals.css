@@ -172,13 +172,86 @@ button.btn:focus-visible {
 }
 
 .btn-feedback {
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: var(--teal);
   animation: btn-spin 0.7s linear infinite;
   flex-shrink: 0;
+}
+
+.nav-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 2000;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nav-progress-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), #53aaff);
+  box-shadow: 0 0 10px rgba(67, 231, 211, 0.55);
+  transition: width 0.22s ease;
+}
+
+.route-loading-panel {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.route-loading-card,
+.tour-preparing-card {
+  max-width: 420px;
+  text-align: center;
+  border-radius: 16px;
+  border: 1px solid rgba(67, 231, 211, 0.25);
+  background: rgba(11, 21, 34, 0.92);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+}
+
+.route-loading-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--teal);
+  animation: btn-spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+.route-loading-title,
+.tour-preparing-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.route-loading-subtitle,
+.tour-preparing-subtitle {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tour-preparing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 8, 14, 0.72);
 }
 
 @keyframes btn-spin {
@@ -2547,6 +2620,67 @@ button.btn:disabled {
   margin: 10px 0 0;
 }
 
+.cross-venue-research {
+  margin: 16px 0 20px;
+  padding: 14px 16px;
+}
+
+.cross-venue-research-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.cross-venue-research-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cross-venue-research-badge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.cross-venue-research-note,
+.cross-venue-research-footer {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+
+.cross-venue-research-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.cross-venue-research-k {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cross-venue-research-v {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cross-venue-research-v.teal {
+  color: var(--teal);
+}
+
+.cross-venue-research-v.muted {
+  color: var(--muted);
+}
+
 .forward-consistency {
   margin: 16px 0 20px;
   padding: 14px 16px;
@@ -3351,6 +3485,177 @@ button.btn:disabled {
   flex-wrap: wrap;
 }
 
+.command-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 16px 18px;
+}
+
+.command-hero h2 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+
+.command-hero p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.command-hero-stat {
+  margin-top: 8px !important;
+  font-size: 13px !important;
+  font-weight: 650;
+  color: var(--teal) !important;
+}
+
+.command-hero-note {
+  margin-top: 8px !important;
+  color: #f3e2b6 !important;
+}
+
+.command-hero-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.command-hero-secondary {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.command-hero-secondary:hover {
+  color: var(--teal);
+}
+
+.module-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.module-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.module-card:hover {
+  border-color: rgba(67, 231, 211, 0.22);
+  background: rgba(67, 231, 211, 0.04);
+}
+
+.module-card-mark {
+  height: 38px;
+  width: 38px;
+  border-radius: 11px;
+  background: rgba(67, 231, 211, 0.11);
+  border: 1px solid rgba(67, 231, 211, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.module-card h2 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.module-card p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.45;
+  flex: 1;
+}
+
+.module-card-cta {
+  align-self: flex-start;
+  pointer-events: none;
+}
+
+.module-card-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.planned-modules {
+  margin-bottom: 12px;
+  padding: 12px 16px;
+}
+
+.planned-modules summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+  user-select: none;
+}
+
+.planned-modules-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.planned-modules-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.command-resume {
+  margin-top: 4px;
+}
+
+.command-resume-all {
+  font-size: 12px;
+  color: var(--teal);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.command-resume-all:hover {
+  text-decoration: underline;
+}
+
+.command-resume-empty {
+  margin: 0;
+}
+
+.strategy-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.strategy-link:hover {
+  border-color: rgba(67, 231, 211, 0.2);
+}
+
 .history-panel {
   margin-top: 8px;
 }
@@ -3512,6 +3817,21 @@ button.btn:disabled {
   .calibration-strip {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .command-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .command-hero-actions {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .module-card-grid {
+    grid-template-columns: 1fr;
   }
 
   .learn-loop-strip {

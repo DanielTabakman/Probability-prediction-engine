@@ -110,6 +110,59 @@ def _cross_venue_snapshot_days(repo: Path) -> tuple[int, int]:
         return 0, 14
 
 
+def _archive_crack_catcher_items(repo: Path) -> list[dict[str, str]]:
+    try:
+        from scripts.research_archive_health import build_archive_health
+    except ImportError:
+        return []
+
+    titles = {
+        "cross_venue_event_gap": "Cross-venue backtest scoring",
+        "options_horizon_surface": "Horizon replay scrubber",
+        "implied_distribution_ts": "Distribution timeseries archive",
+    }
+    tails = {
+        "cross_venue_event_gap": "scan OK; backtest thin until history deepens",
+        "options_horizon_surface": "promote when archive_meta.replay_ready",
+        "implied_distribution_ts": "feeds dist timeseries charts when collector task live",
+    }
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for item in build_archive_health(repo).get("collectors") or []:
+        if not isinstance(item, dict):
+            continue
+        cid = str(item.get("id") or "")
+        if item.get("stale"):
+            key = f"stale_{cid}"
+            if key not in seen:
+                seen.add(key)
+                out.append(
+                    {
+                        "id": key,
+                        "title": f"Stale collector — {item.get('label') or cid}",
+                        "why": f"last snapshot {item.get('last_snapshot_utc') or 'never'} · check VM scheduled task",
+                        "source": str(item.get("archive_root") or cid),
+                    }
+                )
+        if item.get("ready"):
+            continue
+        key = f"archive_{cid}"
+        if key in seen:
+            continue
+        seen.add(key)
+        have = int(item.get("calendar_days") or 0)
+        need = int(item.get("min_calendar_days") or 0)
+        out.append(
+            {
+                "id": key,
+                "title": titles.get(cid, str(item.get("label") or cid)),
+                "why": f"{have} / {need} daily snapshots · {tails.get(cid, 'VM collector must keep running')}",
+                "source": str(item.get("archive_root") or cid),
+            }
+        )
+    return out
+
+
 def _parse_module_registry(repo: Path) -> list[dict[str, str]]:
     path = repo / REGISTRY_REL
     if not path.is_file():
@@ -243,30 +296,8 @@ def _backlog_do_now(repo: Path) -> list[dict[str, str]]:
 
 
 def _crack_catcher_items(repo: Path, status: dict[str, Any]) -> list[dict[str, str]]:
-    out: list[dict[str, str]] = []
-    seen: set[str] = set()
-
-    h_days, h_need = _horizon_archive_hint(repo)
-    if h_days < h_need:
-        out.append(
-            {
-                "id": "archive_horizon_replay",
-                "title": "Horizon replay scrubber",
-                "why": f"{h_days} / {h_need} daily surface snapshots · promote when archive_meta.replay_ready",
-                "source": "horizon_surface_archive",
-            }
-        )
-
-    cv_days, cv_need = _cross_venue_snapshot_days(repo)
-    if cv_days < cv_need:
-        out.append(
-            {
-                "id": "archive_cross_venue_backtest",
-                "title": "Cross-venue backtest scoring",
-                "why": f"{cv_days} / {cv_need} daily PM ↔ Deribit snapshots · scan OK; backtest thin until history deepens",
-                "source": "cross_venue_snapshots",
-            }
-        )
+    out: list[dict[str, str]] = _archive_crack_catcher_items(repo)
+    seen: set[str] = {item["id"] for item in out}
 
     supply = status.get("supply") or {}
     queue_ready = int(supply.get("queue_ready") or 0)

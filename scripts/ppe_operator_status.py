@@ -387,11 +387,32 @@ def _format_human(
             lines.append(operator_lane_line(repo))
     except Exception:
         pass
+    if repo is not None:
+        try:
+            from scripts.ppe_tracking_hub import format_operator_tracking_lines
+
+            lines.extend(format_operator_tracking_lines(repo))
+        except Exception:
+            pass
     next_promo = supply.get("next_promotable_blocked")
     if isinstance(next_promo, dict) and next_promo.get("chapterId"):
         lines.append(f"Next after closeout: {next_promo.get('chapterId')} ({next_promo.get('planPath')})")
     elif supply.get("promote_reason") and status.get("verdict") == VERDICT_SUPPLY_LOW:
         lines.append(f"Promote: {supply.get('promote_reason')}")
+
+    if repo is not None:
+        try:
+            from scripts.research_archive_health import build_archive_health, format_health_line
+
+            collectors_health = build_archive_health(repo).get("collectors") or []
+            if collectors_health:
+                lines.append("")
+                lines.append("Research archives:")
+                for item in collectors_health:
+                    if isinstance(item, dict):
+                        lines.append(f"  {format_health_line(item)}")
+        except Exception:
+            pass
 
     burst = burst_plan if burst_plan is not None else status.get("burst_plan")
     if isinstance(burst, dict):
@@ -472,6 +493,18 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
 {_format_human(status, repo, burst_plan=burst_plan)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
+    try:
+        from scripts.research_archive_health import write_archive_health
+
+        write_archive_health(repo)
+    except Exception:
+        pass
+    try:
+        from src.viz.research_summary import write_research_summary
+
+        write_research_summary(repo)
+    except Exception:
+        pass
     try:
         from scripts.ppe_operator_compass import sync_compass
 

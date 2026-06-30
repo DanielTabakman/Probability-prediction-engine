@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { LabDataMode } from "@/lib/strategyLabCopy";
 import { ExpiryMarketContextStrip } from "@/components/ExpiryMarketContextStrip";
+import { CrossVenueGapPanel } from "@/components/CrossVenueGapPanel";
 import { ForwardConsistencyPanel } from "@/components/ForwardConsistencyPanel";
 import { LabSetupRow } from "@/components/LabSetupRow";
 import { StrategyLabInteractivePanel } from "@/components/StrategyLabInteractivePanel";
@@ -39,6 +40,12 @@ export function StrategyLabWorkSection({
     [live, displayPayload],
   );
   const [selectedExpiry, setSelectedExpiry] = useState(() => expiryOptions[0] ?? "30 days");
+
+  useEffect(() => {
+    setSelectedExpiry((current) =>
+      expiryOptions.includes(current) ? current : (expiryOptions[0] ?? "30 days"),
+    );
+  }, [expiryOptions]);
 
   const resolvedExpiry = expiryOptions.includes(selectedExpiry)
     ? selectedExpiry
@@ -107,6 +114,8 @@ export function StrategyLabWorkSection({
         displayPayload={displayPayload}
         live={live}
       />
+
+      {assetMeta.id === "BTC" ? <CrossVenueGapPanel live={live} /> : null}
 
       <section className="work strategy-lab-work">
         <StrategyLabInteractivePanel

@@ -8,10 +8,18 @@ export type NavItem = {
   disabled?: boolean;
 };
 
-export type MarketAsset = {
+export type ModuleCard = {
+  mark: string;
+  title: string;
+  description: string;
+  cta: string;
+  href: string;
+  live?: boolean;
+};
+
+export type PlannedModule = {
   label: string;
   status: string;
-  live?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -21,115 +29,43 @@ export const navItems: NavItem[] = [
   { id: "history", label: "History", href: "/history" },
 ];
 
-/** Secondary destinations — linked from Command Center and sidebar footer, not primary nav. */
+/** Secondary destinations — linked from sidebar footer, not primary nav. */
 export const secondaryNavItems: NavItem[] = [
   { id: "exposure", label: "Exposure menu", href: "/exposure" },
   { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
   { id: "learn", label: "Learn", href: "/learn" },
 ];
 
-export const calibrationStrip = {
-  title: "Track how your views hold up",
-  body: "Compare what you thought would happen with what actually happened — paper trading only for now.",
-  cta: "Open monitor",
-  href: "/monitor",
-};
-
-export const connectedMarkets: MarketAsset[] = [
-  { label: "BTC options", status: "Live", live: true },
-  { label: "ETH options", status: "Live", live: true },
-  { label: "NVDA options", status: "Live", live: true },
-  { label: "Event markets", status: "Planned" },
-  { label: "Perp positioning", status: "Planned" },
-];
-
-export const kpis = [
-  { label: "Draft ideas", value: "3", tone: "amber" as const, sub: "Pick up where you left off" },
-  { label: "Confirmed views", value: "2", tone: "teal" as const, sub: "1 waiting for review" },
-  { label: "Paper / live", value: "1 / 0", sub: "No live trades connected" },
-  { label: "Reviews due", value: "4", tone: "red" as const, sub: "Check stale data on one idea" },
-];
-
-export const labTiles = [
+/** Registry-aligned module launch cards — one card per tool, not per asset. */
+export const moduleCards: ModuleCard[] = [
   {
-    mark: "B",
+    mark: "L",
     title: "Strategy Lab",
-    description: "Compare your view to what BTC options are pricing — live now",
+    description: "Compare your view to what options are pricing",
     cta: "Open lab",
-    enabled: true,
-    labHref: "/strategy-lab",
+    href: "/strategy-lab",
+    live: true,
+  },
+  {
+    mark: "H",
+    title: "Options Horizon",
+    description: "Chart price × time and drag a region you care about",
+    cta: "Open chart",
+    href: "/options-horizon",
+    live: true,
   },
   {
     mark: "E",
-    title: "ETH options",
-    description: "Same workflow — live on Deribit",
-    cta: "Open lab",
-    enabled: true,
-    labHref: "/strategy-lab?asset=ETH",
-  },
-  {
-    mark: "N",
-    title: "NVDA options",
-    description: "Equity LEAPS — live chain with trust caveats",
-    cta: "Open lab",
-    enabled: true,
-    labHref: "/strategy-lab?asset=NVDA",
-  },
-  {
-    mark: "P",
-    title: "Event markets",
-    description: "Outcome markets and implied odds",
-    tag: "Planned",
-    enabled: false,
-  },
-  {
-    mark: "L",
-    title: "Positioning & funding",
-    description: "Funding, open interest, and crowding",
-    tag: "Planned",
-    enabled: false,
+    title: "Exposure menu",
+    description: "Paths to express your view — spot, options, and more",
+    cta: "Browse paths",
+    href: "/exposure",
+    live: true,
   },
 ];
 
-export const currentWork = [
-  {
-    name: "BTC range — vol looks rich",
-    tag: "Draft",
-    tagTone: "amber" as const,
-    detail: "Exploring in Strategy Lab · no trade plan yet",
-  },
-  {
-    name: "Downside tail hedge",
-    tag: "Confirmed",
-    detail: "Trade structure saved · alerts not set up yet",
-  },
-  {
-    name: "Calmer-than-market view",
-    tag: "Paper only",
-    detail: "Simulated — not connected to a broker",
-  },
-];
-
-export const headlines = [
-  {
-    title: "Volatility picked up",
-    body: "BTC option ranges widened versus last week.",
-  },
-  {
-    title: "Macro calendar",
-    body: "Two high-impact releases this week — worth a glance before sizing.",
-  },
-];
-
-export const reviewEvents = [
-  {
-    title: "Range trade idea",
-    body: "Time to check whether your view still holds — review due tomorrow.",
-    tone: "teal" as const,
-  },
-  {
-    title: "Stale quote check",
-    body: "One saved idea may be using older market data — refresh before sharing.",
-    tone: "amber" as const,
-  },
+/** Future modules — progressive disclosure on home, not primary launch cards. */
+export const plannedModules: PlannedModule[] = [
+  { label: "Event markets", status: "Planned" },
+  { label: "Perp positioning", status: "Planned" },
 ];

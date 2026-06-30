@@ -21,6 +21,14 @@
 - **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
 - **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
 
+### Operator vs charter Cursor thread habit
+
+- **id:** `operator_vs_charter_thread_habit` · **priority:** medium · **category:** operator
+- **added:** 2026-06-30
+- **summary:** Pin one long-lived Operator Cursor chat for what's next?; use Charter thread opener for UX, data, and SELECTION — never mix relay status into those threads.
+- **policy question:** Which thread roles become pinned bookmarks vs fresh chats per slice?
+- **notes:** Filed from THREAD_INSIGHTS closeout (control_plane_thread_roles).
+
 ### Relay decision model reconcile
 
 - **id:** `relay_decision_reconcile` · **priority:** medium · **category:** control-plane
@@ -130,4 +138,4 @@
 
 ## Changelog
 
-| 2026-06-29 | Auto-render from JSON |
+| 2026-06-30 | Auto-render from JSON |

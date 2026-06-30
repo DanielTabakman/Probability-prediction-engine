@@ -9,10 +9,17 @@ def test_cross_venue_collector_cmd_wrappers_exist() -> None:
     root = Path(__file__).resolve().parents[1]
     for name in (
         "collect_cross_venue_snapshot.cmd",
+        "collect_distribution_stats_snapshot.cmd",
         "run_cross_venue_scan.cmd",
         "run_cross_venue_backtest.cmd",
+        "run_cross_venue_tradeability.cmd",
         "run_cross_venue_daily.cmd",
+        "run_research_daily.cmd",
+        "run_cross_venue_collector_dev.cmd",
+        "run_cross_venue_tradeability_backtest.cmd",
+        "research_status.cmd",
         "install_cross_venue_collector_task.cmd",
+        "install_distribution_collector_task.cmd",
     ):
         path = root / name
         assert path.is_file(), name
