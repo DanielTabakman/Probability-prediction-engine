@@ -363,6 +363,41 @@ def format_operator_tracking_lines(repo: Path, *, days: int = 7) -> list[str]:
     return lines
 
 
+def format_tracking_digest_lines(repo: Path, *, days: int = 7) -> list[str]:
+    """Brief markdown bullets for weekly digest / Monday ntfy."""
+    snap = collect_tracking_snapshot(repo, days=days)
+    lines: list[str] = []
+
+    factory = snap.get("factory") or {}
+    closeouts = int(factory.get("context_closeouts") or 0)
+    validation = int(factory.get("validation_sessions") or 0)
+    if closeouts or validation:
+        lines.append(
+            f"- Factory window: {closeouts} context closeout(s), {validation} validation session(s)."
+        )
+
+    usage = snap.get("product_usage") or {}
+    usage_line = format_usage_line(usage)
+    if usage_line:
+        lines.append(f"- {usage_line}.")
+    elif not usage.get("exists"):
+        lines.append(
+            "- Product usage JSONL not found — run `ppe_pull_product_usage.cmd` on VPS or set "
+            "`PPE_PRODUCT_USAGE_JSONL`."
+        )
+
+    steering = snap.get("steering") or {}
+    if not steering.get("aligned"):
+        lines.append(f"- Steering drift: {steering.get('gap_count', 0)} gap(s) vs active manifest.")
+
+    trader = snap.get("trader_outcomes") or {}
+    pending = int(trader.get("pending_review") or 0)
+    if trader.get("db_exists") and pending > 0:
+        lines.append(f"- Trader loop: {pending} snapshot(s) pending review.")
+
+    return lines[:4]
+
+
 def render_tracking_markdown(snap: dict[str, Any]) -> str:
     lines = [
         "# Tracking status (latest)",
