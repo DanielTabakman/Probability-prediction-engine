@@ -57,13 +57,6 @@
 - **summary:** Health gate warn-only for non-critical issues; soften preflight dirty-tree in sandbox; auto-heal STALE_STATE without exit 7.
 - **policy question:** How much repo drift is acceptable during operator sandbox?
 
-### Founder / canon policy
-
-- **id:** `founder_canon_policy` · **priority:** high · **category:** governance
-- **added:** 2026-06-17
-- **summary:** Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions.
-- **policy question:** What stays human-only forever vs delegated envelope?
-
 ### Observability — human vs informational stops
 
 - **id:** `observability_human_signal` · **priority:** low · **category:** operator
@@ -104,6 +97,15 @@
 - **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
 - **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
 - **notes:** DECISION: Option A default — manual DESKTOP_BUILD / ppe_go paste (autoRemoteBuild=false). Mid-month burn boost: after day 16, if Cursor credits <35% used (operator records via ppe_remote_build_policy.cmd), autoRemoteBuild ON for rest of month. Implemented: remoteBuildPolicy in PPE_AUTO_OPERATOR.local.json + scripts/ppe_remote_build_policy.py.
+
+### Founder / canon policy
+
+- **id:** `founder_canon_policy` · **priority:** high · **category:** governance
+- **added:** 2026-06-17
+- **closed:** 2026-06-30
+- **summary:** Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions.
+- **policy question:** What stays human-only forever vs delegated envelope?
+- **notes:** DECISION: Balanced smart delegation — agents/control-plane auto-ship routine hygiene. human_only: secrets, pivotId/northStar, billing, prod access. steward_packet: PPE_MASTER, mixed-plane. DELEGATION_ENVELOPE_V1 + ppe_delegation_envelope.py.
 
 ### MSOS production live hookup (usable demo)
 

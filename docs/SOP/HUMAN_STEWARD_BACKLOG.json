@@ -88,12 +88,14 @@
     {
       "id": "founder_canon_policy",
       "title": "Founder / canon policy",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "category": "governance",
       "summary": "Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions.",
       "policyQuestion": "What stays human-only forever vs delegated envelope?",
-      "added": "2026-06-17"
+      "added": "2026-06-17",
+      "closed": "2026-06-30",
+      "notes": "DECISION: Balanced smart delegation — agents/control-plane auto-ship routine hygiene. human_only: secrets, pivotId/northStar, billing, prod access. steward_packet: PPE_MASTER, mixed-plane. DELEGATION_ENVELOPE_V1 + ppe_delegation_envelope.py."
     },
     {
       "id": "observability_human_signal",
