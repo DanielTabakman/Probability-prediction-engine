@@ -1,5 +1,10 @@
 import { Suspense } from "react";
 
+import {
+  HORIZON_REGION_TOUR_ANCHOR,
+  HORIZON_REGION_TOUR_COPY,
+  HorizonNavLink,
+} from "@/components/AppNav";
 import { StrategyLabClientShell } from "@/components/StrategyLabClientShell";
 import { StrategyLabErrorBoundary } from "@/components/StrategyLabErrorBoundary";
 import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
@@ -27,6 +32,13 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
 
   return (
     <>
+      <div className="lab-horizon-nav-toolbar" data-tour={HORIZON_REGION_TOUR_ANCHOR}>
+        <HorizonNavLink assetId={assetId} className="btn slim dark">
+          Open Options Horizon
+        </HorizonNavLink>
+        <p className="footer-note lab-horizon-nav-note">{HORIZON_REGION_TOUR_COPY}</p>
+      </div>
+
       <div className="lab-export-toolbar" data-tour="lab-distribution-export">
         {live ? (
           <a href={downloadHref} className="btn slim dark" download>

@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+import {
+  assetAwareModuleHref,
+  buildOptionsHorizonPath,
+  buildStrategyLabPathWithAsset,
+  DEFAULT_CROSS_MODULE_ASSET,
+} from "@/components/AppNav";
 import type { CommandCenterSummary } from "@/lib/commandCenterSummary";
 import { buildCalibrationStrip, type CalibrationStrip } from "@/lib/monitorHistoryFeed";
 import type { WorkflowSummary, WorkflowSummaryWorkItem } from "@/lib/msosWorkflowStore";
@@ -62,10 +68,16 @@ function resolveHeroPrimary(
     return { cta: calibration.cta, href: calibration.href };
   }
   if (workflow.currentWork.some((item) => item.tag === "Draft")) {
-    return { cta: "Resume in Strategy Lab", href: MSOS_ROUTES.strategyLab };
+    return {
+      cta: "Resume in Strategy Lab",
+      href: buildStrategyLabPathWithAsset(DEFAULT_CROSS_MODULE_ASSET),
+    };
   }
   if (summary.status === "empty" && workflow.currentWork.length === 0) {
-    return { cta: "Open Strategy Lab", href: MSOS_ROUTES.strategyLab };
+    return {
+      cta: "Open Strategy Lab",
+      href: buildStrategyLabPathWithAsset(DEFAULT_CROSS_MODULE_ASSET),
+    };
   }
   return { cta: calibration.cta, href: calibration.href };
 }
@@ -80,7 +92,7 @@ function buildResumeItems(summary: CommandCenterSummary, workflow: WorkflowSumma
       tag: item.tag,
       detail: item.detail,
       tagTone: item.tagTone,
-      href: MSOS_ROUTES.strategyLab,
+      href: buildStrategyLabPathWithAsset(DEFAULT_CROSS_MODULE_ASSET),
     });
   });
 
@@ -99,11 +111,13 @@ function buildResumeItems(summary: CommandCenterSummary, workflow: WorkflowSumma
 }
 
 export function CommandCenterContent({ summary, workflow }: Props) {
+  const navAssetId = DEFAULT_CROSS_MODULE_ASSET;
   const calibrationStrip = buildCalibrationStrip(summary);
   const heroPrimary = resolveHeroPrimary(summary, workflow, calibrationStrip);
   const heroStat = heroStatLine(summary, workflow);
   const resumeItems = buildResumeItems(summary, workflow);
   const hasResume = resumeItems.length > 0;
+  const horizonHref = buildOptionsHorizonPath(navAssetId);
 
   return (
     <>
@@ -138,6 +152,9 @@ export function CommandCenterContent({ summary, workflow }: Props) {
           <Link href={heroPrimary.href} className="btn slim primary">
             {heroPrimary.cta}
           </Link>
+          <Link href={horizonHref} className="command-hero-secondary">
+            Options Horizon
+          </Link>
           <Link href={MSOS_ROUTES.history} className="command-hero-secondary">
             History
           </Link>
@@ -146,7 +163,7 @@ export function CommandCenterContent({ summary, workflow }: Props) {
 
       <section className="module-card-grid" aria-label="Open a tool">
         {moduleCards.map((card) => (
-          <Link key={card.title} href={card.href} className="module-card panel">
+          <Link key={card.title} href={assetAwareModuleHref(card.href, navAssetId)} className="module-card panel">
             <div className="module-card-mark" aria-hidden="true">
               {card.mark}
             </div>

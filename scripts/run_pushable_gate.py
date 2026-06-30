@@ -374,6 +374,17 @@ def main(argv: list[str] | None = None) -> int:
         except FileNotFoundError:
             pass
 
+    if files and os.environ.get("PPE_DELEGATION_AUDIT", "1") != "0":
+        try:
+            from scripts.ppe_delegation_envelope import gate_check
+
+            pass_type = os.environ.get("PPE_PASS_TYPE", "")
+            rc = gate_check(repo, files, pass_type=pass_type)
+            if rc != 0:
+                return rc
+        except ImportError:
+            pass
+
     for cmd in plan.commands:
         rc = _run(cmd, cwd=repo)
         if rc != 0:
