@@ -40,3 +40,13 @@ def test_build_archive_health_writes_json(tmp_path: Path) -> None:
     out = write_archive_health(tmp_path)
     assert out.is_file()
     assert "collectors" in out.read_text(encoding="utf-8")
+
+
+def test_format_health_line_replaces_unicode_arrow_for_console() -> None:
+    from scripts.research_archive_health import format_health_line
+
+    line = format_health_line(
+        {"label": "Cross-venue PM \u2194 Deribit", "calendar_days": 8, "min_calendar_days": 14}
+    )
+    assert "<->" in line
+    assert "\u2194" not in line

@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.research_archive_health import format_health_line  # noqa: E402
+from scripts.research_archive_health import _console_safe, format_health_line  # noqa: E402
 from src.viz.research_summary import build_research_summary  # noqa: E402
 
 
@@ -32,7 +32,10 @@ def main(argv: list[str] | None = None) -> int:
         print("Stale collectors (check VM tasks):")
         for item in stale:
             if isinstance(item, dict):
-                print(f"  - {item.get('label') or item.get('id')}: last {item.get('last_snapshot_utc') or 'never'}")
+                print(
+                    f"  - {_console_safe(str(item.get('label') or item.get('id')))}: "
+                    f"last {item.get('last_snapshot_utc') or 'never'}"
+                )
 
     cv = summary.get("cross_venue") or {}
     if cv:
