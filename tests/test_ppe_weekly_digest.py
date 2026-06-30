@@ -151,6 +151,29 @@ class TestPpeWeeklyDigest(unittest.TestCase):
         assert "Workflow watch" in phone["phone_body"]
         assert "roundtrips" in phone["phone_body"]
 
+    def test_build_phone_digest_includes_tracking(self) -> None:
+        phone = build_phone_digest_notify(
+            {
+                "week_monday": "2026-06-01",
+                "merge_count": 2,
+                "product_lines": [],
+                "ops_summary": "1 control-plane merge",
+                "whats_next_lines": [],
+                "friction_lines": [],
+                "tracking_lines": [
+                    "- Factory window: 3 context closeout(s), 1 validation session(s).",
+                    "- Product usage: events=12 users=2 top=lab_view.",
+                ],
+            }
+        )
+        assert "Tracking pulse" in phone["phone_body"]
+        assert "lab_view" in phone["phone_body"]
+
+    def test_build_week_section_includes_tracking(self) -> None:
+        self._seed_changelog()
+        section = build_week_section(self.repo, date(2026, 6, 1))
+        self.assertTrue(section.tracking_lines)
+
     def test_format_week_range(self) -> None:
         self.assertEqual(format_week_range("2026-06-01"), "Jun 1-7")
 

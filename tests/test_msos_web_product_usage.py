@@ -38,3 +38,17 @@ def test_review_route_logs_usage() -> None:
     text = route.read_text(encoding="utf-8")
     assert "review_submit" in text
     assert "appendProductUsageEvent" in text
+
+
+def test_distribution_export_logs_usage() -> None:
+    route = MSOS_WEB / "src" / "app" / "api" / "ppe-display-api" / "distribution-export" / "route.ts"
+    text = route.read_text(encoding="utf-8")
+    assert "distribution_export" in text
+    assert "appendProductUsageEvent" in text
+
+
+def test_feedback_route_logs_usage() -> None:
+    route = MSOS_WEB / "src" / "app" / "api" / "feedback" / "route.ts"
+    text = route.read_text(encoding="utf-8")
+    assert "feedback_submit" in text
+    assert "appendProductUsageEvent" in text

@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,6 +24,28 @@ def resolve_usage_path(repo: Path) -> Path:
             return p / PRODUCT_USAGE_FILENAME
         return p
     return repo / DEFAULT_REL
+
+
+def pull_usage_from_container(
+    repo: Path,
+    *,
+    container: str = "msos_web",
+    dest: Path | None = None,
+) -> Path:
+    """Copy product usage JSONL from a running MSOS web container (VPS docker)."""
+    target = dest or (repo / DEFAULT_REL)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    remote = f"{container}:/data/{PRODUCT_USAGE_FILENAME}"
+    proc = subprocess.run(
+        ["docker", "cp", remote, str(target)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0:
+        err = (proc.stderr or proc.stdout or "docker cp failed").strip()
+        raise RuntimeError(f"pull failed ({remote} -> {target}): {err}")
+    return target
 
 
 def read_usage_events(path: Path) -> list[dict[str, Any]]:
@@ -92,8 +116,22 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument(
+        "--pull-from-docker",
+        nargs="?",
+        const="msos_web",
+        metavar="CONTAINER",
+        help="Copy JSONL from docker container (default: msos_web) before summarize",
+    )
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
+    if args.pull_from_docker is not None:
+        try:
+            dest = pull_usage_from_container(repo, container=args.pull_from_docker)
+            print(f"ppe_product_usage: pulled {dest} from {args.pull_from_docker}", file=sys.stderr)
+        except RuntimeError as exc:
+            print(f"ppe_product_usage: {exc}", file=sys.stderr)
+            return 1
     summary = summarize_usage(repo, days=args.days)
     if args.json:
         print(json.dumps(summary, indent=2))

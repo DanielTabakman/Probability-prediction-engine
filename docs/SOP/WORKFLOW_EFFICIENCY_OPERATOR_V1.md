@@ -107,7 +107,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `workflow_radar.cmd generate` | Workflow friction scan (`--no-cleanup` when prep already ran) |
 | `workflow_radar.cmd cleanup --dry-run` | Orphan scan only (locks, triggers, job files) |
 | `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; includes **operator compass** do-now + crack-catcher, then steward backlog · optional Windows toast (`PPE_WEEKLY_DIGEST_TOAST=0` for phone only) |
-| `weekly_digest_monday.cmd` | **Single Monday pipeline:** prep → wait until **08:00** → radar → digest → notify |
+| `weekly_digest_monday.cmd` | **Single Monday pipeline:** prep → wait until **08:00** → radar → digest (includes **tracking pulse**) → notify |
 | `install_weekly_radar_monday_task.cmd` | Register Task Scheduler: starts **06:00** local, report at **08:00** (run once) |
 | `install_weekly_digest_monday_task.cmd` | Legacy alias — prefer `install_weekly_radar_monday_task.cmd` |
 | `bootstrap_operator_pair.cmd` | One-shot desktop IDE-only + VM SSH setup ([`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)) |
