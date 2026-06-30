@@ -38,6 +38,7 @@ def test_run_director_go_single_ide_build_handoff(tmp_path, monkeypatch):
     assert result["prompt"] == DIRECTOR_PROMPT
     banner = format_user_banner(result)
     assert "Ctrl+V" in banner
+    assert "THREAD_ROLE: operator" in banner
 
 
 def test_run_director_go_burst_default_prompt(tmp_path, monkeypatch):

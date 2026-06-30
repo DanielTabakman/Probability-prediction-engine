@@ -59,4 +59,5 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 - New thread per slice; starter file only — no log/diff paste.
 - After closeout: new thread + continuity brief only.
 - Thread roles: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
-- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`auto-commit.mdc`](auto-commit.mdc), [`product-direction.mdc`](product-direction.mdc).
+- Thread roles + SOP discovery: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc), [`sop-discovery.mdc`](sop-discovery.mdc).
+- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Auto-commit: [`auto-commit.mdc`](auto-commit.mdc) (always-on).

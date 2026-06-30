@@ -124,6 +124,23 @@ Do **not** re-BUILD product when status shows `CLOSEOUT_ONLY` or starter has clo
 
 ---
 
+## PPE relay subagents (`@ppe-director`, `@ppe-build-worker`, `@ppe-finish-worker`)
+
+**Operator thread only.** Paste with burst plan or slice starter context:
+
+```text
+THREAD_ROLE: operator (or ide_build when using IDE_BUILD_STARTER only).
+
+Thread roles: .cursor/rules/ppe-thread-roles.mdc — no charter-style response tails.
+- Do not end with stash/checkout/relay handoff noise.
+- Operator owns branch recovery (RECOVERY_PROTOCOL); finish the delegated slice only.
+- Auto-ship when slice complete + gate passes (auto-commit.mdc).
+```
+
+Also: [`docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md`](../CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md) (legacy manager worker loop).
+
+---
+
 ## Factory policy (no skills layer)
 
 PPE uses **rules + generated status + starters + subagents**, not Cursor Agent Skills, for operator workflows. Do not add a parallel skills hierarchy unless a ritual fails after script/rule fixes ([`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md)).
