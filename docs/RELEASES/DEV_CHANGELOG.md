@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `2e78594` — ops: loop publish ops/loop-publish-20260630051704-3e1f4bd (#785)
+- `f6a66ad` — ops: loop publish ops/loop-publish-20260630045903-2b4f377 (#783)
+- `374cb3f` — ops: loop publish ops/loop-publish-20260630045857-2b4f377 (#782) (`docs/SOP/`)
+- `eae745e` — Control-plane: dev changelog
 - `c5feed1` — Control-plane: dev changelog
 - `0bb13d0` — ops: loop publish ops/loop-publish-20260630045448-a1220fe (#781)
 - `2b40969` — ops: loop publish ops/loop-publish-20260630045142-a1220fe (#779)
@@ -30,6 +34,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-29
 
+- `2f04787` — ops: loop publish ops/loop-publish-20260630051659-3e1f4bd (#784)
 - `38419a2` — ops: loop publish ops/loop-publish-20260630042130-a1220fe (#754)
 - `0258684` — ops: loop publish ops/loop-publish-20260630042215-a1220fe (#755)
 - `462d647` — ops: loop publish ops/loop-publish-20260630042536-a1220fe (#758)
