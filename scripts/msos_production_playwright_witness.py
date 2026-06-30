@@ -35,6 +35,7 @@ from scripts.msos_production_demo_witness import (
     validate_display_api_response,
     validate_strategy_lab_html,
 )
+from scripts.msos_public_copy_gate import scan_html
 
 DEFAULT_OUT = Path("artifacts/health/msos_production_playwright")
 
@@ -195,18 +196,21 @@ def run_playwright_witness(
             screenshot = shot_dir / f"{key}.png"
             page.screenshot(path=str(screenshot), full_page=True)
             html = page.content()
+            copy_errors, copy_warns = scan_html(html, page_id=key)
+            for warn in copy_warns:
+                warnings.append({"id": f"public_copy_{key}_{warn.label}", "detail": warn.detail})
             entry: dict[str, Any] = {
                 "id": key,
                 "url": url,
                 "screenshot": str(screenshot.as_posix()),
-                "ok": True,
+                "ok": len(copy_errors) == 0,
                 "status": 200,
-                "error": None,
+                "error": copy_errors[0].detail if copy_errors else None,
             }
             if path == "/strategy-lab":
                 embed_ok, embed_err = validate_strategy_lab_html(html)
-                entry["ok"] = embed_ok
-                entry["error"] = embed_err
+                entry["ok"] = embed_ok and entry["ok"]
+                entry["error"] = embed_err or entry["error"]
                 if "$104,320" in html:
                     warnings.append(
                         {

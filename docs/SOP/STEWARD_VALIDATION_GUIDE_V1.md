@@ -149,25 +149,27 @@ Run this **alone** once. Time yourself (~5 min).
 
 This is what **Mon 13:00** and **Thu 20:00** nudges drive.
 
+**Solo-default path:** [`OPERATOR_ASYNC_VALIDATION_V1.md`](OPERATOR_ASYNC_VALIDATION_V1.md) — async outreach + `/feedback` counts; live screen share optional.
+
 ### Monday 13:00 — Book outreach (~5 min)
 
 | | |
 |---|---|
-| **Why** | Validation is a **calendar problem**, not a code problem — no hold = no session |
-| **How** | One text, one calendar block before Thursday |
+| **Why** | Validation is a **calendar problem**, not a code problem — one outreach touch beats zero |
+| **How** | **Async default:** one text with demo + feedback link. **Live optional:** calendar hold when they reply |
 
 **Steps:**
 
 1. Run scoreboard (optional): `python scripts\ppe_steward_scoreboard.py`
 2. Pick **one name** from your list (rotate; don’t spam the same person weekly)
-3. Send a message (copy/edit):
+3. Send **async** message (copy/edit — [`OPERATOR_ASYNC_VALIDATION_V1.md`](OPERATOR_ASYNC_VALIDATION_V1.md)):
 
 ```text
-Hey [Name] — I'm building a BTC options research demo (market-implied vs your view, ~5 min walkthrough). Would you have 20–30 min this week for a guided look? No pitch — just want honest feedback from someone who trades options.
+Hey [Name] — BTC options research demo (market-implied vs your view). Explore when you have 5 min, then Share feedback on the site (~2 min). https://marketstructureos.com/strategy-lab
 ```
 
-4. When they reply, **calendar hold** 20–30 min Tue–Thu
-5. Send link: `https://marketstructureos.com`
+4. **Optional live:** if they want a call, calendar hold 20–30 min and use [`DEMO_OPERATOR_SCRIPT.md`](DEMO_OPERATOR_SCRIPT.md)
+5. Export feedback Thu: `python scripts\ppe_export_web_feedback.py --markdown`
 
 **If no reply:** pick the next name next Monday — don’t wait for perfect.
 
