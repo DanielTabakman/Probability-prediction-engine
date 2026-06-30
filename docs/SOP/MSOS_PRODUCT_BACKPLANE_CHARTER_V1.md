@@ -16,6 +16,7 @@
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Future interaction-mode ontology (not build scope) |
 | [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) | Analytical modules — tiers, pillars, data map ([`assets/msos_module_map.html`](assets/msos_module_map.html)) |
+| [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) | User-facing module UX — game/casino interaction craft, ethical boundaries |
 
 ---
 
@@ -132,3 +133,4 @@ When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins fo
 |------|--------|
 | 2026-06-20 | v1 — platform-shaped shell, PPE module, MCD, disagreement grammar |
 | 2026-06-20 | Link interaction-mode ontology doc (vision; not build scope) |
+| 2026-06-29 | Link MSOS UX design philosophy for user-facing modules |

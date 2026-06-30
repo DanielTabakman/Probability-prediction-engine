@@ -4,6 +4,8 @@
 
 **Official canonical phase name:** **PHASE 2 = Desirability / Playability / UX** (same phrase as this document’s heading).
 
+**Platform UX canon (broader):** [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) — applies to all user-facing MSOS modules; this charter remains the **PPE implied-lab** slice of that philosophy.
+
 ## 2. Status / supersession
 
 - **Phase 1** (one-screen BTC implied lab) **remains complete.** Exit criteria and confirmation are unchanged: `docs/SOP/PHASE_1_EXIT_CRITERIA.md`, `docs/SPRINT_1_SPEC.md`, and historical CLOSEOUT evidence referenced from `docs/SOP/CURRENT_FRONTIER.md`.
@@ -98,6 +100,8 @@ Do **not** silently expand “desirability” into **architecture hardening**, *
 ## 1. Title
 
 **Official canonical phase name:** **PHASE 2 = Desirability / Playability / UX** (same phrase as this document’s heading).
+
+**Platform UX canon (broader):** [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) — applies to all user-facing MSOS modules; this charter remains the **PPE implied-lab** slice of that philosophy.
 
 ## 2. Status / supersession
 
