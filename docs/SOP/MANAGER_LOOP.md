@@ -1,5 +1,7 @@
 # MANAGER_LOOP
 
+> **Superseded (2026-06):** MVP1/MSOS relay uses [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md), [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md), and `@ppe-director` / IDE BUILD starters — not manager/worker chat loops. **Do not load this doc for steering.** Historical Phase 2 reference only.
+
 Purpose: define the manager agent's role in the feature slice chain.
 
 ## Manager stance

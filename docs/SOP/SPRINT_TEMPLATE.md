@@ -72,3 +72,18 @@ Done means:
 ### Risks / caveats
 ### Needs human attention
 ### Recommended next step
+
+## Agent load bundle (required on program + sprint closeout)
+
+Every **program doc** and active **sprint spec** must link the relay artifact set so agents never grep `docs/SOP/`:
+
+| Role | Path |
+|------|------|
+| Program (charter thread) | `docs/SOP/<MODULE>_PROGRAM_V1.md` |
+| SELECTION | `docs/SOP/POST_<CHAPTER>_SELECTION.md` |
+| Sprint | `docs/SOP/SPRINT_<CHAPTER>.md` |
+| Evidence | `docs/SOP/<CHAPTER>_EVIDENCE_STATUS.md` |
+| Relay plan | `docs/SOP/PHASE_PLANS/<chapter>_relay.json` |
+| Resolve CLI | `python scripts/resolve_sop.py --chapter <chapter_id> --json` |
+
+Regenerate machine index: `generate_chapter_doc_index.cmd --write` → [`CHAPTER_DOC_INDEX.json`](CHAPTER_DOC_INDEX.json).

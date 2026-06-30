@@ -8,6 +8,18 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter) | this file |
+| Milestone | [`MILESTONE_OPTIONS_HORIZON_V1.md`](MILESTONE_OPTIONS_HORIZON_V1.md) |
+| Resolve | `python scripts/resolve_sop.py --module options_horizon --json` |
+
+Chapter → SELECTION → evidence table below.
+
+---
+
 ## North star
 
 **See where price has been, where options imply it's going, and box the region you care about — then preview payoff and suggested expressions in simulation.**

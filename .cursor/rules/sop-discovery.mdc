@@ -1,0 +1,30 @@
+---
+description: SOP doc discovery — run resolve_sop.py when topic/chapter is unclear. Load on demand.
+alwaysApply: false
+---
+
+# SOP discovery (on demand)
+
+**When the operator asks about a program/chapter/topic** and the correct SOP is not already in the thread starter or continuity brief:
+
+```bash
+python scripts/resolve_sop.py --topic "<phrase>" --json
+python scripts/resolve_sop.py --chapter <chapter_id> --json
+python scripts/resolve_sop.py --module <module_id> --json
+```
+
+**Execute `next_action` and load only paths in `load_always` / `load_for_build` for the thread role.**
+
+| Thread role | Load from resolve JSON |
+|-------------|------------------------|
+| **charter** | `load_always` only |
+| **ide_build** | IDE_BUILD_STARTER only — ignore resolve unless generating starter |
+| **operator** | `OPERATOR_STATUS` + continuity brief; resolve for topic questions only |
+
+**Do not grep `docs/SOP/`** when resolve_sop returns a match.
+
+**Never load** paths in `do_not_load` (legacy Phase 2 ledgers, superseded worker/manager loops).
+
+**Canon:** [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) · index [`CHAPTER_DOC_INDEX.json`](../../docs/SOP/CHAPTER_DOC_INDEX.json) · regenerate `generate_chapter_doc_index.cmd --write`
+
+**Asset enablement** still uses [`asset-auto-discovery.mdc`](asset-auto-discovery.mdc) first — not resolve_sop.

@@ -171,14 +171,17 @@ Future (not v0):
 
 ---
 
-## Related docs
+## Agent load bundle
 
 | Doc | Role |
 |-----|------|
 | [`POST_PPE_EXPOSURE_MENU_V1_SELECTION.md`](POST_PPE_EXPOSURE_MENU_V1_SELECTION.md) | SELECTION |
 | [`SPRINT_PPE_EXPOSURE_MENU_V1.md`](SPRINT_PPE_EXPOSURE_MENU_V1.md) | Sprint |
+| [`PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md`](PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md) | Evidence |
 | [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json) | Relay plan |
-| [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Exposure-first intent (adjacent to Expression Search / Hedging) |
+| Resolve | `python scripts/resolve_sop.py --module exposure_menu --json` |
+
+**Vision:** [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
 
 ---
 

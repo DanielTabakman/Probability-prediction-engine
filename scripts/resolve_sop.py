@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""Resolve which SOP docs to load for a chapter, module, or topic.
+
+Agents MUST run this when the thread role or topic is unclear — do not grep docs/SOP/.
+
+Examples:
+  python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json
+  python scripts/resolve_sop.py --topic "asset batch wave 1" --json
+  python scripts/resolve_sop.py --module exposure_menu --json
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
+from scripts.sop_discovery_core import (  # noqa: E402
+    resolve_by_chapter,
+    resolve_by_module,
+    resolve_by_topic,
+)
+
+
+def _parse_args(argv: list[str] | None) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="Resolve SOP docs to load for agents/humans")
+    ap.add_argument("--repo-root", type=Path, default=_REPO)
+    ap.add_argument("--chapter", help="Relay chapter id (e.g. ppe_exposure_menu_v1)")
+    ap.add_argument("--plan-path", help="Phase plan path (alternative to --chapter)")
+    ap.add_argument("--module", help="Module id from PPE_MODULE_REGISTRY_V1.md")
+    ap.add_argument("--topic", help="Free-text topic or operator phrase")
+    ap.add_argument("--json", action="store_true", help="Emit JSON report")
+    return ap.parse_args(argv)
+
+
+def _print_human(report: dict) -> None:
+    ok = report.get("ok")
+    label = "OK" if ok else "UNRESOLVED"
+    print(f"resolve_sop: {label}")
+    if report.get("chapter_id"):
+        print(f"  chapter: {report['chapter_id']}")
+    if report.get("module_id"):
+        print(f"  module: {report['module_id']}")
+    if report.get("topic"):
+        print(f"  topic: {report['topic']}")
+    if report.get("topic_route_id"):
+        print(f"  route: {report['topic_route_id']}")
+    if report.get("sop"):
+        print(f"  sop: {report['sop']}")
+    if report.get("next_action"):
+        print(f"  next_action: {report['next_action']}")
+    for key in ("load_always", "load_for_build", "load_on_demand"):
+        paths = report.get(key) or []
+        if paths:
+            print(f"  {key}:")
+            for p in paths:
+                print(f"    - {p}")
+    steps = report.get("agent_steps") or []
+    if steps:
+        print("  agent_steps:")
+        for step in steps:
+            print(f"    - {step}")
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parse_args(argv)
+    repo = args.repo_root.resolve()
+
+    modes = sum(
+        1
+        for x in (args.chapter, args.plan_path, args.module, args.topic)
+        if x
+    )
+    if modes != 1:
+        print(
+            "resolve_sop: pass exactly one of --chapter, --plan-path, --module, --topic",
+            file=sys.stderr,
+        )
+        return 2
+
+    if args.chapter or args.plan_path:
+        report = resolve_by_chapter(
+            repo,
+            chapter_id=args.chapter,
+            plan_path=args.plan_path,
+        )
+    elif args.module:
+        report = resolve_by_module(repo, args.module)
+    else:
+        report = resolve_by_topic(args.topic or "")
+
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        _print_human(report)
+
+    return 0 if report.get("ok", True) else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

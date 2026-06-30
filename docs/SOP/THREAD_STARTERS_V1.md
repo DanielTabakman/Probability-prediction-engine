@@ -70,6 +70,28 @@ Topic: asset batch / data collection
 Load only: @docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md (or relevant program doc).
 ```
 
+Unclear topic — resolve first:
+
+```text
+Charter thread. THREAD_ROLE: charter.
+Run: python scripts/resolve_sop.py --topic "<your topic>" --json
+Load only paths from load_always in the JSON.
+```
+
+---
+
+## Topic quick reference
+
+| Topic | @ file or command |
+|-------|-------------------|
+| UX backlog | `docs/SOP/UX_EXECUTION_BACKLOG_V1.md` |
+| Trader spine | `docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md` |
+| Asset enable | `python scripts/discover_asset_data_source.py --asset ID --json` |
+| Asset batch | `docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md` |
+| Any chapter | `python scripts/resolve_sop.py --chapter <id> --json` |
+
+Full table: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) § Topic → load.
+
 ---
 
 ## Explore / review
