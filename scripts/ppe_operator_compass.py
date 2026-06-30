@@ -163,11 +163,18 @@ def _verdict_do_now(repo: Path, status: dict[str, Any]) -> list[dict[str, str]]:
         return [{"id": "verdict_run_local", "title": title, "why": f"{why} · {action}", "source": "operator_status"}]
 
     if verdict == "IDE_BUILD":
+        burst = status.get("burst_plan") if isinstance(status.get("burst_plan"), dict) else {}
+        burst_tail = ""
+        if burst.get("burst_allowed"):
+            burst_tail = (
+                f" · burst max_workers={burst.get('max_cycles')} band={burst.get('overall_band')} "
+                "→ @ppe-director"
+            )
         return [
             {
                 "id": "verdict_ide_build",
                 "title": "IDE BUILD — implement product slice",
-                "why": blocker or "PRODUCT_BLOCKED · ppe_go.cmd → new Agent",
+                "why": (blocker or "PRODUCT_BLOCKED · ppe_go.cmd → new Agent") + burst_tail,
                 "source": "operator_status",
             }
         ]
@@ -373,6 +380,9 @@ def build_compass(repo: Path, status: dict[str, Any] | None = None) -> dict[str,
         "sources": {
             "operator_verdict": str(status.get("verdict") or ""),
             "operator_chapter": str(status.get("chapter_name") or ""),
+            "burst_allowed": bool((status.get("burst_plan") or {}).get("burst_allowed")),
+            "burst_max_workers": (status.get("burst_plan") or {}).get("max_cycles"),
+            "burst_band": (status.get("burst_plan") or {}).get("overall_band"),
         },
     }
 
@@ -444,6 +454,7 @@ def _render_right_now(right_now: dict[str, str]) -> str:
         "      <span class=\"right-now-links\">\n"
         "        <a href=\"../PPE_INTEGRATED_STATUS.md\">Integrated status</a>\n"
         "        · <a href=\"../../../artifacts/orchestrator/OPERATOR_STATUS.md\">Operator status</a>\n"
+        "        · <a href=\"#autobuilder\">Autobuilder</a>\n"
         "        · <a href=\"../HUMAN_STEWARD_BACKLOG.md\">Steward backlog</a>\n"
         "      </span>\n"
         "    </div>\n"
@@ -529,6 +540,10 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
             "Agents bump <code>#map-last-updated</code>",
             "Panels above auto-sync via <code>ppe_operator_compass.py</code>",
         )
+
+    from scripts.msos_map_autobuilder_section import inject as inject_autobuilder_section
+
+    html = inject_autobuilder_section(html)
 
     path.write_text(html, encoding="utf-8")
     return path

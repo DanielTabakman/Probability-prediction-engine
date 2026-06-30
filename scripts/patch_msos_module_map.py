@@ -277,6 +277,10 @@ def main() -> None:
     html = _inject_css(html)
     html = _inject_card_css(html)
 
+    from scripts.msos_map_autobuilder_section import inject as inject_autobuilder_section
+
+    html = inject_autobuilder_section(html)
+
     if MARKER_RIGHT_NOW not in html:
         header_match = re.search(
             r"    <p class=\"sub\">.*?</div>\n\n    <h2>MSOS pillars</h2>",
