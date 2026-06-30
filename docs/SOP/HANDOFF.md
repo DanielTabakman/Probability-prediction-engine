@@ -14,7 +14,7 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — msos trader review loop v1 **COMPLETE** 2026-06-30
+- Active MVP1 focus: **none** — msos strategy lab distribution download v1 **COMPLETE** 2026-06-30
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
 - Next pending execution step: **steward SELECTION** — `docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**MSOS trader review loop v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MSOS Strategy Lab distribution download v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -52,4 +52,4 @@ C) AGENT CONTINUITY (required)
 
 ## Last updated
 
-2026-06-30 — MSOS trader review loop v1 COMPLETE; closeout job `MSOS-RevLoop-Closeout-Slice004`.
+2026-06-30 — MSOS Strategy Lab distribution download v1 COMPLETE; closeout job `MSOS-DistDl-Closeout-Slice003`.

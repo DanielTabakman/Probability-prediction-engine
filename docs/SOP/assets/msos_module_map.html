@@ -476,8 +476,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-30T21:01:36Z">
-        Last updated: 2026-06-30 <time datetime="2026-06-30T21:01:36Z">17:01 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-30T22:49:46Z">
+        Last updated: 2026-06-30 <time datetime="2026-06-30T22:49:46Z">18:49 EDT</time>
       </span>
     </p>
 
@@ -518,7 +518,7 @@
       <ol>
         <li>
           <strong>IDE BUILD — implement product slice</strong>
-          <span class="why">Next product slice [MSOS-DistDl-Product-Slice002] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). ppe_go.cmd → new Agent → Ctrl+V → Enter · burst max_workers=2 band=NORMAL → @ppe-director <em class="compass-src">(operator_status)</em></span>
+          <span class="why">Next product slice [MSOS-FCR-Product-Slice002] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). ppe_go.cmd → new Agent → Ctrl+V → Enter <em class="compass-src">(operator_status)</em></span>
         </li>
         <li>
           <strong>Asset batch — ppe_equity_universe_tier1a_v1</strong>
@@ -546,14 +546,6 @@
         <li>
           <strong>Distribution timeseries archive</strong>
           <span class="why">1 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
-        </li>
-        <li>
-          <strong>Product lane automation</strong>
-          <span class="why">Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker. · Policy: Stay near-zero-API (local profile) vs pay for full autonomous product slices? <em class="compass-src">(human_steward_backlog)</em></span>
-        </li>
-        <li>
-          <strong>Founder / canon policy</strong>
-          <span class="why">Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions. · Policy: What stays human-only forever vs delegated envelope? <em class="compass-src">(human_steward_backlog)</em></span>
         </li>
         <li>
           <strong>Stripe operator prerequisites (phase 7b gate)</strong>
