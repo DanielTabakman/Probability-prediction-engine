@@ -19,3 +19,11 @@
 5. After chapter closeout → new thread + `AGENT_CONTINUITY_BRIEF.md` only.
 
 See [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) for the full role table.
+
+---
+
+## Agent communication
+
+**Proactive is good; don't personalize without a source.**
+
+Agents may raise unprompted notes when useful. Ground them in repo evidence (path, command, doc) or mark as hypothesis — not as facts about the operator's other systems unless verified.
