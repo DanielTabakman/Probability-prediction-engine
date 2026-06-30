@@ -326,7 +326,33 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     return collect_operator_status(repo)
 
 
-def _format_human(status: dict[str, Any], repo: Path | None = None) -> str:
+def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
+    if not burst_plan:
+        return []
+    allowed = bool(burst_plan.get("burst_allowed"))
+    lines = [
+        "Burst: "
+        f"max_workers={burst_plan.get('max_cycles')} "
+        f"band={burst_plan.get('overall_band')} "
+        f"remaining={burst_plan.get('remaining_count')} "
+        f"allowed={'true' if allowed else 'false'}"
+    ]
+    if allowed and burst_plan.get("use_director"):
+        lines.append(
+            "Burst path: read artifacts/control_plane/BURST_PLAN.json → @ppe-director "
+            "(adaptive burst default; ppe_go.cmd --single to opt out)"
+        )
+    elif not allowed:
+        lines.append("Burst path: single verdict only — split slice or trim spec before chaining workers")
+    return lines
+
+
+def _format_human(
+    status: dict[str, Any],
+    repo: Path | None = None,
+    *,
+    burst_plan: dict[str, Any] | None = None,
+) -> str:
     lines = [
         f"VERDICT: {status.get('verdict')}",
         "",
@@ -360,6 +386,10 @@ def _format_human(status: dict[str, Any], repo: Path | None = None) -> str:
     elif supply.get("promote_reason") and status.get("verdict") == VERDICT_SUPPLY_LOW:
         lines.append(f"Promote: {supply.get('promote_reason')}")
 
+    burst = burst_plan if burst_plan is not None else status.get("burst_plan")
+    if isinstance(burst, dict):
+        lines.extend(_format_burst_summary(burst))
+
     cmds = status.get("commands") or []
     if cmds:
         lines.extend(["", "Do this:"])
@@ -390,9 +420,18 @@ def _format_brief(status: dict[str, Any]) -> str:
     return f"VERDICT={verdict} exit={exit_code} plan={plan}"
 
 
-def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
+def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool = True) -> Path:
     out = repo / STATUS_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
+    burst_plan: dict[str, Any] | None = None
+    if sync_burst:
+        try:
+            from scripts.ppe_burst_plan import refresh_burst_plan
+
+            burst_plan = refresh_burst_plan(repo, status)
+            status["burst_plan"] = burst_plan
+        except Exception:
+            pass
     whats_next_block = ""
     try:
         from scripts.ppe_context_window_closeout import load_whats_next_markdown
@@ -411,7 +450,7 @@ def write_status_report(repo: Path, status: dict[str, Any]) -> Path:
 **As-of:** {status.get("as_of")}
 **Verdict:** `{status.get("verdict")}`
 
-{_format_human(status, repo)}
+{_format_human(status, repo, burst_plan=burst_plan)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
     try:

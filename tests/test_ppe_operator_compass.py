@@ -25,6 +25,20 @@ def test_build_compass_includes_verdict_do_now() -> None:
     ids = [item["id"] for item in compass["do_now"]]
     assert "verdict_run_local" in ids
     assert any("exposure" in item["title"].lower() or "closeout" in item["title"].lower() for item in compass["do_now"])
+    assert compass["relay_busy"] is True
+    assert not any(item["id"].startswith("program_") for item in compass["do_now"])
+
+
+def test_program_queue_hidden_from_do_now_when_relay_busy() -> None:
+    from scripts.ppe_operator_compass import build_compass
+
+    busy = build_compass(REPO, status={"as_of": "2026-06-29T20:00:00Z", "verdict": "RUN_LOCAL", "chapter_name": "msos_strategy_lab_dist_download_v1"})
+    assert busy["relay_busy"] is True
+    assert not any(i["id"].startswith("program_") for i in busy["do_now"])
+
+    idle = build_compass(REPO, status={"as_of": "2026-06-29T20:00:00Z", "verdict": "SUPPLY_LOW", "supply": {"queue_ready": 0}})
+    assert idle["relay_busy"] is False
+    assert any(i["id"].startswith("program_") for i in idle["do_now"])
 
 
 def test_done_vm_collector_not_in_do_now() -> None:
@@ -60,6 +74,10 @@ def test_sync_compass_writes_json_and_patches_map(tmp_path: Path) -> None:
         (REPO / "docs/SOP/PPE_MODULE_REGISTRY_V1.md").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    for rel in ("config/operator_program_queue.yaml", "config/assets_tier1_manifest.yaml", "docs/SOP/PHASE_QUEUE.json"):
+        dest = repo / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text((REPO / rel).read_text(encoding="utf-8"), encoding="utf-8")
 
     status = {
         "as_of": "2026-06-29T20:00:00Z",
@@ -78,7 +96,9 @@ def test_sync_compass_writes_json_and_patches_map(tmp_path: Path) -> None:
 
     html = (repo / MAP_REL).read_text(encoding="utf-8")
     assert 'id="map-do-now"' in html
+    assert 'id="map-program-queue"' in html
     assert "test_chapter" in html or "closeout" in html.lower()
+    assert "asset batch —" not in html.lower()
     assert "compass-src" in html
     assert "EDT" in html or "EST" in html
 
@@ -87,6 +107,7 @@ def test_module_map_has_compass_sections() -> None:
     html = (REPO / "docs/SOP/assets/msos_module_map.html").read_text(encoding="utf-8")
     for marker in (
         'id="map-do-now"',
+        'id="map-program-queue"',
         'id="map-crack-catcher"',
         'id="map-module-progress"',
         'id="map-waiting-on-time"',

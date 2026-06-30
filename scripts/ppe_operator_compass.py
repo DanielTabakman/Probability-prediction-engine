@@ -17,6 +17,7 @@ if str(_REPO) not in sys.path:
 
 from scripts.ppe_human_backlog import open_items
 from scripts.ppe_loop_host_guard import loop_host_start_allowed
+from scripts.ppe_operator_program_queue import build_program_queue, program_do_now, relay_is_busy
 
 COMPASS_REL = "artifacts/control_plane/OPERATOR_COMPASS.json"
 MAP_REL = "docs/SOP/assets/msos_module_map.html"
@@ -29,6 +30,7 @@ DO_NOW_BACKLOG_CATEGORIES = frozenset({"ops"})
 CRACK_CATCHER_BACKLOG_CATEGORIES = frozenset({"operator", "architecture", "governance", "control-plane"})
 
 MARKER_DO_NOW = 'id="map-do-now"'
+MARKER_PROGRAM_QUEUE = 'id="map-program-queue"'
 MARKER_CRACK = 'id="map-crack-catcher"'
 MARKER_PROGRESS = 'id="map-module-progress"'
 MARKER_WAITING = 'id="map-waiting-on-time"'
@@ -163,11 +165,18 @@ def _verdict_do_now(repo: Path, status: dict[str, Any]) -> list[dict[str, str]]:
         return [{"id": "verdict_run_local", "title": title, "why": f"{why} · {action}", "source": "operator_status"}]
 
     if verdict == "IDE_BUILD":
+        burst = status.get("burst_plan") if isinstance(status.get("burst_plan"), dict) else {}
+        burst_tail = ""
+        if burst.get("burst_allowed"):
+            burst_tail = (
+                f" · burst max_workers={burst.get('max_cycles')} band={burst.get('overall_band')} "
+                "→ @ppe-director"
+            )
         return [
             {
                 "id": "verdict_ide_build",
                 "title": "IDE BUILD — implement product slice",
-                "why": blocker or "PRODUCT_BLOCKED · ppe_go.cmd → new Agent",
+                "why": (blocker or "PRODUCT_BLOCKED · ppe_go.cmd → new Agent") + burst_tail,
                 "source": "operator_status",
             }
         ]
@@ -196,25 +205,6 @@ def _verdict_do_now(repo: Path, status: dict[str, Any]) -> list[dict[str, str]]:
 
     return []
 
-
-def _asset_batch_do_now(repo: Path) -> list[dict[str, str]]:
-    out: list[dict[str, str]] = []
-    for chapter in _load_yaml_chapters(repo):
-        st = str(chapter.get("status") or "").strip().lower()
-        if st not in ("in_progress", "reopened"):
-            continue
-        cid = str(chapter.get("chapter_id") or "")
-        assets = chapter.get("assets") or []
-        asset_txt = ", ".join(str(a) for a in assets) if isinstance(assets, list) else ""
-        out.append(
-            {
-                "id": f"asset_{cid}",
-                "title": f"Asset batch — {cid}",
-                "why": f"{asset_txt} · witness + trust-caveat sign-off before Live pill · say asset batch wave 1",
-                "source": "assets_tier1_manifest",
-            }
-        )
-    return out[:2]
 
 
 def _backlog_do_now(repo: Path) -> list[dict[str, str]]:
@@ -295,23 +285,6 @@ def _crack_catcher_items(repo: Path, status: dict[str, Any]) -> list[dict[str, s
             }
         )
 
-    for chapter in _load_yaml_chapters(repo):
-        st = str(chapter.get("status") or "").strip().lower()
-        if st != "queued":
-            continue
-        cid = str(chapter.get("chapter_id") or "")
-        assets = chapter.get("assets") or []
-        if not isinstance(assets, list) or not assets:
-            continue
-        out.append(
-            {
-                "id": f"asset_queued_{cid}",
-                "title": f"Asset wave queued — {cid}",
-                "why": f"Next group after current batch: {', '.join(str(a) for a in assets[:5])}",
-                "source": "assets_tier1_manifest",
-            }
-        )
-        break
 
     return out
 
@@ -351,7 +324,7 @@ def build_compass(repo: Path, status: dict[str, Any] | None = None) -> dict[str,
     iso = str(status.get("as_of") or _utc_now())
     date_et, time_et, iso = _et_display(iso)
 
-    do_now = _verdict_do_now(repo, status) + _asset_batch_do_now(repo) + _backlog_do_now(repo)
+    do_now = _verdict_do_now(repo, status) + program_do_now(repo, status) + _backlog_do_now(repo)
     deduped: list[dict[str, str]] = []
     seen_ids: set[str] = set()
     for item in do_now:
@@ -362,17 +335,25 @@ def build_compass(repo: Path, status: dict[str, Any] | None = None) -> dict[str,
         deduped.append(item)
     do_now = deduped[:5]
 
+    busy = relay_is_busy(status)
+
     return {
         "version": 1,
         "as_of_utc": iso,
         "as_of_et": f"{date_et} {time_et}",
         "do_now": do_now,
+        "program_queue": build_program_queue(repo, status),
+        "relay_busy": busy,
         "crack_catcher": _crack_catcher_items(repo, status)[:12],
         "module_progress": _parse_module_registry(repo),
         "right_now": _right_now(repo, status),
         "sources": {
             "operator_verdict": str(status.get("verdict") or ""),
             "operator_chapter": str(status.get("chapter_name") or ""),
+            "relay_busy": busy,
+            "burst_allowed": bool((status.get("burst_plan") or {}).get("burst_allowed")),
+            "burst_max_workers": (status.get("burst_plan") or {}).get("max_cycles"),
+            "burst_band": (status.get("burst_plan") or {}).get("overall_band"),
         },
     }
 
@@ -400,6 +381,35 @@ def _render_list_section(items: list[dict[str, str]], *, empty: str, ordered: bo
     lines.append(f"      </{tag}>")
     return "\n".join(lines) + "\n"
 
+
+
+def _render_program_queue(programs: list[dict[str, Any]], *, relay_busy: bool) -> str:
+    if not programs:
+        return '      <p class="flow-intro compass-empty">No multi-slice programs queued.</p>\n'
+    intro = (
+        "Relay active — finish <strong>Do this now</strong> before starting a program."
+        if relay_busy
+        else "Higher-level BUILD tracks — slice counts and rough time estimates."
+    )
+    lines = [f'      <p class="flow-intro">{intro}</p>', '      <table class="compass-modules program-queue-table">']
+    lines.extend([
+        "        <thead><tr>",
+        "          <th>Program</th><th>Slices left</th><th>Est. time</th><th>How to start</th>",
+        "        </tr></thead><tbody>",
+    ])
+    for row in programs:
+        label = _esc(str(row.get("label") or ""))
+        note = ' <span class="status-partial">in closeout</span>' if row.get("in_closeout") else ""
+        lines.append("          <tr>")
+        lines.append(f"            <td><strong>{label}</strong>{note}</td>")
+        lines.append(f"            <td>{int(row.get('slices_remaining') or 0)}</td>")
+        lines.append(f"            <td>{_esc(str(row.get('est_hours') or ''))}</td>")
+        why = _esc(str(row.get("why") or ""))
+        src = _esc(str(row.get("source") or "program_queue"))
+        lines.append(f'            <td>{why} <em class="compass-src">({src})</em></td>')
+        lines.append("          </tr>")
+    lines.extend(["        </tbody>", "      </table>"])
+    return "\n".join(lines) + "\n"
 
 def _render_module_progress(modules: list[dict[str, str]]) -> str:
     if not modules:
@@ -444,6 +454,7 @@ def _render_right_now(right_now: dict[str, str]) -> str:
         "      <span class=\"right-now-links\">\n"
         "        <a href=\"../PPE_INTEGRATED_STATUS.md\">Integrated status</a>\n"
         "        · <a href=\"../../../artifacts/orchestrator/OPERATOR_STATUS.md\">Operator status</a>\n"
+        "        · <a href=\"#autobuilder\">Autobuilder</a>\n"
         "        · <a href=\"../HUMAN_STEWARD_BACKLOG.md\">Steward backlog</a>\n"
         "      </span>\n"
         "    </div>\n"
@@ -477,6 +488,8 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
         empty="Nothing blocking you on human actions — agents/relay carry the next BUILD.",
         ordered=True,
     )
+    relay_busy = bool(compass.get("relay_busy"))
+    program_inner = _render_program_queue(compass.get("program_queue") or [], relay_busy=relay_busy)
     crack_inner = _render_list_section(
         compass.get("crack_catcher") or [],
         empty="No crack-catcher signals right now.",
@@ -499,6 +512,8 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
     )
 
     html = _replace_div_inner(html, "map-do-now", do_now_inner.rstrip())
+    if MARKER_PROGRAM_QUEUE in html:
+        html = _replace_div_inner(html, "map-program-queue", program_inner.rstrip())
     html = _replace_div_inner(html, "map-crack-catcher", crack_inner.rstrip())
     html = _replace_div_inner(html, "map-module-progress", progress_inner.rstrip())
     html = _replace_div_inner(html, "map-waiting-on-time", waiting_inner.rstrip())
@@ -529,6 +544,10 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
             "Agents bump <code>#map-last-updated</code>",
             "Panels above auto-sync via <code>ppe_operator_compass.py</code>",
         )
+
+    from scripts.msos_map_autobuilder_section import inject as inject_autobuilder_section
+
+    html = inject_autobuilder_section(html)
 
     path.write_text(html, encoding="utf-8")
     return path
