@@ -13,13 +13,16 @@
       "added": "2026-06-17"
     },
     {
+      "id": "product_lane_automation",
       "title": "Product lane automation",
-      "status": "open",
+      "status": "done",
       "priority": "high",
       "category": "architecture",
       "summary": "Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.",
       "policyQuestion": "Stay near-zero-API (local profile) vs pay for full autonomous product slices?",
-      "added": "2026-06-17"
+      "added": "2026-06-17",
+      "closed": "2026-06-30",
+      "notes": "DECISION: Option A default — manual DESKTOP_BUILD / ppe_go paste (autoRemoteBuild=false). Mid-month burn boost: after day 16, if Cursor credits <35% used (operator records via ppe_remote_build_policy.cmd), autoRemoteBuild ON for rest of month. Implemented: remoteBuildPolicy in PPE_AUTO_OPERATOR.local.json + scripts/ppe_remote_build_policy.py."
     },
     {
       "id": "operator_vs_charter_thread_habit",

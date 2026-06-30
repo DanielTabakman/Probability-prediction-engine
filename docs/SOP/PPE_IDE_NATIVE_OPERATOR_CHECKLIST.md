@@ -52,6 +52,21 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ---
 
+## Mid-month credit burn boost (Option A + smart Option B)
+
+**Default (Option A):** `autoRemoteBuild: false` — you run **`DESKTOP_BUILD.cmd`** when ntfy says `IDE_BUILD`.
+
+**After day 16:** if Cursor/agent credits look **underused** (<35% of monthly budget), the loop **auto-starts** remote BUILD for the rest of the month (Option B).
+
+1. Once around mid-month, check Cursor dashboard usage.
+2. Record: `ppe_remote_build_policy.cmd record --used-pct 0.15` (15% used).
+3. Check: `ppe_remote_build_policy.cmd status` — shows whether boost is active.
+4. Budget file: `artifacts/control_plane/CREDIT_BUDGET.json` (gitignored; safe to update anytime).
+
+Boost resets next calendar month; record fresh usage after day 16 if you want boost again.
+
+---
+
 ## After chapter closeout
 
 - [ ] New Cursor thread; load only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).

@@ -155,7 +155,10 @@ def auto_remote_build_enabled(repo_root: Path) -> bool:
     if env in ("1", "true", "yes", "on"):
         return True
     cfg = load_operator_config(repo_root)
-    return cfg.get("autoRemoteBuild", True) is not False
+    from scripts.ppe_remote_build_policy import load_credit_budget, resolve_auto_remote_build
+
+    enabled, _reason = resolve_auto_remote_build(cfg, budget=load_credit_budget(repo_root))
+    return enabled
 
 
 def continuous_max(repo_root: Path) -> int:

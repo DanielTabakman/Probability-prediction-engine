@@ -14,13 +14,6 @@
 
 ## Open
 
-### Product lane automation
-
-- **id:** `` · **priority:** high · **category:** architecture
-- **added:** 2026-06-17
-- **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
-- **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
-
 ### Operator vs charter Cursor thread habit
 
 - **id:** `operator_vs_charter_thread_habit` · **priority:** medium · **category:** operator
@@ -102,6 +95,15 @@
 - **added:** 2026-06-17
 - **closed:** 2026-06-17
 - **summary:** focusGate off, stopOnContextEscalate off, procedural exit-20 auto-advance reporting, legacy relay hard-stops demoted, human steward backlog + weekly ntfy hook.
+
+### Product lane automation
+
+- **id:** `product_lane_automation` · **priority:** high · **category:** architecture
+- **added:** 2026-06-17
+- **closed:** 2026-06-30
+- **summary:** Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker.
+- **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
+- **notes:** DECISION: Option A default — manual DESKTOP_BUILD / ppe_go paste (autoRemoteBuild=false). Mid-month burn boost: after day 16, if Cursor credits <35% used (operator records via ppe_remote_build_policy.cmd), autoRemoteBuild ON for rest of month. Implemented: remoteBuildPolicy in PPE_AUTO_OPERATOR.local.json + scripts/ppe_remote_build_policy.py.
 
 ### MSOS production live hookup (usable demo)
 
