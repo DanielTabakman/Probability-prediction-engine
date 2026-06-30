@@ -5,7 +5,7 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Relay runbook:** [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 

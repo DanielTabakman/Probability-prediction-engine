@@ -2,7 +2,7 @@
 
 **Status:** Accepted (2026-06-17)  
 **Supersedes:** Desktop-as-primary-loop-host (pre–Hyper-V VM cutover)  
-**Canon:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) · [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md)
+**Canon:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) (verdict SSOT) · [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) · [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md)
 
 ---
 
@@ -50,14 +50,9 @@ A dedicated **Hyper-V VM** now runs the loop headlessly; the **daily PC** runs C
 
 ### 4. IDE BUILD vs relay continue
 
-| Step | Where | Action |
-|------|--------|--------|
-| Loop blocks on product | VM (automatic) | `VERDICT=IDE_BUILD` |
-| Implement slice | **Desktop Cursor** | `DESKTOP_BUILD.cmd` or starter `@` file |
-| After merge | Desktop | `DESKTOP_CONTINUE.cmd` (SSH finish on VM) |
-| Continue relay | **VM** (automatic) | `run_ppe_local` / loop — **not** on desktop |
+Verdict → machine → command table: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) (SSOT — do not duplicate elsewhere).
 
-**Policy:** `run_ppe_local.cmd` does **not** implement product code; it advances relay after `mark_ide_product_ready`.
+**Policy:** `run_ppe_local.cmd` does **not** implement product code; it advances relay after `mark_ide_product_ready`. Desktop uses **`DESKTOP_CONTINUE.cmd`** (SSH → VM `finish_ide_build.cmd`), not local relay commands.
 
 ### 5. Operator UX
 

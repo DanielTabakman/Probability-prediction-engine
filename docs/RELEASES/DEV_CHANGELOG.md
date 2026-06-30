@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- product(msos-ui): MSOS-HorizonNav-Product-Slice002 cross-module horizon nav (#1014) (`apps/msos-web/`)
+- `3408d98` — ops(local): manifest RUNNING for relay pass (#1012)
+- `99776ef` — ops(local): manifest RUNNING for relay pass (#1013) (`docs/SOP/`)
+- `7fa1a45` — Control-plane: dev changelog
 - `505f2c9` — control-plane: smart delegation envelope for agent auto-ship (#1011) (`docs/SOP/`)
 - `4eef8e1` — control-plane: Option A product BUILD + mid-month credit burn boost (#1009) (`docs/SOP/`)
 - `7f4d706` — product(msos-web): prominent homepage guided tour CTA (#1008) (`apps/msos-web/`)
