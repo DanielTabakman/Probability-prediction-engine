@@ -35,6 +35,7 @@ export function RestartTourButton({ className, children, beginner = false }: Res
         setPending(true);
         start();
         clearPlatformTutorialComplete();
+        warmStrategyLabEntry(router, tourHref);
         router.push(tourHref);
       }}
     >

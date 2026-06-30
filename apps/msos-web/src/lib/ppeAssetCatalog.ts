@@ -154,10 +154,19 @@ export async function fetchAssetCatalogServer(): Promise<AssetCatalogPayload | n
   return fetchAssetCatalogFromUrl(resolveCatalogApiFetchUrl());
 }
 
-async function fetchAssetCatalogFromUrl(fetchUrl: string): Promise<AssetCatalogPayload | null> {
-  if (!fetchUrl) {
-    return null;
-  }
+const CATALOG_CACHE_TTL_MS = 45_000;
+
+type CatalogCacheEntry = {
+  at: number;
+  value: AssetCatalogPayload | null;
+};
+
+const catalogCache = new Map<string, CatalogCacheEntry>();
+const catalogInFlight = new Map<string, Promise<AssetCatalogPayload | null>>();
+
+async function fetchAssetCatalogFromNetwork(
+  fetchUrl: string,
+): Promise<AssetCatalogPayload | null> {
   try {
     const res = await fetch(fetchUrl, {
       cache: "no-store",
@@ -176,5 +185,30 @@ async function fetchAssetCatalogFromUrl(fetchUrl: string): Promise<AssetCatalogP
     return data;
   } catch {
     return null;
+  }
+}
+
+async function fetchAssetCatalogFromUrl(fetchUrl: string): Promise<AssetCatalogPayload | null> {
+  if (!fetchUrl) {
+    return null;
+  }
+
+  const cached = catalogCache.get(fetchUrl);
+  if (cached && Date.now() - cached.at < CATALOG_CACHE_TTL_MS) {
+    return cached.value;
+  }
+
+  let pending = catalogInFlight.get(fetchUrl);
+  if (!pending) {
+    pending = fetchAssetCatalogFromNetwork(fetchUrl);
+    catalogInFlight.set(fetchUrl, pending);
+  }
+
+  try {
+    const value = await pending;
+    catalogCache.set(fetchUrl, { at: Date.now(), value });
+    return value;
+  } finally {
+    catalogInFlight.delete(fetchUrl);
   }
 }

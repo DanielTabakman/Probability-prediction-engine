@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-const POLL_MS = 100;
 const FALLBACK_MS = 8000;
 
-/** Poll until a tour anchor exists in the DOM, with a hard timeout fallback. */
+/** Wait until a tour anchor exists in the DOM, with a hard timeout fallback. */
 export function useTourAnchorsReady(active: boolean, anchorSelector: string): boolean {
   const [ready, setReady] = useState(false);
 
@@ -24,6 +23,12 @@ export function useTourAnchorsReady(active: boolean, anchorSelector: string): bo
 
     const hasAnchor = () => Boolean(document.querySelector(anchorSelector));
 
+    const markReady = () => {
+      if (!cancelled) {
+        setReady(true);
+      }
+    };
+
     if (hasAnchor()) {
       setReady(true);
       return;
@@ -31,25 +36,27 @@ export function useTourAnchorsReady(active: boolean, anchorSelector: string): bo
 
     setReady(false);
 
-    const interval = window.setInterval(() => {
-      if (cancelled) {
-        return;
-      }
+    const observer = new MutationObserver(() => {
       if (hasAnchor()) {
-        setReady(true);
-        window.clearInterval(interval);
+        markReady();
+        observer.disconnect();
       }
-    }, POLL_MS);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 
-    const timeout = window.setTimeout(() => {
-      if (!cancelled) {
-        setReady(true);
+    const raf = window.requestAnimationFrame(() => {
+      if (hasAnchor()) {
+        markReady();
+        observer.disconnect();
       }
-    }, FALLBACK_MS);
+    });
+
+    const timeout = window.setTimeout(markReady, FALLBACK_MS);
 
     return () => {
       cancelled = true;
-      window.clearInterval(interval);
+      observer.disconnect();
+      window.cancelAnimationFrame(raf);
       window.clearTimeout(timeout);
     };
   }, [active, anchorSelector]);

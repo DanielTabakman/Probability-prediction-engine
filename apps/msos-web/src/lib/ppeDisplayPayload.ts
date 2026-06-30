@@ -390,10 +390,18 @@ export function buildOutcomeFromPayload(
   };
 }
 
-export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<DisplayPayload | null> {
-  if (!fetchUrl) {
-    return null;
-  }
+/** Short-lived client cache so homepage prefetch shares results with Strategy Lab. */
+const DISPLAY_PAYLOAD_CACHE_TTL_MS = 45_000;
+
+type DisplayPayloadCacheEntry = {
+  at: number;
+  value: DisplayPayload | null;
+};
+
+const displayPayloadCache = new Map<string, DisplayPayloadCacheEntry>();
+const displayPayloadInFlight = new Map<string, Promise<DisplayPayload | null>>();
+
+async function fetchDisplayPayloadFromNetwork(fetchUrl: string): Promise<DisplayPayload | null> {
   try {
     const res = await fetch(fetchUrl, {
       cache: "no-store",
@@ -413,6 +421,31 @@ export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<Disp
     return data;
   } catch {
     return null;
+  }
+}
+
+export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<DisplayPayload | null> {
+  if (!fetchUrl) {
+    return null;
+  }
+
+  const cached = displayPayloadCache.get(fetchUrl);
+  if (cached && Date.now() - cached.at < DISPLAY_PAYLOAD_CACHE_TTL_MS) {
+    return cached.value;
+  }
+
+  let pending = displayPayloadInFlight.get(fetchUrl);
+  if (!pending) {
+    pending = fetchDisplayPayloadFromNetwork(fetchUrl);
+    displayPayloadInFlight.set(fetchUrl, pending);
+  }
+
+  try {
+    const value = await pending;
+    displayPayloadCache.set(fetchUrl, { at: Date.now(), value });
+    return value;
+  } finally {
+    displayPayloadInFlight.delete(fetchUrl);
   }
 }
 
