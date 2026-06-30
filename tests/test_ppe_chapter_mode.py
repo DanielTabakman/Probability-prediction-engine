@@ -118,6 +118,25 @@ class TestPpeChapterMode(unittest.TestCase):
         self.assertIn("do NOT re-BUILD", text)
         self.assertIn("OPERATOR_STATUS Mode", text)
 
+    def test_resolve_operator_commands_closeout_desktop(self) -> None:
+        from scripts.ppe_chapter_mode import resolve_operator_commands
+
+        cmds, avoid = resolve_operator_commands(
+            verdict="RUN_LOCAL",
+            chapter_mode={"do_not_rebuild": True, "mode": "CLOSEOUT_ONLY"},
+            loop_host_allowed=False,
+        )
+        self.assertTrue(any("DESKTOP_CONTINUE" in c for c in cmds))
+        self.assertTrue(any("run_ppe_local" in a for a in avoid))
+
+    def test_prune_closeout_chapter(self) -> None:
+        from scripts.ppe_chapter_mode import prune_closeout_chapter
+
+        plan = "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json"
+        self.assertTrue(prune_closeout_chapter(self.repo, plan_path=plan))
+        steering = json.loads((self.repo / "docs/SOP/AGENT_STEERING_V1.json").read_text())
+        self.assertNotIn("msos_strategy_lab_dist_download_v1", steering["closeoutOnlyChapterIds"])
+
 
 if __name__ == "__main__":
     unittest.main()

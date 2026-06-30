@@ -27,6 +27,20 @@ class TestOperatorStatusChapterMode(unittest.TestCase):
         self.assertIn("Preflight warnings (action required", text)
         self.assertIn("RECOVERY_PROTOCOL", text)
 
+    def test_format_human_closeout_commands_desktop(self) -> None:
+        status = {
+            "verdict": VERDICT_RUN_LOCAL,
+            "chapter_mode": {
+                "mode": "CLOSEOUT_ONLY",
+                "do_not_rebuild": True,
+                "loop_host_allowed": False,
+            },
+            "commands": ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"],
+            "avoid": ["run_ppe_local.cmd on desktop (forbidden — use DESKTOP_CONTINUE)"],
+        }
+        text = _format_human(status, Path("."))
+        self.assertIn("DESKTOP_CONTINUE", text)
+
 
 if __name__ == "__main__":
     unittest.main()
