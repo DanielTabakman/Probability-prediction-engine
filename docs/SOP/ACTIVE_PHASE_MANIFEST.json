@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md",
-  "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md",
   "status": "RUNNING",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [P1 SPINE] MSOS distribution CSV download",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [P0 SPINE] MSOS snapshot post-mortem review loop",
   "workerMode": "local-agent"
 }
