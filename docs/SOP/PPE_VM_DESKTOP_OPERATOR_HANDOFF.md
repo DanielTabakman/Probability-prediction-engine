@@ -1,8 +1,10 @@
-# PPE VM + desktop operator — session handoff (2026-06)
+# PPE VM + desktop operator — session handoff
 
 **Plane:** CONTROL-PLANE · **Status:** canonical operator layout after Hyper-V VM cutover
 
-**Policy (accepted):** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)
+**Policy (accepted):** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)  
+**Verdict → command (SSOT):** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)  
+**Human button lookup:** [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
 
 Use this doc when opening a **new Cursor thread** after VM/desktop operator work. Companion quick ref: [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) (repo root).
 
@@ -54,50 +56,32 @@ PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=
 | `PHASE=STACK_DOWN` + `stack_loop=False` | Loop off → double-click **VM_RESTART** on VM |
 | `next=handoff` | Waiting for IDE work, not `run_ppe_local` yet |
 
-**Active chapter:** `msos_user_state_v1` — check `ppe_autobuilder.cmd status --brief` for current slice.
+Current slice: `ppe_autobuilder.cmd status --brief` (do not hard-code chapter ids in docs).
 
 ---
 
-## IDE BUILD vs `ppe_go.cmd` vs `run_ppe_local.cmd`
+## IDE BUILD flow (summary)
 
-**Common confusion:** `run_ppe_local.cmd` does **not** implement the product slice. It continues the relay **after** IDE BUILD is done.
+**`run_ppe_local.cmd` does not implement the product slice** — it continues the relay after IDE BUILD is done.
 
-| Step | Where | Command / action |
-|------|--------|------------------|
-| 1. Operator blocks on product | VM loop (automatic) | `VERDICT=IDE_BUILD` in status |
-| 2. Start BUILD | **Real PC** | Double-click **`DESKTOP BUILD`** — copies prompt to clipboard, opens starter |
-| 3. Paste in Agent | **Real PC Cursor** | New Agent chat → **Ctrl+V** → Enter |
-| 4. Agent closeout | **Real PC** | Gate → commit → `mark_ide_product_ready` (agent runs this) |
-| 5. After PR merge | **Real PC** | **`DESKTOP CONTINUE`** |
-| 6. Continue relay | **VM** (automatic) | Loop runs `run_ppe_local` — no VM action needed |
+1. VM loop blocks → `VERDICT=IDE_BUILD`
+2. Desktop → **`DESKTOP BUILD`** (clipboard prompt + starter)
+3. Cursor Agent → gate → commit → `mark_ide_product_ready`
+4. After PR merge → desktop **`DESKTOP CONTINUE`** (SSH → VM `finish_ide_build.cmd`)
+5. VM loop advances automatically
 
-**Phone ntfy** messages include button hints — see [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
-
----
-
-## Incidents fixed this session (code + ops)
-
-| Issue | Root cause | Fix |
-|-------|------------|-----|
-| Popup cmd storm (VM) | Headless loop spawned `cmd /c` windows; repeated START | `ppe_headless_auto_loop_entry.py`, `CREATE_NO_WINDOW`, `VM_STOP` / `VM_RESTART` |
-| Popups on daily PC | `PPE Desktop Operator` logon task + `PPE_LOOP_HOST=1` on desktop | `DESKTOP_STOP.cmd`, `ppe_operator_no_loop.local.cmd`, removed logon task |
-| `Windows can't find set` | Pasted `set "..."` into Win+R | Use double-click scripts only |
-| Status window closes | `VM_STATUS` had no pause; `PHASE=` takes ~10s | `VM_STATUS.cmd` wait + `pause` |
-| Empty `PPE_STACK_HEADLESS` | Stale `ppe_operator_loop_host.local.cmd` on VM | Refresh from `.example` on START/RESTART |
-| Copy-paste fatigue | Too many one-liners | `VM_*.cmd` + Desktop shortcuts + this doc |
-
-**Merged PRs (representative):** #181 headless popup fix, #186 double-click VM scripts, #187 VM_UPDATE, #189 VM_RESTART, #191 VM_STATUS pause.
+Full step-by-step and forbidden commands: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md). Human double-click steps: [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
 
 ---
 
 ## Procedure docs to prefer going forward
 
-1. [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md) — VM sizing, clone, loop-host token
-2. [`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md) — headless supervisor model
-3. [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) — IDE-native relay, `ppe_go`, director agents
-4. [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) — one-page VM operator card
-5. [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) — daily operator process + incident playbook
-6. [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) — symptom → which `.cmd` on which machine
+1. [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) — verdict → command SSOT
+2. [`PPE_VM_LOOP_HOST_V1.md`](PPE_VM_LOOP_HOST_V1.md) — VM sizing, clone, loop-host token
+3. [`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md) — headless supervisor model
+4. [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) — IDE-native relay, `ppe_go`, director agents
+5. [`VM_OPERATOR_README.txt`](../../VM_OPERATOR_README.txt) — one-page VM operator card
+6. [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) — daily operator process + incident playbook
 7. [`OPERATOR_OPS_QUEUE.md`](OPERATOR_OPS_QUEUE.md) — remaining host-only tasks
 
 ---
@@ -129,5 +113,5 @@ Park relay work for the operator thread.
 
 - [ ] VM: **VM_STATUS** → `stack_loop=True`
 - [ ] Desktop: no operator popups; **no** auto-loop
-- [ ] If `IDE_BUILD`: BUILD in Cursor on desktop, then mark ready + `run_ppe_local` on VM
+- [ ] If `IDE_BUILD`: **DESKTOP BUILD** in Cursor on desktop; after PR merge → **DESKTOP CONTINUE**
 - [ ] If `STACK_DOWN` on VM: **VM_RESTART** once (not repeatedly)

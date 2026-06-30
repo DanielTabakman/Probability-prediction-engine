@@ -1,6 +1,8 @@
 # Operator button map — which machine, which double-click
 
-**Plane:** CONTROL-PLANE · **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Layout:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
+**Plane:** CONTROL-PLANE · **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md)  
+**Verdict → command (SSOT):** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)  
+**Layout / thread handoff:** [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](PPE_VM_DESKTOP_OPERATOR_HANDOFF.md)
 
 ## IDE BUILD — when phone says `IDE_BUILD` (most common)
 
@@ -41,6 +43,6 @@ You do **not** need Automations, API credits, or `run_ppe_local` on the desktop.
 - Desktop = **IDE BUILD only** (`ppe_operator_no_loop.local.cmd`).
 - Do **not** enable `DESKTOP_AUTO` on the daily PC unless you explicitly opt in.
 
-**Canonical scripts (5 surfaces):** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+Full verdict table and forbidden desktop commands: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md).
 
 Phone ntfy messages append the same hints via `scripts/ppe_operator_hint.py`.

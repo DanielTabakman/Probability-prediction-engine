@@ -20,6 +20,8 @@ Mark `status: done` when complete. Product sequence continues via `PHASE_CHAPTER
 
 **Code landed (agent):** generic `fix_vm_operator`, git pull exempt paths, relay stale-state heal, ntfy button hints, SOP rewrites, `VM_WATCHDOG`, `setup_desktop_ide_only`, `install_ppe_vm_headless_logon_task.cmd`.
 
+**VM+desktop cutover incidents (archived):** headless popup storm (`ppe_headless_auto_loop_entry.py`, `VM_RESTART`); desktop logon task removed (`DESKTOP_STOP`, `ppe_operator_no_loop.local.cmd`); Win+R paste replaced by double-click `VM_*.cmd` / `DESKTOP_*.cmd`. Representative PRs: #181, #186–#191.
+
 **Operator routine**
 
 1. VM: `VM_STATUS` daily.
