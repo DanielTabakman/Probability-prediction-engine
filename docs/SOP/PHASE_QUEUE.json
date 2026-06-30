@@ -467,10 +467,11 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[P1 SPINE] MSOS distribution CSV download",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md",
-      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
@@ -523,7 +524,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
       "status": "READY",
-      "reason": "[MEDIUM] Trader workflow horizon nav \u2014 promoted READY per UX_EXECUTION_BACKLOG_V1 2026-06-30",
+      "reason": "[MEDIUM] Trader workflow horizon nav",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "workerMode": "local-agent"

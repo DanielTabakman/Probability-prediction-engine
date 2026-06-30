@@ -648,7 +648,7 @@
     },
     {
       "chapterId": "msos_strategy_lab_dist_download_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",

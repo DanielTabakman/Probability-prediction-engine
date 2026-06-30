@@ -15,8 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_TRADER_LEARNING_SPINE_V1_SELECTION.md`](docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md))
-- **Last closed chapter:** **MSOS trader review loop v1** — **COMPLETE** 2026-06-30
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md`](docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md))
+- **Last closed chapter:** **MSOS trader workflow horizon nav v1** — **COMPLETE** 2026-06-30
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
