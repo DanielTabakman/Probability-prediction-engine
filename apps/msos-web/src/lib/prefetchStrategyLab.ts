@@ -38,16 +38,9 @@ export function warmStrategyLabEntry(
   });
 }
 
-/** Idle prefetch for homepage — tour route + default lab data. */
+/** Homepage prefetch — route + lab data warm immediately on mount. */
 export function scheduleStrategyLabTourPrefetch(router: PrefetchRouter): () => void {
   const tourHref = strategyLabForcedTourHref();
-  const run = () => warmStrategyLabEntry(router, tourHref);
-
-  if (typeof window.requestIdleCallback === "function") {
-    const id = window.requestIdleCallback(run, { timeout: 2500 });
-    return () => window.cancelIdleCallback(id);
-  }
-
-  const id = window.setTimeout(run, 600);
-  return () => window.clearTimeout(id);
+  warmStrategyLabEntry(router, tourHref);
+  return () => {};
 }

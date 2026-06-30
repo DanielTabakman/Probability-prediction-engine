@@ -20,7 +20,7 @@ export function TourPreparingOverlay({ active }: { active: boolean }) {
       <div className="tour-preparing-card">
         <span className="route-loading-spinner" aria-hidden="true" />
         <p className="tour-preparing-title">Preparing guided tour…</p>
-        <p className="tour-preparing-subtitle">Loading Strategy Lab and highlighting the first step.</p>
+        <p className="tour-preparing-subtitle">Highlighting the first step — live data keeps loading in the background.</p>
       </div>
     </div>,
     document.body,

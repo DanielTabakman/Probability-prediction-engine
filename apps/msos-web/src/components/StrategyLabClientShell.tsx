@@ -117,7 +117,8 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   );
   const firstTourAnchor = tutorialSteps[0]?.anchor ?? "";
   const tourAnchorsReady = useTourAnchorsReady(tutorialOpen, firstTourAnchor);
-  const tourReady = !tutorialOpen || (tourAnchorsReady && mode !== "loading");
+  /** Tour step 1 anchors in the header — do not block on live chain fetch. */
+  const tourReady = !tutorialOpen || tourAnchorsReady;
   const showTourPreparing = tutorialOpen && !tourReady;
 
   const closeTutorial = useCallback(() => {
