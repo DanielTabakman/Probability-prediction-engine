@@ -1,4 +1,4 @@
-import { appendFile, mkdir } from "fs/promises";
+import { appendFile, mkdir, readFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
@@ -44,4 +44,29 @@ export async function appendWebFeedback(
   await mkdir(dir, { recursive: true });
   await appendFile(feedbackFilePath(), `${JSON.stringify(record)}\n`, "utf8");
   return record;
+}
+
+export async function readWebFeedbackRecords(limit = 200): Promise<WebFeedbackRecord[]> {
+  const pathToFile = feedbackFilePath();
+  let raw = "";
+  try {
+    raw = await readFile(pathToFile, "utf8");
+  } catch {
+    return [];
+  }
+  const records: WebFeedbackRecord[] = [];
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      const row = JSON.parse(trimmed) as WebFeedbackRecord;
+      if (row && typeof row === "object" && row.id) {
+        records.push(row);
+      }
+    } catch {
+      continue;
+    }
+  }
+  records.sort((a, b) => String(b.created_at_utc).localeCompare(String(a.created_at_utc)));
+  return records.slice(0, limit);
 }

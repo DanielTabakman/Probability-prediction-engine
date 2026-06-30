@@ -77,6 +77,9 @@ export function ConclusionContent({ highlightDebrief = false }: ConclusionConten
           <p className="bodycopy">{nextSelectionRecommendation.recommendation}</p>
           <p className="micro aside-warning">{nextSelectionRecommendation.notNow}</p>
           <div className="conclusion-links">
+            <Link href="/feedback" className="btn slim primary">
+              Share feedback
+            </Link>
             <Link href="/strategy-lab" className="btn slim">
               Strategy Lab
             </Link>

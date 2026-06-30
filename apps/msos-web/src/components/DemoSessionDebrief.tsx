@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import {
+  CONFUSION_CATEGORIES,
+  ynToLikert,
+  type FeedbackSubmitPayload,
+} from "@/lib/feedbackForm";
+import { MSOS_ROUTES } from "@/lib/msosPublicUrls";
+
 const STORAGE_KEY = "msos.demo.debrief.draft.v1";
 
 export type DemoDebriefDraft = {
@@ -11,6 +18,7 @@ export type DemoDebriefDraft = {
   returnAgain: "Y" | "N" | "";
   asset: string;
   notes: string;
+  confusionCategory: string;
 };
 
 const EMPTY: DemoDebriefDraft = {
@@ -19,7 +27,10 @@ const EMPTY: DemoDebriefDraft = {
   returnAgain: "",
   asset: "BTC",
   notes: "",
+  confusionCategory: CONFUSION_CATEGORIES[7],
 };
+
+type SubmitState = "idle" | "sending" | "sent" | "error";
 
 function loadDraft(): DemoDebriefDraft {
   if (typeof window === "undefined") return EMPTY;
@@ -70,6 +81,7 @@ type DemoSessionDebriefProps = {
 export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProps) {
   const [draft, setDraft] = useState<DemoDebriefDraft>(EMPTY);
   const [copied, setCopied] = useState<string | null>(null);
+  const [submitState, setSubmitState] = useState<SubmitState>("idle");
 
   useEffect(() => {
     setDraft(loadDraft());
@@ -92,6 +104,40 @@ export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProp
     }
   }, []);
 
+  const submitFeedback = useCallback(async () => {
+    if (!draft.profile.trim()) return;
+    setSubmitState("sending");
+    const payload: FeedbackSubmitPayload = {
+      source: "learn_debrief",
+      tester_profile: draft.profile.trim(),
+      confusion_category: draft.confusionCategory,
+      usefulness: ynToLikert(draft.clarity),
+      repeat_use_intent: ynToLikert(draft.returnAgain),
+      objections_text: draft.notes.trim() || undefined,
+      reality_check_row: buildMarkdownRow(draft),
+    };
+    if (draft.clarity) payload.comprehension = draft.clarity;
+    if (draft.returnAgain) payload.return_intent = draft.returnAgain;
+    if (draft.notes.trim()) {
+      payload.session_note = `asset=${draft.asset.trim().toUpperCase()}`;
+    }
+
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        setSubmitState("error");
+        return;
+      }
+      setSubmitState("sent");
+    } catch {
+      setSubmitState("error");
+    }
+  }, [draft]);
+
   return (
     <section
       className={`panel demo-debrief${highlight ? " demo-debrief-highlight" : ""}`}
@@ -100,18 +146,24 @@ export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProp
       <div className="panel-head">
         <h2>Log this session</h2>
         <div className="panel-sub">
-          60 seconds after a demo — capture what worked. Copy the row or run the command on your
-          desktop repo.
+          After a demo or solo walkthrough — submit feedback or copy a row for your desktop repo.
         </div>
       </div>
 
+      {submitState === "sent" ? (
+        <p className="feedback-success" role="status">
+          Feedback saved. Copy the validation row below if you want it in{" "}
+          <code>VALIDATION_REALITY_CHECKS.md</code>.
+        </p>
+      ) : null}
+
       <div className="demo-debrief-grid">
         <label className="demo-debrief-field">
-          <span>Who watched</span>
+          <span>Who watched (or solo note)</span>
           <input
             type="text"
             value={draft.profile}
-            placeholder="e.g. BTC options trader, fund PM"
+            placeholder="e.g. BTC options trader, solo walkthrough"
             onChange={(e) => setDraft({ ...draft, profile: e.target.value })}
           />
         </label>
@@ -166,6 +218,19 @@ export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProp
             No
           </label>
         </fieldset>
+        <label className="demo-debrief-field">
+          <span>Main signal (optional)</span>
+          <select
+            value={draft.confusionCategory}
+            onChange={(e) => setDraft({ ...draft, confusionCategory: e.target.value })}
+          >
+            {CONFUSION_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="demo-debrief-field demo-debrief-notes">
           <span>Friction / quotes (optional)</span>
           <textarea
@@ -181,6 +246,14 @@ export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProp
         <button
           type="button"
           className="btn slim primary"
+          disabled={!draft.profile.trim() || submitState === "sending"}
+          onClick={() => void submitFeedback()}
+        >
+          {submitState === "sending" ? "Sending…" : "Submit feedback"}
+        </button>
+        <button
+          type="button"
+          className="btn slim"
           disabled={!draft.profile.trim()}
           onClick={() => void copyText("row", markdownRow)}
         >
@@ -194,15 +267,24 @@ export function DemoSessionDebrief({ highlight = false }: DemoSessionDebriefProp
         >
           {copied === "cmd" ? "Copied command" : "Copy log command"}
         </button>
+        <Link href={MSOS_ROUTES.feedback} className="btn slim">
+          Public feedback form
+        </Link>
       </div>
+
+      {submitState === "error" ? (
+        <p className="modal-error" role="alert">
+          Could not save remotely — use copy buttons or try{" "}
+          <Link href={MSOS_ROUTES.feedback}>the public form</Link>.
+        </p>
+      ) : null}
 
       <pre className="demo-debrief-preview micro" aria-live="polite">
         {markdownRow}
       </pre>
       <p className="micro">
-        Desktop: paste command in repo root, or run{" "}
-        <code>python scripts/log_demo_session.py --append-validation-md …</code>. See{" "}
-        <Link href="/strategy-lab">Strategy Lab</Link> to replay the tour.
+        Export: <code>python scripts/ppe_export_web_feedback.py --markdown</code> · Operator inbox:{" "}
+        <code>/operator/feedback</code> (Cloudflare Access)
       </p>
     </section>
   );
