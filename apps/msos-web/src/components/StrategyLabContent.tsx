@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { StrategyLabClientShell } from "@/components/StrategyLabClientShell";
+import { StrategyLabErrorBoundary } from "@/components/StrategyLabErrorBoundary";
 import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
 import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
 
@@ -47,9 +48,11 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
         </p>
       </div>
 
-      <Suspense fallback={<p className="footer-note">Loading Strategy Lab…</p>}>
-        <StrategyLabClientShell initialPayload={displayPayload} />
-      </Suspense>
+      <StrategyLabErrorBoundary>
+        <Suspense fallback={<p className="footer-note">Loading Strategy Lab…</p>}>
+          <StrategyLabClientShell initialPayload={displayPayload} />
+        </Suspense>
+      </StrategyLabErrorBoundary>
     </>
   );
 }

@@ -184,17 +184,19 @@ export function StrategyLabInteractivePanel({
           />
         </div>
 
-        <button
-          type="button"
-          className="btn slim dark lab-advanced-toggle"
-          aria-expanded={showFineTuning}
-          onClick={() => setShowFineTuning((open) => !open)}
-        >
-          {showFineTuning ? "Hide fine-tuning sliders" : "Adjust more (sliders)"}
-        </button>
-        {showFineTuning ? (
-          <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
-        ) : null}
+        <div data-tour="lab-tuning">
+          <button
+            type="button"
+            className="btn slim dark lab-advanced-toggle"
+            aria-expanded={showFineTuning}
+            onClick={() => setShowFineTuning((open) => !open)}
+          >
+            {showFineTuning ? "Hide fine-tuning sliders" : "Adjust more (sliders)"}
+          </button>
+          {showFineTuning ? (
+            <BeliefFineTuning tuning={tuning} onChange={handleFineTuning} />
+          ) : null}
+        </div>
 
         <div className="legend chart-curve-legend" aria-label="Chart legend">
           <span>
