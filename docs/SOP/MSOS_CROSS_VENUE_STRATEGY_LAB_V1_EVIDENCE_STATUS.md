@@ -16,3 +16,5 @@
 - `/ppe-display-api/cross-venue-research.json` via `cross_venue_research_boundary.py`
 - `artifacts/control_plane/RESEARCH_SUMMARY.json` rollup
 - `research_status.cmd` operator readout
+
+**VM witness (2026-06-30):** Distribution collector task registered on ppeloop; smoke CSV under `artifacts/distribution_snapshots/2026-06-30/`.

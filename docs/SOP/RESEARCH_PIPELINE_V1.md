@@ -94,3 +94,5 @@ Ops: [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md)
 | Date | Change |
 |------|--------|
 | 2026-06-30 | v1 — registry JSON, daily runner, archive health, tradeability test, dev collector |
+| 2026-06-30 | Hardening merged (#1000): stale detection, RESEARCH_SUMMARY, MSOS panel, tradeability backtest |
+| 2026-06-30 | VM witness: `PPE Distribution Stats Daily` on ppeloop; smoke snapshot `2026-06-30/ppe_btc_distribution_stats_203540Z.csv` |

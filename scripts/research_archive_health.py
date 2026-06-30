@@ -105,13 +105,18 @@ def build_archive_health(repo: Path) -> dict[str, Any]:
     }
 
 
+def _console_safe(text: str) -> str:
+    """Avoid Windows cp1252 console crashes on registry labels with ↔."""
+    return text.replace("\u2194", "<->")
+
+
 def format_health_line(item: dict[str, Any]) -> str:
     have = int(item.get("calendar_days") or 0)
     need = int(item.get("min_calendar_days") or 0)
-    label = str(item.get("label") or item.get("id") or "collector")
-    tail = " · STALE" if item.get("stale") else ""
+    label = _console_safe(str(item.get("label") or item.get("id") or "collector"))
+    tail = " - STALE" if item.get("stale") else ""
     if not item.get("stale") and item.get("last_snapshot_utc"):
-        tail = f" · last {item.get('last_snapshot_utc')}"
+        tail = f" - last {item.get('last_snapshot_utc')}"
     return f"{label}: {have}/{need} days{tail}"
 
 
