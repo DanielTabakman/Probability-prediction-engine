@@ -172,13 +172,68 @@ button.btn:focus-visible {
 }
 
 .btn-feedback {
-  width: 10px;
-  height: 10px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-top-color: var(--teal);
   animation: btn-spin 0.7s linear infinite;
   flex-shrink: 0;
+}
+
+.route-loading-panel {
+  min-height: 70vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.route-loading-card,
+.tour-preparing-card {
+  max-width: 420px;
+  text-align: center;
+  border-radius: 16px;
+  border: 1px solid rgba(67, 231, 211, 0.25);
+  background: rgba(11, 21, 34, 0.92);
+  padding: 28px 24px;
+  box-shadow: var(--shadow);
+}
+
+.route-loading-spinner {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--teal);
+  animation: btn-spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+.route-loading-title,
+.tour-preparing-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.route-loading-subtitle,
+.tour-preparing-subtitle {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.tour-preparing-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 8, 14, 0.72);
 }
 
 @keyframes btn-spin {

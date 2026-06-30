@@ -57,8 +57,13 @@ def test_platform_tutorial_wiring() -> None:
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
+    assert "TourPreparingOverlay" in shell
     assert "LabAssetPicker" in shell
     assert 'data-tour="lab-asset"' in picker
+    loading = (MSOS_WEB / "src" / "app" / "strategy-lab" / "loading.tsx").read_text(encoding="utf-8")
+    assert "Opening Strategy Lab" in loading
+    restart = (MSOS_WEB / "src" / "components" / "RestartTourButton.tsx").read_text(encoding="utf-8")
+    assert "Opening tour" in restart
 
 
 def test_features_row_self_serve_entry() -> None:

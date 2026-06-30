@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
+import { TourPreparingOverlay } from "@/components/TourPreparingOverlay";
+import { useTourAnchorsReady } from "@/hooks/useTourAnchorsReady";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { WorkflowStepper } from "@/components/WorkflowStepper";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
@@ -102,6 +104,14 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     [payload, selectedAssetId],
   );
   const trustState = payload?.trust_state ?? payload?.meta?.trust_state;
+  const tutorialSteps = useMemo(
+    () => resolveTutorialSteps(tutorialBeginner),
+    [tutorialBeginner],
+  );
+  const firstTourAnchor = tutorialSteps[0]?.anchor ?? "";
+  const tourAnchorsReady = useTourAnchorsReady(tutorialOpen, firstTourAnchor);
+  const tourReady = !tutorialOpen || (tourAnchorsReady && mode !== "loading");
+  const showTourPreparing = tutorialOpen && !tourReady;
 
   const closeTutorial = useCallback(() => {
     setTutorialOpen(false);
@@ -278,10 +288,12 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
 
       <StrategyLabWorkSection displayPayload={payload} dataMode={mode} assetMeta={assetMeta} />
 
+      <TourPreparingOverlay active={showTourPreparing} />
+
       <PlatformTutorial
-        active={tutorialOpen}
+        active={tutorialOpen && tourReady}
         onClose={closeTutorial}
-        steps={resolveTutorialSteps(tutorialBeginner)}
+        steps={tutorialSteps}
         completeHref="/learn?debrief=1"
       />
 
