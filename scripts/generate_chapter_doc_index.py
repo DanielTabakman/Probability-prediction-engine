@@ -30,8 +30,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.write:
         out = write_chapter_doc_index(repo)
-        data = build_chapter_doc_index(repo)
-        print(f"generate_chapter_doc_index: wrote {out} ({data['chapter_count']} chapters)")
+        index = build_chapter_doc_index(repo)
+        print(
+            f"generate_chapter_doc_index: wrote {out} "
+            f"({index['chapter_count']} chapters, "
+            f"{index['active_chapter_count']} active, "
+            f"{index['archived_chapter_count']} archived)"
+        )
         return 0
 
     ap.print_help()

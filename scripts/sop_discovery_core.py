@@ -17,6 +17,7 @@ from scripts.ppe_queue import QUEUE_REL, load_queue
 
 CHAPTER_DOC_INDEX_REL = "docs/SOP/CHAPTER_DOC_INDEX.json"
 ROUTING_CANON_REL = "docs/SOP/AGENT_ROUTING_V1.md"
+STEERING_REL = "docs/SOP/AGENT_STEERING_V1.json"
 
 DO_NOT_LOAD: tuple[str, ...] = (
     "docs/SOP/CURRENT_FRONTIER.md",
@@ -29,10 +30,10 @@ DO_NOT_LOAD: tuple[str, ...] = (
 
 # module_id → program doc (analytical modules)
 MODULE_PROGRAM_DOCS: dict[str, str] = {
-    "implied_distribution": "docs/SOP/MVP1_FRONTIER.md",
+    "implied_distribution": "docs/SOP/IMPLIED_DISTRIBUTION_PROGRAM_V1.md",
     "options_horizon": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
     "forward_consistency": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-    "expression_planner": "docs/SOP/MVP1_FRONTIER.md",
+    "expression_planner": "docs/SOP/EXPRESSION_PLANNER_PROGRAM_V1.md",
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
     "workflow": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
@@ -267,6 +268,7 @@ def chapter_doc_bundle(repo: Path, *, chapter_id: str, plan_path: str) -> dict[s
     load_always = [p for p in (program_doc, selection) if p]
     load_for_build = [p for p in (sprint, plan_rel) if p]
     load_on_demand = [p for p in (evidence, next_selection, *carry) if p]
+    archived = queue_status == "DONE"
 
     return {
         "chapter_id": chapter_id,
@@ -278,6 +280,7 @@ def chapter_doc_bundle(repo: Path, *, chapter_id: str, plan_path: str) -> dict[s
         "next_selection": next_selection or None,
         "carry_docs": carry,
         "queue_status": queue_status,
+        "archived": archived,
         "load_always": load_always,
         "load_for_build": load_for_build,
         "load_on_demand": load_on_demand,
@@ -304,13 +307,18 @@ def scan_chapter_plans(repo: Path) -> list[dict[str, Any]]:
 def build_chapter_doc_index(repo: Path) -> dict[str, Any]:
     chapters = scan_chapter_plans(repo)
     by_id = {row["chapter_id"]: row for row in chapters if row.get("chapter_id")}
+    active = [row for row in chapters if not row.get("archived")]
+    archived_rows = [row for row in chapters if row.get("archived")]
     return {
         "version": 1,
         "generated_at": _utc_now(),
         "canon": ROUTING_CANON_REL,
         "resolve_cmd": "python scripts/resolve_sop.py --chapter <id> --json",
         "chapter_count": len(chapters),
+        "active_chapter_count": len(active),
+        "archived_chapter_count": len(archived_rows),
         "chapters": chapters,
+        "active_chapters": active,
         "by_chapter_id": by_id,
         "topic_route_ids": [r["id"] for r in TOPIC_ROUTES],
         "module_program_docs": MODULE_PROGRAM_DOCS,
@@ -323,7 +331,90 @@ def write_chapter_doc_index(repo: Path) -> Path:
     out = repo / CHAPTER_DOC_INDEX_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    sync_agent_steering_doc_hints(repo)
     return out
+
+
+def list_topics() -> list[dict[str, Any]]:
+    return [
+        {
+            "id": route["id"],
+            "sop": route["sop"],
+            "match": list(route.get("match") or ()),
+            "next_action": route.get("next_action"),
+        }
+        for route in TOPIC_ROUTES
+    ]
+
+
+def expand_carry_docs_for_closeout(
+    repo: Path,
+    *,
+    carry_docs: list[str] | None,
+    chapter_id: str,
+    plan_path: str,
+) -> list[str]:
+    repo = repo.resolve()
+    base = [_norm(p) for p in (carry_docs or []) if str(p).strip()]
+    try:
+        bundle = chapter_doc_bundle(repo, chapter_id=chapter_id, plan_path=plan_path)
+    except (OSError, json.JSONDecodeError, KeyError):
+        return list(dict.fromkeys(base))
+    extras = [
+        p
+        for p in (
+            bundle.get("program_doc"),
+            bundle.get("selection"),
+            bundle.get("sprint"),
+            bundle.get("evidence"),
+            bundle.get("next_selection"),
+            *(bundle.get("carry_docs") or []),
+        )
+        if p
+    ]
+    return list(dict.fromkeys(base + extras))
+
+
+def sync_agent_steering_doc_hints(repo: Path) -> dict[str, Any]:
+    repo = repo.resolve()
+    steering_path = repo / STEERING_REL
+    if not steering_path.is_file():
+        return {"ok": False, "reason": "steering_missing"}
+    try:
+        steering = json.loads(steering_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {"ok": False, "reason": "steering_unreadable"}
+    if not isinstance(steering, dict):
+        return {"ok": False, "reason": "steering_invalid"}
+    hints: dict[str, Any] = {}
+    next_id = str(steering.get("nextBuildCandidateId") or "").strip()
+    if next_id:
+        report = resolve_by_chapter(repo, chapter_id=next_id)
+        if report.get("ok"):
+            hints["nextBuildCandidate"] = {
+                "chapter_id": next_id,
+                "resolve_cmd": f"python scripts/resolve_sop.py --chapter {next_id} --json",
+                "program_doc": report.get("program_doc"),
+                "load_always": list(report.get("load_always") or []),
+                "load_for_build": list(report.get("load_for_build") or []),
+                "load_on_demand": list(report.get("load_on_demand") or []),
+            }
+    steering["docHints"] = hints
+    steering_path.write_text(json.dumps(steering, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {"ok": True, "docHints": hints}
+
+
+def refresh_sop_discovery_artifacts(repo: Path) -> dict[str, Any]:
+    repo = repo.resolve()
+    out = write_chapter_doc_index(repo)
+    data = build_chapter_doc_index(repo)
+    return {
+        "ok": True,
+        "index_path": _norm(str(out.relative_to(repo))),
+        "chapter_count": data.get("chapter_count"),
+        "active_chapter_count": data.get("active_chapter_count"),
+        "archived_chapter_count": data.get("archived_chapter_count"),
+    }
 
 
 def _match_topic(topic: str) -> dict[str, Any] | None:
@@ -392,7 +483,12 @@ def resolve_by_module(repo: Path, module_id: str) -> dict[str, Any]:
     for row in scan_chapter_plans(repo):
         cid = str(row.get("chapter_id") or "")
         if mid.replace("_", "") in cid.replace("_", ""):
-            if row.get("queue_status") in (None, "READY", "RUNNING", "PLANNED"):
+            if not row.get("archived") and row.get("queue_status") in (
+                None,
+                "READY",
+                "RUNNING",
+                "PLANNED",
+            ):
                 chapter_match = row
                 break
 
@@ -445,6 +541,7 @@ def resolve_by_chapter(repo: Path, *, chapter_id: str | None = None, plan_path: 
         "chapter_id": cid,
         "plan_path": plan,
         "queue_status": bundle.get("queue_status"),
+        "archived": bundle.get("archived"),
         "selection_prep": _norm(str(queue_row.get("selectionPrep") or "")) or None,
         "sop": bundle.get("program_doc") or bundle.get("selection") or ROUTING_CANON_REL,
         "program_doc": bundle.get("program_doc"),

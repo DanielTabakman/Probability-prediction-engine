@@ -153,6 +153,21 @@ def resolve_chapter_mode(
     if not isinstance(pending_closeout, list):
         pending_closeout = []
 
+    next_build_hint: dict[str, Any] | None = None
+    next_c = str(steering.get("nextBuildCandidateId") or "").strip()
+    if next_c:
+        from scripts.sop_discovery_core import resolve_by_chapter
+
+        resolved = resolve_by_chapter(repo, chapter_id=next_c)
+        if resolved.get("ok"):
+            next_build_hint = {
+                "chapter_id": next_c,
+                "resolve_cmd": f"python scripts/resolve_sop.py --chapter {next_c} --json",
+                "program_doc": resolved.get("program_doc"),
+                "load_for_build": list(resolved.get("load_for_build") or []),
+                "load_always": list(resolved.get("load_always") or []),
+            }
+
     return {
         "mode": mode,
         "product_on_main": product_on_main,
@@ -162,6 +177,7 @@ def resolve_chapter_mode(
         "agent_instructions": instructions,
         "pending_closeout_chapters": pending_closeout,
         "next_build_candidate": steering.get("nextBuildCandidateId"),
+        "next_build_resolve_hint": next_build_hint,
     }
 
 
@@ -189,6 +205,16 @@ def format_chapter_mode_block(info: dict[str, Any]) -> list[str]:
     next_c = info.get("next_build_candidate")
     if next_c and info.get("do_not_rebuild"):
         lines.append(f"  Next BUILD candidate (after closeout): `{next_c}`")
+
+    hint = info.get("next_build_resolve_hint")
+    if isinstance(hint, dict) and hint.get("chapter_id"):
+        lines.append(f"  Resolve hint: `{hint.get('resolve_cmd')}`")
+        program = hint.get("program_doc")
+        if program:
+            lines.append(f"  Program doc: `{program}`")
+        build_paths = hint.get("load_for_build") or []
+        if build_paths:
+            lines.append(f"  load_for_build: {', '.join(f'`{p}`' for p in build_paths[:3])}")
 
     return lines
 

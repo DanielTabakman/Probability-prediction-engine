@@ -1,6 +1,670 @@
 {
+  "active_chapter_count": 21,
+  "active_chapters": [
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/VISION/OPTIONS_HORIZON/SURFACE_ARCHIVE_CONTRACT_V1.md",
+        "docs/SOP/HORIZON_SURFACE_COLLECTOR_OPS_V1.md"
+      ],
+      "chapter_id": "horizon_replay_scrubber_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md",
+        "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
+        "docs/VISION/OPTIONS_HORIZON/SURFACE_ARCHIVE_CONTRACT_V1.md",
+        "docs/SOP/HORIZON_SURFACE_COLLECTOR_OPS_V1.md"
+      ],
+      "next_selection": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+      ],
+      "chapter_id": "msos_forward_consistency_radar_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+        "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+        "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+      ],
+      "next_selection": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
+      "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_strategy_lab_dist_download_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md",
+        "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "READY",
+      "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "msos_trader_workflow_horizon_nav_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+        "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md",
+        "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
+      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "queue_status": "READY",
+      "selection": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_belief_input_ux",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [
+        "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md",
+        "docs/SOP/PHASE_PLANS/mvp1_belief_input_ux_relay.json"
+      ],
+      "load_on_demand": [],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_belief_input_ux_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md"
+      ],
+      "chapter_id": "mvp1_distribution_export",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
+        "docs/SOP/PHASE_PLANS/mvp1_distribution_export_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md",
+        "docs/SOP/MVP1_FRONTIER.md",
+        "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": "docs/SOP/MVP1_FRONTIER.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_export_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
+      ],
+      "chapter_id": "mvp1_distribution_timeseries_collector_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+        "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
+        "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
+      ],
+      "next_selection": "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md"
+      ],
+      "chapter_id": "mvp1_friends_first_screen",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md",
+        "docs/SOP/PHASE_PLANS/mvp1_friends_first_screen_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION.md",
+        "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_friends_first_screen_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_SMOKE_REGRESSION_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_onboarding_how_it_works",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md",
+        "docs/SOP/PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_ONBOARDING_HOW_IT_WORKS_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_onboarding_how_it_works_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_BELIEF_INPUT_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_operator_hardening",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [
+        "docs/SOP/POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_OPERATOR_HARDENING.md",
+        "docs/SOP/PHASE_PLANS/mvp1_operator_hardening_relay.json"
+      ],
+      "load_on_demand": [],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_operator_hardening_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_PHASE2_CHAPTER_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_OPERATOR_HARDENING.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_phase2_on_main",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [
+        "docs/SOP/POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_PHASE2_ON_MAIN.md",
+        "docs/SOP/PHASE_PLANS/mvp1_phase2_on_main_relay.json"
+      ],
+      "load_on_demand": [],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_phase2_on_main_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_RELIABILITY_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_PHASE2_ON_MAIN.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_reliability",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_RELIABILITY_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_RELIABILITY.md",
+        "docs/SOP/PHASE_PLANS/mvp1_reliability_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_RELIABILITY_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_reliability_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_RELIABILITY.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_review_enrichment",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_REVIEW_ENRICHMENT.md",
+        "docs/SOP/PHASE_PLANS/mvp1_review_enrichment_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_REVIEW_ENRICHMENT_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_review_enrichment_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_OPERATOR_HARDENING_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_REVIEW_ENRICHMENT.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "mvp1_smoke_regression",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md",
+        "docs/SOP/PHASE_PLANS/mvp1_smoke_regression_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MVP1_SMOKE_REGRESSION_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_smoke_regression_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_MVP1_REVIEW_ENRICHMENT_SELECTION_OUTCOME.md",
+      "sprint": "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "ppe_cme_commodity_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_CME_COMMODITY_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_cme_commodity_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_CME_COMMODITY_V1_EVIDENCE_STATUS.md"
+      ],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_cme_commodity_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
+      ],
+      "chapter_id": "ppe_commodity_proxy_tier1_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
+        "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "ppe_equity_universe_tier1a_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "ppe_equity_universe_tier1b_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "ppe_equity_universe_tier1c_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+      ],
+      "chapter_id": "ppe_forward_consistency_radar_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+        "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+      ],
+      "next_selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
+      "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
+      "queue_status": "PLANNED",
+      "selection": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "validation_chapter",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": null,
+      "load_always": [
+        "docs/SOP/POST_VALIDATION_CHAPTER_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/PHASE_PLANS/validation_chapter_relay.json"
+      ],
+      "load_on_demand": [],
+      "next_selection": null,
+      "plan_path": "docs/SOP/PHASE_PLANS/validation_chapter_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_VALIDATION_CHAPTER_SELECTION.md",
+      "sprint": null
+    }
+  ],
+  "archived_chapter_count": 59,
   "by_chapter_id": {
     "horizon_chart_polish_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
         "docs/VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md"
@@ -36,6 +700,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md"
     },
     "horizon_region_workflow_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/OPTIONS_HORIZON/REGION_INTENT_SCHEMA_V1.md"
       ],
@@ -70,6 +735,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REGION_WORKFLOW_V1.md"
     },
     "horizon_replay_scrubber_v1": {
+      "archived": false,
       "carry_docs": [
         "docs/VISION/OPTIONS_HORIZON/SURFACE_ARCHIVE_CONTRACT_V1.md",
         "docs/SOP/HORIZON_SURFACE_COLLECTOR_OPS_V1.md"
@@ -105,6 +771,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md"
     },
     "msos_access_identity_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -138,6 +805,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md"
     },
     "msos_billing_stripe_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -173,6 +841,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
     },
     "msos_cross_venue_strategy_lab_v1": {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "msos_cross_venue_strategy_lab_v1",
       "do_not_load": [
@@ -203,6 +872,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_CROSS_VENUE_STRATEGY_LAB_V1.md"
     },
     "msos_e2e_product_witness_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
       ],
@@ -236,6 +906,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md"
     },
     "msos_entitlements_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -273,6 +944,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md"
     },
     "msos_forward_consistency_radar_v1": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -307,6 +979,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
     "msos_mcd_production_witness_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md",
         "docs/SOP/MSOS_PRODUCTION_LIVE_HOOKUP_V1.md",
@@ -344,6 +1017,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md"
     },
     "msos_monitor_history_live_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -377,6 +1051,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
     },
     "msos_p1_stack_routing": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -410,6 +1085,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md"
     },
     "msos_p2_homepage": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -443,6 +1119,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md"
     },
     "msos_p3_command_center": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
@@ -478,6 +1155,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md"
     },
     "msos_p4_strategy_lab": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
@@ -513,6 +1191,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md"
     },
     "msos_p5_thesis_confirm": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -546,6 +1225,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md"
     },
     "msos_p6_expression_sim": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -579,6 +1259,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P6_EXPRESSION_SIM.md"
     },
     "msos_p7_monitoring": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -612,6 +1293,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md"
     },
     "msos_p8_tester_release": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/VALIDATION_REALITY_CHECKS.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -649,6 +1331,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md"
     },
     "msos_production_multi_asset_witness_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -682,6 +1365,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md"
     },
     "msos_production_wiring_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md",
@@ -721,6 +1405,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md"
     },
     "msos_public_demo_launch_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -756,6 +1441,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md"
     },
     "msos_self_serve_onboarding_v1": {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "msos_self_serve_onboarding_v1",
       "do_not_load": [
@@ -786,6 +1472,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     "msos_storyboard_visual_parity_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -821,6 +1508,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
     "msos_strategy_lab_dist_download_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "msos_strategy_lab_dist_download_v1",
       "do_not_load": [
@@ -851,6 +1539,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md"
     },
     "msos_strategy_lab_distribution_demo": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -884,6 +1573,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md"
     },
     "msos_strategy_lab_embed_shell_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -919,6 +1609,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
     },
     "msos_trader_review_loop_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
       ],
@@ -952,6 +1643,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md"
     },
     "msos_trader_workflow_horizon_nav_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "msos_trader_workflow_horizon_nav_v1",
       "do_not_load": [
@@ -983,6 +1675,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md"
     },
     "msos_usable_demo_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -1018,6 +1711,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md"
     },
     "msos_user_state_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
         "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
@@ -1053,6 +1747,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md"
     },
     "msos_website_program_p0": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md",
         "docs/SOP/MSOS_WEBSITE_PROGRAM.md"
@@ -1088,6 +1783,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md"
     },
     "msos_workflow_asset_parity_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md",
         "docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md"
@@ -1124,6 +1820,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     "msos_workflow_persistence_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -1158,6 +1855,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
     "mvp1_belief_input_ux": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_belief_input_ux",
       "do_not_load": [
@@ -1185,6 +1883,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md"
     },
     "mvp1_bl_density_smoothing_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md"
       ],
@@ -1218,6 +1917,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md"
     },
     "mvp1_cross_venue_backtest_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -1251,6 +1951,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md"
     },
     "mvp1_cross_venue_prob_panel": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md",
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
@@ -1286,6 +1987,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md"
     },
     "mvp1_cross_venue_scan_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -1319,6 +2021,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
     },
     "mvp1_deploy_witness_refresh": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md",
         "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
@@ -1354,6 +2057,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md"
     },
     "mvp1_disagreement_candidate_strip_polish": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md"
       ],
@@ -1387,6 +2091,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md"
     },
     "mvp1_distribution_export": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md"
       ],
@@ -1420,6 +2125,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md"
     },
     "mvp1_distribution_quant_research_v2": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md"
       ],
@@ -1453,6 +2159,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     "mvp1_distribution_stats_legibility": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -1486,6 +2193,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
     "mvp1_distribution_timeseries_collector_v1": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
       ],
@@ -1519,6 +2227,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md"
     },
     "mvp1_feedback_beta_instrumentation": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md"
       ],
@@ -1552,6 +2261,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md"
     },
     "mvp1_friends_first_screen": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md"
       ],
@@ -1585,6 +2295,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md"
     },
     "mvp1_onboarding_how_it_works": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_onboarding_how_it_works",
       "do_not_load": [
@@ -1614,6 +2325,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md"
     },
     "mvp1_operator_hardening": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_operator_hardening",
       "do_not_load": [
@@ -1641,6 +2353,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_OPERATOR_HARDENING.md"
     },
     "mvp1_phase2_on_main": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_phase2_on_main",
       "do_not_load": [
@@ -1668,6 +2381,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE2_ON_MAIN.md"
     },
     "mvp1_phase5_review_hardening": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md"
       ],
@@ -1701,6 +2415,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md"
     },
     "mvp1_phase6_trust_metrics_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md"
       ],
@@ -1734,6 +2449,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md"
     },
     "mvp1_post_phase3_steering_smoke": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md"
       ],
@@ -1767,6 +2483,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md"
     },
     "mvp1_probability_method_legibility": {
+      "archived": true,
       "carry_docs": [
         "docs/SEMANTIC_CONTRACTS.md"
       ],
@@ -1800,6 +2517,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md"
     },
     "mvp1_reliability": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_reliability",
       "do_not_load": [
@@ -1829,6 +2547,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_RELIABILITY.md"
     },
     "mvp1_review_enrichment": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_review_enrichment",
       "do_not_load": [
@@ -1858,6 +2577,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_REVIEW_ENRICHMENT.md"
     },
     "mvp1_smoke_regression": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_smoke_regression",
       "do_not_load": [
@@ -1887,6 +2607,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md"
     },
     "mvp1_snapshot_owner_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -1920,6 +2641,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md"
     },
     "mvp1_sprint003_evidence_plane": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md"
       ],
@@ -1953,6 +2675,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
     },
     "mvp1_steering_sync_evidence": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md"
       ],
@@ -1986,6 +2709,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md"
     },
     "phase3_commercial_wrapper": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md"
       ],
@@ -2019,6 +2743,7 @@
       "sprint": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md"
     },
     "ppe_asset_display_parity_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md",
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
@@ -2054,6 +2779,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md"
     },
     "ppe_asset_enablement_pipeline_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -2087,6 +2813,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md"
     },
     "ppe_cache_isolation_audit_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -2120,6 +2847,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CACHE_ISOLATION_AUDIT_V1.md"
     },
     "ppe_cme_commodity_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_cme_commodity_v1",
       "do_not_load": [
@@ -2149,6 +2877,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md"
     },
     "ppe_commodity_proxy_tier1_v1": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
       ],
@@ -2182,6 +2911,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md"
     },
     "ppe_crypto_multi_asset_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
       ],
@@ -2215,6 +2945,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md"
     },
     "ppe_deribit_crypto_tier1_v1": {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_deribit_crypto_tier1_v1",
       "do_not_load": [
@@ -2245,6 +2976,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     "ppe_display_cache_ops_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -2278,6 +3010,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DISPLAY_CACHE_OPS_V1.md"
     },
     "ppe_equity_options_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
       ],
@@ -2311,6 +3044,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md"
     },
     "ppe_equity_universe_tier1a_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1a_v1",
       "do_not_load": [
@@ -2341,6 +3075,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md"
     },
     "ppe_equity_universe_tier1b_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1b_v1",
       "do_not_load": [
@@ -2371,6 +3106,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
     },
     "ppe_equity_universe_tier1c_v1": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1c_v1",
       "do_not_load": [
@@ -2401,6 +3137,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md"
     },
     "ppe_exposure_menu_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md"
       ],
@@ -2435,6 +3172,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md"
     },
     "ppe_forward_consistency_radar_v1": {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -2469,6 +3207,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
     "ppe_sol_bybit_ship_v1": {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_sol_bybit_ship_v1",
       "do_not_load": [
@@ -2496,6 +3235,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     "ppe_tradeable_universe_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
         "config/assets_tier1_manifest.yaml"
@@ -2531,6 +3271,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md"
     },
     "ppe_trust_surface_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -2564,6 +3305,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md"
     },
     "repo_housekeeping_v1": {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
       ],
@@ -2597,6 +3339,7 @@
       "sprint": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md"
     },
     "validation_chapter": {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "validation_chapter",
       "do_not_load": [
@@ -2627,6 +3370,7 @@
   "chapter_count": 80,
   "chapters": [
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
         "docs/VISION/OPTIONS_HORIZON/CHART_DISPLAY_CONTRACT_V1.md"
@@ -2662,6 +3406,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_CHART_POLISH_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/OPTIONS_HORIZON/REGION_INTENT_SCHEMA_V1.md"
       ],
@@ -2696,6 +3441,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REGION_WORKFLOW_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/VISION/OPTIONS_HORIZON/SURFACE_ARCHIVE_CONTRACT_V1.md",
         "docs/SOP/HORIZON_SURFACE_COLLECTOR_OPS_V1.md"
@@ -2731,6 +3477,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -2764,6 +3511,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -2799,6 +3547,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "msos_cross_venue_strategy_lab_v1",
       "do_not_load": [
@@ -2829,6 +3578,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_CROSS_VENUE_STRATEGY_LAB_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
       ],
@@ -2862,6 +3612,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -2899,6 +3650,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -2933,6 +3685,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md",
         "docs/SOP/MSOS_PRODUCTION_LIVE_HOOKUP_V1.md",
@@ -2970,6 +3723,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -3003,6 +3757,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -3036,6 +3791,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P1_STACK_ROUTING.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -3069,6 +3825,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
@@ -3104,6 +3861,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
@@ -3139,6 +3897,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P4_STRATEGY_LAB.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -3172,6 +3931,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P5_THESIS_CONFIRM.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -3205,6 +3965,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P6_EXPRESSION_SIM.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md"
       ],
@@ -3238,6 +3999,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P7_MONITORING.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/VALIDATION_REALITY_CHECKS.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -3275,6 +4037,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P8_TESTER_RELEASE.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -3308,6 +4071,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md",
@@ -3347,6 +4111,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -3382,6 +4147,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "msos_self_serve_onboarding_v1",
       "do_not_load": [
@@ -3412,6 +4178,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -3447,6 +4214,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "msos_strategy_lab_dist_download_v1",
       "do_not_load": [
@@ -3477,6 +4245,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -3510,6 +4279,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -3545,6 +4315,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
       ],
@@ -3578,6 +4349,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_TRADER_REVIEW_LOOP_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "msos_trader_workflow_horizon_nav_v1",
       "do_not_load": [
@@ -3609,6 +4381,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -3644,6 +4417,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_USABLE_DEMO_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md",
         "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
@@ -3679,6 +4453,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_USER_STATE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md",
         "docs/SOP/MSOS_WEBSITE_PROGRAM.md"
@@ -3714,6 +4489,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WEBSITE_PROGRAM_P0.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md",
         "docs/VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md"
@@ -3750,6 +4526,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -3784,6 +4561,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_belief_input_ux",
       "do_not_load": [
@@ -3811,6 +4589,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md"
       ],
@@ -3844,6 +4623,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_BL_DENSITY_SMOOTHING_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -3877,6 +4657,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md",
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
@@ -3912,6 +4693,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -3945,6 +4727,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md",
         "docs/SOP/VALIDATION_DEPLOY_WITNESS.md"
@@ -3980,6 +4763,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DEPLOY_WITNESS_REFRESH.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md"
       ],
@@ -4013,6 +4797,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md"
       ],
@@ -4046,6 +4831,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md"
       ],
@@ -4079,6 +4865,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -4112,6 +4899,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
       ],
@@ -4145,6 +4933,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md"
       ],
@@ -4178,6 +4967,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_FEEDBACK_BETA_INSTRUMENTATION.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/MVP1_FRIENDS_FIRST_EVIDENCE_STATUS.md"
       ],
@@ -4211,6 +5001,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_FRIENDS_FIRST_SCREEN.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_onboarding_how_it_works",
       "do_not_load": [
@@ -4240,6 +5031,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_ONBOARDING_HOW_IT_WORKS.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_operator_hardening",
       "do_not_load": [
@@ -4267,6 +5059,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_OPERATOR_HARDENING.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_phase2_on_main",
       "do_not_load": [
@@ -4294,6 +5087,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE2_ON_MAIN.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md"
       ],
@@ -4327,6 +5121,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE5_REVIEW_HARDENING.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_PHASE6_TRUST_METRICS_V1_EVIDENCE_STATUS.md"
       ],
@@ -4360,6 +5155,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PHASE6_TRUST_METRICS_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md"
       ],
@@ -4393,6 +5189,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_POST_PHASE3_STEERING_SMOKE.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SEMANTIC_CONTRACTS.md"
       ],
@@ -4426,6 +5223,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_PROBABILITY_METHOD_LEGIBILITY.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_reliability",
       "do_not_load": [
@@ -4455,6 +5253,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_RELIABILITY.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_review_enrichment",
       "do_not_load": [
@@ -4484,6 +5283,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_REVIEW_ENRICHMENT.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_smoke_regression",
       "do_not_load": [
@@ -4513,6 +5313,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -4546,6 +5347,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md"
       ],
@@ -4579,6 +5381,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SPRINT003_EVIDENCE_PLANE.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md"
       ],
@@ -4612,6 +5415,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_STEERING_SYNC_EVIDENCE.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md"
       ],
@@ -4645,6 +5449,7 @@
       "sprint": "docs/SOP/SPRINT_PHASE3_COMMERCIAL_WRAPPER.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md",
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
@@ -4680,6 +5485,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -4713,6 +5519,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_ASSET_ENABLEMENT_PIPELINE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -4746,6 +5553,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CACHE_ISOLATION_AUDIT_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_cme_commodity_v1",
       "do_not_load": [
@@ -4775,6 +5583,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CME_COMMODITY_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/POST_PPE_CME_COMMODITY_V1_SELECTION.md"
       ],
@@ -4808,6 +5617,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
       ],
@@ -4841,6 +5651,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_CRYPTO_MULTI_ASSET_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_deribit_crypto_tier1_v1",
       "do_not_load": [
@@ -4871,6 +5682,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -4904,6 +5716,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DISPLAY_CACHE_OPS_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/briefs/NVIDIA_LEAPS_VALIDATION_BRIEF.md"
       ],
@@ -4937,6 +5750,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_OPTIONS_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1a_v1",
       "do_not_load": [
@@ -4967,6 +5781,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1b_v1",
       "do_not_load": [
@@ -4997,6 +5812,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1c_v1",
       "do_not_load": [
@@ -5027,6 +5843,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1C_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md"
       ],
@@ -5061,6 +5878,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EXPOSURE_MENU_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -5095,6 +5913,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_sol_bybit_ship_v1",
       "do_not_load": [
@@ -5122,6 +5941,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
         "config/assets_tier1_manifest.yaml"
@@ -5157,6 +5977,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
       ],
@@ -5190,6 +6011,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md"
     },
     {
+      "archived": true,
       "carry_docs": [
         "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
       ],
@@ -5223,6 +6045,7 @@
       "sprint": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md"
     },
     {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "validation_chapter",
       "do_not_load": [
@@ -5249,13 +6072,13 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-06-30T22:35:05Z",
+  "generated_at": "2026-06-30T23:38:34Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
-    "expression_planner": "docs/SOP/MVP1_FRONTIER.md",
+    "expression_planner": "docs/SOP/EXPRESSION_PLANNER_PROGRAM_V1.md",
     "forward_consistency": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-    "implied_distribution": "docs/SOP/MVP1_FRONTIER.md",
+    "implied_distribution": "docs/SOP/IMPLIED_DISTRIBUTION_PROGRAM_V1.md",
     "options_horizon": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md",
     "workflow": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
   },

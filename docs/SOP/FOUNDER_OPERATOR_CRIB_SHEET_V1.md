@@ -90,3 +90,20 @@ Do not improvise formulas on a call.
 ```text
 Hey [Name] — I'm building a BTC options research demo (market-implied vs your view, ~5 min walkthrough). Not a trade signal — just structure legibility. Would you have 20 min this week for a guided look? Honest feedback from someone who trades options, not a pitch. https://marketstructureos.com
 ```
+
+---
+
+## SOP discovery CLI (agents)
+
+When an agent or steward needs the correct doc bundle:
+
+```bat
+python scripts/resolve_sop.py --topic "asset batch wave 1" --json
+python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json
+python scripts/resolve_sop.py --module exposure_menu --json
+python scripts/resolve_sop.py --list-topics --json
+python scripts/validate_sop_links.py
+python scripts/generate_chapter_doc_index.py --write
+```
+
+Index: [`CHAPTER_DOC_INDEX.json`](CHAPTER_DOC_INDEX.json) · canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)

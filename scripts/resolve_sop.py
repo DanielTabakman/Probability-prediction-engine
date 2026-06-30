@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""Resolve which SOP docs to load for a chapter, module, or topic.
-
-Agents MUST run this when the thread role or topic is unclear — do not grep docs/SOP/.
-
-Examples:
-  python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json
-  python scripts/resolve_sop.py --topic "asset batch wave 1" --json
-  python scripts/resolve_sop.py --module exposure_menu --json
-"""
+"""Resolve which SOP docs to load for a chapter, module, or topic."""
 
 from __future__ import annotations
 
@@ -21,6 +13,7 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from scripts.sop_discovery_core import (  # noqa: E402
+    list_topics,
     resolve_by_chapter,
     resolve_by_module,
     resolve_by_topic,
@@ -34,6 +27,7 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap.add_argument("--plan-path", help="Phase plan path (alternative to --chapter)")
     ap.add_argument("--module", help="Module id from PPE_MODULE_REGISTRY_V1.md")
     ap.add_argument("--topic", help="Free-text topic or operator phrase")
+    ap.add_argument("--list-topics", action="store_true", help="List topic route catalog")
     ap.add_argument("--json", action="store_true", help="Emit JSON report")
     return ap.parse_args(argv)
 
@@ -70,6 +64,16 @@ def _print_human(report: dict) -> None:
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     repo = args.repo_root.resolve()
+
+    if args.list_topics:
+        topics = list_topics()
+        if args.json:
+            print(json.dumps(topics, indent=2, sort_keys=True))
+        else:
+            print("resolve_sop: topic routes")
+            for row in topics:
+                print(f"  {row['id']}: {row['sop']}")
+        return 0
 
     modes = sum(
         1

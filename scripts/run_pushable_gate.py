@@ -188,6 +188,35 @@ def _msos_web_gate_commands(files: list[str], *, pre_push: bool) -> list[list[st
     return [["python", "scripts/verify_msos_web_build.py", "--witness-only"]]
 
 
+_SOP_DISCOVERY_PATHS = frozenset(
+    {
+        "scripts/sop_discovery_core.py",
+        "scripts/resolve_sop.py",
+        "scripts/generate_chapter_doc_index.py",
+        "scripts/validate_sop_links.py",
+        "docs/SOP/CHAPTER_DOC_INDEX.json",
+    }
+)
+
+
+def _touches_sop_discovery(files: list[str]) -> bool:
+    norms = {f.replace("\\", "/") for f in files}
+    if norms & _SOP_DISCOVERY_PATHS:
+        return True
+    return any(
+        n.startswith("docs/SOP/") and n.endswith("_PROGRAM_V1.md") for n in norms
+    )
+
+
+def _sop_discovery_gate_commands(files: list[str]) -> list[list[str]]:
+    if not _touches_sop_discovery(files):
+        return []
+    return [
+        ["python", "scripts/generate_chapter_doc_index.py", "--write"],
+        ["python", "scripts/validate_sop_links.py"],
+    ]
+
+
 def _classify(
     files: list[str],
     *,
@@ -390,6 +419,11 @@ def main(argv: list[str] | None = None) -> int:
         if rc != 0:
             return rc
 
+    for cmd in _sop_discovery_gate_commands(files):
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
     msos_cmds = _msos_web_gate_commands(files, pre_push=args.pre_push)
     for cmd in msos_cmds:
         rc = _run(cmd, cwd=repo)
@@ -490,6 +524,11 @@ def run_gate_for_paths(
             pass
 
     for cmd in plan.commands:
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
+
+    for cmd in _sop_discovery_gate_commands(files):
         rc = _run(cmd, cwd=repo)
         if rc != 0:
             return rc
