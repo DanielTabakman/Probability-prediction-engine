@@ -7,7 +7,16 @@ Bid/ask only for executable edges; never midpoint for arb comparison.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any, Literal
+
+
+class ForwardConsistencyQualityFlag(str, Enum):
+    STALE_QUOTES = "STALE_QUOTES"
+    WIDE_SPREAD = "WIDE_SPREAD"
+    INSUFFICIENT_DEPTH = "INSUFFICIENT_DEPTH"
+    MISSING_LEG = "MISSING_LEG"
+    EXPIRY_MISMATCH = "EXPIRY_MISMATCH"
 
 ForwardConsistencyStatus = Literal[
     "NO_ARB",
@@ -59,6 +68,7 @@ class SyntheticForwardRow:
 class ForwardConsistencyConfig:
     max_synthetic_width_usd: float = 750.0
     max_quote_age_ms: int = 180_000
+    min_reliable_strikes: int = 2
     estimated_cost_bps: float = 10.0
     estimated_cost_floor_usd: float = 30.0
     watch_buffer_usd: float = 25.0
@@ -85,6 +95,7 @@ class ForwardConsistencyCheck:
     estimated_cost_usd: float | None = None
     net_edge_usd: float | None = None
     legs: list[ForwardConsistencyLeg] = field(default_factory=list)
+    quality_flags: list[ForwardConsistencyQualityFlag] = field(default_factory=list)
     detail: str = ""
 
 
@@ -161,6 +172,83 @@ def filter_reliable_synthetic_rows(
     return kept
 
 
+def _option_leg_missing(q: OptionLegQuote) -> bool:
+    return (
+        q.call_bid is None
+        or q.call_ask is None
+        or q.put_bid is None
+        or q.put_ask is None
+    )
+
+
+def _quote_is_stale(ts_ms: int | None, *, now_ms: int, max_age_ms: int) -> bool:
+    if ts_ms is None:
+        return False
+    return now_ms - int(ts_ms) > max_age_ms
+
+
+def derive_quality_flags(
+    *,
+    option_quotes: list[OptionLegQuote],
+    future: FutureLegQuote | None,
+    all_rows: list[SyntheticForwardRow],
+    reliable_rows: list[SyntheticForwardRow],
+    config: ForwardConsistencyConfig,
+    now_ms: int | None = None,
+    expected_expiry_ts_ms: int | None = None,
+) -> list[ForwardConsistencyQualityFlag]:
+    """Collect data-quality flags for a forward consistency run."""
+    flags: set[ForwardConsistencyQualityFlag] = set()
+
+    if not option_quotes:
+        flags.add(ForwardConsistencyQualityFlag.MISSING_LEG)
+    else:
+        for q in option_quotes:
+            if _option_leg_missing(q):
+                flags.add(ForwardConsistencyQualityFlag.MISSING_LEG)
+                break
+
+    if future is None or future.bid is None or future.ask is None:
+        flags.add(ForwardConsistencyQualityFlag.MISSING_LEG)
+
+    if (
+        future is not None
+        and expected_expiry_ts_ms is not None
+        and future.expiry_ts_ms is not None
+        and int(future.expiry_ts_ms) != int(expected_expiry_ts_ms)
+    ):
+        flags.add(ForwardConsistencyQualityFlag.EXPIRY_MISMATCH)
+
+    if now_ms is not None:
+        stale = False
+        if future is not None and _quote_is_stale(
+            future.quote_ts_ms, now_ms=now_ms, max_age_ms=config.max_quote_age_ms
+        ):
+            stale = True
+        if not stale:
+            for q in option_quotes:
+                if _quote_is_stale(q.quote_ts_ms, now_ms=now_ms, max_age_ms=config.max_quote_age_ms):
+                    stale = True
+                    break
+        if not stale:
+            for row in all_rows:
+                if _quote_is_stale(row.quote_ts_ms, now_ms=now_ms, max_age_ms=config.max_quote_age_ms):
+                    stale = True
+                    break
+        if stale:
+            flags.add(ForwardConsistencyQualityFlag.STALE_QUOTES)
+
+    if all_rows:
+        if any(r.width_usd > config.max_synthetic_width_usd for r in all_rows):
+            if not reliable_rows or reliable_rows[0].width_usd > config.max_synthetic_width_usd:
+                flags.add(ForwardConsistencyQualityFlag.WIDE_SPREAD)
+
+    if len(reliable_rows) < config.min_reliable_strikes:
+        flags.add(ForwardConsistencyQualityFlag.INSUFFICIENT_DEPTH)
+
+    return sorted(flags, key=lambda f: f.value)
+
+
 def _estimated_cost_usd(forward_ref_usd: float, config: ForwardConsistencyConfig) -> float:
     ref = max(float(forward_ref_usd), 1.0)
     from_bps = ref * float(config.estimated_cost_bps) / 10_000.0
@@ -171,21 +259,28 @@ def check_forward_consistency(
     row: SyntheticForwardRow,
     future: FutureLegQuote,
     config: ForwardConsistencyConfig,
+    *,
+    quality_flags: list[ForwardConsistencyQualityFlag] | None = None,
 ) -> ForwardConsistencyCheck:
     """Compare one synthetic forward band to a tradable future/perp quote."""
+    flags = list(quality_flags or [])
     if future.bid is None or future.ask is None or future.bid <= 0 or future.ask <= 0:
+        if ForwardConsistencyQualityFlag.MISSING_LEG not in flags:
+            flags.append(ForwardConsistencyQualityFlag.MISSING_LEG)
         return ForwardConsistencyCheck(
             status="BAD_DATA",
             best_strike=row.strike,
             synthetic_bid=row.synthetic_bid,
             synthetic_ask=row.synthetic_ask,
             synthetic_width_usd=row.width_usd,
+            quality_flags=sorted(set(flags), key=lambda f: f.value),
             detail="Future/perp bid or ask missing or non-positive.",
         )
     if future.ask < future.bid:
         return ForwardConsistencyCheck(
             status="BAD_DATA",
             best_strike=row.strike,
+            quality_flags=sorted(set(flags), key=lambda f: f.value),
             detail="Future/perp quote crossed (ask < bid).",
         )
 
@@ -238,6 +333,7 @@ def check_forward_consistency(
         estimated_cost_usd=cost,
         net_edge_usd=net,
         legs=legs if status == "POSSIBLE_ARB" else [],
+        quality_flags=sorted(set(flags), key=lambda f: f.value),
         detail="",
     )
     return result
@@ -251,6 +347,7 @@ def run_forward_consistency_check(
     forward_usd: float,
     config: ForwardConsistencyConfig | None = None,
     now_ms: int | None = None,
+    expected_expiry_ts_ms: int | None = None,
 ) -> ForwardConsistencyCheck:
     """End-to-end: build rows, filter, pick tightest, compare to future."""
     cfg = config or ForwardConsistencyConfig()
@@ -259,13 +356,32 @@ def run_forward_consistency_check(
         premium_in_usd=premium_in_usd,
         forward_usd=forward_usd,
     )
+    flags = derive_quality_flags(
+        option_quotes=option_quotes,
+        future=future,
+        all_rows=rows,
+        reliable_rows=[],
+        config=cfg,
+        now_ms=now_ms,
+        expected_expiry_ts_ms=expected_expiry_ts_ms,
+    )
     reliable = filter_reliable_synthetic_rows(rows, cfg, now_ms=now_ms)
+    flags = derive_quality_flags(
+        option_quotes=option_quotes,
+        future=future,
+        all_rows=rows,
+        reliable_rows=reliable,
+        config=cfg,
+        now_ms=now_ms,
+        expected_expiry_ts_ms=expected_expiry_ts_ms,
+    )
     if not reliable:
         return ForwardConsistencyCheck(
             status="BAD_DATA",
+            quality_flags=flags,
             detail="No reliable strike pairs with tight synthetic forward (missing quotes or wide bands).",
         )
-    return check_forward_consistency(reliable[0], future, cfg)
+    return check_forward_consistency(reliable[0], future, cfg, quality_flags=flags)
 
 
 def check_to_dict(check: ForwardConsistencyCheck) -> dict[str, Any]:
@@ -285,5 +401,6 @@ def check_to_dict(check: ForwardConsistencyCheck) -> dict[str, Any]:
             {"side": leg.side, "instrument_type": leg.instrument_type, "label": leg.label}
             for leg in check.legs
         ],
+        "quality_flags": [flag.value for flag in check.quality_flags],
         "detail": check.detail,
     }
