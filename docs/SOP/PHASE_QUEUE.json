@@ -473,11 +473,12 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json",
-      "status": "PLANNED",
+      "status": "DONE",
       "reason": "[P2 SPINE] Cross-venue MSOS embed panel",
       "selectionPrep": "docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md",
       "sideChannel": true,
-      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
@@ -521,7 +522,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json",
       "status": "READY",
-      "reason": "[MEDIUM] Trader workflow horizon nav — promoted READY per UX_EXECUTION_BACKLOG_V1 2026-06-30",
+      "reason": "[MEDIUM] Trader workflow horizon nav \u2014 promoted READY per UX_EXECUTION_BACKLOG_V1 2026-06-30",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "workerMode": "local-agent"

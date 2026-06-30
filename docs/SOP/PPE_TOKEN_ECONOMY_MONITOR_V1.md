@@ -69,8 +69,10 @@ Cursor subscription usage itself is tracked **manually** (Cursor dashboard) — 
 ### Monthly (operator, 5 min)
 
 1. Compare Cursor dashboard usage vs prior month
-2. `token_audit.cmd --stdout` — check trend section
-3. If always-on >2.5k tok/turn for 3+ weeks → charter Workflow-Hardening slice
+2. `ppe_token_reconcile.cmd record --month YYYY-MM --usd N` (Cursor dashboard total)
+3. `ppe_token_reconcile.cmd summary` — compare vs advisory ledger
+4. `token_audit.cmd --stdout` — check trend section
+5. If always-on >2.5k tok/turn for 3+ weeks → charter Workflow-Hardening slice
 
 ---
 

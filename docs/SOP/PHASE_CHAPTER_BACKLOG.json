@@ -668,7 +668,7 @@
     },
     {
       "chapterId": "msos_cross_venue_strategy_lab_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,

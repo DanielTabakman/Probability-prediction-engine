@@ -41,6 +41,7 @@ import {
   labThinChainBannerBody,
   type LabDataMode,
 } from "@/lib/strategyLabCopy";
+import { logProductUsage } from "@/lib/logProductUsage";
 import {
   hasTutorialSearchParams,
   isPlatformTutorialComplete,
@@ -133,6 +134,10 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   useEffect(() => {
     setClientReady(true);
   }, []);
+
+  useEffect(() => {
+    logProductUsage({ event_name: "lab_view", path: pathname, asset_id: selectedAssetId });
+  }, [pathname, selectedAssetId]);
 
   useEffect(() => {
     const beginner = resolveTutorialBeginnerMode(searchParams);

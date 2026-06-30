@@ -279,6 +279,13 @@ def build_token_audit(repo: Path) -> TokenAuditReport:
         operator_config=audit_operator_config(repo),
     )
     report.recommendations = build_recommendations(report)
+    try:
+        from scripts.ppe_token_reconcile import billing_recommendation
+        billing_rec = billing_recommendation(repo)
+        if billing_rec:
+            report.recommendations.append(billing_rec)
+    except ImportError:
+        pass
     report.verdict = compute_verdict(report)
     return report
 

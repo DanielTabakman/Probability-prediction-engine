@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scripts.ppe_tracking_hub import record_event
 from scripts.workflow_metrics_cli import (
     cmd_export_csv,
     cmd_session_start,
@@ -50,6 +51,13 @@ class TestWorkflowMetricsCli(unittest.TestCase):
         cmd_export_csv(self.repo)
         text = (self.repo / "artifacts" / "workflow_metrics" / "weekly_summary.csv").read_text(encoding="utf-8")
         self.assertIn("worker_lane", text)
+
+    def test_export_csv_includes_events(self) -> None:
+        record_event(self.repo, event_type="usage_note", note="csv-test")
+        self.assertEqual(cmd_export_csv(self.repo), 0)
+        events_csv = self.repo / "artifacts" / "workflow_metrics" / "events_export.csv"
+        self.assertTrue(events_csv.is_file())
+        self.assertIn("usage_note", events_csv.read_text(encoding="utf-8"))
 
     def test_summary_by_lane(self) -> None:
         cmd_slice_close(

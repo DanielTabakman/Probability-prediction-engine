@@ -764,6 +764,14 @@ def load_radar_friction_lines(repo: Path, week_monday: date) -> list[str]:
     elif cleanup:
         lines.append(f"- Auto-cleaned {len(cleanup)} orphan operator artifact(s).")
 
+    try:
+        from scripts.ppe_token_reconcile import digest_reconcile_line
+        rec = digest_reconcile_line(repo, days=30)
+        if rec and len(lines) < 4:
+            lines.append(rec)
+    except ImportError:
+        pass
+
     return lines[:4]
 
 

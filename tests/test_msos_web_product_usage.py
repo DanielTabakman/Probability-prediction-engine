@@ -1,0 +1,40 @@
+﻿"""MSOS web product usage wiring (Q-009 v0)."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
+
+
+def test_usage_api_route_exists() -> None:
+    route = MSOS_WEB / "src" / "app" / "api" / "usage" / "event" / "route.ts"
+    lib = MSOS_WEB / "src" / "lib" / "webProductUsage.ts"
+    assert route.is_file()
+    assert lib.is_file()
+    text = route.read_text(encoding="utf-8")
+    assert "appendProductUsageEvent" in text
+
+
+def test_product_usage_beacon_wired_in_layout() -> None:
+    layout = (MSOS_WEB / "src" / "app" / "layout.tsx").read_text(encoding="utf-8")
+    assert "ProductUsageBeacon" in layout
+
+
+def test_strategy_lab_logs_lab_view() -> None:
+    shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    assert "logProductUsage" in shell
+    assert "lab_view" in shell
+
+
+def test_msos_web_compose_product_usage_volume() -> None:
+    compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    assert "PPE_PRODUCT_USAGE_DIR" in compose
+
+
+def test_review_route_logs_usage() -> None:
+    route = MSOS_WEB / "src" / "app" / "api" / "snapshots" / "[id]" / "review" / "route.ts"
+    text = route.read_text(encoding="utf-8")
+    assert "review_submit" in text
+    assert "appendProductUsageEvent" in text
