@@ -6,10 +6,18 @@ import { useCallback, useState, type ComponentProps, type ReactNode } from "reac
 type ActionLinkProps = Omit<ComponentProps<typeof Link>, "onClick"> & {
   children: ReactNode;
   onNavigate?: () => void;
+  /** Replaces link label while navigation is in flight. */
+  pendingLabel?: string;
 };
 
 /** Link with immediate pressed/pending feedback while navigation starts. */
-export function ActionLink({ children, className, onNavigate, ...props }: ActionLinkProps) {
+export function ActionLink({
+  children,
+  className,
+  onNavigate,
+  pendingLabel,
+  ...props
+}: ActionLinkProps) {
   const [pending, setPending] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -25,7 +33,7 @@ export function ActionLink({ children, className, onNavigate, ...props }: Action
       aria-busy={pending || undefined}
     >
       {pending ? <span className="btn-feedback" aria-hidden="true" /> : null}
-      {children}
+      {pending && pendingLabel ? pendingLabel : children}
     </Link>
   );
 }

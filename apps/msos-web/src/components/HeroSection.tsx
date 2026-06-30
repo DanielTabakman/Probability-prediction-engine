@@ -22,7 +22,11 @@ export function HeroSection() {
         explore paper-trade structures — with assumptions visible, not hidden.
       </p>
       <div className="hero-actions">
-        <ActionLink className="btn primary" href={strategyLabForcedTourHref()}>
+        <ActionLink
+          className="btn primary"
+          href={strategyLabForcedTourHref()}
+          pendingLabel="Opening tour…"
+        >
           Start guided tour <span aria-hidden="true">→</span>
         </ActionLink>
         <ActionLink className="btn" href={strategyLabTutorialHref()}>

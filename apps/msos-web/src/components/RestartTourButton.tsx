@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import { clearPlatformTutorialComplete, strategyLabForcedTourHref } from "@/lib/platformTutorial";
 
@@ -14,17 +14,22 @@ type RestartTourButtonProps = {
 /** Clears tour completion and opens Strategy Lab — only use for explicit restart CTAs. */
 export function RestartTourButton({ className, children, beginner = false }: RestartTourButtonProps) {
   const router = useRouter();
+  const [pending, setPending] = useState(false);
 
   return (
     <button
       type="button"
-      className={className}
+      className={[className, pending ? "btn-pending" : ""].filter(Boolean).join(" ")}
+      aria-busy={pending || undefined}
+      disabled={pending}
       onClick={() => {
+        setPending(true);
         clearPlatformTutorialComplete();
         router.push(strategyLabForcedTourHref(beginner));
       }}
     >
-      {children}
+      {pending ? <span className="btn-feedback" aria-hidden="true" /> : null}
+      {pending ? "Opening tour…" : children}
     </button>
   );
 }
