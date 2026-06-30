@@ -187,7 +187,7 @@ export function upsertSnapshotReview(input: {
   let db: Database.Database | undefined;
   try {
     db = openDb(dbPath, false);
-    db.pragma("foreign_keys = ON");
+    db.exec("PRAGMA foreign_keys = ON");
 
     const hasOwnerColumn = tableHasOwnerEmail(db);
     const cols = hasOwnerColumn ? ", owner_email" : "";
