@@ -64,6 +64,11 @@ def test_platform_tutorial_wiring() -> None:
     assert "Opening Strategy Lab" in loading
     restart = (MSOS_WEB / "src" / "components" / "RestartTourButton.tsx").read_text(encoding="utf-8")
     assert "Opening tour" in restart
+    hero = (MSOS_WEB / "src" / "components" / "HeroSection.tsx").read_text(encoding="utf-8")
+    assert "scheduleStrategyLabTourPrefetch" in hero
+    assert "warmStrategyLabEntry" in restart or "Opening tour" in hero
+    layout = (MSOS_WEB / "src" / "app" / "layout.tsx").read_text(encoding="utf-8")
+    assert "NavigationProgressProvider" in layout
 
 
 def test_features_row_self_serve_entry() -> None:

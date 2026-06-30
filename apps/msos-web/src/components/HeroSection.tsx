@@ -1,17 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { ActionButton, ActionLink } from "@/components/ActionLink";
 import { ResearchBetaModal } from "@/components/ResearchBetaModal";
 import { resolveSignInUrl } from "@/lib/msosPublicUrls";
+import { scheduleStrategyLabTourPrefetch } from "@/lib/prefetchStrategyLab";
 import { strategyLabForcedTourHref, strategyLabTutorialHref } from "@/lib/platformTutorial";
 import { resolveResearchOfferCta } from "@/lib/researchOfferCta";
 
 export function HeroSection() {
+  const router = useRouter();
   const signInUrl = resolveSignInUrl();
   const researchOffer = resolveResearchOfferCta();
   const [researchOpen, setResearchOpen] = useState(false);
+
+  useEffect(() => scheduleStrategyLabTourPrefetch(router), [router]);
 
   return (
     <section>
@@ -26,10 +31,11 @@ export function HeroSection() {
           className="btn primary"
           href={strategyLabForcedTourHref()}
           pendingLabel="Opening tour…"
+          warmupOnHover
         >
           Start guided tour <span aria-hidden="true">→</span>
         </ActionLink>
-        <ActionLink className="btn" href={strategyLabTutorialHref()}>
+        <ActionLink className="btn" href={strategyLabTutorialHref()} warmupOnHover>
           Jump to Strategy Lab
         </ActionLink>
         <ActionButton className="btn" onClick={() => setResearchOpen(true)}>
