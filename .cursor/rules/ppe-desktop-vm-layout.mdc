@@ -5,13 +5,13 @@ alwaysApply: true
 
 # PPE desktop vs VM (agents — hard)
 
-**Canon:** [`PPE_OPERATOR_LAYOUT_ADR.md`](docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md) · [`PPE_IDE_NATIVE_OPERATOR_V1.md`](docs/SOP/PPE_IDE_NATIVE_OPERATOR_V1.md)
+**Canon:** [`PPE_OPERATOR_LAYOUT_ADR.md`](docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md) · [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) (verdict SSOT)
 
 ## Machine roles
 
 | Machine | Relay / loop | Product BUILD | After IDE BUILD |
 |---------|----------------|---------------|-----------------|
-| **Hyper-V VM** (`PPE_LOOP_HOST=1`) | **Yes** — `run_ppe_local`, headless stack, auto loop | No (blocks → `IDE_BUILD`) | Automatic in loop |
+| **Hyper-V VM** (`PPE_LOOP_HOST=1`) | **Yes** — headless stack, auto loop | No (blocks → `IDE_BUILD`) | Automatic in loop |
 | **Daily desktop** (`PPE_STACK_FORBIDDEN` or no loop token) | **Never** | **Yes** — Cursor IDE BUILD | **`DESKTOP_CONTINUE.cmd`** (SSH → VM `finish_ide_build.cmd`) |
 
 Reading `OPERATOR_STATUS.md` / `ppe_operator_status.py` is fine on **operator** threads (either machine). **Charter/topic threads:** do not read unless switching role ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc)). **Executing relay** is VM-only.
@@ -24,7 +24,7 @@ Run **first**:
 python scripts/ppe_loop_host_guard.py --check
 ```
 
-If `"allowed": false` → **do not** run relay locally. Use the desktop/VM action table below.
+If `"allowed": false` → **do not** run relay locally. Map verdict using [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md).
 
 ## Forbidden on daily desktop (never run in Cursor shell)
 
@@ -36,18 +36,17 @@ If `"allowed": false` → **do not** run relay locally. Use the desktop/VM actio
 
 **Why:** Desktop lacks ACP orchestrator path and is not the loop host; these fail or fight the VM supervisor.
 
-## Verdict → agent action (machine-aware)
+## Verdict → agent action
 
-| Verdict | **Desktop** (guard `allowed: false`) | **VM** (guard `allowed: true`) |
-|---------|--------------------------------------|--------------------------------|
-| `IDE_BUILD` | Implement slice; gate → commit → `mark_ide_product_ready` | Wait — ntfy operator for desktop BUILD |
-| `RUN_LOCAL` | **`DESKTOP_CONTINUE.cmd`** only (after merge to `main`) | `run_ppe_local.cmd` or `@ppe-finish-worker` |
-| `RUN_AUTO` | **SSH** `ppe_autobuilder.cmd status --brief` / tell operator to check VM — **do not** local `run_ppe.cmd` | `run_ppe.cmd` or loop advance |
-| `SUPPLY_LOW` | Charter/merge to `main`; VM pulls on next pass | Idle is normal until `main` has queued work |
+Full table: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md). Quick reference:
+
+| Verdict | Desktop | VM |
+|---------|---------|-----|
+| `IDE_BUILD` | Implement slice; gate → commit → `mark_ide_product_ready` | Wait for desktop BUILD |
+| `RUN_LOCAL` | **`DESKTOP_CONTINUE.cmd`** (after merge) | `run_ppe_local.cmd` |
+| `RUN_AUTO` | SSH status only | `run_ppe.cmd` or loop advance |
 
 ## SSH status (desktop agents)
-
-Check VM without starting relay locally:
 
 ```bash
 ssh ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engine && ppe_autobuilder.cmd status --brief"
