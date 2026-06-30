@@ -1,0 +1,73 @@
+---
+description: PPE thread roles — operator vs charter/topic separation. Prevents relay queue from hijacking UX, data, and planning threads.
+alwaysApply: true
+---
+
+# PPE thread roles
+
+**Canon:** [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md) · [`CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md)
+
+## Roles
+
+| Role | Optimize for | Relay / queue |
+|------|----------------|---------------|
+| **operator** | Verdict, burst, autobuilder, triage | **Yes** — read `OPERATOR_STATUS.md`, run verdict |
+| **ide_build** | One product slice | Only via `IDE_BUILD_STARTER_*.md` / `IDE_BUILD_NOW.md` |
+| **charter** | SELECTION, programs, UX/data design, backlog rows | **No** — charter docs only; park relay for operator thread |
+| **explore** | Questions, reviews, tradeoffs (Ask-style in Agent) | **No** |
+| **neutral** (default) | User's actual question | **No** — do not open with operator status |
+
+## Detect role (first user message in thread)
+
+**Operator** — any of:
+
+- `what's next` / `whats next` / `ppe_go` / `operator thread`
+- `THREAD_ROLE: operator`
+- `@artifacts/orchestrator/OPERATOR_STATUS.md`
+- `@ppe-director` / `@ppe-autobuilder-operator`
+- `keep going` / `run until watch` (burst continuations)
+- Recovery: `@docs/SOP/RECOVERY_PROTOCOL.md` when relay recovery is the ask
+
+**IDE BUILD** — any of:
+
+- `THREAD_ROLE: ide_build` / `IDE BUILD thread`
+- `@artifacts/orchestrator/IDE_BUILD_STARTER_` or `IDE_BUILD_NOW.md`
+
+**Charter** — any of:
+
+- `charter thread` / `topic thread` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
+- Explicit program-only load: e.g. "Load only `@docs/SOP/UX_EXECUTION_BACKLOG_V1.md`" with no operator @
+
+**Explore** — any of:
+
+- `explore thread` / `THREAD_ROLE: explore` / `review only` / `no relay`
+
+**Neutral** — none of the above (most UX, data, bug, and doc threads).
+
+## Precedence (hard)
+
+1. **Charter / explore / ide_build** → **never** read `OPERATOR_STATUS.md`, `BURST_PLAN.json`, or run burst/`@ppe-director` unless the user **explicitly** switches role ("switch to operator", `what's next?`).
+2. **Operator** → follow [`ppe-operator-core.mdc`](ppe-operator-core.mdc) auto-execute path.
+3. **Neutral** → answer the user's task; do **not** lead with relay verdict or `IDE_BUILD` blockers. One-line pointer to operator thread is OK if they asked about queue health.
+
+## Charter thread may
+
+- Read/edit program docs (`*_PROGRAM_V1.md`, `UX_EXECUTION_BACKLOG_V1.md`, SELECTION, `PHASE_CHAPTER_BACKLOG.json`, `ACTIVE_PRODUCT_DIRECTION.json` for scope)
+- Run asset discovery when adding/enabling assets ([`asset-auto-discovery.mdc`](asset-auto-discovery.mdc))
+- Implement product code **only** when that is the stated charter task (not via relay starter)
+
+## Charter thread must not
+
+- Summarize `OPERATOR_STATUS` or steer work to current `IDE_BUILD` slice
+- Spawn `@ppe-director`, `@ppe-build-worker`, or `@ppe-finish-worker`
+- Run `ppe_go.cmd`, `run_ppe_local.cmd`, or `DESKTOP_CONTINUE.cmd` unless user switches to operator role
+
+## UX execution vs UX charter
+
+- **Charter / design** → backlog, philosophy, acceptance — no `@ppe-ux-director`
+- **Execute UX backlog through relay** → **operator thread** + `@ppe-ux-director` (relay may override backlog order)
+
+## Closeout
+
+- **Operator thread** closeout → next thread: `what's next?` (operator role)
+- **Charter thread** closeout → triage relay items to `operator_next` bucket; next thread: same charter doc or new topic — not operator unless requested

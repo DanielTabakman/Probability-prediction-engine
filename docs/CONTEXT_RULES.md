@@ -25,12 +25,27 @@ Do NOT create a new context for every tiny action.
 - **Steward thread:** SELECTION, manifest, read `LAST_RUN_REPORT.md` — keep separate from BUILD.
 - **After phase exit:** new Cursor thread; load only `docs/SOP/AGENT_CONTINUITY_BRIEF.md`.
 
+## Thread roles (operator vs charter)
+
+**Canon:** [`THREAD_STARTERS_V1.md`](SOP/THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-thread-roles.mdc`](../.cursor/rules/ppe-thread-roles.mdc)
+
+| Thread | Open with | Touches relay? |
+|--------|-----------|----------------|
+| **Operator / autobuilder** | `what's next?` or `Operator thread` | Yes |
+| **IDE BUILD** | `IDE_BUILD_STARTER_*.md` only | That slice only |
+| **Charter / topic** | `Charter thread` + program doc | No — park relay for operator thread |
+| **Explore** | `Explore thread` | No |
+| **Default** | User question only | No — do not lead with `OPERATOR_STATUS` |
+
+Do **not** mix operator queue work with UX design, data programs, or SELECTION in one thread.
+
 ## Operator layout (2026-06)
 
 **Policy:** [`docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md`](SOP/PPE_OPERATOR_LAYOUT_ADR.md) · **Process:** [`docs/SOP/PPE_OPERATOR_PROCESS_V1.md`](SOP/PPE_OPERATOR_PROCESS_V1.md)
 
 - **VM** runs the 24/7 loop; **desktop** runs IDE BUILD only.
-- New operator threads: load [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) + continuity brief — not laptop chat history.
+- **Operator thread only:** load [`PPE_VM_DESKTOP_OPERATOR_HANDOFF.md`](SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md) + continuity brief — not laptop chat history.
+- **Charter threads:** load program/SELECTION docs only — see [`THREAD_STARTERS_V1.md`](SOP/THREAD_STARTERS_V1.md).
 
 ## Good thread unit
 One thread per sprint or sub-sprint.

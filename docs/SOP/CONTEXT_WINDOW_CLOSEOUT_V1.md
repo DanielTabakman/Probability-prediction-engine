@@ -208,9 +208,12 @@ Report **doc-state safety** and **repo-state safety** separately ([`FRONTIER_STE
 
 ### 6 — Next thread boot
 
+**Thread roles:** [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)
+
 | Closing thread role | New thread |
 |---------------------|------------|
-| Steward / guide | Ask **`what's next?`** — agent runs adaptive burst (preflight + director when allowed), then reads `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| **Operator** / steward relay | Ask **`what's next?`** in operator thread — burst + director when allowed; `WHATS_NEXT.md` + `AGENT_CONTINUITY_BRIEF.md` |
+| **Charter** / topic | Same charter doc or new `Charter thread` opener — **not** operator unless relay blocked |
 | IDE BUILD | Starter file only — **not** steward narrative |
 | Recovery | `what's next?` or `@docs/SOP/RECOVERY_PROTOCOL.md` if recovery-specific |
 

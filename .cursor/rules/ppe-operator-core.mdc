@@ -5,11 +5,13 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 
-Read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-only).
+**Gate:** run this section **only** when thread role is **operator** or **ide_build** per [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc). Charter, explore, and neutral threads must **not** enter here.
+
+When gated in: read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-only).
 
 **Default path (adaptive burst):**
 
@@ -28,7 +30,7 @@ Read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-onl
 
 **Handoff:** `ppe_go.cmd` (burst default). **`ppe_go.cmd --single`** for one-shot director prompt.
 
-Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
+Also skip when thread role is charter / explore / neutral (see thread-roles). Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 
 ## Token discipline
 
