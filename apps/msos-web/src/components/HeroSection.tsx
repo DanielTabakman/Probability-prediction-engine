@@ -26,19 +26,29 @@ export function HeroSection() {
         Compare what BTC and ETH options imply with your own view, see the disagreement on a chart, and
         explore paper-trade structures — with assumptions visible, not hidden.
       </p>
-      <div className="hero-actions">
+      <div className="hero-cta-primary" data-self-serve-entry="hero-tour">
+        <p className="hero-cta-eyebrow">Recommended first step</p>
         <ActionLink
-          className="btn primary"
+          className="btn primary hero-tour-btn"
           href={strategyLabForcedTourHref()}
           pendingLabel="Opening tour…"
           warmupOnHover
         >
-          Start guided tour <span aria-hidden="true">→</span>
+          Start guided tour
+          <span className="hero-tour-arrow" aria-hidden="true">
+            →
+          </span>
         </ActionLink>
-        <ActionLink className="btn" href={strategyLabTutorialHref()} warmupOnHover>
+        <p className="hero-cta-hint">
+          3-minute walkthrough of Strategy Lab with live BTC options — paper trading only, no sign-in
+          required.
+        </p>
+      </div>
+      <div className="hero-actions-secondary">
+        <ActionLink className="btn slim" href={strategyLabTutorialHref()} warmupOnHover>
           Jump to Strategy Lab
         </ActionLink>
-        <ActionButton className="btn" onClick={() => setResearchOpen(true)}>
+        <ActionButton className="btn slim" onClick={() => setResearchOpen(true)}>
           {researchOffer?.label ?? "Request research beta"}
         </ActionButton>
         <a className="btn slim dark" href={signInUrl}>
