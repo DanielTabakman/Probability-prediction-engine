@@ -1,20 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { CONFUSION_CATEGORIES, isConfusionCategory } from "@/lib/feedbackForm";
 import { appendWebFeedback } from "@/lib/webFeedback";
 
 export const runtime = "nodejs";
-
-const CONFUSION_CATEGORIES = [
-  "naming confusion",
-  "market-read confusion",
-  "trust/provenance confusion",
-  "belief-control confusion",
-  "candidate/recommendation confusion",
-  "no-trade/watch-only confusion",
-  "layout/visual hierarchy confusion",
-  "value/desirability signal",
-  "feature request / later-scope item",
-] as const;
 
 function asTrimmed(value: unknown, max = 4000): string | undefined {
   if (typeof value !== "string") return undefined;
@@ -39,8 +28,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const confusion = asTrimmed(body?.confusion_category, 120);
-    if (!confusion || !CONFUSION_CATEGORIES.includes(confusion as typeof CONFUSION_CATEGORIES[number])) {
-      return NextResponse.json({ error: "invalid confusion_category" }, { status: 400 });
+    if (!confusion || !isConfusionCategory(confusion)) {
+      return NextResponse.json(
+        { error: "invalid confusion_category", allowed: CONFUSION_CATEGORIES },
+        { status: 400 },
+      );
     }
     const usefulness = asLikert(body?.usefulness);
     const repeatUse = asLikert(body?.repeat_use_intent);
@@ -49,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     const record = await appendWebFeedback({
-      source: asTrimmed(body?.source, 80) || "operator_session_notebook",
+      source: asTrimmed(body?.source, 80) || "public_feedback",
       tester_profile: asTrimmed(body?.tester_profile, 200),
       comprehension: asYn(body?.comprehension),
       thesis_confirm: asYn(body?.thesis_confirm),

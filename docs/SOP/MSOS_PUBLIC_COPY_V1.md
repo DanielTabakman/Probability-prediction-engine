@@ -109,11 +109,11 @@ Before marking IDE BUILD ready:
 
 ## Human vs machine (UX witness)
 
-| Machine (CI) | Human (operator) |
-|--------------|------------------|
-| HTTP + Playwright witnesses after deploy | “Would I show this to a trader friend?” |
-| Integration PASS/FAIL | Tone, density, confusion, mobile layout |
-| Fixture **warnings** for stale storyboard strings | Subjective UX notes in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
+| Machine (CI) | Human (operator solo) | Visitors (async) |
+|--------------|----------------------|------------------|
+| HTTP + Playwright witnesses after deploy | 3-checkbox solo pass — [`OPERATOR_UX_WITNESS_V1.md`](OPERATOR_UX_WITNESS_V1.md) | `/feedback` + Strategy Lab strip |
+| Integration PASS/FAIL | Tone, density, link-ready | Structured confusion + likert + notes |
+| Fixture **warnings** for stale storyboard strings | Optional notes in [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) | `python scripts/ppe_export_web_feedback.py --markdown` |
 
 See [`OPERATOR_UX_WITNESS_V1.md`](OPERATOR_UX_WITNESS_V1.md).
 
