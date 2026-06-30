@@ -26,18 +26,18 @@ Not a quant backtest engine. Not live execution. Paper + saved snapshots only.
 | 4 | After horizon, open post-mortem and submit review | `/monitor` → snapshot detail |
 | 5 | Command Center shows reviews due + completed counts | `/` calibration strip |
 
-**Gap today (2026-06-29):** steps 1–3 and 5 **read** review state; step 4 **write** still requires Streamlit implied lab. Chapter `msos_trader_review_loop_v1` closes that gap.
+**Gap today (2026-06-30):** step 4 **write** shipped on `main` (`/monitor` snapshot detail + `SnapshotReviewForm` + review API). Streamlit freeze (step 2) still optional. Relay may still run witness/closeout for `msos_trader_review_loop_v1` — **do not re-BUILD product**.
 
 ---
 
 ## Spine chapters (relay order)
 
-Run **after** current `ppe_exposure_menu_v1` READY chapter unless steward re-prioritizes.
+Run **after** exposure menu COMPLETE unless steward re-prioritizes. **Next UX BUILD (steward):** promote `msos_trader_workflow_horizon_nav_v1` per [`UX_EXECUTION_BACKLOG_V1.md`](UX_EXECUTION_BACKLOG_V1.md).
 
 | # | Chapter | Delivers | Priority |
 |---|---------|----------|----------|
-| 1 | **`msos_trader_review_loop_v1`** | Post-mortem form in MSOS + review API; KPIs update | **P0 spine** |
-| 2 | `msos_strategy_lab_dist_download_v1` | Distribution CSV download on `/strategy-lab` | P1 |
+| 1 | **`msos_trader_review_loop_v1`** | Post-mortem form in MSOS + review API; KPIs update | **P0 spine** — product on `main`; relay closeout only |
+| 2 | `msos_strategy_lab_dist_download_v1` | Distribution CSV download on `/strategy-lab` | P1 — product on `main`; relay closeout only |
 | 3 | `msos_cross_venue_strategy_lab_v1` | Cross-venue gap + backtest summary card (read-only) | P2 · side |
 | 4 | `mvp1_distribution_timeseries_collector_v1` | VM daily dist-stats archive (feeds future charts) | P2 · ops |
 

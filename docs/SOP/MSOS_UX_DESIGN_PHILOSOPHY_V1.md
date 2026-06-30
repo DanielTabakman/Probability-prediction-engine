@@ -193,7 +193,7 @@ For each user-facing module at **T2+** (see module registry), document:
 | **Plain-English read** | `outcome.headline` under “What this means” |
 | **Trust cue** | `trust_state` banners (thin chain, degraded); live vs fixture mode |
 | **Restraint state** | Market tuning = no false “edge found”; watch-only when trust insufficient |
-| **Return hook** | Asset picker parity, CSV download, workflow steps (confirm → expression) |
+| **Return hook** | CSV download; workflow steps (confirm → expression) |
 
 **Game/casino steal:** belief chips = odds taps; headline strip = bet slip hero anchored while chart moves.
 
@@ -244,8 +244,8 @@ For each user-facing module at **T2+** (see module registry), document:
 |-------|-------|
 | **Primary question** | What did I save, and **was I right** after the horizon? |
 | **Hero object** | Snapshot / paper-trade list → detail drill-down |
-| **First action** | Open a snapshot with review due |
-| **Feedback** | Post-mortem form → KPI strip updates |
+| **First action** | Open a snapshot with review due; submit post-mortem on detail page |
+| **Feedback** | Post-mortem form saves via `/api/snapshots/[id]/review` → Command Center KPI strip updates on refresh |
 | **Plain-English read** | Review status + class summary copy |
 | **Trust cue** | Frozen evaluation provenance on detail |
 | **Restraint state** | “Review not due yet” calm state |
@@ -363,4 +363,5 @@ Observable in demo or witness:
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 — MSOS platform scope, game/casino mechanics, module template, reference apps |
+| 2026-06-30 | Insight collect — Monitor post-mortem write path on main (#590) |
 | 2026-06-30 | Insight collect — living module frames for live MSOS routes |

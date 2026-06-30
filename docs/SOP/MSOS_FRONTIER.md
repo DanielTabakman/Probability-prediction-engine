@@ -5,14 +5,14 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 ### Active strategic frame
 
 <!-- ACTIVE_PRODUCT_DIRECTION:START -->
-**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-29
+**Direction pivot:** `trader-workflow-integration-v1` · **as-of:** 2026-06-30
 
 - **North star:** See what BTC options imply, where you disagree, and what payoff fits — in under 15 seconds.
 - **Primary focus:** Trader workflow integration — MSOS used as part of the trading process, not a one-off demo
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** BUILD: ppe_exposure_menu_v1 READY (operator priority). Then Trader Learning Spine queue: msos_trader_review_loop_v1 → dist_download → cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
+- **Next steward action:** Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY). Spine relay: let VM finish msos_trader_review_loop_v1 closeout only (product on main — do not re-BUILD RevLoop or DistDl). Then spine queue: cross_venue panel → dist timeseries collector. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
@@ -35,7 +35,8 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1** ([`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md)) — IDE BUILD side channel — 7 meta chapters; PLANNED in queue; does not preempt tier1a relay
 - **POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION** ([`POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md`](docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md)) — COMPLETE — chart polish (#429); region workflow CHARTERED (P2)
 - **POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION** ([`POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md`](docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md)) — COMPLETE — P4→P7 ?asset= propagation (#495 #507)
-- **TRADER_LEARNING_SPINE_PROGRAM_V1** ([`TRADER_LEARNING_SPINE_PROGRAM_V1.md`](docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md)) — ACTIVE — P0 spine: msos_trader_review_loop_v1 chartered; dist download + cross-venue + dist timeseries queued
+- **TRADER_LEARNING_SPINE_PROGRAM_V1** ([`TRADER_LEARNING_SPINE_PROGRAM_V1.md`](docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md)) — ACTIVE — RevLoop + DistDl product on main; VM closeout in flight. Next UX BUILD: horizon_nav (#3 in UX_EXECUTION_BACKLOG_V1.md)
+- **UX_EXECUTION_BACKLOG_V1** ([`UX_EXECUTION_BACKLOG_V1.md`](docs/SOP/UX_EXECUTION_BACKLOG_V1.md)) — ACTIVE — prioritized UX/workflow BUILD map; relay queue wins over backlog order
 - **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — COMPLETE — scan/backtest CLIs + daily collector pipeline (#529); VM install: install_cross_venue_collector_task.cmd (CROSS_VENUE_COLLECTOR_OPS_V1.md)
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
