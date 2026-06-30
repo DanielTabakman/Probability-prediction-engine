@@ -421,6 +421,7 @@
         "ppe_tracking_status.cmd",
         "ppe_token_reconcile.cmd",
         "ppe_product_usage.cmd",
+        "ppe_pull_product_usage.cmd",
         "token_audit.cmd",
         "ppe_remote_build_policy.cmd",
         "ppe_delegation_envelope.cmd",
