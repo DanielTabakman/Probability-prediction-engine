@@ -1,6 +1,6 @@
 ---
 description: SOP doc discovery — load the right canon by topic/chapter before guessing paths.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # SOP discovery (PPE)

@@ -33,12 +33,12 @@
   },
   "guardStopSleepSeconds": 300,
   "keepLoopAliveOnGuardStop": true,
-  "autoRemoteBuild": false,
+  "autoRemoteBuild": true,
   "remoteBuildPolicy": {
     "midMonthBurnBoost": true,
     "enableAfterDay": 16,
     "underuseThresholdPct": 0.35,
-    "notes": "Option A default (manual DESKTOP_BUILD). After day 16, if CREDIT_BUDGET.used_pct < 35%, autoRemoteBuild turns ON for rest of month. Record: ppe_remote_build_policy.cmd record --used-pct 0.15"
+    "notes": "Headless Codex CLI on IDE_BUILD (buildWorker=codex). Mid-month boost still applies when autoRemoteBuild=false override. Record Cursor usage: ppe_remote_build_policy.cmd record --used-pct 0.15"
   },
   "ideHandoff": {
     "enabled": true,

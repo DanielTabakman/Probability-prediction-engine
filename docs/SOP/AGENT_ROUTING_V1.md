@@ -32,6 +32,19 @@
 
 Charter/explore/neutral: do **not** end replies with relay verdicts, stash pop, or checkout instructions unless the user asked about git/queue. See [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) § Response shape.
 
+### Relay disclosure (when offering work)
+
+When proposing implementation, fix, or ship work, state relay impact in one line — see [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) § Relay disclosure:
+
+| Label | Use when |
+|-------|----------|
+| **Relay: off** | Self-contained in this thread; no status read, queue advance, or mark ready |
+| **Relay: on** | Current IDE_BUILD slice or operator verdict execution |
+| **Relay: parked** | Spec/design here; operator thread or IDE BUILD starter owns execution |
+| **Relay: conflict** | Work fits this thread but ship needs operator recovery (mixed-plane / wrong branch) |
+
+Required on first scoped offer or when relay vs self-contained paths both exist. Skip for pure Q&A and implicit operator `what's next?` (already **Relay: on**).
+
 ### Operator thread — BUILD load order
 
 When implementing product (rare — prefer `@ppe-build-worker`):
