@@ -4,7 +4,7 @@
 
 **Scope:** Applies to MSOS-owned UI (`apps/msos-web/`, module routes, Command Center cards, embed shells) and to PPE surfaces when rendered inside MSOS or as standalone trader tools. Does **not** govern control-plane scripts, relay automation, or internal admin tooling.
 
-**As-of:** 2026-06-29
+**As-of:** 2026-06-30
 
 **Related (do not duplicate):**
 
@@ -161,6 +161,106 @@ For each user-facing module at **T2+** (see module registry), document:
 
 ---
 
+## Insight collect (living module frames)
+
+**Insight collect** = keep this section updated when a user-facing module ships or materially changes. Each row is the module frame template filled from **current product truth** (routes in `apps/msos-web/`, display APIs in `src/viz/`). BUILD agents and UX review use this as the fast spec — not a Figma board.
+
+**When to run insight collect:** module closeout (T2+), major UX slice merge, or after a guided trader session surfaces a framing gap.
+
+### `options_horizon` — `/options-horizon`
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | How does BTC (or selected asset) structure look in **price × time**, and what does options imply inside a region I care about? |
+| **Hero object** | Price × time chart (spot, volume, implied forward curve) |
+| **First action** | Drag a **thesis region** on the chart (or switch expiry on forward curve) |
+| **Feedback** | Region box + implied-mass preview string; optional distribution side panel |
+| **Plain-English read** | “Implied mass in region: X%” (+ method label) |
+| **Trust cue** | Payload `as_of_utc`, live vs loading state, thin-chain handling |
+| **Restraint state** | Preview fails → calm “could not compute” (not a crash) |
+| **Return hook** | Deep link to Strategy Lab with region context; expiry / surface moves daily |
+
+**Game/casino steal:** map is the slot reel — drag region = pull lever; preview line = slip payout text.
+
+### `implied_distribution` — `/strategy-lab`
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | What outcome distribution do options **price** at this expiry, and how does **my view** compare? |
+| **Hero object** | Distribution chart + **“What this means”** outcome headline |
+| **First action** | Belief preset chip or nudge (bullish / bearish / vol up) — not blank sliders |
+| **Feedback** | Overlay curve + outcome headline + disagreement read updates in place |
+| **Plain-English read** | `outcome.headline` under “What this means” |
+| **Trust cue** | `trust_state` banners (thin chain, degraded); live vs fixture mode |
+| **Restraint state** | Market tuning = no false “edge found”; watch-only when trust insufficient |
+| **Return hook** | Asset picker parity, CSV download, workflow steps (confirm → expression) |
+
+**Game/casino steal:** belief chips = odds taps; headline strip = bet slip hero anchored while chart moves.
+
+### `exposure_menu` — `/exposure`
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | What **paths exist** to get exposure to this asset (spot, options, planned rails) under my direction and horizon? |
+| **Hero object** | Ranked **path cards** stack (not a single chart) |
+| **First action** | Tap direction chip (long / short / neutral) or horizon chip (3m / 12m) |
+| **Feedback** | Path list refreshes; spot line + status note update |
+| **Plain-English read** | Each card `headline` + `capital_shape` |
+| **Trust cue** | Per-path `trust_badge`; page-level live vs sample paths note |
+| **Restraint state** | `insufficient_chain` → thin chain note; fixture fallback labeled honest |
+| **Return hook** | Card `deep_link` into Strategy Lab / expression when wired |
+
+**Game/casino steal:** intake chips = sportsbook market filter; path cards = parlay legs you can inspect one-by-one.
+
+### `expression_planner` — `/strategy-lab/expression`
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | What **structure fits** my view under constraints (simulation only)? |
+| **Hero object** | Suggested expression summary + payoff preview |
+| **First action** | Arrive from lab workflow or open with thesis context |
+| **Feedback** | Structure / legs update when inputs change |
+| **Plain-English read** | Fit language — not “buy this” |
+| **Trust cue** | Simulation-only footer; link back to lab trust state |
+| **Restraint state** | No expression promoted when materiality low |
+| **Return hook** | Save to monitor / paper track |
+
+### Command Center — `/` (authenticated home)
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | What should I **open next** in my trading process? |
+| **Hero object** | Calibration / reviews-due strip + module entry cards |
+| **First action** | Tap a module card (Horizon, Strategy Lab, Exposure) |
+| **Feedback** | Card highlights; counts update after monitor actions |
+| **Plain-English read** | Short module one-liners on cards |
+| **Trust cue** | Live / Soon / Planned labels honest |
+| **Restraint state** | Empty monitor = invitation, not error |
+| **Return hook** | Reviews due, return visits without scheduled demo |
+
+### Monitor + History — `/monitor`, `/history`
+
+| Field | Value |
+|-------|-------|
+| **Primary question** | What did I save, and **was I right** after the horizon? |
+| **Hero object** | Snapshot / paper-trade list → detail drill-down |
+| **First action** | Open a snapshot with review due |
+| **Feedback** | Post-mortem form → KPI strip updates |
+| **Plain-English read** | Review status + class summary copy |
+| **Trust cue** | Frozen evaluation provenance on detail |
+| **Restraint state** | “Review not due yet” calm state |
+| **Return hook** | Learning spine — track record over time |
+
+### Planned / partial (fill on ship)
+
+| Module | Route | Note |
+|--------|-------|------|
+| `forward_consistency` | `/forward-consistency` (planned) | Radar flags = variable insight moments |
+| `cross_venue_event_gap` | Strategy Lab card / artifacts | Gap found = highlight; thin history = restraint |
+| Public homepage | `/` | Product window = zero-login first action; CTA into app |
+
+---
+
 ## Reference apps (pattern library)
 
 Use as **interaction inspiration**, not visual clone targets.
@@ -263,3 +363,4 @@ Observable in demo or witness:
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 — MSOS platform scope, game/casino mechanics, module template, reference apps |
+| 2026-06-30 | Insight collect — living module frames for live MSOS routes |

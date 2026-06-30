@@ -226,6 +226,8 @@ Queue via [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FR
 | Ops 005 | `platform` / scripts | Collector **only if archive charter filled** |
 | Closeout N | `dev-factory` | COMPLETE; update registry + HTML map |
 
+**T2+ closeout:** run **insight collect** — add or refresh the module’s row in [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) § Insight collect.
+
 ### Step 5 — Layer rules
 
 | Work | Path |
