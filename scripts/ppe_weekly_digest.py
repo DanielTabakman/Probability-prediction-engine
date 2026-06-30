@@ -401,18 +401,32 @@ def cmd_write_notify_payload(repo: Path) -> int:
         summary["click_url"] = click_url
     summary.update(build_phone_digest_notify(summary))
     try:
+        from scripts.ppe_operator_compass import phone_snippet_lines as compass_phone_lines
+        from scripts.ppe_operator_compass import sync_compass, write_notify_snippet as write_compass_notify
+
+        compass = sync_compass(repo, patch_map=True)
+        write_compass_notify(repo, compass=compass)
+        compass_snippet = compass_phone_lines(repo, compass=compass)
+        if compass_snippet:
+            summary["compass_do_now_count"] = len(compass.get("do_now") or [])
+            summary["compass_crack_catcher_count"] = len(compass.get("crack_catcher") or [])
+            body = str(summary.get("phone_body") or "").strip()
+            summary["phone_body"] = f"{body}\n\n" + "\n".join(compass_snippet) if body else "\n".join(compass_snippet)
+    except ImportError:
+        pass
+    try:
         from scripts.ppe_human_backlog import (
             open_items,
-            phone_snippet_lines,
+            phone_snippet_lines as backlog_phone_lines,
             render_markdown,
-            write_notify_snippet,
+            write_notify_snippet as write_backlog_notify,
         )
 
         (repo / "docs/SOP/HUMAN_STEWARD_BACKLOG.md").write_text(
             render_markdown(repo), encoding="utf-8"
         )
-        write_notify_snippet(repo)
-        snippet = phone_snippet_lines(repo)
+        write_backlog_notify(repo)
+        snippet = backlog_phone_lines(repo)
         if snippet:
             summary["human_backlog_open"] = len(open_items(repo))
             body = str(summary.get("phone_body") or "").strip()

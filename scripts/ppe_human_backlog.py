@@ -190,6 +190,13 @@ def main(argv: list[str] | None = None) -> int:
         out = repo / BACKLOG_MD_REL
         out.write_text(render_markdown(repo), encoding="utf-8")
         print(f"ppe_human_backlog: wrote {out.relative_to(repo)}")
+        try:
+            from scripts.ppe_operator_compass import sync_compass
+
+            sync_compass(repo, patch_map=True)
+            print("ppe_human_backlog: synced operator compass")
+        except Exception:
+            pass
         return 0
     if args.write_notify_snippet:
         path = write_notify_snippet(repo)

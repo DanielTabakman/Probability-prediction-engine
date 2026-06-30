@@ -317,6 +317,15 @@
       }
       .archive-hint { color: var(--violet); font-weight: 600; }
       .last-updated time { font-weight: 600; }
+      .crack-panel { border: 1px solid rgba(242, 182, 87, 0.45); }
+      .progress-panel { border: 1px solid var(--line); max-width: 52rem; overflow-x: auto; }
+      .compass-empty { margin: 0; font-size: 0.84rem; color: var(--muted); }
+      .compass-src { color: var(--muted); font-style: normal; font-size: 0.72rem; }
+      .compass-modules { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+      .compass-modules th, .compass-modules td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+      .compass-modules th { color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; }
+      .compass-modules code { font-size: 0.68rem; color: var(--muted); }
+      .status-partial { color: var(--amber); font-weight: 600; }
     </style>
   </head>
   <body>
@@ -325,30 +334,31 @@
       Living operator chart — modules, data, tiers, priorities.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-29T16:47:00Z">
-        Last updated: 2026-06-29 <time datetime="2026-06-29T16:47:00Z">16:47 UTC</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-06-29T21:08:31Z">
+        Last updated: 2026-06-29 <time datetime="2026-06-29T21:08:31Z">17:08 EDT</time>
       </span>
     </p>
 
     <div class="maint-note">
       <strong>Refresh workflow:</strong> If you <code>git pull</code> often, browser refresh is usually enough.
-      This file tracks your current branch — it does not poll relay or VM live.
-      Agents bump <code>#map-last-updated</code> (date <em>and</em> UTC time) at steward closeout.
+      Top panels auto-sync from <code>ppe_operator_compass.py</code> (also runs with operator status refresh).
+      Module cards below are manual architecture reference.
     </div>
 
-    <div class="right-now" id="map-right-now">
+<div class="right-now" id="map-right-now">
       <strong>Right now</strong>
       <ul>
-        <li><strong>Milestone:</strong> <a href="../MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md">Trader Workflow Integration v1</a> — process fit over platform breadth</li>
-        <li><strong>Last closed:</strong> MSOS operator module map dashboard (#557) · Exposure menu /exposure v0 (#576)</li>
-        <li><strong>Relay queue hint:</strong> <code>mvp1_bl_density_smoothing_v1</code> · forward consistency ch.1–2 · exposure menu closeout</li>
+        <li><strong>Milestone:</strong> <a href="../MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md">Trader Workflow Integration v1</a></li>
+        <li><strong>Relay verdict:</strong> <code>IDE_BUILD</code></li>
+        <li><strong>Queue hint:</strong> mvp1_bl_density_smoothing_v1 · forward consistency after supply refresh</li>
       </ul>
       <span class="right-now-links">
         <a href="../PPE_INTEGRATED_STATUS.md">Integrated status</a>
-        · <a href="../AGENT_CONTINUITY_BRIEF.md">Continuity brief</a>
+        · <a href="../../../artifacts/orchestrator/OPERATOR_STATUS.md">Operator status</a>
         · <a href="../HUMAN_STEWARD_BACKLOG.md">Steward backlog</a>
       </span>
     </div>
+
 
     <div class="quick-links" id="map-quick-links">
       <a href="https://app.marketstructureos.com/options-horizon">/options-horizon</a>
@@ -358,43 +368,126 @@
       <a class="planned" href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">/forward-consistency (planned)</a>
     </div>
 
-    <h2>Your attention — human to-do</h2>
-    <div class="op-section todo-panel">
-      <h3>Bottlenecks — needs you to keep it moving</h3>
+    <h2>Do this now</h2>
+    <p class="flow-intro">Actionable today — synced from operator verdict, asset batch, and ops backlog.</p>
+    <div class="op-section todo-panel" id="map-do-now">
       <ol>
         <li>
-          <strong>VM collectors — confirm tasks on ppeloop</strong>
-          <span class="why"><code>install_horizon_surface_collector_task.cmd</code> + <code>install_cross_venue_collector_task.cmd</code> after pull.</span>
+          <strong>Finish chapter closeout — msos_trader_review_loop_v1 (MSOS snapshot post-mortem review loop)</strong>
+          <span class="why">IDE product marker present — finish chapter with run_ppe_local · docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json · DESKTOP_CONTINUE.cmd <em class="compass-src">(operator_status)</em></span>
         </li>
         <li>
-          <strong>Next asset batch — pick the group</strong>
-          <span class="why">Sign off trust caveats after witness before Live pill on new symbols.</span>
+          <strong>Asset batch — ppe_equity_universe_tier1a_v1</strong>
+          <span class="why">SPY, QQQ, IWM · witness + trust-caveat sign-off before Live pill · say asset batch wave 1 <em class="compass-src">(assets_tier1_manifest)</em></span>
         </li>
       </ol>
+    </div>
+
+    <h2>Crack catcher</h2>
+    <p class="flow-intro">Things that may fall through the cracks — archive depth, policy backlog, queued work.</p>
+    <div class="op-section crack-panel" id="map-crack-catcher">
+      <ul>
+        <li>
+          <strong>Horizon replay scrubber</strong>
+          <span class="why">1 / 30 daily surface snapshots · promote when archive_meta.replay_ready <em class="compass-src">(horizon_surface_archive)</em></span>
+        </li>
+        <li>
+          <strong>Cross-venue backtest scoring</strong>
+          <span class="why">0 / 14 daily PM ↔ Deribit snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(cross_venue_snapshots)</em></span>
+        </li>
+        <li>
+          <strong>Product lane automation</strong>
+          <span class="why">Auto-spawn IDE build on PRODUCT_BLOCKED, or switch product slices to ACP, or inline IDE build in the deterministic worker. · Policy: Stay near-zero-API (local profile) vs pay for full autonomous product slices? <em class="compass-src">(human_steward_backlog)</em></span>
+        </li>
+        <li>
+          <strong>Founder / canon policy</strong>
+          <span class="why">Which PPE_MASTER hard stops agents may auto-resolve; PR-only vs direct control-plane edits; cross-layer slice exceptions. · Policy: What stays human-only forever vs delegated envelope? <em class="compass-src">(human_steward_backlog)</em></span>
+        </li>
+        <li>
+          <strong>Stripe operator prerequisites (phase 7b gate)</strong>
+          <span class="why">Before msos_billing_stripe_v1 BUILD: Stripe account, test products/prices, API keys + webhook signing secret on VPS, Checkout return URLs. Also verify full E2E demo journey on production. · Policy: When done, mark this item done and promote billing_stripe queue row from BLOCKED to READY. <em class="compass-src">(human_steward_backlog)</em></span>
+        </li>
+        <li>
+          <strong>Asset wave queued — ppe_equity_universe_tier1b_v1</strong>
+          <span class="why">Next group after current batch: TSLA, AMD, AAPL, MSFT, AMZN <em class="compass-src">(assets_tier1_manifest)</em></span>
+        </li>
+      </ul>
+    </div>
+
+    <h2>Module progress</h2>
+    <p class="flow-intro">Living registry snapshot — tier and status from <code>PPE_MODULE_REGISTRY_V1.md</code>.</p>
+    <div class="op-section progress-panel" id="map-module-progress">
+      <table class="compass-modules">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Module</th>
+            <th>Tier</th>
+            <th>Status</th>
+            <th>Next / advance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>Implied distribution</strong><br><code>implied_distribution</code></td>
+            <td>T2→T4</td>
+            <td><span class="status-live">LIVE</span></td>
+            <td>T4: richer relationship modes</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>Options Horizon</strong><br><code>options_horizon</code></td>
+            <td>T2→T5*</td>
+            <td><span class="status-live">LIVE</span></td>
+            <td>chart polish + archive</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Forward consistency</strong><br><code>forward_consistency</code></td>
+            <td>T1→T3</td>
+            <td><span class="status-partial">PARTIAL · SELECTED ch.1–2</span></td>
+            <td>**yes** — radar T1–T2 queued</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>Expression planner</strong><br><code>expression_planner</code></td>
+            <td>T2→T3</td>
+            <td><span class="status-live">LIVE</span></td>
+            <td>exposure optimization depth</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Cross-venue scan</strong><br><code>cross_venue_event_gap</code></td>
+            <td>T3→T3</td>
+            <td><span class="status-live">LIVE (ops)</span></td>
+            <td>backtest when history deep</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><strong>Exposure menu</strong><br><code>exposure_menu</code></td>
+            <td>—→T2</td>
+            <td><span class="status-partial">SELECTED</span></td>
+            <td>**yes** — v0 BUILD active</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <h2>Waiting on time / data</h2>
     <p class="flow-intro">
       Blocked by clock or archive depth — not a human decision today. VM daily collectors must keep running.
     </p>
-    <div class="op-section time-panel">
+    <div class="op-section time-panel" id="map-waiting-on-time">
       <h3>Needs more days of snapshots</h3>
       <ul>
         <li>
           <strong>Horizon replay scrubber</strong>
-          <span class="when">Chartered · <span class="archive-hint">~8 / 30</span> daily surface snapshots (steward est.) · promote SELECTION when <code>archive_meta.replay_ready</code></span>
+          <span class="why">1 / 30 daily surface snapshots · promote when archive_meta.replay_ready <em class="compass-src">(horizon_surface_archive)</em></span>
         </li>
         <li>
           <strong>Cross-venue backtest scoring</strong>
-          <span class="when"><span class="archive-hint">~6 / 14</span> daily PM ↔ Deribit snapshots (steward est.) · scan runs today; backtest thin until history deepens</span>
-        </li>
-        <li>
-          <strong>Forward consistency T3 archive</strong>
-          <span class="when">After radar dashboard (T1–T2) ships · then daily status snapshots per archive charter</span>
-        </li>
-        <li>
-          <strong>Horizon surface replay UX</strong>
-          <span class="when">Daily <code>collect_horizon_surface_snapshot</code> on VM — archive grows ~1 day at a time</span>
+          <span class="why">0 / 14 daily PM ↔ Deribit snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(cross_venue_snapshots)</em></span>
         </li>
       </ul>
     </div>
@@ -757,7 +850,8 @@
     <footer>
       Open locally: <code>docs/SOP/assets/msos_module_map.html</code>
       · <code>git pull</code> then refresh · Gate: <code>tests/test_msos_module_map_operator_sections.py</code>
-      · Patch: <code>python scripts/patch_msos_module_map.py</code>
+      · Sync: <code>python scripts/ppe_operator_compass.py --sync-map</code>
+      · Cards patch: <code>python scripts/patch_msos_module_map.py</code>
       · noindex
     </footer>
   </body>

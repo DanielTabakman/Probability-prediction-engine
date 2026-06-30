@@ -8,7 +8,7 @@ import {
   type ReviewStatus,
   reviewStatusLabel,
   type SnapshotReviewRow,
-} from "@/lib/snapshotReview";
+} from "@/lib/snapshotReviewShared";
 
 type Props = {
   snapshotId: string;
