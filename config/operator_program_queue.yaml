@@ -1,0 +1,23 @@
+# Operator program queue — human labels for compass / module map (not relay SSOT).
+# Slice counts are computed live from PHASE_QUEUE.json + asset manifests.
+
+version: 1
+
+programs:
+  - id: trader_learning_spine
+    label: Trader learning spine
+    hours_per_slice: 4
+    priority: 1
+    phase_queue:
+      spine_program_suffix: TRADER_LEARNING_SPINE_PROGRAM_V1.md
+    operator_hint: Relay picks next READY spine chapter (review loop → dist download → cross-venue → timeseries)
+
+  - id: asset_batch_wave1
+    label: Adding new assets
+    hours_per_slice: 3
+    priority: 2
+    parallel: true
+    manifest: config/assets_tier1_manifest.yaml
+    manifest_wave: ppe_asset_batch_wave1_v1
+    operator_phrase: asset batch wave 1
+    doc: docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md
