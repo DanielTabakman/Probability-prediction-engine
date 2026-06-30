@@ -333,13 +333,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[P0 SPINE] MSOS snapshot post-mortem review loop",
       "selectionPrep": "docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[P1 SPINE] MSOS distribution CSV download",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md"
     },

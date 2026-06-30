@@ -143,6 +143,25 @@ def _witness_touchset_only_evidence(slice_obj: dict[str, Any]) -> bool:
     return len(paths) == 1 and paths[0].endswith("_EVIDENCE_STATUS.md")
 
 
+def _plan_evidence_doc_path(repo: Path, plan: dict[str, Any]) -> Path | None:
+    for sl in plan.get("slices") or []:
+        if not isinstance(sl, dict):
+            continue
+        co = sl.get("closeout")
+        if isinstance(co, dict):
+            rel = str(co.get("evidenceDoc") or "").strip()
+            if rel:
+                return repo / rel.replace("\\", "/")
+    return None
+
+
+def _chapter_evidence_pending(repo: Path, plan: dict[str, Any]) -> bool:
+    path = _plan_evidence_doc_path(repo, plan)
+    if not path or not path.is_file():
+        return False
+    return _evidence_has_pending_slices(path.read_text(encoding="utf-8", errors="replace"))
+
+
 def sync_slice_progress(repo: Path, plan_path: str) -> dict[str, Any]:
     """Mark relay slices complete when their touchSet (or product merge) is already on main."""
     from scripts.ppe_ide_product_ready import _product_touchset_on_main
@@ -202,6 +221,8 @@ def sync_slice_progress(repo: Path, plan_path: str) -> dict[str, Any]:
             if _platform_touchset_satisfied(repo, sid, sl):
                 mark_slice_complete(repo, norm, sid)
                 marked.append(sid)
+            continue
+        if "WITNESS" in sid.upper() and _chapter_evidence_pending(repo, plan):
             continue
         if _touchset_satisfied(repo, sl):
             mark_slice_complete(repo, norm, sid)
