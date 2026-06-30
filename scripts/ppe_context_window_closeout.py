@@ -516,6 +516,12 @@ def record_context_closeout(
         ship_report=ship_report,
     )
     append_closeout_record(repo, record)
+    try:
+        from scripts.ppe_tracking_hub import record_context_closeout_event
+
+        record_context_closeout_event(repo, record)
+    except Exception:
+        pass
     if promote:
         promote_whats_next(repo, record)
     try:

@@ -14,6 +14,7 @@ METRICS_DIR = "artifacts/workflow_metrics"
 SESSIONS_FILE = "sessions.jsonl"
 SLICES_FILE = "slices.jsonl"
 CONTEXT_WINDOWS_FILE = "context_windows.jsonl"
+EVENTS_FILE = "events.jsonl"
 
 SIZE_WEIGHTS = {"S": 1, "M": 2, "L": 3, "XL": 5}
 
@@ -61,6 +62,50 @@ def _parse_iso(ts: str) -> datetime | None:
 
 def read_context_windows(repo: Path) -> list[dict[str, Any]]:
     return _read_jsonl(_metrics_dir(repo) / CONTEXT_WINDOWS_FILE)
+
+
+def read_events(repo: Path) -> list[dict[str, Any]]:
+    return _read_jsonl(_metrics_dir(repo) / EVENTS_FILE)
+
+
+def events_in_days(repo: Path, days: int) -> list[dict[str, Any]]:
+    rows = read_events(repo)
+    if days <= 0:
+        return rows
+    cutoff = datetime.now(timezone.utc).timestamp() - days * 86400
+    return [
+        row
+        for row in rows
+        if (t := _parse_iso(str(row.get("timestamp") or ""))) and t.timestamp() >= cutoff
+    ]
+
+
+def append_event_row(
+    repo: Path,
+    *,
+    event_type: str,
+    note: str = "",
+    slice_id: str | None = None,
+    session_id: str | None = None,
+    value_1: str | int | float | None = None,
+    value_2: str | int | float | None = None,
+) -> dict[str, Any]:
+    row: dict[str, Any] = {
+        "event_id": str(uuid.uuid4()),
+        "timestamp": _utc_now(),
+        "event_type": event_type.strip(),
+        "note": note,
+    }
+    if slice_id:
+        row["slice_id"] = slice_id
+    if session_id:
+        row["session_id"] = session_id
+    if value_1 is not None:
+        row["value_1"] = value_1
+    if value_2 is not None:
+        row["value_2"] = value_2
+    _append_jsonl(_metrics_dir(repo) / EVENTS_FILE, row)
+    return row
 
 
 def context_windows_in_week(repo: Path, week_monday: date) -> list[dict[str, Any]]:
@@ -163,6 +208,8 @@ def append_slice_close_row(
     worker_lane: str | None = None,
     api_calls: int | None = None,
     source: str | None = None,
+    slice_kind: str | None = None,
+    incident_flag: bool | None = None,
 ) -> None:
     size_u = size.upper()
     if size_u not in SIZE_WEIGHTS:
@@ -192,6 +239,20 @@ def append_slice_close_row(
     src = (source or "").strip()
     if src:
         row["source"] = src
+    kind = (slice_kind or "").strip()
+    if not kind:
+        try:
+            from scripts.ppe_slice_worker_mode import infer_slice_kind
+
+            kind = infer_slice_kind(slice_id, None)
+        except ImportError:
+            kind = ""
+    if kind:
+        row["slice_kind"] = kind
+    if incident_flag is None:
+        incident_flag = rework > 0 or roundtrips >= 3
+    if incident_flag:
+        row["incident_flag"] = True
     _append_jsonl(_metrics_dir(repo) / SLICES_FILE, row)
 
 
@@ -242,7 +303,7 @@ def _slices_in_days(repo: Path, days: int) -> list[dict[str, Any]]:
     ]
 
 
-def cmd_summary(repo: Path, *, days: int = 7, by_lane: bool = False) -> int:
+def cmd_summary(repo: Path, *, days: int = 7, by_lane: bool = False, include_validation: bool = False) -> int:
     sessions = _read_jsonl(_metrics_dir(repo) / SESSIONS_FILE)
     slices_window = _slices_in_days(repo, days)
 
@@ -286,6 +347,22 @@ def cmd_summary(repo: Path, *, days: int = 7, by_lane: bool = False) -> int:
             print(f"  api_calls_total: {lane_summary['api_calls_total']}")
         if lane_summary.get("est_usd_total"):
             print(f"  est_usd_total (advisory): {lane_summary['est_usd_total']}")
+
+    incidents = sum(1 for s in slices_window if s.get("incident_flag") in (True, "true", 1, "1"))
+    ctx_cutoff = datetime.now(timezone.utc).timestamp() - days * 86400
+    ctx_count = sum(
+        1
+        for row in read_context_windows(repo)
+        if (t := _parse_iso(str(row.get("closed_at") or ""))) and t.timestamp() >= ctx_cutoff
+    )
+    print(f"  incident_slices: {incidents}")
+    print(f"  context_closeouts: {ctx_count}")
+
+    if include_validation:
+        from scripts.ppe_tracking_hub import demo_sessions_in_days
+
+        print(f"  validation_sessions: {len(demo_sessions_in_days(repo, days))}")
+        print(f"  tracking_events: {len(events_in_days(repo, days))}")
     return 0
 
 
@@ -374,6 +451,11 @@ def main(argv: list[str] | None = None) -> int:
     p_sum = sub.add_parser("summary")
     p_sum.add_argument("--days", type=int, default=7)
     p_sum.add_argument("--by-lane", action="store_true", help="Include worker-lane rollup")
+    p_sum.add_argument(
+        "--include-validation",
+        action="store_true",
+        help="Include validation sessions and tracking events counts",
+    )
 
     p_backfill = sub.add_parser("backfill", help="Backfill recent slice closes from progress + git log")
     p_backfill.add_argument("--limit", type=int, default=10)
@@ -407,7 +489,12 @@ def main(argv: list[str] | None = None) -> int:
             source=args.source,
         )
     if args.command == "summary":
-        return cmd_summary(repo, days=args.days, by_lane=args.by_lane)
+        return cmd_summary(
+            repo,
+            days=args.days,
+            by_lane=args.by_lane,
+            include_validation=getattr(args, "include_validation", False),
+        )
     if args.command == "backfill":
         from scripts.ppe_workflow_cost import backfill_recent_slices
 

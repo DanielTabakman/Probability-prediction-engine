@@ -14,6 +14,7 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 | **User time** | Guard resume → generated starter; ≤2 roundtrips per slice |
 | **Computer time** | `run_pushable_gate.py` tiered gate (unchanged) |
 | **Real-life time** | `workflow_metrics.cmd summary --by-lane` — throughput + lane mix (also in `OPERATOR_STATUS`) |
+| **Product + validation** | `ppe_tracking_status.cmd --brief` — trader loop, assets, steering drift |
 
 ---
 
