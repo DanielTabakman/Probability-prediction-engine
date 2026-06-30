@@ -5,7 +5,7 @@ alwaysApply: false
 
 # PPE thread roles
 
-**Canon:** [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md) · [`CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md)
+**Canon:** [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md) · [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md)
 
 ## Roles
 

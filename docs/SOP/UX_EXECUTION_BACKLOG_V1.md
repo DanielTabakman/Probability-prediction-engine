@@ -42,8 +42,8 @@ Run `@ux_legibility_reviewer` checklist at closeout when user-visible copy/layou
 
 | Item | Chapter | Closed |
 |------|---------|--------|
-| MSOS post-mortem review loop | `msos_trader_review_loop_v1` | Product on `main` (#590, #792); relay witness/closeout in flight — **do not re-BUILD** |
-| Strategy Lab distribution CSV download | `msos_strategy_lab_dist_download_v1` | Product on `main` (#582); relay closeout in flight — **do not re-BUILD** |
+| MSOS post-mortem review loop | `msos_trader_review_loop_v1` | **CLOSEOUT_ONLY** — product on `main`; see `OPERATOR_STATUS` Mode |
+| Strategy Lab distribution CSV download | `msos_strategy_lab_dist_download_v1` | **CLOSEOUT_ONLY** — product on `main`; do not re-BUILD |
 | Exposure menu v0 | `ppe_exposure_menu_v1` | 2026-06-29 |
 | Options Horizon chart polish | `horizon_chart_polish_v1` | 2026-06-28 (#429) |
 | Options Horizon region workflow | `horizon_region_workflow_v1` | COMPLETE |

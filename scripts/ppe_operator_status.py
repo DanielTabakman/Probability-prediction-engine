@@ -298,9 +298,24 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         plan_path=plan_path or "",
     )
 
+    chapter_mode: dict[str, Any] = {}
+    try:
+        from scripts.ppe_chapter_mode import resolve_chapter_mode
+
+        chapter_mode = resolve_chapter_mode(
+            repo,
+            verdict=verdict,
+            plan_path=plan_path,
+            guard_reason=guard.reason if guard.reason else None,
+            chapter_name=str(summary.get("chapter_name") or "") or None,
+        )
+    except Exception:
+        pass
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
+        "chapter_mode": chapter_mode or None,
         "exit_code": exit_code,
         "chapter_name": summary.get("chapter_name"),
         "manifest_status": manifest_status,
@@ -364,6 +379,17 @@ def _format_human(
         f"VERDICT: {status.get('verdict')}",
         "",
     ]
+    chapter_mode = status.get("chapter_mode")
+    if isinstance(chapter_mode, dict) and chapter_mode.get("mode"):
+        try:
+            from scripts.ppe_chapter_mode import format_chapter_mode_block
+
+            mode_lines = format_chapter_mode_block(chapter_mode)
+            if mode_lines:
+                lines.extend(mode_lines)
+                lines.append("")
+        except Exception:
+            pass
     if status.get("chapter_name"):
         lines.append(f"Chapter: {status['chapter_name']}")
     if status.get("manifest_status"):
@@ -430,9 +456,12 @@ def _format_human(
             lines.append(f"  - {item}")
     warnings = status.get("preflight_warnings") or []
     if warnings:
-        lines.extend(["", "Preflight warnings:"])
+        lines.extend(["", "Preflight warnings (action required before relay):"])
         for w in warnings:
             lines.append(f"  - {w}")
+        lines.append(
+            "  → Resolve branch/dirty-tree issues or enter RECOVERY per docs/SOP/RECOVERY_PROTOCOL.md"
+        )
     errors = status.get("errors") or []
     if errors:
         lines.extend(["", "Errors:"])

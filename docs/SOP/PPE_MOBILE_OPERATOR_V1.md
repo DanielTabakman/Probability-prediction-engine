@@ -139,6 +139,8 @@ type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 
 ### Verdict matrix
 
+Full table: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · agent routing: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+
 | Verdict | Phone | Desktop | VM loop |
 |---------|-------|---------|---------|
 | `SUPPLY_LOW` | Nothing | — | idle |
