@@ -323,6 +323,14 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     except Exception:
         pass
 
+    delegation_hint: str | None = None
+    try:
+        from scripts.ppe_delegation_envelope import operator_delegation_hint
+
+        delegation_hint = operator_delegation_hint(repo)
+    except ImportError:
+        pass
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
@@ -340,6 +348,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "supply": supply,
         "preflight_ok": preflight.get("ok"),
         "preflight_warnings": preflight.get("warnings") or [],
+        "delegation_hint": delegation_hint,
         "commands": commands,
         "avoid": avoid,
         "errors": errors,
@@ -479,6 +488,9 @@ def _format_human(
         lines.append(
             "  → Resolve branch/dirty-tree issues or enter RECOVERY per docs/SOP/RECOVERY_PROTOCOL.md"
         )
+    delegation_hint = status.get("delegation_hint")
+    if delegation_hint:
+        lines.extend(["", "Delegation:", f"  - {delegation_hint}"])
     errors = status.get("errors") or []
     if errors:
         lines.extend(["", "Errors:"])

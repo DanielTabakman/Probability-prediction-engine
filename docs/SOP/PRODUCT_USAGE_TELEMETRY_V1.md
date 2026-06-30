@@ -9,6 +9,8 @@ Minimal MSOS web usage telemetry: append-only JSONL (`ppe_product_usage.jsonl`) 
 | Event | Emitter |
 |-------|---------|
 | `page_view` | `ProductUsageBeacon` (pathname changes) |
+| `session_start` | `ProductUsageBeacon` (once per browser session) |
+| `distribution_export_click` | Strategy Lab CSV download link (client intent) |
 | `lab_view` | `StrategyLabClientShell` (pathname + asset) |
 | `review_submit` | snapshot review API after successful upsert |
 | `distribution_export` | distribution export API after successful CSV fetch |

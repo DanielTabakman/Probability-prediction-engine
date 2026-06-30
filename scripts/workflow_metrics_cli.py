@@ -434,6 +434,25 @@ def cmd_export_csv(repo: Path) -> int:
     print(f"workflow_metrics: wrote {slices_csv}")
     print(f"workflow_metrics: wrote {events_csv}")
     print(f"workflow_metrics: wrote {ctx_csv}")
+
+    from scripts.ppe_product_usage import summarize_usage
+
+    usage = summarize_usage(repo, days=7)
+    usage_csv = out_dir / "product_usage_export.csv"
+    usage_rows: list[dict[str, str]] = [
+        {"kind": "summary", "key": "total_events", "value": str(usage.get("total_events", 0))},
+        {"kind": "summary", "key": "unique_users", "value": str(usage.get("unique_users", 0))},
+        {"kind": "summary", "key": "top_event", "value": str(usage.get("top_event") or "")},
+        {"kind": "summary", "key": "path", "value": str(usage.get("path") or "")},
+        {"kind": "summary", "key": "exists", "value": str(bool(usage.get("exists"))).lower()},
+    ]
+    for event_name, count in (usage.get("by_event") or {}).items():
+        usage_rows.append({"kind": "event", "key": str(event_name), "value": str(count)})
+    with usage_csv.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=["kind", "key", "value"])
+        w.writeheader()
+        w.writerows(usage_rows)
+    print(f"workflow_metrics: wrote {usage_csv}")
     return 0
 
 

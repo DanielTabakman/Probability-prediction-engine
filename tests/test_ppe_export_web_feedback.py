@@ -56,3 +56,34 @@ def test_playwright_witness_imports_copy_scan() -> None:
         encoding="utf-8"
     )
     assert "scan_html" in text
+
+
+def test_format_digest_line_window() -> None:
+    from datetime import datetime, timedelta, timezone
+
+    from scripts.ppe_export_web_feedback import records_in_days
+
+    now = datetime.now(timezone.utc).isoformat()
+    old = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+    rows = [
+        {"created_at_utc": now, "usefulness": 4, "repeat_use_intent": 5},
+        {"created_at_utc": old, "usefulness": 1, "repeat_use_intent": 1},
+    ]
+    assert len(records_in_days(rows, 7)) == 1
+
+
+def test_format_digest_line_with_env(tmp_path: Path, monkeypatch) -> None:
+    from scripts.ppe_export_web_feedback import format_digest_line
+
+    jsonl = tmp_path / "ppe_web_feedback.jsonl"
+    row = {
+        "created_at_utc": "2026-06-30T12:00:00Z",
+        "usefulness": 4,
+        "repeat_use_intent": 5,
+    }
+    jsonl.write_text(json.dumps(row) + "\n", encoding="utf-8")
+    monkeypatch.setenv("PPE_WEB_FEEDBACK_DIR", str(tmp_path))
+    line = format_digest_line(REPO_ROOT, days=7)
+    assert line is not None
+    assert "submission" in line
+    assert "4.0/5" in line

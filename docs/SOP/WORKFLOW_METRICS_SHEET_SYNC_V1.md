@@ -11,8 +11,8 @@ Ritual for syncing JSONL workflow metrics exports into the operator Google Sheet
 
 ## Steps
 
-1. `workflow_metrics.cmd export-csv` — writes `sessions_export.csv`, `weekly_summary.csv`, `events_export.csv`, `context_windows_export.csv`
-2. Import each CSV into the matching sheet tab (Sessions, Slices, Events, Context closeouts)
+1. `workflow_metrics.cmd export-csv` — writes `sessions_export.csv`, `weekly_summary.csv`, `events_export.csv`, `context_windows_export.csv`, `product_usage_export.csv`
+2. Import each CSV into the matching sheet tab (Sessions, Slices, Events, Context closeouts, **Product usage**)
 3. Do not edit JSONL directly from the sheet; re-export if corrections are needed
 
 ## Related

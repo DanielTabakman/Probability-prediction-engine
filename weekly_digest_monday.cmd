@@ -18,6 +18,11 @@ if errorlevel 1 exit /b %ERRORLEVEL%
 call "%~dp0monday_morning_prep.cmd" wait
 if errorlevel 1 exit /b %ERRORLEVEL%
 
+if exist "%CD%\ppe_pull_product_usage.cmd" (
+  call "%CD%\ppe_pull_product_usage.cmd"
+  if errorlevel 1 echo weekly_digest_monday: product usage pull skipped — continuing
+)
+
 call "%~dp0token_audit.cmd" --prune-stale
 if errorlevel 1 exit /b %ERRORLEVEL%
 

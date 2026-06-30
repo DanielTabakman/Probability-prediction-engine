@@ -6,6 +6,7 @@ import {
   HorizonNavLink,
 } from "@/components/AppNav";
 import { StrategyLabClientShell } from "@/components/StrategyLabClientShell";
+import { DistributionExportLink } from "@/components/DistributionExportLink";
 import { StrategyLabErrorBoundary } from "@/components/StrategyLabErrorBoundary";
 import type { DisplayPayload } from "@/lib/ppeDisplayPayload";
 import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
@@ -41,9 +42,9 @@ export function StrategyLabContent({ displayPayload = null }: StrategyLabContent
 
       <div className="lab-export-toolbar" data-tour="lab-distribution-export">
         {live ? (
-          <a href={downloadHref} className="btn slim dark" download>
+          <DistributionExportLink href={downloadHref} assetId={assetId} className="btn slim dark">
             Download distribution stats (CSV)
-          </a>
+          </DistributionExportLink>
         ) : (
           <span
             className="btn slim dark"

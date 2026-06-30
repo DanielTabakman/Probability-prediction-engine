@@ -109,6 +109,7 @@ Heuristics from [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md)
 | `weekly_digest.cmd notify` | **ntfy** phone digest when `PPE_NTFY_TOPIC` is set; includes **operator compass** do-now + crack-catcher, then steward backlog · optional Windows toast (`PPE_WEEKLY_DIGEST_TOAST=0` for phone only) |
 | `weekly_digest_monday.cmd` | **Single Monday pipeline:** prep → wait until **08:00** → radar → digest (includes **tracking pulse**) → notify |
 | `install_weekly_radar_monday_task.cmd` | Register Task Scheduler: starts **06:00** local, report at **08:00** (run once) |
+| `install_ppe_product_usage_pull_task.cmd` | Daily **07:30** pull of MSOS usage JSONL from docker (`ppe_pull_product_usage.cmd`) |
 | `install_weekly_digest_monday_task.cmd` | Legacy alias — prefer `install_weekly_radar_monday_task.cmd` |
 | `bootstrap_operator_pair.cmd` | One-shot desktop IDE-only + VM SSH setup ([`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)) |
 | `VM_RESTART.cmd` / `VM_STATUS.cmd` | **VM** loop host stack ([`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)) |

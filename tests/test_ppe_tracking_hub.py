@@ -12,6 +12,7 @@ from scripts.ppe_tracking_hub import (
     collect_steering_drift,
     collect_tracking_snapshot,
     format_operator_tracking_lines,
+    format_tracking_digest_lines,
     record_event,
     record_validation_session,
 )
@@ -92,6 +93,11 @@ class TestPpeTrackingHub(unittest.TestCase):
             source="test",
         )
         self.assertEqual(cmd_summary(self.repo, days=7, include_validation=True), 0)
+
+    def test_tracking_digest_lines(self) -> None:
+        lines = format_tracking_digest_lines(self.repo, days=7)
+        self.assertIsInstance(lines, list)
+        self.assertLessEqual(len(lines), 6)
 
 
 if __name__ == "__main__":
