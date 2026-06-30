@@ -2,13 +2,24 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+from unittest.mock import patch
+
+from src.data.forward_consistency_quotes import (
+    ForwardConsistencyHeatmapCell,
+    build_forward_consistency_dashboard,
+    dashboard_payload_to_dict,
+    summarize_forward_consistency_cells,
+)
 from src.engine.forward_consistency import (
     ForwardConsistencyConfig,
+    ForwardConsistencyQualityFlag,
     FutureLegQuote,
     OptionLegQuote,
     SyntheticForwardRow,
     check_forward_consistency,
     compute_synthetic_forward_rows,
+    derive_quality_flags,
     filter_reliable_synthetic_rows,
     run_forward_consistency_check,
 )
@@ -156,6 +167,156 @@ def test_run_check_picks_tightest_strike() -> None:
         future,
         premium_in_usd=False,
         forward_usd=100_000.0,
-        config=ForwardConsistencyConfig(max_synthetic_width_usd=5000.0),
+        config=ForwardConsistencyConfig(max_synthetic_width_usd=5000.0, min_reliable_strikes=1),
     )
     assert check.best_strike == 101_000.0
+
+
+def test_derive_stale_quotes_flag() -> None:
+    now_ms = 1_700_000_000_000
+    quotes = [
+        OptionLegQuote(
+            strike=100_000.0,
+            call_bid=0.01,
+            call_ask=0.011,
+            put_bid=0.008,
+            put_ask=0.009,
+            quote_ts_ms=now_ms - 500_000,
+        ),
+    ]
+    future = FutureLegQuote(
+        instrument_name="BTC-TEST",
+        bid=100_000.0,
+        ask=100_050.0,
+        quote_ts_ms=now_ms - 1_000,
+    )
+    rows = compute_synthetic_forward_rows(quotes, premium_in_usd=False, forward_usd=100_000.0)
+    cfg = ForwardConsistencyConfig(max_quote_age_ms=60_000, min_reliable_strikes=1)
+    flags = derive_quality_flags(
+        option_quotes=quotes,
+        future=future,
+        all_rows=rows,
+        reliable_rows=rows,
+        config=cfg,
+        now_ms=now_ms,
+    )
+    assert ForwardConsistencyQualityFlag.STALE_QUOTES in flags
+
+
+def test_derive_wide_spread_flag_when_all_rows_filtered() -> None:
+    quotes = [_quote(100_000.0, cb=0.05, ca=0.08, pb=0.04, pa=0.07)]
+    future = FutureLegQuote(instrument_name="BTC-TEST", bid=100_000.0, ask=100_050.0)
+    rows = compute_synthetic_forward_rows(quotes, premium_in_usd=False, forward_usd=100_000.0)
+    cfg = ForwardConsistencyConfig(max_synthetic_width_usd=100.0, min_reliable_strikes=1)
+    reliable = filter_reliable_synthetic_rows(rows, cfg)
+    flags = derive_quality_flags(
+        option_quotes=quotes,
+        future=future,
+        all_rows=rows,
+        reliable_rows=reliable,
+        config=cfg,
+    )
+    assert ForwardConsistencyQualityFlag.WIDE_SPREAD in flags
+    assert ForwardConsistencyQualityFlag.INSUFFICIENT_DEPTH in flags
+
+
+def test_derive_missing_leg_and_expiry_mismatch_flags() -> None:
+    quotes = [
+        OptionLegQuote(
+            strike=100_000.0,
+            call_bid=0.01,
+            call_ask=0.011,
+            put_bid=None,
+            put_ask=0.009,
+        ),
+    ]
+    future = FutureLegQuote(
+        instrument_name="BTC-TEST",
+        bid=100_000.0,
+        ask=100_050.0,
+        expiry_ts_ms=1_800_000_000_000,
+    )
+    flags = derive_quality_flags(
+        option_quotes=quotes,
+        future=future,
+        all_rows=[],
+        reliable_rows=[],
+        config=ForwardConsistencyConfig(min_reliable_strikes=1),
+        expected_expiry_ts_ms=1_700_000_000_000,
+    )
+    assert ForwardConsistencyQualityFlag.MISSING_LEG in flags
+    assert ForwardConsistencyQualityFlag.EXPIRY_MISMATCH in flags
+
+
+def test_run_check_attaches_quality_flags() -> None:
+    now_ms = 1_700_000_000_000
+    quotes = [
+        OptionLegQuote(
+            strike=100_000.0,
+            call_bid=0.01,
+            call_ask=0.011,
+            put_bid=0.008,
+            put_ask=0.009,
+            quote_ts_ms=now_ms - 500_000,
+        ),
+    ]
+    future = FutureLegQuote(instrument_name="BTC-TEST", bid=100_000.0, ask=100_050.0)
+    check = run_forward_consistency_check(
+        quotes,
+        future,
+        premium_in_usd=False,
+        forward_usd=100_000.0,
+        config=ForwardConsistencyConfig(max_quote_age_ms=60_000, min_reliable_strikes=1),
+        now_ms=now_ms,
+    )
+    assert ForwardConsistencyQualityFlag.STALE_QUOTES.value in [f.value for f in check.quality_flags]
+
+
+def test_summarize_forward_consistency_cells() -> None:
+    as_of = datetime.now(timezone.utc).isoformat()
+    cells = [
+        ForwardConsistencyHeatmapCell("BTC", "2026-07-25", "WATCH", 10.0, [], as_of),
+        ForwardConsistencyHeatmapCell("BTC", "2026-08-29", "POSSIBLE_ARB", 50.0, [], as_of),
+        ForwardConsistencyHeatmapCell("ETH", "2026-07-25", "BAD_DATA", None, ["MISSING_LEG"], as_of),
+        ForwardConsistencyHeatmapCell("ETH", "2026-08-29", "NO_ARB", 0.0, [], as_of),
+    ]
+    summary = summarize_forward_consistency_cells(cells)
+    assert summary == {
+        "assets_checked": 2,
+        "expiries_checked": 4,
+        "watch_count": 1,
+        "possible_count": 1,
+        "bad_data_count": 1,
+    }
+
+
+def test_build_forward_consistency_dashboard_matrix() -> None:
+    as_of = "2026-06-30T12:00:00+00:00"
+    mock_cell_btc = ForwardConsistencyHeatmapCell(
+        "BTC", "2026-07-25", "NO_ARB", 0.0, [], as_of
+    )
+    mock_cell_eth = ForwardConsistencyHeatmapCell(
+        "ETH", "2026-07-25", "WATCH", 5.0, ["STALE_QUOTES"], as_of
+    )
+
+    with patch(
+        "src.data.forward_consistency_quotes.list_enabled_asset_ids",
+        return_value=["BTC", "ETH"],
+    ), patch(
+        "src.data.forward_consistency_quotes.list_forward_consistency_expiries",
+        side_effect=lambda aid, **_: ["2026-07-25"] if aid in ("BTC", "ETH") else [],
+    ), patch(
+        "src.data.forward_consistency_quotes.build_forward_consistency_matrix_cell",
+        side_effect=lambda asset_id, **_: mock_cell_btc if asset_id == "BTC" else mock_cell_eth,
+    ):
+        payload = build_forward_consistency_dashboard(as_of_utc=as_of)
+
+    doc = dashboard_payload_to_dict(payload)
+    assert doc["kind"] == "forward_consistency_dashboard"
+    assert doc["schema_version"] == 1
+    assert doc["summary"]["assets_checked"] == 2
+    assert doc["summary"]["expiries_checked"] == 2
+    assert doc["summary"]["watch_count"] == 1
+    assert len(doc["cells"]) == 2
+    assert doc["cells"][0]["asset_id"] == "BTC"
+    assert doc["cells"][1]["quality_flags"] == ["STALE_QUOTES"]

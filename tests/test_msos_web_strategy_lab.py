@@ -234,7 +234,7 @@ def test_nav_enables_strategy_lab() -> None:
 
     cc = (MSOS_WEB / "src" / "components" / "CommandCenterContent.tsx").read_text(encoding="utf-8")
     assert "moduleCards" in cc
-    assert "MSOS_ROUTES.strategyLab" in cc
+    assert "buildStrategyLabPathWithAsset" in cc
 
 
 def test_expression_plan_propagates_selected_asset() -> None:

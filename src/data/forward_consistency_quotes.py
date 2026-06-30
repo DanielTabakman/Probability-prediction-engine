@@ -5,6 +5,7 @@ Live bid/ask quotes for forward consistency checks (venue adapters).
 from __future__ import annotations
 
 import time
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
@@ -13,8 +14,10 @@ from src.data.assets_registry import (
     deribit_currency,
     is_asset_enabled,
     is_usd_premium_options_venue,
+    list_enabled_asset_ids,
 )
 from src.data.fetch_deribit import (
+    DEFAULT_OPTION_EXPIRIES_MAX,
     fetch_deribit_index,
     fetch_deribit_forward_and_iv_for_expiry,
     fetch_deribit_option_expiries,
@@ -23,10 +26,31 @@ from src.data.fetch_deribit import (
     _deribit_public_request,
 )
 from src.engine.forward_consistency import (
+    ForwardConsistencyCheck,
+    ForwardConsistencyQualityFlag,
+    ForwardConsistencyStatus,
     FutureLegQuote,
     OptionLegQuote,
     run_forward_consistency_check,
 )
+
+
+@dataclass(frozen=True)
+class ForwardConsistencyHeatmapCell:
+    asset_id: str
+    expiry_date: str
+    status: ForwardConsistencyStatus
+    net_edge_usd: float | None
+    quality_flags: list[str]
+    as_of_utc: str
+
+
+@dataclass
+class ForwardConsistencyDashboardPayload:
+    kind: str = "forward_consistency_dashboard"
+    schema_version: int = 1
+    summary: dict[str, int] = field(default_factory=dict)
+    cells: list[ForwardConsistencyHeatmapCell] = field(default_factory=list)
 
 
 def _bid_ask_from_book_row(row: dict[str, Any]) -> tuple[float | None, float | None]:
@@ -298,13 +322,15 @@ def build_forward_consistency_live(
         premium_in_usd=is_usd_premium_options_venue(aid),
         forward_usd=forward_usd,
         now_ms=now_ms,
+        expected_expiry_ts_ms=expiry_ts,
     )
 
     base.update(
         {
             "comparable": True,
             "future_instrument": future_quote.instrument_name,
-            **{k: v for k, v in check.__dict__.items() if k != "legs"},
+            **{k: v for k, v in check.__dict__.items() if k not in ("legs", "quality_flags")},
+            "quality_flags": [flag.value for flag in check.quality_flags],
             "legs": [
                 {"side": leg.side, "instrument_type": leg.instrument_type, "label": leg.label}
                 for leg in check.legs
@@ -312,3 +338,199 @@ def build_forward_consistency_live(
         }
     )
     return base
+
+
+def list_forward_consistency_expiries(
+    asset_id: str,
+    *,
+    max_expiries: int = DEFAULT_OPTION_EXPIRIES_MAX,
+) -> list[str]:
+    """Option expiry date strings for dashboard matrix (Deribit assets)."""
+    aid = str(asset_id or "").strip().upper()
+    if asset_venue(aid) != "deribit":
+        return []
+    rows = fetch_deribit_option_expiries(max_expiries, currency=deribit_currency(aid))
+    return [str(row.get("expiry_date_str") or "")[:10] for row in rows if row.get("expiry_date_str")]
+
+
+def _heatmap_cell_from_check(
+    *,
+    asset_id: str,
+    expiry_date: str,
+    check: ForwardConsistencyCheck,
+    as_of_utc: str,
+) -> ForwardConsistencyHeatmapCell:
+    return ForwardConsistencyHeatmapCell(
+        asset_id=asset_id,
+        expiry_date=expiry_date,
+        status=check.status,
+        net_edge_usd=check.net_edge_usd,
+        quality_flags=[flag.value for flag in check.quality_flags],
+        as_of_utc=as_of_utc,
+    )
+
+
+def build_forward_consistency_matrix_cell(
+    *,
+    asset_id: str,
+    expiry_date: str,
+    as_of_utc: str | None = None,
+    now_ms: int | None = None,
+) -> ForwardConsistencyHeatmapCell:
+    """Run one asset/expiry check and return a heatmap cell (no full boundary payload)."""
+    aid = str(asset_id or "BTC").strip().upper()
+    expiry = str(expiry_date or "").strip()[:10]
+    as_of = as_of_utc or datetime.now(timezone.utc).isoformat()
+    ts_now = now_ms if now_ms is not None else int(datetime.now(timezone.utc).timestamp() * 1000)
+
+    if not is_asset_enabled(aid):
+        return ForwardConsistencyHeatmapCell(
+            asset_id=aid,
+            expiry_date=expiry,
+            status="NOT_COMPARABLE",
+            net_edge_usd=None,
+            quality_flags=[],
+            as_of_utc=as_of,
+        )
+
+    if asset_venue(aid) != "deribit":
+        return ForwardConsistencyHeatmapCell(
+            asset_id=aid,
+            expiry_date=expiry,
+            status="NOT_COMPARABLE",
+            net_edge_usd=None,
+            quality_flags=[],
+            as_of_utc=as_of,
+        )
+
+    spot = fetch_deribit_index(deribit_currency(aid))
+    if spot is None or spot <= 0:
+        return ForwardConsistencyHeatmapCell(
+            asset_id=aid,
+            expiry_date=expiry,
+            status="BAD_DATA",
+            net_edge_usd=None,
+            quality_flags=[ForwardConsistencyQualityFlag.MISSING_LEG.value],
+            as_of_utc=as_of,
+        )
+
+    expiry_ts = resolve_expiry_ts_ms(aid, expiry)
+    if expiry_ts is None:
+        return ForwardConsistencyHeatmapCell(
+            asset_id=aid,
+            expiry_date=expiry,
+            status="BAD_DATA",
+            net_edge_usd=None,
+            quality_flags=[ForwardConsistencyQualityFlag.EXPIRY_MISMATCH.value],
+            as_of_utc=as_of,
+        )
+
+    fwd_meta = fetch_deribit_forward_and_iv_for_expiry(
+        expiry_ts, float(spot), currency=deribit_currency(aid)
+    )
+    forward_usd = float(fwd_meta["forward"]) if fwd_meta else float(spot)
+
+    option_quotes = fetch_deribit_option_bid_ask_for_expiry(expiry_ts, asset_id=aid)
+    future_quote = fetch_deribit_future_for_expiry(expiry_ts, asset_id=aid)
+    if future_quote is None:
+        check = ForwardConsistencyCheck(
+            status="BAD_DATA",
+            quality_flags=[ForwardConsistencyQualityFlag.MISSING_LEG],
+            detail="No dated future/perp matched to this option expiry on Deribit.",
+        )
+        return _heatmap_cell_from_check(
+            asset_id=aid,
+            expiry_date=expiry,
+            check=check,
+            as_of_utc=as_of,
+        )
+
+    check = run_forward_consistency_check(
+        option_quotes,
+        future_quote,
+        premium_in_usd=is_usd_premium_options_venue(aid),
+        forward_usd=forward_usd,
+        now_ms=ts_now,
+        expected_expiry_ts_ms=expiry_ts,
+    )
+    return _heatmap_cell_from_check(
+        asset_id=aid,
+        expiry_date=expiry,
+        check=check,
+        as_of_utc=as_of,
+    )
+
+
+def summarize_forward_consistency_cells(
+    cells: list[ForwardConsistencyHeatmapCell],
+) -> dict[str, int]:
+    assets = {cell.asset_id for cell in cells}
+    expiries = {(cell.asset_id, cell.expiry_date) for cell in cells}
+    return {
+        "assets_checked": len(assets),
+        "expiries_checked": len(expiries),
+        "watch_count": sum(1 for c in cells if c.status == "WATCH"),
+        "possible_count": sum(1 for c in cells if c.status == "POSSIBLE_ARB"),
+        "bad_data_count": sum(1 for c in cells if c.status == "BAD_DATA"),
+    }
+
+
+def build_forward_consistency_dashboard(
+    *,
+    asset_ids: list[str] | None = None,
+    max_expiries_per_asset: int = DEFAULT_OPTION_EXPIRIES_MAX,
+    as_of_utc: str | None = None,
+    now_ms: int | None = None,
+) -> ForwardConsistencyDashboardPayload:
+    """Build heatmap matrix over enabled assets × option expiries."""
+    as_of = as_of_utc or datetime.now(timezone.utc).isoformat()
+    ids = asset_ids if asset_ids is not None else list_enabled_asset_ids()
+    cells: list[ForwardConsistencyHeatmapCell] = []
+
+    for aid in ids:
+        expiries = list_forward_consistency_expiries(aid, max_expiries=max_expiries_per_asset)
+        if not expiries:
+            cells.append(
+                ForwardConsistencyHeatmapCell(
+                    asset_id=aid,
+                    expiry_date="",
+                    status="NOT_COMPARABLE" if asset_venue(aid) != "deribit" else "BAD_DATA",
+                    net_edge_usd=None,
+                    quality_flags=[],
+                    as_of_utc=as_of,
+                )
+            )
+            continue
+        for expiry_date in expiries:
+            cells.append(
+                build_forward_consistency_matrix_cell(
+                    asset_id=aid,
+                    expiry_date=expiry_date,
+                    as_of_utc=as_of,
+                    now_ms=now_ms,
+                )
+            )
+
+    return ForwardConsistencyDashboardPayload(
+        summary=summarize_forward_consistency_cells(cells),
+        cells=cells,
+    )
+
+
+def dashboard_payload_to_dict(payload: ForwardConsistencyDashboardPayload) -> dict[str, Any]:
+    return {
+        "kind": payload.kind,
+        "schema_version": payload.schema_version,
+        "summary": dict(payload.summary),
+        "cells": [
+            {
+                "asset_id": cell.asset_id,
+                "expiry_date": cell.expiry_date,
+                "status": cell.status,
+                "net_edge_usd": cell.net_edge_usd,
+                "quality_flags": list(cell.quality_flags),
+                "as_of_utc": cell.as_of_utc,
+            }
+            for cell in payload.cells
+        ],
+    }
