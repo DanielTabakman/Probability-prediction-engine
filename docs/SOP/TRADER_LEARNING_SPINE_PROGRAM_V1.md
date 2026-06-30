@@ -26,7 +26,7 @@ Not a quant backtest engine. Not live execution. Paper + saved snapshots only.
 | 4 | After horizon, open post-mortem and submit review | `/monitor` → snapshot detail |
 | 5 | Command Center shows reviews due + completed counts | `/` calibration strip |
 
-**Gap today (2026-06-30):** step 4 **write** shipped on `main` (`/monitor` snapshot detail + `SnapshotReviewForm` + review API). Streamlit freeze (step 2) still optional. Relay may still run witness/closeout for `msos_trader_review_loop_v1` — **do not re-BUILD product**.
+**Gap today (2026-06-30):** step 4 **write** shipped on `main`. Streamlit freeze (step 2) still optional. Relay closeout for `msos_trader_review_loop_v1` — **CLOSEOUT_ONLY** per `OPERATOR_STATUS` Mode; do not re-BUILD product.
 
 ---
 

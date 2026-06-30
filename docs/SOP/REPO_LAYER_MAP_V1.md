@@ -187,6 +187,8 @@ Canonical gates: [`COMMIT_POLICY.md`](COMMIT_POLICY.md) · `python scripts/run_p
 
 ## Agent load order (BUILD)
 
+**Role routing (all threads):** [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+
 1. This doc OR the `LAYER_PRESET` block in the BUILD packet  
 2. Active sprint spec  
 3. [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md)  

@@ -2,7 +2,7 @@
 
 **Plane:** CONTROL-PLANE · **Purpose:** copy-paste openers so relay/autobuilder does not hijack topic threads.
 
-**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
+**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
 
 ---
 

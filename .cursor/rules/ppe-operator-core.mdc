@@ -5,13 +5,17 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Relay runbook:** [`RELAY_ORCHESTRATOR_RUNBOOK_V1.md`](docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 
 **Gate:** run this section **only** when thread role is **operator** or **ide_build** per [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc). Charter, explore, and neutral threads must **not** enter here.
 
-When gated in: read `OPERATOR_STATUS.md` first; **run** verdict before replying (not advise-only).
+When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOSEOUT_ONLY` → do NOT re-BUILD product). **Run** verdict before replying (not advise-only).
+
+**Before relay on desktop:** `python scripts/ppe_loop_host_guard.py --check` — if `"allowed": false`, map verdict per [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md).
+
+**Preflight warnings in status:** resolve branch/dirty-tree before relay; mixed-plane → [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md).
 
 **Default path (adaptive burst):**
 

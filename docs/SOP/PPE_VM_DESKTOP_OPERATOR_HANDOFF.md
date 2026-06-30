@@ -70,6 +70,8 @@ Current slice: `ppe_autobuilder.cmd status --brief` (do not hard-code chapter id
 4. After PR merge → desktop **`DESKTOP CONTINUE`** (SSH → VM `finish_ide_build.cmd`)
 5. VM loop advances automatically
 
+Check **`Mode:`** in `OPERATOR_STATUS.md` — `CLOSEOUT_ONLY` means product on main; **do not re-BUILD** product.
+
 Full step-by-step and forbidden commands: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md). Human double-click steps: [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md).
 
 ---

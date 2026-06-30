@@ -131,12 +131,45 @@ def starter_line_band(line_count: int) -> str:
     return "NORMAL"
 
 
+def _closeout_only_banner(repo: Path, *, slice_id: str, phase_plan: str) -> str | None:
+    try:
+        from scripts.ppe_chapter_mode import (
+            is_closeout_only_chapter,
+            plan_chapter_id,
+            slice_product_on_main,
+        )
+        from scripts.ppe_slice_worker_mode import infer_slice_kind
+    except ImportError:
+        return None
+
+    norm_plan = phase_plan.replace("\\", "/").strip()
+    plan = load_phase_plan(repo, norm_plan)
+    sl = find_slice_in_plan(plan, slice_id)
+    kind = infer_slice_kind(slice_id, sl)
+    if kind != "product":
+        return None
+    on_main = slice_product_on_main(repo, slice_id=slice_id, phase_plan=norm_plan)
+    closeout = is_closeout_only_chapter(
+        repo,
+        plan_path=norm_plan,
+        chapter_name=plan_chapter_id(norm_plan),
+    )
+    if not on_main and not closeout:
+        return None
+    return (
+        "> **CLOSEOUT_ONLY** — product touchSet already on `main`. "
+        "**Do NOT re-implement this slice.** Finish marker/closeout via operator thread only."
+    )
+
+
 def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     norm_plan = phase_plan.replace("\\", "/").strip()
     plan = load_phase_plan(repo, norm_plan)
     sl = find_slice_in_plan(plan, slice_id)
     if sl is None:
         raise SystemExit(f"slice_id not in plan: {slice_id}")
+
+    closeout_banner = _closeout_only_banner(repo, slice_id=slice_id, phase_plan=norm_plan)
 
     declared_plane = str(sl.get("declaredPlane") or "EVIDENCE-PLANE")
     scope = resolve_slice_layer_scope(
@@ -156,18 +189,24 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
         "",
         f"# IDE BUILD — `{slice_id}`",
         "",
-        f"`{head[:12]}` · `{declared_plane}` · `{scope.layer_preset}` · branch `{build_branch}`",
-        "",
-        _compact_focus(repo, norm_plan),
-        _compact_scope(scope),
-        _compact_acceptance(sl, sprint_path),
-        _compact_loads(touch=touch, sprint_path=sprint_path, phase_plan=norm_plan),
-        "",
-        "_New Agent thread · this file only · no orchestrator/pytest/diff paste._",
-        "",
-        format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),
-        "",
     ]
+    if closeout_banner:
+        parts.extend([closeout_banner, ""])
+    parts.extend(
+        [
+            f"`{head[:12]}` · `{declared_plane}` · `{scope.layer_preset}` · branch `{build_branch}`",
+            "",
+            _compact_focus(repo, norm_plan),
+            _compact_scope(scope),
+            _compact_acceptance(sl, sprint_path),
+            _compact_loads(touch=touch, sprint_path=sprint_path, phase_plan=norm_plan),
+            "",
+            "_New Agent thread · this file only · no orchestrator/pytest/diff paste._",
+            "",
+            format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),
+            "",
+        ]
+    )
     return "\n".join(parts)
 
 

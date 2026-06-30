@@ -81,6 +81,22 @@ def load_direction(repo: Path) -> Direction:
     return Direction(raw=data)
 
 
+def direction_for_propagation(repo: Path) -> Direction:
+    """Direction with nextStewardAction composed from agentSteering when present."""
+    direction = load_direction(repo)
+    try:
+        from scripts.ppe_chapter_mode import compose_steward_action_snippet
+
+        composed = compose_steward_action_snippet(repo)
+    except Exception:
+        composed = ""
+    if not composed:
+        return direction
+    raw = dict(direction.raw)
+    raw["nextStewardAction"] = composed
+    return Direction(raw=raw)
+
+
 def _deprecated_lines(direction: Direction) -> str:
     items = direction.raw.get("deprecatedApproaches") or []
     if not isinstance(items, list) or not items:
@@ -395,7 +411,7 @@ def _replace_marked_block(text: str, new_block: str) -> tuple[str, bool]:
 
 
 def propagate(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
-    direction = load_direction(repo)
+    direction = direction_for_propagation(repo)
     targets: list[tuple[str, str]] = [
         ("docs/SOP/MSOS_FRONTIER.md", render_frontier_block(direction)),
         ("docs/SOP/PPE_INTEGRATED_STATUS.md", render_integrated_status_block(direction)),
