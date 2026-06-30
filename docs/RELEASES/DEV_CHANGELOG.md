@@ -4,6 +4,19 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `09ca8ac` — ops: loop publish ops/loop-publish-20260630082933-5ceb031 (#845)
+- `97bba8c` — ops: loop publish ops/loop-publish-20260630082945-5ceb031 (#846)
+- `f59aefe` — ops: loop publish ops/loop-publish-20260630085340-5ceb031 (#870)
+- `3331c57` — ops: loop publish ops/loop-publish-20260630085536-5ceb031 (#872)
+- `f9f4da7` — ops: loop publish ops/loop-publish-20260630085924-5ceb031 (#877)
+- `32a2c76` — ops: loop publish ops/loop-publish-20260630090010-5ceb031 (#878)
+- `66a569e` — ops: loop publish ops/loop-publish-20260630090145-5ceb031 (#879)
+- `22bba66` — ops: loop publish ops/loop-publish-20260630101913-5ceb031 (#942)
+- `11a40da` — ops: loop publish ops/loop-publish-20260630102047-5ceb031 (#943)
+- `af14cf4` — ops: loop publish ops/loop-publish-20260630102501-5ceb031 (#946)
+- `bde6dbe` — ops: loop publish ops/loop-publish-20260630102304-5ceb031 (#945)
+- `7d584f1` — ops: loop publish ops/loop-publish-20260630102107-5ceb031 (#944)
+- `23e91db` — Control-plane: dev changelog
 - `b92cb55` — ops: loop publish ops/loop-publish-20260630090411-5ceb031 (#881)
 - `68f763c` — ops: loop publish ops/loop-publish-20260630090859-5ceb031 (#886)
 - `408f845` — ops: loop publish ops/loop-publish-20260630091705-5ceb031 (#890)
