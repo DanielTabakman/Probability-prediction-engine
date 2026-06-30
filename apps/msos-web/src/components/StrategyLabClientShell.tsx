@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { StrategyLabWorkSection } from "@/components/StrategyLabWorkSection";
 import { PlatformTutorial } from "@/components/PlatformTutorial";
+import { StrategyLabFeedbackStrip } from "@/components/StrategyLabFeedbackStrip";
 import { TourPreparingOverlay } from "@/components/TourPreparingOverlay";
 import { useTourAnchorsReady } from "@/hooks/useTourAnchorsReady";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
@@ -315,8 +316,10 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         active={tutorialOpen && tourReady}
         onClose={closeTutorial}
         steps={tutorialSteps}
-        completeHref="/learn?debrief=1"
+        completeHref="/feedback"
       />
+
+      <StrategyLabFeedbackStrip />
 
       <p className="footer-note">{DEMO_FOOTER}</p>
     </>

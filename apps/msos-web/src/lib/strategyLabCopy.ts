@@ -15,7 +15,7 @@ export const LAB_DATA_LOADING_PILL = "Loading live data…";
 export const LAB_DEMO_BANNER_TITLE = "Sample mode — not live market data";
 
 export function labDemoBannerBody(asset: DisplayAssetMeta): string {
-  return `The numbers and chart below use placeholder fixtures for layout preview. Refresh the page or check your connection — live ${asset.instrument_label ?? asset.label} load automatically when available.`;
+  return `The numbers and chart below use placeholder sample data for layout preview. Refresh the page or check your connection — live ${asset.instrument_label ?? asset.label} load automatically when available.`;
 }
 
 export function labLoadingBannerBody(asset: DisplayAssetMeta): string {
