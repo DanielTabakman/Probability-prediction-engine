@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md",
-  "selectionRecord": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Forward consistency radar ch.1 \u2014 dashboard payload + quality flags; P2 side channel",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
+  "selectionRecord": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
+  "status": "RUNNING",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Forward consistency radar ch.2 \u2014 MSOS /forward-consistency heatmap",
   "workerMode": "local-agent"
 }
