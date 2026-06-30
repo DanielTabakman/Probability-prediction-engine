@@ -12,6 +12,19 @@ export const PPE_DISPLAY_API_URL = (
 /** Cold equity chains can take 30–120s; keep MSOS in Loading until then. */
 export const DISPLAY_PAYLOAD_FETCH_TIMEOUT_MS = 120_000;
 
+function resolveDisplayFetchSignal(): AbortSignal | undefined {
+  const timeoutMs = DISPLAY_PAYLOAD_FETCH_TIMEOUT_MS;
+  if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+    return AbortSignal.timeout(timeoutMs);
+  }
+  if (typeof AbortController === "undefined") {
+    return undefined;
+  }
+  const controller = new AbortController();
+  globalThis.setTimeout(() => controller.abort(), timeoutMs);
+  return controller.signal;
+}
+
 export const PPE_EMBED_ONLY_PARAM = "embed_only";
 
 export const PPE_EMBED_URL = (process.env.NEXT_PUBLIC_PPE_EMBED_URL ?? "").trim();
@@ -388,7 +401,7 @@ export async function fetchDisplayPayloadFromUrl(fetchUrl: string): Promise<Disp
         Accept: "application/json",
         "User-Agent": "msos-web/1",
       },
-      signal: AbortSignal.timeout(DISPLAY_PAYLOAD_FETCH_TIMEOUT_MS),
+      signal: resolveDisplayFetchSignal(),
     });
     if (!res.ok) {
       return null;

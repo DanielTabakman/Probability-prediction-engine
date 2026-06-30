@@ -1,8 +1,13 @@
 /** First-run platform tour — Strategy Lab walkthrough (display only). */
 
+import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
+
 export const PLATFORM_TUTORIAL_STORAGE_KEY = "msos.platform.tutorial.completed.v1";
 export const PLATFORM_TUTORIAL_QUERY = "tutorial";
 export const PLATFORM_TUTORIAL_BEGINNER_QUERY = "beginner";
+
+/** Guided tour always starts on a crypto lab asset (never last session stock pick). */
+export const PLATFORM_TOUR_DEFAULT_ASSET = "BTC";
 
 export type PlatformTutorialStep = {
   id: string;
@@ -142,8 +147,12 @@ export function strategyLabTutorialHref(): string {
 
 /** Force guided tour (homepage CTAs, restart). */
 export function strategyLabForcedTourHref(beginner = false): string {
+  const params = new URLSearchParams();
+  params.set(LAB_ASSET_QUERY_PARAM, PLATFORM_TOUR_DEFAULT_ASSET);
   if (beginner) {
-    return `/strategy-lab?${PLATFORM_TUTORIAL_BEGINNER_QUERY}=1`;
+    params.set(PLATFORM_TUTORIAL_BEGINNER_QUERY, "1");
+  } else {
+    params.set(PLATFORM_TUTORIAL_QUERY, "1");
   }
-  return `/strategy-lab?${PLATFORM_TUTORIAL_QUERY}=1`;
+  return `/strategy-lab?${params.toString()}`;
 }

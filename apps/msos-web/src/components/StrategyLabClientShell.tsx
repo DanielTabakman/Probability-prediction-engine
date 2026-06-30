@@ -26,7 +26,7 @@ import {
   fetchAssetCatalog,
   listSelectableAssetIds,
 } from "@/lib/ppeAssetCatalog";
-import { resolveLabAssetId, saveStoredLabAssetId } from "@/lib/strategyLabAsset";
+import { resolveLabAssetId, resolveTourLabAssetId, saveStoredLabAssetId } from "@/lib/strategyLabAsset";
 import { buildWorkflowStepHref } from "@/lib/strategyLabWorkflow";
 import {
   LAB_DATA_DEMO_PILL,
@@ -82,23 +82,30 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     listSelectableAssetIds(FALLBACK_ASSET_PICKER),
   );
   const [catalogDefault, setCatalogDefault] = useState<string | null>(null);
+  const [clientReady, setClientReady] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [tutorialBeginner, setTutorialBeginner] = useState(false);
   const queryAsset = searchParams.get(LAB_ASSET_QUERY_PARAM);
-  const selectedAssetId = useMemo(
-    () =>
-      resolveLabAssetId({
+  const tutorialActive = hasTutorialSearchParams(searchParams);
+  const tourAssetMode = tutorialActive || tutorialOpen;
+  const selectedAssetId = useMemo(() => {
+    if (tourAssetMode) {
+      return resolveTourLabAssetId({
         query: queryAsset,
         allowedIds: catalogAssetIds,
-        catalogDefault,
-        useStored: true,
-      }),
-    [queryAsset, catalogAssetIds, catalogDefault],
-  );
+      });
+    }
+    return resolveLabAssetId({
+      query: queryAsset,
+      allowedIds: catalogAssetIds,
+      catalogDefault,
+      useStored: clientReady,
+    });
+  }, [tourAssetMode, queryAsset, catalogAssetIds, catalogDefault, clientReady]);
   const [payload, setPayload] = useState<DisplayPayload | null>(initialPayload);
   const [mode, setMode] = useState<LabDataMode>(() =>
     resolveInitialMode(initialPayload, selectedAssetId),
   );
-  const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [tutorialBeginner, setTutorialBeginner] = useState(false);
   const assetMeta = useMemo(
     () => resolveDisplayAssetMeta(payload, selectedAssetId),
     [payload, selectedAssetId],
@@ -121,6 +128,10 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }
   }, [pathname, router, searchParams]);
+
+  useEffect(() => {
+    setClientReady(true);
+  }, []);
 
   useEffect(() => {
     const beginner = resolveTutorialBeginnerMode(searchParams);
@@ -159,11 +170,15 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   }, [selectedAssetId]);
 
   useEffect(() => {
-    if (queryAsset?.trim()) {
+    if (!clientReady) {
+      return;
+    }
+    const normalizedQuery = queryAsset?.trim().toUpperCase() ?? "";
+    if (normalizedQuery === selectedAssetId) {
       return;
     }
     router.replace(buildAssetHref(pathname, searchParams, selectedAssetId), { scroll: false });
-  }, [queryAsset, pathname, router, searchParams, selectedAssetId]);
+  }, [clientReady, queryAsset, pathname, router, searchParams, selectedAssetId]);
 
   useEffect(() => {
     let cancelled = false;
