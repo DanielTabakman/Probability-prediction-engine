@@ -59,6 +59,20 @@ class TestWorkflowMetricsCli(unittest.TestCase):
         self.assertTrue(events_csv.is_file())
         self.assertIn("usage_note", events_csv.read_text(encoding="utf-8"))
 
+    def test_export_csv_includes_product_usage(self) -> None:
+        usage_path = self.repo / "data" / "ppe_product_usage.jsonl"
+        usage_path.parent.mkdir(parents=True)
+        usage_path.write_text(
+            '{"event_name":"lab_view","created_at_utc":"2026-06-30T12:00:00Z"}\n',
+            encoding="utf-8",
+        )
+        self.assertEqual(cmd_export_csv(self.repo), 0)
+        usage_csv = self.repo / "artifacts" / "workflow_metrics" / "product_usage_export.csv"
+        self.assertTrue(usage_csv.is_file())
+        text = usage_csv.read_text(encoding="utf-8")
+        self.assertIn("lab_view", text)
+        self.assertIn("total_events", text)
+
     def test_summary_by_lane(self) -> None:
         cmd_slice_close(
             self.repo,

@@ -398,6 +398,19 @@ def main(argv: list[str] | None = None) -> int:
 
     if plan.tier >= 1 or msos_cmds:
         print("\033[1;32mAll checks passed!\033[0m")
+    if files:
+        try:
+            from scripts.ppe_delegation_envelope import classify_paths, current_branch, record_auto_notify
+
+            verdict = classify_paths(
+                repo,
+                files,
+                pass_type=os.environ.get("PPE_PASS_TYPE", ""),
+                branch=current_branch(repo),
+            )
+            record_auto_notify(repo, verdict, files, branch=current_branch(repo))
+        except ImportError:
+            pass
     return 0
 
 

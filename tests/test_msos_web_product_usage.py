@@ -22,6 +22,20 @@ def test_product_usage_beacon_wired_in_layout() -> None:
     assert "ProductUsageBeacon" in layout
 
 
+def test_product_usage_beacon_session_start() -> None:
+    beacon = (MSOS_WEB / "src" / "components" / "ProductUsageBeacon.tsx").read_text(encoding="utf-8")
+    assert "session_start" in beacon
+    assert "sessionStorage" in beacon
+
+
+def test_distribution_export_client_link() -> None:
+    link = MSOS_WEB / "src" / "components" / "DistributionExportLink.tsx"
+    shell = MSOS_WEB / "src" / "components" / "StrategyLabContent.tsx"
+    assert link.is_file()
+    assert "distribution_export_click" in link.read_text(encoding="utf-8")
+    assert "DistributionExportLink" in shell.read_text(encoding="utf-8")
+
+
 def test_strategy_lab_logs_lab_view() -> None:
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
     assert "logProductUsage" in shell

@@ -41,6 +41,43 @@ def load_records(path: Path) -> list[dict]:
     return records
 
 
+def records_in_days(records: list[dict], days: int) -> list[dict]:
+    if days <= 0:
+        return records
+    from datetime import datetime, timedelta, timezone
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    out: list[dict] = []
+    for row in records:
+        raw = str(row.get("created_at_utc") or "")
+        if not raw:
+            continue
+        try:
+            ts = raw.replace("Z", "+00:00")
+            dt = datetime.fromisoformat(ts)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            if dt >= cutoff:
+                out.append(row)
+        except ValueError:
+            continue
+    return out
+
+
+def format_digest_line(repo: Path, *, days: int = 7) -> str | None:
+    """One markdown bullet for weekly tracking digest."""
+    path = resolve_feedback_path(None)
+    records = records_in_days(load_records(path), days)
+    if not records:
+        return None
+    avg_use = sum(int(r.get("usefulness") or 0) for r in records) / len(records)
+    avg_repeat = sum(int(r.get("repeat_use_intent") or 0) for r in records) / len(records)
+    return (
+        f"- MSOS feedback: {len(records)} submission(s) in {days}d — "
+        f"avg usefulness {avg_use:.1f}/5, repeat intent {avg_repeat:.1f}/5."
+    )
+
+
 def format_markdown(records: list[dict], *, source_path: Path) -> str:
     now = datetime.now(tz=UTC).strftime("%Y-%m-%d %H:%M UTC")
     lines = [

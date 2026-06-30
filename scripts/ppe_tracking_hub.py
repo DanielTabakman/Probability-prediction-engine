@@ -395,7 +395,25 @@ def format_tracking_digest_lines(repo: Path, *, days: int = 7) -> list[str]:
     if trader.get("db_exists") and pending > 0:
         lines.append(f"- Trader loop: {pending} snapshot(s) pending review.")
 
-    return lines[:4]
+    try:
+        from scripts.ppe_export_web_feedback import format_digest_line as feedback_digest_line
+
+        fb = feedback_digest_line(repo, days=days)
+        if fb:
+            lines.append(fb)
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_token_reconcile import digest_reconcile_line
+
+        billing = digest_reconcile_line(repo, days=30)
+        if billing:
+            lines.append(billing)
+    except Exception:
+        pass
+
+    return lines[:6]
 
 
 def render_tracking_markdown(snap: dict[str, Any]) -> str:
