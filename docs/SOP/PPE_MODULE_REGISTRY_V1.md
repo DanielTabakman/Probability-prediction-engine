@@ -4,11 +4,11 @@
 
 **Status:** Living draft — improve as we go.
 
-**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser)
+**Visual map:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (open in browser — top panels auto-sync via `ppe_operator_compass.py`)
 
 **As-of:** 2026-06-29
 
-**Controlling context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md)
+**Controlling context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) · [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) · [`BUILD_PACKET_TEMPLATE.md`](BUILD_PACKET_TEMPLATE.md)
 
 ---
 
@@ -68,7 +68,7 @@ Every module declares **target tier** and **current tier** when chartered. Relay
 |------|----------|------------------|
 | **T0 — Contract** | Python types, semantic copy, fixture JSON, unit tests | “What is the output shape?” |
 | **T1 — Boundary** | `GET /ppe-display-api/...` + pytest boundary tests | “Can MSOS fetch honest JSON?” |
-| **T2 — MSOS surface** | Route + read-only UI (display/proxy only) | “Can a human inspect it in MSOS?” |
+| **T2 — MSOS surface** | Route + read-only UI (display/proxy only) | “Can a human inspect it in MSOS?” — must meet [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) bar |
 | **T3 — Archive** | Scheduled snapshot → `artifacts/` + optional history API | “**Why** collect? **What** subset? **How often**?” |
 | **T4 — Workflow hook** | Deep-links, Monitor feed, Command Center cards | “Does it close the trader loop?” |
 
@@ -225,6 +225,8 @@ Queue via [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FR
 | Product 004 | `msos-shell` | MSOS route |
 | Ops 005 | `platform` / scripts | Collector **only if archive charter filled** |
 | Closeout N | `dev-factory` | COMPLETE; update registry + HTML map |
+
+**T2+ closeout:** run **insight collect** — add or refresh the module’s row in [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) § Insight collect.
 
 ### Step 5 — Layer rules
 
