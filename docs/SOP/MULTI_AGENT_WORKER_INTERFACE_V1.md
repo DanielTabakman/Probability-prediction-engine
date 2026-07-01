@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Status:** Tier 1 + Tier 2 (leases, lanes, cost routing, synthetic events)  
 **Audience:** operators, agents, future external adopters
 
-**Related:** [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json) · [`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md) · verdict SSOT [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+**Related:** [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json) · [`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md) (insights, tiers, CBA, revisit) · verdict SSOT [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
 
 ---
 
@@ -62,6 +62,7 @@ Implementation: `python scripts/ppe_worker_lease.py`
 
 | Command | Purpose |
 |---------|---------|
+| `ppe_worker_lease.py --prepare-desktop-build` | **DESKTOP_BUILD.cmd** — auto lane + lease + dispatch |
 | `ppe_worker_lease.py --assess` | Lease vs git tree + preferred lane |
 | `ppe_worker_lease.py --write-dispatch` | Emit `WORK_DISPATCH.json` |
 | `ppe_worker_lease.py --infer-events` | Emit `WORKER_EVENTS.json` (Tier 2) |
@@ -106,5 +107,7 @@ Release lease on: gate pass + `--ship --release`, `mark_ide_product_ready` (when
 ## Sharing externally
 
 Copyable without PPE: lane policy, `ACTIVE_LEASE` + `WORK_DISPATCH` JSON shapes, `ppe_worker_lease.py`.
+
+**Roadmap / CBA / revisit:** [`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md)
 
 Keep PPE VM relay / `DESKTOP_CONTINUE` as reference implementation only.

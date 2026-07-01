@@ -19,6 +19,7 @@ if str(_REPO) not in sys.path:
 ACTIVE_LEASE_REL = "artifacts/control_plane/ACTIVE_LEASE.json"
 WORK_DISPATCH_REL = "artifacts/control_plane/WORK_DISPATCH.json"
 WORKER_EVENTS_REL = "artifacts/control_plane/WORKER_EVENTS.json"
+DESKTOP_BUILD_HANDOFF_REL = "artifacts/control_plane/DESKTOP_BUILD_HANDOFF.json"
 REGISTRY_REL = "docs/SOP/WORKER_REGISTRY_V1.json"
 
 LANE_CURSOR = "cursor-desktop"
@@ -630,6 +631,179 @@ def acquire_lease(
     return lease
 
 
+def lane_to_handoff_worker(lane: str) -> str:
+    """Map ARCP lane id to ppe_build_worker handoff kind."""
+    if lane == LANE_CODEX:
+        return "codex-cli"
+    if lane == LANE_CURSOR:
+        return "manual"
+    return "manual"
+
+
+def default_lease_scope_for_lane(
+    repo: Path,
+    worker_id: str,
+    *,
+    branch: str,
+    closeout_only: bool,
+) -> tuple[list[str], list[str]]:
+    registry = load_worker_registry(repo)
+    workers = registry.get("workers") if isinstance(registry.get("workers"), list) else []
+    row = next((w for w in workers if isinstance(w, dict) and w.get("id") == worker_id), {})
+    path_globs = _normalize_globs(row.get("default_path_globs"))
+    forbidden: list[str] = []
+    if closeout_only or worker_id == LANE_CODEX:
+        forbidden.append("src/**")
+    if worker_id == LANE_CURSOR and any(branch.startswith(p) for p in ("product/", "build/")):
+        forbidden = [g for g in forbidden if g != "src/**"]
+    return path_globs, forbidden
+
+
+def load_desktop_build_handoff(repo: Path) -> dict[str, Any] | None:
+    path = repo / DESKTOP_BUILD_HANDOFF_REL
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def write_desktop_build_handoff(repo: Path, record: dict[str, Any]) -> Path:
+    path = repo / DESKTOP_BUILD_HANDOFF_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def _refresh_lease_ttl(repo: Path, lease: dict[str, Any], *, ttl_hours: float) -> dict[str, Any]:
+    now = _utc_now()
+    lease = {**lease, "expires_at": _utc_iso(now + timedelta(hours=ttl_hours))}
+    save_lease(repo, lease)
+    return lease
+
+
+def prepare_desktop_build_handoff(
+    repo: Path,
+    status: dict[str, Any] | None = None,
+    *,
+    ttl_hours: float = 4.0,
+) -> dict[str, Any]:
+    """DESKTOP_BUILD entry: prefer lane, acquire/refresh lease, write dispatch."""
+    repo = repo.resolve()
+    if status is None:
+        from scripts.ppe_operator_status import collect_operator_status
+
+        status = collect_operator_status(repo)
+
+    verdict = str(status.get("verdict") or "")
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    closeout_only = bool(chapter_mode.get("do_not_rebuild")) or str(chapter_mode.get("mode") or "") == "CLOSEOUT_ONLY"
+    mode = str(chapter_mode.get("mode") or verdict)
+    branch = _current_branch(repo)
+
+    lane_pref = prefer_build_lane(
+        repo,
+        verdict=verdict,
+        branch=branch,
+        closeout_only=closeout_only,
+    )
+    worker_id = str(lane_pref.get("preferred_lane") or LANE_CURSOR)
+    path_globs, forbidden = default_lease_scope_for_lane(
+        repo, worker_id, branch=branch, closeout_only=closeout_only
+    )
+
+    slice_id = str(status.get("product_slice") or "").strip() or None
+    if not slice_id:
+        guard = status.get("guard") if isinstance(status.get("guard"), dict) else {}
+        detail = str(guard.get("detail") or status.get("blocker") or "")
+        left, right = detail.find("["), detail.find("]")
+        if left >= 0 and right > left:
+            ids = [s.strip() for s in detail[left + 1 : right].split(",") if s.strip()]
+            if ids:
+                slice_id = ids[0]
+
+    work_item = {
+        "slice_id": slice_id,
+        "verdict": verdict,
+        "mode": mode,
+        "source": "DESKTOP_BUILD",
+    }
+
+    blocked = False
+    reasons: list[str] = []
+    lease: dict[str, Any] | None = None
+    existing = load_lease(repo)
+    should_lease = verdict == "IDE_BUILD" and not closeout_only
+
+    if not should_lease:
+        reasons.append(
+            f"skip auto-lease (verdict={verdict!r}, closeout_only={closeout_only}) — handoff only"
+        )
+    elif existing and _lease_active(existing):
+        same_worker = str(existing.get("worker_id") or existing.get("lane") or "") == worker_id
+        same_branch = str(existing.get("branch") or "") == branch
+        if same_worker and same_branch:
+            lease = _refresh_lease_ttl(repo, existing, ttl_hours=ttl_hours)
+        else:
+            assessment = assess_worker_lease(repo, status, proposed_worker=worker_id)
+            if assessment.get("blocks_dispatch"):
+                blocked = True
+                reasons.extend(assessment.get("reasons") or [])
+            else:
+                release_lease(repo)
+                lease = acquire_lease(
+                    repo,
+                    worker_id=worker_id,
+                    branch=branch,
+                    path_globs=path_globs,
+                    forbidden_globs=forbidden,
+                    ttl_hours=ttl_hours,
+                    work_item=work_item,
+                    notes="DESKTOP_BUILD auto-acquire",
+                )
+    elif should_lease:
+        try:
+            lease = acquire_lease(
+                repo,
+                worker_id=worker_id,
+                branch=branch,
+                path_globs=path_globs,
+                forbidden_globs=forbidden,
+                ttl_hours=ttl_hours,
+                work_item=work_item,
+                notes="DESKTOP_BUILD auto-acquire",
+            )
+        except RuntimeError as exc:
+            blocked = True
+            reasons.append(str(exc))
+
+    dispatch_path: str | None = None
+    if not blocked:
+        write_work_dispatch(repo, status)
+        write_worker_events(repo, status)
+        dispatch_path = WORK_DISPATCH_REL
+
+    record: dict[str, Any] = {
+        "schema_version": 1,
+        "as_of": _utc_iso(_utc_now()),
+        "preferred_lane": worker_id,
+        "handoff_worker": lane_to_handoff_worker(worker_id),
+        "lane_preference": lane_pref,
+        "lease_id": (lease or {}).get("lease_id"),
+        "branch": branch,
+        "path_globs": path_globs,
+        "forbidden_globs": forbidden,
+        "blocked": blocked,
+        "reasons": reasons,
+        "dispatch_uri": dispatch_path,
+        "work_item": work_item,
+    }
+    write_desktop_build_handoff(repo, record)
+    return record
+
+
 def _commit_message_for_ship_paths(paths: list[str]) -> str:
     norm = [p.replace("\\", "/") for p in paths]
     if norm and all(p.startswith("docs/") for p in norm):
@@ -874,6 +1048,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--assess", action="store_true")
     ap.add_argument("--write-dispatch", action="store_true")
     ap.add_argument("--infer-events", action="store_true", help=f"Write {WORKER_EVENTS_REL}")
+    ap.add_argument(
+        "--prepare-desktop-build",
+        action="store_true",
+        help=f"DESKTOP_BUILD: auto-acquire lease + write {WORK_DISPATCH_REL}",
+    )
     ap.add_argument("--release", action="store_true")
     ap.add_argument("--ship", action="store_true", help="Gate → commit → push → PR for lease-scoped dirty paths")
     ap.add_argument("--dry-run", action="store_true", help="With --ship: plan paths only, no git writes")
@@ -936,6 +1115,23 @@ def main(argv: list[str] | None = None) -> int:
         path = write_work_dispatch(repo)
         print(json.dumps(dispatch, indent=2) if args.json else f"ppe_worker_lease: wrote {path.relative_to(repo)}")
         return 0
+
+    if args.prepare_desktop_build:
+        record = prepare_desktop_build_handoff(repo)
+        if args.json:
+            print(json.dumps(record, indent=2))
+        else:
+            lane = record.get("preferred_lane")
+            hw = record.get("handoff_worker")
+            pref = record.get("lane_preference") or {}
+            reason = pref.get("reason") if isinstance(pref, dict) else None
+            print(f"ppe_worker_lease: DESKTOP_BUILD lane={lane} handoff={hw} reason={reason}")
+            if record.get("blocked"):
+                for r in record.get("reasons") or []:
+                    print(f"  BLOCKED: {r}")
+            elif record.get("dispatch_uri"):
+                print(f"  dispatch: {record['dispatch_uri']}")
+        return 1 if record.get("blocked") else 0
 
     if args.infer_events:
         payload = infer_worker_events(repo)

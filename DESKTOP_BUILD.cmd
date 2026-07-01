@@ -15,6 +15,18 @@ echo.
 python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 goto done
 
+echo [DESKTOP_BUILD] Worker lane + lease (ARCP)...
+python "%CD%\scripts\ppe_worker_lease.py" --repo-root "%CD%" --prepare-desktop-build
+if errorlevel 1 (
+  echo.
+  echo [DESKTOP_BUILD] BLOCKED — resolve lease conflict before BUILD.
+  echo   python scripts/ppe_worker_lease.py --assess
+  echo   docs/SOP/WORKER_LANE_POLICY_V1.md
+  set "RC=1"
+  goto done
+)
+echo.
+
 python -u "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" handoff
 set "RC=%ERRORLEVEL%"
 
