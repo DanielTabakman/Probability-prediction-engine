@@ -392,7 +392,7 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
                 if recovery.get("recovered"):
                     status = enrich_operator_status_with_vm_trust(repo, collect_operator_status(repo))
                     status["run_local_recovery"] = recovery
-        if stuck_watch_enabled():
+        if stuck_watch_enabled(repo):
             ensure_stuck_watch_daemon(repo)
     except Exception:
         pass

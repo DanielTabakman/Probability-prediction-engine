@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_operator_stuck_run_local import (
+    DESKTOP_UNLOCK_TOKEN,
     assess_stuck_run_local,
+    desktop_stuck_recovery_blocked,
     ensure_stuck_watch_daemon,
     maybe_auto_recover_run_local,
     stuck_automation_enabled,
@@ -78,47 +79,69 @@ def test_auto_recover_desktop_disabled_by_default(tmp_path: Path, monkeypatch) -
         out = maybe_auto_recover_run_local(tmp_path, status=status, source="test")
         assert out is None
         assert stuck_automation_enabled(tmp_path) is False
+        assert desktop_stuck_recovery_blocked(tmp_path) == "no_unlock_file"
 
 
-def test_auto_recover_desktop_opt_in(tmp_path: Path, monkeypatch) -> None:
+def test_env_vars_alone_do_not_enable_desktop(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY", "1")
+    monkeypatch.setenv("PPE_STUCK_RUN_LOCAL_WATCH", "1")
     status = {"verdict": "RUN_LOCAL", "operator_session": {"elapsed_seconds": 400}}
     with patch("scripts.ppe_operator_stuck_run_local._is_loop_host", return_value=False):
-        with patch(
-            "scripts.ppe_remote_build_agent._run_local_lock_active",
-            return_value=False,
-        ):
+        out = maybe_auto_recover_run_local(tmp_path, status=status, source="test")
+    assert out is None
+
+
+def test_auto_recover_desktop_requires_unlock_file(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("PPE_STACK_FORBIDDEN", raising=False)
+    monkeypatch.delenv("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", raising=False)
+    (tmp_path / "ppe_operator_stuck_recovery.unlock").write_text(
+        f"{DESKTOP_UNLOCK_TOKEN}\n",
+        encoding="utf-8",
+    )
+    status = {"verdict": "RUN_LOCAL", "operator_session": {"elapsed_seconds": 400}}
+    with patch("scripts.ppe_operator_stuck_run_local._is_loop_host", return_value=False):
+        with patch("scripts.ppe_loop_host_guard.loop_host_blocked", return_value=None):
             with patch(
-                "scripts.ppe_remote_build_agent._read_run_local_lock",
-                return_value=None,
+                "scripts.ppe_remote_build_agent._run_local_lock_active",
+                return_value=False,
             ):
                 with patch(
-                    "scripts.ppe_operator_stuck_run_local._recover_on_desktop",
-                    return_value={"action": "desktop_ssh_recover", "recovered": True, "step": "handoff"},
+                    "scripts.ppe_remote_build_agent._read_run_local_lock",
+                    return_value=None,
                 ):
-                    out = maybe_auto_recover_run_local(tmp_path, status=status, source="test")
+                    with patch(
+                        "scripts.ppe_operator_stuck_run_local._recover_on_desktop",
+                        return_value={
+                            "action": "desktop_ssh_recover",
+                            "recovered": True,
+                            "step": "handoff",
+                        },
+                    ):
+                        out = maybe_auto_recover_run_local(tmp_path, status=status, source="test")
     assert out is not None
     assert out.get("recovered") is True
 
 
-def test_ensure_watch_skipped_without_opt_in(tmp_path: Path, monkeypatch) -> None:
+def test_stack_forbidden_blocks_even_with_unlock(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("PPE_STACK_FORBIDDEN", "1")
+    (tmp_path / "ppe_operator_stuck_recovery.unlock").write_text(
+        f"{DESKTOP_UNLOCK_TOKEN}\n",
+        encoding="utf-8",
+    )
+    with patch("scripts.ppe_operator_stuck_run_local._is_loop_host", return_value=False):
+        assert desktop_stuck_recovery_blocked(tmp_path) == "stack_forbidden"
+        out = ensure_stuck_watch_daemon(tmp_path)
+    assert out.get("skipped") is True
+    assert out.get("reason") == "stack_forbidden"
+
+
+def test_ensure_watch_skipped_without_unlock(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.delenv("PPE_STUCK_RUN_LOCAL_WATCH", raising=False)
     with patch("scripts.ppe_operator_stuck_run_local._is_loop_host", return_value=False):
         out = ensure_stuck_watch_daemon(tmp_path)
-    assert out.get("skipped") is True
-    assert out.get("reason") == "not_enabled"
-    assert stuck_watch_enabled() is False
-
-
-def test_ensure_watch_explicit_opt_in(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.delenv("PPE_STUCK_RUN_LOCAL_WATCH", raising=False)
-    monkeypatch.setenv("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", "1")
-    with patch("scripts.ppe_operator_stuck_run_local._is_loop_host", return_value=False):
-        with patch("scripts.ppe_remote_agent_spawn.spawn_python_worker") as spawn:
-            spawn.return_value = type("P", (), {"pid": 9999})()
-            out = ensure_stuck_watch_daemon(tmp_path, explicit=True)
-    assert out.get("started") is True
-    spawn.assert_called_once()
+        assert out.get("skipped") is True
+        assert out.get("reason") == "no_unlock_file"
+        assert stuck_watch_enabled(tmp_path) is False
 
 
 def test_vm_handoff_preflight_legacy_ok(tmp_path: Path) -> None:

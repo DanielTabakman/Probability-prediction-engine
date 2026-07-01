@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -152,20 +153,54 @@ def _recovery_disabled_by_env() -> bool:
     return raw in ("1", "true", "yes", "off")
 
 
-def stuck_automation_enabled(repo: Path) -> bool:
-    """Auto-recovery: VM loop host by default; desktop only when explicitly opted in."""
-    if _recovery_disabled_by_env():
+DESKTOP_UNLOCK_REL = "ppe_operator_stuck_recovery.unlock"
+DESKTOP_UNLOCK_TOKEN = "i-accept-desktop-cmd-popups"
+
+
+def _desktop_unlock_path(repo: Path) -> Path:
+    return (repo / DESKTOP_UNLOCK_REL).resolve()
+
+
+def _desktop_unlock_present(repo: Path) -> bool:
+    path = _desktop_unlock_path(repo)
+    if not path.is_file():
         return False
+    try:
+        return DESKTOP_UNLOCK_TOKEN in path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+
+
+def desktop_stuck_recovery_blocked(repo: Path) -> str | None:
+    """Why desktop stuck recovery/watch must not run. None = allowed (rare non-loop desktop)."""
     if _is_loop_host(repo):
-        return True
-    return _env_truthy("PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY") or _env_truthy("PPE_STUCK_RUN_LOCAL_WATCH")
-
-
-def stuck_watch_enabled() -> bool:
-    """Detached desktop watch daemon — explicit opt-in only (never from status reads)."""
+        return None
     if _recovery_disabled_by_env():
-        return False
-    return _env_truthy("PPE_STUCK_RUN_LOCAL_WATCH")
+        return "disabled_by_env"
+    if _env_truthy("PPE_STACK_FORBIDDEN"):
+        return "stack_forbidden"
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_blocked
+
+        if loop_host_blocked() is not None:
+            return "stack_forbidden"
+    except Exception:
+        pass
+    if not _desktop_unlock_present(repo):
+        return "no_unlock_file"
+    return None
+
+
+def stuck_automation_enabled(repo: Path) -> bool:
+    """Auto-recovery: VM loop host by default; desktop only with unlock file (never env alone)."""
+    if _is_loop_host(repo):
+        return not _recovery_disabled_by_env()
+    return desktop_stuck_recovery_blocked(repo) is None
+
+
+def stuck_watch_enabled(repo: Path) -> bool:
+    """Detached desktop watch daemon — unlock file only; never from casual env/CLI."""
+    return stuck_automation_enabled(repo)
 
 
 def _recover_on_loop_host(repo: Path, *, dry_run: bool) -> dict[str, Any]:
@@ -320,16 +355,12 @@ def ensure_stuck_watch_daemon(
     repo: Path,
     *,
     poll_seconds: int = DEFAULT_WATCH_POLL_SECONDS,
-    explicit: bool = False,
 ) -> dict[str, Any]:
     """Desktop: start detached stuck-RUN_LOCAL watcher if not already running."""
     repo = repo.resolve()
-    if not explicit and not stuck_watch_enabled():
-        return {"action": "stuck_watch", "skipped": True, "reason": "not_enabled"}
-    if explicit:
-        os.environ["PPE_STUCK_RUN_LOCAL_WATCH"] = "1"
-        os.environ["PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY"] = "1"
-        os.environ.pop("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", None)
+    blocked = desktop_stuck_recovery_blocked(repo)
+    if blocked:
+        return {"action": "stuck_watch", "skipped": True, "reason": blocked}
     if _is_loop_host(repo):
         return {"action": "stuck_watch", "skipped": True, "reason": "loop_host"}
 
@@ -370,6 +401,10 @@ def run_watch_daemon(repo: Path, *, poll_seconds: int = DEFAULT_WATCH_POLL_SECON
     import time
 
     repo = repo.resolve()
+    blocked = desktop_stuck_recovery_blocked(repo)
+    if blocked:
+        append_log(repo, f"watch daemon refused: {blocked}")
+        return 1
     append_log(repo, f"watch daemon running poll={poll_seconds}s pid={os.getpid()}")
     while True:
         try:
@@ -401,7 +436,24 @@ def main(argv: list[str] | None = None) -> int:
         return run_watch_daemon(repo)
 
     if args.ensure_watch:
-        out = ensure_stuck_watch_daemon(repo, explicit=True)
+        blocked = desktop_stuck_recovery_blocked(repo)
+        if blocked:
+            msg = {
+                "action": "stuck_watch",
+                "skipped": True,
+                "reason": blocked,
+                "hint": (
+                    "Daily desktop: use DESKTOP_CONTINUE.cmd once. "
+                    f"Unlock (not recommended): create {DESKTOP_UNLOCK_REL} with "
+                    f"line {DESKTOP_UNLOCK_TOKEN!r} and unset PPE_STACK_FORBIDDEN."
+                ),
+            }
+            if args.json:
+                print(json.dumps(msg, indent=2))
+            else:
+                print(json.dumps(msg, indent=2), file=sys.stderr)
+            return 1
+        out = ensure_stuck_watch_daemon(repo)
         if args.json:
             print(json.dumps(out, indent=2))
         return 0

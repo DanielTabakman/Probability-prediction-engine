@@ -16,6 +16,7 @@ ppe_operator_no_loop.local.cmd
 ppe_operator_no_loop.local.cmd.off-vm
 ppe_operator_desktop_auto.local.cmd
 ppe_operator_ssh.local.cmd
+ppe_operator_stuck_recovery.unlock
 ops/restic/env.local
 
 # Data and DB (optional: remove if you want to track sample DB)
