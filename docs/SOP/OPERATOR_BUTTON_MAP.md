@@ -26,8 +26,10 @@ You do **not** need Automations, API credits, or `run_ppe_local` on the desktop.
 |-------------------|---------|--------|
 | `VERDICT=IDE_BUILD` | **Real PC** | **`DESKTOP BUILD`** → new Agent → `@` starter in IDE_BUILD_NOW.md |
 | After product PR merged | **Real PC** | **`DESKTOP CONTINUE`** (pull + SSH finish on VM) |
+| Live VM health from desktop | **Real PC** | **`DESKTOP VM STATUS`** (SSH + auto-ensure stack) |
 | `PHASE=STACK_DOWN` / `stack_loop=False` | **VM** | `VM_RESTART.cmd` or `VM_AUTO.cmd` |
-| Check health | **VM** | `VM_STATUS.cmd` (wait ~10s for `PHASE=`) |
+| Check health | **VM** | `VM_STATUS.cmd` or `check_vm_loop.cmd --no-pause` |
+| Weekly git/worktree hygiene | **VM** (once) | `install_ppe_vm_hygiene_task.cmd` |
 | Status stale / docs disagree | **Either** | `ppe_request.cmd reconcile` → `CONTROL_PLANE_STATUS.json` |
 | Queue human chapter work | **Steward** | `ppe_request.cmd --chapter-id … --reason "…" [--apply]` |
 | Emergency stop popups | **VM** | `VM_STOP.cmd` |

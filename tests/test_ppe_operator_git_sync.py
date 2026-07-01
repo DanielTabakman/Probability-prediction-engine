@@ -8,6 +8,7 @@ from unittest.mock import patch
 from scripts.ppe_operator_git_sync import (
     check_and_nudge_merges,
     ensure_main_on_loop_host,
+    prepare_handoff_with_auto_recover,
     prepare_loop_host_for_handoff,
     pull_main,
     publish_ahead,
@@ -155,9 +156,56 @@ def test_vm_finish_command_uses_prepare_handoff() -> None:
     from scripts.ppe_operator_vm_ssh import vm_finish_command
 
     cmd = vm_finish_command(pull_main=True)
-    assert "--prepare-handoff" in cmd
+    assert "--prepare-handoff-auto" in cmd
     assert "finish_ide_build.cmd" in cmd
     assert "git pull origin main" not in cmd
+
+
+def test_prepare_handoff_detaches_main_worktrees(tmp_path: Path) -> None:
+    repo = tmp_path
+    detached = [{"worktree": str(tmp_path / "wt1"), "branch": "main", "detached": True}]
+
+    def fake_git(_repo: Path, *args: str):
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+        if args[:2] == ("checkout", "main"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=False):
+                with patch(
+                    "scripts.ppe_operator_git_sync.reset_runtime_sop_drift_from_origin",
+                    return_value={"changes": []},
+                ):
+                    with patch("scripts.ppe_operator_git_sync._dirty_paths", return_value=[]):
+                        with patch("scripts.ppe_operator_git_sync._detach_main_worktrees", return_value=detached):
+                            with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                                out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any("detach_main_worktrees" in str(c) for c in out.get("changes") or [])
+
+
+def test_prepare_handoff_auto_recovers_and_retries(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls = {"n": 0}
+
+    def fake_prepare(_repo: Path):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"ok": False, "error": "worktree", "changes": []}
+        return {"ok": True, "changes": ["checkout main"]}
+
+    with patch("scripts.ppe_operator_git_sync.prepare_loop_host_for_handoff", side_effect=fake_prepare):
+        with patch(
+            "scripts.ppe_operator_git_sync._handoff_light_recover",
+            return_value={"action": "handoff_light_recover", "ok": True, "steps": []},
+        ):
+            out = prepare_handoff_with_auto_recover(repo)
+    assert out.get("ok") is True
+    assert out.get("auto_recover") is True
+    assert calls["n"] == 2
 
 
 def test_publish_skips_when_nothing_ahead(tmp_path: Path) -> None:

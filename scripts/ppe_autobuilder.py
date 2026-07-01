@@ -411,6 +411,27 @@ def format_status_brief(status: dict[str, Any]) -> str:
     )
 
 
+def try_fast_stack_brief(repo: Path) -> dict[str, Any] | None:
+    """When headless stack is down, return brief status without heavy operator collect."""
+    from scripts.ppe_desktop_operator_stack import stack_status
+
+    stack = stack_status(repo)
+    loop_running = bool(stack.get("loop_running"))
+    watch_running = bool(stack.get("watch_running"))
+    if loop_running and watch_running:
+        return None
+    return {
+        "version": 1,
+        "as_of": _utc_now(),
+        "phase": PHASE_STACK_DOWN,
+        "verdict": "?",
+        "recommended_action": ACTION_ENSURE,
+        "stack": {**stack, "stack_ok": False},
+        "build": {"slice_id": "-"},
+        "fast_path": True,
+    }
+
+
 def run_diagnose(repo: Path, *, ping_webhook: bool = False) -> dict[str, Any]:
     repo = repo.resolve()
     status = collect_autobuilder_status(repo)
@@ -615,7 +636,12 @@ def main(argv: list[str] | None = None) -> int:
         pass
 
     if args.command == "status":
-        status = collect_autobuilder_status(repo)
+        status: dict[str, Any]
+        if args.brief:
+            fast = try_fast_stack_brief(repo)
+            status = fast if fast is not None else collect_autobuilder_status(repo)
+        else:
+            status = collect_autobuilder_status(repo)
         if args.write or not (args.json or args.brief):
             path = write_status_artifact(repo, status)
             if not args.json and not args.brief:
