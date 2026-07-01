@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-01T22:47:35Z",
-  "program_count": 11,
+  "generated_at": "2026-07-01T23:29:43Z",
+  "program_count": 12,
   "programs": [
     {
       "module_id": "cross_venue_event_gap",
@@ -29,6 +29,10 @@
     {
       "module_id": "workflow",
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/MSOS_WEBSITE_PROGRAM.md"
     },
     {
       "module_id": null,
