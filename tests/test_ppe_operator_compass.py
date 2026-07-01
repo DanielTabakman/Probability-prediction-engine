@@ -10,6 +10,15 @@ import pytest
 REPO = Path(__file__).resolve().parents[1]
 
 
+def test_build_compass_includes_vapor_backlog() -> None:
+    from scripts.ppe_operator_compass import build_compass
+
+    status = {"as_of": "2026-06-29T20:00:00Z", "verdict": "RUN_AUTO", "supply": {"queue_ready": 1}}
+    compass = build_compass(REPO, status=status)
+    assert "vapor_backlog" in compass
+    assert isinstance(compass["vapor_backlog"], list)
+
+
 def test_build_compass_includes_verdict_do_now() -> None:
     from scripts.ppe_operator_compass import build_compass
 
