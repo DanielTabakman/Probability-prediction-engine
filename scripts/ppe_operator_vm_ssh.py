@@ -85,14 +85,14 @@ def vm_status_brief_command() -> str:
 
 
 def vm_finish_command(*, pull_main: bool = False) -> str:
-    """SSH command: loop-host env, optional handoff git preflight, finish_ide_build."""
+    """SSH command: loop-host env, handoff git preflight, finish_ide_build."""
     parts = [
         f"cd /d {VM_REPO}",
         "call call_ppe_operator_local.cmd",
         "set PYTHONPATH=%CD%",
     ]
     if pull_main:
-        parts.append("python scripts\\ppe_operator_git_sync.py --prepare-handoff")
+        parts.append("python scripts\\ppe_vm_handoff_preflight.py")
     parts.append("finish_ide_build.cmd")
     return " && ".join(parts)
 

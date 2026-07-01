@@ -376,7 +376,20 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     except Exception:
         pass
     status = collect_operator_status(repo)
-    return enrich_operator_status_with_vm_trust(repo, status)
+    status = enrich_operator_status_with_vm_trust(repo, status)
+    try:
+        from scripts.ppe_operator_stuck_run_local import ensure_stuck_watch_daemon, maybe_auto_recover_run_local
+
+        recovery = maybe_auto_recover_run_local(repo, status=status, source="operator_status")
+        if recovery:
+            status["run_local_recovery"] = recovery
+            if recovery.get("recovered"):
+                status = enrich_operator_status_with_vm_trust(repo, collect_operator_status(repo))
+                status["run_local_recovery"] = recovery
+        ensure_stuck_watch_daemon(repo)
+    except Exception:
+        pass
+    return status
 
 
 def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
@@ -675,6 +688,16 @@ def _format_human(
     if op_session and op_session.get("rotate_recommended"):
         lines.append("")
         lines.append(f"**Thread timebox:** {op_session.get('message')}")
+
+    recovery = status.get("run_local_recovery") if isinstance(status.get("run_local_recovery"), dict) else None
+    if recovery and not recovery.get("skipped"):
+        lines.append("")
+        if recovery.get("recovered"):
+            lines.append(
+                f"**Auto-recovery:** RUN_LOCAL closeout restarted ({recovery.get('step') or recovery.get('action')})."
+            )
+        elif recovery.get("assessment", {}).get("stuck"):
+            lines.append("**Auto-recovery:** stuck RUN_LOCAL detected — retry scheduled (cooldown).")
 
     blind = status.get("operator_blind_spots") if isinstance(status.get("operator_blind_spots"), dict) else None
     if blind:

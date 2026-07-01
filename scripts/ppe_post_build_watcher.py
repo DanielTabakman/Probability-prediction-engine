@@ -302,8 +302,31 @@ def try_closeout_only_run_local(repo: Path, *, dry_run: bool = False) -> dict[st
     return {"action": "closeout_finish", **spawned}
 
 
+def _chapter_mode_is_closeout_only(repo: Path) -> bool:
+    try:
+        from scripts.ppe_chapter_mode import MODE_CLOSEOUT_ONLY
+        from scripts.ppe_operator_status import collect_operator_status
+
+        status = collect_operator_status(repo)
+        chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+        return str(chapter_mode.get("mode") or "") == MODE_CLOSEOUT_ONLY
+    except ImportError:
+        return False
+
+
 def try_finish_ide_build_handoff(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
     """Post-build mark+finish, else explicit CLOSEOUT_ONLY run_ppe_local trigger."""
+    if _chapter_mode_is_closeout_only(repo):
+        closeout = try_closeout_only_run_local(repo, dry_run=dry_run)
+        if closeout.get("started") or (dry_run and closeout.get("would_start")):
+            return closeout
+        return {
+            "action": "finish_ide_build_handoff",
+            "skipped": True,
+            "closeout_reason": closeout.get("reason"),
+            "mode": "CLOSEOUT_ONLY",
+        }
+
     post = try_finish_pending_ide_build(repo, dry_run=dry_run)
     if post.get("started"):
         return post

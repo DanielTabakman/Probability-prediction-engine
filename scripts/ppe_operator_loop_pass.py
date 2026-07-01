@@ -34,6 +34,20 @@ def run_loop_pass(repo: Path) -> int:
             return EXIT_PASS_HANDLED
         reason = result.get("reason") or "run-local did not start"
         print(f"ppe_operator_loop_pass: RUN_LOCAL but not started — {reason}", file=sys.stderr)
+        try:
+            from scripts.ppe_operator_stuck_run_local import maybe_auto_recover_run_local
+            import scripts.ppe_operator_status as _op_status
+
+            recovery = maybe_auto_recover_run_local(
+                repo,
+                status=_op_status.collect_operator_status(repo),
+                source="loop_pass",
+            )
+            if recovery and recovery.get("recovered"):
+                print("ppe_operator_loop_pass: stuck RUN_LOCAL auto-recovery started")
+                return EXIT_PASS_HANDLED
+        except Exception as exc:
+            print(f"ppe_operator_loop_pass: stuck recovery failed: {exc}", file=sys.stderr)
         return 7
 
     return 0
