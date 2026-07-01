@@ -115,10 +115,11 @@ Each `--record` closeout:
 `OPERATOR_STATUS.md` includes the **What's next** block when `WHATS_NEXT.md` exists. Weekly radar flags **context-chat-churn** when ≥3 closeouts in a week and zero slices closed.
 
 ```bat
+context_window_closeout.cmd --record --thread-role charter --whats-next "Continue UX backlog edits per UX_EXECUTION_BACKLOG_V1.md"
 context_window_closeout.cmd --record --thread-role operator --whats-next "Continue msos_user_state_v1: run_ppe_local.cmd"
 ```
 
-`--record` implies `--render`. Omit `--whats-next` to infer from operator verdict.
+`--record` implies `--render`. Omit `--whats-next` to infer from operator verdict. **Charter/steward closeouts:** always pass `--thread-role charter` (legacy `steward` aliases to charter).
 
 ---
 
@@ -172,15 +173,17 @@ Chat memory is **not** ground truth. Reconcile against git log and pushed docs.
 
 Sort every open item **exactly one** bucket:
 
-| Bucket | Meaning | Destination |
-|--------|---------|-------------|
-| **ship_now** | ≤15 min, gates pass, in declared plane | Commit + push in this closeout pass |
-| **operator_next** | Loop / relay / IDE BUILD command | `OPERATOR_STATUS` / `run_ppe_local.cmd` / starter file |
-| **build_backlog** | Chartered product/evidence work, not urgent today | [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) (`blocked` default) — see [`BACKLOG_OPERATOR.md`](BACKLOG_OPERATOR.md) |
-| **triggered_ideas** | Great idea, too early — revisit when a chapter matches | [`TRIGGERED_IDEAS.json`](TRIGGERED_IDEAS.json) — see [`TRIGGERED_IDEAS.md`](TRIGGERED_IDEAS.md) |
-| **human_backlog** | Policy, architecture, tradeoff needs you | [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) — see [`HUMAN_STEWARD_BACKLOG.md`](HUMAN_STEWARD_BACKLOG.md) |
-| **park** | Dirty or ambiguous repo state | Named branch/stash + one-line in `HANDOFF.md` only if steward-visible |
-| **drop** | Explicitly ruled out | One-line reason (no backlog row) |
+| Bucket | Meaning | Lane | Destination |
+|--------|---------|------|-------------|
+| **ship_now** | ≤15 min, gates pass, in declared plane | control_plane | Commit + push in this closeout pass |
+| **operator_next** | Loop / relay / IDE BUILD command | relay | Operator thread — `what's next?` (not charter execution) |
+| **build_backlog** | Chartered product/evidence work, not urgent today | control_plane | [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |
+| **triggered_ideas** | Great idea, too early — revisit when a chapter matches | control_plane | [`TRIGGERED_IDEAS.json`](TRIGGERED_IDEAS.json) |
+| **human_backlog** | Policy, architecture, tradeoff needs you | human | [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) |
+| **park** | Dirty or ambiguous repo state | mixed | Named branch/stash; recovery → operator thread |
+| **drop** | Explicitly ruled out | — | One-line reason (no backlog row) |
+
+Classify ambiguous items with `scripts.ppe_thread_roles.classify_parked_lane` — see [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) § Parked items.
 
 **CLI helpers** (optional):
 

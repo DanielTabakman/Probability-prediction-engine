@@ -15,8 +15,32 @@ from scripts.ppe_thread_roles import (
 
 class TestPpeThreadRoles(unittest.TestCase):
     def test_normalize_legacy_steward(self) -> None:
-        self.assertEqual(normalize_thread_role("steward"), "operator")
+        self.assertEqual(normalize_thread_role("steward"), "charter")
         self.assertEqual(normalize_thread_role("exploratory"), "charter")
+
+    def test_classify_parked_lane(self) -> None:
+        from scripts.ppe_thread_roles import (
+            PARKED_LANE_CONTROL,
+            PARKED_LANE_RELAY,
+            classify_parked_lane,
+        )
+
+        self.assertEqual(classify_parked_lane("merge delegation PR #1039"), PARKED_LANE_CONTROL)
+        self.assertEqual(classify_parked_lane("spine closeout DESKTOP_CONTINUE"), PARKED_LANE_RELAY)
+        self.assertEqual(classify_parked_lane("Stripe billing decision"), "human")
+
+    def test_infer_thread_role_from_opener(self) -> None:
+        from scripts.ppe_thread_roles import infer_thread_role_from_opener
+
+        self.assertEqual(infer_thread_role_from_opener("what's next?"), "operator")
+        self.assertEqual(
+            infer_thread_role_from_opener("Charter thread. THREAD_ROLE: charter. UX backlog."),
+            "charter",
+        )
+        self.assertEqual(
+            infer_thread_role_from_opener("close out thread — delegation v2 wiring"),
+            "charter",
+        )
 
     def test_infer_suggest_thread_rotate_ide_build(self) -> None:
         out = infer_suggest_thread_rotate(

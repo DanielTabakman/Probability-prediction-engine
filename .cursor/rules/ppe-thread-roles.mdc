@@ -1,6 +1,6 @@
 ---
-description: PPE thread roles — operator vs charter/topic separation. Prevents relay queue from hijacking UX, data, and planning threads.
-alwaysApply: false
+description: PPE thread roles — operator vs charter separation. Prevents relay from hijacking steward/control-plane threads.
+alwaysApply: true
 ---
 
 # PPE thread roles
@@ -33,11 +33,14 @@ alwaysApply: false
 - `THREAD_ROLE: ide_build` / `IDE BUILD thread`
 - `@artifacts/orchestrator/IDE_BUILD_STARTER_` or `IDE_BUILD_NOW.md`
 
-**Charter** — any of:
+**Charter** (includes **steward** / control-plane policy) — any of:
 
-- `charter thread` / `topic thread` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
+- `charter thread` / `steward thread` / `topic thread` / `THREAD_ROLE: charter` / `THREAD_ROLE: steward`
+- `control-plane only` / `no relay` — explicit lane fence
+- Policy, delegation, rules, backlog landings, PR merges for `docs/SOP/` + `.cursor/rules/` + `scripts/`
+- `close out thread` / `context closeout` on a non-operator thread (charter closeout — not relay execution)
 - Explicit program-only load: e.g. "Load only `@docs/SOP/UX_EXECUTION_BACKLOG_V1.md`" with no operator @
-- Control-plane / agent-policy work scoped to `docs/SOP/`, `.cursor/rules/`, `scripts/` (no relay)
+- "Deal with parked …" when items are mostly merges/stashes/docs — **split by lane first** (§ Parked items)
 
 **Explore** — any of:
 
@@ -47,9 +50,34 @@ alwaysApply: false
 
 ## Precedence (hard)
 
-1. **Charter / explore / ide_build** → **never** read `OPERATOR_STATUS.md`, `BURST_PLAN.json`, or run burst/`@ppe-director` unless the user **explicitly** switches role ("switch to operator", `what's next?`).
+1. **Charter / explore / ide_build / neutral** → **never** read `OPERATOR_STATUS.md` for **execution**, run `DESKTOP_CONTINUE` / SSH / `run_ppe_local`, or report relay verdict as task completion unless the user **explicitly** switches role (`switch to operator`, `what's next?`, `THREAD_ROLE: operator`).
 2. **Operator** → follow [`ppe-operator-core.mdc`](ppe-operator-core.mdc) auto-execute path.
 3. **Neutral** → answer the user's task; do **not** lead with relay verdict or `IDE_BUILD` blockers. One-line pointer to operator thread is OK if they asked about queue health.
+4. **Mixed handoff lists** (conversation summary, parked inventory) → classify each item **before** acting; execute only items matching this thread's role; relay items → one line: *"Operator thread: what's next?"*
+
+## Parked items (lane taxonomy)
+
+When triaging "parked" or "still open" lists, tag each row:
+
+| Lane | Examples | Execute in charter thread? |
+|------|----------|----------------------------|
+| **control_plane** | Merge PR, delegation/rules, stashes, dirty-tree cleanup, backlog docs | **Yes** |
+| **relay** | `DESKTOP_CONTINUE`, spine closeout, `IDE_BUILD`, VM heal, queue advance, research collectors on VM | **No** — operator thread only |
+| **human** | Stripe, architecture tradeoffs, policy decisions | **No** — backlog or one-line ask |
+
+**Failure mode to avoid:** treating a mixed parked list as one bucket and running relay commands to "clear everything."
+
+Use `python -c "from scripts.ppe_thread_roles import classify_parked_lane; print(classify_parked_lane('…'))"` when unsure.
+
+## Completion summary guard (charter / explore / neutral)
+
+When finishing a **non-operator** thread, the reply may include:
+
+- What shipped in **this lane** (PRs, rules, docs, stashes)
+- What was **parked for operator** (relay items — one line, no command checklist)
+- Optional: `context_window_closeout.cmd --record --thread-role charter`
+
+**Must not** end with relay next steps (`DESKTOP_CONTINUE`, chapter names, `IDE_BUILD` slice, VM status) unless the user opened an **operator** thread.
 
 ## Relay disclosure (when offering work)
 
