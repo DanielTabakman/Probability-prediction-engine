@@ -137,7 +137,7 @@ Future (post v0):
 |---------|----------|
 | **`ppe_exposure_menu_scan_v1`** | Sections, fit lenses, two-path compare — [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) **LIVE** |
 | `ppe_exposure_menu_nl_v1` | Natural-language intake (“nvidia exposure”) |
-| `msos_exposure_menu_save_v1` | Save chosen path to workflow store |
+| `msos_exposure_menu_save_v1` | Save chosen path — **preview LIVE** [`MSOS_EXPOSURE_PATH_SAVE_V1.md`](MSOS_EXPOSURE_PATH_SAVE_V1.md) |
 | `ppe_exposure_menu_universe_v1` | Neutral/hedge catalog + remaining assets (SPY/QQQ/IWM index binding shipped in scan follow-up) |
 
 ---
