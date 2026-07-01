@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "description": "Git-tracked VM autobuilder phase mirror — written by loop host on phase change; desktop reads via git pull (no SSH).",
+  "as_of": null,
+  "phase": null,
+  "verdict": null,
+  "chapter_name": null,
+  "phase_plan_path": null,
+  "recommended_action": null
+}

@@ -27,7 +27,8 @@ from scripts.ppe_autobuilder import (
     action_run_local,
     collect_autobuilder_status,
 )
-from scripts.ppe_desktop_auto_operator import VM_REPO, VM_SSH_HOST, _maybe_git_pull, _ssh_vm
+from scripts.ppe_desktop_auto_operator import _maybe_git_pull
+from scripts.ppe_operator_vm_ssh import fetch_vm_brief, ssh_vm, vm_advance_command, vm_finish_command
 from scripts.ppe_operator_shortcuts import detect_role
 
 QUEUE_REL = "artifacts/orchestrator/DO_THE_THING_QUEUE.json"
@@ -240,8 +241,8 @@ def _execute_action(repo: Path, item: dict[str, Any]) -> dict[str, Any]:
 
     if action == "desktop_continue":
         pull = _run_git_pull(repo)
-        ssh = _ssh_vm(f"cd /d {VM_REPO} && git pull origin main && finish_ide_build.cmd")
-        status = _ssh_vm(f"cd /d {VM_REPO} && ppe_autobuilder.cmd status --brief")
+        ssh = ssh_vm(vm_finish_command(pull_main=True))
+        status = fetch_vm_brief(repo, use_cache=False)
         ok = pull.get("ok") and ssh.get("ok")
         return {
             "action": action,
@@ -252,11 +253,11 @@ def _execute_action(repo: Path, item: dict[str, Any]) -> dict[str, Any]:
         }
 
     if action == "vm_finish":
-        ssh = _ssh_vm(f"cd /d {VM_REPO} && finish_ide_build.cmd")
+        ssh = ssh_vm(vm_finish_command())
         return {"action": action, "ok": ssh.get("ok"), **ssh}
 
     if action == "vm_advance":
-        ssh = _ssh_vm(f"cd /d {VM_REPO} && ppe_autobuilder.cmd advance")
+        ssh = ssh_vm(vm_advance_command())
         return {"action": action, "ok": ssh.get("ok"), **ssh}
 
     if action == "advance" or action == "autobuilder:advance":

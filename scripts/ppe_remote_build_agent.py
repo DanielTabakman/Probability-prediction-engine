@@ -239,6 +239,11 @@ def _run_local_lock_active(repo: Path, lock: dict[str, Any] | None) -> bool:
         return True
 
 
+def spawn_run_local_detached(repo: Path) -> dict[str, Any]:
+    """Start run_ppe_local.cmd in a detached worker (lock-aware)."""
+    return _run_local_detached(repo)
+
+
 def _run_local_detached(repo: Path) -> dict[str, Any]:
     lock = _read_run_local_lock(repo)
     if _run_local_lock_active(repo, lock):
@@ -303,7 +308,7 @@ def launch_build(
         return {"action": "build", "started": False, **target}
 
     if target.get("mode") == "run_local":
-        return {"action": "build", **_run_local_detached(repo)}
+        return {"action": "build", **spawn_run_local_detached(repo)}
 
     slice_id = str(target["slice_id"])
     plan_path = str(target["plan_path"])

@@ -13,6 +13,8 @@ from unittest.mock import patch
 from scripts.ppe_ide_product_ready import write_marker
 from scripts.ppe_post_build_watcher import (
     post_build_watcher_enabled,
+    try_closeout_only_run_local,
+    try_finish_ide_build_handoff,
     try_finish_pending_ide_build,
 )
 
@@ -83,6 +85,27 @@ class TestPpePostBuildWatcher(unittest.TestCase):
         result = try_finish_pending_ide_build(self.repo)
         self.assertTrue(result.get("skipped"))
         assert not spawn.called  # type: ignore[attr-defined]
+
+    @patch("scripts.ppe_remote_build_agent.spawn_run_local_detached")
+    @patch("scripts.ppe_operator_status.collect_operator_status")
+    def test_closeout_only_triggers_run_local(self, status: object, spawn: object) -> None:
+        status.return_value = {
+            "verdict": "RUN_LOCAL",
+            "chapter_mode": {"mode": "CLOSEOUT_ONLY"},
+        }
+        spawn.return_value = {"started": True, "worker_pid": 9999}
+        result = try_closeout_only_run_local(self.repo)
+        self.assertTrue(result.get("started"))
+        assert spawn.called  # type: ignore[attr-defined]
+
+    @patch("scripts.ppe_post_build_watcher.try_closeout_only_run_local")
+    @patch("scripts.ppe_post_build_watcher.try_finish_pending_ide_build")
+    def test_finish_handoff_falls_through_to_closeout(self, post: object, closeout: object) -> None:
+        post.return_value = {"action": "post_build_watcher", "skipped": True, "reason": "no finishable slice"}
+        closeout.return_value = {"action": "closeout_finish", "started": True, "worker_pid": 8888}
+        result = try_finish_ide_build_handoff(self.repo)
+        self.assertTrue(result.get("started"))
+        assert closeout.called  # type: ignore[attr-defined]
 
 
 if __name__ == "__main__":

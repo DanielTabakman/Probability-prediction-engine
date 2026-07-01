@@ -48,9 +48,21 @@ Full table: [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPER
 
 ## SSH status (desktop agents)
 
+**Budget:** one SSH call per operator pass; 120s max; no parallel sessions; no SSH+findstr on repo JSON (read locally).
+
 ```bash
-ssh ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engine && ppe_autobuilder.cmd status --brief"
+python scripts/ppe_operator_status.py --brief
 ```
+
+Optional VM brief (only when mirror stale): use `scripts/ppe_operator_vm_ssh.py` via `DESKTOP_CONTINUE.cmd` or:
+
+```bash
+ssh -o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=10 -o ServerAliveCountMax=3 ppeloop@desktop-caqll8k "cd /d C:\Users\ppeloop\Probability-prediction-engine && ppe_autobuilder.cmd status --brief"
+```
+
+**Prefer git mirror:** `docs/SOP/VM_OPERATOR_PHASE.json` (VM loop host writes; desktop `git pull`).
+
+**Canonical SSH wrapper:** `scripts/ppe_operator_vm_ssh.py` — all agent/desktop Python paths must use this, not raw `subprocess.run(["ssh", ...])`.
 
 ## Common mistake (do not repeat)
 

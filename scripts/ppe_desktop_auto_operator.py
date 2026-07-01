@@ -12,12 +12,16 @@ from pathlib import Path
 from typing import Any
 
 from scripts.ppe_operator_shortcuts import detect_role, ensure_shortcuts
+from scripts.ppe_operator_vm_ssh import (
+    fetch_vm_brief,
+    ssh_vm,
+    vm_advance_command,
+    vm_finish_command,
+)
 
 STATE_REL = "artifacts/orchestrator/DESKTOP_AUTO_OPERATOR.json"
 LOG_REL = "artifacts/orchestrator/DESKTOP_AUTO_OPERATOR.log"
 DEFAULT_POLL_SECONDS = 120
-VM_SSH_HOST = "ppeloop@desktop-caqll8k"
-VM_REPO = r"C:\Users\ppeloop\Probability-prediction-engine"
 
 
 def _utc_now() -> str:
@@ -69,20 +73,7 @@ def desktop_auto_enabled(repo: Path) -> bool:
 
 
 def _ssh_vm(command: str) -> dict[str, Any]:
-    import subprocess
-
-    proc = subprocess.run(
-        ["ssh", VM_SSH_HOST, command],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return {
-        "ok": proc.returncode == 0,
-        "exit_code": proc.returncode,
-        "stdout": (proc.stdout or "").strip(),
-        "stderr": (proc.stderr or "").strip(),
-    }
+    return ssh_vm(command)
 
 
 def _maybe_git_pull(repo: Path) -> None:
@@ -146,11 +137,18 @@ def auto_pass(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
             append_log(repo, f"auto finish pending slice={finish.get('slice_id')}")
 
     if not dry_run and (verdict == "RUN_LOCAL" or phase == "RUN_LOCAL_PENDING"):
-        ssh = _ssh_vm(f'cd /d {VM_REPO} && finish_ide_build.cmd')
-        if ssh.get("ok"):
-            actions.append("vm_finish_ide_build")
-            append_log(repo, "auto vm finish_ide_build via ssh")
-        result["vm_ssh"] = ssh
+        trust = fetch_vm_brief(repo, use_cache=True)
+        parsed = trust.get("parsed") if isinstance(trust.get("parsed"), dict) else {}
+        vm_phase = str(parsed.get("phase") or "")
+        if vm_phase in ("FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"):
+            actions.append("skip_vm_finish_in_flight")
+            result["vm_trust"] = {"wait_for_vm": True, "vm_phase": vm_phase}
+        else:
+            ssh = _ssh_vm(vm_finish_command())
+            if ssh.get("ok"):
+                actions.append("vm_finish_ide_build")
+                append_log(repo, "auto vm finish_ide_build via ssh")
+            result["vm_ssh"] = ssh
 
     if not actions:
         result["skipped"] = True

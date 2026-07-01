@@ -9,6 +9,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
 from scripts.ppe_context_bands import max_burst_cycles
 from scripts.ppe_context_preflight import run_preflight
 from scripts.ppe_operator_status import (
@@ -88,6 +92,24 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
     use_director = verdict in WORKER_VERDICTS
     director_recommended = verdict in WORKER_VERDICTS | TRIAGE_VERDICTS
 
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    closeout_only = bool(chapter_mode.get("do_not_rebuild")) or str(chapter_mode.get("mode") or "") == "CLOSEOUT_ONLY"
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
+    vm_in_flight = bool(vm_trust.get("wait_for_vm"))
+
+    direct_action: str | None = None
+    if (
+        verdict == VERDICT_RUN_LOCAL
+        and closeout_only
+        and remaining <= 1
+        and not vm_in_flight
+    ):
+        use_director = False
+        direct_action = "DESKTOP_CONTINUE.cmd --no-pause"
+    elif vm_in_flight:
+        use_director = False
+        direct_action = "wait_for_vm"
+
     band_cap = max_burst_cycles(overall_band, director=use_director or verdict in TRIAGE_VERDICTS)
     max_cycles = band_cap
     if remaining > 0:
@@ -98,6 +120,8 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         use_director = True
 
     burst_allowed = max_cycles > 0 and verdict not in ("RUN_AUTO", "SUPPLY_LOW")
+    if direct_action == "wait_for_vm":
+        burst_allowed = False
 
     return {
         "as_of": _utc_now(),
@@ -112,6 +136,8 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "use_director": use_director,
         "director_recommended": director_recommended,
         "burst_allowed": burst_allowed,
+        "direct_action": direct_action,
+        "closeout_only": closeout_only,
         "worker_verdicts_only": True,
         "prompt": format_burst_director_prompt(
             max_cycles=max_cycles,
@@ -119,6 +145,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             remaining=remaining,
             verdict=verdict,
             burst_allowed=burst_allowed,
+            direct_action=direct_action,
         ),
     }
 
@@ -130,10 +157,21 @@ def format_burst_director_prompt(
     remaining: int,
     verdict: str,
     burst_allowed: bool,
+    direct_action: str | None = None,
 ) -> str:
     from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 
-    if not burst_allowed:
+    if direct_action == "wait_for_vm":
+        body = (
+            "VM phase FINISH_IN_FLIGHT or BUILD_IN_FLIGHT — wait for loop host; "
+            "do NOT SSH probe queue/manifest or spawn @ppe-director."
+        )
+    elif direct_action == "DESKTOP_CONTINUE.cmd --no-pause":
+        body = (
+            "CLOSEOUT_ONLY with ≤1 remaining slice — skip @ppe-director. "
+            "Run DESKTOP_CONTINUE.cmd --no-pause once, then rotate operator thread."
+        )
+    elif not burst_allowed:
         body = (
             "@ppe-director Burst blocked (band=ESCALATE or max_cycles=0). "
             "Read artifacts/control_plane/BURST_PLAN.json. Triage only — do not chain BUILD workers."

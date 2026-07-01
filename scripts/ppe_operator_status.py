@@ -11,6 +11,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
 from scripts.ppe_auto_select import choose_next_plan
 from scripts.ppe_ide_build_starter import format_ide_build_resume, starter_path
 from scripts.ppe_operator_hint import PPE_GO_HINT, append_ppe_go_hint
@@ -365,7 +369,59 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
         apply_operator_env(repo)
     except Exception:
         pass
-    return collect_operator_status(repo)
+    status = collect_operator_status(repo)
+    return enrich_operator_status_with_vm_trust(repo, status)
+
+
+def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
+    """Desktop: attach VM phase mirror/cache so agents act without SSH probes."""
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        if loop_host_start_allowed()[0]:
+            return status
+    except Exception:
+        pass
+
+    vm_mirror = None
+    vm_brief = None
+    try:
+        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+        vm_mirror = load_vm_phase_mirror(repo)
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
+
+        if not vm_mirror or not str(vm_mirror.get("phase") or "").strip():
+            vm_brief = fetch_vm_brief(repo, use_cache=True)
+        trust = resolve_vm_trust(
+            local_verdict=str(status.get("verdict") or ""),
+            vm_brief=vm_brief,
+            vm_mirror=vm_mirror,
+        )
+        status["vm_trust"] = trust
+
+        chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+        mode = str(chapter_mode.get("mode") or "")
+        if trust.get("wait_for_vm"):
+            status["commands"] = [
+                "Wait for VM in-flight phase to complete (no parallel SSH/findstr probes)."
+            ]
+            status.setdefault("avoid", []).extend(
+                [
+                    "SSH findstr/type on queue or manifest JSON",
+                    "Multiple parallel ssh ppeloop@desktop-caqll8k calls",
+                    "@ppe-director while VM FINISH_IN_FLIGHT or BUILD_IN_FLIGHT",
+                ]
+            )
+        elif trust.get("recommended_action") == "desktop_continue" and mode == "CLOSEOUT_ONLY":
+            status["commands"] = ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"]
+    except Exception:
+        pass
+    return status
 
 
 def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
@@ -384,6 +440,12 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
             "Burst path: read artifacts/control_plane/BURST_PLAN.json → @ppe-director "
             "(adaptive burst default; ppe_go.cmd --single to opt out)"
         )
+    elif burst_plan.get("direct_action") == "DESKTOP_CONTINUE.cmd --no-pause":
+        lines.append(
+            "Burst path: CLOSEOUT_ONLY — run DESKTOP_CONTINUE.cmd --no-pause directly (no @ppe-director)"
+        )
+    elif burst_plan.get("direct_action") == "wait_for_vm":
+        lines.append("Burst path: wait — VM in-flight; no SSH probes or burst workers")
     elif not allowed:
         lines.append("Burst path: single verdict only — split slice or trim spec before chaining workers")
     return lines
@@ -463,6 +525,16 @@ def _format_human(
     burst = burst_plan if burst_plan is not None else status.get("burst_plan")
     if isinstance(burst, dict):
         lines.extend(_format_burst_summary(burst))
+
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else None
+    if vm_trust and (vm_trust.get("vm_phase") or vm_trust.get("agent_note")):
+        lines.append("")
+        phase = vm_trust.get("vm_phase") or "?"
+        source = vm_trust.get("source") or "?"
+        lines.append(f"VM phase: `{phase}` (source={source})")
+        note = vm_trust.get("agent_note")
+        if note:
+            lines.append(f"  → {note}")
 
     lines.extend(
         [

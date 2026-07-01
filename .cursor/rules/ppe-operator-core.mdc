@@ -21,12 +21,21 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 1. `python scripts/ppe_burst_plan.py --write`
 2. Read `artifacts/control_plane/BURST_PLAN.json` + load [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc)
-3. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
-4. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
+3. If `direct_action` is set → execute it (no burst): `DESKTOP_CONTINUE.cmd --no-pause` or wait for VM
+4. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
+5. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
+
+**SSH budget (desktop — mandatory):**
+
+- **Max 1** `ssh ppeloop@desktop-caqll8k` call per operator pass (use `python scripts/ppe_operator_status.py --brief` locally first).
+- **Never** SSH + `findstr`/`type` on `PHASE_QUEUE.json`, `ACTIVE_PHASE_MANIFEST.json`, or backlog — read those files **locally** from git.
+- **Never** parallel SSH sessions to the VM.
+- Prefer `docs/SOP/VM_OPERATOR_PHASE.json` (git mirror) + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
+- Hard timeout: 120s — if SSH hangs, trust mirror/cache and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
 
 | Verdict | Action |
 |---------|--------|
-| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. VM → `run_ppe_local.cmd` (burst: `@ppe-director` → finish worker) |
+| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. CLOSEOUT_ONLY + ≤1 slice → **direct** (skip `@ppe-director`). VM in-flight → **wait**. VM → `run_ppe_local.cmd` |
 | `IDE_BUILD` | Burst: `@ppe-director` → build worker. Single escape: `ppe_go.cmd --single` or `@` slim `IDE_BUILD_STARTER_*.md` only |
 | `RUN_AUTO` | VM relay only; desktop → SSH status — no burst |
 | `SUPPLY_LOW` | Summarize supply; no burst |
@@ -53,6 +62,24 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 **Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
 
 **Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.
+
+## Relay finish hygiene (RUN_LOCAL / CLOSEOUT_ONLY)
+
+**Desktop `RUN_LOCAL`:** only `DESKTOP_CONTINUE.cmd --no-pause` — never local `run_ppe_local.cmd` or SSH `run_ppe_local` without VM env.
+
+**VM env:** any VM `run_ppe_local` path must load `call_ppe_operator_local.cmd` first (sets `PPE_LOOP_HOST=1` on loop host). `finish_ide_build.cmd` and `run_ppe_local.cmd` do this automatically after merge.
+
+**Do not fight the headless stack:** when VM brief shows `stack_loop=True` and `FINISH_IN_FLIGHT` or `RUN_LOCAL_PENDING`, poll status — do **not** spawn a second manual `run_ppe_local` over SSH. Use `fix_vm_operator.cmd` on VM only when `STACK_DOWN` or `stack_loop=False`.
+
+**Long finish waits (~20 min):** tail VM logs while polling — `artifacts/orchestrator/REMOTE_RUN_LOCAL.log`, `POST_BUILD_FINISH.log` — not status alone.
+
+**VM health one-liner:** SSH → `check_vm_loop.cmd --no-pause` (loads loop-host env + brief status).
+
+**Operator script PYTHONPATH:** when calling `python scripts/ppe_*.py` directly from agent shell, set `PYTHONPATH` to repo root (or use `*.cmd` wrappers). `ppe_operator_status.py` and `ppe_burst_plan.py` self-bootstrap; others may still need it.
+
+**Branch hygiene:** start operator threads from clean `main` or a slice worktree. Dirty product paths on a control-plane branch → recovery in operator thread per [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) before `IDE_BUILD`.
+
+**Thread rotate:** after `run_ppe_local` / chapter continue completes, fresh operator thread (`what's next?`) — avoids stale context during long VM finishes.
 
 ## Token discipline
 
