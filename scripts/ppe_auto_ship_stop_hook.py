@@ -21,6 +21,8 @@ def _repo_from_payload(payload: dict) -> Path | None:
             candidate = Path(text)
             if (candidate / "scripts" / "ppe_worker_lease.py").is_file():
                 return candidate.resolve()
+            if (candidate / ".git").exists():
+                return candidate.resolve()
     if (_REPO / "scripts" / "ppe_worker_lease.py").is_file():
         return _REPO
     return None
