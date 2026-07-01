@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       mirror_only: ${{ steps.filter.outputs.mirror_only }}
+      sop_discovery: ${{ steps.filter.outputs.sop_discovery }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
@@ -25,6 +26,18 @@ jobs:
           filters: |
             mirror_only:
               - 'docs/SOP/VM_OPERATOR_PHASE.json'
+            sop_discovery:
+              - 'docs/SOP/**'
+              - 'scripts/sop_discovery_core.py'
+              - 'scripts/resolve_sop.py'
+              - 'scripts/validate_sop_links.py'
+              - 'scripts/generate_chapter_doc_index.py'
+              - 'generate_chapter_doc_index.cmd'
+              - 'tests/test_resolve_sop.py'
+              - 'tests/test_validate_sop_links.py'
+              - 'tests/test_sop_topic_coverage.py'
+              - 'tests/test_ppe_queue_starter_regen.py'
+              - 'tests/test_closeout_doc_validation.py'
 
   mirror_publish_check:
     needs: changes
@@ -55,6 +68,43 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest
           python -m pytest -q tests/test_ppe_operator_followup_v2.py::test_maybe_commit_publish_vm_mirror tests/test_ppe_operator_followup_v2.py::test_mirror_is_populated --tb=short
+        env:
+          PYTHONPATH: .
+
+  sop_discovery_gate:
+    needs: changes
+    if: needs.changes.outputs.sop_discovery == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Chapter doc index freshness
+        run: python scripts/generate_chapter_doc_index.py --check
+        env:
+          PYTHONPATH: .
+
+      - name: Validate SOP discovery links
+        run: python scripts/validate_sop_links.py
+        env:
+          PYTHONPATH: .
+
+      - name: SOP discovery unit tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          python -m pytest -q \
+            tests/test_resolve_sop.py \
+            tests/test_validate_sop_links.py \
+            tests/test_sop_topic_coverage.py \
+            tests/test_ppe_queue_starter_regen.py \
+            tests/test_closeout_doc_validation.py \
+            tests/test_ppe_ide_build_starter_doc_resolve.py \
+            --tb=short
         env:
           PYTHONPATH: .
 

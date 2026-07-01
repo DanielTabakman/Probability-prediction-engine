@@ -967,15 +967,19 @@ def send_from_payload(payload_path: Path) -> bool:
 
     title = str(payload.get("title") or "PPE operator status")
     body = str(payload.get("body") or "See artifacts/orchestrator/OPERATOR_STATUS.md")
+    resolve_hint = str(payload.get("resolve_hint") or "").strip()
+    if resolve_hint and resolve_hint not in body:
+        body = f"{body}\n{resolve_hint}"
     verdict = str(payload.get("verdict") or "")
     priority = _priority_for_verdict(verdict)
     tags = ["ppe", verdict.lower()] if verdict else ["ppe"]
     return send_ntfy(title, body, tags=tags, priority=priority)
 
 
-def send_operator_status(status: dict[str, Any]) -> bool:
+def send_operator_status(status: dict[str, Any], *, repo_root: Path | None = None) -> bool:
     from scripts.ppe_operator_hint import append_ppe_go_hint
 
+    repo = (repo_root or Path.cwd()).resolve()
     verdict = str(status.get("verdict") or "UNKNOWN")
     title = f"PPE operator: {verdict}"
     lines = [f"VERDICT={verdict}"]
@@ -984,6 +988,20 @@ def send_operator_status(status: dict[str, Any]) -> bool:
     commands = status.get("commands") or []
     if commands:
         lines.append("Next: " + str(commands[0]))
+    if verdict == "IDE_BUILD":
+        try:
+            from scripts.sop_discovery_core import format_notify_resolve_hint
+
+            chapter_mode = status.get("chapter_mode") or {}
+            hint = format_notify_resolve_hint(
+                repo,
+                plan_path=str(status.get("phase_plan_path") or "") or None,
+                next_build_candidate=str(chapter_mode.get("next_build_candidate") or "") or None,
+            )
+            if hint:
+                lines.append(hint)
+        except Exception:
+            pass
     body = append_ppe_go_hint("\n".join(lines), verdict)
     return send_ntfy(
         title,

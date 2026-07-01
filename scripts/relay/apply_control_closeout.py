@@ -284,6 +284,18 @@ def patch_evidence_chapter_status(repo: Path, spec: CloseoutSpec) -> None:
             changed = True
     if changed:
         path.write_text(text, encoding="utf-8")
+    if str(spec.chapter_status or "").strip().upper() == "COMPLETE":
+        try:
+            from scripts.sop_discovery_core import stamp_evidence_archived_frontmatter
+
+            stamp_evidence_archived_frontmatter(
+                repo,
+                spec.evidence_doc,
+                chapter_id=spec.chapter_id,
+                closed_date=spec.closed_date,
+            )
+        except Exception:
+            pass
 
 
 def build_continuity_brief_md(
@@ -391,6 +403,16 @@ def apply_control_closeout(
     phase_plan_path: str | None = None,
 ) -> dict[str, Any]:
     repo = repo_root.resolve()
+    from scripts.sop_discovery_core import validate_closeout_spec_docs
+
+    doc_errors = validate_closeout_spec_docs(repo, closeout)
+    if doc_errors:
+        return {
+            "job": "apply_control_closeout_v1",
+            "passed": False,
+            "doc_validation_errors": doc_errors,
+            "generated_at": _iso_now(),
+        }
     if phase_plan_path:
         try:
             from scripts.relay.ensure_evidence_doc_stub import ensure_evidence_doc_stub

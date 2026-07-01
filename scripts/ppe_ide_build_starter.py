@@ -259,6 +259,47 @@ def write_starter(repo: Path, *, slice_id: str, phase_plan: str) -> Path:
     return out
 
 
+def regenerate_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
+    """Write IDE BUILD starters for pending product slices when a plan is READY."""
+    from scripts.ppe_ide_product_ready import completed_product_slice_ids
+    from scripts.ppe_slice_worker_mode import infer_slice_kind
+
+    norm = phase_plan.replace("\\", "/").strip()
+    if not norm:
+        return []
+    try:
+        from scripts.ppe_queue_health import chapter_marked_complete_in_repo
+
+        if chapter_marked_complete_in_repo(repo, norm):
+            return []
+    except ImportError:
+        pass
+    try:
+        plan = load_phase_plan(repo, norm)
+    except (FileNotFoundError, OSError):
+        return []
+
+    completed = completed_product_slice_ids(repo, plan_path=norm)
+    written: list[str] = []
+    for sl in plan.get("slices") or []:
+        if not isinstance(sl, dict):
+            continue
+        sid = str(sl.get("sliceId") or "").strip()
+        if not sid or infer_slice_kind(sid, sl) != "product":
+            continue
+        if sid in completed:
+            continue
+        try:
+            write_starter(repo, slice_id=sid, phase_plan=norm)
+            written.append(sid)
+        except Exception as exc:
+            print(
+                f"ppe_ide_build_starter: regenerate skip {sid}: {exc}",
+                file=sys.stderr,
+            )
+    return written
+
+
 def prune_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
     norm_plan = phase_plan.replace("\\", "/").strip()
     if not norm_plan:

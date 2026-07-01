@@ -848,12 +848,28 @@ def _write_notify_payload(repo: Path, status: dict[str, Any]) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     verdict = str(status.get("verdict") or "")
     body = append_ppe_go_hint(str(status.get("blocker") or _format_brief(status)), verdict, repo=repo)
+    resolve_hint: str | None = None
+    if verdict == VERDICT_IDE_BUILD:
+        try:
+            from scripts.sop_discovery_core import format_notify_resolve_hint
+
+            chapter_mode = status.get("chapter_mode") or {}
+            resolve_hint = format_notify_resolve_hint(
+                repo,
+                plan_path=str(status.get("phase_plan_path") or "") or None,
+                next_build_candidate=str(chapter_mode.get("next_build_candidate") or "") or None,
+            )
+            if resolve_hint:
+                body = f"{body}\n{resolve_hint}"
+        except Exception:
+            pass
     payload = {
         "as_of": status.get("as_of"),
         "verdict": status.get("verdict"),
         "exit_code": status.get("exit_code"),
         "title": f"PPE operator: {status.get('verdict')}",
         "body": body,
+        "resolve_hint": resolve_hint,
     }
     out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return out
