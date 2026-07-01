@@ -1134,6 +1134,18 @@ def dispatch_codebase_health_report(runtime: Runtime, baseline_branch: Optional[
             _, ci_code = _run_git(repo, ["check-ignore", "-q", "orchestrator/relay.py"])
             orchestrator_status["gitignored"] = ci_code == 0
 
+    known_unresolved = [p for p in untracked_paths if not _looks_like_artifact(p)]
+    structural: dict[str, Any] = {}
+    try:
+        from scripts.ppe_structural_health import structural_health_block
+
+        structural = structural_health_block(
+            repo,
+            untracked_non_artifact=len(known_unresolved),
+        )
+    except Exception as exc:
+        structural = {"error": str(exc), "warnings": [], "metrics": {}}
+
     report = {
         "protocol": PROTOCOL,
         "job": JOB_HEALTH,
@@ -1149,9 +1161,8 @@ def dispatch_codebase_health_report(runtime: Runtime, baseline_branch: Optional[
         },
         "canonical_docs_present": canonical_present,
         "orchestrator_status": orchestrator_status,
-        "known_unresolved_items": [
-            p for p in untracked_paths if not _looks_like_artifact(p)
-        ],
+        "known_unresolved_items": known_unresolved,
+        "structural_health": structural,
         "generated_at": _iso_now(),
     }
 

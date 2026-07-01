@@ -179,6 +179,30 @@ class TestPpeQueueHealth(unittest.TestCase):
             chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/pending_slices.json")
         )
 
+    def test_recurring_chapter_never_marked_permanently_complete(self) -> None:
+        evidence = self.repo / "docs" / "SOP" / "RECURRING_EVIDENCE.md"
+        evidence.write_text(
+            "# Evidence\n\n**Status:** **COMPLETE** 2026-06-30\n",
+            encoding="utf-8",
+        )
+        plan = {
+            "name": "recurring",
+            "slices": [
+                {
+                    "sliceId": "R-Closeout",
+                    "closeout": {
+                        "recurring": True,
+                        "evidenceDoc": "docs/SOP/RECURRING_EVIDENCE.md",
+                    },
+                }
+            ],
+        }
+        plan_path = self.repo / "docs" / "SOP" / "PHASE_PLANS" / "recurring.json"
+        plan_path.write_text(json.dumps(plan), encoding="utf-8")
+        self.assertFalse(
+            chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/recurring.json")
+        )
+
     def test_audit_roadmap_detects_backlog_vocabulary(self) -> None:
         roadmap = {
             "version": 1,
