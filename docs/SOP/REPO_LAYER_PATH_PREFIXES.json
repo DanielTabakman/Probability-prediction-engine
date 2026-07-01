@@ -416,6 +416,7 @@
         "tests/test_resolve_sop.py",
         "tests/test_validate_sop_links.py",
         "tests/test_ppe_ide_build_starter_doc_resolve.py",
+        "tests/test_ppe_ide_build_starter_freshness.py",
         "tests/test_sop_topic_coverage.py",
         "tests/test_sop_discovery_maintenance.py",
         "tests/test_closeout_doc_validation.py",
