@@ -5,7 +5,7 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 
@@ -50,7 +50,9 @@ Also skip when thread role is charter / explore / neutral (see thread-roles). Sk
 
 ## Operator reply format (mandatory)
 
-After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist.
+After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md).
+
+**Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions).
 
 **Never:**
 
@@ -59,7 +61,9 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 - **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-ship.mdc`](auto-ship.mdc)); do not punt to the operator.
 - Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
 
-**Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**
+**Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default founder line: **"Nothing required from you."**
+
+**Never paste** [`OPERATING_CALENDAR_V1.md`](docs/SOP/OPERATING_CALENDAR_V1.md) or [`HUMAN_STEWARD_BACKLOG.md`](docs/SOP/HUMAN_STEWARD_BACKLOG.md) as end-of-reply todos unless the user opened a steward/charter pass for that purpose.
 
 **VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
 

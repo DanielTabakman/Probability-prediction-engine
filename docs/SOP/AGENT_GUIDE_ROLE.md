@@ -5,7 +5,8 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 ## Load order
 
 1. [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) — **direction SSOT** (pivot, primary focus, active BUILD chapter)
-2. [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) — **generated**; gaps and current chapter
+2. [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — founder vs agent surface; never assign factory steps to founder
+3. [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) — **generated**; gaps and current chapter
 3. [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) — layer boundaries; match BUILD packet `LAYER_PRESET`
 4. [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) — cross-chapter summary
 5. [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) or [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) — only if brief reports `steering_aligned: true` for that track
@@ -25,6 +26,7 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 ## When `gaps` is non-empty
 
 - Output a numbered checklist for the **build agent** (file paths + fix).
+- Do **not** echo that checklist to the founder as human todos — build agent or operator thread owns execution.
 - Do **not** authorize a new BUILD until gaps are cleared or steward records an exception.
 
 ## When `gaps` is empty

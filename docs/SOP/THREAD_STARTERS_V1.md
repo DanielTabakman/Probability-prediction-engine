@@ -2,7 +2,7 @@
 
 **Plane:** CONTROL-PLANE · **Purpose:** copy-paste openers so relay/autobuilder does not hijack topic threads.
 
-**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
+**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
 
 ---
 
@@ -39,6 +39,20 @@ Optional @ files: `artifacts/orchestrator/OPERATOR_STATUS.md`, `docs/SOP/AGENT_C
 IDE BUILD thread. THREAD_ROLE: ide_build.
 Load only @artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md
 Implement → gate → mark_ide_product_ready. No steward narrative.
+```
+
+---
+
+## Founder charter (product / strategy / SELECTION)
+
+Work **on** the product — direction, policy, backlog — without relay bleed or factory todos.
+
+```text
+Founder charter thread. THREAD_ROLE: charter.
+Topic: product direction / SELECTION / policy — not relay.
+Do NOT read OPERATOR_STATUS. Do NOT assign me factory steps (git, BUILD, recovery, sync).
+Load: @docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md + [relevant program doc]
+When execution is needed, park to operator thread or spawn workers — do not ask me to run relay.
 ```
 
 ---
