@@ -88,6 +88,27 @@ def run_operator_doctor(
     except Exception as exc:
         report["blind_spots_error"] = str(exc)
 
+    try:
+        from scripts.ppe_coordination_check import (
+            assess_coordination_check,
+            write_coordination_check,
+        )
+
+        coordination = assess_coordination_check(repo, status)
+        if write_artifacts:
+            write_coordination_check(repo, coordination)
+        report["coordination_check"] = coordination
+        report["checks"].append(
+            {
+                "id": "coordination",
+                "ok": not coordination.get("blocks_burst"),
+                "verdict": coordination.get("verdict"),
+                "detail": coordination.get("summary"),
+            }
+        )
+    except Exception as exc:
+        report["coordination_check_error"] = str(exc)
+
     high = [
         i
         for i in (report.get("blind_spots") or {}).get("issues") or []
@@ -107,6 +128,11 @@ def format_doctor_report(report: dict[str, Any]) -> str:
     line = blind.get("operator_health_line")
     if line:
         lines.append(str(line))
+    coord = report.get("coordination_check") if isinstance(report.get("coordination_check"), dict) else {}
+    if coord:
+        lines.append(
+            f"Coordination: {coord.get('verdict')} — {coord.get('summary')}"
+        )
     lines.append("")
     for check in report.get("checks") or []:
         if not isinstance(check, dict):

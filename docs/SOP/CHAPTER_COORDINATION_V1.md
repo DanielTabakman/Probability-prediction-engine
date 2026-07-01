@@ -33,7 +33,7 @@ When product lands on `main` **outside** the relay (or ahead of witness slices),
 When product code for a relay chapter is already on `main`:
 
 1. **Do not re-BUILD product** — witness/closeout slices only.
-2. **Write IDE marker** for every product slice on `main`:
+2. **Write IDE marker** for every product slice on `main` (v2 `planMarkers` in `IDE_PRODUCT_READY.json` holds one entry per phase plan):
    ```bat
    mark_ide_product_ready.cmd <sliceId> docs/SOP/PHASE_PLANS/<chapter>_relay.json
    ```

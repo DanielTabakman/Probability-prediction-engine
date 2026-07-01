@@ -548,6 +548,20 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
         status["operator_health_line"] = blind.get("operator_health_line")
     except Exception:
         pass
+
+    try:
+        from scripts.ppe_coordination_check import (
+            assess_coordination_check,
+            format_status_lines,
+            write_coordination_check,
+        )
+
+        coordination = assess_coordination_check(repo, status)
+        write_coordination_check(repo, coordination)
+        status["coordination_check"] = coordination
+        status["coordination_status_lines"] = format_status_lines(coordination)
+    except Exception:
+        pass
     return status
 
 
@@ -726,6 +740,12 @@ def _format_human(
             lines.extend(format_blind_spot_lines(blind))
         except Exception:
             pass
+
+    coord_lines = status.get("coordination_status_lines") or []
+    if coord_lines:
+        lines.append("")
+        for line in coord_lines:
+            lines.append(line)
 
     lines.extend(
         [

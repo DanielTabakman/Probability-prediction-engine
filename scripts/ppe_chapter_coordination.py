@@ -70,14 +70,12 @@ def _frontier_claims_chapter_complete(repo: Path, chapter_id: str) -> bool:
     )
     if pattern.search(body):
         return True
-    # Alternate: chapter id in backticks near COMPLETE header within ~400 chars
-    idx = body.lower().find(title_token)
-    if idx < 0:
-        idx = body.lower().find(chapter_id.lower())
-    if idx < 0:
-        return False
-    window = body[max(0, idx - 80) : idx + 400]
-    return bool(re.search(r"\*\*COMPLETE\*\*", window, re.I))
+    # Backtick chapter id on same line as a ### header only (avoid table-row false positives).
+    backtick_pat = re.compile(
+        rf"^###[^\n]*`{re.escape(chapter_id)}`[^\n]*\*\*COMPLETE\*\*",
+        re.I | re.M,
+    )
+    return bool(backtick_pat.search(body))
 
 
 def _product_slice_ids(repo: Path, plan_path: str) -> list[str]:

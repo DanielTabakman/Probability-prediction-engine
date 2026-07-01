@@ -35,6 +35,66 @@ def load_marker(repo: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
+def _norm_plan(path: str) -> str:
+    return path.replace("\\", "/").strip()
+
+
+def _plan_markers_map(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Per-plan marker entries (v2 planMarkers + legacy single-plan fields)."""
+    out: dict[str, dict[str, Any]] = {}
+    raw = data.get("planMarkers")
+    if isinstance(raw, dict):
+        for key, val in raw.items():
+            if isinstance(val, dict):
+                out[_norm_plan(str(key))] = dict(val)
+    legacy_plan = _norm_plan(str(data.get("phasePlanPath") or ""))
+    if not legacy_plan:
+        return out
+    completed: list[str] = []
+    for sid in data.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s and s not in completed:
+            completed.append(s)
+    legacy_sid = str(data.get("sliceId") or "").strip()
+    if legacy_sid and legacy_sid not in completed:
+        completed.append(legacy_sid)
+    if not completed and legacy_plan not in out:
+        return out
+    entry = dict(out.get(legacy_plan) or {})
+    merged: list[str] = []
+    for sid in entry.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s and s not in merged:
+            merged.append(s)
+    for sid in completed:
+        if sid not in merged:
+            merged.append(sid)
+    entry["completedProductSlices"] = merged
+    for field in ("buildBranch", "commitSha", "markedAt"):
+        if field in data and field not in entry:
+            entry[field] = data[field]
+    if legacy_sid:
+        entry["sliceId"] = legacy_sid
+    out[legacy_plan] = entry
+    return out
+
+
+def _completed_slices_for_plan(data: dict[str, Any], plan_path: str) -> set[str]:
+    norm = _norm_plan(plan_path)
+    entry = _plan_markers_map(data).get(norm)
+    if not entry:
+        return set()
+    completed: set[str] = set()
+    for sid in entry.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s:
+            completed.add(s)
+    legacy = str(entry.get("sliceId") or "").strip()
+    if legacy:
+        completed.add(legacy)
+    return completed
+
+
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         ["git", *args],
@@ -122,26 +182,38 @@ def write_marker(
 ) -> Path:
     p = marker_path(repo)
     p.parent.mkdir(parents=True, exist_ok=True)
-    norm_plan = phase_plan_path.replace("\\", "/").strip()
-    prior = load_marker(repo) or {}
+    norm_plan = _norm_plan(phase_plan_path)
+    data = load_marker(repo) or {}
+    markers = _plan_markers_map(data)
+    entry = dict(markers.get(norm_plan) or {})
     completed: list[str] = []
-    if str(prior.get("phasePlanPath") or "").replace("\\", "/").strip() == norm_plan:
-        for sid in prior.get("completedProductSlices") or []:
-            s = str(sid or "").strip()
-            if s and s not in completed:
-                completed.append(s)
-        legacy = str(prior.get("sliceId") or "").strip()
-        if legacy and legacy not in completed:
-            completed.append(legacy)
+    for sid in entry.get("completedProductSlices") or []:
+        s = str(sid or "").strip()
+        if s and s not in completed:
+            completed.append(s)
+    legacy = str(entry.get("sliceId") or "").strip()
+    if legacy and legacy not in completed:
+        completed.append(legacy)
     if slice_id not in completed:
         completed.append(slice_id)
-    payload = {
+    marked_at = _utc_now()
+    plan_entry = {
+        "completedProductSlices": completed,
+        "buildBranch": build_branch,
+        "commitSha": commit_sha,
+        "markedAt": marked_at,
+        "sliceId": slice_id,
+    }
+    markers[norm_plan] = plan_entry
+    payload: dict[str, Any] = {
+        "version": 2,
+        "planMarkers": markers,
         "phasePlanPath": norm_plan,
         "sliceId": slice_id,
         "completedProductSlices": completed,
         "buildBranch": build_branch,
         "commitSha": commit_sha,
-        "markedAt": _utc_now(),
+        "markedAt": marked_at,
     }
     p.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return p
@@ -224,40 +296,16 @@ def marker_covers_product_slices(
     data = load_marker(repo)
     if not data:
         return False
-    norm_plan = plan_path.replace("\\", "/").strip()
-    if str(data.get("phasePlanPath") or "").replace("\\", "/").strip() != norm_plan:
-        return False
-    branch = str(data.get("buildBranch") or "").strip()
-    if not branch or not _branch_has_commits(repo, build_branch=branch):
-        return False
-    completed: set[str] = set()
-    for sid in data.get("completedProductSlices") or []:
-        s = str(sid or "").strip()
-        if s:
-            completed.add(s)
-    legacy = str(data.get("sliceId") or "").strip()
-    if legacy:
-        completed.add(legacy)
+    completed = _completed_slices_for_plan(data, plan_path)
     return all(sid in completed for sid in product_slice_ids)
 
 
 def completed_product_slice_ids(repo: Path, *, plan_path: str) -> set[str]:
     """Product slices already marked ready for this phase plan."""
-    norm_plan = plan_path.replace("\\", "/").strip()
     data = load_marker(repo)
     if not data:
         return set()
-    if str(data.get("phasePlanPath") or "").replace("\\", "/").strip() != norm_plan:
-        return set()
-    completed: set[str] = set()
-    for sid in data.get("completedProductSlices") or []:
-        s = str(sid or "").strip()
-        if s:
-            completed.add(s)
-    legacy = str(data.get("sliceId") or "").strip()
-    if legacy:
-        completed.add(legacy)
-    return completed
+    return _completed_slices_for_plan(data, plan_path)
 
 
 def next_pending_product_slice(repo: Path, *, plan_path: str) -> str | None:

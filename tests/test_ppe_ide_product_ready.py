@@ -83,6 +83,41 @@ class TestPpeIdeProductReady(unittest.TestCase):
 
     @patch("scripts.ppe_ide_product_ready._branch_has_commits", return_value=True)
     @patch("scripts.ppe_ide_product_ready._git")
+    def test_multi_plan_markers_preserved(self, mock_git: object, *_m: object) -> None:
+        mock_git.return_value = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="abc123\n", stderr=""
+        )
+        plan_a = "docs/SOP/PHASE_PLANS/plan_a_relay.json"
+        plan_b = "docs/SOP/PHASE_PLANS/plan_b_relay.json"
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "plan_a_relay.json").write_text(
+            json.dumps(
+                {
+                    "slices": [
+                        {"sliceId": "A-Product-Slice001", "buildBranch": "main"},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "plan_b_relay.json").write_text(
+            json.dumps(
+                {
+                    "slices": [
+                        {"sliceId": "B-Product-Slice001", "buildBranch": "main"},
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        mark_product_ready(self.repo, slice_id="A-Product-Slice001", plan_path=plan_a)
+        mark_product_ready(self.repo, slice_id="B-Product-Slice001", plan_path=plan_b)
+        from scripts.ppe_ide_product_ready import completed_product_slice_ids
+
+        self.assertIn("A-Product-Slice001", completed_product_slice_ids(self.repo, plan_path=plan_a))
+        self.assertIn("B-Product-Slice001", completed_product_slice_ids(self.repo, plan_path=plan_b))
+
+    @patch("scripts.ppe_ide_product_ready._branch_has_commits", return_value=True)
+    @patch("scripts.ppe_ide_product_ready._git")
     def test_mark_releases_matching_worker_lease(self, mock_git: object, *_m: object) -> None:
         from scripts.ppe_worker_lease import acquire_lease, load_lease
 

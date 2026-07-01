@@ -23,23 +23,11 @@ def _norm_plan(path: str) -> str:
 
 def _ide_marker_completed_slices(repo: Path, plan_path: str) -> set[str]:
     """Product slices marked IDE-ready for this plan (skip re-run in relay batch)."""
-    norm = _norm_plan(plan_path)
     try:
-        from scripts.ppe_ide_product_ready import load_marker
+        from scripts.ppe_ide_product_ready import completed_product_slice_ids
     except ImportError:
         return set()
-    marker = load_marker(repo)
-    if not marker:
-        return set()
-    marker_plan = _norm_plan(str(marker.get("phasePlanPath") or ""))
-    if marker_plan and marker_plan != norm:
-        return set()
-    out: set[str] = set()
-    for sid in marker.get("completedProductSlices") or []:
-        s = str(sid or "").strip()
-        if s:
-            out.add(s)
-    return out
+    return completed_product_slice_ids(repo, plan_path=plan_path)
 
 
 def progress_path(repo: Path) -> Path:

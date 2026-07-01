@@ -188,6 +188,23 @@ def write_coordination_check(repo: Path, payload: dict[str, Any]) -> Path:
     return out
 
 
+def format_status_lines(payload: dict[str, Any]) -> list[str]:
+    """Lines for OPERATOR_STATUS.md coordination section."""
+    verdict = str(payload.get("verdict") or VERDICT_PROCEED)
+    summary = str(payload.get("summary") or "coordination ok")
+    lines = [f"**Coordination:** `{verdict}` — {summary}"]
+    if payload.get("blocks_burst"):
+        lines.append(
+            "  → Burst blocked — `@ppe-coordination-check` or "
+            "`python scripts/ppe_coordination_check.py --write` before BUILD"
+        )
+    elif verdict == VERDICT_REPAIR:
+        lines.append("  → Safe repair available — run commands in COORDINATION_CHECK.json")
+    for cmd in (payload.get("commands") or [])[:2]:
+        lines.append(f"  → `{cmd}`")
+    return lines
+
+
 def format_agent_prompt(payload: dict[str, Any]) -> str:
     verdict = str(payload.get("verdict") or VERDICT_PROCEED)
     lines = [
