@@ -1,9 +1,19 @@
 {
   "asOf": "2026-06-30",
   "closeoutOnlyChapterIds": [
+    "msos_access_identity_v1",
+    "msos_entitlements_v1",
+    "msos_monitor_history_live_v1",
+    "msos_p3_command_center",
+    "msos_public_demo_launch_v1",
     "msos_storyboard_visual_parity_v1",
     "msos_strategy_lab_dist_download_v1",
-    "msos_trader_review_loop_v1"
+    "msos_strategy_lab_distribution_demo",
+    "msos_strategy_lab_embed_shell_v1",
+    "msos_trader_review_loop_v1",
+    "msos_workflow_persistence_v1",
+    "mvp1_distribution_stats_legibility",
+    "mvp1_snapshot_owner_v1"
   ],
   "docHints": {
     "nextBuildCandidate": {
