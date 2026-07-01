@@ -14,26 +14,31 @@
 
 ## Quick start — two machines
 
-| Machine | Your job |
-|---------|----------|
-| **Hyper-V VM** (24/7) | Nothing daily — loop runs itself. Triage: **`VM_STATUS.cmd`** · restart: **`VM_RESTART.cmd`** |
-| **Real daily PC** | **Only when ntfy says `IDE_BUILD`** — see below · normal relay: operator thread → **`what's next?`** |
+**Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — **runtime automation is SSOT**. Founder does **not** open Cursor threads or run relay for factory on a normal day.
 
-### When phone buzzes `IDE_BUILD` (product slice)
+| Machine | Normal day (automation) | Degraded only |
+|---------|------------------------|---------------|
+| **Hyper-V VM** (24/7) | Nothing — headless stack runs loop + watch + ntfy | `VM_RESTART.cmd` if stack down (agent or ntfy `restart`) |
+| **Real daily PC** | Nothing — `autoRemoteBuild` + postBuildWatcher dispatch BUILD and continue | See [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) § degraded |
 
-On your **real PC** (not the VM):
+### Default factory path (zero founder steps)
 
-1. Double-click **`DESKTOP BUILD`** (`DESKTOP_BUILD.cmd`).
-2. Open a **new** Cursor Agent chat.
-3. `@` the starter file from **`IDE_BUILD_NOW.md`** and send.
-4. Let the agent finish (gate → commit → closeout).
-5. After PR merges: **`DESKTOP CONTINUE`**.
+1. VM headless stack: loop + mobile watch + `watch_ide_build_local` ([`PPE_HEADLESS_STACK_V1.md`](PPE_HEADLESS_STACK_V1.md)).
+2. On `IDE_BUILD`: loop/watch calls headless Codex CLI (`autoRemoteBuild: true`, [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json)).
+3. Post-build watcher: mark ready → `run_ppe_local` → relay continues.
+4. Founder: optional ntfy read only — **no** Cursor, **no** paste, **no** `what's next?`
 
-The VM picks up relay automatically — you do **not** run `run_ppe_local` or fix the VM for product BUILD.
+Config reference: [`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md) · autobuilder: [`PPE_AUTOBUILDER_V1.md`](PPE_AUTOBUILDER_V1.md)
 
-**Normal relay:** operator thread → **`what's next?`** (agent reads status, burst plan, spawns workers).
+### Degraded — when automation fails (not daily process)
 
-**Emergency paste handoff:** `DESKTOP_BUILD_CLIPBOARD.cmd` or `ppe_go_clipboard.cmd` (copies prompt to clipboard — **Ctrl+V**).
+| Symptom | Agent / override path |
+|---------|-------------------------|
+| Headless BUILD blocked | `ppe_autobuilder.cmd advance` or ntfy `build` |
+| CLI quota / DEGRADED | IDE handoff — agent opens Cursor, not founder ritual |
+| Last resort | `DESKTOP BUILD` → agent thread with starter → `DESKTOP CONTINUE` after merge |
+
+**Do not** document degraded steps as the founder's normal job. Agents try autobuilder + ntfy + burst before any handoff.
 
 Monitor (optional): `.\scripts\watch_ppe_live.ps1`
 
@@ -54,19 +59,17 @@ Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`. Control/wi
 
 Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/ppe_director_go.py`](../../scripts/ppe_director_go.py).
 
-**Manual fallback** (operator thread):
+**Manual fallback (agent / degraded — not founder daily):**
 
 ```text
 what's next?
 ```
 
-Emergency clipboard paste (`ppe_go_clipboard.cmd`):
+Used when automation is blocked and an **agent** opens Cursor to execute burst. Founder does not run this as routine process.
 
-```text
-@ppe-director Director pass. Terminal loop running.
-```
+Emergency clipboard paste (`ppe_go_clipboard.cmd`) — agent recovery only.
 
-**After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then ask **`what's next?`** in operator thread.
+**After chapter closeout:** runtime + `post_relay_continue` update continuity brief; **no** founder thread ritual required.
 
 **Optional Automation (zero-click happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
 
@@ -190,15 +193,16 @@ Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` i
 
 ## Jump-in matrix
 
-| Signal | You do |
-|--------|--------|
-| Guard exit **7** / `PRODUCT_BLOCKED` | Operator thread → **`what's next?`** (emergency: `ppe_go_clipboard.cmd`) |
-| Relay exit **20** on control/smoke/witness | **Nothing** — auto-advance (see above) |
-| `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | Fix plan/spec; see guard report |
-| `SCOPE_AMBIGUITY` on product slice | Same as product blocked |
-| Queue idle, no `READY` | Add `queued` row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |
-| Test/smoke fail | Fix code or env; `run_ppe_local.cmd` |
-| Chapter closeout complete | New Cursor thread; [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only |
+| Signal | Founder | Automation / agent |
+|--------|---------|-------------------|
+| Guard exit **7** / `PRODUCT_BLOCKED` | **Nothing** (default) | `autoRemoteBuild` → Codex CLI; else autobuilder `advance` / ntfy `build` |
+| Relay exit **20** on control/smoke/witness | **Nothing** | Auto-advance |
+| `IDE_BUILD` with stack healthy | **Nothing** | Headless BUILD + postBuildWatcher |
+| `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | **Nothing** | Agent fixes plan/spec |
+| Headless DEGRADED / CLI blocked | **Nothing** unless agent escalates | Agent IDE handoff or `@ppe-director` |
+| Queue idle, no `READY` | **Decision** if SELECTION needed | Agent queues after founder direction |
+| Test/smoke fail | **Nothing** | Agent fixes; `run_ppe_local` via loop |
+| Chapter closeout complete | **Nothing** | Loop + closeout jobs continue |
 
 ---
 

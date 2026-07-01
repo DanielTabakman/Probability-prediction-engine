@@ -2,7 +2,7 @@
 
 **Purpose:** Documented or implied capability **not yet real** and **not in active relay**. Inventory only — steward SELECTION owns BUILD. See [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) for chartered modules.
 
-**Last sync:** `2026-07-01T20:28:54Z` · **Open:** 11 · **Closed (history):** 0
+**Last sync:** `2026-07-01T20:33:41Z` · **Open:** 11 · **Closed (history):** 0
 
 **Refresh:** `python scripts/ppe_vapor_registry.py --sync` · **Dashboard:** [`assets/msos_module_map.html`](assets/msos_module_map.html) (Product vapor panel)
 
