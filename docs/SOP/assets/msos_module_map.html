@@ -318,6 +318,7 @@
       .archive-hint { color: var(--violet); font-weight: 600; }
       .last-updated time { font-weight: 600; }
       .crack-panel { border: 1px solid rgba(242, 182, 87, 0.45); }
+      .vapor-panel { border: 1px solid rgba(160, 140, 220, 0.45); }
       .progress-panel { border: 1px solid var(--line); max-width: 52rem; overflow-x: auto; }
       .compass-empty { margin: 0; font-size: 0.84rem; color: var(--muted); }
       .compass-src { color: var(--muted); font-style: normal; font-size: 0.72rem; }
@@ -476,8 +477,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-01T19:47:52Z">
-        Last updated: 2026-07-01 <time datetime="2026-07-01T19:47:52Z">15:47 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-01T20:28:57Z">
+        Last updated: 2026-07-01 <time datetime="2026-07-01T20:28:57Z">16:28 EDT</time>
       </span>
     </p>
 
@@ -500,6 +501,7 @@
         · <a href="#autobuilder">Autobuilder</a>
         · <a href="#research-pipeline">Research pipeline</a>
         · <a href="../HUMAN_STEWARD_BACKLOG.md">Steward backlog</a>
+        · <a href="../PRODUCT_VAPOR_REGISTRY.md">Product vapor</a>
       </span>
     </div>
 
@@ -546,6 +548,60 @@
         <li>
           <strong>Asset wave queued — ppe_equity_universe_tier1b_v1</strong>
           <span class="why">Next group after current batch: TSLA, AMD, AAPL, MSFT, AMZN <em class="compass-src">(assets_tier1_manifest)</em></span>
+        </li>
+      </ul>
+    </div>
+
+    <h2>Product vapor (not in active relay)</h2>
+    <p class="flow-intro">
+      Documented or implied capability not yet real — auto-synced from registry, vision docs, and UI fixtures.
+      Not a BUILD queue. Full list: <a href="../PRODUCT_VAPOR_REGISTRY.md">PRODUCT_VAPOR_REGISTRY.md</a>
+    </p>
+    <div class="op-section vapor-panel" id="map-vapor-backlog">
+      <ul>
+        <li>
+          <strong>Module class — POSITIONING</strong>
+          <span class="why">Where is leverage / positioning concentrated? · registry: *(planned)* <em class="compass-src">(module_registry)</em></span>
+        </li>
+        <li>
+          <strong>Module class — REPLAY</strong>
+          <span class="why">How did implied structure **evolve** over time? · registry: *(horizon replay — planned)* <em class="compass-src">(module_registry)</em></span>
+        </li>
+        <li>
+          <strong>Forward consistency — demo payload fallback</strong>
+          <span class="why">Route may serve DEMO_FORWARD_CONSISTENCY when live API unavailable <em class="compass-src">(ui_fixture)</em></span>
+        </li>
+        <li>
+          <strong>Strategy Lab — sample mode banner</strong>
+          <span class="why">StrategyLabClientShell falls back to demo/sample pill when live PPE fetch fails <em class="compass-src">(ui_fixture)</em></span>
+        </li>
+        <li>
+          <strong>Trader learning spine — usage gap</strong>
+          <span class="why">No frozen evaluations saved — save→review loop not exercised in production yet <em class="compass-src">(trader_outcomes)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 2 — Expression Search</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 3 — Hedging</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 4 — Scenario Planning</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 5 — Timing</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 6 — Monitoring</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
+        </li>
+        <li>
+          <strong>Interaction mode 7 — Learning / Review</strong>
+          <span class="why">Vision/ontology only — not current BUILD scope until trader workflow research + SELECTION <em class="compass-src">(interaction_modes_vision)</em></span>
         </li>
       </ul>
     </div>

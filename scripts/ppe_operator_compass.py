@@ -17,6 +17,8 @@ if str(_REPO) not in sys.path:
 
 from scripts.ppe_human_backlog import open_items
 from scripts.ppe_loop_host_guard import loop_host_start_allowed
+from scripts.ppe_vapor_registry import compass_items as vapor_compass_items
+from scripts.ppe_vapor_registry import sync_registry as sync_vapor_registry
 
 COMPASS_REL = "artifacts/control_plane/OPERATOR_COMPASS.json"
 MAP_REL = "docs/SOP/assets/msos_module_map.html"
@@ -32,6 +34,7 @@ MARKER_DO_NOW = 'id="map-do-now"'
 MARKER_CRACK = 'id="map-crack-catcher"'
 MARKER_PROGRESS = 'id="map-module-progress"'
 MARKER_WAITING = 'id="map-waiting-on-time"'
+MARKER_VAPOR = 'id="map-vapor-backlog"'
 MARKER_RIGHT_NOW = 'id="map-right-now"'
 MARKER_LAST_UPDATED = 'id="map-last-updated"'
 
@@ -406,6 +409,7 @@ def build_compass(repo: Path, status: dict[str, Any] | None = None) -> dict[str,
         "as_of_et": f"{date_et} {time_et}",
         "do_now": do_now,
         "crack_catcher": _crack_catcher_items(repo, status)[:12],
+        "vapor_backlog": vapor_compass_items(repo, limit=12),
         "module_progress": _parse_module_registry(repo),
         "right_now": _right_now(repo, status),
         "sources": {
@@ -524,6 +528,11 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
         empty="No crack-catcher signals right now.",
         ordered=False,
     )
+    vapor_inner = _render_list_section(
+        compass.get("vapor_backlog") or [],
+        empty="No open vapor items — run ppe_vapor_registry.py --sync or check PRODUCT_VAPOR_REGISTRY.md.",
+        ordered=False,
+    )
     progress_inner = _render_module_progress(compass.get("module_progress") or [])
 
     waiting_items = [
@@ -542,6 +551,7 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
 
     html = _replace_div_inner(html, "map-do-now", do_now_inner.rstrip())
     html = _replace_div_inner(html, "map-crack-catcher", crack_inner.rstrip())
+    html = _replace_div_inner(html, "map-vapor-backlog", vapor_inner.rstrip())
     html = _replace_div_inner(html, "map-module-progress", progress_inner.rstrip())
     html = _replace_div_inner(html, "map-waiting-on-time", waiting_inner.rstrip())
 
@@ -581,6 +591,10 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
 
 
 def sync_compass(repo: Path, *, status: dict[str, Any] | None = None, patch_map: bool = True) -> dict[str, Any]:
+    try:
+        sync_vapor_registry(repo)
+    except OSError as exc:
+        print(f"ppe_operator_compass: vapor sync skipped ({exc})", file=sys.stderr)
     compass = build_compass(repo, status=status)
     write_compass_json(repo, compass)
     if patch_map:

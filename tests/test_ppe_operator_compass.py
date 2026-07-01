@@ -88,6 +88,7 @@ def test_module_map_has_compass_sections() -> None:
     for marker in (
         'id="map-do-now"',
         'id="map-crack-catcher"',
+        'id="map-vapor-backlog"',
         'id="map-module-progress"',
         'id="map-waiting-on-time"',
     ):
