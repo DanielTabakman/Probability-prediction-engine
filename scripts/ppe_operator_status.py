@@ -378,15 +378,22 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     status = collect_operator_status(repo)
     status = enrich_operator_status_with_vm_trust(repo, status)
     try:
-        from scripts.ppe_operator_stuck_run_local import ensure_stuck_watch_daemon, maybe_auto_recover_run_local
+        from scripts.ppe_operator_stuck_run_local import (
+            ensure_stuck_watch_daemon,
+            maybe_auto_recover_run_local,
+            stuck_automation_enabled,
+            stuck_watch_enabled,
+        )
 
-        recovery = maybe_auto_recover_run_local(repo, status=status, source="operator_status")
-        if recovery:
-            status["run_local_recovery"] = recovery
-            if recovery.get("recovered"):
-                status = enrich_operator_status_with_vm_trust(repo, collect_operator_status(repo))
+        if stuck_automation_enabled(repo):
+            recovery = maybe_auto_recover_run_local(repo, status=status, source="operator_status")
+            if recovery:
                 status["run_local_recovery"] = recovery
-        ensure_stuck_watch_daemon(repo)
+                if recovery.get("recovered"):
+                    status = enrich_operator_status_with_vm_trust(repo, collect_operator_status(repo))
+                    status["run_local_recovery"] = recovery
+        if stuck_watch_enabled():
+            ensure_stuck_watch_daemon(repo)
     except Exception:
         pass
     return status

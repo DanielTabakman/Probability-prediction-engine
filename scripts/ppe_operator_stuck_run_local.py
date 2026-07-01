@@ -143,6 +143,31 @@ def _is_loop_host(repo: Path) -> bool:
         return bool(os.environ.get("PPE_LOOP_HOST", "").strip())
 
 
+def _env_truthy(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in ("1", "true", "yes", "on")
+
+
+def _recovery_disabled_by_env() -> bool:
+    raw = os.environ.get("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", "").strip().lower()
+    return raw in ("1", "true", "yes", "off")
+
+
+def stuck_automation_enabled(repo: Path) -> bool:
+    """Auto-recovery: VM loop host by default; desktop only when explicitly opted in."""
+    if _recovery_disabled_by_env():
+        return False
+    if _is_loop_host(repo):
+        return True
+    return _env_truthy("PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY") or _env_truthy("PPE_STUCK_RUN_LOCAL_WATCH")
+
+
+def stuck_watch_enabled() -> bool:
+    """Detached desktop watch daemon — explicit opt-in only (never from status reads)."""
+    if _recovery_disabled_by_env():
+        return False
+    return _env_truthy("PPE_STUCK_RUN_LOCAL_WATCH")
+
+
 def _recover_on_loop_host(repo: Path, *, dry_run: bool) -> dict[str, Any]:
     from scripts.ppe_autobuilder import action_advance, action_run_local
 
@@ -243,12 +268,7 @@ def maybe_auto_recover_run_local(
 ) -> dict[str, Any] | None:
     """Rate-limited auto-recovery when RUN_LOCAL is stuck. Returns None when not applicable."""
     repo = repo.resolve()
-    if os.environ.get("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", "").strip().lower() in (
-        "1",
-        "true",
-        "yes",
-        "off",
-    ):
+    if not stuck_automation_enabled(repo):
         return None
 
     assessment = assess_stuck_run_local(repo, status, stuck_seconds=stuck_seconds)
@@ -296,9 +316,20 @@ def _watch_state_path(repo: Path) -> Path:
     return (repo / WATCH_STATE_REL).resolve()
 
 
-def ensure_stuck_watch_daemon(repo: Path, *, poll_seconds: int = DEFAULT_WATCH_POLL_SECONDS) -> dict[str, Any]:
+def ensure_stuck_watch_daemon(
+    repo: Path,
+    *,
+    poll_seconds: int = DEFAULT_WATCH_POLL_SECONDS,
+    explicit: bool = False,
+) -> dict[str, Any]:
     """Desktop: start detached stuck-RUN_LOCAL watcher if not already running."""
     repo = repo.resolve()
+    if not explicit and not stuck_watch_enabled():
+        return {"action": "stuck_watch", "skipped": True, "reason": "not_enabled"}
+    if explicit:
+        os.environ["PPE_STUCK_RUN_LOCAL_WATCH"] = "1"
+        os.environ["PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY"] = "1"
+        os.environ.pop("PPE_DISABLE_STUCK_RUN_LOCAL_RECOVERY", None)
     if _is_loop_host(repo):
         return {"action": "stuck_watch", "skipped": True, "reason": "loop_host"}
 
@@ -370,7 +401,7 @@ def main(argv: list[str] | None = None) -> int:
         return run_watch_daemon(repo)
 
     if args.ensure_watch:
-        out = ensure_stuck_watch_daemon(repo)
+        out = ensure_stuck_watch_daemon(repo, explicit=True)
         if args.json:
             print(json.dumps(out, indent=2))
         return 0
