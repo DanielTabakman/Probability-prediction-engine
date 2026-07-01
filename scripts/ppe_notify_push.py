@@ -67,6 +67,17 @@ def repo_root() -> Path:
     return Path(raw) if raw else Path.cwd()
 
 
+def _cmd_call_local_script(root: Path, path: Path) -> str:
+    """Build a cmd.exe `call` line that survives Windows quoting (avoid call \"abs\\path\")."""
+    try:
+        script = str(path.relative_to(root)).replace("/", "\\")
+    except ValueError:
+        script = str(path)
+    if " " in script:
+        return f'call "{script}"'
+    return f"call {script}"
+
+
 def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
     """Load PPE_* vars from local cmd wrappers when Python was not started via .cmd."""
     if os.environ.get("PPE_NTFY_TOPIC", "").strip():
@@ -78,7 +89,7 @@ def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
             continue
         try:
             proc = subprocess.run(
-                ["cmd", "/c", f'call "{path}" && set PPE'],
+                ["cmd", "/c", f"{_cmd_call_local_script(root, path)} && set PPE"],
                 cwd=root,
                 capture_output=True,
                 text=True,

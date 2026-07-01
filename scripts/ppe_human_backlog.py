@@ -86,13 +86,14 @@ def render_markdown(repo: Path) -> str:
     lines = [
         "# Human steward backlog",
         "",
-        "**Purpose:** Policy and architecture topics too big for the auto-loop. "
-        "Work through these deliberately — not via `PHASE_CHAPTER_BACKLOG.json`.",
+        "**Purpose:** Policy and architecture topics for **founder** review — not auto-loop work. "
+        "See [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md). "
+        "Agents must not paste open items as founder todos in unrelated threads.",
         "",
         "| When | Action |",
         "|------|--------|",
-        "| **Weekly** (Monday digest) | Scan open **high** items — ntfy lists top titles |",
-        "| **Monthly** ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)) | Pick one item → `in_progress` |",
+        "| **Weekly** (Monday digest) | `digest-only` — ntfy lists top titles; no action unless founder opts in |",
+        "| **Monthly** ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)) | Founder charter pass — pick one item → `in_progress` |",
         "| **When done** | Set `status: done` + `closed` date in JSON; run `render-md` |",
         "",
         "**Machine source:** [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) · "

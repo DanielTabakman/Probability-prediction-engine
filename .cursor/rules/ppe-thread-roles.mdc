@@ -5,7 +5,7 @@ alwaysApply: false
 
 # PPE thread roles
 
-**Canon:** [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md) · [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md)
+**Canon:** [`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md) · [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](../../docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · [`CONTEXT_RULES.md`](../../docs/CONTEXT_RULES.md)
 
 ## Roles
 
@@ -35,7 +35,7 @@ alwaysApply: false
 
 **Charter** — any of:
 
-- `charter thread` / `topic thread` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
+- `charter thread` / `topic thread` / `founder charter` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
 - Explicit program-only load: e.g. "Load only `@docs/SOP/UX_EXECUTION_BACKLOG_V1.md`" with no operator @
 - Control-plane / agent-policy work scoped to `docs/SOP/`, `.cursor/rules/`, `scripts/` (no relay)
 
@@ -81,6 +81,7 @@ Do **not** end replies with operator noise unless the user asked about queue, br
 - No `RUN_LOCAL` / `DESKTOP_CONTINUE` / stash / checkout instructions
 - No "switch back to branch X" or stash pop playbooks
 - No summarizing `OPERATOR_STATUS` or next BUILD candidate
+- No [`OPERATING_CALENDAR_V1.md`](../../docs/SOP/OPERATING_CALENDAR_V1.md) or [`HUMAN_STEWARD_BACKLOG.md`](../../docs/SOP/HUMAN_STEWARD_BACKLOG.md) as founder todo lists — see [`FOUNDER_OPERATOR_SURFACE_V1.md`](../../docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md)
 
 **Instead:** finish the chartered answer; if relay or branch recovery is needed, one line: *"Operator thread: what's next?"* (or park in draft on context closeout).
 

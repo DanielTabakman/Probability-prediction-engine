@@ -178,6 +178,7 @@ def resolve_vm_trust(
     local_verdict: str,
     vm_brief: dict[str, Any] | None,
     vm_mirror: dict[str, Any] | None = None,
+    mirror_stale: bool = False,
 ) -> dict[str, Any]:
     """Decide whether desktop agents should wait, act, or trust VM in-flight work."""
     vm_phase = ""
@@ -192,9 +193,16 @@ def resolve_vm_trust(
 
     brief = vm_brief if isinstance(vm_brief, dict) else None
     parsed = (brief or {}).get("parsed") if isinstance((brief or {}).get("parsed"), dict) else None
-    if parsed:
-        vm_phase = vm_phase or str(parsed.get("phase") or "").strip()
-        vm_verdict = vm_verdict or str(parsed.get("verdict") or "").strip()
+    live_phase = str(parsed.get("phase") or "").strip() if parsed else ""
+    live_verdict = str(parsed.get("verdict") or "").strip() if parsed else ""
+    live_ok = bool(brief and brief.get("ok", True) and live_phase)
+    if live_ok and (mirror_stale or not vm_phase or live_phase != vm_phase or live_verdict != vm_verdict):
+        vm_phase = live_phase
+        vm_verdict = live_verdict
+        source = str(brief.get("source") or "ssh")
+    elif parsed:
+        vm_phase = vm_phase or live_phase
+        vm_verdict = vm_verdict or live_verdict
         if source == "none":
             source = str(brief.get("source") or "ssh")
 
