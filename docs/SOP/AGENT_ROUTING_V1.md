@@ -74,16 +74,28 @@ Before any relay command on desktop: `python scripts/ppe_loop_host_guard.py --ch
 
 ---
 
-## Founder-facing replies (`what's next?` and all threads)
+## Founder-facing replies (all threads)
 
-**SSOT:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md). Agents **run** factory work, then summarize — they do **not** delegate relay/git/recovery back to the founder.
+**SSOT:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · **Runtime automation is SSOT** on normal days. Agents **run** factory work, then summarize — they do **not** delegate relay/git/recovery back to the founder.
 
-| Founder does | Agent does |
-|--------------|------------|
-| Ask `what's next?` (or fresh operator thread after closeout) | Read status, burst plan, guard; execute or spawn `@ppe-director` workers |
-| Double-click **`DESKTOP BUILD`** / **`DESKTOP CONTINUE`** when phone ntfy says `IDE_BUILD` (outside agent thread) | `DESKTOP_CONTINUE.cmd`, `@ppe-director`, build/finish workers, gate, commit, mark ready |
+### Normal factory day
+
+| Founder | Automation / agent |
+|---------|-------------------|
+| **Nothing** (optional ntfy digest) | VM loop → autoRemoteBuild → postBuildWatcher → relay continues |
 | Strategic decisions when agent presents a **decision packet** | Direction pivots, sync, queue, evidence docs — after founder states intent |
-| Nothing else by default | Queue promotion, branch preflight, recovery, calendar `agent` rows — without asking |
+| External world (credentials, billing, live tester) | One-line **External action:** only |
+
+Do **not** tell the founder to open threads, paste starters, or run `what's next?` for factory on a normal day.
+
+### Degraded mode only
+
+| Founder (optional) | Agent |
+|--------------------|-------|
+| Double-click **`DESKTOP BUILD`** / **`DESKTOP CONTINUE`** when ntfy fires and no agent active | `@ppe-director`, build/finish workers, gate, commit, mark ready |
+| ntfy `build` / `fix` one-tap | autobuilder advance, operator thread, burst |
+
+Default reply: **Nothing required from you.**
 
 **Forbidden in all founder-facing replies:**
 
@@ -101,7 +113,7 @@ Before any relay command on desktop: `python scripts/ppe_loop_host_guard.py --ch
 
 **Example (good):**
 
-> **Verdict:** `IDE_BUILD` · FCR slice002 (VM SSOT). Burst spawned build worker. **You:** nothing. **Next:** worker ships slice → mark ready → `DESKTOP_CONTINUE`.
+> **Verdict:** `IDE_BUILD` · FCR slice002 (VM SSOT). autoRemoteBuild dispatched headless BUILD. **You:** nothing. **Next:** postBuildWatcher → relay continues.
 
 **Example (bad — do not send):**
 
@@ -177,7 +189,8 @@ Built-in Cursor skills (PR babysit, security review) are optional for generic ta
 | Steward + operator + BUILD in one thread | Separate threads per role |
 | Pasting `OPERATOR_STATUS` into charter threads | One-line pointer to operator thread |
 | Re-implementing product when `CLOSEOUT_ONLY` | Finish relay / `DESKTOP_CONTINUE` |
-| "What you should do" + relay cmds as operator steps | Agent auto-execute; founder: nothing / `what's next?` |
+| "What you should do" + relay cmds as founder steps | Agent auto-execute; founder: nothing ([`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md)) |
+| Telling founder to run `what's next?` as daily factory ritual | Runtime automation SSOT; Cursor chat is agent-initiated degraded mode only |
 | Calendar/backlog rows as founder todo lists | Tag per [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md); digest-only in ntfy |
 | Choice questions (`Want me to…?`) at end of reply | Decide per verdict; spawn workers; advance product |
 | Stale local status vs VM `IDE_BUILD` — ask operator | Trust VM; `@ppe-director` → build worker |

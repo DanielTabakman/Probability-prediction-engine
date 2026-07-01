@@ -6,24 +6,24 @@
 
 ---
 
-## Operator / autobuilder (relay + what's next)
+## Operator / autobuilder (agent-initiated — not founder daily ritual)
 
-Dedicated thread for queue, VM status, burst, and triage. Open **one** long-lived operator chat or a fresh thread when you want relay work.
+**Founder:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — runtime automation runs factory on normal days. **Agents** open operator threads when automation fails or burst is needed — **not** a founder homework ritual.
 
 ```text
 Operator thread. THREAD_ROLE: operator.
-Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
-Auto-execute — do not ask operator to choose paths or run relay commands.
+Agent-initiated (automation degraded). Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
+Auto-execute — do not ask founder to choose paths or run relay commands.
 Do not mix UX charter or SELECTION planning here.
 ```
 
-Minimal:
+Minimal (agent use when automation blocked):
 
 ```text
 what's next?
 ```
 
-After context closeout:
+After context closeout (agent):
 
 ```text
 what's next?

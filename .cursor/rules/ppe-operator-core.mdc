@@ -61,7 +61,7 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 - **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-ship.mdc`](auto-ship.mdc)); do not punt to the operator.
 - Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
 
-**Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default founder line: **"Nothing required from you."**
+**Founder manual surface (degraded only):** per [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) — runtime automation is SSOT; founder does **nothing** on a normal factory day. Optional last-resort: `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy fires and no agent is active. **Never** tell the founder to run `what's next?` or open factory threads as a daily ritual — operator threads are **agent-initiated** when automation fails. Default founder line: **"Nothing required from you."**
 
 **Never paste** [`OPERATING_CALENDAR_V1.md`](docs/SOP/OPERATING_CALENDAR_V1.md) or [`HUMAN_STEWARD_BACKLOG.md`](docs/SOP/HUMAN_STEWARD_BACKLOG.md) as end-of-reply todos unless the user opened a steward/charter pass for that purpose.
 
