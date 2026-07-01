@@ -492,9 +492,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.1 \u2014 SPY QQQ IWM (re-charter; registry enable pending)",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "DONE",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.1 \u2014 SPY QQQ IWM (re-charter)",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
