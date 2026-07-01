@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `d3313bd3` — Control-plane: dev changelog
 - `650b2a69` — control-plane: disable clipboard handoff by default (#1065) (`docs/SOP/`)
 - `c7afa4c6` — Control-plane: dev changelog
 - `fb2d9d51` — control-plane: multi-agent leases + no-commit-questions policy (#1058) (`docs/SOP/`)
