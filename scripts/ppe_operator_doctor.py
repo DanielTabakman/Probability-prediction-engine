@@ -101,7 +101,8 @@ def run_operator_doctor(
                 if not sop.get("index_fresh")
                 else (
                     f"evidence_backfill={sop.get('evidence_backfill_pending')}, "
-                    f"ready_starters={sop.get('ready_starter_regen_pending')}"
+                    f"ready_starters={sop.get('ready_starter_regen_pending')}, "
+                    f"stale_starters={sop.get('ready_starter_stale_pending')}"
                     if not sop.get("ok")
                     else None
                 ),

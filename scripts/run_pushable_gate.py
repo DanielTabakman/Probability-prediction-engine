@@ -451,6 +451,12 @@ def main(argv: list[str] | None = None) -> int:
             warn_if_coordination_needed(repo, files)
         except ImportError:
             pass
+        try:
+            from scripts.ppe_ide_build_starter import warn_if_stale_ready_starters
+
+            warn_if_stale_ready_starters(repo)
+        except ImportError:
+            pass
     if files:
         try:
             from scripts.ppe_delegation_envelope import classify_paths, current_branch, record_auto_notify

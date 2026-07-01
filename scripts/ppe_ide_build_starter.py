@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -19,6 +22,7 @@ PRESETS_REL = "docs/SOP/REPO_LAYER_PATH_PREFIXES.json"
 # Token budget (see docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 STARTER_LINE_TARGET = 65
 STARTER_LINE_ESCALATE = 80
+RESOLVE_FP_RE = re.compile(r"<!--\s*starter-resolve-fp:\s*([a-f0-9]{8,64})\s*-->")
 
 
 def _git_head(repo: Path) -> str | None:
@@ -132,6 +136,90 @@ def _compact_doc_resolve(repo: Path, phase_plan: str) -> str:
         return ""
 
 
+def doc_resolve_fingerprint_payload(repo: Path, phase_plan: str) -> dict[str, Any] | None:
+    """Stable payload for starter doc-resolve freshness (mirrors resolve_sop --chapter)."""
+    try:
+        from scripts.ppe_chapter_mode import plan_chapter_id
+        from scripts.sop_discovery_core import chapter_doc_bundle
+
+        norm = phase_plan.replace("\\", "/").strip()
+        cid = plan_chapter_id(norm)
+        bundle = chapter_doc_bundle(repo, chapter_id=cid, plan_path=norm)
+        build = [_norm_path(p) for p in (bundle.get("load_for_build") or []) if str(p).strip()]
+        skip = [_norm_path(p) for p in (bundle.get("do_not_load") or [])[:2] if str(p).strip()]
+        return {"chapter_id": cid, "load_for_build": build, "skip": skip}
+    except Exception:
+        return None
+
+
+def _norm_path(path: str) -> str:
+    return str(path or "").replace("\\", "/").strip()
+
+
+def doc_resolve_fingerprint(repo: Path, phase_plan: str) -> str | None:
+    payload = doc_resolve_fingerprint_payload(repo, phase_plan)
+    if not payload:
+        return None
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def format_resolve_fingerprint_line(fingerprint: str) -> str:
+    return f"<!-- starter-resolve-fp: {fingerprint} -->"
+
+
+def parse_starter_resolve_fingerprint(text: str) -> str | None:
+    match = RESOLVE_FP_RE.search(text or "")
+    return match.group(1) if match else None
+
+
+def extract_doc_resolve_block(text: str) -> str:
+    lines: list[str] = []
+    in_block = False
+    for line in (text or "").splitlines():
+        if line.startswith("**Doc resolve:**"):
+            in_block = True
+        elif in_block and line.startswith("**") and not line.startswith("**load") and not line.startswith("**skip"):
+            break
+        if in_block:
+            lines.append(line.rstrip())
+    return "\n".join(lines).strip()
+
+
+def starter_doc_resolve_stale(
+    repo: Path,
+    *,
+    slice_id: str,
+    phase_plan: str,
+    starter_text: str | None = None,
+) -> tuple[bool, str]:
+    """Return (stale, reason) for a starter's embedded doc-resolve bundle."""
+    expected_fp = doc_resolve_fingerprint(repo, phase_plan)
+    if not expected_fp:
+        return False, "no doc-resolve payload"
+    rel = starter_path(slice_id)
+    text = starter_text
+    if text is None:
+        path = repo / rel
+        if not path.is_file():
+            return False, "missing starter"
+        text = path.read_text(encoding="utf-8")
+    embedded_fp = parse_starter_resolve_fingerprint(text)
+    if embedded_fp:
+        if embedded_fp != expected_fp:
+            return True, "fingerprint mismatch"
+        return False, "fresh"
+    expected_block = _compact_doc_resolve(repo, phase_plan)
+    if not expected_block:
+        return False, "no doc-resolve block"
+    actual_block = extract_doc_resolve_block(text)
+    if not actual_block:
+        return True, "missing doc-resolve block"
+    if actual_block != expected_block:
+        return True, "doc-resolve block drift"
+    return False, "legacy block matches"
+
+
 def _compact_loads(*, touch: tuple[str, ...], sprint_path: str, phase_plan: str) -> str:
     paths: list[str] = []
     for p in touch[:5]:
@@ -227,6 +315,9 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
     doc_resolve = _compact_doc_resolve(repo, norm_plan)
     if doc_resolve:
         parts.insert(-2, doc_resolve)
+        fp = doc_resolve_fingerprint(repo, norm_plan)
+        if fp:
+            parts.insert(-2, format_resolve_fingerprint_line(fp))
         parts.insert(-2, "")
     parts.extend(
         [
@@ -302,7 +393,7 @@ def regenerate_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
 
 
 def plan_regen_ready_starters(repo: Path) -> dict[str, Any]:
-    """Plans IDE BUILD starter regen for READY queue rows missing starter files."""
+    """Plans IDE BUILD starter regen for READY queue rows (missing or stale doc-resolve)."""
     from scripts.ppe_ide_product_ready import next_pending_product_slice
     from scripts.ppe_queue import load_queue
 
@@ -311,7 +402,7 @@ def plan_regen_ready_starters(repo: Path) -> dict[str, Any]:
     try:
         queue = load_queue(repo)
     except (FileNotFoundError, OSError):
-        return {"pending_count": 0, "pending": []}
+        return {"pending_count": 0, "pending": [], "stale_count": 0, "missing_count": 0}
     for item in queue.get("items") or []:
         if not isinstance(item, dict):
             continue
@@ -327,10 +418,38 @@ def plan_regen_ready_starters(repo: Path) -> dict[str, Any]:
         if not slice_id:
             continue
         rel = starter_path(slice_id)
-        if (repo / rel).is_file():
+        path = repo / rel
+        if not path.is_file():
+            pending.append({"plan_path": plan, "slice_id": slice_id, "reason": "missing starter"})
             continue
-        pending.append({"plan_path": plan, "slice_id": slice_id, "reason": "missing starter"})
-    return {"pending_count": len(pending), "pending": pending}
+        stale, reason = starter_doc_resolve_stale(repo, slice_id=slice_id, phase_plan=plan)
+        if stale:
+            pending.append(
+                {
+                    "plan_path": plan,
+                    "slice_id": slice_id,
+                    "reason": "stale doc-resolve",
+                    "stale_detail": reason,
+                }
+            )
+    missing = sum(1 for row in pending if row.get("reason") == "missing starter")
+    stale = sum(1 for row in pending if row.get("reason") == "stale doc-resolve")
+    return {
+        "pending_count": len(pending),
+        "pending": pending,
+        "missing_count": missing,
+        "stale_count": stale,
+    }
+
+
+def plan_stale_ready_starters(repo: Path) -> dict[str, Any]:
+    """READY queue starters with outdated doc-resolve bundles."""
+    plan = plan_regen_ready_starters(repo)
+    stale_rows = [row for row in plan.get("pending") or [] if row.get("reason") == "stale doc-resolve"]
+    return {
+        "pending_count": len(stale_rows),
+        "pending": stale_rows,
+    }
 
 
 def regenerate_starters_for_ready_queue(repo: Path) -> dict[str, list[str]]:
@@ -341,12 +460,49 @@ def regenerate_starters_for_ready_queue(repo: Path) -> dict[str, list[str]]:
         if not isinstance(row, dict):
             continue
         plan_path = str(row.get("plan_path") or "").strip()
-        if not plan_path:
+        slice_id = str(row.get("slice_id") or "").strip()
+        if not plan_path or not slice_id:
             continue
-        written = regenerate_starters_for_plan(repo, plan_path)
-        if written:
-            out[plan_path] = written
+        try:
+            write_starter(repo, slice_id=slice_id, phase_plan=plan_path)
+            out.setdefault(plan_path, []).append(slice_id)
+        except Exception as exc:
+            print(
+                f"ppe_ide_build_starter: regen skip {slice_id}: {exc}",
+                file=sys.stderr,
+            )
     return out
+
+
+def warn_if_stale_ready_starters(repo: Path, *, max_lines: int = 5) -> list[dict[str, Any]]:
+    """Print non-blocking warnings for stale READY starters; return pending rows."""
+    repo = repo.resolve()
+    plan = plan_stale_ready_starters(repo)
+    rows = plan.get("pending") or []
+    if not rows:
+        return []
+    print(
+        "WARN: stale IDE BUILD starters for READY queue (doc-resolve drift):",
+        file=sys.stderr,
+    )
+    for row in rows[:max_lines]:
+        sid = str(row.get("slice_id") or "")
+        plan_path = str(row.get("plan_path") or "")
+        print(
+            f"  [{sid}] {plan_path} — {row.get('stale_detail') or 'stale doc-resolve'}",
+            file=sys.stderr,
+        )
+        print(
+            f"         → generate_ide_build_starter.cmd {sid} {plan_path}",
+            file=sys.stderr,
+        )
+    extra = len(rows) - min(max_lines, len(rows))
+    if extra > 0:
+        print(
+            f"  ... {extra} more — `sop_discovery_maintenance.cmd --regen-ready-starters --apply`",
+            file=sys.stderr,
+        )
+    return rows
 
 
 def prune_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
