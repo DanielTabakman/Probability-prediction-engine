@@ -48,6 +48,16 @@ def test_parse_module_registry_from_markdown() -> None:
     assert all(m.get("status") for m in modules)
 
 
+def test_build_compass_includes_factory_throughput() -> None:
+    from scripts.ppe_operator_compass import build_compass
+
+    status = {"as_of": "2026-06-29T20:00:00Z", "verdict": "RUN_AUTO", "supply": {"queue_ready": 1}}
+    compass = build_compass(REPO, status=status)
+    ft = compass.get("factory_throughput") or {}
+    assert ft.get("mode") == "aggregate"
+    assert "slices_logged" in ft
+
+
 def test_sync_compass_writes_json_and_patches_map(tmp_path: Path) -> None:
     from scripts.ppe_operator_compass import COMPASS_REL, MAP_REL, sync_compass
 
@@ -78,6 +88,7 @@ def test_sync_compass_writes_json_and_patches_map(tmp_path: Path) -> None:
 
     html = (repo / MAP_REL).read_text(encoding="utf-8")
     assert 'id="map-do-now"' in html
+    assert 'id="map-factory-throughput"' in html
     assert "test_chapter" in html or "closeout" in html.lower()
     assert "compass-src" in html
     assert "EDT" in html or "EST" in html
@@ -88,6 +99,7 @@ def test_module_map_has_compass_sections() -> None:
     for marker in (
         'id="map-do-now"',
         'id="map-crack-catcher"',
+        'id="map-factory-throughput"',
         'id="map-module-progress"',
         'id="map-waiting-on-time"',
     ):

@@ -30,6 +30,7 @@ CRACK_CATCHER_BACKLOG_CATEGORIES = frozenset({"operator", "architecture", "gover
 
 MARKER_DO_NOW = 'id="map-do-now"'
 MARKER_CRACK = 'id="map-crack-catcher"'
+MARKER_FACTORY = 'id="map-factory-throughput"'
 MARKER_PROGRESS = 'id="map-module-progress"'
 MARKER_WAITING = 'id="map-waiting-on-time"'
 MARKER_RIGHT_NOW = 'id="map-right-now"'
@@ -354,6 +355,31 @@ def _crack_catcher_items(repo: Path, status: dict[str, Any]) -> list[dict[str, s
     return out
 
 
+def _factory_throughput(repo: Path, *, days: int = 7) -> dict[str, Any]:
+    try:
+        from scripts.ppe_workflow_aggregate import summarize_aggregate
+
+        return summarize_aggregate(repo, days=days)
+    except Exception:
+        return {"days": days, "mode": "aggregate"}
+
+
+def _refresh_tracking_rollup(repo: Path, *, days: int = 7) -> None:
+    try:
+        from scripts.ppe_tracking_hub import (
+            TRACKING_ROLLUP_HTML,
+            collect_tracking_snapshot,
+            render_tracking_rollup_html,
+        )
+
+        snap = collect_tracking_snapshot(repo, days=days)
+        path = repo / TRACKING_ROLLUP_HTML
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(render_tracking_rollup_html(snap), encoding="utf-8")
+    except OSError:
+        pass
+
+
 def _right_now(repo: Path, status: dict[str, Any]) -> dict[str, str]:
     milestone = "Trader Workflow Integration v1"
     relay_hint = "mvp1_bl_density_smoothing_v1 · forward consistency after supply refresh"
@@ -406,6 +432,7 @@ def build_compass(repo: Path, status: dict[str, Any] | None = None) -> dict[str,
         "as_of_et": f"{date_et} {time_et}",
         "do_now": do_now,
         "crack_catcher": _crack_catcher_items(repo, status)[:12],
+        "factory_throughput": _factory_throughput(repo, days=7),
         "module_progress": _parse_module_registry(repo),
         "right_now": _right_now(repo, status),
         "sources": {
@@ -439,6 +466,55 @@ def _render_list_section(items: list[dict[str, str]], *, empty: str, ordered: bo
         lines.append(f'          <span class="why">{why} <em class="compass-src">({source})</em></span>')
         lines.append("        </li>")
     lines.append(f"      </{tag}>")
+    return "\n".join(lines) + "\n"
+
+
+def _render_factory_throughput(agg: dict[str, Any]) -> str:
+    slices = int(agg.get("slices_logged") or 0)
+    pulses = int(agg.get("thread_pulses") or 0)
+    if slices <= 0 and pulses <= 0:
+        return (
+            '      <p class="flow-intro compass-empty">'
+            "No workflow metrics yet — slices log on relay closeout; optional pulse on "
+            "<code>context_window_closeout --record</code>.</p>\n"
+        )
+
+    rows = [
+        ("Slices logged", agg.get("slices_logged", 0)),
+        ("Weighted slices", agg.get("weighted_slices", 0)),
+        ("Weighted / closeout", agg.get("weighted_slices_per_closeout", 0)),
+        ("Avg roundtrips / slice", agg.get("avg_roundtrips_per_slice", 0)),
+        ("Context closeouts", agg.get("context_closeouts", 0)),
+        ("Thread pulses", agg.get("thread_pulses", 0)),
+        ("Avg cognitive load", agg.get("avg_cognitive_load", 0)),
+        ("Incident slices", agg.get("incident_slices", 0)),
+    ]
+    lines = ['      <table class="compass-modules">', "        <tbody>"]
+    for label, value in rows:
+        lines.append(f"          <tr><th>{_esc(str(label))}</th><td>{_esc(str(value))}</td></tr>")
+    lines.extend(["        </tbody>", "      </table>"])
+
+    recent = [p for p in (agg.get("recent_pulses") or []) if isinstance(p, dict)]
+    if recent:
+        lines.append('      <p class="flow-intro" style="margin-top:12px"><strong>Recent pulses</strong></p>')
+        lines.append('      <table class="compass-modules">')
+        lines.append("        <thead><tr><th>When</th><th>Load</th><th>Note</th></tr></thead>")
+        lines.append("        <tbody>")
+        for pulse in recent[-5:]:
+            lines.append(
+                "          <tr>"
+                f"<td>{_esc(str(pulse.get('recorded_at') or ''))}</td>"
+                f"<td>{_esc(str(pulse.get('cognitive_load_1_5') or ''))}</td>"
+                f"<td>{_esc(str(pulse.get('note') or ''))}</td>"
+                "</tr>"
+            )
+        lines.extend(["        </tbody>", "      </table>"])
+
+    lines.append(
+        '      <p class="flow-intro" style="margin-top:8px">'
+        '<a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">Full rollup HTML</a>'
+        ' · <em class="compass-src">(workflow_metrics aggregate)</em></p>'
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -486,6 +562,8 @@ def _render_right_now(right_now: dict[str, str]) -> str:
         "        <a href=\"../PPE_INTEGRATED_STATUS.md\">Integrated status</a>\n"
         "        · <a href=\"../../../artifacts/orchestrator/OPERATOR_STATUS.md\">Operator status</a>\n"
         "        · <a href=\"#autobuilder\">Autobuilder</a>\n"
+        "        · <a href=\"#research-pipeline\">Research pipeline</a>\n"
+        "        · <a href=\"../../../artifacts/control_plane/TRACKING_ROLLUP.html\">Tracking rollup</a>\n"
         "        · <a href=\"../HUMAN_STEWARD_BACKLOG.md\">Steward backlog</a>\n"
         "      </span>\n"
         "    </div>\n"
@@ -524,6 +602,7 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
         empty="No crack-catcher signals right now.",
         ordered=False,
     )
+    throughput_inner = _render_factory_throughput(compass.get("factory_throughput") or {})
     progress_inner = _render_module_progress(compass.get("module_progress") or [])
 
     waiting_items = [
@@ -542,6 +621,7 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
 
     html = _replace_div_inner(html, "map-do-now", do_now_inner.rstrip())
     html = _replace_div_inner(html, "map-crack-catcher", crack_inner.rstrip())
+    html = _replace_div_inner(html, "map-factory-throughput", throughput_inner.rstrip())
     html = _replace_div_inner(html, "map-module-progress", progress_inner.rstrip())
     html = _replace_div_inner(html, "map-waiting-on-time", waiting_inner.rstrip())
 
@@ -583,6 +663,7 @@ def patch_module_map(repo: Path, compass: dict[str, Any]) -> Path:
 def sync_compass(repo: Path, *, status: dict[str, Any] | None = None, patch_map: bool = True) -> dict[str, Any]:
     compass = build_compass(repo, status=status)
     write_compass_json(repo, compass)
+    _refresh_tracking_rollup(repo, days=int((compass.get("factory_throughput") or {}).get("days") or 7))
     if patch_map:
         patch_module_map(repo, compass)
     return compass
