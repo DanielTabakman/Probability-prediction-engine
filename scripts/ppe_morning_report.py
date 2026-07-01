@@ -144,6 +144,22 @@ def build_morning_report(repo: Path, status: dict[str, Any]) -> tuple[str, str]:
                 lines.append(f"- {when}: {title[:100]}")
 
     lines.append("")
+    health_line = str(status.get("operator_health_line") or "").strip()
+    if not health_line:
+        try:
+            from scripts.ppe_operator_blind_spots import HEALTH_REL
+
+            path = repo / HEALTH_REL
+            if path.is_file():
+                data = json.loads(path.read_text(encoding="utf-8"))
+                if isinstance(data, dict):
+                    health_line = str(data.get("line") or "").strip()
+        except Exception:
+            pass
+    if health_line:
+        lines.append(f"Infra: {health_line}")
+
+    lines.append("")
     lines.append("Send status for the live picture.")
     return "PPE morning report", "\n".join(lines)
 
