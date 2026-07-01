@@ -20,6 +20,8 @@ from scripts.workflow_metrics_cli import (
 DEMO_SESSIONS_REL = "artifacts/validation/demo_sessions.jsonl"
 TRACKING_STATUS_JSON = "artifacts/control_plane/TRACKING_STATUS_LATEST.json"
 TRACKING_STATUS_MD = "artifacts/control_plane/TRACKING_STATUS_LATEST.md"
+TRACKING_ROLLUP_HTML = "artifacts/control_plane/TRACKING_ROLLUP.html"
+LAST_VPS_DEPLOY_REL = Path("data") / "last_vps_deploy.utc"
 
 EventType = Literal[
     "validation_session",
@@ -301,9 +303,45 @@ def format_usage_line(usage: dict[str, Any]) -> str | None:
     if total <= 0 and not usage.get("exists"):
         return None
     users = int(usage.get("unique_users") or 0)
+    sessions = int(usage.get("session_starts") or 0)
+    page_views = int(usage.get("page_views") or 0)
+    streamlit = int(usage.get("streamlit_events") or 0)
     top = usage.get("top_event")
     top_s = f" top={top}" if top else ""
-    return f"Product usage: events={total} users={users}{top_s}"
+    st_s = f" streamlit={streamlit}" if streamlit else ""
+    return (
+        f"Product usage: events={total} sessions={sessions} page_views={page_views} "
+        f"users={users}{st_s}{top_s}"
+    )
+
+
+def _days_since_vps_deploy(repo: Path) -> float | None:
+    path = repo / LAST_VPS_DEPLOY_REL
+    if not path.is_file():
+        return None
+    raw = path.read_text(encoding="utf-8").strip()
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        dt = datetime.fromisoformat(raw)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return (datetime.now(timezone.utc) - dt).total_seconds() / 86400
+    except ValueError:
+        return None
+
+
+def zero_activity_watch_line(repo: Path, usage: dict[str, Any], *, days: int = 7) -> str | None:
+    deploy_days = _days_since_vps_deploy(repo)
+    if deploy_days is None or deploy_days > 14:
+        return None
+    total = int(usage.get("total_events") or 0)
+    if total > 0:
+        return None
+    return (
+        f"- Product usage ZERO in {days}d but VPS deploy was {deploy_days:.0f}d ago — "
+        "check MSOS beacons, docker volume, and `ppe_pull_product_usage.cmd`."
+    )
 
 
 def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
@@ -386,6 +424,10 @@ def format_tracking_digest_lines(repo: Path, *, days: int = 7) -> list[str]:
             "`PPE_PRODUCT_USAGE_JSONL`."
         )
 
+    zero_line = zero_activity_watch_line(repo, usage, days=days)
+    if zero_line:
+        lines.append(zero_line)
+
     steering = snap.get("steering") or {}
     if not steering.get("aligned"):
         lines.append(f"- Steering drift: {steering.get('gap_count', 0)} gap(s) vs active manifest.")
@@ -413,7 +455,7 @@ def format_tracking_digest_lines(repo: Path, *, days: int = 7) -> list[str]:
     except Exception:
         pass
 
-    return lines[:6]
+    return lines[:7]
 
 
 def render_tracking_markdown(snap: dict[str, Any]) -> str:
@@ -473,14 +515,68 @@ def render_tracking_markdown(snap: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def write_tracking_artifacts(repo: Path, snap: dict[str, Any]) -> tuple[Path, Path]:
+def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
+    payload = json.dumps(snap, indent=2)
+    usage = snap.get("product_usage") or {}
+    factory = snap.get("factory") or {}
+    rows = [
+        ("Generated (UTC)", str(snap.get("generated_at_utc") or "—")),
+        ("Window (days)", str(snap.get("days") or "—")),
+        ("Context closeouts", str(factory.get("context_closeouts", 0))),
+        ("Validation sessions", str(factory.get("validation_sessions", 0))),
+        ("Product events", str(usage.get("total_events", 0))),
+        ("Sessions (session_start)", str(usage.get("session_starts", 0))),
+        ("Page views", str(usage.get("page_views", 0))),
+        ("Streamlit events", str(usage.get("streamlit_events", 0))),
+        ("Unique users", str(usage.get("unique_users", 0))),
+    ]
+    body_rows = "\n".join(f"<tr><th>{k}</th><td>{v}</td></tr>" for k, v in rows)
+    by_event = usage.get("by_event") or {}
+    event_rows = "\n".join(
+        f"<tr><td>{name}</td><td>{count}</td></tr>" for name, count in sorted(by_event.items())
+    )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PPE tracking rollup</title>
+  <style>
+    body {{ font-family: system-ui, sans-serif; margin: 2rem; max-width: 960px; }}
+    table {{ border-collapse: collapse; width: 100%; margin-bottom: 1.5rem; }}
+    th, td {{ border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; }}
+    th {{ background: #f4f4f4; width: 40%; }}
+    pre {{ background: #f8f8f8; padding: 1rem; overflow: auto; font-size: 0.85rem; }}
+    h1 {{ font-size: 1.4rem; }}
+    h2 {{ font-size: 1.1rem; margin-top: 1.5rem; }}
+  </style>
+</head>
+<body>
+  <h1>PPE tracking rollup (in-house)</h1>
+  <p>Replaces external spreadsheet ritual — regenerate via <code>ppe_tracking_status.cmd</code>.</p>
+  <h2>Summary</h2>
+  <table>{body_rows}</table>
+  <h2>Product usage by event</h2>
+  <table>
+    <tr><th>Event</th><th>Count ({usage.get('days', 7)}d)</th></tr>
+    {event_rows or '<tr><td colspan="2">No events</td></tr>'}
+  </table>
+  <h2>Raw snapshot JSON</h2>
+  <pre>{payload}</pre>
+</body>
+</html>
+"""
+
+
+def write_tracking_artifacts(repo: Path, snap: dict[str, Any]) -> tuple[Path, Path, Path]:
     out_dir = repo / "artifacts" / "control_plane"
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = repo / TRACKING_STATUS_JSON
     md_path = repo / TRACKING_STATUS_MD
+    html_path = repo / TRACKING_ROLLUP_HTML
     json_path.write_text(json.dumps(snap, indent=2) + "\n", encoding="utf-8")
     md_path.write_text(render_tracking_markdown(snap), encoding="utf-8")
-    return json_path, md_path
+    html_path.write_text(render_tracking_rollup_html(snap), encoding="utf-8")
+    return json_path, md_path, html_path
 
 
 def scan_tracking_friction(repo: Path, week_monday) -> list:
@@ -551,5 +647,19 @@ def scan_tracking_friction(repo: Path, week_monday) -> list:
                 suggested_action="Log demo sessions via log_demo_session.cmd after tester walkthroughs.",
             )
         )
+
+    usage = snap.get("product_usage") or {}
+    if int(usage.get("total_events") or 0) == 0:
+        deploy_days = _days_since_vps_deploy(repo)
+        if deploy_days is not None and deploy_days <= 14:
+            candidates.append(
+                RadarCandidate(
+                    id="product-usage-zero-post-deploy",
+                    severity="watch",
+                    title="No product usage events after recent VPS deploy",
+                    evidence=[f"deploy_days_ago={deploy_days:.1f}", f"path={usage.get('path')}"],
+                    suggested_action="Verify MSOS usage API, docker volume, and ppe_pull_product_usage.cmd.",
+                )
+            )
 
     return candidates

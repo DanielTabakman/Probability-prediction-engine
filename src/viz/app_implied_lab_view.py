@@ -78,6 +78,7 @@ from src.viz.distribution_export import (
 )
 from src.viz.distribution_summary_panel import render_distribution_summary_panel
 from src.viz.implied_lab_derive import derive_lab_outputs
+from src.viz.product_usage_telemetry import log_product_usage_event
 from src.viz.implied_lab_legibility import (
     BELIEF_STRATEGY_HOW_CALCULATED_MARKDOWN,
     CUMULATIVE_CAPTION,
@@ -135,6 +136,9 @@ def render_implied_lab_bitcoin_section(
     perf: PerfLog,
 ) -> None:
     post_mvp_implied_lab_ui = post_mvp1_lab_ui_enabled()
+    if not st.session_state.get("_ppe_streamlit_lab_view_logged"):
+        st.session_state["_ppe_streamlit_lab_view_logged"] = True
+        log_product_usage_event("streamlit_lab_view", path="/implied-lab")
     st.header("Bitcoin implied lab — market-implied view as the anchor")
     st.caption(
         "**Read in order:** market-implied chart → your **belief** (left) → **Belief vs market** for the disagreement "
@@ -266,6 +270,9 @@ def render_implied_lab_bitcoin_section(
                     file_name=f"ppe_{_export_slug}_distribution_stats.csv",
                     mime="text/csv",
                     key="implied_dist_export_csv",
+                    on_click=log_product_usage_event,
+                    args=("streamlit_distribution_export",),
+                    kwargs={"path": "/implied-lab", "asset_id": lab_asset_id},
                 )
                 if load_deribit:
                     keywords = (

@@ -27,10 +27,11 @@ def main(argv: list[str] | None = None) -> int:
     snap = collect_tracking_snapshot(repo, days=args.days)
 
     if not args.no_write:
-        json_path, md_path = write_tracking_artifacts(repo, snap)
+        json_path, md_path, html_path = write_tracking_artifacts(repo, snap)
         if not args.json and not args.brief:
             print(f"ppe_tracking_status: wrote {json_path}")
             print(f"ppe_tracking_status: wrote {md_path}")
+            print(f"ppe_tracking_status: wrote {html_path}")
 
     if args.json:
         print(json.dumps(snap, indent=2))

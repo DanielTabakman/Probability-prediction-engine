@@ -85,6 +85,9 @@ services:
       - PPE_PRIVATE_APP_URL=https://app.marketstructureos.com
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+      - PPE_PRODUCT_USAGE_DIR=/telemetry
+    volumes:
+      - msos_web_data:/telemetry
     restart: unless-stopped
     networks:
       - web
@@ -128,8 +131,10 @@ services:
       - PORT=8501
       - PPE_ENABLE_SNAPSHOTS=1
       - PPE_SNAPSHOT_DB_PATH=/data/ppe_frozen_evaluations.sqlite3
+      - PPE_PRODUCT_USAGE_DIR=/telemetry
     volumes:
       - ppe_snapshots:/data
+      - msos_web_data:/telemetry
     restart: unless-stopped
     networks:
       - web
