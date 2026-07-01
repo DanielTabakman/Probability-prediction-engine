@@ -99,6 +99,37 @@ def test_compute_burst_plan_run_auto_not_allowed(tmp_path) -> None:
     assert plan["burst_allowed"] is False
 
 
+def test_compute_burst_plan_closeout_direct_skips_director(tmp_path) -> None:
+    plan_rel = "docs/SOP/PHASE_TEST.json"
+    _write_plan(tmp_path, plan_rel, [{"sliceId": "Slice-A", "closeout": {"job": "x"}}])
+    status = {
+        "verdict": "RUN_LOCAL",
+        "phase_plan_path": plan_rel,
+        "guard": {"reason": "IDE_MARKER_OK"},
+        "chapter_mode": {"mode": "CLOSEOUT_ONLY", "do_not_rebuild": True},
+        "vm_trust": {"wait_for_vm": False},
+    }
+    with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
+        mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 1}
+        plan = compute_burst_plan(tmp_path, status)
+    assert plan["use_director"] is False
+    assert plan["direct_action"] == "DESKTOP_CONTINUE.cmd --no-pause"
+    assert "skip @ppe-director" in plan["prompt"]
+
+
+def test_compute_burst_plan_vm_in_flight_waits(tmp_path) -> None:
+    status = {
+        "verdict": "RUN_LOCAL",
+        "phase_plan_path": None,
+        "guard": {},
+        "vm_trust": {"wait_for_vm": True, "vm_phase": "FINISH_IN_FLIGHT"},
+    }
+    plan = compute_burst_plan(tmp_path, status)
+    assert plan["burst_allowed"] is False
+    assert plan["direct_action"] == "wait_for_vm"
+    assert "do NOT SSH probe" in plan["prompt"]
+
+
 def test_prepare_operator_status_applies_env_before_collect(tmp_path, monkeypatch) -> None:
     from scripts.ppe_operator_status import prepare_operator_status
 

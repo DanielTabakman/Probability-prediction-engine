@@ -388,6 +388,12 @@ def write_status_artifact(repo: Path, status: dict[str, Any] | None = None) -> P
     path = status_json_path(repo)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    try:
+        from scripts.ppe_vm_phase_mirror import sync_autobuilder_phase_artifacts
+
+        sync_autobuilder_phase_artifacts(repo, data)
+    except Exception:
+        pass
     return path
 
 
