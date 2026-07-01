@@ -45,6 +45,12 @@ Implement → gate → mark_ide_product_ready. No steward narrative.
 
 ## Charter / topic (UX, data, SELECTION, programs)
 
+**Steward / control-plane one-liner** (rules, policy, PR merges, no relay):
+
+```text
+Charter thread. THREAD_ROLE: charter. Control-plane only — no relay.
+```
+
 Use for planning, backlog edits, and domain work **without** relay bleed.
 
 ```text

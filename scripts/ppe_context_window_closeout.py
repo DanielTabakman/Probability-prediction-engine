@@ -318,14 +318,14 @@ def render_draft_markdown(
             "",
             "## Follow-up triage",
             "",
-            "| Bucket | Item | Action / destination |",
-            "|--------|------|----------------------|",
-            "| ship_now | <!-- AGENT_FILL --> | |",
-            "| operator_next | <!-- AGENT_FILL --> | |",
-            "| build_backlog | <!-- AGENT_FILL --> | `PHASE_CHAPTER_BACKLOG.json` |",
-            "| human_backlog | <!-- AGENT_FILL --> | `HUMAN_STEWARD_BACKLOG.json` |",
-            "| park | <!-- AGENT_FILL --> | branch/stash name |",
-            "| drop | <!-- AGENT_FILL --> | reason |",
+            "| Bucket | Item | Lane | Action / destination |",
+            "|--------|------|------|----------------------|",
+            "| ship_now | <!-- AGENT_FILL --> | control_plane | |",
+            "| operator_next | <!-- AGENT_FILL --> | relay | operator thread |",
+            "| build_backlog | <!-- AGENT_FILL --> | control_plane | `PHASE_CHAPTER_BACKLOG.json` |",
+            "| human_backlog | <!-- AGENT_FILL --> | human | `HUMAN_STEWARD_BACKLOG.json` |",
+            "| park | <!-- AGENT_FILL --> | mixed | branch/stash name |",
+            "| drop | <!-- AGENT_FILL --> | — | reason |",
             "",
             "## AGENT CONTINUITY",
             "",
@@ -689,7 +689,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--thread-role",
         default="operator",
-        help="operator | charter | ide_build | recovery | explore (legacy: steward→operator, exploratory→charter)",
+        help="operator | charter | ide_build | recovery | explore (legacy: steward→charter, exploratory→charter)",
     )
     ap.add_argument("--whats-next", default="", help="One-line next action (default: infer from operator verdict)")
     ap.add_argument(
