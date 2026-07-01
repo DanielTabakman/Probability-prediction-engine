@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-01
+
+- **Chapter closed:** MSOS forward consistency radar v1 (`MSOS-FCR-Closeout-Slice003`)
+
 ## 2026-06-30
 
 - feat(msos): forward consistency dashboard (MSOS-FCR-Product-Slice002) (#1027) (`apps/msos-web/`)
