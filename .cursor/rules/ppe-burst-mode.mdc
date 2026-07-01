@@ -37,6 +37,7 @@ Operator thread only:
 |---------|------------|
 | `IDE_BUILD` · `RUN_LOCAL` | **`@ppe-director`** → spawn `ppe-build-worker` / `ppe-finish-worker` only |
 | `FIX_PLAN` · `STALE_STATE` · `ERROR` | **`@ppe-director`** → **one** `ppe-triage-worker` max |
+| Burst blocked (`coordination_check`) | **`@ppe-coordination-check`** first → then director when `proceed` |
 | `RUN_AUTO` · `SUPPLY_LOW` | No burst — loop driving or queue idle |
 
 ## Loop (director burst)
