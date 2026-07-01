@@ -375,26 +375,71 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
 
 def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Desktop: attach VM phase mirror/cache so agents act without SSH probes."""
+    loop_ok = False
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
 
-        if loop_host_start_allowed()[0]:
+        loop_ok = bool(loop_host_start_allowed()[0])
+        if loop_ok:
             return status
     except Exception:
         pass
 
-    vm_mirror = None
-    vm_brief = None
     try:
-        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+        from scripts.ppe_operator_pass_timebox import record_operator_session
 
-        vm_mirror = load_vm_phase_mirror(repo)
+        status["operator_session"] = record_operator_session(repo, status)
     except Exception:
         pass
 
     try:
+        from scripts.ppe_operator_branch_preflight import assess_operator_branch_preflight
+
+        branch_pf = assess_operator_branch_preflight(
+            repo,
+            verdict=str(status.get("verdict") or ""),
+            loop_host_allowed=loop_ok,
+        )
+        status["branch_preflight"] = branch_pf
+        if branch_pf.get("blocks_relay"):
+            status["commands"] = list(branch_pf.get("commands") or [])
+            status.setdefault("avoid", []).extend(
+                [
+                    "DESKTOP_CONTINUE.cmd until branch/tree preflight passes",
+                    "Relay / IDE BUILD on wrong branch or dirty product tree",
+                ]
+            )
+    except Exception:
+        pass
+
+    vm_mirror = None
+    mirror_health: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_vm_mirror_refresh import (
+            assess_mirror_health,
+            refresh_vm_mirror_from_git,
+        )
+        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+        refresh_vm_mirror_from_git(repo)
+        vm_mirror = load_vm_phase_mirror(repo)
+        mirror_health = assess_mirror_health(
+            vm_mirror,
+            local_verdict=str(status.get("verdict") or ""),
+        )
+        status["vm_mirror_health"] = mirror_health
+    except Exception:
+        try:
+            from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+            vm_mirror = load_vm_phase_mirror(repo)
+        except Exception:
+            pass
+
+    try:
         from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
 
+        vm_brief = None
         if not vm_mirror or not str(vm_mirror.get("phase") or "").strip():
             vm_brief = fetch_vm_brief(repo, use_cache=True)
         trust = resolve_vm_trust(
@@ -402,23 +447,33 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             vm_brief=vm_brief,
             vm_mirror=vm_mirror,
         )
+        if mirror_health and mirror_health.get("alert"):
+            trust = {
+                **trust,
+                "mirror_stale": True,
+                "agent_note": mirror_health.get("agent_note") or trust.get("agent_note"),
+            }
         status["vm_trust"] = trust
 
-        chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
-        mode = str(chapter_mode.get("mode") or "")
-        if trust.get("wait_for_vm"):
+        if status.get("branch_preflight", {}).get("blocks_relay"):
+            pass
+        elif trust.get("wait_for_vm"):
             status["commands"] = [
                 "Wait for VM in-flight phase to complete (no parallel SSH/findstr probes)."
             ]
             status.setdefault("avoid", []).extend(
                 [
                     "SSH findstr/type on queue or manifest JSON",
-                    "Multiple parallel ssh ppeloop@desktop-caqll8k calls",
+                    "Multiple parallel ssh to VM",
                     "@ppe-director while VM FINISH_IN_FLIGHT or BUILD_IN_FLIGHT",
                 ]
             )
-        elif trust.get("recommended_action") == "desktop_continue" and mode == "CLOSEOUT_ONLY":
-            status["commands"] = ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"]
+        elif trust.get("recommended_action") == "desktop_continue":
+            if str(status.get("verdict") or "") == "RUN_LOCAL":
+                status["commands"] = [
+                    "DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)",
+                    "Alternative: DO_THE_THING.cmd run",
+                ]
     except Exception:
         pass
     return status
@@ -509,18 +564,22 @@ def _format_human(
         lines.append(f"Promote: {supply.get('promote_reason')}")
 
     if repo is not None:
-        try:
-            from scripts.research_archive_health import build_archive_health, format_health_line
+        skip_archives = False
+        if isinstance(chapter_mode, dict) and chapter_mode.get("do_not_rebuild"):
+            skip_archives = True
+        if not skip_archives:
+            try:
+                from scripts.research_archive_health import build_archive_health, format_health_line
 
-            collectors_health = build_archive_health(repo).get("collectors") or []
-            if collectors_health:
-                lines.append("")
-                lines.append("Research archives:")
-                for item in collectors_health:
-                    if isinstance(item, dict):
-                        lines.append(f"  {format_health_line(item)}")
-        except Exception:
-            pass
+                collectors_health = build_archive_health(repo).get("collectors") or []
+                if collectors_health:
+                    lines.append("")
+                    lines.append("Research archives:")
+                    for item in collectors_health:
+                        if isinstance(item, dict):
+                            lines.append(f"  {format_health_line(item)}")
+            except Exception:
+                pass
 
     burst = burst_plan if burst_plan is not None else status.get("burst_plan")
     if isinstance(burst, dict):
@@ -535,6 +594,28 @@ def _format_human(
         note = vm_trust.get("agent_note")
         if note:
             lines.append(f"  → {note}")
+
+    branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
+    if branch_pf and branch_pf.get("blocks_relay"):
+        lines.extend(
+            [
+                "",
+                "**Branch preflight: BLOCKS relay**",
+                f"  Branch: `{branch_pf.get('branch')}` (on_main={branch_pf.get('on_main')})",
+            ]
+        )
+        for reason in branch_pf.get("reasons") or []:
+            lines.append(f"  - {reason}")
+
+    mirror_health = status.get("vm_mirror_health") if isinstance(status.get("vm_mirror_health"), dict) else None
+    if mirror_health and mirror_health.get("alert"):
+        lines.append("")
+        lines.append(f"**VM mirror alert:** {mirror_health.get('agent_note')}")
+
+    op_session = status.get("operator_session") if isinstance(status.get("operator_session"), dict) else None
+    if op_session and op_session.get("rotate_recommended"):
+        lines.append("")
+        lines.append(f"**Thread timebox:** {op_session.get('message')}")
 
     lines.extend(
         [

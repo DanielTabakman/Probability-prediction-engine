@@ -15,6 +15,11 @@ if (-not (Test-Path $sshDir)) {
     New-Item -ItemType Directory -Path $sshDir -Force | Out-Null
 }
 
+$socketsDir = Join-Path $sshDir "sockets"
+if (-not (Test-Path $socketsDir)) {
+    New-Item -ItemType Directory -Path $socketsDir -Force | Out-Null
+}
+
 if (-not (Test-Path $key)) {
     Write-Host "Generating SSH key at $key ..."
     ssh-keygen -t ed25519 -f $key -N '""' -C "ppe-vm-cursor"
@@ -27,6 +32,9 @@ Host ppe-vm
     IdentityFile ~/.ssh/id_ppe_vm
     IdentitiesOnly yes
     StrictHostKeyChecking accept-new
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h-%p
+    ControlPersist 600
 
 Host desktop-caqll8k
     HostName desktop-caqll8k
@@ -34,6 +42,9 @@ Host desktop-caqll8k
     IdentityFile ~/.ssh/id_ppe_vm
     IdentitiesOnly yes
     StrictHostKeyChecking accept-new
+    ControlMaster auto
+    ControlPath ~/.ssh/sockets/%r@%h-%p
+    ControlPersist 600
 
 "@
 if (-not (Test-Path $config) -or -not (Select-String -Path $config -Pattern "Host ppe-vm" -Quiet)) {
@@ -77,3 +88,6 @@ Write-Host "3. File -> Open Folder -> C:\Users\ppeloop\Probability-prediction-en
 Write-Host "4. Bottom-left should show SSH: ppe-vm"
 Write-Host ""
 Write-Host "Daily coding stays on THIS machine. Only open ppe-vm for VM operator fixes."
+Write-Host ""
+Write-Host "Add to ppe_operator_no_loop.local.cmd (optional): set PPE_VM_SSH_HOST=ppe-vm"
+Write-Host "Verify VM mirror: scripts\vm_verify_mirror.cmd"
