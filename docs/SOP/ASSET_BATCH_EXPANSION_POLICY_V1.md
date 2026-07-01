@@ -127,6 +127,8 @@ python scripts/msos_production_multi_asset_witness.py   # when meta #7 COMPLETE
 
 Skip ids with `blocked_no_live_options`; document in chapter evidence.
 
+**Not wave 1:** **HYPE / Hyperliquid** — perp-only; use [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md) (exposure menu side channel). Do not merge into tier-1 manifest or run options discovery enablement.
+
 ---
 
 ## Wave 2 — tier-2 (~100)
