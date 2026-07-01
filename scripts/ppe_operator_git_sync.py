@@ -711,6 +711,98 @@ def reset_runtime_sop_drift_from_origin(repo: Path) -> dict[str, Any]:
     }
 
 
+def _git_operation_in_progress(repo: Path) -> bool:
+    git_dir = repo / ".git"
+    if (git_dir / "MERGE_HEAD").is_file():
+        return True
+    if (git_dir / "rebase-merge").is_dir() or (git_dir / "rebase-apply").is_dir():
+        return True
+    return False
+
+
+def prepare_loop_host_for_handoff(repo: Path) -> dict[str, Any]:
+    """Prepare loop-host git state before DESKTOP_CONTINUE / finish_ide_build.
+
+    Clears stale merge state, resets runtime SOP drift, returns transient build
+    branches to origin/main, then fast-forwards pull. Safe only on the VM loop
+    host after desktop IDE BUILD has merged.
+    """
+    repo = repo.resolve()
+    target = (str(_git_sync_cfg(repo).get("pullBranch") or "main")).strip() or "main"
+    changes: list[str] = []
+    from_branch = _current_branch(repo)
+
+    if _git_operation_in_progress(repo):
+        _git(repo, "merge", "--abort")
+        changes.append("merge --abort")
+
+    sop = reset_runtime_sop_drift_from_origin(repo)
+    changes.extend(sop.get("changes") or [])
+
+    current = _current_branch(repo)
+    if _loop_host_transient_branch(current, target):
+        fetch = _git(repo, "fetch", "origin")
+        if fetch.returncode != 0:
+            return {
+                "action": "prepare_handoff",
+                "ok": False,
+                "from_branch": from_branch,
+                "changes": changes,
+                "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+            }
+        co = _git(repo, "checkout", "-f", target)
+        if co.returncode != 0:
+            co = _git(repo, "checkout", target)
+        hard = _git(repo, "reset", "--hard", f"origin/{target}")
+        ok_reset = hard.returncode == 0
+        if ok_reset:
+            changes.append(f"reset --hard origin/{target} (from transient {current})")
+        current = _current_branch(repo)
+    elif current == target:
+        dirty = _dirty_paths(repo)
+        if dirty and _runtime_sop_only_dirty(repo):
+            sop2 = reset_runtime_sop_drift_from_origin(repo)
+            changes.extend(sop2.get("changes") or [])
+
+    fetch = _git(repo, "fetch", "origin")
+    if fetch.returncode != 0:
+        return {
+            "action": "prepare_handoff",
+            "ok": False,
+            "from_branch": from_branch,
+            "branch": _current_branch(repo),
+            "changes": changes,
+            "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+        }
+
+    if _current_branch(repo) != target:
+        co = _git(repo, "checkout", target)
+        if co.returncode != 0:
+            return {
+                "action": "prepare_handoff",
+                "ok": False,
+                "from_branch": from_branch,
+                "branch": _current_branch(repo),
+                "changes": changes,
+                "error": (co.stderr or co.stdout or "git checkout failed").strip(),
+            }
+        changes.append(f"checkout {target}")
+
+    pull = _git(repo, "pull", "--ff-only", "origin", target)
+    ok = pull.returncode == 0
+    result: dict[str, Any] = {
+        "action": "prepare_handoff",
+        "ok": ok,
+        "from_branch": from_branch,
+        "branch": _current_branch(repo),
+        "changes": changes,
+        "stdout": (pull.stdout or "").strip(),
+    }
+    if not ok:
+        result["error"] = (pull.stderr or pull.stdout or "git pull failed").strip()
+    return result
+
+
 def maybe_auto_publish(repo: Path) -> dict[str, Any]:
     """Push + open PR when this branch has unpushed commits (loop/agent work)."""
     repo = repo.resolve()
@@ -769,11 +861,18 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Retarget child PRs to main when parent branch already merged",
     )
+    ap.add_argument(
+        "--prepare-handoff",
+        action="store_true",
+        help="Loop host only: abort merges, reset runtime SOP drift, return to main, pull",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
     results: list[dict[str, Any]] = []
+    if args.prepare_handoff:
+        results.append(prepare_loop_host_for_handoff(repo))
     if args.pull:
         results.append(pull_main(repo))
     if args.publish:
@@ -785,7 +884,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.retarget_stacked:
         results.append(check_and_retarget_stacked_prs(repo))
     if not results:
-        ap.error("specify --pull, --publish, --auto-publish, --check-merge, and/or --retarget-stacked")
+        ap.error(
+            "specify --pull, --prepare-handoff, --publish, --auto-publish, "
+            "--check-merge, and/or --retarget-stacked"
+        )
         return 2
 
     if args.json:
