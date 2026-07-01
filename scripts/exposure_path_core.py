@@ -331,6 +331,28 @@ def _activate_options_path(
                 expiry_date=expiry_date,
             )
         )
+    elif structure == "long_put":
+        if not avail_puts:
+            return None
+        strike = snap_strike(avail_puts, spot)
+        premium = put_by_k.get(strike)
+        if premium is None:
+            return None
+        path.cost_hint_usd = premium_to_usd(
+            premium,
+            forward_usd=spot,
+            premium_in_usd=premium_in_usd,
+            contract_multiplier=contract_multiplier,
+        )
+        legs.append(
+            format_leg(
+                asset_id=asset_id,
+                instrument="Put",
+                side="BUY",
+                strike=strike,
+                expiry_date=expiry_date,
+            )
+        )
     else:
         return None
 

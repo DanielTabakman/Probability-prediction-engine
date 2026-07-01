@@ -1814,6 +1814,20 @@ button.btn:focus-visible {
   padding-top: 8px;
 }
 
+.exposure-pin-hint {
+  margin: 0;
+  padding: 0 4px;
+}
+
+.exposure-path-handoff {
+  margin: 0;
+  font-size: 12px;
+}
+
+.exposure-path-handoff a {
+  color: #7ee0c8;
+}
+
 .exposure-compare-bar {
   display: flex;
   flex-wrap: wrap;

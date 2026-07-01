@@ -61,7 +61,7 @@ def test_msos_modules_do_not_declare_module_asset_allowlists() -> None:
     assert hits == [], f"module allowlists found: {hits}"
 
 
-@pytest.mark.parametrize("asset_id", ["SOL"])
+@pytest.mark.parametrize("asset_id", ["SOL", "SPY", "QQQ", "IWM", "ETH"])
 def test_enabled_asset_has_exposure_asset_class_binding(asset_id: str) -> None:
     from scripts.exposure_path_core import load_exposure_path_catalog, resolve_path_ids_for_asset
     from src.data.assets_registry import asset_class

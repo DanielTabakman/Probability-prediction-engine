@@ -633,6 +633,8 @@ def test_exposure_menu_boundary_proxy_no_ts_math() -> None:
     assert "exposure-menu-section" in client
     assert "ExposureCompareDrawer" in client
     assert "fit is not a recommendation" in client.lower()
+    assert "buildExpressionPlannerHandoffHref" in lib
+    assert "exposure-pin-hint" in client
     assert "FIT_LENS_CATALOG" in lib
     assert "not trade recommendations" in client.lower() or "comparison only" in client.lower()
 
@@ -651,6 +653,7 @@ def test_exposure_menu_fixtures_and_deep_links() -> None:
 
     card = (MSOS_WEB / "src" / "components" / "ExposurePathCard.tsx").read_text(encoding="utf-8")
     assert "Open in Strategy Lab" in card
+    assert "structure fit" in card
     assert "deep_link" in card
 
 

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import {
+  buildExpressionPlannerHandoffHref,
+  buildStrategyLabHandoffHref,
   fitLensLabel,
   formatLegsOneLine,
   leverageChipLabel,
@@ -17,6 +19,7 @@ import {
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 
 type ExposurePathCardProps = {
+  assetId: string;
   path: ExposurePathRecord;
   activeFitLens: FitLensId | null;
   dimmed: boolean;
@@ -26,6 +29,7 @@ type ExposurePathCardProps = {
 };
 
 export function ExposurePathCard({
+  assetId,
   path,
   activeFitLens,
   dimmed,
@@ -127,7 +131,16 @@ export function ExposurePathCard({
         </div>
       ) : null}
 
-      {path.deep_link ? (
+      {path.instrument_rail === "listed_options" && path.trust_badge !== "Planned" ? (
+        <p className="exposure-path-handoff panel-sub">
+          Next:{" "}
+          <Link href={path.deep_link ?? buildStrategyLabHandoffHref(assetId)}>
+            inspect in Strategy Lab
+          </Link>
+          {" · "}
+          <Link href={buildExpressionPlannerHandoffHref(assetId)}>structure fit</Link>
+        </p>
+      ) : path.deep_link ? (
         <Link href={path.deep_link} className="btn slim">
           Open in Strategy Lab
         </Link>
