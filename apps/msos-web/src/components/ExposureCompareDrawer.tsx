@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import {
   fitLensLabel,
   formatLegsOneLine,
@@ -32,6 +34,20 @@ export function ExposureCompareDrawer({
   onClose,
 }: ExposureCompareDrawerProps) {
   const { formatMoney } = useDisplayCurrency();
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }
