@@ -23,6 +23,12 @@ if exist "%CD%\ppe_pull_product_usage.cmd" (
   if errorlevel 1 echo weekly_digest_monday: product usage pull skipped — continuing
 )
 
+python "%CD%\scripts\ppe_jsonl_retention.py" --repo-root "%CD%" --apply
+if errorlevel 1 echo weekly_digest_monday: jsonl retention skipped — continuing
+
+python "%CD%\scripts\ppe_feedback_steward_hook.py" --repo-root "%CD%"
+if errorlevel 1 echo weekly_digest_monday: feedback steward hook skipped — continuing
+
 call "%~dp0token_audit.cmd" --prune-stale
 if errorlevel 1 exit /b %ERRORLEVEL%
 

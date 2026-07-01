@@ -100,12 +100,18 @@ def summarize_usage(repo: Path, *, days: int = 7) -> dict[str, Any]:
         if email:
             users.add(email)
     top = by_event.most_common(1)[0][0] if by_event else None
+    session_starts = int(by_event.get("session_start") or 0)
+    page_views = int(by_event.get("page_view") or 0)
+    streamlit_events = sum(v for k, v in by_event.items() if str(k).startswith("streamlit_"))
     return {
         "path": str(path),
         "exists": path.is_file(),
         "days": days,
         "total_events": len(rows),
         "unique_users": len(users),
+        "session_starts": session_starts,
+        "page_views": page_views,
+        "streamlit_events": streamlit_events,
         "by_event": dict(by_event.most_common(10)),
         "top_event": top,
     }
@@ -137,7 +143,8 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(summary, indent=2))
     else:
         print(
-            f"ppe_product_usage: events={summary['total_events']} users={summary['unique_users']} "
+            f"ppe_product_usage: events={summary['total_events']} sessions={summary.get('session_starts', 0)} "
+            f"page_views={summary.get('page_views', 0)} users={summary['unique_users']} "
             f"path={summary['path']}"
         )
         if summary.get("by_event"):

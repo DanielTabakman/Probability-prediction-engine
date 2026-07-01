@@ -13,8 +13,13 @@ from scripts.ppe_tracking_hub import (
     collect_tracking_snapshot,
     format_operator_tracking_lines,
     format_tracking_digest_lines,
+    format_usage_line,
     record_event,
     record_validation_session,
+    render_tracking_rollup_html,
+    scan_tracking_friction,
+    write_tracking_artifacts,
+    zero_activity_watch_line,
 )
 from scripts.workflow_metrics_cli import (
     append_slice_close_row,
@@ -97,7 +102,53 @@ class TestPpeTrackingHub(unittest.TestCase):
     def test_tracking_digest_lines(self) -> None:
         lines = format_tracking_digest_lines(self.repo, days=7)
         self.assertIsInstance(lines, list)
-        self.assertLessEqual(len(lines), 6)
+        self.assertLessEqual(len(lines), 7)
+
+    def test_format_usage_line_sessions(self) -> None:
+        line = format_usage_line(
+            {
+                "total_events": 10,
+                "exists": True,
+                "unique_users": 2,
+                "session_starts": 3,
+                "page_views": 5,
+                "streamlit_events": 2,
+                "top_event": "page_view",
+            }
+        )
+        self.assertIn("sessions=3", line or "")
+        self.assertIn("streamlit=2", line or "")
+
+    def test_zero_activity_watch_after_deploy(self) -> None:
+        from datetime import datetime, timedelta, timezone
+
+        deploy = (datetime.now(timezone.utc) - timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        (self.repo / "data").mkdir(parents=True)
+        (self.repo / "data" / "last_vps_deploy.utc").write_text(deploy, encoding="utf-8")
+        usage = {"total_events": 0, "exists": True}
+        line = zero_activity_watch_line(self.repo, usage)
+        self.assertIsNotNone(line)
+        self.assertIn("ZERO", line or "")
+
+    def test_render_rollup_html_and_write(self) -> None:
+        snap = collect_tracking_snapshot(self.repo, days=7)
+        html = render_tracking_rollup_html(snap)
+        self.assertIn("PPE tracking rollup", html)
+        json_path, md_path, html_path = write_tracking_artifacts(self.repo, snap)
+        self.assertTrue(html_path.is_file())
+        self.assertTrue(json_path.is_file())
+        self.assertTrue(md_path.is_file())
+
+    def test_scan_friction_zero_usage_post_deploy(self) -> None:
+        from datetime import date, datetime, timedelta, timezone
+
+        deploy = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        (self.repo / "data").mkdir(parents=True)
+        (self.repo / "data" / "last_vps_deploy.utc").write_text(deploy, encoding="utf-8")
+        snap = collect_tracking_snapshot(self.repo, days=7)
+        candidates = scan_tracking_friction(self.repo, date.today())
+        ids = [c.id for c in candidates]
+        self.assertIn("product-usage-zero-post-deploy", ids)
 
 
 if __name__ == "__main__":
