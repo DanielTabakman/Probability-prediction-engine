@@ -185,6 +185,18 @@ Do **not** add: comparison export, saved pins, NL intake, or fourth fit dimensio
 
 ---
 
+## Known gaps — resolution plan
+
+| Gap | Resolution |
+|-----|------------|
+| **Workflow handoff** (Lab → Expression planner) | Shipped: options cards link “inspect in Strategy Lab” and “structure fit” (`/strategy-lab/expression?asset=`). |
+| **Short / neutral sparse** | Short: added `long_put_leaps` + income-style put on equities. Neutral: honest empty copy — hedged catalog deferred. |
+| **Universe** | `equity_index` binding for SPY/QQQ/IWM; crypto binding covers BTC/ETH/SOL via registry picker. |
+| **Branch / PR** | Ship on a product branch (`product/exposure-menu-scan-v1` or similar); avoid mixed control-plane commits. |
+| **Relay closeout** | Optional evidence row when operator runs chapter closeout — not blocking UX. |
+
+---
+
 ## Related docs
 
 | Doc | Role |

@@ -135,10 +135,10 @@ Future (post v0):
 
 | Chapter | Delivers |
 |---------|----------|
-| **`ppe_exposure_menu_scan_v1`** | Sections, fit lenses, two-path compare — [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) |
+| **`ppe_exposure_menu_scan_v1`** | Sections, fit lenses, two-path compare — [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) **LIVE** |
 | `ppe_exposure_menu_nl_v1` | Natural-language intake (“nvidia exposure”) |
 | `msos_exposure_menu_save_v1` | Save chosen path to workflow store |
-| `ppe_exposure_menu_universe_v1` | All enabled catalog assets |
+| `ppe_exposure_menu_universe_v1` | Neutral/hedge catalog + remaining assets (SPY/QQQ/IWM index binding shipped in scan follow-up) |
 
 ---
 

@@ -181,6 +181,21 @@ def test_scan_compare_fields_on_nvda_long(nvda_mocks) -> None:
     assert spread.get("legs")
 
 
+def test_nvda_short_includes_put_and_income_paths(nvda_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("NVDA", "short")
+    path_ids = [p["path_id"] for p in report["paths"]]
+    assert "long_put_leaps" in path_ids
+    assert "cash_secured_put" in path_ids
+
+
+def test_spy_long_resolves_index_binding(nvda_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("SPY", "long")
+    assert report["asset_id"] == "SPY"
+    path_ids = [p["path_id"] for p in report["paths"]]
+    assert "long_stock" in path_ids
+    assert "sector_etf_proxy" not in path_ids
+
+
 def test_planned_rail_has_planned_badge(nvda_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("NVDA", "long")
     planned = next(p for p in report["paths"] if p["path_id"] == "sector_etf_proxy")

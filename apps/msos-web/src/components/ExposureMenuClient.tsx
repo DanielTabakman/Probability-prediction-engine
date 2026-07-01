@@ -287,7 +287,11 @@ export function ExposureMenuClient({
       {!loading && paths.length === 0 ? (
         <section className="exposure-menu-empty panel" role="status">
           <p>No exposure paths for this asset and direction yet.</p>
-          <p className="panel-sub">Try Long or Short, or pick another asset from the registry.</p>
+          <p className="panel-sub">
+            {direction === "neutral"
+              ? "Neutral / hedged structures are not cataloged in v1 — try Long or Short, or open Strategy Lab for belief-based structures."
+              : "Try Long or Short, or pick another asset from the registry."}
+          </p>
         </section>
       ) : null}
 
@@ -315,6 +319,7 @@ export function ExposureMenuClient({
                 return (
                   <ExposurePathCard
                     key={path.path_id}
+                    assetId={assetId}
                     path={path}
                     activeFitLens={activeFitLens}
                     dimmed={Boolean(activeFitLens && !matches)}
@@ -328,6 +333,12 @@ export function ExposureMenuClient({
           </section>
         );
       })}
+
+      {pinnedIds.length === 1 ? (
+        <p className="exposure-pin-hint panel-sub" role="status">
+          Pin one more path to compare side by side.
+        </p>
+      ) : null}
 
       {pinnedPaths.length === 2 ? (
         <div className="exposure-compare-bar panel">

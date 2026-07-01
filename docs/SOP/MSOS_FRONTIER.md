@@ -38,6 +38,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **TRADER_LEARNING_SPINE_PROGRAM_V1** ([`TRADER_LEARNING_SPINE_PROGRAM_V1.md`](docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md)) — ACTIVE — RevLoop + DistDl product on main; VM closeout in flight. Next UX BUILD: horizon_nav (#3 in UX_EXECUTION_BACKLOG_V1.md)
 - **UX_EXECUTION_BACKLOG_V1** ([`UX_EXECUTION_BACKLOG_V1.md`](docs/SOP/UX_EXECUTION_BACKLOG_V1.md)) — ACTIVE — prioritized UX/workflow BUILD map; relay queue wins over backlog order
 - **POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION** ([`POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md`](docs/SOP/POST_MVP1_CROSS_VENUE_ARB_CHARTER_V1_SELECTION.md)) — COMPLETE — scan/backtest CLIs + daily collector pipeline (#529); VM install: install_cross_venue_collector_task.cmd (CROSS_VENUE_COLLECTOR_OPS_V1.md)
+- **POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION** ([`POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md`](docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md)) — CHARTERED — HYPE perp on /exposure; P2 side channel parallel to asset batch wave 1; not options batch
 <!-- ACTIVE_PRODUCT_DIRECTION:END -->
 
 - **MSOS** = platform-shaped shell around **PPE** (narrow scope, future-platform-ready architecture).

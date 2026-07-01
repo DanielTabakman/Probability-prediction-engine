@@ -245,6 +245,17 @@ export function buildExposurePagePath(
   return `/exposure?${params.toString()}`;
 }
 
+/** Handoff targets after picking an options path (fit exploration — not recommendations). */
+export function buildStrategyLabHandoffHref(assetId: string): string {
+  const id = assetId.trim().toUpperCase();
+  return `/strategy-lab?${EXPOSURE_ASSET_QUERY_PARAM}=${encodeURIComponent(id)}`;
+}
+
+export function buildExpressionPlannerHandoffHref(assetId: string): string {
+  const id = assetId.trim().toUpperCase();
+  return `/strategy-lab/expression?${EXPOSURE_ASSET_QUERY_PARAM}=${encodeURIComponent(id)}`;
+}
+
 export function isExposureMenuPayload(value: unknown): value is ExposureMenuPayload {
   if (!value || typeof value !== "object") {
     return false;

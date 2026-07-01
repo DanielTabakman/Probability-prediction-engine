@@ -143,6 +143,28 @@ path_templates:
     deep_link_rail: strategy_lab
     recommendation_status: path_not_recommendation
 
+  long_put_leaps:
+    path_id: long_put_leaps
+    instrument_rail: listed_options
+    label: "Long LEAPS put"
+    direction: short
+    headline: "Bearish exposure with premium at risk"
+    capital_shape: "Premium at risk; profits if spot falls before expiry"
+    leverage: defined
+    time_bound: dated
+    liquidity: medium
+    sort_group: listed_options_leaps
+    structure: long_put
+    min_horizon_days: 270
+    pros:
+      - "Defined max loss (premium paid)"
+      - "Less capital than shorting shares outright"
+    cons:
+      - "Time decay works against you"
+      - "Needs a meaningful drop to profit"
+    deep_link_rail: strategy_lab
+    recommendation_status: path_not_recommendation
+
   sector_etf_proxy:
     path_id: sector_etf_proxy
     instrument_rail: etf_proxy
@@ -251,6 +273,19 @@ asset_bindings:
       - long_otm_call
       - sector_etf_proxy
     short:
+      - long_put_leaps
+      - cash_secured_put
+    neutral: []
+
+  equity_index:
+    long:
+      - long_stock
+      - bull_call_spread_leaps
+      - long_leaps_call
+      - long_near_dated_call
+      - long_otm_call
+    short:
+      - long_put_leaps
       - cash_secured_put
     neutral: []
 
