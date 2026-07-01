@@ -16,7 +16,9 @@ When the task is complete:
 
 **Hold:** Ask mode; explore/Q&A with no implementation; user said "don't commit"; mixed-plane on charter thread (park to operator).
 
-**Gate fail:** operator/ide_build/neutral → clean branch, stage task files only, fix layers, re-run gate, ship. Charter/explore → one line: "Operator thread: recovery + ship."
+**Gate fail:** operator/ide_build/neutral → clean branch, stage task files only, fix layers, re-run gate, ship. Charter/explore → one line: "Operator thread: recovery + ship." Or: `python scripts/ppe_worker_lease.py --ship` when a lease is active.
+
+**Delegation WARN:** `steward_packet` / `can_auto_ship=False` on gate output is advisory — **gate exit 0 still ships**. Only `human_only` blocks.
 
 **Never commit:** `.env`, credentials, `artifacts/`, caches, `*.db`.
 

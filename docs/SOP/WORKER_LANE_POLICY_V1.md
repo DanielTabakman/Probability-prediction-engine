@@ -36,7 +36,7 @@ Cost lane mapping (metrics): `cursor-desktop` → `cursor-cli` / `acp`; `codex-a
 
 1. One active lease per overlapping path set on a dirty tree.
 2. Acquire before BUILD: `ppe_worker_lease.py --acquire --worker codex-app --branch … --paths …`
-3. Release after gate: `ppe_worker_lease.py --release`
+3. Release after ship: `ppe_worker_lease.py --ship --release`
 4. `CLOSEOUT_ONLY` forbids new edits under `src/**`.
 5. `resolve_lease` in burst plan → stop; do not spawn second BUILD worker.
 
