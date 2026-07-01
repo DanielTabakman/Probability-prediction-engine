@@ -629,6 +629,16 @@ def _format_human(
                 lines.append("")
         except Exception:
             pass
+    if repo is not None:
+        try:
+            from scripts.ppe_chapter_coordination import format_operator_coordination_lines
+
+            coord_lines = format_operator_coordination_lines(repo)
+            if coord_lines:
+                lines.extend(coord_lines)
+                lines.append("")
+        except Exception:
+            pass
     if status.get("chapter_name"):
         lines.append(f"Chapter: {status['chapter_name']}")
     if status.get("manifest_status"):

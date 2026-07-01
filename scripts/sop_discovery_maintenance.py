@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""One-shot SOP discovery maintenance (backfill + READY starter regen)."""
+"""One-shot SOP discovery + chapter coordination maintenance."""
 
 from __future__ import annotations
 
@@ -12,6 +12,11 @@ _REPO = Path(__file__).resolve().parents[1]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
+from scripts.ppe_chapter_coordination import (  # noqa: E402
+    assess_chapter_coordination_health,
+    plan_coordination_repair,
+    repair_repo_coordination,
+)
 from scripts.sop_discovery_core import (  # noqa: E402
     assess_sop_discovery_health,
     backfill_evidence_front_matter,
@@ -26,10 +31,11 @@ from scripts.ppe_ide_build_starter import (  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="SOP discovery maintenance (backfill + regen)")
+    ap = argparse.ArgumentParser(description="SOP discovery + chapter coordination maintenance")
     ap.add_argument("--repo-root", type=Path, default=_REPO)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--apply", action="store_true", help="Write changes (default is dry-run plan)")
+    ap.add_argument("--coordination-repair", action="store_true", help="Repair IDE markers + closeout registry desync")
     ap.add_argument("--evidence-backfill", action="store_true", help="Stamp archived YAML on evidence docs")
     ap.add_argument("--regen-ready-starters", action="store_true", help="Regen IDE BUILD starters for READY queue")
     ap.add_argument("--refresh-index", action="store_true", help="Regenerate CHAPTER_DOC_INDEX + archive catalog")
@@ -37,39 +43,55 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--all",
         action="store_true",
-        help="Run repair + evidence backfill + READY starter regen + index refresh",
+        help="Run coordination repair + SOP discovery maintenance (repair, backfill, starters, index)",
     )
-    ap.add_argument("--status", action="store_true", help="Print assess_sop_discovery_health only")
+    ap.add_argument("--status", action="store_true", help="Print maintenance health (SOP + coordination)")
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
     if args.status:
-        report = assess_sop_discovery_health(repo)
+        sop = assess_sop_discovery_health(repo)
+        coord = assess_chapter_coordination_health(repo)
+        report = {"sop_discovery": sop, "chapter_coordination": coord, "ok": bool(sop.get("ok") and coord.get("ok"))}
         if args.json:
             print(json.dumps(report, indent=2, sort_keys=True))
         else:
-            print("SOP discovery health:", "OK" if report.get("ok") else "WARN")
-            for key in (
-                "index_fresh_detail",
-                "link_error_count",
-                "evidence_backfill_pending",
-                "ready_starter_regen_pending",
-            ):
-                if report.get(key) is not None:
-                    print(f"  {key}: {report[key]}")
-        return 0 if report.get("ok") else 1
+            print("Maintenance health:", "OK" if report["ok"] else "WARN")
+            print("  SOP discovery:", "OK" if sop.get("ok") else "WARN")
+            if not sop.get("ok"):
+                for key in (
+                    "index_fresh_detail",
+                    "link_error_count",
+                    "evidence_backfill_pending",
+                    "ready_starter_regen_pending",
+                ):
+                    if sop.get(key) is not None:
+                        print(f"    {key}: {sop[key]}")
+            print("  Chapter coordination:", "OK" if coord.get("ok") else "WARN")
+            if not coord.get("ok"):
+                top = coord.get("top_issue") if isinstance(coord.get("top_issue"), dict) else {}
+                if top.get("message"):
+                    print(f"    top: {top['message']}")
+                print(f"    repairable_plans: {coord.get('repairable_plan_count')}")
+        return 0 if report["ok"] else 1
 
+    run_coord = args.all or args.coordination_repair
     run_repair = args.all or args.repair_active_evidence
     run_evidence = args.all or args.evidence_backfill
     run_starters = args.all or args.regen_ready_starters
     run_refresh = args.all or args.refresh_index
-    if not (run_repair or run_evidence or run_starters or run_refresh):
+    if not (run_coord or run_repair or run_evidence or run_starters or run_refresh):
         ap.error(
-            "Specify --all, --status, or one of --repair-active-evidence / "
-            "--evidence-backfill / --regen-ready-starters / --refresh-index"
+            "Specify --all, --status, --coordination-repair, or one of "
+            "--repair-active-evidence / --evidence-backfill / --regen-ready-starters / --refresh-index"
         )
 
     out: dict[str, object] = {"applied": args.apply}
+    if run_coord:
+        if args.apply:
+            out["coordination_repair"] = repair_repo_coordination(repo, apply=True)
+        else:
+            out["coordination_repair"] = plan_coordination_repair(repo)
     if run_repair:
         if args.apply:
             out["repair_active_evidence"] = repair_active_evidence_front_matter(repo, apply=True)
@@ -99,6 +121,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(out, indent=2, sort_keys=True))
     else:
+        if run_coord:
+            block = out.get("coordination_repair") or {}
+            if args.apply:
+                print(
+                    f"coordination repair: {block.get('fix_count', 0)} fix(es), "
+                    f"{block.get('remaining_count', 0)} remaining"
+                )
+            else:
+                print(
+                    f"coordination repair: {block.get('repairable_plan_count', 0)} plan(s) "
+                    f"({block.get('issue_count', 0)} issues, dry-run)"
+                )
         if run_repair:
             block = out.get("repair_active_evidence") or {}
             if args.apply:

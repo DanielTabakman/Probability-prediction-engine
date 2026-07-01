@@ -93,5 +93,11 @@ def test_run_operator_doctor_no_ssh(tmp_path, monkeypatch) -> None:
                     "scripts.check_vm_host_health.collect_host_health",
                     return_value={"healthy": True, "alerts": []},
                 ):
-                    report = run_operator_doctor(tmp_path, probe_ssh=False, write_artifacts=False)
+                    with patch(
+                        "scripts.ppe_chapter_coordination.assess_chapter_coordination_health",
+                        return_value={"ok": True, "issue_count": 0, "high_count": 0},
+                    ):
+                        report = run_operator_doctor(tmp_path, probe_ssh=False, write_artifacts=False)
     assert "checks" in report
+    check_ids = {c.get("id") for c in report.get("checks") or [] if isinstance(c, dict)}
+    assert "chapter_coordination" in check_ids

@@ -34,4 +34,4 @@ Do **not** treat stale handoff copies as SSOT when generated files disagree — 
 
 Index: [`CHAPTER_DOC_INDEX.json`](../../docs/SOP/CHAPTER_DOC_INDEX.json) · canon: [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md)
 
-Maintenance (backfill archived evidence YAML, READY starter regen): `sop_discovery_maintenance.cmd --all --apply`
+Maintenance (backfill archived evidence YAML, READY starter regen, coordination repair): `sop_discovery_maintenance.cmd --all --apply`
