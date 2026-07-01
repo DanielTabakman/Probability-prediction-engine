@@ -224,7 +224,7 @@ def audit_repo(repo: Path, *, plan_path: str | None = None) -> list[Issue]:
     issues: list[Issue] = []
     seen: set[str] = set()
     for plan in plans:
-        plan_file = repo / plan.replace("/", "\\") if "\\" not in plan else repo / plan
+        plan_file = repo / _norm_plan(plan)
         if not plan_file.is_file():
             continue
         try:
