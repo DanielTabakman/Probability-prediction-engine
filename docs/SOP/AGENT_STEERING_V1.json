@@ -2,8 +2,9 @@
   "version": 1,
   "asOf": "2026-06-30",
   "closeoutOnlyChapterIds": [
-    "msos_trader_review_loop_v1",
-    "msos_strategy_lab_dist_download_v1"
+    "msos_storyboard_visual_parity_v1",
+    "msos_strategy_lab_dist_download_v1",
+    "msos_trader_review_loop_v1"
   ],
   "nextBuildCandidateId": "msos_trader_workflow_horizon_nav_v1",
   "nextBuildCandidateNote": "promote READY in PHASE_QUEUE.json",

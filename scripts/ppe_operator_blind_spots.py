@@ -254,6 +254,34 @@ def assess_operator_blind_spots(
         pass
 
     try:
+        from scripts.ppe_chapter_coordination import audit_repo, format_warning_lines
+
+        coord_issues = audit_repo(repo)
+        if coord_issues:
+            health["coordination_issues"] = len(coord_issues)
+            for issue in coord_issues[:4]:
+                issues.append(
+                    _issue(
+                        f"chapter_coordination_{issue.get('code', 'unknown')}".lower(),
+                        severity=str(issue.get("severity") or "high"),
+                        message=str(issue.get("message") or "Chapter coordination desync"),
+                        fix=str(issue.get("fix") or f"See docs/SOP/CHAPTER_COORDINATION_V1.md"),
+                    )
+                )
+            if len(coord_issues) > 4:
+                extra = format_warning_lines(coord_issues[4:], max_lines=2)
+                issues.append(
+                    _issue(
+                        "chapter_coordination_more",
+                        severity="medium",
+                        message=f"{len(coord_issues) - 4} more coordination issue(s)",
+                        fix="; ".join(extra) if extra else "python scripts/ppe_chapter_coordination.py",
+                    )
+                )
+    except Exception:
+        pass
+
+    try:
         from scripts.ppe_gh_auth_expiry import assess_gh_auth_expiry, format_gh_expiry_line
 
         gh_exp = assess_gh_auth_expiry()

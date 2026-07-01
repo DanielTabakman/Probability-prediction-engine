@@ -411,6 +411,13 @@ def main(argv: list[str] | None = None) -> int:
         print("\033[1;32mAll checks passed!\033[0m")
     if files:
         try:
+            from scripts.ppe_chapter_coordination import warn_if_coordination_needed
+
+            warn_if_coordination_needed(repo, files)
+        except ImportError:
+            pass
+    if files:
+        try:
             from scripts.ppe_delegation_envelope import classify_paths, current_branch, record_auto_notify
 
             verdict = classify_paths(

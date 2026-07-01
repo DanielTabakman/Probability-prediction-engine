@@ -12,7 +12,7 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 - **Product milestone:** **Trader Workflow Integration v1** · [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](docs/SOP/MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md)
 - **Stage:** trader_workflow_integration — storyboard design **complete** ([`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/))
 - **Active relay chapter:** `` · plan [``]()
-- **Next steward action:** Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY in PHASE_QUEUE.json). Spine relay: finish closeout only for [msos_trader_review_loop_v1, msos_strategy_lab_dist_download_v1] — product on main; do NOT re-BUILD (see OPERATOR_STATUS Mode). Then spine queue: msos_cross_venue_strategy_lab_v1 → mvp1_distribution_timeseries_collector_v1. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
+- **Next steward action:** Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate msos_trader_workflow_horizon_nav_v1 (promote READY in PHASE_QUEUE.json). Spine relay: finish closeout only for [msos_storyboard_visual_parity_v1, msos_strategy_lab_dist_download_v1, msos_trader_review_loop_v1] — product on main; do NOT re-BUILD (see OPERATOR_STATUS Mode). Then spine queue: msos_cross_venue_strategy_lab_v1 → mvp1_distribution_timeseries_collector_v1. Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md.
 
 **Workstreams (milestone):**
 - **Self-serve onboarding** (complete) · `msos_self_serve_onboarding_v1` — [`CLIENT_SELF_SERVE_DEMO_V1.md`](docs/SOP/CLIENT_SELF_SERVE_DEMO_V1.md)
@@ -124,19 +124,19 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Charter:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) · **Blocked until** workflow persistence COMPLETE · **Does not block** phases 4a–7
 
-### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
+### MSOS storyboard visual parity v1 — relay queue — **WITNESS PENDING**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **CLOSED** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
-| **CLOSED** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
-| **CLOSED** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
-| **CLOSED** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
-| **CLOSED** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
-| **CLOSED** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
-| **CLOSED** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
-| **CLOSED** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
-| **CLOSED** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
+| **SHIPPED** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
+| **SHIPPED** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
+| **SHIPPED** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
+| **SHIPPED** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
+| **SHIPPED** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
+| **PENDING** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
+| **PENDING** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
 
 **Evidence:** [`MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md`](MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md)
 
