@@ -159,6 +159,15 @@ def build_morning_report(repo: Path, status: dict[str, Any]) -> tuple[str, str]:
     if health_line:
         lines.append(f"Infra: {health_line}")
 
+    try:
+        from scripts.ppe_gh_auth_expiry import assess_gh_auth_expiry, format_gh_expiry_line
+
+        gh_line = format_gh_expiry_line(assess_gh_auth_expiry())
+        if gh_line:
+            lines.append(gh_line)
+    except Exception:
+        pass
+
     lines.append("")
     lines.append("Send status for the live picture.")
     return "PPE morning report", "\n".join(lines)

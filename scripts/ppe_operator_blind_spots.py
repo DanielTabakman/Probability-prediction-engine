@@ -234,10 +234,10 @@ def assess_operator_blind_spots(
         )
 
     try:
-        from scripts.check_vm_host_health import load_host_health
+        from scripts.check_vm_host_health import host_health_is_fresh, load_host_health
 
         host = load_host_health(repo)
-        if host and host.get("alerts"):
+        if host and host_health_is_fresh(host) and host.get("alerts"):
             health["host_alerts"] = host.get("alerts")
             for alert in host.get("alerts") or []:
                 issues.append(
@@ -245,7 +245,37 @@ def assess_operator_blind_spots(
                         "vm_host_resources",
                         severity="high" if "critical" in str(alert) else "medium",
                         message=str(alert),
-                        fix="Free disk/RAM on loop host; see VM_HOST_HEALTH.json.",
+                        fix="Free disk/RAM on loop host; run scripts/ppe_doctor.cmd.",
+                    )
+                )
+        elif host and not host_health_is_fresh(host):
+            health["host_health_stale"] = True
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_gh_auth_expiry import assess_gh_auth_expiry, format_gh_expiry_line
+
+        gh_exp = assess_gh_auth_expiry()
+        health["gh_expiry"] = gh_exp
+        if gh_exp.get("needs_reauth"):
+            issues.append(
+                _issue(
+                    "gh_auth_expired",
+                    severity="high",
+                    message="GitHub CLI auth missing or expired.",
+                    fix="Run gh auth login on desktop and loop host.",
+                )
+            )
+        elif gh_exp.get("warn_expiry"):
+            line = format_gh_expiry_line(gh_exp)
+            if line:
+                issues.append(
+                    _issue(
+                        "gh_auth_expiring",
+                        severity="medium",
+                        message=line,
+                        fix="Run gh auth login before token expires.",
                     )
                 )
     except Exception:

@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 HEALTH_REL = "artifacts/control_plane/VM_HOST_HEALTH.json"
+HOST_HEALTH_MAX_AGE_SECONDS = 3600
 DISK_WARN_GB = 5.0
 DISK_CRITICAL_GB = 2.0
 RAM_WARN_PCT = 15.0
@@ -205,6 +206,38 @@ def load_host_health(repo: Path) -> dict[str, Any] | None:
     except (OSError, json.JSONDecodeError):
         return None
     return data if isinstance(data, dict) else None
+
+
+def _parse_utc(value: str) -> datetime | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def host_health_age_seconds(host: dict[str, Any] | None) -> float | None:
+    if not host:
+        return None
+    ts = _parse_utc(str(host.get("as_of") or ""))
+    if ts is None:
+        return None
+    return max(0.0, (datetime.now(timezone.utc) - ts).total_seconds())
+
+
+def host_health_is_fresh(
+    host: dict[str, Any] | None,
+    *,
+    max_age_seconds: int = HOST_HEALTH_MAX_AGE_SECONDS,
+) -> bool:
+    age = host_health_age_seconds(host)
+    if age is None:
+        return False
+    return age <= max(60, int(max_age_seconds))
 
 
 def main(argv: list[str] | None = None) -> int:
