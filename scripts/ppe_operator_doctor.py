@@ -20,10 +20,20 @@ def run_operator_doctor(
 
     try:
         from scripts.ppe_notify_push import bootstrap_operator_notify_env, ntfy_configured, notify_enabled
+        from scripts.ppe_notify_setup import maybe_init_notify_config
 
         bootstrap_operator_notify_env(repo)
+        if not (notify_enabled() and ntfy_configured()):
+            maybe_init_notify_config(repo)
+            bootstrap_operator_notify_env(repo)
         ntfy_ok = notify_enabled() and ntfy_configured()
-        report["checks"].append({"id": "ntfy", "ok": ntfy_ok})
+        report["checks"].append(
+            {
+                "id": "ntfy",
+                "ok": ntfy_ok,
+                "fix": None if ntfy_ok else "Run setup_notify.cmd and subscribe in the ntfy app",
+            }
+        )
     except Exception as exc:
         report["checks"].append({"id": "ntfy", "ok": False, "error": str(exc)})
 
@@ -113,7 +123,7 @@ def format_doctor_report(report: dict[str, Any]) -> str:
             continue
         mark = "ok" if check.get("ok") else "FAIL"
         cid = check.get("id", "?")
-        detail = check.get("detail") or check.get("error") or ""
+        detail = check.get("detail") or check.get("error") or check.get("fix") or ""
         lines.append(f"  [{mark}] {cid}" + (f" — {detail}" if detail else ""))
     issues = blind.get("issues") or []
     if issues:

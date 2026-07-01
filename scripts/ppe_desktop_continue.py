@@ -10,10 +10,14 @@ from typing import Any
 
 def run_desktop_continue(repo: Path, *, finish_timeout: int = 300) -> dict[str, Any]:
     repo = repo.resolve()
+    from scripts.ppe_operator_branch_preflight import prepare_desktop_relay_pull
     from scripts.ppe_operator_git_sync import pull_main
     from scripts.ppe_operator_vm_ssh import ssh_vm, vm_finish_command, vm_status_brief_command
 
+    desktop_prep = prepare_desktop_relay_pull(repo)
     pull = pull_main(repo)
+    if not pull.get("ok", True) and not pull.get("skipped") and desktop_prep.get("ok"):
+        pull = desktop_prep
     pull_ok = pull.get("ok", True) or pull.get("skipped")
 
     finish = ssh_vm(vm_finish_command(pull_main=True), timeout=finish_timeout)
@@ -23,6 +27,7 @@ def run_desktop_continue(repo: Path, *, finish_timeout: int = 300) -> dict[str, 
     return {
         "action": "desktop_continue",
         "ok": ok,
+        "desktop_prep": desktop_prep,
         "git_pull": pull,
         "vm_finish": finish,
         "vm_status": status,

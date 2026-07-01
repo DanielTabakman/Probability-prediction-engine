@@ -135,6 +135,12 @@ def refresh_vm_mirror_from_git(
     report["remote_age_s"] = mirror_age_seconds(remote)
 
     if not mirror_is_populated(remote):
+        hydrate = hydrate_vm_mirror_from_ssh_cache(repo)
+        report["hydrate"] = hydrate
+        if hydrate.get("ok"):
+            report["action"] = "hydrated_from_ssh_cache"
+            report["path"] = str(mirror_path(repo))
+            return report
         report["action"] = "no_remote_mirror"
         return report
 
@@ -149,6 +155,48 @@ def refresh_vm_mirror_from_git(
     else:
         report["action"] = "keep_local_newer"
     return report
+
+
+def hydrate_vm_mirror_from_ssh_cache(repo: Path) -> dict[str, Any]:
+    """When git mirror is empty, hydrate local VM_OPERATOR_PHASE.json from SSH cache."""
+    repo = repo.resolve()
+    if mirror_is_populated(load_vm_phase_mirror(repo)):
+        return {"skipped": True, "reason": "mirror_already_populated"}
+
+    try:
+        from scripts.ppe_operator_vm_ssh import (
+            VM_STATUS_CACHE_TTL_SECONDS,
+            cache_is_fresh,
+            load_vm_status_cache,
+            parse_autobuilder_brief,
+        )
+    except ImportError:
+        return {"skipped": True, "reason": "vm_ssh_unavailable"}
+
+    cache = load_vm_status_cache(repo)
+    if not cache or not cache_is_fresh(cache, ttl_seconds=VM_STATUS_CACHE_TTL_SECONDS):
+        return {"skipped": True, "reason": "no_fresh_ssh_cache"}
+
+    parsed = cache.get("parsed") if isinstance(cache.get("parsed"), dict) else None
+    if not parsed or not str(parsed.get("phase") or "").strip():
+        parsed = parse_autobuilder_brief(str(cache.get("stdout") or ""))
+    phase = str((parsed or {}).get("phase") or "").strip()
+    verdict = str((parsed or {}).get("verdict") or "").strip()
+    if not phase or phase in ("-", "null"):
+        return {"skipped": True, "reason": "no_phase_in_cache"}
+
+    payload = {
+        "version": 1,
+        "description": "Hydrated from VM_STATUS_CACHE on desktop (not loop-host publish).",
+        "as_of": str(cache.get("as_of") or _utc_now()),
+        "phase": phase,
+        "verdict": verdict,
+        "source": "ssh_cache",
+    }
+    path = mirror_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return {"ok": True, "action": "hydrated_from_cache", "phase": phase, "path": str(path)}
 
 
 def assess_mirror_health(

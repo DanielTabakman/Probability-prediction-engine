@@ -105,3 +105,32 @@ def assess_operator_branch_preflight(
         "reasons": reasons,
         "commands": commands,
     }
+
+
+def prepare_desktop_relay_pull(repo: Path) -> dict[str, Any]:
+    """Best-effort desktop git sync when operator is on an allowed non-main branch."""
+    repo = repo.resolve()
+    branch = _current_branch(repo)
+    target = "main"
+    if not branch or branch == target:
+        return {"action": "prepare_relay_pull", "skipped": True, "reason": "on_main", "branch": branch or target}
+
+    allowed = branch.startswith(ALLOWED_DESKTOP_PREFIXES) or branch.startswith(("fix/", "charter/"))
+    if not allowed:
+        return {
+            "action": "prepare_relay_pull",
+            "skipped": True,
+            "reason": "branch_not_allowed_for_fetch",
+            "branch": branch,
+        }
+
+    proc = _git(repo, "fetch", "origin", target, "--quiet")
+    ok = proc.returncode == 0
+    return {
+        "action": "prepare_relay_pull",
+        "ok": ok,
+        "skipped": False,
+        "branch": branch,
+        "fetched": target,
+        "error": None if ok else (proc.stderr or proc.stdout or "git fetch failed").strip(),
+    }

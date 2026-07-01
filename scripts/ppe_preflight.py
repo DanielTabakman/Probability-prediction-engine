@@ -186,6 +186,10 @@ def run_preflight(
         if dirty_paths:
             if closeout_only and not product_dirty:
                 pass
+            elif branch and branch != "main":
+                warnings.append(
+                    f"working tree has uncommitted changes ({len(dirty_paths)} path(s)) on {branch!r}"
+                )
             else:
                 warnings.append("main checkout has uncommitted changes (worktrees do BUILD)")
     except (subprocess.CalledProcessError, FileNotFoundError):

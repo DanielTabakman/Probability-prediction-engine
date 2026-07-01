@@ -101,7 +101,7 @@ def assess_operator_blind_spots(
                     "ntfy_unconfigured",
                     severity="medium",
                     message="Mobile ntfy not configured — stuck/mirror alerts won't reach phone.",
-                    fix="Copy ppe_operator_notify.local.cmd.example → set PPE_NTFY_TOPIC (+ PPE_NTFY_TOPIC_STUCK).",
+                    fix="Run setup_notify.cmd once, then subscribe to the topic in the ntfy app.",
                 )
             )
     except Exception:
