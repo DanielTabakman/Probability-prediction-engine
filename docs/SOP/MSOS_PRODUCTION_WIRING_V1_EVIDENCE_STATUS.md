@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_production_wiring_v1
+closed: 2026-06-17
+---
+
 # MSOS production wiring v1 — evidence status
 
 **Chapter:** `msos_production_wiring_v1`  

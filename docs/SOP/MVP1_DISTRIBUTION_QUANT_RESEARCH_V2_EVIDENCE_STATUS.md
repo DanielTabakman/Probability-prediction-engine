@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_distribution_quant_research_v2
+closed: 2026-06-13
+---
+
 # MVP1 distribution quant research v2 — evidence status
 
 **Chapter:** `mvp1_distribution_quant_research_v2`  

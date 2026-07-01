@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_website_program_p0
+closed: 2026-06-01
+---
+
 # MSOS Website Program P0 — evidence status
 
 **Chapter:** MSOS Website Program P0 — queue installation  

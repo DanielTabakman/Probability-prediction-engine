@@ -329,6 +329,14 @@ def scaffold_chapter_files(repo_root: Path, proposal: dict[str, Any]) -> list[st
         )
         written.append(evidence)
 
+    if written:
+        try:
+            from scripts.sop_discovery_core import refresh_sop_discovery_artifacts
+
+            refresh_sop_discovery_artifacts(repo)
+        except Exception:
+            pass
+
     return written
 
 

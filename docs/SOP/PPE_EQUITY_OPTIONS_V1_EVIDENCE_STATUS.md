@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_equity_options_v1
+closed: 2026-06-26
+---
+
 # PPE equity options v1 — evidence status
 
 **Chapter:** `ppe_equity_options_v1`  

@@ -1,3 +1,4 @@
+
 # MSOS entitlements v1 — evidence status
 
 **Chapter:** `msos_entitlements_v1`  

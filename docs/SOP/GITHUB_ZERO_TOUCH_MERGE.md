@@ -126,7 +126,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 | Symptom | What to check |
 |--------|----------------|
 | Auto-merge not available | Repo setting **Allow auto-merge**; branch protection may require incompatible rules. **Private Free:** use label **`automerge`** + workflow **Merge on green** ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). |
-| PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. |
+| PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. SOP-touching PRs also run **`CI / sop_discovery_gate`** (path-filtered; not a required check — skipped jobs do not satisfy branch protection). |
 | Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**. **Private Free:** confirm **Merge on green** ran (Actions tab) and **Workflow permissions** allow read/write. |
 | Merged but site old | [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D; confirm **Deploy VPS** run for that commit. |
 | Child PR green but not merging | Base may still be a feature branch — wait for **Retarget stacked PRs** workflow or run `python scripts/retarget_stacked_prs.py --scan`. |
@@ -135,5 +135,5 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 
 - [RELAY_ORCHESTRATOR_RUNBOOK_V1.md](RELAY_ORCHESTRATOR_RUNBOOK_V1.md) — slice/phase artifacts; **Shipping (GitHub)** subsection.  
 - [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) — VPS and `main` as source of truth.  
-- [README](../../README.md) — commit/merge test gates; CI runs **ruff + full pytest** (`CI / pytest`) and **Docker entrypoint smoke** (`CI / docker_entrypoint`).
+- [README](../../README.md) — commit/merge test gates; CI runs **ruff + full pytest** (`CI / pytest`) and **Docker entrypoint smoke** (`CI / docker_entrypoint`). SOP PRs: **`CI / sop_discovery_gate`** (index `--check` + link validation).
 - [COMMIT_POLICY.md](COMMIT_POLICY.md) — canonical local gate before pushable commits.

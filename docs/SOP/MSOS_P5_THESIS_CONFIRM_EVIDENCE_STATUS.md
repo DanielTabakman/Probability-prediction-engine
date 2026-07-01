@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p5_thesis_confirm
+closed: 2026-06-11
+---
+
 # MSOS P5 thesis confirm — evidence status
 
 **Chapter:** `msos_p5_thesis_confirm`  

@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_deploy_witness_refresh
+closed: 2026-05-28
+---
+
 # MVP1 deploy witness refresh — evidence status
 
 **Chapter:** `mvp1_deploy_witness_refresh`  

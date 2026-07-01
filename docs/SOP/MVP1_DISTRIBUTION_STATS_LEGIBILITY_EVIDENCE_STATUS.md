@@ -1,3 +1,4 @@
+
 # MVP1 distribution stats legibility — evidence status
 
 **Chapter:** `mvp1_distribution_stats_legibility`  

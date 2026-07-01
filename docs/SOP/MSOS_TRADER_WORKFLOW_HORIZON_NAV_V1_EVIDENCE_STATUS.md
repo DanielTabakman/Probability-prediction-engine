@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_trader_workflow_horizon_nav_v1
+closed: 2026-06-30
+---
+
 # MSOS trader workflow horizon nav v1 — evidence status
 
 **Chapter:** `msos_trader_workflow_horizon_nav_v1`  

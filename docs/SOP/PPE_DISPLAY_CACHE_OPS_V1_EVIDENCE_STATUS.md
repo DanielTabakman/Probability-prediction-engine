@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_display_cache_ops_v1
+closed: 2026-06-29
+---
+
 # PPE display cache ops v1 — evidence status
 
 **Chapter:** `ppe_display_cache_ops_v1`  

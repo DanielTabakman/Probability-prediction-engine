@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_crypto_multi_asset_v1
+closed: 2026-06-26
+---
+
 # PPE crypto multi-asset v1 — evidence status
 
 **Chapter:** `ppe_crypto_multi_asset_v1`  

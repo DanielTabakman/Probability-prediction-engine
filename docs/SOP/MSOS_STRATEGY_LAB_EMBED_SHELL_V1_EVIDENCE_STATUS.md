@@ -1,3 +1,4 @@
+
 # MSOS Strategy Lab embed shell v1 — evidence status
 
 **Chapter:** `msos_strategy_lab_embed_shell_v1`  

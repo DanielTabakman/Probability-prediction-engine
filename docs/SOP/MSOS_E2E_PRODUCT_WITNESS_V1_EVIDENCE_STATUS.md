@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_e2e_product_witness_v1
+closed: 2026-06-19
+---
+
 # MSOS end-to-end product witness v1 — evidence status
 
 **Chapter:** `msos_e2e_product_witness_v1`  

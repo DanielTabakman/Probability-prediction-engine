@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p6_expression_sim
+closed: 2026-06-12
+---
+
 # MSOS P6 expression sim — evidence status
 
 **Chapter:** `msos_p6_expression_sim`  

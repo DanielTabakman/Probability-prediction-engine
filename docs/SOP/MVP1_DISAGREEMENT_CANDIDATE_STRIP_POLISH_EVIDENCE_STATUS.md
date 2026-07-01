@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_disagreement_candidate_strip_polish
+closed: 2026-05-26
+---
+
 # MVP1 disagreement / candidate strip polish — evidence status
 
 **Chapter:** MVP1 disagreement / candidate strip polish (v0)  

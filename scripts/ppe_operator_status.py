@@ -619,6 +619,16 @@ def _format_human(
                 lines.append("")
         except Exception:
             pass
+    if repo is not None:
+        try:
+            from scripts.sop_discovery_core import format_operator_sop_health_lines
+
+            sop_lines = format_operator_sop_health_lines(repo)
+            if sop_lines:
+                lines.extend(sop_lines)
+                lines.append("")
+        except Exception:
+            pass
     if status.get("chapter_name"):
         lines.append(f"Chapter: {status['chapter_name']}")
     if status.get("manifest_status"):

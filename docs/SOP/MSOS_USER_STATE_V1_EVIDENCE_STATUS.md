@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_user_state_v1
+closed: 2026-06-20
+---
+
 # MSOS user state v1 — evidence status
 
 **Chapter:** `msos_user_state_v1`  

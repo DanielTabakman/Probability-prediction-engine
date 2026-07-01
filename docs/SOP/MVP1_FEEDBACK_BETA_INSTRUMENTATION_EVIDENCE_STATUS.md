@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_feedback_beta_instrumentation
+closed: 2026-05-27
+---
+
 # MVP1 feedback + beta instrumentation — evidence status
 
 **Chapter:** MVP1 feedback + beta instrumentation (v0)  

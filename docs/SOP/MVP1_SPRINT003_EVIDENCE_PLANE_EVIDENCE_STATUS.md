@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_sprint003_evidence_plane
+closed: 2026-05-27
+---
+
 # MVP1 Sprint 003 evidence-plane — evidence status
 
 **Chapter:** MVP1 Sprint 003 evidence-plane (relay-assisted hardening)  

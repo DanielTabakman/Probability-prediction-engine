@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_cross_venue_prob_panel
+closed: 2026-06-13
+---
+
 # MVP1 cross-venue probability panel — evidence status
 
 **Chapter:** `mvp1_cross_venue_prob_panel`  

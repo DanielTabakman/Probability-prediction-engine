@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_trader_review_loop_v1
+closed: 2026-06-30
+---
+
 # MSOS trader review loop v1 — evidence status
 
 **Chapter:** `msos_trader_review_loop_v1`  

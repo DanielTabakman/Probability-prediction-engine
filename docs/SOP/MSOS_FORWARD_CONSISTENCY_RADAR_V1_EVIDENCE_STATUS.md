@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_forward_consistency_radar_v1
+closed: unknown
+---
+
 # MSOS forward consistency radar v1 — evidence status
 
 **Chapter:** `msos_forward_consistency_radar_v1`

@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_equity_universe_tier1a_v1
+closed: 2026-06-30
+---
+
 # PPE equity universe tier-1a v1 — evidence status
 
 **Chapter:** `ppe_equity_universe_tier1a_v1`  

@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_self_serve_onboarding_v1
+closed: 2026-06-26
+---
+
 # MSOS self-serve onboarding v1 — evidence status
 
 **Chapter:** `msos_self_serve_onboarding_v1`  

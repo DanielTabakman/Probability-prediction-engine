@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_distribution_export
+closed: 2026-06-06
+---
+
 # MVP1 distribution export — evidence status
 
 **Chapter:** `mvp1_distribution_export`  

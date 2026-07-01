@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: phase3_commercial_wrapper
+closed: 2026-05-28
+---
+
 # Phase 3 commercial wrapper — evidence status
 
 **Chapter:** Phase 3 commercial wrapper (v0)  

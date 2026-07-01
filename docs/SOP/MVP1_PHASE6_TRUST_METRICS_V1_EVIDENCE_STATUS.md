@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_phase6_trust_metrics_v1
+closed: 2026-05-29
+---
+
 # MVP1 Phase 6 trust metrics v1 — evidence status
 
 **Chapter:** `mvp1_phase6_trust_metrics_v1`  

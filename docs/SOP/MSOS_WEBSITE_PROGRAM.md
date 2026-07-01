@@ -166,3 +166,15 @@ Phase **6:** [`SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md`](SPRINT_MSOS_E2E_PRODUCT_W
 **Live product sequence:** [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) · **Commercial ADR:** [`MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md`](MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md)
 
 Backlog rows stay **blocked** until the prior chapter is **done**; closeout then **auto-promotes** the next row to `queued` ([`PPE_QUEUE_PROPAGATION_V1.md`](PPE_QUEUE_PROPAGATION_V1.md)).
+
+---
+
+## Agent load bundle
+
+| Doc | Role |
+|-----|------|
+| [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) | Live steering |
+| [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) | Product sequence |
+| [`POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md`](POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md) | P0 SELECTION |
+| [`PHASE_PLANS/msos_website_program_p0_relay.json`](PHASE_PLANS/msos_website_program_p0_relay.json) | P0 relay plan |
+| Resolve | `python scripts/resolve_sop.py --topic "msos web" --json` |
