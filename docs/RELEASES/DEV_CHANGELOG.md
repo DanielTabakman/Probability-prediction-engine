@@ -4,6 +4,13 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `32f28d89` — build(deps): bump actions/setup-python from 5 to 6 (#1111)
+- `3fc6a580` — build(deps): bump dorny/paths-filter from 3 to 4 (#1109)
+- `a7e751b4` — control-plane: SOP discovery tier 6 (#1127) (`scripts/`)
+- `416cdf70` — ops: context closeout ship (control-plane/recovery-202607012146) (#1116) (`docs/SOP/`)
+- `78c38a08` — ops: loop publish control-plane/desktop-continue-vm-sync (#1119)
+- `01f4fb17` — control-plane: slim operator rules, VM SOP reset before pull (#1051) (`docs/SOP/`)
+- `946940b0` — Control-plane: dev changelog
 - `2a27ab51` — Merge pull request #1113 from DanielTabakman/fix/sop-discovery-merge
 - `b177ef6f` — control-plane: add coordination-check script, agent, and tests (`docs/SOP/`)
 - `7fca8b3d` — control-plane: coordination-check agent + burst gate (`docs/SOP/`)
