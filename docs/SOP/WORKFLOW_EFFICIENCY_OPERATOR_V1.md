@@ -2,7 +2,9 @@
 
 **Plane:** CONTROL-PLANE. **Purpose:** operational runbook for token, user-time, and throughput optimization.
 
-Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md) · [`WORKFLOW_METRICS_V1.md`](WORKFLOW_METRICS_V1.md) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · [`PPE_TOKEN_ECONOMY_V1.md`](PPE_TOKEN_ECONOMY_V1.md) · [`WORKFLOW_METRICS_V1.md`](WORKFLOW_METRICS_V1.md) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md)
+
+**Human vs agent:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — factory steps below are **agent-owned** when an operator thread is active; founder manual surface is ntfy double-click only (see that doc).
 
 ---
 
@@ -22,23 +24,30 @@ Cross-refs: [`WORKFLOW_CONTEXT_AUDIT_001.md`](WORKFLOW_CONTEXT_AUDIT_001.md) · 
 
 **Policy:** [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) · **Process:** [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md)
 
-### VM loop host
+### Agent-owned factory (default in operator thread)
+
+| Step | Who |
+|------|-----|
+| `git pull` before BUILD | Agent in operator/ide_build thread |
+| `DESKTOP_BUILD.cmd` / `DESKTOP_CONTINUE.cmd` on verdict | Agent — or founder **double-click** when ntfy fires outside Cursor |
+| Burst + `@ppe-director` on `IDE_BUILD` | Agent |
+| VM triage (`fix_vm_operator.cmd`) | Agent on VM Remote-SSH thread |
+
+### VM loop host (mostly unattended)
 
 1. Stack runs via logon task or `VM_RESTART.cmd` — no daily git pull from phone.
-2. `ppe_autobuilder.cmd status --brief` when triaging.
-3. `fix_vm_operator.cmd` when relay stuck.
+2. `ppe_autobuilder.cmd status --brief` when triaging — **agent** in operator thread.
+3. `fix_vm_operator.cmd` when relay stuck — **agent** on VM thread.
 
-### Desktop (IDE BUILD)
+### Founder manual surface only
 
-1. `git pull` before BUILD sessions.
-2. `DESKTOP_BUILD.cmd` on `IDE_BUILD` ntfy.
-3. `DESKTOP_CONTINUE.cmd` after product PR merges.
+1. Double-click **`DESKTOP BUILD`** / **`DESKTOP CONTINUE`** when phone ntfy says `IDE_BUILD` and **not** in an agent thread.
+2. Otherwise: **`what's next?`** in operator thread — agent runs everything below.
 
 ### Legacy single-machine (no VM)
 
-1. `git checkout main && git pull`
-2. `python scripts/ppe_operator_status.py`
-3. `run_ppe_auto_local_loop.cmd` — only when VM is **not** the loop host
+1. Agent: `git checkout main && git pull` + status + loop — only when VM is **not** the loop host.
+2. Do not assign these steps to founder in agent threads.
 
 ---
 
@@ -50,13 +59,18 @@ When `PRODUCT_BLOCKED` or loop exit 7:
 generate_ide_build_starter.cmd <sliceId> <phasePlanPath>
 ```
 
-1. Open **new** Cursor Agent thread.
-2. `@` `artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md` only.
-3. Implement → commit on plan `buildBranch`.
-4. `mark_ide_product_ready.cmd <sliceId> [phasePlanPath]`
-5. `run_ppe_local.cmd`
+### Agent path (operator thread active — default)
 
-Optional before BUILD:
+1. `@ppe-director` → build worker, or implement in `ide_build` thread with starter only.
+2. Gate → commit on plan `buildBranch` → `mark_ide_product_ready.cmd` → `DESKTOP_CONTINUE.cmd` or VM `run_ppe_local.cmd`.
+3. Do **not** ask founder to open threads or run relay steps.
+
+### Founder manual path (ntfy outside Cursor only)
+
+1. Double-click **`DESKTOP BUILD`** or open operator thread with `what's next?`.
+2. Agent owns steps 2–3 above once thread is open.
+
+Optional before BUILD (agent):
 
 ```bat
 python scripts/ppe_context_preflight.py --phase-plan <phasePlanPath> --slice-id <sliceId>

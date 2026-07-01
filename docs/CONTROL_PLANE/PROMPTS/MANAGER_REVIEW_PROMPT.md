@@ -11,8 +11,9 @@ You are the **manager** for this repository. This is a **single execution step**
 - Do **not** silently continue into manager-start for the next feature slice or into worker execution.
 - Stop immediately after producing the required output.
 
-### Git posture
+### Git posture (Codex sprint worker — not Cursor IDE)
 - Do **not** commit, push, branch, rebase, reset, or amend unless explicitly asked.
+- **Cursor agents** in this repo auto-ship per [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc); this block does not apply to them.
 
 ### Required reads (do this before deciding)
 Read these in priority order:

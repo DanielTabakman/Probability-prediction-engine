@@ -115,7 +115,7 @@ AUTOBUILDER_SECTION = """
         <h3>Daily desktop (IDE BUILD)</h3>
         <p>Cursor / Codex only when verdict is <code>IDE_BUILD</code>. No loop, no <code>run_ppe_local</code>.</p>
         <ul>
-          <li><code>DESKTOP_BUILD.cmd</code> → clipboard prompt → Agent</li>
+          <li><code>DESKTOP_BUILD.cmd</code> → starter + IDE_BUILD_NOW.md → Agent</li>
           <li>Gate → commit → PR → merge</li>
           <li><code>DESKTOP_CONTINUE.cmd</code> → SSH finish on VM</li>
         </ul>

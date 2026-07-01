@@ -1,0 +1,25 @@
+---
+description: Auto commit, push, PR when task is done and gate passes.
+alwaysApply: true
+---
+
+# Auto-ship (PPE)
+
+When the task is complete:
+
+1. `python scripts/run_pushable_gate.py`
+2. `git status`, `git diff`, `git log -1 --oneline`
+3. Commit — message = slice/chapter + plane + intent
+4. Feature branch: `python scripts/run_pushable_gate.py --pre-push` → push → `gh pr create` to `main` if no PR
+
+**Never ask** to commit, push, stage, or open a PR.
+
+**Hold:** Ask mode; explore/Q&A with no implementation; user said "don't commit"; mixed-plane on charter thread (park to operator).
+
+**Gate fail:** operator/ide_build/neutral → clean branch, stage task files only, fix layers, re-run gate, ship. Charter/explore → one line: "Operator thread: recovery + ship." Or: `python scripts/ppe_worker_lease.py --ship` when a lease is active.
+
+**Delegation WARN:** `steward_packet` / `can_auto_ship=False` on gate output is advisory — **gate exit 0 still ships**. Only `human_only` blocks.
+
+**Never commit:** `.env`, credentials, `artifacts/`, caches, `*.db`.
+
+Canon: `docs/SOP/COMMIT_POLICY.md`

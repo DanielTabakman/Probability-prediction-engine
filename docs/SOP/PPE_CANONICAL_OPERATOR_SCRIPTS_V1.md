@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Audience:** operators, stewards, agents  
 **Role:** **Single source of truth** for verdict → machine → command. Other docs link here instead of duplicating tables.
 
-**Related:** [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) (human double-click lookup) · [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) · [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) (policy)
+**Related:** [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) (human double-click lookup) · [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) · [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) (policy) · [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) (product-on-main factory sync)
 
 ## Why this doc exists
 
@@ -19,7 +19,7 @@ If any helper, runbook, or agent rule disagrees with this doc, **trust this doc*
 |---|---------|---------------|-----------------|
 | 1 | **Verdict / status** | `python scripts/ppe_operator_status.py` · `ppe_autobuilder.cmd status --brief` | What should run next? (`IDE_BUILD`, `RUN_LOCAL`, `RUN_AUTO`, …) |
 | 2 | **Relay advance** | `run_ppe.cmd` (VM) · `ppe_autobuilder.cmd advance` | Execute the next relay slice or propagate queue |
-| 3 | **Pushable gate** | `python scripts/run_pushable_gate.py` | Is this commit/PR safe to push? (tier 0/1/2) |
+| 3 | **Pushable gate** | `python scripts/run_pushable_gate.py` | Is this commit/PR safe to push? (tier 0/1/2); warns on coordination-sensitive edits |
 | 4 | **IDE BUILD handoff** | `DESKTOP_BUILD.cmd` | Stage Cursor/Codex worker when verdict is `IDE_BUILD` |
 | 5 | **Relay runtime** | `python scripts/relay_runtime_v0.py` | Stage / resume / abort a single in-flight relay run (file-backed state machine) |
 
@@ -49,8 +49,9 @@ Phone ntfy hints mirror this table via [`scripts/ppe_operator_hint.py`](../../sc
 
 ### `DESKTOP_BUILD.cmd` (start IDE BUILD)
 
+0. `python scripts/ppe_worker_lease.py --prepare-desktop-build` — lane + lease + `WORK_DISPATCH.json` (blocks on conflict).
 1. Loads `ppe_operator_no_loop.local.cmd` (`PPE_STACK_FORBIDDEN=1`).
-2. `python scripts/ppe_autobuilder.py handoff` — stages worker prompt to clipboard.
+2. `python scripts/ppe_autobuilder.py handoff` — stages starter + `IDE_BUILD_NOW.md` (clipboard off by default).
 3. `python scripts/ppe_build_worker.py print-handoff` — on-screen worker steps.
 
 Related helpers: `scripts/ppe_ide_handoff.py`, `scripts/ppe_build_worker.py`.
@@ -58,15 +59,26 @@ Related helpers: `scripts/ppe_ide_handoff.py`, `scripts/ppe_build_worker.py`.
 ### `DESKTOP_CONTINUE.cmd` (after PR merge)
 
 1. `git pull origin main` on desktop.
-2. SSH to VM → **`call call_ppe_operator_local.cmd`** → **`python scripts/ppe_operator_git_sync.py --reset-runtime-sop`** → **`git pull origin main`** → **`finish_ide_build.cmd`**.
+2. SSH to VM → **`call call_ppe_operator_local.cmd`** → **`ppe_operator_git_sync.py --prepare-handoff-auto`** → **`finish_ide_build.cmd`**.
 3. `finish_ide_build.cmd` runs `scripts/ppe_post_build_watcher.py --finish-handoff` (post-build mark when build branch has commits; **else explicit CLOSEOUT_ONLY `run_ppe_local` trigger** when product is already on `main`).
-4. SSH status uses loop-host env: `call call_ppe_operator_local.cmd && ppe_autobuilder.cmd status --brief`.
+4. SSH status: `call call_ppe_operator_local.cmd && check_vm_loop.cmd --no-pause`.
 
 Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 
 **VM health check:** `check_vm_loop.cmd --no-pause` on the loop host (loads env + brief status).
 
 **Forbidden on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `finish_ide_build.cmd`, `run_ppe_auto_local_loop.cmd`, `run_ppe_headless_stack.cmd`, `ppe_autobuilder.cmd advance`.
+
+### Desktop maintenance (not relay)
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/ppe_doctor.cmd` | One-shot infra check: ntfy, gh, SSH, VM health, blind spots |
+| `install_ppe_network_watchdog_task.cmd` | Register Task Scheduler: SSH probe every 15m; ntfy after 3 failures |
+| `python scripts/ppe_network_watchdog.py` | Manual probe (same as scheduled task) |
+| `python scripts/ppe_worktree_janitor.py` | List removable `_worktrees/*`; `--remove <path>` only after human review |
+
+These do **not** advance the relay queue or call `DESKTOP_CONTINUE`.
 
 ---
 
@@ -78,6 +90,8 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 | **Notify / phone** | `ppe_notify_fix.py`, `ppe_ntfy_listen.py`, `ppe_operator_hint.py` | Mobile alerts; blocked-state triage |
 | **Witness / deploy** | `verify_msos_web_ship.py`, `ensure_production_deploy.py` | Post-merge production checks |
 | **Recovery** | `vm_bootstrap.cmd --recover`, `fix_vm_operator.cmd` | Stale relay, dirty trigger, stack down |
+| **Desktop maintenance** | `scripts/ppe_doctor.cmd`, `install_ppe_network_watchdog_task.cmd`, `scripts/ppe_worktree_janitor.py` | Infra blind spots, VM reachability, stale worktrees — **not relay** |
+| **Multi-agent leases** | `ppe_worker_lease.py` | Cursor vs Codex lanes; [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) |
 | **Closeout** | `post_relay_continue.py`, `apply_control_closeout_v1` (via relay) | Chapter COMPLETE propagation |
 
 ---

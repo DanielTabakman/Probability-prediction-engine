@@ -17,7 +17,7 @@ export function WorkflowStepper({ currentStep, assetId }: WorkflowStepperProps) 
   const currentIndex = workflowStepIndex(currentStep);
 
   return (
-    <nav className="workflow-stepper" aria-label="Strategy Lab workflow">
+    <nav className="workflow-stepper" aria-label="Strategy Lab workflow" data-tour="lab-workflow-review">
       {STRATEGY_LAB_WORKFLOW_STEPS.map((step, index) => {
         const active = step.id === currentStep;
         const complete = index < currentIndex;

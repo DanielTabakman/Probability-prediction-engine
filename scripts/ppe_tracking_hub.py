@@ -344,6 +344,12 @@ def zero_activity_watch_line(repo: Path, usage: dict[str, Any], *, days: int = 7
     )
 
 
+def collect_aggregate_signals(repo: Path, *, days: int = 7) -> dict[str, Any]:
+    from scripts.ppe_workflow_aggregate import summarize_aggregate
+
+    return summarize_aggregate(repo, days=days)
+
+
 def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
     return {
         "generated_at_utc": _utc_now(),
@@ -352,6 +358,7 @@ def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
         "assets": collect_asset_enablement(repo),
         "trader_outcomes": collect_trader_outcomes(repo),
         "factory": collect_factory_signals(repo, days=days),
+        "aggregate": collect_aggregate_signals(repo, days=days),
         "product_usage": collect_product_usage(repo, days=days),
     }
 
@@ -361,12 +368,19 @@ def format_operator_tracking_lines(repo: Path, *, days: int = 7) -> list[str]:
     lines: list[str] = []
 
     factory = snap.get("factory") or {}
+    agg = snap.get("aggregate") or {}
     lines.append(
         "Tracking: "
-        f"ctx_closeouts={factory.get('context_closeouts', 0)} "
-        f"validation_sessions={factory.get('validation_sessions', 0)} "
+        f"slices={agg.get('slices_logged', factory.get('slices_logged', 0))} "
+        f"weighted={agg.get('weighted_slices', 0)} "
+        f"closeouts={agg.get('context_closeouts', factory.get('context_closeouts', 0))} "
         f"incidents={factory.get('incident_slices', 0)}"
     )
+    if agg.get("thread_pulses"):
+        lines.append(
+            f"Thread pulse: avg_load={agg.get('avg_cognitive_load')} "
+            f"pulses={agg.get('thread_pulses', 0)}"
+        )
 
     steering = snap.get("steering") or {}
     if not steering.get("aligned"):
@@ -407,11 +421,19 @@ def format_tracking_digest_lines(repo: Path, *, days: int = 7) -> list[str]:
     lines: list[str] = []
 
     factory = snap.get("factory") or {}
-    closeouts = int(factory.get("context_closeouts") or 0)
+    agg = snap.get("aggregate") or {}
+    closeouts = int(agg.get("context_closeouts") or factory.get("context_closeouts") or 0)
     validation = int(factory.get("validation_sessions") or 0)
-    if closeouts or validation:
+    weighted = int(agg.get("weighted_slices") or 0)
+    if closeouts or validation or weighted:
         lines.append(
-            f"- Factory window: {closeouts} context closeout(s), {validation} validation session(s)."
+            f"- Factory window: {weighted} weighted slice(s), {closeouts} closeout(s), "
+            f"{validation} validation session(s)."
+        )
+    if agg.get("thread_pulses"):
+        lines.append(
+            f"- Thread pulses: {agg.get('thread_pulses')} "
+            f"(avg load {agg.get('avg_cognitive_load')}/5)."
         )
 
     usage = snap.get("product_usage") or {}
@@ -491,6 +513,20 @@ def render_tracking_markdown(snap: dict[str, Any]) -> str:
     for key in ("enabled_count", "total_registered", "target_enabled_count", "gap_to_target"):
         if key in assets and assets[key] is not None:
             lines.append(f"- **{key}:** {assets[key]}")
+    lines.extend(["", "## Aggregate (async/mobile)", ""])
+    agg = snap.get("aggregate") or {}
+    for key in (
+        "slices_logged",
+        "weighted_slices",
+        "weighted_slices_per_closeout",
+        "avg_roundtrips_per_slice",
+        "thread_pulses",
+        "avg_cognitive_load",
+        "context_closeouts",
+        "incident_slices",
+    ):
+        if key in agg:
+            lines.append(f"- **{key}:** {agg[key]}")
     lines.extend(["", "## Product usage", ""])
     usage = snap.get("product_usage") or {}
     for key in ("exists", "total_events", "unique_users", "top_event", "path"):
@@ -519,10 +555,17 @@ def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
     payload = json.dumps(snap, indent=2)
     usage = snap.get("product_usage") or {}
     factory = snap.get("factory") or {}
+    agg = snap.get("aggregate") or {}
     rows = [
         ("Generated (UTC)", str(snap.get("generated_at_utc") or "—")),
         ("Window (days)", str(snap.get("days") or "—")),
-        ("Context closeouts", str(factory.get("context_closeouts", 0))),
+        ("Slices logged", str(agg.get("slices_logged", factory.get("slices_logged", 0)))),
+        ("Weighted slices", str(agg.get("weighted_slices", 0))),
+        ("Weighted slices / closeout", str(agg.get("weighted_slices_per_closeout", 0))),
+        ("Avg roundtrips / slice", str(agg.get("avg_roundtrips_per_slice", 0))),
+        ("Thread pulses", str(agg.get("thread_pulses", 0))),
+        ("Avg cognitive load", str(agg.get("avg_cognitive_load", 0))),
+        ("Context closeouts", str(agg.get("context_closeouts", factory.get("context_closeouts", 0)))),
         ("Validation sessions", str(factory.get("validation_sessions", 0))),
         ("Product events", str(usage.get("total_events", 0))),
         ("Sessions (session_start)", str(usage.get("session_starts", 0))),
@@ -534,6 +577,12 @@ def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
     by_event = usage.get("by_event") or {}
     event_rows = "\n".join(
         f"<tr><td>{name}</td><td>{count}</td></tr>" for name, count in sorted(by_event.items())
+    )
+    pulses = agg.get("recent_pulses") or []
+    pulse_rows = "\n".join(
+        f"<tr><td>{p.get('recorded_at', '')}</td><td>{p.get('cognitive_load_1_5', '')}</td>"
+        f"<td>{p.get('note', '')}</td></tr>"
+        for p in pulses
     )
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -552,9 +601,14 @@ def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
 </head>
 <body>
   <h1>PPE tracking rollup (in-house)</h1>
-  <p>Replaces external spreadsheet ritual — regenerate via <code>ppe_tracking_status.cmd</code>.</p>
+  <p>Aggregate-first — no session timers. Slices auto-log; optional thread pulse on closeout.</p>
   <h2>Summary</h2>
   <table>{body_rows}</table>
+  <h2>Recent thread pulses</h2>
+  <table>
+    <tr><th>When</th><th>Load</th><th>Note</th></tr>
+    {pulse_rows or '<tr><td colspan="3">None yet</td></tr>'}
+  </table>
   <h2>Product usage by event</h2>
   <table>
     <tr><th>Event</th><th>Count ({usage.get('days', 7)}d)</th></tr>
@@ -576,6 +630,12 @@ def write_tracking_artifacts(repo: Path, snap: dict[str, Any]) -> tuple[Path, Pa
     json_path.write_text(json.dumps(snap, indent=2) + "\n", encoding="utf-8")
     md_path.write_text(render_tracking_markdown(snap), encoding="utf-8")
     html_path.write_text(render_tracking_rollup_html(snap), encoding="utf-8")
+    try:
+        from scripts.workflow_metrics_cli import cmd_export_csv
+
+        cmd_export_csv(repo)
+    except OSError:
+        pass
     return json_path, md_path, html_path
 
 

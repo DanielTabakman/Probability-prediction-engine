@@ -8,6 +8,8 @@ from unittest.mock import patch
 from scripts.ppe_operator_git_sync import (
     check_and_nudge_merges,
     ensure_main_on_loop_host,
+    prepare_handoff_with_auto_recover,
+    prepare_loop_host_for_handoff,
     pull_main,
     publish_ahead,
 )
@@ -86,6 +88,124 @@ def test_ensure_main_from_charter_when_clean(tmp_path: Path) -> None:
     assert out.get("checked_out") is True
     assert out.get("ok") is True
     assert any(args[:2] == ["checkout", "main"] for args in calls)
+
+
+def test_prepare_handoff_resets_transient_build_branch(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("status", "--porcelain"):
+            return type(
+                "P",
+                (),
+                {
+                    "returncode": 0,
+                    "stdout": " M docs/SOP/PHASE_QUEUE.json\n M docs/SOP/HANDOFF.md\n",
+                    "stderr": "",
+                },
+            )()
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+        if args[:3] == ["checkout", "origin/main", "--"]:
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("checkout", "-f") or args[:2] == ("checkout", "main"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("reset", "--hard"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="build/auto/MSOS-FCR-Product-Slice002"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=False):
+                with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                    out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any(args[:2] == ["reset", "--hard"] for args in calls)
+    assert any(args[:2] == ["pull", "--ff-only"] for args in calls)
+
+
+def test_prepare_handoff_aborts_merge_before_pull(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("merge", "--abort"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=True):
+                with patch("scripts.ppe_operator_git_sync._dirty_paths", return_value=[]):
+                    with patch(
+                        "scripts.ppe_operator_git_sync.reset_runtime_sop_drift_from_origin",
+                        return_value={"changes": []},
+                    ):
+                        with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                            out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any(args[:2] == ["merge", "--abort"] for args in calls)
+
+
+def test_vm_finish_command_uses_prepare_handoff() -> None:
+    from scripts.ppe_operator_vm_ssh import vm_finish_command
+
+    cmd = vm_finish_command(pull_main=True)
+    assert "--prepare-handoff-auto" in cmd
+    assert "finish_ide_build.cmd" in cmd
+    assert "git pull origin main" not in cmd
+
+
+def test_prepare_handoff_detaches_main_worktrees(tmp_path: Path) -> None:
+    repo = tmp_path
+    detached = [{"worktree": str(tmp_path / "wt1"), "branch": "main", "detached": True}]
+
+    def fake_git(_repo: Path, *args: str):
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+        if args[:2] == ("checkout", "main"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=False):
+                with patch(
+                    "scripts.ppe_operator_git_sync.reset_runtime_sop_drift_from_origin",
+                    return_value={"changes": []},
+                ):
+                    with patch("scripts.ppe_operator_git_sync._dirty_paths", return_value=[]):
+                        with patch("scripts.ppe_operator_git_sync._detach_main_worktrees", return_value=detached):
+                            with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                                out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any("detach_main_worktrees" in str(c) for c in out.get("changes") or [])
+
+
+def test_prepare_handoff_auto_recovers_and_retries(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls = {"n": 0}
+
+    def fake_prepare(_repo: Path):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"ok": False, "error": "worktree", "changes": []}
+        return {"ok": True, "changes": ["checkout main"]}
+
+    with patch("scripts.ppe_operator_git_sync.prepare_loop_host_for_handoff", side_effect=fake_prepare):
+        with patch(
+            "scripts.ppe_operator_git_sync._handoff_light_recover",
+            return_value={"action": "handoff_light_recover", "ok": True, "steps": []},
+        ):
+            out = prepare_handoff_with_auto_recover(repo)
+    assert out.get("ok") is True
+    assert out.get("auto_recover") is True
+    assert calls["n"] == 2
 
 
 def test_publish_skips_when_nothing_ahead(tmp_path: Path) -> None:
@@ -197,3 +317,70 @@ def test_publish_reports_timeout(tmp_path: Path) -> None:
                         out = publish_ahead(repo)
     assert out["ok"] is False
     assert out.get("timed_out") is True
+
+
+def test_vm_mirror_head_eligible_for_automerge() -> None:
+    from scripts.ppe_operator_git_sync import VM_MIRROR_PUBLISH_PREFIX, _head_eligible_for_automerge
+
+    head = f"{VM_MIRROR_PUBLISH_PREFIX}20260101120000-abc1234"
+    assert _head_eligible_for_automerge(head, {}) is True
+
+
+def test_publish_vm_mirror_ahead_opens_pr(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("push", "origin"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync.push_enabled", return_value=True):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._ahead_count", return_value=1):
+                with patch("scripts.ppe_operator_git_sync._short_head", return_value="abc1234"):
+                    with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                        with patch(
+                            "scripts.ppe_operator_git_sync._open_pr",
+                            return_value="https://github.com/example/pr/1",
+                        ) as open_pr:
+                            from scripts.ppe_operator_git_sync import publish_vm_mirror_ahead
+
+                            out = publish_vm_mirror_ahead(repo, phase="FINISH_IN_FLIGHT")
+    assert out["ok"] is True
+    assert out.get("mirror_only") is True
+    open_pr.assert_called_once()
+    assert open_pr.call_args.kwargs.get("labels") == ["automerge"]
+
+
+def test_close_conflicting_mirror_prs(tmp_path: Path) -> None:
+    from scripts.ppe_operator_git_sync import VM_MIRROR_PUBLISH_PREFIX, close_conflicting_mirror_prs
+
+    head = f"{VM_MIRROR_PUBLISH_PREFIX}20260701-deadbeef"
+    closed_nums: list[str] = []
+
+    def fake_gh_json(_repo: Path, args: list[str]):
+        if args[1] == "pr" and args[2] == "list":
+            return [
+                {
+                    "number": 1061,
+                    "headRefName": head,
+                    "mergeable": "CONFLICTING",
+                    "mergeStateStatus": "DIRTY",
+                    "url": "https://github.com/example/pr/1061",
+                }
+            ]
+        return []
+
+    def fake_run(args, **kwargs):
+        if args[:3] == ["gh", "pr", "close"]:
+            closed_nums.append(args[3])
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._gh_available", return_value=True):
+        with patch("scripts.ppe_operator_git_sync._gh_json", side_effect=fake_gh_json):
+            with patch("scripts.ppe_operator_git_sync.subprocess.run", side_effect=fake_run):
+                out = close_conflicting_mirror_prs(tmp_path)
+    assert out["ok"] is True
+    assert closed_nums == ["1061"]

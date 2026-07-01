@@ -1,16 +1,16 @@
 # Human steward backlog
 
-**Purpose:** Policy and architecture topics too big for the auto-loop. Work through these deliberately — not via `PHASE_CHAPTER_BACKLOG.json`.
+**Purpose:** Policy and architecture topics for **founder** review — not auto-loop work. See [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md). Agents must not paste open items as founder todos in unrelated threads.
 
 | When | Action |
 |------|--------|
-| **Weekly** (Monday digest) | Scan open **high** items — ntfy lists top titles |
-| **Monthly** ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)) | Pick one item → `in_progress` |
+| **Weekly** (Monday digest) | `digest-only` — ntfy lists top titles; no action unless founder opts in |
+| **Monthly** ([`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md)) | Founder charter pass — pick one item → `in_progress` |
 | **When done** | Set `status: done` + `closed` date in JSON; run `render-md` |
 
 **Machine source:** [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) · **Refresh this file:** `python scripts/ppe_human_backlog.py render-md`
 
-> Policy and architecture topics for human review — not auto-loop work. Edit items here; run python scripts/ppe_human_backlog.py render-md to refresh the readable doc. Weekly ntfy digest includes open high-priority titles.
+> Founder charter work only — see FOUNDER_OPERATOR_SURFACE_V1.md. Agents must not append open items to operator-thread replies or weekly todo lists. Surface one item only when the user opens a steward/charter pass. Weekly ntfy digest lists open high-priority titles (digest-only).
 
 ## Open
 
@@ -98,6 +98,15 @@
 - **policy question:** Stay near-zero-API (local profile) vs pay for full autonomous product slices?
 - **notes:** DECISION: Option A default — manual DESKTOP_BUILD / ppe_go paste (autoRemoteBuild=false). Mid-month burn boost: after day 16, if Cursor credits <35% used (operator records via ppe_remote_build_policy.cmd), autoRemoteBuild ON for rest of month. Implemented: remoteBuildPolicy in PPE_AUTO_OPERATOR.local.json + scripts/ppe_remote_build_policy.py.
 
+### Founder vs operator surface v1
+
+- **id:** `founder_operator_surface_v1` · **priority:** high · **category:** governance
+- **added:** 2026-07-01
+- **closed:** 2026-07-01
+- **summary:** Codify founder (work ON product) vs agent factory (work IN product); stop surfacing relay/git/recovery as human todos.
+- **policy question:** What stays founder-only forever vs delegated envelope?
+- **notes:** Shipped FOUNDER_OPERATOR_SURFACE_V1.md + routing/rules/calendar/workflow patches.
+
 ### Founder / canon policy
 
 - **id:** `founder_canon_policy` · **priority:** high · **category:** governance
@@ -142,4 +151,4 @@
 
 ## Changelog
 
-| 2026-06-30 | Auto-render from JSON |
+| 2026-07-01 | Auto-render from JSON |

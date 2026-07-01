@@ -5,7 +5,7 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 
@@ -41,9 +41,19 @@ Also skip when thread role is charter / explore / neutral (see thread-roles). Sk
 
 ## Operator reply format
 
-Short state summary only — no operator checklists, choice questions, or relay command lists (agent runs those). Default: **"Nothing required from you."** Canon: [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies. **RUN_LOCAL detail:** [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc).
+After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md).
+
+**Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions).
+
+**Never:** operator checklists, choice questions, commit permission prompts, or manual IDE BUILD thread asks when burst can spawn workers. Default founder line: **"Nothing required from you."**
+
+**VM vs stale desktop status:** trust VM brief — refresh status and advance product; do not ask which source to trust.
+
+**VM recovery:** stuck relay on VM → `DESKTOP_CONTINUE` (`--prepare-handoff-auto`) or `fix_vm_operator.cmd` on VM **only when `STACK_DOWN`**. No desktop SSH git surgery. Live health: `DESKTOP_VM_STATUS.cmd --no-pause`.
+
+**RUN_LOCAL detail:** [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc).
 
 ## Token discipline
 
 - New thread per slice; starter only — no log/diff paste.
-- On-demand: [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc), [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc), [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc), [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Roles/discovery/auto-commit: always-on rules.
+- On-demand: [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc), [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc), [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc), [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc), [`auto-ship.mdc`](auto-ship.mdc). Roles/discovery: always-on rules.

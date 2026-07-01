@@ -328,11 +328,18 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         pass
 
     delegation_hint: str | None = None
+    ship_hint: str | None = None
     try:
         from scripts.ppe_delegation_envelope import operator_delegation_hint
 
         delegation_hint = operator_delegation_hint(repo)
     except ImportError:
+        pass
+    try:
+        from scripts.ppe_worker_lease import operator_ship_hint
+
+        ship_hint = operator_ship_hint(repo)
+    except Exception:
         pass
 
     return {
@@ -353,6 +360,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "preflight_ok": preflight.get("ok"),
         "preflight_warnings": preflight.get("warnings") or [],
         "delegation_hint": delegation_hint,
+        "ship_hint": ship_hint,
         "commands": commands,
         "avoid": avoid,
         "errors": errors,
@@ -363,6 +371,12 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 
 def prepare_operator_status(repo: Path) -> dict[str, Any]:
     """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
+    try:
+        from scripts.ppe_notify_push import bootstrap_operator_notify_env
+
+        bootstrap_operator_notify_env(repo)
+    except Exception:
+        pass
     try:
         from scripts.ppe_operator_config import apply_operator_env
 
@@ -375,50 +389,163 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
 
 def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Desktop: attach VM phase mirror/cache so agents act without SSH probes."""
+    loop_ok = False
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
 
-        if loop_host_start_allowed()[0]:
+        loop_ok = bool(loop_host_start_allowed()[0])
+        if loop_ok:
             return status
     except Exception:
         pass
 
-    vm_mirror = None
-    vm_brief = None
     try:
-        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+        from scripts.ppe_operator_pass_timebox import record_operator_session
 
-        vm_mirror = load_vm_phase_mirror(repo)
+        status["operator_session"] = record_operator_session(repo, status)
     except Exception:
         pass
 
     try:
+        from scripts.ppe_operator_branch_preflight import assess_operator_branch_preflight
+
+        branch_pf = assess_operator_branch_preflight(
+            repo,
+            verdict=str(status.get("verdict") or ""),
+            loop_host_allowed=loop_ok,
+            chapter_mode=status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else None,
+        )
+        status["branch_preflight"] = branch_pf
+        if branch_pf.get("blocks_relay"):
+            status["commands"] = list(branch_pf.get("commands") or [])
+            status.setdefault("avoid", []).extend(
+                [
+                    "DESKTOP_CONTINUE.cmd until branch/tree preflight passes",
+                    "Relay / IDE BUILD on wrong branch or dirty product tree",
+                ]
+            )
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_worker_lease import assess_worker_lease, write_worker_events
+
+        worker_lease = assess_worker_lease(repo, status)
+        status["worker_lease"] = worker_lease
+        write_worker_events(repo, status)
+        if worker_lease.get("blocks_dispatch") and not status.get("branch_preflight", {}).get("blocks_relay"):
+            status.setdefault("avoid", []).extend(
+                ["Second BUILD worker while lease blocks dispatch", "@ppe-director IDE_BUILD until lease resolved"]
+            )
+    except Exception:
+        pass
+
+    vm_mirror = None
+    mirror_health: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_vm_mirror_refresh import (
+            assess_mirror_health,
+            refresh_vm_mirror_from_git,
+        )
+        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+        refresh_vm_mirror_from_git(repo)
+        vm_mirror = load_vm_phase_mirror(repo)
+        mirror_health = assess_mirror_health(
+            vm_mirror,
+            local_verdict=str(status.get("verdict") or ""),
+        )
+        status["vm_mirror_health"] = mirror_health
+        if mirror_health.get("stale"):
+            try:
+                from scripts.ppe_operator_git_sync import check_and_nudge_merges
+
+                merge_report = check_and_nudge_merges(repo)
+                status["vm_mirror_merge"] = merge_report
+                refresh_vm_mirror_from_git(repo, force_fetch=True)
+                vm_mirror = load_vm_phase_mirror(repo)
+                mirror_health = assess_mirror_health(
+                    vm_mirror,
+                    local_verdict=str(status.get("verdict") or ""),
+                )
+                status["vm_mirror_health"] = mirror_health
+            except Exception:
+                pass
+    except Exception:
+        try:
+            from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+            vm_mirror = load_vm_phase_mirror(repo)
+        except Exception:
+            pass
+
+    try:
         from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
 
-        if not vm_mirror or not str(vm_mirror.get("phase") or "").strip():
-            vm_brief = fetch_vm_brief(repo, use_cache=True)
+        vm_brief = None
+        mirror_stale = bool(mirror_health and mirror_health.get("stale"))
+        need_live_vm = mirror_stale or not vm_mirror or not str(vm_mirror.get("phase") or "").strip()
+        if need_live_vm:
+            vm_brief = fetch_vm_brief(repo, use_cache=not mirror_stale)
         trust = resolve_vm_trust(
             local_verdict=str(status.get("verdict") or ""),
             vm_brief=vm_brief,
             vm_mirror=vm_mirror,
+            mirror_stale=mirror_stale,
         )
+        if mirror_health and mirror_health.get("alert"):
+            trust = {
+                **trust,
+                "mirror_stale": True,
+                "agent_note": mirror_health.get("agent_note") or trust.get("agent_note"),
+            }
         status["vm_trust"] = trust
 
-        chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
-        mode = str(chapter_mode.get("mode") or "")
-        if trust.get("wait_for_vm"):
+        if status.get("branch_preflight", {}).get("blocks_relay"):
+            pass
+        elif trust.get("wait_for_vm"):
             status["commands"] = [
                 "Wait for VM in-flight phase to complete (no parallel SSH/findstr probes)."
             ]
             status.setdefault("avoid", []).extend(
                 [
                     "SSH findstr/type on queue or manifest JSON",
-                    "Multiple parallel ssh ppeloop@desktop-caqll8k calls",
+                    "Multiple parallel ssh to VM",
                     "@ppe-director while VM FINISH_IN_FLIGHT or BUILD_IN_FLIGHT",
                 ]
             )
-        elif trust.get("recommended_action") == "desktop_continue" and mode == "CLOSEOUT_ONLY":
-            status["commands"] = ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"]
+        elif trust.get("recommended_action") == "desktop_continue":
+            if str(status.get("verdict") or "") == "RUN_LOCAL":
+                status["commands"] = [
+                    "DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)",
+                    "Alternative: DO_THE_THING.cmd run",
+                ]
+    except Exception:
+        pass
+
+    try:
+        from scripts.check_vm_host_health import collect_host_health, write_host_health
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        loop_host = bool(loop_host_start_allowed()[0])
+        host_health = collect_host_health(repo, via_ssh=not loop_host)
+        write_host_health(repo, host_health)
+        status["vm_host_health"] = host_health
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_operator_blind_spots import (
+            assess_operator_blind_spots,
+            write_blind_spots,
+            write_operator_health,
+        )
+
+        blind = assess_operator_blind_spots(repo, status, probe_ssh=False)
+        write_blind_spots(repo, blind)
+        write_operator_health(repo, blind)
+        status["operator_blind_spots"] = blind
+        status["operator_health_line"] = blind.get("operator_health_line")
     except Exception:
         pass
     return status
@@ -446,6 +573,10 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
         )
     elif burst_plan.get("direct_action") == "wait_for_vm":
         lines.append("Burst path: wait — VM in-flight; no SSH probes or burst workers")
+    elif burst_plan.get("direct_action") == "resolve_lease":
+        lines.append("Burst path: worker lease conflict — ppe_worker_lease.py --assess")
+    elif burst_plan.get("suggested_lane"):
+        lines.append(f"Worker lane: `{burst_plan.get('suggested_lane')}`")
     elif not allowed:
         lines.append("Burst path: single verdict only — split slice or trim spec before chaining workers")
     return lines
@@ -509,18 +640,22 @@ def _format_human(
         lines.append(f"Promote: {supply.get('promote_reason')}")
 
     if repo is not None:
-        try:
-            from scripts.research_archive_health import build_archive_health, format_health_line
+        skip_archives = False
+        if isinstance(chapter_mode, dict) and chapter_mode.get("do_not_rebuild"):
+            skip_archives = True
+        if not skip_archives:
+            try:
+                from scripts.research_archive_health import build_archive_health, format_health_line
 
-            collectors_health = build_archive_health(repo).get("collectors") or []
-            if collectors_health:
-                lines.append("")
-                lines.append("Research archives:")
-                for item in collectors_health:
-                    if isinstance(item, dict):
-                        lines.append(f"  {format_health_line(item)}")
-        except Exception:
-            pass
+                collectors_health = build_archive_health(repo).get("collectors") or []
+                if collectors_health:
+                    lines.append("")
+                    lines.append("Research archives:")
+                    for item in collectors_health:
+                        if isinstance(item, dict):
+                            lines.append(f"  {format_health_line(item)}")
+            except Exception:
+                pass
 
     burst = burst_plan if burst_plan is not None else status.get("burst_plan")
     if isinstance(burst, dict):
@@ -535,6 +670,46 @@ def _format_human(
         note = vm_trust.get("agent_note")
         if note:
             lines.append(f"  → {note}")
+
+    branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
+    if branch_pf and branch_pf.get("blocks_relay"):
+        lines.extend(
+            [
+                "",
+                "**Branch preflight: BLOCKS relay**",
+                f"  Branch: `{branch_pf.get('branch')}` (on_main={branch_pf.get('on_main')})",
+            ]
+        )
+        for reason in branch_pf.get("reasons") or []:
+            lines.append(f"  - {reason}")
+
+    worker_lease = status.get("worker_lease") if isinstance(status.get("worker_lease"), dict) else None
+    if worker_lease:
+        try:
+            from scripts.ppe_worker_lease import format_lease_lines
+
+            lines.extend(format_lease_lines(worker_lease))
+        except Exception:
+            pass
+
+    mirror_health = status.get("vm_mirror_health") if isinstance(status.get("vm_mirror_health"), dict) else None
+    if mirror_health and mirror_health.get("alert"):
+        lines.append("")
+        lines.append(f"**VM mirror alert:** {mirror_health.get('agent_note')}")
+
+    op_session = status.get("operator_session") if isinstance(status.get("operator_session"), dict) else None
+    if op_session and op_session.get("rotate_recommended"):
+        lines.append("")
+        lines.append(f"**Thread timebox:** {op_session.get('message')}")
+
+    blind = status.get("operator_blind_spots") if isinstance(status.get("operator_blind_spots"), dict) else None
+    if blind:
+        try:
+            from scripts.ppe_operator_blind_spots import format_blind_spot_lines
+
+            lines.extend(format_blind_spot_lines(blind))
+        except Exception:
+            pass
 
     lines.extend(
         [
@@ -563,6 +738,14 @@ def _format_human(
     delegation_hint = status.get("delegation_hint")
     if delegation_hint:
         lines.extend(["", "Delegation:", f"  - {delegation_hint}"])
+    ship_hint = status.get("ship_hint")
+    if ship_hint:
+        try:
+            from scripts.ppe_worker_lease import format_ship_hint_lines
+
+            lines.extend(format_ship_hint_lines(str(ship_hint)))
+        except Exception:
+            lines.extend(["", "Ship (agent):", f"  → {ship_hint}"])
     errors = status.get("errors") or []
     if errors:
         lines.extend(["", "Errors:"])

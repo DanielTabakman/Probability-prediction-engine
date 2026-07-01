@@ -46,9 +46,10 @@ import { logProductUsage } from "@/lib/logProductUsage";
 import {
   hasTutorialSearchParams,
   isPlatformTutorialComplete,
-  resolveTutorialBeginnerMode,
+  resolveTutorialMode,
   resolveTutorialSteps,
   stripTutorialSearchParams,
+  type PlatformTutorialMode,
 } from "@/lib/platformTutorial";
 
 type StrategyLabClientShellProps = {
@@ -86,7 +87,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   const [catalogDefault, setCatalogDefault] = useState<string | null>(null);
   const [clientReady, setClientReady] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
-  const [tutorialBeginner, setTutorialBeginner] = useState(false);
+  const [tutorialMode, setTutorialMode] = useState<PlatformTutorialMode>("standard");
   const queryAsset = searchParams.get(LAB_ASSET_QUERY_PARAM);
   const tutorialActive = hasTutorialSearchParams(searchParams);
   const tourAssetMode = tutorialActive || tutorialOpen;
@@ -113,10 +114,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
     [payload, selectedAssetId],
   );
   const trustState = payload?.trust_state ?? payload?.meta?.trust_state;
-  const tutorialSteps = useMemo(
-    () => resolveTutorialSteps(tutorialBeginner),
-    [tutorialBeginner],
-  );
+  const tutorialSteps = useMemo(() => resolveTutorialSteps(tutorialMode), [tutorialMode]);
   const firstTourAnchor = tutorialSteps[0]?.anchor ?? "";
   const tourAnchorsReady = useTourAnchorsReady(tutorialOpen, firstTourAnchor);
   /** Tour step 1 anchors in the header — do not block on live chain fetch. */
@@ -141,8 +139,7 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
   }, [pathname, selectedAssetId]);
 
   useEffect(() => {
-    const beginner = resolveTutorialBeginnerMode(searchParams);
-    setTutorialBeginner(beginner);
+    setTutorialMode(resolveTutorialMode(searchParams));
 
     if (hasTutorialSearchParams(searchParams)) {
       setTutorialOpen(true);

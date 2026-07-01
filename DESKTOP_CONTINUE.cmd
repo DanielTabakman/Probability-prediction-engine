@@ -10,7 +10,7 @@ set "PYTHONPATH=%CD%"
 if exist "%CD%\ppe_operator_no_loop.local.cmd" call "%CD%\ppe_operator_no_loop.local.cmd"
 set "PPE_OPERATOR_PROFILE=local"
 set "SSH_OPTS=-o BatchMode=yes -o ConnectTimeout=15 -o ServerAliveInterval=10 -o ServerAliveCountMax=3"
-set "VM_HOST=ppeloop@desktop-caqll8k"
+if defined PPE_VM_SSH_HOST (set "VM_HOST=%PPE_VM_SSH_HOST%") else set "VM_HOST=ppe-vm"
 set "VM_REPO=C:\Users\ppeloop\Probability-prediction-engine"
 set "NO_PAUSE=0"
 if /i "%~1"=="--no-pause" set "NO_PAUSE=1"
@@ -29,12 +29,12 @@ echo [DESKTOP_CONTINUE] step 2/3 — mark product ready + start relay on VM...
 echo            (via SSH to %VM_HOST%)
 echo.
 
-ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && set PYTHONPATH=%VM_REPO% && python scripts/ppe_operator_git_sync.py --repo-root %VM_REPO% --reset-runtime-sop && git pull origin main && finish_ide_build.cmd"
+ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && set PYTHONPATH=%VM_REPO% && python scripts/ppe_operator_git_sync.py --repo-root %VM_REPO% --prepare-handoff-auto && finish_ide_build.cmd"
 set "RC=%ERRORLEVEL%"
 
 echo.
 echo [DESKTOP_CONTINUE] step 3/3 — VM status:
-ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && ppe_autobuilder.cmd status --brief"
+ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && call check_vm_loop.cmd --no-pause"
 set "RC=%ERRORLEVEL%"
 
 :done

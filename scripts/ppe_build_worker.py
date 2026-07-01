@@ -281,6 +281,18 @@ def _resolve_handoff_worker(repo: Path, *, pref: BuildWorkerPref) -> WorkerKind:
     """Desktop handoff target (Cursor Agent or Codex session)."""
     if pref == PREF_CODEX:
         return WORKER_CODEX_CLI
+    try:
+        from scripts.ppe_worker_lease import LANE_CODEX, LANE_CURSOR, load_desktop_build_handoff
+
+        dbh = load_desktop_build_handoff(repo)
+        if dbh and not dbh.get("blocked"):
+            lane = str(dbh.get("preferred_lane") or "")
+            if lane == LANE_CODEX:
+                return WORKER_CODEX_CLI
+            if lane == LANE_CURSOR:
+                return WORKER_MANUAL
+    except Exception:
+        pass
     if _cursor_cli_exhausted(repo) and codex_available():
         return WORKER_CODEX_CLI
     return WORKER_MANUAL
@@ -363,18 +375,36 @@ def build_product_prompt(
 
 
 def handoff_instructions(worker: WorkerKind) -> list[str]:
+    from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
+    if clipboard_on_handoff_enabled():
+        if worker == WORKER_CODEX_CLI:
+            return [
+                "Open **Codex** in this repo folder (`codex` in terminal, or Codex desktop).",
+                "Start a **new session**.",
+                "Paste the build prompt from clipboard (**Ctrl+V**) and send.",
+                "Let Codex finish gate, commit, and closeout.",
+                "After PR merges → double-click **DESKTOP CONTINUE**.",
+            ]
+        return [
+            "Open **Cursor** on this machine (repo folder).",
+            "Start a **new Agent chat**.",
+            "Press **Ctrl+V** then Enter — build prompt is on clipboard.",
+            "Let the agent finish gate, commit, and closeout.",
+            "After PR merges → double-click **DESKTOP CONTINUE**.",
+        ]
     if worker == WORKER_CODEX_CLI:
         return [
             "Open **Codex** in this repo folder (`codex` in terminal, or Codex desktop).",
             "Start a **new session**.",
-            "Paste the build prompt from clipboard (**Ctrl+V**) and send.",
+            "Paste the build prompt from **IDE_BUILD_NOW.md** and send.",
             "Let Codex finish gate, commit, and closeout.",
             "After PR merges → double-click **DESKTOP CONTINUE**.",
         ]
     return [
         "Open **Cursor** on this machine (repo folder).",
         "Start a **new Agent chat**.",
-        "Press **Ctrl+V** then Enter — build prompt is on clipboard.",
+        "`@` the starter file from **IDE_BUILD_NOW.md** and send.",
         "Let the agent finish gate, commit, and closeout.",
         "After PR merges → double-click **DESKTOP CONTINUE**.",
     ]
@@ -552,15 +582,38 @@ def launch_build_worker_background(
 
 def format_handoff_banner(repo: Path) -> str:
     """Human-readable steps for DESKTOP_BUILD.cmd after handoff."""
+    from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
     resolved = resolve_build_worker(repo, for_handoff=True)
     worker = resolved["worker"]
+    lane_line = ""
+    try:
+        from scripts.ppe_worker_lease import load_desktop_build_handoff
+
+        dbh = load_desktop_build_handoff(repo)
+        if dbh:
+            lane = dbh.get("preferred_lane")
+            pref = dbh.get("lane_preference") if isinstance(dbh.get("lane_preference"), dict) else {}
+            reason = pref.get("reason")
+            if lane:
+                lane_line = f"Lane: {lane}" + (f" ({reason})" if reason else "")
+            if dbh.get("blocked"):
+                lane_line = "Lease: BLOCKED — " + "; ".join(dbh.get("reasons") or [])
+    except Exception:
+        pass
+    prompt_line = (
+        "Build prompt is on your clipboard."
+        if clipboard_on_handoff_enabled()
+        else "Load the starter from IDE_BUILD_NOW.md (@ file in new Agent chat)."
+    )
     lines = [
         "DESKTOP BUILD — your real PC only (NOT the VM)",
         "",
         f"Worker: {worker} ({resolved.get('reason')})",
-        "Build prompt is on your clipboard.",
-        "",
     ]
+    if lane_line:
+        lines.append(lane_line)
+    lines.extend(["", prompt_line, ""])
     for idx, step in enumerate(handoff_instructions(worker), start=1):
         lines.append(f"{idx}. {step}")
     lines.extend(

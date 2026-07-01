@@ -169,6 +169,8 @@ _LOOP_HOST_TRANSIENT_PREFIXES: tuple[str, ...] = (
     "fix/",
 )
 
+VM_MIRROR_PUBLISH_PREFIX = "ops/vm-mirror-"
+
 
 def _loop_host_transient_branch(current: str, target: str) -> bool:
     if not current or current == target:
@@ -309,6 +311,8 @@ def _default_merge_head_prefixes(cfg: dict[str, Any]) -> tuple[str, ...]:
 
 
 def _head_eligible_for_automerge(head: str, cfg: dict[str, Any]) -> bool:
+    if head.startswith(VM_MIRROR_PUBLISH_PREFIX):
+        return True
     return any(head.startswith(prefix) for prefix in _default_merge_head_prefixes(cfg))
 
 
@@ -322,11 +326,75 @@ def _merge_ready(pr: dict[str, Any]) -> bool:
     return mergeable == "MERGEABLE" and state in ("", "UNKNOWN", "BEHIND")
 
 
+def close_conflicting_mirror_prs(repo: Path) -> dict[str, Any]:
+    """Close stale vm-mirror PRs that conflict with main (unblocks fresh mirror publish)."""
+    repo = repo.resolve()
+    if not _gh_available():
+        return {"action": "close_mirror_prs", "skipped": True, "reason": "gh not available"}
+
+    cfg = _git_sync_cfg(repo)
+    base = (str(cfg.get("pullBranch") or "main")).strip() or "main"
+    prs = _gh_json(
+        repo,
+        [
+            "gh",
+            "pr",
+            "list",
+            "--base",
+            base,
+            "--state",
+            "open",
+            "--limit",
+            "30",
+            "--json",
+            "number,headRefName,mergeable,mergeStateStatus,url",
+        ],
+    )
+    if prs is None:
+        return {"action": "close_mirror_prs", "ok": False, "error": "gh pr list failed"}
+
+    closed: list[dict[str, Any]] = []
+    for pr in prs:
+        if not isinstance(pr, dict):
+            continue
+        head = str(pr.get("headRefName") or "")
+        if not head.startswith(VM_MIRROR_PUBLISH_PREFIX):
+            continue
+        mergeable = str(pr.get("mergeable") or "").upper()
+        state = str(pr.get("mergeStateStatus") or "").upper()
+        if mergeable != "CONFLICTING" and state != "DIRTY":
+            continue
+        num = pr.get("number")
+        if num is None:
+            continue
+        comment = (
+            "Auto-closed: vm-mirror PR conflicts with main — superseded; "
+            "loop host will publish a fresh mirror."
+        )
+        close_proc = subprocess.run(
+            ["gh", "pr", "close", str(num), "--comment", comment],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if close_proc.returncode == 0:
+            closed.append({"number": num, "head": head, "url": str(pr.get("url") or "")})
+
+    return {"action": "close_mirror_prs", "ok": True, "closed": closed}
+
+
 def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
     """Ensure automerge label on loop PRs and squash-merge when GitHub reports merge-ready."""
     repo = repo.resolve()
+    mirror_close = close_conflicting_mirror_prs(repo)
     if not merge_each_pass_enabled(repo):
-        return {"action": "check_merge", "skipped": True, "reason": "disabled"}
+        return {
+            "action": "check_merge",
+            "skipped": True,
+            "reason": "disabled",
+            "close_mirror_prs": mirror_close,
+        }
     if not _gh_available():
         return {"action": "check_merge", "skipped": True, "reason": "gh not available"}
 
@@ -426,6 +494,7 @@ def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
         "merged": merged,
         "pending": pending,
         "blocked": blocked,
+        "close_mirror_prs": mirror_close,
     }
     if merged and pull_enabled(repo):
         pull_after = pull_main(repo)
@@ -448,7 +517,15 @@ def check_and_retarget_stacked_prs(repo: Path) -> dict[str, Any]:
     return scan_and_retarget_stacked_prs(repo, main=main)
 
 
-def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str) -> str | None:
+def _open_pr(
+    repo: Path,
+    *,
+    head: str,
+    base: str = "main",
+    title: str,
+    body: str,
+    labels: list[str] | None = None,
+) -> str | None:
     if not _gh_available():
         print("ppe_operator_git_sync: gh not available; skip PR", file=sys.stderr)
         return None
@@ -462,14 +539,22 @@ def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str
         try:
             data = json.loads(existing.stdout)
             if data:
-                return str(data[0].get("url") or "")
+                url = str(data[0].get("url") or "")
+                if url and labels:
+                    for label in labels:
+                        _run_cmd(
+                            ["gh", "pr", "edit", head, "--add-label", label],
+                            cwd=repo,
+                            timeout=timeout,
+                        )
+                return url
         except json.JSONDecodeError:
             pass
-    proc = _run_cmd(
-        ["gh", "pr", "create", "--base", base, "--head", head, "--title", title, "--body", body],
-        cwd=repo,
-        timeout=timeout,
-    )
+    create_args = ["gh", "pr", "create", "--base", base, "--head", head, "--title", title, "--body", body]
+    if labels:
+        for label in labels:
+            create_args.extend(["--label", label])
+    proc = _run_cmd(create_args, cwd=repo, timeout=timeout)
     if proc.returncode == 124:
         print("ppe_operator_git_sync: gh pr create timed out", file=sys.stderr)
         return None
@@ -539,6 +624,64 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
         "branch": publish_branch,
         "pushed_ref": pushed_ref,
         "pr_url": pr_url,
+        "stdout": (push.stdout or "").strip(),
+    }
+
+
+def publish_vm_mirror_ahead(repo: Path, *, phase: str = "unknown") -> dict[str, Any]:
+    """Push VM phase mirror commit from main; open automerge PR for desktop git pull."""
+    repo = repo.resolve()
+    if not push_enabled(repo):
+        return {"action": "vm_mirror_push", "skipped": True, "reason": "disabled"}
+
+    current = _current_branch(repo)
+    if current != "main":
+        return {"action": "vm_mirror_push", "skipped": True, "reason": f"not on main ({current!r})"}
+
+    ahead = _ahead_count(repo, branch="main")
+    if ahead == 0:
+        return {"action": "vm_mirror_push", "skipped": True, "reason": "nothing ahead"}
+
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    publish_branch = f"{VM_MIRROR_PUBLISH_PREFIX}{stamp}-{_short_head(repo)}"
+    push = _git(repo, "push", "origin", f"HEAD:refs/heads/{publish_branch}")
+    if push.returncode == 124:
+        return {
+            "action": "vm_mirror_push",
+            "ok": False,
+            "branch": publish_branch,
+            "error": (push.stderr or "git push timed out").strip(),
+            "timed_out": True,
+        }
+    if push.returncode != 0:
+        return {
+            "action": "vm_mirror_push",
+            "ok": False,
+            "branch": publish_branch,
+            "error": (push.stderr or push.stdout or "git push failed").strip(),
+        }
+
+    pr_url = None
+    if _git_sync_cfg(repo).get("openPrOnPush", True) is not False:
+        phase_label = (phase or "unknown").replace("_", " ")
+        pr_url = _open_pr(
+            repo,
+            head=publish_branch,
+            title=f"ops: vm phase mirror {phase_label}",
+            body=(
+                "Auto-published VM phase mirror (`docs/SOP/VM_OPERATOR_PHASE.json`) from loop host.\n\n"
+                "Mirror-only — safe to automerge when checks pass."
+            ),
+            labels=["automerge"],
+        )
+
+    return {
+        "action": "vm_mirror_push",
+        "ok": True,
+        "branch": publish_branch,
+        "pushed_ref": publish_branch,
+        "pr_url": pr_url,
+        "mirror_only": True,
         "stdout": (push.stdout or "").strip(),
     }
 
@@ -633,6 +776,186 @@ def reset_runtime_sop_drift_from_origin(repo: Path) -> dict[str, Any]:
     }
 
 
+def _git_operation_in_progress(repo: Path) -> bool:
+    git_dir = repo / ".git"
+    if (git_dir / "MERGE_HEAD").is_file():
+        return True
+    if (git_dir / "rebase-merge").is_dir() or (git_dir / "rebase-apply").is_dir():
+        return True
+    return False
+
+
+def _detach_main_worktrees(repo: Path) -> list[dict[str, Any]]:
+    """Detach orchestrator worktrees holding main so checkout can succeed."""
+    try:
+        from scripts.ppe_vm_bootstrap import detach_worktrees_holding_branch
+
+        return detach_worktrees_holding_branch(repo, "main")
+    except ImportError:
+        return []
+
+
+def _handoff_light_recover(repo: Path) -> dict[str, Any]:
+    """Minimal VM recovery when prepare_handoff fails (worktrees, locks, hygiene)."""
+    repo = repo.resolve()
+    steps: list[dict[str, Any]] = []
+    detached = _detach_main_worktrees(repo)
+    if detached:
+        steps.append({"action": "detach_main_worktrees", "detached": detached})
+    try:
+        from scripts.ppe_vm_bootstrap import (
+            ensure_on_main,
+            heal_operator_artifacts,
+            heal_stale_relay_state,
+            loop_host_git_hygiene,
+        )
+
+        steps.append(ensure_on_main(repo))
+        steps.append(loop_host_git_hygiene(repo))
+        steps.append(heal_stale_relay_state(repo))
+        steps.append(heal_operator_artifacts(repo))
+    except ImportError as exc:
+        return {"action": "handoff_light_recover", "ok": False, "error": str(exc), "steps": steps}
+    ok = all(s.get("ok", True) or s.get("skipped") for s in steps if isinstance(s, dict))
+    return {"action": "handoff_light_recover", "ok": ok, "steps": steps}
+
+
+def prepare_loop_host_for_handoff(repo: Path) -> dict[str, Any]:
+    """Prepare loop-host git state before DESKTOP_CONTINUE / finish_ide_build.
+
+    Clears stale merge state, resets runtime SOP drift, returns transient build
+    branches to origin/main, then fast-forwards pull. Safe only on the VM loop
+    host after desktop IDE BUILD has merged.
+    """
+    repo = repo.resolve()
+    target = (str(_git_sync_cfg(repo).get("pullBranch") or "main")).strip() or "main"
+    changes: list[str] = []
+    from_branch = _current_branch(repo)
+
+    detached = _detach_main_worktrees(repo)
+    if detached:
+        ok_detach = all(d.get("detached") for d in detached)
+        changes.append(f"detach_main_worktrees ({len(detached)} worktree(s))")
+        if not ok_detach:
+            errors = [d.get("error") for d in detached if d.get("error")]
+            if errors:
+                changes.append(f"detach_errors: {'; '.join(str(e) for e in errors[:3])}")
+
+    if _git_operation_in_progress(repo):
+        _git(repo, "merge", "--abort")
+        changes.append("merge --abort")
+
+    sop = reset_runtime_sop_drift_from_origin(repo)
+    changes.extend(sop.get("changes") or [])
+
+    current = _current_branch(repo)
+    if _loop_host_transient_branch(current, target):
+        fetch = _git(repo, "fetch", "origin")
+        if fetch.returncode != 0:
+            return {
+                "action": "prepare_handoff",
+                "ok": False,
+                "from_branch": from_branch,
+                "changes": changes,
+                "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+            }
+        co = _git(repo, "checkout", "-f", target)
+        if co.returncode != 0:
+            co = _git(repo, "checkout", target)
+        hard = _git(repo, "reset", "--hard", f"origin/{target}")
+        ok_reset = hard.returncode == 0
+        if ok_reset:
+            changes.append(f"reset --hard origin/{target} (from transient {current})")
+        current = _current_branch(repo)
+    elif current == target:
+        dirty = _dirty_paths(repo)
+        if dirty and _runtime_sop_only_dirty(repo):
+            sop2 = reset_runtime_sop_drift_from_origin(repo)
+            changes.extend(sop2.get("changes") or [])
+
+    fetch = _git(repo, "fetch", "origin")
+    if fetch.returncode != 0:
+        return {
+            "action": "prepare_handoff",
+            "ok": False,
+            "from_branch": from_branch,
+            "branch": _current_branch(repo),
+            "changes": changes,
+            "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+        }
+
+    if _current_branch(repo) != target:
+        co = _git(repo, "checkout", target)
+        if co.returncode != 0:
+            return {
+                "action": "prepare_handoff",
+                "ok": False,
+                "from_branch": from_branch,
+                "branch": _current_branch(repo),
+                "changes": changes,
+                "error": (co.stderr or co.stdout or "git checkout failed").strip(),
+            }
+        changes.append(f"checkout {target}")
+
+    pull = _git(repo, "pull", "--ff-only", "origin", target)
+    ok = pull.returncode == 0
+    result: dict[str, Any] = {
+        "action": "prepare_handoff",
+        "ok": ok,
+        "from_branch": from_branch,
+        "branch": _current_branch(repo),
+        "changes": changes,
+        "stdout": (pull.stdout or "").strip(),
+    }
+    if not ok:
+        result["error"] = (pull.stderr or pull.stdout or "git pull failed").strip()
+    return result
+
+
+def prepare_handoff_with_auto_recover(repo: Path) -> dict[str, Any]:
+    """prepare_handoff; on failure run light recover + ensure stack + retry once."""
+    repo = repo.resolve()
+    first = prepare_loop_host_for_handoff(repo)
+    if first.get("ok"):
+        first["auto_recover"] = False
+        return first
+
+    recover = _handoff_light_recover(repo)
+    retry = prepare_loop_host_for_handoff(repo)
+    retry["auto_recover"] = True
+    retry["first_attempt"] = {
+        "ok": first.get("ok"),
+        "error": first.get("error"),
+        "changes": first.get("changes"),
+    }
+    retry["recover"] = recover
+    if retry.get("ok"):
+        return retry
+
+    try:
+        from scripts.ppe_vm_bootstrap import bootstrap
+
+        bootstrap(
+            repo,
+            sync_progress=False,
+            heal=True,
+            queue_repair=False,
+            run_local=False,
+            ensure_stack=True,
+            detach_main_worktrees=True,
+            ensure_main=True,
+        )
+        final = prepare_loop_host_for_handoff(repo)
+        final["auto_recover"] = True
+        final["bootstrap_retry"] = True
+        final["first_attempt"] = retry.get("first_attempt")
+        final["recover"] = recover
+        return final
+    except ImportError:
+        retry["bootstrap_retry"] = False
+        return retry
+
+
 def maybe_auto_publish(repo: Path) -> dict[str, Any]:
     """Push + open PR when this branch has unpushed commits (loop/agent work)."""
     repo = repo.resolve()
@@ -696,11 +1019,25 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Discard loop-host runtime SOP/RELEASES drift from origin before pull",
     )
+    ap.add_argument(
+        "--prepare-handoff",
+        action="store_true",
+        help="Loop host only: abort merges, reset runtime SOP drift, return to main, pull",
+    )
+    ap.add_argument(
+        "--prepare-handoff-auto",
+        action="store_true",
+        help="Like --prepare-handoff; on failure detach worktrees, heal, ensure stack, retry",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
     results: list[dict[str, Any]] = []
+    if args.prepare_handoff_auto:
+        results.append(prepare_handoff_with_auto_recover(repo))
+    elif args.prepare_handoff:
+        results.append(prepare_loop_host_for_handoff(repo))
     if args.pull:
         results.append(pull_main(repo))
     if args.publish:
@@ -715,8 +1052,8 @@ def main(argv: list[str] | None = None) -> int:
         results.append(reset_runtime_sop_drift_from_origin(repo))
     if not results:
         ap.error(
-            "specify --pull, --publish, --auto-publish, --check-merge, "
-            "--retarget-stacked, and/or --reset-runtime-sop"
+            "specify --pull, --prepare-handoff, --prepare-handoff-auto, --reset-runtime-sop, "
+            "--publish, --auto-publish, --check-merge, and/or --retarget-stacked"
         )
         return 2
 

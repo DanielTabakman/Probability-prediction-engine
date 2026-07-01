@@ -2,18 +2,18 @@
 
 **Chapter:** `msos_storyboard_visual_parity_v1`  
 **Priority:** MEDIUM  
-**Status:** **PENDING** — chartered 2026-06-12; blocked until `mvp1_distribution_quant_research_v2` COMPLETE  
+**Status:** **WITNESS PENDING** — product slices 002–006 shipped on `main` (2026-07-01); witness/deploy/closeout slices remain  
 **Phase plan:** [`PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json`](PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
 | MSOS-VisParityV1-Control-Slice001 | PENDING | Charter + witness asset checklist |
-| MSOS-VisParityV1-Product-Slice002 | PENDING | Public homepage (`01_home`) |
-| MSOS-VisParityV1-Product-Slice003 | PENDING | App shell + Command Center (`02`, `08`) |
-| MSOS-VisParityV1-Product-Slice004 | PENDING | Strategy Lab chrome (`03_ppe_lab`) |
-| MSOS-VisParityV1-Product-Slice005 | PENDING | Thesis + expression (`04`, `05`) |
-| MSOS-VisParityV1-Product-Slice006 | PENDING | Monitor, history, learn (`06`, `07`, `09`) |
+| MSOS-VisParityV1-Product-Slice002 | SHIPPED_ON_MAIN | Public homepage (`01_home`) — touchset on `main` |
+| MSOS-VisParityV1-Product-Slice003 | SHIPPED_ON_MAIN | App shell + Command Center (`02`, `08`) |
+| MSOS-VisParityV1-Product-Slice004 | SHIPPED_ON_MAIN | Strategy Lab chrome (`03_ppe_lab`) |
+| MSOS-VisParityV1-Product-Slice005 | SHIPPED_ON_MAIN | Thesis + expression (`04`, `05`) |
+| MSOS-VisParityV1-Product-Slice006 | SHIPPED_ON_MAIN | Monitor, history, learn (`06`, `07`, `09`) |
 | MSOS-VisParityV1-Platform-Slice007 | PENDING | VPS deploy + routing clarity |
 | MSOS-VisParityV1-Witness-Slice008 | PENDING | Screenshot witness + pytest |
 | MSOS-VisParityV1-Closeout-Slice009 | PENDING | Chapter COMPLETE |

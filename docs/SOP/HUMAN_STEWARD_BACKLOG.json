@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Policy and architecture topics for human review \u2014 not auto-loop work. Edit items here; run python scripts/ppe_human_backlog.py render-md to refresh the readable doc. Weekly ntfy digest includes open high-priority titles.",
+  "notes": "Founder charter work only — see FOUNDER_OPERATOR_SURFACE_V1.md. Agents must not append open items to operator-thread replies or weekly todo lists. Surface one item only when the user opens a steward/charter pass. Weekly ntfy digest lists open high-priority titles (digest-only).",
   "items": [
     {
       "id": "operator_friction_cleanup_2026_06",
@@ -23,6 +23,18 @@
       "added": "2026-06-17",
       "closed": "2026-06-30",
       "notes": "DECISION: Option A default — manual DESKTOP_BUILD / ppe_go paste (autoRemoteBuild=false). Mid-month burn boost: after day 16, if Cursor credits <35% used (operator records via ppe_remote_build_policy.cmd), autoRemoteBuild ON for rest of month. Implemented: remoteBuildPolicy in PPE_AUTO_OPERATOR.local.json + scripts/ppe_remote_build_policy.py."
+    },
+    {
+      "id": "founder_operator_surface_v1",
+      "title": "Founder vs operator surface v1",
+      "status": "done",
+      "priority": "high",
+      "category": "governance",
+      "summary": "Codify founder (work ON product) vs agent factory (work IN product); stop surfacing relay/git/recovery as human todos.",
+      "policyQuestion": "What stays founder-only forever vs delegated envelope?",
+      "added": "2026-07-01",
+      "closed": "2026-07-01",
+      "notes": "Shipped FOUNDER_OPERATOR_SURFACE_V1.md + routing/rules/calendar/workflow patches."
     },
     {
       "id": "operator_vs_charter_thread_habit",

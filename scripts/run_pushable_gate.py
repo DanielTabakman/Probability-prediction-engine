@@ -16,6 +16,12 @@ PytestProfile = str  # "fast" | "full" | "scoped"
 
 FAST_PYTEST_MARKER = "not witness and not slow"
 
+_LAYER_AUDIT_RECOVERY_HINT = (
+    "Recovery: checkout the plane branch (e.g. control-plane/<slice>), stage only task paths, "
+    "re-run gate. Or: python scripts/ppe_branch_recovery.py --plane control --ship "
+    "(python scripts/ppe_worker_lease.py --ship with active lease). "
+    "See docs/SOP/COMMIT_POLICY.md § Gate failed."
+)
 
 @dataclass(frozen=True)
 class GatePlan:
@@ -354,6 +360,8 @@ def main(argv: list[str] | None = None) -> int:
                     return "PPE_CORE"
                 if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
                     return "MSOS_UI"
+                if path.startswith("docs/CONTROL_PLANE/") or path == "AGENTS.md":
+                    return "CONTROL"
                 if path.startswith("docs/"):
                     return "DOCS_ONLY" if path.startswith("docs/SOP/") else "DOCS_CANON"
                 return "CONTROL"
@@ -372,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
                     "Use one LAYER_PRESET per commit — see docs/SOP/PARALLEL_AGENT_CHECKLIST_V1.md",
                     file=sys.stderr,
                 )
+                print(_LAYER_AUDIT_RECOVERY_HINT, file=sys.stderr)
                 return 1
         except FileNotFoundError:
             pass
@@ -400,6 +409,13 @@ def main(argv: list[str] | None = None) -> int:
 
     if plan.tier >= 1 or msos_cmds:
         print("\033[1;32mAll checks passed!\033[0m")
+    if files:
+        try:
+            from scripts.ppe_chapter_coordination import warn_if_coordination_needed
+
+            warn_if_coordination_needed(repo, files)
+        except ImportError:
+            pass
     if files:
         try:
             from scripts.ppe_delegation_envelope import classify_paths, current_branch, record_auto_notify
@@ -491,6 +507,8 @@ def run_gate_for_paths(
                     return "PPE_CORE"
                 if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
                     return "MSOS_UI"
+                if path.startswith("docs/CONTROL_PLANE/") or path == "AGENTS.md":
+                    return "CONTROL"
                 if path.startswith("docs/"):
                     return "DOCS_ONLY" if path.startswith("docs/SOP/") else "DOCS_CANON"
                 return "CONTROL"
@@ -502,6 +520,9 @@ def run_gate_for_paths(
                 print("ERROR: repo layer audit failed for changed files:", file=sys.stderr)
                 for v in violations[:10]:
                     print(f"  {v}", file=sys.stderr)
+                if len(violations) > 10:
+                    print(f"  ... {len(violations) - 10} more", file=sys.stderr)
+                print(_LAYER_AUDIT_RECOVERY_HINT, file=sys.stderr)
                 return 1
         except FileNotFoundError:
             pass

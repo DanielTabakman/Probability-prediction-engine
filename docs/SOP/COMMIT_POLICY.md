@@ -27,6 +27,17 @@ Commit and continue the ship path when **any** of these is true:
 
 Do **not** ask “may I commit?” or “may I push?” for the rows above.
 
+### Gate failed — recover, do not ask
+
+A failed gate (layer audit, mixed plane, wrong branch, unrelated dirty paths) is **agent work**, not an operator decision.
+
+| Thread role | Action |
+|-------------|--------|
+| **operator** / **ide_build** / **neutral** (implementation done) | Clean branch or split plane → stage task files only → fix layer audit → re-run gate → commit → push → PR. Or `python scripts/ppe_branch_recovery.py --plane control --ship`. Operator line: **Nothing required from you.** |
+| **charter** / **explore** | Park one line to operator thread ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)). No commit questions. |
+
+**Forbidden closers:** “unless you want this committed”, “I can stage if you want”, “commit when the branch is clean” without doing the cleanup yourself (when role allows).
+
 ## When to hold (no commit)
 
 | Situation | Why |
@@ -50,6 +61,16 @@ Run from repo root. Tier classification and layer audit are built into the gate 
 | **Viz PR / merge** | `python scripts/run_implied_lab_ui_smoke.py` (or dual when chartered) | Heavy smoke — **not** a commit gate; see [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md) |
 
 **Docs-only:** diff touches only `docs/` → tier 0 (no pytest). Ruff optional unless `src/` or `scripts/` also changed.
+
+### Delegation envelope (gate stderr)
+
+| Gate output | Meaning | Ship? |
+|-------------|---------|-------|
+| `human_only` | Operator must authorize path or use `PPE_DELEGATION_OVERRIDE=1` on RECOVERY | **No** — gate exit 1 |
+| `steward_packet` / `can_auto_ship=False` | Prefer steward decision packet before merge | **Yes** — WARN only; gate exit 0 → commit → push → PR |
+| `auto` / `auto_notify` | Routine delegation | **Yes** |
+
+Do **not** treat `can_auto_ship=False` alone as permission to ask the operator about commits.
 
 **After `git merge origin/main` or rebase** on a feature branch: run the gate, then **push** — syncing is not done until push succeeds.
 
@@ -98,7 +119,7 @@ Resolve conflicts in this order (top wins for this repo):
 |----------|--------|-----------------|
 | 1 | **Ask / read-only mode** | No writes — guidance only |
 | 2 | User says **“don’t commit”** (this thread) | Hold until released |
-| 3 | **[`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)** (`alwaysApply: true`) | Auto-ship when task complete + gate passes |
+| 3 | **[`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc)** (`alwaysApply: true`) | Auto-ship when task complete + gate passes |
 | 4 | **Thread role** ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)) | Operator / ide_build / neutral with implementation → ship; charter / explore with **no** implementation → hold; charter mixed-plane → park |
 | 5 | Generic Cursor **user rule** (“commit only when asked”) | Applies to **other repos only** — must not block rows 3–4 here |
 
@@ -122,7 +143,7 @@ Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-rol
 ## Related docs
 
 - Tests: [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md)
-- Agent behavior: [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)
+- Agent behavior: [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc)
 - Planes and branches: [`OPERATING_RULES.md`](OPERATING_RULES.md)
 - PR merge: [`GITHUB_ZERO_TOUCH_MERGE.md`](GITHUB_ZERO_TOUCH_MERGE.md)
 - Worktrees: [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md)

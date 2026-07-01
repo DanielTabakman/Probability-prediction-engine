@@ -574,6 +574,16 @@ button.btn:focus-visible {
   line-height: 1.45;
 }
 
+.platform-tutorial-play-hint {
+  color: var(--teal, #3dd6c3);
+  margin: 0 0 12px;
+}
+
+.platform-tutorial-actions .btn.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .platform-tutorial-actions {
   display: flex;
   gap: 8px;
