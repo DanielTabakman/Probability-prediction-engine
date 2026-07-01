@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
@@ -30,6 +31,7 @@ def test_ntfy_topic_stuck_fallback(monkeypatch) -> None:
     assert ntfy_topic_stuck() == "stuck-topic"
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="bootstrap_operator_notify_env uses cmd.exe")
 def test_bootstrap_loads_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
     if bootstrap_operator_notify_env is None or ntfy_configured is None:
         pytest.skip("bootstrap_operator_notify_env removed from ppe_notify_push")
