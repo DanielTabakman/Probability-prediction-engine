@@ -491,6 +491,7 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             local_verdict=str(status.get("verdict") or ""),
             vm_brief=vm_brief,
             vm_mirror=vm_mirror,
+            mirror_stale=mirror_stale,
         )
         if mirror_health and mirror_health.get("alert"):
             trust = {

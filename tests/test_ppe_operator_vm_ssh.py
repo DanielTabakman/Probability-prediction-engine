@@ -35,6 +35,23 @@ def test_resolve_vm_trust_wait_in_flight() -> None:
     assert "do not spawn" in trust["agent_note"].lower()
 
 
+def test_resolve_vm_trust_prefers_live_ssh_over_stale_mirror() -> None:
+    trust = resolve_vm_trust(
+        local_verdict="RUN_LOCAL",
+        vm_brief={
+            "ok": True,
+            "source": "ssh",
+            "parsed": {"phase": "BUILD_IN_FLIGHT", "verdict": "IDE_BUILD"},
+        },
+        vm_mirror={"phase": "FINISH_IN_FLIGHT", "verdict": "RUN_LOCAL"},
+        mirror_stale=True,
+    )
+    assert trust["wait_for_vm"] is True
+    assert trust["vm_phase"] == "BUILD_IN_FLIGHT"
+    assert trust["vm_verdict"] == "IDE_BUILD"
+    assert trust["source"] == "ssh"
+
+
 def test_resolve_vm_trust_desktop_continue() -> None:
     trust = resolve_vm_trust(
         local_verdict="RUN_LOCAL",
