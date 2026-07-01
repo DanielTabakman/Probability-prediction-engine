@@ -25,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         repo = Path(str(job["repo_root"])).resolve()
         log_path = Path(str(job.get("log_path") or repo / "artifacts/orchestrator/REMOTE_RUN_LOCAL.log"))
         proc = subprocess.run(
-            ["cmd", "/c", "run_ppe_local.cmd"],
+            ["cmd", "/c", "call call_ppe_operator_local.cmd && run_ppe_local.cmd"],
             cwd=repo,
             capture_output=True,
             text=True,

@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_manifest import load_manifest, maybe_mark_manifest_complete
-from scripts.ppe_operator_git_sync import reset_runtime_sop_drift_from_origin
+from scripts.ppe_operator_git_sync import is_runtime_sop_path, reset_runtime_sop_drift_from_origin
 from scripts.ppe_phase_plan_window import mark_slice_complete
 from scripts.ppe_queue_health import heal_premature_chapter_closeout
 from scripts.ppe_vm_bootstrap import heal_premature_chapter_closeout_step
@@ -123,6 +123,10 @@ def test_reset_runtime_sop_drift_from_origin_on_build_branch(tmp_path: Path) -> 
     assert out.get("ok") is True
     assert out.get("changes")
     assert any(args[:3] == ["checkout", "origin/main", "--"] for args in calls)
+
+
+def test_msos_module_map_is_runtime_sop_path() -> None:
+    assert is_runtime_sop_path("docs/SOP/assets/msos_module_map.html")
 
 
 def test_bootstrap_step_wraps_heal(tmp_path: Path) -> None:

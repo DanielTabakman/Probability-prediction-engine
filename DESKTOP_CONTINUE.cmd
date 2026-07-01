@@ -29,12 +29,12 @@ echo [DESKTOP_CONTINUE] step 2/3 — mark product ready + start relay on VM...
 echo            (via SSH to %VM_HOST%)
 echo.
 
-ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && git pull origin main && finish_ide_build.cmd"
+ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && git pull origin main && call call_ppe_operator_local.cmd && finish_ide_build.cmd"
 set "RC=%ERRORLEVEL%"
 
 echo.
 echo [DESKTOP_CONTINUE] step 3/3 — VM status:
-ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && ppe_autobuilder.cmd status --brief"
+ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && ppe_autobuilder.cmd status --brief"
 set "RC=%ERRORLEVEL%"
 
 :done

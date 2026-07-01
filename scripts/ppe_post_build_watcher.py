@@ -258,24 +258,104 @@ def try_finish_pending_ide_build(repo: Path, *, dry_run: bool = False) -> dict[s
     return {"action": "post_build_watcher", **spawned}
 
 
+def try_closeout_only_run_local(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
+    """When product is already on main (CLOSEOUT_ONLY), spawn run_ppe_local if idle."""
+    repo = repo.resolve()
+    try:
+        from scripts.ppe_chapter_mode import MODE_CLOSEOUT_ONLY
+        from scripts.ppe_operator_status import VERDICT_RUN_LOCAL, collect_operator_status
+        from scripts.ppe_remote_build_agent import (
+            _read_run_local_lock,
+            _run_local_lock_active,
+            spawn_run_local_detached,
+        )
+    except ImportError as exc:
+        return {"action": "closeout_finish", "skipped": True, "reason": str(exc)}
+
+    status = collect_operator_status(repo)
+    verdict = str(status.get("verdict") or "")
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    mode = str(chapter_mode.get("mode") or "")
+
+    if mode != MODE_CLOSEOUT_ONLY:
+        return {"action": "closeout_finish", "skipped": True, "reason": "not closeout-only"}
+    if verdict != VERDICT_RUN_LOCAL:
+        return {
+            "action": "closeout_finish",
+            "skipped": True,
+            "reason": f"verdict={verdict or 'unknown'}",
+        }
+
+    lock = _read_run_local_lock(repo)
+    if _run_local_lock_active(repo, lock):
+        return {
+            "action": "closeout_finish",
+            "skipped": True,
+            "reason": "run_local already in flight",
+            "worker_pid": lock.get("worker_pid") if lock else None,
+        }
+
+    if dry_run:
+        return {"action": "closeout_finish", "dry_run": True, "would_start": True}
+
+    spawned = spawn_run_local_detached(repo)
+    return {"action": "closeout_finish", **spawned}
+
+
+def try_finish_ide_build_handoff(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
+    """Post-build mark+finish, else explicit CLOSEOUT_ONLY run_ppe_local trigger."""
+    post = try_finish_pending_ide_build(repo, dry_run=dry_run)
+    if post.get("started"):
+        return post
+    if dry_run and post.get("would_finish"):
+        return post
+
+    closeout = try_closeout_only_run_local(repo, dry_run=dry_run)
+    if closeout.get("started"):
+        return closeout
+    if dry_run and closeout.get("would_start"):
+        return closeout
+
+    if post.get("skipped") and closeout.get("skipped"):
+        return {
+            "action": "finish_ide_build_handoff",
+            "skipped": True,
+            "post_build_reason": post.get("reason"),
+            "closeout_reason": closeout.get("reason"),
+        }
+    return closeout if not closeout.get("skipped") else post
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Post-build watcher for IDE product slices")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--finish-handoff", action="store_true", help="Post-build + CLOSEOUT_ONLY run_local")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
-    result = try_finish_pending_ide_build(repo, dry_run=args.dry_run)
+    if args.finish_handoff:
+        result = try_finish_ide_build_handoff(repo, dry_run=args.dry_run)
+    else:
+        result = try_finish_pending_ide_build(repo, dry_run=args.dry_run)
     if args.json:
         print(json.dumps(result, indent=2))
     elif not result.get("skipped") and result.get("started"):
-        print(
-            f"ppe_post_build_watcher: finish started for {result.get('slice_id')} "
-            f"(pid={result.get('worker_pid')})"
-        )
+        action = str(result.get("action") or "post_build_watcher")
+        label = result.get("slice_id") or "closeout"
+        print(f"ppe_post_build_watcher: {action} started for {label} (pid={result.get('worker_pid')})")
     elif result.get("dry_run"):
-        print(f"ppe_post_build_watcher: would finish {result.get('would_finish')}")
+        if result.get("would_start"):
+            print("ppe_post_build_watcher: would start closeout run_local")
+        else:
+            print(f"ppe_post_build_watcher: would finish {result.get('would_finish')}")
+    elif args.finish_handoff and result.get("skipped"):
+        print(
+            "ppe_post_build_watcher: finish handoff skipped — "
+            f"post_build={result.get('post_build_reason') or result.get('reason')}; "
+            f"closeout={result.get('closeout_reason') or result.get('reason')}"
+        )
     return 0
 
 
