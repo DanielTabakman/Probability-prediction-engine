@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: horizon_chart_polish_v1
+closed: 2026-06-28
+---
+
 # Options Horizon chart polish v1 — evidence status
 
 **Chapter:** `horizon_chart_polish_v1`  

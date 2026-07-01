@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p8_tester_release
+closed: 2026-06-12
+---
+
 # MSOS P8 tester release — evidence status
 
 **Chapter:** `msos_p8_tester_release`  

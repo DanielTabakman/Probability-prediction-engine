@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_probability_method_legibility
+closed: 2026-06-05
+---
+
 # MVP1 probability method legibility — evidence status
 
 **Status:** **COMPLETE** 2026-06-05 — implementation on `main`; relay skipped (evidence witness)

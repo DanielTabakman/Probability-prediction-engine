@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_steering_sync_evidence
+closed: 2026-05-28
+---
+
 # MVP1 steering sync evidence — evidence status
 
 **Chapter:** `mvp1_steering_sync_evidence`  

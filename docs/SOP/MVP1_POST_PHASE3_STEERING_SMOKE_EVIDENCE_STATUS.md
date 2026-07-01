@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_post_phase3_steering_smoke
+closed: 2026-05-28
+---
+
 # MVP1 post-Phase3 steering + smoke witness — evidence status
 
 **Chapter:** MVP1 post-Phase3 steering + smoke witness refresh (v0)  

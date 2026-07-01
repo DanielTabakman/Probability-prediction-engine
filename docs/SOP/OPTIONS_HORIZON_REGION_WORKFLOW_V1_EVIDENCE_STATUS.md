@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: horizon_region_workflow_v1
+closed: 2026-06-29
+---
+
 # Options Horizon region workflow v1 — evidence status
 
 **Chapter:** `horizon_region_workflow_v1`  

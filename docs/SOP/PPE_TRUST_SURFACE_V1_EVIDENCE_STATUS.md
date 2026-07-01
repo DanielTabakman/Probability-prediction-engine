@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_trust_surface_v1
+closed: 2026-06-28
+---
+
 # PPE trust surface v1 — evidence status
 
 **Chapter:** `ppe_trust_surface_v1`  

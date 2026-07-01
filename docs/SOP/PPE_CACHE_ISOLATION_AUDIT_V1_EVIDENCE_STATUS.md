@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_cache_isolation_audit_v1
+closed: 2026-06-28
+---
+
 # PPE cache isolation audit v1 — evidence status
 
 **Chapter:** `ppe_cache_isolation_audit_v1`  

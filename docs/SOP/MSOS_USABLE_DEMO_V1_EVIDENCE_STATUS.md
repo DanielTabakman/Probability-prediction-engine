@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_usable_demo_v1
+closed: unknown
+---
+
 # MSOS usable demo v1 — evidence status
 
 **Chapter:** `msos_usable_demo_v1`  

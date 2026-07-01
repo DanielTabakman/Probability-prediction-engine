@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_reliability
+closed: 2026-05-19
+---
+
 # MVP1 Reliability — evidence status
 
 **Chapter:** [`SPRINT_MVP1_RELIABILITY.md`](SPRINT_MVP1_RELIABILITY.md) · **Status:** **COMPLETE** 2026-05-19

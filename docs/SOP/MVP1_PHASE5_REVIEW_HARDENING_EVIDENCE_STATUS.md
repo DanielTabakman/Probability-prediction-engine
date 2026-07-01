@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_phase5_review_hardening
+closed: 2026-05-28
+---
+
 # MVP1 Phase 5 review persistence — evidence status
 
 **Chapter:** `mvp1_phase5_review_hardening`  

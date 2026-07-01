@@ -162,6 +162,18 @@ Promote catalog template `perp_long` ([`config/exposure_path_catalog.yaml`](../.
 
 ---
 
+## Agent load bundle
+
+| Doc | Role |
+|-----|------|
+| [`POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md) | SELECTION |
+| [`SPRINT_PPE_HYPERLIQUID_PERP_RAIL_V1.md`](SPRINT_PPE_HYPERLIQUID_PERP_RAIL_V1.md) | Sprint |
+| [`PPE_HYPERLIQUID_PERP_RAIL_V1_EVIDENCE_STATUS.md`](PPE_HYPERLIQUID_PERP_RAIL_V1_EVIDENCE_STATUS.md) | Evidence |
+| [`PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json`](PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json) | Relay plan |
+| Resolve | `python scripts/resolve_sop.py --chapter ppe_hyperliquid_perp_rail_v1 --json` |
+
+---
+
 ## Changelog
 
 | Date | Change |

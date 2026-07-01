@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p2_homepage
+closed: 2026-06-02
+---
+
 # MSOS P2 homepage — evidence status
 
 **Chapter:** `msos_p2_homepage`  

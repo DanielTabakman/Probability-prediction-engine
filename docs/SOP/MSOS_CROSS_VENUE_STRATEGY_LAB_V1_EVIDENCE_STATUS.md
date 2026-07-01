@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_cross_venue_strategy_lab_v1
+closed: unknown
+---
+
 # MSOS cross-venue Strategy Lab v1 — evidence status
 
 **Chapter:** `msos_cross_venue_strategy_lab_v1`  

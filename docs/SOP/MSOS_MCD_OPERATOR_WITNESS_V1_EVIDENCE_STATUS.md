@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_mcd_production_witness_v1
+closed: 2026-06-21
+---
+
 # MCD operator witness v1 — evidence status
 
 **Chapter:** `msos_mcd_production_witness_v1`  

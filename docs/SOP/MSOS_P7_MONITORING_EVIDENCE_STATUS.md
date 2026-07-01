@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p7_monitoring
+closed: 2026-06-12
+---
+
 # MSOS P7 monitoring — evidence status
 
 **Chapter:** `msos_p7_monitoring`  

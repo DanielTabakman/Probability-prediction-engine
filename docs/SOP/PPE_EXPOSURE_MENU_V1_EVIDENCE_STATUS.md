@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_exposure_menu_v1
+closed: 2026-06-29
+---
+
 # PPE Exposure menu v1 — evidence status
 
 **Chapter:** `ppe_exposure_menu_v1`  

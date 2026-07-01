@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_asset_display_parity_v1
+closed: unknown
+---
+
 # PPE asset display parity v1 — evidence status
 
 **Chapter:** `ppe_asset_display_parity_v1`  

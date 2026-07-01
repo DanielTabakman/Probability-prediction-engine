@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_asset_enablement_pipeline_v1
+closed: 2026-06-28
+---
+
 # PPE asset enablement pipeline v1 — evidence status
 
 **Chapter:** `ppe_asset_enablement_pipeline_v1`  

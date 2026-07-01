@@ -88,6 +88,28 @@ def run_operator_doctor(
     except Exception as exc:
         report["blind_spots_error"] = str(exc)
 
+    try:
+        from scripts.sop_discovery_core import assess_sop_discovery_health
+
+        sop = assess_sop_discovery_health(repo)
+        report["sop_discovery_health"] = sop
+        report["checks"].append(
+            {
+                "id": "sop_discovery",
+                "ok": bool(sop.get("ok")),
+                "detail": sop.get("index_fresh_detail")
+                if not sop.get("index_fresh")
+                else (
+                    f"evidence_backfill={sop.get('evidence_backfill_pending')}, "
+                    f"ready_starters={sop.get('ready_starter_regen_pending')}"
+                    if not sop.get("ok")
+                    else None
+                ),
+            }
+        )
+    except Exception as exc:
+        report["checks"].append({"id": "sop_discovery", "ok": False, "error": str(exc)})
+
     high = [
         i
         for i in (report.get("blind_spots") or {}).get("issues") or []

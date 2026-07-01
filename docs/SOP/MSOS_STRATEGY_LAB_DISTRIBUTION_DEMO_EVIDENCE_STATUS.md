@@ -1,3 +1,4 @@
+
 # MSOS Strategy Lab distribution demo — evidence status
 
 **Chapter:** `msos_strategy_lab_distribution_demo`  

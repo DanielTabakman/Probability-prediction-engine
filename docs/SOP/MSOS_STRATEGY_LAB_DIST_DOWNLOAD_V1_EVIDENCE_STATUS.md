@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_strategy_lab_dist_download_v1
+closed: 2026-06-30
+---
+
 # MSOS Strategy Lab distribution download v1 — evidence status
 
 **Chapter:** `msos_strategy_lab_dist_download_v1`  

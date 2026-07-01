@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p4_strategy_lab
+closed: 2026-06-09
+---
+
 # MSOS P4 Strategy Lab — evidence status
 
 **Chapter:** `msos_p4_strategy_lab`  

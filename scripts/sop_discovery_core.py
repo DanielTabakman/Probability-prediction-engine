@@ -408,7 +408,13 @@ def chapter_doc_bundle(repo: Path, *, chapter_id: str, plan_path: str) -> dict[s
     load_always = [p for p in (program_doc, selection) if p]
     load_for_build = [p for p in (sprint, plan_rel) if p]
     load_on_demand = [p for p in (evidence, next_selection, *carry) if p]
-    archived = queue_status == "DONE"
+    qs = str(queue_status or "").strip().upper()
+    if qs == "DONE":
+        archived = True
+    elif qs in ("READY", "PLANNED", "RUNNING"):
+        archived = False
+    else:
+        archived = evidence_front_matter_archived(repo, evidence)
 
     return {
         "chapter_id": chapter_id,
@@ -979,6 +985,278 @@ def resolve_by_search(repo: Path, query: str) -> dict[str, Any]:
     }
 
 
+_FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
+_EVIDENCE_COMPLETE_RE = re.compile(
+    r"\*\*Status:\*\*\s+\*\*COMPLETE\*\*(?:\s+(\d{4}-\d{2}-\d{2}))?",
+    re.IGNORECASE,
+)
+_EVIDENCE_CHAPTER_RE = re.compile(
+    r"\*\*Chapter:\*\*\s+`([^`]+)`",
+    re.IGNORECASE,
+)
+
+
+def parse_evidence_front_matter(text: str) -> dict[str, Any]:
+    """Parse YAML front matter from an evidence status doc."""
+    if not text.startswith("---\n"):
+        return {}
+    end = text.find("\n---\n", 4)
+    if end < 0:
+        return {}
+    block = text[4:end]
+    out: dict[str, Any] = {}
+    for line in block.splitlines():
+        if ":" not in line:
+            continue
+        key, val = line.split(":", 1)
+        key = key.strip()
+        val = val.strip()
+        if val.lower() == "true":
+            out[key] = True
+        elif val.lower() == "false":
+            out[key] = False
+        else:
+            out[key] = val
+    return out
+
+
+def evidence_front_matter_archived(repo: Path, evidence_rel: str | None) -> bool:
+    """True only when evidence YAML explicitly marks archived (not body COMPLETE)."""
+    rel = str(evidence_rel or "").replace("\\", "/").strip()
+    if not rel:
+        return False
+    path = repo / rel
+    if not path.is_file():
+        return False
+    text = path.read_text(encoding="utf-8-sig")
+    return parse_evidence_front_matter(text).get("archived") is True
+
+
+def evidence_doc_archived(repo: Path, evidence_rel: str | None) -> bool:
+    """True when evidence is archived via queue DONE or explicit front matter."""
+    rel = str(evidence_rel or "").replace("\\", "/").strip()
+    if not rel:
+        return False
+    if evidence_front_matter_archived(repo, rel):
+        return True
+    text = (repo / rel).read_text(encoding="utf-8-sig")
+    return bool(_EVIDENCE_COMPLETE_RE.search(text))
+
+
+def _evidence_archive_metadata(text: str, *, fallback_chapter_id: str = "") -> tuple[str, str]:
+    fm = parse_evidence_front_matter(text)
+    chapter_id = str(fm.get("chapter_id") or "").strip()
+    if not chapter_id:
+        m = _EVIDENCE_CHAPTER_RE.search(text)
+        chapter_id = (m.group(1) if m else fallback_chapter_id).strip()
+    closed = str(fm.get("closed") or "").strip()
+    if not closed:
+        m = _EVIDENCE_COMPLETE_RE.search(text)
+        closed = (m.group(1) if m and m.group(1) else "unknown").strip()
+    return chapter_id, closed
+
+
+def plan_evidence_front_matter_backfill(repo: Path) -> dict[str, Any]:
+    """List archived evidence docs missing `archived: true` front matter."""
+    repo = repo.resolve()
+    index = build_chapter_doc_index(repo)
+    evidence_to_chapter: dict[str, str] = {}
+    for row in index.get("chapters") or []:
+        if not isinstance(row, dict):
+            continue
+        ev = _norm(str(row.get("evidence") or ""))
+        cid = str(row.get("chapter_id") or "").strip()
+        if ev:
+            evidence_to_chapter[ev] = cid
+    queue_done: set[str] = set()
+    if (repo / QUEUE_REL).is_file():
+        try:
+            queue = load_queue(repo)
+            for item in queue.get("items") or []:
+                if not isinstance(item, dict):
+                    continue
+                if str(item.get("status") or "").upper() != "DONE":
+                    continue
+                plan = _norm(str(item.get("planPath") or ""))
+                if not plan:
+                    continue
+                cid = _chapter_id_from_plan(plan)
+                for row in index.get("chapters") or []:
+                    if isinstance(row, dict) and row.get("chapter_id") == cid:
+                        ev = _norm(str(row.get("evidence") or ""))
+                        if ev:
+                            queue_done.add(ev)
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    pending: list[dict[str, str]] = []
+    sop = repo / "docs" / "SOP"
+    for path in sorted(sop.glob("*_EVIDENCE_STATUS.md")):
+        rel = _norm(str(path.relative_to(repo)))
+        try:
+            text = path.read_text(encoding="utf-8-sig")
+        except OSError:
+            continue
+        if parse_evidence_front_matter(text).get("archived") is True:
+            continue
+        if rel not in queue_done:
+            continue
+        chapter_id, closed = _evidence_archive_metadata(
+            text,
+            fallback_chapter_id=evidence_to_chapter.get(rel, ""),
+        )
+        pending.append(
+            {
+                "evidence_doc": rel,
+                "chapter_id": chapter_id or evidence_to_chapter.get(rel, ""),
+                "closed": closed,
+            }
+        )
+    return {"pending_count": len(pending), "pending": pending}
+
+
+def plan_repair_active_evidence_front_matter(repo: Path) -> dict[str, Any]:
+    """Evidence docs stamped archived while queue row is still active (READY/PLANNED/RUNNING)."""
+    repo = repo.resolve()
+    index = build_chapter_doc_index(repo)
+    plan_to_evidence: dict[str, str] = {}
+    for row in index.get("chapters") or []:
+        if not isinstance(row, dict):
+            continue
+        plan = _norm(str(row.get("plan_path") or ""))
+        ev = _norm(str(row.get("evidence") or ""))
+        if plan and ev:
+            plan_to_evidence[plan] = ev
+
+    active_statuses = {"READY", "PLANNED", "RUNNING"}
+    pending: list[str] = []
+    if not (repo / QUEUE_REL).is_file():
+        return {"pending_count": 0, "pending": []}
+    queue = load_queue(repo)
+    for item in queue.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "").upper() not in active_statuses:
+            continue
+        plan = _norm(str(item.get("planPath") or ""))
+        ev = plan_to_evidence.get(plan, "")
+        if not ev:
+            continue
+        path = repo / ev
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8-sig")
+        if parse_evidence_front_matter(text).get("archived") is True:
+            pending.append(ev)
+    return {"pending_count": len(pending), "pending": pending}
+
+
+def repair_active_evidence_front_matter(repo: Path, *, apply: bool) -> dict[str, Any]:
+    plan = plan_repair_active_evidence_front_matter(repo)
+    repaired: list[str] = []
+    for rel in plan.get("pending") or []:
+        if not isinstance(rel, str) or not rel.strip():
+            continue
+        path = repo / rel.replace("\\", "/")
+        if not path.is_file():
+            continue
+        if not apply:
+            repaired.append(rel)
+            continue
+        text = path.read_text(encoding="utf-8-sig")
+        if text.startswith("---\n"):
+            text = _FRONT_MATTER_RE.sub("", text, count=1)
+            path.write_text(text, encoding="utf-8")
+            repaired.append(rel)
+    out = {"applied": apply, "repaired_count": len(repaired), "repaired": repaired}
+    if apply and repaired:
+        refresh_sop_discovery_artifacts(repo)
+    return out
+
+
+def backfill_evidence_front_matter(repo: Path, *, apply: bool) -> dict[str, Any]:
+    plan = plan_evidence_front_matter_backfill(repo)
+    stamped: list[str] = []
+    skipped: list[str] = []
+    for row in plan.get("pending") or []:
+        if not isinstance(row, dict):
+            continue
+        rel = str(row.get("evidence_doc") or "").strip()
+        cid = str(row.get("chapter_id") or "").strip() or "unknown"
+        closed = str(row.get("closed") or "").strip() or "unknown"
+        if not rel:
+            continue
+        if not apply:
+            stamped.append(rel)
+            continue
+        if stamp_evidence_archived_frontmatter(repo, rel, chapter_id=cid, closed_date=closed):
+            stamped.append(rel)
+        else:
+            skipped.append(rel)
+    out = {
+        "applied": apply,
+        "stamped_count": len(stamped),
+        "stamped": stamped,
+        "skipped": skipped,
+    }
+    if apply and stamped:
+        refresh_sop_discovery_artifacts(repo)
+    return out
+
+
+def assess_sop_discovery_health(repo: Path) -> dict[str, Any]:
+    """Operator/doctor snapshot for SOP discovery drift."""
+    repo = repo.resolve()
+    fresh, fresh_detail = chapter_doc_index_fresh(repo)
+    try:
+        from scripts.validate_sop_links import validate_sop_links
+
+        links = validate_sop_links(repo)
+        links_ok = bool(links.get("ok"))
+        link_errors = int(links.get("error_count") or 0)
+    except Exception as exc:
+        links_ok = False
+        link_errors = -1
+        links = {"error": str(exc)}
+    backfill = plan_evidence_front_matter_backfill(repo)
+    try:
+        from scripts.ppe_ide_build_starter import plan_regen_ready_starters
+
+        starter_plan = plan_regen_ready_starters(repo)
+    except Exception as exc:
+        starter_plan = {"pending_count": -1, "error": str(exc)}
+    ok = fresh and links_ok and int(backfill.get("pending_count") or 0) == 0
+    return {
+        "ok": ok,
+        "index_fresh": fresh,
+        "index_fresh_detail": fresh_detail,
+        "links_ok": links_ok,
+        "link_error_count": link_errors,
+        "evidence_backfill_pending": int(backfill.get("pending_count") or 0),
+        "ready_starter_regen_pending": int(starter_plan.get("pending_count") or 0),
+        "links": links if not links_ok else None,
+    }
+
+
+def format_operator_sop_health_lines(repo: Path) -> list[str]:
+    health = assess_sop_discovery_health(repo)
+    if health.get("ok"):
+        return ["**SOP discovery:** OK (index fresh, links valid)"]
+    parts: list[str] = []
+    if not health.get("index_fresh"):
+        parts.append(f"stale index ({health.get('index_fresh_detail')})")
+    if not health.get("links_ok"):
+        parts.append(f"link errors={health.get('link_error_count')}")
+    pending_ev = int(health.get("evidence_backfill_pending") or 0)
+    if pending_ev:
+        parts.append(f"evidence backfill pending={pending_ev}")
+    pending_st = int(health.get("ready_starter_regen_pending") or 0)
+    if pending_st:
+        parts.append(f"READY starter regen pending={pending_st}")
+    fix = "python scripts/sop_discovery_maintenance.py --all --apply"
+    return [f"**SOP discovery:** WARN — {'; '.join(parts)} · fix: `{fix}`"]
+
+
 def validate_closeout_spec_docs(repo: Path, spec: Any) -> list[str]:
     """Fail closeout when referenced steward/build doc paths are missing."""
     repo = repo.resolve()
@@ -1003,9 +1281,6 @@ def validate_closeout_spec_docs(repo: Path, spec: Any) -> list[str]:
         if path and not (repo / path).is_file():
             errors.append(f"closeout carry_doc path not found: {path}")
     return errors
-
-
-_FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
 
 
 def stamp_evidence_archived_frontmatter(

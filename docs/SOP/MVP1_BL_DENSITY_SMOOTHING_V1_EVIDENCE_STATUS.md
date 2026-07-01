@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_bl_density_smoothing_v1
+closed: 2026-06-29
+---
+
 # MVP1 B–L density smoothing v1 — evidence status
 
 **Chapter:** `mvp1_bl_density_smoothing_v1`  

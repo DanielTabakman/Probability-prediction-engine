@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_production_multi_asset_witness_v1
+closed: 2026-06-28
+---
+
 # MSOS production multi-asset witness v1 — evidence status
 
 **Chapter:** `msos_production_multi_asset_witness_v1`  

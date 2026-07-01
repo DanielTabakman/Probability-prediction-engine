@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_workflow_asset_parity_v1
+closed: 2026-06-28
+---
+
 # MSOS workflow asset parity v1 — evidence status
 
 **Chapter:** `msos_workflow_asset_parity_v1`  

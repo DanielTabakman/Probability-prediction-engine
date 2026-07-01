@@ -1,3 +1,4 @@
+
 # MVP1 snapshot owner v1 — evidence status
 
 **Chapter:** `mvp1_snapshot_owner_v1`  

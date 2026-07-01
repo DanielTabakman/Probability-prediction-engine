@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p1_stack_routing
+closed: 2026-06-01
+---
+
 # MSOS P1 stack routing — evidence status
 
 **Chapter:** MSOS P1 stack / routing ADR  

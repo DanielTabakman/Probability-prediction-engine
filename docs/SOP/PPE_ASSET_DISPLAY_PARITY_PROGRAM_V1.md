@@ -45,3 +45,15 @@ See [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](SPRINT_PPE_ASSET_DISPLAY_PARITY_V1
 ## Evidence
 
 [`PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md`](PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md)
+
+---
+
+## Agent load bundle
+
+| Doc | Role |
+|-----|------|
+| [`POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md`](POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md) | SELECTION |
+| [`SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md`](SPRINT_PPE_ASSET_DISPLAY_PARITY_V1.md) | Sprint |
+| [`PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md`](PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md) | Evidence |
+| [`PHASE_PLANS/ppe_asset_display_parity_v1_relay.json`](PHASE_PLANS/ppe_asset_display_parity_v1_relay.json) | Relay plan |
+| Resolve | `python scripts/resolve_sop.py --chapter ppe_asset_display_parity_v1 --json` |

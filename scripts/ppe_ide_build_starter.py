@@ -6,6 +6,7 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 from scripts.ppe_context_bands import classify_line_count, score_text
 from scripts.ppe_manifest import load_phase_plan
@@ -298,6 +299,54 @@ def regenerate_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
                 file=sys.stderr,
             )
     return written
+
+
+def plan_regen_ready_starters(repo: Path) -> dict[str, Any]:
+    """Plans IDE BUILD starter regen for READY queue rows missing starter files."""
+    from scripts.ppe_ide_product_ready import next_pending_product_slice
+    from scripts.ppe_queue import load_queue
+
+    repo = repo.resolve()
+    pending: list[dict[str, Any]] = []
+    try:
+        queue = load_queue(repo)
+    except (FileNotFoundError, OSError):
+        return {"pending_count": 0, "pending": []}
+    for item in queue.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("status") or "").upper() != "READY":
+            continue
+        plan = str(item.get("planPath") or "").replace("\\", "/").strip()
+        if not plan:
+            continue
+        try:
+            slice_id = next_pending_product_slice(repo, plan_path=plan)
+        except (FileNotFoundError, OSError, ValueError):
+            continue
+        if not slice_id:
+            continue
+        rel = starter_path(slice_id)
+        if (repo / rel).is_file():
+            continue
+        pending.append({"plan_path": plan, "slice_id": slice_id, "reason": "missing starter"})
+    return {"pending_count": len(pending), "pending": pending}
+
+
+def regenerate_starters_for_ready_queue(repo: Path) -> dict[str, list[str]]:
+    """Regenerate product-slice starters for READY queue plans that need them."""
+    plan = plan_regen_ready_starters(repo)
+    out: dict[str, list[str]] = {}
+    for row in plan.get("pending") or []:
+        if not isinstance(row, dict):
+            continue
+        plan_path = str(row.get("plan_path") or "").strip()
+        if not plan_path:
+            continue
+        written = regenerate_starters_for_plan(repo, plan_path)
+        if written:
+            out[plan_path] = written
+    return out
 
 
 def prune_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:

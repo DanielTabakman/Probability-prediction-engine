@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_forward_consistency_radar_v1
+closed: 2026-06-30
+---
+
 # PPE forward consistency radar v1 — evidence status
 
 **Chapter:** `ppe_forward_consistency_radar_v1`
