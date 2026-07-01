@@ -476,8 +476,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-01T20:16:56Z">
-        Last updated: 2026-07-01 <time datetime="2026-07-01T20:16:56Z">16:16 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-01T21:09:50Z">
+        Last updated: 2026-07-01 <time datetime="2026-07-01T21:09:50Z">17:09 EDT</time>
       </span>
     </p>
 
@@ -517,8 +517,8 @@
     <div class="op-section todo-panel" id="map-do-now">
       <ol>
         <li>
-          <strong>Finish chapter closeout — msos_forward_consistency_radar_v1 (MSOS /forward-consistency dashboard)</strong>
-          <span class="why">IDE product marker present — finish chapter with run_ppe_local · docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json · DESKTOP_CONTINUE.cmd <em class="compass-src">(operator_status)</em></span>
+          <strong>IDE BUILD — implement product slice</strong>
+          <span class="why">Next product slice [MSOS-VisParityV1-Product-Slice002] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). Operator thread → ask **what's next?** <em class="compass-src">(operator_status)</em></span>
         </li>
       </ol>
     </div>
@@ -548,6 +548,32 @@
           <span class="why">Next group after current batch: TSLA, AMD, AAPL, MSFT, AMZN <em class="compass-src">(assets_tier1_manifest)</em></span>
         </li>
       </ul>
+    </div>
+
+    <h2>Factory throughput (7d)</h2>
+    <p class="flow-intro">Aggregate factory metrics — slices auto-log; optional thread pulse on closeout. Regenerate: <code>ppe_tracking_rollup.cmd</code> · <a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">TRACKING_ROLLUP.html</a></p>
+    <div class="op-section progress-panel" id="map-factory-throughput">
+      <table class="compass-modules">
+        <tbody>
+          <tr><th>Slices logged</th><td>22</td></tr>
+          <tr><th>Weighted slices</th><td>39</td></tr>
+          <tr><th>Weighted / closeout</th><td>0.41</td></tr>
+          <tr><th>Avg roundtrips / slice</th><td>0.77</td></tr>
+          <tr><th>Context closeouts</th><td>96</td></tr>
+          <tr><th>Thread pulses</th><td>2</td></tr>
+          <tr><th>Avg cognitive load</th><td>3.0</td></tr>
+          <tr><th>Incident slices</th><td>0</td></tr>
+        </tbody>
+      </table>
+      <p class="flow-intro" style="margin-top:12px"><strong>Recent pulses</strong></p>
+      <table class="compass-modules">
+        <thead><tr><th>When</th><th>Load</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>2026-07-01T21:06:54Z</td><td>3</td><td></td></tr>
+          <tr><td>2026-07-01T21:04:15Z</td><td>3</td><td></td></tr>
+        </tbody>
+      </table>
+      <p class="flow-intro" style="margin-top:8px"><a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">Full rollup HTML</a> · <em class="compass-src">(workflow_metrics aggregate)</em></p>
     </div>
 
     <h2>Module progress</h2>

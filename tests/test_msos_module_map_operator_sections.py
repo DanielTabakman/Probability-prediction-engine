@@ -12,6 +12,7 @@ MAP_HTML = REPO / "docs" / "SOP" / "assets" / "msos_module_map.html"
 REQUIRED_SECTIONS = (
     "Do this now",
     "Crack catcher",
+    "Factory throughput (7d)",
     "Module progress",
     "Waiting on time / data",
     "Recently shipped",
@@ -22,6 +23,7 @@ REQUIRED_SECTIONS = (
 OPERATOR_H2_ORDER = (
     "Do this now",
     "Crack catcher",
+    "Factory throughput (7d)",
     "Module progress",
     "Waiting on time / data",
     "Recently shipped",
@@ -31,6 +33,7 @@ OPERATOR_H2_ORDER = (
 COMPASS_MARKERS = (
     'id="map-do-now"',
     'id="map-crack-catcher"',
+    'id="map-factory-throughput"',
     'id="map-module-progress"',
     'id="map-waiting-on-time"',
 )
