@@ -1,0 +1,23 @@
+---
+description: Thread roles — operator vs charter vs explore. Stops relay hijacking planning threads.
+alwaysApply: true
+---
+
+# Thread roles
+
+| Role | Trigger (first message) | Relay? | Ship? |
+|------|-------------------------|--------|-------|
+| **operator** | `what's next`, `ppe_go`, `THREAD_ROLE: operator`, `@OPERATOR_STATUS.md` | Yes | Yes |
+| **ide_build** | `IDE BUILD`, `@IDE_BUILD_STARTER_*`, `THREAD_ROLE: ide_build` | Slice only | Yes + mark ready |
+| **charter** | `charter thread`, `THREAD_ROLE: charter`, program/backlog docs only | No | Docs/control-plane only |
+| **explore** | `explore`, `review only`, `THREAD_ROLE: explore` | No | Only if user asked to implement |
+| **neutral** | Everything else | No | Only if user asked to implement |
+
+**Hard rules:**
+- Charter / explore / neutral → never read `OPERATOR_STATUS`, never run burst/`@ppe-director`, never `DESKTOP_CONTINUE` unless user switches role.
+- Operator / ide_build → run verdict per `ppe-operator.mdc`.
+- Neutral/charter → answer the question first; no operator checklist at end.
+- Branch recovery (stash, mixed-plane) → operator thread only.
+- Product `src/` slices → ide_build or operator, not charter.
+
+Canon: `docs/SOP/THREAD_STARTERS_V1.md`, `docs/SOP/AGENT_ROUTING_V1.md`

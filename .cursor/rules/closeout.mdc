@@ -1,0 +1,18 @@
+---
+description: Context window closeout triggers.
+globs:
+  - docs/SOP/**
+  - artifacts/control_plane/**
+---
+
+# Closeout
+
+Triggers: `close out thread`, `closeout`, `end thread`, `wrap this chat`
+
+Run `context_window_closeout.cmd --record` (auto-ship per `auto-ship.mdc`).
+
+Charter/explore mixed-plane → park only, no branch surgery.
+
+End with one line: "Thread closed — work shipped" or "Thread closed — parked."
+
+Canon: `docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`

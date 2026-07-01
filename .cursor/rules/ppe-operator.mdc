@@ -1,8 +1,4 @@
 ---
-alwaysApply: true
----
-
----
 description: Operator relay — desktop vs VM, verdicts, what's next.
 alwaysApply: true
 ---
@@ -20,9 +16,7 @@ alwaysApply: true
 
 Before relay on desktop: `python scripts/ppe_loop_host_guard.py --check` — if not allowed, don't run relay locally.
 
-**Never on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_*`, `finish_ide_build.cmd`, `ppe_autobuilder.cmd advance`, `STUCK_RUN_LOCAL_WATCH.cmd`, `ppe_operator_stuck_run_local.py --ensure-watch` / `--watch-daemon`.
-
-**Never on desktop (stuck recovery):** Do not set `PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY`, `PPE_STUCK_RUN_LOCAL_WATCH`, or create `ppe_operator_stuck_recovery.unlock` for the operator — causes CMD pop-ups. `RUN_LOCAL` → `DESKTOP_CONTINUE.cmd --no-pause` once; do not ask the operator to enable background watchers.
+**Never on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_*`, `finish_ide_build.cmd`, `ppe_autobuilder.cmd advance`.
 
 `RUN_LOCAL` on desktop = **`DESKTOP_CONTINUE.cmd --no-pause`** (not local `run_ppe_local`).
 
