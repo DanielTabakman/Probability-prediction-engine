@@ -40,8 +40,7 @@ export function HeroSection() {
           </span>
         </ActionLink>
         <p className="hero-cta-hint">
-          3-minute walkthrough of Strategy Lab with live BTC options — paper trading only, no sign-in
-          required.
+          Guided walkthrough with a hands-on belief step — paper trading only, no sign-in required.
         </p>
       </div>
       <div className="hero-actions-secondary">

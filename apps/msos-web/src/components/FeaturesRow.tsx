@@ -32,6 +32,14 @@ export function FeaturesRow() {
           <RestartTourButton className="nav-text-btn" beginner>
             New to options? Try the simpler tour
           </RestartTourButton>
+          {" · "}
+          <RestartTourButton className="nav-text-btn" quick>
+            Quick wedge (~15s)
+          </RestartTourButton>
+          {" · "}
+          <RestartTourButton className="nav-text-btn" full>
+            Full trader loop
+          </RestartTourButton>
         </p>
       </div>
     </section>

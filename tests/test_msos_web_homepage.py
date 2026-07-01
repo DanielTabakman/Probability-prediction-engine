@@ -52,16 +52,30 @@ def test_public_nav_restart_tour() -> None:
 
 def test_platform_tutorial_wiring() -> None:
     lib = (MSOS_WEB / "src" / "lib" / "platformTutorial.ts").read_text(encoding="utf-8")
+    events = (MSOS_WEB / "src" / "lib" / "platformTutorialEvents.ts").read_text(encoding="utf-8")
     assert "lab-asset" in lib
     assert "BTC or ETH" in lib
     assert "PLATFORM_TOUR_DEFAULT_ASSET" in lib
     assert "LAB_ASSET_QUERY_PARAM" in lib
     assert "asset=BTC" in lib or "PLATFORM_TOUR_DEFAULT_ASSET" in lib
+    assert "playAction" in lib
+    assert "belief-nudge" in lib
+    assert "PLATFORM_TUTORIAL_QUICK_STEPS" in lib
+    assert "PLATFORM_TUTORIAL_SPINE_STEPS" in lib
+    assert "lab-horizon-nav" in lib
+    assert "lab-workflow-review" in lib
+    assert "resolveTutorialMode" in lib
+    assert "PLATFORM_TOUR_PLAY_EVENT" in events
     shell = (MSOS_WEB / "src" / "components" / "StrategyLabClientShell.tsx").read_text(encoding="utf-8")
+    panel = (MSOS_WEB / "src" / "components" / "StrategyLabInteractivePanel.tsx").read_text(encoding="utf-8")
+    tutorial = (MSOS_WEB / "src" / "components" / "PlatformTutorial.tsx").read_text(encoding="utf-8")
     picker = (MSOS_WEB / "src" / "components" / "LabAssetPicker.tsx").read_text(encoding="utf-8")
     assert "PlatformTutorial" in shell
+    assert "resolveTutorialMode" in shell
     assert "TourPreparingOverlay" in shell
     assert "LabAssetPicker" in shell
+    assert "notifyPlatformTourPlayAction" in panel
+    assert "playSatisfied" in tutorial
     assert 'data-tour="lab-asset"' in picker
     loading = (MSOS_WEB / "src" / "app" / "strategy-lab" / "loading.tsx").read_text(encoding="utf-8")
     assert "Opening Strategy Lab" in loading
@@ -72,6 +86,8 @@ def test_platform_tutorial_wiring() -> None:
     assert "warmStrategyLabEntry" in restart or "Opening tour" in hero
     layout = (MSOS_WEB / "src" / "app" / "layout.tsx").read_text(encoding="utf-8")
     assert "NavigationProgressProvider" in layout
+    stepper = (MSOS_WEB / "src" / "components" / "WorkflowStepper.tsx").read_text(encoding="utf-8")
+    assert 'data-tour="lab-workflow-review"' in stepper
 
 
 def test_features_row_self_serve_entry() -> None:
@@ -79,6 +95,8 @@ def test_features_row_self_serve_entry() -> None:
     assert 'data-self-serve-entry="features"' in features
     assert "BTC and ETH" in features
     assert "beginner" in features
+    assert "quick" in features
+    assert "Full trader loop" in features
 
 
 def test_expiry_context_strip_uses_asset_ticker() -> None:
