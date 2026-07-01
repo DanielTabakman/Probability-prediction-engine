@@ -1,19 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { ExposurePathCard } from "@/components/ExposurePathCard";
 import { demoExposureMenuForAsset } from "@/data/exposureMenuFixtures";
+import { assetBucketForId, bucketsFromCatalog, fetchAssetCatalog } from "@/lib/ppeAssetCatalog";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
   buildExposurePagePath,
-  DEFAULT_EXPOSURE_ASSET_ID,
   DEFAULT_EXPOSURE_DIRECTION,
   DEFAULT_EXPOSURE_HORIZON,
-  EXPOSURE_PROOF_ASSETS,
   fetchExposureMenuClient,
-  normalizeExposureAssetId,
   normalizeExposureDirection,
   normalizeExposureHorizon,
   type ExposureDirection,
@@ -46,14 +44,29 @@ export function ExposureMenuClient({
   initialDirection,
   initialHorizon,
 }: ExposureMenuClientProps) {
-  const router = useRouter();
-  const assetId = normalizeExposureAssetId(initialAsset, DEFAULT_EXPOSURE_ASSET_ID);
+  const assetId = (initialAsset ?? "").trim().toUpperCase();
   const direction = normalizeExposureDirection(initialDirection, DEFAULT_EXPOSURE_DIRECTION);
   const horizon = normalizeExposureHorizon(initialHorizon, DEFAULT_EXPOSURE_HORIZON);
 
   const [payload, setPayload] = useState<ExposureMenuPayload | null>(initialPayload);
   const [loading, setLoading] = useState(!initialPayload);
   const [live, setLive] = useState(Boolean(initialPayload));
+  const [assetBucket, setAssetBucket] = useState<"crypto" | "stocks" | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const catalog = await fetchAssetCatalog();
+      if (cancelled || !catalog) {
+        return;
+      }
+      const buckets = bucketsFromCatalog(catalog);
+      setAssetBucket(assetBucketForId(assetId, buckets));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [assetId]);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -62,20 +75,20 @@ export function ExposureMenuClient({
       setPayload(data);
       setLive(true);
     } else {
-      setPayload(demoExposureMenuForAsset(assetId, direction, horizon));
+      setPayload(demoExposureMenuForAsset(assetId, direction, horizon, assetBucket));
       setLive(false);
     }
     setLoading(false);
-  }, [assetId, direction, horizon]);
+  }, [assetId, assetBucket, direction, horizon]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  const onAssetChange = (nextAsset: string) => {
-    const normalized = normalizeExposureAssetId(nextAsset);
-    router.replace(buildExposurePagePath(normalized, direction, horizon));
-  };
+  const buildAssetHref = useCallback(
+    (nextAsset: string) => buildExposurePagePath(nextAsset, direction, horizon),
+    [direction, horizon],
+  );
 
   const onDirectionChange = (nextDirection: ExposureDirection) => {
     router.replace(buildExposurePagePath(assetId, nextDirection, horizon));
@@ -114,16 +127,11 @@ export function ExposureMenuClient({
       </header>
 
       <section className="exposure-menu-intake panel compact" aria-label="Exposure intake">
-        <label className="exposure-menu-field">
-          <span>Asset</span>
-          <select value={assetId} onChange={(event) => onAssetChange(event.target.value)}>
-            {EXPOSURE_PROOF_ASSETS.map((id) => (
-              <option key={id} value={id}>
-                {id}
-              </option>
-            ))}
-          </select>
-        </label>
+        <LabAssetPicker
+          selectedAssetId={assetId}
+          buildAssetHref={buildAssetHref}
+          className="exposure-menu-asset-picker"
+        />
 
         <div className="exposure-menu-chip-group" role="group" aria-label="Direction">
           <span className="micro">Direction</span>

@@ -189,13 +189,16 @@ export function demoExposureMenuForAsset(
   assetId: string,
   direction: ExposureMenuPayload["direction"] = "long",
   horizon: ExposureMenuPayload["horizon"] = "any",
+  bucket: "crypto" | "stocks" | null = null,
 ): ExposureMenuPayload {
   const upper = assetId.trim().toUpperCase();
-  const base = upper === "BTC" ? DEMO_EXPOSURE_MENU_BTC_LONG : DEMO_EXPOSURE_MENU_NVDA_LONG;
+  const useCrypto = bucket === "crypto" || (bucket === null && upper === "BTC");
+  const base = useCrypto ? DEMO_EXPOSURE_MENU_BTC_LONG : DEMO_EXPOSURE_MENU_NVDA_LONG;
   return {
     ...base,
-    asset_id: upper === "BTC" ? "BTC" : "NVDA",
+    asset_id: upper,
     direction,
     horizon,
+    proof_asset: false,
   };
 }

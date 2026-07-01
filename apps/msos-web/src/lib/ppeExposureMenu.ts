@@ -1,6 +1,10 @@
 /**
  * PPE exposure menu boundary — display/proxy only (path ranking math in Python).
+ * Asset picker uses catalog.json (registry SSOT) — see ppeAssetCatalog.ts.
  */
+
+import { normalizeCatalogAssetId, type AssetCatalogPayload } from "@/lib/ppeAssetCatalog";
+import { REGISTRY_DEFAULT_ASSET_ID } from "@/lib/ppeDisplayPayload";
 
 export const PPE_EXPOSURE_MENU_API_URL = (
   process.env.NEXT_PUBLIC_PPE_EXPOSURE_MENU_API_URL ?? "/ppe-display-api/exposure-menu.json"
@@ -9,9 +13,6 @@ export const PPE_EXPOSURE_MENU_API_URL = (
 export const EXPOSURE_ASSET_QUERY_PARAM = "asset";
 export const EXPOSURE_DIRECTION_QUERY_PARAM = "direction";
 export const EXPOSURE_HORIZON_QUERY_PARAM = "horizon";
-
-export const EXPOSURE_PROOF_ASSETS = ["NVDA", "BTC"] as const;
-export type ExposureProofAssetId = (typeof EXPOSURE_PROOF_ASSETS)[number];
 
 export type ExposureDirection = "long" | "short" | "neutral";
 export type HorizonChip = "any" | "3m" | "12m";
@@ -52,22 +53,17 @@ export type ExposureMenuPayload = {
   proof_asset?: boolean;
 };
 
-export const DEFAULT_EXPOSURE_ASSET_ID: ExposureProofAssetId = "NVDA";
+export const DEFAULT_EXPOSURE_ASSET_ID = REGISTRY_DEFAULT_ASSET_ID;
 export const DEFAULT_EXPOSURE_DIRECTION: ExposureDirection = "long";
 export const DEFAULT_EXPOSURE_HORIZON: HorizonChip = "any";
 
-const ASSET_PATTERN = /^[A-Z][A-Z0-9._-]{0,11}$/;
-
+/** Normalize ?asset= against enabled catalog ids (registry SSOT). */
 export function normalizeExposureAssetId(
   value: string | null | undefined,
-  fallback: ExposureProofAssetId = DEFAULT_EXPOSURE_ASSET_ID,
-): ExposureProofAssetId {
-  const upper = (value ?? "").trim().toUpperCase();
-  if (!upper || !ASSET_PATTERN.test(upper)) {
-    return fallback;
-  }
-  const proof = EXPOSURE_PROOF_ASSETS as readonly string[];
-  return proof.includes(upper) ? (upper as ExposureProofAssetId) : fallback;
+  catalog: AssetCatalogPayload | null,
+  fallback: string = DEFAULT_EXPOSURE_ASSET_ID,
+): string {
+  return normalizeCatalogAssetId(value, catalog, fallback);
 }
 
 export function normalizeExposureDirection(

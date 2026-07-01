@@ -58,6 +58,24 @@ def _btc_marks() -> dict[str, list[dict[str, Any]]]:
     }
 
 
+def _sol_expiries() -> list[dict[str, Any]]:
+    now = _now_ms()
+    return [
+        {"expiration_timestamp": now + 120 * 86_400_000, "expiry_date_str": "2026-10-28"},
+    ]
+
+
+def _sol_marks() -> dict[str, list[dict[str, Any]]]:
+    return {
+        "calls": [
+            {"strike": 70.0, "mark_btc": 4.5},
+            {"strike": 80.0, "mark_btc": 2.5},
+            {"strike": 82.0, "mark_btc": 2.0},
+        ],
+        "puts": [],
+    }
+
+
 @pytest.fixture
 def nvda_mocks():
     with (
@@ -74,6 +92,16 @@ def btc_mocks():
         patch.object(core_mod, "_fetch_spot", return_value=100_000.0),
         patch.object(core_mod, "_fetch_option_expiries", return_value=_btc_expiries()),
         patch.object(core_mod, "_fetch_marks_for_expiry", return_value=_btc_marks()),
+    ):
+        yield
+
+
+@pytest.fixture
+def sol_mocks():
+    with (
+        patch.object(core_mod, "_fetch_spot", return_value=70.5),
+        patch.object(core_mod, "_fetch_option_expiries", return_value=_sol_expiries()),
+        patch.object(core_mod, "_fetch_marks_for_expiry", return_value=_sol_marks()),
     ):
         yield
 
@@ -107,10 +135,23 @@ def test_btc_long_returns_live_paths(btc_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("BTC", "long")
     assert report["asset_id"] == "BTC"
     assert report["status"] == "ok"
+    assert report["proof_asset"] is True
     live = [p for p in report["paths"] if p["trust_badge"] == "Live"]
     assert len(live) >= 3
     spot = next(p for p in live if p["path_id"] == "crypto_spot")
     assert spot["cost_hint_usd"] == 10_000.0
+
+
+def test_sol_long_returns_live_paths(sol_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("SOL", "long")
+    assert report["asset_id"] == "SOL"
+    assert report["status"] == "ok"
+    assert report["proof_asset"] is True
+    live = [p for p in report["paths"] if p["trust_badge"] == "Live"]
+    assert len(live) >= 3
+    for path in live:
+        if path["instrument_rail"] == "listed_options":
+            assert path.get("deep_link") == "/strategy-lab?asset=SOL"
 
 
 def test_sort_spot_before_aggressive_options(nvda_mocks) -> None:

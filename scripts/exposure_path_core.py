@@ -14,6 +14,7 @@ from src.data.assets_registry import (
     asset_venue,
     deribit_currency,
     get_asset,
+    is_asset_enabled,
     is_usd_premium_options_venue,
 )
 from src.engine.exposure_paths import (
@@ -448,7 +449,7 @@ def find_exposure_paths(
         "footer_copy": FOOTER_COPY,
         "as_of_utc": datetime.now(tz=UTC).isoformat(),
         "spot_usd": round(float(spot), 4) if spot is not None else None,
-        "proof_asset": aid in [str(x).upper() for x in (cat.get("proof_assets") or [])],
+        "proof_asset": is_asset_enabled(aid),
     }
 
 

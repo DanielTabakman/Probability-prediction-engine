@@ -263,10 +263,7 @@ asset_bindings:
     short: []
     neutral: []
 
-# v0 proof assets (must match asset_bindings keys via assets.yaml asset_class)
-proof_assets:
-  - NVDA
-  - BTC
+# Enabled assets: config/assets.yaml (registry SSOT). No per-module allowlist here.
 
 illustrative_size:
   equity_shares: 100

@@ -1,8 +1,13 @@
 /**
  * Read-only PPE asset catalog (metadata only — no prices or curves).
+ * Enabled asset list SSOT: config/assets.yaml → catalog.json API.
  */
 
-import { PPE_DISPLAY_API_URL } from "@/lib/ppeDisplayPayload";
+import {
+  normalizeLabAssetId,
+  REGISTRY_DEFAULT_ASSET_ID,
+  PPE_DISPLAY_API_URL,
+} from "@/lib/ppeDisplayPayload";
 
 export const PPE_CATALOG_API_URL = (
   process.env.NEXT_PUBLIC_PPE_CATALOG_API_URL ??
@@ -42,16 +47,22 @@ const CRYPTO_GROUP_ID = "crypto";
 
 const STOCK_GROUP_IDS = new Set(["equity_index", "equity_mega", "commodity_proxy"]);
 
-/** Static fallback when catalog.json is unavailable (matches legacy lab allowlist). */
+/** Static fallback when catalog.json is unavailable (subset of enabled registry — not a gate). */
 export const FALLBACK_ASSET_PICKER: AssetPickerBuckets = {
   crypto: [
+    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
     {
       id: "ETH",
       label: "ETH options",
       catalog_group: "crypto",
       trust_notes: ["Thinner books than BTC — BL curve may be noisier; surface trust state in lab."],
     },
-    { id: "BTC", label: "BTC options", catalog_group: "crypto", trust_notes: [] },
+    {
+      id: "SOL",
+      label: "SOL options",
+      catalog_group: "crypto",
+      trust_notes: ["Bybit USDT-settled SOL options; thinner than BTC/ETH on Deribit."],
+    },
   ],
   stocks: [
     {
@@ -107,6 +118,19 @@ export function bucketsFromCatalog(payload: AssetCatalogPayload): AssetPickerBuc
 
 export function listSelectableAssetIds(buckets: AssetPickerBuckets): string[] {
   return [...buckets.crypto, ...buckets.stocks].map((asset) => asset.id.toUpperCase());
+}
+
+/** Normalize a query param against enabled catalog assets (shared by lab, exposure, etc.). */
+export function normalizeCatalogAssetId(
+  value: string | null | undefined,
+  catalog: AssetCatalogPayload | null,
+  fallback: string = REGISTRY_DEFAULT_ASSET_ID,
+): string {
+  const buckets = catalog ? bucketsFromCatalog(catalog) : FALLBACK_ASSET_PICKER;
+  const allowed = listSelectableAssetIds(buckets);
+  const defaultId = catalog?.default_asset_id?.trim().toUpperCase() || fallback;
+  const resolvedFallback = allowed.includes(defaultId) ? defaultId : allowed[0] ?? fallback;
+  return normalizeLabAssetId(value, allowed, resolvedFallback);
 }
 
 export function assetBucketForId(
