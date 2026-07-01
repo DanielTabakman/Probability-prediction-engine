@@ -52,11 +52,11 @@ def format_build_closeout_section(*, slice_id: str, phase_plan: str) -> str:
 
 
 def format_ide_build_resume(slice_id: str, phase_plan: str) -> str:
-    from scripts.ppe_operator_hint import PPE_GO_HINT
+    from scripts.ppe_operator_hint import WHAT_NEXT_HINT
 
     rel = starter_path(slice_id)
     return (
-        f"1. **You:** `{PPE_GO_HINT}`\n"
+        f"1. **You:** `{WHAT_NEXT_HINT}`\n"
         f"2. **Manual:** `@` `{rel}` → commit → `mark_ide_product_ready.cmd {slice_id}` → `run_ppe_local.cmd`.\n"
         f"3. Regenerate: `generate_ide_build_starter.cmd {slice_id} {phase_plan}`"
     )

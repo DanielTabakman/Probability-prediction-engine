@@ -12,12 +12,12 @@
 
 ---
 
-## Quick start — two machines, one paste
+## Quick start — two machines
 
 | Machine | Your job |
 |---------|----------|
 | **Hyper-V VM** (24/7) | Nothing daily — loop runs itself. Triage: **`VM_STATUS.cmd`** · restart: **`VM_RESTART.cmd`** |
-| **Real daily PC** | **Only when ntfy says `IDE_BUILD`** — see below |
+| **Real daily PC** | **Only when ntfy says `IDE_BUILD`** — see below · normal relay: operator thread → **`what's next?`** |
 
 ### When phone buzzes `IDE_BUILD` (product slice)
 
@@ -25,13 +25,15 @@ On your **real PC** (not the VM):
 
 1. Double-click **`DESKTOP BUILD`** (`DESKTOP_BUILD.cmd`).
 2. Open a **new** Cursor Agent chat.
-3. **Ctrl+V** → Enter — the prompt is already on your clipboard.
+3. `@` the starter file from **`IDE_BUILD_NOW.md`** and send.
 4. Let the agent finish (gate → commit → closeout).
 5. After PR merges: **`DESKTOP CONTINUE`**.
 
 The VM picks up relay automatically — you do **not** run `run_ppe_local` or fix the VM for product BUILD.
 
-`ppe_go.cmd` is an alternate handoff (director prompt to clipboard). **`DESKTOP BUILD`** is the one-click path for product slices.
+**Normal relay:** operator thread → **`what's next?`** (agent reads status, burst plan, spawns workers).
+
+**Emergency paste handoff:** `DESKTOP_BUILD_CLIPBOARD.cmd` or `ppe_go_clipboard.cmd` (copies prompt to clipboard — **Ctrl+V**).
 
 Monitor (optional): `.\scripts\watch_ppe_live.ps1`
 
@@ -52,13 +54,19 @@ Startup preflight writes `artifacts/orchestrator/OPERATOR_STATUS.md`. Control/wi
 
 Definitions: [`.cursor/agents/`](../.cursor/agents/). Handoff script: [`scripts/ppe_director_go.py`](../../scripts/ppe_director_go.py).
 
-**Manual fallback** (same as clipboard from `ppe_go.cmd`):
+**Manual fallback** (operator thread):
+
+```text
+what's next?
+```
+
+Emergency clipboard paste (`ppe_go_clipboard.cmd`):
 
 ```text
 @ppe-director Director pass. Terminal loop running.
 ```
 
-**After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then `ppe_go.cmd` again.
+**After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then ask **`what's next?`** in operator thread.
 
 **Optional Automation (zero-click happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
 
@@ -184,7 +192,7 @@ Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` i
 
 | Signal | You do |
 |--------|--------|
-| Guard exit **7** / `PRODUCT_BLOCKED` | **`ppe_go.cmd`** → Ctrl+V in Agent |
+| Guard exit **7** / `PRODUCT_BLOCKED` | Operator thread → **`what's next?`** (emergency: `ppe_go_clipboard.cmd`) |
 | Relay exit **20** on control/smoke/witness | **Nothing** — auto-advance (see above) |
 | `CONTEXT_ESCALATE` / `TOO_MANY_SLICES` | Fix plan/spec; see guard report |
 | `SCOPE_AMBIGUITY` on product slice | Same as product blocked |

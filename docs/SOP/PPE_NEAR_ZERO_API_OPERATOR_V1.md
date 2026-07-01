@@ -53,9 +53,11 @@
 
 1. Generate `IDE_BUILD_STARTER_<sliceId>.md` for the **next unmarked** product slice.
 2. Write `artifacts/orchestrator/IDE_BUILD_NOW.md`.
-3. Copy build prompt to **clipboard** (Windows).
+3. Write `artifacts/orchestrator/IDE_BUILD_NOW.md` with starter `@` instructions.
 4. **Open Cursor** on repo + starter file (when `PPE_IDE_HANDOFF_OPEN=1`).
 5. **ntfy:** `PPE IDE BUILD: <sliceId>`.
+
+**Emergency paste:** set `PPE_IDE_HANDOFF_CLIPBOARD=1` or run `DESKTOP_BUILD_CLIPBOARD.cmd`.
 
 **Automation (optional):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md).
 
@@ -78,6 +80,7 @@ run_ppe_local.cmd
 | `PPE_PREFER_IDE_OVER_CLI` | `0` | `1` |
 | `PPE_FORCE_IDE_HANDOFF` | unset | `1` |
 | `PPE_IDE_HANDOFF_OPEN` | `0` (config) | `1` |
+| `PPE_IDE_HANDOFF_CLIPBOARD` | `0` (default) | `1` (emergency paste) |
 | `PPE_FORCE_CLI_BUILD` | unset | unset — set `1` for one emergency CLI build |
 
 Manual handoff: `open_ide_handoff.cmd`

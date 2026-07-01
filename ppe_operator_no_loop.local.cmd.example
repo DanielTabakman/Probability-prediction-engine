@@ -5,3 +5,5 @@ REM Blocks accidental loop/stack start on the real PC when the VM is the loop ho
 set "PPE_STACK_FORBIDDEN=1"
 REM Daily PC must not run the ntfy command listener (prevents restart death-spiral on wrong host).
 set "PPE_NTFY_CMD_ENABLED=0"
+REM Default: no clipboard overwrite on handoff (operator thread → what's next?). Emergency: DESKTOP_BUILD_CLIPBOARD.cmd
+set "PPE_IDE_HANDOFF_CLIPBOARD=0"

@@ -65,7 +65,7 @@ Current slice: `ppe_autobuilder.cmd status --brief` (do not hard-code chapter id
 **`run_ppe_local.cmd` does not implement the product slice** — it continues the relay after IDE BUILD is done.
 
 1. VM loop blocks → `VERDICT=IDE_BUILD`
-2. Desktop → **`DESKTOP BUILD`** (clipboard prompt + starter)
+2. Desktop → **`DESKTOP BUILD`** (starter + IDE_BUILD_NOW.md)
 3. Cursor Agent → gate → commit → `mark_ide_product_ready`
 4. After PR merge → desktop **`DESKTOP CONTINUE`** (SSH → VM `finish_ide_build.cmd`)
 5. VM loop advances automatically

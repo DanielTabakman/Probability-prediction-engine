@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path
 
 PPE_GO_CMD = "ppe_go.cmd"
-PPE_GO_HINT = f"{PPE_GO_CMD} → new Agent → Ctrl+V → Enter"
+WHAT_NEXT_HINT = "Operator thread → ask **what's next?**"
+PPE_GO_HINT = WHAT_NEXT_HINT
+PPE_GO_CLIPBOARD_HINT = f"{PPE_GO_CMD} → new Agent → Ctrl+V → Enter"
 
 from scripts.ppe_do_the_thing import BUTTON_NAME
 
@@ -14,11 +16,45 @@ DESKTOP_CONTINUE_CMD = "DESKTOP CONTINUE"
 DO_THE_THING_CMD = BUTTON_NAME
 VM_RESTART_CMD = "VM_RESTART"
 
+def _ide_build_desktop_hint(*, clipboard: bool | None = None) -> str:
+    if clipboard is None:
+        try:
+            from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
+            clipboard = clipboard_on_handoff_enabled()
+        except ImportError:
+            clipboard = False
+    if clipboard:
+        return (
+            f"Real PC (not VM): double-click **{DESKTOP_BUILD_CMD}** → new **IDE BUILD** Agent chat → **Ctrl+V** → Enter. "
+            f"Prompt is on clipboard (includes THREAD_ROLE: ide_build). After PR merge: **{DESKTOP_CONTINUE_CMD}**."
+        )
+    return (
+        f"Real PC (not VM): double-click **{DESKTOP_BUILD_CMD}** → new **IDE BUILD** Agent chat → `@` starter in IDE_BUILD_NOW.md. "
+        f"After PR merge: **{DESKTOP_CONTINUE_CMD}**."
+    )
+
+
+def _codex_build_desktop_hint(*, clipboard: bool | None = None) -> str:
+    if clipboard is None:
+        try:
+            from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
+            clipboard = clipboard_on_handoff_enabled()
+        except ImportError:
+            clipboard = False
+    if clipboard:
+        return (
+            f"Real PC: double-click **{DESKTOP_BUILD_CMD}** → open **Codex** → "
+            f"**Ctrl+V** → Enter. After PR merge: **{DESKTOP_CONTINUE_CMD}**."
+        )
+    return (
+        f"Real PC: double-click **{DESKTOP_BUILD_CMD}** → open **Codex** → "
+        f"paste build prompt from IDE_BUILD_NOW.md. After PR merge: **{DESKTOP_CONTINUE_CMD}**."
+    )
+
+
 VERDICT_BUTTON_HINTS: dict[str, str] = {
-    "IDE_BUILD": (
-        f"Real PC (not VM): double-click **{DESKTOP_BUILD_CMD}** → new **IDE BUILD** Agent chat → **Ctrl+V** → Enter. "
-        f"Prompt is on clipboard (includes THREAD_ROLE: ide_build). After PR merge: **{DESKTOP_CONTINUE_CMD}**."
-    ),
     "RUN_LOCAL": "VM relay finishes automatically when the stack is up — no action needed.",
     "STACK_DOWN": f"VM: double-click **{VM_RESTART_CMD}** (or VM_AUTO). Desktop must stay loop-off.",
     "FIX_PLAN": f"VM: **VM_STATUS** → **fix_vm_operator.cmd** or vm_bootstrap --recover. Desktop: steward chat.",
@@ -41,6 +77,8 @@ PPE_GO_VERDICTS = frozenset(
 def operator_button_hint(verdict: str, *, phase: str | None = None) -> str | None:
     if phase == "STACK_DOWN":
         return VERDICT_BUTTON_HINTS["STACK_DOWN"]
+    if verdict == "IDE_BUILD":
+        return _ide_build_desktop_hint()
     return VERDICT_BUTTON_HINTS.get(verdict)
 
 
@@ -96,11 +134,8 @@ def resolve_operator_hint(
             handoff_worker = worker_status.get("handoff_worker") or "manual"
             if prefer_ide_over_cli(repo) or cli_usage_exhausted(repo):
                 if handoff_worker == "codex-cli":
-                    return (
-                        f"Real PC: double-click **{DESKTOP_BUILD_CMD}** → open **Codex** → "
-                        f"**Ctrl+V** → Enter. After PR merge: **{DESKTOP_CONTINUE_CMD}**."
-                    )
-                return VERDICT_BUTTON_HINTS["IDE_BUILD"]
+                    return _codex_build_desktop_hint()
+                return _ide_build_desktop_hint()
             if stack.get("local_trigger_watcher_running"):
                 return "Local watcher will dispatch headless BUILD when allowed — no action unless stuck >30m."
         except ImportError:
@@ -153,7 +188,7 @@ def append_ppe_go_hint(
     hint = resolve_operator_hint(verdict, phase=phase, repo=repo)
     if not hint:
         return text
-    if hint in text or PPE_GO_CMD in text:
+    if hint in text or PPE_GO_CMD in text or WHAT_NEXT_HINT in text:
         return text
     base = text.rstrip()
     if base:
