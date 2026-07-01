@@ -169,6 +169,8 @@ _LOOP_HOST_TRANSIENT_PREFIXES: tuple[str, ...] = (
     "fix/",
 )
 
+VM_MIRROR_PUBLISH_PREFIX = "ops/vm-mirror-"
+
 
 def _loop_host_transient_branch(current: str, target: str) -> bool:
     if not current or current == target:
@@ -309,6 +311,8 @@ def _default_merge_head_prefixes(cfg: dict[str, Any]) -> tuple[str, ...]:
 
 
 def _head_eligible_for_automerge(head: str, cfg: dict[str, Any]) -> bool:
+    if head.startswith(VM_MIRROR_PUBLISH_PREFIX):
+        return True
     return any(head.startswith(prefix) for prefix in _default_merge_head_prefixes(cfg))
 
 
@@ -448,7 +452,15 @@ def check_and_retarget_stacked_prs(repo: Path) -> dict[str, Any]:
     return scan_and_retarget_stacked_prs(repo, main=main)
 
 
-def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str) -> str | None:
+def _open_pr(
+    repo: Path,
+    *,
+    head: str,
+    base: str = "main",
+    title: str,
+    body: str,
+    labels: list[str] | None = None,
+) -> str | None:
     if not _gh_available():
         print("ppe_operator_git_sync: gh not available; skip PR", file=sys.stderr)
         return None
@@ -462,14 +474,22 @@ def _open_pr(repo: Path, *, head: str, base: str = "main", title: str, body: str
         try:
             data = json.loads(existing.stdout)
             if data:
-                return str(data[0].get("url") or "")
+                url = str(data[0].get("url") or "")
+                if url and labels:
+                    for label in labels:
+                        _run_cmd(
+                            ["gh", "pr", "edit", head, "--add-label", label],
+                            cwd=repo,
+                            timeout=timeout,
+                        )
+                return url
         except json.JSONDecodeError:
             pass
-    proc = _run_cmd(
-        ["gh", "pr", "create", "--base", base, "--head", head, "--title", title, "--body", body],
-        cwd=repo,
-        timeout=timeout,
-    )
+    create_args = ["gh", "pr", "create", "--base", base, "--head", head, "--title", title, "--body", body]
+    if labels:
+        for label in labels:
+            create_args.extend(["--label", label])
+    proc = _run_cmd(create_args, cwd=repo, timeout=timeout)
     if proc.returncode == 124:
         print("ppe_operator_git_sync: gh pr create timed out", file=sys.stderr)
         return None
@@ -539,6 +559,64 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
         "branch": publish_branch,
         "pushed_ref": pushed_ref,
         "pr_url": pr_url,
+        "stdout": (push.stdout or "").strip(),
+    }
+
+
+def publish_vm_mirror_ahead(repo: Path, *, phase: str = "unknown") -> dict[str, Any]:
+    """Push VM phase mirror commit from main; open automerge PR for desktop git pull."""
+    repo = repo.resolve()
+    if not push_enabled(repo):
+        return {"action": "vm_mirror_push", "skipped": True, "reason": "disabled"}
+
+    current = _current_branch(repo)
+    if current != "main":
+        return {"action": "vm_mirror_push", "skipped": True, "reason": f"not on main ({current!r})"}
+
+    ahead = _ahead_count(repo, branch="main")
+    if ahead == 0:
+        return {"action": "vm_mirror_push", "skipped": True, "reason": "nothing ahead"}
+
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    publish_branch = f"{VM_MIRROR_PUBLISH_PREFIX}{stamp}-{_short_head(repo)}"
+    push = _git(repo, "push", "origin", f"HEAD:refs/heads/{publish_branch}")
+    if push.returncode == 124:
+        return {
+            "action": "vm_mirror_push",
+            "ok": False,
+            "branch": publish_branch,
+            "error": (push.stderr or "git push timed out").strip(),
+            "timed_out": True,
+        }
+    if push.returncode != 0:
+        return {
+            "action": "vm_mirror_push",
+            "ok": False,
+            "branch": publish_branch,
+            "error": (push.stderr or push.stdout or "git push failed").strip(),
+        }
+
+    pr_url = None
+    if _git_sync_cfg(repo).get("openPrOnPush", True) is not False:
+        phase_label = (phase or "unknown").replace("_", " ")
+        pr_url = _open_pr(
+            repo,
+            head=publish_branch,
+            title=f"ops: vm phase mirror {phase_label}",
+            body=(
+                "Auto-published VM phase mirror (`docs/SOP/VM_OPERATOR_PHASE.json`) from loop host.\n\n"
+                "Mirror-only — safe to automerge when checks pass."
+            ),
+            labels=["automerge"],
+        )
+
+    return {
+        "action": "vm_mirror_push",
+        "ok": True,
+        "branch": publish_branch,
+        "pushed_ref": publish_branch,
+        "pr_url": pr_url,
+        "mirror_only": True,
         "stdout": (push.stdout or "").strip(),
     }
 

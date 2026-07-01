@@ -93,7 +93,7 @@ def test_maybe_commit_publish_vm_mirror(tmp_path, monkeypatch) -> None:
         with patch("scripts.ppe_vm_phase_mirror._git") as mock_git:
             proc_ok = type("P", (), {"returncode": 0, "stdout": "docs/SOP/VM_OPERATOR_PHASE.json", "stderr": ""})()
             mock_git.return_value = proc_ok
-            with patch("scripts.ppe_operator_git_sync.publish_ahead", return_value={"ok": True}):
+            with patch("scripts.ppe_operator_git_sync.publish_vm_mirror_ahead", return_value={"ok": True}):
                 result = maybe_commit_publish_vm_mirror(tmp_path, payload)
     assert result.get("ok") is True
 
@@ -115,6 +115,6 @@ def test_maybe_notify_stuck_in_flight(tmp_path, monkeypatch) -> None:
     since.write_text(json.dumps({"phase": "FINISH_IN_FLIGHT", "since": "2020-01-01T00:00:00Z"}) + "\n")
     status = {"phase": "FINISH_IN_FLIGHT", "verdict": "RUN_LOCAL", "operator": {"chapter_name": "t"}}
     with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "ok")):
-        with patch("scripts.ppe_notify_push.send_ntfy", return_value=True) as mock_ntfy:
+        with patch("scripts.ppe_notify_push.send_ntfy_to_topic", return_value=True) as mock_ntfy:
             assert maybe_notify_stuck_in_flight(tmp_path, status, stuck_seconds=60) is True
     mock_ntfy.assert_called_once()

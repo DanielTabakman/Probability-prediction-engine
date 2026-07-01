@@ -47,6 +47,12 @@ def ntfy_topic() -> str:
     return os.environ.get("PPE_NTFY_TOPIC", "").strip()
 
 
+def ntfy_topic_stuck() -> str:
+    """Separate topic for stuck/in-flight alerts (falls back to main topic)."""
+    stuck = os.environ.get("PPE_NTFY_TOPIC_STUCK", "").strip()
+    return stuck or ntfy_topic()
+
+
 def ntfy_server() -> str:
     raw = os.environ.get("PPE_NTFY_SERVER", DEFAULT_NTFY_SERVER).strip()
     return raw.rstrip("/") if raw else DEFAULT_NTFY_SERVER
@@ -671,10 +677,18 @@ def _format_quota_notice_body(snap: dict[str, Any], *, kind: str, skipped_title:
     return "\n".join(lines)
 
 
-def _post_ntfy_raw(title: str, body: str, *, tags: list[str] | None = None, priority: str = "default") -> bool:
-    if not notify_enabled() or not ntfy_topic():
+def _post_ntfy_raw(
+    title: str,
+    body: str,
+    *,
+    tags: list[str] | None = None,
+    priority: str = "default",
+    topic: str | None = None,
+) -> bool:
+    target = (topic or ntfy_topic()).strip()
+    if not notify_enabled() or not target:
         return False
-    url = f"{ntfy_server()}/{ntfy_topic()}"
+    url = f"{ntfy_server()}/{target}"
     outbound_tags = list(tags or [])
     if OUTBOUND_TAG not in outbound_tags:
         outbound_tags.insert(0, OUTBOUND_TAG)
@@ -809,7 +823,8 @@ def record_ntfy_send(
     _save_send_state(state, repo)
 
 
-def send_ntfy(
+def send_ntfy_to_topic(
+    topic: str,
     title: str,
     body: str,
     *,
@@ -818,17 +833,16 @@ def send_ntfy(
     click_url: str | None = None,
     bypass_snooze: bool = False,
     bypass_throttle: bool = False,
+    record_send: bool = True,
 ) -> bool:
-    """POST a message to ntfy. Returns True when a message was sent."""
-    if not notify_enabled():
+    """POST to an explicit ntfy topic (e.g. stuck alerts). Returns True when sent."""
+    target = (topic or "").strip()
+    if not notify_enabled() or not target:
         return False
     if not bypass_snooze and is_ntfy_snoozed():
         return False
     if is_routine_notify_muted(title=title, tags=tags, priority=priority):
         print(f"ppe_notify_push: skipped (quiet hours): {title[:80]}", file=sys.stderr)
-        return False
-    topic = ntfy_topic()
-    if not topic:
         return False
 
     allow, skip_reason = should_throttle_ntfy(
@@ -842,7 +856,7 @@ def send_ntfy(
         print(f"ppe_notify_push: skipped ({skip_reason}): {title[:80]}", file=sys.stderr)
         return False
 
-    url = f"{ntfy_server()}/{topic}"
+    url = f"{ntfy_server()}/{target}"
     outbound_tags = list(tags or [])
     if OUTBOUND_TAG not in outbound_tags:
         outbound_tags.insert(0, OUTBOUND_TAG)
@@ -861,7 +875,7 @@ def send_ntfy(
     try:
         with urllib.request.urlopen(request, timeout=15) as response:
             ok = 200 <= response.status < 300
-            if ok:
+            if ok and record_send:
                 record_ntfy_send(title, tags=outbound_tags, priority=priority, repo=repo_root())
                 if is_loop_down_alert(title):
                     mark_loop_down_alerted(repo_root())
@@ -871,6 +885,32 @@ def send_ntfy(
     except urllib.error.URLError as exc:
         print(f"ppe_notify_push: ntfy failed: {exc}", file=sys.stderr)
         return False
+
+
+def send_ntfy(
+    title: str,
+    body: str,
+    *,
+    tags: list[str] | None = None,
+    priority: str = "default",
+    click_url: str | None = None,
+    bypass_snooze: bool = False,
+    bypass_throttle: bool = False,
+) -> bool:
+    """POST a message to the default ntfy topic. Returns True when a message was sent."""
+    topic = ntfy_topic()
+    if not topic:
+        return False
+    return send_ntfy_to_topic(
+        topic,
+        title,
+        body,
+        tags=tags,
+        priority=priority,
+        click_url=click_url,
+        bypass_snooze=bypass_snooze,
+        bypass_throttle=bypass_throttle,
+    )
 
 
 def send_weekly_digest_from_payload(payload_path: Path) -> bool:

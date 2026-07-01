@@ -148,9 +148,12 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
 
     publish: dict[str, Any] = {"skipped": True, "reason": "publish_disabled"}
     try:
-        from scripts.ppe_operator_git_sync import publish_ahead
+        from scripts.ppe_operator_git_sync import publish_vm_mirror_ahead
 
-        publish = publish_ahead(repo)
+        publish = publish_vm_mirror_ahead(repo, phase=phase)
+        pr_url = str(publish.get("pr_url") or "").strip()
+        if publish.get("ok") and pr_url:
+            _maybe_notify_mirror_pr_opened(repo, phase=phase, pr_url=pr_url)
     except Exception as exc:
         publish = {"ok": False, "error": str(exc)}
 
@@ -164,6 +167,33 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
         encoding="utf-8",
     )
     return {"ok": True, "fingerprint": fp, "commit": True, "publish": publish}
+
+
+def _maybe_notify_mirror_pr_opened(repo: Path, *, phase: str, pr_url: str) -> bool:
+    state_path = repo / "artifacts/control_plane/VM_MIRROR_PR_NOTIFY.json"
+    prior: dict[str, Any] = {}
+    if state_path.is_file():
+        try:
+            prior = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            prior = {}
+    if str(prior.get("pr_url") or "") == pr_url:
+        return False
+    title = f"PPE VM mirror PR: {phase.replace('_', ' ')}"
+    body = f"Loop host published phase mirror — desktop: git pull origin main after merge.\n{pr_url}"
+    try:
+        from scripts.ppe_notify_push import send_ntfy
+
+        sent = send_ntfy(title, body, priority="low", tags=["mirror", "pr"], click_url=pr_url)
+    except Exception:
+        return False
+    if sent:
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(
+            json.dumps({"pr_url": pr_url, "phase": phase, "notified_at": _utc_now()}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    return sent
 
 
 def _load_notify_state(repo: Path) -> dict[str, Any]:
@@ -311,9 +341,15 @@ def maybe_notify_stuck_in_flight(
         "Desktop: Remote-SSH ppe-vm or one status SSH."
     )
     try:
-        from scripts.ppe_notify_push import send_ntfy
+        from scripts.ppe_notify_push import ntfy_topic_stuck, send_ntfy_to_topic
 
-        send_ntfy(title=title, body=body, priority="high", tags=["warning", "rotating_light"])
+        send_ntfy_to_topic(
+            ntfy_topic_stuck(),
+            title=title,
+            body=body,
+            priority="high",
+            tags=["warning", "rotating_light", "stuck"],
+        )
     except Exception:
         return False
 
