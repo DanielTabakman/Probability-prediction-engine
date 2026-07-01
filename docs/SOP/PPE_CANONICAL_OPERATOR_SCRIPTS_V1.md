@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Audience:** operators, stewards, agents  
 **Role:** **Single source of truth** for verdict → machine → command. Other docs link here instead of duplicating tables.
 
-**Related:** [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) (human double-click lookup) · [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) · [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) (policy)
+**Related:** [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) (human double-click lookup) · [`PPE_OPERATOR_PROCESS_V1.md`](PPE_OPERATOR_PROCESS_V1.md) · [`PPE_OPERATOR_LAYOUT_ADR.md`](PPE_OPERATOR_LAYOUT_ADR.md) (policy) · [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) (product-on-main factory sync)
 
 ## Why this doc exists
 
@@ -19,7 +19,7 @@ If any helper, runbook, or agent rule disagrees with this doc, **trust this doc*
 |---|---------|---------------|-----------------|
 | 1 | **Verdict / status** | `python scripts/ppe_operator_status.py` · `ppe_autobuilder.cmd status --brief` | What should run next? (`IDE_BUILD`, `RUN_LOCAL`, `RUN_AUTO`, …) |
 | 2 | **Relay advance** | `run_ppe.cmd` (VM) · `ppe_autobuilder.cmd advance` | Execute the next relay slice or propagate queue |
-| 3 | **Pushable gate** | `python scripts/run_pushable_gate.py` | Is this commit/PR safe to push? (tier 0/1/2) |
+| 3 | **Pushable gate** | `python scripts/run_pushable_gate.py` | Is this commit/PR safe to push? (tier 0/1/2); warns on coordination-sensitive edits |
 | 4 | **IDE BUILD handoff** | `DESKTOP_BUILD.cmd` | Stage Cursor/Codex worker when verdict is `IDE_BUILD` |
 | 5 | **Relay runtime** | `python scripts/relay_runtime_v0.py` | Stage / resume / abort a single in-flight relay run (file-backed state machine) |
 
