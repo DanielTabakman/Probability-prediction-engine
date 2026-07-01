@@ -16,6 +16,7 @@ from scripts.ppe_manifest import load_phase_plan
 from scripts.ppe_queue import QUEUE_REL, load_queue
 
 CHAPTER_DOC_INDEX_REL = "docs/SOP/CHAPTER_DOC_INDEX.json"
+ARCHIVE_INDEX_REL = "docs/SOP/ARCHIVE_INDEX.md"
 ROUTING_CANON_REL = "docs/SOP/AGENT_ROUTING_V1.md"
 STEERING_REL = "docs/SOP/AGENT_STEERING_V1.json"
 
@@ -174,7 +175,136 @@ TOPIC_ROUTES: list[dict[str, Any]] = [
         "load_on_demand": ["config/research_pipeline_registry.json"],
         "next_action": "charter_thread_load_program",
     },
+    {
+        "id": "steward_selection",
+        "match": ("steward", "selection", "closeout", "selection outcome", "selection prep"),
+        "sop": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+        "load_always": [
+            "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+            "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
+        ],
+        "load_on_demand": ["docs/SOP/PHASE_SELECTION_ROADMAP.json"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "module_registry",
+        "match": ("module registry", "module map", "ppe module", "tier-1 module"),
+        "sop": "docs/SOP/PPE_MODULE_REGISTRY_V1.md",
+        "load_always": ["docs/SOP/PPE_MODULE_REGISTRY_V1.md"],
+        "load_on_demand": ["docs/SOP/CHAPTER_DOC_INDEX.json"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "enablement",
+        "match": ("enablement", "enable runbook", "asset enablement", "enable asset batch"),
+        "sop": "docs/SOP/ASSET_ENABLEMENT_RUNBOOK_V1.md",
+        "load_always": [
+            "docs/SOP/ASSET_ENABLEMENT_RUNBOOK_V1.md",
+            "docs/SOP/ASSET_DATA_SOURCE_DISCOVERY_V1.md",
+        ],
+        "cursor_rule": ".cursor/rules/asset-auto-discovery.mdc",
+        "next_action": "run_discover_asset_data_source",
+    },
+    {
+        "id": "msos_web",
+        "match": ("msos web", "msos website", "strategy lab", "feedback beta", "feedback instrumentation"),
+        "sop": "docs/SOP/MSOS_WEBSITE_PROGRAM.md",
+        "load_always": ["docs/SOP/MSOS_WEBSITE_PROGRAM.md"],
+        "load_on_demand": ["docs/SOP/MSOS_FRONTIER.md"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "token_burst",
+        "match": ("token economy", "burst mode", "burst plan", "adaptive burst", "token budget"),
+        "sop": "docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md",
+        "load_always": ["docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md"],
+        "load_on_demand": [".cursor/rules/ppe-burst-mode.mdc"],
+        "next_action": "operator_thread_burst_or_single",
+    },
+    {
+        "id": "sop_discovery",
+        "match": (
+            "sop discovery",
+            "resolve_sop",
+            "chapter doc index",
+            "chapter_doc_index",
+            "which sop",
+            "which doc to load",
+        ),
+        "sop": ROUTING_CANON_REL,
+        "load_always": [ROUTING_CANON_REL, CHAPTER_DOC_INDEX_REL],
+        "load_on_demand": [ARCHIVE_INDEX_REL, ".cursor/rules/sop-discovery.mdc"],
+        "next_action": "run_resolve_sop_cli",
+        "agent_steps": [
+            "python scripts/resolve_sop.py --topic \"<phrase>\" --json",
+            "python scripts/resolve_sop.py --list-topics --json",
+            "python scripts/resolve_sop.py --role <role> --json",
+        ],
+    },
 ]
+
+ROLE_ROUTES: dict[str, dict[str, Any]] = {
+    "operator": {
+        "sop": ROUTING_CANON_REL,
+        "load_always": [
+            "artifacts/orchestrator/OPERATOR_STATUS.md",
+            "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
+            "docs/SOP/ACTIVE_PRODUCT_DIRECTION.json",
+        ],
+        "never_load": [
+            "docs/SOP/UX_EXECUTION_BACKLOG_V1.md",
+            "docs/SOP/MSOS_UX_DESIGN_PHILOSOPHY_V1.md",
+        ],
+        "next_action": "operator_thread_burst_or_single",
+        "agent_steps": [
+            "python scripts/ppe_burst_plan.py --write",
+            "Read artifacts/orchestrator/OPERATOR_STATUS.md Mode: line first.",
+        ],
+    },
+    "charter": {
+        "sop": ROUTING_CANON_REL,
+        "load_always": [],
+        "never_load": [
+            "artifacts/orchestrator/OPERATOR_STATUS.md",
+            "artifacts/control_plane/BURST_PLAN.json",
+        ],
+        "next_action": "charter_thread_load_program",
+        "agent_steps": [
+            "Load only the stated program/SELECTION doc.",
+            "python scripts/resolve_sop.py --topic \"<topic>\" --json for unclear topics.",
+        ],
+    },
+    "ide_build": {
+        "sop": ROUTING_CANON_REL,
+        "load_always": [],
+        "never_load": [
+            "artifacts/orchestrator/OPERATOR_STATUS.md",
+            "artifacts/control_plane/BURST_PLAN.json",
+            "docs/SOP/PHASE_QUEUE.json",
+        ],
+        "next_action": "load_ide_build_starter_only",
+        "agent_steps": [
+            "Load only @artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md",
+        ],
+    },
+    "explore": {
+        "sop": ROUTING_CANON_REL,
+        "load_always": [],
+        "never_load": [
+            "artifacts/orchestrator/OPERATOR_STATUS.md",
+            "artifacts/control_plane/BURST_PLAN.json",
+        ],
+        "next_action": "explore_user_scope_only",
+        "agent_steps": ["Load only user @ files; no relay or commits unless asked."],
+    },
+    "neutral": {
+        "sop": ROUTING_CANON_REL,
+        "load_always": [],
+        "never_load": ["artifacts/orchestrator/OPERATOR_STATUS.md"],
+        "next_action": "answer_user_scope_only",
+        "agent_steps": ["Do not lead with operator status or relay verdict."],
+    },
+}
 
 
 def _utc_now() -> str:
@@ -331,8 +461,89 @@ def write_chapter_doc_index(repo: Path) -> Path:
     out = repo / CHAPTER_DOC_INDEX_REL
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    write_archive_index(repo, data=data)
     sync_agent_steering_doc_hints(repo)
     return out
+
+
+
+def _index_without_timestamp(data: dict[str, Any]) -> dict[str, Any]:
+    copy = dict(data)
+    copy.pop("generated_at", None)
+    return copy
+
+
+def _archive_markdown(data: dict[str, Any]) -> str:
+    archived = [row for row in (data.get("chapters") or []) if row.get("archived")]
+    archived.sort(key=lambda r: str(r.get("chapter_id") or ""))
+    lines = [
+        "# SOP archive index (generated)",
+        "",
+        f"**Generated:** {data.get('generated_at', 'unknown')} · "
+        f"**Archived chapters:** {len(archived)}",
+        "",
+        "> **Do not load for BUILD** — archived chapters only. "
+        "Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.",
+        "",
+        "| chapter_id | selection | evidence | plan |",
+        "|------------|-----------|----------|------|",
+    ]
+    for row in archived:
+        cid = str(row.get("chapter_id") or "")
+        sel = str(row.get("selection") or "—")
+        ev = str(row.get("evidence") or "—")
+        plan = str(row.get("plan_path") or "—")
+        lines.append(f"| `{cid}` | `{sel}` | `{ev}` | `{plan}` |")
+    if not archived:
+        lines.append("| _none_ | — | — | — |")
+    lines.extend(
+        [
+            "",
+            f"Regenerate: `python scripts/generate_chapter_doc_index.py --write` · "
+            f"canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_archive_index(repo: Path, *, data: dict[str, Any] | None = None) -> Path:
+    repo = repo.resolve()
+    payload = data if data is not None else build_chapter_doc_index(repo)
+    out = repo / ARCHIVE_INDEX_REL
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(_archive_markdown(payload), encoding="utf-8")
+    return out
+
+
+def chapter_doc_index_fresh(repo: Path) -> tuple[bool, str]:
+    repo = repo.resolve()
+    index_path = repo / CHAPTER_DOC_INDEX_REL
+    archive_path = repo / ARCHIVE_INDEX_REL
+    if not index_path.is_file():
+        return False, f"missing {CHAPTER_DOC_INDEX_REL}"
+    if not archive_path.is_file():
+        return False, f"missing {ARCHIVE_INDEX_REL}"
+    try:
+        on_disk = json.loads(index_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False, f"unreadable {CHAPTER_DOC_INDEX_REL}"
+    expected = build_chapter_doc_index(repo)
+    if _index_without_timestamp(on_disk) != _index_without_timestamp(expected):
+        return False, f"stale {CHAPTER_DOC_INDEX_REL} (run --write)"
+    expected_archive = _archive_markdown(expected)
+    try:
+        archive_text = archive_path.read_text(encoding="utf-8")
+    except OSError:
+        return False, f"unreadable {ARCHIVE_INDEX_REL}"
+
+    def _archive_body(text: str) -> str:
+        rows = [ln for ln in text.splitlines() if ln.startswith("|")]
+        return "\n".join(rows)
+
+    if _archive_body(archive_text) != _archive_body(expected_archive):
+        return False, f"stale {ARCHIVE_INDEX_REL} (run --write)"
+    return True, "fresh"
 
 
 def list_topics() -> list[dict[str, Any]]:
@@ -407,10 +618,12 @@ def sync_agent_steering_doc_hints(repo: Path) -> dict[str, Any]:
 def refresh_sop_discovery_artifacts(repo: Path) -> dict[str, Any]:
     repo = repo.resolve()
     out = write_chapter_doc_index(repo)
+    archive_out = repo / ARCHIVE_INDEX_REL
     data = build_chapter_doc_index(repo)
     return {
         "ok": True,
         "index_path": _norm(str(out.relative_to(repo))),
+        "archive_index_path": _norm(str(archive_out.relative_to(repo))),
         "chapter_count": data.get("chapter_count"),
         "active_chapter_count": data.get("active_chapter_count"),
         "archived_chapter_count": data.get("archived_chapter_count"),
@@ -432,6 +645,36 @@ def _match_topic(topic: str) -> dict[str, Any] | None:
                     best_score = score
                     best = route
     return best
+
+
+
+def resolve_by_role(role: str) -> dict[str, Any]:
+    key = role.strip().lower()
+    route = ROLE_ROUTES.get(key)
+    if route is None:
+        return {
+            "ok": False,
+            "role": key,
+            "next_action": "unknown_role",
+            "sop": ROUTING_CANON_REL,
+            "load_always": [ROUTING_CANON_REL],
+            "never_load": list(DO_NOT_LOAD),
+            "do_not_load": list(DO_NOT_LOAD),
+            "agent_steps": [
+                f"Valid roles: {', '.join(sorted(ROLE_ROUTES))}",
+                "python scripts/resolve_sop.py --role <role> --json",
+            ],
+        }
+    return {
+        "ok": True,
+        "role": key,
+        "sop": route.get("sop") or ROUTING_CANON_REL,
+        "load_always": list(route.get("load_always") or []),
+        "never_load": list(route.get("never_load") or []),
+        "do_not_load": list(dict.fromkeys(list(route.get("never_load") or []) + list(DO_NOT_LOAD))),
+        "next_action": route.get("next_action"),
+        "agent_steps": list(route.get("agent_steps") or []),
+    }
 
 
 def resolve_by_topic(topic: str) -> dict[str, Any]:

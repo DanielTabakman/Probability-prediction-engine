@@ -9,10 +9,14 @@ from pathlib import Path
 
 from scripts.sop_discovery_core import (
     build_chapter_doc_index,
+    chapter_doc_index_fresh,
     expand_carry_docs_for_closeout,
     list_topics,
+    refresh_sop_discovery_artifacts,
     resolve_by_chapter,
+    resolve_by_role,
     resolve_by_topic,
+    write_archive_index,
     write_chapter_doc_index,
 )
 
@@ -67,6 +71,7 @@ class TestResolveSop(unittest.TestCase):
     def test_list_topics(self) -> None:
         topics = list_topics()
         self.assertIn("asset_batch", {t["id"] for t in topics})
+        self.assertIn("steward_selection", {t["id"] for t in topics})
 
     def test_expand_carry_docs_for_closeout(self) -> None:
         expanded = expand_carry_docs_for_closeout(
@@ -85,9 +90,43 @@ class TestResolveSop(unittest.TestCase):
         report = resolve_by_topic("asset batch wave 1")
         self.assertEqual(report["topic_route_id"], "asset_batch")
 
+    def test_resolve_by_role_operator(self) -> None:
+        report = resolve_by_role("operator")
+        self.assertTrue(report["ok"])
+        self.assertIn("OPERATOR_STATUS.md", report["load_always"][0])
+
+    def test_resolve_by_role_unknown(self) -> None:
+        report = resolve_by_role("invalid")
+        self.assertFalse(report["ok"])
+
     def test_write_index(self) -> None:
         out = write_chapter_doc_index(self.repo)
         self.assertTrue(out.is_file())
+        archive = self.repo / "docs" / "SOP" / "ARCHIVE_INDEX.md"
+        self.assertTrue(archive.is_file())
+        self.assertIn("ppe_exposure_menu_v1", archive.read_text(encoding="utf-8"))
+
+    def test_chapter_doc_index_fresh_after_write(self) -> None:
+        write_chapter_doc_index(self.repo)
+        fresh, reason = chapter_doc_index_fresh(self.repo)
+        self.assertTrue(fresh, reason)
+
+    def test_chapter_doc_index_stale_when_missing(self) -> None:
+        fresh, reason = chapter_doc_index_fresh(self.repo)
+        self.assertFalse(fresh)
+        self.assertIn("missing", reason)
+
+    def test_write_archive_index(self) -> None:
+        data = build_chapter_doc_index(self.repo)
+        out = write_archive_index(self.repo, data=data)
+        text = out.read_text(encoding="utf-8")
+        self.assertIn("Do not load for BUILD", text)
+        self.assertIn("ppe_exposure_menu_v1", text)
+
+    def test_refresh_returns_archive_path(self) -> None:
+        report = refresh_sop_discovery_artifacts(self.repo)
+        self.assertTrue(report.get("archive_index_path"))
+        self.assertTrue((self.repo / report["archive_index_path"]).is_file())
 
 
 if __name__ == "__main__":

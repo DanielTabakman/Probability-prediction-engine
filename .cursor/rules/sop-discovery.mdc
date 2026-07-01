@@ -11,6 +11,8 @@ alwaysApply: false
 python scripts/resolve_sop.py --topic "<phrase>" --json
 python scripts/resolve_sop.py --chapter <chapter_id> --json
 python scripts/resolve_sop.py --module <module_id> --json
+python scripts/resolve_sop.py --role <operator|charter|ide_build|explore|neutral> --json
+python scripts/resolve_sop.py --list-topics --json
 ```
 
 **Execute `next_action` and load only paths in `load_always` / `load_for_build` for the thread role.**
@@ -19,12 +21,15 @@ python scripts/resolve_sop.py --module <module_id> --json
 |-------------|------------------------|
 | **charter** | `load_always` only |
 | **ide_build** | IDE_BUILD_STARTER only — ignore resolve unless generating starter |
-| **operator** | `OPERATOR_STATUS` + continuity brief; resolve for topic questions only |
+| **operator** | `OPERATOR_STATUS` + continuity brief; resolve for ad-hoc topics |
+| **explore / neutral** | User @ scope only |
 
-**Do not grep `docs/SOP/`** when resolve_sop returns a match.
+**Archive catalog:** [`ARCHIVE_INDEX.md`](../../docs/SOP/ARCHIVE_INDEX.md) — archived chapters only; **do not load for BUILD**.
 
-**Never load** paths in `do_not_load` (legacy Phase 2 ledgers, superseded worker/manager loops).
+**Charter / neutral:** discovery only — no relay, no branch recovery ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc))
 
-**Canon:** [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) · index [`CHAPTER_DOC_INDEX.json`](../../docs/SOP/CHAPTER_DOC_INDEX.json) · regenerate `generate_chapter_doc_index.cmd --write`
+**Operator:** may read `OPERATOR_STATUS.md` after role is confirmed
 
-**Asset enablement** still uses [`asset-auto-discovery.mdc`](asset-auto-discovery.mdc) first — not resolve_sop.
+Do **not** treat stale handoff copies as SSOT when generated files disagree — prefer `ACTIVE_PRODUCT_DIRECTION.json`, manifest, queue
+
+Index: [`CHAPTER_DOC_INDEX.json`](../../docs/SOP/CHAPTER_DOC_INDEX.json) · canon: [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md)

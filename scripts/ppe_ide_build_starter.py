@@ -131,6 +131,32 @@ def starter_line_band(line_count: int) -> str:
     return "NORMAL"
 
 
+def _compact_doc_resolve(repo: Path, *, phase_plan: str) -> str:
+    try:
+        from scripts.ppe_chapter_mode import plan_chapter_id
+        from scripts.sop_discovery_core import resolve_by_chapter
+
+        chapter_id = plan_chapter_id(phase_plan)
+        report = resolve_by_chapter(repo, chapter_id=chapter_id, plan_path=phase_plan)
+    except (ImportError, SystemExit, OSError, KeyError, ValueError):
+        return ""
+
+    if not report.get("ok"):
+        return ""
+
+    build_paths = list(report.get("load_for_build") or [])[:4]
+    skip_paths = list(report.get("do_not_load") or [])[:3]
+    if not build_paths and not skip_paths:
+        return ""
+
+    lines = ["**Doc resolve:**"]
+    for p in build_paths:
+        lines.append(f"- load_for_build: `{p}`")
+    for p in skip_paths:
+        lines.append(f"- do_not_load: `{p}`")
+    return "\n".join(lines)
+
+
 def _closeout_only_banner(repo: Path, *, slice_id: str, phase_plan: str) -> str | None:
     try:
         from scripts.ppe_chapter_mode import (
@@ -201,6 +227,13 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
             _compact_acceptance(sl, sprint_path),
             _compact_loads(touch=touch, sprint_path=sprint_path, phase_plan=norm_plan),
             "",
+        ]
+    )
+    doc_resolve = _compact_doc_resolve(repo, phase_plan=norm_plan)
+    if doc_resolve:
+        parts.extend([doc_resolve, ""])
+    parts.extend(
+        [
             "_New Agent thread · this file only · no orchestrator/pytest/diff paste._",
             "",
             format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),

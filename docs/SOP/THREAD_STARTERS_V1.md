@@ -75,6 +75,7 @@ Unclear topic — resolve first:
 ```text
 Charter thread. THREAD_ROLE: charter.
 Run: python scripts/resolve_sop.py --topic "<your topic>" --json
+Or: python scripts/resolve_sop.py --role charter --json
 Load only paths from load_always in the JSON.
 ```
 

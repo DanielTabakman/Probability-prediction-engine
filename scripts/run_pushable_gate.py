@@ -195,6 +195,7 @@ _SOP_DISCOVERY_PATHS = frozenset(
         "scripts/generate_chapter_doc_index.py",
         "scripts/validate_sop_links.py",
         "docs/SOP/CHAPTER_DOC_INDEX.json",
+        "docs/SOP/ARCHIVE_INDEX.md",
     }
 )
 
@@ -212,7 +213,7 @@ def _sop_discovery_gate_commands(files: list[str]) -> list[list[str]]:
     if not _touches_sop_discovery(files):
         return []
     return [
-        ["python", "scripts/generate_chapter_doc_index.py", "--write"],
+        ["python", "scripts/generate_chapter_doc_index.py", "--check"],
         ["python", "scripts/validate_sop_links.py"],
     ]
 

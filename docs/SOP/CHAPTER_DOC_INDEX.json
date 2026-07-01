@@ -6072,7 +6072,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-06-30T23:38:34Z",
+  "generated_at": "2026-07-01T01:19:21Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
@@ -6096,7 +6096,13 @@
     "operator_relay",
     "commit_gate",
     "deploy",
-    "research_pipeline"
+    "research_pipeline",
+    "steward_selection",
+    "module_registry",
+    "enablement",
+    "msos_web",
+    "token_burst",
+    "sop_discovery"
   ],
   "version": 1
 }

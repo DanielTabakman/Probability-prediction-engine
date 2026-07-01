@@ -13,9 +13,11 @@ if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
 from scripts.sop_discovery_core import (  # noqa: E402
+    ROLE_ROUTES,
     list_topics,
     resolve_by_chapter,
     resolve_by_module,
+    resolve_by_role,
     resolve_by_topic,
 )
 
@@ -27,6 +29,11 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap.add_argument("--plan-path", help="Phase plan path (alternative to --chapter)")
     ap.add_argument("--module", help="Module id from PPE_MODULE_REGISTRY_V1.md")
     ap.add_argument("--topic", help="Free-text topic or operator phrase")
+    ap.add_argument(
+        "--role",
+        choices=sorted(ROLE_ROUTES),
+        help="Thread role load bundle (operator, charter, ide_build, explore, neutral)",
+    )
     ap.add_argument("--list-topics", action="store_true", help="List topic route catalog")
     ap.add_argument("--json", action="store_true", help="Emit JSON report")
     return ap.parse_args(argv)
@@ -44,6 +51,8 @@ def _print_human(report: dict) -> None:
         print(f"  topic: {report['topic']}")
     if report.get("topic_route_id"):
         print(f"  route: {report['topic_route_id']}")
+    if report.get("role"):
+        print(f"  role: {report['role']}")
     if report.get("sop"):
         print(f"  sop: {report['sop']}")
     if report.get("next_action"):
@@ -54,6 +63,11 @@ def _print_human(report: dict) -> None:
             print(f"  {key}:")
             for p in paths:
                 print(f"    - {p}")
+    never = report.get("never_load") or []
+    if never:
+        print("  never_load:")
+        for p in never:
+            print(f"    - {p}")
     steps = report.get("agent_steps") or []
     if steps:
         print("  agent_steps:")
@@ -77,17 +91,19 @@ def main(argv: list[str] | None = None) -> int:
 
     modes = sum(
         1
-        for x in (args.chapter, args.plan_path, args.module, args.topic)
+        for x in (args.chapter, args.plan_path, args.module, args.topic, args.role)
         if x
     )
     if modes != 1:
         print(
-            "resolve_sop: pass exactly one of --chapter, --plan-path, --module, --topic",
+            "resolve_sop: pass exactly one of --chapter, --plan-path, --module, --topic, --role",
             file=sys.stderr,
         )
         return 2
 
-    if args.chapter or args.plan_path:
+    if args.role:
+        report = resolve_by_role(args.role)
+    elif args.chapter or args.plan_path:
         report = resolve_by_chapter(
             repo,
             chapter_id=args.chapter,

@@ -11,13 +11,22 @@ _REPO = Path(__file__).resolve().parents[1]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
-from scripts.sop_discovery_core import build_chapter_doc_index, write_chapter_doc_index  # noqa: E402
+from scripts.sop_discovery_core import (  # noqa: E402
+    build_chapter_doc_index,
+    chapter_doc_index_fresh,
+    write_chapter_doc_index,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Generate CHAPTER_DOC_INDEX.json")
     ap.add_argument("--repo-root", type=Path, default=_REPO)
     ap.add_argument("--write", action="store_true", help="Write docs/SOP/CHAPTER_DOC_INDEX.json")
+    ap.add_argument(
+        "--check",
+        action="store_true",
+        help="Fail if CHAPTER_DOC_INDEX.json or ARCHIVE_INDEX.md is stale",
+    )
     ap.add_argument("--stdout", action="store_true", help="Print JSON to stdout")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
@@ -37,6 +46,14 @@ def main(argv: list[str] | None = None) -> int:
             f"{index['active_chapter_count']} active, "
             f"{index['archived_chapter_count']} archived)"
         )
+        return 0
+
+    if args.check:
+        fresh, reason = chapter_doc_index_fresh(repo)
+        if not fresh:
+            print(f"generate_chapter_doc_index: {reason}", file=sys.stderr)
+            return 1
+        print(f"generate_chapter_doc_index: {reason}")
         return 0
 
     ap.print_help()
