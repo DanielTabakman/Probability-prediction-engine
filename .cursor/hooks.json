@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      {
+        "command": "python scripts/ppe_auto_ship_stop_hook.py",
+        "timeout": 30,
+        "loop_limit": 1
+      }
+    ]
+  }
+}

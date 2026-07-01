@@ -37,3 +37,7 @@ Layer audit / mixed branch / wrong branch → **agent fixes hygiene**, not opera
 ## Hold (no commit)
 
 Ask/read-only mode; explore with no implementation; user said "don't commit"; charter mixed-plane park.
+
+## Cursor stop hook
+
+When an agent turn ends with scoped dirty work, `.cursor/hooks.json` runs `scripts/ppe_auto_ship_stop_hook.py` once (`loop_limit: 1`) to auto-submit a ship reminder — no operator click.

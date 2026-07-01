@@ -701,6 +701,57 @@ def ship_lease_work(
     return report
 
 
+def operator_ship_hint(repo: Path) -> str | None:
+    """One-line ship command for OPERATOR_STATUS when scoped dirty work exists."""
+    repo = repo.resolve()
+    dirty = _dirty_paths(repo)
+    if not dirty:
+        return None
+
+    lease = load_lease(repo)
+    globs = _normalize_globs((lease or {}).get("path_globs"))
+    forbidden = _normalize_globs((lease or {}).get("forbidden_globs"))
+    scoped = scoped_dirty_paths(
+        repo,
+        path_globs=globs if globs else ["**"],
+        forbidden_globs=forbidden,
+    )
+    if not scoped:
+        return None
+
+    try:
+        from scripts.ppe_delegation_envelope import classify_paths, current_branch
+
+        verdict = classify_paths(repo, scoped, branch=current_branch(repo))
+        if verdict.tier == "human_only":
+            return None
+    except Exception:
+        pass
+
+    if lease and _lease_active(lease):
+        return "python scripts/ppe_worker_lease.py --ship --release"
+
+    branch = _current_branch(repo)
+    if branch in ("main", "master", ""):
+        return (
+            "checkout control-plane/<slice> → stage task paths → "
+            "python scripts/ppe_worker_lease.py --acquire --worker codex-app --branch … --paths … "
+            "→ python scripts/ppe_worker_lease.py --ship --release"
+        )
+
+    return "python scripts/run_pushable_gate.py → commit → push → PR (see AGENTS.md)"
+
+
+def format_ship_hint_lines(hint: str | None) -> list[str]:
+    if not hint:
+        return []
+    return [
+        "",
+        "**Ship (agent — do not ask operator):**",
+        f"  → `{hint}`",
+    ]
+
+
 def format_lease_lines(assessment: dict[str, Any]) -> list[str]:
     lines: list[str] = []
     lane = assessment.get("suggested_lane")

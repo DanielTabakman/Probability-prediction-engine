@@ -404,6 +404,7 @@
         "tests/test_validate_research_pipeline_registry.py",
         "tests/test_run_cross_venue_backtest.py",
         ".cursor/rules/",
+        ".cursor/hooks.json",
         ".cursor/USER_RULES_GIT_SNIPPET.md",
         ".cursor/agents/",
         ".cursor/IDE_BUILD_TRIGGER.json",

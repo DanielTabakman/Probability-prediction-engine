@@ -150,6 +150,27 @@ def test_scoped_dirty_paths_respects_globs(tmp_path, monkeypatch) -> None:
     assert "src/b.py" not in scoped
 
 
+def test_operator_ship_hint_with_active_lease(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import operator_ship_hint
+
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+    )
+    f = tmp_path / "scripts" / "x.py"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text("x\n", encoding="utf-8")
+
+    hint = operator_ship_hint(tmp_path)
+    assert hint == "python scripts/ppe_worker_lease.py --ship --release"
+
+
 def test_ship_lease_work_dry_run(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
