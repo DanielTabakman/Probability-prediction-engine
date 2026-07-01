@@ -599,6 +599,10 @@ def test_exposure_menu_offline_fixture_contract() -> None:
     assert payload["asset_id"] == "NVDA"
     assert payload["recommendation_status"] == "path_not_recommendation"
     assert payload["live_path_count"] >= 3
+    assert "sections" in payload
+    assert len(payload["sections"]) >= 3
+    first_path = payload["paths"][0]
+    assert "sort_group" in first_path
 
 
 def test_exposure_menu_wsgi_route() -> None:

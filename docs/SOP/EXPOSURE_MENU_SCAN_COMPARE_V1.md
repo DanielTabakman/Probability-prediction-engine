@@ -3,7 +3,7 @@
 **Parent program:** [`EXPOSURE_MENU_PROGRAM_V1.md`](EXPOSURE_MENU_PROGRAM_V1.md)  
 **Module ID:** `exposure_menu`  
 **As-of:** 2026-06-30  
-**Status:** CHARTERED — follow-on to v0 (`ppe_exposure_menu_v1` COMPLETE)
+**Status:** **LIVE** — scan/compare shipped in product (2026-06-30)
 
 ---
 
@@ -200,3 +200,4 @@ Do **not** add: comparison export, saved pins, NL intake, or fourth fit dimensio
 | Date | Change |
 |------|--------|
 | 2026-06-30 | v1 charter — scan sections, six fit lenses, two-path compare |
+| 2026-06-30 | Implemented in product — boundary sections/fit_lenses + MSOS UI |

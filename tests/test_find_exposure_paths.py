@@ -160,6 +160,27 @@ def test_sort_spot_before_aggressive_options(nvda_mocks) -> None:
     assert path_ids.index("long_stock") < path_ids.index("long_otm_call")
 
 
+def test_scan_compare_fields_on_nvda_long(nvda_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("NVDA", "long")
+    assert report["planned_path_count"] == 1
+    sections = report["sections"]
+    assert len(sections) >= 4
+    assert sections[0]["section_key"] == "spot_equity"
+    assert sections[-1]["section_key"] == "planned_context"
+
+    stock = next(p for p in report["paths"] if p["path_id"] == "long_stock")
+    assert stock["sort_group"] == "spot_equity"
+    assert "simplest" in stock["fit_lenses"]
+    assert "liquid" in stock["fit_lenses"]
+
+    planned = next(p for p in report["paths"] if p["path_id"] == "sector_etf_proxy")
+    assert planned.get("fit_lenses", []) == []
+
+    spread = next(p for p in report["paths"] if p["path_id"] == "bull_call_spread_leaps")
+    assert "defined_risk" in spread["fit_lenses"]
+    assert spread.get("legs")
+
+
 def test_planned_rail_has_planned_badge(nvda_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("NVDA", "long")
     planned = next(p for p in report["paths"] if p["path_id"] == "sector_etf_proxy")

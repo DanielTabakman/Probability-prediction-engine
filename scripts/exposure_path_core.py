@@ -25,9 +25,12 @@ from src.engine.exposure_paths import (
     ExposurePath,
     ExposurePathTemplate,
     HorizonChip,
+    apply_fit_lenses,
+    build_exposure_menu_sections,
     build_strategy_lab_deep_link,
     bull_call_spread_strikes,
     count_live_paths,
+    count_planned_paths,
     format_leg,
     mark_lookup,
     parse_path_template,
@@ -429,7 +432,10 @@ def find_exposure_paths(
             activated.append(path)
 
     ranked = sort_exposure_paths(activated, sort_order=sort_order)
+    apply_fit_lenses(ranked, templates=templates, direction=dir_key)
+    sections = build_exposure_menu_sections(ranked, sort_order=sort_order)
     live_count = count_live_paths(ranked)
+    planned_count = count_planned_paths(ranked)
     options_live = sum(1 for p in ranked if p.instrument_rail == "listed_options" and p.trust_badge == "Live")
     spot_live = sum(1 for p in ranked if p.instrument_rail == "spot_equity" and p.trust_badge == "Live")
 
@@ -444,7 +450,9 @@ def find_exposure_paths(
         "horizon": horizon,
         "status": status,
         "live_path_count": live_count,
+        "planned_path_count": planned_count,
         "paths": [p.to_dict() for p in ranked],
+        "sections": sections,
         "recommendation_status": RECOMMENDATION_STATUS,
         "footer_copy": FOOTER_COPY,
         "as_of_utc": datetime.now(tz=UTC).isoformat(),

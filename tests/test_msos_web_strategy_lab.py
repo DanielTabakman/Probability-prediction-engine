@@ -630,6 +630,10 @@ def test_exposure_menu_boundary_proxy_no_ts_math() -> None:
     assert "Math." not in card
     assert "fetchExposureMenuClient" in client
     assert "exposure-path-grid" in client
+    assert "exposure-menu-section" in client
+    assert "ExposureCompareDrawer" in client
+    assert "fit is not a recommendation" in client.lower()
+    assert "FIT_LENS_CATALOG" in lib
     assert "not trade recommendations" in client.lower() or "comparison only" in client.lower()
 
 
@@ -662,4 +666,5 @@ def test_exposure_menu_secondary_nav() -> None:
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".exposure-path-grid" in styles
     assert ".exposure-menu-work" in styles
+    assert ".exposure-compare-drawer" in styles
 

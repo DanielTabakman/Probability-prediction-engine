@@ -12,12 +12,31 @@ TimeBound = Literal["none", "dated"]
 LiquidityLabel = Literal["high", "medium", "low", "planned"]
 TrustBadge = Literal["Live", "Thin chain", "Planned"]
 HorizonChip = Literal["any", "3m", "12m"]
+FitLensId = Literal[
+    "simplest",
+    "defined_risk",
+    "capital_light",
+    "upside_leverage",
+    "patient",
+    "liquid",
+    "income_style",
+]
 
 EXPOSURE_PATH_KIND = "exposure_paths"
 RECOMMENDATION_STATUS = "path_not_recommendation"
 FOOTER_COPY = "Paths for comparison only — simulation and research support, not trade recommendations."
 
 EQUITY_OPTION_MULTIPLIER = 100
+
+PLANNED_SORT_GROUPS = frozenset({"etf_proxy", "perp"})
+
+EXPOSURE_SECTION_META: dict[str, tuple[str, str]] = {
+    "spot_equity": ("Spot — simplest", "No expiry; full delta on the underlying"),
+    "listed_options_defined_risk": ("Defined-risk options", "Premium or net debit caps worst case"),
+    "listed_options_leaps": ("Longer-dated options", "More time; usually higher premium"),
+    "listed_options_aggressive": ("Timing-sensitive", "More leverage; faster decay"),
+    "planned_context": ("Planned — context only", "Not connected yet; shown for honesty"),
+}
 
 
 @dataclass(frozen=True)
@@ -62,6 +81,7 @@ class ExposurePath:
     deep_link: str | None = None
     sort_group: str = ""
     catalog_order: int = 0
+    fit_lenses: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {
@@ -78,7 +98,10 @@ class ExposurePath:
             "pros": list(self.pros),
             "cons": list(self.cons),
             "recommendation_status": self.recommendation_status,
+            "sort_group": self.sort_group,
         }
+        if self.fit_lenses:
+            out["fit_lenses"] = list(self.fit_lenses)
         if self.cost_hint_usd is not None:
             out["cost_hint_usd"] = round(float(self.cost_hint_usd), 2)
         if self.legs:
@@ -285,3 +308,109 @@ def resolve_trust_badge(
 
 def count_live_paths(paths: list[ExposurePath]) -> int:
     return sum(1 for p in paths if p.trust_badge == "Live")
+
+
+def count_planned_paths(paths: list[ExposurePath]) -> int:
+    return sum(1 for p in paths if p.trust_badge == "Planned")
+
+
+def section_key_for_sort_group(sort_group: str) -> str:
+    if sort_group in PLANNED_SORT_GROUPS:
+        return "planned_context"
+    return sort_group
+
+
+def capital_light_path_ids(paths: list[ExposurePath]) -> frozenset[str]:
+    """Lowest third of live paths by illustrative cost (ties included at cutoff)."""
+    live_costs = [
+        (p.path_id, float(p.cost_hint_usd))
+        for p in paths
+        if p.trust_badge == "Live" and p.cost_hint_usd is not None
+    ]
+    if not live_costs:
+        return frozenset()
+    live_costs.sort(key=lambda row: row[1])
+    tier_size = max(1, (len(live_costs) + 2) // 3)
+    cutoff = live_costs[tier_size - 1][1]
+    return frozenset(path_id for path_id, cost in live_costs if cost <= cutoff)
+
+
+def compute_fit_lenses(
+    path: ExposurePath,
+    *,
+    template: ExposurePathTemplate | None,
+    direction: str,
+    capital_light_ids: frozenset[str],
+) -> list[str]:
+    if path.trust_badge == "Planned":
+        return []
+    tags: list[str] = []
+    if path.leverage == "none" and path.time_bound == "none":
+        tags.append("simplest")
+    if path.leverage == "defined":
+        tags.append("defined_risk")
+    if path.leverage == "high" or path.sort_group == "listed_options_aggressive":
+        tags.append("upside_leverage")
+    min_horizon = template.min_horizon_days if template is not None else None
+    if "leaps" in path.sort_group or (min_horizon is not None and min_horizon >= 270):
+        tags.append("patient")
+    if path.trust_badge == "Live" and path.liquidity in ("high", "medium"):
+        tags.append("liquid")
+    if path.path_id in capital_light_ids:
+        tags.append("capital_light")
+    if direction == "short" and path.path_id == "cash_secured_put":
+        tags.append("income_style")
+    return tags
+
+
+def apply_fit_lenses(
+    paths: list[ExposurePath],
+    *,
+    templates: dict[str, ExposurePathTemplate],
+    direction: str,
+) -> None:
+    capital_light_ids = capital_light_path_ids(paths)
+    for path in paths:
+        template = templates.get(path.path_id)
+        path.fit_lenses = compute_fit_lenses(
+            path,
+            template=template,
+            direction=direction,
+            capital_light_ids=capital_light_ids,
+        )
+
+
+def build_exposure_menu_sections(
+    paths: list[ExposurePath],
+    *,
+    sort_order: list[str],
+) -> list[dict[str, Any]]:
+    ordered_keys: list[str] = []
+    seen: set[str] = set()
+    for sort_group in sort_order:
+        key = section_key_for_sort_group(str(sort_group))
+        if key not in seen:
+            ordered_keys.append(key)
+            seen.add(key)
+
+    paths_by_key: dict[str, list[str]] = {key: [] for key in ordered_keys}
+    for path in paths:
+        key = section_key_for_sort_group(path.sort_group)
+        if key in paths_by_key:
+            paths_by_key[key].append(path.path_id)
+
+    sections: list[dict[str, Any]] = []
+    for key in ordered_keys:
+        path_ids = paths_by_key.get(key) or []
+        if not path_ids:
+            continue
+        title, subcopy = EXPOSURE_SECTION_META[key]
+        sections.append(
+            {
+                "section_key": key,
+                "title": title,
+                "subcopy": subcopy,
+                "path_ids": path_ids,
+            }
+        )
+    return sections
