@@ -2,21 +2,21 @@
 
 **Chapter:** `msos_storyboard_visual_parity_v1`  
 **Priority:** MEDIUM  
-**Status:** **PENDING** — chartered 2026-06-12; blocked until `mvp1_distribution_quant_research_v2` COMPLETE  
+**Status:** **COMPLETE** 2026-07-01 — chartered 2026-06-12; blocked until `mvp1_distribution_quant_research_v2` COMPLETE  
 **Phase plan:** [`PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json`](PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| MSOS-VisParityV1-Control-Slice001 | PENDING | Charter + witness asset checklist |
-| MSOS-VisParityV1-Product-Slice002 | PENDING | Public homepage (`01_home`) |
-| MSOS-VisParityV1-Product-Slice003 | PENDING | App shell + Command Center (`02`, `08`) |
-| MSOS-VisParityV1-Product-Slice004 | PENDING | Strategy Lab chrome (`03_ppe_lab`) |
-| MSOS-VisParityV1-Product-Slice005 | PENDING | Thesis + expression (`04`, `05`) |
-| MSOS-VisParityV1-Product-Slice006 | PENDING | Monitor, history, learn (`06`, `07`, `09`) |
-| MSOS-VisParityV1-Platform-Slice007 | PENDING | VPS deploy + routing clarity |
-| MSOS-VisParityV1-Witness-Slice008 | PENDING | Screenshot witness + pytest |
-| MSOS-VisParityV1-Closeout-Slice009 | PENDING | Chapter COMPLETE |
+| MSOS-VisParityV1-Control-Slice001 | COMPLETE | Charter + witness asset checklist |
+| MSOS-VisParityV1-Product-Slice002 | COMPLETE | Public homepage (`01_home`) |
+| MSOS-VisParityV1-Product-Slice003 | COMPLETE | App shell + Command Center (`02`, `08`) |
+| MSOS-VisParityV1-Product-Slice004 | COMPLETE | Strategy Lab chrome (`03_ppe_lab`) |
+| MSOS-VisParityV1-Product-Slice005 | COMPLETE | Thesis + expression (`04`, `05`) |
+| MSOS-VisParityV1-Product-Slice006 | COMPLETE | Monitor, history, learn (`06`, `07`, `09`) |
+| MSOS-VisParityV1-Platform-Slice007 | COMPLETE | VPS deploy + routing clarity |
+| MSOS-VisParityV1-Witness-Slice008 | COMPLETE | Screenshot witness + pytest |
+| MSOS-VisParityV1-Closeout-Slice009 | COMPLETE | Chapter COMPLETE |
 
 ## Visual witness (required at closeout)
 
