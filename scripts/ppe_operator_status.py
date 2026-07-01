@@ -419,6 +419,19 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
     except Exception:
         pass
 
+    try:
+        from scripts.ppe_worker_lease import assess_worker_lease, write_worker_events
+
+        worker_lease = assess_worker_lease(repo, status)
+        status["worker_lease"] = worker_lease
+        write_worker_events(repo, status)
+        if worker_lease.get("blocks_dispatch") and not status.get("branch_preflight", {}).get("blocks_relay"):
+            status.setdefault("avoid", []).extend(
+                ["Second BUILD worker while lease blocks dispatch", "@ppe-director IDE_BUILD until lease resolved"]
+            )
+    except Exception:
+        pass
+
     vm_mirror = None
     mirror_health: dict[str, Any] | None = None
     try:
@@ -534,6 +547,10 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
         )
     elif burst_plan.get("direct_action") == "wait_for_vm":
         lines.append("Burst path: wait — VM in-flight; no SSH probes or burst workers")
+    elif burst_plan.get("direct_action") == "resolve_lease":
+        lines.append("Burst path: worker lease conflict — ppe_worker_lease.py --assess")
+    elif burst_plan.get("suggested_lane"):
+        lines.append(f"Worker lane: `{burst_plan.get('suggested_lane')}`")
     elif not allowed:
         lines.append("Burst path: single verdict only — split slice or trim spec before chaining workers")
     return lines
@@ -639,6 +656,15 @@ def _format_human(
         )
         for reason in branch_pf.get("reasons") or []:
             lines.append(f"  - {reason}")
+
+    worker_lease = status.get("worker_lease") if isinstance(status.get("worker_lease"), dict) else None
+    if worker_lease:
+        try:
+            from scripts.ppe_worker_lease import format_lease_lines
+
+            lines.extend(format_lease_lines(worker_lease))
+        except Exception:
+            pass
 
     mirror_health = status.get("vm_mirror_health") if isinstance(status.get("vm_mirror_health"), dict) else None
     if mirror_health and mirror_health.get("alert"):
