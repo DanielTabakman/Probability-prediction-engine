@@ -281,6 +281,18 @@ def _resolve_handoff_worker(repo: Path, *, pref: BuildWorkerPref) -> WorkerKind:
     """Desktop handoff target (Cursor Agent or Codex session)."""
     if pref == PREF_CODEX:
         return WORKER_CODEX_CLI
+    try:
+        from scripts.ppe_worker_lease import LANE_CODEX, LANE_CURSOR, load_desktop_build_handoff
+
+        dbh = load_desktop_build_handoff(repo)
+        if dbh and not dbh.get("blocked"):
+            lane = str(dbh.get("preferred_lane") or "")
+            if lane == LANE_CODEX:
+                return WORKER_CODEX_CLI
+            if lane == LANE_CURSOR:
+                return WORKER_MANUAL
+    except Exception:
+        pass
     if _cursor_cli_exhausted(repo) and codex_available():
         return WORKER_CODEX_CLI
     return WORKER_MANUAL
@@ -574,6 +586,21 @@ def format_handoff_banner(repo: Path) -> str:
 
     resolved = resolve_build_worker(repo, for_handoff=True)
     worker = resolved["worker"]
+    lane_line = ""
+    try:
+        from scripts.ppe_worker_lease import load_desktop_build_handoff
+
+        dbh = load_desktop_build_handoff(repo)
+        if dbh:
+            lane = dbh.get("preferred_lane")
+            pref = dbh.get("lane_preference") if isinstance(dbh.get("lane_preference"), dict) else {}
+            reason = pref.get("reason")
+            if lane:
+                lane_line = f"Lane: {lane}" + (f" ({reason})" if reason else "")
+            if dbh.get("blocked"):
+                lane_line = "Lease: BLOCKED — " + "; ".join(dbh.get("reasons") or [])
+    except Exception:
+        pass
     prompt_line = (
         "Build prompt is on your clipboard."
         if clipboard_on_handoff_enabled()
@@ -583,9 +610,10 @@ def format_handoff_banner(repo: Path) -> str:
         "DESKTOP BUILD — your real PC only (NOT the VM)",
         "",
         f"Worker: {worker} ({resolved.get('reason')})",
-        prompt_line,
-        "",
     ]
+    if lane_line:
+        lines.append(lane_line)
+    lines.extend(["", prompt_line, ""])
     for idx, step in enumerate(handoff_instructions(worker), start=1):
         lines.append(f"{idx}. {step}")
     lines.extend(
