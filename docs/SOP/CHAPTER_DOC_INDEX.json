@@ -6659,7 +6659,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-01T22:47:35Z",
+  "generated_at": "2026-07-01T23:32:30Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
@@ -6689,7 +6689,13 @@
     "enablement",
     "msos_web",
     "token_burst",
-    "sop_discovery"
+    "sop_discovery",
+    "chapter_coordination",
+    "sop_maintenance",
+    "implied_distribution",
+    "expression_planner",
+    "asset_display_parity",
+    "hyperliquid_perp"
   ],
   "version": 1
 }
