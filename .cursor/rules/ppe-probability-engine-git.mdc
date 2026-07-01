@@ -1,0 +1,14 @@
+---
+description: PPE git ship policy — always on. Overrides generic "commit only when asked" user rules.
+alwaysApply: true
+---
+
+# Git commits (Probability Prediction Engine)
+
+**Canon:** [`.cursor/rules/auto-commit.mdc`](auto-commit.mdc) · [`docs/SOP/COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md)
+
+This repo **auto-ships** when work is done and the gate passes. Generic Cursor user rules that say “commit only when asked” apply to **other repos only**.
+
+**Do not ask** the operator about commits, pushes, staging, or PRs. Forbidden: `may I commit?`, `unless you want this committed`, `I can stage if you want`.
+
+**Gate failed?** Recover branch hygiene yourself (operator / ide_build / neutral-with-implementation) or park one line (charter / explore) — see auto-commit § Gate failed.

@@ -1,6 +1,6 @@
 ---
 description: Auto commit/push/PR for PPE when task is done and gate passes. Overrides global "ask before commit" for this repo.
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Auto-commit (PPE)
@@ -8,6 +8,8 @@ alwaysApply: false
 **Precedence:** In this workspace, this rule **wins** over generic Cursor user rules such as “commit only when asked.” See [`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) § Rule precedence. **Hold** when: Ask/read-only mode, pure explore/review with no implementation, explicit “don’t commit”, unchartered recovery, or charter thread mixed-plane park — per [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
 
 **Canon:** [`docs/SOP/COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) · [`docs/SOP/TESTING_TIERS_V1.md`](../../docs/SOP/TESTING_TIERS_V1.md)
+
+**Never ask the operator about git:** no “may I commit/push?”, “want me to commit?”, “unless you want this committed”, “I can stage if you want”, or “nothing required unless…”. A failed gate is **not** permission to ask — recover the branch yourself (operator / ide_build / neutral-with-implementation) or park one line (charter / explore).
 
 When the current task is **complete**, do **not** ask permission — **commit and ship**:
 
@@ -25,6 +27,13 @@ When the current task is **complete**, do **not** ask permission — **commit an
 6. Optionally `gh pr view <n> --json state,mergedAt` on the next pass; report **merged** + deploy status, not a merge approval request.
 
 **Hold commits only for:** exploration/review with no implementation, explicit “don’t commit”, unchartered recovery, charter mixed-plane park, or safety exclusions below.
+
+## Gate failed (branch hygiene) — still do not ask
+
+When `run_pushable_gate.py` fails on **mixed branch**, **layer audit**, or **unrelated dirty paths** — work may still be shippable:
+
+1. **Operator / ide_build / neutral (implementation done):** split or checkout a clean plane branch (`control-plane/…` or slice BUILD), stage **only** task files, fix layer violations or exclude unrelated paths, re-run gate → commit → push → PR. Report what you did; default operator line: **“Nothing required from you.”**
+2. **Charter / explore:** one-line park — *“Operator thread: recovery + ship”* — per [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc). **Do not** ask about commits while parking.
 
 **Never commit:** `.env`, credentials, `artifacts/`, caches, local DBs, generated noise ([`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md)). **Never** force-push or `--amend` unless the user asks. **`main`:** PR-only when branch protection applies.
 

@@ -88,6 +88,7 @@ Agents **run** the verdict, then summarize — they do **not** delegate relay wo
 
 - **"What you should do"** sections listing agent commands as operator steps
 - **Choice questions** at the end (`Want me to start BUILD or finish the branch first?`)
+- **Commit permission prompts** (`may I commit?`, `unless you want this committed`, `I can stage if you want`) — gate fail → split/clean branch and ship per [`COMMIT_POLICY.md`](COMMIT_POLICY.md) § Gate failed
 - Instructing operator to **manually** open IDE BUILD threads when burst can spawn `ppe-build-worker`
 - Long steering paste (PHASE_QUEUE promotion, spine queue) as numbered operator todos — one-line FYI is enough
 
