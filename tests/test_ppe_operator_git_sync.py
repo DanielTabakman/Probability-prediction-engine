@@ -197,3 +197,38 @@ def test_publish_reports_timeout(tmp_path: Path) -> None:
                         out = publish_ahead(repo)
     assert out["ok"] is False
     assert out.get("timed_out") is True
+
+
+def test_vm_mirror_head_eligible_for_automerge() -> None:
+    from scripts.ppe_operator_git_sync import VM_MIRROR_PUBLISH_PREFIX, _head_eligible_for_automerge
+
+    head = f"{VM_MIRROR_PUBLISH_PREFIX}20260101120000-abc1234"
+    assert _head_eligible_for_automerge(head, {}) is True
+
+
+def test_publish_vm_mirror_ahead_opens_pr(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("push", "origin"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync.push_enabled", return_value=True):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._ahead_count", return_value=1):
+                with patch("scripts.ppe_operator_git_sync._short_head", return_value="abc1234"):
+                    with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                        with patch(
+                            "scripts.ppe_operator_git_sync._open_pr",
+                            return_value="https://github.com/example/pr/1",
+                        ) as open_pr:
+                            from scripts.ppe_operator_git_sync import publish_vm_mirror_ahead
+
+                            out = publish_vm_mirror_ahead(repo, phase="FINISH_IN_FLIGHT")
+    assert out["ok"] is True
+    assert out.get("mirror_only") is True
+    open_pr.assert_called_once()
+    assert open_pr.call_args.kwargs.get("labels") == ["automerge"]

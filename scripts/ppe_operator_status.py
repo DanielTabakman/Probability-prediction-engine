@@ -476,6 +476,32 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
                 ]
     except Exception:
         pass
+
+    try:
+        from scripts.check_vm_host_health import collect_host_health, write_host_health
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        loop_host = bool(loop_host_start_allowed()[0])
+        host_health = collect_host_health(repo, via_ssh=not loop_host)
+        write_host_health(repo, host_health)
+        status["vm_host_health"] = host_health
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_operator_blind_spots import (
+            assess_operator_blind_spots,
+            write_blind_spots,
+            write_operator_health,
+        )
+
+        blind = assess_operator_blind_spots(repo, status, probe_ssh=False)
+        write_blind_spots(repo, blind)
+        write_operator_health(repo, blind)
+        status["operator_blind_spots"] = blind
+        status["operator_health_line"] = blind.get("operator_health_line")
+    except Exception:
+        pass
     return status
 
 
@@ -616,6 +642,15 @@ def _format_human(
     if op_session and op_session.get("rotate_recommended"):
         lines.append("")
         lines.append(f"**Thread timebox:** {op_session.get('message')}")
+
+    blind = status.get("operator_blind_spots") if isinstance(status.get("operator_blind_spots"), dict) else None
+    if blind:
+        try:
+            from scripts.ppe_operator_blind_spots import format_blind_spot_lines
+
+            lines.extend(format_blind_spot_lines(blind))
+        except Exception:
+            pass
 
     lines.extend(
         [
