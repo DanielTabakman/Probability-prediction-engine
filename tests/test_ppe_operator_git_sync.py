@@ -8,6 +8,7 @@ from unittest.mock import patch
 from scripts.ppe_operator_git_sync import (
     check_and_nudge_merges,
     ensure_main_on_loop_host,
+    prepare_loop_host_for_handoff,
     pull_main,
     publish_ahead,
 )
@@ -86,6 +87,77 @@ def test_ensure_main_from_charter_when_clean(tmp_path: Path) -> None:
     assert out.get("checked_out") is True
     assert out.get("ok") is True
     assert any(args[:2] == ["checkout", "main"] for args in calls)
+
+
+def test_prepare_handoff_resets_transient_build_branch(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("status", "--porcelain"):
+            return type(
+                "P",
+                (),
+                {
+                    "returncode": 0,
+                    "stdout": " M docs/SOP/PHASE_QUEUE.json\n M docs/SOP/HANDOFF.md\n",
+                    "stderr": "",
+                },
+            )()
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "ok", "stderr": ""})()
+        if args[:3] == ["checkout", "origin/main", "--"]:
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("checkout", "-f") or args[:2] == ("checkout", "main"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] == ("reset", "--hard"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="build/auto/MSOS-FCR-Product-Slice002"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=False):
+                with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                    out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any(args[:2] == ["reset", "--hard"] for args in calls)
+    assert any(args[:2] == ["pull", "--ff-only"] for args in calls)
+
+
+def test_prepare_handoff_aborts_merge_before_pull(tmp_path: Path) -> None:
+    repo = tmp_path
+    calls: list[list[str]] = []
+
+    def fake_git(_repo: Path, *args: str):
+        calls.append(list(args))
+        if args[:2] == ("merge", "--abort"):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        if args[:2] in (("fetch", "origin"), ("pull", "--ff-only")):
+            return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._git_sync_cfg", return_value={"pullBranch": "main"}):
+        with patch("scripts.ppe_operator_git_sync._current_branch", return_value="main"):
+            with patch("scripts.ppe_operator_git_sync._git_operation_in_progress", return_value=True):
+                with patch("scripts.ppe_operator_git_sync._dirty_paths", return_value=[]):
+                    with patch(
+                        "scripts.ppe_operator_git_sync.reset_runtime_sop_drift_from_origin",
+                        return_value={"changes": []},
+                    ):
+                        with patch("scripts.ppe_operator_git_sync._git", side_effect=fake_git):
+                            out = prepare_loop_host_for_handoff(repo)
+    assert out.get("ok") is True
+    assert any(args[:2] == ["merge", "--abort"] for args in calls)
+
+
+def test_vm_finish_command_uses_prepare_handoff() -> None:
+    from scripts.ppe_operator_vm_ssh import vm_finish_command
+
+    cmd = vm_finish_command(pull_main=True)
+    assert "--prepare-handoff" in cmd
+    assert "finish_ide_build.cmd" in cmd
+    assert "git pull origin main" not in cmd
 
 
 def test_publish_skips_when_nothing_ahead(tmp_path: Path) -> None:
