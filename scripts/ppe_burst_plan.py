@@ -9,6 +9,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
 from scripts.ppe_context_bands import max_burst_cycles
 from scripts.ppe_context_preflight import run_preflight
 from scripts.ppe_operator_status import (

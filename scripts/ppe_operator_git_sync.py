@@ -549,6 +549,7 @@ RUNTIME_SOP_EXACT: frozenset[str] = frozenset(
         "docs/SOP/PHASE_QUEUE.json",
         "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
         "docs/SOP/PHASE_SELECTION_ROADMAP.json",
+        "docs/SOP/assets/msos_module_map.html",
     }
 )
 

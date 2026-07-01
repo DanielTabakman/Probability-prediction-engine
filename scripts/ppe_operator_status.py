@@ -11,6 +11,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
 from scripts.ppe_auto_select import choose_next_plan
 from scripts.ppe_ide_build_starter import format_ide_build_resume, starter_path
 from scripts.ppe_operator_hint import PPE_GO_HINT, append_ppe_go_hint

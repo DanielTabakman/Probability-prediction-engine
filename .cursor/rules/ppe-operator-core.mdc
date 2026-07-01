@@ -54,6 +54,24 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 **Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.
 
+## Relay finish hygiene (RUN_LOCAL / CLOSEOUT_ONLY)
+
+**Desktop `RUN_LOCAL`:** only `DESKTOP_CONTINUE.cmd --no-pause` — never local `run_ppe_local.cmd` or SSH `run_ppe_local` without VM env.
+
+**VM env:** any VM `run_ppe_local` path must load `call_ppe_operator_local.cmd` first (sets `PPE_LOOP_HOST=1` on loop host). `finish_ide_build.cmd` and `run_ppe_local.cmd` do this automatically after merge.
+
+**Do not fight the headless stack:** when VM brief shows `stack_loop=True` and `FINISH_IN_FLIGHT` or `RUN_LOCAL_PENDING`, poll status — do **not** spawn a second manual `run_ppe_local` over SSH. Use `fix_vm_operator.cmd` on VM only when `STACK_DOWN` or `stack_loop=False`.
+
+**Long finish waits (~20 min):** tail VM logs while polling — `artifacts/orchestrator/REMOTE_RUN_LOCAL.log`, `POST_BUILD_FINISH.log` — not status alone.
+
+**VM health one-liner:** SSH → `check_vm_loop.cmd --no-pause` (loads loop-host env + brief status).
+
+**Operator script PYTHONPATH:** when calling `python scripts/ppe_*.py` directly from agent shell, set `PYTHONPATH` to repo root (or use `*.cmd` wrappers). `ppe_operator_status.py` and `ppe_burst_plan.py` self-bootstrap; others may still need it.
+
+**Branch hygiene:** start operator threads from clean `main` or a slice worktree. Dirty product paths on a control-plane branch → recovery in operator thread per [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) before `IDE_BUILD`.
+
+**Thread rotate:** after `run_ppe_local` / chapter continue completes, fresh operator thread (`what's next?`) — avoids stale context during long VM finishes.
+
 ## Token discipline
 
 - New thread per slice; starter file only — no log/diff paste.

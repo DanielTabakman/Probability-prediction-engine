@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
 
         proc = subprocess.run(
-            ["cmd", "/c", "run_ppe_local.cmd"],
+            ["cmd", "/c", "call call_ppe_operator_local.cmd && run_ppe_local.cmd"],
             cwd=repo,
             capture_output=True,
             text=True,
