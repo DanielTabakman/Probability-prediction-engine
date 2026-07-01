@@ -456,6 +456,21 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             local_verdict=str(status.get("verdict") or ""),
         )
         status["vm_mirror_health"] = mirror_health
+        if mirror_health.get("stale"):
+            try:
+                from scripts.ppe_operator_git_sync import check_and_nudge_merges
+
+                merge_report = check_and_nudge_merges(repo)
+                status["vm_mirror_merge"] = merge_report
+                refresh_vm_mirror_from_git(repo, force_fetch=True)
+                vm_mirror = load_vm_phase_mirror(repo)
+                mirror_health = assess_mirror_health(
+                    vm_mirror,
+                    local_verdict=str(status.get("verdict") or ""),
+                )
+                status["vm_mirror_health"] = mirror_health
+            except Exception:
+                pass
     except Exception:
         try:
             from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
@@ -468,8 +483,10 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
         from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
 
         vm_brief = None
-        if not vm_mirror or not str(vm_mirror.get("phase") or "").strip():
-            vm_brief = fetch_vm_brief(repo, use_cache=True)
+        mirror_stale = bool(mirror_health and mirror_health.get("stale"))
+        need_live_vm = mirror_stale or not vm_mirror or not str(vm_mirror.get("phase") or "").strip()
+        if need_live_vm:
+            vm_brief = fetch_vm_brief(repo, use_cache=not mirror_stale)
         trust = resolve_vm_trust(
             local_verdict=str(status.get("verdict") or ""),
             vm_brief=vm_brief,

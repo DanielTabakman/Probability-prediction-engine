@@ -23,9 +23,9 @@ python "%CD%\scripts\ppe_operator_env.py"
 if errorlevel 1 exit /b 1
 
 if "%~1"=="" (
-  python "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" status --write --brief
+  python -u "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" status --write --brief
   exit /b %ERRORLEVEL%
 )
 
-python "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" %*
+python -u "%CD%\scripts\ppe_autobuilder.py" --repo-root "%CD%" %*
 exit /b %ERRORLEVEL%

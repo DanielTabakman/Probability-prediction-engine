@@ -720,6 +720,41 @@ def _git_operation_in_progress(repo: Path) -> bool:
     return False
 
 
+def _detach_main_worktrees(repo: Path) -> list[dict[str, Any]]:
+    """Detach orchestrator worktrees holding main so checkout can succeed."""
+    try:
+        from scripts.ppe_vm_bootstrap import detach_worktrees_holding_branch
+
+        return detach_worktrees_holding_branch(repo, "main")
+    except ImportError:
+        return []
+
+
+def _handoff_light_recover(repo: Path) -> dict[str, Any]:
+    """Minimal VM recovery when prepare_handoff fails (worktrees, locks, hygiene)."""
+    repo = repo.resolve()
+    steps: list[dict[str, Any]] = []
+    detached = _detach_main_worktrees(repo)
+    if detached:
+        steps.append({"action": "detach_main_worktrees", "detached": detached})
+    try:
+        from scripts.ppe_vm_bootstrap import (
+            ensure_on_main,
+            heal_operator_artifacts,
+            heal_stale_relay_state,
+            loop_host_git_hygiene,
+        )
+
+        steps.append(ensure_on_main(repo))
+        steps.append(loop_host_git_hygiene(repo))
+        steps.append(heal_stale_relay_state(repo))
+        steps.append(heal_operator_artifacts(repo))
+    except ImportError as exc:
+        return {"action": "handoff_light_recover", "ok": False, "error": str(exc), "steps": steps}
+    ok = all(s.get("ok", True) or s.get("skipped") for s in steps if isinstance(s, dict))
+    return {"action": "handoff_light_recover", "ok": ok, "steps": steps}
+
+
 def prepare_loop_host_for_handoff(repo: Path) -> dict[str, Any]:
     """Prepare loop-host git state before DESKTOP_CONTINUE / finish_ide_build.
 
@@ -731,6 +766,15 @@ def prepare_loop_host_for_handoff(repo: Path) -> dict[str, Any]:
     target = (str(_git_sync_cfg(repo).get("pullBranch") or "main")).strip() or "main"
     changes: list[str] = []
     from_branch = _current_branch(repo)
+
+    detached = _detach_main_worktrees(repo)
+    if detached:
+        ok_detach = all(d.get("detached") for d in detached)
+        changes.append(f"detach_main_worktrees ({len(detached)} worktree(s))")
+        if not ok_detach:
+            errors = [d.get("error") for d in detached if d.get("error")]
+            if errors:
+                changes.append(f"detach_errors: {'; '.join(str(e) for e in errors[:3])}")
 
     if _git_operation_in_progress(repo):
         _git(repo, "merge", "--abort")
@@ -803,6 +847,50 @@ def prepare_loop_host_for_handoff(repo: Path) -> dict[str, Any]:
     return result
 
 
+def prepare_handoff_with_auto_recover(repo: Path) -> dict[str, Any]:
+    """prepare_handoff; on failure run light recover + ensure stack + retry once."""
+    repo = repo.resolve()
+    first = prepare_loop_host_for_handoff(repo)
+    if first.get("ok"):
+        first["auto_recover"] = False
+        return first
+
+    recover = _handoff_light_recover(repo)
+    retry = prepare_loop_host_for_handoff(repo)
+    retry["auto_recover"] = True
+    retry["first_attempt"] = {
+        "ok": first.get("ok"),
+        "error": first.get("error"),
+        "changes": first.get("changes"),
+    }
+    retry["recover"] = recover
+    if retry.get("ok"):
+        return retry
+
+    try:
+        from scripts.ppe_vm_bootstrap import bootstrap
+
+        bootstrap(
+            repo,
+            sync_progress=False,
+            heal=True,
+            queue_repair=False,
+            run_local=False,
+            ensure_stack=True,
+            detach_main_worktrees=True,
+            ensure_main=True,
+        )
+        final = prepare_loop_host_for_handoff(repo)
+        final["auto_recover"] = True
+        final["bootstrap_retry"] = True
+        final["first_attempt"] = retry.get("first_attempt")
+        final["recover"] = recover
+        return final
+    except ImportError:
+        retry["bootstrap_retry"] = False
+        return retry
+
+
 def maybe_auto_publish(repo: Path) -> dict[str, Any]:
     """Push + open PR when this branch has unpushed commits (loop/agent work)."""
     repo = repo.resolve()
@@ -866,12 +954,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Loop host only: abort merges, reset runtime SOP drift, return to main, pull",
     )
+    ap.add_argument(
+        "--prepare-handoff-auto",
+        action="store_true",
+        help="Like --prepare-handoff; on failure detach worktrees, heal, ensure stack, retry",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
     results: list[dict[str, Any]] = []
-    if args.prepare_handoff:
+    if args.prepare_handoff_auto:
+        results.append(prepare_handoff_with_auto_recover(repo))
+    elif args.prepare_handoff:
         results.append(prepare_loop_host_for_handoff(repo))
     if args.pull:
         results.append(pull_main(repo))
@@ -885,7 +980,7 @@ def main(argv: list[str] | None = None) -> int:
         results.append(check_and_retarget_stacked_prs(repo))
     if not results:
         ap.error(
-            "specify --pull, --prepare-handoff, --publish, --auto-publish, "
+            "specify --pull, --prepare-handoff, --prepare-handoff-auto, --publish, --auto-publish, "
             "--check-merge, and/or --retarget-stacked"
         )
         return 2

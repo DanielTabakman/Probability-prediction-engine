@@ -63,6 +63,14 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 **VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
 
+**VM recovery (mandatory — no SSH spelunking):**
+
+- Stuck relay / git sync / worktree errors on VM → **`fix_vm_operator.cmd` on VM only** (or `DESKTOP_CONTINUE` which runs `--prepare-handoff-auto`).
+- **Never** desktop SSH + ad-hoc `git reset --hard`, custom recovery scripts, or multi-step VM surgery from agent threads.
+- **Never** spawn `@ppe-director` for VM git/worktree recovery.
+- Live VM health from desktop: **`DESKTOP_VM_STATUS.cmd --no-pause`** (auto-ensures stack when down).
+- After any VM **STOP**, run **`VM_RESTART.cmd`** on VM before expecting `PHASE=` lines.
+
 **Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
 
 **Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.

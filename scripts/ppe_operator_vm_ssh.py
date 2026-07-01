@@ -92,7 +92,7 @@ def vm_finish_command(*, pull_main: bool = False) -> str:
         "set PYTHONPATH=%CD%",
     ]
     if pull_main:
-        parts.append("python scripts\\ppe_operator_git_sync.py --prepare-handoff")
+        parts.append("python scripts\\ppe_operator_git_sync.py --prepare-handoff-auto")
     parts.append("finish_ide_build.cmd")
     return " && ".join(parts)
 
