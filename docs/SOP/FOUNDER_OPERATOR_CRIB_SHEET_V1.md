@@ -102,6 +102,8 @@ python scripts/resolve_sop.py --topic "asset batch wave 1" --json
 python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json
 python scripts/resolve_sop.py --module exposure_menu --json
 python scripts/resolve_sop.py --list-topics --json
+python scripts/sop_discovery_maintenance.py --status
+sop_discovery_maintenance.cmd --all --apply
 python scripts/validate_sop_links.py
 python scripts/generate_chapter_doc_index.py --write
 ```

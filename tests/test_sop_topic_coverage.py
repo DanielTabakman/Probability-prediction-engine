@@ -18,6 +18,12 @@ CHARTER_PHRASE_COVERAGE: list[tuple[str, str]] = [
     ("token economy", "token_burst"),
     ("msos web feedback", "msos_web"),
     ("resolve_sop", "sop_discovery"),
+    ("chapter coordination", "chapter_coordination"),
+    ("sop maintenance", "sop_maintenance"),
+    ("implied distribution", "implied_distribution"),
+    ("expression planner", "expression_planner"),
+    ("asset display parity", "asset_display_parity"),
+    ("hyperliquid perp", "hyperliquid_perp"),
 ]
 
 

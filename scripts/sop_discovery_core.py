@@ -41,6 +41,14 @@ MODULE_PROGRAM_DOCS: dict[str, str] = {
     "workflow": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
 }
 
+# Program docs outside *PROGRAM_V1.md glob (still require Agent load bundle footer)
+EXTRA_PROGRAM_DOCS: tuple[str, ...] = (
+    "docs/SOP/MSOS_WEBSITE_PROGRAM.md",
+)
+
+PROGRAM_FOOTER_MARKER = "## Agent load bundle"
+PROGRAM_FOOTER_RESOLVE_HINT = "resolve_sop.py"
+
 # topic phrase (substring match, lowercased) → routing bundle
 TOPIC_ROUTES: list[dict[str, Any]] = [
     {
@@ -250,6 +258,67 @@ TOPIC_ROUTES: list[dict[str, Any]] = [
             "python scripts/resolve_sop.py --list-topics --json",
             "python scripts/resolve_sop.py --role <role> --json",
         ],
+    },
+    {
+        "id": "chapter_coordination",
+        "match": (
+            "chapter coordination",
+            "coordination repair",
+            "IDE_PRODUCT_READY",
+            "closeout registry",
+        ),
+        "sop": "docs/SOP/CHAPTER_COORDINATION_V1.md",
+        "load_always": ["docs/SOP/CHAPTER_COORDINATION_V1.md"],
+        "load_on_demand": ["docs/SOP/AGENT_STEERING_V1.json"],
+        "next_action": "run_sop_discovery_maintenance",
+        "agent_steps": [
+            "python scripts/ppe_chapter_coordination.py --repair",
+            "python scripts/sop_discovery_maintenance.py --coordination-repair --apply",
+        ],
+    },
+    {
+        "id": "sop_maintenance",
+        "match": (
+            "sop maintenance",
+            "sop_discovery_maintenance",
+            "discovery maintenance",
+        ),
+        "sop": ROUTING_CANON_REL,
+        "load_always": [ROUTING_CANON_REL, ".cursor/rules/sop-discovery.mdc"],
+        "load_on_demand": [ARCHIVE_INDEX_REL],
+        "next_action": "run_sop_discovery_maintenance",
+        "agent_steps": [
+            "python scripts/sop_discovery_maintenance.py --status",
+            "sop_discovery_maintenance.cmd --all --apply",
+        ],
+    },
+    {
+        "id": "implied_distribution",
+        "match": ("implied distribution", "distribution stats", "distribution collector"),
+        "sop": "docs/SOP/IMPLIED_DISTRIBUTION_PROGRAM_V1.md",
+        "load_always": ["docs/SOP/IMPLIED_DISTRIBUTION_PROGRAM_V1.md"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "expression_planner",
+        "match": ("expression planner", "expression plan"),
+        "sop": "docs/SOP/EXPRESSION_PLANNER_PROGRAM_V1.md",
+        "load_always": ["docs/SOP/EXPRESSION_PLANNER_PROGRAM_V1.md"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "asset_display_parity",
+        "match": ("asset display parity", "display parity", "asset badge"),
+        "sop": "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md",
+        "load_always": ["docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md"],
+        "next_action": "charter_thread_load_program",
+    },
+    {
+        "id": "hyperliquid_perp",
+        "match": ("hyperliquid", "hyperliquid perp", "perp rail"),
+        "sop": "docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md",
+        "load_always": ["docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md"],
+        "next_action": "charter_thread_load_program",
     },
 ]
 
@@ -827,6 +896,12 @@ def build_program_doc_index(repo: Path) -> dict[str, Any]:
         norm = _norm(path)
         rows.append({"module_id": mod_id, "program_doc": norm})
         seen.add(norm)
+    for extra in EXTRA_PROGRAM_DOCS:
+        norm = _norm(extra)
+        if norm in seen or not (repo / norm).is_file():
+            continue
+        rows.append({"module_id": None, "program_doc": norm})
+        seen.add(norm)
     sop = repo / "docs" / "SOP"
     if sop.is_dir():
         for path in sorted(sop.glob("*PROGRAM_V1.md")):
@@ -850,6 +925,70 @@ def write_program_doc_index(repo: Path) -> Path:
     out = repo / PROGRAM_DOC_INDEX_REL
     out.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return out
+
+
+def iter_program_doc_paths(repo: Path) -> list[str]:
+    """All program docs cataloged for charter agents (index + extras)."""
+    data = build_program_doc_index(repo)
+    out: list[str] = []
+    for row in data.get("programs") or []:
+        if not isinstance(row, dict):
+            continue
+        rel = _norm(str(row.get("program_doc") or ""))
+        if rel and rel not in out:
+            out.append(rel)
+    return out
+
+
+def validate_program_doc_footers(repo: Path) -> list[str]:
+    """Require Agent load bundle footer + resolve_sop hint on every program doc."""
+    repo = repo.resolve()
+    errors: list[str] = []
+    for rel in iter_program_doc_paths(repo):
+        path = repo / rel
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        if PROGRAM_FOOTER_MARKER not in text:
+            errors.append(f"program doc missing {PROGRAM_FOOTER_MARKER}: {rel}")
+            continue
+        footer = text.split(PROGRAM_FOOTER_MARKER, 1)[1][:1200]
+        if PROGRAM_FOOTER_RESOLVE_HINT not in footer:
+            errors.append(f"program doc footer missing resolve_sop hint: {rel}")
+    return errors
+
+
+def validate_archived_selection_refs(repo: Path, *, index: dict[str, Any] | None = None) -> list[str]:
+    """Broken selectionRecord / closeout selection paths on archived relay plans."""
+    repo = repo.resolve()
+    if index is None:
+        index = _load_chapter_index(repo)
+    archived_plans = {
+        _norm(str(row.get("plan_path") or ""))
+        for row in (index.get("chapters") or [])
+        if isinstance(row, dict) and row.get("archived") and row.get("plan_path")
+    }
+    errors: list[str] = []
+    for plan_rel in sorted(archived_plans):
+        plan_path = repo / plan_rel
+        if not plan_path.is_file():
+            continue
+        try:
+            plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        sel = _norm(str(plan.get("selectionRecord") or ""))
+        if sel and not (repo / sel).is_file():
+            errors.append(f"archived plan {plan_rel}: missing selectionRecord {sel}")
+        for sl in plan.get("slices") or []:
+            if not isinstance(sl, dict):
+                continue
+            closeout = sl.get("closeout") or {}
+            for key in ("nextSelectionDoc", "selectionOutcomeDoc"):
+                ref = _norm(str(closeout.get(key) or ""))
+                if ref and not (repo / ref).is_file():
+                    errors.append(f"archived plan {plan_rel}: missing closeout {key} {ref}")
+    return errors
 
 
 def _load_chapter_index(repo: Path) -> dict[str, Any]:
