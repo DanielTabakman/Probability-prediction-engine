@@ -27,6 +27,17 @@ Commit and continue the ship path when **any** of these is true:
 
 Do **not** ask “may I commit?” or “may I push?” for the rows above.
 
+### Gate failed — recover, do not ask
+
+A failed gate (layer audit, mixed plane, wrong branch, unrelated dirty paths) is **agent work**, not an operator decision.
+
+| Thread role | Action |
+|-------------|--------|
+| **operator** / **ide_build** / **neutral** (implementation done) | Clean branch or split plane → stage task files only → fix layer audit → re-run gate → commit → push → PR. Operator line: **Nothing required from you.** |
+| **charter** / **explore** | Park one line to operator thread ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)). No commit questions. |
+
+**Forbidden closers:** “unless you want this committed”, “I can stage if you want”, “commit when the branch is clean” without doing the cleanup yourself (when role allows).
+
 ## When to hold (no commit)
 
 | Situation | Why |

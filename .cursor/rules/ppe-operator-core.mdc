@@ -56,6 +56,7 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 - Headings like **"What you should do"** / **"On this desktop:"** that list relay commands (`DESKTOP_CONTINUE`, `DESKTOP_BUILD`, `@ppe-director`, `ppe_go.cmd`, queue promotion, branch cleanup) as **operator** steps — those are **agent** actions; run them in-thread or via burst workers.
 - End with **choice questions** (`Want me to…?`, `Should I…?`, `…or … first?`) — the operator does not pick paths. **Decide and execute** per verdict + burst plan.
+- **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-commit.mdc`](auto-commit.mdc) § Gate failed); do not punt to the operator.
 - Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
 
 **Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**

@@ -102,7 +102,7 @@ Charter threads **may** gate → commit → push → PR for:
 **When gate fails** (mixed-plane dirty tree, wrong branch, layer audit on unrelated paths):
 
 - **Do not** stash, checkout, or rebase to recover in a charter thread
-- Report what blocked ship in one short paragraph
+- Report what blocked ship in one short paragraph — **no** “may I commit?” or “want me to stage?”
 - Park: *"Operator thread: recovery + ship"* — operator owns [`RECOVERY_PROTOCOL.md`](../../docs/SOP/RECOVERY_PROTOCOL.md)
 
 Charter threads **must not** implement product `src/` slices unless that is the explicit chartered task (use IDE BUILD or operator thread for relay product work).

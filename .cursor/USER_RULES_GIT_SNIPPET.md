@@ -20,6 +20,8 @@ If Cursor **User Rules** still say “only commit when asked” with **no** PPE 
 
 When the task is done and `python scripts/run_pushable_gate.py` passes: **commit, push, and open a PR to `main` if needed — without asking.**
 
+**Never ask** “may I commit?”, “want me to commit?”, “unless you want this committed”, or “I can stage if you want”. If the gate fails on branch/layer audit, **fix the branch and ship** (split plane, stage task files, re-run gate) — do not punt to the operator.
+
 Hold (do not commit): Ask/read-only mode; explore/review with no implementation; user said “don’t commit”; charter mixed-plane park; unchartered recovery.
 
 After merge/rebase `origin/main` on a feature branch: gate, then push.
