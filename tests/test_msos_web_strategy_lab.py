@@ -635,6 +635,8 @@ def test_exposure_menu_boundary_proxy_no_ts_math() -> None:
     assert "fit is not a recommendation" in client.lower()
     assert "buildExpressionPlannerHandoffHref" in lib
     assert "exposure-pin-hint" in client
+    assert "Save for later" in card
+    assert "EXPOSURE_PATH_STORAGE_KEY" in (MSOS_WEB / "src" / "lib" / "exposurePathPersistence.ts").read_text(encoding="utf-8")
     assert "FIT_LENS_CATALOG" in lib
     assert "not trade recommendations" in client.lower() or "comparison only" in client.lower()
 

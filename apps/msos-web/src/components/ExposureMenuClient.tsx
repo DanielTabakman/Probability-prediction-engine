@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -7,6 +8,14 @@ import { ExposureCompareDrawer } from "@/components/ExposureCompareDrawer";
 import { LabAssetPicker } from "@/components/LabAssetPicker";
 import { ExposurePathCard } from "@/components/ExposurePathCard";
 import { demoExposureMenuForAsset } from "@/data/exposureMenuFixtures";
+import {
+  buildExposurePageHrefFromSaved,
+  clearSavedExposurePath,
+  EXPOSURE_PATH_SAVE_LABEL,
+  loadSavedExposurePath,
+  saveExposurePathBookmark,
+  type SavedExposurePath,
+} from "@/lib/exposurePathPersistence";
 import { assetBucketForId, bucketsFromCatalog, fetchAssetCatalog } from "@/lib/ppeAssetCatalog";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 import {
@@ -68,6 +77,12 @@ export function ExposureMenuClient({
   const [activeFitLens, setActiveFitLens] = useState<FitLensId | null>(null);
   const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [savedPath, setSavedPath] = useState<SavedExposurePath | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSavedPath(loadSavedExposurePath());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -162,6 +177,23 @@ export function ExposureMenuClient({
     });
   };
 
+  const savePath = (path: ExposurePathRecord) => {
+    const record = saveExposurePathBookmark({
+      assetId,
+      direction,
+      horizon,
+      path,
+    });
+    setSavedPath(record);
+    setSaveNotice(EXPOSURE_PATH_SAVE_LABEL);
+  };
+
+  const clearSaved = () => {
+    clearSavedExposurePath();
+    setSavedPath(null);
+    setSaveNotice(null);
+  };
+
   const statusNote = useMemo(() => {
     if (loading) return "Loading paths from the display API…";
     if (!live) {
@@ -193,6 +225,28 @@ export function ExposureMenuClient({
           ) : null}
         </div>
       </header>
+
+      {savedPath ? (
+        <section className="exposure-saved-banner panel compact" aria-label="Saved path">
+          <p className="panel-sub">
+            Saved path: <strong>{savedPath.label}</strong> ({savedPath.assetId} · {savedPath.direction})
+          </p>
+          <div className="exposure-saved-banner-actions">
+            <Link href={buildExposurePageHrefFromSaved(savedPath)} className="btn slim">
+              Reopen
+            </Link>
+            <button type="button" className="btn slim ghost" onClick={clearSaved}>
+              Clear saved
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {saveNotice ? (
+        <p className="exposure-save-notice panel-sub" role="status">
+          {saveNotice}
+        </p>
+      ) : null}
 
       <section className="exposure-menu-intake panel compact" aria-label="Exposure intake">
         <LabAssetPicker
@@ -325,7 +379,14 @@ export function ExposureMenuClient({
                     dimmed={Boolean(activeFitLens && !matches)}
                     pinned={pinnedIds.includes(path.path_id)}
                     pinDisabled={!pinnedIds.includes(path.path_id) && pinnedIds.length >= 2}
+                    saved={
+                      savedPath?.pathId === path.path_id &&
+                      savedPath.assetId === assetId &&
+                      savedPath.direction === direction &&
+                      savedPath.horizon === horizon
+                    }
                     onPinToggle={() => togglePin(path.path_id)}
+                    onSave={() => savePath(path)}
                   />
                 );
               })}
