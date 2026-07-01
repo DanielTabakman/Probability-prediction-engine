@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Purpose:** who may touch what — Cursor vs Codex vs VM vs scripts  
 **SSOT for leases:** `python scripts/ppe_worker_lease.py --assess`
 
-**Related:** [`MULTI_AGENT_WORKER_INTERFACE_V1.md`](MULTI_AGENT_WORKER_INTERFACE_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json)
+**Related:** [`MULTI_AGENT_WORKER_INTERFACE_V1.md`](MULTI_AGENT_WORKER_INTERFACE_V1.md) · [`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json)
 
 ---
 

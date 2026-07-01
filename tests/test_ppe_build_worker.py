@@ -93,6 +93,24 @@ def test_resolve_handoff_uses_codex_when_cursor_exhausted(tmp_path, monkeypatch)
     assert out["mode"] == "manual"
 
 
+def test_handoff_prefers_desktop_build_lane_file(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import LANE_CURSOR, write_desktop_build_handoff
+
+    monkeypatch.chdir(tmp_path)
+    write_desktop_build_handoff(
+        tmp_path,
+        {
+            "preferred_lane": LANE_CURSOR,
+            "blocked": False,
+            "lane_preference": {"reason": "product_path_scope"},
+        },
+    )
+    with patch("scripts.ppe_build_worker.load_build_worker_pref", return_value="auto"):
+        with patch("scripts.ppe_build_worker._cursor_cli_exhausted", return_value=False):
+            out = resolve_build_worker(tmp_path, for_handoff=True)
+    assert out["worker"] == WORKER_MANUAL
+
+
 def test_build_product_prompt_codex_includes_protocol():
     text = build_product_prompt(
         slice_id="Slice001",

@@ -210,3 +210,64 @@ def test_ship_lease_work_dry_run(tmp_path, monkeypatch) -> None:
     assert report["ok"] is True
     assert report["paths"] == ["scripts/x.py"]
     assert "lease ship" in report["message"]
+
+
+def test_lane_to_handoff_worker() -> None:
+    from scripts.ppe_worker_lease import lane_to_handoff_worker
+
+    assert lane_to_handoff_worker(LANE_CODEX) == "codex-cli"
+    assert lane_to_handoff_worker(LANE_CURSOR) == "manual"
+
+
+def test_prepare_desktop_build_acquires_lease(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import (
+        DESKTOP_BUILD_HANDOFF_REL,
+        WORK_DISPATCH_REL,
+        load_lease,
+        prepare_desktop_build_handoff,
+    )
+
+    monkeypatch.chdir(tmp_path)
+    status = {
+        "verdict": "IDE_BUILD",
+        "chapter_mode": {"mode": "IDE_BUILD"},
+        "guard": {"detail": "[Slice-A]"},
+    }
+    with patch("scripts.ppe_worker_lease.prefer_build_lane") as mock_pref:
+        mock_pref.return_value = {
+            "preferred_lane": LANE_CODEX,
+            "reason": "branch_heuristic",
+            "cost_lanes_7d": {},
+        }
+        record = prepare_desktop_build_handoff(tmp_path, status)
+    assert record["blocked"] is False
+    assert record["preferred_lane"] == LANE_CODEX
+    assert load_lease(tmp_path) is not None
+    assert (tmp_path / DESKTOP_BUILD_HANDOFF_REL).is_file()
+    assert (tmp_path / WORK_DISPATCH_REL).is_file()
+
+
+def test_prepare_desktop_build_blocked_on_lease_conflict(tmp_path, monkeypatch) -> None:
+    from datetime import datetime, timedelta, timezone
+
+    from scripts.ppe_worker_lease import prepare_desktop_build_handoff
+
+    monkeypatch.chdir(tmp_path)
+    now = datetime.now(timezone.utc)
+    lease = {
+        "lease_id": "x",
+        "worker_id": LANE_CODEX,
+        "branch": "control-plane/other",
+        "exclusive": True,
+        "path_globs": ["scripts/**"],
+        "forbidden_globs": [],
+        "expires_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
+    }
+    (tmp_path / "artifacts/control_plane").mkdir(parents=True)
+    (tmp_path / "artifacts/control_plane/ACTIVE_LEASE.json").write_text(json.dumps(lease) + "\n")
+
+    status = {"verdict": "IDE_BUILD", "chapter_mode": {"mode": "IDE_BUILD"}}
+    with patch("scripts.ppe_worker_lease.prefer_build_lane") as mock_pref:
+        mock_pref.return_value = {"preferred_lane": LANE_CODEX, "reason": "test", "cost_lanes_7d": {}}
+        record = prepare_desktop_build_handoff(tmp_path, status)
+    assert record["blocked"] is True
