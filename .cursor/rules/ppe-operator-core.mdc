@@ -25,13 +25,7 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 4. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
 5. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
 
-**SSH budget (desktop — mandatory):**
-
-- **Max 1** `ssh ppeloop@desktop-caqll8k` call per operator pass (use `python scripts/ppe_operator_status.py --brief` locally first).
-- **Never** SSH + `findstr`/`type` on `PHASE_QUEUE.json`, `ACTIVE_PHASE_MANIFEST.json`, or backlog — read those files **locally** from git.
-- **Never** parallel SSH sessions to the VM.
-- Prefer `docs/SOP/VM_OPERATOR_PHASE.json` (git mirror) + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
-- Hard timeout: 120s — if SSH hangs, trust mirror/cache and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
+**SSH / VM polling:** load on demand [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc).
 
 | Verdict | Action |
 |---------|--------|
@@ -45,46 +39,11 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 Also skip when thread role is charter / explore / neutral (see thread-roles). Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 
-## Operator reply format (mandatory)
+## Operator reply format
 
-After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist.
-
-**Never:**
-
-- Headings like **"What you should do"** / **"On this desktop:"** that list relay commands (`DESKTOP_CONTINUE`, `DESKTOP_BUILD`, `@ppe-director`, `ppe_go.cmd`, queue promotion, branch cleanup) as **operator** steps — those are **agent** actions; run them in-thread or via burst workers.
-- End with **choice questions** (`Want me to…?`, `Should I…?`, `…or … first?`) — the operator does not pick paths. **Decide and execute** per verdict + burst plan.
-- Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
-
-**Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**
-
-**VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
-
-**Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
-
-**Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.
-
-## Relay finish hygiene (RUN_LOCAL / CLOSEOUT_ONLY)
-
-**Desktop `RUN_LOCAL`:** only `DESKTOP_CONTINUE.cmd --no-pause` — never local `run_ppe_local.cmd` or SSH `run_ppe_local` without VM env.
-
-**VM env:** any VM `run_ppe_local` path must load `call_ppe_operator_local.cmd` first (sets `PPE_LOOP_HOST=1` on loop host). `finish_ide_build.cmd` and `run_ppe_local.cmd` do this automatically after merge.
-
-**Do not fight the headless stack:** when VM brief shows `stack_loop=True` and `FINISH_IN_FLIGHT` or `RUN_LOCAL_PENDING`, poll status — do **not** spawn a second manual `run_ppe_local` over SSH. Use `fix_vm_operator.cmd` on VM only when `STACK_DOWN` or `stack_loop=False`.
-
-**Long finish waits (~20 min):** tail VM logs while polling — `artifacts/orchestrator/REMOTE_RUN_LOCAL.log`, `POST_BUILD_FINISH.log` — not status alone.
-
-**VM health one-liner:** SSH → `check_vm_loop.cmd --no-pause` (loads loop-host env + brief status).
-
-**Operator script PYTHONPATH:** when calling `python scripts/ppe_*.py` directly from agent shell, set `PYTHONPATH` to repo root (or use `*.cmd` wrappers). `ppe_operator_status.py` and `ppe_burst_plan.py` self-bootstrap; others may still need it.
-
-**Branch hygiene:** start operator threads from clean `main` or a slice worktree. Dirty product paths on a control-plane branch → recovery in operator thread per [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) before `IDE_BUILD`.
-
-**Thread rotate:** after `run_ppe_local` / chapter continue completes, fresh operator thread (`what's next?`) — avoids stale context during long VM finishes.
+Short state summary only — no operator checklists, choice questions, or relay command lists (agent runs those). Default: **"Nothing required from you."** Canon: [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies. **RUN_LOCAL detail:** [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc).
 
 ## Token discipline
 
-- New thread per slice; starter file only — no log/diff paste.
-- After closeout: new thread + continuity brief only.
-- Thread roles: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
-- Thread roles + SOP discovery: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc), [`sop-discovery.mdc`](sop-discovery.mdc).
-- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Auto-commit: [`auto-commit.mdc`](auto-commit.mdc) (always-on).
+- New thread per slice; starter only — no log/diff paste.
+- On-demand: [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc), [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc), [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc), [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Roles/discovery/auto-commit: always-on rules.

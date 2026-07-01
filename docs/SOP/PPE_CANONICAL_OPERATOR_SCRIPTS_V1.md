@@ -58,7 +58,7 @@ Related helpers: `scripts/ppe_ide_handoff.py`, `scripts/ppe_build_worker.py`.
 ### `DESKTOP_CONTINUE.cmd` (after PR merge)
 
 1. `git pull origin main` on desktop.
-2. SSH to VM → `git pull origin main` → **`call call_ppe_operator_local.cmd`** → **`finish_ide_build.cmd`**.
+2. SSH to VM → **`call call_ppe_operator_local.cmd`** → **`python scripts/ppe_operator_git_sync.py --reset-runtime-sop`** → **`git pull origin main`** → **`finish_ide_build.cmd`**.
 3. `finish_ide_build.cmd` runs `scripts/ppe_post_build_watcher.py --finish-handoff` (post-build mark when build branch has commits; **else explicit CLOSEOUT_ONLY `run_ppe_local` trigger** when product is already on `main`).
 4. SSH status uses loop-host env: `call call_ppe_operator_local.cmd && ppe_autobuilder.cmd status --brief`.
 

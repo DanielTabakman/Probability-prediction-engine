@@ -691,6 +691,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Retarget child PRs to main when parent branch already merged",
     )
+    ap.add_argument(
+        "--reset-runtime-sop",
+        action="store_true",
+        help="Discard loop-host runtime SOP/RELEASES drift from origin before pull",
+    )
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
@@ -706,8 +711,13 @@ def main(argv: list[str] | None = None) -> int:
         results.append(check_and_nudge_merges(repo))
     if args.retarget_stacked:
         results.append(check_and_retarget_stacked_prs(repo))
+    if args.reset_runtime_sop:
+        results.append(reset_runtime_sop_drift_from_origin(repo))
     if not results:
-        ap.error("specify --pull, --publish, --auto-publish, --check-merge, and/or --retarget-stacked")
+        ap.error(
+            "specify --pull, --publish, --auto-publish, --check-merge, "
+            "--retarget-stacked, and/or --reset-runtime-sop"
+        )
         return 2
 
     if args.json:
