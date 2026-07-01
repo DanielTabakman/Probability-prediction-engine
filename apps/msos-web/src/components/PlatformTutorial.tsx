@@ -9,8 +9,13 @@ import {
   markPlatformTutorialComplete,
   platformTourFeedbackHref,
   PLATFORM_TUTORIAL_STEPS,
+  type PlatformTutorialPlayAction,
   type PlatformTutorialStep,
 } from "@/lib/platformTutorial";
+import {
+  PLATFORM_TOUR_PLAY_EVENT,
+  type PlatformTourPlayDetail,
+} from "@/lib/platformTutorialEvents";
 
 type PlatformTutorialProps = {
   active: boolean;
@@ -97,6 +102,7 @@ function TutorialCard({
   onBack,
   onNext,
   onSkip,
+  playSatisfied,
 }: {
   step: PlatformTutorialStep;
   index: number;
@@ -106,7 +112,12 @@ function TutorialCard({
   onBack: () => void;
   onNext: () => void;
   onSkip: () => void;
+  playSatisfied: boolean;
 }) {
+  const playPending = Boolean(step.playAction) && !playSatisfied;
+  const body =
+    step.playAction && playSatisfied && step.bodyAfterPlay ? step.bodyAfterPlay : step.body;
+
   return (
     <div
       ref={cardRef}
@@ -119,7 +130,10 @@ function TutorialCard({
         Step {index + 1} of {total}
       </div>
       <h3 id={`tutorial-title-${step.id}`}>{step.title}</h3>
-      <p>{step.body}</p>
+      <p>{body}</p>
+      {playPending && step.playHint ? (
+        <p className="micro platform-tutorial-play-hint">{step.playHint}</p>
+      ) : null}
       <div className="platform-tutorial-actions">
         {index > 0 ? (
           <button type="button" className="btn slim" onClick={onBack}>
@@ -130,7 +144,13 @@ function TutorialCard({
             Skip tour
           </button>
         )}
-        <button type="button" className="btn slim primary" onClick={onNext}>
+        <button
+          type="button"
+          className="btn slim primary"
+          onClick={onNext}
+          disabled={playPending}
+          aria-disabled={playPending || undefined}
+        >
           {index + 1 >= total ? "Done" : "Next"}
         </button>
       </div>
@@ -184,6 +204,7 @@ export function PlatformTutorial({
 
   const [stepIndex, setStepIndex] = useState(0);
   const [feedbackPromptOpen, setFeedbackPromptOpen] = useState(false);
+  const [playSatisfied, setPlaySatisfied] = useState(false);
   const [anchor, setAnchor] = useState<ViewportRect | null>(null);
   const [placement, setPlacement] = useState<CardPlacement>({
     top: VIEWPORT_PADDING + 80,
@@ -225,6 +246,7 @@ export function PlatformTutorial({
     if (!active) {
       setStepIndex(0);
       setFeedbackPromptOpen(false);
+      setPlaySatisfied(false);
       return;
     }
     refreshLayout();
@@ -235,7 +257,26 @@ export function PlatformTutorial({
       window.removeEventListener("resize", onViewportChange);
       window.removeEventListener("scroll", onViewportChange, true);
     };
-  }, [active, feedbackPromptOpen, stepIndex, refreshLayout]);
+  }, [active, feedbackPromptOpen, stepIndex, playSatisfied, refreshLayout]);
+
+  useEffect(() => {
+    setPlaySatisfied(false);
+  }, [stepIndex]);
+
+  useEffect(() => {
+    if (!active || !step?.playAction) {
+      return;
+    }
+    const expected: PlatformTutorialPlayAction = step.playAction;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<PlatformTourPlayDetail>).detail;
+      if (detail?.action === expected) {
+        setPlaySatisfied(true);
+      }
+    };
+    window.addEventListener(PLATFORM_TOUR_PLAY_EVENT, handler);
+    return () => window.removeEventListener(PLATFORM_TOUR_PLAY_EVENT, handler);
+  }, [active, step?.playAction]);
 
   const dismissTour = useCallback(() => {
     markPlatformTutorialComplete();
@@ -305,6 +346,7 @@ export function PlatformTutorial({
         onBack={() => setStepIndex((value) => Math.max(0, value - 1))}
         onNext={handleNext}
         onSkip={handleSkipTour}
+        playSatisfied={playSatisfied}
       />
     </div>,
     document.body,

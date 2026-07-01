@@ -22,6 +22,7 @@ import {
   type BeliefNudgeAxis,
   type BeliefTuning,
 } from "@/lib/beliefTuning";
+import { notifyPlatformTourPlayAction } from "@/lib/platformTutorialEvents";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import {
   buildOutcomeFromPayload,
@@ -76,6 +77,7 @@ export function StrategyLabInteractivePanel({
         saveBeliefTuning(next);
         return next;
       });
+      notifyPlatformTourPlayAction("belief-nudge");
     },
     [],
   );

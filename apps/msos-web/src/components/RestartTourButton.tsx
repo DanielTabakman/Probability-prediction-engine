@@ -5,20 +5,33 @@ import { useCallback, useState, type ReactNode } from "react";
 
 import { useNavigationProgress } from "@/components/NavigationProgressProvider";
 import { warmStrategyLabEntry } from "@/lib/prefetchStrategyLab";
-import { clearPlatformTutorialComplete, strategyLabForcedTourHref } from "@/lib/platformTutorial";
+import {
+  clearPlatformTutorialComplete,
+  strategyLabForcedTourHref,
+  type ForcedTourOptions,
+} from "@/lib/platformTutorial";
 
 type RestartTourButtonProps = {
   className?: string;
   children: ReactNode;
   beginner?: boolean;
+  quick?: boolean;
+  full?: boolean;
 };
 
 /** Clears tour completion and opens Strategy Lab — only use for explicit restart CTAs. */
-export function RestartTourButton({ className, children, beginner = false }: RestartTourButtonProps) {
+export function RestartTourButton({
+  className,
+  children,
+  beginner = false,
+  quick = false,
+  full = false,
+}: RestartTourButtonProps) {
   const router = useRouter();
   const { start } = useNavigationProgress();
   const [pending, setPending] = useState(false);
-  const tourHref = strategyLabForcedTourHref(beginner);
+  const tourOptions: ForcedTourOptions = { beginner, quick, full };
+  const tourHref = strategyLabForcedTourHref(tourOptions);
 
   const handlePointerEnter = useCallback(() => {
     warmStrategyLabEntry(router, tourHref);
