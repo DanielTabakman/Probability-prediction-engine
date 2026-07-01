@@ -45,6 +45,19 @@ venues:
       US equity + ETF options. Normalized to Deribit-shaped marks for the engine.
       Commodity proxies (GLD, SLV, USO) use this venue with asset_class commodity_proxy.
 
+  hyperliquid:
+    label: Hyperliquid public info API
+    fetch_module: src.data.fetch_hyperliquid
+    api_base: https://api.hyperliquid.xyz/info
+    registry_fields:
+      - hyperliquid_coin
+    enable_requires: live_perp_mark_and_funding
+    exposure_only: true
+    notes: >
+      Perp mark + funding for exposure menu (HYPE v1). No API key for info endpoints.
+      Not an options venue — registry rows use exposure_only: true; skip options discovery.
+      Program: docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md
+
 # Historical / research notes (discovery scans live vendors first — do not trust stale rows)
 research_alternatives:
   SOL:
@@ -53,3 +66,5 @@ research_alternatives:
     note: Deribit 0 instruments 2026-06-27; try Bybit scan
   XRP:
     note: Deribit 0 instruments 2026-06-27; try Bybit scan
+  HYPE:
+    note: Options blocked on Deribit/Bybit; use hyperliquid perp rail (exposure_only) — not asset batch wave 1

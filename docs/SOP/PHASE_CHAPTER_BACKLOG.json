@@ -702,6 +702,17 @@
       "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION approved"
     },
     {
+      "chapterId": "ppe_hyperliquid_perp_rail_v1",
+      "status": "ready",
+      "priority": "medium",
+      "focusPlaybookTier": "P2",
+      "sideChannel": true,
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md",
+      "canonRef": "docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md",
+      "reason": "[P2] HYPE Hyperliquid perp exposure path \u2014 operator HL customer signal; parallel to wave 1"
+    },
+    {
       "chapterId": "ppe_asset_batch_wave2_v1",
       "status": "blocked",
       "priority": "low",

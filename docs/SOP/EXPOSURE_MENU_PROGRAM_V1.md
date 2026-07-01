@@ -95,13 +95,15 @@ Engine activates paths from catalog + live eligibility (chain depth, horizon, sp
 |-------|------------------|
 | **NVDA** | spot, LEAPS call, bull call spread, near-dated call, OTM call, cash-secured put (short exposure path) |
 | **BTC** | spot/index, long call, bull call spread |
+| **HYPE** | perp only (Hyperliquid) — [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md) |
 
 ### Planned cards (honest labels, no fake math)
 
 | Rail | v0 posture |
 |------|------------|
 | `etf_proxy` (e.g. SMH for NVDA) | **Planned** card |
-| `perp` | **Planned** card (Hyperliquid not execution rail yet) |
+| `perp` (BTC/ETH) | **Planned** until HL chapter ships |
+| `perp` (HYPE) | **CHARTERED** → Live mark/funding in [`ppe_hyperliquid_perp_rail_v1`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md) |
 
 ---
 
@@ -127,6 +129,7 @@ Engine activates paths from catalog + live eligibility (chain depth, horizon, sp
 | # | Chapter | Tier | Delivers |
 |---|---------|------|----------|
 | 1 | **`ppe_exposure_menu_v1`** | T0→T2 | Core + CLI + boundary + MSOS page (NVDA + BTC) |
+| 2 | **`ppe_hyperliquid_perp_rail_v1`** | T1→T2 | HYPE Live perp path (Hyperliquid read-only) — [`POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md) |
 
 Future (post v0):
 
@@ -148,7 +151,7 @@ Future (post v0):
 | Merging into Strategy Lab or Expression planner | Own lens |
 | Natural language intake | v1 |
 | ETF proxy live pricing | v1 |
-| Perp math without vendor | Planned cards only |
+| Perp math without vendor | Planned cards only (except HYPE — chartered HL fetch) |
 | T3 collector without archive charter | Registry rule |
 
 ---
@@ -180,6 +183,7 @@ Future (post v0):
 | [`SPRINT_PPE_EXPOSURE_MENU_V1.md`](SPRINT_PPE_EXPOSURE_MENU_V1.md) | Sprint |
 | [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json) | Relay plan |
 | [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) | Scan sections, fit lenses, compare drawer (next UX chapter) |
+| [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md) | HYPE perp rail — exposure-only registry |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Exposure-first intent (adjacent to Expression Search / Hedging) |
 
 ---
@@ -190,3 +194,4 @@ Future (post v0):
 |------|--------|
 | 2026-06-29 | v1 charter — module `exposure_menu`, v0 scope NVDA+BTC, T2 target |
 | 2026-06-30 | Link scan/compare follow-on charter; status v0 LIVE |
+| 2026-06-30 | Charter `ppe_hyperliquid_perp_rail_v1` — HYPE perp under exposure menu (P2 side channel) |
