@@ -1224,7 +1224,7 @@ def assess_sop_discovery_health(repo: Path) -> dict[str, Any]:
 
         starter_plan = plan_regen_ready_starters(repo)
     except Exception as exc:
-        starter_plan = {"pending_count": -1, "error": str(exc)}
+        starter_plan = {"pending_count": -1, "stale_count": -1, "missing_count": -1, "error": str(exc)}
     ok = fresh and links_ok and int(backfill.get("pending_count") or 0) == 0
     return {
         "ok": ok,
@@ -1234,6 +1234,8 @@ def assess_sop_discovery_health(repo: Path) -> dict[str, Any]:
         "link_error_count": link_errors,
         "evidence_backfill_pending": int(backfill.get("pending_count") or 0),
         "ready_starter_regen_pending": int(starter_plan.get("pending_count") or 0),
+        "ready_starter_missing_pending": int(starter_plan.get("missing_count") or 0),
+        "ready_starter_stale_pending": int(starter_plan.get("stale_count") or 0),
         "links": links if not links_ok else None,
     }
 
@@ -1253,6 +1255,9 @@ def format_operator_sop_health_lines(repo: Path) -> list[str]:
     pending_st = int(health.get("ready_starter_regen_pending") or 0)
     if pending_st:
         parts.append(f"READY starter regen pending={pending_st}")
+    pending_stale = int(health.get("ready_starter_stale_pending") or 0)
+    if pending_stale:
+        parts.append(f"READY starter stale={pending_stale}")
     fix = "python scripts/sop_discovery_maintenance.py --all --apply"
     return [f"**SOP discovery:** WARN — {'; '.join(parts)} · fix: `{fix}`"]
 
