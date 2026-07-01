@@ -4,6 +4,17 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `74f6033e` — ops(control-plane): sync desktop git with VM after FCR closeout (#1093) (`docs/SOP/`)
+- `77d4559b` — control-plane: aggregate workflow tracking for async/mobile operators (#1088) (`scripts/`)
+- `b122a49f` — control-plane: wire routing/rules to runtime automation SSOT (#1087) (`docs/SOP/`)
+- `0ab7362e` — control-plane: DESKTOP_BUILD auto-lease + multi-agent roadmap doc (#1085) (`docs/SOP/`)
+- `fb5a2d43` — control-plane: auto-release worker lease on mark_ide_product_ready (#1081) (`docs/SOP/`)
+- `20f23398` — ops: vm phase mirror RUN LOCAL PENDING (#1075)
+- `6cb9e694` — ops: vm phase mirror RUN LOCAL PENDING (#1076) (`docs/SOP/`)
+- `56054632` — fix(control-plane): prefer live VM SSH over stale phase mirror (#1074) (`docs/SOP/`)
+- `8d633a8a` — control-plane: operator recovery automation v1 (#1067) (`scripts/`)
+- `6df93063` — control-plane: auto-ship tooling, hints, and stop hook (#1064) (`docs/SOP/`)
+- `5fdbdb32` — Control-plane: dev changelog
 - `d3313bd3` — Control-plane: dev changelog
 - `650b2a69` — control-plane: disable clipboard handoff by default (#1065) (`docs/SOP/`)
 - `c7afa4c6` — Control-plane: dev changelog
