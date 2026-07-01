@@ -62,6 +62,16 @@ Run from repo root. Tier classification and layer audit are built into the gate 
 
 **Docs-only:** diff touches only `docs/` → tier 0 (no pytest). Ruff optional unless `src/` or `scripts/` also changed.
 
+### Delegation envelope (gate stderr)
+
+| Gate output | Meaning | Ship? |
+|-------------|---------|-------|
+| `human_only` | Operator must authorize path or use `PPE_DELEGATION_OVERRIDE=1` on RECOVERY | **No** — gate exit 1 |
+| `steward_packet` / `can_auto_ship=False` | Prefer steward decision packet before merge | **Yes** — WARN only; gate exit 0 → commit → push → PR |
+| `auto` / `auto_notify` | Routine delegation | **Yes** |
+
+Do **not** treat `can_auto_ship=False` alone as permission to ask the operator about commits.
+
 **After `git merge origin/main` or rebase** on a feature branch: run the gate, then **push** — syncing is not done until push succeeds.
 
 **CI on merge:** GitHub **CI** requires **`CI / pytest`** and **`CI / docker_entrypoint`**. Local `--pre-push` covers pytest + ruff; add **`python scripts/run_pre_push_parity.py --docker`** (or `run_pre_push_parity.cmd --docker`) when you touched `Dockerfile`, deps, or Streamlit entry — otherwise docker smoke runs only on GitHub.

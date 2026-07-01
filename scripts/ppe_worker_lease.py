@@ -73,7 +73,15 @@ def _dirty_paths(repo: Path) -> list[str]:
     for line in (proc.stdout or "").splitlines():
         if len(line) < 4 or line.startswith("##"):
             continue
-        paths.append(line[3:].strip().split(" -> ")[-1].replace("\\", "/"))
+        raw = line[3:].strip().split(" -> ")[-1].replace("\\", "/")
+        if raw.endswith("/"):
+            dir_path = repo / raw.rstrip("/")
+            if dir_path.is_dir():
+                for f in sorted(dir_path.rglob("*")):
+                    if f.is_file():
+                        paths.append(str(f.relative_to(repo)).replace("\\", "/"))
+            continue
+        paths.append(raw)
     return paths
 
 
@@ -475,6 +483,7 @@ def build_work_dispatch(repo: Path, status: dict[str, Any] | None = None) -> dic
         },
         "acceptance": {
             "gate": "python scripts/run_pushable_gate.py",
+            "ship": "python scripts/ppe_worker_lease.py --ship --release",
             "mark_ready": f"python scripts/mark_ide_product_ready.py --slice {slice_id}" if slice_id else None,
             "relay_continue": "DESKTOP_CONTINUE.cmd --no-pause",
         },
@@ -539,6 +548,159 @@ def acquire_lease(
     return lease
 
 
+def _commit_message_for_ship_paths(paths: list[str]) -> str:
+    norm = [p.replace("\\", "/") for p in paths]
+    if norm and all(p.startswith("docs/") for p in norm):
+        return "control-plane: lease ship (docs)"
+    if any(p.startswith("src/") or p.startswith("apps/") for p in norm):
+        return "product: lease ship"
+    if any(p.startswith("tests/") or p.startswith("scripts/") for p in norm):
+        return "evidence-plane: lease ship"
+    return "control-plane: lease ship"
+
+
+def _ship_excluded(path: str) -> bool:
+    p = path.replace("\\", "/")
+    if p.startswith(("artifacts/", "_worktrees/", ".cursor/projects/")):
+        return True
+    lower = p.lower()
+    return lower in {".env", ".env.local"} or "credential" in lower
+
+
+def scoped_dirty_paths(
+    repo: Path,
+    *,
+    path_globs: list[str],
+    forbidden_globs: list[str],
+) -> list[str]:
+    scoped: list[str] = []
+    for p in _dirty_paths(repo):
+        if _ship_excluded(p):
+            continue
+        if forbidden_globs and path_matches_any(p, forbidden_globs):
+            continue
+        if path_globs and not path_matches_any(p, path_globs):
+            continue
+        scoped.append(p)
+    return scoped
+
+
+def _ensure_work_branch(repo: Path, branch: str) -> tuple[bool, str, str]:
+    current = _current_branch(repo)
+    if not branch:
+        return True, current, "no branch constraint"
+    if current == branch:
+        return True, branch, "on lease branch"
+    co = _git(repo, "checkout", branch)
+    if co.returncode == 0:
+        return True, branch, f"checked out {branch}"
+    cob = _git(repo, "checkout", "-b", branch)
+    if cob.returncode == 0:
+        return True, branch, f"created branch {branch}"
+    detail = (co.stderr or co.stdout or cob.stderr or cob.stdout or "checkout failed").strip()
+    return False, current, detail
+
+
+def ship_lease_work(
+    repo: Path,
+    *,
+    dry_run: bool = False,
+    release_after: bool = False,
+    message: str | None = None,
+    pre_push: bool = False,
+    path_globs: list[str] | None = None,
+    forbidden_globs: list[str] | None = None,
+    branch: str | None = None,
+) -> dict[str, Any]:
+    """Stage lease-scoped dirty paths → gate → commit → push → PR."""
+    repo = repo.resolve()
+    lease = load_lease(repo)
+    globs = _normalize_globs(path_globs or (lease or {}).get("path_globs"))
+    forbidden = _normalize_globs(forbidden_globs or (lease or {}).get("forbidden_globs"))
+    work_branch = (branch or (lease or {}).get("branch") or _current_branch(repo) or "").strip()
+
+    report: dict[str, Any] = {
+        "action": "ship",
+        "ok": False,
+        "dry_run": dry_run,
+        "branch": work_branch,
+        "path_globs": globs,
+        "steps": [],
+    }
+
+    def step(name: str, payload: dict[str, Any]) -> None:
+        report["steps"].append({"step": name, **payload})
+        if payload.get("ok") is False and not payload.get("optional"):
+            report["ok"] = False
+
+    ok_branch, actual_branch, branch_detail = _ensure_work_branch(repo, work_branch)
+    step("branch", {"ok": ok_branch, "branch": actual_branch, "detail": branch_detail})
+    if not ok_branch:
+        report["blocked"] = True
+        report["reason"] = branch_detail
+        return report
+
+    scoped = scoped_dirty_paths(repo, path_globs=globs, forbidden_globs=forbidden)
+    report["paths"] = scoped
+    if not scoped:
+        report["ok"] = True
+        report["skipped"] = True
+        report["reason"] = "no scoped dirty paths"
+        return report
+
+    commit_msg = message or _commit_message_for_ship_paths(scoped)
+    if dry_run:
+        report["ok"] = True
+        report["message"] = commit_msg
+        step("dry_run", {"ok": True, "paths": scoped, "message": commit_msg})
+        return report
+
+    add = _git(repo, "add", "--", *scoped)
+    step("stage", {"ok": add.returncode == 0, "count": len(scoped)})
+    if add.returncode != 0:
+        report["blocked"] = True
+        report["reason"] = (add.stderr or add.stdout or "git add failed").strip()
+        return report
+
+    from scripts.run_pushable_gate import run_gate_for_paths
+
+    gate_rc = run_gate_for_paths(repo, scoped, pre_push=pre_push)
+    step("gate", {"ok": gate_rc == 0, "pre_push": pre_push})
+    if gate_rc != 0:
+        _git(repo, "reset", "HEAD", "--", *scoped)
+        report["blocked"] = True
+        report["reason"] = "gate failed — see stderr"
+        return report
+
+    commit = subprocess.run(
+        ["git", "commit", "-m", commit_msg],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    step("commit", {"ok": commit.returncode == 0, "message": commit_msg})
+    if commit.returncode != 0:
+        report["blocked"] = True
+        report["reason"] = (commit.stderr or commit.stdout or "git commit failed").strip()
+        return report
+
+    from scripts.ppe_context_closeout_ship import _publish
+
+    pub = _publish(repo, branch=actual_branch)
+    step("publish", pub)
+    report["ok"] = bool(pub.get("ok"))
+
+    if pub.get("pr_url"):
+        report["pr_url"] = pub["pr_url"]
+
+    if release_after and report["ok"]:
+        released = release_lease(repo)
+        step("release", {"ok": released, "released": released})
+
+    return report
+
+
 def format_lease_lines(assessment: dict[str, Any]) -> list[str]:
     lines: list[str] = []
     lane = assessment.get("suggested_lane")
@@ -573,6 +735,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--write-dispatch", action="store_true")
     ap.add_argument("--infer-events", action="store_true", help=f"Write {WORKER_EVENTS_REL}")
     ap.add_argument("--release", action="store_true")
+    ap.add_argument("--ship", action="store_true", help="Gate → commit → push → PR for lease-scoped dirty paths")
+    ap.add_argument("--dry-run", action="store_true", help="With --ship: plan paths only, no git writes")
+    ap.add_argument("--pre-push", action="store_true", help="With --ship: run full pre-push gate")
+    ap.add_argument("--message", type=str, default=None, help="With --ship: commit message override")
     ap.add_argument("--acquire", action="store_true")
     ap.add_argument("--worker", type=str, default=LANE_CODEX)
     ap.add_argument("--branch", type=str, default=None)
@@ -584,10 +750,29 @@ def main(argv: list[str] | None = None) -> int:
 
     repo = args.repo_root.resolve()
 
-    if args.release:
+    if args.release and not args.ship:
         released = release_lease(repo)
         print(json.dumps({"released": released}) if args.json else f"ppe_worker_lease: released={released}")
         return 0
+
+    if args.ship:
+        report = ship_lease_work(
+            repo,
+            dry_run=args.dry_run,
+            release_after=args.release and not args.dry_run,
+            message=args.message,
+            pre_push=args.pre_push,
+            path_globs=args.paths,
+            forbidden_globs=args.forbid,
+            branch=args.branch,
+        )
+        if args.json:
+            print(json.dumps(report, indent=2))
+        else:
+            status = "ok" if report.get("ok") else "blocked"
+            extra = report.get("pr_url") or report.get("reason") or report.get("skipped")
+            print(f"ppe_worker_lease: ship {status} {extra or ''}".strip())
+        return 0 if report.get("ok") and not report.get("blocked") else 1
 
     if args.acquire:
         try:

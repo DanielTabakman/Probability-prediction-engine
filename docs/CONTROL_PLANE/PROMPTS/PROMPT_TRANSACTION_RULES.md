@@ -19,7 +19,12 @@ For slices that qualify under `docs/SOP/OPERATING_RULES.md` (**Compact slice mod
 - When the required output is produced, **stop**. Do not add “next steps” that begin another execution step.
 - Do not continue operating “in the background” (no extra exploration, no extra edits) after satisfying the prompt.
 
-## Conservative git posture (default)
+## Conservative git posture (default — **Codex sprint workers only**)
+
+**Scope:** These prompts target **external Codex relay / sprint workers** (one bounded execution step per paste). **Cursor IDE agents** in this repo follow [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc) and [`COMMIT_POLICY.md`](../../docs/SOP/COMMIT_POLICY.md) — gate pass → commit → push → PR **without asking** the operator.
+
+For Codex workers in this control-plane prompt set:
+
 - **Do not commit, push, branch, rebase, reset, or amend** unless explicitly asked.
 - Avoid destructive commands.
 - If a prompt requires work that would normally include git actions, **request explicit user instruction** first.

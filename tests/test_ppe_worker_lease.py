@@ -18,6 +18,8 @@ from scripts.ppe_worker_lease import (
     path_matches_any,
     prefer_build_lane,
     release_lease,
+    scoped_dirty_paths,
+    ship_lease_work,
     suggest_lane,
 )
 
@@ -128,3 +130,42 @@ def test_build_work_dispatch_shape(tmp_path, monkeypatch) -> None:
     dispatch = build_work_dispatch(tmp_path, status)
     assert dispatch["lane"]["worker_id"] == LANE_CURSOR
     assert dispatch["lane"].get("preference_reason")
+    assert "ship" in dispatch["acceptance"]
+
+
+def test_scoped_dirty_paths_respects_globs(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    scripts = tmp_path / "scripts" / "a.py"
+    scripts.parent.mkdir(parents=True)
+    scripts.write_text("a\n", encoding="utf-8")
+    src = tmp_path / "src" / "b.py"
+    src.parent.mkdir(parents=True)
+    src.write_text("b\n", encoding="utf-8")
+
+    scoped = scoped_dirty_paths(tmp_path, path_globs=["scripts/**"], forbidden_globs=["src/**"])
+    assert "scripts/a.py" in scoped
+    assert "src/b.py" not in scoped
+
+
+def test_ship_lease_work_dry_run(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+    )
+    f = tmp_path / "scripts" / "x.py"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text("x\n", encoding="utf-8")
+
+    report = ship_lease_work(tmp_path, dry_run=True)
+    assert report["ok"] is True
+    assert report["paths"] == ["scripts/x.py"]
+    assert "lease ship" in report["message"]

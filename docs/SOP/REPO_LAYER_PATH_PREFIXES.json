@@ -347,6 +347,8 @@
         ".gitignore",
         "scripts/",
         "docs/SOP/",
+        "docs/CONTROL_PLANE/",
+        "AGENTS.md",
         "tests/test_ppe_",
         "tests/test_relay_",
         "tests/test_phase_",
