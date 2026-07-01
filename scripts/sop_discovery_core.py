@@ -178,7 +178,16 @@ TOPIC_ROUTES: list[dict[str, Any]] = [
     },
     {
         "id": "steward_selection",
-        "match": ("steward", "selection", "closeout", "selection outcome", "selection prep"),
+        "match": (
+            "steward",
+            "selection",
+            "closeout",
+            "selection outcome",
+            "selection prep",
+            "charter thread",
+            "topic thread",
+            "founder charter",
+        ),
         "sop": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
         "load_always": [
             "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
@@ -968,6 +977,80 @@ def resolve_by_search(repo: Path, query: str) -> dict[str, Any]:
             "Pick one result and re-run resolve with --chapter or --module.",
         ],
     }
+
+
+def validate_closeout_spec_docs(repo: Path, spec: Any) -> list[str]:
+    """Fail closeout when referenced steward/build doc paths are missing."""
+    repo = repo.resolve()
+    errors: list[str] = []
+    required: list[tuple[str, str | None]] = [
+        ("evidence_doc", getattr(spec, "evidence_doc", None)),
+        ("sprint_spec", getattr(spec, "sprint_spec", None)),
+        ("next_selection_doc", getattr(spec, "next_selection_doc", None)),
+    ]
+    selection_outcome = getattr(spec, "selection_outcome_doc", None)
+    if selection_outcome:
+        required.append(("selection_outcome_doc", selection_outcome))
+    for label, rel in required:
+        path = str(rel or "").replace("\\", "/").strip()
+        if not path:
+            errors.append(f"closeout missing {label}")
+            continue
+        if not (repo / path).is_file():
+            errors.append(f"closeout {label} path not found: {path}")
+    for rel in getattr(spec, "carry_docs", None) or []:
+        path = str(rel or "").replace("\\", "/").strip()
+        if path and not (repo / path).is_file():
+            errors.append(f"closeout carry_doc path not found: {path}")
+    return errors
+
+
+_FRONT_MATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
+
+
+def stamp_evidence_archived_frontmatter(
+    repo: Path,
+    evidence_rel: str,
+    *,
+    chapter_id: str,
+    closed_date: str,
+) -> bool:
+    """Add or refresh YAML front matter when a chapter evidence doc is archived."""
+    path = repo / str(evidence_rel or "").replace("\\", "/").strip()
+    if not path.is_file():
+        return False
+    text = path.read_text(encoding="utf-8-sig")
+    block = (
+        "---\n"
+        f"archived: true\n"
+        f"chapter_id: {chapter_id}\n"
+        f"closed: {closed_date}\n"
+        "---\n\n"
+    )
+    if text.startswith("---\n"):
+        text = _FRONT_MATTER_RE.sub(block, text, count=1)
+    else:
+        text = block + text
+    path.write_text(text, encoding="utf-8")
+    return True
+
+
+def format_notify_resolve_hint(
+    repo: Path,
+    *,
+    plan_path: str | None = None,
+    next_build_candidate: str | None = None,
+) -> str | None:
+    """One-line mobile ntfy hint for IDE_BUILD doc resolve."""
+    lines = format_operator_resolve_lines(
+        repo,
+        plan_path=plan_path,
+        next_build_candidate=next_build_candidate,
+    )
+    if not lines:
+        return None
+    line = lines[0]
+    return line.replace("**Doc resolve:** ", "Doc: ")
 
 
 def format_operator_resolve_lines(

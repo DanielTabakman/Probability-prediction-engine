@@ -58,6 +58,8 @@ def _minimal_docs(tmp_path: Path) -> CloseoutSpec:
     (sop / "TEST_EVIDENCE.md").write_text(
         "## Chapter status\n\n**Test Chapter:** **PENDING**.\n", encoding="utf-8"
     )
+    (sop / "POST_TEST_SELECTION.md").write_text("# next selection\n", encoding="utf-8")
+    (sop / "SPRINT_TEST.md").write_text("# sprint\n", encoding="utf-8")
     return spec
 
 

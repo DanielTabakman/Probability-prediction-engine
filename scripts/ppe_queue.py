@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -96,6 +97,10 @@ def upsert_queue_item(
 
     norm = plan_path.replace("\\", "/").strip()
     idx = find_queue_item_index(queue, norm)
+    was_ready = (
+        idx is not None
+        and str(items[idx].get("status") or "").strip().upper() == "READY"
+    )
     row: dict[str, Any] = {"planPath": norm, "status": status.upper()}
     for key, val in fields.items():
         if val is not None and val != "":
@@ -103,12 +108,27 @@ def upsert_queue_item(
 
     if idx is None:
         items.append(row)
-        save_queue(repo_root, queue)
-        return True, f"queue item {len(items) - 1} created ({status})"
-
-    prev = items[idx]
-    prev.update(row)
-    items[idx] = prev
+        item_idx = len(items) - 1
+    else:
+        prev = items[idx]
+        prev.update(row)
+        items[idx] = prev
+        item_idx = idx
     queue["items"] = items
     save_queue(repo_root, queue)
-    return True, f"queue item {idx} updated ({status})"
+
+    msg = (
+        f"queue item {item_idx} created ({status})"
+        if idx is None
+        else f"queue item {item_idx} updated ({status})"
+    )
+    if status.upper() == "READY" and not was_ready:
+        try:
+            from scripts.ppe_ide_build_starter import regenerate_starters_for_plan
+
+            regen = regenerate_starters_for_plan(repo_root, norm)
+            if regen:
+                msg += f"; regen starters: {', '.join(regen)}"
+        except Exception as exc:
+            print(f"ppe_queue: starter regen skipped: {exc}", file=sys.stderr)
+    return True, msg
