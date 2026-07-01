@@ -20,4 +20,16 @@ alwaysApply: true
 - Branch recovery (stash, mixed-plane) → operator thread only.
 - Product `src/` slices → ide_build or operator, not charter.
 
+## Response shape (charter / explore / neutral)
+
+Do not end with operator relay steps, stash/checkout instructions, or `OPERATOR_STATUS` unless the user asked about queue/branch.
+
+## Relay disclosure (one line when offering work)
+
+| Label | Meaning |
+|-------|---------|
+| **Relay: off** | No queue/status/burst — default for charter/explore/neutral |
+| **Relay: on** | Operator or ide_build slice path |
+| **Relay: parked** | Design here; execution in operator thread |
+
 Canon: `docs/SOP/THREAD_STARTERS_V1.md`, `docs/SOP/AGENT_ROUTING_V1.md`

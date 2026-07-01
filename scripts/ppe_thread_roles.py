@@ -20,7 +20,7 @@ LEGACY_THREAD_ROLE_MAP = {
 
 OPERATOR_THREAD_OPENER = (
     "Operator thread. THREAD_ROLE: operator.\n"
-    "Run what's next per ppe-operator-core (burst + @ppe-director when allowed).\n"
+    "Run what's next per ppe-operator (burst + @ppe-director when allowed).\n"
 )
 
 IDE_BUILD_THREAD_OPENER = (

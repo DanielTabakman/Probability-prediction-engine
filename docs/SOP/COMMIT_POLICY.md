@@ -34,7 +34,7 @@ A failed gate (layer audit, mixed plane, wrong branch, unrelated dirty paths) is
 | Thread role | Action |
 |-------------|--------|
 | **operator** / **ide_build** / **neutral** (implementation done) | Clean branch or split plane → stage task files only → fix layer audit → re-run gate → commit → push → PR. Operator line: **Nothing required from you.** |
-| **charter** / **explore** | Park one line to operator thread ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)). No commit questions. |
+| **charter** / **explore** | Park one line to operator thread ([`ppe-roles.mdc`](../../.cursor/rules/ppe-roles.mdc)). No commit questions. |
 
 **Forbidden closers:** “unless you want this committed”, “I can stage if you want”, “commit when the branch is clean” without doing the cleanup yourself (when role allows).
 
@@ -109,8 +109,8 @@ Resolve conflicts in this order (top wins for this repo):
 |----------|--------|-----------------|
 | 1 | **Ask / read-only mode** | No writes — guidance only |
 | 2 | User says **“don’t commit”** (this thread) | Hold until released |
-| 3 | **[`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)** (`alwaysApply: true`) | Auto-ship when task complete + gate passes |
-| 4 | **Thread role** ([`ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)) | Operator / ide_build / neutral with implementation → ship; charter / explore with **no** implementation → hold; charter mixed-plane → park |
+| 3 | **[`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc)** (`alwaysApply: true`) | Auto-ship when task complete + gate passes |
+| 4 | **Thread role** ([`ppe-roles.mdc`](../../.cursor/rules/ppe-roles.mdc)) | Operator / ide_build / neutral with implementation → ship; charter / explore with **no** implementation → hold; charter mixed-plane → park |
 | 5 | Generic Cursor **user rule** (“commit only when asked”) | Applies to **other repos only** — must not block rows 3–4 here |
 
 **Do not** ask “may I commit?” or “may I push?” when priority 3 applies and none of 1–2 block.
@@ -124,7 +124,7 @@ Resolve conflicts in this order (top wins for this repo):
 | **neutral** | Yes if user requested implementation | **Park** — operator thread |
 | **explore** | Hold unless user asked to implement | **Park** |
 
-Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) (`alwaysApply: true`).
+Canon: [`.cursor/rules/ppe-roles.mdc`](../../.cursor/rules/ppe-roles.mdc) (`alwaysApply: true`).
 
 ## Cursor and global user rules
 
@@ -133,7 +133,7 @@ Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-rol
 ## Related docs
 
 - Tests: [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md)
-- Agent behavior: [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)
+- Agent behavior: [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc)
 - Planes and branches: [`OPERATING_RULES.md`](OPERATING_RULES.md)
 - PR merge: [`GITHUB_ZERO_TOUCH_MERGE.md`](GITHUB_ZERO_TOUCH_MERGE.md)
 - Worktrees: [`FRONTIER_STEWARD_PROTOCOL.md`](FRONTIER_STEWARD_PROTOCOL.md)

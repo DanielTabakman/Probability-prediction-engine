@@ -94,10 +94,11 @@ See `TOKEN_AUDIT_LATEST.md` recommendations block for auto-generated next steps.
 
 Keep **only:**
 
-- `ppe-operator-core.mdc`
-- `ppe-desktop-vm-layout.mdc`
+- `auto-ship.mdc`
+- `ppe-roles.mdc`
+- `ppe-operator.mdc`
 
-Everything else: `alwaysApply: false` (load on demand).
+`closeout.mdc` is glob-triggered (not always-on). Everything else: `alwaysApply: false` (load on demand).
 
 ### IDE BUILD starters
 
@@ -123,7 +124,7 @@ No continuity excerpt, no duplicate BUILD packet, no context band footer.
 | Trigger | Agent action |
 |---------|----------------|
 | `IDE_BUILD` handoff | Ensure starter generated; warn if >80 lines |
-| New always-on rule proposed | Reject unless ppe-operator-core/desktop-vm split preserved |
+| New always-on rule proposed | Reject unless minimal four-file set preserved (`auto-ship`, `ppe-roles`, `ppe-operator`, `closeout`) |
 | Weekly radar token ESCALATE | Regenerate starters + verify_codex; gate+commit if control-plane fix |
 | Chapter closeout | Starters pruned automatically on next `token_audit --prune-stale` |
 | Repeated WATCH 3+ audits | Charter Workflow-Hardening slice; update this doc thresholds if needed |

@@ -10,7 +10,7 @@ Cursor token burn was dominated by (1) six always-on rules ~4.7k tok/turn, (2) f
 ## Shipped
 
 - Minimal starter generator (touchSet-first, ≤65/80 line budgets)
-- `ppe-operator-core.mdc` + demoted load-on-demand rules
+- `ppe-operator.mdc` + demoted load-on-demand rules
 - `token_audit.cmd` + `token_economy_history.jsonl` trend log
 - Weekly Monday pipeline integration + workflow radar token section
 - `regenerate_ide_starters.cmd` for bulk refresh

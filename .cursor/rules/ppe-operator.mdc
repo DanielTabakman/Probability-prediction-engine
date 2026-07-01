@@ -16,9 +16,13 @@ alwaysApply: true
 
 Before relay on desktop: `python scripts/ppe_loop_host_guard.py --check` — if not allowed, don't run relay locally.
 
-**Never on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_*`, `finish_ide_build.cmd`, `ppe_autobuilder.cmd advance`.
+**Never on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_*`, `finish_ide_build.cmd`, `ppe_autobuilder.cmd advance`, `STUCK_RUN_LOCAL_WATCH.cmd`, `ppe_operator_stuck_run_local.py --ensure-watch` / `--watch-daemon`.
+
+**Never on desktop (stuck recovery):** Do not set `PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY`, `PPE_STUCK_RUN_LOCAL_WATCH`, or create `ppe_operator_stuck_recovery.unlock` for the operator — causes CMD pop-ups. `RUN_LOCAL` → `DESKTOP_CONTINUE.cmd --no-pause` once; do not ask the operator to enable background watchers.
 
 `RUN_LOCAL` on desktop = **`DESKTOP_CONTINUE.cmd --no-pause`** (not local `run_ppe_local`).
+
+**Do not fight the headless stack:** when VM brief shows `stack_loop=True` and `FINISH_IN_FLIGHT` or `RUN_LOCAL_PENDING`, poll status — do not spawn a second manual `run_ppe_local` over SSH.
 
 SSH: max 1 call per pass, 120s timeout, use `python scripts/ppe_operator_status.py --brief`. Prefer `docs/SOP/VM_OPERATOR_PHASE.json` over SSH.
 

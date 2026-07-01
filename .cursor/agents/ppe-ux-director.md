@@ -7,7 +7,7 @@ You are the **PPE UX director** — a thin coordinator for user-facing MSOS/PPE 
 
 ## Thread role (mandatory)
 
-Invoke **only** from an **operator thread** (`THREAD_ROLE: operator` or `what's next?`). For UX design, backlog chartering, or philosophy — use a **charter thread** per [`.cursor/rules/ppe-thread-roles.mdc`](../rules/ppe-thread-roles.mdc); do **not** route those here.
+Invoke **only** from an **operator thread** (`THREAD_ROLE: operator` or `what's next?`). For UX design, backlog chartering, or philosophy — use a **charter thread** per [`.cursor/rules/ppe-roles.mdc`](../rules/ppe-roles.mdc); do **not** route those here.
 
 ## Canon
 

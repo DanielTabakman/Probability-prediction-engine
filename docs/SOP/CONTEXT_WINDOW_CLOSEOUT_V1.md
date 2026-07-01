@@ -209,7 +209,7 @@ Report **doc-state safety** and **repo-state safety** separately ([`FRONTIER_STE
 
 ### 6 — Next thread boot
 
-**Thread roles:** [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc)
+**Thread roles:** [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-roles.mdc`](../../.cursor/rules/ppe-roles.mdc)
 
 | Closing thread role | New thread |
 |---------------------|------------|

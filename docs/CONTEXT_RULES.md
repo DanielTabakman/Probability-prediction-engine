@@ -27,7 +27,7 @@ Do NOT create a new context for every tiny action.
 
 ## Thread roles (operator vs charter)
 
-**Canon:** [`THREAD_STARTERS_V1.md`](SOP/THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-thread-roles.mdc`](../.cursor/rules/ppe-thread-roles.mdc)
+**Canon:** [`THREAD_STARTERS_V1.md`](SOP/THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-roles.mdc`](../.cursor/rules/ppe-roles.mdc)
 
 | Thread | Open with | Touches relay? |
 |--------|-----------|----------------|
@@ -37,7 +37,7 @@ Do NOT create a new context for every tiny action.
 | **Explore** | `Explore thread` | No |
 | **Default** | User question only | No — do not lead with `OPERATOR_STATUS` |
 
-When an agent **offers to implement** something, it must say **Relay: off | on | parked | conflict** in one line so you know whether the work touches the autobuilder queue. Canon: [`.cursor/rules/ppe-thread-roles.mdc`](../.cursor/rules/ppe-thread-roles.mdc) § Relay disclosure.
+When an agent **offers to implement** something, it must say **Relay: off | on | parked | conflict** in one line so you know whether the work touches the autobuilder queue. Canon: [`.cursor/rules/ppe-roles.mdc`](../.cursor/rules/ppe-roles.mdc) § Relay disclosure.
 
 Do **not** mix operator queue work with UX design, data programs, or SELECTION in one thread.
 
@@ -87,4 +87,4 @@ Full ritual: [`docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSE
 
 **Trigger phrases:** `close out thread` · `closeout thread` · `context closeout` · `wrap this chat` (see SOP for full list)
 
-**Next thread after closeout:** ask **what's next?** — agent runs adaptive burst (preflight + `@ppe-director` when allowed) from `OPERATOR_STATUS.md`, then summarizes via `AGENT_CONTINUITY_BRIEF.md` + closeout draft (not chat history). See `.cursor/rules/ppe-operator-core.mdc` and `ppe-burst-mode.mdc`.
+**Next thread after closeout:** ask **what's next?** — agent runs adaptive burst (preflight + `@ppe-director` when allowed) from `OPERATOR_STATUS.md`, then summarizes via `AGENT_CONTINUITY_BRIEF.md` + closeout draft (not chat history). See `.cursor/rules/ppe-operator.mdc` and `ppe-burst-mode.mdc`.

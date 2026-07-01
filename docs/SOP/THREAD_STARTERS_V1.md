@@ -2,7 +2,7 @@
 
 **Plane:** CONTROL-PLANE · **Purpose:** copy-paste openers so relay/autobuilder does not hijack topic threads.
 
-**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
+**Rules:** [`.cursor/rules/ppe-roles.mdc`](../../.cursor/rules/ppe-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
 
 ---
 
@@ -12,7 +12,7 @@ Dedicated thread for queue, VM status, burst, and triage. Open **one** long-live
 
 ```text
 Operator thread. THREAD_ROLE: operator.
-Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
+Run what's next per ppe-operator (burst + @ppe-director when allowed).
 Auto-execute — do not ask operator to choose paths or run relay commands.
 Do not mix UX charter or SELECTION planning here.
 ```

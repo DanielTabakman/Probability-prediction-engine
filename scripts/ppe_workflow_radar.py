@@ -624,7 +624,7 @@ def _token_friction_candidates(repo: Path) -> tuple[list[RadarCandidate], dict[s
         detail = str(sig.get("detail") or "")
         action = "token_audit.cmd --prune-stale; regenerate starters; verify_codex.cmd"
         if sid == "always-on-rules-heavy":
-            action = "Keep ppe-operator-core + ppe-desktop-vm-layout always-on only."
+            action = "Keep auto-ship + ppe-roles + ppe-operator always-on only."
         candidates.append(
             RadarCandidate(
                 id=sid,

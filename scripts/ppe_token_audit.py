@@ -227,7 +227,7 @@ def build_recommendations(report: TokenAuditReport) -> list[str]:
     if always_chars > ALWAYS_ON_CHAR_ESCALATE:
         recs.append("ESCALATE: always-on rules exceed hard ceiling — demote to load-on-demand immediately.")
     elif always_chars > ALWAYS_ON_CHAR_TARGET:
-        recs.append("WATCH: always-on rules heavy — keep only ppe-operator-core + ppe-desktop-vm-layout.")
+        recs.append("WATCH: always-on rules heavy — keep only auto-ship + ppe-roles + ppe-operator.")
     if data["starter_over_escalate_count"]:
         recs.append(
             f"ESCALATE: {data['starter_over_escalate_count']} starter(s) >{STARTER_LINE_ESCALATE} lines — regenerate."

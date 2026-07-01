@@ -1,0 +1,33 @@
+---
+description: PPE adaptive burst — preflight sizing + director subagents (on-demand).
+alwaysApply: false
+---
+
+# PPE burst mode (adaptive)
+
+**Canon:** [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](../../docs/SOP/WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · [`ppe-operator.mdc`](ppe-operator.mdc)
+
+Operator `what's next?` runs burst per `BURST_PLAN.json` until cap or stop. Charter/explore/neutral: [`ppe-roles.mdc`](ppe-roles.mdc).
+
+## Start
+
+```bat
+python scripts/ppe_burst_plan.py --write --json
+```
+
+| Verdict | Burst path |
+|---------|------------|
+| `IDE_BUILD` · `RUN_LOCAL` | `@ppe-director` → build/finish workers only |
+| `FIX_PLAN` · `STALE_STATE` · `ERROR` | `@ppe-director` → one triage worker max |
+| `RUN_AUTO` · `SUPPLY_LOW` | No burst |
+
+## Stop when
+
+- `workers_run >= max_cycles` or ESCALATE band
+- Verdict `RUN_AUTO` or same stuck verdict twice
+- Desktop relay guard blocks VM-only cmds
+
+## Forbidden
+
+- Implementing `IDE_BUILD` in the operator thread during burst
+- `run_ppe_auto_local_loop.cmd` on desktop

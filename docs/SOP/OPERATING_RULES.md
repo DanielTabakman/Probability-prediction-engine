@@ -261,7 +261,7 @@ Steward/agent may interpret meaning after listing facts, but should not hand-aut
 
 ## Git
 
-**Default:** follow [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc) and [`COMMIT_POLICY.md`](COMMIT_POLICY.md)—when the task is done and the gate passes, **commit, push, and open a PR** on feature branches without asking.
+**Default:** follow [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc) and [`COMMIT_POLICY.md`](COMMIT_POLICY.md)—when the task is done and the gate passes, **commit, push, and open a PR** on feature branches without asking.
 
 **Hold only when:** exploration/review with no implementation, explicit “don’t commit”, unchartered recovery, or direct `main` push when PR-only delivery applies.
 
