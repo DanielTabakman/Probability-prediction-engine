@@ -183,6 +183,32 @@ def main(argv: list[str] | None = None) -> int:
         if remaining:
             print(f"post_relay_continue: queue health {len(remaining)} issue(s): {remaining}")
         try:
+            closeout_hk = find_closeout_for_slice(plan, slice_id) or {}
+            chapter_id_hk = str(closeout_hk.get("chapterId") or slice_id).strip()
+            try:
+                plan_rel_close = str(args.phase_plan.resolve().relative_to(repo)).replace("\\", "/")
+            except ValueError:
+                plan_rel_close = queue_plan
+            from scripts.ppe_between_chapter_housekeeping import (
+                is_housekeeping_chapter,
+                note_housekeeping_completed,
+                schedule_after_product_closeout,
+            )
+
+            if is_housekeeping_chapter(chapter_id=chapter_id_hk, plan_path=plan_rel_close):
+                hk_out = note_housekeeping_completed(repo, apply=True)
+                print(f"post_relay_continue: housekeeping completed {json.dumps(hk_out)}")
+            else:
+                hk_out = schedule_after_product_closeout(
+                    repo,
+                    closed_chapter_id=chapter_id_hk,
+                    closed_plan_path=plan_rel_close,
+                    apply=True,
+                )
+                print(f"post_relay_continue: between-chapter housekeeping {json.dumps(hk_out)}")
+        except Exception as exc:
+            print(f"post_relay_continue: between-chapter housekeeping skipped: {exc}")
+        try:
             from scripts.ppe_propagate_queue import (
                 maybe_propagate_queue,
                 promote_first_blocked_with_plan,

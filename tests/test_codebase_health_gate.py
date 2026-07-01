@@ -38,6 +38,26 @@ class TestEvaluateCodebaseHealthReport(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertTrue(any("unresolved" in w for w in warnings))
 
+    def test_structural_warnings_are_logged(self) -> None:
+        errors, warnings = evaluate_codebase_health_report(
+            {
+                "canonical_docs_present": {},
+                "known_unresolved_items": [],
+                "tree_cleanliness": {},
+                "structural_health": {
+                    "warnings": [
+                        {
+                            "id": "app-py-monolith",
+                            "severity": "watch",
+                            "message": "app.py too large",
+                        }
+                    ]
+                },
+            }
+        )
+        self.assertEqual(errors, [])
+        self.assertTrue(any("structural_health" in w for w in warnings))
+
 
 class TestEvaluateConsistencyReport(unittest.TestCase):
     def test_error_findings_fail(self) -> None:

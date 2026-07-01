@@ -70,6 +70,9 @@ def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
     except (FileNotFoundError, json.JSONDecodeError, OSError):
         return False
     closeout = _closeout_meta(plan)
+    recurring = closeout.get("recurring")
+    if recurring is True or str(recurring or "").strip().lower() in ("1", "true", "yes", "on"):
+        return False
     evidence_rel = str(closeout.get("evidenceDoc") or "").strip()
     if not evidence_rel:
         return False

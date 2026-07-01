@@ -92,6 +92,13 @@
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md"
     },
     {
+      "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
+      "status": "skipped",
+      "reason": "Recurring between-chapter hygiene \u2014 auto-scheduled sideChannel",
+      "workerMode": "deterministic",
+      "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
+    },
+    {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json",
       "status": "done",
       "reason": "Chart + belief + Polymarket probability method labeling \u2014 next MVP1 priority after MSOS P4",

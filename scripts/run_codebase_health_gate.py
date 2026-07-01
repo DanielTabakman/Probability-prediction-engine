@@ -84,6 +84,18 @@ def evaluate_codebase_health_report(report: dict[str, Any]) -> tuple[list[str], 
         if count:
             warnings.append(f"codebase_health: {count} tracked {label} file(s)")
 
+    structural = report.get("structural_health") or {}
+    for item in structural.get("warnings") or []:
+        if not isinstance(item, dict):
+            continue
+        severity = str(item.get("severity") or "info")
+        message = str(item.get("message") or item.get("id") or "structural warning")
+        line = f"structural_health: [{severity}] {message}"
+        if severity == "escalate":
+            errors.append(line)
+        else:
+            warnings.append(line)
+
     return errors, warnings
 
 

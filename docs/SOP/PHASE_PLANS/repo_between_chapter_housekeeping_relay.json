@@ -1,0 +1,48 @@
+{
+  "name": "Repo between-chapter housekeeping",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+  "selectionRecord": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+  "slices": [
+    {
+      "sliceId": "BetweenChapterHousekeeping-Evidence-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 20,
+      "hardMinutes": 45,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "BetweenChapterHousekeeping-Witness-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "BetweenChapterHousekeeping-Closeout-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+      "declaredPlane": "CONTROL-PLANE",
+      "susMinutes": 10,
+      "hardMinutes": 20,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "repo_between_chapter_housekeeping",
+        "chapterTitle": "Repo between-chapter housekeeping",
+        "chapterStatus": "COMPLETE",
+        "recurring": true,
+        "evidenceDoc": "docs/SOP/REPO_BETWEEN_CHAPTER_HOUSEKEEPING_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+        "nextSelectionDoc": "docs/SOP/MVP1_FRONTIER.md",
+        "carryDocs": [
+          "docs/SOP/REPO_BETWEEN_CHAPTER_HOUSEKEEPING_EVIDENCE_STATUS.md"
+        ]
+      }
+    }
+  ]
+}

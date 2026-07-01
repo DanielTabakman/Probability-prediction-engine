@@ -720,6 +720,19 @@
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE2_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 2",
       "reason": "[LOW BLOCKED] Tier-2 ~100 batch \u2014 deferred until wave 1 evidence COMPLETE (\u226520 enabled)"
+    },
+    {
+      "chapterId": "repo_between_chapter_housekeeping",
+      "status": "blocked",
+      "priority": "low",
+      "workerMode": "deterministic",
+      "sideChannel": true,
+      "betweenChapterHousekeeping": true,
+      "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
+      "chapterTitle": "Repo between-chapter housekeeping",
+      "selectionRecord": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
+      "canonRef": "docs/SOP/REPO_LAYER_MAP_V1.md \u2014 dev-factory hygiene",
+      "reason": "[LOW] Auto-scheduled after each product chapter closeout; sideChannel when idle"
     }
   ]
 }

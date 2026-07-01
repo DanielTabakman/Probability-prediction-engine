@@ -327,6 +327,60 @@ def scan_workflow_friction(repo: Path, week_monday: date) -> tuple[list[RadarCan
     return candidates, signals
 
 
+def scan_structural_health(repo: Path) -> tuple[list[RadarCandidate], dict[str, int]]:
+    signals: dict[str, int] = {}
+    candidates: list[RadarCandidate] = []
+
+    block: dict[str, Any] | None = None
+    health_root = repo / "artifacts" / "health"
+    if health_root.is_dir():
+        reports = sorted(
+            health_root.glob("*/codebase_health_report.json"),
+            key=lambda p: p.parent.name,
+        )
+        if reports:
+            try:
+                raw = json.loads(reports[-1].read_text(encoding="utf-8-sig"))
+                block = raw.get("structural_health") if isinstance(raw, dict) else None
+            except (json.JSONDecodeError, OSError):
+                block = None
+
+    if not block:
+        try:
+            from scripts.ppe_structural_health import structural_health_block
+
+            block = structural_health_block(repo)
+        except Exception:
+            return candidates, signals
+
+    warnings = block.get("warnings") or []
+    if warnings:
+        signals["structural_health"] = len(warnings)
+
+    for item in warnings:
+        if not isinstance(item, dict):
+            continue
+        severity_raw = str(item.get("severity") or "info")
+        severity: Severity = "watch" if severity_raw == "watch" else "info"
+        if severity_raw == "escalate":
+            severity = "escalate"
+        candidates.append(
+            RadarCandidate(
+                id=str(item.get("id") or "structural"),
+                severity=severity,
+                title=str(item.get("message") or "Structural health warning"),
+                evidence=[
+                    f"{item.get('metric')}={item.get('value')} (threshold {item.get('threshold')})"
+                ],
+                suggested_action=(
+                    "Review repo layer map; charter between-chapter housekeeping if overdue."
+                ),
+            )
+        )
+
+    return candidates, signals
+
+
 def scan_orphans(repo: Path) -> list[OrphanFinding]:
     findings: list[OrphanFinding] = []
     repo = repo.resolve()
@@ -609,6 +663,9 @@ def build_radar_report(
 ) -> RadarReport:
     repo = repo.resolve()
     candidates, signals = scan_workflow_friction(repo, week_monday)
+    struct_candidates, struct_signals = scan_structural_health(repo)
+    candidates.extend(struct_candidates)
+    signals.update(struct_signals)
     orphans = scan_orphans(repo)
 
     orphan_stale_count = sum(1 for o in orphans if o.auto_cleanable)
