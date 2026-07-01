@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
+  buildTourReturnPath,
   markPlatformTutorialComplete,
+  platformTourFeedbackHref,
   PLATFORM_TUTORIAL_STEPS,
   type PlatformTutorialStep,
 } from "@/lib/platformTutorial";
@@ -13,7 +16,6 @@ type PlatformTutorialProps = {
   active: boolean;
   onClose: () => void;
   steps?: PlatformTutorialStep[];
-  completeHref?: string;
 };
 
 type ViewportRect = {
@@ -136,13 +138,52 @@ function TutorialCard({
   );
 }
 
+function FeedbackPromptCard({
+  onShare,
+  onDecline,
+}: {
+  onShare: () => void;
+  onDecline: () => void;
+}) {
+  return (
+    <div
+      className="platform-tutorial-card platform-tutorial-prompt"
+      role="dialog"
+      aria-labelledby="tutorial-feedback-prompt-title"
+    >
+      <div className="platform-tutorial-kicker">Tour complete</div>
+      <h3 id="tutorial-feedback-prompt-title">Share quick feedback?</h3>
+      <p>
+        Totally optional — even one line helps us improve. You can skip and keep exploring where
+        you left off.
+      </p>
+      <div className="platform-tutorial-actions">
+        <button type="button" className="btn slim" onClick={onDecline}>
+          No thanks — keep exploring
+        </button>
+        <button type="button" className="btn slim primary" onClick={onShare}>
+          Share feedback
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function PlatformTutorial({
   active,
   onClose,
   steps = PLATFORM_TUTORIAL_STEPS,
-  completeHref,
 }: PlatformTutorialProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnPath = useMemo(
+    () => buildTourReturnPath(pathname, searchParams),
+    [pathname, searchParams],
+  );
+
   const [stepIndex, setStepIndex] = useState(0);
+  const [feedbackPromptOpen, setFeedbackPromptOpen] = useState(false);
   const [anchor, setAnchor] = useState<ViewportRect | null>(null);
   const [placement, setPlacement] = useState<CardPlacement>({
     top: VIEWPORT_PADDING + 80,
@@ -154,7 +195,7 @@ export function PlatformTutorial({
   const step = steps[stepIndex];
 
   const refreshLayout = useCallback(() => {
-    if (!step) return;
+    if (!step || feedbackPromptOpen) return;
     const nextAnchor = measureAnchorViewport(step.anchor);
     setAnchor(nextAnchor);
 
@@ -162,14 +203,14 @@ export function PlatformTutorial({
     const cardHeight = cardNode?.offsetHeight ?? CARD_FALLBACK_HEIGHT;
     const cardWidth = cardNode?.offsetWidth ?? CARD_MAX_WIDTH;
     setPlacement(computeCardPlacement(nextAnchor, cardHeight, cardWidth));
-  }, [step]);
+  }, [feedbackPromptOpen, step]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useLayoutEffect(() => {
-    if (!active || !step) return;
+    if (!active || !step || feedbackPromptOpen) return;
     scrollAnchorIntoView(step.anchor);
     refreshLayout();
     const afterScroll = window.setTimeout(refreshLayout, 350);
@@ -178,11 +219,12 @@ export function PlatformTutorial({
       window.clearTimeout(afterScroll);
       window.clearTimeout(afterScrollLong);
     };
-  }, [active, stepIndex, step, refreshLayout]);
+  }, [active, feedbackPromptOpen, stepIndex, step, refreshLayout]);
 
   useEffect(() => {
     if (!active) {
       setStepIndex(0);
+      setFeedbackPromptOpen(false);
       return;
     }
     refreshLayout();
@@ -193,25 +235,50 @@ export function PlatformTutorial({
       window.removeEventListener("resize", onViewportChange);
       window.removeEventListener("scroll", onViewportChange, true);
     };
-  }, [active, stepIndex, refreshLayout]);
+  }, [active, feedbackPromptOpen, stepIndex, refreshLayout]);
 
-  const finish = useCallback(() => {
+  const dismissTour = useCallback(() => {
     markPlatformTutorialComplete();
     onClose();
-    if (completeHref && typeof window !== "undefined") {
-      window.location.assign(completeHref);
-    }
-  }, [completeHref, onClose]);
+  }, [onClose]);
+
+  const handleSkipTour = useCallback(() => {
+    dismissTour();
+  }, [dismissTour]);
 
   const handleNext = useCallback(() => {
     if (stepIndex + 1 >= steps.length) {
-      finish();
+      setFeedbackPromptOpen(true);
+      setAnchor(null);
       return;
     }
     setStepIndex((value) => value + 1);
-  }, [finish, stepIndex, steps.length]);
+  }, [stepIndex, steps.length]);
 
-  if (!active || !mounted || !step) {
+  const handleShareFeedback = useCallback(() => {
+    dismissTour();
+    router.push(platformTourFeedbackHref(returnPath));
+  }, [dismissTour, returnPath, router]);
+
+  const handleDeclineFeedback = useCallback(() => {
+    dismissTour();
+  }, [dismissTour]);
+
+  if (!active || !mounted) {
+    return null;
+  }
+
+  if (feedbackPromptOpen) {
+    return createPortal(
+      <div className="platform-tutorial-root" aria-live="polite">
+        <div className="platform-tutorial-scrim platform-tutorial-scrim-blocking" aria-hidden="true" />
+        <FeedbackPromptCard onShare={handleShareFeedback} onDecline={handleDeclineFeedback} />
+      </div>,
+      document.body,
+    );
+  }
+
+  if (!step) {
     return null;
   }
 
@@ -237,7 +304,7 @@ export function PlatformTutorial({
         cardRef={cardRef}
         onBack={() => setStepIndex((value) => Math.max(0, value - 1))}
         onNext={handleNext}
-        onSkip={finish}
+        onSkip={handleSkipTour}
       />
     </div>,
     document.body,

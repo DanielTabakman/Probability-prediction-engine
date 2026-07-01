@@ -578,6 +578,38 @@ button.btn:focus-visible {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.platform-tutorial-prompt {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: auto;
+  width: min(360px, calc(100vw - 32px));
+}
+
+.platform-tutorial-scrim-blocking {
+  pointer-events: auto;
+}
+
+.feedback-tour-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+}
+
+.feedback-tour-banner p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  flex: 1 1 220px;
 }
 
 .chips {
