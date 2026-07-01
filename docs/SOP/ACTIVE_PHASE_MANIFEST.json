@@ -1,6 +1,6 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
   "status": "RUNNING",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
