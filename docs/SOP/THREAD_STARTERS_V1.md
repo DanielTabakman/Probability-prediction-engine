@@ -104,6 +104,21 @@ Run what's next; do not restart VM loop unless STACK_DOWN.
 
 ---
 
+## VM Remote-SSH (loop debugging — no desktop SSH)
+
+Use when the VM loop is stuck or you need `fix_vm_operator` / log tails.
+
+```text
+Operator thread on VM via Remote-SSH (ppe-vm).
+THREAD_ROLE: operator.
+Connected to loop host — run ppe_autobuilder.cmd status --brief; fix_vm_operator.cmd if needed.
+Load @docs/SOP/PPE_CURSOR_REMOTE_SSH_V1.md
+```
+
+One-time desktop setup: `powershell -ExecutionPolicy Bypass -File scripts\setup_ppe_vm_cursor_ssh.ps1`
+
+---
+
 ## Switching roles mid-thread
 
 | Phrase | Effect |

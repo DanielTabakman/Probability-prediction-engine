@@ -31,7 +31,10 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 - **Never** SSH + `findstr`/`type` on `PHASE_QUEUE.json`, `ACTIVE_PHASE_MANIFEST.json`, or backlog — read those files **locally** from git.
 - **Never** parallel SSH sessions to the VM.
 - Prefer `docs/SOP/VM_OPERATOR_PHASE.json` (git mirror) + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
-- Hard timeout: 120s — if SSH hangs, trust mirror/cache and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
+- Hard timeout: 120s — if SSH hangs, trust mirror and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
+- **Thread timebox:** if status shows **Thread timebox** (~10m same verdict) → rotate operator thread.
+- **Branch preflight BLOCKS relay** → stash/checkout `main` first; never `DESKTOP_CONTINUE` on `product/*` or dirty `src/`.
+- **VM debugging:** Remote-SSH `ppe-vm` thread per [`THREAD_STARTERS_V1.md`](docs/SOP/THREAD_STARTERS_V1.md).
 
 | Verdict | Action |
 |---------|--------|
