@@ -2,8 +2,37 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-01
+
+- `fb2d9d51` — control-plane: multi-agent leases + no-commit-questions policy (#1058) (`docs/SOP/`)
+- `5f228fb7` — control-plane: multi-agent worker leases, lanes, and cost routing (#1057) (`docs/SOP/`)
+- `afe51d46` — control-plane: operator doctor, mirror CI fast path, closeout preflight (#1056) (`scripts/`)
+- `2b2d929a` — fix(control-plane): harden DESKTOP_CONTINUE VM git handoff (#1054) (`scripts/`)
+- `7fe91e4b` — MSOS platform tutorial v2: play gates, tour modes, spine steps (#1053) (`apps/msos-web/`)
+- `88626734` — control-plane: operator blind spots, mirror PR automerge, stuck ntfy (#1052) (`scripts/`)
+- `d5c21d70` — control-plane: VM mirror publish, operator preflight, SSH hardening (#1049) (`scripts/`)
+- `0ae852e8` — control-plane: auto-schedule between-chapter housekeeping and structural health (#1048) (`scripts/`)
+- `4fa2f0fa` — ops(relay): harden RUN_LOCAL closeout handoff and VM loop-host env (#1044) (`scripts/`)
+- `165f41fd` — Exposure menu: scan sections, fit lenses, compare, universe bindings (#1043) (`apps/msos-web/`)
+- `96597400` — Charter Hyperliquid HYPE perp rail as P2 exposure-menu side channel. (#1042) (`docs/SOP/`)
+- `6bec7110` — Registry-driven asset pickers + tracking hub v4 (#1041) (`apps/msos-web/`)
+- `fa0a4a6e` — control-plane: tracking hub v4 — in-house rollup, telemetry, VPS hooks (#1040) (`scripts/`)
+- `655fdbc5` — control-plane: delegation envelope v2 wiring (#1039) (`docs/SOP/`)
+
 ## 2026-06-30
 
+- `5421c7b2` — ops: vm phase mirror BUILD IN FLIGHT (#1060) (`docs/SOP/`)
+- `95330d96` — control-plane: tracking hub v3 — session_start, digest enrichments, scheduled pull, sheet export (#1038) (`scripts/`)
+- `33ef7f71` — product: asset batch wave 1 batch 1 — SPY QQQ IWM (clean) (#1037) (`docs/SOP/`)
+- `10c69197` — ops: loop publish ops/loop-publish-20260630234225-c8f92134 (#1035)
+- `da753030` — ops: loop publish ops/loop-publish-20260630234231-c8f92134 (#1036) (`docs/SOP/`)
+- `1c473a68` — ops(control): clear stale Codex CLI quota in build worker reset (#1034) (`scripts/`)
+- `2aa9bcdd` — control-plane: tracking follow-ups — usage events, Monday pulse, VPS pull (#1033) (`scripts/`)
+- `6fbc8e03` — feat(msos-shell): public feedback, async validation, copy gate (#1032) (`apps/msos-web/`)
+- `5b66e934` — ops(control): slim always-on Cursor rules + Codex headless BUILD (#1031)
+- `6b460d95` — control-plane: relay disclosure + slim always-on rules (#1030) (`docs/SOP/`)
+- `a8fe4ab6` — control-plane: agent policy followups (witness, commit, closeout, discovery) (#1028) (`docs/SOP/`)
+- `6135c395` — Control-plane: dev changelog
 - feat(msos): forward consistency dashboard (MSOS-FCR-Product-Slice002) (#1027) (`apps/msos-web/`)
 - `68d2e66` — control-plane: tighten PPE thread roles (always-on + ship boundaries) (#1026) (`docs/SOP/`)
 - `00c9230` — fix(control-plane): mode-aware operator commands and relay guards (#1025) (`docs/SOP/`)
