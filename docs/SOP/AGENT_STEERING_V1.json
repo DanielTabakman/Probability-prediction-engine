@@ -1,16 +1,35 @@
 {
-  "version": 1,
   "asOf": "2026-06-30",
   "closeoutOnlyChapterIds": [
     "msos_storyboard_visual_parity_v1",
     "msos_strategy_lab_dist_download_v1",
     "msos_trader_review_loop_v1"
   ],
+  "docHints": {
+    "nextBuildCandidate": {
+      "chapter_id": "msos_trader_workflow_horizon_nav_v1",
+      "load_always": [
+        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+        "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md",
+        "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md"
+      ],
+      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "resolve_cmd": "python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json"
+    }
+  },
   "nextBuildCandidateId": "msos_trader_workflow_horizon_nav_v1",
   "nextBuildCandidateNote": "promote READY in PHASE_QUEUE.json",
+  "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
   "spineQueueAfterCloseout": [
     "msos_cross_venue_strategy_lab_v1",
     "mvp1_distribution_timeseries_collector_v1"
   ],
-  "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+  "version": 1
 }

@@ -8,6 +8,17 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter) | this file |
+| UX dispatch queue | [`UX_EXECUTION_BACKLOG_V1.md`](UX_EXECUTION_BACKLOG_V1.md) |
+| Milestone | [`MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md`](MILESTONE_TRADER_WORKFLOW_INTEGRATION_V1.md) |
+| Resolve chapter | `python scripts/resolve_sop.py --topic "trader learning spine" --json` |
+
+---
+
 ## What the spine is (one sentence)
 
 **Save what you thought, come back after expiry, say if you were right, see your track record.**

@@ -54,8 +54,23 @@ When product code for a relay chapter is already on `main`:
 |------|----------------|
 | Operator status | `ppe_operator_blind_spots` → `chapter_coordination` issues |
 | Pushable gate | Warns after tier pass when changed paths touch coordination-sensitive files |
+| Burst plan | `ppe_coordination_check.py` → `artifacts/control_plane/COORDINATION_CHECK.json`; blocks burst on `recovery`/`park` |
 | Manual audit | `python scripts/ppe_chapter_coordination.py` |
+| Agent synthesizer | `@ppe-coordination-check` — read-only; runs audits + routes repair/recovery |
 | Safe repair | `python scripts/ppe_chapter_coordination.py --repair --plan <relay.json>` |
+
+### Coordination check verdicts
+
+| Verdict | Meaning | Burst |
+|---------|---------|-------|
+| `proceed` | Layers aligned enough for relay | Allowed |
+| `repair` | Safe auto-repair available (markers/registry) | Allowed after repair |
+| `recovery` | Mixed-plane or branch blocks relay | Blocked — run recovery first |
+| `park` | Human-only or frontier/evidence mismatch | Blocked — manual alignment |
+
+```bat
+python scripts/ppe_coordination_check.py --write --json
+```
 
 ### Coordination-sensitive changes (gate warns)
 

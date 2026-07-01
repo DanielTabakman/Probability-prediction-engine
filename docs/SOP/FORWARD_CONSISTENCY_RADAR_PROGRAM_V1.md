@@ -10,6 +10,17 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter) | this file |
+| SELECTION ch.1 | [`POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md`](POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md) |
+| SELECTION ch.2 | [`POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md`](POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md) |
+| Resolve | `python scripts/resolve_sop.py --module forward_consistency --json` |
+
+---
+
 ## North star
 
 **Show which enabled asset/expiry pairs have internally consistent executable forwards, which look wrong, and whether wrongness is bad data or a persistent dislocation — without execution language.**

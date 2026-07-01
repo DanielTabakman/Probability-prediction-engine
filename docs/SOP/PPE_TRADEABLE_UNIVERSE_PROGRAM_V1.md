@@ -8,6 +8,18 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter) | this file |
+| Parent meta infra | [`PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md`](PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md) |
+| Batch operator policy | [`ASSET_BATCH_EXPANSION_POLICY_V1.md`](ASSET_BATCH_EXPANSION_POLICY_V1.md) |
+| Asset discovery CLI | `python scripts/discover_asset_data_source.py --asset <ID> --json` |
+| Resolve chapter | `python scripts/resolve_sop.py --chapter <chapter_id> --json` |
+
+---
+
 ## North star
 
 **Every major liquid options name a trader expects is one click away in Strategy Lab** — with honest trust labels when chains are thin — and adding the next name is **registry row + witness**, not a cross-layer rewrite.

@@ -12,7 +12,7 @@ Every operator handoff (`what's next?`, `ppe_go.cmd`) uses adaptive burst unless
 1. Read `artifacts/control_plane/BURST_PLAN.json` first (written by `ppe_burst_plan.py --write` or `ppe_go.cmd`).
 2. Use `max_cycles` from the plan — **not** a fixed 3.
 3. After each worker: re-read `OPERATOR_STATUS.md`; if still `IDE_BUILD` or `RUN_LOCAL` and `workers_run < max_cycles` → spawn next worker.
-4. **Workers only:** `ppe-build-worker` (IDE_BUILD), `ppe-finish-worker` (RUN_LOCAL), `ppe-triage-worker` (triage verdicts, max 1). Never implement product code in this thread.
+4. **Workers only:** `ppe-build-worker` (IDE_BUILD), `ppe-finish-worker` (RUN_LOCAL), `ppe-triage-worker` (triage verdicts, max 1), `ppe-coordination-check` (when `BURST_PLAN.direct_action == coordination_check` or `COORDINATION_CHECK.blocks_burst`). Never implement product code in this thread.
 5. Stop when cap reached, `RUN_AUTO`/`SUPPLY_LOW`, stuck verdict, or runtime WATCH per [`.cursor/rules/ppe-burst-mode.mdc`](../rules/ppe-burst-mode.mdc).
 6. On stop: summarize; `context_window_closeout.cmd --record` if product work shipped.
 
@@ -22,6 +22,15 @@ Every operator handoff (`what's next?`, `ppe_go.cmd`) uses adaptive burst unless
 
 - Terminal should already be running: `run_ppe_auto_local_loop.cmd`
 - If unsure, tell the operator to start it; do not substitute by running the loop yourself.
+
+## Coordination gate (before BUILD burst)
+
+When `artifacts/control_plane/BURST_PLAN.json` has `direct_action: coordination_check` or `coordination_check.blocks_burst`:
+
+1. Spawn **ppe-coordination-check** (max 1 per burst).
+2. If coordination returns `repair`, allow safe `--repair` then re-check.
+3. If `recovery`, run branch recovery — do not spawn build worker until `proceed`.
+4. Re-read `COORDINATION_CHECK.json` and refresh burst plan before next worker.
 
 ## Every turn (minimal reads)
 

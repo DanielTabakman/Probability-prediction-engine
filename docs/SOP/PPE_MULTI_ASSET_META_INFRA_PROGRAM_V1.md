@@ -8,6 +8,17 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter) | this file |
+| Parent program | [`PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md`](PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md) |
+| Batch policy | [`ASSET_BATCH_EXPANSION_POLICY_V1.md`](ASSET_BATCH_EXPANSION_POLICY_V1.md) |
+| Resolve chapter | `python scripts/resolve_sop.py --chapter <chapter_id> --json` |
+
+---
+
 ## Problem
 
 Universe v1 (`catalog.json`, registry v2, dynamic picker) proves **one** asset path. Scaling to ~25 enabled names fails without meta layers for:

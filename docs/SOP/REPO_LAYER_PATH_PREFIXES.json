@@ -413,6 +413,10 @@
         "tests/test_run_research_daily.py",
         "tests/test_validate_research_pipeline_registry.py",
         "tests/test_run_cross_venue_backtest.py",
+        "tests/test_resolve_sop.py",
+        "tests/test_validate_sop_links.py",
+        "tests/test_ppe_ide_build_starter_doc_resolve.py",
+        "generate_chapter_doc_index.cmd",
         ".cursor/rules/",
         ".cursor/hooks.json",
         ".cursor/USER_RULES_GIT_SNIPPET.md",
@@ -587,6 +591,7 @@
       "typical_plane": "CONTROL-PLANE",
       "allowed_paths": [
         "docs/VISION/",
+        "docs/README.md",
         "docs/PRODUCT_THESIS.md",
         "docs/PLAN.md",
         "docs/SEMANTIC_CONTRACTS.md",
