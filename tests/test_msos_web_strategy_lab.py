@@ -609,6 +609,7 @@ def test_exposure_menu_route_and_shell() -> None:
     assert "ExposureMenuClient" in text
     assert 'activeNavId="exposure"' in text
     assert "fetchExposureMenu" in text
+    assert "fetchAssetCatalogServer" in text
     assert "searchParams: Promise" in text
 
 
@@ -621,12 +622,18 @@ def test_exposure_menu_boundary_proxy_no_ts_math() -> None:
     assert "fetchExposureMenuClient" in lib
     assert "isExposureMenuPayload" in lib
     assert "buildExposureMenuFetchUrl" in lib
+    assert "EXPOSURE_PROOF_ASSETS" not in lib
+    assert "LabAssetPicker" in client
     assert "path_not_recommendation" not in client
     assert "Math." not in lib
     assert "Math." not in client
     assert "Math." not in card
     assert "fetchExposureMenuClient" in client
     assert "exposure-path-grid" in client
+    assert "exposure-menu-section" in client
+    assert "ExposureCompareDrawer" in client
+    assert "fit is not a recommendation" in client.lower()
+    assert "FIT_LENS_CATALOG" in lib
     assert "not trade recommendations" in client.lower() or "comparison only" in client.lower()
 
 
@@ -659,4 +666,5 @@ def test_exposure_menu_secondary_nav() -> None:
     styles = (MSOS_WEB / "src" / "app" / "globals.css").read_text(encoding="utf-8")
     assert ".exposure-path-grid" in styles
     assert ".exposure-menu-work" in styles
+    assert ".exposure-compare-drawer" in styles
 

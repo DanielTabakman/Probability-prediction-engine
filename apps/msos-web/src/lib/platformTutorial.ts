@@ -5,6 +5,9 @@ import { LAB_ASSET_QUERY_PARAM } from "@/lib/ppeDisplayPayload";
 export const PLATFORM_TUTORIAL_STORAGE_KEY = "msos.platform.tutorial.completed.v1";
 export const PLATFORM_TUTORIAL_QUERY = "tutorial";
 export const PLATFORM_TUTORIAL_BEGINNER_QUERY = "beginner";
+export const PLATFORM_TUTORIAL_FEEDBACK_FROM_QUERY = "from";
+export const PLATFORM_TUTORIAL_FEEDBACK_FROM_TOUR = "tour";
+export const PLATFORM_TUTORIAL_RETURN_TO_QUERY = "returnTo";
 
 /** Guided tour always starts on a crypto lab asset (never last session stock pick). */
 export const PLATFORM_TOUR_DEFAULT_ASSET = "BTC";
@@ -143,6 +146,41 @@ export function resolveTutorialBeginnerMode(searchParams: URLSearchParams): bool
 /** Strategy Lab entry — first visit auto-opens tour via localStorage. */
 export function strategyLabTutorialHref(): string {
   return "/strategy-lab";
+}
+
+function isSafeReturnPath(path: string): boolean {
+  return path.startsWith("/") && !path.startsWith("//");
+}
+
+/** Post-tour feedback — optional; includes return path so skip brings user back. */
+export function platformTourFeedbackHref(returnTo?: string): string {
+  const params = new URLSearchParams();
+  params.set(PLATFORM_TUTORIAL_FEEDBACK_FROM_QUERY, PLATFORM_TUTORIAL_FEEDBACK_FROM_TOUR);
+  if (returnTo && isSafeReturnPath(returnTo)) {
+    params.set(PLATFORM_TUTORIAL_RETURN_TO_QUERY, returnTo);
+  }
+  return `/feedback?${params.toString()}`;
+}
+
+export function isTourFeedbackEntry(searchParams: URLSearchParams): boolean {
+  return searchParams.get(PLATFORM_TUTORIAL_FEEDBACK_FROM_QUERY) === PLATFORM_TUTORIAL_FEEDBACK_FROM_TOUR;
+}
+
+export function resolveTourFeedbackReturnTo(
+  searchParams: URLSearchParams,
+  fallback = "/strategy-lab",
+): string {
+  const raw = searchParams.get(PLATFORM_TUTORIAL_RETURN_TO_QUERY)?.trim();
+  if (raw && isSafeReturnPath(raw)) {
+    return raw;
+  }
+  return fallback;
+}
+
+export function buildTourReturnPath(pathname: string, searchParams: URLSearchParams): string {
+  const next = stripTutorialSearchParams(searchParams);
+  const qs = next.toString();
+  return qs ? `${pathname}?${qs}` : pathname;
 }
 
 /** Force guided tour (homepage CTAs, restart). */

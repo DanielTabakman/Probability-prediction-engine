@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { ExposureMenuClient } from "@/components/ExposureMenuClient";
+import { fetchAssetCatalogServer } from "@/lib/ppeAssetCatalog";
 import {
-  DEFAULT_EXPOSURE_ASSET_ID,
   DEFAULT_EXPOSURE_DIRECTION,
   DEFAULT_EXPOSURE_HORIZON,
   fetchExposureMenu,
@@ -34,10 +34,8 @@ function firstParam(value: string | string[] | undefined): string | undefined {
 
 export default async function ExposurePage({ searchParams }: ExposurePageProps) {
   const params = await searchParams;
-  const assetId = normalizeExposureAssetId(
-    firstParam(params.asset),
-    DEFAULT_EXPOSURE_ASSET_ID,
-  );
+  const catalog = await fetchAssetCatalogServer();
+  const assetId = normalizeExposureAssetId(firstParam(params.asset), catalog);
   const direction = normalizeExposureDirection(
     firstParam(params.direction),
     DEFAULT_EXPOSURE_DIRECTION,

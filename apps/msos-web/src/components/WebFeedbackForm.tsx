@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useState } from "react";
 
 import {
@@ -20,6 +21,8 @@ export type WebFeedbackFormProps = {
   initialReturnIntent?: "Y" | "N" | "";
   initialNotes?: string;
   showProfileField?: boolean;
+  skipHref?: string;
+  skipLabel?: string;
 };
 
 export function WebFeedbackForm({
@@ -30,6 +33,8 @@ export function WebFeedbackForm({
   initialReturnIntent = "",
   initialNotes = "",
   showProfileField,
+  skipHref,
+  skipLabel = "Skip for now",
 }: WebFeedbackFormProps) {
   const [profile, setProfile] = useState(initialProfile);
   const [confusionCategory, setConfusionCategory] = useState<string>(CONFUSION_CATEGORIES[7]);
@@ -83,10 +88,19 @@ export function WebFeedbackForm({
 
   if (state === "sent") {
     return (
-      <p className="feedback-success" role="status">
-        Thanks — your feedback goes straight to the team and helps us improve the demo for new
-        traders.
-      </p>
+      <div className="feedback-form">
+        <p className="feedback-success" role="status">
+          Thanks — your feedback goes straight to the team and helps us improve the demo for new
+          traders.
+        </p>
+        {skipHref ? (
+          <div className="demo-debrief-actions">
+            <Link href={skipHref} className="btn slim primary">
+              {skipLabel}
+            </Link>
+          </div>
+        ) : null}
+      </div>
     );
   }
 
@@ -167,6 +181,11 @@ export function WebFeedbackForm({
       ) : null}
 
       <div className="demo-debrief-actions">
+        {skipHref ? (
+          <Link href={skipHref} className="btn slim">
+            {skipLabel}
+          </Link>
+        ) : null}
         <button
           type="button"
           className="btn slim primary"

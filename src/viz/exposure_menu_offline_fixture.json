@@ -4,11 +4,8 @@
   "direction": "long",
   "horizon": "any",
   "status": "ok",
-  "live_path_count": 4,
-  "recommendation_status": "path_not_recommendation",
-  "footer_copy": "Paths for comparison only — simulation and research support, not trade recommendations.",
-  "spot_usd": 180.0,
-  "proof_asset": true,
+  "live_path_count": 5,
+  "planned_path_count": 1,
   "paths": [
     {
       "path_id": "long_stock",
@@ -21,10 +18,21 @@
       "time_bound": "none",
       "liquidity": "high",
       "trust_badge": "Live",
-      "cost_hint_usd": 18000.0,
-      "pros": ["Simplest path — no theta decay"],
-      "cons": ["Full downside if price falls"],
-      "recommendation_status": "path_not_recommendation"
+      "pros": [
+        "Simplest path — no theta decay",
+        "Full participation in spot moves"
+      ],
+      "cons": [
+        "Full downside if price falls",
+        "More capital per unit of exposure than options"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "spot_equity",
+      "fit_lenses": [
+        "simplest",
+        "liquid"
+      ],
+      "cost_hint_usd": 18000.0
     },
     {
       "path_id": "bull_call_spread_leaps",
@@ -37,11 +45,38 @@
       "time_bound": "dated",
       "liquidity": "medium",
       "trust_badge": "Live",
-      "cost_hint_usd": 420.0,
-      "deep_link": "/strategy-lab?asset=NVDA",
-      "pros": ["Lower cost than naked long call"],
-      "cons": ["Upside capped at short call strike"],
-      "recommendation_status": "path_not_recommendation"
+      "pros": [
+        "Lower cost than naked long call",
+        "Max loss known at entry"
+      ],
+      "cons": [
+        "Upside capped at short call strike",
+        "Still subject to time decay"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "listed_options_defined_risk",
+      "fit_lenses": [
+        "defined_risk",
+        "patient",
+        "liquid",
+        "capital_light"
+      ],
+      "cost_hint_usd": 650.0,
+      "legs": [
+        {
+          "side": "BUY",
+          "instrument": "NVDA Call",
+          "strike": "$180",
+          "tenor": "2027-04-25"
+        },
+        {
+          "side": "SELL",
+          "instrument": "NVDA Call",
+          "strike": "$198",
+          "tenor": "2027-04-25"
+        }
+      ],
+      "deep_link": "/strategy-lab?asset=NVDA"
     },
     {
       "path_id": "long_leaps_call",
@@ -54,26 +89,170 @@
       "time_bound": "dated",
       "liquidity": "medium",
       "trust_badge": "Live",
-      "cost_hint_usd": 525.0,
-      "deep_link": "/strategy-lab?asset=NVDA",
-      "pros": ["Less capital than owning shares for similar upside bias"],
-      "cons": ["Time decay; must be right before expiry"],
-      "recommendation_status": "path_not_recommendation"
+      "pros": [
+        "Less capital than owning shares for similar upside bias",
+        "Defined max loss (premium paid)"
+      ],
+      "cons": [
+        "Time decay; must be right before expiry",
+        "LEAPS chain may be thin — check trust badge"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "listed_options_leaps",
+      "fit_lenses": [
+        "defined_risk",
+        "patient",
+        "liquid"
+      ],
+      "cost_hint_usd": 1250.0,
+      "legs": [
+        {
+          "side": "BUY",
+          "instrument": "NVDA Call",
+          "strike": "$180",
+          "tenor": "2027-04-25"
+        }
+      ],
+      "deep_link": "/strategy-lab?asset=NVDA"
+    },
+    {
+      "path_id": "long_near_dated_call",
+      "instrument_rail": "listed_options",
+      "label": "Long call (3–6 months)",
+      "direction": "long",
+      "headline": "Shorter-dated bullish options",
+      "capital_shape": "Premium at risk",
+      "leverage": "high",
+      "time_bound": "dated",
+      "liquidity": "medium",
+      "trust_badge": "Live",
+      "pros": [
+        "Lower premium than LEAPS",
+        "More leverage per dollar if move is near-term"
+      ],
+      "cons": [
+        "Faster time decay",
+        "Timing risk higher than LEAPS"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "listed_options_aggressive",
+      "fit_lenses": [
+        "upside_leverage",
+        "liquid"
+      ],
+      "cost_hint_usd": 1250.0,
+      "legs": [
+        {
+          "side": "BUY",
+          "instrument": "NVDA Call",
+          "strike": "$180",
+          "tenor": "2026-09-28"
+        }
+      ],
+      "deep_link": "/strategy-lab?asset=NVDA"
+    },
+    {
+      "path_id": "long_otm_call",
+      "instrument_rail": "listed_options",
+      "label": "Long OTM call",
+      "direction": "long",
+      "headline": "High leverage, low probability payoff",
+      "capital_shape": "Small premium; likely total loss if spot stays below strike",
+      "leverage": "high",
+      "time_bound": "dated",
+      "liquidity": "low",
+      "trust_badge": "Live",
+      "pros": [
+        "Low cash outlay for large notional exposure if right"
+      ],
+      "cons": [
+        "Low probability of profit vs ATM structures",
+        "Sensitive to vol and time"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "listed_options_aggressive",
+      "fit_lenses": [
+        "upside_leverage",
+        "capital_light"
+      ],
+      "cost_hint_usd": 600.0,
+      "legs": [
+        {
+          "side": "BUY",
+          "instrument": "NVDA Call",
+          "strike": "$198",
+          "tenor": "2026-09-28"
+        }
+      ],
+      "deep_link": "/strategy-lab?asset=NVDA"
     },
     {
       "path_id": "sector_etf_proxy",
       "instrument_rail": "etf_proxy",
-      "label": "Sector ETF (SMH)",
+      "label": "Sector ETF proxy",
       "direction": "long",
       "headline": "Broader semiconductor exposure — not single-name",
-      "capital_shape": "ETF shares at risk on sector move",
+      "capital_shape": "ETF spot move risk",
       "leverage": "none",
       "time_bound": "none",
       "liquidity": "planned",
       "trust_badge": "Planned",
-      "pros": ["Diversified sector tilt"],
-      "cons": ["Not pure NVDA exposure"],
-      "recommendation_status": "path_not_recommendation"
+      "pros": [
+        "Diversified sector exposure"
+      ],
+      "cons": [
+        "Not pure NVDA beta — includes other holdings",
+        "Not connected in v0 — Planned only"
+      ],
+      "recommendation_status": "path_not_recommendation",
+      "sort_group": "etf_proxy"
     }
-  ]
+  ],
+  "sections": [
+    {
+      "section_key": "spot_equity",
+      "title": "Spot — simplest",
+      "subcopy": "No expiry; full delta on the underlying",
+      "path_ids": [
+        "long_stock"
+      ]
+    },
+    {
+      "section_key": "listed_options_defined_risk",
+      "title": "Defined-risk options",
+      "subcopy": "Premium or net debit caps worst case",
+      "path_ids": [
+        "bull_call_spread_leaps"
+      ]
+    },
+    {
+      "section_key": "listed_options_leaps",
+      "title": "Longer-dated options",
+      "subcopy": "More time; usually higher premium",
+      "path_ids": [
+        "long_leaps_call"
+      ]
+    },
+    {
+      "section_key": "listed_options_aggressive",
+      "title": "Timing-sensitive",
+      "subcopy": "More leverage; faster decay",
+      "path_ids": [
+        "long_near_dated_call",
+        "long_otm_call"
+      ]
+    },
+    {
+      "section_key": "planned_context",
+      "title": "Planned — context only",
+      "subcopy": "Not connected yet; shown for honesty",
+      "path_ids": [
+        "sector_etf_proxy"
+      ]
+    }
+  ],
+  "recommendation_status": "path_not_recommendation",
+  "footer_copy": "Paths for comparison only — simulation and research support, not trade recommendations.",
+  "spot_usd": 180.0,
+  "proof_asset": true
 }

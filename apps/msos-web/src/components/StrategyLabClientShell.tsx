@@ -316,7 +316,6 @@ export function StrategyLabClientShell({ initialPayload }: StrategyLabClientShel
         active={tutorialOpen && tourReady}
         onClose={closeTutorial}
         steps={tutorialSteps}
-        completeHref="/feedback"
       />
 
       <StrategyLabFeedbackStrip />

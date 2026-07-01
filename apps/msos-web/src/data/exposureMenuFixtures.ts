@@ -1,6 +1,6 @@
 /**
  * Sample exposure path cards — honest labels when the display API is offline.
- * Ordering matches engine sort (spot before aggressive options).
+ * Shape mirrors /ppe-display-api/exposure-menu.json (scan/compare v1).
  */
 
 import type { ExposureMenuPayload } from "@/lib/ppeExposureMenu";
@@ -8,17 +8,52 @@ import type { ExposureMenuPayload } from "@/lib/ppeExposureMenu";
 const FOOTER_COPY =
   "Paths for comparison only — simulation and research support, not trade recommendations.";
 
+const NVDA_SECTIONS: ExposureMenuPayload["sections"] = [
+  {
+    section_key: "spot_equity",
+    title: "Spot — simplest",
+    subcopy: "No expiry; full delta on the underlying",
+    path_ids: ["long_stock"],
+  },
+  {
+    section_key: "listed_options_defined_risk",
+    title: "Defined-risk options",
+    subcopy: "Premium or net debit caps worst case",
+    path_ids: ["bull_call_spread_leaps"],
+  },
+  {
+    section_key: "listed_options_leaps",
+    title: "Longer-dated options",
+    subcopy: "More time; usually higher premium",
+    path_ids: ["long_leaps_call"],
+  },
+  {
+    section_key: "listed_options_aggressive",
+    title: "Timing-sensitive",
+    subcopy: "More leverage; faster decay",
+    path_ids: ["long_otm_call"],
+  },
+  {
+    section_key: "planned_context",
+    title: "Planned — context only",
+    subcopy: "Not connected yet; shown for honesty",
+    path_ids: ["sector_etf_proxy"],
+  },
+];
+
 export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
   kind: "exposure_paths",
   asset_id: "NVDA",
   direction: "long",
   horizon: "any",
   status: "ok",
-  live_path_count: 5,
+  live_path_count: 4,
+  planned_path_count: 1,
   recommendation_status: "path_not_recommendation",
   footer_copy: FOOTER_COPY,
   spot_usd: 180,
   proof_asset: true,
+  sections: NVDA_SECTIONS,
   paths: [
     {
       path_id: "long_stock",
@@ -31,6 +66,8 @@ export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
       time_bound: "none",
       liquidity: "high",
       trust_badge: "Live",
+      sort_group: "spot_equity",
+      fit_lenses: ["simplest", "liquid"],
       cost_hint_usd: 18_000,
       pros: ["Simplest path — no theta decay", "Full participation in spot moves"],
       cons: ["Full downside if price falls", "More capital per unit of exposure than options"],
@@ -47,8 +84,14 @@ export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
       time_bound: "dated",
       liquidity: "medium",
       trust_badge: "Live",
+      sort_group: "listed_options_defined_risk",
+      fit_lenses: ["defined_risk", "patient", "liquid", "capital_light"],
       cost_hint_usd: 420,
       deep_link: "/strategy-lab?asset=NVDA",
+      legs: [
+        { side: "BUY", instrument: "NVDA Call", strike: "$180", tenor: "2027-04-25" },
+        { side: "SELL", instrument: "NVDA Call", strike: "$198", tenor: "2027-04-25" },
+      ],
       pros: ["Lower cost than naked long call", "Max loss known at entry"],
       cons: ["Upside capped at short call strike", "Still subject to time decay"],
       recommendation_status: "path_not_recommendation",
@@ -64,6 +107,8 @@ export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
       time_bound: "dated",
       liquidity: "medium",
       trust_badge: "Live",
+      sort_group: "listed_options_leaps",
+      fit_lenses: ["defined_risk", "patient", "liquid"],
       cost_hint_usd: 525,
       deep_link: "/strategy-lab?asset=NVDA",
       pros: ["Less capital than owning shares for similar upside bias", "Defined max loss (premium paid)"],
@@ -81,6 +126,8 @@ export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
       time_bound: "dated",
       liquidity: "medium",
       trust_badge: "Live",
+      sort_group: "listed_options_aggressive",
+      fit_lenses: ["upside_leverage", "capital_light"],
       cost_hint_usd: 250,
       deep_link: "/strategy-lab?asset=NVDA",
       pros: ["Low cash outlay for large notional exposure if right"],
@@ -98,12 +145,40 @@ export const DEMO_EXPOSURE_MENU_NVDA_LONG: ExposureMenuPayload = {
       time_bound: "none",
       liquidity: "planned",
       trust_badge: "Planned",
+      sort_group: "etf_proxy",
       pros: ["Diversified sector exposure"],
       cons: ["Not pure NVDA beta", "No live path math in v0"],
       recommendation_status: "path_not_recommendation",
     },
   ],
 };
+
+const BTC_SECTIONS: ExposureMenuPayload["sections"] = [
+  {
+    section_key: "spot_equity",
+    title: "Spot — simplest",
+    subcopy: "No expiry; full delta on the underlying",
+    path_ids: ["crypto_spot"],
+  },
+  {
+    section_key: "listed_options_defined_risk",
+    title: "Defined-risk options",
+    subcopy: "Premium or net debit caps worst case",
+    path_ids: ["crypto_bull_call_spread"],
+  },
+  {
+    section_key: "listed_options_leaps",
+    title: "Longer-dated options",
+    subcopy: "More time; usually higher premium",
+    path_ids: ["crypto_long_call"],
+  },
+  {
+    section_key: "planned_context",
+    title: "Planned — context only",
+    subcopy: "Not connected yet; shown for honesty",
+    path_ids: ["perp_long"],
+  },
+];
 
 export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
   kind: "exposure_paths",
@@ -112,10 +187,12 @@ export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
   horizon: "any",
   status: "ok",
   live_path_count: 3,
+  planned_path_count: 1,
   recommendation_status: "path_not_recommendation",
   footer_copy: FOOTER_COPY,
   spot_usd: 100_000,
   proof_asset: true,
+  sections: BTC_SECTIONS,
   paths: [
     {
       path_id: "crypto_spot",
@@ -128,6 +205,8 @@ export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
       time_bound: "none",
       liquidity: "high",
       trust_badge: "Live",
+      sort_group: "spot_equity",
+      fit_lenses: ["simplest", "liquid"],
       cost_hint_usd: 10_000,
       pros: ["No expiry or theta", "Full upside participation"],
       cons: ["Full downside on drawdowns", "Capital intensive vs options"],
@@ -144,6 +223,8 @@ export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
       time_bound: "dated",
       liquidity: "medium",
       trust_badge: "Live",
+      sort_group: "listed_options_defined_risk",
+      fit_lenses: ["defined_risk", "liquid", "capital_light"],
       cost_hint_usd: 1_200,
       deep_link: "/strategy-lab?asset=BTC",
       pros: ["Cheaper than naked call", "Max loss known"],
@@ -161,6 +242,8 @@ export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
       time_bound: "dated",
       liquidity: "medium",
       trust_badge: "Live",
+      sort_group: "listed_options_leaps",
+      fit_lenses: ["defined_risk", "liquid"],
       cost_hint_usd: 2_000,
       deep_link: "/strategy-lab?asset=BTC",
       pros: ["Defined max loss in premium", "Less capital than spot for upside bias"],
@@ -178,6 +261,7 @@ export const DEMO_EXPOSURE_MENU_BTC_LONG: ExposureMenuPayload = {
       time_bound: "none",
       liquidity: "planned",
       trust_badge: "Planned",
+      sort_group: "perp",
       pros: ["Capital-efficient directional bet when live"],
       cons: ["Funding and liquidation risk", "No live Hyperliquid rail in v0"],
       recommendation_status: "path_not_recommendation",
@@ -189,13 +273,16 @@ export function demoExposureMenuForAsset(
   assetId: string,
   direction: ExposureMenuPayload["direction"] = "long",
   horizon: ExposureMenuPayload["horizon"] = "any",
+  bucket: "crypto" | "stocks" | null = null,
 ): ExposureMenuPayload {
   const upper = assetId.trim().toUpperCase();
-  const base = upper === "BTC" ? DEMO_EXPOSURE_MENU_BTC_LONG : DEMO_EXPOSURE_MENU_NVDA_LONG;
+  const useCrypto = bucket === "crypto" || (bucket === null && upper === "BTC");
+  const base = useCrypto ? DEMO_EXPOSURE_MENU_BTC_LONG : DEMO_EXPOSURE_MENU_NVDA_LONG;
   return {
     ...base,
-    asset_id: upper === "BTC" ? "BTC" : "NVDA",
+    asset_id: upper,
     direction,
     horizon,
+    proof_asset: false,
   };
 }

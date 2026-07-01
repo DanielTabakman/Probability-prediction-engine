@@ -58,6 +58,24 @@ def _btc_marks() -> dict[str, list[dict[str, Any]]]:
     }
 
 
+def _sol_expiries() -> list[dict[str, Any]]:
+    now = _now_ms()
+    return [
+        {"expiration_timestamp": now + 120 * 86_400_000, "expiry_date_str": "2026-10-28"},
+    ]
+
+
+def _sol_marks() -> dict[str, list[dict[str, Any]]]:
+    return {
+        "calls": [
+            {"strike": 70.0, "mark_btc": 4.5},
+            {"strike": 80.0, "mark_btc": 2.5},
+            {"strike": 82.0, "mark_btc": 2.0},
+        ],
+        "puts": [],
+    }
+
+
 @pytest.fixture
 def nvda_mocks():
     with (
@@ -74,6 +92,16 @@ def btc_mocks():
         patch.object(core_mod, "_fetch_spot", return_value=100_000.0),
         patch.object(core_mod, "_fetch_option_expiries", return_value=_btc_expiries()),
         patch.object(core_mod, "_fetch_marks_for_expiry", return_value=_btc_marks()),
+    ):
+        yield
+
+
+@pytest.fixture
+def sol_mocks():
+    with (
+        patch.object(core_mod, "_fetch_spot", return_value=70.5),
+        patch.object(core_mod, "_fetch_option_expiries", return_value=_sol_expiries()),
+        patch.object(core_mod, "_fetch_marks_for_expiry", return_value=_sol_marks()),
     ):
         yield
 
@@ -107,16 +135,50 @@ def test_btc_long_returns_live_paths(btc_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("BTC", "long")
     assert report["asset_id"] == "BTC"
     assert report["status"] == "ok"
+    assert report["proof_asset"] is True
     live = [p for p in report["paths"] if p["trust_badge"] == "Live"]
     assert len(live) >= 3
     spot = next(p for p in live if p["path_id"] == "crypto_spot")
     assert spot["cost_hint_usd"] == 10_000.0
 
 
+def test_sol_long_returns_live_paths(sol_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("SOL", "long")
+    assert report["asset_id"] == "SOL"
+    assert report["status"] == "ok"
+    assert report["proof_asset"] is True
+    live = [p for p in report["paths"] if p["trust_badge"] == "Live"]
+    assert len(live) >= 3
+    for path in live:
+        if path["instrument_rail"] == "listed_options":
+            assert path.get("deep_link") == "/strategy-lab?asset=SOL"
+
+
 def test_sort_spot_before_aggressive_options(nvda_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("NVDA", "long")
     path_ids = [p["path_id"] for p in report["paths"]]
     assert path_ids.index("long_stock") < path_ids.index("long_otm_call")
+
+
+def test_scan_compare_fields_on_nvda_long(nvda_mocks) -> None:
+    report = cli_mod.run_find_exposure_paths("NVDA", "long")
+    assert report["planned_path_count"] == 1
+    sections = report["sections"]
+    assert len(sections) >= 4
+    assert sections[0]["section_key"] == "spot_equity"
+    assert sections[-1]["section_key"] == "planned_context"
+
+    stock = next(p for p in report["paths"] if p["path_id"] == "long_stock")
+    assert stock["sort_group"] == "spot_equity"
+    assert "simplest" in stock["fit_lenses"]
+    assert "liquid" in stock["fit_lenses"]
+
+    planned = next(p for p in report["paths"] if p["path_id"] == "sector_etf_proxy")
+    assert planned.get("fit_lenses", []) == []
+
+    spread = next(p for p in report["paths"] if p["path_id"] == "bull_call_spread_leaps")
+    assert "defined_risk" in spread["fit_lenses"]
+    assert spread.get("legs")
 
 
 def test_planned_rail_has_planned_badge(nvda_mocks) -> None:

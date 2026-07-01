@@ -5,8 +5,8 @@
 **Class:** `EXPOSURE_PATH` — “What ways exist to get exposure to this asset?”  
 **Pillars:** WORKFLOW (primary) + LEGIBILITY (trust labels per path)  
 **First ship-to:** TRADER  
-**As-of:** 2026-06-29  
-**Status:** CHARTERED — v0 relay not yet SELECTED for BUILD
+**As-of:** 2026-06-30  
+**Status:** v0 **LIVE** — scan/compare follow-on chartered in [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md)
 
 ---
 
@@ -128,10 +128,11 @@ Engine activates paths from catalog + live eligibility (chain depth, horizon, sp
 |---|---------|------|----------|
 | 1 | **`ppe_exposure_menu_v1`** | T0→T2 | Core + CLI + boundary + MSOS page (NVDA + BTC) |
 
-Future (not v0):
+Future (post v0):
 
 | Chapter | Delivers |
 |---------|----------|
+| **`ppe_exposure_menu_scan_v1`** | Sections, fit lenses, two-path compare — [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) |
 | `ppe_exposure_menu_nl_v1` | Natural-language intake (“nvidia exposure”) |
 | `msos_exposure_menu_save_v1` | Save chosen path to workflow store |
 | `ppe_exposure_menu_universe_v1` | All enabled catalog assets |
@@ -178,6 +179,7 @@ Future (not v0):
 | [`POST_PPE_EXPOSURE_MENU_V1_SELECTION.md`](POST_PPE_EXPOSURE_MENU_V1_SELECTION.md) | SELECTION |
 | [`SPRINT_PPE_EXPOSURE_MENU_V1.md`](SPRINT_PPE_EXPOSURE_MENU_V1.md) | Sprint |
 | [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json) | Relay plan |
+| [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) | Scan sections, fit lenses, compare drawer (next UX chapter) |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Exposure-first intent (adjacent to Expression Search / Hedging) |
 
 ---
@@ -187,3 +189,4 @@ Future (not v0):
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 charter — module `exposure_menu`, v0 scope NVDA+BTC, T2 target |
+| 2026-06-30 | Link scan/compare follow-on charter; status v0 LIVE |
