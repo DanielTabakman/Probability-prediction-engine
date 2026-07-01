@@ -83,6 +83,29 @@ class TestPpeIdeProductReady(unittest.TestCase):
 
     @patch("scripts.ppe_ide_product_ready._branch_has_commits", return_value=True)
     @patch("scripts.ppe_ide_product_ready._git")
+    def test_mark_releases_matching_worker_lease(self, mock_git: object, *_m: object) -> None:
+        from scripts.ppe_worker_lease import acquire_lease, load_lease
+
+        mock_git.return_value = subprocess.CompletedProcess(
+            args=[], returncode=0, stdout="abc123\n", stderr=""
+        )
+        acquire_lease(
+            self.repo,
+            worker_id="codex-app",
+            branch="build/auto/Ch-Product-Slice002-local",
+            path_globs=["src/**"],
+            work_item={"slice_id": "Ch-Product-Slice002"},
+        )
+        rc, _path = mark_product_ready(
+            self.repo,
+            slice_id="Ch-Product-Slice002",
+            plan_path=self.plan_rel,
+        )
+        self.assertEqual(rc, 0)
+        self.assertIsNone(load_lease(self.repo))
+
+    @patch("scripts.ppe_ide_product_ready._branch_has_commits", return_value=True)
+    @patch("scripts.ppe_ide_product_ready._git")
     def test_check_ok(self, mock_git: object, *_m: object) -> None:
         mock_git.return_value = subprocess.CompletedProcess(
             args=[], returncode=0, stdout="deadbeef\n", stderr=""
