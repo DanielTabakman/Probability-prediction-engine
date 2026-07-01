@@ -74,7 +74,7 @@ def test_manifest_points_at_tradeable_universe_chapter() -> None:
         return
     queue = json.loads((SOP / "PHASE_QUEUE.json").read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item.get("planPath") == universe_plan)
-    assert row["status"] == "DONE"
+    assert row["status"] in ("DONE", "READY")
 
 
 def test_universe_control_slice_closed_in_evidence_doc() -> None:

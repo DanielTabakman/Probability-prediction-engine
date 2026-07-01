@@ -106,6 +106,9 @@ MSOS_MULTI_ASSET_WITNESS_PLAN = (
 MSOS_FORWARD_CONSISTENCY_RADAR_PLAN = (
     "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json"
 )
+MSOS_STORYBOARD_VISUAL_PARITY_PLAN = (
+    "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json"
+)
 MVP1_DIST_QUANT_V2_PLAN = (
     "docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json"
 )
@@ -150,6 +153,7 @@ ALLOWED_READY_PLANS = (
     PPE_TRUST_SURFACE_PLAN,
     MSOS_MULTI_ASSET_WITNESS_PLAN,
     MSOS_FORWARD_CONSISTENCY_RADAR_PLAN,
+    MSOS_STORYBOARD_VISUAL_PARITY_PLAN,
 )
 
 
