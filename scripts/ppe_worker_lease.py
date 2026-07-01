@@ -132,6 +132,51 @@ def release_lease(repo: Path) -> bool:
     return True
 
 
+def maybe_release_lease_on_mark_ready(
+    repo: Path,
+    *,
+    slice_id: str,
+    build_branch: str | None = None,
+) -> dict[str, Any]:
+    """Release ACTIVE_LEASE when mark_ide_product_ready matches slice + branch."""
+    repo = repo.resolve()
+    lease = load_lease(repo)
+    if not lease or not _lease_active(lease):
+        return {"released": False, "reason": "no_active_lease"}
+
+    work_item = lease.get("work_item") if isinstance(lease.get("work_item"), dict) else {}
+    lease_slice = str(work_item.get("slice_id") or "").strip()
+    if lease_slice and lease_slice != slice_id.strip():
+        return {
+            "released": False,
+            "reason": "slice_mismatch",
+            "lease_slice": lease_slice,
+            "slice_id": slice_id,
+        }
+
+    lease_branch = str(lease.get("branch") or "").strip()
+    current = _current_branch(repo)
+    branch = (build_branch or current).strip()
+    if lease_branch and lease_branch not in {current, branch}:
+        return {
+            "released": False,
+            "reason": "branch_mismatch",
+            "lease_branch": lease_branch,
+            "current_branch": current,
+            "build_branch": branch,
+        }
+
+    lease_id = lease.get("lease_id")
+    released = release_lease(repo)
+    return {
+        "released": released,
+        "reason": "mark_ide_product_ready",
+        "lease_id": lease_id,
+        "slice_id": slice_id,
+        "branch": branch or current,
+    }
+
+
 def load_worker_registry(repo: Path) -> dict[str, Any]:
     path = repo / REGISTRY_REL
     if not path.is_file():

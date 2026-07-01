@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Status:** Tier 1 + Tier 2 (leases, lanes, cost routing, synthetic events)  
 **Audience:** operators, agents, future external adopters
 
-**Related:** [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json) · verdict SSOT [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · routing [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
+**Related:** [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json) · [`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md) · verdict SSOT [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
 
 ---
 
@@ -69,6 +69,7 @@ Implementation: `python scripts/ppe_worker_lease.py`
 | `ppe_worker_lease.py --ship [--release]` | Stage lease paths → gate → commit → push → PR |
 | `ppe_branch_recovery.py --plane control --ship` | Mixed branch → clean plane branch → ship |
 | `ppe_worker_lease.py --release` | Clear lease after ship |
+| `mark_ide_product_ready` | Auto-releases matching `ACTIVE_LEASE` (slice + branch) |
 
 Router integration:
 
@@ -98,7 +99,7 @@ Full table: [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md).
 Queued → Leased → Dispatched → InProgress → Gated → Committed → Relayed
 ```
 
-Release lease on: gate pass + commit, `--release`, or TTL expiry.
+Release lease on: gate pass + `--ship --release`, `mark_ide_product_ready` (when slice/branch match), `--release`, or TTL expiry.
 
 ---
 

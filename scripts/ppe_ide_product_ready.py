@@ -197,6 +197,18 @@ def mark_product_ready(
             print(f"ppe_ide_product_ready: workflow cost recorded for {slice_id}")
     except Exception as exc:
         print(f"ppe_ide_product_ready: workflow cost skipped: {exc}")
+    try:
+        from scripts.ppe_worker_lease import maybe_release_lease_on_mark_ready
+
+        lease_result = maybe_release_lease_on_mark_ready(
+            repo, slice_id=slice_id, build_branch=branch
+        )
+        if lease_result.get("released"):
+            print(
+                f"ppe_ide_product_ready: released worker lease {lease_result.get('lease_id')!r}"
+            )
+    except Exception as exc:
+        print(f"ppe_ide_product_ready: worker lease release skipped: {exc}")
     return 0, str(out)
 
 

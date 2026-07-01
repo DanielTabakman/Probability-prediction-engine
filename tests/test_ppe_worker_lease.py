@@ -191,6 +191,45 @@ def test_operator_ship_hint_with_active_lease(tmp_path, monkeypatch) -> None:
     assert hint == "python scripts/ppe_worker_lease.py --ship --release"
 
 
+def test_maybe_release_lease_on_mark_ready_matching(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import (
+        acquire_lease,
+        load_lease,
+        maybe_release_lease_on_mark_ready,
+    )
+
+    monkeypatch.chdir(tmp_path)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+        work_item={"slice_id": "Slice-A"},
+    )
+    out = maybe_release_lease_on_mark_ready(
+        tmp_path, slice_id="Slice-A", build_branch="control-plane/test"
+    )
+    assert out["released"] is True
+    assert load_lease(tmp_path) is None
+
+
+def test_maybe_release_lease_on_mark_ready_slice_mismatch(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import acquire_lease, load_lease, maybe_release_lease_on_mark_ready
+
+    monkeypatch.chdir(tmp_path)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+        work_item={"slice_id": "Slice-A"},
+    )
+    out = maybe_release_lease_on_mark_ready(tmp_path, slice_id="Slice-B", build_branch="control-plane/test")
+    assert out["released"] is False
+    assert out["reason"] == "slice_mismatch"
+    assert load_lease(tmp_path) is not None
+
+
 def test_ship_lease_work_dry_run(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
