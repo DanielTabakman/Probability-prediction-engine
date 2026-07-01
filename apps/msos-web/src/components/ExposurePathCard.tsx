@@ -25,7 +25,9 @@ type ExposurePathCardProps = {
   dimmed: boolean;
   pinned: boolean;
   pinDisabled: boolean;
+  saved: boolean;
   onPinToggle: () => void;
+  onSave: () => void;
 };
 
 export function ExposurePathCard({
@@ -35,7 +37,9 @@ export function ExposurePathCard({
   dimmed,
   pinned,
   pinDisabled,
+  saved,
   onPinToggle,
+  onSave,
 }: ExposurePathCardProps) {
   const { formatMoney } = useDisplayCurrency();
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -104,6 +108,14 @@ export function ExposurePathCard({
           onClick={() => setDetailsOpen((open) => !open)}
         >
           {detailsOpen ? "Hide details" : "Details"}
+        </button>
+        <button
+          type="button"
+          className={`btn slim ghost${saved ? " active" : ""}`}
+          aria-pressed={saved}
+          onClick={onSave}
+        >
+          {saved ? "Saved" : "Save for later"}
         </button>
       </div>
 
