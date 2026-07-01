@@ -172,6 +172,32 @@ def _cost_lane_counts(repo: Path, *, days: int = 7) -> dict[str, int]:
         return {}
 
 
+def _load_lane_est_usd(repo: Path) -> dict[str, float]:
+    path = repo / "docs/SOP/PPE_COST_LANE_ESTIMATES.json"
+    if not path.is_file():
+        from scripts.ppe_workflow_cost import DEFAULT_LANE_EST_USD
+
+        return dict(DEFAULT_LANE_EST_USD)
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+        if isinstance(data, dict):
+            return {str(k): float(v) for k, v in data.items()}
+    except (json.JSONDecodeError, OSError, TypeError, ValueError):
+        pass
+    from scripts.ppe_workflow_cost import DEFAULT_LANE_EST_USD
+
+    return dict(DEFAULT_LANE_EST_USD)
+
+
+def _worker_lane_est_usd(registry: dict[str, Any], worker_id: str, est: dict[str, float]) -> float:
+    workers = registry.get("workers") if isinstance(registry.get("workers"), list) else []
+    row = next((w for w in workers if isinstance(w, dict) and w.get("id") == worker_id), None)
+    lanes = row.get("cost_lanes") if isinstance(row, dict) else None
+    if not lanes:
+        return est.get("unspecified", 0.5)
+    return min(float(est.get(str(lane), est.get("unspecified", 0.5))) for lane in lanes)
+
+
 def prefer_build_lane(
     repo: Path,
     *,
@@ -193,6 +219,10 @@ def prefer_build_lane(
     counts = _cost_lane_counts(repo)
     codex_n = counts.get("codex-cli", 0)
     cursor_n = counts.get("cursor-cli", 0) + counts.get("acp", 0)
+    registry = load_worker_registry(repo)
+    est = _load_lane_est_usd(repo)
+    codex_usd = _worker_lane_est_usd(registry, LANE_CODEX, est)
+    cursor_usd = _worker_lane_est_usd(registry, LANE_CURSOR, est)
 
     globs = _normalize_globs(path_globs)
     product_scope = any(g.startswith("src/") for g in globs) or (
@@ -203,6 +233,11 @@ def prefer_build_lane(
         if product_scope:
             preferred = LANE_CURSOR
             reason = "product_path_scope"
+        elif not product_scope and codex_usd < cursor_usd and any(
+            branch.startswith(p) for p in CONTROL_PLANE_BRANCH_PREFIXES
+        ):
+            preferred = LANE_CODEX
+            reason = "cost_usd_prefer_codex"
         elif base == LANE_CODEX and codex_n > cursor_n + 3:
             preferred = LANE_CURSOR
             reason = "cost_cap_codex_high"
@@ -215,6 +250,7 @@ def prefer_build_lane(
         "base_lane": base,
         "reason": reason,
         "cost_lanes_7d": counts,
+        "cost_est_usd": {"codex-app": codex_usd, "cursor-desktop": cursor_usd},
     }
 
 
@@ -484,6 +520,7 @@ def build_work_dispatch(repo: Path, status: dict[str, Any] | None = None) -> dic
         "acceptance": {
             "gate": "python scripts/run_pushable_gate.py",
             "ship": "python scripts/ppe_worker_lease.py --ship --release",
+            "branch_recovery": "python scripts/ppe_branch_recovery.py --plane control --ship",
             "mark_ready": f"python scripts/mark_ide_product_ready.py --slice {slice_id}" if slice_id else None,
             "relay_continue": "DESKTOP_CONTINUE.cmd --no-pause",
         },
@@ -733,11 +770,18 @@ def operator_ship_hint(repo: Path) -> str | None:
 
     branch = _current_branch(repo)
     if branch in ("main", "master", ""):
-        return (
-            "checkout control-plane/<slice> → stage task paths → "
-            "python scripts/ppe_worker_lease.py --acquire --worker codex-app --branch … --paths … "
-            "→ python scripts/ppe_worker_lease.py --ship --release"
-        )
+        from scripts.ppe_branch_recovery import recovery_ship_command
+
+        return recovery_ship_command(plane="control")
+
+    try:
+        from scripts.ppe_branch_recovery import needs_branch_recovery, recovery_ship_command
+
+        if needs_branch_recovery(repo, scoped):
+            plane = "product" if any(p.startswith(("src/", "apps/")) for p in scoped) else "control"
+            return recovery_ship_command(plane=plane)
+    except Exception:
+        pass
 
     return "python scripts/run_pushable_gate.py → commit → push → PR (see AGENTS.md)"
 

@@ -28,13 +28,32 @@ def _repo_from_payload(payload: dict) -> Path | None:
     return None
 
 
+def _is_control_plane_ship_path(path: str) -> bool:
+    p = path.replace("\\", "/")
+    return p.startswith(
+        ("scripts/", "docs/SOP/", ".cursor/", "tests/", "AGENTS.md")
+    )
+
+
 def build_stop_followup(payload: dict, *, repo: Path) -> str | None:
     if str(payload.get("status") or "") != "completed":
         return None
     if int(payload.get("loop_count") or 0) >= 1:
         return None
 
-    from scripts.ppe_worker_lease import operator_ship_hint
+    from scripts.ppe_worker_lease import load_lease, operator_ship_hint, scoped_dirty_paths
+
+    lease = load_lease(repo)
+    globs = (lease or {}).get("path_globs") or ["**"]
+    scoped = scoped_dirty_paths(
+        repo,
+        path_globs=globs if isinstance(globs, list) else ["**"],
+        forbidden_globs=[],
+    )
+    if lease:
+        pass
+    elif not any(_is_control_plane_ship_path(p) for p in scoped):
+        return None
 
     hint = operator_ship_hint(repo)
     if not hint:

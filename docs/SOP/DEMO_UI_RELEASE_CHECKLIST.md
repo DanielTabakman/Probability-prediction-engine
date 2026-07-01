@@ -8,7 +8,7 @@ Use this for **Streamlit UI / copy / theme** changes that should appear on **`ma
 
 **Validation Chapter:** After merging to `main`, confirm deploy then run [DEMO_OPERATOR_SCRIPT.md](DEMO_OPERATOR_SCRIPT.md) against production hostnames.
 
-**Important:** Without that workflow (or if secrets are missing), pushing to GitHub does **not** update the live site until you run **§4** on the VPS. Cursor **autocommit** (see [README](../../README.md) and [`.cursor/rules/auto-commit.mdc`](../../.cursor/rules/auto-commit.mdc)) only updates git, not Docker on the server.
+**Important:** Without that workflow (or if secrets are missing), pushing to GitHub does **not** update the live site until you run **§4** on the VPS. Cursor **autocommit** (see [README](../../README.md) and [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc)) only updates git, not Docker on the server.
 
 ## 1) Local smoke
 

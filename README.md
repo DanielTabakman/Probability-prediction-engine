@@ -84,7 +84,7 @@ Unit tests should import **pure modules** under `src/` (for example `src.viz.app
 
 ### Agent commit / push behavior (automation)
 
-- **Always-on rule:** [`.cursor/rules/auto-commit.mdc`](.cursor/rules/auto-commit.mdc). Paste global snippet from [`.cursor/USER_RULES_GIT_SNIPPET.md`](.cursor/USER_RULES_GIT_SNIPPET.md) if Cursor user rules still say “commit only when asked.”
+- **Always-on rule:** [`.cursor/rules/auto-ship.mdc`](.cursor/rules/auto-ship.mdc). Paste global snippet from [`.cursor/USER_RULES_GIT_SNIPPET.md`](.cursor/USER_RULES_GIT_SNIPPET.md) if Cursor user rules still say “commit only when asked.”
 - Auto-commit when todos are complete and **ruff + full pytest** pass (or docs-only exception); show `git status` / `git diff` / `git log -1` first.
 - Auto-push after the same gate on feature branches (no force-push).
 - On **`main`**, prefer PR + full **CI** workflow green (pytest + docker_entrypoint) rather than direct push when branch protection applies.

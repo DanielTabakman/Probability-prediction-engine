@@ -150,7 +150,7 @@ THREAD_ROLE: operator (or ide_build when using IDE_BUILD_STARTER only).
 Thread roles: .cursor/rules/ppe-thread-roles.mdc — no charter-style response tails.
 - Do not end with stash/checkout/relay handoff noise.
 - Operator owns branch recovery (RECOVERY_PROTOCOL); finish the delegated slice only.
-- Auto-ship when slice complete + gate passes (auto-commit.mdc).
+- Auto-ship when slice complete + gate passes (`auto-ship.mdc`).
 ```
 
 Also: [`docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md`](../CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md) (legacy manager worker loop).

@@ -18,7 +18,8 @@ FAST_PYTEST_MARKER = "not witness and not slow"
 
 _LAYER_AUDIT_RECOVERY_HINT = (
     "Recovery: checkout the plane branch (e.g. control-plane/<slice>), stage only task paths, "
-    "re-run gate. Or: python scripts/ppe_worker_lease.py --ship (with active lease). "
+    "re-run gate. Or: python scripts/ppe_branch_recovery.py --plane control --ship "
+    "(python scripts/ppe_worker_lease.py --ship with active lease). "
     "See docs/SOP/COMMIT_POLICY.md § Gate failed."
 )
 

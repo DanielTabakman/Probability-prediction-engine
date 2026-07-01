@@ -9,9 +9,12 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 def test_auto_ship_rule_always_on() -> None:
-    text = (REPO / ".cursor" / "rules" / "auto-ship.mdc").read_text(encoding="utf-8")
+    path = REPO / ".cursor" / "rules" / "auto-ship.mdc"
+    assert path.is_file(), "auto-ship.mdc must exist (auto-commit.mdc retired)"
+    text = path.read_text(encoding="utf-8")
     assert "alwaysApply: true" in text
     assert "Never ask" in text
+    assert not (REPO / ".cursor" / "rules" / "auto-commit.mdc").is_file()
 
 
 def test_agents_md_exists_and_points_to_auto_ship() -> None:

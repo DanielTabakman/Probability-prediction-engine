@@ -56,7 +56,7 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 - Headings like **"What you should do"** / **"On this desktop:"** that list relay commands (`DESKTOP_CONTINUE`, `DESKTOP_BUILD`, `@ppe-director`, `ppe_go.cmd`, queue promotion, branch cleanup) as **operator** steps — those are **agent** actions; run them in-thread or via burst workers.
 - End with **choice questions** (`Want me to…?`, `Should I…?`, `…or … first?`) — the operator does not pick paths. **Decide and execute** per verdict + burst plan.
-- **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-commit.mdc`](auto-commit.mdc) § Gate failed); do not punt to the operator.
+- **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-ship.mdc`](auto-ship.mdc)); do not punt to the operator.
 - Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
 
 **Operator manual surface (human double-click only):** `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy says `IDE_BUILD` and they are not in an agent thread; otherwise **`what's next?`** / fresh operator thread. Default operator line: **"Nothing required from you."**
@@ -69,26 +69,13 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 
 ## Relay finish hygiene (RUN_LOCAL / CLOSEOUT_ONLY)
 
-**Desktop `RUN_LOCAL`:** only `DESKTOP_CONTINUE.cmd --no-pause` — never local `run_ppe_local.cmd` or SSH `run_ppe_local` without VM env.
+On demand: [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc) — desktop `DESKTOP_CONTINUE` only; VM `run_ppe_local` via loop host; no second finish over SSH when stack in-flight.
 
-**VM env:** any VM `run_ppe_local` path must load `call_ppe_operator_local.cmd` first (sets `PPE_LOOP_HOST=1` on loop host). `finish_ide_build.cmd` and `run_ppe_local.cmd` do this automatically after merge.
-
-**Do not fight the headless stack:** when VM brief shows `stack_loop=True` and `FINISH_IN_FLIGHT` or `RUN_LOCAL_PENDING`, poll status — do **not** spawn a second manual `run_ppe_local` over SSH. Use `fix_vm_operator.cmd` on VM only when `STACK_DOWN` or `stack_loop=False`.
-
-**Long finish waits (~20 min):** tail VM logs while polling — `artifacts/orchestrator/REMOTE_RUN_LOCAL.log`, `POST_BUILD_FINISH.log` — not status alone.
-
-**VM health one-liner:** SSH → `check_vm_loop.cmd --no-pause` (loads loop-host env + brief status).
-
-**Operator script PYTHONPATH:** when calling `python scripts/ppe_*.py` directly from agent shell, set `PYTHONPATH` to repo root (or use `*.cmd` wrappers). `ppe_operator_status.py` and `ppe_burst_plan.py` self-bootstrap; others may still need it.
-
-**Branch hygiene:** start operator threads from clean `main` or a slice worktree. Dirty product paths on a control-plane branch → recovery in operator thread per [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) before `IDE_BUILD`.
-
-**Thread rotate:** after `run_ppe_local` / chapter continue completes, fresh operator thread (`what's next?`) — avoids stale context during long VM finishes.
+**Branch hygiene:** dirty product on control-plane branch → [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) or `ppe_branch_recovery.py --plane control --ship` before `IDE_BUILD`.
 
 ## Token discipline
 
 - New thread per slice; starter file only — no log/diff paste.
 - After closeout: new thread + continuity brief only.
-- Thread roles: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
-- Thread roles + SOP discovery: always-on [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc), [`sop-discovery.mdc`](sop-discovery.mdc).
-- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc). Auto-commit: [`auto-commit.mdc`](auto-commit.mdc) (always-on).
+- Thread roles + SOP: [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc), [`sop-discovery.mdc`](sop-discovery.mdc).
+- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc), [`auto-ship.mdc`](auto-ship.mdc), [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc).

@@ -33,10 +33,10 @@ def test_suggest_lane_control_plane_branch() -> None:
     assert suggest_lane(verdict="IDE_BUILD", branch="control-plane/foo", closeout_only=False, loop_host_allowed=False) == LANE_CODEX
 
 
-def test_prefer_build_lane_product_scope() -> None:
+def test_prefer_build_lane_product_scope(tmp_path) -> None:
     with patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "acp": 5}):
         out = prefer_build_lane(
-            None,  # type: ignore[arg-type]
+            tmp_path,
             verdict="IDE_BUILD",
             branch="main",
             closeout_only=False,
@@ -44,6 +44,26 @@ def test_prefer_build_lane_product_scope() -> None:
         )
     assert out["preferred_lane"] == LANE_CURSOR
     assert out["reason"] == "product_path_scope"
+
+
+def test_prefer_build_lane_cost_usd_codex(tmp_path) -> None:
+    def _est_usd(_registry: object, worker_id: str, _est: object) -> float:
+        return 2.0 if worker_id == LANE_CODEX else 2.5
+
+    with (
+        patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "cursor-cli": 0}),
+        patch("scripts.ppe_worker_lease._worker_lane_est_usd", side_effect=_est_usd),
+    ):
+        out = prefer_build_lane(
+            tmp_path,
+            verdict="IDE_BUILD",
+            branch="control-plane/foo",
+            closeout_only=False,
+            path_globs=["scripts/**"],
+        )
+    assert out["preferred_lane"] == LANE_CODEX
+    assert out["reason"] == "cost_usd_prefer_codex"
+    assert "cost_est_usd" in out
 
 
 def test_prefer_build_lane_cost_codex(tmp_path) -> None:

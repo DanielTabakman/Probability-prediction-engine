@@ -13,7 +13,20 @@
 
 ## Gate failed?
 
-Layer audit / mixed branch / wrong branch → **agent fixes hygiene**, not operator choice. See `docs/SOP/COMMIT_POLICY.md` § Gate failed.
+```bash
+python scripts/ppe_branch_recovery.py --plane control --ship
+# or with lease:
+python scripts/ppe_worker_lease.py --ship --release
+```
+
+See `docs/SOP/COMMIT_POLICY.md` § Gate failed.
+
+## Branch recovery (mixed plane)
+
+```bash
+python scripts/ppe_branch_recovery.py --plane control --dry-run
+python scripts/ppe_branch_recovery.py --plane control --ship --acquire-lease
+```
 
 ## Canon
 
