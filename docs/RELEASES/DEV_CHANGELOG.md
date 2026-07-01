@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `d3313bd3` — Control-plane: dev changelog
+- `650b2a69` — control-plane: disable clipboard handoff by default (#1065) (`docs/SOP/`)
+- `c7afa4c6` — Control-plane: dev changelog
 - `fb2d9d51` — control-plane: multi-agent leases + no-commit-questions policy (#1058) (`docs/SOP/`)
 - `5f228fb7` — control-plane: multi-agent worker leases, lanes, and cost routing (#1057) (`docs/SOP/`)
 - `afe51d46` — control-plane: operator doctor, mirror CI fast path, closeout preflight (#1056) (`scripts/`)
@@ -21,6 +24,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-06-30
 
+- `408b7fc3` — ops: vm phase mirror FINISH_IN_FLIGHT (#1063) (`docs/SOP/`)
 - `5421c7b2` — ops: vm phase mirror BUILD IN FLIGHT (#1060) (`docs/SOP/`)
 - `95330d96` — control-plane: tracking hub v3 — session_start, digest enrichments, scheduled pull, sheet export (#1038) (`scripts/`)
 - `33ef7f71` — product: asset batch wave 1 batch 1 — SPY QQQ IWM (clean) (#1037) (`docs/SOP/`)

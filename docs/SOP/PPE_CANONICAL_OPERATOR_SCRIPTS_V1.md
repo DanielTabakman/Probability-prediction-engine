@@ -50,7 +50,7 @@ Phone ntfy hints mirror this table via [`scripts/ppe_operator_hint.py`](../../sc
 ### `DESKTOP_BUILD.cmd` (start IDE BUILD)
 
 1. Loads `ppe_operator_no_loop.local.cmd` (`PPE_STACK_FORBIDDEN=1`).
-2. `python scripts/ppe_autobuilder.py handoff` — stages worker prompt to clipboard.
+2. `python scripts/ppe_autobuilder.py handoff` — stages starter + `IDE_BUILD_NOW.md` (clipboard off by default).
 3. `python scripts/ppe_build_worker.py print-handoff` — on-screen worker steps.
 
 Related helpers: `scripts/ppe_ide_handoff.py`, `scripts/ppe_build_worker.py`.

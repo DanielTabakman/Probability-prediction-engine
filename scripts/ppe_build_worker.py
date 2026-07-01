@@ -363,18 +363,36 @@ def build_product_prompt(
 
 
 def handoff_instructions(worker: WorkerKind) -> list[str]:
+    from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
+    if clipboard_on_handoff_enabled():
+        if worker == WORKER_CODEX_CLI:
+            return [
+                "Open **Codex** in this repo folder (`codex` in terminal, or Codex desktop).",
+                "Start a **new session**.",
+                "Paste the build prompt from clipboard (**Ctrl+V**) and send.",
+                "Let Codex finish gate, commit, and closeout.",
+                "After PR merges → double-click **DESKTOP CONTINUE**.",
+            ]
+        return [
+            "Open **Cursor** on this machine (repo folder).",
+            "Start a **new Agent chat**.",
+            "Press **Ctrl+V** then Enter — build prompt is on clipboard.",
+            "Let the agent finish gate, commit, and closeout.",
+            "After PR merges → double-click **DESKTOP CONTINUE**.",
+        ]
     if worker == WORKER_CODEX_CLI:
         return [
             "Open **Codex** in this repo folder (`codex` in terminal, or Codex desktop).",
             "Start a **new session**.",
-            "Paste the build prompt from clipboard (**Ctrl+V**) and send.",
+            "Paste the build prompt from **IDE_BUILD_NOW.md** and send.",
             "Let Codex finish gate, commit, and closeout.",
             "After PR merges → double-click **DESKTOP CONTINUE**.",
         ]
     return [
         "Open **Cursor** on this machine (repo folder).",
         "Start a **new Agent chat**.",
-        "Press **Ctrl+V** then Enter — build prompt is on clipboard.",
+        "`@` the starter file from **IDE_BUILD_NOW.md** and send.",
         "Let the agent finish gate, commit, and closeout.",
         "After PR merges → double-click **DESKTOP CONTINUE**.",
     ]
@@ -552,13 +570,20 @@ def launch_build_worker_background(
 
 def format_handoff_banner(repo: Path) -> str:
     """Human-readable steps for DESKTOP_BUILD.cmd after handoff."""
+    from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
     resolved = resolve_build_worker(repo, for_handoff=True)
     worker = resolved["worker"]
+    prompt_line = (
+        "Build prompt is on your clipboard."
+        if clipboard_on_handoff_enabled()
+        else "Load the starter from IDE_BUILD_NOW.md (@ file in new Agent chat)."
+    )
     lines = [
         "DESKTOP BUILD — your real PC only (NOT the VM)",
         "",
         f"Worker: {worker} ({resolved.get('reason')})",
-        "Build prompt is on your clipboard.",
+        prompt_line,
         "",
     ]
     for idx, step in enumerate(handoff_instructions(worker), start=1):

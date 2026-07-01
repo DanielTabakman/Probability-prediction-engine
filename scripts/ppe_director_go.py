@@ -106,9 +106,15 @@ def format_user_banner(result: dict[str, Any]) -> str:
         lines.append("")
 
     if result.get("needs_handoff"):
+        clip = result.get("clipboard") or {}
+        role_line = (
+            "  THREAD_ROLE: operator (prompt copied to clipboard)"
+            if clip.get("ok")
+            else "  THREAD_ROLE: operator"
+        )
         lines.extend(
             [
-                "  THREAD_ROLE: operator (included in clipboard prompt)",
+                role_line,
                 f"  {PPE_GO_HINT}",
                 "",
             ]
@@ -120,7 +126,10 @@ def format_user_banner(result: dict[str, Any]) -> str:
                 f"remaining={bp.get('remaining_count')}"
             )
             lines.append("")
-        lines.append("  (Cursor opening; prompt copied to clipboard)")
+        if clip.get("ok"):
+            lines.append("  (Cursor opening; prompt copied to clipboard)")
+        else:
+            lines.append("  (Cursor opening)")
     else:
         for line in USER_LINES.get(verdict, ["See artifacts/orchestrator/OPERATOR_STATUS.md"]):
             lines.append(f"  {line}")

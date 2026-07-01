@@ -1,6 +1,6 @@
 @echo off
 REM === DESKTOP ONLY — unified BUILD handoff (Cursor or Codex) ===
-REM Copies build prompt to clipboard via ppe_autobuilder handoff.
+REM Stages starter + IDE_BUILD_NOW.md via ppe_autobuilder handoff (clipboard off by default).
 
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
