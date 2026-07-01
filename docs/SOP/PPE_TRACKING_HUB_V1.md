@@ -13,6 +13,7 @@ Unified tracking for factory throughput, validation sessions, steering drift, as
 | Signal | Source | Auto? |
 |--------|--------|-------|
 | Slice closes + worker lanes | `artifacts/workflow_metrics/slices.jsonl` | Yes — relay closeout, IDE ready |
+| Thread pulses (cognitive load) | `sessions.jsonl` (`thread_pulse`) | Optional — closeout or `workflow_metrics pulse` |
 | Context closeouts | `context_windows.jsonl` | Yes — context window closeout |
 | Tracking events | `events.jsonl` | Yes — witnesses, validation, closeout |
 | Validation sessions | `artifacts/validation/demo_sessions.jsonl` | On `log_demo_session.cmd` |
@@ -33,6 +34,8 @@ ppe_tracking_status.cmd
 ppe_tracking_status.cmd --brief
 ppe_tracking_status.cmd --json --days 14
 ppe_tracking_rollup.cmd
+workflow_metrics.cmd aggregate --days 7
+workflow_metrics.cmd pulse
 workflow_metrics.cmd summary --days 7 --by-lane --include-validation
 python scripts/ppe_jsonl_retention.py --apply
 python scripts/ppe_feedback_steward_hook.py

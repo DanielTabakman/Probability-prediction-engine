@@ -701,6 +701,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--slices-closed", type=int, default=0, help="Slices closed in this Cursor thread")
     ap.add_argument("--notes", default="", help="Optional closeout notes")
     ap.add_argument("--no-promote", action="store_true", help="Skip writing WHATS_NEXT artifacts")
+    ap.add_argument("--no-pulse", action="store_true", help="Skip thread pulse questionnaire")
+    ap.add_argument(
+        "--pulse-load",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Cognitive load 1-5 (non-interactive)",
+    )
     sub = ap.add_subparsers(dest="cmd")
 
     ab = sub.add_parser("add-build", help="Append blocked row to PHASE_CHAPTER_BACKLOG.json")
@@ -807,6 +815,15 @@ def main(argv: list[str] | None = None) -> int:
             if not args.no_promote:
                 print(f"ppe_context_window_closeout: promoted {WHATS_NEXT_MD_REL}")
             print(f"ppe_context_window_closeout: whats_next={record.get('whats_next')}")
+            if not args.no_pulse:
+                from scripts.ppe_workflow_aggregate import record_thread_pulse
+
+                record_thread_pulse(
+                    repo,
+                    cognitive_load=args.pulse_load,
+                    non_interactive=not sys.stdin.isatty() or args.pulse_load is not None,
+                    source="context_closeout",
+                )
         exit_code = 0 if not ship_report or ship_report.get("ok") else 1
         return exit_code
 

@@ -9,8 +9,21 @@
 ### 2. Core principle
 
 - Optimize for clean throughput.
-- **North-star metric:** `weighted_slices_per_active_hour`
-- Interpret alongside: `avg_cognitive_load`, `avg_roundtrips`
+- **North-star (focused sessions):** `weighted_slices_per_active_hour` — legacy; use when you log session start/stop.
+- **North-star (async / mobile):** `weighted_slices` per window + `weighted_slices_per_closeout` + `avg_roundtrips_per_slice`.
+- Interpret alongside: `avg_cognitive_load` from **thread pulses** (not timers).
+
+### 2b. Aggregate mode (async / phone)
+
+No session timers. Slices auto-log from relay closeout; optional **thread pulse** on `context_window_closeout --record`:
+
+```bat
+workflow_metrics.cmd aggregate --days 7
+workflow_metrics.cmd pulse --cognitive-load 3 --non-interactive
+ppe_tracking_rollup.cmd
+```
+
+Pulse = one question when you finish a Cursor thread (load 1–5). Rollup aggregates slices + pulses + product usage — no Sheet import.
 
 ### 3. System layers
 
@@ -161,8 +174,21 @@
 ### 2. Core principle
 
 - Optimize for clean throughput.
-- **North-star metric:** `weighted_slices_per_active_hour`
-- Interpret alongside: `avg_cognitive_load`, `avg_roundtrips`
+- **North-star (focused sessions):** `weighted_slices_per_active_hour` — legacy; use when you log session start/stop.
+- **North-star (async / mobile):** `weighted_slices` per window + `weighted_slices_per_closeout` + `avg_roundtrips_per_slice`.
+- Interpret alongside: `avg_cognitive_load` from **thread pulses** (not timers).
+
+### 2b. Aggregate mode (async / phone)
+
+No session timers. Slices auto-log from relay closeout; optional **thread pulse** on `context_window_closeout --record`:
+
+```bat
+workflow_metrics.cmd aggregate --days 7
+workflow_metrics.cmd pulse --cognitive-load 3 --non-interactive
+ppe_tracking_rollup.cmd
+```
+
+Pulse = one question when you finish a Cursor thread (load 1–5). Rollup aggregates slices + pulses + product usage — no Sheet import.
 
 ### 3. System layers
 
