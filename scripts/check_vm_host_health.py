@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import shutil
@@ -92,19 +93,27 @@ def check_local_ram_health() -> dict[str, Any] | None:
     }
 
 
+def _powershell_encoded_command(script: str) -> str:
+    encoded = base64.b64encode(script.encode("utf-16-le")).decode("ascii")
+    return f"powershell -NoProfile -NonInteractive -EncodedCommand {encoded}"
+
+
+def _vm_host_health_ps_script() -> str:
+    return (
+        "$d=Get-PSDrive C;$os=Get-CimInstance Win32_OperatingSystem;"
+        "$fg=[math]::Round($d.Free/1GB,2);$tg=[math]::Round(($d.Used+$d.Free)/1GB,2);"
+        "$rg=[math]::Round($os.FreePhysicalMemory/1MB,2);$rt=[math]::Round($os.TotalVisibleMemorySize/1MB,2);"
+        'Write-Output "$fg|$tg|$rg|$rt"'
+    )
+
+
 def check_vm_host_health_via_ssh(repo: Path) -> dict[str, Any]:
     """Desktop: probe VM disk/RAM via SSH (one lightweight call)."""
     try:
         from scripts.ppe_operator_vm_ssh import VM_SSH_HOST, ssh_vm
     except ImportError:
         return {"ok": False, "error": "ppe_operator_vm_ssh unavailable"}
-    cmd = (
-        "powershell -NoProfile -Command "
-        "\"$d=Get-PSDrive C;$os=Get-CimInstance Win32_OperatingSystem;"
-        "$fg=[math]::Round($d.Free/1GB,2);$tg=[math]::Round(($d.Used+$d.Free)/1GB,2);"
-        "$rg=[math]::Round($os.FreePhysicalMemory/1MB,2);$rt=[math]::Round($os.TotalVisibleMemorySize/1MB,2);"
-        "Write-Output \\\"$fg|$tg|$rg|$rt\\\"\""
-    )
+    cmd = _powershell_encoded_command(_vm_host_health_ps_script())
     try:
         ssh = ssh_vm(cmd, timeout=30)
     except subprocess.TimeoutExpired:

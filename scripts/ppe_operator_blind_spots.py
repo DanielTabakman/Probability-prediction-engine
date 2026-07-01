@@ -204,13 +204,18 @@ def assess_operator_blind_spots(
             )
 
     warnings = status.get("preflight_warnings") or []
-    if warnings:
-        health["preflight_warnings"] = len(warnings)
+    actionable_warnings = [
+        w
+        for w in warnings
+        if not str(w).startswith("repo layer scope:")
+    ]
+    if actionable_warnings:
+        health["preflight_warnings"] = len(actionable_warnings)
         issues.append(
             _issue(
                 "mixed_plane",
                 severity="high",
-                message=f"{len(warnings)} preflight warning(s) — dirty tree or branch mismatch.",
+                message=f"{len(actionable_warnings)} preflight warning(s) — dirty tree or branch mismatch.",
                 fix="See docs/SOP/RECOVERY_PROTOCOL.md before relay.",
             )
         )

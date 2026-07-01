@@ -326,11 +326,75 @@ def _merge_ready(pr: dict[str, Any]) -> bool:
     return mergeable == "MERGEABLE" and state in ("", "UNKNOWN", "BEHIND")
 
 
+def close_conflicting_mirror_prs(repo: Path) -> dict[str, Any]:
+    """Close stale vm-mirror PRs that conflict with main (unblocks fresh mirror publish)."""
+    repo = repo.resolve()
+    if not _gh_available():
+        return {"action": "close_mirror_prs", "skipped": True, "reason": "gh not available"}
+
+    cfg = _git_sync_cfg(repo)
+    base = (str(cfg.get("pullBranch") or "main")).strip() or "main"
+    prs = _gh_json(
+        repo,
+        [
+            "gh",
+            "pr",
+            "list",
+            "--base",
+            base,
+            "--state",
+            "open",
+            "--limit",
+            "30",
+            "--json",
+            "number,headRefName,mergeable,mergeStateStatus,url",
+        ],
+    )
+    if prs is None:
+        return {"action": "close_mirror_prs", "ok": False, "error": "gh pr list failed"}
+
+    closed: list[dict[str, Any]] = []
+    for pr in prs:
+        if not isinstance(pr, dict):
+            continue
+        head = str(pr.get("headRefName") or "")
+        if not head.startswith(VM_MIRROR_PUBLISH_PREFIX):
+            continue
+        mergeable = str(pr.get("mergeable") or "").upper()
+        state = str(pr.get("mergeStateStatus") or "").upper()
+        if mergeable != "CONFLICTING" and state != "DIRTY":
+            continue
+        num = pr.get("number")
+        if num is None:
+            continue
+        comment = (
+            "Auto-closed: vm-mirror PR conflicts with main — superseded; "
+            "loop host will publish a fresh mirror."
+        )
+        close_proc = subprocess.run(
+            ["gh", "pr", "close", str(num), "--comment", comment],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if close_proc.returncode == 0:
+            closed.append({"number": num, "head": head, "url": str(pr.get("url") or "")})
+
+    return {"action": "close_mirror_prs", "ok": True, "closed": closed}
+
+
 def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
     """Ensure automerge label on loop PRs and squash-merge when GitHub reports merge-ready."""
     repo = repo.resolve()
+    mirror_close = close_conflicting_mirror_prs(repo)
     if not merge_each_pass_enabled(repo):
-        return {"action": "check_merge", "skipped": True, "reason": "disabled"}
+        return {
+            "action": "check_merge",
+            "skipped": True,
+            "reason": "disabled",
+            "close_mirror_prs": mirror_close,
+        }
     if not _gh_available():
         return {"action": "check_merge", "skipped": True, "reason": "gh not available"}
 
@@ -430,6 +494,7 @@ def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
         "merged": merged,
         "pending": pending,
         "blocked": blocked,
+        "close_mirror_prs": mirror_close,
     }
     if merged and pull_enabled(repo):
         pull_after = pull_main(repo)

@@ -352,3 +352,35 @@ def test_publish_vm_mirror_ahead_opens_pr(tmp_path: Path) -> None:
     assert out.get("mirror_only") is True
     open_pr.assert_called_once()
     assert open_pr.call_args.kwargs.get("labels") == ["automerge"]
+
+
+def test_close_conflicting_mirror_prs(tmp_path: Path) -> None:
+    from scripts.ppe_operator_git_sync import VM_MIRROR_PUBLISH_PREFIX, close_conflicting_mirror_prs
+
+    head = f"{VM_MIRROR_PUBLISH_PREFIX}20260701-deadbeef"
+    closed_nums: list[str] = []
+
+    def fake_gh_json(_repo: Path, args: list[str]):
+        if args[1] == "pr" and args[2] == "list":
+            return [
+                {
+                    "number": 1061,
+                    "headRefName": head,
+                    "mergeable": "CONFLICTING",
+                    "mergeStateStatus": "DIRTY",
+                    "url": "https://github.com/example/pr/1061",
+                }
+            ]
+        return []
+
+    def fake_run(args, **kwargs):
+        if args[:3] == ["gh", "pr", "close"]:
+            closed_nums.append(args[3])
+        return type("P", (), {"returncode": 0, "stdout": "", "stderr": ""})()
+
+    with patch("scripts.ppe_operator_git_sync._gh_available", return_value=True):
+        with patch("scripts.ppe_operator_git_sync._gh_json", side_effect=fake_gh_json):
+            with patch("scripts.ppe_operator_git_sync.subprocess.run", side_effect=fake_run):
+                out = close_conflicting_mirror_prs(tmp_path)
+    assert out["ok"] is True
+    assert closed_nums == ["1061"]
