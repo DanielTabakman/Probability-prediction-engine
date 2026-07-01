@@ -13,9 +13,11 @@ from typing import Any
 
 from scripts.ppe_autobuilder import (
     ACTION_ADVANCE,
+    ACTION_DESKTOP_CONTINUE,
     ACTION_FINISH_PENDING,
     ACTION_HANDOFF,
     ACTION_RUN_LOCAL,
+    ACTION_VM_ADVANCE,
     PHASE_AWAITING_BUILD,
     PHASE_CLOSEOUT_PENDING,
     PHASE_DEGRADED,
@@ -144,12 +146,35 @@ def _dedupe_plan(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def derive_actions(repo: Path) -> list[dict[str, Any]]:
     """Status-derived plan when the queue is empty."""
     repo = repo.resolve()
-    role = detect_role(repo)
     status = collect_autobuilder_status(repo)
     phase = str(status.get("phase") or "")
     verdict = str(status.get("verdict") or "")
     closeout = status.get("closeout") or {}
+    nxt = status.get("next") or {}
+    action_key = str(nxt.get("action_key") or "")
 
+    if action_key == ACTION_DESKTOP_CONTINUE:
+        return _dedupe_plan(
+            [
+                {
+                    "action": "desktop_continue",
+                    "label": nxt.get("reason") or "Continue relay on VM (finish_ide_build)",
+                    "derived": True,
+                }
+            ]
+        )
+    if action_key == ACTION_VM_ADVANCE:
+        return _dedupe_plan(
+            [
+                {
+                    "action": "vm_advance",
+                    "label": nxt.get("reason") or "VM stack down — restart/advance on loop host",
+                    "derived": True,
+                }
+            ]
+        )
+
+    role = str(status.get("role") or detect_role(repo))
     derived: list[dict[str, Any]] = []
 
     if role == "daily_driver":
@@ -240,20 +265,13 @@ def _execute_action(repo: Path, item: dict[str, Any]) -> dict[str, Any]:
         return {"action": action, "ok": True, **result}
 
     if action == "desktop_continue":
-        pull = _run_git_pull(repo)
-        ssh = ssh_vm(vm_finish_command(pull_main=True))
-        status = fetch_vm_brief(repo, use_cache=False)
-        ok = pull.get("ok") and ssh.get("ok")
-        return {
-            "action": action,
-            "ok": ok,
-            "git_pull": pull,
-            "vm_finish": ssh,
-            "vm_status": status,
-        }
+        from scripts.ppe_desktop_continue import run_desktop_continue
+
+        result = run_desktop_continue(repo)
+        return {"action": action, **result}
 
     if action == "vm_finish":
-        ssh = ssh_vm(vm_finish_command())
+        ssh = ssh_vm(vm_finish_command(pull_main=True))
         return {"action": action, "ok": ssh.get("ok"), **ssh}
 
     if action == "vm_advance":

@@ -93,18 +93,12 @@ def check_local_ram_health() -> dict[str, Any] | None:
 
 
 def check_vm_host_health_via_ssh(repo: Path) -> dict[str, Any]:
-    """Desktop: probe VM disk/RAM via SSH (one lightweight call)."""
+    """Desktop: probe VM disk/RAM via SSH (run local health script on loop host)."""
     try:
-        from scripts.ppe_operator_vm_ssh import VM_SSH_HOST, ssh_vm
+        from scripts.ppe_operator_vm_ssh import VM_REPO, VM_SSH_HOST, ssh_vm
     except ImportError:
         return {"ok": False, "error": "ppe_operator_vm_ssh unavailable"}
-    cmd = (
-        "powershell -NoProfile -Command "
-        "\"$d=Get-PSDrive C;$os=Get-CimInstance Win32_OperatingSystem;"
-        "$fg=[math]::Round($d.Free/1GB,2);$tg=[math]::Round(($d.Used+$d.Free)/1GB,2);"
-        "$rg=[math]::Round($os.FreePhysicalMemory/1MB,2);$rt=[math]::Round($os.TotalVisibleMemorySize/1MB,2);"
-        "Write-Output \\\"$fg|$tg|$rg|$rt\\\"\""
-    )
+    cmd = f"cd /d {VM_REPO} && set PYTHONPATH=%CD% && python scripts\\check_vm_host_health.py"
     try:
         ssh = ssh_vm(cmd, timeout=30)
     except subprocess.TimeoutExpired:
@@ -112,36 +106,42 @@ def check_vm_host_health_via_ssh(repo: Path) -> dict[str, Any]:
     if not ssh.get("ok"):
         return {
             "ok": False,
-            "error": (ssh.get("stderr") or "ssh failed").strip()[:200],
+            "error": (ssh.get("stderr") or ssh.get("stdout") or "ssh failed").strip()[:200],
             "host": VM_SSH_HOST,
         }
-    line = (ssh.get("stdout") or "").strip().splitlines()[-1]
-    parts = line.split("|")
-    if len(parts) != 4:
-        return {"ok": False, "error": f"unexpected ssh output: {line[:120]}", "host": VM_SSH_HOST}
-    try:
-        disk_free = float(parts[0])
-        disk_total = float(parts[1])
-        ram_free = float(parts[2])
-        ram_total = float(parts[3])
-    except ValueError:
-        return {"ok": False, "error": "parse failed", "host": VM_SSH_HOST}
-    disk_level = "ok"
-    if disk_free < DISK_CRITICAL_GB:
-        disk_level = "critical"
-    elif disk_free < DISK_WARN_GB:
-        disk_level = "warn"
-    ram_free_pct = (100.0 * ram_free / ram_total) if ram_total else 0.0
-    ram_level = "ok"
-    if ram_free_pct < RAM_CRITICAL_PCT:
-        ram_level = "critical"
-    elif ram_free_pct < RAM_WARN_PCT:
-        ram_level = "warn"
+    text = (ssh.get("stdout") or "").strip()
+    local_payload = None
+    for line in reversed(text.splitlines()):
+        candidate = line.strip()
+        if not candidate.startswith("{"):
+            continue
+        try:
+            local_payload = json.loads(candidate)
+            break
+        except json.JSONDecodeError:
+            continue
+    if not isinstance(local_payload, dict):
+        return {"ok": False, "error": f"unexpected ssh output: {text[:120]}", "host": VM_SSH_HOST}
+    disk = local_payload.get("disk") or {}
+    ram = local_payload.get("ram") or {}
+    if not disk and not ram:
+        return {"ok": False, "error": "no disk/ram in VM health payload", "host": VM_SSH_HOST}
+    disk_level = str(disk.get("level") or "ok")
+    ram_level = str(ram.get("level") or "ok")
     return {
         "ok": True,
         "host": VM_SSH_HOST,
-        "disk": {"free_gb": disk_free, "total_gb": disk_total, "level": disk_level},
-        "ram": {"free_gb": ram_free, "total_gb": ram_total, "free_pct": round(ram_free_pct, 1), "level": ram_level},
+        "disk": {
+            "free_gb": disk.get("free_gb"),
+            "total_gb": disk.get("total_gb"),
+            "level": disk_level,
+        },
+        "ram": {
+            "free_gb": ram.get("free_gb"),
+            "total_gb": ram.get("total_gb"),
+            "free_pct": ram.get("free_pct"),
+            "level": ram_level,
+        },
     }
 
 

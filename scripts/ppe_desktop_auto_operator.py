@@ -144,7 +144,7 @@ def auto_pass(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
             actions.append("skip_vm_finish_in_flight")
             result["vm_trust"] = {"wait_for_vm": True, "vm_phase": vm_phase}
         else:
-            ssh = _ssh_vm(vm_finish_command())
+            ssh = _ssh_vm(vm_finish_command(pull_main=True))
             if ssh.get("ok"):
                 actions.append("vm_finish_ide_build")
                 append_log(repo, "auto vm finish_ide_build via ssh")

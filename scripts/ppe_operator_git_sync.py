@@ -249,6 +249,7 @@ def pull_main(repo: Path, *, branch: str | None = None) -> dict[str, Any]:
             "reason": f"checkout is {current!r}, not {target!r}",
         }
 
+    reset_runtime_sop_drift_from_origin(repo)
     dirty = _dirty_paths(repo)
     if dirty:
         return {
