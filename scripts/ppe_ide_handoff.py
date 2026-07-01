@@ -102,7 +102,7 @@ def clipboard_on_handoff_enabled() -> bool:
         return False
     if env in ("1", "true", "yes", "on"):
         return True
-    return True
+    return False
 
 
 def explicit_prefer_ide_over_cli(repo: Path) -> bool:
@@ -414,10 +414,13 @@ def write_handoff_now_doc(
         repo=repo,
     )
     steps = handoff_instructions(handoff_worker)  # type: ignore[arg-type]
-    numbered = "\n".join(
-        [f"1. Double-click **{DESKTOP_BUILD_CMD}** (build prompt copies to clipboard)."]
-        + [f"{idx}. {step}" for idx, step in enumerate(steps, start=2)]
-    )
+    from scripts.ppe_ide_handoff import clipboard_on_handoff_enabled
+
+    if clipboard_on_handoff_enabled():
+        opener = f"1. Double-click **{DESKTOP_BUILD_CMD}** (build prompt copies to clipboard)."
+    else:
+        opener = f"1. Double-click **{DESKTOP_BUILD_CMD}** (opens Cursor + writes IDE_BUILD_NOW.md)."
+    numbered = "\n".join([opener] + [f"{idx}. {step}" for idx, step in enumerate(steps, start=2)])
     body = "\n".join(
         [
             "# IDE BUILD — action required",

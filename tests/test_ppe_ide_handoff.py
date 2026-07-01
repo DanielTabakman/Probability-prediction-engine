@@ -9,6 +9,8 @@ from scripts.ppe_ide_build_automation_trigger import TRIGGER_REL
 from scripts.ppe_ide_handoff import (
     BUILD_LOG_REL,
     cli_usage_exhausted,
+    clipboard_on_handoff_enabled,
+    copy_text_to_clipboard,
     handoff_recently_done,
     launch_ide_fix_handoff,
     launch_ide_handoff,
@@ -180,3 +182,20 @@ def test_worker_fix_failure_triggers_handoff(tmp_path, monkeypatch):
     assert result is not None
     assert result.get("verdict") == "ERROR"
     assert (tmp_path / "artifacts/orchestrator/IDE_FIX_NOW.md").is_file()
+
+
+def test_clipboard_on_handoff_disabled_by_default(monkeypatch):
+    monkeypatch.delenv("PPE_IDE_HANDOFF_CLIPBOARD", raising=False)
+    assert clipboard_on_handoff_enabled() is False
+
+
+def test_clipboard_on_handoff_opt_in(monkeypatch):
+    monkeypatch.setenv("PPE_IDE_HANDOFF_CLIPBOARD", "1")
+    assert clipboard_on_handoff_enabled() is True
+
+
+def test_copy_text_to_clipboard_skipped_when_disabled(monkeypatch):
+    monkeypatch.setenv("PPE_IDE_HANDOFF_CLIPBOARD", "0")
+    result = copy_text_to_clipboard("hello")
+    assert result.get("skipped") is True
+    assert result.get("ok") is False

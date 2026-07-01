@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-REM Phone buzzed? Run this. Then Ctrl+V in a new Agent chat.
+REM Phone buzzed? Opens Cursor + refreshes status. Normal path: operator thread → what's next?
 cd /d "%~dp0"
 set "PYTHONPATH=%CD%"
 
