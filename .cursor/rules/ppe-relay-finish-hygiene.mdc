@@ -1,0 +1,43 @@
+---
+description: RUN_LOCAL / CLOSEOUT_ONLY finish hygiene — VM env, stack discipline, long-wait polling. Load on demand during operator closeout passes.
+alwaysApply: false
+---
+
+# PPE relay finish hygiene
+
+**When:** `RUN_LOCAL` verdict, `CLOSEOUT_ONLY` mode, or `DESKTOP_CONTINUE` / VM finish troubleshooting.
+
+**Canon:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · layout [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc)
+
+## Desktop
+
+- **`RUN_LOCAL` on desktop** = only `DESKTOP_CONTINUE.cmd --no-pause` — never local `run_ppe_local.cmd`.
+- Never SSH `run_ppe_local` without VM loop-host env (`call call_ppe_operator_local.cmd` first).
+
+## VM
+
+- `finish_ide_build.cmd` and `run_ppe_local.cmd` load `call_ppe_operator_local.cmd` (sets `PPE_LOOP_HOST=1`).
+- **`--finish-handoff`:** when product is already on `main`, `ppe_post_build_watcher` spawns closeout `run_ppe_local` if post-build mark skips.
+- **Before `git pull` on loop host:** `python scripts/ppe_operator_git_sync.py --reset-runtime-sop` (discards relay-written SOP drift).
+
+## Stack discipline
+
+| VM brief | Agent action |
+|----------|----------------|
+| `stack_loop=True` + `FINISH_IN_FLIGHT` / `RUN_LOCAL_PENDING` | Poll status or mirror — **do not** second SSH `run_ppe_local` |
+| `STACK_DOWN` or `stack_loop=False` | VM: `fix_vm_operator.cmd` |
+| `git pull` fails on VM (dirty PHASE_QUEUE / DEV_CHANGELOG) | VM: `fix_vm_operator.cmd` or `--reset-runtime-sop` then pull |
+| Long wait (~20 min) | Tail `artifacts/orchestrator/REMOTE_RUN_LOCAL.log`, `POST_BUILD_FINISH.log` |
+| Quick health | VM: `check_vm_loop.cmd --no-pause` |
+
+## Agent shell
+
+- `python scripts/ppe_*.py`: set `PYTHONPATH` to repo root or use `*.cmd` wrappers.
+
+## Branch hygiene
+
+- Operator threads: clean `main` checkout or dedicated slice worktree per [`PARALLEL_AGENT_CHECKLIST_V1.md`](docs/SOP/PARALLEL_AGENT_CHECKLIST_V1.md).
+
+## After closeout
+
+Fresh operator thread (`what's next?`).

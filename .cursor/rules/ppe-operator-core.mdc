@@ -25,16 +25,7 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 4. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
 5. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
 
-**SSH budget (desktop — mandatory):**
-
-- **Max 1** `ssh ppeloop@desktop-caqll8k` call per operator pass (use `python scripts/ppe_operator_status.py --brief` locally first).
-- **Never** SSH + `findstr`/`type` on `PHASE_QUEUE.json`, `ACTIVE_PHASE_MANIFEST.json`, or backlog — read those files **locally** from git.
-- **Never** parallel SSH sessions to the VM.
-- Prefer `docs/SOP/VM_OPERATOR_PHASE.json` (git mirror) + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
-- Hard timeout: 120s — if SSH hangs, trust mirror and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
-- **Thread timebox:** if status shows **Thread timebox** (~10m same verdict) → rotate operator thread.
-- **Branch preflight BLOCKS relay** → stash/checkout `main` first; never `DESKTOP_CONTINUE` on `product/*` or dirty `src/`.
-- **VM debugging:** Remote-SSH `ppe-vm` thread per [`THREAD_STARTERS_V1.md`](docs/SOP/THREAD_STARTERS_V1.md).
+**SSH / VM polling:** load on demand [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc).
 
 | Verdict | Action |
 |---------|--------|
@@ -48,46 +39,21 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 Also skip when thread role is charter / explore / neutral (see thread-roles). Skip when read-only, guard blocks, or triage first. Steering: `ACTIVE_PRODUCT_DIRECTION.json`, `AGENT_CONTINUITY_BRIEF.md`.
 
-## Operator reply format (mandatory)
+## Operator reply format
 
 After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md).
 
 **Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions).
 
-**Never:**
+**Never:** operator checklists, choice questions, commit permission prompts, or manual IDE BUILD thread asks when burst can spawn workers. Default founder line: **"Nothing required from you."**
 
-- Headings like **"What you should do"** / **"On this desktop:"** that list relay commands (`DESKTOP_CONTINUE`, `DESKTOP_BUILD`, `@ppe-director`, `ppe_go.cmd`, queue promotion, branch cleanup) as **operator** steps — those are **agent** actions; run them in-thread or via burst workers.
-- End with **choice questions** (`Want me to…?`, `Should I…?`, `…or … first?`) — the operator does not pick paths. **Decide and execute** per verdict + burst plan.
-- **Commit permission prompts** — `may I commit?`, `want me to commit?`, `unless you want this committed`, `I can stage if you want`, `nothing required unless…`. Gate fail → fix branch and ship ([`auto-ship.mdc`](auto-ship.mdc)); do not punt to the operator.
-- Ask the operator to open a **new IDE BUILD thread** manually when burst allows `@ppe-director` → `ppe-build-worker` — spawn the worker instead.
+**VM vs stale desktop status:** trust VM brief — refresh status and advance product; do not ask which source to trust.
 
-**Founder manual surface (degraded only):** per [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) — runtime automation is SSOT; founder does **nothing** on a normal factory day. Optional last-resort: `DESKTOP BUILD` / `DESKTOP CONTINUE` when ntfy fires and no agent is active. **Never** tell the founder to run `what's next?` or open factory threads as a daily ritual — operator threads are **agent-initiated** when automation fails. Default founder line: **"Nothing required from you."**
+**VM recovery:** stuck relay on VM → `DESKTOP_CONTINUE` (`--prepare-handoff-auto`) or `fix_vm_operator.cmd` on VM **only when `STACK_DOWN`**. No desktop SSH git surgery. Live health: `DESKTOP_VM_STATUS.cmd --no-pause`.
 
-**Never paste** [`OPERATING_CALENDAR_V1.md`](docs/SOP/OPERATING_CALENDAR_V1.md) or [`HUMAN_STEWARD_BACKLOG.md`](docs/SOP/HUMAN_STEWARD_BACKLOG.md) as end-of-reply todos unless the user opened a steward/charter pass for that purpose.
-
-**VM vs stale desktop status:** When SSH / VM brief shows a newer verdict (e.g. VM `IDE_BUILD`, local still `RUN_LOCAL` / `CLOSEOUT_ONLY` on a dirty branch) → **trust VM**, refresh status, **advance product** — do not ask which source to trust.
-
-**VM recovery (mandatory — no SSH spelunking):**
-
-- Stuck relay / git sync / worktree errors on VM → **`fix_vm_operator.cmd` on VM only** (or `DESKTOP_CONTINUE` which runs `--prepare-handoff-auto`).
-- **Never** desktop SSH + ad-hoc `git reset --hard`, custom recovery scripts, or multi-step VM surgery from agent threads.
-- **Never** spawn `@ppe-director` for VM git/worktree recovery.
-- Live VM health from desktop: **`DESKTOP_VM_STATUS.cmd --no-pause`** (auto-ensures stack when down).
-- After any VM **STOP**, run **`VM_RESTART.cmd`** on VM before expecting `PHASE=` lines.
-
-**Work priority (no operator choice):** Relay product work (`IDE_BUILD`, finish closeout) **beats** optional control-plane/doc cleanup on a feature branch. Ship control-plane patches yourself (gate → commit) when clean; never block product on operator approval.
-
-**Good reply shape:** verdict + mode → what burst/agent did → one-line operator note → one-line agent next (if blocked). No numbered operator steps. See [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) § Operator-facing replies.
-
-## Relay finish hygiene (RUN_LOCAL / CLOSEOUT_ONLY)
-
-On demand: [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc) — desktop `DESKTOP_CONTINUE` only; VM `run_ppe_local` via loop host; no second finish over SSH when stack in-flight.
-
-**Branch hygiene:** dirty product on control-plane branch → [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md) or `ppe_branch_recovery.py --plane control --ship` before `IDE_BUILD`.
+**RUN_LOCAL detail:** [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc).
 
 ## Token discipline
 
-- New thread per slice; starter file only — no log/diff paste.
-- After closeout: new thread + continuity brief only.
-- Thread roles + SOP: [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc), [`sop-discovery.mdc`](sop-discovery.mdc).
-- On-demand: [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc), [`auto-ship.mdc`](auto-ship.mdc), [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc).
+- New thread per slice; starter only — no log/diff paste.
+- On-demand: [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc), [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc), [`ppe-operator-ssh-budget.mdc`](ppe-operator-ssh-budget.mdc), [`repo-layers.mdc`](repo-layers.mdc), [`product-direction.mdc`](product-direction.mdc), [`auto-ship.mdc`](auto-ship.mdc). Roles/discovery: always-on rules.

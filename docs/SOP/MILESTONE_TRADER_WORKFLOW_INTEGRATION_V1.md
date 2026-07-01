@@ -16,6 +16,10 @@
 
 Canon loop (backplane): **thesis → implied probability → disagreement → expression → save/review → monitor/history**.
 
+### Relay spine vs steering `nextBuildCandidate`
+
+When **`PHASE_QUEUE.json` READY order** disagrees with **`ACTIVE_PRODUCT_DIRECTION.json` `nextBuildCandidate`**, the **relay queue wins** until a steward explicitly retargets the queue (promote/demote in `PHASE_QUEUE.json` or SELECTION). Operator threads execute the manifest chapter; charter/steward threads reconcile steering drift — do not re-BUILD product out of queue order without a documented SELECTION outcome.
+
 ---
 
 ## Foundation (already shipped)

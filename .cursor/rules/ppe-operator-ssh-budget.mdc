@@ -1,0 +1,21 @@
+---
+description: Desktop operator SSH budget and VM status mirror — load on demand during operator passes that touch the VM.
+alwaysApply: false
+---
+
+# PPE operator SSH budget
+
+**When:** operator thread before any SSH to the loop host (`ppe-vm` / `ppeloop@desktop-caqll8k`).
+
+- **Max 1** SSH call per operator pass — run `python scripts/ppe_operator_status.py --brief` locally first.
+- **Never** SSH + `findstr`/`type` on `PHASE_QUEUE.json`, `ACTIVE_PHASE_MANIFEST.json`, or backlog — read locally from git.
+- **Never** parallel SSH sessions to the VM.
+- Prefer `docs/SOP/VM_OPERATOR_PHASE.json` + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
+- Hard timeout: 120s — if SSH hangs, trust mirror and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
+- **Thread timebox:** status shows ~10m same verdict → rotate operator thread.
+- **Branch preflight BLOCKS relay** → recovery first; never `DESKTOP_CONTINUE` on `product/*` or dirty `src/`.
+- **VM debugging:** Remote-SSH `ppe-vm` thread per [`THREAD_STARTERS_V1.md`](docs/SOP/THREAD_STARTERS_V1.md).
+- **Live VM health from desktop:** `DESKTOP_VM_STATUS.cmd --no-pause` (auto-ensures stack when down).
+- **First action for RUN_LOCAL closeout:** `DESKTOP_CONTINUE.cmd --no-pause` — not investigation SSH.
+
+**Finish hygiene:** [`ppe-relay-finish-hygiene.mdc`](ppe-relay-finish-hygiene.mdc)

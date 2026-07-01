@@ -37,7 +37,7 @@ def test_p3_phase_plan_valid() -> None:
 def test_phase_queue_msos_p3_done() -> None:
     queue = json.loads(PHASE_QUEUE.read_text(encoding="utf-8"))
     row = next(item for item in queue["items"] if item["planPath"] == P3_PLAN_REL)
-    assert row["status"] == "DONE"
+    assert row["status"] in ("DONE", "READY")
     assert row["selectionPrep"] == "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md"
 
 

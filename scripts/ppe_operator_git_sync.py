@@ -1015,6 +1015,11 @@ def main(argv: list[str] | None = None) -> int:
         help="Retarget child PRs to main when parent branch already merged",
     )
     ap.add_argument(
+        "--reset-runtime-sop",
+        action="store_true",
+        help="Discard loop-host runtime SOP/RELEASES drift from origin before pull",
+    )
+    ap.add_argument(
         "--prepare-handoff",
         action="store_true",
         help="Loop host only: abort merges, reset runtime SOP drift, return to main, pull",
@@ -1043,10 +1048,12 @@ def main(argv: list[str] | None = None) -> int:
         results.append(check_and_nudge_merges(repo))
     if args.retarget_stacked:
         results.append(check_and_retarget_stacked_prs(repo))
+    if args.reset_runtime_sop:
+        results.append(reset_runtime_sop_drift_from_origin(repo))
     if not results:
         ap.error(
-            "specify --pull, --prepare-handoff, --prepare-handoff-auto, --publish, --auto-publish, "
-            "--check-merge, and/or --retarget-stacked"
+            "specify --pull, --prepare-handoff, --prepare-handoff-auto, --reset-runtime-sop, "
+            "--publish, --auto-publish, --check-merge, and/or --retarget-stacked"
         )
         return 2
 
