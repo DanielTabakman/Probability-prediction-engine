@@ -364,6 +364,12 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 def prepare_operator_status(repo: Path) -> dict[str, Any]:
     """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
     try:
+        from scripts.ppe_notify_push import bootstrap_operator_notify_env
+
+        bootstrap_operator_notify_env(repo)
+    except Exception:
+        pass
+    try:
         from scripts.ppe_operator_config import apply_operator_env
 
         apply_operator_env(repo)
@@ -399,6 +405,7 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             repo,
             verdict=str(status.get("verdict") or ""),
             loop_host_allowed=loop_ok,
+            chapter_mode=status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else None,
         )
         status["branch_preflight"] = branch_pf
         if branch_pf.get("blocks_relay"):

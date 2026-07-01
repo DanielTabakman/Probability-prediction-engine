@@ -42,6 +42,7 @@ def assess_operator_branch_preflight(
     *,
     verdict: str,
     loop_host_allowed: bool | None = None,
+    chapter_mode: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     repo = repo.resolve()
     if loop_host_allowed is None:
@@ -58,6 +59,9 @@ def assess_operator_branch_preflight(
     blocks_relay = False
     reasons: list[str] = []
     commands: list[str] = []
+    mode = str((chapter_mode or {}).get("mode") or "")
+    closeout_only = mode == "CLOSEOUT_ONLY"
+    product_dirty = [p for p in dirty if p.replace("\\", "/").startswith("src/")]
 
     if loop_host_allowed or verdict not in RELAY_VERDICTS:
         return {
@@ -70,7 +74,11 @@ def assess_operator_branch_preflight(
         }
 
     if not on_main:
-        if branch.startswith(("product/", "build/")) and verdict in ("RUN_LOCAL", "IDE_BUILD"):
+        if closeout_only and verdict == "RUN_LOCAL" and not product_dirty:
+            if branch.startswith(("control-plane/", "ops/", "fix/", "chore/")):
+                commands.append("git checkout main && git pull origin main  # when WIP parked")
+            pass
+        elif branch.startswith(("product/", "build/")) and verdict in ("RUN_LOCAL", "IDE_BUILD"):
             blocks_relay = True
             reasons.append(
                 f"checkout is {branch!r} — product/build branch blocks relay handoff; use main after merge"
@@ -81,8 +89,7 @@ def assess_operator_branch_preflight(
             reasons.append(f"checkout is {branch!r}, not main — unexpected branch for operator relay")
             commands.append("git checkout main && git pull origin main")
 
-    product_dirty = [p for p in dirty if p.replace("\\", "/").startswith("src/")]
-    if product_dirty and verdict in ("RUN_LOCAL", "IDE_BUILD"):
+    if product_dirty and verdict in ("RUN_LOCAL", "IDE_BUILD") and not closeout_only:
         blocks_relay = True
         reasons.append(
             f"dirty product tree ({len(product_dirty)} path(s) under src/) — commit/stash before relay"
