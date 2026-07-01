@@ -73,6 +73,50 @@ def _orchestrator_root(repo_root: Path) -> Path | None:
     return None
 
 
+def _dirty_paths(repo: Path) -> list[str]:
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+    paths: list[str] = []
+    for line in (out.stdout or "").splitlines():
+        if len(line) < 4 or line.startswith("##"):
+            continue
+        paths.append(line[3:].strip().split(" -> ")[-1])
+    return paths
+
+
+def _closeout_only_context(repo: Path, manifest: dict[str, object]) -> bool:
+    try:
+        from scripts.ppe_ide_product_ready import load_marker
+
+        if load_marker(repo):
+            return True
+    except Exception:
+        pass
+    plan_path = str(manifest.get("phasePlanPath") or "").strip()
+    if not plan_path:
+        return False
+    try:
+        from scripts.ppe_chapter_mode import is_closeout_only_chapter
+        from scripts.ppe_manifest import resolve_summary
+
+        summary = resolve_summary(repo)
+        return is_closeout_only_chapter(
+            repo,
+            plan_path=plan_path,
+            chapter_name=str(summary.get("chapter_name") or "") or None,
+        )
+    except Exception:
+        return False
+
+
 def run_preflight(
     repo_root: Path,
     *,
@@ -126,21 +170,24 @@ def run_preflight(
             text=True,
             check=True,
         ).stdout.strip()
+        closeout_only = _closeout_only_context(repo, manifest) if manifest else False
+        dirty_paths = _dirty_paths(repo)
+        product_dirty = [p for p in dirty_paths if p.replace("\\", "/").startswith("src/")]
+        control_branch = branch.startswith(("control-plane/", "ops/", "fix/", "chore/"))
+
         if branch and branch != "main":
-            warnings.append(
-                f"checkout is {branch!r}, not main; post-phase closeout patches docs/SOP here — "
-                "prefer main for run_ppe.cmd"
-            )
-        out = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=repo,
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        dirty = out.stdout.strip()
-        if dirty:
-            warnings.append("main checkout has uncommitted changes (worktrees do BUILD)")
+            if closeout_only and control_branch and not product_dirty:
+                pass
+            else:
+                warnings.append(
+                    f"checkout is {branch!r}, not main; post-phase closeout patches docs/SOP here — "
+                    "prefer main for run_ppe.cmd"
+                )
+        if dirty_paths:
+            if closeout_only and not product_dirty:
+                pass
+            else:
+                warnings.append("main checkout has uncommitted changes (worktrees do BUILD)")
     except (subprocess.CalledProcessError, FileNotFoundError):
         warnings.append("git status unavailable")
 
