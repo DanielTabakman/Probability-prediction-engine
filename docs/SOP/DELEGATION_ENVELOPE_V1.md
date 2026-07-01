@@ -54,7 +54,7 @@ ppe_delegation_envelope.cmd --pass-type RECOVERY
 ## Human only — never auto
 
 - Secrets / `.env` / credentials
-- `ACTIVE_PRODUCT_DIRECTION.json` pivot fields (`pivotId`, `northStar`, …)
+- `ACTIVE_PRODUCT_DIRECTION.json` pivot fields (`pivotId`, `northStar`, `primaryFocus`, `currentStage`) — other field syncs are **auto**
 - Stripe / billing chapters
 - Production Access / deploy runbooks (policy changes)
 
