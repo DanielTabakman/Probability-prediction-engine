@@ -391,7 +391,7 @@ def cmd_export_csv(repo: Path) -> int:
         w = csv.DictWriter(fh, fieldnames=session_fields, extrasaction="ignore")
         w.writeheader()
         for row in sessions:
-            if row.get("event") != "session_stop":
+            if row.get("event") not in ("session_stop", "thread_pulse", "session_checkin"):
                 continue
             w.writerow({k: row.get(k, "") for k in session_fields})
 
@@ -496,6 +496,15 @@ def main(argv: list[str] | None = None) -> int:
         help="Include validation sessions and tracking events counts",
     )
 
+    p_agg = sub.add_parser("aggregate", help="Aggregate rollup (no session timers)")
+    p_agg.add_argument("--days", type=int, default=7)
+
+    p_pulse = sub.add_parser("pulse", help="Thread closeout pulse (cognitive load 1-5)")
+    p_pulse.add_argument("--cognitive-load", type=int, default=None, metavar="N")
+    p_pulse.add_argument("--notes", default="")
+    p_pulse.add_argument("--non-interactive", action="store_true")
+    p_pulse.add_argument("--source", default="manual")
+
     p_backfill = sub.add_parser("backfill", help="Backfill recent slice closes from progress + git log")
     p_backfill.add_argument("--limit", type=int, default=10)
     p_backfill.add_argument("--dry-run", action="store_true")
@@ -545,6 +554,20 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "export-csv":
         return cmd_export_csv(repo)
+    if args.command == "aggregate":
+        from scripts.ppe_workflow_aggregate import print_aggregate_summary
+
+        return print_aggregate_summary(repo, days=args.days)
+    if args.command == "pulse":
+        from scripts.ppe_workflow_aggregate import record_thread_pulse
+
+        return record_thread_pulse(
+            repo,
+            cognitive_load=args.cognitive_load,
+            notes=args.notes,
+            non_interactive=args.non_interactive,
+            source=args.source,
+        )
 
     ap.error(f"unknown command: {args.command}")
     return 2

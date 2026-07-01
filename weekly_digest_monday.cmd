@@ -38,6 +38,9 @@ if errorlevel 1 echo weekly_digest_monday: cross-venue backtest failed — conti
 python "%CD%\scripts\ppe_workflow_radar.py" --repo-root "%CD%" generate --no-cleanup
 if errorlevel 1 exit /b %ERRORLEVEL%
 
+call "%~dp0ppe_tracking_rollup.cmd" --brief
+if errorlevel 1 echo weekly_digest_monday: tracking rollup skipped — continuing
+
 call "%~dp0weekly_digest.cmd" generate
 if errorlevel 1 exit /b %ERRORLEVEL%
 
