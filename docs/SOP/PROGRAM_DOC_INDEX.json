@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-07-01T21:34:38Z",
+  "program_count": 11,
+  "programs": [
+    {
+      "module_id": "cross_venue_event_gap",
+      "program_doc": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "exposure_menu",
+      "program_doc": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "expression_planner",
+      "program_doc": "docs/SOP/EXPRESSION_PLANNER_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "forward_consistency",
+      "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "implied_distribution",
+      "program_doc": "docs/SOP/IMPLIED_DISTRIBUTION_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "options_horizon",
+      "program_doc": "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md"
+    },
+    {
+      "module_id": "workflow",
+      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/PPE_MULTI_ASSET_META_INFRA_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md"
+    }
+  ],
+  "resolve_cmd": "python scripts/resolve_sop.py --module <module_id> --json",
+  "version": 1
+}
