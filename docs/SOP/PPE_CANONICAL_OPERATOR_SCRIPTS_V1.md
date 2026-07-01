@@ -74,7 +74,8 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 | Script | Purpose |
 |--------|---------|
 | `scripts/ppe_doctor.cmd` | One-shot infra check: ntfy, gh, SSH, VM health, blind spots |
-| `python scripts/ppe_network_watchdog.py` | SSH probe to `ppe-vm`; ntfy to stuck topic after 3 failures (schedule every 15m) |
+| `install_ppe_network_watchdog_task.cmd` | Register Task Scheduler: SSH probe every 15m; ntfy after 3 failures |
+| `python scripts/ppe_network_watchdog.py` | Manual probe (same as scheduled task) |
 | `python scripts/ppe_worktree_janitor.py` | List removable `_worktrees/*`; `--remove <path>` only after human review |
 
 These do **not** advance the relay queue or call `DESKTOP_CONTINUE`.
@@ -89,7 +90,7 @@ These do **not** advance the relay queue or call `DESKTOP_CONTINUE`.
 | **Notify / phone** | `ppe_notify_fix.py`, `ppe_ntfy_listen.py`, `ppe_operator_hint.py` | Mobile alerts; blocked-state triage |
 | **Witness / deploy** | `verify_msos_web_ship.py`, `ensure_production_deploy.py` | Post-merge production checks |
 | **Recovery** | `vm_bootstrap.cmd --recover`, `fix_vm_operator.cmd` | Stale relay, dirty trigger, stack down |
-| **Desktop maintenance** | `scripts/ppe_doctor.cmd`, `scripts/ppe_network_watchdog.py`, `scripts/ppe_worktree_janitor.py` | Infra blind spots, VM reachability, stale worktrees — **not relay** |
+| **Desktop maintenance** | `scripts/ppe_doctor.cmd`, `install_ppe_network_watchdog_task.cmd`, `scripts/ppe_worktree_janitor.py` | Infra blind spots, VM reachability, stale worktrees — **not relay** |
 | **Multi-agent leases** | `ppe_worker_lease.py` | Cursor vs Codex lanes; [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) |
 | **Closeout** | `post_relay_continue.py`, `apply_control_closeout_v1` (via relay) | Chapter COMPLETE propagation |
 
