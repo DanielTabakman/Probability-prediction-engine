@@ -4,6 +4,16 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `2a27ab51` — Merge pull request #1113 from DanielTabakman/fix/sop-discovery-merge
+- `b177ef6f` — control-plane: add coordination-check script, agent, and tests (`docs/SOP/`)
+- `7fca8b3d` — control-plane: coordination-check agent + burst gate (`docs/SOP/`)
+- `c3e3471d` — control-plane: SOP discovery tiers 1-5 — resolve, archive, operator hooks (`docs/SOP/`)
+- `2271d6d7` — control-plane: chapter coordination audit + VisParity factory sync (#1101) (`docs/SOP/`)
+- `ea4df5c2` — control-plane: Task Scheduler installer for network watchdog (#1099) (`docs/SOP/`)
+- `f625afa3` — control-plane: factory throughput panel on module map (#1096) (`docs/SOP/`)
+- `927d3012` — ops: vm phase mirror FINISH IN FLIGHT (#1095) (`docs/SOP/`)
+- `3486b188` — control-plane: operator maintenance tier (doctor companions, not relay) (#1094) (`scripts/`)
+- `7bbd6603` — Control-plane: dev changelog
 - `74f6033e` — ops(control-plane): sync desktop git with VM after FCR closeout (#1093) (`docs/SOP/`)
 - `77d4559b` — control-plane: aggregate workflow tracking for async/mobile operators (#1088) (`scripts/`)
 - `b122a49f` — control-plane: wire routing/rules to runtime automation SSOT (#1087) (`docs/SOP/`)
