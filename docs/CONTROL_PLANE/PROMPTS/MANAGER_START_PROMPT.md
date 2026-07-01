@@ -10,8 +10,9 @@ You are the **manager** for this repository. This is a **single execution step**
 - You are **not** updating `CURRENT_FRONTIER.md` / `HANDOFF.md` “as if work were complete.”
 - You must **not** chain into manager-review mode or worker mode after producing the required output.
 
-### Git posture
+### Git posture (Codex sprint worker — not Cursor IDE)
 - Do **not** commit, push, branch, rebase, reset, or amend unless explicitly asked.
+- **Cursor agents** in this repo auto-ship per [`.cursor/rules/auto-ship.mdc`](../../.cursor/rules/auto-ship.mdc); this block does not apply to them.
 
 ### Required reads (do this before deciding)
 Read these in priority order:

@@ -10,7 +10,7 @@ alwaysApply: false
 Before committing steering/canon changes or mixed-plane recovery:
 
 1. Run `python scripts/ppe_delegation_envelope.py --gate-check` (or rely on `run_pushable_gate.py`).
-2. **auto / auto_notify** → ship per [`auto-commit.mdc`](auto-commit.mdc).
+2. **auto / auto_notify** → ship per [`auto-ship.mdc`](auto-ship.mdc).
 3. **steward_packet** → file human backlog item; prefer PR over direct merge.
 4. **human_only** → stop; ask operator unless they already said to proceed.
 

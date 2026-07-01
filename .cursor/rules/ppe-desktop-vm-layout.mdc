@@ -1,6 +1,6 @@
 ---
 description: Hard machine boundary — VM runs relay loop; desktop runs IDE BUILD only. Agents must never start relay on the daily PC.
-alwaysApply: true
+alwaysApply: false
 ---
 
 # PPE desktop vs VM (agents — hard)

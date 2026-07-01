@@ -88,7 +88,7 @@ Do **not** end replies with operator noise unless the user asked about queue, br
 
 - Answer the question first; scope stays on the user's topic.
 - **Do not** open with `OPERATOR_STATUS`, burst plan, or IDE_BUILD blockers.
-- **Commit/ship** only when the user requested implementation and the task is complete ([`auto-commit.mdc`](auto-commit.mdc)).
+- **Commit/ship** only when the user requested implementation and the task is complete ([`auto-ship.mdc`](auto-ship.mdc)).
 - **Do not** run branch surgery, stash management, or mixed-plane recovery — defer to operator thread.
 - Queue health question → one-line pointer to operator thread; do not run relay.
 

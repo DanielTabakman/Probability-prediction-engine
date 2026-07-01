@@ -328,11 +328,18 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         pass
 
     delegation_hint: str | None = None
+    ship_hint: str | None = None
     try:
         from scripts.ppe_delegation_envelope import operator_delegation_hint
 
         delegation_hint = operator_delegation_hint(repo)
     except ImportError:
+        pass
+    try:
+        from scripts.ppe_worker_lease import operator_ship_hint
+
+        ship_hint = operator_ship_hint(repo)
+    except Exception:
         pass
 
     return {
@@ -353,6 +360,7 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
         "preflight_ok": preflight.get("ok"),
         "preflight_warnings": preflight.get("warnings") or [],
         "delegation_hint": delegation_hint,
+        "ship_hint": ship_hint,
         "commands": commands,
         "avoid": avoid,
         "errors": errors,
@@ -712,6 +720,14 @@ def _format_human(
     delegation_hint = status.get("delegation_hint")
     if delegation_hint:
         lines.extend(["", "Delegation:", f"  - {delegation_hint}"])
+    ship_hint = status.get("ship_hint")
+    if ship_hint:
+        try:
+            from scripts.ppe_worker_lease import format_ship_hint_lines
+
+            lines.extend(format_ship_hint_lines(str(ship_hint)))
+        except Exception:
+            lines.extend(["", "Ship (agent):", f"  → {ship_hint}"])
     errors = status.get("errors") or []
     if errors:
         lines.extend(["", "Errors:"])

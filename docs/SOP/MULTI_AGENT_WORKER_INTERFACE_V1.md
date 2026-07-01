@@ -66,7 +66,9 @@ Implementation: `python scripts/ppe_worker_lease.py`
 | `ppe_worker_lease.py --write-dispatch` | Emit `WORK_DISPATCH.json` |
 | `ppe_worker_lease.py --infer-events` | Emit `WORKER_EVENTS.json` (Tier 2) |
 | `ppe_worker_lease.py --acquire --worker …` | Hold lease before BUILD |
-| `ppe_worker_lease.py --release` | Clear lease after gate + commit |
+| `ppe_worker_lease.py --ship [--release]` | Stage lease paths → gate → commit → push → PR |
+| `ppe_branch_recovery.py --plane control --ship` | Mixed branch → clean plane branch → ship |
+| `ppe_worker_lease.py --release` | Clear lease after ship |
 
 Router integration:
 

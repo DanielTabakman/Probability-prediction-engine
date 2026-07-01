@@ -18,6 +18,8 @@ from scripts.ppe_worker_lease import (
     path_matches_any,
     prefer_build_lane,
     release_lease,
+    scoped_dirty_paths,
+    ship_lease_work,
     suggest_lane,
 )
 
@@ -31,10 +33,10 @@ def test_suggest_lane_control_plane_branch() -> None:
     assert suggest_lane(verdict="IDE_BUILD", branch="control-plane/foo", closeout_only=False, loop_host_allowed=False) == LANE_CODEX
 
 
-def test_prefer_build_lane_product_scope() -> None:
+def test_prefer_build_lane_product_scope(tmp_path) -> None:
     with patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "acp": 5}):
         out = prefer_build_lane(
-            None,  # type: ignore[arg-type]
+            tmp_path,
             verdict="IDE_BUILD",
             branch="main",
             closeout_only=False,
@@ -42,6 +44,26 @@ def test_prefer_build_lane_product_scope() -> None:
         )
     assert out["preferred_lane"] == LANE_CURSOR
     assert out["reason"] == "product_path_scope"
+
+
+def test_prefer_build_lane_cost_usd_codex(tmp_path) -> None:
+    def _est_usd(_registry: object, worker_id: str, _est: object) -> float:
+        return 2.0 if worker_id == LANE_CODEX else 2.5
+
+    with (
+        patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "cursor-cli": 0}),
+        patch("scripts.ppe_worker_lease._worker_lane_est_usd", side_effect=_est_usd),
+    ):
+        out = prefer_build_lane(
+            tmp_path,
+            verdict="IDE_BUILD",
+            branch="control-plane/foo",
+            closeout_only=False,
+            path_globs=["scripts/**"],
+        )
+    assert out["preferred_lane"] == LANE_CODEX
+    assert out["reason"] == "cost_usd_prefer_codex"
+    assert "cost_est_usd" in out
 
 
 def test_prefer_build_lane_cost_codex(tmp_path) -> None:
@@ -128,3 +150,63 @@ def test_build_work_dispatch_shape(tmp_path, monkeypatch) -> None:
     dispatch = build_work_dispatch(tmp_path, status)
     assert dispatch["lane"]["worker_id"] == LANE_CURSOR
     assert dispatch["lane"].get("preference_reason")
+    assert "ship" in dispatch["acceptance"]
+
+
+def test_scoped_dirty_paths_respects_globs(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    scripts = tmp_path / "scripts" / "a.py"
+    scripts.parent.mkdir(parents=True)
+    scripts.write_text("a\n", encoding="utf-8")
+    src = tmp_path / "src" / "b.py"
+    src.parent.mkdir(parents=True)
+    src.write_text("b\n", encoding="utf-8")
+
+    scoped = scoped_dirty_paths(tmp_path, path_globs=["scripts/**"], forbidden_globs=["src/**"])
+    assert "scripts/a.py" in scoped
+    assert "src/b.py" not in scoped
+
+
+def test_operator_ship_hint_with_active_lease(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_worker_lease import operator_ship_hint
+
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+    )
+    f = tmp_path / "scripts" / "x.py"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text("x\n", encoding="utf-8")
+
+    hint = operator_ship_hint(tmp_path)
+    assert hint == "python scripts/ppe_worker_lease.py --ship --release"
+
+
+def test_ship_lease_work_dry_run(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.email", "t@test"], cwd=tmp_path, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=tmp_path, check=True, capture_output=True)
+    acquire_lease(
+        tmp_path,
+        worker_id=LANE_CODEX,
+        branch="control-plane/test",
+        path_globs=["scripts/**"],
+    )
+    f = tmp_path / "scripts" / "x.py"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text("x\n", encoding="utf-8")
+
+    report = ship_lease_work(tmp_path, dry_run=True)
+    assert report["ok"] is True
+    assert report["paths"] == ["scripts/x.py"]
+    assert "lease ship" in report["message"]
