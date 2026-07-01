@@ -78,6 +78,7 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 | **Notify / phone** | `ppe_notify_fix.py`, `ppe_ntfy_listen.py`, `ppe_operator_hint.py` | Mobile alerts; blocked-state triage |
 | **Witness / deploy** | `verify_msos_web_ship.py`, `ensure_production_deploy.py` | Post-merge production checks |
 | **Recovery** | `vm_bootstrap.cmd --recover`, `fix_vm_operator.cmd` | Stale relay, dirty trigger, stack down |
+| **Multi-agent leases** | `ppe_worker_lease.py` | Cursor vs Codex lanes; [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) |
 | **Closeout** | `post_relay_continue.py`, `apply_control_closeout_v1` (via relay) | Chapter COMPLETE propagation |
 
 ---

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-07-01",
+  "workers": [
+    {
+      "id": "cursor-desktop",
+      "runtime": "cursor",
+      "machines": ["desktop"],
+      "skills": ["ide_build", "ui_explore", "operator_thread", "subagents"],
+      "cost_lanes": ["cursor-cli", "acp"],
+      "default_path_globs": ["src/**", "apps/**", "tests/**"]
+    },
+    {
+      "id": "codex-app",
+      "runtime": "codex",
+      "machines": ["desktop"],
+      "skills": ["ide_build", "bounded_slice", "control_plane"],
+      "cost_lanes": ["codex-cli"],
+      "default_path_globs": ["scripts/**", "docs/SOP/**", ".cursor/**", "tests/**"]
+    },
+    {
+      "id": "vm-relay",
+      "runtime": "ppe_local",
+      "machines": ["vm"],
+      "skills": ["run_local", "run_auto", "closeout"],
+      "cost_lanes": ["deterministic-local"],
+      "default_path_globs": ["artifacts/orchestrator/**"]
+    },
+    {
+      "id": "scripts-only",
+      "runtime": "deterministic",
+      "machines": ["desktop", "vm"],
+      "skills": ["witness", "gate", "smoke"],
+      "cost_lanes": ["deterministic-local"],
+      "default_path_globs": []
+    }
+  ]
+}

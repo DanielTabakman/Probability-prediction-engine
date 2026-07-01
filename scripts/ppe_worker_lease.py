@@ -1,0 +1,633 @@
+"""Multi-agent worker leases — lanes, cost preference, and synthetic events."""
+
+from __future__ import annotations
+
+import argparse
+import fnmatch
+import json
+import subprocess
+import sys
+import uuid
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+_REPO = Path(__file__).resolve().parents[1]
+if str(_REPO) not in sys.path:
+    sys.path.insert(0, str(_REPO))
+
+ACTIVE_LEASE_REL = "artifacts/control_plane/ACTIVE_LEASE.json"
+WORK_DISPATCH_REL = "artifacts/control_plane/WORK_DISPATCH.json"
+WORKER_EVENTS_REL = "artifacts/control_plane/WORKER_EVENTS.json"
+REGISTRY_REL = "docs/SOP/WORKER_REGISTRY_V1.json"
+
+LANE_CURSOR = "cursor-desktop"
+LANE_CODEX = "codex-app"
+LANE_VM = "vm-relay"
+LANE_SCRIPTS = "scripts-only"
+
+CONTROL_PLANE_BRANCH_PREFIXES = ("control-plane/", "ops/", "chore/")
+RELAY_VERDICTS = frozenset({"RUN_LOCAL", "IDE_BUILD", "RUN_AUTO"})
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(microsecond=0)
+
+
+def _utc_iso(dt: datetime) -> str:
+    return dt.isoformat().replace("+00:00", "Z")
+
+
+def _parse_utc(value: str) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        return None
+
+
+def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _current_branch(repo: Path) -> str:
+    proc = _git(repo, "branch", "--show-current")
+    return (proc.stdout or "").strip()
+
+
+def _dirty_paths(repo: Path) -> list[str]:
+    proc = _git(repo, "status", "--porcelain")
+    if proc.returncode != 0:
+        return []
+    paths: list[str] = []
+    for line in (proc.stdout or "").splitlines():
+        if len(line) < 4 or line.startswith("##"):
+            continue
+        paths.append(line[3:].strip().split(" -> ")[-1].replace("\\", "/"))
+    return paths
+
+
+def _normalize_globs(globs: list[str] | None) -> list[str]:
+    return [str(g).strip().replace("\\", "/") for g in (globs or []) if str(g).strip()]
+
+
+def path_matches_any(path: str, globs: list[str]) -> bool:
+    norm = path.replace("\\", "/")
+    return any(fnmatch.fnmatch(norm, g) for g in globs)
+
+
+def paths_overlap(dirty: list[str], globs: list[str], forbidden: list[str]) -> list[str]:
+    hits: list[str] = []
+    for p in dirty:
+        if forbidden and path_matches_any(p, forbidden):
+            hits.append(p)
+        elif globs and path_matches_any(p, globs):
+            hits.append(p)
+        elif not globs:
+            hits.append(p)
+    return hits
+
+
+def load_lease(repo: Path) -> dict[str, Any] | None:
+    path = repo / ACTIVE_LEASE_REL
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def save_lease(repo: Path, lease: dict[str, Any]) -> Path:
+    path = repo / ACTIVE_LEASE_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(lease, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def release_lease(repo: Path) -> bool:
+    path = repo / ACTIVE_LEASE_REL
+    if not path.is_file():
+        return False
+    path.unlink(missing_ok=True)
+    return True
+
+
+def load_worker_registry(repo: Path) -> dict[str, Any]:
+    path = repo / REGISTRY_REL
+    if not path.is_file():
+        return {"workers": []}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {"workers": []}
+    return data if isinstance(data, dict) else {"workers": []}
+
+
+def suggest_lane(
+    *,
+    verdict: str,
+    branch: str,
+    closeout_only: bool,
+    loop_host_allowed: bool,
+) -> str:
+    if verdict in ("RUN_LOCAL", "RUN_AUTO"):
+        return LANE_VM
+    if closeout_only:
+        return LANE_SCRIPTS
+    if verdict == "IDE_BUILD":
+        if any(branch.startswith(p) for p in CONTROL_PLANE_BRANCH_PREFIXES):
+            return LANE_CODEX
+        return LANE_CURSOR
+    return LANE_CURSOR
+
+
+def _cost_lane_counts(repo: Path, *, days: int = 7) -> dict[str, int]:
+    try:
+        from scripts.ppe_workflow_cost import summarize_by_lane
+
+        summary = summarize_by_lane(repo, days=days)
+        raw = summary.get("by_lane") if isinstance(summary.get("by_lane"), dict) else {}
+        return {str(k): int(v) for k, v in raw.items()}
+    except Exception:
+        return {}
+
+
+def prefer_build_lane(
+    repo: Path,
+    *,
+    verdict: str,
+    branch: str,
+    closeout_only: bool,
+    loop_host_allowed: bool = False,
+    path_globs: list[str] | None = None,
+) -> dict[str, Any]:
+    """Tier 2: branch heuristic + 7d cost lanes → preferred worker lane."""
+    base = suggest_lane(
+        verdict=verdict,
+        branch=branch,
+        closeout_only=closeout_only,
+        loop_host_allowed=loop_host_allowed,
+    )
+    reason = "branch_heuristic"
+    preferred = base
+    counts = _cost_lane_counts(repo)
+    codex_n = counts.get("codex-cli", 0)
+    cursor_n = counts.get("cursor-cli", 0) + counts.get("acp", 0)
+
+    globs = _normalize_globs(path_globs)
+    product_scope = any(g.startswith("src/") for g in globs) or (
+        not globs and not any(branch.startswith(p) for p in CONTROL_PLANE_BRANCH_PREFIXES)
+    )
+
+    if verdict == "IDE_BUILD" and not closeout_only:
+        if product_scope:
+            preferred = LANE_CURSOR
+            reason = "product_path_scope"
+        elif base == LANE_CODEX and codex_n > cursor_n + 3:
+            preferred = LANE_CURSOR
+            reason = "cost_cap_codex_high"
+        elif base == LANE_CURSOR and branch.startswith(CONTROL_PLANE_BRANCH_PREFIXES[:1]) and codex_n <= cursor_n:
+            preferred = LANE_CODEX
+            reason = "cost_prefer_codex"
+
+    return {
+        "preferred_lane": preferred,
+        "base_lane": base,
+        "reason": reason,
+        "cost_lanes_7d": counts,
+    }
+
+
+def _lease_active(lease: dict[str, Any], now: datetime | None = None) -> bool:
+    now = now or _utc_now()
+    expires = _parse_utc(str(lease.get("expires_at") or ""))
+    if expires is not None and now >= expires:
+        return False
+    return True
+
+
+def assess_worker_lease(
+    repo: Path,
+    status: dict[str, Any] | None = None,
+    *,
+    proposed_worker: str | None = None,
+) -> dict[str, Any]:
+    repo = repo.resolve()
+    if status is None:
+        from scripts.ppe_operator_status import collect_operator_status
+
+        status = collect_operator_status(repo)
+
+    verdict = str(status.get("verdict") or "")
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    closeout_only = bool(chapter_mode.get("do_not_rebuild")) or str(chapter_mode.get("mode") or "") == "CLOSEOUT_ONLY"
+
+    loop_host_allowed = False
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        loop_host_allowed = bool(loop_host_start_allowed()[0])
+    except Exception:
+        pass
+
+    branch = _current_branch(repo)
+    dirty = _dirty_paths(repo)
+    lease = load_lease(repo)
+    now = _utc_now()
+
+    lane_pref = prefer_build_lane(
+        repo,
+        verdict=verdict,
+        branch=branch,
+        closeout_only=closeout_only,
+        loop_host_allowed=loop_host_allowed,
+        path_globs=_normalize_globs((lease or {}).get("path_globs")),
+    )
+
+    result: dict[str, Any] = {
+        "as_of": _utc_iso(now),
+        "suggested_lane": lane_pref["preferred_lane"],
+        "lane_preference": lane_pref,
+        "current_branch": branch,
+        "dirty_count": len(dirty),
+        "active": False,
+        "expired": False,
+        "blocks_dispatch": False,
+        "blocks_relay": False,
+        "reasons": [],
+        "path_conflicts": [],
+        "lease": lease,
+    }
+
+    if lease is None:
+        if closeout_only and any(p.startswith("src/") for p in dirty) and verdict in RELAY_VERDICTS:
+            result["reasons"].append("CLOSEOUT_ONLY with dirty src/ — park product edits before relay")
+            result["blocks_dispatch"] = True
+        return result
+
+    if not _lease_active(lease, now):
+        result["expired"] = True
+        result["reasons"].append("ACTIVE_LEASE expired — release or re-acquire before BUILD")
+        return result
+
+    result["active"] = True
+    lease_branch = str(lease.get("branch") or "").strip()
+    lease_worker = str(lease.get("worker_id") or lease.get("lane") or "").strip()
+    path_globs = _normalize_globs(lease.get("path_globs"))
+    forbidden = _normalize_globs(lease.get("forbidden_globs"))
+    exclusive = lease.get("exclusive", True)
+
+    if lease_branch and branch != lease_branch:
+        result["reasons"].append(f"checkout {branch!r} != lease branch {lease_branch!r}")
+        result["blocks_dispatch"] = True
+        if verdict in RELAY_VERDICTS and not loop_host_allowed:
+            result["blocks_relay"] = True
+
+    conflicts = paths_overlap(dirty, path_globs, forbidden)
+    if conflicts and exclusive:
+        result["path_conflicts"] = conflicts[:10]
+        result["reasons"].append(f"dirty paths overlap lease scope ({len(conflicts)} path(s))")
+        result["blocks_dispatch"] = True
+
+    for p in dirty:
+        if forbidden and path_matches_any(p, forbidden):
+            result["reasons"].append(f"forbidden path dirty under lease: {p}")
+            result["blocks_dispatch"] = True
+            break
+
+    if closeout_only and any(p.startswith("src/") for p in dirty):
+        result["reasons"].append("CLOSEOUT_ONLY forbids product edits under src/")
+        result["blocks_dispatch"] = True
+
+    if proposed_worker and lease_worker and proposed_worker != lease_worker and exclusive:
+        result["reasons"].append(f"lease held by {lease_worker!r}, cannot dispatch {proposed_worker!r}")
+        result["blocks_dispatch"] = True
+
+    return result
+
+
+def infer_worker_events(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Tier 2: infer worker progress from git + markers (no Codex API)."""
+    repo = repo.resolve()
+    if status is None:
+        from scripts.ppe_operator_status import collect_operator_status
+
+        status = collect_operator_status(repo)
+
+    now = _utc_iso(_utc_now())
+    events: list[dict[str, Any]] = []
+    branch = _current_branch(repo)
+    dirty = _dirty_paths(repo)
+
+    proc = _git(repo, "log", "-1", "--format=%H %s")
+    if proc.returncode == 0 and (proc.stdout or "").strip():
+        parts = (proc.stdout or "").strip().split(" ", 1)
+        events.append(
+            {
+                "event": "git_head",
+                "at": now,
+                "commit": parts[0],
+                "subject": parts[1] if len(parts) > 1 else "",
+                "branch": branch,
+            }
+        )
+
+    trigger = repo / ".cursor" / "IDE_BUILD_TRIGGER.json"
+    if trigger.is_file():
+        try:
+            data = json.loads(trigger.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                events.append({"event": "ide_build_trigger", "at": now, "payload": data})
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    ready_marker = repo / "artifacts" / "orchestrator" / "IDE_PRODUCT_READY.json"
+    if ready_marker.is_file():
+        try:
+            data = json.loads(ready_marker.read_text(encoding="utf-8"))
+            if isinstance(data, dict):
+                events.append({"event": "ide_product_ready", "at": now, "payload": data})
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    lease = load_lease(repo)
+    if lease and _lease_active(lease):
+        events.append(
+            {
+                "event": "lease_active",
+                "at": now,
+                "worker_id": lease.get("worker_id"),
+                "branch": lease.get("branch"),
+                "expires_at": lease.get("expires_at"),
+            }
+        )
+
+    assessment = assess_worker_lease(repo, status)
+    if assessment.get("blocks_dispatch"):
+        events.append(
+            {
+                "event": "dispatch_blocked",
+                "at": now,
+                "reasons": assessment.get("reasons") or [],
+            }
+        )
+
+    if dirty:
+        events.append({"event": "dirty_tree", "at": now, "paths": dirty[:20], "count": len(dirty)})
+
+    return {
+        "schema_version": 1,
+        "as_of": now,
+        "events": events,
+        "suggested_lane": assessment.get("suggested_lane"),
+        "verdict": status.get("verdict"),
+    }
+
+
+def write_worker_events(repo: Path, status: dict[str, Any] | None = None) -> Path:
+    payload = infer_worker_events(repo, status)
+    path = repo / WORKER_EVENTS_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def build_work_dispatch(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
+    if status is None:
+        from scripts.ppe_operator_status import collect_operator_status
+
+        status = collect_operator_status(repo)
+
+    assessment = assess_worker_lease(repo, status)
+    lane_pref = assessment.get("lane_preference") if isinstance(assessment.get("lane_preference"), dict) else {}
+    preferred = str(assessment.get("suggested_lane") or LANE_CURSOR)
+    fallback = LANE_CURSOR if preferred == LANE_CODEX else LANE_CODEX
+
+    verdict = str(status.get("verdict") or "")
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    mode = str(chapter_mode.get("mode") or verdict)
+
+    slice_id = str(status.get("product_slice") or "").strip() or None
+    if not slice_id:
+        guard = status.get("guard") if isinstance(status.get("guard"), dict) else {}
+        detail = str(guard.get("detail") or status.get("blocker") or "")
+        left, right = detail.find("["), detail.find("]")
+        if left >= 0 and right > left:
+            ids = [s.strip() for s in detail[left + 1 : right].split(",") if s.strip()]
+            if ids:
+                slice_id = ids[0]
+
+    lease = assessment.get("lease") if isinstance(assessment.get("lease"), dict) else {}
+    branch = str(lease.get("branch") or assessment.get("current_branch") or _current_branch(repo))
+    now = _utc_now()
+    dispatch_id = f"wi-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:8]}"
+
+    kind = "finish_closeout" if mode == "CLOSEOUT_ONLY" and verdict == "RUN_LOCAL" else "ide_build"
+    if verdict == "RUN_AUTO":
+        kind = "relay_auto"
+
+    registry = load_worker_registry(repo)
+    workers = registry.get("workers") if isinstance(registry.get("workers"), list) else []
+    worker_row = next((w for w in workers if isinstance(w, dict) and w.get("id") == preferred), {})
+    path_globs = _normalize_globs(lease.get("path_globs")) or _normalize_globs(
+        worker_row.get("default_path_globs")
+    )
+    forbidden = _normalize_globs(lease.get("forbidden_globs"))
+    if mode == "CLOSEOUT_ONLY" and "src/**" not in forbidden:
+        forbidden = [*forbidden, "src/**"]
+
+    return {
+        "schema_version": 1,
+        "dispatch_id": dispatch_id,
+        "as_of": _utc_iso(now),
+        "work_item": {"slice_id": slice_id, "kind": kind, "verdict": verdict, "mode": mode},
+        "lane": {
+            "machine": "vm" if preferred == LANE_VM else "desktop",
+            "runtime": str(worker_row.get("runtime") or preferred),
+            "worker_id": preferred,
+            "fallback_worker_id": fallback,
+            "preference_reason": lane_pref.get("reason"),
+        },
+        "lease": {
+            "lease_id": lease.get("lease_id"),
+            "branch": branch,
+            "path_globs": path_globs,
+            "forbidden_globs": forbidden,
+            "expires_at": lease.get("expires_at"),
+            "active": bool(assessment.get("active")),
+        },
+        "handoff": {
+            "continuity_uri": "docs/SOP/AGENT_CONTINUITY_BRIEF.md",
+            "operator_status_uri": "artifacts/orchestrator/OPERATOR_STATUS.md",
+            "lane_policy_uri": "docs/SOP/WORKER_LANE_POLICY_V1.md",
+        },
+        "acceptance": {
+            "gate": "python scripts/run_pushable_gate.py",
+            "mark_ready": f"python scripts/mark_ide_product_ready.py --slice {slice_id}" if slice_id else None,
+            "relay_continue": "DESKTOP_CONTINUE.cmd --no-pause",
+        },
+        "coordination": {
+            "other_workers_blocked": bool(assessment.get("active")),
+            "blocks_dispatch": bool(assessment.get("blocks_dispatch")),
+            "notes": "; ".join(assessment.get("reasons") or []) or None,
+        },
+    }
+
+
+def write_work_dispatch(repo: Path, status: dict[str, Any] | None = None) -> Path:
+    dispatch = build_work_dispatch(repo, status)
+    path = repo / WORK_DISPATCH_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(dispatch, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def acquire_lease(
+    repo: Path,
+    *,
+    worker_id: str,
+    branch: str | None = None,
+    path_globs: list[str] | None = None,
+    forbidden_globs: list[str] | None = None,
+    ttl_hours: float = 2.0,
+    exclusive: bool = True,
+    notes: str | None = None,
+    work_item: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    repo = repo.resolve()
+    existing = load_lease(repo)
+    if existing and _lease_active(existing):
+        assessment = assess_worker_lease(repo, proposed_worker=worker_id)
+        if assessment.get("blocks_dispatch"):
+            raise RuntimeError(
+                "Cannot acquire lease: " + "; ".join(assessment.get("reasons") or ["active lease conflict"])
+            )
+
+    now = _utc_now()
+    expires = now + timedelta(hours=ttl_hours)
+    branch = branch or _current_branch(repo)
+    lease_id = f"lease-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:8]}"
+
+    lease = {
+        "schema_version": 1,
+        "lease_id": lease_id,
+        "worker_id": worker_id,
+        "lane": worker_id,
+        "machine": "desktop" if worker_id != LANE_VM else "vm",
+        "branch": branch,
+        "exclusive": exclusive,
+        "path_globs": _normalize_globs(path_globs),
+        "forbidden_globs": _normalize_globs(forbidden_globs),
+        "work_item": work_item or {},
+        "acquired_at": _utc_iso(now),
+        "expires_at": _utc_iso(expires),
+        "notes": notes,
+    }
+    save_lease(repo, lease)
+    return lease
+
+
+def format_lease_lines(assessment: dict[str, Any]) -> list[str]:
+    lines: list[str] = []
+    lane = assessment.get("suggested_lane")
+    if not lane:
+        return lines
+
+    pref = assessment.get("lane_preference") if isinstance(assessment.get("lane_preference"), dict) else {}
+    reason = pref.get("reason")
+    lines.append("")
+    lines.append(f"**Worker lane:** `{lane}`" + (f" ({reason})" if reason else ""))
+
+    if assessment.get("blocks_dispatch"):
+        lines.append("  **Lease: BLOCKS dispatch**")
+        for r in assessment.get("reasons") or []:
+            lines.append(f"  - {r}")
+        lines.append("  → docs/SOP/WORKER_LANE_POLICY_V1.md — release, re-acquire, or checkout lease branch")
+    elif assessment.get("expired"):
+        lines.append("  Lease expired — re-acquire before multi-agent BUILD")
+    elif assessment.get("active"):
+        lease = assessment.get("lease") if isinstance(assessment.get("lease"), dict) else {}
+        holder = lease.get("worker_id") or "?"
+        lines.append(f"  Active lease: `{holder}` on `{lease.get('branch')}`")
+
+    return lines
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description="Multi-agent worker lease assess / acquire / dispatch.")
+    ap.add_argument("--repo-root", type=Path, default=Path.cwd())
+    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--assess", action="store_true")
+    ap.add_argument("--write-dispatch", action="store_true")
+    ap.add_argument("--infer-events", action="store_true", help=f"Write {WORKER_EVENTS_REL}")
+    ap.add_argument("--release", action="store_true")
+    ap.add_argument("--acquire", action="store_true")
+    ap.add_argument("--worker", type=str, default=LANE_CODEX)
+    ap.add_argument("--branch", type=str, default=None)
+    ap.add_argument("--paths", nargs="*", default=None)
+    ap.add_argument("--forbid", nargs="*", default=None)
+    ap.add_argument("--ttl-hours", type=float, default=2.0)
+    ap.add_argument("--notes", type=str, default=None)
+    args = ap.parse_args(argv)
+
+    repo = args.repo_root.resolve()
+
+    if args.release:
+        released = release_lease(repo)
+        print(json.dumps({"released": released}) if args.json else f"ppe_worker_lease: released={released}")
+        return 0
+
+    if args.acquire:
+        try:
+            lease = acquire_lease(
+                repo,
+                worker_id=args.worker,
+                branch=args.branch,
+                path_globs=args.paths,
+                forbidden_globs=args.forbid,
+                ttl_hours=args.ttl_hours,
+                notes=args.notes,
+            )
+        except RuntimeError as exc:
+            print(f"ppe_worker_lease: {exc}", file=sys.stderr)
+            return 1
+        print(json.dumps(lease, indent=2) if args.json else f"ppe_worker_lease: acquired {lease['lease_id']}")
+        return 0
+
+    if args.write_dispatch:
+        dispatch = build_work_dispatch(repo)
+        path = write_work_dispatch(repo)
+        print(json.dumps(dispatch, indent=2) if args.json else f"ppe_worker_lease: wrote {path.relative_to(repo)}")
+        return 0
+
+    if args.infer_events:
+        payload = infer_worker_events(repo)
+        path = write_worker_events(repo)
+        print(json.dumps(payload, indent=2) if args.json else f"ppe_worker_lease: wrote {path.relative_to(repo)}")
+        return 0
+
+    assessment = assess_worker_lease(repo)
+    if args.json:
+        print(json.dumps(assessment, indent=2))
+    else:
+        print(
+            f"ppe_worker_lease: lane={assessment.get('suggested_lane')} "
+            f"active={assessment.get('active')} blocks={assessment.get('blocks_dispatch')}"
+        )
+    return 1 if assessment.get("blocks_dispatch") else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

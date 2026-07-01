@@ -130,6 +130,38 @@ def test_compute_burst_plan_vm_in_flight_waits(tmp_path) -> None:
     assert "do NOT SSH probe" in plan["prompt"]
 
 
+def test_compute_burst_plan_lease_conflict_blocks(tmp_path, monkeypatch) -> None:
+    from datetime import datetime, timedelta, timezone
+
+    monkeypatch.chdir(tmp_path)
+    now = datetime.now(timezone.utc)
+    lease = {
+        "lease_id": "lease-test",
+        "worker_id": "codex-app",
+        "branch": "control-plane/other",
+        "exclusive": True,
+        "path_globs": ["scripts/**"],
+        "forbidden_globs": [],
+        "expires_at": (now + timedelta(hours=1)).isoformat().replace("+00:00", "Z"),
+    }
+    (tmp_path / "artifacts/control_plane").mkdir(parents=True)
+    (tmp_path / "artifacts/control_plane/ACTIVE_LEASE.json").write_text(json.dumps(lease) + "\n")
+
+    plan_rel = "docs/SOP/PHASE_TEST.json"
+    _write_plan(tmp_path, plan_rel, [{"sliceId": "Slice-A"}])
+    status = {
+        "verdict": VERDICT_IDE_BUILD,
+        "phase_plan_path": plan_rel,
+        "guard": {"reason": "PRODUCT_BLOCKED", "detail": "[Slice-A]"},
+        "chapter_mode": {"mode": "IDE_BUILD"},
+    }
+    with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
+        mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 1}
+        plan = compute_burst_plan(tmp_path, status)
+    assert plan["burst_allowed"] is False
+    assert plan["direct_action"] == "resolve_lease"
+
+
 def test_prepare_operator_status_applies_env_before_collect(tmp_path, monkeypatch) -> None:
     from scripts.ppe_operator_status import prepare_operator_status
 

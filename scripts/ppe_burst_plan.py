@@ -123,6 +123,19 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
     if direct_action == "wait_for_vm":
         burst_allowed = False
 
+    worker_lease: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_worker_lease import assess_worker_lease
+
+        worker_lease = assess_worker_lease(repo, status)
+        if worker_lease.get("blocks_dispatch"):
+            burst_allowed = False
+            use_director = False
+            if direct_action not in ("wait_for_vm",):
+                direct_action = "resolve_lease"
+    except Exception:
+        pass
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
@@ -139,6 +152,8 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "direct_action": direct_action,
         "closeout_only": closeout_only,
         "worker_verdicts_only": True,
+        "worker_lease": worker_lease,
+        "suggested_lane": (worker_lease or {}).get("suggested_lane"),
         "prompt": format_burst_director_prompt(
             max_cycles=max_cycles,
             overall_band=overall_band,
@@ -165,6 +180,11 @@ def format_burst_director_prompt(
         body = (
             "VM phase FINISH_IN_FLIGHT or BUILD_IN_FLIGHT — wait for loop host; "
             "do NOT SSH probe queue/manifest or spawn @ppe-director."
+        )
+    elif direct_action == "resolve_lease":
+        body = (
+            "Worker lease blocks dispatch — run python scripts/ppe_worker_lease.py --assess; "
+            "see docs/SOP/WORKER_LANE_POLICY_V1.md."
         )
     elif direct_action == "DESKTOP_CONTINUE.cmd --no-pause":
         body = (
