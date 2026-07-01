@@ -189,6 +189,9 @@ def format_chapter_mode_block(info: dict[str, Any]) -> list[str]:
     next_c = info.get("next_build_candidate")
     if next_c and info.get("do_not_rebuild"):
         lines.append(f"  Next BUILD candidate (after closeout): `{next_c}`")
+        lines.append(
+            f"  Resolve docs: `python scripts/resolve_sop.py --chapter {next_c} --json`"
+        )
 
     return lines
 

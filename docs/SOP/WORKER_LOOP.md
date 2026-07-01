@@ -1,5 +1,7 @@
 # WORKER_LOOP
 
+> **Superseded (2026-06):** Relay BUILD uses [`IDE_BUILD_STARTER_*.md`](../../artifacts/orchestrator/) (one file per slice) or ACP workers via `run_ppe.cmd`. Load order: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md). **Do not load this doc for BUILD.**
+
 Purpose: define the worker agent's role for executing **one** feature slice at a time.
 
 ## Worker responsibilities

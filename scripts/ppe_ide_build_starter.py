@@ -111,6 +111,26 @@ def _compact_scope(scope) -> str:
     return f"**Scope:** {scope_line} · **Forbidden:** {forbid_line}"
 
 
+def _compact_doc_resolve(repo: Path, phase_plan: str) -> str:
+    try:
+        from scripts.ppe_chapter_mode import plan_chapter_id
+        from scripts.sop_discovery_core import chapter_doc_bundle
+
+        norm = phase_plan.replace("\\", "/").strip()
+        cid = plan_chapter_id(norm)
+        bundle = chapter_doc_bundle(repo, chapter_id=cid, plan_path=norm)
+        build = bundle.get("load_for_build") or []
+        skip = (bundle.get("do_not_load") or [])[:2]
+        lines = [f"**Doc resolve:** `python scripts/resolve_sop.py --chapter {cid} --json`"]
+        if build:
+            lines.append("**load_for_build:** " + " · ".join(f"`{p}`" for p in build[:3]))
+        if skip:
+            lines.append("**skip:** " + " · ".join(f"`{p}`" for p in skip))
+        return "\n".join(lines)
+    except Exception:
+        return ""
+
+
 def _compact_loads(*, touch: tuple[str, ...], sprint_path: str, phase_plan: str) -> str:
     paths: list[str] = []
     for p in touch[:5]:
@@ -201,6 +221,14 @@ def build_starter_md(repo: Path, *, slice_id: str, phase_plan: str) -> str:
             _compact_acceptance(sl, sprint_path),
             _compact_loads(touch=touch, sprint_path=sprint_path, phase_plan=norm_plan),
             "",
+        ]
+    )
+    doc_resolve = _compact_doc_resolve(repo, norm_plan)
+    if doc_resolve:
+        parts.insert(-2, doc_resolve)
+        parts.insert(-2, "")
+    parts.extend(
+        [
             "_New Agent thread · this file only · no orchestrator/pytest/diff paste._",
             "",
             format_build_closeout_section(slice_id=slice_id, phase_plan=norm_plan),

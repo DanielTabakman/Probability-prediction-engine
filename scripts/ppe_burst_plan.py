@@ -136,6 +136,20 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
     except Exception:
         pass
 
+    coordination_check: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_coordination_check import assess_coordination_check, write_coordination_check
+
+        coordination_check = assess_coordination_check(repo, status)
+        write_coordination_check(repo, coordination_check)
+        if coordination_check.get("blocks_burst"):
+            burst_allowed = False
+            use_director = True
+            if direct_action not in ("wait_for_vm", "resolve_lease"):
+                direct_action = "coordination_check"
+    except Exception:
+        pass
+
     return {
         "as_of": _utc_now(),
         "verdict": verdict,
@@ -153,6 +167,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "closeout_only": closeout_only,
         "worker_verdicts_only": True,
         "worker_lease": worker_lease,
+        "coordination_check": coordination_check,
         "suggested_lane": (worker_lease or {}).get("suggested_lane"),
         "prompt": format_burst_director_prompt(
             max_cycles=max_cycles,
@@ -161,6 +176,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             verdict=verdict,
             burst_allowed=burst_allowed,
             direct_action=direct_action,
+            coordination_check=coordination_check,
         ),
     }
 
@@ -173,10 +189,20 @@ def format_burst_director_prompt(
     verdict: str,
     burst_allowed: bool,
     direct_action: str | None = None,
+    coordination_check: dict[str, Any] | None = None,
 ) -> str:
     from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 
-    if direct_action == "wait_for_vm":
+    if direct_action == "coordination_check":
+        coord_verdict = str((coordination_check or {}).get("verdict") or "recovery")
+        summary = str((coordination_check or {}).get("summary") or "coordination blocked")
+        body = (
+            f"Coordination blocked burst (verdict={coord_verdict}). "
+            f"Spawn @ppe-coordination-check first — {summary}. "
+            f"Read artifacts/control_plane/COORDINATION_CHECK.json. "
+            "Do NOT spawn ppe-build-worker until coordination returns proceed or repair complete."
+        )
+    elif direct_action == "wait_for_vm":
         body = (
             "VM phase FINISH_IN_FLIGHT or BUILD_IN_FLIGHT — wait for loop host; "
             "do NOT SSH probe queue/manifest or spawn @ppe-director."

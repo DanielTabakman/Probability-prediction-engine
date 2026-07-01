@@ -2,28 +2,27 @@
 
 **Plane:** CONTROL-PLANE · **Purpose:** copy-paste openers so relay/autobuilder does not hijack topic threads.
 
-**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
+**Rules:** [`.cursor/rules/ppe-thread-roles.mdc`](../../.cursor/rules/ppe-thread-roles.mdc) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`CONTEXT_RULES.md`](../CONTEXT_RULES.md)
 
 ---
 
-## Operator / autobuilder (agent-initiated — not founder daily ritual)
+## Operator / autobuilder (relay + what's next)
 
-**Founder:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — runtime automation runs factory on normal days. **Agents** open operator threads when automation fails or burst is needed — **not** a founder homework ritual.
+Dedicated thread for queue, VM status, burst, and triage. Open **one** long-lived operator chat or a fresh thread when you want relay work.
 
 ```text
 Operator thread. THREAD_ROLE: operator.
-Agent-initiated (automation degraded). Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
-Auto-execute — do not ask founder to choose paths or run relay commands.
+Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
 Do not mix UX charter or SELECTION planning here.
 ```
 
-Minimal (agent use when automation blocked):
+Minimal:
 
 ```text
 what's next?
 ```
 
-After context closeout (agent):
+After context closeout:
 
 ```text
 what's next?
@@ -39,20 +38,6 @@ Optional @ files: `artifacts/orchestrator/OPERATOR_STATUS.md`, `docs/SOP/AGENT_C
 IDE BUILD thread. THREAD_ROLE: ide_build.
 Load only @artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md
 Implement → gate → mark_ide_product_ready. No steward narrative.
-```
-
----
-
-## Founder charter (product / strategy / SELECTION)
-
-Work **on** the product — direction, policy, backlog — without relay bleed or factory todos.
-
-```text
-Founder charter thread. THREAD_ROLE: charter.
-Topic: product direction / SELECTION / policy — not relay.
-Do NOT read OPERATOR_STATUS. Do NOT assign me factory steps (git, BUILD, recovery, sync).
-Load: @docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md + [relevant program doc]
-When execution is needed, park to operator thread or spawn workers — do not ask me to run relay.
 ```
 
 ---
@@ -85,14 +70,28 @@ Topic: asset batch / data collection
 Load only: @docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md (or relevant program doc).
 ```
 
-Control-plane / agent policy (no relay):
+Unclear topic — resolve first:
 
 ```text
 Charter thread. THREAD_ROLE: charter.
-Topic: agent rules / SOP / commit policy / thread roles
-Load only: relevant docs/SOP or .cursor/rules files.
-Do NOT read OPERATOR_STATUS. Ship docs/control-plane if gate passes; park mixed-plane to operator thread.
+Run: python scripts/resolve_sop.py --topic "<your topic>" --json
+Or: python scripts/resolve_sop.py --role charter --json
+Load only paths from load_always in the JSON.
 ```
+
+---
+
+## Topic quick reference
+
+| Topic | @ file or command |
+|-------|-------------------|
+| UX backlog | `docs/SOP/UX_EXECUTION_BACKLOG_V1.md` |
+| Trader spine | `docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md` |
+| Asset enable | `python scripts/discover_asset_data_source.py --asset ID --json` |
+| Asset batch | `docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md` |
+| Any chapter | `python scripts/resolve_sop.py --chapter <id> --json` |
+
+Full table: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) § Topic → load.
 
 ---
 
@@ -118,21 +117,6 @@ Run what's next; do not restart VM loop unless STACK_DOWN.
 
 ---
 
-## VM Remote-SSH (loop debugging — no desktop SSH)
-
-Use when the VM loop is stuck or you need `fix_vm_operator` / log tails.
-
-```text
-Operator thread on VM via Remote-SSH (ppe-vm).
-THREAD_ROLE: operator.
-Connected to loop host — run ppe_autobuilder.cmd status --brief; fix_vm_operator.cmd if needed.
-Load @docs/SOP/PPE_CURSOR_REMOTE_SSH_V1.md
-```
-
-One-time desktop setup: `powershell -ExecutionPolicy Bypass -File scripts\setup_ppe_vm_cursor_ssh.ps1`
-
----
-
 ## Switching roles mid-thread
 
 | Phrase | Effect |
@@ -151,5 +135,3 @@ One-time desktop setup: `powershell -ExecutionPolicy Bypass -File scripts\setup_
 | `@ppe-ux-director` for UX brainstorming | Charter thread + `@ppe-ux-charter` |
 | Steward + operator + BUILD in one thread | Separate operator vs charter vs IDE BUILD |
 | Pasting `OPERATOR_STATUS` into charter threads | One-line "see operator thread" if needed |
-| Charter thread ending with stash/checkout/relay commands | Finish topic; one line: "Operator thread: what's next?" |
-| Branch/stash recovery in charter or neutral threads | Operator thread + [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) |
