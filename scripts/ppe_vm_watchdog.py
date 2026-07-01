@@ -154,6 +154,17 @@ def maybe_supervisor_tick(repo: Path) -> None:
         check_and_recover(repo, apply=True)
     except Exception as exc:
         print(f"ppe_vm_watchdog: supervisor tick failed: {exc}", file=sys.stderr)
+    try:
+        from scripts.ppe_operator_stuck_run_local import maybe_auto_recover_run_local
+        from scripts.ppe_operator_status import collect_operator_status
+
+        maybe_auto_recover_run_local(
+            repo,
+            status=collect_operator_status(repo),
+            source="vm_watchdog",
+        )
+    except Exception as exc:
+        print(f"ppe_vm_watchdog: stuck RUN_LOCAL tick failed: {exc}", file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> int:

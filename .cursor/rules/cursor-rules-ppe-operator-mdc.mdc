@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+---
+
+---
+description: Operator relay — desktop vs VM, verdicts, what's next.
+alwaysApply: true
+---
+
+# Operator workflow
+
+**Only when role = operator or ide_build.**
+
+## Desktop vs VM
+
+| Machine | Relay | BUILD | After BUILD |
+|---------|-------|-------|-------------|
+| Daily desktop | Never | IDE BUILD in Cursor | `DESKTOP_CONTINUE.cmd` |
+| Hyper-V VM | Yes (loop host) | No | `run_ppe_local.cmd` |
+
+Before relay on desktop: `python scripts/ppe_loop_host_guard.py --check` — if not allowed, don't run relay locally.
+
+**Never on desktop:** `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_*`, `finish_ide_build.cmd`, `ppe_autobuilder.cmd advance`, `STUCK_RUN_LOCAL_WATCH.cmd`, `ppe_operator_stuck_run_local.py --ensure-watch` / `--watch-daemon`.
+
+**Never on desktop (stuck recovery):** Do not set `PPE_ENABLE_STUCK_RUN_LOCAL_RECOVERY`, `PPE_STUCK_RUN_LOCAL_WATCH`, or create `ppe_operator_stuck_recovery.unlock` for the operator — causes CMD pop-ups. `RUN_LOCAL` → `DESKTOP_CONTINUE.cmd --no-pause` once; do not ask the operator to enable background watchers.
+
+`RUN_LOCAL` on desktop = **`DESKTOP_CONTINUE.cmd --no-pause`** (not local `run_ppe_local`).
+
+SSH: max 1 call per pass, 120s timeout, use `python scripts/ppe_operator_status.py --brief`. Prefer `docs/SOP/VM_OPERATOR_PHASE.json` over SSH.
+
+## What's next (operator only)
+
+1. Read `artifacts/orchestrator/OPERATOR_STATUS.md` — check `Mode:` (`CLOSEOUT_ONLY` = no re-BUILD)
+2. `python scripts/ppe_burst_plan.py --write` → read `BURST_PLAN.json`
+3. `direct_action` set → run it (`DESKTOP_CONTINUE.cmd --no-pause` or wait)
+4. `burst_allowed` + `use_director` → `@ppe-director` (don't implement IDE_BUILD in operator thread)
+5. Else run verdict:
+
+| Verdict | Desktop | VM |
+|---------|---------|-----|
+| `RUN_LOCAL` | `DESKTOP_CONTINUE.cmd` | `run_ppe_local.cmd` |
+| `IDE_BUILD` | `@ppe-director` → build worker | wait |
+| `RUN_AUTO` | status only | relay advance |
+| `ERROR`/`FIX_PLAN` | `@ppe-director` triage or `ppe_notify_fix.py` | same |
+
+## Reply format
+
+Short summary: verdict → what you did → "Nothing required from you." if clear.
+
+**Never:** numbered steps for the human, choice questions, commit permission asks, manual "open a BUILD thread" when burst can spawn workers.
+
+Trust VM status over stale desktop status.
+
+Canon: `docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`, `docs/SOP/PPE_OPERATOR_LAYOUT_ADR.md`

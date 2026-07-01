@@ -155,9 +155,9 @@ def test_vm_finish_command_uses_prepare_handoff() -> None:
     from scripts.ppe_operator_vm_ssh import vm_finish_command
 
     cmd = vm_finish_command(pull_main=True)
-    assert "--prepare-handoff" in cmd
+    assert "ppe_vm_handoff_preflight.py" in cmd
     assert "finish_ide_build.cmd" in cmd
-    assert "git pull origin main" not in cmd
+    assert "--prepare-handoff" not in cmd
 
 
 def test_publish_skips_when_nothing_ahead(tmp_path: Path) -> None:
