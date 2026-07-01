@@ -110,6 +110,23 @@ def run_operator_doctor(
     except Exception as exc:
         report["checks"].append({"id": "sop_discovery", "ok": False, "error": str(exc)})
 
+    try:
+        from scripts.ppe_chapter_coordination import assess_chapter_coordination_health
+
+        coord = assess_chapter_coordination_health(repo)
+        report["chapter_coordination"] = coord
+        top = coord.get("top_issue") if isinstance(coord.get("top_issue"), dict) else {}
+        report["checks"].append(
+            {
+                "id": "chapter_coordination",
+                "ok": bool(coord.get("ok")),
+                "detail": str(top.get("message") or "")[:160] or None,
+                "repairable_plans": coord.get("repairable_plan_count"),
+            }
+        )
+    except Exception as exc:
+        report["checks"].append({"id": "chapter_coordination", "ok": False, "error": str(exc)})
+
     high = [
         i
         for i in (report.get("blind_spots") or {}).get("issues") or []
