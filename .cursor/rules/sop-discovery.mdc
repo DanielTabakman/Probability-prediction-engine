@@ -1,21 +1,35 @@
 ---
-description: SOP doc discovery — load the right canon by topic/chapter before guessing paths.
+description: SOP doc discovery — run resolve_sop.py when topic/chapter is unclear. Load on demand.
 alwaysApply: false
 ---
 
-# SOP discovery (PPE)
+# SOP discovery (on demand)
 
-**When** the topic, chapter, or program doc is unclear — before inventing paths or reading `OPERATOR_STATUS.md` in a charter thread.
+**When the operator asks about a program/chapter/topic** and the correct SOP is not already in the thread starter or continuity brief:
 
-## Order
+```bash
+python scripts/resolve_sop.py --topic "<phrase>" --json
+python scripts/resolve_sop.py --chapter <chapter_id> --json
+python scripts/resolve_sop.py --module <module_id> --json
+python scripts/resolve_sop.py --role <operator|charter|ide_build|explore|neutral> --json
+python scripts/resolve_sop.py --list-topics --json
+```
 
-1. **[`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md)** — load order by thread role
-2. **[`THREAD_STARTERS_V1.md`](../../docs/SOP/THREAD_STARTERS_V1.md)** — copy-paste openers
-3. **`python scripts/resolve_sop.py --topic "<topic>" --json`** — when the script exists; use `next_action` + paths from JSON
-4. Program doc named in user message or [`ACTIVE_PRODUCT_DIRECTION.json`](../../docs/SOP/ACTIVE_PRODUCT_DIRECTION.json)
+**Execute `next_action` and load only paths in `load_always` / `load_for_build` for the thread role.**
 
-## Rules
+| Thread role | Load from resolve JSON |
+|-------------|------------------------|
+| **charter** | `load_always` only |
+| **ide_build** | IDE_BUILD_STARTER only — ignore resolve unless generating starter |
+| **operator** | `OPERATOR_STATUS` + continuity brief; resolve for ad-hoc topics |
+| **explore / neutral** | User @ scope only |
 
-- **Charter / neutral:** discovery only — no relay, no branch recovery ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc))
-- **Operator:** may read `OPERATOR_STATUS.md` after role is confirmed
-- Do **not** treat stale handoff copies as SSOT when generated files disagree — prefer `ACTIVE_PRODUCT_DIRECTION.json`, manifest, queue
+**Archive catalog:** [`ARCHIVE_INDEX.md`](../../docs/SOP/ARCHIVE_INDEX.md) — archived chapters only; **do not load for BUILD**.
+
+**Charter / neutral:** discovery only — no relay, no branch recovery ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc))
+
+**Operator:** may read `OPERATOR_STATUS.md` after role is confirmed
+
+Do **not** treat stale handoff copies as SSOT when generated files disagree — prefer `ACTIVE_PRODUCT_DIRECTION.json`, manifest, queue
+
+Index: [`CHAPTER_DOC_INDEX.json`](../../docs/SOP/CHAPTER_DOC_INDEX.json) · canon: [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md)

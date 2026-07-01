@@ -727,6 +727,12 @@ def cmd_generate(repo: Path, *, week_monday: date | None = None, force: bool = F
     digest_path(repo).parent.mkdir(parents=True, exist_ok=True)
     digest_path(repo).write_text(render_digest(sections), encoding="utf-8")
     save_state(repo, state)
+    try:
+        from scripts.sop_discovery_core import refresh_sop_discovery_artifacts
+
+        refresh_sop_discovery_artifacts(repo)
+    except Exception:
+        pass
     print(f"ppe_weekly_digest: wrote week of {week_id}")
     return 0
 

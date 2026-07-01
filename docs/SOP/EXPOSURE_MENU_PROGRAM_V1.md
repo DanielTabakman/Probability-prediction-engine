@@ -5,8 +5,8 @@
 **Class:** `EXPOSURE_PATH` — “What ways exist to get exposure to this asset?”  
 **Pillars:** WORKFLOW (primary) + LEGIBILITY (trust labels per path)  
 **First ship-to:** TRADER  
-**As-of:** 2026-06-30  
-**Status:** v0 **LIVE** — scan/compare follow-on chartered in [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md)
+**As-of:** 2026-06-29  
+**Status:** CHARTERED — v0 relay not yet SELECTED for BUILD
 
 ---
 
@@ -95,15 +95,13 @@ Engine activates paths from catalog + live eligibility (chain depth, horizon, sp
 |-------|------------------|
 | **NVDA** | spot, LEAPS call, bull call spread, near-dated call, OTM call, cash-secured put (short exposure path) |
 | **BTC** | spot/index, long call, bull call spread |
-| **HYPE** | perp only (Hyperliquid) — [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md) |
 
 ### Planned cards (honest labels, no fake math)
 
 | Rail | v0 posture |
 |------|------------|
 | `etf_proxy` (e.g. SMH for NVDA) | **Planned** card |
-| `perp` (BTC/ETH) | **Planned** until HL chapter ships |
-| `perp` (HYPE) | **CHARTERED** → Live mark/funding in [`ppe_hyperliquid_perp_rail_v1`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md) |
+| `perp` | **Planned** card (Hyperliquid not execution rail yet) |
 
 ---
 
@@ -129,16 +127,14 @@ Engine activates paths from catalog + live eligibility (chain depth, horizon, sp
 | # | Chapter | Tier | Delivers |
 |---|---------|------|----------|
 | 1 | **`ppe_exposure_menu_v1`** | T0→T2 | Core + CLI + boundary + MSOS page (NVDA + BTC) |
-| 2 | **`ppe_hyperliquid_perp_rail_v1`** | T1→T2 | HYPE Live perp path (Hyperliquid read-only) — [`POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md) |
 
-Future (post v0):
+Future (not v0):
 
 | Chapter | Delivers |
 |---------|----------|
-| **`ppe_exposure_menu_scan_v1`** | Sections, fit lenses, two-path compare — [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) **LIVE** |
 | `ppe_exposure_menu_nl_v1` | Natural-language intake (“nvidia exposure”) |
 | `msos_exposure_menu_save_v1` | Save chosen path to workflow store |
-| `ppe_exposure_menu_universe_v1` | Neutral/hedge catalog + remaining assets (SPY/QQQ/IWM index binding shipped in scan follow-up) |
+| `ppe_exposure_menu_universe_v1` | All enabled catalog assets |
 
 ---
 
@@ -151,7 +147,7 @@ Future (post v0):
 | Merging into Strategy Lab or Expression planner | Own lens |
 | Natural language intake | v1 |
 | ETF proxy live pricing | v1 |
-| Perp math without vendor | Planned cards only (except HYPE — chartered HL fetch) |
+| Perp math without vendor | Planned cards only |
 | T3 collector without archive charter | Registry rule |
 
 ---
@@ -175,16 +171,17 @@ Future (post v0):
 
 ---
 
-## Related docs
+## Agent load bundle
 
 | Doc | Role |
 |-----|------|
 | [`POST_PPE_EXPOSURE_MENU_V1_SELECTION.md`](POST_PPE_EXPOSURE_MENU_V1_SELECTION.md) | SELECTION |
 | [`SPRINT_PPE_EXPOSURE_MENU_V1.md`](SPRINT_PPE_EXPOSURE_MENU_V1.md) | Sprint |
+| [`PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md`](PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md) | Evidence |
 | [`PHASE_PLANS/ppe_exposure_menu_v1_relay.json`](PHASE_PLANS/ppe_exposure_menu_v1_relay.json) | Relay plan |
-| [`EXPOSURE_MENU_SCAN_COMPARE_V1.md`](EXPOSURE_MENU_SCAN_COMPARE_V1.md) | Scan sections, fit lenses, compare drawer (next UX chapter) |
-| [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md) | HYPE perp rail — exposure-only registry |
-| [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Exposure-first intent (adjacent to Expression Search / Hedging) |
+| Resolve | `python scripts/resolve_sop.py --module exposure_menu --json` |
+
+**Vision:** [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md)
 
 ---
 
@@ -193,5 +190,3 @@ Future (post v0):
 | Date | Change |
 |------|--------|
 | 2026-06-29 | v1 charter — module `exposure_menu`, v0 scope NVDA+BTC, T2 target |
-| 2026-06-30 | Link scan/compare follow-on charter; status v0 LIVE |
-| 2026-06-30 | Charter `ppe_hyperliquid_perp_rail_v1` — HYPE perp under exposure menu (P2 side channel) |

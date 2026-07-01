@@ -1,5 +1,7 @@
 # WORKER_LAUNCH_PROMPT
 
+> **Superseded (2026-06):** Use [`AGENT_ROUTING_V1.md`](../../docs/SOP/AGENT_ROUTING_V1.md) + `@artifacts/orchestrator/IDE_BUILD_STARTER_<sliceId>.md` for product BUILD, or `what's next?` on an operator thread. **Do not paste this prompt for relay work.**
+
 Reusable **ready-to-paste launch prompt** for a worker agent. Control plane artifact; not the worker loop itself.
 
 ---

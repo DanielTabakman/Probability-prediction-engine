@@ -603,6 +603,22 @@ def _format_human(
                 lines.append("")
         except Exception:
             pass
+    if repo is not None:
+        try:
+            from scripts.sop_discovery_core import format_operator_resolve_lines
+
+            chapter_mode_dict = chapter_mode if isinstance(chapter_mode, dict) else {}
+            resolve_lines = format_operator_resolve_lines(
+                repo,
+                plan_path=str(status.get("phase_plan_path") or "") or None,
+                next_build_candidate=str(chapter_mode_dict.get("next_build_candidate") or "")
+                or None,
+            )
+            if resolve_lines:
+                lines.extend(resolve_lines)
+                lines.append("")
+        except Exception:
+            pass
     if status.get("chapter_name"):
         lines.append(f"Chapter: {status['chapter_name']}")
     if status.get("manifest_status"):

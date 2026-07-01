@@ -4,6 +4,18 @@
 
 ---
 
+## Agent load bundle
+
+| Role | Path |
+|------|------|
+| Program (charter / ops) | this file |
+| Collector ops | [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md) |
+| Research pipeline | [`RESEARCH_PIPELINE_V1.md`](RESEARCH_PIPELINE_V1.md) |
+| Registry | [`config/research_pipeline_registry.json`](../../config/research_pipeline_registry.json) |
+| Resolve | `python scripts/resolve_sop.py --module cross_venue_event_gap --json` |
+
+---
+
 ## Operator commands
 
 ```bat
