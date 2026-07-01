@@ -289,6 +289,109 @@ def repair_chapter(repo: Path, plan_path: str, *, apply: bool) -> tuple[list[Fix
     return fixes, remaining
 
 
+REPAIRABLE_ISSUE_CODES = frozenset(
+    {
+        "PRODUCT_ON_MAIN_NO_MARKER",
+        "CLOSEOUT_REGISTRY_MISSING",
+        "QUEUE_ACTIVE_PRODUCT_DESYNC",
+    }
+)
+
+
+def _repairable_plan_paths(issues: list[Issue]) -> list[str]:
+    plans: list[str] = []
+    seen: set[str] = set()
+    for issue in issues:
+        if str(issue.get("code") or "") not in REPAIRABLE_ISSUE_CODES:
+            continue
+        plan = _norm_plan(str(issue.get("planPath") or ""))
+        if plan and plan not in seen:
+            seen.add(plan)
+            plans.append(plan)
+    return plans
+
+
+def assess_chapter_coordination_health(repo: Path) -> dict[str, Any]:
+    """Operator/doctor snapshot for factory vs steering desync."""
+    issues = audit_repo(repo)
+    high = [i for i in issues if str(i.get("severity") or "").lower() == "high"]
+    repairable = _repairable_plan_paths(issues)
+    return {
+        "ok": not high,
+        "issue_count": len(issues),
+        "high_count": len(high),
+        "repairable_plan_count": len(repairable),
+        "repairable_plans": repairable,
+        "top_issue": high[0] if high else (issues[0] if issues else None),
+        "issues": issues,
+    }
+
+
+def plan_coordination_repair(repo: Path) -> dict[str, Any]:
+    issues = audit_repo(repo)
+    plans = _repairable_plan_paths(issues)
+    return {
+        "issue_count": len(issues),
+        "repairable_plan_count": len(plans),
+        "plans": plans,
+    }
+
+
+def repair_repo_coordination(repo: Path, *, apply: bool) -> dict[str, Any]:
+    """Apply safe marker + closeout-registry repairs for all repairable plans."""
+    plan = plan_coordination_repair(repo)
+    all_fixes: list[Fix] = []
+    all_remaining: list[Issue] = []
+    if apply:
+        for plan_path in plan.get("plans") or []:
+            fixes, remaining = repair_chapter(repo, str(plan_path), apply=True)
+            all_fixes.extend(fixes)
+            for issue in remaining:
+                key = f"{issue.get('code')}|{issue.get('planPath')}"
+                if not any(
+                    f"{r.get('code')}|{r.get('planPath')}" == key for r in all_remaining
+                ):
+                    all_remaining.append(issue)
+    else:
+        all_remaining = audit_repo(repo)
+    return {
+        "applied": apply,
+        "fixes": all_fixes,
+        "fix_count": len(all_fixes),
+        "remaining": all_remaining,
+        "remaining_count": len(all_remaining),
+        "repairable_plan_count": plan.get("repairable_plan_count"),
+    }
+
+
+def format_operator_coordination_lines(repo: Path, *, max_high: int = 1) -> list[str]:
+    """Compact coordination block for OPERATOR_STATUS.md."""
+    health = assess_chapter_coordination_health(repo)
+    if health.get("ok"):
+        return ["**Chapter coordination:** OK"]
+    high_count = int(health.get("high_count") or 0)
+    if high_count == 0:
+        return [
+            f"**Chapter coordination:** {health.get('issue_count')} issue(s) — "
+            "`python scripts/ppe_chapter_coordination.py`"
+        ]
+    lines: list[str] = []
+    issues = [i for i in (health.get("issues") or []) if str(i.get("severity")).lower() == "high"]
+    for issue in issues[:max_high]:
+        msg = str(issue.get("message") or "Chapter coordination desync")
+        lines.append(f"**Chapter coordination:** WARN — {msg}")
+        fix = str(issue.get("fix") or "").strip()
+        if fix:
+            lines.append(f"  fix: `{fix}`")
+    extra_high = high_count - min(max_high, len(issues))
+    if extra_high > 0:
+        lines.append(
+            f"  (+{extra_high} more HIGH — `python scripts/ppe_chapter_coordination.py` "
+            "or `sop_discovery_maintenance.cmd --coordination-repair --apply`)"
+        )
+    return lines
+
+
 def format_warning_lines(issues: list[Issue], *, max_lines: int = 8) -> list[str]:
     lines: list[str] = []
     for issue in issues[:max_lines]:
@@ -332,12 +435,15 @@ def main(argv: list[str] | None = None) -> int:
     plan = _norm_plan(args.plan) or None
 
     if args.repair:
-        targets = [plan] if plan else []
-        if not targets:
-            for issue in audit_repo(repo):
-                p = _norm_plan(str(issue.get("planPath") or ""))
-                if p and p not in targets:
-                    targets.append(p)
+        if plan:
+            targets = [plan]
+        else:
+            targets = plan_coordination_repair(repo).get("plans") or []
+            if not targets:
+                for issue in audit_repo(repo):
+                    p = _norm_plan(str(issue.get("planPath") or ""))
+                    if p and p not in targets:
+                        targets.append(p)
         all_fixes: list[Fix] = []
         all_remaining: list[Issue] = []
         for p in targets:

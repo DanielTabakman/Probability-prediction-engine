@@ -23,10 +23,15 @@ from scripts.ppe_ide_build_starter import (  # noqa: E402
     plan_regen_ready_starters,
     regenerate_starters_for_ready_queue,
 )
+from scripts.ppe_chapter_coordination import (  # noqa: E402
+    assess_chapter_coordination_health,
+    plan_coordination_repair,
+    repair_repo_coordination,
+)
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="SOP discovery maintenance (backfill + regen)")
+    ap = argparse.ArgumentParser(description="SOP discovery + chapter coordination maintenance")
     ap.add_argument("--repo-root", type=Path, default=_REPO)
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--apply", action="store_true", help="Write changes (default is dry-run plan)")
@@ -34,32 +39,43 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--regen-ready-starters", action="store_true", help="Regen IDE BUILD starters for READY queue")
     ap.add_argument("--refresh-index", action="store_true", help="Regenerate CHAPTER_DOC_INDEX + archive catalog")
     ap.add_argument("--repair-active-evidence", action="store_true", help="Strip archived YAML from active queue rows")
+    ap.add_argument("--coordination-repair", action="store_true", help="Repair IDE markers + closeout registry desync")
     ap.add_argument(
         "--all",
         action="store_true",
-        help="Run repair + evidence backfill + READY starter regen + index refresh",
+        help="Run coordination repair + SOP discovery maintenance (repair, backfill, starters, index)",
     )
     ap.add_argument("--status", action="store_true", help="Print assess_sop_discovery_health only")
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
     if args.status:
-        report = assess_sop_discovery_health(repo)
+        sop = assess_sop_discovery_health(repo)
+        coord = assess_chapter_coordination_health(repo)
+        report = {"sop_discovery": sop, "chapter_coordination": coord, "ok": bool(sop.get("ok") and coord.get("ok"))}
         if args.json:
             print(json.dumps(report, indent=2, sort_keys=True))
         else:
-            print("SOP discovery health:", "OK" if report.get("ok") else "WARN")
-            for key in (
-                "index_fresh_detail",
-                "link_error_count",
-                "evidence_backfill_pending",
-                "ready_starter_regen_pending",
-            ):
-                if report.get(key) is not None:
-                    print(f"  {key}: {report[key]}")
-        return 0 if report.get("ok") else 1
+            print("Maintenance health:", "OK" if report["ok"] else "WARN")
+            print("  SOP discovery:", "OK" if sop.get("ok") else "WARN")
+            if not sop.get("ok"):
+                for key in (
+                    "index_fresh_detail",
+                    "link_error_count",
+                    "evidence_backfill_pending",
+                    "ready_starter_regen_pending",
+                ):
+                    if sop.get(key) is not None:
+                        print(f"    {key}: {sop[key]}")
+            print("  Chapter coordination:", "OK" if coord.get("ok") else "WARN")
+            if not coord.get("ok"):
+                top = coord.get("top_issue") if isinstance(coord.get("top_issue"), dict) else {}
+                if top.get("message"):
+                    print(f"    top: {top['message']}")
+                print(f"    repairable_plans: {coord.get('repairable_plan_count')}")
+        return 0 if report["ok"] else 1
 
-    run_repair = args.all or args.repair_active_evidence
+    run_coord = args.all or args.coordination_repair
     run_evidence = args.all or args.evidence_backfill
     run_starters = args.all or args.regen_ready_starters
     run_refresh = args.all or args.refresh_index

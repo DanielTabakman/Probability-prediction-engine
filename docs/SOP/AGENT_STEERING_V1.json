@@ -12,8 +12,14 @@
     "msos_strategy_lab_embed_shell_v1",
     "msos_trader_review_loop_v1",
     "msos_workflow_persistence_v1",
+    "mvp1_cross_venue_backtest_v1",
+    "mvp1_cross_venue_scan_v1",
     "mvp1_distribution_stats_legibility",
-    "mvp1_snapshot_owner_v1"
+    "mvp1_snapshot_owner_v1",
+    "ppe_deribit_crypto_tier1_v1",
+    "ppe_hyperliquid_perp_rail_v1",
+    "ppe_sol_bybit_ship_v1",
+    "ppe_tradeable_universe_v1"
   ],
   "docHints": {
     "nextBuildCandidate": {
