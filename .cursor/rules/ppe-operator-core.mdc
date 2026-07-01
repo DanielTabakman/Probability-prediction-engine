@@ -32,6 +32,9 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 - **Never** parallel SSH sessions to the VM.
 - Prefer `docs/SOP/VM_OPERATOR_PHASE.json` (git mirror) + `artifacts/orchestrator/VM_STATUS_CACHE.json` before SSH.
 - Hard timeout: 120s — if SSH hangs, trust mirror/cache and run `DESKTOP_CONTINUE.cmd --no-pause` once or rotate thread.
+- **Thread timebox:** if no actionable progress in ~10 minutes, rotate operator thread (stale SSH/context spiral).
+- **Branch preflight:** when status shows **Branch preflight: BLOCKS relay** — stash/checkout main first; do not DESKTOP_CONTINUE on wrong branch.
+- **First action for RUN_LOCAL closeout:** `DESKTOP_CONTINUE.cmd --no-pause` or `DO_THE_THING.cmd` — not investigation SSH.
 
 | Verdict | Action |
 |---------|--------|

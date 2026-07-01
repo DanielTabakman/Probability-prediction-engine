@@ -5,11 +5,12 @@ from __future__ import annotations
 import json
 import re
 import subprocess
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-VM_SSH_HOST = "ppeloop@desktop-caqll8k"
+VM_SSH_HOST = os.environ.get("PPE_VM_SSH_HOST", "ppe-vm").strip() or "ppe-vm"
 VM_REPO = r"C:\Users\ppeloop\Probability-prediction-engine"
 
 SSH_ARGS: tuple[str, ...] = (

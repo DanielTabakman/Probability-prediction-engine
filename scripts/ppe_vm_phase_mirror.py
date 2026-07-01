@@ -12,6 +12,9 @@ PHASE_NOTIFY_STATE_REL = "artifacts/control_plane/VM_PHASE_NOTIFY_STATE.json"
 
 IN_FLIGHT_PHASES = frozenset({"FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"})
 PHASE_NOTIFY_COOLDOWN_SECONDS = 900
+IN_FLIGHT_STUCK_SECONDS = 2700
+IN_FLIGHT_SINCE_REL = "artifacts/control_plane/VM_IN_FLIGHT_SINCE.json"
+STUCK_NOTIFY_STATE_REL = "artifacts/control_plane/VM_IN_FLIGHT_STUCK_NOTIFY.json"
 
 
 def _utc_now() -> str:
@@ -24,6 +27,14 @@ def mirror_path(repo: Path) -> Path:
 
 def notify_state_path(repo: Path) -> Path:
     return (repo / PHASE_NOTIFY_STATE_REL).resolve()
+
+
+def in_flight_since_path(repo: Path) -> Path:
+    return (repo / IN_FLIGHT_SINCE_REL).resolve()
+
+
+def stuck_notify_state_path(repo: Path) -> Path:
+    return (repo / STUCK_NOTIFY_STATE_REL).resolve()
 
 
 def load_vm_phase_mirror(repo: Path) -> dict[str, Any] | None:
@@ -137,8 +148,116 @@ def maybe_notify_in_flight_phase(repo: Path, status: dict[str, Any]) -> bool:
     return True
 
 
+def _load_in_flight_since(repo: Path) -> dict[str, Any]:
+    path = in_flight_since_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _save_in_flight_since(repo: Path, state: dict[str, Any]) -> None:
+    path = in_flight_since_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def track_in_flight_since(repo: Path, status: dict[str, Any]) -> dict[str, Any] | None:
+    """Loop host: record when an in-flight phase started; clear when idle."""
+    if not _is_loop_host(repo):
+        return None
+    phase = str(status.get("phase") or "").strip()
+    prior = _load_in_flight_since(repo)
+    if phase in IN_FLIGHT_PHASES:
+        if str(prior.get("phase") or "") != phase:
+            state = {
+                "phase": phase,
+                "since": _utc_now(),
+                "verdict": str(status.get("verdict") or ""),
+                "chapter_name": (status.get("operator") or {}).get("chapter_name"),
+            }
+            _save_in_flight_since(repo, state)
+            return state
+        return prior
+    if prior:
+        _save_in_flight_since(repo, {})
+    return None
+
+
+def maybe_notify_stuck_in_flight(
+    repo: Path,
+    status: dict[str, Any],
+    *,
+    stuck_seconds: int = IN_FLIGHT_STUCK_SECONDS,
+) -> bool:
+    """Loop host: ntfy when FINISH/BUILD in-flight exceeds stuck threshold."""
+    if not _is_loop_host(repo):
+        return False
+    phase = str(status.get("phase") or "").strip()
+    if phase not in IN_FLIGHT_PHASES:
+        return False
+    since_state = _load_in_flight_since(repo)
+    since_at = _parse_utc(str(since_state.get("since") or ""))
+    if since_at is None:
+        return False
+    elapsed = (datetime.now(timezone.utc) - since_at).total_seconds()
+    if elapsed < max(300, int(stuck_seconds)):
+        return False
+
+    operator = status.get("operator") if isinstance(status.get("operator"), dict) else {}
+    chapter = str(operator.get("chapter_name") or operator.get("phase_plan_path") or "relay").strip()
+    fingerprint = f"stuck|{phase}|{chapter}"
+    stuck_path = stuck_notify_state_path(repo)
+    prior: dict[str, Any] = {}
+    if stuck_path.is_file():
+        try:
+            prior = json.loads(stuck_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            prior = {}
+    if fingerprint == str(prior.get("fingerprint") or ""):
+        return False
+
+    mins = int(elapsed // 60)
+    title = f"PPE stuck: {phase.replace('_', ' ').title()}"
+    body = (
+        f"{chapter} — in-flight {mins}m. VM: check POST_BUILD_FINISH.log / "
+        "fix_vm_operator.cmd. Desktop: SSH status only."
+    )
+    try:
+        from scripts.ppe_notify_push import send_ntfy
+
+        send_ntfy(title=title, body=body, priority="high", tags=["warning", "rotating_light"])
+    except Exception:
+        return False
+
+    stuck_path.parent.mkdir(parents=True, exist_ok=True)
+    stuck_path.write_text(
+        json.dumps(
+            {
+                "fingerprint": fingerprint,
+                "last_notified_at": _utc_now(),
+                "elapsed_seconds": elapsed,
+                "phase": phase,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return True
+
+
 def sync_autobuilder_phase_artifacts(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Write git mirror + optional ntfy when autobuilder status changes on loop host."""
     mirror = write_vm_phase_mirror(repo, status)
     notified = maybe_notify_in_flight_phase(repo, status)
-    return {"mirror_path": str(mirror) if mirror else None, "notified": notified}
+    track_in_flight_since(repo, status)
+    stuck_notified = maybe_notify_stuck_in_flight(repo, status)
+    return {
+        "mirror_path": str(mirror) if mirror else None,
+        "notified": notified,
+        "stuck_notified": stuck_notified,
+    }

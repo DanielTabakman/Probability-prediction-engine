@@ -375,23 +375,61 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
 
 def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Desktop: attach VM phase mirror/cache so agents act without SSH probes."""
+    loop_ok = False
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
 
-        if loop_host_start_allowed()[0]:
+        loop_ok = bool(loop_host_start_allowed()[0])
+        if loop_ok:
             return status
     except Exception:
         pass
 
-    vm_mirror = None
-    vm_brief = None
     try:
-        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+        from scripts.ppe_operator_branch_preflight import assess_operator_branch_preflight
 
-        vm_mirror = load_vm_phase_mirror(repo)
+        branch_pf = assess_operator_branch_preflight(
+            repo,
+            verdict=str(status.get("verdict") or ""),
+            loop_host_allowed=loop_ok,
+        )
+        status["branch_preflight"] = branch_pf
+        if branch_pf.get("blocks_relay"):
+            status["commands"] = list(branch_pf.get("commands") or [])
+            status.setdefault("avoid", []).extend(
+                [
+                    "DESKTOP_CONTINUE.cmd until branch/tree preflight passes",
+                    "Relay / IDE BUILD on wrong branch or dirty product tree",
+                ]
+            )
     except Exception:
         pass
 
+    vm_mirror = None
+    mirror_health: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_operator_vm_mirror_refresh import (
+            assess_mirror_health,
+            refresh_vm_mirror_from_git,
+        )
+        from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+        refresh_vm_mirror_from_git(repo)
+        vm_mirror = load_vm_phase_mirror(repo)
+        mirror_health = assess_mirror_health(
+            vm_mirror,
+            local_verdict=str(status.get("verdict") or ""),
+        )
+        status["vm_mirror_health"] = mirror_health
+    except Exception:
+        try:
+            from scripts.ppe_vm_phase_mirror import load_vm_phase_mirror
+
+            vm_mirror = load_vm_phase_mirror(repo)
+        except Exception:
+            pass
+
+    vm_brief = None
     try:
         from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
 
@@ -402,11 +440,17 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             vm_brief=vm_brief,
             vm_mirror=vm_mirror,
         )
+        if mirror_health and mirror_health.get("alert"):
+            trust = {
+                **trust,
+                "mirror_stale": True,
+                "agent_note": mirror_health.get("agent_note") or trust.get("agent_note"),
+            }
         status["vm_trust"] = trust
 
-        chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
-        mode = str(chapter_mode.get("mode") or "")
-        if trust.get("wait_for_vm"):
+        if status.get("branch_preflight", {}).get("blocks_relay"):
+            pass
+        elif trust.get("wait_for_vm"):
             status["commands"] = [
                 "Wait for VM in-flight phase to complete (no parallel SSH/findstr probes)."
             ]
@@ -417,8 +461,14 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
                     "@ppe-director while VM FINISH_IN_FLIGHT or BUILD_IN_FLIGHT",
                 ]
             )
-        elif trust.get("recommended_action") == "desktop_continue" and mode == "CLOSEOUT_ONLY":
-            status["commands"] = ["DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)"]
+        elif trust.get("recommended_action") == "desktop_continue":
+            chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+            mode = str(chapter_mode.get("mode") or "")
+            if mode == "CLOSEOUT_ONLY" or str(status.get("verdict") or "") == "RUN_LOCAL":
+                status["commands"] = [
+                    "DESKTOP_CONTINUE.cmd --no-pause (SSH → VM finish_ide_build)",
+                    "Alternative: DO_THE_THING.cmd run (queued desktop_continue)",
+                ]
     except Exception:
         pass
     return status
@@ -535,6 +585,24 @@ def _format_human(
         note = vm_trust.get("agent_note")
         if note:
             lines.append(f"  → {note}")
+
+    branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
+    if branch_pf and branch_pf.get("blocks_relay"):
+        lines.extend(
+            [
+                "",
+                "**Branch preflight: BLOCKS relay**",
+                f"  Branch: `{branch_pf.get('branch')}` (on_main={branch_pf.get('on_main')})",
+            ]
+        )
+        for reason in branch_pf.get("reasons") or []:
+            lines.append(f"  - {reason}")
+        lines.append("  → Resolve branch/dirty-tree before DESKTOP_CONTINUE or IDE BUILD")
+
+    mirror_health = status.get("vm_mirror_health") if isinstance(status.get("vm_mirror_health"), dict) else None
+    if mirror_health and mirror_health.get("alert"):
+        lines.append("")
+        lines.append(f"**VM mirror alert:** {mirror_health.get('agent_note')}")
 
     lines.extend(
         [
