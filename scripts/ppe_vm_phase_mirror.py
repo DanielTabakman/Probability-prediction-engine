@@ -128,6 +128,35 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
                 return {"skipped": True, "reason": "unchanged", "fingerprint": fp}
 
     rel = VM_OPERATOR_PHASE_REL.replace("\\", "/")
+    target_branch = "main"
+    current_branch = _current_branch(repo)
+    branch_switch: str | None = None
+    if current_branch != target_branch:
+        fetch = _git(repo, "fetch", "origin")
+        if fetch.returncode != 0:
+            return {
+                "ok": False,
+                "error": (fetch.stderr or fetch.stdout or "git fetch failed").strip(),
+            }
+        co = _git(repo, "checkout", "-f", target_branch)
+        if co.returncode != 0:
+            try:
+                from scripts.ppe_operator_git_sync import prepare_loop_host_for_handoff
+
+                handoff = prepare_loop_host_for_handoff(repo)
+                if not handoff.get("ok"):
+                    return {
+                        "ok": False,
+                        "error": handoff.get("error") or f"could not checkout {target_branch}",
+                        "handoff": handoff,
+                    }
+            except ImportError as exc:
+                return {"ok": False, "error": str(exc)}
+        branch_switch = current_branch
+        path = mirror_path(repo)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
     diff = _git(repo, "diff", "--name-only", "--", rel)
     untracked = _git(repo, "ls-files", "--others", "--exclude-standard", "--", rel)
     has_change = bool((diff.stdout or "").strip()) or bool((untracked.stdout or "").strip())
@@ -166,7 +195,15 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
         + "\n",
         encoding="utf-8",
     )
-    return {"ok": True, "fingerprint": fp, "commit": True, "publish": publish}
+    result: dict[str, Any] = {"ok": True, "fingerprint": fp, "commit": True, "publish": publish}
+    if branch_switch:
+        result["branch_switch"] = branch_switch
+    return result
+
+
+def _current_branch(repo: Path) -> str:
+    proc = _git(repo, "branch", "--show-current")
+    return (proc.stdout or "").strip()
 
 
 def _maybe_notify_mirror_pr_opened(repo: Path, *, phase: str, pr_url: str) -> bool:

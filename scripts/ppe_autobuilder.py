@@ -32,6 +32,8 @@ ACTION_HANDOFF = "handoff"
 ACTION_FINISH_PENDING = "finish-pending"
 ACTION_RUN_LOCAL = "run-local"
 ACTION_ADVANCE = "advance"
+ACTION_DESKTOP_CONTINUE = "desktop-continue"
+ACTION_VM_ADVANCE = "vm-advance"
 
 PHASE_ACTIONS: dict[str, list[str]] = {
     PHASE_STACK_DOWN: [ACTION_ENSURE, ACTION_DIAGNOSE],
@@ -678,3 +680,15 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def _apply_autobuilder_v2_patch() -> None:
+    try:
+        from scripts.ppe_autobuilder_patch import apply
+
+        apply()
+    except Exception:
+        pass
+
+
+_apply_autobuilder_v2_patch()

@@ -42,6 +42,7 @@ def assess_operator_branch_preflight(
     *,
     verdict: str,
     loop_host_allowed: bool | None = None,
+    chapter_mode: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     repo = repo.resolve()
     if loop_host_allowed is None:
@@ -58,6 +59,9 @@ def assess_operator_branch_preflight(
     blocks_relay = False
     reasons: list[str] = []
     commands: list[str] = []
+    mode = str((chapter_mode or {}).get("mode") or "")
+    closeout_only = mode == "CLOSEOUT_ONLY"
+    product_dirty = [p for p in dirty if p.replace("\\", "/").startswith("src/")]
 
     if loop_host_allowed or verdict not in RELAY_VERDICTS:
         return {
@@ -70,7 +74,11 @@ def assess_operator_branch_preflight(
         }
 
     if not on_main:
-        if branch.startswith(("product/", "build/")) and verdict in ("RUN_LOCAL", "IDE_BUILD"):
+        if closeout_only and verdict == "RUN_LOCAL" and not product_dirty:
+            if branch.startswith(("control-plane/", "ops/", "fix/", "chore/")):
+                commands.append("git checkout main && git pull origin main  # when WIP parked")
+            pass
+        elif branch.startswith(("product/", "build/")) and verdict in ("RUN_LOCAL", "IDE_BUILD"):
             blocks_relay = True
             reasons.append(
                 f"checkout is {branch!r} — product/build branch blocks relay handoff; use main after merge"
@@ -81,8 +89,7 @@ def assess_operator_branch_preflight(
             reasons.append(f"checkout is {branch!r}, not main — unexpected branch for operator relay")
             commands.append("git checkout main && git pull origin main")
 
-    product_dirty = [p for p in dirty if p.replace("\\", "/").startswith("src/")]
-    if product_dirty and verdict in ("RUN_LOCAL", "IDE_BUILD"):
+    if product_dirty and verdict in ("RUN_LOCAL", "IDE_BUILD") and not closeout_only:
         blocks_relay = True
         reasons.append(
             f"dirty product tree ({len(product_dirty)} path(s) under src/) — commit/stash before relay"
@@ -97,4 +104,33 @@ def assess_operator_branch_preflight(
         "blocks_relay": blocks_relay,
         "reasons": reasons,
         "commands": commands,
+    }
+
+
+def prepare_desktop_relay_pull(repo: Path) -> dict[str, Any]:
+    """Best-effort desktop git sync when operator is on an allowed non-main branch."""
+    repo = repo.resolve()
+    branch = _current_branch(repo)
+    target = "main"
+    if not branch or branch == target:
+        return {"action": "prepare_relay_pull", "skipped": True, "reason": "on_main", "branch": branch or target}
+
+    allowed = branch.startswith(ALLOWED_DESKTOP_PREFIXES) or branch.startswith(("fix/", "charter/"))
+    if not allowed:
+        return {
+            "action": "prepare_relay_pull",
+            "skipped": True,
+            "reason": "branch_not_allowed_for_fetch",
+            "branch": branch,
+        }
+
+    proc = _git(repo, "fetch", "origin", target, "--quiet")
+    ok = proc.returncode == 0
+    return {
+        "action": "prepare_relay_pull",
+        "ok": ok,
+        "skipped": False,
+        "branch": branch,
+        "fetched": target,
+        "error": None if ok else (proc.stderr or proc.stdout or "git fetch failed").strip(),
     }

@@ -81,12 +81,20 @@ def detach_worktrees_holding_branch(repo: Path, branch: str = "main") -> list[di
 
 def ensure_on_main(repo: Path) -> dict[str, Any]:
     try:
-        from scripts.ppe_operator_git_sync import ensure_main_on_loop_host, pull_main
+        from scripts.ppe_operator_git_sync import (
+            ensure_main_on_loop_host,
+            prepare_loop_host_for_handoff,
+            pull_main,
+        )
 
         checkout = ensure_main_on_loop_host(repo)
         if checkout.get("checked_out"):
             return {"action": "ensure_main", **checkout}
         pull = pull_main(repo)
+        if not pull.get("ok", True) and not pull.get("skipped"):
+            handoff = prepare_loop_host_for_handoff(repo)
+            if handoff.get("ok"):
+                return {"action": "ensure_main", "checkout": checkout, "pull": pull, "handoff": handoff}
         return {"action": "ensure_main", "checkout": checkout, "pull": pull}
     except ImportError as exc:
         return {"action": "ensure_main", "ok": False, "error": str(exc)}
