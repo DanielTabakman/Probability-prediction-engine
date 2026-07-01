@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-01T23:39:53Z",
+  "as_of": "2026-07-01T23:42:29Z",
   "phase": "RUN_LOCAL_PENDING",
   "verdict": "RUN_LOCAL",
   "chapter_name": "MSOS_storyboard_visual_parity_v1 (storyboard v0.6 pixel/layout parity)",
