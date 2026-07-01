@@ -387,6 +387,8 @@
         "tests/test_program_charter_invariants.py",
         "tests/test_msos_p4_charter_witness.py",
         "tests/test_msos_production_demo_witness.py",
+        "tests/test_msos_product_usage_telemetry_witness.py",
+        "tests/test_product_usage_telemetry.py",
         "tests/test_workflow_metrics_cli.py",
         "tests/test_ppe_workflow_cost.py",
         "tests/test_log_demo_session.py",
