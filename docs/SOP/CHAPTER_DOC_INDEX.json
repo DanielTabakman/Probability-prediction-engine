@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 34,
+  "active_chapter_count": 32,
   "active_chapters": [
     {
       "archived": false,
@@ -178,78 +178,6 @@
       "queue_status": "READY",
       "selection": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
-      ],
-      "chapter_id": "msos_p3_command_center",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md",
-        "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "chapter_id": "msos_public_demo_launch_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md"
     },
     {
       "archived": false,
@@ -1118,7 +1046,7 @@
       "sprint": null
     }
   ],
-  "archived_chapter_count": 48,
+  "archived_chapter_count": 50,
   "by_chapter_id": {
     "horizon_chart_polish_v1": {
       "archived": true,
@@ -1576,7 +1504,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md"
     },
     "msos_p3_command_center": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
@@ -1607,7 +1535,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md"
     },
@@ -1862,7 +1790,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md"
     },
     "msos_public_demo_launch_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -1893,7 +1821,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md"
     },
@@ -4347,7 +4275,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_P2_HOMEPAGE.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
@@ -4378,7 +4306,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_P3_COMMAND_CENTER.md"
     },
@@ -4633,7 +4561,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_PRODUCTION_WIRING_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -4664,7 +4592,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_PUBLIC_DEMO_LAUNCH_V1.md"
     },
@@ -6659,7 +6587,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-01T23:32:30Z",
+  "generated_at": "2026-07-02T00:31:07Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",

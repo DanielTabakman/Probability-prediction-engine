@@ -476,8 +476,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-01T23:13:05Z">
-        Last updated: 2026-07-01 <time datetime="2026-07-01T23:13:05Z">19:13 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-02T00:12:48Z">
+        Last updated: 2026-07-01 <time datetime="2026-07-02T00:12:48Z">20:12 EDT</time>
       </span>
     </p>
 
@@ -517,8 +517,8 @@
     <div class="op-section todo-panel" id="map-do-now">
       <ol>
         <li>
-          <strong>IDE BUILD — implement product slice</strong>
-          <span class="why">Next product slice [MSOS-VisParityV1-Product-Slice002] needs IDE BUILD (PPE_SKIP_ACP=1, not in IDE_PRODUCT_READY). Operator thread → ask **what's next?** <em class="compass-src">(operator_status)</em></span>
+          <strong>Finish chapter closeout — MSOS_storyboard_visual_parity_v1 (storyboard v0.6 pixel/layout parity)</strong>
+          <span class="why">IDE product marker present — finish chapter with run_ppe_local · docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json · DESKTOP_CONTINUE.cmd <em class="compass-src">(operator_status)</em></span>
         </li>
       </ol>
     </div>
@@ -529,15 +529,15 @@
       <ul>
         <li>
           <strong>Cross-venue backtest scoring</strong>
-          <span class="why">2 / 14 daily snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
+          <span class="why">1 / 14 daily snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
         </li>
         <li>
           <strong>Horizon replay scrubber</strong>
-          <span class="why">3 / 30 daily snapshots · promote when archive_meta.replay_ready <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
+          <span class="why">2 / 30 daily snapshots · promote when archive_meta.replay_ready <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
         </li>
         <li>
           <strong>Distribution timeseries archive</strong>
-          <span class="why">2 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
+          <span class="why">1 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
         </li>
         <li>
           <strong>Stripe operator prerequisites (phase 7b gate)</strong>
@@ -555,14 +555,25 @@
     <div class="op-section progress-panel" id="map-factory-throughput">
       <table class="compass-modules">
         <tbody>
-          <tr><th>Slices logged</th><td>45</td></tr>
-          <tr><th>Weighted slices</th><td>73</td></tr>
-          <tr><th>Weighted / closeout</th><td>0.0</td></tr>
-          <tr><th>Avg roundtrips / slice</th><td>0.62</td></tr>
-          <tr><th>Context closeouts</th><td>0</td></tr>
-          <tr><th>Thread pulses</th><td>0</td></tr>
-          <tr><th>Avg cognitive load</th><td>0.0</td></tr>
+          <tr><th>Slices logged</th><td>46</td></tr>
+          <tr><th>Weighted slices</th><td>87</td></tr>
+          <tr><th>Weighted / closeout</th><td>0.85</td></tr>
+          <tr><th>Avg roundtrips / slice</th><td>0.89</td></tr>
+          <tr><th>Context closeouts</th><td>102</td></tr>
+          <tr><th>Thread pulses</th><td>8</td></tr>
+          <tr><th>Avg cognitive load</th><td>3.0</td></tr>
           <tr><th>Incident slices</th><td>0</td></tr>
+        </tbody>
+      </table>
+      <p class="flow-intro" style="margin-top:12px"><strong>Recent pulses</strong></p>
+      <table class="compass-modules">
+        <thead><tr><th>When</th><th>Load</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>2026-07-01T21:43:43Z</td><td>3</td><td></td></tr>
+          <tr><td>2026-07-01T21:31:46Z</td><td>3</td><td></td></tr>
+          <tr><td>2026-07-01T21:13:22Z</td><td>3</td><td></td></tr>
+          <tr><td>2026-07-01T21:06:54Z</td><td>3</td><td></td></tr>
+          <tr><td>2026-07-01T21:04:15Z</td><td>3</td><td></td></tr>
         </tbody>
       </table>
       <p class="flow-intro" style="margin-top:8px"><a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">Full rollup HTML</a> · <em class="compass-src">(workflow_metrics aggregate)</em></p>
