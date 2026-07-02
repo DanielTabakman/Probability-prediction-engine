@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `1030e804` — Merge pull request #1157 from DanielTabakman/fix/coordination-audit-linux-path
+- `f2162e22` — control-plane: founder pipeline diagnostics v1 — root cause, alerts, gate (`scripts/`)
+- `3468a8e3` — fix(control-plane): closeout registry coordination audit + evidence alignment (`docs/SOP/`)
+- `8a58192e` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine into fix/coordination-audit-linux-path
+- `0034402c` — Control-plane: dev changelog
+- `b95c8b47` — fix: audit_repo plan paths on Linux (POSIX path join) (`scripts/`)
 - `1ae032e8` — fix: audit_repo plan paths on Linux (POSIX path join) (#1155) (`scripts/`)
 - `af671ee6` — control-plane: tier 9 starter freshness (rebased on main) (#1152) (`scripts/`)
 - `b055da00` — control-plane: SOP doc hygiene tier 10 — footers, topics, crib sheet (#1148) (`docs/SOP/`)
