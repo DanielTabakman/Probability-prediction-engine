@@ -42,6 +42,21 @@ Implement → gate → mark_ide_product_ready. No steward narrative.
 
 ---
 
+## Founder collaboration (permanent — how we work)
+
+Use for collaboration charter, pulse design, stall honesty, and decision defaults. **Not** operator execution.
+
+```text
+Founder collaboration thread. THREAD_ROLE: founder_charter.
+Load @docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md
+Relay: off — do not read OPERATOR_STATUS or run burst.
+Update the charter here; park factory execution to operator thread (one-line handoff).
+```
+
+Rule: [`.cursor/rules/founder-collaboration.mdc`](../../.cursor/rules/founder-collaboration.mdc)
+
+---
+
 ## Charter / topic (UX, data, SELECTION, programs)
 
 Use for planning, backlog edits, and domain work **without** relay bleed.

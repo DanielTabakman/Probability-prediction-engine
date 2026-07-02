@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "charter_doc": "docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md",
+  "updated_at": "2026-07-02",
+  "posture": {
+    "always_building": true,
+    "pause_only_when": ["founder_asleep", "missing_direction_ssot"]
+  },
+  "layers": {
+    "morning": {
+      "id": "L1",
+      "schedule": "daily_local_08:00",
+      "env_time": "PPE_NTFY_MORNING_REPORT_AT",
+      "script": "scripts/ppe_morning_report.py",
+      "channel": ["ntfy", "charter_thread_optional"],
+      "max_lines": 20
+    },
+    "completion": {
+      "id": "L2",
+      "trigger": "slice_or_closeout_or_chapter_step_done",
+      "channel": ["agent_reply", "ntfy_optional"],
+      "env_ntfy": "PPE_FOUNDER_COMPLETION_NTFY",
+      "max_lines": 6
+    },
+    "alert": {
+      "id": "L3",
+      "trigger": "immediate_when_no_active_program",
+      "channel": ["ntfy_high", "agent_reply_alert_line"],
+      "active_program_vm_phases": [
+        "BUILD_IN_FLIGHT",
+        "FINISH_IN_FLIGHT",
+        "RUN_LOCAL_PENDING",
+        "CLOSEOUT_PENDING"
+      ],
+      "coordination_block_verdicts": ["recovery", "park"]
+    },
+    "weekly": {
+      "id": "L4",
+      "schedule": "monday",
+      "script": "weekly_digest_monday.cmd",
+      "channel": ["ntfy", "docs/RELEASES/WEEKLY_DIGEST.md"],
+      "tag": "digest-only"
+    }
+  },
+  "decision_defaults": {
+    "agent_always": [
+      "technical_implementation",
+      "scripts_branches_recovery",
+      "marker_repair",
+      "burst_sizing",
+      "evidence_closeout_drafts"
+    ],
+    "founder_always": [
+      "pivot_fields",
+      "external_credentials",
+      "billing",
+      "live_validation_sessions",
+      "canon_conflict_resolution"
+    ],
+    "founder_when_no_ssot": [
+      "selection_build_order",
+      "next_build_candidate"
+    ]
+  },
+  "reply_closings": {
+    "nothing_required": "Nothing required from you.",
+    "completion_prefix": "Completion:",
+    "alert_prefix": "Alert:",
+    "decision_prefix": "Decision needed:",
+    "external_prefix": "External action:"
+  },
+  "forbidden_in_founder_replies": [
+    "technical_choice_questions",
+    "numbered_git_steps_for_founder",
+    "nothing_required_when_layer3",
+    "operator_status_full_paste",
+    "steward_backlog_as_todos"
+  ]
+}

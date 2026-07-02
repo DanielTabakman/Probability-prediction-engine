@@ -62,6 +62,7 @@ ppe_delegation_envelope.cmd --pass-type RECOVERY
 
 ## Related
 
+- [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) — founder decision defaults vs agent technical defaults
 - [`OPERATING_RULES.md`](OPERATING_RULES.md) — plane discipline
 - [`COMMIT_POLICY.md`](COMMIT_POLICY.md) — auto-ship path
 - [`PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) — standing queue delegation (envelope narrows hard stops)

@@ -14,6 +14,7 @@ alwaysApply: false
 | **operator** | Verdict, burst, autobuilder, triage | **Yes** — read `OPERATOR_STATUS.md`, run verdict | Branch recovery, relay, stash, mixed-plane → [`RECOVERY_PROTOCOL.md`](../../docs/SOP/RECOVERY_PROTOCOL.md) |
 | **ide_build** | One product slice | Only via `IDE_BUILD_STARTER_*.md` / `IDE_BUILD_NOW.md` | Gate → commit → mark ready on slice branch |
 | **charter** | SELECTION, programs, UX/data design, policy | **No** — park relay for operator thread | Docs/control-plane only; see § Charter ship |
+| **founder_charter** | Collaboration charter, pulses, decision defaults | **No** — load [`FOUNDER_COLLABORATION_CHARTER_V1.md`](../../docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md) | Charter updates only; see [`founder-collaboration.mdc`](founder-collaboration.mdc) |
 | **explore** | Questions, reviews, tradeoffs | **No** | Hold unless user asked for implementation |
 | **neutral** (default) | User's actual question | **No** — do not open with operator status | Ship **only** when user requested implementation; see § Neutral |
 
@@ -36,6 +37,7 @@ alwaysApply: false
 **Charter** — any of:
 
 - `charter thread` / `topic thread` / `founder charter` / `THREAD_ROLE: charter` / `THREAD_ROLE: topic`
+- `founder collaboration` / `THREAD_ROLE: founder_charter` / `@docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md`
 - Explicit program-only load: e.g. "Load only `@docs/SOP/UX_EXECUTION_BACKLOG_V1.md`" with no operator @
 - Control-plane / agent-policy work scoped to `docs/SOP/`, `.cursor/rules/`, `scripts/` (no relay)
 
