@@ -137,6 +137,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         pass
 
     coordination_check: dict[str, Any] | None = None
+    pipeline_health: dict[str, Any] | None = None
     try:
         from scripts.ppe_coordination_check import assess_coordination_check, write_coordination_check
 
@@ -147,6 +148,21 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             use_director = True
             if direct_action not in ("wait_for_vm", "resolve_lease"):
                 direct_action = "coordination_check"
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_pipeline_health import assess_pipeline_health, write_pipeline_health
+
+        pipeline_health = assess_pipeline_health(repo, status)
+        write_pipeline_health(repo, pipeline_health)
+        if pipeline_health.get("blocks_burst"):
+            burst_allowed = False
+            use_director = True
+            if direct_action not in ("wait_for_vm", "resolve_lease", "coordination_check"):
+                direct_action = "pipeline_health"
+            elif direct_action == "coordination_check":
+                direct_action = "pipeline_health"
     except Exception:
         pass
 
@@ -168,6 +184,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "worker_verdicts_only": True,
         "worker_lease": worker_lease,
         "coordination_check": coordination_check,
+        "pipeline_health": pipeline_health,
         "suggested_lane": (worker_lease or {}).get("suggested_lane"),
         "prompt": format_burst_director_prompt(
             max_cycles=max_cycles,
@@ -177,6 +194,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             burst_allowed=burst_allowed,
             direct_action=direct_action,
             coordination_check=coordination_check,
+            pipeline_health=pipeline_health,
         ),
     }
 
@@ -190,10 +208,20 @@ def format_burst_director_prompt(
     burst_allowed: bool,
     direct_action: str | None = None,
     coordination_check: dict[str, Any] | None = None,
+    pipeline_health: dict[str, Any] | None = None,
 ) -> str:
     from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 
-    if direct_action == "coordination_check":
+    if direct_action == "pipeline_health":
+        code = str((pipeline_health or {}).get("root_cause_code") or "PIPELINE_UNHEALTHY")
+        summary = str((pipeline_health or {}).get("root_cause_message") or "pipeline blocked")
+        fix_class = str((pipeline_health or {}).get("fix_class") or "recovery")
+        body = (
+            f"Pipeline health blocked burst ({code}, fix_class={fix_class}). "
+            f"{summary}. Read artifacts/control_plane/PIPELINE_HEALTH.json. "
+            "Run repair/recovery commands before @ppe-director or BUILD workers."
+        )
+    elif direct_action == "coordination_check":
         coord_verdict = str((coordination_check or {}).get("verdict") or "recovery")
         summary = str((coordination_check or {}).get("summary") or "coordination blocked")
         body = (

@@ -128,6 +128,23 @@ def run_operator_doctor(
     except Exception as exc:
         report["checks"].append({"id": "chapter_coordination", "ok": False, "error": str(exc)})
 
+    try:
+        from scripts.ppe_pipeline_health import assess_pipeline_health
+
+        pipeline = assess_pipeline_health(repo, status if status else None)
+        report["pipeline_health"] = pipeline
+        report["checks"].append(
+            {
+                "id": "pipeline_health",
+                "ok": bool(pipeline.get("ok")),
+                "detail": str(pipeline.get("root_cause_code") or pipeline.get("root_cause_message") or "")[:160]
+                or None,
+                "fix_class": pipeline.get("fix_class"),
+            }
+        )
+    except Exception as exc:
+        report["checks"].append({"id": "pipeline_health", "ok": False, "error": str(exc)})
+
     high = [
         i
         for i in (report.get("blind_spots") or {}).get("issues") or []

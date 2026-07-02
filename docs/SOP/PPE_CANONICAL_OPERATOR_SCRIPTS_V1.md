@@ -74,6 +74,7 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 | Script | Purpose |
 |--------|---------|
 | `scripts/ppe_doctor.cmd` | One-shot infra check: ntfy, gh, SSH, VM health, blind spots |
+| `scripts/ppe_pipeline_health.cmd` | Founder pipeline diagnostic: root cause, milestone clock, `PIPELINE_HEALTH.json` |
 | `install_ppe_network_watchdog_task.cmd` | Register Task Scheduler: SSH probe every 15m; ntfy after 3 failures |
 | `python scripts/ppe_network_watchdog.py` | Manual probe (same as scheduled task) |
 | `python scripts/ppe_worktree_janitor.py` | List removable `_worktrees/*`; `--remove <path>` only after human review |
