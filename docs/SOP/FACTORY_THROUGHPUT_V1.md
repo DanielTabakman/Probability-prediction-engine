@@ -71,13 +71,44 @@ Loop host also runs `maybe_notify_stuck_in_flight` (45m) via phase mirror sync.
 
 ## Alerts (ntfy)
 
-`maybe_notify_throughput_regression` fires on:
+| Alert | When |
+|-------|------|
+| Regression | OK → stuck/stack_down |
+| Phase/zero throughput | 12h dedupe on PHASE_STUCK, ZERO_THROUGHPUT_24H, CHAPTER_STALL |
+| Weekly rollup | Every 7d — 7d slices, weighted SLA, supply forecast |
+| VM watchdog | Stack restarted after ensure |
 
-- OK → stuck / stack_down
-- `ZERO_THROUGHPUT_24H` or `PHASE_STUCK` (12h dedupe)
-- Wired via `ppe_pipeline_health.cmd --notify` and operator status refresh
+`ppe_factory_throughput.cmd` runs `--write --notify --auto-advance` (loop host only for advance).
 
-VM watchdog sends **stack restarted** when `ensure_stack` succeeds.
+---
+
+## Auto-advance (loop host)
+
+When verdict is `stuck` or `stack_down` for ≥30 minutes:
+
+- Runs `ppe_autobuilder.cmd advance` (rate-limited: 1h cooldown, max 3/day)
+- Wired into VM phase mirror sync (`sync_autobuilder_phase_artifacts`)
+- State: `artifacts/control_plane/FACTORY_AUTO_ADVANCE_STATE.json`
+
+---
+
+## Extended metrics
+
+| Metric | Source |
+|--------|--------|
+| **CHAPTER** line | Active plan pending slices + stall hours |
+| **wspc7d** | Weighted slices per closeout (7d SLA) |
+| **Supply forecast** | `~Nd supply` from burn rate vs queue pool |
+| **~mirror** | Phase age from stale VM mirror (untrusted) |
+
+---
+
+## Issue codes (extended)
+
+| Code | Meaning |
+|------|---------|
+| `CHAPTER_STALL` | Active chapter: no slice ≥24h |
+| `SUPPLY_FORECAST_LOW` | Queue exhausted in ≤7d at current burn |
 
 ---
 
