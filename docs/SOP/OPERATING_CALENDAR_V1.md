@@ -2,7 +2,7 @@
 
 **Purpose:** Light cadence for a real-company operating rhythm — without agent overload. **Calendar doc only**; automation does not schedule these events.
 
-**Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — agents must not paste these rows as founder todo lists in unrelated threads.
+**Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · **Collaboration pulses:** [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) — agents must not paste these rows as founder todo lists in unrelated threads.
 
 **Strategic canon:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) · **Validation rollup:** [`MSOS_P8_VALIDATION_REPORT_V1.md`](MSOS_P8_VALIDATION_REPORT_V1.md)
 
@@ -10,10 +10,22 @@
 
 ---
 
+## Daily (automated — founder read optional)
+
+| Layer | When | Artifact |
+|-------|------|----------|
+| **L1 Morning** | ~08:00 local ntfy | `scripts/ppe_morning_report.py` · `ppe_founder_pulse.cmd --layer morning` |
+| **L3 Alert** | Immediate on stall | `ppe_founder_pulse.cmd --layer alert --write --notify` |
+
+See [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) for L2 completion and L4 weekly.
+
+---
+
 ## Weekly (~30 min founder time)
 
 | Tag | Task | Artifact |
 |-----|------|----------|
+| `digest-only` | **L4 Weekly** systems pulse | `weekly_digest_monday.cmd` · [`WEEKLY_DIGEST.md`](../RELEASES/WEEKLY_DIGEST.md) |
 | `founder` | 1–2 tester sessions OR log why skipped | [`VALIDATION_REALITY_CHECKS.md`](VALIDATION_REALITY_CHECKS.md) |
 | `agent` | Check loop verdict | Operator thread: `what's next?` or `run_ppe_operator.cmd --brief` → `OPERATOR_GUARD_REPORT.md` |
 | `digest-only` | Scan **human steward backlog** (policy topics) | [`HUMAN_STEWARD_BACKLOG.md`](HUMAN_STEWARD_BACKLOG.md) · Monday ntfy digest — deep work only on monthly steward pass |
@@ -82,3 +94,4 @@ Update at quarterly review. **Done** = evidence in repo, not aspiration.
 |------|--------|
 | 2026-06-12 | v1 — weekly / monthly / quarterly cadence + milestone table |
 | 2026-07-01 | Founder/agent/digest-only tags; link FOUNDER_OPERATOR_SURFACE_V1 |
+| 2026-07-02 | Daily L1/L3 pulse rows; link FOUNDER_COLLABORATION_CHARTER_V1 |

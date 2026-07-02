@@ -4,7 +4,9 @@
 
 **Vocabulary:** **Founder** = product owner working *on* the product (direction, judgment, external world). **Agent/factory** = relay, BUILD, git, recovery, steering sync — working *in* the product. Legacy docs say "operator" for both; prefer **founder** vs **agent surface** in human-facing replies.
 
-**Related:** [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`DELEGATION_ENVELOPE_V1.md`](DELEGATION_ENVELOPE_V1.md) · [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-operator-core.mdc`](../../.cursor/rules/ppe-operator-core.mdc)
+**Related:** [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`DELEGATION_ENVELOPE_V1.md`](DELEGATION_ENVELOPE_V1.md) · [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-operator-core.mdc`](../../.cursor/rules/ppe-operator-core.mdc)
+
+**Collaboration SSOT:** Pulse layers, stall policy, and decision defaults live in [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md). This doc defines founder vs agent *surface*; the charter defines *cadence and honesty*.
 
 ---
 
@@ -39,18 +41,22 @@ Agents **execute in-thread** or spawn workers (`@ppe-director`, `@ppe-build-work
 
 ## Agent reply contract
 
-End founder-facing replies with **one** of:
+Use **one primary closing** per [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) § Agent reply contract. Layer 3 (**Alert:**) overrides all others.
 
-| Closing | When |
-|---------|------|
-| **Nothing required from you.** | Factory handled or in progress |
-| **Decision needed:** _one sentence + options_ | Strategic judgment only |
-| **External action:** _one sentence_ | Accounts, credentials, live sessions agents cannot run |
+| Closing | Layer | When |
+|---------|-------|------|
+| **Nothing required from you.** | — | Factory advancing; no founder gap |
+| **Completion:** _sentence_ · Next: _line_ · **Nothing required from you.** | L2 | Slice/closeout/chapter step just finished |
+| **Alert:** _plain problem_ · _consequence_ · **Decision needed:** or **External action:** | L3 | Stall, deadlock, or founder-only gap — **never** hide behind "nothing required" |
+| **Decision needed:** _outcome options + default recommendation_ | L3 | Strategic judgment only — not technical forks |
+
+**Technical decisions:** agents default and execute ([`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) § Decision defaults). Do not ask the founder to choose scripts, branches, or repair paths.
 
 **Forbidden:**
 
 - Numbered factory steps (`git pull`, `DESKTOP_CONTINUE`, open thread, mark ready)
-- Choice questions (`Want me to…?`, `Should I… first?`)
+- Choice questions (`Want me to…?`, `Should I… first?`) for **technical** choices
+- **Nothing required from you.** when Layer 3 alert conditions are true
 - Commit permission prompts
 - Pasting `OPERATING_CALENDAR` or `HUMAN_STEWARD_BACKLOG` as end-of-reply todo lists
 - Implementation checklists disguised as "next steps for you"
@@ -70,6 +76,7 @@ End founder-facing replies with **one** of:
 | Intent | Opener | Load |
 |--------|--------|------|
 | Factory / relay | `what's next?` · `THREAD_ROLE: operator` | `OPERATOR_STATUS.md` → burst → workers |
+| **Collaboration / how we work** | **Founder collaboration** starter in [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) | [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) — **no** relay |
 | Product / strategy / SELECTION | **Founder charter** starter in [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) | This doc + program doc — **no** `OPERATOR_STATUS` |
 | One product slice | `THREAD_ROLE: ide_build` + starter | Starter only |
 
@@ -94,3 +101,4 @@ Agents must not convert `agent` or `digest-only` rows into founder todo lists in
 | Date | Change |
 |------|--------|
 | 2026-07-01 | v1 — founder vs agent surface SSOT; reply contract; cadence tags |
+| 2026-07-02 | Link FOUNDER_COLLABORATION_CHARTER_V1; layered closings; L3 alert overrides |

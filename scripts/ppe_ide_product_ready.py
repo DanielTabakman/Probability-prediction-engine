@@ -119,25 +119,31 @@ def write_marker(
     slice_id: str,
     build_branch: str,
     commit_sha: str,
+    completed_product_slices: list[str] | None = None,
 ) -> Path:
     p = marker_path(repo)
     p.parent.mkdir(parents=True, exist_ok=True)
     norm_plan = phase_plan_path.replace("\\", "/").strip()
-    prior = load_marker(repo) or {}
-    completed: list[str] = []
-    if str(prior.get("phasePlanPath") or "").replace("\\", "/").strip() == norm_plan:
-        for sid in prior.get("completedProductSlices") or []:
-            s = str(sid or "").strip()
-            if s and s not in completed:
-                completed.append(s)
-        legacy = str(prior.get("sliceId") or "").strip()
-        if legacy and legacy not in completed:
-            completed.append(legacy)
-    if slice_id not in completed:
-        completed.append(slice_id)
+    if completed_product_slices is not None:
+        completed = [str(s).strip() for s in completed_product_slices if str(s).strip()]
+        if slice_id and slice_id not in completed:
+            completed.append(slice_id)
+    else:
+        prior = load_marker(repo) or {}
+        completed = []
+        if str(prior.get("phasePlanPath") or "").replace("\\", "/").strip() == norm_plan:
+            for sid in prior.get("completedProductSlices") or []:
+                s = str(sid or "").strip()
+                if s and s not in completed:
+                    completed.append(s)
+            legacy = str(prior.get("sliceId") or "").strip()
+            if legacy and legacy not in completed:
+                completed.append(legacy)
+        if slice_id not in completed:
+            completed.append(slice_id)
     payload = {
         "phasePlanPath": norm_plan,
-        "sliceId": slice_id,
+        "sliceId": slice_id or (completed[-1] if completed else ""),
         "completedProductSlices": completed,
         "buildBranch": build_branch,
         "commitSha": commit_sha,
@@ -145,6 +151,64 @@ def write_marker(
     }
     p.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return p
+
+
+def mark_product_slices_batch_ready(
+    repo: Path,
+    *,
+    plan_path: str,
+    slice_ids: list[str],
+) -> tuple[int, str, list[str]]:
+    """Atomically mark multiple product slices for one phase plan."""
+    repo = repo.resolve()
+    norm_plan = plan_path.replace("\\", "/").strip()
+    from scripts.ppe_operator_guards import _plan_product_slice_ids
+
+    product_order = _plan_product_slice_ids(repo, norm_plan)
+    if not product_order:
+        return 2, f"no product slices in plan {norm_plan}", []
+
+    want = {str(s).strip() for s in slice_ids if str(s).strip()}
+    ordered = [sid for sid in product_order if sid in want]
+    if not ordered:
+        return 2, "no valid product slice ids to mark", []
+
+    build_branch = "main"
+    baseline = "main"
+    try:
+        plan = load_phase_plan(repo, norm_plan)
+        baseline = str(plan.get("baselineBranch") or "main").strip() or "main"
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        pass
+
+    for sid in ordered:
+        try:
+            _, branch, bl = _resolve_slice_and_branch(
+                repo, slice_id=sid, plan_path=norm_plan, build_branch=None
+            )
+        except ValueError as exc:
+            return 2, str(exc), []
+        if not _branch_has_commits(repo, build_branch=branch, baseline=bl):
+            if not _product_touchset_on_main(repo, slice_id=sid, plan_path=norm_plan):
+                return 2, f"build branch {branch!r} has no commits ahead of {bl} for {sid}", []
+
+    head = _git(repo, "rev-parse", baseline)
+    sha = (head.stdout or "").strip() if head.returncode == 0 else ""
+    out = write_marker(
+        repo,
+        phase_plan_path=norm_plan,
+        slice_id=ordered[-1],
+        build_branch=build_branch,
+        commit_sha=sha,
+        completed_product_slices=ordered,
+    )
+    try:
+        from scripts.ppe_ide_handoff import clear_cli_usage_exhausted
+
+        clear_cli_usage_exhausted(repo)
+    except ImportError:
+        pass
+    return 0, str(out), ordered
 
 
 def mark_product_ready(

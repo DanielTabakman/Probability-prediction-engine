@@ -17,7 +17,19 @@ if /i "%~1"=="--no-pause" set "NO_PAUSE=1"
 
 python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
 
-echo [DESKTOP_CONTINUE] step 1/3 — git pull...
+echo [DESKTOP_CONTINUE] step 0/4 — chapter coordination repair (desktop)...
+python "%CD%\scripts\ppe_prepare_desktop_handoff.py" --repo-root "%CD%"
+set "PREP_RC=%ERRORLEVEL%"
+if not "%PREP_RC%"=="0" (
+  echo.
+  echo Coordination repair did not reach RUN_LOCAL — fix above, then retry.
+  echo See docs/SOP/CHAPTER_COORDINATION_V1.md
+  set "RC=%PREP_RC%"
+  goto done
+)
+
+echo.
+echo [DESKTOP_CONTINUE] step 1/4 — git pull...
 git pull origin main
 if errorlevel 1 (
   echo git pull failed.
@@ -25,17 +37,21 @@ if errorlevel 1 (
 )
 
 echo.
-echo [DESKTOP_CONTINUE] step 2/3 — mark product ready + start relay on VM...
+echo [DESKTOP_CONTINUE] step 2/4 — VM coordination repair + finish handoff...
 echo            (via SSH to %VM_HOST%)
 echo.
 
-ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && set PYTHONPATH=%VM_REPO% && python scripts/ppe_operator_git_sync.py --repo-root %VM_REPO% --prepare-handoff-auto && finish_ide_build.cmd"
+ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && set PYTHONPATH=%VM_REPO% && python scripts/ppe_chapter_coordination.py --repair && python scripts/ppe_operator_git_sync.py --repo-root %VM_REPO% --prepare-handoff-auto && finish_ide_build.cmd"
 set "RC=%ERRORLEVEL%"
 
 echo.
-echo [DESKTOP_CONTINUE] step 3/3 — VM status:
+echo [DESKTOP_CONTINUE] step 3/4 — VM status:
 ssh %SSH_OPTS% %VM_HOST% "cd /d %VM_REPO% && call call_ppe_operator_local.cmd && call check_vm_loop.cmd --no-pause"
 set "RC=%ERRORLEVEL%"
+
+echo.
+echo [DESKTOP_CONTINUE] step 4/4 — closeout spine audit (desktop):
+python "%CD%\scripts\ppe_chapter_coordination.py" --spine-audit --repo-root "%CD%"
 
 :done
 echo.
