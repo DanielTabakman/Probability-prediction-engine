@@ -18,6 +18,8 @@ from scripts.sop_discovery_core import (  # noqa: E402
     MODULE_PROGRAM_DOCS,
     TOPIC_ROUTES,
     build_chapter_doc_index,
+    validate_archived_selection_refs,
+    validate_program_doc_footers,
 )
 
 
@@ -130,6 +132,8 @@ def validate_sop_links(
     errors.extend(validate_active_chapters(repo, index))
     errors.extend(validate_program_docs(repo, module_program_docs=module_program_docs))
     errors.extend(validate_topic_routes(repo, topic_routes=topic_routes))
+    errors.extend(validate_program_doc_footers(repo))
+    errors.extend(validate_archived_selection_refs(repo, index=index))
 
     return {
         "ok": not errors,

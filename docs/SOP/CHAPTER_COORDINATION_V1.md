@@ -54,7 +54,8 @@ When product code for a relay chapter is already on `main`:
 |------|----------------|
 | Operator status | `ppe_operator_blind_spots` → `chapter_coordination` issues |
 | Pushable gate | Warns after tier pass when changed paths touch coordination-sensitive files |
-| Burst plan | `ppe_coordination_check.py` → `artifacts/control_plane/COORDINATION_CHECK.json`; blocks burst on `recovery`/`park` |
+| Burst plan | `ppe_coordination_check.py` + `ppe_pipeline_health.py` → `PIPELINE_HEALTH.json`; blocks burst on `recovery`/`park` |
+| Founder diagnostic | `ppe_pipeline_health.cmd` or `python scripts/ppe_pipeline_health.py --write` — see [`PIPELINE_HEALTH_V1.md`](PIPELINE_HEALTH_V1.md) |
 | Manual audit | `python scripts/ppe_chapter_coordination.py` |
 | Agent synthesizer | `@ppe-coordination-check` — read-only; runs audits + routes repair/recovery |
 | Safe repair | `python scripts/ppe_chapter_coordination.py --repair --plan <relay.json>` |

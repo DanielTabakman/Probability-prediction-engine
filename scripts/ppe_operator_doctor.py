@@ -101,7 +101,8 @@ def run_operator_doctor(
                 if not sop.get("index_fresh")
                 else (
                     f"evidence_backfill={sop.get('evidence_backfill_pending')}, "
-                    f"ready_starters={sop.get('ready_starter_regen_pending')}"
+                    f"ready_starters={sop.get('ready_starter_regen_pending')}, "
+                    f"stale_starters={sop.get('ready_starter_stale_pending')}"
                     if not sop.get("ok")
                     else None
                 ),
@@ -126,6 +127,23 @@ def run_operator_doctor(
         )
     except Exception as exc:
         report["checks"].append({"id": "chapter_coordination", "ok": False, "error": str(exc)})
+
+    try:
+        from scripts.ppe_pipeline_health import assess_pipeline_health
+
+        pipeline = assess_pipeline_health(repo, status if status else None)
+        report["pipeline_health"] = pipeline
+        report["checks"].append(
+            {
+                "id": "pipeline_health",
+                "ok": bool(pipeline.get("ok")),
+                "detail": str(pipeline.get("root_cause_code") or pipeline.get("root_cause_message") or "")[:160]
+                or None,
+                "fix_class": pipeline.get("fix_class"),
+            }
+        )
+    except Exception as exc:
+        report["checks"].append({"id": "pipeline_health", "ok": False, "error": str(exc)})
 
     high = [
         i

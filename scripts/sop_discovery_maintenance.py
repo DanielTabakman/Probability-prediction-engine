@@ -37,7 +37,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--apply", action="store_true", help="Write changes (default is dry-run plan)")
     ap.add_argument("--coordination-repair", action="store_true", help="Repair IDE markers + closeout registry desync")
     ap.add_argument("--evidence-backfill", action="store_true", help="Stamp archived YAML on evidence docs")
-    ap.add_argument("--regen-ready-starters", action="store_true", help="Regen IDE BUILD starters for READY queue")
+    ap.add_argument("--regen-ready-starters", action="store_true", help="Regen missing/stale IDE BUILD starters for READY queue")
     ap.add_argument("--refresh-index", action="store_true", help="Regenerate CHAPTER_DOC_INDEX + archive catalog")
     ap.add_argument("--repair-active-evidence", action="store_true", help="Strip archived YAML from active queue rows")
     ap.add_argument(
@@ -64,6 +64,7 @@ def main(argv: list[str] | None = None) -> int:
                     "link_error_count",
                     "evidence_backfill_pending",
                     "ready_starter_regen_pending",
+                    "ready_starter_stale_pending",
                 ):
                     if sop.get(key) is not None:
                         print(f"    {key}: {sop[key]}")
@@ -149,9 +150,15 @@ def main(argv: list[str] | None = None) -> int:
             block = out.get("ready_starters") or {}
             if args.apply:
                 plans = block if isinstance(block, dict) else {}
-                print(f"READY starters: regen {len(plans)} plan(s)")
+                total = sum(len(v) for v in plans.values())
+                print(f"READY starters: regen {total} slice(s) across {len(plans)} plan(s)")
             else:
-                print(f"READY starters: pending {block.get('pending_count', 0)} (dry-run)")
+                stale = block.get("stale_count")
+                missing = block.get("missing_count")
+                print(
+                    f"READY starters: pending {block.get('pending_count', 0)} "
+                    f"(missing={missing}, stale={stale}) (dry-run)"
+                )
         if run_refresh:
             block = out.get("index_refresh") or {}
             if args.apply:

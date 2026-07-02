@@ -4,6 +4,22 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-01
 
+- `1030e804` — Merge pull request #1157 from DanielTabakman/fix/coordination-audit-linux-path
+- `f2162e22` — control-plane: founder pipeline diagnostics v1 — root cause, alerts, gate (`scripts/`)
+- `3468a8e3` — fix(control-plane): closeout registry coordination audit + evidence alignment (`docs/SOP/`)
+- `8a58192e` — Merge branch 'main' of https://github.com/DanielTabakman/Probability-prediction-engine into fix/coordination-audit-linux-path
+- `0034402c` — Control-plane: dev changelog
+- `b95c8b47` — fix: audit_repo plan paths on Linux (POSIX path join) (`scripts/`)
+- `1ae032e8` — fix: audit_repo plan paths on Linux (POSIX path join) (#1155) (`scripts/`)
+- `af671ee6` — control-plane: tier 9 starter freshness (rebased on main) (#1152) (`scripts/`)
+- `b055da00` — control-plane: SOP doc hygiene tier 10 — footers, topics, crib sheet (#1148) (`docs/SOP/`)
+- `5838ae79` — ops: vm phase mirror BUILD IN FLIGHT (#1146) (`docs/SOP/`)
+- `b9befd4f` — ops: context closeout ship (control-plane/recovery-202607012315) (#1143) (`docs/SOP/`)
+- `ad0027d3` — MVP1 CrossVenueScan Product Slice002 closeout (#1142) (`docs/SOP/`)
+- `a8e6734a` — control-plane: chapter coordination tier 8 — repair wiring, operator health, maintenance CLI (#1141) (`scripts/`)
+- `48626d0b` — ops: vm phase mirror CLOSEOUT_PENDING (#1140) (`docs/SOP/`)
+- `608ef5e2` — control-plane: SOP discovery tier 7 — backfill, maintenance, doctor health (#1138) (`docs/SOP/`)
+- `27bec235` — Control-plane: dev changelog
 - `32f28d89` — build(deps): bump actions/setup-python from 5 to 6 (#1111)
 - `3fc6a580` — build(deps): bump dorny/paths-filter from 3 to 4 (#1109)
 - `a7e751b4` — control-plane: SOP discovery tier 6 (#1127) (`scripts/`)
