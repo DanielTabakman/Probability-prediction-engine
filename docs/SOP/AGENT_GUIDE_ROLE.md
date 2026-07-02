@@ -6,6 +6,7 @@ Purpose: instructions for a **read-only guide AI** that helps steer the build ag
 
 1. [`ACTIVE_PRODUCT_DIRECTION.json`](ACTIVE_PRODUCT_DIRECTION.json) — **direction SSOT** (pivot, primary focus, active BUILD chapter)
 2. [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) — founder vs agent surface; never assign factory steps to founder
+3. [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) — layered pulses, alert policy, decision defaults
 3. [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) — **generated**; gaps and current chapter
 3. [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) — layer boundaries; match BUILD packet `LAYER_PRESET`
 4. [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md) — cross-chapter summary

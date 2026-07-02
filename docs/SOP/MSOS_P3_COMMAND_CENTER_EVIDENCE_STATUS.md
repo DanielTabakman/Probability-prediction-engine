@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_p3_command_center
+closed: 2026-06-05
+---
+
 
 # MSOS P3 Command Center — evidence status
 

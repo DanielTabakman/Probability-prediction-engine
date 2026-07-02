@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-01T22:47:35Z · **Archived chapters:** 48
+**Generated:** 2026-07-02T00:31:07Z · **Archived chapters:** 50
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -14,6 +14,7 @@
 | `msos_mcd_production_witness_v1` | `docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json` |
 | `msos_p1_stack_routing` | `docs/SOP/MSOS_FRONTIER.md` | `docs/SOP/MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json` |
 | `msos_p2_homepage` | `docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md` | `docs/SOP/MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json` |
+| `msos_p3_command_center` | `docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md` | `docs/SOP/MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json` |
 | `msos_p4_strategy_lab` | `docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md` | `docs/SOP/MSOS_P4_STRATEGY_LAB_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json` |
 | `msos_p5_thesis_confirm` | `docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md` | `docs/SOP/MSOS_P5_THESIS_CONFIRM_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json` |
 | `msos_p6_expression_sim` | `docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md` | `docs/SOP/MSOS_P6_EXPRESSION_SIM_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json` |
@@ -21,6 +22,7 @@
 | `msos_p8_tester_release` | `docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md` | `docs/SOP/MSOS_P8_TESTER_RELEASE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json` |
 | `msos_production_multi_asset_witness_v1` | `docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json` |
 | `msos_production_wiring_v1` | `docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md` | `docs/SOP/MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json` |
+| `msos_public_demo_launch_v1` | `docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md` | `docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | `msos_self_serve_onboarding_v1` | `docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md` | `docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json` |
 | `msos_strategy_lab_dist_download_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json` |
 | `msos_trader_review_loop_v1` | `docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md` | `docs/SOP/MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json` |

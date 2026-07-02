@@ -71,9 +71,13 @@ def test_write_status_report_burst_writes_json_when_not_mocked(tmp_path) -> None
         "errors": [],
         "supply": {"backlog": {}, "queue_ready": 0},
     }
-    with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
-        mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 2}
-        write_status_report(tmp_path, status)
+    with patch(
+        "scripts.ppe_loop_host_guard.loop_host_start_allowed",
+        return_value=(False, "not_loop_host", ""),
+    ):
+        with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
+            mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 2}
+            write_status_report(tmp_path, status)
 
     burst_path = tmp_path / BURST_PLAN_REL
     assert burst_path.is_file()

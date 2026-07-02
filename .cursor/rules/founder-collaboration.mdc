@@ -1,0 +1,35 @@
+---
+description: Founder collaboration charter — layered pulses, alert policy, decision defaults. Load in founder_charter threads and when formatting founder-facing replies.
+alwaysApply: false
+---
+
+# Founder collaboration
+
+**Canon:** [`docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md`](../../docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md)
+
+## Pulses (never collapse layers)
+
+| Layer | When | Shape |
+|-------|------|--------|
+| **L1 Morning** | Daily ~08:00 | Yesterday shipped + now state — `ppe_morning_report.py` / `ppe_founder_pulse.cmd --layer morning` |
+| **L2 Completion** | After slice/closeout/chapter step | 3–6 lines + "Nothing required from you." |
+| **L3 Alert** | Blocked + no active program | **Alert:** plain language — immediate; never hide behind "nothing required" |
+| **L4 Weekly** | Monday | `weekly_digest_monday.cmd` — digest-only steward titles |
+
+Generate: `ppe_founder_pulse.cmd --layer alert --write --notify`
+
+## Posture
+
+**Always building** unless founder asleep or missing direction SSOT. Default technical choices — do not ask founder.
+
+## Founder-facing closings
+
+One primary closing from charter § Agent reply contract. Layer 3 overrides.
+
+## Bookkeeping translation
+
+Prefer "four ledgers disagree" / "desktop–VM sync" over raw verdict jargon. See [`CHAPTER_COORDINATION_V1.md`](../../docs/SOP/CHAPTER_COORDINATION_V1.md).
+
+## This thread type
+
+`THREAD_ROLE: founder_charter` + collaboration charter — relay **off**; update charter; park execution to operator thread.

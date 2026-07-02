@@ -108,8 +108,26 @@ Fix high-severity issues before merging. Gate warnings are **non-blocking**; bli
 
 ## Recovery sequence (deadlocked chapter)
 
-1. Desktop: `python scripts/ppe_chapter_coordination.py --repair --plan <relay.json>`
-2. Align evidence + frontier (witness rows honest)
-3. VM: `fix_vm_operator.cmd` if `BUILD_IN_FLIGHT` > 45m
-4. VM: `run_ppe_local.cmd` to advance witness/closeout slices
-5. Verify: `python scripts/ppe_operator_status.py --brief` → `RUN_LOCAL` or advancing phase
+1. Desktop: `python scripts/ppe_prepare_desktop_handoff.py` (or `--dry-run` to audit only)
+   - Runs `--repair` for active manifest plan + all repairable plans
+   - Must reach **`VERDICT=RUN_LOCAL`** before handoff
+2. Desktop: `DESKTOP_CONTINUE.cmd --no-pause` (step 0 runs prepare automatically; VM step runs `--repair` again)
+3. Align evidence + frontier (witness rows honest) when `FRONTIER_AHEAD_OF_EVIDENCE` remains
+4. VM: `fix_vm_operator.cmd` if `BUILD_IN_FLIGHT` > 45m or `prepare-handoff` ff-only fails (diverging `main`)
+5. VM: `run_ppe_local.cmd` to advance witness/closeout slices when not auto-spawned
+6. Verify: `python scripts/ppe_operator_status.py --brief` → `RUN_LOCAL` or advancing phase
+7. Spine progress: `python scripts/ppe_chapter_coordination.py --spine-audit`
+
+### Marker repair (atomic batch)
+
+`--repair` writes **all** missing product slices for a plan in **one** `IDE_PRODUCT_READY.json` update. Do not loop `mark_ide_product_ready.cmd` per slice when multiple product slices shipped on `main` — partial sequential writes can drop earlier slice ids.
+
+### DESKTOP_CONTINUE step order
+
+| Step | Where | Action |
+|------|-------|--------|
+| 0 | Desktop | `ppe_prepare_desktop_handoff.py` — repair + verify `RUN_LOCAL` |
+| 1 | Desktop | `git pull origin main` |
+| 2 | VM (SSH) | `ppe_chapter_coordination.py --repair` → `prepare-handoff-auto` → `finish_ide_build.cmd` |
+| 3 | VM (SSH) | `check_vm_loop.cmd` |
+| 4 | Desktop | `ppe_chapter_coordination.py --spine-audit` |

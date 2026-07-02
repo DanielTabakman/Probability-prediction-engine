@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_public_demo_launch_v1
+closed: 2026-06-14
+---
+
 
 # MSOS public demo launch v1 — evidence status
 

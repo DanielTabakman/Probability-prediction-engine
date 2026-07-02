@@ -10,6 +10,7 @@ from pathlib import Path
 from scripts.ppe_chapter_coordination import (
     assess_chapter_coordination_health,
     audit_chapter,
+    audit_closeout_spine,
     format_operator_coordination_lines,
     paths_touch_coordination,
     plan_coordination_repair,
@@ -105,7 +106,7 @@ class TestChapterCoordination(unittest.TestCase):
     def test_repair_marks_slices_and_registry(self) -> None:
         fixes, remaining = repair_chapter(self.repo, self.plan_rel, apply=True)
         actions = {f["action"] for f in fixes}
-        self.assertIn("mark_ide_product_ready", actions)
+        self.assertIn("mark_ide_product_ready_batch", actions)
         self.assertIn("add_closeout_registry", actions)
         marker = json.loads(
             (self.repo / "artifacts/orchestrator/IDE_PRODUCT_READY.json").read_text(encoding="utf-8")
@@ -115,6 +116,42 @@ class TestChapterCoordination(unittest.TestCase):
         self.assertIn("msos_storyboard_visual_parity_v1", steering.get("closeoutOnlyChapterIds") or [])
         codes = {i["code"] for i in remaining}
         self.assertIn("FRONTIER_AHEAD_OF_EVIDENCE", codes)
+
+    def test_batch_repair_preserves_all_product_slices(self) -> None:
+        plan_path = self.repo / "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json"
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        plan["slices"] = [
+            {
+                "sliceId": "MSOS-VisParityV1-Product-Slice002",
+                "layerPreset": "MSOS_UI",
+                "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice002",
+                "touchSet": ["apps/msos-web/src/app/page.tsx"],
+            },
+            {
+                "sliceId": "MSOS-VisParityV1-Product-Slice003",
+                "layerPreset": "MSOS_UI",
+                "buildBranch": "build/auto/MSOS-VisParityV1-Product-Slice003",
+                "touchSet": ["apps/msos-web/src/app/page.tsx"],
+            },
+            {
+                "sliceId": "MSOS-VisParityV1-Closeout-Slice009",
+                "closeout": {"evidenceDoc": "docs/SOP/VIS_PARITY_EVIDENCE.md"},
+            },
+        ]
+        plan_path.write_text(json.dumps(plan), encoding="utf-8")
+        fixes, _ = repair_chapter(self.repo, self.plan_rel, apply=True)
+        batch = next(f for f in fixes if f.get("action") == "mark_ide_product_ready_batch")
+        self.assertEqual(
+            batch.get("sliceIds"),
+            ["MSOS-VisParityV1-Product-Slice002", "MSOS-VisParityV1-Product-Slice003"],
+        )
+        marker = json.loads(
+            (self.repo / "artifacts/orchestrator/IDE_PRODUCT_READY.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            marker.get("completedProductSlices"),
+            ["MSOS-VisParityV1-Product-Slice002", "MSOS-VisParityV1-Product-Slice003"],
+        )
 
     def test_assess_and_format_operator_lines_before_repair(self) -> None:
         health = assess_chapter_coordination_health(self.repo)

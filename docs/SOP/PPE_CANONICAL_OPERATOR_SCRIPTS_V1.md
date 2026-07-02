@@ -58,12 +58,16 @@ Related helpers: `scripts/ppe_ide_handoff.py`, `scripts/ppe_build_worker.py`.
 
 ### `DESKTOP_CONTINUE.cmd` (after PR merge)
 
+0. **`ppe_prepare_desktop_handoff.py`** — coordination repair for active plan + repairable spine chapters; must reach **`RUN_LOCAL`** before SSH (see [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md)).
 1. `git pull origin main` on desktop.
-2. SSH to VM → **`call call_ppe_operator_local.cmd`** → **`ppe_operator_git_sync.py --prepare-handoff-auto`** → **`finish_ide_build.cmd`**.
+2. SSH to VM → **`ppe_chapter_coordination.py --repair`** → **`call call_ppe_operator_local.cmd`** → **`ppe_operator_git_sync.py --prepare-handoff-auto`** → **`finish_ide_build.cmd`**.
 3. `finish_ide_build.cmd` runs `scripts/ppe_post_build_watcher.py --finish-handoff` (post-build mark when build branch has commits; **else explicit CLOSEOUT_ONLY `run_ppe_local` trigger** when product is already on `main`).
 4. SSH status: `call call_ppe_operator_local.cmd && check_vm_loop.cmd --no-pause`.
+5. Desktop: **`ppe_chapter_coordination.py --spine-audit`** — closeout registry progress.
 
 Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
+
+**VM git sync failure:** If `prepare-handoff` reports ff-only abort (diverging `main`), run `fix_vm_operator.cmd` on the loop host, then retry.
 
 **VM health check:** `check_vm_loop.cmd --no-pause` on the loop host (loads env + brief status).
 
@@ -75,6 +79,7 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 |--------|---------|
 | `scripts/ppe_doctor.cmd` | One-shot infra check: ntfy, gh, SSH, VM health, blind spots |
 | `scripts/ppe_pipeline_health.cmd` | Founder pipeline diagnostic: root cause, milestone clock, `PIPELINE_HEALTH.json` |
+| `scripts/ppe_factory_throughput.cmd` | Factory moving? slices/closeouts, phase stuck, supply — `FACTORY_THROUGHPUT.json` |
 | `install_ppe_network_watchdog_task.cmd` | Register Task Scheduler: SSH probe every 15m; ntfy after 3 failures |
 | `python scripts/ppe_network_watchdog.py` | Manual probe (same as scheduled task) |
 | `python scripts/ppe_worktree_janitor.py` | List removable `_worktrees/*`; `--remove <path>` only after human review |
