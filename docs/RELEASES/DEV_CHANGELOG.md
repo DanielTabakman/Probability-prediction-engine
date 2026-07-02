@@ -4,6 +4,13 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-02
 
+- `7c275e7b` — build(deps): update google-auth requirement from >=2.55.0 to >=2.55.1 (#1788)
+- `7deae1ed` — build(deps-dev): bump @types/node in /apps/msos-web (#1785) (`apps/msos-web/`)
+- `90a0430d` — build(deps): bump next from 15.5.19 to 16.2.10 in /apps/msos-web (#1783) (`apps/msos-web/`)
+- `3aaea7d1` — ops: context closeout ship (fix/coordination-audit-linux-path) (#1703) (`docs/SOP/`)
+- MSOS-VisParityV1-Witness-Slice008: storyboard visual parity witness (#1701) (`docs/SOP/`)
+- `a9668a6c` — control-plane: atomic coordination repair + closeout spine audit (#1169) (`docs/SOP/`)
+- `00b17b04` — Control-plane: dev changelog
 - `db8a2854` — ops: vm phase mirror RUN LOCAL PENDING (#1176) (`docs/SOP/`)
 - `a3f74a98` — Control-plane: dev changelog
 
