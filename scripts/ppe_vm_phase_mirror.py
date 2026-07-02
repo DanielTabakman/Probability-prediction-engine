@@ -377,9 +377,25 @@ def sync_autobuilder_phase_artifacts(repo: Path, status: dict[str, Any]) -> dict
     notified = maybe_notify_in_flight_phase(repo, status)
     track_in_flight_since(repo, status)
     stuck_notified = maybe_notify_stuck_in_flight(repo, status)
+    auto_advance: dict[str, Any] = {"skipped": True}
+    try:
+        from scripts.ppe_factory_throughput import assess_factory_throughput, maybe_auto_advance_stuck
+
+        operator = status.get("operator") if isinstance(status.get("operator"), dict) else {}
+        light_status = {
+            "verdict": status.get("verdict") or operator.get("verdict"),
+            "phase_plan_path": operator.get("phase_plan_path"),
+            "chapter_name": operator.get("chapter_name"),
+            "supply": operator.get("supply") or {},
+        }
+        ft = assess_factory_throughput(repo, light_status)
+        auto_advance = maybe_auto_advance_stuck(repo, ft)
+    except Exception:
+        pass
     return {
         "mirror_path": str(mirror) if mirror else None,
         "publish": publish,
         "notified": notified,
         "stuck_notified": stuck_notified,
+        "auto_advance": auto_advance,
     }

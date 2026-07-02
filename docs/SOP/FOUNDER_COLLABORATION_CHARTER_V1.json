@@ -75,5 +75,15 @@
     "nothing_required_when_layer3",
     "operator_status_full_paste",
     "steward_backlog_as_todos"
-  ]
+  ],
+  "ongoing_integration": {
+    "ssot_doc": "docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md",
+    "last_pulse_artifact": "artifacts/control_plane/FOUNDER_PULSE_LAST.json",
+    "no_permanent_thread": true,
+    "fresh_thread_opener": "THREAD_STARTERS_V1.md#founder-collaboration-permanent--how-we-work",
+    "daily_touchpoint": "L1_morning_ntfy",
+    "stall_touchpoint": "L3_alert_ntfy",
+    "weekly_touchpoint": "L4_weekly_digest",
+    "monthly_review": "OPERATING_CALENDAR_V1.md#founder-collaboration-review"
+  }
 }

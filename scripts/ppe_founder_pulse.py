@@ -117,6 +117,8 @@ def build_morning_pulse(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
         next_build = str(cm.get("next_build_candidate") or "").strip()
     if next_build:
         lines.append(f"After closeout: {next_build}")
+    if _mode_line(status) == "CLOSEOUT_ONLY":
+        lines.append("Bookkeeping: code on main — factory finishing ledgers (charter § Bookkeeping).")
     lines.append("")
     lines.append("Your role today: see weekly digest Monday; alerts only if factory stalls.")
     return {

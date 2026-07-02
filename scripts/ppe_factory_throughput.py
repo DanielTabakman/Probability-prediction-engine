@@ -18,6 +18,8 @@ if str(_REPO) not in sys.path:
 
 FACTORY_THROUGHPUT_REL = "artifacts/control_plane/FACTORY_THROUGHPUT.json"
 FACTORY_THROUGHPUT_STATE_REL = "artifacts/control_plane/FACTORY_THROUGHPUT_STATE.json"
+AUTO_ADVANCE_STATE_REL = "artifacts/control_plane/FACTORY_AUTO_ADVANCE_STATE.json"
+WEEKLY_DIGEST_STATE_REL = "artifacts/control_plane/FACTORY_WEEKLY_DIGEST_STATE.json"
 FACTORY_THROUGHPUT_DOC = "docs/SOP/FACTORY_THROUGHPUT_V1.md"
 
 VERDICT_MOVING = "moving"
@@ -25,7 +27,6 @@ VERDICT_IDLE_OK = "idle_ok"
 VERDICT_STUCK = "stuck"
 VERDICT_STACK_DOWN = "stack_down"
 
-# Phase stuck thresholds (seconds) for desktop diagnostic.
 PHASE_STUCK_THRESHOLDS: dict[str, int] = {
     "BUILD_IN_FLIGHT": 2 * 3600,
     "FINISH_IN_FLIGHT": 3600,
@@ -35,6 +36,11 @@ PHASE_STUCK_THRESHOLDS: dict[str, int] = {
 
 ZERO_THROUGHPUT_WARN_HOURS = 12
 ZERO_THROUGHPUT_ALERT_HOURS = 24
+AUTO_ADVANCE_COOLDOWN_SEC = 3600
+AUTO_ADVANCE_MAX_PER_DAY = 3
+AUTO_ADVANCE_MIN_STUCK_MINUTES = 30
+SUPPLY_FORECAST_MIN_SLICES_PER_DAY = 0.25
+WEEKLY_DIGEST_INTERVAL_HOURS = 168
 
 Issue = dict[str, Any]
 
@@ -101,16 +107,6 @@ def _last_slice_completed(repo: Path) -> dict[str, Any] | None:
         return None
 
 
-def _throughput_counts(repo: Path, *, hours: int) -> dict[str, int]:
-    slices = _count_slices_hours(repo, hours)
-    closeouts = _count_closeouts_hours(repo, hours)
-    return {
-        "slices": slices,
-        "closeouts": closeouts,
-        "weighted_slices": slices,
-    }
-
-
 def _count_slices_hours(repo: Path, hours: int) -> int:
     from scripts.workflow_metrics_cli import SLICES_FILE, _metrics_dir, _parse_iso, _read_jsonl
 
@@ -131,6 +127,28 @@ def _count_closeouts_hours(repo: Path, hours: int) -> int:
         for row in read_context_windows(repo)
         if (t := _parse_iso(str(row.get("closed_at") or ""))) and t.timestamp() >= cutoff
     )
+
+
+def _throughput_counts(repo: Path, *, hours: int) -> dict[str, Any]:
+    slices = _count_slices_hours(repo, hours)
+    closeouts = _count_closeouts_hours(repo, hours)
+    weighted = slices
+    wspc = 0.0
+    try:
+        from scripts.ppe_workflow_aggregate import summarize_aggregate
+
+        days = max(1, (hours + 23) // 24)
+        agg = summarize_aggregate(repo, days=days)
+        weighted = int(agg.get("weighted_slices") or slices)
+        wspc = float(agg.get("weighted_slices_per_closeout") or 0.0)
+    except Exception:
+        pass
+    return {
+        "slices": slices,
+        "closeouts": closeouts,
+        "weighted_slices": weighted,
+        "weighted_slices_per_closeout": round(wspc, 2),
+    }
 
 
 def _stack_snapshot(repo: Path) -> dict[str, Any]:
@@ -165,47 +183,175 @@ def _stack_snapshot(repo: Path) -> dict[str, Any]:
         return {"error": str(exc), "loop_running": None, "watch_running": None, "unknown": True}
 
 
-def _phase_age_minutes(repo: Path, phase: str) -> float | None:
-    since_path = repo / "artifacts/control_plane/VM_IN_FLIGHT_SINCE.json"
-    since = _load_json(since_path)
+def _phase_age_with_trust(
+    repo: Path,
+    phase: str,
+    *,
+    stack: dict[str, Any] | None = None,
+) -> tuple[float | None, bool, str | None]:
+    stack = stack or {}
+    on_desktop = bool(stack.get("unknown"))
+
+    since = _load_json(repo / "artifacts/control_plane/VM_IN_FLIGHT_SINCE.json")
     if str(since.get("phase") or "") == phase:
         hrs = _hours_since(_parse_utc(str(since.get("since") or "")))
         if hrs is not None:
-            return round(hrs * 60, 1)
+            return round(hrs * 60, 1), True, None
 
     mirror = _load_json(repo / "docs/SOP/VM_OPERATOR_PHASE.json")
     if str(mirror.get("phase") or "") == phase:
         hrs = _hours_since(_parse_utc(str(mirror.get("as_of") or "")))
         if hrs is not None:
-            return round(hrs * 60, 1)
+            stale_warn: str | None = None
+            trusted = True
+            if on_desktop:
+                try:
+                    from scripts.ppe_operator_vm_mirror_refresh import mirror_is_stale
 
-    ab_path = repo / "artifacts/orchestrator/AUTOBUILDER_STATUS.json"
-    ab = _load_json(ab_path)
+                    if mirror_is_stale(mirror):
+                        trusted = False
+                        stale_warn = "VM mirror stale — phase age approximate"
+                except Exception:
+                    pass
+            return round(hrs * 60, 1), trusted, stale_warn
+
+    ab = _load_json(repo / "artifacts/orchestrator/AUTOBUILDER_STATUS.json")
     if str(ab.get("phase") or "") == phase:
         hrs = _hours_since(_parse_utc(str(ab.get("as_of") or "")))
         if hrs is not None:
-            return round(hrs * 60, 1)
-    return None
+            return round(hrs * 60, 1), True, None
+    return None, True, None
+
+
+def _phase_age_minutes(repo: Path, phase: str, *, stack: dict[str, Any] | None = None) -> float | None:
+    minutes, _, _ = _phase_age_with_trust(repo, phase, stack=stack)
+    return minutes
+
+
+def _slice_prefix(slice_id: str) -> str:
+    parts = str(slice_id or "").split("-")
+    if len(parts) >= 3:
+        return "-".join(parts[:3])
+    return str(slice_id or "")
+
+
+def collect_chapter_throughput(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
+    plan_path = str(status.get("phase_plan_path") or "").replace("\\", "/").strip()
+    chapter_name = str(status.get("chapter_name") or "").strip()
+    chapter_id = ""
+    if plan_path:
+        try:
+            from scripts.ppe_chapter_mode import plan_chapter_id
+
+            chapter_id = plan_chapter_id(plan_path)
+        except Exception:
+            pass
+
+    pending: list[str] = []
+    if plan_path:
+        try:
+            from scripts.ppe_phase_plan_window import non_closeout_slices_pending
+
+            pending = non_closeout_slices_pending(repo, plan_path)
+        except Exception:
+            pass
+
+    prefix = _slice_prefix(pending[0]) if pending else ""
+    if not prefix and plan_path:
+        try:
+            from scripts.ppe_manifest import load_phase_plan
+
+            plan = load_phase_plan(repo, plan_path)
+            for sl in plan.get("slices") or []:
+                if isinstance(sl, dict) and sl.get("sliceId"):
+                    prefix = _slice_prefix(str(sl["sliceId"]))
+                    break
+        except Exception:
+            pass
+
+    last_in_chapter: dict[str, Any] | None = None
+    slices_in_chapter_7d = 0
+    if prefix:
+        try:
+            from scripts.workflow_metrics_cli import SLICES_FILE, _metrics_dir, _parse_iso, _read_jsonl
+
+            cutoff = datetime.now(timezone.utc).timestamp() - 7 * 86400
+            for row in _read_jsonl(_metrics_dir(repo) / SLICES_FILE):
+                sid = str(row.get("slice_id") or "")
+                if not sid.startswith(prefix):
+                    continue
+                dt = _parse_iso(str(row.get("completed_at") or ""))
+                if dt and dt.timestamp() >= cutoff:
+                    slices_in_chapter_7d += 1
+                if dt and (
+                    last_in_chapter is None
+                    or dt > _parse_utc(str(last_in_chapter.get("completed_at") or ""))
+                ):
+                    last_in_chapter = {
+                        "slice_id": sid,
+                        "completed_at": dt.isoformat().replace("+00:00", "Z"),
+                        "hours_ago": round(_hours_since(dt) or 0.0, 2),
+                    }
+        except Exception:
+            pass
+
+    stall_hours = last_in_chapter.get("hours_ago") if last_in_chapter else None
+    return {
+        "chapter_id": chapter_id or None,
+        "chapter_name": chapter_name or None,
+        "plan_path": plan_path or None,
+        "slice_prefix": prefix or None,
+        "pending_slices": pending,
+        "pending_count": len(pending),
+        "slices_completed_7d": slices_in_chapter_7d,
+        "last_slice_in_chapter": last_in_chapter,
+        "stall_hours": stall_hours,
+    }
+
+
+def forecast_supply_days(supply: dict[str, Any], throughput_7d: dict[str, Any]) -> dict[str, Any]:
+    ready = int(supply.get("queue_ready") or 0)
+    queued = int(supply.get("backlog_queued") or 0)
+    blocked = int(supply.get("backlog_blocked") or 0)
+    pool = ready + queued + blocked
+    slices_7d = int(throughput_7d.get("slices") or 0)
+    slices_per_day = slices_7d / 7.0 if slices_7d > 0 else 0.0
+
+    if supply.get("idle_risk") or pool == 0:
+        return {
+            "days_until_supply_low": 0.0,
+            "slices_per_day": round(slices_per_day, 2),
+            "supply_pool": pool,
+            "at_risk": True,
+            "note": "Already at or near supply idle",
+        }
+    if slices_per_day < SUPPLY_FORECAST_MIN_SLICES_PER_DAY:
+        return {
+            "days_until_supply_low": None,
+            "slices_per_day": round(slices_per_day, 2),
+            "supply_pool": pool,
+            "at_risk": pool <= 3,
+            "note": "Burn rate too low to forecast",
+        }
+    days = round(pool / slices_per_day, 1)
+    return {
+        "days_until_supply_low": days,
+        "slices_per_day": round(slices_per_day, 2),
+        "supply_pool": pool,
+        "at_risk": days <= 3,
+        "note": f"~{days}d at {slices_per_day:.1f} slices/day",
+    }
 
 
 def assess_supply_health(repo: Path, status: dict[str, Any] | None = None) -> dict[str, Any]:
     if status is None:
-        try:
-            from scripts.ppe_operator_status import prepare_operator_status
-
-            status = prepare_operator_status(repo)
-        except Exception:
-            status = {}
-
+        status = {}
     supply = status.get("supply") if isinstance(status.get("supply"), dict) else {}
     backlog = supply.get("backlog") if isinstance(supply.get("backlog"), dict) else {}
-    next_promo = supply.get("next_promotable_blocked")
     verdict = str(status.get("verdict") or "")
-
     queued = int(backlog.get("queued") or 0)
     blocked = int(backlog.get("blocked") or 0)
     ready = int(supply.get("queue_ready") or 0)
-
     idle_risk = verdict == "SUPPLY_LOW" or (ready == 0 and queued == 0 and blocked == 0)
     return {
         "queue_ready": ready,
@@ -213,16 +359,16 @@ def assess_supply_health(repo: Path, status: dict[str, Any] | None = None) -> di
         "backlog_blocked": blocked,
         "verdict": verdict,
         "idle_risk": idle_risk,
-        "next_promotable": next_promo if isinstance(next_promo, dict) else None,
+        "next_promotable": supply.get("next_promotable_blocked"),
         "promote_reason": supply.get("promote_reason"),
     }
 
 
-def detect_phase_stuck(repo: Path, phase: str) -> Issue | None:
+def detect_phase_stuck(repo: Path, phase: str, *, stack: dict[str, Any] | None = None) -> Issue | None:
     threshold = PHASE_STUCK_THRESHOLDS.get(phase)
     if not threshold:
         return None
-    age_min = _phase_age_minutes(repo, phase)
+    age_min, trusted, stale_warn = _phase_age_with_trust(repo, phase, stack=stack)
     if age_min is None:
         return None
     age_sec = age_min * 60
@@ -230,22 +376,142 @@ def detect_phase_stuck(repo: Path, phase: str) -> Issue | None:
         return None
     hours = round(age_sec / 3600, 1)
     limit_h = round(threshold / 3600, 1)
+    msg = f"Phase `{phase}` for ~{hours}h (limit {limit_h}h) — factory spinning, not shipping."
+    if stale_warn:
+        msg = f"{msg} ({stale_warn})"
     return {
         "code": "PHASE_STUCK",
-        "severity": "high",
-        "message": f"Phase `{phase}` for ~{hours}h (limit {limit_h}h) — factory spinning, not shipping.",
+        "severity": "high" if trusted else "medium",
+        "message": msg,
         "fix": "VM: ppe_autobuilder.cmd advance or diagnose. Desktop: DESKTOP_CONTINUE when RUN_LOCAL due.",
         "phase": phase,
         "minutes_in_phase": age_min,
+        "phase_age_trusted": trusted,
         "threshold_seconds": threshold,
     }
+
+
+def maybe_auto_advance_stuck(repo: Path, throughput: dict[str, Any]) -> dict[str, Any]:
+    """Loop host only: rate-limited ppe_autobuilder advance when stuck/stack_down."""
+    result: dict[str, Any] = {"attempted": False, "skipped": True}
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        if not loop_host_start_allowed()[0]:
+            result["reason"] = "not_loop_host"
+            return result
+    except Exception:
+        result["reason"] = "loop_host_check_failed"
+        return result
+
+    verdict = str(throughput.get("verdict") or "")
+    if verdict not in (VERDICT_STUCK, VERDICT_STACK_DOWN):
+        result["reason"] = f"verdict={verdict}"
+        return result
+
+    phase_min = throughput.get("phase_minutes")
+    if verdict == VERDICT_STUCK and (
+        not isinstance(phase_min, (int, float)) or phase_min < AUTO_ADVANCE_MIN_STUCK_MINUTES
+    ):
+        result["reason"] = "below_min_stuck_minutes"
+        return result
+
+    state = _load_json(repo / AUTO_ADVANCE_STATE_REL)
+    last_at = _parse_utc(str(state.get("last_advance_at") or ""))
+    if last_at is not None:
+        elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
+        if elapsed < AUTO_ADVANCE_COOLDOWN_SEC:
+            result["reason"] = f"cooldown ({int(AUTO_ADVANCE_COOLDOWN_SEC - elapsed)}s left)"
+            return result
+
+    day_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    count_today = int(state.get("count_today") or 0)
+    count_day = _parse_utc(str(state.get("count_day") or ""))
+    if count_day is None or count_day < day_start:
+        count_today = 0
+
+    if count_today >= AUTO_ADVANCE_MAX_PER_DAY:
+        result["reason"] = "daily_cap"
+        return result
+
+    try:
+        from scripts.ppe_autobuilder import action_advance
+
+        advance_result = action_advance(repo)
+        result = {
+            "attempted": True,
+            "skipped": bool(advance_result.get("skipped")),
+            "action": advance_result.get("action"),
+            "phase": advance_result.get("phase"),
+            "reason": advance_result.get("reason"),
+        }
+        state = {
+            "last_advance_at": _utc_now(),
+            "count_today": count_today + 1,
+            "count_day": day_start.isoformat().replace("+00:00", "Z"),
+            "last_verdict": verdict,
+            "last_result": advance_result,
+        }
+        path = repo / AUTO_ADVANCE_STATE_REL
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    except Exception as exc:
+        result = {"attempted": True, "skipped": True, "error": str(exc)}
+    return result
+
+
+def maybe_notify_weekly_rollup(repo: Path, throughput: dict[str, Any]) -> bool:
+    """Weekly ntfy digest of factory throughput (7d stats)."""
+    prev = _load_json(repo / WEEKLY_DIGEST_STATE_REL)
+    last_sent = _parse_utc(str(prev.get("last_sent_at") or ""))
+    if last_sent is not None and (_hours_since(last_sent) or 0) < WEEKLY_DIGEST_INTERVAL_HOURS:
+        return False
+
+    t7 = throughput.get("throughput_7d") if isinstance(throughput.get("throughput_7d"), dict) else {}
+    sla = throughput.get("weighted_sla") if isinstance(throughput.get("weighted_sla"), dict) else {}
+    chapter = throughput.get("chapter") if isinstance(throughput.get("chapter"), dict) else {}
+    forecast = throughput.get("supply_forecast") if isinstance(throughput.get("supply_forecast"), dict) else {}
+
+    lines = [
+        f"7d: {t7.get('slices', 0)} slices, {t7.get('closeouts', 0)} closeouts",
+        f"Weighted: {sla.get('weighted_slices_7d', 0)} (wspc={sla.get('weighted_slices_per_closeout_7d', 0)})",
+        f"Factory verdict: {throughput.get('verdict')}",
+    ]
+    if chapter.get("chapter_id"):
+        lines.append(
+            f"Active chapter: {chapter['chapter_id']} ({chapter.get('pending_count', 0)} pending)"
+        )
+    if forecast.get("note"):
+        lines.append(f"Supply: {forecast['note']}")
+
+    try:
+        from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
+
+        if not (notify_enabled() and ntfy_configured()):
+            return False
+        sent = send_ntfy(
+            "PPE factory weekly rollup",
+            "\n".join(lines),
+            tags=["ppe", "factory", "weekly"],
+            priority="low",
+        )
+    except Exception:
+        return False
+
+    if sent:
+        path = repo / WEEKLY_DIGEST_STATE_REL
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"last_sent_at": _utc_now(), "lines": lines}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    return sent
 
 
 def assess_factory_throughput(
     repo: Path,
     status: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Throughput + stack + supply snapshot."""
     repo = repo.resolve()
     if status is None:
         try:
@@ -263,6 +529,9 @@ def assess_factory_throughput(
     t24 = _throughput_counts(repo, hours=24)
     t7d = _throughput_counts(repo, hours=168)
     supply = assess_supply_health(repo, status)
+    chapter = collect_chapter_throughput(repo, status)
+    supply_forecast = forecast_supply_days(supply, t7d)
+    phase_min, phase_trusted, _ = _phase_age_with_trust(repo, phase, stack=stack) if phase else (None, True, None)
 
     issues: list[Issue] = []
     loop_ok = bool(stack.get("loop_running")) and bool(stack.get("watch_running"))
@@ -281,9 +550,26 @@ def assess_factory_throughput(
             }
         )
 
-    phase_stuck = detect_phase_stuck(repo, phase) if phase and not unknown_stack else None
+    phase_stuck = detect_phase_stuck(repo, phase, stack=stack) if phase and not unknown_stack else None
     if phase_stuck:
         issues.append(phase_stuck)
+
+    if (
+        chapter.get("pending_count")
+        and chapter.get("stall_hours") is not None
+        and float(chapter["stall_hours"]) >= 24
+    ):
+        issues.append(
+            {
+                "code": "CHAPTER_STALL",
+                "severity": "medium",
+                "message": (
+                    f"Chapter `{chapter.get('chapter_id') or chapter.get('chapter_name')}` — "
+                    f"no slice in {chapter['stall_hours']:.0f}h ({chapter.get('pending_count')} pending)."
+                ),
+                "fix": "ppe_autobuilder.cmd advance on VM.",
+            }
+        )
 
     hours_since_slice = last_slice.get("hours_ago") if last_slice else None
     moving = (t24.get("slices") or 0) > 0 or (t24.get("closeouts") or 0) > 0
@@ -297,7 +583,7 @@ def assess_factory_throughput(
                     "code": "ZERO_THROUGHPUT_24H",
                     "severity": "high",
                     "message": f"No slices/closeouts in 24h — last slice {hrs:.0f}h ago.",
-                    "fix": "ppe_autobuilder.cmd diagnose && advance; check pipeline health ROOT CAUSE.",
+                    "fix": "ppe_autobuilder.cmd diagnose && advance",
                 }
             )
         elif hrs >= ZERO_THROUGHPUT_WARN_HOURS:
@@ -305,8 +591,20 @@ def assess_factory_throughput(
                 {
                     "code": "ZERO_THROUGHPUT_12H",
                     "severity": "medium",
-                    "message": f"Throughput low — no completions in 24h; last slice {hrs:.0f}h ago.",
-                    "fix": "Review OPERATOR_STATUS + ppe_pipeline_health.cmd",
+                    "message": f"Throughput low — last slice {hrs:.0f}h ago.",
+                    "fix": "ppe_pipeline_health.cmd",
+                }
+            )
+
+    if supply_forecast.get("at_risk") and not supply.get("idle_risk"):
+        days_left = supply_forecast.get("days_until_supply_low")
+        if days_left is not None and days_left <= 7:
+            issues.append(
+                {
+                    "code": "SUPPLY_FORECAST_LOW",
+                    "severity": "medium" if days_left > 3 else "high",
+                    "message": f"Supply forecast: ~{days_left}d until queue exhausted.",
+                    "fix": "Charter/promote next chapter.",
                 }
             )
 
@@ -316,7 +614,7 @@ def assess_factory_throughput(
                 "code": "SUPPLY_STARVATION_RISK",
                 "severity": "medium",
                 "message": f"Queue READY={supply.get('queue_ready')} — supply may idle factory soon.",
-                "fix": "Promote PHASE_CHAPTER_BACKLOG or charter next chapter.",
+                "fix": "Promote PHASE_CHAPTER_BACKLOG.",
             }
         )
 
@@ -336,9 +634,7 @@ def assess_factory_throughput(
         verdict = VERDICT_IDLE_OK
 
     top = issues[0] if issues else None
-    commands: list[str] = []
-    if top and top.get("fix"):
-        commands.append(str(top["fix"]))
+    commands = [str(top["fix"])] if top and top.get("fix") else []
 
     return {
         "as_of": _utc_now(),
@@ -346,12 +642,19 @@ def assess_factory_throughput(
         "ok": verdict in (VERDICT_MOVING, VERDICT_IDLE_OK),
         "stack": {**stack, "unknown": unknown_stack},
         "phase": phase,
-        "phase_minutes": _phase_age_minutes(repo, phase) if phase else None,
+        "phase_minutes": phase_min,
+        "phase_age_trusted": phase_trusted,
         "operator_verdict": operator_verdict,
         "last_slice": last_slice,
         "throughput_24h": t24,
         "throughput_7d": t7d,
+        "weighted_sla": {
+            "weighted_slices_7d": t7d.get("weighted_slices"),
+            "weighted_slices_per_closeout_7d": t7d.get("weighted_slices_per_closeout"),
+        },
+        "chapter": chapter,
         "supply": supply,
+        "supply_forecast": supply_forecast,
         "issues": issues,
         "top_issue": top,
         "top_issue_code": str(top.get("code") or "") if top else None,
@@ -370,23 +673,38 @@ def write_factory_throughput(repo: Path, payload: dict[str, Any]) -> Path:
 
 
 def format_throughput_lines(throughput: dict[str, Any]) -> list[str]:
-    """Compact lines for OPERATOR_STATUS / pipeline health block."""
     verdict = throughput.get("verdict") or "?"
     t24 = throughput.get("throughput_24h") if isinstance(throughput.get("throughput_24h"), dict) else {}
     phase = throughput.get("phase") or "?"
     phase_min = throughput.get("phase_minutes")
+    trusted = throughput.get("phase_age_trusted", True)
     phase_s = f"{phase}" + (f" ({phase_min:.0f}m)" if isinstance(phase_min, (int, float)) else "")
+    if trusted is False:
+        phase_s += " ~mirror"
+    wspc = (throughput.get("weighted_sla") or {}).get("weighted_slices_per_closeout_7d")
+    wspc_s = f" · wspc7d={wspc}" if wspc else ""
     lines = [
         f"**FACTORY:** `{verdict}` — phase `{phase_s}` · "
-        f"24h: {t24.get('slices', 0)} slices, {t24.get('closeouts', 0)} closeouts",
+        f"24h: {t24.get('slices', 0)} slices, {t24.get('closeouts', 0)} closeouts{wspc_s}",
     ]
+    chapter = throughput.get("chapter") if isinstance(throughput.get("chapter"), dict) else {}
+    if chapter.get("chapter_id") and chapter.get("pending_count"):
+        stall = chapter.get("stall_hours")
+        stall_s = f", last slice {stall:.0f}h ago" if isinstance(stall, (int, float)) else ""
+        lines.append(
+            f"**CHAPTER:** `{chapter['chapter_id']}` — {chapter['pending_count']} pending{stall_s}"
+        )
     if throughput.get("top_issue_message"):
         lines.append(f"  → {throughput['top_issue_message']}")
     supply = throughput.get("supply") if isinstance(throughput.get("supply"), dict) else {}
+    forecast = throughput.get("supply_forecast") if isinstance(throughput.get("supply_forecast"), dict) else {}
     if supply.get("queue_ready") is not None:
+        fc = ""
+        if forecast.get("days_until_supply_low") is not None:
+            fc = f" · ~{forecast['days_until_supply_low']}d supply"
         lines.append(
             f"**SUPPLY:** READY={supply.get('queue_ready')} "
-            f"queued={supply.get('backlog_queued')} blocked={supply.get('backlog_blocked')}"
+            f"queued={supply.get('backlog_queued')} blocked={supply.get('backlog_blocked')}{fc}"
         )
     return lines
 
@@ -394,19 +712,23 @@ def format_throughput_lines(throughput: dict[str, Any]) -> list[str]:
 def format_founder_throughput_report(throughput: dict[str, Any]) -> str:
     lines = ["Factory throughput", ""]
     lines.append(f"Verdict: {throughput.get('verdict')}")
-    stack = throughput.get("stack") if isinstance(throughput.get("stack"), dict) else {}
-    lines.append(
-        f"Stack: loop={stack.get('loop_running')} watch={stack.get('watch_running')} phase={stack.get('phase')}"
-    )
     t24 = throughput.get("throughput_24h") or {}
     t7 = throughput.get("throughput_7d") or {}
+    sla = throughput.get("weighted_sla") or {}
     lines.append(
         f"24h: slices={t24.get('slices', 0)} closeouts={t24.get('closeouts', 0)} | "
-        f"7d: slices={t7.get('slices', 0)} closeouts={t7.get('closeouts', 0)}"
+        f"7d: slices={t7.get('slices', 0)} weighted={sla.get('weighted_slices_7d', 0)} "
+        f"wspc={sla.get('weighted_slices_per_closeout_7d', 0)}"
     )
-    last = throughput.get("last_slice")
-    if last:
-        lines.append(f"Last slice: {last.get('slice_id')} ({last.get('hours_ago')}h ago)")
+    chapter = throughput.get("chapter") or {}
+    if chapter.get("chapter_id"):
+        lines.append(
+            f"Chapter: {chapter['chapter_id']} pending={chapter.get('pending_count', 0)} "
+            f"7d_slices={chapter.get('slices_completed_7d', 0)}"
+        )
+    forecast = throughput.get("supply_forecast") or {}
+    if forecast.get("note"):
+        lines.append(f"Supply forecast: {forecast['note']}")
     if throughput.get("top_issue_message"):
         lines.append(f"Issue: {throughput['top_issue_message']}")
     cmds = throughput.get("commands") or []
@@ -428,7 +750,6 @@ def _write_state(repo: Path, state: dict[str, Any]) -> None:
 
 
 def maybe_notify_throughput_regression(repo: Path, throughput: dict[str, Any]) -> bool:
-    """ntfy when factory drops to stuck/stack_down or zero throughput alert."""
     prev = _load_state(repo)
     prev_verdict = str(prev.get("verdict") or "")
     now_verdict = str(throughput.get("verdict") or "")
@@ -449,7 +770,7 @@ def maybe_notify_throughput_regression(repo: Path, throughput: dict[str, Any]) -
         body_parts.append(str(throughput.get("top_issue_message") or now_verdict))
 
     top_code = throughput.get("top_issue_code")
-    if top_code in ("ZERO_THROUGHPUT_24H", "PHASE_STUCK", "STACK_DOWN"):
+    if top_code in ("ZERO_THROUGHPUT_24H", "PHASE_STUCK", "STACK_DOWN", "CHAPTER_STALL"):
         last_alert = _parse_utc(str(prev.get("last_alert_at") or ""))
         if last_alert is None or (_hours_since(last_alert) or 0) >= 12:
             if not should:
@@ -484,6 +805,7 @@ def maybe_notify_throughput_regression(repo: Path, throughput: dict[str, Any]) -
         state["last_alert_at"] = prev.get("last_alert_at")
 
     _write_state(repo, state)
+    maybe_notify_weekly_rollup(repo, throughput)
     return should
 
 
@@ -493,6 +815,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--notify", action="store_true")
+    ap.add_argument("--auto-advance", action="store_true", help="Loop host: auto-advance when stuck")
     ap.add_argument("--no-status", action="store_true")
     args = ap.parse_args(argv)
 
@@ -508,6 +831,12 @@ def main(argv: list[str] | None = None) -> int:
         path = write_factory_throughput(repo, payload)
         if not args.json:
             print(f"ppe_factory_throughput: wrote {path.relative_to(repo)}")
+
+    if args.auto_advance:
+        adv = maybe_auto_advance_stuck(repo, payload)
+        payload["auto_advance"] = adv
+        if not args.json:
+            print(f"ppe_factory_throughput: auto_advance={adv}")
 
     if args.notify:
         maybe_notify_throughput_regression(repo, payload)
