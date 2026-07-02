@@ -136,6 +136,37 @@ class TestChapterCoordination(unittest.TestCase):
         self.assertNotIn("QUEUE_ACTIVE_PRODUCT_DESYNC", codes)
         self.assertNotIn("CLOSEOUT_REGISTRY_MISSING", codes)
 
+    def test_closeout_registry_skips_marker_for_non_active_chapter(self) -> None:
+        other_plan_rel = "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json"
+        other_plan = {
+            "name": "msos_p3_command_center",
+            "baselineBranch": "main",
+            "slices": [
+                {
+                    "sliceId": "MSOS-P3-Product-Slice002",
+                    "layerPreset": "MSOS_UI",
+                    "buildBranch": "build/auto/MSOS-P3-Product-Slice002",
+                    "touchSet": ["apps/msos-web/src/app/page.tsx"],
+                }
+            ],
+        }
+        plans = self.repo / "docs" / "SOP" / "PHASE_PLANS"
+        (plans / "msos_p3_command_center_relay.json").write_text(json.dumps(other_plan), encoding="utf-8")
+        steering = json.loads(
+            (self.repo / "docs" / "SOP" / "AGENT_STEERING_V1.json").read_text(encoding="utf-8")
+        )
+        steering["closeoutOnlyChapterIds"] = [
+            "msos_storyboard_visual_parity_v1",
+            "msos_p3_command_center",
+        ]
+        (self.repo / "docs" / "SOP" / "AGENT_STEERING_V1.json").write_text(
+            json.dumps(steering), encoding="utf-8"
+        )
+        issues = audit_chapter(self.repo, other_plan_rel)
+        codes = {i["code"] for i in issues}
+        self.assertNotIn("PRODUCT_ON_MAIN_NO_MARKER", codes)
+        self.assertNotIn("QUEUE_ACTIVE_PRODUCT_DESYNC", codes)
+
 
 if __name__ == "__main__":
     unittest.main()

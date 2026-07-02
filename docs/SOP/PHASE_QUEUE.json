@@ -89,9 +89,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Authenticated shell + Command Center \u2014 SELECTION 2026-06-03 after P2 COMPLETE",
-      "selectionPrep": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
@@ -177,9 +178,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] VPS live MSOS shell + research beta CTA + operator URL check-in after visual parity",
-      "selectionPrep": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md",
+      "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",

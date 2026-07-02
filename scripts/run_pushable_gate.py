@@ -470,6 +470,23 @@ def main(argv: list[str] | None = None) -> int:
             record_auto_notify(repo, verdict, files, branch=current_branch(repo))
         except ImportError:
             pass
+    if os.environ.get("PPE_PIPELINE_GATE", "1") != "0":
+        try:
+            from scripts.ppe_pipeline_health import (
+                gate_check_pipeline_health,
+                gate_check_pipeline_on_sensitive_changes,
+            )
+
+            if args.pre_push:
+                rc = gate_check_pipeline_health(repo, pre_push=True)
+                if rc != 0:
+                    return rc
+            elif files:
+                rc = gate_check_pipeline_on_sensitive_changes(repo, files)
+                if rc != 0:
+                    return rc
+        except ImportError:
+            pass
     return 0
 
 
@@ -583,6 +600,24 @@ def run_gate_for_paths(
         rc = _run(cmd, cwd=repo)
         if rc != 0:
             return rc
+
+    if os.environ.get("PPE_PIPELINE_GATE", "1") != "0":
+        try:
+            from scripts.ppe_pipeline_health import (
+                gate_check_pipeline_health,
+                gate_check_pipeline_on_sensitive_changes,
+            )
+
+            if pre_push:
+                rc = gate_check_pipeline_health(repo, pre_push=True)
+                if rc != 0:
+                    return rc
+            elif files:
+                rc = gate_check_pipeline_on_sensitive_changes(repo, files)
+                if rc != 0:
+                    return rc
+        except ImportError:
+            pass
 
     return 0
 

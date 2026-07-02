@@ -575,6 +575,12 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
         lines.append("Burst path: wait — VM in-flight; no SSH probes or burst workers")
     elif burst_plan.get("direct_action") == "resolve_lease":
         lines.append("Burst path: worker lease conflict — ppe_worker_lease.py --assess")
+    elif burst_plan.get("direct_action") == "coordination_check":
+        lines.append("Burst path: coordination blocked — read COORDINATION_CHECK.json; repair/recovery first")
+    elif burst_plan.get("direct_action") == "pipeline_health":
+        ph = burst_plan.get("pipeline_health") if isinstance(burst_plan.get("pipeline_health"), dict) else {}
+        code = ph.get("root_cause_code") or "PIPELINE_UNHEALTHY"
+        lines.append(f"Burst path: pipeline health blocked ({code}) — read PIPELINE_HEALTH.json")
     elif burst_plan.get("suggested_lane"):
         lines.append(f"Worker lane: `{burst_plan.get('suggested_lane')}`")
     elif not allowed:
@@ -834,12 +840,28 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
             whats_next_block = "\n## What's next (last context closeout)\n\n" + "\n".join(body_lines).strip() + "\n"
     except ImportError:
         pass
+    pipeline_block = ""
+    try:
+        from scripts.ppe_pipeline_health import (
+            assess_pipeline_health,
+            format_root_cause_block,
+            maybe_notify_pipeline_regression,
+            write_pipeline_health,
+        )
+
+        pipeline_health = assess_pipeline_health(repo, status)
+        write_pipeline_health(repo, pipeline_health)
+        status["pipeline_health"] = pipeline_health
+        maybe_notify_pipeline_regression(repo, pipeline_health)
+        pipeline_block = format_root_cause_block(pipeline_health) + "\n"
+    except Exception:
+        pass
     body = f"""# Operator status
 
 **As-of:** {status.get("as_of")}
 **Verdict:** `{status.get("verdict")}`
 
-{_format_human(status, repo, burst_plan=burst_plan)}
+{pipeline_block}{_format_human(status, repo, burst_plan=burst_plan)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
     try:
