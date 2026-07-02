@@ -57,6 +57,32 @@ def _closeout_registry_ids(repo: Path) -> set[str]:
     return {str(x).strip() for x in raw if str(x).strip()}
 
 
+def _active_manifest_plan_path(repo: Path) -> str:
+    try:
+        from scripts.ppe_manifest import load_manifest
+
+        return _norm_plan(str(load_manifest(repo).get("phasePlanPath") or ""))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return ""
+
+
+def _marker_required_for_chapter(
+    repo: Path,
+    *,
+    plan_path: str,
+    chapter_id: str,
+    registry: set[str],
+    on_main: bool,
+    missing_marker: list[str],
+) -> bool:
+    """IDE_PRODUCT_READY is a single active-plan marker — skip stale checks for closeout registry rows."""
+    if not on_main or not missing_marker:
+        return False
+    if chapter_id not in registry:
+        return True
+    return _norm_plan(plan_path) == _active_manifest_plan_path(repo)
+
+
 def _frontier_claims_chapter_complete(repo: Path, chapter_id: str) -> bool:
     path = repo / FRONTIER_REL
     if not path.is_file() or not chapter_id:
@@ -64,20 +90,17 @@ def _frontier_claims_chapter_complete(repo: Path, chapter_id: str) -> bool:
     body = path.read_text(encoding="utf-8", errors="replace")
     title_token = chapter_id.replace("_", " ").lower()
     # Section header like: ### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
-    pattern = re.compile(
-        rf"^###[^\n]*{re.escape(title_token)}[^\n]*\*\*COMPLETE\*\*",
-        re.I | re.M,
+    header_patterns = (
+        re.compile(
+            rf"^###[^\n]*{re.escape(title_token)}[^\n]*\*\*COMPLETE\*\*",
+            re.I | re.M,
+        ),
+        re.compile(
+            rf"^###[^\n]*`{re.escape(chapter_id)}`[^\n]*\*\*COMPLETE\*\*",
+            re.I | re.M,
+        ),
     )
-    if pattern.search(body):
-        return True
-    # Alternate: chapter id in backticks near COMPLETE header within ~400 chars
-    idx = body.lower().find(title_token)
-    if idx < 0:
-        idx = body.lower().find(chapter_id.lower())
-    if idx < 0:
-        return False
-    window = body[max(0, idx - 80) : idx + 400]
-    return bool(re.search(r"\*\*COMPLETE\*\*", window, re.I))
+    return any(p.search(body) for p in header_patterns)
 
 
 def _product_slice_ids(repo: Path, plan_path: str) -> list[str]:
@@ -133,7 +156,14 @@ def audit_chapter(repo: Path, plan_path: str) -> list[Issue]:
             queue_status = str(item.get("status") or "").upper()
             break
 
-    if on_main and missing_marker:
+    if _marker_required_for_chapter(
+        repo,
+        plan_path=norm,
+        chapter_id=chapter_id,
+        registry=registry,
+        on_main=on_main,
+        missing_marker=missing_marker,
+    ):
         issues.append(
             {
                 "code": "PRODUCT_ON_MAIN_NO_MARKER",
@@ -179,7 +209,14 @@ def audit_chapter(repo: Path, plan_path: str) -> list[Issue]:
             }
         )
 
-    if queue_status == "READY" and on_main and missing_marker:
+    if queue_status == "READY" and _marker_required_for_chapter(
+        repo,
+        plan_path=norm,
+        chapter_id=chapter_id,
+        registry=registry,
+        on_main=on_main,
+        missing_marker=missing_marker,
+    ):
         issues.append(
             {
                 "code": "QUEUE_ACTIVE_PRODUCT_DESYNC",
