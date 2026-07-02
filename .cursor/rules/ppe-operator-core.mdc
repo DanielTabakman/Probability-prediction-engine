@@ -5,7 +5,7 @@ alwaysApply: true
 
 # PPE operator core
 
-**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
+**Layout:** [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc) · **Routing:** [`AGENT_ROUTING_V1.md`](docs/SOP/AGENT_ROUTING_V1.md) · **Founder surface:** [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · **Collaboration:** [`FOUNDER_COLLABORATION_CHARTER_V1.md`](docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md) · **Verdict SSOT:** [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · **Roles:** [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc) · **Token:** [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](docs/SOP/PPE_TOKEN_ECONOMY_MONITOR_V1.md)
 
 ## What's next (auto-execute)
 
@@ -41,9 +41,9 @@ Also skip when thread role is charter / explore / neutral (see thread-roles). Sk
 
 ## Operator reply format
 
-After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md).
+After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · Pulses/closings: [`FOUNDER_COLLABORATION_CHARTER_V1.md`](docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md) (L2 completion, L3 alert overrides "nothing required").
 
-**Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions).
+**Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions). On stall with no active program → **Alert:** per charter; run `ppe_founder_pulse.cmd --layer alert --write --notify`.
 
 **Never:** operator checklists, choice questions, commit permission prompts, or manual IDE BUILD thread asks when burst can spawn workers. Default founder line: **"Nothing required from you."**
 

@@ -41,6 +41,15 @@ See [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md)
 
 Open a **founder charter** thread ([`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md)); agents draft, founder decides.
 
+### Founder collaboration review (~15 min of the pass)
+
+| Tag | Task | Artifact |
+|-----|------|----------|
+| `founder` | Did L1/L3/L4 pulses feel honest this month? | [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) § Ongoing integration |
+| `founder` | One charter tweak if agents hid stalls or asked technical forks | Same doc — changelog |
+| `agent` | Write `FOUNDER_PULSE_LAST.json` sample if asked | `ppe_founder_pulse.cmd --layer weekly` |
+
+---
 | Tag | Task | Artifact |
 |-----|------|----------|
 | `founder` | Confirm playbook **Current stage** table is honest | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md) — agent may draft update |

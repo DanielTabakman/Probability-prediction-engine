@@ -44,14 +44,17 @@ Implement → gate → mark_ide_product_ready. No steward narrative.
 
 ## Founder collaboration (permanent — how we work)
 
-Use for collaboration charter, pulse design, stall honesty, and decision defaults. **Not** operator execution.
+Use for collaboration charter, pulse design, stall honesty, and decision defaults. **Not** operator execution. **Close the thread anytime** — relationship continues via ntfy pulses + charter doc.
 
 ```text
 Founder collaboration thread. THREAD_ROLE: founder_charter.
 Load @docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md
 Relay: off — do not read OPERATOR_STATUS or run burst.
+Continue from charter + artifacts/control_plane/FOUNDER_PULSE_LAST.json (not prior chat).
 Update the charter here; park factory execution to operator thread (one-line handoff).
 ```
+
+**Bookkeeping confused?** Ask agent to explain charter § Bookkeeping for founders (four ledgers diagram).
 
 Rule: [`.cursor/rules/founder-collaboration.mdc`](../../.cursor/rules/founder-collaboration.mdc)
 

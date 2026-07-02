@@ -1,5 +1,5 @@
 ---
-description: Founder collaboration charter — layered pulses, alert policy, decision defaults. Load in founder_charter threads and when formatting founder-facing replies.
+description: Founder collaboration charter — layered pulses, alert policy, decision defaults, bookkeeping translation. Load in founder_charter threads; operator threads use closings only.
 alwaysApply: false
 ---
 
@@ -7,29 +7,29 @@ alwaysApply: false
 
 **Canon:** [`docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md`](../../docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md)
 
+## Ongoing (no permanent thread)
+
+Relationship lives in **pulses + charter doc**, not chat history. Founder opens **fresh** `THREAD_ROLE: founder_charter` only for monthly tweak or after a bad day. Daily: L1 ntfy · stalls: L3 ntfy · weekly: L4 digest. Last pulse: `artifacts/control_plane/FOUNDER_PULSE_LAST.json`.
+
 ## Pulses (never collapse layers)
 
 | Layer | When | Shape |
 |-------|------|--------|
-| **L1 Morning** | Daily ~08:00 | Yesterday shipped + now state — `ppe_morning_report.py` / `ppe_founder_pulse.cmd --layer morning` |
+| **L1 Morning** | Daily ~08:00 | Yesterday shipped + now state |
 | **L2 Completion** | After slice/closeout/chapter step | 3–6 lines + "Nothing required from you." |
-| **L3 Alert** | Blocked + no active program | **Alert:** plain language — immediate; never hide behind "nothing required" |
-| **L4 Weekly** | Monday | `weekly_digest_monday.cmd` — digest-only steward titles |
+| **L3 Alert** | Blocked + no active program | **Alert:** plain language — immediate |
+| **L4 Weekly** | Monday | `weekly_digest_monday.cmd` |
 
-Generate: `ppe_founder_pulse.cmd --layer alert --write --notify`
+`ppe_founder_pulse.cmd --layer alert --write --notify`
 
-## Posture
+## Bookkeeping (founder translation)
 
-**Always building** unless founder asleep or missing direction SSOT. Default technical choices — do not ask founder.
+Four ledgers: **queue · marker · evidence · steering** (+ code on main). Deadlock = ledgers disagree, not "we didn't build." Diagram: charter § Bookkeeping for founders.
 
-## Founder-facing closings
+## Posture & closings
 
-One primary closing from charter § Agent reply contract. Layer 3 overrides.
+**Always building** unless asleep or missing direction SSOT. Default technical choices. One primary closing from charter § Agent reply contract — L3 overrides "nothing required."
 
-## Bookkeeping translation
+## Thread type
 
-Prefer "four ledgers disagree" / "desktop–VM sync" over raw verdict jargon. See [`CHAPTER_COORDINATION_V1.md`](../../docs/SOP/CHAPTER_COORDINATION_V1.md).
-
-## This thread type
-
-`THREAD_ROLE: founder_charter` + collaboration charter — relay **off**; update charter; park execution to operator thread.
+`THREAD_ROLE: founder_charter` — relay **off**. Operator threads apply closings without opening charter thread.

@@ -6,7 +6,9 @@
 
 **Related:** [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md) · [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md) · [`DELEGATION_ENVELOPE_V1.md`](DELEGATION_ENVELOPE_V1.md) · [`THREAD_STARTERS_V1.md`](THREAD_STARTERS_V1.md) · [`.cursor/rules/ppe-operator-core.mdc`](../../.cursor/rules/ppe-operator-core.mdc)
 
-**Collaboration SSOT:** Pulse layers, stall policy, and decision defaults live in [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md). This doc defines founder vs agent *surface*; the charter defines *cadence and honesty*.
+**Collaboration SSOT:** Pulse layers, stall policy, and decision defaults live in [`FOUNDER_COLLABORATION_CHARTER_V1.md`](FOUNDER_COLLABORATION_CHARTER_V1.md). This doc defines founder vs agent *surface*; the charter defines *cadence, honesty, and bookkeeping translation*.
+
+**No permanent collaboration thread:** pulses (L1–L4) + charter doc carry the relationship. Open a fresh `founder_charter` thread only for monthly review or charter edits — see charter § Ongoing integration.
 
 ---
 

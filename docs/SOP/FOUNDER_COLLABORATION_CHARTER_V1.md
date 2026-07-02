@@ -128,11 +128,120 @@ Use **one primary closing** from this table. Layer 3 overrides all others.
 - “Nothing required” when Layer 3 conditions are true
 - Pasting `OPERATOR_STATUS` or steward backlog as founder todos
 
-**Bookkeeping translation (when blocked):** prefer “four ledgers disagree” / “desktop–VM sync lag” over raw verdict names.
+**Bookkeeping translation (when blocked):** prefer “four ledgers disagree” / “desktop–VM sync lag” over raw verdict names. See § Bookkeeping for founders.
 
 ---
 
-## Decision defaults
+## Bookkeeping for founders (one page)
+
+The factory tracks **code** and **records**. Code on `main` is not the same as “chapter done.” When you feel ghosts or contradiction, it is usually **records out of sync** — not missing product work.
+
+### Four ledgers (must agree)
+
+| Ledger | Plain name | What it says |
+|--------|------------|--------------|
+| **Queue** | What’s next in the factory | Active chapter + slice order (`PHASE_QUEUE`, manifest) |
+| **Marker** | Product cleared for relay | “Do not rebuild — advance deterministically” (`IDE_PRODUCT_READY`) |
+| **Evidence** | Honest witness truth | Closeout/witness rows in `*_EVIDENCE_STATUS.md` |
+| **Steering** | Human-facing status | What we tell ourselves is COMPLETE (`MSOS_FRONTIER`, steering JSON) |
+
+**Fifth thing:** product **code on `main`** — can land before the four ledgers catch up.
+
+### Flow (healthy chapter)
+
+```mermaid
+flowchart LR
+  subgraph build [Build]
+    A[IDE BUILD slice] --> B[Merge to main]
+  end
+  subgraph books [Bookkeeping]
+    B --> C[Write marker]
+    C --> D[Relay witness / closeout]
+    D --> E[Evidence COMPLETE]
+    E --> F[Steering COMPLETE]
+  end
+  F --> G[Next chapter BUILD]
+```
+
+### Deadlock (what it felt like this week)
+
+```mermaid
+flowchart TD
+  M[Code already on main] --> Q{Queue says BUILD?}
+  Q -->|yes| V[Verdict: IDE_BUILD]
+  M --> N{Marker missing?}
+  N -->|yes| V
+  M --> O{Mode: CLOSEOUT_ONLY?}
+  O -->|yes| X[Do not rebuild]
+  V --> X
+  X --> S[STUCK — feels like ghosts]
+```
+
+**Translation for you:** “Product is built; paperwork and relay finish are behind.” Agents repair markers and run closeout — **not** a founder git decision.
+
+### Sync (desktop + VM + GitHub)
+
+Relay runs **one slice at a time** on the VM. Sync breaks when **two writers** touch queue/manifest/steering or desktop does not hand off after merge.
+
+| Step | Who | Plain meaning |
+|------|-----|----------------|
+| BUILD | Desktop | Product slice implemented |
+| Merge | GitHub | Code on `main` |
+| Continue | Desktop → VM SSH | “VM, pull and finish” (`DESKTOP_CONTINUE`) |
+| Relay | VM | Witness/closeout slices |
+| Mirror | VM → GitHub | Phase/status back to repo (can lag) |
+
+**Your overlap rule:** while a chapter is mid-closeout, avoid editing `main` + queue/manifest + that chapter’s `apps/msos-web` paths unless charter thread says otherwise.
+
+**Agent canon:** [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md)
+
+---
+
+## Ongoing integration (no permanent thread)
+
+The collaboration **lives in the repo and pulses**, not in one long Cursor chat. Close this thread anytime.
+
+### What carries the relationship day-to-day
+
+| Channel | Layer | You do |
+|---------|-------|--------|
+| **ntfy morning** | L1 | Read ~30s — yesterday + now |
+| **ntfy alert** | L3 | Read when fired — only stalls / founder gaps |
+| **Monday digest** | L4 | Optional ~30 min systems skim |
+| **Agent replies** | L2/L3 | Completion or Alert closing — no checklist |
+| **Last pulse file** | any | `artifacts/control_plane/FOUNDER_PULSE_LAST.json` |
+
+### When to open a **new** founder charter thread
+
+Not daily. Open fresh when:
+
+- Monthly charter tweak (15–30 min)
+- After a frustrating day (“pulses lied” / “wrong decision asked”)
+- Changing pulse rules, alert thresholds, or decision defaults
+
+**Opener (copy-paste):**
+
+```text
+Founder collaboration thread. THREAD_ROLE: founder_charter.
+Load @docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md
+Relay: off. Continue from charter + FOUNDER_PULSE_LAST.json — not prior chat history.
+```
+
+### What agents do without you in a charter thread
+
+| Thread | Behavior |
+|--------|----------|
+| **Operator** | Execute factory; end with charter closings (L2/L3); run `ppe_founder_pulse.cmd --layer alert` when stall |
+| **Charter / topic** | Your product/systems design; relay off |
+| **IDE BUILD** | Ship slice; L2 completion when done |
+
+**Posture:** always building unless asleep or missing direction SSOT — agents default technical choices ([§ Decision defaults](#decision-defaults)).
+
+### Monthly ritual (calendar)
+
+See [`OPERATING_CALENDAR_V1.md`](OPERATING_CALENDAR_V1.md) § Founder collaboration review — one short pass: did L1/L3/L4 feel honest? Edit charter if not.
+
+---
 
 Agents **default and execute** unless a row says **Ask founder**.
 
@@ -155,12 +264,12 @@ Agents **default and execute** unless a row says **Ask founder**.
 
 | Thread | Opener | Relay | This charter |
 |--------|--------|-------|--------------|
-| **Founder collaboration** | `THREAD_ROLE: founder_charter` + this doc | **Off** | **Home** — update charter, review pulses, systems design |
-| **Operator** | `what's next?` | **On** | Read pulse rules; emit L2/L3 closings |
+| **Founder collaboration** | `THREAD_ROLE: founder_charter` + this doc | **Off** | **Home** — update charter; **open fresh anytime** |
+| **Operator** | `what's next?` | **On** | Closings + alert policy; no charter thread required |
 | **Charter / topic** | `THREAD_ROLE: charter` | **Off** | One-line relay impact label |
 | **IDE BUILD** | starter only | Slice only | Completion pulse when slice ships |
 
-**This thread stays special:** design how we work. Other threads execute. Handoff = one line, not a play-by-play.
+**You do not keep a collaboration thread open.** Pulses + this doc are the SSOT; new thread = same relationship.
 
 ---
 
@@ -192,3 +301,4 @@ Charter changes ship like any control-plane doc: gate → commit → PR. Version
 | Date | Change |
 |------|--------|
 | 2026-07-02 | v1 — layered pulses, alert-immediate stall policy, decision defaults, permanent charter thread |
+| 2026-07-02 | Bookkeeping one-pager + ongoing integration (no permanent thread) |
