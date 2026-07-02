@@ -3,7 +3,19 @@
 **Plane:** CONTROL-PLANE · **Audience:** founder, operator agents  
 **Purpose:** One glance at **root cause**, **fix class**, and **milestone slip** — avoid a day of runaround.
 
-**Related:** [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+**Related:** [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) · [`FACTORY_THROUGHPUT_V1.md`](FACTORY_THROUGHPUT_V1.md) · [`FOUNDER_OPERATOR_SURFACE_V1.md`](FOUNDER_OPERATOR_SURFACE_V1.md) · [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+
+---
+
+## Unified report (pipeline + factory)
+
+`ppe_pipeline_health.cmd` now includes:
+
+- **ROOT CAUSE** — bookkeeping deadlocks (coordination)
+- **FACTORY** — throughput verdict (`moving` / `stuck` / `stack_down`)
+- **SUPPLY** — queue READY / blocked / queued
+
+One JSON: `PIPELINE_HEALTH.json` (factory section embedded). Detail throughput: `FACTORY_THROUGHPUT.json`.
 
 ---
 

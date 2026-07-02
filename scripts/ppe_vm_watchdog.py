@@ -142,6 +142,19 @@ def check_and_recover(
         state["last_restart_at"] = _utc_now()
         state["consecutive_down"] = 0
         result["restarted"] = True
+        try:
+            from scripts.ppe_notify_push import ntfy_configured, notify_enabled, send_ntfy
+
+            if notify_enabled() and ntfy_configured():
+                phase = str(snapshot.get("phase") or "STACK_DOWN")
+                send_ntfy(
+                    "PPE VM watchdog: stack restarted",
+                    f"Loop host was down — ran ensure_stack. Phase was {phase}.",
+                    tags=["ppe", "watchdog", "stack"],
+                    priority="high",
+                )
+        except Exception:
+            pass
     save_state(repo, state)
     return result
 

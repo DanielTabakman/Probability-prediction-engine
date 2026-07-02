@@ -87,7 +87,17 @@ class TestPipelineHealth(unittest.TestCase):
                         "scripts.ppe_chapter_coordination.audit_repo",
                         return_value=[],
                     ):
-                        health = assess_pipeline_health(self.repo, status)
+                        with patch(
+                            "scripts.ppe_factory_throughput.assess_factory_throughput",
+                            return_value={
+                                "ok": True,
+                                "verdict": "moving",
+                                "issues": [],
+                                "commands": [],
+                            },
+                        ):
+                            with patch("scripts.ppe_factory_throughput.write_factory_throughput"):
+                                health = assess_pipeline_health(self.repo, status)
         self.assertFalse(health["ok"])
         self.assertEqual(health["root_cause_code"], DEADLOCK_IDE_BUILD_CLOSEOUT)
         self.assertEqual(health["fix_class"], FIX_REPAIR)
@@ -95,7 +105,7 @@ class TestPipelineHealth(unittest.TestCase):
 
     def test_format_root_cause_block_ok(self) -> None:
         block = format_root_cause_block({"ok": True, "milestone": {"next_build_candidate": "horizon_nav"}})
-        self.assertIn("pipeline OK", block)
+        self.assertIn("factory OK", block)
         self.assertIn("horizon_nav", block)
 
     def test_format_root_cause_block_unhealthy(self) -> None:

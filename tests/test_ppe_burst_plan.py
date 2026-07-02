@@ -35,6 +35,10 @@ def _write_plan(repo, rel: str, slices: list[dict]) -> None:
     spec = repo / "docs/SOP/SPRINT_TEST.md"
     spec.parent.mkdir(parents=True, exist_ok=True)
     spec.write_text("\n".join(["# Test"] + ["line"] * 50) + "\n", encoding="utf-8")
+    sop = repo / "docs/SOP"
+    sop.mkdir(parents=True, exist_ok=True)
+    (sop / "PHASE_QUEUE.json").write_text(json.dumps({"version": 1, "items": []}), encoding="utf-8")
+    (sop / "AGENT_STEERING_V1.json").write_text(json.dumps({"version": 1}), encoding="utf-8")
 
 
 def test_compute_burst_plan_normal_caps_by_remaining(tmp_path) -> None:
@@ -54,9 +58,13 @@ def test_compute_burst_plan_normal_caps_by_remaining(tmp_path) -> None:
         "guard": {"reason": "PRODUCT_BLOCKED", "detail": "blocked [Slice-A]"},
         "blocker": "PRODUCT_BLOCKED",
     }
-    with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
-        mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 3}
-        plan = compute_burst_plan(tmp_path, status)
+    with patch(
+        "scripts.ppe_loop_host_guard.loop_host_start_allowed",
+        return_value=(False, "not_loop_host", ""),
+    ):
+        with patch("scripts.ppe_burst_plan.run_preflight") as mock_pf:
+            mock_pf.return_value = {"overall_band": "NORMAL", "slice_count": 3}
+            plan = compute_burst_plan(tmp_path, status)
     assert plan["remaining_count"] == 2
     assert plan["max_cycles"] == 2
     assert plan["use_director"] is True

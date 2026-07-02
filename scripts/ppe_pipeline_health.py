@@ -282,12 +282,28 @@ def detect_contradictions(
 def _pick_root_cause(
     contradictions: list[Issue],
     coordination: dict[str, Any],
+    factory: dict[str, Any] | None = None,
 ) -> Issue | None:
+    factory_issues = (factory or {}).get("issues") or []
+    for issue in factory_issues:
+        code = str(issue.get("code") or "")
+        if code in ("STACK_DOWN", "ZERO_THROUGHPUT_24H", "PHASE_STUCK"):
+            fix_class = FIX_RECOVERY if code == "STACK_DOWN" else FIX_REPAIR
+            return {
+                "code": code,
+                "severity": issue.get("severity") or "high",
+                "message": str(issue.get("message") or ""),
+                "fix_class": fix_class,
+                "fix": str(issue.get("fix") or ""),
+                "commands": [str(issue.get("fix") or "")] if issue.get("fix") else [],
+            }
+
     priority = [
         DEADLOCK_IDE_BUILD_CLOSEOUT,
         BRANCH_BLOCKS_RELAY,
         "FRONTIER_AHEAD_OF_EVIDENCE",
         VM_VERDICT_MISMATCH,
+        "ZERO_THROUGHPUT_12H",
         MILESTONE_BLOCKED,
     ]
     by_code = {str(i.get("code") or ""): i for i in contradictions}
@@ -355,17 +371,37 @@ def assess_pipeline_health(
 
     contradictions = detect_contradictions(repo, status, coordination)
     milestone = compute_milestone_clock(repo)
-    root = _pick_root_cause(contradictions, coordination)
+
+    factory: dict[str, Any] = {}
+    try:
+        from scripts.ppe_factory_throughput import (
+            assess_factory_throughput,
+            write_factory_throughput,
+        )
+
+        factory = assess_factory_throughput(repo, status)
+        write_factory_throughput(repo, factory)
+    except Exception as exc:
+        factory = {"ok": False, "verdict": "unknown", "error": str(exc), "issues": []}
+
+    root = _pick_root_cause(contradictions, coordination, factory)
 
     fix_class = str(root.get("fix_class") if root else coordination.get("verdict") or FIX_PROCEED)
     if fix_class not in (FIX_PROCEED, FIX_REPAIR, FIX_RECOVERY, FIX_PARK):
         fix_class = FIX_PARK
 
-    blocks_burst = bool(coordination.get("blocks_burst")) or fix_class in (FIX_RECOVERY, FIX_PARK)
+    factory_ok = bool(factory.get("ok", True))
+    factory_verdict = str(factory.get("verdict") or "")
+    blocks_burst = (
+        bool(coordination.get("blocks_burst"))
+        or fix_class in (FIX_RECOVERY, FIX_PARK)
+        or factory_verdict in ("stuck", "stack_down")
+    )
     blocks_build = bool(coordination.get("blocks_build")) or fix_class in (FIX_RECOVERY, FIX_PARK)
     blocks_gate = fix_class in (FIX_RECOVERY, FIX_PARK)
 
-    ok = fix_class == FIX_PROCEED and not contradictions
+    pipeline_ok = fix_class == FIX_PROCEED and not contradictions
+    ok = pipeline_ok and factory_ok
 
     commands: list[str] = []
     if root:
@@ -375,10 +411,14 @@ def assess_pipeline_health(
             commands.insert(0, fix_one)
     if not commands:
         commands = [str(c) for c in coordination.get("commands") or [] if str(c).strip()]
+    if not commands and factory.get("commands"):
+        commands = list(factory.get("commands") or [])
 
     return {
         "as_of": _utc_now(),
         "ok": ok,
+        "pipeline_ok": pipeline_ok,
+        "factory_ok": factory_ok,
         "fix_class": fix_class,
         "root_cause": root,
         "root_cause_code": str(root.get("code") or "") if root else None,
@@ -392,6 +432,21 @@ def assess_pipeline_health(
             "blocks_build": coordination.get("blocks_build"),
         },
         "milestone": milestone,
+        "factory": {
+            "verdict": factory.get("verdict"),
+            "ok": factory.get("ok"),
+            "phase": factory.get("phase"),
+            "phase_minutes": factory.get("phase_minutes"),
+            "throughput_24h": factory.get("throughput_24h"),
+            "throughput_7d": factory.get("throughput_7d"),
+            "supply": factory.get("supply"),
+            "stack": factory.get("stack"),
+            "last_slice": factory.get("last_slice"),
+            "top_issue_code": factory.get("top_issue_code"),
+            "top_issue_message": factory.get("top_issue_message"),
+            "issues": factory.get("issues"),
+            "commands": factory.get("commands"),
+        },
         "operator_verdict": str(status.get("verdict") or ""),
         "chapter_mode": (status.get("chapter_mode") or {}).get("mode")
         if isinstance(status.get("chapter_mode"), dict)
@@ -399,7 +454,7 @@ def assess_pipeline_health(
         "blocks_burst": blocks_burst,
         "blocks_build": blocks_build,
         "blocks_gate": blocks_gate,
-        "docs": [PIPELINE_HEALTH_DOC, "docs/SOP/CHAPTER_COORDINATION_V1.md"],
+        "docs": [PIPELINE_HEALTH_DOC, "docs/SOP/CHAPTER_COORDINATION_V1.md", "docs/SOP/FACTORY_THROUGHPUT_V1.md"],
     }
 
 
@@ -412,15 +467,35 @@ def write_pipeline_health(repo: Path, payload: dict[str, Any]) -> Path:
 
 def format_root_cause_block(health: dict[str, Any]) -> str:
     """Markdown block for top of OPERATOR_STATUS.md."""
+    factory = health.get("factory") if isinstance(health.get("factory"), dict) else {}
+    factory_lines: list[str] = []
+    try:
+        from scripts.ppe_factory_throughput import format_throughput_lines
+
+        if factory.get("verdict"):
+            ft_payload = {
+                "verdict": factory.get("verdict"),
+                "phase": factory.get("phase"),
+                "phase_minutes": factory.get("phase_minutes"),
+                "throughput_24h": factory.get("throughput_24h") or {},
+                "top_issue_message": factory.get("top_issue_message"),
+                "supply": factory.get("supply") or {},
+            }
+            factory_lines = format_throughput_lines(ft_payload)
+    except ImportError:
+        pass
+
     if health.get("ok"):
         milestone = health.get("milestone") if isinstance(health.get("milestone"), dict) else {}
         next_build = milestone.get("next_build_candidate") or "—"
-        return (
-            "## Pipeline health\n\n"
-            f"**ROOT CAUSE:** none — pipeline OK\n"
-            f"**FIX CLASS:** `{FIX_PROCEED}`\n"
-            f"**NEXT BUILD:** `{next_build}` (not blocked)\n"
-        )
+        lines = [
+            "## Pipeline health\n",
+            "**ROOT CAUSE:** none — pipeline + factory OK",
+            f"**FIX CLASS:** `{FIX_PROCEED}`",
+            f"**NEXT BUILD:** `{next_build}` (not blocked)",
+        ]
+        lines.extend(factory_lines)
+        return "\n".join(lines) + "\n"
 
     code = health.get("root_cause_code") or "UNKNOWN"
     msg = health.get("root_cause_message") or "Pipeline unhealthy"
@@ -429,20 +504,26 @@ def format_root_cause_block(health: dict[str, Any]) -> str:
     blocked = milestone.get("milestone_blocked_days")
     next_build = milestone.get("next_build_candidate") or "—"
     blocked_line = (
-        f"**MILESTONE BLOCKED:** `{next_build}` — ~{blocked} day(s)\n"
+        f"**MILESTONE BLOCKED:** `{next_build}` — ~{blocked} day(s)"
         if blocked is not None
-        else f"**NEXT BUILD:** `{next_build}`\n"
+        else f"**NEXT BUILD:** `{next_build}`"
     )
     cmds = health.get("commands") or []
-    cmd_line = f"**FIX:** `{cmds[0]}`\n" if cmds else ""
-    return (
-        "## Pipeline health\n\n"
-        f"**ROOT CAUSE:** `{code}` — {msg}\n"
-        f"**FIX CLASS:** `{fix_class}`\n"
-        f"{blocked_line}"
-        f"{cmd_line}"
-        f"Detail: `{PIPELINE_HEALTH_REL}`\n"
+    cmd_line = f"**FIX:** `{cmds[0]}`" if cmds else ""
+    parts = [
+        "## Pipeline health\n",
+        f"**ROOT CAUSE:** `{code}` — {msg}",
+        f"**FIX CLASS:** `{fix_class}`",
+        blocked_line,
+    ]
+    if cmd_line:
+        parts.append(cmd_line)
+    parts.extend(factory_lines)
+    parts.append(
+        "Detail: `artifacts/control_plane/PIPELINE_HEALTH.json` + "
+        "`artifacts/control_plane/FACTORY_THROUGHPUT.json`"
     )
+    return "\n".join(parts) + "\n"
 
 
 def format_founder_report(health: dict[str, Any]) -> str:
@@ -470,6 +551,15 @@ def format_founder_report(health: dict[str, Any]) -> str:
         lines.append("Burst: BLOCKED")
     if health.get("blocks_gate"):
         lines.append("Gate: BLOCKED on recovery/park paths")
+    factory = health.get("factory") if isinstance(health.get("factory"), dict) else {}
+    if factory.get("verdict"):
+        t24 = factory.get("throughput_24h") or {}
+        lines.append(
+            f"Factory: {factory.get('verdict')} phase={factory.get('phase')} "
+            f"24h slices={t24.get('slices', 0)} closeouts={t24.get('closeouts', 0)}"
+        )
+        if factory.get("top_issue_message"):
+            lines.append(f"  {factory['top_issue_message']}")
     cmds = health.get("commands") or []
     if cmds:
         lines.append("")
@@ -559,8 +649,26 @@ def maybe_notify_pipeline_regression(repo: Path, health: dict[str, Any]) -> bool
 
     _write_health_state(repo, state)
 
+    throughput_sent = False
+    factory_blob = health.get("factory") if isinstance(health.get("factory"), dict) else {}
+    if factory_blob.get("verdict"):
+        try:
+            from scripts.ppe_factory_throughput import maybe_notify_throughput_regression
+
+            ft_payload = {
+                "ok": factory_blob.get("ok", True),
+                "verdict": factory_blob.get("verdict"),
+                "top_issue_code": factory_blob.get("top_issue_code"),
+                "top_issue_message": factory_blob.get("top_issue_message"),
+                "commands": factory_blob.get("commands") or [],
+                "issues": factory_blob.get("issues") or [],
+            }
+            throughput_sent = maybe_notify_throughput_regression(repo, ft_payload)
+        except Exception:
+            pass
+
     if not should_notify:
-        return False
+        return throughput_sent
 
     cmds = health.get("commands") or []
     if cmds:

@@ -137,7 +137,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         pass
 
     coordination_check: dict[str, Any] | None = None
-    pipeline_health: dict[str, Any] | None = None
+    factory_throughput: dict[str, Any] | None = None
     try:
         from scripts.ppe_coordination_check import assess_coordination_check, write_coordination_check
 
@@ -145,24 +145,37 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         write_coordination_check(repo, coordination_check)
         if coordination_check.get("blocks_burst"):
             burst_allowed = False
-            use_director = True
-            if direct_action not in ("wait_for_vm", "resolve_lease"):
-                direct_action = "coordination_check"
+            if direct_action not in ("wait_for_vm", "DESKTOP_CONTINUE.cmd --no-pause", "resolve_lease"):
+                use_director = True
+                if direct_action not in ("wait_for_vm", "resolve_lease"):
+                    direct_action = "coordination_check"
+    except Exception:
+        pass
+
+    factory_throughput: dict[str, Any] | None = None
+    on_loop_host = False
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        on_loop_host = bool(loop_host_start_allowed()[0])
     except Exception:
         pass
 
     try:
-        from scripts.ppe_pipeline_health import assess_pipeline_health, write_pipeline_health
+        from scripts.ppe_factory_throughput import assess_factory_throughput, write_factory_throughput
 
-        pipeline_health = assess_pipeline_health(repo, status)
-        write_pipeline_health(repo, pipeline_health)
-        if pipeline_health.get("blocks_burst"):
+        factory_throughput = assess_factory_throughput(repo, status)
+        write_factory_throughput(repo, factory_throughput)
+        if (
+            on_loop_host
+            and not factory_throughput.get("ok")
+            and str(factory_throughput.get("verdict") or "") in ("stuck", "stack_down")
+            and direct_action not in ("wait_for_vm", "DESKTOP_CONTINUE.cmd --no-pause")
+        ):
             burst_allowed = False
             use_director = True
             if direct_action not in ("wait_for_vm", "resolve_lease", "coordination_check"):
-                direct_action = "pipeline_health"
-            elif direct_action == "coordination_check":
-                direct_action = "pipeline_health"
+                direct_action = "factory_throughput"
     except Exception:
         pass
 
@@ -184,7 +197,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "worker_verdicts_only": True,
         "worker_lease": worker_lease,
         "coordination_check": coordination_check,
-        "pipeline_health": pipeline_health,
+        "factory_throughput": factory_throughput,
         "suggested_lane": (worker_lease or {}).get("suggested_lane"),
         "prompt": format_burst_director_prompt(
             max_cycles=max_cycles,
@@ -194,7 +207,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             burst_allowed=burst_allowed,
             direct_action=direct_action,
             coordination_check=coordination_check,
-            pipeline_health=pipeline_health,
+            factory_throughput=factory_throughput,
         ),
     }
 
@@ -208,18 +221,22 @@ def format_burst_director_prompt(
     burst_allowed: bool,
     direct_action: str | None = None,
     coordination_check: dict[str, Any] | None = None,
-    pipeline_health: dict[str, Any] | None = None,
+    factory_throughput: dict[str, Any] | None = None,
 ) -> str:
     from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 
-    if direct_action == "pipeline_health":
-        code = str((pipeline_health or {}).get("root_cause_code") or "PIPELINE_UNHEALTHY")
-        summary = str((pipeline_health or {}).get("root_cause_message") or "pipeline blocked")
-        fix_class = str((pipeline_health or {}).get("fix_class") or "recovery")
+    if direct_action == "factory_throughput":
+        ft = factory_throughput or {}
+        code = str(ft.get("top_issue_code") or ft.get("verdict") or "FACTORY_STUCK")
+        summary = str(ft.get("top_issue_message") or "factory throughput blocked")
         body = (
-            f"Pipeline health blocked burst ({code}, fix_class={fix_class}). "
-            f"{summary}. Read artifacts/control_plane/PIPELINE_HEALTH.json. "
-            "Run repair/recovery commands before @ppe-director or BUILD workers."
+            f"Factory throughput blocked burst ({code}). {summary}. "
+            "Read artifacts/control_plane/FACTORY_THROUGHPUT.json. "
+            "Run ppe_autobuilder.cmd diagnose/advance before @ppe-director."
+        )
+    elif direct_action == "pipeline_health":
+        body = (
+            "Pipeline health blocked burst — read PIPELINE_HEALTH.json and fix ROOT CAUSE first."
         )
     elif direct_action == "coordination_check":
         coord_verdict = str((coordination_check or {}).get("verdict") or "recovery")

@@ -577,10 +577,12 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
         lines.append("Burst path: worker lease conflict — ppe_worker_lease.py --assess")
     elif burst_plan.get("direct_action") == "coordination_check":
         lines.append("Burst path: coordination blocked — read COORDINATION_CHECK.json; repair/recovery first")
+    elif burst_plan.get("direct_action") == "factory_throughput":
+        ft = burst_plan.get("factory_throughput") if isinstance(burst_plan.get("factory_throughput"), dict) else {}
+        code = ft.get("top_issue_code") or ft.get("verdict") or "FACTORY_STUCK"
+        lines.append(f"Burst path: factory throughput blocked ({code}) — read FACTORY_THROUGHPUT.json")
     elif burst_plan.get("direct_action") == "pipeline_health":
-        ph = burst_plan.get("pipeline_health") if isinstance(burst_plan.get("pipeline_health"), dict) else {}
-        code = ph.get("root_cause_code") or "PIPELINE_UNHEALTHY"
-        lines.append(f"Burst path: pipeline health blocked ({code}) — read PIPELINE_HEALTH.json")
+        lines.append("Burst path: pipeline health blocked — read PIPELINE_HEALTH.json")
     elif burst_plan.get("suggested_lane"):
         lines.append(f"Worker lane: `{burst_plan.get('suggested_lane')}`")
     elif not allowed:
