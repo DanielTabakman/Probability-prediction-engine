@@ -2,6 +2,11 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-02
+
+- `db8a2854` — ops: vm phase mirror RUN LOCAL PENDING (#1176) (`docs/SOP/`)
+- `a3f74a98` — Control-plane: dev changelog
+
 ## 2026-07-01
 
 - `1030e804` — Merge pull request #1157 from DanielTabakman/fix/coordination-audit-linux-path
