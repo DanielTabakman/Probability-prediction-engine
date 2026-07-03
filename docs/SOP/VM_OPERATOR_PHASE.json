@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-03T03:35:12Z",
+  "as_of": "2026-07-03T03:38:57Z",
   "phase": "RUN_LOCAL_PENDING",
   "verdict": "RUN_LOCAL",
   "chapter_name": "ppe_tradeable_universe_v1 (registry v2 + catalog API + MSOS picker)",
