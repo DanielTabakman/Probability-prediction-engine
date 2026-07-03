@@ -251,3 +251,35 @@ jobs:
         run: python scripts/run_implied_lab_ui_smoke.py
         env:
           PYTHONUNBUFFERED: "1"
+
+  ci_success:
+    name: ci_success
+    runs-on: ubuntu-latest
+    needs: [changes, mirror_publish_check, pytest, msos_web_build, docker_entrypoint]
+    if: always()
+    steps:
+      - name: Aggregate CI (mirror-only vs full)
+        env:
+          MIRROR_ONLY: ${{ needs.changes.outputs.mirror_only }}
+          MIRROR_RC: ${{ needs.mirror_publish_check.result }}
+          PYTEST_RC: ${{ needs.pytest.result }}
+          MSOS_RC: ${{ needs.msos_web_build.result }}
+          DOCKER_RC: ${{ needs.docker_entrypoint.result }}
+        run: |
+          set -euo pipefail
+          if [ "$MIRROR_ONLY" = "true" ]; then
+            if [ "$MIRROR_RC" != "success" ]; then
+              echo "Mirror-only CI failed (mirror_publish_check=$MIRROR_RC)"
+              exit 1
+            fi
+            echo "Mirror-only CI OK"
+            exit 0
+          fi
+          for name in PYTEST MSOS DOCKER; do
+            eval "rc=\$${name}_RC"
+            if [ "$rc" != "success" ]; then
+              echo "Full CI failed (${name}=$rc)"
+              exit 1
+            fi
+          done
+          echo "Full CI OK"

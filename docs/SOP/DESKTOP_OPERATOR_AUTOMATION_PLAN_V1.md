@@ -86,6 +86,8 @@ Signals are scattered:
 
 **Setup:** `setup_desktop_zero_click_build.cmd` + `PPE_AUTO_DISPATCH=1` (set by `zero_click` start).
 
+**VM mirror sync (optional):** `install_ppe_desktop_mirror_sync_task.cmd` — Task Scheduler every 5m merges `ops/vm-mirror-*` PRs, pulls `main`, refreshes `docs/SOP/VM_OPERATOR_PHASE.json`. Complements `DESKTOP_CONTINUE` step 1 mirror sync.
+
 ---
 
 ### Step 4 — Branch recovery gate (shipped)

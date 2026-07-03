@@ -12,6 +12,27 @@ from scripts.ppe_operator_git_sync import VM_MIRROR_PUBLISH_PREFIX, _gh_availabl
 
 BLIND_SPOTS_REL = "artifacts/control_plane/OPERATOR_BLIND_SPOTS.json"
 HEALTH_REL = "artifacts/control_plane/OPERATOR_HEALTH.json"
+MIRROR_PR_ESCALATE_SECONDS = 900
+MIRROR_PR_NOTIFY_STATE_REL = "artifacts/control_plane/VM_MIRROR_PR_STALE_NOTIFY.json"
+
+
+def _parse_utc(value: str) -> datetime | None:
+    raw = (value or "").strip()
+    if not raw:
+        return None
+    try:
+        if raw.endswith("Z"):
+            raw = raw[:-1] + "+00:00"
+        return datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+
+
+def _pr_age_seconds(pr: dict[str, Any]) -> float | None:
+    created = _parse_utc(str(pr.get("createdAt") or ""))
+    if created is None:
+        return None
+    return max(0.0, (datetime.now(timezone.utc) - created).total_seconds())
 
 
 def _utc_now() -> str:
@@ -60,7 +81,7 @@ def _open_vm_mirror_prs(repo: Path) -> list[dict[str, Any]]:
             "--state",
             "open",
             "--json",
-            "number,headRefName,url,title",
+            "number,headRefName,url,title,createdAt",
             "--limit",
             "20",
         ],
@@ -75,6 +96,46 @@ def _open_vm_mirror_prs(repo: Path) -> list[dict[str, Any]]:
         if head.startswith(VM_MIRROR_PUBLISH_PREFIX):
             out.append(pr)
     return out
+
+
+def _maybe_notify_stale_mirror_prs(repo: Path, stale_prs: list[dict[str, Any]]) -> bool:
+    if not stale_prs:
+        return False
+    nums = sorted(int(p["number"]) for p in stale_prs if p.get("number") is not None)
+    if not nums:
+        return False
+    fp = ",".join(str(n) for n in nums)
+    state_path = repo / MIRROR_PR_NOTIFY_STATE_REL
+    prior: dict[str, Any] = {}
+    if state_path.is_file():
+        try:
+            prior = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            prior = {}
+    if fp == str(prior.get("fingerprint") or ""):
+        return False
+    urls = [str(p.get("url") or "") for p in stale_prs[:3] if p.get("url")]
+    title = f"PPE VM mirror PR stuck ({len(stale_prs)} open >15m)"
+    body = "Merge or automerge mirror PRs so desktop git pull sees fresh phase.\n" + "\n".join(urls)
+    try:
+        from scripts.ppe_notify_push import ntfy_topic_stuck, send_ntfy_to_topic
+
+        sent = send_ntfy_to_topic(
+            ntfy_topic_stuck(),
+            title=title,
+            body=body,
+            priority="high",
+            tags=["mirror", "pr", "warning"],
+        )
+    except Exception:
+        return False
+    if sent:
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(
+            json.dumps({"fingerprint": fp, "notified_at": _utc_now(), "pr_numbers": nums}, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    return sent
 
 
 def assess_operator_blind_spots(
@@ -148,6 +209,40 @@ def assess_operator_blind_spots(
                             fix="Run scripts/setup_ppe_vm_cursor_ssh.ps1; set PPE_VM_SSH_HOST=ppe-vm.",
                         )
                     )
+                else:
+                    try:
+                        from scripts.ppe_ntfy_commands import commands_enabled
+
+                        if commands_enabled():
+                            from scripts.ppe_operator_vm_ssh import VM_REPO, ssh_vm
+
+                            heal = ssh_vm(
+                                f"cd /d {VM_REPO} && call call_ppe_operator_local.cmd && "
+                                f"set PYTHONPATH=%CD% && "
+                                f"python scripts/ppe_headless_stack_supervisor.py --repo-root . --ensure",
+                                timeout=90,
+                            )
+                            stdout = str(heal.get("stdout") or "")
+                            start = stdout.find("{")
+                            vm_ntfy = None
+                            if start >= 0:
+                                try:
+                                    blob = json.loads(stdout[start:])
+                                    vm_ntfy = bool(blob.get("ntfy_listen_running"))
+                                    health["vm_ntfy_listen"] = vm_ntfy
+                                except json.JSONDecodeError:
+                                    pass
+                            if vm_ntfy is False:
+                                issues.append(
+                                    _issue(
+                                        "vm_ntfy_listener_down",
+                                        severity="high",
+                                        message="VM phone-command listener (ppe_ntfy_listen) is not running — status/build from phone will not reply.",
+                                        fix="On VM: run_ppe_headless_stack.cmd --ensure or ppe_ntfy_phone_diag.cmd --heal-vm from desktop.",
+                                    )
+                                )
+                    except Exception:
+                        pass
             except Exception as exc:
                 health["ssh_ok"] = False
                 issues.append(
@@ -180,13 +275,26 @@ def assess_operator_blind_spots(
     if mirror_health:
         health["mirror_populated"] = mirror_health.get("populated")
         health["mirror_stale"] = mirror_health.get("stale")
-        if mirror_health.get("alert"):
+        health["mirror_untrusted"] = mirror_health.get("untrusted")
+        health["mirror_heartbeat_overdue"] = mirror_health.get("heartbeat_overdue")
+        if mirror_health.get("alert") and (
+            mirror_health.get("untrusted") or mirror_health.get("stale")
+        ):
             issues.append(
                 _issue(
                     "vm_mirror_stale",
                     severity="high",
                     message=str(mirror_health.get("agent_note") or "VM phase mirror stale or empty."),
                     fix="git pull origin main; wait for loop host mirror PR merge.",
+                )
+            )
+        elif mirror_health.get("heartbeat_overdue") and mirror_health.get("alert"):
+            issues.append(
+                _issue(
+                    "vm_mirror_heartbeat_overdue",
+                    severity="medium",
+                    message=str(mirror_health.get("agent_note") or "VM in-flight mirror heartbeat overdue."),
+                    fix="git pull origin main; VM loop republishes every ~10m during in-flight.",
                 )
             )
 
@@ -222,16 +330,28 @@ def assess_operator_blind_spots(
 
     mirror_prs = _open_vm_mirror_prs(repo) if gh_ok else []
     health["open_mirror_prs"] = len(mirror_prs)
+    stale_mirror_prs = [
+        p
+        for p in mirror_prs
+        if (_pr_age_seconds(p) or 0.0) > float(MIRROR_PR_ESCALATE_SECONDS)
+    ]
     if mirror_prs:
         nums = ", ".join(f"#{p.get('number')}" for p in mirror_prs[:3])
+        severity = "high" if stale_mirror_prs else "medium"
+        age_note = ""
+        if stale_mirror_prs:
+            oldest_m = int(max(_pr_age_seconds(p) or 0 for p in stale_mirror_prs) // 60)
+            age_note = f" (oldest {oldest_m}m)"
         issues.append(
             _issue(
                 "mirror_pr_pending",
-                severity="medium",
-                message=f"Open VM mirror PR(s) not merged: {nums}",
+                severity=severity,
+                message=f"Open VM mirror PR(s) not merged: {nums}{age_note}",
                 fix="Merge or wait for automerge; then git pull origin main on desktop.",
             )
         )
+        if stale_mirror_prs:
+            _maybe_notify_stale_mirror_prs(repo, stale_mirror_prs)
 
     try:
         from scripts.check_vm_host_health import host_health_is_fresh, load_host_health
@@ -331,8 +451,10 @@ def _format_health_line(health: dict[str, Any], issues: list[dict[str, str]]) ->
     ]
     if health.get("ssh_ok") is not None:
         parts.append(f"ssh={'ok' if health.get('ssh_ok') else 'fail'}")
-    if health.get("mirror_stale"):
+    if health.get("mirror_untrusted") or health.get("mirror_stale"):
         parts.append("mirror=stale")
+    elif health.get("mirror_heartbeat_overdue"):
+        parts.append("mirror=heartbeat_overdue")
     elif health.get("mirror_populated"):
         parts.append("mirror=ok")
     if health.get("open_mirror_prs"):

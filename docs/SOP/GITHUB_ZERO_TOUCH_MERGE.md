@@ -79,6 +79,8 @@ powershell -ExecutionPolicy Bypass -File scripts/enable_github_zero_touch.ps1
 
 This enables **Allow auto-merge** and creates or updates a ruleset named **`PPE zero-touch main`** for `refs/heads/main` (PR required with **0** approvals, required checks **`CI / pytest`** and **`CI / docker_entrypoint`**, no force-push). Re-run the script anytime to refresh that ruleset.
 
+**VM phase mirror PRs (`ops/vm-mirror-*`):** CI runs a fast **mirror-only** path (`CI / mirror_publish_check` + aggregating **`CI / ci_success`**) instead of full pytest/docker. Prefer requiring **`CI / ci_success`** in branch rules (covers both mirror-only and full PRs). Merge-on-green **skips Deploy VPS** for mirror heads.
+
 ### Repository
 
 - **Settings → General → Pull Requests:** enable **Allow auto-merge** (the script above does this via API; confirm in the UI if you like).
