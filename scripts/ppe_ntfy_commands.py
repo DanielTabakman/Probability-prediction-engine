@@ -86,9 +86,12 @@ def parse_command_text(text: str) -> RemoteCommand | None:
         tokens[0] = tokens[0][1:]
     secret = command_secret()
     if secret:
-        if not tokens or tokens[0] != secret.lower():
+        if not tokens:
             return None
-        tokens = tokens[1:]
+        if tokens[0] == secret.lower():
+            tokens = tokens[1:]
+        elif tokens[0] != "help":
+            return None
     if not tokens or tokens[0] not in KNOWN_COMMANDS:
         return None
     name = tokens[0]
@@ -96,6 +99,48 @@ def parse_command_text(text: str) -> RemoteCommand | None:
     if not secret and name != "help":
         return None
     return RemoteCommand(name=name, args=" ".join(tokens[1:]).strip())
+
+
+def looks_like_rejected_command(text: str) -> bool:
+    """True when user sent a known verb but it was not accepted (e.g. missing secret)."""
+    tokens = (text or "").strip().lower().split()
+    if not tokens:
+        return False
+    if tokens[0] in ("/ppe", "ppe") and len(tokens) > 1:
+        tokens = tokens[1:]
+    if tokens and tokens[0].startswith("/"):
+        tokens[0] = tokens[0][1:]
+    secret = command_secret()
+    if not tokens:
+        return False
+    if secret:
+        if tokens[0] == secret.lower():
+            return False
+        if tokens[0] == "help":
+            return False
+        return tokens[0] in KNOWN_COMMANDS
+    return tokens[0] in KNOWN_COMMANDS and tokens[0] != "help"
+
+
+def notify_command_rejected(text: str) -> bool:
+    """Reply on ntfy when a phone message looked like a command but was rejected."""
+    if not notify_enabled() or not ntfy_configured():
+        return False
+    secret = command_secret()
+    if secret:
+        body = (
+            f"Rejected: {text.strip()[:80]}\n"
+            f"Prefix commands with your secret, e.g. `{secret} status` or `{secret} help`."
+        )
+    else:
+        body = "Rejected command. Send `help` for the command list (other commands need PPE_NTFY_CMD_SECRET)."
+    return send_ntfy(
+        "PPE command rejected",
+        body,
+        tags=["ppe", "cmd", OUTBOUND_TAG],
+        priority="low",
+        bypass_throttle=True,
+    )
 
 
 def parse_command_message(message: dict[str, Any]) -> RemoteCommand | None:

@@ -374,12 +374,26 @@ def ensure_headless_supervisor(
 
     if is_supervisor_running(repo):
         status = stack_status(repo)
+        started: list[str] = []
+        from scripts.ppe_loop_host_guard import loop_host_blocked
+
+        if loop_host_blocked() is None and commands_enabled():
+            if not status.get("ntfy_listen_running"):
+                if headless_stack_mode(repo):
+                    spec = WorkerSpec("ntfy_listen", NTFY_CMD_PATTERN, True)
+                    spawn_worker(repo, spec, log_handles=[])
+                else:
+                    from scripts.ppe_desktop_operator_stack import start_ntfy_listen_only
+
+                    start_ntfy_listen_only(repo)
+                started.append("ntfy_listen")
+                status = stack_status(repo)
         return {
             **status,
             "headless": True,
             "supervisor_running": True,
-            "started": [],
-            "action": "none",
+            "started": started,
+            "action": ",".join(started) or "none",
         }
 
     from scripts.ppe_loop_host_guard import loop_host_blocked

@@ -21,6 +21,8 @@ from scripts.ppe_ntfy_commands import (
     command_security_warnings,
     commands_enabled,
     execute_command,
+    looks_like_rejected_command,
+    notify_command_rejected,
     notify_command_result,
     parse_command_message,
     should_ignore_message,
@@ -110,8 +112,11 @@ def poll_messages(*, since: str | None = None) -> list[dict[str, Any]]:
 def handle_message(repo: Path, message: dict[str, Any], *, notify: bool = True) -> dict[str, Any] | None:
     if should_ignore_message(message):
         return None
+    body = str(message.get("message") or "").strip()
     command = parse_command_message(message)
     if command is None:
+        if notify and looks_like_rejected_command(body):
+            notify_command_rejected(body)
         return None
     result = execute_command(repo, command)
     if notify:

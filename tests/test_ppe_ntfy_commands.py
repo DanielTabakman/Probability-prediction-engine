@@ -77,8 +77,10 @@ def test_command_security_warnings_when_no_secret(monkeypatch):
 def test_parse_requires_secret_when_configured(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
     assert parse_command_text("restart") is None
+    assert parse_command_text("status") is None
     assert parse_command_text("s3cret restart").name == "restart"
     assert parse_command_text("s3cret build").name == "build"
+    assert parse_command_text("help").name == "help"
 
 
 def test_ignore_outbound_messages():
@@ -114,6 +116,20 @@ def test_execute_restart_refused_when_stack_forbidden(tmp_path, monkeypatch):
 
 def test_is_outbound_message_string_tags():
     assert is_outbound_message({"tags": "ppe,from-desktop,ok"})
+
+
+def test_rejected_command_hint(monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    from scripts.ppe_ntfy_commands import looks_like_rejected_command, notify_command_rejected
+
+    assert looks_like_rejected_command("status") is True
+    assert looks_like_rejected_command("s3cret status") is False
+    assert looks_like_rejected_command("help") is False
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "t")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    with patch("scripts.ppe_ntfy_commands.send_ntfy", return_value=True) as send:
+        assert notify_command_rejected("status") is True
+    assert "s3cret status" in send.call_args[0][1]
 
 
 def test_execute_restart_calls_stack(tmp_path, monkeypatch):

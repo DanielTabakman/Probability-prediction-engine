@@ -54,7 +54,12 @@ def test_ensure_headless_supervisor_noop_when_running(tmp_path):
     with patch("scripts.ppe_headless_stack_supervisor.is_supervisor_running", return_value=True):
         with patch(
             "scripts.ppe_headless_stack_supervisor.stack_status",
-            return_value={"stack_running": True, "loop_running": True, "watch_running": True},
+            return_value={
+                "stack_running": True,
+                "loop_running": True,
+                "watch_running": True,
+                "ntfy_listen_running": True,
+            },
         ):
             result = ensure_headless_supervisor(tmp_path, detach=True, start=True)
     assert result["action"] == "none"

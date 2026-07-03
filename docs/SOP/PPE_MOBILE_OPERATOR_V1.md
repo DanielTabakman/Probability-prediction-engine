@@ -166,10 +166,10 @@ When `watch_ntfy_commands.cmd` is running on the **VM** (started by headless sta
 | `restart` | Stops loop + watch, restarts the stack |
 | `fix` | Investigates the current blocker — headless CLI when allowed, otherwise **IDE handoff** (`IDE_FIX_NOW.md` + continuity brief) |
 | `fix <note>` | Same as `fix`, with extra context |
-| `status` | Desktop replies on ntfy with loop/watch state + operator brief |
-| `help` | Lists commands |
+| `status` | VM replies on ntfy with loop/watch state + operator brief |
+| `help` | Lists commands (no secret prefix required) |
 
-**Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`my-secret build`** (prefix with `PPE_NTFY_CMD_SECRET`). No SSH, no RDP, no opening Cursor manually.
+**Typical phone workflow:** ntfy alert says `IDE_BUILD` → open ntfy → send **`my-secret build`** (prefix with `PPE_NTFY_CMD_SECRET`). **`status`** also needs the secret prefix when a secret is set. **`help`** works without the prefix.
 
 **Fully automatic (default):** when `autoRemoteBuild` is true in [`PPE_AUTO_OPERATOR.local.json`](PPE_AUTO_OPERATOR.local.json) (or `PPE_AUTO_REMOTE_BUILD=1`), the **loop** and **mobile watch** start the desktop **agent CLI** on `IDE_BUILD` without a phone tap. Phone `build` remains a manual override. Disable: `set PPE_AUTO_REMOTE_BUILD=0`.
 
