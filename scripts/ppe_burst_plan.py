@@ -249,8 +249,8 @@ def format_burst_director_prompt(
         )
     elif direct_action == "wait_for_vm":
         body = (
-            "VM phase FINISH_IN_FLIGHT or BUILD_IN_FLIGHT — wait for loop host; "
-            "do NOT SSH probe queue/manifest or spawn @ppe-director."
+            "VM phase FINISH_IN_FLIGHT or BUILD_IN_FLIGHT — run ppe_in_flight_monitor.cmd "
+            "(adaptive cadence until phase clears); do NOT spawn @ppe-director or parallel SSH probes."
         )
     elif direct_action == "resolve_lease":
         body = (

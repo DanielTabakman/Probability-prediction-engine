@@ -49,7 +49,7 @@ Plus dispatch paths:
 | `STACK_DOWN` | Loop or watch not running | `ensure` |
 | `HEALTHY_IDLE` | `RUN_AUTO` / `SUPPLY_LOW`, stack OK | none |
 | `AWAITING_BUILD` | Product slice needs IDE BUILD | `advance` / `retry-build` |
-| `BUILD_IN_FLIGHT` | `REMOTE_BUILD_LOCK.json` active | wait |
+| `BUILD_IN_FLIGHT` | `REMOTE_BUILD_LOCK.json` active | monitor (`ppe_in_flight_monitor.cmd`); escalate at 45m |
 | `CLOSEOUT_PENDING` | Commits on build branch, no marker | `finish-pending` |
 | `FINISH_IN_FLIGHT` | post_build worker running | wait |
 | `RUN_LOCAL_PENDING` | Marker present, relay pending | `run-local` |

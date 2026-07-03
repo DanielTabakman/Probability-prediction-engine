@@ -21,7 +21,7 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 1. `python scripts/ppe_burst_plan.py --write`
 2. Read `artifacts/control_plane/BURST_PLAN.json` + load [`ppe-burst-mode.mdc`](ppe-burst-mode.mdc)
-3. If `direct_action` is set → execute it (no burst): `DESKTOP_CONTINUE.cmd --no-pause` or wait for VM
+3. If `direct_action` is set → execute it (no burst): `DESKTOP_CONTINUE.cmd --no-pause` or **adaptive VM monitor** (`ppe_in_flight_monitor.cmd`) when `wait_for_vm`
 4. If `burst_allowed` and `use_director` → **`@ppe-director`** with plan prompt; never implement `IDE_BUILD` in this thread
 5. If `burst_allowed` is false → single verdict below; if ESCALATE → triage/split slice first
 
@@ -29,7 +29,7 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 | Verdict | Action |
 |---------|--------|
-| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. CLOSEOUT_ONLY + ≤1 slice → **direct** (skip `@ppe-director`). VM in-flight → **wait**. VM → `run_ppe_local.cmd` |
+| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. CLOSEOUT_ONLY + ≤1 slice → **direct** (skip `@ppe-director`). VM in-flight → **monitor** (`ppe_in_flight_monitor.cmd` until clear). VM → `run_ppe_local.cmd` |
 | `IDE_BUILD` | Burst: `@ppe-director` → build worker. Single escape: `ppe_go.cmd --single` or `@` slim `IDE_BUILD_STARTER_*.md` only |
 | `RUN_AUTO` | VM relay only; desktop → SSH status — no burst |
 | `SUPPLY_LOW` | Summarize supply; no burst |
@@ -48,6 +48,8 @@ After running (or attempting) the verdict, reply with a **short state summary** 
 **Never:** operator checklists, choice questions, commit permission prompts, or manual IDE BUILD thread asks when burst can spawn workers. Default founder line: **"Nothing required from you."**
 
 **VM vs stale desktop status:** trust VM brief — refresh status and advance product; do not ask which source to trust.
+
+**VM in-flight (`BUILD_IN_FLIGHT` / `FINISH_IN_FLIGHT`):** do **not** passive-wait and exit. Run `ppe_in_flight_monitor.cmd` (repeat per `next_poll_s`) or `--daemon` until phase clears; act on `completion_action`. Load [`ppe-in-flight-monitor.mdc`](ppe-in-flight-monitor.mdc).
 
 **VM recovery:** stuck relay on VM → `DESKTOP_CONTINUE` (`--prepare-handoff-auto`) or `fix_vm_operator.cmd` on VM **only when `STACK_DOWN`**. No desktop SSH git surgery. Live health: `DESKTOP_VM_STATUS.cmd --no-pause`.
 

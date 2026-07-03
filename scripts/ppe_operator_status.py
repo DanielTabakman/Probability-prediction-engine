@@ -372,9 +372,9 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
 def prepare_operator_status(repo: Path) -> dict[str, Any]:
     """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
     try:
-        from scripts.ppe_notify_push import bootstrap_operator_notify_env
+        from scripts.ppe_notify_push import ensure_operator_notify_env
 
-        bootstrap_operator_notify_env(repo)
+        ensure_operator_notify_env(repo)
     except Exception:
         pass
     try:
@@ -505,7 +505,8 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
             pass
         elif trust.get("wait_for_vm"):
             status["commands"] = [
-                "Wait for VM in-flight phase to complete (no parallel SSH/findstr probes)."
+                "Adaptive VM monitor: ppe_in_flight_monitor.cmd (repeat per next_poll_s) or --daemon until phase clears.",
+                "On action_ready: DESKTOP_CONTINUE.cmd --no-pause or @ppe-finish-worker.",
             ]
             status.setdefault("avoid", []).extend(
                 [
@@ -572,7 +573,9 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
             "Burst path: CLOSEOUT_ONLY — run DESKTOP_CONTINUE.cmd --no-pause directly (no @ppe-director)"
         )
     elif burst_plan.get("direct_action") == "wait_for_vm":
-        lines.append("Burst path: wait — VM in-flight; no SSH probes or burst workers")
+        lines.append(
+            "Burst path: monitor — ppe_in_flight_monitor.cmd until VM phase clears; no burst workers"
+        )
     elif burst_plan.get("direct_action") == "resolve_lease":
         lines.append("Burst path: worker lease conflict — ppe_worker_lease.py --assess")
     elif burst_plan.get("direct_action") == "coordination_check":

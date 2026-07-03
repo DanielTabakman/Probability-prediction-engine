@@ -20,7 +20,7 @@ Refresh: `ppe_autobuilder.cmd status --write` from repo root.
 | `STACK_DOWN` | `ppe_autobuilder.cmd ensure` |
 | `HEALTHY_IDLE` | Report "loop driving — no action." Stop. |
 | `AWAITING_BUILD` | `ppe_autobuilder.cmd advance` or spawn **ppe-build-worker** if handoff/CLI already failed |
-| `BUILD_IN_FLIGHT` | Wait; check log tail in diagnose report. Do not start second build. |
+| `BUILD_IN_FLIGHT` | Wait; check log tail in diagnose report. Run `ppe_in_flight_monitor.cmd` until clear; escalate at 45m. Do not start second build. |
 | `CLOSEOUT_PENDING` | `ppe_autobuilder.cmd finish-pending` |
 | `FINISH_IN_FLIGHT` | Wait; re-run `status` after 30s. |
 | `RUN_LOCAL_PENDING` | `ppe_autobuilder.cmd run-local` |
