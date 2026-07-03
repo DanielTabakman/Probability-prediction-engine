@@ -48,13 +48,16 @@ def test_bootstrap_loads_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
 @pytest.mark.skipif(sys.platform != "win32", reason="bootstrap_operator_notify_env uses cmd.exe")
 def test_desktop_preflight_check_ntfy_loads_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
     from scripts.desktop_operator_preflight import check_ntfy
+    from scripts.ppe_notify_push import bootstrap_operator_notify_env
 
+    monkeypatch.chdir(tmp_path)
     monkeypatch.delenv("PPE_NTFY_TOPIC", raising=False)
     (tmp_path / "ppe_operator_notify.local.cmd").write_text(
         '@echo off\nset "PPE_NTFY_TOPIC=ppe-preflight-topic"\n',
         encoding="utf-8",
     )
-    assert check_ntfy(tmp_path) is True
+    bootstrap_operator_notify_env(tmp_path)
+    assert check_ntfy() is True
     assert os.environ.get("PPE_NTFY_TOPIC") == "ppe-preflight-topic"
 
 

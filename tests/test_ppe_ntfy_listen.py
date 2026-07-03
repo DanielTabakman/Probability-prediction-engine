@@ -10,13 +10,12 @@ from scripts.ppe_ntfy_listen import handle_message, listen_once, load_state, pro
 
 def test_handle_message_restart(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
     with patch("scripts.ppe_ntfy_commands.execute_restart") as restart:
         restart.return_value = {"action": "restart", "killed": 1, "stack": {}}
         with patch("scripts.ppe_ntfy_commands.notify_command_result", return_value=True):
             out = handle_message(
                 tmp_path,
-                {"event": "message", "id": "abc", "message": "s3cret restart"},
+                {"event": "message", "id": "abc", "message": "restart"},
                 notify=True,
             )
     assert out is not None
@@ -28,8 +27,7 @@ def test_listen_once_updates_state(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
     monkeypatch.setenv("PPE_NTFY_TOPIC", "topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    messages = [{"event": "message", "id": "m1", "message": "s3cret status"}]
+    messages = [{"event": "message", "id": "m1", "message": "status"}]
     with patch("scripts.ppe_ntfy_listen.poll_messages", return_value=messages):
         with patch("scripts.ppe_ntfy_commands.execute_status") as status:
             status.return_value = {"action": "status", "body": "ok", "notified": True}
@@ -47,8 +45,7 @@ def test_state_roundtrip(tmp_path: Path):
 
 def test_process_messages_acks_restart_before_handle(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    messages = [{"event": "message", "id": "restart-1", "message": "s3cret restart"}]
+    messages = [{"event": "message", "id": "restart-1", "message": "restart"}]
     with patch("scripts.ppe_ntfy_listen.handle_message") as handle:
         handle.return_value = {"command": "restart"}
         handled, state = process_messages(tmp_path, messages, state={}, notify=False)

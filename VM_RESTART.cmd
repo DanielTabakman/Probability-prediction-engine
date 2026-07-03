@@ -25,9 +25,9 @@ echo            Close any blank cmd windows by hand if you still see them.
 timeout /t 30 /nobreak
 
 echo.
-echo [VM_RESTART] step 4/6 — ensure ntfy restart secret...
+echo [VM_RESTART] step 4/6 — ensure operator notify config...
 set "PYTHONPATH=%CD%"
-python "%CD%\scripts\ensure_ntfy_cmd_secret.py" --repo-root "%CD%"
+python "%CD%\scripts\bootstrap_operator_notify_secret.py" --repo-root "%CD%"
 
 echo.
 echo [VM_RESTART] step 5/6 — ensure loop-host env + start headless stack...
