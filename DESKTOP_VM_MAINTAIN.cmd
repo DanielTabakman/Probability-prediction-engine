@@ -1,5 +1,5 @@
 @echo off
-REM === DESKTOP ONLY — VM update + ntfy secret + stack restart via SSH ===
+REM === DESKTOP ONLY — VM update + stack restart via SSH ===
 REM One double-click from daily PC. No Hyper-V console required.
 
 cd /d "%~dp0"
@@ -19,8 +19,8 @@ if errorlevel 1 (
 )
 
 echo.
-echo [DESKTOP_VM_MAINTAIN] step 2/4 — VM git pull + ntfy secret repair...
-ssh -o BatchMode=yes -o ConnectTimeout=30 %VM_HOST% "cd /d %VM_REPO% && git pull origin main && set PYTHONPATH=%VM_REPO% && python scripts\ensure_ntfy_cmd_secret.py --repo-root ."
+echo [DESKTOP_VM_MAINTAIN] step 2/4 — VM git pull + notify config...
+ssh -o BatchMode=yes -o ConnectTimeout=30 %VM_HOST% "cd /d %VM_REPO% && git pull origin main && set PYTHONPATH=%VM_REPO% && python scripts\bootstrap_operator_notify_secret.py --repo-root ."
 if errorlevel 1 (
   echo VM SSH step 2 failed.
   goto done

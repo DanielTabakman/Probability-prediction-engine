@@ -9,7 +9,7 @@ Use this after security hardening lands on `main`, or when onboarding a new desk
 
 ## A) Desktop — ntfy remote commands (required if phone commands are on)
 
-Remote commands are **enabled by default** when `watch_ntfy_commands` / `ppe_ntfy_listen` runs. Without a secret, only **`help`** is accepted.
+Remote commands are **enabled by default** when `watch_ntfy_commands` / `ppe_ntfy_listen` runs on the loop host. Security is the **private topic name** (one-time setup in `ppe_operator_notify.local.cmd`), not a per-message prefix.
 
 ### One-time
 
@@ -19,7 +19,6 @@ Remote commands are **enabled by default** when `watch_ntfy_commands` / `ppe_ntf
   ```
 - [ ] Set **`PPE_NTFY_TOPIC`** to a long, unguessable private topic (not the placeholder).
 - [ ] Install [ntfy](https://ntfy.sh) on your phone and **subscribe** to that topic.
-- [ ] Confirm **`PPE_NTFY_CMD_SECRET`** is set (bootstrap does this if missing). Use 16+ random characters.
 - [ ] Optional hardening:
   - [ ] `PPE_NTFY_TOKEN` if your ntfy server supports ACL/auth
   - [ ] Self-hosted ntfy behind Tailscale instead of public `ntfy.sh`
@@ -32,16 +31,15 @@ python scripts\ppe_notify_push.py --check
 python scripts\ppe_notify_push.py --title "PPE test" --body "desktop ready"
 ```
 
-From the phone (replace `SECRET` with your `PPE_NTFY_CMD_SECRET`):
+From the phone (publish to your private topic):
 
 | Message | Expected |
 |---------|----------|
-| `help` | Command list (no secret) |
-| `SECRET status` | Operator snapshot reply |
-| `build` (no secret) | **Ignored** |
-| `SECRET build` | IDE BUILD handoff when verdict allows |
+| `help` | Command list |
+| `status` | Operator snapshot reply |
+| `build` | IDE BUILD handoff when verdict allows |
 
-Listener startup should warn if secret/token is weak — check the `ppe_ntfy_listen` console on first run.
+Listener startup should warn if topic/token is unset — check the `ppe_ntfy_listen` console on first run.
 
 ---
 
@@ -132,8 +130,7 @@ Local Cursor MCP may still use broader scopes; that is separate from CI.
 
 | Variable | Where | Purpose |
 |----------|-------|---------|
-| `PPE_NTFY_TOPIC` | Desktop `ppe_operator_notify.local.cmd` | Private ntfy topic |
-| `PPE_NTFY_CMD_SECRET` | Same | Prefix for phone commands |
+| `PPE_NTFY_TOPIC` | Desktop `ppe_operator_notify.local.cmd` | Private ntfy topic (one-time setup) |
 | `PPE_NTFY_TOKEN` | Same (optional) | ntfy ACL auth |
 | `PPE_NTFY_CMD_ENABLED` | Same | `0` = alerts only, no commands |
 | `PPE_CADDYFILE` | VPS `.env` | `./Caddyfile.tls` for Phase B |
