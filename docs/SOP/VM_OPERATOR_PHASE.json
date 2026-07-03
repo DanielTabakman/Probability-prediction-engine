@@ -1,8 +1,8 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-03T05:56:54Z",
-  "phase": "HEALTHY_IDLE",
+  "as_of": "2026-07-03T05:57:37Z",
+  "phase": "FINISH_IN_FLIGHT",
   "verdict": "SUPPLY_LOW",
   "chapter_name": null,
   "phase_plan_path": null,
