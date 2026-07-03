@@ -64,3 +64,12 @@ jobs:
             echo "No changes to commit."
           fi
 
+      - name: Verify Live Mirror timestamp is fresh
+        env:
+          PPE_MSOS_MIRROR_DOC_ID: ${{ secrets.PPE_MSOS_MIRROR_DOC_ID }}
+          GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
+          GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
+          GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
+          PYTHONPATH: .
+        run: python scripts/verify_msos_mirror_timestamp.py --max-age-hours 24
+

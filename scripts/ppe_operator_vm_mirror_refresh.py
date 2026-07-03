@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -235,6 +236,25 @@ def sync_desktop_mirror_from_main(repo: Path) -> dict[str, Any]:
     return report
 
 
+def maybe_sync_desktop_mirror_after_ship(repo: Path, *, pre_push: bool = False) -> dict[str, Any]:
+    """Best-effort VM mirror sync after gate/ship on desktop (never raises)."""
+    if not pre_push:
+        return {"skipped": True, "reason": "not_post_ship"}
+    if os.environ.get("PPE_MIRROR_SYNC_AFTER_SHIP", "1").strip().lower() in ("0", "false", "no"):
+        return {"skipped": True, "reason": "disabled"}
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        if loop_host_start_allowed()[0]:
+            return {"skipped": True, "reason": "loop_host"}
+    except Exception:
+        pass
+    try:
+        return sync_desktop_mirror_from_main(repo)
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)}
+
+
 def main(argv: list[str] | None = None) -> int:
     import argparse
     import json
@@ -244,6 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
     ap.add_argument("--sync-desktop", action="store_true", help="Merge mirror PRs, pull main, refresh local mirror")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
@@ -253,7 +274,7 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(report, indent=2))
         elif not report.get("ok"):
             print(f"ppe_operator_vm_mirror_refresh: sync failed — {report.get('pull_blocked') or report.get('merge_pull_error')}")
-        else:
+        elif not args.quiet:
             health = report.get("health") or {}
             print(
                 f"ppe_operator_vm_mirror_refresh: ok phase={health.get('phase')} "

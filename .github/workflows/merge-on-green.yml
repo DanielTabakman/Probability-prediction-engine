@@ -42,7 +42,12 @@ jobs:
               });
               const runs = data.workflow_runs || [];
               if (!runs.length) return false;
-              return runs[0].conclusion === 'success';
+              if (runs[0].conclusion === 'success') return true;
+              return false;
+            }
+
+            function isVmMirrorHead(headRef) {
+              return typeof headRef === 'string' && headRef.startsWith('ops/vm-mirror-');
             }
 
             const defaultBranch = context.payload.repository.default_branch || 'main';
@@ -94,6 +99,11 @@ jobs:
                 merge_method: 'squash',
               });
               core.notice(`Merged PR #${number} (squash) after green CI + automerge label`);
+
+              if (isVmMirrorHead(pr.head.ref)) {
+                core.info(`PR #${number} is VM phase mirror — skip Deploy VPS dispatch`);
+                continue;
+              }
 
               try {
                 await github.rest.actions.createWorkflowDispatch({
