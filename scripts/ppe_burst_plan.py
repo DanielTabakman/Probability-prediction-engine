@@ -96,9 +96,15 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
     closeout_only = bool(chapter_mode.get("do_not_rebuild")) or str(chapter_mode.get("mode") or "") == "CLOSEOUT_ONLY"
     vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
     vm_in_flight = bool(vm_trust.get("wait_for_vm"))
+    action_ready = bool(status.get("action_ready"))
+    completion_action = str(status.get("completion_action") or "").strip()
 
     direct_action: str | None = None
-    if (
+    if action_ready and completion_action:
+        use_director = False
+        direct_action = completion_action
+        vm_in_flight = False
+    elif (
         verdict == VERDICT_RUN_LOCAL
         and closeout_only
         and remaining <= 1
@@ -152,7 +158,16 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
     except Exception:
         pass
 
-    factory_throughput: dict[str, Any] | None = None
+    repo_state = status.get("repo_state") if isinstance(status.get("repo_state"), dict) else None
+    if (
+        repo_state
+        and int(repo_state.get("severity") or 0) >= 2
+        and direct_action not in ("wait_for_vm", completion_action if action_ready else "", "resolve_lease")
+    ):
+        burst_allowed = False
+        use_director = False
+        direct_action = "branch_recovery"
+
     on_loop_host = False
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
@@ -197,6 +212,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
         "worker_verdicts_only": True,
         "worker_lease": worker_lease,
         "coordination_check": coordination_check,
+        "repo_state": repo_state,
         "factory_throughput": factory_throughput,
         "suggested_lane": (worker_lease or {}).get("suggested_lane"),
         "prompt": format_burst_director_prompt(
@@ -208,6 +224,7 @@ def compute_burst_plan(repo: Path, status: dict[str, Any] | None = None) -> dict
             direct_action=direct_action,
             coordination_check=coordination_check,
             factory_throughput=factory_throughput,
+            repo_state=repo_state,
         ),
     }
 
@@ -222,6 +239,7 @@ def format_burst_director_prompt(
     direct_action: str | None = None,
     coordination_check: dict[str, Any] | None = None,
     factory_throughput: dict[str, Any] | None = None,
+    repo_state: dict[str, Any] | None = None,
 ) -> str:
     from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 
@@ -246,6 +264,13 @@ def format_burst_director_prompt(
             f"Spawn @ppe-coordination-check first — {summary}. "
             f"Read artifacts/control_plane/COORDINATION_CHECK.json. "
             "Do NOT spawn ppe-build-worker until coordination returns proceed or repair complete."
+        )
+    elif direct_action == "branch_recovery":
+        rs = repo_state or {}
+        cmd = (rs.get("recommended_commands") or ["python scripts/ppe_branch_recovery.py --ship-all"])[0]
+        body = (
+            f"Repo state {rs.get('severity_label', 'STEWARD')} blocks burst — run recovery first. "
+            f"Read artifacts/control_plane/REPO_STATE.json. Command: `{cmd}`"
         )
     elif direct_action == "wait_for_vm":
         body = (

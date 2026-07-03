@@ -9,10 +9,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_pipeline_health import (
+    ACTIVE_CHAPTER_GATE,
     DEADLOCK_IDE_BUILD_CLOSEOUT,
     FIX_REPAIR,
     FIX_PROCEED,
+    STEERING_CANDIDATE_STALE,
     assess_pipeline_health,
+    compute_milestone_clock,
     detect_contradictions,
     format_root_cause_block,
     maybe_notify_pipeline_regression,
@@ -112,19 +115,63 @@ class TestPipelineHealth(unittest.TestCase):
         block = format_root_cause_block(
             {
                 "ok": False,
-                "root_cause_code": DEADLOCK_IDE_BUILD_CLOSEOUT,
-                "root_cause_message": "bookkeeping deadlock",
+                "root_cause_code": ACTIVE_CHAPTER_GATE,
+                "root_cause_message": "active chapter pending",
                 "fix_class": FIX_REPAIR,
                 "milestone": {
-                    "next_build_candidate": "horizon_nav",
-                    "milestone_blocked_days": 1.2,
+                    "next_build_candidate": "msos_cross_venue_strategy_lab_v1",
+                    "next_build_resolved": "msos_cross_venue_strategy_lab_v1",
+                    "next_build_steering": "msos_trader_workflow_horizon_nav_v1",
+                    "steering_stale": True,
+                    "active_chapter_id": "msos_storyboard_visual_parity_v1",
+                    "active_pending_count": 2,
+                    "registry_total": 19,
+                    "registry_stale": 17,
+                    "registry_actionable": 1,
                 },
-                "commands": ["python scripts/ppe_chapter_coordination.py --repair"],
+                "commands": ["DESKTOP_CONTINUE.cmd --no-pause"],
             }
         )
         self.assertIn("ROOT CAUSE", block)
-        self.assertIn(DEADLOCK_IDE_BUILD_CLOSEOUT, block)
-        self.assertIn("1.2", block)
+        self.assertIn(ACTIVE_CHAPTER_GATE, block)
+        self.assertIn("storyboard_visual_parity", block)
+        self.assertIn("Steering drift", block)
+
+    def test_compute_milestone_clock_no_blocked_days_when_only_stale_registry(self) -> None:
+        with patch(
+            "scripts.ppe_pipeline_health.assess_closeout_debt",
+            return_value={
+                "has_active_gate": False,
+                "active_pending_count": 0,
+                "next_build_steering": "horizon_nav",
+                "next_build_resolved": "cross_venue",
+                "steering_stale": True,
+                "registry_stale": 10,
+            },
+        ):
+            clock = compute_milestone_clock(self.repo)
+        self.assertIsNone(clock.get("milestone_blocked_days"))
+        self.assertEqual(clock.get("next_build_resolved"), "cross_venue")
+
+    def test_detect_steering_stale_issue(self) -> None:
+        with patch(
+            "scripts.ppe_pipeline_health.assess_closeout_debt",
+            return_value={
+                "active_chapter_id": None,
+                "active_pending_count": 0,
+                "active_pending_slices": [],
+                "has_active_gate": False,
+                "registry_total": 5,
+                "registry_stale": 3,
+                "registry_actionable": 0,
+                "next_build_steering": "horizon_nav",
+                "next_build_resolved": "cross_venue",
+                "steering_stale": True,
+            },
+        ):
+            issues = detect_contradictions(self.repo, {"verdict": "RUN_LOCAL"}, {"chapter_issues": []})
+        codes = [i["code"] for i in issues]
+        self.assertIn(STEERING_CANDIDATE_STALE, codes)
 
     def test_write_pipeline_health(self) -> None:
         payload = {"ok": True, "fix_class": FIX_PROCEED, "as_of": "2026-07-01T00:00:00Z"}

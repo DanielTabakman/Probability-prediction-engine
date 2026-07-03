@@ -387,6 +387,18 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     status = enrich_operator_status_with_vm_trust(repo, status)
     status = enrich_operator_status_with_monitor(repo, status)
     try:
+        from scripts.ppe_repo_state import assess_and_write
+
+        bpf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
+        status["repo_state"] = assess_and_write(
+            repo,
+            verdict=str(status.get("verdict") or ""),
+            branch_preflight=bpf,
+            preflight_warnings=list(status.get("preflight_warnings") or []),
+        )
+    except Exception:
+        pass
+    try:
         from scripts.ppe_burst_plan import refresh_burst_plan
 
         status["burst_plan"] = refresh_burst_plan(repo, status)
@@ -866,7 +878,20 @@ def _format_human(
         for item in avoid:
             lines.append(f"  - {item}")
     warnings = status.get("preflight_warnings") or []
-    if warnings:
+    repo_state = status.get("repo_state") if isinstance(status.get("repo_state"), dict) else None
+    if repo_state:
+        try:
+            from scripts.ppe_repo_state import format_repo_state_lines, split_preflight_warnings
+
+            lines.extend(format_repo_state_lines(repo_state))
+            actionable, _info = split_preflight_warnings(warnings)
+            if actionable and not repo_state.get("blockers"):
+                lines.extend(["", "Preflight (actionable):"])
+                for w in actionable:
+                    lines.append(f"  - {w}")
+        except Exception:
+            pass
+    elif warnings:
         lines.extend(["", "Preflight warnings (action required before relay):"])
         for w in warnings:
             lines.append(f"  - {w}")

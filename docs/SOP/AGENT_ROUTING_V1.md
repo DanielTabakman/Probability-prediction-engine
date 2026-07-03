@@ -97,6 +97,7 @@ Do **not** re-BUILD product when status shows `CLOSEOUT_ONLY` or starter has clo
 |-----------|--------------|
 | Mixed-plane dirty tree | [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) — repair only, no product scope |
 | Coordination uncertain / burst blocked | `python scripts/ppe_coordination_check.py --write` → `@ppe-coordination-check` |
+| Building new autobuilder / factory surface | [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md) · `resolve_sop.py --topic "factory change"` |
 | Before steering/canon commit | `python scripts/ppe_delegation_envelope.py --gate-check` |
 | Asset enable / batch wave | [`.cursor/rules/asset-auto-discovery.mdc`](../../.cursor/rules/asset-auto-discovery.mdc) — run `discover_asset_data_source.py --json` first |
 | Unclear which SOP to load | `python scripts/resolve_sop.py --topic "<phrase>" --json` · [`.cursor/rules/sop-discovery.mdc`](../../.cursor/rules/sop-discovery.mdc) |
@@ -122,6 +123,7 @@ Run `resolve_sop.py` when unsure; table below is the fast path.
 | Commit / test gates | [`COMMIT_POLICY.md`](COMMIT_POLICY.md) |
 | Deploy / VPS | [`PRODUCTION_DEPLOY_PROTOCOL.md`](PRODUCTION_DEPLOY_PROTOCOL.md) |
 | Relay chapter by id | `python scripts/resolve_sop.py --chapter <id> --json` |
+| Factory / autobuilder BUILD | [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md) + [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) |
 
 ---
 
@@ -135,7 +137,7 @@ Run `resolve_sop.py` when unsure; table below is the fast path.
 | `@ppe-finish-worker` | `RUN_LOCAL` closeout |
 | `@ppe-triage-worker` | `FIX_PLAN` / `STALE_STATE` / `ERROR` (max 1) |
 
-Coordination SSOT: [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) · artifact: `artifacts/control_plane/COORDINATION_CHECK.json`
+Coordination SSOT: [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) (runtime) · [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md) (building factory) · artifact: `artifacts/control_plane/COORDINATION_CHECK.json`
 
 ---
 

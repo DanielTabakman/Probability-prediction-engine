@@ -55,7 +55,12 @@ Read **`ROOT CAUSE`** at the top of `artifacts/orchestrator/OPERATOR_STATUS.md` 
 | `BRANCH_BLOCKS_RELAY` | Wrong branch blocks relay |
 | `VM_VERDICT_MISMATCH` | Desktop vs VM disagree — trust VM |
 | `FRONTIER_AHEAD_OF_EVIDENCE` | Frontier COMPLETE before evidence |
-| `MILESTONE_BLOCKED` | Next BUILD candidate blocked ≥1 day |
+| `ACTIVE_CHAPTER_GATE` | Active manifest chapter has pending factory slices |
+| `STEERING_CANDIDATE_STALE` | `nextBuildCandidateId` points at COMPLETE chapter |
+| `CLOSEOUT_REGISTRY_DEBT` | Stale-complete rows still in `closeoutOnlyChapterIds` |
+| `MILESTONE_BLOCKED` | Active spine gate blocks next BUILD (pending factory slices) |
+
+**Commands:** `python scripts/ppe_milestone_gate.py` · `python scripts/ppe_milestone_gate.py --reconcile --apply`
 
 Full coordination codes: [`CHAPTER_COORDINATION_V1.md`](CHAPTER_COORDINATION_V1.md) § Issue codes.
 

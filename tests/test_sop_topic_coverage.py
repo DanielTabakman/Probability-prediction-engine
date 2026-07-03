@@ -19,6 +19,8 @@ CHARTER_PHRASE_COVERAGE: list[tuple[str, str]] = [
     ("msos web feedback", "msos_web"),
     ("resolve_sop", "sop_discovery"),
     ("chapter coordination", "chapter_coordination"),
+    ("factory change", "factory_change"),
+    ("autobuilder change", "factory_change"),
     ("sop maintenance", "sop_maintenance"),
     ("implied distribution", "implied_distribution"),
     ("expression planner", "expression_planner"),

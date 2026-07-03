@@ -55,3 +55,22 @@ def test_recovery_ship_command() -> None:
     cmd = recovery_ship_command(plane="control", branch="control-plane/foo")
     assert "ppe_branch_recovery.py" in cmd
     assert "--ship" in cmd
+
+
+def test_plan_recovery_empty(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    from scripts.ppe_branch_recovery import plan_recovery
+
+    plan = plan_recovery(tmp_path)
+    assert plan["ok"] is True
+    assert plan.get("skipped") or plan.get("steps") == []
+
+
+def test_verify_recovery_clean(tmp_path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)
+    from scripts.ppe_branch_recovery import verify_recovery
+
+    v = verify_recovery(tmp_path)
+    assert v.get("ok") is True

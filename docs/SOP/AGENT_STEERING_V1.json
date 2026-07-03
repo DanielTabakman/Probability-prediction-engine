@@ -4,13 +4,9 @@
     "msos_access_identity_v1",
     "msos_entitlements_v1",
     "msos_monitor_history_live_v1",
-    "msos_p3_command_center",
-    "msos_public_demo_launch_v1",
     "msos_storyboard_visual_parity_v1",
-    "msos_strategy_lab_dist_download_v1",
     "msos_strategy_lab_distribution_demo",
     "msos_strategy_lab_embed_shell_v1",
-    "msos_trader_review_loop_v1",
     "msos_workflow_persistence_v1",
     "mvp1_cross_venue_backtest_v1",
     "mvp1_cross_venue_scan_v1",
@@ -23,7 +19,7 @@
   ],
   "docHints": {
     "nextBuildCandidate": {
-      "chapter_id": "msos_trader_workflow_horizon_nav_v1",
+      "chapter_id": "mvp1_distribution_timeseries_collector_v1",
       "load_always": [
         "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
         "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
@@ -37,11 +33,11 @@
         "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md"
       ],
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "resolve_cmd": "python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json"
+      "resolve_cmd": "python scripts/resolve_sop.py --chapter mvp1_distribution_timeseries_collector_v1 --json"
     }
   },
-  "nextBuildCandidateId": "msos_trader_workflow_horizon_nav_v1",
-  "nextBuildCandidateNote": "promote READY in PHASE_QUEUE.json",
+  "nextBuildCandidateId": "mvp1_distribution_timeseries_collector_v1",
+  "nextBuildCandidateNote": "auto-advanced by ppe_milestone_gate (stale or spine)",
   "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
   "spineQueueAfterCloseout": [
     "msos_cross_venue_strategy_lab_v1",

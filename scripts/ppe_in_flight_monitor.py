@@ -38,6 +38,7 @@ from scripts.ppe_vm_phase_mirror import (  # noqa: E402
 )
 
 MONITOR_STATE_REL = "artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json"
+MONITOR_DAEMON_STATE_REL = "artifacts/control_plane/IN_FLIGHT_MONITOR_DAEMON.json"
 
 POLL_STALE_MIRROR_SECONDS = 60
 POLL_HEALTHY_SECONDS = 1800
@@ -345,6 +346,109 @@ def run_monitor_pass(
         "escalation": escalation,
         "auto_act": auto_act_result,
     }
+
+
+def monitor_daemon_state_path(repo: Path) -> Path:
+    return (repo / MONITOR_DAEMON_STATE_REL).resolve()
+
+
+def load_monitor_daemon_state(repo: Path) -> dict[str, Any]:
+    path = monitor_daemon_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_monitor_daemon_state(repo: Path, state: dict[str, Any]) -> None:
+    path = monitor_daemon_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state["updated_at"] = _utc_now()
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def monitor_daemon_running(repo: Path) -> bool:
+    from scripts.ppe_remote_agent_spawn import process_alive
+
+    state = load_monitor_daemon_state(repo)
+    pid = state.get("daemon_pid")
+    if pid is None:
+        return False
+    try:
+        return process_alive(int(pid))
+    except (TypeError, ValueError):
+        return False
+
+
+def start_detached_daemon(repo: Path, *, auto_act: bool = False) -> dict[str, Any]:
+    from scripts.ppe_remote_agent_spawn import process_alive, spawn_python_worker
+
+    repo = repo.resolve()
+    state = load_monitor_daemon_state(repo)
+    pid = state.get("daemon_pid")
+    if pid is not None:
+        try:
+            if process_alive(int(pid)):
+                return {"started": False, "reason": "already running", "pid": int(pid)}
+        except (TypeError, ValueError):
+            pass
+
+    args = ["scripts/ppe_in_flight_monitor.py", "--repo-root", str(repo), "--daemon"]
+    if auto_act:
+        args.append("--auto-act")
+    proc = spawn_python_worker(repo, *args)
+    save_monitor_daemon_state(
+        repo,
+        {
+            "daemon_pid": proc.pid,
+            "auto_act": auto_act,
+            "started_at": _utc_now(),
+        },
+    )
+    return {"started": True, "pid": proc.pid, "auto_act": auto_act}
+
+
+def stop_daemon(repo: Path) -> dict[str, Any]:
+    import subprocess
+
+    from scripts.ppe_remote_agent_spawn import process_alive
+
+    repo = repo.resolve()
+    state = load_monitor_daemon_state(repo)
+    killed: list[int] = []
+    pid = state.get("daemon_pid")
+    if pid is not None:
+        try:
+            pid_i = int(pid)
+            if process_alive(pid_i):
+                subprocess.run(
+                    ["taskkill", "/PID", str(pid_i), "/F"],
+                    capture_output=True,
+                    check=False,
+                )
+                killed.append(pid_i)
+        except (TypeError, ValueError):
+            pass
+    save_monitor_daemon_state(repo, {"daemon_pid": None, "stopped_at": _utc_now()})
+    return {"stopped": True, "killed": killed}
+
+
+def maybe_start_monitor_daemon(repo: Path, *, auto_act: bool = False) -> dict[str, Any]:
+    """Start background monitor if not already running (desktop only)."""
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        if bool(loop_host_start_allowed()[0]):
+            return {"skipped": True, "reason": "loop_host"}
+    except Exception:
+        pass
+    if monitor_daemon_running(repo):
+        state = load_monitor_daemon_state(repo)
+        return {"started": False, "reason": "already running", "pid": state.get("daemon_pid")}
+    return start_detached_daemon(repo, auto_act=auto_act)
 
 
 def format_brief(result: dict[str, Any]) -> str:

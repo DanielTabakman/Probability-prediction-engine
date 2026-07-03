@@ -167,6 +167,13 @@ def main(argv: list[str] | None = None) -> int:
         road: dict = {}
         ok, qreason = mark_queue_item_done(repo, plan_path=queue_plan)
         print(f"post_relay_continue: queue mark-done {ok!r} ({qreason})")
+        try:
+            from scripts.ppe_milestone_gate import reconcile_milestone_gate
+
+            recon = reconcile_milestone_gate(repo, apply=True)
+            print(f"post_relay_continue: milestone gate reconcile {json.dumps(recon)}")
+        except Exception as exc:
+            print(f"post_relay_continue: milestone gate reconcile skipped: {exc}")
         clear_manifest_plan_path(
             repo,
             note=f"Chapter closeout {slice_id}; queue item marked DONE.",

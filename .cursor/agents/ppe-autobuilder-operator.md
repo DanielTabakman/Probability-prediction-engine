@@ -78,8 +78,9 @@ AGENT CONTINUITY
 
 ## Factory boundary (grounded meta only)
 
-Per [`BUILD_FACTORY_BOUNDARY_V1.md`](docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md):
+Per [`BUILD_FACTORY_BOUNDARY_V1.md`](docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md) and [`FACTORY_CHANGE_COORDINATION_V1.md`](docs/SOP/FACTORY_CHANGE_COORDINATION_V1.md):
 
 - Meta-infrastructure is allowed when it serves product-slice **throughput**, **operator relief**, **reliability/recovery**, or **workflow-learning ingestion**.
 - **Do not** expand ungrounded control-plane surface — prefer small **product witnesses** over large orchestration churn.
+- **Building** new factory surface (phases, dispatch, status wiring) → follow F0–F4 tiers in `FACTORY_CHANGE_COORDINATION_V1.md`; this agent **diagnoses** only — use `@ppe-build-worker` to implement.
 - Codex fallback is acceptable when it protects throughput during Cursor quota exhaustion.

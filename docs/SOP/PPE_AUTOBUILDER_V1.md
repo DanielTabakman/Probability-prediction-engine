@@ -4,7 +4,7 @@
 
 **Agent:** `@ppe-autobuilder-operator` · **Entry:** `ppe_autobuilder.cmd`
 
-**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)
+**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md) · [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md) (building new factory surface)
 
 ---
 

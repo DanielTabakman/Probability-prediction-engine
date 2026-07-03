@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Purpose:** persistence — insights, tiers, CBA, revisit checklist  
 **Status as-of:** 2026-07-01
 
-**Canon:** [`MULTI_AGENT_WORKER_INTERFACE_V1.md`](MULTI_AGENT_WORKER_INTERFACE_V1.md) · [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json)
+**Canon:** [`MULTI_AGENT_WORKER_INTERFACE_V1.md`](MULTI_AGENT_WORKER_INTERFACE_V1.md) · [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md) · [`WORKER_REGISTRY_V1.json`](WORKER_REGISTRY_V1.json) · factory BUILD: [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md)
 
 ---
 
@@ -27,6 +27,7 @@ PPE runs **Cursor + Codex + VM relay** on one repo. We built a thin **Agent Rela
 | **Tier 2a** | `prefer_build_lane`, `WORKER_EVENTS.json` | **Shipped** |
 | **Tier 2b** | `DESKTOP_BUILD` auto-acquire + dispatch | **Shipped** |
 | **Tier 2c** | Auto-release lease on `mark_ide_product_ready` | **Shipped** |
+| **Tier 2d** | Desktop operator automation (`action_ready` → status/burst; dispatch plan) | **In progress** — [`DESKTOP_OPERATOR_AUTOMATION_PLAN_V1.md`](DESKTOP_OPERATOR_AUTOMATION_PLAN_V1.md) |
 | **Tier 3** | Codex SDK, hard cost caps, OSS extract, ARCP UI | **Deferred** |
 
 ---

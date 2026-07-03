@@ -101,6 +101,19 @@ def assess_coordination_check(
     blocks_relay = bool(branch_pf.get("blocks_relay"))
     branch_commands = [str(c) for c in branch_pf.get("commands") or []]
 
+    repo_state: dict[str, Any] | None = None
+    try:
+        from scripts.ppe_repo_state import assess_and_write
+
+        repo_state = assess_and_write(
+            repo,
+            verdict=str(status.get("verdict") or ""),
+            branch_preflight=branch_pf,
+            preflight_warnings=list(status.get("preflight_warnings") or []),
+        )
+    except Exception:
+        repo_state = None
+
     delegation_tier, delegation_reasons = _delegation_tier(repo)
     delegation_hint = str(status.get("delegation_hint") or "").strip()
 
@@ -121,9 +134,18 @@ def assess_coordination_check(
     elif blocks_relay or any("mixed_plane" in str(r).lower() for r in delegation_reasons):
         verdict = VERDICT_RECOVERY
         summary_parts.append("branch/tree or mixed-plane blocks relay")
-        commands.append("python scripts/ppe_branch_recovery.py --plane control --ship")
+        if repo_state and repo_state.get("recommended_commands"):
+            commands.extend(repo_state["recommended_commands"][:2])
+        else:
+            commands.append("python scripts/ppe_branch_recovery.py --plane control --ship")
         if branch_commands:
             commands.extend(branch_commands[:2])
+    elif repo_state and int(repo_state.get("severity") or 0) >= 2:
+        verdict = VERDICT_RECOVERY
+        summary_parts.append(f"repo state {repo_state.get('severity_label')} — recovery required")
+        for cmd in repo_state.get("recommended_commands") or []:
+            if cmd not in commands:
+                commands.append(cmd)
     elif delegation_tier == "steward_packet" and delegation_hint:
         verdict = VERDICT_RECOVERY
         summary_parts.append("steward_packet — recovery pass only")
@@ -171,6 +193,7 @@ def assess_coordination_check(
         else None,
         "branch": branch_pf.get("branch") or None,
         "blocks_relay": blocks_relay,
+        "repo_state": repo_state,
         "delegation_tier": delegation_tier,
         "delegation_hint": delegation_hint or None,
         "chapter_issues": chapter_issues,

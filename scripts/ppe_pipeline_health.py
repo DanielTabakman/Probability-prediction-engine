@@ -31,7 +31,15 @@ FIX_PARK = "park"
 DEADLOCK_IDE_BUILD_CLOSEOUT = "DEADLOCK_IDE_BUILD_CLOSEOUT"
 VM_VERDICT_MISMATCH = "VM_VERDICT_MISMATCH"
 BRANCH_BLOCKS_RELAY = "BRANCH_BLOCKS_RELAY"
-MILESTONE_BLOCKED = "MILESTONE_BLOCKED"
+from scripts.ppe_milestone_gate import (  # noqa: E402
+    ACTIVE_CHAPTER_GATE,
+    CLOSEOUT_REGISTRY_DEBT,
+    MILESTONE_BLOCKED,
+    STEERING_CANDIDATE_STALE,
+    assess_closeout_debt,
+    format_milestone_gate_lines,
+    milestone_gate_issues,
+)
 
 Issue = dict[str, Any]
 
@@ -116,11 +124,10 @@ def _next_build_candidate(repo: Path) -> str:
 
 
 def compute_milestone_clock(repo: Path) -> dict[str, Any]:
-    """Days milestone blocked and closeout-mode age."""
+    """Actionable closeout debt + resolved next BUILD (milestone gate v2)."""
     repo = repo.resolve()
     direction = _load_direction(repo)
     pivot_as_of = str(direction.get("asOf") or "").strip()
-    pivot_dt = _parse_utc(f"{pivot_as_of}T00:00:00Z") if pivot_as_of else None
 
     closeout_since = _git_first_commit_date(
         repo,
@@ -129,12 +136,18 @@ def compute_milestone_clock(repo: Path) -> dict[str, Any]:
     )
     closeout_days = _days_since(closeout_since)
 
-    next_build = _next_build_candidate(repo)
+    debt: dict[str, Any] = {}
+    try:
+        debt = assess_closeout_debt(repo)
+    except Exception:
+        debt = {}
+
+    next_build_steering = debt.get("next_build_steering") or _next_build_candidate(repo) or None
+    next_build_resolved = debt.get("next_build_resolved") or next_build_steering
+
     milestone_blocked_days: float | None = None
-    if closeout_days is not None:
-        milestone_blocked_days = round(closeout_days, 1)
-    elif pivot_dt is not None:
-        milestone_blocked_days = round(_days_since(pivot_dt) or 0.0, 1)
+    if debt.get("has_active_gate") and debt.get("active_pending_count"):
+        milestone_blocked_days = round(closeout_days, 1) if closeout_days is not None else 1.0
 
     oldest_closeout_debt: dict[str, Any] | None = None
     try:
@@ -154,11 +167,20 @@ def compute_milestone_clock(repo: Path) -> dict[str, Any]:
         pass
 
     return {
-        "next_build_candidate": next_build or None,
+        "next_build_candidate": next_build_resolved,
+        "next_build_steering": next_build_steering,
+        "next_build_resolved": next_build_resolved,
+        "steering_stale": bool(debt.get("steering_stale")),
         "direction_pivot_as_of": pivot_as_of or None,
         "closeout_mode_since": closeout_since.isoformat().replace("+00:00", "Z") if closeout_since else None,
         "closeout_mode_days": round(closeout_days, 1) if closeout_days is not None else None,
         "milestone_blocked_days": milestone_blocked_days,
+        "active_chapter_id": debt.get("active_chapter_id"),
+        "active_pending_count": debt.get("active_pending_count"),
+        "registry_total": debt.get("registry_total"),
+        "registry_stale": debt.get("registry_stale"),
+        "registry_actionable": debt.get("registry_actionable"),
+        "has_active_gate": debt.get("has_active_gate"),
         "oldest_closeout_debt": oldest_closeout_debt,
     }
 
@@ -254,27 +276,19 @@ def detect_contradictions(
                 }
             )
 
-    clock = compute_milestone_clock(repo)
-    blocked_days = clock.get("milestone_blocked_days")
-    next_build = clock.get("next_build_candidate")
-    if (
-        isinstance(blocked_days, (int, float))
-        and blocked_days >= 1.0
-        and next_build
-    ):
-        issues.append(
-            {
-                "code": MILESTONE_BLOCKED,
-                "severity": "medium" if blocked_days < 2 else "high",
-                "message": (
-                    f"Next BUILD `{next_build}` blocked ~{blocked_days:.1f} day(s) "
-                    f"(closeout/coordination gate)."
-                ),
-                "fix_class": str(coordination.get("verdict") or FIX_REPAIR),
-                "fix": "Clear active chapter closeout + coordination repair before horizon BUILD.",
-                "commands": list(coordination.get("commands") or [])[:2],
-            }
-        )
+    try:
+        debt = assess_closeout_debt(repo)
+        gate_issues = milestone_gate_issues(repo, debt)
+        seen_codes: set[str] = {str(i.get("code") or "") for i in issues}
+        for gate_issue in gate_issues:
+            code = str(gate_issue.get("code") or "")
+            if code and code not in seen_codes:
+                if "fix_class" not in gate_issue:
+                    gate_issue["fix_class"] = FIX_REPAIR
+                issues.append(gate_issue)
+                seen_codes.add(code)
+    except Exception:
+        pass
 
     return issues
 
@@ -304,10 +318,21 @@ def _pick_root_cause(
         "FRONTIER_AHEAD_OF_EVIDENCE",
         VM_VERDICT_MISMATCH,
         "ZERO_THROUGHPUT_12H",
+        ACTIVE_CHAPTER_GATE,
+        STEERING_CANDIDATE_STALE,
         MILESTONE_BLOCKED,
+        CLOSEOUT_REGISTRY_DEBT,
     ]
     by_code = {str(i.get("code") or ""): i for i in contradictions}
+    factory_moving = str((factory or {}).get("verdict") or "") == "moving"
+    defer_informational = factory_moving and ACTIVE_CHAPTER_GATE not in by_code
     for code in priority:
+        if defer_informational and code in (
+            STEERING_CANDIDATE_STALE,
+            MILESTONE_BLOCKED,
+            CLOSEOUT_REGISTRY_DEBT,
+        ):
+            continue
         if code in by_code:
             return by_code[code]
 
@@ -502,12 +527,22 @@ def format_root_cause_block(health: dict[str, Any]) -> str:
     fix_class = health.get("fix_class") or FIX_PARK
     milestone = health.get("milestone") if isinstance(health.get("milestone"), dict) else {}
     blocked = milestone.get("milestone_blocked_days")
-    next_build = milestone.get("next_build_candidate") or "—"
-    blocked_line = (
-        f"**MILESTONE BLOCKED:** `{next_build}` — ~{blocked} day(s)"
-        if blocked is not None
-        else f"**NEXT BUILD:** `{next_build}`"
-    )
+    next_build = milestone.get("next_build_resolved") or milestone.get("next_build_candidate") or "—"
+    steering_build = milestone.get("next_build_steering")
+    active_id = milestone.get("active_chapter_id")
+    pending = milestone.get("active_pending_count")
+    if active_id and pending:
+        blocked_line = f"**ACTIVE GATE:** `{active_id}` — {pending} pending slice(s)"
+    elif blocked is not None:
+        blocked_line = f"**MILESTONE BLOCKED:** `{next_build}` — ~{blocked} day(s)"
+    else:
+        blocked_line = f"**NEXT BUILD (resolved):** `{next_build}`"
+    gate_detail_lines = format_milestone_gate_lines(milestone)
+    if steering_build and milestone.get("steering_stale") and steering_build != next_build:
+        gate_detail_lines = [
+            f"**Steering drift:** `{steering_build}` (COMPLETE) → resolved `{next_build}`",
+            *gate_detail_lines,
+        ]
     cmds = health.get("commands") or []
     cmd_line = f"**FIX:** `{cmds[0]}`" if cmds else ""
     parts = [
@@ -516,6 +551,9 @@ def format_root_cause_block(health: dict[str, Any]) -> str:
         f"**FIX CLASS:** `{fix_class}`",
         blocked_line,
     ]
+    for detail in gate_detail_lines:
+        if detail not in parts:
+            parts.append(detail)
     if cmd_line:
         parts.append(cmd_line)
     parts.extend(factory_lines)

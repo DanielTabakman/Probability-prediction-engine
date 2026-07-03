@@ -324,6 +324,15 @@ def scan_workflow_friction(repo: Path, week_monday: date) -> tuple[list[RadarCan
                 )
             )
 
+    try:
+        from scripts.ppe_operator_pass_progress import scan_operator_pass_friction
+
+        op_candidates, op_signals = scan_operator_pass_friction(repo)
+        candidates.extend(op_candidates)
+        signals.update(op_signals)
+    except Exception:
+        pass
+
     return candidates, signals
 
 

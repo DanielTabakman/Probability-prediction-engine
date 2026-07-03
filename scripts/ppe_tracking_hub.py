@@ -350,6 +350,24 @@ def collect_aggregate_signals(repo: Path, *, days: int = 7) -> dict[str, Any]:
     return summarize_aggregate(repo, days=days)
 
 
+def collect_operator_pass_summary(repo: Path) -> dict[str, Any]:
+    try:
+        from scripts.ppe_operator_pass_progress import collect_operator_pass_stats
+
+        return collect_operator_pass_stats(repo)
+    except Exception:
+        return {}
+
+
+def read_operator_passes_for_rollup(repo: Path, *, limit: int = 10) -> list[dict[str, Any]]:
+    try:
+        from scripts.ppe_operator_pass_progress import read_operator_passes
+
+        return list(reversed(read_operator_passes(repo)[-limit:]))
+    except Exception:
+        return []
+
+
 def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
     return {
         "generated_at_utc": _utc_now(),
@@ -360,6 +378,7 @@ def collect_tracking_snapshot(repo: Path, *, days: int = 7) -> dict[str, Any]:
         "factory": collect_factory_signals(repo, days=days),
         "aggregate": collect_aggregate_signals(repo, days=days),
         "product_usage": collect_product_usage(repo, days=days),
+        "operator_passes": collect_operator_pass_summary(repo),
     }
 
 
@@ -547,11 +566,23 @@ def render_tracking_markdown(snap: dict[str, Any]) -> str:
     ):
         if key in trader:
             lines.append(f"- **{key}:** {trader[key]}")
+    op_pass = snap.get("operator_passes") or {}
+    if op_pass:
+        lines.extend(["", "## Operator pass progress", ""])
+        for key in (
+            "passes_in_window",
+            "no_progress_in_window",
+            "low_progress_in_window",
+            "consecutive_no_progress",
+            "wait_health",
+        ):
+            if key in op_pass:
+                lines.append(f"- **{key}:** {op_pass[key]}")
     lines.append("")
     return "\n".join(lines)
 
 
-def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
+def render_tracking_rollup_html(snap: dict[str, Any], repo: Path | None = None) -> str:
     payload = json.dumps(snap, indent=2)
     usage = snap.get("product_usage") or {}
     factory = snap.get("factory") or {}
@@ -584,6 +615,28 @@ def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
         f"<td>{p.get('note', '')}</td></tr>"
         for p in pulses
     )
+    op_pass = snap.get("operator_passes") or {}
+    latest_op = op_pass.get("latest") if isinstance(op_pass.get("latest"), dict) else {}
+    op_rows = "\n".join(
+        f"<tr><th>{k}</th><td>{v}</td></tr>"
+        for k, v in [
+            ("Passes in window", op_pass.get("passes_in_window", 0)),
+            ("No progress in window", op_pass.get("no_progress_in_window", 0)),
+            ("Low progress in window", op_pass.get("low_progress_in_window", 0)),
+            ("Stuck/deadlock in window", op_pass.get("stuck_or_deadlock_in_window", 0)),
+            ("Consecutive no progress", op_pass.get("consecutive_no_progress", 0)),
+            ("Latest wait health", op_pass.get("wait_health") or "—"),
+            ("Latest summary", latest_op.get("progress_summary") or "—"),
+        ]
+    )
+    recent_passes = op_pass.get("recent") or []
+    pass_history_rows = "\n".join(
+        f"<tr><td>{r.get('pass_at', '')}</td><td>{r.get('progress_class', '')}</td>"
+        f"<td>{'yes' if r.get('had_progress') else 'no'}</td>"
+        f"<td>{r.get('wait_health', '')}</td>"
+        f"<td>{(r.get('progress_summary') or '')[:80]}</td></tr>"
+        for r in recent_passes
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -609,6 +662,12 @@ def render_tracking_rollup_html(snap: dict[str, Any]) -> str:
     <tr><th>When</th><th>Load</th><th>Note</th></tr>
     {pulse_rows or '<tr><td colspan="3">None yet</td></tr>'}
   </table>
+  <h2>Operator pass progress (last 10)</h2>
+  <table>{op_rows}</table>
+  <table>
+    <tr><th>When</th><th>Class</th><th>Progress</th><th>Wait</th><th>Summary</th></tr>
+    {pass_history_rows or '<tr><td colspan="5">No passes recorded — run operator status</td></tr>'}
+  </table>
   <h2>Product usage by event</h2>
   <table>
     <tr><th>Event</th><th>Count ({usage.get('days', 7)}d)</th></tr>
@@ -629,7 +688,7 @@ def write_tracking_artifacts(repo: Path, snap: dict[str, Any]) -> tuple[Path, Pa
     html_path = repo / TRACKING_ROLLUP_HTML
     json_path.write_text(json.dumps(snap, indent=2) + "\n", encoding="utf-8")
     md_path.write_text(render_tracking_markdown(snap), encoding="utf-8")
-    html_path.write_text(render_tracking_rollup_html(snap), encoding="utf-8")
+    html_path.write_text(render_tracking_rollup_html(snap, repo), encoding="utf-8")
     try:
         from scripts.workflow_metrics_cli import cmd_export_csv
 

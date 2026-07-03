@@ -277,6 +277,35 @@ TOPIC_ROUTES: list[dict[str, Any]] = [
         ],
     },
     {
+        "id": "factory_change",
+        "match": (
+            "factory change",
+            "autobuilder change",
+            "build the factory",
+            "new autobuilder",
+            "factory slice",
+            "control plane slice",
+            "meta infrastructure build",
+        ),
+        "sop": "docs/SOP/FACTORY_CHANGE_COORDINATION_V1.md",
+        "load_always": [
+            "docs/SOP/FACTORY_CHANGE_COORDINATION_V1.md",
+            "docs/SOP/BUILD_FACTORY_BOUNDARY_V1.md",
+        ],
+        "load_on_demand": [
+            "docs/SOP/PPE_AUTOBUILDER_V1.md",
+            "docs/SOP/MULTI_AGENT_WORKER_INTERFACE_V1.md",
+            "docs/SOP/DESKTOP_OPERATOR_AUTOMATION_PLAN_V1.md",
+        ],
+        "next_action": "ide_build_control_plane_slice",
+        "agent_steps": [
+            "Pick tier F0–F4 in FACTORY_CHANGE_COORDINATION_V1.md",
+            "Cite BUILD_FACTORY_BOUNDARY purpose (a–e)",
+            "Acquire lease: ppe_worker_lease.py --acquire --worker codex-app",
+            "Use touch-surface checklist before merge",
+        ],
+    },
+    {
         "id": "sop_maintenance",
         "match": (
             "sop maintenance",

@@ -2,7 +2,7 @@
 
 **Purpose:** Guardrails for **autobuilder** and control-plane work — meta-infrastructure is allowed; **ungrounded** meta-infrastructure is not.
 
-**Strategic context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · **Operator runbook:** [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md)
+**Strategic context:** [`MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md`](MSOS_PRODUCT_BACKPLANE_CHARTER_V1.md) · **Operator runbook:** [`WORKFLOW_EFFICIENCY_OPERATOR_V1.md`](WORKFLOW_EFFICIENCY_OPERATOR_V1.md) · **Factory BUILD coordination:** [`FACTORY_CHANGE_COORDINATION_V1.md`](FACTORY_CHANGE_COORDINATION_V1.md)
 
 ---
 
