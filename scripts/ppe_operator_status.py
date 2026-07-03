@@ -612,6 +612,8 @@ def enrich_operator_status_with_monitor(repo: Path, status: dict[str, Any]) -> d
         "wait_for_vm": snapshot.get("wait_for_vm"),
         "completion_action": snapshot.get("completion_action"),
         "stuck": snapshot.get("stuck"),
+        "stuck_threshold_m": snapshot.get("stuck_threshold_m"),
+        "log_tail": snapshot.get("log_tail"),
         "next_poll_s": snapshot.get("next_poll_s"),
         "message": snapshot.get("message"),
     }
@@ -686,6 +688,52 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
     return lines
 
 
+def assess_founder_posture(status: dict[str, Any]) -> str:
+    """Founder posture: wait | kick | alert | nothing."""
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else {}
+    if monitor.get("stuck"):
+        return "alert"
+    if status.get("action_ready"):
+        return "kick"
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
+    if monitor.get("status") == "watching" or vm_trust.get("wait_for_vm"):
+        return "wait"
+    return "nothing"
+
+
+def build_founder_truth_card(status: dict[str, Any]) -> dict[str, Any]:
+    """Compact founder-facing snapshot for status header."""
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else {}
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
+    mirror_age_s = monitor.get("mirror_age_s")
+    mirror_age_m: int | None = None
+    if isinstance(mirror_age_s, (int, float)):
+        mirror_age_m = int(mirror_age_s // 60)
+    return {
+        "posture": assess_founder_posture(status),
+        "verdict": str(status.get("verdict") or ""),
+        "vm_phase": vm_trust.get("vm_phase") or monitor.get("phase"),
+        "mirror_age_m": mirror_age_m,
+        "monitor_status": monitor.get("status"),
+        "action_ready": bool(status.get("action_ready")),
+        "next_poll_m": monitor.get("next_poll_m"),
+    }
+
+
+def format_founder_truth_card_lines(status: dict[str, Any]) -> list[str]:
+    card = build_founder_truth_card(status)
+    parts = [
+        f"posture={card['posture']}",
+        f"verdict={card['verdict']}" if card.get("verdict") else None,
+        f"vm={card['vm_phase']}" if card.get("vm_phase") else None,
+        f"mirror={card['mirror_age_m']}m" if card.get("mirror_age_m") is not None else None,
+        f"monitor={card['monitor_status']}" if card.get("monitor_status") else None,
+        "action_ready" if card.get("action_ready") else None,
+    ]
+    detail = " · ".join(p for p in parts if p)
+    return [f"Truth card: {detail}"]
+
+
 def _format_human(
     status: dict[str, Any],
     repo: Path | None = None,
@@ -696,6 +744,10 @@ def _format_human(
         f"VERDICT: {status.get('verdict')}",
         "",
     ]
+    truth_lines = format_founder_truth_card_lines(status)
+    if truth_lines:
+        lines.extend(truth_lines)
+        lines.append("")
     pass_lines = status.get("operator_pass_lines")
     if isinstance(pass_lines, list) and pass_lines:
         lines.extend(str(x) for x in pass_lines)
@@ -821,11 +873,20 @@ def _format_human(
         lines.append(f"**Action ready:** VM phase cleared — run `{completion}` (not wait).")
 
     monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else None
-    if monitor and monitor.get("status") == "watching" and not status.get("action_ready"):
+    monitor_status = str(monitor.get("status") or "") if monitor else ""
+    if monitor and monitor_status in ("watching", "stuck") and not status.get("action_ready"):
         elapsed = monitor.get("message")
         if elapsed:
             lines.append("")
-            lines.append(f"**VM monitor:** {elapsed}")
+            label = "VM monitor (stuck)" if monitor.get("stuck") else "VM monitor"
+            lines.append(f"**{label}:** {elapsed}")
+        if monitor.get("stuck"):
+            log_tail = monitor.get("log_tail") if isinstance(monitor.get("log_tail"), dict) else None
+            if log_tail and log_tail.get("lines"):
+                rel = log_tail.get("path") or "log"
+                lines.append(f"**Log tail** (`{rel}`):")
+                for row in log_tail.get("lines") or []:
+                    lines.append(f"  {row}")
 
     branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
     if branch_pf and branch_pf.get("blocks_relay"):

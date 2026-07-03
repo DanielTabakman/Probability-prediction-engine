@@ -21,6 +21,7 @@ QUIET_ALERT_REL = "artifacts/control_plane/NTFY_QUIET_ALERT_STATE.json"
 SEND_STATE_REL = "artifacts/control_plane/NTFY_SEND_STATE.json"
 LOOP_DOWN_STATE_REL = "artifacts/control_plane/NTFY_LOOP_DOWN_STATE.json"
 QUOTA_STATUS_REL = "artifacts/control_plane/NTFY_QUOTA_STATUS.json"
+ACTION_READY_NOTIFY_STATE_REL = "artifacts/control_plane/ACTION_READY_NOTIFY_STATE.json"
 OUTBOUND_TAG = "from-desktop"
 DEFAULT_DAILY_CAP = 40
 DEFAULT_LOOP_DOWN_COOLDOWN_MIN = 30.0
@@ -1009,6 +1010,70 @@ def send_operator_status(status: dict[str, Any], *, repo_root: Path | None = Non
         tags=["ppe", verdict.lower()],
         priority=_priority_for_verdict(verdict),
     )
+
+
+def action_ready_notify_state_path(repo: Path | None = None) -> Path:
+    return (repo or repo_root()).resolve() / ACTION_READY_NOTIFY_STATE_REL
+
+
+def load_action_ready_notify_state(repo: Path | None = None) -> dict[str, Any]:
+    path = action_ready_notify_state_path(repo)
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_action_ready_notify_state(repo: Path | None, state: dict[str, Any]) -> None:
+    path = action_ready_notify_state_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    state["updated_at"] = _utc_now()
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def maybe_notify_action_ready(
+    repo: Path,
+    *,
+    phase: str = "",
+    completion_action: str = "",
+    auto_dispatched: bool = False,
+) -> bool:
+    """One-shot ntfy when monitor promotes action_ready (deduped per phase+action)."""
+    action = str(completion_action or "DESKTOP_CONTINUE.cmd --no-pause").strip()
+    phase_key = str(phase or "unknown").strip()
+    fingerprint = f"action_ready|{phase_key}|{action}|auto={int(auto_dispatched)}"
+    prior = load_action_ready_notify_state(repo)
+    if fingerprint == str(prior.get("fingerprint") or ""):
+        return False
+
+    if auto_dispatched:
+        title = f"PPE auto-continued: {phase_key or 'VM phase cleared'}"
+        body = f"Dispatched `{action}` automatically (PPE_AUTO_DISPATCH)."
+    else:
+        title = f"PPE action ready: {phase_key or 'VM phase cleared'}"
+        body = f"Monitor cleared in-flight — run `{action}`."
+
+    sent = send_ntfy(
+        title,
+        body,
+        tags=["ppe", "action_ready", "kick"],
+        priority="high",
+    )
+    if sent:
+        save_action_ready_notify_state(
+            repo,
+            {
+                "fingerprint": fingerprint,
+                "notified_at": _utc_now(),
+                "phase": phase_key,
+                "completion_action": action,
+                "auto_dispatched": auto_dispatched,
+            },
+        )
+    return sent
 
 
 def main(argv: list[str] | None = None) -> int:

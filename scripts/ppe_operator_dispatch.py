@@ -28,8 +28,54 @@ DIRECT_ACTION_COMMANDS: dict[str, str] = {
 }
 
 
-def dispatch_allowed() -> bool:
-    return os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower() in ("1", "true", "yes")
+def dispatch_allowed(repo: Path | None = None) -> bool:
+    if os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower() in ("1", "true", "yes"):
+        return True
+    if repo is not None:
+        return _desktop_auto_dispatch_from_opt_in(repo)
+    return False
+
+
+def _desktop_auto_dispatch_from_opt_in(repo: Path) -> bool:
+    """True when desktop opt-in cmd sets PPE_AUTO_DISPATCH=1."""
+    path = (repo.resolve() / "ppe_operator_desktop_auto.local.cmd").resolve()
+    if not path.is_file():
+        return False
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("REM"):
+            continue
+        upper = stripped.upper()
+        if upper.startswith("SET ") and "PPE_AUTO_DISPATCH" in upper:
+            _, _, value = stripped.partition("=")
+            return value.strip().strip('"').lower() in ("1", "true", "yes")
+    return False
+
+
+def ensure_desktop_auto_dispatch_opt_in(repo: Path) -> dict[str, Any]:
+    """Ensure ppe_operator_desktop_auto.local.cmd contains PPE_AUTO_DISPATCH=1."""
+    repo = repo.resolve()
+    path = repo / "ppe_operator_desktop_auto.local.cmd"
+    if not path.is_file():
+        return {"ok": False, "action": "missing_opt_in", "path": str(path)}
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return {"ok": False, "action": "read_failed", "error": str(exc), "path": str(path)}
+    if _desktop_auto_dispatch_from_opt_in(repo):
+        return {"ok": True, "action": "already_present", "path": str(path)}
+    patched = text.rstrip() + '\nset "PPE_AUTO_DISPATCH=1"\n'
+    path.write_text(patched, encoding="utf-8")
+    return {"ok": True, "action": "patched", "path": str(path)}
+
+
+def scheduled_dispatch_allowed(repo: Path) -> bool:
+    """Scheduled dispatch requires the same desktop auto opt-in token as zero-click."""
+    return (repo.resolve() / "ppe_operator_desktop_auto.local.cmd").is_file()
 
 
 def automation_preflight_blocked(
@@ -142,7 +188,7 @@ def dispatch_direct_action(
         report["reason"] = "dry_run"
         return report
 
-    if not force and not dispatch_allowed():
+    if not force and not dispatch_allowed(repo):
         report["skipped"] = True
         report["reason"] = "PPE_AUTO_DISPATCH not set"
         return report
@@ -181,7 +227,7 @@ def dispatch_direct_action(
 
 def maybe_auto_operate(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Opt-in automation: start monitor daemon on wait_for_vm; run completion when action_ready."""
-    if not dispatch_allowed():
+    if not dispatch_allowed(repo):
         return status
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
@@ -199,12 +245,28 @@ def maybe_auto_operate(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
                 "reason": reason,
                 "preferred_action": preferred,
             }
-            if preferred and recovery_auto_dispatch_allowed(status) and dispatch_allowed():
+            if preferred and recovery_auto_dispatch_allowed(status) and dispatch_allowed(repo):
                 status["auto_dispatch"] = dispatch_direct_action(repo, preferred, force=True)
             return status
         if completion:
             report = dispatch_direct_action(repo, completion, force=True)
             status["auto_dispatch"] = report
+            if report.get("ok"):
+                try:
+                    from scripts.ppe_notify_push import maybe_notify_action_ready
+
+                    maybe_notify_action_ready(
+                        repo,
+                        phase=str(
+                            (status.get("in_flight_monitor") or {}).get("phase")
+                            or (status.get("vm_trust") or {}).get("vm_phase")
+                            or ""
+                        ),
+                        completion_action=completion,
+                        auto_dispatched=True,
+                    )
+                except Exception:
+                    pass
             return status
 
     vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
@@ -270,12 +332,28 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--action", type=str, default=None, help="direct_action string")
     ap.add_argument("--from-burst-plan", action="store_true")
     ap.add_argument("--from-status", action="store_true", help="Read direct_action from operator status / burst plan")
+    ap.add_argument("--auto", action="store_true", help="Scheduled mode: require opt-in token; set PPE_AUTO_DISPATCH=1")
     ap.add_argument("--dry-run", action="store_true", help="Resolve command only; do not execute")
     ap.add_argument("--force", action="store_true", help="Run even if PPE_AUTO_DISPATCH unset")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
+    if args.auto:
+        if not scheduled_dispatch_allowed(repo):
+            report = {
+                "ok": False,
+                "skipped": True,
+                "reason": "missing ppe_operator_desktop_auto.local.cmd opt-in token",
+            }
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                print("ppe_operator_dispatch: skipped — missing desktop auto opt-in token")
+            return 1
+        os.environ["PPE_AUTO_DISPATCH"] = "1"
+        args.from_status = True
+
     if args.from_status:
         report = dispatch_from_status(repo, force=args.force, dry_run=args.dry_run)
     elif args.from_burst_plan:

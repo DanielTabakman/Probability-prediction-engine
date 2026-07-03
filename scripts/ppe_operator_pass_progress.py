@@ -732,6 +732,8 @@ def _attach_in_flight_monitor(repo: Path, status: dict[str, Any], outcome: dict[
         "elapsed_in_phase_m": snap.get("elapsed_in_phase_m"),
         "next_poll_m": snap.get("next_poll_m"),
         "stuck": snap.get("stuck"),
+        "stuck_threshold_m": snap.get("stuck_threshold_m"),
+        "log_tail": snap.get("log_tail"),
         "done": snap.get("done"),
         "completion_action": snap.get("completion_action"),
         "mirror_stale": snap.get("mirror_stale"),
@@ -783,8 +785,17 @@ def format_pass_lines(outcome: dict[str, Any]) -> list[str]:
             parts.append("mirror stale — git refresh/merge pending")
         if monitor.get("completion_action"):
             parts.append(f"then {monitor.get('completion_action')}")
+        if monitor.get("stuck") and monitor.get("stuck_threshold_m") is not None:
+            parts.append(f"stuck threshold {monitor.get('stuck_threshold_m')}m")
         if parts:
             lines.append(f"**Monitor:** {' · '.join(parts)}")
+        if monitor.get("stuck"):
+            log_tail = monitor.get("log_tail") if isinstance(monitor.get("log_tail"), dict) else None
+            if log_tail and log_tail.get("lines"):
+                rel = log_tail.get("path") or "log"
+                lines.append(f"**Log tail** (`{rel}`):")
+                for row in log_tail.get("lines") or []:
+                    lines.append(f"  {row}")
 
     if health in ("stuck", "deadlock") or int(outcome.get("consecutive_no_progress") or 0) >= ALERT_STREAK_THRESHOLD:
         lines.append("**Alert:** factory wait unhealthy — agents should triage (fix_vm / coordination repair)")

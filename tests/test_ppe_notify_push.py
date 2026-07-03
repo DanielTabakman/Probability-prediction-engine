@@ -229,3 +229,28 @@ def test_stuck_reminder_not_muted_by_quiet_hours(tmp_path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_MIN_INTERVAL_SEC", "0")
     with patch("scripts.ppe_notify_push.is_ntfy_quiet_hours", return_value=True):
         assert push.is_routine_notify_muted(title="PPE: still stuck - IDE BUILD") is False
+
+
+def test_maybe_notify_action_ready_dedupes(tmp_path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_TOPIC", "t")
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_REPO_ROOT", str(tmp_path))
+    monkeypatch.setenv("PPE_NTFY_MIN_INTERVAL_SEC", "0")
+
+    response = MagicMock()
+    response.status = 200
+    response.__enter__ = MagicMock(return_value=response)
+    response.__exit__ = MagicMock(return_value=False)
+
+    with patch("urllib.request.urlopen", return_value=response) as urlopen:
+        assert push.maybe_notify_action_ready(
+            tmp_path,
+            phase="RUN_LOCAL_PENDING",
+            completion_action="DESKTOP_CONTINUE.cmd --no-pause",
+        ) is True
+        assert push.maybe_notify_action_ready(
+            tmp_path,
+            phase="RUN_LOCAL_PENDING",
+            completion_action="DESKTOP_CONTINUE.cmd --no-pause",
+        ) is False
+    assert urlopen.call_count == 1

@@ -1,0 +1,51 @@
+---
+description: Adaptive VM in-flight monitor — mirror-first polling, stuck escalation, Cursor /loop recipe.
+alwaysApply: false
+---
+
+# PPE in-flight monitor
+
+**When:** VM phase is `BUILD_IN_FLIGHT` or `FINISH_IN_FLIGHT` on desktop operator threads.
+
+**Canon:** `scripts/ppe_in_flight_monitor.py` · `ppe_in_flight_monitor.cmd` · [`DESKTOP_OPERATOR_AUTOMATION_PLAN_V1.md`](../docs/SOP/DESKTOP_OPERATOR_AUTOMATION_PLAN_V1.md)
+
+## Behavior
+
+1. **Mirror-first** — refresh `docs/SOP/VM_OPERATOR_PHASE.json` from git; avoid SSH unless mirror stale or stuck.
+2. **Adaptive poll** — healthy ~30m · approaching ~10m · stuck ~5m · stale mirror ~1m.
+3. **Phase thresholds** — BUILD stuck 45m · FINISH stuck 90m (see `ppe_vm_phase_mirror.py`).
+4. **Stuck** — one bounded SSH `ppe_autobuilder.cmd advance` per hour; attach log tail from `REMOTE_BUILD_AGENT.log` / `POST_BUILD_FINISH.log`.
+5. **action_ready** — promote to `OPERATOR_STATUS` + optional ntfy; `--auto-act` runs `DESKTOP_CONTINUE` when `PPE_AUTO_DISPATCH=1`.
+
+## Commands
+
+```bat
+ppe_in_flight_monitor.cmd
+ppe_in_flight_monitor.cmd --daemon --auto-act
+python scripts/ppe_in_flight_monitor.py --json
+```
+
+## Cursor /loop recipe (operator thread)
+
+When burst `direct_action` is `wait_for_vm` or status shows in-flight monitor `watching`:
+
+1. Run one pass: `python scripts/ppe_in_flight_monitor.py --repo-root . --json`
+2. Read `next_poll_s` from output (or `artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json`)
+3. Use Cursor **`/loop`** with interval ≈ `next_poll_m` minutes (minimum 5m):
+
+```
+/loop 30m
+Read artifacts/orchestrator/OPERATOR_STATUS.md Mode line.
+Run: python scripts/ppe_in_flight_monitor.py --repo-root . --brief
+If output contains action_ready or done → run DESKTOP_CONTINUE.cmd --no-pause and stop looping.
+If stuck → summarize log tail; one triage pass only.
+Otherwise reply with monitor brief only — no burst BUILD.
+```
+
+Prefer **`--daemon --auto-act`** on opt-in desktop (`PPE_AUTO_DISPATCH=1`) instead of manual /loop when unattended.
+
+## Do not
+
+- Passive wait without monitor refresh
+- Repeated SSH probes while mirror is fresh
+- Start relay loop on daily PC (VM only)

@@ -174,11 +174,21 @@ def _active_program_running(status: dict[str, Any], coord: dict[str, Any]) -> bo
 
 def assess_alert(repo: Path, status: dict[str, Any], coord: dict[str, Any]) -> dict[str, Any] | None:
     """Return alert pulse dict if Layer 3 should fire; else None."""
-    if _active_program_running(status, coord):
-        return None
-
     reasons: list[str] = []
     founder_asks: list[str] = []
+
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else {}
+    if monitor.get("stuck"):
+        phase = monitor.get("phase") or "?"
+        elapsed = monitor.get("elapsed_in_phase_m")
+        reasons.append(
+            f"VM in-flight monitor stuck on `{phase}`"
+            + (f" ({elapsed}m elapsed)" if elapsed is not None else "")
+            + " — adaptive poll not clearing phase."
+        )
+
+    if not reasons and _active_program_running(status, coord):
+        return None
 
     tier = str(coord.get("delegation_tier") or "auto")
     if tier == "human_only":

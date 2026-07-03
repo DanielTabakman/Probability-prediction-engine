@@ -12,7 +12,7 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -33,8 +33,9 @@ from scripts.ppe_operator_vm_ssh import (  # noqa: E402
 )
 from scripts.ppe_vm_phase_mirror import (  # noqa: E402
     IN_FLIGHT_PHASES,
-    IN_FLIGHT_STUCK_SECONDS,
+    approaching_threshold_seconds,
     load_vm_phase_mirror,
+    stuck_threshold_seconds,
 )
 
 MONITOR_STATE_REL = "artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json"
@@ -44,9 +45,39 @@ POLL_STALE_MIRROR_SECONDS = 60
 POLL_HEALTHY_SECONDS = 1800
 POLL_APPROACHING_SECONDS = 600
 POLL_STUCK_SECONDS = 300
-APPROACHING_ELAPSED_SECONDS = 1800
 ESCALATE_COOLDOWN_SECONDS = 3600
 DEFAULT_MAX_DAEMON_HOURS = 8.0
+LOG_TAIL_LINES = 20
+IN_FLIGHT_LOG_PATHS: dict[str, str] = {
+    "BUILD_IN_FLIGHT": "artifacts/orchestrator/REMOTE_BUILD_AGENT.log",
+    "FINISH_IN_FLIGHT": "artifacts/orchestrator/POST_BUILD_FINISH.log",
+}
+
+
+def _phase_stuck_seconds(phase: str) -> float:
+    return stuck_threshold_seconds(phase)
+
+
+def _tail_file(path: Path, *, lines: int = LOG_TAIL_LINES) -> list[str]:
+    if not path.is_file():
+        return []
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    rows = text.splitlines()
+    return rows[-max(1, lines) :] if rows else []
+
+
+def collect_stuck_log_tail(repo: Path, phase: str) -> dict[str, Any] | None:
+    rel = IN_FLIGHT_LOG_PATHS.get(phase)
+    if not rel:
+        return None
+    path = (repo / rel).resolve()
+    tail = _tail_file(path)
+    if not tail:
+        return None
+    return {"path": rel, "lines": tail}
 
 
 def _utc_now() -> str:
@@ -99,9 +130,9 @@ def compute_next_poll_seconds(
     if not wait_for_vm and phase not in IN_FLIGHT_PHASES:
         return 0
     elapsed = float(elapsed_s or 0.0)
-    if elapsed >= float(IN_FLIGHT_STUCK_SECONDS):
+    if elapsed >= _phase_stuck_seconds(phase):
         return POLL_STUCK_SECONDS
-    if elapsed >= float(APPROACHING_ELAPSED_SECONDS):
+    if elapsed >= approaching_threshold_seconds(phase):
         return POLL_APPROACHING_SECONDS
     return POLL_HEALTHY_SECONDS
 
@@ -153,7 +184,7 @@ def _maybe_escalate_stuck(
     if phase not in IN_FLIGHT_PHASES:
         result["reason"] = "not_in_flight"
         return result
-    if elapsed_s < float(IN_FLIGHT_STUCK_SECONDS):
+    if elapsed_s < _phase_stuck_seconds(phase):
         result["reason"] = "below_stuck_threshold"
         return result
     if not _should_escalate(state):
@@ -228,11 +259,21 @@ def collect_monitor_snapshot(
         mirror_stale=mirror_untrusted or bool(mirror_health.get("heartbeat_overdue")),
         wait_for_vm=wait_for_vm,
     )
+    stuck_threshold_s = _phase_stuck_seconds(phase) if phase in IN_FLIGHT_PHASES else None
+    stuck_threshold_m = int(stuck_threshold_s // 60) if stuck_threshold_s is not None else None
     stuck = bool(
         wait_for_vm
         and elapsed_s is not None
-        and elapsed_s >= float(IN_FLIGHT_STUCK_SECONDS)
+        and stuck_threshold_s is not None
+        and elapsed_s >= stuck_threshold_s
     )
+    stuck_at: str | None = None
+    if stuck and state.get("watch_started_at"):
+        started = _parse_utc(str(state.get("watch_started_at") or ""))
+        if started is not None and stuck_threshold_s is not None:
+            stuck_dt = started + timedelta(seconds=stuck_threshold_s)
+            stuck_at = stuck_dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    log_tail = collect_stuck_log_tail(repo, phase) if stuck else None
     completion = _completion_action(trust, local_verdict)
     done = not wait_for_vm and bool(completion or phase not in IN_FLIGHT_PHASES)
 
@@ -272,6 +313,10 @@ def collect_monitor_snapshot(
         "elapsed_in_phase_s": elapsed_s,
         "elapsed_in_phase_m": mins if elapsed_s is not None else None,
         "stuck": stuck,
+        "stuck_at": stuck_at,
+        "stuck_threshold_s": stuck_threshold_s,
+        "stuck_threshold_m": stuck_threshold_m,
+        "log_tail": log_tail,
         "next_poll_s": next_poll_s,
         "next_poll_m": max(0, next_poll_s // 60),
         "status": status,
@@ -291,14 +336,29 @@ def run_monitor_pass(
     auto_act: bool = False,
 ) -> dict[str, Any]:
     repo = repo.resolve()
+    state = load_monitor_state(repo)
+    prior_status = str((state.get("last_snapshot") or {}).get("status") or "")
+
     snapshot = collect_monitor_snapshot(
         repo, local_verdict=local_verdict, force_fetch=force_fetch
     )
-    state = load_monitor_state(repo)
     phase = str(snapshot.get("phase") or "")
     wait_for_vm = bool(snapshot.get("wait_for_vm"))
     elapsed_s = snapshot.get("elapsed_in_phase_s")
     state = _update_watch_state(state, phase, wait_for_vm)
+
+    current_status = str(snapshot.get("status") or "")
+    if current_status == "action_ready" and prior_status != "action_ready":
+        try:
+            from scripts.ppe_notify_push import maybe_notify_action_ready
+
+            maybe_notify_action_ready(
+                repo,
+                phase=phase,
+                completion_action=str(snapshot.get("completion_action") or ""),
+            )
+        except Exception:
+            pass
 
     escalation: dict[str, Any] = {"skipped": True}
     if snapshot.get("stuck"):
@@ -326,6 +386,18 @@ def run_monitor_pass(
         except Exception as exc:
             auto_act_result = {"ok": False, "error": str(exc)}
         state["last_auto_act"] = auto_act_result
+        if auto_act_result and auto_act_result.get("ok"):
+            try:
+                from scripts.ppe_notify_push import maybe_notify_action_ready
+
+                maybe_notify_action_ready(
+                    repo,
+                    phase=phase,
+                    completion_action=str(completion or ""),
+                    auto_dispatched=True,
+                )
+            except Exception:
+                pass
 
     state["last_snapshot"] = {
         "phase": snapshot.get("phase"),

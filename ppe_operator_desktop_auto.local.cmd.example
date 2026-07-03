@@ -1,5 +1,7 @@
 @echo off
 REM OPT-IN ONLY — do not create on daily PC unless you know you want desktop auto.
 REM Default: automation runs on the VM only. See VM_AUTO.cmd on the VM.
+REM PPE_AUTO_DISPATCH=1 enables headless direct_action execution (dispatch + monitor --auto-act).
 
 set "PPE_DESKTOP_AUTO=1"
+set "PPE_AUTO_DISPATCH=1"

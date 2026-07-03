@@ -14,7 +14,7 @@ if not exist "%CD%\ppe_operator_desktop_auto.local.cmd" (
   goto done
 )
 
-set "PPE_DESKTOP_AUTO=1"
+call "%CD%\ppe_operator_desktop_auto.local.cmd"
 
 python "%CD%\scripts\ppe_operator_shortcuts.py" --repo-root "%CD%" --apply --quiet 2>nul
 

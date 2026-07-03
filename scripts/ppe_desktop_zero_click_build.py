@@ -75,12 +75,28 @@ def ensure_opt_in_token(repo: Path) -> dict[str, Any]:
     repo = repo.resolve()
     target = repo / OPT_IN_FILE
     if target.is_file():
-        return {"ok": True, "action": "already_present", "path": str(target)}
+        patched = _patch_opt_in_auto_dispatch(target)
+        return {"ok": True, "action": patched or "already_present", "path": str(target)}
     example = repo / OPT_IN_EXAMPLE
     if not example.is_file():
         return {"ok": False, "action": "missing_example", "path": str(example)}
     target.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
+    _patch_opt_in_auto_dispatch(target)
     return {"ok": True, "action": "created", "path": str(target)}
+
+
+def _patch_opt_in_auto_dispatch(path: Path) -> str | None:
+    """Add PPE_AUTO_DISPATCH=1 to opt-in cmd when missing."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.upper().startswith("SET ") and "PPE_AUTO_DISPATCH" in stripped.upper():
+            return None
+    path.write_text(text.rstrip() + '\nset "PPE_AUTO_DISPATCH=1"\n', encoding="utf-8")
+    return "patched_auto_dispatch"
 
 
 def ensure_no_loop_guard(repo: Path) -> dict[str, Any]:
