@@ -157,3 +157,13 @@ def test_format_brief() -> None:
     )
     assert "IN_FLIGHT_MONITOR" in line
     assert "next_check=30m" in line
+
+
+def test_maybe_start_monitor_daemon_skips_loop_host(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_in_flight_monitor import maybe_start_monitor_daemon
+
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
+    (tmp_path / "ppe_operator_loop_host.local.cmd").write_text("@echo off\n", encoding="utf-8")
+    with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "ok")):
+        result = maybe_start_monitor_daemon(tmp_path)
+    assert result.get("skipped") is True

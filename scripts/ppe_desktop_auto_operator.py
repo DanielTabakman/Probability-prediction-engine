@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -143,12 +144,37 @@ def auto_pass(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
         if vm_phase in ("FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"):
             actions.append("skip_vm_finish_in_flight")
             result["vm_trust"] = {"wait_for_vm": True, "vm_phase": vm_phase}
+            if not dry_run and os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower() in ("1", "true", "yes"):
+                try:
+                    from scripts.ppe_in_flight_monitor import maybe_start_monitor_daemon
+
+                    daemon = maybe_start_monitor_daemon(repo, auto_act=True)
+                    actions.append("monitor_daemon")
+                    result["monitor_daemon"] = daemon
+                except Exception as exc:
+                    result["monitor_daemon"] = {"started": False, "error": str(exc)}
         else:
-            ssh = _ssh_vm(vm_finish_command())
-            if ssh.get("ok"):
-                actions.append("vm_finish_ide_build")
-                append_log(repo, "auto vm finish_ide_build via ssh")
-            result["vm_ssh"] = ssh
+            if dry_run:
+                actions.append("would_desktop_continue")
+            else:
+                continue_cmd = repo / "DESKTOP_CONTINUE.cmd"
+                proc = subprocess.run(
+                    [str(continue_cmd), "--no-pause"],
+                    cwd=repo,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if proc.returncode == 0:
+                    actions.append("desktop_continue")
+                    append_log(repo, "auto DESKTOP_CONTINUE.cmd --no-pause")
+                else:
+                    actions.append("desktop_continue_failed")
+                result["desktop_continue"] = {
+                    "ok": proc.returncode == 0,
+                    "exit_code": proc.returncode,
+                    "stderr_tail": (proc.stderr or "")[-200:],
+                }
 
     if not actions:
         result["skipped"] = True

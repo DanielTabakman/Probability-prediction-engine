@@ -21,18 +21,18 @@
     "nextBuildCandidate": {
       "chapter_id": "mvp1_distribution_timeseries_collector_v1",
       "load_always": [
-        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-        "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+        "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md"
       ],
       "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json"
+        "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
+        "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json"
       ],
       "load_on_demand": [
-        "docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md"
+        "docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md",
+        "docs/SOP/DISTRIBUTION_STATS_COLLECTOR_OPS_V1.md"
       ],
-      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "program_doc": null,
       "resolve_cmd": "python scripts/resolve_sop.py --chapter mvp1_distribution_timeseries_collector_v1 --json"
     }
   },

@@ -42,6 +42,12 @@ Manual recovery: `@ppe-autobuilder-operator` diagnose · VM `fix_vm_operator.cmd
 
 Optional: `ppe_in_flight_monitor.cmd --daemon --auto-act` runs completion when clear (opt-in).
 
+## Auto-start (opt-in)
+
+Set `PPE_AUTO_DISPATCH=1` (see `ppe_operator_dispatch.py`). On `wait_for_vm`, `prepare_operator_status` starts detached monitor with `--auto-act`. On `action_ready`, runs `DESKTOP_CONTINUE.cmd --no-pause` once.
+
+Manual: `ppe_in_flight_monitor.cmd --start` / `--stop`
+
 ## Do NOT
 
 - Parallel SSH probes or `@ppe-director` while `wait_for_vm`

@@ -50,35 +50,39 @@ Signals are scattered:
 
 ---
 
-### Step 2 — Central dispatch executor
+### Step 2 — Central dispatch executor (shipped)
 
 **Goal:** One module executes `direct_action` strings without a Cursor turn.
 
 | Action | Handler |
 |--------|---------|
 | `DESKTOP_CONTINUE.cmd --no-pause` | subprocess full continue (not slim SSH finish) |
-| `wait_for_vm` | `ppe_in_flight_monitor.cmd --daemon --auto-act` |
+| `wait_for_vm` | `ppe_in_flight_monitor.py --daemon --auto-act` |
 | `resolve_lease` | `ppe_worker_lease.py --assess` |
-| `coordination_check` | write handoff; optional `@ppe-coordination-check` |
-| `branch_recovery` | `ppe_branch_recovery.py --plane control --ship` when delegation allows |
+| `coordination_check` | `ppe_coordination_check.py --write` |
+| `factory_throughput` | `ppe_factory_throughput.py --write` |
+| `pipeline_health` | `ppe_pipeline_health.py --write` |
+| `branch_recovery` | `ppe_branch_recovery.py --plane control --ship` (or repo-state recommended cmd) |
 
-**New:** `scripts/ppe_operator_dispatch.py` + `ppe_operator_dispatch.cmd`
+**Entry:** `scripts/ppe_operator_dispatch.py` + `ppe_operator_dispatch.cmd`
 
 **Env:** `PPE_AUTO_DISPATCH=1` enables execution; default off.
 
-**Wire:** `ppe_in_flight_monitor.py` calls dispatch on `action_ready` when env set.
+**CLI:** `--dry-run` · `--from-status` · `--from-burst-plan` · `--force`
+
+**Wire:** `prepare_operator_status()` → `maybe_auto_operate()`; monitor `--auto-act` → dispatch.
 
 ---
 
-### Step 3 — Zero-click stack integration
+### Step 3 — Zero-click stack integration (partial)
 
 **Goal:** Opt-in desktop daemon chain monitor → continue without separate manual steps.
 
-| Change | File |
-|--------|------|
-| Spawn monitor daemon when auto-operator skips in-flight | `scripts/ppe_desktop_auto_operator.py` |
-| Start monitor `--daemon --auto-act` from zero-click stack | `scripts/ppe_desktop_zero_click_build.py` |
-| Use full `DESKTOP_CONTINUE` not slim SSH finish | `scripts/ppe_desktop_auto_operator.py` |
+| Change | File | Status |
+|--------|------|--------|
+| Spawn monitor daemon when auto-operator skips in-flight | `scripts/ppe_desktop_auto_operator.py` | shipped |
+| Use full `DESKTOP_CONTINUE` not slim SSH finish | `scripts/ppe_desktop_auto_operator.py` | shipped |
+| Start monitor `--daemon --auto-act` from zero-click stack | `scripts/ppe_desktop_zero_click_build.py` | pending |
 
 **Setup:** `setup_desktop_build_efficiency.cmd` (existing) + doc update.
 
@@ -158,3 +162,5 @@ python scripts/ppe_operator_dispatch.py --dry-run   REM after Step 2
 | Date | Step |
 |------|------|
 | 2026-07-03 | v1 plan + Step 1 (`action_ready` in status/burst) |
+| 2026-07-03 | Step 2 — central dispatch executor (`ppe_operator_dispatch`) |
+| 2026-07-03 | Steps 2–3 partial: dispatch cmd, `maybe_auto_operate`, auto-operator DESKTOP_CONTINUE |

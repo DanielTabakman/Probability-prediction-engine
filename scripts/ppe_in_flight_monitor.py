@@ -315,22 +315,16 @@ def run_monitor_pass(
     auto_act_result: dict[str, Any] | None = None
     completion = snapshot.get("completion_action")
     if auto_act and completion and snapshot.get("done"):
-        import subprocess
+        try:
+            from scripts.ppe_operator_dispatch import dispatch_direct_action
 
-        cmd_path = repo / "DESKTOP_CONTINUE.cmd"
-        proc = subprocess.run(
-            [str(cmd_path), "--no-pause"],
-            cwd=repo,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        auto_act_result = {
-            "command": completion,
-            "exit_code": proc.returncode,
-            "stdout_tail": (proc.stdout or "")[-300:],
-            "stderr_tail": (proc.stderr or "")[-200:],
-        }
+            auto_act_result = dispatch_direct_action(
+                repo,
+                str(completion),
+                force=True,
+            )
+        except Exception as exc:
+            auto_act_result = {"ok": False, "error": str(exc)}
         state["last_auto_act"] = auto_act_result
 
     state["last_snapshot"] = {

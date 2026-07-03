@@ -80,6 +80,7 @@ Agent/non-interactive: `DESKTOP_CONTINUE.cmd --no-pause`.
 | `scripts/ppe_doctor.cmd` | One-shot infra check: ntfy, gh, SSH, VM health, blind spots |
 | `scripts/ppe_pipeline_health.cmd` | Founder pipeline diagnostic: root cause, milestone clock, `PIPELINE_HEALTH.json` |
 | `scripts/ppe_factory_throughput.cmd` | Factory moving? slices/closeouts, phase stuck, supply — `FACTORY_THROUGHPUT.json` |
+| `ppe_operator_dispatch.cmd` | Opt-in burst `direct_action` executor (`PPE_AUTO_DISPATCH=1`; `--dry-run`, `--from-status`) |
 | `install_ppe_network_watchdog_task.cmd` | Register Task Scheduler: SSH probe every 15m; ntfy after 3 failures |
 | `python scripts/ppe_network_watchdog.py` | Manual probe (same as scheduled task) |
 | `python scripts/ppe_worktree_janitor.py` | List removable `_worktrees/*`; `--remove <path>` only after human review |

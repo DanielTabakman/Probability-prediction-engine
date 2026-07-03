@@ -6587,7 +6587,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-02T00:31:07Z",
+  "generated_at": "2026-07-03T02:12:05Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
@@ -6619,6 +6619,7 @@
     "token_burst",
     "sop_discovery",
     "chapter_coordination",
+    "factory_change",
     "sop_maintenance",
     "implied_distribution",
     "expression_planner",

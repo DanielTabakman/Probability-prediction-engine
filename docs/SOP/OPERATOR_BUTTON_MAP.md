@@ -37,6 +37,7 @@ You do **not** need Automations, API credits, or `run_ppe_local` on the desktop.
 | Stuck relay / stale state | **VM** | `fix_vm_operator.cmd` (= `vm_bootstrap.cmd --recover`) |
 | VM reboot — auto-start stack | **VM** (once) | `install_ppe_vm_headless_logon_task.cmd` |
 | Desktop IDE-only setup | **Desktop** (once) | `setup_desktop_ide_only.cmd` |
+| Opt-in auto dispatch (`direct_action`) | **Desktop** | Set `PPE_AUTO_DISPATCH=1` → `ppe_operator_dispatch.cmd --from-status --dry-run` |
 | Sync scripts from GitHub | **VM** | `VM_UPDATE.cmd` |
 
 **Hard rules**

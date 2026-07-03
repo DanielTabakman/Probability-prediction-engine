@@ -277,7 +277,9 @@ def assess_operator_blind_spots(
         health["mirror_stale"] = mirror_health.get("stale")
         health["mirror_untrusted"] = mirror_health.get("untrusted")
         health["mirror_heartbeat_overdue"] = mirror_health.get("heartbeat_overdue")
-        if mirror_health.get("untrusted") and mirror_health.get("alert"):
+        if mirror_health.get("alert") and (
+            mirror_health.get("untrusted") or mirror_health.get("stale")
+        ):
             issues.append(
                 _issue(
                     "vm_mirror_stale",

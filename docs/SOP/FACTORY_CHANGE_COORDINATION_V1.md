@@ -147,9 +147,9 @@ ppe_autobuilder.cmd status --write
 
 Deferred programs — enable only when triggers fire twice ([`MULTI_AGENT_ROADMAP_V1.md`](MULTI_AGENT_ROADMAP_V1.md) pattern).
 
-| Tier | Program | Trigger to start |
+| Tier | Program | Status / trigger |
 |------|---------|------------------|
-| **FC-1** | Central dispatch executor | Step 2 of desktop automation plan — `ppe_operator_dispatch.py` |
+| **FC-1** | Central dispatch executor (`ppe_operator_dispatch.py`) | **Shipped** — opt-in `PPE_AUTO_DISPATCH=1` |
 | **FC-2** | Factory change linter | Repeated F2 merges missing burst/status updates |
 | **FC-3** | `ppe_factory_change_audit.py` | Pre-merge checklist enforced in gate (F2 touch-surface) |
 | **FC-4** | VM/desktop config split | Same script behaves differently per host without env docs |
@@ -162,3 +162,4 @@ Deferred programs — enable only when triggers fire twice ([`MULTI_AGENT_ROADMA
 | Date | Change |
 |------|--------|
 | 2026-07-03 | v1 — factory BUILD coordination SSOT |
+| 2026-07-03 | FC-1 shipped — central dispatch executor |

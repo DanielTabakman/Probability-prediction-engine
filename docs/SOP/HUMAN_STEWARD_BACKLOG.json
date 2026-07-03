@@ -37,6 +37,17 @@
       "notes": "Shipped FOUNDER_OPERATOR_SURFACE_V1.md + routing/rules/calendar/workflow patches."
     },
     {
+      "id": "steering_coordination_program_v1",
+      "title": "Steering coordination program v1",
+      "status": "open",
+      "priority": "high",
+      "category": "control-plane",
+      "summary": "Harden relay vs steering drift: milestone gate hooks, docHints refresh, operator ACTIVE/NEXT headlines, drift gate codes, chapter lifecycle consolidate. Plan ready to charter.",
+      "policyQuestion": "Charter Phase 1 now (P0) or wait for visual parity closeout?",
+      "added": "2026-07-02",
+      "notes": "Program: docs/SOP/STEERING_COORDINATION_PROGRAM_V1.md · SELECTION: POST_STEERING_COORDINATION_V1_SELECTION.md · Absorbs relay_decision_reconcile in Phase 3."
+    },
+    {
       "id": "operator_vs_charter_thread_habit",
       "title": "Operator vs charter Cursor thread habit",
       "status": "open",
@@ -55,7 +66,8 @@
       "category": "control-plane",
       "summary": "AUTO_ADVANCE decision (or fold Rule 7b into CONTINUE); align CODEX_AUTONOMY \u00a715 with implementation; auto PR on REPO_STATE_DRIFT for all slice kinds.",
       "policyQuestion": "How much steward judgment should remain vs machine CONTINUE?",
-      "added": "2026-06-17"
+      "added": "2026-06-17",
+      "notes": "Decision table + implementation under steering_coordination_program_v1 Phase 3; close when Phase 3.1 ships."
     },
     {
       "id": "guard_framework_v2",
