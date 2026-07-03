@@ -1,7 +1,13 @@
+---
+archived: true
+chapter_id: ppe_deribit_crypto_tier1_v1
+closed: 2026-07-03
+---
+
 # PPE Deribit crypto tier-1 v1 — evidence status
 
 **Chapter:** `ppe_deribit_crypto_tier1_v1` / **`ppe_sol_bybit_ship_v1`**  
-**Status:** **PARTIAL COMPLETE** — SOL live via Bybit; BNB/XRP blocked on Deribit delist  
+**Status:** **COMPLETE** 2026-07-03 — SOL live via Bybit; BNB/XRP blocked on Deribit delist  
 **SELECTED:** 2026-06-26 · **SOL enable:** 2026-06-28 (Bybit adapter) · **Registry merge:** 2026-06-27
 
 | Slice | Status | Notes |
