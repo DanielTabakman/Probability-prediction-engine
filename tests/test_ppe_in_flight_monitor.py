@@ -4,15 +4,21 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_in_flight_monitor import (
+    collect_stuck_log_tail,
     compute_next_poll_seconds,
     collect_monitor_snapshot,
     format_brief,
     run_monitor_pass,
 )
-from scripts.ppe_vm_phase_mirror import IN_FLIGHT_STUCK_SECONDS
+from scripts.ppe_vm_phase_mirror import (
+    BUILD_IN_FLIGHT_STUCK_SECONDS,
+    FINISH_IN_FLIGHT_STUCK_SECONDS,
+    stuck_threshold_seconds,
+)
 
 
 def _utc_now() -> str:
@@ -34,7 +40,25 @@ def test_compute_next_poll_adaptive() -> None:
     ) == 600
     assert compute_next_poll_seconds(
         phase="BUILD_IN_FLIGHT",
-        elapsed_s=float(IN_FLIGHT_STUCK_SECONDS) + 60,
+        elapsed_s=float(BUILD_IN_FLIGHT_STUCK_SECONDS) + 60,
+        mirror_stale=False,
+        wait_for_vm=True,
+    ) == 300
+    assert compute_next_poll_seconds(
+        phase="FINISH_IN_FLIGHT",
+        elapsed_s=float(BUILD_IN_FLIGHT_STUCK_SECONDS) + 60,
+        mirror_stale=False,
+        wait_for_vm=True,
+    ) == 1800
+    assert compute_next_poll_seconds(
+        phase="FINISH_IN_FLIGHT",
+        elapsed_s=3700,
+        mirror_stale=False,
+        wait_for_vm=True,
+    ) == 600
+    assert compute_next_poll_seconds(
+        phase="FINISH_IN_FLIGHT",
+        elapsed_s=float(FINISH_IN_FLIGHT_STUCK_SECONDS) + 60,
         mirror_stale=False,
         wait_for_vm=True,
     ) == 300
@@ -157,6 +181,20 @@ def test_format_brief() -> None:
     )
     assert "IN_FLIGHT_MONITOR" in line
     assert "next_check=30m" in line
+
+
+def test_stuck_threshold_by_phase() -> None:
+    assert stuck_threshold_seconds("BUILD_IN_FLIGHT") == float(BUILD_IN_FLIGHT_STUCK_SECONDS)
+    assert stuck_threshold_seconds("FINISH_IN_FLIGHT") == float(FINISH_IN_FLIGHT_STUCK_SECONDS)
+
+
+def test_collect_stuck_log_tail(tmp_path: Path) -> None:
+    log = tmp_path / "artifacts/orchestrator/POST_BUILD_FINISH.log"
+    log.parent.mkdir(parents=True)
+    log.write_text("\n".join(f"line {i}" for i in range(30)) + "\n", encoding="utf-8")
+    tail = collect_stuck_log_tail(tmp_path, "FINISH_IN_FLIGHT")
+    assert "line 29" in tail.get("combined", "")
+    assert "line 9" not in tail.get("combined", "")
 
 
 def test_maybe_start_monitor_daemon_skips_loop_host(tmp_path, monkeypatch) -> None:

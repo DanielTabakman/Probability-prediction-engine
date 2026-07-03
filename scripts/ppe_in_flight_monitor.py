@@ -33,8 +33,9 @@ from scripts.ppe_operator_vm_ssh import (  # noqa: E402
 )
 from scripts.ppe_vm_phase_mirror import (  # noqa: E402
     IN_FLIGHT_PHASES,
-    IN_FLIGHT_STUCK_SECONDS,
+    approaching_threshold_seconds,
     load_vm_phase_mirror,
+    stuck_threshold_seconds,
 )
 
 MONITOR_STATE_REL = "artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json"
@@ -44,9 +45,19 @@ POLL_STALE_MIRROR_SECONDS = 60
 POLL_HEALTHY_SECONDS = 1800
 POLL_APPROACHING_SECONDS = 600
 POLL_STUCK_SECONDS = 300
-APPROACHING_ELAPSED_SECONDS = 1800
 ESCALATE_COOLDOWN_SECONDS = 3600
 DEFAULT_MAX_DAEMON_HOURS = 8.0
+LOG_TAIL_LINES = 20
+IN_FLIGHT_LOG_PATHS: dict[str, tuple[str, ...]] = {
+    "BUILD_IN_FLIGHT": (
+        "artifacts/orchestrator/build_worker_events.jsonl",
+        "artifacts/orchestrator/REMOTE_BUILD_LOCK.json",
+    ),
+    "FINISH_IN_FLIGHT": (
+        "artifacts/orchestrator/POST_BUILD_FINISH.log",
+        "artifacts/orchestrator/REMOTE_RUN_LOCAL.log",
+    ),
+}
 
 
 def _utc_now() -> str:
@@ -87,6 +98,52 @@ def save_monitor_state(repo: Path, state: dict[str, Any]) -> None:
     path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
 
+def _phase_stuck_seconds(phase: str) -> float:
+    return stuck_threshold_seconds(phase)
+
+
+def _tail_file(path: Path, *, max_lines: int = LOG_TAIL_LINES) -> str | None:
+    if not path.is_file():
+        return None
+    try:
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None
+    if not lines:
+        return None
+    tail = lines[-max_lines:]
+    return "\n".join(tail)
+
+
+def collect_stuck_log_tail(repo: Path, phase: str) -> dict[str, Any]:
+    """Last lines from local orchestrator logs when in-flight is stuck (desktop mirror)."""
+    repo = repo.resolve()
+    rel_paths = IN_FLIGHT_LOG_PATHS.get(phase, ())
+    sections: list[dict[str, str]] = []
+    for rel in rel_paths:
+        path = repo / rel
+        if rel.endswith(".json") or rel.endswith(".jsonl"):
+            if path.is_file():
+                try:
+                    raw = path.read_text(encoding="utf-8", errors="replace").strip()
+                    if rel.endswith(".jsonl"):
+                        last = [ln for ln in raw.splitlines() if ln.strip()][-LOG_TAIL_LINES:]
+                        text = "\n".join(last) if last else raw[-1200:]
+                    else:
+                        text = raw[-1200:]
+                    sections.append({"path": rel, "text": text})
+                except OSError:
+                    continue
+            continue
+        text = _tail_file(path)
+        if text:
+            sections.append({"path": rel, "text": text})
+    if not sections:
+        return {}
+    combined = "\n\n".join(f"--- {s['path']} ---\n{s['text']}" for s in sections)
+    return {"sections": sections, "combined": combined[:4000]}
+
+
 def compute_next_poll_seconds(
     *,
     phase: str,
@@ -99,9 +156,10 @@ def compute_next_poll_seconds(
     if not wait_for_vm and phase not in IN_FLIGHT_PHASES:
         return 0
     elapsed = float(elapsed_s or 0.0)
-    if elapsed >= float(IN_FLIGHT_STUCK_SECONDS):
+    stuck_at = _phase_stuck_seconds(phase)
+    if elapsed >= stuck_at:
         return POLL_STUCK_SECONDS
-    if elapsed >= float(APPROACHING_ELAPSED_SECONDS):
+    if elapsed >= approaching_threshold_seconds(phase):
         return POLL_APPROACHING_SECONDS
     return POLL_HEALTHY_SECONDS
 
@@ -153,7 +211,7 @@ def _maybe_escalate_stuck(
     if phase not in IN_FLIGHT_PHASES:
         result["reason"] = "not_in_flight"
         return result
-    if elapsed_s < float(IN_FLIGHT_STUCK_SECONDS):
+    if elapsed_s < _phase_stuck_seconds(phase):
         result["reason"] = "below_stuck_threshold"
         return result
     if not _should_escalate(state):
@@ -228,10 +286,11 @@ def collect_monitor_snapshot(
         mirror_stale=mirror_untrusted or bool(mirror_health.get("heartbeat_overdue")),
         wait_for_vm=wait_for_vm,
     )
+    stuck_at = _phase_stuck_seconds(phase)
     stuck = bool(
         wait_for_vm
         and elapsed_s is not None
-        and elapsed_s >= float(IN_FLIGHT_STUCK_SECONDS)
+        and elapsed_s >= stuck_at
     )
     completion = _completion_action(trust, local_verdict)
     done = not wait_for_vm and bool(completion or phase not in IN_FLIGHT_PHASES)
@@ -257,6 +316,10 @@ def collect_monitor_snapshot(
         status = "idle"
         message = f"Phase `{phase}` — monitor not required."
 
+    log_tail: dict[str, Any] | None = None
+    if stuck and phase:
+        log_tail = collect_stuck_log_tail(repo, phase)
+
     return {
         "as_of": _utc_now(),
         "phase": phase or None,
@@ -272,6 +335,9 @@ def collect_monitor_snapshot(
         "elapsed_in_phase_s": elapsed_s,
         "elapsed_in_phase_m": mins if elapsed_s is not None else None,
         "stuck": stuck,
+        "stuck_threshold_s": int(stuck_at),
+        "stuck_threshold_m": int(stuck_at // 60),
+        "log_tail": log_tail,
         "next_poll_s": next_poll_s,
         "next_poll_m": max(0, next_poll_s // 60),
         "status": status,
@@ -300,6 +366,7 @@ def run_monitor_pass(
     elapsed_s = snapshot.get("elapsed_in_phase_s")
     state = _update_watch_state(state, phase, wait_for_vm)
 
+    prior_status = str((state.get("last_snapshot") or {}).get("status") or "")
     escalation: dict[str, Any] = {"skipped": True}
     if snapshot.get("stuck"):
         escalation = _maybe_escalate_stuck(
@@ -314,6 +381,19 @@ def run_monitor_pass(
 
     auto_act_result: dict[str, Any] | None = None
     completion = snapshot.get("completion_action")
+    action_ready_notify: dict[str, Any] | None = None
+    if str(snapshot.get("status") or "") == "action_ready" and prior_status != "action_ready":
+        try:
+            from scripts.ppe_notify_push import maybe_notify_action_ready
+
+            action_ready_notify = maybe_notify_action_ready(
+                repo,
+                phase=phase,
+                completion_action=str(completion or "DESKTOP_CONTINUE.cmd --no-pause"),
+                auto_dispatched=False,
+            )
+        except Exception as exc:
+            action_ready_notify = {"sent": False, "error": str(exc)}
     if auto_act and completion and snapshot.get("done"):
         try:
             from scripts.ppe_operator_dispatch import dispatch_direct_action
@@ -323,6 +403,18 @@ def run_monitor_pass(
                 str(completion),
                 force=True,
             )
+            if action_ready_notify is not None and auto_act_result.get("ok"):
+                try:
+                    from scripts.ppe_notify_push import maybe_notify_action_ready
+
+                    action_ready_notify = maybe_notify_action_ready(
+                        repo,
+                        phase=phase,
+                        completion_action=str(completion),
+                        auto_dispatched=True,
+                    )
+                except Exception:
+                    pass
         except Exception as exc:
             auto_act_result = {"ok": False, "error": str(exc)}
         state["last_auto_act"] = auto_act_result
@@ -339,6 +431,7 @@ def run_monitor_pass(
         **snapshot,
         "escalation": escalation,
         "auto_act": auto_act_result,
+        "action_ready_notify": action_ready_notify,
     }
 
 

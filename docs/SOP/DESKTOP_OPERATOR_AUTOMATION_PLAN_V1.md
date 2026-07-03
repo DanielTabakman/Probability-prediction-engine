@@ -132,10 +132,25 @@ Signals are scattered:
 | Capability | Token / flag | Default |
 |------------|--------------|---------|
 | Desktop auto-operator | `ppe_operator_desktop_auto.local.cmd` | off |
-| Auto dispatch execute | `PPE_AUTO_DISPATCH=1` | off |
+| Auto dispatch execute | `PPE_AUTO_DISPATCH=1` in env or `ppe_operator_desktop_auto.local.cmd` | off |
 | Monitor auto-act | `--auto-act` on monitor daemon | off |
 | Zero-click BUILD watcher | `setup_desktop_zero_click_build.cmd` | off |
 | Scheduled dispatch task | Step 6 installer | off |
+
+---
+
+## Level A → Level B auto-graduation
+
+When `ppe_operator_desktop_auto.local.cmd` is present with dispatch enabled:
+
+| Env | Default | Meaning |
+|-----|---------|---------|
+| `PPE_AUTO_GRADUATE_SUCCESSES` | `5` | Successful auto-dispatches before Level B |
+| `PPE_AUTO_GRADUATE_MIN_HOURS` | `48` | Minimum hours since first success |
+
+After thresholds met, the factory runs `setup_desktop_zero_click_build` + `start` (BUILD watcher + auto-operator + monitor daemon). Requires `agent login` for full Level B; setup still runs if agent CLI missing (continue-only daemons).
+
+State: `artifacts/control_plane/DESKTOP_AUTOMATION_GRADUATION.json` (gitignored).
 
 ---
 
@@ -151,12 +166,16 @@ Signals are scattered:
 ## Verification per step
 
 ```bat
-python -m pytest tests/test_ppe_burst_plan.py tests/test_ppe_operator_monitor_enrich.py -q
+python -m pytest tests/test_ppe_burst_plan.py tests/test_ppe_operator_monitor_enrich.py tests/test_ppe_in_flight_monitor.py -q
 python scripts/ppe_operator_status.py --write
 type artifacts\orchestrator\OPERATOR_STATUS.md
 ppe_in_flight_monitor.cmd --json
 python scripts/ppe_operator_dispatch.py --dry-run   REM after Step 2
 ```
+
+### Cursor `/loop` when `wait_for_vm`
+
+Operator thread (no `PPE_AUTO_DISPATCH`): loop `ppe_in_flight_monitor.cmd --json`, sleep `next_poll_s`, stop on `done` or `action_ready`. See `.cursor/rules/ppe-in-flight-monitor.mdc`.
 
 ---
 

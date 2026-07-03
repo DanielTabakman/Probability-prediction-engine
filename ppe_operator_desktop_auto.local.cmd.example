@@ -1,5 +1,11 @@
 @echo off
 REM OPT-IN ONLY — do not create on daily PC unless you know you want desktop auto.
 REM Default: automation runs on the VM only. See VM_AUTO.cmd on the VM.
+REM Copy to ppe_operator_desktop_auto.local.cmd to enable Level A on daily PC.
 
 set "PPE_DESKTOP_AUTO=1"
+set "PPE_AUTO_DISPATCH=1"
+REM PPE_AUTO_DISPATCH enables monitor daemon + auto DESKTOP_CONTINUE on action_ready.
+REM Auto-promote to Level B (zero-click BUILD+continue) after N successes + hours:
+set "PPE_AUTO_GRADUATE_SUCCESSES=5"
+set "PPE_AUTO_GRADUATE_MIN_HOURS=48"

@@ -102,6 +102,25 @@ def test_maybe_auto_operate_action_ready(monkeypatch, tmp_path: Path) -> None:
     assert out.get("auto_dispatch", {}).get("ok") is True
 
 
+def test_dispatch_allowed_from_opt_in_file(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("PPE_AUTO_DISPATCH", raising=False)
+    (tmp_path / "ppe_operator_desktop_auto.local.cmd").write_text(
+        '@echo off\nset "PPE_AUTO_DISPATCH=1"\n',
+        encoding="utf-8",
+    )
+    assert dispatch_allowed(tmp_path)
+
+
+def test_ensure_desktop_auto_dispatch_opt_in_patches(tmp_path: Path) -> None:
+    from scripts.ppe_operator_dispatch import ensure_desktop_auto_dispatch_opt_in
+
+    path = tmp_path / "ppe_operator_desktop_auto.local.cmd"
+    path.write_text('set "PPE_DESKTOP_AUTO=1"\n', encoding="utf-8")
+    result = ensure_desktop_auto_dispatch_opt_in(tmp_path)
+    assert result.get("action") == "patched"
+    assert "PPE_AUTO_DISPATCH=1" in path.read_text(encoding="utf-8")
+
+
 def test_parked_work_roundtrip(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     subprocess.run(["git", "init"], cwd=tmp_path, check=True, capture_output=True)

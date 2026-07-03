@@ -28,8 +28,49 @@ DIRECT_ACTION_COMMANDS: dict[str, str] = {
 }
 
 
-def dispatch_allowed() -> bool:
-    return os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower() in ("1", "true", "yes")
+def dispatch_allowed(repo: Path | None = None) -> bool:
+    env = os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower()
+    if env in ("1", "true", "yes"):
+        return True
+    if env in ("0", "false", "no", "off"):
+        return False
+    if repo is not None:
+        return _desktop_auto_dispatch_from_opt_in(repo)
+    return False
+
+
+def _desktop_auto_dispatch_from_opt_in(repo: Path) -> bool:
+    path = repo.resolve() / "ppe_operator_desktop_auto.local.cmd"
+    if not path.is_file():
+        return False
+    try:
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            upper = line.strip().upper().replace('"', "")
+            if upper.startswith("SET ") and "PPE_AUTO_DISPATCH=1" in upper.replace(" ", ""):
+                return True
+    except OSError:
+        pass
+    return False
+
+
+def ensure_desktop_auto_dispatch_opt_in(repo: Path) -> dict[str, Any]:
+    """Upgrade legacy desktop auto opt-in to include PPE_AUTO_DISPATCH=1."""
+    repo = repo.resolve()
+    path = repo / "ppe_operator_desktop_auto.local.cmd"
+    if not path.is_file():
+        return {"ok": False, "action": "missing_opt_in"}
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return {"ok": False, "action": "read_error", "error": str(exc)}
+    if "PPE_AUTO_DISPATCH=1" in text.upper().replace('"', ""):
+        return {"ok": True, "action": "already_set"}
+    addition = 'set "PPE_AUTO_DISPATCH=1"\r\n'
+    if text.endswith("\n"):
+        path.write_text(text + addition, encoding="utf-8")
+    else:
+        path.write_text(text + "\r\n" + addition, encoding="utf-8")
+    return {"ok": True, "action": "patched"}
 
 
 def automation_preflight_blocked(
@@ -142,7 +183,7 @@ def dispatch_direct_action(
         report["reason"] = "dry_run"
         return report
 
-    if not force and not dispatch_allowed():
+    if not force and not dispatch_allowed(repo):
         report["skipped"] = True
         report["reason"] = "PPE_AUTO_DISPATCH not set"
         return report
@@ -176,12 +217,41 @@ def dispatch_direct_action(
         verify = run_cmd("python scripts/ppe_branch_recovery.py --verify --json", repo)
         report["steps"].append(verify)
         report["ok"] = bool(verify.get("ok"))
+    if report.get("ok") and action and (
+        action.startswith("DESKTOP_CONTINUE") or action == "branch_recovery"
+    ):
+        try:
+            from scripts.ppe_desktop_automation_graduation import maybe_graduate_after_success
+
+            report["graduation"] = maybe_graduate_after_success(
+                repo,
+                event="auto_dispatch",
+                report=report,
+            )
+        except Exception as exc:
+            report["graduation"] = {"error": str(exc)}
     return report
 
 
 def maybe_auto_operate(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     """Opt-in automation: start monitor daemon on wait_for_vm; run completion when action_ready."""
-    if not dispatch_allowed():
+    try:
+        from scripts.ppe_desktop_automation_graduation import (
+            evaluate_graduation,
+            load_desktop_automation_env,
+        )
+
+        status["desktop_automation_env"] = load_desktop_automation_env(repo)
+        grad = evaluate_graduation(repo)
+        status["automation_graduation"] = grad
+        if grad.get("eligible") and dispatch_allowed(repo):
+            from scripts.ppe_desktop_automation_graduation import try_graduate_to_level_b
+
+            status["automation_graduation_attempt"] = try_graduate_to_level_b(repo)
+            status["automation_graduation"] = evaluate_graduation(repo)
+    except Exception:
+        pass
+    if not dispatch_allowed(repo):
         return status
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
@@ -199,12 +269,29 @@ def maybe_auto_operate(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
                 "reason": reason,
                 "preferred_action": preferred,
             }
-            if preferred and recovery_auto_dispatch_allowed(status) and dispatch_allowed():
+            if preferred and recovery_auto_dispatch_allowed(status) and dispatch_allowed(repo):
                 status["auto_dispatch"] = dispatch_direct_action(repo, preferred, force=True)
             return status
         if completion:
             report = dispatch_direct_action(repo, completion, force=True)
             status["auto_dispatch"] = report
+            if report.get("ok"):
+                try:
+                    from scripts.ppe_notify_push import maybe_notify_action_ready
+
+                    vm_phase = str(
+                        (status.get("vm_trust") or {}).get("vm_phase")
+                        or (status.get("in_flight_monitor") or {}).get("phase")
+                        or ""
+                    )
+                    status["action_ready_notify"] = maybe_notify_action_ready(
+                        repo,
+                        phase=vm_phase,
+                        completion_action=completion,
+                        auto_dispatched=True,
+                    )
+                except Exception:
+                    pass
             return status
 
     vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
