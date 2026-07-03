@@ -2,8 +2,18 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-03
+
+- `27b469ab` — control-plane: Level A desktop automation + auto-graduate to Level B (#1967) (`scripts/`)
+- `144dbbc4` — feat(control-plane): VM mirror robustness tier 1+2 consolidated (#1969) (`scripts/`)
+- `2014cd74` — control-plane: desktop automation steps 3-4 — monitor wiring + preflight gate (#1961) (`scripts/`)
+- `219a50f5` — control-plane: repo-state SSOT — mixed-plane recovery transaction (#1939) (`scripts/`)
+- `48b87195` — ops: context closeout ship (fix/coordination-audit-linux-path) (#1876) (`docs/SOP/`)
+
 ## 2026-07-02
 
+- `2f9af87f` — build(deps-dev): bump @types/react in /apps/msos-web (#1787) (`apps/msos-web/`)
+- `18695887` — Control-plane: dev changelog
 - `7c275e7b` — build(deps): update google-auth requirement from >=2.55.0 to >=2.55.1 (#1788)
 - `7deae1ed` — build(deps-dev): bump @types/node in /apps/msos-web (#1785) (`apps/msos-web/`)
 - `90a0430d` — build(deps): bump next from 15.5.19 to 16.2.10 in /apps/msos-web (#1783) (`apps/msos-web/`)
