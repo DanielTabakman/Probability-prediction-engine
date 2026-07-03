@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
   "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
-  "status": "READY",
+  "status": "RUNNING",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses Chapter closeout MSOS-VisParityV1-Closeout-Slice009; queue item marked DONE. auto-repair: chapter closeout reverted \u2014 evidence/slices still pending Chapter closeout PPE-CryptoT1-Closeout-Slice004 via promotion recovery. auto-repair: chapter closeout reverted \u2014 evidence/slices still pending",
   "workerMode": "local-agent"
 }
