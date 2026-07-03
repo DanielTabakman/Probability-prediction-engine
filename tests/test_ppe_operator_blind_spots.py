@@ -81,6 +81,7 @@ def test_assess_blind_spots_mirror_stale(tmp_path, monkeypatch) -> None:
             "alert": True,
             "agent_note": "VM mirror stale (45m old)",
             "stale": True,
+            "untrusted": True,
             "populated": True,
         },
     }

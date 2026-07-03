@@ -201,17 +201,17 @@ def collect_monitor_snapshot(
     refresh = refresh_vm_mirror_from_git(repo, force_fetch=force_fetch)
     mirror = load_vm_phase_mirror(repo)
     mirror_health = assess_mirror_health(mirror, local_verdict=local_verdict)
-    mirror_stale = bool(mirror_health.get("stale"))
+    mirror_untrusted = bool(mirror_health.get("untrusted"))
 
     vm_brief = None
-    if mirror_stale or not str(mirror_health.get("phase") or "").strip():
+    if mirror_untrusted or not str(mirror_health.get("phase") or "").strip():
         vm_brief = fetch_vm_brief(repo, use_cache=False)
 
     trust = resolve_vm_trust(
         local_verdict=local_verdict,
         vm_brief=vm_brief,
         vm_mirror=mirror,
-        mirror_stale=mirror_stale,
+        mirror_stale=mirror_untrusted,
     )
     phase = str(trust.get("vm_phase") or mirror_health.get("phase") or "")
     wait_for_vm = bool(trust.get("wait_for_vm"))
@@ -224,7 +224,7 @@ def collect_monitor_snapshot(
     next_poll_s = compute_next_poll_seconds(
         phase=phase,
         elapsed_s=elapsed_s,
-        mirror_stale=mirror_stale,
+        mirror_stale=mirror_untrusted or bool(mirror_health.get("heartbeat_overdue")),
         wait_for_vm=wait_for_vm,
     )
     stuck = bool(
@@ -241,8 +241,10 @@ def collect_monitor_snapshot(
         message = (
             f"Watching `{phase}` — {mins}m elapsed; next check in {max(1, next_poll_s // 60)}m."
         )
-        if mirror_stale:
-            message += " Mirror stale — refreshed from git; confirm phase."
+        if mirror_untrusted:
+            message += " Mirror untrusted — refreshed from git; confirm phase."
+        elif mirror_health.get("heartbeat_overdue"):
+            message += " Mirror heartbeat overdue — git pull or wait for VM publish."
     elif completion:
         status = "action_ready"
         message = f"Phase cleared (`{phase}`) — run {completion}."
@@ -261,7 +263,9 @@ def collect_monitor_snapshot(
         "local_verdict": local_verdict or None,
         "source": trust.get("source"),
         "wait_for_vm": wait_for_vm,
-        "mirror_stale": mirror_stale,
+        "mirror_stale": mirror_untrusted,
+        "mirror_untrusted": mirror_untrusted,
+        "mirror_heartbeat_overdue": bool(mirror_health.get("heartbeat_overdue")),
         "mirror_age_s": mirror_age_seconds(mirror),
         "mirror_refresh": refresh,
         "elapsed_in_phase_s": elapsed_s,

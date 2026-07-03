@@ -9,6 +9,15 @@ from pathlib import Path
 
 def prepare_desktop_handoff(repo: Path, *, apply_repair: bool = True) -> dict:
     repo = repo.resolve()
+    out: dict = {"fixes": [], "remaining": []}
+
+    try:
+        from scripts.ppe_operator_vm_mirror_refresh import sync_desktop_mirror_from_main
+
+        out["mirrorSync"] = sync_desktop_mirror_from_main(repo)
+    except Exception as exc:
+        out["mirrorSync"] = {"ok": False, "error": str(exc)}
+
     from scripts.ppe_chapter_coordination import (
         audit_chapter,
         audit_closeout_spine,
@@ -28,7 +37,7 @@ def prepare_desktop_handoff(repo: Path, *, apply_repair: bool = True) -> dict:
 
     manifest = load_manifest(repo)
     active_plan = str(manifest.get("phasePlanPath") or "").replace("\\", "/").strip()
-    out: dict = {"activePlanPath": active_plan or None, "fixes": [], "remaining": []}
+    out["activePlanPath"] = active_plan or None
 
     if apply_repair:
         if active_plan:
