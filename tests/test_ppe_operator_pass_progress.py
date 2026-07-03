@@ -8,13 +8,16 @@ from pathlib import Path
 
 from scripts.ppe_operator_pass_progress import (
     OPERATOR_PASSES_FILE,
+    _budget_for_phase,
     assess_pass_progress,
     assess_wait_program,
+    backfill_operator_passes,
     classify_wait_health,
     collect_evidence_fingerprint,
     format_pass_lines,
     read_operator_passes,
     record_operator_pass,
+    scan_operator_pass_friction,
 )
 from scripts.ppe_operator_status import write_status_report
 from scripts.workflow_metrics_cli import _append_jsonl, _metrics_dir
@@ -96,9 +99,31 @@ def test_waiting_is_not_progress(tmp_path: Path) -> None:
     assert wait["kind"] == "vm_in_flight"
     outcome = assess_pass_progress(tmp_path, status)
     assert outcome["had_progress"] is False
+    assert outcome["progress_class"] == "low"
     lines = format_pass_lines(outcome)
-    assert any("Progress:" in ln and "none" in ln.lower() for ln in lines)
+    assert any("Progress:" in ln and "low" in ln.lower() for ln in lines)
     assert any("Waiting:" in ln for ln in lines)
+
+
+def test_format_pass_lines_includes_monitor(tmp_path: Path) -> None:
+    outcome = {
+        "had_progress": False,
+        "progress_summary": "none",
+        "consecutive_no_progress": 1,
+        "wait_health": "quiet",
+        "wait": {"waiting_for": "VM wait"},
+        "wait_elapsed_s": 600,
+        "wait_expected_s": 3600,
+        "monitor": {
+            "phase": "FINISH_IN_FLIGHT",
+            "elapsed_in_phase_m": 10,
+            "next_poll_m": 30,
+            "mirror_stale": True,
+        },
+    }
+    lines = format_pass_lines(outcome)
+    assert any("**Monitor:**" in ln for ln in lines)
+    assert any("mirror stale" in ln for ln in lines)
 
 
 def test_stuck_when_over_budget_no_evidence(tmp_path: Path) -> None:
@@ -142,3 +167,72 @@ def test_dedupe_same_fingerprint_within_window(tmp_path: Path) -> None:
     record_operator_pass(tmp_path, _base_status())
     rows = read_operator_passes(tmp_path)
     assert len(rows) == 1
+
+
+def test_low_progress_when_vm_in_flight(tmp_path: Path) -> None:
+    status = _base_status(
+        vm_trust={"wait_for_vm": True, "vm_phase": "FINISH_IN_FLIGHT"},
+    )
+    (tmp_path / "docs/SOP").mkdir(parents=True)
+    (tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json").write_text(
+        json.dumps({"phase": "FINISH_IN_FLIGHT", "as_of": _utc_now()}) + "\n",
+        encoding="utf-8",
+    )
+    outcome = assess_pass_progress(tmp_path, status)
+    assert outcome["progress_class"] == "low"
+    assert outcome["had_progress"] is False
+    lines = format_pass_lines(outcome)
+    assert any("low" in ln.lower() for ln in lines)
+
+
+def test_backfill_from_context_windows(tmp_path: Path) -> None:
+    from scripts.workflow_metrics_cli import CONTEXT_WINDOWS_FILE
+
+    _append_jsonl(
+        _metrics_dir(tmp_path) / CONTEXT_WINDOWS_FILE,
+        {
+            "closed_at": "2026-06-01T12:00:00Z",
+            "slices_closed_in_thread": 0,
+            "operator_verdict": "RUN_LOCAL",
+            "chapter_id": "test",
+        },
+    )
+    report = backfill_operator_passes(tmp_path, limit=10)
+    assert report["added"] == 1
+    rows = read_operator_passes(tmp_path)
+    assert rows[0].get("backfill") is True
+
+
+def test_scan_operator_pass_friction(tmp_path: Path) -> None:
+    for i in range(8):
+        _append_jsonl(
+            _metrics_dir(tmp_path) / OPERATOR_PASSES_FILE,
+            {
+                "pass_at": f"2026-06-0{i+1}T12:00:00Z",
+                "had_progress": False,
+                "consecutive_no_progress": i + 1,
+            },
+        )
+    latest = tmp_path / "artifacts/control_plane/OPERATOR_PASS_LATEST.json"
+    latest.parent.mkdir(parents=True, exist_ok=True)
+    latest.write_text(
+        json.dumps({"consecutive_no_progress": 8, "wait_health": "quiet"}) + "\n",
+        encoding="utf-8",
+    )
+    candidates, signals = scan_operator_pass_friction(tmp_path)
+    assert signals.get("operator_no_progress_streak", 0) >= 7
+    assert any(c.id == "operator-no-progress-streak" for c in candidates)
+
+
+def test_median_budget_from_slices(tmp_path: Path) -> None:
+    for i, hours in enumerate((1, 2, 3)):
+        _append_jsonl(
+            _metrics_dir(tmp_path) / "slices.jsonl",
+            {
+                "slice_id": f"Test-Closeout-Slice00{i}",
+                "started_at": f"2026-06-0{i+1}T10:00:00Z",
+                "completed_at": f"2026-06-0{i+1}T{10+hours}:00:00Z",
+            },
+        )
+    budget = _budget_for_phase(tmp_path, "FINISH_IN_FLIGHT")
+    assert budget >= 3600

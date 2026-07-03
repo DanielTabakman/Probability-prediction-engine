@@ -384,7 +384,21 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     except Exception:
         pass
     status = collect_operator_status(repo)
-    return enrich_operator_status_with_vm_trust(repo, status)
+    status = enrich_operator_status_with_vm_trust(repo, status)
+    status = enrich_operator_status_with_monitor(repo, status)
+    try:
+        from scripts.ppe_burst_plan import refresh_burst_plan
+
+        status["burst_plan"] = refresh_burst_plan(repo, status)
+    except Exception:
+        pass
+    try:
+        from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
+
+        enrich_status_with_pass_progress(repo, status, record=True)
+    except Exception:
+        pass
+    return status
 
 
 def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
@@ -483,20 +497,21 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
         from scripts.ppe_operator_vm_ssh import fetch_vm_brief, resolve_vm_trust
 
         vm_brief = None
-        mirror_stale = bool(mirror_health and mirror_health.get("stale"))
-        need_live_vm = mirror_stale or not vm_mirror or not str(vm_mirror.get("phase") or "").strip()
+        mirror_untrusted = bool(mirror_health and mirror_health.get("untrusted"))
+        need_live_vm = mirror_untrusted or not vm_mirror or not str(vm_mirror.get("phase") or "").strip()
         if need_live_vm:
-            vm_brief = fetch_vm_brief(repo, use_cache=not mirror_stale)
+            vm_brief = fetch_vm_brief(repo, use_cache=not mirror_untrusted)
         trust = resolve_vm_trust(
             local_verdict=str(status.get("verdict") or ""),
             vm_brief=vm_brief,
             vm_mirror=vm_mirror,
-            mirror_stale=mirror_stale,
+            mirror_stale=mirror_untrusted,
         )
         if mirror_health and mirror_health.get("alert"):
             trust = {
                 **trust,
-                "mirror_stale": True,
+                "mirror_stale": mirror_untrusted,
+                "mirror_heartbeat_overdue": bool(mirror_health.get("heartbeat_overdue")),
                 "agent_note": mirror_health.get("agent_note") or trust.get("agent_note"),
             }
         status["vm_trust"] = trust
@@ -549,6 +564,66 @@ def enrich_operator_status_with_vm_trust(repo: Path, status: dict[str, Any]) -> 
         status["operator_health_line"] = blind.get("operator_health_line")
     except Exception:
         pass
+    return status
+
+
+def enrich_operator_status_with_monitor(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
+    """Desktop: promote in-flight monitor transitions (action_ready) into operator status."""
+    try:
+        from scripts.ppe_loop_host_guard import loop_host_start_allowed
+
+        if bool(loop_host_start_allowed()[0]):
+            return status
+    except Exception:
+        pass
+
+    try:
+        from scripts.ppe_in_flight_monitor import collect_monitor_snapshot
+
+        snapshot = collect_monitor_snapshot(
+            repo,
+            local_verdict=str(status.get("verdict") or ""),
+        )
+    except Exception:
+        return status
+
+    monitor = {
+        "phase": snapshot.get("phase"),
+        "status": snapshot.get("status"),
+        "done": snapshot.get("done"),
+        "wait_for_vm": snapshot.get("wait_for_vm"),
+        "completion_action": snapshot.get("completion_action"),
+        "stuck": snapshot.get("stuck"),
+        "next_poll_s": snapshot.get("next_poll_s"),
+        "message": snapshot.get("message"),
+    }
+    status["in_flight_monitor"] = monitor
+
+    if str(monitor.get("status") or "") != "action_ready":
+        return status
+    completion = str(monitor.get("completion_action") or "").strip()
+    if not completion:
+        return status
+
+    status["action_ready"] = True
+    status["completion_action"] = completion
+
+    if status.get("branch_preflight", {}).get("blocks_relay"):
+        status.setdefault(
+            "preflight_warnings",
+            [],
+        ).append(
+            "VM phase cleared (action_ready) but branch preflight blocks relay — fix branch/tree before continue.",
+        )
+        return status
+
+    status["commands"] = [
+        f"{completion} (monitor: phase cleared — execute now)",
+        "Then: prepare_operator_status refresh or ask what's next? in operator thread",
+    ]
+    vm_trust = status.get("vm_trust")
+    if isinstance(vm_trust, dict):
+        status["vm_trust"] = {**vm_trust, "wait_for_vm": False, "agent_note": monitor.get("message")}
     return status
 
 
@@ -722,6 +797,18 @@ def _format_human(
         if note:
             lines.append(f"  → {note}")
 
+    if status.get("action_ready"):
+        completion = str(status.get("completion_action") or "DESKTOP_CONTINUE.cmd --no-pause")
+        lines.append("")
+        lines.append(f"**Action ready:** VM phase cleared — run `{completion}` (not wait).")
+
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else None
+    if monitor and monitor.get("status") == "watching" and not status.get("action_ready"):
+        elapsed = monitor.get("message")
+        if elapsed:
+            lines.append("")
+            lines.append(f"**VM monitor:** {elapsed}")
+
     branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
     if branch_pf and branch_pf.get("blocks_relay"):
         lines.extend(
@@ -866,9 +953,10 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
     except Exception:
         pass
     try:
-        from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
+        if not status.get("operator_pass_lines"):
+            from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
 
-        enrich_status_with_pass_progress(repo, status, record=True)
+            enrich_status_with_pass_progress(repo, status, record=True)
     except Exception:
         pass
     body = f"""# Operator status

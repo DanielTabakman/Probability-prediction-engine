@@ -170,6 +170,7 @@ _LOOP_HOST_TRANSIENT_PREFIXES: tuple[str, ...] = (
 )
 
 VM_MIRROR_PUBLISH_PREFIX = "ops/vm-mirror-"
+VM_OPERATOR_PHASE_REL = "docs/SOP/VM_OPERATOR_PHASE.json"
 
 
 def _loop_host_transient_branch(current: str, target: str) -> bool:
@@ -421,6 +422,16 @@ def check_and_nudge_merges(repo: Path) -> dict[str, Any]:
     if not prs:
         return {"action": "check_merge", "ok": True, "merged": [], "pending": [], "blocked": []}
 
+    prs = sorted(
+        prs,
+        key=lambda item: (
+            0
+            if isinstance(item, dict)
+            and str(item.get("headRefName") or "").startswith(VM_MIRROR_PUBLISH_PREFIX)
+            else 1
+        ),
+    )
+
     merged: list[dict[str, Any]] = []
     pending: list[dict[str, Any]] = []
     blocked: list[dict[str, Any]] = []
@@ -628,6 +639,85 @@ def publish_ahead(repo: Path) -> dict[str, Any]:
     }
 
 
+def _mirror_differs_from_origin_main(repo: Path) -> bool:
+    _git(repo, "fetch", "origin", "main", "--quiet")
+    proc = _git(repo, "diff", "--name-only", f"origin/main...HEAD", "--", VM_OPERATOR_PHASE_REL)
+    if proc.returncode == 0 and (proc.stdout or "").strip():
+        return True
+    proc2 = _git(repo, "diff", "--name-only", "origin/main", "--", VM_OPERATOR_PHASE_REL)
+    return bool((proc2.stdout or "").strip())
+
+
+def _publish_vm_mirror_worktree(repo: Path, *, phase: str) -> dict[str, Any]:
+    """Publish mirror JSON from working tree without checking out main (relay branch safe)."""
+    import shutil
+    import tempfile
+
+    repo = repo.resolve()
+    mirror_src = repo / VM_OPERATOR_PHASE_REL
+    if not mirror_src.is_file():
+        return {"action": "vm_mirror_worktree", "skipped": True, "reason": "no_mirror_file"}
+
+    _git(repo, "fetch", "origin", "main", "--quiet")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    publish_branch = f"{VM_MIRROR_PUBLISH_PREFIX}{stamp}-{_short_head(repo)}"
+    phase_label = (phase or "unknown").replace("_", " ")
+    wt_root = Path(tempfile.mkdtemp(prefix="ppe-vm-mirror-"))
+    try:
+        add = _git(repo, "worktree", "add", "-B", publish_branch, str(wt_root), "origin/main")
+        if add.returncode != 0:
+            return {
+                "action": "vm_mirror_worktree",
+                "ok": False,
+                "error": (add.stderr or add.stdout or "worktree add failed").strip(),
+            }
+        mirror_dst = wt_root / VM_OPERATOR_PHASE_REL
+        mirror_dst.parent.mkdir(parents=True, exist_ok=True)
+        mirror_dst.write_text(mirror_src.read_text(encoding="utf-8"), encoding="utf-8")
+        stage = _git(wt_root, "add", "--", VM_OPERATOR_PHASE_REL)
+        if stage.returncode != 0:
+            return {"action": "vm_mirror_worktree", "ok": False, "error": "git add failed"}
+        commit = _git(wt_root, "commit", "-m", f"ops: vm phase mirror {phase_label}")
+        if commit.returncode != 0:
+            err = (commit.stderr or commit.stdout or "").strip()
+            if "nothing to commit" in err.lower():
+                return {"action": "vm_mirror_worktree", "skipped": True, "reason": "nothing_to_commit"}
+            return {"action": "vm_mirror_worktree", "ok": False, "error": err}
+        push = _git(wt_root, "push", "-u", "origin", publish_branch)
+        if push.returncode != 0:
+            return {
+                "action": "vm_mirror_worktree",
+                "ok": False,
+                "branch": publish_branch,
+                "error": (push.stderr or push.stdout or "git push failed").strip(),
+            }
+    finally:
+        _git(repo, "worktree", "remove", "--force", str(wt_root))
+        shutil.rmtree(wt_root, ignore_errors=True)
+
+    pr_url = None
+    if _git_sync_cfg(repo).get("openPrOnPush", True) is not False:
+        pr_url = _open_pr(
+            repo,
+            head=publish_branch,
+            title=f"ops: vm phase mirror {phase_label}",
+            body=(
+                "Auto-published VM phase mirror (`docs/SOP/VM_OPERATOR_PHASE.json`) from loop host "
+                "(worktree off main).\n\nMirror-only — safe to automerge when checks pass."
+            ),
+            labels=["automerge"],
+        )
+    return {
+        "action": "vm_mirror_worktree",
+        "ok": True,
+        "branch": publish_branch,
+        "pushed_ref": publish_branch,
+        "pr_url": pr_url,
+        "mirror_only": True,
+        "off_main": True,
+    }
+
+
 def publish_vm_mirror_ahead(repo: Path, *, phase: str = "unknown") -> dict[str, Any]:
     """Push VM phase mirror commit from main; open automerge PR for desktop git pull."""
     repo = repo.resolve()
@@ -635,55 +725,58 @@ def publish_vm_mirror_ahead(repo: Path, *, phase: str = "unknown") -> dict[str, 
         return {"action": "vm_mirror_push", "skipped": True, "reason": "disabled"}
 
     current = _current_branch(repo)
-    if current != "main":
-        return {"action": "vm_mirror_push", "skipped": True, "reason": f"not on main ({current!r})"}
+    if current == "main":
+        ahead = _ahead_count(repo, branch="main")
+        if ahead > 0:
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+            publish_branch = f"{VM_MIRROR_PUBLISH_PREFIX}{stamp}-{_short_head(repo)}"
+            push = _git(repo, "push", "origin", f"HEAD:refs/heads/{publish_branch}")
+            if push.returncode == 124:
+                return {
+                    "action": "vm_mirror_push",
+                    "ok": False,
+                    "branch": publish_branch,
+                    "error": (push.stderr or "git push timed out").strip(),
+                    "timed_out": True,
+                }
+            if push.returncode != 0:
+                return {
+                    "action": "vm_mirror_push",
+                    "ok": False,
+                    "branch": publish_branch,
+                    "error": (push.stderr or push.stdout or "git push failed").strip(),
+                }
 
-    ahead = _ahead_count(repo, branch="main")
-    if ahead == 0:
+            pr_url = None
+            if _git_sync_cfg(repo).get("openPrOnPush", True) is not False:
+                phase_label = (phase or "unknown").replace("_", " ")
+                pr_url = _open_pr(
+                    repo,
+                    head=publish_branch,
+                    title=f"ops: vm phase mirror {phase_label}",
+                    body=(
+                        "Auto-published VM phase mirror (`docs/SOP/VM_OPERATOR_PHASE.json`) from loop host.\n\n"
+                        "Mirror-only — safe to automerge when checks pass."
+                    ),
+                    labels=["automerge"],
+                )
+
+            return {
+                "action": "vm_mirror_push",
+                "ok": True,
+                "branch": publish_branch,
+                "pushed_ref": publish_branch,
+                "pr_url": pr_url,
+                "mirror_only": True,
+                "stdout": (push.stdout or "").strip(),
+            }
+        if _mirror_differs_from_origin_main(repo) or (repo / VM_OPERATOR_PHASE_REL).is_file():
+            return _publish_vm_mirror_worktree(repo, phase=phase)
         return {"action": "vm_mirror_push", "skipped": True, "reason": "nothing ahead"}
 
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    publish_branch = f"{VM_MIRROR_PUBLISH_PREFIX}{stamp}-{_short_head(repo)}"
-    push = _git(repo, "push", "origin", f"HEAD:refs/heads/{publish_branch}")
-    if push.returncode == 124:
-        return {
-            "action": "vm_mirror_push",
-            "ok": False,
-            "branch": publish_branch,
-            "error": (push.stderr or "git push timed out").strip(),
-            "timed_out": True,
-        }
-    if push.returncode != 0:
-        return {
-            "action": "vm_mirror_push",
-            "ok": False,
-            "branch": publish_branch,
-            "error": (push.stderr or push.stdout or "git push failed").strip(),
-        }
-
-    pr_url = None
-    if _git_sync_cfg(repo).get("openPrOnPush", True) is not False:
-        phase_label = (phase or "unknown").replace("_", " ")
-        pr_url = _open_pr(
-            repo,
-            head=publish_branch,
-            title=f"ops: vm phase mirror {phase_label}",
-            body=(
-                "Auto-published VM phase mirror (`docs/SOP/VM_OPERATOR_PHASE.json`) from loop host.\n\n"
-                "Mirror-only — safe to automerge when checks pass."
-            ),
-            labels=["automerge"],
-        )
-
-    return {
-        "action": "vm_mirror_push",
-        "ok": True,
-        "branch": publish_branch,
-        "pushed_ref": publish_branch,
-        "pr_url": pr_url,
-        "mirror_only": True,
-        "stdout": (push.stdout or "").strip(),
-    }
+    if (repo / VM_OPERATOR_PHASE_REL).is_file():
+        return _publish_vm_mirror_worktree(repo, phase=phase)
+    return {"action": "vm_mirror_push", "skipped": True, "reason": f"not on main ({current!r})"}
 
 
 RUNTIME_SOP_EXACT: frozenset[str] = frozenset(

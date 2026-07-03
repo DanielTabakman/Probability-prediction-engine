@@ -138,6 +138,20 @@ def test_compute_burst_plan_vm_in_flight_waits(tmp_path) -> None:
     assert "ppe_in_flight_monitor" in plan["prompt"]
 
 
+def test_compute_burst_plan_action_ready_overrides_wait(tmp_path) -> None:
+    status = {
+        "verdict": "RUN_LOCAL",
+        "phase_plan_path": None,
+        "guard": {},
+        "vm_trust": {"wait_for_vm": True, "vm_phase": "FINISH_IN_FLIGHT"},
+        "action_ready": True,
+        "completion_action": "DESKTOP_CONTINUE.cmd --no-pause",
+    }
+    plan = compute_burst_plan(tmp_path, status)
+    assert plan["direct_action"] == "DESKTOP_CONTINUE.cmd --no-pause"
+    assert plan["burst_allowed"] is False
+
+
 def test_compute_burst_plan_lease_conflict_blocks(tmp_path, monkeypatch) -> None:
     from datetime import datetime, timedelta, timezone
 
@@ -177,7 +191,14 @@ def test_prepare_operator_status_applies_env_before_collect(tmp_path, monkeypatc
     fake_status = {"verdict": VERDICT_IDE_BUILD, "guard": {"reason": "PRODUCT_BLOCKED"}}
     with patch("scripts.ppe_operator_config.apply_operator_env") as mock_env:
         with patch("scripts.ppe_operator_status.collect_operator_status", return_value=fake_status) as mock_collect:
-            out = prepare_operator_status(tmp_path)
+            with patch("scripts.ppe_operator_status.enrich_operator_status_with_vm_trust", side_effect=lambda _r, s: s):
+                with patch("scripts.ppe_operator_status.enrich_operator_status_with_monitor", side_effect=lambda _r, s: s):
+                    with patch("scripts.ppe_burst_plan.refresh_burst_plan", return_value={}):
+                        with patch(
+                            "scripts.ppe_operator_pass_progress.enrich_status_with_pass_progress",
+                            return_value={},
+                        ):
+                            out = prepare_operator_status(tmp_path)
     mock_env.assert_called_once_with(tmp_path)
     mock_collect.assert_called_once_with(tmp_path)
     assert out["verdict"] == VERDICT_IDE_BUILD
