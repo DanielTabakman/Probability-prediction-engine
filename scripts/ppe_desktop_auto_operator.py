@@ -16,7 +16,6 @@ from scripts.ppe_operator_vm_ssh import (
     fetch_vm_brief,
     ssh_vm,
     vm_advance_command,
-    vm_finish_command,
 )
 
 STATE_REL = "artifacts/orchestrator/DESKTOP_AUTO_OPERATOR.json"
@@ -72,6 +71,10 @@ def desktop_auto_enabled(repo: Path) -> bool:
     return detect_role(repo) == "daily_driver"
 
 
+def dispatch_allowed_env() -> bool:
+    return os.environ.get("PPE_AUTO_DISPATCH", "").strip().lower() in ("1", "true", "yes")
+
+
 def _ssh_vm(command: str) -> dict[str, Any]:
     return ssh_vm(command)
 
@@ -104,6 +107,37 @@ def auto_pass(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
         "actions": actions,
         "dry_run": dry_run,
     }
+
+    operator_status: dict[str, Any] = {}
+    if not dry_run:
+        try:
+            from scripts.ppe_operator_status import prepare_operator_status
+
+            operator_status = prepare_operator_status(repo)
+            from scripts.ppe_operator_dispatch import (
+                automation_preflight_blocked,
+                dispatch_direct_action,
+                recovery_auto_dispatch_allowed,
+            )
+
+            blocked, reason, preferred = automation_preflight_blocked(operator_status)
+            if blocked:
+                result["preflight_blocked"] = {
+                    "reason": reason,
+                    "preferred_action": preferred,
+                }
+                actions.append("skip_preflight_blocked")
+                if (
+                    preferred
+                    and dispatch_allowed_env()
+                    and recovery_auto_dispatch_allowed(operator_status)
+                ):
+                    result["auto_dispatch"] = dispatch_direct_action(repo, preferred, force=True)
+                    actions.append(f"auto_dispatch_{preferred}")
+                result["skipped"] = True
+                return result
+        except Exception as exc:
+            result["preflight_error"] = str(exc)
 
     if verdict == "IDE_BUILD" and phase in ("AWAITING_BUILD", "DEGRADED", "STACK_DOWN"):
         from scripts.ppe_autobuilder import action_handoff
@@ -143,12 +177,37 @@ def auto_pass(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
         if vm_phase in ("FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"):
             actions.append("skip_vm_finish_in_flight")
             result["vm_trust"] = {"wait_for_vm": True, "vm_phase": vm_phase}
+            if dispatch_allowed_env():
+                try:
+                    from scripts.ppe_in_flight_monitor import maybe_start_monitor_daemon
+
+                    daemon = maybe_start_monitor_daemon(repo, auto_act=True)
+                    actions.append("monitor_daemon")
+                    result["monitor_daemon"] = daemon
+                except Exception as exc:
+                    result["monitor_daemon"] = {"started": False, "error": str(exc)}
         else:
-            ssh = _ssh_vm(vm_finish_command())
-            if ssh.get("ok"):
-                actions.append("vm_finish_ide_build")
-                append_log(repo, "auto vm finish_ide_build via ssh")
-            result["vm_ssh"] = ssh
+            if dry_run:
+                actions.append("would_desktop_continue")
+            else:
+                continue_cmd = repo / "DESKTOP_CONTINUE.cmd"
+                proc = subprocess.run(
+                    [str(continue_cmd), "--no-pause"],
+                    cwd=repo,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                if proc.returncode == 0:
+                    actions.append("desktop_continue")
+                    append_log(repo, "auto DESKTOP_CONTINUE.cmd --no-pause")
+                else:
+                    actions.append("desktop_continue_failed")
+                result["desktop_continue"] = {
+                    "ok": proc.returncode == 0,
+                    "exit_code": proc.returncode,
+                    "stderr_tail": (proc.stderr or "")[-200:],
+                }
 
     if not actions:
         result["skipped"] = True
