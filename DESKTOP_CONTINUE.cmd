@@ -28,11 +28,10 @@ if not "%PREP_RC%"=="0" (
   goto done
 )
 
-echo.
-echo [DESKTOP_CONTINUE] step 1/4 — git pull...
-git pull origin main
+echo [DESKTOP_CONTINUE] step 1/4 — mirror sync (merge mirror PRs + pull main)...
+python "%CD%\scripts\ppe_operator_vm_mirror_refresh.py" --sync-desktop --repo-root "%CD%"
 if errorlevel 1 (
-  echo git pull failed.
+  echo mirror sync failed — fix git/gh auth or dirty tree, then retry.
   goto done
 )
 

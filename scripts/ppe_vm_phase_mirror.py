@@ -24,6 +24,7 @@ IN_FLIGHT_APPROACHING_SECONDS_BY_PHASE: dict[str, int] = {
     "FINISH_IN_FLIGHT": 3600,  # 60m
 }
 MIRROR_PUBLISH_COOLDOWN_SECONDS = 90
+MIRROR_HEARTBEAT_PUBLISH_SECONDS = 600
 
 
 def stuck_threshold_seconds(phase: str) -> float:
@@ -125,6 +126,32 @@ def _mirror_fingerprint(payload: dict[str, Any]) -> str:
     )
 
 
+def _heartbeat_publish_due(
+    payload: dict[str, Any],
+    prior: dict[str, Any],
+    *,
+    fingerprint: str,
+) -> bool:
+    phase = str(payload.get("phase") or "")
+    if phase not in IN_FLIGHT_PHASES:
+        return False
+    last_ok = prior.get("last_publish_ok")
+    if last_ok is False:
+        return True
+    last_at = _parse_utc(str(prior.get("last_publish_at") or ""))
+    if last_at is None:
+        return True
+    elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
+    if elapsed >= MIRROR_HEARTBEAT_PUBLISH_SECONDS:
+        return True
+    if str(prior.get("fingerprint") or "") != fingerprint:
+        return True
+    mirror_as_of = _parse_utc(str(payload.get("as_of") or ""))
+    if mirror_as_of and last_at and mirror_as_of > last_at:
+        return True
+    return False
+
+
 def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[str, Any]:
     if not _is_loop_host(repo):
         return {"skipped": True, "reason": "not_loop_host"}
@@ -138,19 +165,31 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
         except (OSError, json.JSONDecodeError):
             prior = {}
 
-    if fp == str(prior.get("fingerprint") or ""):
+    heartbeat_due = _heartbeat_publish_due(payload, prior, fingerprint=fp)
+    if heartbeat_due:
+        payload = {**payload, "as_of": _utc_now()}
+    if fp == str(prior.get("fingerprint") or "") and not heartbeat_due:
         last_at = _parse_utc(str(prior.get("last_publish_at") or ""))
-        if last_at is not None:
+        if last_at is not None and prior.get("last_publish_ok") is not False:
             elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
             if elapsed < MIRROR_PUBLISH_COOLDOWN_SECONDS:
                 return {"skipped": True, "reason": "unchanged", "fingerprint": fp}
 
     rel = VM_OPERATOR_PHASE_REL.replace("\\", "/")
+    mirror_file = mirror_path(repo)
+    if heartbeat_due and mirror_file.is_file():
+        mirror_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
     diff = _git(repo, "diff", "--name-only", "--", rel)
     untracked = _git(repo, "ls-files", "--others", "--exclude-standard", "--", rel)
     has_change = bool((diff.stdout or "").strip()) or bool((untracked.stdout or "").strip())
     if not has_change:
-        return {"skipped": True, "reason": "no_git_diff", "fingerprint": fp}
+        if heartbeat_due:
+            mirror_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+            diff = _git(repo, "diff", "--name-only", "--", rel)
+            has_change = bool((diff.stdout or "").strip())
+        if not has_change:
+            return {"skipped": True, "reason": "no_git_diff", "fingerprint": fp, "heartbeat_due": heartbeat_due}
 
     stage = _git(repo, "add", "--", rel)
     if stage.returncode != 0:
@@ -165,26 +204,48 @@ def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[
         return {"ok": False, "error": err}
 
     publish: dict[str, Any] = {"skipped": True, "reason": "publish_disabled"}
+    publish_ok = False
     try:
         from scripts.ppe_operator_git_sync import publish_vm_mirror_ahead
 
         publish = publish_vm_mirror_ahead(repo, phase=phase)
+        publish_ok = bool(publish.get("ok"))
         pr_url = str(publish.get("pr_url") or "").strip()
-        if publish.get("ok") and pr_url:
+        if publish_ok and pr_url:
             _maybe_notify_mirror_pr_opened(repo, phase=phase, pr_url=pr_url)
+        if publish_ok:
+            try:
+                from scripts.ppe_operator_git_sync import close_conflicting_mirror_prs
+
+                close_conflicting_mirror_prs(repo)
+            except Exception:
+                pass
     except Exception as exc:
         publish = {"ok": False, "error": str(exc)}
 
     state_path.parent.mkdir(parents=True, exist_ok=True)
     state_path.write_text(
         json.dumps(
-            {"fingerprint": fp, "last_publish_at": _utc_now(), "phase": phase},
+            {
+                "fingerprint": fp,
+                "last_publish_at": _utc_now(),
+                "last_publish_ok": publish_ok,
+                "phase": phase,
+                "heartbeat_due": heartbeat_due,
+                "publish": publish,
+            },
             indent=2,
         )
         + "\n",
         encoding="utf-8",
     )
-    return {"ok": True, "fingerprint": fp, "commit": True, "publish": publish}
+    return {
+        "ok": publish_ok or bool(commit.returncode == 0),
+        "fingerprint": fp,
+        "commit": True,
+        "publish": publish,
+        "heartbeat_due": heartbeat_due,
+    }
 
 
 def _maybe_notify_mirror_pr_opened(repo: Path, *, phase: str, pr_url: str) -> bool:

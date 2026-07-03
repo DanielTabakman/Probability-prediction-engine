@@ -10,8 +10,10 @@ from scripts.ppe_operator_branch_preflight import assess_operator_branch_preflig
 from scripts.ppe_operator_pass_timebox import record_operator_session
 from scripts.ppe_operator_vm_mirror_refresh import (
     assess_mirror_health,
+    maybe_sync_desktop_mirror_after_ship,
     mirror_is_populated,
     refresh_vm_mirror_from_git,
+    sync_desktop_mirror_from_main,
 )
 from scripts.ppe_vm_phase_mirror import (
     maybe_commit_publish_vm_mirror,
@@ -35,6 +37,56 @@ def test_assess_mirror_health_stale() -> None:
         local_verdict="RUN_LOCAL",
     )
     assert health["alert"] is True
+    assert health["untrusted"] is True
+    assert health["heartbeat_overdue"] is False
+
+
+def test_assess_mirror_health_in_flight_not_untrusted() -> None:
+    health = assess_mirror_health(
+        {"phase": "FINISH_IN_FLIGHT", "as_of": "2020-01-01T00:00:00Z"},
+        local_verdict="RUN_LOCAL",
+    )
+    assert health["stale"] is True
+    assert health["untrusted"] is False
+    assert health["in_flight"] is True
+    assert health["heartbeat_overdue"] is True
+    assert health["alert"] is True
+
+
+def test_sync_desktop_mirror_from_main(tmp_path, monkeypatch) -> None:
+    mirror_path = tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json"
+    mirror_path.parent.mkdir(parents=True)
+    mirror_path.write_text(json.dumps({"phase": "IDLE", "as_of": _utc_now()}) + "\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "scripts.ppe_operator_git_sync.check_and_nudge_merges",
+        lambda repo: {"action": "check_merge", "ok": True},
+    )
+    monkeypatch.setattr(
+        "scripts.ppe_operator_git_sync.pull_main",
+        lambda repo: {"action": "pull", "ok": True},
+    )
+    monkeypatch.setattr(
+        "scripts.ppe_operator_vm_mirror_refresh.read_mirror_from_git_ref",
+        lambda repo, ref="origin/main": {"phase": "RUN_LOCAL_PENDING", "as_of": _utc_now()},
+    )
+    monkeypatch.setattr(
+        "scripts.ppe_operator_vm_mirror_refresh.maybe_fetch_origin_main",
+        lambda repo, force=False: {"fetched": True},
+    )
+    report = sync_desktop_mirror_from_main(tmp_path)
+    assert report["ok"] is True
+    assert report["health"]["populated"] is True
+
+
+def test_maybe_sync_skips_loop_host(tmp_path, monkeypatch) -> None:
+    from scripts.ppe_operator_vm_mirror_refresh import maybe_sync_desktop_mirror_after_ship
+
+    monkeypatch.setenv("PPE_LOOP_HOST", "1")
+    (tmp_path / "ppe_operator_loop_host.local.cmd").write_text("@echo off\n", encoding="utf-8")
+    with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "ok")):
+        out = maybe_sync_desktop_mirror_after_ship(tmp_path, pre_push=True)
+    assert out.get("skipped") is True
+    assert out.get("reason") == "loop_host"
 
 
 def test_refresh_vm_mirror_from_git(tmp_path, monkeypatch) -> None:
