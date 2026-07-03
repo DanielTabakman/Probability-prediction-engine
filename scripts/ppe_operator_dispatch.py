@@ -46,7 +46,7 @@ def dispatch_direct_action(repo: Path, action: str | None, *, force: bool = Fals
 
     handlers: dict[str, str] = {
         "DESKTOP_CONTINUE.cmd --no-pause": "DESKTOP_CONTINUE.cmd --no-pause",
-        "wait_for_vm": "python scripts/ppe_in_flight_monitor.py --daemon --auto-act",
+        "wait_for_vm": "echo wait_for_vm: set PPE_AUTO_DISPATCH and run monitor when ppe_in_flight_monitor ships",
         "resolve_lease": "python scripts/ppe_worker_lease.py --assess",
         "coordination_check": "python scripts/ppe_coordination_check.py --write",
         "branch_recovery": "python scripts/ppe_branch_recovery.py --ship-all",
@@ -77,43 +77,6 @@ def dispatch_direct_action(repo: Path, action: str | None, *, force: bool = Fals
         report["steps"].append(verify)
         report["ok"] = bool(verify.get("ok"))
     return report
-
-
-def maybe_auto_operate(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
-    """Opt-in automation: start monitor daemon on wait_for_vm; run completion when action_ready."""
-    if not dispatch_allowed():
-        return status
-    try:
-        from scripts.ppe_loop_host_guard import loop_host_start_allowed
-
-        if bool(loop_host_start_allowed()[0]):
-            return status
-    except Exception:
-        pass
-
-    if status.get("action_ready") and not status.get("branch_preflight", {}).get("blocks_relay"):
-        completion = str(status.get("completion_action") or "DESKTOP_CONTINUE.cmd --no-pause").strip()
-        if completion:
-            report = dispatch_direct_action(repo, completion, force=True)
-            status["auto_dispatch"] = report
-            return status
-
-    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
-    if vm_trust.get("wait_for_vm"):
-        try:
-            from scripts.ppe_in_flight_monitor import maybe_start_monitor_daemon
-
-            daemon = maybe_start_monitor_daemon(repo, auto_act=True)
-            status["monitor_daemon"] = daemon
-            if daemon.get("started") or daemon.get("reason") == "already running":
-                pid = daemon.get("pid")
-                status["commands"] = [
-                    f"Monitor daemon active (pid={pid}) — adaptive poll until VM phase clears.",
-                    "On action_ready: DESKTOP_CONTINUE runs automatically when PPE_AUTO_DISPATCH=1.",
-                ]
-        except Exception as exc:
-            status["monitor_daemon"] = {"started": False, "error": str(exc)}
-    return status
 
 
 def dispatch_from_burst_plan(repo: Path, *, force: bool = False) -> dict[str, Any]:
