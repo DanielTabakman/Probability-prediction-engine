@@ -135,7 +135,7 @@ def test_compute_burst_plan_vm_in_flight_waits(tmp_path) -> None:
     plan = compute_burst_plan(tmp_path, status)
     assert plan["burst_allowed"] is False
     assert plan["direct_action"] == "wait_for_vm"
-    assert "do NOT SSH probe" in plan["prompt"]
+    assert "parallel SSH probes" in plan["prompt"]
 
 
 def test_compute_burst_plan_lease_conflict_blocks(tmp_path, monkeypatch) -> None:

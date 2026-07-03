@@ -7,7 +7,7 @@ import os
 import subprocess
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from scripts.ppe_dev_changelog import (
@@ -63,16 +63,18 @@ class TestPpeDevChangelog(unittest.TestCase):
     def test_refresh_appends_commit_under_utc_date(self) -> None:
         (self.repo / "apps" / "msos-web" / "page.tsx").parent.mkdir(parents=True)
         (self.repo / "apps" / "msos-web" / "page.tsx").write_text("export {}\n", encoding="utf-8")
+        commit_date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%dT10:00:00+00:00")
+        date_key = commit_date[:10]
         _commit(
             self.repo,
             "MSOS-P2-Product-Slice002: homepage (product-plane)",
-            date="2026-06-03T10:00:00+00:00",
+            date=commit_date,
         )
 
         self.assertEqual(cmd_refresh(self.repo), 0)
         parsed = load_changelog(self.repo)
-        self.assertIn("2026-06-03", parsed.sections)
-        bullets = "\n".join(parsed.sections["2026-06-03"])
+        self.assertIn(date_key, parsed.sections)
+        bullets = "\n".join(parsed.sections[date_key])
         self.assertIn("MSOS-P2-Product-Slice002", bullets)
         self.assertIn("apps/msos-web", bullets)
 
