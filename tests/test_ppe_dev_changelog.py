@@ -61,18 +61,20 @@ class TestPpeDevChangelog(unittest.TestCase):
         self._tmp.cleanup()
 
     def test_refresh_appends_commit_under_utc_date(self) -> None:
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        commit_date = f"{today}T10:00:00+00:00"
         (self.repo / "apps" / "msos-web" / "page.tsx").parent.mkdir(parents=True)
         (self.repo / "apps" / "msos-web" / "page.tsx").write_text("export {}\n", encoding="utf-8")
         _commit(
             self.repo,
             "MSOS-P2-Product-Slice002: homepage (product-plane)",
-            date="2026-06-03T10:00:00+00:00",
+            date=commit_date,
         )
 
         self.assertEqual(cmd_refresh(self.repo), 0)
         parsed = load_changelog(self.repo)
-        self.assertIn("2026-06-03", parsed.sections)
-        bullets = "\n".join(parsed.sections["2026-06-03"])
+        self.assertIn(today, parsed.sections)
+        bullets = "\n".join(parsed.sections[today])
         self.assertIn("MSOS-P2-Product-Slice002", bullets)
         self.assertIn("apps/msos-web", bullets)
 

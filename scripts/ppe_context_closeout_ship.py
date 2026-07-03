@@ -269,6 +269,12 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
 
     dirty = committable_dirty_paths(repo)
     if pf.get("mixed_plane_dirty") and dirty:
+        try:
+            from scripts.ppe_parked_work import write_parked_work
+
+            write_parked_work(repo, reason="mixed_plane", thread_role="closeout", note="context closeout ship blocked")
+        except Exception:
+            pass
         step(
             "mixed_plane",
             {
