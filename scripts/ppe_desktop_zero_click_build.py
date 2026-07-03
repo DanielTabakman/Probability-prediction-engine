@@ -244,16 +244,25 @@ def start(repo: Path, *, poll_seconds: int = 120) -> dict[str, Any]:
         }
 
     os.environ.setdefault("PPE_DESKTOP_AUTO", "1")
+    os.environ.setdefault("PPE_AUTO_DISPATCH", "1")
     from scripts.ppe_desktop_auto_operator import start_detached as start_auto
 
     watcher = start_watcher_detached(repo)
     auto = start_auto(repo, poll_seconds=poll_seconds)
-    append_log(repo, f"start watcher={watcher} auto={auto}")
+    monitor: dict[str, Any] = {"skipped": True}
+    try:
+        from scripts.ppe_in_flight_monitor import maybe_start_monitor_daemon
+
+        monitor = maybe_start_monitor_daemon(repo, auto_act=True)
+    except Exception as exc:
+        monitor = {"started": False, "error": str(exc)}
+    append_log(repo, f"start watcher={watcher} auto={auto} monitor={monitor}")
     status = collect_status(repo)
     return {
         "ok": True,
         "watcher": watcher,
         "auto_operator": auto,
+        "monitor_daemon": monitor,
         "status": status,
     }
 

@@ -410,6 +410,12 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
         enrich_status_with_pass_progress(repo, status, record=True)
     except Exception:
         pass
+    try:
+        from scripts.ppe_operator_dispatch import maybe_auto_operate
+
+        status = maybe_auto_operate(repo, status)
+    except Exception:
+        pass
     return status
 
 
