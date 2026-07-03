@@ -55,6 +55,8 @@ Cross-venue PM, horizon surface, BTC distribution archives stale — separate fr
 
 Steward backlog item — formalize when auto-selected chapter ≠ steering `nextBuildCandidate`.
 
+**Hardened plan (2026-07-02):** [`STEERING_COORDINATION_PROGRAM_V1.md`](STEERING_COORDINATION_PROGRAM_V1.md) — charter-ready; high priority in [`HUMAN_STEWARD_BACKLOG.json`](HUMAN_STEWARD_BACKLOG.json) (`steering_coordination_program_v1`). Phase 0 (`ppe_milestone_gate.py`) shipped; Phase 1–3 pending charter.
+
 ### 6. `fix_vm_operator` manifest rewind (P2 — control-plane)
 
 **Symptom:** `fix_vm_operator` resets `ACTIVE_PHASE_MANIFEST.json` from `origin/main`, which can **rewind** the active chapter (observed: FCR reappeared after recovery).  

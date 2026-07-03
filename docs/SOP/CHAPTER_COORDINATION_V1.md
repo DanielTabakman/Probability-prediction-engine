@@ -3,7 +3,7 @@
 **Plane:** CONTROL-PLANE · **Audience:** operators, stewards, IDE BUILD agents  
 **Role:** Prevent relay deadlocks when product ships on `main` before the factory finishes witness/closeout.
 
-**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) · [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md)
+**Related:** [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · [`RECOVERY_PROTOCOL.md`](RECOVERY_PROTOCOL.md) · [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md) · [`STEERING_COORDINATION_PROGRAM_V1.md`](STEERING_COORDINATION_PROGRAM_V1.md) (steering drift — charter draft)
 
 ---
 
