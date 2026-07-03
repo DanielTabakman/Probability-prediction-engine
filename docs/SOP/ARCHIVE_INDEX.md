@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-03T01:05:55Z · **Archived chapters:** 61
+**Generated:** 2026-07-03T05:12:28Z · **Archived chapters:** 61
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -59,12 +59,12 @@
 | `ppe_asset_enablement_pipeline_v1` | `docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md` | `docs/SOP/PPE_ASSET_ENABLEMENT_PIPELINE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json` |
 | `ppe_cache_isolation_audit_v1` | `docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md` | `docs/SOP/PPE_CACHE_ISOLATION_AUDIT_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json` |
 | `ppe_crypto_multi_asset_v1` | `docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md` | `docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json` |
+| `ppe_deribit_crypto_tier1_v1` | `docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json` |
 | `ppe_display_cache_ops_v1` | `docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md` | `docs/SOP/PPE_DISPLAY_CACHE_OPS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json` |
 | `ppe_equity_options_v1` | `docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json` |
 | `ppe_equity_universe_tier1a_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json` |
 | `ppe_exposure_menu_v1` | `docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md` | `docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json` |
 | `ppe_forward_consistency_radar_v1` | `docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json` |
-| `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |
 | `ppe_trust_surface_v1` | `docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md` | `docs/SOP/PPE_TRUST_SURFACE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json` |
 | `repo_housekeeping_v1` | `docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md` | `docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json` |
 

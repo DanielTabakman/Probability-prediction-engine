@@ -1,8 +1,14 @@
+---
+archived: true
+chapter_id: ppe_tradeable_universe_v1
+closed: 2026-07-03
+---
+
 
 # PPE tradeable universe v1 — evidence status
 
 **Chapter:** `ppe_tradeable_universe_v1`  
-**Status:** **COMPLETE** 2026-06-27 (SELECTED 2026-06-26)  
+**Status:** **COMPLETE** 2026-07-03  
 **SELECTION:** [`POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md`](POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_tradeable_universe_v1_relay.json`](PHASE_PLANS/ppe_tradeable_universe_v1_relay.json)  
 **Sprint:** [`SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md`](SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md)  
@@ -14,10 +20,10 @@
 | PPE-Universe-Core-Slice002 | **CLOSED** | Registry v2 schema + `list_enabled_asset_ids` / `list_catalog_entries` |
 | PPE-Universe-Core-Slice003 | **CLOSED** | `catalog.json` route + `witness_asset_catalog.py` scaffold |
 | PPE-Universe-UI-Slice004 | **CLOSED** | `lab_asset_selection.py` uses `list_enabled_asset_ids()` only |
-| PPE-Universe-Product-Slice005 | PENDING | MSOS catalog picker |
-| PPE-Universe-Platform-Slice006 | PENDING | Deploy witness |
-| PPE-Universe-Witness-Slice007 | PENDING | pytest |
-| PPE-Universe-Closeout-Slice008 | PENDING | Chapter close |
+| PPE-Universe-Product-Slice005 | COMPLETE | MSOS catalog picker |
+| PPE-Universe-Platform-Slice006 | COMPLETE | Deploy witness |
+| PPE-Universe-Witness-Slice007 | COMPLETE | pytest |
+| PPE-Universe-Closeout-Slice008 | COMPLETE | Chapter close |
 
 ---
 
