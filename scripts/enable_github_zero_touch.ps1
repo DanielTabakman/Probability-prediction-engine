@@ -2,13 +2,13 @@
   One-time (or repeat-safe) GitHub configuration for zero-touch ship:
   - Enables "Allow auto-merge" on the repository.
   - Creates or updates a branch ruleset for `refs/heads/main`:
-    PR required (0 approving reviews), required checks "CI / pytest" and "CI / docker_entrypoint", no force-push.
+    PR required (0 approving reviews), required check **CI / ci_success** (covers mirror-only and full PRs), no force-push.
 
   Prerequisites:
   - GitHub CLI: https://cli.github.com/ (winget: GitHub.cli)
   - Authenticated: run `gh auth login` (HTTPS + github.com) with repo admin scope.
   - The CI workflow must have run at least once on a PR or on `main` so the check
-    names "CI / pytest" and "CI / docker_entrypoint" exist when you require them (GitHub UI can also pick the checks).
+    name **CI / ci_success** exists when you require it (GitHub UI can also pick the check).
 
   Usage (from repo root):
     powershell -ExecutionPolicy Bypass -File scripts/enable_github_zero_touch.ps1
@@ -107,11 +107,7 @@ $ruleset = @{
                 strict_required_status_checks_policy = $true
                 required_status_checks               = @(
                     @{
-                        context        = "CI / pytest"
-                        integration_id = 15368
-                    }
-                    @{
-                        context        = "CI / docker_entrypoint"
+                        context        = "CI / ci_success"
                         integration_id = 15368
                     }
                 )
@@ -137,7 +133,7 @@ try {
             Write-Host "Rulesets API returned 403 (common for private repos on GitHub Free)." -ForegroundColor Yellow
             Write-Host "Options: (1) GitHub Pro / Team for this account or org, (2) make the repo public if acceptable," -ForegroundColor Yellow
             Write-Host "or (3) add branch protection manually: Settings -> Rules -> Rulesets (or Branch protection) for main." -ForegroundColor Yellow
-            Write-Host "Require PR + status checks CI / pytest and CI / docker_entrypoint + 0 required reviewers; then use Enable auto-merge on each PR if available." -ForegroundColor Yellow
+            Write-Host "Require PR + status check CI / ci_success + 0 required reviewers; then use Enable auto-merge on each PR if available." -ForegroundColor Yellow
             exit 0
         }
         throw "GET rulesets failed: $existing"

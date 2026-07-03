@@ -950,6 +950,14 @@ def ship_lease_work(
     if pub.get("pr_url"):
         report["pr_url"] = pub["pr_url"]
 
+    if report.get("ok"):
+        try:
+            from scripts.ppe_operator_vm_mirror_refresh import maybe_sync_desktop_mirror_after_ship
+
+            report["mirror_sync"] = maybe_sync_desktop_mirror_after_ship(repo, pre_push=True)
+        except Exception as exc:
+            report["mirror_sync"] = {"ok": False, "error": str(exc)}
+
     if release_after and report["ok"]:
         released = release_lease(repo)
         step("release", {"ok": released, "released": released})

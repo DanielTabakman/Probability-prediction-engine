@@ -487,6 +487,20 @@ def main(argv: list[str] | None = None) -> int:
                     return rc
         except ImportError:
             pass
+    if args.pre_push:
+        try:
+            from scripts.ppe_operator_vm_mirror_refresh import maybe_sync_desktop_mirror_after_ship
+
+            mirror_sync = maybe_sync_desktop_mirror_after_ship(repo, pre_push=True)
+            if mirror_sync.get("ok"):
+                print("pushable gate: desktop mirror sync OK")
+            elif not mirror_sync.get("skipped"):
+                print(
+                    f"pushable gate: desktop mirror sync warn — {mirror_sync.get('pull_blocked') or mirror_sync.get('error') or mirror_sync}",
+                    file=sys.stderr,
+                )
+        except Exception as exc:
+            print(f"pushable gate: desktop mirror sync skipped ({exc})", file=sys.stderr)
     return 0
 
 
@@ -617,6 +631,14 @@ def run_gate_for_paths(
                 if rc != 0:
                     return rc
         except ImportError:
+            pass
+
+    if pre_push:
+        try:
+            from scripts.ppe_operator_vm_mirror_refresh import maybe_sync_desktop_mirror_after_ship
+
+            maybe_sync_desktop_mirror_after_ship(repo, pre_push=True)
+        except Exception:
             pass
 
     return 0

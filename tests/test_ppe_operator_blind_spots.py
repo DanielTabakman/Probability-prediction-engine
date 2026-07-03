@@ -45,6 +45,19 @@ def test_bootstrap_loads_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
     assert os.environ.get("PPE_NTFY_TOPIC") == "ppe-test-topic-from-file"
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="bootstrap_operator_notify_env uses cmd.exe")
+def test_desktop_preflight_check_ntfy_loads_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
+    from scripts.desktop_operator_preflight import check_ntfy
+
+    monkeypatch.delenv("PPE_NTFY_TOPIC", raising=False)
+    (tmp_path / "ppe_operator_notify.local.cmd").write_text(
+        '@echo off\nset "PPE_NTFY_TOPIC=ppe-preflight-topic"\n',
+        encoding="utf-8",
+    )
+    assert check_ntfy(tmp_path) is True
+    assert os.environ.get("PPE_NTFY_TOPIC") == "ppe-preflight-topic"
+
+
 def test_check_local_disk_health() -> None:
     disk = check_local_disk_health()
     assert disk["level"] in ("ok", "warn", "critical")
@@ -68,6 +81,7 @@ def test_assess_blind_spots_mirror_stale(tmp_path, monkeypatch) -> None:
             "alert": True,
             "agent_note": "VM mirror stale (45m old)",
             "stale": True,
+            "untrusted": True,
             "populated": True,
         },
     }
