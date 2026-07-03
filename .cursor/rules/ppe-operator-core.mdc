@@ -29,7 +29,7 @@ When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOS
 
 | Verdict | Action |
 |---------|--------|
-| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. CLOSEOUT_ONLY + ≤1 slice → **direct** (skip `@ppe-director`). VM in-flight → **wait**. VM → `run_ppe_local.cmd` |
+| `RUN_LOCAL` | Desktop → `DESKTOP_CONTINUE.cmd`. CLOSEOUT_ONLY + ≤1 slice → **direct** (skip `@ppe-director`). VM in-flight → **monitor** (`ppe-in-flight-monitor.mdc`). VM → `run_ppe_local.cmd` |
 | `IDE_BUILD` | Burst: `@ppe-director` → build worker. Single escape: `ppe_go.cmd --single` or `@` slim `IDE_BUILD_STARTER_*.md` only |
 | `RUN_AUTO` | VM relay only; desktop → SSH status — no burst |
 | `SUPPLY_LOW` | Summarize supply; no burst |

@@ -411,8 +411,10 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
     except Exception:
         pass
     try:
+        from scripts.ppe_desktop_automation_graduation import load_desktop_automation_env
         from scripts.ppe_operator_dispatch import maybe_auto_operate
 
+        load_desktop_automation_env(repo)
         status = maybe_auto_operate(repo, status)
     except Exception:
         pass
@@ -612,7 +614,9 @@ def enrich_operator_status_with_monitor(repo: Path, status: dict[str, Any]) -> d
         "wait_for_vm": snapshot.get("wait_for_vm"),
         "completion_action": snapshot.get("completion_action"),
         "stuck": snapshot.get("stuck"),
+        "stuck_threshold_m": snapshot.get("stuck_threshold_m"),
         "next_poll_s": snapshot.get("next_poll_s"),
+        "log_tail": snapshot.get("log_tail"),
         "message": snapshot.get("message"),
     }
     status["in_flight_monitor"] = monitor
@@ -820,12 +824,27 @@ def _format_human(
         lines.append("")
         lines.append(f"**Action ready:** VM phase cleared — run `{completion}` (not wait).")
 
+    grad = status.get("automation_graduation") if isinstance(status.get("automation_graduation"), dict) else None
+    if grad and str(grad.get("level") or "A").upper() == "A":
+        lines.append("")
+        lines.append(
+            f"**Automation:** Level A — {grad.get('success_count', 0)}/{grad.get('min_successes', '?')} successes, "
+            f"{grad.get('elapsed_hours', '?')}h/{grad.get('min_hours', '?')}h → Level B (zero-click)"
+        )
+
     monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else None
-    if monitor and monitor.get("status") == "watching" and not status.get("action_ready"):
-        elapsed = monitor.get("message")
-        if elapsed:
+    if monitor and not status.get("action_ready"):
+        msg = monitor.get("message")
+        if msg and monitor.get("status") in ("watching", "stuck"):
             lines.append("")
-            lines.append(f"**VM monitor:** {elapsed}")
+            lines.append(f"**VM monitor:** {msg}")
+        log_tail = monitor.get("log_tail") if isinstance(monitor.get("log_tail"), dict) else None
+        combined = str((log_tail or {}).get("combined") or "").strip()
+        if monitor.get("stuck") and combined:
+            lines.append("")
+            lines.append("**Stuck log tail:**")
+            for log_line in combined.splitlines()[:22]:
+                lines.append(f"  {log_line}")
 
     branch_pf = status.get("branch_preflight") if isinstance(status.get("branch_preflight"), dict) else None
     if branch_pf and branch_pf.get("blocks_relay"):

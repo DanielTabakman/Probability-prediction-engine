@@ -16,9 +16,27 @@ MIRROR_PUBLISH_STATE_REL = "artifacts/control_plane/VM_MIRROR_PUBLISH_STATE.json
 
 IN_FLIGHT_PHASES = frozenset({"FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"})
 PHASE_NOTIFY_COOLDOWN_SECONDS = 900
-IN_FLIGHT_STUCK_SECONDS = 2700
+BUILD_IN_FLIGHT_STUCK_SECONDS = 2700  # 45m
+FINISH_IN_FLIGHT_STUCK_SECONDS = 5400  # 90m
+IN_FLIGHT_STUCK_SECONDS = BUILD_IN_FLIGHT_STUCK_SECONDS  # default / legacy alias
+IN_FLIGHT_APPROACHING_SECONDS_BY_PHASE: dict[str, int] = {
+    "BUILD_IN_FLIGHT": 1800,  # 30m
+    "FINISH_IN_FLIGHT": 3600,  # 60m
+}
 MIRROR_PUBLISH_COOLDOWN_SECONDS = 90
 MIRROR_HEARTBEAT_PUBLISH_SECONDS = 600
+
+
+def stuck_threshold_seconds(phase: str) -> float:
+    if phase == "FINISH_IN_FLIGHT":
+        return float(FINISH_IN_FLIGHT_STUCK_SECONDS)
+    if phase == "BUILD_IN_FLIGHT":
+        return float(BUILD_IN_FLIGHT_STUCK_SECONDS)
+    return float(IN_FLIGHT_STUCK_SECONDS)
+
+
+def approaching_threshold_seconds(phase: str) -> float:
+    return float(IN_FLIGHT_APPROACHING_SECONDS_BY_PHASE.get(phase, 1800))
 
 
 def _utc_now() -> str:
@@ -367,19 +385,20 @@ def maybe_notify_stuck_in_flight(
     repo: Path,
     status: dict[str, Any],
     *,
-    stuck_seconds: int = IN_FLIGHT_STUCK_SECONDS,
+    stuck_seconds: int | None = None,
 ) -> bool:
     if not _is_loop_host(repo):
         return False
     phase = str(status.get("phase") or "").strip()
     if phase not in IN_FLIGHT_PHASES:
         return False
+    threshold = int(stuck_seconds) if stuck_seconds is not None else int(stuck_threshold_seconds(phase))
     since_state = _load_in_flight_since(repo)
     since_at = _parse_utc(str(since_state.get("since") or ""))
     if since_at is None:
         return False
     elapsed = (datetime.now(timezone.utc) - since_at).total_seconds()
-    if elapsed < max(300, int(stuck_seconds)):
+    if elapsed < max(300, threshold):
         return False
 
     operator = status.get("operator") if isinstance(status.get("operator"), dict) else {}

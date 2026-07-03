@@ -1011,6 +1011,69 @@ def send_operator_status(status: dict[str, Any], *, repo_root: Path | None = Non
     )
 
 
+ACTION_READY_NOTIFY_STATE_REL = "artifacts/control_plane/ACTION_READY_NOTIFY_STATE.json"
+
+
+def _action_ready_notify_state_path(repo: Path) -> Path:
+    return (repo.resolve() / ACTION_READY_NOTIFY_STATE_REL).resolve()
+
+
+def maybe_notify_action_ready(
+    repo: Path,
+    *,
+    phase: str,
+    completion_action: str,
+    auto_dispatched: bool = False,
+) -> dict[str, Any]:
+    """Phone ping when VM in-flight clears (deduped per phase+action)."""
+    if not notify_enabled() or not ntfy_configured():
+        return {"sent": False, "reason": "not_configured"}
+    repo = repo.resolve()
+    phase_s = str(phase or "").strip() or "unknown"
+    action_s = str(completion_action or "").strip() or "DESKTOP_CONTINUE.cmd --no-pause"
+    fingerprint = f"{phase_s}|{action_s}"
+    state_path = _action_ready_notify_state_path(repo)
+    prior: dict[str, Any] = {}
+    if state_path.is_file():
+        try:
+            prior = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            prior = {}
+    if fingerprint == str(prior.get("fingerprint") or ""):
+        return {"sent": False, "reason": "deduped", "fingerprint": fingerprint}
+
+    title = "PPE: VM phase cleared"
+    body = f"Phase `{phase_s}` cleared — {action_s}"
+    if auto_dispatched:
+        body += " (auto-continue dispatched)"
+    sent = send_ntfy(
+        title,
+        body,
+        tags=["ppe", "action_ready", phase_s.lower()],
+        priority="high",
+    )
+    if sent:
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(
+            json.dumps(
+                {
+                    "fingerprint": fingerprint,
+                    "phase": phase_s,
+                    "completion_action": action_s,
+                    "auto_dispatched": auto_dispatched,
+                    "notified_at": datetime.now(timezone.utc)
+                    .replace(microsecond=0)
+                    .isoformat()
+                    .replace("+00:00", "Z"),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    return {"sent": sent, "fingerprint": fingerprint, "title": title}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Send PPE operator alerts to ntfy (mobile push)")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())

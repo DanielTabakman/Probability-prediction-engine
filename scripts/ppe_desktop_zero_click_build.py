@@ -75,11 +75,23 @@ def ensure_opt_in_token(repo: Path) -> dict[str, Any]:
     repo = repo.resolve()
     target = repo / OPT_IN_FILE
     if target.is_file():
-        return {"ok": True, "action": "already_present", "path": str(target)}
+        try:
+            from scripts.ppe_operator_dispatch import ensure_desktop_auto_dispatch_opt_in
+
+            patch = ensure_desktop_auto_dispatch_opt_in(repo)
+            return {"ok": True, "action": "already_present", "path": str(target), "dispatch_patch": patch}
+        except Exception:
+            return {"ok": True, "action": "already_present", "path": str(target)}
     example = repo / OPT_IN_EXAMPLE
     if not example.is_file():
         return {"ok": False, "action": "missing_example", "path": str(example)}
     target.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
+    try:
+        from scripts.ppe_operator_dispatch import ensure_desktop_auto_dispatch_opt_in
+
+        ensure_desktop_auto_dispatch_opt_in(repo)
+    except Exception:
+        pass
     return {"ok": True, "action": "created", "path": str(target)}
 
 

@@ -1,0 +1,64 @@
+---
+description: Adaptive VM in-flight monitor — replace passive wait on BUILD_IN_FLIGHT / FINISH_IN_FLIGHT. Load when OPERATOR_STATUS or burst plan says wait_for_vm.
+alwaysApply: false
+---
+
+# VM in-flight monitor (adaptive)
+
+**Canon script:** `scripts/ppe_in_flight_monitor.py` · **Entry:** `ppe_in_flight_monitor.cmd`
+
+When `wait_for_vm` or VM phase is `BUILD_IN_FLIGHT` / `FINISH_IN_FLIGHT`: **monitor until clear** — do not end the operator thread on passive wait.
+
+## One pass (agent thread loop)
+
+```bat
+ppe_in_flight_monitor.cmd
+ppe_in_flight_monitor.cmd --json
+```
+
+Repeat when `next_poll_s` elapsed (or sleep in `--daemon`). Report to founder only on **phase change**, **stuck**, or **action_ready**.
+
+## Cursor `/loop` (operator thread, `wait_for_vm`)
+
+When burst plan `direct_action` is `wait_for_vm` and `PPE_AUTO_DISPATCH` is off:
+
+1. Run `ppe_in_flight_monitor.cmd --json` once; read `next_poll_s`, `done`, `status`.
+2. Sleep `next_poll_s` (min 30s).
+3. Stop when `done` is true or `status` is `action_ready` → run `completion_action` or refresh `prepare_operator_status`.
+4. Reply to founder only when brief changes (phase, stuck, action_ready).
+
+**Opt-in auto:** `PPE_AUTO_DISPATCH=1` (or `ppe_operator_desktop_auto.local.cmd`) starts detached daemon with `--auto-act` on status refresh.
+
+Manual daemon: `ppe_in_flight_monitor.cmd --start` / `--stop`
+
+## Adaptive cadence (defaults)
+
+| Condition | Next check |
+|-----------|------------|
+| Mirror stale | ~1m (+ git refresh) |
+| Healthy in-flight | ~30m |
+| Approaching stuck (BUILD ≥30m, FINISH ≥60m) | ~10m |
+| Stuck (BUILD ≥45m, FINISH ≥90m) | ~5m + escalate + log tail |
+
+## Escalation (phase stuck threshold)
+
+One bounded SSH per hour: `ppe_autobuilder.cmd advance` on VM (script runs this when `--no-escalate` not set).
+
+Manual recovery: `@ppe-autobuilder-operator` diagnose · VM `fix_vm_operator.cmd` if advance fails.
+
+## Phase cleared
+
+| Outcome | Action |
+|---------|--------|
+| `completion_action` = DESKTOP_CONTINUE | Run `DESKTOP_CONTINUE.cmd --no-pause` (or `@ppe-finish-worker`) |
+| `done` + no action | Rotate thread; run normal burst path |
+
+Phone ntfy fires once on `action_ready` when ntfy is configured.
+
+## Do NOT
+
+- Parallel SSH probes or `@ppe-director` while `wait_for_vm`
+- Fixed 5m polling regardless of state
+- Trust stale SSH cache over fresh `docs/SOP/VM_OPERATOR_PHASE.json`
+
+**State:** `artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json`
