@@ -154,9 +154,36 @@ def process_messages(
     return handled, state
 
 
+def ensure_cmd_listener_watermark(repo: Path, state: dict[str, Any]) -> tuple[dict[str, Any], bool]:
+    """First connect: advance cursor to newest message without replaying phone command history."""
+    if state.get("cmd_listener_initialized") or state.get("last_message_id"):
+        return state, False
+    try:
+        messages = poll_messages(since="all")
+    except Exception:
+        messages = []
+    if messages:
+        newest = str(messages[-1].get("id") or "")
+        if newest:
+            state = {**state, "last_message_id": newest, "cmd_listener_initialized": True}
+            save_state(repo, state)
+            return state, True
+    state = {**state, "cmd_listener_initialized": True}
+    save_state(repo, state)
+    return state, True
+
+
 def listen_once(repo: Path, *, notify: bool = True) -> dict[str, Any]:
     repo = repo.resolve()
     state = load_state(repo)
+    state, seeded = ensure_cmd_listener_watermark(repo, state)
+    if seeded:
+        return {
+            "handled": [],
+            "polled": 0,
+            "initialized": True,
+            "state_path": str(state_path(repo)),
+        }
     since = str(state.get("last_message_id") or "") or None
     messages = poll_messages(since=since)
     handled, state = process_messages(repo, messages, state=state, notify=notify)
@@ -198,6 +225,7 @@ def poll_loop(repo: Path, *, notify: bool = True) -> None:
 
 def sse_loop(repo: Path, *, notify: bool = True) -> None:
     state = load_state(repo)
+    state, _seeded = ensure_cmd_listener_watermark(repo, state)
     since = str(state.get("last_message_id") or "") or None
     print(
         f"ppe_ntfy_listen: SSE on topic={ntfy_topic()} since={since or 'all'} — Ctrl+C to stop",

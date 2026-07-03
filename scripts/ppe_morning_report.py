@@ -175,6 +175,9 @@ def build_morning_report(repo: Path, status: dict[str, Any]) -> tuple[str, str]:
 
 def maybe_send_morning_report(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
     repo = repo.resolve()
+    from scripts.ppe_notify_push import ensure_operator_notify_env
+
+    ensure_operator_notify_env(repo)
     if not notify_enabled() or not ntfy_configured() or not morning_report_enabled():
         return {"sent": False, "reason": "disabled"}
     if not is_morning_report_window():

@@ -594,6 +594,12 @@ def _write_health_state(repo: Path, state: dict[str, Any]) -> Path:
 
 def maybe_notify_pipeline_regression(repo: Path, health: dict[str, Any]) -> bool:
     """Push ntfy when pipeline regresses OK→NOT OK or milestone blocked ≥24h."""
+    try:
+        from scripts.ppe_notify_push import ensure_operator_notify_env
+
+        ensure_operator_notify_env(repo)
+    except Exception:
+        pass
     prev = _load_health_state(repo)
     now = _utc_now()
     was_ok = bool(prev.get("ok"))

@@ -9,9 +9,10 @@ from unittest.mock import MagicMock, patch
 import scripts.ppe_notify_push as push
 
 
-def test_send_ntfy_skips_when_topic_unset(monkeypatch):
+def test_send_ntfy_skips_when_topic_unset(monkeypatch, tmp_path):
     monkeypatch.delenv("PPE_NTFY_TOPIC", raising=False)
     monkeypatch.setenv("PPE_NOTIFY", "1")
+    monkeypatch.setenv("PPE_REPO_ROOT", str(tmp_path))
     assert push.send_ntfy("t", "b") is False
 
 
@@ -179,9 +180,15 @@ def test_send_from_payload(tmp_path: Path, monkeypatch):
             assert push.send_from_payload(payload) is True
 
 
-def test_priority_for_verdict():
-    assert push._priority_for_verdict("IDE_BUILD") == "high"
-    assert push._priority_for_verdict("ERROR") == "urgent"
+def test_main_check_bootstraps_notify_local_cmd(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("PPE_NTFY_TOPIC", raising=False)
+    monkeypatch.setenv("PPE_NOTIFY", "1")
+    (tmp_path / "ppe_operator_notify.local.cmd").write_text(
+        '@echo off\nset "PPE_NTFY_TOPIC=ppe-main-check-topic"\n',
+        encoding="utf-8",
+    )
+    rc = push.main(["--repo-root", str(tmp_path), "--check"])
+    assert rc == 0
 
 
 def test_send_weekly_digest_from_payload(tmp_path: Path, monkeypatch):

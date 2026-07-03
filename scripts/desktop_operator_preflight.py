@@ -26,9 +26,10 @@ def _run(cmd: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-def check_ntfy() -> bool:
-    from scripts.ppe_notify_push import ntfy_configured, notify_enabled
+def check_ntfy(repo: Path | None = None) -> bool:
+    from scripts.ppe_notify_push import ensure_operator_notify_env, ntfy_configured, notify_enabled
 
+    ensure_operator_notify_env(repo)
     if not notify_enabled():
         _warn("PPE_NOTIFY disabled")
         return True
@@ -224,9 +225,15 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     repo = args.repo_root.resolve()
 
-    local = repo / "ppe_operator_local.cmd"
-    if local.is_file():
-        subprocess.run(["cmd", "/c", str(local)], cwd=repo, check=False)
+    from scripts.ppe_notify_push import ensure_operator_notify_env
+
+    ensure_operator_notify_env(repo)
+    try:
+        from scripts.ppe_operator_config import apply_operator_env
+
+        apply_operator_env(repo)
+    except Exception:
+        pass
 
     if args.agent_only:
         return 0 if check_agent_cli() else 1
@@ -257,7 +264,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     checks = [
-        check_ntfy(),
+        check_ntfy(repo),
         check_codex_cli(),
         check_agent_cli(),
         check_build_worker(repo),

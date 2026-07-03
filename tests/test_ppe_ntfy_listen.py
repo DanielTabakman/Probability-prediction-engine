@@ -29,6 +29,7 @@ def test_listen_once_updates_state(tmp_path: Path, monkeypatch):
     monkeypatch.setenv("PPE_NTFY_TOPIC", "topic")
     monkeypatch.setenv("PPE_NOTIFY", "1")
     monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    save_state(tmp_path, {"last_message_id": "m0", "cmd_listener_initialized": True})
     messages = [{"event": "message", "id": "m1", "message": "s3cret status"}]
     with patch("scripts.ppe_ntfy_listen.poll_messages", return_value=messages):
         with patch("scripts.ppe_ntfy_commands.execute_status") as status:
@@ -38,6 +39,25 @@ def test_listen_once_updates_state(tmp_path: Path, monkeypatch):
     assert result["handled"]
     state = load_state(tmp_path)
     assert state["last_message_id"] == "m1"
+
+
+def test_listen_once_seeds_watermark_without_replaying_history(tmp_path: Path, monkeypatch):
+    monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
+    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
+    history = [
+        {"event": "message", "id": "old-build", "message": "s3cret build"},
+        {"event": "message", "id": "old-status", "message": "s3cret status"},
+    ]
+    with patch("scripts.ppe_ntfy_listen.poll_messages", return_value=history) as poll:
+        with patch("scripts.ppe_ntfy_listen.handle_message") as handle:
+            result = listen_once(tmp_path, notify=False)
+    poll.assert_called_once_with(since="all")
+    handle.assert_not_called()
+    assert result.get("initialized") is True
+    assert result["handled"] == []
+    state = load_state(tmp_path)
+    assert state["last_message_id"] == "old-status"
+    assert state["cmd_listener_initialized"] is True
 
 
 def test_state_roundtrip(tmp_path: Path):

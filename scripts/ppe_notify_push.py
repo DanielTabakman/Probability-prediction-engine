@@ -78,6 +78,11 @@ def _cmd_call_local_script(root: Path, path: Path) -> str:
     return f"call {script}"
 
 
+def ensure_operator_notify_env(repo: Path | None = None) -> None:
+    """Load ntfy topic from local cmd wrappers when Python was not started via .cmd."""
+    bootstrap_operator_notify_env(repo)
+
+
 def bootstrap_operator_notify_env(repo: Path | None = None) -> None:
     """Load PPE_* vars from local cmd wrappers when Python was not started via .cmd."""
     if os.environ.get("PPE_NTFY_TOPIC", "").strip():
@@ -1022,6 +1027,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--check", action="store_true", help="Print whether ntfy is configured and exit 0/1")
     ap.add_argument("--quota", action="store_true", help="Print today's ntfy send budget and exit")
     args = ap.parse_args(argv)
+    repo = args.repo_root.resolve()
+    os.environ.setdefault("PPE_REPO_ROOT", str(repo))
+    ensure_operator_notify_env(repo)
 
     if args.check:
         ok = notify_enabled() and ntfy_configured()
@@ -1029,11 +1037,11 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if ok else 1
 
     if args.quota:
-        print(format_quota_brief(args.repo_root.resolve()))
+        print(format_quota_brief(repo))
         return 0
 
     if args.weekly_digest:
-        payload = args.payload or (args.repo_root / "artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json")
+        payload = args.payload or (repo / "artifacts/control_plane/WEEKLY_DIGEST_NOTIFY.json")
         sent = send_weekly_digest_from_payload(payload.resolve())
         return 0 if sent or not ntfy_configured() else 1
 

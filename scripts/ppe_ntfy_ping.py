@@ -5,10 +5,18 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from scripts.ppe_notify_push import ntfy_configured, notify_enabled, ntfy_topic, send_ntfy
+from scripts.ppe_notify_push import (
+    ensure_operator_notify_env,
+    ntfy_configured,
+    notify_enabled,
+    ntfy_topic,
+    send_ntfy,
+)
 
 
 def main() -> int:
+    repo = Path.cwd().resolve()
+    ensure_operator_notify_env(repo)
     if not notify_enabled():
         print("FAIL: PPE_NOTIFY disabled", file=sys.stderr)
         return 1
