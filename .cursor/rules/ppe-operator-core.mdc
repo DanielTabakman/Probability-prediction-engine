@@ -43,6 +43,8 @@ Also skip when thread role is charter / explore / neutral (see thread-roles). Sk
 
 After running (or attempting) the verdict, reply with a **short state summary** — not an operator checklist. Full contract: [`FOUNDER_OPERATOR_SURFACE_V1.md`](docs/SOP/FOUNDER_OPERATOR_SURFACE_V1.md) · Pulses/closings: [`FOUNDER_COLLABORATION_CHARTER_V1.md`](docs/SOP/FOUNDER_COLLABORATION_CHARTER_V1.md) (L2 completion, L3 alert overrides "nothing required").
 
+**Progress block (mandatory):** mirror `OPERATOR_STATUS.md` **Progress** / **Waiting** lines from `operator_pass_progress` (`artifacts/control_plane/OPERATOR_PASS_LATEST.json`). **Waiting is never progress.** If progress is none, include streak (`N in a row · X/10 last passes`). If waiting, state what, expected duration, elapsed, evidence health (`moving`/`quiet`/`stuck`/`deadlock`). Layer 3 **Alert:** when wait is stuck/deadlock or streak ≥4.
+
 **Founder surface (hard):** If the reply would assign git, relay, BUILD, recovery, sync, or queue work to the human → execute in-thread or spawn worker. Only escalate **decisions** (pivot judgment, canon conflict) or **external actions** (credentials, live tester sessions). On stall with no active program → **Alert:** per charter; run `ppe_founder_pulse.cmd --layer alert --write --notify`.
 
 **Never:** operator checklists, choice questions, commit permission prompts, or manual IDE BUILD thread asks when burst can spawn workers. Default founder line: **"Nothing required from you."**

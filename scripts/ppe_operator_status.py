@@ -603,6 +603,10 @@ def _format_human(
         f"VERDICT: {status.get('verdict')}",
         "",
     ]
+    pass_lines = status.get("operator_pass_lines")
+    if isinstance(pass_lines, list) and pass_lines:
+        lines.extend(str(x) for x in pass_lines)
+        lines.append("")
     chapter_mode = status.get("chapter_mode")
     if isinstance(chapter_mode, dict) and chapter_mode.get("mode"):
         try:
@@ -859,6 +863,12 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
         status["pipeline_health"] = pipeline_health
         maybe_notify_pipeline_regression(repo, pipeline_health)
         pipeline_block = format_root_cause_block(pipeline_health) + "\n"
+    except Exception:
+        pass
+    try:
+        from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
+
+        enrich_status_with_pass_progress(repo, status, record=True)
     except Exception:
         pass
     body = f"""# Operator status
