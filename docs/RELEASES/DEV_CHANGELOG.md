@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-04
+
+_No merges to `main`._
+
 ## 2026-07-03
 
+- `1baf639a` — Control-plane: dev changelog
 - `27b469ab` — control-plane: Level A desktop automation + auto-graduate to Level B (#1967) (`scripts/`)
 - `144dbbc4` — feat(control-plane): VM mirror robustness tier 1+2 consolidated (#1969) (`scripts/`)
 - `2014cd74` — control-plane: desktop automation steps 3-4 — monitor wiring + preflight gate (#1961) (`scripts/`)
