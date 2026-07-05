@@ -13,72 +13,49 @@ from scripts.ppe_ntfy_commands import (
 
 
 def test_parse_restart_command():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("restart") is None
-    assert parse_command_text("PPE restart") is None
-    assert parse_command_text("/restart") is None
+    assert parse_command_text("restart").name == "restart"
+    assert parse_command_text("PPE restart").name == "restart"
+    assert parse_command_text("/restart").name == "restart"
 
 
-def test_parse_restart_command_with_secret(monkeypatch):
+def test_parse_restart_legacy_prefix(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    assert parse_command_text("restart") is None
     assert parse_command_text("s3cret restart").name == "restart"
-    assert parse_command_text("PPE restart") is None
+    assert parse_command_text("restart").name == "restart"
 
 
 def test_parse_build_command():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("build") is None
+    assert parse_command_text("build").name == "build"
 
 
-def test_parse_build_command_with_secret(monkeypatch):
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    assert parse_command_text("s3cret build").name == "build"
-    assert parse_command_text("s3cret build extra context").args == "extra context"
+def test_parse_build_with_note():
+    cmd = parse_command_text("build extra context")
+    assert cmd is not None
+    assert cmd.name == "build"
+    assert cmd.args == "extra context"
 
 
 def test_parse_fix_with_note():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("fix loop died after smoke") is None
-
-
-def test_parse_fix_with_note_and_secret(monkeypatch):
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    cmd = parse_command_text("s3cret fix loop died after smoke")
+    cmd = parse_command_text("fix loop died after smoke")
     assert cmd is not None
     assert cmd.name == "fix"
     assert cmd.args == "loop died after smoke"
 
 
-def test_help_allowed_without_secret():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    cmd = parse_command_text("help")
-    assert cmd is not None
-    assert cmd.name == "help"
+def test_all_commands_without_secret():
+    for name in ("help", "status", "build", "fix", "restart", "snooze"):
+        cmd = parse_command_text(name)
+        assert cmd is not None
+        assert cmd.name == name
 
 
-def test_command_security_warnings_when_no_secret(monkeypatch):
-    monkeypatch.delenv("PPE_NTFY_CMD_SECRET", raising=False)
+def test_command_security_warnings_when_topic_unset(monkeypatch):
+    monkeypatch.delenv("PPE_NTFY_TOPIC", raising=False)
     monkeypatch.setenv("PPE_NTFY_CMD_ENABLED", "1")
     from scripts.ppe_ntfy_commands import command_security_warnings
 
     msgs = command_security_warnings()
-    assert any("PPE_NTFY_CMD_SECRET" in m for m in msgs)
-
-
-def test_parse_requires_secret_when_configured(monkeypatch):
-    monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
-    assert parse_command_text("restart") is None
-    assert parse_command_text("s3cret restart").name == "restart"
-    assert parse_command_text("s3cret build").name == "build"
+    assert any("PPE_NTFY_TOPIC" in m for m in msgs)
 
 
 def test_ignore_outbound_messages():

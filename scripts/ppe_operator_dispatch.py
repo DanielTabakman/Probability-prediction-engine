@@ -64,13 +64,18 @@ def ensure_desktop_auto_dispatch_opt_in(repo: Path) -> dict[str, Any]:
     except OSError as exc:
         return {"ok": False, "action": "read_error", "error": str(exc)}
     if "PPE_AUTO_DISPATCH=1" in text.upper().replace('"', ""):
-        return {"ok": True, "action": "already_set"}
+        return {"ok": True, "action": "already_present"}
     addition = 'set "PPE_AUTO_DISPATCH=1"\r\n'
     if text.endswith("\n"):
         path.write_text(text + addition, encoding="utf-8")
     else:
         path.write_text(text + "\r\n" + addition, encoding="utf-8")
     return {"ok": True, "action": "patched"}
+
+
+def scheduled_dispatch_allowed(repo: Path) -> bool:
+    """Scheduled dispatch requires the same desktop auto opt-in token as zero-click."""
+    return (repo.resolve() / "ppe_operator_desktop_auto.local.cmd").is_file()
 
 
 def automation_preflight_blocked(
@@ -357,12 +362,28 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--action", type=str, default=None, help="direct_action string")
     ap.add_argument("--from-burst-plan", action="store_true")
     ap.add_argument("--from-status", action="store_true", help="Read direct_action from operator status / burst plan")
+    ap.add_argument("--auto", action="store_true", help="Scheduled mode: require opt-in token; set PPE_AUTO_DISPATCH=1")
     ap.add_argument("--dry-run", action="store_true", help="Resolve command only; do not execute")
     ap.add_argument("--force", action="store_true", help="Run even if PPE_AUTO_DISPATCH unset")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
     repo = args.repo_root.resolve()
+    if args.auto:
+        if not scheduled_dispatch_allowed(repo):
+            report = {
+                "ok": False,
+                "skipped": True,
+                "reason": "missing ppe_operator_desktop_auto.local.cmd opt-in token",
+            }
+            if args.json:
+                print(json.dumps(report, indent=2))
+            else:
+                print("ppe_operator_dispatch: skipped - missing desktop auto opt-in token")
+            return 1
+        os.environ["PPE_AUTO_DISPATCH"] = "1"
+        args.from_status = True
+
     if args.from_status:
         report = dispatch_from_status(repo, force=args.force, dry_run=args.dry_run)
     elif args.from_burst_plan:

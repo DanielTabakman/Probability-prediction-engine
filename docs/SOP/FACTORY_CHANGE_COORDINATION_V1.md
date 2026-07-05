@@ -150,8 +150,8 @@ Deferred programs — enable only when triggers fire twice ([`MULTI_AGENT_ROADMA
 | Tier | Program | Status / trigger |
 |------|---------|------------------|
 | **FC-1** | Central dispatch executor (`ppe_operator_dispatch.py`) | **Shipped** — opt-in `PPE_AUTO_DISPATCH=1` |
-| **FC-2** | Factory change linter | Repeated F2 merges missing burst/status updates |
-| **FC-3** | `ppe_factory_change_audit.py` | Pre-merge checklist enforced in gate (F2 touch-surface) |
+| **FC-2** | Factory change linter (`ppe_factory_change_audit.py`) | **Shipped** — gate warns on SSOT touch without companions |
+| **FC-3** | Pre-merge checklist enforced in gate | F2 touch-surface blocks ship (not warn-only) |
 | **FC-4** | VM/desktop config split | Same script behaves differently per host without env docs |
 | **FC-5** | Factory slice starters | `IDE_BUILD_STARTER_Factory-*.md` template from phase plan |
 
@@ -163,3 +163,4 @@ Deferred programs — enable only when triggers fire twice ([`MULTI_AGENT_ROADMA
 |------|--------|
 | 2026-07-03 | v1 — factory BUILD coordination SSOT |
 | 2026-07-03 | FC-1 shipped — central dispatch executor |
+| 2026-07-03 | FC-2 shipped — factory SSOT gate warnings |

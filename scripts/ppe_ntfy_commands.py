@@ -34,30 +34,30 @@ def commands_enabled() -> bool:
     return os.environ.get("PPE_NTFY_CMD_ENABLED", "1").strip().lower() not in ("0", "false", "no", "off")
 
 
-def command_secret() -> str:
-    return os.environ.get("PPE_NTFY_CMD_SECRET", "").strip()
-
-
 def command_security_warnings() -> list[str]:
     """Startup hints when remote commands are enabled but under-protected."""
     if not commands_enabled():
         return []
     warnings: list[str] = []
-    if not command_secret():
+    if not ntfy_configured():
         warnings.append(
-            "PPE_NTFY_CMD_SECRET is unset — only 'help' is accepted on this topic; "
-            "set a long random secret in ppe_operator_notify.local.cmd for build/fix/restart/status/snooze."
-        )
-    elif len(command_secret()) < 12:
-        warnings.append(
-            "PPE_NTFY_CMD_SECRET is short — use a long random value (16+ chars) to resist topic guessing."
+            "PPE_NTFY_TOPIC is unset — set a private topic in ppe_operator_notify.local.cmd "
+            "and subscribe in the ntfy app on your phone."
         )
     token = os.environ.get("PPE_NTFY_TOKEN", "").strip()
     if not token and (os.environ.get("PPE_NTFY_SERVER", "https://ntfy.sh").strip().rstrip("/") == "https://ntfy.sh"):
         warnings.append(
-            "PPE_NTFY_TOKEN is unset on ntfy.sh — consider a private ntfy server or ACL token for the topic."
+            "PPE_NTFY_TOKEN is unset on ntfy.sh — use an unguessable topic name or a private ntfy server with ACL."
         )
     return warnings
+
+
+def _strip_legacy_command_prefix(tokens: list[str]) -> list[str]:
+    """Accept old `{secret} status` messages without requiring the prefix going forward."""
+    legacy = os.environ.get("PPE_NTFY_CMD_SECRET", "").strip().lower()
+    if legacy and tokens and tokens[0] == legacy:
+        return tokens[1:]
+    return tokens
 
 
 def is_outbound_message(message: dict[str, Any]) -> bool:
@@ -84,17 +84,10 @@ def parse_command_text(text: str) -> RemoteCommand | None:
         tokens = tokens[1:]
     if tokens and tokens[0].startswith("/"):
         tokens[0] = tokens[0][1:]
-    secret = command_secret()
-    if secret:
-        if not tokens or tokens[0] != secret.lower():
-            return None
-        tokens = tokens[1:]
+    tokens = _strip_legacy_command_prefix(tokens)
     if not tokens or tokens[0] not in KNOWN_COMMANDS:
         return None
     name = tokens[0]
-    # Without a shared secret, only help is allowed (no stack/agent side effects on open topics).
-    if not secret and name != "help":
-        return None
     return RemoteCommand(name=name, args=" ".join(tokens[1:]).strip())
 
 
@@ -236,17 +229,16 @@ def execute_snooze(repo: Path, *, note: str = "") -> dict[str, Any]:
 
 
 def execute_help(repo: Path) -> dict[str, Any]:
-    prefix = f"{command_secret()} " if command_secret() else ""
     from scripts.ppe_operator_hint import PPE_GO_HINT
 
     body = (
-        f"{prefix}build - start IDE BUILD when verdict is IDE_BUILD\n"
+        "build - start IDE BUILD when verdict is IDE_BUILD\n"
         f"Desktop: {PPE_GO_HINT}\n"
-        f"{prefix}restart - restart loop + watch on the VM loop host (secret required)\n"
-        f"{prefix}fix - investigate blocker (CLI or IDE handoff)\n"
-        f"{prefix}status - friendly operator snapshot\n"
-        f"{prefix}snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
-        f"{prefix}help - this list"
+        "restart - restart loop + watch on the VM loop host\n"
+        "fix - investigate blocker (CLI or IDE handoff)\n"
+        "status - friendly operator snapshot\n"
+        "snooze [6|30m|until 08:00|clear] - mute phone pings (default 8h)\n"
+        "help - this list"
     )
     sent = send_ntfy(
         "PPE remote commands",
