@@ -8,6 +8,8 @@ one timestamped CSV under artifacts/distribution_snapshots/ by default.
 from __future__ import annotations
 
 import argparse
+import csv
+import json
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -30,6 +32,13 @@ from src.viz.distribution_export import (
 )
 
 DEFAULT_SNAPSHOT_ROOT = ROOT / "artifacts" / "distribution_snapshots"
+REPLAY_THRESHOLD_DAYS = 30
+RETENTION_MIN_DAYS = 90
+
+
+def default_archive_root(repo_root: Path | None = None) -> Path:
+    root = repo_root or ROOT
+    return root / "artifacts" / "distribution_snapshots"
 
 
 def default_snapshot_path(
@@ -40,6 +49,81 @@ def default_snapshot_path(
     day = as_of_utc.astimezone(UTC).strftime("%Y-%m-%d")
     stamp = as_of_utc.astimezone(UTC).strftime("%H%M%S")
     return root / day / f"ppe_btc_distribution_stats_{stamp}Z.csv"
+
+
+def _parse_as_of(value: str | datetime) -> datetime:
+    if isinstance(value, datetime):
+        return value.astimezone(UTC)
+    text = str(value).strip()
+    if len(text) == 10:
+        return datetime.strptime(text, "%Y-%m-%d").replace(tzinfo=UTC)
+    parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
+
+
+def list_snapshot_files(root: Path) -> list[Path]:
+    if not root.is_dir():
+        return []
+    files: list[Path] = []
+    for day_dir in sorted(root.iterdir()):
+        if not day_dir.is_dir():
+            continue
+        for path in sorted(day_dir.glob("ppe_btc_distribution_stats_*.csv")):
+            files.append(path)
+    return files
+
+
+def _snapshot_as_of(path: Path) -> datetime | None:
+    try:
+        with path.open("r", encoding="utf-8", newline="") as handle:
+            row = next(csv.DictReader(handle), None)
+    except (OSError, csv.Error):
+        return None
+    if not row:
+        return None
+    try:
+        return _parse_as_of(str(row.get("as_of_utc") or ""))
+    except ValueError:
+        return None
+
+
+def archive_meta(root: Path) -> dict[str, Any]:
+    files = list_snapshot_files(root)
+    if not files:
+        return {
+            "available_days": 0,
+            "snapshot_count": 0,
+            "earliest_utc": None,
+            "latest_utc": None,
+            "replay_ready": False,
+            "replay_threshold_days": REPLAY_THRESHOLD_DAYS,
+            "retention_min_days": RETENTION_MIN_DAYS,
+        }
+
+    day_dirs = {p.parent.name for p in files}
+    earliest = None
+    latest = None
+    for path in files:
+        as_of = _snapshot_as_of(path)
+        if as_of is None:
+            continue
+        if earliest is None or as_of < earliest:
+            earliest = as_of
+        if latest is None or as_of > latest:
+            latest = as_of
+
+    available_days = len(day_dirs)
+    return {
+        "available_days": available_days,
+        "snapshot_count": len(files),
+        "earliest_utc": earliest.isoformat() if earliest else None,
+        "latest_utc": latest.isoformat() if latest else None,
+        "replay_ready": available_days >= REPLAY_THRESHOLD_DAYS,
+        "replay_threshold_days": REPLAY_THRESHOLD_DAYS,
+        "retention_min_days": RETENTION_MIN_DAYS,
+    }
 
 
 def collect_distribution_stats_snapshot(
@@ -107,7 +191,16 @@ def main(argv: list[str] | None = None) -> int:
         default=DEFAULT_SNAPSHOT_ROOT,
         help="Root directory for dated snapshot folders",
     )
+    ap.add_argument(
+        "--archive-meta",
+        action="store_true",
+        help="Print archive metadata for the snapshot root and exit",
+    )
     args = ap.parse_args(argv)
+
+    if args.archive_meta:
+        print(json.dumps(archive_meta(args.snapshot_root), indent=2, sort_keys=True))
+        return 0
 
     try:
         out = collect_distribution_stats_snapshot(

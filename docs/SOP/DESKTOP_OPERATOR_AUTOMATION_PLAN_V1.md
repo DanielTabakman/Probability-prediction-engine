@@ -135,7 +135,10 @@ Signals are scattered:
 | Auto dispatch execute | `PPE_AUTO_DISPATCH=1` in env or `ppe_operator_desktop_auto.local.cmd` | off |
 | Monitor auto-act | `--auto-act` on monitor daemon | off |
 | Zero-click BUILD watcher | `setup_desktop_zero_click_build.cmd` | off |
-| Scheduled dispatch task | Step 6 installer | off |
+| Scheduled dispatch task | Step 6 installer (`install_ppe_operator_dispatch_task.cmd`) | off |
+| action_ready ntfy | deduped in `ACTION_READY_NOTIFY_STATE.json` | on when ntfy configured |
+
+**Opt-in file:** copy `ppe_operator_desktop_auto.local.cmd.example` to `ppe_operator_desktop_auto.local.cmd`. The example sets both `PPE_DESKTOP_AUTO=1` and `PPE_AUTO_DISPATCH=1`; startup and zero-click setup upgrade legacy opt-in files that are missing the dispatch line.
 
 ---
 

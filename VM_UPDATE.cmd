@@ -24,9 +24,9 @@ if errorlevel 1 (
 )
 
 echo.
-echo [VM_UPDATE] ensuring ntfy restart secret...
+echo [VM_UPDATE] ensuring operator notify config...
 set "PYTHONPATH=%CD%"
-python "%CD%\scripts\ensure_ntfy_cmd_secret.py" --repo-root "%CD%"
+python "%CD%\scripts\bootstrap_operator_notify_secret.py" --repo-root "%CD%"
 
 echo.
 echo [VM_UPDATE] refreshing Desktop shortcuts if needed...

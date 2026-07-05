@@ -9,13 +9,17 @@ from scripts.ppe_remote_build_agent import resolve_build_target
 
 
 def test_parse_build_command():
-    import os
-
-    os.environ.pop("PPE_NTFY_CMD_SECRET", None)
-    assert parse_command_text("build") is None
+    assert parse_command_text("build").name == "build"
 
 
-def test_parse_build_command_with_secret(monkeypatch):
+def test_parse_build_command_with_note():
+    cmd = parse_command_text("build extra context")
+    assert cmd is not None
+    assert cmd.name == "build"
+    assert cmd.args == "extra context"
+
+
+def test_parse_build_legacy_prefix(monkeypatch):
     monkeypatch.setenv("PPE_NTFY_CMD_SECRET", "s3cret")
     assert parse_command_text("s3cret build").name == "build"
     assert parse_command_text("s3cret build extra context").args == "extra context"

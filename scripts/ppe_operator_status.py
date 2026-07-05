@@ -690,6 +690,52 @@ def _format_burst_summary(burst_plan: dict[str, Any] | None) -> list[str]:
     return lines
 
 
+def assess_founder_posture(status: dict[str, Any]) -> str:
+    """Founder posture: wait | kick | alert | nothing."""
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else {}
+    if monitor.get("stuck"):
+        return "alert"
+    if status.get("action_ready"):
+        return "kick"
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
+    if monitor.get("status") == "watching" or vm_trust.get("wait_for_vm"):
+        return "wait"
+    return "nothing"
+
+
+def build_founder_truth_card(status: dict[str, Any]) -> dict[str, Any]:
+    """Compact founder-facing snapshot for status header."""
+    monitor = status.get("in_flight_monitor") if isinstance(status.get("in_flight_monitor"), dict) else {}
+    vm_trust = status.get("vm_trust") if isinstance(status.get("vm_trust"), dict) else {}
+    mirror_age_s = monitor.get("mirror_age_s")
+    mirror_age_m: int | None = None
+    if isinstance(mirror_age_s, (int, float)):
+        mirror_age_m = int(mirror_age_s // 60)
+    return {
+        "posture": assess_founder_posture(status),
+        "verdict": str(status.get("verdict") or ""),
+        "vm_phase": vm_trust.get("vm_phase") or monitor.get("phase"),
+        "mirror_age_m": mirror_age_m,
+        "monitor_status": monitor.get("status"),
+        "action_ready": bool(status.get("action_ready")),
+        "next_poll_m": monitor.get("next_poll_m"),
+    }
+
+
+def format_founder_truth_card_lines(status: dict[str, Any]) -> list[str]:
+    card = build_founder_truth_card(status)
+    parts = [
+        f"posture={card['posture']}",
+        f"verdict={card['verdict']}" if card.get("verdict") else None,
+        f"vm={card['vm_phase']}" if card.get("vm_phase") else None,
+        f"mirror={card['mirror_age_m']}m" if card.get("mirror_age_m") is not None else None,
+        f"monitor={card['monitor_status']}" if card.get("monitor_status") else None,
+        "action_ready" if card.get("action_ready") else None,
+    ]
+    detail = " · ".join(p for p in parts if p)
+    return [f"Truth card: {detail}"]
+
+
 def _format_human(
     status: dict[str, Any],
     repo: Path | None = None,
@@ -700,6 +746,10 @@ def _format_human(
         f"VERDICT: {status.get('verdict')}",
         "",
     ]
+    truth_lines = format_founder_truth_card_lines(status)
+    if truth_lines:
+        lines.extend(truth_lines)
+        lines.append("")
     pass_lines = status.get("operator_pass_lines")
     if isinstance(pass_lines, list) and pass_lines:
         lines.extend(str(x) for x in pass_lines)

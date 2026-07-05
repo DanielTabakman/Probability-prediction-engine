@@ -6,14 +6,36 @@ import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.ppe_operator_dispatch import dispatch_allowed, dispatch_direct_action
+from scripts.ppe_operator_dispatch import (
+    dispatch_allowed,
+    dispatch_direct_action,
+    ensure_desktop_auto_dispatch_opt_in,
+)
 from scripts.ppe_parked_work import clear_parked_work, load_parked_work, write_parked_work
 
 
-def test_dispatch_skipped_without_env(tmp_path: Path) -> None:
-    assert not dispatch_allowed()
+def test_dispatch_skipped_without_env(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.delenv("PPE_AUTO_DISPATCH", raising=False)
+    assert not dispatch_allowed(tmp_path)
     report = dispatch_direct_action(tmp_path, "branch_recovery", force=False)
     assert report.get("skipped") is True
+
+
+def test_dispatch_allowed_from_opt_in_file(tmp_path: Path) -> None:
+    opt_in = tmp_path / "ppe_operator_desktop_auto.local.cmd"
+    opt_in.write_text('@echo off\nset "PPE_AUTO_DISPATCH=1"\n', encoding="utf-8")
+    assert dispatch_allowed(tmp_path)
+
+
+def test_ensure_desktop_auto_dispatch_opt_in_patches(tmp_path: Path) -> None:
+    opt_in = tmp_path / "ppe_operator_desktop_auto.local.cmd"
+    opt_in.write_text('@echo off\nset "PPE_DESKTOP_AUTO=1"\n', encoding="utf-8")
+    result = ensure_desktop_auto_dispatch_opt_in(tmp_path)
+    assert result.get("ok") is True
+    assert result.get("action") == "patched"
+    assert dispatch_allowed(tmp_path)
+    again = ensure_desktop_auto_dispatch_opt_in(tmp_path)
+    assert again.get("action") == "already_present"
 
 
 def test_dispatch_force_unknown_action(tmp_path: Path) -> None:
@@ -66,6 +88,13 @@ def test_dispatch_desktop_continue_skipped_when_preflight_blocked(monkeypatch, t
     report = dispatch_direct_action(tmp_path, "DESKTOP_CONTINUE.cmd --no-pause", force=True)
     assert report.get("preflight_blocked") is True
     assert report.get("skipped") is True
+
+
+def test_scheduled_dispatch_auto_requires_opt_in(tmp_path: Path) -> None:
+    from scripts import ppe_operator_dispatch as mod
+
+    rc = mod.main(["--repo-root", str(tmp_path), "--auto", "--json"])
+    assert rc == 1
 
 
 def test_maybe_auto_operate_starts_monitor(monkeypatch, tmp_path: Path) -> None:
