@@ -26,8 +26,10 @@ def _run(cmd: list[str], *, cwd: Path) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, check=False)
 
 
-def check_ntfy() -> bool:
-    from scripts.ppe_notify_push import ntfy_configured, notify_enabled
+def check_ntfy(repo: Path | None = None) -> bool:
+    from scripts.ppe_notify_push import bootstrap_operator_notify_env, ntfy_configured, notify_enabled
+
+    bootstrap_operator_notify_env(repo)
 
     if not notify_enabled():
         _warn("PPE_NOTIFY disabled")
