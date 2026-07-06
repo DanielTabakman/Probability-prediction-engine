@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-06
+
+_No merges to `main`._
+
 ## 2026-07-05
 
+- `6f36b4d2` — Control-plane: dev changelog
 - `066437ae` — control-plane: rebuild recovery PR cleanly (#2915) (`scripts/`)
 - `f48263a3` — Control-plane: ntfy preflight local bootstrap (#2957) (`scripts/`)
 
