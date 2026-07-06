@@ -124,19 +124,19 @@ Purpose: live steering document for the **MSOS Website Program** (platform UI / 
 
 **Charter:** [`SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md`](SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md) · **Blocked until** workflow persistence COMPLETE · **Does not block** phases 4a–7
 
-### MSOS storyboard visual parity v1 — relay queue — **WITNESS PENDING**
+### MSOS storyboard visual parity v1 — relay queue — **COMPLETE**
 
 | Status | Slice | Plane |
 |--------|--------|-------|
-| **PENDING** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Control-Slice001` — charter + witness checklist | EVIDENCE |
 | **SHIPPED** | `MSOS-VisParityV1-Product-Slice002` — homepage (`01_home`) | PRODUCT |
 | **SHIPPED** | `MSOS-VisParityV1-Product-Slice003` — shell + Command Center (`02`, `08`) | PRODUCT |
 | **SHIPPED** | `MSOS-VisParityV1-Product-Slice004` — Strategy Lab chrome (`03`) | PRODUCT |
 | **SHIPPED** | `MSOS-VisParityV1-Product-Slice005` — thesis + expression (`04`, `05`) | PRODUCT |
 | **SHIPPED** | `MSOS-VisParityV1-Product-Slice006` — monitor, history, learn (`06`, `07`, `09`) | PRODUCT |
-| **PENDING** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
-| **PENDING** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
-| **PENDING** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Platform-Slice007` — VPS deploy + routing | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Witness-Slice008` — screenshot witness | EVIDENCE |
+| **CLOSED** | `MSOS-VisParityV1-Closeout-Slice009` — chapter close | EVIDENCE |
 
 **Evidence:** [`MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md`](MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md)
 

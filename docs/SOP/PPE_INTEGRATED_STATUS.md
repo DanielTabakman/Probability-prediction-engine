@@ -1,6 +1,6 @@
 # PPE integrated status — canonical one-pager
 
-**As-of:** 2026-06-30 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
+**As-of:** 2026-07-06 · **Baseline `main`:** verify `git rev-parse origin/main` after push  
 **Controlling canon:** [`docs/VISION/PPE_MASTER_MVP1.md`](../VISION/PPE_MASTER_MVP1.md) · **MVP1 steering:** [`MVP1_FRONTIER.md`](MVP1_FRONTIER.md) · **MSOS steering:** [`MSOS_FRONTIER.md`](MSOS_FRONTIER.md) · **MSOS acceleration:** [`MSOS_WEBSITE_ACCELERATION_CHECKLIST.md`](MSOS_WEBSITE_ACCELERATION_CHECKLIST.md) · **Strategic focus:** [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](PRODUCT_FOCUS_PLAYBOOK_V1.md)
 
 This file merges archived chapters, steward parallel work, engineering gates, and the doc map. On drift, **`MVP1_FRONTIER.md`** wins for MVP1 slice queue; **`MSOS_FRONTIER.md`** wins for MSOS website slice queue; this file wins for cross-chapter summary.
@@ -188,6 +188,8 @@ flowchart LR
 
 | PPE forward consistency radar v1 | **COMPLETE** 2026-06-30 | [`SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md`](docs/SOP/SPRINT_PPE_FORWARD_CONSISTENCY_RADAR_V1.md), [`PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md) |
 
+| MSOS storyboard visual parity v1 | **COMPLETE** 2026-07-06 | [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md), [`MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md`](docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -248,4 +250,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_TRADER_LEARNING_SPINE_V1_SELECTION.md`](docs/SOP/POST_TRADER_LEARNING_SPINE_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`MSOS_FRONTIER.md`](docs/SOP/MSOS_FRONTIER.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

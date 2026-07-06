@@ -93,7 +93,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
-      "status": "skipped",
+      "status": "ready",
       "reason": "Recurring between-chapter hygiene \u2014 auto-scheduled sideChannel",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"

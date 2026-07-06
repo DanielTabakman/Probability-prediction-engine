@@ -4,16 +4,18 @@ Record post-deploy smoke after **`main`** merge per [DEMO_UI_RELEASE_CHECKLIST.m
 
 | Field | Value |
 |-------|--------|
-| **Date (UTC)** | 2026-06-19 (production HTTP witness — `msos_production_demo_witness.py`) |
+| **Date (UTC)** | 2026-07-06 (MSOS storyboard visual parity deploy witness refresh) |
 | **Git SHA on VPS** | steward verify: `cd /opt/marketstructureos && git rev-parse HEAD` after latest **Deploy VPS** |
 | **Deploy path** | GitHub Actions **Deploy VPS** on push to `main` |
-| **marketstructureos.com (apex)** | **PASS** — Next.js MSOS homepage; full storyboard journey HTTP 200 (witness 2026-06-19) |
-| **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**) |
+| **marketstructureos.com (apex)** | **PASS** — Next.js MSOS homepage; storyboard routes `/`, `/command-center`, `/strategy-lab`, `/strategy-lab/confirm`, `/strategy-lab/expression`, `/monitor`, `/history`, and `/learn` HTTP 200 via `Invoke-WebRequest`; apex includes `_next/static` and no Streamlit markers |
+| **app.marketstructureos.com** | PASS — Cloudflare Access gate (**App full (snapshots)**); HTTP 200 with Access signals |
 | **HTTPS static assets** | PASS |
 | **Demo operator script** | PASS |
 | **Research offer CTA on demo (`app_demo`)** | **pending steward `.env`** — Streamlit demo banner |
 | **Research offer CTA on apex (`msos_web`)** | **pending** — run `bash scripts/vps_enable_research_cta.sh <email>` on VPS after `git pull` |
-| **PPE embed on Strategy Lab (`msos_web`)** | **PASS** — `/strategy-lab` shows live PPE embed region (witness 2026-06-19) |
+| **PPE embed on Strategy Lab (`msos_web`)** | **PASS** — `/strategy-lab` HTTP 200 and `/ppe-display-api/display.json` HTTP 200 with `spot_usd` |
+
+**2026-07-06 tooling warning:** local Python HTTPS witnesses (`verify_msos_web_ship.py`, `msos_production_demo_witness.py`) failed with `CERTIFICATE_VERIFY_FAILED: certificate has expired`. Windows HTTPS requests succeeded for apex routes and `app.*`; treat this as a local Python certificate-path follow-up, not a deploy-route failure.
 
 **Phase 2 (local):** dual smoke green `20260519_155858` + `20260519_160103` — [`MVP1_PHASE2_EVIDENCE_STATUS.md`](MVP1_PHASE2_EVIDENCE_STATUS.md).
 
