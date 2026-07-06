@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T00:31:07Z",
-  "program_count": 12,
+  "generated_at": "2026-07-06T12:00:26Z",
+  "program_count": 13,
   "programs": [
     {
       "module_id": "cross_venue_event_gap",
@@ -49,6 +49,10 @@
     {
       "module_id": null,
       "program_doc": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/STEERING_COORDINATION_PROGRAM_V1.md"
     }
   ],
   "resolve_cmd": "python scripts/resolve_sop.py --module <module_id> --json",
