@@ -364,7 +364,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
-      "status": "ready",
+      "status": "done",
       "reason": "[MEDIUM] Forward consistency radar ch.2 \u2014 MSOS /forward-consistency heatmap",
       "selectionPrep": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },

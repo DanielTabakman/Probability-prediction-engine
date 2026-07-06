@@ -160,4 +160,4 @@
 
 ## Changelog
 
-| 2026-07-03 | Auto-render from JSON |
+| 2026-07-06 | Auto-render from JSON |
