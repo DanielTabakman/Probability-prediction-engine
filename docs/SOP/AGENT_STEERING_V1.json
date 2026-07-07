@@ -2,6 +2,7 @@
   "asOf": "2026-06-30",
   "closeoutOnlyChapterIds": [
     "msos_access_identity_v1",
+    "msos_cross_venue_strategy_lab_v1",
     "msos_entitlements_v1",
     "msos_monitor_history_live_v1",
     "msos_p3_command_center",
@@ -11,6 +12,7 @@
     "msos_strategy_lab_distribution_demo",
     "msos_strategy_lab_embed_shell_v1",
     "msos_trader_review_loop_v1",
+    "msos_trader_workflow_horizon_nav_v1",
     "msos_workflow_persistence_v1",
     "mvp1_cross_venue_backtest_v1",
     "mvp1_cross_venue_scan_v1",
@@ -24,29 +26,27 @@
   ],
   "docHints": {
     "nextBuildCandidate": {
-      "chapter_id": "msos_trader_workflow_horizon_nav_v1",
+      "chapter_id": "ppe_equity_universe_tier1b_v1",
       "load_always": [
-        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-        "docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md"
+        "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md",
+        "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
       ],
       "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json"
+        "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
+        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json"
       ],
       "load_on_demand": [
-        "docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/POST_TRADER_WORKFLOW_SUPPLY_REFRESH_V1_SELECTION.md"
+        "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md"
       ],
-      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "resolve_cmd": "python scripts/resolve_sop.py --chapter msos_trader_workflow_horizon_nav_v1 --json"
+      "program_doc": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md",
+      "resolve_cmd": "python scripts/resolve_sop.py --chapter ppe_equity_universe_tier1b_v1 --json"
     }
   },
-  "nextBuildCandidateId": "msos_trader_workflow_horizon_nav_v1",
-  "nextBuildCandidateNote": "promote READY in PHASE_QUEUE.json",
+  "nextBuildCandidateId": "ppe_equity_universe_tier1b_v1",
+  "nextBuildCandidateNote": "complete asset batch wave 1 batch-1 retrospect, then promote READY in PHASE_QUEUE.json",
   "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-  "spineQueueAfterCloseout": [
-    "msos_cross_venue_strategy_lab_v1",
-    "mvp1_distribution_timeseries_collector_v1"
-  ],
+  "spineQueueAfterCloseout": [],
   "version": 1
 }

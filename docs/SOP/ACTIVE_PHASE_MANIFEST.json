@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1.md",
-  "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
-  "status": "READY",
-  "notes": "Steward SELECTION 2026-07-07: Trader Learning Spine ops chapter; resume distribution timeseries collector from clean main after visual parity closeout.",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
+  "status": "PLANNED",
+  "notes": "Next control action: complete asset batch wave 1 batch-1 retrospect (SPY/QQQ/IWM witness/cache/prod green + remaining OI rank refresh), then promote ppe_equity_universe_tier1b_v1 READY.",
   "workerMode": "local-agent"
 }
