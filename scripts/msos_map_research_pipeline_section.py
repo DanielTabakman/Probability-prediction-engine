@@ -152,7 +152,7 @@ RESEARCH_PIPELINE_SECTION = """
             <td><code>implied_distribution_ts</code></td>
             <td><code>artifacts/distribution_snapshots/</code></td>
             <td>dist charts (planned)</td>
-            <td><code>install_distribution_collector_task.cmd</code></td>
+            <td><code>install_distribution_stats_collector_task.cmd</code></td>
           </tr>
         </tbody>
       </table>
