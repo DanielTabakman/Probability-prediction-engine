@@ -13,6 +13,10 @@ from typing import Any
 
 DEFAULT_BASE = "https://marketstructureos.com"
 DEFAULT_OUT = Path("artifacts/health/msos_product_usage_telemetry_witness.json")
+USER_AGENT = (
+    "Mozilla/5.0 (compatible; ppe-msos-product-usage-witness/1; "
+    "+https://marketstructureos.com)"
+)
 
 
 def _utc_now() -> str:
@@ -31,7 +35,12 @@ def probe_usage_api(base_url: str) -> dict[str, Any]:
     req = urllib.request.Request(
         url,
         data=body,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": USER_AGENT,
+            "Origin": base_url.rstrip("/"),
+            "Referer": f"{base_url.rstrip('/')}/",
+        },
         method="POST",
     )
     try:
