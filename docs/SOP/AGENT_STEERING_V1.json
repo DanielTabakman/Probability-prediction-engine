@@ -45,7 +45,7 @@
     }
   },
   "nextBuildCandidateId": "ppe_equity_universe_tier1b_v1",
-  "nextBuildCandidateNote": "complete asset batch wave 1 batch-1 retrospect, then promote READY in PHASE_QUEUE.json",
+  "nextBuildCandidateNote": "blocked until production multi-asset witness is reachable/green; then promote READY in PHASE_QUEUE.json",
   "parallelWork": "Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
   "spineQueueAfterCloseout": [],
   "version": 1
