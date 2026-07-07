@@ -57,26 +57,40 @@ def fetch_url(url: str, *, timeout: float = 30.0) -> tuple[int, str, str | None]
 def verify_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
     """Strategy Lab page JS must ship labeled chart axes."""
     chunks = sorted(set(re.findall(r"/_next/static/chunks/app/strategy-lab/page-[^\"']+\.js", html)))
+    route_specific_chunks = bool(chunks)
+    if not chunks:
+        chunks = sorted(set(re.findall(r"/_next/static/chunks/[^\"']+\.js", html)))
     if not chunks:
         return False, "strategy-lab page bundle missing from HTML"
     base = base_url.rstrip("/")
+    fetched = 0
     for rel in chunks:
         status, body, err = fetch_url(f"{base}{rel}")
         if status != 200 or err:
-            return False, err or f"strategy-lab bundle HTTP {status}"
+            continue
+        fetched += 1
+        stale = [m for m in STALE_STRATEGY_LAB_MARKERS if m in body]
+        if route_specific_chunks and stale:
+            return False, (
+                "strategy-lab bundle still ships stale legend copy "
+                f"({', '.join(stale)}) - rebuild msos_web with --no-cache"
+            )
+        missing = [m for m in REQUIRED_STRATEGY_LAB_MARKERS if m not in body]
+        if missing:
+            continue
         stale = [m for m in STALE_STRATEGY_LAB_MARKERS if m in body]
         if stale:
             return False, (
                 "strategy-lab bundle still ships stale legend copy "
                 f"({', '.join(stale)}) — rebuild msos_web with --no-cache"
             )
-        missing = [m for m in REQUIRED_STRATEGY_LAB_MARKERS if m not in body]
-        if missing:
-            return False, (
-                "strategy-lab bundle missing labeled axis copy "
-                f"({', '.join(missing)}) — msos_web deploy did not ship"
-            )
-    return True, None
+        return True, None
+    if fetched == 0:
+        return False, "strategy-lab bundles could not be fetched"
+    return False, (
+        "strategy-lab bundles missing labeled axis copy "
+        f"({', '.join(REQUIRED_STRATEGY_LAB_MARKERS)}) - msos_web deploy did not ship"
+    )
 
 
 def verify_mobile_context_rail_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
