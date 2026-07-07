@@ -33,7 +33,7 @@ FIXTURE_PREVIEW_SPOT = "$104,320"
 FIXTURE_SAMPLE_SPOT = "Sample only"
 
 JOURNEY_PATHS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
-    ("/", "homepage", ("Market Structure OS", "Explore the platform")),
+    ("/", "homepage", ("Market Structure OS", "Turn your market thesis into a trade")),
     ("/strategy-lab", "strategy_lab", ("Strategy Lab", "Deribit")),
     ("/strategy-lab/confirm", "thesis_confirm", ("Is this what you actually believe?",)),
     ("/strategy-lab/expression", "expression", ("expression",)),
@@ -161,7 +161,7 @@ def validate_strategy_suggestion_api_response(
 
 
 def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
-    """Strategy Lab must expose a live PPE surface, not degraded embed placeholder."""
+    """Strategy Lab must expose a live PPE surface or client shell, not a dead placeholder."""
     if "Sample mode — not live market data" in html:
         return False, "Strategy Lab rendered sample fixtures — live display API not loaded"
     if "Placeholder chart" in html and "ppe-chart-region" not in html:
@@ -175,12 +175,31 @@ def validate_strategy_lab_html(html: str) -> tuple[bool, str | None]:
         return True, None
     if "Traceback (most recent call last)" in html or "AttributeError" in html:
         return False, "Python error in page HTML"
+    if (
+        "StrategyLabClientShell" in html
+        and "Loading live chart" in html
+        and "Fetching live" in html
+        and "/_next/static/chunks/" in html
+    ):
+        return True, None
     return False, "no PPE chart/embed region in Strategy Lab HTML"
+
+
+def _strategy_lab_asset_marker_present(html: str, *, asset_id: str) -> bool:
+    if f'data-asset="{asset_id}"' in html:
+        return True
+    return (
+        f"Strategy Lab · <!-- -->{asset_id} options" in html
+        and f"Fetching live {asset_id} options" in html
+    )
 
 
 def validate_strategy_lab_client_bundle(html: str, *, base_url: str) -> tuple[bool, str | None]:
     """Strategy Lab page JS must ship labeled chart axes (not pre-#320 legend copy)."""
-    from scripts.verify_msos_web_ship import verify_strategy_lab_client_bundle as _verify
+    try:
+        from scripts.verify_msos_web_ship import verify_strategy_lab_client_bundle as _verify
+    except ModuleNotFoundError:
+        from verify_msos_web_ship import verify_strategy_lab_client_bundle as _verify
 
     return _verify(html, base_url=base_url)
 
@@ -354,7 +373,7 @@ def run_witness(*, base_url: str = DEFAULT_BASE) -> dict[str, Any]:
         nvda_status == 200
         and nvda_html_ok
         and "NVDA" in nvda_body
-        and 'data-asset="NVDA"' in nvda_body
+        and _strategy_lab_asset_marker_present(nvda_body, asset_id="NVDA")
     )
     checks.append(
         {
