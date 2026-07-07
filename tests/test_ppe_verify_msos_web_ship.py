@@ -41,6 +41,29 @@ def test_verify_strategy_lab_client_bundle_accepts_labeled_axes() -> None:
     assert err is None
 
 
+def test_verify_strategy_lab_client_bundle_accepts_generic_next_chunks() -> None:
+    html = (
+        '<script src="/_next/static/chunks/runtime.js"></script>'
+        '<script src="/_next/static/chunks/strategy.js"></script>'
+    )
+
+    def fake_fetch(url: str, *, timeout: float = 30.0):
+        if url.endswith("runtime.js"):
+            return 200, "shared runtime", None
+        if url.endswith("strategy.js"):
+            return 200, "BTC price at expiry Market view", None
+        return 404, "", "not found"
+
+    original = ship.fetch_url
+    ship.fetch_url = fake_fetch
+    try:
+        ok, err = ship.verify_strategy_lab_client_bundle(html, base_url="https://example.com")
+    finally:
+        ship.fetch_url = original
+    assert ok is True
+    assert err is None
+
+
 def test_verify_msos_web_apex_rejects_streamlit() -> None:
     def fake_fetch(url: str, *, timeout: float = 30.0):
         if url.endswith("/"):
