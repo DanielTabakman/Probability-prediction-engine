@@ -8,6 +8,7 @@ from scripts.msos_production_demo_witness import (
     FIXTURE_PREVIEW_SPOT,
     _collect_fixture_warnings,
     _has_research_cta,
+    _strategy_lab_asset_marker_present,
     validate_belief_overlay_api_response,
     validate_display_api_response,
     validate_strategy_lab_client_bundle,
@@ -114,6 +115,28 @@ def test_validate_strategy_lab_html_placeholder_chart() -> None:
     ok, err = validate_strategy_lab_html(html)
     assert ok is False
     assert "sample" in (err or "").lower() or "placeholder" in (err or "").lower()
+
+
+def test_validate_strategy_lab_html_accepts_client_shell_loading_live_data() -> None:
+    html = (
+        '<script src="/_next/static/chunks/app-shell.js"></script>'
+        "<script>StrategyLabClientShell</script>"
+        '<div class="ppe-embed ppe-embed-degraded">'
+        "<h3>Loading live chart</h3>"
+        "<p>Fetching live BTC options from Deribit options.</p>"
+        "</div>"
+    )
+    ok, err = validate_strategy_lab_html(html)
+    assert ok is True
+    assert err is None
+
+
+def test_strategy_lab_asset_marker_present_accepts_client_shell_query_asset() -> None:
+    html = (
+        "<div>Strategy Lab · <!-- -->NVDA options</div>"
+        "<p>Fetching live NVDA options from equity options chain.</p>"
+    )
+    assert _strategy_lab_asset_marker_present(html, asset_id="NVDA") is True
 
 
 def test_validate_strategy_lab_client_bundle_rejects_stale_legend() -> None:
