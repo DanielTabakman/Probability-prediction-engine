@@ -54,6 +54,9 @@ On the Hyper-V loop host (`ppeloop`), from repo root after `git pull`:
 install_distribution_stats_collector_task.cmd
 ```
 
+`install_distribution_collector_task.cmd` is kept as the shorter alias used by
+the research pipeline registry; both wrappers register the same task.
+
 | Item | Value |
 |------|-------|
 | Task name | `PPE Distribution Stats Daily` |
