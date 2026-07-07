@@ -2,9 +2,17 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-07
+
+- MVP1-DistTs-Product-Slice002 product: add distribution collector task wrapper (#3991) (`docs/SOP/`)
+- `43d3bd01` — ops: context closeout ship (control-plane/recovery-202607070554) (#3972) (`docs/SOP/`)
+- `43a9d6d9` — control-plane: refresh SOP discovery indexes (#3962) (`docs/SOP/`)
+- `7b84da78` — control-plane: select distribution timeseries collector (#3958) (`docs/SOP/`)
+
 ## 2026-07-06
 
-_No merges to `main`._
+- `dc634e17` — control-plane: refresh digest and SOP indexes (#3768) (`docs/SOP/`)
+- `a3f8336a` — Control-plane: dev changelog
 
 ## 2026-07-05
 
