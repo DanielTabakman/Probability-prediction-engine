@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-07
 
+- `1266ef1c` — MVP1 DistTs: register collector closeout (`docs/SOP/`)
+- `e765d3ce` — Control-plane: dev changelog
 - MVP1-DistTs-Product-Slice002 product: add distribution collector task wrapper (#3991) (`docs/SOP/`)
 - `43d3bd01` — ops: context closeout ship (control-plane/recovery-202607070554) (#3972) (`docs/SOP/`)
 - `43a9d6d9` — control-plane: refresh SOP discovery indexes (#3962) (`docs/SOP/`)
