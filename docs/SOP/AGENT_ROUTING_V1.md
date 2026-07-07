@@ -51,13 +51,23 @@ When implementing product (rare — prefer `@ppe-build-worker`):
 
 ---
 
-## Verdict + Mode → action
+## Verdict + Mode -> action
 
 Before any relay command on desktop: `python scripts/ppe_loop_host_guard.py --check` — if `"allowed": false`, use desktop row only.
 
+Before any Codex-first product BUILD, run the build-worker preflight from [`WORKER_LANE_POLICY_V1.md`](WORKER_LANE_POLICY_V1.md):
+
+```bat
+verify_codex.cmd
+verify_build_worker.cmd
+python scripts/ppe_worker_lease.py --assess
+```
+
+If that preflight fails, record the Codex blocker as a routing/tooling issue and fall back to Cursor only when the active operator profile or blocker requires it.
+
 | Verdict | `Mode` in status | Desktop | VM |
 |---------|------------------|---------|-----|
-| `IDE_BUILD` | `IDE_BUILD` | `DESKTOP_BUILD.cmd` → starter → gate → commit → mark ready | Wait for desktop |
+| `IDE_BUILD` | `IDE_BUILD` | Codex-first when `buildWorker=codex`: `DESKTOP_BUILD.cmd` / build-worker handoff -> starter -> gate -> commit -> mark ready; Cursor is fallback/exception | Wait for desktop |
 | `IDE_BUILD` | `CLOSEOUT_ONLY` | Do **not** re-implement — finish marker/closeout | `run_ppe_local.cmd` |
 | `RUN_LOCAL` | any | **`DESKTOP_CONTINUE.cmd`** | `run_ppe_local.cmd` / `@ppe-finish-worker` |
 | `RUN_AUTO` | any | SSH status only | `run_ppe.cmd` or loop |

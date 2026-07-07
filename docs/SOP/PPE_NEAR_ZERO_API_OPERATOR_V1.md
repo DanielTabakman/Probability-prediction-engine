@@ -49,12 +49,14 @@
 
 **When CLI blocked (usage / not installed):** same as IDE handoff below.
 
+**Before Codex-first BUILD:** run `verify_codex.cmd`, `verify_build_worker.cmd`, and `python scripts/ppe_worker_lease.py --assess`. Classify failures as routing/tooling unless the product slice itself has already failed its sprint tests or gate.
+
 **IDE handoff path:**
 
 1. Generate `IDE_BUILD_STARTER_<sliceId>.md` for the **next unmarked** product slice.
 2. Write `artifacts/orchestrator/IDE_BUILD_NOW.md`.
-3. Write `artifacts/orchestrator/IDE_BUILD_NOW.md` with starter `@` instructions.
-4. **Open Cursor** on repo + starter file (when `PPE_IDE_HANDOFF_OPEN=1`).
+3. Write starter `@` instructions into the handoff artifact.
+4. **Open Codex or Cursor** on repo + starter file according to `buildWorker` and fallback state (when `PPE_IDE_HANDOFF_OPEN=1`).
 5. **ntfy:** `PPE IDE BUILD: <sliceId>`.
 
 **Emergency paste:** set `PPE_IDE_HANDOFF_CLIPBOARD=1` or run `DESKTOP_BUILD_CLIPBOARD.cmd`.
