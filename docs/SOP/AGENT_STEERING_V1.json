@@ -15,6 +15,7 @@
     "mvp1_cross_venue_backtest_v1",
     "mvp1_cross_venue_scan_v1",
     "mvp1_distribution_stats_legibility",
+    "mvp1_distribution_timeseries_collector_v1",
     "mvp1_snapshot_owner_v1",
     "ppe_deribit_crypto_tier1_v1",
     "ppe_hyperliquid_perp_rail_v1",
