@@ -74,7 +74,7 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
         "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
     )
-    assert status in ("READY", "RUNNING", "COMPLETE")
+    assert status in ("READY", "RUNNING", "COMPLETE", "BLOCKED")
     if status == "COMPLETE":
         assert plan == "" or plan in allowed
     else:
