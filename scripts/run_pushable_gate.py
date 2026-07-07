@@ -380,6 +380,8 @@ def main(argv: list[str] | None = None) -> int:
                     return "PPE_CORE"
                 if path.startswith("tests/test_lab_asset"):
                     return "PPE_CORE"
+                if path.startswith("tests/test_find_exposure_paths"):
+                    return "PPE_CORE"
                 if path.startswith("tests/test_equity_distribution"):
                     return "PPE_CORE"
                 if path.startswith("tests/test_horizon_"):
@@ -574,6 +576,8 @@ def run_gate_for_paths(
                 if path.startswith("tests/test_fetch_") or path.startswith("tests/test_assets_registry"):
                     return "PPE_CORE"
                 if path.startswith("tests/test_lab_asset"):
+                    return "PPE_CORE"
+                if path.startswith("tests/test_find_exposure_paths"):
                     return "PPE_CORE"
                 if path.startswith("tests/test_equity_distribution"):
                     return "PPE_CORE"

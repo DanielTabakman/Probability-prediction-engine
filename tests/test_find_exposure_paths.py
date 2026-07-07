@@ -142,6 +142,12 @@ def test_btc_long_returns_live_paths(btc_mocks) -> None:
     assert spot["cost_hint_usd"] == 10_000.0
 
 
+def test_deribit_expiries_pass_currency_by_keyword() -> None:
+    with patch("src.data.fetch_deribit.fetch_deribit_option_expiries", return_value=[]) as fetch_expiries:
+        assert core_mod._fetch_option_expiries("BTC") == []
+    fetch_expiries.assert_called_once_with(currency="BTC")
+
+
 def test_sol_long_returns_live_paths(sol_mocks) -> None:
     report = cli_mod.run_find_exposure_paths("SOL", "long")
     assert report["asset_id"] == "SOL"
