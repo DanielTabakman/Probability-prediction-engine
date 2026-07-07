@@ -47,6 +47,15 @@ def test_msos_web_compose_product_usage_volume() -> None:
     assert "PPE_PRODUCT_USAGE_DIR" in compose
 
 
+def test_msos_web_docker_entrypoint_chowns_product_usage_volume() -> None:
+    dockerfile = (MSOS_WEB / "Dockerfile").read_text(encoding="utf-8")
+    entrypoint = (MSOS_WEB / "docker-entrypoint.sh").read_text(encoding="utf-8")
+    assert "su-exec" in dockerfile
+    assert "docker-entrypoint.sh" in dockerfile
+    assert "PPE_PRODUCT_USAGE_DIR" in entrypoint
+    assert "chown -R nextjs:nodejs /data" in entrypoint
+
+
 def test_review_route_logs_usage() -> None:
     route = MSOS_WEB / "src" / "app" / "api" / "snapshots" / "[id]" / "review" / "route.ts"
     text = route.read_text(encoding="utf-8")
