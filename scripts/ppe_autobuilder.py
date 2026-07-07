@@ -359,6 +359,7 @@ def collect_autobuilder_status(repo: Path) -> dict[str, Any]:
             "handoff_worker": dispatch.get("handoff_worker"),
             "worker_pref": dispatch.get("pref"),
             "worker_reason": dispatch.get("reason"),
+            "preflight": dispatch.get("preflight"),
             "handoff": {
                 "last_slice": handoff_state.get("last_handoff_slice"),
                 "last_at": handoff_state.get("last_handoff_at"),

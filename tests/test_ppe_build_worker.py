@@ -11,6 +11,7 @@ from scripts.ppe_build_worker import (
     WORKER_CODEX_CLI,
     WORKER_CURSOR_CLI,
     WORKER_MANUAL,
+    build_worker_preflight_status,
     build_product_prompt,
     load_build_worker_pref,
     read_build_worker_events,
@@ -315,6 +316,42 @@ def test_resolve_codex_prefers_codex_when_available(tmp_path, monkeypatch):
         out = resolve_build_worker(tmp_path)
     assert out["worker"] == WORKER_CODEX_CLI
     assert out["mode"] == "headless"
+
+
+def test_build_worker_preflight_ready_for_codex_headless(tmp_path):
+    status = build_worker_preflight_status(
+        tmp_path,
+        resolved={
+            "pref": PREF_CODEX,
+            "worker": WORKER_CODEX_CLI,
+            "mode": "headless",
+            "codex_cli_available": True,
+            "codex_cli_exhausted": False,
+            "cursor_cli_available": True,
+            "cursor_cli_exhausted": False,
+        },
+        handoff={"worker": WORKER_CODEX_CLI},
+    )
+    assert status["ok"] is True
+    assert status["classification"] == "ready"
+
+
+def test_build_worker_preflight_classifies_codex_tooling_gap(tmp_path):
+    status = build_worker_preflight_status(
+        tmp_path,
+        resolved={
+            "pref": PREF_CODEX,
+            "worker": WORKER_CODEX_CLI,
+            "mode": "manual",
+            "codex_cli_available": False,
+            "codex_cli_exhausted": False,
+            "cursor_cli_available": False,
+            "cursor_cli_exhausted": False,
+        },
+        handoff={"worker": WORKER_CODEX_CLI},
+    )
+    assert status["ok"] is False
+    assert status["classification"] == "routing_tooling"
 
 
 def test_clear_cli_usage_exhausted_ignores_stale_log(tmp_path):

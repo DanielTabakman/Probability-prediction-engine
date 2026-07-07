@@ -653,6 +653,71 @@ def _build_worker_policy_context(repo: Path) -> dict[str, Any]:
     }
 
 
+def build_worker_preflight_status(
+    repo: Path,
+    *,
+    resolved: dict[str, Any] | None = None,
+    handoff: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Classify BUILD worker readiness without treating routing issues as product failures."""
+    repo = repo.resolve()
+    resolved = resolved or resolve_build_worker(repo)
+    handoff = handoff or resolve_build_worker(repo, for_handoff=True)
+
+    pref = str(resolved.get("pref") or load_build_worker_pref(repo))
+    worker = str(resolved.get("worker") or "")
+    mode = str(resolved.get("mode") or "")
+    handoff_worker = str(handoff.get("worker") or "")
+    codex_ready = bool(resolved.get("codex_cli_available")) and not bool(
+        resolved.get("codex_cli_exhausted")
+    )
+    cursor_ready = bool(resolved.get("cursor_cli_available")) and not bool(
+        resolved.get("cursor_cli_exhausted")
+    )
+
+    if pref != PREF_CODEX:
+        return {
+            "ok": True,
+            "classification": "fallback_profile",
+            "detail": f"buildWorker={pref}; Codex-first preflight not required",
+            "pref": pref,
+            "worker": worker,
+            "mode": mode,
+            "handoff_worker": handoff_worker,
+            "codex_ready": codex_ready,
+            "cursor_ready": cursor_ready,
+        }
+
+    if worker == WORKER_CODEX_CLI and mode == "headless" and codex_ready:
+        classification = "ready"
+        ok = True
+        detail = "Codex CLI headless ready"
+    elif handoff_worker == WORKER_CODEX_CLI and codex_ready:
+        classification = "ready"
+        ok = True
+        detail = "Codex desktop handoff ready; headless BUILD unavailable"
+    elif worker == WORKER_MANUAL and cursor_ready:
+        classification = "fallback_available"
+        ok = True
+        detail = "Codex unavailable; Cursor fallback available"
+    else:
+        classification = "routing_tooling"
+        ok = False
+        detail = "Codex unavailable or exhausted; run verify_codex.cmd / setup_codex.cmd"
+
+    return {
+        "ok": ok,
+        "classification": classification,
+        "detail": detail,
+        "pref": pref,
+        "worker": worker,
+        "mode": mode,
+        "handoff_worker": handoff_worker,
+        "codex_ready": codex_ready,
+        "cursor_ready": cursor_ready,
+    }
+
+
 def evaluate_codex_first_policy(repo: Path) -> dict[str, Any]:
     """Check BUILD dispatch prefers Codex CLI to preserve Cursor quota (local default)."""
     ctx = _build_worker_policy_context(repo)
@@ -749,6 +814,7 @@ def evaluate_cursor_first_policy(repo: Path) -> dict[str, Any]:
 def collect_build_worker_status(repo: Path) -> dict[str, Any]:
     resolved = resolve_build_worker(repo)
     handoff = resolve_build_worker(repo, for_handoff=True)
+    preflight = build_worker_preflight_status(repo, resolved=resolved, handoff=handoff)
     return {
         "pref": resolved.get("pref"),
         "worker": resolved.get("worker"),
@@ -759,6 +825,7 @@ def collect_build_worker_status(repo: Path) -> dict[str, Any]:
         "codex_cli_available": resolved.get("codex_cli_available"),
         "cursor_cli_exhausted": _cursor_cli_exhausted(repo),
         "codex_cli_exhausted": _codex_cli_exhausted(repo),
+        "preflight": preflight,
     }
 
 
