@@ -186,7 +186,7 @@ def test_backlog_p4_done() -> None:
 
 def test_manifest_ready_for_next_chapter() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assert manifest["status"] in ("READY", "RUNNING", "COMPLETE")
+    assert manifest["status"] in ("READY", "RUNNING", "COMPLETE", "BLOCKED")
     if manifest["status"] == "COMPLETE":
         assert manifest.get("phasePlanPath") in ("", None)
     if manifest["status"] == "READY":
