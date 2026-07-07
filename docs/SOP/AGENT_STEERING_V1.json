@@ -28,19 +28,17 @@
     "nextBuildCandidate": {
       "chapter_id": "ppe_equity_universe_tier1b_v1",
       "load_always": [
-        "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md",
-        "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
       ],
       "load_for_build": [
         "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
         "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json"
       ],
       "load_on_demand": [
-        "docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md"
+        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
       ],
-      "program_doc": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md",
+      "program_doc": null,
       "resolve_cmd": "python scripts/resolve_sop.py --chapter ppe_equity_universe_tier1b_v1 --json"
     }
   },

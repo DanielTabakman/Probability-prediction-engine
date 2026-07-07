@@ -1,16 +1,42 @@
+---
+archived: true
+chapter_id: mvp1_distribution_timeseries_collector_v1
+closed: 2026-07-07
+---
+
 # MVP1 distribution timeseries collector v1 — evidence status
 
 **Chapter:** `mvp1_distribution_timeseries_collector_v1`  
-**Status:** **QUEUED** (SELECTION 2026-06-29)  
+**Status:** **COMPLETE** 2026-07-07  
 **Phase plan:** [`PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json`](PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json)
 
 | Slice | Status |
 |-------|--------|
-| MVP1-DistTs-Control-Slice001 | PENDING |
-| MVP1-DistTs-Product-Slice002 | IMPLEMENTED LOCAL; SHIP BLOCKED |
-| MVP1-DistTs-Closeout-Slice003 | PENDING |
+| MVP1-DistTs-Control-Slice001 | COMPLETE |
+| MVP1-DistTs-Product-Slice002 | COMPLETE |
+| MVP1-DistTs-Closeout-Slice003 | COMPLETE |
 
 ## MVP1-DistTs-Product-Slice002 evidence
+
+2026-07-07 closeout verification:
+
+```bash
+python -m pytest tests/test_collect_distribution_stats_snapshot.py tests/test_ppe_collect_distribution_stats_snapshot.py
+```
+
+Result: PASS, 8 passed.
+
+```bash
+python scripts/run_pushable_gate.py
+```
+
+Result: PASS, tier 0.
+
+```bash
+PPE_SKIP_ACP=1 run_phase.cmd docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json
+```
+
+Result: PASS. Closeout completed; Google Docs mirror refresh was skipped/failed non-blocking because `PPE_MSOS_MIRROR_DOC_ID` is not set locally.
 
 2026-07-05 local run:
 
