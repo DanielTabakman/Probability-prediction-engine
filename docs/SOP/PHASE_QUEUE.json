@@ -103,7 +103,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "workerMode": "deterministic"
@@ -117,13 +117,13 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md"
     },
@@ -172,9 +172,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
-      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
@@ -199,37 +200,37 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] MCD phase 3 \u2014 server thesis/expression store",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",
       "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Access on MSOS routes \u2014 phase 4b",
       "selectionPrep": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Live monitor/history \u2014 phase 5",
       "selectionPrep": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Free tier + manual paid \u2014 phase 7a",
       "selectionPrep": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
     },
@@ -249,7 +250,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     },
@@ -272,9 +273,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_happy_path_v1_relay.json",
-      "status": "READY",
-      "reason": "[HIGH] Autobuilder happy path \u2014 active factory chapter",
-      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
+      "status": "PLANNED",
+      "reason": "[HOLD] Autobuilder happy path plan file missing; demoted during 2026-07-07 selection so queue automation can advance valid chapters.",
+      "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md",
+      "holdReason": "plan file missing on main; requires separate factory charter before READY"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
@@ -292,7 +294,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
       "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
     },
@@ -359,7 +361,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "urgent": true,
@@ -398,7 +400,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     },
@@ -468,11 +470,12 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[P2 SPINE] VM distribution stats collector",
+      "status": "READY",
+      "reason": "[P2 SPINE] VM distribution stats collector ? SELECTED 2026-07-07 after storyboard visual parity closeout; resume cleanly from main.",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md",
       "sideChannel": true,
-      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md"
+      "spineProgram": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
+      "workerMode": "local-agent"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",

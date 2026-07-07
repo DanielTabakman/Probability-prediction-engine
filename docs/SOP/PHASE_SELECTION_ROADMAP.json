@@ -94,7 +94,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
       "status": "skipped",
-      "reason": "Recurring between-chapter hygiene \u2014 auto-scheduled sideChannel",
+      "reason": "Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     },
@@ -376,8 +376,8 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
-      "status": "pending",
-      "reason": "[P2 SPINE] VM distribution stats collector",
+      "status": "ready",
+      "reason": "[P2 SPINE] VM distribution stats collector ? SELECTED 2026-07-07 after storyboard visual parity closeout.",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md"
     },
     {
