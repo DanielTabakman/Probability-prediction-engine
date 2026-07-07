@@ -142,7 +142,7 @@ def _fetch_option_expiries(asset_id: str) -> list[dict[str, Any]]:
         return fetch_bybit_option_expiries(asset_id=aid)
     from src.data.fetch_deribit import fetch_deribit_option_expiries
 
-    return fetch_deribit_option_expiries(deribit_currency(aid))
+    return fetch_deribit_option_expiries(currency=deribit_currency(aid))
 
 
 def _fetch_marks_for_expiry(asset_id: str, expiry_ts: int) -> dict[str, list[dict[str, Any]]]:
