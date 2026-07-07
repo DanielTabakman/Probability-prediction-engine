@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_distribution_stats_legibility
+closed: 2026-06-11
+---
+
 
 # MVP1 distribution stats legibility — evidence status
 

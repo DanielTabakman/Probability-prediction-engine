@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_strategy_lab_distribution_demo
+closed: 2026-06-11
+---
+
 
 # MSOS Strategy Lab distribution demo — evidence status
 

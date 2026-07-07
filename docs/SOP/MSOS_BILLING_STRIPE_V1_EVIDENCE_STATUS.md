@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_billing_stripe_v1
+closed: unknown
+---
+
 # MSOS billing Stripe v1 — evidence status
 
 **Chapter:** `msos_billing_stripe_v1`  

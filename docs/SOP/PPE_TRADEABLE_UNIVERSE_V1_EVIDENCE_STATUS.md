@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_tradeable_universe_v1
+closed: 2026-06-27
+---
+
 
 # PPE tradeable universe v1 — evidence status
 
