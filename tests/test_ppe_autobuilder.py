@@ -135,7 +135,12 @@ def test_collect_autobuilder_status_writes_json(tmp_path: Path):
         patch("scripts.ppe_autobuilder._finish_worker_running", return_value={"running": False}),
         patch(
             "scripts.ppe_autobuilder._dispatch_profile",
-            return_value={"prefer_ide": False, "degraded": False, "reason": None},
+            return_value={
+                "prefer_ide": False,
+                "degraded": False,
+                "reason": None,
+                "preflight": {"ok": True, "classification": "ready"},
+            },
         ),
         patch("scripts.ppe_autobuilder._automation_summary", return_value={"trigger_status": "idle"}),
         patch("scripts.ppe_ide_handoff.load_handoff_state", return_value={}),
@@ -147,6 +152,7 @@ def test_collect_autobuilder_status_writes_json(tmp_path: Path):
     assert status["phase"] == PHASE_HEALTHY_IDLE
     assert status["verdict"] == "RUN_AUTO"
     assert "allowed_actions" in status
+    assert status["build"]["preflight"]["classification"] == "ready"
     assert path == tmp_path / STATUS_JSON_REL
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["agent"] == "@ppe-autobuilder-operator"
