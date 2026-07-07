@@ -99,8 +99,8 @@ services:
     environment:
       - PORT=8765
       - PPE_DISPLAY_CACHE_ENABLED=1
-      - PPE_DISPLAY_CACHE_TTL_SECONDS=120
-      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=90
+      - PPE_DISPLAY_CACHE_TTL_SECONDS=900
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=300
     restart: unless-stopped
     networks:
       - web
@@ -117,7 +117,7 @@ services:
         "http://ppe_display_api:8765",
       ]
     environment:
-      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=90
+      - PPE_DISPLAY_CACHE_REFRESH_SECONDS=300
     depends_on:
       - ppe_display_api
     restart: unless-stopped
