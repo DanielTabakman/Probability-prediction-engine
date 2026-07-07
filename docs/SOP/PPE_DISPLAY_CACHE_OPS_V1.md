@@ -11,8 +11,8 @@
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `PPE_DISPLAY_CACHE_ENABLED` | `1` | Toggle WSGI TTL cache |
-| `PPE_DISPLAY_CACHE_TTL_SECONDS` | `120` | Cache max-age |
-| `PPE_DISPLAY_CACHE_REFRESH_SECONDS` | `90` | Scheduled warm interval (must stay below TTL) |
+| `PPE_DISPLAY_CACHE_TTL_SECONDS` | `900` in production compose; code default `120` | Cache max-age |
+| `PPE_DISPLAY_CACHE_REFRESH_SECONDS` | `300` in production compose; code default `90` | Scheduled warm interval (must stay below TTL) |
 | `PPE_DISPLAY_API_BASE_URL` | `http://127.0.0.1:8765` | Target for warm scripts / Windows task |
 
 ---
@@ -31,7 +31,7 @@ Post-recreate hook in [`deploy-vps.yml`](../../.github/workflows/deploy-vps.yml)
 python scripts/run_display_cache_refresh.py --loop --base-url http://ppe_display_api:8765
 ```
 
-Interval from `PPE_DISPLAY_CACHE_REFRESH_SECONDS` (default **90s**, below 120s TTL).
+Interval from `PPE_DISPLAY_CACHE_REFRESH_SECONDS` (production compose **300s**, below 900s TTL).
 
 Deploy workflow starts the sidecar with `ppe_display_api`.
 
