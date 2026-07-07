@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_cross_venue_scan_v1
+closed: unknown
+---
+
 # MVP1 cross-venue scan v1 — evidence status
 
 **Chapter:** `mvp1_cross_venue_scan_v1`  

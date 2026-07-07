@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: mvp1_snapshot_owner_v1
+closed: 2026-06-18
+---
+
 
 # MVP1 snapshot owner v1 — evidence status
 

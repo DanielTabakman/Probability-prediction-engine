@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: ppe_deribit_crypto_tier1_v1
+closed: unknown
+---
+
 # PPE Deribit crypto tier-1 v1 — evidence status
 
 **Chapter:** `ppe_deribit_crypto_tier1_v1` / **`ppe_sol_bybit_ship_v1`**  

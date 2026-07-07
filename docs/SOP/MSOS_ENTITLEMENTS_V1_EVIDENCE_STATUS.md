@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_entitlements_v1
+closed: 2026-06-19
+---
+
 
 # MSOS entitlements v1 — evidence status
 

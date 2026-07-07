@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_monitor_history_live_v1
+closed: 2026-06-18
+---
+
 
 # MSOS monitor & history live v1 — evidence status
 
