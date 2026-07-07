@@ -16,7 +16,7 @@
 | `run_cross_venue_daily.cmd` | Cross-venue collect + scan only (legacy daily) |
 | `run_cross_venue_collector_dev.cmd --interval 300 --count 12` | Dev high-cadence smoke (not production) |
 | `run_cross_venue_tradeability.cmd` | Net gap after spread proxy on latest snapshot |
-| `install_distribution_collector_task.cmd` | VM daily distribution stats (07:45) |
+| `install_distribution_stats_collector_task.cmd` | VM daily distribution stats (07:45) |
 | `research_status.cmd` | Human-readable pipeline status |
 | `run_cross_venue_tradeability_backtest.cmd` | Historical tradeability vs resolution |
 
@@ -47,7 +47,7 @@ Tests declare which collector archive they read. Strategies (future) consume tes
 |----|---------|----------|---------|
 | `cross_venue_event_gap` | `artifacts/cross_venue_snapshots/` | 14 | `install_cross_venue_collector_task.cmd` |
 | `options_horizon_surface` | `artifacts/horizon_surface_archive/` | 30 | `install_horizon_surface_collector_task.cmd` |
-| `implied_distribution_ts` | `artifacts/distribution_snapshots/` | 7 | `install_distribution_collector_task.cmd` |
+| `implied_distribution_ts` | `artifacts/distribution_snapshots/` | 7 | `install_distribution_stats_collector_task.cmd` |
 
 Full list: `config/research_pipeline_registry.json`
 

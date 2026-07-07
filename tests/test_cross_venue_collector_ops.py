@@ -20,11 +20,20 @@ def test_cross_venue_collector_cmd_wrappers_exist() -> None:
         "research_status.cmd",
         "install_cross_venue_collector_task.cmd",
         "install_distribution_collector_task.cmd",
+        "install_distribution_stats_collector_task.cmd",
     ):
         path = root / name
         assert path.is_file(), name
         text = path.read_text(encoding="utf-8")
         assert "python" in text.lower()
+
+
+def test_distribution_stats_task_alias_uses_distribution_installer() -> None:
+    root = Path(__file__).resolve().parents[1]
+    cmd = root / "install_distribution_stats_collector_task.cmd"
+    text = cmd.read_text(encoding="utf-8")
+    assert "install_ppe_distribution_collector_task.ps1" in text
+    assert "--unregister" in text
 
 
 def test_install_cross_venue_task_ps1_references_daily_runner() -> None:
