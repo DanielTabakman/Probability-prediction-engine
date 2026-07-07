@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts.ppe_tracking_hub import record_event
@@ -62,8 +63,9 @@ class TestWorkflowMetricsCli(unittest.TestCase):
     def test_export_csv_includes_product_usage(self) -> None:
         usage_path = self.repo / "data" / "ppe_product_usage.jsonl"
         usage_path.parent.mkdir(parents=True)
+        created_at_utc = datetime.now(timezone.utc).isoformat()
         usage_path.write_text(
-            '{"event_name":"lab_view","created_at_utc":"2026-06-30T12:00:00Z"}\n',
+            f'{{"event_name":"lab_view","created_at_utc":"{created_at_utc}"}}\n',
             encoding="utf-8",
         )
         self.assertEqual(cmd_export_csv(self.repo), 0)

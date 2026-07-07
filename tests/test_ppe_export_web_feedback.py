@@ -73,11 +73,13 @@ def test_format_digest_line_window() -> None:
 
 
 def test_format_digest_line_with_env(tmp_path: Path, monkeypatch) -> None:
+    from datetime import datetime, timezone
+
     from scripts.ppe_export_web_feedback import format_digest_line
 
     jsonl = tmp_path / "ppe_web_feedback.jsonl"
     row = {
-        "created_at_utc": "2026-06-30T12:00:00Z",
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "usefulness": 4,
         "repeat_use_intent": 5,
     }

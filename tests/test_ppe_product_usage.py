@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,7 +35,7 @@ class TestPpeProductUsage(unittest.TestCase):
     def test_read_jsonl_rows(self) -> None:
         path = self.repo / "data" / "ppe_product_usage.jsonl"
         path.parent.mkdir(parents=True)
-        row = {"event_name": "page_view", "created_at_utc": "2026-06-30T12:00:00Z"}
+        row = {"event_name": "page_view", "created_at_utc": datetime.now(timezone.utc).isoformat()}
         path.write_text(json.dumps(row) + "\n", encoding="utf-8")
         rows = read_usage_events(path)
         self.assertEqual(len(rows), 1)
