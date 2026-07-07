@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import os
-from wsgiref.simple_server import make_server
+from socketserver import ThreadingMixIn
+from wsgiref.simple_server import WSGIServer, make_server
 
 from src.viz.embed_display_boundary import (
     build_cached_live_distribution_display_payload,
@@ -11,10 +12,16 @@ from src.viz.embed_display_boundary import (
 )
 
 
+class ThreadingWSGIServer(ThreadingMixIn, WSGIServer):
+    """Serve slow upstream-backed payload requests without blocking health routes."""
+
+    daemon_threads = True
+
+
 def main() -> None:
     port = int(os.environ.get("PORT", "8765"))
     app = create_display_payload_wsgi_app(build_cached_live_distribution_display_payload)
-    with make_server("", port, app) as httpd:
+    with make_server("", port, app, server_class=ThreadingWSGIServer) as httpd:
         print(f"ppe_display_api listening on :{port}", flush=True)
         httpd.serve_forever()
 
