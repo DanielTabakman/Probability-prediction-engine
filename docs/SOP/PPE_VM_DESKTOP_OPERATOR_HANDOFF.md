@@ -14,7 +14,7 @@ Use this doc when opening a **new Cursor thread** after VM/desktop operator work
 
 | Machine | Path | Role | Loop |
 |---------|------|------|------|
-| **Daily PC** | `C:\Users\USER\Desktop\Probability-prediction-engine` | Cursor IDE BUILD, steward chat | **Off** (`ppe_operator_no_loop.local.cmd` → `PPE_STACK_FORBIDDEN=1`) |
+| **Daily PC** | `C:\Users\USER\Desktop\Probability-prediction-engine` | Configured IDE BUILD worker (Codex first, Cursor fallback), steward chat | **Off** (`ppe_operator_no_loop.local.cmd` → `PPE_STACK_FORBIDDEN=1`) |
 | **Hyper-V VM** (`ppeloop@DESKTOP-CAQLL8K`) | `C:\Users\ppeloop\Probability-prediction-engine` | Headless operator 24/7 | **On** (`ppe_operator_loop_host.local.cmd` → `PPE_LOOP_HOST=1` + `PPE_STACK_HEADLESS=1`) |
 
 **Do not** install `PPE Desktop Operator` scheduled task on the daily PC. **Do not** copy `ppe_operator_loop_host.local.cmd` to the desktop.
@@ -51,7 +51,7 @@ PHASE=RUN_LOCAL_PENDING VERDICT=RUN_LOCAL stack_loop=True stack_watch=True next=
 | Reading | Meaning |
 |---------|---------|
 | `stack_loop=True` / `stack_watch=True` | Headless stack OK |
-| `VERDICT=IDE_BUILD` | Product slice needs **Cursor BUILD on desktop** → `DESKTOP_BUILD.cmd` |
+| `VERDICT=IDE_BUILD` | Product slice needs configured desktop BUILD worker → `DESKTOP_BUILD.cmd` |
 | `VERDICT=RUN_LOCAL` | Relay continuing on VM after product merge |
 | `PHASE=STACK_DOWN` + `stack_loop=False` | Loop off → double-click **VM_RESTART** on VM |
 | `next=handoff` | Waiting for IDE work, not `run_ppe_local` yet |
@@ -66,7 +66,7 @@ Current slice: `ppe_autobuilder.cmd status --brief` (do not hard-code chapter id
 
 1. VM loop blocks → `VERDICT=IDE_BUILD`
 2. Desktop → **`DESKTOP BUILD`** (starter + IDE_BUILD_NOW.md)
-3. Cursor Agent → gate → commit → `mark_ide_product_ready`
+3. Configured worker (Codex first, Cursor fallback) → gate → commit → `mark_ide_product_ready`
 4. After PR merge → desktop **`DESKTOP CONTINUE`** (SSH → VM `finish_ide_build.cmd`)
 5. VM loop advances automatically
 
@@ -115,5 +115,5 @@ Park relay work for the operator thread.
 
 - [ ] VM: **VM_STATUS** → `stack_loop=True`
 - [ ] Desktop: no operator popups; **no** auto-loop
-- [ ] If `IDE_BUILD`: **DESKTOP BUILD** in Cursor on desktop; after PR merge → **DESKTOP CONTINUE**
+- [ ] If `IDE_BUILD`: **DESKTOP BUILD** with configured worker on desktop; after PR merge → **DESKTOP CONTINUE**
 - [ ] If `STACK_DOWN` on VM: **VM_RESTART** once (not repeatedly)

@@ -16,7 +16,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 ## Daily run (two machines)
 
 - [ ] **VM:** `VM_STATUS.cmd` — expect `stack_loop=True` and sensible `PHASE=` / `VERDICT=`.
-- [ ] **Desktop:** loop **off** (`ppe_operator_no_loop.local.cmd`); use Cursor for IDE BUILD only.
+- [ ] **Desktop:** loop **off** (`ppe_operator_no_loop.local.cmd`); use configured BUILD worker for IDE BUILD only.
 - [ ] Phone ntfy: follow button hint in message ([`OPERATOR_BUTTON_MAP.md`](OPERATOR_BUTTON_MAP.md)).
 - [ ] `IDE_BUILD` ping → desktop `DESKTOP_BUILD.cmd`; after merge → `DESKTOP_CONTINUE.cmd`.
 - [ ] VM `STACK_DOWN` → `VM_RESTART.cmd` on VM (not on desktop).
@@ -35,9 +35,9 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 - [ ] Read `artifacts/orchestrator/IDE_BUILD_NOW.md` or `OPERATOR_GUARD_REPORT.md`.
 - [ ] **Autobuilder:** `ppe_autobuilder.cmd status` — agent `@ppe-autobuilder-operator` ([`PPE_AUTOBUILDER_V1.md`](PPE_AUTOBUILDER_V1.md))
-- [ ] **Local trigger watcher:** `watch_ide_build_local.cmd` running (desktop stack item 4); `setup_cursor_agent.cmd` + `agent login`
-- [ ] **Automation (legacy):** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) cloud webhook — optional; prefer local watcher
-- [ ] **Manual:** `@` `IDE_BUILD_STARTER_<sliceId>.md` — starter includes **## When done**.
+- [ ] **Local trigger watcher:** `watch_ide_build_local.cmd` running (desktop stack item 4); `setup_codex.cmd` + `codex login` for Codex-first, Cursor setup only for fallback
+- [ ] **Automation (legacy/fallback):** [`CURSOR_IDE_BUILD_AUTOMATION_V1.md`](CURSOR_IDE_BUILD_AUTOMATION_V1.md) cloud webhook — optional; prefer Codex/local watcher
+- [ ] **Manual:** load/paste `IDE_BUILD_STARTER_<sliceId>.md` — starter includes **## When done**.
 - [ ] If agent committed but stalled: `finish_ide_build.cmd`
 - [ ] Optional: `workflow_metrics.cmd slice close --slice-id <sliceId> --size M --roundtrips N`
 - [ ] Loop continues on next pass (or restart loop).
@@ -54,7 +54,7 @@ Runnable steps for **no API credits** operation. Full runbook: [`PPE_IDE_NATIVE_
 
 ## Mid-month credit burn boost (Option A + smart Option B)
 
-**Default (Option A):** `autoRemoteBuild: false` — you run **`DESKTOP_BUILD.cmd`** when ntfy says `IDE_BUILD`.
+**Default (Option A):** `autoRemoteBuild: false` — you run **`DESKTOP_BUILD.cmd`** when ntfy says `IDE_BUILD`; the handoff chooses Codex first when `buildWorker=codex`.
 
 **After day 16:** if Cursor/agent credits look **underused** (<35% of monthly budget), the loop **auto-starts** remote BUILD for the rest of the month (Option B).
 
@@ -69,7 +69,7 @@ Boost resets next calendar month; record fresh usage after day 16 if you want bo
 
 ## After chapter closeout
 
-- [ ] New Cursor thread; load only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
+- [ ] New operator thread; load only [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
 - [ ] Do not paste orchestrator logs into steward chat.
 
 ---

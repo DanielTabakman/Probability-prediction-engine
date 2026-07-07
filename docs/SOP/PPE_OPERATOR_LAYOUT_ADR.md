@@ -8,13 +8,13 @@
 
 ## Context
 
-The PPE near-zero-API operator runs a 24/7 relay loop (control slices, `run_ppe_local`, ntfy) and pauses on **product** slices for **IDE BUILD** in Cursor. Before June 2026 the **daily Windows desktop** was the loop host. That caused:
+The PPE near-zero-API operator runs a 24/7 relay loop (control slices, `run_ppe_local`, ntfy) and pauses on **product** slices for the configured desktop **IDE BUILD** worker. Current local config is Codex-first (`buildWorker=codex`) with Cursor as fallback. Before June 2026 the **daily Windows desktop** was the loop host. That caused:
 
 - `cmd.exe` popup storms (headless loop + logon scheduled tasks on the wrong machine)
 - Confusion between `run_ppe_local` and IDE BUILD
 - Copy-paste / Win+R operator friction
 
-A dedicated **Hyper-V VM** now runs the loop headlessly; the **daily PC** runs Cursor only.
+A dedicated **Hyper-V VM** now runs the loop headlessly; the **daily PC** runs only the configured desktop BUILD worker and steward/operator chats.
 
 ---
 
@@ -25,7 +25,7 @@ A dedicated **Hyper-V VM** now runs the loop headlessly; the **daily PC** runs C
 | Machine | Role | Loop / stack | Gitignored token |
 |---------|------|--------------|------------------|
 | **Hyper-V VM** (`PPE-Loop-Host`) | 24/7 operator relay | **Allowed** — headless stack | `ppe_operator_loop_host.local.cmd` → `PPE_LOOP_HOST=1`, `PPE_STACK_HEADLESS=1` |
-| **Daily desktop** | Cursor IDE BUILD | **Forbidden** | `ppe_operator_no_loop.local.cmd` → `PPE_STACK_FORBIDDEN=1` |
+| **Daily desktop** | Codex-first IDE BUILD; Cursor fallback | **Forbidden** | `ppe_operator_no_loop.local.cmd` → `PPE_STACK_FORBIDDEN=1` |
 | **Phone** | ntfy + SSH triage | — | — |
 
 **Forbidden:** running `run_ppe_headless_stack`, `run_ppe_auto_local_loop`, or `start_ppe_desktop_operator` on the daily desktop while the VM is live.

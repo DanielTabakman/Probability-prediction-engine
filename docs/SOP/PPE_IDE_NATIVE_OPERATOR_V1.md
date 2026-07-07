@@ -24,8 +24,8 @@
 On your **real PC** (not the VM):
 
 1. Double-click **`DESKTOP BUILD`** (`DESKTOP_BUILD.cmd`).
-2. Open a **new** Cursor Agent chat.
-3. `@` the starter file from **`IDE_BUILD_NOW.md`** and send.
+2. Open **Codex** when `buildWorker=codex`; use Cursor only for fallback/exception handoffs.
+3. Load/paste the starter from **`IDE_BUILD_NOW.md`** and send.
 4. Let the agent finish (gate → commit → closeout).
 5. After PR merges: **`DESKTOP CONTINUE`**.
 
@@ -68,7 +68,7 @@ Emergency clipboard paste (`ppe_go_clipboard.cmd`):
 
 **After chapter closeout:** new Agent thread with `AGENT_CONTINUITY_BRIEF.md` only, then ask **`what's next?`** in operator thread.
 
-**Optional Automation (zero-click happy path):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Use Automation for `IDE_BUILD`; use `ppe_go.cmd` for exceptions.
+**Optional Automation (legacy/fallback):** Cursor Automation on `.cursor/IDE_BUILD_TRIGGER.json` — prompt in [`.cursor/IDE_BUILD_AUTOMATION_PROMPT.md`](../.cursor/IDE_BUILD_AUTOMATION_PROMPT.md). Default Codex-first BUILD uses `buildWorker=codex`; use Automation only when the active handoff selects Cursor.
 
 **Autobuilder (pipeline SRE):** [`PPE_AUTOBUILDER_V1.md`](PPE_AUTOBUILDER_V1.md) · `ppe_autobuilder.cmd` · `@ppe-autobuilder-operator` — status, diagnose, and `advance` without product BUILD.
 
@@ -184,7 +184,7 @@ Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` i
 | Backlog → queue propagation | Yes |
 | Steward charter when idle | **No** (no API) |
 | Control / smoke / closeout slices | Yes (pytest/scripts) |
-| Product slices | **No** — guard stop until marker + `run_ppe_local` |
+| Product slices | **Configured BUILD worker** — Codex first when `buildWorker=codex`; guard waits for marker + `run_ppe_local` |
 
 ---
 
@@ -198,7 +198,7 @@ Control and smoke slices often exit `STOP_FOR_REVIEW` / `UNCLEAR_TEST_RESULTS` i
 | `SCOPE_AMBIGUITY` on product slice | Same as product blocked |
 | Queue idle, no `READY` | Add `queued` row to [`PHASE_CHAPTER_BACKLOG.json`](PHASE_CHAPTER_BACKLOG.json) |
 | Test/smoke fail | Fix code or env; `run_ppe_local.cmd` |
-| Chapter closeout complete | New Cursor thread; [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only |
+| Chapter closeout complete | New operator thread; [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md) only |
 
 ---
 

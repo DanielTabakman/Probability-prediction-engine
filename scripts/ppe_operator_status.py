@@ -736,6 +736,29 @@ def format_founder_truth_card_lines(status: dict[str, Any]) -> list[str]:
     return [f"Truth card: {detail}"]
 
 
+def format_build_worker_preflight_lines(repo: Path | None, status: dict[str, Any]) -> list[str]:
+    if repo is None or status.get("verdict") != VERDICT_IDE_BUILD:
+        return []
+    try:
+        from scripts.ppe_build_worker import collect_build_worker_status
+
+        worker_status = collect_build_worker_status(repo)
+    except Exception:
+        return []
+    preflight = worker_status.get("preflight") if isinstance(worker_status.get("preflight"), dict) else {}
+    if not preflight:
+        return []
+    classification = str(preflight.get("classification") or "unknown")
+    detail = str(preflight.get("detail") or "").strip()
+    worker = str(worker_status.get("worker") or "?")
+    pref = str(worker_status.get("pref") or "?")
+    line = f"Build worker preflight: `{classification}`"
+    if detail:
+        line += f" — {detail}"
+    line += f" (worker={worker}, pref={pref})"
+    return [line]
+
+
 def _format_human(
     status: dict[str, Any],
     repo: Path | None = None,
@@ -809,6 +832,8 @@ def _format_human(
         lines.append(f"Plan: {status['phase_plan_path']}")
     if status.get("blocker"):
         lines.append(f"Blocker: {status['blocker']}")
+    if repo is not None:
+        lines.extend(format_build_worker_preflight_lines(repo, status))
     supply = status.get("supply") or {}
     backlog = supply.get("backlog") or {}
     lines.append(
