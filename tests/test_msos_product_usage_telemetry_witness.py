@@ -23,10 +23,14 @@ def test_probe_usage_api_ok() -> None:
         def __exit__(self, *args):
             return False
 
-    with mock.patch("urllib.request.urlopen", return_value=FakeResp()):
+    with mock.patch("urllib.request.urlopen", return_value=FakeResp()) as urlopen:
         result = probe_usage_api("https://example.com")
     assert result["ok"] is True
     assert result["status"] == 200
+    req = urlopen.call_args.args[0]
+    assert req.headers["User-agent"].startswith("Mozilla/5.0")
+    assert req.headers["Origin"] == "https://example.com"
+    assert req.headers["Referer"] == "https://example.com/"
 
 
 def test_probe_usage_api_http_error() -> None:
