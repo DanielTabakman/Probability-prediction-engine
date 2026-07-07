@@ -2,7 +2,7 @@
 
 **Chapter:** `ppe_equity_universe_tier1b_v1`  
 **Program:** [`PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md`](PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md)  
-**Status:** **PENDING** (wave 1 ch.2 — after tier1a witness green)
+**Status:** **PENDING** (wave 1 ch.2 - blocked until batch-1 retrospect prod witness is green)
 
 | Slice | Status |
 |-------|--------|
@@ -13,8 +13,8 @@
 
 ## Per-asset witness
 
+- [ ] TSLA
+- [ ] AMD
 - [ ] AAPL
 - [ ] MSFT
 - [ ] AMZN
-- [ ] GOOGL
-- [ ] META
