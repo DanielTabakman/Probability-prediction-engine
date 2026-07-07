@@ -679,7 +679,7 @@
     },
     {
       "chapterId": "mvp1_distribution_timeseries_collector_v1",
-      "status": "chartered",
+      "status": "done",
       "priority": "low",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
