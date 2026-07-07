@@ -277,8 +277,36 @@ def prefer_build_lane(
 
     if verdict == "IDE_BUILD" and not closeout_only:
         if product_scope:
-            preferred = LANE_CURSOR
-            reason = "product_path_scope"
+            codex_pref = False
+            codex_preflight: dict[str, Any] = {}
+            try:
+                from scripts.ppe_build_worker import (
+                    PREF_CODEX,
+                    build_worker_preflight_status,
+                    load_build_worker_pref,
+                )
+
+                codex_pref = load_build_worker_pref(repo) == PREF_CODEX
+                codex_preflight = build_worker_preflight_status(repo)
+            except Exception:
+                codex_pref = False
+                codex_preflight = {}
+
+            if codex_pref and (
+                codex_preflight.get("ok") or codex_preflight.get("classification") == "routing_tooling"
+            ):
+                preferred = LANE_CODEX
+                reason = (
+                    "codex_build_worker_pref"
+                    if codex_preflight.get("ok")
+                    else "codex_build_worker_pref_tooling_gap"
+                )
+            elif codex_pref and codex_preflight.get("classification") == "fallback_available":
+                preferred = LANE_CURSOR
+                reason = "codex_preflight_cursor_fallback"
+            else:
+                preferred = LANE_CURSOR
+                reason = "product_path_scope"
         elif not product_scope and codex_usd < cursor_usd and any(
             branch.startswith(p) for p in CONTROL_PLANE_BRANCH_PREFIXES
         ):
@@ -646,13 +674,19 @@ def default_lease_scope_for_lane(
     *,
     branch: str,
     closeout_only: bool,
+    product_build: bool = False,
 ) -> tuple[list[str], list[str]]:
     registry = load_worker_registry(repo)
     workers = registry.get("workers") if isinstance(registry.get("workers"), list) else []
     row = next((w for w in workers if isinstance(w, dict) and w.get("id") == worker_id), {})
     path_globs = _normalize_globs(row.get("default_path_globs"))
     forbidden: list[str] = []
-    if closeout_only or worker_id == LANE_CODEX:
+    product_branch = product_build or any(branch.startswith(p) for p in ("product/", "build/"))
+    if worker_id == LANE_CODEX and product_branch:
+        product_row = next((w for w in workers if isinstance(w, dict) and w.get("id") == LANE_CURSOR), {})
+        product_globs = _normalize_globs(product_row.get("default_path_globs"))
+        path_globs = product_globs or ["src/**", "apps/**", "tests/**"]
+    if closeout_only or (worker_id == LANE_CODEX and not product_branch):
         forbidden.append("src/**")
     if worker_id == LANE_CURSOR and any(branch.startswith(p) for p in ("product/", "build/")):
         forbidden = [g for g in forbidden if g != "src/**"]
@@ -711,7 +745,11 @@ def prepare_desktop_build_handoff(
     )
     worker_id = str(lane_pref.get("preferred_lane") or LANE_CURSOR)
     path_globs, forbidden = default_lease_scope_for_lane(
-        repo, worker_id, branch=branch, closeout_only=closeout_only
+        repo,
+        worker_id,
+        branch=branch,
+        closeout_only=closeout_only,
+        product_build=verdict == "IDE_BUILD" and not closeout_only,
     )
 
     slice_id = str(status.get("product_slice") or "").strip() or None
