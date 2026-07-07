@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_strategy_lab_embed_shell_v1
+closed: 2026-06-21
+---
+
 
 # MSOS Strategy Lab embed shell v1 — evidence status
 

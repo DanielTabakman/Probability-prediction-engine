@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: repo_housekeeping_v1
+closed: 2026-06-10
+---
+
 
 # Repo housekeeping v1 — evidence status
 

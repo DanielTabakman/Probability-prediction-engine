@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_storyboard_visual_parity_v1
+closed: unknown
+---
+
 # MSOS storyboard visual parity v1 — evidence status
 
 **Chapter:** `msos_storyboard_visual_parity_v1`  

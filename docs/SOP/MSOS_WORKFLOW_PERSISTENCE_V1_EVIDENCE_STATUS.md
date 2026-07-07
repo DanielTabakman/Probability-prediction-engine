@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_workflow_persistence_v1
+closed: 2026-06-20
+---
+
 
 # MSOS workflow persistence v1 — evidence status
 

@@ -1,3 +1,9 @@
+---
+archived: true
+chapter_id: msos_access_identity_v1
+closed: 2026-06-18
+---
+
 
 # MSOS access identity v1 — evidence status
 
