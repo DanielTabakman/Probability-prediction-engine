@@ -46,6 +46,46 @@ def test_prefer_build_lane_product_scope(tmp_path) -> None:
     assert out["reason"] == "product_path_scope"
 
 
+def test_prefer_build_lane_product_scope_codex_pref(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("PPE_BUILD_WORKER", "codex")
+    with (
+        patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "acp": 5}),
+        patch(
+            "scripts.ppe_build_worker.build_worker_preflight_status",
+            return_value={"ok": True, "classification": "ready"},
+        ),
+    ):
+        out = prefer_build_lane(
+            tmp_path,
+            verdict="IDE_BUILD",
+            branch="main",
+            closeout_only=False,
+            path_globs=["src/**"],
+        )
+    assert out["preferred_lane"] == LANE_CODEX
+    assert out["reason"] == "codex_build_worker_pref"
+
+
+def test_prefer_build_lane_product_scope_codex_tooling_gap_stays_codex(tmp_path, monkeypatch) -> None:
+    monkeypatch.setenv("PPE_BUILD_WORKER", "codex")
+    with (
+        patch("scripts.ppe_worker_lease._cost_lane_counts", return_value={"codex-cli": 0, "acp": 5}),
+        patch(
+            "scripts.ppe_build_worker.build_worker_preflight_status",
+            return_value={"ok": False, "classification": "routing_tooling"},
+        ),
+    ):
+        out = prefer_build_lane(
+            tmp_path,
+            verdict="IDE_BUILD",
+            branch="main",
+            closeout_only=False,
+            path_globs=["src/**"],
+        )
+    assert out["preferred_lane"] == LANE_CODEX
+    assert out["reason"] == "codex_build_worker_pref_tooling_gap"
+
+
 def test_prefer_build_lane_cost_usd_codex(tmp_path) -> None:
     def _est_usd(_registry: object, worker_id: str, _est: object) -> float:
         return 2.0 if worker_id == LANE_CODEX else 2.5
@@ -256,6 +296,45 @@ def test_lane_to_handoff_worker() -> None:
 
     assert lane_to_handoff_worker(LANE_CODEX) == "codex-cli"
     assert lane_to_handoff_worker(LANE_CURSOR) == "manual"
+
+
+def test_codex_product_branch_lease_scope_allows_src(tmp_path) -> None:
+    from scripts.ppe_worker_lease import default_lease_scope_for_lane
+
+    scope, forbidden = default_lease_scope_for_lane(
+        tmp_path,
+        LANE_CODEX,
+        branch="build/auto/Product-Slice002",
+        closeout_only=False,
+    )
+    assert "src/**" in scope
+    assert "src/**" not in forbidden
+
+
+def test_codex_control_branch_lease_scope_forbids_src(tmp_path) -> None:
+    from scripts.ppe_worker_lease import default_lease_scope_for_lane
+
+    _scope, forbidden = default_lease_scope_for_lane(
+        tmp_path,
+        LANE_CODEX,
+        branch="control-plane/foo",
+        closeout_only=False,
+    )
+    assert "src/**" in forbidden
+
+
+def test_codex_product_build_scope_allows_src_on_main(tmp_path) -> None:
+    from scripts.ppe_worker_lease import default_lease_scope_for_lane
+
+    scope, forbidden = default_lease_scope_for_lane(
+        tmp_path,
+        LANE_CODEX,
+        branch="main",
+        closeout_only=False,
+        product_build=True,
+    )
+    assert "src/**" in scope
+    assert "src/**" not in forbidden
 
 
 def test_prepare_desktop_build_acquires_lease(tmp_path, monkeypatch) -> None:
