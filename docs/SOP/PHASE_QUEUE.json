@@ -487,19 +487,19 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 AAPL MSFT AMZN GOOGL META",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 TSLA AMD AAPL MSFT AMZN; blocked until prod witness repair + retrospect green",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 TSLA AMD COIN",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 COIN SLV GLD GOOGL META",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO commodity ETF proxies",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 USO commodity ETF proxy",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
