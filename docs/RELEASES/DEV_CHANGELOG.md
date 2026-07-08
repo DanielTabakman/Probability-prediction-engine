@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-08
 
+- `676e42f8` — ops: context closeout ship (control-plane/recovery-202607081611) (#4592) (`docs/SOP/`)
+- `3f2a265a` — ops: vm phase mirror RUN LOCAL PENDING (#4604) (`docs/SOP/`)
+- `c6d11cf4` — Control-plane: close out PPE Crypto T1 Core Slice002 (#4600)
+- `9cc3fc7b` — ops: build/auto/PPE-CryptoT1-Core-Slice002-crypto_t1 (#4599) (`docs/SOP/`)
+- `60558d6b` — Control-plane: dev changelog
 - `c1b73fd5` — Control-plane: dev changelog
 - `64b1aafe` — Coordination: heal Tier1b active manifest (`docs/SOP/`)
 - `40ca2a57` — Coordination: refresh Tier1b run-local status (#4567) (`docs/SOP/`)
