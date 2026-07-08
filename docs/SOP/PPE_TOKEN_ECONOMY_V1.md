@@ -9,7 +9,7 @@
 | Lane | Entry | Worker | Billing |
 |------|--------|--------|---------|
 | **Auto local** | `run_ppe_auto_local_loop.cmd` | Deterministic (`PPE_SKIP_ACP=1`) | None for relay slices |
-| **IDE product** | Cursor Agent chat | Human + subscription | IDE plan (not API relay) |
+| **IDE product** | Codex CLI / Codex desktop; Cursor fallback | Codex quota first, Cursor only for exceptions | IDE plan (not API relay) |
 | **ACP** | `run_ppe_auto_acp_loop.cmd` | `ppe-orchestrator-acp` | API / agent credits |
 
 Do **not** disable `skipAcp` on the local profile to “fix” product slices — that multiplies API cost.

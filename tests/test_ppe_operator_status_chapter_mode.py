@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from scripts.ppe_operator_status import VERDICT_RUN_LOCAL, _format_human
+from scripts.ppe_operator_status import VERDICT_IDE_BUILD, VERDICT_RUN_LOCAL, _format_human
 
 
 class TestOperatorStatusChapterMode(unittest.TestCase):
@@ -43,6 +44,24 @@ class TestOperatorStatusChapterMode(unittest.TestCase):
         self.assertIn("Agent action", text)
         self.assertIn("Operator: nothing required", text)
         self.assertIn("DESKTOP_CONTINUE", text)
+
+    def test_format_human_includes_build_worker_preflight(self) -> None:
+        status = {
+            "verdict": VERDICT_IDE_BUILD,
+            "blocker": "product blocked [Slice-A]",
+            "supply": {"backlog": {}, "queue_ready": 1},
+        }
+        with patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": "codex",
+                "worker": "codex-cli",
+                "preflight": {"classification": "ready", "detail": "Codex CLI headless ready"},
+            },
+        ):
+            text = _format_human(status, Path("."))
+        self.assertIn("Build worker preflight: `ready`", text)
+        self.assertIn("Codex CLI headless ready", text)
 
 
 if __name__ == "__main__":

@@ -13,10 +13,10 @@ Cross-refs: [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md) · 
 | Device | Tools | Job |
 |--------|-------|-----|
 | **VM** (Hyper-V, always on) | Headless loop + ntfy listen | **Loop host** — relay, control slices, `run_ppe_local` |
-| **Desktop** (daily PC) | Cursor | **IDE BUILD only** — `DESKTOP_BUILD.cmd`, no loop |
+| **Desktop** (daily PC) | Codex / Cursor | **IDE BUILD only** — `DESKTOP_BUILD.cmd`, no loop |
 | **Phone** | **ntfy** + **Termius** | Alerts with button hints; SSH triage to VM |
 
-**You do not code by hand.** When something needs judgment, open **Cursor Agent** on the desktop (locally or via phone RDP).
+**You do not code by hand.** When something needs judgment, use the configured desktop BUILD worker (Codex first, Cursor fallback) locally or via phone RDP.
 
 ---
 
@@ -52,7 +52,7 @@ Windows → Optional features → **OpenSSH Server**.
 ssh USER@desktop-ge39o15
 ```
 
-### 5. Remote Desktop on desktop (Cursor from phone)
+### 5. Remote Desktop on desktop (BUILD worker from phone)
 
 Run **once as Administrator** on the desktop:
 
@@ -131,9 +131,9 @@ ppe_autobuilder.cmd status --brief
 type artifacts\orchestrator\OPERATOR_GUARD_REPORT.md
 ```
 
-### IDE BUILD (desktop Cursor — default)
+### IDE BUILD (desktop worker — Codex first)
 
-1. On **daily PC**: double-click **DESKTOP BUILD** (or open starter in Cursor)
+1. On **daily PC**: double-click **DESKTOP BUILD** (or open starter in Codex/Cursor according to the handoff)
 2. Gate → commit → PR → **DESKTOP CONTINUE** after merge
 3. VM loop continues relay automatically
 
@@ -161,7 +161,7 @@ When `watch_ntfy_commands.cmd` is running on the **VM** (started by headless sta
 
 | Message | What happens |
 |---------|----------------|
-| **`build`** | **Primary workflow.** When verdict is `IDE_BUILD`, starts Cursor Agent on the queued product slice (gate → commit → mark ready → `run_ppe_local`). When verdict is `RUN_LOCAL`, runs `run_ppe_local.cmd` on the desktop. |
+| **`build`** | **Primary workflow.** When verdict is `IDE_BUILD`, starts the configured BUILD worker on the queued product slice (Codex first, Cursor fallback; gate → commit → mark ready → `run_ppe_local`). When verdict is `RUN_LOCAL`, runs `run_ppe_local.cmd` on the desktop. |
 | `build <note>` | Same as `build`, with extra context in the agent prompt |
 | `restart` | Stops loop + watch, restarts the stack |
 | `fix` | Investigates the current blocker — headless CLI when allowed, otherwise **IDE handoff** (`IDE_FIX_NOW.md` + continuity brief) |
@@ -181,9 +181,9 @@ fix can you fix it if so please do
 status
 ```
 
-**Agent command contract:** `build` and `fix` always try headless CLI when allowed (`autoRemoteBuild`, usage available, `preferIdeOverCli` off). Otherwise they **IDE handoff** — open Cursor, copy prompt, ntfy ping — same near-zero-API path as loop exit 7.
+**Agent command contract:** `build` and `fix` always try headless CLI when allowed (`autoRemoteBuild`, usage available, `preferIdeOverCli` off). Otherwise they **IDE handoff** — open Codex or Cursor according to `buildWorker`, copy prompt, ntfy ping — same near-zero-API path as loop exit 7.
 
-The headless path uses the `agent` CLI when installed, otherwise `cursor-sdk` with `CURSOR_API_KEY`. One-time desktop setup:
+The headless path uses Codex CLI when `buildWorker=codex`; Cursor Agent / `cursor-sdk` remain fallback paths. One-time desktop fallback setup:
 
 ```bat
 setup_cursor_agent.cmd
@@ -208,8 +208,8 @@ Disable remote commands: `set PPE_NTFY_CMD_ENABLED=0` in `ppe_operator_notify.lo
 | Every 6h while loop running | **ntfy** heartbeat (title: **PPE OK - …**, low priority) |
 | Relay slice completes | **ntfy** (title: **PPE slice done: …**) |
 | Chapter closeout completes | **ntfy** (title: **PPE chapter done: …**, includes next chapter if known) |
-| Cursor Agent starts fixing a block | **ntfy** (title: **PPE fixing: …**) — agent runs `ppe_notify_fix.py --working` |
-| Cursor Agent finishes a fix | **ntfy** (title: **PPE fixed (VERDICT): …** or **PPE fix done: …**) — agent runs `ppe_notify_fix.py --resolved` |
+| BUILD worker starts fixing a block | **ntfy** (title: **PPE fixing: …**) — agent runs `ppe_notify_fix.py --working` |
+| BUILD worker finishes a fix | **ntfy** (title: **PPE fixed (VERDICT): …** or **PPE fix done: …**) — agent runs `ppe_notify_fix.py --resolved` |
 | Stuck verdict clears (watch poll) | **ntfy** (title: **PPE fixed: RUN_AUTO** / **RUN_LOCAL** — includes prior blocker) |
 | Monday weekly digest (`weekly_digest_monday.cmd`) | **ntfy** (title: **This week in PPE - …**) |
 
