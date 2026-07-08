@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-08
 
+- `c1b73fd5` — Control-plane: dev changelog
 - `64b1aafe` — Coordination: heal Tier1b active manifest (`docs/SOP/`)
 - `40ca2a57` — Coordination: refresh Tier1b run-local status (#4567) (`docs/SOP/`)
 - `694419d3` — ops: vm phase mirror RUN LOCAL PENDING (#4532) (`docs/SOP/`)
