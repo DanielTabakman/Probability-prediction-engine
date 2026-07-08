@@ -476,8 +476,8 @@
       Living operator chart — modules, data, tiers, priorities, and autobuilder pipeline.
       Canon markdown: <a href="../PPE_MODULE_REGISTRY_V1.md">PPE_MODULE_REGISTRY_V1.md</a>
       · Forward consistency: <a href="../FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md">program doc</a>
-      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-08T15:36:52Z">
-        Last updated: 2026-07-08 <time datetime="2026-07-08T15:36:52Z">11:36 EDT</time>
+      <span class="last-updated" id="map-last-updated" data-last-updated="2026-07-08T19:55:37Z">
+        Last updated: 2026-07-08 <time datetime="2026-07-08T19:55:37Z">15:55 EDT</time>
       </span>
     </p>
 
@@ -529,27 +529,27 @@
       <ul>
         <li>
           <strong>Stale collector — Cross-venue PM ↔ Deribit options</strong>
-          <span class="why">last snapshot 2026-07-01T00:58:35Z · check VM scheduled task <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
+          <span class="why">last snapshot never · check VM scheduled task <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
         </li>
         <li>
           <strong>Cross-venue backtest scoring</strong>
-          <span class="why">1 / 14 daily snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
+          <span class="why">0 / 14 daily snapshots · scan OK; backtest thin until history deepens <em class="compass-src">(artifacts/cross_venue_snapshots)</em></span>
         </li>
         <li>
           <strong>Stale collector — Options Horizon surface</strong>
-          <span class="why">last snapshot 2026-07-01T00:59:31Z · check VM scheduled task <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
+          <span class="why">last snapshot never · check VM scheduled task <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
         </li>
         <li>
           <strong>Horizon replay scrubber</strong>
-          <span class="why">2 / 30 daily snapshots · promote when archive_meta.replay_ready <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
+          <span class="why">0 / 30 daily snapshots · promote when archive_meta.replay_ready <em class="compass-src">(artifacts/horizon_surface_archive)</em></span>
         </li>
         <li>
           <strong>Stale collector — BTC distribution stats</strong>
-          <span class="why">last snapshot 2026-07-01T01:00:22Z · check VM scheduled task <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
+          <span class="why">last snapshot never · check VM scheduled task <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
         </li>
         <li>
           <strong>Distribution timeseries archive</strong>
-          <span class="why">1 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
+          <span class="why">0 / 7 daily snapshots · feeds dist timeseries charts when collector task live <em class="compass-src">(artifacts/distribution_snapshots)</em></span>
         </li>
         <li>
           <strong>Steering coordination program v1</strong>
@@ -569,30 +569,7 @@
     <h2>Factory throughput (7d)</h2>
     <p class="flow-intro">Aggregate factory metrics — slices auto-log; optional thread pulse on closeout. Regenerate: <code>ppe_tracking_rollup.cmd</code> · <a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">TRACKING_ROLLUP.html</a></p>
     <div class="op-section progress-panel" id="map-factory-throughput">
-      <table class="compass-modules">
-        <tbody>
-          <tr><th>Slices logged</th><td>27</td></tr>
-          <tr><th>Weighted slices</th><td>52</td></tr>
-          <tr><th>Weighted / closeout</th><td>2.48</td></tr>
-          <tr><th>Avg roundtrips / slice</th><td>0.93</td></tr>
-          <tr><th>Context closeouts</th><td>21</td></tr>
-          <tr><th>Thread pulses</th><td>13</td></tr>
-          <tr><th>Avg cognitive load</th><td>3.0</td></tr>
-          <tr><th>Incident slices</th><td>0</td></tr>
-        </tbody>
-      </table>
-      <p class="flow-intro" style="margin-top:12px"><strong>Recent pulses</strong></p>
-      <table class="compass-modules">
-        <thead><tr><th>When</th><th>Load</th><th>Note</th></tr></thead>
-        <tbody>
-          <tr><td>2026-07-02T18:25:27Z</td><td>3</td><td></td></tr>
-          <tr><td>2026-07-02T18:22:38Z</td><td>3</td><td></td></tr>
-          <tr><td>2026-07-01T23:19:21Z</td><td>3</td><td></td></tr>
-          <tr><td>2026-07-01T22:26:54Z</td><td>3</td><td></td></tr>
-          <tr><td>2026-07-01T22:08:23Z</td><td>3</td><td></td></tr>
-        </tbody>
-      </table>
-      <p class="flow-intro" style="margin-top:8px"><a href="../../../artifacts/control_plane/TRACKING_ROLLUP.html">Full rollup HTML</a> · <em class="compass-src">(workflow_metrics aggregate)</em></p>
+      <p class="flow-intro compass-empty">No workflow metrics yet — slices log on relay closeout; optional pulse on <code>context_window_closeout --record</code>.</p>
     </div>
 
     <h2>Module progress</h2>
