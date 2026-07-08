@@ -60,6 +60,15 @@ def test_manifest_ready_requires_plan(tmp_path: Path):
     assert any("phasePlanPath" in e for e in errs)
 
 
+def test_manifest_blocked_status_is_valid_without_plan(tmp_path: Path):
+    manifest = {
+        "phasePlanPath": "",
+        "status": "BLOCKED",
+        "selectionRecord": "",
+    }
+    assert validate_manifest(tmp_path, manifest) == []
+
+
 def test_resolve_summary_ok(tmp_path: Path):
     plan_rel = _write_plan(tmp_path)
     manifest_path = tmp_path / "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
