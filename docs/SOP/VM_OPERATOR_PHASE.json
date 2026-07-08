@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-08T16:14:55Z",
-  "phase": "AWAITING_BUILD",
+  "as_of": "2026-07-08T16:16:59Z",
+  "phase": "BUILD_IN_FLIGHT",
   "verdict": "IDE_BUILD",
   "chapter_name": "ppe_deribit_crypto_tier1_v1 (SOL + BNB + XRP)",
   "phase_plan_path": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
-  "recommended_action": "retry-build"
+  "recommended_action": "status"
 }
