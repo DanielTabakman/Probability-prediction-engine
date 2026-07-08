@@ -39,6 +39,42 @@
     },
     {
       "archived": false,
+      "carry_docs": [
+        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
+        "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
+      ],
+      "chapter_id": "msos_storyboard_visual_parity_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
+        "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/MSOS_FRONTIER.md",
+        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
+        "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
+      ],
+      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
+      "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
+      "program_doc": null,
+      "queue_status": "READY",
+      "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
+    },
+    {
+      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_belief_input_ux",
       "do_not_load": [
@@ -342,37 +378,6 @@
       "queue_status": "PLANNED",
       "selection": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [],
-      "chapter_id": "ppe_equity_universe_tier1b_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
-        "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md"
-      ],
-      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "PLANNED",
-      "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
     },
     {
       "archived": false,
@@ -1337,7 +1342,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     "msos_storyboard_visual_parity_v1": {
-      "archived": true,
+      "archived": false,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -1368,7 +1373,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "DONE",
+      "queue_status": "READY",
       "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
@@ -2940,7 +2945,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md"
     },
     "ppe_equity_universe_tier1b_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1b_v1",
       "do_not_load": [
@@ -2966,7 +2971,7 @@
       "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
       "program_doc": null,
-      "queue_status": "PLANNED",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
     },
@@ -4108,7 +4113,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     {
-      "archived": true,
+      "archived": false,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -4139,7 +4144,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "DONE",
+      "queue_status": "READY",
       "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
@@ -5711,7 +5716,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1A_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [],
       "chapter_id": "ppe_equity_universe_tier1b_v1",
       "do_not_load": [
@@ -5737,7 +5742,7 @@
       "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
       "program_doc": null,
-      "queue_status": "PLANNED",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md"
     },
@@ -6067,7 +6072,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-07T23:47:12Z",
+  "generated_at": "2026-07-08T12:45:34Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",

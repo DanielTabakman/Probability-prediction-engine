@@ -172,10 +172,9 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
-      "status": "DONE",
+      "status": "READY",
       "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
-      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
@@ -487,9 +486,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 TSLA AMD AAPL MSFT AMZN; blocked until prod witness repair + retrospect green",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "DONE",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 mega caps batch 1",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
@@ -545,7 +545,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
       "status": "READY",
-      "reason": "Recurring between-chapter hygiene \u2014 auto-scheduled sideChannel",
+      "reason": "Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     }
