@@ -2,8 +2,32 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-08
+
+- `64b1aafe` — Coordination: heal Tier1b active manifest (`docs/SOP/`)
+- `40ca2a57` — Coordination: refresh Tier1b run-local status (#4567) (`docs/SOP/`)
+- `694419d3` — ops: vm phase mirror RUN LOCAL PENDING (#4532) (`docs/SOP/`)
+- `87b6d76b` — Control-plane: fix Codex live verification status (#4452) (`scripts/`)
+- `7fc47707` — Control-plane: finish Codex-first operator wording (#4423) (`docs/SOP/`)
+
 ## 2026-07-07
 
+- `878c94b3` — Control-plane: align leases and close DistTs collector (#4415) (`docs/SOP/`)
+- `83455a19` — Control-plane: align leases with Codex build worker (#4408) (`scripts/`)
+- `94f22caa` — Control-plane: surface Codex build preflight (#4387)
+- `ea42eda5` — Control-plane: surface Codex build preflight (#4385) (`scripts/`)
+- `6fc66069` — Witness: send product usage probe headers (#4371) (`scripts/`)
+- `ba0210df` — Deploy: fix MSOS web data volume ownership (#4359) (`apps/msos-web/`)
+- `82425dca` — Witness: accept Strategy Lab client shell (#4351) (`scripts/`)
+- `f5abc508` — Platform: extend display cache cadence (#4341) (`docs/SOP/`)
+- `0a0ed08c` — API: thread display payload server (#4329) (`docs/SOP/`)
+- `67c71f57` — Deploy: accept Turbopack MSOS web chunks (#4310) (`scripts/`)
+- `f38dce3b` — Control-plane: clarify Codex build routing (#4293) (`docs/SOP/`)
+- `83d60a36` — Tests: allow blocked active manifest (#4290)
+- `c41e8bc2` — PPE exposure menu: fix crypto expiry lookup (#4286) (`docs/SOP/`)
+- `78a0567d` — Control-plane: record asset batch retrospect blocker (#4278) (`docs/SOP/`)
+- `827072fd` — Control-plane: steer next asset batch retrospect (#4265) (`docs/SOP/`)
+- `f598cf77` — Control-plane: dev changelog
 - `1266ef1c` — MVP1 DistTs: register collector closeout (`docs/SOP/`)
 - `e765d3ce` — Control-plane: dev changelog
 - MVP1-DistTs-Product-Slice002 product: add distribution collector task wrapper (#3991) (`docs/SOP/`)

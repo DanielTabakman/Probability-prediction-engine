@@ -1,5 +1,5 @@
 {
-  "last_main_sha": "1266ef1cc265f6be4fde8df055ea614606cd879e",
+  "last_main_sha": "64b1aafe24151e8a56793c1503324952b9ed980b",
   "recorded_events": [
     "chapter_closed:MVP1-DistStatsLeg-Closeout-Slice005",
     "chapter_closed:MSOS-DistDemo-Closeout-Slice005",
@@ -1334,6 +1334,27 @@
     "43d3bd0153489a40e4564bc310a953782df7b22d",
     "beb14de0ee66e8dba12fef8b8456f6b3f9144980",
     "e765d3ce8336c8ca7f29d56e50b60ab135c6eb42",
-    "1266ef1cc265f6be4fde8df055ea614606cd879e"
+    "1266ef1cc265f6be4fde8df055ea614606cd879e",
+    "f598cf774a5a5699aa4aa9ed99eaecec5506fcd6",
+    "827072fd88a86942ad48d96c859307730a4b8eaf",
+    "78a0567d544058162c2fba6d7039cdf7cc90575c",
+    "c41e8bc2df010a41f551462c22125abbed3aaa30",
+    "83d60a368df281085a742987900c7d622c6ed8b0",
+    "f38dce3b0fa2a954bf8cdda622cbc81cf4a08167",
+    "67c71f57c1e254d00574788d0b9f48451eb87e7a",
+    "0a0ed08c0baadbc8cdc832cbe9306a361c01394b",
+    "f5abc5082d4cdba22f8f50a6e316a0b860a0f09b",
+    "82425dcaafcaf026917448c2547910c51bc8e333",
+    "ba0210dfd1a57bba5d3dc6e2882690fddde51737",
+    "6fc66069c818ce900f20575ce1e62f366f92f569",
+    "ea42eda5abf18685713e94966325aecfa1bb4c1b",
+    "94f22caa45425f3498b9fd3c127bbd0363ab0b32",
+    "83455a19cc7d377a9dad3318ce4dabae5ac8378e",
+    "878c94b37d424f7230a88cdc3e6af4fa96fdfa1f",
+    "7fc477072f8d50a0bc0f5076aa78b7a371b18ee8",
+    "87b6d76bb9cd3d3f86cb4265f64f94b12b9b242d",
+    "694419d36aacc9d02b8e8ffcbaa14f8e81c22ed2",
+    "40ca2a57d5e065eaa2c2533fdeb8387f9b4615ef",
+    "64b1aafe24151e8a56793c1503324952b9ed980b"
   ]
 }
