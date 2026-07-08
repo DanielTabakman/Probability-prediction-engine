@@ -1,9 +1,9 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-08T14:51:41Z",
+  "as_of": "2026-07-08T14:52:27Z",
   "phase": "FINISH_IN_FLIGHT",
-  "verdict": "RUN_AUTO",
+  "verdict": "SUPPLY_LOW",
   "chapter_name": "MVP1_cross_venue_scan_v1",
   "phase_plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
   "recommended_action": "status"
