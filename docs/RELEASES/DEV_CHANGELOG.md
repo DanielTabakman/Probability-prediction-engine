@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-08
 
+- `73919be3` — ops: context closeout ship (control-plane/recovery-202607081957) (#4610) (`docs/SOP/`)
+- `d30c2869` — Control-plane: dev changelog
 - `676e42f8` — ops: context closeout ship (control-plane/recovery-202607081611) (#4592) (`docs/SOP/`)
 - `3f2a265a` — ops: vm phase mirror RUN LOCAL PENDING (#4604) (`docs/SOP/`)
 - `c6d11cf4` — Control-plane: close out PPE Crypto T1 Core Slice002 (#4600)
