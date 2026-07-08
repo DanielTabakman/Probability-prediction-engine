@@ -262,7 +262,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
-      "status": "done",
+      "status": "ready",
       "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     },
@@ -322,7 +322,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "skipped",
+      "status": "pending",
       "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
@@ -382,7 +382,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[LOW BLOCKED] Replay scrubber \u2014 gated on archive_meta.replay_ready (\u226530d); do not ready until gate",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     }
