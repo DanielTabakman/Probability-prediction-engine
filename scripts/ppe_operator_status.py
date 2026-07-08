@@ -1109,7 +1109,8 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
     try:
         from scripts.ppe_operator_compass import sync_compass
 
-        sync_compass(repo, status=status, patch_map=True)
+        patch_map = str(os.environ.get("PPE_OPERATOR_STATUS_PATCH_MAP", "1")).strip().lower()
+        sync_compass(repo, status=status, patch_map=patch_map not in {"0", "false", "no", "off"})
     except Exception:
         pass
     return out
