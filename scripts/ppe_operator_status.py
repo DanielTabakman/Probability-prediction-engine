@@ -614,6 +614,8 @@ def enrich_operator_status_with_monitor(repo: Path, status: dict[str, Any]) -> d
         "wait_for_vm": snapshot.get("wait_for_vm"),
         "completion_action": snapshot.get("completion_action"),
         "stuck": snapshot.get("stuck"),
+        "stale_recover": snapshot.get("stale_recover"),
+        "productive_evidence": snapshot.get("productive_evidence"),
         "stuck_threshold_m": snapshot.get("stuck_threshold_m"),
         "next_poll_s": snapshot.get("next_poll_s"),
         "log_tail": snapshot.get("log_tail"),

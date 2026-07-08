@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_in_flight_monitor import (
+    collect_productive_evidence,
     collect_stuck_log_tail,
     compute_next_poll_seconds,
     collect_monitor_snapshot,
@@ -144,8 +145,52 @@ def test_run_monitor_pass_escalates_when_stuck(tmp_path, monkeypatch) -> None:
     with patch("scripts.ppe_in_flight_monitor.ssh_vm", return_value={"ok": True, "stdout": "ok"}) as ssh:
         result = run_monitor_pass(tmp_path, local_verdict="RUN_LOCAL", escalate=True)
     assert result["stuck"] is True
+    assert result["stale_recover"] is True
+    assert result["status"] == "stale_recover"
     assert result["escalation"]["attempted"] is True
     ssh.assert_called_once()
+
+
+def test_collect_snapshot_keeps_recent_productive_evidence_distinct(tmp_path, monkeypatch) -> None:
+    mirror = {
+        "phase": "BUILD_IN_FLIGHT",
+        "verdict": "IDE_BUILD",
+        "as_of": _utc_now(),
+    }
+    mirror_path = tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json"
+    mirror_path.parent.mkdir(parents=True)
+    mirror_path.write_text(json.dumps(mirror) + "\n", encoding="utf-8")
+    events = tmp_path / "artifacts/orchestrator/build_worker_events.jsonl"
+    events.parent.mkdir(parents=True)
+    events.write_text('{"event":"tick"}\n', encoding="utf-8")
+    state_path = tmp_path / "artifacts/control_plane/IN_FLIGHT_MONITOR_STATE.json"
+    state_path.parent.mkdir(parents=True)
+    state_path.write_text(
+        json.dumps(
+            {
+                "watch_phase": "BUILD_IN_FLIGHT",
+                "watch_started_at": "2020-01-01T00:00:00Z",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "scripts.ppe_in_flight_monitor.refresh_vm_mirror_from_git",
+        lambda repo, **kw: {"action": "skip_fresh_local"},
+    )
+    snap = collect_monitor_snapshot(tmp_path, local_verdict="RUN_LOCAL")
+    assert snap["stuck"] is True
+    assert snap["stale_recover"] is False
+    assert snap["status"] == "stuck"
+    assert snap["productive_evidence"]["recent"] is True
+    assert snap["productive_evidence"]["latest_path"] == "artifacts/orchestrator/build_worker_events.jsonl"
+
+
+def test_collect_productive_evidence_waiting_without_artifacts(tmp_path: Path) -> None:
+    evidence = collect_productive_evidence(tmp_path, "FINISH_IN_FLIGHT")
+    assert evidence["status"] == "waiting_for_evidence"
+    assert evidence["recent"] is False
 
 
 def test_collect_snapshot_healthy_idle_no_false_continue(tmp_path, monkeypatch) -> None:

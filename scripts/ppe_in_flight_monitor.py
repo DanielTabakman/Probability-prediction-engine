@@ -48,6 +48,7 @@ POLL_STUCK_SECONDS = 300
 ESCALATE_COOLDOWN_SECONDS = 3600
 DEFAULT_MAX_DAEMON_HOURS = 8.0
 LOG_TAIL_LINES = 20
+PRODUCTIVE_EVIDENCE_TTL_SECONDS = 15 * 60
 IN_FLIGHT_LOG_PATHS: dict[str, tuple[str, ...]] = {
     "BUILD_IN_FLIGHT": (
         "artifacts/orchestrator/build_worker_events.jsonl",
@@ -56,6 +57,21 @@ IN_FLIGHT_LOG_PATHS: dict[str, tuple[str, ...]] = {
     "FINISH_IN_FLIGHT": (
         "artifacts/orchestrator/POST_BUILD_FINISH.log",
         "artifacts/orchestrator/REMOTE_RUN_LOCAL.log",
+    ),
+}
+IN_FLIGHT_PROGRESS_PATHS: dict[str, tuple[str, ...]] = {
+    "BUILD_IN_FLIGHT": (
+        "artifacts/orchestrator/build_worker_events.jsonl",
+        "artifacts/orchestrator/REMOTE_BUILD_LOCK.json",
+        "artifacts/orchestrator/ACTIVE_RUN.json",
+        "artifacts/control_plane/WORKER_EVENTS.json",
+    ),
+    "FINISH_IN_FLIGHT": (
+        "artifacts/orchestrator/POST_BUILD_FINISH.log",
+        "artifacts/orchestrator/REMOTE_RUN_LOCAL.log",
+        "artifacts/orchestrator/ACTIVE_RUN.json",
+        "artifacts/relay/state/run_state.json",
+        "artifacts/relay/state/current_job.json",
     ),
 }
 
@@ -142,6 +158,45 @@ def collect_stuck_log_tail(repo: Path, phase: str) -> dict[str, Any]:
         return {}
     combined = "\n\n".join(f"--- {s['path']} ---\n{s['text']}" for s in sections)
     return {"sections": sections, "combined": combined[:4000]}
+
+
+def collect_productive_evidence(repo: Path, phase: str) -> dict[str, Any]:
+    """Classify in-flight state using artifact movement, not just live processes."""
+    repo = repo.resolve()
+    if phase not in IN_FLIGHT_PHASES:
+        return {"status": "not_in_flight", "recent": False, "signals": []}
+
+    now_ts = time.time()
+    signals: list[dict[str, Any]] = []
+    latest: dict[str, Any] | None = None
+    for rel in IN_FLIGHT_PROGRESS_PATHS.get(phase, ()):
+        path = repo / rel
+        if not path.is_file():
+            continue
+        try:
+            st = path.stat()
+        except OSError:
+            continue
+        signal = {
+            "path": rel,
+            "mtime": int(st.st_mtime),
+            "age_s": max(0.0, now_ts - st.st_mtime),
+            "size": st.st_size,
+        }
+        signals.append(signal)
+        if latest is None or int(signal["mtime"]) > int(latest["mtime"]):
+            latest = signal
+
+    latest_age = float(latest["age_s"]) if latest else None
+    recent = latest_age is not None and latest_age <= PRODUCTIVE_EVIDENCE_TTL_SECONDS
+    return {
+        "status": "productive" if recent else "waiting_for_evidence",
+        "recent": recent,
+        "latest_path": latest.get("path") if latest else None,
+        "latest_age_s": latest_age,
+        "ttl_s": PRODUCTIVE_EVIDENCE_TTL_SECONDS,
+        "signals": signals,
+    }
 
 
 def compute_next_poll_seconds(
@@ -292,15 +347,25 @@ def collect_monitor_snapshot(
         and elapsed_s is not None
         and elapsed_s >= stuck_at
     )
+    productive_evidence = collect_productive_evidence(repo, phase)
+    stale_recover = bool(
+        stuck
+        and phase in IN_FLIGHT_PHASES
+        and not productive_evidence.get("recent")
+    )
     completion = _completion_action(trust, local_verdict)
     done = not wait_for_vm and bool(completion or phase not in IN_FLIGHT_PHASES)
 
     mins = int((elapsed_s or 0) // 60)
     if wait_for_vm:
-        status = "stuck" if stuck else "watching"
+        status = "stale_recover" if stale_recover else ("stuck" if stuck else "watching")
         message = (
             f"Watching `{phase}` — {mins}m elapsed; next check in {max(1, next_poll_s // 60)}m."
         )
+        if stale_recover:
+            message += " No recent productive evidence; run recovery/continue instead of passive waiting."
+        elif productive_evidence.get("recent"):
+            message += f" Productive evidence: {productive_evidence.get('latest_path')}."
         if mirror_untrusted:
             message += " Mirror untrusted — refreshed from git; confirm phase."
         elif mirror_health.get("heartbeat_overdue"):
@@ -335,8 +400,10 @@ def collect_monitor_snapshot(
         "elapsed_in_phase_s": elapsed_s,
         "elapsed_in_phase_m": mins if elapsed_s is not None else None,
         "stuck": stuck,
+        "stale_recover": stale_recover,
         "stuck_threshold_s": int(stuck_at),
         "stuck_threshold_m": int(stuck_at // 60),
+        "productive_evidence": productive_evidence,
         "log_tail": log_tail,
         "next_poll_s": next_poll_s,
         "next_poll_m": max(0, next_poll_s // 60),
