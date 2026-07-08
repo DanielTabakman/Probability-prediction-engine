@@ -55,6 +55,9 @@ MSOS_SELF_SERVE_PLAN = (
 PPE_EQUITY_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json"
 )
+PPE_EQUITY_TIER1B_PLAN = (
+    "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json"
+)
 PPE_TRADEABLE_UNIVERSE_PLAN = (
     "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
 )
@@ -136,6 +139,7 @@ ALLOWED_READY_PLANS = (
     PPE_CRYPTO_MA_PLAN,
     MSOS_SELF_SERVE_PLAN,
     PPE_EQUITY_PLAN,
+    PPE_EQUITY_TIER1B_PLAN,
     PPE_TRADEABLE_UNIVERSE_PLAN,
     PPE_COMMODITY_PROXY_PLAN,
     PPE_DISPLAY_PARITY_PLAN,
