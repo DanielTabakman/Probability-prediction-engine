@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-08
 
+- `b9b6ce40` — evidence-plane: lease ship (#4611) (`scripts/`)
+- `2fb7be89` — Control-plane: dev changelog
 - `73919be3` — ops: context closeout ship (control-plane/recovery-202607081957) (#4610) (`docs/SOP/`)
 - `d30c2869` — Control-plane: dev changelog
 - `676e42f8` — ops: context closeout ship (control-plane/recovery-202607081611) (#4592) (`docs/SOP/`)
