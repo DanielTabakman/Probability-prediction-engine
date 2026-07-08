@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 MANIFEST_REL = "docs/SOP/ACTIVE_PHASE_MANIFEST.json"
-VALID_STATUSES = frozenset({"READY", "RUNNING", "COMPLETE"})
+VALID_STATUSES = frozenset({"READY", "RUNNING", "COMPLETE", "BLOCKED"})
 
 
 def manifest_path(repo_root: Path) -> Path:

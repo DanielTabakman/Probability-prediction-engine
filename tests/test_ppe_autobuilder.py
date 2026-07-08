@@ -19,6 +19,7 @@ from scripts.ppe_autobuilder import (
     collect_autobuilder_status,
     derive_phase,
     format_status_brief,
+    _dispatch_profile,
     write_status_artifact,
 )
 
@@ -156,6 +157,32 @@ def test_collect_autobuilder_status_writes_json(tmp_path: Path):
     assert path == tmp_path / STATUS_JSON_REL
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["agent"] == "@ppe-autobuilder-operator"
+
+
+def test_dispatch_profile_skips_desktop_health_when_headless_worker_ready(tmp_path: Path):
+    with (
+        patch(
+            "scripts.ppe_build_worker.collect_build_worker_status",
+            return_value={
+                "pref": "codex",
+                "worker": "codex-cli",
+                "handoff_worker": "codex-cli",
+                "mode": "headless",
+                "reason": "buildWorker=codex",
+                "codex_cli_exhausted": False,
+                "preflight": {"ok": True, "classification": "ready"},
+            },
+        ),
+        patch("scripts.ppe_ide_handoff.prefer_ide_over_cli", return_value=False),
+        patch("scripts.ppe_ide_handoff.cli_usage_exhausted", return_value=False),
+        patch("scripts.ppe_ide_build_automation_health.run_health_checks") as health,
+    ):
+        dispatch = _dispatch_profile(tmp_path)
+
+    health.assert_not_called()
+    assert dispatch["degraded"] is False
+    assert dispatch["worker"] == "codex-cli"
+    assert dispatch["preflight"]["classification"] == "ready"
 
 
 def test_format_status_brief():

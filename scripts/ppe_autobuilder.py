@@ -264,7 +264,13 @@ def _dispatch_profile(repo: Path) -> dict[str, Any]:
     if worker_status.get("codex_cli_exhausted"):
         degraded = True
         reason = reason or "codex_cli_usage_exhausted"
-    if not degraded:
+    preflight = worker_status.get("preflight")
+    headless_worker_ready = (
+        worker_status.get("mode") == "headless"
+        and isinstance(preflight, dict)
+        and bool(preflight.get("ok"))
+    )
+    if not degraded and not headless_worker_ready:
         try:
             from scripts.ppe_ide_build_automation_health import run_health_checks
 
