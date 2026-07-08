@@ -732,6 +732,8 @@ def _attach_in_flight_monitor(repo: Path, status: dict[str, Any], outcome: dict[
         "elapsed_in_phase_m": snap.get("elapsed_in_phase_m"),
         "next_poll_m": snap.get("next_poll_m"),
         "stuck": snap.get("stuck"),
+        "stale_recover": snap.get("stale_recover"),
+        "productive_evidence": snap.get("productive_evidence"),
         "stuck_threshold_m": snap.get("stuck_threshold_m"),
         "done": snap.get("done"),
         "completion_action": snap.get("completion_action"),

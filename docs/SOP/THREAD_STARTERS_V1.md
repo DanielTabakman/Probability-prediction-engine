@@ -12,6 +12,8 @@ Dedicated thread for queue, VM status, burst, and triage. Open **one** long-live
 
 ```text
 Operator thread. THREAD_ROLE: operator.
+Load @docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md
+VM loop host: ppeloop@DESKTOP-CAQLL8K. Daily PC shell is status/bridge only: DESKTOP_BUILD or DESKTOP_CONTINUE, never local relay.
 Run what's next per ppe-operator-core (burst + @ppe-director when allowed).
 Do not mix UX charter or SELECTION planning here.
 ```
@@ -131,6 +133,7 @@ Operator thread. THREAD_ROLE: operator.
 Load @docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md
 VM loop host: ppeloop@DESKTOP-CAQLL8K. Desktop is IDE BUILD only.
 Run what's next; do not restart VM loop unless STACK_DOWN.
+Daily PC shell is status/bridge only: DESKTOP_BUILD or DESKTOP_CONTINUE, never local relay.
 ```
 
 ---

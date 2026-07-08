@@ -16,6 +16,16 @@ alwaysApply: false
 
 Reading `OPERATOR_STATUS.md` / `ppe_operator_status.py` is fine on **operator** threads (either machine). **Charter/topic threads:** do not read unless switching role ([`ppe-thread-roles.mdc`](ppe-thread-roles.mdc)). **Executing relay** is VM-only.
 
+## Daily PC is a console, not the worker
+
+When Codex/Cursor is opened on `C:\Users\USER\Desktop\Probability-prediction-engine`, treat that shell as a **desktop control console**:
+
+- Allowed: read status artifacts, run `python scripts/ppe_operator_status.py`, run `ppe_in_flight_monitor.cmd`, run `DESKTOP_BUILD.cmd`, run `DESKTOP_CONTINUE.cmd --no-pause`, and inspect VM status through the canonical wrappers.
+- Not allowed: product edits/builds/tests unless the thread role is `ide_build` or the user explicitly requested local implementation.
+- Not allowed: relay finish, local loop, stack start, or autobuilder advance except through `DESKTOP_CONTINUE.cmd`.
+
+Heartbeat, reminder, and "let me know when done" agents inherit this boundary. They monitor and bridge to the VM; they do not become local workers just because their shell is on the daily PC.
+
 ## Before any relay command (mandatory)
 
 Run **first**:

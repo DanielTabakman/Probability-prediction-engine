@@ -19,6 +19,8 @@ Use this doc when opening a **new Cursor thread** after VM/desktop operator work
 
 **Do not** install `PPE Desktop Operator` scheduled task on the daily PC. **Do not** copy `ppe_operator_loop_host.local.cmd` to the desktop.
 
+For agents on the daily PC, this means the desktop shell is a **status/bridge console**. It may run `DESKTOP_BUILD.cmd`, `DESKTOP_CONTINUE.cmd --no-pause`, status helpers, and VM status wrappers. It must not run local relay/finish commands (`run_ppe_local.cmd`, `run_ppe.cmd`, `finish_ide_build.cmd`), local auto-loops/stacks, `ppe_autobuilder.cmd advance`, or product builds/tests outside an explicit `IDE_BUILD` worker.
+
 ---
 
 ## VM operator — double-click only (no Win+R paste)
@@ -99,6 +101,7 @@ Operator thread. THREAD_ROLE: operator.
 Load @docs/SOP/PPE_VM_DESKTOP_OPERATOR_HANDOFF.md
 VM loop host: ppeloop@DESKTOP-CAQLL8K. Desktop is IDE BUILD only.
 Run what's next; do not restart VM loop unless STACK_DOWN.
+Daily PC shell is status/bridge only: DESKTOP_BUILD or DESKTOP_CONTINUE, never local relay.
 ```
 
 ### Charter thread (UX, data, SELECTION — no relay)

@@ -49,6 +49,32 @@ def test_monitor_action_ready_respects_branch_block(tmp_path: Path) -> None:
     assert any("action_ready" in w for w in warnings)
 
 
+def test_monitor_stale_recover_surfaces_productive_evidence(tmp_path: Path) -> None:
+    status = {"verdict": "RUN_LOCAL"}
+    snapshot = {
+        "phase": "BUILD_IN_FLIGHT",
+        "status": "stale_recover",
+        "done": False,
+        "wait_for_vm": True,
+        "stuck": True,
+        "stale_recover": True,
+        "productive_evidence": {
+            "status": "waiting_for_evidence",
+            "recent": False,
+            "latest_path": None,
+        },
+        "message": "No recent productive evidence.",
+    }
+    with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(False, "desktop")):
+        with patch("scripts.ppe_in_flight_monitor.collect_monitor_snapshot", return_value=snapshot):
+            out = enrich_operator_status_with_monitor(tmp_path, status)
+
+    monitor = out.get("in_flight_monitor") or {}
+    assert monitor.get("status") == "stale_recover"
+    assert monitor.get("stale_recover") is True
+    assert monitor.get("productive_evidence", {}).get("recent") is False
+
+
 def test_monitor_skipped_on_loop_host(tmp_path: Path) -> None:
     status = {"verdict": "RUN_LOCAL"}
     with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "loop")):

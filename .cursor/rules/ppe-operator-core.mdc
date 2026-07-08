@@ -13,7 +13,7 @@ alwaysApply: true
 
 When gated in: read `OPERATOR_STATUS.md` first — check **`Mode:`** line (`CLOSEOUT_ONLY` → do NOT re-BUILD product). **Run** verdict before replying (not advise-only).
 
-**Before relay on desktop:** `python scripts/ppe_loop_host_guard.py --check` — if `"allowed": false`, map verdict per [`PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md).
+**Before relay on desktop:** load [`ppe-desktop-vm-layout.mdc`](ppe-desktop-vm-layout.mdc), then run `python scripts/ppe_loop_host_guard.py --check`. If `"allowed": false`, the desktop is a control console only: use `DESKTOP_BUILD.cmd`, `DESKTOP_CONTINUE.cmd --no-pause`, status reads, and VM wrappers. Do **not** run `run_ppe_local.cmd`, local builds/tests, local relay loops, or `ppe_autobuilder.cmd advance` from the daily PC shell.
 
 **Preflight warnings in status:** resolve branch/dirty-tree before relay; mixed-plane → [`RECOVERY_PROTOCOL.md`](docs/SOP/RECOVERY_PROTOCOL.md). **Operator thread only** — charter/explore/neutral must not run recovery; one-line park to operator thread per [`ppe-thread-roles.mdc`](ppe-thread-roles.mdc).
 
