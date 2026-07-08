@@ -38,6 +38,12 @@ python scripts/ppe_branch_recovery.py --plane control --ship --acquire-lease
 | Thread roles | [`.cursor/rules/ppe-roles.mdc`](.cursor/rules/ppe-roles.mdc) |
 | Multi-agent leases | [`docs/SOP/MULTI_AGENT_WORKER_INTERFACE_V1.md`](docs/SOP/MULTI_AGENT_WORKER_INTERFACE_V1.md) |
 
+## Desktop / VM boundary
+
+Daily PC Codex/Cursor shells are the **operator console**, not the relay loop host. On the desktop, agents may read status artifacts, run status helpers, run `DESKTOP_BUILD.cmd`, and run `DESKTOP_CONTINUE.cmd --no-pause`. Product implementation happens only in an explicit `IDE_BUILD` worker flow, and relay/finish execution happens on the VM through the canonical desktop bridge.
+
+Never run these directly from the daily PC shell: `run_ppe_local.cmd`, `run_ppe.cmd`, `run_ppe_auto_local_loop.cmd`, `run_ppe_auto_loop.cmd`, `run_ppe_headless_stack.cmd`, `finish_ide_build.cmd`, or `ppe_autobuilder.cmd advance`. Before any relay command, apply [`.cursor/rules/ppe-desktop-vm-layout.mdc`](.cursor/rules/ppe-desktop-vm-layout.mdc) and [`docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md`](docs/SOP/PPE_CANONICAL_OPERATOR_SCRIPTS_V1.md).
+
 ## Delegation gate output
 
 - `human_only` → stop (gate exit 1)

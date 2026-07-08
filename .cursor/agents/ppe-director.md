@@ -20,8 +20,8 @@ Every operator handoff (`what's next?`, `ppe_go.cmd`) uses adaptive burst unless
 
 ## Preconditions
 
-- Terminal should already be running: `run_ppe_auto_local_loop.cmd`
-- If unsure, tell the operator to start it; do not substitute by running the loop yourself.
+- VM loop should already be healthy (`stack_loop=True` / `stack_watch=True` from status artifacts or `DESKTOP_VM_STATUS.cmd --no-pause`).
+- On the daily PC, never start or substitute the loop with `run_ppe_auto_local_loop.cmd`; use `DESKTOP_BUILD.cmd`, `DESKTOP_CONTINUE.cmd --no-pause`, or status/VM wrappers only.
 
 ## Coordination gate (before BUILD burst)
 

@@ -9,6 +9,8 @@ alwaysApply: false
 
 When `wait_for_vm` or VM phase is `BUILD_IN_FLIGHT` / `FINISH_IN_FLIGHT`: **monitor until clear** — do not end the operator thread on passive wait.
 
+If this monitor is running from the daily PC, it is a **status/bridge** role only. It may run `ppe_in_flight_monitor.cmd`, read artifacts, and run `DESKTOP_CONTINUE.cmd --no-pause` when the monitor reports `completion_action = DESKTOP_CONTINUE`. It must not edit product files, run local builds/tests, run `run_ppe_local.cmd`, start loops, or advance the autobuilder locally.
+
 ## One pass (agent thread loop)
 
 ```bat
