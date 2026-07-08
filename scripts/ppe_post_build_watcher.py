@@ -277,9 +277,12 @@ def try_closeout_only_run_local(repo: Path, *, dry_run: bool = False) -> dict[st
     chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
     mode = str(chapter_mode.get("mode") or "")
 
-    if mode != MODE_CLOSEOUT_ONLY:
+    closeout_registry = bool(chapter_mode.get("closeout_only_registry")) and bool(
+        chapter_mode.get("product_on_main")
+    )
+    if mode != MODE_CLOSEOUT_ONLY and not closeout_registry:
         return {"action": "closeout_finish", "skipped": True, "reason": "not closeout-only"}
-    if verdict != VERDICT_RUN_LOCAL:
+    if verdict not in (VERDICT_RUN_LOCAL, "RUN_AUTO"):
         return {
             "action": "closeout_finish",
             "skipped": True,

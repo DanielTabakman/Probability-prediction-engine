@@ -98,6 +98,22 @@ class TestPpePostBuildWatcher(unittest.TestCase):
         self.assertTrue(result.get("started"))
         assert spawn.called  # type: ignore[attr-defined]
 
+    @patch("scripts.ppe_remote_build_agent.spawn_run_local_detached")
+    @patch("scripts.ppe_operator_status.collect_operator_status")
+    def test_closeout_registry_run_auto_triggers_run_local(self, status: object, spawn: object) -> None:
+        status.return_value = {
+            "verdict": "RUN_AUTO",
+            "chapter_mode": {
+                "mode": "RUN_AUTO",
+                "product_on_main": True,
+                "closeout_only_registry": True,
+            },
+        }
+        spawn.return_value = {"started": True, "worker_pid": 9999}
+        result = try_closeout_only_run_local(self.repo)
+        self.assertTrue(result.get("started"))
+        assert spawn.called  # type: ignore[attr-defined]
+
     @patch("scripts.ppe_post_build_watcher.try_closeout_only_run_local")
     @patch("scripts.ppe_post_build_watcher.try_finish_pending_ide_build")
     def test_finish_handoff_falls_through_to_closeout(self, post: object, closeout: object) -> None:
