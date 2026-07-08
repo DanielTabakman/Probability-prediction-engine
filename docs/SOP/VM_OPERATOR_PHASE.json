@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-08T10:10:44Z",
+  "as_of": "2026-07-08T10:17:13Z",
   "phase": "FINISH_IN_FLIGHT",
   "verdict": "RUN_LOCAL",
   "chapter_name": "msos_forward_consistency_radar_v1 (MSOS /forward-consistency dashboard)",
