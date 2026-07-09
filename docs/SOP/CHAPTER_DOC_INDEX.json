@@ -386,7 +386,7 @@
         "docs/SOP/WORKER_LOOP.md",
         "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
       ],
-      "evidence": null,
+      "evidence": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
       "load_always": [
         "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md"
       ],
@@ -394,8 +394,11 @@
         "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
         "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json"
       ],
-      "load_on_demand": [],
-      "next_selection": null,
+      "load_on_demand": [
+        "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
       "program_doc": null,
       "queue_status": "READY",
@@ -3052,7 +3055,7 @@
         "docs/SOP/WORKER_LOOP.md",
         "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
       ],
-      "evidence": null,
+      "evidence": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
       "load_always": [
         "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md"
       ],
@@ -3060,8 +3063,11 @@
         "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
         "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json"
       ],
-      "load_on_demand": [],
-      "next_selection": null,
+      "load_on_demand": [
+        "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
       "program_doc": null,
       "queue_status": "READY",
@@ -5823,7 +5829,7 @@
         "docs/SOP/WORKER_LOOP.md",
         "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
       ],
-      "evidence": null,
+      "evidence": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
       "load_always": [
         "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md"
       ],
@@ -5831,8 +5837,11 @@
         "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
         "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json"
       ],
-      "load_on_demand": [],
-      "next_selection": null,
+      "load_on_demand": [
+        "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      ],
+      "next_selection": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
       "program_doc": null,
       "queue_status": "READY",
@@ -6005,7 +6014,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-09T03:02:38Z",
+  "generated_at": "2026-07-09T04:47:32Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",

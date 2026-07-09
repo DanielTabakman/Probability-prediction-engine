@@ -20,6 +20,25 @@
         "tests/test_probe_asset_data_source.py"
       ],
       "intent": "Rebase build/ppe-sol-bybit-adapter on main; resolve conflicts; green CI; merge PR #425 so SOL (Bybit) is enabled in catalog."
+    },
+    {
+      "sliceId": "PPE-SOLBybit-Closeout-Slice002",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+      "buildBranch": "build/auto/PPE-SOLBybit-Closeout-Slice002-sol_bybit",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "ppe_sol_bybit_ship_v1",
+        "chapterTitle": "PPE SOL Bybit ship v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
+        "nextSelectionDoc": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md"
+      }
     }
   ]
 }
