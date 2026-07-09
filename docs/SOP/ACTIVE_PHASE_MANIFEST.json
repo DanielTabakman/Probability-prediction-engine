@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
+  "phasePlanPath": "",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_EQUITY_UNIVERSE_TIER1B_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-  "status": "RUNNING",
-  "notes": "Asset batch wave 1 batch-1 retrospect is blocked on production reachability: 2026-07-07 prod multi-asset witness fails HTTPS verification (expired marketstructureos.com cert) and unverified probe returns 403. Batch-1 mocked witness and per-asset local summary builds are green; OI refresh is complete. Fix prod witness, then promote ppe_equity_universe_tier1b_v1 READY.",
+  "status": "COMPLETE",
+  "notes": "Asset batch wave 1 batch-1 retrospect is blocked on production reachability: 2026-07-07 prod multi-asset witness fails HTTPS verification (expired marketstructureos.com cert) and unverified probe returns 403. Batch-1 mocked witness and per-asset local summary builds are green; OI refresh is complete. Fix prod witness, then promote ppe_equity_universe_tier1b_v1 READY. Chapter closeout PPE-EqT1b-Closeout-Slice004; queue item marked DONE.",
   "workerMode": "local-agent"
 }
