@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-09T06:48:50Z",
-  "phase": "HEALTHY_IDLE",
-  "verdict": "RUN_AUTO",
+  "as_of": "2026-07-09T06:48:55Z",
+  "phase": "RUN_LOCAL_PENDING",
+  "verdict": "RUN_LOCAL",
   "chapter_name": "MVP1_cross_venue_backtest_v1",
   "phase_plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
-  "recommended_action": "status"
+  "recommended_action": "run-local"
 }
