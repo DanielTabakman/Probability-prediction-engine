@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `10096a6f` — ops: vm phase mirror RUN LOCAL PENDING (#4819)
+- `3b213570` — ops: loop publish ops/loop-publish-20260709054415-89cb4b95 (#4821)
+- `49c5d119` — ops: loop publish ops/loop-publish-20260709054401-89cb4b95 (#4820) (`docs/SOP/`)
+- `96670800` — control-plane: lease ship (docs) (#4804) (`docs/SOP/`)
+- `f4face39` — control-plane: lease ship (docs) (#4799) (`docs/SOP/`)
+- `bea74442` — Control-plane: dev changelog
 - `39bf7c0a` — ops: vm phase mirror RUN LOCAL PENDING (#4744) (`docs/SOP/`)
 - `393d776f` — ops: vm phase mirror RUN_LOCAL_PENDING (#4742) (`docs/SOP/`)
 - `37ace769` — ops: vm phase mirror RUN LOCAL PENDING (#4740) (`docs/SOP/`)
