@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "PPE equity universe tier-1b v1 is complete; activate ppe_equity_universe_tier1c_v1 for TSLA, AMD, and COIN per selection record. Chapter closeout PPE-EqT1c-Closeout-Slice004; queue item marked DONE. auto-repair: chapter closeout reverted \u2014 evidence/slices still pending",
   "workerMode": "local-agent"
 }
