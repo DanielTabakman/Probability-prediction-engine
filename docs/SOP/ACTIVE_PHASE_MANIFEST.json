@@ -2,7 +2,7 @@
   "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md",
   "selectionRecord": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
-  "status": "RUNNING",
+  "status": "READY",
   "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [P0] Operator SOL \u2014 ship PR #425 (Bybit adapter + enabled SOL)",
   "workerMode": "local-agent"
 }
