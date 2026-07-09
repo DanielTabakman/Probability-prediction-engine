@@ -20,7 +20,6 @@
     "mvp1_distribution_timeseries_collector_v1",
     "mvp1_snapshot_owner_v1",
     "ppe_deribit_crypto_tier1_v1",
-    "ppe_equity_universe_tier1c_v1",
     "ppe_hyperliquid_perp_rail_v1",
     "ppe_sol_bybit_ship_v1",
     "ppe_tradeable_universe_v1"

@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- **Chapter closed:** PPE equity universe tier-1c v1 (mega caps batch 2) (`PPE-EqT1c-Closeout-Slice004`)
 - `3b423487` — control-plane:eqt1b-closeout-docs (#4713) (`docs/SOP/`)
 - `0ea3b850` — ops: vm phase mirror RUN LOCAL PENDING (#4703) (`docs/SOP/`)
 - **Chapter closed:** PPE equity universe tier-1b v1 (mega caps batch 1) (`PPE-EqT1b-Closeout-Slice004`)
