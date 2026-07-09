@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-09T05:18:31Z · **Archived chapters:** 65
+**Generated:** 2026-07-09T05:25:47Z · **Archived chapters:** 66
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -13,6 +13,7 @@
 | `msos_cross_venue_strategy_lab_v1` | `docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md` | `docs/SOP/MSOS_CROSS_VENUE_STRATEGY_LAB_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json` |
 | `msos_e2e_product_witness_v1` | `docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
 | `msos_entitlements_v1` | `docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md` | `docs/SOP/MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json` |
+| `msos_forward_consistency_radar_v1` | `docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json` |
 | `msos_mcd_production_witness_v1` | `docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json` |
 | `msos_monitor_history_live_v1` | `docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md` | `docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
 | `msos_p1_stack_routing` | `docs/SOP/MSOS_FRONTIER.md` | `docs/SOP/MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json` |
