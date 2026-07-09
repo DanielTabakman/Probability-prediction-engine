@@ -51,6 +51,7 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
     allowed = (
         "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
         "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
