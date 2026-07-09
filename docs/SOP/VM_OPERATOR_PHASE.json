@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-09T05:43:09Z",
-  "phase": "RUN_LOCAL_PENDING",
-  "verdict": "RUN_LOCAL",
-  "chapter_name": "ppe_sol_bybit_ship_v1 (PR #425 merge + SOL live)",
-  "phase_plan_path": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
-  "recommended_action": "run-local"
+  "as_of": "2026-07-09T05:45:16Z",
+  "phase": "AWAITING_BUILD",
+  "verdict": "IDE_BUILD",
+  "chapter_name": "MVP1_cross_venue_backtest_v1",
+  "phase_plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
+  "recommended_action": "handoff"
 }
