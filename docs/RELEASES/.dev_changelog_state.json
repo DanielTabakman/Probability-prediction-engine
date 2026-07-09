@@ -14,7 +14,9 @@
     "chapter_closed:PPE-EqT1a-Closeout-Slice004",
     "chapter_closed:PPE-CryptoT1-Closeout-Slice004",
     "chapter_closed:PPE-EqT1b-Closeout-Slice004",
-    "chapter_closed:PPE-EqT1c-Closeout-Slice004"
+    "chapter_closed:PPE-EqT1c-Closeout-Slice004",
+    "chapter_closed:MVP1-CrossVenueBacktest-Closeout-Slice004",
+    "chapter_closed:MSOS-VisParityV1-Closeout-Slice009"
   ],
   "recorded_shas": [
     "45183580b52bd671c3f4ac9d9e27f48d153e5e85",

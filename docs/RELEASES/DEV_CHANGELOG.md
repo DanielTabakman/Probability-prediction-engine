@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- **Chapter closed:** MSOS storyboard visual parity v1 (`MSOS-VisParityV1-Closeout-Slice009`)
+- **Chapter closed:** MVP1 cross-venue backtest v1 (`MVP1-CrossVenueBacktest-Closeout-Slice004`)
 - `10096a6f` — ops: vm phase mirror RUN LOCAL PENDING (#4819)
 - `3b213570` — ops: loop publish ops/loop-publish-20260709054415-89cb4b95 (#4821)
 - `49c5d119` — ops: loop publish ops/loop-publish-20260709054401-89cb4b95 (#4820) (`docs/SOP/`)
