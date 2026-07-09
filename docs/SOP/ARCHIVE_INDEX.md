@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-09T01:14:53Z · **Archived chapters:** 66
+**Generated:** 2026-07-09T05:18:31Z · **Archived chapters:** 65
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -13,7 +13,6 @@
 | `msos_cross_venue_strategy_lab_v1` | `docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md` | `docs/SOP/MSOS_CROSS_VENUE_STRATEGY_LAB_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json` |
 | `msos_e2e_product_witness_v1` | `docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
 | `msos_entitlements_v1` | `docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md` | `docs/SOP/MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json` |
-| `msos_forward_consistency_radar_v1` | `docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json` |
 | `msos_mcd_production_witness_v1` | `docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json` |
 | `msos_monitor_history_live_v1` | `docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md` | `docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
 | `msos_p1_stack_routing` | `docs/SOP/MSOS_FRONTIER.md` | `docs/SOP/MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json` |
@@ -28,7 +27,6 @@
 | `msos_production_wiring_v1` | `docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md` | `docs/SOP/MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json` |
 | `msos_public_demo_launch_v1` | `docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md` | `docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | `msos_self_serve_onboarding_v1` | `docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md` | `docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json` |
-| `msos_storyboard_visual_parity_v1` | `docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md` | `docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
 | `msos_strategy_lab_dist_download_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json` |
 | `msos_strategy_lab_distribution_demo` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json` |
 | `msos_strategy_lab_embed_shell_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json` |
@@ -67,6 +65,7 @@
 | `ppe_equity_options_v1` | `docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json` |
 | `ppe_equity_universe_tier1a_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json` |
 | `ppe_equity_universe_tier1b_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json` |
+| `ppe_equity_universe_tier1c_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json` |
 | `ppe_exposure_menu_v1` | `docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md` | `docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json` |
 | `ppe_forward_consistency_radar_v1` | `docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json` |
 | `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |

@@ -172,10 +172,9 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
-      "status": "DONE",
+      "status": "READY",
       "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
-      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
@@ -494,9 +493,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 COIN SLV GLD GOOGL META",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "DONE",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
+      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
