@@ -369,7 +369,12 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     }
 
 
-def prepare_operator_status(repo: Path) -> dict[str, Any]:
+def prepare_operator_status(
+    repo: Path,
+    *,
+    sync_burst: bool = True,
+    auto_operate: bool = True,
+) -> dict[str, Any]:
     """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
     try:
         from scripts.ppe_notify_push import ensure_operator_notify_env
@@ -398,26 +403,28 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
         )
     except Exception:
         pass
-    try:
-        from scripts.ppe_burst_plan import refresh_burst_plan
+    if sync_burst:
+        try:
+            from scripts.ppe_burst_plan import refresh_burst_plan
 
-        status["burst_plan"] = refresh_burst_plan(repo, status)
-    except Exception:
-        pass
+            status["burst_plan"] = refresh_burst_plan(repo, status)
+        except Exception:
+            pass
     try:
         from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
 
         enrich_status_with_pass_progress(repo, status, record=True)
     except Exception:
         pass
-    try:
-        from scripts.ppe_desktop_automation_graduation import load_desktop_automation_env
-        from scripts.ppe_operator_dispatch import maybe_auto_operate
+    if auto_operate:
+        try:
+            from scripts.ppe_desktop_automation_graduation import load_desktop_automation_env
+            from scripts.ppe_operator_dispatch import maybe_auto_operate
 
-        load_desktop_automation_env(repo)
-        status = maybe_auto_operate(repo, status)
-    except Exception:
-        pass
+            load_desktop_automation_env(repo)
+            status = maybe_auto_operate(repo, status)
+        except Exception:
+            pass
     return status
 
 
