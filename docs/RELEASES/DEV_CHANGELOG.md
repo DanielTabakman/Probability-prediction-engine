@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-09
+
+- **Chapter closed:** PPE equity universe tier-1b v1 (mega caps batch 1) (`PPE-EqT1b-Closeout-Slice004`)
+
 ## 2026-07-08
 
 - `b9b6ce40` — evidence-plane: lease ship (#4611) (`scripts/`)
