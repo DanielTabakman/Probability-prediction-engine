@@ -4,10 +4,23 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `3b423487` — control-plane:eqt1b-closeout-docs (#4713) (`docs/SOP/`)
+- `0ea3b850` — ops: vm phase mirror RUN LOCAL PENDING (#4703) (`docs/SOP/`)
 - **Chapter closed:** PPE equity universe tier-1b v1 (mega caps batch 1) (`PPE-EqT1b-Closeout-Slice004`)
 
 ## 2026-07-08
 
+- `59bc1a8b` — ops: vm phase mirror HEALTHY_IDLE (#4714) (`docs/SOP/`)
+- `22613511` — control-plane: lease ship (docs) (#4633) (`docs/SOP/`)
+- `ee84a7a6` — control-plane: refresh module map status (#4627) (`docs/SOP/`)
+- `e7de7938` — ops: vm phase mirror RUN LOCAL PENDING (#4625)
+- `26cc4998` — ops: vm phase mirror RUN LOCAL PENDING (#4626) (`docs/SOP/`)
+- `d856417e` — control-plane: finish closeout registry handoff (#4623) (`scripts/`)
+- `b6254a21` — control-plane: lease ship (docs) (#4621)
+- `6d0a2d3b` — ops: vm phase mirror RUN LOCAL PENDING (#4620) (`docs/SOP/`)
+- `dae01a8a` — control-plane: keep desktop continue map-clean (#4612)
+- `6e283fce` — ops: context closeout ship (control-plane/recovery-202607081949) (#4609)
+- `acf80862` — Control-plane: dev changelog
 - `b9b6ce40` — evidence-plane: lease ship (#4611) (`scripts/`)
 - `2fb7be89` — Control-plane: dev changelog
 - `73919be3` — ops: context closeout ship (control-plane/recovery-202607081957) (#4610) (`docs/SOP/`)
