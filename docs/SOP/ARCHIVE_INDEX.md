@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-09T02:45:46Z · **Archived chapters:** 66
+**Generated:** 2026-07-09T03:02:38Z · **Archived chapters:** 67
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -67,6 +67,7 @@
 | `ppe_equity_options_v1` | `docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_OPTIONS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json` |
 | `ppe_equity_universe_tier1a_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1A_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json` |
 | `ppe_equity_universe_tier1b_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1B_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1B_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json` |
+| `ppe_equity_universe_tier1c_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json` |
 | `ppe_exposure_menu_v1` | `docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md` | `docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json` |
 | `ppe_forward_consistency_radar_v1` | `docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json` |
 | `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |
