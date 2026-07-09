@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `a4b08147` — ops: vm phase mirror STACK_DOWN (#4966) (`docs/SOP/`)
+- `bc5b05dc` — Control-plane: close out MVP1 cross-venue backtest (#4965) (`docs/SOP/`)
+- `c718bc12` — ops: vm phase mirror HEALTHY IDLE (#4927)
+- `5c8f0541` — ops: vm phase mirror HEALTHY IDLE (#4928) (`docs/SOP/`)
+- `f7e9584b` — Control-plane: dev changelog
 - **Chapter closed:** MVP1 cross-venue backtest v1 (`MVP1-CrossVenueBacktest-Closeout-Slice004`)
 - `ed9dea4d` — control: refresh module map closeout status (#4886) (`docs/SOP/`)
 - `e0d57ee2` — ops: vm phase mirror HEALTHY IDLE (#4849) (`docs/SOP/`)
