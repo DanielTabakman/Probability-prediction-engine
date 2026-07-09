@@ -14,9 +14,9 @@ A) DOC-STATE SAFETY (alignment)
 - Controlling master canon: `docs/VISION/PPE_MASTER_MVP1.md`
 - Live frontier (only steering truth): `docs/SOP/MVP1_FRONTIER.md`
 - Integrated one-pager: `docs/SOP/PPE_INTEGRATED_STATUS.md`
-- Active MVP1 focus: **none** — ppe sol bybit ship v1 **COMPLETE** 2026-07-09
+- Active MVP1 focus: **none** — mvp1 cross-venue backtest v1 **COMPLETE** 2026-07-09
 - Closed chapters: Validation, Commercial Validation, MVP1 Reliability, Phase 2 on `main`, operator hardening, review enrichment, smoke regression, friends-first screen
-- Next pending execution step: **steward SELECTION** — `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md`
+- Next pending execution step: **steward SELECTION** — `docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md`
 - Steward parallel: VPS `.env` CTA **pending**; paid-interest **N** until live call
 - Reporting posture: SLIM MODE / REPO-SENSOR execution-only
 - Drift rule: **`MVP1_FRONTIER.md`** outranks HANDOFF if they drift
@@ -28,12 +28,12 @@ B) REPO-STATE SAFETY (reproducibility)
 
 C) AGENT CONTINUITY (required)
 - Safe to switch agents: YES after push
-- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md`
+- Carry: `PPE_INTEGRATED_STATUS.md` + `MVP1_FRONTIER.md` + `MVP1_CROSS_VENUE_BACKTEST_V1_EVIDENCE_STATUS.md`
 ```
 
 ## Current priority
 
-**PPE SOL Bybit ship v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
+**MVP1 cross-venue backtest v1 COMPLETE** — dual smoke green. Await steward **SELECTION**.
 
 
 ## Hard rule reminders
@@ -47,9 +47,9 @@ C) AGENT CONTINUITY (required)
 ## Recommended next step
 
 1. **Relay:** closeout applied — see [`AGENT_CONTINUITY_BRIEF.md`](AGENT_CONTINUITY_BRIEF.md).
-2. **Steward:** SELECTION — [`POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md).
+2. **Steward:** SELECTION — [`POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md`](docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md).
 
 
 ## Last updated
 
-2026-07-09 — PPE SOL Bybit ship v1 COMPLETE; closeout job `PPE-SOLBybit-Closeout-Slice002`.
+2026-07-09 — MVP1 cross-venue backtest v1 COMPLETE; closeout job `MVP1-CrossVenueBacktest-Closeout-Slice004`.

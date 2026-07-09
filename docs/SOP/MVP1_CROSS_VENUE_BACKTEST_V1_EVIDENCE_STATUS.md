@@ -1,7 +1,13 @@
+---
+archived: true
+chapter_id: mvp1_cross_venue_backtest_v1
+closed: 2026-07-09
+---
+
 # MVP1 cross-venue backtest v1 — evidence status
 
 **Chapter:** `mvp1_cross_venue_backtest_v1`  
-**Status:** **IN PROGRESS** (SELECTED 2026-06-27)  
+**Status:** **COMPLETE** 2026-07-09  
 **Phase plan:** [`PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json`](PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json)  
 **Sprint:** [`SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md`](SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md)  
 **Program:** [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md)
@@ -10,7 +16,7 @@
 |-------|--------|-------|
 | MVP1-CrossVenueBacktest-Control-Slice001 | **CLOSED** | Evidence stub + queue wiring (#417) |
 | MVP1-CrossVenueBacktest-Product-Slice002 | **CLOSED** | `cross_venue_backtest.py` Brier + gap buckets (#415) |
-| MVP1-CrossVenueBacktest-Closeout-Slice004 | PENDING | Chapter closeout + run script follow-on |
+| MVP1-CrossVenueBacktest-Closeout-Slice004 | COMPLETE | Chapter closeout + run script follow-on |
 
 ## Deliverables
 
