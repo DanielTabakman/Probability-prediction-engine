@@ -91,6 +91,21 @@ def bybit_base_coin(asset_id: str | None = None) -> str:
     return coin
 
 
+def hyperliquid_coin(asset_id: str | None = None) -> str:
+    entry = get_asset(asset_id)
+    if asset_venue(asset_id) != "hyperliquid":
+        raise ValueError(f"asset {asset_id!r} is not hyperliquid venue")
+    coin = _normalize_asset_id(str(entry.get("hyperliquid_coin") or asset_id or ""))
+    if not coin:
+        raise ValueError(f"asset {asset_id!r} missing hyperliquid_coin")
+    return coin
+
+
+def is_exposure_only(asset_id: str | None = None) -> bool:
+    entry = get_asset(asset_id)
+    return entry.get("exposure_only") is True
+
+
 def is_asset_enabled(asset_id: str | None = None) -> bool:
     entry = get_asset(asset_id)
     if "enabled" in entry:
@@ -212,6 +227,8 @@ def deribit_currency(asset_id: str | None = None) -> str:
         raise ValueError(f"asset {asset_id!r} is equity venue, not deribit")
     if venue == "bybit":
         raise ValueError(f"asset {asset_id!r} is bybit venue, not deribit")
+    if venue == "hyperliquid":
+        raise ValueError(f"asset {asset_id!r} is hyperliquid venue, not deribit")
     currency = _normalize_asset_id(str(entry.get("deribit_currency") or asset_id or default_asset_id()))
     if not currency:
         raise ValueError(f"asset {asset_id!r} missing deribit_currency")

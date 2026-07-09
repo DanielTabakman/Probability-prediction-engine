@@ -24,6 +24,7 @@ from src.data.assets_registry import (  # noqa: E402
     asset_venue,
     get_asset,
     is_asset_enabled,
+    is_exposure_only,
     list_asset_ids_for_catalog_group,
     list_asset_ids_for_manifest_chapter,
     list_enabled_asset_ids,
@@ -90,7 +91,22 @@ def run_witness(
             )
             continue
 
-        ok, detail = witness_display_boundary_for_asset(aid, live=live, pre_enable=pre_enable)
+        if is_exposure_only(aid):
+            if live:
+                try:
+                    from scripts.probe_hyperliquid_perp import probe_hyperliquid_perp
+
+                    probe = probe_hyperliquid_perp(aid)
+                    ok = probe.get("status") == "ok"
+                    detail = "exposure-only perp probe ok" if ok else str(probe.get("status") or "probe failed")
+                except Exception as exc:  # noqa: BLE001 - witness reports vendor/probe failure
+                    ok = False
+                    detail = str(exc)
+            else:
+                ok = True
+                detail = "exposure-only asset catalog ok"
+        else:
+            ok, detail = witness_display_boundary_for_asset(aid, live=live, pre_enable=pre_enable)
         results.append(
             {
                 "asset_id": aid,

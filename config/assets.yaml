@@ -111,6 +111,20 @@ assets:
       - "Bybit USDT-settled SOL options; thinner than BTC/ETH on Deribit."
       - "Venue: Bybit public API (Deribit SOL options delisted 2026-06-27)."
 
+  HYPE:
+    label: "HYPE perp"
+    asset_class: crypto
+    tier: experimental
+    venue: hyperliquid
+    hyperliquid_coin: HYPE
+    price_unit: USD
+    enabled: true
+    exposure_only: true
+    catalog:
+      group: crypto
+    trust_notes:
+      - "Exposure-only Hyperliquid perp rail; no options chain or execution support."
+
   BNB:
     label: "BNB options"
     asset_class: crypto

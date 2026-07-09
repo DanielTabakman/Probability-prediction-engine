@@ -11,6 +11,7 @@ import pytest
 
 from scripts import exposure_path_core as core_mod
 from scripts import find_exposure_paths as cli_mod
+from scripts import probe_hyperliquid_perp as hype_probe_mod
 
 
 def _now_ms() -> int:
@@ -73,6 +74,17 @@ def _sol_marks() -> dict[str, list[dict[str, Any]]]:
             {"strike": 82.0, "mark_btc": 2.0},
         ],
         "puts": [],
+    }
+
+
+def _hype_ctx() -> dict[str, Any]:
+    return {
+        "coin": "HYPE",
+        "mark_px": 41.25,
+        "funding": 0.000012,
+        "open_interest": 123_456.0,
+        "as_of_utc": "2026-07-09T00:00:00+00:00",
+        "source": "hyperliquid",
     }
 
 
@@ -158,6 +170,38 @@ def test_sol_long_returns_live_paths(sol_mocks) -> None:
     for path in live:
         if path["instrument_rail"] == "listed_options":
             assert path.get("deep_link") == "/strategy-lab?asset=SOL"
+
+
+def test_hype_long_returns_live_perp_only_path() -> None:
+    with (
+        patch("src.data.fetch_hyperliquid.fetch_hyperliquid_mark", return_value=41.25),
+        patch("src.data.fetch_hyperliquid.fetch_hyperliquid_perp_context", return_value=_hype_ctx()),
+    ):
+        report = cli_mod.run_find_exposure_paths("HYPE", "long")
+
+    assert report["asset_id"] == "HYPE"
+    assert report["status"] == "ok_perp_only"
+    assert report["proof_asset"] is True
+    assert report["spot_usd"] == 41.25
+    perp = next(p for p in report["paths"] if p["path_id"] == "perp_long")
+    assert perp["trust_badge"] == "Live"
+    assert perp["instrument_rail"] == "perp"
+    assert perp["recommendation_status"] == "path_not_recommendation"
+    assert "funding 0.000012" in perp["legs"][0]["tenor"]
+    assert not [p for p in report["paths"] if p["instrument_rail"] == "listed_options" and p["trust_badge"] == "Live"]
+
+
+def test_probe_hyperliquid_perp_cli_json(capsys) -> None:
+    with patch.object(hype_probe_mod, "fetch_hyperliquid_perp_context", return_value=_hype_ctx()):
+        code = hype_probe_mod.main(["--asset", "HYPE", "--json"])
+
+    assert code == 0
+    data = json.loads(capsys.readouterr().out)
+    assert data["asset_id"] == "HYPE"
+    assert data["venue"] == "hyperliquid"
+    assert data["status"] == "ok"
+    assert data["mark_px"] == 41.25
+    assert data["funding"] == 0.000012
 
 
 def test_sort_spot_before_aggressive_options(nvda_mocks) -> None:

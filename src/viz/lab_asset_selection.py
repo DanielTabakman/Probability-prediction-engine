@@ -10,6 +10,7 @@ from src.data.assets_registry import (
     catalog_group_order,
     default_asset_id,
     get_asset,
+    is_exposure_only,
     list_enabled_asset_ids,
 )
 
@@ -18,7 +19,7 @@ LAB_ASSET_QUERY_PARAM = "asset"
 
 def list_selectable_lab_asset_ids() -> list[str]:
     """Enabled registry assets in catalog group order (registry SSOT)."""
-    enabled = list_enabled_asset_ids()
+    enabled = [aid for aid in list_enabled_asset_ids() if not is_exposure_only(aid)]
     if not enabled:
         return [default_asset_id()]
 
