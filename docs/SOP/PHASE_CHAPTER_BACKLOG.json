@@ -494,7 +494,7 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1b_v1",
-      "status": "queued",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
