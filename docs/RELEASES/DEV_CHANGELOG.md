@@ -4,6 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `39bf7c0a` — ops: vm phase mirror RUN LOCAL PENDING (#4744) (`docs/SOP/`)
+- `393d776f` — ops: vm phase mirror RUN_LOCAL_PENDING (#4742) (`docs/SOP/`)
+- `37ace769` — ops: vm phase mirror RUN LOCAL PENDING (#4740) (`docs/SOP/`)
+- `7ae745c6` — PPE-EqT1c-Control: repair steering spine (#4731) (`docs/SOP/`)
+- `36ea4cba` — PPE-EqT1c-Control: activate READY manifest (#4729) (`docs/SOP/`)
+- `0ed52295` — ops: vm phase mirror HEALTHY_IDLE (#4727) (`docs/SOP/`)
+- `92cad6eb` — ops: vm phase mirror HEALTHY_IDLE (#4726) (`docs/SOP/`)
+- `8ac23706` — Control-plane: dev changelog
 - **Chapter closed:** PPE equity universe tier-1c v1 (mega caps batch 2) (`PPE-EqT1c-Closeout-Slice004`)
 - `3b423487` — control-plane:eqt1b-closeout-docs (#4713) (`docs/SOP/`)
 - `0ea3b850` — ops: vm phase mirror RUN LOCAL PENDING (#4703) (`docs/SOP/`)
@@ -11,6 +19,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-08
 
+- `71602cf9` — PPE-EqT1c-Control: close chapter docs (#4756) (`docs/SOP/`)
 - `59bc1a8b` — ops: vm phase mirror HEALTHY_IDLE (#4714) (`docs/SOP/`)
 - `22613511` — control-plane: lease ship (docs) (#4633) (`docs/SOP/`)
 - `ee84a7a6` — control-plane: refresh module map status (#4627) (`docs/SOP/`)
