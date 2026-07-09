@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-09T10:02:12Z",
-  "phase": "FINISH_IN_FLIGHT",
+  "as_of": "2026-07-09T10:08:18Z",
+  "phase": "AWAITING_BUILD",
   "verdict": "IDE_BUILD",
   "chapter_name": "PPE_hyperliquid_perp_rail_v1 (HYPE perp exposure path \u2014 Hyperliquid read-only)",
   "phase_plan_path": "docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json",
-  "recommended_action": "status"
+  "recommended_action": "handoff"
 }
