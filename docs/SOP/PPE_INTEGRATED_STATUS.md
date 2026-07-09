@@ -17,7 +17,7 @@ This file merges archived chapters, steward parallel work, engineering gates, an
 | **Design** | Storyboard v0.6 **complete** — [`storyboard-v0.6`](docs/VISION/MSOS/storyboard-v0.6/prototype/html/) |
 | **Active BUILD** | `` — [``]() |
 | **Relay plan** | [``]() |
-| **Next** | Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate ppe_equity_universe_tier1b_v1 (blocked until production multi-asset witness is reachable/green; then promote READY in PHASE_QUEUE.json). Spine relay: finish closeout only for [msos_access_identity_v1, msos_cross_venue_strategy_lab_v1, msos_entitlements_v1, msos_monitor_history_live_v1, msos_p3_command_center, msos_public_demo_launch_v1, msos_storyboard_visual_parity_v1, msos_strategy_lab_dist_download_v1, msos_strategy_lab_distribution_demo, msos_strategy_lab_embed_shell_v1, msos_trader_review_loop_v1, msos_trader_workflow_horizon_nav_v1, msos_workflow_persistence_v1, mvp1_cross_venue_backtest_v1, mvp1_cross_venue_scan_v1, mvp1_distribution_stats_legibility, mvp1_distribution_timeseries_collector_v1, mvp1_snapshot_owner_v1, ppe_deribit_crypto_tier1_v1, ppe_hyperliquid_perp_rail_v1, ppe_tradeable_universe_v1] — product on main; do NOT re-BUILD (see OPERATOR_STATUS Mode). Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. |
+| **Next** | Direction/UX: docs/SOP/UX_EXECUTION_BACKLOG_V1.md — next BUILD candidate ppe_equity_universe_tier1b_v1 (blocked until production multi-asset witness is reachable/green; then promote READY in PHASE_QUEUE.json). Spine relay: finish closeout only for [msos_access_identity_v1, msos_cross_venue_strategy_lab_v1, msos_entitlements_v1, msos_forward_consistency_radar_v1, msos_monitor_history_live_v1, msos_p3_command_center, msos_public_demo_launch_v1, msos_storyboard_visual_parity_v1, msos_strategy_lab_dist_download_v1, msos_strategy_lab_distribution_demo, msos_strategy_lab_embed_shell_v1, msos_trader_review_loop_v1, msos_trader_workflow_horizon_nav_v1, msos_workflow_persistence_v1, mvp1_cross_venue_backtest_v1, mvp1_cross_venue_scan_v1, mvp1_distribution_stats_legibility, mvp1_distribution_timeseries_collector_v1, mvp1_snapshot_owner_v1, ppe_deribit_crypto_tier1_v1, ppe_hyperliquid_perp_rail_v1, ppe_tradeable_universe_v1] — product on main; do NOT re-BUILD (see OPERATOR_STATUS Mode). Asset batch wave 1 parallel per POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md. |
 
 **Trader Workflow Integration v1:** MSOS in the trading process — imply, disagree, express, return; not a demo-only visit
 
@@ -194,6 +194,8 @@ flowchart LR
 
 | PPE SOL Bybit ship v1 | **COMPLETE** 2026-07-09 | [`SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md`](docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md), [`PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md`](docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md) |
 
+| MVP1 cross-venue backtest v1 | **COMPLETE** 2026-07-09 | [`SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md`](docs/SOP/SPRINT_MVP1_CROSS_VENUE_BACKTEST_V1.md), [`MVP1_CROSS_VENUE_BACKTEST_V1_EVIDENCE_STATUS.md`](docs/SOP/MVP1_CROSS_VENUE_BACKTEST_V1_EVIDENCE_STATUS.md) |
+
 **Ops tail:** [`COMMERCIAL_OPS_COMPLETION.md`](COMMERCIAL_OPS_COMPLETION.md) — VPS CTA + paid-interest remain steward.
 
 ---
@@ -254,4 +256,4 @@ See [`TESTING_TIERS_V1.md`](TESTING_TIERS_V1.md).
 
 ## Next BUILD (agent lane)
 
-**Await steward SELECTION** — [`POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md`](docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1A_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).
+**Await steward SELECTION** — [`POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md`](docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md). **Worry audit:** [`PPE_RISK_REGISTER.md`](PPE_RISK_REGISTER.md).

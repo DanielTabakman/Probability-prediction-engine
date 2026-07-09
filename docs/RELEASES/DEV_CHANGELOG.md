@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- **Chapter closed:** MVP1 cross-venue backtest v1 (`MVP1-CrossVenueBacktest-Closeout-Slice004`)
 - `ed9dea4d` — control: refresh module map closeout status (#4886) (`docs/SOP/`)
 - `e0d57ee2` — ops: vm phase mirror HEALTHY IDLE (#4849) (`docs/SOP/`)
 - `cbe5c9a5` — ops: vm phase mirror HEALTHY_IDLE (#4832) (`docs/SOP/`)
