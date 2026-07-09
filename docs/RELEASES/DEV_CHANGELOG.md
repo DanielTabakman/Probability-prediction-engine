@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `ed9dea4d` — control: refresh module map closeout status (#4886) (`docs/SOP/`)
+- `e0d57ee2` — ops: vm phase mirror HEALTHY IDLE (#4849) (`docs/SOP/`)
+- `cbe5c9a5` — ops: vm phase mirror HEALTHY_IDLE (#4832) (`docs/SOP/`)
+- `709b8cdf` — control-plane: publish SOL closeout state (#4824) (`docs/SOP/`)
+- `70f58492` — ops: vm phase mirror RUN LOCAL PENDING (#4825) (`docs/SOP/`)
+- `a300d05e` — Control-plane: dev changelog
 - `10096a6f` — ops: vm phase mirror RUN LOCAL PENDING (#4819)
 - `3b213570` — ops: loop publish ops/loop-publish-20260709054415-89cb4b95 (#4821)
 - `49c5d119` — ops: loop publish ops/loop-publish-20260709054401-89cb4b95 (#4820) (`docs/SOP/`)
