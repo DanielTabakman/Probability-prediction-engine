@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-09T02:44:04Z",
-  "phase": "RUN_LOCAL_PENDING",
-  "verdict": "RUN_LOCAL",
-  "chapter_name": "ppe_equity_universe_tier1c_v1 (TSLA AMD COIN)",
-  "phase_plan_path": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-  "recommended_action": "run-local"
+  "as_of": "2026-07-09T02:47:15Z",
+  "phase": "HEALTHY_IDLE",
+  "verdict": "SUPPLY_LOW",
+  "chapter_name": null,
+  "phase_plan_path": null,
+  "recommended_action": "status"
 }
