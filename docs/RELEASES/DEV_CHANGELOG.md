@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-09
 
+- `2aa559ce` — build(deps): update google-auth requirement from >=2.55.1 to >=2.55.2 (#5107)
+- `61ff81a9` — build(deps): update cursor-sdk requirement from >=0.1.8 to >=0.1.9 (#5108)
+- `b005fea2` — Control-plane: dev changelog
 - `a4b08147` — ops: vm phase mirror STACK_DOWN (#4966) (`docs/SOP/`)
 - `bc5b05dc` — Control-plane: close out MVP1 cross-venue backtest (#4965) (`docs/SOP/`)
 - `c718bc12` — ops: vm phase mirror HEALTHY IDLE (#4927)
