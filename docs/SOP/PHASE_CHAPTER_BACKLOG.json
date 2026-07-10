@@ -514,7 +514,7 @@
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",

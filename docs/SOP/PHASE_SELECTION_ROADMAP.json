@@ -328,7 +328,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "skipped",
+      "status": "pending",
       "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
@@ -382,7 +382,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
-      "status": "pending",
+      "status": "ready",
       "reason": "[LOW BLOCKED] Replay scrubber \u2014 gated on archive_meta.replay_ready (\u226530d); do not ready until gate",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     }

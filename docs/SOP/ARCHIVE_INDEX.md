@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-10T04:16:34Z · **Archived chapters:** 69
+**Generated:** 2026-07-10T04:45:56Z · **Archived chapters:** 70
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -28,6 +28,7 @@
 | `msos_production_wiring_v1` | `docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md` | `docs/SOP/MSOS_PRODUCTION_WIRING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json` |
 | `msos_public_demo_launch_v1` | `docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md` | `docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | `msos_self_serve_onboarding_v1` | `docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md` | `docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json` |
+| `msos_storyboard_visual_parity_v1` | `docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md` | `docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json` |
 | `msos_strategy_lab_dist_download_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json` |
 | `msos_strategy_lab_distribution_demo` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json` |
 | `msos_strategy_lab_embed_shell_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json` |

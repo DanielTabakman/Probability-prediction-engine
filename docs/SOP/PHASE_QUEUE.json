@@ -172,9 +172,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
-      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
+      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json",
@@ -427,7 +428,7 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
-      "status": "PLANNED",
+      "status": "READY",
       "reason": "[LOW BLOCKED] Replay scrubber \u2014 gated on archive_meta.replay_ready (\u226530d); do not ready until gate",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     },
@@ -503,7 +504,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 USO commodity ETF proxy",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
