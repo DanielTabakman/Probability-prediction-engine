@@ -6,6 +6,7 @@ Start here when navigating the Probability Prediction Engine repo.
 
 | Role | Path |
 |------|------|
+| **ChatGPT + GitHub + Codex operating contract** | [`SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md) — GitHub SSOT, thread routing, task handoffs, and mandatory agent disagreement protocol |
 | **Integrated one-pager** | [`SOP/PPE_INTEGRATED_STATUS.md`](SOP/PPE_INTEGRATED_STATUS.md) |
 | **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) (MVP1 engine) · [`SOP/MSOS_FRONTIER.md`](SOP/MSOS_FRONTIER.md) (MSOS website) |
 | **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
@@ -16,8 +17,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Product canon** | [`VISION/PPE_MASTER_MVP1.md`](VISION/PPE_MASTER_MVP1.md) |
 | **Health check history** | [`SOP/HEALTH_CHECK_LOG.md`](SOP/HEALTH_CHECK_LOG.md) |
 | **Commit / test gates** | [`SOP/COMMIT_POLICY.md`](SOP/COMMIT_POLICY.md) |
-| **Google Docs MCP (agents)** | [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) |
-| **Google Docs control plane** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) — MSOS sync; Master read-only for Cursor |
+| **Google Docs (legacy/manual fallback)** | [`SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md`](SOP/GOOGLE_DOCS_CONTROL_PLANE_V1.md) · [`SOP/MCP_GOOGLE_DOCS_SETUP.md`](SOP/MCP_GOOGLE_DOCS_SETUP.md) — non-authoritative; verify against GitHub before use |
 | **Repo layer map (agents)** | [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) · presets [`SOP/REPO_LAYER_PATH_PREFIXES.json`](SOP/REPO_LAYER_PATH_PREFIXES.json) · [`SOP/PARALLEL_AGENT_CHECKLIST_V1.md`](SOP/PARALLEL_AGENT_CHECKLIST_V1.md) |
 | **Agent continuity (generated)** | [`SOP/AGENT_CONTINUITY_BRIEF.md`](SOP/AGENT_CONTINUITY_BRIEF.md) · role card [`SOP/AGENT_GUIDE_ROLE.md`](SOP/AGENT_GUIDE_ROLE.md) |
 | **SOP discovery (agents)** | `python scripts/resolve_sop.py --topic "<phrase>" --json` · index [`SOP/CHAPTER_DOC_INDEX.json`](SOP/CHAPTER_DOC_INDEX.json) · [`SOP/AGENT_ROUTING_V1.md`](SOP/AGENT_ROUTING_V1.md) |
@@ -25,9 +25,9 @@ Start here when navigating the Probability Prediction Engine repo.
 | **Dev changelog (rolling)** | [`RELEASES/DEV_CHANGELOG.md`](RELEASES/DEV_CHANGELOG.md) — daily / merge release notes on `main` |
 | **Weekly digest (human)** | [`RELEASES/WEEKLY_DIGEST.md`](RELEASES/WEEKLY_DIGEST.md) — Monday summary of prior week |
 
-**Precedence:** pushed repo + accepted docs → `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for its track.
+**Precedence:** accepted files on GitHub `main` → explicitly approved open PR → fresh code/test/deployment evidence → current thread proposals → historical chats, Google Docs, or stale mirrors. Within accepted repo docs: `PPE_MASTER_MVP1` → `MVP1_FRONTIER` (MVP1 engine) / `MSOS_FRONTIER` (MSOS website) → `HANDOFF` → `OPERATING_RULES`. On slice-queue drift, the matching frontier wins for its track. Agent disagreement must be surfaced using the Coordination Status contract; it must not be silently resolved.
 
-**Legacy (do not use for steering):** [`SOP/CURRENT_FRONTIER.md`](SOP/CURRENT_FRONTIER.md) and [`CURRENT_FRONTIER.md`](CURRENT_FRONTIER.md) are historical Phase 2 ledgers only.
+**Legacy (do not use for steering):** [`SOP/CURRENT_FRONTIER.md`](SOP/CURRENT_FRONTIER.md) and [`CURRENT_FRONTIER.md`](CURRENT_FRONTIER.md) are historical Phase 2 ledgers only. Google Docs are also non-authoritative unless reconfirmed against GitHub.
 
 ## By plane
 
@@ -58,7 +58,8 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 
 ## Context rules
 
-- [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor thread vs stay in-session
+- [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor or ChatGPT thread vs stay in-session
+- [`SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md) — ChatGPT Project layout, GitHub handoff packets, and reconciliation protocol
 - [`SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md) — end a long chat: push/pull sweep, narrative, backlog triage
 - [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only; includes layer presets)
 - [`SOP/REPO_LAYER_MAP_V1.md`](SOP/REPO_LAYER_MAP_V1.md) — MSOS / PPE / factory folder boundaries
