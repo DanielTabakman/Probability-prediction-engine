@@ -1,7 +1,7 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-10T01:47:11Z",
+  "as_of": "2026-07-10T01:53:29Z",
   "phase": "AWAITING_BUILD",
   "verdict": "IDE_BUILD",
   "chapter_name": "PPE_hyperliquid_perp_rail_v1 (HYPE perp exposure path \u2014 Hyperliquid read-only)",
