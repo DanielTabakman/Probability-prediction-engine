@@ -17,6 +17,7 @@ from scripts.ppe_ide_handoff import _detached_open, copy_text_to_clipboard, reso
 from scripts.ppe_operator_hint import PPE_GO_HINT, PPE_GO_VERDICTS
 from scripts.ppe_thread_roles import OPERATOR_THREAD_OPENER, prepend_role_opener
 from scripts.ppe_operator_status import (
+    STATUS_BRIEF_REL,
     STATUS_REPORT_REL,
     VERDICT_RUN_AUTO,
     VERDICT_SUPPLY_LOW,
@@ -28,7 +29,7 @@ DIRECTOR_PROMPT = prepend_role_opener(
     "@ppe-director Director pass. Terminal loop running.",
     OPERATOR_THREAD_OPENER,
 )
-LITE_STATUS_REL = "artifacts/control_plane/OPERATOR_STATUS_BRIEF.md"
+LITE_STATUS_REL = STATUS_BRIEF_REL
 BURST_PLAN_REL = "artifacts/control_plane/BURST_PLAN.json"
 
 
@@ -51,16 +52,29 @@ def _load_whats_next_line(repo: Path) -> str:
         text = load_whats_next_markdown(repo) or ""
     except Exception:
         text = ""
+    legacy_next_action = ""
     for raw in text.splitlines():
         line = raw.strip()
+        if line.startswith("**Next action summary:**"):
+            return line.replace("**Next action summary:**", "", 1).strip()
         if line.startswith("**Next action:**"):
-            return line.replace("**Next action:**", "", 1).strip()
-    return ""
+            legacy_next_action = line.replace("**Next action:**", "", 1).strip()
+    return _summarize_inline(legacy_next_action)
+
+
+def _summarize_inline(text: str, *, max_chars: int = 280) -> str:
+    compact = " ".join(str(text or "").split())
+    if len(compact) <= max_chars:
+        return compact
+    cut = compact[: max_chars - 3].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return f"{cut}..."
 
 
 def _strip_markdown_value(line: str) -> str:
     value = line.split(":", 1)[1].strip() if ":" in line else line.strip()
     value = value.replace("**", "").strip()
+    if value.startswith("`") and "`" in value[1:]:
+        return value.split("`", 2)[1].strip()
     return value.strip("`").strip()
 
 
@@ -349,7 +363,13 @@ def main(argv: list[str] | None = None) -> int:
         burst=not args.single,
         lite=args.lite,
     )
-    print(format_user_banner(result), end="")
+    try:
+        print(format_user_banner(result), end="")
+    except UnicodeEncodeError:
+        safe = format_user_banner(result).encode(sys.stdout.encoding or "utf-8", errors="replace").decode(
+            sys.stdout.encoding or "utf-8"
+        )
+        print(safe, end="")
 
     verdict = str(result.get("verdict") or "")
     if verdict == VERDICT_RUN_AUTO:

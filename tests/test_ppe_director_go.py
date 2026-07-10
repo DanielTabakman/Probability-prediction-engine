@@ -90,6 +90,20 @@ def test_run_director_go_lite_skips_handoff_and_writes_brief(tmp_path, monkeypat
         ),
         encoding="utf-8",
     )
+    whats_next = tmp_path / "artifacts/control_plane/WHATS_NEXT.md"
+    whats_next.parent.mkdir(parents=True, exist_ok=True)
+    whats_next.write_text(
+        "\n".join(
+            [
+                "# What's next",
+                "",
+                "**Next action summary:** compact action",
+                "",
+                "**Next action detail:** compact action plus " + "long detail " * 80,
+            ]
+        ),
+        encoding="utf-8",
+    )
     with patch("scripts.ppe_director_go.prepare_operator_status") as prep:
         with patch("scripts.ppe_director_go.write_status_report") as write_full:
             with patch("scripts.ppe_director_go.refresh_burst_plan") as refresh:
@@ -108,6 +122,8 @@ def test_run_director_go_lite_skips_handoff_and_writes_brief(tmp_path, monkeypat
     text = brief.read_text(encoding="utf-8")
     assert "Operator Status Brief" in text
     assert "CLOSEOUT_ONLY" in text
+    assert "What's next: compact action" in text
+    assert "long detail" not in text
     assert "DESKTOP_CONTINUE.cmd --no-pause" in text
     banner = format_user_banner(result)
     assert "PPE GO LITE" in banner

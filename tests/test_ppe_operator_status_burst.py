@@ -6,7 +6,7 @@ import json
 from unittest.mock import patch
 
 from scripts.ppe_burst_plan import BURST_PLAN_REL
-from scripts.ppe_operator_status import VERDICT_IDE_BUILD, write_status_report
+from scripts.ppe_operator_status import STATUS_BRIEF_REL, VERDICT_IDE_BUILD, write_status_report
 
 
 def test_write_status_report_syncs_burst_plan(tmp_path) -> None:
@@ -40,6 +40,11 @@ def test_write_status_report_syncs_burst_plan(tmp_path) -> None:
     assert "allowed=true" in text
     assert "@ppe-director" in text
     assert status["burst_plan"] == fake_plan
+    brief = tmp_path / STATUS_BRIEF_REL
+    assert brief.is_file()
+    brief_text = brief.read_text(encoding="utf-8")
+    assert "Operator Status Brief" in brief_text
+    assert "Burst: band=NORMAL remaining=2 allowed=True" in brief_text
 
 
 def test_write_status_report_burst_writes_json_when_not_mocked(tmp_path) -> None:
