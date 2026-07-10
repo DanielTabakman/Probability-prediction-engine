@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-10
+
+- `eda100a4` — Control-plane: dev changelog
+
 ## 2026-07-09
 
+- `9a445254` — build(deps-dev): bump @types/node in /apps/msos-web (#5105) (`apps/msos-web/`)
 - `2aa559ce` — build(deps): update google-auth requirement from >=2.55.1 to >=2.55.2 (#5107)
 - `61ff81a9` — build(deps): update cursor-sdk requirement from >=0.1.8 to >=0.1.9 (#5108)
 - `b005fea2` — Control-plane: dev changelog
