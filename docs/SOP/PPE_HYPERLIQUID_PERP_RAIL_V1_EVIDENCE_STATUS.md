@@ -1,18 +1,24 @@
+---
+archived: true
+chapter_id: ppe_hyperliquid_perp_rail_v1
+closed: 2026-07-10
+---
+
 # PPE Hyperliquid perp rail v1 — evidence status
 
 **Chapter:** `ppe_hyperliquid_perp_rail_v1`  
 **Program:** [`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md)  
-**Status:** **CHARTERED** — SELECTION 2026-06-30; BUILD not started  
+**Status:** **COMPLETE** 2026-07-10 — SELECTION 2026-06-30; BUILD not started  
 **SELECTION:** [`POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md`](POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md)  
 **Phase plan:** [`PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json`](PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json)
 
 | Slice | Status | Notes |
 |-------|--------|-------|
-| PPE-HyperliquidPerp-Control-Slice001 | PENDING | |
-| PPE-HyperliquidPerp-Core-Slice002 | PENDING | |
-| PPE-HyperliquidPerp-Exposure-Slice003 | PENDING | |
-| PPE-HyperliquidPerp-Product-Slice004 | PENDING | |
-| PPE-HyperliquidPerp-Closeout-Slice005 | PENDING | |
+| PPE-HyperliquidPerp-Control-Slice001 | COMPLETE | |
+| PPE-HyperliquidPerp-Core-Slice002 | COMPLETE | |
+| PPE-HyperliquidPerp-Exposure-Slice003 | COMPLETE | |
+| PPE-HyperliquidPerp-Product-Slice004 | COMPLETE | |
+| PPE-HyperliquidPerp-Closeout-Slice005 | COMPLETE | |
 
 ## Acceptance checklist (chapter close)
 
