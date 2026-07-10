@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-10T03:11:52Z · **Archived chapters:** 55
+**Generated:** 2026-07-10T04:16:34Z · **Archived chapters:** 69
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -8,9 +8,14 @@
 |------------|-----------|----------|------|
 | `horizon_chart_polish_v1` | `docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md` | `docs/SOP/OPTIONS_HORIZON_CHART_POLISH_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json` |
 | `horizon_region_workflow_v1` | `docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md` | `docs/SOP/OPTIONS_HORIZON_REGION_WORKFLOW_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json` |
+| `msos_access_identity_v1` | `docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md` | `docs/SOP/MSOS_ACCESS_IDENTITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json` |
+| `msos_billing_stripe_v1` | `docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md` | `docs/SOP/MSOS_BILLING_STRIPE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json` |
 | `msos_cross_venue_strategy_lab_v1` | `docs/SOP/POST_MSOS_CROSS_VENUE_STRATEGY_LAB_V1_SELECTION.md` | `docs/SOP/MSOS_CROSS_VENUE_STRATEGY_LAB_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_cross_venue_strategy_lab_v1_relay.json` |
 | `msos_e2e_product_witness_v1` | `docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_E2E_PRODUCT_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json` |
+| `msos_entitlements_v1` | `docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md` | `docs/SOP/MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json` |
+| `msos_forward_consistency_radar_v1` | `docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json` |
 | `msos_mcd_production_witness_v1` | `docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md` | `docs/SOP/MSOS_MCD_OPERATOR_WITNESS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json` |
+| `msos_monitor_history_live_v1` | `docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md` | `docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json` |
 | `msos_p1_stack_routing` | `docs/SOP/MSOS_FRONTIER.md` | `docs/SOP/MSOS_P1_STACK_ROUTING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p1_stack_routing_relay.json` |
 | `msos_p2_homepage` | `docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md` | `docs/SOP/MSOS_P2_HOMEPAGE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json` |
 | `msos_p3_command_center` | `docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md` | `docs/SOP/MSOS_P3_COMMAND_CENTER_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json` |
@@ -24,19 +29,24 @@
 | `msos_public_demo_launch_v1` | `docs/SOP/POST_MSOS_PUBLIC_DEMO_LAUNCH_V1_SELECTION.md` | `docs/SOP/MSOS_PUBLIC_DEMO_LAUNCH_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_public_demo_launch_v1_relay.json` |
 | `msos_self_serve_onboarding_v1` | `docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md` | `docs/SOP/MSOS_SELF_SERVE_ONBOARDING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json` |
 | `msos_strategy_lab_dist_download_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_dist_download_v1_relay.json` |
+| `msos_strategy_lab_distribution_demo` | `docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json` |
+| `msos_strategy_lab_embed_shell_v1` | `docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md` | `docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json` |
 | `msos_trader_review_loop_v1` | `docs/SOP/POST_MSOS_TRADER_REVIEW_LOOP_V1_SELECTION.md` | `docs/SOP/MSOS_TRADER_REVIEW_LOOP_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_trader_review_loop_v1_relay.json` |
 | `msos_trader_workflow_horizon_nav_v1` | `docs/SOP/POST_MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_SELECTION.md` | `docs/SOP/MSOS_TRADER_WORKFLOW_HORIZON_NAV_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_trader_workflow_horizon_nav_v1_relay.json` |
 | `msos_usable_demo_v1` | `docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md` | `docs/SOP/MSOS_USABLE_DEMO_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json` |
 | `msos_user_state_v1` | `docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md` | `docs/SOP/MSOS_USER_STATE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json` |
 | `msos_website_program_p0` | `docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md` | `docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json` |
 | `msos_workflow_asset_parity_v1` | `docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md` | `docs/SOP/MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json` |
+| `msos_workflow_persistence_v1` | `docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md` | `docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
 | `mvp1_bl_density_smoothing_v1` | `docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md` | `docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json` |
 | `mvp1_cross_venue_backtest_v1` | `docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md` | `docs/SOP/MVP1_CROSS_VENUE_BACKTEST_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json` |
 | `mvp1_cross_venue_prob_panel` | `docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md` | `docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json` |
+| `mvp1_cross_venue_scan_v1` | `docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md` | `docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json` |
 | `mvp1_deploy_witness_refresh` | `docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md` | `docs/SOP/MVP1_DEPLOY_WITNESS_REFRESH_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json` |
 | `mvp1_disagreement_candidate_strip_polish` | `docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json` |
 | `mvp1_distribution_export` | `docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_export_relay.json` |
 | `mvp1_distribution_quant_research_v2` | `docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json` |
+| `mvp1_distribution_stats_legibility` | `docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json` |
 | `mvp1_distribution_timeseries_collector_v1` | `docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json` |
 | `mvp1_feedback_beta_instrumentation` | `docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json` |
 | `mvp1_phase5_review_hardening` | `docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json` |
@@ -44,6 +54,7 @@
 | `mvp1_post_phase3_steering_smoke` | `docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json` |
 | `mvp1_probability_method_legibility` | `docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md` | `docs/SOP/MVP1_PROBABILITY_METHOD_LEGIBILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json` |
 | `mvp1_reliability` | `docs/SOP/POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_RELIABILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_reliability_relay.json` |
+| `mvp1_snapshot_owner_v1` | `docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md` | `docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
 | `mvp1_sprint003_evidence_plane` | `docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json` |
 | `mvp1_steering_sync_evidence` | `docs/SOP/MVP1_FRONTIER.md` | `docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json` |
 | `phase3_commercial_wrapper` | `docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md` | `docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json` |
@@ -59,7 +70,10 @@
 | `ppe_equity_universe_tier1c_v1` | `docs/SOP/POST_PPE_EQUITY_UNIVERSE_TIER1C_V1_SELECTION.md` | `docs/SOP/PPE_EQUITY_UNIVERSE_TIER1C_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json` |
 | `ppe_exposure_menu_v1` | `docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md` | `docs/SOP/PPE_EXPOSURE_MENU_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json` |
 | `ppe_forward_consistency_radar_v1` | `docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md` | `docs/SOP/PPE_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json` |
+| `ppe_hyperliquid_perp_rail_v1` | `docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md` | `docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json` |
 | `ppe_sol_bybit_ship_v1` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json` |
+| `ppe_tradeable_universe_v1` | `docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md` | `docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json` |
 | `ppe_trust_surface_v1` | `docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md` | `docs/SOP/PPE_TRUST_SURFACE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json` |
+| `repo_housekeeping_v1` | `docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md` | `docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json` |
 
 Regenerate: `python scripts/generate_chapter_doc_index.py --write` · canon: [`AGENT_ROUTING_V1.md`](AGENT_ROUTING_V1.md)
