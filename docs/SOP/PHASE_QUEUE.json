@@ -552,8 +552,7 @@
       "status": "READY",
       "reason": "Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",
       "workerMode": "deterministic",
-      "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     }
   ]
 }

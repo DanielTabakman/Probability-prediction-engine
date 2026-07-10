@@ -723,7 +723,7 @@
     },
     {
       "chapterId": "repo_between_chapter_housekeeping",
-      "status": "blocked",
+      "status": "done",
       "priority": "low",
       "workerMode": "deterministic",
       "sideChannel": true,
