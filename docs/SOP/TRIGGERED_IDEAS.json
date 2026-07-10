@@ -6,7 +6,7 @@
       "id": "web3_uniblock_revisit",
       "title": "Revisit Uniblock vs single Web3 provider",
       "summary": "Deferred 2026-06-15. Not needed for Deribit/Polymarket/Yahoo or Cloudflare Access email accounts. Revisit when charter includes wallet connect or on-chain per-user reads.",
-      "status": "parked",
+      "status": "surfaced",
       "priority": "low",
       "added": "2026-06-15",
       "triggers": {
@@ -28,7 +28,8 @@
         "msos_workflow_persistence_v1",
         "msos_access_identity_v1",
         "msos_billing_stripe_v1"
-      ]
+      ],
+      "surfacedAt": "2026-07-09T09:47:01Z"
     },
     {
       "id": "surface_thread_insights_at_selection",
