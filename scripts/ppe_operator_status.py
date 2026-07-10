@@ -35,6 +35,7 @@ from scripts.ppe_queue import load_queue
 from scripts.ppe_thread_roles import infer_suggest_thread_rotate
 
 STATUS_REPORT_REL = "artifacts/orchestrator/OPERATOR_STATUS.md"
+STATUS_BRIEF_REL = "artifacts/control_plane/OPERATOR_STATUS_BRIEF.md"
 NOTIFY_REL = "artifacts/control_plane/OPERATOR_STATUS_NOTIFY.json"
 
 VERDICT_RUN_AUTO = "RUN_AUTO"
@@ -369,7 +370,12 @@ def collect_operator_status(repo: Path) -> dict[str, Any]:
     }
 
 
-def prepare_operator_status(repo: Path) -> dict[str, Any]:
+def prepare_operator_status(
+    repo: Path,
+    *,
+    sync_burst: bool = True,
+    auto_operate: bool = True,
+) -> dict[str, Any]:
     """Apply operator config env, then collect status (CLI / handoff / burst parity)."""
     try:
         from scripts.ppe_notify_push import ensure_operator_notify_env
@@ -398,26 +404,28 @@ def prepare_operator_status(repo: Path) -> dict[str, Any]:
         )
     except Exception:
         pass
-    try:
-        from scripts.ppe_burst_plan import refresh_burst_plan
+    if sync_burst:
+        try:
+            from scripts.ppe_burst_plan import refresh_burst_plan
 
-        status["burst_plan"] = refresh_burst_plan(repo, status)
-    except Exception:
-        pass
+            status["burst_plan"] = refresh_burst_plan(repo, status)
+        except Exception:
+            pass
     try:
         from scripts.ppe_operator_pass_progress import enrich_status_with_pass_progress
 
         enrich_status_with_pass_progress(repo, status, record=True)
     except Exception:
         pass
-    try:
-        from scripts.ppe_desktop_automation_graduation import load_desktop_automation_env
-        from scripts.ppe_operator_dispatch import maybe_auto_operate
+    if auto_operate:
+        try:
+            from scripts.ppe_desktop_automation_graduation import load_desktop_automation_env
+            from scripts.ppe_operator_dispatch import maybe_auto_operate
 
-        load_desktop_automation_env(repo)
-        status = maybe_auto_operate(repo, status)
-    except Exception:
-        pass
+            load_desktop_automation_env(repo)
+            status = maybe_auto_operate(repo, status)
+        except Exception:
+            pass
     return status
 
 
@@ -1038,6 +1046,84 @@ def _format_brief(status: dict[str, Any]) -> str:
     return f"VERDICT={verdict} exit={exit_code} plan={plan}"
 
 
+def _summarize_inline(text: str, *, max_chars: int = 280) -> str:
+    compact = " ".join(str(text or "").split())
+    if len(compact) <= max_chars:
+        return compact
+    cut = compact[: max_chars - 3].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return f"{cut}..."
+
+
+def _load_whats_next_summary(repo: Path) -> str:
+    path = repo / "artifacts/control_plane/WHATS_NEXT.md"
+    if not path.is_file():
+        return ""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+    legacy_next_action = ""
+    for raw in text.splitlines():
+        line = raw.strip()
+        if line.startswith("**Next action summary:**"):
+            return line.replace("**Next action summary:**", "", 1).strip()
+        if line.startswith("**Next action:**"):
+            legacy_next_action = line.replace("**Next action:**", "", 1).strip()
+    return _summarize_inline(legacy_next_action)
+
+
+def format_status_brief(
+    status: dict[str, Any],
+    repo: Path,
+    *,
+    burst_plan: dict[str, Any] | None = None,
+) -> str:
+    chapter_mode = status.get("chapter_mode") if isinstance(status.get("chapter_mode"), dict) else {}
+    burst = burst_plan if burst_plan is not None else status.get("burst_plan")
+    commands = [str(x).strip() for x in (status.get("commands") or []) if str(x).strip()]
+    lines = [
+        "# Operator Status Brief",
+        "",
+        f"Verdict: `{status.get('verdict') or VERDICT_ERROR}`",
+    ]
+    if chapter_mode.get("mode"):
+        lines.append(f"Mode: `{chapter_mode.get('mode')}`")
+    if status.get("chapter_name"):
+        lines.append(f"Chapter: {status.get('chapter_name')}")
+    if status.get("phase_plan_path"):
+        lines.append(f"Plan: `{status.get('phase_plan_path')}`")
+    if status.get("blocker"):
+        lines.append(f"Blocker: {status.get('blocker')}")
+    if isinstance(burst, dict):
+        lines.append(
+            "Burst: "
+            f"band={burst.get('overall_band')} "
+            f"remaining={burst.get('remaining_count')} "
+            f"allowed={burst.get('burst_allowed')} "
+            f"direct_action={burst.get('direct_action')}"
+        )
+    whats_next = _load_whats_next_summary(repo)
+    if whats_next:
+        lines.extend(["", f"What's next: {whats_next}"])
+    if commands:
+        lines.extend(["", "Agent action:"])
+        lines.extend(f"- `{cmd}`" for cmd in commands[:2])
+    lines.extend(["", "Full detail: `artifacts/orchestrator/OPERATOR_STATUS.md`", ""])
+    return "\n".join(lines)
+
+
+def write_status_brief(
+    repo: Path,
+    status: dict[str, Any],
+    *,
+    burst_plan: dict[str, Any] | None = None,
+) -> Path:
+    out = repo / STATUS_BRIEF_REL
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(format_status_brief(status, repo, burst_plan=burst_plan), encoding="utf-8")
+    return out
+
+
 def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool = True) -> Path:
     out = repo / STATUS_REPORT_REL
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -1094,6 +1180,7 @@ def write_status_report(repo: Path, status: dict[str, Any], *, sync_burst: bool 
 {pipeline_block}{_format_human(status, repo, burst_plan=burst_plan)}
 {whats_next_block}"""
     out.write_text(body, encoding="utf-8")
+    write_status_brief(repo, status, burst_plan=burst_plan)
     try:
         from scripts.research_archive_health import write_archive_health
 

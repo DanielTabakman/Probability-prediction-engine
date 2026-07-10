@@ -10,7 +10,9 @@ from scripts.active_product_direction import (
     MARKER_END,
     MARKER_START,
     load_direction,
+    render_whats_next,
     render_frontier_block,
+    summarize_next_action,
     _replace_marked_block,
 )
 
@@ -35,6 +37,16 @@ def test_render_frontier_block_contains_markers() -> None:
     assert block.startswith(MARKER_START)
     assert block.endswith(MARKER_END)
     assert "workstream" in block.lower()
+
+
+def test_render_whats_next_has_summary_and_detail() -> None:
+    d = load_direction(REPO)
+    text = render_whats_next(d)
+    summary = summarize_next_action(d.next_steward_action)
+    assert "**Next action summary:**" in text
+    assert f"**Next action summary:** {summary}" in text
+    assert "**Next action detail:**" in text
+    assert len(summary) <= 280
 
 
 def test_replace_marked_block_on_frontier() -> None:

@@ -8,6 +8,7 @@ so loading app.py does not pollute the pytest process.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -21,6 +22,8 @@ import sys
 from pathlib import Path
 
 repo = Path({repo!r})
+import os
+os.environ["PPE_APP_IMPORT_SMOKE"] = "1"
 viz = repo / "src" / "viz"
 app = viz / "app.py"
 

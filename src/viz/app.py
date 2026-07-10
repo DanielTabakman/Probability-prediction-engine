@@ -15,6 +15,9 @@ if str(_app_root) not in sys.path:
 
 from src.viz.app_env import APP_ROOT as ROOT, env_flag as _env_flag
 
+if os.environ.get("PPE_APP_IMPORT_SMOKE") == "1":
+    raise SystemExit(0)
+
 import streamlit as st
 import yaml
 

@@ -14,7 +14,9 @@ from src.data.assets_registry import (
     asset_venue,
     deribit_currency,
     get_asset,
+    hyperliquid_coin,
     is_asset_enabled,
+    is_exposure_only,
     is_usd_premium_options_venue,
 )
 from src.engine.exposure_paths import (
@@ -124,6 +126,10 @@ def _fetch_spot(asset_id: str) -> float | None:
         from src.data.fetch_bybit_options import fetch_bybit_spot
 
         return fetch_bybit_spot(asset_id=aid)
+    if venue == "hyperliquid":
+        from src.data.fetch_hyperliquid import fetch_hyperliquid_mark
+
+        return fetch_hyperliquid_mark(hyperliquid_coin(aid))
     from src.data.fetch_deribit import fetch_deribit_index
 
     return fetch_deribit_index(deribit_currency(aid))
@@ -140,6 +146,8 @@ def _fetch_option_expiries(asset_id: str) -> list[dict[str, Any]]:
         from src.data.fetch_bybit_options import fetch_bybit_option_expiries
 
         return fetch_bybit_option_expiries(asset_id=aid)
+    if venue == "hyperliquid" or is_exposure_only(aid):
+        return []
     from src.data.fetch_deribit import fetch_deribit_option_expiries
 
     return fetch_deribit_option_expiries(currency=deribit_currency(aid))
@@ -213,6 +221,28 @@ def _activate_planned_path(path: ExposurePath) -> ExposurePath:
     path.trust_badge = "Planned"
     path.cost_hint_usd = None
     path.legs = []
+    return path
+
+
+def _activate_hyperliquid_perp_path(path: ExposurePath, *, asset_id: str) -> ExposurePath | None:
+    from src.data.fetch_hyperliquid import fetch_hyperliquid_perp_context
+
+    ctx = fetch_hyperliquid_perp_context(hyperliquid_coin(asset_id))
+    mark = ctx.get("mark_px")
+    funding = ctx.get("funding")
+    if mark is None or funding is None:
+        return None
+    path.trust_badge = "Live"
+    path.liquidity = "high"
+    path.cost_hint_usd = float(mark)
+    path.legs = [
+        {
+            "instrument": "Perp",
+            "side": "LONG",
+            "strike": f"mark ${float(mark):,.2f}",
+            "tenor": f"funding {float(funding):.6f}",
+        }
+    ]
     return path
 
 
@@ -374,6 +404,14 @@ def activate_path_template(
     premium_in_usd = is_usd_premium_options_venue(aid)
     contract_multiplier = _option_contract_multiplier(aid)
 
+    if template.instrument_rail == "perp" and asset_venue(aid) == "hyperliquid":
+        shell = template_to_path_shell(
+            template,
+            catalog_order=catalog_order,
+            trust_badge="Live",
+        )
+        return _activate_hyperliquid_perp_path(shell, asset_id=aid)
+
     if template.status == "planned" or template.liquidity == "planned":
         shell = template_to_path_shell(
             template,
@@ -460,9 +498,12 @@ def find_exposure_paths(
     planned_count = count_planned_paths(ranked)
     options_live = sum(1 for p in ranked if p.instrument_rail == "listed_options" and p.trust_badge == "Live")
     spot_live = sum(1 for p in ranked if p.instrument_rail == "spot_equity" and p.trust_badge == "Live")
+    perp_live = sum(1 for p in ranked if p.instrument_rail == "perp" and p.trust_badge == "Live")
 
     status = "ok"
-    if dir_key != "neutral" and (spot_live < 1 or options_live < 2):
+    if asset_venue(aid) == "hyperliquid" and perp_live >= 1:
+        status = "ok_perp_only"
+    elif dir_key != "neutral" and (spot_live < 1 or options_live < 2):
         status = "insufficient_chain"
 
     return {

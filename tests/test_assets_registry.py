@@ -14,7 +14,9 @@ from src.data.assets_registry import (
     default_asset_id,
     deribit_currency,
     get_asset,
+    hyperliquid_coin,
     is_asset_enabled,
+    is_exposure_only,
     list_asset_ids,
     list_catalog_entries,
     list_enabled_asset_ids,
@@ -32,7 +34,7 @@ def test_assets_registry_schema_v2() -> None:
     assert default_asset_id() == "ETH"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
-    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP", "SPY", "QQQ", "IWM"}
+    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP", "SPY", "QQQ", "IWM"}
     for asset_id in ("BTC", "ETH"):
         entry = assets[asset_id]
         assert entry.get("venue") == "deribit"
@@ -52,12 +54,16 @@ def test_assets_registry_schema_v2() -> None:
     sol = assets["SOL"]
     assert sol.get("venue") == "bybit"
     assert sol.get("enabled") is True
+    hype = assets["HYPE"]
+    assert hype.get("venue") == "hyperliquid"
+    assert hype.get("enabled") is True
+    assert hype.get("exposure_only") is True
 
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
-    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "BNB", "XRP"}
+    assert list_enabled_asset_ids() == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
+    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP"}
 
 
 def test_catalog_entry_shape() -> None:
@@ -75,12 +81,22 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
+    assert [e["id"] for e in entries] == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
     assert all(e["venue"] == "deribit" for e in entries if e["id"] in ("BTC", "ETH"))
     nvda = next(e for e in entries if e["id"] == "NVDA")
     assert nvda["venue"] == "equity"
     sol = next(e for e in entries if e["id"] == "SOL")
     assert sol["venue"] == "bybit"
+    hype = next(e for e in entries if e["id"] == "HYPE")
+    assert hype["venue"] == "hyperliquid"
+
+
+def test_hyperliquid_exposure_only_registry_helpers() -> None:
+    load_assets_registry.cache_clear()
+    assert hyperliquid_coin("HYPE") == "HYPE"
+    assert is_exposure_only("HYPE") is True
+    with pytest.raises(ValueError, match="hyperliquid venue"):
+        deribit_currency("HYPE")
 
 
 def test_catalog_group_order_from_tier1_manifest() -> None:

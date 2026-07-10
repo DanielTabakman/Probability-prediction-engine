@@ -374,6 +374,8 @@ def main(argv: list[str] | None = None) -> int:
                     return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
                 if path.startswith("tests/test_implied_lab_"):
                     return "PPE_UI"
+                if path.startswith("tests/test_app_entrypoint_import"):
+                    return "PPE_UI"
                 if path.startswith("tests/test_caddy"):
                     return "PLATFORM"
                 if path.startswith("tests/test_fetch_") or path.startswith("tests/test_assets_registry"):
@@ -572,6 +574,8 @@ def run_gate_for_paths(
                 if path.startswith("src/"):
                     return "PPE_UI" if path.startswith("src/viz/") else "PPE_CORE"
                 if path.startswith("tests/test_implied_lab_"):
+                    return "PPE_UI"
+                if path.startswith("tests/test_app_entrypoint_import"):
                     return "PPE_UI"
                 if path.startswith("tests/test_caddy"):
                     return "PLATFORM"

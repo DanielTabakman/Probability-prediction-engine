@@ -380,10 +380,20 @@ def render_continuity_active_build(direction: Direction) -> str:
 {MARKER_END}"""
 
 
+def summarize_next_action(text: str, *, max_chars: int = 280) -> str:
+    """Compact operator-facing next action while preserving full detail nearby."""
+    compact = " ".join(str(text or "").split())
+    if len(compact) <= max_chars:
+        return compact
+    cut = compact[: max_chars - 3].rsplit(" ", 1)[0].rstrip(" ,;:-")
+    return f"{cut}..."
+
+
 def render_whats_next(direction: Direction) -> str:
     milestone_line = ""
     if direction.milestone_label:
         milestone_line = f"\n**Milestone:** {direction.milestone_label}\n"
+    next_action_summary = summarize_next_action(direction.next_steward_action)
     return f"""# What's next
 
 {MARKER_START}
@@ -391,7 +401,9 @@ def render_whats_next(direction: Direction) -> str:
 {milestone_line}
 **Primary focus:** {direction.primary_focus}
 
-**Next action:** {direction.next_steward_action}
+**Next action summary:** {next_action_summary}
+
+**Next action detail:** {direction.next_steward_action}
 
 **Active relay:** `{direction.active_chapter_id}`
 {MARKER_END}
