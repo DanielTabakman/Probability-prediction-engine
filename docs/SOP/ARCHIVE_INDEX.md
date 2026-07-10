@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-10T04:45:56Z · **Archived chapters:** 70
+**Generated:** 2026-07-10T05:45:20Z · **Archived chapters:** 71
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -62,6 +62,7 @@
 | `ppe_asset_display_parity_v1` | `docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md` | `docs/SOP/PPE_ASSET_DISPLAY_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json` |
 | `ppe_asset_enablement_pipeline_v1` | `docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md` | `docs/SOP/PPE_ASSET_ENABLEMENT_PIPELINE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json` |
 | `ppe_cache_isolation_audit_v1` | `docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md` | `docs/SOP/PPE_CACHE_ISOLATION_AUDIT_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json` |
+| `ppe_commodity_proxy_tier1_v1` | `docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md` | `docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json` |
 | `ppe_crypto_multi_asset_v1` | `docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md` | `docs/SOP/PPE_CRYPTO_MULTI_ASSET_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json` |
 | `ppe_deribit_crypto_tier1_v1` | `docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md` | `docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json` |
 | `ppe_display_cache_ops_v1` | `docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md` | `docs/SOP/PPE_DISPLAY_CACHE_OPS_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json` |
