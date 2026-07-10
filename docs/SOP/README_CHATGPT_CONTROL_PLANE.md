@@ -1,0 +1,9 @@
+# ChatGPT control-plane quick index
+
+- Operating contract: [`CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md)
+- Project instructions: [`CHATGPT_PROJECT_STARTER.md`](CHATGPT_PROJECT_STARTER.md)
+- Thread openers: [`CHATGPT_THREAD_STARTERS.md`](CHATGPT_THREAD_STARTERS.md)
+- Agent reconciliation block: [`COORDINATION_STATUS_TEMPLATE.md`](COORDINATION_STATUS_TEMPLATE.md)
+- Implementation packet: [`TASK_HANDOFF_TEMPLATE_V1.md`](TASK_HANDOFF_TEMPLATE_V1.md)
+- Setup checkpoint: [`SETUP_THREAD_STATUS.md`](SETUP_THREAD_STATUS.md)
+- Google Docs retirement: [`GOOGLE_DOCS_RETIRED_NOTICE.md`](GOOGLE_DOCS_RETIRED_NOTICE.md)
