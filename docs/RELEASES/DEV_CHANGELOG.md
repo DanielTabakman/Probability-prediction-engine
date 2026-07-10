@@ -4,10 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-10
 
+- `fcac69ad` — Control-plane: dev changelog
 - `eda100a4` — Control-plane: dev changelog
 
 ## 2026-07-09
 
+- `c85155c8` — PPE Hyperliquid exposure: add operator lite status (#5103) (`scripts/`)
 - `9a445254` — build(deps-dev): bump @types/node in /apps/msos-web (#5105) (`apps/msos-web/`)
 - `2aa559ce` — build(deps): update google-auth requirement from >=2.55.1 to >=2.55.2 (#5107)
 - `61ff81a9` — build(deps): update cursor-sdk requirement from >=0.1.8 to >=0.1.9 (#5108)
