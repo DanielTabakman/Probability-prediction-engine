@@ -1,5 +1,8 @@
 @echo off
 setlocal
 set "REPO=%~dp0"
-python "%REPO%scripts\ppe_autobuilder_pr_cleanup.py" --repo "%REPO%" %*
-exit /b %ERRORLEVEL%
+pushd "%REPO%" || exit /b 1
+python -m scripts.ppe_autobuilder_pr_cleanup --repo "%REPO%" %*
+set "RC=%ERRORLEVEL%"
+popd
+exit /b %RC%
