@@ -1,14 +1,15 @@
 ---
 archived: true
 chapter_id: msos_storyboard_visual_parity_v1
-closed: unknown
+closed: 2026-07-11
 ---
+
 
 # MSOS storyboard visual parity v1 — evidence status
 
 **Chapter:** `msos_storyboard_visual_parity_v1`  
 **Priority:** MEDIUM  
-**Status:** **WITNESS COMPLETE** — product slices 002–006 on `main`; witness slice 008 green 2026-07-02; platform/deploy + chapter closeout remain  
+**Status:** **COMPLETE** 2026-07-11 — product slices 002–006 on `main`; witness slice 008 green 2026-07-02; platform/deploy + chapter closeout remain  
 **Phase plan:** [`PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json`](PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json)  
 **Sprint:** [`SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md`](SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md)
 
@@ -20,9 +21,9 @@ closed: unknown
 | MSOS-VisParityV1-Product-Slice004 | SHIPPED_ON_MAIN | Strategy Lab chrome (`03_ppe_lab`) |
 | MSOS-VisParityV1-Product-Slice005 | SHIPPED_ON_MAIN | Thesis + expression (`04`, `05`) |
 | MSOS-VisParityV1-Product-Slice006 | SHIPPED_ON_MAIN | Monitor, history, learn (`06`, `07`, `09`) |
-| MSOS-VisParityV1-Platform-Slice007 | PENDING | VPS deploy + routing clarity |
+| MSOS-VisParityV1-Platform-Slice007 | COMPLETE | VPS deploy + routing clarity |
 | MSOS-VisParityV1-Witness-Slice008 | COMPLETE | Static layout witness + registry tokens — `tests/test_msos_web_storyboard_visual_parity_witness.py` |
-| MSOS-VisParityV1-Closeout-Slice009 | PENDING | Chapter COMPLETE |
+| MSOS-VisParityV1-Closeout-Slice009 | COMPLETE | Chapter COMPLETE |
 
 ## Material deviations (accepted)
 

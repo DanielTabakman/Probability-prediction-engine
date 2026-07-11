@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 27,
+  "active_chapter_count": 13,
   "active_chapters": [
     {
       "archived": false,
@@ -39,324 +39,6 @@
     },
     {
       "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "msos_access_identity_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_ACCESS_IDENTITY_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_ACCESS_IDENTITY_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "chapter_id": "msos_billing_stripe_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_BILLING_STRIPE_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_BILLING_STRIPE_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
-        "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "chapter_id": "msos_entitlements_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_ENTITLEMENTS_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
-        "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
-        "docs/SOP/VALIDATION_REALITY_CHECKS.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
-      ],
-      "chapter_id": "msos_forward_consistency_radar_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-        "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_FORWARD_CONSISTENCY_RADAR_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-        "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
-      ],
-      "next_selection": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
-      "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "msos_monitor_history_live_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_MONITOR_HISTORY_LIVE_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
-        "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
-      ],
-      "chapter_id": "msos_storyboard_visual_parity_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_STORYBOARD_VISUAL_PARITY_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
-        "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
-      ],
-      "chapter_id": "msos_strategy_lab_distribution_demo",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md",
-        "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "msos_strategy_lab_embed_shell_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_STRATEGY_LAB_EMBED_SHELL_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "msos_workflow_persistence_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-        "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
-    },
-    {
-      "archived": false,
       "carry_docs": [],
       "chapter_id": "mvp1_belief_input_ux",
       "do_not_load": [
@@ -382,74 +64,6 @@
       "queue_status": null,
       "selection": "docs/SOP/POST_MVP1_FRIENDS_FIRST_SELECTION_OUTCOME.md",
       "sprint": "docs/SOP/SPRINT_MVP1_BELIEF_INPUT_UX.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
-      ],
-      "chapter_id": "mvp1_cross_venue_scan_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md",
-        "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MVP1_CROSS_VENUE_SCAN_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
-        "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
-      ],
-      "next_selection": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
-      ],
-      "chapter_id": "mvp1_distribution_stats_legibility",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
-        "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md",
-        "docs/SOP/MVP1_FRONTIER.md",
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
-      ],
-      "next_selection": "docs/SOP/MVP1_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
     {
       "archived": false,
@@ -633,40 +247,6 @@
     },
     {
       "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "mvp1_snapshot_owner_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md",
-        "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md"
-    },
-    {
-      "archived": false,
       "carry_docs": [],
       "chapter_id": "ppe_cme_commodity_v1",
       "do_not_load": [
@@ -763,42 +343,6 @@
     {
       "archived": false,
       "carry_docs": [
-        "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
-        "config/assets_tier1_manifest.yaml"
-      ],
-      "chapter_id": "ppe_tradeable_universe_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md",
-        "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/PPE_TRADEABLE_UNIVERSE_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
-        "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
-        "config/assets_tier1_manifest.yaml"
-      ],
-      "next_selection": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
         "docs/SOP/REPO_BETWEEN_CHAPTER_HOUSEKEEPING_EVIDENCE_STATUS.md"
       ],
       "chapter_id": "repo_between_chapter_housekeeping",
@@ -832,40 +376,6 @@
     },
     {
       "archived": false,
-      "carry_docs": [
-        "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
-      ],
-      "chapter_id": "repo_housekeeping_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md",
-        "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MVP1_FRONTIER.md",
-        "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
-      ],
-      "next_selection": "docs/SOP/MVP1_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md"
-    },
-    {
-      "archived": false,
       "carry_docs": [],
       "chapter_id": "validation_chapter",
       "do_not_load": [
@@ -892,7 +402,7 @@
       "sprint": null
     }
   ],
-  "archived_chapter_count": 55,
+  "archived_chapter_count": 69,
   "by_chapter_id": {
     "horizon_chart_polish_v1": {
       "archived": true,
@@ -1002,7 +512,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md"
     },
     "msos_access_identity_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -1031,12 +541,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md"
     },
     "msos_billing_stripe_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -1067,7 +577,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
     },
@@ -1137,7 +647,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md"
     },
     "msos_entitlements_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -1170,12 +680,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md"
     },
     "msos_forward_consistency_radar_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -1205,7 +715,7 @@
       "next_selection": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
       "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
@@ -1248,7 +758,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md"
     },
     "msos_monitor_history_live_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -1277,7 +787,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
     },
@@ -1703,7 +1213,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     "msos_storyboard_visual_parity_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -1734,7 +1244,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
@@ -1770,7 +1280,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md"
     },
     "msos_strategy_lab_distribution_demo": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -1799,12 +1309,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md"
     },
     "msos_strategy_lab_embed_shell_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -1835,7 +1345,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
     },
@@ -2051,7 +1561,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     "msos_workflow_persistence_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -2081,7 +1591,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
@@ -2218,7 +1728,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md"
     },
     "mvp1_cross_venue_scan_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -2247,7 +1757,7 @@
       "next_selection": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
     },
@@ -2390,7 +1900,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     "mvp1_distribution_stats_legibility": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -2419,7 +1929,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
@@ -2838,7 +2348,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md"
     },
     "mvp1_snapshot_owner_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -2867,7 +2377,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md"
     },
@@ -3500,7 +3010,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     "ppe_tradeable_universe_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
         "config/assets_tier1_manifest.yaml"
@@ -3531,7 +3041,7 @@
       "next_selection": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md"
     },
@@ -3604,7 +3114,7 @@
       "sprint": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     },
     "repo_housekeeping_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
       ],
@@ -3633,7 +3143,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md"
     },
@@ -3776,7 +3286,7 @@
       "sprint": "docs/SOP/SPRINT_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -3805,12 +3315,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_ACCESS_IDENTITY_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/VALIDATION_REALITY_CHECKS.md"
@@ -3841,7 +3351,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_BILLING_STRIPE_V1.md"
     },
@@ -3911,7 +3421,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_E2E_PRODUCT_WITNESS_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
         "docs/SOP/COMMERCIAL_VALIDATION_OPERATOR.md",
@@ -3944,12 +3454,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_ENTITLEMENTS_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md"
       ],
@@ -3979,7 +3489,7 @@
       "next_selection": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
       "program_doc": "docs/SOP/FORWARD_CONSISTENCY_RADAR_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_FORWARD_CONSISTENCY_RADAR_V1.md"
     },
@@ -4022,7 +3532,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_MCD_PRODUCTION_WITNESS_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -4051,7 +3561,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_MONITOR_HISTORY_LIVE_V1.md"
     },
@@ -4477,7 +3987,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_SELF_SERVE_ONBOARDING_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/VISION/MSOS/storyboard-v0.6/MANIFEST.md",
         "docs/SOP/MSOS_WEBSITE_ACCELERATION_CHECKLIST.md"
@@ -4508,7 +4018,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STORYBOARD_VISUAL_PARITY_V1.md"
     },
@@ -4544,7 +4054,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DIST_DOWNLOAD_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md"
       ],
@@ -4573,12 +4083,12 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_P1_STACK_ROUTING_ADR.md",
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
@@ -4609,7 +4119,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
     },
@@ -4825,7 +4335,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -4855,7 +4365,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
@@ -4992,7 +4502,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_PROB_PANEL.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md"
       ],
@@ -5021,7 +4531,7 @@
       "next_selection": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
     },
@@ -5164,7 +4674,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -5193,7 +4703,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
@@ -5612,7 +5122,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_SMOKE_REGRESSION.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -5641,7 +5151,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_SNAPSHOT_OWNER_V1.md"
     },
@@ -6274,7 +5784,7 @@
       "sprint": "docs/SOP/SPRINT_PPE_DERIBIT_CRYPTO_TIER1_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
         "config/assets_tier1_manifest.yaml"
@@ -6305,7 +5815,7 @@
       "next_selection": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "plan_path": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_TRADEABLE_UNIVERSE_V1.md"
     },
@@ -6378,7 +5888,7 @@
       "sprint": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/REPO_HOUSEKEEPING_V1_EVIDENCE_STATUS.md"
       ],
@@ -6407,7 +5917,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_REPO_HOUSEKEEPING_V1.md"
     },
@@ -6439,7 +5949,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-09T08:49:26Z",
+  "generated_at": "2026-07-11T18:44:51Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
