@@ -4,6 +4,14 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-11
 
+- `0d3ce406` — CI: require explicit automerge and exact green run
+- `683ee0b0` — tests: remove legacy VM mirror publication expectations (#5344)
+- `589cc21f` — ci: upload pytest failure logs (#5343)
+- `557e8ca0` — ci: make pytest failures compact and actionable (#5342)
+- `9b6cd6ea` — Control-plane: finish desktop runtime-state migration (#5341) (`scripts/`)
+- `4db865e1` — ci: remove tracked VM mirror contract (#5336)
+- `65b8df90` — Control-plane: finish Autobuilder churn remediation (#5334) (`scripts/`)
+- `c2eaa5a4` — Control-plane: dev changelog
 - `72f4e3b3` — Control-plane: make Autobuilder Git writes fail closed (`scripts/`)
 - `95606eea` — Control-plane: dev changelog
 - `5d8710cb` — Control-plane: stop Autobuilder GitHub churn (`docs/SOP/`)
