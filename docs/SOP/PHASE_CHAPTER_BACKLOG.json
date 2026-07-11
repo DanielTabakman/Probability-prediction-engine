@@ -514,7 +514,7 @@
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
-      "status": "queued",
+      "status": "chartered",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
@@ -703,7 +703,7 @@
     },
     {
       "chapterId": "ppe_hyperliquid_perp_rail_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "sideChannel": true,

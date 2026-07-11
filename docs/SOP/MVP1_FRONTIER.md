@@ -15,8 +15,8 @@ Purpose: live steering document for PPE under **MVP1 phase architecture**.
 
 ### Current execution focus (MVP1 framing)
 - **Integrated status (one-pager):** [`PPE_INTEGRATED_STATUS.md`](PPE_INTEGRATED_STATUS.md)
-- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md`](docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md))
-- **Last closed chapter:** **PPE Hyperliquid perp rail v1 (HYPE exposure path)** — **COMPLETE** 2026-07-11
+- **Active BUILD chapter:** **none** — await steward **SELECTION** ([`MVP1_FRONTIER.md`](docs/SOP/MVP1_FRONTIER.md))
+- **Last closed chapter:** **Repo between-chapter housekeeping** — **COMPLETE** 2026-07-11
 - **Steward parallel:** VPS `.env` → **Research beta (v0)** CTA **pending**; paid-interest **N** until live conversation.
 - **Non-goal**: billing automation, execution engine, multi-asset BUILD without new charter.
 
