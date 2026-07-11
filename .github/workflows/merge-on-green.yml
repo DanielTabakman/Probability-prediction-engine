@@ -1,13 +1,11 @@
-# Free private repos: merges PRs when CI passed AND label `automerge` is present.
-# Triggers after workflow "CI" OR "Label PR automerge" so ordering (label vs CI) never races.
-# See docs/SOP/GITHUB_ZERO_TOUCH_MERGE.md § "Merge on green (Actions workaround)".
+# Explicit opt-in merge: runs only after the CI workflow itself completes successfully.
+# A successful labeling workflow can never trigger a merge.
 name: Merge on green
 
 on:
   workflow_run:
-    workflows: [CI, Label PR automerge]
-    types:
-      - completed
+    workflows: [CI]
+    types: [completed]
 
 permissions:
   contents: write
@@ -25,32 +23,13 @@ jobs:
             const run = context.payload.workflow_run;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
+            const defaultBranch = context.payload.repository.default_branch || 'main';
 
-            if (run.event !== 'pull_request') {
-              core.info(`Skip: workflow_run.event is ${run.event}`);
+            if (run.name !== 'CI' || run.conclusion !== 'success' || run.event !== 'pull_request') {
+              core.info(`Skip non-green CI run: name=${run.name} conclusion=${run.conclusion} event=${run.event}`);
               return;
             }
 
-            async function ciPassedOnSha(sha) {
-              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
-                owner,
-                repo,
-                workflow_id: 'ci.yml',
-                head_sha: sha,
-                event: 'pull_request',
-                per_page: 5,
-              });
-              const runs = data.workflow_runs || [];
-              if (!runs.length) return false;
-              if (runs[0].conclusion === 'success') return true;
-              return false;
-            }
-
-            function isVmMirrorHead(headRef) {
-              return typeof headRef === 'string' && headRef.startsWith('ops/vm-mirror-');
-            }
-
-            const defaultBranch = context.payload.repository.default_branch || 'main';
             let prRefs = run.pull_requests || [];
             if (!prRefs.length && run.head_branch && run.head_branch !== defaultBranch) {
               const { data: items } = await github.rest.pulls.list({
@@ -61,7 +40,6 @@ jobs:
                 base: defaultBranch,
               });
               prRefs = items.map((p) => ({ number: p.number }));
-              core.info(`workflow_run.pull_requests empty; resolved ${prRefs.length} PR(s) via head ${run.head_branch}`);
             }
 
             for (const { number } of prRefs) {
@@ -70,40 +48,41 @@ jobs:
                 repo,
                 pull_number: number,
               });
-              if (pr.draft) {
-                core.info(`PR #${number} is draft; skip`);
+              if (pr.draft || pr.merged || pr.state !== 'open') continue;
+              if (pr.head.sha !== run.head_sha) {
+                core.warning(`PR #${number} moved from CI SHA ${run.head_sha.slice(0, 7)} to ${pr.head.sha.slice(0, 7)}; skip`);
                 continue;
               }
-              const hasLabel = pr.labels.some((l) => l.name === 'automerge');
-              if (!hasLabel) {
-                core.info(`PR #${number} has no label automerge; skip`);
-                continue;
-              }
-              if (pr.merged) {
-                core.info(`PR #${number} already merged`);
+              if (!pr.labels.some((label) => label.name === 'automerge')) {
+                core.info(`PR #${number} has no explicit automerge label; skip`);
                 continue;
               }
               if (pr.mergeable === false) {
-                core.warning(`PR #${number} has conflicts (mergeable=false); skip`);
+                core.warning(`PR #${number} has conflicts; skip`);
                 continue;
               }
-              const sha = pr.head.sha;
-              if (!(await ciPassedOnSha(sha))) {
-                core.info(`PR #${number}: latest CI on ${sha.slice(0, 7)} not success yet; skip`);
+
+              const { data: runs } = await github.rest.actions.listWorkflowRuns({
+                owner,
+                repo,
+                workflow_id: 'ci.yml',
+                head_sha: pr.head.sha,
+                event: 'pull_request',
+                per_page: 20,
+              });
+              const exactRun = (runs.workflow_runs || []).find((item) => item.id === run.id);
+              if (!exactRun || exactRun.conclusion !== 'success') {
+                core.warning(`Exact CI run ${run.id} is not confirmed successful; skip PR #${number}`);
                 continue;
               }
+
               await github.rest.pulls.merge({
                 owner,
                 repo,
                 pull_number: number,
                 merge_method: 'squash',
               });
-              core.notice(`Merged PR #${number} (squash) after green CI + automerge label`);
-
-              if (isVmMirrorHead(pr.head.ref)) {
-                core.info(`PR #${number} is VM phase mirror — skip Deploy VPS dispatch`);
-                continue;
-              }
+              core.notice(`Merged explicitly opted-in PR #${number} after exact green CI run ${run.id}`);
 
               try {
                 await github.rest.actions.createWorkflowDispatch({
@@ -112,10 +91,7 @@ jobs:
                   workflow_id: 'deploy-vps.yml',
                   ref: defaultBranch,
                 });
-                core.notice(`Dispatched Deploy VPS on ${defaultBranch} after merge`);
               } catch (dispatchErr) {
-                core.warning(
-                  `Deploy VPS dispatch after merge failed (push to ${defaultBranch} should still trigger deploy): ${dispatchErr.message}`,
-                );
+                core.warning(`Deploy dispatch failed: ${dispatchErr.message}`);
               }
             }
