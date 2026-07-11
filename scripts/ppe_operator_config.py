@@ -22,9 +22,28 @@ _AUTONOMOUS_GIT_WRITE_KEYS = (
 _TRUE_VALUES = frozenset({"1", "true", "yes", "on"})
 
 
+def _env_true(key: str) -> bool:
+    return os.environ.get(key, "").strip().lower() in _TRUE_VALUES
+
+
 def autonomous_git_writes_enabled() -> bool:
-    """Require an explicit runtime opt-in before the operator may write to GitHub."""
-    return os.environ.get("PPE_GIT_AUTONOMOUS_WRITES", "").strip().lower() in _TRUE_VALUES
+    """Legacy loop publishing is unsafe and requires a two-part break-glass opt-in.
+
+    `PPE_GIT_AUTONOMOUS_WRITES=1` is intentionally no longer sufficient. The old
+    timestamped publisher may only run when both variables below are explicitly set:
+
+    - PPE_GIT_AUTONOMOUS_WRITES=legacy-unsafe
+    - PPE_ALLOW_LEGACY_GIT_PUBLISH=1
+
+    Normal durable publication belongs to `ppe_chapter_publisher.py`.
+    """
+    mode = os.environ.get("PPE_GIT_AUTONOMOUS_WRITES", "").strip().lower()
+    return mode == "legacy-unsafe" and _env_true("PPE_ALLOW_LEGACY_GIT_PUBLISH")
+
+
+def chapter_publication_enabled() -> bool:
+    """Explicit opt-in for the bounded chapter publisher."""
+    return _env_true("PPE_CHAPTER_PUBLISH")
 
 
 def _apply_autonomous_git_write_safety(cfg: dict[str, Any]) -> dict[str, Any]:
