@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-11
 
+- `7e716743` — Charter Autobuilder extraction v1 (`docs/SOP/`)
+- `56d0d1f1` — Fix Windows Autobuilder maintenance wrappers (#5347)
+- `6c10e15f` — Control-plane: dev changelog
 - `0d3ce406` — CI: require explicit automerge and exact green run
 - `683ee0b0` — tests: remove legacy VM mirror publication expectations (#5344)
 - `589cc21f` — ci: upload pytest failure logs (#5343)
