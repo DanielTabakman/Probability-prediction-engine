@@ -127,11 +127,7 @@ def decide_budget_gate(
                 token_audit=token_audit or {},
                 context_preflight=context_preflight or {},
             )
-        missing = (
-            "WATCH requires --allow-budget-watch plus a non-empty reason."
-            if not allow_watch or not reason_text
-            else "WATCH override was incomplete."
-        )
+        missing = "WATCH requires --allow-budget-watch plus a non-empty reason."
         return BillingGateDecision(
             command=command,
             phase=phase,
@@ -164,6 +160,74 @@ def _report_reasons(token_data: dict[str, Any], context_data: dict[str, Any]) ->
         if text:
             reasons.append(f"context_preflight: {text}")
     return reasons
+
+
+def _read_only_stale_starter_ids(repo: Path) -> list[str]:
+    """Find stale completed-chapter starters without deleting them.
+
+    The legacy token audit calls a pruning helper while building its report.
+    A dispatch preflight must remain read-only, so the gate mirrors the
+    discovery portion and never calls ``Path.unlink``.
+    """
+    from scripts.ppe_ide_build_starter import starter_path
+    from scripts.ppe_manifest import load_phase_plan
+    from scripts.ppe_queue_health import chapter_marked_complete_in_repo
+
+    plans_dir = repo / "docs" / "SOP" / "PHASE_PLANS"
+    if not plans_dir.is_dir():
+        return []
+
+    stale: list[str] = []
+    for plan_file in sorted(plans_dir.glob("*_relay.json")):
+        rel = plan_file.relative_to(repo).as_posix()
+        if not chapter_marked_complete_in_repo(repo, rel):
+            continue
+        try:
+            plan = load_phase_plan(repo, rel)
+        except (FileNotFoundError, OSError, ValueError):
+            continue
+        for slice_obj in plan.get("slices") or []:
+            if not isinstance(slice_obj, dict):
+                continue
+            slice_id = str(slice_obj.get("sliceId") or "").strip()
+            if not slice_id or slice_id in stale:
+                continue
+            if (repo / starter_path(slice_id)).is_file():
+                stale.append(slice_id)
+    return stale
+
+
+def _build_read_only_token_audit(repo: Path):
+    """Reconstruct the existing token audit without its stale-file prune side effect."""
+    from scripts.ppe_token_audit import (
+        TokenAuditReport,
+        audit_build_worker,
+        audit_operator_config,
+        audit_rules,
+        audit_starters,
+        build_recommendations,
+        compute_verdict,
+    )
+
+    report = TokenAuditReport(
+        generated_at_utc=_utc_now(),
+        rules=audit_rules(repo),
+        starters=audit_starters(repo),
+        stale_starter_ids=_read_only_stale_starter_ids(repo),
+        build_worker=audit_build_worker(repo),
+        operator_config=audit_operator_config(repo),
+    )
+    report.recommendations = build_recommendations(report)
+    try:
+        from scripts.ppe_token_reconcile import billing_recommendation
+
+        recommendation = billing_recommendation(repo)
+        if recommendation:
+            report.recommendations.append(recommendation)
+    except ImportError:
+        pass
+    report.verdict = compute_verdict(report)
+    return report
 
 
 def collect_billing_gate(
@@ -203,9 +267,7 @@ def collect_billing_gate(
         )
 
     try:
-        from scripts.ppe_token_audit import build_token_audit
-
-        token_report = build_token_audit(repo)
+        token_report = _build_read_only_token_audit(repo)
         token_data = token_report.to_dict()
         token_verdict = str(token_report.verdict or "ESCALATE")
     except Exception as exc:  # fail closed: an unavailable budget audit is not an OK audit
