@@ -1,4 +1,4 @@
-"""Tests for VM mirror refresh, branch preflight, pass timebox, stuck watchdog."""
+"""Tests for runtime VM state health, branch preflight, timebox, and stuck watchdog."""
 
 from __future__ import annotations
 
@@ -26,6 +26,12 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def _write_runtime_state(tmp_path, payload: dict) -> None:
+    path = tmp_path / "artifacts/control_plane/VM_OPERATOR_PHASE.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+
 def test_mirror_is_populated() -> None:
     assert mirror_is_populated({"phase": "FINISH_IN_FLIGHT", "as_of": _utc_now()})
     assert not mirror_is_populated({"phase": None})
@@ -39,6 +45,7 @@ def test_assess_mirror_health_stale() -> None:
     assert health["alert"] is True
     assert health["untrusted"] is True
     assert health["heartbeat_overdue"] is False
+    assert "direct status/SSH" in health["agent_note"]
 
 
 def test_assess_mirror_health_in_flight_not_untrusted() -> None:
@@ -53,57 +60,31 @@ def test_assess_mirror_health_in_flight_not_untrusted() -> None:
     assert health["alert"] is True
 
 
-def test_sync_desktop_mirror_from_main(tmp_path, monkeypatch) -> None:
-    mirror_path = tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json"
-    mirror_path.parent.mkdir(parents=True)
-    mirror_path.write_text(json.dumps({"phase": "IDLE", "as_of": _utc_now()}) + "\n", encoding="utf-8")
-    monkeypatch.setattr(
-        "scripts.ppe_operator_git_sync.check_and_nudge_merges",
-        lambda repo: {"action": "check_merge", "ok": True},
-    )
-    monkeypatch.setattr(
-        "scripts.ppe_operator_git_sync.pull_main",
-        lambda repo: {"action": "pull", "ok": True},
-    )
-    monkeypatch.setattr(
-        "scripts.ppe_operator_vm_mirror_refresh.read_mirror_from_git_ref",
-        lambda repo, ref="origin/main": {"phase": "RUN_LOCAL_PENDING", "as_of": _utc_now()},
-    )
-    monkeypatch.setattr(
-        "scripts.ppe_operator_vm_mirror_refresh.maybe_fetch_origin_main",
-        lambda repo, force=False: {"fetched": True},
-    )
+def test_sync_desktop_assesses_runtime_state_without_git(tmp_path) -> None:
+    _write_runtime_state(tmp_path, {"phase": "IDLE", "as_of": _utc_now()})
     report = sync_desktop_mirror_from_main(tmp_path)
     assert report["ok"] is True
     assert report["health"]["populated"] is True
+    assert report["transport"] == "runtime_local"
+    assert "pull" not in report
+    assert "merge" not in report
 
 
-def test_maybe_sync_skips_loop_host(tmp_path, monkeypatch) -> None:
-    from scripts.ppe_operator_vm_mirror_refresh import maybe_sync_desktop_mirror_after_ship
-
-    monkeypatch.setenv("PPE_LOOP_HOST", "1")
-    (tmp_path / "ppe_operator_loop_host.local.cmd").write_text("@echo off\n", encoding="utf-8")
-    with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "ok")):
-        out = maybe_sync_desktop_mirror_after_ship(tmp_path, pre_push=True)
+def test_maybe_sync_after_ship_is_obsolete(tmp_path) -> None:
+    out = maybe_sync_desktop_mirror_after_ship(tmp_path, pre_push=True)
     assert out.get("skipped") is True
-    assert out.get("reason") == "loop_host"
+    assert out.get("reason") == "runtime_state_not_in_git"
 
 
-def test_refresh_vm_mirror_from_git(tmp_path, monkeypatch) -> None:
-    mirror_path = tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json"
-    mirror_path.parent.mkdir(parents=True)
-    mirror_path.write_text(json.dumps({"phase": None}) + "\n", encoding="utf-8")
-    remote = {"phase": "FINISH_IN_FLIGHT", "as_of": _utc_now(), "verdict": "RUN_LOCAL"}
-    monkeypatch.setattr(
-        "scripts.ppe_operator_vm_mirror_refresh.read_mirror_from_git_ref",
-        lambda repo, ref="origin/main": remote,
-    )
-    monkeypatch.setattr(
-        "scripts.ppe_operator_vm_mirror_refresh.maybe_fetch_origin_main",
-        lambda repo, force=False: {"fetched": True},
+def test_refresh_reads_runtime_state_without_git(tmp_path) -> None:
+    _write_runtime_state(
+        tmp_path,
+        {"phase": "FINISH_IN_FLIGHT", "as_of": _utc_now(), "verdict": "RUN_LOCAL"},
     )
     report = refresh_vm_mirror_from_git(tmp_path)
-    assert report["action"] == "updated_from_git"
+    assert report["action"] == "runtime_local"
+    assert report["local_populated"] is True
+    assert report["transport"] == "runtime_local"
 
 
 def test_branch_preflight_blocks_product(tmp_path, monkeypatch) -> None:
@@ -134,20 +115,12 @@ def test_operator_session_timebox(tmp_path) -> None:
     assert out["rotate_recommended"] is True
 
 
-def test_maybe_commit_publish_vm_mirror(tmp_path, monkeypatch) -> None:
-    monkeypatch.setenv("PPE_LOOP_HOST", "1")
-    (tmp_path / "ppe_operator_loop_host.local.cmd").write_text("@echo off\n", encoding="utf-8")
-    mirror = tmp_path / "docs/SOP/VM_OPERATOR_PHASE.json"
-    mirror.parent.mkdir(parents=True)
-    mirror.write_text(json.dumps({"phase": "IDLE"}) + "\n", encoding="utf-8")
-    payload = {"phase": "FINISH_IN_FLIGHT", "verdict": "RUN_LOCAL", "chapter_name": "ch"}
-    with patch("scripts.ppe_loop_host_guard.loop_host_start_allowed", return_value=(True, "ok")):
-        with patch("scripts.ppe_vm_phase_mirror._git") as mock_git:
-            proc_ok = type("P", (), {"returncode": 0, "stdout": "docs/SOP/VM_OPERATOR_PHASE.json", "stderr": ""})()
-            mock_git.return_value = proc_ok
-            with patch("scripts.ppe_operator_git_sync.publish_vm_mirror_ahead", return_value={"ok": True}):
-                result = maybe_commit_publish_vm_mirror(tmp_path, payload)
-    assert result.get("ok") is True
+def test_maybe_commit_publish_vm_mirror_is_permanent_noop(tmp_path) -> None:
+    result = maybe_commit_publish_vm_mirror(
+        tmp_path,
+        {"phase": "FINISH_IN_FLIGHT", "verdict": "RUN_LOCAL", "chapter_name": "ch"},
+    )
+    assert result == {"skipped": True, "reason": "runtime_state_not_publishable"}
 
 
 def test_track_in_flight_since(tmp_path, monkeypatch) -> None:
