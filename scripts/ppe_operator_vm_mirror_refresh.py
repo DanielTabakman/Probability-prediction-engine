@@ -1,10 +1,14 @@
-"""Desktop: refresh VM phase mirror from git + assess mirror age without SSH."""
+"""Assess local runtime VM phase state without using Git as a transport.
+
+The historical API names remain for compatibility, but refresh/sync no longer
+fetch, merge, pull, or read phase state from Git. Direct loop-host status/SSH is
+authoritative; this module reads the gitignored runtime artifact when present.
+"""
 
 from __future__ import annotations
 
 import json
 import os
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -12,7 +16,6 @@ from typing import Any
 from scripts.ppe_vm_phase_mirror import (
     IN_FLIGHT_PHASES,
     MIRROR_HEARTBEAT_PUBLISH_SECONDS,
-    VM_OPERATOR_PHASE_REL,
     load_vm_phase_mirror,
     mirror_path,
 )
@@ -67,55 +70,16 @@ def mirror_is_stale(
     return age > max(60, int(stale_seconds))
 
 
-def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-
 def maybe_fetch_origin_main(repo: Path, *, force: bool = False) -> dict[str, Any]:
-    repo = repo.resolve()
-    prior_path = repo / FETCH_STATE_REL
-    prior: dict[str, Any] = {}
-    if prior_path.is_file():
-        try:
-            prior = json.loads(prior_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            prior = {}
-    last_at = _parse_utc(str(prior.get("last_fetch_at") or ""))
-    if not force and last_at is not None:
-        elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
-        if elapsed < MIRROR_FETCH_MIN_INTERVAL_SECONDS:
-            return {"fetched": False, "reason": "fetch_cooldown", "elapsed_s": elapsed}
-
-    proc = _git(repo, "fetch", "origin", "main", "--quiet")
-    result: dict[str, Any] = {
-        "fetched": proc.returncode == 0,
-        "exit_code": proc.returncode,
-        "stderr": (proc.stderr or "").strip()[-200:],
-    }
-    if proc.returncode == 0:
-        prior_path.parent.mkdir(parents=True, exist_ok=True)
-        prior_path.write_text(
-            json.dumps({"last_fetch_at": _utc_now()}, indent=2) + "\n",
-            encoding="utf-8",
-        )
-    return result
+    """Compatibility shim: runtime phase state is never fetched from Git."""
+    del repo, force
+    return {"fetched": False, "skipped": True, "reason": "runtime_state_not_in_git"}
 
 
 def read_mirror_from_git_ref(repo: Path, ref: str = "origin/main") -> dict[str, Any] | None:
-    proc = _git(repo, "show", f"{ref}:{VM_OPERATOR_PHASE_REL.replace(chr(92), '/')}")
-    if proc.returncode != 0:
-        return None
-    try:
-        data = json.loads(proc.stdout)
-    except json.JSONDecodeError:
-        return None
-    return data if isinstance(data, dict) else None
+    """Compatibility shim retained for callers during migration."""
+    del repo, ref
+    return None
 
 
 def refresh_vm_mirror_from_git(
@@ -124,37 +88,18 @@ def refresh_vm_mirror_from_git(
     force_fetch: bool = False,
     stale_seconds: int = MIRROR_STALE_SECONDS,
 ) -> dict[str, Any]:
+    """Read and assess the local runtime artifact; never mutate it from Git."""
+    del force_fetch
     repo = repo.resolve()
     local = load_vm_phase_mirror(repo)
     report: dict[str, Any] = {
         "local_populated": mirror_is_populated(local),
         "local_stale": mirror_is_stale(local, stale_seconds=stale_seconds),
         "local_age_s": mirror_age_seconds(local),
+        "path": str(mirror_path(repo)),
+        "transport": "runtime_local",
     }
-
-    if mirror_is_populated(local) and not mirror_is_stale(local, stale_seconds=stale_seconds):
-        report["action"] = "skip_fresh_local"
-        return report
-
-    report["fetch"] = maybe_fetch_origin_main(repo, force=force_fetch)
-    remote = read_mirror_from_git_ref(repo)
-    report["remote_populated"] = mirror_is_populated(remote)
-    report["remote_age_s"] = mirror_age_seconds(remote)
-
-    if not mirror_is_populated(remote):
-        report["action"] = "no_remote_mirror"
-        return report
-
-    remote_age = mirror_age_seconds(remote) or 0.0
-    local_age = mirror_age_seconds(local) or 1e9
-    if remote_age < local_age or not mirror_is_populated(local):
-        path = mirror_path(repo)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(remote, indent=2) + "\n", encoding="utf-8")
-        report["action"] = "updated_from_git"
-        report["path"] = str(path)
-    else:
-        report["action"] = "keep_local_newer"
+    report["action"] = "runtime_local" if mirror_is_populated(local) else "runtime_state_missing"
     return report
 
 
@@ -186,18 +131,15 @@ def assess_mirror_health(
     note = ""
     if not populated:
         alert = local_verdict in ("RUN_LOCAL", "IDE_BUILD", "RUN_AUTO")
-        note = "VM mirror empty — git pull origin main or wait for loop host publish."
+        note = "VM runtime state missing — query the loop host through direct status/SSH."
     elif untrusted:
         alert = local_verdict in ("RUN_LOCAL", "IDE_BUILD")
         mins = int((age or 0) // 60)
-        note = f"VM mirror stale ({mins}m old) — git pull origin main before trusting phase."
+        note = f"VM runtime state stale ({mins}m old) — query direct status/SSH before trusting phase."
     elif heartbeat_overdue:
         alert = local_verdict in ("RUN_LOCAL", "IDE_BUILD")
         mins = int((age or 0) // 60)
-        note = (
-            f"VM in-flight mirror heartbeat overdue ({mins}m) — "
-            "git pull origin main or wait for loop host publish."
-        )
+        note = f"VM in-flight runtime heartbeat overdue ({mins}m) — inspect the loop host directly."
     return {
         "populated": populated,
         "stale": stale,
@@ -208,61 +150,42 @@ def assess_mirror_health(
         "alert": alert,
         "agent_note": note,
         "phase": str(mirror.get("phase") or "") if mirror else None,
+        "transport": "runtime_local",
     }
 
 
 def sync_desktop_mirror_from_main(repo: Path) -> dict[str, Any]:
-    """Desktop: nudge mirror PR merges, pull main, refresh local VM phase mirror."""
+    """Compatibility entrypoint: assess runtime state without Git operations."""
     repo = repo.resolve()
-    report: dict[str, Any] = {"action": "sync_desktop_mirror"}
-    try:
-        from scripts.ppe_operator_git_sync import check_and_nudge_merges, pull_main
-
-        report["merge"] = check_and_nudge_merges(repo)
-        report["pull"] = pull_main(repo)
-    except Exception as exc:
-        report["merge_pull_error"] = str(exc)
-    report["refresh"] = refresh_vm_mirror_from_git(repo, force_fetch=True)
+    refresh = refresh_vm_mirror_from_git(repo)
     mirror = load_vm_phase_mirror(repo)
-    report["health"] = assess_mirror_health(mirror, local_verdict="RUN_LOCAL")
-    pull = report.get("pull") if isinstance(report.get("pull"), dict) else {}
-    if report.get("merge_pull_error"):
-        report["ok"] = False
-    elif pull.get("skipped"):
-        report["ok"] = False
-        report["pull_blocked"] = pull.get("reason") or pull.get("error") or "pull skipped"
-    else:
-        report["ok"] = bool(pull.get("ok"))
-    return report
+    health = assess_mirror_health(mirror, local_verdict="RUN_LOCAL")
+    return {
+        "action": "assess_runtime_state",
+        "refresh": refresh,
+        "health": health,
+        "ok": bool(health.get("populated")),
+        "transport": "runtime_local",
+    }
 
 
 def maybe_sync_desktop_mirror_after_ship(repo: Path, *, pre_push: bool = False) -> dict[str, Any]:
-    """Best-effort VM mirror sync after gate/ship on desktop (never raises)."""
+    """Post-ship Git synchronization is obsolete for runtime phase state."""
+    del repo
     if not pre_push:
         return {"skipped": True, "reason": "not_post_ship"}
     if os.environ.get("PPE_MIRROR_SYNC_AFTER_SHIP", "1").strip().lower() in ("0", "false", "no"):
         return {"skipped": True, "reason": "disabled"}
-    try:
-        from scripts.ppe_loop_host_guard import loop_host_start_allowed
-
-        if loop_host_start_allowed()[0]:
-            return {"skipped": True, "reason": "loop_host"}
-    except Exception:
-        pass
-    try:
-        return sync_desktop_mirror_from_main(repo)
-    except Exception as exc:
-        return {"ok": False, "error": str(exc)}
+    return {"skipped": True, "reason": "runtime_state_not_in_git"}
 
 
 def main(argv: list[str] | None = None) -> int:
     import argparse
-    import json
     import sys
 
-    ap = argparse.ArgumentParser(description="VM phase mirror refresh (desktop git pull path)")
+    ap = argparse.ArgumentParser(description="Assess local VM runtime phase state")
     ap.add_argument("--repo-root", type=Path, default=Path.cwd())
-    ap.add_argument("--sync-desktop", action="store_true", help="Merge mirror PRs, pull main, refresh local mirror")
+    ap.add_argument("--sync-desktop", action="store_true", help="Compatibility alias: assess runtime state")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args(argv)
@@ -273,11 +196,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.json:
             print(json.dumps(report, indent=2))
         elif not report.get("ok"):
-            print(f"ppe_operator_vm_mirror_refresh: sync failed — {report.get('pull_blocked') or report.get('merge_pull_error')}")
+            print("ppe_operator_vm_mirror_refresh: runtime state unavailable — use direct status/SSH")
         elif not args.quiet:
             health = report.get("health") or {}
             print(
-                f"ppe_operator_vm_mirror_refresh: ok phase={health.get('phase')} "
+                f"ppe_operator_vm_mirror_refresh: phase={health.get('phase')} "
                 f"untrusted={health.get('untrusted')} heartbeat_overdue={health.get('heartbeat_overdue')}"
             )
         return 0 if report.get("ok") else 1
