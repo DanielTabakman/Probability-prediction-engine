@@ -110,6 +110,9 @@ def write_vm_phase_mirror(repo: Path, status: dict[str, Any]) -> Path | None:
         "recommended_action": status.get("recommended_action"),
     }
     path = mirror_path(repo)
+    current = load_vm_phase_mirror(repo)
+    if current is not None and _mirror_fingerprint(current) == _mirror_fingerprint(payload):
+        return path
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return path
@@ -122,6 +125,7 @@ def _mirror_fingerprint(payload: dict[str, Any]) -> str:
             str(payload.get("verdict") or ""),
             str(payload.get("chapter_name") or ""),
             str(payload.get("phase_plan_path") or ""),
+            str(payload.get("recommended_action") or ""),
         ]
     )
 
@@ -146,15 +150,16 @@ def _heartbeat_publish_due(
         return True
     if str(prior.get("fingerprint") or "") != fingerprint:
         return True
-    mirror_as_of = _parse_utc(str(payload.get("as_of") or ""))
-    if mirror_as_of and last_at and mirror_as_of > last_at:
-        return True
     return False
 
 
 def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[str, Any]:
     if not _is_loop_host(repo):
         return {"skipped": True, "reason": "not_loop_host"}
+    from scripts.ppe_operator_config import autonomous_git_writes_enabled
+
+    if not autonomous_git_writes_enabled():
+        return {"skipped": True, "reason": "autonomous_git_writes_disabled"}
 
     fp = _mirror_fingerprint(payload)
     state_path = repo / MIRROR_PUBLISH_STATE_REL
@@ -451,9 +456,15 @@ def maybe_notify_stuck_in_flight(
 
 
 def sync_autobuilder_phase_artifacts(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
-    mirror = write_vm_phase_mirror(repo, status)
-    payload = load_vm_phase_mirror(repo) or {}
-    publish = maybe_commit_publish_vm_mirror(repo, payload) if mirror else {"skipped": True}
+    from scripts.ppe_operator_config import autonomous_git_writes_enabled
+
+    if autonomous_git_writes_enabled():
+        mirror = write_vm_phase_mirror(repo, status)
+        payload = load_vm_phase_mirror(repo) or {}
+        publish = maybe_commit_publish_vm_mirror(repo, payload) if mirror else {"skipped": True}
+    else:
+        mirror = None
+        publish = {"skipped": True, "reason": "autonomous_git_writes_disabled"}
     notified = maybe_notify_in_flight_phase(repo, status)
     track_in_flight_since(repo, status)
     stuck_notified = maybe_notify_stuck_in_flight(repo, status)
