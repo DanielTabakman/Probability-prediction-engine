@@ -1,4 +1,4 @@
-"""Safety tests for Autobuilder GitHub write opt-in and VM mirror churn guards."""
+"""Safety tests for legacy Autobuilder Git writes and runtime VM state."""
 
 from __future__ import annotations
 
@@ -10,7 +10,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 from scripts.ppe_operator_config import autonomous_git_writes_enabled, load_operator_config
-from scripts.ppe_vm_phase_mirror import _heartbeat_publish_due, maybe_commit_publish_vm_mirror
+from scripts.ppe_vm_phase_mirror import (
+    _heartbeat_publish_due,
+    load_vm_phase_mirror,
+    maybe_commit_publish_vm_mirror,
+    mirror_path,
+    write_vm_phase_mirror,
+)
 
 
 class TestAutonomousGitWriteSafety(unittest.TestCase):
@@ -36,12 +42,20 @@ class TestAutonomousGitWriteSafety(unittest.TestCase):
             ),
             encoding="utf-8",
         )
-        os.environ.pop("PPE_GIT_AUTONOMOUS_WRITES", None)
-        os.environ.pop("PPE_OPERATOR_PROFILE", None)
+        for key in (
+            "PPE_GIT_AUTONOMOUS_WRITES",
+            "PPE_ALLOW_LEGACY_GIT_PUBLISH",
+            "PPE_OPERATOR_PROFILE",
+        ):
+            os.environ.pop(key, None)
 
     def tearDown(self) -> None:
-        os.environ.pop("PPE_GIT_AUTONOMOUS_WRITES", None)
-        os.environ.pop("PPE_OPERATOR_PROFILE", None)
+        for key in (
+            "PPE_GIT_AUTONOMOUS_WRITES",
+            "PPE_ALLOW_LEGACY_GIT_PUBLISH",
+            "PPE_OPERATOR_PROFILE",
+        ):
+            os.environ.pop(key, None)
         self._tmp.cleanup()
 
     def test_autonomous_git_writes_are_fail_closed_by_default(self) -> None:
@@ -53,45 +67,41 @@ class TestAutonomousGitWriteSafety(unittest.TestCase):
         self.assertFalse(git_sync["pushAfterCommit"])
         self.assertFalse(git_sync["openPrOnPush"])
 
-    def test_explicit_runtime_opt_in_preserves_configured_writes(self) -> None:
+    def test_old_single_flag_no_longer_reenables_legacy_publisher(self) -> None:
         os.environ["PPE_GIT_AUTONOMOUS_WRITES"] = "1"
+        self.assertFalse(autonomous_git_writes_enabled())
+        self.assertFalse(load_operator_config(self.repo)["gitSync"]["publishEachPass"])
+
+    def test_legacy_publisher_requires_two_part_break_glass(self) -> None:
+        os.environ["PPE_GIT_AUTONOMOUS_WRITES"] = "legacy-unsafe"
+        self.assertFalse(autonomous_git_writes_enabled())
+        os.environ["PPE_ALLOW_LEGACY_GIT_PUBLISH"] = "1"
         self.assertTrue(autonomous_git_writes_enabled())
-        git_sync = load_operator_config(self.repo)["gitSync"]
-        self.assertTrue(git_sync["publishEachPass"])
-        self.assertTrue(git_sync["mergeEachPass"])
-        self.assertTrue(git_sync["pushAfterCommit"])
-        self.assertTrue(git_sync["openPrOnPush"])
 
-    def test_vm_mirror_does_not_commit_without_explicit_opt_in(self) -> None:
-        payload = {
-            "phase": "CLOSEOUT_PENDING",
-            "verdict": "RUN_LOCAL",
-            "chapter_name": "chapter",
-            "phase_plan_path": "docs/SOP/PHASE_PLANS/chapter.json",
-            "recommended_action": "run-local",
-        }
-        with patch("scripts.ppe_vm_phase_mirror._is_loop_host", return_value=True), patch(
-            "scripts.ppe_vm_phase_mirror._git"
-        ) as git_mock:
-            result = maybe_commit_publish_vm_mirror(self.repo, payload)
-        self.assertEqual(result.get("reason"), "autonomous_git_writes_disabled")
-        git_mock.assert_not_called()
+    def test_vm_mirror_is_never_committed(self) -> None:
+        result = maybe_commit_publish_vm_mirror(self.repo, {"phase": "CLOSEOUT_PENDING"})
+        self.assertEqual(result.get("reason"), "runtime_state_not_publishable")
 
-    def test_new_status_timestamp_alone_does_not_force_heartbeat(self) -> None:
-        payload = {
+    def test_vm_mirror_writes_to_gitignored_runtime_plane(self) -> None:
+        status = {
             "as_of": "2026-07-11T18:10:00Z",
             "phase": "BUILD_IN_FLIGHT",
             "verdict": "WAIT",
+            "operator": {"chapter_name": "chapter", "phase_plan_path": "plan.json"},
+            "recommended_action": "wait",
         }
-        prior = {
-            "fingerprint": "BUILD_IN_FLIGHT|WAIT|||",
-            "last_publish_at": "2026-07-11T18:09:30Z",
-            "last_publish_ok": True,
-        }
+        with patch("scripts.ppe_vm_phase_mirror._is_loop_host", return_value=True):
+            path = write_vm_phase_mirror(self.repo, status)
+        self.assertEqual(path, mirror_path(self.repo))
+        self.assertIn("artifacts/control_plane", str(path).replace("\\", "/"))
+        self.assertEqual(load_vm_phase_mirror(self.repo)["phase"], "BUILD_IN_FLIGHT")
+        self.assertFalse((self.repo / "docs" / "SOP" / "VM_OPERATOR_PHASE.json").exists())
+
+    def test_runtime_heartbeat_never_requires_git_publication(self) -> None:
         self.assertFalse(
             _heartbeat_publish_due(
-                payload,
-                prior,
+                {"phase": "BUILD_IN_FLIGHT"},
+                {"last_publish_ok": False},
                 fingerprint="BUILD_IN_FLIGHT|WAIT|||",
             )
         )
