@@ -1,14 +1,15 @@
-"""Automatic git ship sweep for context window closeout.
+"""Bounded context closeout: commit onto the active chapter branch and update its PR.
 
-Gate → commit → push → open PR (automerge label). No operator merge clicks.
-Canon: docs/SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md
+The closeout path no longer creates timestamped branches, replacement PRs, or
+automerge labels. Publication is delegated to `ppe_chapter_publisher.py`.
 """
 
 from __future__ import annotations
 
+import json
+import os
 import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -18,13 +19,7 @@ COMMIT_EXCLUDED_PREFIXES: tuple[str, ...] = (
     ".env",
     ".cursor/projects/",
 )
-COMMIT_EXCLUDED_EXACT: frozenset[str] = frozenset(
-    {
-        ".env",
-        ".env.local",
-        ".env.production",
-    }
-)
+COMMIT_EXCLUDED_EXACT: frozenset[str] = frozenset({".env", ".env.local", ".env.production"})
 
 
 def _norm(path: str) -> str:
@@ -54,12 +49,12 @@ def committable_dirty_paths(repo: Path) -> list[str]:
 def _commit_message_for_paths(paths: list[str]) -> str:
     norm = [_norm(p) for p in paths]
     if norm and all(p.startswith("docs/") for p in norm):
-        return "control-plane: context closeout auto-ship (docs)"
+        return "control-plane: context closeout"
     if any(p.startswith("src/") or p.startswith("apps/") for p in norm):
-        return "product: context closeout auto-ship"
+        return "product: context closeout"
     if any(p.startswith("tests/") or p.startswith("scripts/") for p in norm):
-        return "evidence-plane: context closeout auto-ship"
-    return "control-plane: context closeout auto-ship"
+        return "evidence-plane: context closeout"
+    return "control-plane: context closeout"
 
 
 def _preflight(repo: Path) -> dict[str, Any]:
@@ -73,12 +68,10 @@ def _preflight(repo: Path) -> dict[str, Any]:
     if proc.returncode not in (0, 1) or not proc.stdout.strip():
         return {}
     try:
-        import json
-
         data = json.loads(proc.stdout)
-        return data if isinstance(data, dict) else {}
     except json.JSONDecodeError:
         return {}
+    return data if isinstance(data, dict) else {}
 
 
 def _run_gate(
@@ -92,30 +85,74 @@ def _run_gate(
 
     kwargs: dict[str, Any] = {"pre_push": pre_push}
     if pytest_profile:
-        kwargs["pytest_profile"] = pytest_profile  # type: ignore[arg-type]
+        kwargs["pytest_profile"] = pytest_profile
     rc = run_gate_for_paths(repo, files, **kwargs)
-    if rc != 0:
-        return False, "gate failed"
-    return True, "gate passed"
+    return (rc == 0, "gate passed" if rc == 0 else "gate failed")
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    from scripts.ppe_operator_git_sync import _git as git_run
-
-    return git_run(repo, *args)
+    return subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, check=False)
 
 
-def _ensure_closeout_branch(repo: Path, *, current: str) -> tuple[bool, str, str]:
-    from scripts.ppe_operator_git_sync import _short_head
+def _current_branch(repo: Path) -> str:
+    proc = _git(repo, "branch", "--show-current")
+    return (proc.stdout or "").strip() if proc.returncode == 0 else ""
 
-    if current and current != "main":
-        return True, current, "already on feature branch"
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    branch = f"ops/closeout-{stamp}-{_short_head(repo)}"
+
+def _ahead_count(repo: Path, branch: str) -> int:
+    for ref in (f"origin/{branch}", "origin/main", "main"):
+        proc = _git(repo, "rev-list", "--count", f"{ref}..HEAD")
+        if proc.returncode == 0:
+            try:
+                return int((proc.stdout or "0").strip() or "0")
+            except ValueError:
+                continue
+    return 0
+
+
+def _load_manifest(repo: Path) -> dict[str, Any]:
+    path = repo / "docs" / "SOP" / "ACTIVE_PHASE_MANIFEST.json"
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def infer_chapter_id(repo: Path, preflight: dict[str, Any] | None = None) -> str:
+    explicit = os.environ.get("PPE_ACTIVE_CHAPTER_ID", "").strip()
+    if explicit:
+        return explicit
+    pf = preflight or {}
+    for key in ("chapter_id", "chapter_name", "phase_plan_path"):
+        value = str(pf.get(key) or "").strip()
+        if value:
+            return value
+    manifest = _load_manifest(repo)
+    for key in ("chapterId", "chapterName", "phasePlanPath", "phasePlan"):
+        value = str(manifest.get(key) or "").strip()
+        if value:
+            return value
+    branch = _current_branch(repo)
+    if branch and branch not in ("main", "master"):
+        return branch
+    return "context-closeout"
+
+
+def _ensure_chapter_branch(repo: Path, *, current: str, chapter_id: str) -> tuple[bool, str, str]:
+    from scripts.ppe_chapter_publisher import chapter_branch
+
+    if current and current not in ("main", "master", "HEAD"):
+        return True, current, "using active feature branch"
+    branch = chapter_branch(chapter_id)
     co = _git(repo, "checkout", "-b", branch)
     if co.returncode != 0:
+        co = _git(repo, "checkout", branch)
+    if co.returncode != 0:
         return False, current, (co.stderr or co.stdout or "checkout failed").strip()
-    return True, branch, f"created {branch}"
+    return True, branch, f"using stable chapter branch {branch}"
 
 
 def _stage_paths(repo: Path, paths: list[str]) -> tuple[bool, str]:
@@ -128,15 +165,9 @@ def _stage_paths(repo: Path, paths: list[str]) -> tuple[bool, str]:
 
 
 def _commit(repo: Path, *, message: str) -> tuple[bool, str]:
-    commit = subprocess.run(
-        ["git", "commit", "-m", message],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if commit.returncode != 0:
-        return False, (commit.stderr or commit.stdout or "git commit failed").strip()
+    proc = _git(repo, "commit", "-m", message)
+    if proc.returncode != 0:
+        return False, (proc.stderr or proc.stdout or "git commit failed").strip()
     return True, message
 
 
@@ -144,74 +175,30 @@ def _unstage_all(repo: Path) -> None:
     _git(repo, "reset", "HEAD")
 
 
-def _label_automerge(repo: Path, head: str) -> tuple[bool, str]:
-    try:
-        proc = subprocess.run(
-            ["gh", "pr", "list", "--head", head, "--json", "number", "--limit", "1"],
-            cwd=repo,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except FileNotFoundError:
-        return False, "gh not available"
-    if proc.returncode != 0 or not proc.stdout.strip():
-        return False, "no open PR for head"
-    try:
-        import json
+def _publish(
+    repo: Path,
+    *,
+    chapter_id: str,
+    branch: str,
+    dry_run: bool = False,
+) -> dict[str, Any]:
+    from scripts.ppe_chapter_publisher import publish_chapter
 
-        rows = json.loads(proc.stdout)
-        num = rows[0].get("number") if rows else None
-    except (json.JSONDecodeError, IndexError, KeyError):
-        return False, "could not parse gh pr list"
-    if not num:
-        return False, "no PR number"
-    label = subprocess.run(
-        ["gh", "pr", "edit", str(num), "--add-label", "automerge"],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
+    return publish_chapter(
+        repo,
+        chapter_id=chapter_id,
+        title=f"Chapter: {chapter_id}",
+        body=(
+            "Context closeout updated the existing chapter publication. "
+            "No timestamp branch or replacement PR was created."
+        ),
+        create_branch_if_main=False,
+        dry_run=dry_run,
     )
-    if label.returncode != 0:
-        return False, (label.stderr or label.stdout or "add-label failed").strip()
-    return True, f"labeled PR #{num} automerge"
-
-
-def _publish(repo: Path, *, branch: str) -> dict[str, Any]:
-    from scripts.ppe_operator_git_sync import _open_pr, push_enabled
-
-    if not push_enabled(repo):
-        return {"action": "publish", "skipped": True, "reason": "push disabled"}
-
-    push = _git(repo, "push", "-u", "origin", "HEAD")
-    if push.returncode != 0:
-        return {
-            "action": "publish",
-            "ok": False,
-            "branch": branch,
-            "error": (push.stderr or push.stdout or "git push failed").strip(),
-        }
-
-    title = f"ops: context closeout ship ({branch})"
-    body = (
-        "Auto-shipped by context window closeout (`ppe_context_closeout_ship.py`).\n\n"
-        "Merge-on-green applies when CI passes — no operator action required."
-    )
-    pr_url = _open_pr(repo, head=branch, title=title, body=body)
-    label_ok, label_detail = _label_automerge(repo, branch) if pr_url else (False, "no PR")
-    return {
-        "action": "publish",
-        "ok": True,
-        "branch": branch,
-        "pr_url": pr_url,
-        "automerge_label": label_ok,
-        "automerge_detail": label_detail,
-    }
 
 
 def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any]:
-    """Commit dirty shippable work, push, open PR. Idempotent when tree is clean."""
+    """Commit shippable work and update exactly one chapter PR."""
     repo = repo.resolve()
     report: dict[str, Any] = {
         "action": "operational_sweep",
@@ -223,48 +210,29 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
     }
 
     def step(name: str, payload: dict[str, Any]) -> None:
-        row = {"step": name, **payload}
-        report["steps"].append(row)
+        report["steps"].append({"step": name, **payload})
         if payload.get("ok") is False and not payload.get("optional"):
             report["ok"] = False
         if payload.get("blocked"):
             report["blocked"] = True
 
     pf = _preflight(repo)
-    branch = str(pf.get("branch") or "")
+    branch = str(pf.get("branch") or _current_branch(repo) or "")
     wt = str(pf.get("working_tree") or "")
-    report["preflight"] = {"branch": branch, "working_tree": wt, "blocker": pf.get("blocker")}
+    chapter_id = infer_chapter_id(repo, pf)
+    report["preflight"] = {
+        "branch": branch,
+        "working_tree": wt,
+        "blocker": pf.get("blocker"),
+        "chapter_id": chapter_id,
+    }
 
     if branch == "HEAD":
-        step(
-            "branch",
-            {
-                "ok": False,
-                "blocked": True,
-                "reason": "detached HEAD — park manually",
-            },
-        )
+        step("branch", {"ok": False, "blocked": True, "reason": "detached HEAD"})
         return report
 
-    fetch = _git(repo, "fetch", "origin")
-    step(
-        "fetch",
-        {
-            "ok": fetch.returncode == 0,
-            "optional": True,
-            "detail": (fetch.stderr or fetch.stdout or "").strip()[:200],
-        },
-    )
-
     if pf.get("blocker") and "unmerged" in str(pf.get("blocker") or "").lower():
-        step(
-            "conflicts",
-            {
-                "ok": False,
-                "blocked": True,
-                "reason": pf.get("blocker"),
-            },
-        )
+        step("conflicts", {"ok": False, "blocked": True, "reason": pf.get("blocker")})
         return report
 
     dirty = committable_dirty_paths(repo)
@@ -272,7 +240,7 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
         try:
             from scripts.ppe_parked_work import write_parked_work
 
-            write_parked_work(repo, reason="mixed_plane", thread_role="closeout", note="context closeout ship blocked")
+            write_parked_work(repo, reason="mixed_plane", thread_role="closeout", note="context closeout blocked")
         except Exception:
             pass
         step(
@@ -280,7 +248,7 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
             {
                 "ok": False,
                 "blocked": True,
-                "reason": "mixed-plane dirty — parked for recovery thread",
+                "reason": "mixed-plane dirty; parked for deliberate reconciliation",
                 "paths": dirty[:12],
             },
         )
@@ -288,25 +256,13 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
         return report
 
     if wt == "clean" or not dirty:
-        from scripts.ppe_operator_git_sync import _ahead_count, _current_branch, publish_ahead
-
         current = _current_branch(repo) or branch
-        ahead = _ahead_count(repo, branch=current)
+        ahead = _ahead_count(repo, current)
         if ahead > 0:
-            if dry_run:
-                step("publish_ahead", {"ok": True, "dry_run": True, "branch": current, "ahead": ahead})
-            else:
-                pub = publish_ahead(repo)
-                step("publish_ahead", pub)
-                if pub.get("ok") and pub.get("pr_url"):
-                    head = str(pub.get("pushed_ref") or current)
-                    label_ok, label_detail = _label_automerge(repo, head)
-                    step(
-                        "automerge_label",
-                        {"ok": label_ok, "optional": not label_ok, "detail": label_detail},
-                    )
+            pub = _publish(repo, chapter_id=chapter_id, branch=current, dry_run=dry_run)
+            step("chapter_publish", pub)
         else:
-            step("clean", {"ok": True, "reason": "working tree clean; nothing to ship"})
+            step("clean", {"ok": True, "reason": "working tree clean; nothing to publish"})
         return report
 
     if dry_run:
@@ -315,13 +271,14 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
             {
                 "ok": True,
                 "dry_run": True,
+                "chapter_id": chapter_id,
                 "paths": dirty,
                 "message": _commit_message_for_paths(dirty),
             },
         )
         return report
 
-    ok_branch, work_branch, branch_detail = _ensure_closeout_branch(repo, current=branch)
+    ok_branch, work_branch, branch_detail = _ensure_chapter_branch(repo, current=branch, chapter_id=chapter_id)
     step("branch", {"ok": ok_branch, "branch": work_branch, "detail": branch_detail})
     if not ok_branch:
         report["blocked"] = True
@@ -340,32 +297,21 @@ def run_operational_sweep(repo: Path, *, dry_run: bool = False) -> dict[str, Any
         report["blocked"] = True
         return report
 
-    message = _commit_message_for_paths(dirty)
-    ok_commit, commit_detail = _commit(repo, message=message)
+    ok_commit, commit_detail = _commit(repo, message=_commit_message_for_paths(dirty))
     step("commit", {"ok": ok_commit, "detail": commit_detail})
     if not ok_commit:
         _unstage_all(repo)
         report["blocked"] = True
         return report
 
-    from scripts.run_pushable_gate import _upstream_ref
-
-    if _upstream_ref(repo):
-        pre_ok, pre_detail = _run_gate(repo, dirty, pre_push=True)
-    else:
-        pre_ok, pre_detail = _run_gate(repo, dirty, pre_push=False)
-        if pre_ok:
-            from scripts.run_pushable_gate import run_gate_for_paths
-
-            pre_ok = run_gate_for_paths(repo, dirty, pytest_profile="full") == 0
-            pre_detail = "full pytest (no upstream yet)"
+    pre_ok, pre_detail = _run_gate(repo, dirty, pre_push=True)
     step("pre_push_gate", {"ok": pre_ok, "detail": pre_detail})
     if not pre_ok:
         report["blocked"] = True
         return report
 
-    pub = _publish(repo, branch=work_branch)
-    step("publish", pub)
+    pub = _publish(repo, chapter_id=chapter_id, branch=work_branch)
+    step("chapter_publish", pub)
     if not pub.get("ok"):
         report["blocked"] = True
     return report
