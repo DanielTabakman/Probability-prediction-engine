@@ -111,7 +111,16 @@ jobs:
           }
           tail -20 /tmp/pytest-fast.log
 
+      - name: Upload fast-test failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-fast-failure
+          path: /tmp/pytest-fast.log
+          if-no-files-found: ignore
+
       - name: Run slow tests (serial)
+        if: success()
         run: |
           set -o pipefail
           python -m pytest -q -m slow --tb=short > /tmp/pytest-slow.log 2>&1 || {
@@ -120,6 +129,14 @@ jobs:
             exit 1
           }
           tail -20 /tmp/pytest-slow.log
+
+      - name: Upload slow-test failure log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-slow-failure
+          path: /tmp/pytest-slow.log
+          if-no-files-found: ignore
 
   msos_web_build:
     needs: changes
