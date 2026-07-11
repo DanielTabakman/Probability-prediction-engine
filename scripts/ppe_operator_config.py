@@ -13,6 +13,33 @@ OPERATOR_PROFILE_REL: dict[str, str] = {
     "acp": "docs/SOP/PPE_AUTO_OPERATOR.acp.json",
 }
 
+_AUTONOMOUS_GIT_WRITE_KEYS = (
+    "publishEachPass",
+    "mergeEachPass",
+    "pushAfterCommit",
+    "openPrOnPush",
+)
+_TRUE_VALUES = frozenset({"1", "true", "yes", "on"})
+
+
+def autonomous_git_writes_enabled() -> bool:
+    """Require an explicit runtime opt-in before the operator may write to GitHub."""
+    return os.environ.get("PPE_GIT_AUTONOMOUS_WRITES", "").strip().lower() in _TRUE_VALUES
+
+
+def _apply_autonomous_git_write_safety(cfg: dict[str, Any]) -> dict[str, Any]:
+    if autonomous_git_writes_enabled():
+        return cfg
+    raw = cfg.get("gitSync")
+    if not isinstance(raw, dict):
+        return cfg
+    safe_cfg = dict(cfg)
+    safe_git_sync = dict(raw)
+    for key in _AUTONOMOUS_GIT_WRITE_KEYS:
+        safe_git_sync[key] = False
+    safe_cfg["gitSync"] = safe_git_sync
+    return safe_cfg
+
 
 def _resolve_operator_profile(repo: Path) -> str:
     profile = (os.environ.get("PPE_OPERATOR_PROFILE") or "").strip().lower()
@@ -44,7 +71,10 @@ def load_operator_config(repo_root: Path) -> dict[str, Any]:
     p = operator_config_path(repo_root)
     if not p.is_file():
         return {}
-    return json.loads(p.read_text(encoding="utf-8-sig"))
+    raw = json.loads(p.read_text(encoding="utf-8-sig"))
+    if not isinstance(raw, dict):
+        return {}
+    return _apply_autonomous_git_write_safety(raw)
 
 
 def _guards_config(cfg: dict[str, Any]) -> dict[str, Any]:
