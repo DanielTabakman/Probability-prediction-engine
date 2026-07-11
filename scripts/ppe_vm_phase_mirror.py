@@ -1,14 +1,18 @@
-"""Git-tracked VM phase mirror + FINISH_IN_FLIGHT ntfy heartbeat (loop host only)."""
+"""Runtime VM phase state + in-flight notifications (loop host only).
+
+Live operator state belongs in the gitignored artifacts plane. This module no
+longer stages, commits, pushes, or opens PRs for phase/heartbeat changes.
+"""
 
 from __future__ import annotations
 
 import json
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-VM_OPERATOR_PHASE_REL = "docs/SOP/VM_OPERATOR_PHASE.json"
+VM_OPERATOR_PHASE_REL = "artifacts/control_plane/VM_OPERATOR_PHASE.json"
+LEGACY_VM_OPERATOR_PHASE_REL = "docs/SOP/VM_OPERATOR_PHASE.json"
 PHASE_NOTIFY_STATE_REL = "artifacts/control_plane/VM_PHASE_NOTIFY_STATE.json"
 IN_FLIGHT_SINCE_REL = "artifacts/control_plane/VM_IN_FLIGHT_SINCE.json"
 STUCK_NOTIFY_STATE_REL = "artifacts/control_plane/VM_IN_FLIGHT_STUCK_NOTIFY.json"
@@ -16,12 +20,12 @@ MIRROR_PUBLISH_STATE_REL = "artifacts/control_plane/VM_MIRROR_PUBLISH_STATE.json
 
 IN_FLIGHT_PHASES = frozenset({"FINISH_IN_FLIGHT", "BUILD_IN_FLIGHT"})
 PHASE_NOTIFY_COOLDOWN_SECONDS = 900
-BUILD_IN_FLIGHT_STUCK_SECONDS = 2700  # 45m
-FINISH_IN_FLIGHT_STUCK_SECONDS = 5400  # 90m
-IN_FLIGHT_STUCK_SECONDS = BUILD_IN_FLIGHT_STUCK_SECONDS  # default / legacy alias
+BUILD_IN_FLIGHT_STUCK_SECONDS = 2700
+FINISH_IN_FLIGHT_STUCK_SECONDS = 5400
+IN_FLIGHT_STUCK_SECONDS = BUILD_IN_FLIGHT_STUCK_SECONDS
 IN_FLIGHT_APPROACHING_SECONDS_BY_PHASE: dict[str, int] = {
-    "BUILD_IN_FLIGHT": 1800,  # 30m
-    "FINISH_IN_FLIGHT": 3600,  # 60m
+    "BUILD_IN_FLIGHT": 1800,
+    "FINISH_IN_FLIGHT": 3600,
 }
 MIRROR_PUBLISH_COOLDOWN_SECONDS = 90
 MIRROR_HEARTBEAT_PUBLISH_SECONDS = 600
@@ -47,6 +51,10 @@ def mirror_path(repo: Path) -> Path:
     return (repo / VM_OPERATOR_PHASE_REL).resolve()
 
 
+def legacy_mirror_path(repo: Path) -> Path:
+    return (repo / LEGACY_VM_OPERATOR_PHASE_REL).resolve()
+
+
 def notify_state_path(repo: Path) -> Path:
     return (repo / PHASE_NOTIFY_STATE_REL).resolve()
 
@@ -59,8 +67,7 @@ def stuck_notify_state_path(repo: Path) -> Path:
     return (repo / STUCK_NOTIFY_STATE_REL).resolve()
 
 
-def load_vm_phase_mirror(repo: Path) -> dict[str, Any] | None:
-    path = mirror_path(repo)
+def _read_json(path: Path) -> dict[str, Any] | None:
     if not path.is_file():
         return None
     try:
@@ -70,6 +77,11 @@ def load_vm_phase_mirror(repo: Path) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
+def load_vm_phase_mirror(repo: Path) -> dict[str, Any] | None:
+    """Read runtime state first; legacy tracked state is read-only fallback."""
+    return _read_json(mirror_path(repo)) or _read_json(legacy_mirror_path(repo))
+
+
 def _is_loop_host(repo: Path) -> bool:
     try:
         from scripts.ppe_loop_host_guard import loop_host_start_allowed
@@ -77,45 +89,6 @@ def _is_loop_host(repo: Path) -> bool:
         return bool(loop_host_start_allowed()[0])
     except Exception:
         return False
-
-
-def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-
-def write_vm_phase_mirror(repo: Path, status: dict[str, Any]) -> Path | None:
-    if not _is_loop_host(repo):
-        return None
-    phase = str(status.get("phase") or "").strip()
-    if not phase:
-        return None
-    operator = status.get("operator") if isinstance(status.get("operator"), dict) else {}
-    payload = {
-        "version": 1,
-        "description": (
-            "Git-tracked VM autobuilder phase mirror — loop host writes on phase change; "
-            "desktop reads via git pull."
-        ),
-        "as_of": str(status.get("as_of") or _utc_now()),
-        "phase": phase,
-        "verdict": str(status.get("verdict") or "").strip(),
-        "chapter_name": operator.get("chapter_name"),
-        "phase_plan_path": operator.get("phase_plan_path"),
-        "recommended_action": status.get("recommended_action"),
-    }
-    path = mirror_path(repo)
-    current = load_vm_phase_mirror(repo)
-    if current is not None and _mirror_fingerprint(current) == _mirror_fingerprint(payload):
-        return path
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    return path
 
 
 def _mirror_fingerprint(payload: dict[str, Any]) -> str:
@@ -130,165 +103,48 @@ def _mirror_fingerprint(payload: dict[str, Any]) -> str:
     )
 
 
+def write_vm_phase_mirror(repo: Path, status: dict[str, Any]) -> Path | None:
+    if not _is_loop_host(repo):
+        return None
+    phase = str(status.get("phase") or "").strip()
+    if not phase:
+        return None
+    operator = status.get("operator") if isinstance(status.get("operator"), dict) else {}
+    payload = {
+        "version": 2,
+        "description": "Runtime VM autobuilder state. Gitignored; SSH/status is authoritative.",
+        "as_of": str(status.get("as_of") or _utc_now()),
+        "phase": phase,
+        "verdict": str(status.get("verdict") or "").strip(),
+        "chapter_name": operator.get("chapter_name"),
+        "phase_plan_path": operator.get("phase_plan_path"),
+        "recommended_action": status.get("recommended_action"),
+    }
+    path = mirror_path(repo)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 def _heartbeat_publish_due(
     payload: dict[str, Any],
     prior: dict[str, Any],
     *,
     fingerprint: str,
 ) -> bool:
-    phase = str(payload.get("phase") or "")
-    if phase not in IN_FLIGHT_PHASES:
-        return False
-    last_ok = prior.get("last_publish_ok")
-    if last_ok is False:
-        return True
-    last_at = _parse_utc(str(prior.get("last_publish_at") or ""))
-    if last_at is None:
-        return True
-    elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
-    if elapsed >= MIRROR_HEARTBEAT_PUBLISH_SECONDS:
-        return True
-    if str(prior.get("fingerprint") or "") != fingerprint:
-        return True
+    """Compatibility helper: runtime heartbeats are never Git publication events."""
+    del payload, prior, fingerprint
     return False
 
 
 def maybe_commit_publish_vm_mirror(repo: Path, payload: dict[str, Any]) -> dict[str, Any]:
-    if not _is_loop_host(repo):
-        return {"skipped": True, "reason": "not_loop_host"}
-    from scripts.ppe_operator_config import autonomous_git_writes_enabled
-
-    if not autonomous_git_writes_enabled():
-        return {"skipped": True, "reason": "autonomous_git_writes_disabled"}
-
-    fp = _mirror_fingerprint(payload)
-    state_path = repo / MIRROR_PUBLISH_STATE_REL
-    prior: dict[str, Any] = {}
-    if state_path.is_file():
-        try:
-            prior = json.loads(state_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            prior = {}
-
-    heartbeat_due = _heartbeat_publish_due(payload, prior, fingerprint=fp)
-    if heartbeat_due:
-        payload = {**payload, "as_of": _utc_now()}
-    if fp == str(prior.get("fingerprint") or "") and not heartbeat_due:
-        last_at = _parse_utc(str(prior.get("last_publish_at") or ""))
-        if last_at is not None and prior.get("last_publish_ok") is not False:
-            elapsed = (datetime.now(timezone.utc) - last_at).total_seconds()
-            if elapsed < MIRROR_PUBLISH_COOLDOWN_SECONDS:
-                return {"skipped": True, "reason": "unchanged", "fingerprint": fp}
-
-    rel = VM_OPERATOR_PHASE_REL.replace("\\", "/")
-    mirror_file = mirror_path(repo)
-    if heartbeat_due and mirror_file.is_file():
-        mirror_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-
-    diff = _git(repo, "diff", "--name-only", "--", rel)
-    untracked = _git(repo, "ls-files", "--others", "--exclude-standard", "--", rel)
-    has_change = bool((diff.stdout or "").strip()) or bool((untracked.stdout or "").strip())
-    if not has_change:
-        if heartbeat_due:
-            mirror_file.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-            diff = _git(repo, "diff", "--name-only", "--", rel)
-            has_change = bool((diff.stdout or "").strip())
-        if not has_change:
-            return {"skipped": True, "reason": "no_git_diff", "fingerprint": fp, "heartbeat_due": heartbeat_due}
-
-    stage = _git(repo, "add", "--", rel)
-    if stage.returncode != 0:
-        return {"ok": False, "error": (stage.stderr or "git add failed").strip()}
-
-    phase = str(payload.get("phase") or "unknown")
-    commit = _git(repo, "commit", "-m", f"ops: vm phase mirror {phase}")
-    if commit.returncode != 0:
-        err = (commit.stderr or commit.stdout or "").strip()
-        if "nothing to commit" in err.lower():
-            return {"skipped": True, "reason": "nothing_to_commit"}
-        return {"ok": False, "error": err}
-
-    publish: dict[str, Any] = {"skipped": True, "reason": "publish_disabled"}
-    publish_ok = False
-    try:
-        from scripts.ppe_operator_git_sync import publish_vm_mirror_ahead
-
-        publish = publish_vm_mirror_ahead(repo, phase=phase)
-        publish_ok = bool(publish.get("ok"))
-        pr_url = str(publish.get("pr_url") or "").strip()
-        if publish_ok and pr_url:
-            _maybe_notify_mirror_pr_opened(repo, phase=phase, pr_url=pr_url)
-        if publish_ok:
-            try:
-                from scripts.ppe_operator_git_sync import close_conflicting_mirror_prs
-
-                close_conflicting_mirror_prs(repo)
-            except Exception:
-                pass
-    except Exception as exc:
-        publish = {"ok": False, "error": str(exc)}
-
-    state_path.parent.mkdir(parents=True, exist_ok=True)
-    state_path.write_text(
-        json.dumps(
-            {
-                "fingerprint": fp,
-                "last_publish_at": _utc_now(),
-                "last_publish_ok": publish_ok,
-                "phase": phase,
-                "heartbeat_due": heartbeat_due,
-                "publish": publish,
-            },
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    return {
-        "ok": publish_ok or bool(commit.returncode == 0),
-        "fingerprint": fp,
-        "commit": True,
-        "publish": publish,
-        "heartbeat_due": heartbeat_due,
-    }
-
-
-def _maybe_notify_mirror_pr_opened(repo: Path, *, phase: str, pr_url: str) -> bool:
-    state_path = repo / "artifacts/control_plane/VM_MIRROR_PR_NOTIFY.json"
-    prior: dict[str, Any] = {}
-    if state_path.is_file():
-        try:
-            prior = json.loads(state_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            prior = {}
-    if str(prior.get("pr_url") or "") == pr_url:
-        return False
-    title = f"PPE VM mirror PR: {phase.replace('_', ' ')}"
-    body = f"Loop host published phase mirror — desktop: git pull origin main after merge.\n{pr_url}"
-    try:
-        from scripts.ppe_notify_push import send_ntfy
-
-        sent = send_ntfy(title, body, priority="low", tags=["mirror", "pr"], click_url=pr_url)
-    except Exception:
-        return False
-    if sent:
-        state_path.parent.mkdir(parents=True, exist_ok=True)
-        state_path.write_text(
-            json.dumps({"pr_url": pr_url, "phase": phase, "notified_at": _utc_now()}, indent=2) + "\n",
-            encoding="utf-8",
-        )
-    return sent
+    """Compatibility shim. Runtime state must never enter Git history."""
+    del repo, payload
+    return {"skipped": True, "reason": "runtime_state_not_publishable"}
 
 
 def _load_notify_state(repo: Path) -> dict[str, Any]:
-    path = notify_state_path(repo)
-    if not path.is_file():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return data if isinstance(data, dict) else {}
+    return _read_json(notify_state_path(repo)) or {}
 
 
 def _save_notify_state(repo: Path, state: dict[str, Any]) -> None:
@@ -332,8 +188,10 @@ def maybe_notify_in_flight_phase(repo: Path, status: dict[str, Any]) -> bool:
     try:
         from scripts.ppe_notify_push import send_ntfy
 
-        send_ntfy(title=title, body=body, priority="low", tags=["hourglass_flowing_sand"])
+        sent = send_ntfy(title=title, body=body, priority="low", tags=["hourglass_flowing_sand"])
     except Exception:
+        return False
+    if sent is False:
         return False
 
     _save_notify_state(
@@ -349,14 +207,7 @@ def maybe_notify_in_flight_phase(repo: Path, status: dict[str, Any]) -> bool:
 
 
 def _load_in_flight_since(repo: Path) -> dict[str, Any]:
-    path = in_flight_since_path(repo)
-    if not path.is_file():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return data if isinstance(data, dict) else {}
+    return _read_json(in_flight_since_path(repo)) or {}
 
 
 def _save_in_flight_since(repo: Path, state: dict[str, Any]) -> None:
@@ -410,12 +261,7 @@ def maybe_notify_stuck_in_flight(
     chapter = str(operator.get("chapter_name") or operator.get("phase_plan_path") or "relay").strip()
     fingerprint = f"stuck|{phase}|{chapter}"
     stuck_path = stuck_notify_state_path(repo)
-    prior: dict[str, Any] = {}
-    if stuck_path.is_file():
-        try:
-            prior = json.loads(stuck_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            prior = {}
+    prior = _read_json(stuck_path) or {}
     if fingerprint == str(prior.get("fingerprint") or ""):
         return False
 
@@ -428,7 +274,7 @@ def maybe_notify_stuck_in_flight(
     try:
         from scripts.ppe_notify_push import ntfy_topic_stuck, send_ntfy_to_topic
 
-        send_ntfy_to_topic(
+        sent = send_ntfy_to_topic(
             ntfy_topic_stuck(),
             title=title,
             body=body,
@@ -436,6 +282,8 @@ def maybe_notify_stuck_in_flight(
             tags=["warning", "rotating_light", "stuck"],
         )
     except Exception:
+        return False
+    if sent is False:
         return False
 
     stuck_path.parent.mkdir(parents=True, exist_ok=True)
@@ -456,15 +304,8 @@ def maybe_notify_stuck_in_flight(
 
 
 def sync_autobuilder_phase_artifacts(repo: Path, status: dict[str, Any]) -> dict[str, Any]:
-    from scripts.ppe_operator_config import autonomous_git_writes_enabled
-
-    if autonomous_git_writes_enabled():
-        mirror = write_vm_phase_mirror(repo, status)
-        payload = load_vm_phase_mirror(repo) or {}
-        publish = maybe_commit_publish_vm_mirror(repo, payload) if mirror else {"skipped": True}
-    else:
-        mirror = None
-        publish = {"skipped": True, "reason": "autonomous_git_writes_disabled"}
+    mirror = write_vm_phase_mirror(repo, status)
+    publish = {"skipped": True, "reason": "runtime_state_not_publishable"}
     notified = maybe_notify_in_flight_phase(repo, status)
     track_in_flight_since(repo, status)
     stuck_notified = maybe_notify_stuck_in_flight(repo, status)
@@ -479,8 +320,7 @@ def sync_autobuilder_phase_artifacts(repo: Path, status: dict[str, Any]) -> dict
             "chapter_name": operator.get("chapter_name"),
             "supply": operator.get("supply") or {},
         }
-        ft = assess_factory_throughput(repo, light_status)
-        auto_advance = maybe_auto_advance_stuck(repo, ft)
+        auto_advance = maybe_auto_advance_stuck(repo, assess_factory_throughput(repo, light_status))
     except Exception:
         pass
     return {
