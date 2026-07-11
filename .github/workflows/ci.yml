@@ -102,10 +102,24 @@ jobs:
           PYTHONPATH: .
 
       - name: Run tests (parallel, excluding slow)
-        run: python -m pytest -q -n auto -m "not slow"
+        run: |
+          set -o pipefail
+          python -m pytest -q -n auto -m "not slow" --tb=short > /tmp/pytest-fast.log 2>&1 || {
+            echo "Fast-test failure tail:"
+            tail -200 /tmp/pytest-fast.log
+            exit 1
+          }
+          tail -20 /tmp/pytest-fast.log
 
       - name: Run slow tests (serial)
-        run: python -m pytest -q -m slow
+        run: |
+          set -o pipefail
+          python -m pytest -q -m slow --tb=short > /tmp/pytest-slow.log 2>&1 || {
+            echo "Slow-test failure tail:"
+            tail -200 /tmp/pytest-slow.log
+            exit 1
+          }
+          tail -20 /tmp/pytest-slow.log
 
   msos_web_build:
     needs: changes
