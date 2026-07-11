@@ -2,7 +2,7 @@
   "version": 1,
   "profile": "local",
   "enabled": true,
-  "notes": "No API credits: deterministic relay; product BUILD prefers Codex CLI headless (ideHandoff.buildWorker=codex). Cursor CLI/IDE reserved for exceptions. Run verify_build_worker.cmd + verify_codex.cmd. See PPE_NEAR_ZERO_API_OPERATOR_V1.md.",
+  "notes": "No API credits: deterministic relay; product BUILD prefers Codex CLI headless (ideHandoff.buildWorker=codex). Cursor CLI/IDE reserved for exceptions. Autonomous Git writes are disabled by default; publish intentionally from a bounded chapter branch. Run verify_build_worker.cmd + verify_codex.cmd. See PPE_NEAR_ZERO_API_OPERATOR_V1.md.",
   "propagateBacklog": true,
   "focusGate": false,
   "stewardCharter": false,
@@ -11,16 +11,16 @@
   "continuousMax": 20,
   "loopWhenIdle": true,
   "idleSleepSeconds": 120,
-    "gitSync": {
+  "gitSync": {
     "enabled": true,
     "pullEachPass": true,
-    "publishEachPass": true,
-    "mergeEachPass": true,
+    "publishEachPass": false,
+    "mergeEachPass": false,
     "retargetStackedPrs": true,
     "pullBranch": "main",
     "checkoutMainWhenOpsBranch": true,
-    "pushAfterCommit": true,
-    "openPrOnPush": true
+    "pushAfterCommit": false,
+    "openPrOnPush": false
   },
   "guards": {
     "enabled": true,
