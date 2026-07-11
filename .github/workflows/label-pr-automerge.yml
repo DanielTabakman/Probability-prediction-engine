@@ -1,10 +1,10 @@
-# Applies label `automerge` so merge-on-green.yml can merge after CI — no manual label click.
-# Same-repo heads only; skips drafts until ready_for_review.
+# Applies `automerge` only when a PR explicitly opts in with a body marker.
+# Normal chapter and agent PRs remain reviewable and never receive this label automatically.
 name: Label PR automerge
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, reopened, edited, ready_for_review]
     branches: [main]
 
 permissions:
@@ -22,14 +22,19 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const pr = context.payload.pull_request;
+            const marker = '<!-- ppe-automerge: true -->';
 
             if (pr.draft) {
-              core.info('Draft PR; skip automerge label until ready_for_review');
+              core.info('Draft PR; skip automerge label');
               return;
             }
             const headFull = pr.head.repo.full_name;
             if (headFull !== `${owner}/${repo}`) {
               core.info(`Fork or foreign head (${headFull}); skip automerge label`);
+              return;
+            }
+            if (!(pr.body || '').includes(marker)) {
+              core.info(`PR #${pr.number} has no explicit ${marker} marker; skip automerge label`);
               return;
             }
 
@@ -42,9 +47,8 @@ jobs:
                 repo,
                 name: 'automerge',
                 color: '0E8A16',
-                description: 'Merge on green: squash-merge when CI passes',
+                description: 'Explicit opt-in: squash-merge only after green CI',
               });
-              core.info('Created label automerge');
             }
 
             await github.rest.issues.addLabels({
@@ -53,4 +57,4 @@ jobs:
               issue_number: pr.number,
               labels: ['automerge'],
             });
-            core.notice(`Added automerge to PR #${pr.number}`);
+            core.notice(`Added explicit automerge label to PR #${pr.number}`);
