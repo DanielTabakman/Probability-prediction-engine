@@ -1,0 +1,100 @@
+version: 1
+
+status: draft
+project:
+  id: msos
+  repository: DanielTabakman/Probability-prediction-engine
+  default_branch: main
+
+workspace:
+  isolation: worktree_or_clone
+  shared_mutable_checkout: false
+
+layers:
+  msos-shell:
+    allowed_paths:
+      - apps/msos-web/**
+    forbidden_paths:
+      - src/engine/**
+      - src/data/**
+      - src/models/**
+      - src/viz/**
+  ppe-ui:
+    allowed_paths:
+      - src/viz/**
+    forbidden_paths:
+      - apps/msos-web/**
+  ppe-core:
+    allowed_paths:
+      - src/engine/**
+      - src/data/**
+      - src/models/**
+    forbidden_paths:
+      - apps/msos-web/**
+      - src/viz/**
+  platform:
+    allowed_paths:
+      - .github/**
+      - caddy/**
+      - Caddyfile
+      - docker-compose.yml
+      - docs/DEPLOY/**
+  product-canon:
+    allowed_paths:
+      - docs/VISION/**
+  dev-factory-transition:
+    allowed_paths:
+      - scripts/**
+      - docs/SOP/**
+      - tests/**
+      - "*.cmd"
+    status: migration_only
+
+validation:
+  commands:
+    fast:
+      command: python scripts/run_pushable_gate.py
+    full:
+      command: python scripts/run_pushable_gate.py --pre-push
+    msos-web:
+      command: python scripts/verify_msos_web_build.py
+    ppe-ui-smoke:
+      command: python scripts/run_implied_lab_ui_smoke.py
+  selection_policy: changed_paths_and_layer
+
+publication:
+  branch_pattern: chapter/{chapter_id}
+  max_open_prs_per_chapter: 1
+  direct_main_writes: false
+  explicit_merge_authorization: true
+  runtime_only_paths_rejected: true
+
+runtime_only_paths:
+  - artifacts/**
+  - .env
+  - "*.sqlite3"
+  - "*.db"
+  - _worktrees/**
+
+lanes:
+  require_unique_lane_id: true
+  require_unique_workspace: true
+  require_lease: true
+  require_declared_ownership: true
+  overlap_policy: explicit_integration_lane
+  max_publishers: 1
+
+workers:
+  selection_fields:
+    - capabilities
+    - cost_class
+    - concurrency
+    - timeout_seconds
+    - operating_system
+  reference_backend: local_codex
+
+safety:
+  old_writer_must_lose_write_credentials_before_cutover: true
+  shadow_mode_must_be_read_only: true
+  rollback_required: true
+  product_business_module_imports_allowed: false
