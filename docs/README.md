@@ -7,6 +7,9 @@ Start here when navigating the Probability Prediction Engine repo.
 | Role | Path |
 |------|------|
 | **ChatGPT + GitHub + Codex operating contract** | [`SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md) — GitHub SSOT, thread routing, task handoffs, and mandatory agent disagreement protocol |
+| **Autobuilder strategic thesis** | [`SOP/AUTOBUILDER_THESIS_AND_OPERATING_MODEL_V1.md`](SOP/AUTOBUILDER_THESIS_AND_OPERATING_MODEL_V1.md) — core internal product, technical-founder function, operating principles, and anti-regression instruction |
+| **Autobuilder accepted decision** | [`SOP/AUTOBUILDER_CORE_INTERNAL_PRODUCT_DECISION_V1.md`](SOP/AUTOBUILDER_CORE_INTERNAL_PRODUCT_DECISION_V1.md) — decision, alternatives, accepted costs, guardrails, and reconsideration triggers |
+| **Autobuilder leverage scorecard** | [`SOP/AUTOBUILDER_LEVERAGE_SCORECARD_V1.md`](SOP/AUTOBUILDER_LEVERAGE_SCORECARD_V1.md) — validated output, founder attention, compute cost, rescue, rework, and review cadence |
 | **Integrated one-pager** | [`SOP/PPE_INTEGRATED_STATUS.md`](SOP/PPE_INTEGRATED_STATUS.md) |
 | **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) (MVP1 engine) · [`SOP/MSOS_FRONTIER.md`](SOP/MSOS_FRONTIER.md) (MSOS website) |
 | **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
