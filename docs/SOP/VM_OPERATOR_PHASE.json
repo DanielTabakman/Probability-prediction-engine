@@ -1,10 +1,10 @@
 {
   "version": 1,
   "description": "Git-tracked VM autobuilder phase mirror \u2014 loop host writes on phase change; desktop reads via git pull.",
-  "as_of": "2026-07-11T18:36:57Z",
-  "phase": "RUN_LOCAL_PENDING",
-  "verdict": "RUN_LOCAL",
+  "as_of": "2026-07-11T18:38:12Z",
+  "phase": "HEALTHY_IDLE",
+  "verdict": "SUPPLY_LOW",
   "chapter_name": "PPE_hyperliquid_perp_rail_v1 (HYPE perp exposure path \u2014 Hyperliquid read-only)",
   "phase_plan_path": "docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json",
-  "recommended_action": "run-local"
+  "recommended_action": "status"
 }
