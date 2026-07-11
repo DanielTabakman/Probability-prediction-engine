@@ -2,8 +2,14 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-11
+
+_No merges to `main`._
+
 ## 2026-07-10
 
+- `98368d1d` — control-plane: lease ship (docs) (#5268) (`docs/SOP/`)
+- `624cb901` — Control-plane: dev changelog
 - `d6e4cb12` — Control-plane: dev changelog
 - `fcac69ad` — Control-plane: dev changelog
 - `eda100a4` — Control-plane: dev changelog
