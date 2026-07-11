@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-11
 
+- `72f4e3b3` — Control-plane: make Autobuilder Git writes fail closed (`scripts/`)
+- `95606eea` — Control-plane: dev changelog
 - `5d8710cb` — Control-plane: stop Autobuilder GitHub churn (`docs/SOP/`)
 - `56e69d35` — ops: vm phase mirror CLOSEOUT_PENDING (#5280) (`docs/SOP/`)
 - `9b4643ce` — Control-plane: dev changelog
