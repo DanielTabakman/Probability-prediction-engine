@@ -1,8 +1,8 @@
 {
-  "phasePlanPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
-  "sprintSpecPath": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
-  "selectionRecord": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
-  "status": "READY",
-  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",
+  "phasePlanPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+  "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+  "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+  "status": "RUNNING",
+  "notes": "auto-selected from docs/SOP/PHASE_QUEUE.json: [MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO",
   "workerMode": "deterministic"
 }
