@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-11
 
-_No merges to `main`._
+- `86e9c3c5` — Control plane: ChatGPT + GitHub + Codex coordination (`docs/SOP/`)
+- `d375ec62` — Control-plane: dev changelog
 
 ## 2026-07-10
 
