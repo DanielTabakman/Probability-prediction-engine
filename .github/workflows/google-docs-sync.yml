@@ -1,19 +1,18 @@
-name: Google Docs sync
+name: Google Docs manual sync (legacy fallback)
 
+# GitHub is the canonical control plane. This workflow is retained only for
+# deliberate archival/export fallback and must not run on a schedule.
 on:
   workflow_dispatch:
     inputs:
       sync_master_to_repo:
-        description: "Sync PPE Master Google Doc into repo docs/VISION/PPE_MASTER_MVP1.md"
+        description: "Legacy fallback: import PPE Master Google Doc into repo"
         required: true
-        default: "true"
+        default: "false"
       sync_repo_to_mirror:
-        description: "Sync repo MSOS snapshot into MSOS mirror Google Doc marker block"
+        description: "Legacy fallback: export repo MSOS snapshot to Google Doc mirror"
         required: true
-        default: "true"
-  schedule:
-    # Daily 13:15 UTC (adjust as needed).
-    - cron: "15 13 * * *"
+        default: "false"
 
 permissions:
   contents: write
@@ -33,7 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Sync Google Docs
+      - name: Sync Google Docs manually
         env:
           PPE_MASTER_DOC_ID: ${{ secrets.PPE_MASTER_DOC_ID }}
           PPE_MSOS_MIRROR_DOC_ID: ${{ secrets.PPE_MSOS_MIRROR_DOC_ID }}
@@ -41,13 +40,17 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
         run: |
-          python scripts/sync_msos_repo_truth.py
           ARGS="--write-report"
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.sync_master_to_repo }}" = "true" ]; then
+          if [ "${{ inputs.sync_master_to_repo }}" = "true" ]; then
             ARGS="$ARGS --sync-master-to-repo"
           fi
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.sync_repo_to_mirror }}" = "true" ]; then
+          if [ "${{ inputs.sync_repo_to_mirror }}" = "true" ]; then
+            python scripts/sync_msos_repo_truth.py
             ARGS="$ARGS --sync-repo-to-mirror"
+          fi
+          if [ "$ARGS" = "--write-report" ]; then
+            echo "No sync direction selected; exiting without changes."
+            exit 0
           fi
           python scripts/google_docs_sync.py $ARGS
 
@@ -58,13 +61,14 @@ jobs:
           git status --porcelain
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "Control-plane: sync Google Docs"
+            git commit -m "Control-plane: manual legacy Google Docs sync"
             git push
           else
             echo "No changes to commit."
           fi
 
-      - name: Verify Live Mirror timestamp is fresh
+      - name: Verify Live Mirror timestamp when exported
+        if: ${{ inputs.sync_repo_to_mirror == 'true' }}
         env:
           PPE_MSOS_MIRROR_DOC_ID: ${{ secrets.PPE_MSOS_MIRROR_DOC_ID }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -72,4 +76,3 @@ jobs:
           GOOGLE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_OAUTH_REFRESH_TOKEN }}
           PYTHONPATH: .
         run: python scripts/verify_msos_mirror_timestamp.py --max-age-hours 24
-
