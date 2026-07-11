@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-11
 
+- `5d8710cb` — Control-plane: stop Autobuilder GitHub churn (`docs/SOP/`)
+- `56e69d35` — ops: vm phase mirror CLOSEOUT_PENDING (#5280) (`docs/SOP/`)
+- `9b4643ce` — Control-plane: dev changelog
 - `86e9c3c5` — Control plane: ChatGPT + GitHub + Codex coordination (`docs/SOP/`)
 - `d375ec62` — Control-plane: dev changelog
 
