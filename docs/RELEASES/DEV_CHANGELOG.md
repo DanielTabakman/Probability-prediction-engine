@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-12
+
+_No merges to `main`._
+
 ## 2026-07-11
 
+- `1d7097be` — Control-plane: dev changelog
 - `7e716743` — Charter Autobuilder extraction v1 (`docs/SOP/`)
 - `56d0d1f1` — Fix Windows Autobuilder maintenance wrappers (#5347)
 - `6c10e15f` — Control-plane: dev changelog
