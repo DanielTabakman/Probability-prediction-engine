@@ -2,16 +2,19 @@
 
 **Purpose:** Strategic umbrella for MSOS + PPE ownership, integration boundaries, and scope guards. Operational waterfall and relay detail live elsewhere — this doc is the **why** and **who owns what**.
 
-**As-of:** 2026-06-20 · **Precedence:** When scope or ownership conflicts, this charter wins over ad-hoc BUILD rationale until steward SELECTION says otherwise.
+**As-of:** 2026-07-13 · **Precedence:** When scope or ownership conflicts, this charter wins over ad-hoc BUILD rationale until steward SELECTION says otherwise.
+
+**Company destination:** [`MSOS_COMPANY_VISION_V1.md`](../VISION/MSOS/MSOS_COMPANY_VISION_V1.md) defines the long-term environment, customer, product loop, and expansion logic. It is a north star, **not authority to pull future phases into the active queue**.
 
 **Related (do not duplicate):**
 
 | Doc | Role |
 |-----|------|
+| [`MSOS_COMPANY_VISION_V1.md`](../VISION/MSOS/MSOS_COMPANY_VISION_V1.md) | Long-term company thesis, complete decision loop, expansion sequence, and anti-bloat doctrine |
 | [`MSOS_WEBSITE_PROGRAM.md`](MSOS_WEBSITE_PROGRAM.md) | P0–P8 waterfall + storyboard gates |
 | [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) | Phased BUILD queue + MCD vs post-MCD tracks |
 | [`MINIMUM_CREDIBLE_DEMO_GATE_V1.md`](MINIMUM_CREDIBLE_DEMO_GATE_V1.md) | Product milestone gate |
-| [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Post-MCD research ops |
+| [`TRADER_WORKFLOW_RESEARCH_V1.md`](TRADER_WORKFLOW_RESEARCH_V1.md) | Workflow observation, import, and learning ops |
 | [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) | Path/layer presets |
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Future interaction-mode ontology (not build scope) |
@@ -26,8 +29,11 @@
 
 - It should look and feel like a credible platform.
 - It should be architected so it can evolve into a broader platform later.
-- **Active scope is narrow:** MSOS exists to hold PPE and deliver a smooth **thesis → market-implied probability → disagreement → expression → save/review** workflow.
+- **Long-term loop:** observe → understand → form a view → choose a strategy → execute → monitor → learn.
+- **Active scope is narrow:** MSOS exists to hold PPE and deliver a smooth **market understanding → thesis → market-implied probability → disagreement → expression → save/review** workflow.
 - **Three product pillars:** **workflow** (trader process), **edge** (find/test dislocations — simulation only), **legibility** (honest readable market structure). **Market relationship** (disagreement today; more modes later) lives inside workflow — see module registry.
+
+The initial target is an **emerging serious trader or very small team** that understands basic markets but cannot yet assemble institutional-quality research, strategy construction, risk analysis, and workflow. Do not redesign the MCD as a complete-beginner education product or an institutional procurement product.
 
 **PPE** is the **first real product module** inside MSOS — not a separate product the user must leave MSOS to use.
 
@@ -94,7 +100,10 @@ After MCD passes → primary focus shifts to [`TRADER_WORKFLOW_RESEARCH_V1.md`](
 
 ## Future-platform readiness
 
-- Preserve architecture that can host more modules later (shell, workflow store, entitlement hooks).
+- Preserve architecture that can host more modules later (shell, shared workflow/decision objects, workflow store, entitlement hooks).
+- Research broad trader workflows now when cheap; do not convert broad research into broad BUILD scope without strong evidence and explicit SELECTION.
+- New tools should usually become views and operations on shared objects rather than isolated mini-apps, duplicate state, or duplicate math.
+- Use the hierarchy **integrate → clone and simplify → build deeply → avoid/defer** from the company vision.
 - Do **not** expand active platform scope (new asset classes, execution, AI chat, broad commercial plumbing) unless **explicitly SELECTION'd**.
 
 ---
@@ -107,6 +116,7 @@ Unless steward **SELECTION** says otherwise:
 - Live execution / order routing
 - AI chat / auto trade recommendations
 - Broad platform expansion (multi-product marketplace)
+- Certification or career ecosystem work
 - Excessive commercial plumbing (Stripe, entitlements automation) before MCD + workflow signal
 
 Chartered post-MCD chapters remain in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_LIVE_PRODUCT_SEQUENCE_V1.md) — **deferred**, not deleted.
@@ -116,14 +126,15 @@ Chartered post-MCD chapters remain in [`MSOS_LIVE_PRODUCT_SEQUENCE_V1.md`](MSOS_
 ## Doc precedence (scope decisions)
 
 ```
-BACKPLANE (this doc)
+COMPANY VISION (destination; no BUILD authority)
+  → BACKPLANE (this doc)
   → MINIMUM_CREDIBLE_DEMO_GATE
   → TRADER_WORKFLOW_RESEARCH
   → MSOS_FRONTIER (BUILD order for automation)
   → MSOS_LIVE_PRODUCT_SEQUENCE (post-MCD phases deferred unless selected)
 ```
 
-When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins for relay automation. When they disagree on **whether to widen scope**, this charter wins.
+When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins for relay automation. When they disagree on **whether to widen scope**, this charter wins. The company vision explains where MSOS may go but cannot override either guard.
 
 ---
 
@@ -134,3 +145,4 @@ When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins fo
 | 2026-06-20 | v1 — platform-shaped shell, PPE module, MCD, disagreement grammar |
 | 2026-06-20 | Link interaction-mode ontology doc (vision; not build scope) |
 | 2026-06-29 | Link MSOS UX design philosophy for user-facing modules |
+| 2026-07-13 | Harden company destination, complete decision loop, initial customer, workflow import, shared-object, and anti-scope-pull rules |
