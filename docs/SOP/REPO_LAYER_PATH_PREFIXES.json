@@ -40,7 +40,7 @@
     "ppe-core": {
       "label": "C — PPE engine",
       "description": "Math, fetchers, schemas; no Streamlit imports.",
-      "primary_paths": ["src/engine/", "src/data/", "src/models/"],
+      "primary_paths": ["src/engine/", "src/data/", "src/models/", "src/msos_autobuilder/"],
       "related_paths": ["config/"]
     },
     "dev-factory": {
@@ -359,6 +359,7 @@
         "src/engine/",
         "src/data/",
         "src/models/",
+        "src/msos_autobuilder/",
         "config/",
         "tests/test_"
       ],
@@ -391,6 +392,7 @@
         "tests/test_manifest_",
         "tests/test_canonical_docs",
         "tests/test_msos_module_map_operator_sections.py",
+        "tests/test_msos_autobuilder_staged_task_transport.py",
         "tests/test_ppe_operator_compass.py",
         "tests/test_ppe_dev_changelog.py",
         "tests/test_ppe_weekly_digest.py",
