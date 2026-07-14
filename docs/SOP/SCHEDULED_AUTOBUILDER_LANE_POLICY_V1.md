@@ -10,7 +10,7 @@
 
 The scheduled Autobuilder uses **continuous capacity scheduling**, not blind clock-based launches.
 
-The founder sets a desired number of active build-worker slots. While automatic mode is enabled, the system may refill empty slots from already accepted, registered, implementation-ready work. It may not invent product scope, resolve founder decisions, bypass dependencies, or call queued work running.
+The founder sets a desired number of active build-worker slots. While automatic mode is enabled, the system may refill empty slots from already accepted, registered, schedule-ready work. It may not invent product scope, resolve founder decisions, bypass dependencies, or call queued work running.
 
 The initial production target is **two Codex write-worker slots across the whole portfolio**, reached only through staged witnesses:
 
@@ -121,12 +121,10 @@ Parallel worker scheduler and isolated workspaces
 Relay → candidate gate → bounded revision → controlled draft publisher
 ```
 
-Ownership is split deliberately:
-
 ### PPE control plane owns
 
 - founder command semantics;
-- pipeline registration;
+- pipeline registration and scheduling eligibility;
 - accepted priorities and deadlines;
 - native-to-founder status normalization;
 - work-item readiness;
@@ -178,20 +176,12 @@ Each scheduled work item requires:
 - acceptance criteria;
 - validation or evidence requirements;
 - authority and publication boundary;
-- current `READY_TO_BUILD` evidence.
+- current `READY_TO_BUILD` evidence;
+- a pipeline currently marked `SCHEDULE_READY`.
 
 Compatible work items may be grouped into one execution batch when the installed host requires a multi-lane manifest. Grouping is an implementation optimization only.
 
-A batch must not erase independent:
-
-- work-item identity;
-- success or failure state;
-- retry/revision limits;
-- evidence;
-- review status;
-- publication outcome.
-
-A failed lane must not make unrelated completed lanes disappear. A batch must not become a giant cross-project all-or-nothing unit.
+A batch must not erase independent work-item identity, success or failure state, retry limits, evidence, review status, or publication outcome. A failed lane must not make unrelated completed lanes disappear.
 
 ## Selection policy
 
@@ -216,7 +206,7 @@ The selection record must state why the chosen item ranked above other eligible 
 The following are excluded:
 
 - unregistered pipelines;
-- pipelines below `EXECUTION_READY`;
+- pipelines below `SCHEDULE_READY`;
 - stale or missing runtime evidence;
 - `AWAITING_FOUNDER` items;
 - blocked dependencies;
@@ -251,7 +241,7 @@ On each reconciliation:
 2. refresh pipeline registry and native status;
 3. read actual worker, queue, gate, review, and publisher state;
 4. calculate available build capacity;
-5. apply exclusions and backpressure;
+5. apply schedule-readiness exclusions and backpressure;
 6. rank eligible work;
 7. dispatch only enough work to fill safe capacity;
 8. record the decision and evidence;
@@ -309,9 +299,7 @@ After the revision limit is exhausted:
 4. continue unrelated safe work;
 5. notify Daniel only when the failure is meaningful or requires a decision.
 
-Repeated failures are evidence about design. The controller must not create endless retries, flags, bypasses, or rewritten job IDs.
-
-Interrupted work is archived according to the host recovery contract and must not be silently rerun without a new allowed decision.
+The controller must not create endless retries, bypasses, or rewritten job IDs. Interrupted work follows the host recovery contract and is not silently rerun.
 
 ## Shared interfaces and parallel work
 
@@ -333,13 +321,7 @@ Context windows are independent. Shared truth must exist in GitHub and the sourc
 
 Builds may run concurrently. Publication remains serialized per target repository.
 
-The controlled publisher remains the only writer for its configured product target and retains no authority to:
-
-- write product `main`;
-- force-push;
-- mark a PR ready;
-- add automerge authority;
-- merge.
+The controlled publisher remains the only writer for its configured product target and retains no authority to write product `main`, force-push, mark a PR ready, add automerge authority, or merge.
 
 Multiple completed candidates may wait for publication or review. Each candidate is revalidated against current target state and fails closed on overlapping drift.
 
@@ -347,20 +329,13 @@ Multiple completed candidates may wait for publication or review. Each candidate
 
 Founder-required decisions block only affected work.
 
-Examples include:
-
-- product meaning or customer-facing behavior;
-- trading or wagering semantics;
-- materially different architecture or strategy;
-- legal, compliance, credential, spending, or destructive actions;
-- a change to definition of done;
-- a priority conflict not already resolved in canon.
+Examples include product meaning, trading or wagering semantics, materially different strategy, legal/compliance/credential/spending/destructive actions, definition-of-done changes, and unresolved priority conflicts.
 
 The scheduler may continue unrelated work with current authority. It may not infer a decision merely because a worker slot is empty.
 
 ## Autobuilder self-improvement
 
-Autobuilder infrastructure work may participate in scheduled selection when it is already accepted, bounded, execution-ready, and non-conflicting.
+Autobuilder infrastructure work may participate in scheduled selection when it is already accepted, bounded, schedule-ready, and non-conflicting.
 
 The following remain separate authority levels:
 
@@ -373,8 +348,6 @@ This policy authorizes the design and staged implementation of level 2 only.
 
 Level 3 remains governed by `DanielTabakman/msos-autobuilder#33`. Level 4 remains governed by the complete acceptance boundary of `DanielTabakman/msos-autobuilder#32` and its update-supervisor witnesses.
 
-Scheduled building must not silently expand autonomous self-improvement or deployment authority.
-
 ## Rollout and acceptance witnesses
 
 ### Phase 1 — read-only portfolio visibility
@@ -386,14 +359,16 @@ Scheduled building must not silently expand autonomous self-improvement or deplo
 
 ### Phase 2 — continuous single-slot refill
 
+- authorize a controlled experimental witness before final `SCHEDULE_READY` promotion;
 - implement durable policy state;
 - support `keep 1 running`, pause, and resume;
 - prove one real job refills without Daniel returning;
-- prove restart, backpressure, and fail-closed behavior.
+- prove restart, backpressure, and fail-closed behavior;
+- promote the witnessed pipeline/controller path to `SCHEDULE_READY`.
 
 ### Phase 3 — two same-repository lanes
 
-- run two disjoint PPE or equivalent lanes simultaneously;
+- run two disjoint lanes simultaneously under an explicit witness plan;
 - prove separate contexts, workspaces, ownership, evidence, and outcomes;
 - keep publication serialized.
 
@@ -404,7 +379,7 @@ Scheduled building must not silently expand autonomous self-improvement or deplo
 
 ### Phase 5 — continuous two-slot refill
 
-- enable `keep 2 running`;
+- enable `keep 2 running` only for witnessed schedule-ready pipelines;
 - complete one lane and refill exactly one free slot without disturbing the other;
 - prove queue and review backpressure;
 - prove pause/resume with active work.
