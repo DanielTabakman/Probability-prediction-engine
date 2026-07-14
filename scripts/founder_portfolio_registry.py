@@ -142,10 +142,17 @@ def validate_registry(repo: Path | None = None) -> list[str]:
                 errors.append(f"{owner}: external status adapter missing external_repo")
             if not str(status_adapter.get("external_root_env") or "").strip():
                 errors.append(f"{owner}: external status adapter missing external_root_env")
-        if build_adapter and build_adapter.get("dispatch_commands_enabled") is not False:
-            errors.append(f"{owner}: dispatch commands must be disabled in v1")
+        dispatch_enabled = build_adapter.get("dispatch_commands_enabled") is True if build_adapter else False
+        if dispatch_enabled:
+            dependency = str(build_adapter.get("accepted_dispatcher_dependency") or "")
+            if pid != "ppe":
+                errors.append(f"{owner}: only ppe may enable one-shot dispatch")
+            if dependency != "msos_autobuilder_build_next_dispatcher":
+                errors.append(f"{owner}: enabled dispatch must cite accepted Autobuilder dependency")
         if scheduling and scheduling.get("continuous_refill_eligible") is not False:
             errors.append(f"{owner}: continuous_refill_eligible must remain false in v1")
+        if pid != "ppe" and scheduling and scheduling.get("build_next_eligible") is True:
+            errors.append(f"{owner}: only ppe may be build-next eligible in this rollout")
         if authority and not str(authority.get("portfolio_registry_owner") or "").strip():
             errors.append(f"{owner}: missing portfolio_registry_owner")
 

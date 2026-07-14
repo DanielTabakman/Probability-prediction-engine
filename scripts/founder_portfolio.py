@@ -14,6 +14,7 @@ labels evidence quality in the founder-facing snapshot.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -29,11 +30,11 @@ from scripts.founder_portfolio_registry import load_registry, pipelines, validat
 
 COMMANDS = [
     ("what's next", "Read-only portfolio briefing across registered pipelines.", "what's next"),
-    ("build next", "Dispatch one safe ready item. Not implemented in this read-only v1.", "build next"),
-    ("build next <number>", "Fill up to N safe build slots once. Not implemented in this read-only v1.", "build next 2"),
-    ("keep <number> running", "Maintain continuous safe capacity. Not implemented in this read-only v1.", "keep 1 running"),
-    ("pause builds", "Pause automatic dispatch. Not implemented in this read-only v1.", "pause builds"),
-    ("resume builds", "Refresh state and resume prior capacity. Not implemented in this read-only v1.", "resume builds"),
+    ("build next", "Installed one-shot dispatch via Autobuilder after PPE prerequisite checks.", "build next"),
+    ("build next <number>", "Fill up to N safe build slots once. Disabled/unimplemented.", "build next 2"),
+    ("keep <number> running", "Maintain continuous safe capacity. Disabled/unimplemented.", "keep 1 running"),
+    ("pause builds", "Pause automatic dispatch. Disabled/unimplemented.", "pause builds"),
+    ("resume builds", "Refresh state and resume prior capacity. Disabled/unimplemented.", "resume builds"),
     ("what's running", "Read-only execution and capacity check-in.", "what's running"),
     ("commands", "Show founder command vocabulary.", "commands"),
     ("create pipeline <name>", "Start pipeline-registration workflow. Not implemented in this read-only v1.", "create pipeline txline"),
@@ -101,6 +102,26 @@ def _load_json(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     if not isinstance(data, dict):
         return None, "invalid: expected object"
     return data, None
+
+
+def _safe_rel(path: Any) -> str:
+    return str(path or "").strip().replace("\\", "/")
+
+
+def _sha256_file(path: Path) -> str | None:
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except OSError:
+        return None
+
+
+def _evidence_source_file(repo: Path, rel: str) -> dict[str, Any]:
+    path = repo / rel
+    digest = _sha256_file(path)
+    out: dict[str, Any] = {"path": rel, "exists": digest is not None}
+    if digest:
+        out["sha256"] = digest
+    return out
 
 
 def _file_evidence(
@@ -209,18 +230,243 @@ def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
         status = str(item.get("status") or "").strip().upper()
         if status != "READY":
             continue
-        out.append(
-            {
-                "work_item_id": Path(str(item.get("planPath") or "")).stem.replace("_relay", ""),
-                "title": str(item.get("reason") or item.get("planPath") or "").strip(),
-                "native_state": status,
-                "state": "READY_TO_BUILD",
-                "trace": str(item.get("planPath") or "").replace("\\", "/"),
-                "evidence": "manual",
-                "selection": _selection_metadata(item, age_index=index),
-            }
-        )
+        work = {
+            "work_item_id": Path(str(item.get("planPath") or "")).stem.replace("_relay", ""),
+            "title": str(item.get("reason") or item.get("planPath") or "").strip(),
+            "native_state": status,
+            "state": "READY_TO_BUILD",
+            "trace": _safe_rel(item.get("planPath")),
+            "evidence": "manual",
+            "selection": _selection_metadata(item, age_index=index),
+        }
+        packet = _native_prerequisites_for_ready_item(repo, item)
+        if packet is not None:
+            work["native_prerequisites"] = packet
+        out.append(work)
     return out
+
+
+def _native_prerequisites_for_ready_item(repo: Path, queue_item: dict[str, Any]) -> dict[str, Any] | None:
+    plan_rel = _safe_rel(queue_item.get("planPath"))
+    if not plan_rel:
+        return None
+    plan, plan_error = _load_json(repo / plan_rel)
+    slices = plan.get("slices") if isinstance(plan, dict) else None
+    if not isinstance(slices, list) or len(slices) < 2:
+        return None
+    source_rels = _prerequisite_source_rels(plan_rel, plan)
+    statuses = _native_slice_statuses(repo, plan_rel, plan, source_rels, plan_error)
+    source_files = [_evidence_source_file(repo, rel) for rel in source_rels]
+    identity_payload = {"source_files": source_files, "statuses": statuses}
+    identity = hashlib.sha256(
+        json.dumps(identity_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "read_only": True,
+        "source": "ppe_native_read_only",
+        "evidence": {
+            "source_files": source_files,
+            "identity": identity,
+            "as_of": _latest_source_mtime(repo, source_rels) or _utc_now(),
+        },
+        "statuses": statuses,
+    }
+
+
+def _prerequisite_source_rels(plan_rel: str, plan: dict[str, Any] | None) -> list[str]:
+    source_rels = [
+        "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+        "docs/SOP/PHASE_QUEUE.json",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+        "artifacts/orchestrator/ACTIVE_RUN.json",
+        "artifacts/orchestrator/OPERATOR_STATUS.md",
+        "artifacts/workflow_metrics/slices.jsonl",
+        plan_rel,
+    ]
+    if isinstance(plan, dict):
+        for key in ("selectionRecord", "sprintSpecPath"):
+            rel = _safe_rel(plan.get(key))
+            if rel:
+                source_rels.append(rel)
+        for raw_slice in plan.get("slices") or []:
+            if isinstance(raw_slice, dict) and isinstance(raw_slice.get("closeout"), dict):
+                evidence_doc = _safe_rel(raw_slice["closeout"].get("evidenceDoc"))
+                if evidence_doc:
+                    source_rels.append(evidence_doc)
+    return sorted(dict.fromkeys(source_rels))
+
+
+def _latest_source_mtime(repo: Path, source_rels: list[str]) -> str | None:
+    latest: datetime | None = None
+    for rel in source_rels:
+        path = repo / rel
+        if not path.is_file():
+            continue
+        mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).replace(microsecond=0)
+        latest = mtime if latest is None or mtime > latest else latest
+    return latest.isoformat().replace("+00:00", "Z") if latest else None
+
+
+def _native_slice_statuses(
+    repo: Path,
+    plan_rel: str,
+    plan: dict[str, Any] | None,
+    source_rels: list[str],
+    plan_error: str | None,
+) -> dict[str, dict[str, Any]]:
+    evidence_statuses = _evidence_doc_slice_statuses(repo, source_rels)
+    metrics_statuses = _workflow_metric_slice_statuses(repo)
+    non_blocking = _explicit_non_blocking_slices(plan or {})
+    statuses: dict[str, dict[str, Any]] = {}
+    for raw_slice in (plan or {}).get("slices") or []:
+        if not isinstance(raw_slice, dict):
+            continue
+        slice_id = str(raw_slice.get("sliceId") or "").strip()
+        if not slice_id:
+            continue
+        claims: list[dict[str, Any]] = []
+        if plan_error:
+            claims.append({"source": plan_rel, "state": "blocked", "detail": plan_error})
+        if slice_id in evidence_statuses:
+            claims.append(evidence_statuses[slice_id])
+        if slice_id in metrics_statuses:
+            claims.append(metrics_statuses[slice_id])
+        if slice_id in non_blocking:
+            claims.append(non_blocking[slice_id])
+        statuses[slice_id] = _resolve_native_slice_status(slice_id, claims)
+    return statuses
+
+
+def _evidence_doc_slice_statuses(repo: Path, source_rels: list[str]) -> dict[str, dict[str, Any]]:
+    statuses: dict[str, dict[str, Any]] = {}
+    for rel in source_rels:
+        if not rel.endswith("_EVIDENCE_STATUS.md"):
+            continue
+        path = repo / rel
+        if not path.is_file():
+            continue
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line.startswith("|") or "Slice" not in line:
+                continue
+            cells = [cell.strip(" `*") for cell in line.strip("|").split("|")]
+            if len(cells) < 2 or cells[0].lower() == "slice":
+                continue
+            slice_id = cells[0]
+            state = cells[1].lower().replace(" ", "_").replace("-", "_")
+            if not slice_id:
+                continue
+            statuses[slice_id] = {
+                "source": rel,
+                "state": state,
+                "detail": cells[2] if len(cells) > 2 else "",
+            }
+    return statuses
+
+
+def _workflow_metric_slice_statuses(repo: Path) -> dict[str, dict[str, Any]]:
+    path = repo / "artifacts/workflow_metrics/slices.jsonl"
+    statuses: dict[str, dict[str, Any]] = {}
+    if not path.is_file():
+        return statuses
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        if not raw_line.strip():
+            continue
+        try:
+            row = json.loads(raw_line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(row, dict):
+            continue
+        slice_id = str(row.get("slice_id") or row.get("sliceId") or "").strip()
+        if not slice_id:
+            continue
+        status = str(row.get("status") or "").strip().lower()
+        if status in {"closed", "complete", "completed"}:
+            state = "completed"
+        elif status in {"blocked", "failed"}:
+            state = "blocked"
+        elif status:
+            state = "pending"
+        else:
+            state = "pending"
+        statuses[slice_id] = {
+            "source": "artifacts/workflow_metrics/slices.jsonl",
+            "state": state,
+            "detail": f"workflow metric status={status or 'missing'} source={row.get('source') or 'unknown'}",
+        }
+    return statuses
+
+
+def _explicit_non_blocking_slices(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for raw_slice in plan.get("slices") or []:
+        if not isinstance(raw_slice, dict):
+            continue
+        slice_id = str(raw_slice.get("sliceId") or "").strip()
+        if not slice_id:
+            continue
+        flag = raw_slice.get("non_blocking") is True or raw_slice.get("nonBlocking") is True
+        status_text = str(raw_slice.get("prerequisiteStatus") or raw_slice.get("status") or "").lower()
+        if flag or status_text in {"non_blocking", "non-blocking", "not_required", "not required"}:
+            out[slice_id] = {
+                "source": "phase_plan",
+                "state": "non_blocking",
+                "detail": "phase plan explicitly marks slice prerequisite as non-blocking",
+            }
+    return out
+
+
+def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) -> dict[str, Any]:
+    complete_claims = [claim for claim in claims if claim["state"] in {"complete", "completed"}]
+    non_blocking_claims = [
+        claim for claim in claims if claim["state"] in {"non_blocking", "not_required", "not required"}
+    ]
+    blocking_claims = [claim for claim in claims if claim["state"] in {"blocked", "failed", "error"}]
+    pending_claims = [claim for claim in claims if claim["state"] in {"pending", "in_progress", "ready", "planned"}]
+    evidence = "; ".join(f"{claim['source']}: {claim['state']} ({claim.get('detail') or 'no detail'})" for claim in claims)
+    source_refs = [claim["source"] for claim in claims]
+    if non_blocking_claims and not blocking_claims:
+        return {
+            "status": "pending",
+            "non_blocking": True,
+            "evidence": evidence,
+            "source_refs": source_refs,
+        }
+    if complete_claims and not pending_claims and not blocking_claims:
+        return {
+            "status": "completed",
+            "non_blocking": False,
+            "evidence": evidence,
+            "source_refs": source_refs,
+        }
+    if complete_claims and (pending_claims or blocking_claims):
+        return {
+            "status": "blocked",
+            "non_blocking": False,
+            "evidence": f"conflicting native evidence for {slice_id}: {evidence}",
+            "source_refs": source_refs,
+        }
+    if blocking_claims:
+        return {
+            "status": "blocked",
+            "non_blocking": False,
+            "evidence": evidence,
+            "source_refs": source_refs,
+        }
+    if pending_claims:
+        return {
+            "status": "pending",
+            "non_blocking": False,
+            "evidence": evidence,
+            "source_refs": source_refs,
+        }
+    return {
+        "status": "pending",
+        "non_blocking": False,
+        "evidence": "no accepted PPE native completion or non-blocking evidence found",
+        "source_refs": source_refs,
+    }
 
 
 def _selection_metadata(item: dict[str, Any], *, age_index: int) -> dict[str, Any]:
@@ -829,7 +1075,12 @@ def _selection_explanation(pipe: dict[str, Any], work: dict[str, Any], rank: tup
 def format_commands() -> str:
     lines = ["Founder commands (read-only implementation status)", ""]
     for name, meaning, example in COMMANDS:
-        marker = "implemented read-only" if name in {"what's next", "what's running", "commands"} else "not implemented"
+        if name in {"what's next", "what's running", "commands"}:
+            marker = "implemented read-only"
+        elif name == "build next":
+            marker = "installed/enabled one-shot dispatch via Autobuilder; this help entrypoint remains read-only"
+        else:
+            marker = "disabled/unimplemented"
         lines.append(f"- {name}: {meaning} Example: `{example}` ({marker})")
     lines.append("")
     lines.append("Read-only v1 confirmation: this entrypoint never dispatches, enqueues, approves, repairs, or writes.")

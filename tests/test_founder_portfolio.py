@@ -37,6 +37,78 @@ def _minimal_repo(tmp_path: Path) -> Path:
     return tmp_path
 
 
+def _write_multislice_ready_repo(
+    repo: Path,
+    *,
+    control_status: str | None = None,
+    control_non_blocking: bool = False,
+) -> Path:
+    _write_json(
+        repo / "docs/SOP/PHASE_QUEUE.json",
+        {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/fixture_relay.json",
+                    "status": "READY",
+                    "reason": "[HIGH] Fixture",
+                }
+            ],
+        },
+    )
+    control_slice = {
+        "sliceId": "Fixture-Control-Slice001",
+        "layerPreset": "CONTROL",
+        "declaredPlane": "EVIDENCE-PLANE",
+        "buildBranch": "build/auto/control",
+    }
+    if control_non_blocking:
+        control_slice["nonBlocking"] = True
+    _write_json(
+        repo / "docs/SOP/PHASE_PLANS/fixture_relay.json",
+        {
+            "name": "fixture",
+            "sprintSpecPath": "docs/SOP/SPRINT_FIXTURE.md",
+            "selectionRecord": "docs/SOP/POST_FIXTURE_SELECTION.md",
+            "slices": [
+                control_slice,
+                {
+                    "sliceId": "Fixture-Product-Slice002",
+                    "layerPreset": "PPE_UI",
+                    "declaredPlane": "PRODUCT-PLANE",
+                    "buildBranch": "build/auto/product",
+                    "touchSet": ["src/viz/panel.py"],
+                },
+                {
+                    "sliceId": "Fixture-Closeout-Slice003",
+                    "layerPreset": "CONTROL",
+                    "declaredPlane": "EVIDENCE-PLANE",
+                    "buildBranch": "build/auto/closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/FIXTURE_EVIDENCE_STATUS.md"},
+                },
+            ],
+        },
+    )
+    (repo / "docs/SOP/SPRINT_FIXTURE.md").write_text("# sprint\n", encoding="utf-8")
+    (repo / "docs/SOP/POST_FIXTURE_SELECTION.md").write_text("# selection\n", encoding="utf-8")
+    if control_status is not None:
+        (repo / "docs/SOP/FIXTURE_EVIDENCE_STATUS.md").write_text(
+            "\n".join(
+                [
+                    "# Fixture evidence",
+                    "",
+                    "| Slice | Status | Notes |",
+                    "|---|---|---|",
+                    f"| Fixture-Control-Slice001 | {control_status} | control witness |",
+                    "| Fixture-Product-Slice002 | PENDING | product |",
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    return repo
+
+
 def _hash_tree(root: Path) -> dict[str, str]:
     hashes: dict[str, str] = {}
     for path in sorted(p for p in root.rglob("*") if p.is_file()):
@@ -52,6 +124,12 @@ def test_commands_lists_only_founder_vocabulary() -> None:
     assert "what's next" in body
     assert "what's running" in body
     assert "create pipeline <name>" in body
+    assert "build next: Installed one-shot dispatch" in body
+    assert "installed/enabled one-shot dispatch" in body
+    assert "build next <number>: Fill up to N safe build slots once. Disabled/unimplemented." in body
+    assert "keep <number> running: Maintain continuous safe capacity. Disabled/unimplemented." in body
+    assert "pause builds: Pause automatic dispatch. Disabled/unimplemented." in body
+    assert "resume builds: Refresh state and resume prior capacity. Disabled/unimplemented." in body
     assert "scripts/ppe_" not in body
     assert "never dispatches, enqueues, approves, repairs, or writes" in body
 
@@ -160,6 +238,98 @@ def test_ready_to_build_is_not_reported_as_queued(tmp_path: Path, monkeypatch) -
     assert ppe["queued_work"] == []
     assert snapshot["capacity"]["ready"] == 1
     assert snapshot["capacity"]["queued"] == 0
+
+
+def test_selected_multislice_work_contains_deterministic_prerequisite_packet(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="PENDING")
+    first = collect_portfolio(repo)
+    second = collect_portfolio(repo)
+    work = next(item for item in first["pipelines"][0]["ready_work"] if item["work_item_id"] == "fixture")
+    packet = work["native_prerequisites"]
+
+    assert packet["read_only"] is True
+    assert packet["source"] == "ppe_native_read_only"
+    assert packet["evidence"]["identity"] == next(
+        item for item in second["pipelines"][0]["ready_work"] if item["work_item_id"] == "fixture"
+    )["native_prerequisites"]["evidence"]["identity"]
+    assert packet["statuses"]["Fixture-Control-Slice001"]["status"] == "pending"
+    assert packet["statuses"]["Fixture-Control-Slice001"]["non_blocking"] is False
+    assert any(
+        source["path"] == "docs/SOP/FIXTURE_EVIDENCE_STATUS.md"
+        for source in packet["evidence"]["source_files"]
+    )
+
+
+def test_missing_prerequisite_evidence_remains_pending(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status=None)
+    snapshot = collect_portfolio(repo)
+    work = snapshot["pipelines"][0]["ready_work"][0]
+
+    status = work["native_prerequisites"]["statuses"]["Fixture-Control-Slice001"]
+    assert status["status"] == "pending"
+    assert "no accepted PPE native completion" in status["evidence"]
+
+
+def test_explicit_native_completion_permits_product_slice(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="COMPLETE")
+    snapshot = collect_portfolio(repo)
+    status = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]["statuses"][
+        "Fixture-Control-Slice001"
+    ]
+
+    assert status["status"] == "completed"
+    assert status["non_blocking"] is False
+
+
+def test_explicit_non_blocking_evidence_permits_product_slice(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status=None, control_non_blocking=True)
+    snapshot = collect_portfolio(repo)
+    status = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]["statuses"][
+        "Fixture-Control-Slice001"
+    ]
+
+    assert status["status"] == "pending"
+    assert status["non_blocking"] is True
+
+
+def test_prerequisite_identity_changes_when_evidence_changes(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="PENDING")
+    first = collect_portfolio(repo)["pipelines"][0]["ready_work"][0]["native_prerequisites"]["evidence"]["identity"]
+    evidence = repo / "docs/SOP/FIXTURE_EVIDENCE_STATUS.md"
+    evidence.write_text(evidence.read_text(encoding="utf-8").replace("PENDING", "COMPLETE"), encoding="utf-8")
+    second = collect_portfolio(repo)["pipelines"][0]["ready_work"][0]["native_prerequisites"]["evidence"]["identity"]
+
+    assert first != second
+
+
+def test_current_live_dist_stats_legibility_control_slice_fails_closed(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    snapshot = collect_portfolio(REPO)
+    ppe = next(item for item in snapshot["pipelines"] if item["pipeline_id"] == "ppe")
+    work = next(item for item in ppe["ready_work"] if item["work_item_id"] == "mvp1_distribution_stats_legibility")
+    status = work["native_prerequisites"]["statuses"]["MVP1-DistStatsLeg-Control-Slice001"]
+
+    assert status["status"] in {"pending", "blocked"}
+    assert status["non_blocking"] is False
+    assert "MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md" in status["evidence"]
+    assert "PENDING" in status["evidence"].upper()
 
 
 def test_blocked_autobuilder_does_not_prevent_safe_ppe_recommendation(tmp_path: Path, monkeypatch) -> None:
