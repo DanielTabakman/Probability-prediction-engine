@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `9424cae6` — Control-plane: dev changelog
 - `a3551453` — Merge scheduled Autobuilder and lane policy v1
 - `4937b950` — docs: require schedule-ready evidence for refill (`docs/SOP/`)
 - `76ebe212` — docs: add scheduled eligibility to pipeline SOP (`docs/SOP/`)
