@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 26,
+  "active_chapter_count": 25,
   "active_chapters": [
     {
       "archived": false,
@@ -319,41 +319,6 @@
       "queue_status": "READY",
       "selection": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_STRATEGY_LAB_EMBED_SHELL_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "chapter_id": "msos_workflow_persistence_v1",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-        "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md",
-        "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md",
-        "docs/SOP/MSOS_FRONTIER.md",
-        "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
-      ],
-      "next_selection": "docs/SOP/MSOS_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
-      "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
     {
       "archived": false,
@@ -858,7 +823,7 @@
       "sprint": null
     }
   ],
-  "archived_chapter_count": 56,
+  "archived_chapter_count": 57,
   "by_chapter_id": {
     "horizon_chart_polish_v1": {
       "archived": true,
@@ -2017,7 +1982,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     "msos_workflow_persistence_v1": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -2047,7 +2012,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
@@ -4791,7 +4756,7 @@
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_ASSET_PARITY_V1.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md"
       ],
@@ -4821,7 +4786,7 @@
       "next_selection": "docs/SOP/MSOS_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "program_doc": "docs/SOP/TRADER_LEARNING_SPINE_PROGRAM_V1.md",
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MSOS_WORKFLOW_PERSISTENCE_V1.md"
     },
@@ -6405,7 +6370,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-14T19:22:34Z",
+  "generated_at": "2026-07-14T21:32:09Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",

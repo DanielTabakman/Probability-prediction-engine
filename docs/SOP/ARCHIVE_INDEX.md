@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-14T19:22:34Z · **Archived chapters:** 56
+**Generated:** 2026-07-14T21:32:09Z · **Archived chapters:** 57
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -30,6 +30,7 @@
 | `msos_user_state_v1` | `docs/SOP/POST_MSOS_USER_STATE_V1_SELECTION.md` | `docs/SOP/MSOS_USER_STATE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_user_state_v1_relay.json` |
 | `msos_website_program_p0` | `docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md` | `docs/SOP/MSOS_WEBSITE_PROGRAM_P0_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json` |
 | `msos_workflow_asset_parity_v1` | `docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md` | `docs/SOP/MSOS_WORKFLOW_ASSET_PARITY_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json` |
+| `msos_workflow_persistence_v1` | `docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md` | `docs/SOP/MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json` |
 | `mvp1_bl_density_smoothing_v1` | `docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md` | `docs/SOP/MVP1_BL_DENSITY_SMOOTHING_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json` |
 | `mvp1_cross_venue_backtest_v1` | `docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md` | `docs/SOP/MVP1_CROSS_VENUE_BACKTEST_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json` |
 | `mvp1_cross_venue_prob_panel` | `docs/SOP/POST_MVP1_CROSS_VENUE_PROB_PANEL_SELECTION.md` | `docs/SOP/MVP1_CROSS_VENUE_PROB_PANEL_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_cross_venue_prob_panel_relay.json` |

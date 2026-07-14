@@ -255,7 +255,7 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md \u2014 MCD phase 3",
-      "reason": "[HIGH] MSOS thesis/expression server store \u2014 MCD-required; blocked until user state COMPLETE"
+      "reason": "[HIGH] MSOS thesis/expression server store \u2014 MCD-required; COMPLETE 2026-06-20 and reconciled by issue #5370"
     },
     {
       "chapterId": "msos_strategy_lab_embed_shell_v1",
