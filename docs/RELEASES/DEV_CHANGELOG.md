@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `646f031f` — Merge pull request #5367 from DanielTabakman/codex/issue-5366-build-next-prereqs
+- `bdf03d29` — Preserve native prerequisite conflicts (`scripts/`)
+- `83adf7dd` — Enable build-next prerequisites packet (`scripts/`)
+- `733c562b` — Control-plane: dev changelog
 - `37a165d6` — Merge founder portfolio registry and read-only commands
 - `8490ac21` — Control-plane: dev changelog
 - `bbb97033` — Fix founder portfolio read-only semantics (`scripts/`)
