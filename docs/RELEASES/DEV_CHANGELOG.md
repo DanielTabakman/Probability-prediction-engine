@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `617dc86b` — Merge pull request #5371 from DanielTabakman/codex/reconcile-workflow-persistence-5370
+- `1cba16d0` — workflow-persistence(control): tighten selection evidence (`docs/SOP/`)
+- `58437dda` — workflow-persistence(control): reconcile native closeout state (`docs/SOP/`)
+- `3e8d0e5a` — Control-plane: dev changelog
 - `1db2b722` — Merge pull request #5369 from DanielTabakman/codex/issue-5368-dist-stats-reconcile
 - `892a69c5` — control-plane: refresh dist-stats SOP indexes (`docs/SOP/`)
 - `66f79d9a` — control-plane: reconcile dist-stats native state (`docs/SOP/`)
