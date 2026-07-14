@@ -95,7 +95,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_EXPORT.md",
-      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility"
+      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
+      "doneReason": "reconciled by issue #5368: PR #104 selected/advanced the chapter; PR #111 / commit 58b82aaf implemented the distribution summary panel and tests; workflow metrics closed Product-Slice002 and Product-Slice003; dev changelog records MVP1-DistStatsLeg-Closeout-Slice005"
     },
     {
       "chapterId": "ppe_backlog_priority_scheduling_v1",

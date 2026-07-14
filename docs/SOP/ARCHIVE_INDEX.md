@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-09T08:49:26Z · **Archived chapters:** 55
+**Generated:** 2026-07-14T19:22:34Z · **Archived chapters:** 56
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -37,6 +37,7 @@
 | `mvp1_disagreement_candidate_strip_polish` | `docs/SOP/POST_MVP1_ONBOARDING_DISAGREEMENT_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_DISAGREEMENT_CANDIDATE_STRIP_POLISH_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_disagreement_candidate_strip_polish_relay.json` |
 | `mvp1_distribution_export` | `docs/SOP/POST_MVP1_DISTRIBUTION_EXPORT_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_EXPORT_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_export_relay.json` |
 | `mvp1_distribution_quant_research_v2` | `docs/SOP/POST_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_QUANT_RESEARCH_V2_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_quant_research_v2_relay.json` |
+| `mvp1_distribution_stats_legibility` | `docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json` |
 | `mvp1_distribution_timeseries_collector_v1` | `docs/SOP/POST_MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_SELECTION.md` | `docs/SOP/MVP1_DISTRIBUTION_TIMESERIES_COLLECTOR_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json` |
 | `mvp1_feedback_beta_instrumentation` | `docs/SOP/POST_MVP1_DISAGREEMENT_FEEDBACK_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_FEEDBACK_BETA_INSTRUMENTATION_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_feedback_beta_instrumentation_relay.json` |
 | `mvp1_phase5_review_hardening` | `docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_PHASE5_REVIEW_HARDENING_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json` |
