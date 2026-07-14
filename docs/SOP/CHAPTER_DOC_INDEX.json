@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 27,
+  "active_chapter_count": 26,
   "active_chapters": [
     {
       "archived": false,
@@ -416,40 +416,6 @@
       "queue_status": "READY",
       "selection": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_CROSS_VENUE_SCAN_V1.md"
-    },
-    {
-      "archived": false,
-      "carry_docs": [
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
-      ],
-      "chapter_id": "mvp1_distribution_stats_legibility",
-      "do_not_load": [
-        "docs/SOP/CURRENT_FRONTIER.md",
-        "docs/CURRENT_FRONTIER.md",
-        "docs/Frontier_Steward_Handoff.md",
-        "docs/SOP/MANAGER_LOOP.md",
-        "docs/SOP/WORKER_LOOP.md",
-        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
-      ],
-      "evidence": "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md",
-      "load_always": [
-        "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
-      ],
-      "load_for_build": [
-        "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md",
-        "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json"
-      ],
-      "load_on_demand": [
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md",
-        "docs/SOP/MVP1_FRONTIER.md",
-        "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
-      ],
-      "next_selection": "docs/SOP/MVP1_FRONTIER.md",
-      "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
-      "program_doc": null,
-      "queue_status": "READY",
-      "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
-      "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
     {
       "archived": false,
@@ -892,7 +858,7 @@
       "sprint": null
     }
   ],
-  "archived_chapter_count": 55,
+  "archived_chapter_count": 56,
   "by_chapter_id": {
     "horizon_chart_polish_v1": {
       "archived": true,
@@ -2390,7 +2356,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     "mvp1_distribution_stats_legibility": {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -2419,7 +2385,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
@@ -5164,7 +5130,7 @@
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_QUANT_RESEARCH_V2.md"
     },
     {
-      "archived": false,
+      "archived": true,
       "carry_docs": [
         "docs/SOP/MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md"
       ],
@@ -5193,7 +5159,7 @@
       "next_selection": "docs/SOP/MVP1_FRONTIER.md",
       "plan_path": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "program_doc": null,
-      "queue_status": "READY",
+      "queue_status": "DONE",
       "selection": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_MVP1_DISTRIBUTION_STATS_LEGIBILITY.md"
     },
@@ -6439,7 +6405,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-09T08:49:26Z",
+  "generated_at": "2026-07-14T19:22:34Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
