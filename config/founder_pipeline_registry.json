@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "canon": [
+    "docs/SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md",
+    "docs/SOP/FOUNDER_PIPELINE_COMMANDS_V1.md",
+    "docs/SOP/PIPELINE_CREATION_SOP_V1.md",
+    "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md"
+  ],
+  "portfolio_capacity": {
+    "automatic_mode_default": "DISABLED",
+    "future_steady_state_build_workers": 2,
+    "first_enabled_witness_capacity": 1,
+    "maximum_queued_ready_builds": 4,
+    "maximum_awaiting_review_per_repository": 2,
+    "automatic_bounded_revisions_per_candidate": 1,
+    "production_publishers_per_repository": 1
+  },
+  "pipelines": [
+    {
+      "pipeline_id": "ppe",
+      "display_name": "Probability Prediction Engine / MSOS product pipeline",
+      "aliases": [
+        "probability prediction engine",
+        "msos",
+        "product"
+      ],
+      "canonical_repo": "DanielTabakman/Probability-prediction-engine",
+      "pipeline_type": "product",
+      "registration_stage": "EXECUTION_READY",
+      "status_adapter": {
+        "kind": "ppe_phase_queue",
+        "read_only": true,
+        "source_scope": "canonical_repo",
+        "manual_sources": [
+          "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+          "docs/SOP/PHASE_QUEUE.json",
+          "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+        ],
+        "native_sources": [
+          "artifacts/orchestrator/ACTIVE_RUN.json"
+        ],
+        "freshness_seconds": 21600
+      },
+      "build_adapter": {
+        "readiness": "READY_FOR_MANUAL_OR_SINGLE_DISPATCH",
+        "adapter": "ppe_operator",
+        "read_only_commands_enabled": true,
+        "dispatch_commands_enabled": false
+      },
+      "authority": {
+        "portfolio_registry_owner": "PPE control plane",
+        "runtime_queue_owner": "PPE operator / MSOS Autobuilder adapters",
+        "publication_authority": "controlled publisher only; draft PR by default",
+        "founder_required": [
+          "product direction",
+          "priority conflict",
+          "legal/financial/credential/destructive decisions",
+          "definition-of-done changes"
+        ]
+      },
+      "scheduling": {
+        "build_next_eligible": true,
+        "continuous_refill_eligible": false,
+        "reason": "Read-only portfolio evidence exists; scheduled refill requires staged runtime witnesses."
+      }
+    },
+    {
+      "pipeline_id": "autobuilder",
+      "display_name": "MSOS Autobuilder infrastructure pipeline",
+      "aliases": [
+        "msos autobuilder",
+        "autobuilder",
+        "build factory"
+      ],
+      "canonical_repo": "DanielTabakman/msos-autobuilder",
+      "pipeline_type": "infrastructure",
+      "registration_stage": "CHARTERED",
+      "status_adapter": {
+        "kind": "autobuilder_readonly_artifacts",
+        "read_only": true,
+        "source_scope": "external_repository",
+        "external_repo": "DanielTabakman/msos-autobuilder",
+        "external_root_env": "MSOS_AUTOBUILDER_STATUS_ROOT",
+        "source_unavailable_behavior": "fail_closed_pipeline_scoped",
+        "native_sources": [
+          "artifacts/orchestrator/AUTOBUILDER_STATUS.json",
+          "artifacts/control_plane/AUTOMATIC_BUILD_POLICY.json",
+          "artifacts/control_plane/PORTFOLIO_RECONCILIATION.json"
+        ],
+        "freshness_seconds": 21600
+      },
+      "build_adapter": {
+        "readiness": "NOT_READY_IN_PPE_PORTFOLIO",
+        "adapter": "msos-autobuilder runtime controller",
+        "read_only_commands_enabled": true,
+        "dispatch_commands_enabled": false
+      },
+      "authority": {
+        "portfolio_registry_owner": "PPE control plane",
+        "runtime_queue_owner": "DanielTabakman/msos-autobuilder",
+        "publication_authority": "msos-autobuilder controlled publisher; no product main merge authority",
+        "founder_required": [
+          "new autonomous improvement generation",
+          "self-deployment authority",
+          "runtime refill promotion"
+        ]
+      },
+      "scheduling": {
+        "build_next_eligible": false,
+        "continuous_refill_eligible": false,
+        "reason": "Registered for read-only visibility; runtime refill controller and staged witnesses are pending."
+      }
+    }
+  ]
+}
