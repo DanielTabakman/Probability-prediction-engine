@@ -2,9 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-14
+
+- `9d159060` — control-plane: canonize founder pipeline commands and pipeline creation SOP (`docs/SOP/`)
+
 ## 2026-07-13
 
-_No merges to `main`._
+- `03ee830f` — Control-plane: dev changelog
 
 ## 2026-07-12
 
