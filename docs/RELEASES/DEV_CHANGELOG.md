@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `a3551453` — Merge scheduled Autobuilder and lane policy v1
+- `4937b950` — docs: require schedule-ready evidence for refill (`docs/SOP/`)
+- `76ebe212` — docs: add scheduled eligibility to pipeline SOP (`docs/SOP/`)
+- `563dabab` — docs: add continuous build founder commands (`docs/SOP/`)
+- `3d616e7a` — docs: add scheduled Autobuilder and lane policy v1 (`docs/SOP/`)
+- `00785601` — Control-plane: dev changelog
 - `9d159060` — control-plane: canonize founder pipeline commands and pipeline creation SOP (`docs/SOP/`)
 
 ## 2026-07-13
