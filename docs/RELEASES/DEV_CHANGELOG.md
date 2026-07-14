@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `1db2b722` — Merge pull request #5369 from DanielTabakman/codex/issue-5368-dist-stats-reconcile
+- `892a69c5` — control-plane: refresh dist-stats SOP indexes (`docs/SOP/`)
+- `66f79d9a` — control-plane: reconcile dist-stats native state (`docs/SOP/`)
+- `99f9e477` — Control-plane: dev changelog
 - `646f031f` — Merge pull request #5367 from DanielTabakman/codex/issue-5366-build-next-prereqs
 - `bdf03d29` — Preserve native prerequisite conflicts (`scripts/`)
 - `83adf7dd` — Enable build-next prerequisites packet (`scripts/`)
