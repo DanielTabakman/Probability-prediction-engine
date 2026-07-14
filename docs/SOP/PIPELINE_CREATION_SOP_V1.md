@@ -3,8 +3,8 @@
 **Plane:** CONTROL-PLANE  
 **Status:** Approved registration contract; implementation adapters may be pending  
 **Canonical home:** GitHub  
-**Issue:** #5354  
-**Purpose:** Define the minimum information and safety boundary required before a project or workstream becomes a founder-visible pipeline and before it becomes eligible for automatic build selection.
+**Issues:** #5354, #5356  
+**Purpose:** Define the minimum information and safety boundary required before a project or workstream becomes a founder-visible pipeline, before it becomes eligible for build selection, and before it may participate in continuous scheduled refill.
 
 ## Principle
 
@@ -16,24 +16,25 @@ A pipeline is not merely a repository, idea, module, or backlog. It is a named p
 - an ordered frontier;
 - a way to report status;
 - a way to dispatch bounded work;
-- explicit authority, validation, and concurrency boundaries.
+- explicit authority, validation, concurrency, and scheduling boundaries.
 
-The `create pipeline <name>` command creates or completes this contract. It does not automatically start implementation.
+The `create pipeline <name>` command creates or completes this contract. It does not automatically start implementation or scheduled execution.
 
 ## Registration stages
 
 A pipeline moves through these registration stages:
 
-| Stage | Meaning | Eligible for `what's next` | Eligible for `build next` |
-|---|---|---:|---:|
-| `PROPOSED` | Named idea with no accepted contract | No | No |
-| `REGISTERED_READ_ONLY` | Identity, repo, purpose, and status source exist | Yes | No |
-| `CHARTERED` | Outcome, scope, non-goals, definition of done, and frontier accepted | Yes | No |
-| `EXECUTION_READY` | Build adapter, authority, paths, tests, and ready work exist | Yes | Yes |
-| `ACTIVE` | Work is running or queued | Yes | Already active |
-| `COMPLETE` | Definition of done satisfied | Historical | No, unless reopened |
+| Stage | Meaning | Eligible for `what's next` | Eligible for `build next` | Eligible for `keep N running` |
+|---|---|---:|---:|---:|
+| `PROPOSED` | Named idea with no accepted contract | No | No | No |
+| `REGISTERED_READ_ONLY` | Identity, repo, purpose, and status source exist | Yes | No | No |
+| `CHARTERED` | Outcome, scope, non-goals, definition of done, and frontier accepted | Yes | No | No |
+| `EXECUTION_READY` | Build adapter, authority, paths, tests, and ready work exist | Yes | Yes | No |
+| `SCHEDULE_READY` | Continuous-refill, backpressure, pause/resume, and runtime evidence requirements are accepted | Yes | Yes | Yes |
+| `ACTIVE` | Work is running or queued | Yes | Already active | According to recorded automatic-build policy |
+| `COMPLETE` | Definition of done satisfied | Historical | No, unless reopened | No, unless reopened and revalidated |
 
-A pipeline may remain read-only or charter-only indefinitely.
+A pipeline may remain read-only, charter-only, or manually dispatchable indefinitely. Technical ability to execute does not automatically grant scheduled eligibility.
 
 ## Required pipeline record
 
@@ -79,7 +80,7 @@ Required:
 - dependencies on other pipelines or shared contracts;
 - product, legal, financial, credential, or destructive decisions that remain founder-owned.
 
-A pipeline must not be used to hide scope expansion inside a build command.
+A pipeline must not be used to hide scope expansion inside a build or scheduling command.
 
 ### 4. Canon and state source
 
@@ -118,6 +119,8 @@ Each build-eligible work item must include:
 - validation commands or evidence;
 - ownership/overlap warning.
 
+Scheduled selection may only use work items currently marked `READY_TO_BUILD` by the pipeline's authoritative frontier/status adapter.
+
 ### 6. Status adapter
 
 Required for `REGISTERED_READ_ONLY`:
@@ -126,9 +129,9 @@ Required for `REGISTERED_READ_ONLY`:
 - how `what's running` reads actual runtime state;
 - native-to-founder state mapping;
 - how stale or missing evidence is reported;
-- what counts as running, queued, blocked, awaiting review, and complete.
+- what counts as ready, running, queued, backpressured, blocked, awaiting review, awaiting founder, unfilled, and complete.
 
-The adapter may be manual at first, but the output must identify that fact.
+The adapter may be manual at first, but the output must identify that fact. Manual or inferred state is not sufficient for reporting a build as actually running.
 
 ### 7. Build adapter
 
@@ -159,7 +162,7 @@ Required:
 - destructive-action authority;
 - rollback or recovery owner.
 
-A pipeline cannot inherit broader authority merely because the Autobuilder can technically execute commands.
+A pipeline cannot inherit broader authority merely because the Autobuilder can technically execute commands or because automatic capacity is available.
 
 ### 9. Concurrency contract
 
@@ -183,7 +186,9 @@ Default rules:
 3. parallel workers use isolated clones or worktrees;
 4. running and queued are reported separately;
 5. publication remains serialized when a target has one publisher;
-6. capacity is a maximum, not an obligation to fill unsafe slots.
+6. capacity is a maximum, not an obligation to fill unsafe slots;
+7. independent workers must not depend on hidden shared conversation context;
+8. shared truth must already exist in GitHub or the accepted source checkout.
 
 ### 10. Validation and evidence
 
@@ -198,7 +203,7 @@ Required:
 - retry/revision policy;
 - completion evidence.
 
-No pipeline is complete because an agent said it completed.
+No pipeline is complete because an agent said it completed. No pipeline is scheduled because a configuration value exists without a runtime witness.
 
 ### 11. Founder visibility
 
@@ -207,12 +212,33 @@ Required:
 - how the pipeline appears in `what's next`;
 - how it appears in `what's running`;
 - short founder-facing name;
-- current stage;
+- current registration stage;
+- current execution stage;
 - next action;
-- blocker or decision language;
+- blocker, backpressure, or decision language;
 - traceable links or identities.
 
 The founder view should hide low-level mechanics by default while preserving inspectability.
+
+### 12. Scheduling eligibility
+
+Required for `SCHEDULE_READY` under [`SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md`](SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md):
+
+- whether automatic refill is permitted;
+- pipeline-specific maximum active worker slots, if lower than the portfolio maximum;
+- queue and awaiting-review caps;
+- automatic revision limit;
+- dispatch-window or quiet-hours policy, if any;
+- pause/resume behavior;
+- backpressure conditions;
+- failure classification and escalation behavior;
+- deadline and fairness participation;
+- runtime adapter used by the refill controller;
+- restart/recovery behavior;
+- immutable selection and dispatch evidence;
+- accepted staged witness proving scheduled behavior.
+
+A pipeline becomes schedule-ready only after its runtime evidence shows that automatic selection and dispatch fail closed. Registration alone is insufficient.
 
 ## Creation workflow
 
@@ -230,6 +256,7 @@ When Daniel says `create pipeline <name>`:
 10. Add the pipeline to founder portfolio visibility.
 11. Open a bounded implementation issue/PR for missing automation.
 12. Return a pipeline-registration receipt.
+13. Promote to `SCHEDULE_READY` only through a separate scheduling review and witness.
 
 ## Pipeline-registration receipt
 
@@ -240,13 +267,14 @@ PIPELINE REGISTERED
 
 ID: <pipeline_id>
 Name: <display name>
-Stage: <REGISTERED_READ_ONLY | CHARTERED | EXECUTION_READY>
+Stage: <REGISTERED_READ_ONLY | CHARTERED | EXECUTION_READY | SCHEDULE_READY>
 Canonical repo: <owner/repo>
 Canon: <document/issue>
 Status source: <adapter/source>
 Build adapter: <adapter or NOT READY>
 Next action: <work item or decision>
 Build-next eligible: <yes/no>
+Continuous-refill eligible: <yes/no>
 Missing requirements: <none or concise list>
 ```
 
@@ -258,11 +286,22 @@ Expected canonical ID: `ppe`.
 
 It already has substantial product canon, frontiers, operator status, worker routing, and build/closeout commands. Portfolio registration should adapt those existing sources rather than create a replacement operator.
 
+PPE scheduled eligibility requires read-only portfolio/status evidence, a valid Autobuilder build adapter for selected work, backpressure, and staged runtime witnesses. The existing single desktop worker lease is not by itself proof of portfolio-level parallel scheduling.
+
 ### MSOS Autobuilder
 
 Expected canonical ID: `autobuilder`.
 
-Its canonical repository is `DanielTabakman/msos-autobuilder`. Registration must distinguish infrastructure implementation, installed-host runtime, update-supervisor evidence, and product-job execution. Autobuilder improvements must not silently become product priorities.
+Its canonical repository is `DanielTabakman/msos-autobuilder`. Registration must distinguish:
+
+- infrastructure implementation;
+- installed-host runtime;
+- update-supervisor evidence;
+- product-job execution;
+- refill-controller state;
+- controlled publication.
+
+Autobuilder improvements must not silently become product priorities. Scheduled building of accepted Autobuilder work does not grant autonomous new-improvement generation or self-deployment authority.
 
 ### TxLINE hackathon
 
@@ -278,27 +317,35 @@ Before execution eligibility it requires:
 - allowed paths and validation;
 - a status and build adapter.
 
+Before scheduled eligibility it also requires:
+
+- independent queue/review limits;
+- failure and demo-witness behavior;
+- concurrency compatibility with PPE and Autobuilder;
+- a real registered adapter witness.
+
 Conversational aliases may include `hackathon` and `world-cup`.
 
-## Scheduling boundary
+## Scheduling policy
 
-Pipeline registration does not decide scheduled execution.
+Pipeline registration uses [`SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md`](SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md).
 
-A later scheduled-Autobuilder design must determine:
+The accepted v1 model is:
 
-- whether schedules target pipelines, work items, capacity, or time windows;
-- whether one scheduler spans repositories;
-- how many lanes may run concurrently;
-- how slots refill;
-- pause/resume and quiet-hours behavior;
-- power, network, authentication, cost, and deadline policies;
-- how founder-required decisions stop automatic refill;
-- how failed or stale work affects prioritization;
-- how one publisher serializes multiple completed candidates.
+- schedule continuous safe capacity, not blind named-job clock launches;
+- keep enabled capacity at one until the single-slot witness passes;
+- enable routine capacity two only after same-repository, cross-pipeline, refill, and backpressure witnesses pass;
+- use event-driven refill with periodic reconciliation;
+- maintain independent canonical work items even when grouped into one execution batch;
+- serialize publication per target repository;
+- stop affected refill on queue/review caps, stale evidence, failure limits, conflicts, or founder decisions;
+- allow unrelated safe pipelines to continue.
 
-Until that design is accepted, pipeline registration only makes work visible and dispatchable; it does not make it continuously scheduled.
+A time window may suppress new starts but must not terminate running work.
 
-## Acceptance checklist
+## Acceptance checklists
+
+### `EXECUTION_READY`
 
 A pipeline may be marked `EXECUTION_READY` only when all are true:
 
@@ -314,13 +361,28 @@ A pipeline may be marked `EXECUTION_READY` only when all are true:
 - [ ] founder portfolio output is defined;
 - [ ] conflicts with existing pipelines have been surfaced rather than silently resolved.
 
+### `SCHEDULE_READY`
+
+A pipeline may be marked `SCHEDULE_READY` only when all `EXECUTION_READY` requirements and all of the following are true:
+
+- [ ] automatic-refill permission and runtime adapter recorded;
+- [ ] queue, review, revision, and worker caps recorded;
+- [ ] backpressure and founder-decision stop conditions recorded;
+- [ ] pause/resume and restart recovery defined;
+- [ ] priority, deadline, and fairness inputs trace to accepted canon;
+- [ ] duplicate immutable job prevention exists;
+- [ ] selection and dispatch evidence is durable;
+- [ ] required single-slot or later concurrency witness accepted;
+- [ ] cross-repository behavior remains disabled unless separately witnessed;
+- [ ] no autonomous scope, merge, or deployment authority was added implicitly.
+
 ## COORDINATION STATUS
 
 Agreement: aligned  
-Compared: founder decision, control-plane SOP, PPE operator/worker contracts, Autobuilder operating manual, current host/scheduler architecture, and planned TxLINE work  
+Compared: founder decisions, control-plane SOP, PPE operator/worker contracts, Autobuilder operating manual, scheduled Autobuilder lane policy, current host/scheduler architecture, and planned TxLINE work  
 Disagreement: none  
-Evidence gap: portfolio registry implementation and completed TxLINE registration  
-Ownership overlap: pipeline canon belongs in its canonical repo; portfolio registry and adapters require one control-plane writer  
-Risk if unresolved: named pipelines may exist without reliable next-state, authority, or execution boundaries  
-Recommended default: register pipelines read-only first, then promote each to execution-ready only with evidence-backed adapters  
+Evidence gap: portfolio registry implementation, completed TxLINE registration, continuous refill controller, and staged runtime witnesses  
+Ownership overlap: pipeline canon belongs in its canonical repo; PPE portfolio registry and msos-autobuilder refill runtime require separate single writers  
+Risk if unresolved: named pipelines may become automatically selectable without reliable readiness, backpressure, authority, or execution boundaries  
+Recommended default: register pipelines read-only first, promote to execution-ready with adapters, and promote to schedule-ready only after a real witness  
 Founder decision required: no
