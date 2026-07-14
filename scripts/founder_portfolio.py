@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -102,12 +103,20 @@ def _load_json(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     return data, None
 
 
-def _file_evidence(repo: Path, rel: str, *, freshness_seconds: int | None = None) -> dict[str, Any]:
+def _file_evidence(
+    repo: Path,
+    rel: str,
+    *,
+    kind: str,
+    freshness_seconds: int | None = None,
+    scope: str = "local",
+) -> dict[str, Any]:
     path = repo / rel
     if not path.is_file():
         return {
             "kind": "missing",
             "source": rel,
+            "scope": scope,
             "fresh": False,
             "message": "source not present",
         }
@@ -115,8 +124,9 @@ def _file_evidence(repo: Path, rel: str, *, freshness_seconds: int | None = None
     age = _age_seconds(mtime)
     fresh = freshness_seconds is None or (age is not None and age <= freshness_seconds)
     return {
-        "kind": "native_runtime" if fresh else "stale",
+        "kind": kind if fresh else "stale",
         "source": rel,
+        "scope": scope,
         "fresh": fresh,
         "as_of": mtime.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "age_seconds": int(age or 0),
@@ -129,15 +139,18 @@ def _payload_evidence(
     *,
     fallback_kind: str = "manual",
     freshness_seconds: int | None = None,
+    scope: str = "local",
 ) -> dict[str, Any]:
     if payload is None:
-        return {"kind": "missing", "source": rel, "fresh": False, "message": "source not present"}
+        return {"kind": "missing", "source": rel, "scope": scope, "fresh": False, "message": "source not present"}
     as_of = _parse_utc(payload.get("as_of") or payload.get("asOf") or payload.get("timestamp"))
     age = _age_seconds(as_of)
     fresh = as_of is not None and (freshness_seconds is None or (age is not None and age <= freshness_seconds))
+    kind = fallback_kind if fresh else ("stale" if as_of or fallback_kind == "native_runtime" else "manual")
     return {
-        "kind": fallback_kind if fresh else ("stale" if as_of else "manual"),
+        "kind": kind,
         "source": rel,
+        "scope": scope,
         "fresh": fresh,
         "as_of": as_of.replace(microsecond=0).isoformat().replace("+00:00", "Z") if as_of else None,
         "age_seconds": int(age) if age is not None else None,
@@ -148,10 +161,49 @@ def _norm_state(native: Any, *, default: str = "BLOCKED") -> str:
     return NATIVE_TO_FOUNDER_STATE.get(str(native or "").strip().upper(), default)
 
 
+def _external_source_root(pipe: dict[str, Any]) -> tuple[Path | None, dict[str, Any]]:
+    adapter = pipe.get("status_adapter") if isinstance(pipe.get("status_adapter"), dict) else {}
+    env_name = str(adapter.get("external_root_env") or "").strip()
+    external_repo = str(adapter.get("external_repo") or pipe.get("canonical_repo") or "").strip()
+    if not env_name:
+        return None, {
+            "kind": "missing",
+            "scope": "external_repository",
+            "source": external_repo,
+            "fresh": False,
+            "message": "external_root_env is not configured",
+        }
+    raw = str(os.environ.get(env_name) or "").strip()
+    if not raw:
+        return None, {
+            "kind": "missing",
+            "scope": "external_repository",
+            "source": external_repo,
+            "fresh": False,
+            "message": f"{env_name} is not set; external runtime evidence unavailable",
+        }
+    root = Path(raw).expanduser().resolve()
+    if not root.is_dir():
+        return None, {
+            "kind": "missing",
+            "scope": "external_repository",
+            "source": str(root),
+            "fresh": False,
+            "message": f"{env_name} does not point to an existing directory",
+        }
+    return root, {
+        "kind": "external",
+        "scope": "external_repository",
+        "source": str(root),
+        "external_repo": external_repo,
+        "fresh": True,
+    }
+
+
 def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
     data, _ = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
     out: list[dict[str, Any]] = []
-    for item in (data or {}).get("items") or []:
+    for index, item in enumerate((data or {}).get("items") or []):
         if not isinstance(item, dict):
             continue
         status = str(item.get("status") or "").strip().upper()
@@ -165,9 +217,56 @@ def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
                 "state": "READY_TO_BUILD",
                 "trace": str(item.get("planPath") or "").replace("\\", "/"),
                 "evidence": "manual",
+                "selection": _selection_metadata(item, age_index=index),
             }
         )
     return out
+
+
+def _selection_metadata(item: dict[str, Any], *, age_index: int) -> dict[str, Any]:
+    priority_raw = str(item.get("founderPriority") or item.get("priority") or "").strip().lower()
+    if item.get("urgent") is True and not priority_raw:
+        priority_raw = "urgent"
+    if not priority_raw:
+        reason = str(item.get("reason") or "").strip().lower()
+        if reason.startswith("[p0]") or reason.startswith("[p0 "):
+            priority_raw = "p0"
+        elif reason.startswith("[high]") or reason.startswith("[high "):
+            priority_raw = "high"
+        elif reason.startswith("[medium]") or reason.startswith("[medium "):
+            priority_raw = "medium"
+        elif reason.startswith("[low]") or reason.startswith("[low "):
+            priority_raw = "low"
+        elif reason.startswith("[defer]") or reason.startswith("[defer "):
+            priority_raw = "defer"
+    priority_rank = {
+        "urgent": 0,
+        "p0": 0,
+        "critical": 0,
+        "high": 1,
+        "p1": 1,
+        "medium": 2,
+        "p2": 2,
+        "low": 3,
+        "p3": 3,
+        "defer": 9,
+        "deferred": 9,
+    }.get(priority_raw, 4)
+    deadline = str(item.get("acceptedDeadline") or item.get("deadline") or "").strip()
+    deadline_dt = _parse_utc(f"{deadline}T00:00:00Z") if deadline and "T" not in deadline else _parse_utc(deadline)
+    try:
+        unblock = int(item.get("dependencyUnblockValue") or item.get("dependency_unblock_value") or 0)
+    except (TypeError, ValueError):
+        unblock = 0
+    return {
+        "founder_priority": priority_raw or None,
+        "founder_priority_rank": priority_rank,
+        "deadline": deadline or None,
+        "deadline_rank": deadline_dt.isoformat() if deadline_dt else "9999-12-31T00:00:00+00:00",
+        "dependency_unblock_value": unblock,
+        "age_index": age_index,
+        "tie_breaker": str(item.get("planPath") or item.get("chapterId") or ""),
+    }
 
 
 def _backlog_counts(repo: Path) -> dict[str, int]:
@@ -244,18 +343,6 @@ def _ppe_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
             }
         )
 
-    queued = [
-        {
-            "work_item_id": item["work_item_id"],
-            "state": "QUEUED",
-            "native_state": item["native_state"],
-            "title": item["title"],
-            "trace": item["trace"],
-            "evidence": item["evidence"],
-        }
-        for item in ready
-    ]
-
     native_status = manifest_state or ("READY" if ready else "COMPLETE")
     normalized = _norm_state(native_status, default="UNFILLED")
     if running:
@@ -266,15 +353,6 @@ def _ppe_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
         normalized = "READY_TO_BUILD"
 
     backpressure: list[dict[str, Any]] = []
-    if len(ready) >= 4:
-        backpressure.append(
-            {
-                "state": "BACKPRESSURE",
-                "reason": "maximum queued ready builds reached",
-                "limit": 4,
-                "evidence": "manual",
-            }
-        )
     if stale:
         backpressure.append(
             {
@@ -284,7 +362,12 @@ def _ppe_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
             }
         )
 
-    manifest_evidence = _file_evidence(repo, "docs/SOP/ACTIVE_PHASE_MANIFEST.json", freshness_seconds=None)
+    manifest_evidence = _file_evidence(
+        repo,
+        "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+        kind="manual",
+        freshness_seconds=None,
+    )
     if manifest_error and manifest_error != "missing":
         stale.append({"state": "BLOCKED", "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json", "message": manifest_error})
     if active_error and active_error != "missing":
@@ -307,7 +390,8 @@ def _ppe_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
             "evidence": "manual",
         },
         "running_work": running,
-        "queued_work": queued,
+        "ready_work": ready,
+        "queued_work": [],
         "awaiting_review_work": [],
         "awaiting_founder_count": backlog["awaiting_founder"],
         "blocked_count": backlog["blocked"],
@@ -359,17 +443,82 @@ def _autobuilder_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
     status_rel = "artifacts/orchestrator/AUTOBUILDER_STATUS.json"
     policy_rel = "artifacts/control_plane/AUTOMATIC_BUILD_POLICY.json"
     reconcile_rel = "artifacts/control_plane/PORTFOLIO_RECONCILIATION.json"
-    status, status_error = _load_json(repo / status_rel)
-    policy, _ = _load_json(repo / policy_rel)
-    reconcile, _ = _load_json(repo / reconcile_rel)
+    source_root, source_evidence = _external_source_root(pipe)
+    if source_root is None:
+        evidence = [
+            source_evidence,
+            {
+                "kind": "missing",
+                "scope": "external_repository",
+                "source": f"{pipe.get('canonical_repo')}:{status_rel}",
+                "fresh": False,
+                "message": "external source root unavailable; PPE checkout is not a fallback",
+            },
+        ]
+        return {
+            "pipeline_id": "autobuilder",
+            "display_name": pipe.get("display_name"),
+            "registration_stage": pipe.get("registration_stage"),
+            "canonical_repo": pipe.get("canonical_repo"),
+            "native_state": "EXTERNAL_SOURCE_UNAVAILABLE",
+            "state": "BLOCKED",
+            "blocker_scope": "pipeline",
+            "evidence": evidence,
+            "capacity": {
+                "automatic_mode": "DISABLED",
+                "desired": 0,
+                "configured_max": 2,
+                "available": 2,
+                "source": "external source unavailable",
+                "evidence": "missing",
+            },
+            "running_work": [],
+            "ready_work": [],
+            "queued_work": [],
+            "awaiting_review_work": [],
+            "awaiting_founder_count": 0,
+            "blocked_count": 1,
+            "backpressure": [],
+            "stale_evidence": evidence,
+            "next_action": {
+                "state": "BLOCKED",
+                "action_type": "evidence check",
+                "summary": "Autobuilder external runtime source is unavailable; this blocks only Autobuilder visibility.",
+                "evidence": "missing",
+                "blocker_scope": "pipeline",
+            },
+        }
+
+    status, status_error = _load_json(source_root / status_rel)
+    policy, _ = _load_json(source_root / policy_rel)
+    reconcile, _ = _load_json(source_root / reconcile_rel)
 
     phase = str((status or {}).get("phase") or "").strip().upper()
     normalized = _norm_state(phase, default="BLOCKED" if status is None else "UNFILLED")
-    status_evidence = _payload_evidence(status_rel, status, fallback_kind="native_runtime", freshness_seconds=freshness)
+    status_evidence = _payload_evidence(
+        status_rel,
+        status,
+        fallback_kind="native_runtime",
+        freshness_seconds=freshness,
+        scope="external_repository",
+    )
     evidence = [
+        source_evidence,
         status_evidence,
-        _payload_evidence(policy_rel, policy, fallback_kind="native_runtime", freshness_seconds=freshness),
-        _payload_evidence(reconcile_rel, reconcile, fallback_kind="native_runtime", freshness_seconds=freshness),
+        _payload_evidence(
+            policy_rel,
+            policy,
+            fallback_kind="native_runtime",
+            freshness_seconds=freshness,
+            scope="external_repository",
+        ),
+        _payload_evidence(
+            reconcile_rel,
+            reconcile,
+            fallback_kind="native_runtime",
+            freshness_seconds=freshness,
+            scope="external_repository",
+        ),
     ]
     stale = [item for item in evidence if item["kind"] in {"missing", "stale"}]
     running: list[dict[str, Any]] = []
@@ -391,7 +540,7 @@ def _autobuilder_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
                 "trace": {
                     "plan_path": build.get("plan_path"),
                     "lock": build.get("lock"),
-                    "source": status_rel,
+                    "source": f"{source_root}:{status_rel}",
                 },
                 "evidence": "native_runtime",
             }
@@ -440,16 +589,18 @@ def _autobuilder_status(repo: Path, pipe: dict[str, Any]) -> dict[str, Any]:
         "canonical_repo": pipe.get("canonical_repo"),
         "native_state": phase or "MISSING",
         "state": normalized,
+        "blocker_scope": "pipeline" if normalized in {"BLOCKED", "BACKPRESSURE"} else None,
         "evidence": evidence,
         "capacity": {
             "automatic_mode": mode if mode in {"ENABLED", "PAUSED", "DISABLED"} else "DISABLED",
             "desired": desired,
             "configured_max": configured,
             "available": max(0, configured - len(running)),
-            "source": policy_rel if policy else "registry/default; durable policy missing",
+            "source": f"{source_root}:{policy_rel}" if policy else "external source available; durable policy missing",
             "evidence": "native_runtime" if policy else "missing",
         },
         "running_work": running,
+        "ready_work": [],
         "queued_work": queued,
         "awaiting_review_work": awaiting_review,
         "awaiting_founder_count": 0,
@@ -518,6 +669,7 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
                     "evidence": [{"kind": "missing", "source": kind or "unknown", "fresh": False}],
                     "capacity": {"automatic_mode": "DISABLED", "desired": 0, "configured_max": 0, "available": 0},
                     "running_work": [],
+                    "ready_work": [],
                     "queued_work": [],
                     "awaiting_review_work": [],
                     "backpressure": [],
@@ -533,6 +685,7 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
 
     capacity_cfg = registry.get("portfolio_capacity") if isinstance(registry.get("portfolio_capacity"), dict) else {}
     running_count = sum(len(p.get("running_work") or []) for p in snapshots)
+    ready_count = sum(len(p.get("ready_work") or []) for p in snapshots)
     queued_count = sum(len(p.get("queued_work") or []) for p in snapshots)
     awaiting_review_count = sum(len(p.get("awaiting_review_work") or []) for p in snapshots)
     configured_max = int(capacity_cfg.get("future_steady_state_build_workers") or 2)
@@ -548,6 +701,7 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
             "first_enabled_witness_capacity": int(capacity_cfg.get("first_enabled_witness_capacity") or 1),
             "available": max(0, configured_max - running_count),
             "running": running_count,
+            "ready": ready_count,
             "queued": queued_count,
             "awaiting_review": awaiting_review_count,
             "source": "config/founder_pipeline_registry.json",
@@ -558,22 +712,65 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
 
 
 def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
-    priority = {
-        "BLOCKED": 0,
-        "BACKPRESSURE": 1,
-        "AWAITING_FOUNDER": 2,
-        "AWAITING_REVIEW": 3,
-        "RUNNING": 4,
-        "READY_TO_BUILD": 5,
-        "UNFILLED": 6,
-        "COMPLETE": 7,
-    }
-    candidates = []
+    ready_candidates: list[tuple[tuple[Any, ...], dict[str, Any], dict[str, Any]]] = []
+    for pipe in pipelines_snapshot:
+        if str(pipe.get("state") or "") in {"BLOCKED", "BACKPRESSURE"}:
+            continue
+        evidence_rank = _pipeline_evidence_rank(pipe)
+        active_in_pipeline = len(pipe.get("running_work") or []) + len(pipe.get("queued_work") or [])
+        for work in pipe.get("ready_work") or []:
+            if not isinstance(work, dict):
+                continue
+            selection = work.get("selection") if isinstance(work.get("selection"), dict) else {}
+            rank = (
+                int(selection.get("founder_priority_rank", 4)),
+                str(selection.get("deadline_rank") or "9999-12-31T00:00:00+00:00"),
+                -int(selection.get("dependency_unblock_value") or 0),
+                evidence_rank,
+                active_in_pipeline,
+                int(selection.get("age_index") or 0),
+                str(pipe.get("pipeline_id") or ""),
+                str(work.get("work_item_id") or ""),
+            )
+            ready_candidates.append((rank, pipe, work))
+
+    if ready_candidates:
+        rank, pipe, work = sorted(ready_candidates, key=lambda item: item[0])[0]
+        return {
+            "pipeline_id": pipe.get("pipeline_id"),
+            "state": "READY_TO_BUILD",
+            "action_type": "build",
+            "summary": work.get("title"),
+            "work_item_id": work.get("work_item_id"),
+            "evidence": work.get("evidence"),
+            "selection_rank": list(rank),
+            "selection_explanation": _selection_explanation(pipe, work, rank),
+        }
+
+    review_candidates = [
+        (str(pipe.get("pipeline_id") or ""), pipe, item)
+        for pipe in pipelines_snapshot
+        for item in (pipe.get("awaiting_review_work") or [])
+        if isinstance(item, dict)
+    ]
+    if review_candidates:
+        _, pipe, item = sorted(review_candidates, key=lambda row: (row[0], str(row[2].get("work_item_id") or "")))[0]
+        return {
+            "pipeline_id": pipe.get("pipeline_id"),
+            "state": "AWAITING_REVIEW",
+            "action_type": "review",
+            "summary": f"Review {item.get('work_item_id') or 'candidate'}",
+            "work_item_id": item.get("work_item_id"),
+            "evidence": item.get("evidence"),
+        }
+
+    pipeline_actions = []
+    action_priority = {"RUNNING": 0, "AWAITING_FOUNDER": 1, "BLOCKED": 2, "BACKPRESSURE": 3, "UNFILLED": 4, "COMPLETE": 5}
     for pipe in pipelines_snapshot:
         action = pipe.get("next_action") if isinstance(pipe.get("next_action"), dict) else {}
         state = str(action.get("state") or pipe.get("state") or "BLOCKED")
-        candidates.append((priority.get(state, 99), pipe, action))
-    if not candidates:
+        pipeline_actions.append((action_priority.get(state, 99), str(pipe.get("pipeline_id") or ""), pipe, action))
+    if not pipeline_actions:
         return {
             "pipeline_id": None,
             "state": "UNFILLED",
@@ -581,7 +778,7 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
             "summary": "No registered pipelines.",
             "evidence": "missing",
         }
-    _, pipe, action = sorted(candidates, key=lambda item: item[0])[0]
+    _, _, pipe, action = sorted(pipeline_actions, key=lambda item: (item[0], item[1]))[0]
     return {
         "pipeline_id": pipe.get("pipeline_id"),
         "state": action.get("state") or pipe.get("state"),
@@ -589,6 +786,43 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
         "summary": action.get("summary"),
         "work_item_id": action.get("work_item_id"),
         "evidence": action.get("evidence"),
+    }
+
+
+def _pipeline_evidence_rank(pipe: dict[str, Any]) -> int:
+    evidence = pipe.get("evidence") if isinstance(pipe.get("evidence"), list) else []
+    kinds = {str(item.get("kind") or "") for item in evidence if isinstance(item, dict)}
+    if "native_runtime" in kinds:
+        return 0
+    if "manual" in kinds or "canonical" in kinds:
+        return 1
+    if "inferred" in kinds:
+        return 2
+    return 3
+
+
+def _selection_explanation(pipe: dict[str, Any], work: dict[str, Any], rank: tuple[Any, ...]) -> dict[str, Any]:
+    selection = work.get("selection") if isinstance(work.get("selection"), dict) else {}
+    return {
+        "policy": [
+            "explicit accepted founder priority",
+            "accepted external deadline",
+            "dependency-unblock value",
+            "readiness and evidence freshness",
+            "portfolio fairness",
+            "age within priority class",
+            "deterministic tie-breaker",
+        ],
+        "winner": {
+            "pipeline_id": pipe.get("pipeline_id"),
+            "work_item_id": work.get("work_item_id"),
+            "founder_priority": selection.get("founder_priority"),
+            "deadline": selection.get("deadline"),
+            "dependency_unblock_value": selection.get("dependency_unblock_value"),
+            "age_index": selection.get("age_index"),
+        },
+        "rank_tuple": list(rank),
+        "why": "Selected the lowest deterministic rank among safe READY_TO_BUILD items; blocked/stale pipelines are excluded.",
     }
 
 
@@ -615,6 +849,8 @@ def format_whats_next(snapshot: dict[str, Any]) -> str:
         "Recommended next action: "
         f"{rec.get('pipeline_id') or 'none'} / {rec.get('state')} / {rec.get('action_type')} - {rec.get('summary')}"
     )
+    if rec.get("selection_explanation"):
+        lines.append(f"Selection: {rec['selection_explanation'].get('why')}")
     lines.append("")
     lines.append("Pipelines:")
     for pipe in snapshot.get("pipelines") or []:
@@ -642,6 +878,7 @@ def format_whats_running(snapshot: dict[str, Any]) -> str:
         f"DESIRED CAPACITY: {cap.get('desired')}",
         f"CONFIGURED MAX: {cap.get('configured_max')}",
         f"RUNNING: {cap.get('running')}",
+        f"READY TO BUILD: {cap.get('ready')}",
         f"QUEUED: {cap.get('queued')}",
         f"AWAITING REVIEW: {cap.get('awaiting_review')}",
         f"AVAILABLE CAPACITY: {cap.get('available')}",
@@ -656,6 +893,7 @@ def format_whats_running(snapshot: dict[str, Any]) -> str:
         )
         for label, key in (
             ("running", "running_work"),
+            ("ready to build", "ready_work"),
             ("queued", "queued_work"),
             ("awaiting review", "awaiting_review_work"),
             ("backpressure", "backpressure"),

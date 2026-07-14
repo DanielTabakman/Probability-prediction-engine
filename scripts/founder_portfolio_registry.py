@@ -24,7 +24,7 @@ REGISTRATION_STAGES = {
     "COMPLETE",
 }
 
-EVIDENCE_KINDS = {"native_runtime", "manual", "inferred", "missing", "stale"}
+EVIDENCE_KINDS = {"native_runtime", "canonical", "manual", "external", "inferred", "missing", "stale"}
 NORMALIZED_STATES = {
     "READY_TO_BUILD",
     "RUNNING",
@@ -137,6 +137,11 @@ def validate_registry(repo: Path | None = None) -> list[str]:
 
         if status_adapter and status_adapter.get("read_only") is not True:
             errors.append(f"{owner}: status_adapter.read_only must be true")
+        if status_adapter and str(status_adapter.get("source_scope") or "") == "external_repository":
+            if not str(status_adapter.get("external_repo") or "").strip():
+                errors.append(f"{owner}: external status adapter missing external_repo")
+            if not str(status_adapter.get("external_root_env") or "").strip():
+                errors.append(f"{owner}: external status adapter missing external_root_env")
         if build_adapter and build_adapter.get("dispatch_commands_enabled") is not False:
             errors.append(f"{owner}: dispatch commands must be disabled in v1")
         if scheduling and scheduling.get("continuous_refill_eligible") is not False:

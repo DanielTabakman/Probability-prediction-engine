@@ -30,10 +30,13 @@
       "status_adapter": {
         "kind": "ppe_phase_queue",
         "read_only": true,
-        "native_sources": [
+        "source_scope": "canonical_repo",
+        "manual_sources": [
           "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
           "docs/SOP/PHASE_QUEUE.json",
-          "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+          "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+        ],
+        "native_sources": [
           "artifacts/orchestrator/ACTIVE_RUN.json"
         ],
         "freshness_seconds": 21600
@@ -75,6 +78,10 @@
       "status_adapter": {
         "kind": "autobuilder_readonly_artifacts",
         "read_only": true,
+        "source_scope": "external_repository",
+        "external_repo": "DanielTabakman/msos-autobuilder",
+        "external_root_env": "MSOS_AUTOBUILDER_STATUS_ROOT",
+        "source_unavailable_behavior": "fail_closed_pipeline_scoped",
         "native_sources": [
           "artifacts/orchestrator/AUTOBUILDER_STATUS.json",
           "artifacts/control_plane/AUTOMATIC_BUILD_POLICY.json",
