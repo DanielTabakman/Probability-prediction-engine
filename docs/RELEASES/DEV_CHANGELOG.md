@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `37a165d6` — Merge founder portfolio registry and read-only commands
+- `8490ac21` — Control-plane: dev changelog
+- `bbb97033` — Fix founder portfolio read-only semantics (`scripts/`)
+- `1fcfcd29` — Add founder portfolio registry commands (`scripts/`)
 - `9424cae6` — Control-plane: dev changelog
 - `a3551453` — Merge scheduled Autobuilder and lane policy v1
 - `4937b950` — docs: require schedule-ready evidence for refill (`docs/SOP/`)
