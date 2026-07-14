@@ -42,14 +42,20 @@ def _write_multislice_ready_repo(
     *,
     control_status: str | None = None,
     control_non_blocking: bool = False,
+    selection_text: str = "**SELECTED**",
+    backlog_status: str | None = None,
+    active_manifest_plan: str | None = None,
+    active_run_slice: str | None = None,
+    operator_text: str | None = None,
 ) -> Path:
+    plan_rel = "docs/SOP/PHASE_PLANS/fixture_relay.json"
     _write_json(
         repo / "docs/SOP/PHASE_QUEUE.json",
         {
             "version": 1,
             "items": [
                 {
-                    "planPath": "docs/SOP/PHASE_PLANS/fixture_relay.json",
+                    "planPath": plan_rel,
                     "status": "READY",
                     "reason": "[HIGH] Fixture",
                 }
@@ -65,7 +71,7 @@ def _write_multislice_ready_repo(
     if control_non_blocking:
         control_slice["nonBlocking"] = True
     _write_json(
-        repo / "docs/SOP/PHASE_PLANS/fixture_relay.json",
+        repo / plan_rel,
         {
             "name": "fixture",
             "sprintSpecPath": "docs/SOP/SPRINT_FIXTURE.md",
@@ -90,7 +96,40 @@ def _write_multislice_ready_repo(
         },
     )
     (repo / "docs/SOP/SPRINT_FIXTURE.md").write_text("# sprint\n", encoding="utf-8")
-    (repo / "docs/SOP/POST_FIXTURE_SELECTION.md").write_text("# selection\n", encoding="utf-8")
+    (repo / "docs/SOP/POST_FIXTURE_SELECTION.md").write_text(f"# selection\n\n{selection_text}\n", encoding="utf-8")
+    if backlog_status is not None:
+        _write_json(
+            repo / "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+            {
+                "version": 1,
+                "items": [
+                    {
+                        "chapterId": "fixture",
+                        "status": backlog_status,
+                        "planPath": plan_rel,
+                    }
+                ],
+            },
+        )
+    if active_manifest_plan is not None:
+        _write_json(
+            repo / "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+            {"version": 1, "status": "READY", "phasePlanPath": active_manifest_plan},
+        )
+    if active_run_slice is not None:
+        _write_json(
+            repo / "artifacts/orchestrator/ACTIVE_RUN.json",
+            {
+                "version": 1,
+                "phasePlanPath": plan_rel,
+                "slice_id": active_run_slice,
+                "stage": "RUNNING",
+            },
+        )
+    if operator_text is not None:
+        path = repo / "artifacts/orchestrator/OPERATOR_STATUS.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(operator_text, encoding="utf-8")
     if control_status is not None:
         (repo / "docs/SOP/FIXTURE_EVIDENCE_STATUS.md").write_text(
             "\n".join(
@@ -107,6 +146,17 @@ def _write_multislice_ready_repo(
             encoding="utf-8",
         )
     return repo
+
+
+def _fixture_control_status(repo: Path) -> dict:
+    from scripts.founder_portfolio import collect_portfolio
+
+    snapshot = collect_portfolio(repo)
+    return snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]["statuses"]["Fixture-Control-Slice001"]
+
+
+def _claim_kinds(status: dict) -> set[str]:
+    return {claim["kind"] for claim in status["claims"]}
 
 
 def _hash_tree(root: Path) -> dict[str, str]:
@@ -252,6 +302,8 @@ def test_selected_multislice_work_contains_deterministic_prerequisite_packet(tmp
 
     assert packet["read_only"] is True
     assert packet["source"] == "ppe_native_read_only"
+    assert packet["dispatchable"] is False
+    assert packet["dispatch_blockers"]
     assert packet["evidence"]["identity"] == next(
         item for item in second["pipelines"][0]["ready_work"] if item["work_item_id"] == "fixture"
     )["native_prerequisites"]["evidence"]["identity"]
@@ -261,6 +313,119 @@ def test_selected_multislice_work_contains_deterministic_prerequisite_packet(tmp
         source["path"] == "docs/SOP/FIXTURE_EVIDENCE_STATUS.md"
         for source in packet["evidence"]["source_files"]
     )
+    assert "as_of" not in packet["evidence"]
+    assert "generated_at" in packet
+
+
+def test_queue_state_contributes_explicit_claim(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="COMPLETE")
+
+    status = _fixture_control_status(repo)
+
+    assert "queue" in _claim_kinds(status)
+    assert any(claim["source"] == "docs/SOP/PHASE_QUEUE.json" and claim["state"] == "ready" for claim in status["claims"])
+
+
+def test_active_manifest_mismatch_blocks_prerequisite(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(
+        _minimal_repo(tmp_path),
+        control_status="COMPLETE",
+        active_manifest_plan="docs/SOP/PHASE_PLANS/other_relay.json",
+    )
+
+    status = _fixture_control_status(repo)
+
+    assert status["status"] == "blocked"
+    assert "active_manifest" in _claim_kinds(status)
+    assert "other_relay.json" in status["evidence"]
+
+
+def test_selected_and_not_selected_selection_records_affect_status(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    selected = _write_multislice_ready_repo(_minimal_repo(tmp_path / "selected"), control_status="COMPLETE")
+    not_selected = _write_multislice_ready_repo(
+        _minimal_repo(tmp_path / "not-selected"),
+        control_status="COMPLETE",
+        selection_text="**NOT SELECTED** - blocked",
+    )
+
+    assert _fixture_control_status(selected)["status"] == "completed"
+    blocked = _fixture_control_status(not_selected)
+    assert blocked["status"] == "blocked"
+    assert "selection record says NOT SELECTED" in blocked["evidence"]
+
+
+def test_backlog_blocked_or_deferred_state_affects_status(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    for state in ("blocked", "deferred"):
+        repo = _write_multislice_ready_repo(_minimal_repo(tmp_path / state), control_status="COMPLETE", backlog_status=state)
+
+        status = _fixture_control_status(repo)
+
+        assert status["status"] == "blocked"
+        assert "backlog" in _claim_kinds(status)
+        assert f"backlog status={state}" in status["evidence"]
+
+
+def test_matching_active_run_affects_prerequisite_status(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(
+        _minimal_repo(tmp_path),
+        control_status="COMPLETE",
+        active_run_slice="Fixture-Control-Slice001",
+    )
+
+    status = _fixture_control_status(repo)
+
+    assert status["status"] == "blocked"
+    assert "active_run" in _claim_kinds(status)
+    assert "active run stage=RUNNING" in status["evidence"]
+
+
+def test_operator_status_can_block_prerequisite_status(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(
+        _minimal_repo(tmp_path),
+        control_status="COMPLETE",
+        operator_text="**Mode:** `CLOSEOUT_ONLY` - fixture product on main; do NOT re-BUILD.",
+    )
+
+    status = _fixture_control_status(repo)
+
+    assert status["status"] == "blocked"
+    assert "operator_status" in _claim_kinds(status)
+    assert "do-not-rebuild" in status["evidence"].lower()
+
+
+def test_multiple_conflicting_current_claims_are_retained_and_blocked(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="PENDING", backlog_status="done")
+
+    status = _fixture_control_status(repo)
+
+    assert status["status"] == "blocked"
+    assert "conflicting native evidence" in status["evidence"]
+    assert "backlog" in _claim_kinds(status)
+    assert "evidence_status" in _claim_kinds(status)
+
+
+def test_duplicate_metric_rows_use_latest_timestamp_not_iteration_order(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status=None)
+    rows = [
+        {"slice_id": "Fixture-Control-Slice001", "status": "closed", "completed_at": "2030-01-02T00:00:00Z"},
+        {"slice_id": "Fixture-Control-Slice001", "status": "failed", "completed_at": "2030-01-01T00:00:00Z"},
+    ]
+    path = repo / "artifacts/workflow_metrics/slices.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+
+    status = _fixture_control_status(repo)
+
+    assert status["status"] == "completed"
+    assert "latest accepted workflow metric status=closed" in status["evidence"]
 
 
 def test_missing_prerequisite_evidence_remains_pending(tmp_path: Path, monkeypatch) -> None:
@@ -285,9 +450,11 @@ def test_explicit_native_completion_permits_product_slice(tmp_path: Path, monkey
     status = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]["statuses"][
         "Fixture-Control-Slice001"
     ]
+    packet = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]
 
     assert status["status"] == "completed"
     assert status["non_blocking"] is False
+    assert packet["dispatchable"] is True
 
 
 def test_explicit_non_blocking_evidence_permits_product_slice(tmp_path: Path, monkeypatch) -> None:
@@ -299,9 +466,11 @@ def test_explicit_non_blocking_evidence_permits_product_slice(tmp_path: Path, mo
     status = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]["statuses"][
         "Fixture-Control-Slice001"
     ]
+    packet = snapshot["pipelines"][0]["ready_work"][0]["native_prerequisites"]
 
     assert status["status"] == "pending"
     assert status["non_blocking"] is True
+    assert packet["dispatchable"] is True
 
 
 def test_prerequisite_identity_changes_when_evidence_changes(tmp_path: Path, monkeypatch) -> None:
@@ -317,6 +486,39 @@ def test_prerequisite_identity_changes_when_evidence_changes(tmp_path: Path, mon
     assert first != second
 
 
+def test_prerequisite_identity_is_deterministic_across_same_commit_worktrees(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo_a = _write_multislice_ready_repo(_minimal_repo(tmp_path / "a"), control_status="PENDING")
+    repo_b = _write_multislice_ready_repo(_minimal_repo(tmp_path / "b"), control_status="PENDING")
+
+    identity_a = collect_portfolio(repo_a)["pipelines"][0]["ready_work"][0]["native_prerequisites"]["evidence"][
+        "identity"
+    ]
+    identity_b = collect_portfolio(repo_b)["pipelines"][0]["ready_work"][0]["native_prerequisites"]["evidence"][
+        "identity"
+    ]
+
+    assert identity_a == identity_b
+
+
+def test_filesystem_mtime_does_not_change_identity_or_source_evidence_time(tmp_path: Path, monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    repo = _write_multislice_ready_repo(_minimal_repo(tmp_path), control_status="PENDING")
+    first_packet = collect_portfolio(repo)["pipelines"][0]["ready_work"][0]["native_prerequisites"]
+    evidence_doc = repo / "docs/SOP/FIXTURE_EVIDENCE_STATUS.md"
+    os.utime(evidence_doc, (100, 100))
+    second_packet = collect_portfolio(repo)["pipelines"][0]["ready_work"][0]["native_prerequisites"]
+
+    assert first_packet["evidence"]["identity"] == second_packet["evidence"]["identity"]
+    assert "as_of" not in first_packet["evidence"]
+    assert "as_of" not in second_packet["evidence"]
+    assert first_packet["evidence"]["source_files"] == second_packet["evidence"]["source_files"]
+
+
 def test_current_live_dist_stats_legibility_control_slice_fails_closed(monkeypatch) -> None:
     from scripts.founder_portfolio import collect_portfolio
 
@@ -324,11 +526,20 @@ def test_current_live_dist_stats_legibility_control_slice_fails_closed(monkeypat
     snapshot = collect_portfolio(REPO)
     ppe = next(item for item in snapshot["pipelines"] if item["pipeline_id"] == "ppe")
     work = next(item for item in ppe["ready_work"] if item["work_item_id"] == "mvp1_distribution_stats_legibility")
-    status = work["native_prerequisites"]["statuses"]["MVP1-DistStatsLeg-Control-Slice001"]
+    packet = work["native_prerequisites"]
+    status = packet["statuses"]["MVP1-DistStatsLeg-Control-Slice001"]
 
-    assert status["status"] in {"pending", "blocked"}
+    assert packet["dispatchable"] is False
+    assert packet["dispatch_blockers"]
+    assert status["status"] == "blocked"
     assert status["non_blocking"] is False
+    assert "docs/SOP/PHASE_QUEUE.json" in status["source_refs"]
+    assert "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md" in status["source_refs"]
+    assert "docs/SOP/ACTIVE_PHASE_MANIFEST.json" in status["source_refs"]
     assert "MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md" in status["evidence"]
+    assert "selection record says NOT SELECTED" in status["evidence"]
+    assert "active manifest selects docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json" in status["evidence"]
+    assert "evidence document front matter is archived/closed" in status["evidence"]
     assert "PENDING" in status["evidence"].upper()
 
 

@@ -121,6 +121,30 @@ def _evidence_source_file(repo: Path, rel: str) -> dict[str, Any]:
     out: dict[str, Any] = {"path": rel, "exists": digest is not None}
     if digest:
         out["sha256"] = digest
+        git_meta = _git_source_metadata(repo, rel)
+        if git_meta:
+            out.update(git_meta)
+    return out
+
+
+def _git_source_metadata(repo: Path, rel: str) -> dict[str, Any] | None:
+    import subprocess
+
+    proc = subprocess.run(
+        ["git", "log", "-1", "--format=%H%x00%cI", "--", rel],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        return None
+    commit, _, committed_at = proc.stdout.strip().partition("\x00")
+    if not commit:
+        return None
+    out = {"git_commit": commit}
+    if committed_at:
+        out["git_committed_at"] = committed_at
     return out
 
 
@@ -256,18 +280,21 @@ def _native_prerequisites_for_ready_item(repo: Path, queue_item: dict[str, Any])
         return None
     source_rels = _prerequisite_source_rels(plan_rel, plan)
     statuses = _native_slice_statuses(repo, plan_rel, plan, source_rels, plan_error)
+    dispatchability = _native_dispatchability(plan or {}, statuses)
     source_files = [_evidence_source_file(repo, rel) for rel in source_rels]
-    identity_payload = {"source_files": source_files, "statuses": statuses}
+    identity_payload = {"dispatchability": dispatchability, "source_files": source_files, "statuses": statuses}
     identity = hashlib.sha256(
         json.dumps(identity_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
     return {
         "read_only": True,
         "source": "ppe_native_read_only",
+        "generated_at": _utc_now(),
+        "dispatchable": dispatchability["dispatchable"],
+        "dispatch_blockers": dispatchability["dispatch_blockers"],
         "evidence": {
             "source_files": source_files,
             "identity": identity,
-            "as_of": _latest_source_mtime(repo, source_rels) or _utc_now(),
         },
         "statuses": statuses,
     }
@@ -296,15 +323,30 @@ def _prerequisite_source_rels(plan_rel: str, plan: dict[str, Any] | None) -> lis
     return sorted(dict.fromkeys(source_rels))
 
 
-def _latest_source_mtime(repo: Path, source_rels: list[str]) -> str | None:
-    latest: datetime | None = None
-    for rel in source_rels:
-        path = repo / rel
-        if not path.is_file():
+def _native_dispatchability(plan: dict[str, Any], statuses: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    slices = [item for item in plan.get("slices") or [] if isinstance(item, dict)]
+    selected_index: int | None = None
+    for index, item in enumerate(slices):
+        plane = str(item.get("declaredPlane") or "").strip().upper()
+        layer = str(item.get("layerPreset") or "").strip().upper()
+        if item.get("closeout") or "SMOKE" in str(item.get("sliceId") or "").upper():
             continue
-        mtime = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).replace(microsecond=0)
-        latest = mtime if latest is None or mtime > latest else latest
-    return latest.isoformat().replace("+00:00", "Z") if latest else None
+        if plane == "PRODUCT-PLANE" and layer != "CONTROL" and isinstance(item.get("touchSet"), list):
+            selected_index = index
+            break
+    if selected_index is None:
+        return {"dispatchable": False, "dispatch_blockers": ["no native product implementation slice found"]}
+    blockers: list[str] = []
+    for item in slices[:selected_index]:
+        slice_id = str(item.get("sliceId") or "").strip()
+        if not slice_id or item.get("closeout") or "SMOKE" in slice_id.upper() or "CLOSEOUT" in slice_id.upper():
+            continue
+        status = statuses.get(slice_id) or {}
+        state = str(status.get("status") or "").lower()
+        if state in {"complete", "completed"} or status.get("non_blocking") is True:
+            continue
+        blockers.append(f"{slice_id}: {state or 'missing'} - {status.get('evidence') or 'no evidence'}")
+    return {"dispatchable": not blockers, "dispatch_blockers": blockers}
 
 
 def _native_slice_statuses(
@@ -314,9 +356,10 @@ def _native_slice_statuses(
     source_rels: list[str],
     plan_error: str | None,
 ) -> dict[str, dict[str, Any]]:
-    evidence_statuses = _evidence_doc_slice_statuses(repo, source_rels)
-    metrics_statuses = _workflow_metric_slice_statuses(repo)
-    non_blocking = _explicit_non_blocking_slices(plan or {})
+    plan_claims = _plan_level_claims(repo, plan_rel, plan or {})
+    evidence_statuses = _evidence_doc_slice_claims(repo, source_rels)
+    metrics_statuses = _workflow_metric_slice_claims(repo)
+    non_blocking = _explicit_non_blocking_slice_claims(plan or {})
     statuses: dict[str, dict[str, Any]] = {}
     for raw_slice in (plan or {}).get("slices") or []:
         if not isinstance(raw_slice, dict):
@@ -326,19 +369,223 @@ def _native_slice_statuses(
             continue
         claims: list[dict[str, Any]] = []
         if plan_error:
-            claims.append({"source": plan_rel, "state": "blocked", "detail": plan_error})
-        if slice_id in evidence_statuses:
-            claims.append(evidence_statuses[slice_id])
-        if slice_id in metrics_statuses:
-            claims.append(metrics_statuses[slice_id])
-        if slice_id in non_blocking:
-            claims.append(non_blocking[slice_id])
+            claims.append(_claim(plan_rel, "blocked", "phase_plan", plan_error))
+        claims.extend(plan_claims)
+        claims.extend(evidence_statuses.get(slice_id, []))
+        claims.extend(metrics_statuses.get(slice_id, []))
+        claims.extend(non_blocking.get(slice_id, []))
         statuses[slice_id] = _resolve_native_slice_status(slice_id, claims)
     return statuses
 
 
-def _evidence_doc_slice_statuses(repo: Path, source_rels: list[str]) -> dict[str, dict[str, Any]]:
-    statuses: dict[str, dict[str, Any]] = {}
+def _claim(
+    source: str,
+    state: str,
+    kind: str,
+    detail: str,
+    *,
+    applies_to: str = "slice",
+    timestamp: str | None = None,
+    order: int | None = None,
+) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "source": source,
+        "state": state,
+        "kind": kind,
+        "detail": detail,
+        "applies_to": applies_to,
+    }
+    if timestamp:
+        out["timestamp"] = timestamp
+    if order is not None:
+        out["order"] = order
+    return out
+
+
+def _chapter_id_from_plan_rel(plan_rel: str) -> str:
+    return Path(plan_rel).stem.replace("_relay", "")
+
+
+def _plan_level_claims(repo: Path, plan_rel: str, plan: dict[str, Any]) -> list[dict[str, Any]]:
+    chapter_id = _chapter_id_from_plan_rel(plan_rel)
+    claims: list[dict[str, Any]] = []
+    claims.extend(_queue_claims(repo, plan_rel))
+    claims.extend(_active_manifest_claims(repo, plan_rel))
+    selection_rel = _safe_rel(plan.get("selectionRecord"))
+    if selection_rel:
+        claims.extend(_selection_record_claims(repo, selection_rel))
+    claims.extend(_backlog_claims(repo, plan_rel, chapter_id))
+    claims.extend(_active_run_claims(repo, plan_rel))
+    claims.extend(_operator_status_claims(repo, plan_rel, chapter_id))
+    claims.extend(_evidence_doc_plan_claims(repo, plan))
+    return claims
+
+
+def _queue_claims(repo: Path, plan_rel: str) -> list[dict[str, Any]]:
+    data, error = _load_json(repo / "docs/SOP/PHASE_QUEUE.json")
+    if error and error != "missing":
+        return [_claim("docs/SOP/PHASE_QUEUE.json", "blocked", "queue", error, applies_to="plan")]
+    matches = [
+        item for item in (data or {}).get("items") or [] if isinstance(item, dict) and _safe_rel(item.get("planPath")) == plan_rel
+    ]
+    if not matches:
+        return [_claim("docs/SOP/PHASE_QUEUE.json", "blocked", "queue", "selected plan is missing from queue", applies_to="plan")]
+    claims = []
+    for index, item in enumerate(matches):
+        status = str(item.get("status") or "").strip().upper()
+        state = "ready" if status in {"READY", "PLANNED"} else "completed" if status == "DONE" else "blocked"
+        claims.append(
+            _claim(
+                "docs/SOP/PHASE_QUEUE.json",
+                state,
+                "queue",
+                f"queue status={status}",
+                applies_to="plan",
+                order=index,
+            )
+        )
+    return claims
+
+
+def _active_manifest_claims(repo: Path, plan_rel: str) -> list[dict[str, Any]]:
+    data, error = _load_json(repo / "docs/SOP/ACTIVE_PHASE_MANIFEST.json")
+    if error and error != "missing":
+        return [_claim("docs/SOP/ACTIVE_PHASE_MANIFEST.json", "blocked", "active_manifest", error, applies_to="plan")]
+    manifest_plan = _safe_rel((data or {}).get("phasePlanPath"))
+    manifest_status = str((data or {}).get("status") or "").strip().upper()
+    if not manifest_plan:
+        return [
+            _claim(
+                "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                "unknown",
+                "active_manifest",
+                "no active phase plan",
+                applies_to="plan",
+            )
+        ]
+    if manifest_plan != plan_rel:
+        return [
+            _claim(
+                "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                "blocked",
+                "active_manifest",
+                f"active manifest selects {manifest_plan}, not {plan_rel}; status={manifest_status or 'missing'}",
+                applies_to="plan",
+            )
+        ]
+    state = (
+        "running"
+        if manifest_status == "RUNNING"
+        else "selected"
+        if manifest_status in {"READY", "IDE_BUILD", "RUN_LOCAL"}
+        else "completed"
+        if manifest_status == "COMPLETE"
+        else "blocked"
+    )
+    return [
+        _claim(
+            "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+            state,
+            "active_manifest",
+            f"active manifest matches plan; status={manifest_status}",
+            applies_to="plan",
+        )
+    ]
+
+
+def _selection_record_claims(repo: Path, selection_rel: str) -> list[dict[str, Any]]:
+    path = repo / selection_rel
+    if not path.is_file():
+        return [_claim(selection_rel, "blocked", "selection_record", "selection record missing", applies_to="plan")]
+    text = path.read_text(encoding="utf-8")
+    upper = text.upper()
+    if "NOT SELECTED" in upper:
+        return [_claim(selection_rel, "blocked", "selection_record", "selection record says NOT SELECTED", applies_to="plan")]
+    if "SELECTED" in upper:
+        return [_claim(selection_rel, "selected", "selection_record", "selection record says SELECTED", applies_to="plan")]
+    return [_claim(selection_rel, "unknown", "selection_record", "selection record has no explicit selected state", applies_to="plan")]
+
+
+def _backlog_claims(repo: Path, plan_rel: str, chapter_id: str) -> list[dict[str, Any]]:
+    data, error = _load_json(repo / "docs/SOP/PHASE_CHAPTER_BACKLOG.json")
+    if error and error != "missing":
+        return [_claim("docs/SOP/PHASE_CHAPTER_BACKLOG.json", "blocked", "backlog", error, applies_to="plan")]
+    out = []
+    for index, item in enumerate((data or {}).get("items") or []):
+        if not isinstance(item, dict):
+            continue
+        if _safe_rel(item.get("planPath")) != plan_rel and str(item.get("chapterId") or "") != chapter_id:
+            continue
+        status = str(item.get("status") or "").strip().lower()
+        if status in {"done", "complete", "completed"}:
+            state = "completed"
+        elif status in {"blocked", "deferred", "awaiting_founder"}:
+            state = "blocked"
+        else:
+            state = "pending"
+        out.append(_claim("docs/SOP/PHASE_CHAPTER_BACKLOG.json", state, "backlog", f"backlog status={status or 'missing'}", applies_to="plan", order=index))
+    return out
+
+
+def _active_run_claims(repo: Path, plan_rel: str) -> list[dict[str, Any]]:
+    data, error = _load_json(repo / "artifacts/orchestrator/ACTIVE_RUN.json")
+    if error == "missing":
+        return []
+    if error:
+        return [_claim("artifacts/orchestrator/ACTIVE_RUN.json", "blocked", "active_run", error, applies_to="plan")]
+    run_plan = _safe_rel((data or {}).get("plan_path") or (data or {}).get("phasePlanPath"))
+    run_slice = str((data or {}).get("slice_id") or (data or {}).get("sliceId") or "").strip()
+    run_stage = str((data or {}).get("stage") or (data or {}).get("status") or "RUNNING").strip().upper()
+    if run_plan and run_plan != plan_rel:
+        return [_claim("artifacts/orchestrator/ACTIVE_RUN.json", "blocked", "active_run", f"active run is for {run_plan}, not {plan_rel}", applies_to="plan")]
+    detail = f"active run stage={run_stage}"
+    if run_slice:
+        detail += f" slice={run_slice}"
+    return [_claim("artifacts/orchestrator/ACTIVE_RUN.json", "running", "active_run", detail, applies_to=run_slice or "plan")]
+
+
+def _operator_status_claims(repo: Path, plan_rel: str, chapter_id: str) -> list[dict[str, Any]]:
+    rel = "artifacts/orchestrator/OPERATOR_STATUS.md"
+    path = repo / rel
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    lower = text.lower()
+    claims: list[dict[str, Any]] = []
+    if chapter_id.lower() in lower:
+        if "closeout_only" in lower or "closeout-only" in lower or "do not re-build" in lower:
+            claims.append(_claim(rel, "blocked", "operator_status", f"operator status references {chapter_id} in closeout-only / do-not-rebuild context", applies_to="plan"))
+        else:
+            claims.append(_claim(rel, "pending", "operator_status", f"operator status references {chapter_id}", applies_to="plan"))
+    if plan_rel.lower() in lower:
+        claims.append(_claim(rel, "pending", "operator_status", f"operator status references {plan_rel}", applies_to="plan"))
+    return claims
+
+
+def _evidence_doc_plan_claims(repo: Path, plan: dict[str, Any]) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for raw_slice in plan.get("slices") or []:
+        if not isinstance(raw_slice, dict) or not isinstance(raw_slice.get("closeout"), dict):
+            continue
+        evidence_doc = _safe_rel(raw_slice["closeout"].get("evidenceDoc"))
+        if not evidence_doc:
+            continue
+        path = repo / evidence_doc
+        if not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8")
+        lower = text.lower()
+        if "archived: true" in lower or "closed:" in lower:
+            out.append(_claim(evidence_doc, "completed", "evidence_document", "evidence document front matter is archived/closed", applies_to="plan"))
+        for line in text.splitlines():
+            if "status" in line.lower() and "complete" in line.lower() and not line.strip().startswith("|"):
+                out.append(_claim(evidence_doc, "completed", "evidence_document", line.strip(), applies_to="plan"))
+                break
+    return out
+
+
+def _evidence_doc_slice_claims(repo: Path, source_rels: list[str]) -> dict[str, list[dict[str, Any]]]:
+    statuses: dict[str, list[dict[str, Any]]] = {}
     for rel in source_rels:
         if not rel.endswith("_EVIDENCE_STATUS.md"):
             continue
@@ -356,20 +603,16 @@ def _evidence_doc_slice_statuses(repo: Path, source_rels: list[str]) -> dict[str
             state = cells[1].lower().replace(" ", "_").replace("-", "_")
             if not slice_id:
                 continue
-            statuses[slice_id] = {
-                "source": rel,
-                "state": state,
-                "detail": cells[2] if len(cells) > 2 else "",
-            }
+            statuses.setdefault(slice_id, []).append(_claim(rel, state, "evidence_status", cells[2] if len(cells) > 2 else ""))
     return statuses
 
 
-def _workflow_metric_slice_statuses(repo: Path) -> dict[str, dict[str, Any]]:
+def _workflow_metric_slice_claims(repo: Path) -> dict[str, list[dict[str, Any]]]:
     path = repo / "artifacts/workflow_metrics/slices.jsonl"
-    statuses: dict[str, dict[str, Any]] = {}
+    rows_by_slice: dict[str, list[dict[str, Any]]] = {}
     if not path.is_file():
-        return statuses
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        return {}
+    for order, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines()):
         if not raw_line.strip():
             continue
         try:
@@ -381,6 +624,12 @@ def _workflow_metric_slice_statuses(repo: Path) -> dict[str, dict[str, Any]]:
         slice_id = str(row.get("slice_id") or row.get("sliceId") or "").strip()
         if not slice_id:
             continue
+        row["_order"] = order
+        rows_by_slice.setdefault(slice_id, []).append(row)
+    claims: dict[str, list[dict[str, Any]]] = {}
+    for slice_id, rows in rows_by_slice.items():
+        latest = _latest_metric_row(rows)
+        row = latest
         status = str(row.get("status") or "").strip().lower()
         if status in {"closed", "complete", "completed"}:
             state = "completed"
@@ -390,16 +639,29 @@ def _workflow_metric_slice_statuses(repo: Path) -> dict[str, dict[str, Any]]:
             state = "pending"
         else:
             state = "pending"
-        statuses[slice_id] = {
-            "source": "artifacts/workflow_metrics/slices.jsonl",
-            "state": state,
-            "detail": f"workflow metric status={status or 'missing'} source={row.get('source') or 'unknown'}",
-        }
-    return statuses
+        claims[slice_id] = [
+            _claim(
+                "artifacts/workflow_metrics/slices.jsonl",
+                state,
+                "workflow_metric",
+                f"latest accepted workflow metric status={status or 'missing'} source={row.get('source') or 'unknown'}",
+                timestamp=str(row.get("completed_at") or row.get("timestamp") or ""),
+                order=int(row.get("_order") or 0),
+            )
+        ]
+    return claims
 
 
-def _explicit_non_blocking_slices(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    out: dict[str, dict[str, Any]] = {}
+def _latest_metric_row(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    def key(row: dict[str, Any]) -> tuple[str, int]:
+        timestamp = str(row.get("completed_at") or row.get("timestamp") or "")
+        return (timestamp, int(row.get("_order") or 0))
+
+    return sorted(rows, key=key)[-1]
+
+
+def _explicit_non_blocking_slice_claims(plan: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    out: dict[str, list[dict[str, Any]]] = {}
     for raw_slice in plan.get("slices") or []:
         if not isinstance(raw_slice, dict):
             continue
@@ -409,11 +671,14 @@ def _explicit_non_blocking_slices(plan: dict[str, Any]) -> dict[str, dict[str, A
         flag = raw_slice.get("non_blocking") is True or raw_slice.get("nonBlocking") is True
         status_text = str(raw_slice.get("prerequisiteStatus") or raw_slice.get("status") or "").lower()
         if flag or status_text in {"non_blocking", "non-blocking", "not_required", "not required"}:
-            out[slice_id] = {
-                "source": "phase_plan",
-                "state": "non_blocking",
-                "detail": "phase plan explicitly marks slice prerequisite as non-blocking",
-            }
+            out.setdefault(slice_id, []).append(
+                _claim(
+                    "phase_plan",
+                    "non_blocking",
+                    "phase_plan",
+                    "phase plan explicitly marks slice prerequisite as non-blocking",
+                )
+            )
     return out
 
 
@@ -422,12 +687,20 @@ def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) ->
     non_blocking_claims = [
         claim for claim in claims if claim["state"] in {"non_blocking", "not_required", "not required"}
     ]
-    blocking_claims = [claim for claim in claims if claim["state"] in {"blocked", "failed", "error"}]
-    pending_claims = [claim for claim in claims if claim["state"] in {"pending", "in_progress", "ready", "planned"}]
+    blocking_claims = [claim for claim in claims if claim["state"] in {"blocked", "failed", "error", "running"}]
+    pending_claims = [claim for claim in claims if claim["state"] in {"pending", "in_progress", "planned"}]
     evidence = "; ".join(f"{claim['source']}: {claim['state']} ({claim.get('detail') or 'no detail'})" for claim in claims)
     source_refs = [claim["source"] for claim in claims]
+    claim_payload = [
+        {key: claim[key] for key in ("source", "state", "kind", "detail", "applies_to") if key in claim}
+        | ({"timestamp": claim["timestamp"]} if claim.get("timestamp") else {})
+        | ({"order": claim["order"]} if "order" in claim else {})
+        for claim in claims
+    ]
+    base = {"claims": claim_payload}
     if non_blocking_claims and not blocking_claims:
         return {
+            **base,
             "status": "pending",
             "non_blocking": True,
             "evidence": evidence,
@@ -435,6 +708,7 @@ def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) ->
         }
     if complete_claims and not pending_claims and not blocking_claims:
         return {
+            **base,
             "status": "completed",
             "non_blocking": False,
             "evidence": evidence,
@@ -442,6 +716,7 @@ def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) ->
         }
     if complete_claims and (pending_claims or blocking_claims):
         return {
+            **base,
             "status": "blocked",
             "non_blocking": False,
             "evidence": f"conflicting native evidence for {slice_id}: {evidence}",
@@ -449,6 +724,7 @@ def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) ->
         }
     if blocking_claims:
         return {
+            **base,
             "status": "blocked",
             "non_blocking": False,
             "evidence": evidence,
@@ -456,12 +732,14 @@ def _resolve_native_slice_status(slice_id: str, claims: list[dict[str, Any]]) ->
         }
     if pending_claims:
         return {
+            **base,
             "status": "pending",
             "non_blocking": False,
             "evidence": evidence,
             "source_refs": source_refs,
         }
     return {
+        **base,
         "status": "pending",
         "non_blocking": False,
         "evidence": "no accepted PPE native completion or non-blocking evidence found",
