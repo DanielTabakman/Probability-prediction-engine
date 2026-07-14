@@ -23,10 +23,10 @@ closed: 2026-06-20
 
 ## Operator check-in (required at closeout)
 
-- [x] Confirm thesis on website → reload → state persists (not browser-only) — server store/API path shipped in PR #177; current clients use `/api/theses` with localStorage only as migration/offline fallback.
-- [x] Command Center draft/confirmed counts match MSOS records — `loadWorkflowSummary` is wired into `CommandCenterContent.tsx` and covered by workflow persistence tests.
-- [x] Snapshot bridge (phase 2) still works alongside MSOS rows — Command Center combines snapshot summary with workflow summary.
-- [x] Expression save remains sim-only labeled — expression persistence saves simulated paper-trade records to the workspace and does not send orders.
+- [ ] Confirm thesis on website → reload → state persists (not browser-only) — automated equivalent covered by PR #177 implementation/tests for `/api/theses`, `upsertCurrentThesis`, and localStorage migration fallback; no exact historical browser reload witness was found during issue #5370, and issue #5370 did not rerun the website manually.
+- [ ] Command Center draft/confirmed counts match MSOS records — automated equivalent covered by PR #177 Command Center integration and `loadWorkflowSummary` tests; no exact historical manual Command Center runtime witness was found during issue #5370.
+- [ ] Snapshot bridge (phase 2) still works alongside MSOS rows — automated/current code evidence shows Command Center combines snapshot summary with workflow summary; no fresh website runtime check was performed during issue #5370.
+- [ ] Expression save remains sim-only labeled — automated/current code evidence shows expression persistence saves simulated paper-trade records to the workspace and does not send orders; no fresh website runtime check was performed during issue #5370.
 
 ## Issue #5370 reconciliation
 

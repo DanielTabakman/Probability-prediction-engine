@@ -9,9 +9,11 @@
 
 ## Status
 
-**SELECTED** 2026-06-14 — steward: MSOS-native thesis/expression server store (long-term canon).
+**SELECTED AND COMPLETE** — selected 2026-06-14 by steward for MSOS-native thesis/expression server store (long-term canon); completed/accepted by 2026-06-20.
 
-**Blocked until** `msos_user_state_v1` **COMPLETE**.
+Historical blocker resolved: `msos_user_state_v1` later completed, and workflow persistence was accepted as COMPLETE. PR #177 / merge commit `183b22e1d2d90e9f41eaac411adc9d559739ed6f` shipped the product implementation and tests; commit `d3e5275faf58e7d4c1ad4955cc18dec279a07b4b` recorded `MSOS-WorkflowV1-Closeout-Slice005`; PR #260 / merge commit `aa6a5e4abcc7bdaf49134ea53ccc2fdcefcfbbe9` marked workflow persistence DONE/COMPLETE and advanced selection to the next chapter.
+
+Current native relationship: `PHASE_QUEUE.json` is DONE, `PHASE_CHAPTER_BACKLOG.json` is done, `MSOS_WORKFLOW_PERSISTENCE_V1_EVIDENCE_STATUS.md` is archived/closed, and the unrelated active storyboard manifest remains unchanged. This document is a historical selection record, not an active blocker or dispatch packet.
 
 ## Scope (in)
 
@@ -28,7 +30,7 @@
 
 ## First slice at SELECTION
 
-`MSOS-WorkflowV1-Control-Slice001`
+`MSOS-WorkflowV1-Control-Slice001` was the first historical slice at selection time. It is no longer pending; all workflow-persistence slices are accepted/closed per the evidence-status document and closeout history.
 
 ## Focus playbook
 
