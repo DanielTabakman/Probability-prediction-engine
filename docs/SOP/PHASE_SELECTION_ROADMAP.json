@@ -108,7 +108,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "status": "done",
       "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
-      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
+      "doneReason": "reconciled by issue #5368: PR #104 selected/advanced the chapter; PR #111 / commit 58b82aaf implemented the distribution summary panel and tests; workflow metrics closed Product-Slice002 and Product-Slice003; dev changelog records MVP1-DistStatsLeg-Closeout-Slice005"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",

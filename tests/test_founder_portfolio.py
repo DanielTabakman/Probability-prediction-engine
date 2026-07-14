@@ -519,28 +519,16 @@ def test_filesystem_mtime_does_not_change_identity_or_source_evidence_time(tmp_p
     assert first_packet["evidence"]["source_files"] == second_packet["evidence"]["source_files"]
 
 
-def test_current_live_dist_stats_legibility_control_slice_fails_closed(monkeypatch) -> None:
+def test_current_live_dist_stats_legibility_is_not_ready_after_reconciliation(monkeypatch) -> None:
     from scripts.founder_portfolio import collect_portfolio
 
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
     snapshot = collect_portfolio(REPO)
     ppe = next(item for item in snapshot["pipelines"] if item["pipeline_id"] == "ppe")
-    work = next(item for item in ppe["ready_work"] if item["work_item_id"] == "mvp1_distribution_stats_legibility")
-    packet = work["native_prerequisites"]
-    status = packet["statuses"]["MVP1-DistStatsLeg-Control-Slice001"]
 
-    assert packet["dispatchable"] is False
-    assert packet["dispatch_blockers"]
-    assert status["status"] == "blocked"
-    assert status["non_blocking"] is False
-    assert "docs/SOP/PHASE_QUEUE.json" in status["source_refs"]
-    assert "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md" in status["source_refs"]
-    assert "docs/SOP/ACTIVE_PHASE_MANIFEST.json" in status["source_refs"]
-    assert "MVP1_DISTRIBUTION_STATS_LEGIBILITY_EVIDENCE_STATUS.md" in status["evidence"]
-    assert "selection record says NOT SELECTED" in status["evidence"]
-    assert "active manifest selects docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json" in status["evidence"]
-    assert "evidence document front matter is archived/closed" in status["evidence"]
-    assert "PENDING" in status["evidence"].upper()
+    ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
+    assert "mvp1_distribution_stats_legibility" not in ready_ids
+    assert snapshot["recommended_next_action"]["work_item_id"] != "mvp1_distribution_stats_legibility"
 
 
 def test_blocked_autobuilder_does_not_prevent_safe_ppe_recommendation(tmp_path: Path, monkeypatch) -> None:
