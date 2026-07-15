@@ -186,8 +186,9 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",
-      "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md"
+      "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a COMPLETE 2026-06-18; reconciled by issue #5372",
+      "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
+      "doneReason": "PR #227 / merge commit b05f80f0 shipped implementation and MVP1-SnapshotOwner-Closeout-Slice004"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",

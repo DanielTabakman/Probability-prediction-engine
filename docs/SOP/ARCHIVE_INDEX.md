@@ -1,6 +1,6 @@
 # SOP archive index (generated)
 
-**Generated:** 2026-07-14T21:32:09Z · **Archived chapters:** 57
+**Generated:** 2026-07-15T03:37:09Z · **Archived chapters:** 58
 
 > **Do not load for BUILD** — archived chapters only. Use `python scripts/resolve_sop.py --chapter <id> --json` for active work.
 
@@ -46,6 +46,7 @@
 | `mvp1_post_phase3_steering_smoke` | `docs/SOP/POST_PHASE3_COMMERCIAL_WRAPPER_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_POST_PHASE3_STEERING_SMOKE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_post_phase3_steering_smoke_relay.json` |
 | `mvp1_probability_method_legibility` | `docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md` | `docs/SOP/MVP1_PROBABILITY_METHOD_LEGIBILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json` |
 | `mvp1_reliability` | `docs/SOP/POST_COMMERCIAL_OPS_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_RELIABILITY_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_reliability_relay.json` |
+| `mvp1_snapshot_owner_v1` | `docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md` | `docs/SOP/MVP1_SNAPSHOT_OWNER_V1_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json` |
 | `mvp1_sprint003_evidence_plane` | `docs/SOP/POST_MVP1_FEEDBACK_BETA_SELECTION_OUTCOME.md` | `docs/SOP/MVP1_SPRINT003_EVIDENCE_PLANE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_sprint003_evidence_plane_relay.json` |
 | `mvp1_steering_sync_evidence` | `docs/SOP/MVP1_FRONTIER.md` | `docs/SOP/MVP1_MVP1_STEERING_SYNC_EVIDENCE_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/mvp1_steering_sync_evidence_relay.json` |
 | `phase3_commercial_wrapper` | `docs/SOP/POST_MVP1_PRODUCT_SHELL_SELECTION_OUTCOME.md` | `docs/SOP/PHASE3_COMMERCIAL_WRAPPER_EVIDENCE_STATUS.md` | `docs/SOP/PHASE_PLANS/phase3_commercial_wrapper_relay.json` |
