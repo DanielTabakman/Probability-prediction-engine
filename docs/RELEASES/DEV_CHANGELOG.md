@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-15
+
+- `ae3869d7` — Control-plane: dev changelog
+
 ## 2026-07-14
 
 - `0531bb9d` — Merge pull request #5373 from DanielTabakman/codex/reconcile-snapshot-owner-5372
