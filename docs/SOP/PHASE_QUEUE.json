@@ -38,7 +38,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_deploy_witness_refresh_relay.json",
       "status": "DONE",
-      "reason": "Deploy witness refresh \u2014 evidence-only relay on main",
+      "reason": "Deploy witness refresh — evidence-only relay on main",
       "selectionPrep": "docs/SOP/DEPLOY_WITNESS_REFRESH_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
@@ -46,7 +46,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_phase5_review_hardening_relay.json",
       "status": "DONE",
-      "reason": "Phase 5 review SQLite FK hardening \u2014 MVP1-Phase5-Slice002 canon",
+      "reason": "Phase 5 review SQLite FK hardening — MVP1-Phase5-Slice002 canon",
       "selectionPrep": "docs/SOP/POST_DEPLOY_WITNESS_PHASE5_SELECTION_OUTCOME.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
@@ -68,7 +68,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_website_program_p0_relay.json",
       "status": "DONE",
-      "reason": "MSOS Website Program P0 \u2014 queue install",
+      "reason": "MSOS Website Program P0 — queue install",
       "selectionPrep": "docs/SOP/POST_MSOS_WEBSITE_PROGRAM_P0_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
@@ -83,28 +83,28 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p2_homepage_relay.json",
       "status": "DONE",
-      "reason": "Design system + public homepage \u2014 storyboard gate OPEN; relay plan ready for SELECTION",
+      "reason": "Design system + public homepage — storyboard gate OPEN; relay plan ready for SELECTION",
       "selectionPrep": "docs/SOP/POST_MSOS_P2_HOMEPAGE_SELECTION.md",
       "doneReason": "MSOS P2 closeout manual finish"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p3_command_center_relay.json",
       "status": "DONE",
-      "reason": "Authenticated shell + Command Center \u2014 SELECTION 2026-06-03 after P2 COMPLETE",
+      "reason": "Authenticated shell + Command Center — SELECTION 2026-06-03 after P2 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P3_COMMAND_CENTER_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p4_strategy_lab_relay.json",
       "status": "DONE",
-      "reason": "Strategy Lab / PPE integration \u2014 pre-chartered; blocked until P3 COMPLETE",
+      "reason": "Strategy Lab / PPE integration — pre-chartered; blocked until P3 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P4_STRATEGY_LAB_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "status": "DONE",
-      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
+      "reason": "Worktree prune, queue/consistency witness, optional SOP trim — no product scope",
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "workerMode": "deterministic",
       "doneReason": "issue #5374 READY-frontier audit: evidence archived COMPLETE 2026-06-10; roadmap/backlog already done; selection record remains NOT SELECTED/pre-chartered, so not a build-next candidate"
@@ -112,14 +112,14 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_probability_method_legibility_relay.json",
       "status": "DONE",
-      "reason": "Chart + belief + Polymarket probability method labeling \u2014 next MVP1 priority after MSOS P4",
+      "reason": "Chart + belief + Polymarket probability method labeling — next MVP1 priority after MSOS P4",
       "selectionPrep": "docs/SOP/POST_MVP1_PROBABILITY_METHOD_LEGIBILITY_SELECTION.md",
       "doneReason": "operator guard: chapter evidence already COMPLETE in repo"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_distribution_stats_legibility_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo \u2014 after prob-method legibility",
+      "reason": "[HIGH] Labeled on-screen BTC distribution summary (mean + quartiles) for research demo — after prob-method legibility",
       "selectionPrep": "docs/SOP/POST_MVP1_DISTRIBUTION_STATS_LEGIBILITY_SELECTION.md",
       "doneReason": "reconciled by issue #5368: PR #104 selected/advanced the chapter; PR #111 / commit 58b82aaf implemented the distribution summary panel and tests; workflow metrics closed Product-Slice002 and Product-Slice003; dev changelog records MVP1-DistStatsLeg-Closeout-Slice005"
     },
@@ -133,28 +133,28 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p5_thesis_confirm_relay.json",
       "status": "DONE",
-      "reason": "Thesis confirmation + durable state \u2014 pre-chartered; blocked until P4 COMPLETE",
+      "reason": "Thesis confirmation + durable state — pre-chartered; blocked until P4 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P5_THESIS_CONFIRM_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p6_expression_sim_relay.json",
       "status": "DONE",
-      "reason": "Expression planning + simulation only \u2014 pre-chartered; blocked until P5 COMPLETE",
+      "reason": "Expression planning + simulation only — pre-chartered; blocked until P5 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P6_EXPRESSION_SIM_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p7_monitoring_relay.json",
       "status": "DONE",
-      "reason": "Monitoring, history, calibration loop \u2014 pre-chartered; blocked until P6 COMPLETE",
+      "reason": "Monitoring, history, calibration loop — pre-chartered; blocked until P6 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P7_MONITORING_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_p8_tester_release_relay.json",
       "status": "DONE",
-      "reason": "Tester release + evidence-based next selection \u2014 pre-chartered; blocked until P7 COMPLETE",
+      "reason": "Tester release + evidence-based next selection — pre-chartered; blocked until P7 COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_P8_TESTER_RELEASE_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
@@ -176,7 +176,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
+      "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web — closes deferred P2–P8 screenshot witnesses",
       "selectionPrep": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: product slices 002-006 closed on workflow metrics; PR #1701 merge f86654cecf2c08c5cbee3d15047266d32478a8d9 shipped Witness-Slice008; workflow metric closed Closeout-Slice009 2026-07-06; active manifest remains historical stale READY until VM/operator refresh"
     },
@@ -190,7 +190,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_wiring_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Sign-in, live PPE embed, wired nav \u2014 live product sequence phase 1",
+      "reason": "[HIGH] Sign-in, live PPE embed, wired nav — live product sequence phase 1",
       "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_WIRING_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
@@ -204,63 +204,63 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_persistence_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] MCD phase 3 \u2014 server thesis/expression store",
+      "reason": "[HIGH] MCD phase 3 — server thesis/expression store",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_PERSISTENCE_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",
+      "reason": "[HIGH] PPE snapshot owner_email — phase 4a",
       "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
       "doneReason": "reconciled by issue #5372: PR #227 / merge commit b05f80f0 shipped owner_email schema, migration, Streamlit Access identity capture, owner-filtered list_recent, tests, and MVP1-SnapshotOwner-Closeout-Slice004; PR #221 closed unmerged as superseded"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Access on MSOS routes \u2014 phase 4b",
+      "reason": "[HIGH] Access on MSOS routes — phase 4b",
       "selectionPrep": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #222 merge 7cae9b04dcdb79e59309c0c19ac1c9f795c31bf6 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Live monitor/history \u2014 phase 5",
+      "reason": "[HIGH] Live monitor/history — phase 5",
       "selectionPrep": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #230 merge 4ce632da348efcdfce46c101ae243378327f2628 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Free tier + manual paid \u2014 phase 7a",
+      "reason": "[HIGH] Free tier + manual paid — phase 7a",
       "selectionPrep": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #232 merge a5aaed8072f931203439bd92a4707e5380370db1 completed steering closeout; evidence archived COMPLETE 2026-06-19 and backlog/roadmap done"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
+      "reason": "[HIGH] MCD embed shell — re-queued after workflow persistence COMPLETE",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #267 merge 4eb30f0657309b8e1d8c9119788c260cc3bf4a5d closed EmbedShellV1 Closeout-Slice006; evidence archived COMPLETE 2026-06-21 and backlog/roadmap done"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_e2e_product_witness_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] E2E product witness \u2014 phase 6",
+      "reason": "[MEDIUM] E2E product witness — phase 6",
       "selectionPrep": "docs/SOP/POST_MSOS_E2E_PRODUCT_WITNESS_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_mcd_production_witness_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] MCD operator witness + production sign-off \u2014 COMPLETE 2026-06-21",
+      "reason": "[HIGH] MCD operator witness + production sign-off — COMPLETE 2026-06-21",
       "selectionPrep": "docs/SOP/POST_MSOS_MCD_PRODUCTION_WITNESS_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
+      "reason": "[DEFER] Stripe billing — dropped by operator until stripe_operator_prereq complete",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "holdReason": "issue #5374 READY-frontier audit: deferred, not dispatchable; Stripe BUILD remains blocked until operator Stripe prerequisite/secrets are enabled after entitlements completion",
       "reactivationCondition": "deferred, not dispatchable; Stripe BUILD remains blocked until operator Stripe prerequisite/secrets are enabled after entitlements completion"
@@ -268,18 +268,18 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_usable_demo_v1_relay.json",
       "status": "DONE",
-      "reason": "[P0] Usable demo BUILD \u2014 COMPLETE 2026-06-25",
+      "reason": "[P0] Usable demo BUILD — COMPLETE 2026-06-25",
       "selectionPrep": "docs/SOP/POST_MSOS_USABLE_DEMO_V1_SELECTION.md",
-      "doneReason": "steward closeout 2026-06-25 \u2014 operator confirmed walkable demo; evidence COMPLETE"
+      "doneReason": "steward closeout 2026-06-25 — operator confirmed walkable demo; evidence COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_crypto_multi_asset_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry \u2014 G-05 SELECTED 2026-06-25",
+      "reason": "[MEDIUM] Deribit BTC + ETH + asset registry — G-05 SELECTED 2026-06-25",
       "selectionPrep": "docs/SOP/POST_PPE_CRYPTO_MULTI_ASSET_V1_SELECTION.md",
       "focusPlaybookTier": "P2",
       "urgent": true,
-      "urgentReason": "Operator SELECTION \u2014 crypto before stocks",
+      "urgentReason": "Operator SELECTION — crypto before stocks",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
@@ -292,35 +292,35 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_self_serve_onboarding_v1_relay.json",
       "status": "DONE",
-      "reason": "[P0] Self-serve onboarding \u2014 COMPLETE 2026-06-26",
+      "reason": "[P0] Self-serve onboarding — COMPLETE 2026-06-26",
       "selectionPrep": "docs/SOP/POST_MSOS_SELF_SERVE_ONBOARDING_V1_SELECTION.md",
       "doneReason": "IDE BUILD closeout 2026-06-26"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_options_v1_relay.json",
       "status": "DONE",
-      "reason": "[P2] Equity options NVDA v1 \u2014 SELECTED",
+      "reason": "[P2] Equity options NVDA v1 — SELECTED",
       "selectionPrep": "docs/SOP/POST_PPE_EQUITY_OPTIONS_V1_SELECTION.md",
       "doneReason": "PPE-Equity-Closeout-Slice008 chapter closeout"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
+      "reason": "[HIGH] Tradeable universe infra — registry v2 + catalog.json + MSOS picker",
       "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #389 merge b90b74e6e43153408871565d33774a549a3c467c published tradeable-universe closeout; evidence archived COMPLETE 2026-06-27 and backlog/roadmap done"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_display_parity_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Meta #1 \u2014 display parity (PLANNED queue; no autobuilder preempt)",
+      "reason": "[HIGH] Meta #1 — display parity (PLANNED queue; no autobuilder preempt)",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_DISPLAY_PARITY_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout VM 2026-06-27)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_sol_bybit_ship_v1_relay.json",
       "status": "DONE",
-      "reason": "[P0] Operator SOL \u2014 ship PR #425 (Bybit adapter + enabled SOL)",
+      "reason": "[P0] Operator SOL — ship PR #425 (Bybit adapter + enabled SOL)",
       "selectionPrep": "docs/SOP/PPE_DERIBIT_CRYPTO_TIER1_V1_EVIDENCE_STATUS.md",
       "urgent": true,
       "urgentReason": "SOL blocked until PR #425 rebased on main and merged",
@@ -331,60 +331,60 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_asset_enablement_pipeline_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Meta #2 \u2014 enable_asset_batch.py + group witness",
+      "reason": "[HIGH] Meta #2 — enable_asset_batch.py + group witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_ENABLEMENT_PIPELINE_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_workflow_asset_parity_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Meta #5 \u2014 P4\u2192P7 asset propagation; trader workflow loop fidelity",
+      "reason": "[HIGH] Meta #5 — P4→P7 asset propagation; trader workflow loop fidelity",
       "selectionPrep": "docs/SOP/POST_MSOS_WORKFLOW_ASSET_PARITY_V1_SELECTION.md",
       "focusPlaybookTier": "P1",
       "workerMode": "local-agent",
-      "doneReason": "Workflow asset parity COMPLETE 2026-06-28 (#495 #507); P4\u2192P7 ?asset= propagation"
+      "doneReason": "Workflow asset parity COMPLETE 2026-06-28 (#495 #507); P4→P7 ?asset= propagation"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_cache_isolation_audit_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Meta #3 IDE BUILD \u2014 cache isolation audit",
+      "reason": "[HIGH] Meta #3 IDE BUILD — cache isolation audit",
       "selectionPrep": "docs/SOP/POST_PPE_CACHE_ISOLATION_AUDIT_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_display_cache_ops_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Meta #4 IDE BUILD \u2014 display cache ops",
+      "reason": "[MEDIUM] Meta #4 IDE BUILD — display cache ops",
       "selectionPrep": "docs/SOP/POST_PPE_DISPLAY_CACHE_OPS_V1_SELECTION.md",
       "doneReason": "IDE BUILD closeout 2026-06-28"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_trust_surface_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Meta #6 \u2014 trust_state in MSOS",
+      "reason": "[MEDIUM] Meta #6 — trust_state in MSOS",
       "selectionPrep": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_production_multi_asset_witness_v1_relay.json",
       "status": "DONE",
-      "reason": "[HIGH] Meta #7 \u2014 production multi-asset witness",
+      "reason": "[HIGH] Meta #7 — production multi-asset witness",
       "selectionPrep": "docs/SOP/POST_MSOS_PRODUCTION_MULTI_ASSET_WITNESS_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_deribit_crypto_tier1_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Deribit crypto tier-1 \u2014 SOL BNB XRP",
+      "reason": "[MEDIUM] Deribit crypto tier-1 — SOL BNB XRP",
       "selectionPrep": "docs/SOP/POST_PPE_DERIBIT_CRYPTO_TIER1_V1_SELECTION.md",
       "urgent": true,
-      "urgentReason": "Operator SOL-first \u2014 first tier-1 batch after universe infra",
+      "urgentReason": "Operator SOL-first — first tier-1 batch after universe infra",
       "focusPlaybookTier": "P1"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_autobuilder_bounded_repair_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[MEDIUM] Bounded build repair \u2014 factory side-channel after P0 usable demo",
+      "reason": "[MEDIUM] Bounded build repair — factory side-channel after P0 usable demo",
       "selectionPrep": "docs/SOP/POST_PPE_AUTOBUILDER_FACTORY_SELECTION.md"
     },
     {
@@ -414,41 +414,41 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "status": "DONE",
-      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
+      "reason": "[LOW] Ranked gap report — sideChannel auto when idle",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #402 merge 3d47cd61c9be9f730d4d73de2d6e40bab6d0777c shipped Product-Slice002; PR #1142 merge ad0027d38b16d1a71fb23293147aae06af5e84fc published closeout; workflow metric closed Product-Slice002"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_backtest_v1_relay.json",
       "status": "DONE",
-      "reason": "[LOW] Gap scoring backtest \u2014 product slice shipped (#415)",
+      "reason": "[LOW] Gap scoring backtest — product slice shipped (#415)",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_BACKTEST_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_chart_polish_v1_relay.json",
       "status": "DONE",
-      "reason": "[LOW] Options Horizon chart polish \u2014 implied overlay + axis parity; side channel P2",
+      "reason": "[LOW] Options Horizon chart polish — implied overlay + axis parity; side channel P2",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_CHART_POLISH_V1_SELECTION.md",
       "doneReason": "Chart polish COMPLETE 2026-06-28 (#429); closeout evidence green"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_region_workflow_v1_relay.json",
       "status": "DONE",
-      "reason": "[LOW] Options Horizon region workflow \u2014 after chart polish",
+      "reason": "[LOW] Options Horizon region workflow — after chart polish",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REGION_WORKFLOW_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/horizon_replay_scrubber_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[LOW BLOCKED] Replay scrubber \u2014 gated on archive_meta.replay_ready (\u226530d); do not ready until gate",
+      "reason": "[LOW BLOCKED] Replay scrubber — gated on archive_meta.replay_ready (≥30d); do not ready until gate",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_REPLAY_SCRUBBER_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_exposure_menu_v1_relay.json",
       "status": "DONE",
-      "reason": "[P1] Exposure menu v0 \u2014 NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
+      "reason": "[P1] Exposure menu v0 — NVDA + BTC multi-rail paths; steward SELECTION 2026-06-29",
       "selectionPrep": "docs/SOP/POST_PPE_EXPOSURE_MENU_V1_SELECTION.md",
       "urgent": true,
       "urgentReason": "Operator approved exposure menu over BL density smoothing",
@@ -496,34 +496,37 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1a_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.1 \u2014 SPY QQQ IWM (re-charter)",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.1 — SPY QQQ IWM (re-charter)",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 mega caps batch 1",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 - TSLA AMD AAPL MSFT AMZN; blocked until production multi-asset witness is green",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "holdReason": "Issue #5376 temporary USO acceptance-witness override does not mark batch 2 complete."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 - COIN SLV GLD GOOGL META; remains pending behind batch 2",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "holdReason": "Issue #5376 temporary USO acceptance-witness override does not mark batch 3 complete."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 USO commodity ETF proxy",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "READY",
+      "reason": "[HIGH] Founder acceptance-witness override - USO commodity ETF proxy only",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "dependencyUnblockValue": 10,
+      "overrideReason": "GitHub issue #5376 temporarily promotes USO ahead of incomplete batches 2-3 for the first installed Autobuilder witness."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] B\u2013L density smoothing \u2014 deferred behind exposure menu + wave 1",
+      "reason": "[MEDIUM] B–L density smoothing — deferred behind exposure menu + wave 1",
       "selectionPrep": "docs/SOP/POST_MVP1_BL_DENSITY_SMOOTHING_V1_SELECTION.md",
       "doneReason": "auto-repair: evidence doc shows chapter COMPLETE"
     },
@@ -539,21 +542,21 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_forward_consistency_radar_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Forward consistency radar ch.1 \u2014 dashboard payload + quality flags; P2 side channel",
+      "reason": "[MEDIUM] Forward consistency radar ch.1 — dashboard payload + quality flags; P2 side channel",
       "selectionPrep": "docs/SOP/POST_PPE_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
       "status": "DONE",
-      "reason": "[MEDIUM] Forward consistency radar ch.2 \u2014 MSOS /forward-consistency heatmap",
+      "reason": "[MEDIUM] Forward consistency radar ch.2 — MSOS /forward-consistency heatmap",
       "selectionPrep": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md",
       "doneReason": "issue #5374 READY-frontier audit: PR #1027 merge 22c3491f999e8fc8a6c2f124cfa7fb8927b422a9 shipped Product-Slice002; PR #1093 merge 74f6033e16b2875b00fb9945bdf67636ec9ba272 synced closeout; workflow metric closed Product-Slice002"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json",
       "status": "PLANNED",
-      "reason": "[P2] Hyperliquid HYPE perp exposure path \u2014 exposure menu side channel; parallel to wave 1",
+      "reason": "[P2] Hyperliquid HYPE perp exposure path — exposure menu side channel; parallel to wave 1",
       "selectionPrep": "docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md",
       "sideChannel": true,
       "focusPlaybookTier": "P2",
