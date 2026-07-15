@@ -506,33 +506,33 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1b_v1",
-      "status": "done",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 2",
-      "reason": "[MEDIUM] Asset batch wave 1 batch 2 (OI vol order) \u2014 TSLA AMD AAPL MSFT AMZN \u2014 blocked until batch 1 retrospect"
+      "reason": "[MEDIUM] Asset batch wave 1 batch 2 (OI vol order) \u2014 TSLA AMD AAPL MSFT AMZN \u2014 blocked until production multi-asset witness is green; not completed by issue #5376"
     },
     {
       "chapterId": "ppe_equity_universe_tier1c_v1",
-      "status": "done",
+      "status": "queued",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 3",
-      "reason": "[MEDIUM] Asset batch wave 1 batch 3 (OI vol order) \u2014 COIN SLV GLD GOOGL META"
+      "reason": "[MEDIUM] Asset batch wave 1 batch 3 (OI vol order) \u2014 COIN SLV GLD GOOGL META; GLD/SLV ownership remains here and is not claimed shipped by issue #5376"
     },
     {
       "chapterId": "ppe_commodity_proxy_tier1_v1",
-      "status": "queued",
-      "priority": "medium",
+      "status": "ready",
+      "priority": "high",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
+      "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 4",
-      "reason": "[MEDIUM] Asset batch wave 1 batch 4 (OI vol order) \u2014 USO"
+      "reason": "[HIGH] Temporary founder acceptance-witness override \u2014 USO only; batches 2-3 remain incomplete and permanent wave order is not rewritten"
     },
     {
       "chapterId": "ppe_cme_commodity_v1",

@@ -8,7 +8,11 @@
 
 ## Sprint intent
 
-Enable **GLD, SLV, USO** ETF options via equity adapter with `asset_class: commodity_proxy` and honest catalog labels.
+Prepare the first dispatchable product slice for **USO** ETF options via the equity adapter with `asset_class: commodity_proxy` and honest catalog labels.
+
+This sprint is temporarily promoted ahead of asset-wave batches 2 and 3 for the founder acceptance witness in GitHub issue #5376. The override proves one complete installed Autobuilder run-through; it does not close batches 2 or 3 and does not permanently rewrite the asset-wave order.
+
+USO is not a durable product-priority claim. It is selected for this witness because it is a small, already-chartered, credential-free PPE change that can use the existing equity-options adapter. After this witness, product priority returns to founder selection, with Match Horizon intended as the immediate separate follow-on.
 
 ---
 
@@ -16,9 +20,9 @@ Enable **GLD, SLV, USO** ETF options via equity adapter with `asset_class: commo
 
 | Slice | Deliverable |
 |-------|-------------|
-| PPE-CommProxy-Control-Slice001 | Charter |
-| PPE-CommProxy-Core-Slice002 | Registry + MSOS copy uses proxy labels from payload |
-| PPE-CommProxy-Witness-Slice003 | Per-ETF witness |
+| PPE-CommProxy-Control-Slice001 | USO-only charter/evidence packet and founder priority override |
+| PPE-CommProxy-Core-Slice002 | Registry + MSOS copy uses USO proxy labels from payload |
+| PPE-CommProxy-Witness-Slice003 | USO witness |
 | PPE-CommProxy-Closeout-Slice004 | Evidence COMPLETE |
 
 ---
@@ -26,3 +30,6 @@ Enable **GLD, SLV, USO** ETF options via equity adapter with `asset_class: commo
 ## Non-goals
 
 - CME GC/SI/CL native chains (see `ppe_cme_commodity_v1`)
+- GLD or SLV implementation in this chapter; GLD/SLV remain owned by asset-wave batch 3 records.
+- Running Autobuilder `build next`, dry-run, or live dispatch.
+- Product-main writes, merge authority, publication authority, Match Horizon work, or `msos-autobuilder` changes.

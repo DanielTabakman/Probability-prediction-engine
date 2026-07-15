@@ -1,0 +1,494 @@
+{
+  "version": 1,
+  "as_of": "2026-07-15T16:36:28Z",
+  "read_only": true,
+  "registry_errors": [],
+  "capacity": {
+    "automatic_mode": "DISABLED",
+    "desired": 0,
+    "configured_max": 2,
+    "first_enabled_witness_capacity": 1,
+    "available": 2,
+    "running": 0,
+    "ready": 1,
+    "queued": 0,
+    "awaiting_review": 0,
+    "source": "config/founder_pipeline_registry.json"
+  },
+  "pipelines": [
+    {
+      "pipeline_id": "ppe",
+      "display_name": "Probability Prediction Engine / MSOS product pipeline",
+      "registration_stage": "EXECUTION_READY",
+      "canonical_repo": "DanielTabakman/Probability-prediction-engine",
+      "native_state": "COMPLETE",
+      "state": "READY_TO_BUILD",
+      "evidence": [
+        {
+          "kind": "manual",
+          "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+          "scope": "local",
+          "fresh": true,
+          "as_of": "2026-07-15T04:27:04Z",
+          "age_seconds": 43763
+        },
+        {
+          "kind": "missing",
+          "source": "artifacts/orchestrator/ACTIVE_RUN.json",
+          "scope": "local",
+          "fresh": false,
+          "message": "source not present"
+        }
+      ],
+      "capacity": {
+        "automatic_mode": "DISABLED",
+        "desired": 0,
+        "configured_max": 1,
+        "available": 1,
+        "source": "registry/default; no durable automatic policy in PPE repo",
+        "evidence": "manual"
+      },
+      "running_work": [],
+      "ready_work": [
+        {
+          "work_item_id": "ppe_commodity_proxy_tier1_v1",
+          "title": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
+          "native_state": "READY",
+          "state": "READY_TO_BUILD",
+          "trace": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+          "evidence": "manual",
+          "selection": {
+            "founder_priority": "high",
+            "founder_priority_rank": 1,
+            "deadline": null,
+            "deadline_rank": "9999-12-31T00:00:00+00:00",
+            "dependency_unblock_value": 10,
+            "age_index": 70,
+            "tie_breaker": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json"
+          },
+          "native_prerequisites": {
+            "read_only": true,
+            "source": "ppe_native_read_only",
+            "generated_at": "2026-07-15T16:36:28Z",
+            "source_plan": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+            "selected_native_slice": "PPE-CommProxy-Core-Slice002",
+            "allowed_product_paths": [
+              "config/assets.yaml",
+              "src/viz/embed_display_boundary.py",
+              "scripts/witness_asset_catalog.py"
+            ],
+            "dispatchable": true,
+            "dispatch_blockers": [],
+            "evidence": {
+              "source_files": [
+                {
+                  "path": "artifacts/orchestrator/ACTIVE_RUN.json",
+                  "exists": false
+                },
+                {
+                  "path": "artifacts/orchestrator/OPERATOR_STATUS.md",
+                  "exists": true,
+                  "sha256": "cc77a82618747dd447b19a5b278e89b8091c507b142acb701c6efa146bbacb91"
+                },
+                {
+                  "path": "artifacts/workflow_metrics/slices.jsonl",
+                  "exists": true,
+                  "sha256": "8875144fe7ba5750f7d77cfe44c571282a0fa70cc644430f88be6feef2d9ed5d"
+                },
+                {
+                  "path": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                  "exists": true,
+                  "sha256": "d361cc7e4590bbd99f93e5d3e9307f51c43274614d2f861f86ee359545525d5d",
+                  "git_commit": "0ff7a9c0530966ec2f4657257f01061643a74a10",
+                  "git_committed_at": "2026-07-15T00:27:16-04:00"
+                },
+                {
+                  "path": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                  "exists": true,
+                  "sha256": "72af20545a134ef31479707f08eaeb81bc235ad386e250d9ef24469b42203247",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                },
+                {
+                  "path": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+                  "exists": true,
+                  "sha256": "2fa45c5bb2b6aa76c365dffba8554770136111a532525ac1640825fcbe5db10e",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                },
+                {
+                  "path": "docs/SOP/PHASE_QUEUE.json",
+                  "exists": true,
+                  "sha256": "700c13764f10d98213e7c13992b64a78ce0cb2db7dee7e675afe014a1b86e14d",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                },
+                {
+                  "path": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                  "exists": true,
+                  "sha256": "b76ce13b78b86a35179b1bc89c6e4cfa86127fa68f487cf8cae9b9df0f57e248",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                },
+                {
+                  "path": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+                  "exists": true,
+                  "sha256": "0fddcfbbc86417ea3c50b1019bdf237c6f120be64f299d9b390b756d3ef48ffc",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                },
+                {
+                  "path": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
+                  "exists": true,
+                  "sha256": "fa687d450813cdbb1d953358ea82e9a876e5fd57d18b2844bb03a4c7a29419f0",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
+                }
+              ],
+              "identity": "173a20125a9fe29ab8200c7adbc739375055393f354e9c26010fd3163ec98082"
+            },
+            "statuses": {
+              "PPE-CommProxy-Control-Slice001": {
+                "claims": [
+                  {
+                    "source": "docs/SOP/PHASE_QUEUE.json",
+                    "state": "ready",
+                    "kind": "queue",
+                    "detail": "queue status=READY",
+                    "applies_to": "plan",
+                    "order": 0
+                  },
+                  {
+                    "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                    "state": "unknown",
+                    "kind": "active_manifest",
+                    "detail": "no active phase plan",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                    "state": "selected",
+                    "kind": "selection_record",
+                    "detail": "selection record says SELECTED",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                    "state": "ready",
+                    "kind": "backlog",
+                    "detail": "backlog status=ready",
+                    "applies_to": "plan",
+                    "order": 53
+                  },
+                  {
+                    "source": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+                    "state": "complete",
+                    "kind": "evidence_status",
+                    "detail": "",
+                    "applies_to": "slice"
+                  }
+                ],
+                "status": "completed",
+                "non_blocking": false,
+                "evidence": "docs/SOP/PHASE_QUEUE.json: ready (queue status=READY); docs/SOP/ACTIVE_PHASE_MANIFEST.json: unknown (no active phase plan); docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md: selected (selection record says SELECTED); docs/SOP/PHASE_CHAPTER_BACKLOG.json: ready (backlog status=ready); docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md: complete (no detail)",
+                "source_refs": [
+                  "docs/SOP/PHASE_QUEUE.json",
+                  "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                  "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                  "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                  "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+                ]
+              },
+              "PPE-CommProxy-Core-Slice002": {
+                "claims": [
+                  {
+                    "source": "docs/SOP/PHASE_QUEUE.json",
+                    "state": "ready",
+                    "kind": "queue",
+                    "detail": "queue status=READY",
+                    "applies_to": "plan",
+                    "order": 0
+                  },
+                  {
+                    "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                    "state": "unknown",
+                    "kind": "active_manifest",
+                    "detail": "no active phase plan",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                    "state": "selected",
+                    "kind": "selection_record",
+                    "detail": "selection record says SELECTED",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                    "state": "ready",
+                    "kind": "backlog",
+                    "detail": "backlog status=ready",
+                    "applies_to": "plan",
+                    "order": 53
+                  },
+                  {
+                    "source": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+                    "state": "pending",
+                    "kind": "evidence_status",
+                    "detail": "",
+                    "applies_to": "slice"
+                  }
+                ],
+                "status": "pending",
+                "non_blocking": false,
+                "evidence": "docs/SOP/PHASE_QUEUE.json: ready (queue status=READY); docs/SOP/ACTIVE_PHASE_MANIFEST.json: unknown (no active phase plan); docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md: selected (selection record says SELECTED); docs/SOP/PHASE_CHAPTER_BACKLOG.json: ready (backlog status=ready); docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md: pending (no detail)",
+                "source_refs": [
+                  "docs/SOP/PHASE_QUEUE.json",
+                  "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                  "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                  "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                  "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+                ]
+              },
+              "PPE-CommProxy-Witness-Slice003": {
+                "claims": [
+                  {
+                    "source": "docs/SOP/PHASE_QUEUE.json",
+                    "state": "ready",
+                    "kind": "queue",
+                    "detail": "queue status=READY",
+                    "applies_to": "plan",
+                    "order": 0
+                  },
+                  {
+                    "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                    "state": "unknown",
+                    "kind": "active_manifest",
+                    "detail": "no active phase plan",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                    "state": "selected",
+                    "kind": "selection_record",
+                    "detail": "selection record says SELECTED",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                    "state": "ready",
+                    "kind": "backlog",
+                    "detail": "backlog status=ready",
+                    "applies_to": "plan",
+                    "order": 53
+                  },
+                  {
+                    "source": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+                    "state": "pending",
+                    "kind": "evidence_status",
+                    "detail": "",
+                    "applies_to": "slice"
+                  }
+                ],
+                "status": "pending",
+                "non_blocking": false,
+                "evidence": "docs/SOP/PHASE_QUEUE.json: ready (queue status=READY); docs/SOP/ACTIVE_PHASE_MANIFEST.json: unknown (no active phase plan); docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md: selected (selection record says SELECTED); docs/SOP/PHASE_CHAPTER_BACKLOG.json: ready (backlog status=ready); docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md: pending (no detail)",
+                "source_refs": [
+                  "docs/SOP/PHASE_QUEUE.json",
+                  "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                  "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                  "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                  "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+                ]
+              },
+              "PPE-CommProxy-Closeout-Slice004": {
+                "claims": [
+                  {
+                    "source": "docs/SOP/PHASE_QUEUE.json",
+                    "state": "ready",
+                    "kind": "queue",
+                    "detail": "queue status=READY",
+                    "applies_to": "plan",
+                    "order": 0
+                  },
+                  {
+                    "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                    "state": "unknown",
+                    "kind": "active_manifest",
+                    "detail": "no active phase plan",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                    "state": "selected",
+                    "kind": "selection_record",
+                    "detail": "selection record says SELECTED",
+                    "applies_to": "plan"
+                  },
+                  {
+                    "source": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                    "state": "ready",
+                    "kind": "backlog",
+                    "detail": "backlog status=ready",
+                    "applies_to": "plan",
+                    "order": 53
+                  },
+                  {
+                    "source": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
+                    "state": "pending",
+                    "kind": "evidence_status",
+                    "detail": "",
+                    "applies_to": "slice"
+                  }
+                ],
+                "status": "pending",
+                "non_blocking": false,
+                "evidence": "docs/SOP/PHASE_QUEUE.json: ready (queue status=READY); docs/SOP/ACTIVE_PHASE_MANIFEST.json: unknown (no active phase plan); docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md: selected (selection record says SELECTED); docs/SOP/PHASE_CHAPTER_BACKLOG.json: ready (backlog status=ready); docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md: pending (no detail)",
+                "source_refs": [
+                  "docs/SOP/PHASE_QUEUE.json",
+                  "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+                  "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+                  "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+                  "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md"
+                ]
+              }
+            }
+          },
+          "source_plan": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+          "selected_native_slice": "PPE-CommProxy-Core-Slice002",
+          "selected_native_dispatchable": true,
+          "allowed_product_paths": [
+            "config/assets.yaml",
+            "src/viz/embed_display_boundary.py",
+            "scripts/witness_asset_catalog.py"
+          ]
+        }
+      ],
+      "queued_work": [],
+      "awaiting_review_work": [],
+      "awaiting_founder_count": 3,
+      "blocked_count": 6,
+      "backpressure": [],
+      "stale_evidence": [],
+      "next_action": {
+        "state": "READY_TO_BUILD",
+        "action_type": "build",
+        "summary": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
+        "work_item_id": "ppe_commodity_proxy_tier1_v1",
+        "trace": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+        "evidence": "manual"
+      }
+    },
+    {
+      "pipeline_id": "autobuilder",
+      "display_name": "MSOS Autobuilder infrastructure pipeline",
+      "registration_stage": "CHARTERED",
+      "canonical_repo": "DanielTabakman/msos-autobuilder",
+      "native_state": "EXTERNAL_SOURCE_UNAVAILABLE",
+      "state": "BLOCKED",
+      "blocker_scope": "pipeline",
+      "evidence": [
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder",
+          "fresh": false,
+          "message": "MSOS_AUTOBUILDER_STATUS_ROOT is not set; external runtime evidence unavailable"
+        },
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder:artifacts/orchestrator/AUTOBUILDER_STATUS.json",
+          "fresh": false,
+          "message": "external source root unavailable; PPE checkout is not a fallback"
+        }
+      ],
+      "capacity": {
+        "automatic_mode": "DISABLED",
+        "desired": 0,
+        "configured_max": 2,
+        "available": 2,
+        "source": "external source unavailable",
+        "evidence": "missing"
+      },
+      "running_work": [],
+      "ready_work": [],
+      "queued_work": [],
+      "awaiting_review_work": [],
+      "awaiting_founder_count": 0,
+      "blocked_count": 1,
+      "backpressure": [],
+      "stale_evidence": [
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder",
+          "fresh": false,
+          "message": "MSOS_AUTOBUILDER_STATUS_ROOT is not set; external runtime evidence unavailable"
+        },
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder:artifacts/orchestrator/AUTOBUILDER_STATUS.json",
+          "fresh": false,
+          "message": "external source root unavailable; PPE checkout is not a fallback"
+        }
+      ],
+      "next_action": {
+        "state": "BLOCKED",
+        "action_type": "evidence check",
+        "summary": "Autobuilder external runtime source is unavailable; this blocks only Autobuilder visibility.",
+        "evidence": "missing",
+        "blocker_scope": "pipeline"
+      }
+    }
+  ],
+  "recommended_next_action": {
+    "pipeline_id": "ppe",
+    "state": "READY_TO_BUILD",
+    "action_type": "build",
+    "summary": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
+    "work_item_id": "ppe_commodity_proxy_tier1_v1",
+    "evidence": "manual",
+    "selection_rank": [
+      1,
+      "9999-12-31T00:00:00+00:00",
+      -10,
+      1,
+      0,
+      70,
+      "ppe",
+      "ppe_commodity_proxy_tier1_v1"
+    ],
+    "selection_explanation": {
+      "policy": [
+        "explicit accepted founder priority",
+        "accepted external deadline",
+        "dependency-unblock value",
+        "readiness and evidence freshness",
+        "portfolio fairness",
+        "age within priority class",
+        "deterministic tie-breaker"
+      ],
+      "winner": {
+        "pipeline_id": "ppe",
+        "work_item_id": "ppe_commodity_proxy_tier1_v1",
+        "founder_priority": "high",
+        "deadline": null,
+        "dependency_unblock_value": 10,
+        "age_index": 70
+      },
+      "rank_tuple": [
+        1,
+        "9999-12-31T00:00:00+00:00",
+        -10,
+        1,
+        0,
+        70,
+        "ppe",
+        "ppe_commodity_proxy_tier1_v1"
+      ],
+      "why": "Selected the lowest deterministic rank among safe READY_TO_BUILD items; blocked/stale pipelines are excluded."
+    }
+  }
+}

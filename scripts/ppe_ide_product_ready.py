@@ -77,6 +77,9 @@ def _product_touchset_on_main(repo: Path, *, slice_id: str, plan_path: str) -> b
     for sl in plan.get("slices") or []:
         if not isinstance(sl, dict) or str(sl.get("sliceId") or "") != slice_id:
             continue
+        implementation_status = str(sl.get("implementationStatus") or sl.get("productStatus") or "").strip().upper()
+        if implementation_status in {"PENDING", "READY_TO_BUILD", "NOT_IMPLEMENTED"}:
+            return False
         raw = sl.get("touchSet") or []
         if isinstance(raw, list):
             touch = [str(p).strip() for p in raw if str(p).strip()]

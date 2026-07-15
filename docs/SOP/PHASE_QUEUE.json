@@ -502,23 +502,26 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 mega caps batch 1",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 TSLA AMD AAPL MSFT AMZN; blocked until production multi-asset witness is green",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "holdReason": "Issue #5376 temporary USO acceptance-witness override does not mark batch 2 complete."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "DONE",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
+      "status": "PLANNED",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 COIN SLV GLD GOOGL META; remains pending behind batch 2",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
-      "doneReason": "marked DONE by post_relay_continue (chapter closeout)"
+      "holdReason": "Issue #5376 temporary USO acceptance-witness override does not mark batch 3 complete."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "PLANNED",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 USO commodity ETF proxy",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "READY",
+      "reason": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "dependencyUnblockValue": 10,
+      "overrideReason": "GitHub issue #5376 temporarily promotes USO ahead of incomplete batches 2-3 for the first installed Autobuilder witness."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",

@@ -1,8 +1,46 @@
 {
-  "name": "ppe_commodity_proxy_tier1_v1 (GLD SLV USO ETF options)",
+  "name": "ppe_commodity_proxy_tier1_v1 (USO ETF options)",
   "baselineBranch": "main",
   "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
   "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+  "productScope": {
+    "assets": [
+      "USO"
+    ],
+    "assetClass": "commodity_proxy",
+    "venue": "equity",
+    "excludedAssets": [
+      "GLD",
+      "SLV"
+    ],
+    "exclusionReason": "GLD and SLV remain owned by asset wave batch 3 records; this temporary witness packet is USO only."
+  },
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "scope": "temporary acceptance-witness priority override",
+    "decision": "Promote USO ahead of incomplete asset-wave batches 2 and 3 so the installed Autobuilder can complete its first genuine end-to-end witness.",
+    "doesNotChangePermanentOrder": true,
+    "source": "GitHub issue #5376"
+  },
+  "selectedNativeSlice": {
+    "sliceId": "PPE-CommProxy-Core-Slice002",
+    "state": "READY_TO_BUILD",
+    "completedPrerequisite": "PPE-CommProxy-Control-Slice001"
+  },
+  "authority": {
+    "allowedProductPaths": [
+      "config/assets.yaml",
+      "src/viz/embed_display_boundary.py",
+      "scripts/witness_asset_catalog.py"
+    ],
+    "forbiddenPaths": [
+      "product-main write",
+      "merge authority",
+      "publication authority",
+      "DanielTabakman/msos-autobuilder",
+      "Match Horizon"
+    ]
+  },
   "slices": [
     {
       "sliceId": "PPE-CommProxy-Control-Slice001",
@@ -20,6 +58,7 @@
       "sprintSpecPath": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
       "buildBranch": "build/auto/PPE-CommProxy-Core-Slice002-comm_proxy",
       "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
       "workerMode": "local-agent",
       "susMinutes": 90,
       "hardMinutes": 240,

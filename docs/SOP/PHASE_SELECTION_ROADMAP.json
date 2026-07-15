@@ -318,21 +318,21 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1b_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 mega caps batch 1",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.2 \u2014 blocked until production multi-asset witness is green; temporarily bypassed only for issue #5376 USO witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
-      "status": "done",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 mega caps batch 2",
+      "status": "skipped",
+      "reason": "[MEDIUM] Asset batch wave 1 ch.3 \u2014 COIN SLV GLD GOOGL META remains pending; temporarily bypassed only for issue #5376 USO witness",
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
-      "status": "skipped",
-      "reason": "[MEDIUM] Asset batch wave 1 ch.4 \u2014 GLD SLV USO",
-      "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
+      "status": "ready",
+      "reason": "[HIGH] Founder acceptance-witness override \u2014 USO only",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",

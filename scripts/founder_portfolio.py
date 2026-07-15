@@ -266,6 +266,10 @@ def _ready_queue_items(repo: Path) -> list[dict[str, Any]]:
         packet = _native_prerequisites_for_ready_item(repo, item)
         if packet is not None:
             work["native_prerequisites"] = packet
+            work["source_plan"] = packet.get("source_plan")
+            work["selected_native_slice"] = packet.get("selected_native_slice")
+            work["selected_native_dispatchable"] = packet.get("dispatchable")
+            work["allowed_product_paths"] = packet.get("allowed_product_paths")
         out.append(work)
     return out
 
@@ -281,6 +285,7 @@ def _native_prerequisites_for_ready_item(repo: Path, queue_item: dict[str, Any])
     source_rels = _prerequisite_source_rels(plan_rel, plan)
     statuses = _native_slice_statuses(repo, plan_rel, plan, source_rels, plan_error)
     dispatchability = _native_dispatchability(plan or {}, statuses)
+    selected_slice = _selected_native_product_slice(plan or {})
     source_files = [_evidence_source_file(repo, rel) for rel in source_rels]
     identity_payload = {"dispatchability": dispatchability, "source_files": source_files, "statuses": statuses}
     identity = hashlib.sha256(
@@ -290,6 +295,9 @@ def _native_prerequisites_for_ready_item(repo: Path, queue_item: dict[str, Any])
         "read_only": True,
         "source": "ppe_native_read_only",
         "generated_at": _utc_now(),
+        "source_plan": plan_rel,
+        "selected_native_slice": selected_slice.get("sliceId"),
+        "allowed_product_paths": selected_slice.get("touchSet") or [],
         "dispatchable": dispatchability["dispatchable"],
         "dispatch_blockers": dispatchability["dispatch_blockers"],
         "evidence": {
@@ -325,15 +333,8 @@ def _prerequisite_source_rels(plan_rel: str, plan: dict[str, Any] | None) -> lis
 
 def _native_dispatchability(plan: dict[str, Any], statuses: dict[str, dict[str, Any]]) -> dict[str, Any]:
     slices = [item for item in plan.get("slices") or [] if isinstance(item, dict)]
-    selected_index: int | None = None
-    for index, item in enumerate(slices):
-        plane = str(item.get("declaredPlane") or "").strip().upper()
-        layer = str(item.get("layerPreset") or "").strip().upper()
-        if item.get("closeout") or "SMOKE" in str(item.get("sliceId") or "").upper():
-            continue
-        if plane == "PRODUCT-PLANE" and layer != "CONTROL" and isinstance(item.get("touchSet"), list):
-            selected_index = index
-            break
+    selected = _selected_native_product_slice(plan)
+    selected_index = selected.get("_index")
     if selected_index is None:
         return {"dispatchable": False, "dispatch_blockers": ["no native product implementation slice found"]}
     blockers: list[str] = []
@@ -347,6 +348,17 @@ def _native_dispatchability(plan: dict[str, Any], statuses: dict[str, dict[str, 
             continue
         blockers.append(f"{slice_id}: {state or 'missing'} - {status.get('evidence') or 'no evidence'}")
     return {"dispatchable": not blockers, "dispatch_blockers": blockers}
+
+
+def _selected_native_product_slice(plan: dict[str, Any]) -> dict[str, Any]:
+    for index, item in enumerate([item for item in plan.get("slices") or [] if isinstance(item, dict)]):
+        plane = str(item.get("declaredPlane") or "").strip().upper()
+        layer = str(item.get("layerPreset") or "").strip().upper()
+        if item.get("closeout") or "SMOKE" in str(item.get("sliceId") or "").upper():
+            continue
+        if plane == "PRODUCT-PLANE" and layer != "CONTROL" and isinstance(item.get("touchSet"), list):
+            return {**item, "_index": index}
+    return {}
 
 
 def _native_slice_statuses(
@@ -521,6 +533,8 @@ def _backlog_claims(repo: Path, plan_rel: str, chapter_id: str) -> list[dict[str
             state = "completed"
         elif status in {"blocked", "deferred", "awaiting_founder"}:
             state = "blocked"
+        elif status in {"ready", "queued", "planned", "selected"}:
+            state = "ready"
         else:
             state = "pending"
         out.append(_claim("docs/SOP/PHASE_CHAPTER_BACKLOG.json", state, "backlog", f"backlog status={status or 'missing'}", applies_to="plan", order=index))
