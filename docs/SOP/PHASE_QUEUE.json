@@ -207,9 +207,10 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_snapshot_owner_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] PPE snapshot owner_email \u2014 phase 4a",
-      "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md"
+      "selectionPrep": "docs/SOP/POST_MVP1_SNAPSHOT_OWNER_V1_SELECTION.md",
+      "doneReason": "reconciled by issue #5372: PR #227 / merge commit b05f80f0 shipped owner_email schema, migration, Streamlit Access identity capture, owner-filtered list_recent, tests, and MVP1-SnapshotOwner-Closeout-Slice004; PR #221 closed unmerged as superseded"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",

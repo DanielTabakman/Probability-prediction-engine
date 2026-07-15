@@ -543,6 +543,18 @@ def test_current_workflow_persistence_is_not_ready_after_reconciliation(monkeypa
     assert snapshot["recommended_next_action"]["work_item_id"] != "msos_workflow_persistence_v1"
 
 
+def test_current_snapshot_owner_is_not_ready_after_reconciliation(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    snapshot = collect_portfolio(REPO)
+    ppe = next(item for item in snapshot["pipelines"] if item["pipeline_id"] == "ppe")
+
+    ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
+    assert "mvp1_snapshot_owner_v1" not in ready_ids
+    assert snapshot["recommended_next_action"]["work_item_id"] != "mvp1_snapshot_owner_v1"
+
+
 def test_blocked_autobuilder_does_not_prevent_safe_ppe_recommendation(tmp_path: Path, monkeypatch) -> None:
     from scripts.founder_portfolio import collect_portfolio
 
