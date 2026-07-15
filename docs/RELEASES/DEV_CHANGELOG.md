@@ -4,6 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-14
 
+- `0531bb9d` — Merge pull request #5373 from DanielTabakman/codex/reconcile-snapshot-owner-5372
+- `63549d65` — control-plane: reconcile snapshot owner native state (`docs/SOP/`)
+- `870c2104` — Control-plane: dev changelog
 - `617dc86b` — Merge pull request #5371 from DanielTabakman/codex/reconcile-workflow-persistence-5370
 - `1cba16d0` — workflow-persistence(control): tighten selection evidence (`docs/SOP/`)
 - `58437dda` — workflow-persistence(control): reconcile native closeout state (`docs/SOP/`)
