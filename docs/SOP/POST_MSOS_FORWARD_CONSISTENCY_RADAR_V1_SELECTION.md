@@ -13,7 +13,7 @@
 
 **SELECTED** 2026-06-29 — operator-approved relay ch.2 (paired with ch.1).
 
-**First slice:** `MSOS-FCR-Control-Slice001`
+**First slice:** `MSOS-FCR-Control-Slice001` was historical and is no longer pending.
 
 ---
 
@@ -25,7 +25,7 @@
 | Operator need | Distinguish BAD_DATA vs WATCH without opening Strategy Lab |
 | Ship-to | OPERATOR first — internal / ops nav |
 
-**Blocked until:** `ppe_forward_consistency_radar_v1` merged to `main`.
+**Historical blocker cleared:** `ppe_forward_consistency_radar_v1` merged to `main`; no active blocker remains for this completed chapter.
 
 ---
 

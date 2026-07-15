@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "as_of": "2026-07-15T04:27:05Z",
+  "read_only": true,
+  "registry_errors": [],
+  "capacity": {
+    "automatic_mode": "DISABLED",
+    "desired": 0,
+    "configured_max": 2,
+    "first_enabled_witness_capacity": 1,
+    "available": 2,
+    "running": 0,
+    "ready": 0,
+    "queued": 0,
+    "awaiting_review": 0,
+    "source": "config/founder_pipeline_registry.json"
+  },
+  "pipelines": [
+    {
+      "pipeline_id": "ppe",
+      "display_name": "Probability Prediction Engine / MSOS product pipeline",
+      "registration_stage": "EXECUTION_READY",
+      "canonical_repo": "DanielTabakman/Probability-prediction-engine",
+      "native_state": "COMPLETE",
+      "state": "COMPLETE",
+      "evidence": [
+        {
+          "kind": "manual",
+          "source": "docs/SOP/ACTIVE_PHASE_MANIFEST.json",
+          "scope": "local",
+          "fresh": true,
+          "as_of": "2026-07-15T04:27:04Z",
+          "age_seconds": 0
+        },
+        {
+          "kind": "missing",
+          "source": "artifacts/orchestrator/ACTIVE_RUN.json",
+          "scope": "local",
+          "fresh": false,
+          "message": "source not present"
+        }
+      ],
+      "capacity": {
+        "automatic_mode": "DISABLED",
+        "desired": 0,
+        "configured_max": 1,
+        "available": 1,
+        "source": "registry/default; no durable automatic policy in PPE repo",
+        "evidence": "manual"
+      },
+      "running_work": [],
+      "ready_work": [],
+      "queued_work": [],
+      "awaiting_review_work": [],
+      "awaiting_founder_count": 3,
+      "blocked_count": 5,
+      "backpressure": [],
+      "stale_evidence": [],
+      "next_action": {
+        "state": "UNFILLED",
+        "action_type": "evidence check",
+        "summary": "No READY PPE queue item found in PHASE_QUEUE.json.",
+        "evidence": "manual"
+      }
+    },
+    {
+      "pipeline_id": "autobuilder",
+      "display_name": "MSOS Autobuilder infrastructure pipeline",
+      "registration_stage": "CHARTERED",
+      "canonical_repo": "DanielTabakman/msos-autobuilder",
+      "native_state": "EXTERNAL_SOURCE_UNAVAILABLE",
+      "state": "BLOCKED",
+      "blocker_scope": "pipeline",
+      "evidence": [
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder",
+          "fresh": false,
+          "message": "MSOS_AUTOBUILDER_STATUS_ROOT is not set; external runtime evidence unavailable"
+        },
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder:artifacts/orchestrator/AUTOBUILDER_STATUS.json",
+          "fresh": false,
+          "message": "external source root unavailable; PPE checkout is not a fallback"
+        }
+      ],
+      "capacity": {
+        "automatic_mode": "DISABLED",
+        "desired": 0,
+        "configured_max": 2,
+        "available": 2,
+        "source": "external source unavailable",
+        "evidence": "missing"
+      },
+      "running_work": [],
+      "ready_work": [],
+      "queued_work": [],
+      "awaiting_review_work": [],
+      "awaiting_founder_count": 0,
+      "blocked_count": 1,
+      "backpressure": [],
+      "stale_evidence": [
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder",
+          "fresh": false,
+          "message": "MSOS_AUTOBUILDER_STATUS_ROOT is not set; external runtime evidence unavailable"
+        },
+        {
+          "kind": "missing",
+          "scope": "external_repository",
+          "source": "DanielTabakman/msos-autobuilder:artifacts/orchestrator/AUTOBUILDER_STATUS.json",
+          "fresh": false,
+          "message": "external source root unavailable; PPE checkout is not a fallback"
+        }
+      ],
+      "next_action": {
+        "state": "BLOCKED",
+        "action_type": "evidence check",
+        "summary": "Autobuilder external runtime source is unavailable; this blocks only Autobuilder visibility.",
+        "evidence": "missing",
+        "blocker_scope": "pipeline"
+      }
+    }
+  ],
+  "recommended_next_action": {
+    "pipeline_id": "autobuilder",
+    "state": "BLOCKED",
+    "action_type": "evidence check",
+    "summary": "Autobuilder external runtime source is unavailable; this blocks only Autobuilder visibility.",
+    "work_item_id": null,
+    "evidence": "missing"
+  }
+}

@@ -13,7 +13,7 @@
 
 **SELECTED** 2026-06-30 — operator-approved **P2 side channel**. Does not preempt asset batch wave 1 or spine closeout.
 
-**First slice:** `PPE-HyperliquidPerp-Control-Slice001`
+**First slice:** `PPE-HyperliquidPerp-Control-Slice001` remains the historical first slice; it is not currently dispatchable from the READY frontier.
 
 ---
 
@@ -27,7 +27,7 @@
 | Perps vs options | **Not a blocker** for exposure path; **blocks** Strategy Lab / wave 1 only |
 | Priority | **P2** — parallel to wave 1; charter now, BUILD when slot available |
 
-**Blocked until:** ~~exposure menu v0~~ **satisfied**.
+**Historical prerequisite cleared:** exposure menu v0 is satisfied. **Current reactivation condition:** evidence reconciliation or founder/operator-approved explicit requeue after the issue #5374 audit.
 
 ---
 
@@ -71,7 +71,7 @@
 |------|--------|
 | **Now (2026-06-30)** | Charter + queue READY — this SELECTION |
 | **Parallel** | Wave 1 batches 2–4 continue unchanged |
-| **BUILD start** | Next idle IDE BUILD side-channel slot |
+| **BUILD start** | Blocked after issue #5374 until evidence reconciliation or founder/operator-approved explicit requeue |
 
 ---
 

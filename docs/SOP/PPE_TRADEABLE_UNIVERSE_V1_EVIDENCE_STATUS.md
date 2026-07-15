@@ -20,10 +20,10 @@ closed: 2026-06-27
 | PPE-Universe-Core-Slice002 | **CLOSED** | Registry v2 schema + `list_enabled_asset_ids` / `list_catalog_entries` |
 | PPE-Universe-Core-Slice003 | **CLOSED** | `catalog.json` route + `witness_asset_catalog.py` scaffold |
 | PPE-Universe-UI-Slice004 | **CLOSED** | `lab_asset_selection.py` uses `list_enabled_asset_ids()` only |
-| PPE-Universe-Product-Slice005 | PENDING | MSOS catalog picker |
-| PPE-Universe-Platform-Slice006 | PENDING | Deploy witness |
-| PPE-Universe-Witness-Slice007 | PENDING | pytest |
-| PPE-Universe-Closeout-Slice008 | PENDING | Chapter close |
+| PPE-Universe-Product-Slice005 | CLOSED | MSOS catalog picker |
+| PPE-Universe-Platform-Slice006 | CLOSED | Deploy witness accepted by closeout; no fresh production runtime check in issue #5374 |
+| PPE-Universe-Witness-Slice007 | CLOSED | pytest witness |
+| PPE-Universe-Closeout-Slice008 | CLOSED | PR #389 / merge `b90b74e6e43153408871565d33774a549a3c467c` |
 
 ---
 
@@ -37,9 +37,9 @@ closed: 2026-06-27
 
 - [x] `catalog.json` returns grouped enabled assets (`/ppe-display-api/catalog.json`)
 - [x] `witness_asset_catalog.py --asset BTC` green (mocked scaffold)
-- [ ] MSOS picker loads from catalog (no hardcoded allowlist)
+- [x] MSOS picker loads from catalog (no hardcoded allowlist) ??? repository/test witness only
 - [x] Streamlit selector registry-driven (`list_enabled_asset_ids`)
-- [ ] Production demo witness catalog smoke
+- [ ] Production demo witness catalog smoke ??? no fresh production check in issue #5374
 
 ## Operator sign-off
 

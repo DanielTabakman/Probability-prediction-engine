@@ -87,14 +87,14 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_housekeeping_v1_relay.json",
       "status": "done",
-      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
+      "reason": "issue #5374 READY-frontier audit: evidence archived COMPLETE 2026-06-10; roadmap/backlog already done; selection record remains NOT SELECTED/pre-chartered, so not a build-next candidate",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/repo_between_chapter_housekeeping_relay.json",
-      "status": "ready",
-      "reason": "Recurring between-chapter hygiene skipped for this selection; steward selected Trader Learning Spine ops chapter.",
+      "status": "skipped",
+      "reason": "issue #5374 READY-frontier audit: recurring deterministic housekeeping is backlog-blocked and has no native product implementation slice; schedule only after a product chapter closeout, not build-next READY",
       "workerMode": "deterministic",
       "selectionPrep": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md"
     },
@@ -114,7 +114,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "status": "done",
-      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website",
+      "reason": "issue #5374 READY-frontier audit: PR #121 merge 5eb77873c9233d2eb1c399e5e1ef6bc5a24b4335 shipped Product-Slice002; evidence archived COMPLETE 2026-06-11 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md"
     },
     {
@@ -174,7 +174,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] MCD embed shell \u2014 re-queued after workflow persistence COMPLETE",
+      "reason": "issue #5374 READY-frontier audit: PR #267 merge 4eb30f0657309b8e1d8c9119788c260cc3bf4a5d closed EmbedShellV1 Closeout-Slice006; evidence archived COMPLETE 2026-06-21 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md"
     },
     {
@@ -193,13 +193,13 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] Access on MSOS routes \u2014 phase 4b",
+      "reason": "issue #5374 READY-frontier audit: PR #222 merge 7cae9b04dcdb79e59309c0c19ac1c9f795c31bf6 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] Live monitor/history \u2014 phase 5",
+      "reason": "issue #5374 READY-frontier audit: PR #230 merge 4ce632da348efcdfce46c101ae243378327f2628 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md"
     },
     {
@@ -211,13 +211,13 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] Free tier + manual paid \u2014 phase 7a",
+      "reason": "issue #5374 READY-frontier audit: PR #232 merge a5aaed8072f931203439bd92a4707e5380370db1 completed steering closeout; evidence archived COMPLETE 2026-06-19 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
-      "status": "done",
-      "reason": "[DEFER] Stripe billing \u2014 dropped by operator until stripe_operator_prereq complete",
+      "status": "skipped",
+      "reason": "issue #5374 READY-frontier audit: deferred, not dispatchable; Stripe BUILD remains blocked until operator Stripe prerequisite/secrets are enabled after entitlements completion",
       "selectionPrep": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md"
     },
     {
@@ -247,7 +247,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "status": "done",
-      "reason": "[HIGH] Tradeable universe infra \u2014 registry v2 + catalog.json + MSOS picker",
+      "reason": "issue #5374 READY-frontier audit: PR #389 merge b90b74e6e43153408871565d33774a549a3c467c published tradeable-universe closeout; evidence archived COMPLETE 2026-06-27 and backlog/roadmap done",
       "selectionPrep": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md"
     },
     {
@@ -265,7 +265,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "status": "done",
-      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
+      "reason": "issue #5374 READY-frontier audit: PR #402 merge 3d47cd61c9be9f730d4d73de2d6e40bab6d0777c shipped Product-Slice002; PR #1142 merge ad0027d38b16d1a71fb23293147aae06af5e84fc published closeout; workflow metric closed Product-Slice002",
       "selectionPrep": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md"
     },
     {
@@ -367,7 +367,7 @@
     {
       "planPath": "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
       "status": "done",
-      "reason": "[MEDIUM] Forward consistency radar ch.2 \u2014 MSOS /forward-consistency heatmap",
+      "reason": "issue #5374 READY-frontier audit: PR #1027 merge 22c3491f999e8fc8a6c2f124cfa7fb8927b422a9 shipped Product-Slice002; PR #1093 merge 74f6033e16b2875b00fb9945bdf67636ec9ba272 synced closeout; workflow metric closed Product-Slice002",
       "selectionPrep": "docs/SOP/POST_MSOS_FORWARD_CONSISTENCY_RADAR_V1_SELECTION.md"
     },
     {

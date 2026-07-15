@@ -78,7 +78,8 @@
       "chapterTitle": "Repo housekeeping v1",
       "selectionRecord": "docs/SOP/POST_REPO_HOUSEKEEPING_V1_SELECTION.md",
       "canonRef": "docs/SOP/RELAY_ORCHESTRATOR_RUNBOOK_V1.md \u2014 Cleanup",
-      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope"
+      "reason": "Worktree prune, queue/consistency witness, optional SOP trim \u2014 no product scope",
+      "doneReason": "issue #5374 READY-frontier audit: evidence archived COMPLETE 2026-06-10; roadmap/backlog already done; selection record remains NOT SELECTED/pre-chartered, so not a build-next candidate"
     },
     {
       "chapterId": "mvp1_probability_method_legibility",
@@ -113,7 +114,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_distribution_demo_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_DISTRIBUTION_DEMO_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 P4 follow-on",
-      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website"
+      "reason": "[MEDIUM] Strategy Lab embed + copy so research contact sees labeled distribution summary on website",
+      "doneReason": "issue #5374 READY-frontier audit: PR #121 merge 5eb77873c9233d2eb1c399e5e1ef6bc5a24b4335 shipped Product-Slice002; evidence archived COMPLETE 2026-06-11 and backlog/roadmap done"
     },
     {
       "chapterId": "mvp1_distribution_quant_research_v2",
@@ -151,7 +153,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_cross_venue_scan_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MVP1_CROSS_VENUE_SCAN_V1_SELECTION.md",
       "canonRef": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
-      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle"
+      "reason": "[LOW] Ranked gap report \u2014 sideChannel auto when idle",
+      "doneReason": "issue #5374 READY-frontier audit: PR #402 merge 3d47cd61c9be9f730d4d73de2d6e40bab6d0777c shipped Product-Slice002; PR #1142 merge ad0027d38b16d1a71fb23293147aae06af5e84fc published closeout; workflow metric closed Product-Slice002"
     },
     {
       "chapterId": "mvp1_cross_venue_backtest_v1",
@@ -215,7 +218,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_STORYBOARD_VISUAL_PARITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_WEBSITE_PROGRAM.md \u2014 post-P8 visual parity",
-      "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses"
+      "reason": "[MEDIUM] Storyboard v0.6 pixel/layout parity for apps/msos-web \u2014 closes deferred P2\u2013P8 screenshot witnesses",
+      "doneReason": "issue #5374 READY-frontier audit: product slices 002-006 closed on workflow metrics; PR #1701 merge f86654cecf2c08c5cbee3d15047266d32478a8d9 shipped Witness-Slice008; workflow metric closed Closeout-Slice009 2026-07-06; active manifest remains historical stale READY until VM/operator refresh"
     },
     {
       "chapterId": "msos_public_demo_launch_v1",
@@ -265,7 +269,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_strategy_lab_embed_shell_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_STRATEGY_LAB_EMBED_SHELL_V1_SELECTION.md",
       "canonRef": "docs/SOP/MINIMUM_CREDIBLE_DEMO_GATE_V1.md \u2014 MCD-required integration surface",
-      "reason": "[HIGH] Strategy Lab chart shell \u2014 MCD-required; storyboard 03 region without box-in-box Streamlit chrome; display API or chromeless embed \u2014 blocked until workflow persistence COMPLETE"
+      "reason": "[HIGH] Strategy Lab chart shell \u2014 MCD-required; storyboard 03 region without box-in-box Streamlit chrome; display API or chromeless embed \u2014 blocked until workflow persistence COMPLETE",
+      "doneReason": "issue #5374 READY-frontier audit: PR #267 merge 4eb30f0657309b8e1d8c9119788c260cc3bf4a5d closed EmbedShellV1 Closeout-Slice006; evidence archived COMPLETE 2026-06-21 and backlog/roadmap done"
     },
     {
       "chapterId": "msos_mcd_production_witness_v1",
@@ -295,7 +300,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_access_identity_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_ACCESS_IDENTITY_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 4b",
-      "reason": "[HIGH] Cloudflare Access on MSOS routes + user-scoped APIs \u2014 blocked until snapshot owner COMPLETE"
+      "reason": "[HIGH] Cloudflare Access on MSOS routes + user-scoped APIs \u2014 blocked until snapshot owner COMPLETE",
+      "doneReason": "issue #5374 READY-frontier audit: PR #222 merge 7cae9b04dcdb79e59309c0c19ac1c9f795c31bf6 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done"
     },
     {
       "chapterId": "msos_monitor_history_live_v1",
@@ -305,7 +311,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_monitor_history_live_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_MONITOR_HISTORY_LIVE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 5",
-      "reason": "[HIGH] Monitor/History + updated Command Center from live state \u2014 blocked until access identity COMPLETE"
+      "reason": "[HIGH] Monitor/History + updated Command Center from live state \u2014 blocked until access identity COMPLETE",
+      "doneReason": "issue #5374 READY-frontier audit: PR #230 merge 4ce632da348efcdfce46c101ae243378327f2628 shipped Product-Slice002; evidence archived COMPLETE 2026-06-18 and backlog/roadmap done"
     },
     {
       "chapterId": "msos_e2e_product_witness_v1",
@@ -325,17 +332,20 @@
       "planPath": "docs/SOP/PHASE_PLANS/msos_entitlements_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_ENTITLEMENTS_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_COMMERCIAL_ENTITLEMENTS_ADR.md",
-      "reason": "[HIGH] Free tier accounts + manual paid upgrade path (Stripe hooks, no Stripe SDK) \u2014 blocked until access identity COMPLETE"
+      "reason": "[HIGH] Free tier accounts + manual paid upgrade path (Stripe hooks, no Stripe SDK) \u2014 blocked until access identity COMPLETE",
+      "doneReason": "issue #5374 READY-frontier audit: PR #232 merge a5aaed8072f931203439bd92a4707e5380370db1 completed steering closeout; evidence archived COMPLETE 2026-06-19 and backlog/roadmap done"
     },
     {
       "chapterId": "msos_billing_stripe_v1",
-      "status": "done",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P4",
       "planPath": "docs/SOP/PHASE_PLANS/msos_billing_stripe_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_MSOS_BILLING_STRIPE_V1_SELECTION.md",
       "canonRef": "docs/SOP/MSOS_LIVE_PRODUCT_SEQUENCE_V1.md \u2014 phase 7b",
-      "reason": "[DEFER] Stripe Checkout \u2014 operator dropped until human prereq (stripe_operator_prereq); MSOS live sequence otherwise COMPLETE"
+      "reason": "[DEFER] Stripe Checkout \u2014 operator dropped until human prereq (stripe_operator_prereq); MSOS live sequence otherwise COMPLETE",
+      "blockedReason": "issue #5374 READY-frontier audit: deferred, not dispatchable; Stripe BUILD remains blocked until operator Stripe prerequisite/secrets are enabled after entitlements completion",
+      "reactivationCondition": "deferred, not dispatchable; Stripe BUILD remains blocked until operator Stripe prerequisite/secrets are enabled after entitlements completion"
     },
     {
       "chapterId": "msos_usable_demo_v1",
@@ -387,7 +397,8 @@
       "planPath": "docs/SOP/PHASE_PLANS/ppe_tradeable_universe_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_TRADEABLE_UNIVERSE_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md",
-      "reason": "[HIGH] Registry v2 + catalog.json + witness harness \u2014 gates tier-1 asset batches; blocked on ppe_equity_options_v1 COMPLETE"
+      "reason": "[HIGH] Registry v2 + catalog.json + witness harness \u2014 gates tier-1 asset batches; blocked on ppe_equity_options_v1 COMPLETE",
+      "doneReason": "issue #5374 READY-frontier audit: PR #389 merge b90b74e6e43153408871565d33774a549a3c467c published tradeable-universe closeout; evidence archived COMPLETE 2026-06-27 and backlog/roadmap done"
     },
     {
       "chapterId": "ppe_asset_display_parity_v1",
@@ -704,14 +715,16 @@
     },
     {
       "chapterId": "ppe_hyperliquid_perp_rail_v1",
-      "status": "ready",
+      "status": "blocked",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "sideChannel": true,
       "planPath": "docs/SOP/PHASE_PLANS/ppe_hyperliquid_perp_rail_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md",
       "canonRef": "docs/SOP/PPE_HYPERLIQUID_PERP_RAIL_PROGRAM_V1.md",
-      "reason": "[P2] HYPE Hyperliquid perp exposure path \u2014 operator HL customer signal; parallel to wave 1"
+      "reason": "[P2] HYPE Hyperliquid perp exposure path \u2014 operator HL customer signal; parallel to wave 1",
+      "blockedReason": "issue #5374 READY-frontier audit: historically ambiguous/closeout-only; current main has HYPE implementation/tests and Product-Slice004 workflow metric but evidence still CHARTERED/PENDING and no main closeout; reactivation requires evidence reconciliation or founder-approved explicit requeue",
+      "reactivationCondition": "founder/operator-approved explicit requeue with refreshed native evidence packet"
     },
     {
       "chapterId": "ppe_asset_batch_wave2_v1",
@@ -733,7 +746,9 @@
       "chapterTitle": "Repo between-chapter housekeeping",
       "selectionRecord": "docs/SOP/SPRINT_REPO_BETWEEN_CHAPTER_HOUSEKEEPING_V1.md",
       "canonRef": "docs/SOP/REPO_LAYER_MAP_V1.md \u2014 dev-factory hygiene",
-      "reason": "[LOW] Auto-scheduled after each product chapter closeout; sideChannel when idle"
+      "reason": "[LOW] Auto-scheduled after each product chapter closeout; sideChannel when idle",
+      "blockedReason": "issue #5374 READY-frontier audit: recurring deterministic housekeeping is backlog-blocked and has no native product implementation slice; schedule only after a product chapter closeout, not build-next READY",
+      "reactivationCondition": "recurring deterministic housekeeping is backlog-blocked and has no native product implementation slice; schedule only after a product chapter closeout, not build-next READY"
     }
   ]
 }

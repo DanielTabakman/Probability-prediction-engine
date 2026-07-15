@@ -13,11 +13,11 @@ closed: 2026-06-19
 
 | Slice | Status |
 |-------|--------|
-| MSOS-EntitleV1-Control-Slice001 | PENDING |
-| MSOS-EntitleV1-Product-Slice002 | PENDING |
-| MSOS-EntitleV1-Platform-Slice003 | PENDING |
-| MSOS-EntitleV1-Witness-Slice004 | PENDING |
-| MSOS-EntitleV1-Closeout-Slice005 | PENDING |
+| MSOS-EntitleV1-Control-Slice001 | CLOSED |
+| MSOS-EntitleV1-Product-Slice002 | CLOSED |
+| MSOS-EntitleV1-Platform-Slice003 | CLOSED |
+| MSOS-EntitleV1-Witness-Slice004 | CLOSED | automated witness only; no fresh manual runtime check in issue #5374 |
+| MSOS-EntitleV1-Closeout-Slice005 | CLOSED | PR #232 / merge `a5aaed8072f931203439bd92a4707e5380370db1` |
 
 ## Commercial witness
 

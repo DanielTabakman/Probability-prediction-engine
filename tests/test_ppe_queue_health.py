@@ -179,6 +179,127 @@ class TestPpeQueueHealth(unittest.TestCase):
             chapter_marked_complete_in_repo(self.repo, "docs/SOP/PHASE_PLANS/pending_slices.json")
         )
 
+    def test_audit_detects_ready_with_terminal_backlog_even_without_done_queue_row(self) -> None:
+        plan = {
+            "name": "terminal_backlog_only",
+            "slices": [
+                {
+                    "sliceId": "T-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/TERMINAL_BACKLOG_ONLY_EVIDENCE.md"},
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "terminal_backlog_only.json").write_text(
+            json.dumps(plan),
+            encoding="utf-8",
+        )
+        (self.repo / "docs" / "SOP" / "TERMINAL_BACKLOG_ONLY_EVIDENCE.md").write_text(
+            "# Evidence\n\n**Status:** **PENDING**\n",
+            encoding="utf-8",
+        )
+        backlog = {
+            "version": 1,
+            "items": [
+                {
+                    "chapterId": "terminal_backlog_only",
+                    "status": "done",
+                    "planPath": "docs/SOP/PHASE_PLANS/terminal_backlog_only.json",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(backlog, indent=2),
+            encoding="utf-8",
+        )
+        queue = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/terminal_backlog_only.json",
+                    "status": "READY",
+                    "reason": "stale frontier row",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_QUEUE.json").write_text(
+            json.dumps(queue, indent=2),
+            encoding="utf-8",
+        )
+        issues, _ = audit_queue(self.repo)
+        self.assertIn("READY_WITH_TERMINAL_BACKLOG", {issue["code"] for issue in issues})
+
+    def test_explicit_requeue_can_reopen_terminal_backlog_frontier(self) -> None:
+        backlog = {
+            "version": 1,
+            "items": [
+                {
+                    "chapterId": "chapter_done",
+                    "status": "done",
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(backlog, indent=2),
+            encoding="utf-8",
+        )
+        queue = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "status": "READY",
+                    "explicitRequeue": True,
+                    "requeueReason": "new founder-approved follow-up slice",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_QUEUE.json").write_text(
+            json.dumps(queue, indent=2),
+            encoding="utf-8",
+        )
+        issues, _ = audit_queue(self.repo)
+        self.assertNotIn("READY_WITH_TERMINAL_BACKLOG", {issue["code"] for issue in issues})
+
+    def test_audit_detects_archived_complete_evidence_with_pending_slice_rows(self) -> None:
+        evidence = self.repo / "docs" / "SOP" / "CHAPTER_PENDING_EVIDENCE.md"
+        evidence.write_text(
+            "---\narchived: true\n---\n\n"
+            "# Evidence\n\n**Status:** **WITNESS COMPLETE**\n\n"
+            "| Slice | Status |\n|-------|--------|\n"
+            "| X-Slice001 | PENDING |\n",
+            encoding="utf-8",
+        )
+        plan = {
+            "name": "pending_slices",
+            "slices": [
+                {
+                    "sliceId": "X-Closeout",
+                    "closeout": {"evidenceDoc": "docs/SOP/CHAPTER_PENDING_EVIDENCE.md"},
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_PLANS" / "pending_slices.json").write_text(
+            json.dumps(plan),
+            encoding="utf-8",
+        )
+        queue = {
+            "version": 1,
+            "items": [
+                {
+                    "planPath": "docs/SOP/PHASE_PLANS/pending_slices.json",
+                    "status": "READY",
+                    "reason": "stale archived evidence row",
+                }
+            ],
+        }
+        (self.repo / "docs" / "SOP" / "PHASE_QUEUE.json").write_text(
+            json.dumps(queue, indent=2),
+            encoding="utf-8",
+        )
+        issues, _ = audit_queue(self.repo)
+        self.assertIn("READY_WITH_ARCHIVED_COMPLETE_EVIDENCE", {issue["code"] for issue in issues})
+
     def test_recurring_chapter_never_marked_permanently_complete(self) -> None:
         evidence = self.repo / "docs" / "SOP" / "RECURRING_EVIDENCE.md"
         evidence.write_text(

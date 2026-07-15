@@ -21,6 +21,8 @@ BACKLOG_TERMINAL_STATUSES = frozenset({"done", "skipped"})
 FINALIZE_DONE_REASON = "auto-repair: evidence doc shows chapter COMPLETE"
 PREMATURE_REOPEN_REASON = "auto-repair: chapter closeout reverted — evidence/slices still pending"
 ROADMAP_REPAIR_REASON = "auto-repair: backlog status on roadmap normalized"
+READY_TERMINAL_BACKLOG_REASON = "READY row conflicts with terminal backlog status"
+READY_ARCHIVED_COMPLETE_REASON = "READY row conflicts with archived/complete evidence"
 # Backlog-only statuses sometimes land on PHASE_SELECTION_ROADMAP by hand; map to valid roadmap rows.
 ROADMAP_INVALID_TO_VALID = {
     "chartered": "pending",
@@ -61,6 +63,54 @@ def _evidence_has_pending_slices(body: str) -> bool:
             if re.fullmatch(r"\*{0,2}PENDING\*{0,2}", cell, re.I):
                 return True
     return False
+
+
+def _queue_item_has_explicit_requeue(item: dict[str, Any]) -> bool:
+    """True when a READY item intentionally reopens terminal chapter evidence."""
+    if item.get("explicitRequeue") is not True:
+        return False
+    return bool(str(item.get("requeueReason") or "").strip())
+
+
+def _backlog_status_for_plan(repo_root: Path, plan_path: str) -> str:
+    path = repo_root / BACKLOG_REL
+    if not path.is_file():
+        return ""
+    try:
+        backlog = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return ""
+    norm = _norm_plan(plan_path)
+    for item in backlog.get("items") or []:
+        if not isinstance(item, dict):
+            continue
+        if _norm_plan(str(item.get("planPath") or "")) == norm:
+            return str(item.get("status") or "").strip().lower()
+    return ""
+
+
+def evidence_archived_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
+    """True when closeout evidence is archived/closed and claims a complete status."""
+    try:
+        plan = load_phase_plan(repo_root, plan_path)
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return False
+    closeout = _closeout_meta(plan)
+    evidence_rel = str(closeout.get("evidenceDoc") or "").strip()
+    if not evidence_rel:
+        return False
+    evidence = repo_root / evidence_rel
+    if not evidence.is_file():
+        return False
+    body = evidence.read_text(encoding="utf-8", errors="replace")
+    head = body[:1600].lower()
+    archived_or_closed = "archived: true" in head or re.search(r"^closed:\s*(?!unknown\b).+", head, re.M)
+    complete_status = re.search(r"\*\*status:\*\*.*\bcomplete\b", head, re.I) or re.search(
+        r"chapter\s+\*\*complete\*\*",
+        head,
+        re.I,
+    )
+    return bool(archived_or_closed and complete_status)
 
 
 def chapter_marked_complete_in_repo(repo_root: Path, plan_path: str) -> bool:
@@ -351,6 +401,7 @@ def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
         plan = _norm_plan(str(item.get("planPath") or ""))
         if status != "READY" or not plan:
             continue
+        explicit_requeue = _queue_item_has_explicit_requeue(item)
         done_idxs = [
             j
             for j in by_plan.get(plan, [i])
@@ -373,6 +424,27 @@ def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
                     "planPath": plan,
                 }
             )
+        elif not explicit_requeue:
+            backlog_status = _backlog_status_for_plan(repo, plan)
+            if backlog_status in BACKLOG_TERMINAL_STATUSES:
+                issues.append(
+                    {
+                        "code": "READY_WITH_TERMINAL_BACKLOG",
+                        "index": i,
+                        "planPath": plan,
+                        "backlogStatus": backlog_status,
+                        "reason": READY_TERMINAL_BACKLOG_REASON,
+                    }
+                )
+            if evidence_archived_complete_in_repo(repo, plan):
+                issues.append(
+                    {
+                        "code": "READY_WITH_ARCHIVED_COMPLETE_EVIDENCE",
+                        "index": i,
+                        "planPath": plan,
+                        "reason": READY_ARCHIVED_COMPLETE_REASON,
+                    }
+                )
 
     return issues, fixes
 
