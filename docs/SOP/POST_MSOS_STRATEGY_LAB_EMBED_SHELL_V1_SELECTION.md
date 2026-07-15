@@ -10,7 +10,7 @@
 
 **SELECTED** 2026-06-20 — steward: replace box-in-box Streamlit iframe on `/strategy-lab` with storyboard-aligned chart shell; PPE math stays in Python.
 
-**Precondition met:** `msos_workflow_persistence_v1` **COMPLETE** 2026-06-20.
+**Precondition met:** `msos_workflow_persistence_v1` **COMPLETE** 2026-06-20. No active blocker remains.
 
 ## Scope (in)
 
@@ -32,9 +32,9 @@
 
 Does **not** block live product sequence phases 4a–7; runs in parallel slot after phase 3 closeout promotion.
 
-## First slice at SELECTION
+## First slice at SELECTION (historical)
 
-`MSOS-EmbedShellV1-Control-Slice001`
+`MSOS-EmbedShellV1-Control-Slice001` was the historical first slice and is no longer pending.
 
 ## Focus playbook
 

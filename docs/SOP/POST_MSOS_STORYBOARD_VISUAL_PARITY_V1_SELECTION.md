@@ -9,7 +9,7 @@
 
 **SELECTED** 2026-06-12 — operator request: MSOS surfaces should match storyboard v0.6 pictures, not only narrative parity.
 
-**Blocked until** `mvp1_distribution_quant_research_v2` **COMPLETE** (smoke + closeout on current LOW chapter).
+**Historical prerequisite cleared:** `mvp1_distribution_quant_research_v2` completed. No active blocker remains for this completed chapter; the active manifest READY pointer is stale coordination state, not product BUILD work.
 
 ## Preconditions (met)
 
@@ -32,9 +32,9 @@
 - Live execution, paywall, or auth server beyond existing ADR
 - Replacing Streamlit embed interior — only MSOS chrome around embed
 
-## First slice at SELECTION
+## First slice at SELECTION (historical)
 
-`MSOS-VisParityV1-Control-Slice001`
+`MSOS-VisParityV1-Control-Slice001` was the historical first slice and is no longer pending.
 
 ## Local compare loop
 

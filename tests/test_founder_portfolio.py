@@ -555,6 +555,35 @@ def test_current_snapshot_owner_is_not_ready_after_reconciliation(monkeypatch) -
     assert snapshot["recommended_next_action"]["work_item_id"] != "mvp1_snapshot_owner_v1"
 
 
+def test_issue_5374_ready_frontier_is_not_ready_after_reconciliation(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    snapshot = collect_portfolio(REPO)
+    ppe = next(item for item in snapshot["pipelines"] if item["pipeline_id"] == "ppe")
+
+    reconciled_ids = {
+        "repo_housekeeping_v1",
+        "msos_strategy_lab_distribution_demo",
+        "msos_storyboard_visual_parity_v1",
+        "msos_access_identity_v1",
+        "msos_monitor_history_live_v1",
+        "msos_entitlements_v1",
+        "msos_strategy_lab_embed_shell_v1",
+        "msos_billing_stripe_v1",
+        "ppe_tradeable_universe_v1",
+        "mvp1_cross_venue_scan_v1",
+        "msos_forward_consistency_radar_v1",
+        "ppe_hyperliquid_perp_rail_v1",
+        "repo_between_chapter_housekeeping",
+    }
+    ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
+
+    assert ready_ids.isdisjoint(reconciled_ids)
+    assert ppe["ready_work"] == []
+    assert snapshot["recommended_next_action"]["work_item_id"] not in reconciled_ids
+
+
 def test_blocked_autobuilder_does_not_prevent_safe_ppe_recommendation(tmp_path: Path, monkeypatch) -> None:
     from scripts.founder_portfolio import collect_portfolio
 
