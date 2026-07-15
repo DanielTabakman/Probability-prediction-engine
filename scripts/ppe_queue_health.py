@@ -416,7 +416,7 @@ def audit_queue(repo_root: Path) -> tuple[list[Issue], list[Fix]]:
                     "doneIndex": done_idxs[0],
                 }
             )
-        elif chapter_marked_complete_in_repo(repo, plan):
+        elif not explicit_requeue and chapter_marked_complete_in_repo(repo, plan):
             issues.append(
                 {
                     "code": "READY_BUT_CHAPTER_COMPLETE",

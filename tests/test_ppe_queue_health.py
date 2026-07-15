@@ -228,14 +228,38 @@ class TestPpeQueueHealth(unittest.TestCase):
         issues, _ = audit_queue(self.repo)
         self.assertIn("READY_WITH_TERMINAL_BACKLOG", {issue["code"] for issue in issues})
 
-    def test_explicit_requeue_can_reopen_terminal_backlog_frontier(self) -> None:
+    def _write_archived_complete_chapter(self) -> str:
+        plan_rel = "docs/SOP/PHASE_PLANS/complete_requeue.json"
+        evidence_rel = "docs/SOP/COMPLETE_REQUEUE_EVIDENCE.md"
+        plan = {
+            "name": "complete_requeue",
+            "slices": [
+                {
+                    "sliceId": "Complete-Requeue-Closeout",
+                    "closeout": {"evidenceDoc": evidence_rel},
+                }
+            ],
+        }
+        (self.repo / plan_rel).write_text(json.dumps(plan), encoding="utf-8")
+        (self.repo / evidence_rel).write_text(
+            "---\narchived: true\nclosed: 2026-07-15\n---\n\n"
+            "# Complete requeue evidence\n\n"
+            "**Status:** **COMPLETE** 2026-07-15\n\n"
+            "| Slice | Status |\n|-------|--------|\n"
+            "| Complete-Requeue-Closeout | CLOSED |\n",
+            encoding="utf-8",
+        )
+        return plan_rel
+
+    def test_explicit_requeue_can_reopen_archived_complete_terminal_frontier(self) -> None:
+        plan_rel = self._write_archived_complete_chapter()
         backlog = {
             "version": 1,
             "items": [
                 {
-                    "chapterId": "chapter_done",
+                    "chapterId": "complete_requeue",
                     "status": "done",
-                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "planPath": plan_rel,
                 }
             ],
         }
@@ -247,7 +271,7 @@ class TestPpeQueueHealth(unittest.TestCase):
             "version": 1,
             "items": [
                 {
-                    "planPath": "docs/SOP/PHASE_PLANS/chapter_done.json",
+                    "planPath": plan_rel,
                     "status": "READY",
                     "explicitRequeue": True,
                     "requeueReason": "new founder-approved follow-up slice",
@@ -259,7 +283,49 @@ class TestPpeQueueHealth(unittest.TestCase):
             encoding="utf-8",
         )
         issues, _ = audit_queue(self.repo)
-        self.assertNotIn("READY_WITH_TERMINAL_BACKLOG", {issue["code"] for issue in issues})
+        codes = {issue["code"] for issue in issues}
+        self.assertNotIn("READY_BUT_CHAPTER_COMPLETE", codes)
+        self.assertNotIn("READY_WITH_TERMINAL_BACKLOG", codes)
+        self.assertNotIn("READY_WITH_ARCHIVED_COMPLETE_EVIDENCE", codes)
+
+    def test_malformed_explicit_requeue_still_reports_terminal_history(self) -> None:
+        plan_rel = self._write_archived_complete_chapter()
+        (self.repo / "docs" / "SOP" / "PHASE_CHAPTER_BACKLOG.json").write_text(
+            json.dumps(
+                {
+                    "version": 1,
+                    "items": [
+                        {
+                            "chapterId": "complete_requeue",
+                            "status": "done",
+                            "planPath": plan_rel,
+                        }
+                    ],
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+        malformed_requeues = [
+            {"explicitRequeue": True},
+            {"explicitRequeue": True, "requeueReason": ""},
+            {"explicitRequeue": True, "requeueReason": "   "},
+        ]
+        for malformed in malformed_requeues:
+            queue_item = {
+                "planPath": plan_rel,
+                "status": "READY",
+                "reason": "malformed explicit requeue",
+                **malformed,
+            }
+            (self.repo / "docs" / "SOP" / "PHASE_QUEUE.json").write_text(
+                json.dumps({"version": 1, "items": [queue_item]}, indent=2),
+                encoding="utf-8",
+            )
+            issues, _ = audit_queue(self.repo)
+            codes = {issue["code"] for issue in issues}
+            self.assertIn("READY_BUT_CHAPTER_COMPLETE", codes)
 
     def test_audit_detects_archived_complete_evidence_with_pending_slice_rows(self) -> None:
         evidence = self.repo / "docs" / "SOP" / "CHAPTER_PENDING_EVIDENCE.md"

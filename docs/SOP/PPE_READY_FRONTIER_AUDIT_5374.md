@@ -1,9 +1,9 @@
 # PPE READY frontier audit - issue #5374
 
-**Issue:** #5374, "Audit remaining READY frontier before build-next witness"  
-**Audit date:** 2026-07-15  
-**Branch:** `codex/audit-ready-frontier-5374`  
-**Autobuilder:** no `build next` dry-run/live command was run; `msos-autobuilder` was not modified.  
+**Issue:** #5374, "Audit remaining READY frontier before build-next witness"
+**Audit date:** 2026-07-15
+**Branch:** `codex/audit-ready-frontier-5374`
+**Autobuilder:** no `build next` dry-run/live command was run; `msos-autobuilder` was not modified.
 
 ## Founder portfolio snapshots
 
@@ -12,6 +12,8 @@
 
 Before reconciliation, PPE `ready_work` contained 13 rows and recommended `msos_access_identity_v1`.
 After reconciliation, PPE `ready_work` is empty. There is no genuine READY PPE item and therefore no native prerequisite packet to dispatch. Promoting the next product chapter would require founder/operator reactivation evidence, so this audit did not create a new READY item.
+
+Merging this audit reconciles stale PPE control-plane state, but it does not make the live Autobuilder witness runnable. A founder/operator must select or explicitly reactivate genuine work after merge before another dry run or live dispatch.
 
 ## READY frontier classification
 
@@ -34,6 +36,19 @@ After reconciliation, PPE `ready_work` is empty. There is no genuine READY PPE i
 ## Systemic protection
 
 `scripts/ppe_queue_health.py` now reports READY rows that conflict with terminal backlog status or archived/complete evidence. Future legitimate requeues must carry structured `explicitRequeue: true` and a non-empty `requeueReason`; prose-only stale READY rows are no longer silent.
+
+Structured requeue semantics are deliberately narrow: a single READY row with `explicitRequeue: true` and non-empty `requeueReason` bypasses historical terminal findings, while duplicate READY/DONE rows and malformed requeue metadata remain invalid.
+
+## Coordination status
+
+Agreement: partial
+Compared: issue #5374, PR #5375, READY-frontier audit, queue-health invariant, founder-portfolio after-state, and PR-head CI
+Disagreement: the reconciliation is supported, but the next genuine work item is not selected by this PR
+Evidence gap: founder selection of the next genuine work item
+Ownership overlap: PPE control-plane only; Autobuilder remains read-only and was not run
+Risk if unresolved: there is no real task available for the Autobuilder live witness
+Recommended default: merge the frontier reconciliation, then make an explicit founder selection before another dry run
+Founder decision required: yes
 
 ## Runtime witness policy
 
