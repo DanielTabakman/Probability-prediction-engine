@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-15
 
+- `c7733bf2` — 
+- `026d929a` — Control-plane: dev changelog
 - `b6b831d5` — Merge pull request #5375 from DanielTabakman/codex/audit-ready-frontier-5374
 - `5a09d1f0` — Control-plane: dev changelog
 - `f173017a` — control-plane: honor explicit requeue terminal bypass (`docs/SOP/`)
