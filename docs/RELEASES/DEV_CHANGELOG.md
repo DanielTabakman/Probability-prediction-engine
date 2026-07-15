@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-15
 
+- `301612b7` — Prepare USO commodity proxy witness packet (#5377) (`docs/SOP/`)
+- `1860954b` — Control-plane: dev changelog
 - `3fea102c` — revert accidental empty file
 - `747974ff` — Control-plane: dev changelog
 - `c7733bf2` —
