@@ -12,6 +12,8 @@ Prepare the first dispatchable product slice for **USO** ETF options via the equ
 
 This sprint is temporarily promoted ahead of asset-wave batches 2 and 3 for the founder acceptance witness in GitHub issue #5376. The override proves one complete installed Autobuilder run-through; it does not close batches 2 or 3 and does not permanently rewrite the asset-wave order.
 
+USO is not a durable product-priority claim. It is selected for this witness because it is a small, already-chartered, credential-free PPE change that can use the existing equity-options adapter. After this witness, product priority returns to founder selection, with Match Horizon intended as the immediate separate follow-on.
+
 ---
 
 ## Slice acceptance

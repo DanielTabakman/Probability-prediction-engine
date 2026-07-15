@@ -25,6 +25,8 @@ Founder approval in GitHub issue #5376 temporarily promotes `ppe_commodity_proxy
 
 This override does not mark batch 2 or batch 3 complete, does not claim GLD or SLV shipped under the commodity-proxy chapter, and does not permanently rewrite the asset-wave order. After the acceptance witness, the wave order remains batch 2, then batch 3, then batch 4 unless a later accepted GitHub record changes it.
 
+Historical PR #396 published steering/queue-only closeouts. Current `config/assets.yaml` still lacks tier1b, tier1c, GLD, SLV, and USO rows, so those historical closeouts do not establish current product implementation.
+
 ## Batch-1 retrospect attempt - 2026-07-07
 
 **Decision:** do not promote `ppe_equity_universe_tier1b_v1` yet. Batch-1 catalog/display witnesses are green, and the remaining-id OI refresh completed, but production witness is not green from desktop.

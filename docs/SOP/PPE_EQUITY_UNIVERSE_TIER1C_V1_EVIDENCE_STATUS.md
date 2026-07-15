@@ -6,6 +6,8 @@
 
 This document supersedes the stale 2026-07-09 archived COMPLETE claim for the current wave-1 control plane. Issue #5376 does not mark this batch complete.
 
+Historical PR #396 published steering/queue-only closeouts; current `config/assets.yaml` still lacks this batch, so it does not establish current product implementation.
+
 | Slice | Status |
 |-------|--------|
 | PPE-EqT1c-Control-Slice001 | PENDING |

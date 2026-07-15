@@ -10,13 +10,14 @@ This chapter is narrowed to **USO only**. GLD and SLV remain owned by asset-wave
 
 ## Founder override
 
-Daniel approved temporarily promoting USO ahead of asset-wave batches 2 and 3 so the installed Autobuilder can complete its first genuine end-to-end witness. This does not mark batches 2 or 3 complete and does not permanently rewrite the asset-wave order.
+Daniel approved temporarily promoting USO ahead of asset-wave batches 2 and 3 so the installed Autobuilder can complete its first genuine end-to-end witness. USO has no special customer-demand claim and is not being elevated as a durable product-strategy priority; it is selected here because it is a small, already-chartered, credential-free PPE change that can use the existing equity-options adapter. This does not mark batches 2 or 3 complete and does not permanently rewrite the asset-wave order. After this witness, product priority returns to founder selection, with Match Horizon intended as the immediate separate follow-on.
 
 ## Control-Slice001 evidence
 
 - `config/assets_tier1_manifest.yaml` assigns `ppe_commodity_proxy_tier1_v1` to `assets: [USO]`, `status: queued`, `wave: ppe_asset_batch_wave1_v1`, `volume_batch: 4`.
 - `config/assets.yaml` does not contain GLD, SLV, or USO on current main; USO is not already implemented.
 - `docs/SOP/PPE_ASSET_BATCH_WAVE1_V1_EVIDENCE_STATUS.md` records batch 2 as blocked, batch 3 as pending, and batch 4 as USO pending before this temporary override.
+- Historical PR #396 published steering/queue-only closeouts and did not establish current product implementation for tier1b, tier1c, or USO.
 - GitHub issue #5376 records the founder priority override and the requirement to prepare, not dispatch or implement, the USO packet.
 
 | Slice | Status |

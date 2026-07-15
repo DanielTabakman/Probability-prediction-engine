@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "as_of": "2026-07-15T16:07:51Z",
+  "as_of": "2026-07-15T16:36:28Z",
   "read_only": true,
   "registry_errors": [],
   "capacity": {
@@ -30,7 +30,7 @@
           "scope": "local",
           "fresh": true,
           "as_of": "2026-07-15T04:27:04Z",
-          "age_seconds": 42046
+          "age_seconds": 43763
         },
         {
           "kind": "missing",
@@ -52,7 +52,7 @@
       "ready_work": [
         {
           "work_item_id": "ppe_commodity_proxy_tier1_v1",
-          "title": "[HIGH] Founder acceptance-witness override - USO commodity ETF proxy only",
+          "title": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
           "native_state": "READY",
           "state": "READY_TO_BUILD",
           "trace": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
@@ -69,7 +69,7 @@
           "native_prerequisites": {
             "read_only": true,
             "source": "ppe_native_read_only",
-            "generated_at": "2026-07-15T16:07:51Z",
+            "generated_at": "2026-07-15T16:36:28Z",
             "source_plan": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
             "selected_native_slice": "PPE-CommProxy-Core-Slice002",
             "allowed_product_paths": [
@@ -105,47 +105,47 @@
                 {
                   "path": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
                   "exists": true,
-                  "sha256": "38dfbafbfeb5951dbd5c27bc49f54ffc2642ff649465429a6358d8df7622a39e",
-                  "git_commit": "0ff7a9c0530966ec2f4657257f01061643a74a10",
-                  "git_committed_at": "2026-07-15T00:27:16-04:00"
+                  "sha256": "72af20545a134ef31479707f08eaeb81bc235ad386e250d9ef24469b42203247",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 },
                 {
                   "path": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
                   "exists": true,
                   "sha256": "2fa45c5bb2b6aa76c365dffba8554770136111a532525ac1640825fcbe5db10e",
-                  "git_commit": "7c15ceed57e3734fab5613231fcbec1eb2fe7f29",
-                  "git_committed_at": "2026-06-26T17:18:23Z"
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 },
                 {
                   "path": "docs/SOP/PHASE_QUEUE.json",
                   "exists": true,
-                  "sha256": "83221948c771ed99196a4892d6498e87fa4bee186e37dd9aaed9ef404c4ad6bc",
-                  "git_commit": "0ff7a9c0530966ec2f4657257f01061643a74a10",
-                  "git_committed_at": "2026-07-15T00:27:16-04:00"
+                  "sha256": "700c13764f10d98213e7c13992b64a78ce0cb2db7dee7e675afe014a1b86e14d",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 },
                 {
                   "path": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
                   "exists": true,
-                  "sha256": "899a0d72501ca2f5a8a68a3cd4a7615da04db8ed9f896324dc8aff6392a6a91b",
-                  "git_commit": "7c15ceed57e3734fab5613231fcbec1eb2fe7f29",
-                  "git_committed_at": "2026-06-26T17:18:23Z"
+                  "sha256": "b76ce13b78b86a35179b1bc89c6e4cfa86127fa68f487cf8cae9b9df0f57e248",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 },
                 {
                   "path": "docs/SOP/PPE_COMMODITY_PROXY_TIER1_V1_EVIDENCE_STATUS.md",
                   "exists": true,
-                  "sha256": "cb3b8e88bb411854c161f99f1509843d4b363a0f21348007cd7838def5fd823a",
-                  "git_commit": "1137e40aa9a89829c84abda617f0397f0d529647",
-                  "git_committed_at": "2026-06-29T15:35:51Z"
+                  "sha256": "0fddcfbbc86417ea3c50b1019bdf237c6f120be64f299d9b390b756d3ef48ffc",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 },
                 {
                   "path": "docs/SOP/SPRINT_PPE_COMMODITY_PROXY_TIER1_V1.md",
                   "exists": true,
-                  "sha256": "7a46721120d28b568f8896c1938dea034770e233814d632d09551c87f916921b",
-                  "git_commit": "7c15ceed57e3734fab5613231fcbec1eb2fe7f29",
-                  "git_committed_at": "2026-06-26T17:18:23Z"
+                  "sha256": "fa687d450813cdbb1d953358ea82e9a876e5fd57d18b2844bb03a4c7a29419f0",
+                  "git_commit": "c7765b01b75feea67323315ce5bb15ec5c5ca657",
+                  "git_committed_at": "2026-07-15T12:09:59-04:00"
                 }
               ],
-              "identity": "8c9739eafd567724514b6f943851e8309bd36ffacdca492edb08451d5a9110f7"
+              "identity": "173a20125a9fe29ab8200c7adbc739375055393f354e9c26010fd3163ec98082"
             },
             "statuses": {
               "PPE-CommProxy-Control-Slice001": {
@@ -373,7 +373,7 @@
       "next_action": {
         "state": "READY_TO_BUILD",
         "action_type": "build",
-        "summary": "[HIGH] Founder acceptance-witness override - USO commodity ETF proxy only",
+        "summary": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
         "work_item_id": "ppe_commodity_proxy_tier1_v1",
         "trace": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
         "evidence": "manual"
@@ -447,7 +447,7 @@
     "pipeline_id": "ppe",
     "state": "READY_TO_BUILD",
     "action_type": "build",
-    "summary": "[HIGH] Founder acceptance-witness override - USO commodity ETF proxy only",
+    "summary": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
     "work_item_id": "ppe_commodity_proxy_tier1_v1",
     "evidence": "manual",
     "selection_rank": [
