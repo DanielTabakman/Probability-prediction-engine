@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-16
+
+_No merges to `main`._
+
 ## 2026-07-15
 
+- `ec1789cd` — Control-plane: dev changelog
 - `301612b7` — Prepare USO commodity proxy witness packet (#5377) (`docs/SOP/`)
 - `1860954b` — Control-plane: dev changelog
 - `3fea102c` — revert accidental empty file
