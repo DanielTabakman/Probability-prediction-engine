@@ -515,13 +515,32 @@
       "holdReason": "Issue #5376 temporary USO acceptance-witness override does not mark batch 3 complete."
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "planPath": "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
       "status": "READY",
-      "reason": "[HIGH] Founder acceptance-witness override \u2014 USO commodity ETF proxy only",
-      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job A: deterministic option horizon comparison; genuine PPE product work, not a manufactured Autobuilder acceptance row.",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
+      "founderPriority": "HIGH",
+      "dependencyUnblockValue": 20,
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
+      "status": "READY",
+      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job B: deterministic best-fit expression ranking; technically independent from job A and dispatchable from current main.",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "dependencyUnblockValue": 10,
-      "overrideReason": "GitHub issue #5376 temporarily promotes USO ahead of incomplete batches 2-3 for the first installed Autobuilder witness."
+      "workerMode": "local-agent",
+      "focusPlaybookTier": "P1"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "PLANNED",
+      "reason": "[HOLD] USO acceptance-witness override retired for issue #50 zero-founder-return witness; existing USO work must not be reused merely to make the witness pass.",
+      "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
+      "holdReason": "PPE PR #5375 prohibited manufacturing READY work for Autobuilder acceptance; founder approved Options Made Simple A -> B as the next genuine product witness. USO must not be reused for this witness without a fresh explicit requeue.",
+      "reactivationCondition": "Founder-approved explicit requeue with refreshed native evidence packet; not eligible for issue #50 A -> B witness."
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/mvp1_bl_density_smoothing_v1_relay.json",

@@ -1,0 +1,118 @@
+{
+  "name": "options_horizon_comparison_v1",
+  "title": "Options Made Simple: option horizon comparison v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+  "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/OPTIONS_HORIZON_COMPARISON_V1_EVIDENCE_STATUS.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Founder decision: APPROVED. Charter these as the next two genuine PPE product jobs. GitHub issue #5381.",
+    "purpose": "Issue #50 zero-founder-return A -> B witness; genuine Options Made Simple product work."
+  },
+  "productScope": {
+    "direction": "Options Made Simple",
+    "job": "A",
+    "stableId": "options_horizon_comparison_v1",
+    "summary": "Compare a small deterministic set of listed option expiry/horizon candidates.",
+    "paperOnly": true
+  },
+  "authority": {
+    "allowedProductPaths": [
+      "src/engine/options_horizon_comparison.py",
+      "src/viz/options_horizon_comparison_boundary.py",
+      "apps/msos-web/src/lib/optionsHorizonComparison.ts",
+      "apps/msos-web/src/components/OptionsHorizonComparisonPanel.tsx",
+      "apps/msos-web/src/components/OptionsHorizonClient.tsx",
+      "tests/test_options_horizon_comparison.py",
+      "tests/test_msos_web_options_horizon_comparison.py"
+    ],
+    "forbiddenPaths": [
+      "src/engine/options_expression_fit_ranking.py",
+      "src/viz/options_expression_fit_ranking_boundary.py",
+      "scripts/rank_options_expression_fit.py",
+      "apps/msos-web/src/lib/optionsExpressionFitRanking.ts",
+      "apps/msos-web/src/components/OptionsExpressionFitRankingPanel.tsx",
+      "apps/msos-web/src/components/ExpressionPlanningPanel.tsx",
+      "tests/test_options_expression_fit_ranking.py",
+      "tests/test_msos_web_options_expression_fit_ranking.py",
+      "DanielTabakman/msos-autobuilder",
+      "product-main write",
+      "merge authority",
+      "publication authority",
+      "deployment authority",
+      "refill changes",
+      "feed mutation",
+      "live job submission",
+      "brokerage or execution",
+      "USO commodity proxy witness reuse"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "Options-HorizonComparison-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+      "buildBranch": "build/auto/Options-HorizonComparison-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "Options-HorizonComparison-Product-Slice002",
+      "layerPreset": "PPE_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+      "buildBranch": "build/auto/Options-HorizonComparison-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "src/engine/options_horizon_comparison.py",
+        "src/viz/options_horizon_comparison_boundary.py",
+        "apps/msos-web/src/lib/optionsHorizonComparison.ts",
+        "apps/msos-web/src/components/OptionsHorizonComparisonPanel.tsx",
+        "apps/msos-web/src/components/OptionsHorizonClient.tsx",
+        "tests/test_options_horizon_comparison.py",
+        "tests/test_msos_web_options_horizon_comparison.py"
+      ]
+    },
+    {
+      "sliceId": "Options-HorizonComparison-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+      "buildBranch": "build/auto/Options-HorizonComparison-Witness-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "Options-HorizonComparison-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+      "buildBranch": "build/auto/Options-HorizonComparison-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "options_horizon_comparison_v1",
+        "chapterTitle": "Options Made Simple: option horizon comparison v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/OPTIONS_HORIZON_COMPARISON_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/SPRINT_OPTIONS_EXPRESSION_FIT_RANKING_V1.md",
+        "carryDocs": [
+          "docs/SOP/OPTIONS_HORIZON_PROGRAM_V1.md"
+        ]
+      }
+    }
+  ]
+}

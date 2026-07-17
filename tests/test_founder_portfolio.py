@@ -555,7 +555,7 @@ def test_current_snapshot_owner_is_not_ready_after_reconciliation(monkeypatch) -
     assert snapshot["recommended_next_action"]["work_item_id"] != "mvp1_snapshot_owner_v1"
 
 
-def test_issue_5374_reconciled_items_do_not_reappear_after_uso_witness_selection(monkeypatch) -> None:
+def test_issue_5374_reconciled_items_do_not_reappear_after_options_made_simple_selection(monkeypatch) -> None:
     from scripts.founder_portfolio import collect_portfolio
 
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
@@ -579,7 +579,7 @@ def test_issue_5374_reconciled_items_do_not_reappear_after_uso_witness_selection
     }
     ready_ids = {item["work_item_id"] for item in ppe["ready_work"]}
 
-    assert ready_ids == {"ppe_commodity_proxy_tier1_v1"}
+    assert ready_ids == {"options_horizon_comparison_v1", "options_expression_fit_ranking_v1"}
     assert ready_ids.isdisjoint(reconciled_ids)
     assert snapshot["recommended_next_action"]["work_item_id"] not in reconciled_ids
 
