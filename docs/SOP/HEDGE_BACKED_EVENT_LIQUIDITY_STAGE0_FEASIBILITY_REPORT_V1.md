@@ -18,7 +18,7 @@ Observed quote quality is mixed:
 - Deribit individual option tickers expose top-of-book bid/ask, mark, open interest, and timestamps.
 - The existing cross-venue snapshot stores Polymarket outcome prices, options-implied probabilities, and Deribit mark-derived spread proxies. It does **not** store depth-aware executable synthetic bid/ask or a full fee/slippage/collateral stack.
 
-Result: continue only with a narrower repeat focused on genuinely terminal BTC `above` / `below` contracts, or extend the charter explicitly to touch-option/barrier-style replication before building a scanner.
+Result: continue only with a narrower repeat focused on genuinely terminal BTC `above` / `below` contracts. The authorized next action is a terminal-only repeat with a frozen Polymarket and Deribit bid/ask/depth witness. Touch-option/barrier-style replication is a separate possible future charter decision, not part of this continuation authorization.
 
 ## 2. Evidence Date And Commands
 
@@ -164,15 +164,26 @@ Static terminal spread witness:
 
 Terminal payoff:
 
-| BTC at Deribit expiry | Normalized spread payoff | Terminal digital above $75k | Error |
+Intended terminal digital threshold for comparison: `$70,000`, matching the event threshold. The listed spread is not centered around that threshold; it is lower-bounded at the threshold and ramps above it from `$70,000` to `$75,000`.
+
+Normalized terminal ramp formula, with `S_T` as Deribit expiry settlement:
+
+```text
+V_A(S_T) = min(max((S_T - 70000) / 5000, 0), 1)
+D_A(S_T) = 1{S_T >= 70000}
+```
+
+For the terminal digital approximation alone, the pointwise error over the transition interval is `|V_A(S_T) - D_A(S_T)|`. It is `1.00` at exactly `$70,000` if the terminal digital includes equality, and otherwise has supremum `1.00` immediately above `$70,000`. The earlier midpoint error of `0.50` at `$72,500` is only one sample point; it is not the maximum for this one-sided spread.
+
+| BTC at Deribit expiry | Normalized spread payoff | Terminal digital at/above $70k | Error |
 | ---: | ---: | ---: | ---: |
 | $65,000 | 0.00 | 0.00 | 0.00 |
-| $70,000 | 0.00 | 0.00 | 0.00 |
-| $72,500 | 0.50 | 0.00 | 0.50 |
+| $70,000 | 0.00 | 1.00 | 1.00 |
+| $72,500 | 0.50 | 1.00 | 0.50 |
 | $75,000 | 1.00 | 1.00 | 0.00 |
 | $85,000 | 1.00 | 1.00 | 0.00 |
 
-Rejection reason: even a well-quoted terminal call spread does not pay if BTC touched $70k earlier and finished below the spread at Deribit expiry. It also ignores the Binance/Deribit index mismatch and the 6 day 21 hour expiry gap.
+Rejection reason: the vertical-spread approximation error above is a terminal-payoff shape error. The separate and more important mismatch is touch versus terminal: even a well-quoted terminal call spread does not pay if BTC touched $70k earlier and finished below the spread at Deribit expiry. It also ignores the Binance/Deribit index mismatch and the 6 day 21 hour expiry gap.
 
 ### Witness B: $140k / $150k Call Spread vs $150k Touch
 
@@ -193,7 +204,18 @@ Static terminal spread witness:
 
 Terminal payoff:
 
-| BTC at Deribit expiry | Normalized spread payoff | Terminal digital above $150k | Error |
+Intended terminal digital threshold for comparison: `$150,000`, matching the event threshold. The listed spread is not centered around that threshold; it is upper-bounded at the threshold and ramps below it from `$140,000` to `$150,000`.
+
+Normalized terminal ramp formula, with `S_T` as Deribit expiry settlement:
+
+```text
+V_B(S_T) = min(max((S_T - 140000) / 10000, 0), 1)
+D_B(S_T) = 1{S_T >= 150000}
+```
+
+For the terminal digital approximation alone, the pointwise error over the transition interval is `|V_B(S_T) - D_B(S_T)|`. It has supremum `1.00` immediately below `$150,000`; if the digital is strict `S_T > 150000`, the maximum is also `1.00` at `$150,000`. The midpoint error of `0.50` at `$145,000` is not the maximum because the target threshold is at the upper strike, not centered in the spread.
+
+| BTC at Deribit expiry | Normalized spread payoff | Terminal digital at/above $150k | Error |
 | ---: | ---: | ---: | ---: |
 | $130,000 | 0.00 | 0.00 | 0.00 |
 | $140,000 | 0.00 | 0.00 | 0.00 |
@@ -201,7 +223,7 @@ Terminal payoff:
 | $150,000 | 1.00 | 1.00 | 0.00 |
 | $160,000 | 1.00 | 1.00 | 0.00 |
 
-Rejection reason: the apparent cheapness of far-OTM terminal call spreads is not a tradable edge against a touch contract. Touch probability can be materially higher than terminal probability. The static spread can lose after a valid Polymarket YES event if BTC later falls back below the terminal threshold before Deribit expiry.
+Rejection reason: the vertical-spread approximation error above is separate from the dominant touch-versus-terminal mismatch. The apparent cheapness of far-OTM terminal call spreads is not a tradable edge against a touch contract. Touch probability can be materially higher than terminal probability. The static spread can lose after a valid Polymarket YES event if BTC later falls back below the terminal threshold before Deribit expiry.
 
 ### Witness C: $190k / $200k Call Spread vs $200k Touch
 
@@ -222,7 +244,18 @@ Static terminal spread witness:
 
 Terminal payoff:
 
-| BTC at Deribit expiry | Normalized spread payoff | Terminal digital above $200k | Error |
+Intended terminal digital threshold for comparison: `$200,000`, matching the event threshold. The listed spread is not centered around that threshold; it is upper-bounded at the threshold and ramps below it from `$190,000` to `$200,000`.
+
+Normalized terminal ramp formula, with `S_T` as Deribit expiry settlement:
+
+```text
+V_C(S_T) = min(max((S_T - 190000) / 10000, 0), 1)
+D_C(S_T) = 1{S_T >= 200000}
+```
+
+For the terminal digital approximation alone, the pointwise error over the transition interval is `|V_C(S_T) - D_C(S_T)|`. It has supremum `1.00` immediately below `$200,000`; if the digital is strict `S_T > 200000`, the maximum is also `1.00` at `$200,000`. The midpoint error of `0.50` at `$195,000` is not the maximum because the target threshold is at the upper strike, not centered in the spread.
+
+| BTC at Deribit expiry | Normalized spread payoff | Terminal digital at/above $200k | Error |
 | ---: | ---: | ---: | ---: |
 | $180,000 | 0.00 | 0.00 | 0.00 |
 | $190,000 | 0.00 | 0.00 | 0.00 |
@@ -230,7 +263,7 @@ Terminal payoff:
 | $200,000 | 1.00 | 1.00 | 0.00 |
 | $210,000 | 1.00 | 1.00 | 0.00 |
 
-Rejection reason: the hedge is terminal and capped, while the event is first-passage/touch. It also relies on far-OTM option quotes with very small BTC premiums where tick size, stale quotes, and size constraints need a dedicated executable-cost stack.
+Rejection reason: the vertical-spread approximation error above is separate from the dominant touch-versus-terminal mismatch. The hedge is terminal and capped, while the event is first-passage/touch. It also relies on far-OTM option quotes with very small BTC premiums where tick size, stale quotes, and size constraints need a dedicated executable-cost stack.
 
 ## 7. Recurring Rejection Reasons
 
@@ -288,10 +321,13 @@ Why not `STOP`:
 Recommended next repeat:
 
 ```text
+Terminal-only repeat with a frozen Polymarket and Deribit bid/ask/depth witness.
 Search only active binary BTC contracts whose resolution text says YES/NO based on BTC being above/below K at a single explicit timestamp.
 Reject "hit", "reach", "dip", "any point", "before", conditional, and 50/50 fallback wording before hedge compilation.
 Collect Polymarket CLOB books and Deribit ticker/books into one frozen JSON witness.
 ```
+
+Touch/barrier replication remains out of scope for this continuation. It may be proposed later only as a separate charter decision with its own hedge grammar, cost stack, and residual-risk acceptance criteria.
 
 ## 11. Confidence And Evidence Gaps
 
@@ -305,6 +341,23 @@ Evidence gaps:
 - No historical performance or fill simulation is available; local backtest has no resolved questions.
 - Existing scan's "tradeable after costs" means "after spread proxy", not executable hedge tradeability.
 
+## 12. Compact Contract Provenance
+
+This appendix records enough source identity to reproduce the three static witness claims without committing local raw artifacts. Polymarket fields are from the public Gamma market objects observed during the Stage 0 revision pass. CLOB YES token IDs are the first entry in each market's `clobTokenIds`, matching `outcomes = ["Yes", "No"]`.
+
+| Witness | Polymarket slug / source ID | Market / condition ID | YES token ID used for CLOB witness | Deadline and timezone | Resolution source and calculation pointer | Payout mapping |
+| --- | --- | --- | --- | --- | --- | --- |
+| A | `will-bitcoin-reach-70000-by-december-31-2026-from-june-8` | market `2467210`; condition `0x7b9072e6a9cdcf022c4f098564e8ee612d544e179e4a33dcc2790fbaa778daa8` | `95532524407959903145510583684979049735028502452973932716346555811355282494630` | `2027-01-01T05:00:00Z`, equivalent to Dec 31, 2026 23:59 ET market deadline | Binance BTC/USDT one-minute candle `High` at `https://www.binance.com/en/trade/BTC_USDT`; YES if any final one-minute high from market creation through deadline is greater than or equal to `$70,000`; other exchanges/pairs excluded | Polymarket binary YES pays `1` if condition resolves YES and `0` otherwise; NO is the complement; denomination is the market's dollar stablecoin payout convention |
+| B | `will-bitcoin-reach-150000-by-december-31-2026-557-246-971` | market `701491`; condition `0xa7b594ae07d5c1590fa86028fcc2f8705990437237416556c05837a08b2e1cda` | `9408196828451163378822245032645030045707991112669125056198742225498158094445` | `2027-01-01T05:00:00Z`, equivalent to Dec 31, 2026 23:59 ET market deadline | Binance BTC/USDT one-minute candle `High`; YES if any final one-minute high between Nov 24, 2025 14:00 ET and Dec 31, 2026 23:59 ET is greater than or equal to `$150,000`; other exchanges/pairs excluded | Polymarket binary YES pays `1` if condition resolves YES and `0` otherwise; NO is the complement; denomination is the market's dollar stablecoin payout convention |
+| C | `will-bitcoin-reach-200000-by-december-31-2026-752-232-389` | market `701486`; condition `0xac32e73aa9e0dae801d88d4f81efd2ef3fa0f04b815f3a0e74426f0762e668cd` | `61368943128255287414565270336856615453000675377332178800733742873558311943412` | `2027-01-01T05:00:00Z`, equivalent to Dec 31, 2026 23:59 ET market deadline | Binance BTC/USDT one-minute candle `High`; YES if any final one-minute high between Nov 24, 2025 14:00 ET and Dec 31, 2026 23:59 ET is greater than or equal to `$200,000`; other exchanges/pairs excluded | Polymarket binary YES pays `1` if condition resolves YES and `0` otherwise; NO is the complement; denomination is the market's dollar stablecoin payout convention |
+
+Deribit normalization convention used in section 6:
+
+- Instruments are BTC European call options expiring `2026-12-25 08:00 UTC`; Deribit instrument metadata for each witness leg reports `contract_size = 1.0`, `base_currency = BTC`, `quote_currency = BTC`, and `settlement_currency = BTC`.
+- Ticker prices are BTC-denominated option premiums. The report's debit examples convert BTC premium to an approximate USD debit using sampled BTC spot, then divide by the USD strike width as a proxy cost per `$1` normalized terminal payoff.
+- The terminal ramp formulas in section 6 are normalized dollar-payoff shape witnesses: `min(max((S_T - K_low) / (K_high - K_low), 0), 1)`. They are not a complete Deribit settlement, fee, collateral, or size model.
+- The static witness uses top-of-book bid/ask only. It does not normalize Deribit book depth, legging risk, settlement reserve, or the BTC cash-settlement mechanics needed for an executable scanner.
+
 ## Coordination Status
 
 ```text
@@ -315,7 +368,7 @@ Disagreement: none
 Evidence gap: no active terminal BTC above/below contract found; no full executable synthetic bid/ask or full cost stack
 Ownership overlap: intentional base from PR #5384 only; no charter edits; report path owned by this Stage 0 branch
 Risk if unresolved: scanner could mistake touch-probability differences or mark-derived spread proxies for executable terminal hedge edge
-Recommended default: NARROW_AND_REPEAT with terminal-only contract filter and frozen bid/ask/depth witness
+Recommended default: NARROW_AND_REPEAT; terminal-only repeat with a frozen Polymarket and Deribit bid/ask/depth witness
 Founder decision required: no
 ```
 
