@@ -8,6 +8,15 @@
 **As-of:** 2026-07-18  
 **Status:** **SELECTED AS NEXT STEP; IMPLEMENTATION BLOCKED UNTIL #5388 ACCEPTANCE**
 
+## Agent load bundle
+
+| Role | Path |
+|---|---|
+| Program (charter) | this file |
+| Selection | [`POST_MARKET_PROPOSAL_HEDGE_CAPACITY_PREVIEW_V0_SELECTION.md`](POST_MARKET_PROPOSAL_HEDGE_CAPACITY_PREVIEW_V0_SELECTION.md) |
+| Implementation packet | [`MARKET_PROPOSAL_HEDGE_CAPACITY_PREVIEW_V0_CODEX_PACKET.md`](MARKET_PROPOSAL_HEDGE_CAPACITY_PREVIEW_V0_CODEX_PACKET.md) |
+| Resolve | `python scripts/resolve_sop.py --chapter ppe_market_proposal_hedge_capacity_preview_v0 --json` |
+
 ## Purpose
 
 Turn a proposed terminal BTC prediction-market idea into a shareable, evidence-backed preview that answers:
