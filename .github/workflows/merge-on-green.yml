@@ -24,74 +24,173 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const defaultBranch = context.payload.repository.default_branch || 'main';
+            const marker = '<!-- ppe-automerge: true -->';
+            const formatAssociation = (prRef) => {
+              if (!prRef) return 'missing association';
+              const head = prRef.head || {};
+              const base = prRef.base || {};
+              return `number=${prRef.number || 'unknown'} head_sha=${head.sha || 'missing'} head_ref=${head.ref || 'missing'} base_sha=${base.sha || 'missing'} base_ref=${base.ref || 'missing'}`;
+            };
+            const classifyRunContext = (workflowRun, pr) => {
+              const refs = workflowRun.pull_requests || [];
+              if (refs.length !== 1) {
+                return {
+                  current: false,
+                  reason: refs.length === 0 ? 'missing PR association' : `ambiguous PR associations (${refs.length})`,
+                  observed: refs.map(formatAssociation),
+                };
+              }
+              const ref = refs[0];
+              const head = ref.head || {};
+              const base = ref.base || {};
+              const observed = formatAssociation(ref);
+              if (ref.number !== pr.number) {
+                return { current: false, reason: `associated PR #${ref.number} does not match current PR #${pr.number}`, observed: [observed] };
+              }
+              if (head.sha !== pr.head.sha) {
+                return { current: false, reason: `associated head SHA ${head.sha || 'missing'} does not match current head ${pr.head.sha}`, observed: [observed] };
+              }
+              if (head.ref && head.ref !== pr.head.ref) {
+                return { current: false, reason: `associated head ref ${head.ref} does not match current head ref ${pr.head.ref}`, observed: [observed] };
+              }
+              if (base.sha !== pr.base.sha) {
+                core.warning(`Stale base for PR #${pr.number}: run base ${base.sha || 'missing'} current base ${pr.base.sha}`);
+                return { current: false, reason: `associated base SHA ${base.sha || 'missing'} does not match current base ${pr.base.sha}`, observed: [observed] };
+              }
+              if (base.ref && base.ref !== pr.base.ref) {
+                return { current: false, reason: `associated base ref ${base.ref} does not match current base ref ${pr.base.ref}`, observed: [observed] };
+              }
+              return { current: true, reason: 'current-context PR association', observed: [observed] };
+            };
+            const requireCurrentContext = (workflowRun, pr, source) => {
+              const contextCheck = classifyRunContext(workflowRun, pr);
+              if (!contextCheck.current) {
+                core.setFailed(`${source} for run ${workflowRun.id} is not current-context for PR #${pr.number}: ${contextCheck.reason}; observed=${contextCheck.observed.join(' | ')}`);
+                return false;
+              }
+              return true;
+            };
 
             if (run.name !== 'CI' || run.conclusion !== 'success' || run.event !== 'pull_request') {
               core.info(`Skip non-green CI run: name=${run.name} conclusion=${run.conclusion} event=${run.event}`);
               return;
             }
 
-            let prRefs = run.pull_requests || [];
-            if (!prRefs.length && run.head_branch && run.head_branch !== defaultBranch) {
-              const { data: items } = await github.rest.pulls.list({
-                owner,
-                repo,
-                state: 'open',
-                head: `${owner}:${run.head_branch}`,
-                base: defaultBranch,
-              });
-              prRefs = items.map((p) => ({ number: p.number }));
+            const prRefs = run.pull_requests || [];
+            if (prRefs.length !== 1) {
+              core.setFailed(`CI run ${run.id} must have exactly one explicit PR association; found ${prRefs.length}`);
+              return;
+            }
+            const associatedPrNumber = prRefs[0].number;
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: associatedPrNumber,
+            });
+            if (!requireCurrentContext(run, pr, 'workflow_run event association')) return;
+            if (pr.draft || pr.merged || pr.state !== 'open') {
+              core.info(`PR #${pr.number} is not open, non-draft, and unmerged; skip`);
+              return;
+            }
+            if (!(pr.body || '').includes(marker)) {
+              core.info(`PR #${pr.number} has no explicit ${marker} marker; skip`);
+              return;
+            }
+            if (!pr.labels.some((label) => label.name === 'automerge')) {
+              core.info(`PR #${pr.number} has no explicit automerge label; skip`);
+              return;
+            }
+            if (pr.head.sha !== run.head_sha) {
+              core.warning(`PR #${pr.number} moved from CI SHA ${run.head_sha.slice(0, 7)} to ${pr.head.sha.slice(0, 7)}; skip`);
+              return;
+            }
+            if (pr.head.sha !== prRefs[0].head?.sha || pr.base.sha !== prRefs[0].base?.sha) {
+              core.setFailed(`PR #${pr.number} head/base no longer match workflow-run association`);
+              return;
+            }
+            if (pr.head.ref !== (prRefs[0].head?.ref || pr.head.ref) || pr.base.ref !== (prRefs[0].base?.ref || pr.base.ref)) {
+              core.setFailed(`PR #${pr.number} head/base refs no longer match workflow-run association`);
+              return;
+            }
+            if (pr.mergeable === false) {
+              core.warning(`PR #${pr.number} has conflicts; skip`);
+              return;
             }
 
-            for (const { number } of prRefs) {
-              const { data: pr } = await github.rest.pulls.get({
+            const { data: exactRun } = await github.rest.actions.getWorkflowRun({
+              owner,
+              repo,
+              run_id: run.id,
+            });
+            if (exactRun.id !== run.id) {
+              core.setFailed(`Fetched workflow run ${exactRun.id} does not match event run ${run.id}`);
+              return;
+            }
+            if (
+              exactRun.name !== 'CI' ||
+              exactRun.event !== 'pull_request' ||
+              exactRun.status !== 'completed' ||
+              exactRun.conclusion !== 'success' ||
+              exactRun.head_sha !== run.head_sha
+            ) {
+              core.setFailed(`Exact CI run ${run.id} is not completed successful pull_request CI for head ${run.head_sha}`);
+              return;
+            }
+            if (exactRun.run_attempt && run.run_attempt && exactRun.run_attempt !== run.run_attempt) {
+              core.setFailed(`Exact CI run ${run.id} attempt ${exactRun.run_attempt} does not match event attempt ${run.run_attempt}`);
+              return;
+            }
+            if (!requireCurrentContext(exactRun, pr, 'exact workflow-run association')) return;
+
+            const { data: finalPr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: pr.number,
+            });
+            if (finalPr.state !== 'open' || finalPr.draft || finalPr.merged) {
+              core.setFailed(`PR #${pr.number} changed state before merge`);
+              return;
+            }
+            if (!(finalPr.body || '').includes(marker)) {
+              core.setFailed(`PR #${pr.number} lost explicit automerge marker before merge`);
+              return;
+            }
+            if (!finalPr.labels.some((label) => label.name === 'automerge')) {
+              core.setFailed(`PR #${pr.number} lost automerge label before merge`);
+              return;
+            }
+            if (finalPr.head.sha !== pr.head.sha || finalPr.head.ref !== pr.head.ref) {
+              core.setFailed(`PR #${pr.number} head moved before merge`);
+              return;
+            }
+            if (finalPr.base.sha !== pr.base.sha || finalPr.base.ref !== pr.base.ref) {
+              core.setFailed(`PR #${pr.number} base moved before merge`);
+              return;
+            }
+            if (finalPr.mergeable === false) {
+              core.warning(`PR #${pr.number} has conflicts before merge; skip`);
+              return;
+            }
+            if (!requireCurrentContext(run, finalPr, 'final workflow_run event association')) return;
+            if (!requireCurrentContext(exactRun, finalPr, 'final exact workflow-run association')) return;
+
+            await github.rest.pulls.merge({
+              owner,
+              repo,
+              pull_number: finalPr.number,
+              sha: finalPr.head.sha,
+              merge_method: 'squash',
+            });
+            core.notice(`Merged explicitly opted-in PR #${finalPr.number} after exact green CI run ${run.id}`);
+
+            try {
+              await github.rest.actions.createWorkflowDispatch({
                 owner,
                 repo,
-                pull_number: number,
+                workflow_id: 'deploy-vps.yml',
+                ref: defaultBranch,
               });
-              if (pr.draft || pr.merged || pr.state !== 'open') continue;
-              if (pr.head.sha !== run.head_sha) {
-                core.warning(`PR #${number} moved from CI SHA ${run.head_sha.slice(0, 7)} to ${pr.head.sha.slice(0, 7)}; skip`);
-                continue;
-              }
-              if (!pr.labels.some((label) => label.name === 'automerge')) {
-                core.info(`PR #${number} has no explicit automerge label; skip`);
-                continue;
-              }
-              if (pr.mergeable === false) {
-                core.warning(`PR #${number} has conflicts; skip`);
-                continue;
-              }
-
-              const { data: runs } = await github.rest.actions.listWorkflowRuns({
-                owner,
-                repo,
-                workflow_id: 'ci.yml',
-                head_sha: pr.head.sha,
-                event: 'pull_request',
-                per_page: 20,
-              });
-              const exactRun = (runs.workflow_runs || []).find((item) => item.id === run.id);
-              if (!exactRun || exactRun.conclusion !== 'success') {
-                core.warning(`Exact CI run ${run.id} is not confirmed successful; skip PR #${number}`);
-                continue;
-              }
-
-              await github.rest.pulls.merge({
-                owner,
-                repo,
-                pull_number: number,
-                merge_method: 'squash',
-              });
-              core.notice(`Merged explicitly opted-in PR #${number} after exact green CI run ${run.id}`);
-
-              try {
-                await github.rest.actions.createWorkflowDispatch({
-                  owner,
-                  repo,
-                  workflow_id: 'deploy-vps.yml',
-                  ref: defaultBranch,
-                });
-              } catch (dispatchErr) {
-                core.warning(`Deploy dispatch failed: ${dispatchErr.message}`);
-              }
+            } catch (dispatchErr) {
+              core.warning(`Deploy dispatch failed: ${dispatchErr.message}`);
             }
