@@ -1,204 +1,178 @@
 # Hedge-backed event liquidity Stage 0.1 terminal availability report v1
 
-**Status:** Stage 0.1 witness complete  
-**As-of:** 2026-07-18 20:54-20:59 UTC  
+**Status:** Stage 0.1 witness revised after independent review  
+**As-of:** 2026-07-18 21:20-21:21 UTC  
 **Thread role:** `codex_build`  
 **Repository:** `DanielTabakman/Probability-prediction-engine`  
 **Base commit:** `1fd8dc45011398e9f67ec2b19b9bc2014be4ba75`  
 **Branch:** `codex/stage0-1-terminal-availability`  
 **Parent charter:** [`../VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md`](../VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md)  
 **Accepted Stage 0 report:** [`HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_FEASIBILITY_REPORT_V1.md`](HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_FEASIBILITY_REPORT_V1.md)  
-**Recommendation:** `WATCH_SPARSE_MARKET`
+**Recommendation:** `STOP_POLYMARKET_BRANCH`
 
 ## 1. Executive Answer
 
-Polymarket does not currently show a recurring, usable active universe of BTC binary contracts that resolve only by BTC being above or below a threshold at one explicit timestamp.
+The revised Stage 0.1 witness found zero qualifying BTC terminal contracts in active markets and zero qualifying BTC terminal contracts in the closed/resolved coverage that the public Gamma search returned. `WATCH_SPARSE_MARKET` is therefore not supported by this evidence: a sparse valid market requires at least one genuine terminal contract, and this run found none.
 
-The Stage 0.1 terminal-only witness found:
+`STOP_POLYMARKET_BRANCH` means:
 
-| Count | Result |
-| ---: | --- |
-| 1,100 | Polymarket market objects discovered across active pagination plus targeted BTC searches |
-| 8 | BTC price-threshold markets frozen as candidates |
-| 2 | Current active BTC price-threshold markets in the frozen candidate set |
-| 0 | Qualifying terminal `above` / `below` BTC markets |
-| 8 | Rejected before hedge compilation |
-| 0 | Synthetic bid/ask witnesses constructed |
+- stop investing in a Polymarket-specific hedge scanner or implementation branch;
+- preserve the reusable public-data collection and parser code;
+- allow an inexpensive future availability check to see whether genuine terminal BTC contracts later appear;
+- do not authorize Stage 1.
 
-The active candidates were both rejected before hedge compilation:
+The possibility that a terminal contract may appear someday is not evidence that a sparse valid market currently exists. Touch, barrier, path-dependent, conditional, scalar, fallback, or ambiguous contracts remain outside scope and must not be replicated as terminal hedges.
 
-1. `540844`, "Will bitcoin hit $1m before GTA VI?" - rejected as touch/path-dependent, conditional, and not terminal `above` / `below`.
-2. `573656`, "Will Bitcoin hit $150k by December 31, 2026?" - rejected as touch/path-dependent and not terminal `above` / `below`.
+## 2. Coverage And Counts
 
-Deribit public option metadata and order-book depth are obtainable. The final witness saw 870 listed BTC option instruments and froze displayed Deribit depth for the only current active BTC threshold candidate with comparable listed strikes, `BTC-25DEC26-140000-C` and `BTC-25DEC26-150000-C`. That evidence supports later executable data collection, but it does not authorize a Stage 1 hedge scanner because the Polymarket semantic gate did not pass.
+The witness used active Gamma pagination plus targeted public Gamma searches for BTC-related terms, with `--include-closed --limit 200 --max-candidates 20`. The large JSON artifact was regenerated under the required path:
 
-## 2. Evidence Date And Commands
+`artifacts/hedge_backed_event_liquidity/terminal_availability/stage0_1_terminal_availability_witness_20260718T212113Z.json`
 
-Commands run from `C:\Users\USER\Desktop\Probability-prediction-engine`:
+This raw artifact is not committed because it is large live-market evidence. The compact reproducibility record is in Appendix A below.
 
-```powershell
-git fetch origin main --prune
-git checkout -B codex/stage0-1-terminal-availability origin/main
-Test-Path docs/VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md
-Test-Path docs/SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_FEASIBILITY_REPORT_V1.md
-python scripts/collect_cross_venue_snapshot.py --max-questions 20 --polymarket-limit 300
-python scripts/run_cross_venue_scan.py --latest-snapshot --top 20
-python scripts/run_cross_venue_tradeability.py --latest-snapshot
-python -m pytest -q tests/test_cross_venue_tradeability.py tests/test_cross_venue_export.py
-python scripts/hedge_backed_event_stage0_1_terminal_witness.py --include-closed --limit 200 --max-candidates 20 --clob-depth 10 --deribit-depth 5
-```
+| Coverage item | Count / range |
+| --- | ---: |
+| Active general Polymarket market objects paginated | 1,000 |
+| Closed/resolved general market objects returned by targeted searches | 100 |
+| General Polymarket market objects discovered | 1,100 |
+| BTC price-threshold candidates frozen | 7 |
+| Active BTC price-threshold candidates frozen | 2 |
+| Closed/resolved BTC price-threshold candidates frozen | 5 |
+| Closed/resolved candidate date span observed | 2020-11-26 to 2021-04-01 deadlines |
+| Recent-history lookback definition | closed/resolved targeted Gamma search, max 200 per search term, inspected for the current run |
+| Terminal qualifiers, active category | 0 |
+| Terminal qualifiers, closed/resolved category | 0 |
+| Canonical `ELIGIBLE` outcomes | 0 |
+| Canonical `WATCH` outcomes | 0 |
+| Canonical `REJECT` outcomes | 7 |
+| Synthetic hedge witnesses constructed | 0 |
 
-Generated artifacts:
+The 1,100 general market objects were not 1,100 semantically inspected BTC contracts. They were the public coverage envelope used to find the seven BTC threshold candidates that were then parsed and frozen.
 
-| Artifact | Path | Result |
-| --- | --- | --- |
-| Cross-venue snapshot | `artifacts/cross_venue_snapshots/2026-07-18/ppe_cross_venue_prob_panel_205443Z.csv` | 1 matched row, the active $150k hit market |
-| Cross-venue scan | `artifacts/cross_venue_reports/latest.md`, `artifacts/cross_venue_reports/latest.json` | 1 ranked row |
-| Tradeability report | `artifacts/cross_venue_tradeability/latest_report.md`, `artifacts/cross_venue_tradeability/latest_summary.json` | 1 row flagged by spread proxy |
-| Stage 0.1 witness | `artifacts/hedge_backed_event_liquidity/stage0_1_terminal_availability_witness_20260718T205907Z.json` | 8 BTC price-threshold candidates, 0 terminal qualifiers |
+## 3. Structured Contract Gate
 
-Validation:
+The revised witness no longer uses loose keywords as the final eligibility gate. `classify_market` now builds a deterministic `EventContractSpec`-style parse with these fields:
 
-```text
-python -m pytest -q tests/test_cross_venue_tradeability.py tests/test_cross_venue_export.py
-11 passed in 1.43s
+| Field | Required for `ELIGIBLE` |
+| --- | --- |
+| underlying | exactly one BTC underlying |
+| comparator | exactly one of `above` or `below` |
+| threshold | exactly one BTC price threshold |
+| resolution timestamp | one explicit date and time |
+| timezone | explicit timezone |
+| resolution source/index | explicit source or index |
+| calculation method | explicit terminal calculation method |
+| YES payout | explicit `$1` payout |
+| NO payout | explicit `$0` payout |
+| ambiguity/fallback flags | none |
 
-python -m pytest -q tests/test_cross_venue_tradeability.py
-8 passed
-```
+Keywords still provide rejection hints for touch, barrier, scalar, conditional, or fallback language, but final eligibility comes only from validated structured fields. Missing, conflicting, or ambiguous fields produce `WATCH` or `REJECT`; the witness never infers eligibility.
 
-## 3. Data-Quality And Quote-Type Audit
+Canonical outcomes:
 
-The existing cross-venue pipeline still uses Polymarket probability fields and Deribit probability/mark-derived estimates for scan and tradeability research. The Stage 0.1 witness added a narrow public-data freeze for the terminal-only question:
+- `ELIGIBLE`: all structured fields pass and no ambiguity flags are present.
+- `WATCH`: BTC threshold-shaped market, but required structured evidence is missing rather than contradicting the gate.
+- `REJECT`: contradictory, path-dependent, conditional, scalar, non-BTC-secondary, fallback, nonstandard-payout, or otherwise unsafe semantics.
 
-| Source | Frozen field | Quote label |
-| --- | --- | --- |
-| Polymarket Gamma `outcomePrices` | YES/NO probability array | market estimate, not executable by itself |
-| Polymarket Gamma `bestBid` / `bestAsk` | top-of-book market fields | top-of-book indicator |
-| Polymarket CLOB `/book` | displayed token-level bids and asks | displayed depth |
-| Deribit `get_instruments` | expiry, strike, option type, multiplier metadata | instrument metadata |
-| Deribit `get_order_book` | best bid/ask and displayed depth | top-of-book and displayed depth |
-| Deribit `mark_price` | order-book response field | mark only, not executable |
-| Existing tradeability `spread_proxy` | probability spread-cost proxy | proxy, not executable hedge price |
+## 4. Execution Order
 
-No marks, mids, modeled probabilities, or spread proxies are called executable in this report.
+Semantic contract parsing now runs before Deribit leg selection or order-book collection. The regenerated witness did not call Deribit order-book matching for the seven rejected candidates, and every candidate records:
 
-## 4. Contract Taxonomy
+`synthetic_not_constructed_semantic_gate_failed`
 
-| Taxon | Found in Stage 0.1 witness? | Handling |
-| --- | ---: | --- |
-| Terminal `YES if BTC above K at explicit timestamp` | 0 | No hedge compilation |
-| Terminal `YES if BTC below K at explicit timestamp` | 0 | No hedge compilation |
-| Touch / hit / break by deadline | 6 | Rejected before hedge compilation |
-| Conditional touch with fallback or non-BTC timing | 1 | Rejected before hedge compilation |
-| Scalar / range BTC price market | 1 | Rejected before hedge compilation |
+Deribit public metadata remains a separately labelled data-availability probe only:
+
+| Probe | Result |
+| --- | ---: |
+| Deribit BTC option instruments observed | 872 |
+| Probe label | `data_availability_only_not_hedge_compilation` |
+
+This is not hedge compilation, candidate matching, or Stage 1 authorization.
 
 ## 5. Candidate Compatibility Matrix
 
-| # | Polymarket ID | Current? | Candidate | Event bid/ask | Semantic outcome | Deribit evidence | Result |
-| ---: | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `540844` | yes | Will bitcoin hit $1m before GTA VI? | `0.498 / 0.499` | Touch/path-dependent, conditional, not terminal `above`/`below` | No comparable listed strike around $1m in selected Deribit chain | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 2 | `573656` | yes | Will Bitcoin hit $150k by December 31, 2026? | `0.035 / 0.036` | Touch/path-dependent, not terminal `above`/`below`; Binance 1m high semantics | `BTC-25DEC26-140000-C` `0.0008 / 0.0011`; `BTC-25DEC26-150000-C` `0.0006 / 0.0011`; 5 displayed levels captured per side | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 3 | `76` | no | Will $BTC break $20k before 2021? | closed `0 / 1` | Historical break/touch before deadline | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 4 | `25367` | no | Will $BTC break $50k before April 1st, 2021? | closed `0 / 1` | Historical break/touch before deadline | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 5 | `8939` | no | Will $BTC break $25k before March 1st? | closed `0 / 1` | Historical break/touch before deadline | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 6 | `36` | no | What will the price of Bitcoin be on November 4th, 2020? | closed `0 / 1` | Scalar/range-style market, not binary YES/NO terminal | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 7 | `63` | no | Will BTC break $15k before 2021? | closed `0 / 1` | Historical break/touch before deadline | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
-| 8 | `103` | no | Will $BTC break $20k before Thanksgiving? | closed `0 / 1` | Historical break/touch before deadline | Expired event; no hedge witness | `REJECT_NOT_SAFELY_HEDGEABLE` |
+| # | Market ID | Current? | Candidate | Semantic outcome | Canonical result |
+| ---: | --- | --- | --- | --- | --- |
+| 1 | `573656` | yes | Will Bitcoin hit $150k by December 31, 2026? | Touch/path-dependent Binance 1m candle high; missing explicit `$1/$0` payout text | `REJECT` |
+| 2 | `540844` | yes | Will bitcoin hit $1m before GTA VI? | Touch/path-dependent; secondary GTA condition; fallback 50-50 condition; missing `above`/`below`; missing explicit payout | `REJECT` |
+| 3 | `76` | no | Will $BTC break $20k before 2021? | Break/touch before deadline; missing source/index and explicit payout | `REJECT` |
+| 4 | `25367` | no | Will $BTC break $50k before April 1st, 2021? | Break/touch before deadline; missing source/index and explicit payout | `REJECT` |
+| 5 | `8939` | no | Will $BTC break $25k before March 1st? | Break/touch before deadline; missing source/index and explicit payout | `REJECT` |
+| 6 | `63` | no | Will BTC break $15k before 2021? | Break/touch before deadline; missing source/index, calculation method, and explicit payout | `REJECT` |
+| 7 | `103` | no | Will $BTC break $20k before Thanksgiving? | Break/touch before deadline; missing source/index and explicit payout | `REJECT` |
 
-Cost and compatibility status:
+## 6. Validation
 
-| Item | Stage 0.1 status |
+Focused parser and witness tests:
+
+```text
+python -m pytest -q tests/test_cross_venue_tradeability.py tests/test_cross_venue_export.py
+23 passed in 2.32s
+```
+
+Focused lint:
+
+```text
+python -m ruff check scripts/hedge_backed_event_stage0_1_terminal_witness.py tests/test_cross_venue_tradeability.py
+All checks passed.
+```
+
+The focused tests include negative coverage for two thresholds, both `above` and `below`, date without time/timezone, missing source/index, secondary non-BTC condition, nonstandard payout, fallback or ambiguous resolution, and source wording containing `by`, `high`, or `low` that is not path-dependent.
+
+## 7. Recommendation
+
+Recommendation: `STOP_POLYMARKET_BRANCH`.
+
+Do not proceed to Stage 1. Stop the Polymarket-specific hedge scanner or implementation branch because active and closed/resolved evidence found no qualifying terminal BTC contract universe. Preserve the reusable public-data code and the narrow structured parser so a cheap future availability check can be run before any new selection.
+
+Touch/barrier replication remains prohibited.
+
+## Appendix A. Compact Provenance For Frozen Candidates
+
+Fetch timestamp for the regenerated witness: `2026-07-18T21:20:21.577137+00:00`; per-candidate Gamma/CLOB fetch timestamps are recorded in the regenerated artifact. Exact questions are listed below. Exact resolution text is the Gamma `description` field at the stable source pointer when present; active candidates also have the precise source/index and calculation rule extracted below.
+
+| Market | Condition | Question ID | YES token | NO token | Slug / pointer | Created | Deadline / timezone | Source / rule | Payout | Result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `573656` | `0x02deb9538f5c123373adaa4ee6217b01745f1662bc902e46ac92f3fe6f8741e8` | `0x5ffb6001758f989dc5a6a9ce6dd78554784e022036e2e7dab37038add592f2a8` | `93694900555669388759405753550770573998169287228984912881955464376232163096213` | `55119388124180116303253993098894090042427725500010038140578121972388485050538` | `will-bitcoin-hit-150k-by-december-31-2026` | `2025-08-07T14:34:08.095389Z` | `December 31, 2026 11:59PM ET` | Binance BTC/USDT 1m candle final high; path-dependent | missing explicit `$1/$0` | `REJECT` |
+| `540844` | `0xbb57ccf5853a85487bc3d83d04d669310d28c6c810758953b9d9b91d1aee89d2` | `0x7e4ff7b7fdfe7d1fbc6c0e2a7626ae4fc8d62f3848a5e601d511a51bdfa51f09` | `105267568073659068217311993901927962476298440625043565106676088842803600775810` | `91863162118308663069733924043159186005106558783397508844234610341221325526200` | `will-bitcoin-hit-1m-before-gta-vi-872-424` | `2025-05-02T15:24:45.04244Z` | `July 31, 2026 11:59 PM ET` | Binance BTCUSDT 1m candle final high plus GTA release condition/fallback | fallback 50-50; missing explicit `$1/$0` | `REJECT` |
+| `76` | `0xa670159e0a8868ed1ca0013cf026805c1c5ffbf778a1d5030218471620211222` | not returned | `24680891386899004239422217017747530833228850388439331073974543214962789676595` | `83973309932681465959484168662520374150245867260821232128773724666573303624136` | `will-btc-break-20k-before-2021` | `2020-11-06T21:50:06.493Z` | `January 1st, 2021 12:00am EST` | stable Gamma description pointer; break/touch wording | missing explicit `$1/$0` | `REJECT` |
+| `25367` | `0xe97a28fbd11bc755d4dff8a710d64b1a9ffd10324adbdcf391da64da60a96e2e` | not returned | `6691484561624346413649341413488271135999574859299388605100127341090504781015` | `70580131683183266462078834111066430299653156454501725753019074800892827343672` | `will-btc-break-50k-before-april-1st-2021` | `2021-01-04T17:20:08.085Z` | `April 1st, 2021 12:00am EST` | stable Gamma description pointer; break/touch wording | missing explicit `$1/$0` | `REJECT` |
+| `8939` | `0x9cff735d7e2d1c7ed06cdc30f206e66dbf8331c493f0d260f6f777b6a7f72908` | not returned | `111442005067379510832855695143617202880785476284619910510703686643727966998475` | `9192758429981042942584759348647002322418162537159342549043196464861358439245` | `will-btc-break-25k-before-march-1st` | `2020-12-16T17:05:22.378Z` | `March 1st, 2021 12:00am EST` | stable Gamma description pointer; break/touch wording | missing explicit `$1/$0` | `REJECT` |
+| `63` | `0x7b02c10a310f38be83ae0dbbb5caa96722a69ae1488b1ac5c2003bccd70ac021` | not returned | `81489679527234870363655397325586438057198526422665424757123802116412728199295` | `49766556628062086013472587707046514950870842420956058689393245878472316276945` | `will-btc-break-15k-before-2021-1` | `2020-10-22T16:50:03.826Z` | `Dec 31, 2020 11:59 PM ET` | stable Gamma description pointer; break/touch wording | missing explicit `$1/$0` | `REJECT` |
+| `103` | `0xb787f500a7b6e105eb6eddcb47df6a6de87ea4f26059e917daea1bbf54c8accb` | not returned | `86454146934806610986347752380863288016151372034608409853443136263523534610246` | `96454313312833889175528293976423410488772363048009139816268524349544941728710` | `will-btc-break-20k-before-thanksgiving` | `2020-11-18T17:50:08.3Z` | `November 26th, 2020 12:00am EST` | stable Gamma description pointer; break/touch wording | missing explicit `$1/$0` | `REJECT` |
+
+Question text:
+
+| Market | Exact question |
 | --- | --- |
-| Option bid/ask crossing cost | Known only as displayed Deribit top-of-book for `573656`; not assembled into synthetic quote because semantic gate failed |
-| Event-market bid/ask and depth | Known for active candidates through Gamma and CLOB books |
-| Event fees | Gamma fee fields and fee schedule frozen when present; full account-specific fee/collateral treatment not proven |
-| Expected slippage and displayed depth | Displayed depth frozen; slippage model unavailable |
-| Hedge legging reserve | Unavailable |
-| Expiry mismatch | Known for `573656`: Polymarket deadline `2027-01-01T05:00:00Z`; Deribit matched option expiry `2026-12-25 08:00 UTC` |
-| Timestamp mismatch | Known for active hit markets: any earlier qualifying candle versus terminal expiry instant |
-| Settlement-index mismatch | Known for `573656`: Binance BTC/USDT 1m high versus Deribit BTC index option settlement |
-| Strike approximation error | Not applicable after semantic rejection; no terminal digital spread witness accepted |
-| Duplicated collateral or margin burden | Unavailable |
-| Stale-data risk | Present; frozen timestamps differ by venue |
-| Maximum residual terminal loss | Not computed because no candidate passed semantic compatibility |
+| `573656` | Will Bitcoin hit $150k by December 31, 2026? |
+| `540844` | Will bitcoin hit $1m before GTA VI? |
+| `76` | Will $BTC break $20k before 2021? |
+| `25367` | Will $BTC break $50k before April 1st, 2021? |
+| `8939` | Will $BTC break $25k before March 1st? |
+| `63` | Will BTC break $15k before 2021? |
+| `103` | Will $BTC break $20k before Thanksgiving? |
 
-## 6. Hedge Witnesses
-
-No synthetic bid/ask witness was constructed.
-
-This is intentional. The Stage 0.1 gate requires terminal `above` or `below` semantics before hedge compilation. Every frozen BTC price-threshold candidate failed that semantic gate. Constructing a normalized call-spread or put-spread synthetic quote for these markets would risk presenting a terminal hedge as evidence against a touch, conditional, historical, or scalar payoff.
-
-For `573656`, the witness froze Deribit displayed depth for `BTC-25DEC26-140000-C` and `BTC-25DEC26-150000-C`. Those books prove that executable-looking option-side data is obtainable, not that the touch payoff is hedgeable by a static terminal spread.
-
-## 7. Recurring Rejection Reasons
-
-1. Active BTC threshold contracts use "hit" or "break" language, not terminal `above` / `below` language.
-2. The active $150k market resolves on any Binance BTC/USDT one-minute candle high before the deadline, making it path-dependent.
-3. The active $1m market is conditional on GTA VI timing and includes non-BTC event semantics.
-4. Older archived BTC threshold markets are also break/touch markets and have no live executable event books.
-5. Scalar/range-style BTC price markets do not provide binary YES/NO terminal payoff mapping.
-6. The existing scan/tradeability path can flag a probability gap or spread proxy for a rejected market; that must not be treated as executable hedge evidence.
-
-## 8. Qualifying-Market Frequency And Observed Depth
-
-Qualifying terminal-market frequency in this run: `0 / 8` frozen BTC price-threshold candidates, and `0 / 2` current active BTC price-threshold candidates.
-
-Observed active event-side quote evidence:
-
-| Market | Gamma bid/ask | CLOB depth status |
-| --- | --- | --- |
-| `540844` $1m before GTA VI | `0.498 / 0.499` | YES and NO token books returned 10 bid and 10 ask levels |
-| `573656` $150k by Dec 31 2026 | `0.035 / 0.036` | YES and NO token books returned displayed depth; frozen artifact stores 10 levels per side where available |
-
-Observed active hedge-side evidence:
-
-| Market | Deribit instrument | Top of book | Displayed depth |
-| --- | --- | --- | --- |
-| `573656` | `BTC-25DEC26-140000-C` | `0.0008 / 0.0011` BTC | 5 bid and 5 ask levels frozen |
-| `573656` | `BTC-25DEC26-150000-C` | `0.0006 / 0.0011` BTC | 5 bid and 5 ask levels frozen |
-
-These are displayed public books, not guaranteed fills after fees, slippage, legging, stale-data reserve, settlement basis reserve, or collateral cost.
-
-## 9. Missing Capabilities Before Stage 1
-
-1. Evidence of a recurring active Polymarket universe of terminal BTC `above` / `below` contracts.
-2. A deterministic event-contract schema and parser that rejects touch, hit, break, dip, scalar, conditional, and fallback markets before any hedge compilation.
-3. Full Polymarket contract semantics, fee, collateral, accepting-order, and CLOB depth snapshots in a replayable format.
-4. Deribit option metadata and order-book depth snapshots matched only after semantic and settlement compatibility pass.
-5. Settlement compatibility checks for event source, timestamp, timezone, calculation window, expiry, and index.
-6. Synthetic bid/ask construction using correct executable book sides and displayed depth, with no mark/mid/proxy substitution.
-7. Fee, slippage, legging, duplicated-collateral, stale-data, and settlement-basis reserves.
-
-## 10. Recommendation
-
-Recommendation: `WATCH_SPARSE_MARKET`.
-
-Do not proceed to Stage 1 now. The active Polymarket BTC threshold universe remains observable and liquid enough to monitor, and synchronized public Polymarket/Deribit book evidence appears obtainable. But the terminal `above` / `below` universe was empty in the fresh witness, so a hedge compiler or executable synthetic scanner would have no qualifying market set to operate on.
-
-Do not stop the Polymarket branch entirely. The data path is useful, and a terminal strip may appear later. The correct next state is a watcher/repeat posture: rerun this Stage 0.1 witness periodically or before any future Stage 1 selection, and proceed only if multiple active terminal BTC `above` / `below` markets pass semantic and settlement compatibility.
-
-Touch/barrier replication remains outside scope.
-
-## 11. Coordination Status
+## Coordination Status
 
 ```text
 COORDINATION STATUS
-Agreement: aligned
-Compared: charter, accepted Stage 0 report, Stage 0 packet, code paths, commands, evidence
+Agreement: aligned after revision
+Compared: charter, accepted Stage 0 report, Stage 0 packet, PR review, code paths, commands, evidence
 Disagreement: none
-Evidence gap: no active terminal BTC above/below contracts found; no synthetic executable bid/ask could be constructed because semantic compatibility never passed
+Evidence gap: no active or closed/resolved qualifying terminal BTC above/below contracts found; no synthetic executable bid/ask could be constructed because semantic compatibility never passed
 Ownership overlap: none detected; docs-only report plus research-only witness script/test, no frontier/queue/UI/product path touched
 Risk if unresolved: Stage 1 could mistake touch/path-dependent probability gaps or spread proxies for executable terminal hedge edge
-Recommended default: WATCH_SPARSE_MARKET
+Recommended default: STOP_POLYMARKET_BRANCH
 Founder decision required: no
 ```
 
-## 12. Agent Continuity
+## Agent Continuity
 
 ```text
 AGENT CONTINUITY
 - Safe to switch agents? YES
 - Exact reason: Work is research-only and bounded to Stage 0.1 terminal availability evidence. No UI, frontier, queue, manifest, order, wallet, custody, treasury, or customer-funds paths were changed.
-- If YES: exact handoff payload required: branch codex/stage0-1-terminal-availability; report path docs/SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_1_TERMINAL_AVAILABILITY_REPORT_V1.md; witness script scripts/hedge_backed_event_stage0_1_terminal_witness.py; focused parser tests in tests/test_cross_venue_tradeability.py; final artifact artifacts/hedge_backed_event_liquidity/stage0_1_terminal_availability_witness_20260718T205907Z.json; recommendation WATCH_SPARSE_MARKET.
+- If YES: exact handoff payload required: branch codex/stage0-1-terminal-availability; report path docs/SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_1_TERMINAL_AVAILABILITY_REPORT_V1.md; witness script scripts/hedge_backed_event_stage0_1_terminal_witness.py; focused parser tests in tests/test_cross_venue_tradeability.py; regenerated artifact path artifacts/hedge_backed_event_liquidity/terminal_availability/stage0_1_terminal_availability_witness_20260718T212113Z.json; recommendation STOP_POLYMARKET_BRANCH.
 ```

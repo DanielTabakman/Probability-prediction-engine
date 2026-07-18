@@ -27,7 +27,7 @@ from src.data.fetch_deribit import DERIBIT_BASE, fetch_deribit_btc_options_instr
 
 GAMMA_MARKETS_URL = "https://gamma-api.polymarket.com/markets"
 CLOB_BOOK_URL = "https://clob.polymarket.com/book"
-DEFAULT_OUT_ROOT = ROOT / "artifacts" / "hedge_backed_event_liquidity"
+DEFAULT_OUT_ROOT = ROOT / "artifacts" / "hedge_backed_event_liquidity" / "terminal_availability"
 
 SEARCH_TERMS = (
     "Bitcoin",
@@ -46,25 +46,60 @@ SEARCH_TERMS = (
 REJECT_PATTERNS = {
     "touch_or_path_dependent": re.compile(
         r"\b(reach|reaches|reached|hit|hits|break|breaks|touch|touches|dip|dips|"
-        r"any point|at any point|high|low|before|by)\b",
+        r"any point|at any point|intraday|before the deadline|prior to)\b|"
+        r"\b(?:candle|daily|weekly|monthly)\s+(?:high|low)\b|\b(?:high|low)\s+price\b",
         re.I,
     ),
-    "conditional_or_fallback": re.compile(r"\b(if neither|50-50|50/50|before gta|conditional)\b", re.I),
+    "conditional_or_fallback": re.compile(
+        r"\b(if neither|50-50|50/50|fallback|otherwise.*(?:void|split)|conditional)\b",
+        re.I | re.S,
+    ),
     "scalar_or_range": re.compile(r"\b(what price|between|range|or more|or less|close between)\b", re.I),
-    "multivariable": re.compile(r"\b(and|or)\b.*\b(ethereum|eth|solana|sol|gta|etf|ipo|stock|trump)\b", re.I),
 }
 
 PRICE_RE = re.compile(r"\$(\d+(?:,\d{3})*(?:\.\d+)?)(\s*[kKmM])?\b")
 BTC_RE = re.compile(r"\b(bitcoin|btc)\b|\$btc\b", re.I)
-ABOVE_RE = re.compile(r"\babove\b", re.I)
-BELOW_RE = re.compile(r"\bbelow\b", re.I)
-EXPLICIT_TIME_RE = re.compile(
-    r"\b(at|as of|on)\b.{0,80}\b("
-    r"\d{1,2}:\d{2}|am|pm|utc|et|est|edt|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|"
-    r"january|february|march|april|june|july|august|september|october|november|december|"
-    r"\d{4}-\d{2}-\d{2})\b",
+SECONDARY_UNDERLYING_RE = re.compile(r"\b(ethereum|eth|solana|sol|gta|etf|ipo|stock|trump)\b", re.I)
+ABOVE_RE = re.compile(r"\b(above|greater than|higher than|at or above|equal to or greater than)\b", re.I)
+BELOW_RE = re.compile(r"\b(below|less than|lower than|at or below|equal to or less than)\b", re.I)
+TIMEZONE_RE = re.compile(r"\b(UTC|ET|EST|EDT|CST|CDT|MST|MDT|PST|PDT|GMT)\b", re.I)
+DATE_RE = re.compile(
+    r"\b(?:\d{4}-\d{2}-\d{2}|"
+    r"(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|"
+    r"\d{1,2}/\d{1,2}/\d{2,4})\b",
     re.I,
 )
+TIME_RE = re.compile(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\s*(?:AM|PM|am|pm)?|(?:1[0-2]|0?[1-9])\s*(?:AM|PM|am|pm)\b")
+SOURCE_RE = re.compile(
+    r"\b(Binance|Coinbase|Kraken|Deribit|CME|CF Benchmarks|CoinDesk|Kaiko|"
+    r"BTCUSDT|BTC/USDT|BTC/USD|BTC-USD|bitcoin price index|btc price index|index|oracle)\b",
+    re.I,
+)
+CALCULATION_RE = re.compile(
+    r"\b(single|spot|index|published|closing|close|settlement|final)\b.{0,80}\b(price|value|print|level)|"
+    r"\b(price|value|print|level)\b.{0,80}\b(at|as of|exactly|published|settlement)\b",
+    re.I,
+)
+YES_NO_PAYOUT_RE = re.compile(
+    r"\b(?:yes|\"yes\")\b.{0,80}\$?1(?:\.00)?\b.{0,120}\b(?:no|\"no\")\b.{0,80}\$?0(?:\.00)?\b|"
+    r"\b(?:no|\"no\")\b.{0,80}\$?0(?:\.00)?\b.{0,120}\b(?:yes|\"yes\")\b.{0,80}\$?1(?:\.00)?\b",
+    re.I | re.S,
+)
+NONSTANDARD_PAYOUT_RE = re.compile(r"\b(?:yes|no)\b.{0,80}(?:50-50|50/50|\$0\.50|\$0\.5|half|scalar|pro rata)", re.I | re.S)
+
+
+@dataclass(frozen=True)
+class EventContractSpec:
+    underlying: str | None
+    comparator: str | None
+    threshold: float | None
+    resolution_timestamp: str | None
+    timezone: str | None
+    resolution_source_index: str | None
+    calculation_method: str | None
+    yes_payout: str | None
+    no_payout: str | None
+    ambiguity_or_fallback_flags: list[str]
 
 
 @dataclass(frozen=True)
@@ -75,6 +110,7 @@ class Classification:
     terminal_candidate: bool
     decision: str
     reasons: list[str]
+    contract_spec: EventContractSpec
 
 
 def market_text(market: dict[str, Any]) -> str:
@@ -88,9 +124,20 @@ def market_text(market: dict[str, Any]) -> str:
 
 
 def parse_price_usd(text: str) -> float | None:
-    match = PRICE_RE.search(text)
-    if not match:
-        return None
+    prices = parse_price_usd_values(text)
+    return prices[0] if prices else None
+
+
+def parse_price_usd_values(text: str) -> list[float]:
+    prices: list[float] = []
+    for match in PRICE_RE.finditer(text):
+        parsed = parse_price_match(match)
+        if parsed is not None and parsed >= 1_000:
+            prices.append(parsed)
+    return prices
+
+
+def parse_price_match(match: re.Match[str]) -> float | None:
     raw = match.group(1).replace(",", "")
     try:
         value = float(raw)
@@ -104,38 +151,131 @@ def parse_price_usd(text: str) -> float | None:
     return value
 
 
-def classify_market(market: dict[str, Any]) -> Classification:
-    text = market_text(market)
-    is_btc_price = bool(BTC_RE.search(text) and parse_price_usd(text))
-    comparator = "above" if ABOVE_RE.search(text) else ("below" if BELOW_RE.search(text) else None)
-    reasons: list[str] = []
+def unique_values(values: list[Any]) -> list[Any]:
+    out: list[Any] = []
+    for value in values:
+        if value not in out:
+            out.append(value)
+    return out
 
-    if not is_btc_price:
-        return Classification(False, comparator, None, False, "OUT_OF_SCOPE", ["not_btc_price_threshold"])
+
+def parse_resolution_timestamp(text: str) -> tuple[str | None, str | None, str | None]:
+    date = DATE_RE.search(text)
+    time_match = TIME_RE.search(text)
+    timezone = TIMEZONE_RE.search(text)
+    if date and time_match and timezone:
+        return (
+            f"{date.group(0)} {time_match.group(0)} {timezone.group(0).upper()}",
+            timezone.group(0).upper(),
+            None,
+        )
+    if date and (not time_match or not timezone):
+        return None, timezone.group(0).upper() if timezone else None, "missing_explicit_time_or_timezone"
+    return None, timezone.group(0).upper() if timezone else None, "missing_explicit_timestamp"
+
+
+def parse_source_and_method(text: str) -> tuple[str | None, str | None]:
+    source = SOURCE_RE.search(text)
+    method = CALCULATION_RE.search(text)
+    return (source.group(0) if source else None, method.group(0) if method else None)
+
+
+def parse_payout(text: str, market: dict[str, Any]) -> tuple[str | None, str | None, str | None]:
+    outcomes = [str(o).lower() for o in parse_json_list(market.get("outcomes"))[:2]]
+    if outcomes != ["yes", "no"]:
+        return None, None, "not_binary_yes_no"
+    if NONSTANDARD_PAYOUT_RE.search(text):
+        return None, None, "nonstandard_payout_mapping"
+    if YES_NO_PAYOUT_RE.search(text):
+        return "$1", "$0", None
+    return None, None, "missing_explicit_yes_no_payout"
+
+
+def parse_event_contract_spec(market: dict[str, Any]) -> EventContractSpec:
+    text = market_text(market)
+    flags: list[str] = []
+
+    underlying = "BTC" if BTC_RE.search(text) else None
+    if not underlying:
+        flags.append("missing_btc_underlying")
+    if SECONDARY_UNDERLYING_RE.search(text):
+        flags.append("secondary_non_btc_condition")
+
+    comparator_values = []
+    if ABOVE_RE.search(text):
+        comparator_values.append("above")
+    if BELOW_RE.search(text):
+        comparator_values.append("below")
+    comparator_values = unique_values(comparator_values)
+    comparator = comparator_values[0] if len(comparator_values) == 1 else None
+    if len(comparator_values) == 0:
+        flags.append("missing_above_below_comparator")
+    elif len(comparator_values) > 1:
+        flags.append("conflicting_comparators")
+
+    thresholds = unique_values(parse_price_usd_values(text))
+    threshold = thresholds[0] if len(thresholds) == 1 else None
+    if len(thresholds) == 0:
+        flags.append("missing_threshold")
+    elif len(thresholds) > 1:
+        flags.append("multiple_thresholds")
+
+    resolution_timestamp, timezone, timestamp_flag = parse_resolution_timestamp(text)
+    if timestamp_flag:
+        flags.append(timestamp_flag)
+
+    source, method = parse_source_and_method(text)
+    if not source:
+        flags.append("missing_resolution_source_index")
+    if not method:
+        flags.append("missing_calculation_method")
+
+    yes_payout, no_payout, payout_flag = parse_payout(text, market)
+    if payout_flag:
+        flags.append(payout_flag)
 
     for reason, pattern in REJECT_PATTERNS.items():
         if pattern.search(text):
-            reasons.append(reason)
+            flags.append(reason)
 
-    outcomes = parse_json_list(market.get("outcomes"))
-    if [str(o).lower() for o in outcomes[:2]] != ["yes", "no"]:
-        reasons.append("not_binary_yes_no")
+    return EventContractSpec(
+        underlying=underlying,
+        comparator=comparator,
+        threshold=threshold,
+        resolution_timestamp=resolution_timestamp,
+        timezone=timezone,
+        resolution_source_index=source,
+        calculation_method=method,
+        yes_payout=yes_payout,
+        no_payout=no_payout,
+        ambiguity_or_fallback_flags=unique_values(flags),
+    )
 
-    if comparator not in {"above", "below"}:
-        reasons.append("no_terminal_above_below_comparator")
 
-    if comparator in {"above", "below"} and not EXPLICIT_TIME_RE.search(text):
-        reasons.append("no_explicit_single_timestamp")
+def classify_market(market: dict[str, Any]) -> Classification:
+    spec = parse_event_contract_spec(market)
+    reasons = spec.ambiguity_or_fallback_flags
+    is_btc_price = bool(spec.underlying == "BTC" and spec.threshold)
+    hard_reject_reasons = {
+        "touch_or_path_dependent",
+        "conditional_or_fallback",
+        "scalar_or_range",
+        "secondary_non_btc_condition",
+        "conflicting_comparators",
+        "multiple_thresholds",
+        "not_binary_yes_no",
+        "nonstandard_payout_mapping",
+    }
 
-    terminal = is_btc_price and comparator in {"above", "below"} and not reasons
+    terminal = is_btc_price and spec.comparator in {"above", "below"} and not reasons
     if terminal:
-        decision = "ELIGIBLE_FOR_SCANNER_FEASIBILITY"
-    elif is_btc_price and comparator in {"above", "below"} and reasons == ["no_explicit_single_timestamp"]:
-        decision = "WATCH_EVIDENCE_INCOMPLETE"
+        decision = "ELIGIBLE"
+    elif any(reason in hard_reject_reasons for reason in reasons):
+        decision = "REJECT"
     else:
-        decision = "REJECT_NOT_SAFELY_HEDGEABLE"
+        decision = "WATCH"
 
-    return Classification(is_btc_price, comparator, parse_price_usd(text), terminal, decision, reasons)
+    return Classification(is_btc_price, spec.comparator, spec.threshold, terminal, decision, reasons, spec)
 
 
 def parse_json_list(value: Any) -> list[Any]:
@@ -292,17 +432,38 @@ def choose_deribit_legs(
 
 
 def compact_market(market: dict[str, Any], classification: Classification, clob_depth: int) -> dict[str, Any]:
+    token_ids = parse_json_list(market.get("clobTokenIds"))
+    source_pointer = f"https://polymarket.com/event/{market.get('slug')}" if market.get("slug") else None
     return {
+        "event_id": market.get("eventId") or market.get("event_id"),
+        "market_id": market.get("id"),
         "id": market.get("id"),
         "conditionId": market.get("conditionId"),
         "questionID": market.get("questionID"),
+        "question_id": market.get("questionID"),
         "slug": market.get("slug"),
+        "canonical_source_pointer": source_pointer,
         "question": market.get("question"),
         "description": market.get("description"),
+        "resolution_text": market.get("description"),
         "outcomes": parse_json_list(market.get("outcomes")),
         "outcomePrices": parse_json_list(market.get("outcomePrices")),
+        "yes_token_id": token_ids[0] if len(token_ids) > 0 else None,
+        "no_token_id": token_ids[1] if len(token_ids) > 1 else None,
+        "createdAt": market.get("createdAt") or market.get("created_at"),
+        "closeTime": market.get("closeTime") or market.get("closeDate"),
+        "resolutionDate": market.get("resolutionDate") or market.get("resolvedAt"),
         "endDate": market.get("endDate"),
         "endDateIso": market.get("endDateIso"),
+        "deadline": classification.contract_spec.resolution_timestamp or market.get("endDate"),
+        "deadline_timezone": classification.contract_spec.timezone,
+        "resolution_source_index": classification.contract_spec.resolution_source_index,
+        "calculation_method": classification.contract_spec.calculation_method,
+        "payout_mapping": {
+            "YES": classification.contract_spec.yes_payout,
+            "NO": classification.contract_spec.no_payout,
+            "denomination": "USDC" if classification.contract_spec.yes_payout == "$1" else None,
+        },
         "active": market.get("active"),
         "closed": market.get("closed"),
         "acceptingOrders": market.get("acceptingOrders"),
@@ -316,7 +477,10 @@ def compact_market(market: dict[str, Any], classification: Classification, clob_
         "makerBaseFee": market.get("makerBaseFee"),
         "takerBaseFee": market.get("takerBaseFee"),
         "feeSchedule": market.get("feeSchedule"),
-        "clobTokenIds": parse_json_list(market.get("clobTokenIds")),
+        "clobTokenIds": token_ids,
+        "fetch_timestamps": {
+            "gamma_as_of_utc": datetime.now(tz=UTC).isoformat(),
+        },
         "classification": asdict(classification),
         "clob_books": fetch_clob_books(market, clob_depth),
     }
@@ -341,7 +505,7 @@ def run(limit: int, max_candidates: int, clob_depth: int, deribit_depth: int, in
     frozen = []
     for market, classification in candidates:
         row = compact_market(market, classification, clob_depth)
-        legs = choose_deribit_legs(classification, market, instruments)
+        legs = choose_deribit_legs(classification, market, instruments) if classification.decision == "ELIGIBLE" else []
         deribit_legs = []
         for leg in legs:
             name = leg.get("instrument_name")
@@ -358,7 +522,7 @@ def run(limit: int, max_candidates: int, clob_depth: int, deribit_depth: int, in
         row["deribit_legs"] = deribit_legs
         row["hedge_witness_status"] = (
             "synthetic_not_constructed_semantic_gate_failed"
-            if classification.decision != "ELIGIBLE_FOR_SCANNER_FEASIBILITY"
+            if classification.decision != "ELIGIBLE"
             else "eligible_for_manual_synthetic_witness"
         )
         frozen.append(row)
@@ -368,11 +532,21 @@ def run(limit: int, max_candidates: int, clob_depth: int, deribit_depth: int, in
         "search_terms": list(SEARCH_TERMS),
         "polymarket_markets_discovered": len(markets),
         "btc_price_threshold_markets": len(btc_price),
+        "active_markets_inspected": sum(1 for m in markets if bool(m.get("active")) and not bool(m.get("closed"))),
+        "recent_history_markets_inspected": sum(1 for m in markets if not bool(m.get("active")) or bool(m.get("closed"))),
+        "recent_history_lookback": "targeted closed/resolved Gamma search for BTC search terms; report records observed date span and limits",
         "candidates_frozen": len(frozen),
         "qualifying_terminal_count": sum(1 for _m, c in btc_price if c.terminal_candidate),
-        "watch_count": sum(1 for _m, c in btc_price if c.decision == "WATCH_EVIDENCE_INCOMPLETE"),
-        "rejected_count": sum(1 for _m, c in btc_price if c.decision == "REJECT_NOT_SAFELY_HEDGEABLE"),
+        "active_qualifying_terminal_count": sum(
+            1 for m, c in btc_price if bool(m.get("active")) and not bool(m.get("closed")) and c.terminal_candidate
+        ),
+        "recent_history_qualifying_terminal_count": sum(
+            1 for m, c in btc_price if (not bool(m.get("active")) or bool(m.get("closed"))) and c.terminal_candidate
+        ),
+        "watch_count": sum(1 for _m, c in btc_price if c.decision == "WATCH"),
+        "rejected_count": sum(1 for _m, c in btc_price if c.decision == "REJECT"),
         "deribit_btc_option_instruments": instrument_count,
+        "deribit_probe_label": "data_availability_only_not_hedge_compilation",
         "quote_labels": {
             "polymarket_bestBid_bestAsk": "Gamma top-of-book fields; CLOB books freeze displayed depth by token",
             "polymarket_outcomePrices": "market estimate, not executable by itself",
