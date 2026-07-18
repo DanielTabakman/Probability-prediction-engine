@@ -8,6 +8,15 @@
 **As-of:** 2026-07-18  
 **Status:** **SELECTED FOR BOUNDED IMPLEMENTATION**
 
+## Agent load bundle
+
+| Role | Path |
+|---|---|
+| Program (charter) | this file |
+| Selection | [`POST_RESEARCH_DECISION_DASHBOARD_V0_SELECTION.md`](POST_RESEARCH_DECISION_DASHBOARD_V0_SELECTION.md) |
+| Implementation packet | [`RESEARCH_DECISION_DASHBOARD_V0_CODEX_PACKET.md`](RESEARCH_DECISION_DASHBOARD_V0_CODEX_PACKET.md) |
+| Resolve | `python scripts/resolve_sop.py --chapter ppe_research_decision_dashboard_v0 --json` |
+
 ## Purpose
 
 Give the founder and operator one inspectable surface for answering:
