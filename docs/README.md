@@ -34,7 +34,7 @@ Start here when navigating the Probability Prediction Engine repo.
 | Plane | Directory | Contents |
 |-------|-----------|----------|
 | **SOP / workflow** | [`SOP/`](SOP/) | Operating rules, relay, steward protocol, sprints, evidence status, phase plans (`SOP/PHASE_PLANS/`) |
-| **Vision** | [`VISION/`](VISION/) | MVP1 master canon, vision templates, bounded future initiatives |
+| **Vision** | [`VISION/`](VISION/) | MVP1 master canon, vision templates |
 | **Deploy** | [`DEPLOY/`](DEPLOY/) | Production and early-customer runbooks |
 | **Agents** | [`agents/`](agents/) | Role briefs (app engineer, QA smoke, etc.) |
 | **Control plane prompts** | [`CONTROL_PLANE/PROMPTS/`](CONTROL_PLANE/PROMPTS/) | Manager/worker prompt standards |
@@ -56,9 +56,11 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`SEMANTIC_CONTRACTS.md`](SEMANTIC_CONTRACTS.md) — market-implied vs belief vs disagreement
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
 
-### Bounded MSOS initiatives
+## Bounded MSOS initiatives
 
-- [`VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md`](VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md) — event-contract hedge compilation, executable synthetic pricing, and shadow-liquidity feasibility; not current BUILD scope
+| Initiative | Status | Execution |
+|------------|--------|-----------|
+| [`VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md`](VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md) | Chartered for feasibility; not current BUILD scope | [`SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md`](SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md) — evidence-only Stage 0 handoff |
 
 ## Context rules
 
