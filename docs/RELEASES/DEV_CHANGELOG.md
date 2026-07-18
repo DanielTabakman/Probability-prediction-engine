@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
+- `cb6b7180` — Merge Research Decision Dashboard governance charter
+- `a2ec116d` — Link research pipeline to decision governance dashboard (`docs/SOP/`)
+- `f324a0d1` — Add bounded Codex packet for research decision dashboard (`docs/SOP/`)
+- `7aa11fbd` — Select bounded research decision dashboard v0 (`docs/SOP/`)
+- `ebc6c913` — Charter research decision dashboard governance surface (`docs/SOP/`)
+- `dd106c04` — Control-plane: dev changelog
 - `e162a4dc` — Stage 0.1 terminal availability witness (#5386) (`docs/SOP/`)
 - `1fd8dc45` — Control-plane: dev changelog
 - `a56bd883` — Add hedge-backed event liquidity Stage 0 report (#5385) (`docs/SOP/`)
