@@ -15,6 +15,7 @@
 | [`REPO_LAYER_MAP_V1.md`](REPO_LAYER_MAP_V1.md) | Path/layer presets |
 | [`BUILD_FACTORY_BOUNDARY_V1.md`](BUILD_FACTORY_BOUNDARY_V1.md) | Autobuilder / control-plane guards |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](../VISION/MSOS/MSOS_Market_Interaction_Modes_v0.1.md) | Future interaction-mode ontology (not build scope) |
+| [`MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md`](../VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md) | Bounded event-market hedge compilation and shadow-liquidity feasibility initiative; no live execution authorization |
 | [`PPE_MODULE_REGISTRY_V1.md`](PPE_MODULE_REGISTRY_V1.md) | Analytical modules — tiers, pillars, data map ([`assets/msos_module_map.html`](assets/msos_module_map.html)) |
 | [`MSOS_UX_DESIGN_PHILOSOPHY_V1.md`](MSOS_UX_DESIGN_PHILOSOPHY_V1.md) | User-facing module UX — game/casino interaction craft, ethical boundaries |
 
@@ -96,6 +97,7 @@ After MCD passes → primary focus shifts to [`TRADER_WORKFLOW_RESEARCH_V1.md`](
 
 - Preserve architecture that can host more modules later (shell, workflow store, entitlement hooks).
 - Do **not** expand active platform scope (new asset classes, execution, AI chat, broad commercial plumbing) unless **explicitly SELECTION'd**.
+- Bounded vision or feasibility initiatives may be chartered without queue activation only when they explicitly preserve the current frontier and state the later SELECTION gate.
 
 ---
 
@@ -134,3 +136,4 @@ When **FRONTIER** and this charter disagree on **BUILD order**, FRONTIER wins fo
 | 2026-06-20 | v1 — platform-shaped shell, PPE module, MCD, disagreement grammar |
 | 2026-06-20 | Link interaction-mode ontology doc (vision; not build scope) |
 | 2026-06-29 | Link MSOS UX design philosophy for user-facing modules |
+| 2026-07-18 | Link bounded hedge-backed event liquidity feasibility initiative; clarify charter-without-queue rule |
