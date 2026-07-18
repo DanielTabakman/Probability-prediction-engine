@@ -4,7 +4,8 @@
 
 **SSOT registry:** [`config/research_pipeline_registry.json`](../../config/research_pipeline_registry.json)  
 **Visual:** [`assets/msos_module_map.html`](assets/msos_module_map.html) § Research pipeline  
-**Archive health:** `python scripts/research_archive_health.py --write`
+**Archive health:** `python scripts/research_archive_health.py --write`  
+**Decision governance:** [`RESEARCH_DECISION_DASHBOARD_PROGRAM_V1.md`](RESEARCH_DECISION_DASHBOARD_PROGRAM_V1.md)
 
 ---
 
@@ -26,6 +27,24 @@ Daily summary: `artifacts/control_plane/RESEARCH_DAILY_LAST.json`
 MSOS panel: `/ppe-display-api/cross-venue-research.json` (Strategy Lab, BTC)
 
 Stale collectors: `stale: true` when last snapshot is older than `stale_hours` (default 36h).
+
+---
+
+## Decision governance
+
+Collectors and tests answer what evidence exists. A research decision must additionally preserve how that evidence changed the initiative.
+
+The operator review contract is defined by [`RESEARCH_DECISION_DASHBOARD_PROGRAM_V1.md`](RESEARCH_DECISION_DASHBOARD_PROGRAM_V1.md). It requires explicit separation among:
+
+- theory status;
+- venue or implementation-branch status;
+- profitability status;
+- execution status;
+- tested, failed, blocked, untested, unauthorized, and inconclusive gates;
+- interpretation, recommendation, and reopen conditions;
+- provenance back to accepted reports, PRs, commits, artifacts, and validation evidence.
+
+A test report must not silently promote itself into a strategy or product decision. Material continuation, narrowing, stopping, or reopening remains a steward decision recorded in GitHub.
 
 ---
 
@@ -86,6 +105,7 @@ Ops: [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md)
 2. `scripts/collect_*.py` + cmd + optional VM install task
 3. `scripts/run_*` test reading matching archive only
 4. Tests + update this doc and module map
+5. For a material continue/narrow/stop/reopen decision, add or update a research-decision dashboard contract and canonical steward record
 
 ---
 
@@ -96,3 +116,4 @@ Ops: [`CROSS_VENUE_COLLECTOR_OPS_V1.md`](CROSS_VENUE_COLLECTOR_OPS_V1.md)
 | 2026-06-30 | v1 — registry JSON, daily runner, archive health, tradeability test, dev collector |
 | 2026-06-30 | Hardening merged (#1000): stale detection, RESEARCH_SUMMARY, MSOS panel, tradeability backtest |
 | 2026-06-30 | VM witness: `PPE Distribution Stats Daily` on ppeloop; smoke snapshot `2026-06-30/ppe_btc_distribution_stats_203540Z.csv` |
+| 2026-07-18 | Link selected Research Decision Dashboard governance contract; require explicit status and provenance separation for material research decisions |
