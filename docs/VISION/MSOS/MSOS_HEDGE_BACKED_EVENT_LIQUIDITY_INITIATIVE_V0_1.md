@@ -28,6 +28,7 @@ It is an extension of the existing `cross_venue_event_gap` module and research p
 | [`PRODUCT_FOCUS_PLAYBOOK_V1.md`](../../SOP/PRODUCT_FOCUS_PLAYBOOK_V1.md) | Priority and anti-drift gate |
 | [`PPE_MODULE_REGISTRY_V1.md`](../../SOP/PPE_MODULE_REGISTRY_V1.md) | Existing `cross_venue_event_gap` module, tiers, and ship-to |
 | [`MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md`](../../SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md) | Existing Polymarket ↔ options collection, scan, and backtest capability |
+| [`HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md`](../../SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md) | Bounded Codex handoff for fresh Stage 0 feasibility evidence |
 | [`MSOS_Market_Interaction_Modes_v0.1.md`](MSOS_Market_Interaction_Modes_v0.1.md) | Hedging and expression-search ontology; simulation-only guard |
 | [`SEMANTIC_CONTRACTS.md`](../../SEMANTIC_CONTRACTS.md) | Risk-neutral probability, belief, and user-facing meaning contracts |
 
@@ -305,6 +306,8 @@ Deliverables:
 - list of recurring rejection reasons;
 - estimate of qualifying-market frequency and depth.
 
+**Execution packet:** [`HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md`](../../SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md)
+
 **Continue gate:** a meaningful recurring subset of contracts is deterministically specifiable and has plausible static hedges.
 
 ### Stage 1 — Minimum credible hedge scanner
@@ -494,3 +497,4 @@ If any claim fails, retain the work as an MSOS legibility and research capabilit
 | Date | Change |
 |------|--------|
 | 2026-07-18 | v0.1 — charter bounded hedge-backed event liquidity initiative; feasibility only; no live execution authorization |
+| 2026-07-18 | Link bounded Stage 0 Codex feasibility packet |
