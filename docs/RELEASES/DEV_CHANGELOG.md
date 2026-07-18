@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
-_No merges to `main`._
+- `5c45d606` — Charter hedge-backed event liquidity initiative (#5384) (`docs/SOP/`)
+- `65ed1b36` — Control-plane: dev changelog
 
 ## 2026-07-17
 
