@@ -27,6 +27,16 @@ Use one of these safe paths:
 
 Before editing or running work, report any branch, file, or ownership overlap.
 
+## Execution sequence
+
+1. Read the parent charter and this packet.
+2. Inspect the listed existing pipeline paths before proposing new code.
+3. Run fresh evidence collection and audit the quote types actually returned.
+4. Complete the contract and hedge feasibility matrix.
+5. Add only the smallest reproducibility tooling needed, if any.
+6. Produce the Stage 0 feasibility report.
+7. Open a separate draft PR; do not append implementation work to charter PR #5384.
+
 ## Canon / relevant documents
 
 Read only what is needed:
