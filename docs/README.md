@@ -56,6 +56,12 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`SEMANTIC_CONTRACTS.md`](SEMANTIC_CONTRACTS.md) — market-implied vs belief vs disagreement
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
 
+## Bounded MSOS initiatives
+
+| Initiative | Status | Execution |
+|------------|--------|-----------|
+| [`VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md`](VISION/MSOS/MSOS_HEDGE_BACKED_EVENT_LIQUIDITY_INITIATIVE_V0_1.md) | Chartered for feasibility; not current BUILD scope | [`SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md`](SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_CODEX_PACKET_V1.md) — evidence-only Stage 0 handoff |
+
 ## Context rules
 
 - [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor or ChatGPT thread vs stay in-session
