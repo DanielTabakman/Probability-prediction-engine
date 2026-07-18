@@ -4,6 +4,11 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
+- `555c0680` — Merge pull request #5392 from DanielTabakman/chatgpt/market-proposal-hedge-capacity-charter
+- `dde92c14` — Add market proposal hedge capacity Codex packet (`docs/SOP/`)
+- `209fdce4` — Select market proposal hedge capacity preview (`docs/SOP/`)
+- `3c8f1b89` — Charter market proposal hedge capacity preview (`docs/SOP/`)
+- `d5d26938` — Control-plane: dev changelog
 - `cb6b7180` — Merge Research Decision Dashboard governance charter
 - `a2ec116d` — Link research pipeline to decision governance dashboard (`docs/SOP/`)
 - `f324a0d1` — Add bounded Codex packet for research decision dashboard (`docs/SOP/`)
