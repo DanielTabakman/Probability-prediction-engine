@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
+- `e162a4dc` — Stage 0.1 terminal availability witness (#5386) (`docs/SOP/`)
+- `1fd8dc45` — Control-plane: dev changelog
 - `a56bd883` — Add hedge-backed event liquidity Stage 0 report (#5385) (`docs/SOP/`)
 - `f6df8df7` — Control-plane: dev changelog
 - `5c45d606` — Charter hedge-backed event liquidity initiative (#5384) (`docs/SOP/`)
