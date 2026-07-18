@@ -1,0 +1,315 @@
+{
+  "schema_version": "ResearchDecisionDashboardV1",
+  "initiative_id": "hedge_backed_event_liquidity",
+  "display_name": "Hedge-backed event liquidity",
+  "stage": "Stage 0/0.1",
+  "as_of_utc": "2026-07-18T21:21:13Z",
+  "theory_statement": "Listed options may still support hedge-backed event liquidity when a prediction contract has a compatible terminal payoff; this run did not economically test that theory because the Polymarket BTC universe failed the terminal-contract gate.",
+  "mechanism_steps": [
+    "terminal event contract",
+    "deterministic payoff specification",
+    "compatible listed-option hedge",
+    "executable synthetic bid/ask",
+    "costs and residual risk",
+    "quote / watch / abstain"
+  ],
+  "theory_status": "PLAUSIBLE_NOT_ECONOMICALLY_TESTED",
+  "venue_or_branch_status": "STOPPED_POLYMARKET",
+  "profitability_status": "NOT_TESTED",
+  "execution_status": "NOT_AUTHORIZED",
+  "recommendation": "STOP_POLYMARKET_BRANCH",
+  "funnel": [
+    {
+      "label": "general market objects discovered",
+      "count": 1100,
+      "note": "Public Gamma coverage envelope only; not 1,100 semantic BTC contract reviews."
+    },
+    {
+      "label": "BTC threshold candidates frozen",
+      "count": 7,
+      "note": "Seven BTC threshold-shaped candidates were parsed and frozen from the broader discovery envelope."
+    },
+    {
+      "label": "semantically eligible",
+      "count": 0,
+      "note": "No candidate passed the terminal payoff specification."
+    },
+    {
+      "label": "synthetic hedges constructed",
+      "count": 0,
+      "note": "Hedge compilation did not run because semantic compatibility failed first."
+    },
+    {
+      "label": "executable discrepancies tested",
+      "count": 0,
+      "note": "No executable cost stack was tested."
+    },
+    {
+      "label": "shadow trades",
+      "count": 0,
+      "note": "Execution was outside the authorized stage."
+    }
+  ],
+  "gates": [
+    {
+      "gate": "Public market discovery",
+      "state": "PASS",
+      "evidence": "1,100 public Polymarket market objects discovered from active pagination and targeted BTC searches."
+    },
+    {
+      "gate": "Deribit option availability",
+      "state": "PASS",
+      "evidence": "872 BTC option instruments observed as data availability only, not hedge compilation."
+    },
+    {
+      "gate": "Deterministic semantic parsing",
+      "state": "PASS",
+      "evidence": "Structured parser classified all seven frozen candidates before any hedge matching."
+    },
+    {
+      "gate": "Terminal BTC contract availability",
+      "state": "FAIL",
+      "evidence": "Zero active or closed/resolved BTC threshold candidates qualified as terminal above/below contracts."
+    },
+    {
+      "gate": "Hedge compilation",
+      "state": "BLOCKED",
+      "evidence": "Every candidate recorded synthetic_not_constructed_semantic_gate_failed."
+    },
+    {
+      "gate": "Full executable cost stack",
+      "state": "NOT_TESTED",
+      "evidence": "Fees, slippage, legging, collateral, and depth-aware synthetic bid/ask were not assembled."
+    },
+    {
+      "gate": "Historical profitability",
+      "state": "NOT_TESTED",
+      "evidence": "Local backtest had no resolved questions and did not test profitability."
+    },
+    {
+      "gate": "Shadow execution",
+      "state": "NOT_TESTED",
+      "evidence": "No shadow trades were authorized or run."
+    },
+    {
+      "gate": "Live execution",
+      "state": "NOT_AUTHORIZED",
+      "evidence": "No trading, quoting, wallets, custody, treasury, or order routing were in scope."
+    }
+  ],
+  "candidates": [
+    {
+      "market_id": "573656",
+      "question": "Will Bitcoin hit $150k by December 31, 2026?",
+      "current_state": "active",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 150000,
+        "resolution_timestamp": "December 31, 2026 11:59PM ET",
+        "resolution_source_index": "Binance BTC/USDT 1m candle final high",
+        "calculation_method": "path-dependent high",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-bitcoin-hit-150k-by-december-31-2026",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "540844",
+      "question": "Will bitcoin hit $1m before GTA VI?",
+      "current_state": "active",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 1000000,
+        "resolution_timestamp": "July 31, 2026 11:59 PM ET",
+        "resolution_source_index": "Binance BTCUSDT 1m candle final high plus GTA release condition/fallback",
+        "calculation_method": "path-dependent high with secondary condition",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "secondary_non_btc_condition",
+        "conditional_or_fallback",
+        "missing_above_below_comparator",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-bitcoin-hit-1m-before-gta-vi-872-424",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "76",
+      "question": "Will $BTC break $20k before 2021?",
+      "current_state": "closed/resolved",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 20000,
+        "resolution_timestamp": "January 1st, 2021 12:00am EST",
+        "resolution_source_index": null,
+        "calculation_method": "break/touch before deadline",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_resolution_source_index",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-btc-break-20k-before-2021",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "25367",
+      "question": "Will $BTC break $50k before April 1st, 2021?",
+      "current_state": "closed/resolved",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 50000,
+        "resolution_timestamp": "April 1st, 2021 12:00am EST",
+        "resolution_source_index": null,
+        "calculation_method": "break/touch before deadline",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_resolution_source_index",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-btc-break-50k-before-april-1st-2021",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "8939",
+      "question": "Will $BTC break $25k before March 1st?",
+      "current_state": "closed/resolved",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 25000,
+        "resolution_timestamp": "March 1st, 2021 12:00am EST",
+        "resolution_source_index": null,
+        "calculation_method": "break/touch before deadline",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_resolution_source_index",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-btc-break-25k-before-march-1st",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "63",
+      "question": "Will BTC break $15k before 2021?",
+      "current_state": "closed/resolved",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 15000,
+        "resolution_timestamp": "Dec 31, 2020 11:59 PM ET",
+        "resolution_source_index": null,
+        "calculation_method": null,
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_resolution_source_index",
+        "missing_calculation_method",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-btc-break-15k-before-2021-1",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    },
+    {
+      "market_id": "103",
+      "question": "Will $BTC break $20k before Thanksgiving?",
+      "current_state": "closed/resolved",
+      "parsed_contract_fields": {
+        "underlying": "BTC",
+        "comparator": null,
+        "threshold_usd": 20000,
+        "resolution_timestamp": "November 26th, 2020 12:00am EST",
+        "resolution_source_index": null,
+        "calculation_method": "break/touch before deadline",
+        "yes_payout": null,
+        "no_payout": null
+      },
+      "canonical_classification": "REJECT",
+      "rejection_or_watch_reasons": [
+        "touch_or_path_dependent",
+        "missing_resolution_source_index",
+        "missing_explicit_yes_no_payout"
+      ],
+      "hedge_compilation_ran": false,
+      "source_pointer": "https://polymarket.com/event/will-btc-break-20k-before-thanksgiving",
+      "evidence_timestamp_utc": "2026-07-18T21:20:21.577137+00:00"
+    }
+  ],
+  "interpretation": {
+    "what_we_learned": "Public Polymarket BTC threshold discovery and deterministic semantic parsing are reusable, but the accepted Stage 0.1 evidence found no qualifying active or closed/resolved terminal BTC above/below contracts.",
+    "what_we_did_not_learn": "We did not learn whether a compatible terminal event contract can be profitably hedged, quoted, shadow-traded, or executed because no candidate reached hedge compilation.",
+    "why_the_branch_stopped_or_continued": "The Polymarket-specific branch stopped because terminal contract availability failed. The broader theory remains plausible but not economically tested.",
+    "reopen_conditions": "Reopen only if a future cheap availability check finds active BTC contracts with explicit terminal above/below semantics, a single timestamp/timezone, a named compatible source/index, deterministic calculation, and explicit YES $1 / NO $0 payout."
+  },
+  "reopen_conditions": [
+    "Active BTC terminal above/below contract exists with one threshold, one timestamp, explicit timezone, named source/index, and deterministic terminal calculation.",
+    "Resolution text excludes hit, reach, break, dip, any-point, before-deadline, barrier, conditional, scalar, fallback, or ambiguous settlement language.",
+    "Explicit binary YES $1 / NO $0 payout mapping is present.",
+    "A later authorized stage collects depth-aware Polymarket and Deribit books, fees, slippage, legging reserve, collateral burden, and residual-risk bounds before any quote or trade decision."
+  ],
+  "provenance": {
+    "canonical_reports": [
+      "docs/SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_FEASIBILITY_REPORT_V1.md",
+      "docs/SOP/HEDGE_BACKED_EVENT_LIQUIDITY_STAGE0_1_TERMINAL_AVAILABILITY_REPORT_V1.md"
+    ],
+    "pull_requests": [
+      "#5384",
+      "#5385",
+      "#5386"
+    ],
+    "accepted_merge_commit": "e162a4dc48a8c724d37502ca90bdebe49029d493",
+    "witness_timestamp_utc": "2026-07-18T21:20:21.577137+00:00",
+    "artifact_paths": [
+      "artifacts/hedge_backed_event_liquidity/terminal_availability/stage0_1_terminal_availability_witness_20260718T212113Z.json"
+    ],
+    "validation_commands": [
+      "python -m pytest -q tests/test_cross_venue_tradeability.py tests/test_cross_venue_export.py",
+      "python -m ruff check scripts/hedge_backed_event_stage0_1_terminal_witness.py tests/test_cross_venue_tradeability.py"
+    ],
+    "coverage_limitations": [
+      "Large live-market raw artifact is not committed.",
+      "The 1,100 general market objects were a discovery envelope, not semantic inspections.",
+      "No qualifying terminal BTC contract was found, so hedge economics and execution were not tested."
+    ]
+  },
+  "warnings": [
+    "Operator-only read-only surface; no customer-facing route.",
+    "No live network calls during render.",
+    "No Polymarket branch restart, market creation, trading, quoting, wallets, custody, treasury, or order routing.",
+    "STOP_POLYMARKET_BRANCH is not a rejection of the general hedge-backed event-liquidity theory."
+  ]
+}
