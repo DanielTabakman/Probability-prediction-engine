@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
+- `91b76029` — Add SOP agent load bundles (`docs/SOP/`)
+- `c3af18ea` — Control-plane: dev changelog
 - `555c0680` — Merge pull request #5392 from DanielTabakman/chatgpt/market-proposal-hedge-capacity-charter
 - `dde92c14` — Add market proposal hedge capacity Codex packet (`docs/SOP/`)
 - `209fdce4` — Select market proposal hedge capacity preview (`docs/SOP/`)
