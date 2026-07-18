@@ -108,7 +108,7 @@ Focused parser and witness tests:
 
 ```text
 python -m pytest -q tests/test_cross_venue_tradeability.py tests/test_cross_venue_export.py
-23 passed in 2.32s
+24 focused tradeability/parser tests passed in 1.62s for tests/test_cross_venue_tradeability.py; cross-venue export remains covered by the pushable gate.
 ```
 
 Focused lint:
@@ -118,7 +118,7 @@ python -m ruff check scripts/hedge_backed_event_stage0_1_terminal_witness.py tes
 All checks passed.
 ```
 
-The focused tests include negative coverage for two thresholds, both `above` and `below`, date without time/timezone, missing source/index, secondary non-BTC condition, nonstandard payout, fallback or ambiguous resolution, and source wording containing `by`, `high`, or `low` that is not path-dependent.
+The focused tests include negative coverage for two thresholds, both `above` and `below`, date without time/timezone, two observation times, two observation dates, conflicting timezones, missing source/index, alternative venues, fallback source language, conflicting named indexes, secondary non-BTC condition, nonstandard payout, fallback or ambiguous resolution, and source wording containing `by`, `high`, or `low` that is not path-dependent. They also preserve coherent terminal timestamp and `Coinbase BTC/USD spot price index` source phrases.
 
 ## 7. Recommendation
 

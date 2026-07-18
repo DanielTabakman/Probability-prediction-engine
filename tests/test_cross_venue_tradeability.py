@@ -166,6 +166,70 @@ def test_stage0_1_date_without_time_or_timezone_watches() -> None:
     assert "missing_explicit_time_or_timezone" in classification.reasons
 
 
+def test_stage0_1_two_times_on_one_date_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC or 16:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at that "
+            "timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "multiple_observation_times" in classification.reasons
+
+
+def test_stage0_1_two_observation_dates_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 or January 1, 2027 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at that "
+            "timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "multiple_observation_dates" in classification.reasons
+
+
+def test_stage0_1_conflicting_timezones_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at "
+            "7:00 ET. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "conflicting_timezones" in classification.reasons
+
+
+def test_stage0_1_one_coherent_timestamp_is_eligible() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at that "
+            "timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "ELIGIBLE"
+    assert classification.contract_spec.resolution_timestamp == "December 31, 2026 12:00 UTC"
+
+
 def test_stage0_1_missing_source_or_index_watches() -> None:
     market = {
         "question": "Will Bitcoin be below $90,000 on December 31, 2026 at 12:00 UTC?",
@@ -177,6 +241,70 @@ def test_stage0_1_missing_source_or_index_watches() -> None:
 
     assert classification.decision == "WATCH"
     assert "missing_resolution_source_index" in classification.reasons
+
+
+def test_stage0_1_two_alternative_venues_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase or Kraken BTC/USD spot price index, using the single published price "
+            "at that timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "coinbase_or_kraken_alternative_sources" in classification.reasons
+
+
+def test_stage0_1_fallback_source_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at that "
+            "timestamp. If Coinbase is unavailable, the fallback source is Kraken. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "fallback_resolution_source" in classification.reasons
+
+
+def test_stage0_1_conflicting_indexes_rejects() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is the Coinbase BTC/USD spot price index or the CME CF Bitcoin Reference Rate "
+            "index, using the single published price at that timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "REJECT"
+    assert "conflicting_named_indexes" in classification.reasons
+
+
+def test_stage0_1_one_coherent_venue_pair_index_source_is_eligible() -> None:
+    market = {
+        "question": "Will Bitcoin be above $120,000 on December 31, 2026 at 12:00 UTC?",
+        "description": (
+            "Resolution source is Coinbase BTC/USD spot price index, using the single published price at that "
+            "timestamp. YES pays $1 and NO pays $0."
+        ),
+        "outcomes": '["Yes", "No"]',
+    }
+
+    classification = classify_market(market)
+
+    assert classification.decision == "ELIGIBLE"
+    assert classification.contract_spec.resolution_source_index == "Coinbase BTC/USD spot price index"
 
 
 def test_stage0_1_secondary_non_btc_condition_rejects() -> None:

@@ -70,10 +70,36 @@ DATE_RE = re.compile(
     re.I,
 )
 TIME_RE = re.compile(r"\b(?:[01]?\d|2[0-3]):[0-5]\d\s*(?:AM|PM|am|pm)?|(?:1[0-2]|0?[1-9])\s*(?:AM|PM|am|pm)\b")
+ALTERNATIVE_MOMENT_RE = re.compile(
+    r"\b(?:at|on|as of)\b.{0,80}\b(?:or|either|alternatively|whichever|earlier|later)\b.{0,80}\b(?:at|on|as of)\b",
+    re.I | re.S,
+)
 SOURCE_RE = re.compile(
     r"\b(Binance|Coinbase|Kraken|Deribit|CME|CF Benchmarks|CoinDesk|Kaiko|"
     r"BTCUSDT|BTC/USDT|BTC/USD|BTC-USD|bitcoin price index|btc price index|index|oracle)\b",
     re.I,
+)
+VENUE_RE = re.compile(r"\b(Binance|Coinbase|Kraken|Deribit|CME|CF Benchmarks|CoinDesk|Kaiko)\b", re.I)
+PAIR_RE = re.compile(r"\b(BTCUSDT|BTC/USDT|BTC/USD|BTC-USD)\b", re.I)
+SOURCE_PHRASE_RE = re.compile(
+    r"\b((?:Coinbase|Kraken|Binance|Deribit|CME|CF Benchmarks|CoinDesk|Kaiko)"
+    r"(?:\s+[A-Z]{2,5}/[A-Z]{2,5}|\s+BTC-USD|\s+BTCUSDT)?"
+    r".{0,80}?\b(?:spot price index|price index|index|oracle))\b",
+    re.I,
+)
+INDEX_PHRASE_RE = re.compile(
+    r"\b((?:[A-Z][A-Za-z0-9-]*\s+){0,6}(?:BTC/USD|BTC-USD|BTCUSDT|bitcoin|btc)"
+    r"(?:\s+[A-Za-z0-9-]+){0,6}\s+(?:spot price index|price index|index|oracle))\b",
+    re.I,
+)
+SOURCE_FALLBACK_RE = re.compile(
+    r"\b(?:fallback|backup|secondary|alternate|alternative|if .*?(?:unavailable|fails|not available)|"
+    r"otherwise use|will use|may use)\b.{0,120}\b(?:source|index|oracle|Coinbase|Kraken|Binance|Deribit|CME)\b",
+    re.I | re.S,
+)
+CONDITIONAL_SOURCE_RE = re.compile(
+    r"\bif\b.{0,120}\b(?:Coinbase|Kraken|Binance|Deribit|CME|index|source|oracle)\b.{0,160}\b(?:otherwise|else|then)\b",
+    re.I | re.S,
 )
 CALCULATION_RE = re.compile(
     r"\b(single|spot|index|published|closing|close|settlement|final)\b.{0,80}\b(price|value|print|level)|"
@@ -160,24 +186,67 @@ def unique_values(values: list[Any]) -> list[Any]:
 
 
 def parse_resolution_timestamp(text: str) -> tuple[str | None, str | None, str | None]:
-    date = DATE_RE.search(text)
-    time_match = TIME_RE.search(text)
-    timezone = TIMEZONE_RE.search(text)
+    dates = unique_values([match.group(0).strip() for match in DATE_RE.finditer(text)])
+    times = unique_values([normalize_time(match.group(0)) for match in TIME_RE.finditer(text)])
+    timezones = unique_values([match.group(0).upper() for match in TIMEZONE_RE.finditer(text)])
+    if len(dates) > 1:
+        return None, timezones[0] if len(timezones) == 1 else None, "multiple_observation_dates"
+    if len(timezones) > 1:
+        return None, None, "conflicting_timezones"
+    if len(times) > 1:
+        return None, timezones[0] if len(timezones) == 1 else None, "multiple_observation_times"
+    if ALTERNATIVE_MOMENT_RE.search(text):
+        return None, timezones[0] if len(timezones) == 1 else None, "alternative_observation_moments"
+    date = dates[0] if dates else None
+    time_match = times[0] if times else None
+    timezone = timezones[0] if timezones else None
     if date and time_match and timezone:
         return (
-            f"{date.group(0)} {time_match.group(0)} {timezone.group(0).upper()}",
-            timezone.group(0).upper(),
+            f"{date} {time_match} {timezone}",
+            timezone,
             None,
         )
     if date and (not time_match or not timezone):
-        return None, timezone.group(0).upper() if timezone else None, "missing_explicit_time_or_timezone"
-    return None, timezone.group(0).upper() if timezone else None, "missing_explicit_timestamp"
+        return None, timezone, "missing_explicit_time_or_timezone"
+    return None, timezone, "missing_explicit_timestamp"
 
 
-def parse_source_and_method(text: str) -> tuple[str | None, str | None]:
-    source = SOURCE_RE.search(text)
+def normalize_time(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip().upper())
+
+
+def parse_source_and_method(text: str) -> tuple[str | None, str | None, list[str]]:
+    flags: list[str] = []
+    source_phrases = unique_values([normalize_source_phrase(match.group(1)) for match in SOURCE_PHRASE_RE.finditer(text)])
+    venues = unique_values([match.group(1).title() for match in VENUE_RE.finditer(text)])
+    pairs = unique_values([normalize_pair(match.group(1)) for match in PAIR_RE.finditer(text)])
+    index_phrases = unique_values([normalize_source_phrase(match.group(1)) for match in INDEX_PHRASE_RE.finditer(text)])
+
+    if len(venues) > 1:
+        flags.append("multiple_or_alternative_resolution_sources")
+    if {"Coinbase", "Kraken"}.issubset(set(venues)):
+        flags.append("coinbase_or_kraken_alternative_sources")
+    if SOURCE_FALLBACK_RE.search(text):
+        flags.append("fallback_resolution_source")
+    if CONDITIONAL_SOURCE_RE.search(text):
+        flags.append("conditional_resolution_sources")
+    if len(index_phrases) > 1:
+        flags.append("conflicting_named_indexes")
+
+    source = source_phrases[0] if len(source_phrases) == 1 else None
+    if source is None and len(venues) == 1 and len(pairs) <= 1:
+        source_match = SOURCE_RE.search(text)
+        source = source_match.group(0) if source_match else None
     method = CALCULATION_RE.search(text)
-    return (source.group(0) if source else None, method.group(0) if method else None)
+    return (source, method.group(0) if method else None, unique_values(flags))
+
+
+def normalize_pair(value: str) -> str:
+    return value.upper().replace("-", "/")
+
+
+def normalize_source_phrase(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip()).rstrip(".,;:")
 
 
 def parse_payout(text: str, market: dict[str, Any]) -> tuple[str | None, str | None, str | None]:
@@ -224,7 +293,8 @@ def parse_event_contract_spec(market: dict[str, Any]) -> EventContractSpec:
     if timestamp_flag:
         flags.append(timestamp_flag)
 
-    source, method = parse_source_and_method(text)
+    source, method, source_flags = parse_source_and_method(text)
+    flags.extend(source_flags)
     if not source:
         flags.append("missing_resolution_source_index")
     if not method:
@@ -265,6 +335,15 @@ def classify_market(market: dict[str, Any]) -> Classification:
         "multiple_thresholds",
         "not_binary_yes_no",
         "nonstandard_payout_mapping",
+        "alternative_observation_moments",
+        "multiple_observation_times",
+        "multiple_observation_dates",
+        "conflicting_timezones",
+        "multiple_or_alternative_resolution_sources",
+        "coinbase_or_kraken_alternative_sources",
+        "fallback_resolution_source",
+        "conditional_resolution_sources",
+        "conflicting_named_indexes",
     }
 
     terminal = is_btc_price and spec.comparator in {"above", "below"} and not reasons
