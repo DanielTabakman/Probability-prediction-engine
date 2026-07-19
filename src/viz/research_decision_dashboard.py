@@ -68,6 +68,7 @@ class ResearchDecisionDashboardV1:
     profitability_status: str
     execution_status: str
     recommendation: str
+    eligible_contract_count: int
     funnel: list[FunnelStep]
     gates: list[GateRow]
     candidates: list[CandidateRow]
@@ -137,6 +138,7 @@ def parse_research_decision_dashboard(data: dict[str, Any]) -> ResearchDecisionD
         )
         for row in _list(data, "candidates")
     ]
+    eligible_contract_count = count_eligible_contracts(candidates)
     _validate_semantics(data, funnel, gates, candidates)
     return ResearchDecisionDashboardV1(
         schema_version=str(data["schema_version"]),
@@ -151,6 +153,7 @@ def parse_research_decision_dashboard(data: dict[str, Any]) -> ResearchDecisionD
         profitability_status=str(data["profitability_status"]),
         execution_status=str(data["execution_status"]),
         recommendation=str(data["recommendation"]),
+        eligible_contract_count=eligible_contract_count,
         funnel=funnel,
         gates=gates,
         candidates=candidates,
@@ -159,6 +162,10 @@ def parse_research_decision_dashboard(data: dict[str, Any]) -> ResearchDecisionD
         provenance=dict(data["provenance"]),
         warnings=[str(item) for item in _list(data, "warnings")],
     )
+
+
+def count_eligible_contracts(candidates: list[CandidateRow]) -> int:
+    return sum(1 for row in candidates if row.canonical_classification == "ELIGIBLE")
 
 
 def _parse_gate(row: dict[str, Any]) -> GateRow:

@@ -27,7 +27,10 @@ def render_research_decision_dashboard(dashboard: ResearchDecisionDashboardV1) -
                 f"- Polymarket branch: `{dashboard.venue_or_branch_status}`",
                 f"- Profitability: `{dashboard.profitability_status}`",
                 f"- Execution: `{dashboard.execution_status}`",
-                f"- Frozen candidates: `{len(dashboard.candidates)}`; eligible contracts: `0`",
+                (
+                    f"- Frozen candidates: `{len(dashboard.candidates)}`; "
+                    f"eligible contracts: `{dashboard.eligible_contract_count}`"
+                ),
             ]
         )
     )
@@ -35,10 +38,7 @@ def render_research_decision_dashboard(dashboard: ResearchDecisionDashboardV1) -
 
     st.header("Theory and Mechanism")
     st.write(" -> ".join(dashboard.mechanism_steps))
-    st.info(
-        "The accepted evidence found touch/path-dependent Polymarket BTC contracts, "
-        "not terminal option-payoff-compatible contracts. The general theory is not disproven."
-    )
+    st.info(dashboard.interpretation["what_we_learned"])
 
     st.header("Test Funnel")
     st.table(
@@ -51,7 +51,10 @@ def render_research_decision_dashboard(dashboard: ResearchDecisionDashboardV1) -
     )
 
     st.header("Candidate Inspector")
-    st.caption("Seven frozen candidates; zero eligible contracts.")
+    st.caption(
+        f"Frozen candidates: {len(dashboard.candidates)}; "
+        f"eligible contracts: {dashboard.eligible_contract_count}."
+    )
     for candidate in dashboard.candidates:
         with st.expander(f"{candidate.market_id} - {candidate.question}", expanded=False):
             cols = st.columns(3)

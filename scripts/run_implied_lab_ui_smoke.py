@@ -2,8 +2,9 @@
 One-command wrapper for the primary implied-lab UI smoke path.
 
 Auto-selects scenario from UI mode:
-  - Default MVP1 and full lab: A_width_target_payoff (harness skips hidden controls)
-  - Dual-smoke / explicit compact path: MVP1_compact_verification via harness --scenario
+  - Default MVP1 compact UI: MVP1_compact_verification
+  - Full post-MVP1 lab UI: A_width_target_payoff
+  - Dual-smoke / explicit paths: pass --scenario directly to the harness
 
 Delegates to scripts/implied_lab_ui_smoke_harness.py with:
   --scenario <primary>
@@ -29,6 +30,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.implied_lab_ui_smoke_harness import (  # noqa: E402
+    PRIMARY_SMOKE_SCENARIO_COMPACT,
+    PRIMARY_SMOKE_SCENARIO_FULL_LAB,
+    mvp1_execution_surfaces_hidden_by_default,
     primary_smoke_scenario,
     ui_smoke_env_summary,
 )
@@ -55,7 +59,11 @@ def main() -> int:
         print(f"Missing harness script: {HARNESS}", file=sys.stderr)
         return 2
 
-    scenario = primary_smoke_scenario()
+    scenario = (
+        PRIMARY_SMOKE_SCENARIO_COMPACT
+        if mvp1_execution_surfaces_hidden_by_default()
+        else PRIMARY_SMOKE_SCENARIO_FULL_LAB
+    )
     env_summary = ui_smoke_env_summary()
     print(
         f"Primary smoke scenario: {scenario} "

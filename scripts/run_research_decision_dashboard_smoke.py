@@ -51,7 +51,7 @@ def _run_page_witness(url: str, screenshot_path: Path) -> dict[str, bool]:
         browser = playwright.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1440, "height": 1200})
         page.goto(url, wait_until="networkidle", timeout=90000)
-        page.get_by_text("Research Review").wait_for(timeout=60000)
+        page.get_by_test_id("stMainBlockContainer").get_by_text("Research Review").wait_for(timeout=60000)
         page.get_by_text("Profitability:").wait_for(timeout=60000)
         page.wait_for_timeout(1500)
         page.screenshot(path=str(screenshot_path), full_page=True)
