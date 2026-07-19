@@ -2,6 +2,12 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-19
+
+- `910f0800` — Charter Options Made Simple witness jobs (#5383) (`docs/SOP/`)
+- `e8f6cf67` — Fix late automerge CI rerun (#5390) (`docs/SOP/`)
+- `829a68ff` — Control-plane: dev changelog
+
 ## 2026-07-18
 
 - `d22ad666` — Merge PR #5393: Research Decision Dashboard v0
