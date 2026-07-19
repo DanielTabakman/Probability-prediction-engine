@@ -525,14 +525,36 @@
       "reason": "[MEDIUM] Asset batch wave 1 batch 3 (OI vol order) \u2014 COIN SLV GLD GOOGL META; GLD/SLV ownership remains here and is not claimed shipped by issue #5376"
     },
     {
-      "chapterId": "ppe_commodity_proxy_tier1_v1",
+      "chapterId": "options_horizon_comparison_v1",
       "status": "ready",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
+      "reason": "[HIGH] Options Made Simple job A; compare deterministic listed expiry/horizon candidates for issue #50 witness."
+    },
+    {
+      "chapterId": "options_expression_fit_ranking_v1",
+      "status": "ready",
+      "priority": "high",
+      "focusPlaybookTier": "P1",
+      "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_OPTIONS_EXPRESSION_FIT_RANKING_V1.md",
+      "reason": "[HIGH] Options Made Simple job B; rank current-main expression candidates with no technical prerequisite on job A."
+    },
+    {
+      "chapterId": "ppe_commodity_proxy_tier1_v1",
+      "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md \u2014 wave 1 batch 4",
-      "reason": "[HIGH] Temporary founder acceptance-witness override \u2014 USO only; batches 2-3 remain incomplete and permanent wave order is not rewritten"
+      "reason": "[HOLD] USO acceptance-witness override retired; existing USO work must not be reused merely to make the issue #50 witness pass.",
+      "blockedReason": "Founder approved Options Made Simple A -> B as the next genuine PPE product witness. USO requires fresh explicit requeue and refreshed native evidence before READY.",
+      "reactivationCondition": "Founder-approved explicit requeue with refreshed native evidence packet; not issue #50 A -> B witness work."
     },
     {
       "chapterId": "ppe_cme_commodity_v1",

@@ -329,9 +329,21 @@
       "selectionPrep": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md"
     },
     {
-      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "planPath": "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
       "status": "ready",
-      "reason": "[HIGH] Founder acceptance-witness override \u2014 USO only",
+      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job A: option horizon comparison.",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
+      "status": "ready",
+      "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job B: best-fit expression ranking; no native prerequisite on job A.",
+      "selectionPrep": "docs/SOP/POST_OPTIONS_EXPRESSION_FIT_RANKING_V1_SELECTION.md"
+    },
+    {
+      "planPath": "docs/SOP/PHASE_PLANS/ppe_commodity_proxy_tier1_v1_relay.json",
+      "status": "skipped",
+      "reason": "[HOLD] USO acceptance-witness override retired for issue #50; must not be reused merely to make the witness pass.",
       "selectionPrep": "docs/SOP/POST_PPE_COMMODITY_PROXY_TIER1_V1_SELECTION.md"
     },
     {

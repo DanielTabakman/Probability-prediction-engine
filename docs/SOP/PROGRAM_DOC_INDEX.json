@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T16:36:16Z",
-  "program_count": 13,
+  "generated_at": "2026-07-19T01:50:11Z",
+  "program_count": 15,
   "programs": [
     {
       "module_id": "cross_venue_event_gap",
@@ -36,6 +36,10 @@
     },
     {
       "module_id": null,
+      "program_doc": "docs/SOP/MARKET_PROPOSAL_HEDGE_CAPACITY_PREVIEW_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
       "program_doc": "docs/SOP/PPE_ASSET_DISPLAY_PARITY_PROGRAM_V1.md"
     },
     {
@@ -49,6 +53,10 @@
     {
       "module_id": null,
       "program_doc": "docs/SOP/PPE_TRADEABLE_UNIVERSE_PROGRAM_V1.md"
+    },
+    {
+      "module_id": null,
+      "program_doc": "docs/SOP/RESEARCH_DECISION_DASHBOARD_PROGRAM_V1.md"
     },
     {
       "module_id": null,
