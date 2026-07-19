@@ -12,8 +12,36 @@ from typing import Any
 import streamlit as st
 
 
-def build_sidebar_state(*, show_bitcoin_default: bool = True) -> dict[str, Any]:
+def build_sidebar_state(
+    *,
+    show_bitcoin_default: bool = True,
+    show_research_review: bool = False,
+    research_review_default: bool = False,
+) -> dict[str, Any]:
     st.sidebar.header("Data")
+    app_surface = "Research Review" if show_research_review and research_review_default else "Probability Engine"
+    if show_research_review:
+        app_surface = st.sidebar.radio(
+            "Surface",
+            ["Probability Engine", "Research Review"],
+            index=1 if research_review_default else 0,
+        )
+    if app_surface == "Research Review":
+        return {
+            "app_surface": app_surface,
+            "show_bitcoin_view": False,
+            "show_markets": False,
+            "show_polymarket": False,
+            "chart_days": 30,
+            "show_forward_curve": False,
+            "show_bull_spreads": False,
+            "show_prediction_spreads": False,
+            "show_options_on_chart": False,
+            "options_in_separate_chart": False,
+            "option_types_on_chart": ["call", "put"],
+            "min_prob_label_pct": 5,
+            "implied_lab_auto_compute": bool(st.session_state.get("implied_lab_auto_compute", False)),
+        }
     show_bitcoin_view = st.sidebar.checkbox(
         "Bitcoin view (chart + questions + implied)", value=show_bitcoin_default
     )
@@ -88,6 +116,7 @@ def build_sidebar_state(*, show_bitcoin_default: bool = True) -> dict[str, Any]:
         implied_auto_compute = bool(st.session_state.get("implied_lab_auto_compute", False))
 
     return {
+        "app_surface": app_surface,
         "show_bitcoin_view": show_bitcoin_view,
         "show_markets": show_markets,
         "show_polymarket": show_polymarket,

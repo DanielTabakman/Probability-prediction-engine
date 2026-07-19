@@ -376,10 +376,12 @@
       "allowed_paths": [
         ".gitignore",
         "scripts/",
+        "fixtures/research_decision_dashboard/",
         "docs/SOP/",
         "docs/CONTROL_PLANE/",
         "AGENTS.md",
         "tests/test_ppe_",
+        "tests/test_research_decision_dashboard.py",
         "tests/test_collect_distribution_stats_snapshot.py",
         "tests/test_relay_",
         "tests/test_phase_",

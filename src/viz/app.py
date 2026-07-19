@@ -36,6 +36,8 @@ from src.viz.tutorial import render_tutorial_section
 PAGE_TITLE = "Probability Engine"
 _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
 _show_debug_ui = _env_flag("PPE_SHOW_DEBUG_UI", False)
+_research_review_enabled = _env_flag("PPE_RESEARCH_REVIEW_UI", False)
+_research_review_default = _env_flag("PPE_RESEARCH_REVIEW_DEFAULT", False)
 _commercial_copy = commercial_surface_copy()
 _cta_private_url, _research_offer = resolve_demo_ctas(
     snapshots_enabled=_snapshots_enabled,
@@ -47,6 +49,19 @@ _cta_private_url, _research_offer = resolve_demo_ctas(
 st.set_page_config(page_title=PAGE_TITLE, page_icon="📈", layout="wide")
 
 if maybe_run_embed_only_early_exit():
+    st.stop()
+
+# --- Sidebar
+sidebar = build_sidebar_state(
+    show_bitcoin_default=True,
+    show_research_review=_research_review_enabled,
+    research_review_default=_research_review_default,
+)
+if sidebar.get("app_surface") == "Research Review":
+    from src.viz.research_decision_dashboard import load_default_research_decision_dashboard
+    from src.viz.research_decision_view import render_research_decision_dashboard
+
+    render_research_decision_dashboard(load_default_research_decision_dashboard())
     st.stop()
 
 if _cta_private_url:
@@ -112,8 +127,6 @@ symbols_full = (config.get("markets") or {}).get("yahoo", {}).get("symbols")
 if symbols_full:
     btc_symbols = {"bitcoin": symbols_full.get("bitcoin", ["BTC-USD", "BTC=F"])}
 
-# --- Sidebar
-sidebar = build_sidebar_state(show_bitcoin_default=True)
 show_bitcoin_view = bool(sidebar["show_bitcoin_view"])
 show_markets = bool(sidebar["show_markets"])
 show_polymarket = bool(sidebar["show_polymarket"])
