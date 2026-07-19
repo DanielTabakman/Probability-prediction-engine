@@ -4,6 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-18
 
+- `d22ad666` — Merge PR #5393: Research Decision Dashboard v0
+- `657ef2f5` — ppe_research_decision_dashboard_v0 product-control repair renderer and smokes (`scripts/`)
+- `691074a8` — ppe_research_decision_dashboard_v0 product implement research review (`src/viz/`)
+- `5fafa504` — Control-plane: dev changelog
 - `91b76029` — Add SOP agent load bundles (`docs/SOP/`)
 - `c3af18ea` — Control-plane: dev changelog
 - `555c0680` — Merge pull request #5392 from DanielTabakman/chatgpt/market-proposal-hedge-capacity-charter
