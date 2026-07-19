@@ -22,8 +22,8 @@ Branch protection and repository rulesets from the **REST API** may return **403
 2. **Public** repo if that is acceptable for the project, or  
 3. **Manual** setup in the GitHub **Settings** UI (branch rules / pull requests); the scripted helper still prints guidance when the API is blocked.  
 4. **Merge on green (Actions workaround)** — keep the repo private on Free and use two workflows:
-   - [`.github/workflows/label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml) — on each PR to **`main`** (non-draft, same-repo branch), creates the **`automerge`** label if missing and applies it (**no manual label**).
-   - [`.github/workflows/merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) — after **CI** *or* **Label PR automerge** completes successfully, merges the PR when the latest **CI** run for the PR head is **success** and the **`automerge`** label is present (squash). Listening to both removes label-vs-CI ordering races.
+   - [`.github/workflows/label-pr-automerge.yml`](../../.github/workflows/label-pr-automerge.yml) — on each PR to **`main`**, applies **`automerge`** only when the PR is non-draft, same-repository, and explicitly opts in with the exact body marker `<!-- ppe-automerge: true -->` (**no manual label**).
+   - [`.github/workflows/merge-on-green.yml`](../../.github/workflows/merge-on-green.yml) — after **CI** completes successfully, merges the PR only when the exact completed **CI** run has one explicit pull-request association for the current PR number, current head, and current base, and the **`automerge`** label is present (squash). The labeling workflow never merges; Merge on Green remains the sole merger.
 
 ### Merge on green (Actions workaround)
 
@@ -31,10 +31,20 @@ Use this when **Allow auto-merge** is greyed out (typical for **private** repos 
 
 1. **One-time:** set **Settings → Actions → General → Workflow permissions** to **Read and write** (see below).  
 2. Merge these workflow files to **`main`** so they run on the default branch.  
-3. Open a **non-draft** PR to **`main`** from a branch in this repo — **`automerge`** is applied automatically; when **CI** is green, **Merge on green** squash-merges.  
+3. Open a **non-draft** PR to **`main`** from a branch in this repo. Add the exact opt-in marker `<!-- ppe-automerge: true -->` to the PR body when the PR is intended to merge automatically. Normal non-draft PRs without the marker remain reviewable and are not labeled. When exact-head **CI** is green, **Merge on green** squash-merges.
 4. **Deploy VPS** runs on push to **`main`** and is **dispatched again** by merge-on-green immediately after squash-merge. The workflow has two jobs: **VPS deploy** (required — SSH rebuild) and **Production witness** (non-blocking — integration checks). Agents should run `python scripts/ensure_production_deploy.py --trigger --wait` after shipping production-facing slices.
 
-**Draft PRs:** no **`automerge`** label while draft; when you mark **Ready for review**, the label workflow runs again and the usual CI → merge path applies.
+**Draft PRs:** no **`automerge`** label while draft, even when the marker is present. When you mark **Ready for review**, the label workflow rechecks the current PR state before applying the label.
+
+**Late opt-in:** GitHub does not create a new workflow run for a `pull_request:labeled` event produced by the repository `GITHUB_TOKEN`; only limited dispatch and pull-request creation/update exceptions create new runs. To avoid a stuck PR after a late marker edit or ready-for-review transition, the label workflow uses `actions: write` to request a full rerun of the latest successful exact-head `ci.yml` pull-request run after it verifies the label is present. The rerun keeps the original workflow run identity, SHA, and ref, so **Merge on green** can still verify the exact run ID on completion.
+
+For `pull_request` workflows, that preserved SHA/ref is the original PR merge context. Head equality is not enough after the base branch advances. Before rerunning, the label workflow inspects each candidate workflow run's associated pull-request record and requires the current PR number, head SHA, head ref when available, base SHA, and base ref to match the current PR. A missing association, ambiguous association, different PR number, stale base SHA, or conflicting head/base ref fails closed and is not treated as current validation.
+
+If an exact-head CI run is already active for the current PR head and current base, the label workflow does not request a duplicate rerun. If the latest current-context exact-head CI completed unsuccessfully, was cancelled, timed out, was skipped, neutral, stale, action-required, or otherwise not successful, the label workflow fails visibly and does not rerun it. If exact-head CI exists but every run is stale-context because the base advanced or the association cannot be proven, the workflow fails visibly and instructs that refreshing or rebasing the PR branch is a separate action that produces ordinary `pull_request:synchronize` CI. The label workflow never updates branches. If a late opt-in has no current-context exact-head CI evidence to rerun, it also fails visibly. The workflow uses only `GITHUB_TOKEN`; no PAT, GitHub App, or new secret is required.
+
+Merge on Green also requires that current-context association before it can merge. It consumes only the explicit `workflow_run.pull_requests` association from the completed `CI` run and does not infer a pull request from a branch name. The workflow fetches the exact workflow run by ID and verifies the ID, workflow name, `pull_request` event, completed/success status, head SHA, run attempt when available, and exactly one pull-request association. The exact workflow-run ID alone is insufficient without a current-context association that matches the currently fetched PR number, head SHA/ref, and base SHA/ref.
+
+A stale-base workflow completion cannot merge. When the associated run base differs from the current PR base, Merge on Green logs both base SHAs and fails closed; base drift requires a separate branch refresh or rebase and ordinary `pull_request:synchronize` CI before automatic merge authority can exist again. Merge on Green refetches the PR immediately before merge, rechecks open/non-draft/unmerged state, marker, `automerge` label, current head and base identity, and the workflow-run association again, then guards the merge with the exact final head SHA and `merge_method: 'squash'`.
 
 ### Stacked PRs (multi-slice chapters)
 
@@ -56,7 +66,7 @@ When slice **A** merges to **`main`** before slice **B** is ready, open **B** wi
 
 **Why a label:** merge-on-green only merges PRs that carry **`automerge`**, so stray or fork PRs are not merged by mistake (fork heads are skipped by the label workflow).
 
-**Permissions:** Uses the default **`GITHUB_TOKEN`** with `contents: write` and `pull-requests: write` (declared in the workflow). The workflow file must live on the **default branch** to receive `workflow_run` events.
+**Permissions:** Uses the default **`GITHUB_TOKEN`**. The label workflow keeps read/write permissions limited to reading contents, writing pull requests/issues for the label, and `actions: write` solely to rerun an existing successful exact-head CI workflow. Merge on Green retains write permissions for its squash merge and deploy dispatch. Workflow files must live on the **default branch** to receive `workflow_run` events.
 
 If merges fail with **403** or **Resource not accessible**, set **Settings → Actions → General → Workflow permissions** to **Read and write permissions** (and allow GitHub Actions to create and approve pull requests, if GitHub shows that sub-option).
 
@@ -120,7 +130,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 
 **Path B — private Free (greyed-out auto-merge):**
 
-1. Open a PR to **`main`** from a branch in this repo (non-draft). **`automerge`** is added by **Label PR automerge**; **CI** runs; **Merge on green** merges after both are satisfied (no **Enable auto-merge** button).  
+1. Open a PR to **`main`** from a branch in this repo (non-draft) and include `<!-- ppe-automerge: true -->` only when automatic squash-merge is intended. **Label PR automerge** applies **`automerge`** after refetching and verifying the current PR state. **CI** runs from the normal PR event, or is rerun only when a late opt-in already has a latest successful PR CI run whose associated PR number, head, and base still match the current PR. **Merge on green** merges only from the resulting successful CI completion after independently verifying the exact run and current PR association (no **Enable auto-merge** button).
 2. **Deploy VPS** runs on the push to **`main`**; post-deploy smoke when you want ([DEMO_UI_RELEASE_CHECKLIST.md](DEMO_UI_RELEASE_CHECKLIST.md) §5).
 
 ## Troubleshooting (steward)
@@ -129,7 +139,7 @@ If you turn on a **merge queue** for `main`, add the `merge_group` trigger to CI
 |--------|----------------|
 | Auto-merge not available | Repo setting **Allow auto-merge**; branch protection may require incompatible rules. **Private Free:** use label **`automerge`** + workflow **Merge on green** ([GITHUB_ZERO_TOUCH_MERGE.md](GITHUB_ZERO_TOUCH_MERGE.md)). |
 | PR stuck “waiting on checks” | Confirm `ci.yml` is on `main` and required check names match **`CI / pytest`** and **`CI / docker_entrypoint`**. SOP-touching PRs also run **`CI / sop_discovery_gate`** (path-filtered; not a required check — skipped jobs do not satisfy branch protection). |
-| Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**. **Private Free:** confirm **Merge on green** ran (Actions tab) and **Workflow permissions** allow read/write. |
+| Checks green but no merge | Conflicts with base branch; or latest **CI** on the PR head is not **success** yet; or PR is **draft**; or the exact `<!-- ppe-automerge: true -->` marker is missing. **Private Free:** confirm **Label PR automerge** applied the label, found a current-base CI association, requested any needed late-opt-in CI rerun, and **Merge on green** ran from a successful CI completion with an explicit current PR number/head/base association. If base drift made prior exact-head CI stale, refresh the branch separately to produce ordinary synchronize CI. |
 | Merged but site old | [PRODUCTION_DEPLOY_PROTOCOL.md](PRODUCTION_DEPLOY_PROTOCOL.md) §D; confirm **Deploy VPS** run for that commit. |
 | Child PR green but not merging | Base may still be a feature branch — wait for **Retarget stacked PRs** workflow or run `python scripts/retarget_stacked_prs.py --scan`. |
 

@@ -11,6 +11,11 @@ permissions:
   contents: read
   pull-requests: write
   issues: write
+  actions: write
+
+concurrency:
+  group: label-pr-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   add-label:
@@ -21,20 +26,77 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const pr = context.payload.pull_request;
+            const eventPr = context.payload.pull_request;
             const marker = '<!-- ppe-automerge: true -->';
+            const activeStatuses = new Set(['queued', 'in_progress', 'requested', 'waiting', 'pending']);
+            const lateOptInActions = new Set(['edited', 'ready_for_review']);
+            const normalCiActions = new Set(['opened', 'reopened']);
+            const formatAssociation = (prRef) => {
+              if (!prRef) return 'missing association';
+              const head = prRef.head || {};
+              const base = prRef.base || {};
+              return `number=${prRef.number || 'unknown'} head_sha=${head.sha || 'missing'} head_ref=${head.ref || 'missing'} base_sha=${base.sha || 'missing'} base_ref=${base.ref || 'missing'}`;
+            };
+            const classifyRunContext = (run, pr) => {
+              const refs = run.pull_requests || [];
+              if (refs.length !== 1) {
+                return {
+                  current: false,
+                  reason: refs.length === 0 ? 'missing PR association' : `ambiguous PR associations (${refs.length})`,
+                  observed: refs.map(formatAssociation),
+                };
+              }
+              const ref = refs[0];
+              const head = ref.head || {};
+              const base = ref.base || {};
+              const observed = formatAssociation(ref);
+              if (ref.number !== pr.number) {
+                return { current: false, reason: `associated PR #${ref.number} does not match current PR #${pr.number}`, observed: [observed] };
+              }
+              if (head.sha !== pr.head.sha) {
+                return { current: false, reason: `associated head SHA ${head.sha || 'missing'} does not match current head ${pr.head.sha}`, observed: [observed] };
+              }
+              if (head.ref && head.ref !== pr.head.ref) {
+                return { current: false, reason: `associated head ref ${head.ref} does not match current head ref ${pr.head.ref}`, observed: [observed] };
+              }
+              if (base.sha !== pr.base.sha) {
+                return { current: false, reason: `associated base SHA ${base.sha || 'missing'} does not match current base ${pr.base.sha}`, observed: [observed] };
+              }
+              if (base.ref && base.ref !== pr.base.ref) {
+                return { current: false, reason: `associated base ref ${base.ref} does not match current base ref ${pr.base.ref}`, observed: [observed] };
+              }
+              return { current: true, reason: 'current-context PR association', observed: [observed] };
+            };
 
-            if (pr.draft) {
+            if (eventPr.draft) {
               core.info('Draft PR; skip automerge label');
               return;
             }
-            const headFull = pr.head.repo.full_name;
+            const headFull = eventPr.head.repo.full_name;
             if (headFull !== `${owner}/${repo}`) {
               core.info(`Fork or foreign head (${headFull}); skip automerge label`);
               return;
             }
-            if (!(pr.body || '').includes(marker)) {
-              core.info(`PR #${pr.number} has no explicit ${marker} marker; skip automerge label`);
+            if (!(eventPr.body || '').includes(marker)) {
+              core.info(`PR #${eventPr.number} has no explicit ${marker} marker; skip automerge label`);
+              return;
+            }
+
+            const { data: currentPr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: eventPr.number,
+            });
+            if (currentPr.state !== 'open' || currentPr.draft || currentPr.merged) {
+              core.setFailed(`PR #${eventPr.number} is not open, non-draft, and unmerged`);
+              return;
+            }
+            if (currentPr.head.sha !== eventPr.head.sha) {
+              core.setFailed(`PR #${eventPr.number} moved from event SHA ${eventPr.head.sha} to ${currentPr.head.sha}`);
+              return;
+            }
+            if (!(currentPr.body || '').includes(marker)) {
+              core.setFailed(`PR #${eventPr.number} lost explicit automerge marker before labeling`);
               return;
             }
 
@@ -51,10 +113,128 @@ jobs:
               });
             }
 
-            await github.rest.issues.addLabels({
+            if (!currentPr.labels.some((label) => label.name === 'automerge')) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: currentPr.number,
+                labels: ['automerge'],
+              });
+              core.notice(`Added explicit automerge label to PR #${currentPr.number}`);
+            } else {
+              core.info(`Explicit automerge label already present on PR #${currentPr.number}`);
+            }
+
+            const { data: labeledPr } = await github.rest.pulls.get({
               owner,
               repo,
-              issue_number: pr.number,
-              labels: ['automerge'],
+              pull_number: currentPr.number,
             });
-            core.notice(`Added explicit automerge label to PR #${pr.number}`);
+            if (labeledPr.state !== 'open' || labeledPr.draft || labeledPr.merged) {
+              core.setFailed(`PR #${currentPr.number} changed state after labeling`);
+              return;
+            }
+            if (labeledPr.head.sha !== currentPr.head.sha) {
+              core.setFailed(`PR #${currentPr.number} moved after labeling from ${currentPr.head.sha} to ${labeledPr.head.sha}`);
+              return;
+            }
+            if (!(labeledPr.body || '').includes(marker)) {
+              core.setFailed(`PR #${currentPr.number} lost explicit automerge marker after labeling`);
+              return;
+            }
+            if (!labeledPr.labels.some((label) => label.name === 'automerge')) {
+              core.setFailed(`PR #${currentPr.number} does not have automerge label after label step`);
+              return;
+            }
+
+            const workflowRuns = await github.paginate(github.rest.actions.listWorkflowRuns, {
+              owner,
+              repo,
+              workflow_id: 'ci.yml',
+              head_sha: labeledPr.head.sha,
+              event: 'pull_request',
+              per_page: 100,
+            });
+            const exactRuns = workflowRuns
+              .filter((run) => run.head_sha === labeledPr.head.sha && run.event === 'pull_request')
+              .sort((a, b) => {
+                const byTime = new Date(b.created_at) - new Date(a.created_at);
+                return byTime || b.id - a.id;
+              });
+            const classifiedRuns = exactRuns.map((run) => ({
+              run,
+              context: classifyRunContext(run, labeledPr),
+            }));
+            const currentContextRuns = classifiedRuns
+              .filter((item) => item.context.current)
+              .map((item) => item.run);
+            const staleContextRuns = classifiedRuns
+              .filter((item) => !item.context.current);
+            for (const item of staleContextRuns) {
+              core.warning(`Stale-context exact-head CI run ${item.run.id}: ${item.context.reason}; observed=${item.context.observed.join(' | ')}`);
+            }
+            const activeRuns = currentContextRuns.filter((run) => activeStatuses.has(run.status));
+            if (activeRuns.length > 1) {
+              core.setFailed(`Multiple active current-context exact-head CI runs for PR #${labeledPr.number}: ${activeRuns.map((run) => run.id).join(', ')}`);
+              return;
+            }
+            if (activeRuns.length === 1) {
+              const active = activeRuns[0];
+              core.notice(`PR #${labeledPr.number} has automerge label; active current-context exact-head CI run ${active.id} (${active.status}) will own Merge on Green`);
+              return;
+            }
+
+            const latest = currentContextRuns[0];
+            if (!latest) {
+              if (exactRuns.length === 0 && normalCiActions.has(context.payload.action)) {
+                core.info(`No exact-head CI exists yet for PR #${labeledPr.number}; normal ${context.payload.action} CI may still be materializing`);
+                return;
+              }
+              if (exactRuns.length > 0) {
+                core.setFailed(`Exact-head CI exists for PR #${labeledPr.number}, but no current-context run matches PR #${labeledPr.number} head ${labeledPr.head.sha} base ${labeledPr.base.sha}; base advanced or CI association cannot be proven. Refresh the PR branch against current main to produce ordinary pull_request:synchronize CI before automerge rerun.`);
+                return;
+              }
+              core.setFailed(`Late automerge opt-in for PR #${labeledPr.number} has no current-context exact-head CI run to rerun`);
+              return;
+            }
+            if (latest.status !== 'completed' || latest.conclusion !== 'success') {
+              core.setFailed(`Latest current-context exact-head CI run ${latest.id} for PR #${labeledPr.number} is ${latest.status}/${latest.conclusion}; refusing automatic rerun`);
+              return;
+            }
+            if (!lateOptInActions.has(context.payload.action) && !normalCiActions.has(context.payload.action)) {
+              core.setFailed(`Unsupported automerge label action ${context.payload.action}`);
+              return;
+            }
+
+            const { data: finalPr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: labeledPr.number,
+            });
+            if (finalPr.state !== 'open' || finalPr.draft || finalPr.merged) {
+              core.setFailed(`PR #${labeledPr.number} changed state before CI rerun`);
+              return;
+            }
+            if (!(finalPr.body || '').includes(marker)) {
+              core.setFailed(`PR #${labeledPr.number} lost explicit automerge marker before CI rerun`);
+              return;
+            }
+            if (!finalPr.labels.some((label) => label.name === 'automerge')) {
+              core.setFailed(`PR #${labeledPr.number} lost automerge label before CI rerun`);
+              return;
+            }
+            if (finalPr.head.sha !== labeledPr.head.sha || finalPr.head.ref !== labeledPr.head.ref) {
+              core.setFailed(`PR #${labeledPr.number} head moved before CI rerun`);
+              return;
+            }
+            if (finalPr.base.sha !== labeledPr.base.sha || finalPr.base.ref !== labeledPr.base.ref) {
+              core.setFailed(`PR #${labeledPr.number} base moved before CI rerun`);
+              return;
+            }
+
+            const response = await github.rest.actions.reRunWorkflow({
+              owner,
+              repo,
+              run_id: latest.id,
+            });
+            core.notice(`Requested full rerun of current-context exact-head CI run ${latest.id} for PR #${labeledPr.number} at head ${finalPr.head.sha} base ${finalPr.base.sha}; original conclusion=${latest.conclusion}; response=${response.status}`);
