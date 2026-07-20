@@ -17,6 +17,8 @@ CANON = [
     "docs/SOP/PIPELINE_CREATION_SOP_V1.md",
     "docs/SOP/SCHEDULED_AUTOBUILDER_LANE_POLICY_V1.md",
 ]
+OPTIONS_A_ID = "options_horizon_comparison_v1"
+OPTIONS_B_ID = "options_expression_fit_ranking_v1"
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -165,6 +167,10 @@ def _hash_tree(root: Path) -> dict[str, str]:
         rel = path.relative_to(root).as_posix()
         hashes[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
     return hashes
+
+
+def _ppe_pipeline(snapshot: dict) -> dict:
+    return next(pipe for pipe in snapshot["pipelines"] if pipe["pipeline_id"] == "ppe")
 
 
 def test_commands_lists_only_founder_vocabulary() -> None:
@@ -793,6 +799,363 @@ def test_selection_fairness_prefers_pipeline_without_active_work() -> None:
         },
     ]
     assert _recommend_next(snapshot)["pipeline_id"] == "idle"
+
+
+def _excluded_selection_context(*work_item_ids: str) -> dict:
+    return {
+        "excluded_work_item_ids": sorted(work_item_ids),
+        "matched_exclusions": [{"pipeline_id": "ppe", "work_item_id": item} for item in sorted(work_item_ids)],
+        "unmatched_exclusions": [],
+        "scope": "request",
+        "effect": "exclusions remove matching READY candidates from recommendation eligibility only; ready_work is unchanged",
+    }
+
+
+def _ready_work(work_item_id: str) -> dict:
+    return {
+        "work_item_id": work_item_id,
+        "title": work_item_id,
+        "evidence": "manual",
+        "selection": {
+            "founder_priority_rank": 1,
+            "deadline_rank": "9999-12-31T00:00:00+00:00",
+            "dependency_unblock_value": 1,
+            "age_index": 0,
+        },
+    }
+
+
+def test_all_ready_excluded_preserves_awaiting_review_recommendation() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a", "ready-b")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "READY_TO_BUILD",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a"), _ready_work("ready-b")],
+            "awaiting_review_work": [{"work_item_id": "review-me", "evidence": "manual"}],
+            "next_action": {"state": "READY_TO_BUILD", "work_item_id": "ready-a", "action_type": "build"},
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "AWAITING_REVIEW"
+    assert rec["action_type"] == "review"
+    assert rec["work_item_id"] == "review-me"
+    assert rec["selection_context"] == context
+
+
+def test_all_ready_excluded_preserves_running_recommendation() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "RUNNING",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [{"work_item_id": "active"}],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "RUNNING",
+                "action_type": "wait",
+                "summary": "Work is already running.",
+                "work_item_id": "active",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "RUNNING"
+    assert rec["work_item_id"] == "active"
+    assert rec["selection_context"] == context
+
+
+def test_all_ready_excluded_preserves_awaiting_founder_recommendation() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "AWAITING_FOUNDER",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "AWAITING_FOUNDER",
+                "action_type": "founder decision",
+                "summary": "Founder decision required.",
+                "work_item_id": "decision",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "AWAITING_FOUNDER"
+    assert rec["work_item_id"] == "decision"
+    assert rec["selection_context"] == context
+
+
+def test_all_ready_excluded_preserves_blocked_recommendation() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "BLOCKED",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "BLOCKED",
+                "action_type": "evidence check",
+                "summary": "Resolve blocker.",
+                "work_item_id": "blocker",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "BLOCKED"
+    assert rec["work_item_id"] == "blocker"
+    assert rec["selection_context"] == context
+
+
+def test_all_ready_excluded_preserves_backpressure_recommendation() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "BACKPRESSURE",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "BACKPRESSURE",
+                "action_type": "wait",
+                "summary": "Backpressure is active.",
+                "work_item_id": "pressure",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "BACKPRESSURE"
+    assert rec["work_item_id"] == "pressure"
+    assert rec["selection_context"] == context
+
+
+def test_all_ready_excluded_keeps_special_unfilled_ahead_of_complete_fallback() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "COMPLETE",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "COMPLETE",
+                "action_type": "wait",
+                "summary": "Pipeline complete.",
+                "work_item_id": "complete",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "UNFILLED"
+    assert rec["work_item_id"] is None
+    assert "excluded by request context" in rec["summary"]
+
+
+def test_all_ready_excluded_does_not_reintroduce_excluded_build_fallback() -> None:
+    from scripts.founder_portfolio import _recommend_next
+
+    context = _excluded_selection_context("ready-a")
+    snapshot = [
+        {
+            "pipeline_id": "ppe",
+            "state": "READY_TO_BUILD",
+            "evidence": [{"kind": "manual"}],
+            "running_work": [],
+            "queued_work": [],
+            "ready_work": [_ready_work("ready-a")],
+            "awaiting_review_work": [],
+            "next_action": {
+                "state": "READY_TO_BUILD",
+                "action_type": "build",
+                "summary": "Ready fallback",
+                "work_item_id": "ready-a",
+                "evidence": "manual",
+            },
+        }
+    ]
+
+    rec = _recommend_next(snapshot, selection_context=context)
+
+    assert rec["state"] == "UNFILLED"
+    assert rec["work_item_id"] is None
+    assert "excluded by request context" in rec["summary"]
+
+
+def test_selection_context_without_exclusions_preserves_options_a_recommendation(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+
+    snapshot = collect_portfolio(REPO)
+    ppe = _ppe_pipeline(snapshot)
+
+    assert snapshot["version"] == 1
+    assert snapshot["selection_context"] == {
+        "excluded_work_item_ids": [],
+        "matched_exclusions": [],
+        "unmatched_exclusions": [],
+        "scope": "request",
+        "effect": "exclusions remove matching READY candidates from recommendation eligibility only; ready_work is unchanged",
+    }
+    assert [item["work_item_id"] for item in ppe["ready_work"][:2]] == [OPTIONS_A_ID, OPTIONS_B_ID]
+    assert snapshot["recommended_next_action"]["work_item_id"] == OPTIONS_A_ID
+
+
+def test_selection_context_excluding_options_a_recommends_b_and_keeps_ready_work(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+
+    snapshot = collect_portfolio(REPO, excluded_work_item_ids=[OPTIONS_A_ID])
+    ppe = _ppe_pipeline(snapshot)
+    ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
+    rec = snapshot["recommended_next_action"]
+
+    assert ready_ids[:2] == [OPTIONS_A_ID, OPTIONS_B_ID]
+    assert rec["work_item_id"] == OPTIONS_B_ID
+    assert rec["selection_rank"][:3] == [1, "9999-12-31T00:00:00+00:00", -10]
+    assert rec["selection_context"] == snapshot["selection_context"]
+    assert rec["selection_explanation"]["selection_context"] == snapshot["selection_context"]
+    assert snapshot["selection_context"]["matched_exclusions"] == [
+        {"pipeline_id": "ppe", "work_item_id": OPTIONS_A_ID}
+    ]
+    assert snapshot["selection_context"]["unmatched_exclusions"] == []
+
+
+def test_selection_context_excluding_options_pair_preserves_existing_blocked_action(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+
+    snapshot = collect_portfolio(REPO, excluded_work_item_ids=[OPTIONS_A_ID, OPTIONS_B_ID])
+    rec = snapshot["recommended_next_action"]
+
+    assert rec["state"] == "BLOCKED"
+    assert rec["action_type"] == "evidence check"
+    assert rec["pipeline_id"] == "autobuilder"
+    assert "external runtime source is unavailable" in rec["summary"]
+    assert snapshot["selection_context"]["matched_exclusions"] == [
+        {"pipeline_id": "ppe", "work_item_id": OPTIONS_B_ID},
+        {"pipeline_id": "ppe", "work_item_id": OPTIONS_A_ID},
+    ]
+
+
+def test_selection_context_unknown_exclusion_reports_unmatched_without_blocking(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+
+    snapshot = collect_portfolio(REPO, excluded_work_item_ids=["missing_work_item"])
+
+    assert snapshot["recommended_next_action"]["work_item_id"] == OPTIONS_A_ID
+    assert snapshot["selection_context"]["matched_exclusions"] == []
+    assert snapshot["selection_context"]["unmatched_exclusions"] == ["missing_work_item"]
+
+
+def test_selection_context_deduplicates_and_sorts_exclusions(monkeypatch) -> None:
+    from scripts.founder_portfolio import collect_portfolio
+
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+
+    first = collect_portfolio(REPO, excluded_work_item_ids=[OPTIONS_B_ID, OPTIONS_A_ID, OPTIONS_A_ID])
+    second = collect_portfolio(REPO, excluded_work_item_ids=[OPTIONS_A_ID, OPTIONS_B_ID])
+
+    assert first["selection_context"] == second["selection_context"]
+    assert first["selection_context"]["excluded_work_item_ids"] == [OPTIONS_B_ID, OPTIONS_A_ID]
+    assert first["recommended_next_action"]["state"] == second["recommended_next_action"]["state"] == "BLOCKED"
+    assert first["recommended_next_action"]["pipeline_id"] == second["recommended_next_action"]["pipeline_id"]
+
+
+def test_cli_exclusion_contract_is_json_and_read_only(monkeypatch) -> None:
+    monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
+    before = subprocess.run(
+        ["git", "diff", "--name-only"],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+    ).stdout
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(REPO / "scripts/founder_portfolio.py"),
+            "what's next",
+            "--repo-root",
+            str(REPO),
+            "--json",
+            "--exclude-work-item-id",
+            OPTIONS_A_ID,
+        ],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    after = subprocess.run(
+        ["git", "diff", "--name-only"],
+        cwd=REPO,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=True,
+    ).stdout
+    payload = json.loads(proc.stdout)
+
+    assert proc.returncode == 0
+    assert before == after
+    assert payload["recommended_next_action"]["work_item_id"] == OPTIONS_B_ID
+    assert payload["selection_context"]["excluded_work_item_ids"] == [OPTIONS_A_ID]
 
 
 def test_unsupported_build_next_does_not_dispatch() -> None:

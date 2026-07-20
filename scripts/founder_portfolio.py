@@ -1184,7 +1184,7 @@ def _autobuilder_next_action(
     }
 
 
-def collect_portfolio(repo: Path) -> dict[str, Any]:
+def collect_portfolio(repo: Path, excluded_work_item_ids: list[str] | None = None) -> dict[str, Any]:
     repo = repo.resolve()
     errors = validate_registry(repo)
     registry = load_registry(repo)
@@ -1227,6 +1227,7 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
     queued_count = sum(len(p.get("queued_work") or []) for p in snapshots)
     awaiting_review_count = sum(len(p.get("awaiting_review_work") or []) for p in snapshots)
     configured_max = int(capacity_cfg.get("future_steady_state_build_workers") or 2)
+    selection_context = _selection_context(snapshots, excluded_work_item_ids)
     return {
         "version": 1,
         "as_of": _utc_now(),
@@ -1245,12 +1246,57 @@ def collect_portfolio(repo: Path) -> dict[str, Any]:
             "source": "config/founder_pipeline_registry.json",
         },
         "pipelines": snapshots,
-        "recommended_next_action": _recommend_next(snapshots),
+        "selection_context": selection_context,
+        "recommended_next_action": _recommend_next(snapshots, selection_context=selection_context),
     }
 
 
-def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
+def _normalize_excluded_work_item_ids(excluded_work_item_ids: list[str] | None) -> list[str]:
+    return sorted({str(item).strip() for item in excluded_work_item_ids or [] if str(item).strip()})
+
+
+def _selection_context(
+    pipelines_snapshot: list[dict[str, Any]],
+    excluded_work_item_ids: list[str] | None,
+) -> dict[str, Any]:
+    excluded = _normalize_excluded_work_item_ids(excluded_work_item_ids)
+    excluded_set = set(excluded)
+    matched: list[dict[str, str]] = []
+    matched_ids: set[str] = set()
+    if excluded_set:
+        for pipe in pipelines_snapshot:
+            for work in pipe.get("ready_work") or []:
+                if not isinstance(work, dict):
+                    continue
+                work_item_id = str(work.get("work_item_id") or "")
+                if work_item_id in excluded_set:
+                    matched.append(
+                        {
+                            "pipeline_id": str(pipe.get("pipeline_id") or ""),
+                            "work_item_id": work_item_id,
+                        }
+                    )
+                    matched_ids.add(work_item_id)
+    matched = sorted(matched, key=lambda item: (item["pipeline_id"], item["work_item_id"]))
+    return {
+        "excluded_work_item_ids": excluded,
+        "matched_exclusions": matched,
+        "unmatched_exclusions": [item for item in excluded if item not in matched_ids],
+        "scope": "request",
+        "effect": "exclusions remove matching READY candidates from recommendation eligibility only; ready_work is unchanged",
+    }
+
+
+def _recommend_next(
+    pipelines_snapshot: list[dict[str, Any]],
+    *,
+    selection_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    selection_context = selection_context or _selection_context(pipelines_snapshot, None)
+    excluded_work_item_ids = set(selection_context.get("excluded_work_item_ids") or [])
     ready_candidates: list[tuple[tuple[Any, ...], dict[str, Any], dict[str, Any]]] = []
+    excluded_ready_count = 0
+    ready_candidate_count = 0
     for pipe in pipelines_snapshot:
         if str(pipe.get("state") or "") in {"BLOCKED", "BACKPRESSURE"}:
             continue
@@ -1258,6 +1304,10 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
         active_in_pipeline = len(pipe.get("running_work") or []) + len(pipe.get("queued_work") or [])
         for work in pipe.get("ready_work") or []:
             if not isinstance(work, dict):
+                continue
+            ready_candidate_count += 1
+            if str(work.get("work_item_id") or "") in excluded_work_item_ids:
+                excluded_ready_count += 1
                 continue
             selection = work.get("selection") if isinstance(work.get("selection"), dict) else {}
             rank = (
@@ -1282,8 +1332,11 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
             "work_item_id": work.get("work_item_id"),
             "evidence": work.get("evidence"),
             "selection_rank": list(rank),
-            "selection_explanation": _selection_explanation(pipe, work, rank),
+            "selection_context": selection_context,
+            "selection_explanation": _selection_explanation(pipe, work, rank, selection_context),
         }
+
+    all_ready_candidates_excluded = bool(ready_candidate_count and excluded_ready_count == ready_candidate_count)
 
     review_candidates = [
         (str(pipe.get("pipeline_id") or ""), pipe, item)
@@ -1300,6 +1353,7 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
             "summary": f"Review {item.get('work_item_id') or 'candidate'}",
             "work_item_id": item.get("work_item_id"),
             "evidence": item.get("evidence"),
+            "selection_context": selection_context,
         }
 
     pipeline_actions = []
@@ -1307,7 +1361,34 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
     for pipe in pipelines_snapshot:
         action = pipe.get("next_action") if isinstance(pipe.get("next_action"), dict) else {}
         state = str(action.get("state") or pipe.get("state") or "BLOCKED")
+        if state == "READY_TO_BUILD" and str(action.get("work_item_id") or "") in excluded_work_item_ids:
+            continue
         pipeline_actions.append((action_priority.get(state, 99), str(pipe.get("pipeline_id") or ""), pipe, action))
+
+    sorted_pipeline_actions = sorted(pipeline_actions, key=lambda item: (item[0], item[1]))
+    if sorted_pipeline_actions and sorted_pipeline_actions[0][0] < action_priority["UNFILLED"]:
+        _, _, pipe, action = sorted_pipeline_actions[0]
+        return {
+            "pipeline_id": pipe.get("pipeline_id"),
+            "state": action.get("state") or pipe.get("state"),
+            "action_type": action.get("action_type"),
+            "summary": action.get("summary"),
+            "work_item_id": action.get("work_item_id"),
+            "evidence": action.get("evidence"),
+            "selection_context": selection_context,
+        }
+
+    if all_ready_candidates_excluded:
+        return {
+            "pipeline_id": None,
+            "state": "UNFILLED",
+            "action_type": "build",
+            "summary": "READY_TO_BUILD items exist, but all eligible build candidates were excluded by request context.",
+            "work_item_id": None,
+            "evidence": "request_scoped_selection_context",
+            "selection_context": selection_context,
+        }
+
     if not pipeline_actions:
         return {
             "pipeline_id": None,
@@ -1315,8 +1396,9 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
             "action_type": "evidence check",
             "summary": "No registered pipelines.",
             "evidence": "missing",
+            "selection_context": selection_context,
         }
-    _, _, pipe, action = sorted(pipeline_actions, key=lambda item: (item[0], item[1]))[0]
+    _, _, pipe, action = sorted_pipeline_actions[0]
     return {
         "pipeline_id": pipe.get("pipeline_id"),
         "state": action.get("state") or pipe.get("state"),
@@ -1324,6 +1406,7 @@ def _recommend_next(pipelines_snapshot: list[dict[str, Any]]) -> dict[str, Any]:
         "summary": action.get("summary"),
         "work_item_id": action.get("work_item_id"),
         "evidence": action.get("evidence"),
+        "selection_context": selection_context,
     }
 
 
@@ -1339,7 +1422,12 @@ def _pipeline_evidence_rank(pipe: dict[str, Any]) -> int:
     return 3
 
 
-def _selection_explanation(pipe: dict[str, Any], work: dict[str, Any], rank: tuple[Any, ...]) -> dict[str, Any]:
+def _selection_explanation(
+    pipe: dict[str, Any],
+    work: dict[str, Any],
+    rank: tuple[Any, ...],
+    selection_context: dict[str, Any],
+) -> dict[str, Any]:
     selection = work.get("selection") if isinstance(work.get("selection"), dict) else {}
     return {
         "policy": [
@@ -1360,6 +1448,7 @@ def _selection_explanation(pipe: dict[str, Any], work: dict[str, Any], rank: tup
             "age_index": selection.get("age_index"),
         },
         "rank_tuple": list(rank),
+        "selection_context": selection_context,
         "why": "Selected the lowest deterministic rank among safe READY_TO_BUILD items; blocked/stale pipelines are excluded.",
     }
 
@@ -1477,6 +1566,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("command", nargs="*", help="commands | what's next | what's running")
     ap.add_argument("--repo-root", type=Path, default=ROOT)
     ap.add_argument("--json", action="store_true")
+    ap.add_argument(
+        "--exclude-work-item-id",
+        action="append",
+        default=[],
+        help="Request-scoped READY work item ID to exclude from recommended_next_action eligibility.",
+    )
     args = ap.parse_args(argv)
 
     command = _normalize_command(args.command or ["commands"])
@@ -1498,7 +1593,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 2
 
-    snapshot = collect_portfolio(repo)
+    snapshot = collect_portfolio(repo, excluded_work_item_ids=args.exclude_work_item_id)
     if args.json:
         print(json.dumps(snapshot, indent=2))
     elif command == "what's next":
