@@ -4,6 +4,7 @@
 **As-of:** 2026-07-20  
 **Owner:** MSOS steward  
 **Core engine:** [`MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md`](MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md)  
+**Execution decisions:** [`MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md`](MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md)  
 **Deferred feasibility issue:** [#5396 — HBCC Stage 0 single-contract compilation witness](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5396)
 
 ## 1. Executive decision
@@ -618,40 +619,4 @@ No production code, live-market execution, custody, token issuance, deployment, 
 7. Product honesty: liquidity is transformed and bounded, never described as infinite.
 8. Tax boundary: tokenization does not itself prove tax deferral.
 9. Regulatory boundary: non-custodial architecture does not itself remove operator obligations.
-10. Expansion path: price-state contracts first, market-event contracts later, broader external events only after explicit modeling and resolution work.
-11. Current priority: Autobuilder completion before HBCC implementation.
-
-## 18. Non-goals of the current planning phase
-
-- implementing the compiler;
-- running issue #5396;
-- selecting a chain or final custody model;
-- deploying claim tokens;
-- operating an exchange or market maker;
-- taking customer funds;
-- making legal or tax claims;
-- claiming that every financial question is hedgeable;
-- treating implied volatility as a direct probability of a named event;
-- broad politics, weather, sports, or personal-event markets in the initial supported language.
-
-## 19. Current decision
-
-Continue product theory, architecture, and chartering only.
-
-Do not begin HBCC implementation until:
-
-1. the Autobuilder is complete;
-2. this product vision and the HBCC charter are accepted;
-3. the founder explicitly selects the next HBCC feasibility stage;
-4. implementation ownership is assigned through the control plane.
-
-## COORDINATION STATUS
-
-Agreement: partial  
-Compared: accepted hedge-backed event-liquidity charter; accepted Stage 0 and Stage 0.1 evidence; HBCC charter PR; founder personalized-market thesis in the current charter thread  
-Disagreement: earlier HBCC framing emphasized an internal research/operator tool and immediate Stage 0 execution; this vision makes the personalized first-party market plus API the controlling product direction and defers implementation until the Autobuilder is complete  
-Evidence gap: external hedge capacity, user demand, on-chain operating model, tax treatment, and regulatory pathway are not yet proven  
-Ownership overlap: none for planning documentation; future implementation may overlap PPE distribution, cross-venue data, execution, settlement, and Autobuilder-managed delivery paths  
-Risk if unresolved: the project could optimize a narrow hedge scanner while missing the larger personalized-market product, or overstate smart-contract, liquidity, tax, or regulatory properties  
-Recommended default: accept this vision as the parent product charter, keep issue #5396 deferred, and continue only bounded planning work  
-Founder decision required: yes — accept, revise, or reject this vision
+10. Execution detail: `MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md` controls hedge granularity, fractionalization, RFQ quoting, residual and settlement risk, API-first go-to-market, custody alternatives, legal gate, and initial fee-model hypotheses.
