@@ -4,30 +4,32 @@
 **As-of:** 2026-07-20  
 **Issue:** [#5396](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5396)  
 **Parent product vision:** [`../VISION/MSOS/MSOS_PERSONALIZED_MARKET_COMPILATION_VISION_V0_1.md`](../VISION/MSOS/MSOS_PERSONALIZED_MARKET_COMPILATION_VISION_V0_1.md)  
-**Core-engine charter:** [`../VISION/MSOS/MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md`](../VISION/MSOS/MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md)
+**Core-engine charter:** [`../VISION/MSOS/MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md`](../VISION/MSOS/MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md)  
+**Execution decisions:** [`../VISION/MSOS/MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md`](../VISION/MSOS/MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md)
 
 ## Execution gate
 
 Do not launch this packet until all of the following are true:
 
 1. the Autobuilder is complete;
-2. the personalized-market vision and HBCC charter are accepted on the default branch;
+2. the personalized-market vision, HBCC charter, and execution decisions are accepted on the default branch;
 3. the founder explicitly selects HBCC Stage 0;
 4. one implementation writer is assigned through the control plane;
 5. current market-data and external-review assumptions are reconfirmed.
 
 Until then, this document is a retained future handoff, not active implementation scope.
 
-## Thread setup after authorization
+## Thread setup
 
 ```text
 Implementation thread. THREAD_ROLE: codex_build.
 Repository: DanielTabakman/Probability-prediction-engine.
-Implement only issue #5396.
+Implement only issue #5396 after its deferred state is explicitly removed.
 GitHub is the source of truth. Relay: off.
 Read docs/SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md,
 docs/VISION/MSOS/MSOS_PERSONALIZED_MARKET_COMPILATION_VISION_V0_1.md,
 docs/VISION/MSOS/MSOS_HEDGE_BACKED_CONTRACT_COMPILER_INITIATIVE_V0_1.md,
+docs/VISION/MSOS/MSOS_PERSONALIZED_MARKET_EXECUTION_DECISIONS_V0_1.md,
 and this packet before editing.
 Do not change product direction or acceptance criteria.
 Before editing, report ownership overlap and any disagreement with the charter.
@@ -43,25 +45,21 @@ Build and run one offline, public-data BTC witness that starts from a real two-l
 
 The witness must quantify the complete terminal residual function, executable entry cost, settlement compatibility, displayed-depth capacity, and compiler verdict for both candidates.
 
-## Product context
-
-This witness is not the full product. The controlling product is a personalized market with a blank-box interface and API, supported by HBCC.
-
-The witness is a system-level calibration test that asks whether one payoff primitive can be:
-
-- represented honestly;
-- priced from executable hedge markets;
-- capacity-limited;
-- compared on a common economic basis;
-- emitted without silently changing its payout.
+It must record external hedge-lot granularity separately from customer denomination. The witness may analyze fractional customer claims conceptually, but it does not implement token issuance, batching, pooling, or live fractional hedging.
 
 ## Why this matters
 
-The personalized-market thesis depends on bespoke claims inheriting liquidity from shared standardized instruments.
+The HBCC concept is not empirically validated until one real structure shows whether payout semantics, settlement, executable price, capacity, and residual exposure can be preserved honestly.
 
-The witness tests the smallest defensible instance of that mechanism and prevents the central failure mode:
+The witness must prevent the central failure modes:
 
-> treating a finite-width call-spread ramp as though it were an exact binary payoff.
+> treating a finite-width call-spread ramp as though it were an exact binary payoff;
+
+and:
+
+> treating option-lot fractionalization as though it creates additional aggregate liquidity.
+
+This is a system-level calibration and honesty test beneath the personalized market vision. It is not the product itself.
 
 ## Binding prior evidence
 
@@ -96,7 +94,7 @@ Do not broadly refactor the existing Polymarket witness.
 
 ## Required domain objects
 
-The implementation may use dataclasses, typed dictionaries, or Pydantic according to repository conventions, but must preserve these semantic objects.
+The implementation may use dataclasses, typed dictionaries, or Pydantic according to existing repository conventions, but must preserve these semantic objects.
 
 ### `ContractSpec`
 
@@ -104,11 +102,14 @@ Required fields:
 
 - `contract_id`;
 - `contract_type` (`strict_binary_above` or `capped_linear_call_spread`);
-- underlying;
-- lower and upper thresholds as applicable;
-- terminal timestamp and timezone;
-- denomination and payout cap;
-- exact machine-readable payoff formula;
+- `underlying`;
+- `lower_strike`;
+- `upper_strike` where applicable;
+- `threshold` where applicable;
+- `expiry_timestamp`;
+- `payout_currency`;
+- `payout_cap`;
+- machine-readable piecewise payout;
 - user-facing wording;
 - semantic-equivalence proof state.
 
@@ -116,30 +117,47 @@ Required fields:
 
 Required fields:
 
-- source/index;
-- publisher and venue;
-- observation timestamp and timezone;
+- hedge index/source;
+- exact expiry timestamp and timezone;
 - settlement calculation;
-- currency and precision;
-- outage and fallback treatment where official evidence is available;
+- currency and multiplier;
+- outage and fallback evidence where available;
+- correction/finality evidence where available;
 - evidence pointers;
-- explicit unknowns.
+- explicit unknown fields.
 
 ### `HedgeSpec`
 
 Required fields:
 
-- venue and instrument identifiers;
-- option sides, strikes, expiry, quantities, and multiplier normalization;
-- executable bid/ask inputs and source timestamps;
-- displayed depth by leg;
-- terminal hedge payoff;
-- replication class;
-- residual payoff formula;
-- error-bound method;
-- settlement and basis mismatches;
-- fees, slippage, and configurable reserves;
-- constraining leg and capacity methodology.
+- venue;
+- instruments;
+- sides;
+- quantities;
+- strikes and expiry;
+- contract multipliers;
+- executable bid/ask inputs and timestamps;
+- displayed depth;
+- normalized payoff;
+- residual function;
+- residual-bound proof type;
+- settlement compatibility;
+- external hedge-lot granularity;
+- capacity methodology;
+- constraining leg.
+
+### `QuoteSpec`
+
+Research-only output fields:
+
+- indicative replication-cost bid and ask;
+- pass-through fees;
+- configurable risk and operational reserve;
+- research-only platform fee input;
+- available size at current displayed depth;
+- quote timestamp;
+- staleness rule;
+- no-live-execution marker.
 
 ### `CompileDecision`
 
@@ -147,85 +165,74 @@ Required fields:
 
 - verdict: `COMPILE_EXACT`, `COMPILE_BOUNDED`, `MODIFY_PAYOUT`, or `REJECT`;
 - hedge grade;
-- replication-cost range;
-- research-only synthetic bid and ask;
 - supported size;
-- risk flags;
-- machine-readable reasons;
+- constraining leg;
+- maximum residual values and locations;
+- settlement flags;
 - human-readable explanation;
-- provenance identifiers.
+- reproducibility identifiers.
 
 ## Required candidate pair
 
-Use the same selected BTC expiry and two real call instruments.
+Using the same selected BTC expiry and adjacent or otherwise defensible liquid call strikes, compile and compare:
 
-### Candidate A — strict binary
+### 1. Strict terminal binary candidate
 
-Proposed terminal payout:
+- Proposed payout: `$1` if settlement value is at or above the declared threshold, otherwise `$0`.
+- The system must not label a normalized finite-width call spread as exact replication.
+- It must calculate and display the full residual payoff function across terminal states.
+- Verdict must be one of the canonical compile outcomes with machine-readable reasons.
 
-```text
-Y_binary(S_T) = 1 when S_T >= K, otherwise 0
-```
+### 2. Capped-linear terminal candidate
 
-Requirements:
+- Proposed payout: `$0` at or below `K1`, linear from `$0` to `$1` between `K1` and `K2`, and `$1` at or above `K2`.
+- Test whether the normalized call spread preserves this terminal payoff under matched settlement semantics.
+- Operational and settlement-basis risks remain separately disclosed even when terminal payoff replication is exact.
 
-- never describe the finite-width call spread as exact binary replication;
-- calculate the complete residual function;
-- identify all state regions where the hedge differs;
-- state whether any residual bound is mathematical, grid-estimated, or simulation-estimated;
-- include the reserve or rejection logic.
+## Required outputs
 
-### Candidate B — capped linear
+For each candidate, produce:
 
-For `K1 < K2`, proposed terminal payout:
+- canonical `ContractSpec`;
+- canonical `SettlementSpec`;
+- selected hedge instruments and normalized quantities;
+- live bid/ask and source timestamps;
+- executable hedge entry cost on the correct book sides;
+- trading-fee and configurable reserve inputs;
+- fair-value / replication-cost range;
+- research-only indicative bid and ask;
+- terminal payoff table across a sufficiently dense price grid;
+- maximum absolute replication error;
+- maximum positive and negative residual;
+- location and shape of replication error;
+- settlement/index/timestamp compatibility matrix;
+- external hedge-lot granularity;
+- hedge-depth-derived aggregate capacity estimate;
+- explicit statement that fractional claims do not increase aggregate capacity;
+- stale-data and missing-depth flags;
+- compiler verdict and human-readable explanation.
 
-```text
-0                                      when S_T <= K1
-(S_T - K1) / (K2 - K1)                 when K1 < S_T < K2
-1                                      when S_T >= K2
-```
+The JSON output must retain all raw inputs needed to reproduce calculations without refetching.
 
-Requirements:
+## Formal payout requirements
 
-- prove the normalized call-spread equivalence algebraically or piecewise;
-- separately disclose settlement, execution, and operational risks;
-- do not treat terminal payoff equivalence as complete risk elimination.
+Let prediction-contract liability be `Y(S_T)` and hedge terminal payoff be `H(S_T)`.
 
-## Required market-data witness
-
-Use timestamped public market data and retain all inputs required to reproduce calculations without refetching.
-
-The witness must include:
-
-- selected expiry and instruments;
-- live executable bid and ask on the correct sides;
-- available displayed depth;
-- source timestamps and freshness;
-- contract multipliers;
-- official settlement semantics or explicit evidence gaps;
-- fee and configurable reserve inputs.
-
-Do not use marks alone for executable cost. Do not infer capacity from open interest alone.
-
-## Required calculations
-
-For each candidate calculate:
+The witness must calculate:
 
 ```text
 residual(S_T) = Y(S_T) - H(S_T)
 ```
 
-Report at minimum:
+and report at minimum:
 
 - `max_abs_residual`;
 - `max_positive_residual`;
 - `max_negative_residual`;
-- terminal-state regions where each occurs;
-- proof or estimation method;
-- executable hedge entry cost;
-- cost range after fees and reserves;
-- research-only bid and ask;
-- supported size and limiting constraint.
+- terminal-price regions where each occurs;
+- whether the bound is mathematical, grid-estimated, or simulation-estimated.
+
+A finite grid alone must not be described as a mathematical global bound unless the piecewise payoff structure proves it.
 
 ## Settlement compatibility
 
@@ -236,89 +243,74 @@ Explicitly compare:
 - timezone;
 - settlement calculation;
 - currency and multiplier;
-- outage and fallback rules where discoverable.
+- outage/fallback treatment where discoverable;
+- correction and finality treatment where discoverable.
 
-Missing official evidence must become an evidence gap or rejection flag, not an inferred match.
+Missing official evidence becomes an evidence gap or rejection flag, not an inferred match.
 
-## Capacity methodology
+## Capacity and granularity methodology
 
-Estimate capacity from observable executable depth and predefined risk limits.
+Estimate aggregate capacity only from observable executable depth and predefined risk limits.
 
 Report:
 
-- size available at current displayed levels;
-- which leg constrains capacity;
-- whether multi-level depth is available;
-- any price-impact assumption;
-- whether the result is a lower bound, upper bound, or point estimate;
-- what would cause capacity to be recalculated.
+- minimum external hedge lot;
+- number of hedge lots executable at current displayed depth;
+- aggregate claim notional represented by those lots;
+- size executable at current price level;
+- price-impact assumption, if any;
+- which option leg constrains capacity;
+- whether multi-level depth was available;
+- whether the estimate is a lower bound, upper bound, or point estimate.
 
-## Required outputs
+Do not infer meaningful capacity from open interest alone.
 
-Produce:
-
-1. one timestamped frozen JSON artifact;
-2. one compact Markdown report;
-3. independently testable payoff and residual functions;
-4. one final recommendation.
-
-The report must distinguish:
-
-- demonstrated facts;
-- calculations;
-- assumptions;
-- evidence gaps;
-- unsupported claims.
+Do not imply that dividing a hedge lot into smaller customer claim units increases the aggregate liability that can be supported.
 
 ## Constraints
 
 - Public-data, offline research only.
 - No authenticated endpoints.
-- No live orders, wallets, custody, signing, token issuance, deployment, or treasury movement.
+- No live orders, wallets, custody, signing, treasury movement, or token issuance.
 - No unrestricted LLM parsing as settlement source of truth.
-- Preserve the distinction among replication cost, risk-neutral price, real-world probability, and user belief.
+- Preserve exact distinction among replication cost, risk-neutral price, real-world probability, and user belief.
 - Prefer the smallest reversible implementation.
-- Reuse existing code only when semantics remain correct.
+- Reuse existing code only where semantics remain correct.
+- Do not implement the API-first go-to-market, RFQ workflow, first-party site, fractional claims, internal netting, or custody architecture in Stage 0.
 
 ## Non-goals
 
-- Building the personalized-market site.
-- Building the API.
-- Selecting a chain or custody architecture.
 - Selecting a prediction-market venue.
 - Proving customer demand.
-- Generating a strike or expiry ladder.
-- Narrative generation.
+- Generating a full strike/expiry ladder.
+- Narrative or marketing generation.
 - Dynamic hedging.
 - Path-dependent, barrier, touch, multi-asset, volatility, or conditional contracts.
-- Production market making.
+- Production API or frontend.
+- Live market making.
+- Legal, tax, or regulatory conclusions.
 
 ## Acceptance criteria
 
-- [ ] The execution gate was explicitly confirmed before implementation.
+- [ ] Deferred execution gate is explicitly lifted before implementation begins.
 - [ ] One deterministic CLI produces a timestamped frozen JSON artifact and compact Markdown report.
-- [ ] One real BTC expiry and two real option instruments have executable public bid/ask evidence.
+- [ ] The report uses one real BTC expiry and two real option instruments with executable public bid/ask evidence.
 - [ ] Binary and capped-linear candidates are generated from the same hedge structure.
 - [ ] Strict binary semantics are never silently replaced by the call-spread ramp.
 - [ ] Terminal payout and residual functions are independently testable and covered by unit tests.
-- [ ] Call-spread/capped-linear equivalence is proven algebraically or piecewise.
-- [ ] Settlement mismatches and missing evidence are explicit.
+- [ ] The call-spread/capped-linear equivalence is proven algebraically or piecewise, not only sampled.
+- [ ] All settlement mismatches and missing evidence are explicit.
 - [ ] Costs use executable sides rather than marks alone.
 - [ ] Capacity is tied to displayed depth and names the constraining leg.
-- [ ] Every candidate ends in an allowed compiler verdict.
+- [ ] Hedge-lot granularity is reported separately from customer denomination.
+- [ ] The report states that fractional claims do not increase aggregate hedge capacity.
+- [ ] Every candidate ends in a canonical compile verdict.
 - [ ] Focused tests and lint pass.
-- [ ] Final report ends in one Stage 0 recommendation.
-- [ ] Report includes the mandatory `COORDINATION STATUS` block.
-
-## Final recommendation set
-
-The witness must end in exactly one:
-
-- `CONTINUE_HBCC_STATIC_PAYOFFS`;
-- `CONTINUE_HBCC_CAPPED_LINEAR_ONLY`;
-- `STOP_HBCC_CURRENT_PRIMITIVE`.
-
-No result authorizes the full compiler, personalized-market site, API, on-chain claim deployment, or live action.
+- [ ] The final report makes one Stage 0 recommendation:
+  - `CONTINUE_HBCC_STATIC_PAYOFFS`;
+  - `CONTINUE_HBCC_CAPPED_LINEAR_ONLY`;
+  - `STOP_HBCC_CURRENT_PRIMITIVE`.
+- [ ] The report includes the mandatory `COORDINATION STATUS` block.
 
 ## Validation commands or evidence
 
@@ -331,23 +323,27 @@ python scripts/hbcc_stage0_single_contract_witness.py --help
 python scripts/hbcc_stage0_single_contract_witness.py <frozen witness args>
 ```
 
-The future PR must include exact commands, pass/fail output, artifact paths, fetch timestamps, and selected instruments.
+The PR must include exact commands, pass/fail output, artifact paths, fetch timestamps, and selected instruments.
 
 ## Ownership / overlap warning
 
-One implementation writer only for new HBCC witness paths. Existing Polymarket Stage 0.1 code is reference material and is not authorized for broad refactoring. If another agent is editing shared market-data or cross-venue modules, report overlap before editing and prefer non-overlapping paths.
+One implementation writer only for the new HBCC witness paths. Existing Polymarket Stage 0.1 code is reusable reference material but is not authorized for broad refactoring.
+
+If another agent is editing shared cross-venue modules or tests, report the overlap before editing and choose non-overlapping new paths where possible.
 
 ## Completion boundary
 
-Stage 0 is complete when the reproducible report is independently reviewable and reaches one explicit recommendation. It does not authorize the next stage.
+Stage 0 is complete when the reproducible report is independently reviewable and reaches one explicit recommendation.
+
+It does not authorize Stage 0.1, a full compiler, API, quote service, fractional claim system, first-party site, custody, or live action.
 
 ## COORDINATION STATUS
 
-Agreement: partial  
-Compared: control-plane charter; personalized-market vision; HBCC core-engine charter; accepted Stage 0 and Stage 0.1 evidence; issue #5396  
-Disagreement: this packet was originally ready for immediate execution; founder direction now defers all implementation until Autobuilder completion and explicit selection  
+Agreement: aligned  
+Compared: personalized market vision; HBCC charter; execution decisions; accepted Stage 0 and Stage 0.1 evidence; deferred issue #5396  
+Disagreement: none; the packet remains the correct first witness but is no longer current build scope  
 Evidence gap: no timestamped venue-agnostic single-contract compilation witness exists  
-Ownership overlap: future overlap may exist with shared Deribit and cross-venue modules; default to new bounded paths  
-Risk if unresolved: an agent could execute a valid future packet at the wrong priority or silently change a binary payout into a ramp  
-Recommended default: retain this packet as future scope and do not run it until the execution gate is explicitly satisfied  
-Founder decision required: no for deferral; yes before future execution
+Ownership overlap: possible future overlap with cross-venue data and parser modules; default to new bounded paths  
+Risk if unresolved: an implementation agent may start early, overstate binary hedge quality, or confuse claim fractionalization with aggregate liquidity  
+Recommended default: retain this packet in deferred state until Autobuilder completion and explicit founder selection  
+Founder decision required: no while deferred; yes when selecting implementation
