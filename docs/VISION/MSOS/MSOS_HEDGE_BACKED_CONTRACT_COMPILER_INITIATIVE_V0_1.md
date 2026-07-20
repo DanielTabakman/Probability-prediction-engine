@@ -1,33 +1,45 @@
 # MSOS Hedge-Backed Contract Compiler initiative v0.1
 
-**Status:** PROPOSED FOR REVIEW — bounded research initiative; not BUILD authorization  
-**As-of:** 2026-07-18  
+**Status:** PROPOSED FOR REVIEW — core-engine charter; planning only; implementation deferred  
+**As-of:** 2026-07-20  
 **Owner:** MSOS steward  
-**First ship-to:** RESEARCH / OPERATOR  
-**Implementation issue:** [#5396 — HBCC Stage 0: Single-Contract Compilation Feasibility Witness](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5396)
+**Parent product vision:** [`MSOS_PERSONALIZED_MARKET_COMPILATION_VISION_V0_1.md`](MSOS_PERSONALIZED_MARKET_COMPILATION_VISION_V0_1.md)  
+**Deferred feasibility issue:** [#5396 — HBCC Stage 0 single-contract compilation witness](https://github.com/DanielTabakman/Probability-prediction-engine/issues/5396)
 
 ## 1. Executive decision
 
-MSOS will investigate a **Hedge-Backed Contract Compiler (HBCC)**: a venue-agnostic system that begins with executable hedge instruments and compiles them into precisely specified prediction-style contracts, together with settlement semantics, executable cost, capacity, residual-risk bounds, and an explicit compile-or-reject verdict.
+MSOS will plan a **Hedge-Backed Contract Compiler (HBCC)** as the core engine of a personalized market product.
 
-The initial direction is:
+The product begins with a blank box:
+
+> **What do you want to make a market on?**
+
+HBCC determines whether the requested financially resolvable question can be transformed into:
+
+- a precise contingent payoff;
+- deterministic settlement semantics;
+- an executable price;
+- a supported size and liquidity explanation;
+- an external hedge and residual-risk description;
+- a transferable claim asset where the eventual deployment model permits it;
+- a compile, modify, or reject decision.
+
+The controlling product direction is:
 
 ```text
-available hedge instruments
-    -> preservable terminal payoffs
-    -> formal contract specifications
-    -> executable pricing and capacity
-    -> human-readable questions
-    -> launch selection
+user intent
+    -> deterministic contract specification
+    -> supported hedge and liquidity basis
+    -> executable quote and available size
+    -> claim asset and settlement path
+    -> private trade, publication, or API delivery
 ```
 
-The compiler must not begin with attractive question text and silently force an approximate hedge. Payout semantics are controlling.
+HBCC is not merely a scanner for existing prediction markets. It is the compiler that allows bespoke user questions to inherit liquidity from standardized markets and a shared portfolio risk engine.
 
-The next authorized work is documentation plus the bounded Stage 0 witness in issue #5396. No full compiler, venue integration, automated generation surface, or live execution is authorized.
+No implementation is authorized while the Autobuilder remains the selected build priority. Issue #5396 and its Codex packet are deferred until explicit founder selection after Autobuilder completion.
 
-## 2. Relationship to accepted hedge-backed event-liquidity work
-
-This initiative refines and extends the accepted hedge-backed event-liquidity research without reversing its evidence.
+## 2. Binding prior evidence
 
 The accepted Stage 0.1 conclusion remains binding:
 
@@ -35,38 +47,78 @@ The accepted Stage 0.1 conclusion remains binding:
 STOP_POLYMARKET_BRANCH
 ```
 
-That conclusion means the repository found no qualifying recurring Polymarket universe of terminal BTC binary contracts and must not invest in a Polymarket-specific hedge scanner on the strength of that search.
+That conclusion means:
 
-HBCC changes the search direction:
+- do not restart a Polymarket-specific hedge scanner on the existing evidence;
+- do not assume an adequate universe of listed terminal BTC prediction contracts exists;
+- preserve reusable public-data collection and semantic parsing where useful;
+- require new evidence and a separate steward decision before revisiting that venue-specific branch.
 
-| Prior branch | HBCC branch |
+HBCC changes the search direction rather than reversing the conclusion:
+
+| Prior venue-first branch | HBCC personalized-market branch |
 |---|---|
-| Start from existing prediction-market listings | Start from executable hedge instruments |
-| Ask whether listed contracts can be hedged | Ask which contracts can honestly be emitted from the hedge payoff |
-| Venue-specific availability constraint | Venue-agnostic contract-design and feasibility constraint |
-| Terminal binary contract focus | Payout-preserving static contract focus |
+| Start from existing listed questions | Start from user intent and supported payoff primitives |
+| Ask whether a venue contract can be hedged | Ask what contract can honestly be compiled and quoted |
+| Each question depends on its native order book | Bespoke contracts may inherit shared external liquidity |
+| Venue listing is the product boundary | First-party blank box and API are the product boundary |
 
-Reusable public-market collection, semantic parsing, and compatibility checks may be retained. The rejected Polymarket availability assumption may not be revived without new evidence and a separate steward decision.
+## 3. Core product thesis
 
-## 3. Core thesis
-
-A prediction-style financial contract is a state-contingent payoff over an observable market state or path. A hedge-backed compiler should emit a contract only when it can map the contract payout to an external hedge with explicitly characterized residual exposure.
+A personalized financial question can be represented as a state-contingent payoff over a future market state or path.
 
 Let:
 
-- `Y(S_T)` be the contract liability at settlement;
-- `H(S_T)` be the external hedge payoff;
-- `epsilon(S_T) = Y(S_T) - H(S_T)` be residual exposure.
+```text
+Y(omega) = customer contract liability
+H_i(omega) = payoff of hedge instrument i
+a_i = quantity of hedge instrument i
+epsilon(omega) = Y(omega) - sum_i a_i H_i(omega)
+```
 
-The compiler's central job is not merely to estimate a probability. It must answer:
+HBCC must answer:
 
-> What payoff can be preserved, what does replication cost at executable prices, how much can be supported, what residual risk remains, and when must the system abstain?
+> What payout is requested, can it be preserved, what does the backing cost at executable prices, how much can be supported, what risk remains, and when must the system abstain?
 
-## 4. Hardening correction: binary versus call-spread payoff
+The valuable output is not question text. It is a complete economic object:
 
-A finite-width normalized call spread does **not** exactly replicate a strict digital payoff at every terminal price.
+```text
+ContractSpec
++ SettlementSpec
++ HedgeSpec
++ QuoteSpec
++ CapacitySpec
++ Claim/RedemptionSpec
++ CompileDecision
+```
 
-For strikes `K1 < K2`, the normalized call-spread payoff is:
+## 4. Liquidity inheritance
+
+Many user-facing questions are different projections, partitions, or transformations of the same underlying future-state distribution.
+
+Examples include:
+
+- BTC above a threshold;
+- BTC within a range;
+- BTC returning more than a chosen percentage;
+- a capped-linear section between two prices;
+- one supported asset outperforming another.
+
+These contracts do not necessarily require separate pools of native liquidity. When their payoffs can be transformed into standardized hedge instruments, they may be quoted from:
+
+- external option, futures, spot, or other approved markets;
+- internal offsetting customer inventory;
+- fully collateralized paired claims;
+- native market-maker participation;
+- explicitly limited risk capital.
+
+Liquidity is transformed, not copied. The compiler must state the actual executable capacity rather than the headline liquidity of the underlying market.
+
+## 5. Hardening correction: binary versus call-spread payoff
+
+A finite-width normalized call spread does **not** exactly replicate a strict binary payout at every terminal price.
+
+For `K1 < K2`, the normalized call-spread payoff is:
 
 ```text
 0                                      when S_T <= K1
@@ -74,90 +126,122 @@ For strikes `K1 < K2`, the normalized call-spread payoff is:
 1                                      when S_T >= K2
 ```
 
-This is a capped-linear ramp. A strict binary threshold contract is:
+A strict terminal binary threshold is:
 
 ```text
 0                                      when S_T < K
 1                                      when S_T >= K
 ```
 
-The compiler must therefore choose one of four honest outcomes:
+The compiler must choose one honest outcome:
 
-1. `COMPILE_EXACT` — the hedge terminal payoff and contract terminal payout match under declared semantics;
-2. `COMPILE_BOUNDED` — mismatch is explicitly bounded and reserved under a declared tolerance;
-3. `MODIFY_PAYOUT` — emit the payout naturally replicated by the hedge, such as the capped-linear ramp;
-4. `REJECT` — no supported contract preserves the required semantics within the risk envelope.
+1. `COMPILE_EXACT` — contract and hedge terminal payoffs match under declared settlement semantics;
+2. `COMPILE_BOUNDED` — mismatch has a proven bound inside declared tolerance and reserve;
+3. `MODIFY_PAYOUT` — offer the payout naturally represented by the hedge, such as a capped-linear ramp;
+4. `REJECT` — no supported contract preserves the requested economics within the risk envelope.
 
-Marketing language, user-interface simplicity, or venue conventions must not silently convert one payout into another.
+User-interface simplicity must never silently substitute one payoff for another.
 
-## 5. Product definition
+## 6. Canonical domain objects
 
-The HBCC is a constrained compiler with four primary outputs.
+### 6.1 `QuestionIntent`
 
-### 5.1 `ContractSpec`
+Captures what the user is trying to express:
 
-Defines the economic liability:
+- natural-language request;
+- underlying or market set;
+- date, expiry, or observation window;
+- threshold, range, comparison, or transformation;
+- desired payout and size;
+- private or public preference;
+- unresolved ambiguity.
+
+### 6.2 `ContractSpec`
+
+Defines the liability:
 
 - contract type;
 - underlying;
 - terminal or path observable;
 - transformation;
 - comparator or payout function;
-- threshold or strike interval;
+- threshold or interval;
 - observation window;
 - denomination and payout cap;
 - machine-readable payoff formula;
-- user-facing question;
+- user-facing wording;
 - semantic-equivalence proof state.
 
-### 5.2 `SettlementSpec`
+### 6.3 `SettlementSpec`
 
 Defines the observable fact:
 
-- source/index;
+- source or index;
 - publisher and venue;
 - timestamp and timezone;
 - averaging or calculation method;
-- currency and precision;
+- currency, precision, and rounding;
 - outage and fallback treatment;
-- correction policy;
+- correction and dispute policy;
 - evidence pointers;
-- unresolved ambiguities.
+- unresolved gaps.
 
 The headline is presentation. The settlement specification is the contract.
 
-### 5.3 `HedgeSpec`
+### 6.4 `HedgeSpec`
 
-Defines the backing structure:
+Defines the backing transformation:
 
-- hedge venue;
-- instruments and sides;
-- strikes, expiry, quantities, and multipliers;
-- executable bid/ask inputs;
+- hedge venue and instruments;
+- sides, strikes, expiries, quantities, and multipliers;
+- executable bid/ask and depth inputs;
 - terminal hedge payoff;
 - replication class;
 - residual payoff function;
-- mathematical or estimated error bounds;
+- proof or estimation method;
 - settlement and basis mismatches;
-- fees, slippage, and reserves;
-- displayed depth and capacity methodology.
+- fees, slippage, capital charge, and reserves;
+- constraining leg and capacity methodology.
 
-### 5.4 `CompileDecision`
+### 6.5 `QuoteSpec`
 
-Defines whether the candidate can proceed:
+Defines the customer-facing economics:
+
+- bid and ask;
+- available size at each price level;
+- fee and spread decomposition;
+- backing classification;
+- maximum loss;
+- quote timestamp and expiry;
+- alternatives with better liquidity where useful.
+
+### 6.6 `ClaimSpec`
+
+Defines the eventual position asset where supported:
+
+- ownership representation;
+- transferability;
+- collateral or hedge reference;
+- minting and burning rules;
+- expiry;
+- oracle or attestation source;
+- redemption rights;
+- administrative and upgrade controls.
+
+### 6.7 `CompileDecision`
+
+Defines whether the request proceeds:
 
 - verdict;
 - hedge grade;
-- replication-cost range;
-- research-only synthetic bid/ask;
 - supported size;
-- constraining leg;
+- residual-risk bound;
 - risk flags;
-- rejection or modification reasons;
+- modification or rejection reasons;
 - human-readable explanation;
 - provenance and reproducibility identifiers.
 
-## 6. Canonical contract grammar
+## 7. Canonical contract grammar
 
 A contract can be represented as:
 
@@ -167,105 +251,134 @@ C = (U, O, G, W, K, R, P, S)
 
 Where:
 
-- `U` — underlying;
+- `U` — underlying or market set;
 - `O` — observable;
-- `G` — transformation of terminal state or path;
+- `G` — transformation of state or path;
 - `W` — observation window or terminal timestamp;
 - `K` — threshold or thresholds;
-- `R` — comparison or resolution condition;
+- `R` — resolution condition;
 - `P` — payout function;
 - `S` — settlement specification.
 
-A general binary question can be written as:
+The supported language may include binary, range, bucketed, capped-linear, scalar, and later other explicitly authorized payout forms.
+
+Question composition may begin with natural language, but accepted semantics must end in this deterministic representation or a stricter equivalent.
+
+## 8. Compiler pipeline
+
+HBCC should ultimately support both directions.
+
+### 8.1 Question-first compilation
 
 ```text
-1{ G(X_W) satisfies R(K) }
+user intent
+    -> semantic specification
+    -> hedge search
+    -> payoff and settlement verification
+    -> executable quote and capacity
+    -> compile, modify, or reject
 ```
 
-But HBCC may emit binary, categorical, bucketed, capped-linear, or other explicitly supported payout forms. The compiler is not restricted to binary presentation when the hedge naturally spans a different payoff.
+This is the primary first-party product experience.
 
-## 7. Generation direction
+### 8.2 Hedge-first generation
 
-HBCC generation is hedge-first by default:
+```text
+available hedge instruments
+    -> preservable payoff primitives
+    -> formal contract candidates
+    -> executable pricing and capacity
+    -> human-readable questions
+    -> launch selection
+```
 
-1. ingest executable hedge instruments and official settlement semantics;
-2. identify payoff primitives spanned by those instruments;
-3. normalize candidate terminal payoffs;
-4. generate formal contract and settlement specifications;
-5. prove or estimate replication error;
-6. calculate executable cost and supported capacity;
-7. emit human-readable wording proven equivalent to the formal payout;
-8. rank only valid candidates for possible launch.
+This supports automatic market generation, venue APIs, discovery, and question recommendations.
 
-Question-first compilation may exist later, but it must terminate in `REJECT` when no hedge preserves the requested payout.
+Both directions must terminate in explicit rejection when the economics cannot be preserved.
 
-## 8. Hedgeability classes
+## 9. Hedgeability classes
 
-| Class | Meaning | Initial compiler treatment |
+| Class | Meaning | Treatment |
 |---|---|---|
-| A | Exact static terminal replication under matched settlement semantics | `COMPILE_EXACT` |
-| B | Static replication with a mathematical residual bound inside declared tolerance and reserve | `COMPILE_BOUNDED` |
-| C | Dynamic hedge with gap, path, and execution exposure | Research only; not launchable in v0.1 |
-| D | Model-backed relationship without payoff replication | Information product only |
-| E | Observable but practically unhedgeable at required size | Reject or research only |
+| A | Exact static replication under matched settlement semantics | `COMPILE_EXACT` |
+| B | Static replication with a proven residual bound inside declared tolerance and reserve | `COMPILE_BOUNDED` |
+| C | Dynamic hedge with gap, path, or execution exposure | Research only until separately authorized |
+| D | Model-backed relationship without payoff replication | Forecast or information product, not hedge-backed claim |
+| E | Observable but practically unhedgeable at requested size | Modify, reduce size, or reject |
 | F | Circular, manipulable, ambiguous, or non-resolvable | `REJECT` |
 
-Operational failure, venue credit, and settlement evidence risks remain even when terminal payoff replication is Class A.
+Terminal payoff replication does not remove operational, counterparty, oracle, or legal risk.
 
-## 9. Initial supported payoff space
+## 10. Liquidity and capacity model
 
-Stage 0 considers only:
+For requested notional `N`, the compiler seeks the largest size such that an admissible net portfolio exists.
 
-- BTC;
-- one listed options venue;
-- one real expiry;
-- two real call instruments;
-- static terminal payoffs;
-- strict terminal binary candidate;
-- capped-linear terminal candidate derived from a normalized call spread;
-- public executable bid/ask and displayed depth;
-- offline research outputs.
+Capacity ends when one or more of the following binds:
 
-Possible later families, not authorized now, include:
+- payoff cannot be spanned within tolerance;
+- executable hedge depth is exhausted;
+- market impact destroys quote economics;
+- collateral or capital is insufficient;
+- residual-risk limits bind;
+- internal exposure becomes concentrated;
+- adverse selection or latency makes the quote unsafe;
+- settlement or oracle integrity is insufficient;
+- counterparty, bridge, stablecoin, or venue limits bind;
+- regulatory or customer-access gates prohibit issuance.
 
-- put-spread downside ramps;
+Available liquidity is therefore:
+
+> **The maximum additional customer notional that can be transformed into an admissible net portfolio at the displayed quote.**
+
+The system must state whether capacity is a lower bound, upper bound, or point estimate and must name the limiting constraint.
+
+## 11. On-chain claim boundary
+
+An eventual Solana or other on-chain deployment may allow users to self-custody transferable contingent claims and redeem them through programmatic settlement.
+
+Possible models include:
+
+1. fully collateralized paired claims;
+2. hedge-backed issuance;
+3. a hybrid portfolio using collateral, external hedges, internal netting, native liquidity, and reserves.
+
+On-chain settlement can automate ownership, transfer, collateral vaulting, and redemption. It does not by itself prove:
+
+- that the protocol has no custody or operator role;
+- that an off-chain hedge is controlled trustlessly;
+- that the claim is outside derivatives, securities, gaming, or other regulation;
+- that the customer receives tax deferral.
+
+These remain separate architecture and external-review questions.
+
+## 12. Initial supported product language
+
+The initial planning space includes:
+
+- terminal price thresholds;
 - terminal ranges and buckets;
-- mutually exclusive strike ladders;
-- relative-performance contracts;
-- basis and funding contracts;
-- implied-volatility and surface contracts;
-- cross-market consistency contracts;
-- probability-price derivatives.
+- capped-linear probability sections;
+- percentage-return thresholds;
+- selected relative-performance contracts;
+- later option-price, implied-volatility, realized-volatility, basis, and funding observables where semantics and backing are defensible.
 
-## 10. Compiler invariants
+The first implementation primitive remains intentionally narrow, but the product vision is not limited to one BTC call spread.
 
-The implementation must preserve these invariants:
+## 13. Automatic generation and selection
 
-1. **Payout preservation:** user-facing text, formal payout, and hedge analysis describe the same economic object.
-2. **No inferred settlement match:** missing official evidence becomes a flag, not an assumption.
-3. **Executable pricing:** costs use the correct book sides and retain timestamps.
-4. **Capacity before opportunity:** no quote size may exceed hedge depth and risk limits.
-5. **Residual transparency:** residual payoff is a function, not a single confidence score.
-6. **Proof labeling:** distinguish mathematical bounds from grid and simulation estimates.
-7. **Probability separation:** replication cost, risk-neutral price, real-world probability, and MSOS belief remain distinct.
-8. **Abstention:** inability to compile safely is a valid and expected output.
-9. **Provenance:** every recommendation can be reproduced from frozen inputs.
-10. **No live implication:** research synthetic quotes do not authorize trading.
+The compiler should not materialize every mathematically valid contract.
 
-## 11. Automatic question generator boundary
+It should generate lazily from:
 
-An automatic question generator is a later layer of HBCC, not the first implementation.
-
-It should generate lazily from the supported payoff universe rather than materialize every mathematically valid question. Candidate selection may later use:
-
+- user requests;
 - probability landmarks;
 - available strikes and expiries;
 - hedge depth;
+- repeated demand;
 - catalyst proximity;
-- public attention;
 - expected disagreement;
-- comprehensibility;
-- cannibalization of nearby contracts;
+- comprehension;
+- native-market interest;
 - operational and manipulation risk.
 
 The valid-set relationship is:
@@ -273,207 +386,195 @@ The valid-set relationship is:
 ```text
 possible questions
     contains resolvable questions
-        contains hedgeable questions
+        contains compilable questions
             contains economically supportable questions
-                contains questions worth launching
+                contains questions worth quoting or publishing
 ```
 
-HBCC first establishes hedgeable and supportable. A selector later establishes worth launching.
+## 14. Product surfaces
 
-## 12. Stage plan
+### 14.1 First-party personalized market
 
-### Stage 0 — Single-contract compilation witness
+Owns:
 
-Authorized by issue #5396.
+- the blank-box experience;
+- user intent and demand data;
+- personalized contract creation;
+- private trading;
+- publication and sharing;
+- native participation;
+- repeated-market standardization.
 
-Deliver:
+### 14.2 API
 
-- one timestamped BTC option-spread snapshot;
-- strict-binary and capped-linear candidates from the same hedge;
-- exact terminal payoff and residual functions;
-- executable cost and capacity;
-- settlement compatibility matrix;
-- compile verdicts;
-- one continue/stop recommendation.
+Supports:
 
-### Stage 0.1 — Static payoff ladder
+- existing prediction markets;
+- wallets and exchanges;
+- agent-generated markets;
+- professional RFQs;
+- embedded contract creation and quoting;
+- settlement and risk infrastructure integrations.
 
-Not authorized until Stage 0 review.
+Partner distribution is an opportunity, not the limiting product definition.
 
-Potential scope:
+## 15. Revenue hypotheses
 
-- five contract candidates around selected probability landmarks;
-- strike and expiry selection rules;
-- cross-candidate capacity and shared-hedge accounting;
-- contract-family coherence.
+Potential revenue includes:
 
-### Stage 0.2 — Contract selector
+- bid-ask spread;
+- execution fee;
+- contract-creation or RFQ fee;
+- API and infrastructure fees;
+- listing and liquidity services;
+- market-making revenue;
+- settlement or oracle fee;
+- analytics and risk tooling.
 
-Not authorized until Stage 0.1 review.
+Revenue must be evaluated after hedge costs, capital, collateral, adverse selection, residual losses, settlement, operations, and compliance.
 
-Potential scope:
+## 16. Expansion toward market events
 
-- interest and comprehension scoring;
-- catalyst and disagreement signals;
-- liquidity fragmentation analysis;
-- ranked launch recommendations.
+The planned conceptual ladder is:
 
-### Stage 1 — Minimum credible compiler
+```text
+probability sections
+    -> personalized financial questions
+    -> market-movement and volatility questions
+    -> market-impact contracts
+    -> external-event contracts and impact maps
+```
 
-Requires explicit steward SELECTION.
+Implied volatility must not be treated as a direct confidence score or proof of a named event.
 
-Potential scope:
+A more accurate working model is:
 
-- reusable `ContractSpec`, `SettlementSpec`, `HedgeSpec`, and `CompileDecision` objects;
-- supported static payoff templates;
-- deterministic CLI/API;
-- frozen provenance;
-- explicit rejection paths.
+> Implied volatility is the market price of future dispersion and uncertainty, including risk premia and supply-demand effects.
 
-### Stage 2 — Shadow quoting and reconciliation
+Forward levels, skew, term structure, and option flows add directional, asymmetric, and time-localized information.
 
-Requires separate authorization.
+The first event-like products should remain directly observable in market data, such as realized movement, volatility, basis, or correlation changes. External named events require a separate event ontology, oracle, causal model, and impact map.
 
-### Stage 3 — Controlled live pilot
+## 17. Compiler invariants
 
-Requires legal, venue, capital, operational, settlement, and treasury gates. No customer funds.
+1. **Payout preservation:** user wording, formal payout, claim asset, and hedge analysis describe the same economic object.
+2. **No inferred settlement match:** missing evidence becomes a gap or rejection.
+3. **Executable pricing:** quote costs use correct book sides and timestamps.
+4. **Capacity before opportunity:** no supported size exceeds hedge, collateral, and risk limits.
+5. **Residual transparency:** residual exposure is represented as a function or explicit state set.
+6. **Proof labeling:** mathematical, grid, historical, and simulation evidence remain distinct.
+7. **Probability separation:** replication cost, risk-neutral price, real-world forecast, and user belief remain separate.
+8. **Abstention:** rejection and modification are normal compiler outputs.
+9. **Provenance:** every decision is reproducible from frozen inputs.
+10. **Custody honesty:** smart-contract control and economic responsibility are described accurately.
+11. **Tax honesty:** tokenization does not imply a specific tax result.
+12. **No live implication:** planning and research quotes do not authorize execution.
 
-## 13. Stage 0 decision gate
+## 18. Deferred Stage 0 witness
 
-Stage 0 must end in exactly one recommendation:
+Issue #5396 remains the first proposed empirical test after the Autobuilder is complete and the initiative is selected.
 
-### `CONTINUE_HBCC_STATIC_PAYOFFS`
+It will compare:
 
-Use when at least one candidate is honestly compilable with executable pricing, interpretable capacity, and acceptable declared residual/operational risk.
+- a strict binary terminal contract;
+- the capped-linear contract naturally represented by the same call spread;
+- executable cost and depth;
+- settlement compatibility;
+- residual payoff;
+- supported size;
+- compile verdict.
 
-### `CONTINUE_HBCC_CAPPED_LINEAR_ONLY`
+The witness is a system-level balancing and honesty test. It is not the full product and does not limit the personalized-market vision.
 
-Use when the normalized spread supports the capped-linear contract but strict binary backing is not defensible under the initial primitive.
+Stage 0 must end in one of:
 
-### `STOP_HBCC_CURRENT_PRIMITIVE`
+- `CONTINUE_HBCC_STATIC_PAYOFFS`;
+- `CONTINUE_HBCC_CAPPED_LINEAR_ONLY`;
+- `STOP_HBCC_CURRENT_PRIMITIVE`.
 
-Use when settlement evidence, executable depth, costs, or payoff preservation prevent a credible contract even at research scale.
+No recommendation automatically authorizes a subsequent stage.
 
-No recommendation automatically authorizes the next stage.
+## 19. Planning work authorized now
 
-## 14. Initial users and value
+While implementation is deferred, continue bounded charter work on:
 
-### Internal MSOS operator / researcher
+- supported question ontology;
+- contract and settlement grammar;
+- on-chain claim models;
+- liquidity, netting, and capacity theory;
+- first-party user journeys;
+- API concepts;
+- backing and risk disclosures;
+- native-market promotion lifecycle;
+- market-event theory;
+- legal, regulatory, tax, oracle, custody, and counterparty question lists;
+- future feasibility and customer-discovery plans.
 
-Receives a reproducible answer to what can be compiled, at what cost and size, and with what residual exposure.
+## 20. Hard rejection rules
 
-### Prediction-market venue or contract designer
+Reject or quarantine a candidate when:
 
-Potential later customer for settlement-ready contract proposals carrying hedge and capacity evidence.
-
-### Market maker
-
-Potential later customer for static hedge plans, executable synthetic pricing, capacity envelopes, and abstention rules.
-
-### Trader
-
-Potential later beneficiary of simpler, bounded-loss expressions that do not require direct option-chain management.
-
-These are hypotheses. Customer demand is not demonstrated by this charter.
-
-## 15. Economic model hypotheses
-
-Possible later revenue mechanisms include:
-
-- contract-design and listing infrastructure;
-- hedge and risk analytics licensing;
-- market-maker tooling;
-- venue integration fees;
-- data products;
-- spreads or liquidity revenue under separately approved live operations.
-
-Stage 0 tests mechanism feasibility, not monetization.
-
-## 16. Hard rejection rules
-
-The compiler must reject or quarantine a candidate when:
-
-- settlement language is ambiguous or incomplete;
-- user-facing wording changes the formal payout;
-- the hedge uses a materially incompatible index, timestamp, currency, or calculation method;
-- the claimed error bound is not supported by its proof method;
+- settlement is ambiguous or incomplete;
+- wording changes the formal payout;
+- claim-token rights differ from the displayed contract;
+- hedge settlement is materially incompatible;
+- an error bound lacks an adequate proof method;
 - executable prices or timestamps are missing or stale;
-- displayed depth cannot support the proposed size;
+- displayed depth cannot support the requested size;
 - capacity is inferred from open interest alone;
-- the candidate depends on unstable historical correlation rather than payoff replication;
-- the settlement observable is cheaply manipulable;
+- the candidate depends only on unstable historical correlation;
+- the observable is cheaply manipulable;
 - the contract is circular or self-referential;
-- dynamic hedging is required but not explicitly authorized;
-- operational reserves or failure modes are silently omitted.
+- dynamic hedging is required but not authorized;
+- operational, counterparty, oracle, or bridge risks are omitted;
+- legal or access gates are unresolved for the proposed launch surface.
 
-## 17. Non-goals
+## 21. Current non-goals
 
-This initiative does not currently authorize:
+This charter does not currently authorize:
 
-- a consumer prediction-market application;
-- a new exchange or protocol;
-- broad question generation;
-- derivatives-on-derivatives implementation;
+- implementation before Autobuilder completion;
+- live order entry or market making;
+- deployment of claim tokens;
+- custody, treasury movement, or customer funds;
+- a consumer launch;
+- a production API;
+- unrestricted question generation;
+- a final chain selection;
+- automated legal or tax conclusions;
 - Polymarket-specific development;
-- live order entry;
-- custody or treasury movement;
-- customer funds;
-- automated legal or compliance conclusions;
-- token issuance;
-- a new top-level MSOS module without registry selection.
+- politics, sports, weather, or personal-event markets in the initial language.
 
-## 18. Success criteria
+These are sequencing boundaries, not statements that the long-term product is limited to an internal research tool.
 
-Early success is demonstrated by correctly and reproducibly answering:
+## 22. Five truths to solve
 
-- what payout is being offered;
-- what hedge terminal payoff actually exists;
-- where they differ;
-- whether the difference is exact, bounded, estimated, or unacceptable;
-- what executable hedge entry costs;
-- what size displayed depth supports;
-- what settlement evidence matches or conflicts;
-- what the compiler recommends and why.
+1. The supported language must express views users actually want.
+2. Quotes must be immediate enough for the blank-box experience.
+3. Supported size must feel meaningful after real constraints.
+4. The interface must remain simpler than direct derivatives construction.
+5. Unit economics must survive all hedge, capital, risk, settlement, operational, and distribution costs.
 
-A credible `REJECT` or `STOP_HBCC_CURRENT_PRIMITIVE` result is successful evidence generation.
+The addressable question space is treated as sufficiently large. The primary uncertainties are economic, operational, distributional, legal, and regulatory feasibility.
 
-## 19. Risks
+## 23. Current decision
 
-### Semantic substitution
+Continue product theory, planning, and chartering only.
 
-The largest immediate risk is calling a ramp payoff a binary hedge.
+Do not implement issue #5396 or broader HBCC capability until:
 
-### Settlement basis
-
-A terminal payoff match is insufficient when the contract and option settle from different indexes, timestamps, or procedures.
-
-### Liquidity illusion
-
-A theoretical structure may have negligible executable depth.
-
-### Product overexpansion
-
-The broad question space can distract from proving one primitive.
-
-### Regulatory and venue treatment
-
-Systematic financial event-contract generation may resemble listed derivatives activity and requires later external review before any live or customer-facing use.
-
-### Reflexivity and manipulation
-
-Derivative-on-prediction-market observables may allow participants to influence the settlement variable and remain outside initial scope.
-
-## 20. Current decision
-
-Proceed only with issue #5396 and its associated Stage 0 packet. Do not begin the automatic question generator or additional question families until the witness is reviewed.
+1. the Autobuilder is complete;
+2. the personalized-market vision and this charter are accepted;
+3. the founder explicitly selects the next feasibility stage;
+4. implementation ownership is assigned through the control plane.
 
 ## COORDINATION STATUS
 
 Agreement: partial  
-Compared: accepted hedge-backed event-liquidity charter; Stage 0 feasibility report; Stage 0.1 terminal-availability report; HBCC white-paper thesis  
-Disagreement: the accepted charter described narrow spreads as approximate binary hedges, while this refinement makes payout preservation controlling and recognizes the normalized spread as a capped-linear payoff unless binary residual risk is explicitly bounded and reserved  
-Evidence gap: no timestamped venue-agnostic contract-compilation witness exists  
-Ownership overlap: possible reuse of cross-venue data and parser code; implementation should default to new bounded paths  
-Risk if unresolved: MSOS could claim hedge backing while silently changing contract semantics  
-Recommended default: accept this charter provisionally for the sole purpose of running and reviewing Stage 0 issue #5396  
-Founder decision required: yes — merge or reject this charter PR
+Compared: accepted hedge-backed event-liquidity charter; accepted Stage 0 and Stage 0.1 evidence; original HBCC draft charter; personalized market compilation vision  
+Disagreement: the original HBCC draft emphasized an immediate internal research witness; the controlling direction now defines HBCC as the engine of a personalized first-party market plus API and defers implementation until Autobuilder completion  
+Evidence gap: executable capacity, user demand, on-chain operating model, tax treatment, and regulatory pathway remain unproven  
+Ownership overlap: none for this documentation revision; future implementation may overlap PPE market data, settlement, execution, and Autobuilder-managed delivery paths  
+Risk if unresolved: the project could optimize a narrow scanner while missing the larger personalized-market product or could overstate payout, liquidity, custody, tax, or regulatory properties  
+Recommended default: accept this charter as the core-engine layer beneath the personalized-market vision and keep issue #5396 deferred  
+Founder decision required: yes — accept, revise, or reject this charter
