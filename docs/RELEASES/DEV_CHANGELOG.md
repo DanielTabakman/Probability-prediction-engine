@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-20
+
+- `a25f26d0` — Replay founder portfolio selection exclusions (#5398) (`scripts/`)
+
 ## 2026-07-19
 
+- `ea2f4e70` — Control-plane: dev changelog
 - `910f0800` — Charter Options Made Simple witness jobs (#5383) (`docs/SOP/`)
 - `e8f6cf67` — Fix late automerge CI rerun (#5390) (`docs/SOP/`)
 - `829a68ff` — Control-plane: dev changelog
