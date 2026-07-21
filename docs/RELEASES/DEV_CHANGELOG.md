@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-21
+
+_No merges to `main`._
+
 ## 2026-07-20
 
+- `49a9af81` — Control-plane: dev changelog
 - `a25f26d0` — Replay founder portfolio selection exclusions (#5398) (`scripts/`)
 
 ## 2026-07-19
