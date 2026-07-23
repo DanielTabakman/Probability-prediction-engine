@@ -1,3 +1,4 @@
+import { ContactFooter } from "@/components/ContactFooter";
 import { FeaturesRow } from "@/components/FeaturesRow";
 import { HeroSection } from "@/components/HeroSection";
 import { ProductWindow } from "@/components/ProductWindow";
@@ -14,6 +15,7 @@ export default function HomePage() {
         </section>
         <FeaturesRow />
       </main>
+      <ContactFooter />
     </div>
   );
 }
