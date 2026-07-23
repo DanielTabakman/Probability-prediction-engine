@@ -26,6 +26,16 @@ def test_msos_web_package_and_homepage_copy() -> None:
     assert 'data-self-serve-entry="homepage"' in page
 
 
+def test_homepage_contact_email() -> None:
+    page = (MSOS_WEB / "src" / "app" / "page.tsx").read_text(encoding="utf-8")
+    contact = (MSOS_WEB / "src" / "components" / "ContactFooter.tsx").read_text(
+        encoding="utf-8"
+    )
+    assert "ContactFooter" in page
+    assert "mailto:marketstructureos@gmail.com" in contact
+    assert "Questions, partnerships, or feedback?" in contact
+
+
 def test_msos_web_docker_and_compose_wiring() -> None:
     assert (MSOS_WEB / "Dockerfile").is_file()
     compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
