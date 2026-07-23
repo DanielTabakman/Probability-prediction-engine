@@ -30,6 +30,14 @@
 - **policy question:** Which thread roles become pinned bookmarks vs fresh chats per slice?
 - **notes:** Filed from THREAD_INSIGHTS closeout (control_plane_thread_roles).
 
+### Operator lite status routing defaults
+
+- **id:** `operator_lite_default_routing` · **priority:** medium · **category:** operator
+- **added:** 2026-07-10
+- **summary:** Make compact operator status the default read path: agents should read OPERATOR_STATUS_BRIEF first, add ppe_go --json-lite for machine consumers, and reserve full OPERATOR_STATUS/burst docs for explicit execution.
+- **policy question:** Should normal status checks default to lite while full burst remains an explicit operator action?
+- **notes:** Follow-up from operator status lite PR #5103; intended as the next small routing-habit slice after the compact artifacts exist.
+
 ### Relay decision model reconcile
 
 - **id:** `relay_decision_reconcile` · **priority:** medium · **category:** control-plane
@@ -160,4 +168,4 @@
 
 ## Changelog
 
-| 2026-07-06 | Auto-render from JSON |
+| 2026-07-10 | Auto-render from JSON |
