@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-23
 
-_No merges to `main`._
+- `610592dd` — Add contact email to public homepage (`apps/msos-web/`)
+- `68a6ccee` — Control-plane: dev changelog
 
 ## 2026-07-22
 
