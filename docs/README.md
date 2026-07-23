@@ -7,6 +7,10 @@ Start here when navigating the Probability Prediction Engine repo.
 | Role | Path |
 |------|------|
 | **ChatGPT + GitHub + Codex operating contract** | [`SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md) — GitHub SSOT, thread routing, task handoffs, and mandatory agent disagreement protocol |
+| **Meeting → system integration** | [`SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md`](SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md) — every substantive thread becomes durable canon, structured work, or an explicit no-write outcome with minimal founder touchpoints |
+| **Autobuilder strategic thesis** | [`SOP/AUTOBUILDER_THESIS_AND_OPERATING_MODEL_V1.md`](SOP/AUTOBUILDER_THESIS_AND_OPERATING_MODEL_V1.md) — core internal product, technical-founder function, operating principles, and anti-regression instruction |
+| **Autobuilder accepted decision** | [`SOP/AUTOBUILDER_CORE_INTERNAL_PRODUCT_DECISION_V1.md`](SOP/AUTOBUILDER_CORE_INTERNAL_PRODUCT_DECISION_V1.md) — decision, alternatives, accepted costs, guardrails, and reconsideration triggers |
+| **Autobuilder leverage scorecard** | [`SOP/AUTOBUILDER_LEVERAGE_SCORECARD_V1.md`](SOP/AUTOBUILDER_LEVERAGE_SCORECARD_V1.md) — validated output, founder attention, compute cost, rescue, rework, and review cadence |
 | **Integrated one-pager** | [`SOP/PPE_INTEGRATED_STATUS.md`](SOP/PPE_INTEGRATED_STATUS.md) |
 | **Live steering / slice queue** | [`SOP/MVP1_FRONTIER.md`](SOP/MVP1_FRONTIER.md) (MVP1 engine) · [`SOP/MSOS_FRONTIER.md`](SOP/MSOS_FRONTIER.md) (MSOS website) |
 | **MSOS website program canon** | [`SOP/MSOS_WEBSITE_PROGRAM.md`](SOP/MSOS_WEBSITE_PROGRAM.md) |
@@ -65,6 +69,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 ## Context rules
 
 - [`CONTEXT_RULES.md`](CONTEXT_RULES.md) — when to open a new Cursor or ChatGPT thread vs stay in-session
+- [`SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md`](SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md) — integrate durable meeting outcomes incrementally; do not require founder copy-paste or end-of-chat reminders
 - [`SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md) — ChatGPT Project layout, GitHub handoff packets, and reconciliation protocol
 - [`SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md`](SOP/CONTEXT_WINDOW_CLOSEOUT_V1.md) — end a long chat: push/pull sweep, narrative, backlog triage
 - [`SOP/BUILD_PACKET_TEMPLATE.md`](SOP/BUILD_PACKET_TEMPLATE.md) — SLIM steward → BUILD handoff (paths only; includes layer presets)
