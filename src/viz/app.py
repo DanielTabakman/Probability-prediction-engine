@@ -38,6 +38,8 @@ _snapshots_enabled = _env_flag("PPE_ENABLE_SNAPSHOTS", True)
 _show_debug_ui = _env_flag("PPE_SHOW_DEBUG_UI", False)
 _research_review_enabled = _env_flag("PPE_RESEARCH_REVIEW_UI", False)
 _research_review_default = _env_flag("PPE_RESEARCH_REVIEW_DEFAULT", False)
+_market_proposal_preview_enabled = _env_flag("PPE_MARKET_PROPOSAL_PREVIEW_UI", False)
+_market_proposal_preview_default = _env_flag("PPE_MARKET_PROPOSAL_PREVIEW_DEFAULT", False)
 _commercial_copy = commercial_surface_copy()
 _cta_private_url, _research_offer = resolve_demo_ctas(
     snapshots_enabled=_snapshots_enabled,
@@ -56,12 +58,19 @@ sidebar = build_sidebar_state(
     show_bitcoin_default=True,
     show_research_review=_research_review_enabled,
     research_review_default=_research_review_default,
+    show_market_proposal_preview=_market_proposal_preview_enabled,
+    market_proposal_preview_default=_market_proposal_preview_default,
 )
 if sidebar.get("app_surface") == "Research Review":
     from src.viz.research_decision_dashboard import load_default_research_decision_dashboard
     from src.viz.research_decision_view import render_research_decision_dashboard
 
     render_research_decision_dashboard(load_default_research_decision_dashboard())
+    st.stop()
+if sidebar.get("app_surface") == "Market Proposal Preview":
+    from src.viz.market_proposal_hedge_capacity_view import render_market_proposal_hedge_capacity_preview
+
+    render_market_proposal_hedge_capacity_preview()
     st.stop()
 
 if _cta_private_url:
