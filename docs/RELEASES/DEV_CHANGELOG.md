@@ -2,6 +2,10 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-07-24
+
+- `32553406` — Control-plane: dev changelog
+
 ## 2026-07-23
 
 - `2a484602` — Trigger production deploy for contact email
