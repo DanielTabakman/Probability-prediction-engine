@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-07-23
 
+- `2a484602` — Trigger production deploy for contact email
+- `bb19c6a4` — Control-plane: dev changelog
 - `610592dd` — Add contact email to public homepage (`apps/msos-web/`)
 - `68a6ccee` — Control-plane: dev changelog
 
