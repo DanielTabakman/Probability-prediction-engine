@@ -15,6 +15,22 @@
 
 ## Active (parked / surfaced)
 
+### Simplify founder surface for recovery preflight
+
+- **id:** `founder_surface_recovery_simplify` · **priority:** medium · **status:** parked
+- **added:** 2026-08-06
+- **summary:** After repo-state SSOT: trim founder/operator surface recovery wording so mixed-plane/recovery parks to operator without checklist sprawl; align FOUNDER_OPERATOR_SURFACE with severity ladder + park scaffolding from PR #1939.
+- **trigger keywords:** founder_surface, recovery, mixed-plane, operator_status
+- **not for:** `factory FC roadmap Tier 2-5 duplicates of factory SSOT/dispatch`
+
+### Consolidate frontier_preflight into ppe_repo_state
+
+- **id:** `frontier_preflight_repo_state_consolidation` · **priority:** medium · **status:** parked
+- **added:** 2026-08-06
+- **summary:** Post repo-state SSOT (PR #1939): fold remaining frontier_preflight checks into ppe_repo_state severity ladder / recovery transaction so mixed-plane preflight has one SSOT. Do not re-park factory FC-3/FC-5 gate/dispatch work already on factory surfaces.
+- **trigger keywords:** repo_state, frontier_preflight, mixed-plane, recovery
+- **not for:** `factory_fc3_gate_enforce; factory_fc5_slice_starters; factory SSOT/dispatch/worktrees already covered post-split`
+
 ### SSH log-tail when stuck and local desktop logs stale
 
 - **id:** `in_flight_ssh_log_tail_when_stale` · **priority:** medium · **status:** parked

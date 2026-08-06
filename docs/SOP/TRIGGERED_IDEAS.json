@@ -104,6 +104,48 @@
           "mirror"
         ]
       }
+    },
+    {
+      "id": "frontier_preflight_repo_state_consolidation",
+      "title": "Consolidate frontier_preflight into ppe_repo_state",
+      "summary": "Post repo-state SSOT (PR #1939): fold remaining frontier_preflight checks into ppe_repo_state severity ladder / recovery transaction so mixed-plane preflight has one SSOT. Do not re-park factory FC-3/FC-5 gate/dispatch work already on factory surfaces.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "repo_state",
+          "frontier_preflight",
+          "mixed-plane",
+          "recovery"
+        ]
+      },
+      "notFor": [
+        "factory_fc3_gate_enforce; factory_fc5_slice_starters; factory SSOT/dispatch/worktrees already covered post-split"
+      ]
+    },
+    {
+      "id": "founder_surface_recovery_simplify",
+      "title": "Simplify founder surface for recovery preflight",
+      "summary": "After repo-state SSOT: trim founder/operator surface recovery wording so mixed-plane/recovery parks to operator without checklist sprawl; align FOUNDER_OPERATOR_SURFACE with severity ladder + park scaffolding from PR #1939.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "founder_surface",
+          "recovery",
+          "mixed-plane",
+          "OPERATOR_STATUS"
+        ]
+      },
+      "notFor": [
+        "factory FC roadmap Tier 2-5 duplicates of factory SSOT/dispatch"
+      ]
     }
   ]
 }
