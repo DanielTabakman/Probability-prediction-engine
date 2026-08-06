@@ -15,6 +15,13 @@
 
 ## Active (parked / surfaced)
 
+### SSH log-tail when stuck and local desktop logs stale
+
+- **id:** `in_flight_ssh_log_tail_when_stale` · **priority:** medium · **status:** parked
+- **added:** 2026-08-06
+- **summary:** When in-flight monitor detects stuck and local desktop logs are unchanged for ~15m, run one bounded SSH tail of VM relay/build logs (not an open-ended poll). Complements local log-tail already shipped; only when desktop logs are stale so operator is not blind to VM-side progress.
+- **trigger keywords:** in-flight, operator, ssh, vm, stuck, log-tail
+
 ### Merge thread insight capture tooling (PR #737)
 
 - **id:** `merge_thread_insight_capture_tooling` · **priority:** medium · **status:** parked
@@ -22,10 +29,18 @@
 - **summary:** Merge PR #737 so context_window_closeout --capture routes via ppe_thread_capture.py on main.
 - **trigger keywords:** thread insight, context closeout, ppe_thread_capture
 
+### ntfy when vm-mirror PR merges during wait_for_vm
+
+- **id:** `vm_mirror_merge_ntfy_during_inflight` · **priority:** medium · **status:** parked
+- **added:** 2026-08-06
+- **summary:** During wait_for_vm / BUILD_IN_FLIGHT, desktop may stay blind until pull. Notify via ntfy when an ops/vm-mirror PR merges so operator knows mirror status advanced without watching GitHub. Ops polish only — not a product chapter.
+- **trigger keywords:** vm-mirror, wait_for_vm, in-flight, ntfy, operator, mirror
+
 ### Skim THREAD_INSIGHTS during SELECTION
 
-- **id:** `surface_thread_insights_at_selection` · **priority:** low · **status:** parked
+- **id:** `surface_thread_insights_at_selection` · **priority:** low · **status:** surfaced
 - **added:** 2026-06-30
+- **surfaced:** 2026-06-30T21:00:24Z
 - **summary:** When burst or what's next runs SELECTION, agent should skim recent THREAD_INSIGHTS.md entries for the active chapter_id (not only TRIGGERED_IDEAS alerts).
 - **trigger keywords:** selection, what's next, burst
 
@@ -40,4 +55,4 @@
 
 ## Changelog
 
-| 2026-06-30 | Auto-render from JSON |
+| 2026-08-06 | Auto-render from JSON |

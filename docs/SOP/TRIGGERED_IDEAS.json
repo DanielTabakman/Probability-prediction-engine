@@ -64,6 +64,46 @@
           "ppe_thread_capture"
         ]
       }
+    },
+    {
+      "id": "in_flight_ssh_log_tail_when_stale",
+      "title": "SSH log-tail when stuck and local desktop logs stale",
+      "summary": "When in-flight monitor detects stuck and local desktop logs are unchanged for ~15m, run one bounded SSH tail of VM relay/build logs (not an open-ended poll). Complements local log-tail already shipped; only when desktop logs are stale so operator is not blind to VM-side progress.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "in-flight",
+          "operator",
+          "SSH",
+          "vm",
+          "stuck",
+          "log-tail"
+        ]
+      }
+    },
+    {
+      "id": "vm_mirror_merge_ntfy_during_inflight",
+      "title": "ntfy when vm-mirror PR merges during wait_for_vm",
+      "summary": "During wait_for_vm / BUILD_IN_FLIGHT, desktop may stay blind until pull. Notify via ntfy when an ops/vm-mirror PR merges so operator knows mirror status advanced without watching GitHub. Ops polish only \u2014 not a product chapter.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "vm-mirror",
+          "wait_for_vm",
+          "in-flight",
+          "ntfy",
+          "operator",
+          "mirror"
+        ]
+      }
     }
   ]
 }
