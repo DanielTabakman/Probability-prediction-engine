@@ -146,6 +146,24 @@
       "notFor": [
         "factory FC roadmap Tier 2-5 duplicates of factory SSOT/dispatch"
       ]
+    },
+    {
+      "id": "milestone_gate_v2_phases_3_5_next_build_resolved_umbrella_tracke",
+      "title": "Milestone gate v2 phases 3-5 (NEXT_BUILD_RESOLVED + umbrella tracker + merge-time markers)",
+      "summary": "Pre-split thread designed milestone gate v2. Phases 1-2 (actionable clock, ACTIVE_CHAPTER_GATE/STEERING_CANDIDATE_STALE/CLOSEOUT_REGISTRY_DEBT, post_relay_continue reconcile) were implemented on a recovery branch but ppe_milestone_gate.py is absent after autobuilder/MSOS split \u2014 do not re-land as ad-hoc product. Revisit as control-plane/factory chapter: Phase 3 NEXT_BUILD_RESOLVED.json + steward doc sync; Phase 4 umbrella milestone tracker separate from relay BUILD; Phase 5 marker+registry at product merge. Drop if PIPELINE_HEALTH / chapter coordination already covers this on main.",
+      "status": "parked",
+      "priority": "medium",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "pipeline health",
+          "milestone gate",
+          "closeoutOnlyChapterIds",
+          "FACTORY"
+        ]
+      }
     }
   ]
 }
