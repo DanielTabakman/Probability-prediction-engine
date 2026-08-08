@@ -64,6 +64,42 @@
           "ppe_thread_capture"
         ]
       }
+    },
+    {
+      "id": "operator_pass_record_at_burst_end",
+      "title": "Record operator pass at burst end only",
+      "summary": "Today prepare_operator_status records every refresh (dedupe 120s). Prefer explicit --record-pass from @ppe-director / burst finish so pass streak reflects real operator cycles, not status polls. Revisit when touching burst plan, director closeout, or ppe_operator_pass_progress. Pre-split thread residual \u2014 not in DESKTOP_OPERATOR plan.",
+      "status": "parked",
+      "priority": "low",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "operator pass",
+          "burst",
+          "ppe-director",
+          "pass progress"
+        ]
+      }
+    },
+    {
+      "id": "operator_pass_slice_sla_hint",
+      "title": "Per-slice SLA hint on Progress/Waiting line",
+      "summary": "Surface historical median closeout duration for active phase/slice type in OPERATOR_STATUS Waiting line (e.g. typical FINISH closeout ~45m). Medians already in _budget_for_phase; expose in format_pass_lines. Revisit with pass-progress or DESKTOP_OPERATOR Step 5 truth card. Pre-split thread residual.",
+      "status": "parked",
+      "priority": "low",
+      "added": "2026-08-06",
+      "triggers": {
+        "chapterIds": [],
+        "planPaths": [],
+        "keywords": [
+          "operator pass",
+          "SLA",
+          "pass progress",
+          "desktop automation"
+        ]
+      }
     }
   ]
 }
