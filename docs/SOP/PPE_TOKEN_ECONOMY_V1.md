@@ -59,9 +59,9 @@ Optional one-shot API product slice (when credits exist): `run_product_slice.cmd
 
 ---
 
-## Cursor token conservation (when IDE is needed)
+## Cursor and cross-surface token conservation
 
-Reserve Cursor for **exceptions**; default product BUILD goes to **Codex CLI** (see local profile `ideHandoff.buildWorker`).
+Reserve Cursor for **exceptions**; default product BUILD goes to **Codex CLI** (see local profile `ideHandoff.buildWorker`). Keep ChatGPT/GitHub/Codex startup to Project instructions already present + one role contract + one relevant issue/program/PR.
 
 | Do | Why |
 |----|-----|
@@ -70,15 +70,19 @@ Reserve Cursor for **exceptions**; default product BUILD goes to **Codex CLI** (
 | **`setup_codex.cmd`** + **`verify_codex.cmd`** | Required for headless path |
 | New Agent thread per slice; `@` starter only | Smallest context (`IDE_BUILD_STARTER_*.md`) |
 | Steward thread separate from BUILD | Avoid SELECTION+BUILD+PR mega-thread |
-| After closeout: new thread + `AGENT_CONTINUITY_BRIEF.md` only | Drop orchestrator noise |
+| After closeout: new thread; load generated continuity only when `token_audit.cmd --stdout` reports it fresh/complete/portable | Prevent stale generated state from displacing GitHub main |
+| When continuity is unsafe, use current GitHub canon + `OPERATOR_STATUS.md` / `ACTIVE_PRODUCT_DIRECTION.json` as applicable | Correctness-first fallback with explicit evidence |
 | `python scripts/ppe_context_preflight.py` before BUILD | Advisory band check |
 | `clear_build_worker_quota.cmd` after plan reset | Clears stale CLI exhaustion from old logs |
-| **`token_audit.cmd`** weekly (Monday pipeline) | Monitor report + history trend |
+| **`token_audit.cmd`** weekly (Monday pipeline) | Monitor Cursor plus ChatGPT/GitHub/Codex fixed context |
 | **`regenerate_ide_starters.cmd`** after generator pull | Bulk refresh on-disk starters |
 
 | Avoid | Why |
 |-------|-----|
 | Pasting orchestrator stdout / full pytest logs into chat | Largest avoidable token burn |
+| Re-pasting ChatGPT Project instructions into every task packet | They are already present |
+| Loading backlog/index/direction state for a generic founder or charter phrase | Broad unrelated context before scope exists |
+| Loading stale or incomplete `AGENT_CONTINUITY_BRIEF.md` first | Correctness drift plus repeated overhead |
 | `buildWorker: auto` or `cursor` unless debugging CLI | Sends headless work to Cursor first |
 | Phone **fix** expecting Cursor CLI | Fix dispatch now follows `buildWorker` (Codex when configured) |
 | Long “what's next / triage / planning” in Agent mode | Use Ask/read-only or Codex for research |
@@ -91,6 +95,7 @@ When Cursor quota returns: keep **Codex for implementation**; use Cursor only fo
 
 - [`PPE_TOKEN_ECONOMY_MONITOR_V1.md`](PPE_TOKEN_ECONOMY_MONITOR_V1.md) — perpetual monitor schedule
 - [`WORKFLOW_CONTEXT_AUDIT_002.md`](WORKFLOW_CONTEXT_AUDIT_002.md)
+- [`WORKFLOW_CONTEXT_AUDIT_003.md`](WORKFLOW_CONTEXT_AUDIT_003.md)
 - [`PPE_NEAR_ZERO_API_OPERATOR_V1.md`](PPE_NEAR_ZERO_API_OPERATOR_V1.md)
 - [`PPE_IDE_NATIVE_OPERATOR_V1.md`](PPE_IDE_NATIVE_OPERATOR_V1.md)
 - [`PPE_CONTINUOUS_OPERATOR.md`](PPE_CONTINUOUS_OPERATOR.md)
