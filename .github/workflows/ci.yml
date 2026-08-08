@@ -113,7 +113,7 @@ jobs:
 
       - name: Upload fast-test failure log
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pytest-fast-failure
           path: /tmp/pytest-fast.log
@@ -132,7 +132,7 @@ jobs:
 
       - name: Upload slow-test failure log
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pytest-slow-failure
           path: /tmp/pytest-slow.log
