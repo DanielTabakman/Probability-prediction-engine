@@ -31,6 +31,7 @@ export const navItems: NavItem[] = [
 
 /** Secondary destinations — linked from sidebar footer, not primary nav. */
 export const secondaryNavItems: NavItem[] = [
+  { id: "mission-control", label: "Mission Control (experimental)", href: "/operator/mission-control" },
   { id: "exposure", label: "Exposure menu", href: "/exposure" },
   { id: "options-horizon", label: "Options Horizon", href: "/options-horizon" },
   { id: "forward-consistency", label: "Forward consistency", href: "/forward-consistency" },
