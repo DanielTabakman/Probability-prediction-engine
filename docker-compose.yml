@@ -18,6 +18,8 @@ services:
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+      - OCT_SIGNAL_CAPTURE_STATUS_URL=${OCT_SIGNAL_CAPTURE_STATUS_URL:-}
+      - OCT_SIGNAL_CAPTURE_STATUS_TOKEN=${OCT_SIGNAL_CAPTURE_STATUS_TOKEN:-}
     volumes:
       - msos_web_data:/data
       - ppe_snapshots:/ppe-snapshots:ro
@@ -57,6 +59,8 @@ services:
       - PPE_SNAPSHOT_DB_PATH=/ppe-snapshots/ppe_frozen_evaluations.sqlite3
       - PPE_RESEARCH_OFFER_URL=${PPE_RESEARCH_OFFER_URL:-}
       - PPE_RESEARCH_OFFER_LABEL=${PPE_RESEARCH_OFFER_LABEL:-}
+      - OCT_SIGNAL_CAPTURE_STATUS_URL=${OCT_SIGNAL_CAPTURE_STATUS_URL:-}
+      - OCT_SIGNAL_CAPTURE_STATUS_TOKEN=${OCT_SIGNAL_CAPTURE_STATUS_TOKEN:-}
     volumes:
       - msos_web_staging_data:/data
       - ppe_snapshots:/ppe-snapshots:ro
@@ -149,8 +153,6 @@ services:
       - ${PPE_CADDYFILE:-./Caddyfile}:/etc/caddy/Caddyfile:ro
       - ./caddy:/etc/caddy/caddy:ro
       - ./certs:/certs:ro
-      - caddy_data:/data
-      - caddy_config:/config
     restart: unless-stopped
     networks:
       - web
