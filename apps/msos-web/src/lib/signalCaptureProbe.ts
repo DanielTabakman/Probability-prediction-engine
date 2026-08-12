@@ -10,7 +10,7 @@ const execFileAsync = promisify(execFile);
 export type SignalCaptureProbeState = {
   status: "NOT CONNECTED" | "STOPPED" | "EMPTY" | "LIVE" | "STALE";
   detail: string;
-  origin: "local" | "vm" | "none";
+  origin: "local" | "vm" | "https" | "none";
   configuredPath: string | null;
   sourceStates: Array<{
     source: (typeof SOURCE_DIRS)[number];
@@ -20,9 +20,9 @@ export type SignalCaptureProbeState = {
   newestMtimeMs: number | null;
 };
 
-type VmStatusPayload = {
+type RemoteStatusPayload = {
   status: "STOPPED" | "EMPTY" | "LIVE" | "STALE";
-  container_running: boolean;
+  container_running?: boolean;
   total_files: number;
   age_seconds: number | null;
   sources: Array<{
@@ -36,6 +36,62 @@ function emptySources(): SignalCaptureProbeState["sourceStates"] {
   return SOURCE_DIRS.map((source) => ({ source, files: 0, newestMtimeMs: null }));
 }
 
+function normalizeRemoteState(
+  payload: RemoteStatusPayload,
+  origin: "vm" | "https",
+  label: string,
+): SignalCaptureProbeState {
+  const sourceStates = SOURCE_DIRS.map((source) => {
+    const remote = payload.sources.find((candidate) => candidate.source === source);
+    return {
+      source,
+      files: remote?.files ?? 0,
+      newestMtimeMs: remote?.newest_mtime == null ? null : remote.newest_mtime * 1000,
+    };
+  });
+  const activeSources = sourceStates.filter((source) => source.files > 0).map((source) => source.source);
+  const newestMtimeMs = newestTimestamp(sourceStates);
+  const detail =
+    payload.status === "STOPPED"
+      ? `${label} is reachable, but signal capture is stopped.`
+      : payload.status === "EMPTY"
+        ? `${label} is connected; capture is running but has not written raw files yet.`
+        : `${label} · ${activeSources.join(", ")} observed · ${payload.total_files} raw files · newest write ${payload.age_seconds ?? "?"}s ago.`;
+
+  return {
+    status: payload.status,
+    detail,
+    origin,
+    configuredPath: null,
+    sourceStates,
+    newestMtimeMs,
+  };
+}
+
+async function loadHttpState(statusUrl: string, token: string): Promise<SignalCaptureProbeState> {
+  try {
+    const response = await fetch(statusUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!response.ok) {
+      throw new Error(`status ${response.status}`);
+    }
+    const payload = (await response.json()) as RemoteStatusPayload;
+    return normalizeRemoteState(payload, "https", "Condor status endpoint");
+  } catch {
+    return {
+      status: "NOT CONNECTED",
+      detail: "Could not read the token-protected Condor status endpoint.",
+      origin: "https",
+      configuredPath: null,
+      sourceStates: emptySources(),
+      newestMtimeMs: null,
+    };
+  }
+}
+
 async function loadVmState(sshHost: string): Promise<SignalCaptureProbeState> {
   try {
     const remoteCommand = 'cd "$HOME/oct/oct-signal-capture" && python3 deploy/status_json.py';
@@ -44,32 +100,8 @@ async function loadVmState(sshHost: string): Promise<SignalCaptureProbeState> {
       ["-o", "BatchMode=yes", "-o", "ConnectTimeout=5", sshHost, remoteCommand],
       { timeout: 7000, maxBuffer: 64 * 1024 },
     );
-    const payload = JSON.parse(stdout.trim()) as VmStatusPayload;
-    const sourceStates = SOURCE_DIRS.map((source) => {
-      const remote = payload.sources.find((candidate) => candidate.source === source);
-      return {
-        source,
-        files: remote?.files ?? 0,
-        newestMtimeMs: remote?.newest_mtime == null ? null : remote.newest_mtime * 1000,
-      };
-    });
-    const activeSources = sourceStates.filter((source) => source.files > 0).map((source) => source.source);
-    const newestMtimeMs = newestTimestamp(sourceStates);
-    const detail =
-      payload.status === "STOPPED"
-        ? `VM ${sshHost} is reachable, but the oct-signal-capture container is stopped.`
-        : payload.status === "EMPTY"
-          ? `VM ${sshHost} is connected; capture is running but has not written raw files yet.`
-          : `VM ${sshHost} · ${activeSources.join(", ")} observed · ${payload.total_files} raw files · newest write ${payload.age_seconds ?? "?"}s ago.`;
-
-    return {
-      status: payload.status,
-      detail,
-      origin: "vm",
-      configuredPath: null,
-      sourceStates,
-      newestMtimeMs,
-    };
+    const payload = JSON.parse(stdout.trim()) as RemoteStatusPayload;
+    return normalizeRemoteState(payload, "vm", `VM ${sshHost}`);
   } catch {
     return {
       status: "NOT CONNECTED",
@@ -159,6 +191,12 @@ async function loadLocalState(configuredPath: string): Promise<SignalCaptureProb
 }
 
 export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeState> {
+  const statusUrl = process.env.OCT_SIGNAL_CAPTURE_STATUS_URL?.trim();
+  const statusToken = process.env.OCT_SIGNAL_CAPTURE_STATUS_TOKEN?.trim();
+  if (statusUrl && statusToken) {
+    return loadHttpState(statusUrl, statusToken);
+  }
+
   const sshHost = process.env.OCT_SIGNAL_CAPTURE_SSH_HOST?.trim();
   if (sshHost) {
     return loadVmState(sshHost);
@@ -171,7 +209,8 @@ export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeS
 
   return {
     status: "NOT CONNECTED",
-    detail: "Set OCT_SIGNAL_CAPTURE_SSH_HOST for VM status or OCT_SIGNAL_CAPTURE_DATA_DIR for a local read-only probe.",
+    detail:
+      "Set OCT_SIGNAL_CAPTURE_STATUS_URL + OCT_SIGNAL_CAPTURE_STATUS_TOKEN for shared web status, OCT_SIGNAL_CAPTURE_SSH_HOST for VM status, or OCT_SIGNAL_CAPTURE_DATA_DIR for a local read-only probe.",
     origin: "none",
     configuredPath: null,
     sourceStates: emptySources(),
