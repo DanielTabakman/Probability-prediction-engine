@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
+import { ProbeAutoRefresh } from "@/components/ProbeAutoRefresh";
 import { operatingLoopProbe } from "@/data/operatingLoopProbe";
 import { loadSignalCaptureProbeState } from "@/lib/signalCaptureProbe";
 
@@ -44,6 +45,7 @@ function ProbeCard({
 export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
   const capture = await loadSignalCaptureProbeState();
+  const observeEyebrow = capture.origin === "vm" ? "OBSERVE · VM READ-ONLY" : "OBSERVE · REAL READ-ONLY";
 
   return (
     <AppShell activeNavId="mission-control">
@@ -53,6 +55,7 @@ export default async function MissionControlPage() {
           <h1 className="title">Mission Control</h1>
         </div>
         <div className="tools">
+          <ProbeAutoRefresh intervalMs={15000} />
           <span className="pill">
             <span className="dot amber" aria-hidden="true" />
             Hybrid probe / read-only
@@ -64,7 +67,7 @@ export default async function MissionControlPage() {
         <div className="panel-sub">{probe.label}</div>
         <h2 style={{ marginBottom: "0.35rem" }}>{probe.experiment}</h2>
         <p className="panel-sub" style={{ marginTop: 0 }}>
-          Deliberately janky. Observe is now wired to real capture-file activity; the middle of the loop remains manual while we test the structure.
+          Deliberately janky. Observe is wired to real capture activity; the middle of the loop remains manual while we test the structure.
         </p>
 
         <div
@@ -87,7 +90,7 @@ export default async function MissionControlPage() {
       </section>
 
       <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <ProbeCard eyebrow="OBSERVE · REAL READ-ONLY" title="Signal Capture" status={capture.status} detail={capture.detail}>
+        <ProbeCard eyebrow={observeEyebrow} title="Signal Capture" status={capture.status} detail={capture.detail}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
             {capture.sourceStates.map((source) => (
               <span key={source.source} className="tiny-pill">
@@ -106,15 +109,19 @@ export default async function MissionControlPage() {
         <div className="panel-sub">NEXT ACTION</div>
         <h2 style={{ marginBottom: "0.35rem" }}>
           {capture.status === "NOT CONNECTED"
-            ? "Point MSOS at the oct-signal-capture data directory."
-            : capture.status === "EMPTY"
-              ? "Start live signal capture from the normal Ubuntu/WSL shell."
-              : capture.status === "LIVE"
-                ? "Observe the live feed, then record the first research conclusion."
-                : "Restart or inspect signal capture; the newest output is stale."}
+            ? capture.origin === "vm"
+              ? "Restore the read-only SSH status connection to the capture VM."
+              : "Point MSOS at the VM or local oct-signal-capture data."
+            : capture.status === "STOPPED"
+              ? "Start the persistent oct-signal-capture service on the VM."
+              : capture.status === "EMPTY"
+                ? "Let persistent capture collect its first live observations."
+                : capture.status === "LIVE"
+                  ? "Observe the live feed, then record the first research conclusion."
+                  : "Inspect persistent signal capture; the newest output is stale."}
         </h2>
         <p className="panel-sub" style={{ marginBottom: 0 }}>
-          Set <code>OCT_SIGNAL_CAPTURE_DATA_DIR</code> in the MSOS process environment. This page only reads file names and modification times; it does not read .env files, credentials, or place trades.
+          Prefer <code>OCT_SIGNAL_CAPTURE_SSH_HOST</code> for the persistent VM probe. Local <code>OCT_SIGNAL_CAPTURE_DATA_DIR</code> remains available as a fallback. Mission Control refreshes this read-only status automatically every 15 seconds.
         </p>
       </section>
 
