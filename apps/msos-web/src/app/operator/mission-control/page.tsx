@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 
 import { AppShell } from "@/components/AppShell";
 import { operatingLoopProbe } from "@/data/operatingLoopProbe";
+import { loadSignalCaptureProbeState } from "@/lib/signalCaptureProbe";
 
 export const metadata: Metadata = {
   title: "Mission Control (Experimental) | Market Structure OS",
-  description: "Fixture-backed operating-loop probe for MSOS operator workflow testing.",
+  description: "Read-only operating-loop probe for MSOS operator workflow testing.",
 };
+
+export const dynamic = "force-dynamic";
 
 function stageMark(status: "active" | "pending") {
   return status === "active" ? "●" : "○";
@@ -17,11 +20,13 @@ function ProbeCard({
   title,
   status,
   detail,
+  children,
 }: {
   eyebrow: string;
   title: string;
   status: string;
   detail: string;
+  children?: React.ReactNode;
 }) {
   return (
     <section className="panel compact">
@@ -30,13 +35,15 @@ function ProbeCard({
         <h2 style={{ margin: 0 }}>{title}</h2>
         <span className="tag muted">{status}</span>
       </div>
-      <p style={{ marginBottom: 0 }}>{detail}</p>
+      <p style={{ marginBottom: children ? "0.75rem" : 0 }}>{detail}</p>
+      {children}
     </section>
   );
 }
 
-export default function MissionControlPage() {
+export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
+  const capture = await loadSignalCaptureProbeState();
 
   return (
     <AppShell activeNavId="mission-control">
@@ -48,7 +55,7 @@ export default function MissionControlPage() {
         <div className="tools">
           <span className="pill">
             <span className="dot amber" aria-hidden="true" />
-            {probe.mode}
+            Hybrid probe / read-only
           </span>
         </div>
       </header>
@@ -57,7 +64,7 @@ export default function MissionControlPage() {
         <div className="panel-sub">{probe.label}</div>
         <h2 style={{ marginBottom: "0.35rem" }}>{probe.experiment}</h2>
         <p className="panel-sub" style={{ marginTop: 0 }}>
-          Deliberately janky. The goal is to test whether this structure is useful before MSOS is redesigned around it.
+          Deliberately janky. Observe is now wired to real capture-file activity; the middle of the loop remains manual while we test the structure.
         </p>
 
         <div
@@ -80,18 +87,34 @@ export default function MissionControlPage() {
       </section>
 
       <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <ProbeCard eyebrow="OBSERVE" {...probe.observe} />
-        <ProbeCard eyebrow="UNDERSTAND" {...probe.understand} />
-        <ProbeCard eyebrow="DECIDE" {...probe.decide} />
-        <ProbeCard eyebrow="EXECUTE" {...probe.execute} />
-        <ProbeCard eyebrow="LEARN" {...probe.learn} />
+        <ProbeCard eyebrow="OBSERVE · REAL READ-ONLY" title="Signal Capture" status={capture.status} detail={capture.detail}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+            {capture.sourceStates.map((source) => (
+              <span key={source.source} className="tiny-pill">
+                {source.source}: {source.files > 0 ? `${source.files} file${source.files === 1 ? "" : "s"}` : "—"}
+              </span>
+            ))}
+          </div>
+        </ProbeCard>
+        <ProbeCard eyebrow="UNDERSTAND · MANUAL" {...probe.understand} />
+        <ProbeCard eyebrow="DECIDE · MANUAL" {...probe.decide} />
+        <ProbeCard eyebrow="EXECUTE · READ ONLY / NOT WIRED" {...probe.execute} />
+        <ProbeCard eyebrow="LEARN · MANUAL" {...probe.learn} />
       </div>
 
       <section className="panel" style={{ marginTop: "1rem" }}>
         <div className="panel-sub">NEXT ACTION</div>
-        <h2 style={{ marginBottom: "0.35rem" }}>{probe.nextAction}</h2>
+        <h2 style={{ marginBottom: "0.35rem" }}>
+          {capture.status === "NOT CONNECTED"
+            ? "Point MSOS at the oct-signal-capture data directory."
+            : capture.status === "EMPTY"
+              ? "Start live signal capture from the normal Ubuntu/WSL shell."
+              : capture.status === "LIVE"
+                ? "Observe the live feed, then record the first research conclusion."
+                : "Restart or inspect signal capture; the newest output is stale."}
+        </h2>
         <p className="panel-sub" style={{ marginBottom: 0 }}>
-          No action on this page can place a trade. We are testing the workflow representation first.
+          Set <code>OCT_SIGNAL_CAPTURE_DATA_DIR</code> in the MSOS process environment. This page only reads file names and modification times; it does not read .env files, credentials, or place trades.
         </p>
       </section>
 
