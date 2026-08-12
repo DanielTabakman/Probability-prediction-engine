@@ -45,7 +45,12 @@ function ProbeCard({
 export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
   const capture = await loadSignalCaptureProbeState();
-  const observeEyebrow = capture.origin === "vm" ? "OBSERVE · VM READ-ONLY" : "OBSERVE · REAL READ-ONLY";
+  const observeEyebrow =
+    capture.origin === "https"
+      ? "OBSERVE · CONDOR READ-ONLY"
+      : capture.origin === "vm"
+        ? "OBSERVE · VM READ-ONLY"
+        : "OBSERVE · REAL READ-ONLY";
 
   return (
     <AppShell activeNavId="mission-control">
@@ -109,9 +114,11 @@ export default async function MissionControlPage() {
         <div className="panel-sub">NEXT ACTION</div>
         <h2 style={{ marginBottom: "0.35rem" }}>
           {capture.status === "NOT CONNECTED"
-            ? capture.origin === "vm"
-              ? "Restore the read-only SSH status connection to the capture VM."
-              : "Point MSOS at the VM or local oct-signal-capture data."
+            ? capture.origin === "https"
+              ? "Restore the token-protected Condor status endpoint."
+              : capture.origin === "vm"
+                ? "Restore the read-only SSH status connection to the capture VM."
+                : "Point MSOS at the shared, VM, or local oct-signal-capture status."
             : capture.status === "STOPPED"
               ? "Start the persistent oct-signal-capture service on the VM."
               : capture.status === "EMPTY"
@@ -121,7 +128,7 @@ export default async function MissionControlPage() {
                   : "Inspect persistent signal capture; the newest output is stale."}
         </h2>
         <p className="panel-sub" style={{ marginBottom: 0 }}>
-          Prefer <code>OCT_SIGNAL_CAPTURE_SSH_HOST</code> for the persistent VM probe. Local <code>OCT_SIGNAL_CAPTURE_DATA_DIR</code> remains available as a fallback. Mission Control refreshes this read-only status automatically every 15 seconds.
+          Shared staging prefers the token-protected HTTPS status endpoint. SSH and local filesystem modes remain development fallbacks. Mission Control refreshes this read-only status automatically every 15 seconds.
         </p>
       </section>
 
