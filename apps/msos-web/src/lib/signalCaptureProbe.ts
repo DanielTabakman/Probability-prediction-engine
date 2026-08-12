@@ -1,12 +1,16 @@
+import { execFile } from "child_process";
 import { readdir, stat } from "fs/promises";
 import path from "path";
+import { promisify } from "util";
 
 const SOURCE_DIRS = ["ws", "txstream", "ndax", "jupiter"] as const;
 const LIVE_AFTER_MS = 2 * 60 * 1000;
+const execFileAsync = promisify(execFile);
 
 export type SignalCaptureProbeState = {
-  status: "NOT CONNECTED" | "EMPTY" | "LIVE" | "STALE";
+  status: "NOT CONNECTED" | "STOPPED" | "EMPTY" | "LIVE" | "STALE";
   detail: string;
+  origin: "local" | "vm" | "none";
   configuredPath: string | null;
   sourceStates: Array<{
     source: (typeof SOURCE_DIRS)[number];
@@ -15,6 +19,68 @@ export type SignalCaptureProbeState = {
   }>;
   newestMtimeMs: number | null;
 };
+
+type VmStatusPayload = {
+  status: "STOPPED" | "EMPTY" | "LIVE" | "STALE";
+  container_running: boolean;
+  total_files: number;
+  age_seconds: number | null;
+  sources: Array<{
+    source: string;
+    files: number;
+    newest_mtime: number | null;
+  }>;
+};
+
+function emptySources(): SignalCaptureProbeState["sourceStates"] {
+  return SOURCE_DIRS.map((source) => ({ source, files: 0, newestMtimeMs: null }));
+}
+
+async function loadVmState(sshHost: string): Promise<SignalCaptureProbeState> {
+  try {
+    const remoteCommand = 'cd "$HOME/oct/oct-signal-capture" && python3 deploy/status_json.py';
+    const { stdout } = await execFileAsync(
+      "ssh",
+      ["-o", "BatchMode=yes", "-o", "ConnectTimeout=5", sshHost, remoteCommand],
+      { timeout: 7000, maxBuffer: 64 * 1024 },
+    );
+    const payload = JSON.parse(stdout.trim()) as VmStatusPayload;
+    const sourceStates = SOURCE_DIRS.map((source) => {
+      const remote = payload.sources.find((candidate) => candidate.source === source);
+      return {
+        source,
+        files: remote?.files ?? 0,
+        newestMtimeMs: remote?.newest_mtime == null ? null : remote.newest_mtime * 1000,
+      };
+    });
+    const activeSources = sourceStates.filter((source) => source.files > 0).map((source) => source.source);
+    const newestMtimeMs = newestTimestamp(sourceStates);
+    const detail =
+      payload.status === "STOPPED"
+        ? `VM ${sshHost} is reachable, but the oct-signal-capture container is stopped.`
+        : payload.status === "EMPTY"
+          ? `VM ${sshHost} is connected; capture is running but has not written raw files yet.`
+          : `VM ${sshHost} · ${activeSources.join(", ")} observed · ${payload.total_files} raw files · newest write ${payload.age_seconds ?? "?"}s ago.`;
+
+    return {
+      status: payload.status,
+      detail,
+      origin: "vm",
+      configuredPath: null,
+      sourceStates,
+      newestMtimeMs,
+    };
+  } catch {
+    return {
+      status: "NOT CONNECTED",
+      detail: `Could not read capture status from VM ${sshHost}. Ensure SSH works non-interactively and deploy/status_json.py exists on the VM.`,
+      origin: "vm",
+      configuredPath: null,
+      sourceStates: emptySources(),
+      newestMtimeMs: null,
+    };
+  }
+}
 
 async function inspectSourceDir(root: string, source: (typeof SOURCE_DIRS)[number]) {
   const dir = path.join(root, "raw", source);
@@ -45,18 +111,7 @@ function newestTimestamp(states: SignalCaptureProbeState["sourceStates"]): numbe
   return values.length > 0 ? Math.max(...values) : null;
 }
 
-export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeState> {
-  const configuredPath = process.env.OCT_SIGNAL_CAPTURE_DATA_DIR?.trim() || null;
-  if (!configuredPath) {
-    return {
-      status: "NOT CONNECTED",
-      detail: "Set OCT_SIGNAL_CAPTURE_DATA_DIR to the oct-signal-capture data directory to enable the live read-only probe.",
-      configuredPath: null,
-      sourceStates: SOURCE_DIRS.map((source) => ({ source, files: 0, newestMtimeMs: null })),
-      newestMtimeMs: null,
-    };
-  }
-
+async function loadLocalState(configuredPath: string): Promise<SignalCaptureProbeState> {
   try {
     const rootStat = await stat(configuredPath);
     if (!rootStat.isDirectory()) {
@@ -66,8 +121,9 @@ export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeS
     return {
       status: "NOT CONNECTED",
       detail: `Configured capture path is unavailable: ${configuredPath}`,
+      origin: "local",
       configuredPath,
-      sourceStates: SOURCE_DIRS.map((source) => ({ source, files: 0, newestMtimeMs: null })),
+      sourceStates: emptySources(),
       newestMtimeMs: null,
     };
   }
@@ -79,7 +135,8 @@ export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeS
   if (totalFiles === 0 || newestMtimeMs === null) {
     return {
       status: "EMPTY",
-      detail: "Capture data directory is connected, but no raw collector files have been observed yet.",
+      detail: "Local capture data directory is connected, but no raw collector files have been observed yet.",
+      origin: "local",
       configuredPath,
       sourceStates,
       newestMtimeMs,
@@ -93,9 +150,31 @@ export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeS
 
   return {
     status,
-    detail: `${activeSources.join(", ")} observed · ${totalFiles} raw files · newest write ${ageSeconds}s ago.`,
+    detail: `Local · ${activeSources.join(", ")} observed · ${totalFiles} raw files · newest write ${ageSeconds}s ago.`,
+    origin: "local",
     configuredPath,
     sourceStates,
     newestMtimeMs,
+  };
+}
+
+export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeState> {
+  const sshHost = process.env.OCT_SIGNAL_CAPTURE_SSH_HOST?.trim();
+  if (sshHost) {
+    return loadVmState(sshHost);
+  }
+
+  const configuredPath = process.env.OCT_SIGNAL_CAPTURE_DATA_DIR?.trim();
+  if (configuredPath) {
+    return loadLocalState(configuredPath);
+  }
+
+  return {
+    status: "NOT CONNECTED",
+    detail: "Set OCT_SIGNAL_CAPTURE_SSH_HOST for VM status or OCT_SIGNAL_CAPTURE_DATA_DIR for a local read-only probe.",
+    origin: "none",
+    configuredPath: null,
+    sourceStates: emptySources(),
+    newestMtimeMs: null,
   };
 }
