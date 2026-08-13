@@ -50,7 +50,9 @@ export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
   const capture = await loadSignalCaptureProbeState();
   const ndax = capture.ndax15m;
+  const jupiter = capture.jupiter15m;
   const ndaxEvidenceReady = ndax?.status === "OK";
+  const jupiterEvidenceReady = jupiter?.status === "OK";
   const observeEyebrow =
     capture.origin === "https"
       ? "OBSERVE · CONDOR READ-ONLY"
@@ -78,7 +80,7 @@ export default async function MissionControlPage() {
         <div className="panel-sub">{probe.label}</div>
         <h2 style={{ marginBottom: "0.35rem" }}>{probe.experiment}</h2>
         <p className="panel-sub" style={{ marginTop: 0 }}>
-          Deliberately janky. Observe is wired to real capture activity; objective NDAX evidence is computed automatically, while interpretation and decisions remain manual.
+          Deliberately janky. Observe is wired to real capture activity; objective market-quality evidence is computed automatically, while interpretation and decisions remain manual.
         </p>
 
         <div
@@ -117,69 +119,72 @@ export default async function MissionControlPage() {
           status={ndaxEvidenceReady ? probe.understand.status : "WAITING FOR EVIDENCE"}
           detail={probe.understand.detail}
         >
-          {ndaxEvidenceReady ? (
-            <>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
-                  gap: "0.5rem",
-                }}
-              >
-                <div className="panel compact">
-                  <div className="panel-sub">L1 observations</div>
-                  <strong>{ndax.l1_observations ?? "—"}</strong>
+          <div style={{ display: "grid", gap: "0.75rem" }}>
+            <section className="panel compact">
+              <div className="panel-sub">NDAX · latest 15 minutes</div>
+              {ndaxEvidenceReady ? (
+                <>
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
+                      gap: "0.5rem",
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    <div className="panel compact"><div className="panel-sub">L1 observations</div><strong>{ndax.l1_observations ?? "—"}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">Coverage</div><strong>{fmt((ndax.coverage_seconds ?? 0) / 60, 1, " min")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">Freshness</div><strong>{fmt(ndax.freshness_seconds, 1, "s")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">L1 rate</div><strong>{fmt(ndax.event_rate_hz, 2, " Hz")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">Mid CAD</div><strong>{fmt(ndax.first_mid_cad, 3)} → {fmt(ndax.last_mid_cad, 3)}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">15m move</div><strong>{fmt(ndax.move_pct, 3, "%")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">15m range</div><strong>{fmt(ndax.range_pct, 3, "%")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">Median spread</div><strong>{fmt(ndax.median_spread_bps, 2, " bps")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">P95 spread</div><strong>{fmt(ndax.p95_spread_bps, 2, " bps")}</strong></div>
+                    <div className="panel compact"><div className="panel-sub">Max L1 gap</div><strong>{fmt(ndax.max_gap_seconds, 2, "s")}</strong></div>
+                  </div>
+                </>
+              ) : (
+                <p className="panel-sub" style={{ marginBottom: 0 }}>
+                  {ndax?.status === "ERROR" ? "NDAX analysis unavailable." : "Waiting for normalized NDAX L1 observations."}
+                </p>
+              )}
+            </section>
+
+            <section className="panel compact">
+              <div className="panel-sub">Jupiter · latest 15 minutes</div>
+              {jupiterEvidenceReady ? (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
+                    gap: "0.5rem",
+                    marginTop: "0.5rem",
+                  }}
+                >
+                  <div className="panel compact"><div className="panel-sub">Quote observations</div><strong>{jupiter.quote_observations ?? "—"}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Coverage</div><strong>{fmt((jupiter.coverage_seconds ?? 0) / 60, 1, " min")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Freshness</div><strong>{fmt(jupiter.freshness_seconds, 1, "s")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Quote rate</div><strong>{fmt(jupiter.event_rate_hz, 2, " Hz")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Price USD</div><strong>{fmt(jupiter.first_price_usd, 3)} → {fmt(jupiter.last_price_usd, 3)}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">15m move</div><strong>{fmt(jupiter.move_pct, 3, "%")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">15m range</div><strong>{fmt(jupiter.range_pct, 3, "%")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Median gap</div><strong>{fmt(jupiter.median_gap_seconds, 2, "s")}</strong></div>
+                  <div className="panel compact"><div className="panel-sub">Max gap</div><strong>{fmt(jupiter.max_gap_seconds, 2, "s")}</strong></div>
                 </div>
-                <div className="panel compact">
-                  <div className="panel-sub">Coverage</div>
-                  <strong>{fmt((ndax.coverage_seconds ?? 0) / 60, 1, " min")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">Freshness</div>
-                  <strong>{fmt(ndax.freshness_seconds, 1, "s")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">L1 rate</div>
-                  <strong>{fmt(ndax.event_rate_hz, 2, " Hz")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">Mid CAD</div>
-                  <strong>
-                    {fmt(ndax.first_mid_cad, 3)} → {fmt(ndax.last_mid_cad, 3)}
-                  </strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">15m move</div>
-                  <strong>{fmt(ndax.move_pct, 3, "%")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">15m range</div>
-                  <strong>{fmt(ndax.range_pct, 3, "%")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">Median spread</div>
-                  <strong>{fmt(ndax.median_spread_bps, 2, " bps")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">P95 spread</div>
-                  <strong>{fmt(ndax.p95_spread_bps, 2, " bps")}</strong>
-                </div>
-                <div className="panel compact">
-                  <div className="panel-sub">Max L1 gap</div>
-                  <strong>{fmt(ndax.max_gap_seconds, 2, "s")}</strong>
-                </div>
-              </div>
-              <p className="panel-sub" style={{ marginBottom: 0, marginTop: "0.75rem" }}>
-                Derived from normalized NDAX Level 1 index rows over the latest 15-minute window. Evidence only; no trade signal or strategy conclusion is generated automatically.
-              </p>
-            </>
-          ) : (
-            <p className="panel-sub" style={{ marginBottom: 0 }}>
-              {ndax?.status === "ERROR"
-                ? "NDAX analysis is temporarily unavailable; capture status remains independent."
-                : "Waiting for enough normalized NDAX Level 1 observations to summarize the latest 15-minute window."}
-            </p>
-          )}
+              ) : (
+                <p className="panel-sub" style={{ marginBottom: 0 }}>
+                  {jupiter?.status === "ERROR"
+                    ? "Jupiter analysis unavailable."
+                    : "Waiting for a stable Jupiter quote window; rate limiting may still be visible here."}
+                </p>
+              )}
+            </section>
+          </div>
+
+          <p className="panel-sub" style={{ marginBottom: 0, marginTop: "0.75rem" }}>
+            Derived from normalized index rows over the latest 15-minute windows. Evidence only; no trade signal or strategy conclusion is generated automatically.
+          </p>
         </ProbeCard>
 
         <ProbeCard eyebrow="DECIDE · MANUAL" {...probe.decide} />
@@ -200,11 +205,13 @@ export default async function MissionControlPage() {
               ? "Start the persistent oct-signal-capture service on the VM."
               : capture.status === "EMPTY"
                 ? "Let persistent capture collect its first live observations."
-                : capture.status === "LIVE" && ndaxEvidenceReady
-                  ? probe.nextAction
-                  : capture.status === "LIVE"
-                    ? "Let the NDAX evidence window populate, then interpret it."
-                    : "Inspect persistent signal capture; the newest output is stale."}
+                : capture.status === "LIVE" && ndaxEvidenceReady && !jupiterEvidenceReady
+                  ? "Stabilize the Jupiter reference window, then compare it with NDAX."
+                  : capture.status === "LIVE" && ndaxEvidenceReady && jupiterEvidenceReady
+                    ? "Compare NDAX with Jupiter and decide which feed should drive the first support/resistance experiment."
+                    : capture.status === "LIVE"
+                      ? "Let the market-quality evidence windows populate, then interpret them."
+                      : "Inspect persistent signal capture; the newest output is stale."}
         </h2>
         <p className="panel-sub" style={{ marginBottom: 0 }}>
           Shared staging prefers the token-protected HTTPS status endpoint. SSH and local filesystem modes remain development fallbacks. Mission Control refreshes this read-only status automatically every 15 seconds.
