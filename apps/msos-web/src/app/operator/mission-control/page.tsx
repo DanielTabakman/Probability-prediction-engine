@@ -16,6 +16,10 @@ function stageMark(status: "active" | "pending") {
   return status === "active" ? "●" : "○";
 }
 
+function fmt(value: number | null | undefined, digits = 2, suffix = "") {
+  return typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : "—";
+}
+
 function ProbeCard({
   eyebrow,
   title,
@@ -45,6 +49,8 @@ function ProbeCard({
 export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
   const capture = await loadSignalCaptureProbeState();
+  const ndax = capture.ndax15m;
+  const ndaxEvidenceReady = ndax?.status === "OK";
   const observeEyebrow =
     capture.origin === "https"
       ? "OBSERVE · CONDOR READ-ONLY"
@@ -72,7 +78,7 @@ export default async function MissionControlPage() {
         <div className="panel-sub">{probe.label}</div>
         <h2 style={{ marginBottom: "0.35rem" }}>{probe.experiment}</h2>
         <p className="panel-sub" style={{ marginTop: 0 }}>
-          Deliberately janky. Observe is wired to real capture activity; the middle of the loop remains manual while we test the structure.
+          Deliberately janky. Observe is wired to real capture activity; objective NDAX evidence is computed automatically, while interpretation and decisions remain manual.
         </p>
 
         <div
@@ -104,7 +110,78 @@ export default async function MissionControlPage() {
             ))}
           </div>
         </ProbeCard>
-        <ProbeCard eyebrow="UNDERSTAND · MANUAL" {...probe.understand} />
+
+        <ProbeCard
+          eyebrow="UNDERSTAND · EVIDENCE AUTO / INTERPRET MANUAL"
+          title={probe.understand.title}
+          status={ndaxEvidenceReady ? "EVIDENCE AVAILABLE" : probe.understand.status}
+          detail={probe.understand.detail}
+        >
+          {ndaxEvidenceReady ? (
+            <>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
+                  gap: "0.5rem",
+                }}
+              >
+                <div className="panel compact">
+                  <div className="panel-sub">L1 observations</div>
+                  <strong>{ndax.l1_observations ?? "—"}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">Coverage</div>
+                  <strong>{fmt((ndax.coverage_seconds ?? 0) / 60, 1, " min")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">Freshness</div>
+                  <strong>{fmt(ndax.freshness_seconds, 1, "s")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">L1 rate</div>
+                  <strong>{fmt(ndax.event_rate_hz, 2, " Hz")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">Mid CAD</div>
+                  <strong>
+                    {fmt(ndax.first_mid_cad, 3)} → {fmt(ndax.last_mid_cad, 3)}
+                  </strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">15m move</div>
+                  <strong>{fmt(ndax.move_pct, 3, "%")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">15m range</div>
+                  <strong>{fmt(ndax.range_pct, 3, "%")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">Median spread</div>
+                  <strong>{fmt(ndax.median_spread_bps, 2, " bps")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">P95 spread</div>
+                  <strong>{fmt(ndax.p95_spread_bps, 2, " bps")}</strong>
+                </div>
+                <div className="panel compact">
+                  <div className="panel-sub">Max L1 gap</div>
+                  <strong>{fmt(ndax.max_gap_seconds, 2, "s")}</strong>
+                </div>
+              </div>
+              <p className="panel-sub" style={{ marginBottom: 0, marginTop: "0.75rem" }}>
+                Derived from normalized NDAX Level 1 index rows over the latest 15-minute window. Evidence only; no trade signal or strategy conclusion is generated automatically.
+              </p>
+            </>
+          ) : (
+            <p className="panel-sub" style={{ marginBottom: 0 }}>
+              {ndax?.status === "ERROR"
+                ? "NDAX analysis is temporarily unavailable; capture status remains independent."
+                : "Waiting for enough normalized NDAX Level 1 observations to summarize the latest 15-minute window."}
+            </p>
+          )}
+        </ProbeCard>
+
         <ProbeCard eyebrow="DECIDE · MANUAL" {...probe.decide} />
         <ProbeCard eyebrow="EXECUTE · READ ONLY / NOT WIRED" {...probe.execute} />
         <ProbeCard eyebrow="LEARN · MANUAL" {...probe.learn} />
@@ -123,9 +200,11 @@ export default async function MissionControlPage() {
               ? "Start the persistent oct-signal-capture service on the VM."
               : capture.status === "EMPTY"
                 ? "Let persistent capture collect its first live observations."
-                : capture.status === "LIVE"
-                  ? "Observe the live feed, then record the first research conclusion."
-                  : "Inspect persistent signal capture; the newest output is stale."}
+                : capture.status === "LIVE" && ndaxEvidenceReady
+                  ? "Review the 15-minute NDAX evidence and record the first research conclusion."
+                  : capture.status === "LIVE"
+                    ? "Let the NDAX evidence window populate, then interpret it."
+                    : "Inspect persistent signal capture; the newest output is stale."}
         </h2>
         <p className="panel-sub" style={{ marginBottom: 0 }}>
           Shared staging prefers the token-protected HTTPS status endpoint. SSH and local filesystem modes remain development fallbacks. Mission Control refreshes this read-only status automatically every 15 seconds.
