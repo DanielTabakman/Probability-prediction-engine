@@ -7,6 +7,31 @@ const SOURCE_DIRS = ["ws", "txstream", "ndax", "jupiter"] as const;
 const LIVE_AFTER_MS = 2 * 60 * 1000;
 const execFileAsync = promisify(execFile);
 
+export type NdaxMarketQualityWindow = {
+  status: "OK" | "NO_L1_DATA" | "ERROR";
+  window_seconds?: number;
+  index_files_considered?: number;
+  truncated_active_files?: number;
+  recent_event_count?: number;
+  l1_observations?: number;
+  coverage_seconds?: number | null;
+  freshness_seconds?: number | null;
+  event_rate_hz?: number | null;
+  first_mid_cad?: number | null;
+  last_mid_cad?: number | null;
+  min_mid_cad?: number | null;
+  max_mid_cad?: number | null;
+  move_pct?: number | null;
+  range_pct?: number | null;
+  median_spread_cad?: number | null;
+  mean_spread_bps?: number | null;
+  median_spread_bps?: number | null;
+  p95_spread_bps?: number | null;
+  median_gap_seconds?: number | null;
+  max_gap_seconds?: number | null;
+  error?: string;
+};
+
 export type SignalCaptureProbeState = {
   status: "NOT CONNECTED" | "STOPPED" | "EMPTY" | "LIVE" | "STALE";
   detail: string;
@@ -18,6 +43,7 @@ export type SignalCaptureProbeState = {
     newestMtimeMs: number | null;
   }>;
   newestMtimeMs: number | null;
+  ndax15m: NdaxMarketQualityWindow | null;
 };
 
 type RemoteStatusPayload = {
@@ -30,6 +56,7 @@ type RemoteStatusPayload = {
     files: number;
     newest_mtime: number | null;
   }>;
+  ndax_15m?: NdaxMarketQualityWindow;
 };
 
 function emptySources(): SignalCaptureProbeState["sourceStates"] {
@@ -65,6 +92,7 @@ function normalizeRemoteState(
     configuredPath: null,
     sourceStates,
     newestMtimeMs,
+    ndax15m: payload.ndax_15m ?? null,
   };
 }
 
@@ -88,6 +116,7 @@ async function loadHttpState(statusUrl: string, token: string): Promise<SignalCa
       configuredPath: null,
       sourceStates: emptySources(),
       newestMtimeMs: null,
+      ndax15m: null,
     };
   }
 }
@@ -110,6 +139,7 @@ async function loadVmState(sshHost: string): Promise<SignalCaptureProbeState> {
       configuredPath: null,
       sourceStates: emptySources(),
       newestMtimeMs: null,
+      ndax15m: null,
     };
   }
 }
@@ -157,6 +187,7 @@ async function loadLocalState(configuredPath: string): Promise<SignalCaptureProb
       configuredPath,
       sourceStates: emptySources(),
       newestMtimeMs: null,
+      ndax15m: null,
     };
   }
 
@@ -172,6 +203,7 @@ async function loadLocalState(configuredPath: string): Promise<SignalCaptureProb
       configuredPath,
       sourceStates,
       newestMtimeMs,
+      ndax15m: null,
     };
   }
 
@@ -187,6 +219,7 @@ async function loadLocalState(configuredPath: string): Promise<SignalCaptureProb
     configuredPath,
     sourceStates,
     newestMtimeMs,
+    ndax15m: null,
   };
 }
 
@@ -215,5 +248,6 @@ export async function loadSignalCaptureProbeState(): Promise<SignalCaptureProbeS
     configuredPath: null,
     sourceStates: emptySources(),
     newestMtimeMs: null,
+    ndax15m: null,
   };
 }
