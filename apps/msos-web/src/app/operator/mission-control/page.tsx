@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 function fmt(value: number | null | undefined, digits = 2, suffix = "") {
   return typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : "—";
 }
-
+function mark(status: "active" | "pending") { return status === "active" ? "●" : "○"; }
 function Card({ eyebrow, title, status, detail, children }: { eyebrow: string; title: string; status: string; detail: string; children?: React.ReactNode }) {
   return <section className="panel compact"><div className="panel-sub">{eyebrow}</div><div className="row" style={{ alignItems: "center", gap: "0.75rem" }}><h2 style={{ margin: 0 }}>{title}</h2><span className="tag muted">{status}</span></div><p style={{ marginBottom: children ? "0.75rem" : 0 }}>{detail}</p>{children}</section>;
 }
@@ -30,7 +30,10 @@ export default async function MissionControlPage() {
 
       <section className="panel compact">
         <div className="panel-sub">{probe.label}</div><h2 style={{ marginBottom: "0.35rem" }}>{probe.experiment}</h2>
-        <p className="panel-sub" style={{ marginBottom: 0 }}>Observe real data, test structure across scales, keep interpretation manual.</p>
+        <p className="panel-sub">Observe real data, test structure across scales, keep interpretation manual.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "0.5rem" }}>
+          {probe.stages.map(stage => <div key={stage.id} className="panel compact" style={{ textAlign: "center" }}><div style={{ fontSize: "1.2rem" }}>{mark(stage.status)}</div><strong>{stage.label}</strong></div>)}
+        </div>
       </section>
 
       <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
@@ -49,7 +52,6 @@ export default async function MissionControlPage() {
         </Card>
 
         <MultiScaleStructureProbe payload={ndax?.multiscale} />
-
         <Card eyebrow="DECIDE · MANUAL" {...probe.decide} />
         <Card eyebrow="EXECUTE · READ ONLY / NOT WIRED" {...probe.execute} />
         <Card eyebrow="LEARN · MANUAL" {...probe.learn} />
