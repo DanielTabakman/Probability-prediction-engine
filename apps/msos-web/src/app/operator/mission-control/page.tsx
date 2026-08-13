@@ -112,9 +112,9 @@ export default async function MissionControlPage() {
         </ProbeCard>
 
         <ProbeCard
-          eyebrow="UNDERSTAND · EVIDENCE AUTO / INTERPRET MANUAL"
+          eyebrow="UNDERSTAND · EVIDENCE AUTO / CONCLUSION MANUAL"
           title={probe.understand.title}
-          status={ndaxEvidenceReady ? "EVIDENCE AVAILABLE" : probe.understand.status}
+          status={ndaxEvidenceReady ? probe.understand.status : "WAITING FOR EVIDENCE"}
           detail={probe.understand.detail}
         >
           {ndaxEvidenceReady ? (
@@ -201,7 +201,7 @@ export default async function MissionControlPage() {
               : capture.status === "EMPTY"
                 ? "Let persistent capture collect its first live observations."
                 : capture.status === "LIVE" && ndaxEvidenceReady
-                  ? "Review the 15-minute NDAX evidence and record the first research conclusion."
+                  ? probe.nextAction
                   : capture.status === "LIVE"
                     ? "Let the NDAX evidence window populate, then interpret it."
                     : "Inspect persistent signal capture; the newest output is stale."}
