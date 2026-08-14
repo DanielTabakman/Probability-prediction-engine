@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { MultiScaleStructureProbe } from "@/components/MultiScaleStructureProbe";
 import { ProbeAutoRefresh } from "@/components/ProbeAutoRefresh";
 import { operatingLoopProbe } from "@/data/operatingLoopProbe";
+import { loadMarketStructureProbeState } from "@/lib/marketStructureProbe";
 import { loadSignalCaptureProbeState } from "@/lib/signalCaptureProbe";
 
 export const metadata: Metadata = { title: "Mission Control (Experimental) | Market Structure OS" };
@@ -19,7 +20,8 @@ function Card({ eyebrow, title, status, detail, children }: { eyebrow: string; t
 export default async function MissionControlPage() {
   const probe = operatingLoopProbe;
   const capture = await loadSignalCaptureProbeState();
-  const ndax = capture.ndax15m as (typeof capture.ndax15m & { multiscale?: unknown }) | null;
+  const structure = await loadMarketStructureProbeState();
+  const ndax = capture.ndax15m;
   const jupiter = capture.jupiter15m;
   const ndaxReady = ndax?.status === "OK";
   const jupiterReady = jupiter?.status === "OK";
@@ -51,7 +53,7 @@ export default async function MissionControlPage() {
           </div>}
         </Card>
 
-        <MultiScaleStructureProbe payload={ndax?.multiscale} />
+        <MultiScaleStructureProbe payload={structure.payload} sourceStatus={structure.status} sourceDetail={structure.detail} />
         <Card eyebrow="DECIDE · MANUAL" {...probe.decide} />
         <Card eyebrow="EXECUTE · READ ONLY / NOT WIRED" {...probe.execute} />
         <Card eyebrow="LEARN · MANUAL" {...probe.learn} />

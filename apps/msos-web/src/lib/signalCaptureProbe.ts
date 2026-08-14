@@ -67,6 +67,8 @@ export type SignalCaptureProbeState = {
   jupiter15m: JupiterPriceQualityWindow | null;
 };
 
+type RemoteNdaxWindow = NdaxMarketQualityWindow & { multiscale?: unknown };
+
 type RemoteStatusPayload = {
   status: "STOPPED" | "EMPTY" | "LIVE" | "STALE";
   container_running?: boolean;
@@ -77,9 +79,15 @@ type RemoteStatusPayload = {
     files: number;
     newest_mtime: number | null;
   }>;
-  ndax_15m?: NdaxMarketQualityWindow;
+  ndax_15m?: RemoteNdaxWindow;
   jupiter_15m?: JupiterPriceQualityWindow;
 };
+
+function captureHealthFromNdax(window: RemoteNdaxWindow | undefined): NdaxMarketQualityWindow | null {
+  if (!window) return null;
+  const { multiscale: _ignored, ...health } = window;
+  return health;
+}
 
 function emptySources(): SignalCaptureProbeState["sourceStates"] {
   return SOURCE_DIRS.map((source) => ({ source, files: 0, newestMtimeMs: null }));
@@ -114,7 +122,7 @@ function normalizeRemoteState(
     configuredPath: null,
     sourceStates,
     newestMtimeMs,
-    ndax15m: payload.ndax_15m ?? null,
+    ndax15m: captureHealthFromNdax(payload.ndax_15m),
     jupiter15m: payload.jupiter_15m ?? null,
   };
 }
