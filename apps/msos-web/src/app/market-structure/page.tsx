@@ -1,9 +1,7 @@
-import MissionControlPage, {
-  dynamic as missionControlDynamic,
-  metadata as missionControlMetadata,
-} from "@/app/operator/mission-control/page";
+import type { Metadata } from "next";
+import MissionControlPage from "@/app/operator/mission-control/page";
 
-export const metadata = missionControlMetadata;
-export const dynamic = missionControlDynamic;
+export const metadata: Metadata = { title: "Market Structure Lab | Market Structure OS" };
+export const dynamic = "force-dynamic";
 
 export default MissionControlPage;
