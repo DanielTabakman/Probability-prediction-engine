@@ -12,6 +12,7 @@ STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
 EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
 EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
+EXPERIMENT_ROUTE = MSOS_WEB / "src" / "app" / "api" / "market-structure" / "experiments" / "route.ts"
 RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
 COMPOSE = REPO_ROOT / "docker-compose.yml"
 STAGING_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml"
@@ -83,6 +84,16 @@ def test_experiment_panel_explains_no_data_and_inconclusive() -> None:
     assert "not evidence for or against the hypothesis" in text
     assert "not enough qualifying evidence" in text
     assert "not a trading backtest" in text
+
+
+def test_dashboard_primary_action_is_the_predeclared_holdout() -> None:
+    panel = EXPERIMENT_COMPONENT.read_text(encoding="utf-8")
+    route = EXPERIMENT_ROUTE.read_text(encoding="utf-8")
+    assert "Run prospective holdout v0" in panel
+    assert 'mode: "prospective_holdout_v0"' in panel
+    assert 'PROSPECTIVE_HOLDOUT_DETECT_AT = "2026-08-15T18:20:00Z"' in route
+    assert "experimentBody.detect_at = PROSPECTIVE_HOLDOUT_DETECT_AT" in route
+    assert "forward_seconds: DEFAULT_FORWARD_SECONDS" in route
 
 
 def test_staging_compose_and_workflow_wire_engine_env() -> None:
