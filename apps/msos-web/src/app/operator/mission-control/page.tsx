@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 function fmt(value: number | null | undefined, digits = 2, suffix = "") {
   return typeof value === "number" && Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : "—";
 }
-function mark(status: "active" | "pending") { return status === "active" ? "●" : "○"; }
+function mark(status: "done" | "blocked") { return status === "done" ? "✓" : "×"; }
 function Card({ eyebrow, title, status, detail, children }: { eyebrow: string; title: string; status: string; detail: string; children?: React.ReactNode }) {
   return <section className="panel compact"><div className="panel-sub">{eyebrow}</div><div className="row" style={{ alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}><h2 style={{ margin: 0 }}>{title}</h2><span className="tag muted">{status}</span></div><p style={{ marginBottom: children ? "0.75rem" : 0 }}>{detail}</p>{children}</section>;
 }
@@ -40,13 +40,20 @@ export default async function MissionControlPage() {
 
       <section className="panel compact">
         <div className="panel-sub">WHAT ARE WE BUILDING?</div>
-        <h2 style={{ marginBottom: "0.35rem" }}>A research lab that tests whether market structure is actually useful before we give it to Hummingbot.</h2>
+        <h2 style={{ marginBottom: "0.35rem" }}>A research lab that tests market ideas before they become Hummingbot strategies.</h2>
         <p style={{ marginBottom: "0.35rem" }}>
-          Right now we detect recurring price structure across multiple time horizons, then test whether those detected levels predict future reactions better than matched control levels.
+          V0 asked one narrow question: do recurring multi-scale price levels predict future reactions better than matched control levels? We built the detector, ran historical and prospective tests, and now have a complete v0 research decision.
         </p>
-        <p className="panel-sub" style={{ marginBottom: "0.8rem" }}><strong>Current question:</strong> {probe.successQuestion}</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
-          {probe.stages.map(stage => <div key={stage.id} className="panel compact" style={{ textAlign: "center" }}><div style={{ fontSize: "1.2rem" }}>{mark(stage.status)}</div><strong>{stage.label}</strong></div>)}
+        <p className="panel-sub" style={{ marginBottom: "0.8rem" }}><strong>V0 question:</strong> {probe.successQuestion}</p>
+        <div className="panel-sub" style={{ marginBottom: "0.45rem" }}>V0 LIFECYCLE</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.5rem" }}>
+          {probe.stages.map(stage => (
+            <div key={stage.id} className="panel compact" style={{ textAlign: "center" }}>
+              <div style={{ fontSize: "1.2rem" }}>{mark(stage.status)}</div>
+              <strong>{stage.label}</strong>
+              <div className="panel-sub" style={{ marginTop: "0.25rem" }}>{stage.detail}</div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -58,12 +65,16 @@ export default async function MissionControlPage() {
           whatWeKnow={probe.researchStatus.whatWeKnow}
           whatWeDoNotKnow={probe.researchStatus.whatWeDoNotKnow}
           nextAction={probe.researchStatus.nextAction}
-          evidence={probe.retrospectiveEvidence}
+          evidence={probe.primaryEvidence}
+          priorEvidence={probe.priorEvidence}
         />
 
         <section>
-          <div className="panel-sub" style={{ marginBottom: "0.45rem" }}>LIVE MARKET · WHAT DO WE SEE RIGHT NOW?</div>
+          <div className="panel-sub" style={{ marginBottom: "0.45rem" }}>LIVE MARKET · WHAT DOES THE DETECTOR SEE RIGHT NOW?</div>
           <MultiScaleStructureProbe payload={structure.payload} sourceStatus={structure.status} sourceDetail={structure.detail} />
+          <p className="panel-sub" style={{ margin: "0.45rem 0 0" }}>
+            Live levels are still useful as research observations. V0 validation showed that seeing recurring structure is not enough to treat those levels as predictive signals.
+          </p>
         </section>
 
         <Card eyebrow="DATA HEALTH · SUPPORTING DETAIL" title="Can we trust the incoming observations?" status={capture.status} detail={capture.detail}>
@@ -87,20 +98,24 @@ export default async function MissionControlPage() {
         <ResearchExperimentPanel />
 
         <section className="panel compact">
-          <div className="panel-sub">IF THE RESEARCH SURVIVES</div>
-          <h2 style={{ marginBottom: "0.35rem" }}>Then we hand a validated idea to Hummingbot.</h2>
-          <p style={{ marginBottom: "0.75rem" }}>We are deliberately not there yet. A detected level is not a trading signal, and a research pattern is not a profitable strategy.</p>
+          <div className="panel-sub">WHAT THIS MEANS FOR HUMMINGBOT</div>
+          <h2 style={{ marginBottom: "0.35rem" }}>V0 stops before strategy backtesting.</h2>
+          <p style={{ marginBottom: "0.75rem" }}>
+            The research console did its job: it prevented a visually plausible pattern from becoming a strategy before it demonstrated predictive value. Hummingbot remains the next layer only for future hypotheses that survive validation.
+          </p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
-            <Card eyebrow="LATER · STRATEGY" {...probe.decide} />
-            <Card eyebrow="LATER · HUMMINGBOT" {...probe.execute} />
+            <Card eyebrow="V0 · STRATEGY" {...probe.decide} />
+            <Card eyebrow="V0 · HUMMINGBOT" {...probe.execute} />
           </div>
         </section>
       </div>
 
       <section className="panel" style={{ marginTop: "1rem" }}>
-        <div className="panel-sub">NEXT ACTION</div>
+        <div className="panel-sub">NEXT RESEARCH DECISION</div>
         <h2 style={{ marginBottom: "0.35rem" }}>{probe.nextAction}</h2>
-        <p className="panel-sub" style={{ marginBottom: 0 }}>The historical result stays recorded exactly as observed. We do not tune the detector because we dislike the answer.</p>
+        <p className="panel-sub" style={{ marginBottom: 0 }}>
+          V0 stays preserved exactly as tested. A future v1 can ask a different question, but it should be written down before inspecting its evaluation sample.
+        </p>
       </section>
     </AppShell>
   );
