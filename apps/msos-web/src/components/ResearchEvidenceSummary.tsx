@@ -18,8 +18,12 @@ type RetrospectiveEvidence = {
 };
 
 function pct(value: number): string {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function signedPct(value: number): string {
   const sign = value > 0 ? "+" : "";
-  return `${sign}${(value * 100).toFixed(1)}%`;
+  return `${sign}${(value * 100).toFixed(1)} pp`;
 }
 
 export function ResearchEvidenceSummary({
@@ -84,7 +88,7 @@ export function ResearchEvidenceSummary({
           </div>
           <div className="panel compact">
             <div className="panel-sub">Observed difference</div>
-            <strong>{pct(evidence.delta)}</strong>
+            <strong>{signedPct(evidence.delta)}</strong>
           </div>
           <div className="panel compact">
             <div className="panel-sub">Window verdicts</div>
