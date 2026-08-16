@@ -1,4 +1,4 @@
-"""MSOS Mission Control cutover: capture health vs market-structure.v1."""
+"""MSOS Market Structure Lab: human-facing research evidence and engine cutover."""
 
 from __future__ import annotations
 
@@ -12,7 +12,6 @@ STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
 EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
 EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
-EXPERIMENT_ROUTE = MSOS_WEB / "src" / "app" / "api" / "market-structure" / "experiments" / "route.ts"
 RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
 COMPOSE = REPO_ROOT / "docker-compose.yml"
 STAGING_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml"
@@ -52,7 +51,7 @@ def test_engine_client_consumes_v1_contract() -> None:
     assert "threshold" not in text.lower()
 
 
-def test_structure_component_separates_unavailable_from_insufficient() -> None:
+def test_structure_component_separates_live_detection_from_validation() -> None:
     text = STRUCTURE_COMPONENT.read_text(encoding="utf-8")
     assert "Market structure engine unavailable" in text
     assert "fit_reason" in text
@@ -62,38 +61,44 @@ def test_structure_component_separates_unavailable_from_insufficient() -> None:
     assert "ndax15m.multiscale" not in text
 
 
-def test_research_summary_leads_with_meaning_not_artifact() -> None:
+def test_research_summary_leads_with_primary_decision() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     evidence = EVIDENCE_COMPONENT.read_text(encoding="utf-8")
     state = RESEARCH_STATE.read_text(encoding="utf-8")
     assert "ResearchEvidenceSummary" in page
-    assert "WHAT HAVE WE ACTUALLY PROVEN?" in evidence
-    assert "WHAT WE KNOW" in evidence
-    assert "WHAT WE DO NOT KNOW" in evidence
-    assert "WHAT HAPPENS NEXT" in evidence
+    assert "RESEARCH DECISION" in evidence
+    assert "Do not promote v0 to Hummingbot" in evidence
+    assert "PRIMARY EVIDENCE" in evidence
     assert "The ZIP is for audit/reproduction" in evidence
-    assert "No edge shown yet" in state
-    assert "UNVALIDATED" in state
-    assert "0.1818" in state
-    assert "-0.0818" in state
+    assert "V0 did not demonstrate an edge" in state
+    assert "NOT VALIDATED" in state
+    assert "0.1667" in state
+    assert "0.1898" in state
+    assert "-0.0231" in state
+    assert "-0.105642" in state
+    assert "0.058834" in state
+    assert "168" in state
 
 
-def test_experiment_panel_explains_no_data_and_inconclusive() -> None:
-    text = EXPERIMENT_COMPONENT.read_text(encoding="utf-8")
-    assert "NO USABLE WINDOW" in text
-    assert "not evidence for or against the hypothesis" in text
-    assert "not enough qualifying evidence" in text
-    assert "not a trading backtest" in text
-
-
-def test_dashboard_primary_action_is_the_predeclared_holdout() -> None:
+def test_v0_experiment_loop_is_closed_not_rerunnable_from_ui() -> None:
     panel = EXPERIMENT_COMPONENT.read_text(encoding="utf-8")
-    route = EXPERIMENT_ROUTE.read_text(encoding="utf-8")
-    assert "Run prospective holdout v0" in panel
-    assert 'mode: "prospective_holdout_v0"' in panel
-    assert 'PROSPECTIVE_HOLDOUT_DETECT_AT = "2026-08-15T18:20:00Z"' in route
-    assert "experimentBody.detect_at = PROSPECTIVE_HOLDOUT_DETECT_AT" in route
-    assert "forward_seconds: DEFAULT_FORWARD_SECONDS" in route
+    assert "V0 TESTING · COMPLETE" in panel
+    assert "We are not running more v0 tests from this page" in panel
+    assert "result-chasing" in panel
+    assert "Run prospective holdout v0" not in panel
+    assert "method: \"POST\"" not in panel
+    assert "ndax-1786818000-d6f199ca8ba2" in panel
+    assert "not evidence for or against the hypothesis" in panel
+
+
+def test_v0_lifecycle_blocks_strategy_and_hummingbot() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    state = RESEARCH_STATE.read_text(encoding="utf-8")
+    assert "V0 LIFECYCLE" in page
+    assert "V0 stops before strategy backtesting" in page
+    assert 'status: "blocked"' in state
+    assert "BLOCKED FOR V0" in state
+    assert "Archive v0 as NOT VALIDATED / NO EDGE DEMONSTRATED" in state
 
 
 def test_staging_compose_and_workflow_wire_engine_env() -> None:
