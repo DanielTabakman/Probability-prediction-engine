@@ -2,13 +2,13 @@ export const operatingLoopProbe = {
   label: "Team Research Console v0",
   experiment: "Persistent-level forward validation v0",
   mode: "Live evidence / deterministic research / no execution",
-  currentStage: "understand",
+  currentStage: "validate",
   stages: [
-    { id: "observe", label: "Observe", status: "active" },
-    { id: "understand", label: "Validate", status: "active" },
-    { id: "decide", label: "Strategy", status: "pending" },
-    { id: "execute", label: "Execute", status: "pending" },
-    { id: "learn", label: "Learn", status: "active" },
+    { id: "detect", label: "Detect", status: "active" },
+    { id: "validate", label: "Validate", status: "active" },
+    { id: "strategy", label: "Strategy", status: "pending" },
+    { id: "backtest", label: "Backtest", status: "pending" },
+    { id: "trade", label: "Trade", status: "pending" },
   ],
   researchStatus: {
     status: "UNVALIDATED",
@@ -62,7 +62,7 @@ export const operatingLoopProbe = {
       "Do not turn detected levels into a trading strategy until forward evidence beats the baseline. If the research survives validation, Hummingbot becomes the strategy-backtest layer.",
   },
   execute: {
-    title: "Hummingbot",
+    title: "Hummingbot backtest / execution",
     status: "NOT YET",
     detail:
       "Hummingbot is reserved for strategy backtesting, paper trading, and separately approved execution after the research hypothesis earns that step.",
