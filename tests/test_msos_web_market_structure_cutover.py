@@ -10,6 +10,9 @@ MISSION_CONTROL = MSOS_WEB / "src" / "app" / "operator" / "mission-control" / "p
 CAPTURE_PROBE = MSOS_WEB / "src" / "lib" / "signalCaptureProbe.ts"
 STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
+EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
+EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
+RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
 COMPOSE = REPO_ROOT / "docker-compose.yml"
 STAGING_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml"
 
@@ -52,9 +55,34 @@ def test_structure_component_separates_unavailable_from_insufficient() -> None:
     text = STRUCTURE_COMPONENT.read_text(encoding="utf-8")
     assert "Market structure engine unavailable" in text
     assert "fit_reason" in text
-    assert "INSUFFICIENT" not in text or "scale.fit" in text
+    assert "detected structure is not the same thing as validated predictive value" in text
+    assert "candidate levels" in text.lower()
     assert "ndax_15m.multiscale" not in text
     assert "ndax15m.multiscale" not in text
+
+
+def test_research_summary_leads_with_meaning_not_artifact() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    evidence = EVIDENCE_COMPONENT.read_text(encoding="utf-8")
+    state = RESEARCH_STATE.read_text(encoding="utf-8")
+    assert "ResearchEvidenceSummary" in page
+    assert "WHAT HAVE WE ACTUALLY PROVEN?" in evidence
+    assert "WHAT WE KNOW" in evidence
+    assert "WHAT WE DO NOT KNOW" in evidence
+    assert "WHAT HAPPENS NEXT" in evidence
+    assert "The ZIP is for audit/reproduction" in evidence
+    assert "No edge shown yet" in state
+    assert "UNVALIDATED" in state
+    assert "0.1818" in state
+    assert "-0.0818" in state
+
+
+def test_experiment_panel_explains_no_data_and_inconclusive() -> None:
+    text = EXPERIMENT_COMPONENT.read_text(encoding="utf-8")
+    assert "NO USABLE WINDOW" in text
+    assert "not evidence for or against the hypothesis" in text
+    assert "not enough qualifying evidence" in text
+    assert "not a trading backtest" in text
 
 
 def test_staging_compose_and_workflow_wire_engine_env() -> None:
@@ -75,7 +103,7 @@ def test_no_active_mission_control_multiscale_dependency() -> None:
         CAPTURE_PROBE,
         STRUCTURE_PROBE,
         STRUCTURE_COMPONENT,
-        MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts",
+        RESEARCH_STATE,
     ]
     blob = "\n".join(path.read_text(encoding="utf-8") for path in files)
     assert "ndax_15m.multiscale" not in blob
