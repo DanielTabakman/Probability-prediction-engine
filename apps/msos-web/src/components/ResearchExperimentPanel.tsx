@@ -44,6 +44,12 @@ function pct(value: number | null | undefined): string {
   return typeof value === "number" && Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : "—";
 }
 
+function deltaPct(value: number | null | undefined): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${(value * 100).toFixed(1)} pp`;
+}
+
 function when(value: number | null | undefined): string {
   return typeof value === "number" && Number.isFinite(value)
     ? new Date(value * 1000).toLocaleString()
@@ -98,7 +104,11 @@ export function ResearchExperimentPanel() {
     setRunning(true);
     setError(null);
     try {
-      const response = await fetch("/api/market-structure/experiments", { method: "POST" });
+      const response = await fetch("/api/market-structure/experiments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "prospective_holdout_v0" }),
+      });
       const payload = (await response.json()) as RunResponse;
       if (!response.ok) throw new Error(payload.detail || `HTTP ${response.status}`);
       setLatest(payload);
@@ -115,19 +125,19 @@ export function ResearchExperimentPanel() {
 
   return (
     <section className="panel">
-      <div className="panel-sub">RUN A TEST · SAME FROZEN RULES EVERY TIME</div>
+      <div className="panel-sub">NEXT SCIENTIFIC TEST · PROSPECTIVE HOLDOUT v0</div>
       <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
         <div style={{ maxWidth: "760px" }}>
-          <h2 style={{ marginBottom: "0.35rem" }}>Does a detected level predict a future reaction better than a control level?</h2>
+          <h2 style={{ marginBottom: "0.35rem" }}>Run the untouched future-window test.</h2>
           <p style={{ marginBottom: "0.35rem" }}>
-            The test freezes the detector before the future window, then checks what happened next. It compares our detected levels with matched control levels.
+            We froze the detector at <strong>2026-08-15 18:20 UTC</strong>, before this four-hour future window completed. The window is now complete, so this is the cleanest check of the hypothesis so far.
           </p>
           <p className="panel-sub" style={{ marginBottom: "0.5rem" }}>
-            This is a research test, not a trading backtest. Running it does not place trades or change detector settings.
+            Same detector. Same control construction. Same touch/reaction rules. No tuning after seeing the historical result. This is a research test, not a trading backtest, and it cannot place trades.
           </p>
         </div>
         <button className="btn primary" type="button" onClick={runExperiment} disabled={running}>
-          {running ? "Running test…" : "Run latest completed 4h test"}
+          {running ? "Running holdout…" : "Run prospective holdout v0"}
         </button>
       </div>
 
@@ -136,7 +146,7 @@ export function ResearchExperimentPanel() {
       {latest ? (
         <div className="panel compact" style={{ marginTop: "1rem" }}>
           <div className="row" style={{ alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
-            <strong>Result from this run</strong>
+            <strong>Prospective holdout result</strong>
             <span className={`tiny-pill ${tone(latest.verdict?.label)}`.trim()}>{resultLabel(latest)}</span>
           </div>
           <p style={{ margin: "0.55rem 0" }}>{resultExplanation(latest)}</p>
@@ -144,7 +154,7 @@ export function ResearchExperimentPanel() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem", marginTop: "0.75rem" }}>
               <div className="panel compact"><div className="panel-sub">Detected levels</div><strong>{latestDetector?.reacted ?? "—"} reactions / {latestDetector?.touched ?? "—"} touches</strong><div className="panel-sub">{pct(latestDetector?.reaction_rate_given_touch)}</div></div>
               <div className="panel compact"><div className="panel-sub">Matched controls</div><strong>{latestBaseline?.reacted ?? "—"} reactions / {latestBaseline?.touched ?? "—"} touches</strong><div className="panel-sub">{pct(latestBaseline?.reaction_rate_given_touch)}</div></div>
-              <div className="panel compact"><div className="panel-sub">Difference</div><strong>{pct(latest.verdict?.reaction_rate_delta)}</strong></div>
+              <div className="panel compact"><div className="panel-sub">Difference</div><strong>{deltaPct(latest.verdict?.reaction_rate_delta)}</strong></div>
               <div className="panel compact"><div className="panel-sub">Detector frozen at</div><strong>{when(latest.detect_at)}</strong></div>
             </div>
           ) : null}
@@ -157,9 +167,9 @@ export function ResearchExperimentPanel() {
       ) : null}
 
       <div style={{ marginTop: "1rem" }}>
-        <div className="panel-sub">RECENT LIVE / FORWARD TESTS</div>
+        <div className="panel-sub">RECENT SAVED FORWARD TESTS</div>
         <p className="panel-sub" style={{ margin: "0.25rem 0 0.6rem" }}>
-          These are saved runs from the live research API. The separate historical batch summary is shown above because it contains multiple predeclared windows.
+          These are saved runs from the live research API. The historical 12-window batch is summarized above because it is one retrospective experiment made of many windows.
         </p>
         {loading ? <p>Loading…</p> : results.length === 0 ? <p className="panel-sub">No saved forward-test results yet.</p> : (
           <div style={{ display: "grid", gap: "0.5rem" }}>
@@ -168,7 +178,7 @@ export function ResearchExperimentPanel() {
                 <div className="row" style={{ justifyContent: "space-between", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
                   <div>
                     <strong>{result.source?.toUpperCase() || "MARKET"} · {resultLabel(result)}</strong>
-                    <div className="panel-sub">{when(result.detect_at)}</div>
+                    <div className="panel-sub">Detector frozen {when(result.detect_at)}</div>
                   </div>
                   <div className="panel-sub" style={{ maxWidth: "520px" }}>{resultExplanation(result)}</div>
                 </div>
