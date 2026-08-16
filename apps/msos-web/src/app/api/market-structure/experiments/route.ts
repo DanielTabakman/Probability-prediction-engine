@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 const DEFAULT_SOURCE = "ndax";
 const DEFAULT_FORWARD_SECONDS = 14_400;
+const PROSPECTIVE_HOLDOUT_DETECT_AT = "2026-08-15T18:20:00Z";
 
 function engineConfig(): { url: string; token: string } | null {
   const configured = process.env.MARKET_STRUCTURE_ENGINE_URL?.trim();
@@ -16,8 +17,6 @@ function resolveEngineUrl(configured: string, enginePath: string): string {
   const base = new URL(configured.includes("://") ? configured : `https://${configured}`);
   const desired = new URL(enginePath, "https://engine.local");
 
-  // Current Condor Cloudflare compatibility route exposes exact /status only.
-  // The edge router accepts an authenticated engine_path query for v0 research APIs.
   if (base.pathname === "/status") {
     base.search = "";
     base.searchParams.set("engine_path", `${desired.pathname}${desired.search}`);
@@ -31,9 +30,7 @@ function resolveEngineUrl(configured: string, enginePath: string): string {
 
 async function engineFetch(enginePath: string, init?: RequestInit): Promise<Response> {
   const config = engineConfig();
-  if (!config) {
-    throw new Error("NOT_CONFIGURED");
-  }
+  if (!config) throw new Error("NOT_CONFIGURED");
   return fetch(resolveEngineUrl(config.url, enginePath), {
     ...init,
     headers: {
@@ -62,15 +59,22 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const body = await request.json().catch(() => ({}));
+    const mode = body && typeof body === "object" && "mode" in body ? String(body.mode) : "prospective_holdout_v0";
+    const experimentBody: Record<string, string | number> = {
+      source: DEFAULT_SOURCE,
+      forward_seconds: DEFAULT_FORWARD_SECONDS,
+    };
+    if (mode === "prospective_holdout_v0") {
+      experimentBody.detect_at = PROSPECTIVE_HOLDOUT_DETECT_AT;
+    }
+
     return passThrough(await engineFetch("/v1/experiments/forward-validation", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        source: DEFAULT_SOURCE,
-        forward_seconds: DEFAULT_FORWARD_SECONDS,
-      }),
+      body: JSON.stringify(experimentBody),
     }));
   } catch (error) {
     const detail = error instanceof Error && error.message === "NOT_CONFIGURED"
