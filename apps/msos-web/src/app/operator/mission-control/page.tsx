@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
 import { MultiScaleStructureProbe } from "@/components/MultiScaleStructureProbe";
 import { ProbeAutoRefresh } from "@/components/ProbeAutoRefresh";
+import { ResearchEvidenceSummary } from "@/components/ResearchEvidenceSummary";
 import { ResearchExperimentPanel } from "@/components/ResearchExperimentPanel";
 import { operatingLoopProbe } from "@/data/operatingLoopProbe";
 import { loadMarketStructureProbeState } from "@/lib/marketStructureProbe";
@@ -15,7 +16,7 @@ function fmt(value: number | null | undefined, digits = 2, suffix = "") {
 }
 function mark(status: "active" | "pending") { return status === "active" ? "●" : "○"; }
 function Card({ eyebrow, title, status, detail, children }: { eyebrow: string; title: string; status: string; detail: string; children?: React.ReactNode }) {
-  return <section className="panel compact"><div className="panel-sub">{eyebrow}</div><div className="row" style={{ alignItems: "center", gap: "0.75rem" }}><h2 style={{ margin: 0 }}>{title}</h2><span className="tag muted">{status}</span></div><p style={{ marginBottom: children ? "0.75rem" : 0 }}>{detail}</p>{children}</section>;
+  return <section className="panel compact"><div className="panel-sub">{eyebrow}</div><div className="row" style={{ alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}><h2 style={{ margin: 0 }}>{title}</h2><span className="tag muted">{status}</span></div><p style={{ marginBottom: children ? "0.75rem" : 0 }}>{detail}</p>{children}</section>;
 }
 
 export default async function MissionControlPage() {
@@ -29,37 +30,78 @@ export default async function MissionControlPage() {
 
   return (
     <AppShell activeNavId="mission-control">
-      <header className="topline"><div><div className="crumb">Research / Team Console v0</div><h1 className="title">Market Structure Lab</h1></div><div className="tools"><ProbeAutoRefresh intervalMs={15000} /><span className="pill">Research only · no execution</span></div></header>
+      <header className="topline">
+        <div>
+          <div className="crumb">Research / Team Console</div>
+          <h1 className="title">Market Structure Lab</h1>
+        </div>
+        <div className="tools"><ProbeAutoRefresh intervalMs={15000} /><span className="pill">Research only · no trading</span></div>
+      </header>
 
       <section className="panel compact">
-        <div className="panel-sub">PURPOSE</div>
-        <h2 style={{ marginBottom: "0.35rem" }}>Find market structure that contains useful information about future price behavior.</h2>
-        <p className="panel-sub" style={{ marginBottom: "0.75rem" }}><strong>Current question:</strong> {probe.successQuestion}</p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "0.5rem" }}>
+        <div className="panel-sub">WHAT ARE WE BUILDING?</div>
+        <h2 style={{ marginBottom: "0.35rem" }}>A research lab that tests whether market structure is actually useful before we give it to Hummingbot.</h2>
+        <p style={{ marginBottom: "0.35rem" }}>
+          Right now we detect recurring price structure across multiple time horizons, then test whether those detected levels predict future reactions better than matched control levels.
+        </p>
+        <p className="panel-sub" style={{ marginBottom: "0.8rem" }}><strong>Current question:</strong> {probe.successQuestion}</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "0.5rem" }}>
           {probe.stages.map(stage => <div key={stage.id} className="panel compact" style={{ textAlign: "center" }}><div style={{ fontSize: "1.2rem" }}>{mark(stage.status)}</div><strong>{stage.label}</strong></div>)}
         </div>
       </section>
 
       <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
-        <Card eyebrow="1 · DATA" title="Market observations" status={capture.status} detail={capture.detail}>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>{capture.sourceStates.map(source => <span key={source.source} className="tiny-pill">{source.source}: {source.files || "—"}</span>)}</div>
-          {ndaxReady && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: "0.5rem", marginTop: "0.75rem" }}>
-            <div className="panel compact"><div className="panel-sub">NDAX observations</div><strong>{ndax.l1_observations ?? "—"}</strong></div>
-            <div className="panel compact"><div className="panel-sub">15m range</div><strong>{fmt(ndax.range_pct, 3, "%")}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Median spread</div><strong>{fmt(ndax.median_spread_bps, 2, " bps")}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Max gap</div><strong>{fmt(ndax.max_gap_seconds, 1, "s")}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Jupiter</div><strong>{jupiterReady ? `${jupiter.quote_observations ?? "—"} quotes` : "waiting"}</strong></div>
-          </div>}
+        <ResearchEvidenceSummary
+          status={probe.researchStatus.status}
+          headline={probe.researchStatus.headline}
+          summary={probe.researchStatus.summary}
+          whatWeKnow={probe.researchStatus.whatWeKnow}
+          whatWeDoNotKnow={probe.researchStatus.whatWeDoNotKnow}
+          nextAction={probe.researchStatus.nextAction}
+          evidence={probe.retrospectiveEvidence}
+        />
+
+        <section>
+          <div className="panel-sub" style={{ marginBottom: "0.45rem" }}>LIVE MARKET · WHAT DO WE SEE RIGHT NOW?</div>
+          <MultiScaleStructureProbe payload={structure.payload} sourceStatus={structure.status} sourceDetail={structure.detail} />
+        </section>
+
+        <Card eyebrow="DATA HEALTH · SUPPORTING DETAIL" title="Can we trust the incoming observations?" status={capture.status} detail={capture.detail}>
+          {ndaxReady ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))", gap: "0.5rem", marginTop: "0.5rem" }}>
+              <div className="panel compact"><div className="panel-sub">NDAX observations</div><strong>{ndax.l1_observations ?? "—"}</strong></div>
+              <div className="panel compact"><div className="panel-sub">15m price range</div><strong>{fmt(ndax.range_pct, 3, "%")}</strong></div>
+              <div className="panel compact"><div className="panel-sub">Typical spread</div><strong>{fmt(ndax.median_spread_bps, 2, " bps")}</strong></div>
+              <div className="panel compact"><div className="panel-sub">Largest observation gap</div><strong>{fmt(ndax.max_gap_seconds, 1, "s")}</strong></div>
+              <div className="panel compact"><div className="panel-sub">Jupiter comparison feed</div><strong>{jupiterReady ? `${jupiter.quote_observations ?? "—"} quotes` : "waiting"}</strong></div>
+            </div>
+          ) : null}
+          <details style={{ marginTop: "0.75rem" }}>
+            <summary style={{ cursor: "pointer" }}>Capture source details</summary>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.5rem" }}>
+              {capture.sourceStates.map(source => <span key={source.source} className="tiny-pill">{source.source}: {source.files || "—"}</span>)}
+            </div>
+          </details>
         </Card>
 
-        <MultiScaleStructureProbe payload={structure.payload} sourceStatus={structure.status} sourceDetail={structure.detail} />
         <ResearchExperimentPanel />
-        <Card eyebrow="4 · STRATEGY · LATER" {...probe.decide} />
-        <Card eyebrow="5 · HUMMINGBOT · LATER" {...probe.execute} />
-        <Card eyebrow="6 · LEARN" {...probe.learn} />
+
+        <section className="panel compact">
+          <div className="panel-sub">IF THE RESEARCH SURVIVES</div>
+          <h2 style={{ marginBottom: "0.35rem" }}>Then we hand a validated idea to Hummingbot.</h2>
+          <p style={{ marginBottom: "0.75rem" }}>We are deliberately not there yet. A detected level is not a trading signal, and a research pattern is not a profitable strategy.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+            <Card eyebrow="LATER · STRATEGY" {...probe.decide} />
+            <Card eyebrow="LATER · HUMMINGBOT" {...probe.execute} />
+          </div>
+        </section>
       </div>
 
-      <section className="panel" style={{ marginTop: "1rem" }}><div className="panel-sub">NEXT ACTION</div><h2 style={{ marginBottom: "0.35rem" }}>{probe.nextAction}</h2><p className="panel-sub" style={{ marginBottom: 0 }}>Keep v0 narrow: fresh observations → frozen levels → matched baseline → saved result. Expand only after the team has used this loop.</p></section>
+      <section className="panel" style={{ marginTop: "1rem" }}>
+        <div className="panel-sub">NEXT ACTION</div>
+        <h2 style={{ marginBottom: "0.35rem" }}>{probe.nextAction}</h2>
+        <p className="panel-sub" style={{ marginBottom: 0 }}>The historical result stays recorded exactly as observed. We do not tune the detector because we dislike the answer.</p>
+      </section>
     </AppShell>
   );
 }
