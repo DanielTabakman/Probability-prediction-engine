@@ -56,6 +56,19 @@ function tone(label: string | null | undefined): string {
   return "amber";
 }
 
+function resultLabel(result: ResultSummary | RunResponse): string {
+  if (result.status === "NO_DATA") return "NO USABLE WINDOW";
+  return result.verdict?.label || result.status || "UNKNOWN";
+}
+
+function resultExplanation(result: ResultSummary | RunResponse): string {
+  if (result.status === "NO_DATA") return "The required historical window was incomplete. This is a data result, not evidence for or against the hypothesis.";
+  if (result.verdict?.label === "PASS") return "Detected levels reacted more often than controls and cleared the frozen evidence rule.";
+  if (result.verdict?.label === "FAIL") return "Detected levels underperformed controls and cleared the frozen evidence rule.";
+  if (result.verdict?.label === "INCONCLUSIVE") return "There was not enough qualifying evidence in this window for a PASS/FAIL call.";
+  return result.verdict?.reason || "Saved deterministic research result.";
+}
+
 export function ResearchExperimentPanel() {
   const [results, setResults] = useState<ResultSummary[]>([]);
   const [latest, setLatest] = useState<RunResponse | null>(null);
@@ -102,16 +115,19 @@ export function ResearchExperimentPanel() {
 
   return (
     <section className="panel">
-      <div className="panel-sub">CURRENT EXPERIMENT · DETERMINISTIC</div>
+      <div className="panel-sub">RUN A TEST · SAME FROZEN RULES EVERY TIME</div>
       <div className="row" style={{ alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
         <div style={{ maxWidth: "760px" }}>
-          <h2 style={{ marginBottom: "0.35rem" }}>Do persistent multi-scale levels predict future reactions?</h2>
+          <h2 style={{ marginBottom: "0.35rem" }}>Does a detected level predict a future reaction better than a control level?</h2>
+          <p style={{ marginBottom: "0.35rem" }}>
+            The test freezes the detector before the future window, then checks what happened next. It compares our detected levels with matched control levels.
+          </p>
           <p className="panel-sub" style={{ marginBottom: "0.5rem" }}>
-            Freeze the detector four hours in the past, observe the next four hours, and compare detected levels with matched control levels. This tests information, not trading profitability.
+            This is a research test, not a trading backtest. Running it does not place trades or change detector settings.
           </p>
         </div>
         <button className="btn primary" type="button" onClick={runExperiment} disabled={running}>
-          {running ? "Running…" : "Run current experiment"}
+          {running ? "Running test…" : "Run latest completed 4h test"}
         </button>
       </div>
 
@@ -120,34 +136,48 @@ export function ResearchExperimentPanel() {
       {latest ? (
         <div className="panel compact" style={{ marginTop: "1rem" }}>
           <div className="row" style={{ alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
-            <strong>Latest run</strong>
-            <span className={`tiny-pill ${tone(latest.verdict?.label)}`.trim()}>{latest.verdict?.label || latest.status || "UNKNOWN"}</span>
-            <span className="panel-sub">{latest.result_id || "unsaved"}</span>
+            <strong>Result from this run</strong>
+            <span className={`tiny-pill ${tone(latest.verdict?.label)}`.trim()}>{resultLabel(latest)}</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem", marginTop: "0.75rem" }}>
-            <div className="panel compact"><div className="panel-sub">Detected reaction rate</div><strong>{pct(latestDetector?.reaction_rate_given_touch)}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Control reaction rate</div><strong>{pct(latestBaseline?.reaction_rate_given_touch)}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Difference</div><strong>{pct(latest.verdict?.reaction_rate_delta)}</strong></div>
-            <div className="panel compact"><div className="panel-sub">Detection time</div><strong>{when(latest.detect_at)}</strong></div>
-          </div>
-          {latest.verdict?.reason ? <p className="panel-sub" style={{ marginTop: "0.75rem", marginBottom: 0 }}>{latest.verdict.reason}</p> : null}
+          <p style={{ margin: "0.55rem 0" }}>{resultExplanation(latest)}</p>
+          {latest.status !== "NO_DATA" ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "0.5rem", marginTop: "0.75rem" }}>
+              <div className="panel compact"><div className="panel-sub">Detected levels</div><strong>{latestDetector?.reacted ?? "—"} reactions / {latestDetector?.touched ?? "—"} touches</strong><div className="panel-sub">{pct(latestDetector?.reaction_rate_given_touch)}</div></div>
+              <div className="panel compact"><div className="panel-sub">Matched controls</div><strong>{latestBaseline?.reacted ?? "—"} reactions / {latestBaseline?.touched ?? "—"} touches</strong><div className="panel-sub">{pct(latestBaseline?.reaction_rate_given_touch)}</div></div>
+              <div className="panel compact"><div className="panel-sub">Difference</div><strong>{pct(latest.verdict?.reaction_rate_delta)}</strong></div>
+              <div className="panel compact"><div className="panel-sub">Detector frozen at</div><strong>{when(latest.detect_at)}</strong></div>
+            </div>
+          ) : null}
+          <details style={{ marginTop: "0.75rem" }}>
+            <summary style={{ cursor: "pointer" }}>Result details</summary>
+            <div className="panel-sub" style={{ marginTop: "0.45rem" }}>{latest.result_id || "unsaved"}</div>
+            {latest.verdict?.reason ? <div className="panel-sub" style={{ marginTop: "0.25rem" }}>{latest.verdict.reason}</div> : null}
+          </details>
         </div>
       ) : null}
 
       <div style={{ marginTop: "1rem" }}>
-        <div className="panel-sub">RECENT SAVED RESULTS</div>
-        {loading ? <p>Loading…</p> : results.length === 0 ? <p className="panel-sub">No saved experiment results yet.</p> : (
+        <div className="panel-sub">RECENT LIVE / FORWARD TESTS</div>
+        <p className="panel-sub" style={{ margin: "0.25rem 0 0.6rem" }}>
+          These are saved runs from the live research API. The separate historical batch summary is shown above because it contains multiple predeclared windows.
+        </p>
+        {loading ? <p>Loading…</p> : results.length === 0 ? <p className="panel-sub">No saved forward-test results yet.</p> : (
           <div style={{ display: "grid", gap: "0.5rem" }}>
             {results.map((result) => (
               <div key={result.result_id || `${result.source}-${result.detect_at}`} className="panel compact">
                 <div className="row" style={{ justifyContent: "space-between", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
                   <div>
-                    <strong>{result.source?.toUpperCase() || "MARKET"}</strong>
-                    <div className="panel-sub">{when(result.detect_at)} · {result.result_id || "result"}</div>
+                    <strong>{result.source?.toUpperCase() || "MARKET"} · {resultLabel(result)}</strong>
+                    <div className="panel-sub">{when(result.detect_at)}</div>
                   </div>
-                  <span className={`tiny-pill ${tone(result.verdict?.label)}`.trim()}>{result.verdict?.label || result.status || "UNKNOWN"}</span>
-                  <div className="panel-sub">detected {pct(result.detector_summary?.reaction_rate_given_touch)} · control {pct(result.baseline_summary?.reaction_rate_given_touch)}</div>
+                  <div className="panel-sub" style={{ maxWidth: "520px" }}>{resultExplanation(result)}</div>
                 </div>
+                <details style={{ marginTop: "0.45rem" }}>
+                  <summary style={{ cursor: "pointer" }}>Numbers & result ID</summary>
+                  <div className="panel-sub" style={{ marginTop: "0.35rem" }}>
+                    detected {pct(result.detector_summary?.reaction_rate_given_touch)} · control {pct(result.baseline_summary?.reaction_rate_given_touch)} · {result.result_id || "result"}
+                  </div>
+                </details>
               </div>
             ))}
           </div>
