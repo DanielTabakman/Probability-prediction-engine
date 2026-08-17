@@ -8,7 +8,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
 MISSION_CONTROL = MSOS_WEB / "src" / "app" / "operator" / "mission-control" / "page.tsx"
-PROJECT_MAP = MSOS_WEB / "src" / "components" / "MarketStructureProjectMap.tsx"
 CAPTURE_PROBE = MSOS_WEB / "src" / "lib" / "signalCaptureProbe.ts"
 STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
@@ -33,35 +32,27 @@ def test_mission_control_loads_capture_and_engine_separately() -> None:
     assert "ndax_15m.multiscale" not in text
 
 
-def test_mission_control_is_persistent_project_console_not_single_experiment_page() -> None:
+def test_mission_control_is_operational_workspace_first() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
-    project_map = PROJECT_MAP.read_text(encoding="utf-8")
-    assert "Market Structure / Project Console" in page
-    assert "THE WHOLE PROJECT" in project_map
-    assert "CAPTURE" in project_map
-    assert "STRUCTURE" in project_map
-    assert "RESEARCH" in project_map
-    assert "VALIDATE" in project_map
-    assert "STRATEGY" in project_map
-    assert "HUMMINGBOT" in project_map
-    assert "PRODUCT" in project_map
-    assert "JUMP TO A LANE" in project_map
-    assert "LANE 1 · INFRASTRUCTURE" in page
-    assert "LANE 2 · ACTIVE RESEARCH" in page
-    assert "LANE 3 · TEST LIBRARY" in page
-    assert "LANE 4 · WHAT WE KNOW" in page
-    assert "LANE 5 · STRATEGY + HUMMINGBOT" in page
-    assert "LANE 6 · PRODUCTIZATION" in page
-    assert "Every test we run stays here permanently" in page
-    assert "EXPLORE → CANDIDATE → LOCK HYPOTHESIS → FRESH TEST → DECISION → LEARN → NEXT HYPOTHESIS" in page
-    assert "Edge-producing engine" in page
-    assert "Research operating system" in page
-    assert "Advanced / project details" in page
-    assert page.index("LANE 1 · INFRASTRUCTURE") < page.index("LANE 2 · ACTIVE RESEARCH")
-    assert page.index("LANE 2 · ACTIVE RESEARCH") < page.index("LANE 3 · TEST LIBRARY")
-    assert page.index("LANE 3 · TEST LIBRARY") < page.index("LANE 4 · WHAT WE KNOW")
-    assert page.index("LANE 4 · WHAT WE KNOW") < page.index("LANE 5 · STRATEGY + HUMMINGBOT")
-    assert page.index("LANE 5 · STRATEGY + HUMMINGBOT") < page.index("LANE 6 · PRODUCTIZATION")
+    assert "Market Structure / Lab" in page
+    assert "1 · LIVE MARKET" in page
+    assert "2 · TESTING WORKSPACE" in page
+    assert "3 · PAST TESTS" in page
+    assert "4 · INFRASTRUCTURE" in page
+    assert "5 · FINDINGS SO FAR" in page
+    assert "What can we see right now?" in page
+    assert "Change the rules and see what happens." in page
+    assert "What have we actually tested already?" in page
+    assert "What is working underneath the tests?" in page
+    assert "MarketStructureSandbox" in page
+    assert "MultiScaleStructureProbe" in page
+    assert "ResearchExperimentPanel" in page
+    assert page.index("1 · LIVE MARKET") < page.index("2 · TESTING WORKSPACE")
+    assert page.index("2 · TESTING WORKSPACE") < page.index("3 · PAST TESTS")
+    assert page.index("3 · PAST TESTS") < page.index("4 · INFRASTRUCTURE")
+    assert page.index("4 · INFRASTRUCTURE") < page.index("5 · FINDINGS SO FAR")
+    assert "LANE 6 · PRODUCTIZATION" not in page
+    assert "THE WHOLE PROJECT" not in page
 
 
 def test_capture_probe_strips_legacy_multiscale() -> None:
@@ -148,11 +139,12 @@ def test_sandbox_default_reproduces_locked_v0_counts() -> None:
     assert sum(row[9] >= 25 for row in baseline_touched) == 26
 
 
-def test_research_summary_leads_with_primary_decision() -> None:
+def test_research_summary_remains_available_as_audit_detail() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     evidence = EVIDENCE_COMPONENT.read_text(encoding="utf-8")
     state = RESEARCH_STATE.read_text(encoding="utf-8")
     assert "ResearchEvidenceSummary" in page
+    assert "Full V0 evidence / audit details" in page
     assert "RESEARCH DECISION" in evidence
     assert "Do not promote v0 to Hummingbot" in evidence
     assert "PRIMARY EVIDENCE" in evidence
@@ -171,7 +163,7 @@ def test_v0_full_report_is_shareable_from_control_panel() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     report = V0_REPORT.read_text(encoding="utf-8")
     assert 'href="/docs/market-structure-v0-report.md"' in page
-    assert "Read / share full V0 report (.md)" in page
+    assert "Open full V0 report" in page
     assert "# Market Structure V0 — Full Project Report" in report
     assert "NOT VALIDATED / NO EDGE DEMONSTRATED" in report
     assert "168 / 168" in report
@@ -192,11 +184,13 @@ def test_v0_experiment_loop_is_closed_not_rerunnable_from_ui() -> None:
     assert "not evidence for or against the hypothesis" in panel
 
 
-def test_v0_lifecycle_blocks_strategy_and_hummingbot() -> None:
+def test_strategy_and_hummingbot_remain_blocked_after_v0() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     state = RESEARCH_STATE.read_text(encoding="utf-8")
-    assert "V0 LIFECYCLE" in page
-    assert "V0 stops before strategy backtesting" in page
+    assert "HUMMINGBOT" in page
+    assert "NOT IN USE" in page
+    assert "LIVE TRADING" in page
+    assert "OFF" in page
     assert 'status: "blocked"' in state
     assert "BLOCKED FOR V0" in state
     assert "Archive v0 as NOT VALIDATED / NO EDGE DEMONSTRATED" in state
