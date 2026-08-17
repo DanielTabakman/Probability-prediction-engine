@@ -13,6 +13,7 @@ STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
 SANDBOX_COMPONENT = MSOS_WEB / "src" / "components" / "MarketStructureSandbox.tsx"
 SANDBOX_DATA = MSOS_WEB / "src" / "data" / "marketStructureSandboxData.ts"
+SANDBOX_ROUTE = MSOS_WEB / "src" / "app" / "api" / "market-structure" / "sandbox-replay" / "route.ts"
 EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
 EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
 RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
@@ -69,16 +70,36 @@ def test_sandbox_is_interactive_without_reopening_v0() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     sandbox = SANDBOX_COMPONENT.read_text(encoding="utf-8")
     assert "MarketStructureSandbox" in page
-    assert "SANDBOX · REAL V0 EVENT RECORDS · EXPLORATORY ONLY" in sandbox
-    assert "Move the dials and watch the historical result change" in sandbox
+    assert "SANDBOX · EXPLORATORY ONLY · V0 STAYS LOCKED" in sandbox
+    assert "Move the dials, then replay the actual price paths" in sandbox
     assert "Reset to V0" in sandbox
     assert "Copy candidate hypothesis" in sandbox
+    assert "Replay raw paths" in sandbox
     assert "useState(25)" in sandbox
     assert "useState(2)" in sandbox
-    assert "Inverse here means non-reaction, not automatically a profitable opposite trade" in sandbox
-    assert "Touch distance" in sandbox and "locked in artifact" in sandbox
-    assert "Reaction horizon" in sandbox and "Forward window" in sandbox
-    assert "freeze before testing on untouched data" in sandbox
+    assert "freeze" in sandbox.lower() and "fresh evaluation sample" in sandbox
+
+
+def test_sandbox_exposes_real_touch_horizon_and_directionality_controls() -> None:
+    sandbox = SANDBOX_COMPONENT.read_text(encoding="utf-8")
+    route = SANDBOX_ROUTE.read_text(encoding="utf-8")
+    assert "Touch distance" in sandbox
+    assert "Outcome horizon" in sandbox
+    assert "Forward window" in sandbox
+    assert 'value="reaction"' in sandbox
+    assert 'value="rejection"' in sandbox
+    assert 'value="breakout"' in sandbox
+    assert 'value="continuation"' in sandbox
+    assert "RawPathChart" in sandbox
+    assert "whipsaw" in sandbox.lower()
+    assert 'fetch("/api/market-structure/sandbox-replay"' in sandbox
+    assert "touch_bps" in sandbox
+    assert "outcome_horizon_seconds" in sandbox
+    assert "outcome_mode" in sandbox
+    assert '"/v1/research/sandbox-replay"' in route
+    assert "MARKET_STRUCTURE_ENGINE_TOKEN" in route
+    assert "Authorization" in route
+    assert "Bearer ${config.token}" in route
 
 
 def test_sandbox_default_reproduces_locked_v0_counts() -> None:
