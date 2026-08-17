@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/AppShell";
+import { MarketStructureSandbox } from "@/components/MarketStructureSandbox";
 import { MultiScaleStructureProbe } from "@/components/MultiScaleStructureProbe";
 import { ProbeAutoRefresh } from "@/components/ProbeAutoRefresh";
 import { ResearchEvidenceSummary } from "@/components/ResearchEvidenceSummary";
@@ -70,6 +71,8 @@ export default async function MissionControlPage() {
       </section>
 
       <div style={{ display: "grid", gap: "1rem", marginTop: "1rem" }}>
+        <MarketStructureSandbox />
+
         <ResearchEvidenceSummary
           status={probe.researchStatus.status}
           headline={probe.researchStatus.headline}
