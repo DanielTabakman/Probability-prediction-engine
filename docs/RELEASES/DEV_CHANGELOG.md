@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-17
 
+- `0da22d4d` — Rebuild PitchPacks as football field autobattler (#5420) (`apps/msos-web/`)
+- `beb6c3b1` — Control-plane: dev changelog
 - `63e1513a` — Add Daniel labs hub and PitchPacks prototype (`apps/msos-web/`)
 - `fc131aef` — Control-plane: dev changelog
 
