@@ -83,7 +83,8 @@ def test_sandbox_is_interactive_without_reopening_v0() -> None:
 
 def test_sandbox_default_reproduces_locked_v0_counts() -> None:
     raw = SANDBOX_DATA.read_text(encoding="utf-8")
-    rows_text = raw.split("= ", maxsplit=1)[1].strip().removesuffix(";")
+    marker = "export const SANDBOX_ROWS: MarketStructureSandboxRow[] = "
+    rows_text = raw.split(marker, maxsplit=1)[1].strip().removesuffix(";")
     rows = ast.literal_eval(rows_text)
     assert len(rows) == 225
     detector_touched = [row for row in rows if row[6] == 1]
