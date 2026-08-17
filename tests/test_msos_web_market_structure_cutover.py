@@ -1,4 +1,4 @@
-"""MSOS Market Structure Lab: human-facing research evidence and engine cutover."""
+"""MSOS Market Structure Workstation: human-facing research evidence and engine cutover."""
 
 from __future__ import annotations
 
@@ -11,6 +11,8 @@ MISSION_CONTROL = MSOS_WEB / "src" / "app" / "operator" / "mission-control" / "p
 CAPTURE_PROBE = MSOS_WEB / "src" / "lib" / "signalCaptureProbe.ts"
 STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
+ACTIVE_EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ActiveExperimentStatus.tsx"
+ACTIVE_EXPERIMENT_ROUTE = MSOS_WEB / "src" / "app" / "api" / "market-structure" / "exp001a" / "status" / "route.ts"
 SANDBOX_COMPONENT = MSOS_WEB / "src" / "components" / "MarketStructureSandbox.tsx"
 SANDBOX_DATA = MSOS_WEB / "src" / "data" / "marketStructureSandboxData.ts"
 SANDBOX_ROUTE = MSOS_WEB / "src" / "app" / "api" / "market-structure" / "sandbox-replay" / "route.ts"
@@ -32,27 +34,53 @@ def test_mission_control_loads_capture_and_engine_separately() -> None:
     assert "ndax_15m.multiscale" not in text
 
 
-def test_mission_control_is_operational_workspace_first() -> None:
+def test_mission_control_is_workstation_not_wall_of_telemetry() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
-    assert "Market Structure / Lab" in page
-    assert "1 · LIVE MARKET" in page
-    assert "2 · TESTING WORKSPACE" in page
-    assert "3 · PAST TESTS" in page
-    assert "4 · INFRASTRUCTURE" in page
-    assert "5 · FINDINGS SO FAR" in page
-    assert "What can we see right now?" in page
-    assert "Change the rules and see what happens." in page
-    assert "What have we actually tested already?" in page
-    assert "What is working underneath the tests?" in page
+    assert "Market Structure / Workstation" in page
+    assert "Market Structure Workstation" in page
+    assert 'href="#desk"' in page
+    assert 'href="#live"' in page
+    assert 'href="#experiments"' in page
+    assert 'href="#sandbox"' in page
+    assert 'href="#infrastructure"' in page
+    assert 'href="#evidence"' in page
+    assert "DESK · WHAT MATTERS NOW" in page
+    assert "LIVE MARKET" in page
+    assert "EXPERIMENTS" in page
+    assert "SANDBOX · EXPLORATION" in page
+    assert "INFRASTRUCTURE" in page
+    assert "EVIDENCE & HISTORY" in page
+    assert "Current mission: collect clean forward evidence." in page
+    assert "What does the engine see right now?" in page
+    assert "Turn the dials and see what changes." in page
+    assert "ActiveExperimentStatus" in page
     assert "MarketStructureSandbox" in page
     assert "MultiScaleStructureProbe" in page
     assert "ResearchExperimentPanel" in page
-    assert page.index("1 · LIVE MARKET") < page.index("2 · TESTING WORKSPACE")
-    assert page.index("2 · TESTING WORKSPACE") < page.index("3 · PAST TESTS")
-    assert page.index("3 · PAST TESTS") < page.index("4 · INFRASTRUCTURE")
-    assert page.index("4 · INFRASTRUCTURE") < page.index("5 · FINDINGS SO FAR")
+    assert page.index('id="desk"') < page.index('id="live"')
+    assert page.index('id="live"') < page.index('id="experiments"')
+    assert page.index('id="experiments"') < page.index('id="sandbox"')
+    assert page.index('id="sandbox"') < page.index('id="infrastructure"')
+    assert page.index('id="infrastructure"') < page.index('id="evidence"')
     assert "LANE 6 · PRODUCTIZATION" not in page
     assert "THE WHOLE PROJECT" not in page
+
+
+def test_active_exp001a_status_is_visible_without_exposing_engine_token() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    component = ACTIVE_EXPERIMENT_COMPONENT.read_text(encoding="utf-8")
+    route = ACTIVE_EXPERIMENT_ROUTE.read_text(encoding="utf-8")
+    assert "ActiveExperimentStatus" in page
+    assert "ACTIVE EXPERIMENT · EXP-001A" in component
+    assert "Frozen-zone forward validation" in component
+    assert 'fetch("/api/market-structure/exp001a/status"' in component
+    assert "15m / 1h / 4h / 1d" in component
+    assert "WAIT FOR EVIDENCE" in component
+    assert '"/v1/research/exp001a/status"' in route
+    assert "MARKET_STRUCTURE_ENGINE_TOKEN" in route
+    assert "Authorization" in route
+    assert "Bearer ${config.token}" in route
+    assert "MARKET_STRUCTURE_ENGINE_TOKEN" not in component
 
 
 def test_capture_probe_strips_legacy_multiscale() -> None:
@@ -139,12 +167,13 @@ def test_sandbox_default_reproduces_locked_v0_counts() -> None:
     assert sum(row[9] >= 25 for row in baseline_touched) == 26
 
 
-def test_research_summary_remains_available_as_audit_detail() -> None:
+def test_research_summary_remains_available_as_collapsed_audit_detail() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     evidence = EVIDENCE_COMPONENT.read_text(encoding="utf-8")
     state = RESEARCH_STATE.read_text(encoding="utf-8")
     assert "ResearchEvidenceSummary" in page
     assert "Full V0 evidence / audit details" in page
+    assert "Primary V0 result" in page
     assert "RESEARCH DECISION" in evidence
     assert "Do not promote v0 to Hummingbot" in evidence
     assert "PRIMARY EVIDENCE" in evidence
@@ -188,7 +217,9 @@ def test_strategy_and_hummingbot_remain_blocked_after_v0() -> None:
     page = MISSION_CONTROL.read_text(encoding="utf-8")
     state = RESEARCH_STATE.read_text(encoding="utf-8")
     assert "HUMMINGBOT" in page
-    assert "NOT IN USE" in page
+    assert "DOWNSTREAM" in page
+    assert "STRATEGY / HUMMINGBOT" in page
+    assert "BLOCKED" in page
     assert "LIVE TRADING" in page
     assert "OFF" in page
     assert 'status: "blocked"' in state
