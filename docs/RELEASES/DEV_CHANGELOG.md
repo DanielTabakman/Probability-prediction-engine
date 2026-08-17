@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-17
 
+- `3b204b3f` — Merge pull request #5421 from DanielTabakman/agent/pitchpacks-v3-mechanics
+- `8964310b` — Point PitchPacks page to v3 mechanics (`apps/msos-web/`)
+- `33532b24` — Add PitchPacks v3 shell (`apps/msos-web/`)
+- `1b2006a6` — Style PitchPacks v3 heat and simulator (`apps/msos-web/`)
+- `611dddfb` — Add PitchPacks v3 mechanics (`apps/msos-web/`)
+- `c519f75c` — Control-plane: dev changelog
 - `0da22d4d` — Rebuild PitchPacks as football field autobattler (#5420) (`apps/msos-web/`)
 - `beb6c3b1` — Control-plane: dev changelog
 - `63e1513a` — Add Daniel labs hub and PitchPacks prototype (`apps/msos-web/`)
