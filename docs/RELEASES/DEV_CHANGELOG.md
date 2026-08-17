@@ -4,6 +4,20 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-17
 
+- `cf64d017` — Merge pull request #5423 from DanielTabakman/agent/pitchpacks-clean-handoff
+- `c0922c12` — Remove obsolete PitchPacks v4 clarity layer (`apps/msos-web/`)
+- `5843e1fc` — Remove obsolete PitchPacks v4 styles (`apps/msos-web/`)
+- `166aebfb` — Remove obsolete PitchPacks v4 shell (`apps/msos-web/`)
+- `6f370056` — Remove obsolete PitchPacks v3 mechanics layer (`apps/msos-web/`)
+- `07cb1385` — Remove obsolete PitchPacks v3 styles (`apps/msos-web/`)
+- `f5fc65ec` — Remove obsolete PitchPacks v3 shell (`apps/msos-web/`)
+- `006861c4` — Remove obsolete layered PitchPacks prototype (`apps/msos-web/`)
+- `4b51746e` — Point PitchPacks route at clean game implementation (`apps/msos-web/`)
+- `651d26a6` — Add PitchPacks visual handoff note
+- `cf317943` — Add consolidated PitchPacks game engine (`apps/msos-web/`)
+- `5a8cbb62` — Add consolidated PitchPacks styles (`apps/msos-web/`)
+- `8514bd2a` — Add clean PitchPacks game shell (`apps/msos-web/`)
+- `f38271a4` — Control-plane: dev changelog
 - `bcf331ec` — Merge pull request #5422 from DanielTabakman/agent/pitchpacks-stat-clarity
 - `9d98b1e4` — Point PitchPacks page to stat clarity build (`apps/msos-web/`)
 - `ff88d019` — Load PitchPacks stat clarity layer (`apps/msos-web/`)
