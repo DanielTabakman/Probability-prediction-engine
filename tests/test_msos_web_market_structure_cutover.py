@@ -32,6 +32,19 @@ def test_mission_control_loads_capture_and_engine_separately() -> None:
     assert "ndax_15m.multiscale" not in text
 
 
+def test_mission_control_leads_with_founder_research_loop() -> None:
+    text = MISSION_CONTROL.read_text(encoding="utf-8")
+    assert "Research / Founder View" in text
+    assert "WHERE ARE WE?" in text
+    assert "Searching for an edge" in text
+    assert "WHAT ARE WE DOING NOW?" in text
+    assert "WHAT SHOULD I DO?" in text
+    assert "Detector minus control is the number that matters" in text
+    assert "SEE PATTERN → PLAY WITH RULE → FIND SOMETHING INTERESTING → FREEZE IT → TEST ON NEW DATA" in text
+    assert "Advanced / project details" in text
+    assert text.index("<MarketStructureSandbox />") < text.index("Advanced / project details")
+
+
 def test_capture_probe_strips_legacy_multiscale() -> None:
     text = CAPTURE_PROBE.read_text(encoding="utf-8")
     assert "function captureHealthFromNdax" in text
