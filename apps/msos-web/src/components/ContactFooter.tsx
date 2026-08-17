@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function ContactFooter() {
   return (
     <footer
@@ -15,7 +17,15 @@ export function ContactFooter() {
         fontSize: 13,
       }}
     >
-      <span>Questions, partnerships, or feedback?</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+        <span>Questions, partnerships, or feedback?</span>
+        <Link
+          href="/daniel"
+          style={{ color: "inherit", textDecoration: "none", fontSize: 12 }}
+        >
+          Other experiments
+        </Link>
+      </div>
       <a
         href="mailto:marketstructureos@gmail.com"
         style={{ color: "var(--teal)", fontWeight: 700 }}
