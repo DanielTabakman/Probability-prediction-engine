@@ -4,6 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-17
 
+- `bcf331ec` — Merge pull request #5422 from DanielTabakman/agent/pitchpacks-stat-clarity
+- `9d98b1e4` — Point PitchPacks page to stat clarity build (`apps/msos-web/`)
+- `ff88d019` — Load PitchPacks stat clarity layer (`apps/msos-web/`)
+- `681e62d3` — Clarify PitchPacks stats and KO language (`apps/msos-web/`)
+- `d95800f9` — Make PitchPacks combat stats obvious (`apps/msos-web/`)
+- `f2ab6a91` — Control-plane: dev changelog
 - `3b204b3f` — Merge pull request #5421 from DanielTabakman/agent/pitchpacks-v3-mechanics
 - `8964310b` — Point PitchPacks page to v3 mechanics (`apps/msos-web/`)
 - `33532b24` — Add PitchPacks v3 shell (`apps/msos-web/`)
