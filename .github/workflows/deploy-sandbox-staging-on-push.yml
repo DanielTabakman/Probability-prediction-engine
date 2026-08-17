@@ -1,0 +1,69 @@
+name: Deploy Sandbox Staging Branch
+
+on:
+  push:
+    branches:
+      - agent/operating-loop-probe-v0
+    paths:
+      - .github/workflows/deploy-sandbox-staging-on-push.yml
+
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: true
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    env:
+      PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+      PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+      PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+      OCT_SIGNAL_CAPTURE_STATUS_URL: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_URL }}
+      OCT_SIGNAL_CAPTURE_STATUS_TOKEN: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_TOKEN }}
+      MARKET_STRUCTURE_ENGINE_URL: ${{ secrets.MARKET_STRUCTURE_ENGINE_URL }}
+      MARKET_STRUCTURE_ENGINE_TOKEN: ${{ secrets.MARKET_STRUCTURE_ENGINE_TOKEN }}
+      GIT_REF: agent/operating-loop-probe-v0
+    steps:
+      - name: Deploy sandbox branch to MSOS staging only
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+          PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+          PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+          OCT_SIGNAL_CAPTURE_STATUS_URL: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_URL }}
+          OCT_SIGNAL_CAPTURE_STATUS_TOKEN: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_TOKEN }}
+          MARKET_STRUCTURE_ENGINE_URL: ${{ secrets.MARKET_STRUCTURE_ENGINE_URL }}
+          MARKET_STRUCTURE_ENGINE_TOKEN: ${{ secrets.MARKET_STRUCTURE_ENGINE_TOKEN }}
+          GIT_REF: agent/operating-loop-probe-v0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          command_timeout: 25m
+          envs: PPE_RESEARCH_OFFER_URL,PPE_RESEARCH_OFFER_EMAIL,PPE_RESEARCH_OFFER_LABEL,OCT_SIGNAL_CAPTURE_STATUS_URL,OCT_SIGNAL_CAPTURE_STATUS_TOKEN,MARKET_STRUCTURE_ENGINE_URL,MARKET_STRUCTURE_ENGINE_TOKEN,GIT_REF
+          script: |
+            set -euo pipefail
+            cd /opt/marketstructureos
+            git fetch origin main agent/operating-loop-probe-v0
+            git checkout main
+            git pull --ff-only origin main
+            bash scripts/vps_bootstrap_staging.sh
+            bash scripts/vps_deploy_staging.sh "origin/${GIT_REF}"
+
+      - name: Checkout sandbox branch for verifier
+        uses: actions/checkout@v7
+
+      - name: Verify Market Structure Lab staging
+        run: |
+          set -euo pipefail
+          code="000"
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 30 https://staging.marketstructureos.com/market-structure || true)
+            if [ "$code" = "200" ]; then
+              break
+            fi
+            sleep 10
+          done
+          test "$code" = "200"
+          python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com
