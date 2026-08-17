@@ -8,7 +8,7 @@ on:
       - .github/workflows/deploy-sandbox-staging-on-push.yml
 
 concurrency:
-  group: deploy-vps
+  group: deploy-vps-staging-sandbox
   cancel-in-progress: false
 
 jobs:
