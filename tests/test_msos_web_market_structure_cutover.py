@@ -13,6 +13,7 @@ STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProb
 EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
 EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
 RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
+V0_REPORT = MSOS_WEB / "public" / "docs" / "market-structure-v0-report.md"
 COMPOSE = REPO_ROOT / "docker-compose.yml"
 STAGING_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "deploy-vps-staging.yml"
 
@@ -78,6 +79,20 @@ def test_research_summary_leads_with_primary_decision() -> None:
     assert "-0.105642" in state
     assert "0.058834" in state
     assert "168" in state
+
+
+def test_v0_full_report_is_shareable_from_control_panel() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    report = V0_REPORT.read_text(encoding="utf-8")
+    assert 'href="/docs/market-structure-v0-report.md"' in page
+    assert "Read / share full V0 report (.md)" in page
+    assert "# Market Structure V0 — Full Project Report" in report
+    assert "NOT VALIDATED / NO EDGE DEMONSTRATED" in report
+    assert "168 / 168" in report
+    assert "16.67%" in report
+    assert "18.98%" in report
+    assert "−2.31 percentage points" in report
+    assert "HUMMINGBOT" in report.upper()
 
 
 def test_v0_experiment_loop_is_closed_not_rerunnable_from_ui() -> None:
