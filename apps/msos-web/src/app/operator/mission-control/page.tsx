@@ -44,6 +44,18 @@ export default async function MissionControlPage() {
         <p style={{ marginBottom: "0.35rem" }}>
           V0 asked one narrow question: do recurring multi-scale price levels predict future reactions better than matched control levels? We built the detector, ran historical and prospective tests, and now have a complete v0 research decision.
         </p>
+        <div className="panel compact" style={{ margin: "0.75rem 0" }}>
+          <div className="panel-sub">TEAM BRIEF · SHARE THIS</div>
+          <div className="row" style={{ alignItems: "center", justifyContent: "space-between", gap: "0.75rem", flexWrap: "wrap" }}>
+            <div style={{ maxWidth: "760px" }}>
+              <strong>Market Structure V0 — full project report</strong>
+              <div className="panel-sub" style={{ marginTop: "0.25rem" }}>
+                One Markdown memo with the context, architecture, exact hypothesis, evidence, interpretation, what v0 is useful for, and where a future v1 could go.
+              </div>
+            </div>
+            <a className="btn" href="/docs/market-structure-v0-report.md" target="_blank" rel="noreferrer">Read / share full V0 report (.md)</a>
+          </div>
+        </div>
         <p className="panel-sub" style={{ marginBottom: "0.8rem" }}><strong>V0 question:</strong> {probe.successQuestion}</p>
         <div className="panel-sub" style={{ marginBottom: "0.45rem" }}>V0 LIFECYCLE</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.5rem" }}>
