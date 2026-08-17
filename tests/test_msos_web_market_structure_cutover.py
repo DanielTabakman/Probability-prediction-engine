@@ -8,6 +8,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MSOS_WEB = REPO_ROOT / "apps" / "msos-web"
 MISSION_CONTROL = MSOS_WEB / "src" / "app" / "operator" / "mission-control" / "page.tsx"
+PROJECT_MAP = MSOS_WEB / "src" / "components" / "MarketStructureProjectMap.tsx"
 CAPTURE_PROBE = MSOS_WEB / "src" / "lib" / "signalCaptureProbe.ts"
 STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
@@ -32,17 +33,35 @@ def test_mission_control_loads_capture_and_engine_separately() -> None:
     assert "ndax_15m.multiscale" not in text
 
 
-def test_mission_control_leads_with_founder_research_loop() -> None:
-    text = MISSION_CONTROL.read_text(encoding="utf-8")
-    assert "Research / Founder View" in text
-    assert "WHERE ARE WE?" in text
-    assert "Searching for an edge" in text
-    assert "WHAT ARE WE DOING NOW?" in text
-    assert "WHAT SHOULD I DO?" in text
-    assert "Detector minus control is the number that matters" in text
-    assert "SEE PATTERN → PLAY WITH RULE → FIND SOMETHING INTERESTING → FREEZE IT → TEST ON NEW DATA" in text
-    assert "Advanced / project details" in text
-    assert text.index("<MarketStructureSandbox />") < text.index("Advanced / project details")
+def test_mission_control_is_persistent_project_console_not_single_experiment_page() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    project_map = PROJECT_MAP.read_text(encoding="utf-8")
+    assert "Market Structure / Project Console" in page
+    assert "THE WHOLE PROJECT" in project_map
+    assert "CAPTURE" in project_map
+    assert "STRUCTURE" in project_map
+    assert "RESEARCH" in project_map
+    assert "VALIDATE" in project_map
+    assert "STRATEGY" in project_map
+    assert "HUMMINGBOT" in project_map
+    assert "PRODUCT" in project_map
+    assert "JUMP TO A LANE" in project_map
+    assert "LANE 1 · INFRASTRUCTURE" in page
+    assert "LANE 2 · ACTIVE RESEARCH" in page
+    assert "LANE 3 · TEST LIBRARY" in page
+    assert "LANE 4 · WHAT WE KNOW" in page
+    assert "LANE 5 · STRATEGY + HUMMINGBOT" in page
+    assert "LANE 6 · PRODUCTIZATION" in page
+    assert "Every test we run stays here permanently" in page
+    assert "EXPLORE → CANDIDATE → LOCK HYPOTHESIS → FRESH TEST → DECISION → LEARN → NEXT HYPOTHESIS" in page
+    assert "Edge-producing engine" in page
+    assert "Research operating system" in page
+    assert "Advanced / project details" in page
+    assert page.index("LANE 1 · INFRASTRUCTURE") < page.index("LANE 2 · ACTIVE RESEARCH")
+    assert page.index("LANE 2 · ACTIVE RESEARCH") < page.index("LANE 3 · TEST LIBRARY")
+    assert page.index("LANE 3 · TEST LIBRARY") < page.index("LANE 4 · WHAT WE KNOW")
+    assert page.index("LANE 4 · WHAT WE KNOW") < page.index("LANE 5 · STRATEGY + HUMMINGBOT")
+    assert page.index("LANE 5 · STRATEGY + HUMMINGBOT") < page.index("LANE 6 · PRODUCTIZATION")
 
 
 def test_capture_probe_strips_legacy_multiscale() -> None:
