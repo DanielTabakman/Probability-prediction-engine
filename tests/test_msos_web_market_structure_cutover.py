@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -10,6 +11,8 @@ MISSION_CONTROL = MSOS_WEB / "src" / "app" / "operator" / "mission-control" / "p
 CAPTURE_PROBE = MSOS_WEB / "src" / "lib" / "signalCaptureProbe.ts"
 STRUCTURE_PROBE = MSOS_WEB / "src" / "lib" / "marketStructureProbe.ts"
 STRUCTURE_COMPONENT = MSOS_WEB / "src" / "components" / "MultiScaleStructureProbe.tsx"
+SANDBOX_COMPONENT = MSOS_WEB / "src" / "components" / "MarketStructureSandbox.tsx"
+SANDBOX_DATA = MSOS_WEB / "src" / "data" / "marketStructureSandboxData.ts"
 EVIDENCE_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchEvidenceSummary.tsx"
 EXPERIMENT_COMPONENT = MSOS_WEB / "src" / "components" / "ResearchExperimentPanel.tsx"
 RESEARCH_STATE = MSOS_WEB / "src" / "data" / "operatingLoopProbe.ts"
@@ -60,6 +63,35 @@ def test_structure_component_separates_live_detection_from_validation() -> None:
     assert "candidate levels" in text.lower()
     assert "ndax_15m.multiscale" not in text
     assert "ndax15m.multiscale" not in text
+
+
+def test_sandbox_is_interactive_without_reopening_v0() -> None:
+    page = MISSION_CONTROL.read_text(encoding="utf-8")
+    sandbox = SANDBOX_COMPONENT.read_text(encoding="utf-8")
+    assert "MarketStructureSandbox" in page
+    assert "SANDBOX · REAL V0 EVENT RECORDS · EXPLORATORY ONLY" in sandbox
+    assert "Move the dials and watch the historical result change" in sandbox
+    assert "Reset to V0" in sandbox
+    assert "Copy candidate hypothesis" in sandbox
+    assert "useState(25)" in sandbox
+    assert "useState(2)" in sandbox
+    assert "Inverse here means non-reaction, not automatically a profitable opposite trade" in sandbox
+    assert "Touch distance" in sandbox and "locked in artifact" in sandbox
+    assert "Reaction horizon" in sandbox and "Forward window" in sandbox
+    assert "freeze before testing on untouched data" in sandbox
+
+
+def test_sandbox_default_reproduces_locked_v0_counts() -> None:
+    raw = SANDBOX_DATA.read_text(encoding="utf-8")
+    rows_text = raw.split("= ", maxsplit=1)[1].strip().removesuffix(";")
+    rows = ast.literal_eval(rows_text)
+    assert len(rows) == 225
+    detector_touched = [row for row in rows if row[6] == 1]
+    baseline_touched = [row for row in rows if row[8] == 1]
+    assert len(detector_touched) == 144
+    assert len(baseline_touched) == 137
+    assert sum(row[7] >= 25 for row in detector_touched) == 24
+    assert sum(row[9] >= 25 for row in baseline_touched) == 26
 
 
 def test_research_summary_leads_with_primary_decision() -> None:
