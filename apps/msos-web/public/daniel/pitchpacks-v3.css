@@ -1,0 +1,7 @@
+.unit.setup{cursor:grab}
+.unit.setup:active{cursor:grabbing}
+.unit.onfire{filter:drop-shadow(0 0 10px #ff8a00)}
+.unit.onfire::before{content:"🔥";position:absolute;left:50%;top:-20px;transform:translateX(-50%);font-size:24px;z-index:20;animation:v3flame .35s ease-in-out infinite alternate;pointer-events:none}
+.unit.onfire::after{content:"";position:absolute;left:50%;top:28px;width:72px;height:72px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#ffb0002b 0,#ff5a0020 42%,transparent 72%);pointer-events:none;z-index:-1}
+.simRow{display:flex;gap:6px;align-items:center;margin:7px 0}.simState{font-size:8px;color:var(--muted)}.simState.live{color:#86efac;font-weight:900}.focusNote{font-size:8px;color:#d6e5f3;line-height:1.4;margin:6px 0 8px}.cooldown{display:block;font-size:8px;color:#ffd87a;margin-top:5px;font-weight:900}
+@keyframes v3flame{from{transform:translateX(-50%) translateY(1px) scale(.94) rotate(-3deg)}to{transform:translateX(-50%) translateY(-2px) scale(1.08) rotate(3deg)}}

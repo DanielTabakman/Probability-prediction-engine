@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "PitchPacks — Football Autobattler | Daniel Tabakman",
   description:
-    "Playable football autobattler prototype: choose five starters and one bench player, then watch them fight while live sports events buff the corresponding fighters.",
+    "Playable football autobattler prototype: choose five starters and one bench player, position them, then watch them fight while simulated live sports events build heat.",
 };
 
 export default function PitchPacksPrototypePage() {
@@ -38,12 +38,12 @@ export default function PitchPacksPrototypePage() {
           ← Daniel&apos;s labs
         </Link>
         <span style={{ color: "#64748b" }}>
-          Football field prototype · drag/drop lineup · fake live feed
+          Football prototype · free positioning · rotating bench · simulated TV heat
         </span>
       </header>
       <iframe
         title="PitchPacks football autobattler prototype"
-        src="/daniel/pitchpacks-prototype.html"
+        src="/daniel/pitchpacks-v3-shell.html"
         style={{
           display: "block",
           width: "100%",
