@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-17
 
-_No merges to `main`._
+- `63e1513a` — Add Daniel labs hub and PitchPacks prototype (`apps/msos-web/`)
+- `fc131aef` — Control-plane: dev changelog
 
 ## 2026-08-16
 
