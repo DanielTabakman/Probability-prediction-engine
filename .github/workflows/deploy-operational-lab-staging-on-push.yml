@@ -1,0 +1,79 @@
+name: Deploy Operational Lab Staging
+
+on:
+  push:
+    branches:
+      - agent/operating-loop-probe-v0
+    paths:
+      - .github/workflows/deploy-operational-lab-staging-on-push.yml
+
+concurrency:
+  group: deploy-operational-lab-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+      PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+      PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+      OCT_SIGNAL_CAPTURE_STATUS_URL: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_URL }}
+      OCT_SIGNAL_CAPTURE_STATUS_TOKEN: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_TOKEN }}
+      MARKET_STRUCTURE_ENGINE_URL: ${{ secrets.MARKET_STRUCTURE_ENGINE_URL }}
+      MARKET_STRUCTURE_ENGINE_TOKEN: ${{ secrets.MARKET_STRUCTURE_ENGINE_TOKEN }}
+      GIT_REF: agent/operating-loop-probe-v0
+    steps:
+      - name: Deploy operational lab to staging only
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          PPE_RESEARCH_OFFER_URL: ${{ secrets.PPE_RESEARCH_OFFER_URL }}
+          PPE_RESEARCH_OFFER_EMAIL: ${{ secrets.PPE_RESEARCH_OFFER_EMAIL }}
+          PPE_RESEARCH_OFFER_LABEL: ${{ secrets.PPE_RESEARCH_OFFER_LABEL }}
+          OCT_SIGNAL_CAPTURE_STATUS_URL: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_URL }}
+          OCT_SIGNAL_CAPTURE_STATUS_TOKEN: ${{ secrets.OCT_SIGNAL_CAPTURE_STATUS_TOKEN }}
+          MARKET_STRUCTURE_ENGINE_URL: ${{ secrets.MARKET_STRUCTURE_ENGINE_URL }}
+          MARKET_STRUCTURE_ENGINE_TOKEN: ${{ secrets.MARKET_STRUCTURE_ENGINE_TOKEN }}
+          GIT_REF: agent/operating-loop-probe-v0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          port: 22
+          command_timeout: 25m
+          envs: PPE_RESEARCH_OFFER_URL,PPE_RESEARCH_OFFER_EMAIL,PPE_RESEARCH_OFFER_LABEL,OCT_SIGNAL_CAPTURE_STATUS_URL,OCT_SIGNAL_CAPTURE_STATUS_TOKEN,MARKET_STRUCTURE_ENGINE_URL,MARKET_STRUCTURE_ENGINE_TOKEN,GIT_REF
+          script: |
+            set -euo pipefail
+            cd /opt/marketstructureos
+            git fetch origin main agent/operating-loop-probe-v0
+            git checkout main
+            git pull --ff-only origin main
+            bash scripts/vps_bootstrap_staging.sh
+            bash scripts/vps_deploy_staging.sh "origin/${GIT_REF}"
+
+      - name: Checkout verifier
+        uses: actions/checkout@v7
+
+      - name: Verify operational sections
+        shell: bash
+        run: |
+          set -euo pipefail
+          url=https://staging.marketstructureos.com/market-structure
+          code="000"
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -sS -o /tmp/page.html -w "%{http_code}" --max-time 30 "$url" || true)
+            if [ "$code" = "200" ] && grep -q '1 · LIVE MARKET' /tmp/page.html && grep -q '2 · TESTING WORKSPACE' /tmp/page.html; then
+              break
+            fi
+            sleep 10
+          done
+          test "$code" = "200"
+          grep -q '1 · LIVE MARKET' /tmp/page.html
+          grep -q 'What can we see right now?' /tmp/page.html
+          grep -q '2 · TESTING WORKSPACE' /tmp/page.html
+          grep -q 'Change the rules and see what happens.' /tmp/page.html
+          grep -q '3 · PAST TESTS' /tmp/page.html
+          grep -q '4 · INFRASTRUCTURE' /tmp/page.html
+          grep -q '5 · FINDINGS SO FAR' /tmp/page.html
+          grep -q 'RAW PATH REPLAY' /tmp/page.html
+          python scripts/verify_msos_web_ship.py --apex-only --base-url https://staging.marketstructureos.com
