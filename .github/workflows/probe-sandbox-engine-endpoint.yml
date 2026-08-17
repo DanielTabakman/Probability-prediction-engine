@@ -14,15 +14,32 @@ jobs:
       ENGINE_URL: ${{ secrets.MARKET_STRUCTURE_ENGINE_URL }}
       ENGINE_TOKEN: ${{ secrets.MARKET_STRUCTURE_ENGINE_TOKEN }}
     steps:
-      - name: Probe engine routes without exposing credentials
+      - name: Probe engine routes through configured adapter
         shell: bash
         run: |
           set -euo pipefail
           test -n "${ENGINE_URL:-}"
           test -n "${ENGINE_TOKEN:-}"
-          base="${ENGINE_URL%/}"
-          latest_code=$(curl -sS -o /tmp/latest.json -w '%{http_code}' --max-time 30 -H "Authorization: Bearer ${ENGINE_TOKEN}" "${base}/v1/structure/latest?source=ndax" || true)
-          replay_code=$(curl -sS -o /tmp/replay.json -w '%{http_code}' --max-time 60 -H "Authorization: Bearer ${ENGINE_TOKEN}" -H 'Content-Type: application/json' -d '{"source":"ndax","anchor_start_at":1786737600,"anchor_end_at":1786737600,"forward_seconds":14400,"min_persistence":2,"touch_bps":10,"outcome_bps":25,"outcome_horizon_seconds":1800,"outcome_mode":"reaction","max_path_points":10}' "${base}/v1/research/sandbox-replay" || true)
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from urllib.parse import urlparse, urlunparse, urlencode
+          configured=os.environ['ENGINE_URL'].strip()
+          if '://' not in configured:
+              configured='https://'+configured
+          base=urlparse(configured)
+          def resolve(path_and_query):
+              desired=urlparse('https://engine.local'+path_and_query)
+              if base.path == '/status':
+                  return urlunparse((base.scheme,base.netloc,base.path,base.params,urlencode({'engine_path':desired.path + (('?' + desired.query) if desired.query else '')}),base.fragment))
+              return urlunparse((base.scheme,base.netloc,desired.path,desired.params,desired.query,base.fragment))
+          Path('/tmp/latest_url').write_text(resolve('/v1/structure/latest?source=ndax'))
+          Path('/tmp/replay_url').write_text(resolve('/v1/research/sandbox-replay'))
+          PY
+          latest_url=$(cat /tmp/latest_url)
+          replay_url=$(cat /tmp/replay_url)
+          latest_code=$(curl -sS -o /tmp/latest.json -w '%{http_code}' --max-time 30 -H "Authorization: Bearer ${ENGINE_TOKEN}" "$latest_url" || true)
+          replay_code=$(curl -sS -o /tmp/replay.json -w '%{http_code}' --max-time 120 -H "Authorization: Bearer ${ENGINE_TOKEN}" -H 'Content-Type: application/json' -d '{"source":"ndax","anchor_start_at":1786737600,"anchor_end_at":1786737600,"forward_seconds":14400,"min_persistence":2,"touch_bps":10,"outcome_bps":25,"outcome_horizon_seconds":1800,"outcome_mode":"reaction","max_path_points":10}' "$replay_url" || true)
           echo "latest_http=${latest_code}"
           echo "replay_http=${replay_code}"
           python - <<'PY'
@@ -37,7 +54,7 @@ jobs:
               if not isinstance(value,dict):
                   print(label+'_summary=non_object')
                   continue
-              safe={k:value[k] for k in ('status','scientific_label','replay_version','detail','canonical_research_effect') if k in value}
+              safe={k:value[k] for k in ('status','scientific_label','replay_version','detail','canonical_research_effect','schema_version') if k in value}
               if isinstance(value.get('aggregate'),dict):
                   safe['aggregate_keys']=sorted(value['aggregate'].keys())
               print(label+'_summary='+json.dumps(safe,sort_keys=True))
