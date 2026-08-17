@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PitchPacks — NFL Autobattler Prototype</title>
+  <link rel="stylesheet" href="/daniel/pitchpacks-game.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="title">
+        <b>PitchPacks — football autobattler</b>
+        <span>Pick 5 starters + 1 bench, position them, then beat the snot out of the other team.</span>
+      </div>
+      <div class="controls">
+        <button class="btn" id="quickBtn">Quick lineup</button>
+        <button class="btn primary" id="startBtn" disabled>Start Battle</button>
+        <button class="btn danger" id="resetBtn">Reset</button>
+        <div class="status" id="status">Select your six players.</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="gameShell">
+        <div class="field" id="field">
+          <div class="endzone enemy">RIVAL</div>
+          <div class="endzone you">YOU</div>
+          <div class="teamLabel enemy">ENEMY TEAM</div>
+          <div class="teamLabel you">YOUR TEAM</div>
+          <div class="setupHint" id="setupHint">Drag five players onto the field, then drag them anywhere in your half to position them. Put one more on the bench.</div>
+          <div class="overlay" id="overlay">
+            <div class="result">
+              <h3 id="resultTitle">YOU WIN</h3>
+              <p id="resultText"></p>
+              <button class="btn primary" id="rematchBtn">Back to TV / Setup</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="benchWrap">
+          <div class="labelBox">
+            <strong>BENCH</strong>
+            <span>During battle: drag the bench card onto any active player. The player you pull becomes the new bench.</span>
+            <span class="cooldown" id="swapCooldown"></span>
+          </div>
+          <div class="benchSlot" id="benchSlot"></div>
+        </div>
+
+        <div class="rosterWrap">
+          <div class="rosterHead">
+            <b>YOUR ROSTER</b>
+            <span id="rosterNote">12 available → choose 6. The other 6 lock when battle starts.</span>
+          </div>
+          <div class="roster" id="roster"></div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel">
+          <h2>WHAT THE POSITIONS DO</h2>
+          <div class="rule"><div class="roleIcon">QB</div><div><b>Quarterback = main DPS</b><span>Throws footballs from range. Usually targets the enemy QB first. Losing him hurts because you lose your main damage dealer.</span></div></div>
+          <div class="rule"><div class="roleIcon">OL</div><div><b>Offensive line = rusher</b><span>Charges through the fight toward the enemy quarterback and tries to knock him out.</span></div></div>
+          <div class="rule"><div class="roleIcon">DL</div><div><b>Defensive line = protector</b><span>Stays near your QB, attacks rushers that enter the pocket, and reduces damage while close to him.</span></div></div>
+          <p>Win condition: beat the snot out of everyone on the other team. Practical strategy: knock out their QB while keeping yours standing.</p>
+        </section>
+
+        <section class="panel">
+          <h2>SIMULATED LIVE NFL GAME</h2>
+          <div class="eventSelected">
+            <b id="selectedName">Click one of your players to focus</b>
+            <span id="selectedStats">ATK = damage per hit · HP = how much punishment they can take.</span>
+          </div>
+          <div class="simRow">
+            <button class="btn" id="simBtn">Start TV plays</button>
+            <span class="simState" id="simState">TV mode paused</span>
+          </div>
+          <div class="focusNote">TV action is intentionally low-attention: choose who you want exposure to and watch the game. Start the autobattle yourself during a commercial, timeout, halftime, or other downtime.</div>
+          <div class="events">
+            <button class="event" data-event="big"><b>TEST ⚡ BIG PLAY</b><span>+3% rest of match · +20% next battle</span></button>
+            <button class="event score" data-event="score"><b>TEST 🔥 TD / HUGE PLAY</b><span>+5% rest of match · +35% next battle</span></button>
+            <button class="event bad" data-event="bad"><b>TEST ↘ TURNOVER / BAD PLAY</b><span>-2% rest of match · -15% next battle</span></button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>FIGHT LOG</h2>
+          <div class="log" id="log"></div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script src="/daniel/pitchpacks-game.js"></script>
+</body>
+</html>
