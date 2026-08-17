@@ -43,7 +43,7 @@ export default function PitchPacksPrototypePage() {
       </header>
       <iframe
         title="PitchPacks football autobattler prototype"
-        src="/daniel/pitchpacks-v4-shell.html"
+        src="/daniel/pitchpacks-game.html"
         style={{
           display: "block",
           width: "100%",
