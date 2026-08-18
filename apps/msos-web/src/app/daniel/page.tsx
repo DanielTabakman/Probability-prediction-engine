@@ -43,36 +43,6 @@ export default function DanielLabsPage() {
           </div>
 
           <div className={styles.grid}>
-            <article className={`${styles.card} ${styles.featured}`}>
-              <p className={styles.eyebrow}>Newest experiment · game</p>
-              <h3>PitchPacks — Live Sports Autobattler</h3>
-              <p>
-                Five little fighters automatically beat the hell out of each
-                other while events from a real sporting match buff the
-                corresponding athlete. Big plays create a small rest-of-match
-                upgrade and a much larger burst for the next battle.
-              </p>
-              <div className={styles.tags}>
-                <span>5v5 autobattle</span>
-                <span>live-event buffs</span>
-                <span>bench swaps</span>
-                <span>sports collectibles</span>
-              </div>
-              <div className={styles.actions}>
-                <Link className={styles.primaryButton} href="/daniel/pitchpacks">
-                  Play prototype →
-                </Link>
-                <a
-                  className={styles.secondaryButton}
-                  href="https://github.com/DanielTabakman/pitch-packs"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Project notes ↗
-                </a>
-              </div>
-            </article>
-
             <article className={styles.card}>
               <p className={styles.eyebrow}>Markets · product</p>
               <h3>Market Structure OS</h3>

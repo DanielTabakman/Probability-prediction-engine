@@ -2,6 +2,17 @@
 
 **Repo:** Probability Prediction Engine — agents **auto-ship** when work is done. Do not ask the operator about commits, pushes, staging, or PRs.
 
+## Repository boundary (hard)
+
+This repository owns **PPE and Market Structure OS only**. Do not copy, host,
+proxy, or implement unrelated products here. A separate product must live in its
+own repository; PPE/MSOS may link to it or consume an explicitly documented API.
+
+Before adding a route, public asset namespace, iframe, or remote runtime source,
+read [`docs/REPOSITORY_BOUNDARIES.md`](docs/REPOSITORY_BOUNDARIES.md). The local
+gate and CI run `python scripts/check_repository_boundaries.py`; do not weaken the
+guard to land product code from another repository.
+
 ## Ship path
 
 1. `python scripts/run_pushable_gate.py`
@@ -34,6 +45,7 @@ python scripts/ppe_branch_recovery.py --plane control --ship --acquire-lease
 |-------|------------|
 | Auto-ship | [`.cursor/rules/auto-ship.mdc`](.cursor/rules/auto-ship.mdc) |
 | Commit policy | [`docs/SOP/COMMIT_POLICY.md`](docs/SOP/COMMIT_POLICY.md) |
+| Repository ownership | [`docs/REPOSITORY_BOUNDARIES.md`](docs/REPOSITORY_BOUNDARIES.md) |
 | Operator relay | [`.cursor/rules/ppe-operator.mdc`](.cursor/rules/ppe-operator.mdc) |
 | Thread roles | [`.cursor/rules/ppe-roles.mdc`](.cursor/rules/ppe-roles.mdc) |
 | Multi-agent leases | [`docs/SOP/MULTI_AGENT_WORKER_INTERFACE_V1.md`](docs/SOP/MULTI_AGENT_WORKER_INTERFACE_V1.md) |

@@ -224,6 +224,13 @@ def _sop_discovery_gate_commands(files: list[str]) -> list[list[str]]:
     ]
 
 
+def _repository_boundary_gate_commands(repo: Path) -> list[list[str]]:
+    script = repo / "scripts/check_repository_boundaries.py"
+    if not script.is_file():
+        return []
+    return [["python", "scripts/check_repository_boundaries.py", "--repo-root", str(repo)]]
+
+
 def _classify(
     files: list[str],
     *,
@@ -394,9 +401,13 @@ def main(argv: list[str] | None = None) -> int:
                     return "PPE_CORE"
                 if path.startswith("tests/test_bl_density"):
                     return "PPE_CORE"
+                if path == "docs/PITCHPACKS_PROTOTYPE_HANDOFF.md":
+                    return "DOCS_ONLY"
                 if path.startswith("apps/") or path.startswith("tests/test_msos_web"):
                     return "MSOS_UI"
                 if path.startswith("docs/CONTROL_PLANE/") or path == "AGENTS.md":
+                    return "CONTROL"
+                if path == "docs/REPOSITORY_BOUNDARIES.md":
                     return "CONTROL"
                 if path.startswith("docs/"):
                     return "DOCS_ONLY" if path.startswith("docs/SOP/") else "DOCS_CANON"
@@ -431,6 +442,11 @@ def main(argv: list[str] | None = None) -> int:
                 return rc
         except ImportError:
             pass
+
+    for cmd in _repository_boundary_gate_commands(repo):
+        rc = _run(cmd, cwd=repo)
+        if rc != 0:
+            return rc
 
     for cmd in plan.commands:
         rc = _run(cmd, cwd=repo)
