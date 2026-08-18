@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-18
 
-_No merges to `main`._
+- `61d7db36` — Add playable Devinder PitchPacks comparison route (`apps/msos-web/`)
+- `2d2de6d8` — Control-plane: dev changelog
 
 ## 2026-08-17
 
