@@ -60,14 +60,14 @@ export default function DevinderPitchPacksPage() {
             rel="noreferrer"
             style={{ color: "#94a3b8", textDecoration: "none", fontWeight: 700 }}
           >
-            Open original ↗
+            Upstream source ↗
           </a>
         </div>
       </header>
 
       <iframe
         title="Devinder Butani's original PitchPacks prototype"
-        src={DEVINDER_PITCHPACKS_URL}
+        src="/daniel/pitchpacks-devinder/game"
         allow="fullscreen"
         style={{
           display: "block",
