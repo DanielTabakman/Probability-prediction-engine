@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-08-18
+
+_No merges to `main`._
+
 ## 2026-08-17
 
+- `c600fdff` — Control-plane: dev changelog
 - `cf64d017` — Merge pull request #5423 from DanielTabakman/agent/pitchpacks-clean-handoff
 - `c0922c12` — Remove obsolete PitchPacks v4 clarity layer (`apps/msos-web/`)
 - `5843e1fc` — Remove obsolete PitchPacks v4 styles (`apps/msos-web/`)
