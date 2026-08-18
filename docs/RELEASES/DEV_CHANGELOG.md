@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-18
 
+- `3fe8e8ff` — Remove PitchPacks from PPE and enforce repository ownership (`apps/msos-web/`)
+- `e6910fa6` — Control-plane: dev changelog
 - `acb448ec` — Serve Devinder PitchPacks through local proxy route (`apps/msos-web/`)
 - `a9ae6676` — Control-plane: dev changelog
 - `9a7181fa` — Proxy Devinder PitchPacks stylesheet (`apps/msos-web/`)
