@@ -101,6 +101,9 @@ jobs:
         env:
           PYTHONPATH: .
 
+      - name: Repository ownership boundary
+        run: python scripts/check_repository_boundaries.py --repo-root .
+
       - name: Run tests (parallel, excluding slow)
         run: |
           set -o pipefail

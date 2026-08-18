@@ -11,6 +11,7 @@ from scripts.run_pushable_gate import (
     GatePlan,
     _classify,
     _msos_web_gate_commands,
+    _repository_boundary_gate_commands,
     _touches_msos_web,
     _union_paths,
     pytest_cmd,
@@ -62,6 +63,19 @@ class TestRunPushableGateTiers(unittest.TestCase):
         self.assertEqual(
             cmds,
             [["python", "scripts/verify_msos_web_build.py", "--witness-only"]],
+        )
+
+    def test_repository_boundary_gate_is_always_available(self) -> None:
+        self.assertEqual(
+            _repository_boundary_gate_commands(REPO),
+            [
+                [
+                    "python",
+                    "scripts/check_repository_boundaries.py",
+                    "--repo-root",
+                    str(REPO),
+                ]
+            ],
         )
 
 
