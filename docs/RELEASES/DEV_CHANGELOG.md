@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-08-18
 
+- `acb448ec` — Serve Devinder PitchPacks through local proxy route (`apps/msos-web/`)
+- `a9ae6676` — Control-plane: dev changelog
 - `9a7181fa` — Proxy Devinder PitchPacks stylesheet (`apps/msos-web/`)
 - `2730569e` — Proxy Devinder PitchPacks JavaScript bundle (`apps/msos-web/`)
 - `21e3ed74` — Proxy Devinder PitchPacks game HTML through MSOS (`apps/msos-web/`)
