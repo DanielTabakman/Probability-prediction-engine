@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-08-19
+
+_No merges to `main`._
+
 ## 2026-08-18
 
+- `2729cf51` — Control-plane: dev changelog
 - `3fe8e8ff` — Remove PitchPacks from PPE and enforce repository ownership (`apps/msos-web/`)
 - `e6910fa6` — Control-plane: dev changelog
 - `acb448ec` — Serve Devinder PitchPacks through local proxy route (`apps/msos-web/`)
