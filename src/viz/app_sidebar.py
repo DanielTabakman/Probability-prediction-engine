@@ -17,16 +17,27 @@ def build_sidebar_state(
     show_bitcoin_default: bool = True,
     show_research_review: bool = False,
     research_review_default: bool = False,
+    show_market_proposal_preview: bool = False,
+    market_proposal_preview_default: bool = False,
 ) -> dict[str, Any]:
     st.sidebar.header("Data")
-    app_surface = "Research Review" if show_research_review and research_review_default else "Probability Engine"
+    app_surface = "Probability Engine"
+    surfaces = ["Probability Engine"]
     if show_research_review:
+        surfaces.append("Research Review")
+    if show_market_proposal_preview:
+        surfaces.append("Market Proposal Preview")
+    if show_research_review and research_review_default:
+        app_surface = "Research Review"
+    if show_market_proposal_preview and market_proposal_preview_default:
+        app_surface = "Market Proposal Preview"
+    if len(surfaces) > 1:
         app_surface = st.sidebar.radio(
             "Surface",
-            ["Probability Engine", "Research Review"],
-            index=1 if research_review_default else 0,
+            surfaces,
+            index=surfaces.index(app_surface),
         )
-    if app_surface == "Research Review":
+    if app_surface in {"Research Review", "Market Proposal Preview"}:
         return {
             "app_surface": app_surface,
             "show_bitcoin_view": False,
