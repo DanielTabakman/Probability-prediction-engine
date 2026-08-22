@@ -527,20 +527,40 @@ def prune_starters_for_plan(repo: Path, phase_plan: str) -> list[str]:
     return removed
 
 
-def prune_starters_for_completed_chapters(repo: Path) -> list[str]:
+def find_starters_for_completed_chapters(repo: Path) -> list[str]:
     from scripts.ppe_queue_health import chapter_marked_complete_in_repo
 
     sop = repo / "docs" / "SOP" / "PHASE_PLANS"
     if not sop.is_dir():
         return []
-    removed: list[str] = []
+    stale: list[str] = []
     for plan_file in sorted(sop.glob("*_relay.json")):
         rel = str(plan_file.relative_to(repo)).replace("\\", "/")
         if not chapter_marked_complete_in_repo(repo, rel):
             continue
-        for sid in prune_starters_for_plan(repo, rel):
-            if sid not in removed:
-                removed.append(sid)
+        try:
+            plan = load_phase_plan(repo, rel)
+        except (FileNotFoundError, OSError):
+            continue
+        for sl in plan.get("slices") or []:
+            if not isinstance(sl, dict):
+                continue
+            sid = str(sl.get("sliceId") or "").strip()
+            if not sid:
+                continue
+            path = repo / starter_path(sid)
+            if path.is_file() and sid not in stale:
+                stale.append(sid)
+    return stale
+
+
+def prune_starters_for_completed_chapters(repo: Path) -> list[str]:
+    removed: list[str] = []
+    for sid in find_starters_for_completed_chapters(repo):
+        path = repo / starter_path(sid)
+        if path.is_file():
+            path.unlink()
+            removed.append(sid)
     return removed
 
 
