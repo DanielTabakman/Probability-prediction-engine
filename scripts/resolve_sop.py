@@ -12,14 +12,16 @@ _REPO = Path(__file__).resolve().parents[1]
 if str(_REPO) not in sys.path:
     sys.path.insert(0, str(_REPO))
 
+from scripts.context_economy_routing import (  # noqa: E402
+    resolve_role_context_economy,
+    resolve_topic_context_economy,
+)
 from scripts.sop_discovery_core import (  # noqa: E402
     ROLE_ROUTES,
     list_topics,
     resolve_by_chapter,
     resolve_by_module,
-    resolve_by_role,
     resolve_by_search,
-    resolve_by_topic,
 )
 
 
@@ -115,7 +117,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.role:
-        report = resolve_by_role(args.role)
+        report = resolve_role_context_economy(args.role)
     elif args.search:
         report = resolve_by_search(repo, args.search)
     elif args.chapter or args.plan_path:
@@ -127,7 +129,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.module:
         report = resolve_by_module(repo, args.module)
     else:
-        report = resolve_by_topic(args.topic or "")
+        report = resolve_topic_context_economy(args.topic or "")
 
     if args.json:
         print(json.dumps(report, indent=2, sort_keys=True))
