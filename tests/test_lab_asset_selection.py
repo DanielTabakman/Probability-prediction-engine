@@ -15,7 +15,7 @@ from src.viz.lab_asset_selection import (
 def test_list_selectable_lab_asset_ids_uses_enabled_registry_only() -> None:
     load_assets_registry.cache_clear()
     ids = list_selectable_lab_asset_ids()
-    assert ids == ["BTC", "ETH", "SOL", "IWM", "QQQ", "SPY", "NVDA"]
+    assert ids == ["BTC", "ETH", "SOL", "IWM", "QQQ", "SPY", "NVDA", "USO"]
     assert "NVDA" in ids
 
 
@@ -24,6 +24,7 @@ def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
     assert normalize_lab_asset_id("ETH") == "ETH"
     assert normalize_lab_asset_id("NVDA") == "NVDA"
     assert normalize_lab_asset_id("SOL") == "SOL"
+    assert normalize_lab_asset_id("USO") == "USO"
     default = default_asset_id()
     assert normalize_lab_asset_id("DOGE") == default
     assert normalize_lab_asset_id(None) == default
@@ -34,6 +35,7 @@ def test_lab_asset_id_from_environ_query_param() -> None:
     environ = {"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=ETH"}
     assert lab_asset_id_from_environ(environ) == "ETH"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=NVDA"}) == "NVDA"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=USO"}) == "USO"
 
 
 def test_display_asset_meta_labels() -> None:

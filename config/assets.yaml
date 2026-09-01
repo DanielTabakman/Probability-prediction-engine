@@ -96,6 +96,23 @@ assets:
     trust_notes:
       - "Russell 2000 ETF; can be thinner than SPY/QQQ."
 
+  USO:
+    label: "USO options (oil ETF)"
+    asset_class: commodity_proxy
+    tier: extended
+    venue: equity
+    equity_symbol: USO
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 2
+    catalog:
+      group: commodity_proxy
+    trust_notes:
+      - "ETF options - crude exposure via USO; roll/contango not modeled."
+      - "Imperfect oil hedge vs CL futures."
+
   SOL:
     label: "SOL options"
     asset_class: crypto
