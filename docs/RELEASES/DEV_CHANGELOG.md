@@ -4,10 +4,12 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-02
 
-_No merges to `main`._
+- `8052a3e2` — Merge pull request #5429 from DanielTabakman/autobuilder/build-next-ppe-commproxy-uso-revision-2
+- `9fae4a8b` — Control-plane: dev changelog
 
 ## 2026-09-01
 
+- `f476b652` — PPE: add USO commodity-proxy catalog slice (`scripts/`)
 - `2120beaa` — Control-plane: dev changelog
 
 ## 2026-08-31
