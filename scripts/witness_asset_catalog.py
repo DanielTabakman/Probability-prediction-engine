@@ -4,6 +4,7 @@ Usage:
   python -m scripts.witness_asset_catalog --asset BTC
   python -m scripts.witness_asset_catalog --all-enabled
   python -m scripts.witness_asset_catalog --group crypto --pre-enable
+  python -m scripts.witness_asset_catalog --manifest-slice ppe_commodity_proxy_tier1_v1
 
 CI uses mocked display-boundary checks by default; ``--live`` hits vendor fetch paths.
 """
@@ -39,7 +40,10 @@ from src.viz.embed_display_boundary import (  # noqa: E402
 def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Witness tradeable asset catalog + display boundary")
     ap.add_argument("--asset", action="append", default=[], help="Asset id (repeatable)")
-    ap.add_argument("--group", help="Witness all assets in catalog.group (e.g. crypto, equity_index)")
+    ap.add_argument(
+        "--group",
+        help="Witness all assets in catalog.group (e.g. crypto, equity_index, commodity_proxy)",
+    )
     ap.add_argument(
         "--manifest-slice",
         help="Witness assets declared in tier1 manifest chapter id",
@@ -138,7 +142,7 @@ def resolve_asset_ids(args: argparse.Namespace) -> list[str]:
         return list_asset_ids_for_manifest_chapter(args.manifest_slice)
     if args.all_enabled:
         return list_enabled_asset_ids()
-    return ["BTC", "ETH", "NVDA"]
+    return ["BTC", "ETH", "NVDA", "USO"]
 
 
 def main(argv: list[str] | None = None) -> int:

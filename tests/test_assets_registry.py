@@ -34,7 +34,19 @@ def test_assets_registry_schema_v2() -> None:
     assert default_asset_id() == "ETH"
     assets = reg.get("assets")
     assert isinstance(assets, dict)
-    assert set(assets) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP", "SPY", "QQQ", "IWM"}
+    assert set(assets) >= {
+        "BTC",
+        "ETH",
+        "NVDA",
+        "SOL",
+        "HYPE",
+        "BNB",
+        "XRP",
+        "SPY",
+        "QQQ",
+        "IWM",
+        "USO",
+    }
     for asset_id in ("BTC", "ETH"):
         entry = assets[asset_id]
         assert entry.get("venue") == "deribit"
@@ -58,12 +70,18 @@ def test_assets_registry_schema_v2() -> None:
     assert hype.get("venue") == "hyperliquid"
     assert hype.get("enabled") is True
     assert hype.get("exposure_only") is True
+    uso = assets["USO"]
+    assert uso.get("venue") == "equity"
+    assert uso.get("asset_class") == "commodity_proxy"
+    assert uso.get("enabled") is True
+    assert uso.get("catalog", {}).get("group") == "commodity_proxy"
+    assert "ETF options" in " ".join(uso.get("trust_notes") or [])
 
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
-    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP"}
+    assert list_enabled_asset_ids() == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY", "USO"]
+    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP", "USO"}
 
 
 def test_catalog_entry_shape() -> None:
@@ -81,7 +99,7 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY"]
+    assert [e["id"] for e in entries] == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY", "USO"]
     assert all(e["venue"] == "deribit" for e in entries if e["id"] in ("BTC", "ETH"))
     nvda = next(e for e in entries if e["id"] == "NVDA")
     assert nvda["venue"] == "equity"
@@ -89,6 +107,10 @@ def test_list_catalog_entries_enabled_only() -> None:
     assert sol["venue"] == "bybit"
     hype = next(e for e in entries if e["id"] == "HYPE")
     assert hype["venue"] == "hyperliquid"
+    uso = next(e for e in entries if e["id"] == "USO")
+    assert uso["venue"] == "equity"
+    assert uso["asset_class"] == "commodity_proxy"
+    assert uso["catalog_group"] == "commodity_proxy"
 
 
 def test_hyperliquid_exposure_only_registry_helpers() -> None:
@@ -153,7 +175,11 @@ def test_asset_class_and_group_helpers() -> None:
     assert asset_class("BTC") == "crypto"
     assert asset_class("NVDA") == "equity_mega"
     assert catalog_group("ETH") == "crypto"
+    assert catalog_group("USO") == "commodity_proxy"
     assert asset_tier("BTC") == "core"
+    assert asset_tier("USO") == "extended"
     assert asset_venue("NVDA") == "equity"
+    assert asset_venue("USO") == "equity"
     assert is_asset_enabled("BTC") is True
     assert is_asset_enabled("NVDA") is True
+    assert is_asset_enabled("USO") is True

@@ -54,6 +54,12 @@ DISPLAY_SUMMARY_MAX_EXPIRIES = 5
 CATALOG_PAYLOAD_KIND = "asset_catalog"
 CATALOG_PAYLOAD_SCHEMA_VERSION = 1
 EMBED_ONLY_FALLBACK_MODE = "streamlit_embed_only"
+CATALOG_GROUP_LABEL_OVERRIDES: dict[str, str] = {
+    "commodity_proxy": "Commodities (ETF options)",
+}
+CATALOG_GROUP_DISCLOSURES: dict[str, str] = {
+    "commodity_proxy": "ETF options exposure; not CME/COMEX futures.",
+}
 
 # MSOS Strategy Lab belief presets — illustrative lognormal shifts vs market reference (display only).
 BELIEF_TUNING_BOUNDS: dict[str, dict[str, float]] = {
@@ -336,30 +342,28 @@ def build_asset_catalog_response() -> dict[str, Any]:
         gid = str(entry.get("catalog_group") or "other")
         by_group.setdefault(gid, []).append(entry)
 
+    def _group_payload(gid: str, label: str) -> dict[str, Any]:
+        group: dict[str, Any] = {
+            "id": gid,
+            "label": CATALOG_GROUP_LABEL_OVERRIDES.get(gid, label),
+            "assets": by_group[gid],
+        }
+        if gid in CATALOG_GROUP_DISCLOSURES:
+            group["disclosure"] = CATALOG_GROUP_DISCLOSURES[gid]
+        return group
+
     groups: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in catalog_group_order():
         gid = str(row.get("id") or "").strip()
         if not gid or gid not in by_group:
             continue
-        groups.append(
-            {
-                "id": gid,
-                "label": str(row.get("label") or gid),
-                "assets": by_group[gid],
-            }
-        )
+        groups.append(_group_payload(gid, str(row.get("label") or gid)))
         seen.add(gid)
     for gid in sorted(by_group):
         if gid in seen:
             continue
-        groups.append(
-            {
-                "id": gid,
-                "label": gid.replace("_", " ").title(),
-                "assets": by_group[gid],
-            }
-        )
+        groups.append(_group_payload(gid, gid.replace("_", " ").title()))
 
     return {
         "schema_version": CATALOG_PAYLOAD_SCHEMA_VERSION,
