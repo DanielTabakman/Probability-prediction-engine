@@ -6,12 +6,14 @@ import { useCallback, useEffect, useState } from "react";
 
 import { LabeledDistributionChart } from "@/components/LabeledDistributionChart";
 import { OptionsHorizonChart } from "@/components/OptionsHorizonChart";
+import { OptionsHorizonComparisonPanel } from "@/components/OptionsHorizonComparisonPanel";
 import {
   fetchHorizonChartPayload,
   fetchHorizonRegionPreview,
   strategyLabDeepLink,
   type HorizonChartPayload,
 } from "@/lib/horizonChartPayload";
+import { buildOptionsHorizonComparisonFromChart } from "@/lib/optionsHorizonComparison";
 import {
   fetchHorizonRegion,
   newRegionId,
@@ -126,6 +128,7 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
   }
 
   const labLink = strategyLabDeepLink(payload, region?.id);
+  const comparison = buildOptionsHorizonComparisonFromChart(payload);
 
   return (
     <div className="options-horizon-work">
@@ -144,6 +147,8 @@ export function OptionsHorizonClient({ initialPayload }: OptionsHorizonClientPro
         <OptionsHorizonChart payload={payload} region={region} onRegionChange={onRegionChange} />
 
         <aside className="options-horizon-side" aria-label="Options Horizon chart controls">
+          <OptionsHorizonComparisonPanel comparison={comparison} />
+
           <section className="options-horizon-panel">
             <label className="options-horizon-field">
               <span>Expiry</span>
