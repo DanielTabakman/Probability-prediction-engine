@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ContextRail } from "@/components/ContextRail";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
+import { OptionsExpressionFitRankingPanel } from "@/components/OptionsExpressionFitRankingPanel";
 import { TradeProsConsCard } from "@/components/TradeProsConsCard";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { PlanLegRow } from "@/components/PlanLegRow";
@@ -55,6 +56,10 @@ import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { relabelPlanLegsForAsset } from "@/lib/planLegDisplay";
+import {
+  buildCandidateFromStrategySuggestion,
+  rankOptionsExpressionFit,
+} from "@/lib/optionsExpressionFitRanking";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 function familyIdForPreset(presetId?: string): string {
@@ -320,6 +325,19 @@ export function ExpressionPlanningPanel() {
     suggestion?.suggested?.review?.payoff_line ?? null,
     suggestion?.suggested?.review?.structure_line ?? null,
   );
+  const expressionFitRanking = useMemo(() => {
+    const candidate = buildCandidateFromStrategySuggestion(suggestion, thesis.horizonDays);
+    if (!candidate) {
+      return null;
+    }
+    return rankOptionsExpressionFit([candidate], {
+      direction: suggestion?.suggested?.expression_family === "range" ? "neutral" : "long",
+      belief: thesis.disagreementLine ?? thesis.referenceLabel,
+      target_horizon_days: thesis.horizonDays,
+      max_loss_usd: suggestion?.suggested?.summary?.max_loss_usd ?? null,
+      payoff_preference: "defined_risk",
+    });
+  }, [suggestion, thesis]);
 
   return (
     <>
@@ -439,6 +457,7 @@ export function ExpressionPlanningPanel() {
               {suggestion?.suggested?.review?.linkage_line ? (
                 <p className="micro">{suggestion.suggested.review.linkage_line}</p>
               ) : null}
+              <OptionsExpressionFitRankingPanel ranking={expressionFitRanking} />
               <div className="risk-note">{expressionRiskNote}</div>
 
               <details className="planner-advanced">
