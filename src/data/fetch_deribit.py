@@ -174,6 +174,14 @@ def fetch_deribit_ticker(instrument_name: str) -> dict[str, Any] | None:
     return None
 
 
+def fetch_deribit_order_book(instrument_name: str, depth: int = 10) -> dict[str, Any] | None:
+    """Get a public Deribit order-book snapshot for one instrument."""
+    out = _request("get_order_book", {"instrument_name": instrument_name, "depth": int(depth)})
+    if isinstance(out, dict):
+        return out
+    return None
+
+
 def fetch_deribit_index(currency: str = "BTC") -> float | None:
     """Get spot/index price from Deribit perpetual. Fallback when Yahoo fails."""
     cur = _deribit_currency(currency)
