@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-03
+
+_No merges to `main`._
+
 ## 2026-09-02
 
+- `37bf03a9` — Control-plane: dev changelog
 - `8052a3e2` — Merge pull request #5429 from DanielTabakman/autobuilder/build-next-ppe-commproxy-uso-revision-2
 - `9fae4a8b` — Control-plane: dev changelog
 
