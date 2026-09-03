@@ -59,6 +59,17 @@
       "notes": "Filed from THREAD_INSIGHTS closeout (control_plane_thread_roles)."
     },
     {
+      "id": "operator_lite_default_routing",
+      "title": "Operator lite status routing defaults",
+      "status": "open",
+      "priority": "medium",
+      "category": "operator",
+      "summary": "Make compact operator status the default read path: agents should read OPERATOR_STATUS_BRIEF first, add ppe_go --json-lite for machine consumers, and reserve full OPERATOR_STATUS/burst docs for explicit execution.",
+      "policyQuestion": "Should normal status checks default to lite while full burst remains an explicit operator action?",
+      "added": "2026-07-10",
+      "notes": "Follow-up from operator status lite PR #5103; intended as the next small routing-habit slice after the compact artifacts exist."
+    },
+    {
       "id": "relay_decision_reconcile",
       "title": "Relay decision model reconcile",
       "status": "open",
