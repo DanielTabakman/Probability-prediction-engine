@@ -36,7 +36,7 @@ chapters:
     volume_batch: 1
     volume_rank_note: "OI ranks 1-3 among remaining tier-1 (2026-06-29)"
   ppe_equity_universe_tier1b_v1:
-    assets: [TSLA, AMD, AAPL, MSFT, AMZN]
+    assets: [AAPL, MSFT, AMZN, GOOGL, META]
     status: queued
     wave: ppe_asset_batch_wave1_v1
     volume_batch: 2
