@@ -156,9 +156,9 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     ids = [a["id"] for a in crypto["assets"]]
     assert ids == ["BTC", "ETH", "HYPE", "SOL"]
     mega = next(g for g in catalog["groups"] if g["id"] == "equity_mega")
-    assert [a["id"] for a in mega["assets"]] == ["NVDA"]
+    assert [a["id"] for a in mega["assets"]] == ["AAPL", "AMZN", "GOOGL", "META", "MSFT", "NVDA"]
     assert all("venue" in a and "asset_class" in a for a in crypto["assets"])
-    nvda = mega["assets"][0]
+    nvda = next(a for a in mega["assets"] if a["id"] == "NVDA")
     assert isinstance(nvda.get("trust_notes"), list)
     assert nvda["trust_notes"]
 
@@ -643,4 +643,3 @@ def test_exposure_menu_wsgi_route() -> None:
     assert payload["kind"] == "exposure_paths"
     assert payload["asset_id"] == "NVDA"
     assert build_exposure_menu_response({"QUERY_STRING": "asset=NVDA&direction=long&offline=1"})["asset_id"] == "NVDA"
-

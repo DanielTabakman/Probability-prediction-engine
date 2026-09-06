@@ -20,6 +20,7 @@ from src.data.assets_registry import (
     list_asset_ids,
     list_catalog_entries,
     list_enabled_asset_ids,
+    list_asset_ids_for_manifest_chapter,
     load_assets_registry,
     registry_version,
     spread_width_for_asset,
@@ -37,6 +38,11 @@ def test_assets_registry_schema_v2() -> None:
     assert set(assets) >= {
         "BTC",
         "ETH",
+        "AAPL",
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT",
         "NVDA",
         "SOL",
         "HYPE",
@@ -76,12 +82,58 @@ def test_assets_registry_schema_v2() -> None:
     assert uso.get("enabled") is True
     assert uso.get("catalog", {}).get("group") == "commodity_proxy"
     assert "ETF options" in " ".join(uso.get("trust_notes") or [])
+    for asset_id in ("AAPL", "MSFT", "AMZN", "GOOGL", "META"):
+        mega = assets[asset_id]
+        assert mega.get("venue") == "equity"
+        assert mega.get("asset_class") == "equity_mega"
+        assert mega.get("enabled") is True
+        assert mega.get("catalog", {}).get("group") == "equity_mega"
 
 
 def test_list_enabled_asset_ids() -> None:
     load_assets_registry.cache_clear()
-    assert list_enabled_asset_ids() == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY", "USO"]
-    assert set(list_asset_ids()) >= {"BTC", "ETH", "NVDA", "SOL", "HYPE", "BNB", "XRP", "USO"}
+    assert list_enabled_asset_ids() == [
+        "AAPL",
+        "AMZN",
+        "BTC",
+        "ETH",
+        "GOOGL",
+        "HYPE",
+        "IWM",
+        "META",
+        "MSFT",
+        "NVDA",
+        "QQQ",
+        "SOL",
+        "SPY",
+        "USO",
+    ]
+    assert set(list_asset_ids()) >= {
+        "AAPL",
+        "AMZN",
+        "BTC",
+        "ETH",
+        "GOOGL",
+        "HYPE",
+        "META",
+        "MSFT",
+        "NVDA",
+        "SOL",
+        "BNB",
+        "XRP",
+        "USO",
+    }
+
+
+def test_tier1b_manifest_assets_are_exact_mega_cap_slice() -> None:
+    load_assets_registry.cache_clear()
+    assert list_asset_ids_for_manifest_chapter("ppe_equity_universe_tier1b_v1") == [
+        "AAPL",
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT",
+    ]
 
 
 def test_catalog_entry_shape() -> None:
@@ -99,10 +151,30 @@ def test_catalog_entry_shape() -> None:
 def test_list_catalog_entries_enabled_only() -> None:
     load_assets_registry.cache_clear()
     entries = list_catalog_entries()
-    assert [e["id"] for e in entries] == ["BTC", "ETH", "HYPE", "IWM", "NVDA", "QQQ", "SOL", "SPY", "USO"]
+    assert [e["id"] for e in entries] == [
+        "AAPL",
+        "AMZN",
+        "BTC",
+        "ETH",
+        "GOOGL",
+        "HYPE",
+        "IWM",
+        "META",
+        "MSFT",
+        "NVDA",
+        "QQQ",
+        "SOL",
+        "SPY",
+        "USO",
+    ]
     assert all(e["venue"] == "deribit" for e in entries if e["id"] in ("BTC", "ETH"))
     nvda = next(e for e in entries if e["id"] == "NVDA")
     assert nvda["venue"] == "equity"
+    for asset_id in ("AAPL", "MSFT", "AMZN", "GOOGL", "META"):
+        mega = next(e for e in entries if e["id"] == asset_id)
+        assert mega["venue"] == "equity"
+        assert mega["asset_class"] == "equity_mega"
+        assert mega["catalog_group"] == "equity_mega"
     sol = next(e for e in entries if e["id"] == "SOL")
     assert sol["venue"] == "bybit"
     hype = next(e for e in entries if e["id"] == "HYPE")
@@ -182,4 +254,9 @@ def test_asset_class_and_group_helpers() -> None:
     assert asset_venue("USO") == "equity"
     assert is_asset_enabled("BTC") is True
     assert is_asset_enabled("NVDA") is True
+    assert is_asset_enabled("AAPL") is True
+    assert is_asset_enabled("MSFT") is True
+    assert is_asset_enabled("AMZN") is True
+    assert is_asset_enabled("GOOGL") is True
+    assert is_asset_enabled("META") is True
     assert is_asset_enabled("USO") is True

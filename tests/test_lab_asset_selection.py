@@ -15,14 +15,34 @@ from src.viz.lab_asset_selection import (
 def test_list_selectable_lab_asset_ids_uses_enabled_registry_only() -> None:
     load_assets_registry.cache_clear()
     ids = list_selectable_lab_asset_ids()
-    assert ids == ["BTC", "ETH", "SOL", "IWM", "QQQ", "SPY", "NVDA", "USO"]
+    assert ids == [
+        "BTC",
+        "ETH",
+        "SOL",
+        "IWM",
+        "QQQ",
+        "SPY",
+        "AAPL",
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT",
+        "NVDA",
+        "USO",
+    ]
     assert "NVDA" in ids
+    assert all(asset_id in ids for asset_id in ("AAPL", "MSFT", "AMZN", "GOOGL", "META"))
 
 
 def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
     load_assets_registry.cache_clear()
     assert normalize_lab_asset_id("ETH") == "ETH"
     assert normalize_lab_asset_id("NVDA") == "NVDA"
+    assert normalize_lab_asset_id("AAPL") == "AAPL"
+    assert normalize_lab_asset_id("MSFT") == "MSFT"
+    assert normalize_lab_asset_id("AMZN") == "AMZN"
+    assert normalize_lab_asset_id("GOOGL") == "GOOGL"
+    assert normalize_lab_asset_id("META") == "META"
     assert normalize_lab_asset_id("SOL") == "SOL"
     assert normalize_lab_asset_id("USO") == "USO"
     default = default_asset_id()
@@ -35,6 +55,11 @@ def test_lab_asset_id_from_environ_query_param() -> None:
     environ = {"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=ETH"}
     assert lab_asset_id_from_environ(environ) == "ETH"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=NVDA"}) == "NVDA"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=AAPL"}) == "AAPL"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=MSFT"}) == "MSFT"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=AMZN"}) == "AMZN"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=GOOGL"}) == "GOOGL"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=META"}) == "META"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=USO"}) == "USO"
 
 
