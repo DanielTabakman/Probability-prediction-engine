@@ -4,6 +4,7 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-06
 
+- `f3c9ef57` — Control-plane: dev changelog
 - `58f6566a` — Merge pull request #5433 from DanielTabakman/autobuilder/build-next-ppe-ppe_equity_universe_tier1b_v1-revision-2
 
 ## 2026-09-05
