@@ -156,7 +156,17 @@ def test_asset_catalog_response_grouped_enabled_assets() -> None:
     ids = [a["id"] for a in crypto["assets"]]
     assert ids == ["BTC", "ETH", "HYPE", "SOL"]
     mega = next(g for g in catalog["groups"] if g["id"] == "equity_mega")
-    assert [a["id"] for a in mega["assets"]] == ["AAPL", "AMZN", "GOOGL", "META", "MSFT", "NVDA"]
+    assert [a["id"] for a in mega["assets"]] == [
+        "AAPL",
+        "AMD",
+        "AMZN",
+        "COIN",
+        "GOOGL",
+        "META",
+        "MSFT",
+        "NVDA",
+        "TSLA",
+    ]
     assert all("venue" in a and "asset_class" in a for a in crypto["assets"])
     nvda = next(a for a in mega["assets"] if a["id"] == "NVDA")
     assert isinstance(nvda.get("trust_notes"), list)
@@ -178,8 +188,8 @@ def test_wsgi_app_serves_catalog_json() -> None:
     assert validate_asset_catalog_payload(parsed)[0] is True
 
 
-def test_witness_display_boundary_mocked_btc_eth_nvda() -> None:
-    for aid in ("BTC", "ETH", "NVDA"):
+def test_witness_display_boundary_mocked_btc_eth_nvda_tier1c() -> None:
+    for aid in ("BTC", "ETH", "NVDA", "TSLA", "AMD", "COIN"):
         ok, detail = witness_display_boundary_for_asset(aid, live=False)
         assert ok is True, detail
         assert "skip" not in detail.lower()
