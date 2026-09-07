@@ -516,17 +516,18 @@
     },
     {
       "chapterId": "ppe_equity_universe_tier1c_v1",
-      "status": "done",
+      "status": "queued",
       "priority": "medium",
       "focusPlaybookTier": "P2",
       "planPath": "docs/SOP/PHASE_PLANS/ppe_equity_universe_tier1c_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_PPE_ASSET_BATCH_WAVE1_V1_SELECTION.md",
       "canonRef": "docs/SOP/ASSET_BATCH_EXPANSION_POLICY_V1.md — wave 1 batch 3",
-      "reason": "[MEDIUM] Equity tier-1c Autobuilder catalog order 5 terminal on product main via PR #5434 (TSLA/AMD/COIN present). Predecessor for region_bet_contract_v1.",
+      "reason": "[MEDIUM] Asset batch wave 1 batch 3 remains queued on PPE chapter/evidence plane. Autobuilder catalog order 5 product implementation merged via PR #5434 (TSLA/AMD/COIN on main); that Autobuilder terminality unblocks catalog order 6 packetization without falsely closing this chapter evidence record.",
       "autobuilderCatalogOrder": 5,
       "relatedPullRequests": [
         "DanielTabakman/Probability-prediction-engine#5434"
-      ]
+      ],
+      "autobuilderItemTerminal": true
     },
     {
       "chapterId": "options_horizon_comparison_v1",
@@ -793,15 +794,15 @@
     },
     {
       "chapterId": "region_bet_contract_v1",
-      "status": "ready",
+      "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
-      "reason": "[HIGH] Autobuilder catalog order 6. Canonical persisted Region Bet contract/persistence slice. Dependency: catalog order 5 terminal. Packetize only this item now; do not freeze 07-17.",
+      "reason": "[HIGH] Autobuilder catalog order 6. Canonical persisted Region Bet contract/persistence slice. Chartered for Autobuilder jobs/catalog packetization; keep chapter-backlog blocked so PPE queue propagation does not race Autobuilder. JIT: only this item is packetized now.",
       "autobuilderCatalogOrder": 6,
-      "eligibility": "buildable",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "ppe_equity_universe_tier1c_v1"
       ],
