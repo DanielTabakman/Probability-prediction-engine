@@ -1,5 +1,5 @@
 {
-  "active_chapter_count": 18,
+  "active_chapter_count": 19,
   "active_chapters": [
     {
       "archived": false,
@@ -506,6 +506,37 @@
       "queue_status": "PLANNED",
       "selection": "docs/SOP/POST_PPE_HYPERLIQUID_PERP_RAIL_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_HYPERLIQUID_PERP_RAIL_V1.md"
+    },
+    {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_contract_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+        "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md"
     },
     {
       "archived": false,
@@ -3315,6 +3346,37 @@
       "selection": "docs/SOP/POST_PPE_TRUST_SURFACE_V1_SELECTION.md",
       "sprint": "docs/SOP/SPRINT_PPE_TRUST_SURFACE_V1.md"
     },
+    "region_bet_contract_v1": {
+      "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_contract_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+        "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md"
+    },
     "repo_between_chapter_housekeeping": {
       "archived": false,
       "carry_docs": [
@@ -3412,7 +3474,7 @@
     }
   },
   "canon": "docs/SOP/AGENT_ROUTING_V1.md",
-  "chapter_count": 84,
+  "chapter_count": 85,
   "chapters": [
     {
       "archived": true,
@@ -6160,6 +6222,37 @@
     },
     {
       "archived": false,
+      "carry_docs": [],
+      "chapter_id": "region_bet_contract_v1",
+      "do_not_load": [
+        "docs/SOP/CURRENT_FRONTIER.md",
+        "docs/CURRENT_FRONTIER.md",
+        "docs/Frontier_Steward_Handoff.md",
+        "docs/SOP/MANAGER_LOOP.md",
+        "docs/SOP/WORKER_LOOP.md",
+        "docs/CONTROL_PLANE/PROMPTS/WORKER_LAUNCH_PROMPT.md"
+      ],
+      "evidence": "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+      "load_always": [
+        "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md"
+      ],
+      "load_for_build": [
+        "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+        "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json"
+      ],
+      "load_on_demand": [
+        "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+        "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      ],
+      "next_selection": "docs/SOP/PHASE_CHAPTER_BACKLOG.json",
+      "plan_path": "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json",
+      "program_doc": null,
+      "queue_status": null,
+      "selection": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
+      "sprint": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md"
+    },
+    {
+      "archived": false,
       "carry_docs": [
         "docs/SOP/REPO_BETWEEN_CHAPTER_HOUSEKEEPING_EVIDENCE_STATUS.md"
       ],
@@ -6254,7 +6347,7 @@
       "sprint": null
     }
   ],
-  "generated_at": "2026-07-19T01:50:11Z",
+  "generated_at": "2026-09-07T19:32:18Z",
   "module_program_docs": {
     "cross_venue_event_gap": "docs/SOP/MVP1_CROSS_VENUE_QUANT_PROGRAM_V1.md",
     "exposure_menu": "docs/SOP/EXPOSURE_MENU_PROGRAM_V1.md",
