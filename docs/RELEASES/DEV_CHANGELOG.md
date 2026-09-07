@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-07
 
+- `bf329ca0` — Control-plane: Region Bet product intent backlog + charter item 06 (#5435) (`docs/SOP/`)
+- `a9943a0a` — Control-plane: dev changelog
 - `a213ec3b` — Control-plane: dev changelog
 - `b9e0dfa3` — Merge pull request #5434 from DanielTabakman/autobuilder/build-next-ppe-ppe_equity_universe_tier1c_v1-PPE-EqT1c-Core-Slice002-0e52f5d9e3-626ab57b89b59568
 - `20508bda` — PPE: ppe_equity_universe_tier1c_v1
