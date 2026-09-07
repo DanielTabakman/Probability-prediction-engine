@@ -128,6 +128,54 @@ assets:
     trust_notes:
       - "Dividends and corporate actions not modeled in v1."
 
+  TSLA:
+    label: "TSLA options"
+    asset_class: equity_mega
+    tier: core
+    venue: equity
+    equity_symbol: TSLA
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 25
+    catalog:
+      group: equity_mega
+    trust_notes:
+      - "High vol name; wide spreads possible. Dividends not modeled."
+
+  AMD:
+    label: "AMD options"
+    asset_class: equity_mega
+    tier: extended
+    venue: equity
+    equity_symbol: AMD
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 10
+    catalog:
+      group: equity_mega
+    trust_notes:
+      - "Dividends and corporate actions not modeled in v1."
+
+  COIN:
+    label: "COIN options"
+    asset_class: equity_mega
+    tier: extended
+    venue: equity
+    equity_symbol: COIN
+    price_unit: USD
+    contract_multiplier: 100
+    data_source: yfinance
+    enabled: true
+    spread_width: 15
+    catalog:
+      group: equity_mega
+    trust_notes:
+      - "Crypto-equity proxy; earnings gap risk. Dividends not modeled."
+
   SPY:
     label: "SPY options"
     asset_class: equity_index

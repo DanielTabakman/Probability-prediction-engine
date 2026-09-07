@@ -42,11 +42,11 @@ chapters:
     volume_batch: 2
     volume_rank_note: "OI ranks 4-10 singles; gated on batch 1 retrospect"
   ppe_equity_universe_tier1c_v1:
-    assets: [COIN, SLV, GLD, GOOGL, META]
+    assets: [TSLA, AMD, COIN]
     status: queued
     wave: ppe_asset_batch_wave1_v1
     volume_batch: 3
-    volume_rank_note: "OI ranks 6-13; SLV ahead of several mega caps"
+    volume_rank_note: "Equity mega caps batch 2: TSLA, AMD, COIN"
   ppe_commodity_proxy_tier1_v1:
     assets: [USO]
     status: queued

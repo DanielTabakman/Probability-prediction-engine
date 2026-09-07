@@ -23,15 +23,21 @@ def test_list_selectable_lab_asset_ids_uses_enabled_registry_only() -> None:
         "QQQ",
         "SPY",
         "AAPL",
+        "AMD",
         "AMZN",
+        "COIN",
         "GOOGL",
         "META",
         "MSFT",
         "NVDA",
+        "TSLA",
         "USO",
     ]
     assert "NVDA" in ids
-    assert all(asset_id in ids for asset_id in ("AAPL", "MSFT", "AMZN", "GOOGL", "META"))
+    assert all(
+        asset_id in ids
+        for asset_id in ("AAPL", "MSFT", "AMZN", "GOOGL", "META", "TSLA", "AMD", "COIN")
+    )
 
 
 def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
@@ -43,6 +49,9 @@ def test_normalize_lab_asset_id_rejects_disabled_and_unknown() -> None:
     assert normalize_lab_asset_id("AMZN") == "AMZN"
     assert normalize_lab_asset_id("GOOGL") == "GOOGL"
     assert normalize_lab_asset_id("META") == "META"
+    assert normalize_lab_asset_id("TSLA") == "TSLA"
+    assert normalize_lab_asset_id("AMD") == "AMD"
+    assert normalize_lab_asset_id("COIN") == "COIN"
     assert normalize_lab_asset_id("SOL") == "SOL"
     assert normalize_lab_asset_id("USO") == "USO"
     default = default_asset_id()
@@ -60,6 +69,9 @@ def test_lab_asset_id_from_environ_query_param() -> None:
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=AMZN"}) == "AMZN"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=GOOGL"}) == "GOOGL"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=META"}) == "META"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=TSLA"}) == "TSLA"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=AMD"}) == "AMD"
+    assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=COIN"}) == "COIN"
     assert lab_asset_id_from_environ({"QUERY_STRING": f"{LAB_ASSET_QUERY_PARAM}=USO"}) == "USO"
 
 
