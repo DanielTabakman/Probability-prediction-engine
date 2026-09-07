@@ -1,0 +1,105 @@
+{
+  "name": "region_bet_contract_v1",
+  "title": "Region Bet contract v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Founder-approved product intent backlog: region_bet_contract_v1 as Autobuilder catalog order 6 after tier1c.",
+    "purpose": "Durable Region Bet persistence contract; option expression is one expression of the market view."
+  },
+  "productScope": {
+    "direction": "Region Bet / Options Made Simple",
+    "job": "06",
+    "stableId": "region_bet_contract_v1",
+    "summary": "Canonical persisted Region Bet object tying asset, entry, region, expiry, market snapshot, risk constraints, expression ref, and lifecycle.",
+    "paperOnly": true
+  },
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/msosWorkflowStore.ts",
+      "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+      "tests/test_msos_web_region_bet_contract.py"
+    ],
+    "forbiddenPaths": [
+      "broad Region Bet UI redesign",
+      "region_bet_guided_shell_v1 owned paths",
+      "recreate PR #5427 options horizon comparison surfaces",
+      "recreate PR #5428 options expression fit ranking surfaces",
+      "DanielTabakman/msos-autobuilder redesign",
+      "product-main write",
+      "merge authority",
+      "publication authority",
+      "deployment authority",
+      "refill changes",
+      "feed mutation",
+      "live job submission",
+      "brokerage or execution",
+      "Options Horizon live archive inspection"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-Contract-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+      "buildBranch": "build/auto/RegionBet-Contract-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-Contract-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+      "buildBranch": "build/auto/RegionBet-Contract-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "apps/msos-web/src/app/api/theses/region-bet/route.ts",
+        "tests/test_msos_web_region_bet_contract.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-Contract-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+      "buildBranch": "build/auto/RegionBet-Contract-Witness-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "RegionBet-Contract-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+      "buildBranch": "build/auto/RegionBet-Contract-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_contract_v1",
+        "chapterTitle": "Region Bet contract v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/REGION_BET_CONTRACT_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
