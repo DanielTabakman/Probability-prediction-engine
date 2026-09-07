@@ -2,8 +2,14 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-07
+
+- `b9e0dfa3` — Merge pull request #5434 from DanielTabakman/autobuilder/build-next-ppe-ppe_equity_universe_tier1c_v1-PPE-EqT1c-Core-Slice002-0e52f5d9e3-626ab57b89b59568
+- `20508bda` — PPE: ppe_equity_universe_tier1c_v1
+
 ## 2026-09-06
 
+- `0e52f5d9` — Control-plane: dev changelog
 - `f3c9ef57` — Control-plane: dev changelog
 - `58f6566a` — Merge pull request #5433 from DanielTabakman/autobuilder/build-next-ppe-ppe_equity_universe_tier1b_v1-revision-2
 
