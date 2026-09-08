@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-08
+
+_No merges to `main`._
+
 ## 2026-09-07
 
+- `bd30f26b` — Control-plane: dev changelog
 - `bf329ca0` — Control-plane: Region Bet product intent backlog + charter item 06 (#5435) (`docs/SOP/`)
 - `a9943a0a` — Control-plane: dev changelog
 - `a213ec3b` — Control-plane: dev changelog
