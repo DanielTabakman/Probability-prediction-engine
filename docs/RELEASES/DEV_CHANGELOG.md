@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-09
 
-_No merges to `main`._
+- `6a0473a7` — Merge pull request #5436 from DanielTabakman/autobuilder/build-next-ppe-region_bet_contract_v1-RegionBet-Contract-Product-Slice002-bd30f-6cf0dfb3d0028338
+- `83907630` — Control-plane: dev changelog
 
 ## 2026-09-08
 
@@ -12,6 +13,7 @@ _No merges to `main`._
 
 ## 2026-09-07
 
+- `3e8e04b6` — PPE: region_bet_contract_v1 (`apps/msos-web/`)
 - `bd30f26b` — Control-plane: dev changelog
 - `bf329ca0` — Control-plane: Region Bet product intent backlog + charter item 06 (#5435) (`docs/SOP/`)
 - `a9943a0a` — Control-plane: dev changelog
