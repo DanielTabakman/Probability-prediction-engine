@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 
 import type { ExpressionRecord, PaperTradeStatus } from "@/lib/expressionPersistence";
 import type { HorizonRegionIntent } from "@/lib/horizonRegion";
+import { isRegionBetContract, type RegionBetContract } from "@/lib/regionBet";
 import type { ThesisRecord } from "@/lib/thesisPersistence";
 import { normalizeOwnerEmail } from "@/lib/msosIdentityCore";
 import { scopeOwnerId } from "@/lib/msosSession";
@@ -27,10 +28,16 @@ export type StoredHorizonRegion = HorizonRegionIntent & {
   ownerEmail?: string | null;
 };
 
+export type StoredRegionBet = RegionBetContract & {
+  kind: "region_bet";
+  ownerEmail?: string | null;
+};
+
 type OwnerPointers = {
   thesisId: string | null;
   expressionId: string | null;
   horizonRegionId: string | null;
+  regionBetId: string | null;
 };
 
 type WorkflowStoreFile = {
@@ -38,6 +45,7 @@ type WorkflowStoreFile = {
   theses: StoredThesis[];
   expressions: StoredExpression[];
   horizonRegions?: StoredHorizonRegion[];
+  regionBets?: StoredRegionBet[];
   currentThesisId: string | null;
   currentExpressionId: string | null;
   currentByOwner?: Record<string, OwnerPointers>;
@@ -68,6 +76,7 @@ const EMPTY_STORE: WorkflowStoreFile = {
   theses: [],
   expressions: [],
   horizonRegions: [],
+  regionBets: [],
   currentThesisId: null,
   currentExpressionId: null,
   currentByOwner: {},
@@ -104,6 +113,7 @@ function normalizeOwnerPointers(raw: Partial<OwnerPointers> | undefined): OwnerP
     thesisId: typeof raw?.thesisId === "string" ? raw.thesisId : null,
     expressionId: typeof raw?.expressionId === "string" ? raw.expressionId : null,
     horizonRegionId: typeof raw?.horizonRegionId === "string" ? raw.horizonRegionId : null,
+    regionBetId: typeof raw?.regionBetId === "string" ? raw.regionBetId : null,
   };
 }
 
@@ -113,6 +123,7 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
   const horizonRegions = Array.isArray(raw.horizonRegions)
     ? (raw.horizonRegions as StoredHorizonRegion[])
     : [];
+  const regionBets = Array.isArray(raw.regionBets) ? (raw.regionBets as StoredRegionBet[]) : [];
   const currentByOwner: Record<string, OwnerPointers> = {};
   for (const [key, pointers] of Object.entries(raw.currentByOwner ?? {})) {
     currentByOwner[key] = normalizeOwnerPointers(pointers);
@@ -122,6 +133,7 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
       thesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
       expressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
       horizonRegionId: null,
+      regionBetId: null,
     };
   }
   return {
@@ -129,6 +141,7 @@ function normalizeStore(raw: Partial<WorkflowStoreFile>): WorkflowStoreFile {
     theses,
     expressions,
     horizonRegions,
+    regionBets,
     currentThesisId: typeof raw.currentThesisId === "string" ? raw.currentThesisId : null,
     currentExpressionId: typeof raw.currentExpressionId === "string" ? raw.currentExpressionId : null,
     currentByOwner,
@@ -227,6 +240,10 @@ function horizonRegionOwnerMatches(row: StoredHorizonRegion, ownerEmail: string)
   return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
 }
 
+function regionBetOwnerMatches(row: StoredRegionBet, ownerEmail: string): boolean {
+  return storedOwnerKey(row.ownerEmail) === ownerKey(ownerEmail);
+}
+
 function persistPointers(
   store: WorkflowStoreFile,
   ownerEmail: string,
@@ -292,6 +309,7 @@ export async function upsertCurrentThesis(
     thesisId: next.id,
     expressionId: pointers.expressionId,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({
     ...nextStore,
@@ -335,6 +353,7 @@ export async function upsertCurrentExpression(
     thesisId: pointers.thesisId,
     expressionId: next.id,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({
     ...nextStore,
@@ -376,6 +395,7 @@ export async function appendPaperTrade(
     thesisId: pointers.thesisId,
     expressionId: next.id,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({
     ...nextStore,
@@ -457,6 +477,7 @@ export async function deletePaperTrade(ownerEmail: string, tradeId: string): Pro
     thesisId: pointers.thesisId,
     expressionId,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({ ...nextStore, expressions });
   return true;
@@ -491,6 +512,7 @@ export async function restorePaperTrade(
     thesisId: pointers.thesisId ?? trade.thesisId,
     expressionId: pointers.expressionId ?? trade.id,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({ ...nextStore, expressions });
   return withEffectiveStatus(restored);
@@ -516,6 +538,7 @@ export async function clearPaperTrades(ownerEmail: string): Promise<number> {
     thesisId: pointers.thesisId,
     expressionId,
     horizonRegionId: pointers.horizonRegionId,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({ ...nextStore, expressions });
   return toRemove.size;
@@ -607,10 +630,74 @@ export async function upsertHorizonRegion(
     thesisId: pointers.thesisId,
     expressionId: pointers.expressionId,
     horizonRegionId: next.id,
+    regionBetId: pointers.regionBetId,
   });
   await writeStore({
     ...nextStore,
     horizonRegions,
+  });
+  return next;
+}
+
+export async function getRegionBetById(
+  ownerEmail: string,
+  regionBetId: string,
+): Promise<StoredRegionBet | null> {
+  const store = await readStore();
+  return (
+    store.regionBets?.find(
+      (row) => row.id === regionBetId && regionBetOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function getCurrentRegionBet(ownerEmail: string): Promise<StoredRegionBet | null> {
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  if (!pointers.regionBetId) return null;
+  return (
+    store.regionBets?.find(
+      (row) => row.id === pointers.regionBetId && regionBetOwnerMatches(row, ownerEmail),
+    ) ?? null
+  );
+}
+
+export async function upsertRegionBet(
+  regionBet: RegionBetContract,
+  ownerEmail: string,
+): Promise<StoredRegionBet> {
+  if (!isRegionBetContract(regionBet)) {
+    throw new Error("invalid region bet");
+  }
+  const store = await readStore();
+  const pointers = pointersForOwner(store, ownerEmail);
+  const existing =
+    store.regionBets?.find(
+      (row) => row.id === regionBet.id && regionBetOwnerMatches(row, ownerEmail),
+    ) ??
+    (pointers.regionBetId
+      ? store.regionBets?.find(
+          (row) => row.id === pointers.regionBetId && regionBetOwnerMatches(row, ownerEmail),
+        )
+      : undefined);
+  const owner = scopeOwnerId(ownerEmail) ?? normalizeOwnerEmail(ownerEmail);
+  const next: StoredRegionBet = {
+    ...regionBet,
+    id: existing?.id ?? regionBet.id,
+    kind: "region_bet",
+    ownerEmail: owner,
+  };
+  const regionBets = (store.regionBets ?? []).filter((row) => row.id !== next.id);
+  regionBets.push(next);
+  const nextStore = persistPointers(store, ownerEmail, {
+    thesisId: pointers.thesisId,
+    expressionId: pointers.expressionId,
+    horizonRegionId: pointers.horizonRegionId,
+    regionBetId: next.id,
+  });
+  await writeStore({
+    ...nextStore,
+    regionBets,
   });
   return next;
 }
