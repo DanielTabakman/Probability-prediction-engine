@@ -1,0 +1,109 @@
+{
+  "name": "region_bet_guided_shell_v1",
+  "title": "Region Bet guided shell v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_GUIDED_SHELL_V1_EVIDENCE_STATUS.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Founder-approved product intent backlog: region_bet_guided_shell_v1 as Autobuilder catalog order 7 after region_bet_contract_v1.",
+    "purpose": "Guided Region Bet workflow shell/stepper retaining asset, expiry/window, and selected region."
+  },
+  "productScope": {
+    "direction": "Region Bet / Options Made Simple",
+    "job": "07",
+    "stableId": "region_bet_guided_shell_v1",
+    "summary": "Guided multi-step Region Bet shell using the order-6 contract; forward/back retains asset, expiry/window, and selected region.",
+    "paperOnly": true
+  },
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+      "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+      "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+      "apps/msos-web/src/lib/regionBet.ts",
+      "apps/msos-web/src/lib/msosWorkflowStore.ts",
+      "tests/test_msos_web_region_bet_guided_shell.py"
+    ],
+    "forbiddenPaths": [
+      "region_bet_market_compare_bridge_v1 owned paths",
+      "region_bet_risk_expression_bridge_v1 owned paths",
+      "recreate PR #5427 options horizon comparison surfaces",
+      "recreate PR #5428 options expression fit ranking surfaces",
+      "DanielTabakman/msos-autobuilder redesign",
+      "product-main write",
+      "merge authority",
+      "publication authority",
+      "deployment authority",
+      "refill changes",
+      "feed mutation",
+      "live job submission",
+      "brokerage or execution",
+      "Options Horizon live archive inspection"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-GuidedShell-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+      "buildBranch": "build/auto/RegionBet-GuidedShell-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-GuidedShell-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+      "buildBranch": "build/auto/RegionBet-GuidedShell-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+        "apps/msos-web/src/lib/regionBet.ts",
+        "apps/msos-web/src/lib/msosWorkflowStore.ts",
+        "tests/test_msos_web_region_bet_guided_shell.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-GuidedShell-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+      "buildBranch": "build/auto/RegionBet-GuidedShell-Witness-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "RegionBet-GuidedShell-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+      "buildBranch": "build/auto/RegionBet-GuidedShell-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_guided_shell_v1",
+        "chapterTitle": "Region Bet guided shell v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/REGION_BET_GUIDED_SHELL_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}
