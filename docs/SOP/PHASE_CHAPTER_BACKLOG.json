@@ -794,13 +794,13 @@
     },
     {
       "chapterId": "region_bet_contract_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_contract_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_REGION_BET_CONTRACT_V1_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_REGION_BET_CONTRACT_V1.md",
-      "reason": "[HIGH] Autobuilder catalog order 6. Canonical persisted Region Bet contract/persistence slice. Chartered for Autobuilder jobs/catalog packetization; keep chapter-backlog blocked so PPE queue propagation does not race Autobuilder. JIT: only this item is packetized now.",
+      "reason": "[DONE] Catalog order 6 merged as PPE PR #5436; contract persistence on main.",
       "autobuilderCatalogOrder": 6,
       "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
@@ -813,13 +813,15 @@
       "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH BLOCKED] Autobuilder intent order 07. Guided Region Bet workflow shell/stepper using existing modules; forward/back must retain asset, expiry/window, selected region. Dependency: region_bet_contract_v1. JIT packetize against then-current main only after 06 is terminal.",
+      "reason": "[HIGH] Autobuilder catalog order 07. Guided Region Bet workflow shell/stepper; charter ready for JIT catalog after contract #5436. Dependency satisfied.",
       "autobuilderCatalogOrder": 7,
       "eligibility": "blocked_until_predecessor_terminal",
       "dependsOn": [
         "region_bet_contract_v1"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_guided_shell_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md"
     },
     {
       "chapterId": "region_bet_market_compare_bridge_v1",
