@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-10
+
+_No merges to `main`._
+
 ## 2026-09-09
 
+- `d48825ef` — Control-plane: dev changelog
 - `6a0473a7` — Merge pull request #5436 from DanielTabakman/autobuilder/build-next-ppe-region_bet_contract_v1-RegionBet-Contract-Product-Slice002-bd30f-6cf0dfb3d0028338
 - `83907630` — Control-plane: dev changelog
 
