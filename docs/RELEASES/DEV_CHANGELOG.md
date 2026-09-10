@@ -4,7 +4,10 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-10
 
-_No merges to `main`._
+- `d5e1ec55` — Merge pull request #5440 from DanielTabakman/charter/region-bet-guided-shell-v1
+- `2b61f248` — Refresh CHAPTER_DOC_INDEX for guided-shell charter docs. (`docs/SOP/`)
+- `a109224a` — Charter Region Bet guided shell v1 for Autobuilder catalog order 7. (`docs/SOP/`)
+- `6c926321` — Control-plane: dev changelog
 
 ## 2026-09-09
 
