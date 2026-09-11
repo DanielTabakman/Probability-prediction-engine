@@ -810,18 +810,19 @@
     },
     {
       "chapterId": "region_bet_guided_shell_v1",
-      "status": "blocked",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH] Autobuilder catalog order 07. Guided Region Bet workflow shell/stepper; charter ready for JIT catalog after contract #5436. Dependency satisfied.",
+      "reason": "[DONE] Catalog order 07 merged as PPE PR #5441; guided shell on main. Next chapter 08 still needs control charter (planPath) and #5427 reuse/supersede decision before JIT packetize.",
       "autobuilderCatalogOrder": 7,
-      "eligibility": "blocked_until_predecessor_terminal",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_contract_v1"
       ],
       "packetization": "just_in_time",
       "planPath": "docs/SOP/PHASE_PLANS/region_bet_guided_shell_v1_relay.json",
-      "selectionRecord": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md"
+      "selectionRecord": "docs/SOP/POST_REGION_BET_GUIDED_SHELL_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_REGION_BET_GUIDED_SHELL_V1.md"
     },
     {
       "chapterId": "region_bet_market_compare_bridge_v1",
