@@ -613,6 +613,14 @@ def repair_queue(repo_root: Path, *, apply: bool) -> tuple[list[Fix], list[Issue
                 i,
                 reason="auto-repair: evidence doc shows chapter COMPLETE",
             )
+        elif (
+            not _queue_item_has_explicit_requeue(item)
+            and _backlog_status_for_plan(repo, plan) in BACKLOG_TERMINAL_STATUSES
+        ):
+            _mark_done(
+                i,
+                reason="auto-repair: READY row conflicts with terminal backlog status",
+            )
 
     if apply and fixes:
         queue["items"] = items
