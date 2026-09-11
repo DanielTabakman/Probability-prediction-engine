@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-11
 
+- `7eb7513e` — Mark options_horizon_comparison_v1 done after #5427 reuse (#5445) (`docs/SOP/`)
+- `add15e38` — Control-plane: dev changelog
 - `a4945de5` — Charter Region Bet market-compare bridge v1 for Autobuilder catalog order 8. (#5443) (`docs/SOP/`)
 - `d4fde938` — Control-plane: dev changelog
 - `f7229e83` — PPE: add options horizon comparison slice (#5427) (`apps/msos-web/`)

@@ -516,13 +516,14 @@
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
-      "status": "READY",
+      "status": "DONE",
       "reason": "[HIGH] Founder-approved issue #50 Options Made Simple job A: deterministic option horizon comparison; genuine PPE product work, not a manufactured Autobuilder acceptance row.",
       "selectionPrep": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
       "founderPriority": "HIGH",
       "dependencyUnblockValue": 20,
       "workerMode": "local-agent",
-      "focusPlaybookTier": "P1"
+      "focusPlaybookTier": "P1",
+      "doneReason": "auto-repair: READY row conflicts with terminal backlog status"
     },
     {
       "planPath": "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",

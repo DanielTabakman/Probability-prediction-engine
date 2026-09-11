@@ -227,6 +227,14 @@ class TestPpeQueueHealth(unittest.TestCase):
         )
         issues, _ = audit_queue(self.repo)
         self.assertIn("READY_WITH_TERMINAL_BACKLOG", {issue["code"] for issue in issues})
+        fixes, remaining = repair_queue(self.repo, apply=True)
+        self.assertTrue(fixes)
+        self.assertEqual(remaining, [])
+        healed = json.loads(
+            (self.repo / "docs" / "SOP" / "PHASE_QUEUE.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(healed["items"][0]["status"], "DONE")
+        self.assertIn("terminal backlog", healed["items"][0]["doneReason"])
 
     def _write_archived_complete_chapter(self) -> str:
         plan_rel = "docs/SOP/PHASE_PLANS/complete_requeue.json"
