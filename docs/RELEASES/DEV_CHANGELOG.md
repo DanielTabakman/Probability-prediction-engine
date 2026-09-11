@@ -2,6 +2,12 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-11
+
+- `f7229e83` — PPE: add options horizon comparison slice (#5427) (`apps/msos-web/`)
+- `80adfce2` — Mark region_bet_guided_shell_v1 done after PPE PR #5441. (#5442) (`docs/SOP/`)
+- `3a042c69` — Control-plane: dev changelog
+
 ## 2026-09-10
 
 - `b49f6b06` — PPE: region_bet_guided_shell_v1 (#5441) (`apps/msos-web/`)
