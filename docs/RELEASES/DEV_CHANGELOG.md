@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-10
 
+- `b49f6b06` — PPE: region_bet_guided_shell_v1 (#5441) (`apps/msos-web/`)
+- `8073c139` — Control-plane: dev changelog
 - `d5e1ec55` — Merge pull request #5440 from DanielTabakman/charter/region-bet-guided-shell-v1
 - `2b61f248` — Refresh CHAPTER_DOC_INDEX for guided-shell charter docs. (`docs/SOP/`)
 - `a109224a` — Charter Region Bet guided shell v1 for Autobuilder catalog order 7. (`docs/SOP/`)
