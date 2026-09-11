@@ -2,7 +2,7 @@
 
 ## Status
 
-CONTROL charter complete. Product Autobuilder slice pending.
+**COMPLETE** 2026-09-11. CONTROL charter merged as PR #5440. Product Autobuilder slice merged as PR #5441 (`b49f6b06`).
 
 ## Owns
 
@@ -14,4 +14,4 @@ Market-compare bridge, expression/risk ranking bridges, monitor teaching, payoff
 
 ## Dependency
 
-Requires terminal `region_bet_contract_v1` on product main (PR #5436).
+Requires terminal `region_bet_contract_v1` on product main (PR #5436). Satisfied.
