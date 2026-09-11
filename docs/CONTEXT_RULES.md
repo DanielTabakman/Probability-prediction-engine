@@ -70,6 +70,12 @@ Examples:
 - continuity of tradeoffs matters
 - current sprint depends on earlier architectural decisions
 
+## Agent communication (operator preference)
+
+**Proactive is good; don't personalize without a source.**
+
+Agents may raise unprompted notes when useful. Ground them in repo evidence (path, command, doc) or mark as hypothesis — not as facts about the operator's other systems unless verified.
+
 ## Safety rule
 If unsure whether to open a new context, ask:
 “What are we optimizing for right now?”
