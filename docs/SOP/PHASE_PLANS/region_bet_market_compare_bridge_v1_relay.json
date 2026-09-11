@@ -1,0 +1,110 @@
+{
+  "name": "region_bet_market_compare_bridge_v1",
+  "title": "Region Bet market-compare bridge v1",
+  "baselineBranch": "main",
+  "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+  "selectionRecord": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
+  "evidenceStatusPath": "docs/SOP/REGION_BET_MARKET_COMPARE_BRIDGE_V1_EVIDENCE_STATUS.md",
+  "founderPriorityOverride": {
+    "status": "accepted",
+    "source": "Reuse already-merged PR #5427 (f7229e831) as comparison primitive; region_bet_market_compare_bridge_v1 as Autobuilder catalog order 8 after region_bet_guided_shell_v1.",
+    "purpose": "Bridge existing Options Horizon comparison into the Region Bet guided shell without rewriting math."
+  },
+  "productScope": {
+    "direction": "Region Bet / Options Made Simple",
+    "job": "08",
+    "stableId": "region_bet_market_compare_bridge_v1",
+    "summary": "Guided-shell compare step that reuses #5427 horizon comparison rows for the current Region Bet snapshot.",
+    "paperOnly": true
+  },
+  "authority": {
+    "allowedProductPaths": [
+      "apps/msos-web/src/lib/regionBetMarketCompare.ts",
+      "apps/msos-web/src/components/RegionBetMarketComparePanel.tsx",
+      "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+      "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+      "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+      "tests/test_msos_web_region_bet_market_compare.py"
+    ],
+    "forbiddenPaths": [
+      "src/engine/options_horizon_comparison.py",
+      "src/viz/options_horizon_comparison_boundary.py",
+      "region_bet_risk_expression_bridge_v1 owned paths",
+      "recreate PR #5428 options expression fit ranking surfaces",
+      "rewrite #5427 comparison math",
+      "DanielTabakman/msos-autobuilder redesign",
+      "product-main write",
+      "merge authority",
+      "publication authority",
+      "deployment authority",
+      "refill changes",
+      "feed mutation",
+      "live job submission",
+      "brokerage or execution",
+      "Options Horizon live archive inspection"
+    ]
+  },
+  "slices": [
+    {
+      "sliceId": "RegionBet-MarketCompare-Control-Slice001",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+      "buildBranch": "build/auto/RegionBet-MarketCompare-Control-Slice001",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "implementationStatus": "COMPLETE",
+      "nonBlocking": true,
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1
+    },
+    {
+      "sliceId": "RegionBet-MarketCompare-Product-Slice002",
+      "layerPreset": "MSOS_UI",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+      "buildBranch": "build/auto/RegionBet-MarketCompare-Product-Slice002",
+      "declaredPlane": "PRODUCT-PLANE",
+      "implementationStatus": "PENDING",
+      "workerMode": "local-agent",
+      "susMinutes": 90,
+      "hardMinutes": 240,
+      "maxAttempts": 2,
+      "touchSet": [
+        "apps/msos-web/src/lib/regionBetMarketCompare.ts",
+        "apps/msos-web/src/components/RegionBetMarketComparePanel.tsx",
+        "apps/msos-web/src/lib/regionBetGuidedShell.ts",
+        "apps/msos-web/src/components/RegionBetGuidedShell.tsx",
+        "apps/msos-web/src/components/RegionBetGuidedShellPanel.tsx",
+        "tests/test_msos_web_region_bet_market_compare.py"
+      ]
+    },
+    {
+      "sliceId": "RegionBet-MarketCompare-Witness-Slice003",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+      "buildBranch": "build/auto/RegionBet-MarketCompare-Witness-Slice003",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 45,
+      "hardMinutes": 120,
+      "maxAttempts": 2
+    },
+    {
+      "sliceId": "RegionBet-MarketCompare-Closeout-Slice004",
+      "layerPreset": "CONTROL",
+      "sprintSpecPath": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+      "buildBranch": "build/auto/RegionBet-MarketCompare-Closeout-Slice004",
+      "declaredPlane": "EVIDENCE-PLANE",
+      "susMinutes": 15,
+      "hardMinutes": 30,
+      "maxAttempts": 1,
+      "closeout": {
+        "chapterId": "region_bet_market_compare_bridge_v1",
+        "chapterTitle": "Region Bet market-compare bridge v1",
+        "chapterStatus": "COMPLETE",
+        "evidenceDoc": "docs/SOP/REGION_BET_MARKET_COMPARE_BRIDGE_V1_EVIDENCE_STATUS.md",
+        "sprintSpec": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md",
+        "selectionOutcomeDoc": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
+        "nextSelectionDoc": "docs/SOP/PHASE_CHAPTER_BACKLOG.json"
+      }
+    }
+  ]
+}

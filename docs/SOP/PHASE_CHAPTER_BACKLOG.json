@@ -531,13 +531,13 @@
     },
     {
       "chapterId": "options_horizon_comparison_v1",
-      "status": "ready",
+      "status": "done",
       "priority": "high",
       "focusPlaybookTier": "P1",
       "planPath": "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
       "selectionRecord": "docs/SOP/POST_OPTIONS_HORIZON_COMPARISON_V1_SELECTION.md",
       "canonRef": "docs/SOP/SPRINT_OPTIONS_HORIZON_COMPARISON_V1.md",
-      "reason": "[HIGH] Options Made Simple job A; Autobuilder draft PR #5427 open on current main relationship — reconcile before packetizing region_bet_market_compare_bridge_v1. Not a new backlog build item.",
+      "reason": "[DONE] Options Made Simple job A reused: Autobuilder draft PR #5427 merged to main as comparison primitives for catalog order 08. Not a new backlog build item.",
       "relatedPullRequests": [
         "DanielTabakman/Probability-prediction-engine#5427"
       ],
@@ -829,16 +829,19 @@
       "status": "blocked",
       "priority": "high",
       "focusPlaybookTier": "P1",
-      "reason": "[HIGH BLOCKED] Autobuilder intent order 08. Bring existing region-vs-market comparison into guided flow; reuse probability/implied-distribution/Options Horizon primitives. Dependency: region_bet_guided_shell_v1 + PR #5427 resolution/supersession decision. Do not invent duplicate comparison math.",
+      "reason": "[HIGH] Autobuilder catalog order 08. Bridge #5427 Options Horizon comparison into the guided Region Bet shell. Reuse decision: keep merged #5427 (f7229e831); do not rewrite math. #5428 stays parked. Charter ready for JIT after #5441.",
       "autobuilderCatalogOrder": 8,
-      "eligibility": "blocked_until_predecessor_and_draft_decision",
+      "eligibility": "buildable_via_autobuilder_catalog",
       "dependsOn": [
         "region_bet_guided_shell_v1"
       ],
       "relatedPullRequests": [
         "DanielTabakman/Probability-prediction-engine#5427"
       ],
-      "packetization": "just_in_time"
+      "packetization": "just_in_time",
+      "planPath": "docs/SOP/PHASE_PLANS/region_bet_market_compare_bridge_v1_relay.json",
+      "selectionRecord": "docs/SOP/POST_REGION_BET_MARKET_COMPARE_BRIDGE_V1_SELECTION.md",
+      "canonRef": "docs/SOP/SPRINT_REGION_BET_MARKET_COMPARE_BRIDGE_V1.md"
     },
     {
       "chapterId": "region_bet_risk_expression_bridge_v1",
