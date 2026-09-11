@@ -207,12 +207,11 @@ _SOP_DISCOVERY_PATHS = frozenset(
 
 
 def _touches_sop_discovery(files: list[str]) -> bool:
+    # Match CI / sop_discovery_gate: any docs/SOP change can stale CHAPTER_DOC_INDEX.
     norms = {f.replace("\\", "/") for f in files}
     if norms & _SOP_DISCOVERY_PATHS:
         return True
-    return any(
-        n.startswith("docs/SOP/") and n.endswith("_PROGRAM_V1.md") for n in norms
-    )
+    return any(n.startswith("docs/SOP/") for n in norms)
 
 
 def _sop_discovery_gate_commands(files: list[str]) -> list[list[str]]:
