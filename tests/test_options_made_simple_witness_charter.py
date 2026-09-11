@@ -33,28 +33,34 @@ def _pipeline(snapshot: dict) -> dict:
     return next(pipe for pipe in snapshot["pipelines"] if pipe["pipeline_id"] == "ppe")
 
 
-def test_ready_frontier_contains_only_options_made_simple_pair(monkeypatch) -> None:
+def test_horizon_comparison_queue_row_is_done_after_reuse() -> None:
+    queue = _json("docs/SOP/PHASE_QUEUE.json")
+    a = next(item for item in queue["items"] if item.get("planPath") == A_PLAN)
+    assert a["status"] == "DONE"
+    assert "terminal backlog" in a["doneReason"]
+
+
+def test_ready_frontier_contains_only_remaining_options_made_simple_job(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     ready = _ready_queue_items()
-    assert [item["planPath"] for item in ready] == [A_PLAN, B_PLAN]
-    assert [item["founderPriority"] for item in ready] == ["HIGH", "HIGH"]
-    assert ready[0]["dependencyUnblockValue"] > ready[1]["dependencyUnblockValue"]
+    assert [item["planPath"] for item in ready] == [B_PLAN]
+    assert [item["founderPriority"] for item in ready] == ["HIGH"]
     assert all("issue #50" in item["reason"] for item in ready)
     joined = "\n".join(item["planPath"] + " " + item["reason"] for item in ready).lower()
     for stale in ("commodity_proxy", "uso", "hyperliquid", "replay_scrubber", "tier1b", "tier1c"):
         assert stale not in joined
 
 
-def test_founder_portfolio_ranks_a_before_b_and_b_dispatches_from_current_main(monkeypatch) -> None:
+def test_founder_portfolio_recommends_remaining_expression_fit_job(monkeypatch) -> None:
     monkeypatch.delenv("MSOS_AUTOBUILDER_STATUS_ROOT", raising=False)
 
     snapshot = collect_portfolio(REPO)
     ppe = _pipeline(snapshot)
     ready_ids = [item["work_item_id"] for item in ppe["ready_work"]]
 
-    assert ready_ids[:2] == [A_ID, B_ID]
-    assert snapshot["recommended_next_action"]["work_item_id"] == A_ID
+    assert ready_ids == [B_ID]
+    assert snapshot["recommended_next_action"]["work_item_id"] == B_ID
     b_work = next(item for item in ppe["ready_work"] if item["work_item_id"] == B_ID)
     assert b_work["source_plan"] == B_PLAN
     assert b_work["selected_native_slice"] == "Options-ExpressionFit-Product-Slice002"
