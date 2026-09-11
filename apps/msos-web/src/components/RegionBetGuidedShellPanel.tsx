@@ -4,6 +4,7 @@ import type {
   RegionBetGuidedShellStep,
   RegionBetGuidedShellSnapshot,
 } from "@/lib/regionBetGuidedShell";
+import { RegionBetMarketComparePanel } from "@/components/RegionBetMarketComparePanel";
 import type { RegionBetContract } from "@/lib/regionBet";
 
 export type RegionBetGuidedAssetOption = {
@@ -221,6 +222,10 @@ export function RegionBetGuidedShellPanel({
         </div>
       </div>
     );
+  }
+
+  if (step === "compare") {
+    return <RegionBetMarketComparePanel snapshot={snapshot} />;
   }
 
   return (

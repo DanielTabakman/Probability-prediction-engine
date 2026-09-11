@@ -4,7 +4,7 @@ import {
   type RegionBetContract,
 } from "@/lib/regionBet";
 
-export type RegionBetGuidedShellStep = "asset" | "window" | "region" | "review";
+export type RegionBetGuidedShellStep = "asset" | "window" | "region" | "compare" | "review";
 
 export type RegionBetGuidedShellStepDef = {
   id: RegionBetGuidedShellStep;
@@ -35,6 +35,7 @@ export const REGION_BET_GUIDED_SHELL_STEPS: RegionBetGuidedShellStepDef[] = [
   { id: "asset", label: "Asset" },
   { id: "window", label: "Window" },
   { id: "region", label: "Region" },
+  { id: "compare", label: "Compare" },
   { id: "review", label: "Review" },
 ];
 
