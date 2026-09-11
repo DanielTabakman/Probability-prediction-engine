@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-11
 
+- `a4945de5` — Charter Region Bet market-compare bridge v1 for Autobuilder catalog order 8. (#5443) (`docs/SOP/`)
+- `d4fde938` — Control-plane: dev changelog
 - `f7229e83` — PPE: add options horizon comparison slice (#5427) (`apps/msos-web/`)
 - `80adfce2` — Mark region_bet_guided_shell_v1 done after PPE PR #5441. (#5442) (`docs/SOP/`)
 - `3a042c69` — Control-plane: dev changelog
