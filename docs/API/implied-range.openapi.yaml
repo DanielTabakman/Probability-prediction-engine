@@ -1,0 +1,149 @@
+openapi: 3.1.0
+info:
+  title: MSOS Market-Implied BTC Range
+  version: "1.0"
+  description: >
+    GET /v1/implied-range returns the options-implied BTC interquartile range
+    (lognormal q25–q75) from a prepared PPE snapshot.
+servers:
+  - url: http://127.0.0.1:8765
+    description: Local WSGI display server
+paths:
+  /v1/implied-range:
+    get:
+      operationId: getImpliedRange
+      summary: Market-implied BTC range by target date
+      parameters:
+        - name: asset
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Case-insensitive. V1 supports BTC only.
+        - name: target_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: ISO date YYYY-MM-DD. Resolved to the first expiry on or after this date.
+      responses:
+        "200":
+          description: Cached lognormal IQR for the resolved expiry.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpliedRangeSuccess"
+        "400":
+          description: Missing parameter or malformed date.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpliedRangeError"
+        "422":
+          description: Unsupported asset, past target date, or no later expiry.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpliedRangeError"
+        "503":
+          description: Missing or inconsistent snapshot/distribution data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpliedRangeError"
+        "500":
+          description: Unexpected internal error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImpliedRangeError"
+components:
+  schemas:
+    ImpliedRangeSuccess:
+      type: object
+      additionalProperties: false
+      required:
+        - schema_version
+        - asset
+        - currency
+        - requested_target_date
+        - resolved_expiry
+        - as_of
+        - distribution_method
+        - implied_range
+        - data_status
+      properties:
+        schema_version:
+          type: string
+          const: "1.0"
+        asset:
+          type: string
+          const: BTC
+        currency:
+          type: string
+          const: USD
+        requested_target_date:
+          type: string
+          format: date
+        resolved_expiry:
+          type: string
+          format: date
+        as_of:
+          type: string
+          format: date-time
+        distribution_method:
+          type: string
+          const: lognormal_iqr
+        implied_range:
+          $ref: "#/components/schemas/ImpliedRange"
+        data_status:
+          type: string
+          const: cached
+    ImpliedRange:
+      type: object
+      additionalProperties: false
+      required:
+        - low_usd
+        - median_usd
+        - high_usd
+        - width_usd
+        - percentile_low
+        - percentile_high
+      properties:
+        low_usd:
+          type: number
+        median_usd:
+          type: number
+        high_usd:
+          type: number
+        width_usd:
+          type: number
+          description: q75 minus q25
+        percentile_low:
+          type: integer
+          const: 25
+        percentile_high:
+          type: integer
+          const: 75
+    ImpliedRangeError:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+            - details
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
