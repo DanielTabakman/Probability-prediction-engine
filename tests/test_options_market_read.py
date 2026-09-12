@@ -24,7 +24,9 @@ from src.viz.options_market_read import (
     build_market_read_response,
     derived_metrics,
     handle_options_market_read_request,
+    load_prepared_snapshot,
     load_snapshot_from_json,
+    public_metrics,
     render_answer,
     snapshot_from_display_payload,
     snapshot_from_export_rows,
@@ -222,12 +224,13 @@ def test_derived_from_export_lognormal_rows() -> None:
         asset_id="BTC",
     )
     snapshot = snapshot_from_export_rows(rows)
+    raw = derived_metrics(snapshot.expiries[0])
     status, payload = _request("target_date=2030-01-01", snapshot=snapshot)
     assert status == "200 OK"
-    rng = payload["metrics"]["middle_50_range"]
-    assert rng["low_price"] == pytest.approx(stats["q25_usd"])
-    assert rng["high_price"] == pytest.approx(stats["q75_usd"])
-    assert rng["width"] == pytest.approx(stats["q75_usd"] - stats["q25_usd"])
+    assert raw["middle_50_range"]["low_price"] == pytest.approx(stats["q25_usd"])
+    assert raw["middle_50_range"]["high_price"] == pytest.approx(stats["q75_usd"])
+    assert raw["middle_50_range"]["width"] == pytest.approx(stats["q75_usd"] - stats["q25_usd"])
+    assert payload["metrics"] == public_metrics(raw)
 
 
 def test_exact_deterministic_answer_text() -> None:
@@ -304,6 +307,7 @@ def test_display_payload_is_canonical_snapshot_source() -> None:
     )
     snapshot = snapshot_from_display_payload(display)
     spec = resolve_market_read_asset("BTC")
+    raw = derived_metrics(snapshot.expiries[0])
     payload = build_market_read_response(
         spec=spec,
         requested_target_date="2030-01-01",
@@ -314,13 +318,14 @@ def test_display_payload_is_canonical_snapshot_source() -> None:
     q = series["quartiles_usd"]
     assert payload["as_of"] == "2026-06-06T12:00:00Z"
     assert payload["asset"] == display["asset"]["id"]
-    assert payload["metrics"]["spot_price"] == display["spot_usd"]
-    assert payload["metrics"]["implied_forward_price"] == series["forward_usd"]
-    assert payload["metrics"]["atm_iv_percent"] == pytest.approx(float(series["atm_iv_annual"]) * 100.0)
-    assert payload["metrics"]["median_terminal_price"] == q["median_usd"]
-    assert payload["metrics"]["middle_50_range"]["low_price"] == q["q1_usd"]
-    assert payload["metrics"]["middle_50_range"]["high_price"] == q["q3_usd"]
-    assert payload["metrics"]["middle_50_range"]["width"] == pytest.approx(q["q3_usd"] - q["q1_usd"])
+    assert raw["spot_price"] == display["spot_usd"]
+    assert raw["implied_forward_price"] == series["forward_usd"]
+    assert raw["atm_iv_percent"] == pytest.approx(float(series["atm_iv_annual"]) * 100.0)
+    assert raw["median_terminal_price"] == q["median_usd"]
+    assert raw["middle_50_range"]["low_price"] == q["q1_usd"]
+    assert raw["middle_50_range"]["high_price"] == q["q3_usd"]
+    assert raw["middle_50_range"]["width"] == pytest.approx(q["q3_usd"] - q["q1_usd"])
+    assert payload["metrics"] == public_metrics(raw)
     assert payload["resolved_expiry"] == series["expiry_date"]
 
 
@@ -350,13 +355,158 @@ def test_wsgi_display_and_market_read_share_cached_payload() -> None:
     assert omr_status == "200 OK"
     display_payload = json.loads(display_body.decode("utf-8"))
     omr = json.loads(omr_body.decode("utf-8"))
+    assert display_payload == display
     series = display_payload["series_by_expiry"][0]
     q = series["quartiles_usd"]
+    snapshot = snapshot_from_display_payload(display_payload)
+    raw = derived_metrics(snapshot.expiries[0])
     assert omr["as_of"] == "2026-06-06T12:00:00Z"
-    assert omr["metrics"]["spot_price"] == display_payload["spot_usd"]
-    assert omr["metrics"]["implied_forward_price"] == series["forward_usd"]
-    assert omr["metrics"]["atm_iv_percent"] == pytest.approx(float(series["atm_iv_annual"]) * 100.0)
-    assert omr["metrics"]["median_terminal_price"] == q["median_usd"]
-    assert omr["metrics"]["middle_50_range"]["low_price"] == q["q1_usd"]
-    assert omr["metrics"]["middle_50_range"]["high_price"] == q["q3_usd"]
+    assert raw["spot_price"] == display_payload["spot_usd"]
+    assert raw["implied_forward_price"] == series["forward_usd"]
+    assert raw["atm_iv_percent"] == pytest.approx(float(series["atm_iv_annual"]) * 100.0)
+    assert raw["median_terminal_price"] == q["median_usd"]
+    assert raw["middle_50_range"]["low_price"] == q["q1_usd"]
+    assert raw["middle_50_range"]["high_price"] == q["q3_usd"]
+    assert omr["metrics"] == public_metrics(raw)
     clear_display_payload_cache()
+
+
+def _production_example_snapshot():
+    return snapshot_from_payload(
+        {
+            "as_of": "2026-09-12T21:39:59Z",
+            "asset": "BTC",
+            "quote_currency": "USD",
+            "snapshot_id": "prod-display-example",
+            "expiries": [
+                {
+                    "expiry_date": "2026-10-30",
+                    "spot_usd": 77228.81,
+                    "forward_usd": 77229.44,
+                    "atm_iv_annual": 0.3599,
+                    "q25_usd": 70168.13,
+                    "q50_usd": 76582.66,
+                    "q75_usd": 83583.58,
+                },
+                {
+                    "expiry_date": "2026-12-25",
+                    "spot_usd": 77228.81,
+                    "forward_usd": 77229.5,
+                    "atm_iv_annual": 0.384,
+                    "q25_usd": 65895.88,
+                    "q50_usd": 75633.81,
+                    "q75_usd": 86810.79,
+                },
+            ],
+        }
+    )
+
+
+def test_public_json_normalizes_numeric_precision() -> None:
+    snapshot = _production_example_snapshot()
+    raw = derived_metrics(snapshot.expiries[0])
+    assert raw["middle_50_range"]["width"] == pytest.approx(13415.449999999997)
+    assert raw["median_vs_spot_percent"] == pytest.approx(-0.8366696314497046)
+    status, body = handle_options_market_read_request(
+        {"QUERY_STRING": ""},
+        snapshot_loader=lambda: snapshot,
+    )
+    assert status == "200 OK"
+    text = body.decode("utf-8")
+    payload = json.loads(text)
+    rng = payload["metrics"]["middle_50_range"]
+    assert rng["low_price"] == 70168.13
+    assert rng["high_price"] == 83583.58
+    assert rng["width"] == 13415.45
+    assert rng["width"] == pytest.approx(rng["high_price"] - rng["low_price"])
+    assert payload["metrics"]["median_vs_spot_percent"] == -0.8367
+    assert payload["metrics"]["atm_iv_percent"] == 35.99
+    assert payload["metrics"]["spot_price"] == 77228.81
+    assert "13415.45" in text
+    assert "13415.449999999997" not in text
+    assert "-0.8367" in text
+    assert "-0.8366696314497046" not in text
+    assert payload["answer"] == render_answer(
+        as_of=snapshot.as_of,
+        asset="BTC",
+        quote_currency="USD",
+        resolved_expiry="2026-10-30",
+        metrics=raw,
+    )
+
+
+def test_public_width_is_rounded_high_minus_low() -> None:
+    snapshot = _production_example_snapshot()
+    status, payload = _request("target_date=2026-12-25", snapshot=snapshot)
+    assert status == "200 OK"
+    rng = payload["metrics"]["middle_50_range"]
+    assert rng["low_price"] == 65895.88
+    assert rng["high_price"] == 86810.79
+    assert rng["width"] == 20914.91
+    assert rng["width"] == pytest.approx(rng["high_price"] - rng["low_price"])
+    assert payload["metrics"]["median_vs_spot_percent"] == -2.0653
+    raw = derived_metrics(snapshot.expiries[1])
+    assert raw["middle_50_range"]["width"] == pytest.approx(20914.90999999999)
+    assert raw["median_vs_spot_percent"] == pytest.approx(-2.065291437224015)
+
+
+def test_public_json_rejects_nan_and_infinity() -> None:
+    base = {
+        "spot_price": 100.0,
+        "implied_forward_price": 101.0,
+        "median_terminal_price": 102.0,
+        "median_vs_spot_percent": 2.0,
+        "atm_iv_percent": 50.0,
+        "middle_50_range": {"low_price": 90.0, "high_price": 120.0, "width": 30.0},
+    }
+    for field, value in (
+        ("spot_price", float("nan")),
+        ("atm_iv_percent", float("inf")),
+        ("median_vs_spot_percent", float("-inf")),
+    ):
+        broken = dict(base)
+        broken[field] = value
+        with pytest.raises(OptionsMarketReadError) as exc:
+            public_metrics(broken)
+        assert exc.value.status == 503
+        assert exc.value.details["field"] == field
+    broken_range = dict(base)
+    broken_range["middle_50_range"] = {"low_price": 90.0, "high_price": float("nan"), "width": 30.0}
+    with pytest.raises(OptionsMarketReadError) as exc:
+        public_metrics(broken_range)
+    assert exc.value.status == 503
+    assert exc.value.details["field"] == "high_price"
+
+
+def test_snapshot_identity_is_stable() -> None:
+    first = _fixture_snapshot()
+    second = _fixture_snapshot()
+    assert first.snapshot_id == second.snapshot_id == "omr-fixture-btc-2026-06-06"
+    status_a, body_a = handle_options_market_read_request(
+        {"QUERY_STRING": ""},
+        snapshot_loader=_fixture_snapshot,
+    )
+    status_b, body_b = handle_options_market_read_request(
+        {"QUERY_STRING": ""},
+        snapshot_loader=_fixture_snapshot,
+    )
+    assert status_a == status_b == "200 OK"
+    assert body_a == body_b
+    assert json.loads(body_a.decode("utf-8"))["snapshot_id"] == first.snapshot_id
+
+
+def test_default_path_does_not_select_fixture(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH", raising=False)
+    seen: dict[str, str] = {}
+
+    def _display(*, asset_id: str = "BTC"):
+        seen["asset_id"] = asset_id
+        return _fixture_snapshot()
+
+    monkeypatch.setattr(
+        "src.viz.options_market_read.load_display_boundary_snapshot",
+        _display,
+    )
+    snapshot = load_prepared_snapshot("BTC")
+    assert seen["asset_id"] == "BTC"
+    assert snapshot.snapshot_id == "omr-fixture-btc-2026-06-06"

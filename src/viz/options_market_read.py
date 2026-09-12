@@ -14,6 +14,7 @@ import math
 import os
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Callable
 from urllib.parse import parse_qs
@@ -31,6 +32,9 @@ DISTRIBUTION_METHOD = "lognormal"
 LOGNORMAL_DISTRIBUTION = "lognormal_reference"
 DATA_STATUS_CACHED = "cached"
 DEFAULT_HORIZON_DAYS = 30
+PUBLIC_PRICE_DECIMALS = 2
+PUBLIC_IV_DECIMALS = 2
+PUBLIC_MEDIAN_VS_SPOT_DECIMALS = 4
 
 _SNAPSHOT_ENV = "PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH"
 
@@ -508,6 +512,69 @@ def derived_metrics(row: MarketReadExpiry) -> dict[str, Any]:
     }
 
 
+def _quantize_public(value: float, decimals: int, field: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise OptionsMarketReadError(
+            503,
+            "inconsistent_snapshot",
+            "Snapshot metadata is missing or inconsistent.",
+            {"field": field, "value": value},
+        )
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise OptionsMarketReadError(
+            503,
+            "inconsistent_snapshot",
+            "Snapshot metadata is missing or inconsistent.",
+            {"field": field, "value": parsed},
+        )
+    quantized = Decimal(str(parsed)).quantize(
+        Decimal("1").scaleb(-decimals),
+        rounding=ROUND_HALF_UP,
+    )
+    return float(quantized)
+
+
+def public_metrics(metrics: dict[str, Any]) -> dict[str, Any]:
+    """Round public JSON numbers only. Does not change PPE calculations or the answer."""
+    mid = metrics["middle_50_range"]
+    low = _quantize_public(float(mid["low_price"]), PUBLIC_PRICE_DECIMALS, "low_price")
+    high = _quantize_public(float(mid["high_price"]), PUBLIC_PRICE_DECIMALS, "high_price")
+    width = _quantize_public(high - low, PUBLIC_PRICE_DECIMALS, "width")
+    return {
+        "spot_price": _quantize_public(float(metrics["spot_price"]), PUBLIC_PRICE_DECIMALS, "spot_price"),
+        "implied_forward_price": _quantize_public(
+            float(metrics["implied_forward_price"]),
+            PUBLIC_PRICE_DECIMALS,
+            "implied_forward_price",
+        ),
+        "median_terminal_price": _quantize_public(
+            float(metrics["median_terminal_price"]),
+            PUBLIC_PRICE_DECIMALS,
+            "median_terminal_price",
+        ),
+        "median_vs_spot_percent": _quantize_public(
+            float(metrics["median_vs_spot_percent"]),
+            PUBLIC_MEDIAN_VS_SPOT_DECIMALS,
+            "median_vs_spot_percent",
+        ),
+        "atm_iv_percent": _quantize_public(
+            float(metrics["atm_iv_percent"]),
+            PUBLIC_IV_DECIMALS,
+            "atm_iv_percent",
+        ),
+        "middle_50_range": {
+            "low_price": low,
+            "high_price": high,
+            "width": width,
+        },
+    }
+
+
+def serialize_market_read_json(payload: dict[str, Any]) -> bytes:
+    return json.dumps(payload, separators=(",", ":"), sort_keys=True, allow_nan=False).encode("utf-8")
+
+
 def _whole_units(value: float) -> str:
     return f"{int(round(value)):,}"
 
@@ -594,7 +661,7 @@ def build_market_read_response(
         "resolved_expiry": resolved.isoformat(),
         "distribution_method": DISTRIBUTION_METHOD,
         "data_status": DATA_STATUS_CACHED,
-        "metrics": metrics,
+        "metrics": public_metrics(metrics),
         "answer": answer,
     }
 
@@ -617,10 +684,10 @@ def handle_options_market_read_request(
             target_date=target_date,
             snapshot=snapshot,
         )
-        body = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+        body = serialize_market_read_json(payload)
         return "200 OK", body
     except OptionsMarketReadError as exc:
-        body = json.dumps(error_body(exc), separators=(",", ":"), sort_keys=True).encode("utf-8")
+        body = serialize_market_read_json(error_body(exc))
         return exc.status_line, body
     except Exception as exc:  # noqa: BLE001 — contract requires 500 for unexpected errors
         unexpected = OptionsMarketReadError(
@@ -629,9 +696,7 @@ def handle_options_market_read_request(
             "Unexpected internal error.",
             {"error": str(exc)},
         )
-        body = json.dumps(error_body(unexpected), separators=(",", ":"), sort_keys=True).encode(
-            "utf-8"
-        )
+        body = serialize_market_read_json(error_body(unexpected))
         return unexpected.status_line, body
 
 

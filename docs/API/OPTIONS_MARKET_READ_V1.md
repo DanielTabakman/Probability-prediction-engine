@@ -27,6 +27,17 @@ Reuse prepared lognormal export fields: spot, implied forward, ATM IV, q25 / med
 - `median_vs_spot_percent` = ((median / spot) − 1) × 100  
 - `atm_iv_percent` = annual ATM IV × 100  
 
+Public JSON rounds **after** those calculations. PPE math and `display.json` stay full precision. The human-readable `answer` still uses whole-unit prices, 1-decimal percents, and 1-decimal ATM IV.
+
+| Public field | Precision |
+|---|---|
+| `spot_price`, `implied_forward_price`, `median_terminal_price`, `middle_50_range.low_price`, `middle_50_range.high_price` | 2 decimal places |
+| `middle_50_range.width` | 2 decimal places; equals rounded high minus rounded low |
+| `atm_iv_percent` | 2 decimal places |
+| `median_vs_spot_percent` | 4 decimal places |
+
+NaN and Infinity are rejected (**503**), never serialized.
+
 This is risk-neutral options pricing, not a forecast. The `answer` string is a fixed template — no LLM, no bullish/bearish label.
 
 ## Data

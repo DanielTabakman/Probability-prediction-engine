@@ -128,14 +128,24 @@ components:
       properties:
         spot_price:
           type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
         implied_forward_price:
           type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
         median_terminal_price:
           type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
         median_vs_spot_percent:
           type: number
+          multipleOf: 0.0001
+          description: Percent serialized to 4 decimal places.
         atm_iv_percent:
           type: number
+          multipleOf: 0.01
+          description: Percent serialized to 2 decimal places.
         middle_50_range:
           type: object
           additionalProperties: false
@@ -146,10 +156,16 @@ components:
           properties:
             low_price:
               type: number
+              multipleOf: 0.01
+              description: USD price serialized to 2 decimal places.
             high_price:
               type: number
+              multipleOf: 0.01
+              description: USD price serialized to 2 decimal places.
             width:
               type: number
+              multipleOf: 0.01
+              description: Rounded high minus rounded low, 2 decimal places.
     ApiError:
       type: object
       additionalProperties: false
