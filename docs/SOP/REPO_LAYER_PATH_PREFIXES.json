@@ -30,6 +30,9 @@
         "tests/test_width_vol",
         "tests/test_directional_candidate",
         "tests/test_display_payload_server.py",
+        "tests/test_implied_range_api.py",
+        "docs/API/",
+        "fixtures/implied_range/",
         "scripts/run_mvp1_dual_implied_lab_smoke.py",
         "scripts/implied_lab_ui_smoke_harness.py",
         "scripts/run_implied_lab_ui_smoke.py",
@@ -254,7 +257,8 @@
         "docs/PRODUCT_THESIS.md",
         "docs/PLAN.md",
         "docs/SEMANTIC_CONTRACTS.md",
-        "docs/ARCHITECT_NOTES.md"
+        "docs/ARCHITECT_NOTES.md",
+        "docs/API/"
       ]
     }
   },
@@ -338,6 +342,9 @@
         "tests/test_width_vol_candidate_strip.py",
         "tests/test_directional_candidate_strip.py",
         "tests/test_display_payload_server.py",
+        "tests/test_implied_range_api.py",
+        "docs/API/",
+        "fixtures/implied_range/",
         "scripts/run_mvp1_dual_implied_lab_smoke.py",
         "scripts/implied_lab_ui_smoke_harness.py",
         "scripts/run_implied_lab_ui_smoke.py",
@@ -378,6 +385,8 @@
         ".gitignore",
         "scripts/",
         "fixtures/research_decision_dashboard/",
+        "fixtures/implied_range/",
+        "tests/test_implied_range_api.py",
         "docs/SOP/",
         "docs/CONTROL_PLANE/",
         "docs/REPOSITORY_BOUNDARIES.md",
@@ -654,7 +663,8 @@
         "docs/PRODUCT_THESIS.md",
         "docs/PLAN.md",
         "docs/SEMANTIC_CONTRACTS.md",
-        "docs/ARCHITECT_NOTES.md"
+        "docs/ARCHITECT_NOTES.md",
+        "docs/API/"
       ],
       "forbidden_paths": ["src/", "apps/msos-web/", "scripts/"]
     },
