@@ -758,10 +758,24 @@ def create_display_payload_wsgi_app(
             return [body]
 
         from src.viz.cross_venue_research_boundary import handle_cross_venue_research_wsgi_path
+        from src.viz.options_market_read import handle_options_market_read_wsgi_path
 
         cv_research = handle_cross_venue_research_wsgi_path(path, environ)
         if cv_research is not None:
             status, body = cv_research
+            start_response(
+                status,
+                [
+                    ("Content-Type", "application/json; charset=utf-8"),
+                    ("Content-Length", str(len(body))),
+                    ("Cache-Control", "no-store"),
+                ],
+            )
+            return [body]
+
+        market_read = handle_options_market_read_wsgi_path(path, environ)
+        if market_read is not None:
+            status, body = market_read
             start_response(
                 status,
                 [

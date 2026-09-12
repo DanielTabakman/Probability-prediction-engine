@@ -1,0 +1,189 @@
+openapi: 3.1.0
+info:
+  title: Options Market Read
+  version: "1.0"
+  description: >
+    GET /v1/options-market-read returns a deterministic plain-English read of
+    what the options market is pricing, from a prepared PPE lognormal snapshot.
+servers:
+  - url: http://127.0.0.1:8765
+    description: Local WSGI display server
+paths:
+  /v1/options-market-read:
+    get:
+      operationId: getOptionsMarketRead
+      summary: Deterministic options-market read
+      parameters:
+        - name: asset
+          in: query
+          required: false
+          schema:
+            type: string
+            default: BTC
+          description: Case-insensitive. V1 enables BTC only.
+        - name: target_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: >
+            ISO YYYY-MM-DD. If omitted, uses snapshot as_of date plus 30
+            calendar days.
+      responses:
+        "200":
+          description: Cached lognormal market read for the resolved expiry.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptionsMarketReadSuccess"
+        "400":
+          description: Malformed input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "422":
+          description: Unsupported asset, past date, or no eligible expiry.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "503":
+          description: Missing, stale, or invalid market snapshot.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "500":
+          description: Unexpected internal failure.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    OptionsMarketReadSuccess:
+      type: object
+      additionalProperties: false
+      required:
+        - schema_version
+        - ruleset_version
+        - asset
+        - quote_currency
+        - as_of
+        - snapshot_id
+        - requested_target_date
+        - default_horizon_days
+        - resolved_expiry
+        - distribution_method
+        - data_status
+        - metrics
+        - answer
+      properties:
+        schema_version:
+          type: string
+          const: "1.0"
+        ruleset_version:
+          type: string
+          const: options-market-read.v1
+        asset:
+          type: string
+        quote_currency:
+          type: string
+        as_of:
+          type: string
+          format: date-time
+        snapshot_id:
+          type: string
+        requested_target_date:
+          type: ["string", "null"]
+          format: date
+        default_horizon_days:
+          type: integer
+          const: 30
+        resolved_expiry:
+          type: string
+          format: date
+        distribution_method:
+          type: string
+          const: lognormal
+        data_status:
+          type: string
+          const: cached
+        metrics:
+          $ref: "#/components/schemas/MarketReadMetrics"
+        answer:
+          type: string
+    MarketReadMetrics:
+      type: object
+      additionalProperties: false
+      required:
+        - spot_price
+        - implied_forward_price
+        - median_terminal_price
+        - median_vs_spot_percent
+        - atm_iv_percent
+        - middle_50_range
+      properties:
+        spot_price:
+          type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
+        implied_forward_price:
+          type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
+        median_terminal_price:
+          type: number
+          multipleOf: 0.01
+          description: USD price serialized to 2 decimal places.
+        median_vs_spot_percent:
+          type: number
+          multipleOf: 0.0001
+          description: Percent serialized to 4 decimal places.
+        atm_iv_percent:
+          type: number
+          multipleOf: 0.01
+          description: Percent serialized to 2 decimal places.
+        middle_50_range:
+          type: object
+          additionalProperties: false
+          required:
+            - low_price
+            - high_price
+            - width
+          properties:
+            low_price:
+              type: number
+              multipleOf: 0.01
+              description: USD price serialized to 2 decimal places.
+            high_price:
+              type: number
+              multipleOf: 0.01
+              description: USD price serialized to 2 decimal places.
+            width:
+              type: number
+              multipleOf: 0.01
+              description: Rounded high minus rounded low, 2 decimal places.
+    ApiError:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+            - details
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
