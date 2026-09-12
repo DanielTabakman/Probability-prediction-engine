@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-12
+
+_No merges to `main`._
+
 ## 2026-09-11
 
+- `3098da71` — Control-plane: dev changelog
 - `6daa449a` — Control-plane: dev changelog
 - `7eb7513e` — Mark options_horizon_comparison_v1 done after #5427 reuse (#5445) (`docs/SOP/`)
 - `add15e38` — Control-plane: dev changelog
