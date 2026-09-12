@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-12
 
-_No merges to `main`._
+- `d3fbe76f` — PPE: region_bet_market_compare_bridge_v1 (#5444) (`apps/msos-web/`)
+- `9f746e9c` — Control-plane: dev changelog
 
 ## 2026-09-11
 
