@@ -1,0 +1,115 @@
+{
+  "as_of_utc": "2026-07-19T01:30:00Z",
+  "data_mode": "fixture",
+  "index_price_usd": 92000.0,
+  "requested_event": {
+    "underlying": "BTC",
+    "comparator": "above",
+    "requested_threshold_usd": 93000.0,
+    "selected_expiry_utc": "2026-09-25T08:00:00Z",
+    "requested_payout_usd": 8000.0,
+    "max_depth_levels": 2,
+    "max_slippage_bps": 400.0
+  },
+  "reserve_policy": {
+    "legging_reserve_bps": 15.0,
+    "stale_sync_reserve_bps": 10.0,
+    "settlement_currency_basis_reserve_bps": 25.0
+  },
+  "settlement_metadata": {
+    "settlement_source": "Deribit BTC Index",
+    "settlement_method": "Official delivery price is the 30-minute TWAP of the relevant Deribit Index from 07:30 to 08:00 UTC for instruments expiring at 08:00 UTC, sampled every 4 seconds.",
+    "provenance": [
+      "https://support.deribit.com/hc/en-us/articles/29734325712413-Settlement",
+      "https://support.deribit.com/hc/en-us/articles/31424939096093-Inverse-Options",
+      "https://docs.deribit.com/api-reference/market-data/public-get_instruments",
+      "https://docs.deribit.com/api-reference/market-data/public-get_order_book",
+      "https://support.deribit.com/hc/en-us/articles/25944746248989-Fees"
+    ]
+  },
+  "expected": {
+    "proposed_threshold_usd": 95000.0,
+    "yes_top_of_book_capacity_usd": 4000.0,
+    "yes_policy_capacity_usd": 9000.0,
+    "yes_supported_payout_usd": 8000.0,
+    "yes_unsupported_payout_usd": 0.0,
+    "no_top_of_book_capacity_usd": 3000.0,
+    "no_policy_capacity_usd": 6000.0,
+    "no_supported_payout_usd": 6000.0,
+    "no_unsupported_payout_usd": 2000.0,
+    "strike_width_usd": 5000.0,
+    "readiness_state": "SHAREABLE_DESIGN"
+  },
+  "instruments": [
+    {
+      "instrument_name": "BTC-25SEP26-90000-C",
+      "option_type": "call",
+      "strike": 90000.0,
+      "expiry_utc": "2026-09-25T08:00:00Z",
+      "contract_size": 1.0,
+      "min_trade_amount": 0.1,
+      "settlement_currency": "BTC",
+      "quote_currency": "BTC",
+      "base_currency": "BTC",
+      "price_index": "btc_usd"
+    },
+    {
+      "instrument_name": "BTC-25SEP26-95000-C",
+      "option_type": "call",
+      "strike": 95000.0,
+      "expiry_utc": "2026-09-25T08:00:00Z",
+      "contract_size": 1.0,
+      "min_trade_amount": 0.1,
+      "settlement_currency": "BTC",
+      "quote_currency": "BTC",
+      "base_currency": "BTC",
+      "price_index": "btc_usd"
+    },
+    {
+      "instrument_name": "BTC-25SEP26-90000-P",
+      "option_type": "put",
+      "strike": 90000.0,
+      "expiry_utc": "2026-09-25T08:00:00Z",
+      "contract_size": 1.0,
+      "min_trade_amount": 0.1,
+      "settlement_currency": "BTC",
+      "quote_currency": "BTC",
+      "base_currency": "BTC",
+      "price_index": "btc_usd"
+    },
+    {
+      "instrument_name": "BTC-25SEP26-95000-P",
+      "option_type": "put",
+      "strike": 95000.0,
+      "expiry_utc": "2026-09-25T08:00:00Z",
+      "contract_size": 1.0,
+      "min_trade_amount": 0.1,
+      "settlement_currency": "BTC",
+      "quote_currency": "BTC",
+      "base_currency": "BTC",
+      "price_index": "btc_usd"
+    }
+  ],
+  "order_books": {
+    "BTC-25SEP26-90000-C": {
+      "timestamp_utc": "2026-07-19T01:29:50Z",
+      "asks": [[0.055, 1.0], [0.056, 0.9], [0.058, 2.0]],
+      "bids": [[0.054, 1.2], [0.053, 2.0]]
+    },
+    "BTC-25SEP26-95000-C": {
+      "timestamp_utc": "2026-07-19T01:29:55Z",
+      "asks": [[0.033, 1.1], [0.034, 1.0]],
+      "bids": [[0.032, 0.8], [0.031, 1.0], [0.030, 2.0]]
+    },
+    "BTC-25SEP26-90000-P": {
+      "timestamp_utc": "2026-07-19T01:29:51Z",
+      "asks": [[0.027, 1.5], [0.028, 1.0]],
+      "bids": [[0.026, 0.6], [0.0255, 1.0], [0.024, 2.0]]
+    },
+    "BTC-25SEP26-95000-P": {
+      "timestamp_utc": "2026-07-19T01:29:57Z",
+      "asks": [[0.049, 0.7], [0.050, 0.5], [0.052, 2.0]],
+      "bids": [[0.048, 1.0], [0.047, 1.0]]
+    }
+  }
+}
