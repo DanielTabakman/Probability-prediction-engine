@@ -31,17 +31,21 @@ This is risk-neutral options pricing, not a forecast. The `answer` string is a f
 
 ## Data
 
-Prepared PPE snapshot only (`artifacts/distribution_snapshots/**/ppe_btc_distribution_stats_*.csv` or `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH`). No live fetch. `as_of` is snapshot metadata. Missing or inconsistent identity, currency, expiry, spot, forward, IV, or quartiles → **503**. BTC request with SOL (or other) snapshot data → **503**.
+Same producer as `GET /ppe-display-api/display.json`: `_load_export_rows` → `build_distribution_export_rows` → in-process TTL cache (`build_cached_live_distribution_display_payload`). Options Market Read maps that payload; it does not keep a second CSV archive.
+
+`as_of` is the display payload’s `as_of_utc` (cache build time). Missing or inconsistent identity, currency, expiry, spot, forward, IV, or quartiles → **503**. BTC request with SOL (or other) snapshot data → **503**.
+
+`PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` is a **test override** only (fixture or a saved display.json). Production compose must not set it.
 
 Future assets: add a row to the small registry in `src/viz/options_market_read_assets.py`. The public schema stays asset-neutral.
 
 ## Local usage
 
 ```bash
-set PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH=fixtures/options_market_read/btc_cached_snapshot.json
 python -m src.viz.display_payload_server
+curl "http://127.0.0.1:8765/display.json?asset=BTC"
 curl "http://127.0.0.1:8765/v1/options-market-read"
 curl "http://127.0.0.1:8765/v1/options-market-read?asset=BTC&target_date=2026-12-25"
 ```
 
-Production still needs a reverse-proxy path for `/v1/*` (Caddy today maps `/ppe-display-api/*` only). This slice does not deploy that mapping.
+Tests may set `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` to a fixture. Production still needs a reverse-proxy path for `/v1/*` (Caddy today maps `/ppe-display-api/*` only). This slice does not deploy that mapping.

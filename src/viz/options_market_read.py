@@ -32,10 +32,7 @@ LOGNORMAL_DISTRIBUTION = "lognormal_reference"
 DATA_STATUS_CACHED = "cached"
 DEFAULT_HORIZON_DAYS = 30
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_SNAPSHOT_ROOT = _REPO_ROOT / "artifacts" / "distribution_snapshots"
 _SNAPSHOT_ENV = "PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH"
-_SNAPSHOT_ROOT_ENV = "PPE_OPTIONS_MARKET_READ_SNAPSHOT_ROOT"
 
 ANSWER_TEMPLATE = (
     "As of {as_of}, {asset} spot is {quote_currency} {spot}. "
@@ -368,17 +365,6 @@ def snapshot_from_export_rows(rows: list[dict[str, Any]]) -> MarketReadSnapshot:
     )
 
 
-def _list_distribution_csvs(root: Path) -> list[Path]:
-    if not root.is_dir():
-        return []
-    files: list[Path] = []
-    for day_dir in sorted(root.iterdir()):
-        if not day_dir.is_dir():
-            continue
-        files.extend(sorted(day_dir.glob("ppe_btc_distribution_stats_*.csv")))
-    return files
-
-
 def load_snapshot_from_json(path: Path) -> MarketReadSnapshot:
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -413,7 +399,79 @@ def load_snapshot_from_csv(path: Path) -> MarketReadSnapshot:
     return snapshot_from_export_rows(rows)
 
 
-def load_prepared_snapshot() -> MarketReadSnapshot:
+def snapshot_from_display_payload(payload: dict[str, Any]) -> MarketReadSnapshot:
+    """Map the display-boundary JSON (same object as GET /display.json) to a market read."""
+    as_of_raw = str(payload.get("as_of_utc") or payload.get("as_of") or "")
+    asset_block = payload.get("asset") if isinstance(payload.get("asset"), dict) else {}
+    asset = str(asset_block.get("id") or "").strip().upper()
+    spot = payload.get("spot_usd")
+    series = payload.get("series_by_expiry")
+    if not isinstance(series, list) or not series:
+        raise OptionsMarketReadError(
+            503,
+            "snapshot_unavailable",
+            "No valid snapshot/distribution data.",
+            {"reason": "display_payload_missing_series"},
+        )
+    try:
+        quote = resolve_market_read_asset(asset).quote_currency
+    except KeyError:
+        quote = ""
+    expiries: list[dict[str, Any]] = []
+    for item in series:
+        if not isinstance(item, dict):
+            raise OptionsMarketReadError(
+                503,
+                "inconsistent_snapshot",
+                "Snapshot metadata is missing or inconsistent.",
+                {"field": "series_by_expiry"},
+            )
+        quartiles = item.get("quartiles_usd") if isinstance(item.get("quartiles_usd"), dict) else {}
+        expiries.append(
+            {
+                "asset": str(item.get("asset") or asset),
+                "expiry_date": item.get("expiry_date"),
+                "spot_usd": item.get("spot_usd", spot),
+                "forward_usd": item.get("forward_usd"),
+                "atm_iv_annual": item.get("atm_iv_annual"),
+                "q25_usd": quartiles.get("q1_usd"),
+                "q50_usd": quartiles.get("median_usd"),
+                "q75_usd": quartiles.get("q3_usd"),
+            }
+        )
+    return snapshot_from_payload(
+        {
+            "as_of": as_of_raw,
+            "asset": asset,
+            "quote_currency": quote,
+            "expiries": expiries,
+        }
+    )
+
+
+def load_display_boundary_snapshot(asset_id: str = DEFAULT_ASSET_ID) -> MarketReadSnapshot:
+    """Reuse the in-process TTL cache that serves GET /ppe-display-api/display.json."""
+    from src.viz.embed_display_boundary import (
+        DISPLAY_DEPTH_FULL,
+        build_cached_live_distribution_display_payload,
+    )
+
+    environ = {"QUERY_STRING": f"asset={asset_id}&depth={DISPLAY_DEPTH_FULL}"}
+    try:
+        payload = build_cached_live_distribution_display_payload(environ)
+    except OptionsMarketReadError:
+        raise
+    except Exception as exc:
+        raise OptionsMarketReadError(
+            503,
+            "snapshot_unavailable",
+            "No valid snapshot/distribution data.",
+            {"reason": "display_boundary_unavailable", "error": str(exc)},
+        ) from exc
+    return snapshot_from_display_payload(payload)
+
+
+def load_prepared_snapshot(asset_id: str = DEFAULT_ASSET_ID) -> MarketReadSnapshot:
     explicit = (os.environ.get(_SNAPSHOT_ENV) or "").strip()
     if explicit:
         path = Path(explicit)
@@ -425,18 +483,12 @@ def load_prepared_snapshot() -> MarketReadSnapshot:
                 {"reason": "snapshot_path_missing"},
             )
         if path.suffix.lower() == ".json":
-            return load_snapshot_from_json(path)
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(raw, dict) and raw.get("kind") == "distribution_display_boundary":
+                return snapshot_from_display_payload(raw)
+            return snapshot_from_payload(raw) if isinstance(raw, dict) else load_snapshot_from_json(path)
         return load_snapshot_from_csv(path)
-    root = Path(os.environ.get(_SNAPSHOT_ROOT_ENV) or _DEFAULT_SNAPSHOT_ROOT)
-    files = _list_distribution_csvs(root)
-    if not files:
-        raise OptionsMarketReadError(
-            503,
-            "snapshot_unavailable",
-            "No valid snapshot/distribution data.",
-            {"reason": "no_prepared_snapshot"},
-        )
-    return load_snapshot_from_csv(files[-1])
+    return load_display_boundary_snapshot(asset_id=asset_id)
 
 
 def derived_metrics(row: MarketReadExpiry) -> dict[str, Any]:
@@ -554,7 +606,11 @@ def handle_options_market_read_request(
 ) -> tuple[str, bytes]:
     try:
         spec, target_date, requested = parse_market_read_request(environ)
-        snapshot = (snapshot_loader or load_prepared_snapshot)()
+        snapshot = (
+            snapshot_loader()
+            if snapshot_loader is not None
+            else load_prepared_snapshot(asset_id=spec.asset_id)
+        )
         payload = build_market_read_response(
             spec=spec,
             requested_target_date=requested,
