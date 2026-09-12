@@ -55,6 +55,7 @@ Release protocol: [`SOP/PRODUCTION_DEPLOY_PROTOCOL.md`](SOP/PRODUCTION_DEPLOY_PR
 - [`PRODUCT_THESIS.md`](PRODUCT_THESIS.md) — north star
 - [`SEMANTIC_CONTRACTS.md`](SEMANTIC_CONTRACTS.md) — market-implied vs belief vs disagreement
 - [`IMPLIED_LAB_SMOKE.md`](IMPLIED_LAB_SMOKE.md) — Playwright UI smoke procedures
+- [`API/OPTIONS_MARKET_READ_V1.md`](API/OPTIONS_MARKET_READ_V1.md) — `GET /v1/options-market-read`
 
 ## Bounded MSOS initiatives
 
