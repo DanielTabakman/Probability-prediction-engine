@@ -26,8 +26,8 @@ from src.viz.options_market_read_assets import (
 )
 
 OPTIONS_MARKET_READ_HTTP_PATH = "/v1/options-market-read"
-SCHEMA_VERSION = "1.1"
-RULESET_VERSION = "options-market-read.v1.1"
+SCHEMA_VERSION = "1.2"
+RULESET_VERSION = "options-market-read.v1.2"
 RESOLUTION_EXACT = "exact"
 RESOLUTION_NEAREST_BEFORE = "nearest_before"
 RESOLUTION_NEAREST_AFTER = "nearest_after"
@@ -38,34 +38,52 @@ DEFAULT_HORIZON_DAYS = 30
 PUBLIC_PRICE_DECIMALS = 2
 PUBLIC_IV_DECIMALS = 2
 PUBLIC_MEDIAN_VS_SPOT_DECIMALS = 4
+PUBLIC_CONTEXT_PERCENT_DECIMALS = 2
+TERM_STRUCTURE_MATERIALITY_VOL_POINTS = 1.0
+
+RELATION_TARGET_HIGHER = "target_higher"
+RELATION_TARGET_LOWER = "target_lower"
+RELATION_SIMILAR = "similar"
+
+UNCERTAINTY_HIGHER_THAN_NEIGHBORS = "higher_than_neighbors"
+UNCERTAINTY_LOWER_THAN_NEIGHBORS = "lower_than_neighbors"
+UNCERTAINTY_RISING = "rising_across_expiries"
+UNCERTAINTY_FALLING = "falling_across_expiries"
+UNCERTAINTY_SIMILAR = "similar_to_neighbors"
+UNCERTAINTY_MIXED = "mixed_or_flat"
+UNCERTAINTY_HIGHER_THAN_AVAILABLE = "higher_than_available_neighbor"
+UNCERTAINTY_LOWER_THAN_AVAILABLE = "lower_than_available_neighbor"
+UNCERTAINTY_SIMILAR_TO_AVAILABLE = "similar_to_available_neighbor"
+UNCERTAINTY_UNAVAILABLE = "insufficient_context"
 
 _SNAPSHOT_ENV = "PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH"
 
 ANSWER_TEMPLATE = (
-    "As of {as_of}, {asset} spot is {quote_currency} {spot}. "
-    "For options expiring {resolved_expiry}, the options-implied terminal "
-    "distribution is centred near {median}, which is {signed_percent}% versus "
-    "spot. The middle 50% of priced outcomes runs from {low} to {high}, and "
-    "ATM implied volatility is {iv}%. This is risk-neutral options pricing, "
-    "not a forecast."
+    "As of {as_of_display}, {asset} spot is {quote_currency} {spot}. "
+    "For options expiring {resolved_expiry_display}, the middle 50% of priced "
+    "terminal outcomes runs from {low} to {high} ({low_percent}% to "
+    "{high_percent}% versus spot), with a median of {median}. ATM implied "
+    "volatility is {iv}% annualized; this measures priced uncertainty, not "
+    "direction. {uncertainty_description} This is "
+    "risk-neutral options pricing, not a forecast or trade recommendation."
 )
 EXPLICIT_BEFORE_PREFIX = (
-    "The requested target date {effective_target_date} is represented by the "
-    "nearest supported options expiry, {resolved_expiry}, {absolute_offset} days "
-    "before the target. "
+    "The requested target date, {effective_target_date_display}, is represented "
+    "by the nearest supported options expiry, {resolved_expiry_display}, "
+    "{absolute_offset} days before the target. "
 )
 EXPLICIT_AFTER_PREFIX = (
-    "The requested target date {effective_target_date} is represented by the "
-    "nearest supported options expiry, {resolved_expiry}, {absolute_offset} days "
-    "after the target. "
+    "The requested target date, {effective_target_date_display}, is represented "
+    "by the nearest supported options expiry, {resolved_expiry_display}, "
+    "{absolute_offset} days after the target. "
 )
 DEFAULT_BEFORE_PREFIX = (
     "The default 30-day target is represented by the nearest supported options "
-    "expiry, {resolved_expiry}, {absolute_offset} days before the target. "
+    "expiry, {resolved_expiry_display}, {absolute_offset} days before the target. "
 )
 DEFAULT_AFTER_PREFIX = (
     "The default 30-day target is represented by the nearest supported options "
-    "expiry, {resolved_expiry}, {absolute_offset} days after the target. "
+    "expiry, {resolved_expiry_display}, {absolute_offset} days after the target. "
 )
 
 
@@ -190,6 +208,20 @@ def format_as_of(raw: str) -> tuple[str, date]:
             {"field": "as_of", "as_of": text},
         ) from exc
     return parsed.strftime("%Y-%m-%dT%H:%M:%SZ"), parsed.date()
+
+
+def _human_date(value: date) -> str:
+    return f"{value.strftime('%B')} {value.day}, {value.year}"
+
+
+def humanize_as_of(as_of: str) -> str:
+    parsed = datetime.fromisoformat(as_of.replace("Z", "+00:00")).astimezone(UTC)
+    hour = parsed.hour % 12 or 12
+    meridiem = "AM" if parsed.hour < 12 else "PM"
+    return (
+        f"{_human_date(parsed.date())} at {hour}:{parsed.minute:02d} "
+        f"{meridiem} UTC"
+    )
 
 
 def parse_market_read_request(
@@ -650,6 +682,166 @@ def public_metrics(metrics: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _range_vs_spot_percent(metrics: dict[str, Any]) -> dict[str, float]:
+    spot = float(metrics["spot_price"])
+    middle = metrics["middle_50_range"]
+    low = _quantize_public(
+        ((float(middle["low_price"]) / spot) - 1.0) * 100.0,
+        PUBLIC_CONTEXT_PERCENT_DECIMALS,
+        "range_low_vs_spot_percent",
+    )
+    high = _quantize_public(
+        ((float(middle["high_price"]) / spot) - 1.0) * 100.0,
+        PUBLIC_CONTEXT_PERCENT_DECIMALS,
+        "range_high_vs_spot_percent",
+    )
+    return {
+        "low_percent": low,
+        "high_percent": high,
+        "width_percent": _quantize_public(
+            high - low,
+            PUBLIC_CONTEXT_PERCENT_DECIMALS,
+            "range_width_vs_spot_percent",
+        ),
+    }
+
+
+def _adjacent_expiry_rows(
+    snapshot: MarketReadSnapshot,
+    selected: MarketReadExpiry,
+) -> tuple[MarketReadExpiry | None, MarketReadExpiry | None]:
+    live = sorted(
+        (row for row in snapshot.expiries if row.expiry_date >= snapshot.as_of_date),
+        key=lambda row: row.expiry_date,
+    )
+    before = [row for row in live if row.expiry_date < selected.expiry_date]
+    after = [row for row in live if row.expiry_date > selected.expiry_date]
+    return (before[-1] if before else None, after[0] if after else None)
+
+
+def _neighbor_context(
+    target_iv_percent: float,
+    neighbor: MarketReadExpiry | None,
+) -> dict[str, Any] | None:
+    if neighbor is None:
+        return None
+    neighbor_iv = _quantize_public(
+        neighbor.atm_iv_annual * 100.0,
+        PUBLIC_IV_DECIMALS,
+        "neighbor_atm_iv_percent",
+    )
+    difference = _quantize_public(
+        target_iv_percent - neighbor_iv,
+        PUBLIC_IV_DECIMALS,
+        "target_minus_neighbor_vol_points",
+    )
+    if difference >= TERM_STRUCTURE_MATERIALITY_VOL_POINTS:
+        relation = RELATION_TARGET_HIGHER
+    elif difference <= -TERM_STRUCTURE_MATERIALITY_VOL_POINTS:
+        relation = RELATION_TARGET_LOWER
+    else:
+        relation = RELATION_SIMILAR
+    return {
+        "expiry": neighbor.expiry_date.isoformat(),
+        "atm_iv_percent": neighbor_iv,
+        "target_minus_neighbor_vol_points": difference,
+        "relation": relation,
+    }
+
+
+def _uncertainty_rating(
+    previous: dict[str, Any] | None,
+    following: dict[str, Any] | None,
+) -> tuple[str, str]:
+    previous_relation = previous["relation"] if previous is not None else None
+    following_relation = following["relation"] if following is not None else None
+
+    if previous_relation is not None and following_relation is not None:
+        pair = (previous_relation, following_relation)
+        if pair == (RELATION_TARGET_HIGHER, RELATION_TARGET_HIGHER):
+            return (
+                UNCERTAINTY_HIGHER_THAN_NEIGHBORS,
+                "This expiry prices noticeably more movement than both neighboring expiries.",
+            )
+        if pair == (RELATION_TARGET_LOWER, RELATION_TARGET_LOWER):
+            return (
+                UNCERTAINTY_LOWER_THAN_NEIGHBORS,
+                "This expiry prices noticeably less movement than both neighboring expiries.",
+            )
+        if pair == (RELATION_TARGET_HIGHER, RELATION_TARGET_LOWER):
+            return (
+                UNCERTAINTY_RISING,
+                "Implied volatility rises across the previous, selected, and next expiries.",
+            )
+        if pair == (RELATION_TARGET_LOWER, RELATION_TARGET_HIGHER):
+            return (
+                UNCERTAINTY_FALLING,
+                "Implied volatility falls across the previous, selected, and next expiries.",
+            )
+        if pair == (RELATION_SIMILAR, RELATION_SIMILAR):
+            return (
+                UNCERTAINTY_SIMILAR,
+                "This expiry prices about the same movement as both neighboring expiries.",
+            )
+        return (
+            UNCERTAINTY_MIXED,
+            "Nearby expiries do not show a clear volatility pattern around this expiry.",
+        )
+
+    available_relation = previous_relation or following_relation
+    if available_relation == RELATION_TARGET_HIGHER:
+        return (
+            UNCERTAINTY_HIGHER_THAN_AVAILABLE,
+            "This expiry prices noticeably more movement than the one available neighboring expiry.",
+        )
+    if available_relation == RELATION_TARGET_LOWER:
+        return (
+            UNCERTAINTY_LOWER_THAN_AVAILABLE,
+            "This expiry prices noticeably less movement than the one available neighboring expiry.",
+        )
+    if available_relation == RELATION_SIMILAR:
+        return (
+            UNCERTAINTY_SIMILAR_TO_AVAILABLE,
+            "This expiry prices about the same movement as the one available neighboring expiry.",
+        )
+    return (
+        UNCERTAINTY_UNAVAILABLE,
+        "There is not enough adjacent-expiry data to compare this expiry with nearby dates.",
+    )
+
+
+def build_interpretation(
+    snapshot: MarketReadSnapshot,
+    selected: MarketReadExpiry,
+    metrics: dict[str, Any],
+) -> dict[str, Any]:
+    target_iv = _quantize_public(
+        float(metrics["atm_iv_percent"]),
+        PUBLIC_IV_DECIMALS,
+        "target_atm_iv_percent",
+    )
+    previous_row, following_row = _adjacent_expiry_rows(snapshot, selected)
+    previous = _neighbor_context(target_iv, previous_row)
+    following = _neighbor_context(target_iv, following_row)
+    rating, description = _uncertainty_rating(previous, following)
+    return {
+        "days_to_expiry": (selected.expiry_date - snapshot.as_of_date).days,
+        "range_vs_spot_percent": _range_vs_spot_percent(metrics),
+        "uncertainty_context": {
+            "rating": rating,
+            "description": description,
+            "basis": "atm_iv_vs_adjacent_live_expiries",
+            "materiality_threshold_vol_points": TERM_STRUCTURE_MATERIALITY_VOL_POINTS,
+            "target_expiry": {
+                "expiry": selected.expiry_date.isoformat(),
+                "atm_iv_percent": target_iv,
+            },
+            "previous_expiry": previous,
+            "next_expiry": following,
+        },
+    }
+
+
 def serialize_market_read_json(payload: dict[str, Any]) -> bytes:
     return json.dumps(payload, separators=(",", ":"), sort_keys=True, allow_nan=False).encode("utf-8")
 
@@ -669,29 +861,39 @@ def render_answer(
     quote_currency: str,
     resolved_expiry: str,
     metrics: dict[str, Any],
+    interpretation: dict[str, Any],
     resolution: str = RESOLUTION_EXACT,
     requested_target_date: str | None = None,
     effective_target_date: str | None = None,
     offset_days: int = 0,
 ) -> str:
     mid = metrics["middle_50_range"]
+    range_percent = interpretation["range_vs_spot_percent"]
+    uncertainty = interpretation["uncertainty_context"]
+    resolved_expiry_display = _human_date(date.fromisoformat(resolved_expiry))
     body = ANSWER_TEMPLATE.format(
-        as_of=as_of,
+        as_of_display=humanize_as_of(as_of),
         asset=asset,
         quote_currency=quote_currency,
         spot=_whole_units(float(metrics["spot_price"])),
-        resolved_expiry=resolved_expiry,
+        resolved_expiry_display=resolved_expiry_display,
         median=_price_with_currency(quote_currency, float(metrics["median_terminal_price"])),
-        signed_percent=f"{float(metrics['median_vs_spot_percent']):+.1f}",
         low=_price_with_currency(quote_currency, float(mid["low_price"])),
         high=_price_with_currency(quote_currency, float(mid["high_price"])),
+        low_percent=f"{float(range_percent['low_percent']):+.1f}",
+        high_percent=f"{float(range_percent['high_percent']):+.1f}",
         iv=f"{float(metrics['atm_iv_percent']):.1f}",
+        uncertainty_description=uncertainty["description"],
     )
     if resolution == RESOLUTION_EXACT:
         return body
     prefix_kwargs = {
-        "effective_target_date": effective_target_date or "",
-        "resolved_expiry": resolved_expiry,
+        "effective_target_date_display": (
+            _human_date(date.fromisoformat(effective_target_date))
+            if effective_target_date
+            else ""
+        ),
+        "resolved_expiry_display": resolved_expiry_display,
         "absolute_offset": abs(offset_days),
     }
     if requested_target_date is None:
@@ -746,12 +948,14 @@ def build_market_read_response(
     )
     row = next(item for item in snapshot.expiries if item.expiry_date == resolved.expiry_date)
     metrics = derived_metrics(row)
+    interpretation = build_interpretation(snapshot, row, metrics)
     answer = render_answer(
         as_of=snapshot.as_of,
         asset=spec.asset_id,
         quote_currency=spec.quote_currency,
         resolved_expiry=resolved.expiry_date.isoformat(),
         metrics=metrics,
+        interpretation=interpretation,
         resolution=resolved.resolution,
         requested_target_date=requested_target_date,
         effective_target_date=resolved.effective_target_date.isoformat(),
@@ -763,6 +967,7 @@ def build_market_read_response(
         "asset": spec.asset_id,
         "quote_currency": spec.quote_currency,
         "as_of": snapshot.as_of,
+        "as_of_display": humanize_as_of(snapshot.as_of),
         "snapshot_id": snapshot.snapshot_id,
         "requested_target_date": requested_target_date,
         "effective_target_date": resolved.effective_target_date.isoformat(),
@@ -774,6 +979,7 @@ def build_market_read_response(
         "distribution_method": DISTRIBUTION_METHOD,
         "data_status": DATA_STATUS_CACHED,
         "metrics": public_metrics(metrics),
+        "interpretation": interpretation,
         "answer": answer,
     }
 
