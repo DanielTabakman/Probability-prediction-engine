@@ -783,9 +783,31 @@ def _uncertainty_rating(
                 UNCERTAINTY_SIMILAR,
                 "This expiry prices about the same movement as both neighboring expiries.",
             )
+        if pair == (RELATION_SIMILAR, RELATION_TARGET_LOWER):
+            description = (
+                "This expiry prices about the same movement as the previous expiry "
+                "and noticeably less than the next expiry."
+            )
+        elif pair == (RELATION_SIMILAR, RELATION_TARGET_HIGHER):
+            description = (
+                "This expiry prices about the same movement as the previous expiry "
+                "and noticeably more than the next expiry."
+            )
+        elif pair == (RELATION_TARGET_HIGHER, RELATION_SIMILAR):
+            description = (
+                "This expiry prices noticeably more movement than the previous expiry "
+                "and about the same as the next expiry."
+            )
+        elif pair == (RELATION_TARGET_LOWER, RELATION_SIMILAR):
+            description = (
+                "This expiry prices noticeably less movement than the previous expiry "
+                "and about the same as the next expiry."
+            )
+        else:
+            description = "Nearby expiries do not show a clear volatility pattern around this expiry."
         return (
             UNCERTAINTY_MIXED,
-            "Nearby expiries do not show a clear volatility pattern around this expiry.",
+            description,
         )
 
     available_relation = previous_relation or following_relation
