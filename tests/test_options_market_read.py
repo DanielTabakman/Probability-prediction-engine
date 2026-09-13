@@ -675,6 +675,11 @@ def test_adjacent_expiry_uncertainty_ratings(
     assert uncertainty["target_expiry"]["atm_iv_percent"] == target_iv
     assert uncertainty["previous_expiry"]["atm_iv_percent"] == previous_iv
     assert uncertainty["next_expiry"]["atm_iv_percent"] == next_iv
+    if expected_rating == "mixed_or_flat":
+        assert uncertainty["description"] == (
+            "This expiry prices about the same movement as the previous expiry "
+            "and noticeably less than the next expiry."
+        )
 
 
 def test_single_expiry_returns_honest_insufficient_context() -> None:
