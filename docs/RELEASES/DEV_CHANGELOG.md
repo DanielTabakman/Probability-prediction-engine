@@ -4,6 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-13
 
+- `84c596ae` — Product: Options Market Read v1.1 nearest-expiry resolution (#5449) (`src/viz/`)
+- `8cb7c882` — Control-plane: dev changelog
 - `b12a7c9d` — Platform: expose GET /v1/options-market-read public preview (#5448)
 
 ## 2026-09-12
