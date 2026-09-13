@@ -59,4 +59,4 @@ curl "http://127.0.0.1:8765/v1/options-market-read"
 curl "http://127.0.0.1:8765/v1/options-market-read?asset=BTC&target_date=2026-12-25"
 ```
 
-Tests may set `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` to a fixture. Production still needs a reverse-proxy path for `/v1/*` (Caddy today maps `/ppe-display-api/*` only). This slice does not deploy that mapping.
+Tests may set `PPE_OPTIONS_MARKET_READ_SNAPSHOT_PATH` to a fixture. Production Caddy exposes the exact path `GET /v1/options-market-read` (query preserved, no `/v1/*` wildcard).
