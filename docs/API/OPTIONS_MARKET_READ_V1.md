@@ -1,4 +1,4 @@
-# Options Market Read API v1
+# Options Market Read API v1.2
 
 **Product:** ask “What is the options market saying?” and receive a deterministic plain-English read of what options are currently pricing.  
 **Future Qatom tool:** `msos.options_market_read`  
@@ -44,7 +44,41 @@ Public JSON rounds **after** those calculations. PPE math and `display.json` sta
 
 NaN and Infinity are rejected (**503**), never serialized.
 
-This is risk-neutral options pricing, not a forecast. The `answer` string is a fixed template — no LLM, no bullish/bearish label.
+## Plain-language interpretation
+
+The machine timestamp remains exact ISO UTC in `as_of`. `as_of_display` and the
+fixed-template `answer` render that same timestamp in ordinary English, including
+the clock time and timezone (for example, `September 13, 2026 at 2:00 PM UTC`).
+
+`interpretation` adds:
+
+- calendar `days_to_expiry` from the snapshot date;
+- the middle-50% bounds and width as percentages of spot;
+- immediately previous and next live expiries, their ATM IV, and the selected
+  expiry's signed difference from each in volatility points;
+- a deterministic relative-uncertainty rating and matching plain-language sentence.
+
+The rating compares annualized ATM IV only with immediately adjacent live
+expiries from the same snapshot. A **1.0 volatility-point** materiality band
+prevents tiny differences from being described as meaningful. Ratings are:
+
+- `higher_than_neighbors` / `lower_than_neighbors`;
+- `rising_across_expiries` / `falling_across_expiries`;
+- `similar_to_neighbors` / `mixed_or_flat`;
+- one-sided equivalents when only one neighbor exists;
+- `insufficient_context` when neither neighbor exists.
+
+This is not an absolute low/moderate/high rating and does not compare with
+history. The API does not infer bullish/bearish direction from the lognormal
+median or forward. It is risk-neutral options pricing, not a forecast or trade
+recommendation. The `answer` string is deterministic and uses no LLM.
+
+## Product boundary
+
+This endpoint informs: what range and relative uncertainty options currently
+price for a supported expiry. Exposure selection, opportunity ranking, strategy
+construction, and trade recommendations are deliberately excluded. Any future
+opportunity or exposure product must use a separate API contract.
 
 ## Data
 

@@ -1,11 +1,14 @@
 openapi: 3.1.0
 info:
   title: Options Market Read
-  version: "1.1"
+  version: "1.2"
   description: >
     GET /v1/options-market-read returns a deterministic plain-English read of
-    what the options market is pricing, from a prepared PPE lognormal snapshot.
+    what the options market is pricing, including relative uncertainty versus
+    adjacent expiries, from a prepared PPE lognormal snapshot.
 servers:
+  - url: https://marketstructureos.com
+    description: Public preview
   - url: http://127.0.0.1:8765
     description: Local WSGI display server
 paths:
@@ -72,6 +75,7 @@ components:
         - asset
         - quote_currency
         - as_of
+        - as_of_display
         - snapshot_id
         - requested_target_date
         - effective_target_date
@@ -83,14 +87,15 @@ components:
         - distribution_method
         - data_status
         - metrics
+        - interpretation
         - answer
       properties:
         schema_version:
           type: string
-          const: "1.1"
+          const: "1.2"
         ruleset_version:
           type: string
-          const: options-market-read.v1.1
+          const: options-market-read.v1.2
         asset:
           type: string
         quote_currency:
@@ -98,6 +103,9 @@ components:
         as_of:
           type: string
           format: date-time
+        as_of_display:
+          type: string
+          description: Human-readable rendering of as_of, including time and UTC.
         snapshot_id:
           type: string
         requested_target_date:
@@ -128,6 +136,8 @@ components:
           const: cached
         metrics:
           $ref: "#/components/schemas/MarketReadMetrics"
+        interpretation:
+          $ref: "#/components/schemas/MarketReadInterpretation"
         answer:
           type: string
     MarketReadMetrics:
@@ -181,6 +191,114 @@ components:
               type: number
               multipleOf: 0.01
               description: Rounded high minus rounded low, 2 decimal places.
+    MarketReadInterpretation:
+      type: object
+      additionalProperties: false
+      required:
+        - days_to_expiry
+        - range_vs_spot_percent
+        - uncertainty_context
+      properties:
+        days_to_expiry:
+          type: integer
+          minimum: 0
+          description: Calendar days from the snapshot as_of date to the resolved expiry.
+        range_vs_spot_percent:
+          $ref: "#/components/schemas/RangeVsSpotPercent"
+        uncertainty_context:
+          $ref: "#/components/schemas/UncertaintyContext"
+    RangeVsSpotPercent:
+      type: object
+      additionalProperties: false
+      required: [low_percent, high_percent, width_percent]
+      properties:
+        low_percent:
+          type: number
+          multipleOf: 0.01
+        high_percent:
+          type: number
+          multipleOf: 0.01
+        width_percent:
+          type: number
+          multipleOf: 0.01
+          description: Rounded high_percent minus rounded low_percent.
+    UncertaintyContext:
+      type: object
+      additionalProperties: false
+      required:
+        - rating
+        - description
+        - basis
+        - materiality_threshold_vol_points
+        - target_expiry
+        - previous_expiry
+        - next_expiry
+      properties:
+        rating:
+          type: string
+          enum:
+            - higher_than_neighbors
+            - lower_than_neighbors
+            - rising_across_expiries
+            - falling_across_expiries
+            - similar_to_neighbors
+            - mixed_or_flat
+            - higher_than_available_neighbor
+            - lower_than_available_neighbor
+            - similar_to_available_neighbor
+            - insufficient_context
+        description:
+          type: string
+          description: Deterministic regular-language explanation of the rating.
+        basis:
+          type: string
+          const: atm_iv_vs_adjacent_live_expiries
+        materiality_threshold_vol_points:
+          type: number
+          const: 1.0
+        target_expiry:
+          $ref: "#/components/schemas/ExpiryIvContext"
+        previous_expiry:
+          anyOf:
+            - $ref: "#/components/schemas/AdjacentExpiryComparison"
+            - type: "null"
+        next_expiry:
+          anyOf:
+            - $ref: "#/components/schemas/AdjacentExpiryComparison"
+            - type: "null"
+    ExpiryIvContext:
+      type: object
+      additionalProperties: false
+      required: [expiry, atm_iv_percent]
+      properties:
+        expiry:
+          type: string
+          format: date
+        atm_iv_percent:
+          type: number
+          multipleOf: 0.01
+    AdjacentExpiryComparison:
+      type: object
+      additionalProperties: false
+      required:
+        - expiry
+        - atm_iv_percent
+        - target_minus_neighbor_vol_points
+        - relation
+      properties:
+        expiry:
+          type: string
+          format: date
+        atm_iv_percent:
+          type: number
+          multipleOf: 0.01
+        target_minus_neighbor_vol_points:
+          type: number
+          multipleOf: 0.01
+          description: Selected expiry ATM IV minus neighboring expiry ATM IV.
+        relation:
+          type: string
+          enum: [target_higher, target_lower, similar]
     ApiError:
       type: object
       additionalProperties: false
