@@ -2,8 +2,13 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-13
+
+- `b12a7c9d` — Platform: expose GET /v1/options-market-read public preview (#5448)
+
 ## 2026-09-12
 
+- `b248c2ec` — Control-plane: dev changelog
 - `aa21cc8f` — Product: GET /v1/options-market-read (Options Market Read v1) (#5447) (`src/viz/`)
 - `bb1dc239` — Control-plane: dev changelog
 - `d3fbe76f` — PPE: region_bet_market_compare_bridge_v1 (#5444) (`apps/msos-web/`)
