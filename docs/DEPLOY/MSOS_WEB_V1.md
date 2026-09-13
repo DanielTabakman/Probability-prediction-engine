@@ -53,6 +53,7 @@ export PPE_PRODUCT_USAGE_JSONL=/opt/marketstructureos/data/ppe_product_usage.jso
 |------|---------|-------|
 | `/ppe-embed/*` | `app_demo:8501` | Same-origin Streamlit demo for Strategy Lab iframe (`NEXT_PUBLIC_PPE_EMBED_URL=/ppe-embed`) |
 | `/ppe-display-api/*` | `ppe_display_api:8765` | Read-only distribution display JSON (`embed_display_boundary`; chromeless fallback uses `/ppe-embed?embed_only=1`) |
+| `/v1/options-market-read` | `ppe_display_api:8765` | Exact public preview path only — no `/v1/*` wildcard; original path and query are forwarded |
 
 Strip prefix `/ppe-embed` before upstream. See [`MSOS_P1_STACK_ROUTING_ADR.md`](../SOP/MSOS_P1_STACK_ROUTING_ADR.md).
 

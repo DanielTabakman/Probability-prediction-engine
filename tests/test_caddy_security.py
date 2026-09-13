@@ -40,3 +40,26 @@ def test_compose_mounts_caddy_snippets_and_certs() -> None:
     assert "PPE_CADDYFILE" in compose
     assert "./caddy:/etc/caddy/caddy:ro" in compose
     assert "./certs:/certs:ro" in compose
+
+
+def _options_market_read_handle(snippets: str) -> str:
+    start = snippets.index("@options_market_read path /v1/options-market-read")
+    rest = snippets[start:]
+    handle_at = rest.index("handle @options_market_read")
+    block = rest[handle_at:]
+    end = block.index("\n\t}")
+    return block[: end + 3]
+
+
+def test_options_market_read_exact_proxy_preserves_path() -> None:
+    snippets = (REPO_ROOT / "caddy" / "snippets.caddy").read_text(encoding="utf-8")
+    assert "@options_market_read path /v1/options-market-read" in snippets
+    assert "path /v1/*" not in snippets
+    assert "path /v1/options-market-read/*" not in snippets
+    handle = _options_market_read_handle(snippets)
+    assert "reverse_proxy ppe_display_api:8765" in handle
+    assert "strip_prefix" not in handle
+    display_start = snippets.index("@ppe_display_api path /ppe-display-api /ppe-display-api/*")
+    display_block = snippets[display_start : snippets.index("@options_market_read")]
+    assert "uri strip_prefix /ppe-display-api" in display_block
+    assert "reverse_proxy ppe_display_api:8765" in display_block
