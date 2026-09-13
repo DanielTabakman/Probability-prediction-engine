@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Options Market Read
-  version: "1.0"
+  version: "1.1"
   description: >
     GET /v1/options-market-read returns a deterministic plain-English read of
     what the options market is pricing, from a prepared PPE lognormal snapshot.
@@ -44,7 +44,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiError"
         "422":
-          description: Unsupported asset, past date, or no eligible expiry.
+          description: Unsupported asset, past date, or no expiry within the permitted gap.
           content:
             application/json:
               schema:
@@ -74,8 +74,12 @@ components:
         - as_of
         - snapshot_id
         - requested_target_date
+        - effective_target_date
         - default_horizon_days
         - resolved_expiry
+        - expiry_offset_days
+        - expiry_resolution
+        - max_expiry_gap_days
         - distribution_method
         - data_status
         - metrics
@@ -83,10 +87,10 @@ components:
       properties:
         schema_version:
           type: string
-          const: "1.0"
+          const: "1.1"
         ruleset_version:
           type: string
-          const: options-market-read.v1
+          const: options-market-read.v1.1
         asset:
           type: string
         quote_currency:
@@ -99,12 +103,23 @@ components:
         requested_target_date:
           type: ["string", "null"]
           format: date
+        effective_target_date:
+          type: string
+          format: date
         default_horizon_days:
           type: integer
           const: 30
         resolved_expiry:
           type: string
           format: date
+        expiry_offset_days:
+          type: integer
+          description: resolved_expiry minus effective_target_date, in calendar days.
+        expiry_resolution:
+          type: string
+          enum: [exact, nearest_before, nearest_after]
+        max_expiry_gap_days:
+          type: integer
         distribution_method:
           type: string
           const: lognormal

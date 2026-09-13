@@ -28,6 +28,7 @@ from src.viz.options_market_read import (
     load_snapshot_from_json,
     public_metrics,
     render_answer,
+    resolve_expiry,
     snapshot_from_display_payload,
     snapshot_from_export_rows,
     snapshot_from_payload,
@@ -81,7 +82,12 @@ def test_no_argument_defaults_to_btc_and_30_days() -> None:
     assert payload["requested_target_date"] is None
     assert payload["default_horizon_days"] == 30
     assert payload["resolved_expiry"] == "2026-07-06"
-    assert payload["ruleset_version"] == "options-market-read.v1"
+    assert payload["schema_version"] == "1.1"
+    assert payload["ruleset_version"] == "options-market-read.v1.1"
+    assert payload["effective_target_date"] == "2026-07-06"
+    assert payload["expiry_offset_days"] == 0
+    assert payload["expiry_resolution"] == "exact"
+    assert payload["max_expiry_gap_days"] == 14
     assert payload["distribution_method"] == "lognormal"
     assert payload["data_status"] == "cached"
     assert payload["snapshot_id"] == "omr-fixture-btc-2026-06-06"
@@ -99,13 +105,43 @@ def test_exact_expiry_resolution() -> None:
     status, payload = _request("target_date=2026-12-25")
     assert status == "200 OK"
     assert payload["resolved_expiry"] == "2026-12-25"
+    assert payload["effective_target_date"] == "2026-12-25"
+    assert payload["expiry_offset_days"] == 0
+    assert payload["expiry_resolution"] == "exact"
+    assert payload["answer"] == (
+        "As of 2026-06-06T12:00:00Z, BTC spot is USD 100,000. "
+        "For options expiring 2026-12-25, the options-implied terminal distribution "
+        "is centred near USD 108,000, which is +8.0% versus spot. The middle 50% of "
+        "priced outcomes runs from USD 80,000 to USD 140,000, and ATM implied "
+        "volatility is 55.0%. This is risk-neutral options pricing, not a forecast."
+    )
 
 
-def test_first_expiry_after_target_date() -> None:
+def test_nearest_later_expiry_has_positive_offset() -> None:
+    status, payload = _request("target_date=2026-07-03")
+    assert status == "200 OK"
+    assert payload["effective_target_date"] == "2026-07-03"
+    assert payload["resolved_expiry"] == "2026-07-06"
+    assert payload["expiry_offset_days"] == 3
+    assert payload["expiry_resolution"] == "nearest_after"
+    assert payload["answer"].startswith(
+        "The requested target date 2026-07-03 is represented by the nearest "
+        "supported options expiry, 2026-07-06, 3 days after the target. "
+    )
+
+
+def test_nearest_earlier_expiry_has_negative_offset() -> None:
     status, payload = _request("target_date=2026-10-01")
     assert status == "200 OK"
     assert payload["requested_target_date"] == "2026-10-01"
-    assert payload["resolved_expiry"] == "2026-12-25"
+    assert payload["effective_target_date"] == "2026-10-01"
+    assert payload["resolved_expiry"] == "2026-09-25"
+    assert payload["expiry_offset_days"] == -6
+    assert payload["expiry_resolution"] == "nearest_before"
+    assert payload["answer"].startswith(
+        "The requested target date 2026-10-01 is represented by the nearest "
+        "supported options expiry, 2026-09-25, 6 days before the target. "
+    )
 
 
 def test_lowercase_asset_normalization() -> None:
@@ -350,7 +386,9 @@ def test_wsgi_display_and_market_read_share_cached_payload() -> None:
     get_cached_display_payload("BTC", DISPLAY_DEPTH_FULL, lambda: display)
     app = create_display_payload_wsgi_app(build_cached_live_distribution_display_payload)
     display_status, _headers, display_body = _call(app, "/display.json", "asset=BTC&depth=full")
-    omr_status, _omr_headers, omr_body = _call(app, OPTIONS_MARKET_READ_HTTP_PATH, "asset=BTC")
+    omr_status, _omr_headers, omr_body = _call(
+        app, OPTIONS_MARKET_READ_HTTP_PATH, "asset=BTC&target_date=2030-01-01"
+    )
     assert display_status == "200 OK"
     assert omr_status == "200 OK"
     display_payload = json.loads(display_body.decode("utf-8"))
@@ -408,7 +446,7 @@ def test_public_json_normalizes_numeric_precision() -> None:
     assert raw["middle_50_range"]["width"] == pytest.approx(13415.449999999997)
     assert raw["median_vs_spot_percent"] == pytest.approx(-0.8366696314497046)
     status, body = handle_options_market_read_request(
-        {"QUERY_STRING": ""},
+        {"QUERY_STRING": "target_date=2026-10-30"},
         snapshot_loader=lambda: snapshot,
     )
     assert status == "200 OK"
@@ -510,3 +548,89 @@ def test_default_path_does_not_select_fixture(monkeypatch: pytest.MonkeyPatch) -
     snapshot = load_prepared_snapshot("BTC")
     assert seen["asset_id"] == "BTC"
     assert snapshot.snapshot_id == "omr-fixture-btc-2026-06-06"
+
+
+def _dated_snapshot(expiries: list[str], *, as_of: str = "2026-06-06T12:00:00Z"):
+    return snapshot_from_payload(
+        {
+            "as_of": as_of,
+            "asset": "BTC",
+            "quote_currency": "USD",
+            "snapshot_id": "omr-expiry-resolution",
+            "expiries": [
+                {
+                    "expiry_date": expiry,
+                    "spot_usd": 100000.0,
+                    "forward_usd": 101000.0,
+                    "atm_iv_annual": 0.5,
+                    "q25_usd": 90000.0,
+                    "q50_usd": 102500.0,
+                    "q75_usd": 120000.0,
+                }
+                for expiry in expiries
+            ],
+        }
+    )
+
+
+def test_equal_distance_tie_selects_later_expiry() -> None:
+    snapshot = _dated_snapshot(["2026-06-10", "2026-06-20"])
+    status, payload = _request("target_date=2026-06-15", snapshot=snapshot)
+    assert status == "200 OK"
+    assert payload["resolved_expiry"] == "2026-06-20"
+    assert payload["expiry_offset_days"] == 5
+    assert payload["expiry_resolution"] == "nearest_after"
+
+
+def test_expired_contracts_are_never_selected() -> None:
+    snapshot = _dated_snapshot(["2026-06-05", "2026-06-10"])
+    resolved = resolve_expiry(
+        date(2026, 6, 8),
+        [date(2026, 6, 5), date(2026, 6, 10)],
+        as_of_date=date(2026, 6, 6),
+        max_expiry_gap_days=14,
+    )
+    assert resolved.expiry_date == date(2026, 6, 10)
+    status, payload = _request("target_date=2026-06-08", snapshot=snapshot)
+    assert status == "200 OK"
+    assert payload["resolved_expiry"] == "2026-06-10"
+    assert payload["expiry_offset_days"] == 2
+
+
+def test_closest_expiry_beyond_gap_returns_422() -> None:
+    snapshot = _dated_snapshot(["2026-06-27", "2026-12-25"])
+    status, payload = _request("target_date=2026-08-15", snapshot=snapshot)
+    assert status == "422 Unprocessable Entity"
+    err = payload["error"]
+    assert err["code"] == "expiry_not_close_enough"
+    assert err["message"] == "No supported options expiry is within 14 days of the target date."
+    assert err["details"] == {
+        "effective_target_date": "2026-08-15",
+        "max_expiry_gap_days": 14,
+        "nearest_before": "2026-06-27",
+        "nearest_after": "2026-12-25",
+    }
+
+
+def test_fourteen_day_gap_is_permitted() -> None:
+    snapshot = _dated_snapshot(["2026-07-04"])
+    status, payload = _request("target_date=2026-06-20", snapshot=snapshot)
+    assert status == "200 OK"
+    assert payload["resolved_expiry"] == "2026-07-04"
+    assert payload["expiry_offset_days"] == 14
+    assert payload["expiry_resolution"] == "nearest_after"
+    assert payload["max_expiry_gap_days"] == 14
+
+
+def test_default_horizon_discloses_nearest_expiry() -> None:
+    snapshot = _dated_snapshot(["2026-07-01"])
+    status, payload = _request("", snapshot=snapshot)
+    assert status == "200 OK"
+    assert payload["effective_target_date"] == "2026-07-06"
+    assert payload["resolved_expiry"] == "2026-07-01"
+    assert payload["expiry_offset_days"] == -5
+    assert payload["expiry_resolution"] == "nearest_before"
+    assert payload["answer"].startswith(
+        "The default 30-day target is represented by the nearest supported "
+        "options expiry, 2026-07-01, 5 days before the target. "
+    )
