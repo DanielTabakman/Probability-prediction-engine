@@ -14,12 +14,19 @@ class MarketReadAsset:
     asset_id: str
     quote_currency: str
     enabled: bool = True
+    max_expiry_gap_days: int = 14
 
 
 DEFAULT_ASSET_ID = "BTC"
+BTC_MAX_EXPIRY_GAP_DAYS = 14
 
 _REGISTRY: dict[str, MarketReadAsset] = {
-    "BTC": MarketReadAsset(asset_id="BTC", quote_currency="USD", enabled=True),
+    "BTC": MarketReadAsset(
+        asset_id="BTC",
+        quote_currency="USD",
+        enabled=True,
+        max_expiry_gap_days=BTC_MAX_EXPIRY_GAP_DAYS,
+    ),
 }
 
 

@@ -17,7 +17,13 @@ Does **not** change `/ppe-display-api/*`. Replaces the earlier `/v1/implied-rang
 
 ## Expiry resolution
 
-Exact listed expiry if present; otherwise the first expiry on or after the target. Never an earlier expiry. `resolved_expiry` is always returned. No eligible expiry → **422**. A target before the snapshot `as_of` date → **422**.
+`effective_target_date` is the explicit `target_date`, or snapshot `as_of` date + 30 calendar days.
+
+Contracts already expired relative to snapshot `as_of` are ignored. Exact listed expiry wins. Otherwise the nearest live expiry by absolute calendar-day distance is used; equal distance prefers the later expiry. Earlier or later expiries are allowed. BTC permits a maximum gap of **14** calendar days (`max_expiry_gap_days` on the BTC registry row). Beyond that → **422** `expiry_not_close_enough`.
+
+Success responses include `effective_target_date`, signed `expiry_offset_days` (`resolved_expiry − effective_target_date`), `expiry_resolution` (`exact` / `nearest_before` / `nearest_after`), and `max_expiry_gap_days`. A target before the snapshot `as_of` date → **422** `past_target_date`.
+
+Non-exact answers prepend a deterministic sentence naming the target, the chosen expiry, and the absolute day offset. That sentence does not imply bullish or bearish.
 
 ## Metrics
 

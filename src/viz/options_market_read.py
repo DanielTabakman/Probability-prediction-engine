@@ -26,8 +26,11 @@ from src.viz.options_market_read_assets import (
 )
 
 OPTIONS_MARKET_READ_HTTP_PATH = "/v1/options-market-read"
-SCHEMA_VERSION = "1.0"
-RULESET_VERSION = "options-market-read.v1"
+SCHEMA_VERSION = "1.1"
+RULESET_VERSION = "options-market-read.v1.1"
+RESOLUTION_EXACT = "exact"
+RESOLUTION_NEAREST_BEFORE = "nearest_before"
+RESOLUTION_NEAREST_AFTER = "nearest_after"
 DISTRIBUTION_METHOD = "lognormal"
 LOGNORMAL_DISTRIBUTION = "lognormal_reference"
 DATA_STATUS_CACHED = "cached"
@@ -45,6 +48,24 @@ ANSWER_TEMPLATE = (
     "spot. The middle 50% of priced outcomes runs from {low} to {high}, and "
     "ATM implied volatility is {iv}%. This is risk-neutral options pricing, "
     "not a forecast."
+)
+EXPLICIT_BEFORE_PREFIX = (
+    "The requested target date {effective_target_date} is represented by the "
+    "nearest supported options expiry, {resolved_expiry}, {absolute_offset} days "
+    "before the target. "
+)
+EXPLICIT_AFTER_PREFIX = (
+    "The requested target date {effective_target_date} is represented by the "
+    "nearest supported options expiry, {resolved_expiry}, {absolute_offset} days "
+    "after the target. "
+)
+DEFAULT_BEFORE_PREFIX = (
+    "The default 30-day target is represented by the nearest supported options "
+    "expiry, {resolved_expiry}, {absolute_offset} days before the target. "
+)
+DEFAULT_AFTER_PREFIX = (
+    "The default 30-day target is represented by the nearest supported options "
+    "expiry, {resolved_expiry}, {absolute_offset} days after the target. "
 )
 
 
@@ -219,16 +240,74 @@ def default_target_date(as_of_date: date) -> date:
     return as_of_date + timedelta(days=DEFAULT_HORIZON_DAYS)
 
 
-def resolve_expiry(target: date, expiry_dates: list[date]) -> date:
-    on_or_after = sorted(d for d in expiry_dates if d >= target)
-    if not on_or_after:
-        raise OptionsMarketReadError(
-            422,
-            "expiry_unavailable",
-            "No options expiry on or after the requested date.",
-            {"requested_target_date": target.isoformat()},
+@dataclass(frozen=True)
+class ResolvedExpiry:
+    expiry_date: date
+    effective_target_date: date
+    offset_days: int
+    resolution: str
+    max_expiry_gap_days: int
+
+
+def live_expiry_dates(expiry_dates: list[date], as_of_date: date) -> list[date]:
+    return sorted(d for d in expiry_dates if d >= as_of_date)
+
+
+def nearest_expiry_neighbors(
+    live_dates: list[date],
+    target: date,
+) -> tuple[date | None, date | None]:
+    before = [d for d in live_dates if d < target]
+    after = [d for d in live_dates if d > target]
+    return (max(before) if before else None, min(after) if after else None)
+
+
+def resolve_expiry(
+    target: date,
+    expiry_dates: list[date],
+    *,
+    as_of_date: date,
+    max_expiry_gap_days: int,
+) -> ResolvedExpiry:
+    live = live_expiry_dates(expiry_dates, as_of_date)
+    nearest_before, nearest_after = nearest_expiry_neighbors(live, target)
+    if target in live:
+        return ResolvedExpiry(
+            expiry_date=target,
+            effective_target_date=target,
+            offset_days=0,
+            resolution=RESOLUTION_EXACT,
+            max_expiry_gap_days=max_expiry_gap_days,
         )
-    return on_or_after[0]
+
+    def _gap_error() -> OptionsMarketReadError:
+        return OptionsMarketReadError(
+            422,
+            "expiry_not_close_enough",
+            f"No supported options expiry is within {max_expiry_gap_days} days of the target date.",
+            {
+                "effective_target_date": target.isoformat(),
+                "max_expiry_gap_days": max_expiry_gap_days,
+                "nearest_before": nearest_before.isoformat() if nearest_before else None,
+                "nearest_after": nearest_after.isoformat() if nearest_after else None,
+            },
+        )
+
+    if not live:
+        raise _gap_error()
+
+    chosen = min(live, key=lambda d: (abs((d - target).days), -d.toordinal()))
+    offset_days = (chosen - target).days
+    if abs(offset_days) > max_expiry_gap_days:
+        raise _gap_error()
+    resolution = RESOLUTION_NEAREST_BEFORE if offset_days < 0 else RESOLUTION_NEAREST_AFTER
+    return ResolvedExpiry(
+        expiry_date=chosen,
+        effective_target_date=target,
+        offset_days=offset_days,
+        resolution=resolution,
+        max_expiry_gap_days=max_expiry_gap_days,
+    )
 
 
 def _canonical_snapshot_id(payload: dict[str, Any]) -> str:
@@ -590,9 +669,13 @@ def render_answer(
     quote_currency: str,
     resolved_expiry: str,
     metrics: dict[str, Any],
+    resolution: str = RESOLUTION_EXACT,
+    requested_target_date: str | None = None,
+    effective_target_date: str | None = None,
+    offset_days: int = 0,
 ) -> str:
     mid = metrics["middle_50_range"]
-    return ANSWER_TEMPLATE.format(
+    body = ANSWER_TEMPLATE.format(
         as_of=as_of,
         asset=asset,
         quote_currency=quote_currency,
@@ -604,6 +687,22 @@ def render_answer(
         high=_price_with_currency(quote_currency, float(mid["high_price"])),
         iv=f"{float(metrics['atm_iv_percent']):.1f}",
     )
+    if resolution == RESOLUTION_EXACT:
+        return body
+    prefix_kwargs = {
+        "effective_target_date": effective_target_date or "",
+        "resolved_expiry": resolved_expiry,
+        "absolute_offset": abs(offset_days),
+    }
+    if requested_target_date is None:
+        prefix = (
+            DEFAULT_BEFORE_PREFIX if resolution == RESOLUTION_NEAREST_BEFORE else DEFAULT_AFTER_PREFIX
+        )
+    else:
+        prefix = (
+            EXPLICIT_BEFORE_PREFIX if resolution == RESOLUTION_NEAREST_BEFORE else EXPLICIT_AFTER_PREFIX
+        )
+    return prefix.format(**prefix_kwargs) + body
 
 
 def build_market_read_response(
@@ -639,15 +738,24 @@ def build_market_read_response(
             },
         )
     expiry_dates = [row.expiry_date for row in snapshot.expiries]
-    resolved = resolve_expiry(resolved_target, expiry_dates)
-    row = next(item for item in snapshot.expiries if item.expiry_date == resolved)
+    resolved = resolve_expiry(
+        resolved_target,
+        expiry_dates,
+        as_of_date=snapshot.as_of_date,
+        max_expiry_gap_days=spec.max_expiry_gap_days,
+    )
+    row = next(item for item in snapshot.expiries if item.expiry_date == resolved.expiry_date)
     metrics = derived_metrics(row)
     answer = render_answer(
         as_of=snapshot.as_of,
         asset=spec.asset_id,
         quote_currency=spec.quote_currency,
-        resolved_expiry=resolved.isoformat(),
+        resolved_expiry=resolved.expiry_date.isoformat(),
         metrics=metrics,
+        resolution=resolved.resolution,
+        requested_target_date=requested_target_date,
+        effective_target_date=resolved.effective_target_date.isoformat(),
+        offset_days=resolved.offset_days,
     )
     return {
         "schema_version": SCHEMA_VERSION,
@@ -657,8 +765,12 @@ def build_market_read_response(
         "as_of": snapshot.as_of,
         "snapshot_id": snapshot.snapshot_id,
         "requested_target_date": requested_target_date,
+        "effective_target_date": resolved.effective_target_date.isoformat(),
         "default_horizon_days": DEFAULT_HORIZON_DAYS,
-        "resolved_expiry": resolved.isoformat(),
+        "resolved_expiry": resolved.expiry_date.isoformat(),
+        "expiry_offset_days": resolved.offset_days,
+        "expiry_resolution": resolved.resolution,
+        "max_expiry_gap_days": resolved.max_expiry_gap_days,
         "distribution_method": DISTRIBUTION_METHOD,
         "data_status": DATA_STATUS_CACHED,
         "metrics": public_metrics(metrics),
