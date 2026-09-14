@@ -2,8 +2,15 @@
 
 Human-readable release notes for work that landed on `main`. Updated on merge, daily (UTC), and chapter closeout.
 
+## 2026-09-14
+
+_No merges to `main`._
+
 ## 2026-09-13
 
+- `ceb0ccfb` — Product: make mixed expiry context specific (#5451) (`src/viz/`)
+- `425ee974` — Product: add qualitative Options Market Read context v1.2 (#5450) (`src/viz/`)
+- `34ebcb56` — Control-plane: dev changelog
 - `84c596ae` — Product: Options Market Read v1.1 nearest-expiry resolution (#5449) (`src/viz/`)
 - `8cb7c882` — Control-plane: dev changelog
 - `b12a7c9d` — Platform: expose GET /v1/options-market-read public preview (#5448)
