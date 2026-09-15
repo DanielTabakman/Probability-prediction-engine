@@ -22,10 +22,25 @@
 - **summary:** Merge PR #737 so context_window_closeout --capture routes via ppe_thread_capture.py on main.
 - **trigger keywords:** thread insight, context closeout, ppe_thread_capture
 
+### Record operator pass at burst end only
+
+- **id:** `operator_pass_record_at_burst_end` · **priority:** low · **status:** parked
+- **added:** 2026-08-06
+- **summary:** Today prepare_operator_status records every refresh (dedupe 120s). Prefer explicit --record-pass from @ppe-director / burst finish so pass streak reflects real operator cycles, not status polls. Revisit when touching burst plan, director closeout, or ppe_operator_pass_progress. Pre-split thread residual — not in DESKTOP_OPERATOR plan.
+- **trigger keywords:** operator pass, burst, ppe-director, pass progress
+
+### Per-slice SLA hint on Progress/Waiting line
+
+- **id:** `operator_pass_slice_sla_hint` · **priority:** low · **status:** parked
+- **added:** 2026-08-06
+- **summary:** Surface historical median closeout duration for active phase/slice type in OPERATOR_STATUS Waiting line (e.g. typical FINISH closeout ~45m). Medians already in _budget_for_phase; expose in format_pass_lines. Revisit with pass-progress or DESKTOP_OPERATOR Step 5 truth card. Pre-split thread residual.
+- **trigger keywords:** operator pass, sla, pass progress, desktop automation
+
 ### Skim THREAD_INSIGHTS during SELECTION
 
-- **id:** `surface_thread_insights_at_selection` · **priority:** low · **status:** parked
+- **id:** `surface_thread_insights_at_selection` · **priority:** low · **status:** surfaced
 - **added:** 2026-06-30
+- **surfaced:** 2026-06-30T21:00:24Z
 - **summary:** When burst or what's next runs SELECTION, agent should skim recent THREAD_INSIGHTS.md entries for the active chapter_id (not only TRIGGERED_IDEAS alerts).
 - **trigger keywords:** selection, what's next, burst
 
@@ -40,4 +55,4 @@
 
 ## Changelog
 
-| 2026-06-30 | Auto-render from JSON |
+| 2026-08-06 | Auto-render from JSON |
