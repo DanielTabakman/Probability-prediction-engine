@@ -74,6 +74,8 @@ def test_equity_chapter_closed_queue_and_manifest() -> None:
         "docs/SOP/PHASE_PLANS/mvp1_distribution_timeseries_collector_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_forward_consistency_radar_v1_relay.json",
         "docs/SOP/PHASE_PLANS/msos_storyboard_visual_parity_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/options_horizon_comparison_v1_relay.json",
+        "docs/SOP/PHASE_PLANS/options_expression_fit_ranking_v1_relay.json",
     )
     assert status in ("READY", "RUNNING", "COMPLETE", "BLOCKED")
     if status == "COMPLETE":
