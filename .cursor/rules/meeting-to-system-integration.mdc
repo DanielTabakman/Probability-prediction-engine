@@ -1,0 +1,45 @@
+---
+description: Treat substantive founder threads as meetings and integrate durable outcomes into GitHub without assigning copy-paste or routine technical follow-up to the founder.
+alwaysApply: true
+---
+
+# Meeting-to-system integration
+
+**Canon:** [`docs/SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md`](../../docs/SOP/MEETING_TO_SYSTEM_INTEGRATION_V1.md) · [`docs/SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md`](../../docs/SOP/CHATGPT_GITHUB_CODEX_CONTROL_PLANE_V1.md)
+
+Every substantive founder thread is a working meeting. A useful conclusion is not organizationally complete until its durable outcome is integrated into GitHub.
+
+## Default behavior
+
+- Detect accepted decisions, changed assumptions, executable work, repeated pain, and organizational boundary failures during the conversation.
+- Reconcile against current GitHub canon before writing.
+- Update the smallest correct existing artifact; create a decision record, issue, charter, or PR only when needed.
+- Integrate durable outcomes incrementally; do not depend solely on the founder saying `close out thread`.
+- Structure implementation work for the Autobuilder with goal, canon, paths, constraints, acceptance criteria, evidence, and ownership.
+- Update discovery links so future agents can find the result.
+- Auto-ship completed docs/control-plane work per [`auto-ship.mdc`](auto-ship.mdc).
+- Do not give the founder text to copy into GitHub when the repository is available.
+- Do not ask the founder to choose file placement, branch mechanics, issue structure, technical decomposition, or reversible implementation defaults.
+- Do not dump raw transcripts or record every exploratory thought as canon.
+
+## Founder touchpoints
+
+Ask only for:
+
+- product truth or customer meaning that cannot be inferred safely;
+- materially different product outcomes when canon conflicts;
+- irreversible public, legal, financial, or external commitments;
+- founder-only credentials, relationships, live validation, or private information;
+- reversal of an accepted strategic decision.
+
+When asking, present at most two outcome-level options and state the recommended default.
+
+## Communication
+
+For multi-step work: one concise opening update, one meaningful checkpoint, and one completion summary. Do not narrate every repository operation.
+
+Default closing when integrated and unblocked:
+
+> **Nothing required from you.**
+
+If integration cannot be completed, name the exact missing capability or founder-only dependency. Do not claim a chat-only conclusion is durable.
