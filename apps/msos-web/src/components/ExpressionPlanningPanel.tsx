@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { resolveCurveLabels } from "@/lib/chartCurveLabels";
 import { ContextRail } from "@/components/ContextRail";
 import { ExpressionPayoffChartFrame } from "@/components/ExpressionPayoffChartFrame";
+import { OptionsExpressionFitRankingPanel } from "@/components/OptionsExpressionFitRankingPanel";
 import { TradeProsConsCard } from "@/components/TradeProsConsCard";
 import { PendingPaperTradeBanner } from "@/components/PendingPaperTradeBanner";
 import { PlanLegRow } from "@/components/PlanLegRow";
@@ -55,6 +56,15 @@ import { displayCurrencyDisclaimer } from "@/lib/displayCurrency";
 import { useDisplayCurrency } from "@/lib/useDisplayCurrency";
 import { loadStoredStrategyLabExpiry } from "@/lib/strategyLabExpiry";
 import { relabelPlanLegsForAsset } from "@/lib/planLegDisplay";
+import {
+  fetchExposureMenuClient,
+  type ExposureMenuPayload,
+} from "@/lib/ppeExposureMenu";
+import {
+  buildCandidateFromStrategySuggestion,
+  buildCandidatesFromExposureMenu,
+  rankOptionsExpressionFit,
+} from "@/lib/optionsExpressionFitRanking";
 import { DEMO_FOOTER } from "@/lib/publicCopy";
 
 function familyIdForPreset(presetId?: string): string {
@@ -130,6 +140,7 @@ export function ExpressionPlanningPanel() {
   const [suggestion, setSuggestion] = useState<StrategySuggestionPayload | null>(null);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
+  const [exposureMenu, setExposureMenu] = useState<ExposureMenuPayload | null>(null);
   const [expiry, setExpiry] = useState<string | null>(null);
   const [savePending, setSavePending] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -216,6 +227,20 @@ export function ExpressionPlanningPanel() {
       abort.cancelled = true;
     };
   }, [hydrated, thesisConfirmed, assetId]);
+
+  useEffect(() => {
+    if (!hydrated || !thesisConfirmed) return;
+    const abort = { cancelled: false };
+    const horizon = thesis.horizonDays >= 270 ? "12m" : thesis.horizonDays <= 120 ? "3m" : "any";
+    const direction =
+      suggestion?.suggested?.expression_family === "range" ? "neutral" : "long";
+    void fetchExposureMenuClient(assetId, direction, horizon).then((payload) => {
+      if (!abort.cancelled) setExposureMenu(payload);
+    });
+    return () => {
+      abort.cancelled = true;
+    };
+  }, [hydrated, thesisConfirmed, assetId, thesis.horizonDays, suggestion?.suggested?.expression_family]);
 
   const livePlan = useMemo(() => {
     const suggested = suggestion?.suggested;
@@ -320,6 +345,30 @@ export function ExpressionPlanningPanel() {
     suggestion?.suggested?.review?.payoff_line ?? null,
     suggestion?.suggested?.review?.structure_line ?? null,
   );
+  const expressionFitRanking = useMemo(() => {
+    const exposureCandidates = buildCandidatesFromExposureMenu(exposureMenu);
+    const strategyCandidate = buildCandidateFromStrategySuggestion(
+      suggestion,
+      thesis.horizonDays,
+    );
+    if (strategyCandidate) {
+      strategyCandidate.source_order = exposureCandidates.length;
+    }
+    const candidates = [
+      ...exposureCandidates,
+      ...(strategyCandidate ? [strategyCandidate] : []),
+    ];
+    if (!candidates.length) {
+      return null;
+    }
+    return rankOptionsExpressionFit(candidates, {
+      direction: suggestion?.suggested?.expression_family === "range" ? "neutral" : "long",
+      belief: thesis.disagreementLine ?? thesis.referenceLabel,
+      target_horizon_days: thesis.horizonDays,
+      max_loss_usd: suggestion?.suggested?.summary?.max_loss_usd ?? null,
+      payoff_preference: "defined_risk",
+    });
+  }, [exposureMenu, suggestion, thesis]);
 
   return (
     <>
@@ -439,6 +488,7 @@ export function ExpressionPlanningPanel() {
               {suggestion?.suggested?.review?.linkage_line ? (
                 <p className="micro">{suggestion.suggested.review.linkage_line}</p>
               ) : null}
+              <OptionsExpressionFitRankingPanel ranking={expressionFitRanking} />
               <div className="risk-note">{expressionRiskNote}</div>
 
               <details className="planner-advanced">
