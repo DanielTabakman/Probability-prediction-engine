@@ -4,7 +4,9 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-15
 
-_No merges to `main`._
+- `0e04b102` — Product: add educational options expression fit ranking (#5454) (`apps/msos-web/`)
+- `94dfc411` — Control-plane: select Options Made Simple job B (#5453) (`docs/SOP/`)
+- `d67d1325` — Control-plane: dev changelog
 
 ## 2026-09-14
 
