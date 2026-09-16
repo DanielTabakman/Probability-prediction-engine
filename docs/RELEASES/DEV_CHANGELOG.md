@@ -4,7 +4,8 @@ Human-readable release notes for work that landed on `main`. Updated on merge, d
 
 ## 2026-09-16
 
-_No merges to `main`._
+- `bc946fa7` — Control: charter Region Bet backlog continuation (#5456) (`docs/SOP/`)
+- `56ccef8e` — Control-plane: dev changelog
 
 ## 2026-09-15
 
